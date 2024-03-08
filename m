@@ -1,74 +1,73 @@
-Return-Path: <netdev+bounces-78774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 139C887667D
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 15:43:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1514087667F
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 15:43:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A363B2162A
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 14:43:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38AD21C21832
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 14:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00341865;
-	Fri,  8 Mar 2024 14:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C293FF4;
+	Fri,  8 Mar 2024 14:43:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="BFYQ4oP+"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="rA7k3VPc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F6341852
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 14:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4BAA8BEF
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 14:43:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709908979; cv=none; b=sA7lN/fJR0GjPWgR1ORVAm63Ak9aqydAn0vvTVFAWCgFjyezEsdPnMmDYv5angArY3IxJmKwDvE2MNLMASh+MO87O7sAq5sYU2d05i3Ip5XcNLu01erH2rHhXnSXYivS3jdQIeiTuphEQjvcTaLJ4uUZeMFG7o7AdUzo/A99Tr8=
+	t=1709908986; cv=none; b=FHDa1PXOrhSogTKjfT9mKbAL6iGyNP+m3xN/OtbjTG+Mag4zyVtNtFq1Bz/WmoEHlWDzD+7RBPAlEl00aZjGh9F11POiJrVmUaoZ0eLpzEccuue+8yW8VfDqMUp7xaCb/T2cOmAy0b+uG2Nlflh/NwcPr1bAQLxtL1EkH7iLUXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709908979; c=relaxed/simple;
-	bh=ZRSk8RM+meM3sYLmU+PEfluHkNnoft+SQSxuvdCMK6w=;
+	s=arc-20240116; t=1709908986; c=relaxed/simple;
+	bh=NJiEARa6MYFWiUt/Ymhn4L3Te/Kdy17V57I5e+I1Uh8=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kTSnVeQo4pNvNKuJ/V8QB1BApAKVJ04BRFuDTicDaiRLYmC6AE3DAj4BkGTNS/MXgSwzv2YxmSrV3n/JSev5+MXu/YOmaD077o03dS6IlbC1uUndHIwrTQq93n8sKCbU+b+o+AMhem7V7FPpye2X0qe30GaaEk/qrdEg08wFck4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=BFYQ4oP+; arc=none smtp.client-ip=209.85.208.44
+	 In-Reply-To:Content-Type; b=ExwWfOq9TuVmG225IvP6PRfWkCnT1sVg17giPADJiG76a1QKG5GuzIf+Tti+mccxcC704mEAxTT+yKXvrh/UvzIzAe4gRGWgTP0LtIBwf1Q+SK2XzTslZhCRvpFsSUVbyPNrSs1VcQ4YvbzuU1gfwuzKPrU+sEeukjnXBN6tHS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=rA7k3VPc; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-563c403719cso2695056a12.2
-        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 06:42:56 -0800 (PST)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-564647bcdbfso1094836a12.2
+        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 06:43:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709908975; x=1710513775; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=o75KofuTcDCWu9VpzQFqT60wzO78WLD1fq0V4X3Ed6A=;
-        b=BFYQ4oP+UsJggky0iZ109OG2fE1+mDrM90D6sYa2vd2TvZDvAsTKx9BiifTa4noFeH
-         4Zl1PUyCKW37/TIisaS79R2StJR/FhyP5yVa/dTYtTHeEWW7KixJCyUM3ZB6BJKizL/Q
-         XF8eVQQmIKdAE4KBpI2ZNnncNozTmMyBBwSbD5ZbPgWW8FbGRq+AXcbIMqH78NaaeoQQ
-         lajSZs+jH0n8fymtHa1n+grHC3HUBcEEXVeQwhr3rN6qZw4aZVE6N+SEe8BCFn4eMQQw
-         v/50HczFsQtqh6ycJbfoCUtr/L3NFHKGEYlJuWHqdH7DJUDkUblKmdXC3k1Ak0EQrNza
-         XZ1A==
+        d=linaro.org; s=google; t=1709908983; x=1710513783; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3WThYkRRnhJpIC3YncPeDPwQRNUn+5aJXkkEDEWnla8=;
+        b=rA7k3VPc1kkfXvbQ8vxBC4agdPhrllha3DDIMkAHz3ZAbsNYkj0nlWo0R1jSrvsSsn
+         SfmOpqbENkyh2l/RVLRC9fl9Uhx80PsX69yt6YQmkNN4UXzA0ykxUW4dnuB27Sg1NpAq
+         kbqQRv8n8wTnUYohb96dqqr0KQytXwUFJqMtOn6Ll1nKwAM2RFDsEt+KImdfrv7OJIFu
+         IM9WZL++F/40FO4sOK8SQDTxrNA+U9bq6Sg0L9Zt/K6JmE7YpV7+7e4eacEF7rr/FP37
+         5Dk8gJXFFrJzGOW2jH5slpEhHXBcrKWltBuZHo7snR11iekIy0LPKzFRkP7ruA7Sblec
+         nGng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709908975; x=1710513775;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o75KofuTcDCWu9VpzQFqT60wzO78WLD1fq0V4X3Ed6A=;
-        b=qj/qlXxU02Gvu8FIKT5zxcLGLGj4faDowaU05WbGRVp+2Yo4bQ+dxFtQhfe+Zs0qVP
-         pR27PRe2gYtS899Y/N+JhJcLT9a5gTj3rq2bDwyfSuj+I8LJXWmma5IGxK54uUW8RMR0
-         huFiAjju17Ce1jRFU+XCkPkvVZIIp6nD9e1SwX5izoNl166dUFtrLTkYB6xeA/p2xWZR
-         c/dQ1wqnTmeapJ+pMidXYEgEmAKDrc1K092DaP9XqlToFcjOD7Wyy8Z93IHrJIhnv0PF
-         yUBreMTEUE+V16tI3cVQGD0ztt1pkn4ra5zD3GJzl6k7oOWOARI4KppsRBl6Dal1b6ex
-         /FIQ==
-X-Gm-Message-State: AOJu0YwHXRTp/ZuoyoslY7Lgkgh8dUJhrvwZWBZ9bHzye4QKo899tIam
-	5bNsWmi1W9IDPAgoYmLzWhLgrz86ExufJet9DKMwYHugwconJw0CJaYZAJXbgTk=
-X-Google-Smtp-Source: AGHT+IG1sxDHT27XqCSxpd1Pyq5w8JXXaU/A1+51dFQOHRtYJ3zrYsZOeQfS2TFXuX673ws/NMLLNw==
-X-Received: by 2002:a17:906:c7c3:b0:a3f:1b49:c92b with SMTP id dc3-20020a170906c7c300b00a3f1b49c92bmr15991680ejb.48.1709908975528;
-        Fri, 08 Mar 2024 06:42:55 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709908983; x=1710513783;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3WThYkRRnhJpIC3YncPeDPwQRNUn+5aJXkkEDEWnla8=;
+        b=bsPcfKg1DrlSyMlsGklIbQhQNlxrT4nhRZQbGNLBVxRAL5hXJlPfAUbH6cljBhNGVA
+         dOHU9/VQZt1cZtOzopVZl8l3P9NEjSFZGSPlrJVR49F7nh5uMr9KgWI5QhmMPpvfUtp/
+         naA7cn7JlIyrbyrUeoLO+DSqLWkM65pkgm0OkTheQfE+fmTAC9RhO6gAlzsbS+cX8/gc
+         x/roOiZOWshbjwohU0jzHIKTfhqiH/jlGumS5C5M67TUliTGikeKAYet9AXPb9pKWVgc
+         c3Kn3qWqVhIDbyVmHr/uCTg4XWxeJNr2K/wi/GZqQ0RqVm4uC0i4aSPHRTteoRr/t2hS
+         PW8w==
+X-Gm-Message-State: AOJu0YxkGvfRxLKPIAVCjEhfQ/CtEq0qA94IwWayohUmvLoX1gRD86qD
+	JU2YHLNPjh2WcCFp0M8hGQpp+H/z6UUiClNfX2MB+SlyQhrfcWwz17+IR21LDg0=
+X-Google-Smtp-Source: AGHT+IG9kumHDKD6N4NHH16d50SIK5Yt/Wg19a+u5iiJekdrCOPSfWSyUdlHS5SEBnACd6Nhq47JvA==
+X-Received: by 2002:a17:906:99d4:b0:a45:f560:99fb with SMTP id s20-20020a17090699d400b00a45f56099fbmr1041586ejn.4.1709908983147;
+        Fri, 08 Mar 2024 06:43:03 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.222.97])
-        by smtp.gmail.com with ESMTPSA id me14-20020a170906aece00b00a45c9474442sm2096353ejb.18.2024.03.08.06.42.53
+        by smtp.gmail.com with ESMTPSA id me14-20020a170906aece00b00a45c9474442sm2096353ejb.18.2024.03.08.06.43.01
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Mar 2024 06:42:55 -0800 (PST)
-Message-ID: <651ad19b-19b1-4a7a-8c8d-d25a8a9aeaba@linaro.org>
-Date: Fri, 8 Mar 2024 15:42:52 +0100
+        Fri, 08 Mar 2024 06:43:02 -0800 (PST)
+Message-ID: <703cc72d-f163-4a47-ad46-7865bb2db31a@linaro.org>
+Date: Fri, 8 Mar 2024 15:43:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,8 +75,9 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v10 6/8] dt-bindings: net: hisi-femac: add
- binding for Hi3798MV200 FEMAC core
+Subject: Re: [PATCH net-next v10 7/8] net: hisi_femac: remove unused
+ compatible strings
+Content-Language: en-US
 To: forbidden405@outlook.com, Yisen Zhuang <yisen.zhuang@huawei.com>,
  Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
@@ -89,8 +89,7 @@ To: forbidden405@outlook.com, Yisen Zhuang <yisen.zhuang@huawei.com>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  devicetree@vger.kernel.org
 References: <20240308-net-v10-0-3684df40897e@outlook.com>
- <20240308-net-v10-6-3684df40897e@outlook.com>
-Content-Language: en-US
+ <20240308-net-v10-7-3684df40897e@outlook.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -136,37 +135,22 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240308-net-v10-6-3684df40897e@outlook.com>
+In-Reply-To: <20240308-net-v10-7-3684df40897e@outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 08/03/2024 09:39, Yang Xiwen via B4 Relay wrote:
 > From: Yang Xiwen <forbidden405@outlook.com>
 > 
-> HiSilicon FEMAC core is also found on Hi3798MV200 SoC. Document it in
-> binding. While at it, make "hisilicon,hi3516cv200-femac" as the fallback
-> compatible.
+> It's hard to get the version number for each FEMAC core and it's unknown
+> how the version can be used. Remove them until it's really needed.
+> 
+> While at it, remove fallback compatibles and only use SoC compatible.
 > 
 > Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
-> ---
->  Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml b/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
-> index 5cd2331668bc..cee10d263d0b 100644
-> --- a/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
-> +++ b/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
-> @@ -14,8 +14,12 @@ allOf:
->  
->  properties:
->    compatible:
-> -    enum:
-> -      - hisilicon,hi3516cv300-femac
 
-If you do not intend to keep it enum, this could be const in the first
-place.
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
 Krzysztof
