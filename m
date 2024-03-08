@@ -1,97 +1,132 @@
-Return-Path: <netdev+bounces-78662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87F178760DE
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 10:23:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E2D28760EA
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 10:29:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 428F6284680
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:23:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B21E41C211B6
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D2252F79;
-	Fri,  8 Mar 2024 09:23:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA7CE219FC;
+	Fri,  8 Mar 2024 09:29:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vyiubk5Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Y/c73erH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70D52EACE
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 09:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4639E22F0F;
+	Fri,  8 Mar 2024 09:29:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709889816; cv=none; b=PS+GkqxRlQ9f85qAH8FpOah//7W/JKu6eAKG3lrQ+Sivt5S7jLK7HyEuQT2Q+MuuAevj2EeEJw9+VwSvB9TB8msaAI9Bjaj7ZWAcFxaalE02Pum/NImKw1RXCSvyb1doFz8fIrb7bfwoOBiJrb1m50jVV7dhyLFzsK+Smkat5/o=
+	t=1709890164; cv=none; b=JNfl/lB5ZE2XAfYRh56dXi7mFD1/BhOGWBNBpLpprdVur4LNRuNBdGGOSywpOdw0J5lVh0Oo4QkQIibb2I3vbh/0GlzZmltKyef+RHEN2fF70osZQpbHojn6G/XDNFv4NazQJ69ercz5iQYAMtwW2FGuN1O9Y2Zg/xGy10a3Tis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709889816; c=relaxed/simple;
-	bh=BLfLBotghxVWtoLRFRUPVIXYAebp/0X/BggmnPDgDQs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CIjfZmuhknSK7VPFonL1PDx55N/05RU1YoF9Z1zsaqCNLYRjMyHU+NnPAMnNmf+JegyDIYiGq4NBMGlFyL8eBGbrzpA2algXgEjn7cWAZeaIrKe+M5sgwOX2esIOegc14yWIWrwvq34e8ZqTfcDyOnahswpBt5cHbW/Pb4gyVJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vyiubk5Y; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-565223fd7d9so6743a12.1
-        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 01:23:34 -0800 (PST)
+	s=arc-20240116; t=1709890164; c=relaxed/simple;
+	bh=g+Ary5J7O5Fu0wFVLDbo5dWH+BoCRSoUQeruUGAsVos=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=uDjmPcPBEi4so5hd4zPKTdLgAjZ3SYmtJPh9150VrvvT+VnDh4TcFKJliMpahrJZMQcAbam5wAthY0FU7PvO6SNpD5BkXP/FucF/GpSlZA9CpvO7vjgcBgWg+iYh5XexZnqMFM1gL4F6MGOdpg4mCnh3YMvgkiVgD89wz9BojV8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Y/c73erH; arc=none smtp.client-ip=209.85.210.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6e66e8fcc2dso262402b3a.3;
+        Fri, 08 Mar 2024 01:29:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709889813; x=1710494613; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BLfLBotghxVWtoLRFRUPVIXYAebp/0X/BggmnPDgDQs=;
-        b=vyiubk5Y69HjxkklBqvBZX550FMslVdeKMlniogPwQ7Fe4NXPEOU0egLiua3akcMNP
-         CYK6AL6ml0FcUSwfMvOvIMAm2ZbZGY8V5hurrErGwC+XXFSnexrN9DYtxUCUrl0jENw3
-         lvUUsTptf9s+CVopIF/Z4DN6lxAxr2lLAhbJTbqZwdLAdujuUmmXiVYjjlvnirOHf0gB
-         PdX/k8gE5Y+Hjk5ivhdjyM5Fw9Sygoa+uBHqJBtvXHIdmZaKDijL9IA+WjAFGvk54f+s
-         Tdpw1lw2rLkGFiujLCzkFMPmchFpernk5oYuyAqXzveH/JQdHwPzSIOzwIoM4/fsoa6A
-         Ij7A==
+        d=gmail.com; s=20230601; t=1709890162; x=1710494962; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q5LUw2+4jv0MJgeX3mrmHBcnaH5rMiClPvVd/LqRsqg=;
+        b=Y/c73erHq0YHK8GNF5dmf1LRtwFW+KZCJAn7pqbyEGAtTlMR319tZ6pI442ibQyh6X
+         GkUMxgkY9pwBYyTJJZSHKR/hE0Cm07O5eakTNZa86ZkCuiRAiD1pXdA5RcHm0YCVg/uD
+         YaRB8yFWrffDQWXgBeY/EkJ3ZzUu6K6dr5czaUv3HXKhl8ogAEZGBc/PJfZK2TBLF15p
+         69SFdzixSJK/t8qHgh59y3oXbrLtTY5hYpaSL+oUgil5M159zCSF+M/YrQsyjhJRU+tJ
+         emD9Q9n71ff/lvX3x5fL+GzZl3n3jpTOHYImA8Vn3WaBpCEn63DDVGQZighVrm2hgxTI
+         c8ZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709889813; x=1710494613;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BLfLBotghxVWtoLRFRUPVIXYAebp/0X/BggmnPDgDQs=;
-        b=XSkTp60cNIPT+kNr9nkjpzKL1EeIH3CY1UPXZqKHT9/FqihsD8wnJr3XWwA3zMfl//
-         8/afLOr5PYuN0/2HfDasp6Y7Sdf9FKOqonR2eCL9Z+8EwVpxLbmgC8tkdY+iiw3jaqfR
-         kyqwlNs0Ycp0L+NhBYLZXRf813x+kSRNXnSmK1aAtD1+MgoaKtr6vxWbKqmXn+pbQvpW
-         xMHm0tGsggbeH8pl4sJTE4KxM4XRiXqmjtKRgealmuHQ9c3Q8GfpBKGL5aB7kiEIKo8S
-         BcC3FoUch5e9HSgO7Yt/U6QF3i65E16c07NgnwYqU8gNt+NV8O3INw5YD0K3NBES0XnH
-         v/Vg==
-X-Forwarded-Encrypted: i=1; AJvYcCUFW6BRuPuuwet9TGOvY7oNWCOWbOAuWGVSnFThBYhHaaIWJ9Lq0/d9CI5bt9AYjXE79cR75Xu5cS5nhc4nNh3hgtEK1QTc
-X-Gm-Message-State: AOJu0YwjVMcLhKmTX1rGOBZ6xkBA93w1oJQ6GiUpfEph6a9wb5vBIEjG
-	cNu4yYsBeH/RBouz/qE9nEN8IO/r4cOA+p1gUiu/OsMN+adkRLxgoHxiVsmdf6/uqF7NTXZG1KF
-	27ClE8KW4Y9577PZuwuhvoWp2RmN4yHfA7ZqDGj4aEchoSiiU2mcB
-X-Google-Smtp-Source: AGHT+IH6czIi3utJKKVj3TJUq9W3dW6SorPIfpYMWpaJ0oJltEhlUuxH6M72xPHQ5+YaZDnTvjfImCU6y2xl7VBtvZg=
-X-Received: by 2002:a05:6402:5202:b0:567:eb05:6d08 with SMTP id
- s2-20020a056402520200b00567eb056d08mr440836edd.6.1709889812581; Fri, 08 Mar
- 2024 01:23:32 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709890162; x=1710494962;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Q5LUw2+4jv0MJgeX3mrmHBcnaH5rMiClPvVd/LqRsqg=;
+        b=KtD0XamEefzLF90aMiAeI66SFB/DUKJ7cMrKpFdzu7kefhwddgMRvx+aHHlhnYFJoS
+         i/oYnYkf/O9TFNRvG7DIH0Bj0b5G04jKC878DH80JpBCs6NizJhbkqudMNcIPmIKothx
+         F1PXE5LWvwQQOHBsOxycSM/81ZvQHVnjXs5oYwVDSk+PJMzRz0rcaX6UJT/gJx2tIQ0d
+         dzn+egiVpZo4TXP1GGbPS6a4k18aeiBMJ+YLkm53XR5UXuKFyzX7nOzAf4/7PRrNQVDJ
+         O8ntd7fT8yK7aFNuPPL/8YP48IwrzwlVB/2WlGN5klUQL3hDb1ckEIFwxj+KoOdxNjYp
+         YoDA==
+X-Forwarded-Encrypted: i=1; AJvYcCXbuJjXfchXNeJG1ctD3nhJ90nmbEPTLI3USNH1CO6KvbBpljaydxcyHYu/X4apOF+JZkL/cWjBWywSCMZ6ueTNhmNkgPaL
+X-Gm-Message-State: AOJu0YwTtVbTDl5zrRBfGlNs4v4sEGuiAzqjun7wS1XRpZoFCMxKpmIB
+	k8rHLzX4IsJEpi5twrhCu1DsxFhUUeDky/6J/fl/DonlJ6XhcLhy
+X-Google-Smtp-Source: AGHT+IGJ4vg6MaBba70jCI6cmfv4uRKZ1SwNamPYMsp1IacfjKMbWDACFVlL33y6GlArMtAirRk8XQ==
+X-Received: by 2002:a05:6a20:548a:b0:1a1:6cf5:5bf1 with SMTP id i10-20020a056a20548a00b001a16cf55bf1mr6344768pzk.12.1709890162406;
+        Fri, 08 Mar 2024 01:29:22 -0800 (PST)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
+        by smtp.gmail.com with ESMTPSA id q6-20020a170902a3c600b001dd6290283fsm1547332plb.248.2024.03.08.01.29.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Mar 2024 01:29:21 -0800 (PST)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: edumazet@google.com,
+	pablo@netfilter.org,
+	kadlec@netfilter.org,
+	fw@strlen.de,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	netdev@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next] netfilter: conntrack: dccp: try not to drop skb in conntrack
+Date: Fri,  8 Mar 2024 17:29:14 +0800
+Message-Id: <20240308092915.9751-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240307220016.3147666-1-edumazet@google.com> <d149f4511c39f39fa6dc8e7c7324962434ae82e9.camel@redhat.com>
- <77f54006d8127bc76c8fb81c7cfa8df1723e317e.camel@redhat.com>
-In-Reply-To: <77f54006d8127bc76c8fb81c7cfa8df1723e317e.camel@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 8 Mar 2024 10:23:21 +0100
-Message-ID: <CANn89iJzpFRgiNatNgS_U9D975DED2L0ieG=o6qb2qz2YB=rWg@mail.gmail.com>
-Subject: Re: [PATCH net-next] udp: no longer touch sk->sk_refcnt in early demux
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
-	eric.dumazet@gmail.com, Martin KaFai Lau <kafai@fb.com>, Joe Stringer <joe@wand.net.nz>, 
-	Alexei Starovoitov <ast@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 8, 2024 at 10:20=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
->
-> Please ignore this last part, too late I noticed we need 'sock_pfree'
-> to let inet_steal_sock() work as expected.
+From: Jason Xing <kernelxing@tencent.com>
 
-Yes, this is skb_sk_is_prefetched() part.
+It would be better not to drop skb in conntrack unless we have good
+alternative as Florian said[1]. So we can treat the result of testing
+skb's header pointer as nf_conntrack_tcp_packet() does.
+
+[1]
+Link: https://lore.kernel.org/all/20240307141025.GL4420@breakpoint.cc/
+
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+ net/netfilter/nf_conntrack_proto_dccp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/netfilter/nf_conntrack_proto_dccp.c b/net/netfilter/nf_conntrack_proto_dccp.c
+index e2db1f4ec2df..ebc4f733bb2e 100644
+--- a/net/netfilter/nf_conntrack_proto_dccp.c
++++ b/net/netfilter/nf_conntrack_proto_dccp.c
+@@ -525,7 +525,7 @@ int nf_conntrack_dccp_packet(struct nf_conn *ct, struct sk_buff *skb,
+ 
+ 	dh = skb_header_pointer(skb, dataoff, sizeof(*dh), &_dh.dh);
+ 	if (!dh)
+-		return NF_DROP;
++		return -NF_ACCEPT;
+ 
+ 	if (dccp_error(dh, skb, dataoff, state))
+ 		return -NF_ACCEPT;
+@@ -533,7 +533,7 @@ int nf_conntrack_dccp_packet(struct nf_conn *ct, struct sk_buff *skb,
+ 	/* pull again, including possible 48 bit sequences and subtype header */
+ 	dh = dccp_header_pointer(skb, dataoff, dh, &_dh);
+ 	if (!dh)
+-		return NF_DROP;
++		return -NF_ACCEPT;
+ 
+ 	type = dh->dccph_type;
+ 	if (!nf_ct_is_confirmed(ct) && !dccp_new(ct, skb, dh, state))
+-- 
+2.37.3
+
 
