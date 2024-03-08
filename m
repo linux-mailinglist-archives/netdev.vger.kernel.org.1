@@ -1,338 +1,220 @@
-Return-Path: <netdev+bounces-78610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A41B875DDC
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 07:04:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AE00875DE5
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 07:10:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E9CD1F21F18
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 06:04:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 59330B21F06
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 06:10:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA4A3611E;
-	Fri,  8 Mar 2024 06:03:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FA1236139;
+	Fri,  8 Mar 2024 06:09:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SHyDNdvc"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="kbw+DRvI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9344358A5
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 06:03:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709877838; cv=none; b=T1s/qDqpdeNmvt8G0z/eUR+SGRK/gametle7gEQaduEaUamakFfJxxeAPNlthwZUjEQ8NbYHsOu9/T60HeWTahJTzU3zBCiQN5/Qm3bJ3984sXl+HheXyq7eqMpUC4zlCc2IZAyjMHCDAjPPHD+kWZ81cYXuowWITYwZUD96Ub4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709877838; c=relaxed/simple;
-	bh=jgt2FmcV3Yk28s1hw88s4sNZ9AfG+QarsYVdwOdt8LQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Nsrs3ABKku6faXsWAX7idV2lNxMsl0niTMXEbpQcEiXxR6+aMmBOco7S+gBS2iqFMqeSpa5L+BY1OgtLJJ2eHPMxT8ywvZkOgMfSSYa5RU6Q7pgP2fvMxfCb8VkrJ3EZcSF5izewvQeX/G65Yp7mTqa+bHTZ+Oq23yTN47iPX9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SHyDNdvc; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1709877835;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yaMKbz1uGEbeDlqPaWY/PoRYwRKKFpuiuv79VQFM3t8=;
-	b=SHyDNdvcBdi1IeJTzTG7WgTFlZsjiJzS5kgOrgtko5vwewLQyDep7T0pvNhP0H0xSvKwI+
-	WxPCFB3iIvNasACtNohOJJN+egWp3bCNdVQzpCK4BwV18xPWQY1tTpEZLrsZTqW6xYorl/
-	xXWAdD4cuTzayZWhLhIY7kucBgkxc5w=
-Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
- [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-492-krVt2AJ-NBaLHwqxFkJwxQ-1; Fri, 08 Mar 2024 01:03:53 -0500
-X-MC-Unique: krVt2AJ-NBaLHwqxFkJwxQ-1
-Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-5c17cff57f9so1318704a12.0
-        for <netdev@vger.kernel.org>; Thu, 07 Mar 2024 22:03:53 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709877832; x=1710482632;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yaMKbz1uGEbeDlqPaWY/PoRYwRKKFpuiuv79VQFM3t8=;
-        b=pY4c9HN+ANS4bv7rWrfGGdeVbG5EezdbBsCEMpwZ9lvoPgCRQzrtdo/XSf8GTePqAc
-         kJ6Cd/ZecG6KFMDJtAgVz37hsX2w6P7DqyOzyGqQc2ex/aLcpn/3fiRjgG1Kug2AWDri
-         l68HOAm0B5Hfh0eSLr8Vove2Q2HeR2lhnIJEaAy1yvLyAE1Yhn5EH1Usv9PCpR8AlL7j
-         MnF3CGXxxRKRt7sWm5HYMBf9p+ewZRII/ZYRYYU2QweYuGGRkTqQa9A8Vg7k60AcbrB3
-         98JMi5R61t++8A6qNalfdMh3hoS8IzOpXF7ayhlD+hkj+5A5fi5LyPh72m4cPfnPHyPV
-         sVXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX9QRlQxpq4XBJEzE22Sq4NHGK7KDSEva0fCgA4w3GQ0wGPvjbeKWqAI0BADwu/6dAYE8cY8b/4q78yI7N4O7NiUcDIRjIU
-X-Gm-Message-State: AOJu0YxG59CtScQ5mtU9bCxgRipT0jhOk1exDmTFu7ql1qhshgqJWdlM
-	wdy0whljIryxEKew8OsqG3MYDXr+tr1tDGzSgVOdDBYEZXPU7roepn0pbFD2KTkVbXnrbj7XiVF
-	y+0CzgZajoGFEoS6EL4yBh4xctsec8/JGt27cRK92ylIgKeUQnpTcnMiqKZm5LOEeGbVJwVuc9+
-	v7ktrMt21N7AouR77hQ74C5vY6g88k
-X-Received: by 2002:a05:6a20:1586:b0:1a0:ebbd:9ae7 with SMTP id h6-20020a056a20158600b001a0ebbd9ae7mr11552898pzj.4.1709877832495;
-        Thu, 07 Mar 2024 22:03:52 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFwSy+KRC/GSn2zLsN0UNnw00pTdXTREweDEIwdkwzwwVJ8XmarEUl1eSz0tZAv2yTcVHqnwoNrrIMVt2DhM18=
-X-Received: by 2002:a05:6a20:1586:b0:1a0:ebbd:9ae7 with SMTP id
- h6-20020a056a20158600b001a0ebbd9ae7mr11552863pzj.4.1709877832102; Thu, 07 Mar
- 2024 22:03:52 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 388B32D634;
+	Fri,  8 Mar 2024 06:09:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709878197; cv=fail; b=Tw72/woBbAgiVzdLBiOs8ihmbEybr1kAYox5nPHAg524dcN3LcsrJjJ30ao5r87T4WjCmn6+a4XVBjuJQvSwtP3xlAOXOLLDSnHEQsFyqMPSxqPNUA9X8HBlDWTApM6gcEYe1WsNELvhR6KWECRheNXGrSlz/ZfX88UhCqfo+EY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709878197; c=relaxed/simple;
+	bh=4OdMWdCtkHEPk6Ck5qrdzwYnqvl7EpKtaWQ69h7DAcA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=o5GOEo2w9QE3H/SB8z6sxngYlL+MRQm9cc9SUskgPPKjaw7itkmN1fxtdggFQ33mDGklWZWz8gbfbCZKFV57wX/RQ4pMBx58tv1nQ7J5BIomM9R2Hda3bYWLWCBFCOfV/euMYiAdP2WCIGIvpCcy8TiIKfdU7Zy8zWC+bcUjR80=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=kbw+DRvI; arc=fail smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 427JDd1C020847;
+	Thu, 7 Mar 2024 22:09:41 -0800
+Received: from nam11-dm6-obe.outbound.protection.outlook.com (mail-dm6nam11lp2168.outbound.protection.outlook.com [104.47.57.168])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3wqkj5squs-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Mar 2024 22:09:41 -0800 (PST)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=J/84CexH2cKb4z9dzipVOfIW2tlSpPhNui3LMA+k2yPowYrkySnbIqHtMnbFGfBx7R4EXiUjyJ2dycJ0g5IYTBVP/Pyt4nhhJgnUi155ORMafXKn8HrvfgoPE8wzjya91oksHIwguw7GkvmOCRtSl4YRdkObrxH8AW8B+Pq7Cqw+aWryf9PKgSGLDq0tfjHD2hyr1n+QonzNshjnv/CzP6PRFUphX2F7dC1N3i2k1bwN8ajjRfCrTBzLnl40MBeP6xEq7UuD0ZLK1MfJ+GJesq6Jc7n4J574rBFxU0mrpw7TuolK96n9gvJUGwPEVcJGEVVRTCPIJqK/OZR+twyBIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8JVAtw+3+0MEvJFMqFq1CP1B8W/To1yvkCx9lSWBmvE=;
+ b=dI3E5jexzVHEQ+9vBQLjDuHTRxfjmtMVi0c9jBWUDTBnIpeQDZoHNR3WgbaHknbAOBA0985HYGoxfr5RbZLV/XX0JcbCR274MKulbFftA8Xkpxb4n4j3tPCYfd/Q/RUnR1iK/NdNzwDs0D0JYVI8199Y6J046KX/OR71P53g8GRkN44ZEKa7sZPefWNT82kDvZJ5+0DtoFZ7xxfsnA98d2gGxhL7TPEeal/EC1eUpGkob99Bi03ecc2VJ7I8wTEvB+hCZcLbRUOBfLhUkqwcloEuXSZL5eHNyHd5UZ32xsdOT5bFq8kagmSJWxZx+kdzkuXB/cNTqBCvW3S6unZ2XQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8JVAtw+3+0MEvJFMqFq1CP1B8W/To1yvkCx9lSWBmvE=;
+ b=kbw+DRvIv41lebAERPcOkykCtWV8+RAOHiYbuGAQS7pTxogn88OPzkFzvck4qdxbpYnSNcFyJjSIeRIS4bHVJX3GQ0JsCq6bcP86DP8SZi80evdf3HkXyXXxbkPylh0SkCy4OO6tl7eTxLpYcdvvbMFf9/CxcdOE1pdeRuw2mrI=
+Received: from BY3PR18MB4707.namprd18.prod.outlook.com (2603:10b6:a03:3ca::23)
+ by CH3PR18MB5891.namprd18.prod.outlook.com (2603:10b6:610:1d6::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.26; Fri, 8 Mar
+ 2024 06:09:36 +0000
+Received: from BY3PR18MB4707.namprd18.prod.outlook.com
+ ([fe80::493a:b05c:8118:9dd4]) by BY3PR18MB4707.namprd18.prod.outlook.com
+ ([fe80::493a:b05c:8118:9dd4%4]) with mapi id 15.20.7362.024; Fri, 8 Mar 2024
+ 06:09:36 +0000
+From: Sai Krishna Gajula <saikrishnag@marvell.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        Sunil Kovvuri
+ Goutham <sgoutham@marvell.com>,
+        Geethasowjanya Akula <gakula@marvell.com>,
+        Hariprasad Kelam <hkelam@marvell.com>,
+        Subbaraya Sundeep Bhatta
+	<sbhatta@marvell.com>
+Subject: Re: [net-next PATCH v2] octeontx2-pf: Reset MAC stats during probe
+Thread-Topic: [net-next PATCH v2] octeontx2-pf: Reset MAC stats during probe
+Thread-Index: AQHacR8yKrGa4MnfIU24yGWkdxB9Xw==
+Date: Fri, 8 Mar 2024 06:09:36 +0000
+Message-ID: 
+ <BY3PR18MB470736FBC23588BE63656D50A0272@BY3PR18MB4707.namprd18.prod.outlook.com>
+References: <20240305082707.213332-1-saikrishnag@marvell.com>
+ <20240307204725.4dddcc9d@kernel.org>
+In-Reply-To: <20240307204725.4dddcc9d@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BY3PR18MB4707:EE_|CH3PR18MB5891:EE_
+x-ms-office365-filtering-correlation-id: ec77cb5b-13a2-4c2c-2533-08dc3f365510
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ x08ehUBWBRy7kttkl6l3YalsnA1R1cgCEZ+vV8J151yo6PsdQsYRPHegNP7y8cyqd0LQl5n0thuy9J1elruQPbJxun4bsCInDWmD6FTdEqAHQjbY5al0mW/n2oJDOnrA8AWStwVseVRf1w0lCercWXdv/1GMDETHSNb2k3oMca2jSbkflC2TtlCBAnGmI7J/HYfkDkDitR2LSejbsKSb0iU9PZvMMv7Od9JZ04YDCn+5GEgR4zuG1ytN9CeW9+mFIDz3zc/xVyAdpmdxPXH6qbhSjNfWET5kg13EHaUmGs/2BUP2Rgp0+YCQxZyAqXoE/SIqAIDXScVMKiygWyLgd6ESzIRITrIUB04oyuZdRC5NsM2A5WdBYJXEJFEUzTXemkng6TfNNb5ri6hE6F1jSImgX8aQqbVCveueYYCnSXqhqB89px+Mr2S10yQs4TeVdMJlgg4pwZ32mnDIkgF9/9jwkSpTFJrrlzWoZH/Lw55hPVIFZW11kVo4VkB1KIsyOtq4utDH4YNIH/kGrqJUHJ9PF/+ueFSnD6ZU5jOr7G82UwdZK+21j8W9CBEcXWCiEsL+ZFDJ0KXQYw612OddGNMOe/eYdGzhpqOuYukC2HdFVKQKZATVQoe3MM8jiil4jhwxUWFx8iRvE7Al7OuLf50Nc57o3FMYbPcUIH6p6Ru/vsjDbueXc8N/i7PxJaCbUc/tEqqKDvZCk0xKniT5yg==
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY3PR18MB4707.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?dNrhgE7m+plqBd8WWefrVu0CvVehf9q8E1BBrMVOj1LAFUiuGVpEaeJMOUm3?=
+ =?us-ascii?Q?mj6oAyWnX9dmmgUnwbq320HjK+nLde7SLFZApjxcYF2Uc75MuEJgEqkIrNUS?=
+ =?us-ascii?Q?bR+AquZWJu3seVU6cDrFu/zkpMGFAUTnKgqhJCFO/f23WA9BJACLoirvwO44?=
+ =?us-ascii?Q?DrC2YVXE/VTVjmKyQt8jo9UR/gzXSAfR0YAVaj+ridupWmdljxludUmZNHo5?=
+ =?us-ascii?Q?M7H2/ar7gZHu0m3JxkAU7XyQD3RvqOQKL0qS/0WGmQRt1AfA85n9DNcND8pQ?=
+ =?us-ascii?Q?+lK0Bl1wJXVmkio+Jkem1GM7IgByoRNdC4Jt4+83YBdrEtWg/RVUbVNJ7n2h?=
+ =?us-ascii?Q?O3dP+cU2peL8Lr3V9ZzkIMZrLQDGxj63gy3gL6qpaUkOUa6/KkLfI7yzEh5+?=
+ =?us-ascii?Q?uViQnpLXytbpxyDfuWTH6aMCR3YZsBKqQe5m16GI2dSDiAPXrvDeMka+EJ2V?=
+ =?us-ascii?Q?G9FJFv7TFE/Pwib8+LRJ4Rysp1fkxzdmud9KVYK7lQHcHHsa5cPI4AqhJg+n?=
+ =?us-ascii?Q?o5eUDiyt8KNXbov7vyU2rilnaorzRlwHWzAwyqizZFkNYrW+aXHcsrRw6PgI?=
+ =?us-ascii?Q?EgHHrmYIDWZUE5wgrP8ee65hSUDMtA6UcE9uxNRfWlp0F2LiACjnqxicL0cT?=
+ =?us-ascii?Q?J32YJY7ntO23Hx8CWoI11Rselw/UoWc1q6Jsi4aLmsMsh2ChIMdZ8SsrzWns?=
+ =?us-ascii?Q?j0r0D3H8a7UAA9P+jx3jLmwf2Vhpg5mikAV6jFLJ6EOW/1j60yMX5pgt5Le2?=
+ =?us-ascii?Q?LxuWxVSbi8K1ELKpAIzssq+b53H7O6IMH13PA1xTsCrCIshphluhmB5tCZjK?=
+ =?us-ascii?Q?cqK/TrHLklvxzBqJo42uoICnJ/PFxPoB7qB/zei2lSRbhsmQwoKl0XTz/kUm?=
+ =?us-ascii?Q?S02LJH3MgNqIpD63kIWmUGHk1MJPpcobCEeLlTWW1EGv/YlwC+6gjTS66Ym9?=
+ =?us-ascii?Q?6NrEcG+iTApU3AfTJRJczMuRlYoUibeHPbR0LSmRUJ3GpBeq07vQf3KeyOzP?=
+ =?us-ascii?Q?dP895775WAJZbsx62TJwFj/jsBg3epDKJ6AlTmHViEM0HF4XayWlWwZpZhX1?=
+ =?us-ascii?Q?gKdQ0v9jsfqtw0GT65zkVt3pzFXlgCQukMMS4ll89VOJ4MLhAm76ZKNCEwF+?=
+ =?us-ascii?Q?p8aH7cuy87u6Y+xe69BBnv6Bcy/N7H3VzlmMyVx+KPPBCZ27WWHOh2aLyGJF?=
+ =?us-ascii?Q?RG4tdTtn9clzPZpkT6XrUMk+lnsQJ0shBvCfGgdEy2NmEcccK3KmlnVig+M/?=
+ =?us-ascii?Q?fApCALfTkV0FNFgO5ckZ/aana7fx53raHeo8EvD3D++inHQZsQKxsXfUIM+l?=
+ =?us-ascii?Q?b0DbSyuaxuvfeAGbAKXGyoS5iHpLIrYAhfc6+SeibVunme6T2EwbdJl3HM0n?=
+ =?us-ascii?Q?nohDfALGZdVW5wJLzg4B0wdrRma9ZDHCbdkZ3Mx+iAT8c/0SF7e8VrOfWlMs?=
+ =?us-ascii?Q?4ybliY9oZqqfUeLXMSconKzMOJKz2I/XUAKifHECfj+8zD4CbXfRrvMRdEYM?=
+ =?us-ascii?Q?vN1g5eOfrW1FXO4UP8RqsL4ltQIBFjZyZ4d4jBem5sXg/W6V1yxgsl6taLI1?=
+ =?us-ascii?Q?w8i6Z7dEP320PrEx+9ynP6m3g1svniwFQx757CV8?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240229072044.77388-1-xuanzhuo@linux.alibaba.com>
- <20240229031755-mutt-send-email-mst@kernel.org> <1709197357.626784-1-xuanzhuo@linux.alibaba.com>
- <20240229043238-mutt-send-email-mst@kernel.org> <1709718889.4420547-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEu5=DKJfXsvOoXDDH7KJ-DWt83jj=vf8GoRnq-9zUeOOg@mail.gmail.com> <1709798771.2564156-2-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1709798771.2564156-2-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 8 Mar 2024 14:03:41 +0800
-Message-ID: <CACGkMEsHTwA=9W+3QfQGxzHcgzZZ=Bi9bb4PijUJHUQmLfEQpw@mail.gmail.com>
-Subject: Re: [PATCH vhost v3 00/19] virtio: drivers maintain dma info for
- premapped vq
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, virtualization@lists.linux.dev, 
-	Richard Weinberger <richard@nod.at>, Anton Ivanov <anton.ivanov@cambridgegreys.com>, 
-	Johannes Berg <johannes@sipsolutions.net>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Hans de Goede <hdegoede@redhat.com>, =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>, 
-	Vadim Pasternak <vadimp@nvidia.com>, Bjorn Andersson <andersson@kernel.org>, 
-	Mathieu Poirier <mathieu.poirier@linaro.org>, Cornelia Huck <cohuck@redhat.com>, 
-	Halil Pasic <pasic@linux.ibm.com>, Eric Farman <farman@linux.ibm.com>, 
-	Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, linux-um@lists.infradead.org, 
-	netdev@vger.kernel.org, platform-driver-x86@vger.kernel.org, 
-	linux-remoteproc@vger.kernel.org, linux-s390@vger.kernel.org, 
-	kvm@vger.kernel.org, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BY3PR18MB4707.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ec77cb5b-13a2-4c2c-2533-08dc3f365510
+X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Mar 2024 06:09:36.7164
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: eLnzZVKlBUhZvxzQBU/JsPVYDQDP2yT8vOZPOOzmDmC5bFVvPjZGd5mEPjmjCslNz+2cfwDnUqW4m/M4yThTBw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR18MB5891
+X-Proofpoint-GUID: 0sZj_jbExxvolHwAUKUSrNbU1u8nI-Fe
+X-Proofpoint-ORIG-GUID: 0sZj_jbExxvolHwAUKUSrNbU1u8nI-Fe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-08_04,2024-03-06_01,2023-05-22_02
 
-On Thu, Mar 7, 2024 at 4:15=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.co=
-m> wrote:
->
-> On Thu, 7 Mar 2024 13:28:27 +0800, Jason Wang <jasowang@redhat.com> wrote=
-:
-> > On Wed, Mar 6, 2024 at 6:01=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibab=
-a.com> wrote:
-> > >
-> > > On Thu, 29 Feb 2024 04:34:20 -0500, "Michael S. Tsirkin" <mst@redhat.=
-com> wrote:
-> > > > On Thu, Feb 29, 2024 at 05:02:37PM +0800, Xuan Zhuo wrote:
-> > > > > On Thu, 29 Feb 2024 03:21:14 -0500, "Michael S. Tsirkin" <mst@red=
-hat.com> wrote:
-> > > > > > On Thu, Feb 29, 2024 at 03:20:25PM +0800, Xuan Zhuo wrote:
-> > > > > > > As discussed:
-> > > > > > > http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cf=
-LcPaVmJ3rHYqRZxYg@mail.gmail.com
-> > > > > > >
-> > > > > > > If the virtio is premapped mode, the driver should manage the=
- dma info by self.
-> > > > > > > So the virtio core should not store the dma info.
-> > > > > > > So we can release the memory used to store the dma info.
-> > > > > > >
-> > > > > > > But if the desc_extra has not dma info, we face a new questio=
-n,
-> > > > > > > it is hard to get the dma info of the desc with indirect flag=
-.
-> > > > > > > For split mode, that is easy from desc, but for the packed mo=
-de,
-> > > > > > > it is hard to get the dma info from the desc. And for hardeni=
-ng
-> > > > > > > the dma unmap is saft, we should store the dma info of indire=
-ct
-> > > > > > > descs.
-> > > > > > >
-> > > > > > > So I introduce the "structure the indirect desc table" to
-> > > > > > > allocate space to store dma info with the desc table.
-> > > > > > >
-> > > > > > > On the other side, we mix the descs with indirect flag
-> > > > > > > with other descs together to share the unmap api. That
-> > > > > > > is complex. I found if we we distinguish the descs with
-> > > > > > > VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
-> > > > > > >
-> > > > > > > Because of the dma array is allocated in the find_vqs(),
-> > > > > > > so I introduce a new parameter to find_vqs().
-> > > > > > >
-> > > > > > > Note:
-> > > > > > >     this is on the top of
-> > > > > > >         [PATCH vhost v1] virtio: packed: fix unmap leak for i=
-ndirect desc table
-> > > > > > >         http://lore.kernel.org/all/20240223071833.26095-1-xua=
-nzhuo@linux.alibaba.com
-> > > > > > >
-> > > > > > > Please review.
-> > > > > > >
-> > > > > > > Thanks
-> > > > > > >
-> > > > > > > v3:
-> > > > > > >     1. fix the conflict with the vp_modern_create_avq().
-> > > > > >
-> > > > > > Okay but are you going to address huge memory waste all this is=
- causing for
-> > > > > > - people who never do zero copy
-> > > > > > - systems where dma unmap is a nop
-> > > > > >
-> > > > > > ?
-> > > > > >
-> > > > > > You should address all comments when you post a new version, no=
-t just
-> > > > > > what was expedient, or alternatively tag patch as RFC and expla=
-in
-> > > > > > in commit log that you plan to do it later.
-> > > > >
-> > > > >
-> > > > > Do you miss this one?
-> > > > > http://lore.kernel.org/all/1708997579.5613105-1-xuanzhuo@linux.al=
-ibaba.com
-> > > >
-> > > >
-> > > > I did. The answer is that no, you don't get to regress memory usage
-> > > > for lots of people then fix it up.
-> > > > So the patchset is big, I guess it will take a couple of cycles to
-> > > > merge gradually.
-> > >
-> > > Hi @Michael
-> > >
-> > > So, how about this patch set?
-> > >
-> > > I do not think they (dma maintainers) will agree the API dma_can_skip=
-_unmap().
-> > >
-> > > If you think sq wastes too much memory using pre-mapped dma mode, how=
- about
-> > > we only enable it when xsk is bond?
-> > >
-> > > Could you give me some advice?
+
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Friday, March 8, 2024 10:17 AM
+> To: Sai Krishna Gajula <saikrishnag@marvell.com>
+> Cc: davem@davemloft.net; edumazet@google.com; pabeni@redhat.com;
+> netdev@vger.kernel.org; linux-kernel@vger.kernel.org; Sunil Kovvuri Gouth=
+am
+> <sgoutham@marvell.com>; Geethasowjanya Akula <gakula@marvell.com>;
+> Hariprasad Kelam <hkelam@marvell.com>; Subbaraya Sundeep Bhatta
+> <sbhatta@marvell.com>
+> Subject: Re: [net-next PATCH v2] octeontx2-pf: Reset MAC stats
+> during probe
+>=20
+> On Tue, 5 Mar 2024 13:57:07 +0530 Sai Krishna wrote:
+> > +int otx2_reset_mac_stats(struct otx2_nic *pfvf);
 > >
-> > I think we have some discussion, one possible solution is:
+> >  /* RVU block related APIs */
+> >  int otx2_attach_npa_nix(struct otx2_nic *pfvf); diff --git
+> > a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> > b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> > index e5fe67e73865..a91f5b7e84c6 100644
+> > --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> > +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> > @@ -1124,6 +1124,24 @@ static int otx2_cgx_config_linkevents(struct
+> otx2_nic *pf, bool enable)
+> >  	return err;
+> >  }
 > >
-> > when pre mapping is enabled, virtio core won't store dma metadatas.
+> > +int otx2_reset_mac_stats(struct otx2_nic *pfvf) {
+> > +	struct msg_req *req;
+> > +	int err;
+> > +
+> > +	mutex_lock(&pfvf->mbox.lock);
+> > +	req =3D otx2_mbox_alloc_msg_cgx_stats_rst(&pfvf->mbox);
+> > +	if (!req) {
+> > +		mutex_unlock(&pfvf->mbox.lock);
+> > +		return -ENOMEM;
+> > +	}
+> > +
+> > +	err =3D otx2_sync_mbox_msg(&pfvf->mbox);
+> > +	mutex_unlock(&pfvf->mbox.lock);
+> > +	return err;
+> > +}
+> > +EXPORT_SYMBOL(otx2_reset_mac_stats);
+>=20
+> Why the export? I see only one call to this function and it's right below=
+..
+
+Ack, Will remove this export and submit patch V3
+
+>=20
+> >  static int otx2_cgx_config_loopback(struct otx2_nic *pf, bool enable)
+> > {
+> >  	struct msg_req *msg;
+> > @@ -3048,6 +3066,9 @@ static int otx2_probe(struct pci_dev *pdev,
+> > const struct pci_device_id *id)
 > >
-> > Then it makes virtio-net align with other NIC.
->
->
-> YES.
->
-> This patch set works as this.
->
-> But the virtio-net must allocate too much memory to store dma and len.
->
-> num =3D queue size * 19
->
-> Michael thinks that waste too much memory.
->         http://lore.kernel.org/all/20240225032330-mutt-send-email-mst@ker=
-nel.org
->
-> So we try this:
->         http://lore.kernel.org/all/20240301071918.64631-1-xuanzhuo@linux.=
-alibaba.com
->
-> But I think that is difficult to be accepted by the  DMA maintainers.
->
-> So I have two advices:
->
-> 1. virtio-net sq works without indirect.
->         - that more like other NIC
->         - the num of the memory to store the dma info is queue_size
-
-This requires benchmarks.
-
->
-> 2. The default mode of virtio-net sq is no-premapped
->         - we just switch the mode when binding xsk
-
-This could be one step.
-
-We can hear from Michael.
-
-Thanks
-
->
-> Thanks.
->
->
+> >  	otx2_qos_init(pf, qos_txqs);
 > >
-> > Thanks
-> >
-> > >
-> > > Thanks.
-> > >
-> > >
-> > > >
-> > > > > I asked you. But I didnot recv your answer.
-> > > > >
-> > > > > Thanks.
-> > > > >
-> > > > >
-> > > > > >
-> > > > > > > v2:
-> > > > > > >     1. change the dma item of virtio-net, every item have MAX=
-_SKB_FRAGS + 2
-> > > > > > >         addr + len pairs.
-> > > > > > >     2. introduce virtnet_sq_free_stats for __free_old_xmit
-> > > > > > >
-> > > > > > > v1:
-> > > > > > >     1. rename transport_vq_config to vq_transport_config
-> > > > > > >     2. virtio-net set dma meta number to (ring-size + 1)(MAX_=
-SKB_FRGAS +2)
-> > > > > > >     3. introduce virtqueue_dma_map_sg_attrs
-> > > > > > >     4. separate vring_create_virtqueue to an independent comm=
-it
-> > > > > > >
-> > > > > > >
-> > > > > > >
-> > > > > > > Xuan Zhuo (19):
-> > > > > > >   virtio_ring: introduce vring_need_unmap_buffer
-> > > > > > >   virtio_ring: packed: remove double check of the unmap ops
-> > > > > > >   virtio_ring: packed: structure the indirect desc table
-> > > > > > >   virtio_ring: split: remove double check of the unmap ops
-> > > > > > >   virtio_ring: split: structure the indirect desc table
-> > > > > > >   virtio_ring: no store dma info when unmap is not needed
-> > > > > > >   virtio: find_vqs: pass struct instead of multi parameters
-> > > > > > >   virtio: vring_create_virtqueue: pass struct instead of mult=
-i
-> > > > > > >     parameters
-> > > > > > >   virtio: vring_new_virtqueue(): pass struct instead of multi=
- parameters
-> > > > > > >   virtio_ring: simplify the parameters of the funcs related t=
-o
-> > > > > > >     vring_create/new_virtqueue()
-> > > > > > >   virtio: find_vqs: add new parameter premapped
-> > > > > > >   virtio_ring: export premapped to driver by struct virtqueue
-> > > > > > >   virtio_net: set premapped mode by find_vqs()
-> > > > > > >   virtio_ring: remove api of setting vq premapped
-> > > > > > >   virtio_ring: introduce dma map api for page
-> > > > > > >   virtio_ring: introduce virtqueue_dma_map_sg_attrs
-> > > > > > >   virtio_net: unify the code for recycling the xmit ptr
-> > > > > > >   virtio_net: rename free_old_xmit_skbs to free_old_xmit
-> > > > > > >   virtio_net: sq support premapped mode
-> > > > > > >
-> > > > > > >  arch/um/drivers/virtio_uml.c             |  31 +-
-> > > > > > >  drivers/net/virtio_net.c                 | 283 ++++++---
-> > > > > > >  drivers/platform/mellanox/mlxbf-tmfifo.c |  24 +-
-> > > > > > >  drivers/remoteproc/remoteproc_virtio.c   |  31 +-
-> > > > > > >  drivers/s390/virtio/virtio_ccw.c         |  33 +-
-> > > > > > >  drivers/virtio/virtio_mmio.c             |  30 +-
-> > > > > > >  drivers/virtio/virtio_pci_common.c       |  59 +-
-> > > > > > >  drivers/virtio/virtio_pci_common.h       |   9 +-
-> > > > > > >  drivers/virtio/virtio_pci_legacy.c       |  16 +-
-> > > > > > >  drivers/virtio/virtio_pci_modern.c       |  38 +-
-> > > > > > >  drivers/virtio/virtio_ring.c             | 698 ++++++++++++-=
-----------
-> > > > > > >  drivers/virtio/virtio_vdpa.c             |  45 +-
-> > > > > > >  include/linux/virtio.h                   |  13 +-
-> > > > > > >  include/linux/virtio_config.h            |  48 +-
-> > > > > > >  include/linux/virtio_ring.h              |  82 +--
-> > > > > > >  tools/virtio/virtio_test.c               |   4 +-
-> > > > > > >  tools/virtio/vringh_test.c               |  28 +-
-> > > > > > >  17 files changed, 847 insertions(+), 625 deletions(-)
-> > > > > > >
-> > > > > > > --
-> > > > > > > 2.32.0.3.g01195cf9f
-> > > > > >
-> > > >
-> > >
-> >
->
+> > +	/* reset CGX/RPM MAC stats */
+> > +	otx2_reset_mac_stats(pf);
+> > +
 
 
