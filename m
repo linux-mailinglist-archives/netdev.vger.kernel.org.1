@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-78682-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4E7C8761F7
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:30:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5B398761F6
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:30:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61BF41F22152
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 10:30:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 766E9282BB8
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 10:30:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0FDF54F94;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0A2854F87;
 	Fri,  8 Mar 2024 10:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DxQYalDF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qG53Um5m"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88B2A54665;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88AF51E48E;
 	Fri,  8 Mar 2024 10:30:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709893834; cv=none; b=iFDp7e/qzRHQZc8CglGFKH4/53QWzv47GuzX2kpgtCgd8i5Is3/JcxfmwT3PV58ggKu1qpYp8YhO6xNMVYbKKwOeB/M05V3HczlnFCRCwoPC613UiAxexeE8k7x7A7/B1jrZoeBr6tB6ZE6Z1/h4uZH4sIe+MhXqlGAk3qEQnKk=
+	t=1709893834; cv=none; b=TuvRCZQICnSHDBnCu1kEgXtWcswyZtTw9srXNSMoVQDKR2/0imhY5q3l5ZlYzJMD90dgqsgnPmS3Xx93+8PaUVvcHiHIq9UjGQwQrAlj7+WQPLMTVzzjDXH06vCH5FWGX4Fjgb555xAHrNCSje1fw5unolA3DvDw6yOB9QXWPjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709893834; c=relaxed/simple;
-	bh=ybeysiln1arLPFOn44mZI7U6wTDKxbgcZkjm5Al4/ok=;
+	bh=DBJyvUiFYHBmEE5Rw8Tzk8KpqQceFdTVRr7W62ft2DU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=rjITWkhY8QFppWqW4ogNK3rO4NZHgVlCY3uo4F8mRkuiuEDT5XDnY88SEcEDdxyd9+Rrt1xklODbkb8oWduam5Bbw+pyN8u9RlIg9fsHGT41B+g8InZo4LRdQwNZs+EjcIXRBH1525CZ9zbyGjZV1XQz4fyHCL4FO9z5y/ZvZrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DxQYalDF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2567CC43390;
+	 In-Reply-To:To:Cc; b=EKpj8YvAs46RrGlMQay+SUmgeFyKkj2BpBgihM/s/pt+XsakjXuwZS4xaLnA7srKk5IP9sykLJ55pUYYythpqo/Hpnd0Q+i1i1H8NCbvLU8iw2Lij3yZyIzO5zuEjuyusAZcvUXDIlzwebIlHiINQd8Wr45V7OQoo7xPZF39shs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qG53Um5m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 363BBC433A6;
 	Fri,  8 Mar 2024 10:30:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1709893834;
-	bh=ybeysiln1arLPFOn44mZI7U6wTDKxbgcZkjm5Al4/ok=;
+	bh=DBJyvUiFYHBmEE5Rw8Tzk8KpqQceFdTVRr7W62ft2DU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DxQYalDFR6fsHPYG75UlFIrPldH21l85DOKixy9Rf0XCNfhijTCNw1EhQBK4h+Wu2
-	 47mTeGBqNHoS8PgJBFt3XzMlWQhW9QL24rJbz1rWfCzQuOYwPny8ECOtAQMuWETtM+
-	 OTkV2VxulMRBgBqbZtRgUhCxibhv5bJGqkFyC1rIre0x74q4PVvdp2nRoLJKQBfa2R
-	 BM70Z1bvA/QbGQtHd2yyhHelHhLncuI3iTwjgu2w+SsbTERLamKDfPsaPGBlcU9n+T
-	 R6s7vh5TEb5LRDb48KBcvmcUeDOjhK2TSXyA7ON94Rmlf2jsIfjmXYziEqTg6ayDRb
-	 kxX2AcWx0arpw==
+	b=qG53Um5mAWgMveKQoLnosEWx8G31xr4T853Bc+Hxzr0zReHgFufMJInKHrgQZRWGd
+	 y1/g/93stjS7tEs3Ah1LPe3/YgWjnnz7T9uMTxMi9wsWHmAeO/cHdBwUhgbGaR+KYN
+	 9MQT0jnhKGMWTyIufzoeLKCxTzWcntlXOWwMLfzdoBHIupiArRloxzdEiJOvBlPmB6
+	 Ih25sCNLi3PeBBlOr9NVd+3+ryUMJH+LJB1CHc8aWOzJv4CsXe+8le4ILefkCA0aDN
+	 8JcCeNMm6zOEnJcnCXqbY274AWaLgMgYtpJAUJZOOuVMfYLkW5Xf7AvncX4og3mQgg
+	 GCoCgyulNJg1w==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F312FD84BB7;
-	Fri,  8 Mar 2024 10:30:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 12C99D84BDC;
+	Fri,  8 Mar 2024 10:30:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH][next] net: chelsio: remove unused function calc_tx_descs
+Subject: Re: [net-next PATCH] octeontx2-pf: Add TC flower offload support for TCP
+ flags
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <170989383398.12583.5995436016062470108.git-patchwork-notify@kernel.org>
-Date: Fri, 08 Mar 2024 10:30:33 +0000
-References: <20240307112237.1982789-1-colin.i.king@gmail.com>
-In-Reply-To: <20240307112237.1982789-1-colin.i.king@gmail.com>
-To: Colin Ian King <colin.i.king@gmail.com>
+ <170989383407.12583.3109784089553687997.git-patchwork-notify@kernel.org>
+Date: Fri, 08 Mar 2024 10:30:34 +0000
+References: <20240305181606.244208-1-saikrishnag@marvell.com>
+In-Reply-To: <20240305181606.244208-1-saikrishnag@marvell.com>
+To: Sai Krishna Gajula <saikrishnag@marvell.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, kernel-janitors@vger.kernel.org,
- linux-kernel@vger.kernel.org
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ sgoutham@marvell.com, gakula@marvell.com, hkelam@marvell.com,
+ sbhatta@marvell.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu,  7 Mar 2024 11:22:37 +0000 you wrote:
-> The inlined helper function calc_tx_descs is not used and is redundant.
-> Remove it.
+On Tue, 5 Mar 2024 23:46:06 +0530 you wrote:
+> This patch adds TC offload support for matching TCP flags
+> from TCP header.
 > 
-> Cleans up clang scan build warning:
-> drivers/net/ethernet/chelsio/cxgb4/sge.c:814:28: warning: unused
-> function 'calc_tx_descs' [-Wunused-function]
+> Example usage:
+> tc qdisc add dev eth0 ingress
+> 
+> TC rule to drop the TCP SYN packets:
+> tc filter add dev eth0 ingress protocol ip flower ip_proto tcp tcp_flags
+> 0x02/0x3f skip_sw action drop
 > 
 > [...]
 
 Here is the summary with links:
-  - [next] net: chelsio: remove unused function calc_tx_descs
-    https://git.kernel.org/netdev/net-next/c/9b78bbef5138
+  - [net-next] octeontx2-pf: Add TC flower offload support for TCP flags
+    https://git.kernel.org/netdev/net-next/c/3b43f19d065d
 
 You are awesome, thank you!
 -- 
