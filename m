@@ -1,93 +1,97 @@
-Return-Path: <netdev+bounces-78585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9215E875D27
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:30:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C88B875D31
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:35:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9DC91C20E3A
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 04:30:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D0D831F21F05
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 04:35:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81312DF87;
-	Fri,  8 Mar 2024 04:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B0082D611;
+	Fri,  8 Mar 2024 04:35:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uCULTRvG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KG6sTqAV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B88A02134B;
-	Fri,  8 Mar 2024 04:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 221882C857;
+	Fri,  8 Mar 2024 04:35:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709872229; cv=none; b=Du2pyxoBH1So4I4PjNE0SmLJQFiD7hSUE87XX6aEbxsluwF298Au7NcwYMcvoU97NvIOw0TMiGzHG55IH05Q7tH8m2hPSgCtpuvGwU8zNJ9M6j8qLxlZoELuCUbCHRA3gP79Y3wC5HGgJYGtrh1jezxxN8MbQPS2JqlQFZl67qw=
+	t=1709872527; cv=none; b=ZbyFwqzuWwJac3lhyFoMSbETwRgdZzZkT3TeZL9wCLrO5ePmO/sUyvr0oP9iJX39Hwh+SRBC7gzSHPTBCNKsnVVmFmzIJf79BLt31NEeZfmg5sbSyn8/IDdZqTjKD6kNH9oALp/PDs5ZXeNp25jhRYbfyBJDoOhk171i1USsZDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709872229; c=relaxed/simple;
-	bh=Bhr4Dtpl623FH4HAMUZOgSXCCm8xgmxDleW5A1X397Q=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BB1/oa8Cny2GL0+PzMGrUH+8XhJw5tE9XEDqvxTCTzXq/aA62O3KKomQ0/ARMUswRpcjRTyKypLJB9N1OP4K8SRUOCt3EpCdWhTintiaug+PzWmr1d6ySDR7aJyDbEh6auuXnzJzGr/xl+C5UXi84oS+iZSW3fFptLhIkAfG6Ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uCULTRvG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 4C10BC43394;
-	Fri,  8 Mar 2024 04:30:29 +0000 (UTC)
+	s=arc-20240116; t=1709872527; c=relaxed/simple;
+	bh=yWj8/hJqPE2pqJgHPZirhlHTQyI5nLVSmlITFRiJKhY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Kn+4Yo/l4sdyK2JOqJhSmxsBZ4vZSu/NjNfx2pROCc+nwgyZGCWJetPT4e7XTrYzWxg55rz81a1xtH1rN7bPcEg6J98WjcY6D04GCWtIQDLLnjJCF0jXMlABg24CMbxXh8/TzmV2dqdqhB6i/DNbRrOlz2NFtn1VLWyX/B93Yk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KG6sTqAV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74A2CC433C7;
+	Fri,  8 Mar 2024 04:35:25 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709872229;
-	bh=Bhr4Dtpl623FH4HAMUZOgSXCCm8xgmxDleW5A1X397Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=uCULTRvGMHIapWzkUMeWz+mn1kZZKPuDWSz2n/Dji1x/ucOz9rKUVl+PiRZx83xRw
-	 R4cJP0u5JMiSYiXdVRjsY+YSxlwCUpREVp6vPE7oddTHDmpA+JITtuAQTmh93RcoLF
-	 f1+AhINduqEIkNUPiN/S51QqRH8mqcOTkmWWxjnsg2rC5yenJvj68G+6p7fSR2ptUK
-	 XgA4uisaDVpePuirTEAq4v3RsJe84EVLHmjRRVf/g5fJRzHfbdpvJoTEQlkDdy0UeR
-	 MsuRIixPXmeleCLcX14vKiC2huG+dTzlO3smGVivZ5AO3ZiAUd4vGU+PxCcNFUQShC
-	 H1KScnrQ5uawA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 30FD8D84BC1;
-	Fri,  8 Mar 2024 04:30:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1709872525;
+	bh=yWj8/hJqPE2pqJgHPZirhlHTQyI5nLVSmlITFRiJKhY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=KG6sTqAVccTzyQVqJPgFwKf0HZaMVOmfOGKHO+x0y/KO68MOCkch9Wk/trnPYOZZK
+	 5fJl/XO5ILc2Na3wEuDfy2AOO6gA0/DZpS6IUyFX8J7/a4vFsiHm61KnuPyuS7fDiX
+	 KilQSjdLr/DI+1KTpCiDcAlU5WnwLRAYo3fJWWhpwhxprAjWsoQptsF6FJ1UUvcT1i
+	 sRo9IBoyXEmus+NX9WEEWLtB+Nx/T/0rst7n7qf62GhJ3X09UgrzJ2Nllr7n+YdWYW
+	 g1iMgN6hCJQNFnF28ZqL9Y/AmEL8UuCF1JJV18IKJuw9c77JLy+2f1eprEE1VOGXKW
+	 TNnS7dQGmsDkA==
+Date: Thu, 7 Mar 2024 20:35:24 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] Doc: netlink: support unterminated-ok
+Message-ID: <20240307203524.34895501@kernel.org>
+In-Reply-To: <20240307070106.1784076-1-liuhangbin@gmail.com>
+References: <20240307070106.1784076-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: x25: remove dead links from Kconfig
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170987222919.2034.12421653557670790951.git-patchwork-notify@kernel.org>
-Date: Fri, 08 Mar 2024 04:30:29 +0000
-References: <20240306112659.25375-1-justin.swartz@risingedge.co.za>
-In-Reply-To: <20240306112659.25375-1-justin.swartz@risingedge.co.za>
-To: Justin Swartz <justin.swartz@risingedge.co.za>
-Cc: ms@dev.tdt.de, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, linux-x25@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu,  7 Mar 2024 15:01:06 +0800 Hangbin Liu wrote:
+> Subject: [PATCH net-next] Doc: netlink: support unterminated-ok
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+I'd use this subject:
 
-On Wed,  6 Mar 2024 13:26:59 +0200 you wrote:
-> Remove the "You can read more about X.25 at" links provided in
-> Kconfig as they have not pointed at any relevant pages for quite
-> a while.
-> 
-> An old copy of https://www.sangoma.com/tutorials/x25/ can be
-> retrieved via https://archive.org/web/ but nothing useful seems
-> to have been preserved for http://docwiki.cisco.com/wiki/X.25
-> 
-> [...]
+	netlink: specs: support unterminated-ok
 
-Here is the summary with links:
-  - net: x25: remove dead links from Kconfig
-    https://git.kernel.org/netdev/net-next/c/7a04ff127786
+> ynl-gen-c.py supports check unterminated-ok, but the yaml schemas don't
+> have this key. Add this to the yaml files.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> diff --git a/Documentation/netlink/genetlink-c.yaml b/Documentation/netlink/genetlink-c.yaml
+> index c58f7153fcf8..7094d619cbb6 100644
+> --- a/Documentation/netlink/genetlink-c.yaml
+> +++ b/Documentation/netlink/genetlink-c.yaml
+> @@ -208,6 +208,9 @@ properties:
+>                    exact-len:
+>                      description: Exact length for a string or a binary attribute.
+>                      $ref: '#/$defs/len-or-define'
+> +                  unterminated-ok:
+> +                    description: Allow the string to not use terminator.
+> +                    type: boolean
 
+Can we expand the doc a little? How about:
 
+	description: |
+		For string attributes, do not check whether attribute
+		contains the terminating null character.
+
+Also maybe let's leave this out of the spec for:
+
+	Documentation/netlink/genetlink.yaml
+
+that spec is supposed to be simplified, supporting both string flavors
+just complicates things.
 
