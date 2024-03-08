@@ -1,133 +1,83 @@
-Return-Path: <netdev+bounces-78664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AB368760EC
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 10:29:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 831B187610A
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 10:38:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 508B81F23CB8
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:29:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A37D1F245A5
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0052535B7;
-	Fri,  8 Mar 2024 09:29:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bQUTsZxL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760D2535A8;
+	Fri,  8 Mar 2024 09:38:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 840D622F0F;
-	Fri,  8 Mar 2024 09:29:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393F752F7F;
+	Fri,  8 Mar 2024 09:38:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709890167; cv=none; b=Dc4yHsZRTQ8NHZF0jcRIgpJ5MCqlpr7rUOk39aTMKqia+z9zLtlRSqmmpQG22ntDPUpOd0apNVS8rJEGYoVLK8KECeYHtMh00fiuG9juGjAGN5yfhVQpWHbPmmSs7ktSayVBhsOygrFnyc17gLNftHmZinqoNKSkWQpShqGG3Dg=
+	t=1709890709; cv=none; b=Jpk7fJHp2waAcG4l3IDLgjsp6pchJ1rlQpSi8cxKluLqHrTHmJOccQyMaZgda8AnZnFFxNGDDw76HWN2YHYS/ojNTY1RAXzELDnpU2u2XjNkvgtXdYkz09oyTq7XxBL6Zd+e9nlAOR60s9JUJ+wOhW8jGDAyUguEm3Mnn+K1Lm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709890167; c=relaxed/simple;
-	bh=uWIbQbhTo1k5Hm2P3NjS7IiGjLT923Fdb/LEytpCR3M=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Tgf86/KDjrLPij2NRRIUrbtrFk3MrWaer7123vo5BrSKZWEbdvNrSNZGO9UAzLW4PmKd/aAbxqQ8zncVpL3YLa5RqQ5MDqVJ6pEsOuCYPRJuJPO1Gs8DPODse17tD/dfHuu6DfcVO/YBB50eZfMYiZwnEzAEyr4KoKe0sqe0ucU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bQUTsZxL; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1dcc7f4717fso5275735ad.0;
-        Fri, 08 Mar 2024 01:29:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709890166; x=1710494966; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6auhInn5rzDEYzHLqWOU0+st73Pngssi19sn4m6uy20=;
-        b=bQUTsZxLv1IjWQlqXwfCTg5RbWxcaE4096NteU8OaHD5dL5oPLlyToKZluf/aOaieQ
-         LOrJIWmD26O2NCVefFQlvw1Biyu8Pbov1l+YjS8/wneStkQUxoPjUKccGPem9jChaSim
-         0pfTcHMfjejzRlPhAAxHayRRDNhyTFk4aCX3YXQDa3T4EFVD4zq9ATA5ghM4i7UIui1i
-         OqjKGd218jxPnmetZd6EBz1UYnIIAU1d2D0tAunejNrFFTBt5ma+FSFcTtCYhczP6jxM
-         4Kv+5JitDs7o+gvHCyq4Jmp+in4suXoudyfJKkq53CjCIhlEabrAw19P+QLBcGp7kUNn
-         S+Gw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709890166; x=1710494966;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6auhInn5rzDEYzHLqWOU0+st73Pngssi19sn4m6uy20=;
-        b=FPLpGx95ikzN0FTMxwnnYMe22gxe+IhBRR7FnevKWDeqD7HRchaeMhaQ5yObpx1PUk
-         RcC7g1gbfp66b6QWiwvDZqsM0BqIrTmTEq/1RKQ7PeJd5xRQC3HhdAmKaDE0RgUWfn7N
-         X7FuWxS0s6qGyROmZXaaAnIDoH4fDG/wLgGaQ8oQGCs4bd9dQZS7Kd5qXV0Xm85ASceo
-         1l18/9RB9dibXKahVwM1qBsqI1o3bHCMTxTatOsjTYs5kB+dBWjmBnmkVy5z6rCo4GCs
-         /l9c9aRR06hEUL27QSm5dLs32wzWCsxxl9fZFqUa49AEpnSevUE6sETCyxe2i2afz/ta
-         s/7g==
-X-Forwarded-Encrypted: i=1; AJvYcCXeuo3+hpNg/144cEw6olXrXHrHLlY09fVdqwUzb13qKSFEagry/wjICBD1nfC2Ja5trK3Fe70xmdmb6fl8v+iBewozm0J9
-X-Gm-Message-State: AOJu0YyiQZGfGUaYlpTPasSUEv+Se6ZmXBlhIoCHqSMJNVBNmH/iCWnb
-	D7/sWkcUac8G7NMjz7AUsGp5cWdcAzpDWILcQxU1uYYjNWhynFf4l1qsQeQxrf4=
-X-Google-Smtp-Source: AGHT+IHJIaIOu5sO+biKSPvmRu3amhiOpHP8UMiEpYU2UEJp9NcmA/NWwNHdV5H2+IXJ2RVi2kAHoQ==
-X-Received: by 2002:a17:902:ce09:b0:1dd:6e47:862e with SMTP id k9-20020a170902ce0900b001dd6e47862emr378048plg.63.1709890165894;
-        Fri, 08 Mar 2024 01:29:25 -0800 (PST)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.24])
-        by smtp.gmail.com with ESMTPSA id q6-20020a170902a3c600b001dd6290283fsm1547332plb.248.2024.03.08.01.29.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Mar 2024 01:29:25 -0800 (PST)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	pablo@netfilter.org,
-	kadlec@netfilter.org,
-	fw@strlen.de,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net
-Cc: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next] netfilter: conntrack: using NF_DROP in test statement in nf_conntrack_in()
-Date: Fri,  8 Mar 2024 17:29:15 +0800
-Message-Id: <20240308092915.9751-2-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240308092915.9751-1-kerneljasonxing@gmail.com>
-References: <20240308092915.9751-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1709890709; c=relaxed/simple;
+	bh=NBM3HX/hK8juwoAhjLMl+cACL+7l+tnUbk6HIlPOyd8=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=dXIA+ZyyKZiCjLzK1CXzj667BWS/Cx+5gYsM/vQGS4G23QS0qTvmGNrVw9yQd0tMKrqdlhrmSnriRkYJqyf3xRIV4IAPoYUhcfMCk8oq4UUAy9PY3GX0Jjdn4Ii1aI6Kvia9ZvKi/2p6eRomdB1C8OfINyz9j//Vf9+9SM4Ma7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Trgyd0q6Sz1Z1MQ;
+	Fri,  8 Mar 2024 17:35:53 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 4CE271A0172;
+	Fri,  8 Mar 2024 17:38:16 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 8 Mar 2024 17:38:15 +0800
+Message-ID: <447cb805-9ad0-4e08-8038-45e3cb8c81fe@huawei.com>
+Date: Fri, 8 Mar 2024 17:38:14 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, "shenjian15@huawei.com" <shenjian15@huawei.com>,
+	"wangjie125@huawei.com" <wangjie125@huawei.com>, "liuyonglong@huawei.com"
+	<liuyonglong@huawei.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net 6/8] net: hns3: fix reset timeout under full functions
+ and queues
+To: Sunil Kovvuri Goutham <sgoutham@marvell.com>, "yisen.zhuang@huawei.com"
+	<yisen.zhuang@huawei.com>, "salil.mehta@huawei.com" <salil.mehta@huawei.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>
+References: <20240307010115.3054770-1-shaojijie@huawei.com>
+ <20240307010115.3054770-7-shaojijie@huawei.com>
+ <BY3PR18MB4737FA1796C8BC8180296BE8C6202@BY3PR18MB4737.namprd18.prod.outlook.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <BY3PR18MB4737FA1796C8BC8180296BE8C6202@BY3PR18MB4737.namprd18.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-From: Jason Xing <kernelxing@tencent.com>
 
-At the beginning in 2009 one patch [1] introduced collecting drop
-counter in nf_conntrack_in() by returning -NF_DROP. Later, another
-patch [2] changed the return value of tcp_packet() which now is
-renamed to nf_conntrack_tcp_packet() from -NF_DROP to NF_DROP.
+on 2024/3/7 19:24, Sunil Kovvuri Goutham wrote:
+>> In order to avoid the above extreme situations, the driver extends the reset
+>> timeout to 1 second.
+>>
+> Reviewed-by: Sunil Goutham <sgoutham@marvell.com>
+>
+> But one observation, loop of udelay(1) for 1sec seems a lot, probably better to use usleep_range().
 
-Well, as NF_DROP is equal to 0, inverting NF_DROP makes no sense
-as patch [2] did many years ago.
-
-[1]
-commit 7d1e04598e5e ("netfilter: nf_conntrack: account packets drop by tcp_packet()")
-[2]
-commit ec8d540969da ("netfilter: conntrack: fix dropping packet after l4proto->packet()")
-
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- net/netfilter/nf_conntrack_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/netfilter/nf_conntrack_core.c b/net/netfilter/nf_conntrack_core.c
-index c63868666bd9..6102dc09cdd3 100644
---- a/net/netfilter/nf_conntrack_core.c
-+++ b/net/netfilter/nf_conntrack_core.c
-@@ -2024,7 +2024,7 @@ nf_conntrack_in(struct sk_buff *skb, const struct nf_hook_state *state)
- 			goto repeat;
- 
- 		NF_CT_STAT_INC_ATOMIC(state->net, invalid);
--		if (ret == -NF_DROP)
-+		if (ret == NF_DROP)
- 			NF_CT_STAT_INC_ATOMIC(state->net, drop);
- 
- 		ret = -ret;
--- 
-2.37.3
+but this is protected by splock, so cannot use usleep_range().
 
 
