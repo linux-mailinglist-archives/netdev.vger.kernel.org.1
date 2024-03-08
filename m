@@ -1,96 +1,185 @@
-Return-Path: <netdev+bounces-78629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB55A875EDA
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 08:53:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24228875F08
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:04:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD0291C220D9
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 07:53:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C8DF281A31
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 08:04:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 366B951C28;
-	Fri,  8 Mar 2024 07:53:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C6474F891;
+	Fri,  8 Mar 2024 08:04:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b="uwbJryeQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mg.ssi.bg (mg.ssi.bg [193.238.174.37])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484E74F61D;
-	Fri,  8 Mar 2024 07:52:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B798481DC;
+	Fri,  8 Mar 2024 08:04:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.238.174.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709884382; cv=none; b=DCQY2Zwn/BBqx4UcxjD/ZAPT32AqbQHCsBZ7E80o9ww8YKeaVN5ChfXF3onj7XUtGCaYLi1q4pQHIt4eLYPDRHgGtHlV7pYJUmJZ1AzECVAbyih2UzRNnK16cJR+rOxwjhLRQlmcZ0mSw38uy24VQRyco9Ri2pz81vS1KgwvC0Q=
+	t=1709885090; cv=none; b=mmgtuW2HpyMCQ6X0Ws+SrBCifiTqxwnfPZ5vnTBgcBwsCcuuHAaOqtmdaJUfWH+H5kgfmKcQRV59/+Vm9VRaubSgCM9oDz7YV0I+ZhB8+wan/hgormosgi4lbgimnqkxBikJgxnSI3Go1HfQEas3NlXDTW0xhZHfIxhmyV+OuLo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709884382; c=relaxed/simple;
-	bh=plk1XpvlB+tBdxjoQXMNOo0U73Y5H1GaU8aJioRRm7Q=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TybWqL5FmNKJ8wgg70j75SbNuOrmoxAn7Wyunbtr8i6sJg3FAz9I91EpAZ0/pFKw5r5qe/z7HIkbd3vaE7BG8bohfeak1RO6F0rpqx0KX/Si2Ml0ZvJ8j3ar4cGjWpUXURnTZCE1pBPhM4MGiS9F4i3ml6KLzuHIOkCUkPDYRZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
-X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4287qeK631940758, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 4287qeK631940758
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 8 Mar 2024 15:52:40 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Fri, 8 Mar 2024 15:52:40 +0800
-Received: from fc38.realtek.com.tw (172.22.228.98) by RTEXMBS04.realtek.com.tw
- (172.21.6.97) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Fri, 8 Mar
- 2024 15:52:39 +0800
-From: Hayes Wang <hayeswang@realtek.com>
-To: <kuba@kernel.org>, <davem@davemloft.net>
-CC: <netdev@vger.kernel.org>, <nic_swsd@realtek.com>,
-        <linux-kernel@vger.kernel.org>, <linux-usb@vger.kernel.org>,
-        Hayes Wang
-	<hayeswang@realtek.com>
-Subject: [PATCH net] r8152: fix unknown device for choose_configuration
-Date: Fri, 8 Mar 2024 15:52:06 +0800
-Message-ID: <20240308075206.33553-436-nic_swsd@realtek.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1709885090; c=relaxed/simple;
+	bh=QZTAxiGWwpEexgLFe9jZSIY9NbeDwvSTqVQZnYmTvI4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=MRqIfpAkpm1Eb8i7FMuyZdbZLYAT9DWijx97qmpiflCvCtLhwi4Uf8CL8Ds0/yny3M+DnWSr/CPJNcZzh/CphzJlF1DLLVz3jpL2rqEy9bKTOAVruS0B2cUJKb5BmS2DjS0FYch1jYyE6LETpcI2TQTkv8AkfjIGWDHUxpYn/Tg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg; spf=pass smtp.mailfrom=ssi.bg; dkim=pass (1024-bit key) header.d=ssi.bg header.i=@ssi.bg header.b=uwbJryeQ; arc=none smtp.client-ip=193.238.174.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ssi.bg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ssi.bg
+Received: from mg.ssi.bg (localhost [127.0.0.1])
+	by mg.ssi.bg (Proxmox) with ESMTP id 3DAD4210EA;
+	Fri,  8 Mar 2024 09:55:40 +0200 (EET)
+Received: from ink.ssi.bg (ink.ssi.bg [193.238.174.40])
+	by mg.ssi.bg (Proxmox) with ESMTPS id 21A7D20E79;
+	Fri,  8 Mar 2024 09:55:40 +0200 (EET)
+Received: from ja.ssi.bg (unknown [213.16.62.126])
+	by ink.ssi.bg (Postfix) with ESMTPSA id 840543C0439;
+	Fri,  8 Mar 2024 09:55:34 +0200 (EET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=ssi.bg; s=ink;
+	t=1709884536; bh=QZTAxiGWwpEexgLFe9jZSIY9NbeDwvSTqVQZnYmTvI4=;
+	h=Date:From:To:cc:Subject:In-Reply-To:References;
+	b=uwbJryeQTqOraXtDwW0CqiNcFIwZl1Qg5NaS2QLFcunSAsCGPap9cjb43fPYdi53l
+	 yiO1mtQ2jGfow6vIwAd/dSXxzzMFuiOQJuUkprRvsRYVwrlCIWyOd1yjJGAJfYFHrM
+	 MLoG9QLnx96tgCc/7vAyISjjV9S7n3/rKy9GQ6pc=
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by ja.ssi.bg (8.17.1/8.17.1) with ESMTP id 4287tOn7014553;
+	Fri, 8 Mar 2024 09:55:26 +0200
+Date: Fri, 8 Mar 2024 09:55:24 +0200 (EET)
+From: Julian Anastasov <ja@ssi.bg>
+To: =?UTF-8?Q?Michael_Wei=C3=9F?= <michael.weiss@aisec.fraunhofer.de>
+cc: Simon Horman <horms@verge.net.au>, gyroidos@aisec.fraunhofer.de,
+        Pablo Neira Ayuso <pablo@netfilter.org>,
+        Jozsef Kadlecsik <kadlec@netfilter.org>,
+        Florian Westphal <fw@strlen.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+        coreteam@netfilter.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ipvs: allow netlink configuration from non-initial user
+ namespace
+In-Reply-To: <20240307203107.63815-1-michael.weiss@aisec.fraunhofer.de>
+Message-ID: <e1c8e477-ae59-48de-4aa8-e6df09013831@ssi.bg>
+References: <20240307203107.63815-1-michael.weiss@aisec.fraunhofer.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
+Content-Type: multipart/mixed; boundary="-1463811672-396118792-1709884526=:4390"
 
-For the unknown device, rtl8152_cfgselector_choose_configuration()
-should return a negative value. Then, usb_choose_configuration() would
-set a configuration for CDC ECM or NCM mode. Otherwise, there is no
-usb interface driver for the device.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Fixes: aa4f2b3e418e ("r8152: Choose our USB config with choose_configuration() rather than probe()")
-Signed-off-by: Hayes Wang <hayeswang@realtek.com>
----
- drivers/net/usb/r8152.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+---1463811672-396118792-1709884526=:4390
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8BIT
 
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 0d0672d2a654..51fe00c2b896 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -10078,7 +10078,7 @@ static int rtl8152_cfgselector_choose_configuration(struct usb_device *udev)
- 	 * driver supports it.
- 	 */
- 	if (__rtl_get_hw_ver(udev) == RTL_VER_UNKNOWN)
--		return 0;
-+		return -ENODEV;
- 
- 	/* The vendor mode is not always config #1, so to find it out. */
- 	c = udev->config;
--- 
-2.43.0
+
+	Hello,
+
+On Thu, 7 Mar 2024, Michael Weiß wrote:
+
+> Configuring ipvs in a non-initial user namespace using the genl
+> netlink interface, e.g., by 'ipvsadm' is currently resulting in an
+> '-EPERM'. This is due to the use of GENL_ADMIN_PERM flag in
+> 'ip_vs_ctl.c'.
+> 
+> Similarly to other genl interfaces, we switch to the use of
+> GENL_UNS_ADMIN_PERM flag which allows connection from non-initial
+> user namespace. Thus, it would be feasible to configure ipvs using
+> the genl interface also from within an unprivileged system container.
+> 
+> Since adding of new services and new dests are triggered from
+> userspace, accounting for the corresponding memory allocations in
+> ip_vs_new_dest() and ip_vs_add_service() is activated.
+> 
+> We tested this by simply running some samples from "man ipvsadm"
+> within an unprivileged user namespaced system container in GyroidOS.
+> Further, we successfully passed an adapted version of the ipvs
+> selftest in 'tools/testing/selftests/netfilter/ipvs.sh' using
+> preliminary created network namespaces from unprivileged GyroidOS
+> containers.
+
+	I planned such change but as followup patchset to other
+work which converts many structures to be per-netns.
+
+	There is a RFC v2 patchset for reference:
+
+https://archive.linuxvirtualserver.org/html/lvs-devel/2023-12/index.html
+
+	My goal was to isolate the different namespaces as much as
+possible: different structures, different kthreads, etc. with the
+goal to reduce the security risks of giving power to unprivileged roots.
+Such isolation should help when namespaces are served from different CPUs.
+
+	May be I should push fresh v3 soon, so that we can later use
+GFP_KERNEL_ACCOUNT not only for services and dests but also
+for allocations by schedulers, estimators, etc. The access to
+sysctl vars should be enabled too, around comment
+"Don't export sysctls to unprivileged users",
+alloc_percpu => alloc_percpu_gfp(,GFP_KERNEL_ACCOUNT),
+SLAB_ACCOUNT for kmem_cache_create, not sure about __GFP_NOWARN and
+__GFP_NORETRY usage too.
+
+	Not sure about the sysctl vars: now they are cloned from
+init_net, do we give full access for writing, some can be privileged,
+etc.
+
+	I didn't push such changes yet because I'm not sure what
+is needed: looks like, for now, what was needed is root from init_net to 
+control rules in different netns and there was no demand from the 
+virtualization world to extend this. If we can clearly define what is 
+good and what is bad from security perspective, we can go with such 
+changes after pushing the above patchset, i.e. the GENL_UNS_ADMIN_PERM
+change should follow all other changes.
+
+> Signed-off-by: Michael Weiß <michael.weiss@aisec.fraunhofer.de>
+> ---
+>  net/netfilter/ipvs/ip_vs_ctl.c | 36 +++++++++++++++++-----------------
+>  1 file changed, 18 insertions(+), 18 deletions(-)
+> 
+> diff --git a/net/netfilter/ipvs/ip_vs_ctl.c b/net/netfilter/ipvs/ip_vs_ctl.c
+> index 143a341bbc0a..d39120c64207 100644
+> --- a/net/netfilter/ipvs/ip_vs_ctl.c
+> +++ b/net/netfilter/ipvs/ip_vs_ctl.c
+> @@ -1080,7 +1080,7 @@ ip_vs_new_dest(struct ip_vs_service *svc, struct ip_vs_dest_user_kern *udest)
+>  			return -EINVAL;
+>  	}
+>  
+> -	dest = kzalloc(sizeof(struct ip_vs_dest), GFP_KERNEL);
+> +	dest = kzalloc(sizeof(struct ip_vs_dest), GFP_KERNEL_ACCOUNT);
+>  	if (dest == NULL)
+>  		return -ENOMEM;
+>  
+> @@ -1421,7 +1421,7 @@ ip_vs_add_service(struct netns_ipvs *ipvs, struct ip_vs_service_user_kern *u,
+>  		ret_hooks = ret;
+>  	}
+>  
+> -	svc = kzalloc(sizeof(struct ip_vs_service), GFP_KERNEL);
+> +	svc = kzalloc(sizeof(struct ip_vs_service), GFP_KERNEL_ACCOUNT);
+>  	if (svc == NULL) {
+>  		IP_VS_DBG(1, "%s(): no memory\n", __func__);
+>  		ret = -ENOMEM;
+> @@ -4139,98 +4139,98 @@ static const struct genl_small_ops ip_vs_genl_ops[] = {
+>  	{
+>  		.cmd	= IPVS_CMD_NEW_SERVICE,
+>  		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
+> -		.flags	= GENL_ADMIN_PERM,
+> +		.flags	= GENL_UNS_ADMIN_PERM,
+>  		.doit	= ip_vs_genl_set_cmd,
+...
+
+Regards
+
+--
+Julian Anastasov <ja@ssi.bg>
+---1463811672-396118792-1709884526=:4390--
 
 
