@@ -1,256 +1,188 @@
-Return-Path: <netdev+bounces-78811-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78812-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6B2D876A4C
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 18:56:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83DDC876A69
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 19:04:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA9D51C20F2D
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 17:56:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36F42284F17
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 18:04:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65B7440873;
-	Fri,  8 Mar 2024 17:56:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61BC654667;
+	Fri,  8 Mar 2024 18:03:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Co8inQyq"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="NqcoGwTs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B818136D;
-	Fri,  8 Mar 2024 17:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71BAE5102A;
+	Fri,  8 Mar 2024 18:03:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709920605; cv=none; b=ODMlhCd2i97wGpIQcc7SgrGaMg/LNP0XUNI5sS8bYB3qQDqIxfba4duTHcgCMAuJRPuAOg7HvpDuDK4LkQwq/pX99DcGq3LgrfwIjiZhjJPnAbtacyvM11ADUIzkEHxicBYUnbdb1mwOI4GwC9yK+DJInTcFnA6yQvuJy1NC2po=
+	t=1709921036; cv=none; b=qeFWNCmJWtlVO4kkM7RwopwQhqjvcCTWqmJxbXESgDBBmSqePX8/m+5lQaDSXVlaj4tn/8VPhVZPpj9pHAAvXypp0XMIKEDUrMmR3KMxCaB+qyfg+hH6OmIIz2RWLkRS+vCpwHVl4PNFtbLQgzwFxXCgUnbIs6Pdy6KSBdhwxnM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709920605; c=relaxed/simple;
-	bh=C3/OQ3lvmtWM5Fk2NQ/zYD5f1oUYWVti/SktEx2bsrM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VaGGcj+IlI4da48F3QAQ0EKhba8zonTf0cAjd5QmAogwuZw0k2GReBJMjh8HckJ4w3pnP0xwvz4blI+MGvN+lpT5HMHtWOyLl9wppFQ3S/g63rweC8mFbq/UE0cNb13v/EIbNJJt7yH3+Z3cP2QYFOF8gDE86Jqgk6VP6P8fEf8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Co8inQyq; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-5cddfe0cb64so1599356a12.0;
-        Fri, 08 Mar 2024 09:56:43 -0800 (PST)
+	s=arc-20240116; t=1709921036; c=relaxed/simple;
+	bh=PAzm2GiniLKpKFC+LeDesWIkkjP8990bk01Z8PFogq4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=urK3yLA9iIT26cdXrVXmmqmmSVJ1AJLAmVTwtiR28n5SzqENWEmYOXHSKMep+3J9ctab0ea4x96/8dn/s51X/j0CE4OK9u3TVtoyUSHIgQw/lGsdEIF7GN9Lcr9ZI+Hp6Y1+zwWpnHrbguqpVUSfBzQnCiG1rp0DSP1blNz0alk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=NqcoGwTs; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709920603; x=1710525403; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=OgXSP3d/pfH7TPIm6gVXNmyWtFVxa9g4fw/sbjv/wQ8=;
-        b=Co8inQyqmXSWrH9vIqskfxCxRB2/TjWpJT4W+1s7vq1uEgQJBBlkoG4vJcXhy1OaRr
-         oyprVVFoTivyThl3QtxX2Y7WSvrfT1p7MBrPOdHTBshQMK/m+9rwSz0HGbFRj43+dtGw
-         /GSWQHb6g4AIqPFye3IvKSn0E73EEqClCKxqoIqUtue4bIH02omn27qOmderTnXcm3Ih
-         dyZ/08VE1ErAHVzARtV2E4lagS2mwL9IQH9WzvfPY7tNZDBM26E62/YrB35SeCvl7g3Y
-         W0RkcbvGRotO/xaUMlDQttYw1AUMRFSoLiqbREsqbshU95v+UWxF9dB7X6dS5ZkCDZ6T
-         8tIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709920603; x=1710525403;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OgXSP3d/pfH7TPIm6gVXNmyWtFVxa9g4fw/sbjv/wQ8=;
-        b=XUNXnJ7WkkMP45iBdTtFxP9JJ6EViCmJo22ka/pTlhiXvyWi0Ww9CZMGHjzMqdAnYt
-         Qw3Z68DrwsePh67hvzGetrA8/ppl3ugRpq0zVeNh9r0rbUJ3jpObWhCvQCl2tFkuszSB
-         Zc3kqLafuqBo6lzoqGL7JXhZjOu6b3XuUhWDUACTYWIAVpSnR13dI3jf0pxMlir5YDcf
-         3CFzxR5hO5B9OlEvGLt7NhTjQVmPAVz5AcI7x3dhvFM5wO/BQ4EW5l7l8C0vElLcq5QJ
-         lP72p8thXlnnxCd3oa7I1EF5Fbry8gN3EWxzOMVzkOgdk4kUAkK1qZ80vO3F5mNJk5GP
-         2Ozw==
-X-Forwarded-Encrypted: i=1; AJvYcCWDn7tF6Nx766qefFsE5Ar1wlR7/rzqZGKMF9vmZScqqj8y4zeMqQuCISA31PKbgfwslraRQRbkbxfVabqM0mNU0vG9J8bLgXzvxOKMkJNo4gBfD6PjBn28lMHNRP7Er35iHV+XwTx2UQ==
-X-Gm-Message-State: AOJu0YxPKeexHdSp1Qtg0fEXTm/2fFardJ3bE4Dt9+ur43p3e4nhxAUp
-	Tbyh2gMRHPdd0DX8rzq/9Pi5w/NHsf+rM8NJfJY+lYAFAENMscc8
-X-Google-Smtp-Source: AGHT+IEjLZQEiki14E+8+WuQTj2DOEDO9pnd9LRofgXc5k2m0gMxe8g0kXRmMDI4Og1HNoFRHiM7HQ==
-X-Received: by 2002:a17:90a:8d85:b0:29b:6da4:277e with SMTP id d5-20020a17090a8d8500b0029b6da4277emr801752pjo.1.1709920602765;
-        Fri, 08 Mar 2024 09:56:42 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id cx12-20020a17090afd8c00b0029bc28b8cedsm27722pjb.28.2024.03.08.09.56.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Mar 2024 09:56:42 -0800 (PST)
-Message-ID: <9bb24a9b-4c95-49f9-8afb-2fdeeed64198@gmail.com>
-Date: Fri, 8 Mar 2024 09:56:39 -0800
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1709921034; x=1741457034;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=QveIAf1ldaT9oI1wUssG+IX1MKZ+YUw+EkppgFFt6QA=;
+  b=NqcoGwTswY6PVMrJyF+nsub2VdvocfzPzD6132LAduq/Ns0PiMIMqHUp
+   ecOHW8pvc8ONZuk40nk9JLLuiNVU5933px8srRqJ0t9vOllBc/hZJOd+a
+   SdYAChA9eMF9mybaLCuI0c+nHv6NRgUxZb3LM1zvJRAR3g9mkWlnGJ7El
+   0=;
+X-IronPort-AV: E=Sophos;i="6.07,110,1708387200"; 
+   d="scan'208";a="618388821"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2024 18:03:51 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:37089]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.56.117:2525] with esmtp (Farcaster)
+ id b5ba1483-0e78-4d17-989b-b009b39c3e3d; Fri, 8 Mar 2024 18:03:51 +0000 (UTC)
+X-Farcaster-Flow-ID: b5ba1483-0e78-4d17-989b-b009b39c3e3d
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 8 Mar 2024 18:03:50 +0000
+Received: from 88665a182662.ant.amazon.com (10.142.235.16) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Fri, 8 Mar 2024 18:03:48 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<syzbot+12c506c1aae251e70449@syzkaller.appspotmail.com>,
+	<syzkaller-bugs@googlegroups.com>
+Subject: Re: [syzbot] [net?] WARNING in sk_nulls_del_node_init_rcu
+Date: Fri, 8 Mar 2024 10:03:39 -0800
+Message-ID: <20240308180339.53907-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CANn89iKXHAoJqVkxSGtFep3Ww+A-v9NeExzgfTKubVo7wYX7_Q@mail.gmail.com>
+References: <CANn89iKXHAoJqVkxSGtFep3Ww+A-v9NeExzgfTKubVo7wYX7_Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: stmmac: dwmac-imx: add support for PHY
- WOL
-Content-Language: en-US
-To: POPESCU Catalin <catalin.popescu@leica-geosystems.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "robh@kernel.org" <robh@kernel.org>,
- "krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
- "conor+dt@kernel.org" <conor+dt@kernel.org>,
- "shawnguo@kernel.org" <shawnguo@kernel.org>,
- "s.hauer@pengutronix.de" <s.hauer@pengutronix.de>,
- "kernel@pengutronix.de" <kernel@pengutronix.de>,
- "festevam@gmail.com" <festevam@gmail.com>,
- "xiaoning.wang@nxp.com" <xiaoning.wang@nxp.com>,
- "linux-imx@nxp.com" <linux-imx@nxp.com>,
- "alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>,
- "joabreu@synopsys.com" <joabreu@synopsys.com>,
- "mcoquelin.stm32@gmail.com" <mcoquelin.stm32@gmail.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "imx@lists.linux.dev" <imx@lists.linux.dev>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-stm32@st-md-mailman.stormreply.com"
- <linux-stm32@st-md-mailman.stormreply.com>,
- GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>,
- "m.felsch@pengutronix.de" <m.felsch@pengutronix.de>
-References: <20240306172409.878928-1-catalin.popescu@leica-geosystems.com>
- <20240306172409.878928-2-catalin.popescu@leica-geosystems.com>
- <bbe3e611-a310-41f5-a037-4b7d5e914b94@gmail.com>
- <ddd2f984-e5e7-4708-a013-bfd668794466@leica-geosystems.com>
- <a25d4d76-a49a-4423-8916-5d7d9303b87a@gmail.com>
- <917f5cea-69d2-4ce2-a5a3-184332415fe5@leica-geosystems.com>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <917f5cea-69d2-4ce2-a5a3-184332415fe5@leica-geosystems.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: EX19D033UWA002.ant.amazon.com (10.13.139.10) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 3/8/24 09:48, POPESCU Catalin wrote:
-> On 07.03.24 19:52, Florian Fainelli wrote:
->> [Some people who received this message don't often get email from
->> f.fainelli@gmail.com. Learn why this is important at
->> https://aka.ms/LearnAboutSenderIdentification ]
->>
->> This email is not from Hexagon’s Office 365 instance. Please be
->> careful while clicking links, opening attachments, or replying to this
->> email.
->>
->>
->> On 3/7/2024 1:13 AM, POPESCU Catalin wrote:
->>> On 06.03.24 18:41, Florian Fainelli wrote:
->>>> [Some people who received this message don't often get email from
->>>> f.fainelli@gmail.com. Learn why this is important at
->>>> https://aka.ms/LearnAboutSenderIdentification ]
->>>>
->>>> This email is not from Hexagon’s Office 365 instance. Please be
->>>> careful while clicking links, opening attachments, or replying to this
->>>> email.
->>>>
->>>>
->>>> On 3/6/24 09:24, Catalin Popescu wrote:
->>>>> Add support for PHY WOL capability into dwmac-imx MAC driver.
->>>>> This is required to enable WOL feature on a platform where MAC
->>>>> WOL capability is not sufficient and WOL capability built into
->>>>> the PHY is actually needed.
->>>>>
->>>>> Signed-off-by: Catalin Popescu <catalin.popescu@leica-geosystems.com>
->>>>
->>>> Nope, this is not about how to do this. You use a Device Tree property
->>>> as a policy rather than properly describe your systems capabilities.
->>> I'm not sure what policy means in that context.
->>> BTW, dwmac-mediatek does the same with binding "mediatek,mac-wol" which
->>> is a commit from 03/2022.
->>
->> Policy here means you want a certain behavior from the OS that is
->> consuming the Device Tree, and that behavior is encoded via a Device
->> Tree property. This is different from describing how the hardware works
->> which does not make any provisions for getting a behavior out of the OS.
->>
->>> I understand this way of doing became "unacceptable" since then ??
->>
->> It was not acceptable then, but there is only a limited reviewer time,
->> and it is easy unfortunately to sneak through reviewers.
->>
->>>>
->>>> What sort of Wake-on-LAN do you want to be done by the PHY exactly?
->>>> Does
->>>> the PHY have packet matching capabilities, or do you want to wake-up
->>>> from a PHY event like link up/down/any interrupt?
->>>
->>> PHY is TI dp83826 and has secure magic packet capability. For the wakeup
->>> we rely on a external MCU which is signaled through a PHY's GPIO which
->>> toggles only on magic packet reception.
->>> We want to wakeup _only_ on magic packet reception.
->>
->> Then you need to represent that wake-up GPIO line in the Device Tree,
->> associate it with the PHY's Device Tree node for starters and add in a
->> 'wakeup-source' property in the Device Tree.
-> The GPIO I was referring to is a PHY GPIO not a SOC GPIO, so there's no
-> way to describe it into the DT.
-
-Well, technically there is, it's just that the PHY is not registered 
-with Linux as a GPIO controller/provider, nothing prevents you from 
-doing that, but it starts raising the bar.
-
-> The PHY is connected on the SOC MDIO bus, so the SOC programs the PHY,
-> but the PHY wakes up the external MCU which in turn wakes up the SOC.
-
-OK, but that still needs to be described somehow, otherwise you are just 
-cutting corners and assuming that the pin from the PHY to the external 
-MCU is only driven when the PHY drives it, how about other wake-up 
-sources to the MCU?
-
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 8 Mar 2024 18:36:45 +0100
+> On Fri, Mar 8, 2024 at 6:34 PM syzbot
+> <syzbot+12c506c1aae251e70449@syzkaller.appspotmail.com> wrote:
+> >
+> > Hello,
+> >
+> > syzbot found the following issue on:
+> >
+> > HEAD commit:    c055fc00c07b net/rds: fix WARNING in rds_conn_connect_if_d..
+> > git tree:       net
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=16aa17f2180000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=fad652894fc96962
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=12c506c1aae251e70449
+> > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> >
+> > Unfortunately, I don't have any reproducer for this issue yet.
+> >
+> > Downloadable assets:
+> > disk image: https://storage.googleapis.com/syzbot-assets/c39eb6fb3ad1/disk-c055fc00.raw.xz
+> > vmlinux: https://storage.googleapis.com/syzbot-assets/110f1226eb89/vmlinux-c055fc00.xz
+> > kernel image: https://storage.googleapis.com/syzbot-assets/1303e2df5cc4/bzImage-c055fc00.xz
+> >
+> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > Reported-by: syzbot+12c506c1aae251e70449@syzkaller.appspotmail.com
+> >
+> > R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+> > R13: 000000000000000b R14: 00007f3b817abf80 R15: 00007ffd3beb57b8
+> >  </TASK>
+> > ------------[ cut here ]------------
+> > WARNING: CPU: 0 PID: 23948 at include/net/sock.h:799 sk_nulls_del_node_init_rcu+0x166/0x1a0 include/net/sock.h:799
+> > Modules linked in:
+> > CPU: 0 PID: 23948 Comm: syz-executor.2 Not tainted 6.8.0-rc6-syzkaller-00159-gc055fc00c07b #0
+> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+> > RIP: 0010:sk_nulls_del_node_init_rcu+0x166/0x1a0 include/net/sock.h:799
+> > Code: e8 7f 71 c6 f7 83 fb 02 7c 25 e8 35 6d c6 f7 4d 85 f6 0f 95 c0 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc e8 1b 6d c6 f7 90 <0f> 0b 90 eb b2 e8 10 6d c6 f7 4c 89 e7 be 04 00 00 00 e8 63 e7 d2
+> > RSP: 0018:ffffc900032d7848 EFLAGS: 00010246
+> > RAX: ffffffff89cd0035 RBX: 0000000000000001 RCX: 0000000000040000
+> > RDX: ffffc90004de1000 RSI: 000000000003ffff RDI: 0000000000040000
+> > RBP: 1ffff1100439ac26 R08: ffffffff89ccffe3 R09: 1ffff1100439ac28
+> > R10: dffffc0000000000 R11: ffffed100439ac29 R12: ffff888021cd6140
+> > R13: dffffc0000000000 R14: ffff88802a9bf5c0 R15: ffff888021cd6130
+> > FS:  00007f3b823f16c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 00007f3b823f0ff8 CR3: 000000004674a000 CR4: 00000000003506f0
+> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> > Call Trace:
+> >  <TASK>
+> >  __inet_hash_connect+0x140f/0x20b0 net/ipv4/inet_hashtables.c:1139
+> >  dccp_v6_connect+0xcb9/0x1480 net/dccp/ipv6.c:956
+> >  __inet_stream_connect+0x262/0xf30 net/ipv4/af_inet.c:678
+> >  inet_stream_connect+0x65/0xa0 net/ipv4/af_inet.c:749
+> >  __sys_connect_file net/socket.c:2048 [inline]
+> >  __sys_connect+0x2df/0x310 net/socket.c:2065
+> >  __do_sys_connect net/socket.c:2075 [inline]
+> >  __se_sys_connect net/socket.c:2072 [inline]
+> >  __x64_sys_connect+0x7a/0x90 net/socket.c:2072
+> >  do_syscall_64+0xf9/0x240
+> >  entry_SYSCALL_64_after_hwframe+0x6f/0x77
+> > RIP: 0033:0x7f3b8167dda9
+> > Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+> > RSP: 002b:00007f3b823f10c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+> > RAX: ffffffffffffffda RBX: 00007f3b817abf80 RCX: 00007f3b8167dda9
+> > RDX: 000000000000001c RSI: 0000000020000040 RDI: 0000000000000003
+> > RBP: 00007f3b823f1120 R08: 0000000000000000 R09: 0000000000000000
+> > R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+> > R13: 000000000000000b R14: 00007f3b817abf80 R15: 00007ffd3beb57b8
+> >  </TASK>
+> >
+> >
+> > ---
+> > This report is generated by a bot. It may contain errors.
+> > See https://goo.gl/tpsmEJ for more information about syzbot.
+> > syzbot engineers can be reached at syzkaller@googlegroups.com.
+> >
+> > syzbot will keep track of this issue. See:
+> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> >
+> > If the report is already addressed, let syzbot know by replying with:
+> > #syz fix: exact-commit-title
+> >
+> > If you want to overwrite report's subsystems, reply with:
+> > #syz set subsystems: new-subsystem
+> > (See the list of subsystem names on the web dashboard)
+> >
+> > If the report is a duplicate of another one, reply with:
+> > #syz dup: exact-subject-of-another-report
+> >
+> > If you want to undo deduplication, reply with:
+> > #syz undup
 > 
->>
->> Now the PHY driver can know about the existence of a GPIO and it can
->> know the PHY is a system wake-up source, so the driver can call
->> device_set_wakeup_capable().
->>
->> In user-space you have to configure the network interface with
->> WAKE_MAGICSECURE which needs to propagate to the PHY driver for adequate
->> configuration. Still in user-space you need to make the PHY device
->> wake-up *enabled* by doing:
->>
->> echo "enable" > /sys/class/net/ethX/attached_phydev/power/wakeup
->>
->> If both WAKE_MAGICSECURE is enabled and the PHY device in sysfs reports
->> that it is wake-up enabled would you wake-up from the PHY's GPIO. Your
->> PHY driver ought to be modified to check for both
->>
->> device_wakeup_enabled() and wolopts being non-zero to call
->> enable_irq_wake() on the GPIO interrupt line.
->>
->> That's how I would go about doing this, yes it's a tad more complicated
->> than adding an ad-hoc Device Tree property, but it's more flexible and
->> it's transposable to other configurations, too. Whether that sort of
->> encoding needs to be in the individual PHY drivers or somewhere in the
->> PHY library can be decided if we have more than one similar
->> configuration to support.
->>
-> Yes, it's more complicated and it doesn't apply to our platform.
-> But, this doesn't really matter in the end, the problem I'm trying to
-> address here is to allow stmac for IMX to support PHY WOL.
-> Since the binding is not acceptable, I guess the only option here is to
-> remove flag STMMAC_FLAG_USE_PHY_WOL from stmac driver and replace it
-> with a call to phylink_ethtool_get_wol to identify whether the PHY is
-> WOL capable or not.
-> Then, how should we allow the platform to choose b/w MAC WOL and PHY WOL
-> if both are supported ?
+> CC Kuniyuki, because this is probably caused by
+> 
+> commit 66b60b0c8c4a163b022a9f0ad6769b0fd3dc662f
+> Author: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Date:   Wed Feb 14 11:13:08 2024 -0800
+> 
+>     dccp/tcp: Unhash sk from ehash for tb2 alloc failure after
+> check_estalblished().
 
-We don't have a good way to configure that decision consistently and 
-across *all* device drivers currently, what I can think of as the least 
-bad solution is to intersect between the PHY supported WOL modes, the 
-MAC supported WOL modes, and checking which of those is a wake-up enable 
-device via device_wakeup_enabled() and use that one with a preference 
-for the PHY since that is the closest to the wire. But this might be 
-good for me and you, maybe not for others.
+I'll look into it.
 
-> AFAIK ethtool only knows about MAC WOL capability since it interrogates
-> the MAC interface. ethtool doesn't know anything about the PHY, or does
-> it ??
-
-No we don't, and until Maxime's patches about PHY topology land upstream:
-
-https://lwn.net/Articles/961959/
-
-we do not want to invent many different ways of specifying which of the 
-MAC or the PHY should be used for WOL. FWIW, I have a similar need:
-
-https://www.spinics.net/lists/netdev/msg751196.html
-
-https://lore.kernel.org/all/20231026224509.112353-1-florian.fainelli@broadcom.com/
--- 
-Florian
-
+Thanks!
 
