@@ -1,94 +1,115 @@
-Return-Path: <netdev+bounces-78850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01BA3876C57
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 22:20:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E50BD876C66
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 22:31:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31E2F1C2163F
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 21:20:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B24C1F21EBC
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 21:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9245FB98;
-	Fri,  8 Mar 2024 21:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B856C5FB8B;
+	Fri,  8 Mar 2024 21:31:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TYQQLM1W"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TW7YYjfk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4560E5FB8D
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 21:20:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7247A5EE96;
+	Fri,  8 Mar 2024 21:31:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709932836; cv=none; b=MD44WV0a1PtgovxvRWZPxKT7nPdAsmga1m9SuKp6utV/IofrW8A21kjSza+1P73tbUxF2+eHTyYhS+ERi4gdnom6mQXaNPLH4ZJb9Osxyv9Sa768Y7h7m66GXBAUdnbSOJEMlwCFicA1KL4ZXm8d2H2Lh9JLqMDjRF83YqYl1vQ=
+	t=1709933469; cv=none; b=kd0ZqaCQ/HdueZAOLLO0kjlGOvAX6W+P9t+TDEWZDeydw5Q+NET3N2us/hR+7sfNc94O/JtkClDpNcic2hPfQMzsVgJdlw0yUJeVLuxSr5Nq9Qky2e+/RVqg+Spc/cEaH78UpsqAaRMDlz2ICe+VPZFgXVV84T6eZRLlS7SEs6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709932836; c=relaxed/simple;
-	bh=7+78oklhsNOulD6tNX/NINjtFsppNoyIJ3KugelH/z4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Ig8Tn7WIy9Oes1dlXMej+44MOjzw4aMEfQAWGXdfzvpmonbE+JXwqaHy1viJ2zKZkknNu0+FTWbCk9ScucHp64QU0vzm8OIS/88K6DCpis07TbVIB1/wpr40EOtQiZRNZMMVXMvyZwEK920b8qEIDm3xCujGm/zCSag5lCKqMxo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TYQQLM1W; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9FE1EC43330;
-	Fri,  8 Mar 2024 21:20:35 +0000 (UTC)
+	s=arc-20240116; t=1709933469; c=relaxed/simple;
+	bh=BIrlIu35U2rimElEMkh+0WBDV89ooLPXuL5UGm7857c=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=WqDf+6eDjBhyc77xsJzRG8S60GMdUwk+cR5vS4PxTgu/SNEWgYULthk0Jb/o8iIIhgaiqEBPiPOAPA4NvKdeFfnAL/pKXRsjYLPwp9TiUUcJTmh21PiuO31qXiKybRzjNTlumfonZsZMWIBLFz2+Eq/gMxrgqVw7bW+ORwCZDjs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TW7YYjfk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97843C43394;
+	Fri,  8 Mar 2024 21:31:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709932835;
-	bh=7+78oklhsNOulD6tNX/NINjtFsppNoyIJ3KugelH/z4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TYQQLM1WLHktwrI+VSy3Xcjf8/KncPafIWM1LNpy6PkuwQOkW+LdQNuKL9FnkJATx
-	 eCtGawc8+xLwMfyf+FEt8eJ4HBdtvjgtc9TUszsjEWCiit3+T3ZEe1fa+bNQzn+79e
-	 Y+R3pxSHXg8j1eMD447Q0hTsSFmidQlKwc8wUjxYv5n/SB5i3BQspamWfDVeKtYx49
-	 LZY3JcWOlXpPfJAU6C2RKVCoeiomgS59uC7zwqjDF1oQY42m1OB1CDxIgHhOS059aO
-	 RyBMThCHgzdGZeny+dg5AY9Elh4HVsk9n5CG+T4t30XE0hv+r6mYu5De++CSxg7fPB
-	 lrDzQYds3Avyg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 82ADED84BDC;
-	Fri,  8 Mar 2024 21:20:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1709933468;
+	bh=BIrlIu35U2rimElEMkh+0WBDV89ooLPXuL5UGm7857c=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=TW7YYjfkc2/7XCq1OsOk4JnkQ2Z4roe/55Aod6b+odn0SZoI1mh5iU4avPdsBAWNJ
+	 vKBopD5GVzT90xHrQM+caKjUTuYrTM7tQ+t8f8Rtpg0do1sXZN4uug2ChAwfwUt8oD
+	 FYO5MDsYtY3VOSDjGJM9RCJyjHti1KtmK4BjwP7C+HHelSf9pmB/FblcRkwN1JJygS
+	 8cvT2c6sCebDAogOn97OZTUAmx5lOItuq5MiswxsqBTwwpFBq4sChVbLa+1RPGMnYF
+	 PnJky00JFyo6T5VFhhxyakNMX6h7kcYchNcS/Xl5ww125XNcuXJ7pVUOeybv5tcaQm
+	 78wmQeAI82sxA==
+Date: Fri, 8 Mar 2024 15:31:07 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
+Cc: linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Ard Biesheuvel <ardb@kernel.org>, Borislav Petkov <bp@alien8.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, linux-edac@vger.kernel.org,
+	linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	Mahesh J Salgaonkar <mahesh@linux.ibm.com>, netdev@vger.kernel.org,
+	Oliver O'Halloran <oohall@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Tony Luck <tony.luck@intel.com>
+Subject: Re: [PATCH 0/4] PCI: Consolidate TLP Log reading and printing
+Message-ID: <20240308213107.GA700934@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] nexthop: Simplify dump error handling
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170993283553.29743.15411416591840690669.git-patchwork-notify@kernel.org>
-Date: Fri, 08 Mar 2024 21:20:35 +0000
-References: <20240307154727.3555462-1-idosch@nvidia.com>
-In-Reply-To: <20240307154727.3555462-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org, petrm@nvidia.com
+In-Reply-To: <20240206135717.8565-1-ilpo.jarvinen@linux.intel.com>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 7 Mar 2024 17:47:27 +0200 you wrote:
-> The only error that can happen during a nexthop dump is insufficient
-> space in the skb caring the netlink messages (EMSGSIZE). If this happens
-> and some messages were already filled in, the nexthop code returns the
-> skb length to signal the netlink core that more objects need to be
-> dumped.
+On Tue, Feb 06, 2024 at 03:57:13PM +0200, Ilpo Järvinen wrote:
+> This series consolidates AER & DPC TLP Log handling code. Helpers are
+> added for reading and printing the TLP Log and the format is made to
+> include E-E Prefixes in both cases (previously only one DPC RP PIO
+> displayed the E-E Prefixes).
 > 
-> After commit b5a899154aa9 ("netlink: handle EMSGSIZE errors in the
-> core") there is no need to handle this error in the nexthop code as it
-> is now handled in the core.
+> I'd appreciate if people familiar with ixgbe could check the error
+> handling conversion within the driver is correct.
 > 
-> [...]
+> Ilpo Järvinen (4):
+>   PCI/AER: Cleanup register variable
+>   PCI: Generalize TLP Header Log reading
 
-Here is the summary with links:
-  - [net-next] nexthop: Simplify dump error handling
-    https://git.kernel.org/netdev/net-next/c/5d9b7cb383bb
+I applied these first two to pci/aer for v6.9, thanks, these are all
+nice improvements!
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+I postponed the ixgbe part for now because I think we should get an
+ack from those maintainers or just send it to them since it subtly
+changes the error and device removal checking there.
 
+>   PCI: Add TLP Prefix reading into pcie_read_tlp_log()
+>   PCI: Create helper to print TLP Header and Prefix Log
 
+I'll respond to these with some minor comments.
+
+>  drivers/firmware/efi/cper.c                   |  4 +-
+>  drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 39 +++------
+>  drivers/pci/ats.c                             |  2 +-
+>  drivers/pci/pci.c                             | 79 +++++++++++++++++++
+>  drivers/pci/pci.h                             |  2 +-
+>  drivers/pci/pcie/aer.c                        | 28 ++-----
+>  drivers/pci/pcie/dpc.c                        | 31 ++++----
+>  drivers/pci/probe.c                           | 14 ++--
+>  include/linux/aer.h                           | 16 ++--
+>  include/linux/pci.h                           |  2 +-
+>  include/ras/ras_event.h                       | 10 +--
+>  include/uapi/linux/pci_regs.h                 |  2 +
+>  12 files changed, 145 insertions(+), 84 deletions(-)
+> 
+> -- 
+> 2.39.2
+> 
 
