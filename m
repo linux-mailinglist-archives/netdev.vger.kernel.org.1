@@ -1,83 +1,98 @@
-Return-Path: <netdev+bounces-78583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36F65875D1D
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:24:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C25C875D26
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:30:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB84F1F21D2D
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 04:24:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E4072826FB
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 04:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F14782C857;
-	Fri,  8 Mar 2024 04:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7BFF2DF73;
+	Fri,  8 Mar 2024 04:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FGHrFJjO"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qsvQCtLT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9FE72C6B6;
-	Fri,  8 Mar 2024 04:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B885E1E4A4;
+	Fri,  8 Mar 2024 04:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709871852; cv=none; b=A0e/fCevvI4nFHLag50kJGOuanZE5A6lsqlSC1HE2MM2Pm0NwS1JAXDcXxR4s1pze4Us7vpKvEuAHaEeDxQwe5uc12zvUKW2KLkvL9Z8BPwZ5nlWSYR6tmvAekUxUyfN81+TWhKOpC9OrerOjZ+FXvYerf1v6UiCj8g7WDE23XE=
+	t=1709872229; cv=none; b=s2Q2VGyWaE5Zvi9Uj+Kr/OnyC1wxhlNhz7ha8/pr0VgQpSSwTxUgulVOkZjIyHevASR58dMQHET5G30ESj2RYD//EAdZhfiK01V7Mwn3XIIfnzHqfg2eKpCorHZTzdySOS37dpRYgA8Xw2+pAwls11+hx9Hau4zusSrn0yw2Pv0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709871852; c=relaxed/simple;
-	bh=BGBLixuXPGuuA+n3MUis9zLgUWGUfR0TjhRnP9RUYyA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aAh0EhWGV4///tYqtYgdiMWi9FXmJ2rojgJs59Ctt6FauJ2zM+pSHgaJG9BU5iZrbgzylQCGls756/FbUDI8hkm+3BVDPVBsLZgEfsJPqHIzX4dYSKNVg4gyqowQcgY4qW3VhQ7HakXfErqa2kqMwbnnUvLPS2LPN4+Vjkghe9g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FGHrFJjO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C4CA7C433C7;
-	Fri,  8 Mar 2024 04:24:11 +0000 (UTC)
+	s=arc-20240116; t=1709872229; c=relaxed/simple;
+	bh=fJ6NAKODlt0NG2MhAdXUHK2ZCec42rPyXfyuZicuCw8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=mEb9prdEUvly2HSAqxCmZlgzFqB0Akg2PzbgGRZsHz52RMjNhXm1xTtczZ7n+Yg6JO1cybXjXhAeIaZBy3NZnJ9JHL/NKM9mWUcrEEIDtzu97NrhKATjQaNxcI3juMmdJaKYu8fj+Xr5eD++xO0QnQ8pzAnBA9Apm8mZa7S3kKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qsvQCtLT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 40545C433C7;
+	Fri,  8 Mar 2024 04:30:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709871852;
-	bh=BGBLixuXPGuuA+n3MUis9zLgUWGUfR0TjhRnP9RUYyA=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FGHrFJjOdLNAVPlVV2y72PZHt3Zdq4NO6a+2+jAPscXe8XtPmN7Tw5MpgAwOpfnIs
-	 I0WUyIL5s1vqJaI0IX0Ki8W6r8zuEby3COUU1JpXiKWJaF95D/irATYgjmIIuebnUk
-	 RdorUU4amsEI8+zINNVQZ0VogYecAyLAkxiT2NSMv+EK97eBBx7qk4plSZotGlcRuE
-	 QMjS28xC/h7VJcLhked9kTMwFyrqXfWM/AC/oCbULkfXCD/KXxL370woS29Y5YOYf2
-	 w0HOiVvaibuTBsPk+i/iAwk5Cak0nZIRub8G4aTliPs++t3bSwIHhT50zGU6OgzYpl
-	 i9TuBjrxV3FlQ==
-Date: Thu, 7 Mar 2024 20:24:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
- Eric Dumazet <edumazet@google.com>, Florian Fainelli
- <f.fainelli@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Vladimir Oltean
- <olteanv@gmail.com>, Woojung Huh <woojung.huh@microchip.com>, Arun Ramadoss
- <arun.ramadoss@microchip.com>, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net v1 1/1] net: dsa: microchip: make sure drive
- strength configuration is not lost by soft reset
-Message-ID: <20240307202410.65595460@kernel.org>
-In-Reply-To: <20240304135612.814404-1-o.rempel@pengutronix.de>
-References: <20240304135612.814404-1-o.rempel@pengutronix.de>
+	s=k20201202; t=1709872229;
+	bh=fJ6NAKODlt0NG2MhAdXUHK2ZCec42rPyXfyuZicuCw8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=qsvQCtLTX/tPCHyhg5Haavr3aq7w8EnlOzjSEB6SeswhHer2s+E9ZmHnOdGYKvH7P
+	 Dnx0lrhy0KKF9bH9vbzPR9VX6s0oeWyDuaXWgZrdZiXzL1kgNevoyosRoHRRMfaSr2
+	 Wb3Jm4FuBjg3blNVVoGRMDxktvD4pAwaeivd7sxv6DqTZLfHIvVVosBLKMDNLaF+92
+	 7KwbbtbbhwdElVBSVaikaJRHN1kfHdAfOn7DxC8UufsvLsmORrGQNyjU3PscEqyJFR
+	 cY1RY3ls+GNYa25T3mGeKHf9sjVZdvfBARCrAgqEQwvRvjlqNRMcsc4LTzxChXYcM6
+	 t8uhS72XPhwaw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 214DFD84BBF;
+	Fri,  8 Mar 2024 04:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH RESEND net-next] dt-bindings: net: dp83822: change
+ ti,rmii-mode description
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <170987222912.2034.16944334972154168429.git-patchwork-notify@kernel.org>
+Date: Fri, 08 Mar 2024 04:30:29 +0000
+References: <20240305141309.127669-1-jeremie.dautheribes@bootlin.com>
+In-Reply-To: <20240305141309.127669-1-jeremie.dautheribes@bootlin.com>
+To: =?utf-8?q?J=C3=A9r=C3=A9mie_Dautheribes_=3Cjeremie=2Edautheribes=40bootlin?=@codeaurora.org,
+	=?utf-8?q?=2Ecom=3E?=@codeaurora.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, afd@ti.com, andrew@lunn.ch, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, yen-mei.goh@keysight.com,
+ miquel.raynal@bootlin.com
 
-On Mon,  4 Mar 2024 14:56:12 +0100 Oleksij Rempel wrote:
-> This driver has two separate reset sequence in different places:
-> - gpio/HW reset on start of ksz_switch_register()
-> - SW reset on start of ksz_setup()
-> 
-> The second one will overwrite drive strength configuration made in the
-> ksz_switch_register().
-> 
-> To fix it, move ksz_parse_drive_strength() from ksz_switch_register() to
-> ksz_setup().
-> 
-> Fixes: d67d7247f641 ("net: dsa: microchip: Add drive strength configuration")
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Hello:
 
-Applied, thanks!
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue,  5 Mar 2024 15:13:09 +0100 you wrote:
+> Drop reference to the 25MHz clock as it has nothing to do with connecting
+> the PHY and the MAC.
+> Add info about the reference clock direction between the PHY and the MAC
+> as it depends on the selected rmii mode.
+> 
+> Suggested-by: Andrew Lunn <andrew@lunn.ch>
+> Signed-off-by: Jérémie Dautheribes <jeremie.dautheribes@bootlin.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [RESEND,net-next] dt-bindings: net: dp83822: change ti,rmii-mode description
+    https://git.kernel.org/netdev/net-next/c/b72413211b48
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
