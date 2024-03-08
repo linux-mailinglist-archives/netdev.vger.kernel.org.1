@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-78631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17B21875EF4
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:01:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69BDF875EFD
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 09:02:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 716F9B20DC7
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 08:01:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1F8CF2821BA
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 08:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D902650A64;
-	Fri,  8 Mar 2024 08:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6C550A64;
+	Fri,  8 Mar 2024 08:02:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="z6HfT87B"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="mEpEp/gs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E60E24F891
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 08:01:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51A734F61C
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 08:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709884867; cv=none; b=pr0wUwss7eZxipwqZvu2ZCaKMAh+7d9a3vtzMPPdiIVg2HFWZ+oGi64MG46KSl6yhNiK8HBcsTS5UN6QgKqKlZI5MfKzQOyvoojIi3mrTCEAA3sGu6IwjGqp7gFX4z1RvR5sSMDJS8ngVRUJXWcoZWNlflgguIn/h4rmI81JaCE=
+	t=1709884940; cv=none; b=CSqtNPNgSr8+2dBPWw66FnLPQ3QOLywUE8QMI3HljbEux0CF122ojJ57mLz+590vR+Np/3RqziyopR/468DlRBAVydCJ8o131vdm/LNH9IZTsNP6EcmVF2/dYN8shgf78YvSwAroxCkReeWfbD631KnDeDRTr6UkQFfDdj6Hibw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709884867; c=relaxed/simple;
-	bh=9/E1gW/SWS68aIKtjqsfQSsNgTvf9eEGWH8xjEhS73E=;
+	s=arc-20240116; t=1709884940; c=relaxed/simple;
+	bh=i5+LQttOiDK+IBb+ac1o0yrDDrJfYdIjIQ3B/hWTbPY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WS3bM8qmwJ1VSm7E7yhS5IV9qX2iaqsADRBi6N68xvTfJclQKznzhZkcbo1II4+5diyhGKZElpEoDDkr1qHZ6qfzj0ubTLXw3TyhjxdDBrrFJWLXHGXW/4B/nBMgJCUNIz+AHXgzc7ddAeeqOWBdW25s43KTVy9ACWp15VkWf9U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=z6HfT87B; arc=none smtp.client-ip=209.85.208.48
+	 In-Reply-To:Content-Type; b=b2eELljSA3FVxahRA0tFXKMy24C6X6gE2eydxwCvMvuUKsmIt8g4VCbNSzRm8o8IH5xMk1FOmwpa8Gdqr8F26SYJw0oDz/6hcqfbYkNV/X3bm+LOfi/ADVuQI3DM09PrId43D+AevEwV6k2oIzzApJRDAMAtQxJohH4zEqSc/Mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=mEpEp/gs; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-55a5e7fa471so669171a12.1
-        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 00:01:04 -0800 (PST)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a44f2d894b7so250935466b.1
+        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 00:02:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709884863; x=1710489663; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1709884936; x=1710489736; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=rd6ySLdCnQAD/erbhy9b4z1gT//LzMF/P+/70cDzp2w=;
-        b=z6HfT87BbotWVC5dJ90cTDG/OAnqR4488M4cmshBXQnEFpSIospgjW5BkkOnms9qL0
-         Ve+/tMxvwz8LPcHGQFJhCKaZqkj0dD3RY2+LTAZzBhnY4ud8F8uW84lRbyoBrbHL85bZ
-         bouzIQ1M7tIieUhkRCBvS5w4+nZeJ8HHw5cWGwodSGrHzeO+yz5X1ztU6FZmTXO/3CnW
-         skA4zBCLpr+GUuK7nXvv9R3oWZoFabu1Mr4lni5XQoi00jkL8vQfEj6h6AA56dotL+1O
-         HY9lU1QEs6TzkvlksGXqzY3X/+/+sMaqJY2MNI7fRObGag85xB18UdZlTRJSsVP478HI
-         jSDw==
+        bh=/acIAeIuT/IxNA+GKkv1P4g4DAq8FS8eDI/yV0nIF4M=;
+        b=mEpEp/gsVXpoi+OCu0r+VduCScvM/eupWRznzuFj3H+f9o3XmkZgBzoMTkY2e3dkg5
+         4UhNrJY0DnCoZdqCDzR0tW0Y8Jdq9lxErZDy/+/251XJJCYYZeaOoi82aP7xC4JetiGp
+         d69bmwyS7kDle1Lrasl0LZiw2bF+ZKVbuus/adOfc7yRJj7sxXymU+Tn6Z6xnT2Gp1Nh
+         0iRcbPxh+iaH1BeYSMmM9X7a+iPtrpBJLnB2pZB4OeYV8JxV3LHVhkXybt9LA63she+z
+         wPinB0lJacObeQggwH9aMSPDQSYF50kgoj7wtxSSmZ5pG3d6zsNhHJX+2hmWs85wbW4I
+         ivRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709884863; x=1710489663;
+        d=1e100.net; s=20230601; t=1709884936; x=1710489736;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rd6ySLdCnQAD/erbhy9b4z1gT//LzMF/P+/70cDzp2w=;
-        b=sAMnXTnY+5vg7kAAEhhV21bfc9OKx26b1fP9jnkbiQ4X0mxZ9CfIZWJqYKoX0h5ujT
-         KHgyHM12Hr2IGARr1b5rgTdkzXfm4RbzmTzQnU+8mnSMQIVtk3SAn/fzHNynBb9GfjxL
-         GmPrqVKPnHUXQ6sBh7qqQCcIEvkMiaRgrP8HskAkaoF3AAHYjzvnmxiBaLjGHJuY/U8m
-         ArBm9hpw1N+xjy3U6GkB9RgdIIpbVxKMz4RrGAwizPmllPO6kdiErkncgeGjmRxeCJ8U
-         nKdZxKBDq8kMFdFaE5DAfiUGPdZDhc5P9eBVcHmIkY6KDxWIVE9CN8atOKvnm2YyE7qa
-         5PXg==
-X-Gm-Message-State: AOJu0Yzln28sj4bKBsNqLnokbTH84YqT+b/vKmNgoGuJOuoc2YeHW+Wl
-	BOH+P1dArBIdBsslLVStyRULtiYBt6b9OeEEInkgGXQFnNMsx7E39SJjUcobkDk=
-X-Google-Smtp-Source: AGHT+IGQZvweC858vxwv32AOnkVgO7gX4S/BV/xaF72fZarb61+hc3hUifS5PpU3y06tEtTxcnWOLQ==
-X-Received: by 2002:a17:906:f8d6:b0:a45:2e21:c779 with SMTP id lh22-20020a170906f8d600b00a452e21c779mr10297783ejb.4.1709884863166;
-        Fri, 08 Mar 2024 00:01:03 -0800 (PST)
+        bh=/acIAeIuT/IxNA+GKkv1P4g4DAq8FS8eDI/yV0nIF4M=;
+        b=iyQ6BkZjYmDXp561GtE3x4GOysLUlVrjbYY7IquCjAVpqgKfRI5puxLFAPZaUtKc9Q
+         ri0rrn15ADjI/D592Yd0q7DZUvDE7C36Dgo57YtzG8oDTgIXDkDAd3ZZofzFdiM4qmmL
+         RCFLyK3zmhH7G+znstxLP3u2GrniqolzEwjmAIATIgiscoNq0bmehbTgMhahWDb3ffug
+         2KesoCQ7f5msetMUIXIb+Qk46ArQuQr7VrJAAkFCxlLWmd/psl4aK6QqPKym3/IA5ElK
+         9fvPyb0Jhpj/Qoox2pzT8DKsTpp5Kw7tQMTJ1CLx/OZ98CtxWONE0GJ3FxxScrAp5Aee
+         P0cA==
+X-Gm-Message-State: AOJu0Yyg36bMJh0xttW797h6jf+QyywR8Corgpma05JYE09UF2xPMNpG
+	u+mN6/TinICZiFMuQMlCe1hl2ksJRcJBIUx9jZHsn/ngVW2QJMmqojzbtRPWA1Y=
+X-Google-Smtp-Source: AGHT+IHBCsp+8rnGqoD50zOFVH+MYSbkOihfUCfDjhZfpW0idEn1stmLAitqj+euGE1M6iN64a24Qw==
+X-Received: by 2002:a17:906:616:b0:a45:8ab6:5f3b with SMTP id s22-20020a170906061600b00a458ab65f3bmr8488948ejb.6.1709884935646;
+        Fri, 08 Mar 2024 00:02:15 -0800 (PST)
 Received: from [192.168.1.20] ([178.197.222.97])
-        by smtp.gmail.com with ESMTPSA id g7-20020a17090670c700b00a45ad52d510sm3354833ejk.139.2024.03.08.00.01.01
+        by smtp.gmail.com with ESMTPSA id g7-20020a17090670c700b00a45ad52d510sm3354833ejk.139.2024.03.08.00.02.13
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Mar 2024 00:01:02 -0800 (PST)
-Message-ID: <272fcc64-a22c-4f19-8172-d1959276547e@linaro.org>
-Date: Fri, 8 Mar 2024 09:01:01 +0100
+        Fri, 08 Mar 2024 00:02:15 -0800 (PST)
+Message-ID: <37ebeeca-e53b-445b-9fa7-53a1b7a4dcd3@linaro.org>
+Date: Fri, 8 Mar 2024 09:02:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,8 +75,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v9 6/9] dt-bindings: net: hisi-femac: add binding
- for Hi3798MV200 FEMAC core
+Subject: Re: [PATCH net-next v9 8/9] net: hisi_femac: add support for
+ hisi_femac core on Hi3798MV200
 Content-Language: en-US
 To: forbidden405@outlook.com, Yisen Zhuang <yisen.zhuang@huawei.com>,
  Salil Mehta <salil.mehta@huawei.com>, "David S. Miller"
@@ -89,7 +89,7 @@ To: forbidden405@outlook.com, Yisen Zhuang <yisen.zhuang@huawei.com>,
 Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  devicetree@vger.kernel.org
 References: <20240307-net-v9-0-6e0cf3e6584d@outlook.com>
- <20240307-net-v9-6-6e0cf3e6584d@outlook.com>
+ <20240307-net-v9-8-6e0cf3e6584d@outlook.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -135,41 +135,27 @@ Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
  fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
  D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <20240307-net-v9-6-6e0cf3e6584d@outlook.com>
+In-Reply-To: <20240307-net-v9-8-6e0cf3e6584d@outlook.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 07/03/2024 12:34, Yang Xiwen via B4 Relay wrote:
 > From: Yang Xiwen <forbidden405@outlook.com>
 > 
-> HiSilicon FEMAC core is also found on Hi3798MV200 SoC. Document it in
-> binding.
-> 
-> Signed-off-by: Yang Xiwen <forbidden405@outlook.com>
-> 
-> # Conflicts:
-> #	Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
+> Register the sub MDIO bus if it is found. Also implement the internal
+> PHY reset procedure as needed.
 
-Drop
+...
 
-> ---
->  Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml b/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
-> index 5cd2331668bc..4f8a07864eb4 100644
-> --- a/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
-> +++ b/Documentation/devicetree/bindings/net/hisilicon,hisi-femac.yaml
-> @@ -16,6 +16,7 @@ properties:
->    compatible:
->      enum:
->        - hisilicon,hi3516cv300-femac
-> +      - hisilicon,hi3798mv200-femac
+>  
+> @@ -946,6 +991,7 @@ static int hisi_femac_drv_resume(struct platform_device *pdev)
+>  
+>  static const struct of_device_id hisi_femac_match[] = {
+>  	{.compatible = "hisilicon,hi3516cv300-femac",},
+> +	{.compatible = "hisilicon,hi3798mv200-femac",},
 
-As I asked two or three or four times: please express compatibility
-(oneOf, items). Your driver suggests that they are compatible. If they
-are not compatible, mention it in commit msg, but so far it suggests
-they are compatible.
+
+Why do you keep growing this table?
 
 Best regards,
 Krzysztof
