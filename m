@@ -1,155 +1,188 @@
-Return-Path: <netdev+bounces-78706-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80FA4876367
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:37:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EF49876393
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 12:47:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 376A02814B7
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:37:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 924091C2083D
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 11:47:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93A4255E67;
-	Fri,  8 Mar 2024 11:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEF16535B7;
+	Fri,  8 Mar 2024 11:47:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="Vv2UMVph"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="d6wySnS4"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05olkn2067.outbound.protection.outlook.com [40.92.91.67])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B93015578A;
-	Fri,  8 Mar 2024 11:37:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.91.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709897847; cv=fail; b=H6Sz7dHEf5046NIMdM7y3T8BJJGXeVPtVCpDX4UNMgideYcqIR2DtA7N8X6Y6WKT/82t8/pQAlrotuFOd8SpANIP59VTymIdxKBQzvWCWLNsmr44I3GXp8OkIX3Fq7JU8QkuRRc5b/2JASOBfGBrxS6mWtWKTjXBnDXzT6EWqhk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709897847; c=relaxed/simple;
-	bh=5W8OQsTkb8zlsQtLe8dbiSIO5acTornZARWuIWrGn08=;
-	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=Ddi6pTeCHmTzYbvWGA4Mgl4B5Ef5PLksszA20nSBaGY6f5fImlBXGD5J4lCTAmlbjFAVjNeemv+ObK805GGeqqk0si0M2uESH4/tVF2zz2IEOk5M8TuqJButTdOCR+DXCbnRYHTAvjNsi6JemyT2gdbyP2Kgc86duKvJ/WMz7Dw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=Vv2UMVph; arc=fail smtp.client-ip=40.92.91.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jiSX6wHNlh/tEJEIztC7Tsan90A6Vg6W/wtAeF2ZoKKmLa37UgGm19Q4kD2S9cTAQd8npYoXwW+lahl9jm8boBUxh8v6wuPeiTl659P5hSztsgnIBWwNemYiYgJ9brWSTL+zt/JgrmDsaNsocxKvL0QOzymrK04ktro5bXMXscM2ngMmSvaVWI9aTlvnhwuzi0ZUNajtDPXTtSr0e44Yr25AlnB4MgTTPGAnOusGIEF4X+BpM6ZRF4YAzIeVltNFQQ+qlN+TZEj4LUF6kVrW+eJqiHR2XPqMjxe5TimGt1ii3Q9eS5QZUlYoJx6SXND1kjdM/nqAcgvIByJAGccl+Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=oZPjAIqUphboDKkP5eYqFo5/dKb7IepaomOF1h29P14=;
- b=AVcTwUpUOKCje3fR9Qh/pDCO/nY7JaBlnZOJQZJTlXasGd9vPES4S0sd0ij45UcGFj0pF9ynXmyYn9EZL3F2RfSqlv0dwTwufeTMTN8+rn3nDA8YJa43aIS5tJhtC2zN1IMrlhEjWb7KH6FWxRAsg9NqGOYnv4NUmxO8Ha5qxLLmHxl5blcx+CM5d2WFjmbHgog683eMqsHD1PpSj+ZuRX3cT8/YJdlhgAyHpCRkCf+u9gBlRQ62X+TmX8kTCVjCMw61A0lA2hESxSa6rbI8d3a9FSu6v4NuvKmyjOhereeEOmBfIBOk9UzNDD+qRRPOTzp2ABUqn1mCNbyDxfxS7g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=oZPjAIqUphboDKkP5eYqFo5/dKb7IepaomOF1h29P14=;
- b=Vv2UMVphRPmn/zyUN0aSRdc9NQfqZzaf++W8b6fKCN7QEDQPkxQ59Xib8qnTARizdUiwFrQrAWl9iwv9TVE+A7SCiVNMfcrg3l/aGvHanx+7jJrT234xsPhjdL828LpSHRl51oYHrfW/Lms+6T1Cx3TCglUCuoMBoHFGqHiOcD5KBMNXl4WQP6TkptkPAIzRZfwp4o8N5pBZuAiSI0Bq6yWkI+kFkG+3ShH/OL3+C4wV7go0yoz0rmcLi3LSaoBpswUIyQrtq4+GXYLFhO5pJNHI5Lx44uM1b2B2Tqtwou1MsBYX1xVRJcUTDV4JyjzR4lYQUokHCAQ1gD/H3G+8AQ==
-Received: from AM6PR03MB5848.eurprd03.prod.outlook.com (2603:10a6:20b:e4::10)
- by AM7PR03MB6309.eurprd03.prod.outlook.com (2603:10a6:20b:131::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.27; Fri, 8 Mar
- 2024 11:37:23 +0000
-Received: from AM6PR03MB5848.eurprd03.prod.outlook.com
- ([fe80::58d5:77b7:b985:3a18]) by AM6PR03MB5848.eurprd03.prod.outlook.com
- ([fe80::58d5:77b7:b985:3a18%7]) with mapi id 15.20.7362.028; Fri, 8 Mar 2024
- 11:37:23 +0000
-From: Juntong Deng <juntong.deng@outlook.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	Liam.Howlett@oracle.com
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCD621DA21
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 11:47:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709898446; cv=none; b=iqda6cR7lVLaSBaYhqoH+4EI3B/b4cR75msMbZUoAIqy0hQk8jEIZDzsFhNh0vaH+C0G9oO2hhqnwGRU+HcCbCaag6XjqtPcnWrhpnh8gjsv+2JEMXWummC1IsBrnwingcV+fl4s3l4/eQGyR74zk/4ScT9hd2ZbWc/wMSViEFg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709898446; c=relaxed/simple;
+	bh=5/6gIpu665kaDySqjr476UgYPYR2H9SQ0vvqIgW0f/c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cn96mY5GRFnA+Cnt3HZRM7+GL6yDs6PXXZZda+s6PeZ+d//Ht7YcU+PQv9GaUUF+SP14DUQCwTFcPaf7GPw9J5XkNs3ivYxgDk207VXeN2CmEwcXA3sPE39Ne/JmGu7qOH8SWm4uZp9zVmMhXtpEjrYQZBBlk4QAs0LIHwxySrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=d6wySnS4; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709898445; x=1741434445;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=5/6gIpu665kaDySqjr476UgYPYR2H9SQ0vvqIgW0f/c=;
+  b=d6wySnS4osoft1cUYqo/CtYpsap3Uc6V+IZX+J9fcXKxp49ouynQIY++
+   HCUoyacEUvG13fQq5S9vqsQIXrH57ZLb0rP7KdNyuL2TuC0ufkmt/0jnU
+   yH8W1iiXQKMmSfdqBPPIvfr11VKMo9ZZtTI7VjEll93lAeMNJmFC6ki0i
+   9/LHwiIxPGK0PfxY910G7Xe4G3MxUVWBoH+aM3x2KUn25g+7Y3DTWGXre
+   yhMz7U+gDmWDRHx2+DJQarUGMXL/IGnt/3f0zuhAvzlpRxlGnvN53lXMw
+   VzxFqq5bJOXOsFXBzjtnCvuj6cNwiI2Y3FUNV3M14nd3drbstKGuhCkfB
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11006"; a="7559149"
+X-IronPort-AV: E=Sophos;i="6.07,109,1708416000"; 
+   d="scan'208";a="7559149"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2024 03:47:24 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,109,1708416000"; 
+   d="scan'208";a="10341758"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmviesa007.fm.intel.com with ESMTP; 08 Mar 2024 03:47:21 -0800
+Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id AF92D3496B;
+	Fri,  8 Mar 2024 11:47:18 +0000 (GMT)
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net/netlink: Add getsockopt support for NETLINK_LISTEN_ALL_NSID
-Date: Fri,  8 Mar 2024 11:33:04 +0000
-Message-ID:
- <AM6PR03MB58482322B7B335308DA56FE599272@AM6PR03MB5848.eurprd03.prod.outlook.com>
-X-Mailer: git-send-email 2.39.2
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-TMN: [JA9sT5KNrvqKZHaox87B830FOKZqk6E/]
-X-ClientProxiedBy: LO4P123CA0111.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:192::8) To AM6PR03MB5848.eurprd03.prod.outlook.com
- (2603:10a6:20b:e4::10)
-X-Microsoft-Original-Message-ID:
- <20240308113304.12061-1-juntong.deng@outlook.com>
+	anthony.l.nguyen@intel.com,
+	kuba@kernel.org,
+	jiri@resnulli.us,
+	horms@kernel.org,
+	przemyslaw.kitszel@intel.com,
+	andrew@lunn.ch,
+	victor.raj@intel.com,
+	michal.wilczynski@intel.com,
+	lukasz.czapnik@intel.com,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Subject: [Intel-wired-lan] [PATCH iwl-next v7 0/6] ice: Support 5 layer Tx scheduler topology
+Date: Fri,  8 Mar 2024 06:39:13 -0500
+Message-Id: <20240308113919.11787-1-mateusz.polchlopek@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM6PR03MB5848:EE_|AM7PR03MB6309:EE_
-X-MS-Office365-Filtering-Correlation-Id: 264ea03d-b2f2-4bc8-6a50-08dc3f641f1b
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	nhzAW36gHmOkEbNg2oKhDSFeQZ/i/bXWKLdToFjxkxuyoWI32soe9Lm03dBBFzwpgNjwddG7Gq/LsXTsJr6OOwUl0qufcEDS4cAKM2kZNfqgdOP54agrXrGea7YSo2hv4dv28IF4FK35pi5d56h2pdlyBaiE0OEP4GbKsFnXqxZvFJgPl72dnqEZxMPFIKPjcBM+a+dALOfuQrCngkbs2Yx/MBPUE+u5oeMPIDfDqXyRN8eVlv47utw8nRgZD3fn2ja2rlgYKFn+kpN3EcAW8XAu+716AFkmRZN//oO8/SPveXKM+KIh9yj/jBhfXsi2iH7tGeDbh1PmVbXQVNHzjlr0JZTXklVJS5789yTaHpIdtt04bcnrA6AzbTJZ3tjU7mjtqvKd3DUUybQBoOC3lSfka7J5Y9aQnfu0d2uXdLkU16LgapVEaVgZAZz6STRtNSpTZx6h2K8f29xF1vGWYo0SptwHZyjDr5t02jsW1gVb/hWXSsHCTenLVWgamXALkNLDEQgPo7sve+EWYLijD0V8U6G0GbsifNdELw/ji4U132bMYQxJvw9BkCrDi0SY
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?912d1s8w57kiceH+niu2NFreFRPUKtBnfThF111yNW4cSbVubR9khLC5hNWf?=
- =?us-ascii?Q?mWiquniLovu1apxzIvGGAJ2S/bcCbchw0SNl6eTRMmfdRvsfSI7oBmHWvF/+?=
- =?us-ascii?Q?k/A0OwIXd9t+rZakai9AA33oDXidBlZpvwpEpwuDgHPz6lNKWX7xU/8xhBsh?=
- =?us-ascii?Q?WormD6ch+kk/Fs+WT5ajiTohNufRfN7Xk05EC19ol6o21rXy4RjSonNe3fm0?=
- =?us-ascii?Q?Ddis78Tn+gJcPJD5MCksl4MlM8/ccs20z4Y+d3XtA/2bnqqS2OEia/Q7Mx/M?=
- =?us-ascii?Q?oZXjsUyFvs9S8KSLRuEQHfXsjLAybA63wnvWWPeCubIkE4Cn6NA4A7DQiRWs?=
- =?us-ascii?Q?1wG4ipGWXlPkodHfgzMEPEe/edNU55GtmroYtf8hP5Qf7MDAZOA6RPS/QIoF?=
- =?us-ascii?Q?fzh7uji3Elxhk2A/d3HUfETihKZ9TB0JNQqMomgr/QYzob+MOspvwi8ihyoJ?=
- =?us-ascii?Q?dTAJqLm0Ap6uHKHadL+Vnp5MlRV6EzvuQn6dGkfEIlurad1CMV1B0LTvzJ5o?=
- =?us-ascii?Q?7kww2DSwaS2gILYiu8SF7svrs2CV40gC+hQkklcVjkrZLvfSYuJKWLBTcOtW?=
- =?us-ascii?Q?HR6rT6JrlEWkJ0cA2p5kahlRw/58yHhD64RIz6ac1s+wdvi09vVvHVsjiM2q?=
- =?us-ascii?Q?KhApkJ7A7kbYbZ+hEas+hyv+H8NEiwT9ZtelvlmJalWfgbqKu0LIZ2A6d0Ss?=
- =?us-ascii?Q?wIP1QKuVu1HrgZf+dRp0UO6DfelVjVJVxR3Ec9t7J7ABQ7/RH+RbAJ8p0ZAL?=
- =?us-ascii?Q?cCf+IlOoRnsHkjVGNgwa55WQaoaYk5YwUPvap5xsZo6VhZa/5pvqp8fyXNpK?=
- =?us-ascii?Q?KdBQaOZdV9nf13jtheVhKFjPKar/ZofR8k4lVxlwi+Eqbg/1m3SzvGpyJ5D6?=
- =?us-ascii?Q?cYClokB+VR8r1toL1iRia2QphwINZQv/cjEX7IkjKqrqem7UCUKu/KCH6Cdr?=
- =?us-ascii?Q?uC8gVsqTLpyYYZ4EIWkl4RfjWMEHpxb7D4UJEfMmuhvbCC0y4ZRLmSaB+vW9?=
- =?us-ascii?Q?hQaPGhPDTPk39i+7x0ZOiwTDwNwXb+J4Y7GZueWsrGE33/5oa/eH++Uj/euJ?=
- =?us-ascii?Q?/IhOcb7v2cmfnrBpor5O3SGCYZv9uWo35OW31BTH/iKI9HdGuC2ujEcIALnM?=
- =?us-ascii?Q?BgV5M+lcclmeKwC371p/eMOM5rtZPZNczkGdXV/ul4iXU/ZIVs7dKBvoEZmL?=
- =?us-ascii?Q?l+VDrIKxDrsHq4n7U0fJ7Rx11VMM8cibnyETMEJT4jaJ7+iUhZNeUvVOGe1Z?=
- =?us-ascii?Q?C1YaNNKfZgwKrVMLBDJ2?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 264ea03d-b2f2-4bc8-6a50-08dc3f641f1b
-X-MS-Exchange-CrossTenant-AuthSource: AM6PR03MB5848.eurprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Mar 2024 11:37:23.3006
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR03MB6309
+Content-Transfer-Encoding: 8bit
 
-Currently getsockopt does not support NETLINK_LISTEN_ALL_NSID,
-and we are unable to get the value of NETLINK_LISTEN_ALL_NSID
-socket option through getsockopt.
+For performance reasons there is a need to have support for selectable
+Tx scheduler topology. Currently firmware supports only the default
+9-layer and 5-layer topology. This patch series enables switch from
+default to 5-layer topology, if user decides to opt-in.
 
-This patch adds getsockopt support for NETLINK_LISTEN_ALL_NSID.
+I sent it again to iwl list, because we need to test that change,
+devlink change is rather mechanical. @Tony - who should send it to
+netdev list after getting Tested-by tag from our Validation?
 
-Signed-off-by: Juntong Deng <juntong.deng@outlook.com>
 ---
- net/netlink/af_netlink.c | 3 +++
- 1 file changed, 3 insertions(+)
+v7:
+- fixed comments from v6 in commit 1 and commit 5
+- included Documentation change that should be in v6 (reboot -> PCI slot powercycle)
+- added Reviewed-by tag to commit 1 and commit 6
 
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index da846212fb9b..7554803218a2 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -1773,6 +1773,9 @@ static int netlink_getsockopt(struct socket *sock, int level, int optname,
- 		netlink_unlock_table();
- 		return err;
- 	}
-+	case NETLINK_LISTEN_ALL_NSID:
-+		flag = NETLINK_F_LISTEN_ALL_NSID;
-+		break;
- 	case NETLINK_CAP_ACK:
- 		flag = NETLINK_F_CAP_ACK;
- 		break;
+v6:
+- extended devlink_param *set pointer to accept one more parameter - extack
+- adjusted all drivers that use *set pointer to pass one more parameter
+- updated Documentation - changed "reboot" to "PCI slot powercycle", kept Kuba's ACK
+- removed "Error: " prefix from NL_SET_ERR_MSG_MOD function in ice_devlink.c
+- removed/adjusted messages sent to end user in ice_devlink.c
+https://lore.kernel.org/netdev/20240305143942.23757-1-mateusz.polchlopek@intel.com/
+
+v5:
+- updated Documentation commit as suggested in v4 
+https://lore.kernel.org/netdev/20240228142054.474626-1-mateusz.polchlopek@intel.com/
+
+v4:
+- restored the initial way of passing firmware data to ice_cfg_tx_topo
+  function in ice_init_tx_topology function in ice_main.c file. In v2
+  and v3 version it was passed as const u8 parameter which caused kernel
+  crash. Because of this change I decided to drop all Reviewed-by tags.
+https://lore.kernel.org/netdev/20240219100555.7220-1-mateusz.polchlopek@intel.com/
+
+v3:
+- fixed documentation warnings
+https://lore.kernel.org/netdev/20231009090711.136777-1-mateusz.polchlopek@intel.com/
+
+v2:
+- updated documentation
+- reorder of variables list (default-init first)
+- comments changed to be more descriptive
+- added elseif's instead of few if's
+- returned error when ice_request_fw fails
+- ice_cfg_tx_topo() changed to take const u8 as parameter (get rid of copy
+  buffer)
+- renamed all "balance" occurences to the new one
+- prevent fail of ice_aq_read_nvm() function
+- unified variables names (int err instead of int status in few
+  functions)
+- some smaller fixes, typo fixes
+https://lore.kernel.org/netdev/20231006110212.96305-1-mateusz.polchlopek@intel.com/
+
+v1:
+https://lore.kernel.org/netdev/20230523174008.3585300-1-anthony.l.nguyen@intel.com/
+---
+
+Lukasz Czapnik (1):
+  ice: Add tx_scheduling_layers devlink param
+
+Mateusz Polchlopek (1):
+  devlink: extend devlink_param *set pointer
+
+Michal Wilczynski (2):
+  ice: Enable switching default Tx scheduler topology
+  ice: Document tx_scheduling_layers parameter
+
+Raj Victor (2):
+  ice: Support 5 layer topology
+  ice: Adjust the VSI/Aggregator layers
+
+ Documentation/networking/devlink/ice.rst      |  47 +++++
+ .../net/ethernet/broadcom/bnxt/bnxt_devlink.c |   6 +-
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  32 +++
+ drivers/net/ethernet/intel/ice/ice_common.c   |   5 +
+ drivers/net/ethernet/intel/ice/ice_ddp.c      | 199 ++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_ddp.h      |   2 +
+ drivers/net/ethernet/intel/ice/ice_devlink.c  | 184 +++++++++++++++-
+ .../net/ethernet/intel/ice/ice_fw_update.c    |   7 +-
+ .../net/ethernet/intel/ice/ice_fw_update.h    |   3 +
+ drivers/net/ethernet/intel/ice/ice_main.c     | 102 +++++++--
+ drivers/net/ethernet/intel/ice/ice_nvm.c      |   7 +-
+ drivers/net/ethernet/intel/ice/ice_nvm.h      |   3 +
+ drivers/net/ethernet/intel/ice/ice_sched.c    |  37 ++--
+ drivers/net/ethernet/intel/ice/ice_sched.h    |   3 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |   1 +
+ drivers/net/ethernet/mellanox/mlx4/main.c     |   6 +-
+ .../net/ethernet/mellanox/mlx5/core/eswitch.c |   3 +-
+ .../mellanox/mlx5/core/eswitch_offloads.c     |   3 +-
+ .../net/ethernet/mellanox/mlx5/core/fs_core.c |   3 +-
+ .../ethernet/mellanox/mlx5/core/fw_reset.c    |   3 +-
+ .../mellanox/mlxsw/spectrum_acl_tcam.c        |   3 +-
+ .../ethernet/netronome/nfp/devlink_param.c    |   3 +-
+ drivers/net/ethernet/qlogic/qed/qed_devlink.c |   3 +-
+ drivers/net/wwan/iosm/iosm_ipc_devlink.c      |   3 +-
+ include/net/devlink.h                         |   3 +-
+ include/net/dsa.h                             |   3 +-
+ net/devlink/param.c                           |   7 +-
+ net/dsa/devlink.c                             |   3 +-
+ 28 files changed, 614 insertions(+), 70 deletions(-)
+
 -- 
-2.39.2
+2.38.1
 
 
