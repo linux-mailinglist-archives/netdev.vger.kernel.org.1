@@ -1,73 +1,58 @@
-Return-Path: <netdev+bounces-78821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09F7E876B00
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 20:02:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92CD9876B03
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 20:03:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1C19CB21D27
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 19:02:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 09D8E1F217AB
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 19:03:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B60C958132;
-	Fri,  8 Mar 2024 19:01:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63BFB225D4;
+	Fri,  8 Mar 2024 19:03:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gMfmjehV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i8+LGrQh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02EBC225D4;
-	Fri,  8 Mar 2024 19:01:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F9498833
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 19:03:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709924515; cv=none; b=n4j95crvv7QzwlEDy46ctULa+LyKg3gOmZaTMB7F0IJM47H1dJyblxDQ28P4OwANsYmyvSH/FOMJacjecC7dB4QOgTX/gUD8QfGakEhYlJSWFQjOGtkc7e2Yt9d5EfzwTmSpn9gs65lAZChm3QQGUtDF7Ho+Fun/4UdK4/l6QNw=
+	t=1709924606; cv=none; b=eurRm9Y+SGXY/KGxsockYWQFXUHy1ztM30rkcY+gdX70Re42EkKNqGIPOhFn0V1xA/sVjK9sdeJxqoqNiOM/Y0L6b9Gp6+VBhaZ44uiwRK77L0AFYlvBU7Sf7hpR/9MvJGqHCImXAXdcS1zTO8Y7VfBMGNeNjmZ8LrBmJ/q5FQk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709924515; c=relaxed/simple;
-	bh=m+eeRPdseEbp1q6czC2WNsFEAQDLt512Oea/8oYoztg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RRG9KHm9KpLOmdgwYLOvuzvYdz5SAiBPjC6bFViQUjPE3wqGgeO0xlOe9tn4DOVfTX7aC8iEsGZlmyoA2eLGOSM809Z70vGouBC/CXfYPs+EwayeA9KGaX4j1MRYunzggzzLm3Pc+jyMTU9rZV1+N1W+/wzRRWeejEY8Z1fL1Z0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gMfmjehV; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1709924513; x=1741460513;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=zl4aK2NfwrOO4Bg03NI8PJKDWOogDZuHv69Wgg9Jrz8=;
-  b=gMfmjehVR0GBL6m71xP3rULc4KQTuB6pW6Hu5J7V8+ipm34w5oomzKio
-   2z0b+NtnXCNPjzeq6N3N7j10IxWkcjjSdG0NSVIT3CMIrAohKUT6SRxwB
-   oKCBAfPobe3oNlD0aEKkYNmEj9Vm37AiE2UUwfR/j8uu4+J3QOz+aTlNs
-   k=;
-X-IronPort-AV: E=Sophos;i="6.07,110,1708387200"; 
-   d="scan'208";a="71838891"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Mar 2024 19:01:48 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:41067]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.28.13:2525] with esmtp (Farcaster)
- id dd49f6fc-2db3-465e-ac57-09b636006db0; Fri, 8 Mar 2024 19:01:48 +0000 (UTC)
-X-Farcaster-Flow-ID: dd49f6fc-2db3-465e-ac57-09b636006db0
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 8 Mar 2024 19:01:44 +0000
-Received: from 88665a182662.ant.amazon.com (10.142.235.16) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Fri, 8 Mar 2024 19:01:42 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <syzbot+12c506c1aae251e70449@syzkaller.appspotmail.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <syzkaller-bugs@googlegroups.com>
-Subject: Re: [syzbot] [net?] WARNING in sk_nulls_del_node_init_rcu
-Date: Fri, 8 Mar 2024 11:01:34 -0800
-Message-ID: <20240308190134.58475-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <00000000000094b65a0613299ae7@google.com>
-References: <00000000000094b65a0613299ae7@google.com>
+	s=arc-20240116; t=1709924606; c=relaxed/simple;
+	bh=QY//B5H9t7Hopwq8QpRUnAlJOSmQI87jLNXcCC4HyTo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d7ci0LhDm2cQLD0ia8ixhSj99YbGCysm/ktDc9skIlSl7u6qTu+edZ/NSBn6M2tnVaip8PqfogSa+GqmxjRK1+gA8j4DXSL1M7QIJJVyntUKW/80pld9ntZuMSuxFbZwzOHKo2NU0qNHJFBFJy6lVAI1HgRSi5BQ2nQZQk2DzMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i8+LGrQh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 837CFC433F1;
+	Fri,  8 Mar 2024 19:03:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709924605;
+	bh=QY//B5H9t7Hopwq8QpRUnAlJOSmQI87jLNXcCC4HyTo=;
+	h=From:To:Cc:Subject:Date:From;
+	b=i8+LGrQhC/eIfUrAG/UCyFeGU7ZgMM+3bn/pQ13yPX5Fy5lFab1W49FzUpuK1JfJ3
+	 yFUpO0VHzaSQC0tA1vFPd6p2c4WTcAZdzbE3XZrG5fPiEKUCuC+zMW+hNpcU/FkX9B
+	 3rblVy3UA+MgggnfBq+fCSjJM8DtEIaSLknpVSyQIr0BxWrKtBZptfkOn9y2Qb4aNZ
+	 T7I3vgnKAZiYKsdOtoXax0I7kn9g2A/wE73zNSnddiPJwETg96P0RF2ngVmoIa7NsR
+	 VqeRh44SyJeTI5C28oohBpz21gtSsPP6WXrlZxv88jUaQ2dEvUaWI+qLi1WJlbT3p4
+	 Rki8kvPJRemAg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	almasrymina@google.com,
+	donald.hunter@gmail.com,
+	jiri@resnulli.us
+Subject: [PATCH net-next] netlink: specs: support generating code for genl socket priv
+Date: Fri,  8 Mar 2024 11:03:19 -0800
+Message-ID: <20240308190319.2523704-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,76 +60,172 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D037UWC004.ant.amazon.com (10.13.139.254) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: syzbot <syzbot+12c506c1aae251e70449@syzkaller.appspotmail.com>
-Date: Fri, 08 Mar 2024 09:34:28 -0800
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    c055fc00c07b net/rds: fix WARNING in rds_conn_connect_if_d..
-> git tree:       net
-> console output: https://syzkaller.appspot.com/x/log.txt?x=16aa17f2180000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=fad652894fc96962
-> dashboard link: https://syzkaller.appspot.com/bug?extid=12c506c1aae251e70449
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> 
-> Unfortunately, I don't have any reproducer for this issue yet.
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/c39eb6fb3ad1/disk-c055fc00.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/110f1226eb89/vmlinux-c055fc00.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/1303e2df5cc4/bzImage-c055fc00.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+12c506c1aae251e70449@syzkaller.appspotmail.com
-> 
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-> R13: 000000000000000b R14: 00007f3b817abf80 R15: 00007ffd3beb57b8
->  </TASK>
-> ------------[ cut here ]------------
-> WARNING: CPU: 0 PID: 23948 at include/net/sock.h:799 sk_nulls_del_node_init_rcu+0x166/0x1a0 include/net/sock.h:799
-> Modules linked in:
-> CPU: 0 PID: 23948 Comm: syz-executor.2 Not tainted 6.8.0-rc6-syzkaller-00159-gc055fc00c07b #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-> RIP: 0010:sk_nulls_del_node_init_rcu+0x166/0x1a0 include/net/sock.h:799
-> Code: e8 7f 71 c6 f7 83 fb 02 7c 25 e8 35 6d c6 f7 4d 85 f6 0f 95 c0 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc e8 1b 6d c6 f7 90 <0f> 0b 90 eb b2 e8 10 6d c6 f7 4c 89 e7 be 04 00 00 00 e8 63 e7 d2
-> RSP: 0018:ffffc900032d7848 EFLAGS: 00010246
-> RAX: ffffffff89cd0035 RBX: 0000000000000001 RCX: 0000000000040000
-> RDX: ffffc90004de1000 RSI: 000000000003ffff RDI: 0000000000040000
-> RBP: 1ffff1100439ac26 R08: ffffffff89ccffe3 R09: 1ffff1100439ac28
-> R10: dffffc0000000000 R11: ffffed100439ac29 R12: ffff888021cd6140
-> R13: dffffc0000000000 R14: ffff88802a9bf5c0 R15: ffff888021cd6130
-> FS:  00007f3b823f16c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007f3b823f0ff8 CR3: 000000004674a000 CR4: 00000000003506f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  __inet_hash_connect+0x140f/0x20b0 net/ipv4/inet_hashtables.c:1139
+The family struct is auto-generated for new families, support
+use of the sock_priv_* mechanism added in commit a731132424ad
+("genetlink: introduce per-sock family private storage").
 
-Here I had to use non-refcnt variant as check_established() doesn't
-increment it.
+For example if the family wants to use struct sk_buff as its
+private struct (unrealistic but just for illustration), it would
+add to its spec:
 
-I'll post a fix soon.
+  kernel-family:
+    headers: [ "linux/skbuff.h" ]
+    sock-priv: struct sk_buff
 
----8<---
-diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-index 308ff34002ea..4e470f18487f 100644
---- a/net/ipv4/inet_hashtables.c
-+++ b/net/ipv4/inet_hashtables.c
-@@ -1136,7 +1136,7 @@ int __inet_hash_connect(struct inet_timewait_death_row *death_row,
- 		sock_prot_inuse_add(net, sk->sk_prot, -1);
+ynl-gen-c will declare the appropriate priv size and hook
+in function prototypes to be implemented by the family.
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+--
+CC: almasrymina@google.com
+CC: donald.hunter@gmail.com
+CC: jiri@resnulli.us
+---
+ Documentation/netlink/genetlink-c.yaml      | 19 +++++++++++++++++++
+ Documentation/netlink/genetlink-legacy.yaml | 19 +++++++++++++++++++
+ Documentation/netlink/genetlink.yaml        | 19 +++++++++++++++++++
+ tools/net/ynl/lib/nlspec.py                 |  2 ++
+ tools/net/ynl/ynl-gen-c.py                  | 10 ++++++++++
+ 5 files changed, 69 insertions(+)
+
+diff --git a/Documentation/netlink/genetlink-c.yaml b/Documentation/netlink/genetlink-c.yaml
+index c58f7153fcf8..292068cc8a5a 100644
+--- a/Documentation/netlink/genetlink-c.yaml
++++ b/Documentation/netlink/genetlink-c.yaml
+@@ -370,3 +370,22 @@ additionalProperties: False
+               type: string
+             # End genetlink-c
+             flags: *cmd_flags
++
++  kernel-family:
++    description: Additional global attributes used for kernel C code generation.
++    type: object
++    additionalProperties: False
++    properties:
++      headers:
++        description: |
++          List of extra headers which should be included in the source
++          of the generated code.
++        type: array
++        items:
++          type: string
++      sock-priv:
++        description: |
++          Literal name of the type which is used within the kernel
++          to store the socket state. The type / structure is internal
++          to the kernel, and is not defined in the spec.
++        type: string
+diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
+index 938703088306..b6de66e38bdb 100644
+--- a/Documentation/netlink/genetlink-legacy.yaml
++++ b/Documentation/netlink/genetlink-legacy.yaml
+@@ -431,3 +431,22 @@ additionalProperties: False
+               type: string
+             # End genetlink-c
+             flags: *cmd_flags
++
++  kernel-family:
++    description: Additional global attributes used for kernel C code generation.
++    type: object
++    additionalProperties: False
++    properties:
++      headers:
++        description: |
++          List of extra headers which should be included in the source
++          of the generated code.
++        type: array
++        items:
++          type: string
++      sock-priv:
++        description: |
++          Literal name of the type which is used within the kernel
++          to store the socket state. The type / structure is internal
++          to the kernel, and is not defined in the spec.
++        type: string
+diff --git a/Documentation/netlink/genetlink.yaml b/Documentation/netlink/genetlink.yaml
+index 3283bf458ff1..0512c771d737 100644
+--- a/Documentation/netlink/genetlink.yaml
++++ b/Documentation/netlink/genetlink.yaml
+@@ -328,3 +328,22 @@ additionalProperties: False
+                 The name for the group, used to form the define and the value of the define.
+               type: string
+             flags: *cmd_flags
++
++  kernel-family:
++    description: Additional global attributes used for kernel C code generation.
++    type: object
++    additionalProperties: False
++    properties:
++      headers:
++        description: |
++          List of extra headers which should be included in the source
++          of the generated code.
++        type: array
++        items:
++          type: string
++      sock-priv:
++        description: |
++          Literal name of the type which is used within the kernel
++          to store the socket state. The type / structure is internal
++          to the kernel, and is not defined in the spec.
++        type: string
+diff --git a/tools/net/ynl/lib/nlspec.py b/tools/net/ynl/lib/nlspec.py
+index fbce52395b3b..6d08ab9e213f 100644
+--- a/tools/net/ynl/lib/nlspec.py
++++ b/tools/net/ynl/lib/nlspec.py
+@@ -418,6 +418,7 @@ jsonschema = None
+         consts     dict of all constants/enums
+         fixed_header  string, optional name of family default fixed header struct
+         mcast_groups  dict of all multicast groups (index by name)
++        kernel_family   dict of kernel family attributes
+     """
+     def __init__(self, spec_path, schema_path=None, exclude_ops=None):
+         with open(spec_path, "r") as stream:
+@@ -461,6 +462,7 @@ jsonschema = None
+         self.ntfs = collections.OrderedDict()
+         self.consts = collections.OrderedDict()
+         self.mcast_groups = collections.OrderedDict()
++        self.kernel_family = collections.OrderedDict(self.yaml.get('kernel-family', {}))
  
- 		spin_lock(lock);
--		sk_nulls_del_node_init_rcu(sk);
-+		__sk_nulls_del_node_init_rcu(sk);
- 		spin_unlock(lock);
+         last_exception = None
+         while len(self._resolution_list) > 0:
+diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+index 2f5febfe66a1..d78dd005cdb9 100755
+--- a/tools/net/ynl/ynl-gen-c.py
++++ b/tools/net/ynl/ynl-gen-c.py
+@@ -2340,6 +2340,10 @@ _C_KW = {
  
- 		sk->sk_hash = 0;
----8<---
+     cw.p(f"extern struct genl_family {family.c_name}_nl_family;")
+     cw.nl()
++    if 'sock-priv' in family.kernel_family:
++        cw.p(f'void {family.c_name}_nl_sock_priv_init({family.kernel_family["sock-priv"]} *priv);')
++        cw.p(f'void {family.c_name}_nl_sock_priv_destroy({family.kernel_family["sock-priv"]} *priv);')
++        cw.nl()
+ 
+ 
+ def print_kernel_family_struct_src(family, cw):
+@@ -2361,6 +2365,11 @@ _C_KW = {
+     if family.mcgrps['list']:
+         cw.p(f'.mcgrps\t\t= {family.c_name}_nl_mcgrps,')
+         cw.p(f'.n_mcgrps\t= ARRAY_SIZE({family.c_name}_nl_mcgrps),')
++    if 'sock-priv' in family.kernel_family:
++        cw.p(f'.sock_priv_size\t= sizeof({family.kernel_family["sock-priv"]}),')
++        # Force cast here, actual helpers take pointer to the real type.
++        cw.p(f'.sock_priv_init\t= (void *){family.c_name}_nl_sock_priv_init,')
++        cw.p(f'.sock_priv_destroy = (void *){family.c_name}_nl_sock_priv_destroy,')
+     cw.block_end(';')
+ 
+ 
+@@ -2657,6 +2666,7 @@ _C_KW = {
+                 cw.p(f'#include "{os.path.basename(args.out_file[:-2])}.h"')
+             cw.nl()
+         headers = ['uapi/' + parsed.uapi_header]
++        headers += parsed.kernel_family.get('headers', [])
+     else:
+         cw.p('#include <stdlib.h>')
+         cw.p('#include <string.h>')
+-- 
+2.44.0
+
 
