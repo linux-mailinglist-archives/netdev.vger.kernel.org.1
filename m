@@ -1,247 +1,349 @@
-Return-Path: <netdev+bounces-78814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BED80876A8F
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 19:11:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05355876AA2
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 19:16:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B5381F218CB
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 18:11:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7041A1F21BB6
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 18:16:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87C172C862;
-	Fri,  8 Mar 2024 18:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91CE54BDD;
+	Fri,  8 Mar 2024 18:16:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IaSoK7kY"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="VAHkuw4h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40B02C853;
-	Fri,  8 Mar 2024 18:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F402F17745;
+	Fri,  8 Mar 2024 18:15:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709921461; cv=none; b=jTxa+XgrJkjzWpMpNqrn68tPiPPPWSI/5agm1iHUhKj583az/9DRig8ZaE821NzCXHJjZpsfPlQF9nU7Wf00UX/AcG5+chWc712kx6NkPaf258Cqb+LYvo1+FK5tXQGoKil1SR5rNRhW4Rvd2uFQPBc0Fhr3/KmDDq/qtR9nShk=
+	t=1709921760; cv=none; b=Ub450gDwQo1SRATnapAvmxSG0UasIsCaEiUTumXVdffbYMcovqCxZcxvRJdYdFxlRwgMZ6D0QoQ/f1atHG3RhCVhzCF8gPw3AHV0PhbogBB910DD2vmKV8u2tzp5r3AYe8FujV0Im188VI+MNtZya5JP29YBxyKqzEjo8OhCc9M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709921461; c=relaxed/simple;
-	bh=EzbdSX/328RfA3ycYArK6uuK3uzLACBuHbi88lCKcoU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZFd99KrejS/5jTHoqEthlwYM+OPPK+I/RQgS8DzxpOLN7ORePzWLpSYZ/D1Oav+7BiYMW7kJmo88OZdlpUHPnFm8TWWSnODl7DkUHY4UWGlzoDmY1YoGPhjHCgpltaZmCe3z2n/del4c9trJNR57h378F3cKF2H7SgiUrjXA/v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IaSoK7kY; arc=none smtp.client-ip=209.85.210.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-6e5027608a9so1090188a34.1;
-        Fri, 08 Mar 2024 10:10:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709921459; x=1710526259; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=OMga39SQ9wf6iw2TDzDEKZteotW8dIG4eHHX7jroGRs=;
-        b=IaSoK7kYKxUS5YqVIYDHwA5qnpjfk7gTvWp8LVfMsf7RpmYy0R6FK6mUGBtLhbJV5O
-         NrAsg7ns+n20YRnU7r2/uxwaY6BAed2oan8HGbKM6X9tvN0cyTAXbK99CjWpVFTGl0uF
-         AXqISma4/WgMlDg7GQ8baBFYFMhVr/6kwOVKmnuVGtgmoquy4lxLcatRtTz0mldBGGOC
-         /lUCSMUsF1DQhJRxoN1rPlzVZtioRMeXTv7ZblOWpLq3ZHiZgeeck9AwP6/xYb6jVn+d
-         T52TH++fAv/R1BIti94NWs/HjiLvI1LVbBTN6jy2DaRqHnFHur+SfHcU7wkQ/nCLeDMZ
-         4+yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709921459; x=1710526259;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=OMga39SQ9wf6iw2TDzDEKZteotW8dIG4eHHX7jroGRs=;
-        b=GoI0Su2qNnKe/vUBC38coSgSPkdcolgzh0DcGstNA7IyhGaw99CMAxRQoIh6n62dC/
-         dR0BZmeydgrt4oXlN/+Bjuz+iNcbtogqgr66fFT1qy2HI9WOCUKLzlrYTmQzlcVuI2vI
-         0BMb2FjNA2SKquezhNRSu0Fz20HTzbqJfr+XecTMyt/cOfsUGWEcQZCHmwsyhItq0Hlr
-         tn5V3MoT3+8WK/XwIe0Utt6feQC+n14btQuLc+qfD+buIcTj3oCpZPFPHgWJb3ZYGtjV
-         35BWGeYUNZ10zn/t3JQO4XsGfmh5XUfyc7v9KplCXYc5m46zqqVQs/Z8/RJ2Lz5O8J3B
-         wa9w==
-X-Forwarded-Encrypted: i=1; AJvYcCX+iIvghcyCz4zVu3crRZIcUKlt4mlO85PZ8CgmQ0HuT0VXJFy+FSGZb1hJqlXryrGdMH1Dji5GTXmJZy9BRQppNdLCBbSK
-X-Gm-Message-State: AOJu0Yx83xcrdHLp7OW5BABh+apOcxWs4iE2mcmlsWUKPPlhZcKnsN7s
-	GnqfSwJfNWGhOvHZTyAVpjK1mpmzg9GlN/rP69sMcJqujYyKMXFtPDflmHnc
-X-Google-Smtp-Source: AGHT+IG1yXd+M5b0gPrwNeyLgPt5tPi/GZhOa8nNf6GRha1EgY9Cm3IfcPgPaAuAKuo/XYx2vD3tUA==
-X-Received: by 2002:a05:6830:114f:b0:6e4:dc5c:f627 with SMTP id x15-20020a056830114f00b006e4dc5cf627mr13474010otq.13.1709921458868;
-        Fri, 08 Mar 2024 10:10:58 -0800 (PST)
-Received: from lvondent-mobl4.. (107-146-107-067.biz.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id m7-20020ac5cfc7000000b004d33a7860ddsm2081091vkf.17.2024.03.08.10.10.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Mar 2024 10:10:58 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2024-03-22
-Date: Fri,  8 Mar 2024 13:10:55 -0500
-Message-ID: <20240308181056.120547-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1709921760; c=relaxed/simple;
+	bh=wxRD1ZTYNzvztdW5CptHw+5R78yFujNF+v6DS4NwlGk=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jkF9ArG9ykcR5v+m8uyxNIRCbgxwSoOsoGvm2yRdDex4kv3DayJcTQw+mR8mh/FysBgu/OVytzqZJNjDRYmVT+4dp+1zROE6ootkVsDi2d9CSYXLpK2Gg/gXPFNPq/aCBs3cF6pA0FJArc8ot2ZsR80XUns/LL2PtANa+0mH1yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=VAHkuw4h; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 428GdXHQ015669;
+	Fri, 8 Mar 2024 10:15:52 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version
+	:content-transfer-encoding:content-type; s=pfpt0220; bh=SnUBZ7x6
+	ixGGP9j5iu8zqYX1t+21E4VeEcMOUAJbdW4=; b=VAHkuw4hOza6n81HGHKIg1LO
+	XjAW6jbbgGMAJey2+v7JS2ZTAfOeRSacqAsxESeX4tgDyMfyqjWlfgGWCtCIZAte
+	D0FddGAt1Cu1kaUiEJYZdZWMQGiE2OY1iW6fSDItu4blg0LtIgBd1e6zvFErLndq
+	EYYfmnsebtADKDo3hIlK05bI0HlQmzwtyXA7iqfwm+au2dauFc1//nwOHm+K+ads
+	O3FyUA0zpYF3CQK5KV+1lRlt6oYlfki5h5qAQtDwpgdEKzj/sYP1ztREfRTQK0X5
+	MzpKtEDz5meR0bszPmJdJTOS3lSpc6u4DjxcaTBBCJxA/9GoNoLb5um9SLmvlA==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3wr5r2ghur-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 08 Mar 2024 10:15:51 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Fri, 8 Mar 2024 10:15:50 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
+ Transport; Fri, 8 Mar 2024 10:15:50 -0800
+Received: from hyd1425.marvell.com (unknown [10.29.37.83])
+	by maili.marvell.com (Postfix) with ESMTP id E105B5B6929;
+	Fri,  8 Mar 2024 10:15:46 -0800 (PST)
+From: Sai Krishna <saikrishnag@marvell.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <sgoutham@marvell.com>,
+        <gakula@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>
+CC: Sai Krishna <saikrishnag@marvell.com>
+Subject: [net-next PATCH v3] octeontx2-pf: Reset MAC stats during probe
+Date: Fri, 8 Mar 2024 23:45:44 +0530
+Message-ID: <20240308181544.806928-1-saikrishnag@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: JUYINUEk74dAp2Pg1dQGPkAzIgUY3h81
+X-Proofpoint-ORIG-GUID: JUYINUEk74dAp2Pg1dQGPkAzIgUY3h81
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-08_08,2024-03-06_01,2023-05-22_02
 
-The following changes since commit eeb78df4063c0b162324a9408ef573b24791871f:
+Reset CGX/RPM MAC HW statistics at the time of driver probe()
 
-  inet: Add getsockopt support for IP_ROUTER_ALERT and IPV6_ROUTER_ALERT (2024-03-06 12:37:06 +0000)
+Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
+Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
+---
+v3:
+    - Addressed review comments given by Jakub Kicinski
+        1. Removed un-necessary EXPORT_SYMBOL 
+v2:
+    - Addressed review comments given by Jakub Kicinski
+	1. Removed devlink option to reset MAC stats, 
+           will implement stats reset with debugfs in later patches.
 
-are available in the Git repository at:
+ .../net/ethernet/marvell/octeontx2/af/cgx.c   | 27 +++++++++++++++++
+ .../net/ethernet/marvell/octeontx2/af/cgx.h   |  1 +
+ .../marvell/octeontx2/af/lmac_common.h        |  1 +
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  1 +
+ .../net/ethernet/marvell/octeontx2/af/rpm.c   | 17 +++++++++++
+ .../net/ethernet/marvell/octeontx2/af/rpm.h   |  3 ++
+ .../ethernet/marvell/octeontx2/af/rvu_cgx.c   | 29 +++++++++++++++++++
+ .../marvell/octeontx2/nic/otx2_common.h       |  1 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  | 20 +++++++++++++
+ 9 files changed, 100 insertions(+)
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2024-03-08
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+index 6c70c8498690..c117489f5caf 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.c
+@@ -24,6 +24,8 @@
+ #define DRV_NAME	"Marvell-CGX/RPM"
+ #define DRV_STRING      "Marvell CGX/RPM Driver"
+ 
++#define CGX_RX_STAT_GLOBAL_INDEX	9
++
+ static LIST_HEAD(cgx_list);
+ 
+ /* Convert firmware speed encoding to user format(Mbps) */
+@@ -701,6 +703,30 @@ u64 cgx_features_get(void *cgxd)
+ 	return ((struct cgx *)cgxd)->hw_features;
+ }
+ 
++int cgx_stats_reset(void *cgxd, int lmac_id)
++{
++	struct cgx *cgx = cgxd;
++	int stat_id;
++
++	if (!is_lmac_valid(cgx, lmac_id))
++		return -ENODEV;
++
++	for (stat_id = 0 ; stat_id < CGX_RX_STATS_COUNT; stat_id++) {
++		if (stat_id >= CGX_RX_STAT_GLOBAL_INDEX)
++		/* pass lmac as 0 for CGX_CMR_RX_STAT9-12 */
++			cgx_write(cgx, 0,
++				  (CGXX_CMRX_RX_STAT0 + (stat_id * 8)), 0);
++		else
++			cgx_write(cgx, lmac_id,
++				  (CGXX_CMRX_RX_STAT0 + (stat_id * 8)), 0);
++	}
++
++	for (stat_id = 0 ; stat_id < CGX_TX_STATS_COUNT; stat_id++)
++		cgx_write(cgx, lmac_id, CGXX_CMRX_TX_STAT0 + (stat_id * 8), 0);
++
++	return 0;
++}
++
+ static int cgx_set_fec_stats_count(struct cgx_link_user_info *linfo)
+ {
+ 	if (!linfo->fec)
+@@ -1783,6 +1809,7 @@ static struct mac_ops	cgx_mac_ops    = {
+ 	.pfc_config =                   cgx_lmac_pfc_config,
+ 	.mac_get_pfc_frm_cfg   =        cgx_lmac_get_pfc_frm_cfg,
+ 	.mac_reset   =			cgx_lmac_reset,
++	.mac_stats_reset       =	cgx_stats_reset,
+ };
+ 
+ static int cgx_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cgx.h b/drivers/net/ethernet/marvell/octeontx2/af/cgx.h
+index 6f7d1dee5830..dc9ace30554a 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/cgx.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/cgx.h
+@@ -141,6 +141,7 @@ int cgx_lmac_evh_register(struct cgx_event_cb *cb, void *cgxd, int lmac_id);
+ int cgx_lmac_evh_unregister(void *cgxd, int lmac_id);
+ int cgx_get_tx_stats(void *cgxd, int lmac_id, int idx, u64 *tx_stat);
+ int cgx_get_rx_stats(void *cgxd, int lmac_id, int idx, u64 *rx_stat);
++int cgx_stats_reset(void *cgxd, int lmac_id);
+ int cgx_lmac_rx_tx_enable(void *cgxd, int lmac_id, bool enable);
+ int cgx_lmac_tx_enable(void *cgxd, int lmac_id, bool enable);
+ int cgx_lmac_addr_set(u8 cgx_id, u8 lmac_id, u8 *mac_addr);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/lmac_common.h b/drivers/net/ethernet/marvell/octeontx2/af/lmac_common.h
+index 0b4cba03f2e8..9ffc6790c513 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/lmac_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/lmac_common.h
+@@ -132,6 +132,7 @@ struct mac_ops {
+ 	/* FEC stats */
+ 	int			(*get_fec_stats)(void *cgxd, int lmac_id,
+ 						 struct cgx_fec_stats_rsp *rsp);
++	int			(*mac_stats_reset)(void *cgxd, int lmac_id);
+ };
+ 
+ struct cgx {
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+index 61ab7f66f053..cfe8a8327e1b 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+@@ -168,6 +168,7 @@ M(CGX_FEC_STATS,	0x217, cgx_fec_stats, msg_req, cgx_fec_stats_rsp) \
+ M(CGX_SET_LINK_MODE,	0x218, cgx_set_link_mode, cgx_set_link_mode_req,\
+ 			       cgx_set_link_mode_rsp)	\
+ M(CGX_GET_PHY_FEC_STATS, 0x219, cgx_get_phy_fec_stats, msg_req, msg_rsp) \
++M(CGX_STATS_RST,	0x21A, cgx_stats_rst, msg_req, msg_rsp)		\
+ M(CGX_FEATURES_GET,	0x21B, cgx_features_get, msg_req,		\
+ 			       cgx_features_info_msg)			\
+ M(RPM_STATS,		0x21C, rpm_stats, msg_req, rpm_stats_rsp)	\
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rpm.c b/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
+index 76218f1cb459..1b34cf9c9703 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rpm.c
+@@ -38,6 +38,7 @@ static struct mac_ops		rpm_mac_ops   = {
+ 	.pfc_config =                   rpm_lmac_pfc_config,
+ 	.mac_get_pfc_frm_cfg   =        rpm_lmac_get_pfc_frm_cfg,
+ 	.mac_reset   =			rpm_lmac_reset,
++	.mac_stats_reset		 =	  rpm_stats_reset,
+ };
+ 
+ static struct mac_ops		rpm2_mac_ops   = {
+@@ -70,6 +71,7 @@ static struct mac_ops		rpm2_mac_ops   = {
+ 	.pfc_config =                   rpm_lmac_pfc_config,
+ 	.mac_get_pfc_frm_cfg   =        rpm_lmac_get_pfc_frm_cfg,
+ 	.mac_reset   =			rpm_lmac_reset,
++	.mac_stats_reset	    =	rpm_stats_reset,
+ };
+ 
+ bool is_dev_rpm2(void *rpmd)
+@@ -443,6 +445,21 @@ int rpm_get_tx_stats(void *rpmd, int lmac_id, int idx, u64 *tx_stat)
+ 	return 0;
+ }
+ 
++int rpm_stats_reset(void *rpmd, int lmac_id)
++{
++	rpm_t *rpm = rpmd;
++	u64 cfg;
++
++	if (!is_lmac_valid(rpm, lmac_id))
++		return -ENODEV;
++
++	cfg = rpm_read(rpm, 0, RPMX_MTI_STAT_STATN_CONTROL);
++	cfg |= RPMX_CMD_CLEAR_TX | RPMX_CMD_CLEAR_RX | BIT_ULL(lmac_id);
++	rpm_write(rpm, 0, RPMX_MTI_STAT_STATN_CONTROL, cfg);
++
++	return 0;
++}
++
+ u8 rpm_get_lmac_type(void *rpmd, int lmac_id)
+ {
+ 	rpm_t *rpm = rpmd;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rpm.h b/drivers/net/ethernet/marvell/octeontx2/af/rpm.h
+index b79cfbc6f877..34b11deb0f3c 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rpm.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rpm.h
+@@ -85,6 +85,8 @@
+ #define RPMX_MTI_STAT_STATN_CONTROL			0x10018
+ #define RPMX_MTI_STAT_DATA_HI_CDC			0x10038
+ #define RPMX_RSFEC_RX_CAPTURE				BIT_ULL(27)
++#define RPMX_CMD_CLEAR_RX				BIT_ULL(30)
++#define RPMX_CMD_CLEAR_TX				BIT_ULL(31)
+ #define RPMX_MTI_RSFEC_STAT_COUNTER_CAPTURE_2		0x40050
+ #define RPMX_MTI_RSFEC_STAT_COUNTER_CAPTURE_3		0x40058
+ #define RPMX_MTI_FCFECX_VL0_CCW_LO			0x38618
+@@ -134,4 +136,5 @@ int rpm2_get_nr_lmacs(void *rpmd);
+ bool is_dev_rpm2(void *rpmd);
+ int rpm_get_fec_stats(void *cgxd, int lmac_id, struct cgx_fec_stats_rsp *rsp);
+ int rpm_lmac_reset(void *rpmd, int lmac_id, u8 pf_req_flr);
++int rpm_stats_reset(void *rpmd, int lmac_id);
+ #endif /* RPM_H */
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+index 38acdc7a73bb..9ea9a06af8ef 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_cgx.c
+@@ -596,6 +596,35 @@ int rvu_mbox_handler_rpm_stats(struct rvu *rvu, struct msg_req *req,
+ 	return rvu_lmac_get_stats(rvu, req, (void *)rsp);
+ }
+ 
++int rvu_mbox_handler_cgx_stats_rst(struct rvu *rvu, struct msg_req *req,
++				   struct msg_rsp *rsp)
++{
++	int pf = rvu_get_pf(req->hdr.pcifunc);
++	struct rvu_pfvf	*parent_pf;
++	struct mac_ops *mac_ops;
++	u8 cgx_idx, lmac;
++	void *cgxd;
++
++	if (!is_cgx_config_permitted(rvu, req->hdr.pcifunc))
++		return LMAC_AF_ERR_PERM_DENIED;
++
++	parent_pf = &rvu->pf[pf];
++	/* To ensure reset cgx stats won't affect VF stats,
++	 *  check if it used by only PF interface.
++	 *  If not, return
++	 */
++	if (parent_pf->cgx_users > 1) {
++		dev_info(rvu->dev, "CGX busy, could not reset statistics\n");
++		return 0;
++	}
++
++	rvu_get_cgx_lmac_id(rvu->pf2cgxlmac_map[pf], &cgx_idx, &lmac);
++	cgxd = rvu_cgx_pdata(cgx_idx, rvu);
++	mac_ops = get_mac_ops(cgxd);
++
++	return mac_ops->mac_stats_reset(cgxd, lmac);
++}
++
+ int rvu_mbox_handler_cgx_fec_stats(struct rvu *rvu,
+ 				   struct msg_req *req,
+ 				   struct cgx_fec_stats_rsp *rsp)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index 06910307085e..a60eff335cd4 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -961,6 +961,7 @@ void otx2_get_mac_from_af(struct net_device *netdev);
+ void otx2_config_irq_coalescing(struct otx2_nic *pfvf, int qidx);
+ int otx2_config_pause_frm(struct otx2_nic *pfvf);
+ void otx2_setup_segmentation(struct otx2_nic *pfvf);
++int otx2_reset_mac_stats(struct otx2_nic *pfvf);
+ 
+ /* RVU block related APIs */
+ int otx2_attach_npa_nix(struct otx2_nic *pfvf);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index e5fe67e73865..8728122d465a 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -1124,6 +1124,23 @@ static int otx2_cgx_config_linkevents(struct otx2_nic *pf, bool enable)
+ 	return err;
+ }
+ 
++int otx2_reset_mac_stats(struct otx2_nic *pfvf)
++{
++	struct msg_req *req;
++	int err;
++
++	mutex_lock(&pfvf->mbox.lock);
++	req = otx2_mbox_alloc_msg_cgx_stats_rst(&pfvf->mbox);
++	if (!req) {
++		mutex_unlock(&pfvf->mbox.lock);
++		return -ENOMEM;
++	}
++
++	err = otx2_sync_mbox_msg(&pfvf->mbox);
++	mutex_unlock(&pfvf->mbox.lock);
++	return err;
++}
++
+ static int otx2_cgx_config_loopback(struct otx2_nic *pf, bool enable)
+ {
+ 	struct msg_req *msg;
+@@ -3048,6 +3065,9 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+ 
+ 	otx2_qos_init(pf, qos_txqs);
+ 
++	/* reset CGX/RPM MAC stats */
++	otx2_reset_mac_stats(pf);
++
+ 	return 0;
+ 
+ err_pf_sriov_init:
+-- 
+2.25.1
 
-for you to fetch changes up to 3d1c16e920c88eb5e583e1b4a10b95a5dc97ec22:
-
-  Bluetooth: hci_sync: Fix UAF in hci_acl_create_conn_sync (2024-03-08 11:06:14 -0500)
-
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
-
- - hci_conn: Only do ACL connections sequentially
- - hci_core: Cancel request on command timeout
- - Remove CONFIG_BT_HS
- - btrtl: Add the support for RTL8852BT/RTL8852BE-VT
- - btusb: Add support Mediatek MT7920
- - btusb: Add new VID/PID 13d3/3602 for MT7925
- - Add new quirk for broken read key length on ATS2851
-
-----------------------------------------------------------------
-Andrey Skvortsov (2):
-      Bluetooth: hci_h5: Add ability to allocate memory for private data
-      Bluetooth: btrtl: fix out of bounds memory access
-
-Bartosz Golaszewski (1):
-      Bluetooth: hci_qca: don't use IS_ERR_OR_NULL() with gpiod_get_optional()
-
-Christophe JAILLET (3):
-      Bluetooth: Remove usage of the deprecated ida_simple_xx() API
-      Bluetooth: btbcm: Use strreplace()
-      Bluetooth: btbcm: Use devm_kstrdup()
-
-Dan Carpenter (1):
-      Bluetooth: ISO: Clean up returns values in iso_connect_ind()
-
-Edward Adam Davis (1):
-      Bluetooth: btintel: Fix null ptr deref in btintel_read_version
-
-Frédéric Danis (1):
-      Bluetooth: Fix eir name length
-
-Iulia Tanasescu (2):
-      Bluetooth: ISO: Add hcon for listening bis sk
-      Bluetooth: ISO: Reassemble PA data for bcast sink
-
-Jonas Dreßler (8):
-      Bluetooth: Remove HCI_POWER_OFF_TIMEOUT
-      Bluetooth: mgmt: Remove leftover queuing of power_off work
-      Bluetooth: Add new state HCI_POWERING_DOWN
-      Bluetooth: Disconnect connected devices before rfkilling adapter
-      Bluetooth: Remove superfluous call to hci_conn_check_pending()
-      Bluetooth: hci_event: Use HCI error defines instead of magic values
-      Bluetooth: hci_conn: Only do ACL connections sequentially
-      Bluetooth: Remove pending ACL connection attempts
-
-Kiran K (1):
-      Bluetooth: btintel: Print Firmware Sequencer information
-
-Luiz Augusto von Dentz (20):
-      Bluetooth: hci_core: Cancel request on command timeout
-      Bluetooth: Remove BT_HS
-      Bluetooth: hci_event: Fix not indicating new connection for BIG Sync
-      Bluetooth: hci_conn: Always use sk_timeo as conn_timeout
-      Bluetooth: hci_conn: Fix UAF Write in __hci_acl_create_connection_sync
-      Bluetooth: hci_sync: Add helper functions to manipulate cmd_sync queue
-      Bluetooth: hci_sync: Attempt to dequeue connection attempt
-      Bluetooth: hci_sync: Fix UAF on hci_abort_conn_sync
-      Bluetooth: hci_sync: Fix UAF on create_le_conn_complete
-      Bluetooth: btintel: Fixe build regression
-      Bluetooth: hci_sync: Use address filtering when HCI_PA_SYNC is set
-      Bluetooth: hci_sync: Use QoS to determine which PHY to scan
-      Bluetooth: hci_sync: Fix overwriting request callback
-      Bluetooth: hci_core: Fix possible buffer overflow
-      Bluetooth: msft: Fix memory leak
-      Bluetooth: btusb: Fix memory leak
-      Bluetooth: bnep: Fix out-of-bound access
-      Bluetooth: af_bluetooth: Fix deadlock
-      Bluetooth: ISO: Align broadcast sync_timeout with connection timeout
-      Bluetooth: hci_sync: Fix UAF in hci_acl_create_conn_sync
-
-Lukas Bulwahn (1):
-      Bluetooth: hci_event: Remove code to removed CONFIG_BT_HS
-
-Marcel Ziswiler (1):
-      Bluetooth: btnxpuart: Fix btnxpuart_close
-
-Max Chou (1):
-      Bluetooth: btrtl: Add the support for RTL8852BT/RTL8852BE-VT
-
-Neeraj Sanjay Kale (1):
-      Bluetooth: btnxpuart: Resolve TX timeout error in power save stress test
-
-Pauli Virtanen (1):
-      Bluetooth: fix use-after-free in accessing skb after sending it
-
-Peter Tsao (1):
-      Bluetooth: btusb: Add support Mediatek MT7920
-
-Ricardo B. Marliere (1):
-      Bluetooth: constify the struct device_type usage
-
-Roman Smirnov (2):
-      Bluetooth: mgmt: remove NULL check in mgmt_set_connectable_complete()
-      Bluetooth: mgmt: remove NULL check in add_ext_adv_params_complete()
-
-Takashi Iwai (1):
-      Bluetooth: btmtk: Add MODULE_FIRMWARE() for MT7922
-
-Ulrik Strid (1):
-      Bluetooth: btusb: Add new VID/PID 13d3/3602 for MT7925
-
-Vinicius Peixoto (1):
-      Bluetooth: Add new quirk for broken read key length on ATS2851
-
- drivers/bluetooth/btbcm.c         |   12 +-
- drivers/bluetooth/btintel.c       |  116 +++-
- drivers/bluetooth/btmtk.c         |    5 +-
- drivers/bluetooth/btmtk.h         |    1 +
- drivers/bluetooth/btnxpuart.c     |   27 +-
- drivers/bluetooth/btrtl.c         |   14 +
- drivers/bluetooth/btusb.c         |   30 +-
- drivers/bluetooth/hci_h5.c        |    5 +-
- drivers/bluetooth/hci_qca.c       |    6 +-
- drivers/bluetooth/hci_serdev.c    |    9 +-
- drivers/bluetooth/hci_uart.h      |   12 +-
- include/net/bluetooth/bluetooth.h |    2 +
- include/net/bluetooth/hci.h       |   19 +-
- include/net/bluetooth/hci_core.h  |   37 +-
- include/net/bluetooth/hci_sync.h  |   22 +-
- include/net/bluetooth/l2cap.h     |   44 +-
- net/bluetooth/6lowpan.c           |    4 +-
- net/bluetooth/Kconfig             |    8 -
- net/bluetooth/Makefile            |    1 -
- net/bluetooth/a2mp.c              | 1054 ------------------------------------
- net/bluetooth/a2mp.h              |  154 ------
- net/bluetooth/af_bluetooth.c      |   10 +-
- net/bluetooth/amp.c               |  590 --------------------
- net/bluetooth/amp.h               |   60 ---
- net/bluetooth/bnep/core.c         |    5 +-
- net/bluetooth/eir.c               |   29 +-
- net/bluetooth/hci_conn.c          |  200 ++-----
- net/bluetooth/hci_core.c          |  170 ++++--
- net/bluetooth/hci_event.c         |  236 ++------
- net/bluetooth/hci_request.c       |    2 +-
- net/bluetooth/hci_sock.c          |    4 +-
- net/bluetooth/hci_sync.c          |  433 +++++++++++++--
- net/bluetooth/iso.c               |  104 +++-
- net/bluetooth/l2cap_core.c        | 1079 +------------------------------------
- net/bluetooth/l2cap_sock.c        |   21 +-
- net/bluetooth/mgmt.c              |  120 +----
- net/bluetooth/msft.c              |    3 +
- net/bluetooth/sco.c               |    3 +-
- 38 files changed, 1028 insertions(+), 3623 deletions(-)
- delete mode 100644 net/bluetooth/a2mp.c
- delete mode 100644 net/bluetooth/a2mp.h
- delete mode 100644 net/bluetooth/amp.c
- delete mode 100644 net/bluetooth/amp.h
 
