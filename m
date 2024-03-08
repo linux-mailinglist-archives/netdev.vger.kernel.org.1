@@ -1,185 +1,88 @@
-Return-Path: <netdev+bounces-78568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2440D875C1F
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 02:53:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FCB0875C36
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 03:03:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B962C1F2249B
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 01:53:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DF641F21E1F
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 02:03:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2448322F1E;
-	Fri,  8 Mar 2024 01:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E295222EED;
+	Fri,  8 Mar 2024 02:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j1e2eFrn"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WSaWCQc9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AD0533DF;
-	Fri,  8 Mar 2024 01:52:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5DB963C1
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 02:03:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709862776; cv=none; b=UMG+ykFwgGYbsR4qguTy/F54US982m0hXmhF+s88QD+q+i3d0ku6yuljlIb6D4vznmHqnbbdR65tGl6I8ZiHsjIgmcgU6LRBtUccoYtd9fP2vXLBWjTUvli88shNoUt5Y1j+pDPEorVy/7Hyy9HZl1Mu9j0oLF38qWmymPrKtQg=
+	t=1709863420; cv=none; b=hFkOyjwf+4L/TF9uG6xNY9i9Q6wLbx4khR1uwTggEuAM46S7Ye/HMR+tgE5Zm0Rhr9bwGtRi9WC2HnL/mN6yazy6EE/koT4AHI/pJwP7b56tOAg9OH1smCng45Tcw+D2A4ZGdB0QkwaVaf/CErin6ChzpHc+T/aYVZoaWoa4RAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709862776; c=relaxed/simple;
-	bh=fz2pz2qjIfAAtut6NhHBeh0SUMiiU7K6EGRFxYVj02A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PVF4repEcA03REBRJAZEyhk/EPvPhJISYYRh6As9yAptSBPoSynXEelY44jnccHpbwELLRhXqru7ruUyO6EfNsEC5Kg8JlEoatokj66HiWUqsOzpc4tu3PD3yK+H4MiL8ziPnA3oTuevIGnUI4MMt0fF1Nr1rWrY+0kydzPhXek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j1e2eFrn; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3C15C433C7;
-	Fri,  8 Mar 2024 01:52:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709862775;
-	bh=fz2pz2qjIfAAtut6NhHBeh0SUMiiU7K6EGRFxYVj02A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=j1e2eFrnn2oGzuVI3SS8F8y9zj4WESKfPCGRxrfE8ZJwdFzIUuvscskwKoFmi+DTe
-	 UQmZ0KaIT3FF+FRpvXC6we5R6cqKVQ7PxIT27sMixkPliMu3Q10jSkbVbV5UEqldl7
-	 g/9r/3K4E7HEUji3HbNPzbY8omvaOXtRxaoIHdESIZ07gj3Ebg3Tdiz+dxppi8+jVN
-	 BX5lADSuUgx4Ca1OlmwBB9024w6TIVf/My/1+BI6NipJq3nAC/RvlOAv/pJv1Kh/oq
-	 jrMd8QyNrvFBw/AxA8zJ5pfQk2+B6Nc/DvQ9ALIqVkGZAgwr5qSmd+ZDwfJUQwO1jV
-	 eIx8mkvdJmylw==
-Date: Thu, 7 Mar 2024 17:52:51 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
- linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
- sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- linux-arch@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
- dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>, Richard Henderson
- <richard.henderson@linaro.org>, Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
- Matt Turner <mattst88@gmail.com>, Thomas Bogendoerfer
- <tsbogend@alpha.franken.de>, "James E.J. Bottomley"
- <James.Bottomley@HansenPartnership.com>, Helge Deller <deller@gmx.de>,
- Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven
- Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Arnd Bergmann
- <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
- Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
- <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, Sumit
- Semwal <sumit.semwal@linaro.org>, "Christian =?UTF-8?B?S8O2bmln?="
- <christian.koenig@amd.com>, Pavel Begunkov <asml.silence@gmail.com>, David
- Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, Yunsheng Lin
- <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, Harshitha
- Ramamurthy <hramamurthy@google.com>, Shakeel Butt <shakeelb@google.com>,
- Jeroen de Borst <jeroendb@google.com>, Praveen Kaligineedi
- <pkaligineedi@google.com>
-Subject: Re: [RFC PATCH net-next v6 14/15] net: add devmem TCP documentation
-Message-ID: <20240307175251.309837e1@kernel.org>
-In-Reply-To: <20240305020153.2787423-15-almasrymina@google.com>
-References: <20240305020153.2787423-1-almasrymina@google.com>
-	<20240305020153.2787423-15-almasrymina@google.com>
+	s=arc-20240116; t=1709863420; c=relaxed/simple;
+	bh=kAklbdXUA8SGIVHP4JDdo/T+4cndl2Zk5g3f7bJoPTg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iH5vJ94ayZjaLReQrHGUKxqRp0zjSS2Q/SL2r/DVZvuCm/MdWcogrfvAtREXkmE1RTFbcvC6zXdOyIcQAlNU+uukQpRWFBolmn9/+ne3wFV6kWauw+1qJYbRnmyaEL8htM3BV2mosia0omQKCwh0+jVztAFnAzCUYMJ8yd5gDkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WSaWCQc9; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0lw4f9Mh4IRuCgUbzdym/CLlagnqDLL6W++mGVYVT9I=; b=WSaWCQc90D/tDAwEbuQYKYZM8m
+	hEwMcPmizysZ2vq3gw7rka8CbsR0x39RxiY0AibUC2NhzQkaXENiAk2+xjyHVOM23uB+mBHefB/b0
+	CfzO0vjQtpDE5COCzw46wgEl5bfAZaFoQS5oSh86ASKXPhhTMOTi2mpdV0o4gq10rxQQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1riPag-009inD-9m; Fri, 08 Mar 2024 03:04:06 +0100
+Date: Fri, 8 Mar 2024 03:04:06 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v2 06/22] ovpn: introduce the ovpn_peer object
+Message-ID: <3ee0ece4-c612-41d5-b5b9-743a849d8aef@lunn.ch>
+References: <20240304150914.11444-1-antonio@openvpn.net>
+ <20240304150914.11444-7-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240304150914.11444-7-antonio@openvpn.net>
 
-On Mon,  4 Mar 2024 18:01:49 -0800 Mina Almasry wrote:
-> +Intro
-> +=====
+> +static inline bool ovpn_peer_hold(struct ovpn_peer *peer)
+> +{
+> +	return kref_get_unless_zero(&peer->refcount);
+> +}
 > +
-> +Device memory TCP (devmem TCP) enables receiving data directly into device
-> +memory (dmabuf). The feature is currently implemented for TCP sockets.
-> +
-> +
-> +Opportunity
-> +-----------
-> +
-> +A large amount of data transfers have device memory as the source and/or
+> +static inline void ovpn_peer_put(struct ovpn_peer *peer)
+> +{
+> +	kref_put(&peer->refcount, ovpn_peer_release_kref);
+> +}
 
-s/amount/number/
+It is reasonably normal in the kernel to use _get() which takes a
+reference on something and _put() to release it. 
 
-> +destination. Accelerators drastically increased the volume of such transfers.
+> +struct ovpn_peer *ovpn_peer_lookup_transp_addr(struct ovpn_struct *ovpn, struct sk_buff *skb);
+> +struct ovpn_peer *ovpn_peer_lookup_by_dst(struct ovpn_struct *ovpn, struct sk_buff *skb);
+> +struct ovpn_peer *ovpn_peer_lookup_by_src(struct ovpn_struct *ovpn, struct sk_buff *skb);
+> +struct ovpn_peer *ovpn_peer_lookup_id(struct ovpn_struct *ovpn, u32 peer_id);
 
-s/volume/prevalence/
+All these look to take a reference on the peer. So maybe replace
+lookup by get? It should then be easier to check there is a matching
+put to every get.
 
-> +Some examples include:
-> +
-> +- Distributed training, where ML accelerators, such as GPUs on different hosts,
-> +  exchange data among them.
-
-s/among them//
-
-> +- Distributed raw block storage applications transfer large amounts of data with
-> +  remote SSDs, much of this data does not require host processing.
-> +
-> +Today, the majority of the Device-to-Device data transfers the network are
-
-"Today" won't age well.
-
-> +implemented as the following low level operations: Device-to-Host copy,
-> +Host-to-Host network transfer, and Host-to-Device copy.
-> +
-> +The implementation is suboptimal, especially for bulk data transfers, and can
-
-/The implementation/The flow involving host copies/
-
-> +put significant strains on system resources such as host memory bandwidth and
-> +PCIe bandwidth.
-> +
-> +Devmem TCP optimizes this use case by implementing socket APIs that enable
-> +the user to receive incoming network packets directly into device memory.
-
-> +More Info
-> +---------
-> +
-> +  slides, video
-> +    https://netdevconf.org/0x17/sessions/talk/device-memory-tcp.html
-> +
-> +  patchset
-> +    [RFC PATCH v3 00/12] Device Memory TCP
-> +    https://lore.kernel.org/lkml/20231106024413.2801438-1-almasrymina@google.com/T/
-
-Won't age well? :)
-
-> +Interface
-> +=========
-> +
-> +Example
-> +-------
-> +
-> +tools/testing/selftests/net/ncdevmem.c:do_server shows an example of setting up
-> +the RX path of this API.
-> +
-> +NIC Setup
-> +---------
-> +
-> +Header split, flow steering, & RSS are required features for devmem TCP.
-> +
-> +Header split is used to split incoming packets into a header buffer in host
-> +memory, and a payload buffer in device memory.
-> +
-> +Flow steering & RSS are used to ensure that only flows targeting devmem land on
-> +RX queue bound to devmem.
-> +
-> +Enable header split & flow steering:
-> +
-> +::
-
-You can put the :: at the end of the text, IIRC, like this:
-
-Enable header split & flow steering::
-
-> +
-> +	# enable header split (assuming priv-flag)
-> +	ethtool --set-priv-flags eth1 enable-header-split on
-
-Olek added the "set" in commit 50d73710715d ("ethtool: add SET for
-TCP_DATA_SPLIT ringparam"), no need for the priv flag any more.
+	Andrew
 
