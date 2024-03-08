@@ -1,96 +1,171 @@
-Return-Path: <netdev+bounces-78605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D33B7875D91
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 06:31:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7BB4875DAA
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 06:38:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B62E283CF1
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:31:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0612A1C21D38
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 05:38:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B6132E84A;
-	Fri,  8 Mar 2024 05:31:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="PTfa9+jt"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FDB032C9C;
+	Fri,  8 Mar 2024 05:38:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F8032564;
-	Fri,  8 Mar 2024 05:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from pegase1.c-s.fr (pegase1.c-s.fr [93.17.236.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A0452E84A;
+	Fri,  8 Mar 2024 05:38:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.236.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709875865; cv=none; b=XGNas+N2e3NOLOB41tmxc6zTx4NHVA+cKlPy0ZxNbMtTh4iIQnTGqzPn+nCSbpQCvzqHgIEB8AoRvEavIGeY+Hp+mHeNkkhtn6nfDOPDxm1xLFOGRnG74Th6N5J6KCZC2eQCkvPl7nXO/MWL+8m/GKdxz/X/17k7TdJ7f0RITO4=
+	t=1709876306; cv=none; b=ZLaCfdAo2FAu5k82lRdBk0WlwiXlXdizBMztDGjOfHe8yt4d0DfPUY6ezqWkkX6/S2uqWGkWhjyIIe/dHlurpoL1wK2LmRbfhi8yYD5+I/BGyjMwyTlDHZEfOn4sroLKbAvsJUws6CFJXrQx5s9+aOzbZSL4OtyKUBB2XL0inWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709875865; c=relaxed/simple;
-	bh=4QA+qfkTVt82T4MJ6mB+KmRrnBaFSpMS1IGiL/1JjJ0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nMoSf8/pMBCSoPeCal5+i+72QuACjYleabrCtrwzpSTT7Lc6yj/Dqs9ViKsSEhMlpmlazWy04NxI1tAJJOK8PoVlil6zwIMCmVUFFONfZFQpRF5UdJYIxAYUVlpxdJHRyzoY6affHUFACS/nVJP4jy7NRxeLgVvpKWJBnZuRA1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=PTfa9+jt; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 238CE20B74C0; Thu,  7 Mar 2024 21:30:56 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 238CE20B74C0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1709875856;
-	bh=u2kPWb3IsqjyN6FSEPkizuq4H3ww/4ROAGYubZNDML8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PTfa9+jt0Q6hKwjBdaXtnHtFyd5ME7DtKa/Q8PYhW+s6pOgjSxmzLDFquvbnH1yh7
-	 4oaRwleRRtKqtNLao+7oXEFtJ67BPVLXXgglcbspIIUogItaQ2qhuJVT9N9+697WD0
-	 vnRBA/gNCCbPWUJF689KDtyKXn9qEWGZjtVTqdr8=
-Date: Thu, 7 Mar 2024 21:30:56 -0800
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Haiyang Zhang <haiyangz@microsoft.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	KY Srinivasan <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>, Long Li <longli@microsoft.com>,
-	Michael Kelley <mikelley@microsoft.com>
-Subject: Re: [PATCH] net :mana : Add per-cpu stats for MANA device
-Message-ID: <20240308053056.GA16944@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1709823132-22411-1-git-send-email-shradhagupta@linux.microsoft.com>
- <20240307072923.6cc8a2ba@kernel.org>
- <DM6PR21MB14817597567C638DEF020FE3CA202@DM6PR21MB1481.namprd21.prod.outlook.com>
- <20240307090145.2fc7aa2e@kernel.org>
+	s=arc-20240116; t=1709876306; c=relaxed/simple;
+	bh=V1cL1/7e+ZqqsHNFqCEQO4q4BiPuZ0HpS/Plz61y9Ik=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Yb4mx4iTKX3Qhp7CE4rgzdbCFtV4Ke1bPp8CgsRRlR5ZVNgHDqhOKJQh9gL45DOOVdItUQHnlsHQIkKYtgsRg9jC565Zi/+qUQR9yYJfJbBtHjo2j9UtDmrUtofy7Sl+3eRPKCqFqqz0lgtEqIA6n4JtSM+aaX6AjvdmvGcF5xc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.236.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
+	by localhost (Postfix) with ESMTP id 4TrZhQ6xLsz9snT;
+	Fri,  8 Mar 2024 06:38:14 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+	by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id PpRWOs160HmF; Fri,  8 Mar 2024 06:38:14 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase1.c-s.fr (Postfix) with ESMTP id 4TrZhQ5gqCz9sl0;
+	Fri,  8 Mar 2024 06:38:14 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id BB8898B775;
+	Fri,  8 Mar 2024 06:38:14 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id xGi3Awh1Plf7; Fri,  8 Mar 2024 06:38:14 +0100 (CET)
+Received: from PO20335.idsi0.si.c-s.fr (PO23130.IDSI0.si.c-s.fr [192.168.232.110])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 291F78B763;
+	Fri,  8 Mar 2024 06:38:14 +0100 (CET)
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+	bpf@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	linux-mips@vger.kernel.org,
+	linux-parisc@vger.kernel.org,
+	linux-s390@vger.kernel.org,
+	sparclinux@vger.kernel.org,
+	netdev@vger.kernel.org,
+	"linux-hardening @ vger . kernel . org" <linux-hardening@vger.kernel.org>,
+	Kees Cook <keescook@chromium.org>
+Subject: [PATCH bpf-next v3 1/2] bpf: Take return from set_memory_ro() into account with bpf_prog_lock_ro()
+Date: Fri,  8 Mar 2024 06:38:07 +0100
+Message-ID: <286def78955e04382b227cb3e4b6ba272a7442e3.1709850515.git.christophe.leroy@csgroup.eu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240307090145.2fc7aa2e@kernel.org>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1709876288; l=3060; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=V1cL1/7e+ZqqsHNFqCEQO4q4BiPuZ0HpS/Plz61y9Ik=; b=/YEOM3OHP8KDJyOO3ehJ1RVP4GzRAcAID6cCJZ/d0dp047mlx2Jh+9clH0DgIt4qgXGkgno5Y LywIbfa5G6aCqIarVYXz5gOrWTacPl27NnwyvDHDUe/9WDzqxsL3gUf
+X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
+Content-Transfer-Encoding: 8bit
 
-Thanks for the comments, I am sending out a newer version with these fixes.
+set_memory_ro() can fail, leaving memory unprotected.
 
-On Thu, Mar 07, 2024 at 09:01:45AM -0800, Jakub Kicinski wrote:
-> On Thu, 7 Mar 2024 15:49:15 +0000 Haiyang Zhang wrote:
-> > > > Extend 'ethtool -S' output for mana devices to include per-CPU packet
-> > > > stats  
-> > > 
-> > > But why? You already have per queue stats.  
-> > Yes. But the q to cpu binding is dynamic, we also want the per-CPU stat 
-> > to analyze the CPU usage by counting the packets and bytes on each CPU.
-> 
-> Dynamic is a bit of an exaggeration, right? On a well-configured system
-> each CPU should use a single queue assigned thru XPS. And for manual
-> debug bpftrace should serve the purpose quite well.
-> 
-> Please note that you can't use num_present_cpus() to size stats in
-> ethtool -S , you have to use possible_cpus(), because the retrieval
-> of the stats is done in a multi-syscall fashion and there are no
-> explicit lengths in the API. So you must always report all possible
-> stats, not just currently active :(
+Check its return and take it into account as an error.
+
+Link: https://github.com/KSPP/linux/issues/7
+Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: linux-hardening@vger.kernel.org <linux-hardening@vger.kernel.org>
+Reviewed-by: Kees Cook <keescook@chromium.org>
+---
+Note: next patch is autonomous, it is sent as a follow-up of this one to minimize risk of conflict on filter.h because the two changes are too close to each other.
+
+v3: Perform bpf_prog_kallsyms_add() after protection of all subprog have succeeded.
+
+v2: No modification (Just added link in patch message), patchwork discarded this series due to failed test of s390 but it seems unrelated, see https://lore.kernel.org/bpf/wvd5gzde5ejc2rzsbrtwqyof56uw5ea3rxntfrxtkdabzcuwt6@w7iczzhmay2i/T/#m2e61446f42d5dc3d78f2e0e8b7a783f15cfb109d
+---
+ include/linux/filter.h | 5 +++--
+ kernel/bpf/core.c      | 4 +++-
+ kernel/bpf/verifier.c  | 8 ++++++--
+ 3 files changed, 12 insertions(+), 5 deletions(-)
+
+diff --git a/include/linux/filter.h b/include/linux/filter.h
+index 36cc29a2934c..7dd59bccaeec 100644
+--- a/include/linux/filter.h
++++ b/include/linux/filter.h
+@@ -884,14 +884,15 @@ bpf_ctx_narrow_access_offset(u32 off, u32 size, u32 size_default)
+ 
+ #define bpf_classic_proglen(fprog) (fprog->len * sizeof(fprog->filter[0]))
+ 
+-static inline void bpf_prog_lock_ro(struct bpf_prog *fp)
++static inline int __must_check bpf_prog_lock_ro(struct bpf_prog *fp)
+ {
+ #ifndef CONFIG_BPF_JIT_ALWAYS_ON
+ 	if (!fp->jited) {
+ 		set_vm_flush_reset_perms(fp);
+-		set_memory_ro((unsigned long)fp, fp->pages);
++		return set_memory_ro((unsigned long)fp, fp->pages);
+ 	}
+ #endif
++	return 0;
+ }
+ 
+ static inline void bpf_jit_binary_lock_ro(struct bpf_binary_header *hdr)
+diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+index 9ee4536d0a09..ae28bab2b138 100644
+--- a/kernel/bpf/core.c
++++ b/kernel/bpf/core.c
+@@ -2393,7 +2393,9 @@ struct bpf_prog *bpf_prog_select_runtime(struct bpf_prog *fp, int *err)
+ 	}
+ 
+ finalize:
+-	bpf_prog_lock_ro(fp);
++	*err = bpf_prog_lock_ro(fp);
++	if (*err)
++		return fp;
+ 
+ 	/* The tail call compatibility check can only be done at
+ 	 * this late stage as we need to determine, if we deal
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index ee86e4d7d5fc..c97108935c9a 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -19153,10 +19153,14 @@ static int jit_subprogs(struct bpf_verifier_env *env)
+ 	 * bpf_prog_load will add the kallsyms for the main program.
+ 	 */
+ 	for (i = 1; i < env->subprog_cnt; i++) {
+-		bpf_prog_lock_ro(func[i]);
+-		bpf_prog_kallsyms_add(func[i]);
++		err = bpf_prog_lock_ro(func[i]);
++		if (err)
++			goto out_free;
+ 	}
+ 
++	for (i = 1; i < env->subprog_cnt; i++)
++		bpf_prog_kallsyms_add(func[i]);
++
+ 	/* Last step: make now unused interpreter insns from main
+ 	 * prog consistent for later dump requests, so they can
+ 	 * later look the same as if they were interpreted only.
+-- 
+2.43.0
+
 
