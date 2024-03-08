@@ -1,193 +1,279 @@
-Return-Path: <netdev+bounces-78562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A8BF875B87
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 01:25:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45C9B875B93
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 01:43:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8D8E1C208BF
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 00:25:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A85F41F21D25
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 00:43:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62ABE366;
-	Fri,  8 Mar 2024 00:25:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AF2663C1;
+	Fri,  8 Mar 2024 00:43:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RHvKvv5h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h/QuucnA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD6E163;
-	Fri,  8 Mar 2024 00:25:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE927470;
+	Fri,  8 Mar 2024 00:42:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709857531; cv=none; b=l5RsBzneC67X1x5IJOcCiSAZVdnIcS5uPDqr8YguD8id6aNZBQReTE5DOCbAlxpAdMh45qncE1IIGZqpR1JHaN1QyDkEfcr7N6E9MBdL+db9lN1IyKYbaacuQ5lQZBo8aPWVBV/K5YtKSOrzBdxjTVGB2WkW2kAenyUoCI90aOc=
+	t=1709858582; cv=none; b=pZERfqZDYj9HoXVtE2kgaz1wP3dlQk4/plKER33vPyIZnVg84/LMgdptPy4UWXXYdGMbikR7jrGELmtQR7FpGGO+Fsa2+81Dr9QM3X8hZX+WO655RBBcnupjS59x8bToiAwWBKyYQW+PrO5t6dDQ+dLmvcm/WZQfoWjnm59bRbA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709857531; c=relaxed/simple;
-	bh=NoWiEoGffuJezyZWQ17Um+qaB1+8zBLrVs97fy9ve34=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BDSHklF7/qBACaj/PdG6StH+WFOQhwGh/7/yVq97ycYHiRflhxhG4q+F62/SaMO1QPSSiuHS2AykjK4T3ycSjtMA/giJAVNm1weQTfFdW/BUJdbakXNRqvzsZ6fRLUwnFY/92eZCC/tsJCu5bvPKm1vN9JF2l4CQMPIjHPxjJy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RHvKvv5h; arc=none smtp.client-ip=209.85.210.177
+	s=arc-20240116; t=1709858582; c=relaxed/simple;
+	bh=3NEG6TNj7KsFoTEvmnkdQHLT3ZPCDsEdozgYR6CjZtQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MQ/WTxlUGyseRncgrs0PZC9we1Fov7sRQxGbLmPdTpzDFx9fsj3vR44weK3lfOyX2wAfGS+vhdJv3QLya3k19goB+oal7QiDi9/tDlwAugIQuJIcuK6/dOyWjtUd8eFj09xt0fn48lCQdLFMZKvpfuULEqBA7qhBPErJa7pfcd8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h/QuucnA; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6e55b33ad14so943978b3a.1;
-        Thu, 07 Mar 2024 16:25:27 -0800 (PST)
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-567bac94719so322497a12.0;
+        Thu, 07 Mar 2024 16:42:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709857527; x=1710462327; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=fGA5+tZzMeOjlHUhcX3WLJZzgdRHTP/pyb/RcLBJvao=;
-        b=RHvKvv5hWIpIKkiqAgBaX/3R7rCX9f48N4UK193aoLf8F5L+SZ+cbwpnO5cJBnmSEL
-         zWFF4maCXqwirfq53NZh6M3OPxVvBl9ZEAOxpHzyZm6p7klv36q2y76kFA+VpwQZDBRO
-         adYWmQKPJY23DbHTmTHmzVsB45MQkyUusQoGA6SexiPVgSkeJvxH8aNAQeqsB6DJCYkk
-         +U2sdCC0Whb7qIFFXHiXVs5FPMRMSjNxdqPs/sssTN2uGSVUCODwwfiZ8529rNagXa36
-         vd9jAUBEoAftRboSFJwcw2oA2QOfk+YgDJ1y92ASq4glDOccga1bptS0abt147696cCH
-         BWPA==
+        d=gmail.com; s=20230601; t=1709858578; x=1710463378; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wYvQtqEyJB+URroCRC8pQOSdeHppTkKZaU1WCC5rpUs=;
+        b=h/QuucnAbMcZBcUoCeKLMrmMcKxPty1oDpQKgWHqdHu0FX1wrd3lEjP6lf2SN0c8oz
+         mXmmJJibI3lrb9WL6+qUoywlfcM1DQGctlItnRF/Sto8Zh7de/1GzsELxEzZTK4W7kkv
+         vh4fmzMr1URIBuxCWvx9P7GqO2j0VZQw86oKHqllkVySQQny0siRMhpyW/hreHJvQN2y
+         JYPAYmdDZAtB8h4jySj088y/za6FeVCGSt8pF20roU8LLQsf3tjnZ/yPyQRAZ9XzwFzb
+         FvlAAY0nX4WD0LxyGaGa+lt/Q3qGoJSObN+rGBBq4E7BYzaQlIKOH2eDnLZtVCuOrL8t
+         GlhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709857527; x=1710462327;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=fGA5+tZzMeOjlHUhcX3WLJZzgdRHTP/pyb/RcLBJvao=;
-        b=TyuhsAPuo2L2vCbFNgDzeciNTjDOZEkglShFZ5WMaQIBSZoglShqaT1ikYg7izeFAq
-         pz7AqMrXqbnrHDz18KmWu37vwZVl/L9/rKUwN2GQ7dy/4aBvy8mtp7+eib92lqd2KMC8
-         z9p4UisYphZskiVFKGgXLppUNMCDMlcL1LW6ASgJb9b6RjPMHlLzKjZrVzWv3Gj7ysPf
-         H738axSAUB+l734Mbx7jbdo5TlvYKhv9suQnQLiiSG84S3xguJzsh64bl+oTv/W4DNDQ
-         jCJH9h2uSelkqNrxxc9S74PxDD3WX3ubug9EyafXzl9SwR4Ek33yJT7aAxZ+TFlSY0sU
-         OhkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXdyRljzXFUxt+LFFXIDW/ZGJIqASgeLgbsPjq+JIo6rJb0+8kj9cKfruekijicZzCsKQut9E/VKfrwZxX+YmDxmAE3hjyPPV6oXjWbb97h70H+adiyOoUdPzj+tkuN5laurBIAAkBl
-X-Gm-Message-State: AOJu0YyC57z/NdYkLdoiI4i2/RfUnan4WD93kEfPj71anfNqJGtT1U04
-	kAbXIspsO1ZjPi4WIoBvMAYqAk4ZZYxHmoLN9dbOFf3oyPFGtUmI
-X-Google-Smtp-Source: AGHT+IE1/ntw3jlhoAiRluZaxPT+dxi/Syac8xM/yjVl3j8vj5lcBMBvjRqmvZOc1eiTyLawL98Fgg==
-X-Received: by 2002:a05:6a20:a106:b0:1a1:82fc:94e2 with SMTP id q6-20020a056a20a10600b001a182fc94e2mr145477pzk.44.1709857527115;
-        Thu, 07 Mar 2024 16:25:27 -0800 (PST)
-Received: from localhost ([2601:644:9381:2f20::5510])
-        by smtp.gmail.com with ESMTPSA id p12-20020aa7860c000000b006e50e79f155sm13050105pfn.60.2024.03.07.16.25.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Mar 2024 16:25:26 -0800 (PST)
-From: Matthew Wood <thepacketgeek@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Breno Leitao <leitao@debian.org>
-Cc: netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4] net: netconsole: Add continuation line prefix to userdata messages
-Date: Thu,  7 Mar 2024 16:25:24 -0800
-Message-ID: <20240308002525.248672-1-thepacketgeek@gmail.com>
-X-Mailer: git-send-email 2.44.0
+        d=1e100.net; s=20230601; t=1709858578; x=1710463378;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wYvQtqEyJB+URroCRC8pQOSdeHppTkKZaU1WCC5rpUs=;
+        b=I+B/qXDZ+jrkK3oliLRyxmP3p91955r615vwEtrfKpZpVHC6Tu9hF3wOhXA9lgcGJ2
+         g5YtwoTRrBVsrT1IWpGMCR9cNWeTY5F4noJ1NC1fGAadeZV87BYjFe/zJIAJIelnwd4m
+         6i0niZ0Sq0l/spnvjnlHjzNoBdx1z19aS9wdEnRv0NVt2vzZxrdjEGbUht4PRNrYt9Z2
+         0BJXGM8zV0GOzsfHsWdmwlYFSOTTNkM7M+/2k10gqkhhN0BQ4J5GRygdIBb7ctSPL25x
+         g6LxD2EOIIHJsgWVaVJeD5ixm5fjQhbdhEl2c8jqgvKjf02O/kjMZWPSIoBCYxFbX9dQ
+         DyLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVtvZpTH02ksZJxa7AY6nhU9Mfq/RXv54biwuz6pzv1x4xG7MDVTzHXMEJDJLfRTvq9mW/2TH2mn1NQjlkXkQF7r9VdBguB/mIzYdMTU3/0eNG4gncb9GYCZeaA2qckJOzTwsVQY+LG
+X-Gm-Message-State: AOJu0Ywx6CjTRrtX/crEtVV6A9tZRJzSmpaWE/KGs07FilPmvy5BKdDL
+	h7hSMmAFR5Xj8TLaGZlCURGkHWjvUrG7BUR9km91Llki9WsXkRjWAzPJRJ2tC8f5aTwYM+dxi8d
+	uV7ufywne51y7TfIk9cEpBql9zmg=
+X-Google-Smtp-Source: AGHT+IFgPm3Vx3eCeRo828gl5p0zzcm1Y75zw1kGYKt2C6e5P0rt9hWDeKEXQwsMFV5wa7KzlxHqWsTkHaYTWwCz8aM=
+X-Received: by 2002:a17:906:3b81:b0:a43:86f3:af37 with SMTP id
+ u1-20020a1709063b8100b00a4386f3af37mr13061731ejf.53.1709858577767; Thu, 07
+ Mar 2024 16:42:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240307090732.56708-1-kerneljasonxing@gmail.com>
+ <20240307093310.GI4420@breakpoint.cc> <CAL+tcoAPi+greENaD8X6Scc97Fnhiqa62eUSn+JS98kqY+VA6A@mail.gmail.com>
+ <20240307120054.GK4420@breakpoint.cc> <CAL+tcoBqBaHxSU9NQqVxhRzzsaJr4=0=imtyCo4p8+DuXPL5AA@mail.gmail.com>
+ <20240307141025.GL4420@breakpoint.cc> <CAL+tcoDUyFU9wT8gzOcDqW7hWfR-7Sg8Tky9QsY_b05gP4uZ1Q@mail.gmail.com>
+ <1cf0cef4-c972-9f8d-7095-66516eafb85c@blackhole.kfki.hu> <CAL+tcoBwmnPO8y7zDvi3h0Y_QzKpj=fjnxiOuQYP_OBzoh=qEA@mail.gmail.com>
+ <55a00270-6750-ca72-f20c-4be84afa0c3b@blackhole.kfki.hu>
+In-Reply-To: <55a00270-6750-ca72-f20c-4be84afa0c3b@blackhole.kfki.hu>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 8 Mar 2024 08:42:20 +0800
+Message-ID: <CAL+tcoBWGEtirQXUKtQ7EnveXc_T3aOCydG_uGUmew4x56hifw@mail.gmail.com>
+Subject: Re: [PATCH net-next] netfilter: conntrack: avoid sending RST to reply
+ out-of-window skb
+To: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+Cc: Florian Westphal <fw@strlen.de>, edumazet@google.com, 
+	Pablo Neira Ayuso <pablo@netfilter.org>, kuba@kernel.org, pabeni@redhat.com, 
+	David Miller <davem@davemloft.net>, netfilter-devel@vger.kernel.org, 
+	coreteam@netfilter.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add a space (' ') prefix to every userdata line to match docs for
-dev-kmsg. To account for this extra character in each userdata entry,
-reduce userdata entry names (directory name) from 54 characters to 53.
+On Fri, Mar 8, 2024 at 3:00=E2=80=AFAM Jozsef Kadlecsik
+<kadlec@blackhole.kfki.hu> wrote:
+>
+> On Thu, 7 Mar 2024, Jason Xing wrote:
+>
+> > > > Allow me to finish the full sentence: my only purpose is not to let
+> > > > the TCP layer send strange RST to the _established_ socket due to
+> > > > receiving strange out-of-window skbs.
+> > >
+> > > I don't understand why do you want to modify conntrack at all: conntr=
+ack
+> > > itself does not send RST packets. And the TCP layer don't send RST pa=
+ckets
+> > > to out of window ones either.
+> >
+> > To normal TCP flow, you're right because the TCP layer doesn't send RST
+> > to out-of-window skbs.
+> >
+> > But the DNAT policy on the server should have converted the port of
+> > incoming skb from A_port to B_port as my description in this patch said=
+.
+> >
+> > It actually doesn't happen. The conntrack clears the skb->_nfct value
+> > after returning -NF_ACCEPT in nf_conntrack_tcp_packet() and then DNAT
+> > would not convert the A_port to B_port.
+>
+> The packet is INVALID therefore it's not NATed. I don't think that could
+> simply be changed in netfilter.
 
-According to the dev-kmsg docs, a space is used for subsequent lines to
-mark them as continuation lines.
+Well, what would you suggest ? :)
 
-> A line starting with ' ', is a continuation line, adding
-> key/value pairs to the log message, which provide the machine
-> readable context of the message, for reliable processing in
-> userspace.
+>
+> > So the TCP layer is not able to look up the correct socket (client_ip,
+> > client_port, server_ip, B_port) because A_port doesn't match B_port,
+> > then an RST would be sent to the client.
+>
+> Yes, if you let the packet continue to traverse the stack.
 
-Testing for this patch::
+Yes!
 
- cd /sys/kernel/config/netconsole && mkdir cmdline0
- cd cmdline0
- mkdir userdata/test && echo "hello" > userdata/test/value
- mkdir userdata/test2 && echo "hello2" > userdata/test2/value
- echo "message" > /dev/kmsg
+>
+> > > The only possibility I see for such packets is an iptables/nftables r=
+ule
+> > > which rejects packets classified as INVALID by conntrack.
+> > >
+> > > As Florian suggested, why don't you change that rule?
+> >
+> > As I said, just for the workaround method, only turning on that sysctl
+> > knob can solve the issue.
+>
+> Sorry, but why? If you drop the packet by a rule, then there's no need to
+> use the sysctl setting and there's no unwanted RST packets.
 
-Outputs::
+Oh, I was trying to clarify that using some knob can work around which
+is not my original intention, but I don't seek a workaround method. I
+didn't use --cstate INVALID to drop those INVALID packets in
+production, which I feel should work.
 
- 6.8.0-rc5-virtme,12,493,231373579,-;message
-  test=hello
-  test2=hello2
+For this particular case, I feel it's not that good to ask
+users/customers to add more rules or turn on sysctl knob to prevent
+seeing such RSTs.
 
-And I confirmed all testing works as expected from the original patchset
+Instead I thought we could naturally stop sending such RSTs as default
+without asking other people to change something. People shouldn't see
+the RSTs really. That's why I wrote this patch.
 
-Fixes: df03f830d099 ("net: netconsole: cache userdata formatted string in netconsole_target")
-Signed-off-by: Matthew Wood <thepacketgeek@gmail.com>
----
- Documentation/networking/netconsole.rst |  8 ++++----
- drivers/net/netconsole.c                | 12 +++++++-----
- 2 files changed, 11 insertions(+), 9 deletions(-)
+I hope I'm right... :S
 
-diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
-index b28c525e5d1e..d55c2a22ec7a 100644
---- a/Documentation/networking/netconsole.rst
-+++ b/Documentation/networking/netconsole.rst
-@@ -180,7 +180,7 @@ Custom user data can be appended to the end of messages with netconsole
- dynamic configuration enabled. User data entries can be modified without
- changing the "enabled" attribute of a target.
- 
--Directories (keys) under `userdata` are limited to 54 character length, and
-+Directories (keys) under `userdata` are limited to 53 character length, and
- data in `userdata/<key>/value` are limited to 200 bytes::
- 
-  cd /sys/kernel/config/netconsole && mkdir cmdline0
-@@ -197,8 +197,8 @@ Messages will now include this additional user data::
- Sends::
- 
-  12,607,22085407756,-;This is a message
-- foo=bar
-- qux=baz
-+  foo=bar
-+  qux=baz
- 
- Preview the userdata that will be appended with::
- 
-@@ -218,7 +218,7 @@ The `qux` key is omitted since it has no value::
- 
-  echo "This is a message" > /dev/kmsg
-  12,607,22085407756,-;This is a message
-- foo=bar
-+  foo=bar
- 
- Delete `userdata` entries with `rmdir`::
- 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 0de108a1c0c8..d7070dd4fe73 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -42,12 +42,14 @@ MODULE_AUTHOR("Maintainer: Matt Mackall <mpm@selenic.com>");
- MODULE_DESCRIPTION("Console driver for network interfaces");
- MODULE_LICENSE("GPL");
- 
--#define MAX_PARAM_LENGTH	256
--#define MAX_USERDATA_NAME_LENGTH	54
--#define MAX_USERDATA_VALUE_LENGTH	200
-+#define MAX_PARAM_LENGTH		256
- #define MAX_USERDATA_ENTRY_LENGTH	256
-+#define MAX_USERDATA_VALUE_LENGTH	200
-+/* The number 3 comes from userdata entry format characters (' ', '=', '\n') */
-+#define MAX_USERDATA_NAME_LENGTH	(MAX_USERDATA_ENTRY_LENGTH - \
-+					MAX_USERDATA_VALUE_LENGTH - 3)
- #define MAX_USERDATA_ITEMS		16
--#define MAX_PRINT_CHUNK		1000
-+#define MAX_PRINT_CHUNK			1000
- 
- static char config[MAX_PARAM_LENGTH];
- module_param_string(netconsole, config, MAX_PARAM_LENGTH, 0);
-@@ -671,7 +673,7 @@ static void update_userdata(struct netconsole_target *nt)
- 		 * checked to not exceed MAX items with child_count above
- 		 */
- 		complete_idx += scnprintf(&nt->userdata_complete[complete_idx],
--					  MAX_USERDATA_ENTRY_LENGTH, "%s=%s\n",
-+					  MAX_USERDATA_ENTRY_LENGTH, " %s=%s\n",
- 					  item->ci_name, udm_item->value);
- 	}
- 	nt->userdata_length = strnlen(nt->userdata_complete,
--- 
-2.44.0
+Thanks,
+Jason
 
+>
+> Best regards,
+> Jozsef
+>
+> > > The conntrack states are not fine-grained to express different TCP st=
+ates
+> > > which covered with INVALID. It was never a good idea to reject INVALI=
+D
+> > > packets or let them through (leaking internal addresses).
+> > >
+> > > Best regards,
+> > > Jozsef
+> > >
+> > > > > > Besides, resorting to turning on nf_conntrack_tcp_be_liberal sy=
+sctl
+> > > > > > knob seems odd to me though it can workaround :S
+> > > > >
+> > > > > I don't see a better alternative, other than -p tcp -m conntrack
+> > > > > --ctstate INVALID -j DROP rule, if you wish for tcp stack to not =
+see
+> > > > > such packets.
+> > > > >
+> > > > > > I would like to prevent sending such an RST as default behaviou=
+r.
+> > > > >
+> > > > > I don't see a way to make this work out of the box, without possi=
+ble
+> > > > > unwanted side effects.
+> > > > >
+> > > > > MAYBE we could drop IFF we check that the conntrack entry candida=
+te
+> > > > > that fails sequence validation has NAT translation applied to it,=
+ and
+> > > > > thus the '-NF_ACCEPT' packet won't be translated.
+> > > > >
+> > > > > Not even compile tested:
+> > > > >
+> > > > > diff --git a/net/netfilter/nf_conntrack_proto_tcp.c b/net/netfilt=
+er/nf_conntrack_proto_tcp.c
+> > > > > --- a/net/netfilter/nf_conntrack_proto_tcp.c
+> > > > > +++ b/net/netfilter/nf_conntrack_proto_tcp.c
+> > > > > @@ -1256,10 +1256,14 @@ int nf_conntrack_tcp_packet(struct nf_con=
+n *ct,
+> > > > >         case NFCT_TCP_IGNORE:
+> > > > >                 spin_unlock_bh(&ct->lock);
+> > > > >                 return NF_ACCEPT;
+> > > > > -       case NFCT_TCP_INVALID:
+> > > > > +       case NFCT_TCP_INVALID: {
+> > > > > +               verdict =3D -NF_ACCEPT;
+> > > > > +               if (ct->status & IPS_NAT_MASK)
+> > > > > +                       res =3D NF_DROP; /* skb would miss nat tr=
+ansformation */
+> > > >
+> > > > Above line, I guess, should be 'verdict =3D NF_DROP'? Then this skb
+> > > > would be dropped in nf_hook_slow() eventually and would not be pass=
+ed
+> > > > to the TCP layer.
+> > > >
+> > > > >                 nf_tcp_handle_invalid(ct, dir, index, skb, state)=
+;
+> > > > >                 spin_unlock_bh(&ct->lock);
+> > > > > -               return -NF_ACCEPT;
+> > > > > +               return verdict;
+> > > > > +       }
+> > > > >         case NFCT_TCP_ACCEPT:
+> > > > >                 break;
+> > > > >         }
+> > > >
+> > > > Great! I think your draft patch makes sense really, which takes NAT
+> > > > into consideration.
+> > > >
+> > > > >
+> > > > > But I don't really see the advantage compared to doing drop decis=
+ion in
+> > > > > iptables/nftables ruleset.
+> > > >
+> > > > From our views, especially to kernel developers, you're right: we
+> > > > could easily turn on that knob or add a drop policy to prevent it
+> > > > happening. Actually I did this in production to prevent such a case=
+.
+> > > > It surely works.
+> > > >
+> > > > But from the views of normal users and those who do not understand =
+how
+> > > > it works in the kernel, it looks strange: people may ask why we get
+> > > > some unknown RSTs in flight?
+> > > >
+> > > > > I also have a hunch that someone will eventually complain about t=
+his
+> > > > > change in behavior.
+> > > >
+> > > > Well, I still think the patch you suggested is proper and don't kno=
+w
+> > > > why people could complain about it.
+> > > >
+> > > > Thanks for your patience :)
+> > > >
+> > > > Thanks,
+> > > > Jason
+> > > >
+> > >
+> > > --
+> > > E-mail  : kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
+> > > PGP key : https://wigner.hu/~kadlec/pgp_public_key.txt
+> > > Address : Wigner Research Centre for Physics
+> > >           H-1525 Budapest 114, POB. 49, Hungary
+> >
+>
+> --
+> E-mail  : kadlec@blackhole.kfki.hu, kadlecsik.jozsef@wigner.hu
+> PGP key : https://wigner.hu/~kadlec/pgp_public_key.txt
+> Address : Wigner Research Centre for Physics
+>           H-1525 Budapest 114, POB. 49, Hungary
 
