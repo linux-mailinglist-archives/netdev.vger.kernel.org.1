@@ -1,163 +1,100 @@
-Return-Path: <netdev+bounces-78749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFFC98764C4
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 14:11:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBD518764CE
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 14:13:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7AD81C219EF
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 13:11:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A55BB283781
+	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 13:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DBAC1EA8F;
-	Fri,  8 Mar 2024 13:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE4C1DA5F;
+	Fri,  8 Mar 2024 13:13:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U+gaKhe/"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="h2/GV7d4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5196F10A34;
-	Fri,  8 Mar 2024 13:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F7DD1D52B
+	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 13:13:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709903512; cv=none; b=cV9gBuSG32ZDh9Al/87XOR0w3PtXtrUqnj25cVj62ku08rdSKpQKamqb4CrSqZkc+GftTg9RMDhPdUY1iYnQnUXR8eyny1+ksxOVOLdnCQt/yrpZ8IU5yIijfogDwoQPrqKaGP5mqndUbgMmXfVTUsgT+ULkpQGAi1J/b+41sGI=
+	t=1709903587; cv=none; b=Qn/+hBD48tqF7exSazWpkIk6tdJqXo8vOjPRZdoVGkvysg8mwLfwrBRNcjbKAQNPVdsiRfh/8exHX/nJ9b45nUWlq5yhfwbuG3zCDsKoVHyV6L0mnoCmG8AXVM8MWH86SqN5iZvVLZSLajk9xBm5BItYKpRzKcNCkLj92w6ct6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709903512; c=relaxed/simple;
-	bh=JW/jVIaU96o6BFKFV+Hpp8LRCawyJhrKD/asgcBfzSo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bYI7J9o6xrHT27pnovgNbLoyV3amntE+9LNxu3Jfwhexs5zfXMxcLiECjabwJVXCRZb9Ho+xDfuio5prNmjPVrZC6ZNeXCF4EqV8hwEobFJKVhW02HmzFTncrVU/W159fLSyNr9bedaThMm3GFEEoNqy+PcPYa6uPWndHH3T+1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U+gaKhe/; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a458eb7db13so303529566b.2;
-        Fri, 08 Mar 2024 05:11:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709903509; x=1710508309; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dGq+jgqU3Fs7LfeBp/kruC5Fh0mzhcdDwgbZAEOMazM=;
-        b=U+gaKhe/3zHcNn5raQK6c8B0UkhGbdlf7dIZzp4BI87RNe3cBp1mUfGQrdcseIqYHd
-         2f8Ze1YI9kYFCGFKWgTWvV2cVMOhYyMTuwpPNY5ORV0658zc6ts66Qcm0xdWj8J6Jlkq
-         0+KYkNw+3VTacB48rhQPWZpuo4xRLkExwbUZ6AQCrsYhxa59PJFRKCTwxag46desVU+s
-         7kmtxyvLznlNODsz19UwqV31Rtw9BjUKcXQzDFVLHXDzTIkVPfdraYUCZZVUE85Zxu27
-         Rf7xAgOBdH93tOmwjZW2LNg6+xN4H1OGEJHsMQ0vPhuo6JX4rJXpwyYS2GEaZULKGCmA
-         b2rQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709903509; x=1710508309;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dGq+jgqU3Fs7LfeBp/kruC5Fh0mzhcdDwgbZAEOMazM=;
-        b=n6Svp8yPXfutnsKARkJ68D7WKwtiVKvg/OkM8QtdKvEl+zGvOSt7L6Iwryy9ZHtNAI
-         Tx0RrBvJ3YPT7DyDfuzEOB23NkPjHVXEODdbUSZ/Yy1dpPuLD/KoA0Yczj2RIFaG+xkn
-         E81hCHT5L4etFlMtpS3kKVkEdHryOaXN0Oxzm9/+L96p2QeRWVwEAJ7+KeZNmlJVaMtl
-         H8OCY6axDJEeEImj2R1e+6GJOF1TXFfp1m+dQmZycR1u4ClsC5KwIxresZrNJ9ujf6aM
-         6AWoDTpHZSqyE8SwT/x6dBbxHXgkTVf6DJE62mSH9FLDFcZPRtrS7q0B7pPuxTWtyLt5
-         lLiw==
-X-Forwarded-Encrypted: i=1; AJvYcCXWYHZgfDovyxQPJwNJaesZlo034mlA14ow3c99xuf4UT1dZFHgvTcxHc5IaHkCuvRO7bQ+z1EMJ0+6rZclEdU01MKc/75KU91o4/fBpa7O6e3BlG1wTepH3zh+VjADtZj0Jbch
-X-Gm-Message-State: AOJu0Yw1oCp3i4buvb6/7iKknqbrLBK/uf1aTytxdxIHlD8O138X0g3K
-	F307Xp/y+1PWtaKtyv/4G0g6WJqXRuW8cHm8QdesUcrgeHaW+Z7kCMsbvMR9l+WE3O+7MRXbAWy
-	n91wlIn/DVcq4DkzoWX0nwd1qZhE=
-X-Google-Smtp-Source: AGHT+IF3RKMb1nYJUHb3CB0FWWkA99zSspvCa/aMBRnHJZCF857WtJtnKtqEyew/Jln4lyeanWB04+5OKIR5e+Y4JxQ=
-X-Received: by 2002:a17:906:bc54:b0:a43:f182:66c4 with SMTP id
- s20-20020a170906bc5400b00a43f18266c4mr14960738ejv.17.1709903509558; Fri, 08
- Mar 2024 05:11:49 -0800 (PST)
+	s=arc-20240116; t=1709903587; c=relaxed/simple;
+	bh=qrs33oqmCSQB8Oe2aG+nn0I65bLciOTgJGd1xV04Kpc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pxCXs7iPbLp3YKTYtF6lmBRXH2bITJROSa+QtzKKRJyYhCRwHUeksQNn2Vx237Sx/VTpRRsFJQApQ4Vx4+Rx+06yRVSFehQSCcVaaXDamNps4uhSeWgxKXuKCo0xD6uQvKIYM/QNXvJyEleZGTfg3SnzJwjSjRoeMf9XQ35zJ54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=h2/GV7d4; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=77YASuY9NYsQZ8BqJB/v2f09IMEsp1/OMYkkkcGPpiM=; b=h2/GV7d4qzfZfrrVb9zRK9U3GT
+	6l3MROx8rcgZk6iQ6mdTjbnM+RYsFhZu5gJojg6Uf0PfMY4RefjnPAwLiSdP7hdxG5APq/4oFME0F
+	kH66PlJeqVz8YO3ctTG/KfiXdiCX/W0aqXQb6eG8WUsKt+t1cTtGsAQHEHCLcQXD/2QY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1ria2X-009lOS-Cg; Fri, 08 Mar 2024 14:13:33 +0100
+Date: Fri, 8 Mar 2024 14:13:33 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v2 04/22] ovpn: add basic interface
+ creation/destruction/management routines
+Message-ID: <b1b50cad-30dd-4002-8950-0869d636b6a7@lunn.ch>
+References: <20240304150914.11444-1-antonio@openvpn.net>
+ <20240304150914.11444-5-antonio@openvpn.net>
+ <e89be898-bcbd-41f9-aaae-037e6f88069e@lunn.ch>
+ <48188b78-9238-44cc-ab2f-efdddad90066@openvpn.net>
+ <540ab521-5dab-44fa-b6b4-2114e376cbfa@lunn.ch>
+ <a9341fa0-bca0-4764-b272-9691ad84b9f2@openvpn.net>
+ <b3499947-f4b6-4974-9cc4-b2ff98fa20fc@lunn.ch>
+ <d896bbd8-2709-4834-a637-f982fc51fc57@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <AM6PR03MB58483266DF047DA017C540CD99272@AM6PR03MB5848.eurprd03.prod.outlook.com>
- <CANn89i+TboBh3S3tegSqZJvjTCCi_Sa+o3iwETygFw5GqjJPsw@mail.gmail.com>
-In-Reply-To: <CANn89i+TboBh3S3tegSqZJvjTCCi_Sa+o3iwETygFw5GqjJPsw@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 8 Mar 2024 21:11:12 +0800
-Message-ID: <CAL+tcoDpZNqU9eJ0oyTyBrcHxnqR_HoGbqy0wznmyczpR05XtA@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net/packet: Add getsockopt support for PACKET_COPY_THRESH
-To: Eric Dumazet <edumazet@google.com>
-Cc: Juntong Deng <juntong.deng@outlook.com>, willemdebruijn.kernel@gmail.com, 
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d896bbd8-2709-4834-a637-f982fc51fc57@openvpn.net>
 
-On Fri, Mar 8, 2024 at 8:56=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Fri, Mar 8, 2024 at 1:43=E2=80=AFPM Juntong Deng <juntong.deng@outlook=
-.com> wrote:
-> >
-> > Currently getsockopt does not support PACKET_COPY_THRESH,
-> > and we are unable to get the value of PACKET_COPY_THRESH
-> > socket option through getsockopt.
-> >
-> > This patch adds getsockopt support for PACKET_COPY_THRESH.
-> >
-> > In addition, this patch converts access to copy_thresh to
-> > READ_ONCE/WRITE_ONCE.
-> >
-> > Signed-off-by: Juntong Deng <juntong.deng@outlook.com>
-> > ---
-> > V1 -> V2: Use READ_ONCE/WRITE_ONCE.
-> >
-> >  net/packet/af_packet.c | 7 +++++--
-> >  1 file changed, 5 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> > index 0db31ca4982d..61270826b9ac 100644
-> > --- a/net/packet/af_packet.c
-> > +++ b/net/packet/af_packet.c
-> > @@ -2318,7 +2318,7 @@ static int tpacket_rcv(struct sk_buff *skb, struc=
-t net_device *dev,
-> >         }
-> >         if (po->tp_version <=3D TPACKET_V2) {
-> >                 if (macoff + snaplen > po->rx_ring.frame_size) {
-> > -                       if (po->copy_thresh &&
-> > +                       if (READ_ONCE(po->copy_thresh) &&
-> >                             atomic_read(&sk->sk_rmem_alloc) < sk->sk_rc=
-vbuf) {
-> >                                 if (skb_shared(skb)) {
-> >                                         copy_skb =3D skb_clone(skb, GFP=
-_ATOMIC);
-> > @@ -3836,7 +3836,7 @@ packet_setsockopt(struct socket *sock, int level,=
- int optname, sockptr_t optval,
-> >                 if (copy_from_sockptr(&val, optval, sizeof(val)))
-> >                         return -EFAULT;
-> >
-> > -               pkt_sk(sk)->copy_thresh =3D val;
-> > +               WRITE_ONCE(pkt_sk(sk)->copy_thresh, val);
-> >                 return 0;
-> >         }
-> >         case PACKET_VERSION:
-> > @@ -4090,6 +4090,9 @@ static int packet_getsockopt(struct socket *sock,=
- int level, int optname,
-> >         case PACKET_VNET_HDR_SZ:
-> >                 val =3D READ_ONCE(po->vnet_hdr_sz);
-> >                 break;
-> > +       case PACKET_COPY_THRESH:
-> > +               val =3D READ_ONCE(pkt_sk(sk)->copy_thresh);
-> > +               break;
-> >         case PACKET_VERSION:
-> >                 val =3D po->tp_version;
-> >                 break;
-> > --
-> > 2.39.2
-> >
->
-> I think you forgot to change net/packet/diag.c pdiag_put_info()
->
+> To be honest we don't have any real concept for the carrier off.
+> Especially on a server, I hardly believe it would be any useful.
+> 
+> However, on a client or on a p2p link, where there is exactly one remote
+> host on the other side, it may make sense to turn the carrier off when that
+> remote peer is lost.
+> 
+> There is an extra detail to consider: if the user wants to, the ovpn device
+> should remain configured (with all IPs and routes) even if openvpn has fully
+> disconnected and it is attempting a reconnection to another server. Reason
+> being avoiding data leaks by accidentally removing routes to the tunnel
+> (traffic that should go through the tunnel would rather go to the local
+> network).
+> 
+> With all this being said, it may make sense to just keep the carrier on all
+> time long.
+> 
+> Should we come up with something smarter in the future, we can still improve
+> this behaviour.
 
-Ah, he updated his patch so soon even without taking a break.
+O.K, so..
 
-I just replied to the v1 thread with three changes made.
+You already have more patches than recommended for a series, but... I
+suggest you make the carrier_on in probe() a patch of its own with a
+good commit message based on the above. We then have a clear
+explanation in git why the carrier is always on.
 
-Juntong, you could check your v1 patch thread and you will see the
-missing point.
-
-Thanks,
-Jason
+	Andrew
 
