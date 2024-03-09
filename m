@@ -1,95 +1,131 @@
-Return-Path: <netdev+bounces-78933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90CB887700A
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 10:09:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 48B25877031
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 11:06:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 307AA1F21686
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 09:09:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD0E41F21855
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 10:06:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8708B3717B;
-	Sat,  9 Mar 2024 09:09:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="d62eV0yI";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="+3D+0CT4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E4603FB9A;
+	Sat,  9 Mar 2024 10:05:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A202D603
-	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 09:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35EDF3D970;
+	Sat,  9 Mar 2024 10:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709975391; cv=none; b=TsmUQ2pLvWLQUA99WwdX2aOoCESG8/T2ha/gpDmUYkpoDZ1r7LCTuNAMGR89JOYqKuxO/+5+NMAJSjLhryeGhGMexZuRVsDy/AKlDx5PT4aTKJOXxmdkdWl66cSrkvAvaBbMTQCmugPeQIIdUuTuANgukhokVLH3I6EV9Gvea8c=
+	t=1709978732; cv=none; b=KoadVjyIwcASE5jg4aWlMMO20+fmL9cDENr1C0J1mgXgPDvxkhiPXfQkcFWdUInBr65bGnrtesc1jsnSbvvQiFNFv+7MynqRxN/xWyDp2ZA+5KsTGXChRgYAciQBG92nMUMQA4JcIdon+l4IyTV/sb958y5C+57aFmPW3dxtBr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709975391; c=relaxed/simple;
-	bh=yWPyjJYW/srtoEgqpdmt2d94c+ebczXgIWqVkpz6CC4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pZVkcuEc4MUXC5TDZAH0yvRv2EHsNWsXBhAy2Ju+fD6JQpNWPbzT/W8385bOcY8faNSczI8kd+6mm52xUJkOVVuOHxk2qr6nSpJYe2goTEzqGkpjV1LKaUi4mTTIJH+SmlQklZf8l7WeHmlVq6eSw2DlKDaks0+VF4HCwI4644w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=d62eV0yI; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=+3D+0CT4; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Sat, 9 Mar 2024 10:09:46 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1709975388;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bm4lngz3t074YUbFcGm9uFI1Xqeh/Z9CaSE4aGZGkAQ=;
-	b=d62eV0yI7Isj0L+N1odw0LivnMpZCkXcr4bjnjR6QxW5OaqA0iGA7FAtDhoZnl1+sZuH8K
-	O/6EU7qoxVKcuVScdUKxEy2IulB4HIfSdYqkS6vvKc+S+xyNqmefzHPKDQ5R3fDLvzaJFJ
-	fQ2BjKwNpK3WPwDMTf/vMDTlTefsjwBdm5ohzXp+kXJAgVXRxIKr2NGP3XFMOwoFXMjt4x
-	YzWCThNLJ1QPoqijmQzwqzwnPTFy2XFm9ZrTLcFwcaAmKHLPp9aPa2X+s8T5KEjbryG3yF
-	af4rl0aZtC4Bqdr7ya2LEE7CfYWkXtYbpMtk//FOz9IIjwDaYxriUj83VLefKg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1709975388;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=bm4lngz3t074YUbFcGm9uFI1Xqeh/Z9CaSE4aGZGkAQ=;
-	b=+3D+0CT4CMBTPNzOnBMPM8XnycV6cMyrMuOjuehwY0A2KNHTbB24IPYGta3GyWpcINxQEL
-	cul0wa38mns33fAg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Wander Lairson Costa <wander@redhat.com>,
-	Yan Zhai <yan@cloudflare.com>
-Subject: Re: [PATCH v4 net-next 0/4] net: Provide SMP threads for backlog NAPI
-Message-ID: <20240309090946.3T8f5Ye1@linutronix.de>
-References: <20240305120002.1499223-1-bigeasy@linutronix.de>
- <20240308153302.AmmDp45Q@linutronix.de>
- <20240308202954.1cca595a@kernel.org>
+	s=arc-20240116; t=1709978732; c=relaxed/simple;
+	bh=+iWHO6GcgleJjy5o5wNtL3f5KainhCIUvXYCx/6tCOA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=mUB+bB+QxFcEzDaiJ0tl3RZogXoA5zbpScd2a3TVIl+cg2bqg/v9vD8kuJUo92ESER3w/yZ9CbWjI70bieXFfQPa1I9T5KZScQmzPPUEMXzWdbGn+Q0oE32PreEdlklCMaxFMCxn8syR+EEDIyU75Dfk7c/sPc5BRNw26ru7YH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TsJX23gYTz1xqVy;
+	Sat,  9 Mar 2024 18:03:30 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6EB581400CF;
+	Sat,  9 Mar 2024 18:05:11 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.2) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Sat, 9 Mar 2024 18:05:10 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <jiri@resnulli.us>
+CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH V5 net-next 0/4] Support some features for the HNS3 ethernet driver
+Date: Sat, 9 Mar 2024 18:00:40 +0800
+Message-ID: <20240309100044.2351166-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240308202954.1cca595a@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On 2024-03-08 20:29:54 [-0800], Jakub Kicinski wrote:
-> On Fri, 8 Mar 2024 16:33:02 +0100 Sebastian Andrzej Siewior wrote:
-> > The v4 is marked as "Changes Requested". Is there anything for me to do?
-> > I've been asked to rebase v3 on top of net-next which I did with v4. It
-> > still applies onto net-next as of today.
-> 
-> Hm, I tried to apply and it doesn't, sure you fetched?
-> Big set of changes from Eric got applied last night.
+Currently, the hns3 driver does not have the trace
+of the command queue. As a result, it is difficult to
+locate the communication between the driver and firmware.
+Therefore, the trace function of the command queue is
+added in this patch set to facilitate the locating of
+communication problems between the driver and firmware.
 
-So git merge did fine but the individual import failed due to recent
-changes. Now I rebased it on top of
-   d7e14e5344933 ("Merge tag 'mlx5-socket-direct-v3' of git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux")
+If a RAS occurs, the driver will automatically reset to attempt
+to recover the RAS. Therefore, to locate the cause of the RAS,
+it is necessary to save the values of some RAS-related dfx
+registers before the reset. So we added a patch in
+this patch set to print these information.
 
-and reposted as of 20240309090824.2956805-1-bigeasy@linutronix.de.
+---
+changeLog:
+v4 -> v5:
+  - Delete a patch about dump pfc frame statistics in tx timeout log by dmesg,
+    suggested by Jiri Pirko
+  - Rewrite the log message of patch about command queue trace, suggested by Jiri Pirko
+  - Add a new patch about querying scc version by devlink info
+  v4: https://lore.kernel.org/all/20240105010119.2619873-1-shaojijie@huawei.com/
+v3 -> v4:
+  - Adjuste the patches sequence in this patch set, suggested by Simon Horman
+  v3: https://lore.kernel.org/all/20231216070018.222798-1-shaojijie@huawei.com/
+v2 -> v3:
+  - Fix the incorrect use of byte order in patch
+    "net: hns3: add command queue trace for hns3" suggested by Simon Horman
+  - Add a new patch to move constants from hclge_debugfs.h
+    to hclge_debugfs.c suggested by Simon Horman
+  v2: https://lore.kernel.org/all/20231214141135.613485-1-shaojijie@huawei.com/
+v1 -> v2:
+  - Delete a patch for ethtool -S to dump page pool statistics, suggested by Jakub Kicinski
+  - Delete two patches about CMIS transceiver modules because
+    ethtool get_module_eeprom_by_page op is not implemented, suggested by Jakub Kicinski
+  v1: https://lore.kernel.org/all/20231211020816.69434-1-shaojijie@huawei.com/
+---
 
-Sebastian
+Hao Chen (1):
+  net: hns3: add support to query scc version by devlink info
+
+Hao Lan (1):
+  net: hns3: add command queue trace for hns3
+
+Jijie Shao (1):
+  net: hns3: move constants from hclge_debugfs.h to hclge_debugfs.c
+
+Peiyang Wang (1):
+  net: hns3: dump more reg info based on ras mod
+
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  13 +
+ .../hns3/hns3_common/hclge_comm_cmd.c         |  19 +
+ .../hns3/hns3_common/hclge_comm_cmd.h         |  24 +-
+ .../hisilicon/hns3/hns3pf/hclge_debugfs.c     | 646 +++++++++++++++++-
+ .../hisilicon/hns3/hns3pf/hclge_debugfs.h     | 643 +----------------
+ .../hisilicon/hns3/hns3pf/hclge_devlink.c     |  44 +-
+ .../hisilicon/hns3/hns3pf/hclge_devlink.h     |   2 +
+ .../hisilicon/hns3/hns3pf/hclge_err.c         | 434 +++++++++++-
+ .../hisilicon/hns3/hns3pf/hclge_err.h         |  36 +
+ .../hisilicon/hns3/hns3pf/hclge_main.c        |  63 ++
+ .../hisilicon/hns3/hns3pf/hclge_main.h        |   1 +
+ .../hisilicon/hns3/hns3pf/hclge_trace.h       |  94 +++
+ .../hisilicon/hns3/hns3vf/hclgevf_main.c      |  40 ++
+ .../hisilicon/hns3/hns3vf/hclgevf_trace.h     |  50 ++
+ 14 files changed, 1457 insertions(+), 652 deletions(-)
+
+-- 
+2.30.0
+
 
