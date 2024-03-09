@@ -1,251 +1,131 @@
-Return-Path: <netdev+bounces-78936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 320E387702C
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 11:05:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 370E8877045
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 11:16:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D9181F2186E
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 10:05:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DF601C2094C
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 10:16:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1A9381CC;
-	Sat,  9 Mar 2024 10:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA66D381D1;
+	Sat,  9 Mar 2024 10:16:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ES3Zz1Hi"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C603A8F7;
-	Sat,  9 Mar 2024 10:05:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4282337143
+	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 10:16:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709978724; cv=none; b=Qkz0gpAtCnMc11xCuBGyYw6Ub2YFmYbTnvu7kxgbhTQGRh6SREcZfsIvkf07zQsTM+aXK87UIZnlq+QfE5k0O2JQ6Jjrr06PVob4fuh65pdQbE2/eqtn+1uaTh2nPXIsjQDrUZH+zKUPZY2DGZ+nbtLQMcCk2hyJJaGptt8G1+o=
+	t=1709979387; cv=none; b=oBmRvGXyo1jvSpTay1JNuWxpT6jR3BJT26Jo5NDVFkxirjLh6w9nj+wA/6hdBj64v9ipkf2otHwL4kWrtuDzXFSrO7wS/3PQiEP32qxbHM7wNElZhhW5BBiy1xc/L7+ejV/jGkbSBQNZz5FffJJU+dTU0VAx5eqdggjjlvcpzBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709978724; c=relaxed/simple;
-	bh=OeCOJXi+V4AjNrEA00UOOb+3Wy6y1zs9/FElN9Bvds4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T8oXH23cLg5tzamAw4R9UK43btAujqrEGf0h8BQW7nrEqV3yqLwl8MxWfXuIs1LbN+ECWW9tZWO/+bbUWumkGtk11oNpDfY+drKXlnKyE5azxJclLGwKEQgBJ7oi2Jdr1QFjCMRvGRPDgmqS+DeurwNDJT9FEMhZI8i5O40VhaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4TsJYp23whz24hgV;
-	Sat,  9 Mar 2024 18:05:02 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 98E6818005F;
-	Sat,  9 Mar 2024 18:05:13 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.2) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sat, 9 Mar 2024 18:05:12 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <jiri@resnulli.us>
-CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
-	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH V5 net-next 4/4] net: hns3: add support to query scc version by devlink info
-Date: Sat, 9 Mar 2024 18:00:44 +0800
-Message-ID: <20240309100044.2351166-5-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20240309100044.2351166-1-shaojijie@huawei.com>
-References: <20240309100044.2351166-1-shaojijie@huawei.com>
+	s=arc-20240116; t=1709979387; c=relaxed/simple;
+	bh=R6YWvxgH9CE3CisoJnp7PZcrDVcPnbLmLxxymhmZHSk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IvMr8jztlsXeb4Dh9N1rsQo5arHLquIeLsvCHPPFxVsUsBQ6QQzAEcgY2vdzXHtWHDp1KCCNNqyDI2soESyMCHMDRMJVky+BOeuCGK6q6tMMtQXKwdiPhs9bEE4+JcXtpNOewyi3nFBhxiu/VC+vZ/hu8cOTesEXQe5tkuR2TSI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ES3Zz1Hi; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1709979385; x=1741515385;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=R6YWvxgH9CE3CisoJnp7PZcrDVcPnbLmLxxymhmZHSk=;
+  b=ES3Zz1HiDe2grJs5H419ZPnBy3Go0q9l+DDTecZ7/s9ZxhzuDyYUiLOB
+   pl673JSkBXicYBMCYiJ0tvX1XS5mvWUa4+q+idi7J938I8V5S0N6IzgoC
+   BO/fk828cW/7S03G4BBaEGsKWkxB4ZFkLDbYj6MKaxe189RmlZdFGFHpc
+   pgXnz6IOGmfswnqYfX57/bAc3HmhjYuAuOtCj+uqYKEujIIb5aQbd70Ra
+   RTJtWRAJFFv5fQk/TFt1gNQG0YYyk6nCFRcqhpCfP/L6wL02o8oINAYsR
+   34g9ls3/lQHFfJj7kyVuiOk7ktW4KTbFfNt2gSr7VSyGtrjKUEIGyqjFz
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11007"; a="4567547"
+X-IronPort-AV: E=Sophos;i="6.07,112,1708416000"; 
+   d="scan'208";a="4567547"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Mar 2024 02:16:25 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,112,1708416000"; 
+   d="scan'208";a="10763951"
+Received: from lkp-server01.sh.intel.com (HELO b21307750695) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 09 Mar 2024 02:16:22 -0800
+Received: from kbuild by b21307750695 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1ritkZ-0007FH-2m;
+	Sat, 09 Mar 2024 10:16:19 +0000
+Date: Sat, 9 Mar 2024 18:16:06 +0800
+From: kernel test robot <lkp@intel.com>
+To: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Antonio Quartulli <antonio@openvpn.net>
+Subject: Re: [PATCH net-next v2 14/22] ovpn: implement peer lookup logic
+Message-ID: <202403091859.HD1Dnk2H-lkp@intel.com>
+References: <20240304150914.11444-15-antonio@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240304150914.11444-15-antonio@openvpn.net>
 
-From: Hao Chen <chenhao418@huawei.com>
+Hi Antonio,
 
-Add support to query scc version by devlink info for device V3.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Hao Chen <chenhao418@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  9 ++++
- .../hns3/hns3_common/hclge_comm_cmd.h         |  8 ++++
- .../hisilicon/hns3/hns3pf/hclge_devlink.c     | 44 +++++++++++++++++--
- .../hisilicon/hns3/hns3pf/hclge_devlink.h     |  2 +
- .../hisilicon/hns3/hns3pf/hclge_main.c        | 18 ++++++++
- .../hisilicon/hns3/hns3pf/hclge_main.h        |  1 +
- 6 files changed, 79 insertions(+), 3 deletions(-)
+[auto build test WARNING on net-next/main]
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-index e9266c65b331..7c2c8bea4c06 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
-@@ -366,6 +366,15 @@ struct hnae3_vector_info {
- #define HNAE3_FW_VERSION_BYTE0_SHIFT	0
- #define HNAE3_FW_VERSION_BYTE0_MASK	GENMASK(7, 0)
- 
-+#define HNAE3_SCC_VERSION_BYTE3_SHIFT	24
-+#define HNAE3_SCC_VERSION_BYTE3_MASK	GENMASK(31, 24)
-+#define HNAE3_SCC_VERSION_BYTE2_SHIFT	16
-+#define HNAE3_SCC_VERSION_BYTE2_MASK	GENMASK(23, 16)
-+#define HNAE3_SCC_VERSION_BYTE1_SHIFT	8
-+#define HNAE3_SCC_VERSION_BYTE1_MASK	GENMASK(15, 8)
-+#define HNAE3_SCC_VERSION_BYTE0_SHIFT	0
-+#define HNAE3_SCC_VERSION_BYTE0_MASK	GENMASK(7, 0)
-+
- struct hnae3_ring_chain_node {
- 	struct hnae3_ring_chain_node *next;
- 	u32 tqp_index;
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
-index a2bc5a9adaa3..2c2a2f1e0d7a 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
-@@ -247,6 +247,9 @@ enum hclge_opcode_type {
- 	HCLGE_OPC_QCN_AJUST_INIT	= 0x1A07,
- 	HCLGE_OPC_QCN_DFX_CNT_STATUS    = 0x1A08,
- 
-+	/* SCC commands */
-+	HCLGE_OPC_QUERY_SCC_VER		= 0x1A84,
-+
- 	/* Mailbox command */
- 	HCLGEVF_OPC_MBX_PF_TO_VF	= 0x2000,
- 	HCLGEVF_OPC_MBX_VF_TO_PF	= 0x2001,
-@@ -394,6 +397,11 @@ struct hclge_comm_query_version_cmd {
- 	__le32 caps[HCLGE_COMM_QUERY_CAP_LENGTH]; /* capabilities of device */
- };
- 
-+struct hclge_comm_query_scc_cmd {
-+	__le32 scc_version;
-+	u8 rsv[20];
-+};
-+
- #define HCLGE_DESC_DATA_LEN		6
- struct hclge_desc {
- 	__le16 opcode;
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.c
-index 9a939c0b217f..a1571c108678 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.c
-@@ -5,6 +5,34 @@
- 
- #include "hclge_devlink.h"
- 
-+static int hclge_devlink_scc_info_get(struct devlink *devlink,
-+				      struct devlink_info_req *req)
-+{
-+	struct hclge_devlink_priv *priv = devlink_priv(devlink);
-+	char scc_version[HCLGE_DEVLINK_FW_SCC_LEN];
-+	struct hclge_dev *hdev = priv->hdev;
-+	u32 scc_version_tmp;
-+	int ret;
-+
-+	ret = hclge_query_scc_version(hdev, &scc_version_tmp);
-+	if (ret) {
-+		dev_err(&hdev->pdev->dev,
-+			"failed to get scc version, ret = %d\n", ret);
-+		return ret;
-+	}
-+
-+	snprintf(scc_version, sizeof(scc_version), "%lu.%lu.%lu.%lu",
-+		 hnae3_get_field(scc_version_tmp, HNAE3_SCC_VERSION_BYTE3_MASK,
-+				 HNAE3_FW_VERSION_BYTE3_SHIFT),
-+		 hnae3_get_field(scc_version_tmp, HNAE3_SCC_VERSION_BYTE2_MASK,
-+				 HNAE3_FW_VERSION_BYTE2_SHIFT),
-+		 hnae3_get_field(scc_version_tmp, HNAE3_SCC_VERSION_BYTE1_MASK,
-+				 HNAE3_FW_VERSION_BYTE1_SHIFT),
-+		 hnae3_get_field(scc_version_tmp, HNAE3_SCC_VERSION_BYTE0_MASK,
-+				 HNAE3_FW_VERSION_BYTE0_SHIFT));
-+	return devlink_info_version_running_put(req, "fw.scc", scc_version);
-+}
-+
- static int hclge_devlink_info_get(struct devlink *devlink,
- 				  struct devlink_info_req *req,
- 				  struct netlink_ext_ack *extack)
-@@ -13,6 +41,7 @@ static int hclge_devlink_info_get(struct devlink *devlink,
- 	struct hclge_devlink_priv *priv = devlink_priv(devlink);
- 	char version_str[HCLGE_DEVLINK_FW_STRING_LEN];
- 	struct hclge_dev *hdev = priv->hdev;
-+	int ret;
- 
- 	snprintf(version_str, sizeof(version_str), "%lu.%lu.%lu.%lu",
- 		 hnae3_get_field(hdev->fw_version, HNAE3_FW_VERSION_BYTE3_MASK,
-@@ -24,9 +53,18 @@ static int hclge_devlink_info_get(struct devlink *devlink,
- 		 hnae3_get_field(hdev->fw_version, HNAE3_FW_VERSION_BYTE0_MASK,
- 				 HNAE3_FW_VERSION_BYTE0_SHIFT));
- 
--	return devlink_info_version_running_put(req,
--						DEVLINK_INFO_VERSION_GENERIC_FW,
--						version_str);
-+	ret = devlink_info_version_running_put(req,
-+					       DEVLINK_INFO_VERSION_GENERIC_FW,
-+					       version_str);
-+	if (ret) {
-+		dev_err(&hdev->pdev->dev, "failed to set running version of fw\n");
-+		return ret;
-+	}
-+
-+	if (hdev->pdev->revision > HNAE3_DEVICE_VERSION_V2)
-+		ret = hclge_devlink_scc_info_get(devlink, req);
-+
-+	return ret;
- }
- 
- static int hclge_devlink_reload_down(struct devlink *devlink, bool netns_change,
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.h
-index 918be04507a5..148effa5ea89 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_devlink.h
-@@ -6,6 +6,8 @@
- 
- #include "hclge_main.h"
- 
-+#define	HCLGE_DEVLINK_FW_SCC_LEN	32
-+
- struct hclge_devlink_priv {
- 	struct hclge_dev *hdev;
- };
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-index 9ecc7fc34c5e..4d2fd89bf202 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
-@@ -10883,6 +10883,24 @@ static u32 hclge_get_fw_version(struct hnae3_handle *handle)
- 	return hdev->fw_version;
- }
- 
-+int hclge_query_scc_version(struct hclge_dev *hdev, u32 *scc_version)
-+{
-+	struct hclge_comm_query_scc_cmd *resp;
-+	struct hclge_desc desc;
-+	int ret;
-+
-+	hclge_cmd_setup_basic_desc(&desc, HCLGE_OPC_QUERY_SCC_VER, 1);
-+	resp = (struct hclge_comm_query_scc_cmd *)desc.data;
-+
-+	ret = hclge_cmd_send(&hdev->hw, &desc, 1);
-+	if (ret)
-+		return ret;
-+
-+	*scc_version = le32_to_cpu(resp->scc_version);
-+
-+	return 0;
-+}
-+
- static void hclge_set_flowctrl_adv(struct hclge_dev *hdev, u32 rx_en, u32 tx_en)
- {
- 	struct phy_device *phydev = hdev->hw.mac.phydev;
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-index e821dd2f1528..df3c10098349 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.h
-@@ -1169,4 +1169,5 @@ int hclge_enable_vport_vlan_filter(struct hclge_vport *vport, bool request_en);
- int hclge_mac_update_stats(struct hclge_dev *hdev);
- struct hclge_vport *hclge_get_vf_vport(struct hclge_dev *hdev, int vf);
- int hclge_inform_vf_reset(struct hclge_vport *vport, u16 reset_type);
-+int hclge_query_scc_version(struct hclge_dev *hdev, u32 *scc_version);
- #endif
+url:    https://github.com/intel-lab-lkp/linux/commits/Antonio-Quartulli/netlink-add-NLA_POLICY_MAX_LEN-macro/20240304-232835
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20240304150914.11444-15-antonio%40openvpn.net
+patch subject: [PATCH net-next v2 14/22] ovpn: implement peer lookup logic
+config: sparc-randconfig-r051-20240309 (https://download.01.org/0day-ci/archive/20240309/202403091859.HD1Dnk2H-lkp@intel.com/config)
+compiler: sparc-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240309/202403091859.HD1Dnk2H-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202403091859.HD1Dnk2H-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/ovpn/peer.c: In function 'ovpn_nexthop_from_rt6':
+   drivers/net/ovpn/peer.c:170:24: error: invalid use of undefined type 'struct rt6_info'
+     170 |         if (!rt || !(rt->rt6i_flags & RTF_GATEWAY))
+         |                        ^~
+   drivers/net/ovpn/peer.c:173:18: error: invalid use of undefined type 'struct rt6_info'
+     173 |         return rt->rt6i_gateway;
+         |                  ^~
+>> drivers/net/ovpn/peer.c:174:1: warning: control reaches end of non-void function [-Wreturn-type]
+     174 | }
+         | ^
+
+
+vim +174 drivers/net/ovpn/peer.c
+
+   165	
+   166	static struct in6_addr ovpn_nexthop_from_rt6(struct sk_buff *skb)
+   167	{
+   168		struct rt6_info *rt = (struct rt6_info *)skb_rtable(skb);
+   169	
+ > 170		if (!rt || !(rt->rt6i_flags & RTF_GATEWAY))
+   171			return ipv6_hdr(skb)->daddr;
+   172	
+   173		return rt->rt6i_gateway;
+ > 174	}
+   175	
+
 -- 
-2.30.0
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
