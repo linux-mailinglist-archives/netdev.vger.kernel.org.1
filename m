@@ -1,117 +1,94 @@
-Return-Path: <netdev+bounces-78955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D428877187
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 14:51:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BC0F877196
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 15:10:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0A62DB20F23
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 13:51:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 552201C20A56
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 14:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1A664085B;
-	Sat,  9 Mar 2024 13:51:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73E5540869;
+	Sat,  9 Mar 2024 14:10:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eM0Mv0rC"
+	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="JVzGrDL2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out203-205-251-66.mail.qq.com (out203-205-251-66.mail.qq.com [203.205.251.66])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F382339ADF
-	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 13:51:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30F71BDF4;
+	Sat,  9 Mar 2024 14:10:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.251.66
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709992276; cv=none; b=paPnFaTXipanblnW+bkxZX08fsDuQwEeg1X9m4gK3EvHj2Pnac4pjFCpZ13Alu1w0zHatKwoV84MG6khZXytfOzUjEJDPTSH2nMzrLx2Dvbo+6IZ5LOna+g48w1BscTp6UdqVQvrzPxIC0Satfu354v41LjjrjRsJQQp9LDnAQ4=
+	t=1709993445; cv=none; b=mjQD+QxRmCFXWqVKmn+YTXs5YtggaW0ZLQP21EK4rdxzamcUBcicbbYdNL2SCskIpNtK9eys86XeKd4ik/9/Ygj5tOKPICbLeDA1bwy3KFOjlG4rVA6qoZypa1d+dLVS5dKD1ZxNs60FLP4Meok+hNAdPbNoIYtURcdxr2kvuOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709992276; c=relaxed/simple;
-	bh=3l5OYOzOQ/vB4Y/VGcrwpNgMlmBP5V1Ml/YaGCtT0pQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aBn6ewHlC9FMgDN56RYEW2ZEJ1j/iHBenqemH/ycf3JVTjyWaLqHd+EwZ8npb5tVGJ+p5zhlpzhKChcrXM2qf0AMm4DDUd995/RdywWJk5T3NoqT31ZJ8Gf4Fg8kZKGNaSLMUg1AnkzRwqb/hLSyyq7ZjWWMngrxSDK+qeGyFvQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eM0Mv0rC; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-565223fd7d9so3521a12.1
-        for <netdev@vger.kernel.org>; Sat, 09 Mar 2024 05:51:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709992273; x=1710597073; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=te496QxdZUYg4ch4iSRnEXCjitC5gIqnzUY0BMOOYY0=;
-        b=eM0Mv0rC/KKtFUrJcixD8FCbeD8wM6RJoF4RQEqP3r9OaDsUQRtfCjX67S+CmGd7ez
-         Miy6yZ0cRAwJz1t/Rm/RUG/6EKp8mB5rFKKk28xqIXakSGUJWq55gDQDqT2qhkvIo/ct
-         RP0yDcTmB/gSx6xjTtgnqIFfNl4KGPTQlRyqCo0PBRnFehbB5+GXRKjZpYpfXmoWHnhj
-         gohyW11941qtAxeKl1OtGXJR4xt3oiV2t2XvbjOGYx+lIjjdrJf6CzhAstFEEHhGpncw
-         uo9UoG91C3WQzbWSbqlNCKx9koCOZOnsLHCkzrmaPBjWFOLJpYCvtin5A1W4ZWfjnHxE
-         KwAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709992273; x=1710597073;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=te496QxdZUYg4ch4iSRnEXCjitC5gIqnzUY0BMOOYY0=;
-        b=A+OxVRyR2AdDTU/YAzlOXflzex0UQKMYhxLcA8+EUki2exOTrl8cyhMmtP1pKgGEMW
-         uS+Twq+WR1x9zU+HLcZtKVcJ1P1h9AbfUITNr3w663GCbQoxZRKLoWsGs3ruKI0oNKSN
-         5/U83nz186r7mTbJ9MM9MPNK4ntKJXLdMO8NhfY7svZQEH5SYNzTHbTjk7k9XWX6x1Ss
-         xZBHbVEmO1csuyXcbsz+xXFmEu8by+3+3tyjEQrQqg5XQZN4g/0YDlS6CsxZFzv4vvhA
-         6ZR5Ykzbijs7pYb4NsV4P8BLDfokc28k8I9+xJ0vrvmzELGYwqESnI3b/9hD0mNdU263
-         bMKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWgtV0/IR46opAF8lLD9bhYPP3GNPWapbHnrTDkgNRRJxGRu+84ri8NrxxKcHBzVEjKhECWBiAdz+pIuKjuOX/jFRX8ZIPn
-X-Gm-Message-State: AOJu0Yxm2fkijlk5XIsgtuwFPmXb44f1GLQSLldNebQCl3gpqObm5C7z
-	KRTZy/QocY72cSmfU2+TTZrVXnMoLDuDc2dxc9v9HRMEUPpSIfbUT4R9u45WkLQowHG++MrUXvm
-	kZsvPimjLnuoGF9whiOnwhJ+JrK/uS+KpiC9U
-X-Google-Smtp-Source: AGHT+IENA+pdgSTpoEoapZTEank+4tXhBFYnvcx3nutGJQOCKuqd441+JVEO6pyirOLVoJkVtcCKjl3A60S0s7Qtflg=
-X-Received: by 2002:a05:6402:1b06:b0:568:3c0c:1755 with SMTP id
- by6-20020a0564021b0600b005683c0c1755mr79029edb.6.1709992273123; Sat, 09 Mar
- 2024 05:51:13 -0800 (PST)
+	s=arc-20240116; t=1709993445; c=relaxed/simple;
+	bh=maIUddBIRkixT08jMamIHlx6Ic+Z9RInYiboQrgEs6s=;
+	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
+	 MIME-Version; b=M5ZW5IQu8fLVq4khRcqyTeIIg2DJH5OUnhIBzMAr28EjKv7SvJTw8LWh8EEjYqtvKkSZhfTfT5VEhQzCoKDjIN3C6ZoQUdx/9N7V6WNvF4EVo86ym7mwUj21OCNlohjt81TrD1tzflf1Jbhn6Y00wT8mHQL7MnQO4fHZvARA+ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=JVzGrDL2; arc=none smtp.client-ip=203.205.251.66
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
+	t=1709993133; bh=maIUddBIRkixT08jMamIHlx6Ic+Z9RInYiboQrgEs6s=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=JVzGrDL29LVUN/yydIMy2NGYJM2EyEidTzZUQ0gLqzXXou8Q5yqxWOrqNPBKdRg88
+	 B2FT+CGmxVvktX5dmAjqqDZrq8rN12bQix1RdgxW5tmLqNFN25WH9/BkxZOJ5r+dxU
+	 2aLqKL4x/K9n+t0bmYsmRg4MRzILDT5IcBPkqYes=
+Received: from localhost.localdomain ([58.213.8.163])
+	by newxmesmtplogicsvrszb9-1.qq.com (NewEsmtp) with SMTP
+	id EC3A729C; Sat, 09 Mar 2024 21:59:03 +0800
+X-QQ-mid: xmsmtpt1709992743tsey328q4
+Message-ID: <tencent_4E77E34FDA2F438430621DF220620A882407@qq.com>
+X-QQ-XMAILINFO: NiAdzfE16ND4bolk1M35OWX6STXNtKuQPLdhDd/JkFmdm5wIJTCi649pCSKM8M
+	 5uyPE9F9cX+lpf9GA+o4h+QfDkgnSsXsQrWD3WmXxTno2qDQAyxX4p4c4PqbM5ZIj6FIqwwrzNYx
+	 XrwPrsCxHmZa5dPWRvDQnXlg0XYblyTTjeI0SzPbd7K/okRDzEDS93pLksKWsnewPRINUck8iTyz
+	 ps7efNFJGutn7vybZyaXRmdpX73/ltUA4j2RFeEygGbobECdsB/13h78gf5vYe5eWXhx4GBp36y4
+	 9DeBui7+MRVQDqjV31MykaWxSJ/8gelC4nOws1ga9zJrhVwCc9SdpiIBmJxKd16PCFyFpgOP+0j2
+	 6NVlqeB9PKmR0pSFc7h0JaLZsqHgZU7Ry5IRuw49uP/qmejY5tWusbBSconD+h9bydyupHyQVAd/
+	 AUzNG3JwUc0v3kLet5PfGlw+xxpAws20DHk9kcWZh0XD99UgzrbE4RNkPJmgtG7BSMs+4iw8SDoM
+	 3hod25UGk+B2SqahuPz3QYj/XDBEGUc4dmZVYoA6hYLkZQNZlZfeFdAUTyIckoTNqzXuAzn8vJjC
+	 uAnsrM/EX6tHqaes5olJtXuAm7kmh4KN766ygYLQN4vkrI+Vg96gUM4VJnFMznPEZaovwok8/h0N
+	 tJnt6/GsVuCYTarATR3e7b2EQpaMWFGAI5bPTiEXgjA5zFVf209u3qHqpRr0xuLi64yyV9APzRQs
+	 r5Cl8HH9Gm+J//3AmzfdF73DvjTgdvef/GD+SyBCTqfE52aR3tvBTayPfMKLeC85gqOUf/4x6FAL
+	 6qVI3l4Tm88xGAYaZ4bk1z4f1Sl54r2AcpaZ73N5Wb3gyFSInWIx0vcqR03keRitC1NW4hHK9BWQ
+	 lskAKk4rzevAtuqkugS2GsJYyA92BvHJdOz12Qi2iFZTv8tirxaLHI7WOwUw4tz7avx8GlpTBtDJ
+	 eaGuVmFgbfLgkZ3guPoCh7sZjMuT0aiERUF6bm4JpQfYhBaJfNK8FDoqViI0qeA2RNQQ478e1FPQ
+	 fPFZ06eg==
+X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
+From: linke li <lilinke99@qq.com>
+To: edumazet@google.com
+Cc: alexander@mihalicyn.com,
+	davem@davemloft.net,
+	dhowells@redhat.com,
+	kuba@kernel.org,
+	kuniyu@amazon.com,
+	leitao@debian.org,
+	lilinke99@qq.com,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	willemb@google.com,
+	wuyun.abel@bytedance.com
+Subject: Re: [PATCH] net: mark racy access on sk->sk_rcvbuf
+Date: Sat,  9 Mar 2024 21:59:02 +0800
+X-OQ-MSGID: <20240309135902.57126-1-lilinke99@qq.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+In-Reply-To: <CANn89iJRXjYTojFyHN6s1Qu9Vkkk6RwxPF=bAKPjOg9zT-GupA@mail.gmail.com>
+References: <CANn89iJRXjYTojFyHN6s1Qu9Vkkk6RwxPF=bAKPjOg9zT-GupA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <tencent_DC4901C65DB41D86CD613F3ACC41EA143808@qq.com>
-In-Reply-To: <tencent_DC4901C65DB41D86CD613F3ACC41EA143808@qq.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 9 Mar 2024 14:50:59 +0100
-Message-ID: <CANn89iJRXjYTojFyHN6s1Qu9Vkkk6RwxPF=bAKPjOg9zT-GupA@mail.gmail.com>
-Subject: Re: [PATCH] net: mark racy access on sk->sk_rcvbuf
-To: linke li <lilinke99@qq.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Willem de Bruijn <willemb@google.com>, Abel Wu <wuyun.abel@bytedance.com>, 
-	Breno Leitao <leitao@debian.org>, Alexander Mikhalitsyn <alexander@mihalicyn.com>, 
-	David Howells <dhowells@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Sat, Mar 9, 2024 at 2:35=E2=80=AFPM linke li <lilinke99@qq.com> wrote:
->
-> sk->sk_rcvbuf can be changed by other threads. Mark this as benign using
-> READ_ONCE.
->
-> This patch is aimed at reducing the number of benign races reported by
-> KCSAN in order to focus future debugging effort on harmful races.
->
-> Signed-off-by: linke li <lilinke99@qq.com>
-> ---
->  net/core/sock.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index 5e78798456fd..4c5524e70534 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -551,7 +551,7 @@ int __sk_receive_skb(struct sock *sk, struct sk_buff =
-*skb,
->
->         skb->dev =3D NULL;
->
-> -       if (sk_rcvqueues_full(sk, sk->sk_rcvbuf)) {
-> +       if (sk_rcvqueues_full(sk, READ_ONCE(sk->sk_rcvbuf))) {
->                 atomic_inc(&sk->sk_drops);
->                 goto discard_and_relse;
+> OK, but what about __sock_queue_rcv_skb() in the same file ?
 
-OK, but what about __sock_queue_rcv_skb() in the same file ?
+I notice that, but I am not very sure whether there is a data race. If it
+is a similar situation, then the same patch should be applied too.
+
 
