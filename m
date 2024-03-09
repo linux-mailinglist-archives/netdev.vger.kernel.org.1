@@ -1,58 +1,61 @@
-Return-Path: <netdev+bounces-78896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04FC4876EFF
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 04:43:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A505876F00
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 04:49:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 456712823DD
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 03:43:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17861282528
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 03:48:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 044122E851;
-	Sat,  9 Mar 2024 03:43:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE68832182;
+	Sat,  9 Mar 2024 03:48:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IARd+tSR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ib0K33nf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D29301DFE8
-	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 03:43:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B853A2E851
+	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 03:48:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709955816; cv=none; b=ZSBoXgDQgKzbxwn09X2DwcdnBpLVWdpwRVY8UJxsPv38GdVkY7/Bc3YzMrE1ej+h0WUfgAF+HnRPGrcjyh44vr3bALrGc1hHmympopIZ+qpfk+hXy/Qdo3ZuOLimvX3mX+ekLlrJPQdVhKK4LlHq3B3bmXBQ49o+7xksQupgZkI=
+	t=1709956135; cv=none; b=OeCM22Y6SQiVixPiA8S6qdhr6qiCVh6j6SCMSiBKKRra4okubJz0+FiTLBPn2WBDxfh7vXbfQlVZhiqJMAoDjmEFE9kl7PwtohMMiuQB5icR1PZ9UlBeSp08VYic/OmfGB9ABUKosVTlo2tS81DyDJGe1qMKcJhiDs/pRvnrVmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709955816; c=relaxed/simple;
-	bh=Cy3Zo7p27wOQW/xMawb2c9DGZVH11rCB52Ur2eowbdc=;
+	s=arc-20240116; t=1709956135; c=relaxed/simple;
+	bh=RhgqKMT0EzLTHDptxHpozVfD6zz12kooT4cSbWoN7Oo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OVuUdG4k467ehNdqhe4hV3SArYqhT7MSBxPhlzOTu9307mWlUuSG1Wn2bf5cEGQ+B3nu/xvhC1PZFNdd0NlWLSyzmWuSKILWxuTHzAl3eq7jFRRp4MVE1JoctYjcsLxt0rmgxcyujVveiJ97Y8VHuIrnyeAT5c0JkG4gBn/Bl8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IARd+tSR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD0AEC433C7;
-	Sat,  9 Mar 2024 03:43:35 +0000 (UTC)
+	 MIME-Version:Content-Type; b=T5Hr3trrA15OxsXu+chJJ4wjVRY5fUUt4Sekg4YCziNxIYVlAkrYHE98mFsEiQunrxMnEndZ2CbRzCptloNXYkNBQYd+f2jJtNfJV4XJFoNBae7b/6xL7GE9sC0YuhFpk+n4JxVilzD6ZS09oFmAnu/9iwZfEvm0ivBAvjqBlpU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ib0K33nf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C67ECC433F1;
+	Sat,  9 Mar 2024 03:48:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709955816;
-	bh=Cy3Zo7p27wOQW/xMawb2c9DGZVH11rCB52Ur2eowbdc=;
+	s=k20201202; t=1709956135;
+	bh=RhgqKMT0EzLTHDptxHpozVfD6zz12kooT4cSbWoN7Oo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IARd+tSR0EQGzfut8Nte2CDbdB/A2vWgQEI1bkO7UrO8rOhjaG6xLsDQZcVePtYmB
-	 OouzKoC5aVGW65FSqOOMRm7xGtEbhDcCI7o4kndqgCfH42uB7RB2xl4G9KxE4JhMBI
-	 ppDA85sF4n3PFRG6+D3QWBt+1pEfcmF7+NkI2uJoW7BF6XVBNWpqFPhzWEtD8JETno
-	 4Njbqg0KFy+bJ8WxPkkrYHQUDDYYuhMkFOn8nFMPb4hc20CwBIpouScu/r1b0S72Ls
-	 LkSxGbg9NCTX9/ssbkUHLa0V0KjA9IEFuKnTMn8tG1l2QiXKZnqN64ct8bLtPsOdiX
-	 ipFRXi7VZBuAQ==
-Date: Fri, 8 Mar 2024 19:43:34 -0800
+	b=ib0K33nf17LfVUaqKnLO86LgWwtapOpy7Ie4k9E1d6ZxL90YIYSkAOHtTcytZdemF
+	 Den20HLvXsLY+tRvLC5VtqEaVtyGVgn1cbhOnL07YJZsoc6hBighGutENoh0W4N+Y7
+	 LRAGpVr2flEa/4u29NPI54N8WObTZin+nD9LuEo7+wQnmyKZRsMsZCdq3D0dSE0r9K
+	 twIIZk4x8S5/xO2mNKUELaz5Uyo688jwyFdNXtz6qwfGX5vsrgPikMek7tUi7/zwlM
+	 eAYQDGBmYdTE2ojKRmYgxTfggq12oeKDZY6XbAFdfV4lA4DOOK2F69q10V5AwK7EUG
+	 VbS+QYwBxoaTg==
+Date: Fri, 8 Mar 2024 19:48:53 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Petr Machata <petrm@nvidia.com>, David Ahern <dsahern@kernel.org>,
- <netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>,
- <mlxsw@nvidia.com>
-Subject: Re: [PATCH iproute2-next 1/4] libnetlink: Add rta_getattr_uint()
-Message-ID: <20240308194334.52236cef@kernel.org>
-In-Reply-To: <20240308145859.6017bd7f@hermes.local>
-References: <cover.1709934897.git.petrm@nvidia.com>
-	<501f27b908eed65e94b569e88ee8a6396db71932.1709934897.git.petrm@nvidia.com>
-	<20240308145859.6017bd7f@hermes.local>
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>, David Ahern
+ <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>, <mlxsw@nvidia.com>
+Subject: Re: [PATCH net-next 11/11] selftests: forwarding: Add a test for NH
+ group stats
+Message-ID: <20240308194853.7619538a@kernel.org>
+In-Reply-To: <87sf10l5fy.fsf@nvidia.com>
+References: <cover.1709901020.git.petrm@nvidia.com>
+	<2a424c54062a5f1efd13b9ec5b2b0e29c6af2574.1709901020.git.petrm@nvidia.com>
+	<20240308090333.4d59fc49@kernel.org>
+	<87sf10l5fy.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,15 +65,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 8 Mar 2024 14:58:59 -0800 Stephen Hemminger wrote:
-> > +static inline __u64 rta_getattr_uint(const struct rtattr *rta)
-> > +{
-> > +	if (RTA_PAYLOAD(rta) == sizeof(__u32))
-> > +		return rta_getattr_u32(rta);
-> > +	return rta_getattr_u64(rta);  
+On Fri, 8 Mar 2024 23:31:57 +0100 Petr Machata wrote:
+> > Are the iproute2 patches still on their way?
+> > I can't find them and the test is getting skipped.  
 > 
-> Don't understand the use case here.
-> The kernel always sends the same payload size for the same attribute.
+> I only just sent it. The code is here FWIW:
+> 
+>     https://github.com/pmachata/iproute2/commits/nh_stats
 
-Please see commit 374d345d9b5e13380c in the kernel.
+I tried but I'll need to also sync the kernel headers.
+Maybe I'll wait until David applies :S
+Will the test still skip, tho, when running on veth?
 
