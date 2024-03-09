@@ -1,79 +1,89 @@
-Return-Path: <netdev+bounces-78986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28545877350
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 19:38:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1CBB877358
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 19:41:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 892891F21577
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 18:38:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2D921C20BFB
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 18:41:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C490E42A84;
-	Sat,  9 Mar 2024 18:38:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEA5745974;
+	Sat,  9 Mar 2024 18:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EnUzSyEs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I281U3DH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0A2E1CA9A
-	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 18:38:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980CE4595A;
+	Sat,  9 Mar 2024 18:40:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710009480; cv=none; b=d4mRDyS/XhdEjTQ9FFaZ9/cemqZXtrjKHhHCT+c2upYAp90Ws6m8g7xvTAPhBICSQKR5TOeT2RHDiqeZ1KkNGOBsHBzw3EGfnL5AF7OjzdduQXt5cJLSV7vlzSb62gP/v5HNo5G+RbOUuxr935SQjGh6qUkJU439IesjvZcKKlo=
+	t=1710009656; cv=none; b=QyxZaQjzDWsJbqqZbmEkZhrVwH3Zlupk9hnp2vNr8yAUbsy0r6DPNzDtQXUP8fgJS1p5R+aa3wFjqBV70dSgWRaifOdCGPmtzlhsal/I1HU8AP4cjm3SfaAVkhGhsiFP4GJarTwk3mgrtyWWBIoycLy+/mn4USrUSVBb3d14kbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710009480; c=relaxed/simple;
-	bh=goZe3xygOYeYwVqrKSXDHdaK9U2VZqyTnbWak1yiAks=;
+	s=arc-20240116; t=1710009656; c=relaxed/simple;
+	bh=iFIjbYvr0QvzfMFGnrmtWfaFnK1GBevJBvSy4qoaWBo=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UKoRRKbtiX4q8lJ9zjmTZDUmVeurgnNewtjxVvBd9UlpKK3Xh3GI+O37zqZE82u/snRnPKTNp3jYa3zxXQHONEu8QkXFrbTnpbaezNLJ805eD6UWz1Rq4ifnKBkf5z1kFNRrz973wi8GwML2aMaraiV/C/k0jMKvBNZFETZU050=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EnUzSyEs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8138C433F1;
-	Sat,  9 Mar 2024 18:37:59 +0000 (UTC)
+	 MIME-Version:Content-Type; b=lHmhA4vc4XLZl+41cCPT6eK2ehaa3B81gTQeqywhGgAksNO7kTqICGFYm2jII3fTp2sxkmIsPYrMXwH3CmSdueaGmR0QG9USUPJIvqS0omGo8rva3eqPRzrTA2bwRk77rHkOabx8KrX4WUBEwpGS895v4lkcm82BToCIJhb6qR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I281U3DH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C230FC433F1;
+	Sat,  9 Mar 2024 18:40:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710009480;
-	bh=goZe3xygOYeYwVqrKSXDHdaK9U2VZqyTnbWak1yiAks=;
+	s=k20201202; t=1710009656;
+	bh=iFIjbYvr0QvzfMFGnrmtWfaFnK1GBevJBvSy4qoaWBo=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EnUzSyEs132JwJAuchtC9bxbi5c4uxqilYdtjxBX6hrKLmKOh9GIiVpVjOz4BSjBz
-	 2WbVxnQCUZxsmalf8E6fpTsMxgkchCdatTALu3mD6OLYxW3Qj1P+Yofggs/iKvz1JO
-	 Oclx/TEcBYgNJ4gTKANX6K0wG6aH2L8kCnM1NZf9js9a8XE4HOpxTQO+meE8tmKeGL
-	 bBVJ2iWglNHosFnXmEoezqI9qXSMvhqiYPCG95rl54stPfS+Krj+m2hr34oSAP6pf0
-	 q2rcuVGFNsl/ilZuHNGt+D1DzHv4fyoWCkGqKcpXziiXD50eiA7dtRrIGgWNJ+BKee
-	 el7cQHAjcYQFw==
-Date: Sat, 9 Mar 2024 10:37:58 -0800
+	b=I281U3DH181gohn+rf8spyJhZXc57TZ8kM6bT0/z1D0hVY3T2QQZ3f2LrbOK+6ioH
+	 HMK7xg8sCs5/rJg2frxrgbSrOU0Z+DBievnLkmyjpbmhHK0VPOcHQerRld8uORBGuQ
+	 xPSDyzKki1o2J07nyOkGHHHbSCju/WyjrcCCVziaoNrB3XJUOwyR8U13e4CJSCTrHh
+	 MIyYOk8z/okD7Q5CIlgxjdIsctuKwTqx4jR41elFPOfjFhbi43U4nqX74gxJtzUSZh
+	 qv2ABaM48fS4yitV0bAZP60CDoN8EDR4Hxadw8tncQV3PZCgymBMA4Mv+tbrFYWGDe
+	 +S1U3hx0lkisA==
+Date: Sat, 9 Mar 2024 10:40:54 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Petr Machata <petrm@nvidia.com>, David Ahern <dsahern@kernel.org>,
- <netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>,
- <mlxsw@nvidia.com>
-Subject: Re: [PATCH iproute2-next 1/4] libnetlink: Add rta_getattr_uint()
-Message-ID: <20240309103758.7bd0c249@kernel.org>
-In-Reply-To: <20240309092158.5a8191dc@hermes.local>
-References: <cover.1709934897.git.petrm@nvidia.com>
-	<501f27b908eed65e94b569e88ee8a6396db71932.1709934897.git.petrm@nvidia.com>
-	<20240308145859.6017bd7f@hermes.local>
-	<20240308194334.52236cef@kernel.org>
-	<20240309092158.5a8191dc@hermes.local>
+To: Eric Dumazet <edumazet@google.com>
+Cc: syzbot <syzbot+65bb09a7208ce3d4a633@syzkaller.appspotmail.com>, Petr
+ Machata <petrm@nvidia.com>, davem@davemloft.net, dsahern@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [net?] kernel BUG in __nla_validate_parse
+Message-ID: <20240309104054.5f058be3@kernel.org>
+In-Reply-To: <CANn89iKLAOJ+HG_y7M27-tx+9HSLUyDaf_NtrJMjs2bZ52KZbA@mail.gmail.com>
+References: <00000000000088981b06133bc07b@google.com>
+	<CANn89iKLAOJ+HG_y7M27-tx+9HSLUyDaf_NtrJMjs2bZ52KZbA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, 9 Mar 2024 09:21:58 -0800 Stephen Hemminger wrote:
-> > > Don't understand the use case here.
-> > > The kernel always sends the same payload size for the same attribute.    
-> > 
-> > Please see commit 374d345d9b5e13380c in the kernel.  
-> 
-> Ok, but maybe go further and handle u16 and u8
+On Sat, 9 Mar 2024 16:25:18 +0100 Eric Dumazet wrote:
+> On Sat, Mar 9, 2024 at 4:13=E2=80=AFPM syzbot
+> > ..
+> Petr, can you take a look ?
+>=20
+> Thanks !
+>=20
+>=20
+> commit 2118f9390d83cf942de8b34faf3d35b54f9f4eee
+> Author: Petr Machata <petrm@nvidia.com>
+> Date:   Wed Mar 6 13:49:15 2024 +0100
+>=20
+>     net: nexthop: Adjust netlink policy parsing for a new attribute
 
-I guess you can if that's helpful in iproute2, as a "universal getter",
-cost of a few branches. In the kernel I try hard to convince people to
-never use u8 and u16 as they simply waste space on padding, and the bits
-may turn out to be needed later.
+Yeah
+
++static const struct nla_policy rtm_nh_policy_del[] =3D {
++       [NHA_ID]                =3D { .type =3D NLA_U32 },
++};
+
++       err =3D nlmsg_parse(nlh, sizeof(struct nhmsg), tb, NHA_MAX,
++                         rtm_nh_policy_del, extack);
+
+The policy size must be >=3D max_attr (NHA_MAX).
 
