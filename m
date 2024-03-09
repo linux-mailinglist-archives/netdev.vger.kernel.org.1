@@ -1,182 +1,104 @@
-Return-Path: <netdev+bounces-78958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 110C08771AB
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 15:41:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 18A798771B1
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 15:50:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5642BB20E9C
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 14:41:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2077FB20E7C
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 14:50:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E93F3FBB0;
-	Sat,  9 Mar 2024 14:41:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C55F4085D;
+	Sat,  9 Mar 2024 14:49:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="UU8jaHjA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JYmgjMHQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E04EC1BDF4
-	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 14:41:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDDBA22325;
+	Sat,  9 Mar 2024 14:49:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709995274; cv=none; b=TPFEID8daJTS4bQe6GP3AaedHww8SOnUOxxrQvsTZ9W9QwT51inSmha2QVTM6jAd+LOJ8sgflz8CT/h19yw9jYaBa0xntXKRrqRjIN9Q8HrjAPJP2SONDpDEPx408B3lvkTXL1QysRFVLbsS7AjaLqbRfv9kqylCo3BLRcF89ZI=
+	t=1709995799; cv=none; b=JfZv/XU/9bgyHzuZkUv24xWXbqSb9HMK53N6Hwtk6l+T+DQFG+zkq0mqNj7ZwZ/GsRwFgN53eqUpJGgjGL1caJXHhVZC5toBgZHHCIdekNoNtvGaiX1m1Rft2X530UR18drzgUDh6hZKeEUQHmwrC4KP17HpCy/oKwTqOEBzemY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709995274; c=relaxed/simple;
-	bh=IzBLFbK9oOlEHEb0H1yGUQxZ9MKYj/qNuBe2AGswBqA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t5jymXJtaEwQi+0TuLuc5Bf6CwVgozoAcO7pTrvG15E3Nl0OZqYcNdXS/DY+criY62qtQ+NgMq8b4FhIYd0aCiNCL13FCFj1mzWxJtEuglQXqCGLlPc7PS4g5xxprjS0xcqJbKeUaD1OVyIugz2qREJhoQIxx0ypgK0+2c2W25Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=UU8jaHjA; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-51336ab1fb7so2324414e87.1
-        for <netdev@vger.kernel.org>; Sat, 09 Mar 2024 06:41:11 -0800 (PST)
+	s=arc-20240116; t=1709995799; c=relaxed/simple;
+	bh=m0fRX6Klr4hL7HKDSzkO0KpHF8yKajILIBRNBCp469Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aqSKLlEWcKFg7THXjICbG6rbAF2ppJqdkVphzsc5x65oxAoNTJx1AxLZBzAz5xYrhUrO9f4gnekbUfB2Ea5PmExYSjvp60fKfNP8PYO6sivE3fLNQBtjJS72xzA98Ar5FHRdHLUTgt2g6n3pnHQQR7q1dsyPxbuJH5VFcGErai8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JYmgjMHQ; arc=none smtp.client-ip=209.85.167.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5132010e5d1so4256642e87.0;
+        Sat, 09 Mar 2024 06:49:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech.se; s=google; t=1709995270; x=1710600070; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0xwESe4a6WCPaLW5Z6luTRR81H770hCLDzcMHfprpWI=;
-        b=UU8jaHjAEUO7AUVaQUNF4ObKonT3gQsSMZW1o84b+fg7E+AmpDQ1d8+lF3ArC9HDlB
-         wyCzWHLp5EcStEGVRqZsqkzKTyPLCs5Y7wCXmYRZ9jJQmiVQBz6XKrNxC0Tu914yJKKK
-         kJjIM1cSBHQD1Wm7HetooJNZ5h4tImTXGp4t4/BsPZTHSbI9kOIDKNLgo6c00gXOQ7qJ
-         vS/1twOiaPf3eHE7zl8NbKaDRo8GaTKglgp70yHnfKfai9svSRvcE6YMR3naql2f/366
-         yhSp579XvcSjMhCW6ak+LJk9GOXKAT9pOHgq+FvyCpcLiQ73mboUiKHaDmBjn6lYkryu
-         9RMQ==
+        d=gmail.com; s=20230601; t=1709995796; x=1710600596; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m0fRX6Klr4hL7HKDSzkO0KpHF8yKajILIBRNBCp469Y=;
+        b=JYmgjMHQgKcOp54UrEGeGxAKAOP0RMzNv1tjPq2d0MKUGLBoi/I/Don7kLteWT4okE
+         1L5JfeuwlJmNFQOznEB+idx6WpQad6BlOQUAVYu1KGEUwal6tssXMd+h7zxesC18N4Vt
+         mEf6tw8CF0r6tShw2K5T8iM+gf38qyWHCCENaKK1GgeFdsyARCWd+1zezWWug5MhHEaV
+         PMgclpgeq5Oe/nMDPGLaxVAaj5w8EPOKP6IZZXule3KldTqiEQ/tyz9C8ZeFdQz3v/7y
+         FVE2jNAygIWSxWpVekGBlpR0+XCzUujZccrkPNXc/1YPcBBG/7P8D/gb6eC8IpTpyPMM
+         xEiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709995270; x=1710600070;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0xwESe4a6WCPaLW5Z6luTRR81H770hCLDzcMHfprpWI=;
-        b=pK7swbAyscsgoEYIxsOC3x2Lzoeg/XLSbYw5PvIHEY4a9IBGpZMB2izjmqLnMgUJQv
-         bCLNCjKSib0ZVgBhO9qGJ8d9+qoj49ldu1pxzWlMyjz1BK3J3m/UaWIRjAZ6ej4OrdcG
-         WMbrtBOq0YVFgBNnbZ+Im92flRHiMO88F+gEfssWo6avQ0voUwWlQ7cnzNJnupyqtJut
-         jVlCP7PeAAZfmuJ2fsl0hrHcJBHeofEf1OmOo8cTCpI/D6LdKDE9wGH6r2SQ08VSPa+0
-         XWVz9FJw2TddMg71j/44rSf76DPGKo4EuGMImm21Hw4GGPGCsKJQrvxbwA9VQq6ZCVlE
-         J9ag==
-X-Forwarded-Encrypted: i=1; AJvYcCXK7YW8zqNgVQfs22HW0jd5Nsa+CxfwlP91h+xCtkXEgJaYINISGqzBBv5EA2vHg4TTOEt6K1OpUPPdkgis2PJUt2rgw3Fu
-X-Gm-Message-State: AOJu0YyfvIKKwtL/nNnakrCHgZhlssqOG/TwjFOZdh4Z+Uonr5eQINy5
-	yhn8axxo4RY8I9ACagzjWuq6YmGkg6lrrRH8zNBG6P3uw/ub3PibXlJoT469kh4=
-X-Google-Smtp-Source: AGHT+IGa/mHD/4/rYMYZsUWADhXsvXO34E4+/aL+FDP5pnnIOG7h6xAxsrkAvY+Zi2tiz6Z6BFLVtQ==
-X-Received: by 2002:ac2:5a09:0:b0:513:45b7:91c2 with SMTP id q9-20020ac25a09000000b0051345b791c2mr1097054lfn.36.1709995269834;
-        Sat, 09 Mar 2024 06:41:09 -0800 (PST)
-Received: from localhost (h-46-59-36-113.A463.priv.bahnhof.se. [46.59.36.113])
-        by smtp.gmail.com with ESMTPSA id fb6-20020a056512124600b005139cbb1695sm271562lfb.264.2024.03.09.06.41.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Mar 2024 06:41:09 -0800 (PST)
-Date: Sat, 9 Mar 2024 15:41:08 +0100
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: net: renesas,etheravb: Add MDIO bus reset
- properties
-Message-ID: <20240309144108.GF3735877@ragnatech.se>
-References: <20240309012538.719518-1-niklas.soderlund+renesas@ragnatech.se>
- <1375d840-6e42-4e60-896c-265fe6a21705@linaro.org>
+        d=1e100.net; s=20230601; t=1709995796; x=1710600596;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m0fRX6Klr4hL7HKDSzkO0KpHF8yKajILIBRNBCp469Y=;
+        b=aXxV17vY5Kj0ZmAUNeUPZCdch1jl/ZcDFTuPMMc/cF1qEhbdWgz7i58Vma9mkCNeR5
+         zhw/b15C++Oeqhi5QSwft5uop3k/sEZ/XQ6HqDS+Hi6RirTucIF4f/GLjgPjDRglqwmF
+         bpwEAR07P4uP7BoKE0dE8kKauHtgcROLl/CPLV5fKvtJxjlJDr2Fe1sCbB/8+ufckmZ9
+         iUMMbLx80RKzAGrvRbuUZk6wvn4nUMFeTcBbsClHDuF1DhcPQgyHoeKJNMwTjy9qL59L
+         QAnFPbIiewmzN9+jL8bX9vG2jf5RzAyMcSnms50DxUq1aSA33Yfk3S5ZMSstLV0mb2jG
+         A8Gg==
+X-Forwarded-Encrypted: i=1; AJvYcCV1HEe2klZYZjZrU2vlDQ/SCfoK5pGuGkgYTWQIiyFjDwWJhJh3mLA7dEXMCSzuA3fo94vKqWyW9GiXGjTER134gIzoSbQ0FhjwpXKb4vRemko1VQEhJTjWRbZT8s7nutLJGviD
+X-Gm-Message-State: AOJu0Yxhu1iVJjLvubDhdaar0LZJ6pldDr6IoHOfElhoKDv7Xb1LF/3S
+	5Je5SOtkMFS7CoihxqVOlwi3unnbTpY/Kn0KX54TKvjK+YMaUxvQcZka6CmEA2o34SUtHRUqiuC
+	u/6rap7MKqc/6h44qXYzocar8/w4c35SkI/AwNg==
+X-Google-Smtp-Source: AGHT+IG/V19PAOGxhrGvgZcXjevkdaBQ0p6IbUzgLrUUhhNYYgMDdQGrl0RPxzPqWqB5Be/ZqoEGyxLfN3Dw0oRC3zM=
+X-Received: by 2002:a05:6512:3e19:b0:513:2b35:2520 with SMTP id
+ i25-20020a0565123e1900b005132b352520mr61277lfv.58.1709995795723; Sat, 09 Mar
+ 2024 06:49:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1375d840-6e42-4e60-896c-265fe6a21705@linaro.org>
+References: <CANn89iJRXjYTojFyHN6s1Qu9Vkkk6RwxPF=bAKPjOg9zT-GupA@mail.gmail.com>
+ <tencent_4E77E34FDA2F438430621DF220620A882407@qq.com>
+In-Reply-To: <tencent_4E77E34FDA2F438430621DF220620A882407@qq.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 9 Mar 2024 22:49:19 +0800
+Message-ID: <CAL+tcoAHN_-c6eVuOY=O_8xJ_KLPS9yUpeW524nuSMo5RXd3jw@mail.gmail.com>
+Subject: Re: [PATCH] net: mark racy access on sk->sk_rcvbuf
+To: linke li <lilinke99@qq.com>
+Cc: edumazet@google.com, alexander@mihalicyn.com, davem@davemloft.net, 
+	dhowells@redhat.com, kuba@kernel.org, kuniyu@amazon.com, leitao@debian.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	willemb@google.com, wuyun.abel@bytedance.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Krzysztof,
+On Sat, Mar 9, 2024 at 10:10=E2=80=AFPM linke li <lilinke99@qq.com> wrote:
+>
+> > OK, but what about __sock_queue_rcv_skb() in the same file ?
+>
+> I notice that, but I am not very sure whether there is a data race. If it
+> is a similar situation, then the same patch should be applied too.
 
-Thanks for your reply.
+During that process, I see no lock owning the socket, so sk->sk_rcvbuf
+should also be read locklessly.
 
-On 2024-03-09 12:45:06 +0100, Krzysztof Kozlowski wrote:
-> On 09/03/2024 02:25, Niklas Söderlund wrote:
-> > The bindings for Renesas Ethernet AVB are from 2015 and contain some
-> > oddities that are impossible to get right without breaking existing
-> > bindings. One such thing is that the MDIO bus properties that should be
-> > its own node are mixed with the node for the IP for Ethernet AVB.
-> > 
-> > Instead of a separate node for the MDIO bus,
-> > 
-> >     avb: ethernet@e6800000 {
-> >             compatible = "renesas,etheravb-r8a7795",
-> >                          "renesas,etheravb-rcar-gen3";
-> >             reg = <0xe6800000 0x800>, <0xe6a00000 0x10000>;
-> > 
-> >             ...
-> > 
-> >             phy-handle = <&phy0>;
-> > 
-> >             mdio {
-> >                 #address-cells = <1>;
-> >                 #size-cells = <0>;
-> > 
-> >                 phy0: ethernet-phy@0 {
-> >                     ...
-> >                 };
-> >             };
-> >     };
-> > 
-> > The Ethernet AVB mix it in one,
-> > 
-> >     avb: ethernet@e6800000 {
-> >             compatible = "renesas,etheravb-r8a7795",
-> >                          "renesas,etheravb-rcar-gen3";
-> >             reg = <0xe6800000 0x800>, <0xe6a00000 0x10000>;
-> > 
-> >             ...
-> > 
-> >             phy-handle = <&phy0>;
-> > 
-> >             #address-cells = <1>;
-> >             #size-cells = <0>;
-> > 
-> >             phy0: ethernet-phy@0 {
-> >                 ...
-> >             };
-> >     };
-> > 
-> > This forces to all MDIO bus properties needed to be described in the
-> > Ethernet AVB bindings directly. However not all MDIO bus properties are
-> > described as they were not needed. This change adds the MDIO bus
-> > properties to reset the MDIO bus in preparation for them being used.
-> 
-> That is not exactly what you wrote in the binding. Binding suggests you
-> have per device GPIO, which in your design is shared but the commit msg
-> says it is some sort of bus reset.
-> 
-> These are two different things, because in first case you could have a
-> design using two GPIOs, not one. Then your binding is completely wrong.
+Thanks,
+Jason
 
-I copied the description from mdio.yaml as the intention is the two are 
-the same. But on a second read I agree it's confusing.
-
-> 
-> Plus, where is the user of all this?
-
-I think you found it in, for posterity it's in '[PATCH] arm64: dts: 
-renesas: white-hawk: ethernet: Describe adv1 and avb2'.
-
-> 
-> I think you should rather correct the binding to use mdio node and add
-> appropriate handling in the driver, keeping backward compatibility.
-
-I had not consider that, the driver can indeed support both modes and 
-only allow MDIO bus properties if the mdio sub-node is present. I will 
-do so, thanks for the suggestion.
-
--- 
-Kind Regards,
-Niklas Söderlund
+>
+>
 
