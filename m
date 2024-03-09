@@ -1,141 +1,124 @@
-Return-Path: <netdev+bounces-78882-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7643876DF5
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 00:50:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 808D5876E08
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 01:04:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E67861C21B8E
-	for <lists+netdev@lfdr.de>; Fri,  8 Mar 2024 23:50:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 607EBB21E9B
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 00:04:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26F373BBF2;
-	Fri,  8 Mar 2024 23:50:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7ABD7FE;
+	Sat,  9 Mar 2024 00:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="mPotTeRv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KO7ECHUh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB8FF3BBDF
-	for <netdev@vger.kernel.org>; Fri,  8 Mar 2024 23:50:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA59627
+	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 00:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709941802; cv=none; b=R+BLKY4EshVKKSxL/CrjNBDgiFb8B1kubSRGF7Bka1Fjz7HyGX9AgGH2qdraLJSU1ddj60YsKGu06RmYRQepPZ/apecJvoEWG3e/kdp3C5QMc6hbkFMzX8t0ivIjvbydPSAZpMG+MWP7a3jtiY3DCkgklMbjjl0/hZSBtExmhCA=
+	t=1709942671; cv=none; b=m3C8RQMHVcDzi2zkjjnT/NKJY3pMw6PnM09TUmAIw1A1eV+4mh+Ep0pBf5TMGmyClxEi2YZNeSjlIs8kQIg0DhzVcmDyWdwiJHwF6ObxPm1J0ei+9+Ybo2o+afbQgxS2HETVDpcOLTBVmy2jikOwAUA4321JyuHSi/4jqkZV2Cc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709941802; c=relaxed/simple;
-	bh=VwVDweM7A7hBcYergFPFJeBgGs3atd09plR0EB3F2zQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mztLPexj+fpl8rOvoCwToaUImi8LJxzKyad+1fttMJ3971wosL00EeXwOfobDLSbZJhJy01MTx4CXOIJgVLPUTKd85xRpkwhzfzUfZqLMykX/LJ92Bn6ri3ykReyyNU7DLVGrgevS4mhokfB9ve3DqP0VxeCWH8b32wv0KBvXvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=mPotTeRv; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1dd3bdb6e9eso18513285ad.3
-        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 15:50:00 -0800 (PST)
+	s=arc-20240116; t=1709942671; c=relaxed/simple;
+	bh=vxsATqgNsPjCEnUG9U3rsV4Pk5K0jSUVYO72o5X1hR0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Bw3OKOV6ylgnFah+tAFbMXDhn9x5Fs8Su8sPh7cu44Cf1kf1jZp7OXTc67KAV73s/I+L6j+IMjW2rSP63BWcp90bbw+6RDPBYqOqHf8tb74b3JKON3rAI3rLo7TnZtiadskxvXQ99jhjYspW8CFo0ioTK7NutLzJq4SvNiu+Yyg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KO7ECHUh; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a36126ee41eso365929166b.2
+        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 16:04:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1709941800; x=1710546600; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bvvVxFJORKVGOnQydvxT4JtEYCtE1bHbtR+qPjK456A=;
-        b=mPotTeRvQwqY6EHIe3q2V6h1UY+84lzJjRtlCPyDJEZe9KpKLa0HZ4HTqbLCFaZa/S
-         qYREF8qbVbHU212nLPexx/76nVA/nW7BWFzGSd2miGv2VTJ6oKRF4mGRooYxWtuOxXB4
-         ZVS7UOfGhge2fTJYrjWI21lxUtR5+uD9vTmIapbXkPeX7wvFZUTDMOfc80AqNAzPN1rq
-         x2LCplBdBaRcvNBepfYT8Zw5PXEtH3DRcCSAzZbTNHK8iqOrq0MzkvaXMxhXk8qJGmkb
-         08deXPimO+EpCMZegfM+ddekFJPMPf7Txp4tl4mMN736AdpkZy5nJ6YYcTdd2n2/omo7
-         3yEw==
+        d=google.com; s=20230601; t=1709942668; x=1710547468; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5ShLjDVt5TyNUjC5WP0bvmBKt0Z3sW/nw5eC5/Dqk7k=;
+        b=KO7ECHUhfUqCYSwFVKfZtIP6UNKf0a1LJaJDi78f5ohgFd9h9HcFUBfvAP/ww33e60
+         HU0ev6JJBmtV0d2muXR315uwwb+ZJ21nM6ZDHnt1lqH7pZjXYN3XEXeX5bzO7fTW66v8
+         CiiTHAC2Gi6FqG58JlGH9aMghNxMJ8tJjXI8RZiAxqIlrtW6IeH6LhaCS9KZAl3DHQmA
+         ngtEnNF92TseMMLumcfFJQkkPflgR5YBEHQm74yaUYrZ3pX6/Vl56U2EkPrLRj8Bl4iD
+         bE+6QxbjM6TjzbXjYIGBkFP7M7esAgXxMSEpzyuTDgrAyLnQSMo+HJk/ehHcXhAmTMPd
+         36Sw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709941800; x=1710546600;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bvvVxFJORKVGOnQydvxT4JtEYCtE1bHbtR+qPjK456A=;
-        b=b4hq3+o7yvivg2X8CWwkREPJd4joXkVHmKgorUue8cOSHZfgH6TpknPGux9dO+N/I6
-         h+I5hxok/IwMxB0JQV2V6Se5xQ6EajCBqax4w+snrbcK0XySrY0v4yM/Gzhh1/Sotzfa
-         UWNq/XphesuboPCSAnambrVJu6YOMuvTEWY+HVHCGuelPCX5LBA2R3TfCaUswg28sV4Y
-         WKfE+V62MwVT2Jby2s7/P1OjAKQEm9SZuIHnWSJrJs9JkssoZCPDSFl+hGIUPBuW5itS
-         XnLuPS8cHAzUjyrbPE0Hud3cRTx5AzJHTSFLcsc7MRgaq9LfEuBm+0zH4rdULEgFSjVV
-         jRtw==
-X-Forwarded-Encrypted: i=1; AJvYcCViB5LoUY6XjP1RWfj6Z6wJKj3aEfU9uogCTzrYZGbrsSgUbFA1MhiKiEJuO3LMBIxN2ml68fluvS97oI3YUE0BDIlKJjP3
-X-Gm-Message-State: AOJu0Yz06CmANmxsrfgvFnHXUmkrxWl4vjYAqHV0jNQKz7Gb/F8DRHRr
-	kxlBqOUsJ9eggmDX229mJeZYYz57IVAmGdTC+DCoeAacV3fflnTNq/wQMhtKg5U=
-X-Google-Smtp-Source: AGHT+IELbp+iVaux9dMAj3AwSjMmEB91AkVFjRihINKGUpZLZJOnpRotYIK+RS+5A3yxMzoBQZHlSw==
-X-Received: by 2002:a17:902:d4c5:b0:1dc:7845:537c with SMTP id o5-20020a170902d4c500b001dc7845537cmr232003plg.1.1709941800017;
-        Fri, 08 Mar 2024 15:50:00 -0800 (PST)
-Received: from ?IPV6:2a03:83e0:1156:1:1cbd:da2b:a9f2:881? ([2620:10d:c090:500::5:2342])
-        by smtp.gmail.com with ESMTPSA id x4-20020a170902a38400b001dd63e22484sm199196pla.135.2024.03.08.15.49.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Mar 2024 15:49:59 -0800 (PST)
-Message-ID: <8adb69f3-b0c0-42bf-b386-51b2be76cbb4@davidwei.uk>
-Date: Fri, 8 Mar 2024 15:49:58 -0800
+        d=1e100.net; s=20230601; t=1709942668; x=1710547468;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5ShLjDVt5TyNUjC5WP0bvmBKt0Z3sW/nw5eC5/Dqk7k=;
+        b=WZOd1etTqK/a3VUb+6lVCdIPak3uakXsmFHz15+/s9xbdO7sb0jaL2yzCzuv+e2H0e
+         AzHc1Jj0sKJ7Kf89KwtVeXIWoCwhpWvcDTnESbEPzE8asykwjNHElMOlwRE+ZbgfWXV2
+         kiwmRiXBkxAWMen4w2v1dGDLvEyfz4BRN4Nt+tXp+n/Bcxyn7sFZzUJE802pGTLbARRo
+         n9z/I+wSdMSRrYwRtpawWmuPdIlCQYuGaPnkY7nHFaxakq4489s5Xiejmkh6dH1IUPLL
+         kTS80LH24p3Z5cIL98Gwl+kBIkSEzx9nL+RgpF7c0XmC7SE3LI3qVOanvkV2RcgM7q4s
+         NqOg==
+X-Gm-Message-State: AOJu0YwhM9FrdANA3Q5EoAsPRAiSmt6ZOGkWzISTZdYeMT5D1RpXgFTC
+	aicVDTn02VwajMlHZlg6/GLMnGd2QL1mPrHOWyNwr90+1usb42ykM+J3oeWUcwOt/WWqLNuFKfe
+	Sue9HM1auU20whrBvgVl6P4N5n6NdBQftNR4q
+X-Google-Smtp-Source: AGHT+IG5/WtGgOurdPyTTfUyg5tMClwiuIy0cwYe/KflW92nffNonl5K+8vLpJQoMoKsScc0PQSkwR4ssZrwckgzolI=
+X-Received: by 2002:a17:906:5cd:b0:a45:2b2c:8968 with SMTP id
+ t13-20020a17090605cd00b00a452b2c8968mr114204ejt.20.1709942668151; Fri, 08 Mar
+ 2024 16:04:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1] net: page_pool: factor out page_pool recycle
- check
-Content-Language: en-GB
-To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Yunsheng Lin <linyunsheng@huawei.com>
-References: <20240308204500.1112858-1-almasrymina@google.com>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20240308204500.1112858-1-almasrymina@google.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20240308204500.1112858-1-almasrymina@google.com> <8adb69f3-b0c0-42bf-b386-51b2be76cbb4@davidwei.uk>
+In-Reply-To: <8adb69f3-b0c0-42bf-b386-51b2be76cbb4@davidwei.uk>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 8 Mar 2024 16:04:14 -0800
+Message-ID: <CAHS8izOm18Rv7QJfpKmquEgf74PvqZeY4zBnyG73BVFDbCvWmw@mail.gmail.com>
+Subject: Re: [PATCH net-next v1] net: page_pool: factor out page_pool recycle check
+To: David Wei <dw@davidwei.uk>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024-03-08 12:44, Mina Almasry wrote:
-> The check is duplicated in 2 places, factor it out into a common helper.
-> 
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> Reviewed-by: Yunsheng Lin <linyunsheng@huawei.com>
-> ---
->  net/core/page_pool.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
-> index d706fe5548df..dd364d738c00 100644
-> --- a/net/core/page_pool.c
-> +++ b/net/core/page_pool.c
-> @@ -657,6 +657,11 @@ static bool page_pool_recycle_in_cache(struct page *page,
->  	return true;
->  }
->  
-> +static bool __page_pool_page_can_be_recycled(const struct page *page)
+On Fri, Mar 8, 2024 at 3:50=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+>
+> On 2024-03-08 12:44, Mina Almasry wrote:
+> > The check is duplicated in 2 places, factor it out into a common helper=
+.
+> >
+> > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> > Reviewed-by: Yunsheng Lin <linyunsheng@huawei.com>
+> > ---
+> >  net/core/page_pool.c | 9 +++++++--
+> >  1 file changed, 7 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> > index d706fe5548df..dd364d738c00 100644
+> > --- a/net/core/page_pool.c
+> > +++ b/net/core/page_pool.c
+> > @@ -657,6 +657,11 @@ static bool page_pool_recycle_in_cache(struct page=
+ *page,
+> >       return true;
+> >  }
+> >
+> > +static bool __page_pool_page_can_be_recycled(const struct page *page)
+>
+> Could this be made inline?
+>
 
-Could this be made inline?
+Looking at the rest of the static functions in this file, they don't
+specify inline, just static. I guess the compiler is smart enough to
+inline static functions in .c files when it makes sense (and does not
+when it doesn't)?
 
-> +{
-> +	return page_ref_count(page) == 1 && !page_is_pfmemalloc(page);
-> +}
-> +
->  /* If the page refcnt == 1, this will try to recycle the page.
->   * if PP_FLAG_DMA_SYNC_DEV is set, we'll try to sync the DMA area for
->   * the configured size min(dma_sync_size, pool->max_len).
-> @@ -678,7 +683,7 @@ __page_pool_put_page(struct page_pool *pool, struct page *page,
->  	 * page is NOT reusable when allocated when system is under
->  	 * some pressure. (page_is_pfmemalloc)
->  	 */
-> -	if (likely(page_ref_count(page) == 1 && !page_is_pfmemalloc(page))) {
-> +	if (likely(__page_pool_page_can_be_recycled(page))) {
->  		/* Read barrier done in page_ref_count / READ_ONCE */
->  
->  		if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
-> @@ -793,7 +798,7 @@ static struct page *page_pool_drain_frag(struct page_pool *pool,
->  	if (likely(page_pool_unref_page(page, drain_count)))
->  		return NULL;
->  
-> -	if (page_ref_count(page) == 1 && !page_is_pfmemalloc(page)) {
-> +	if (__page_pool_page_can_be_recycled(page)) {
->  		if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
->  			page_pool_dma_sync_for_device(pool, page, -1);
->  
+But this doesn't seem to be a kernel wide thing. net/core/dev.c does
+have static inline functions in it, only page_pool.c doesn't do it. I
+guess if there are no objections I can make it static inline to ask
+the compiler to inline it. Likely after the merge window reopens if it
+closes today.
 
