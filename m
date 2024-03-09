@@ -1,159 +1,158 @@
-Return-Path: <netdev+bounces-78974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BB9987720E
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 16:55:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6C10877220
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 17:02:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC632B20FC1
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 15:55:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FCD41F21040
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 16:02:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 551D245C04;
-	Sat,  9 Mar 2024 15:55:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="heZy+aDX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 245A644C89;
+	Sat,  9 Mar 2024 16:02:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 867AA4594C
-	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 15:55:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75FCB2030B
+	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 16:02:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709999704; cv=none; b=vBj1gzh7MdNO/E6RNgAcJJOUOwCMutKMbSJyZkV3szL2OCLuSZiT2uwCkI7p1sZVpTjpV+Ohd9t1QNeDB0sVSWRKNaaEioMyW+UbCImupWilFnwY+0xj3bfBqYgGoJLzyy3Qes2gyDDw3Eqcaqja02QQeHs1aslHYkM/1VRGcmo=
+	t=1710000154; cv=none; b=eb63yiqBRAZKY12sDRr2K44+ZWckmSCycnhVMj917mk5FXBi26SfpQgJ7FVYM6SN4K8NlaHPdMnbXXzCrxv0sI+HzPcB5XMiZVPg8klWIZetd9gMTWPnN89FIcxjBISLGqEQb2zwnpi3E57VJc/NbRpbw+NmzF/tzyE4iDU3kNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709999704; c=relaxed/simple;
-	bh=oxb58H+3dJL1CUmBT7+dL71n3m5oVb4JbCJojOpkuYI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=JVfRBZHw3bxG3yth90wPPgqcwREoZxRj1TG5NXGppSlNnPusaymwiTnMqWWkPCnnUd524Vd2cV9WEJW+Lw4l5TbVb1gG4aW1FCuz8fmEIhgL0KYV3ElrjA+yCODZIE6YdhveqoBuINPDpj0YGCbSQKkHiqSmcLDpCqVXLqGq//Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=heZy+aDX; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5683576ea18so1488604a12.3
-        for <netdev@vger.kernel.org>; Sat, 09 Mar 2024 07:55:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ragnatech.se; s=google; t=1709999701; x=1710604501; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZLBg9xRWeOEFGDBrQs7OucUs0Od0oeREZgUIErgurhk=;
-        b=heZy+aDXlJeGbKVWKYgYdQT8r/MrQSG2MRcfUTnMwMntU1BZCwnBrnVizOKvHmdeev
-         J3e4qE4X73ZFlD8fyXEX9AeR5tDwkfNWKyAS0MadIyhU9zoj4+gXrLFs86I0RqV00cFQ
-         LyaEbe3CC1Ek0z3DoIZ3f62CX4icO1UTpk4J3KX+bctWyaURlUeg7O0igVy2pvQh0AWd
-         LvKc00yZwcoIMu+tY4fFnnJipNOKZirT6m2RRawmb/dYkSNSUqCP+VOYYxhSLzEJH8dj
-         cJcGDu/hGS+i9tNP5d3/OZbxzmkvoht/quqatTXLJ6RZ1oEDs+qmDmIsXYnpOAiDG7WQ
-         GnNw==
+	s=arc-20240116; t=1710000154; c=relaxed/simple;
+	bh=IlNrku6gx4ITKYYDutuHTeSlU+G5G6ZUR+kyBRWRaxU=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=OchLYQsSYioP6OI7OkO1rIiiPHSHeXR5nZWJSZS9iwz6aTRyQw/5ElKGSYTVjaDT+JoGVkBqzBUAAkMIa4AQ9+4pqBIRrldZ+lwl1K4HFFVDkeu4FmfMF/sPy/2Ka6NklHWor2R9sckk0xt7RjU1c1Pr1eIjOL2+PxiAJv29QIw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-36512fcf643so29149425ab.1
+        for <netdev@vger.kernel.org>; Sat, 09 Mar 2024 08:02:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709999701; x=1710604501;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZLBg9xRWeOEFGDBrQs7OucUs0Od0oeREZgUIErgurhk=;
-        b=CmexaOWbNG+Z68ECgTsMDL+tnfdRlnZR/d0yTiu3dNrFxV2YoS9cbzO2aLLWC2aXuX
-         5jPogn2vCFK/cSDnb6rM5Wpt1Lrqwx8tN5qnJEh4UUlNVfxHp8pRlQ3qaL/ozdqXpaEr
-         uozVOz2/r8SOkdNeRVnU7J0lnQiKjjcW9Brb2ycsKVDIFlsn85F1w/X49yGXp/XeHy4H
-         tdRzvEbc4QoJsUoElEa8MbWVApnanl9VyNUH27fGJ1zznxcZAG8MlFgqke0XtJer9BQK
-         33BXp4bYOzRvUdJuGiqjD6BFC9gC9mVaCP+9Zb7Sr7s3cwNLIGDoVzJIrDmiDNX3M4TB
-         qdgw==
-X-Forwarded-Encrypted: i=1; AJvYcCW5c0xBSgkeX+8fzs4CrO/PtKIN8xSbMNB3EPSwhuBOzyL6p4mM/iFEOgoo6qwps2IsqGYR8H99Jg6mjs5FNNe0QI8Xr4qR
-X-Gm-Message-State: AOJu0YygQtIQm0ceXP5GyMHo3mYcJi0VUt5HXCZ8gvPi/f830zO+Ox45
-	B8VvflN2pENsjv5fXWBeJ/fXSEOQWFofW1ez9e5WGAz27v6mGlyGN4ooyOGZq/c=
-X-Google-Smtp-Source: AGHT+IHFKrKh+q85JxwpYDVCMdheOuNJVT349n5QNXE4KZnL8RYGyBx+xA62cTryxrHnY6Xf4F1XTw==
-X-Received: by 2002:a17:906:c183:b0:a44:2ba0:8200 with SMTP id g3-20020a170906c18300b00a442ba08200mr1106169ejz.26.1709999700834;
-        Sat, 09 Mar 2024 07:55:00 -0800 (PST)
-Received: from sleipner.berto.se (p4fcc8c6a.dip0.t-ipconnect.de. [79.204.140.106])
-        by smtp.googlemail.com with ESMTPSA id kq17-20020a170906abd100b00a40f7ed6cb9sm1005216ejb.4.2024.03.09.07.55.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 09 Mar 2024 07:55:00 -0800 (PST)
-From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Sergey Shtylyov <s.shtylyov@omp.ru>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Biju Das <biju.das.jz@bp.renesas.com>,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org
-Cc: linux-renesas-soc@vger.kernel.org,
-	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Subject: [net-next 2/2] ravb: Add support for an optional MDIO mode
-Date: Sat,  9 Mar 2024 16:53:34 +0100
-Message-ID: <20240309155334.1310262-3-niklas.soderlund+renesas@ragnatech.se>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240309155334.1310262-1-niklas.soderlund+renesas@ragnatech.se>
-References: <20240309155334.1310262-1-niklas.soderlund+renesas@ragnatech.se>
+        d=1e100.net; s=20230601; t=1710000151; x=1710604951;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DP1DpJ1i+QrXcPetYGEJb/XTbYsSwgXExEyAIL0rh6k=;
+        b=qrJoFA0DTSDsYjNNTEkfCE63Qg9ODW3PmzRggWbX0ejmswKgTpnuuKvZGvGrQ1GF7F
+         z0RIUZNhqkjresHuq7mny3hfB62adOapheomiK1WuQ4J3MUXwL7wtpVjb/CUac7Jcq+F
+         OW3+QbjilwBlJEWP2iZU0dckkDlt/6WyG99x2OQuLHWsawp7O99jFtBNZoAZRUohiYxC
+         ck3YyQ3wN7lBHCfpbBA/yD1MLA3PGw/BawqgGM4k4ib9sLnFUFu5IaB8NQJ7hhivbWyo
+         dRY9FBFxsa4zhWu6GhlWiL892GfsQD5f3K7dYpEZO6FJcrn9uHyz2u4vz9Knvap04D3G
+         BrWg==
+X-Forwarded-Encrypted: i=1; AJvYcCWUSjdUrIOaJ+a5FYW39k9jPWn4eoK6AO5sZLiROkTGIGPxB3vEA7sIVjO6DgwsyZYoIoUO245+MYRBV1itGDEGpREslQ2G
+X-Gm-Message-State: AOJu0YyKjvwjQxD8QJ7irqwMPeW/VcmwjxoiGjvyO9bjSrkdmFnwNykk
+	KgfmXWs8hUN3mrN4uaLgav/Z6boVqESdA/3I83Htel+/eBccqpbCuKi4+CCMpAE1fAcJX7AZQZX
+	J3nFIHX9oe/EPjPQWyux/5gcWqaUAt+pZWmJst7mGc+aZ6LEzMG78EgU=
+X-Google-Smtp-Source: AGHT+IEnqyTXCKSaxdQhDPFxJ8eQG150S4a4p8lsjTHwF8btT+LJXq03mW7lZ6jdcK/owA+1HcGU/bIv3caTBoQsj1oarwHDYhAI
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1d8e:b0:365:7607:3f4b with SMTP id
+ h14-20020a056e021d8e00b0036576073f4bmr61509ila.2.1710000151675; Sat, 09 Mar
+ 2024 08:02:31 -0800 (PST)
+Date: Sat, 09 Mar 2024 08:02:31 -0800
+In-Reply-To: <00000000000088981b06133bc07b@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009b652f06133c6f27@google.com>
+Subject: Re: [syzbot] [net?] kernel BUG in __nla_validate_parse
+From: syzbot <syzbot+65bb09a7208ce3d4a633@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, petrm@nvidia.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-The driver used the OF node of the device itself when registering the
-MDIO bus. While this works it creates a problem, it forces any MDIO bus
-properties to also be set on the devices OF node. This mixes the
-properties of two distinctly different things and is confusing.
+syzbot has found a reproducer for the following issue on:
 
-This change adds support for an optional mdio node to be defined as a
-child to the device OF node. The child node can then be used to describe
-MDIO bus properties that the MDIO core can act on when registering the
-bus.
+HEAD commit:    d7e14e534493 Merge tag 'mlx5-socket-direct-v3' of git://gi..
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1179b11e180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=63afafeedf00ef8f
+dashboard link: https://syzkaller.appspot.com/bug?extid=65bb09a7208ce3d4a633
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=113a3399180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=156404d6180000
 
-If no mdio child node is found the driver fallback to the old behavior
-and register the MDIO bus using the device OF node. This change is
-backward compatible with old bindings in use.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6e15425ce891/disk-d7e14e53.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/290e40cea50b/vmlinux-d7e14e53.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/099bac6ed92e/bzImage-d7e14e53.xz
 
-Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+65bb09a7208ce3d4a633@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+kernel BUG at lib/nlattr.c:411!
+invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
+CPU: 1 PID: 5074 Comm: syz-executor243 Not tainted 6.8.0-rc7-syzkaller-02431-gd7e14e534493 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+RIP: 0010:validate_nla lib/nlattr.c:411 [inline]
+RIP: 0010:__nla_validate_parse+0x2f61/0x2f70 lib/nlattr.c:635
+Code: 48 8b 4c 24 18 80 e1 07 38 c1 0f 8c e0 f7 ff ff 48 8b 7c 24 18 e8 ff 0e 1d fd e9 d1 f7 ff ff e8 d5 c2 91 06 e8 50 64 ba fc 90 <0f> 0b 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 90 90 90 90 90 90 90
+RSP: 0018:ffffc900041b6ec0 EFLAGS: 00010293
+RAX: ffffffff84d90ad0 RBX: ffffffff8caa11e0 RCX: ffff8880283bd940
+RDX: 0000000000000000 RSI: 000000000000004e RDI: 0000000000000015
+RBP: ffffc900041b7100 R08: ffffffff84d8df5b R09: 0000000000000000
+R10: ffffc900041b71a0 R11: fffff52000836e46 R12: 0000000000000008
+R13: 1ffff11003d97c83 R14: 000000000000004e R15: 0000000000000008
+FS:  0000555556b10380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000000045ad50 CR3: 000000007aa22000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __nla_parse+0x40/0x60 lib/nlattr.c:732
+ __nlmsg_parse include/net/netlink.h:756 [inline]
+ nlmsg_parse include/net/netlink.h:777 [inline]
+ rtm_del_nexthop+0x257/0x6d0 net/ipv4/nexthop.c:3256
+ rtnetlink_rcv_msg+0x89b/0x10d0 net/core/rtnetlink.c:6595
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2556
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x8e0/0xcb0 net/netlink/af_netlink.c:1902
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+ do_syscall_64+0xf9/0x240
+ entry_SYSCALL_64_after_hwframe+0x6f/0x77
+RIP: 0033:0x7f70bac1d369
+Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffcffdc2f38 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007ffcffdc3108 RCX: 00007f70bac1d369
+RDX: 0000000000000000 RSI: 0000000020000640 RDI: 0000000000000003
+RBP: 00007f70bac90610 R08: 0000000000000000 R09: 00007ffcffdc3108
+R10: 00007f70bac589e3 R11: 0000000000000246 R12: 0000000000000001
+R13: 00007ffcffdc30f8 R14: 0000000000000001 R15: 0000000000000001
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:validate_nla lib/nlattr.c:411 [inline]
+RIP: 0010:__nla_validate_parse+0x2f61/0x2f70 lib/nlattr.c:635
+Code: 48 8b 4c 24 18 80 e1 07 38 c1 0f 8c e0 f7 ff ff 48 8b 7c 24 18 e8 ff 0e 1d fd e9 d1 f7 ff ff e8 d5 c2 91 06 e8 50 64 ba fc 90 <0f> 0b 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 90 90 90 90 90 90 90
+RSP: 0018:ffffc900041b6ec0 EFLAGS: 00010293
+RAX: ffffffff84d90ad0 RBX: ffffffff8caa11e0 RCX: ffff8880283bd940
+RDX: 0000000000000000 RSI: 000000000000004e RDI: 0000000000000015
+RBP: ffffc900041b7100 R08: ffffffff84d8df5b R09: 0000000000000000
+R10: ffffc900041b71a0 R11: fffff52000836e46 R12: 0000000000000008
+R13: 1ffff11003d97c83 R14: 000000000000004e R15: 0000000000000008
+FS:  0000555556b10380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000000045ad50 CR3: 000000007aa22000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
+
 ---
- drivers/net/ethernet/renesas/ravb_main.c | 17 +++++++++++++++--
- 1 file changed, 15 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/renesas/ravb_main.c b/drivers/net/ethernet/renesas/ravb_main.c
-index fa48ff4aba2d..b62f765ce066 100644
---- a/drivers/net/ethernet/renesas/ravb_main.c
-+++ b/drivers/net/ethernet/renesas/ravb_main.c
-@@ -2564,6 +2564,7 @@ static int ravb_mdio_init(struct ravb_private *priv)
- {
- 	struct platform_device *pdev = priv->pdev;
- 	struct device *dev = &pdev->dev;
-+	struct device_node *mdio_node;
- 	struct phy_device *phydev;
- 	struct device_node *pn;
- 	int error;
-@@ -2582,8 +2583,20 @@ static int ravb_mdio_init(struct ravb_private *priv)
- 	snprintf(priv->mii_bus->id, MII_BUS_ID_SIZE, "%s-%x",
- 		 pdev->name, pdev->id);
- 
--	/* Register MDIO bus */
--	error = of_mdiobus_register(priv->mii_bus, dev->of_node);
-+	/* Register MDIO bus
-+	 *
-+	 * Look for a mdio child node, if it exist use it when registering the
-+	 * MDIO bus. If no node is found fallback to old behavior and use the
-+	 * device OF node. This is used to be able to describe MDIO bus
-+	 * properties that are consumed when registering the MDIO bus.
-+	 */
-+	mdio_node = of_get_child_by_name(dev->of_node, "mdio");
-+	if (mdio_node) {
-+		error = of_mdiobus_register(priv->mii_bus, mdio_node);
-+		of_node_put(mdio_node);
-+	} else {
-+		error = of_mdiobus_register(priv->mii_bus, dev->of_node);
-+	}
- 	if (error)
- 		goto out_free_bus;
- 
--- 
-2.44.0
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
