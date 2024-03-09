@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-78979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFC25877282
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 18:50:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3EE4E87733B
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 19:25:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97B2A1F21A86
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 17:50:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2F7D1F212A5
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 18:25:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8AA122EEF;
-	Sat,  9 Mar 2024 17:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 347BB29CEF;
+	Sat,  9 Mar 2024 18:22:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ar2ccDdq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BI2sfifc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95370BA4D
-	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 17:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101F0286BD
+	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 18:22:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710006628; cv=none; b=TlSbKnyoQzNvV+X1w1gHiWkajC7GzF3nwFzEvzavXoJ6rcP9wFZoJtLk/vG1Do+7vTwTHmmIn08e0myF20GIWYqg5MIhMyPXrE/u/XIPScsGVpFYsP4AIWrjTaSXxyNomBU7KOR8CelUVCBOZjOPvnRcG8DjSiuun52YjJsj+Xs=
+	t=1710008556; cv=none; b=E8WIcYNe8HY9gfqynS0GiDxrVxglXG0ez5tE7HkIL3uXL0mTkdUTMUF9P12TkvtDJeQ/4JNjF9kccLwqwcDnGY3C2HqJl+AK4kxhC6h6QuF5qx7w1yuWLMRRwafF2pvdgyrMQSCdUugLXq72glZ0oTMxRyfpjILnJ0v6/guAlis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710006628; c=relaxed/simple;
-	bh=H9SxWwtkuoEGXRmemD5AodkzSiaEFmYEKNrb6oO0x08=;
+	s=arc-20240116; t=1710008556; c=relaxed/simple;
+	bh=UcLjrHznQDc/v++sABBhqIj8K7M1EL8zElQoxSgVHQw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=C5W8vPwNn8oy42gBTjsONOVmoI8ba4m0F0ONlmd1sg9lrJIk2EJoEOzNVsVikw1O9co5GYmjlW7uDbAHiy5X8+CNRaXKEbpfwy3ULJI1nHj0ypdNhQr9lcrvCOQFkGbQ5F45xN53h8AVDxqZhFLrFdrlAxjj3+AYJq2EB+sUeD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ar2ccDdq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44699C433F1;
-	Sat,  9 Mar 2024 17:50:27 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=SunlkRMEF/I90UnwUtAnoD9xvJm4fzJ9+B+SBwxTIVtrBdKscqyE2ABgb8aOeASPs/mf0IEYXyGCiz+80vHOFeQyDGP+8Gwtvd54mTFLAp/rNYbA9f8kjfjgeqrwqAifa7TgIAagwUb8xgQhl8kykrTl5UTjxloPy93e7yc7brQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BI2sfifc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E37EC433F1;
+	Sat,  9 Mar 2024 18:22:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710006628;
-	bh=H9SxWwtkuoEGXRmemD5AodkzSiaEFmYEKNrb6oO0x08=;
+	s=k20201202; t=1710008555;
+	bh=UcLjrHznQDc/v++sABBhqIj8K7M1EL8zElQoxSgVHQw=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ar2ccDdq5MkreZWrPEuosttE0ns7iVrB6U0+788NzXbCbh6eFhCCybDRigrVQqNrK
-	 I1fdRjJQISPGOuTjUBeW8TmBZDLrcpLReSZfeQOepyf64HuhvgSFzIesl3l77Oq73P
-	 rT+QGyR3MXzkoS5WT4zxhVOO0Tp6XV0+5yWXoRyvB/yyJV0jcZnOw0kiT5BZw0clo4
-	 IYpZb85Oy1YT9ipei8VgP04I8xFQwVqYrft+GTArbqsW68dtX5AAioiDXsUFLFD+Xv
-	 I4le40UZynmIXtA1runzK0mNcEe5jlLfUG/BKKVRa7WZTrqH7kh9qznfcwAhY3Z08X
-	 LUah4PijAS1Mw==
-Message-ID: <9def52e8-89ac-49eb-a2fa-5877d1d638de@kernel.org>
-Date: Sat, 9 Mar 2024 10:50:26 -0700
+	b=BI2sfifcLoKsSu8wml2S9VvHbXANSSTv0PoUtLQa9r0JNVGZS9vRObSFvGU08M9Hs
+	 aaHdLHe0clDAVOnR/LRvsmgHkwSnXmPsKs1d7AAI+nPMmW6Eeym7NhOutj3GTnrdrs
+	 zHcdcjwPiqC93L/ykiYcMuCY/z3nDVGKMHjgFBW0a8m1j+Bl8H+kttY3uQSAUCZ5/L
+	 VrhHSeohSJQUcE+nzbJrntEkd4KKA3yX1SqvXBT5WDdItz4LwE5VXEhXYWUIBdJuKp
+	 R7J4A/X9VlRNVVmqr4GAaoe+2JxpcDjEjNy3rTu6kEm5ddZg5fCgDOn1bi0bChKPpr
+	 JYSp6TkdHR2Dg==
+Message-ID: <cd48d41f-b9ee-4906-a806-760284a3eeb4@kernel.org>
+Date: Sat, 9 Mar 2024 11:22:34 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,50 +50,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 1/7] net: nexthop: Adjust netlink policy
- parsing for a new attribute
+Subject: Re: [PATCH iproute2-next] ss: fix the compiler warning
 Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>, Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- Ido Schimmel <idosch@nvidia.com>, Simon Horman <horms@kernel.org>,
- mlxsw@nvidia.com
-References: <cover.1709727981.git.petrm@nvidia.com>
- <a76b651c734d81d1f1c749d16adf105acb9e058c.1709727981.git.petrm@nvidia.com>
- <CANn89i+UNcG0PJMW5X7gOMunF38ryMh=L1aeZUKH3kL4UdUqag@mail.gmail.com>
+To: Denis Kirjanov <kirjanov@gmail.com>, stephen@networkplumber.org
+Cc: netdev@vger.kernel.org, Denis Kirjanov <dkirjanov@suse.de>
+References: <20240307105327.2559-1-dkirjanov@suse.de>
 From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <CANn89i+UNcG0PJMW5X7gOMunF38ryMh=L1aeZUKH3kL4UdUqag@mail.gmail.com>
+In-Reply-To: <20240307105327.2559-1-dkirjanov@suse.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 3/9/24 8:02 AM, Eric Dumazet wrote:
+On 3/7/24 3:53 AM, Denis Kirjanov wrote:
+> the patch fixes the following compiler warning:
 > 
-> ...
+> ss.c:1064:53: warning: format string is not a string literal [-Wformat-nonliteral]
+>         len = vsnprintf(pos, buf_chunk_avail(buffer.tail), fmt, _args);
+>                                                            ^~~
+> 1 warning generated.
+>     LINK     ss
 > 
->> -
->>  /* rtnl */
->>  static int rtm_del_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
->>                            struct netlink_ext_ack *extack)
->>  {
->>         struct net *net = sock_net(skb->sk);
->> +       struct nlattr *tb[NHA_MAX + 1];
+> Fixes: e3ecf0485 ("ss: pretty-print BPF socket-local storage")
+> Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
+> ---
+>  misc/ss.c | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> big tb[] array, but small rtm_nh_policy_del[] policy.
-> 
->>         struct nl_info nlinfo = {
->>                 .nlh = nlh,
->>                 .nl_net = net,
->> @@ -3020,7 +3010,12 @@ static int rtm_del_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
->>         int err;
->>         u32 id;
->>
->> -       err = nh_valid_get_del_req(nlh, &id, extack);
->> +       err = nlmsg_parse(nlh, sizeof(struct nhmsg), tb, NHA_MAX,
-> 
-> But here you pass NHA_MAX...
-> 
+> diff --git a/misc/ss.c b/misc/ss.c
+> index 87008d7c..038905f3 100644
+> --- a/misc/ss.c
+> +++ b/misc/ss.c
+> @@ -1042,6 +1042,7 @@ static int buf_update(int len)
+>  }
+>  
+>  /* Append content to buffer as part of the current field */
+> +__attribute__((format(printf, 1, 0)))
+>  static void vout(const char *fmt, va_list args)
+>  {
+>  	struct column *f = current_field;
 
-existing code always used ARRAY_SIZE on the policy for both tb and
-parse; the new del change should use it. Missed that in the review.
+The error message does not align with the change - and it does not fix
+the warning.
 
+pw-bot: cr
 
