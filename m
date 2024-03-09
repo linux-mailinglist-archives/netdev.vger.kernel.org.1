@@ -1,221 +1,146 @@
-Return-Path: <netdev+bounces-78927-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78928-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC90C876FDD
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 09:46:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD65D877005
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 10:09:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66B6A1F2188F
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 08:46:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 749BB281D44
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 09:09:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25FAF3BBFD;
-	Sat,  9 Mar 2024 08:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E9A1374D3;
+	Sat,  9 Mar 2024 09:09:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="mlsi86uw"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="dr8P9RRV";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2QadHf7/"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2044.outbound.protection.outlook.com [40.107.244.44])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A54B3839D;
-	Sat,  9 Mar 2024 08:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709973908; cv=fail; b=nUIJUgm0Az48f80+Z1+NvGoTlxSa3SWMSOUQG8Bv7SPR7S7oMp/3bQtPDgyv96KcNIzGWlO1uOzUVRdOEEpF+mhglAl/Ro+lLwHjWjCnMp4ThrA0mdN1MQJQcHNm+XMWXlgbevDOKLJSPG9VqwehAzSyprfUz2YH4xt1+bO83w0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709973908; c=relaxed/simple;
-	bh=h1BqVMbyqCstV3fz1rbJlr2tJLOfEoJS7bPuFTsMyOw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=dXOXrsc+YNIAHl8QPoFoQfDCvV51xk4tyKMXD8qqopl4GKbVKPduZjnzpbanmu7J+219U6YjK1ATami3A8kxVDZxeGytjkzFIgbJGYaoqlvnJQHPXh8Px5EZrwAcwlwtRJPBH+6kw6zQyefBP1xa0PS65SFma2OH/LTUAi6FnR4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=mlsi86uw; arc=fail smtp.client-ip=40.107.244.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=V28BDd7kXFbyNKpkg8X/w7xLHohqtu6OaR2ordJsXqSF/oDhjnVdAr7svs5jhd29GRrEKlSgCP3WkuUpKkeaHy6YP3TiJTWzVfYnFYALQCIXpcJbGDA126Bm3B6/JdMxjlYA9pN+2tWZ6CwUN/ejZsh29kc+Zo4fGJmj9Q57a3d0reFCvX8DfEzAlPDHtYphNwDjLfSIkCEOHX6tTyAiq03tC5yVEY2n74zsfSr9U2DbAonMGkdS4ndZs14bOZ7Opo6jqu59B+JrKxvBbycnX8LxeBqwzRnG7Z6/OndnyJ+7TwJ6YVEv2kSJy4WMLqQn/AbLm8sg3s+8JBpGqfcEPQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=h8Z0RuwzlbvHvuvBzKaYz9Jq06PE5Uj1SUo9cOuL+Cs=;
- b=kcOhFyQsaKexxX5fTfL1/lDheA3u8RB8h3Zx+upbrxPFgsuM9/2LnqUYHcLFuKMzCbWeeiPwIwq0ezVeE32FIPTye2hstCq5OsDDIuBPvzbTgWekdah+pjQjaCsyF5VjxJxi/FiwDmYaLZHZoli63Uw4LFTzDPWqLsHiOrImctk2kiIZxb7XxuS37OKs9tP8ki2yIdNllFSeiKL9MZt3GDW40OfDcNmlQACqzYhwUMl2VHgYjfw02m2NZhh861QyFXh9xfBgAGvi5ObpqEaT3p7rxzo7jTNgJUJb/PA7KiTlO3lZZ/NWz36ZJibc9cZlF5/GP99GM+PFwAbyDqf7aA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=h8Z0RuwzlbvHvuvBzKaYz9Jq06PE5Uj1SUo9cOuL+Cs=;
- b=mlsi86uwLlF0X3XR+WCPhsHa+Bfnu+ZQfPpavPc6EPUURHKQoP/iTHj/LXqsOl7ybcqqZOx29w1XoMKHAVbOeU319BXPni6J+WKwI8H5w/2oxFMq18QzWYX2V/EzHbMXY5uM1RN3Deboj9bsjab9hGH2xor6EMOHrsXyrLyZHQfOJzPx8kVxw+m6ZmSkfUqBsZde8+qlihwNh5XYS7OQf0XQf21LjXG28zsiYG2TwzZF8LcmsnE9Lhw0ZSCsb2mFwgaTwCaU1RPkJ6P7tVBzr302ADar+Kte3OxjztBHU0CMjPaHNgITGi9599km0ZuGEumGH7OqujKIsssKv/o5KA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by CH3PR12MB9394.namprd12.prod.outlook.com (2603:10b6:610:1cf::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.29; Sat, 9 Mar
- 2024 08:45:00 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::459b:b6fe:a74c:5fbf]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::459b:b6fe:a74c:5fbf%6]) with mapi id 15.20.7362.024; Sat, 9 Mar 2024
- 08:45:00 +0000
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: rrameshbabu@nvidia.com
-Cc: ahmed.zaki@intel.com,
-	aleksander.lobakin@intel.com,
-	alexandre.torgue@foss.st.com,
-	andrew@lunn.ch,
-	corbet@lwn.net,
-	davem@davemloft.net,
-	dtatulea@nvidia.com,
-	edumazet@google.com,
-	gal@nvidia.com,
-	hkallweit1@gmail.com,
-	jacob.e.keller@intel.com,
-	jiri@resnulli.us,
-	joabreu@synopsys.com,
-	justinstitt@google.com,
-	kory.maincent@bootlin.com,
-	kuba@kernel.org,
-	leon@kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	liuhangbin@gmail.com,
-	maxime.chevallier@bootlin.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	paul.greenwalt@intel.com,
-	przemyslaw.kitszel@intel.com,
-	rdunlap@infradead.org,
-	richardcochran@gmail.com,
-	saeed@kernel.org,
-	tariqt@nvidia.com,
-	vadim.fedorenko@linux.dev,
-	vladimir.oltean@nxp.com,
-	wojciech.drewek@intel.com
-Subject: [PATCH RFC v2 6/6] tools: ynl: ethtool.py: Output timestamping statistics from tsinfo-get operation
-Date: Sat,  9 Mar 2024 00:44:40 -0800
-Message-ID: <20240309084440.299358-7-rrameshbabu@nvidia.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240309084440.299358-1-rrameshbabu@nvidia.com>
-References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
- <20240309084440.299358-1-rrameshbabu@nvidia.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: BYAPR01CA0033.prod.exchangelabs.com (2603:10b6:a02:80::46)
- To BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA092D603
+	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 09:09:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1709975351; cv=none; b=qs1MCh8Xp/EZu+0L3PBWNBceJVRNYkd0/ph2FpBu66zSk0mb+PyOAbOyEKPZRs+7Tgy0p2/sB9688UhigLHcFsuNGNYv/W+3OuqveDxUE6y36cExt22gYVqW1cdS7xyQB+Ws+PNTIYZ5opPC6nf/z/6Q3d0qfFUmSvT17FNUwUQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1709975351; c=relaxed/simple;
+	bh=28oym5+nEeZA+1zzJCu9Kl9U/KgaCltc1WRTtnFHa0E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZnZAKo44kIN7LkfZ9vhRSykUBEOByahNi3zyYFeIlkRiGEwRva0BykTuJbkG9lECODUbbNRwvZ+QC9eQnTIxSPOXmQ9buyZ9GkjmRU/mnN6uMOJJtM/0cQKQzNUsHopJHrmWizCoOaxaaDwM9nKDUct6Mfl4CGz/n9nLKZBnV00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=dr8P9RRV; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=2QadHf7/; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1709975341;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=XcWOu74C0ycFsIJcramJax0GJdYjm/JuPWuR7qrjNxE=;
+	b=dr8P9RRVug5YGo+oZuSpHzzCIUZN29pQ0AxH5D88M9wEJZRoZ0TSFpYwhSP+4EqCH0aHLo
+	6fEJDN3H39L0YFz2w7qa0oZx2FoH0OIrS2h5KfEteGDi4ibZJ2B4Rpdoxay8/bxIuoh2Ij
+	kWFOGhTZrHi3XpTDcNNHRMrMqgDHkjndKEOS6n1owP682RWHc3VTooXY5/ewUggNVw3u6n
+	BXVQ8zVqDTxOUo2idNqRyju9V1dtHZJrhyAuWnyNF55oEV6XmSxRx1aQVwN48xy5v3nPxs
+	gh0Ps4h00Mko7y+dQjWuUfJ02r3gj7055bF/NrzuJ2aHHgDkmpsYGVkHfJx1Gw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1709975341;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=XcWOu74C0ycFsIJcramJax0GJdYjm/JuPWuR7qrjNxE=;
+	b=2QadHf7/v9+25rxicjgxIk/sMakLjagOq3NyE8d2MUT6Vjj0ckfjIcnQcUqvCXTgIzMXxt
+	5Wl/gXjY9z8HXyBw==
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Wander Lairson Costa <wander@redhat.com>,
+	Yan Zhai <yan@cloudflare.com>
+Subject: [PATCH v5 net-next 0/4] net: Provide SMP threads for backlog NAPI
+Date: Sat,  9 Mar 2024 10:05:08 +0100
+Message-ID: <20240309090824.2956805-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|CH3PR12MB9394:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6d1e0d06-fee7-4277-af08-08dc40153492
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	NxN2PdfMq9od5FJCJhVxoOaLFcDDbtWy5kpXa7d125TicTKjF0XScbg8nepKrqHdHddKDhU2uZVjg5C7p+jVKmT2LlojmwimaCJTWFrpoR4ymghzijJMAs8ZUT+qdyHcfgTiJUeX6hcD6SUnJ4fVyknMzBvozbyew01/CbmZf9Rhu2THwifVqSTtdurp5VNNbU2LPSxrJ6Xv7npCcl3p1BIWglWOQHU99tscNMRk5Teg8Gtr5fkrOzugC456oDWW0RPJsurCr2L9+N4M7vtUOE4qXQpfy/Ul6x4KbSDQoN9Z7sjMkEWs+u42GDbWhNE4L40jHLxDhzwh4cybkVG9Tb3+d5UqRLQzvh11SeFwBft8qPKOWuVJCDPILbSaRMf53JvVjuqb9LRSfP/qF5qmise6mILWUcwwHpoR+eD97ohgCnVw5KYzFiVWJWOihNEE/oErOAERBwhbXesr4ka0ZHeg4EAQP9zhQhIGYXyZ4QA/uS2kYKTek/VaAHT4q3bOOBMZTQ78B0k8J4RZUy1+LKdWOHcr8a+Hlb01YDYAvTKv5IB4irilx4AZpXzORvcR3agNOWnun9v7ZO/8bnyv7gQ0fOurgFrq8AUBXnnv00fwgK7C12gWKKidwz4ZBu0QpiSX4Wep/cI7A/dDdYKlW8mdFn9cE0vH741Xtl3GDrs=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?KrCkdH7ZYp3RftRDmMScrYzm/9PV194NabIwHI5ZZ9gvePcKcfxsZjqnlg3p?=
- =?us-ascii?Q?QJiUzzWR0pTkEDgWc/y5Sms8nUUVGoLStLm57oz7Sx6DCGw0dK3lZxgdyPaK?=
- =?us-ascii?Q?S9zqEUykbVFpmdB94cdGTMJwfBKX68wzLytJUsyb+uA/QeyW8tS3N0/30VbA?=
- =?us-ascii?Q?tF2ulPo96laoBBOnNi6CPeTN5AXv1HAJT1fra6FtOZkCXOMcRiYZpbZl+v2q?=
- =?us-ascii?Q?UeVRNvKV3KhB+2JejkKrDuFMBLAxjXrrw4ilkeD1QPz8eabBULqqu0dmmaSU?=
- =?us-ascii?Q?xj0u5hKTBNu99jiGQYVSSeMMaCi5pGJ2D8gbjsdykmKOZ/Xy4XDtRItJr3He?=
- =?us-ascii?Q?trh5LVKj2c4rshkK+GBIqDzjKsKXg5oEQ4SVNxEIS7aJg1gWh57V5GAFKRQY?=
- =?us-ascii?Q?6E8zze5p7dvFKEohs0U7oZBWxhSgn4SNHTfG/f7LfJQx6ERnpozaX9gF9TLM?=
- =?us-ascii?Q?gjVT4nMiUVpAKI4zpM74t2GsC1l6FuBARXB8n4YJVFa5AQLWjWYBZdSvf/MZ?=
- =?us-ascii?Q?z8zcWBvFNl1GIBr77bVlfTLVTVSw3megqM2bcZmC7bvOO34eRJXCTs86ZCiw?=
- =?us-ascii?Q?NQgL38a18CQ80gHzfIt1fmQrc4Y6tC47au1XIOeGhZOJwOuCEfljutC3kw4E?=
- =?us-ascii?Q?yxu7cQW1EnbQzLJtZWCJgq9lCMbaEMzDUAs/aJOhdhz39HqRKAg7zWzLfpfG?=
- =?us-ascii?Q?B9ic0KMXXygiGlQUM1jH+FerhSJj5sPIXyIAwrd6KbHiqUeR1ZfhUwFdAPd1?=
- =?us-ascii?Q?P8KLDNEa5C0P264KfOPnyF2mnRgu1F4VGQ7hERQUIadS8nCrdM1bgnvx4W/1?=
- =?us-ascii?Q?CJzaXSn8W/qJ2sQ3xbrrMdQMOj+3XpD4Khac+qedV4pTSC3eh/iNGR9fA75k?=
- =?us-ascii?Q?f+mDJPOqNcZ9XuJnE5jVN0T0zwFXhsODXCwb+RCZ/nKyBltT8HUGS1qtvexs?=
- =?us-ascii?Q?FTkqXCeF3QBhLuMxfRowR0gApyofK3GXZ6+5rzXnliWrHOHbvX1rx0MqGpnY?=
- =?us-ascii?Q?a7J84/MMc87R1snlfBi7uZMwxxwFKbtIxJsfUJskLmBYptVofbIbK8nqZwmr?=
- =?us-ascii?Q?u8il9Dz0RCtBAq2Ffnk48xXUGj0T66efTDeuh1zdq8dmFnoJ1OCK/nGTR7Is?=
- =?us-ascii?Q?f5wd1sRtv+H57I/IN20j1OiL7phSZ3oqv0IJYxzdEp2jqsKUpT0JxCaxvKTz?=
- =?us-ascii?Q?3KRenPz9AXxrK8e1U+i0C76PgJbxseAlrK0JfzozpXKDV426yoUuNFRXbaKl?=
- =?us-ascii?Q?huY3jpvWwcEYRJSR4RPP3UrNXbo7XfvbvTlSTXE6jYOpCatupK8qpm6YKZoO?=
- =?us-ascii?Q?mS+eFf0KaTntwgDWJdnqxWNCMW1NTouItS/bxTWQUGW+lgD2H3cddOrrh7Ip?=
- =?us-ascii?Q?VhZnbtcp4seGSyzbokkVwrpgoR9L3+M3Hsum0M+YzxW60lBejhImw7/yI/Op?=
- =?us-ascii?Q?xbV4ToqVYYdFvErwtaWRENbbx7JcUwVilZ5d03VLGqwXZeC3zLAfqiT5yy3K?=
- =?us-ascii?Q?Nbryj+5gpZsqRrIYFlZg1uaO/jEx82r1W65qF2LSyTx9mYm5vo2wcs6KLJEH?=
- =?us-ascii?Q?H1b+2JiMPpMFrxfWnjtWRU3DVl8emnjD2Q/44hVGXUvf1n5Cg3K9Y/ix+Tlg?=
- =?us-ascii?Q?kQ=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6d1e0d06-fee7-4277-af08-08dc40153492
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Mar 2024 08:45:00.1439
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uqeZ3+5DtsBhpcidu0G8W6dn8Q358NCstGKGMU/N+exNs3t+Ox1BHNqZqAUih96PkmQ2i5n5yIs3LnxJ4v6wfw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9394
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Print the nested stats attribute containing timestamping statistics when
-the --show-time-stamping flag is used.
+The RPS code and "deferred skb free" both send IPI/ function call
+to a remote CPU in which a softirq is raised. This leads to a warning on
+PREEMPT_RT because raising softiqrs from function call led to undesired
+behaviour in the past. I had duct tape in RT for the "deferred skb free"
+and Wander Lairson Costa reported the RPS case.
 
-  [root@binary-eater-vm-01 linux-ethtool-ts]# ./tools/net/ynl/ethtool.py --show-time-stamping mlx5_1
-  Time stamping parameters for mlx5_1:
-  Capabilities:
-    hardware-transmit
-    hardware-receive
-    hardware-raw-clock
-  PTP Hardware Clock: 0
-  Hardware Transmit Timestamp Modes:
-    off
-    on
-  Hardware Receive Filter Modes:
-    none
-    all
-  Statistics:
-    tx-pkts: 8
-    tx-lost: 0
-    tx-err: 0
+This series only provides support for SMP threads for backlog NAPI, I
+did not attach a patch to make it default and remove the IPI related
+code to avoid confusion. I can post it for reference it asked.
 
-Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
----
- tools/net/ynl/ethtool.py | 11 ++++++++++-
- 1 file changed, 10 insertions(+), 1 deletion(-)
+The RedHat performance team was so kind to provide some testing here.
+The series (with the IPI code removed) has been tested and no regression
+vs without the series has been found. For testing iperf3 was used on 25G
+interface, provided by mlx5, ix40e or ice driver and RPS was enabled. I
+can provide the individual test results if needed.
 
-diff --git a/tools/net/ynl/ethtool.py b/tools/net/ynl/ethtool.py
-index 44ba3ba58ed9..193399e7fbd1 100755
---- a/tools/net/ynl/ethtool.py
-+++ b/tools/net/ynl/ethtool.py
-@@ -324,7 +324,13 @@ def main():
-         return
- 
-     if args.show_time_stamping:
--        tsinfo = dumpit(ynl, args, 'tsinfo-get')
-+        req = {
-+          'header': {
-+            'flags': 1 << 2,
-+          },
-+        }
-+
-+        tsinfo = dumpit(ynl, args, 'tsinfo-get', req)
- 
-         print(f'Time stamping parameters for {args.device}:')
- 
-@@ -338,6 +344,9 @@ def main():
- 
-         print('Hardware Receive Filter Modes:')
-         [print(f'\t{v}') for v in bits_to_dict(tsinfo['rx-filters'])]
-+
-+        print('Statistics:')
-+        [print(f'\t{k}: {v}') for k, v in tsinfo['stats'].items()]
-         return
- 
-     print(f'Settings for {args.device}:')
--- 
-2.42.0
+Changes:
+- v4=E2=80=A6v5 https://lore.kernel.org/all/20240305120002.1499223-1-bigeas=
+y@linutronix.de/
+
+  - Rebase on top of current net-next.
+
+- v3=E2=80=A6v4 https://lore.kernel.org/all/20240228121000.526645-1-bigeasy=
+@linutronix.de/
+
+  - Rebase on top of current net-next, collect Acks.
+
+  - Add struct softnet_data as an argument to kick_defer_list_purge().
+
+  - Add sd_has_rps_ipi_waiting() check to napi_threaded_poll_loop() which w=
+as
+    accidentally removed.
+
+- v2=E2=80=A6v3 https://lore.kernel.org/all/20240221172032.78737-1-bigeasy@=
+linutronix.de/
+
+  - Move the "if use_backlog_threads()" case into the CONFIG_RPS block
+    within napi_schedule_rps().
+
+  - Use __napi_schedule_irqoff() instead of napi_schedule_rps() in
+    kick_defer_list_purge().
+
+- v1=E2=80=A6v2 https://lore.kernel.org/all/20230929162121.1822900-1-bigeas=
+y@linutronix.de/
+
+  - Patch #1 is new. It ensures that NAPI_STATE_SCHED_THREADED is always
+    set (instead conditional based on task state) and the smboot thread
+    logic relies on this bit now. In v1 NAPI_STATE_SCHED was used but is
+    racy.
+
+  - The defer list clean up is split out and also relies on
+    NAPI_STATE_SCHED_THREADED. This fixes a different race.
+
+- RFC=E2=80=A6v1 https://lore.kernel.org/all/20230814093528.117342-1-bigeas=
+y@linutronix.de/
+
+   - Patch #2 has been removed. Removing the warning is still an option.
+
+   - There are two patches in the series:
+     - Patch #1 always creates backlog threads
+     - Patch #2 creates the backlog threads if requested at boot time,
+       mandatory on PREEMPT_RT.
+     So it is either or and I wanted to show how both look like.
+
+   - The kernel test robot reported a performance regression with
+     loopback (stress-ng --udp X --udp-ops Y) against the RFC version.
+     The regression is now avoided by using local-NAPI if backlog
+     processing is requested on the local CPU.
+
+Sebastian
 
 
