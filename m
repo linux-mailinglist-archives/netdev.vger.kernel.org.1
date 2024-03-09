@@ -1,86 +1,90 @@
-Return-Path: <netdev+bounces-78885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B46E6876E0D
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 01:08:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB049876E13
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 01:20:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E55D01C221BB
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 00:08:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E7E41C221B9
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 00:19:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C50C37B;
-	Sat,  9 Mar 2024 00:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="coSJ4iJM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90F037B;
+	Sat,  9 Mar 2024 00:19:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7ECB37A;
-	Sat,  9 Mar 2024 00:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33E936E;
+	Sat,  9 Mar 2024 00:19:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.75.126.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709942932; cv=none; b=h0UWjxImUTTE5/cKE5DNNs76w1fQsudb7F8VHtVjpF0Fw99uLlyH/K0lI4bDI3sHOE028Fo7psIrjx8DSXH7PYSN3AlCu1HpC9HZAPcvwjf+uAcUCOqofldj89BrXGp5V7TGCah11lBwdrKMkS30zDQUpPJ+5OZJn9rErl6bD5o=
+	t=1709943595; cv=none; b=a/+v5YT2CaNohpAFVPr1GUV7YLtS4MIMys/eehTGjQ7FNvWpdkJZxLF7Z8/HRKIz/CWlvy672q0sEboA5577FHhxaPYzveij6Aa3CdDuZqqJAmvKMmevPI9S68IO6E71gseQS2lGacx5DVoIoaetu/6tWB0XBz3i8nGYn7yE3ro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709942932; c=relaxed/simple;
-	bh=/5HXstw1PxKqE3qL1W1y4XpmqL7UyT7EmokD9lrIuY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aXGNMMTxrLvesKpJG798o3ib66k3cGPIZ0WsL9fk4bOlOicVYen99tywcMaho7Z/6HMGaOLbKRRYCYJLxKTZTmVOPmUUySVpw19G5rpJyWeiufepArFkvUEOO+hufDvXipI/caoyxkvMLjXpuM+X6WHwo4Sy6cvp+cYlCLhtkdE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=coSJ4iJM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C158C433F1;
-	Sat,  9 Mar 2024 00:08:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709942931;
-	bh=/5HXstw1PxKqE3qL1W1y4XpmqL7UyT7EmokD9lrIuY8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=coSJ4iJMTK9Rw0GH05VG9+EqxDTQ+jfOLDgSvcdmf2kPSREX0NWLxlOBJpftZzoHi
-	 y5rAvV6Ju+nDrm+WFYp1zIgS6ZJ9RgKxkvSOVbgb2WC+rlnEPpPPU3UVBCihr6q1eu
-	 /N2rflDkGAu2FGyDfztUUQv4jLty4JSX0UJt2FVSOLOy6qgxECNsiOPrdElU524vzL
-	 TERhI9DBgNHmuAGg76ropcVQBFZsC4TTiOLv/zU/qXYkl91v77LSMHGy5mQuXZC5SR
-	 Hclcncgwul9lcyugObo3lDheiR7KHpTaBONBrMKSDISyqPVshdVqWJWZV8g86Fo3Al
-	 t+iD0undEtEYA==
-Date: Fri, 8 Mar 2024 16:08:50 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: David Wei <dw@davidwei.uk>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Yunsheng Lin <linyunsheng@huawei.com>
-Subject: Re: [PATCH net-next v1] net: page_pool: factor out page_pool
- recycle check
-Message-ID: <20240308160850.1cfc16b8@kernel.org>
-In-Reply-To: <CAHS8izOm18Rv7QJfpKmquEgf74PvqZeY4zBnyG73BVFDbCvWmw@mail.gmail.com>
-References: <20240308204500.1112858-1-almasrymina@google.com>
-	<8adb69f3-b0c0-42bf-b386-51b2be76cbb4@davidwei.uk>
-	<CAHS8izOm18Rv7QJfpKmquEgf74PvqZeY4zBnyG73BVFDbCvWmw@mail.gmail.com>
+	s=arc-20240116; t=1709943595; c=relaxed/simple;
+	bh=hgublxvBB0WVDZsVatODbqGkGHOgzWTNz3NCZI26pKw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=PC9Kn4R/n13SEMdeJE99MePW1iqebcejKnLWDm10cjOelxLnCs5M6nliWANj97swjbGuqWxmQB+H++ldBXTXrt2JXD1DIKjL3fXvIE8yZ7exzE4G04qxGePQaS4fdVIaNjehhmrqI6v4JfxBuu+2TaNC8qWsQzJUj3jPgziXV4k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com; spf=pass smtp.mailfrom=realtek.com; arc=none smtp.client-ip=211.75.126.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=realtek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=realtek.com
+X-SpamFilter-By: ArmorX SpamTrap 5.78 with qID 4290Jl7bA2356079, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
+	by rtits2.realtek.com.tw (8.15.2/2.95/5.92) with ESMTPS id 4290Jl7bA2356079
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 9 Mar 2024 08:19:47 +0800
+Received: from RTEXMBS02.realtek.com.tw (172.21.6.95) by
+ RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Sat, 9 Mar 2024 08:19:47 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS02.realtek.com.tw (172.21.6.95) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Sat, 9 Mar 2024 08:19:46 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::c9b7:82a9:7e98:fa7f]) by
+ RTEXMBS04.realtek.com.tw ([fe80::c9b7:82a9:7e98:fa7f%7]) with mapi id
+ 15.01.2507.035; Sat, 9 Mar 2024 08:19:46 +0800
+From: Ping-Ke Shih <pkshih@realtek.com>
+To: "kvalo@kernel.org" <kvalo@kernel.org>, "kuba@kernel.org" <kuba@kernel.org>
+CC: "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+        DeanKu
+	<ku920601@realtek.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: pull-request: wireless-next-2024-03-08
+Thread-Topic: pull-request: wireless-next-2024-03-08
+Thread-Index: AQHacUAJ7oSqIHSLZEax02VmaRi8t7EtdrqAgACYMYP///czAA==
+Date: Sat, 9 Mar 2024 00:19:46 +0000
+Message-ID: <a73e5a8f7f6807b736c15a3ea25d063451aec6b5.camel@realtek.com>
+References: <20240308100429.B8EA2C433F1@smtp.kernel.org>
+	 <20240308074539.04512f66@kernel.org> <87wmqc4qik.fsf@kernel.org>
+In-Reply-To: <87wmqc4qik.fsf@kernel.org>
+Accept-Language: en-US, zh-TW
+Content-Language: zh-TW
+user-agent: Evolution 3.36.1-2 
+x-kse-serverinfo: RTEXMBS02.realtek.com.tw, 9
+x-kse-antispam-interceptor-info: fallback
+x-kse-antivirus-interceptor-info: fallback
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <A80AC4CDEA649841BC595FE0A70ADC85@realtek.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-KSE-AntiSpam-Interceptor-Info: fallback
 
-On Fri, 8 Mar 2024 16:04:14 -0800 Mina Almasry wrote:
-> > Could this be made inline?
-> >  
-> 
-> Looking at the rest of the static functions in this file, they don't
-> specify inline, just static. I guess the compiler is smart enough to
-> inline static functions in .c files when it makes sense (and does not
-> when it doesn't)?
-> 
-> But this doesn't seem to be a kernel wide thing. net/core/dev.c does
-> have static inline functions in it, only page_pool.c doesn't do it. I
-> guess if there are no objections I can make it static inline to ask
-> the compiler to inline it. Likely after the merge window reopens if it
-> closes today.
-
-It's all good. We have a policy in netdev of "no inline unless you can
-prove it makes a difference". It will not make a difference here and it
-will mute the "unused function" warning.
+T24gRnJpLCAyMDI0LTAzLTA4IGF0IDE4OjUwICswMjAwLCBLYWxsZSBWYWxvIHdyb3RlOg0KPiAN
+Cj4gSmFrdWIgS2ljaW5za2kgPGt1YmFAa2VybmVsLm9yZz4gd3JpdGVzOg0KPiANCj4gPiBmb3Ig
+YSBub24tdXJnZW50IGZvbGxvdyB1cC4gRG9lc24ndCBsb29rIGxpa2UgYW4gb2J2aW91cyBmYWxz
+ZSBwb3NpdGl2ZS4NCj4gDQo+IFBpbmcsIGNvdWxkIHlvdSBmaXggdGhpcywgcGxlYXNlPyBJbiB0
+aGUgcGF0Y2ggcGxlYXNlIGFkZCBDbG9zZXMgdGFnDQo+IHBvaW50aW5nIHRvIEpha3ViJ3MgZW1h
+aWwgYW5kIG1hcmsgaXQgZm9yIHdpcmVsZXNzIHRyZWUgKGFzc3VtaW5nIHRoZQ0KPiBtZXJnZSB3
+aW5kb3cgc3RhcnRzIG9uIFN1bmRheSwgb3RoZXJ3aXNlIHdlIHRha2UgaXQgdG8gd2lyZWxlc3Mt
+bmV4dCkuDQo+IA0KDQpJIGhhdmUgc2VudCBhIGZpeCBbMV0sIGFuZCB0aGF0IGlzIGEgdHlwbyBp
+bnN0ZWFkICgweDU1ZiB2cyAweDVmZikuDQpUaGFua3MgZm9yIHRoZSBmaW5kaW5nLg0KDQpQaW5n
+LUtlDQoNClsxXSBodHRwczovL2xvcmUua2VybmVsLm9yZy9saW51eC13aXJlbGVzcy8yMDI0MDMw
+OTAwMTM0OC45OTA2LTEtcGtzaGloQHJlYWx0ZWsuY29tL1QvI3UNCg0K
 
