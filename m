@@ -1,51 +1,52 @@
-Return-Path: <netdev+bounces-78893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 954B3876EEA
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 04:16:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1209876EEE
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 04:16:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4249A1C20C41
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 03:16:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5C0EB1F218AD
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 03:16:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C793C2E630;
-	Sat,  9 Mar 2024 03:16:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F3942EB10;
+	Sat,  9 Mar 2024 03:16:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="Idf5SuAR"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="teyFOGLG"
 X-Original-To: netdev@vger.kernel.org
 Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA66C2033A;
-	Sat,  9 Mar 2024 03:16:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FFD22E40F;
+	Sat,  9 Mar 2024 03:16:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709954193; cv=none; b=ZZ4bsqdspGsqzbuNnMlpGrzr9hnaQkaxYZ1+8SlB8XC2xSJjMJ9qbYW4TH9YoUD4TI6SlIpZIOGHERPCLbWoHNwSUgg0yFILw/D8V4sD41Z+0juTLhVBRANIUGqwWK5BKa54UMZw19c94AqBIQnCgrFlCxN0F57WQbwxfF1udHU=
+	t=1709954194; cv=none; b=PjXdm1sYCiMxgKKY94NX8Ad3KVZdtipYQZdeppkT72dI3ecp+wTSZP5cdLh3CYM1nuJhiwaPa+6buX7zKjkdXNug53sNzq2r4agNRjBBAn6Ab6yfU5eVSRJ2lnSWewVUOIKUArvuiRS8P1OftInFHrP++22xvQ99Z5cF1ynpZjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709954193; c=relaxed/simple;
-	bh=6oz/c8tuVzvCAxWB8vw3sC38CdKkKexJbHpFIM6YNvw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=d+gV9PVtNjAlqe7ELNP09zLToRnQsal6SU0Oq4br5QYaXEpNalgbt0MfEWlZIP06i7+6OtncvP7G6dhszWmT4qvk3GJqtkAlcxUGfcq8EwTz+ZLIgxOcFVyFU9bLS87DhI32uPbKrBffnHcQrWUYnFQikkCWhvul843yOF/ZMAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=Idf5SuAR; arc=none smtp.client-ip=85.214.62.61
+	s=arc-20240116; t=1709954194; c=relaxed/simple;
+	bh=P6Y7ZT025E+fiKDvoHFrdjvRl8r4iOmIWTg1138ovb4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pJwz7dM/apw1jfm5uHfDUH2umy9n9VN6rPUwugNIG1wzp3WvM6DXdJBSH73XiUsb/NInIrvfQ26QToitlAJNOB50Np9MnA6EvyUuL5////haQ14HzZ9DA30bhQfH3t9Q3HLlH1nymT8/dfPaNW092QjBPhQoQGvgdaKE1YLP9lc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=teyFOGLG; arc=none smtp.client-ip=85.214.62.61
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
 Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
 	(No client certificate requested)
 	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 0896187D46;
-	Sat,  9 Mar 2024 04:16:28 +0100 (CET)
+	by phobos.denx.de (Postfix) with ESMTPSA id B219287D48;
+	Sat,  9 Mar 2024 04:16:29 +0100 (CET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1709954189;
-	bh=UUyIP5v6l38yz4FL82VwcPPfb7PIR/nDthpWPLat13s=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Idf5SuAR8sooS11ChZBi97oOpOpQ8uXKeWSoQflaHk4jdqOCxGWeWd3YeYoTaEkUQ
-	 bmgATmBvoGZZXjYRWwrVFp7fA6Aqi2RCWtyNTe7flZ+m06mSeigIpGoQcKLX8FS3tJ
-	 k5wEn0Uc2vM+6smx115l7ji0yg99elo3I0Mm4DcGzhd4VB685j1v7RsV0sSqO1INdJ
-	 iPeZnXPkzzzqdR/TEwjpDRMyUvPS4Zd3bN9PPFj9rTD0WwLfsNrcZQY8Z5W9ldSMbv
-	 4qYaPGhK5WJGF73xbKveS00PNKw5h9Gq1oNBAcyikNN10z9wiA9MYTV8xH6+5wZrvc
-	 FMobs0+JzvP5A==
+	s=phobos-20191101; t=1709954190;
+	bh=/dATcc4kK9LuQYmb68VQ5rlvRpgUqj+FWj4uFyYAPNw=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=teyFOGLGYPvMb7m9TZM+Hv/b+oEphjYkqvLRvSOvLgj2H7W+vDPJUQyBXuPGFRYXA
+	 4m7k37LZTD3RvvqCHxfwdI5+Yap9sNEms47Iwt0BrptUQ2NaoKgwnI384Mnf/T8WHW
+	 dT3fgLUwAvlDTiiLe0MBEaWBtSMEG9+PyA55huetGcIq6qmjInYrAKfhCgoQNy0aVK
+	 lrvqi01g5PddKw+UXwpWRLU18neIgrv7w2NDoytLEL4VKlZKeJbY1p3Ygq1eQkPGfH
+	 xw+O9tZh6WdLT+ASDmv+rO4xbxt3Z58Aeqx4S2qU/R5jcYSuu9yrgRZGqsmsI0GmhR
+	 IImma8p8zVq4w==
 From: Marek Vasut <marex@denx.de>
 To: linux-bluetooth@vger.kernel.org
 Cc: Marek Vasut <marex@denx.de>,
@@ -61,10 +62,12 @@ Cc: Marek Vasut <marex@denx.de>,
 	Rob Herring <robh@kernel.org>,
 	devicetree@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH 1/2] dt-bindings: net: broadcom-bluetooth: Add CYW43439 DT binding
-Date: Sat,  9 Mar 2024 04:15:12 +0100
-Message-ID: <20240309031609.270308-1-marex@denx.de>
+Subject: [PATCH 2/2] Bluetooth: hci_bcm: Add CYW43439 support
+Date: Sat,  9 Mar 2024 04:15:13 +0100
+Message-ID: <20240309031609.270308-2-marex@denx.de>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240309031609.270308-1-marex@denx.de>
+References: <20240309031609.270308-1-marex@denx.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,9 +81,16 @@ X-Virus-Status: Clean
 CYW43439 is a Wi-Fi + Bluetooth combo device from Infineon.
 The Bluetooth part is capable of Bluetooth 5.2 BR/EDR/LE .
 This chip is present e.g. on muRata 1YN module. Extend the
-binding with its DT compatible.
+driver to bind with it, even though the device binding is
+most basic.
 
 Signed-off-by: Marek Vasut <marex@denx.de>
+---
+NOTE: This comes up as the following, should the binding be
+      for 43439 (the chipset per muRata 1YN docs) or 4343A2?
+Bluetooth: hci0: BCM: features 0x0e
+Bluetooth: hci0: UART 4343A2 wlbga_BU
+Bluetooth: hci0: BCM (001.003.016) build 0000
 ---
 Cc: "David S. Miller" <davem@davemloft.net>
 Cc: Conor Dooley <conor+dt@kernel.org>
@@ -96,21 +106,21 @@ Cc: devicetree@vger.kernel.org
 Cc: linux-bluetooth@vger.kernel.org
 Cc: netdev@vger.kernel.org
 ---
- Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml | 1 +
+ drivers/bluetooth/hci_bcm.c | 1 +
  1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
-index cc70b00c6ce57..670bff0078ed7 100644
---- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
-+++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
-@@ -27,6 +27,7 @@ properties:
-       - brcm,bcm4335a0
-       - brcm,bcm4349-bt
-       - cypress,cyw4373a0-bt
-+      - infineon,cyw43439-bt
-       - infineon,cyw55572-bt
- 
-   shutdown-gpios:
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 874d23089b39b..16b64b6ff7b1d 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -1608,6 +1608,7 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
+ 	{ .compatible = "brcm,bcm43540-bt", .data = &bcm4354_device_data },
+ 	{ .compatible = "brcm,bcm4335a0" },
+ 	{ .compatible = "cypress,cyw4373a0-bt", .data = &cyw4373a0_device_data },
++	{ .compatible = "infineon,cyw43439-bt" },
+ 	{ .compatible = "infineon,cyw55572-bt", .data = &cyw55572_device_data },
+ 	{ },
+ };
 -- 
 2.43.0
 
