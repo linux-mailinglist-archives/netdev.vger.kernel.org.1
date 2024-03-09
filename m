@@ -1,140 +1,140 @@
-Return-Path: <netdev+bounces-78962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D16768771C2
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 16:08:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 14F7D8771DC
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 16:13:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 57F282819E1
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 15:08:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C32FE281B9B
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 15:13:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C699644362;
-	Sat,  9 Mar 2024 15:08:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37BEC446D6;
+	Sat,  9 Mar 2024 15:13:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="TqR+EJKN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WNYvBbKv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2731C41C77
-	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 15:07:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FAE0446D2;
+	Sat,  9 Mar 2024 15:13:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709996880; cv=none; b=agEcAjTO052X3tB29hqpBJ6xOErsuz1H5KlVuy9HWzOFuheG9tDYTdxK5HGakQuXJvpUhJ5W/oitL8/pjt3Nus2zdydMdeg3IFK7vYAaWTZbBFaHCMg7eCn//QrW/7m9nwHjSSnjFYCJepCQtF+3AwGi//qVyKuCJ58GPpQiR94=
+	t=1709997222; cv=none; b=Z+XHAkZAeEBYXPSdwaagXb+Ipghx4+s0H0DxSP4IPImYsUQbUZ/U8Q+r27ddDdoe3HVp2OJk5XdUKY5TnuLAQzFpNP09AoMNr2W/ahWSyNKIgocpaurGXkkj5ROTCaJ1U6RKvU33DatHNHfN8orhbWWgPqrxZtURNGaoqQIpGFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709996880; c=relaxed/simple;
-	bh=4m3hPqMvoFdvGn08wcU+Z5iHs4T7zsjJ+434nMiwhVI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mqk3eZJ8LQJDDLPMxbQMn6RZDkq41vg0MZzQNFyChQjbhLZRg75JPTn/B4Itt1bVbcB3HFF5BFtkWLISWJNcZ8/vCb5CulN3pluKJUsb5cYmLH9d1xywvxhJI7wGXMA+/6sl5KPcM4Jl6KeymbdHc4N79ePqFcPXMBMkR8kCWLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=TqR+EJKN; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-d9b9adaf291so1664164276.1
-        for <netdev@vger.kernel.org>; Sat, 09 Mar 2024 07:07:58 -0800 (PST)
+	s=arc-20240116; t=1709997222; c=relaxed/simple;
+	bh=mj0NPIc9fBRiahH650Pss85rj/DambmNJceX2Qi26js=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rUu0QYN0zewHQ5T0eW1oGA+RuWjFQC+5XWPBGx4Uu58sxZgL242IYM+UsAmldikksjTeivrwqoAhOq5YxuLW+l9fVAHnM7KCFhyuRdv8Ix96gxVtIc9bauextWQj8hDclEWobyYn6IXYGcSRvYbaunnKKXb3zIa6fItGdehiOsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WNYvBbKv; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-412f67bc6d0so12798525e9.3;
+        Sat, 09 Mar 2024 07:13:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1709996878; x=1710601678; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=bsRsreksVUwY3JxwOHcn4AH1bjEDIW9wxkCIfNiLooU=;
-        b=TqR+EJKNDp+gRQUVitt30nbxcZzS2rqNKdN/EW1WFiZASHPYmyH7HGRZ5HZnDe7iLp
-         WoVqekJKiuY4m/RDLPhqSOqrNCQf2Od2306OJH233a6zyoM+5/8AtdKiLMOrz4bsrbLQ
-         cmcfdVJ4cZg01fQQYee6RwoYPMarMi8JqHMbaLRn1jdEbBOVlWY42HQw4kaqE/3gljry
-         GUMr5Oq6mAIwYiErzG3kVG7bQXHrEKTTCmTyEzjhcQiS18uakPvaxrbKUUjIMhATDgin
-         DINaoiK01V2zKZBslGlGp4SZ+71yIkvbdedGEA21un29Xg5u68fO4Y6YdTcTmolw2tD/
-         h6eQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709996878; x=1710601678;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=gmail.com; s=20230601; t=1709997219; x=1710602019; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bsRsreksVUwY3JxwOHcn4AH1bjEDIW9wxkCIfNiLooU=;
-        b=mzCPCstt2wJUO2W8x5W3zLLG7MBXMKGKoT0lV8y1VjkQVuE6lcBRVd13cfao3drOKz
-         DY9rIP3FoDt0sqJ+Z5M2jI3hb43auRVd2yds/30QBITfVovPgs/JbsFJTuSIBPr8vIfR
-         vr0MWEhiTjH+ZJT9VBYdoScKfPVNTFSG6gSYkNIoIhjzuR5ke5PV7dIwz7Q4YXuHrtbP
-         iqdtL4nrYYfaFdcFiOXIuzIPC1ZSnwDA/hD5n1YEb1XFC3C382T5q1jdTe+BxNnQVb3Q
-         5LlTgP+bgx8u6wZ63MHvydaf6481bHKl3JDxwmEK+P50AdXtiA+z/lQyioNP2IIf/EfP
-         2E/w==
-X-Forwarded-Encrypted: i=1; AJvYcCXlGMP0U/N451TL/v0Sc6lwzNTPj2JvkzMqOQ4HbMIfbgXg9gNiF713BVvlFWvNvLhQRBBgVR1Y7ua9NSkIwrqmS3QlBLN0
-X-Gm-Message-State: AOJu0Yy+4A7ptKVScMwG9JuuDEDTqDnl08Vbri91FU7sH558GXPk/a4s
-	Mimq0iiBeopJm68vuhaBIqjeZHPSraUQ295lGrlxWqDm2aQdouzuGzsUog85y32nsDyc0B6Vjdj
-	t30rHcCIJj3zXPB5CCiIDU9YSf0JIpzp+DnAAXA==
-X-Google-Smtp-Source: AGHT+IF0IfT5MeJdtuGLAxcGUPTzOLwhQqEBQY+xRVBBT6xtNAXgDJlcofP3guSftIG+E5LI1hh+Y6ALeP+yMak/1A0=
-X-Received: by 2002:a25:6c09:0:b0:dd0:453b:485e with SMTP id
- h9-20020a256c09000000b00dd0453b485emr859326ybc.58.1709996877891; Sat, 09 Mar
- 2024 07:07:57 -0800 (PST)
+        bh=nqaCXrKkbqaRO5VSVsw+kFR9jdWnCYq3NGM9vlwLk4s=;
+        b=WNYvBbKvoareTdoVMyfAPVm74QteJN1oFDGlUOqitl8+PV3XyCQlmST7JJA9ezOehC
+         fA+OH6fS2a7hZjg2kluTptLrLWBlYj2wBTXwEMsyhvBvoke/c5Eaq4pLAqwUHltTZsDp
+         QWHR+dOhmCKYV8c8Hr1QNrLU+c/8l03RufAfhxzj5kw4UcWUNjQnYX3oODq7kKd0IPSH
+         35f0XKAVuhbwVYquSKQlqebulsT06uY5xnS8Xe1mBtcdJs8VCMju/iuZ9h3peFnM7/Gk
+         bcoaM/bKeW8c2PXkG/IMi4zxE4Ru4RBIPsCEXfrCqbZTSavosQZdfa6u4OB2QgNzFmWV
+         707Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1709997219; x=1710602019;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nqaCXrKkbqaRO5VSVsw+kFR9jdWnCYq3NGM9vlwLk4s=;
+        b=M+gbOEF92H1WGl3OzNCqaZM2j7hAvn9yC+NcNc/gQykMAt0csHqRTpqZWzAsl3/wHk
+         0aNlS0Pa689KQYYoz3qlfEiuCB2rJfsnMOj/meZYz4UeoSte4nf1icS+A6iG2MoUksRr
+         ZWErXQa2zRSo6APhuxPEY3VfzJhfQIolKhtvf8LwFtGu287ENyZouzJQ0BzhuNid64q9
+         l8eN6H+XsGCBFvewtNVa5cOSfNWFuQq9D+Rk1pvCvg89P6yuSZMp6+3FQF8F/8ZJ0pm8
+         xiuvMXjjAs23LK08Xu5jrnZNEv1BGWBw9SbGP8TxvByESZ5WvhT/s1UFA6Wmmq5Uvytj
+         8rpA==
+X-Forwarded-Encrypted: i=1; AJvYcCUzyr8zslfo7K+6yVC1f3NFBROptt0VVDvFAD1KY3ViVh8B1e/t6jNgIhZlVKKnDu50jLZlCEkEz9d7XQjDGYBIMYhgwsBgM7W3catBS+u4bV5EUuMpKLLD1/AgYt9RseWD0L+jD11wS2DVEox/aLRxuNCtU2dekD96c8apEoFwR18bhu9R
+X-Gm-Message-State: AOJu0Yzq0I7kQWa2VY/h3tUXRSq9XlS16269jc4SXPoQ1eZBx1nzTXYF
+	jaqEmUpDUS01zqCtvxjRrr86wO3bC9VwDRgGrR5OuYoX4l6uxV+5
+X-Google-Smtp-Source: AGHT+IF7vWQHcsedtOCKa4oZJH1KTNQScrKA+4MQ/KRuLfIKq62I7/shNlaYgFLyNWJMqlzXerN9TA==
+X-Received: by 2002:a05:600c:1e19:b0:413:239a:2685 with SMTP id ay25-20020a05600c1e1900b00413239a2685mr615253wmb.38.1709997218700;
+        Sat, 09 Mar 2024 07:13:38 -0800 (PST)
+Received: from debian ([146.70.204.204])
+        by smtp.gmail.com with ESMTPSA id v9-20020a05600c470900b0041312e8ef2bsm2813627wmo.26.2024.03.09.07.13.34
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 09 Mar 2024 07:13:38 -0800 (PST)
+Message-ID: <1d4726dd-cc62-4966-90c1-68ea3f0905c4@gmail.com>
+Date: Sat, 9 Mar 2024 16:13:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240306-wcn3990-firmware-path-v2-0-f89e98e71a57@linaro.org>
- <87plw7hgt4.fsf@kernel.org> <CAA8EJpr6fRfY5pNz6cXVTaNashqffy5_qLv9c35nkgjaDuSgyQ@mail.gmail.com>
- <87cys7hard.fsf@kernel.org> <CAA8EJpowyEEbXQ4YK-GQ63wZSkJDy04qJsC2uuYCXt+aJ1HSOQ@mail.gmail.com>
- <87v85wg39y.fsf@kernel.org>
-In-Reply-To: <87v85wg39y.fsf@kernel.org>
-From: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date: Sat, 9 Mar 2024 17:07:46 +0200
-Message-ID: <CAA8EJpq_XLUEMC67ck2tZRjqS0PazCkQWWMGmwydeWxTETHwcg@mail.gmail.com>
-Subject: Re: [PATCH RFC v2 0/4] wifi: ath10k: support board-specific firmware overrides
-To: Kalle Valo <kvalo@kernel.org>
-Cc: Jeff Johnson <quic_jjohnson@quicinc.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Rob Herring <robh+dt@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	ath10k@lists.infradead.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, 
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH net-next v2 3/4] net: gro: set inner_network_header in
+ receive phase
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ willemdebruijn.kernel@gmail.com, dsahern@kernel.org, shuah@kernel.org,
+ idosch@nvidia.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <2ce1600b-e733-448b-91ac-9d0ae2b866a4@gmail.com>
+ <2076d2ff-cd17-4ab0-b1db-4875d96bf9a6@gmail.com>
+ <CANn89iKq755tvJ1BZFXG5aX2YNd9AycbKu57taxi8gaSWn5Syw@mail.gmail.com>
+From: Richard Gobert <richardbgobert@gmail.com>
+In-Reply-To: <CANn89iKq755tvJ1BZFXG5aX2YNd9AycbKu57taxi8gaSWn5Syw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, 8 Mar 2024 at 17:19, Kalle Valo <kvalo@kernel.org> wrote:
->
-> Dmitry Baryshkov <dmitry.baryshkov@linaro.org> writes:
->
-> >> To be on the safe side using 'qcom-rb1' makes sense but on the other
-> >> hand that means we need to update linux-firmware (basically add a new
-> >> symlink) everytime a new product is added. But are there going to be
-> >> that many new ath10k based products?
-> >>
-> >> Using 'qcm2290' is easier because for a new product then there only
-> >> needs to be a change in DTS and no need to change anything
-> >> linux-firmware. But here the risk is that if there's actually two
-> >> different ath10k firmware branches for 'qcm2290'. If that ever happens
-> >> (I hope not) I guess we could solve that by adding new 'qcm2290-foo'
-> >> directory?
-> >>
-> >> But I don't really know, thoughts?
-> >
-> > After some thought, I'd suggest to follow approach taken by the rest
-> > of qcom firmware:
->
-> Can you provide pointers to those cases?
+Eric Dumazet wrote:
+> On Thu, Mar 7, 2024 at 2:28 PM Richard Gobert <richardbgobert@gmail.com> wrote:
+>>
+>> This patch sets network_header and inner_network_header to their respective
+>> values during the receive phase of GRO. This allows us to use
+>> inner_network_header later on in GRO. network_header is already set in
+>> dev_gro_receive and under encapsulation inner_network_header is set.
+>>
+> 
+>> +static inline int skb_gro_network_offset(const struct sk_buff *skb)
+>> +{
+>> +       const u32 mask = NAPI_GRO_CB(skb)->encap_mark - 1;
+>> +
+>> +       return (skb_network_offset(skb) & mask) | (skb_inner_network_offset(skb) & ~mask);
+> 
+> Presumably this is not needed.
+> 
+>> +}
+>> +
+>>  static inline void *skb_gro_network_header(const struct sk_buff *skb)
+>>  {
+>> +       const int offset = skb_gro_network_offset(skb);
+>> +
+>>         if (skb_gro_may_pull(skb, skb_gro_offset(skb)))
+>> -               return skb_gro_header_fast(skb, skb_network_offset(skb));
+>> +               return skb_gro_header_fast(skb, offset);
+>>
+>> -       return skb_network_header(skb);
+>> +       return skb->data + offset;
+>>  }
+> 
+> I would instead add a new offset parameter to this function.
+> 
+> Again, ideally GRO should work without touching any skb->{offset}.
+> 
+> GRO stack should maintain the offsets it needs in its own storage
+> (stack parameter, or other storage if needed)
+> 
+> Upper stack can not trust any of these skb fields, otherwise we would
+> have some troubles with napi_reuse_skb()
 
-https://gitlab.com/kernel-firmware/linux-firmware/-/tree/main/qcom/sc8280xp/LENOVO/21BX
+Inner and outer network headers are needed for commit #4, I will store them
+in the CB.
 
->
-> > put a default (accepted by non-secured hardware) firmware to SoC dir
-> > and then put a vendor-specific firmware into subdir. If any of such
-> > vendors appear, we might even implement structural fallback: first
-> > look into sdm845/Google/blueline, then in sdm845/Google, sdm845/ and
-> > finally just under hw1.0.
->
-> Honestly that looks quite compilicated compared to having just one
-> sub-directory. How will ath10k find the directory names (or I vendor and
-> model names) like 'Google' or 'blueline' in this example?
-
-I was thinking about the firmware-name = "sdm845/Google/blueline". But
-this can be really simpler, firmware-name = "blueline" or
-"sdm845/blueline" with no need for fallbacks.
-
-My point is that the firmware-name provides the possibility to handle
-that in different ways.
-
--- 
-With best wishes
-Dmitry
+Moreover I will work on another patch series, that changes GRO receive phase
+to use stack params as you suggested. (prev offset, and I will also work on a
+version with data_offset too).
 
