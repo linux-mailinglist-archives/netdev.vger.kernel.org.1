@@ -1,104 +1,85 @@
-Return-Path: <netdev+bounces-78959-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78960-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18A798771B1
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 15:50:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 625D68771B9
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 15:56:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2077FB20E7C
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 14:50:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 056B22818F6
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 14:56:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C55F4085D;
-	Sat,  9 Mar 2024 14:49:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 749D03A28D;
+	Sat,  9 Mar 2024 14:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JYmgjMHQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MYB331rD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDDBA22325;
-	Sat,  9 Mar 2024 14:49:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B361BDF4;
+	Sat,  9 Mar 2024 14:56:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709995799; cv=none; b=JfZv/XU/9bgyHzuZkUv24xWXbqSb9HMK53N6Hwtk6l+T+DQFG+zkq0mqNj7ZwZ/GsRwFgN53eqUpJGgjGL1caJXHhVZC5toBgZHHCIdekNoNtvGaiX1m1Rft2X530UR18drzgUDh6hZKeEUQHmwrC4KP17HpCy/oKwTqOEBzemY=
+	t=1709996176; cv=none; b=J+l39YNEwrKNFh64Cj1pKdoU0GB8Y/XlxAH9ZqfJgQCwCId+7qKhhhlqyXNmTtso2RYv12jRMcU6XaMge8oB9px+ujdsE+Vx45LHTqzHBk2QOCCe29Tu6FkaUQJi8CPX3ZA4dvmRXNvs0V2ypWHWTnKp+GaonHcibNrK1qAax7o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709995799; c=relaxed/simple;
-	bh=m0fRX6Klr4hL7HKDSzkO0KpHF8yKajILIBRNBCp469Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aqSKLlEWcKFg7THXjICbG6rbAF2ppJqdkVphzsc5x65oxAoNTJx1AxLZBzAz5xYrhUrO9f4gnekbUfB2Ea5PmExYSjvp60fKfNP8PYO6sivE3fLNQBtjJS72xzA98Ar5FHRdHLUTgt2g6n3pnHQQR7q1dsyPxbuJH5VFcGErai8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JYmgjMHQ; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-5132010e5d1so4256642e87.0;
-        Sat, 09 Mar 2024 06:49:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1709995796; x=1710600596; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m0fRX6Klr4hL7HKDSzkO0KpHF8yKajILIBRNBCp469Y=;
-        b=JYmgjMHQgKcOp54UrEGeGxAKAOP0RMzNv1tjPq2d0MKUGLBoi/I/Don7kLteWT4okE
-         1L5JfeuwlJmNFQOznEB+idx6WpQad6BlOQUAVYu1KGEUwal6tssXMd+h7zxesC18N4Vt
-         mEf6tw8CF0r6tShw2K5T8iM+gf38qyWHCCENaKK1GgeFdsyARCWd+1zezWWug5MhHEaV
-         PMgclpgeq5Oe/nMDPGLaxVAaj5w8EPOKP6IZZXule3KldTqiEQ/tyz9C8ZeFdQz3v/7y
-         FVE2jNAygIWSxWpVekGBlpR0+XCzUujZccrkPNXc/1YPcBBG/7P8D/gb6eC8IpTpyPMM
-         xEiw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709995796; x=1710600596;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=m0fRX6Klr4hL7HKDSzkO0KpHF8yKajILIBRNBCp469Y=;
-        b=aXxV17vY5Kj0ZmAUNeUPZCdch1jl/ZcDFTuPMMc/cF1qEhbdWgz7i58Vma9mkCNeR5
-         zhw/b15C++Oeqhi5QSwft5uop3k/sEZ/XQ6HqDS+Hi6RirTucIF4f/GLjgPjDRglqwmF
-         bpwEAR07P4uP7BoKE0dE8kKauHtgcROLl/CPLV5fKvtJxjlJDr2Fe1sCbB/8+ufckmZ9
-         iUMMbLx80RKzAGrvRbuUZk6wvn4nUMFeTcBbsClHDuF1DhcPQgyHoeKJNMwTjy9qL59L
-         QAnFPbIiewmzN9+jL8bX9vG2jf5RzAyMcSnms50DxUq1aSA33Yfk3S5ZMSstLV0mb2jG
-         A8Gg==
-X-Forwarded-Encrypted: i=1; AJvYcCV1HEe2klZYZjZrU2vlDQ/SCfoK5pGuGkgYTWQIiyFjDwWJhJh3mLA7dEXMCSzuA3fo94vKqWyW9GiXGjTER134gIzoSbQ0FhjwpXKb4vRemko1VQEhJTjWRbZT8s7nutLJGviD
-X-Gm-Message-State: AOJu0Yxhu1iVJjLvubDhdaar0LZJ6pldDr6IoHOfElhoKDv7Xb1LF/3S
-	5Je5SOtkMFS7CoihxqVOlwi3unnbTpY/Kn0KX54TKvjK+YMaUxvQcZka6CmEA2o34SUtHRUqiuC
-	u/6rap7MKqc/6h44qXYzocar8/w4c35SkI/AwNg==
-X-Google-Smtp-Source: AGHT+IG/V19PAOGxhrGvgZcXjevkdaBQ0p6IbUzgLrUUhhNYYgMDdQGrl0RPxzPqWqB5Be/ZqoEGyxLfN3Dw0oRC3zM=
-X-Received: by 2002:a05:6512:3e19:b0:513:2b35:2520 with SMTP id
- i25-20020a0565123e1900b005132b352520mr61277lfv.58.1709995795723; Sat, 09 Mar
- 2024 06:49:55 -0800 (PST)
+	s=arc-20240116; t=1709996176; c=relaxed/simple;
+	bh=KBygGl79mgaURge7K4LetcAdkwIssOLeohMMAFX3q2M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tY9OUYj5piy4uoUNp5QTpVUV0VKifILrkzsO97/tVlx/pfPM0dHqdDL+bxA7N0C942duBdoPqtJPRqYw8G1q74S0/mjdmCVq8Lr/ThhbVOGrFNORSfKILLckbjXr4mdP6tDxKQXoQjILhjFMv6kp3oVaVC2rbVLh3g3p5VXmofM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MYB331rD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF47BC433C7;
+	Sat,  9 Mar 2024 14:56:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1709996175;
+	bh=KBygGl79mgaURge7K4LetcAdkwIssOLeohMMAFX3q2M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MYB331rDgVyzvJ1jxivyu5GlC+MMjdqMpT7ZkmjFbpJzVEITaXblE30IrFvzl5Twd
+	 5Po7ocReeh8BJtW758Xgh+6Zfr4vL9i3txE8JkPcv38+uuuw2jmqUidU8ZzDL10g1s
+	 JBACl93u+Md2A1dbt9DDl+eGifPnCxF8NnFQNgrjL0rR1i8abFkogZ/hn4b93q9kBc
+	 DmCcspTxmRW59OO6wdmV7kPC8HHLp7HG9zWRijZ1ZQKmplqGZXP/Uynd5zSWEi++uI
+	 cFZqOIjIlqft9sBl3yHKmACnDrC9o9s2zBcGHes/MX4k5MCnkapS/umNcXsOUHOZ8E
+	 TCDPSoXkeRzGw==
+Date: Sat, 9 Mar 2024 14:54:41 +0000
+From: Simon Horman <horms@kernel.org>
+To: thomas.perrot@bootlin.com
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: macb: remove change_mtu callback
+Message-ID: <20240309145441.GA4701@kernel.org>
+References: <20240308155330.1610616-1-thomas.perrot@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CANn89iJRXjYTojFyHN6s1Qu9Vkkk6RwxPF=bAKPjOg9zT-GupA@mail.gmail.com>
- <tencent_4E77E34FDA2F438430621DF220620A882407@qq.com>
-In-Reply-To: <tencent_4E77E34FDA2F438430621DF220620A882407@qq.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sat, 9 Mar 2024 22:49:19 +0800
-Message-ID: <CAL+tcoAHN_-c6eVuOY=O_8xJ_KLPS9yUpeW524nuSMo5RXd3jw@mail.gmail.com>
-Subject: Re: [PATCH] net: mark racy access on sk->sk_rcvbuf
-To: linke li <lilinke99@qq.com>
-Cc: edumazet@google.com, alexander@mihalicyn.com, davem@davemloft.net, 
-	dhowells@redhat.com, kuba@kernel.org, kuniyu@amazon.com, leitao@debian.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	willemb@google.com, wuyun.abel@bytedance.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240308155330.1610616-1-thomas.perrot@bootlin.com>
 
-On Sat, Mar 9, 2024 at 10:10=E2=80=AFPM linke li <lilinke99@qq.com> wrote:
->
-> > OK, but what about __sock_queue_rcv_skb() in the same file ?
->
-> I notice that, but I am not very sure whether there is a data race. If it
-> is a similar situation, then the same patch should be applied too.
+On Fri, Mar 08, 2024 at 04:53:30PM +0100, thomas.perrot@bootlin.com wrote:
+> From: Thomas Perrot <thomas.perrot@bootlin.com>
+> 
+> Because it doesn't allow MTU changes when the interface is up, although
+> it is not necessary.
+> 
+> This callback has been added to add in a first implementation of the Jumbo
+> support [1],since it has been reworked and moved to the probe [2].
+> 
+> [1] commit a5898ea09aad ("net: macb: Add change_mtu callback with
+>     jumbo support")
+> [2] commit 44770e1180de ("ethernet: use core min/max MTU checking")
+> 
+> Signed-off-by: Thomas Perrot <thomas.perrot@bootlin.com>
 
-During that process, I see no lock owning the socket, so sk->sk_rcvbuf
-should also be read locklessly.
+Hi Thomas,
 
-Thanks,
-Jason
-
->
->
+Perhaps it is worth mentioning that after this patch the core will set the
+MTU, regardless of if the interface is up or not.
 
