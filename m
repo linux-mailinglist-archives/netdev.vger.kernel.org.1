@@ -1,106 +1,127 @@
-Return-Path: <netdev+bounces-78971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 989978771FF
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 16:42:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A8C8877209
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 16:55:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39362B20FC7
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 15:42:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 797531C20A78
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 15:55:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52A7D446B3;
-	Sat,  9 Mar 2024 15:42:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C5614594A;
+	Sat,  9 Mar 2024 15:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mrLTnH+h"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="qgDt62PG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A319844391
-	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 15:41:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 814EE3FE1
+	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 15:55:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709998921; cv=none; b=GDSGFtqZVbvCPWZl428l26xLdJybPO1N9FU19qUfSYZmHm2s7pdOryq5pbT5oW72HucKrSqNBB3OsCKPyKBd6OUFTZip6PxbAfMZ6iAqN5qVU9W7aaffsAeVcJpaEzdQqABB2nOx9t5ym5/3vpqrHhg4U6AMYWU7u55LmqHASs8=
+	t=1709999703; cv=none; b=jN3U1AFQFElr3BpE148W/uLK40Y+YKfA51SY0z55KWOnX4yAiyQKbmwMnRyklsVBPNJLzmCf7eEFRuzmWd43dsofk7E5fqb1/NQLiyzofg2vTDgM47OGRD7KXiIcAI2fQ3bjvZsS1mGTsFH7BSyHcSNWbXqTAIfo69v7RKl7oPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709998921; c=relaxed/simple;
-	bh=lgwpTNi1M3yVskswaglSg5hLDE71jPPK741kQGr7/SQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CGbdrhuHuq03oemai5pxxwrZgb5bJJdprrY5oOM7UwfcdI8CMTV/YDKgE0MutKUDon6gDSB/wBL+f+5B4sChyNf6JVIgx3opUtIDF3TxyzbZdIy7kgQG4eV7EPKdw+s/hB2K9smdEUkWrDwlkJdhgwC8qn0q+kb/VKtM4Hn1Vbo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mrLTnH+h; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5682df7917eso8060a12.0
-        for <netdev@vger.kernel.org>; Sat, 09 Mar 2024 07:41:59 -0800 (PST)
+	s=arc-20240116; t=1709999703; c=relaxed/simple;
+	bh=okntOCxHdXfDiSNGp5Q/yJnmIT//bZkGzzyQ8XGTaX4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HIp3Elh45cSXf2H8hsOkEcgTENN+NuCTmze1skhQOIOhgYXFz1HheCWMotiv14RxKfuaAHBKazZulQ/0W/+sqTF50TJt3NnNHnB8J8dKlpFUErUMCKKOjhAe3RsIFkAwl2b8EtRNdUTmiurePFP8vUS5AgOTZLdo2jLOeVMTScU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=qgDt62PG; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a44f2d894b7so401189066b.1
+        for <netdev@vger.kernel.org>; Sat, 09 Mar 2024 07:55:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709998918; x=1710603718; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zkDsUMSZYlTGnFq8L8u1MCZSuc7DRjwYv05YSVPzzQs=;
-        b=mrLTnH+h/N6GRDiJvOJL72/FEFTtqWG/1a+jry6zxfXlDRsOZ+xrBxpkoUT1RxXHy6
-         V7kIuUP0iXn+dFs4geLRYH/J6SlPL4BXNPvw1BvHg/M/SNGvU99xsvxi/QymhEgtxj7p
-         4Q41RyntcpusFYdX/CBCDO1RoO/EPrnpRFYfrGh4oWCYiqNkdBl+tQ0DcZg5vdNjpBK+
-         9S8gpIgwMzVKUE/W82e3E6c25ogxUgFOZGxNoxp8rq3pcoUg7lKdZ9Wqaa1Qo72l0kKD
-         49gkk8Ezc7CcBFiKqQNga+TnIWmPO4Qceo6xJIuCrPF6yn0gRxcqXSUisUtr357M7UHZ
-         bW4g==
+        d=ragnatech.se; s=google; t=1709999699; x=1710604499; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=TuPstnhPbF0+SqOFtEx4l3f770SiiyBvVtP9fLpE7xM=;
+        b=qgDt62PG92EcX5ByZgywORYj/mtAYFh42in+kzB+UY53NXrfMZzqdB+SM2gTlL1wZT
+         Fw7InVEatjH8sEXicUb6byNZ3f0q4emoQllkRkHiPjeojA7j3VLMFcdBysrCBeFuppqA
+         BA3irOkQL7OvDy/w/NAVCGBy2Oy1xwgk8JsTudKkGdGKNZTfH1ttw+bUkqMk9rbqxTXb
+         GIccof5v2g1afIvEJgR0MJg3VDZH9D+UNYBHQGEMMQocDVMChjfKExjdNAL01wGso+7V
+         LbYqa6hv/Tp4eHSKlbeYyu1vyqYMQcBJlOJpJQuJOkNqaXj+j2AgBE9bxKC0zQSrtuH4
+         gTtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709998918; x=1710603718;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zkDsUMSZYlTGnFq8L8u1MCZSuc7DRjwYv05YSVPzzQs=;
-        b=tddVC2wzDXQ9TH0Yo9bd3DeXcv6QxQQZquH4MfF6w6mONZMcsnWI07mrhq1eTTA7LQ
-         yIdgZ4wP48Mpvwnc8zr1fxg84Zatg1IkMwnnON3EQqnzCJKiuDOaHqQMELg5MTNK72wF
-         y7O8AEzl90I93ZaTMd3kF9DMt8V/C3C+6d7fnGvXXKK4f3xeTjc1vvSm/RNnAXe4kZq2
-         AmpJm57BOSVhLwPmrtiqTgrCPzsmhtZfd5hXjAmp1k0cl0j5Ox4p5JpzpCZ9OLSq3KaK
-         jwBqbzMAaNZjBCuKN1AXQQfmhbWJqAeBiHN7S4sJMyAybZ0Qdu2bp8PCMvAR1EmDgQ5Z
-         il+w==
-X-Forwarded-Encrypted: i=1; AJvYcCXz9eTvkCg7ZBpwR31Mg4F2wv8zQNxJ00K/PIM/OIe3hE/F15e2OkLIlPOJ9/7dGlyv2frFEW8iZ4mHejLRb1TqAn2lsJ/m
-X-Gm-Message-State: AOJu0Yz8pJXEimeAic6bU3U8agC+oEwijFKmBNu+YcjlZmo9XmfpQDre
-	6bAgQ78hT7b/0EOQpsPITLxSjw1WUB/y6tB/QqMbq2KTJOBMKChOhDZiiUa+jcQG2QqGX+dglt3
-	jA1PtMvZdx8Km37OAecPuTg3p+RDbsWE8fJBE
-X-Google-Smtp-Source: AGHT+IFPsTXjqJ8K9UyJJZ2xhpe/CdWpMxGY3SffBXmKELvxZlkX7xMtkQZqbztu95EV/lRThefqSgEfRLV/1omhcSI=
-X-Received: by 2002:a05:6402:1b06:b0:568:3c0c:1755 with SMTP id
- by6-20020a0564021b0600b005683c0c1755mr84512edb.6.1709998917765; Sat, 09 Mar
- 2024 07:41:57 -0800 (PST)
+        d=1e100.net; s=20230601; t=1709999699; x=1710604499;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=TuPstnhPbF0+SqOFtEx4l3f770SiiyBvVtP9fLpE7xM=;
+        b=vZ+sxWHUM4h459oQyip5+MPaFVI84L6R87iBt9doFYLALiWvsPCRhv0lj2Ki6/eceE
+         0n5JiDoY+AkfjwU+aHzgGSVaVuCvgex57Kc6Et/9mCY/s5FuJ+Ce4t/vXsMqoMlKIqBx
+         xyj6m3eZktd3/Z/F4D8LCpvaEdZVlXnu23U6hObkCXxhxZ0QEbTJAFXKmicc5NDaYr2J
+         bRNLJnO3qSo8pXXgKWA2BPlyEpzUIOSO8ZyzsYm24afUwFFUamHMqYyy8JbzL52SUXx4
+         sZOD1d5xoUrPw8klD+UMJ460u38VT3cBmOnh0nBjXanr7IMnOUH6994QuxDw/2hXp9WL
+         CjkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7Zl0HU8elgWFyssH7yHGaIMibxtqYDTI1aQwZkII5hk805DV9HVE9Keqe4F6rzZ1agoS4bpNQjRkcc+iwGxsIxYgZ6lq5
+X-Gm-Message-State: AOJu0Yzw7Y9qtrPOL8CSHHyjUZCJDXHOrsAaZ3nreHslBURbgAn7cnd2
+	uEyGdzGwlJK1tqUa/a1F3WVQw7DEHRxO0ygFADcjCgiMAvEZwIdzqiunYC/YA/o=
+X-Google-Smtp-Source: AGHT+IGbh6WubsmxB+EyIWgSpXzWgufzyOMSGt456adwbXwfz1//V8NkFP/YttWdi1xXc6jyRIfsHA==
+X-Received: by 2002:a17:906:1d50:b0:a45:f94d:db4b with SMTP id o16-20020a1709061d5000b00a45f94ddb4bmr1215620ejh.35.1709999698940;
+        Sat, 09 Mar 2024 07:54:58 -0800 (PST)
+Received: from sleipner.berto.se (p4fcc8c6a.dip0.t-ipconnect.de. [79.204.140.106])
+        by smtp.googlemail.com with ESMTPSA id kq17-20020a170906abd100b00a40f7ed6cb9sm1005216ejb.4.2024.03.09.07.54.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Mar 2024 07:54:58 -0800 (PST)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [net-next 0/2] ravb: Support describing the MDIO bus
+Date: Sat,  9 Mar 2024 16:53:32 +0100
+Message-ID: <20240309155334.1310262-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <f939c84a-2322-4393-a5b0-9b1e0be8ed8e@gmail.com> <88831c36-a589-429f-8e8b-2ecb66a30263@gmail.com>
-In-Reply-To: <88831c36-a589-429f-8e8b-2ecb66a30263@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 9 Mar 2024 16:41:46 +0100
-Message-ID: <CANn89iK5+wqYdqMt_Rg3+jO+Xf4n4yO4kOK0kzNdqh99qgL3iQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 4/4] net: gro: move L3 flush checks to tcp_gro_receive
-To: Richard Gobert <richardbgobert@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	willemdebruijn.kernel@gmail.com, dsahern@kernel.org, xeb@mail.ru, 
-	shuah@kernel.org, idosch@nvidia.com, razor@blackwall.org, amcohen@nvidia.com, 
-	petrm@nvidia.com, jbenc@redhat.com, bpoirier@nvidia.com, b.galvani@gmail.com, 
-	gavinl@nvidia.com, liujian56@huawei.com, horms@kernel.org, 
-	linyunsheng@huawei.com, therbert@google.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Sat, Mar 9, 2024 at 4:35=E2=80=AFPM Richard Gobert <richardbgobert@gmail=
-.com> wrote:
->
-> {inet,ipv6}_gro_receive functions perform flush checks (ttl, flags,
-> iph->id, ...) against all packets in a loop. These flush checks are
-> relevant only to tcp flows, and as such they're used to determine whether
-> the packets can be merged later in tcp_gro_receive.
->
-> These checks are not relevant to UDP packets.
+Hello,
 
-I do not think this claim is true.
+This series adds support to the binding and driver of the Renesas 
+Ethernet AVB to described the MDIO bus. Currently the driver uses the OF 
+node of the device itself when registering the MDIO bus. This forces any 
+MDIO bus properties the MDIO core should react on to be set on the 
+device OF node. This is confusing and non of the MDIO bus properties are 
+described in the Ethernet AVB bindings.
 
-Incoming packets  ->  GRO -> GSO -> forwarded packets
+Patch 1/2 extends the bindings with an optional mdio child-node to the 
+device that can be used to contain the MDIO bus settings. While patch 
+2/2 changes the driver to use this node (if present) when registering 
+the MDIO bus.
 
-The {GRO,GSO} step must be transparent, GRO is not LRO.
+If the new optional mdio child-node is not present the driver fallback
+to the old behavior and uses the device OF node like before. This change 
+is fully backward compatible with existing usage of the bindings.
+
+Niklas Söderlunn (2):
+  dt-bindings: net: renesas,etheravb: Add optional MDIO bus node
+  ravb: Add support for an optional MDIO mode
+
+ .../bindings/net/renesas,etheravb.yaml          |  4 ++++
+ drivers/net/ethernet/renesas/ravb_main.c        | 17 +++++++++++++++--
+ 2 files changed, 19 insertions(+), 2 deletions(-)
+
+-- 
+2.44.0
+
 
