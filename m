@@ -1,63 +1,57 @@
-Return-Path: <netdev+bounces-78898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AEDA0876F01
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 04:52:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2010876F03
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 04:55:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C7CA1C20BCA
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 03:52:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7F21282563
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 03:55:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1E2612E5B;
-	Sat,  9 Mar 2024 03:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F2DF32C6C;
+	Sat,  9 Mar 2024 03:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s6mxlKcE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sM4Qs9ET"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A3236123;
-	Sat,  9 Mar 2024 03:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 665E21DFE8;
+	Sat,  9 Mar 2024 03:55:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709956341; cv=none; b=SxH/ywdTHPdDj4R1BU401s+X79B7vwUDbMoJFbewQPnFAVMIooWEBQyBAo838EdxG0500z1Hew77fycOpWcx85emPZL7Dmau0Hi8B7BPJXDT4ofpKlR4X3tbUcn8xH8kjmKo3xZQq1ttprCl1aSDkBrIOXTyJSY/Y3FRYrLXIMA=
+	t=1709956531; cv=none; b=gzmqFiZ3kh56dLACDiwqycnUyHLLd8XbyqwTvNPFQNe2cJmoQ3gHpshUL6D6A3jal1ExkFANKO5sbmO8J0s96hxGyvDasOuEGUkhaxcYThWxuZHnZ0EctltsKVvWLNe+/Ma4syD63plPavd58P0PzLKzDyiWPNiuOgTKWh38SJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709956341; c=relaxed/simple;
-	bh=+qc/HwE+N2E+pOqZ+dIKfsDstUXZTyieQyJAXxKhKgs=;
+	s=arc-20240116; t=1709956531; c=relaxed/simple;
+	bh=cqxnRONxFqoFUHeLlMQOk9RLWMYU12XehXtvW+dv3SU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eGBpb4dRsHC6NOZzysWBJd5+5ge3l9vPNrYe5+a7oE0Z2KqOuee43KymXtMDdILvAyzP5nbULsbfB0+rwEU1udX3FGElB0ALyDZ0/ehSmZytYh37XUTaxShwjxp6JKcenD0BzPhsXDiXMkyW5wpeGEdWfC+cyR/LV14MCgKj+Wk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s6mxlKcE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A46F4C433F1;
-	Sat,  9 Mar 2024 03:52:20 +0000 (UTC)
+	 MIME-Version:Content-Type; b=r7JgGpwVdR7RjDBbgPw5KWVREkyIVkNvAuWRrnuHxUTqonbredHyvNYJxjYZGTmb8lCr75O+QgFclhdgd6P80SvQC639H8AaZUMIAkkuComUXRYD0IQtnf0CgH3RIDwAGQ6M4Bli7Fm8ex326LSKrm4aXREC+TsB0ERDWEN/8yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sM4Qs9ET; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8BD52C433F1;
+	Sat,  9 Mar 2024 03:55:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709956341;
-	bh=+qc/HwE+N2E+pOqZ+dIKfsDstUXZTyieQyJAXxKhKgs=;
+	s=k20201202; t=1709956530;
+	bh=cqxnRONxFqoFUHeLlMQOk9RLWMYU12XehXtvW+dv3SU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=s6mxlKcEO3RUzgQZWn0RN/W6UcxtHg30CUOClNGr73QMj1WK37AvChQRr34XZDDaK
-	 qk7Oy4qCiKr8aRUlJNhN5vTMuY2eoVxluC0CBDfXUc/Z9e3ZcjTzeZ/ny1hVIblpar
-	 KEU4z7xWkGQFBim7gvte625k1YRTKuNexRw+Ef1/mTyFR6kYGAR0Edsjh83qLCmz9k
-	 faPux9L1XnDEOi0FmcF5VwmVWtI91w1ahyoa87u66UT3B+icAWndEnYac5RqvJ4b9H
-	 wCn0rYkDbEi1Y0rUBjDbgolrPueD4IGciIHfQ9xfWAqr3gn72DLImByxpNQDV7DBw/
-	 L3uEhl0WzJjRw==
-Date: Fri, 8 Mar 2024 19:52:19 -0800
+	b=sM4Qs9ETo7lFcytqB+dUZRGcitywoe5QpVnTaB+Gb1qLUPghLmhmX6uZfF9Q9SspY
+	 49vo6v5lhGzBOKbolRDTxPweK0n5BUYO57gIfpAYlCTOfvJPO+tZ2/4F68jvFF6YAh
+	 Zv+mdyJWhO+n/rrHFMigEPhNepDiOhnBwNtlR6p4/4QoL+KiOY0nV7y/baUdeJJ9is
+	 MmMCG33JFuzorRhylVORKkJticmBJ0FiYHvRzRt8n6sGT4jesrgcS2EElPCpeKfPmN
+	 EFu6qHhJsSdjnqOz+kgjP7WO+fmojNwH2taMyHFfIT0WFlkmXubUw6TYcMxpdORLul
+	 wN9zMfntaM78Q==
+Date: Fri, 8 Mar 2024 19:55:29 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: Daniil Dulov <d.dulov@aladdin.ru>, Doug Berger <opendmb@gmail.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- lvc-project@linuxtesting.org
-Subject: Re: [PATCH] net: phy: mdio-bcm-unimac: Cast denominator to unsigned
- long to avoid overflow
-Message-ID: <20240308195219.542550eb@kernel.org>
-In-Reply-To: <5592aeca-608f-4817-8848-99deb2815ddc@broadcom.com>
-References: <20240307131947.13133-1-d.dulov@aladdin.ru>
-	<5592aeca-608f-4817-8848-99deb2815ddc@broadcom.com>
+To: Leone Fernando <leone4fernando@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ dsahern@kernel.org, willemb@google.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/4] net: dst_cache: add input_dst_cache API
+Message-ID: <20240308195529.57b1a4fa@kernel.org>
+In-Reply-To: <20240307171202.232684-3-leone4fernando@gmail.com>
+References: <20240307171202.232684-1-leone4fernando@gmail.com>
+	<20240307171202.232684-3-leone4fernando@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,17 +61,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 7 Mar 2024 12:21:26 -0800 Florian Fainelli wrote:
-> On 3/7/2024 5:19 AM, Daniil Dulov wrote:
-> > The expression priv->clk_freq * 2 can lead to overflow that will cause
-> > a division by zero. So, let's cast it to unsigned long to avoid it.  
-> 
-> It will not in real life because the maximum clock frequency is 250MHz, 
-> but it also does not hurt.
+On Thu,  7 Mar 2024 18:12:00 +0100 Leone Fernando wrote:
+> +static inline u64 create_dst_cache_key_ip4(const struct sk_buff *skb)
+> +{
+> +	struct iphdr *iphdr = ip_hdr(skb);
+> +
+> +	return (((u64)iphdr->daddr) << 8) | iphdr->tos;
 
-If that's the case - Daniil, could you respin against net-next without
-the Fixes tag? Otherwise it'll cause a conflict, if it's not a real
-issue no point creating an extra hassle.
+Sparse complains that you're ignoring bitwise types:
+
+include/net/dst_cache.h:170:19: warning: cast from restricted __be32
+include/net/dst_cache.h:170:19: warning: cast from restricted __be32
 -- 
 pw-bot: cr
 
