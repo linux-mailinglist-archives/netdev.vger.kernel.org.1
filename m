@@ -1,158 +1,108 @@
-Return-Path: <netdev+bounces-78975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6C10877220
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 17:02:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0944877266
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 18:09:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FCD41F21040
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 16:02:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0433B1C211C2
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 17:09:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 245A644C89;
-	Sat,  9 Mar 2024 16:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 973FE1F614;
+	Sat,  9 Mar 2024 17:09:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="pYrS0Ln3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75FCB2030B
-	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 16:02:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F83015BE
+	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 17:09:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710000154; cv=none; b=eb63yiqBRAZKY12sDRr2K44+ZWckmSCycnhVMj917mk5FXBi26SfpQgJ7FVYM6SN4K8NlaHPdMnbXXzCrxv0sI+HzPcB5XMiZVPg8klWIZetd9gMTWPnN89FIcxjBISLGqEQb2zwnpi3E57VJc/NbRpbw+NmzF/tzyE4iDU3kNk=
+	t=1710004175; cv=none; b=XiohwcQyT14KhDtZetPvVL6JSZNmzt/4luU6o1ksO+K3WG4KztjI76/I4/qAis+btD/nZA3s7IiJR87EqR6/xulMV4Gb5kRiDX2X3C1JchtbFJxz4ystOO/IUnlqnjztlDPAf8xL+Fx02StjM07RpWyPn/JFX8MF66E7QkGdm0Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710000154; c=relaxed/simple;
-	bh=IlNrku6gx4ITKYYDutuHTeSlU+G5G6ZUR+kyBRWRaxU=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=OchLYQsSYioP6OI7OkO1rIiiPHSHeXR5nZWJSZS9iwz6aTRyQw/5ElKGSYTVjaDT+JoGVkBqzBUAAkMIa4AQ9+4pqBIRrldZ+lwl1K4HFFVDkeu4FmfMF/sPy/2Ka6NklHWor2R9sckk0xt7RjU1c1Pr1eIjOL2+PxiAJv29QIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-36512fcf643so29149425ab.1
-        for <netdev@vger.kernel.org>; Sat, 09 Mar 2024 08:02:32 -0800 (PST)
+	s=arc-20240116; t=1710004175; c=relaxed/simple;
+	bh=3LtTJJAKkMJi9k3pEnpGML//0wkNiAxpHKQG7njIq9Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bKMZEO03eXJ3vBTH+aK9PwsEAQoZhUW7mNk/hUYlqJ6dAE7+PvWp/QWv4RdZyEPFxuSsizYd9XKSK9C99LJpjcIJ7aXPkOzUQw+iQfFSnOhVtzP/3Nz2V0Zvo6kbgfCMIKw1GmZjBIei72Fa3MSxetktXjFcD8g/C1w38iKMh3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=pYrS0Ln3; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6e6092a84f4so2393087b3a.0
+        for <netdev@vger.kernel.org>; Sat, 09 Mar 2024 09:09:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1710004173; x=1710608973; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SHqXXAD6Bd7td3uOYjMjmxkJMM3dnF/Fwmd9qHYiur0=;
+        b=pYrS0Ln3FOrgu1/Ay3ClydxWzWAzU7HqtDMvH1aWIND0MUnGCW58TcxF1EtXfRIKG+
+         +T0t1YaYbzDzLn3Q6G+VN0tuKRbPFfSd988coqYh15IXpUfJySE9JbiSAn6i76SGBQMc
+         8R3hPIXDVD5EGpUiTyygvghwQCoKKXHPaaluu2JssS5H8OkAv8vqc9Jx1JnZ7Z536NhL
+         aAuNhBu+ZGY/W+Pm5xeEv5vHmQTzTNFE+WwMZHfE15LOTXEM4VR2AMH6luMo0TX47slD
+         K6TWeyEFYY1dBsTaSQ9Q+JFWgaLmjbcv8yzdJXDMhxQl2na9lyauNpNJEQlVLKvYkD7t
+         zBhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710000151; x=1710604951;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DP1DpJ1i+QrXcPetYGEJb/XTbYsSwgXExEyAIL0rh6k=;
-        b=qrJoFA0DTSDsYjNNTEkfCE63Qg9ODW3PmzRggWbX0ejmswKgTpnuuKvZGvGrQ1GF7F
-         z0RIUZNhqkjresHuq7mny3hfB62adOapheomiK1WuQ4J3MUXwL7wtpVjb/CUac7Jcq+F
-         OW3+QbjilwBlJEWP2iZU0dckkDlt/6WyG99x2OQuLHWsawp7O99jFtBNZoAZRUohiYxC
-         ck3YyQ3wN7lBHCfpbBA/yD1MLA3PGw/BawqgGM4k4ib9sLnFUFu5IaB8NQJ7hhivbWyo
-         dRY9FBFxsa4zhWu6GhlWiL892GfsQD5f3K7dYpEZO6FJcrn9uHyz2u4vz9Knvap04D3G
-         BrWg==
-X-Forwarded-Encrypted: i=1; AJvYcCWUSjdUrIOaJ+a5FYW39k9jPWn4eoK6AO5sZLiROkTGIGPxB3vEA7sIVjO6DgwsyZYoIoUO245+MYRBV1itGDEGpREslQ2G
-X-Gm-Message-State: AOJu0YyKjvwjQxD8QJ7irqwMPeW/VcmwjxoiGjvyO9bjSrkdmFnwNykk
-	KgfmXWs8hUN3mrN4uaLgav/Z6boVqESdA/3I83Htel+/eBccqpbCuKi4+CCMpAE1fAcJX7AZQZX
-	J3nFIHX9oe/EPjPQWyux/5gcWqaUAt+pZWmJst7mGc+aZ6LEzMG78EgU=
-X-Google-Smtp-Source: AGHT+IEnqyTXCKSaxdQhDPFxJ8eQG150S4a4p8lsjTHwF8btT+LJXq03mW7lZ6jdcK/owA+1HcGU/bIv3caTBoQsj1oarwHDYhAI
+        d=1e100.net; s=20230601; t=1710004173; x=1710608973;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SHqXXAD6Bd7td3uOYjMjmxkJMM3dnF/Fwmd9qHYiur0=;
+        b=qwTAYISWEIvPzhTBFJAeeIsVyDmo+/3bSGkuWg9luCbocT0TEBFOiXaR8WITa4oG4w
+         3EkaAeg5WvYHBTi87NrJoyV7TwsvBWS6G7ACZpsdJyfe6f/colMLQTpiuYO1vLD1H4Jw
+         afy9zQLPBUvqBURxoOGAvyn5E+tzylxXhVXMKMc84J5+fSmHP4x9g9X9bCBKCQ4I6m9C
+         DuTv2xBy+u4RKMN2pkYYy70IwzDdmdzXRMc9E+/VG9XF801MjkBQx3Dgl5wqemRf5Y1d
+         fONYXbF4Lp0Wup16rjdLmqLlq6t50cy6pejKCgazRsDRCDlYDA+byIxwwF9inpKed5bf
+         wuxQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWA0QiAVf1BjeL51qmUygSGG4YPDvhSX3o+0hPaGsjvXDsMruEersOObn2yEkWkE8fylgaQHLr2HHVy+HlG3RYnVQA4F0QP
+X-Gm-Message-State: AOJu0YwFMmBsY8wIuOBWfCZZixXsf6Fj49u8pD0WI0Z10SE8gHFLvNGv
+	/5ulh7+1l3/SPbE+CMLUjWNUBz0M0F0dA7VG8B0g+NZum87PPCGnfOeBDApkv+g=
+X-Google-Smtp-Source: AGHT+IF7Y1eftpCPunNKY4Vn+a7kmwiaPKByHoRXD9GXTyR07mOXokjvYu/FJibk+pnPc32Q/3RgTg==
+X-Received: by 2002:a05:6a00:812:b0:6e6:3920:7a26 with SMTP id m18-20020a056a00081200b006e639207a26mr2502722pfk.3.1710004173335;
+        Sat, 09 Mar 2024 09:09:33 -0800 (PST)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id u16-20020aa78390000000b006e5dc1b4866sm1500380pfm.144.2024.03.09.09.09.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Mar 2024 09:09:33 -0800 (PST)
+Date: Sat, 9 Mar 2024 09:09:31 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Joe Perches <joe@perches.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>, Jiri Pirko <jiri@resnulli.us>,
+ Ivan Vecera <ivecera@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Andrew Lunn <andrew@lunn.ch>, Eric Dumazet <edumazet@google.com>, Florian
+ Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>, Simon
+ Horman <horms@kernel.org>, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/1] net: bridge: switchdev: Improve error
+ message clarity for switchdev_port_obj_add/del_deffered operations
+Message-ID: <20240309090931.16d8d58a@hermes.local>
+In-Reply-To: <4f38500b4d798ad8effd59fef41353439f76fec3.camel@perches.com>
+References: <20240308104725.2550469-1-o.rempel@pengutronix.de>
+	<4f38500b4d798ad8effd59fef41353439f76fec3.camel@perches.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d8e:b0:365:7607:3f4b with SMTP id
- h14-20020a056e021d8e00b0036576073f4bmr61509ila.2.1710000151675; Sat, 09 Mar
- 2024 08:02:31 -0800 (PST)
-Date: Sat, 09 Mar 2024 08:02:31 -0800
-In-Reply-To: <00000000000088981b06133bc07b@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000009b652f06133c6f27@google.com>
-Subject: Re: [syzbot] [net?] kernel BUG in __nla_validate_parse
-From: syzbot <syzbot+65bb09a7208ce3d4a633@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, petrm@nvidia.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-syzbot has found a reproducer for the following issue on:
+On Sat, 09 Mar 2024 06:26:28 -0800
+Joe Perches <joe@perches.com> wrote:
 
-HEAD commit:    d7e14e534493 Merge tag 'mlx5-socket-direct-v3' of git://gi..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1179b11e180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=63afafeedf00ef8f
-dashboard link: https://syzkaller.appspot.com/bug?extid=65bb09a7208ce3d4a633
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=113a3399180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=156404d6180000
+> > +		problem = "Attempted operation is undefined, indicating a "
+> > +			  "possible programming error.\n";  
+> 
+> My preference would be to write
+> 		problem = "Attempted operation is undefined indicating a possible programming error\n";
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6e15425ce891/disk-d7e14e53.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/290e40cea50b/vmlinux-d7e14e53.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/099bac6ed92e/bzImage-d7e14e53.xz
+ETOOWORDY.
+Be concise please.
+		problem = "Operations is undefined\n";
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+65bb09a7208ce3d4a633@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-kernel BUG at lib/nlattr.c:411!
-invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
-CPU: 1 PID: 5074 Comm: syz-executor243 Not tainted 6.8.0-rc7-syzkaller-02431-gd7e14e534493 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-RIP: 0010:validate_nla lib/nlattr.c:411 [inline]
-RIP: 0010:__nla_validate_parse+0x2f61/0x2f70 lib/nlattr.c:635
-Code: 48 8b 4c 24 18 80 e1 07 38 c1 0f 8c e0 f7 ff ff 48 8b 7c 24 18 e8 ff 0e 1d fd e9 d1 f7 ff ff e8 d5 c2 91 06 e8 50 64 ba fc 90 <0f> 0b 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 90 90 90 90 90 90 90
-RSP: 0018:ffffc900041b6ec0 EFLAGS: 00010293
-RAX: ffffffff84d90ad0 RBX: ffffffff8caa11e0 RCX: ffff8880283bd940
-RDX: 0000000000000000 RSI: 000000000000004e RDI: 0000000000000015
-RBP: ffffc900041b7100 R08: ffffffff84d8df5b R09: 0000000000000000
-R10: ffffc900041b71a0 R11: fffff52000836e46 R12: 0000000000000008
-R13: 1ffff11003d97c83 R14: 000000000000004e R15: 0000000000000008
-FS:  0000555556b10380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000045ad50 CR3: 000000007aa22000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __nla_parse+0x40/0x60 lib/nlattr.c:732
- __nlmsg_parse include/net/netlink.h:756 [inline]
- nlmsg_parse include/net/netlink.h:777 [inline]
- rtm_del_nexthop+0x257/0x6d0 net/ipv4/nexthop.c:3256
- rtnetlink_rcv_msg+0x89b/0x10d0 net/core/rtnetlink.c:6595
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2556
- netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
- netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
- netlink_sendmsg+0x8e0/0xcb0 net/netlink/af_netlink.c:1902
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:745
- ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
- ___sys_sendmsg net/socket.c:2638 [inline]
- __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
- do_syscall_64+0xf9/0x240
- entry_SYSCALL_64_after_hwframe+0x6f/0x77
-RIP: 0033:0x7f70bac1d369
-Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffcffdc2f38 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007ffcffdc3108 RCX: 00007f70bac1d369
-RDX: 0000000000000000 RSI: 0000000020000640 RDI: 0000000000000003
-RBP: 00007f70bac90610 R08: 0000000000000000 R09: 00007ffcffdc3108
-R10: 00007f70bac589e3 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007ffcffdc30f8 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:validate_nla lib/nlattr.c:411 [inline]
-RIP: 0010:__nla_validate_parse+0x2f61/0x2f70 lib/nlattr.c:635
-Code: 48 8b 4c 24 18 80 e1 07 38 c1 0f 8c e0 f7 ff ff 48 8b 7c 24 18 e8 ff 0e 1d fd e9 d1 f7 ff ff e8 d5 c2 91 06 e8 50 64 ba fc 90 <0f> 0b 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 90 90 90 90 90 90 90
-RSP: 0018:ffffc900041b6ec0 EFLAGS: 00010293
-RAX: ffffffff84d90ad0 RBX: ffffffff8caa11e0 RCX: ffff8880283bd940
-RDX: 0000000000000000 RSI: 000000000000004e RDI: 0000000000000015
-RBP: ffffc900041b7100 R08: ffffffff84d8df5b R09: 0000000000000000
-R10: ffffc900041b71a0 R11: fffff52000836e46 R12: 0000000000000008
-R13: 1ffff11003d97c83 R14: 000000000000004e R15: 0000000000000008
-FS:  0000555556b10380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000045ad50 CR3: 000000007aa22000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
