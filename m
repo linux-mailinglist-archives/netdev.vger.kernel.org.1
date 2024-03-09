@@ -1,187 +1,136 @@
-Return-Path: <netdev+bounces-78887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CDFD876E19
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 01:28:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE352876E32
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 01:38:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85A0B1C2205A
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 00:28:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A2D9D1C21BCC
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 00:38:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71AE215B1;
-	Sat,  9 Mar 2024 00:27:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56451810;
+	Sat,  9 Mar 2024 00:38:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cKLX+2Aa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iX3euKuv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE7B837A
-	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 00:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FABE627;
+	Sat,  9 Mar 2024 00:38:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709944075; cv=none; b=XQxO4s0kQyhRDsCNQUa18cUVTqdKMBtYbAyLNoRNJBc4gwXWeqKdU0G/Eiaqn2PJOGNLrMAy4RZaew8BKlgraacUI9EVAAEJlacYIHoHtcsBiE7JiU/Qw1JWL2C9taFYc3Cr8+HTi83iufCtGs8WBUFX6It7hkEB5gv4Nw+EfaQ=
+	t=1709944720; cv=none; b=C4rAAbYrxOQ3E996sRms11D8DcNgXRlzQK3CgPzT4u4km940MetbGI+ATlHaGSfGFOGJT+ru/vwKJaBXkDDk8muii+m9ETTN/0e/+O5Ua4y1QKNjqlgah+CQn95ZpYJzq5QCqMf759NAnZElOxvF2pGy4HRhrqSFIXBGmjl5Oc8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709944075; c=relaxed/simple;
-	bh=UAHNOoQOfnXGU4ynjW3Di4sMLSMOx0hwkdhyKrO246c=;
+	s=arc-20240116; t=1709944720; c=relaxed/simple;
+	bh=7lbVqSoXTt3ZWFzGFPIOjaRutUv/QCs6THdS8lLjyNs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lqDwmq3HBl2U1Qq3QzEIZs6nAUt9PyQk56XZxIW1NRgr54+jTArFOdqTS98ulJK47W+Gpo88qD3PB+5cP93EQhBtnFeYQGLHVghAdsUaXx8+FIovfs6f2wYvvnq68kzjv23VlqYfNYtLoqRhc1KSYsCZX64I1he9DMH+26ILxyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cKLX+2Aa; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a44d084bfe1so174813566b.1
-        for <netdev@vger.kernel.org>; Fri, 08 Mar 2024 16:27:52 -0800 (PST)
+	 To:Cc:Content-Type; b=BDDAi+x2Ah199kus9j89euacz6YmFvzLskCX7u7e4lLxlSbNPPE068Sj5JLaJ1Ocfokcy9aBbKGzHuSzvdLohWNEBs5kIPVK5x0Il+PQ4pvntwV5G6Y+5A1tSEOCDEYBAO2kXBSWdna414KjJHsOO5KWg0EkWQr0wwAUrFHVw90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iX3euKuv; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a44e3176120so360043866b.1;
+        Fri, 08 Mar 2024 16:38:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1709944071; x=1710548871; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1709944717; x=1710549517; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=EWYfh9XoJurOTi8J7CJKHaNZmYFNooi7e3RylW8C//Y=;
-        b=cKLX+2AaXAKsbJm0yJSoV5EfK47mkTHgBxnjzLm3Qi+mbVTJ0/35N0WYiav0SapGJM
-         cDyGrmHJrruoMoMLbe1jOUloQx5t4MAi4aNwOQY0tF21GKFBaIbyB/l1TEL/VySh/Mik
-         uhP1cbY/yn+43G6SGbVcuyZnEEPvvCMiXnZzryMRsh8Odw3H7pu5pO3+Xv/68hE6he8H
-         ZAR9cxuAP0O2ixXqz107LMaGDHHGH3a2etOdS48euG1nmkimVqQO91HOAsFYAgNUbZv7
-         gdlKD2Ge6lIpNV+E+cB7LDUcbiPqA15QcEwaIAxb+3xOnQn/QxOZXkzs8kwfH8dshzUL
-         sTKw==
+        bh=72DcCZF4zzX57IzWh27ui3Nzppo1bro7gcZPjXVNA+s=;
+        b=iX3euKuvBFsuQTJcl3L91GVeXi3QsAMcpy+dPII5FbzUv9Dt/FQR5yKgsSGmTI4/W2
+         0QDBgcgqT6SHktVbVvQnJy8Wkrr9umnNidbas9+kkRDdLKstPA4TKaBcaf3aYnIx9vII
+         6beTTvJ6eD8fUQzcQHVC9tt/XajN3fCoMf/vLOPkErN4a4+1M+4TTsOrpTnWIkg9WWSj
+         E3gARDXGqEND+XmNXw3CXkscJDv1WU9p3HouaCodIBEVkF/kE/s4B9q5Cs7I2YVbT1a1
+         hxl3HVBG85XMuqrmxaXaL8taKTSLhaYUWJJUs1sxJG1sZGE/X+OrhGLvl3R/d1ztWv+Y
+         naDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1709944071; x=1710548871;
+        d=1e100.net; s=20230601; t=1709944717; x=1710549517;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=EWYfh9XoJurOTi8J7CJKHaNZmYFNooi7e3RylW8C//Y=;
-        b=QOwUbt+BVIVFSx0AvevH//V/Mw2PMI3dlErrlUR+JKbLtuJXwGqFJqD74zE6UX+o53
-         +Z/PyfCTy7JFNRfPdu/zyTJepJotG4qm4sVgj1f1Fq3Q/y2ikCMgdTrNCuoFJQTyd6h9
-         8WtHd5GCCxwr1hFaAtRc802TIqZLkdaDLcLQmOBpjvFe7RziN3z7aoU7d0AkTN8sNRPI
-         GsurwarOt0r75YccRZD6q6s2z1wOQEzNuDjqvsj+x/0zYGFMNWoVQ247bV42BWARZvee
-         hd1WEib1cKxduun0TPZqL5Iir99BFhOz1MgGJbzFlu8l9LYn9VexpqtP/TJUbtf45UxB
-         qHZQ==
-X-Gm-Message-State: AOJu0YxccNYglwuEvvjUrl71nD6VDrlfrd+sqQXWqHdF4b3SFq5vmW71
-	BfGu1sI/qnaj0N0vnV649R+RSD9ZoPRSo5QsQ2piatYxTwjZcZ7CcTGuyBy0s8XcliCe5+aU7uZ
-	Ts2ZkG+RUGQfs+j+OmNAEJ2ney6RT/yyNUawx
-X-Google-Smtp-Source: AGHT+IESd1pHYOts43futyrxfMXx/f2edur2d17Kl0AlPQ1Jsil6uEMQ/KupG2jdYDiEzWeJ95HiQuXNh787lBIftRY=
-X-Received: by 2002:a17:906:3c56:b0:a45:b631:1045 with SMTP id
- i22-20020a1709063c5600b00a45b6311045mr133451ejg.21.1709944071018; Fri, 08 Mar
- 2024 16:27:51 -0800 (PST)
+        bh=72DcCZF4zzX57IzWh27ui3Nzppo1bro7gcZPjXVNA+s=;
+        b=shzfuHxNjYBdb3xdieBw5/YNtKQDhAkT3Es8k6UlGsTDGiovCzYwCxTuedB5KukaUz
+         aSmfuWwIU+HwY7A7yovnTlVhjFKPcFZCzKFCeKwzT1LigQ5nI2lHUgcW+9Fd7FiWEF+T
+         ktUblacVNUpG5w6d8BoHLajNi0ia7bPWOUvx2Uua5ZdhkzCgjFGQB6sbj/RFGzYj2WeH
+         VJfRZzVwbsNmPu8nOybRGu94jbSsLZOJjQ+8LRcGioS/fa5DtUST6DRwkjnnvptHnxwj
+         rm5zwvV5edgu2HsUW5MZt5NJ0JyMtgsdx7j3uS/Eb+DquhD0kWHiV3TK29zg15fJNEvJ
+         2tvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV4ZJ0X0VGRfztiN+xDHi1cRSlPAc4FSYTdF+0uxic2vCM9hRrGyWJpxPpWcVJ/JKUXNmZrWJL2JgGmCfv4y+Cb+USJnCWMhEflArFlvMWDaLL6SmNZe+2mtrfTffSxAQ6J6Px4YPIo
+X-Gm-Message-State: AOJu0YycnoliYTksHUd8w36qm9/nYOePeSOQnyXeBt0HAb7unP9Fz20P
+	vaoOuI4Vq89rzStVQbH6yEkSIxZtpyFXEaA/GZVlKX0lfEJZW6LjVHYCR1cr5UCmShs9JJonBCM
+	N++zxLpiqCrPvKNjIbdZlQy2RHr9i37jy22Hgkg==
+X-Google-Smtp-Source: AGHT+IEv68BJOUuaGhqxVRkKxn+KfDlSUbKgIqshiPy4e7wU2I/4jkYErNIyGNgTBmrJ96YLJI5qj0LCOHE4JBxVLEQ=
+X-Received: by 2002:a17:906:d1db:b0:a43:fd9d:a64 with SMTP id
+ bs27-20020a170906d1db00b00a43fd9d0a64mr125290ejb.31.1709944716757; Fri, 08
+ Mar 2024 16:38:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240305020153.2787423-1-almasrymina@google.com>
- <20240305020153.2787423-2-almasrymina@google.com> <54891f27-555a-4ed1-b92f-668813c18c37@davidwei.uk>
-In-Reply-To: <54891f27-555a-4ed1-b92f-668813c18c37@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 8 Mar 2024 16:27:39 -0800
-Message-ID: <CAHS8izPJbLSgvXn7pA6OQ89=dOCoXYYtTvM=7-0_MB2NxucazA@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 01/15] queue_api: define queue api
-To: David Wei <dw@davidwei.uk>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>
+References: <20240307090732.56708-1-kerneljasonxing@gmail.com>
+ <20240307093310.GI4420@breakpoint.cc> <CAL+tcoAPi+greENaD8X6Scc97Fnhiqa62eUSn+JS98kqY+VA6A@mail.gmail.com>
+ <20240307120054.GK4420@breakpoint.cc> <CAL+tcoBqBaHxSU9NQqVxhRzzsaJr4=0=imtyCo4p8+DuXPL5AA@mail.gmail.com>
+ <20240307141025.GL4420@breakpoint.cc> <CAL+tcoDUyFU9wT8gzOcDqW7hWfR-7Sg8Tky9QsY_b05gP4uZ1Q@mail.gmail.com>
+ <20240308224657.GO4420@breakpoint.cc>
+In-Reply-To: <20240308224657.GO4420@breakpoint.cc>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 9 Mar 2024 08:37:59 +0800
+Message-ID: <CAL+tcoDv_tOAdjwpCCuBkgSCAn4rj4wnTWTB17DY0RpXnQ=p5w@mail.gmail.com>
+Subject: Re: [PATCH net-next] netfilter: conntrack: avoid sending RST to reply
+ out-of-window skb
+To: Florian Westphal <fw@strlen.de>
+Cc: edumazet@google.com, pablo@netfilter.org, kadlec@netfilter.org, 
+	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 8, 2024 at 3:48=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+On Sat, Mar 9, 2024 at 6:47=E2=80=AFAM Florian Westphal <fw@strlen.de> wrot=
+e:
 >
-> On 2024-03-04 18:01, Mina Almasry wrote:
-> > This API enables the net stack to reset the queues used for devmem.
+> Jason Xing <kerneljasonxing@gmail.com> wrote:
+> > > connection.  Feel free to send patches that replace drop with -accept
+> > > where possible/where it makes sense, but I don't think the
+> > > TCP_CONNTRACK_SYN_SENT one can reasonably be avoided.
 > >
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> >
-> > ---
-> >  include/linux/netdevice.h | 24 ++++++++++++++++++++++++
-> >  1 file changed, 24 insertions(+)
-> >
-> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> > index c41019f34179..3105c586355d 100644
-> > --- a/include/linux/netdevice.h
-> > +++ b/include/linux/netdevice.h
-> > @@ -1435,6 +1435,20 @@ struct netdev_net_notifier {
-> >   *                      struct kernel_hwtstamp_config *kernel_config,
-> >   *                      struct netlink_ext_ack *extack);
-> >   *   Change the hardware timestamping parameters for NIC device.
-> > + *
-> > + * void *(*ndo_queue_mem_alloc)(struct net_device *dev, int idx);
-> > + *   Allocate memory for an RX queue. The memory returned in the form =
-of
-> > + *   a void * can be passed to ndo_queue_mem_free() for freeing or to
-> > + *   ndo_queue_start to create an RX queue with this memory.
-> > + *
-> > + * void      (*ndo_queue_mem_free)(struct net_device *dev, void *);
-> > + *   Free memory from an RX queue.
-> > + *
-> > + * int (*ndo_queue_start)(struct net_device *dev, int idx, void *);
-> > + *   Start an RX queue at the specified index.
-> > + *
-> > + * int (*ndo_queue_stop)(struct net_device *dev, int idx, void **);
-> > + *   Stop the RX queue at the specified index.
-> >   */
-> >  struct net_device_ops {
-> >       int                     (*ndo_init)(struct net_device *dev);
-> > @@ -1679,6 +1693,16 @@ struct net_device_ops {
-> >       int                     (*ndo_hwtstamp_set)(struct net_device *de=
-v,
-> >                                                   struct kernel_hwtstam=
-p_config *kernel_config,
-> >                                                   struct netlink_ext_ac=
-k *extack);
-> > +     void *                  (*ndo_queue_mem_alloc)(struct net_device =
-*dev,
-> > +                                                    int idx);
-> > +     void                    (*ndo_queue_mem_free)(struct net_device *=
-dev,
-> > +                                                   void *queue_mem);
-> > +     int                     (*ndo_queue_start)(struct net_device *dev=
-,
-> > +                                                int idx,
-> > +                                                void *queue_mem);
-> > +     int                     (*ndo_queue_stop)(struct net_device *dev,
-> > +                                               int idx,
-> > +                                               void **out_queue_mem);
-> >  };
+> > Oh, are you suggesting replacing NF_DROP with -NF_ACCEPT in
+> > nf_conntrack_dccp_packet()?
 >
-> I'm working to port bnxt over to using this API. What are your thoughts
-> on maybe pulling this out and use bnxt to drive it?
+> It would be more consistent with what tcp and sctp trackers are
+> doing, but this should not matter in practice (the packet is malformed).
+
+Okay, I will take some time to check the sctp part. BTW, just like one
+of previous emails said, I noticed there are two points in DCCP part
+which is not consistent with TCP part, so I submitted one simple patch
+[1] to do it.
+
+[1]: https://lore.kernel.org/all/20240308092915.9751-1-kerneljasonxing@gmai=
+l.com/
+
 >
+> > > +       case NFCT_TCP_INVALID: {
+> > > +               verdict =3D -NF_ACCEPT;
+> > > +               if (ct->status & IPS_NAT_MASK)
+> > > +                       res =3D NF_DROP; /* skb would miss nat transf=
+ormation */
+> >
+> > Above line, I guess, should be 'verdict =3D NF_DROP'?
+>
+> Yes.
+>
+> > Great! I think your draft patch makes sense really, which takes NAT
+> > into consideration.
+>
+> You could submit this officially and we could give it a try and see if
+> anyone complains down the road.
 
-Sure thing, go for it! Thanks!
+Great :)
 
-I think we've going to have someone from GVE working on this in
-parallel. I see no issue with us aligning on what the core-net ndos
-would look like and implementing those in parallel for both drivers.
-We're not currently planning to make any changes to the ndos besides
-applying Jakub's feedback from this thread. If you find a need to
-deviate from this, let us know and we'll work on staying in line with
-that. Thanks!
-
---=20
 Thanks,
-Mina
+Jason
 
