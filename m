@@ -1,241 +1,136 @@
-Return-Path: <netdev+bounces-78919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B81F876F64
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 07:33:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CED34876F70
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 07:58:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A41B1F21A85
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 06:33:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B1DD281E74
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 06:58:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CD382E62A;
-	Sat,  9 Mar 2024 06:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F401F2E64C;
+	Sat,  9 Mar 2024 06:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="lhWd6mhP"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173A02103
-	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 06:33:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F42374C2;
+	Sat,  9 Mar 2024 06:58:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709965984; cv=none; b=XWo2Xak746DNmG1io4Suvd++zQfA2v/x/UYzoNp+75offPJxP39/i1AN48nFo0CJajoYzIInTPVXUhMdUqpZWnzjUWoQvXaKaNfHQTo3moWk7Id97YmFnerG+BBrDX9tbLX6xBDBkZaC2hRQA0yT3A92fTRVDYBUYGaHuxbnilw=
+	t=1709967484; cv=none; b=byc5gqEESnJ7411+tNCgRkqEfsP6yjkqZIq9ElOgou2BA+ERU5BVlDFQa0elGbinqVx7yGgUsAEws2o/8WUGWJmmxCcWIZpa/uhJfn1vl3bCA5quUKH9NATNAShKET4pCXYlOJE9DlYxNibEBP5+znG9u5ZFtdqeaEtTgIL8vm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709965984; c=relaxed/simple;
-	bh=FpcLSjcTErLbde7+UZnGYmtaYcUGHirL4BhI2VlIiY0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=BfymUxoUsqoJWHS1YGNj/AlwD+8BND5PfqxaI7/kcWcXw2El+dUsJ9SldHHN2QXOrkDRyTzAVZ50fiV3yME4pnPgGdkD5Nck1F7arjWEF3hcQaumblibN451CGKl8ecwiB7emaDDLXOgvNW2n9+2q+11OpIJzNhMrCcHLMlXxd8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1riqG9-0007rY-3T; Sat, 09 Mar 2024 07:32:41 +0100
-Received: from [2a0a:edc0:0:1101:1d::ac] (helo=dude04.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1riqG7-005HSQ-4S; Sat, 09 Mar 2024 07:32:39 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1riqG7-003hzo-0F;
-	Sat, 09 Mar 2024 07:32:39 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Jiri Pirko <jiri@resnulli.us>,
-	Ivan Vecera <ivecera@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Simon Horman <horms@kernel.org>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v3 1/1] net: bridge: switchdev: Improve error message clarity for switchdev_port_obj_add/del_deffered operations
-Date: Sat,  9 Mar 2024 07:32:38 +0100
-Message-Id: <20240309063238.884067-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1709967484; c=relaxed/simple;
+	bh=raVTJLYBovePc15pim3NUHB9gv1MSvmBUjvjJt/4+tg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LA6lSvmzveHPY8Dhc6pt8Xdub8wfNVhWX+RYH+qO2g5bEEM2ppdn9wEsdcG2kkCUDyxdYCUPqly78LSo6Muf5Ns9bIRcEBLn8OYSs6Ux8153q+VQ4t5/5DYzGkz1Lnhg54UxalewXDl4DdJ8Ne7ylhxLcrIhni1yzZlziliDENg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=lhWd6mhP; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1709967472; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=7GHv9Nn9cqN30tZnE0kKtMZjGgh2K78FJqXybMmv6Kc=;
+	b=lhWd6mhPVfXLg8c8uGRdYJZPhQ2COjfnkKVNQpDnYc4ef3zzESKztLq4DgZ/7EjveLcaxoiUIEIJtlYM7h7aowI2tuE7pmj0UrvdRRmxmZKD0JNeht2WuqV+0jCCbjQBgGQIFh1lp3xOXjgcr7moiF5D8zqvCMn6MvszZiuCplM=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W24RV6B_1709967469;
+Received: from 30.13.153.107(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W24RV6B_1709967469)
+          by smtp.aliyun-inc.com;
+          Sat, 09 Mar 2024 14:57:51 +0800
+Message-ID: <dd28db06-22aa-42ef-8e82-f8bb08363933@linux.alibaba.com>
+Date: Sat, 9 Mar 2024 14:57:48 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 01/11] net/smc: adapt SMC-D device dump for
+ Emulated-ISM
+To: Jan Karcher <jaka@linux.ibm.com>, wintera@linux.ibm.com,
+ twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+ agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240307095536.29648-1-guwen@linux.alibaba.com>
+ <20240307095536.29648-2-guwen@linux.alibaba.com>
+ <1cf8649c-1c09-4076-8910-071cf6b5ea21@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <1cf8649c-1c09-4076-8910-071cf6b5ea21@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Enhance the error reporting mechanism in the switchdev framework to
-provide more informative and user-friendly error messages.
 
-Following feedback from users struggling to understand the implications
-of error messages like "failed (err=-28) to add object (id=2)", this
-update aims to clarify what operation failed and how this might impact
-the system or network.
 
-With this change, error messages now include a description of the failed
-operation, the specific object involved, and a brief explanation of the
-potential impact on the system. This approach helps administrators and
-developers better understand the context and severity of errors,
-facilitating quicker and more effective troubleshooting.
+On 2024/3/8 20:27, Jan Karcher wrote:
+> 
+> 
+> On 07/03/2024 10:55, Wen Gu wrote:
+>> The introduction of Emulated-ISM requires adaptation of SMC-D device
+>> dump. Software implemented non-PCI device (loopback-ism) should be
+>> handled correctly and the CHID reserved for Emulated-ISM should be got
+>> from smcd_ops interface instead of PCI information.
+>>
+>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>> ---
+>>   net/smc/smc_ism.c | 13 ++++++++++---
+>>   1 file changed, 10 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
+>> index ac88de2a06a0..b6eca4231913 100644
+>> --- a/net/smc/smc_ism.c
+>> +++ b/net/smc/smc_ism.c
+>> @@ -252,12 +252,11 @@ static int smc_nl_handle_smcd_dev(struct smcd_dev *smcd,
+>>       char smc_pnet[SMC_MAX_PNETID_LEN + 1];
+>>       struct smc_pci_dev smc_pci_dev;
+>>       struct nlattr *port_attrs;
+>> +    struct device *device;
+>>       struct nlattr *attrs;
+>> -    struct ism_dev *ism;
+>>       int use_cnt = 0;
+>>       void *nlh;
+>> -    ism = smcd->priv;
+>>       nlh = genlmsg_put(skb, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg_seq,
+>>                 &smc_gen_nl_family, NLM_F_MULTI,
+>>                 SMC_NETLINK_GET_DEV_SMCD);
+>> @@ -272,7 +271,15 @@ static int smc_nl_handle_smcd_dev(struct smcd_dev *smcd,
+>>       if (nla_put_u8(skb, SMC_NLA_DEV_IS_CRIT, use_cnt > 0))
+>>           goto errattr;
+>>       memset(&smc_pci_dev, 0, sizeof(smc_pci_dev));
+>> -    smc_set_pci_values(to_pci_dev(ism->dev.parent), &smc_pci_dev);
+>> +    device = smcd->ops->get_dev(smcd);
+>> +    if (device->parent)
+>> +        smc_set_pci_values(to_pci_dev(device->parent), &smc_pci_dev);
+>> +    if (smc_ism_is_emulated(smcd)) {
+> 
+> net/smc/smc_ism.c: In function ‘smc_nl_handle_smcd_dev’:
+> net/smc/smc_ism.c:318:13: error: implicit declaration of function ‘smc_ism_is_emulated’ 
+> [-Werror=implicit-function-declaration]
+>    318 |         if (smc_ism_is_emulated(smcd)) {
+>        |             ^~~~~~~~~~~~~~~~~~~
+> 
 
-Example of the improved logging:
+Hi Jan, the function smc_ism_is_emulated() is introduced by this merged patch:
 
-[   70.516446] ksz-switch spi0.0 uplink: Failed to add Port Multicast
-               Database entry (object id=2) with error: -ENOSPC (-28).
-[   70.516446] Failure in updating the port's Multicast Database could
-               lead to multicast forwarding issues.
-[   70.516446] Current HW/SW setup lacks sufficient resources.
+b27696cd8fcc ("net/smc: change the term virtual ISM to Emulated-ISM")
 
-This comprehensive update includes handling for a range of switchdev
-object IDs, ensuring that most operations within the switchdev framework
-benefit from clearer error reporting.
+Could you please check if your code base has this one?
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
-changes v3:
-- fix check patch warnings
-changes v2:
-- make all variables const
-- add Reviewed-by: Simon Horman <horms@kernel.org>
----
- net/switchdev/switchdev.c | 99 +++++++++++++++++++++++++++++++++++++--
- 1 file changed, 95 insertions(+), 4 deletions(-)
+Thanks!
 
-diff --git a/net/switchdev/switchdev.c b/net/switchdev/switchdev.c
-index c9189a970eec3..6488ead9e4645 100644
---- a/net/switchdev/switchdev.c
-+++ b/net/switchdev/switchdev.c
-@@ -244,6 +244,99 @@ static int switchdev_port_obj_notify(enum switchdev_notifier_type nt,
- 	return 0;
- }
- 
-+static void switchdev_obj_id_to_helpful_msg(struct net_device *dev,
-+					    enum switchdev_obj_id obj_id,
-+					    int err, bool add)
-+{
-+	const char *action = add ? "add" : "del";
-+	const char *reason = "";
-+	const char *problem;
-+	const char *obj_str;
-+
-+	switch (obj_id) {
-+	case SWITCHDEV_OBJ_ID_UNDEFINED:
-+		obj_str = "Undefined object";
-+		problem = "Attempted operation is undefined, indicating a possible programming\n"
-+			  "error.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_PORT_VLAN:
-+		obj_str = "VLAN entry";
-+		problem = "Failure in VLAN settings on this port might disrupt network\n"
-+			  "segmentation or traffic isolation, affecting network partitioning.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_PORT_MDB:
-+		obj_str = "Port Multicast Database entry";
-+		problem = "Failure in updating the port's Multicast Database could lead to\n"
-+			  "multicast forwarding issues.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_HOST_MDB:
-+		obj_str = "Host Multicast Database entry";
-+		problem = "Failure in updating the host's Multicast Database may impact multicast\n"
-+			  "group memberships or traffic delivery, affecting multicast\n"
-+			  "communication.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_MRP:
-+		obj_str = "Media Redundancy Protocol configuration for port";
-+		problem = "Failure to set MRP ring ID on this port prevents communication with\n"
-+			  "the specified redundancy ring, resulting in an inability to engage\n"
-+			  "in MRP-based network operations.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_RING_TEST_MRP:
-+		obj_str = "MRP Test Frame Operations for port";
-+		problem = "Failure to generate/monitor MRP test frames may lead to inability to\n"
-+			  "assess the ring's operational integrity and fault response, hindering\n"
-+			  "proactive network management.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_RING_ROLE_MRP:
-+		obj_str = "MRP Ring Role Configuration";
-+		problem = "Improper MRP ring role configuration may create conflicts in the ring,\n"
-+			  "disrupting communication for all participants, or isolate the local\n"
-+			  "system from the ring, hindering its ability to communicate with other\n"
-+			  "participants.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_RING_STATE_MRP:
-+		obj_str = "MRP Ring State Configuration";
-+		problem = "Failure to correctly set the MRP ring state can result in network\n"
-+			  "loops or leave segments without communication. In a Closed state,\n"
-+			  "it maintains loop prevention by blocking one MRM port, while an Open\n"
-+			  "state activates in response to failures, changing port states to\n"
-+			  "preserve network connectivity.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_IN_TEST_MRP:
-+		obj_str = "MRP_InTest Frame Generation Configuration";
-+		problem = "Failure in managing MRP_InTest frame generation can misjudge the\n"
-+			  "interconnection ring's state, leading to incorrect blocking or\n"
-+			  "unblocking of the I/C port. This misconfiguration might result\n"
-+			  "in unintended network loops or isolate critical network segments,\n"
-+			  "compromising network integrity and reliability.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_IN_ROLE_MRP:
-+		obj_str = "Interconnection Ring Role Configuration";
-+		problem = "Failure in incorrect assignment of interconnection ring roles\n"
-+			  "(MIM/MIC) can impair the formation of the interconnection rings.\n";
-+		break;
-+	case SWITCHDEV_OBJ_ID_IN_STATE_MRP:
-+		obj_str = "Interconnection Ring State Configuration";
-+		problem = "Failure in updating the interconnection ring state can lead in\n"
-+			  "case of Open state to incorrect blocking or unblocking of the\n"
-+			  "I/C port, resulting in unintended network loops or isolation\n"
-+			  "of critical network\n";
-+		break;
-+	default:
-+		obj_str = "Unknown object";
-+		problem	= "Indicating a possible programming error.\n";
-+	}
-+
-+	switch (err) {
-+	case -ENOSPC:
-+		reason = "Current HW/SW setup lacks sufficient resources.\n";
-+		break;
-+	}
-+
-+	netdev_err(dev, "Failed to %s %s (object id=%d) with error: %pe (%d).\n%s%s\n",
-+		   action, obj_str, obj_id, ERR_PTR(err), err, problem, reason);
-+}
-+
- static void switchdev_port_obj_add_deferred(struct net_device *dev,
- 					    const void *data)
- {
-@@ -254,8 +347,7 @@ static void switchdev_port_obj_add_deferred(struct net_device *dev,
- 	err = switchdev_port_obj_notify(SWITCHDEV_PORT_OBJ_ADD,
- 					dev, obj, NULL);
- 	if (err && err != -EOPNOTSUPP)
--		netdev_err(dev, "failed (err=%d) to add object (id=%d)\n",
--			   err, obj->id);
-+		switchdev_obj_id_to_helpful_msg(dev, obj->id, err, true);
- 	if (obj->complete)
- 		obj->complete(dev, err, obj->complete_priv);
- }
-@@ -304,8 +396,7 @@ static void switchdev_port_obj_del_deferred(struct net_device *dev,
- 
- 	err = switchdev_port_obj_del_now(dev, obj);
- 	if (err && err != -EOPNOTSUPP)
--		netdev_err(dev, "failed (err=%d) to del object (id=%d)\n",
--			   err, obj->id);
-+		switchdev_obj_id_to_helpful_msg(dev, obj->id, err, false);
- 	if (obj->complete)
- 		obj->complete(dev, err, obj->complete_priv);
- }
--- 
-2.39.2
-
+>> +        smc_pci_dev.pci_pchid = smc_ism_get_chid(smcd);
+>> +        if (!device->parent)
+>> +            snprintf(smc_pci_dev.pci_id, sizeof(smc_pci_dev.pci_id),
+>> +                 "%s", dev_name(device));
+>> +    }
+>>       if (nla_put_u32(skb, SMC_NLA_DEV_PCI_FID, smc_pci_dev.pci_fid))
+>>           goto errattr;
+>>       if (nla_put_u16(skb, SMC_NLA_DEV_PCI_CHID, smc_pci_dev.pci_pchid))
 
