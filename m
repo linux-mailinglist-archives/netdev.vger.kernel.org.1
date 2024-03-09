@@ -1,119 +1,130 @@
-Return-Path: <netdev+bounces-78992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8924B8773C0
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 20:32:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95BFB8773DD
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 21:32:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F9591F21C1D
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 19:32:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1472BB20F01
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 20:32:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1ACA4D112;
-	Sat,  9 Mar 2024 19:32:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B24E37165;
+	Sat,  9 Mar 2024 20:32:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="COoPRRPA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C194A2A;
-	Sat,  9 Mar 2024 19:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551891C3E
+	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 20:32:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710012751; cv=none; b=LRe/I6JingCnY1IElnOz/gyqPrMYrU20wQ5yMZPPKO4J2rK0HK0o9uE3bvPle+yw+XRCaSb2/aSVaQxQAkB8MJmLyxz5V3lEmYk0XAFUtTECs/Gl62G/3OoTD73aOInSEKDigi04P8GrlD703V+FDAW21HnnMdFzz0jdXCxbNPA=
+	t=1710016369; cv=none; b=Q9MoplSqTwNY/BC2WhvWSArLG5OydKLN4DjSoJ44N0bVT/yWzO9CMGnX4tK78MPQ+FIQ+Ux4RGATbuin4lhIyhX2Bx+JVKtFSn9eWB2SoVjred0JsGWkbNHjKZBUzw2If4P0afq7trk9RtLHQz8B6VoC+eR/3OJtyQqEg6nyBec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710012751; c=relaxed/simple;
-	bh=SRqCX+wi8kXyuWq/ek4j/SpJctbAccVgUQ6LEky5W6w=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=LVd6mnk5jSTSfRtWCeHkeS4DLntYZoBSdTlk2EuFkb/Y6SR/66NkYjXsChcvmdUmEd0WZ6DuH7sPjkswY1YaU7LiZ+zH5HkZS3Q29RbgS1IYVx0JQ47ljiod72G/MBiAnekAyOfKuGB2qrQM2aQYO1q4O6Wh6K0gZs70HZvFYEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.79.234) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sat, 9 Mar
- 2024 22:32:21 +0300
-Subject: Re: [net-next] ravb: Correct buffer size to map for R-Car Rx
-To: =?UTF-8?Q?Niklas_S=c3=b6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Biju Das
-	<biju.das.jz@bp.renesas.com>, Claudiu Beznea
-	<claudiu.beznea.uj@bp.renesas.com>, Yoshihiro Shimoda
-	<yoshihiro.shimoda.uh@renesas.com>, <netdev@vger.kernel.org>
-CC: <linux-renesas-soc@vger.kernel.org>
-References: <20240308224237.496924-1-niklas.soderlund+renesas@ragnatech.se>
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Organization: Open Mobile Platform
-Message-ID: <01cb1d2a-626b-c298-2ace-ebbe99ac5cf3@omp.ru>
-Date: Sat, 9 Mar 2024 22:32:20 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1710016369; c=relaxed/simple;
+	bh=Rjri3ieAXjiF3QC4d8XL08f7tFXcsnCGE3JiXZ7x5Pk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MkAd1ad3Roht93VShOujsO19jgYEqlU56KtCpRd2vQdiFSpy+d3i9a1X2QOrHBYhCLaGhYFkx8xGaPjnL2JYAvx3igCYhVbdhai1+QWwgu+AFYITX/Yd6Ph9YVqTvG8jk7ZnLP1LDVIb8Q8PDuJO4J8mRhmmRhIdY5w2qV1K2pU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=COoPRRPA; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-29bd0669781so326580a91.1
+        for <netdev@vger.kernel.org>; Sat, 09 Mar 2024 12:32:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1710016366; x=1710621166; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/OTMXNhmX4O6lceZQYHXvvgYFS14rznJ5JJ4O2NR9B8=;
+        b=COoPRRPAFdy+cz1+6KCb8xTwFCugnIQPeG2yF77/JikCm4CvPPWgheFLlPohShXh6v
+         ofogxqN0z1g4fgZhKjhElx5gnXba/OzYK5hTRcIGLEGzP61NNZzIk8czMXvrLTSpra2I
+         R8gnSqmP1w3hQCMkDvD0aZB9Vf4nb1zgHUSj8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710016366; x=1710621166;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/OTMXNhmX4O6lceZQYHXvvgYFS14rznJ5JJ4O2NR9B8=;
+        b=F8HJUbp/lrDKr74u1c/9ZfK2gsmKqJsiCki++nglhwNt2MuJ5NcEpXWMbOPLepcooq
+         hpjp6XHb39gkOM8+M0qETk3ALNPVdcmgi3tSQeMl7Zp/fTKtthGuPSEWbglw1GAESSiR
+         WI8nWc4O6GUakIEGcuEvnhkb7qDRwriU8OJ/18igFOqi0LSzseQh3xRzkHcgi3zE2/sp
+         bVdGtwt6lo75grZ+FNXQ9lM1BXjHmGlMOKafvIfzTGSuyjf1AciNchdERLIwwnm2d233
+         XB4ewBGPpKcXZhnooEqMG4QQdqzIaysPACR8nciJs+IOt7OaF4V7+mu1PbzEsJhBvqle
+         /NdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7g4bH9lX5dpJOyzeBgrDkfhAciEsRS8gcTgk1uqpRk3CUYRKP0APgMolQTkX0bR4QWz6cZWeEqFtUx86Ad6lAu/MP98yw
+X-Gm-Message-State: AOJu0YyYcEJ31fqyD1S6cu75WcLCycEua9rBwCB6vJmtyOIVLX9c535F
+	j3AhTyCDvDVLvBu9/AknyZO1zr6yp5262g79WpjX1npzBWcun1Z6poY7YI/w4g==
+X-Google-Smtp-Source: AGHT+IGQkvj/tf7BRo0+9QPNS1Oh6nikqb9cyPmTEPrdArJNXrYufFGDu4ArsCBeCVR+xUAj9syNog==
+X-Received: by 2002:a17:90a:1347:b0:29b:7fe8:be84 with SMTP id y7-20020a17090a134700b0029b7fe8be84mr1876129pjf.41.1710016366573;
+        Sat, 09 Mar 2024 12:32:46 -0800 (PST)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id m12-20020a17090a34cc00b0029a8a599584sm1797656pjf.13.2024.03.09.12.32.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 09 Mar 2024 12:32:46 -0800 (PST)
+Date: Sat, 9 Mar 2024 12:32:45 -0800
+From: Kees Cook <keescook@chromium.org>
+To: Simon Horman <horms@kernel.org>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-hardening@vger.kernel.org,
+	Andrew Morton <akpm@linux-foundation.org>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2] overflow: Change DEFINE_FLEX to take __counted_by
+ member
+Message-ID: <202403091230.ACF639521@keescook>
+References: <20240306235128.it.933-kees@kernel.org>
+ <20240308202018.GC603911@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20240308224237.496924-1-niklas.soderlund+renesas@ragnatech.se>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 03/09/2024 19:12:20
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 184058 [Mar 09 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.3
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 9 0.3.9 e923e63e431b6489f12901471775b2d1b59df0ba
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.79.234 in (user)
- b.barracudacentral.org}
-X-KSE-AntiSpam-Info: {Found in DNSBL: 178.176.79.234 in (user)
- dbl.spamhaus.org}
-X-KSE-AntiSpam-Info:
-	d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;omp.ru:7.1.1;178.176.79.234:7.1.2
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.79.234
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/09/2024 19:18:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/9/2024 4:06:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240308202018.GC603911@kernel.org>
 
-On 3/9/24 1:42 AM, Niklas Söderlund wrote:
-
-> When creating a helper to allocate and align an skb one location where
-> the skb data size was updated was missed. This can lead to a warning
-> being printed when the memory is being unmapped as it now always unmap
-> the maximum frame size, instead of the size after it have been
-> aligned.
+On Fri, Mar 08, 2024 at 08:20:18PM +0000, Simon Horman wrote:
+> On Wed, Mar 06, 2024 at 03:51:36PM -0800, Kees Cook wrote:
+> > The norm should be flexible array structures with __counted_by
+> > annotations, so DEFINE_FLEX() is updated to expect that. Rename
+> > the non-annotated version to DEFINE_RAW_FLEX(), and update the
+> > few existing users.
+> > 
+> > Signed-off-by: Kees Cook <keescook@chromium.org>
 > 
-> This was correctly done for RZ/G2L but missed for R-Car.
+> Hi Kees,
 > 
-> Fixes: cfbad64706c1 ("ravb: Create helper to allocate skb and align it")
-> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+> I'm unclear what this is based on, as it doesn't appear to apply
+> cleanly to net-next or the dev-queue branch of the iwl-next tree.
+> But I manually applied it to the latter and ran some checks.
 
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+It was based on v6.8-rc2, but it no longer applies cleanly to iwl-next:
+https://lore.kernel.org/linux-next/20240307162958.02ec485c@canb.auug.org.au/
 
-[...]
+Is this something iwl-next can take for the v6.9 merge window? I can
+send a rebased patch if that helps?
 
-MBR, Sergey
+> > @@ -396,9 +396,9 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
+> >   * @name: Name for a variable to define.
+> >   * @member: Name of the array member.
+> >   * @count: Number of elements in the array; must be compile-time const.
+> > - * @initializer: initializer expression (could be empty for no init).
+> > + * @initializer...: initializer expression (could be empty for no init).
+> 
+> Curiously kernel-doc --none seems happier without the line above changed.
 
+I've fixed this up too:
+https://lore.kernel.org/linux-next/202403071124.36DC2B617A@keescook/
+
+-- 
+Kees Cook
 
