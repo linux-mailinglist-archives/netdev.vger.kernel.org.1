@@ -1,56 +1,59 @@
-Return-Path: <netdev+bounces-78928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD65D877005
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 10:09:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01349877006
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 10:09:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 749BB281D44
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 09:09:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9457B1F217BD
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 09:09:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E9A1374D3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 547C3374F9;
 	Sat,  9 Mar 2024 09:09:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="dr8P9RRV";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="2QadHf7/"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hD3zDZVS";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CZoxyfhR"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA092D603
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACA3E37142
 	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 09:09:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709975351; cv=none; b=qs1MCh8Xp/EZu+0L3PBWNBceJVRNYkd0/ph2FpBu66zSk0mb+PyOAbOyEKPZRs+7Tgy0p2/sB9688UhigLHcFsuNGNYv/W+3OuqveDxUE6y36cExt22gYVqW1cdS7xyQB+Ws+PNTIYZ5opPC6nf/z/6Q3d0qfFUmSvT17FNUwUQ=
+	t=1709975351; cv=none; b=dtEmXhJEixcHqsokVGqC9LodnHSimUgPSRNneQj0Tiv6eQbwVRyDEeXimvf767KTZljPWO4jjaXCx7hf9D0VCG5Mm0INk2wUL3o5bVu2rDJ5jLbDHXsv3T/oUOcnkvL0Rzku/0J0VgWoqiThoI3FjVq6i6VYJ0ErVnHVnJXRjvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1709975351; c=relaxed/simple;
-	bh=28oym5+nEeZA+1zzJCu9Kl9U/KgaCltc1WRTtnFHa0E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZnZAKo44kIN7LkfZ9vhRSykUBEOByahNi3zyYFeIlkRiGEwRva0BykTuJbkG9lECODUbbNRwvZ+QC9eQnTIxSPOXmQ9buyZ9GkjmRU/mnN6uMOJJtM/0cQKQzNUsHopJHrmWizCoOaxaaDwM9nKDUct6Mfl4CGz/n9nLKZBnV00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=dr8P9RRV; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=2QadHf7/; arc=none smtp.client-ip=193.142.43.55
+	bh=bSbQxH9ZGQjHd77g1oHQlR3FxqAkKU4vKjoJA6Kjl9k=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=k7Z5VRICNM9Ee4EtOiuIuc/2dBeldpU7ho47+QFOBizDXS1VpL9HJr3LCYq/8mNNzrx5UEUtzf+mHRaxT4q2bG9+XZqhAB0IXA3N3sSS+b766FvrqQSNiwsqK/dA9mDgGXZMKZgi33y8jdOWRsO4TsCtcBYL0ohnF9/ItsAA890=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=hD3zDZVS; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CZoxyfhR; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1709975341;
+	s=2020; t=1709975342;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=XcWOu74C0ycFsIJcramJax0GJdYjm/JuPWuR7qrjNxE=;
-	b=dr8P9RRVug5YGo+oZuSpHzzCIUZN29pQ0AxH5D88M9wEJZRoZ0TSFpYwhSP+4EqCH0aHLo
-	6fEJDN3H39L0YFz2w7qa0oZx2FoH0OIrS2h5KfEteGDi4ibZJ2B4Rpdoxay8/bxIuoh2Ij
-	kWFOGhTZrHi3XpTDcNNHRMrMqgDHkjndKEOS6n1owP682RWHc3VTooXY5/ewUggNVw3u6n
-	BXVQ8zVqDTxOUo2idNqRyju9V1dtHZJrhyAuWnyNF55oEV6XmSxRx1aQVwN48xy5v3nPxs
-	gh0Ps4h00Mko7y+dQjWuUfJ02r3gj7055bF/NrzuJ2aHHgDkmpsYGVkHfJx1Gw==
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e1fujFrYH+IlxTgpy5aGAkq1APEffHtkUXW5hctHyKI=;
+	b=hD3zDZVSyGwKNbboQNXMUVbEpwEt4u/8iwKlF/wKriOfdrqnA1fOw0vZWzUOzXSlmz2EY1
+	yb94ZRYWg8cuGDb9l23Tb2wtaKUWtXKsFZ+noYGYsuQD0ddTVEQSgA4rJuNtcdZLx6yWdL
+	G6LUL8SzDoEDfE/m4eqWU1PujSpidsXaqGs4juraxDckgLn3UaWGi/8SGwQ90iONlD0Vjm
+	3k1sk2M/EkUJpmsLGkUAblg1kaQrepSirDcQHWvM/RBNuBswcn1RWFEjNKwxU7w7xu1AT5
+	LDdxu+x8IGK4iGJ11KVkNcwqQNvIunf+y72hg6YnL2Oae7NF9t4GqudlHS//3g==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1709975341;
+	s=2020e; t=1709975342;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=XcWOu74C0ycFsIJcramJax0GJdYjm/JuPWuR7qrjNxE=;
-	b=2QadHf7/v9+25rxicjgxIk/sMakLjagOq3NyE8d2MUT6Vjj0ckfjIcnQcUqvCXTgIzMXxt
-	5Wl/gXjY9z8HXyBw==
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e1fujFrYH+IlxTgpy5aGAkq1APEffHtkUXW5hctHyKI=;
+	b=CZoxyfhRsb/dPtvZkozcAwd4U3R0Y5GeLrxrEaFnCT8xjTjlUW8GTWPLOdg1Wb5cdjs6l3
+	2/VI2Scah6yIPsCw==
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -59,88 +62,95 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Thomas Gleixner <tglx@linutronix.de>,
 	Wander Lairson Costa <wander@redhat.com>,
-	Yan Zhai <yan@cloudflare.com>
-Subject: [PATCH v5 net-next 0/4] net: Provide SMP threads for backlog NAPI
-Date: Sat,  9 Mar 2024 10:05:08 +0100
-Message-ID: <20240309090824.2956805-1-bigeasy@linutronix.de>
+	Yan Zhai <yan@cloudflare.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Subject: [PATCH v5 net-next 1/4] net: Remove conditional threaded-NAPI wakeup based on task state.
+Date: Sat,  9 Mar 2024 10:05:09 +0100
+Message-ID: <20240309090824.2956805-2-bigeasy@linutronix.de>
+In-Reply-To: <20240309090824.2956805-1-bigeasy@linutronix.de>
+References: <20240309090824.2956805-1-bigeasy@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-The RPS code and "deferred skb free" both send IPI/ function call
-to a remote CPU in which a softirq is raised. This leads to a warning on
-PREEMPT_RT because raising softiqrs from function call led to undesired
-behaviour in the past. I had duct tape in RT for the "deferred skb free"
-and Wander Lairson Costa reported the RPS case.
+A NAPI thread is scheduled by first setting NAPI_STATE_SCHED bit. If
+successful (the bit was not yet set) then the NAPI_STATE_SCHED_THREADED
+is set but only if thread's state is not TASK_INTERRUPTIBLE (is
+TASK_RUNNING) followed by task wakeup.
 
-This series only provides support for SMP threads for backlog NAPI, I
-did not attach a patch to make it default and remove the IPI related
-code to avoid confusion. I can post it for reference it asked.
+If the task is idle (TASK_INTERRUPTIBLE) then the
+NAPI_STATE_SCHED_THREADED bit is not set. The thread is no relying on
+the bit but always leaving the wait-loop after returning from schedule()
+because there must have been a wakeup.
 
-The RedHat performance team was so kind to provide some testing here.
-The series (with the IPI code removed) has been tested and no regression
-vs without the series has been found. For testing iperf3 was used on 25G
-interface, provided by mlx5, ix40e or ice driver and RPS was enabled. I
-can provide the individual test results if needed.
+The smpboot-threads implementation for per-CPU threads requires an
+explicit condition and does not support "if we get out of schedule()
+then there must be something to do".
 
-Changes:
-- v4=E2=80=A6v5 https://lore.kernel.org/all/20240305120002.1499223-1-bigeas=
-y@linutronix.de/
+Removing this optimisation simplifies the following integration.
 
-  - Rebase on top of current net-next.
+Set NAPI_STATE_SCHED_THREADED unconditionally on wakeup and rely on it
+in the wait path by removing the `woken' condition.
 
-- v3=E2=80=A6v4 https://lore.kernel.org/all/20240228121000.526645-1-bigeasy=
-@linutronix.de/
+Acked-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+---
+ net/core/dev.c | 14 ++------------
+ 1 file changed, 2 insertions(+), 12 deletions(-)
 
-  - Rebase on top of current net-next, collect Acks.
-
-  - Add struct softnet_data as an argument to kick_defer_list_purge().
-
-  - Add sd_has_rps_ipi_waiting() check to napi_threaded_poll_loop() which w=
-as
-    accidentally removed.
-
-- v2=E2=80=A6v3 https://lore.kernel.org/all/20240221172032.78737-1-bigeasy@=
-linutronix.de/
-
-  - Move the "if use_backlog_threads()" case into the CONFIG_RPS block
-    within napi_schedule_rps().
-
-  - Use __napi_schedule_irqoff() instead of napi_schedule_rps() in
-    kick_defer_list_purge().
-
-- v1=E2=80=A6v2 https://lore.kernel.org/all/20230929162121.1822900-1-bigeas=
-y@linutronix.de/
-
-  - Patch #1 is new. It ensures that NAPI_STATE_SCHED_THREADED is always
-    set (instead conditional based on task state) and the smboot thread
-    logic relies on this bit now. In v1 NAPI_STATE_SCHED was used but is
-    racy.
-
-  - The defer list clean up is split out and also relies on
-    NAPI_STATE_SCHED_THREADED. This fixes a different race.
-
-- RFC=E2=80=A6v1 https://lore.kernel.org/all/20230814093528.117342-1-bigeas=
-y@linutronix.de/
-
-   - Patch #2 has been removed. Removing the warning is still an option.
-
-   - There are two patches in the series:
-     - Patch #1 always creates backlog threads
-     - Patch #2 creates the backlog threads if requested at boot time,
-       mandatory on PREEMPT_RT.
-     So it is either or and I wanted to show how both look like.
-
-   - The kernel test robot reported a performance regression with
-     loopback (stress-ng --udp X --udp-ops Y) against the RFC version.
-     The regression is now avoided by using local-NAPI if backlog
-     processing is requested on the local CPU.
-
-Sebastian
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 0766a245816bd..db8f2c2d33792 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -4427,13 +4427,7 @@ static inline void ____napi_schedule(struct softnet_=
+data *sd,
+ 		 */
+ 		thread =3D READ_ONCE(napi->thread);
+ 		if (thread) {
+-			/* Avoid doing set_bit() if the thread is in
+-			 * INTERRUPTIBLE state, cause napi_thread_wait()
+-			 * makes sure to proceed with napi polling
+-			 * if the thread is explicitly woken from here.
+-			 */
+-			if (READ_ONCE(thread->__state) !=3D TASK_INTERRUPTIBLE)
+-				set_bit(NAPI_STATE_SCHED_THREADED, &napi->state);
++			set_bit(NAPI_STATE_SCHED_THREADED, &napi->state);
+ 			wake_up_process(thread);
+ 			return;
+ 		}
+@@ -6710,8 +6704,6 @@ static int napi_poll(struct napi_struct *n, struct li=
+st_head *repoll)
+=20
+ static int napi_thread_wait(struct napi_struct *napi)
+ {
+-	bool woken =3D false;
+-
+ 	set_current_state(TASK_INTERRUPTIBLE);
+=20
+ 	while (!kthread_should_stop()) {
+@@ -6720,15 +6712,13 @@ static int napi_thread_wait(struct napi_struct *nap=
+i)
+ 		 * Testing SCHED bit is not enough because SCHED bit might be
+ 		 * set by some other busy poll thread or by napi_disable().
+ 		 */
+-		if (test_bit(NAPI_STATE_SCHED_THREADED, &napi->state) || woken) {
++		if (test_bit(NAPI_STATE_SCHED_THREADED, &napi->state)) {
+ 			WARN_ON(!list_empty(&napi->poll_list));
+ 			__set_current_state(TASK_RUNNING);
+ 			return 0;
+ 		}
+=20
+ 		schedule();
+-		/* woken being true indicates this thread owns this napi. */
+-		woken =3D true;
+ 		set_current_state(TASK_INTERRUPTIBLE);
+ 	}
+ 	__set_current_state(TASK_RUNNING);
+--=20
+2.43.0
 
 
