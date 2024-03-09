@@ -1,94 +1,232 @@
-Return-Path: <netdev+bounces-78956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BC0F877196
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 15:10:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 379BB8771A7
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 15:36:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 552201C20A56
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 14:10:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F1EA1F20FF6
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 14:36:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73E5540869;
-	Sat,  9 Mar 2024 14:10:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="JVzGrDL2"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151B479DB;
+	Sat,  9 Mar 2024 14:36:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-251-66.mail.qq.com (out203-205-251-66.mail.qq.com [203.205.251.66])
+Received: from relay.hostedemail.com (smtprelay0017.hostedemail.com [216.40.44.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A30F71BDF4;
-	Sat,  9 Mar 2024 14:10:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.251.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE592030B;
+	Sat,  9 Mar 2024 14:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=216.40.44.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709993445; cv=none; b=mjQD+QxRmCFXWqVKmn+YTXs5YtggaW0ZLQP21EK4rdxzamcUBcicbbYdNL2SCskIpNtK9eys86XeKd4ik/9/Ygj5tOKPICbLeDA1bwy3KFOjlG4rVA6qoZypa1d+dLVS5dKD1ZxNs60FLP4Meok+hNAdPbNoIYtURcdxr2kvuOM=
+	t=1709994959; cv=none; b=hncmxFbcf+rgcbtA31cD3w88nzlp1UPURJyO0HkR7kVZQUbilFfFrqlsFi3zq6nYZ7aGV+FeZkuU9gw2D3K8R1nANX9U+iZoamSGMfxLqoW3a4usWs/pJDeBgfF2XhKzCOLWYlAl+6qCPkxm6sQMEWLZsWh8V6y+EZ8kpLJknYY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709993445; c=relaxed/simple;
-	bh=maIUddBIRkixT08jMamIHlx6Ic+Z9RInYiboQrgEs6s=;
-	h=Message-ID:From:To:Cc:Subject:Date:In-Reply-To:References:
-	 MIME-Version; b=M5ZW5IQu8fLVq4khRcqyTeIIg2DJH5OUnhIBzMAr28EjKv7SvJTw8LWh8EEjYqtvKkSZhfTfT5VEhQzCoKDjIN3C6ZoQUdx/9N7V6WNvF4EVo86ym7mwUj21OCNlohjt81TrD1tzflf1Jbhn6Y00wT8mHQL7MnQO4fHZvARA+ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=JVzGrDL2; arc=none smtp.client-ip=203.205.251.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1709993133; bh=maIUddBIRkixT08jMamIHlx6Ic+Z9RInYiboQrgEs6s=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=JVzGrDL29LVUN/yydIMy2NGYJM2EyEidTzZUQ0gLqzXXou8Q5yqxWOrqNPBKdRg88
-	 B2FT+CGmxVvktX5dmAjqqDZrq8rN12bQix1RdgxW5tmLqNFN25WH9/BkxZOJ5r+dxU
-	 2aLqKL4x/K9n+t0bmYsmRg4MRzILDT5IcBPkqYes=
-Received: from localhost.localdomain ([58.213.8.163])
-	by newxmesmtplogicsvrszb9-1.qq.com (NewEsmtp) with SMTP
-	id EC3A729C; Sat, 09 Mar 2024 21:59:03 +0800
-X-QQ-mid: xmsmtpt1709992743tsey328q4
-Message-ID: <tencent_4E77E34FDA2F438430621DF220620A882407@qq.com>
-X-QQ-XMAILINFO: NiAdzfE16ND4bolk1M35OWX6STXNtKuQPLdhDd/JkFmdm5wIJTCi649pCSKM8M
-	 5uyPE9F9cX+lpf9GA+o4h+QfDkgnSsXsQrWD3WmXxTno2qDQAyxX4p4c4PqbM5ZIj6FIqwwrzNYx
-	 XrwPrsCxHmZa5dPWRvDQnXlg0XYblyTTjeI0SzPbd7K/okRDzEDS93pLksKWsnewPRINUck8iTyz
-	 ps7efNFJGutn7vybZyaXRmdpX73/ltUA4j2RFeEygGbobECdsB/13h78gf5vYe5eWXhx4GBp36y4
-	 9DeBui7+MRVQDqjV31MykaWxSJ/8gelC4nOws1ga9zJrhVwCc9SdpiIBmJxKd16PCFyFpgOP+0j2
-	 6NVlqeB9PKmR0pSFc7h0JaLZsqHgZU7Ry5IRuw49uP/qmejY5tWusbBSconD+h9bydyupHyQVAd/
-	 AUzNG3JwUc0v3kLet5PfGlw+xxpAws20DHk9kcWZh0XD99UgzrbE4RNkPJmgtG7BSMs+4iw8SDoM
-	 3hod25UGk+B2SqahuPz3QYj/XDBEGUc4dmZVYoA6hYLkZQNZlZfeFdAUTyIckoTNqzXuAzn8vJjC
-	 uAnsrM/EX6tHqaes5olJtXuAm7kmh4KN766ygYLQN4vkrI+Vg96gUM4VJnFMznPEZaovwok8/h0N
-	 tJnt6/GsVuCYTarATR3e7b2EQpaMWFGAI5bPTiEXgjA5zFVf209u3qHqpRr0xuLi64yyV9APzRQs
-	 r5Cl8HH9Gm+J//3AmzfdF73DvjTgdvef/GD+SyBCTqfE52aR3tvBTayPfMKLeC85gqOUf/4x6FAL
-	 6qVI3l4Tm88xGAYaZ4bk1z4f1Sl54r2AcpaZ73N5Wb3gyFSInWIx0vcqR03keRitC1NW4hHK9BWQ
-	 lskAKk4rzevAtuqkugS2GsJYyA92BvHJdOz12Qi2iFZTv8tirxaLHI7WOwUw4tz7avx8GlpTBtDJ
-	 eaGuVmFgbfLgkZ3guPoCh7sZjMuT0aiERUF6bm4JpQfYhBaJfNK8FDoqViI0qeA2RNQQ478e1FPQ
-	 fPFZ06eg==
-X-QQ-XMRINFO: NS+P29fieYNw95Bth2bWPxk=
-From: linke li <lilinke99@qq.com>
-To: edumazet@google.com
-Cc: alexander@mihalicyn.com,
-	davem@davemloft.net,
-	dhowells@redhat.com,
-	kuba@kernel.org,
-	kuniyu@amazon.com,
-	leitao@debian.org,
-	lilinke99@qq.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	willemb@google.com,
-	wuyun.abel@bytedance.com
-Subject: Re: [PATCH] net: mark racy access on sk->sk_rcvbuf
-Date: Sat,  9 Mar 2024 21:59:02 +0800
-X-OQ-MSGID: <20240309135902.57126-1-lilinke99@qq.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <CANn89iJRXjYTojFyHN6s1Qu9Vkkk6RwxPF=bAKPjOg9zT-GupA@mail.gmail.com>
-References: <CANn89iJRXjYTojFyHN6s1Qu9Vkkk6RwxPF=bAKPjOg9zT-GupA@mail.gmail.com>
+	s=arc-20240116; t=1709994959; c=relaxed/simple;
+	bh=xA/9kOSEVmLw9nLE0NKCnQ73WhTf8Q1gxFqklnWgViU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=BTZNDWRqpW/bIVlvSF2zHiUcQKMA+hVRGmjaaBGioBK1d+6ewGWucyaF5z7D+qGKxXk+trQdwwvH7kXFg+Jg8bKDMQwr9RYgY2lBaWTgce/tsj5aP3gCPKV+qSfhJF05xWtVEMnSS7a+nITqda+fB6r0nYVnk9eqJPPF/wxfehU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=perches.com; spf=pass smtp.mailfrom=perches.com; arc=none smtp.client-ip=216.40.44.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=perches.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=perches.com
+Received: from omf14.hostedemail.com (a10.router.float.18 [10.200.18.1])
+	by unirelay09.hostedemail.com (Postfix) with ESMTP id 86F5580A43;
+	Sat,  9 Mar 2024 14:26:34 +0000 (UTC)
+Received: from [HIDDEN] (Authenticated sender: joe@perches.com) by omf14.hostedemail.com (Postfix) with ESMTPA id ADAC02D;
+	Sat,  9 Mar 2024 14:26:30 +0000 (UTC)
+Message-ID: <4f38500b4d798ad8effd59fef41353439f76fec3.camel@perches.com>
+Subject: Re: [PATCH net-next v2 1/1] net: bridge: switchdev: Improve error
+ message clarity for switchdev_port_obj_add/del_deffered operations
+From: Joe Perches <joe@perches.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>, Jiri Pirko <jiri@resnulli.us>,
+  Ivan Vecera <ivecera@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Andrew Lunn <andrew@lunn.ch>,  Eric Dumazet <edumazet@google.com>, Florian
+ Fainelli <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>,  Paolo
+ Abeni <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>
+Cc: Simon Horman <horms@kernel.org>, kernel@pengutronix.de, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Date: Sat, 09 Mar 2024 06:26:28 -0800
+In-Reply-To: <20240308104725.2550469-1-o.rempel@pengutronix.de>
+References: <20240308104725.2550469-1-o.rempel@pengutronix.de>
+Content-Type: text/plain; charset="ISO-8859-1"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: ADAC02D
+X-Rspamd-Server: rspamout08
+X-Stat-Signature: i147iw4rs346ixqkpt96tgzf3s85nt13
+X-Session-Marker: 6A6F6540706572636865732E636F6D
+X-Session-ID: U2FsdGVkX1+3BSoxTVywlEzBGCLj6QmH45p+lmVlJCQ=
+X-HE-Tag: 1709994390-270477
+X-HE-Meta: U2FsdGVkX18F/9aSsyZ3Uo+44q24i3iFYpycJOxTQNUDfdp4WDk/ZfGICVQUfEnZUAVK1CE3Ywme4lH/HPz7QSpjvpgNfPZLEaWWvEIVoFK0M1b1RNW30l57XAFXX9ggSm8RaMNxBcXpcS1LoCDeInysL1qTuoM7GmpxTfb4aQX9e4x4EQAHuiiHIgVbFasSg2OamvPXKCskntE8EP6xx0go/BFvSP4RU5fTU/tV+7UvNq9hbXpT25+eDG9V4Hz5upIo8VpvD0woCUALkamgZocImvHBVYocRqAqKyGQui5LmqVGUe8SreNp0Q1KI6L8
 
-> OK, but what about __sock_queue_rcv_skb() in the same file ?
+On Fri, 2024-03-08 at 11:47 +0100, Oleksij Rempel wrote:
+> Enhance the error reporting mechanism in the switchdev framework to
+> provide more informative and user-friendly error messages.
+>=20
+> Following feedback from users struggling to understand the implications
+> of error messages like "failed (err=3D-28) to add object (id=3D2)", this
+> update aims to clarify what operation failed and how this might impact
+> the system or network.
+>=20
+> With this change, error messages now include a description of the failed
+> operation, the specific object involved, and a brief explanation of the
+> potential impact on the system. This approach helps administrators and
+> developers better understand the context and severity of errors,
+> facilitating quicker and more effective troubleshooting.
+>=20
+> Example of the improved logging:
+>=20
+> [   70.516446] ksz-switch spi0.0 uplink: Failed to add Port Multicast
+>                Database entry (object id=3D2) with error: -ENOSPC (-28).
+> [   70.516446] Failure in updating the port's Multicast Database could
+>                lead to multicast forwarding issues.
+> [   70.516446] Current HW/SW setup lacks sufficient resources.
 
-I notice that, but I am not very sure whether there is a data race. If it
-is a similar situation, then the same patch should be applied too.
+In general, I think the "problem" is being written with 80
+columns in mind in the source and is not well thought out
+how someone might read the log.
+
+Generally, I think it's better to have single line statements
+in the log.
+
+[]
+
+> diff --git a/net/switchdev/switchdev.c b/net/switchdev/switchdev.c
+[]
+> @@ -244,6 +244,106 @@ static int switchdev_port_obj_notify(enum switchdev=
+_notifier_type nt,
+>  	return 0;
+>  }
+
+>=20
+> +static void switchdev_obj_id_to_helpful_msg(struct net_device *dev,
+> +					    enum switchdev_obj_id obj_id,
+> +					    int err, bool add)
+> +{
+> +	const char *action =3D add ? "add" : "del";
+> +	const char *reason =3D "";
+> +	const char *problem;
+> +	const char *obj_str;
+> +
+> +	switch (obj_id) {
+> +	case SWITCHDEV_OBJ_ID_UNDEFINED:
+> +		obj_str =3D "Undefined object";
+> +		problem =3D "Attempted operation is undefined, indicating a "
+> +			  "possible programming error.\n";
+
+My preference would be to write
+		problem =3D "Attempted operation is undefined indicating a possible progr=
+amming error\n";
+
+> +		break;
+> +	case SWITCHDEV_OBJ_ID_PORT_VLAN:
+> +		obj_str =3D "VLAN entry";
+> +		problem =3D "Failure in VLAN settings on this port might disrupt "
+> +		          "network segmentation or traffic isolation, affecting\n"
+> +		          "network partitioning.\n";
+> +		break;
+> +	case SWITCHDEV_OBJ_ID_PORT_MDB:
+> +		obj_str =3D "Port Multicast Database entry";
+> +		problem =3D "Failure in updating the port's Multicast Database "
+> +			  "could lead to multicast forwarding issues.\n";
+> +		break;
+> +	case SWITCHDEV_OBJ_ID_HOST_MDB:
+> +		obj_str =3D "Host Multicast Database entry";
+> +		problem =3D "Failure in updating the host's Multicast Database"
+> +		          "may impact multicast group memberships or\n"
+
+No space after Database makes the output "Databasemay"
+
+> +			  "traffic delivery, affecting multicast communication.\n";
+> +		break;
+> +	case SWITCHDEV_OBJ_ID_MRP:
+> +		obj_str =3D "Media Redundancy Protocol configuration for port";
+> +		problem =3D "Failure to set MRP ring ID on this port prevents"
+> +			  "communication with the specified redundancy ring,\n"
+
+portcommunication
+
+> +			  "resulting in an inability to engage in MRP-based "
+> +			  "network operations.\n";
+> +		break;
+> +	case SWITCHDEV_OBJ_ID_RING_TEST_MRP:
+> +		obj_str =3D "MRP Test Frame Operations for port";
+> +		problem =3D "Failure to generate/monitor MRP test frames may lead"
+> +			  "to inability to assess the ring's operational\n"
+
+leadto
+
+> +			  "integrity and fault response, hindering proactive "
+> +			  "network management.\n";
+> +		break;
+> +	case SWITCHDEV_OBJ_ID_RING_ROLE_MRP:
+> +		obj_str =3D "MRP Ring Role Configuration";
+> +		problem =3D "Improper MRP ring role configuration may create "
+> +		          "conflicts in the ring, disrupting communication\n"
+> +			  "for all participants, or isolate the local system "
+> +			  "from the ring, hindering its ability to communicate "
+> +			  "with other participants.\n";
+
+A bunch of unnecessary commas.
+
+> +		break;
+> +	case SWITCHDEV_OBJ_ID_RING_STATE_MRP:
+> +		obj_str =3D "MRP Ring State Configuration";
+> +		problem =3D "Failure to correctly set the MRP ring state can "
+> +		          "result in network loops or leave segments without\n"
+> +			  "communication. In a Closed state, it maintains loop "
+> +			  "prevention by blocking one MRM port, while an Open\n"
+> +			  "state activates in response to failures, changing "
+> +			  "port states to preserve network connectivity.\n";
+> +		break;
+> +	case SWITCHDEV_OBJ_ID_IN_TEST_MRP:
+> +		obj_str =3D "MRP_InTest Frame Generation Configuration";
+> +		problem =3D "Failure in managing MRP_InTest frame generation can "
+> +			  "misjudge the interconnection ring's state, leading\n"
+> +			  "to incorrect blocking or unblocking of the I/C port."
+> +			  "This misconfiguration might result in unintended\n"
+> +			  "network loops or isolate critical network segments, "
+> +			  "compromising network integrity and reliability.\n";
+> +		break;
+> +	case SWITCHDEV_OBJ_ID_IN_ROLE_MRP:
+> +		obj_str =3D "Interconnection Ring Role Configuration";
+> +		problem =3D "Failure in incorrect assignment of interconnection "
+> +			  "ring roles (MIM/MIC) can impair the formation of the\n"
+> +			  "interconnection rings.\n";
+> +		break;
+> +	case SWITCHDEV_OBJ_ID_IN_STATE_MRP:
+> +		obj_str =3D "Interconnection Ring State Configuration";
+> +		problem =3D "Failure in updating the interconnection ring state "
+> +			  "can lead in case of Open state to incorrect blocking\n"
+> +			  "or unblocking of the I/C port, resulting in unintended"
+> +			  "network loops or isolation of critical network\n";
+> +		break;
+> +	default:
+> +		obj_str =3D "Unknown object";
+> +		problem	=3D "Indicating a possible programming error.\n";
+> +	}
+> +
+> +	switch (err) {
+> +	case -ENOSPC:
+> +		reason =3D "Current HW/SW setup lacks sufficient resources.\n";
+
+And adding a newline here puts an unnecessary newline between
+logging output as the format also has a trailing newline.
+
+
+> +		break;
+> +	}
+> +
+> +	netdev_err(dev, "Failed to %s %s (object id=3D%d) with error: %pe (%d).=
+\n%s%s\n",
+> +		   action, obj_str, obj_id, ERR_PTR(err), err, problem, reason);
+> +}
+> +
 
 
