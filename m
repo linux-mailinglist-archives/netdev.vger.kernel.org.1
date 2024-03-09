@@ -1,94 +1,83 @@
-Return-Path: <netdev+bounces-78909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-78910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB1D1876F2D
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 05:40:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0972F876F30
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 05:44:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 541801C20B05
-	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 04:40:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B153F1F217C3
+	for <lists+netdev@lfdr.de>; Sat,  9 Mar 2024 04:44:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9AC1DFE1;
-	Sat,  9 Mar 2024 04:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 041C81DFFE;
+	Sat,  9 Mar 2024 04:44:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xk4PJx9d"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fshozts7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816B210A34;
-	Sat,  9 Mar 2024 04:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D43311DDF1
+	for <netdev@vger.kernel.org>; Sat,  9 Mar 2024 04:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1709959231; cv=none; b=YVCAtNUd3tENXIkbQvvwBCUVcENQ8+CtyihaMbqmULp6AlI0W7chbIfJTnaGm/a76JnqALUrDJ/HX+CK9fyY7J1jURsCSXk9s6gZkBJGsDqCNI9BOgT3Wpvzlf61BWza+HL4SoFD4quDfnGTMT7JeSYOK5S88HHyEeMBP3NJFiU=
+	t=1709959472; cv=none; b=a1bwEUsqzO6ODz7pEgdzo23j9MiBgBThtvYUAdEN1E6F8MUoI7DlB6Z3IAIS4I9vwzSiwtH6F1rMfsxQZJC5y3Z/sxM/VBZd0DVraBd1zD5NzXIx1s2E898omrhOvznVfQyMFLCa2OaC6gRs20P7fwoRzRXMvaclMIP98jt3z34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1709959231; c=relaxed/simple;
-	bh=fJIPG9UQLUAFLhv0yJud14lWN7eoQYLxdALEouubRUE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=T/qU8Ig2p0o7MuOIE1MPUBo1Gad6hTkI6f/L0loQHVGfGPNY3RlNCsuRDh6s/B7n3k33W6GYi9TbEYytUXFIG5/RNaIkYDfrqBl5M9GuCSMsNbA8NUsP4U55oq+rv02XPSNx76RMaohjE/kvDZIibJGFPDLFAyxej5Dz3IE+46w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xk4PJx9d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E66A6C433C7;
-	Sat,  9 Mar 2024 04:40:30 +0000 (UTC)
+	s=arc-20240116; t=1709959472; c=relaxed/simple;
+	bh=0l6Dm4MB0w88u3WqwaQnn0uKHuAXQj0U46zspSqYQAE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kI/HssO4xTofDg8Q47jbXqQwIvyu/m1byunXOBjIDkTXh2x7hs8HyK9WAsrf1zfwioUhTy8fzLKvLmLRxOHoYUhjBAAPdGwY7uxOc8IztTRIAWLaQztGldnB+TB9lS1JpGOwbPQLWgkbNO6U2P3ZNkLaGJUqpjB+OBo3EK0A82A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fshozts7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23B99C433C7;
+	Sat,  9 Mar 2024 04:44:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1709959231;
-	bh=fJIPG9UQLUAFLhv0yJud14lWN7eoQYLxdALEouubRUE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Xk4PJx9djjhz5mE7qYKmmK/5ulO/LQfdhh7EAn6vrWNs5fSjwuf1HJ+Ls1MIYTwub
-	 Gwe8YEW7jYBLrb7aAT/5DITX1Rgekpnfax7db2+kmkgIHIdOdXmSDEiujmiqqDVRQx
-	 flNhJTphgGtduSNA7uLIAYlhuYSBleiKwNBVE8nuYhH28bKT0TE+W29hvcKeN0RHjP
-	 T6U73IG/pwkzqGaupvRcbzpoTRu7sHqUYSQbRpFT7XjIbiwxMIeENPHLc0cIFcAKOB
-	 l18C8DIDbxVZLQ1gL5ieOPS5HAow/RflYwCReCn0Iwm7m2CRxG+VkdYF620Ne+FkcH
-	 pY2XV3UqqTbVg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C6D3AC04D3F;
-	Sat,  9 Mar 2024 04:40:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1709959472;
+	bh=0l6Dm4MB0w88u3WqwaQnn0uKHuAXQj0U46zspSqYQAE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fshozts7o44OZsQY6fHGjFq+HwefosBvxZJNa+zR//2ENMayx5FaBmMZLnRWY2sNM
+	 NVf2wyA54vP3PK7s9uL7qRRA7TKODJO8t99EOmMxIvyso8/30qZH9fIDOX0HWgVHwV
+	 D//qqVl4AitF3s8jo2KNMzRamV5g0hr/h0TBPVEBZMboHqyXACZZ2Jmvnn7Fe8jkPl
+	 YUrgku4yVG5jifi0entAm1jJa/faEINjLo/UcJgX0n+9YVcl2MML9HNVE/cT278pYb
+	 3l7T1lOLKrMBzlXI6OA5UxrrHH3ncU/n8peXYquRVao84ocKBb81O9OaxFnFK4aLAf
+	 121HZ5VDc146Q==
+Date: Fri, 8 Mar 2024 20:44:31 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: William Tu <witu@nvidia.com>
+Cc: <netdev@vger.kernel.org>, <jiri@nvidia.com>, <bodong@nvidia.com>,
+ <tariqt@nvidia.com>, <yossiku@nvidia.com>
+Subject: Re: [PATCH RFC v3 net-next 1/2] devlink: Add shared memory pool
+ eswitch attribute
+Message-ID: <20240308204431.36e56066@kernel.org>
+In-Reply-To: <20240306231253.8100-1-witu@nvidia.com>
+References: <20240306231253.8100-1-witu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: ieee802154-next 2024-03-07
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <170995923080.2022.5674268528661372119.git-patchwork-notify@kernel.org>
-Date: Sat, 09 Mar 2024 04:40:30 +0000
-References: <20240307195105.292085-1-stefan@datenfreihafen.org>
-In-Reply-To: <20240307195105.292085-1-stefan@datenfreihafen.org>
-To: Stefan Schmidt <stefan@datenfreihafen.org>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- linux-wpan@vger.kernel.org, alex.aring@gmail.com, miquel.raynal@bootlin.com,
- netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu,  7 Mar 2024 20:51:05 +0100 you wrote:
-> Hello Dave, Jakub, Paolo.
+On Thu, 7 Mar 2024 01:12:52 +0200 William Tu wrote:
+> When using switchdev mode, the representor ports handles the slow path
+> traffic, the traffic that can't be offloaded will be redirected to the
+> representor port for processing. Memory consumption of the representor
+> port's rx buffer can grow to several GB when scaling to 1k VFs reps.
+> For example, in mlx5 driver, each RQ, with a typical 1K descriptors,
+> consumes 3MB of DMA memory for packet buffer in WQEs, and with four
+> channels, it consumes 4 * 3MB * 1024 = 12GB of memory. And since rep
+> ports are for slow path traffic, most of these rx DMA memory are idle.
 > 
-> A little late, but hopefully still in time.
-> 
-> An update from ieee802154 for your *net-next* tree:
-> 
-> Various cross tree patches for ieee802154v drivers and a resource leak
-> fix for ieee802154 llsec.
-> 
-> [...]
+> Add spool_size configuration, allowing multiple representor ports
+> to share a rx memory buffer pool. When enabled, individual representor
+> doesn't need to allocate its dedicated rx buffer, but just pointing
+> its rq to the memory pool. This could make the memory being better
+> utilized. The spool_size represents the number of bytes of the memory
+> pool. Users can adjust it based on how many reps, total system
+> memory, or performance expectation.
 
-Here is the summary with links:
-  - pull-request: ieee802154-next 2024-03-07
-    https://git.kernel.org/netdev/net-next/c/2612b9f10c5f
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+We may need to wordsmith the docs once present but in general, FWIW:
+Acked-by: Jakub Kicinski <kuba@kernel.org>
 
