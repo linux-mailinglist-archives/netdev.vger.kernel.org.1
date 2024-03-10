@@ -1,214 +1,173 @@
-Return-Path: <netdev+bounces-79013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CDFC8775EF
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 10:18:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 643E6877618
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 11:34:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80E421C20CA8
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 09:18:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEF521F219E5
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 10:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352D81DA4D;
-	Sun, 10 Mar 2024 09:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5C0E817;
+	Sun, 10 Mar 2024 10:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="Yz1JSqQ9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gvQ1tdgq"
 X-Original-To: netdev@vger.kernel.org
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5985B1BC49;
-	Sun, 10 Mar 2024 09:18:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1671219BDC;
+	Sun, 10 Mar 2024 10:34:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710062301; cv=none; b=LH7TbgeTK+PobWNjNM8G++T+82NlAsC4P8fKK4n2T70FP2MRRe7uhDuSxRjkkQ9SlTLuHjW1djan63GI1eVaz3qH24XghAi6A1npfqQ5u8oQr6QBSQyY5GpiPRnUKuGG8fOIuD1zwjRIJ2rHKJs89bcgYTkeWtq15CRVGTa2w8g=
+	t=1710066849; cv=none; b=VRij5VlCEw5FAjsRe9zOKrEN6mJfiL+HiVdFjMrLNXiXPCwhvKmFle/bhN1YOfvUp4iEttj80pmS8GMzZ7JTxm3K4a6sPFuhJLdQXVJWXmjMjrRxqCVPEEY2lhSPhp7YM6vIXEY1QDRjxB2JI4hymxDvaBRvxq5SxBu/ZXS5etI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710062301; c=relaxed/simple;
-	bh=4/Etg5IAaCmbmxqxtDclWTx/CGLXoTnwU28WEm0VocA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OTxbQfHt0OWwJ0v4onY154SHC08neG8jMlfidPfvjapcEOFalhqqVjNkCtRH5tZJu/9EzlyoJGV7E4pXgb7V1T2SVkMDfp2W+ey+JokDGaoaBzZXnYDXrsYJ/8KR452OM5063oyhAi8lmV3uhspmXFBBV1oA6n+7/ktkiMfrKVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=Yz1JSqQ9; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1710062288;
-	bh=4/Etg5IAaCmbmxqxtDclWTx/CGLXoTnwU28WEm0VocA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Yz1JSqQ9iMbvoFUbuHmRaYiRtps/bZUuKgWK0FcDrfCyxM4eFWcO5PeMGg4tbMZuf
-	 7WIWRQw5Hy1O2U9WjFbFjaVwcq3gJ4LSbMRy5C59qi0SYCwxediET+Xc+HJzZmtQo+
-	 pRLB2xl8ZxwSjYjL/Qd65Ff8HRV+o892y2pdAO4c=
-Date: Sun, 10 Mar 2024 10:18:07 +0100
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-To: Joel Granados <j.granados@samsung.com>
-Cc: Luis Chamberlain <mcgrof@kernel.org>, 
-	Kees Cook <keescook@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v2] sysctl: treewide: constify ctl_table_root::permissions
-Message-ID: <e3198416-4d90-4984-88ee-d2fccf96c783@t-8ch.de>
-References: <CGME20240223155229eucas1p24a18fa79cda02a703bcceff3bd38c2ba@eucas1p2.samsung.com>
- <20240223-sysctl-const-permissions-v2-1-0f988d0a6548@weissschuh.net>
- <20240303143408.sxrbd7pykmyhwu5f@joelS2.panther.com>
+	s=arc-20240116; t=1710066849; c=relaxed/simple;
+	bh=wFP5SnRdAlTYrtaQsMeuYAzoSBLP5KDO3ydiK/WFhDI=;
+	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=FE+sKAYaqEeRO5F733MOVLd479+6M7pfj2DhL2qqCsxAwYi9OYJTxHhOftXSn+Wvktat/rBc/XBbFlCnKY1GkeTVgS8Csq10qB6KbB9agCbRDcfDfKNWxSnVBTnYdSNiUoqzy81M7/cmvoEEsXLri8Zu55dnT/mxr68w1rw0ISY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gvQ1tdgq; arc=none smtp.client-ip=209.85.222.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7882e94d408so297458885a.0;
+        Sun, 10 Mar 2024 03:34:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710066847; x=1710671647; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=TQXfYhSSj+U5lwLm5VRHdYF0sy5VxGpEKaFhMn2Srhs=;
+        b=gvQ1tdgq/XehUehUbBXZyutFqZ+W5kmMv6kw/G5pka1WuWBtFPn8Qb7PT98oXFo6FW
+         x1szY0emsPKx4reYWpbushj73/4fVCby0eaGhRBA6ccunUilXzZaxGJrQjhxX8YMiztU
+         oNgR29Vzf8U/WppZVFnR4BDxYoV8r6rAJdZjXFVSN2qFJz5J3ep4SliLrf1EZn4evjsz
+         v32xhUlkeMB32QVDWKFOBvYa4Nbf9JewIKvMsX3iZqOq+otKvdZTSE5Fx/jDz3YRXCPG
+         4kaiHNMM7P3yQsdH6WDlBxdXc4jghV1lKAEVXm0v/Dbqtq2kmzq2afHaq8ckcRVfg3Lg
+         90jA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710066847; x=1710671647;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=TQXfYhSSj+U5lwLm5VRHdYF0sy5VxGpEKaFhMn2Srhs=;
+        b=mVCI8+uemztWFR2PWm4QfThRRIGN2xeAWCb00W4qG4a/fwvJ6tfhBK7sie5ELwu9ON
+         6qePQggWjTVHnaXPMEuQ+6+fi1HXWnCtFNEbnaTE25xL5ibZfd+mKJosYM3EykZ6wSCv
+         3Z7ruPiyRMcOBnanVFRRYBQT3L2DtuINrDUZTVS4cgu19WM/OHeZlB1QOSn8ENP7SK7T
+         u2nX+nBH1GETPlxBflOcW0XEtj42+ZH8wips4sqA1VxfZDscR0858g1q+02NEZmeInLW
+         zc2WzNnMy4K/2Ys7kTXd4zkQwT5Dg8DR6I2Tkgw93FaFOkoigqcDNSlyuOR7BPp//efJ
+         uORg==
+X-Forwarded-Encrypted: i=1; AJvYcCUVvQ+7VOdjXGlKK9GCp3jvf0xffa44JgdBW1Bj7lD9odYUUXP69rZK2W+XFDkBMhD3fH8uy1lcGIlug9Cyc06CptpNA3Tmb5FTZAItnoUW0/8huV+ZHXlGfLNxS4KUYwYx6np3JyoQUUMHvKR3AqKIvUSZUge0epMwxEnZqdOOmAh8kiC4
+X-Gm-Message-State: AOJu0YxUwgd/8EcmRuELT+fWOe/a+J1yuu/5UCwj+yLMKDVAbI2UHu2g
+	0StJcKQbMtdrQ97O7w4ZJ4H/+U1TBBP4uWOJiy4LrhV67G77/ZVT
+X-Google-Smtp-Source: AGHT+IFbCBpNRgqZo+j6zeF9zOKNyhkuBx8fIzO8pR5aME+Fs0REMNDZ+JR+kDa986Ot0EHmXMc4eA==
+X-Received: by 2002:a05:620a:100b:b0:788:2d92:af16 with SMTP id z11-20020a05620a100b00b007882d92af16mr4320951qkj.70.1710066846864;
+        Sun, 10 Mar 2024 03:34:06 -0700 (PDT)
+Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
+        by smtp.gmail.com with ESMTPSA id wh24-20020a05620a56d800b007883c9be0a9sm1717344qkn.80.2024.03.10.03.34.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 10 Mar 2024 03:34:06 -0700 (PDT)
+Date: Sun, 10 Mar 2024 06:34:05 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Richard Gobert <richardbgobert@gmail.com>, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ willemdebruijn.kernel@gmail.com, 
+ dsahern@kernel.org, 
+ xeb@mail.ru, 
+ shuah@kernel.org, 
+ idosch@nvidia.com, 
+ razor@blackwall.org, 
+ amcohen@nvidia.com, 
+ petrm@nvidia.com, 
+ jbenc@redhat.com, 
+ bpoirier@nvidia.com, 
+ b.galvani@gmail.com, 
+ gavinl@nvidia.com, 
+ liujian56@huawei.com, 
+ horms@kernel.org, 
+ linyunsheng@huawei.com, 
+ therbert@google.com, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <65ed8c9d8dc5a_193375294e6@willemb.c.googlers.com.notmuch>
+In-Reply-To: <88831c36-a589-429f-8e8b-2ecb66a30263@gmail.com>
+References: <f939c84a-2322-4393-a5b0-9b1e0be8ed8e@gmail.com>
+ <88831c36-a589-429f-8e8b-2ecb66a30263@gmail.com>
+Subject: Re: [PATCH net-next v3 4/4] net: gro: move L3 flush checks to
+ tcp_gro_receive
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240303143408.sxrbd7pykmyhwu5f@joelS2.panther.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi!
-
-On 2024-03-03 15:34:08+0100, Joel Granados wrote:
-> Just to be sure I'm following. This is V2 of "[PATCH] sysctl: treewide:
-> constify ctl_table_root::set_ownership". Right? I ask, because the
-> subject changes slightly.
-
-No, the v1 of this patch is linked in the patch log below.
-
-The patches for ::set_ownership and ::permissions are changing two
-different callbacks and both of them are needed.
-
-The v2 for set_ownership is here:
-https://lore.kernel.org/lkml/20240223-sysctl-const-ownership-v2-1-f9ba1795aaf2@weissschuh.net/
-
-Regards
-
+Richard Gobert wrote:
+> {inet,ipv6}_gro_receive functions perform flush checks (ttl, flags,
+> iph->id, ...) against all packets in a loop. These flush checks are
+> relevant only to tcp flows, and as such they're used to determine whether
+> the packets can be merged later in tcp_gro_receive.
 > 
-> Best
-> 
-> On Fri, Feb 23, 2024 at 04:52:16PM +0100, Thomas Weißschuh wrote:
-> > The permissions callback is not supposed to modify the ctl_table.
-> > Enforce this expectation via the typesystem.
-> > 
-> > The patch was created with the following coccinelle script:
-> > 
-> >   @@
-> >   identifier func, head, ctl;
-> >   @@
-> > 
-> >   int func(
-> >     struct ctl_table_header *head,
-> >   - struct ctl_table *ctl)
-> >   + const struct ctl_table *ctl)
-> >   { ... }
-> > 
-> > (insert_entry() from fs/proc/proc_sysctl.c is a false-positive)
-> > 
-> > The three changed locations were validated through manually inspection
-> > and compilation.
-> > 
-> > In addition a search for '.permissions =' was done over the full tree to
-> > look for places that were missed by coccinelle.
-> > None were found.
-> > 
-> > This change also is a step to put "struct ctl_table" into .rodata
-> > throughout the kernel.
-> > 
-> > Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
-> > ---
-> > To: Luis Chamberlain <mcgrof@kernel.org>
-> > To: Kees Cook <keescook@chromium.org>
-> > To: Joel Granados <j.granados@samsung.com>
-> > To: David S. Miller <davem@davemloft.net>
-> > Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
-> > 
-> > Changes in v2:
-> > - flesh out commit messages
-> > - Integrate changes to set_ownership and ctl_table_args into a single
-> >   series
-> > - Link to v1: https://lore.kernel.org/r/20231226-sysctl-const-permissions-v1-1-5cd3c91f6299@weissschuh.net
-> > ---
-> > The patch is meant to be merged via the sysctl tree.
-> > 
-> > There is an upcoming series that will introduce a new implementation of
-> > .permission which would need to be adapted [0].
-> > The adaption would be trivial as the 'table' parameter also not modified
-> > there.
-> > 
-> > This change was originally part of the sysctl-const series [1].
-> > To slim down that series and reduce the message load on other
-> > maintainers to a minimumble, submit this patch on its own.
-> > 
-> > [0] https://lore.kernel.org/lkml/20240222160915.315255-1-aleksandr.mikhalitsyn@canonical.com/
-> > [1] https://lore.kernel.org/lkml/20231204-const-sysctl-v2-2-7a5060b11447@weissschuh.net/
-> > ---
-> >  include/linux/sysctl.h | 2 +-
-> >  ipc/ipc_sysctl.c       | 2 +-
-> >  kernel/ucount.c        | 2 +-
-> >  net/sysctl_net.c       | 2 +-
-> >  4 files changed, 4 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/include/linux/sysctl.h b/include/linux/sysctl.h
-> > index ee7d33b89e9e..0a55b5aade16 100644
-> > --- a/include/linux/sysctl.h
-> > +++ b/include/linux/sysctl.h
-> > @@ -207,7 +207,7 @@ struct ctl_table_root {
-> >  	void (*set_ownership)(struct ctl_table_header *head,
-> >  			      struct ctl_table *table,
-> >  			      kuid_t *uid, kgid_t *gid);
-> > -	int (*permissions)(struct ctl_table_header *head, struct ctl_table *table);
-> > +	int (*permissions)(struct ctl_table_header *head, const struct ctl_table *table);
-> >  };
-> >  
-> >  #define register_sysctl(path, table)	\
-> > diff --git a/ipc/ipc_sysctl.c b/ipc/ipc_sysctl.c
-> > index 8c62e443f78b..b087787f608f 100644
-> > --- a/ipc/ipc_sysctl.c
-> > +++ b/ipc/ipc_sysctl.c
-> > @@ -190,7 +190,7 @@ static int set_is_seen(struct ctl_table_set *set)
-> >  	return &current->nsproxy->ipc_ns->ipc_set == set;
-> >  }
-> >  
-> > -static int ipc_permissions(struct ctl_table_header *head, struct ctl_table *table)
-> > +static int ipc_permissions(struct ctl_table_header *head, const struct ctl_table *table)
-> >  {
-> >  	int mode = table->mode;
-> >  
-> > diff --git a/kernel/ucount.c b/kernel/ucount.c
-> > index 4aa6166cb856..90300840256b 100644
-> > --- a/kernel/ucount.c
-> > +++ b/kernel/ucount.c
-> > @@ -38,7 +38,7 @@ static int set_is_seen(struct ctl_table_set *set)
-> >  }
-> >  
-> >  static int set_permissions(struct ctl_table_header *head,
-> > -				  struct ctl_table *table)
-> > +			   const struct ctl_table *table)
-> >  {
-> >  	struct user_namespace *user_ns =
-> >  		container_of(head->set, struct user_namespace, set);
-> > diff --git a/net/sysctl_net.c b/net/sysctl_net.c
-> > index 051ed5f6fc93..ba9a49de9600 100644
-> > --- a/net/sysctl_net.c
-> > +++ b/net/sysctl_net.c
-> > @@ -40,7 +40,7 @@ static int is_seen(struct ctl_table_set *set)
-> >  
-> >  /* Return standard mode bits for table entry. */
-> >  static int net_ctl_permissions(struct ctl_table_header *head,
-> > -			       struct ctl_table *table)
-> > +			       const struct ctl_table *table)
-> >  {
-> >  	struct net *net = container_of(head->set, struct net, sysctls);
-> >  
-> > 
-> > ---
-> > base-commit: ffd2cb6b718e189e7e2d5d0c19c25611f92e061a
-> > change-id: 20231226-sysctl-const-permissions-d7cfd02a7637
-> > 
-> > Best regards,
-> > -- 
-> > Thomas Weißschuh <linux@weissschuh.net>
-> > 
-> 
-> -- 
-> 
-> Joel Granados
+> These checks are not relevant to UDP packets.
 
+These are network protocol coalescing invariants. Why would they be
+limited to certain transport protocols only?
 
+> Furthermore, they need to be
+> done only once in tcp_gro_receive and only against the found p skb, since
+> they only affect flush and not same_flow.
+> 
+> Levaraging the previous commit in the series, in which correct network
+> header offsets are saved for both outer and inner network headers -
+> allowing these checks to be done only once, in tcp_gro_receive. As a
+> result, NAPI_GRO_CB(p)->flush is not used at all. In addition - flush_id
+> checks are more declerative and contained in inet_gro_flush, thus removing
+
+declarative
+
+> the need for flush_id in napi_gro_cb.
+> 
+> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+> ---
+> +static int inet_gro_flush(const struct iphdr *iph, const struct iphdr *iph2,
+> +			  struct sk_buff *p, u32 outer)
+> +{
+> +	const u32 id = ntohl(*(__be32 *)&iph->id);
+> +	const u32 id2 = ntohl(*(__be32 *)&iph2->id);
+> +	const int flush_id = ntohs(id >> 16) - ntohs(id2 >> 16);
+> +	const u16 count = NAPI_GRO_CB(p)->count;
+> +	const u32 df = id & IP_DF;
+> +	u32 is_atomic;
+> +	int flush;
+> +
+> +	/* All fields must match except length and checksum. */
+> +	flush = (iph->ttl ^ iph2->ttl) | (iph->tos ^ iph2->tos) | (df ^ (id2 & IP_DF));
+> +
+> +	/* When we receive our second frame we can make a decision on if we
+> +	 * continue this flow as an atomic flow with a fixed ID or if we use
+> +	 * an incremdfenting ID.
+> +	 */
+
+Comment became garbled on move: incrementing
+
+> +	if (count == 1) {
+> +		is_atomic = df && flush_id == 0;
+> +		NAPI_GRO_CB(p)->is_atomic = is_atomic;
+> +	} else {
+> +		is_atomic = df && NAPI_GRO_CB(p)->is_atomic;
+> +	}
+> +
+> +	/* Ignore outer IP ID value if based on atomic datagram. */
+> +	outer = (outer && df) - 1;
+> +	is_atomic--;
+> +
+> +	return flush | ((flush_id ^ (count & is_atomic)) & outer);
+> +}
 
