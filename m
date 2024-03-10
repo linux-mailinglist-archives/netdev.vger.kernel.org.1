@@ -1,147 +1,140 @@
-Return-Path: <netdev+bounces-79023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A968C87768C
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 13:14:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97888877695
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 13:35:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 419951F213E3
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 12:14:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27C961F21720
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 12:35:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF00028383;
-	Sun, 10 Mar 2024 12:14:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4820322324;
+	Sun, 10 Mar 2024 12:35:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IsjvSd13"
+	dkim=pass (2048-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b="XrZGVqiL";
+	dkim=permerror (0-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b="m3RslpyQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailrelay4-1.pub.mailoutpod2-cph3.one.com (mailrelay4-1.pub.mailoutpod2-cph3.one.com [46.30.211.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8390A20335;
-	Sun, 10 Mar 2024 12:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746BC1EB23
+	for <netdev@vger.kernel.org>; Sun, 10 Mar 2024 12:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.30.211.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710072866; cv=none; b=EIFXG4AURD9XIkxG3fbWuNX1fKa/0OHPBphceusxeHWnjxoHo4tBLOEqJewuntmAEky/nwMMiw2DlTRKBaieAI6Kg46T7auL2zedIXsZnDN2LCQKNdnB0kORs1gpc3OHB0WgtTb0OJpA2iy3/Z7cr7nTjz8+Mr8n+WKkAfv9sNs=
+	t=1710074135; cv=none; b=a0VuK3MV/h5pdEmJkPac1eqEiEx8blSo1i+/cfTLnKtbHVXwJ+PbF9QUnQNzNmbwTwQp8CUQdW3A/R0UP327qcYZ0/EyfTu5GRcAHUKlVih8Lz0q3E9ttiqbYSfkqfBPhMn3SOBWBXJCK1iu5wAjtmsxbXprGdP2nUk0IbWDy9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710072866; c=relaxed/simple;
-	bh=HBFH2KOlP2HSSSU1VXasxhtjODXxUMZmoTi8xeyxyHA=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=n80FonI+E1DrLrzinhZhysKHkdjPTEU1Iz2q9TIEQIJJQ7MSq353Zaz6lwAyFLZ7Mdb5G9Puq1Q9oEVYv1smFyLckT2ZaFvOfzNqCp+cv+1dGKRujSIcv5JjHSUJy6BWTgW0jHVWDROxeuobbJD2q/fAIWAeQq5sSCCVCjcV150=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IsjvSd13; arc=none smtp.client-ip=209.85.215.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-5ce07cf1e5dso2928890a12.2;
-        Sun, 10 Mar 2024 05:14:23 -0700 (PDT)
+	s=arc-20240116; t=1710074135; c=relaxed/simple;
+	bh=eVb3cFCjq/wLYohZULzNmR4wY1wWmg+rXCBfYx/lovk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q0peAED3GSP/JxmDOynF5gn8z0zu4LlodT0D4ADX1/GMsBsBBX1R9scpbDLI330OaNMuCI8D4LELJfcMvofjShWf1Cz1Dri1kCQcpYy9SyhB55hplsQnmFX4ooSy11N5HDnNLaTmrWhhyBkvNS1xFuKMT/6Cnpx6Ia9oLklbN8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ravnborg.org; spf=none smtp.mailfrom=ravnborg.org; dkim=pass (2048-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b=XrZGVqiL; dkim=permerror (0-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b=m3RslpyQ; arc=none smtp.client-ip=46.30.211.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ravnborg.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ravnborg.org
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710072863; x=1710677663; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Kxa+WSij7JIs5xDL7CTBVLsNlWQfBNLOi+KNiX5iofA=;
-        b=IsjvSd13YcKmBjVETrWntfhy9UbZYYMMMLIxvX56HkOjBeotIz7AcQ/QPKuBNmJV5E
-         qivpvO1VVBF/NNkfDLcL6lqQtBi+q+GKZHWxT4uBNsRJYi4gj2cDDBzn249d6OPuqCka
-         pzJgZ94KK/xEfGtjjX1glRjf8PivB9DtdXvmL6Un4tozCdQRqUBAi8ZMfvvtCa2r/t1e
-         cewWj6Qt1kATkq94/doBBrJlXcydhcmizhTuS/1Re7byBeOKHq28ag7wLAldAuwGOEEX
-         l+2nfRmaIvH+plX4vBsJTge0UJign61NRLWdOitwX22F4YxhfIL7k6JdsdcFi7rGoUlp
-         0cPQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710072863; x=1710677663;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Kxa+WSij7JIs5xDL7CTBVLsNlWQfBNLOi+KNiX5iofA=;
-        b=GswnuHd572i30yuFGANGZ7kjDr9yvx783y8Dppb94RryijZWPS3S7hS+DH4TJR/yf8
-         QGCqXswC1Ukf9cKSrr53WaE6giW91DAqiJbL+wNpmbJavgZwC4vkYOJRZuX2qQqS/eIc
-         U/rMJWB9BGEDTNOhEhbaTiwk6Ft2IO/qvY4NpMjVXUvrSUGtOVKEbtVDFzb1rBRQy8TY
-         Fp59drxKyfLkcOFzXNeHredo1H0cOKZ8lmRqqjWdCDRy/j1pULogktO+8olIP9ZKaOfF
-         JEAu4XqwOTtCm9hlRXHwN/MePbywFde+zlU3uVCCfbs4ItalCohmf5Jo66ICmErcZbAI
-         vweg==
-X-Forwarded-Encrypted: i=1; AJvYcCXpEFhVPFXhkfZdu2ruivrXCVSVOSMLCBjnU0C0iZPZdid9OXtSNde7kcQsCotnHxPafv30e7nOB3r6W4fV+Pia9hL2+8LUdnoie5hFZBN+b8sk
-X-Gm-Message-State: AOJu0YwL4zhY1CEAXAEenMCFmLS1x9gUe+fzr+SFP93eOxuXRVpiwbmM
-	5BAZSwR50944jx+166w7yS0yxQyRaDOiLhwP6TQkl3txY2T+0x5/
-X-Google-Smtp-Source: AGHT+IGhuVnLsiaSde8+4+zCnc9ivPFUP0bbOFza29osma/R+lhSX/EGf4YEy2PXyceUXQo8Fpqq1g==
-X-Received: by 2002:a05:6a20:2447:b0:1a1:4e02:e54c with SMTP id t7-20020a056a20244700b001a14e02e54cmr2244148pzc.14.1710072863138;
-        Sun, 10 Mar 2024 05:14:23 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([114.253.38.90])
-        by smtp.gmail.com with ESMTPSA id y30-20020aa793de000000b006e5a99942c6sm2485330pff.88.2024.03.10.05.14.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 10 Mar 2024 05:14:22 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	mhiramat@kernel.org,
-	mathieu.desnoyers@efficios.com,
-	rostedt@goodmis.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next 3/3] trace: use TP_STORE_ADDRS() macro in inet_sock_set_state()
-Date: Sun, 10 Mar 2024 20:14:06 +0800
-Message-Id: <20240310121406.17422-4-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20240310121406.17422-1-kerneljasonxing@gmail.com>
-References: <20240310121406.17422-1-kerneljasonxing@gmail.com>
+	d=ravnborg.org; s=rsa2;
+	h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
+	 from:date:from;
+	bh=YPj7mJSOmbCaNiEGC/t0Gr13wSnOz33kScWhnHNog2A=;
+	b=XrZGVqiLZ7HmxgauHv34KliKYg3bdIPWco3WbmOUS/lB8zsCC5CO+ZmGjgOxo2GjOG74rWmUTzeTD
+	 b/mY6sUBDEHan3+MiNqavhep1+qPHkyBDaWl6exwf4yZnQXZflm2ZNKhjgrSRP7oI7myR7O69SGebo
+	 XlYfPZUDqofK/AVeAQ8SbwF/6PyanxchTuw/gVeaNJjgYIqCt52w0/UnbwyIPRtB3Doc3R096J0hgI
+	 65BFZAHEQ6DOTY5XCc3HExn3ycYD4hb6fzaL/ouKN7wTNatsDLSWPfo0LIq8G88c92fKpkXAryb068
+	 idmG4syFCwOqfBYTzt3xyh947vR51BQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
+	d=ravnborg.org; s=ed2;
+	h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
+	 from:date:from;
+	bh=YPj7mJSOmbCaNiEGC/t0Gr13wSnOz33kScWhnHNog2A=;
+	b=m3RslpyQ6rat08/y9fWoWhKLFFXulH2lxA/XDZXt362zndzEJbzwHFpTAVufQTF1BKRUZp5V6l5Ws
+	 lWldjHQAQ==
+X-HalOne-ID: 84422ca7-deda-11ee-9cef-31e85a7fa845
+Received: from ravnborg.org (2-105-2-98-cable.dk.customer.tdc.net [2.105.2.98])
+	by mailrelay4.pub.mailoutpod2-cph3.one.com (Halon) with ESMTPSA
+	id 84422ca7-deda-11ee-9cef-31e85a7fa845;
+	Sun, 10 Mar 2024 12:34:22 +0000 (UTC)
+Date: Sun, 10 Mar 2024 13:34:20 +0100
+From: Sam Ravnborg <sam@ravnborg.org>
+To: kernel test robot <lkp@intel.com>
+Cc: Sam Ravnborg via B4 Relay <devnull+sam.ravnborg.org@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Arnd Bergmann <arnd@kernel.org>,
+	Andreas Larsson <andreas@gaisler.com>,
+	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Helge Deller <deller@gmx.de>, Randy Dunlap <rdunlap@infradead.org>,
+	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
+	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
+	Kjetil Oftedal <oftedal@gmail.com>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	sparclinux@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-usb@vger.kernel.org, linux-fbdev@vger.kernel.org,
+	dri-devel@lists.freedesktop.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH v2 14/28] sparc32: Drop unused mmu models
+Message-ID: <20240310123420.GA989676@ravnborg.org>
+References: <20240309-sunset-v2-14-f09912574d2c@ravnborg.org>
+ <202403101854.Z94SAU13-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202403101854.Z94SAU13-lkp@intel.com>
 
-From: Jason Xing <kernelxing@tencent.com>
+Hi kernel test robot et al.
 
-As the title said, use the macro directly like the patch[1] did
-to avoid those duplications. No functional change.
+On Sun, Mar 10, 2024 at 06:37:53PM +0800, kernel test robot wrote:
+> Hi Sam,
+> 
+> kernel test robot noticed the following build warnings:
+> 
+> [auto build test WARNING on 84b76d05828a1909e20d0f66553b876b801f98c8]
+> 
+> url:    https://github.com/intel-lab-lkp/linux/commits/Sam-Ravnborg-via-B4-Relay/sparc32-Update-defconfig-to-LEON-SMP/20240310-021717
+> base:   84b76d05828a1909e20d0f66553b876b801f98c8
+> patch link:    https://lore.kernel.org/r/20240309-sunset-v2-14-f09912574d2c%40ravnborg.org
+> patch subject: [PATCH v2 14/28] sparc32: Drop unused mmu models
+> config: sparc-randconfig-r113-20240310 (https://download.01.org/0day-ci/archive/20240310/202403101854.Z94SAU13-lkp@intel.com/config)
+> compiler: sparc-linux-gcc (GCC) 13.2.0
+> reproduce: (https://download.01.org/0day-ci/archive/20240310/202403101854.Z94SAU13-lkp@intel.com/reproduce)
+> 
+> If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> the same patch/commit), kindly add following tags
+> | Reported-by: kernel test robot <lkp@intel.com>
+> | Closes: https://lore.kernel.org/oe-kbuild-all/202403101854.Z94SAU13-lkp@intel.com/
+> 
+> sparse warnings: (new ones prefixed by >>)
+> >> arch/sparc/mm/srmmu.c:49:5: sparse: sparse: symbol 'vac_line_size' was not declared. Should it be static?
+> 
+> vim +/vac_line_size +49 arch/sparc/mm/srmmu.c
+> 
+> accf032cfa582e Sam Ravnborg   2012-05-19  46  
+> ^1da177e4c3f41 Linus Torvalds 2005-04-16  47  int vac_cache_size;
+> 9d262d95114cf2 Guenter Roeck  2017-04-01  48  EXPORT_SYMBOL(vac_cache_size);
+> ^1da177e4c3f41 Linus Torvalds 2005-04-16 @49  int vac_line_size;
+> ^1da177e4c3f41 Linus Torvalds 2005-04-16  50  
 
-[1]
-commit 6a6b0b9914e7 ("tcp: Avoid preprocessor directives in tracepoint macro args")
+vac_line_size is no longer used and can be deleted.
+vac_cache_size is never written to and can be deleted too.
 
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
- include/trace/events/sock.h | 17 ++---------------
- 1 file changed, 2 insertions(+), 15 deletions(-)
+vac_cache_size is used in shmparam_32.h like this:
+#define SHMLBA (vac_cache_size ? vac_cache_size : PAGE_SIZE)
 
-diff --git a/include/trace/events/sock.h b/include/trace/events/sock.h
-index 4397f7bfa406..0d1c5ce4e6a6 100644
---- a/include/trace/events/sock.h
-+++ b/include/trace/events/sock.h
-@@ -160,7 +160,6 @@ TRACE_EVENT(inet_sock_set_state,
- 
- 	TP_fast_assign(
- 		const struct inet_sock *inet = inet_sk(sk);
--		struct in6_addr *pin6;
- 		__be32 *p32;
- 
- 		__entry->skaddr = sk;
-@@ -178,20 +177,8 @@ TRACE_EVENT(inet_sock_set_state,
- 		p32 = (__be32 *) __entry->daddr;
- 		*p32 =  inet->inet_daddr;
- 
--#if IS_ENABLED(CONFIG_IPV6)
--		if (sk->sk_family == AF_INET6) {
--			pin6 = (struct in6_addr *)__entry->saddr_v6;
--			*pin6 = sk->sk_v6_rcv_saddr;
--			pin6 = (struct in6_addr *)__entry->daddr_v6;
--			*pin6 = sk->sk_v6_daddr;
--		} else
--#endif
--		{
--			pin6 = (struct in6_addr *)__entry->saddr_v6;
--			ipv6_addr_set_v4mapped(inet->inet_saddr, pin6);
--			pin6 = (struct in6_addr *)__entry->daddr_v6;
--			ipv6_addr_set_v4mapped(inet->inet_daddr, pin6);
--		}
-+		TP_STORE_ADDRS(__entry, inet->inet_saddr, inet->inet_daddr,
-+			       sk->sk_v6_rcv_saddr, sk->sk_v6_daddr);
- 	),
- 
- 	TP_printk("family=%s protocol=%s sport=%hu dport=%hu saddr=%pI4 daddr=%pI4 saddrv6=%pI6c daddrv6=%pI6c oldstate=%s newstate=%s",
--- 
-2.37.3
+The same file has:
+#define __ARCH_FORCE_SHMLBA	1
 
+If I understand it right then when SHMLBA equals PAGE_SIZE then there is
+no need to define __ARCH_FORCE_SHMLBA and sparc32 can use the asm-generic
+variant of shmparam.h
+
+I will do this change in v3.
+
+	Sam
 
