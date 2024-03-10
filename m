@@ -1,140 +1,172 @@
-Return-Path: <netdev+bounces-79024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97888877695
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 13:35:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0818387772B
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 14:46:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27C961F21720
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 12:35:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2AA8281474
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 13:46:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4820322324;
-	Sun, 10 Mar 2024 12:35:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9298528389;
+	Sun, 10 Mar 2024 13:46:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b="XrZGVqiL";
-	dkim=permerror (0-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b="m3RslpyQ"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="ZLy9zNvw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailrelay4-1.pub.mailoutpod2-cph3.one.com (mailrelay4-1.pub.mailoutpod2-cph3.one.com [46.30.211.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 746BC1EB23
-	for <netdev@vger.kernel.org>; Sun, 10 Mar 2024 12:35:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.30.211.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472DD2C6B2
+	for <netdev@vger.kernel.org>; Sun, 10 Mar 2024 13:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710074135; cv=none; b=a0VuK3MV/h5pdEmJkPac1eqEiEx8blSo1i+/cfTLnKtbHVXwJ+PbF9QUnQNzNmbwTwQp8CUQdW3A/R0UP327qcYZ0/EyfTu5GRcAHUKlVih8Lz0q3E9ttiqbYSfkqfBPhMn3SOBWBXJCK1iu5wAjtmsxbXprGdP2nUk0IbWDy9o=
+	t=1710078405; cv=none; b=A/mbIQlLzg+pADNaZmSpNlHFEi+YK2GrVu/WGh/NUm8pb4n8mqDbbbyT2Q4DSKbgQdhRzajomageOiFy4YTZP1F1EMPJdNiwG8B4eJcDFlBvMburUQb/WkAkhf6EB/hJbtzJH+8scYoZvU9D994Li4ecezy79T/3xXUSPWRS4XQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710074135; c=relaxed/simple;
-	bh=eVb3cFCjq/wLYohZULzNmR4wY1wWmg+rXCBfYx/lovk=;
+	s=arc-20240116; t=1710078405; c=relaxed/simple;
+	bh=21TZ94M2hJQwewiQCyQkESYIMjmxHLmhH5NzgOqAASA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q0peAED3GSP/JxmDOynF5gn8z0zu4LlodT0D4ADX1/GMsBsBBX1R9scpbDLI330OaNMuCI8D4LELJfcMvofjShWf1Cz1Dri1kCQcpYy9SyhB55hplsQnmFX4ooSy11N5HDnNLaTmrWhhyBkvNS1xFuKMT/6Cnpx6Ia9oLklbN8g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ravnborg.org; spf=none smtp.mailfrom=ravnborg.org; dkim=pass (2048-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b=XrZGVqiL; dkim=permerror (0-bit key) header.d=ravnborg.org header.i=@ravnborg.org header.b=m3RslpyQ; arc=none smtp.client-ip=46.30.211.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ravnborg.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=ravnborg.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=OzgI071JEw2SOABe9YEvbOoiamv0Sns3kDt5KEl48LfOYczdak6LIGg1wv7zioDIuy8mgg/74pTeQrNsbC37jOoVsEZoDKa0FUShygE3sWr7vI/I1cEcJwMwLtzfQz1e3Mb9uMGyhyOfR4Zx96F50MCNeTMFzdlLBOKEwBXPNy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=ZLy9zNvw; arc=none smtp.client-ip=209.85.167.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-51320ca689aso2587300e87.2
+        for <netdev@vger.kernel.org>; Sun, 10 Mar 2024 06:46:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=ravnborg.org; s=rsa2;
-	h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
-	 from:date:from;
-	bh=YPj7mJSOmbCaNiEGC/t0Gr13wSnOz33kScWhnHNog2A=;
-	b=XrZGVqiLZ7HmxgauHv34KliKYg3bdIPWco3WbmOUS/lB8zsCC5CO+ZmGjgOxo2GjOG74rWmUTzeTD
-	 b/mY6sUBDEHan3+MiNqavhep1+qPHkyBDaWl6exwf4yZnQXZflm2ZNKhjgrSRP7oI7myR7O69SGebo
-	 XlYfPZUDqofK/AVeAQ8SbwF/6PyanxchTuw/gVeaNJjgYIqCt52w0/UnbwyIPRtB3Doc3R096J0hgI
-	 65BFZAHEQ6DOTY5XCc3HExn3ycYD4hb6fzaL/ouKN7wTNatsDLSWPfo0LIq8G88c92fKpkXAryb068
-	 idmG4syFCwOqfBYTzt3xyh947vR51BQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed;
-	d=ravnborg.org; s=ed2;
-	h=in-reply-to:content-type:mime-version:references:message-id:subject:cc:to:
-	 from:date:from;
-	bh=YPj7mJSOmbCaNiEGC/t0Gr13wSnOz33kScWhnHNog2A=;
-	b=m3RslpyQ6rat08/y9fWoWhKLFFXulH2lxA/XDZXt362zndzEJbzwHFpTAVufQTF1BKRUZp5V6l5Ws
-	 lWldjHQAQ==
-X-HalOne-ID: 84422ca7-deda-11ee-9cef-31e85a7fa845
-Received: from ravnborg.org (2-105-2-98-cable.dk.customer.tdc.net [2.105.2.98])
-	by mailrelay4.pub.mailoutpod2-cph3.one.com (Halon) with ESMTPSA
-	id 84422ca7-deda-11ee-9cef-31e85a7fa845;
-	Sun, 10 Mar 2024 12:34:22 +0000 (UTC)
-Date: Sun, 10 Mar 2024 13:34:20 +0100
-From: Sam Ravnborg <sam@ravnborg.org>
-To: kernel test robot <lkp@intel.com>
-Cc: Sam Ravnborg via B4 Relay <devnull+sam.ravnborg.org@kernel.org>,
+        d=ragnatech.se; s=google; t=1710078400; x=1710683200; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=JdzMv7+p7TMmz2+FgD6x3o47JgLEb4EyxYxDSxikpq8=;
+        b=ZLy9zNvwyEwOknSuR0sQUIytlA52lkybgLor7v4i29gtOIQvWT6NyO1BwqRQlbsV5j
+         qwguYExGXsGhVRIZI04WzvuNmCs3ji2ehqn4TowKCIh1tLhX3LWLNBpOTt2gmxMq7QHE
+         9K5IjsI0sU2CXV07NW9NpU7BuqBnGAL3YNyMERft2rzd0nQmFQsz/N9rHOScHTdHmfEU
+         q+DAg+cLSGOd/rcn5Bl2noQHE9xTxmuBijuMnOA+IUjACI6ysDgSDCF54yE/Znca7a4D
+         Z/kZ4ZgCz2TJy5FJPC5YR9oNTR8FFbuHEG8J2my1elMe15I63F1l7ad8a5EuZjr1kXmM
+         9FGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710078400; x=1710683200;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JdzMv7+p7TMmz2+FgD6x3o47JgLEb4EyxYxDSxikpq8=;
+        b=LbqAwi8F+09TuJlzMQ/T5zHtIp2iFDP1v+LPSbUDS/MhQscKo0DAnwoxZ3SkoQqcTE
+         DaB54+NEdrLmG/dkuPGZrn/mORe2nwy9G92sf08gHpbZQcbiYfLK/BCy9kSqb+HDNcSA
+         ir4tMxsIl6/KRlcbxTB+1+FCnizSydCuuNmLQaS2midM5VvIkxNCEePS+b/aWSrSbfF9
+         GAkLRidq6t56proaEe4HTbmaHcHaBepwhzc1fWpH3arKxWaG24ECpQh/c7Ou5qsQG1tj
+         88NmkHIAAJbECE5i1yDMZ1hZUnnie9J6d1BYIB3JG9FF7sVh2KUKp46wx0yv0yLn7AwR
+         9fwg==
+X-Forwarded-Encrypted: i=1; AJvYcCW02dUvH9wUCEP76nBmAwnyxBlu5GO050FPNoWc4qCORYz3zO9xFW+Vxn8ScpE5mRQwA/HxlvJ8CRv5RAf4A4Qv6W0w5yK8
+X-Gm-Message-State: AOJu0YxwhEdeC4hbblxqOjPpbnsXgXRQwiDytI09L80tDak4M8pdw1C1
+	9wWeWkcyFR07gsmzK0uVGrTmMOkJUPnwrvC2OsfbPK+4Vq2jVGe1MRJgFbYYjhE=
+X-Google-Smtp-Source: AGHT+IG3kp11nPWGWFj8js+ydDFBDe1MFC7OGap0e5Cy99srts4Qp37KpmMFPmbKnmUUlfpPv8QOEA==
+X-Received: by 2002:ac2:5de1:0:b0:513:9da7:3792 with SMTP id z1-20020ac25de1000000b005139da73792mr2371852lfq.19.1710078400171;
+        Sun, 10 Mar 2024 06:46:40 -0700 (PDT)
+Received: from localhost (h-46-59-36-113.A463.priv.bahnhof.se. [46.59.36.113])
+        by smtp.gmail.com with ESMTPSA id y26-20020a19751a000000b005133dafa9c4sm669499lfe.145.2024.03.10.06.46.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 10 Mar 2024 06:46:39 -0700 (PDT)
+Date: Sun, 10 Mar 2024 14:46:38 +0100
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
 	"David S. Miller" <davem@davemloft.net>,
-	Arnd Bergmann <arnd@kernel.org>,
-	Andreas Larsson <andreas@gaisler.com>,
-	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Helge Deller <deller@gmx.de>, Randy Dunlap <rdunlap@infradead.org>,
-	John Paul Adrian Glaubitz <glaubitz@physik.fu-berlin.de>,
-	Mark Cave-Ayland <mark.cave-ayland@ilande.co.uk>,
-	Kjetil Oftedal <oftedal@gmail.com>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
-	sparclinux@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-usb@vger.kernel.org, linux-fbdev@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH v2 14/28] sparc32: Drop unused mmu models
-Message-ID: <20240310123420.GA989676@ravnborg.org>
-References: <20240309-sunset-v2-14-f09912574d2c@ravnborg.org>
- <202403101854.Z94SAU13-lkp@intel.com>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next 1/2] dt-bindings: net: renesas,etheravb: Add optional
+ MDIO bus node
+Message-ID: <20240310134638.GK3735877@ragnatech.se>
+References: <20240309155334.1310262-1-niklas.soderlund+renesas@ragnatech.se>
+ <20240309155334.1310262-2-niklas.soderlund+renesas@ragnatech.se>
+ <cb8f85de-c1cd-4742-b8a4-2533482ee3b6@linaro.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <202403101854.Z94SAU13-lkp@intel.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <cb8f85de-c1cd-4742-b8a4-2533482ee3b6@linaro.org>
 
-Hi kernel test robot et al.
+Hi Krzysztof,
 
-On Sun, Mar 10, 2024 at 06:37:53PM +0800, kernel test robot wrote:
-> Hi Sam,
+Thanks for your comments.
+
+On 2024-03-10 09:44:45 +0100, Krzysztof Kozlowski wrote:
+> On 09/03/2024 16:53, Niklas Söderlund wrote:
+> > The Renesas Ethernet AVB bindings do not allow the MDIO bus to be
+> > described. This has not been needed as only a single PHY is
+> > supported and no MDIO bus properties have been needed.
+> > 
+> > Add an optional mdio node to the binding which allows the MDIO bus to be
+> > described and allow bus properties to be set.
+> > 
+> > Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+> > ---
 > 
-> kernel test robot noticed the following build warnings:
+> I believe this is v2. Mark your patchsets clearly (git format-patch -v2
+> or use b4) and provide changelog under --- or in the cover letter.
 > 
-> [auto build test WARNING on 84b76d05828a1909e20d0f66553b876b801f98c8]
 > 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Sam-Ravnborg-via-B4-Relay/sparc32-Update-defconfig-to-LEON-SMP/20240310-021717
-> base:   84b76d05828a1909e20d0f66553b876b801f98c8
-> patch link:    https://lore.kernel.org/r/20240309-sunset-v2-14-f09912574d2c%40ravnborg.org
-> patch subject: [PATCH v2 14/28] sparc32: Drop unused mmu models
-> config: sparc-randconfig-r113-20240310 (https://download.01.org/0day-ci/archive/20240310/202403101854.Z94SAU13-lkp@intel.com/config)
-> compiler: sparc-linux-gcc (GCC) 13.2.0
-> reproduce: (https://download.01.org/0day-ci/archive/20240310/202403101854.Z94SAU13-lkp@intel.com/reproduce)
+> >  Documentation/devicetree/bindings/net/renesas,etheravb.yaml | 4 ++++
+> >  1 file changed, 4 insertions(+)
+> > 
+> > diff --git a/Documentation/devicetree/bindings/net/renesas,etheravb.yaml b/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
+> > index de7ba7f345a9..5345ad8e1be4 100644
+> > --- a/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
+> > +++ b/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
+> > @@ -93,6 +93,10 @@ properties:
+> >      description: Number of size cells on the MDIO bus.
+> >      const: 0
+> >  
+> > +  mdio:
+> > +    $ref: /schemas/net/mdio.yaml#
+> > +    unevaluatedProperties: false
+> > +
 > 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202403101854.Z94SAU13-lkp@intel.com/
+> Please fixup the phy pattern, so it will be obvious it is for
+> ethernet-phy and probably deprecate it. The phy goes to mdio bus, right?
+
+Yes the PHY goes on the MDIO bus and the pattern is only needed for 
+backward compatibility.
+
+The pattern was specific to ethernet-phy in the past, but Rob removed it 
+in commit ac8fe40c3628 ("dt-bindings: net: renesas: Drop ethernet-phy 
+node schema"). Have something changed and I should revert that as part 
+of this patch?
+
+I agree it should be listed as deprecated, would this diff work for you?
+
++# In older bindings there where no mdio child-node to describe the MDIO bus
++# and the PHY. To not fail older bindings accept any node with an address. New
++# users should describe the PHY inside the mdio child-node.
+ patternProperties:
+   "@[0-9a-f]$":
+     type: object
++    deprecated: true
+
+Depending on if Rob's patch should be reverted in whole or in part I 
+could also try to revert the pattern to "^ethernet-phy@[0-9a-f]$" if you 
+wish. Please let me know what looks best to you.
+
 > 
-> sparse warnings: (new ones prefixed by >>)
-> >> arch/sparc/mm/srmmu.c:49:5: sparse: sparse: symbol 'vac_line_size' was not declared. Should it be static?
 > 
-> vim +/vac_line_size +49 arch/sparc/mm/srmmu.c
+> Best regards,
+> Krzysztof
 > 
-> accf032cfa582e Sam Ravnborg   2012-05-19  46  
-> ^1da177e4c3f41 Linus Torvalds 2005-04-16  47  int vac_cache_size;
-> 9d262d95114cf2 Guenter Roeck  2017-04-01  48  EXPORT_SYMBOL(vac_cache_size);
-> ^1da177e4c3f41 Linus Torvalds 2005-04-16 @49  int vac_line_size;
-> ^1da177e4c3f41 Linus Torvalds 2005-04-16  50  
 
-vac_line_size is no longer used and can be deleted.
-vac_cache_size is never written to and can be deleted too.
-
-vac_cache_size is used in shmparam_32.h like this:
-#define SHMLBA (vac_cache_size ? vac_cache_size : PAGE_SIZE)
-
-The same file has:
-#define __ARCH_FORCE_SHMLBA	1
-
-If I understand it right then when SHMLBA equals PAGE_SIZE then there is
-no need to define __ARCH_FORCE_SHMLBA and sparc32 can use the asm-generic
-variant of shmparam.h
-
-I will do this change in v3.
-
-	Sam
+-- 
+Kind Regards,
+Niklas Söderlund
 
