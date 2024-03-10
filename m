@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-79008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79010-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 566A08775AD
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 09:02:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 14F878775D0
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 09:34:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D62D71F21441
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 08:02:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E9B91F22B41
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 08:34:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4031171C;
-	Sun, 10 Mar 2024 08:02:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D1C17758;
+	Sun, 10 Mar 2024 08:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B5+E/0eQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o9n6DKZa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 300F4111A1;
-	Sun, 10 Mar 2024 08:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D158C3D8E;
+	Sun, 10 Mar 2024 08:34:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710057748; cv=none; b=N4NTqp2LjWLruY2OV7SMCu4o7BosvHOs5/kdlGJ+cyjdRRUD+GJcJsQ+gYO/w5sOIkV2Wc4KudcGmpyvCT25bjN9oJRKDLQutgwVo0jW2qr7HFXjR++MMI0+bP6+faE4c1U0ZAt1VvJzjmb2c2/MOv8MZ+6/RuBBa5aOVsEDUuU=
+	t=1710059657; cv=none; b=u3R5a6lg2DRVb/C3c4XIXzQ6vyByVMeq2n7Mtq/0GCmrPf3S/Xbk4AlSIcFdvAYYwljSl3ebwjLQe8GbBLdEY7wLf0NKct7C98e005914f+0hQmCBXCOq+muZAVP93ImFDVKFrYeb6BKc8GeCsZwVechEUxfi/SEOuvZiUNa9ys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710057748; c=relaxed/simple;
-	bh=or3Sro/KI5eZgOzU2rxwbRh5kkJTQswE6RZfe0KbjYs=;
+	s=arc-20240116; t=1710059657; c=relaxed/simple;
+	bh=gcfTwszRAmyvo21KCTyIC/nvbRn944T+nd3HA1Ic3V4=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eLiAEQmaxlJXhRUB8vmCKSbTggRDa/VhiUj62iVWsg2GyIbodNQnU7Tt9XCGE8LTHQRD1ByPK8RNQcCo4hmMWLzUrC//fTNsHoKaywTmlQ3zegGNKxJXr0JtSE3e7wqG+D/tnlloKHr10lksHKUhqVQH+eK369AgABzusPBN0/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B5+E/0eQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3CC7FC433C7;
-	Sun, 10 Mar 2024 08:02:23 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=jhfqkVi8NspURokxz/YJVFKmjp9hWDjJbmo1+Baox8m8oakCJ3mVaNwV83IZ0U1nlxDe9BfiDODEG404Gn4RmZXdSsxMnEHe3ieqZjsK5LCr2M0XVSTvZWd+b3ISAw9gElurqcU/zcSauM2gbFNoOYVI6ZWCeNV+8q5BECtlCik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o9n6DKZa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87A90C433C7;
+	Sun, 10 Mar 2024 08:34:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710057747;
-	bh=or3Sro/KI5eZgOzU2rxwbRh5kkJTQswE6RZfe0KbjYs=;
+	s=k20201202; t=1710059657;
+	bh=gcfTwszRAmyvo21KCTyIC/nvbRn944T+nd3HA1Ic3V4=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=B5+E/0eQQuyywzUxcgt1i2idkrWQ5BoW+q0AvwI+3YzGEqnrYqdMF2iWSKaZ/SNn8
-	 WI+OQS1UOV/7XAkNoZkyqvDPQtirbD3Q7cGYm5NNyXRg02DzG+L1c3ApV1OP2SDyJ1
-	 3j4Nzag8HGNPzXVzNDyCYBdgYDu8qRVVBuZ7CI4XNjBa5n6RClRtQPCO1DiVAbVq8U
-	 Hq5eDyR1mdKj+opgkfjnwW5OO5x8vnoq4ZjcKEQwqn8VkFLDAVobWtGNcd0pUkctXt
-	 8WVdE212AZ4bBeyhnI1C/RYRyZ04LLExECLgvXtBjBX1SbKSyuRMFYo/vpRXF0iXWd
-	 NaQKhji2qKswA==
-Message-ID: <760b371e-7b02-423f-9ef6-b26ba3ccaf59@kernel.org>
-Date: Sun, 10 Mar 2024 09:02:23 +0100
+	b=o9n6DKZaKoyEEvItgDo0DyiD1szehUfFk3FXrevYmgOneMQTbupoaIQ24ScJWbjjk
+	 Aej5y0DewhUZ3jeOmZm2LHjWYI2cg0g080DT9ro8t45s7qjlUcY/CgPyMusqP+4OBB
+	 e8UooycTp3Mo12ZpWW448AhIcGzyzFR8vQTqlcnkQiv6Ja04HelidMTZNYQo0GShY0
+	 6kCcaCE3QvVEFzd+WqPT4eq4USvP7HlWkdn8giLRuDWVsS6WdUX+h1G7pf9gDvakyK
+	 UaYk4hlz097z+DqzmLHwtX1wvXvvG5vUbmt36OQ360jlnYnWJQoxL0e8ImqL+VkDei
+	 9b/qUGpILWCxw==
+Message-ID: <d2568101-f3e0-4c2d-8613-52d023e22b77@kernel.org>
+Date: Sun, 10 Mar 2024 09:34:09 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,8 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 4/4] net: dsa: realtek: add LED drivers for
- rtl8366rb
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dsa: realtek: describe LED
+ usage
 Content-Language: en-US
 To: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
  Linus Walleij <linus.walleij@linaro.org>,
@@ -60,9 +60,10 @@ To: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
  Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
  <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org
 References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com>
- <20240310-realtek-led-v1-4-4d9813ce938e@gmail.com>
+ <20240310-realtek-led-v1-1-4d9813ce938e@gmail.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Autocrypt: addr=krzk@kernel.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
@@ -107,28 +108,96 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20240310-realtek-led-v1-4-4d9813ce938e@gmail.com>
+In-Reply-To: <20240310-realtek-led-v1-1-4d9813ce938e@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/03/2024 05:52, Luiz Angelo Daros de Luca wrote:
-> This commit introduces LED drivers for rtl8366rb, enabling LEDs to be
-> described in the device tree using the same format as qca8k. Each port
-> can configure up to 4 LEDs.
+On 10/03/2024 05:51, Luiz Angelo Daros de Luca wrote:
+> Each port can have up to 4 LEDs (3 for current rtl8365mb devices). The
+> LED reg property will indicate its LED group.
 > 
-> If all LEDs in a group use the default state "keep", they will use the
-> default behavior after a reset. Changing the brightness of one LED,
-> either manually or by a trigger, will disable the default hardware
-> trigger and switch the entire LED group to manually controlled LEDs.
-> Once in this mode, there is no way to revert to hardware-controlled LEDs
-> (except by resetting the switch).
-> 
-> Software triggers function as expected with manually controlled LEDs.
-> 
-> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-Again, this is the first version, so how could you have a review?
+Please use scripts/get_maintainers.pl to get a list of necessary people
+and lists to CC (and consider --no-git-fallback argument). It might
+happen, that command when run on an older kernel, gives you outdated
+entries. Therefore please be sure you base your patches on recent Linux
+kernel.
+
+Tools like b4 or scripts/get_maintainer.pl provide you proper list of
+people, so fix your workflow. Tools might also fail if you work on some
+ancient tree (don't, instead use mainline), work on fork of kernel
+(don't, instead use mainline) or you ignore some maintainers (really
+don't). Just use b4 and everything should be fine, although remember
+about `b4 prep --auto-to-cc` if you added new patches to the patchset.
+
+> An example of LED usage was included in an existing switch example.
+> 
+> Cc: devicetree@vger.kernel.org
+
+Please drop the autogenerated scripts/get_maintainer.pl CC-entries from
+commit msg. There is no single need to store automated output of
+get_maintainers.pl in the git log. It can be easily re-created at any
+given time, thus its presence in the git history is redundant and
+obfuscates the log.
+
+If you need it for your own patch management purposes, keep it under the
+--- separator.
+
+> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> ---
+>  .../devicetree/bindings/net/dsa/realtek.yaml       | 46 ++++++++++++++++++++++
+>  1 file changed, 46 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/realtek.yaml b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
+> index 70b6bda3cf98..45c1656b3fae 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/realtek.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
+> @@ -108,6 +108,32 @@ properties:
+>        compatible:
+>          const: realtek,smi-mdio
+>  
+> +patternProperties:
+> +  '^(ethernet-)?ports$':
+> +    type: object
+> +    additionalProperties: true
+> +
+> +    patternProperties:
+> +      '^(ethernet-)?port@[0-6]$':
+> +        type: object
+> +        additionalProperties: true
+> +
+> +        properties:
+> +          leds:
+
+type: object
+additionalProperties: false
+
+> +            description:
+> +              "LEDs associated with this port"
+
+Drop quotes.
+
+> +
+> +            patternProperties:
+> +              '^led@[a-f0-9]+$':
+
+[0-3]
+
+> +                type: object
+> +                additionalProperties: true
+
+This cannot be 'true'. Which then will point you to errors and missing
+ref to leds schema and need to use unevaluatedProperties: false.
+
+
+> +
+> +                properties:
+> +                  reg:
+> +                    description:
+> +                      "reg indicates the LED group for this LED"
+
+Drop quotes
+
 
 Best regards,
 Krzysztof
