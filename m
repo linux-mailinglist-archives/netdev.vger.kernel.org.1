@@ -1,84 +1,92 @@
-Return-Path: <netdev+bounces-79034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8A918777D8
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 18:55:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 936EA8777DB
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 19:02:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D03B1F21253
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 17:55:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B5121F2133C
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 18:02:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DA3C39863;
-	Sun, 10 Mar 2024 17:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0E3D39ADB;
+	Sun, 10 Mar 2024 18:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rbWJ2xZw"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="w5FluFU2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A3351D6BD
-	for <netdev@vger.kernel.org>; Sun, 10 Mar 2024 17:55:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BAFC21115;
+	Sun, 10 Mar 2024 18:02:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710093302; cv=none; b=nL46pQcTN0SWgJD8zvbjwS97TS7CpB0MoOxW0byN+ach9YPXO+8PnZ+HXNCG0w2lmrbH5F8CpSTPoFTrgl8BR1CE0yaRY3xjiYOrG9t/R1RzERrbb9mTl7J9+ZR7CGWQTM+kxt89wSwSF5tnp+w1SBDUmXY/6VipaVOBh12xrUo=
+	t=1710093761; cv=none; b=FjaSLXA5OXCQ3mvBkc5U3CeNptfkFY2R+CRUCl+y+WruEBKcBaN5eHwTlE0PPI42Gw25nhY6PQ/RIAE9mvRs61p8fBwzFpsDcCrFJl49rEd4iAxiIQzP32C5h5QRVLlb859URCj1upVddaPaf5Pi502V0aBek0/sVc5bCyhW0qg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710093302; c=relaxed/simple;
-	bh=heTFNwk/ppSR2NA7nRc1RYd/yeHfAhlCgWm5vmeCr8A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EhOR2lTjDKK54Jax9VSAxerz/QF4iIHq/Ikcz5DQH7VOz4iHZRKIKuLaxhEJt0VFiYPaA1QlE5ilOj2WdAzagw4lYkgYyDc7KL7Ok2GFTZ3Z9t9cP72GeNc/s7LwO8yiYTAuTcxHsEigy2yt681/JazmbyWGySpTZpPs5JU0RhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rbWJ2xZw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E37EC433F1;
-	Sun, 10 Mar 2024 17:55:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710093301;
-	bh=heTFNwk/ppSR2NA7nRc1RYd/yeHfAhlCgWm5vmeCr8A=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rbWJ2xZw8nTCFJOs/ZbT9FWyDYe9jOyHqSGlZQInQXFLXUCTzNO06q+EGbHXJmS2c
-	 GIUf27MZ0Guyw8b39ekKCZNF0B11qB4UDty6h/rkyXn3oPH5x4p8eVXDm01DQZZ+xu
-	 i5RGkWdShOgwIjRqOKfv0i4A1q9mo7VPfxinPuB9vojF4A7/7hegaePDq0G423IW4y
-	 1b3RKRbWwCzXil4zaWnsRRMqg952xqYI5wSHpTEfHKPdH2USPdx+XRzowArPgAVstI
-	 E8ag+DZl1a8n2Ly3a8ad6jFTY2fXVgCPFpkPtOMN/4COn6WmWVdVCXnsnviSwEcUNL
-	 6+JKwvKl5IuJA==
-Message-ID: <a92e609b-f5c4-4e9a-8eb8-7e2c54f75215@kernel.org>
-Date: Sun, 10 Mar 2024 11:54:59 -0600
+	s=arc-20240116; t=1710093761; c=relaxed/simple;
+	bh=/uti3KhNUWLN2j9QKHNuTsykTW7CeAjkbaGcoIDvAX8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HbQSau2TBA3earAgw5x/46pBDza1lN1SZ25EbgXx93xA+/Mjr6dG/bcHtOu1EazkWj7hyuso80Mme6mYIDYIEuQndDRUxSGGtGsTUNLRsDQenntXLDvIiDTAKYwPcwE/KhyjOMsDvoUPFjgQH1KpAJw0o13UwbDQ7Z3jmkcuWoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=w5FluFU2; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=nKRXGf8H98Z9tuuZUNbMP7MGE4PkRR7UCT/L+6ltYAE=; b=w5FluFU27o3T9ZV6+J2q4vNQ9v
+	JIt6svUBCo3ZXxBsiBqliqW1LP2CFfMt31fzXHrLoNAvRwmOKo0OBZe+7t91n9aKrizryfZLHdMZ3
+	ex6+Dya9ByuIBmgxubDerQSfrkxnPNldDnOA7zyAZfjFBgiy+HYMa5BJ5TqRHUHUO03g=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rjNVc-009v1u-Sv; Sun, 10 Mar 2024 19:02:52 +0100
+Date: Sun, 10 Mar 2024 19:02:52 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	devicetree@vger.kernel.org
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dsa: realtek: describe
+ LED usage
+Message-ID: <6705a278-d294-475f-bc4c-b08926c5017d@lunn.ch>
+References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com>
+ <20240310-realtek-led-v1-1-4d9813ce938e@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] nexthop: Fix out-of-bounds access during
- attribute validation
-Content-Language: en-US
-To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, petrm@nvidia.com
-References: <20240310173215.200791-1-idosch@nvidia.com>
- <20240310173215.200791-2-idosch@nvidia.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240310173215.200791-2-idosch@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240310-realtek-led-v1-1-4d9813ce938e@gmail.com>
 
-On 3/10/24 11:32 AM, Ido Schimmel wrote:
-> diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-> index 5eb3ba568f4e..f3df80d2b980 100644
-> --- a/net/ipv4/nexthop.c
-> +++ b/net/ipv4/nexthop.c
-> @@ -3253,8 +3253,9 @@ static int rtm_del_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
->  	int err;
->  	u32 id;
->  
-> -	err = nlmsg_parse(nlh, sizeof(struct nhmsg), tb, NHA_MAX,
-> -			  rtm_nh_policy_del, extack);
-> +	err = nlmsg_parse(nlh, sizeof(struct nhmsg), tb,
-> +			  ARRAY_SIZE(rtm_nh_policy_del) - 1, rtm_nh_policy_del,
+On Sun, Mar 10, 2024 at 01:51:58AM -0300, Luiz Angelo Daros de Luca wrote:
+> Each port can have up to 4 LEDs (3 for current rtl8365mb devices). The
+> LED reg property will indicate its LED group.
+> +                properties:
+> +                  reg:
+> +                    description:
+> +                      "reg indicates the LED group for this LED"
+> +                    enum: [0, 1, 2, 3]
 
-'tb' on the stack only needs to be ARRAY_SIZE as well; that's the
-benefit of the approach - only declare what you need.
+If this identifies the group, what identifies the actual LED? There
+are four of them. How do i say LEDs 0 and 1 are unused, 2 and 3 are
+wired to LEDs?
 
-Comment applies to the other locations as well.
+It would be much more usual for reg to be the LED number for the
+port. And there then be a group property indicating what group the LED
+belongs to. However, i'm wondering, is group fixed? Do we actually
+need it in DT, or can there just be a table in the driver which maps
+port:led to group?
+
+	 Andrew
 
