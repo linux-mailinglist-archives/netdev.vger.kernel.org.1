@@ -1,48 +1,74 @@
-Return-Path: <netdev+bounces-79010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14F878775D0
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 09:34:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E31568775D9
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 09:44:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E9B91F22B41
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 08:34:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E8191F22C60
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 08:44:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09D1C17758;
-	Sun, 10 Mar 2024 08:34:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D8AF17556;
+	Sun, 10 Mar 2024 08:44:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o9n6DKZa"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PKuWnHAy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D158C3D8E;
-	Sun, 10 Mar 2024 08:34:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C1ED17BA4
+	for <netdev@vger.kernel.org>; Sun, 10 Mar 2024 08:44:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710059657; cv=none; b=u3R5a6lg2DRVb/C3c4XIXzQ6vyByVMeq2n7Mtq/0GCmrPf3S/Xbk4AlSIcFdvAYYwljSl3ebwjLQe8GbBLdEY7wLf0NKct7C98e005914f+0hQmCBXCOq+muZAVP93ImFDVKFrYeb6BKc8GeCsZwVechEUxfi/SEOuvZiUNa9ys=
+	t=1710060291; cv=none; b=o1wxzdPgmRib1F8g8ntf+yXkSUyzbuhCETEicvVJFxYI1d9hCm4QzG1y2lW/PaMqYG/nU8pwJ5bRQXXp41pi2/7veuAn8JbkVMsNgfR3Aw+pPEfIeS7XS5hqRqtyAf7n8EnrB6s8Gj9LVS+/VnZchMecLkQRKUrJayzj0wmDuLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710059657; c=relaxed/simple;
-	bh=gcfTwszRAmyvo21KCTyIC/nvbRn944T+nd3HA1Ic3V4=;
+	s=arc-20240116; t=1710060291; c=relaxed/simple;
+	bh=HSQ8ESQPklTKLCf3m3sU8WH2pEDTKzKfenduepWXpqw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jhfqkVi8NspURokxz/YJVFKmjp9hWDjJbmo1+Baox8m8oakCJ3mVaNwV83IZ0U1nlxDe9BfiDODEG404Gn4RmZXdSsxMnEHe3ieqZjsK5LCr2M0XVSTvZWd+b3ISAw9gElurqcU/zcSauM2gbFNoOYVI6ZWCeNV+8q5BECtlCik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o9n6DKZa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87A90C433C7;
-	Sun, 10 Mar 2024 08:34:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710059657;
-	bh=gcfTwszRAmyvo21KCTyIC/nvbRn944T+nd3HA1Ic3V4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=o9n6DKZaKoyEEvItgDo0DyiD1szehUfFk3FXrevYmgOneMQTbupoaIQ24ScJWbjjk
-	 Aej5y0DewhUZ3jeOmZm2LHjWYI2cg0g080DT9ro8t45s7qjlUcY/CgPyMusqP+4OBB
-	 e8UooycTp3Mo12ZpWW448AhIcGzyzFR8vQTqlcnkQiv6Ja04HelidMTZNYQo0GShY0
-	 6kCcaCE3QvVEFzd+WqPT4eq4USvP7HlWkdn8giLRuDWVsS6WdUX+h1G7pf9gDvakyK
-	 UaYk4hlz097z+DqzmLHwtX1wvXvvG5vUbmt36OQ360jlnYnWJQoxL0e8ImqL+VkDei
-	 9b/qUGpILWCxw==
-Message-ID: <d2568101-f3e0-4c2d-8613-52d023e22b77@kernel.org>
-Date: Sun, 10 Mar 2024 09:34:09 +0100
+	 In-Reply-To:Content-Type; b=s8GOlaOpgxlJjpSdjXk5fcy7ib426LF/iGoovJfgpjCEDJOj4mkHdrODVoAkihDOa0rtwTg3DbMBBPUTzYPRGiTGqqrhqlZ7CN7jDeW2OpuzoeB8XMFfZEi+lAXYYn7L2LGQ0XdHienqs5Sreu4/Y1VEsCT89Zj8hn+CeAcjPN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PKuWnHAy; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a45f257b81fso224061666b.0
+        for <netdev@vger.kernel.org>; Sun, 10 Mar 2024 00:44:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1710060288; x=1710665088; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3jiQ5qQPdyYdX3mYgTew5eH9b3GM9SSnnTUQ4aps42I=;
+        b=PKuWnHAyvIGwhWF62O8lk55smjiRbNd21QCxJVRUxlgi1pcorkFDxnRyIRrYh5Jniy
+         QyewbC28zX6HLxt/sPAHtmbMHfXU3RxRUyfV8xwrMsWhaAnWAaGulq3CYWPZtC/VniQQ
+         dW+8uTKXFxDtJrytI6/rmRc4eBIe0UFONe8b8a4xbZYqxkCl3RALwKJ6SpwYes7rEovx
+         k6fJRXPxxToauRok4eUbwp9c3LyrFfMHzxRFf5atFS+uLvRyYZ7biflTkhw6xKIyxHuu
+         aLjWibECz+MnQobTxS4Nl3XoGuf/zPZbnUzv7sv2X4U995uLNiS/J20XuoSMh5gsYqh8
+         Zd7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710060288; x=1710665088;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3jiQ5qQPdyYdX3mYgTew5eH9b3GM9SSnnTUQ4aps42I=;
+        b=tHUDsXbR3Xs1a0D+PScYlVK0fFfpPiQ7gcowzrBKlBkuns36oaVW2UaeGfzmu2dtnq
+         JDGwAfOQ+am3pJsKXXSmqzpPp1YxsTS1MhPN3BiWJltOelRSoxtw25sfgc49rJvHiW1L
+         op8QF0OF3sQsEjJeuqkemriXPG7gbboY2W/tCZDWamkiG7ja7gUAmRXlQWxqECBjyv0E
+         lni5Tz/eTZUpS3l6+UBB2fJoe8XCR31ybHguyynPNS+WfAVW61b7S9vEWtzuNUq5VYOX
+         6cRBHs1DFjVoIWdhPxCEwUH/SB+xqDiPtChOj/ucru0xTgEDlS/BG6yLTsPdc7r3mLDI
+         pRTg==
+X-Forwarded-Encrypted: i=1; AJvYcCWa5XbgKegGAfdRxfF9x3yvyRK987VkTSXP6Usr3d6r6NkErF3ZfWL1AxC/uTtr9z3bgzqO5gkm63EV/L7M+60xAn2+mJrx
+X-Gm-Message-State: AOJu0YxPp11AbJzIo1k/LbL0nwyTAezB631Lbgq1nXcTKnapl9MqhRbg
+	VKcs1iMSJzPQJGkYqYKTMdAnK28i41TyrOf4JOPgjVFp57QPkTS7fr9d8kwA4Vo=
+X-Google-Smtp-Source: AGHT+IF06tUR6ZJ6UF9MF9DwypYyaj6kp5s4rW+QjEi2nKEcT4GCcipUL2GIFocpt6f5ylkvxGG1Uw==
+X-Received: by 2002:a17:907:d045:b0:a45:27bd:e1ff with SMTP id vb5-20020a170907d04500b00a4527bde1ffmr2138965ejc.6.1710060287809;
+        Sun, 10 Mar 2024 00:44:47 -0800 (PST)
+Received: from [192.168.1.20] ([178.197.222.97])
+        by smtp.gmail.com with ESMTPSA id u23-20020a170906409700b00a42ed7421b8sm1735370ejj.93.2024.03.10.00.44.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 10 Mar 2024 00:44:47 -0800 (PST)
+Message-ID: <cb8f85de-c1cd-4742-b8a4-2533482ee3b6@linaro.org>
+Date: Sun, 10 Mar 2024 09:44:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,22 +76,26 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dsa: realtek: describe LED
- usage
+Subject: Re: [net-next 1/2] dt-bindings: net: renesas,etheravb: Add optional
+ MDIO bus node
 Content-Language: en-US
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+To: =?UTF-8?Q?Niklas_S=C3=B6derlund?=
+ <niklas.soderlund+renesas@ragnatech.se>, Sergey Shtylyov
+ <s.shtylyov@omp.ru>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Geert Uytterhoeven <geert+renesas@glider.be>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ Biju Das <biju.das.jz@bp.renesas.com>, netdev@vger.kernel.org,
  devicetree@vger.kernel.org
-References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com>
- <20240310-realtek-led-v1-1-4d9813ce938e@gmail.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Autocrypt: addr=krzk@kernel.org; keydata=
+Cc: linux-renesas-soc@vger.kernel.org
+References: <20240309155334.1310262-1-niklas.soderlund+renesas@ragnatech.se>
+ <20240309155334.1310262-2-niklas.soderlund+renesas@ragnatech.se>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
  xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
  cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
  JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
@@ -75,128 +105,77 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  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
- 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 fv0=
-In-Reply-To: <20240310-realtek-led-v1-1-4d9813ce938e@gmail.com>
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240309155334.1310262-2-niklas.soderlund+renesas@ragnatech.se>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/03/2024 05:51, Luiz Angelo Daros de Luca wrote:
-> Each port can have up to 4 LEDs (3 for current rtl8365mb devices). The
-> LED reg property will indicate its LED group.
+On 09/03/2024 16:53, Niklas Söderlund wrote:
+> The Renesas Ethernet AVB bindings do not allow the MDIO bus to be
+> described. This has not been needed as only a single PHY is
+> supported and no MDIO bus properties have been needed.
 > 
-
-Please use scripts/get_maintainers.pl to get a list of necessary people
-and lists to CC (and consider --no-git-fallback argument). It might
-happen, that command when run on an older kernel, gives you outdated
-entries. Therefore please be sure you base your patches on recent Linux
-kernel.
-
-Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-people, so fix your workflow. Tools might also fail if you work on some
-ancient tree (don't, instead use mainline), work on fork of kernel
-(don't, instead use mainline) or you ignore some maintainers (really
-don't). Just use b4 and everything should be fine, although remember
-about `b4 prep --auto-to-cc` if you added new patches to the patchset.
-
-> An example of LED usage was included in an existing switch example.
+> Add an optional mdio node to the binding which allows the MDIO bus to be
+> described and allow bus properties to be set.
 > 
-> Cc: devicetree@vger.kernel.org
-
-Please drop the autogenerated scripts/get_maintainer.pl CC-entries from
-commit msg. There is no single need to store automated output of
-get_maintainers.pl in the git log. It can be easily re-created at any
-given time, thus its presence in the git history is redundant and
-obfuscates the log.
-
-If you need it for your own patch management purposes, keep it under the
---- separator.
-
-> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
 > ---
->  .../devicetree/bindings/net/dsa/realtek.yaml       | 46 ++++++++++++++++++++++
->  1 file changed, 46 insertions(+)
+
+I believe this is v2. Mark your patchsets clearly (git format-patch -v2
+or use b4) and provide changelog under --- or in the cover letter.
+
+
+>  Documentation/devicetree/bindings/net/renesas,etheravb.yaml | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/dsa/realtek.yaml b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-> index 70b6bda3cf98..45c1656b3fae 100644
-> --- a/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-> +++ b/Documentation/devicetree/bindings/net/dsa/realtek.yaml
-> @@ -108,6 +108,32 @@ properties:
->        compatible:
->          const: realtek,smi-mdio
+> diff --git a/Documentation/devicetree/bindings/net/renesas,etheravb.yaml b/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
+> index de7ba7f345a9..5345ad8e1be4 100644
+> --- a/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
+> +++ b/Documentation/devicetree/bindings/net/renesas,etheravb.yaml
+> @@ -93,6 +93,10 @@ properties:
+>      description: Number of size cells on the MDIO bus.
+>      const: 0
 >  
-> +patternProperties:
-> +  '^(ethernet-)?ports$':
-> +    type: object
-> +    additionalProperties: true
+> +  mdio:
+> +    $ref: /schemas/net/mdio.yaml#
+> +    unevaluatedProperties: false
 > +
-> +    patternProperties:
-> +      '^(ethernet-)?port@[0-6]$':
-> +        type: object
-> +        additionalProperties: true
-> +
-> +        properties:
-> +          leds:
 
-type: object
-additionalProperties: false
-
-> +            description:
-> +              "LEDs associated with this port"
-
-Drop quotes.
-
-> +
-> +            patternProperties:
-> +              '^led@[a-f0-9]+$':
-
-[0-3]
-
-> +                type: object
-> +                additionalProperties: true
-
-This cannot be 'true'. Which then will point you to errors and missing
-ref to leds schema and need to use unevaluatedProperties: false.
-
-
-> +
-> +                properties:
-> +                  reg:
-> +                    description:
-> +                      "reg indicates the LED group for this LED"
-
-Drop quotes
+Please fixup the phy pattern, so it will be obvious it is for
+ethernet-phy and probably deprecate it. The phy goes to mdio bus, right?
 
 
 Best regards,
