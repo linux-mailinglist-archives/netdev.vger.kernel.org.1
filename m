@@ -1,113 +1,219 @@
-Return-Path: <netdev+bounces-79037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4002C877800
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 19:33:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 714F087780C
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 19:47:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6BDB1F21028
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 18:33:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D77301F211AA
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 18:47:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55912383B5;
-	Sun, 10 Mar 2024 18:33:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E896839AD5;
+	Sun, 10 Mar 2024 18:47:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="IJNxaL9Z"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mCdKyQqT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f174.google.com (mail-yw1-f174.google.com [209.85.128.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4F861E516
-	for <netdev@vger.kernel.org>; Sun, 10 Mar 2024 18:33:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9113A1CD;
+	Sun, 10 Mar 2024 18:47:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710095620; cv=none; b=hvAZWo/yQ9p0Ga9x8n8Z6IlWa2vpGOXBEYRjniu+/7S1cl+rCAZtWo/Ag8pnLKJTN1xwzy0qBOlfnvEcXmpVcDEaHq5TRLvZoVj/VVGWZW02WhANUhpF3Yty/xLAE1juj/MAYtqifbjtmwqcsr007wYDbFjoPwqXGGA7TJ7wK6s=
+	t=1710096424; cv=none; b=Mi7VGtBlou7zInVOQiMNq9Y8MujqQvzDzvYgti6fMDbJ5JV8zR8VFJ2VluDU+/tYe/bLXr806IeetTGx5ireqdc7mHMY1+HdHgqjRToHzkWuvrU9yrPduEH315ZRW4Lnk9vWbK2brtFT3g9OOp0hXbvVajrnIA3MqZQFwT0e/HI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710095620; c=relaxed/simple;
-	bh=MmuHHmxJmjWcNPf7DeIDPD3TRmMZ/XQvYTWvLXfrFtY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cez6dnsmgiuIM7DO+MTjEoADSASBtFwaMS3F3ckwbtKVt5UmUKneROPinda/RI5GfxdGeQfFcNC9GTr9gEcG1/0Uf8MZqQgrBkD5mL9uDIx/atyHP089Ube3PWDqUwRGtguqoEJNJQCennSK0ATrTJ3SolTfZeJ63fxiue1uYRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=IJNxaL9Z; arc=none smtp.client-ip=209.85.128.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yw1-f174.google.com with SMTP id 00721157ae682-6098b9ed2a3so33951797b3.0
-        for <netdev@vger.kernel.org>; Sun, 10 Mar 2024 11:33:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1710095617; x=1710700417; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MmuHHmxJmjWcNPf7DeIDPD3TRmMZ/XQvYTWvLXfrFtY=;
-        b=IJNxaL9ZbyiZvbHl5PplSI/1TSB1LuRZE0NnCAeh/URtWOG4ZXcJEwZ0FsiYjaYu7a
-         S4QBB5kKPchnaZ1cVZHBRrV44RG6k2+SfBOmKLjdohk5ptHOIVLndKR9N7ci26f5SlTA
-         mmBtprHg+sd0wNUWC6p7Hv1RJ0vbI16G2cDo0zt/i8F22q9DDZ8t5un1GWzuNCF59n+n
-         VQj8lysM4Tdo05V4lwnBjglNLLh4PxH47GTu/e4xdsyQ68fDCk6bSpH1GNeczK4K7ek2
-         V7+NB+pQb+4P4/fG7wAsVhEfOekr4lsC8EphzU9O1zCFcLORxNxRxhFoGBT4mYYUyZRL
-         UV6w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710095617; x=1710700417;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MmuHHmxJmjWcNPf7DeIDPD3TRmMZ/XQvYTWvLXfrFtY=;
-        b=jgfdcjmHqezUgnazHlTbUAsooSHFTGGhQAbqg4FsbUW07jni960P5edG+ho+vGw7RM
-         jeDzuq8El7IMZFdbNx0fhW4EzwNhh6PbjSK7DmleBur3RoL2OocyQifsn0YnFN6bc7Aq
-         ZjngWPlTd0KEaHzYi5eO70J4Ly0Hy5zR4KKXN57AFEQpSt5MDPby0kQDkik+qaMc8yfL
-         7XwIB8hO4xSU+brchH14rqx6tKZIQmeJsm2TQA2X0iv+di1yh6EJx8dKj0bTfTl6HOOO
-         aI+x+feI+wzUzS2qUhhRtToFplpYjHtnryP2SYMr9kQd5A1VcMBM+5+NIyJggtHjYmD9
-         JzIA==
-X-Forwarded-Encrypted: i=1; AJvYcCW3HhmcstpR9VakChAYKPYNWt2dOTMXR88AAHuymMUQR/ykfmxW4pw1BEK4hT6EQe/0ZJHFNAxt4VMFnd6u07s6QtDSPD1D
-X-Gm-Message-State: AOJu0Yz+tu5EThFymT5OAowf52utONyClOp3BzknuESv9vGEg8FkVmus
-	h7lRcB2co21RQcHn/cILcaPXMJ3JcTUMAS1SQXa2imhRr4Os/ROJONBVlUNtpbMmZ9daeIZgFkd
-	T0SncEGXDvjw7JegWBu//l+BLRJSvRo8jJ1Yaeg==
-X-Google-Smtp-Source: AGHT+IHk9/MZKfH04meNx0eo0VkRFv/IXxZwyToHYYJmCwjWJCWpR3X7GXee/M5l0I1grTFtDjTL9/mR0bD01Xz2tOI=
-X-Received: by 2002:a0d:f141:0:b0:5ff:4959:1da8 with SMTP id
- a62-20020a0df141000000b005ff49591da8mr4341361ywf.50.1710095617659; Sun, 10
- Mar 2024 11:33:37 -0700 (PDT)
+	s=arc-20240116; t=1710096424; c=relaxed/simple;
+	bh=TuDuzTQgSNRExIdxUZGT2D0+oqzQPcRdEDnDZHr851Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V7Sjsayg35dLIRcunOgGWhR30OmD/Ykpf1rrb1hqqz8w+I+iCu1KMYL6l07lMq46XkoIy9w3GaiKWArUFmZxjqlar+gA/HquFLqvl9113I1NQTYZd43Wkwv1hjh7cWsBA1qcwYh5HuxiG0BHE2aw9NYafMcsU+o9+vi8BPq0r2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mCdKyQqT; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Ycj1VndeIQ01IYCJKHgEgW6HSGNRHq/qtTl7RopLFLQ=; b=mCdKyQqTefaIcu8hgQ0YdfHTUs
+	rSlUdmzuM+sS6dOJRBA3vDTEwHzyOtJZexS/nFrVj3WQ4iCpak4tSoYXWWjZrAYvgNRhITBVvHQAA
+	1e4HcKzeRb/fG0QyaHihVSukMwnNH9h67EOdkOhYpa1G4DqlNLRnBr4gPJg9kqc27JA0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rjOCi-009v6b-Le; Sun, 10 Mar 2024 19:47:24 +0100
+Date: Sun, 10 Mar 2024 19:47:24 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 4/4] net: dsa: realtek: add LED drivers for
+ rtl8366rb
+Message-ID: <d064b1be-1004-487b-9944-b62d91b671c9@lunn.ch>
+References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com>
+ <20240310-realtek-led-v1-4-4d9813ce938e@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com> <20240310-realtek-led-v1-3-4d9813ce938e@gmail.com>
-In-Reply-To: <20240310-realtek-led-v1-3-4d9813ce938e@gmail.com>
-From: Linus Walleij <linus.walleij@linaro.org>
-Date: Sun, 10 Mar 2024 19:33:26 +0100
-Message-ID: <CACRpkda0pPwW34QyrKYBOsztPhTdCiZ5cop0T9TP7DFTn8d6cg@mail.gmail.com>
-Subject: Re: [PATCH net-next 3/4] net: dsa: realtek: do not assert reset on remove
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240310-realtek-led-v1-4-4d9813ce938e@gmail.com>
 
-On Sun, Mar 10, 2024 at 5:52=E2=80=AFAM Luiz Angelo Daros de Luca
-<luizluca@gmail.com> wrote:
+On Sun, Mar 10, 2024 at 01:52:01AM -0300, Luiz Angelo Daros de Luca wrote:
+> This commit introduces LED drivers for rtl8366rb, enabling LEDs to be
+> described in the device tree using the same format as qca8k. Each port
+> can configure up to 4 LEDs.
+> 
+> If all LEDs in a group use the default state "keep", they will use the
+> default behavior after a reset. Changing the brightness of one LED,
+> either manually or by a trigger, will disable the default hardware
+> trigger and switch the entire LED group to manually controlled LEDs.
 
-> The necessity of asserting the reset on removal was previously questioned=
-, as DSA's own cleanup methods should suffice to prevent traffic leakage[1]=
-.
->
-> When a driver has subdrivers controlled by devres, they will be unregiste=
-red after the main driver's .remove is executed. If it asserts a reset, the=
- subdrivers will be unable to communicate with the hardware during their cl=
-eanup. For LEDs, this means that they will fail to turn off, resulting in a=
- timeout error.
->
-> [1] https://lore.kernel.org/r/20240123215606.26716-9-luizluca@gmail.com/
->
-> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 
-The commit message needs some linebreaks :D
+The previous patch said:
 
-Other than that:
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+  This switch family supports four LEDs for each of its six
+  ports. Each LED group is composed of one of these four LEDs from all
+  six ports. LED groups can be configured to display hardware
+  information, such as link activity, or manually controlled through a
+  bitmap in registers RTL8366RB_LED_0_1_CTRL_REG and
+  RTL8366RB_LED_2_3_CTRL_REG.
 
-Yours,
-Linus Walleij
+I could be understanding this wrongly, but to me, it sounds like an
+LED is either controlled via the group, or you can take an LED out of
+the group and software on/off control it? Ah, after looking at the
+code. The group can be put into forced mode, and then each LED in the
+group controlled in software.
+
+> Once in this mode, there is no way to revert to hardware-controlled LEDs
+> (except by resetting the switch).
+
+Just for my understanding.... This is a software limitation. You could
+check if all LEDs in a group are using the same trigger, and then set
+the group to that trigger?
+
+I do understand how the current offload concept causes problems here.
+You need a call into the trigger to ask it to re-evaluate if offload
+can be performed for an LED.
+
+What you have here seems like a good first step, offloaded could be
+added later if somebody wants to.
+
+> +enum rtl8366_led_mode {
+> +	RTL8366RB_LED_OFF		= 0x0,
+> +	RTL8366RB_LED_DUP_COL		= 0x1,
+> +	RTL8366RB_LED_LINK_ACT		= 0x2,
+> +	RTL8366RB_LED_SPD1000		= 0x3,
+> +	RTL8366RB_LED_SPD100		= 0x4,
+> +	RTL8366RB_LED_SPD10		= 0x5,
+> +	RTL8366RB_LED_SPD1000_ACT	= 0x6,
+> +	RTL8366RB_LED_SPD100_ACT	= 0x7,
+> +	RTL8366RB_LED_SPD10_ACT		= 0x8,
+> +	RTL8366RB_LED_SPD100_10_ACT	= 0x9,
+> +	RTL8366RB_LED_FIBER		= 0xa,
+> +	RTL8366RB_LED_AN_FAULT		= 0xb,
+> +	RTL8366RB_LED_LINK_RX		= 0xc,
+> +	RTL8366RB_LED_LINK_TX		= 0xd,
+> +	RTL8366RB_LED_MASTER		= 0xe,
+> +	RTL8366RB_LED_FORCE		= 0xf,
+
+This is what the group shows? Maybe put _GROUP_ into the name? This
+concept of a group is pretty unusual, so we should be careful with
+naming to make it clear when we are referring to one LED or a group of
+LEDs. I would also put _group_ into the enum.
+
+> +
+> +	__RTL8366RB_LED_MAX
+> +};
+> +
+> +struct rtl8366rb_led {
+> +	u8 port_num;
+> +	u8 led_group;
+> +	struct realtek_priv *priv;
+> +	struct led_classdev cdev;
+> +};
+> +
+>  /**
+>   * struct rtl8366rb - RTL8366RB-specific data
+>   * @max_mtu: per-port max MTU setting
+>   * @pvid_enabled: if PVID is set for respective port
+> + * @leds: per-port and per-ledgroup led info
+>   */
+>  struct rtl8366rb {
+>  	unsigned int max_mtu[RTL8366RB_NUM_PORTS];
+>  	bool pvid_enabled[RTL8366RB_NUM_PORTS];
+> +	struct rtl8366rb_led leds[RTL8366RB_NUM_PORTS][RTL8366RB_NUM_LEDGROUPS];
+>  };
+>  
+>  static struct rtl8366_mib_counter rtl8366rb_mib_counters[] = {
+> @@ -809,6 +829,208 @@ static int rtl8366rb_jam_table(const struct rtl8366rb_jam_tbl_entry *jam_table,
+>  	return 0;
+>  }
+>  
+> +static int rb8366rb_set_ledgroup_mode(struct realtek_priv *priv,
+> +				      u8 led_group,
+> +				      enum rtl8366_led_mode mode)
+> +{
+> +	int ret;
+> +	u32 val;
+> +
+> +	val = mode << RTL8366RB_LED_CTRL_OFFSET(led_group);
+> +
+> +	ret = regmap_update_bits(priv->map,
+> +				 RTL8366RB_LED_CTRL_REG,
+> +				 RTL8366RB_LED_CTRL_MASK(led_group),
+> +				 val);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +
+> +static inline u32 rtl8366rb_led_group_port_mask(u8 led_group, u8 port)
+> +{
+> +	switch (led_group) {
+> +	case 0:
+> +		return FIELD_PREP(RTL8366RB_LED_0_X_CTRL_MASK, BIT(port));
+> +	case 1:
+> +		return FIELD_PREP(RTL8366RB_LED_0_X_CTRL_MASK, BIT(port));
+> +	case 2:
+> +		return FIELD_PREP(RTL8366RB_LED_0_X_CTRL_MASK, BIT(port));
+> +	case 3:
+> +		return FIELD_PREP(RTL8366RB_LED_0_X_CTRL_MASK, BIT(port));
+> +	default:
+> +		return 0;
+> +	}
+> +}
+> +
+> +static int rb8366rb_get_port_led(struct rtl8366rb_led *led, bool enable)
+
+enable seems unused here. It also seems an odd parameter to pass to a
+_get_ function.
+
+> +{
+> +	struct realtek_priv *priv = led->priv;
+> +	u8 led_group = led->led_group;
+> +	u8 port_num = led->port_num;
+> +	int ret;
+> +	u32 val;
+> +
+> +	if (led_group >= RTL8366RB_NUM_LEDGROUPS) {
+> +		dev_err(priv->dev, "Invalid LED group %d for port %d",
+> +			led_group, port_num);
+> +		return -EINVAL;
+> +	}
+
+This check seems odd. You can validate it once when you create the
+struct rtl8366rb_led. After that, just trust it?
+
+       Andrew
 
