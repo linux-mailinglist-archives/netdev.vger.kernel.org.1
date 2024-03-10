@@ -1,151 +1,158 @@
-Return-Path: <netdev+bounces-79006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C839387759D
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 08:30:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 69A648775AB
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 09:02:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 544B32833EF
-	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 07:30:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D459C282E69
+	for <lists+netdev@lfdr.de>; Sun, 10 Mar 2024 08:02:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F204D2566;
-	Sun, 10 Mar 2024 07:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13168107B2;
+	Sun, 10 Mar 2024 08:01:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b="HexphMuC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BTM29pPX"
 X-Original-To: netdev@vger.kernel.org
-Received: from dvalin.narfation.org (dvalin.narfation.org [213.160.73.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2FF8480
-	for <netdev@vger.kernel.org>; Sun, 10 Mar 2024 07:30:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.160.73.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3DB5FBED;
+	Sun, 10 Mar 2024 08:01:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710055844; cv=none; b=fmcQ1WJ9MdC4g/Vuu1bB0Jl0fUNOZjQSEMRh+Jx0lZapWAYmkk4D5WhfI43PBWHzG2qP4t4s69qtwFlTvhmm2wtB2TYcroxPKVJCMoERGoACTk7qKxS/GsG/nAy3LrpJrAv6/W+JAuJakbciTJcnnUkOQmQLzxF19kh+8NXhyU4=
+	t=1710057715; cv=none; b=QmF+y+acfnTeEXYPllwWlqd1fcXYUijPS5rYsexx0JuykMz1IzkhnT4miU/UAGJ5BoAsm4oOQ65vEMuIwMKH3tsnJIExhTSsxoxZcMIsnIRfmPbdjiPWYdAqxZYnZHtwbipCAdQdBtaSSz4zFesdkK0yraIkZvx+aZkWV8NeXEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710055844; c=relaxed/simple;
-	bh=KeBLP/NCbPJo8e7X7mjC3ihGgJGMXHoX+98UB2fM7VQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qJMSIuPfIimYXVWvyW1D/xjomBz5ule7orA4jmopPWoWKtOF4gki3yCpNZrue9e30Z/6Dy6Y9FjXBkZ8qsngRZmwWU93UHTYRNnLWyTL64bnE2FGNEnNLt8AjtRzMkRV0FhFSc1DvgEZ5cWyZCJo/JA+PLykcE5qBdVLrme+4Bk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org; spf=pass smtp.mailfrom=narfation.org; dkim=pass (1024-bit key) header.d=narfation.org header.i=@narfation.org header.b=HexphMuC; arc=none smtp.client-ip=213.160.73.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=narfation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=narfation.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=narfation.org;
-	s=20121; t=1710055365;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=h17KIwzOrUekHzB5+mlymxvuEPwRYsg3TcII5Vg/o+I=;
-	b=HexphMuCuMRkyacOvdRVnTdMb4UJ4zokFC7urfUIJ4G2uYHkTJBURimHAcxJQ7L0KM9wUH
-	5WpvsfQ67RUXDx8DUhMs4bAwqZpkRDn6ptC3IOKw0kV4EUyXu5neGSJcko/zI21HnFrYPE
-	obtd/HCl4exokdEwOjpQdgUgcw45yYc=
-From: Sven Eckelmann <sven@narfation.org>
-To: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- jiri@resnulli.us, Jakub Kicinski <kuba@kernel.org>, Jason@zx2c4.com,
- mareklindner@neomailbox.ch, sw@simonwunderlich.de, a@unstable.cc,
- pshelar@ovn.org, andriy.shevchenko@linux.intel.com,
- wireguard@lists.zx2c4.com, dev@openvswitch.org
-Subject: Re: [PATCH net-next 3/3] genetlink: remove linux/genetlink.h
-Date: Sun, 10 Mar 2024 08:22:35 +0100
-Message-ID: <4554322.LvFx2qVVIh@sven-l14>
-In-Reply-To: <20240309183458.3014713-4-kuba@kernel.org>
-References:
- <20240309183458.3014713-1-kuba@kernel.org>
- <20240309183458.3014713-4-kuba@kernel.org>
+	s=arc-20240116; t=1710057715; c=relaxed/simple;
+	bh=E+MxDKe+KsHvPmTBqM2DlpPwW2CIuyWdH49cjntutmM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lmFfneJuV21gukMUqH9AmRQGRhO8GocuNsy+e5VRSujP0UyY966sqNGcEfrQaogmkvw7ePdIxUFTQO3ZMIynjch+ZV89CDwMrgZgnT/OLYH2JB/eYENG4Ra0kUR0KIbx9D0nJstZiZE0HmSpWtWWGM+MKjaJ9AKxJPyqjp54A50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BTM29pPX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E8B8C433F1;
+	Sun, 10 Mar 2024 08:01:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710057714;
+	bh=E+MxDKe+KsHvPmTBqM2DlpPwW2CIuyWdH49cjntutmM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=BTM29pPXzOQTpyAHRPKU0QJU36DOLFVueJxGoagskCfVBYukYDCYdXotdsL9ZGB7l
+	 Wns2j8gZgTtC2Zv76ZfLU/0Q/rUATM86YNGoX+Th4OAeD8btpUxCqEsmiIgVrPkr37
+	 gMCDFCO77cjUh4IxZ7yCoMeYJeFEZuZvmoOFudSUu8oLEHmfzu7s/w8t22zCDAJRnM
+	 TzhxZcZzniS8IBs+Xjr46JUSxrI5aK81Vt2j6KMB1hyfs7ALjbQkQWqJ0vOmucPjIA
+	 67oC/x9sslk7GuvzQsfrw9X0qn5WVFrq2wc7TWYSiOzbNu+IZRHSvPOM3XdZvjj52A
+	 ZEKD4fviV1Z4w==
+Message-ID: <388b435f-13c5-446f-b265-6da98ccfd313@kernel.org>
+Date: Sun, 10 Mar 2024 09:01:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart2320315.ElGaqSPkdT";
- micalg="pgp-sha512"; protocol="application/pgp-signature"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/4] net: dsa: realtek: keep default LED state in
+ rtl8366rb
+Content-Language: en-US
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com>
+ <20240310-realtek-led-v1-2-4d9813ce938e@gmail.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20240310-realtek-led-v1-2-4d9813ce938e@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
---nextPart2320315.ElGaqSPkdT
-Content-Transfer-Encoding: 7Bit
-Content-Type: text/plain; charset="us-ascii"; protected-headers="v1"
-From: Sven Eckelmann <sven@narfation.org>
-To: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH net-next 3/3] genetlink: remove linux/genetlink.h
-Date: Sun, 10 Mar 2024 08:22:35 +0100
-Message-ID: <4554322.LvFx2qVVIh@sven-l14>
-In-Reply-To: <20240309183458.3014713-4-kuba@kernel.org>
-MIME-Version: 1.0
-
-On Saturday, 9 March 2024 19:34:58 CET Jakub Kicinski wrote:
-> genetlink.h is a shell of what used to be a combined uAPI
-> and kernel header over a decade ago. It has fewer than
-> 10 lines of code. Merge it into net/genetlink.h.
-> In some ways it'd be better to keep the combined header
-> under linux/ but it would make looking through git history
-> harder.
+On 10/03/2024 05:51, Luiz Angelo Daros de Luca wrote:
+> This switch family supports four LEDs for each of its six ports. Each
+> LED group is composed of one of these four LEDs from all six ports. LED
+> groups can be configured to display hardware information, such as link
+> activity, or manually controlled through a bitmap in registers
+> RTL8366RB_LED_0_1_CTRL_REG and RTL8366RB_LED_2_3_CTRL_REG.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-[...]
-> diff --git a/net/batman-adv/main.c b/net/batman-adv/main.c
-> index 75119f1ffccc..8e0f44c71696 100644
-> --- a/net/batman-adv/main.c
-> +++ b/net/batman-adv/main.c
-> @@ -14,7 +14,6 @@
->  #include <linux/crc32c.h>
->  #include <linux/device.h>
->  #include <linux/errno.h>
-> -#include <linux/genetlink.h>
->  #include <linux/gfp.h>
->  #include <linux/if_ether.h>
->  #include <linux/if_vlan.h>
-> @@ -38,6 +37,7 @@
->  #include <linux/string.h>
->  #include <linux/workqueue.h>
->  #include <net/dsfield.h>
-> +#include <net/genetlink.h>
->  #include <net/rtnetlink.h>
->  #include <uapi/linux/batadv_packet.h>
->  #include <uapi/linux/batman_adv.h>
-> diff --git a/net/batman-adv/netlink.c b/net/batman-adv/netlink.c
-> index 0954757f0b8b..9362cd9d6f3d 100644
-> --- a/net/batman-adv/netlink.c
-> +++ b/net/batman-adv/netlink.c
-> @@ -15,7 +15,6 @@
->  #include <linux/cache.h>
->  #include <linux/err.h>
->  #include <linux/errno.h>
-> -#include <linux/genetlink.h>
->  #include <linux/gfp.h>
->  #include <linux/if_ether.h>
->  #include <linux/if_vlan.h>
+> After a reset, the default LED group configuration for groups 0 to 3
+> indicates, respectively, link activity, link at 1000M, 100M, and 10M, or
+> RTL8366RB_LED_CTRL_REG as 0x5432. These configurations are commonly used
+> for LED indications. However, the driver was replacing that
+> configuration to use manually controlled LEDs (RTL8366RB_LED_FORCE)
+> without providing a way for the OS to control them. The default
+> configuration is deemed more useful than fixed, uncontrollable turned-on
+> LEDs.
+> 
+> The driver was enabling/disabling LEDs during port_enable/disable.
+> However, these events occur when the port is administratively controlled
+> (up or down) and are not related to link presence. Additionally, when a
+> port N was disabled, the driver was turning off all LEDs for group N,
+> not only the corresponding LED for port N in any of those 4 groups. In
+> such cases, if port 0 was brought down, the LEDs for all ports in LED
+> group 0 would be turned off. As another side effect, the driver was
+> wrongly warning that port 5 didn't have an LED ("no LED for port 5").
+> Since showing the administrative state of ports is not an orthodox way
+> to use LEDs, it was not worth it to fix it and all this code was
+> dropped.
+> 
+> The code to disable LEDs was simplified only changing each LED group to
+> the RTL8366RB_LED_OFF state. Registers RTL8366RB_LED_0_1_CTRL_REG and
+> RTL8366RB_LED_2_3_CTRL_REG are only used when the corresponding LED
+> group is configured with RTL8366RB_LED_FORCE and they don't need to be
+> cleaned. The code still references an LED controlled by
+> RTL8366RB_INTERRUPT_CONTROL_REG, but as of now, no test device has
+> actually used it. Also, some magic numbers were replaced by macros.
+> 
+> Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
+This is the first version, so where did review happen?
 
-Acked-by: Sven Eckelmann <sven@narfation.org>
-
-Kind regards,
-	Sven
---nextPart2320315.ElGaqSPkdT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEEF10rh2Elc9zjMuACXYcKB8Eme0YFAmXtX7wACgkQXYcKB8Em
-e0ZBNQ//fHhWrp8So5pa2gvNTn5gSGE8Jq/IIcyGWdk8bHyznaYbVxyJNteajKde
-CdRlZ6I63j0si/FHk57YzT3Lcf1e5yhM7vDVlt3oMzySuVYl0Xc1MI9sNQ3SU6ZO
-TyG4LLQQav7noOmtOm54Tousu8Bolp1aAS9wIg6jjECDkZpR+B9U3MGgq+owanhP
-qvhMSrVH6O2I/9eNnE+zaTevEzOnpDY98rNG8LX3ju+ZTpxWFbTqzukoOZqz96IS
-hG3vhBZkI20J9bxs0W6rd5NDPcWKe0Yo9KRGWH+klzMqwzK3giluog3EqdkmXjn8
-272USZIl1ekhkF52reNVrTUh8RqqX6DclA+wcfwp7eRsm4NBBW0nYTAbKN9NCQvz
-P5+Xj4y4LIjo5zkjIfCk/mcIxHx2x089NojbbBae5yUpZcOKvJCk1P8tAdmCgEeG
-n+NYPZTzYRZloVE9X7F5wCceL+DgeeSGDAr/FEJlG1opoXwAguh3jVVTgHhtgaFr
-jSpvVWzbZLhB2wo7TUq2FtS1LMG5U922XAbkRf04mNFr0oxHxoU1imMbzi+VniIT
-hZED8QP3F08hM4LqEKjXmrZwHLx4+v5mz8QtyVEOSvbzWTHjSQhnWexwRS/1UVLy
-kGdKTWyLiOLF+ROo7UXRbl6k3+Iqvpkm66w/oBXrBSoq+TbDiCs=
-=BNz5
------END PGP SIGNATURE-----
-
---nextPart2320315.ElGaqSPkdT--
-
-
+Best regards,
+Krzysztof
 
 
