@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-79229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12AD7878572
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 17:30:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D766878577
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 17:30:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90F51282BEB
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:30:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A100C1C21B61
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:30:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44BD153E33;
-	Mon, 11 Mar 2024 16:27:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA7A55C26;
+	Mon, 11 Mar 2024 16:27:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HeQ1PhNo"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="VSEUtuzg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEC9A495CB;
-	Mon, 11 Mar 2024 16:26:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD974C61F
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 16:27:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710174420; cv=none; b=dIObtWsirlHGTkVVJ+2DFVzd5W3lnI2li8OG5kKH6Zftt8VjhR/26DZCnhUx8hpuaYzCH9y7pg+j+hyGU/sEu1Wq1LFk3vDg2TPQWIb2Qnzv2l8j8zxtrxi3XgBEnEjlkIoWoQkXTS6/lzWFkuJC9FM0Pc/dxVU5SxFZwWxxwfI=
+	t=1710174470; cv=none; b=mOznVIWIbCR/A+oOzVP0qx96Ia++Jn1FaaIYYDFruncVBOVGcvSuzeDRne+qC9wMXf2hHe+O5ixSDgA9MQ080N7ohkM2NekCs2iNaXfFXGvjwge92/d979gNSU6PFbZHoPST98fGMgIg0zeOoiLriPJAw7IcOIWqbrzuRXVlL+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710174420; c=relaxed/simple;
-	bh=TcSwDHfNNgdR4wLojxjff0dRD10Inq481uYy2p6LuD4=;
+	s=arc-20240116; t=1710174470; c=relaxed/simple;
+	bh=icfEGdBlnRAP0yk1flphk/l4+OVOr1PniPVo+1ib7zg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WHluNOuFxUtYUBOmqS8U9Jq7YmzSbaaW429moY5f9LXUgF+EIco/IVh7UWrWcOZXCKuQglfOTMtCFRLu4HMhg1OsDeB/ZIrJqvCWWgg4ecT2g5Uvux+8JgI08Ve9Fs86nr905U8tTF+C0Un+4sf71HxEJjmVRVrBTJp6pRKqEys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HeQ1PhNo; arc=none smtp.client-ip=209.85.166.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-7bc332d3a8cso221410139f.2;
-        Mon, 11 Mar 2024 09:26:58 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=m5ehXpCIqj5/yR7zkz42dXnSNKnZOPo102TvPaG/dkIRz9FKTIYIpu56/cFruRPycRNjS0NT2R5uQXpyr/DRpTtW2uNSyDJ13A7Ty/+NBzwv8iHh3Rr2xfDH+f/hhSH8EDN+jtbdw0xTtCAoKFj5qsp4AxW77aeRDu6pFjUEUZ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=VSEUtuzg; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-33e94c12f33so1434997f8f.3
+        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 09:27:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710174418; x=1710779218; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SQKSOiWUfUqtlvjIi4/X3xeJgscUEIjq/1jiDqrAsaU=;
-        b=HeQ1PhNow9FlBsQiUjxTXC6qjMRmYtrIAjDr06x8RlbbtrSaIBcl+s9C6/GQdK5DQO
-         UTpVlQM7MdK+b5QMzaIOMNHOpFZ138Ek9EBGKILftSADyc26E59fGrveXd7W7xOd/k6M
-         GFJ3yr53RRkde+B9dSwc2GITihEV+eFy1l695bmmg5qcZuMB5zq1ljQNLDevJ9isEmbn
-         LUJ6u3Dil+bok1Xzxfaf+R760yRm0MjPLKq+gQ9lYEsOMYgK8/zXP/Kzbmk8opTxf8bv
-         MdqOE1tdyl985OW8HRhPZlLA1vSOVd+gxEpmVncp6OdK79SMkvgGp9WWsfjUtDEOzJxw
-         GFvg==
+        d=openvpn.net; s=google; t=1710174467; x=1710779267; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=lJQELEmaDQ2s04UlQFFvQPrbC8N/sW6mmdFWuvs/FGQ=;
+        b=VSEUtuzgezwegUiELiC1MTVPSiGbfgb8tBqVo64kBbyUdTW61xU3fMq1hPRTyrv6fi
+         qspDYu5J1Wp6X1ITuoSgEjk2zmpAgKJVeiaQU/3+jG73YW1FETShTQMTQ18bKmFOyVj6
+         BsszkxBNhzaRidXjaFLQmuttzvWOR36BXkE8v0lLUp0rJ/HNJdWgLU504E7OPQQF3D4j
+         XLU4R9l1pnKoUgaPo6cEYC6VhA5cOZ+FquU5b5QiAGkuS0CVZHkPiR54yICMa2bT9gEg
+         Wk0dFCt2wpFibDfk37tjNRCIXtQu4sKYxXhoFa7l8jjRCayQS7TW3IpIhKvtBwawA6M4
+         Rzbw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710174418; x=1710779218;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=SQKSOiWUfUqtlvjIi4/X3xeJgscUEIjq/1jiDqrAsaU=;
-        b=iy3UO2Q0TGFkJQ6KBMczZzj+FN88n4BHwpjE7AAeOKrOZE2TSndy+Pfn9lAaQknGtb
-         xnD4FR2sp5Xp+tPNPpB5yf/kscY3TzoUKc3i01LRQhhM4gkmCcI23uL42xofldvrbH9T
-         CmFMFD5QBpOo5dMIhSphILQvF0KlUOeh2h53L1YhpFs7nG9JxZSm3nbM3nngqwankksk
-         Mz600humMSeGgWgFyWn2h/WCrrbH8+2MI7HIDdgU0/wTGmZYcUylYnzvVrFjz6JfUAQW
-         kubVuoGXPC4Xo8i8TRmNoOqSCqFSqLIu2L6t06m0sxOJj5/3xl+sUH3d1+YmsueaWMAx
-         E3pQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVSNZ04fULcQoISqT9zKliJ19/swQUDg03qdCbykSVfX18VUHYtqoyjKXDeQJpxyK5Wkp/Nr4dQWhJLmGOn0YgZbbKfwDKICeo5815dNJdvPe+aryu8dUg0WrgiocZnQM3549rJLOCeCGEDh3/K
-X-Gm-Message-State: AOJu0YwmYsN83gncJFkhhRMfWiVIqbb7UaEiClU3gR/EpSeFiaUEhs7E
-	Jhi2UfEqJ5/nJcI/5DTI7RaCNxIsKEk6spmZaZLuiXh5pJ1xEW4S
-X-Google-Smtp-Source: AGHT+IECo2iHOUjpdeONaUHjvq623/XyoyVPkWsq2s0ydvavN/sgfnJT26x5Rd1V8RdUQt5khihShw==
-X-Received: by 2002:a5e:c10d:0:b0:7c8:c922:202b with SMTP id v13-20020a5ec10d000000b007c8c922202bmr754312iol.7.1710174417711;
-        Mon, 11 Mar 2024 09:26:57 -0700 (PDT)
-Received: from ?IPV6:2601:284:8200:b700:d7e:114:8305:f21a? ([2601:284:8200:b700:d7e:114:8305:f21a])
-        by smtp.googlemail.com with ESMTPSA id u22-20020a05660229b600b007c8c539e1afsm297522ios.26.2024.03.11.09.26.56
+        d=1e100.net; s=20230601; t=1710174467; x=1710779267;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :references:cc:to:content-language:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lJQELEmaDQ2s04UlQFFvQPrbC8N/sW6mmdFWuvs/FGQ=;
+        b=kiGG6jNQOFE9gShsecmhXtkfJT1QJYlkXMYJ3M/SLSEGJl6aVSu5PTuUsN3g0AgPwU
+         AfPMoA1Rr0e/Jco1gjnOm9cBw0WKlW3EjYsXX1thlpMtJoej/l8mYoX5pUQ3sphTr5BI
+         K1rRh87hj3jqjlaY7zthb2PwXgknF/Acq9RWjAN/Jtu/xC+xTIXQYM4mTTwCV85q1qll
+         AtJSoIPpKGo+RVuBdWeq0KA/tApyu8/SdZ4vJUugXSkqdK6O68PIyBADsGKtyD0qPsyp
+         mFgEVB2W5ZDj7ikTfBpMQ/ieETcE8hOLVGfA8LkcYOQARWR+xAyi23RIgbJNuVciZcKk
+         75WA==
+X-Forwarded-Encrypted: i=1; AJvYcCWAErZwxJKkTfDOzEF/Y6nV/QNPhxPsHFk6ypY9lb9cQsGOAGKhHLjE2nHBLUwScwpofePQrmvsIgIQLaH+fRLMTHAKzHEd
+X-Gm-Message-State: AOJu0YxHM3Ddx3SCmO6H60afyGoIcXdkxuddGqRFSbLTQBd4kyuvcyDY
+	1Vx2LhsI9bbcrRdfcA9ngVkXnjIaeB97ya9MixaWEaTs0Vm+kkIYx2EppptdZmM=
+X-Google-Smtp-Source: AGHT+IGdz7OUh32DV5pfZ8xkCEeE84/OZGF6ltB1l1jwR7n7ZaM/ffM4bXnNQqU+K0l1bnY/BkmyMw==
+X-Received: by 2002:a5d:56d2:0:b0:33e:6ce2:88ab with SMTP id m18-20020a5d56d2000000b0033e6ce288abmr4559155wrw.46.1710174466770;
+        Mon, 11 Mar 2024 09:27:46 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:0:c0e1:a7b8:608:a4bd? ([2001:67c:2fbc:0:c0e1:a7b8:608:a4bd])
+        by smtp.gmail.com with ESMTPSA id z2-20020a5d44c2000000b0033e2b9f647asm6831570wrr.31.2024.03.11.09.27.45
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 11 Mar 2024 09:26:57 -0700 (PDT)
-Message-ID: <685a957d-5ce4-4165-aa6d-71570866b9d4@gmail.com>
-Date: Mon, 11 Mar 2024 10:26:56 -0600
+        Mon, 11 Mar 2024 09:27:46 -0700 (PDT)
+Message-ID: <13c356da-09e5-4830-8ca5-be7e7df31676@openvpn.net>
+Date: Mon, 11 Mar 2024 17:28:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,44 +77,144 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG net-next] fcnal-test.sh: 4 (four) tests FAIL
+Subject: Re: [PATCH net-next v2 08/22] ovpn: implement basic TX path (UDP)
 Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>,
- Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-Cc: netdev@vger.kernel.org, Guillaume Nault <gnault@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <9f24a9c3-4813-4518-9cc4-3923c11981cd@alu.unizg.hr>
- <20240311091751.5c4f2947@kernel.org>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <20240311091751.5c4f2947@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, Sergey Ryazanov
+ <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>
+References: <20240304150914.11444-1-antonio@openvpn.net>
+ <20240304150914.11444-9-antonio@openvpn.net> <87ttlgrb86.fsf@toke.dk>
+ <0273cf51-fbca-453d-81da-777b9462ce3c@openvpn.net> <87edcgre2m.fsf@toke.dk>
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <87edcgre2m.fsf@toke.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 3/11/24 10:17 AM, Jakub Kicinski wrote:
-> On Sat, 9 Mar 2024 19:45:15 +0100 Mirsad Todorovac wrote:
->> In the vanilla net-next tree build of v6.8-rc7-2348-g75c2946db360, with up-to-date
->> iproute2 built tools, fcnal-test.sh reports certain failures:
+On 11/03/2024 16:19, Toke Høiland-Jørgensen wrote:
+> Antonio Quartulli <antonio@openvpn.net> writes:
+> 
+>> Hi Toke,
 >>
->> --------------------------------------------------------------------------------------
->> # TEST: ping local, VRF bind - VRF IP                                           [FAIL]
->> # TEST: ping local, device bind - ns-A IP                                       [FAIL]
->> # TEST: ping local, VRF bind - VRF IP                                           [FAIL]
->> # TEST: ping local, device bind - ns-A IP                                       [FAIL]
->> --------------------------------------------------------------------------------------
+>> On 08/03/2024 16:31, Toke Høiland-Jørgensen wrote:
+>>> Antonio Quartulli <antonio@openvpn.net> writes:
+>>>
+>>>> +/* send skb to connected peer, if any */
+>>>> +static void ovpn_queue_skb(struct ovpn_struct *ovpn, struct sk_buff *skb, struct ovpn_peer *peer)
+>>>> +{
+>>>> +	int ret;
+>>>> +
+>>>> +	if (likely(!peer))
+>>>> +		/* retrieve peer serving the destination IP of this packet */
+>>>> +		peer = ovpn_peer_lookup_by_dst(ovpn, skb);
+>>>> +	if (unlikely(!peer)) {
+>>>> +		net_dbg_ratelimited("%s: no peer to send data to\n", ovpn->dev->name);
+>>>> +		goto drop;
+>>>> +	}
+>>>> +
+>>>> +	ret = ptr_ring_produce_bh(&peer->tx_ring, skb);
+>>>> +	if (unlikely(ret < 0)) {
+>>>> +		net_err_ratelimited("%s: cannot queue packet to TX ring\n", peer->ovpn->dev->name);
+>>>> +		goto drop;
+>>>> +	}
+>>>> +
+>>>> +	if (!queue_work(ovpn->crypto_wq, &peer->encrypt_work))
+>>>> +		ovpn_peer_put(peer);
+>>>> +
+>>>> +	return;
+>>>> +drop:
+>>>> +	if (peer)
+>>>> +		ovpn_peer_put(peer);
+>>>> +	kfree_skb_list(skb);
+>>>> +}
+>>>
+>>> So this puts packets on a per-peer 1024-packet FIFO queue with no
+>>> backpressure? That sounds like a pretty terrible bufferbloat situation.
+>>> Did you do any kind of latency-under-load testing of this, such as
+>>> running the RRUL test[0] through it?
+>>
+>> Thanks for pointing this out.
+>>
+>> Andrew Lunn just raised a similar point about these rings being
+>> potential bufferbloat pitfalls.
+>>
+>> And I totally agree.
+>>
+>> I haven't performed any specific test, but I have already seen latency
+>> bumping here and there under heavy load.
+>>
+>> Andrew suggested at least reducing rings size to something like 128 and
+>> then looking at BQL.
+>>
+>> Do you have any hint as to what may make sense for a first
+>> implementation, balancing complexity and good results?
 > 
-> Adding David A to CC.
+> Hmm, I think BQL may actually be fairly straight forward to implement
+> for this; if you just call netdev_tx_sent_queue() when the packet has
+> been encrypted and sent on to the lower layer, the BQL algorithm should
+> keep the ring buffer occupancy just at the level it needs to be to keep
+> the encryption worker busy. I am not sure if there is some weird reason
+> this won't work for something like this, but I can't think of any off
+> the top of my head. And implementing this should be fairly simple (it's
+> just a couple of function calls in the right places). As an example, see
+> this commit adding it to the mvneta driver:
 > 
-> It rings a bell. We also build ping from source when running the tests
-> locally, I have in my notes "AWS iputils are buggy, use iputils.git"
-> but unfortunately I didn't make a note which tests were failing without
-> it. David might remember..
+> a29b6235560a ("net: mvneta: add BQL support")
+> 
+> Not sure if some additional mechanism is needed to keep a bunch of
+> encrypted packets from piling up in the physical device qdisc (after
+> encryption), but that will be in addition, in that case.
 
-yes, please update ping -- make sure it has proper support for
-SO_BINDTODEVICE.
+Thank you very much - really appreciated.
 
-It's a bug in versions of iputils ping. It sets the BINDTODEVICE and
-then resets it because the source address is not set on the command line
-(it should not be required - they are separate intents).
+I will look into the mentioned commit and will try to implement this 
+logic in the next patchset iteration.
+
+Regards,
+
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
