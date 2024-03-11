@@ -1,97 +1,73 @@
-Return-Path: <netdev+bounces-79319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1F7C878B74
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:20:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 302C6878B79
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:21:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D93051C20BE5
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:20:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C45AC1F21F46
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:21:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05CAF58ABB;
-	Mon, 11 Mar 2024 23:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0679959170;
+	Mon, 11 Mar 2024 23:21:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GlN4t8ik"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uuTpSnOj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2F4758AA9;
-	Mon, 11 Mar 2024 23:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4DE459168;
+	Mon, 11 Mar 2024 23:21:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710199231; cv=none; b=DLf6UfQSDqIrAGzVafR6OWxRFdvIu4PR6SnPt4ZjDmc+PeMTBkTQTJDohorEW9wW/3MQ9a43qUut279Wz/ApDV4VuiLaNjBrcrCgjuvuk7oYRm/GjYAq8GuZehxOhq3aykP3/OrcsWWEDZ8Ob3F0aVzr8XMmgTNIbHYKsVBNOX8=
+	t=1710199273; cv=none; b=tA8is4EC7CKCQtuIIJwIAdP0BYPoiAucpr+EBw3Yl4iRNOP3o8PKLya7NeFtDIw1JJpBuje7qHWK2MBWYZcfzAolIJs+W9bM2YNk9rDGlfmVmcxa1nYfBgaGXSqZxffnlQbu6aSUVYK/yPT1VjEW9ZXiEfNIaeXaGh68xyNUSOI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710199231; c=relaxed/simple;
-	bh=EWuCRZFEQs33N0jmAweFI2AzQaEORtQPMY+IgfcqAH0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=BoHkjI0WM6Db1p8Dx1QXu+MIbN7Ts4gzxCaRYdVYh1PCTVGYRuvA18WDArHWfztZHyzqOzrcF5EkgEULAeVgH1Cr+Nc4VeE287uy1jhTaGpJbSIPR6RHloEWSMTROzAi/MCQh9qSbYS1K9Cc6ALWgFcEfgxD9BySOA5fTra9Ng8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GlN4t8ik; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id AA8D7C433F1;
-	Mon, 11 Mar 2024 23:20:31 +0000 (UTC)
+	s=arc-20240116; t=1710199273; c=relaxed/simple;
+	bh=XPimoA/KY43IGicBOhobqeqOF4qVaAB057YdtvyGzxk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RzQkMaKV8Isb9K9ZS2uGQroxmKSDL0IJf1AoZq/cl9myl5aobduMgwfYT2G3FIPWnemibc8yovTWkKD1fRzZN6OaBdCaXJ+ByGwNF5C84PnycNxnfb+8ui+TrhvxQu8JLRXBZoIRF1c9Zs3p52jMfOUtp3+d7bYuGHM26lmsVFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uuTpSnOj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6ABAC433C7;
+	Mon, 11 Mar 2024 23:21:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710199231;
-	bh=EWuCRZFEQs33N0jmAweFI2AzQaEORtQPMY+IgfcqAH0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GlN4t8ikybD7QHAH3jjnK+qNO4TTG4A4DXUrovZHcY3GivKdJnTCeI7zmKQqEV1Jv
-	 z4zIx9RNG6ti3nMCFGyKqT46mEhHf8wp4V7Sbx1VvIC7MinmV/xlTYmlqkiA+ZK34d
-	 1rdhjTh9lp3ubPDqiX3v3e70xanCWNyT8Uwtevbqyc8f1sAyEP8XkZUPetKqQK1hVi
-	 kbZVCZa/Pe89jBMoUbpyk+wJeaYcv8UMGscnvpf2zjRVP9M5VWjLRrXgdCcjptN98y
-	 i0wpN20bhQqBHufGN7bpfz718UhnNNjLSwtUsHw+tiIqFSDIVeI9My+QWy36vos0Io
-	 ejaX4vygAfYAg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 91B63C395F1;
-	Mon, 11 Mar 2024 23:20:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1710199273;
+	bh=XPimoA/KY43IGicBOhobqeqOF4qVaAB057YdtvyGzxk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uuTpSnOjG+wTQWRXmZ4HEA7JLb7EDuE3wONM8d9HJ6dFrXd1FCVZnJwYOyWEtbEUn
+	 GWd53CAXHEfb+qy5nmy6wE0c3LOYGg8U/z7xPiLHPDaEG5ziYOUvX22dY5TZf4ewBy
+	 R9Mi9iZnsXJNoo7SskMWlw6aCkmb8YLGS98cROYQ22XZiXTZ+9bH0/uvrb6KDV47x7
+	 0bWF6wXvsf1H/YShwK1W6ARriFOQNXzeKV32DDHdbqyVahzEZu8aNKcGL7zfKtynZH
+	 yrnrO0d8egVdHXhWrILE/w5/fqu8pqWku8Sp5lUpG+dtem940xO5CzIJGUiz61ffKS
+	 iHMsbZwQtmlAw==
+Date: Mon, 11 Mar 2024 16:21:12 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: edumazet@google.com, mhiramat@kernel.org,
+ mathieu.desnoyers@efficios.com, rostedt@goodmis.org, pabeni@redhat.com,
+ davem@davemloft.net, netdev@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH net-next 0/3] trace: use TP_STORE_ADDRS macro
+Message-ID: <20240311162112.2e421c9f@kernel.org>
+In-Reply-To: <20240310121406.17422-1-kerneljasonxing@gmail.com>
+References: <20240310121406.17422-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 1/2] vxlan: Do not alloc tstats manually
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171019923159.27198.11426721044166113476.git-patchwork-notify@kernel.org>
-Date: Mon, 11 Mar 2024 23:20:31 +0000
-References: <20240311112437.3813987-1-leitao@debian.org>
-In-Reply-To: <20240311112437.3813987-1-leitao@debian.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, keescook@chromium.org, idosch@nvidia.com,
- razor@blackwall.org, amcohen@nvidia.com, petrm@nvidia.com, jbenc@redhat.com,
- b.galvani@gmail.com, gavinl@nvidia.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Sun, 10 Mar 2024 20:14:03 +0800 Jason Xing wrote:
+> Using the macro for other tracepoints use to be more concise.
+> No functional change.
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 11 Mar 2024 04:24:30 -0700 you wrote:
-> With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
-> convert veth & vrf"), stats allocation could be done on net core
-> instead of in this driver.
-> 
-> With this new approach, the driver doesn't have to bother with error
-> handling (allocation failure checking, making sure free happens in the
-> right spot, etc). This is core responsibility now.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,1/2] vxlan: Do not alloc tstats manually
-    https://git.kernel.org/netdev/net-next/c/e28c5efc3139
-  - [net-next,2/2] vxlan: Remove generic .ndo_get_stats64
-    https://git.kernel.org/netdev/net-next/c/195f88c57737
-
-You are awesome, thank you!
+The merge window for 6.9 has started and we try not to apply patches 
+to net-next during the merge window. Please repost in 2 weeks, once
+Linus has tagged v6.9-rc1.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: defer
 
