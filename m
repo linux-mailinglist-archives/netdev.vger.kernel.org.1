@@ -1,66 +1,56 @@
-Return-Path: <netdev+bounces-79093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB119877CB3
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 10:28:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF215877CB6
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 10:28:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 190101C20C29
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 09:28:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94BAA1F20FD5
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 09:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3DAB17577;
-	Mon, 11 Mar 2024 09:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 508EA17577;
+	Mon, 11 Mar 2024 09:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tjhv/Zpo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZRGTBGb4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F761756E;
-	Mon, 11 Mar 2024 09:28:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8B817999
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 09:28:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710149302; cv=none; b=UjnhXsy1VReydPp4jXVnxiHIDbAn9OZjcV+5ln6TXlX1mF5I36jTZEoOZ4LrxVmVgJDh9AYeDmz5B338ZPog2cnkBozTb20b0qnoD9G6mkgmO/p04hYfuKjk8r112vI2juHidK83gh/LfuNHQMP5iQiTfsF5vg9T+CTQIV6qtVM=
+	t=1710149330; cv=none; b=DVSDYkYlMEORqlSBeQXYhh83hlbrMpvJU6FyRvDjPnYa6F8yp/HJW9movLwZKKmRGQbJ1qTIDpLBsxrg3UuhvLXPJer22dUQWlvSFhqc0OspUVfi9O+b2/qqG0Aq7QNeWUaResm+8Ya0hlzr6/1KnrCxZVJ+H3e1Ag3WgZ2NQF4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710149302; c=relaxed/simple;
-	bh=CZz1SStjRYa5gA+pzYzI6DScrjzAK34yLiBd3eSn7OM=;
+	s=arc-20240116; t=1710149330; c=relaxed/simple;
+	bh=OqhmO6M3OHz6ppHWuh2pIzQYWuzYKvEaLefXwN5PfEw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=upkXqZEcGVCBSuQDPtsnWFg3ZqjJIzFyX0bL1w2Ee1EZtJfbfiV92KMiqUi1GeLboUO7lV/wr6bTzMgvsCuxJE4jCf8x06ZaZrMQ210hkVEkaQlUwfgYjRStAkjeBsMkc3zIDwhCG5HL2iXX9PyWcXO9a0LAim5d6LYicb/Tg8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tjhv/Zpo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C3B3C433F1;
-	Mon, 11 Mar 2024 09:28:17 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=oAMLZNWDRiTRUIizq9wQjViI/q2CKncI/Ysa/pv7Cg+6Van4dTTHtP2rT3PFPnvRVvJJDqf/58Kb0xyRH2WcMWQ0+0LNd4/ZtpanFvuqJjbTe25K9guIRSuBR73nKddNIVEc+X4HUfAtYgCrlEkls5gKsXxGiB+Sc5Y7SyEuMQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZRGTBGb4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CD1DC433F1;
+	Mon, 11 Mar 2024 09:28:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710149302;
-	bh=CZz1SStjRYa5gA+pzYzI6DScrjzAK34yLiBd3eSn7OM=;
+	s=k20201202; t=1710149330;
+	bh=OqhmO6M3OHz6ppHWuh2pIzQYWuzYKvEaLefXwN5PfEw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=tjhv/ZpoX12XOo2I3gSu3TeIMfANUFWUOVc4WeeGSxZgUmENDriqsmt0LHKJPQahW
-	 5+cqskLul9dHqf4b/MnLh+nEYmlfzIBHSi6LBIbobzryCARnp8/7w/4y4zR2UkUCwu
-	 +3kTbnD9Egt084iRhv/Ymlzaip7ektKyhNzaLvrm2+z6Y1yrYxMxB4PTZL4bRKQCFR
-	 HYy0eP1kmXTrboVGrG8wwVY8lLnqtr21SIm6JY2LzTpZVTGXprB8FN9sX1vv3SOOrL
-	 bKm7+dwwemS/fvVDUhFInhTUWMNUKx7Tsh+Tlgzm431kz4m9jyf7U7FAytxvdXdA2F
-	 mBBiA+qZ6w0dw==
-Date: Mon, 11 Mar 2024 09:28:13 +0000
+	b=ZRGTBGb4d/85qIcRIb+cDC+vz6Vq2LQ348+qOGO5naGfsMooKur8+z6c+gkAbhgxP
+	 pfe2jrap8Yn97MhXd4pKO2IqiDyIxnIm7dfUv3jye3Q9lCTuP1C5PEE7qHNc3/6cje
+	 mFAKpO6Mv84eYA5Cy6jXPShr59hV4qGT5iP4yOvuehnNfjRs17A5rivRBk4LUL/4kf
+	 nCSB2H7yhTPDqEISirN5WgbqeGv6knUDQ9ga+mzOM82A7BEm9mmai3YCIq0QdRF8Kb
+	 9lCzhT4JRprKCYUZrMKzBmXJN0f0h/MTdm9rtWmQXifit5ft6YxRYzqJzcs4LxR5wz
+	 dl8kFCjlL1R2g==
+Date: Mon, 11 Mar 2024 09:28:43 +0000
 From: Simon Horman <horms@kernel.org>
-To: Kees Cook <keescook@chromium.org>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] overflow: Change DEFINE_FLEX to take __counted_by
- member
-Message-ID: <20240311092813.GJ24043@kernel.org>
-References: <20240306235128.it.933-kees@kernel.org>
- <20240308202018.GC603911@kernel.org>
- <202403091230.ACF639521@keescook>
+To: David Wei <dw@davidwei.uk>
+Cc: Jakub Kicinski <kuba@kernel.org>, Jiri Pirko <jiri@resnulli.us>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1] netdevsim: replace pr_err with
+ {dev,netdev,}_err wherever possible
+Message-ID: <20240311092843.GK24043@kernel.org>
+References: <20240310015215.4011872-1-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,51 +59,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202403091230.ACF639521@keescook>
+In-Reply-To: <20240310015215.4011872-1-dw@davidwei.uk>
 
-On Sat, Mar 09, 2024 at 12:32:45PM -0800, Kees Cook wrote:
-> On Fri, Mar 08, 2024 at 08:20:18PM +0000, Simon Horman wrote:
-> > On Wed, Mar 06, 2024 at 03:51:36PM -0800, Kees Cook wrote:
-> > > The norm should be flexible array structures with __counted_by
-> > > annotations, so DEFINE_FLEX() is updated to expect that. Rename
-> > > the non-annotated version to DEFINE_RAW_FLEX(), and update the
-> > > few existing users.
-> > > 
-> > > Signed-off-by: Kees Cook <keescook@chromium.org>
-> > 
-> > Hi Kees,
-> > 
-> > I'm unclear what this is based on, as it doesn't appear to apply
-> > cleanly to net-next or the dev-queue branch of the iwl-next tree.
-> > But I manually applied it to the latter and ran some checks.
+On Sat, Mar 09, 2024 at 05:52:15PM -0800, David Wei wrote:
+> Replace pr_err() in netdevsim with {dev,netdev,}_err if possible,
+> preferring the most specific device available.
 > 
-> It was based on v6.8-rc2, but it no longer applies cleanly to iwl-next:
-> https://lore.kernel.org/linux-next/20240307162958.02ec485c@canb.auug.org.au/
+> Not all instances of pr_err() can be replaced however, as there may not
+> be a device to associate the error with, or a device might not be
+> available.
 > 
-> Is this something iwl-next can take for the v6.9 merge window? I can
-> send a rebased patch if that helps?
+> Tested by building and running netdevsim/peer.sh selftest.
+> 
+> Signed-off-by: David Wei <dw@davidwei.uk>
 
-Thanks Kees,
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-I think that would help in the sense that from my POV it would
-be more in fitting with the usual workflow for netdev patches.
-
-But if the iwl maintainers think otherwise then I have no objections.
-
-> 
-> > > @@ -396,9 +396,9 @@ static inline size_t __must_check size_sub(size_t minuend, size_t subtrahend)
-> > >   * @name: Name for a variable to define.
-> > >   * @member: Name of the array member.
-> > >   * @count: Number of elements in the array; must be compile-time const.
-> > > - * @initializer: initializer expression (could be empty for no init).
-> > > + * @initializer...: initializer expression (could be empty for no init).
-> > 
-> > Curiously kernel-doc --none seems happier without the line above changed.
-> 
-> I've fixed this up too:
-> https://lore.kernel.org/linux-next/202403071124.36DC2B617A@keescook/
-> 
-> -- 
-> Kees Cook
-> 
 
