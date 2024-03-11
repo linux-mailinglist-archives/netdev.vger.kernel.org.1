@@ -1,258 +1,181 @@
-Return-Path: <netdev+bounces-79175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79176-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A97788781A7
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:30:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B1AC8781B5
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:35:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC5771C21491
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 14:30:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F6491C20E6E
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 14:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2596E1426A;
-	Mon, 11 Mar 2024 14:30:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28CC24087D;
+	Mon, 11 Mar 2024 14:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="N3I8PSNC";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="m/X9FrW4";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="h7P/JRPL";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="GdoZvGeh"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="aH7yr38n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21BCB2AEFA;
-	Mon, 11 Mar 2024 14:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6753FB8F
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 14:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710167437; cv=none; b=lEB7o8p/6x81Dv2tBY7QMPcMfcVURQNeUsJiG4eYf0hIIAF67HtpoEkP5i8jKxqQGEdylD+BfRf53QGO7WBzkEWZCPQaUqJvymWUXNKzMqZXfV62E708MtJV/nxmfnIk/HpCWPuKODXJopgAvPUgNQv/6mbdTeVmA8kYm66CDeo=
+	t=1710167739; cv=none; b=ekLlbjgTbcBvt7qVkNKHA8N6uyui2lvrHdMwXQ/V8U7ecQo73tAT7QUkjagdaCZ8P6hRXaDOYd93TacMNaH4F+lHOGt/Ugcr0/051B6yflIxPVCyPsxREZCj6jXv0Wkwwq2ANpdRwaTfjl09VdP7v1+L1sUicI0c3cRWEer3HJU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710167437; c=relaxed/simple;
-	bh=0T5pD3BoyrBhhkpaZHMx5I5i33glsJxmRqTm5YAj5ZU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=SFscrY25+x9ro7TzCsekmSTcD57hYHFIO1AGwOpXBVvnUBZlOqOfAC3fqys4FaS9xlMMCbm9rhO05occDydTTK/TWlBew4JShRMlW6nx4zkraJSfpGJy1l8ut0Bs1Yl3AogKo/hhhOIPwcZsdx6glzxYNdBOhSOzoJSkDv/3s9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=N3I8PSNC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=m/X9FrW4; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=h7P/JRPL; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GdoZvGeh; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id D038734D40;
-	Mon, 11 Mar 2024 14:30:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1710167432; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WirrEh476Xt2ACesbhO1dQ1v2HIjjv+mDSb1ujrv7Y4=;
-	b=N3I8PSNCjACrIQH43FSQta0Lm5/U//fGNY55hH4UHtzDlQNmwffvqmDOySBPgRFIHsfi6Q
-	i3S7J83tkQZQkqcMYgzxrSTqV8MfucRU1pea8GgDkcDn0vwlKwRCkEH2bIC3uKQFQlPCDx
-	TQBQj65gMCLB7wQ3UqxKzzOyMFuL1t0=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1710167432;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WirrEh476Xt2ACesbhO1dQ1v2HIjjv+mDSb1ujrv7Y4=;
-	b=m/X9FrW4Rk56mGlDfIbDR6izUwRugpP8JKBMeaGa7Lcxo9voyePaCtMTzQg1FDZdy8XQyk
-	oTNzNBeZgK4MDOAg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1710167431; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WirrEh476Xt2ACesbhO1dQ1v2HIjjv+mDSb1ujrv7Y4=;
-	b=h7P/JRPLCOeiFdX+/zpp49E4smD4US3wLIRkjAQXjuQrEdhgqeHOXrS1FT2NA8+6h5PCKF
-	bJtuvsFHHJtRsoESgH6y+v6qMj95yFTXvpY0QCuhmO1xBgVVH9NPwFG2mbr2iDvEdXr/x6
-	tfUBATdL6Bmflz66PKtxxPIBvBRxd+Q=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1710167431;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WirrEh476Xt2ACesbhO1dQ1v2HIjjv+mDSb1ujrv7Y4=;
-	b=GdoZvGehJMzKjBz80XiAB20s7CcEX83cvrEJV58C37otoleaLi5m1gUgYmwTpThWzgQG4t
-	NAunRnmGxucft5Cg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id ED47A136BA;
-	Mon, 11 Mar 2024 14:30:30 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id /BDlNYYV72XebAAAD6G6ig
-	(envelope-from <dkirjanov@suse.de>); Mon, 11 Mar 2024 14:30:30 +0000
-Message-ID: <48eb38be-41ea-4ce7-99b2-f26b328cdf19@suse.de>
-Date: Mon, 11 Mar 2024 17:30:26 +0300
+	s=arc-20240116; t=1710167739; c=relaxed/simple;
+	bh=45ZfRvUxIddCvTvQrv8f9u/FV8jFaYC8ep2rv/Hz+Kk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m9g73wBGz3+yLfdWuYG5zKdp+zz3h6sWwORftL1GNCc4nPva5n7/LtvrW7cz/3Ef0htAxGhh6EJjzcVTWFOVatMMqbr7Nyb74lH7u5/EPREUVwKkTEmzhvo+1amuGMFEK1uxieZ1/5520uIqxi9jJKI8jB/6xPc196vcohMOk3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=aH7yr38n; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5684ea117a3so2671292a12.0
+        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 07:35:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ragnatech.se; s=google; t=1710167734; x=1710772534; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=j8GA2WqqNZi4sBgOuiFb7TO2wXY4wNFoigcy0Y4xraw=;
+        b=aH7yr38nnRXGYM1xrgU7A8+UUj/euMhhmCDxNvobPDqX13XflR4TnBIlk8zayX/E4J
+         f1iMzFb2X3HV85Tn1xLC6PrnH58aCDOJtdoYIWAmOmau1y6XnCIBFuAeRueQSONKjf14
+         MW7rcoPFlyXRbqVJNQaHyMr0XxrmGofs8MEe3p2EZGv9oKk4HoJOhtCQK34qK/r3zPAS
+         3fCFpqqU4m8rnnqO75D2t8vX1zATBxQgtZBC9qFCQ71RG+IytW0MOKGaSH2bui8AruZN
+         IvT9zbHJ1FTD67TxgZcrzVe7j7q+XnprFtMQc4OD8tr/UlgD1LJc2mK72AnYd+3XRNyP
+         lWFw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710167734; x=1710772534;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=j8GA2WqqNZi4sBgOuiFb7TO2wXY4wNFoigcy0Y4xraw=;
+        b=YrTI/DBfzuyjIa2MlBx76bWbCIcMGA+6gtjxrcnB1Kp+1uq5Dmmp0O7k4xl8dMKqKJ
+         TiCqa/7nvaK1/Nv2IrB1Q9QVH5nxl8igDrgXRhAYEu0CHl1LhyzahQOcD/JceTXQ0XKP
+         p6M6Qn5oWj09scalxUeaSDtu1ex5L/ifdkM2b/KSCo1vAAQpN/F7DS8MWq71dlgpPJBA
+         pi1xfngZNFLo3oiPWoISnPAzaRuHh6ipNA8+fvt2nGvaYWqVKzuMeuS16d2+CNj2k5Oq
+         UNhaSLYQ/sc9UFBx5KrzrfEuoc84OYB8oINVtZBorn3ReGcgTpyghc7nbcww+ygw1GQk
+         q3yw==
+X-Forwarded-Encrypted: i=1; AJvYcCXU7iR2mQgKSihnjMYL87nlYRVTjxWNcDoQEkWClAPRdK/HnKIor6s9s78WgQRngjVfpwy6LykyhrxVdg8cjdxdrpcOGCFP
+X-Gm-Message-State: AOJu0YzoT8u3WWd00f9/RtRuvZ+E+3Ptx1Ewx8mdZMbJBcPHNTazW7bG
+	BK9w3VnKK2iw4Qp5Se8Gt+uGy2CL5vRLMIE1+rrjZzFEkiekY1rqUSu9KnBlaJg=
+X-Google-Smtp-Source: AGHT+IHwPP14dXTQIF8gbZBzyF2nx/SmXHUct1fkrDfFPb4anZHyf6OlSbg0UzJLt7rxxYbiZrm46A==
+X-Received: by 2002:a17:907:7847:b0:a44:1fcf:9b97 with SMTP id lb7-20020a170907784700b00a441fcf9b97mr3736842ejc.24.1710167734423;
+        Mon, 11 Mar 2024 07:35:34 -0700 (PDT)
+Received: from sleipner.berto.se (p4fcc8c6a.dip0.t-ipconnect.de. [79.204.140.106])
+        by smtp.googlemail.com with ESMTPSA id w9-20020a17090652c900b00a461543ab87sm2037458ejn.205.2024.03.11.07.35.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Mar 2024 07:35:34 -0700 (PDT)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [net-next] dt-bindings: net: renesas,ethertsn: Create child-node for MDIO bus
+Date: Mon, 11 Mar 2024 15:35:07 +0100
+Message-ID: <20240311143507.3239566-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/3] net: marvell: prestera: fix driver reload
-Content-Language: en-US
-To: Elad Nachman <enachman@marvell.com>, taras.chornyi@plvision.eu,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew@lunn.ch, kory.maincent@bootlin.com,
- thomas.petazzoni@bootlin.com, miquel.raynal@bootlin.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240311135112.2642491-1-enachman@marvell.com>
- <20240311135112.2642491-2-enachman@marvell.com>
-From: Denis Kirjanov <dkirjanov@suse.de>
-In-Reply-To: <20240311135112.2642491-2-enachman@marvell.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Level: 
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b="h7P/JRPL";
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=GdoZvGeh
-X-Spamd-Result: default: False [-3.30 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 BAYES_HAM(-3.00)[100.00%];
-	 MIME_GOOD(-0.10)[text/plain];
-	 URIBL_BLOCKED(0.00)[suse.de:dkim,bootlin.com:email,marvell.com:email];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 DKIM_TRACE(0.00)[suse.de:+];
-	 MX_GOOD(-0.01)[];
-	 RCPT_COUNT_TWELVE(0.00)[12];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,bootlin.com:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[];
-	 RBL_SPAMHAUS_BLOCKED_OPENRESOLVER(0.00)[2a07:de40:b281:104:10:150:64:97:from]
-X-Spam-Score: -3.30
-X-Rspamd-Queue-Id: D038734D40
-X-Spam-Flag: NO
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
 
+The design for this driver followed that of other Renesas Ethernet
+drivers and thus did not force a child-node for the MDIO bus. As there
+are no upstream drivers or users of this binding yet take the
+opportunity to correct this and force the usage of a child-node for the
+MDIO bus.
 
+Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+---
+Hello,
 
-On 3/11/24 16:51, Elad Nachman wrote:
-> From: Elad Nachman <enachman@marvell.com>
-> 
-> Driver rmmod after insmod would fail because of
-> the following issues:
-> 
-> 1. API call to reset the switch HW and restart the
->    firmware CPU firmware code loading was missing in
->    driver removal code handler.
-> 2. Timeout waiting for the firmware CPU firmware
->    loader code to start was too small.
-> 
-> Fix by adding API call to reset the switch HW and
-> restart the firmware CPU firmware code loading when
-> handling the driver removal procedure,
-> increase the timeout waiting for this restart operation
-> from 5 to 30 seconds.
-> 
-> Reported-by: Köry Maincent <kory.maincent@bootlin.com>
-> Closes: https://lore.kernel.org/netdev/20240208101005.29e8c7f3@kmaincent-XPS-13-7390/T/
-> Signed-off-by: Elad Nachman <enachman@marvell.com>
-Please add Fixes tag
-> ---
->  drivers/net/ethernet/marvell/prestera/prestera_hw.c   | 8 ++++++++
->  drivers/net/ethernet/marvell/prestera/prestera_hw.h   | 1 +
->  drivers/net/ethernet/marvell/prestera/prestera_main.c | 3 ++-
->  drivers/net/ethernet/marvell/prestera/prestera_pci.c  | 7 ++++++-
->  4 files changed, 17 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/prestera/prestera_hw.c b/drivers/net/ethernet/marvell/prestera/prestera_hw.c
-> index fc6f7d2746e8..08de8b498e0a 100644
-> --- a/drivers/net/ethernet/marvell/prestera/prestera_hw.c
-> +++ b/drivers/net/ethernet/marvell/prestera/prestera_hw.c
-> @@ -21,6 +21,7 @@
->  enum prestera_cmd_type_t {
->  	PRESTERA_CMD_TYPE_SWITCH_INIT = 0x1,
->  	PRESTERA_CMD_TYPE_SWITCH_ATTR_SET = 0x2,
-> +	PRESTERA_CMD_TYPE_SWITCH_RESET = 0x4,
->  
->  	PRESTERA_CMD_TYPE_PORT_ATTR_SET = 0x100,
->  	PRESTERA_CMD_TYPE_PORT_ATTR_GET = 0x101,
-> @@ -1087,6 +1088,13 @@ void prestera_hw_switch_fini(struct prestera_switch *sw)
->  	WARN_ON(!list_empty(&sw->event_handlers));
->  }
->  
-> +int prestera_hw_switch_reset(struct prestera_switch *sw)
-> +{
-> +	struct prestera_msg_common_req req;
-> +
-> +	return prestera_cmd(sw, PRESTERA_CMD_TYPE_SWITCH_RESET, &req.cmd, sizeof(req));
-> +}
-> +
->  int prestera_hw_switch_ageing_set(struct prestera_switch *sw, u32 ageing_ms)
->  {
->  	struct prestera_msg_switch_attr_req req = {
-> diff --git a/drivers/net/ethernet/marvell/prestera/prestera_hw.h b/drivers/net/ethernet/marvell/prestera/prestera_hw.h
-> index 0a929279e1ce..86217bea2ca0 100644
-> --- a/drivers/net/ethernet/marvell/prestera/prestera_hw.h
-> +++ b/drivers/net/ethernet/marvell/prestera/prestera_hw.h
-> @@ -150,6 +150,7 @@ struct prestera_neigh_info;
->  
->  /* Switch API */
->  int prestera_hw_switch_init(struct prestera_switch *sw);
-> +int prestera_hw_switch_reset(struct prestera_switch *sw);
->  void prestera_hw_switch_fini(struct prestera_switch *sw);
->  int prestera_hw_switch_ageing_set(struct prestera_switch *sw, u32 ageing_ms);
->  int prestera_hw_switch_mac_set(struct prestera_switch *sw, const char *mac);
-> diff --git a/drivers/net/ethernet/marvell/prestera/prestera_main.c b/drivers/net/ethernet/marvell/prestera/prestera_main.c
-> index 4fb886c57cd7..bcaa8ea27b49 100644
-> --- a/drivers/net/ethernet/marvell/prestera/prestera_main.c
-> +++ b/drivers/net/ethernet/marvell/prestera/prestera_main.c
-> @@ -1444,7 +1444,7 @@ static int prestera_switch_init(struct prestera_switch *sw)
->  err_router_init:
->  	prestera_netdev_event_handler_unregister(sw);
->  	prestera_hw_switch_fini(sw);
-> -
-> +	prestera_hw_switch_reset(sw);
->  	return err;
->  }
->  
-> @@ -1463,6 +1463,7 @@ static void prestera_switch_fini(struct prestera_switch *sw)
->  	prestera_router_fini(sw);
->  	prestera_netdev_event_handler_unregister(sw);
->  	prestera_hw_switch_fini(sw);
-> +	prestera_hw_switch_reset(sw);
->  	of_node_put(sw->np);
->  }
->  
-> diff --git a/drivers/net/ethernet/marvell/prestera/prestera_pci.c b/drivers/net/ethernet/marvell/prestera/prestera_pci.c
-> index 35857dc19542..b75a263ad8cb 100644
-> --- a/drivers/net/ethernet/marvell/prestera/prestera_pci.c
-> +++ b/drivers/net/ethernet/marvell/prestera/prestera_pci.c
-> @@ -24,6 +24,11 @@
->  #define PRESTERA_FW_ARM64_PATH_FMT "mrvl/prestera/mvsw_prestera_fw_arm64-v%u.%u.img"
->  
->  #define PRESTERA_FW_HDR_MAGIC		0x351D9D06
-> +/* Timeout waiting for prestera firmware CPU to reboot and
-> + * restart the firmware loading software layer, hence becoming
-> + * ready for the next firmware downloading phase:
-> + */
-> +#define PRESTERA_FW_READY_TIMEOUT_SECS	30
->  #define PRESTERA_FW_DL_TIMEOUT_MS	50000
->  #define PRESTERA_FW_BLK_SZ		1024
->  
-> @@ -765,7 +770,7 @@ static int prestera_fw_load(struct prestera_fw *fw)
->  
->  	err = prestera_ldr_wait_reg32(fw, PRESTERA_LDR_READY_REG,
->  				      PRESTERA_LDR_READY_MAGIC,
-> -				      5 * MSEC_PER_SEC);
-> +				      PRESTERA_FW_READY_TIMEOUT_SECS * MSEC_PER_SEC);
->  	if (err) {
->  		dev_err(fw->dev.dev, "waiting for FW loader is timed out");
->  		return err;
+Learn from the mistake made with the Renesas AVB bindings being worked
+on in [1] where no mdio node was used to describe the MDIO bus and the
+PHY was added directly as a child node to the AVB node.
+
+The Ethernet TSN driver is still in review and have not been merged and
+no usage of the bindings merged either. So while this breaks the binding
+it effects no one so we can correct this mistake without breaking any
+use-cases before we need to support any backward compatibility.
+
+1. https://patchwork.kernel.org/project/netdevbpf/list/?series=834331
+---
+ .../bindings/net/renesas,ethertsn.yaml        | 33 ++++++++-----------
+ 1 file changed, 14 insertions(+), 19 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
+index ea35d19be829..0a88f4acc3f6 100644
+--- a/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
++++ b/Documentation/devicetree/bindings/net/renesas,ethertsn.yaml
+@@ -71,16 +71,8 @@ properties:
+     enum: [0, 2000]
+     default: 0
+ 
+-  '#address-cells':
+-    const: 1
+-
+-  '#size-cells':
+-    const: 0
+-
+-patternProperties:
+-  "^ethernet-phy@[0-9a-f]$":
+-    type: object
+-    $ref: ethernet-phy.yaml#
++  mdio:
++    $ref: /schemas/net/mdio.yaml#
+     unevaluatedProperties: false
+ 
+ required:
+@@ -94,8 +86,7 @@ required:
+   - resets
+   - phy-mode
+   - phy-handle
+-  - '#address-cells'
+-  - '#size-cells'
++  - mdio
+ 
+ additionalProperties: false
+ 
+@@ -122,14 +113,18 @@ examples:
+         tx-internal-delay-ps = <2000>;
+         phy-handle = <&phy3>;
+ 
+-        #address-cells = <1>;
+-        #size-cells = <0>;
++        mdio {
++            #address-cells = <1>;
++            #size-cells = <0>;
+ 
+-        phy3: ethernet-phy@3 {
+-            compatible = "ethernet-phy-ieee802.3-c45";
+-            reg = <0>;
+-            interrupt-parent = <&gpio4>;
+-            interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
+             reset-gpios = <&gpio1 23 GPIO_ACTIVE_LOW>;
++            reset-post-delay-us = <4000>;
++
++            phy3: ethernet-phy@3 {
++                compatible = "ethernet-phy-ieee802.3-c45";
++                reg = <0>;
++                interrupt-parent = <&gpio4>;
++                interrupts = <3 IRQ_TYPE_LEVEL_LOW>;
++            };
+         };
+     };
+-- 
+2.44.0
+
 
