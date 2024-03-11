@@ -1,92 +1,110 @@
-Return-Path: <netdev+bounces-79295-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5347878A63
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:00:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A37DA878A7F
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:06:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 828651F21FDE
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 22:00:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C506E1C20F08
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 22:06:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B59557300;
-	Mon, 11 Mar 2024 22:00:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B794057304;
+	Mon, 11 Mar 2024 22:05:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eTbWthIB"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="vYnFcRP6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF2256B99
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 22:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31EE56B90;
+	Mon, 11 Mar 2024 22:05:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710194435; cv=none; b=b1D/zFUrAM7kXH0sdJ77PsWNQrJi7xLs7zkOiOtyBMPZ9Bydw1Jk90o0v2O9axhaQgbNqH4NArL3NN3VZqqTtNwrx04RI7wd0hJXo6kZOGAFoHoaGNhY4x5jR8EvUFosVIBu57US5zWcv0mAz2r6h4CMDJ051pYXMGYvfmCP1HQ=
+	t=1710194759; cv=none; b=XVxs3ON8TLtLyYoLDgWs4KSE60vwQAZykkXbNgLLMDW+UlseKCaqihqa2BWJsiZiPQQ+UhEpRQgdYqC4IwJp0/+TNXMCRSzzVH2zZIseae9TRBLm9HsnkXJC9HJOtoNVsgH7u41e9pjVpZS+27bJv3XNAYTC8kuahRbQ4JLzo5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710194435; c=relaxed/simple;
-	bh=XCP5e9KCwSpsI2xoCIrXF2AG8/vGJ7eHFDQAvCXWFi4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=MfVPCVVaTsn+c9WrU5EDinS2UDyn+IGYNwxdiAlhdRW+dzKkd68VkZktLnKZMTvsmDi22JtrLMx8bfPm41lPPfiWOVyua3pdvur7/iN5YBthw8c2RRtx4DtqzH8hLsVERPSmlqm8HUsypu3xy2KiEUGK2K8pUhvw0bMuwPrdqHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eTbWthIB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 90334C43399;
-	Mon, 11 Mar 2024 22:00:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710194434;
-	bh=XCP5e9KCwSpsI2xoCIrXF2AG8/vGJ7eHFDQAvCXWFi4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eTbWthIBOaND/7PfbHXEoP9U0vIyFqXQE+90v9kdBSWaElp8Yjf5hQxgS3v0gwWvN
-	 A6bb46Pr2SXNunJgQYt1Zs5NKvbHq7ecF1ozcrD07fViFxWkxi+QPGNDccH8jlnIJW
-	 7yCwKEx3BWfsqYV3kicQ1Xkn1YV0T4UgvIqctdbzrFbxmquw49QcSjUDW7pBNNXwyr
-	 x286l45MVNU2GTM6BXorTQQf8p6O7Z2dW+6dDNYbmGgSQ6n55p/ntlpRpAqrlLm7Sv
-	 3BPc0oFwOi7jcHy4YzVUiJvmCFr7yH1bTwnGsYu3dDbMVjJutjvuz8bEINkk9K40Pf
-	 aez6Hv5oj2fKw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 773D9D95057;
-	Mon, 11 Mar 2024 22:00:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1710194759; c=relaxed/simple;
+	bh=R+IxDTVIV1VoIdKEZSyusXOyCtEViHcb5yqmR70/jdY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=otfSzi4N5KeRFo3rJ+sNS69FjzVwxAINREA5sFSOYvG9k95ZI+66uIFBmPcVyip0OmikIgapAV8mu2beJi4e1V7hCqFhHXzUrtGCnF8NHNvVfXNhHLgRAfSVWCHgDIylca+gRuHnzXI+MFGUCAvuMnst8GmGpebunH482PYwbYI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=vYnFcRP6; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 269236030A;
+	Mon, 11 Mar 2024 22:05:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1710194747;
+	bh=R+IxDTVIV1VoIdKEZSyusXOyCtEViHcb5yqmR70/jdY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=vYnFcRP6nlepiX2TGdUdMK/hlrOkZMUa054TkbGZhe/BI7rO26n7W1ARTkIaLr87R
+	 h12UHloYr2IRztBWNrIOpWpF2xo+xyqDhEYaioty3GzNHV+UuYWGkKG4O+4dXldRmD
+	 3tkx1/6OCGxXDT8d8tqI3uozy383QuaxaUpdTRzHBbH3Maya4bqJJnupnKLRkhP9HQ
+	 BBOBg2NlG0eBHTxYM9bEEUfYV9v+ewVl3hzLnfysM9vUGVIIh6DI8OWoHf1APbhQe/
+	 6CWdYSqQaQGgyeyffYN9CGS1PL+x7DnPx9vS1XviOxU04OPvV+hyJOdptdTIlBXJKt
+	 mIAeS2XY7hJMg==
+Received: from [127.0.0.1] (localhost [127.0.0.1])
+	by x201s (Postfix) with ESMTP id 29750200B46;
+	Mon, 11 Mar 2024 22:05:29 +0000 (UTC)
+Message-ID: <08ba1c0f-4496-45c1-ab77-df127ac8bf54@fiberby.net>
+Date: Mon, 11 Mar 2024 22:05:28 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 0/3] make skip_sw actually skip software
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
+ <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
+ Daniel Borkmann <daniel@iogearbox.net>, Vlad Buslov <vladbu@nvidia.com>,
+ Marcelo Ricardo Leitner <mleitner@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, llu@fiberby.dk
+References: <20240306165813.656931-1-ast@fiberby.net>
+ <20240311134435.19393f98@kernel.org>
+From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
+In-Reply-To: <20240311134435.19393f98@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: gro: move two declarations to include/net/gro.h
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171019443448.9697.16788661291494587779.git-patchwork-notify@kernel.org>
-Date: Mon, 11 Mar 2024 22:00:34 +0000
-References: <20240308102230.296224-1-edumazet@google.com>
-In-Reply-To: <20240308102230.296224-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
 
-Hello:
+Hi Kuba,
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri,  8 Mar 2024 10:22:30 +0000 you wrote:
-> Move gro_find_receive_by_type() and gro_find_complete_by_type()
-> to include/net/gro.h where they belong.
+On 3/11/24 8:44 PM, Jakub Kicinski wrote:
+> On Wed,  6 Mar 2024 16:58:08 +0000 Asbjørn Sloth Tønnesen wrote:
+>> During development of flower-route[1], which I
+>> recently presented at FOSDEM[2], I noticed that
+>> CPU usage, would increase the more rules I installed
+>> into the hardware for IP forwarding offloading.
+>>
+>> Since we use TC flower offload for the hottest
+>> prefixes, and leave the long tail to the normal (non-TC)
+>> Linux network stack for slow-path IP forwarding.
+>> We therefore need both the hardware and software
+>> datapath to perform well.
+>>
+>> I found that skip_sw rules, are quite expensive
+>> in the kernel datapath, since they must be evaluated
+>> and matched upon, before the kernel checks the
+>> skip_sw flag.
+>>
+>> This patchset optimizes the case where all rules
+>> are skip_sw, by implementing a TC bypass for these
+>> cases, where TC is only used as a control plane
+>> for the hardware path.
 > 
-> Also use _NET_GRO_H instead of _NET_IPV6_GRO_H to protect
-> include/net/gro.h from multiple inclusions.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> 
-> [...]
+> Linus tagged v6.8 and the merge window for v6.9 has started.
+> This feels a bit too risky for me to apply last minute,
+> could you repost in 2 weeks once the merge window is over?
 
-Here is the summary with links:
-  - [net-next] net: gro: move two declarations to include/net/gro.h
-    https://git.kernel.org/netdev/net-next/c/e5b7aefe38f7
+Sure, I will repost once net-next opens back up again.
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Best regards
+Asbjørn Sloth Tønnesen
+Network Engineer
+Fiberby - AS42541
 
