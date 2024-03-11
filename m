@@ -1,58 +1,76 @@
-Return-Path: <netdev+bounces-79324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79325-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58361878B9C
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:44:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DA03878BAB
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:55:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B3E01C2100B
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:44:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75CCD281183
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:55:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43AD058AD1;
-	Mon, 11 Mar 2024 23:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CAB959163;
+	Mon, 11 Mar 2024 23:55:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RCpIijKg"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 263D61BDF4;
-	Mon, 11 Mar 2024 23:44:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DADBA58AAC;
+	Mon, 11 Mar 2024 23:55:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710200646; cv=none; b=cdo1IkbBMHNwcRN+GxX/8lF+qlvgy29tNAP4rBJSS1xPSRFWuRO0XebigtMxdXTJFFESpLPxV8FpW2NmTNL2IGHIm83TpY58U2wo69ZOb2PzCdoNlW8YKNlgBt2BOkia4nKyqDF+QC1JwbtETK/SHkX9ee9dcDgva1oDW/UEJF0=
+	t=1710201339; cv=none; b=u7w10IYzYefBFNJXeK+Y93aLlUyztrY4nSU8jNvepm0MyoKY5t67q2vKI3NfK/+RPfTo99P/ESBkMtCyIGoOX3oZS+VjZxdqzcTUZskCZHqxzds+pDtygvneuOJub1Ip7fZl/FN0oB0e5V27FE+J4AZ+Qx2nDfMN8hIrTLiW0GM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710200646; c=relaxed/simple;
-	bh=Ty91y+ljBZFXfiBLySFDPnvfQL3vSKhG8OKfxi3xM4I=;
+	s=arc-20240116; t=1710201339; c=relaxed/simple;
+	bh=BuwxzEM/Bxcww15ApUyz1+fwftuGUlKv1u90MSb2jyc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b8Mr8/nFmNMqU95DUw91q4z4x821Xg+pS0MeMT0xMYRXPpt7bM4YNpD2zJ+MnVDWPk7AoUtVaJLdAMhdvAVjCwbBQrUeOp0WpLFpyDjpKQx9Uij2hWy4oi0oBLeSMGxW8e5hzRqmgLxtZT0SN2ht/FFWbNoLy8Kim1hdcnXwZuw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1rjpIp-0002Jp-39;
-	Mon, 11 Mar 2024 23:43:32 +0000
-Date: Mon, 11 Mar 2024 23:43:24 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: patchwork-bot+netdevbpf@kernel.org,
-	Justin Swartz <justin.swartz@risingedge.co.za>, dqfext@gmail.com,
-	sean.wang@mediatek.com, andrew@lunn.ch, f.fainelli@gmail.com,
-	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH] net: dsa: mt7530: disable LEDs before reset
-Message-ID: <Ze-XHH4yFjXC0p11@makrotopia.org>
-References: <20240305043952.21590-1-justin.swartz@risingedge.co.za>
- <171019143163.14853.15330891015381229970.git-patchwork-notify@kernel.org>
- <2d206dbb-a27b-4139-a49e-331797d8ba34@arinc9.com>
- <Ze9-mp269h43WGD3@makrotopia.org>
- <2846b377-f45b-45fd-9fe2-cb22615e0fd5@arinc9.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ro3PQcBDB4r/Q15JMucJo/1L+dzMLnX/ExTBf+DF8g41brGlK8zNyVQqxBEfK9j3ae1kPNP7uAF6Ztih4o994XfQOK8nSTqUhzpUKHIPlUD/wxhwkHpe6fZiIqUdVFTkTCakm0AQTbiPRG44CFh3Eu9C3xycqXPVXER4r8awfG0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RCpIijKg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D1F9C433F1;
+	Mon, 11 Mar 2024 23:55:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710201338;
+	bh=BuwxzEM/Bxcww15ApUyz1+fwftuGUlKv1u90MSb2jyc=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=RCpIijKgQgoTSA/YgO5HGnRv3Hf9/Bg6Rr/EDvLtzPQgyI+KITZQdfzApLBYH/2PR
+	 s+tHpIkNnd8px5/X+EeLzzDUEUxl4H6mHKD7AvraOplbNr9dli6MZME3EdEtvGdXmW
+	 pYgwXcM/XGtMTZLpBDr1vnz9eKE2woypzmXew2bH20+gC0+Ppn9o7pbtmBsRmcFH9m
+	 loWPfwQV4KR5r0ugMkELBAZyXvtHC01/1dYPOrTKg+8ho4iv3F+9jgD25U1TOI/DHW
+	 /G2XFIzJ6EOA4Z8DOgLJP87E7bD9F/NFCdNPVlq5ocwS+QZGfqhDQkih2/FSDmDMwq
+	 k0zzq9tzTDy1A==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 0244FCE1A25; Mon, 11 Mar 2024 16:55:37 -0700 (PDT)
+Date: Mon, 11 Mar 2024 16:55:37 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Yan Zhai <yan@cloudflare.com>
+Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Hannes Frederic Sowa <hannes@stressinduktion.org>,
+	linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
+	bpf@vger.kernel.org, kernel-team@cloudflare.com,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>, mark.rutland@arm.com,
+	Jesper Brouer <jesper@cloudflare.com>
+Subject: Re: [PATCH v2] net: raise RCU qs after each threaded NAPI poll
+Message-ID: <aa4909dd-98f2-4185-833d-666c640786c6@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <ZeFPz4D121TgvCje@debian.debian>
+ <CAO3-PboqKqjqrAScqzu6aB8d+fOq97_Wuz8b7d5uoMKT-+-WvQ@mail.gmail.com>
+ <CANn89iLCv0f3vBYt8W+_ZDuNeOY1jDLDBfMbOj7Hzi8s0xQCZA@mail.gmail.com>
+ <CAO3-PboZwTiSmVxVFFfAm94o+LgK=rnm1vbJvMhzSGep+RYzaQ@mail.gmail.com>
+ <ed57b5fa-8b44-48de-904e-fe8da1939292@paulmck-laptop>
+ <CAO3-Pbp0Pxbbgmjf03wKo6MDrQYE7uiL+mUnheT9UA9Pjj5bUQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,103 +80,71 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <2846b377-f45b-45fd-9fe2-cb22615e0fd5@arinc9.com>
+In-Reply-To: <CAO3-Pbp0Pxbbgmjf03wKo6MDrQYE7uiL+mUnheT9UA9Pjj5bUQ@mail.gmail.com>
 
-On Tue, Mar 12, 2024 at 02:27:25AM +0300, Arınç ÜNAL wrote:
-> On 12.03.2024 00:58, Daniel Golle wrote:
-> > On Tue, Mar 12, 2024 at 12:22:48AM +0300, Arınç ÜNAL wrote:
-> > > Why was this applied? I already explained it did not achieve anything.
-> > 
-> > I agree that we were still debating about it, however, I do believe
-> > Justin that he truely observed this problem and the fix seemed
-> > appropriate to me.
-> > 
-> > I've explained this in my previous email which you did not notice
-> > or at least haven't repied to:
-> > 
-> > https://patchwork.kernel.org/project/netdevbpf/patch/20240305043952.21590-1-justin.swartz@risingedge.co.za/#25753421
-> 
-> I did read that and I did not respond because you did not argue over any of
-> the technical points I've made. All you said was did I repeat the test
-> enough, on a technical matter that I consider adding two and two together
-> and expecting a result other than four.
-> 
-> How I interpreted your response was: I don't know much about this, maybe
-> you're wrong. Justin must've made this patch for a reason so let's have
-> them elaborate further.
-> 
-> > 
-> > In the end it probably depends on the electric capacity of the circuit
-> > connecting each LED, so it may not be reproducible on all boards and/or
-> > under all circumstances (temperature, humindity, ...).
-> 
-> I'm sorry, this makes no sense to me. I simply fail to see how this fits
-> here. Could you base your argument over my points please?
+On Mon, Mar 11, 2024 at 05:58:16PM -0500, Yan Zhai wrote:
+> On Fri, Mar 1, 2024 at 4:29 PM Paul E. McKenney <paulmck@kernel.org> wrote:
+> >
+> > On Fri, Mar 01, 2024 at 11:30:29AM -0600, Yan Zhai wrote:
+> > > Hi Eric,
+> > >
+> > > On Fri, Mar 1, 2024 at 2:30 AM Eric Dumazet <edumazet@google.com> wrote:
+> > > >
+> > > > I could not see the reason for 1sec (HZ) delays.
+> > > >
+> > > > Would calling rcu_softirq_qs() every ~10ms instead be a serious issue ?
+> > > >
+> > > The trouble scenarios are often when we need to detach an ad-hoc BPF
+> > > tracing program, or restart a monitoring service. It is fine as long
+> > > as they do not block for 10+ seconds or even completely stall under
+> > > heavy traffic. Raising a QS every few ms or HZ both work in such
+> > > cases.
+> > >
+> > > > In anycase, if this all about rcu_tasks, I would prefer using a macro
+> > > > defined in kernel/rcu/tasks.h
+> > > > instead of having a hidden constant in a networking core function.
+> > >
+> > > Paul E. McKenney was suggesting either current form or
+> > >
+> > >          local_bh_enable();
+> > >          if (!IS_ENABLED(CONFIG_PREEMPT_RT))
+> > >                  rcu_softirq_qs_enable(local_bh_enable());
+> > >          else
+> > >                  local_bh_enable();
+> > >
+> > > With an interval it might have to be
+> > > "rcu_softirq_qs_enable(local_bh_enable(), &next_qs);" to avoid an
+> > > unnecessary extern/static var. Will it make more sense to you?
+> >
+> > I was thinking in terms of something like this (untested):
+> >
+> >         #define rcu_softirq_qs_enable(enable_stmt, oldj) \
+> >         do { \
+> >                 if (!IS_ENABLED(CONFIG_PREEMPT_RT) && \
+> >                     time_after(oldj + HZ / 10, jiffies) { \
+> >                         rcu_softirq_qs(); \
+> >                         (oldj) = jiffies; \
+> >                 } \
+> >                 do  { enable_stmt; } while (0) \
+> >         } while (0)
+> >
+> > Then the call could be "rcu_softirq_qs_enable(local_bh_enable(), last_qs)",
+> > where last_qs is initialized by the caller to jiffies.
+> >
+> > The reason for putting "enable_stmt;" into anothor do-while loop is
+> > in case someone typos an "else" as the first part of the "enable_stmt"
+> > argument.
+> >
+> > Would that work?
+> >
+> Thanks Paul, just got time to continue this thread as I was
+> travelling. I think it is probably better to move
+> preempt_disable/enable into the macro to avoid the friction. And also
+> since this can affect NAPI thread, NAPI busy loop and XDP cpu map
+> thread (+Jesper who reminded me about this), let me send a v3 later to
+> cover all of those places.
 
-Sure, will happily do so.
+OK, looking forward to seeing what you come up with.
 
-> 
-> Do you agree that the LED controller starts manipulating the state of the
-> pins used for LEDs and bootstrapping after a link is established?
-
-Yes. But a reset may happen while a link is already up because the switch IC
-was initialized and in use by the bootloader. And hence LED may be powered
-by the LED controller in that moment **just before reset**.
-
-> 
-> Do you agree that after power is cut from the switch IC and then given
-> back, any active link from before will go away, meaning the pins will go
-> back to the state that is being dictated by the bootstrapping design of the
-> board?
-
-I don't see how this could be related. We are not talking about power cuts
-here, but rather use of a RESET signal (typically a GPIO on standalone MT753x
-or reset controller of the CPU-part of the MCM).
-
-> 
-> Do you agree that with power given back, the HWTRAP register will be
-> populated before a link is established?
-
-Yes sure, but see above.
-
-> 
-> > 
-> > Disabling the LEDs and waiting for around 1mS before reset seems like
-> > a sensible thing to do, and I'm glad Justin took care of it.
-> 
-> Let's ask Justin if they tested this on a standalone MT7530. Because I did.
-> The switch chip won't even be powered on before the switch chip reset
-> operation is done. So the operation this patch brings does not do anything
-> at all for standalone MT7530.
-
-This is not true in case the bootloader has already powered on the
-switch in order to load firmware via TFTP. In this case the link may
-be up (and hence LEDs may be powered on) at the moment the reset
-triggerd by probe of the DSA driver kicks in.
-
-> 
-> My conclusion to this patch is Justin tested this only on an MCM MT7530
-> where the switch IC still has power before the DSA subdriver kicks in. And
-> assumed that disabling the LED controller before switch chip reset would
-> "reduce" the possibility of having these pins continue being manipulated by
-> the LED controller AFTER power is cut off and given back to the switch
-> chip, where the state of these pins would be back to being dictated by the
-> bootstrapping design of the board.
-> 
-> Jakub, please revert this. And please next time do not apply any patch that
-> modifies this driver without my approval if I've already made an argument
-> against it. I'm actively maintaining this driver, if there's a need to
-> respond, I will do so.
-> 
-> This patch did not have any ACKs. It also did not have the tree described
-> on the subject. More reasons as to why this shouldn't have been applied in
-> its current state.
-
-It was clearly recognizable as a fix.
-
-However, I agree that applying it after Ack from an active maintainer
-would have been better.
-
-I don't see a need to revert it before this debate (which starts to
-look like an argument over authority) has concluded.
+							Thanx, Paul
 
