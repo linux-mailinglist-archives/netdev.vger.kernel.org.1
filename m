@@ -1,188 +1,195 @@
-Return-Path: <netdev+bounces-79063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA87D877B24
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 08:06:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E091877B4E
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 08:25:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EE24FB20B04
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 07:06:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AEBB1C20BDE
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 07:25:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AB88F9F5;
-	Mon, 11 Mar 2024 07:06:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAEA5101E8;
+	Mon, 11 Mar 2024 07:25:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NubpE3SD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lLyDxdUD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E178A1C20;
-	Mon, 11 Mar 2024 07:05:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B79BE63AE
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 07:25:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710140760; cv=none; b=l5ZnHGAfFp3ja8yjAPxrdE3vyku7VamJlBt+wB5l564DrLgv1U13LpNZBf6Fzkd8NAc6iN+Z4sdNsNFQtDokfzr8r1fyQkW7/U8FlU7LkgsLKXam659388y6WATvKCxEW1SskPYSOkSBDL8WnboKQY59tohkNn7p81iFAIirr1U=
+	t=1710141950; cv=none; b=Z0tbRpL8HWxwb+9oEEkkd2Eien1iszdP4iDJToCDl0//oUpS48f0xiBEDlJPLAraeKgsV3dTSGBcyhlA1tcRbm2YfegQow3JgV++LRPt0CrtechYysbpl+exJZ48XLJYN1qHKkkabvWpOd9sc4isNnjzgMIRLTrNoNTZtCg88CM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710140760; c=relaxed/simple;
-	bh=dkXn7q2DmB4nUnNs48hqh1yxF8euNmEQbXYa3VzdpYo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=bA9GOSPrltujtPwbm3sO7zdehhtsMogAEHx8psz5KgNPu8KShrG1D97EnooNhKWmBPAuNsU3P+/5tEjwXRgpB9bZuY6/e48HBgU9xUj6+sq0dtG+rj2m/+cKnUxNW+T/0BbHbowP3HlOyaa1ZImZ8/8ettZNHIbI7oOrJ/zprNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NubpE3SD; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1dda51bb52eso1095645ad.3;
-        Mon, 11 Mar 2024 00:05:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710140758; x=1710745558; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DLbH1FpL/W1pRCQh4HZ1seSYIOwW3M1UWX44cGi5xdA=;
-        b=NubpE3SD2npmfOxm7ecMEky+/CAT5dZDVGrkfF7GRI5PiA3sgL0PNjxPfQo4H0SY3t
-         i4o56gTJrTjR2T2sJdP1vc4TAsii4kzX+Mp0HJUqklBlbynOGDn6tTD9ZkBkXyrIF95w
-         ww10YVhy88+K7ent1QcEUmGmXEWN5PczhRqMR4ZiyLGtBkf0qbg6Lz+Ng0rDwjnFKUP6
-         1sNY7BzHyk8RCQoKPZX6QdTEt4oBxxq7kJgXRUBI5x7zpH7NdJtCWzzCh5P9CZriGLrY
-         vT7u0vff1EY4T5UDmKIEtSv/Wm8WFzmZpk/nRnbL1cGg6qL9d4ep9+vLsrnDq6TdVfBW
-         vmFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710140758; x=1710745558;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DLbH1FpL/W1pRCQh4HZ1seSYIOwW3M1UWX44cGi5xdA=;
-        b=WPtR2IB9YsLuL0uNw7hFe7xvlVSgYxWMiFoZdf8hOZMnC1xDEAs5Z+sv8SYT+N3N9J
-         3HkTaPcGcSF5XNPV33eQkOzVEyh7Tw9S4gYc30d6zjIY04LoprnkpCtnQf5kVTdebDBC
-         9Nek92a4/ecONxxVtpgDCU3nVlUw9n/X4UpDP1yNiDrMuC4Tpk2VoOBKu/xNtouWsiaT
-         cGrYyss+IhKAZXyuj2StbxSEjBa1M/sdoyRo7S8DclN50XaD+dWVjG7+dOZBYS/Y8FR7
-         3sos8kTye9YVlFF8felK7bAo+kINvd7I/ti9HQe5/kGEHQlZ7ctRLffoZRR0C5IOUQD2
-         E9ug==
-X-Forwarded-Encrypted: i=1; AJvYcCXVpnlYlHH6uOWXhAgJt2BPUnvxiVdh7jWRmTu+lp7obqta8Ekl/zNBljozW/8XqFYyaF9DG9IhEsCReOIbuba1T6rB+x6d
-X-Gm-Message-State: AOJu0YzkLIwZ8MmuyJjdKlGJ1nKTNPE3hQrlKKJnd09ZDGVvwVZZ+Kx+
-	1wibXypmPFD3ZUKgdHeNzV/cH1oVcnF0Rrvfoydz2JFdPKz2tyFKHaYyfSmSd0Uj/A==
-X-Google-Smtp-Source: AGHT+IGbnoKLMIRqEu0LaKPtnOpgr3d9/3PTmnm5AVamULt41FiaaRgtnlA6CJXUgixOdCOtoP4YzA==
-X-Received: by 2002:a17:903:2406:b0:1d8:ab27:d76c with SMTP id e6-20020a170903240600b001d8ab27d76cmr5920250plo.51.1710140758120;
-        Mon, 11 Mar 2024 00:05:58 -0700 (PDT)
-Received: from KERNELXING-MB0.tencent.com ([43.132.141.25])
-        by smtp.gmail.com with ESMTPSA id iz21-20020a170902ef9500b001dc8d6a9d40sm3931132plb.144.2024.03.11.00.05.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Mar 2024 00:05:57 -0700 (PDT)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: edumazet@google.com,
-	pablo@netfilter.org,
-	kadlec@netfilter.org,
-	fw@strlen.de,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	davem@davemloft.net
-Cc: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	kerneljasonxing@gmail.com,
-	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH nf-next v2] netfilter: conntrack: avoid sending RST to reply out-of-window skb
-Date: Mon, 11 Mar 2024 15:05:50 +0800
-Message-Id: <20240311070550.7438-1-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1710141950; c=relaxed/simple;
+	bh=NAfgclU5F8SNPwQ41IjiwkNoUcrNFui1EwN0HFRPA+s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H5C/D3LtyGoLelrGVKtyb6DVonf1KlwegTbTskRyWIUYxbWonZ62pXYa/w8wAiwx7CnTmSpN7FnjoEltmmT1Pz8bAqKSt7Q8S3gmmztvRh9tbvWnyQUzsr3tcjiZEkz6U7cvKltj0EidU8x3jpkmjSco0LDQj/ZP00O14qujNbo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lLyDxdUD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9FAD8C433F1;
+	Mon, 11 Mar 2024 07:25:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710141950;
+	bh=NAfgclU5F8SNPwQ41IjiwkNoUcrNFui1EwN0HFRPA+s=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=lLyDxdUDdmcl1UCiHUq0wF5Xla1cPJm+eWSbwSSLeE2uImsexFoagHrt+VrzFpSOu
+	 pLoUOeuFashlM/be9zwK9EardWV106zut+MU8MBQBqYchMPfwgacKLnFitF2C/Ut36
+	 /6VbXHkhcDmt1KwfLcUbLbenJj/XEWAdGaMt0VEzBrWJ2jd8BZT37q1aY9CRPxRakW
+	 Bhvqio6Do2r70CE3pkRwLJXBzzONoG3d4VF3fKiGpBmrw7lGK0onRRd5m0harsGMg4
+	 09lPjQEoChUYjbBoiaMUFUMe3QLzG8uQ2/uMroHh2VGbwJZsY3pZjunlY/j2ek3/28
+	 lxlhNHkZgcH6A==
+Date: Mon, 11 Mar 2024 09:25:45 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Antony Antony <antony.antony@secunet.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>, netdev@vger.kernel.org,
+	devel@linux-ipsec.org
+Subject: Re: [PATCH ipsec-next v2] xfrm: Add Direction to the SA in or out
+Message-ID: <20240311072545.GI12921@unreal>
+References: <d84a02e019ef188c4295089f6134af67ef7e7452.1709498351.git.antony.antony@secunet.com>
+ <2a6015ddeb9dfff93ce6e2e25fec892a0d99acf1.1710100643.git.antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2a6015ddeb9dfff93ce6e2e25fec892a0d99acf1.1710100643.git.antony.antony@secunet.com>
 
-From: Jason Xing <kernelxing@tencent.com>
+On Sun, Mar 10, 2024 at 09:03:47PM +0100, Antony Antony wrote:
+> This patch introduces the 'dir' attribute, 'in' or 'out', to the
+> xfrm_state, SA, enhancing usability by delineating the scope of values
+> based on direction. An input SA will now exclusively encompass values
+> pertinent to input, effectively segregating them from output-related
+> values. This change aims to streamline the configuration process and
+> improve the overall clarity of SA attributes.
+> 
+> v1->v2:
 
-Supposing we set DNAT policy converting a_port to b_port on the
-server at the beginning, the socket is set up by using 4-tuple:
+Please try to avoid replying new patch versions as reply-to previous
+versions. It breaks the threading and makes it hard to track the patches.
 
-client_ip:client_port <--> server_ip:b_port
+>  - use .strict_start_type in struct nla_policy xfrma_policy
+>  - delete redundant XFRM_SA_DIR_MAX enum
 
-Then, some strange skbs from client or gateway, say, out-of-window
-skbs are eventually sent to the server_ip:a_port (not b_port)
-in TCP layer due to netfilter clearing skb->_nfct value in
-nf_conntrack_in() function. Why? Because the tcp_in_window()
-considers the incoming skb as an invalid skb by returning
-NFCT_TCP_INVALID.
+Please put changelog after ---, it will allow us to make sure that
+commit message will be clean once the patch is applied.
 
-At last, the TCP layer process the out-of-window
-skb (client_ip,client_port,server_ip,a_port) and try to look up
-such an socket in tcp_v4_rcv(), as we can see, it will fail for sure
-because the port is a_port not our expected b_port and then send
-back an RST to the client.
+> 
+> Signed-off-by: Antony Antony <antony.antony@secunet.com>
+> ---
+>  include/net/xfrm.h        |  1 +
+>  include/uapi/linux/xfrm.h |  7 +++++++
+>  net/xfrm/xfrm_compat.c    |  7 +++++--
+>  net/xfrm/xfrm_device.c    |  5 +++++
+>  net/xfrm/xfrm_state.c     |  1 +
+>  net/xfrm/xfrm_user.c      | 44 +++++++++++++++++++++++++++++++++++----
+>  6 files changed, 59 insertions(+), 6 deletions(-)
+> 
+> diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+> index 1d107241b901..91348a03469c 100644
+> --- a/include/net/xfrm.h
+> +++ b/include/net/xfrm.h
+> @@ -289,6 +289,7 @@ struct xfrm_state {
+>  	/* Private data of this transformer, format is opaque,
+>  	 * interpreted by xfrm_type methods. */
+>  	void			*data;
+> +	enum xfrm_sa_dir	dir;
+>  };
+> 
+>  static inline struct net *xs_net(struct xfrm_state *x)
+> diff --git a/include/uapi/linux/xfrm.h b/include/uapi/linux/xfrm.h
+> index 6a77328be114..46a9770c720c 100644
+> --- a/include/uapi/linux/xfrm.h
+> +++ b/include/uapi/linux/xfrm.h
+> @@ -141,6 +141,12 @@ enum {
+>  	XFRM_POLICY_MAX	= 3
+>  };
+> 
+> +enum xfrm_sa_dir {
+> +	XFRM_SA_DIR_UNSET = 0,
 
-The detailed call graphs go like this:
-1)
-nf_conntrack_in()
-  -> nf_conntrack_handle_packet()
-    -> nf_conntrack_tcp_packet()
-      -> tcp_in_window() // tests if the skb is out-of-window
-      -> return -NF_ACCEPT;
-  -> skb->_nfct = 0; // if the above line returns a negative value
-2)
-tcp_v4_rcv()
-  -> __inet_lookup_skb() // fails, then jump to no_tcp_socket
-  -> tcp_v4_send_reset()
+It doesn't belong to UAPI. Kernel and user space use netlink attribute to understand
+if direction is set.
 
-The moment the client receives the RST, it will drop. So the RST
-skb doesn't hurt the client (maybe hurt some gateway which cancels
-the session when filtering the RST without validating
-the sequence because of performance reason). Well, it doesn't
-matter. However, we can see many strange RST in flight.
+> +	XFRM_SA_DIR_IN	= 1,
+> +	XFRM_SA_DIR_OUT	= 2
+> +};
+> +
+>  enum {
+>  	XFRM_SHARE_ANY,		/* No limitations */
+>  	XFRM_SHARE_SESSION,	/* For this session only */
+> @@ -315,6 +321,7 @@ enum xfrm_attr_type_t {
+>  	XFRMA_SET_MARK_MASK,	/* __u32 */
+>  	XFRMA_IF_ID,		/* __u32 */
+>  	XFRMA_MTIMER_THRESH,	/* __u32 in seconds for input SA */
+> +	XFRMA_SA_DIR,		/* __u8 */
+>  	__XFRMA_MAX
+> 
+>  #define XFRMA_OUTPUT_MARK XFRMA_SET_MARK	/* Compatibility */
+> diff --git a/net/xfrm/xfrm_compat.c b/net/xfrm/xfrm_compat.c
+> index 655fe4ff8621..007dee03b1bc 100644
+> --- a/net/xfrm/xfrm_compat.c
+> +++ b/net/xfrm/xfrm_compat.c
+> @@ -98,6 +98,7 @@ static const int compat_msg_min[XFRM_NR_MSGTYPES] = {
+>  };
+> 
+>  static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
+> +	[XFRMA_UNSPEC]          = { .strict_start_type = XFRMA_SA_DIR },
+>  	[XFRMA_SA]		= { .len = XMSGSIZE(compat_xfrm_usersa_info)},
+>  	[XFRMA_POLICY]		= { .len = XMSGSIZE(compat_xfrm_userpolicy_info)},
+>  	[XFRMA_LASTUSED]	= { .type = NLA_U64},
+> @@ -129,6 +130,7 @@ static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
+>  	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
+>  	[XFRMA_IF_ID]		= { .type = NLA_U32 },
+>  	[XFRMA_MTIMER_THRESH]	= { .type = NLA_U32 },
+> +	[XFRMA_SA_DIR]          = { .type = NLA_U8}
+>  };
+> 
+>  static struct nlmsghdr *xfrm_nlmsg_put_compat(struct sk_buff *skb,
+> @@ -277,9 +279,10 @@ static int xfrm_xlate64_attr(struct sk_buff *dst, const struct nlattr *src)
+>  	case XFRMA_SET_MARK_MASK:
+>  	case XFRMA_IF_ID:
+>  	case XFRMA_MTIMER_THRESH:
+> +	case XFRMA_SA_DIR:
+>  		return xfrm_nla_cpy(dst, src, nla_len(src));
+>  	default:
+> -		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
+> +		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
+>  		pr_warn_once("unsupported nla_type %d\n", src->nla_type);
+>  		return -EOPNOTSUPP;
+>  	}
+> @@ -434,7 +437,7 @@ static int xfrm_xlate32_attr(void *dst, const struct nlattr *nla,
+>  	int err;
+> 
+>  	if (type > XFRMA_MAX) {
+> -		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
+> +		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
+>  		NL_SET_ERR_MSG(extack, "Bad attribute");
+>  		return -EOPNOTSUPP;
+>  	}
+> diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+> index 3784534c9185..11339d7d7140 100644
+> --- a/net/xfrm/xfrm_device.c
+> +++ b/net/xfrm/xfrm_device.c
+> @@ -253,6 +253,11 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
+>  		return -EINVAL;
+>  	}
+> 
+> +	if (xuo->flags & XFRM_OFFLOAD_INBOUND && x->dir != XFRM_SA_DIR_IN) {
 
-The key reason why I wrote this patch is that I don't think
-the behaviour is expected because the RFC 793 defines this
-case:
+It will break backward compatibility. In old iproute2 XFRM_OFFLOAD_INBOUND is set, but x->dir is not set yet.
 
-"If the connection is in a synchronized state (ESTABLISHED,
- FIN-WAIT-1, FIN-WAIT-2, CLOSE-WAIT, CLOSING, LAST-ACK, TIME-WAIT),
- any unacceptable segment (out of window sequence number or
- unacceptible acknowledgment number) must elicit only an empty
- acknowledgment segment containing the current send-sequence number
- and an acknowledgment..."
+> +		NL_SET_ERR_MSG(extack, "Mismatch in SA and offload direction");
+> +		return -EINVAL;
+> +	}
+> +
+>  	is_packet_offload = xuo->flags & XFRM_OFFLOAD_PACKET;
 
-I think, even we have set DNAT policy, it would be better if the
-whole process/behaviour adheres to the original TCP behaviour as
-default.
-
-Suggested-by: Florian Westphal <fw@strlen.de>
-Signed-off-by: Jason Xing <kernelxing@tencent.com>
----
-v2
-Link: https://lore.kernel.org/netdev/20240307090732.56708-1-kerneljasonxing@gmail.com/
-1. add one more test about NAT and then drop the skb (Florian)
----
- net/netfilter/nf_conntrack_proto_tcp.c | 15 +++++++++++++--
- 1 file changed, 13 insertions(+), 2 deletions(-)
-
-diff --git a/net/netfilter/nf_conntrack_proto_tcp.c b/net/netfilter/nf_conntrack_proto_tcp.c
-index ae493599a3ef..19ddac526ea0 100644
---- a/net/netfilter/nf_conntrack_proto_tcp.c
-+++ b/net/netfilter/nf_conntrack_proto_tcp.c
-@@ -1256,10 +1256,21 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
- 	case NFCT_TCP_IGNORE:
- 		spin_unlock_bh(&ct->lock);
- 		return NF_ACCEPT;
--	case NFCT_TCP_INVALID:
-+	case NFCT_TCP_INVALID: {
-+		int verdict = -NF_ACCEPT;
-+
-+		if (ct->status & IPS_NAT_MASK)
-+			/* If DNAT is enabled and netfilter receives
-+			 * out-of-window skbs, we should drop it directly,
-+			 * or else skb would miss NAT transformation and
-+			 * trigger corresponding RST sending to the flow
-+			 * in TCP layer, which is not supposed to happen.
-+			 */
-+			verdict = NF_DROP;
- 		nf_tcp_handle_invalid(ct, dir, index, skb, state);
- 		spin_unlock_bh(&ct->lock);
--		return -NF_ACCEPT;
-+		return verdict;
-+	}
- 	case NFCT_TCP_ACCEPT:
- 		break;
- 	}
--- 
-2.37.3
-
+Thanks
 
