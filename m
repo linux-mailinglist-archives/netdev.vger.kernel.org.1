@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-79311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15D97878B51
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:00:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 296FB878B55
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:00:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD79F281443
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:00:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44C941C21609
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:00:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B10258234;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AE3D59154;
 	Mon, 11 Mar 2024 23:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hRYnXn8g"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pp3bUp6R"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAC3858119
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 23:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 717C058AC4;
+	Mon, 11 Mar 2024 23:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710198033; cv=none; b=AMlOonx/fm7yQxRyrTp2C7kS2b6WHo7i2dNeg1YQFdWtrD4b9ShS3M6ck71tQl341BvSKVxfvh9yYsrIM3laoMHel5BC30GW4O3LsZddN+T07fMHGhfaMqM7XJCFsVyddVIr+aiik1l5XRMwt6hEVguKj+QPbTWB3kyc2PLZAv8=
+	t=1710198033; cv=none; b=nzxEq4/dsKlDYWvdQOaOTEdY1ze9SlsjyZoSbbn4un9KjTcbXaB80H5qgpY28PTo4TTzXX2HoiOVpwwZXc9Sk+jQoN9NJ61kR6uHXxywKQBuwyjChEj2Y9k8i24IXGZSHqHEvByyTCL0w+roMikOPI8pSqe+j3PFem0xRwrFI1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1710198033; c=relaxed/simple;
-	bh=137TvHcexZSr58dHCalta7cWntD+7qBRdlYP2+viTVE=;
+	bh=MJhjs1uYIvjVQPZgooTTazwf3Y8z1r7kEX6jxxCMOSE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=k+WJmVHRdeMp7YGN1UYKDkIPGqEm8VoJxWSDkCzrGscbL461JLYehMExk0SQsaXLbVoIY7iP8EqNhM5ZkFmV7iyBhxFGgzLZjj/+0uejALpCJXEmXAW/hbC8WMfnCfXFWSqre1Ffwf4buv7GaiG5Mdwk4smsIcR8XT7heescIcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hRYnXn8g; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9905FC43390;
-	Mon, 11 Mar 2024 23:00:32 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=LSLB6ZMZvuPQRE6epuaUoToDGUruA2Dg0ImWgoLb3gp9cy2IOe0VM5Gx3ey+VwVS1zEHC2M4GT/mm6DRyp1sBeRueUIqdnk7UtzCjR4RxDJClNtN4MoN4XQkkU0SOOQ+8NZabpql7qVXdOuoMgQRPzwAg0zaThLnKk2sx9RwFBI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pp3bUp6R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1F44EC43609;
+	Mon, 11 Mar 2024 23:00:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710198032;
-	bh=137TvHcexZSr58dHCalta7cWntD+7qBRdlYP2+viTVE=;
+	s=k20201202; t=1710198033;
+	bh=MJhjs1uYIvjVQPZgooTTazwf3Y8z1r7kEX6jxxCMOSE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=hRYnXn8gEA+KrxYJ4idFZDAGFDOEfIXlIXJwiheI9AjQDk19kBcdnBLgWv8ZKi85A
-	 YIPy8rrr9972EJ2NTFAgVADWBqME0Tlq81DgCQhyEPq4LBqTnd3QwSShmAj5NCp3eS
-	 dwzErucKbKspMPl8FYU3eCOfQ+wPiglEtzi09Y3OSTZOJg8YelMrht4p9FT/1msFgV
-	 c1BbFTMwHQorSJswKZGfmET+5PQo/jZM5oh0+QJ3oHF/EjD6lRGG6ODPadMnRuhG8f
-	 EstRqRzF57UuhNrJ5RUwG+kT7EB6IPT6VKDVqjfzVeDt/9B3dqLbnlKfnGs5SlQd9L
-	 Ru//65TUCVu6Q==
+	b=pp3bUp6RFMXtCQ8d/77/R6jNgBasmrVQ9UI4SLyQJMzFErnS+21WJPQAkxGwL2duc
+	 nR+LdYguDl+bc9APg1J9UVHv0ad515zv74zByDKlqTn4hX5ns7vRPpi/tN9B0Ey42K
+	 5suA/QJJ96PcP7bmL7sUyRksKekhoKZl+IBig7uXRtRFaBCJDaoOYRDOwYBOZczR/p
+	 NMQy1CnwGeER6fLjcpEFrZnuS0J7NMhtGteWkIUrQc0Zw4EeubufJuEo2ruqaFy0ID
+	 XHdFKWDG8OwhuAfV1fADuK+XRf/O1YVvUby3UEyMc++24ZtdhGxAwj7JJfZfi0ZYyB
+	 nnu3gfobPlJIQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7E221D95055;
-	Mon, 11 Mar 2024 23:00:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 07F9BC395F1;
+	Mon, 11 Mar 2024 23:00:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,35 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] devlink: Fix length of eswitch inline-mode
+Subject: Re: [PATCH net-next] net/netlink: Add getsockopt support for
+ NETLINK_LISTEN_ALL_NSID
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171019803251.14238.5061905000337723301.git-patchwork-notify@kernel.org>
-Date: Mon, 11 Mar 2024 23:00:32 +0000
-References: <20240310164547.35219-1-witu@nvidia.com>
-In-Reply-To: <20240310164547.35219-1-witu@nvidia.com>
-To: William Tu <witu@nvidia.com>
-Cc: netdev@vger.kernel.org, jiri@nvidia.com, bodong@nvidia.com
+ <171019803301.14238.2701981454364061727.git-patchwork-notify@kernel.org>
+Date: Mon, 11 Mar 2024 23:00:33 +0000
+References: <AM6PR03MB58482322B7B335308DA56FE599272@AM6PR03MB5848.eurprd03.prod.outlook.com>
+In-Reply-To: <AM6PR03MB58482322B7B335308DA56FE599272@AM6PR03MB5848.eurprd03.prod.outlook.com>
+To: Juntong Deng <juntong.deng@outlook.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, Liam.Howlett@oracle.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sun, 10 Mar 2024 18:45:47 +0200 you wrote:
-> Set eswitch inline-mode to be u8, not u16. Otherwise, errors below
+On Fri,  8 Mar 2024 11:33:04 +0000 you wrote:
+> Currently getsockopt does not support NETLINK_LISTEN_ALL_NSID,
+> and we are unable to get the value of NETLINK_LISTEN_ALL_NSID
+> socket option through getsockopt.
 > 
-> $ devlink dev eswitch set pci/0000:08:00.0 mode switchdev \
->   inline-mode network
->     Error: Attribute failed policy validation.
->     kernel answers: Numerical result out of rang
->     netlink: 'devlink': attribute type 26 has an invalid length.
+> This patch adds getsockopt support for NETLINK_LISTEN_ALL_NSID.
+> 
+> Signed-off-by: Juntong Deng <juntong.deng@outlook.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] devlink: Fix length of eswitch inline-mode
-    https://git.kernel.org/netdev/net/c/8f4cd89bf106
+  - [net-next] net/netlink: Add getsockopt support for NETLINK_LISTEN_ALL_NSID
+    https://git.kernel.org/netdev/net-next/c/8b6d307f4391
 
 You are awesome, thank you!
 -- 
