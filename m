@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-79271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 769AF878901
+	by mail.lfdr.de (Postfix) with ESMTPS id 15825878900
 	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 20:39:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 399F828153C
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 19:39:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2C1A2816D4
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 19:39:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A77AF55E75;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A579F55E72;
 	Mon, 11 Mar 2024 19:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tGXBh34U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MEn3l/E5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 791A255C08
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 19:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7916E5579F;
+	Mon, 11 Mar 2024 19:39:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710185962; cv=none; b=NTJdt1TDs7s+VUPnzxIn1TGePozMR2I1M722YNfP9KM+2iQbivMzDAma9g2+yhTUBn+WQ+2A9uJ+LVJ1YXkNO9JX+cBrdSGe1wX32x5Jc6SqL8mNgGxb9+fs42UFuWr+9epEJdc6pjudCY3vj0A4lWG2CT265AAga7bjZkN2SOU=
+	t=1710185962; cv=none; b=EPwmJcdg0Mho97XCtQ00UzK46lF3kb2pyZ2N27Vm73UR8qEGPhmFaYoBhpwESYX3eOisisJikcn+pB2IGHJ+EgAbLwxxOaVLHhef8mzM0puIfz9oGcSUWdrDUZ95rpQhWqKD5hzWYGgP380MUrSPeM0quazKXDi/DaZhYJ5T9mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1710185962; c=relaxed/simple;
-	bh=IA3c9Nq4eM38hX1/CgLS0hVNmFDX36Mi+LYS4d8e2Z4=;
+	bh=RxFF2//vLuW1+4v7hEe9axSby27a7ZHrxc8sIlCocZk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZBcagTy1S3jWSo8K8A8Jj4Ii22tpPDY3vKUqTS7+hdEd5q/z2gDGOuYolEqeQPkdBDyDMS4Ejc8vXIp9yq+1UW/fGqSVcpmuvK0AgoxDhY6fwFkWwJ0JskGYUzuZV08gRH4yCY5PR5iJ9KxBqj5HhKHbDeXkTZ9JgiveZnvVI+Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tGXBh34U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1D764C433A6;
+	 In-Reply-To:To:Cc; b=hToFR3tizzgtT7Ap+REjuGE11OKfJoV0Ga41vFP8pdppuAf6X8Ket3cRkWxJhPOSu5RfPYGMQV1RWAlVJ6Zd4S99JJoimyPnVCg7DRBrRV2PsPyBvlBS31BAstXy2KGHEiGHXWhlkmFgb2TiQl5sjiM5NP24Gl7dEXrEOOhz1tM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MEn3l/E5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 29E26C43601;
 	Mon, 11 Mar 2024 19:39:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1710185962;
-	bh=IA3c9Nq4eM38hX1/CgLS0hVNmFDX36Mi+LYS4d8e2Z4=;
+	bh=RxFF2//vLuW1+4v7hEe9axSby27a7ZHrxc8sIlCocZk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tGXBh34UQRdFdR8mYIWTLUEHEoAyLmYG4duEfFl6MqN8bWZ9pH8NWIphrc6LweoTt
-	 SMznnDnKEsqf2ITbDF5GtMdxhYi/5D30a4kg5Jh+i5QOsjoNmLVmBS2zbX4mbrB+rO
-	 QTX1I9YBRdYTWiiLn8id0WPLabDQshtq5ulcdN18ZUPj9N5LNL6qexKdZBx99HJOrV
-	 tcM8KyOTvc72t+UMZjKx1ZJk0+WtHzp39BuSudonTkOiBhXw7KU1zxUyN5Kh8KMATX
-	 jEs77cbWb3H4qQhgn3VgaQuo8zGaj7o23yimSQ345lm1DRFVfPiNMtM15F61g6V19b
-	 lipzUagyPXy1A==
+	b=MEn3l/E5kTFDtiG36YggELNTNkmcui+sOaC9uL1aKDHvJbSWZK1g5l4bo3MMdH2JD
+	 w3BwfvBb/t6+9VIT2mlIoLH1A0ef8dCB/EW12WFF6dB0RpPzdLBI9EuR46WM6HtjHL
+	 k9KUGHbxCAcrjEn/dNtaLBtWcMjkCIRD3QPl3o8Nl+DorfcZQsXgII74ZyUbmQGlVD
+	 pBgNGeJ1WmRin4ZpU75uC3XBeLYnKuIrbLonzKuvgF6f2E1X53rheezcColrfdPUCY
+	 xkkwT+XOe5H6bfp+rqucms4sAvIPPrYyQ0PSVsM5g+OPdCRSltIwOotEiuPKmjK1Ic
+	 NU1LyWIqBLqWw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F1A1BC39563;
-	Mon, 11 Mar 2024 19:39:21 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 05E76D9505A;
+	Mon, 11 Mar 2024 19:39:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,36 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ynl: samples: fix recycling rate calculation
+Subject: Re: [PATCH net-next 0/2] annotate data-races around sysctl_tcp_wmem[0]
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171018596198.1144.18106942127909565260.git-patchwork-notify@kernel.org>
-Date: Mon, 11 Mar 2024 19:39:21 +0000
-References: <20240307221122.2094511-1-kuba@kernel.org>
-In-Reply-To: <20240307221122.2094511-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, hawk@kernel.org
+ <171018596201.1144.18058014960608498774.git-patchwork-notify@kernel.org>
+Date: Mon, 11 Mar 2024 19:39:22 +0000
+References: <20240308112504.29099-1-kerneljasonxing@gmail.com>
+In-Reply-To: <20240308112504.29099-1-kerneljasonxing@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: edumazet@google.com, dsahern@kernel.org, matttbe@kernel.org,
+ martineau@kernel.org, geliang@kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ davem@davemloft.net, mptcp@lists.linux.dev, netdev@vger.kernel.org,
+ kernelxing@tencent.com
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This series was applied to netdev/net-next.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu,  7 Mar 2024 14:11:22 -0800 you wrote:
-> Running the page-pool sample on production machines under moderate
-> networking load shows recycling rate higher than 100%:
+On Fri,  8 Mar 2024 19:25:02 +0800 you wrote:
+> From: Jason Xing <kernelxing@tencent.com>
 > 
-> $ page-pool
->     eth0[2]	page pools: 14 (zombies: 0)
-> 		refs: 89088 bytes: 364904448 (refs: 0 bytes: 0)
-> 		recycling: 100.3% (alloc: 1392:2290247724 recycle: 469289484:1828235386)
+> Adding simple READ_ONCE() can avoid reading the sysctl knob meanwhile
+> someone is trying to change it.
+> 
+> Jason Xing (2):
+>   mptcp: annotate a data-race around sysctl_tcp_wmem[0]
+>   tcp: annotate a data-race around sysctl_tcp_wmem[0]
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] ynl: samples: fix recycling rate calculation
-    https://git.kernel.org/netdev/net-next/c/900b2801bf25
+  - [net-next,1/2] mptcp: annotate a data-race around sysctl_tcp_wmem[0]
+    https://git.kernel.org/netdev/net-next/c/9eb430d40e44
+  - [net-next,2/2] tcp: annotate a data-race around sysctl_tcp_wmem[0]
+    https://git.kernel.org/netdev/net-next/c/683a67da9561
 
 You are awesome, thank you!
 -- 
