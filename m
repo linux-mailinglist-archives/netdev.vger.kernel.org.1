@@ -1,77 +1,78 @@
-Return-Path: <netdev+bounces-79069-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79070-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 526AD877BBC
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 09:34:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78DB9877BBD
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 09:36:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BFBC280E87
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 08:34:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8EABB208B7
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 08:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DCE0FC17;
-	Mon, 11 Mar 2024 08:34:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1392E11720;
+	Mon, 11 Mar 2024 08:35:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="JMbRbLrb"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="TzK/WDQ9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D6E125B2
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 08:34:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3147110A12
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 08:35:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710146092; cv=none; b=cBpMH9KfP685y/eiCdAOP8nh3xatw8mS44r3ilDB0ZOYIwYuYHeZtAfCbIinlRO4Wt3ME6/iwnbrRupV/xoRA/oA/2JAyjSndXjSW1uGTnnaAjQ9fhfuLIe5RH1Q20a+xzGVKRLiKvfwofy+l8bVcA+rEgKGFhfk1okPJdIQx9M=
+	t=1710146155; cv=none; b=r0GDFw8CtzS2SLGnNpy5sTB+yFY1pVH/8A4lEMuthnpHA/CtEtNRvsdijFIJlTMMZzXGmv+3UqIiFaaQaXa2KFgfb+Pjwr0m3j9eMrxDH8weF0IlnPoLSKubIHlGuWUktfk4kLPdtTJ5lZ3ZpqVn+ORlNFvxRHpzShsy6AoWwI8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710146092; c=relaxed/simple;
-	bh=+56gnhOdDa4MQPCjidHl1cW82GKxo3fwPSRhJ+vmIqQ=;
+	s=arc-20240116; t=1710146155; c=relaxed/simple;
+	bh=TNJWRAN4cCOb64u9AcoLemre2HbuWSRCjfIID/gyouU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WDhrxU5uBTN7jtM64PH3vLRp49MaR3OYBAQQ4MNVN4toLTkOsHmxVRTeEJx+5BoGQb9o2EMwZQOly7N9dc4vuLAI22vygIop9rtKBu9A9De1/Hh7Vlj9i4dlbWhfRmW9DF6Jfv7UASgFvb7QF4GJ94FT0jWbxCROP3ZndEXtoFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=JMbRbLrb; arc=none smtp.client-ip=209.85.208.52
+	 Content-Type:Content-Disposition:In-Reply-To; b=K9XMEP/IaL6RSRCKf6rfs+vg2PmBiy0DDwe7SCUyI6H5OqQ10W5kY/Hu8wtwXUw0OTxgD/8YdNmySXgjmWmm4f2ro2mtk+uuzpsG05uArjRvUoMR2iSbi018Gozy48pwVjm1Cr4GCa1uqiJCQ0Yy9zIfobInLVoQsAe71w9v+hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=TzK/WDQ9; arc=none smtp.client-ip=209.85.218.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-56829f41f81so4076956a12.2
-        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 01:34:49 -0700 (PDT)
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a28a6cef709so397444866b.1
+        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 01:35:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710146088; x=1710750888; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710146151; x=1710750951; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=5SqomN9d4ARgKDPw+9BbVo7j9KTW4k1shjSc7RkylIg=;
-        b=JMbRbLrbfrYQSoSFaUWx2AbkwjPB7WA/1S1nx/SPfvQAquTpmk4SsijFSahgS5EhlL
-         xb7qB1XlHvdHLWrHCUYRTo4QRu7OqOJT4giz6qYeJB8kgQIkCr2tWvT2dNq7+YdzcWsY
-         aoq4uWIxe2B0WC5XhKCHtGDGTJe6gUHbovE2wsVhpimlJzUGRbjsw53R5qHdzNQ34SRx
-         q7ltnys9hMZzqH3CpNXHrCV1/stO9paRQrVIgLgRbIZPipJC06EKKHG0f0SYwlOFKx+b
-         e2RMmcS4hif54VWH+dxMyVQn8tiwsekQXOm5hyfxjwIsTJgD1r0E5u8QXLueKkgbqn+Q
-         vr0w==
+        bh=TNJWRAN4cCOb64u9AcoLemre2HbuWSRCjfIID/gyouU=;
+        b=TzK/WDQ9lb1iyG3hUGvL0RMEReBXLHZAng3NzaX8XvS221HhR5LXFCOx1JUdgq0G7J
+         aVtxUJS/Lt2aMchpcdAYDJb1YAPN6629+1QA+0wymvcmNLsbuWXsmSQaeOdazUPbUemK
+         gl6y+t2iT1lI1TKYVF3781liYRJhbSFRqz2xIJbfZJIX+VwrPFEVExduSmWEiQP6VtZa
+         H16si31LrYLfyczCgqEiFQ46+UUKL70fEoA7KXfb++9Kz8w3QW+fic7zfQExtZDRDIT6
+         VZBA/oHGlnoS0xz+Di1S/myA2fKUTYkaG+d1izzQRC/39cp/6zQa4+zkrFXze5a7oQwR
+         MFRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710146088; x=1710750888;
+        d=1e100.net; s=20230601; t=1710146151; x=1710750951;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=5SqomN9d4ARgKDPw+9BbVo7j9KTW4k1shjSc7RkylIg=;
-        b=awRhk9l2PPz7gzI1PS8Bj7ftqAWUweVwjt9V9h56aPG1maLrYGZZeAqMnk6Od1dUwX
-         yMy5Ey6W3rrpVRFW8qa6qoepIUoQlUwvkbWqyeGC1AcyT2vIZ/vbq9182zO04AnyQL6q
-         IBqxHyIBvntH+sECNZMfmscYtx9kNZ6l+LRd3HxvC9NGwpyIyZIqC4CFhsc01sJ3UQBH
-         XUApGkwO1ucTeYIyDY0V72lUDTnbBwAwJMTRzm/4Q44tcswH9oSJzYpqwhNON6IHCqbD
-         lUlSFKsbT6Mn+F7oJwTOEBk907KLwZuQ9yFjtVx6HANPS/IjQw2gubZbjYuXe0AT7BBm
-         MxBA==
-X-Gm-Message-State: AOJu0YxEUMZjHeFCsPA0QYOX2jdLQxj0bUUbqVzzMngb1xc0lBiuAQEl
-	YMJ8esih4UyL7m0ATa4Qnc4O0wP9dZnJ33+ropI8284bIa4bVhJhejnVZ+A4fw8=
-X-Google-Smtp-Source: AGHT+IHoXBZOeHptJIugrRS6bfBShGdhWG3XML2ZWQfwg5e/+GUeuuJ5xoqyK/oLpPIIzZ/sayjrPg==
-X-Received: by 2002:a50:c05d:0:b0:565:98c5:6c38 with SMTP id u29-20020a50c05d000000b0056598c56c38mr4201082edd.7.1710146088124;
-        Mon, 11 Mar 2024 01:34:48 -0700 (PDT)
+        bh=TNJWRAN4cCOb64u9AcoLemre2HbuWSRCjfIID/gyouU=;
+        b=cbJzgaeJ9cB2Hsvq7s7FmJQ8gmOJouV4U381NekwjEhhsTzU0KnOYos1tb8SSKQFIg
+         /X82/K4RqxeHMll4nRPojCpXjzytbSDpkI1GSDw0W01m4+BIdZ7PQq5wwwnIAYC39eYt
+         GZBtAAc1yS+pdVJrlOfc8ZM4CiwpLeLYxpho84sCCWA82krUowGRbz1bUR7T4gYgg6bF
+         kEFsP/sIcngBDGZUwKrbkBCdH0qTnGig92iDeqEwFgX8VwGjsyYMLgWYMP4uK6p6YPTC
+         Z5/sGL7/Un5ae4dJ78XEUxYOUQsSTJ/BbBdWVWpESE1jaeE/LQ+p4t9GRqv2kWKuDGf5
+         swmQ==
+X-Gm-Message-State: AOJu0Ywx43SrmbV2Z/Xwm9gqw0MQAWy4kmwskTvG2u6DUV0bIDq7tROd
+	ABOlrUKzb+RfkN5X5r81PDe3qxRx2ZnK9NCdY5sdBJmb/S/QtaiSgOh0eR8mrxw=
+X-Google-Smtp-Source: AGHT+IE0SO0siLf2TgHLcj5FASMGfyQDSyNHHEE/oWBbizC5kmCNRRE/JvnCTR12hs1C9j5TfWUFuQ==
+X-Received: by 2002:a17:906:bce5:b0:a45:f33a:138f with SMTP id op5-20020a170906bce500b00a45f33a138fmr3049105ejb.42.1710146151512;
+        Mon, 11 Mar 2024 01:35:51 -0700 (PDT)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id e20-20020a056402149400b00568229390f2sm2715785edv.70.2024.03.11.01.34.46
+        by smtp.gmail.com with ESMTPSA id n17-20020a170906701100b00a46372f6c69sm38211ejj.190.2024.03.11.01.35.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Mar 2024 01:34:47 -0700 (PDT)
-Date: Mon, 11 Mar 2024 09:34:44 +0100
+        Mon, 11 Mar 2024 01:35:51 -0700 (PDT)
+Date: Mon, 11 Mar 2024 09:35:48 +0100
 From: Jiri Pirko <jiri@resnulli.us>
 To: William Tu <witu@nvidia.com>
-Cc: netdev@vger.kernel.org, jiri@nvidia.com, bodong@nvidia.com
-Subject: Re: [PATCH net] devlink: Fix length of eswitch inline-mode
-Message-ID: <Ze7CJDNDicurMYGS@nanopsycho>
-References: <20240310164547.35219-1-witu@nvidia.com>
+Cc: netdev@vger.kernel.org, jiri@nvidia.com, bodong@nvidia.com,
+	kuba@kernel.org
+Subject: Re: [PATCH v2 net-next] devlink: Add comments to use netlink gen tool
+Message-ID: <Ze7CZCMpzYH70lsH@nanopsycho>
+References: <20240310145503.32721-1-witu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,29 +81,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240310164547.35219-1-witu@nvidia.com>
+In-Reply-To: <20240310145503.32721-1-witu@nvidia.com>
 
-Sun, Mar 10, 2024 at 05:45:47PM CET, witu@nvidia.com wrote:
->Set eswitch inline-mode to be u8, not u16. Otherwise, errors below
+Sun, Mar 10, 2024 at 03:55:03PM CET, witu@nvidia.com wrote:
+>Add the comment to remind people not to manually modify
+>the net/devlink/netlink_gen.c, but to use tools/net/ynl/ynl-regen.sh
+>to generate it.
 >
->$ devlink dev eswitch set pci/0000:08:00.0 mode switchdev \
->  inline-mode network
->    Error: Attribute failed policy validation.
->    kernel answers: Numerical result out of rang
->    netlink: 'devlink': attribute type 26 has an invalid length.
->
->Fixes: f2f9dd164db0 ("netlink: specs: devlink: add the remaining command to generate complete split_ops")
-
-Oops. I wonder if I messed anything else.
+>Signed-off-by: William Tu <witu@nvidia.com>
+>Suggested-by: Jiri Pirko <jiri@nvidia.com>
 
 Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
 Thanks!
-
-
->Signed-off-by: William Tu <witu@nvidia.com>
->---
->Or we can fix the iproute2 to use u16?
-
-Nope, this is UAPI.
 
