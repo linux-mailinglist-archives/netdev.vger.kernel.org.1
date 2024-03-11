@@ -1,80 +1,87 @@
-Return-Path: <netdev+bounces-79178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08DD98781C6
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:38:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63E978781F3
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:47:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B57FF28735D
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 14:38:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F16131F23187
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 14:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 821353EA8C;
-	Mon, 11 Mar 2024 14:38:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B35140870;
+	Mon, 11 Mar 2024 14:47:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XX1eeywU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eGZ94rUW"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E11143FB8F;
-	Mon, 11 Mar 2024 14:38:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182F840860
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 14:47:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710167905; cv=none; b=a4TA104WfCF71bw3jZXJAE8VwKNHleJVwp1AQXVVQ9ZBxP3MHg84xZJ8jnfXBBTgGRl9iVDIgwJD7qL4shc7MNqKt02X9QOmtkqllm6nVXcGYw0lumX9qNp5nUyaB2JULkLiKtUtaqIE98g73qKmE+ha2ikeGbe5WzzcNXAGOxw=
+	t=1710168424; cv=none; b=GRbLXuAqsISHGuOAvqAUNGPLiefSjtlGZ0AGk4h/uEph9zShxUVvZY1W4jnMcQKi3NSrp2r3L5IatuzacxSzh5KiB6vggJnFp3J1bEAad9Y75TLqfwWyCHR9Yv2a6nTYQqDUozSKp9kxVEzZfNnM9ydlY+SW35lTU5pDWh5fAJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710167905; c=relaxed/simple;
-	bh=oUNvmy0XwhwFNoI9rEMwHFRE7b5rGc5LDIq9FMmUvxI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dPdxXDcWeRmbF2soCP1dcu0dnXoBRlERqI57zYa3N20Xa/4prSszL7UrIPCkMGsaGLuoFT8g40tUOGrwJm4PvAcnaB8GEavWBfqrJzllFFuOTHhDyiiRRkCqpBA8wT7LnoUuNqE+ATRRtRd57bkPKeyBP0q6536gCIoM3es0dRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XX1eeywU; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=B13BA9QCdeALZoTVpZL3pPUk9+ARVc7Y9epMABvugvo=; b=XX1eeywU964yOZpmresHozn1RP
-	h/Gqy0Bzp/cWGdeLeMFkoIl3Bibn0O9DBNn4AUBn4YC2EiKBOIFpHuGbnIRE1iGYswDAgbOT3ocKk
-	5F3z2oKkw4NzGX5qaLkO6P9dVpWp5P9/BTWHeSh33kMxvcZszUsWA+iTJrhoMsnihItA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rjgnf-009yTX-0Y; Mon, 11 Mar 2024 15:38:47 +0100
-Date: Mon, 11 Mar 2024 15:38:47 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Elad Nachman <enachman@marvell.com>
-Cc: taras.chornyi@plvision.eu, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, kory.maincent@bootlin.com,
-	thomas.petazzoni@bootlin.com, miquel.raynal@bootlin.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] net: marvell: prestera: force good base mac
-Message-ID: <1518680f-c0b1-4dc8-be05-bd099064ac56@lunn.ch>
-References: <20240311135112.2642491-1-enachman@marvell.com>
- <20240311135112.2642491-4-enachman@marvell.com>
+	s=arc-20240116; t=1710168424; c=relaxed/simple;
+	bh=qPfnPac/OYRyBcbEgKzaCkMOfZ8PT/+3AnwdxCO+P1o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=BaP/Tr7SyGGbKRzhnZqMexc3cLFygWXMvpAvQpDhpK69Rt1yVbKZtv08/k2iSRtYgGElivsH8E6UeBlachQOX6bpAty0NLTNWUWB8D94Q0154nlfVMcK0VdA9EQZ7Ont9/qWSh1LVIu6Q0TjAGsixgzPR3ft3QmI9/JZHRNMuMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eGZ94rUW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33D32C43394;
+	Mon, 11 Mar 2024 14:47:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710168423;
+	bh=qPfnPac/OYRyBcbEgKzaCkMOfZ8PT/+3AnwdxCO+P1o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eGZ94rUWfMW+MCz6bUlqITFhzb6f7zMf6UyOlGNygF1I1ij8V/RdapOPW3c+HNfDh
+	 VfWwerM4t0CpGrupLdulkQUV5nZMcCDmDYErFV7D3DEaRzWUDMACuUN3D4MZofKH4H
+	 reeV/ZAzjMYVUEpZvoYnOgBgxuSOQ4Zq1wizxy0oKGjr8MgxvuQLa+MNKxattBLxoN
+	 wn/5hjmpFXRoSohGPfeNiUdcN+/sGUhHp6E8wGzsZJx9FVAUnbtOSisnfcnsqlxr3e
+	 BaKsK3F3XzgLp+yhO3YHowme24fUDvFqzbpGM0me+8RNoZQgv3EKJUGBZrkJnHK4E1
+	 bPcOwRoAELCIw==
+Date: Mon, 11 Mar 2024 07:47:02 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+ davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ petrm@nvidia.com
+Subject: Re: [PATCH net-next 1/2] nexthop: Fix out-of-bounds access during
+ attribute validation
+Message-ID: <20240311074702.340dafcf@kernel.org>
+In-Reply-To: <Ze4pIe_E4BgkCP6w@shredder>
+References: <20240310173215.200791-1-idosch@nvidia.com>
+	<20240310173215.200791-2-idosch@nvidia.com>
+	<a92e609b-f5c4-4e9a-8eb8-7e2c54f75215@kernel.org>
+	<Ze4pIe_E4BgkCP6w@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240311135112.2642491-4-enachman@marvell.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 11, 2024 at 03:51:12PM +0200, Elad Nachman wrote:
-> From: Elad Nachman <enachman@marvell.com>
+On Sun, 10 Mar 2024 23:41:53 +0200 Ido Schimmel wrote:
+> > 'tb' on the stack only needs to be ARRAY_SIZE as well; that's the
+> > benefit of the approach - only declare what you need.  
 > 
-> Since each switchport MAC address uses the switch base mac address
-> and adds the physical port number to it,
-> Force the last byte of the switch base mac address to be at
-> least 128, so when adding to it, we will not wrap around the
-> previous (more significant) mac address byte, resulting in a
-> warning message.
+> The reasoning for that is explained in Petr's commit message:
+> 
+> "
+>     - To allow querying for presence of the attribute, have all the attribute
+>       arrays sized to NHA_MAX, regardless of what is permitted by policy, and
+>       pass the corresponding value to nlmsg_parse() as well.
+> "
+> 
+> IOW, with resizing 'tb' to ARRAY_SIZE:
+> 
+> rtm_del_nexthop
+>     nh_valid_get_del_req
+>         if (tb[NHA_OP_FLAGS]) -> BOOM
 
-It is not clear to me what the real problem is here. Does the hardware
-require that the MAC addresses always have the same upper 5 bytes?
-
-	Andrew
+v2 coming, right? Please repost as soon as possible. v1 crashes AFAICT
+because tb is not 0-initialized so tb[NHA_OP_FLAGS] reads garbage.
 
