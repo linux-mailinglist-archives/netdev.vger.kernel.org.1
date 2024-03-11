@@ -1,145 +1,94 @@
-Return-Path: <netdev+bounces-79237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A03028785DB
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 17:58:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BA158785F8
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 18:05:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39115B20988
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:58:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 160B3B21718
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 17:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C72714594B;
-	Mon, 11 Mar 2024 16:58:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39D563C46B;
+	Mon, 11 Mar 2024 17:05:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b="axbe1rBe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Lwi0CgB4"
 X-Original-To: netdev@vger.kernel.org
-Received: from taslin.fdn.fr (taslin.fdn.fr [80.67.169.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 771743C6A6
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 16:58:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.67.169.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CABF4D9E4
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 17:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710176293; cv=none; b=If7aFJvI0g8DLBZrvIPi8bepDP/fZkrbaA9P3doeNC8x5jIwHOJwg1+gWRXlaMR5hnCNML8pw/DD6igVz1rdGFPWAc9BzrB7oV5CjMK5Yn2NMe/6dp4FArxl9E2gigEFa/gBAIY9OH2kjJEckdSz/sqeupkrKhW8t1ExxWg4BeQ=
+	t=1710176712; cv=none; b=mpcSIkjOzQzFm3EJPnbFAw5JzZqORKrlFcC434BAabMA5iF1Zc5mhDfprK9om7SOhVwn3z7M2r8G7Jkm6r6Is/Ig6X68HxrNIdDFdjbxPzQFTZZDOV3Fiz80IUDnDsi1fnKw2rL6l2J0EOiohFpy6b8nX48EbfNCEIfdHrRVNro=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710176293; c=relaxed/simple;
-	bh=+qqBA4lXdMvOC6Yg2ypQIuLf89voWfBvS+fyAJMOMwk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MTVwLtpOScPeiKcnbAXs8Wy2A68c+oKIjgPQoKk1DOr3SO5tkTb0g15KRSXlMFhEj/p4WI6o23WPuW//dCs21hPwC8yw3uKwXJ8pn4vLx9io37z2BkozSu9hRje/OxaTLhUjS+VPebVGhKkyTD9L99HnXiYUYmhddYZJKp3KhcY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name; spf=pass smtp.mailfrom=max.gautier.name; dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b=axbe1rBe; arc=none smtp.client-ip=80.67.169.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=max.gautier.name
-Received: from localhost (unknown [IPv6:2001:910:10ee:0:a8ca:b785:63e5:1af1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by taslin.fdn.fr (Postfix) with ESMTPSA id E209760260;
-	Mon, 11 Mar 2024 17:58:00 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=max.gautier.name;
-	s=fdn; t=1710176281;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=2I5Ng0sOFAmn7xZoCbwK53i2aj5c0BYQes8nUDeGiGk=;
-	b=axbe1rBeF1mwUWfx6rO+TnlILpPU/2CpMVrdPg4HImQmrKK/dEEDM80FuvFOOmrsgklQ20
-	JoD2tan7hLDExlm94WT4SOAxKqD14qZJh6D5JZqGZnE9ZjQNUeG4f/OSB1S+uUkQr8eqrM
-	17X6KulRp/5/AELigIFIGZuUKi0Y7g0wee+r+rLQ7Zcl1zi39poNjyVFZtMt47Jc3DfDxV
-	xrlGVAsjMODPECvC2zYyzDj+JvLlsTto2TPhHUjcgv5TQdOheUNeZ/23ogwCRQPRvG6zqO
-	6bPq8KnMNotcVEkheFCoLDoInIN0ANlCN5LZtGjb+BSSvjNp+m7nnOfcslPxTw==
-From: Max Gautier <mg@max.gautier.name>
-To: netdev@vger.kernel.org
-Cc: Max Gautier <mg@max.gautier.name>
-Subject: [PATCH iproute2-next] Makefile: use systemd-tmpfiles to create /var/lib/arpd
-Date: Mon, 11 Mar 2024 17:57:27 +0100
-Message-ID: <20240311165803.62431-1-mg@max.gautier.name>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1710176712; c=relaxed/simple;
+	bh=tiqsUKZdBPC3+B4cRKS8C5vjTM9xswrPWQVlMQQtTNM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MGOGsBQd9G4DEYuAUSPsp3MSBfHk9m572acG+1P7AEuUxdFu0M4k7befxbuKmcThGAXKXfpuFy7xC+T8pZJ94nbqIjNs5ABL9rcidVH5WKXdf+m1MMUijviEXng9cqzvsySLg4zYbprSYkbImWGDJK+l1nAs+0m3mk1kCAqn4o8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Lwi0CgB4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 452AAC433C7;
+	Mon, 11 Mar 2024 17:05:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710176711;
+	bh=tiqsUKZdBPC3+B4cRKS8C5vjTM9xswrPWQVlMQQtTNM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Lwi0CgB4VIW+4TcyZWyaUv53qFnK6qYgB8Q2+Ls9ueBZXEaa63wP229/+8rir6Szj
+	 OI0iLkhNVSq5nulJBdr7gMrtBJOLtUyn4950bSakRiC95hTNjWt20CQhlDClvtaUbE
+	 ZaI4fYAaNzv3T6mls16FtEKF0eE+gPENe1FOuHp8T9DVO2iR+VfBS804Vk6k66kU+p
+	 oMrnwefOILJUxcfYrgTMsg7xMrEps/EukpkCl7G/nDxWZ3ecp/Fx7HiWLLFXtr7p+8
+	 RH48xBFVUMASsNPB8MBjFEgp5vWf2Hzs1AKRAwLv5FXUiEsTVuXN67NTZD/SUpRSSt
+	 vQR33OuPmblpA==
+Date: Mon, 11 Mar 2024 10:05:10 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>, Steffen Klassert
+ <steffen.klassert@secunet.com>
+Cc: David Miller  <davem@davemloft.net>, Herbert Xu
+ <herbert@gondor.apana.org.au>, netdev@vger.kernel.org
+Subject: Re: [PATCH 2/5] xfrm: Pass UDP encapsulation in TX packet offload
+Message-ID: <20240311100510.03126bb9@kernel.org>
+In-Reply-To: <a650221ae500f0c7cf496c61c96c1b103dcb6f67.camel@redhat.com>
+References: <20240306100438.3953516-1-steffen.klassert@secunet.com>
+	<20240306100438.3953516-3-steffen.klassert@secunet.com>
+	<a650221ae500f0c7cf496c61c96c1b103dcb6f67.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Only apply on systemd systems (detected in the configure script).
-The motivation is to build distributions packages without /var to go
-towards stateless systems, see link below (TL;DR: provisionning anything
-outside of /usr on boot).
+On Mon, 11 Mar 2024 17:25:03 +0100 Paolo Abeni wrote:
+> Hi,
+> 
+> On Wed, 2024-03-06 at 11:04 +0100, Steffen Klassert wrote:
+> > From: Leon Romanovsky <leonro@nvidia.com>
+> > 
+> > In addition to citied commit in Fixes line, allow UDP encapsulation in
+> > TX path too.
+> > 
+> > Fixes: 89edf40220be ("xfrm: Support UDP encapsulation in packet offload mode")
+> > CC: Steffen Klassert <steffen.klassert@secunet.com>
+> > Reported-by: Mike Yu <yumike@google.com>
+> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> > Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+> > Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>  
+> 
+> This is causing self-test failures:
+> 
+> https://netdev.bots.linux.dev/flakes.html?tn-needle=pmtu-sh
+> 
+> reverting this change locally resolves the issue.
+> 
+> @Leon, @Steffen: could you please have a look?
 
-The feature flag can be overridden on make invocation:
-`make USE_TMPFILES_D=n DESTDIR=<install_loc> install`
+The failure in rtnetlink.sh seems to also be xfrm related:
 
-Links: https://0pointer.net/blog/projects/stateless.html
----
- Makefile          |  8 +++++++-
- configure         | 14 ++++++++++++++
- etc/tmpfiles.conf |  1 +
- 3 files changed, 22 insertions(+), 1 deletion(-)
- create mode 100644 etc/tmpfiles.conf
+# FAIL: ipsec_offload can't create SA
 
-diff --git a/Makefile b/Makefile
-index 8024d45e..8ce69a35 100644
---- a/Makefile
-+++ b/Makefile
-@@ -101,10 +101,16 @@ config.mk:
- 		sh configure $(KERNEL_INCLUDE); \
- 	fi
- 
-+ifeq ($(USE_TMPFILES_D),y)
-+INSTALL_ARPDDIR := install -m 0644 -D etc/tmpfiles.conf $(DESTDIR)$(TMPFILESDIR)/iproute2-arpd.conf
-+else
-+INSTALL_ARPDDIR := install -m 0755 -d $(DESTDIR)$(ARPDDIR)
-+endif
-+
- install: all
- 	install -m 0755 -d $(DESTDIR)$(SBINDIR)
- 	install -m 0755 -d $(DESTDIR)$(CONF_USR_DIR)
--	install -m 0755 -d $(DESTDIR)$(ARPDDIR)
-+	$(INSTALL_ARPDDIR)
- 	install -m 0755 -d $(DESTDIR)$(HDRDIR)
- 	@for i in $(SUBDIRS);  do $(MAKE) -C $$i install; done
- 	install -m 0644 $(shell find etc/iproute2 -maxdepth 1 -type f) $(DESTDIR)$(CONF_USR_DIR)
-diff --git a/configure b/configure
-index 928048b3..2e974e75 100755
---- a/configure
-+++ b/configure
-@@ -432,6 +432,17 @@ check_cap()
- 	fi
- }
- 
-+check_tmpfiles_d()
-+{
-+    if ${PKG_CONFIG} systemd --exists; then
-+        echo "USE_TMPFILES_D ?= y" >>$CONFIG
-+        echo "yes"
-+        echo 'TMPFILESDIR ?=' "$(${PKG_CONFIG} systemd --variable=tmpfilesdir)" >> $CONFIG
-+	else
-+		echo "no"
-+	fi
-+}
-+
- check_color()
- {
- 	case "$COLOR" in
-@@ -615,6 +626,9 @@ check_cap
- echo -n "color output: "
- check_color
- 
-+echo -n "systemd tmpfiles: "
-+check_tmpfiles_d
-+
- echo >> $CONFIG
- echo "%.o: %.c" >> $CONFIG
- echo '	$(QUIET_CC)$(CC) $(CFLAGS) $(EXTRA_CFLAGS) $(CPPFLAGS) -c -o $@ $<' >> $CONFIG
-diff --git a/etc/tmpfiles.conf b/etc/tmpfiles.conf
-new file mode 100644
-index 00000000..39c6d13c
---- /dev/null
-+++ b/etc/tmpfiles.conf
-@@ -0,0 +1 @@
-+d %S/arpd 0755
--- 
-2.44.0
-
+https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/502821/10-rtnetlink-sh/stdout
 
