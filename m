@@ -1,80 +1,76 @@
-Return-Path: <netdev+bounces-79273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7176C87891B
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 20:50:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E86B87893F
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 21:07:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C8982819F9
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 19:50:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C10BA1F2169F
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 20:07:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 576DD5579A;
-	Mon, 11 Mar 2024 19:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1EF455E75;
+	Mon, 11 Mar 2024 20:07:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QeFqc87L"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UTzsQufX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CCD45467F;
-	Mon, 11 Mar 2024 19:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF2E52F82
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 20:07:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710186633; cv=none; b=V8+i+XBMiylUMFsZTxjJaFHxMmhHR3NEpsxUP2oTPuoVkb9E7TemwdY2kRnrZDb5NvlGOhoocTZVLRtkFL4MIcQRNDVwMMFvgiAzQHOC2VVuVJ/nZE3IEnLiyIjb3OTzZ0LRw++v8NxUDhw3PaM2AHxpdeUYkOC91YISwH6StUQ=
+	t=1710187627; cv=none; b=k0UJLwPg+eweGLA/QtKp9EqtNknE5epJq0kXWyzMqcTKjSNSaPiH4Rg7Egemd1TQyORw2ayEb6b+pJUVywIOaHIdvszwdnJR8qwjKyGVjImh/Aq3hePmXTa2XZe8RJHVP2qYnEJNdAGSgguvYqwvndBy7ZMCSX2+T5p0bn6hyyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710186633; c=relaxed/simple;
-	bh=z2jOsQ2xKPATAtbSTLCpoLzHFS9MMbw2YcRF1xX2ZEI=;
+	s=arc-20240116; t=1710187627; c=relaxed/simple;
+	bh=QVKWXgA0QWWVBfoVKKqIeGVnlJ8LxVXtsJRm9NNd4RA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=sWyIIE5YhfQ8KzJ9DCgBm/g8R8nuyuwQy/Imdo91niHaGUZRUMKZRcAQUq5D3zxPlFyh8wKeDyXhRt3VQ4EQdGvoPewuZiqmE9i7fYK34t9M7g1LFqBo8wFovimiLmsrtQyRpMdM6xZZrHBVDbikhtuBGkMcpQUrypJjYYZlMX0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QeFqc87L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A0843C43390;
-	Mon, 11 Mar 2024 19:50:32 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qS3ABHhOnLZ5IEQNlv7YNrM2LH5UB+HMG/Va8iDaancKZYSSJSSUMU7TSZcdHNp5G1ohr4obBNM4bpjuSDcloCEUDHtNWp3/LBuPphePt3sXlvq2zzgd23EaxKP2yPYzW581VZ3c8/Z2iRjkcUKdlWKpftte9I5uP24h0LWR46s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UTzsQufX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B200C433C7;
+	Mon, 11 Mar 2024 20:07:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710186632;
-	bh=z2jOsQ2xKPATAtbSTLCpoLzHFS9MMbw2YcRF1xX2ZEI=;
+	s=k20201202; t=1710187627;
+	bh=QVKWXgA0QWWVBfoVKKqIeGVnlJ8LxVXtsJRm9NNd4RA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QeFqc87L/JM/pC12iWuXBEXSpC0OlEfHxMyA/ioYSItXfqupmKd3xASpWmil9FiF2
-	 3ebtELxYP3gyxnNshlgT+EGs1XtqKQr+QghSpBSiMW7dL9ACq9MqsX1emFTv8Tfx8y
-	 7nPyzcolUHuKbAIVpftpccJi/lKIBiuExbUsdS4RxK3tv2Z9mGzP6K68+XEKXFvx5b
-	 ZeNemMiifTfe72Nr4ezWFT7x3iNokQy7aMDRDVtrCardgK3mFNWjH74iFQEsxdwLiX
-	 IDFGPFsEgaSB1axX85wB7VThV0hJxIXvKnaC7reNRTc2uCT6KShg5xW1zi+CXQYEyH
-	 RL8NK9poJeUUg==
-Date: Mon, 11 Mar 2024 12:50:31 -0700
+	b=UTzsQufXmc/jjD3JdsGut8hICP1FiSueHvrDqnoHOu+BTRY0H60w7/DdNLs6YFA70
+	 fTyc4eiBi5wmoo1fG9AmTpgFeuuYiRqAqckh7aRR7za5U8rPJZ7vEYXDfcY1D4OQ+W
+	 s/C39q/R89k+KL75oRR2DLsDYIj3yuGehwfWjaU7w6BGrfGuBnEaDCy0EAb8R/mamU
+	 3yenXZS4j3B3msUVGxkPEQt1sTmUX3sOna06NN0SnXHmS0q4dKvWFILrZsGZfgmn7z
+	 d81NTE7oXIbP8pvJKERJo24KXzlXvhX4rwxVb3YrBtmer8WdOIHZCzJ8US5ppU3uo6
+	 V9Za2Afa5NcwQ==
+Date: Mon, 11 Mar 2024 13:07:06 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Larysa Zaremba <larysa.zaremba@intel.com>, <netdev@vger.kernel.org>,
- <netdev-driver-reviewers@vger.kernel.org>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [ANN] netdev call - Mar 12th (note time change)
-Message-ID: <20240311125031.2f5ade77@kernel.org>
-In-Reply-To: <Ze9bFepLhiQIBmio@lzaremba-mobl.ger.corp.intel.com>
-References: <20240304103538.0e986ecd@kernel.org>
-	<20240304103657.354800b0@kernel.org>
-	<Ze9bFepLhiQIBmio@lzaremba-mobl.ger.corp.intel.com>
+To: David Wei <dw@davidwei.uk>
+Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v1] netdevsim: replace pr_err with
+ {dev,netdev,}_err wherever possible
+Message-ID: <20240311130706.09f35fdd@kernel.org>
+In-Reply-To: <20240310015215.4011872-1-dw@davidwei.uk>
+References: <20240310015215.4011872-1-dw@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, 11 Mar 2024 20:27:17 +0100 Larysa Zaremba wrote:
-> > Sorry, ignore that, ENOCOFFEE.
-> > The next call is scheduled for the 12th of March, not tomorrow =F0=9F=
-=A4=A6=EF=B8=8F
->=20
-> We have a topic for the 12.03.2024 netdev call:
+On Sat,  9 Mar 2024 17:52:15 -0800 David Wei wrote:
+> -		pr_err("Failed to get snapshot id\n");
+> +		dev_err(&nsim_dev->nsim_bus_dev->dev, "Failed to get snapshot id\n");
 
-Great! Let me change the subject perhaps in an attempt to turn
-this into the reminder:
+We seem to use dev_err(&nsim_dev->nsim_bus_dev->dev, ...
+in quite a few places after this patch, how about we add a wrapper
 
-The bi-weekly netdev call at https://bbb.lwn.net/b/jak-wkr-seg-hjn
-is scheduled tomorrow at 8:30 am (PT) / 4:30 pm (~EU).
-
-NOTE NOTE NOTE: we are already on summer time in the US.
-So for for those who switch time at different points
-this call will likely be at an unusual hour for you!
+#define nsim_err(ns_dev, args...) \
+	dev_err(&(ns_dev)->nsim_bus_dev->dev(dev), ##args)
+?
+-- 
+pw-bot: cr
 
