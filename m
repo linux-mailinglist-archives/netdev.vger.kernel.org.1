@@ -1,108 +1,178 @@
-Return-Path: <netdev+bounces-79191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF4A787835F
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:25:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 92EF38783AE
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:31:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C76D1C2175D
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:25:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C46E41C21B16
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:31:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53FCA612FC;
-	Mon, 11 Mar 2024 15:14:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76ABF446D1;
+	Mon, 11 Mar 2024 15:19:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LJ8SIlLL"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iWKnN6KR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26EFC626DD;
-	Mon, 11 Mar 2024 15:14:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4375446B3
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 15:19:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710170042; cv=none; b=Hzfg7tPsnfYQgj0JuTmUwjd16xQ5NZ+WuBQuX3wmCbHJh7KNreaCjkpoJbAmyPvBYFHuTiRB0suYjV2qoHJKzB4EWk0rlDOh7UlVwqg59t0dAajrf9d0e4rNEdEzsrmgOOqt/Mccafriw00897FO4BrzX+Uo8GMpme/UgdifcA4=
+	t=1710170377; cv=none; b=Nn5VCAnO2/fDXKUQ6qM5F3nnOAMIlfEPwmcYQWDE61QmqP1wqi6omNT1YO7X0WS168HKV+84Tmz1yjskT0TFjxTYOSnxEZCmB+Q/gBDC4Wr2tOJ+aco5ujKGgiaCAN3bjLJCaxgRyz/7zHoAEMQaZzpm0EmWbuVxJarqWYRvOno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710170042; c=relaxed/simple;
-	bh=S9i6rVDTLrc92ZdyKfg4Ixk7H6eGpB3PH6E05e+MPh0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XmfUgjS7Qa4lVSPXFIlEYVay/a+5/dNRSDVANRdKSxJ37gH0pNI9ZDhGZvaLeWeYBF5Ys3CGFeZk+AfVl0BIMgvbgHq29F/dC2LK5O1OahmTuSQ7MztpUnKD6Vs4NiYQC0UPOeWYXHyWfEVTpNkJR1RyGrsN3xAOz9o+rqjfyvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LJ8SIlLL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5DE5C43394;
-	Mon, 11 Mar 2024 15:14:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710170042;
-	bh=S9i6rVDTLrc92ZdyKfg4Ixk7H6eGpB3PH6E05e+MPh0=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=LJ8SIlLLJNBLgbNtaeZomfFWNjpDebvVzUG2itxNxNhpP9lcAWN5JiNIMqaEqN+qa
-	 iyFIam55NRPCNrBurXddfb9tTZpK0+XXj80AQ4oMYYnkoEysrX4k5p38yYg+sicYVW
-	 QQzSj/YdWNM4FGTFiBwDwGDM8kqTs4q/30m2OfgkGENvo4/iKm1Je2Ku2vmH10eHhr
-	 sxk918SFqyVyJcNbqUVRK2CtyQcXKMZGGL5pt0qdnZiaoQvWK9KgVxZtT6Rg/eMzvk
-	 0QYI/RrSrzQS4AgY7fmVarMU23zQJtIwY2OAdaDz3dbBauSCJRgdmuaSbjPeUkN8ZD
-	 s9G5SdpSpurYg==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: Felix Fietkau <nbd@nbd.name>,
-	Johannes Berg <johannes.berg@intel.com>,
-	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 04/13] wifi: mac80211: only call drv_sta_rc_update for uploaded stations
-Date: Mon, 11 Mar 2024 11:13:39 -0400
-Message-ID: <20240311151354.318293-4-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240311151354.318293-1-sashal@kernel.org>
-References: <20240311151354.318293-1-sashal@kernel.org>
+	s=arc-20240116; t=1710170377; c=relaxed/simple;
+	bh=6purTBGXMSzgXgDUt3noQW//iEtgHnYwOwtaTihgO5U=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=ueXJB6KGz1XLKDpng1OXml+lWI8eTFUS5DnFo05XU3CwK202wevMoqku6WsJ6qz82TOvlkoqJHBb40+SMJAZ6WDPHnJjrmTTlRieGdj9oEvhbtNs+RJvr7TNX8J5kCtSX4BKky5RzzhyFvEd3xArZj1JT1zrY8h2IvQ8231og48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iWKnN6KR; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710170374;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7WwvIiwXdQYZuIUIWyh9vmS2DWFC4qIuMLUdct0AxWw=;
+	b=iWKnN6KR+U7rwT8IR3DfFBiq4WsEbYZOKmguDrctIWhFkM0xiNwjWEy8bd0xhyjQrlMNFV
+	HqBOgvMzvRLGv88HQQxskVo02mzKKRiGwdGp0X8c7JGC4RzTiVokhHjx5GAiMaInZqqaiH
+	V3V7xvgNzsEMlAeYtldSMd4yQhTIQVw=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-144-nJ0954ixMZKGBcWIQmQ68A-1; Mon, 11 Mar 2024 11:19:33 -0400
+X-MC-Unique: nJ0954ixMZKGBcWIQmQ68A-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a462e4d8c44so57958166b.1
+        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 08:19:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710170371; x=1710775171;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7WwvIiwXdQYZuIUIWyh9vmS2DWFC4qIuMLUdct0AxWw=;
+        b=UqHruPVmILB0RbPWOfWbF0KWFxE72YrMDWYjHa05GHsZ1HOaQ+K/kk3cX3nVtG8BpL
+         0jH62VNvjZBSBFlQ5RJ+c5mI+ltWZTL/tM0DuVpSf86p4EegJeB5Vh+hIpx1fBx3O6yz
+         xzNhpe0WeXXRaz5CW5MVP7GQjH6z6Q67AYEdDrrEa2w5X8THE6Axep/l4VknQbHh4eVc
+         CnTZj3U2wVmRpy2TVnW3dp14D15khDbmfomPmgODokXZ1tJyJobRYPwjkknLKrWh/gQg
+         gD3qP3Ft9kailPRyFHIPAN4FqjrAwZ860U29IrTt+kU9i+Qd90wOVun9iJOYTVAEBku0
+         b7Rg==
+X-Forwarded-Encrypted: i=1; AJvYcCV2X5QcPHNJXfvo0yIQELAcNrW0cLwTE1knyLVGZlf95doL55uQq78VSsthtRgyNKKHWXfq1zcByDcGagiKtSM4fad4KgRG
+X-Gm-Message-State: AOJu0Yxe8YAnQMVYBDfy/BC6gWcRKov12gxgoqTFua+nuW4aTkYjUbxj
+	vTxE+BnWXecAFLYcEDk3Hcsj4gKYDnheMBJWyK4Gee5nJSS6WmpPmisb7G5LpZ0kKx+AmEhgksS
+	MOVMzgvSnye8cY+ZofDKP9heZhJ7aOaZfsX9IYfOr6+pZ5ThTYjdnP7bGDnFCYQ==
+X-Received: by 2002:a17:906:66ce:b0:a3e:d5ac:9995 with SMTP id k14-20020a17090666ce00b00a3ed5ac9995mr4131441ejp.59.1710170371674;
+        Mon, 11 Mar 2024 08:19:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGMpEjDw/QZvVMgViaMGK3VHe9J5FVW2b/sdnNQOFRhbckT6T3ow18it/xCh22vxdRPTjXofQ==
+X-Received: by 2002:a17:906:66ce:b0:a3e:d5ac:9995 with SMTP id k14-20020a17090666ce00b00a3ed5ac9995mr4131432ejp.59.1710170371345;
+        Mon, 11 Mar 2024 08:19:31 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id gc14-20020a170906c8ce00b00a4629cab2b9sm963969ejb.4.2024.03.11.08.19.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Mar 2024 08:19:30 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 98EFF112FA3B; Mon, 11 Mar 2024 16:19:29 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, Sergey Ryazanov
+ <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
+ <edumazet@google.com>
+Subject: Re: [PATCH net-next v2 08/22] ovpn: implement basic TX path (UDP)
+In-Reply-To: <0273cf51-fbca-453d-81da-777b9462ce3c@openvpn.net>
+References: <20240304150914.11444-1-antonio@openvpn.net>
+ <20240304150914.11444-9-antonio@openvpn.net> <87ttlgrb86.fsf@toke.dk>
+ <0273cf51-fbca-453d-81da-777b9462ce3c@openvpn.net>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Mon, 11 Mar 2024 16:19:29 +0100
+Message-ID: <87edcgre2m.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.81
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: Felix Fietkau <nbd@nbd.name>
+Antonio Quartulli <antonio@openvpn.net> writes:
 
-[ Upstream commit 413dafc8170fcb925fb17af8842f06af305f8e0b ]
+> Hi Toke,
+>
+> On 08/03/2024 16:31, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
+>> Antonio Quartulli <antonio@openvpn.net> writes:
+>>=20
+>>> +/* send skb to connected peer, if any */
+>>> +static void ovpn_queue_skb(struct ovpn_struct *ovpn, struct sk_buff *s=
+kb, struct ovpn_peer *peer)
+>>> +{
+>>> +	int ret;
+>>> +
+>>> +	if (likely(!peer))
+>>> +		/* retrieve peer serving the destination IP of this packet */
+>>> +		peer =3D ovpn_peer_lookup_by_dst(ovpn, skb);
+>>> +	if (unlikely(!peer)) {
+>>> +		net_dbg_ratelimited("%s: no peer to send data to\n", ovpn->dev->name=
+);
+>>> +		goto drop;
+>>> +	}
+>>> +
+>>> +	ret =3D ptr_ring_produce_bh(&peer->tx_ring, skb);
+>>> +	if (unlikely(ret < 0)) {
+>>> +		net_err_ratelimited("%s: cannot queue packet to TX ring\n", peer->ov=
+pn->dev->name);
+>>> +		goto drop;
+>>> +	}
+>>> +
+>>> +	if (!queue_work(ovpn->crypto_wq, &peer->encrypt_work))
+>>> +		ovpn_peer_put(peer);
+>>> +
+>>> +	return;
+>>> +drop:
+>>> +	if (peer)
+>>> +		ovpn_peer_put(peer);
+>>> +	kfree_skb_list(skb);
+>>> +}
+>>=20
+>> So this puts packets on a per-peer 1024-packet FIFO queue with no
+>> backpressure? That sounds like a pretty terrible bufferbloat situation.
+>> Did you do any kind of latency-under-load testing of this, such as
+>> running the RRUL test[0] through it?
+>
+> Thanks for pointing this out.
+>
+> Andrew Lunn just raised a similar point about these rings being=20
+> potential bufferbloat pitfalls.
+>
+> And I totally agree.
+>
+> I haven't performed any specific test, but I have already seen latency=20
+> bumping here and there under heavy load.
+>
+> Andrew suggested at least reducing rings size to something like 128 and=20
+> then looking at BQL.
+>
+> Do you have any hint as to what may make sense for a first=20
+> implementation, balancing complexity and good results?
 
-When a station has not been uploaded yet, receiving SMPS or channel width
-notification action frames can lead to rate_control_rate_update calling
-drv_sta_rc_update with uninitialized driver private data.
-Fix this by adding a missing check for sta->uploaded.
+Hmm, I think BQL may actually be fairly straight forward to implement
+for this; if you just call netdev_tx_sent_queue() when the packet has
+been encrypted and sent on to the lower layer, the BQL algorithm should
+keep the ring buffer occupancy just at the level it needs to be to keep
+the encryption worker busy. I am not sure if there is some weird reason
+this won't work for something like this, but I can't think of any off
+the top of my head. And implementing this should be fairly simple (it's
+just a couple of function calls in the right places). As an example, see
+this commit adding it to the mvneta driver:
 
-Signed-off-by: Felix Fietkau <nbd@nbd.name>
-Link: https://msgid.link/20240221140535.16102-1-nbd@nbd.name
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/mac80211/rate.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+a29b6235560a ("net: mvneta: add BQL support")
 
-diff --git a/net/mac80211/rate.c b/net/mac80211/rate.c
-index d5ea5f5bcf3a0..9d33fd2377c88 100644
---- a/net/mac80211/rate.c
-+++ b/net/mac80211/rate.c
-@@ -119,7 +119,8 @@ void rate_control_rate_update(struct ieee80211_local *local,
- 		rcu_read_unlock();
- 	}
- 
--	drv_sta_rc_update(local, sta->sdata, &sta->sta, changed);
-+	if (sta->uploaded)
-+		drv_sta_rc_update(local, sta->sdata, &sta->sta, changed);
- }
- 
- int ieee80211_rate_control_register(const struct rate_control_ops *ops)
--- 
-2.43.0
+Not sure if some additional mechanism is needed to keep a bunch of
+encrypted packets from piling up in the physical device qdisc (after
+encryption), but that will be in addition, in that case.
+
+-Toke
 
 
