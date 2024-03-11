@@ -1,130 +1,108 @@
-Return-Path: <netdev+bounces-79196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72DB987840B
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:43:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08F7187840E
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:44:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3FE61C2180D
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:43:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15465B23BC6
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:44:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2508D42075;
-	Mon, 11 Mar 2024 15:43:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC8843AC8;
+	Mon, 11 Mar 2024 15:43:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Twxo87P6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RfEidXTQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C89E446AC;
-	Mon, 11 Mar 2024 15:43:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E386D44C8B;
+	Mon, 11 Mar 2024 15:43:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710171807; cv=none; b=o1Kn1pFy/wgB0yPtU3Xd8sx5JYJp0esghoDhXC1SggK/zuQWripAg0EBGJSIHn1Fk4C4v2iwpS4bXASbNNJrgFoeYc5NFD3vijp9lkMLU+YlUr5N3bVOS5Gtfk17TyyTqJ3teVCPGMLtfrauPil0HbXKkEkcW82x0rCCdtuwa8w=
+	t=1710171813; cv=none; b=JdLzoSJ1GwbFP/meHE57unqx01mcgCdJ9IO0AWFiVpO+c+ntRC75USK36IeTJleVJsZkmdDO8B6gEjQuclZVqcMJGYRcdKQMOmNb38xvApPvu18mqIJpQePxPhwlRDDBFQtQcYZ8Hn/+b4vvBN2129x87hEFyJ1z+SJHLlVZa40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710171807; c=relaxed/simple;
-	bh=bQ7XkdqNEZiiCFA5h3YPo1Z/piOhwZZNNUUv3sDmZRQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GgkCgT3r2zDtIFqthpCC7Jgb45OTybh8BFPDBc6w0n96IupqxlxJAODMXOMKDmnRJTLJZ807hOvm9aCf058cNuW0DTPyZmm9ORwWq4XDMjp9/NjcML6j0Kk1u2AvPRHmlgj+GS0pQl1y/ujXUZCvIUbiMrLFk92iwvA3UglDdFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Twxo87P6; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8860E1C0009;
-	Mon, 11 Mar 2024 15:43:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1710171802;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Js1lYw4p1FIj5w+IaLEMzbqeNXg7/oWcjchrh2IjI3Q=;
-	b=Twxo87P6mOwHRgf6hYQHft7XNBlt1NMdN2IWwTeNCOyIw67QunjHn7uRI/9Nit0xIHsmtL
-	/H/xxuJpRcxB0+P80fvzgsdzp9Cj/1ertUP7Uzw3UiZmOZhPOcdj25jl/nY3K6okcnEAzo
-	KU3KXw7FJaKfJmJZz9QznCQNMklrO+WJZ6VmTDfQGlWFQO5R5W+wEI/VsBAh1Ezvc9MUzj
-	9qQq9j1KbSwPCxRih7Q7q6p0zL/tBt6tcog4va54oLTJFiXd9cCLB5f28d9sXJOZxjOt5f
-	CUp6hEalxzsDe4yLmpPagBkZ6t7tzwIWegwtWeu41bSedrHyLA3R3T9tNHKOIA==
-From: thomas.perrot@bootlin.com
-To: Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Thomas Perrot <thomas.perrot@bootlin.com>
-Subject: [PATCH net v3] net: macb: remove change_mtu callback
-Date: Mon, 11 Mar 2024 16:43:15 +0100
-Message-ID: <20240311154315.2575297-1-thomas.perrot@bootlin.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1710171813; c=relaxed/simple;
+	bh=tVOUm4eBVB9aa7asbkuZKPYMDmrBZ5Abtdilf3V/dgo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ACLUa+VL47SOxK1bGcEfxcm9hCY9S0OHeAGDMGepaU61a1LSrIAJu+bVuY5/N6djsYFIxhXaA/mZldSb9DaqckYCrSgTorEh7y17axUucNe025IXMSwnvHNqnzynUgoDggnU1Y1SNMN2pIJeRHGRFOFfsKd+519n9VtQDgF0NTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RfEidXTQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEDD0C433C7;
+	Mon, 11 Mar 2024 15:43:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710171812;
+	bh=tVOUm4eBVB9aa7asbkuZKPYMDmrBZ5Abtdilf3V/dgo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RfEidXTQetRSbMXgWssHizfLrZiVhVW1Xsk3m0k9UZgijOl/4B9DVQQlgv1QlONiw
+	 ZPbGk+NXXwcvPSqq7L2uA5oAvsqnkg9UxzAnASL+yqfrwPiqnmfJjPNUCQILJRuQLY
+	 xkevEEslcpr3sk9zqFGPqvZdBN9mCKQJeIbJCKxZpC2JLRKvQCnq1Rct+1jY/rZDIy
+	 KO8q0dNtm36f/4XGVxeKnGAvf1b5RQOdRIHQGYv6n3/5MqW9Rvg8qvSxgVCjAnnXME
+	 iUNCQI0p0b2Cmi5pLI++EDRFPGPkiWm39CcJ3tNsYMmVqYDoDBhIQvfr5FkXjSOAJS
+	 7EEwmR/ikn/PA==
+Date: Mon, 11 Mar 2024 08:43:30 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, Jason 
+ Wang <jasowang@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric 
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ virtualization@lists.linux.dev, Willem de Bruijn
+ <willemdebruijn.kernel@gmail.com>, Tariq Toukan <tariqt@nvidia.com>,
+ Michael Chan <michael.chan@broadcom.com>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, Shannon Nelson <shannon.nelson@amd.com>
+Subject: Re: [PATCH net-next v3 3/6] virtio_net: support device stats
+Message-ID: <20240311084330.47840d50@kernel.org>
+In-Reply-To: <1710154125.7529383-1-xuanzhuo@linux.alibaba.com>
+References: <20240227080303.63894-1-xuanzhuo@linux.alibaba.com>
+	<20240227080303.63894-4-xuanzhuo@linux.alibaba.com>
+	<20240307085021.1081777d@kernel.org>
+	<1710154125.7529383-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: thomas.perrot@bootlin.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Thomas Perrot <thomas.perrot@bootlin.com>
+On Mon, 11 Mar 2024 18:48:45 +0800 Xuan Zhuo wrote:
+> On Thu, 7 Mar 2024 08:50:21 -0800, Jakub Kicinski <kuba@kernel.org> wrote:
+> > CC: Willem and some driver folks for more input, context: extending
+> > https://lore.kernel.org/all/20240306195509.1502746-1-kuba@kernel.org/
+> > to cover virtio stats.
+> >
+> > On Tue, 27 Feb 2024 16:03:00 +0800 Xuan Zhuo wrote:  
+> > > +static const struct virtnet_stat_desc virtnet_stats_rx_basic_desc[] = {
+> > > +	VIRTNET_STATS_DESC(rx, basic, packets),
+> > > +	VIRTNET_STATS_DESC(rx, basic, bytes),  
+> >
+> > Covered.  
+> 
+> About "packets" and "bytes", here is coming from the hw device.
+> Actually the driver also count "packets" and "bytes" in SW.
+> So there are HW and SW versions. Do we need to distinguish them?
 
-Because it doesn't allow MTU changes when the interface is up, although
-it is not necessary.
+Yup, there are already separate counters defined for SW 
+and HW packets / bytes. For the feature specific counters
+I don't think we need to have both SW and HW flavors defined.
+But for pure rx / tx packets / bytes users may want to see both.
 
-This callback has been added to add in a first implementation of the Jumbo
-support [1],since it has been reworked and moved to the probe [2].
+> > > +static const struct virtnet_stat_desc virtnet_stats_rx_gso_desc[] = {
+> > > +	VIRTNET_STATS_DESC(rx, gso, gso_packets),
+> > > +	VIRTNET_STATS_DESC(rx, gso, gso_bytes),  
+> >
+> > I used the term "GSO" in conversations about Rx and it often confuses
+> > people. Let's use "GRO", so hw-gro-packets, and hw-gro-bytes ?
+> > Or maybe coalesce? "hw-rx-coalesce" ? That's quite a bit longer..  
+> 
+> GRO may also confuse people.
+> 
+> I like hw-rx-coalesce-packets, hw-rx-coalesce-bytes.
 
-With this patch the core will set the MTU, regardless of if the interface
-is up or not.
-
-[1] commit a5898ea09aad ("net: macb: Add change_mtu callback with
-    jumbo support")
-[2] commit 44770e1180de ("ethernet: use core min/max MTU checking")
-
-Fixes: 44770e1180de ("ethernet: use core min/max MTU checking")
-Signed-off-by: Thomas Perrot <thomas.perrot@bootlin.com>
----
-
-Changes since v3:
- - Update prefix
- - Rebase on net
- - Add tag Fixes
-
-Changes since v2:
- - Update the commit message.
-
- drivers/net/ethernet/cadence/macb_main.c | 11 -----------
- 1 file changed, 11 deletions(-)
-
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 898debfd4db3..0532215e5236 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -3017,16 +3017,6 @@ static int macb_close(struct net_device *dev)
- 	return 0;
- }
-
--static int macb_change_mtu(struct net_device *dev, int new_mtu)
--{
--	if (netif_running(dev))
--		return -EBUSY;
--
--	dev->mtu = new_mtu;
--
--	return 0;
--}
--
- static int macb_set_mac_addr(struct net_device *dev, void *addr)
- {
- 	int err;
-@@ -3897,7 +3887,6 @@ static const struct net_device_ops macb_netdev_ops = {
- 	.ndo_get_stats		= macb_get_stats,
- 	.ndo_eth_ioctl		= macb_ioctl,
- 	.ndo_validate_addr	= eth_validate_addr,
--	.ndo_change_mtu		= macb_change_mtu,
- 	.ndo_set_mac_address	= macb_set_mac_addr,
- #ifdef CONFIG_NET_POLL_CONTROLLER
- 	.ndo_poll_controller	= macb_poll_controller,
---
-2.44.0
+FWIW the HW offload feature in ethtool -k is called 'rx-gro-hw',
+but we can use "hw-rx-coalesce-*" and mention the feature in the
+documentation.
 
