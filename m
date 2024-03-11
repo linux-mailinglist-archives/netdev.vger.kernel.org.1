@@ -1,114 +1,113 @@
-Return-Path: <netdev+bounces-79247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97ECE878749
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 19:29:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28D02878798
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 19:39:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB9A11C213A5
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 18:29:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 590B11C21715
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 18:39:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 074D153E27;
-	Mon, 11 Mar 2024 18:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88B4858210;
+	Mon, 11 Mar 2024 18:37:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QkMsk5rt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kv8irJzH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B14D53E1E;
-	Mon, 11 Mar 2024 18:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6018C58AA6;
+	Mon, 11 Mar 2024 18:37:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710181737; cv=none; b=Bv4JaWfpLyeyYkdHJyWdgUYJ52Dq83Fprjbkd+ROJrwksB8H+/dz99zGXoAWCcycgy4EXMPQ51oQR4SrN2nfQPXc0WFsAUPEBdl+o/Ag3bcUYj8L5Wxr3Pq7z17YCJqjLrZhkzBDggSUnA6EYevcA4TS8UXP5/zVxwZ/5f83WGk=
+	t=1710182224; cv=none; b=hegDgh+sRn94bqRhKYUu/1FPK/vVXWx5nSlvjUIHIOvy11Bpayn/IuhhpACpQkkAMcz7K/ZQSX5B3VmPUIoOc7q7pO1RU0t1yboeYzpPJ2NzOdr66kXuDm4rqy/rvEfxNcxUoEr9Y/B37g6SayHmTN0GTUNAfByWBJofYywPPXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710181737; c=relaxed/simple;
-	bh=1DFuVCZwt27vmcTybrkyMywbfdDU13ULx2O965nWEPg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=d1+zgikBrkGMIVXupZX0KlAmX8shqdDAFXPSnrKbndqRKmn+9sCXrebvWpmhB4unstyt3HKDVUJhg34miq0EEFxGke8SNkzuhgytZ029bsdxvdVbyVi7TIArLt5hEYM5NIw9d+1IXs8krZLf1QHNzzfbp+AFClFIff5njCKuXqc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QkMsk5rt; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-5131c0691feso6065804e87.1;
-        Mon, 11 Mar 2024 11:28:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710181734; x=1710786534; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=EA+Rmd4LukCCiQcj2zW077PzEUtEhRdmwmt49q+L1Jc=;
-        b=QkMsk5rtLX7bCG8jc5g8LpD+j/F2xZfk6hYzGiFJQww/pqb2BJVLmDZs2EmJkj21LK
-         gyfTlIVEeX8RWsRxwNtFIJUlsK4WbvcBIxj1eANYjbqbmd7N8Vr4wAfBSWp+lb6RC/RP
-         0Tc1SNLkoTaM7O6IpdEkY5tnNX0sMBfISTjfgYx/FTqPmXUS3bxNjwi0FQ0o2oiA2fDj
-         IvGYTPbnlXSyGpYR47A9qn1F1urYwmwPqKFZb17Atgxk8FkWZFqj20Z9cYM/LJxKSNJ0
-         JAYnZmzjxU+n4HWI1uWDnhUMNvGJrdVKwRZwZvGV+efRTvjNd50SZkt9YWyHYLpg4aWb
-         eOng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710181734; x=1710786534;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EA+Rmd4LukCCiQcj2zW077PzEUtEhRdmwmt49q+L1Jc=;
-        b=gTOmluRvW64SWC4Hs+x9BtAIx774YuVnQQXVDpLPyUZ3sgeYCYuKa2hIuOHCj6fe80
-         agCe0SfwASjIQobfOUa7Tv42m59NPF8sXVBlGZllnn+AsXXe4PHAQmiwpCJqU1Y8VtLP
-         nqNX4wR+6tYXtl9GWJ3fT1FL3iNYVu0Gg3nN953+m7XidIb0xNWL6TFLAt2bBK/m2Dp3
-         5Mz6/9u0SD/hao/3TQ0ktzpxUY6ZKW7mn4W34tFvxlApDPvfKe5BYUJcKnGW77V9F7qK
-         CX2mg8pm1tLFGZ0uX22SoID5tm9ZcoGsAneapE4dVtV11cB7Dd2MurbaPsePhcizYvSg
-         Eg0g==
-X-Forwarded-Encrypted: i=1; AJvYcCXuh7QPQNh+UIXMKce7xvDNL1AMZIbtJjMS5252sUJh/SoV1QOc60IMpTz2KI03XXU/e+t7EGHPl0YRPjNU+Ug304KmpAT0iSdZrelwKszA7D/nUKFXAiYgZAHIUQZtpl66kJ1DhElPp0H2iUdrz91sYJoseGmZm+9N
-X-Gm-Message-State: AOJu0YwRchHTXkiPmFlx7CAmMZeDXv50Cn3TFGZwG/MnnQiAs0keDp6s
-	ckfrltoAq6Hq5wbabDvfKtVPZ+czlIOXt4JyZmbozn2fVcWc3Dm7
-X-Google-Smtp-Source: AGHT+IGXa50h88Id2A4cH9Gq/82q8SMwoZ6hzlhcwUljLBpO5vwElRErN0BdiuE1MSmCm/Egj0AzlQ==
-X-Received: by 2002:a19:7513:0:b0:513:134f:8250 with SMTP id y19-20020a197513000000b00513134f8250mr3895187lfe.55.1710181734181;
-        Mon, 11 Mar 2024 11:28:54 -0700 (PDT)
-Received: from [192.168.1.94] (host-176-36-0-241.b024.la.net.ua. [176.36.0.241])
-        by smtp.gmail.com with ESMTPSA id hg9-20020a05600c538900b00412f855bcc2sm16238600wmb.43.2024.03.11.11.28.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Mar 2024 11:28:53 -0700 (PDT)
-Message-ID: <3b618a33551a0fe0ef5d74b9dc5399afca52209c.camel@gmail.com>
-Subject: Re: [PATCH bpf-next] bpf: fix oob in btf_name_valid_section
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Edward Adam Davis <eadavis@qq.com>, 
- syzbot+cc32304f6487ebff9b70@syzkaller.appspotmail.com, andrii@kernel.org, 
- ast@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net,
- haoluo@google.com,  john.fastabend@gmail.com, jolsa@kernel.org,
- kpsingh@kernel.org,  linux-kernel@vger.kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org,  sdf@google.com, song@kernel.org,
- syzkaller-bugs@googlegroups.com,  yonghong.song@linux.dev
-Date: Mon, 11 Mar 2024 20:28:52 +0200
-In-Reply-To: <CAEf4BzbbvBEwy6_S1MRjiGWWfS_nxy6qNsEc0_Jdro1c10b8Vw@mail.gmail.com>
-References: <00000000000081fb0d06135eb3ca@google.com>
-	 <tencent_E4EB1B6A2584BA2BBBB733409EAE1B524B08@qq.com>
-	 <5f1446d409322de91946a569edc0b836daa52aae.camel@gmail.com>
-	 <CAEf4BzbbvBEwy6_S1MRjiGWWfS_nxy6qNsEc0_Jdro1c10b8Vw@mail.gmail.com>
-Autocrypt: addr=eddyz87@gmail.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.3 
+	s=arc-20240116; t=1710182224; c=relaxed/simple;
+	bh=6XEEDqdkY65lGlx6HiiOD0G5ChxNS9thJ7xpJUYHhH4=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nxfQ6j+O+vTtHBfxtotmSXn4AUer+6fNOruF6iWpws53zzWhov8RSSfTC6IulCDfeIosUAzLvt9v0RL4YKab8KhDfKW7CeMdVxqQbIbiQuoXDRhldt4YISqeDh/JVd66V4BHWqTYJUCw+yAvGU/CzrqjwxQlmVOgxVxEZPPm8G4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kv8irJzH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA240C43394;
+	Mon, 11 Mar 2024 18:37:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710182224;
+	bh=6XEEDqdkY65lGlx6HiiOD0G5ChxNS9thJ7xpJUYHhH4=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=kv8irJzHWX1fqYtUM4wNqihr0rGEj1Ln/fNu6mENwt4vYTp6Ae7CRQFTZTg4n7Sia
+	 F/4azAynlBmM8HXPyiGydfbRYdNbqAwwI2B8iiW9QI8Mt95Q2xBZ8OO5hzwOEnS+UF
+	 nD7ZtrQ+5PbWJdlPWLdqOwzTlkN7OJhPT1nKSBx0iqMx5y+oN99gPSd5ctFG6wlDjC
+	 GVT50WpdnyLQN07h4WEka6CdWOu11wdUjaWbRg4xirhft40xsIimZYgxr+Ie3KUUE6
+	 iDWfw7M5pdRhOaOLfjelIGpq9wz4xPmCXv8SHlTTh9qP9YJQQUdrtqcoN6l0SRwDj9
+	 +pEQM9hejn2QQ==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Mike Yu <yumike@google.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Sasha Levin <sashal@kernel.org>,
+	davem@davemloft.net,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.7 09/14] xfrm: fix xfrm child route lookup for packet offload
+Date: Mon, 11 Mar 2024 14:36:12 -0400
+Message-ID: <20240311183618.327694-9-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240311183618.327694-1-sashal@kernel.org>
+References: <20240311183618.327694-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.7.9
+Content-Transfer-Encoding: 8bit
 
-On Mon, 2024-03-11 at 11:01 -0700, Andrii Nakryiko wrote:
-[...]
+From: Mike Yu <yumike@google.com>
 
-> Eduard, I'd also say we should make __btf_name_valid() a bit more
-> uniform by dropping that first if and then doing
->=20
-> if (!__btf_name_char_ok(*src, src =3D=3D src_orig))
->     return false;
->=20
-> where we just remember original string pointer in src_orig.
->=20
-> WDYT?
+[ Upstream commit d4872d70fc6feabfc8e897edad993a81096ade9f ]
 
-Agree, this looks simpler.
+In current code, xfrm_bundle_create() always uses the matched
+SA's family type to look up a xfrm child route for the skb.
+The route returned by xfrm_dst_lookup() will eventually be
+used in xfrm_output_resume() (skb_dst(skb)->ops->local_out()).
+
+If packet offload is used, the above behavior can lead to
+calling ip_local_out() for an IPv6 packet or calling
+ip6_local_out() for an IPv4 packet, which is likely to fail.
+
+This change fixes the behavior by checking if the matched SA
+has packet offload enabled. If not, keep the same behavior;
+if yes, use the matched SP's family type for the lookup.
+
+Test: verified IPv6-in-IPv4 packets on Android device with
+      IPsec packet offload enabled
+Signed-off-by: Mike Yu <yumike@google.com>
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ net/xfrm/xfrm_policy.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/net/xfrm/xfrm_policy.c b/net/xfrm/xfrm_policy.c
+index c13dc3ef79107..3c666dee04fcf 100644
+--- a/net/xfrm/xfrm_policy.c
++++ b/net/xfrm/xfrm_policy.c
+@@ -2694,7 +2694,9 @@ static struct dst_entry *xfrm_bundle_create(struct xfrm_policy *policy,
+ 			if (xfrm[i]->props.smark.v || xfrm[i]->props.smark.m)
+ 				mark = xfrm_smark_get(fl->flowi_mark, xfrm[i]);
+ 
+-			family = xfrm[i]->props.family;
++			if (xfrm[i]->xso.type != XFRM_DEV_OFFLOAD_PACKET)
++				family = xfrm[i]->props.family;
++
+ 			oif = fl->flowi_oif ? : fl->flowi_l3mdev;
+ 			dst = xfrm_dst_lookup(xfrm[i], tos, oif,
+ 					      &saddr, &daddr, family, mark);
+-- 
+2.43.0
+
 
