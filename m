@@ -1,65 +1,57 @@
-Return-Path: <netdev+bounces-79316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9F94878B60
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:06:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F790878B6D
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:17:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5976928214F
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:06:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5F8B1C20BBF
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8117B58235;
-	Mon, 11 Mar 2024 23:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A846958AA9;
+	Mon, 11 Mar 2024 23:17:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IzMq/1Pg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sM2kfcYv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5934F5822B;
-	Mon, 11 Mar 2024 23:05:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0794AECF;
+	Mon, 11 Mar 2024 23:17:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710198358; cv=none; b=NvPH8/xjxOjtJXlkLymY9djN99Gov9O4bLeWbaSvVZMkSlT+t7493nDqwsfFKI0lvjVv6+R3v7KEyo56xLsWMJ0x/i0wB4NUBijOy7kmFNRr6autay9nG7KDcllhK7k+8iqQ7zjFcF3RU/bFc5LYM/cUL955zBgD2r8MnaNinxg=
+	t=1710199049; cv=none; b=HUihJCRbezURe6ubs32cuH4J6R/bsLPSH0vfWvfn3o3hFJEmW3JXS+SSz4pX8a10LoiwHaKGkCgX9eV0ByfbW9eZZe2An+q4XGIUmuYf2s9GLZ3F2AUUGRxOMrATRBRiFFdZvZ9Uoe/o1mAIE0Iee7RSeF6KpsFMMvbECiOv/0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710198358; c=relaxed/simple;
-	bh=EatrB5D9TJSPm3YFnPCenxX91s899LOVNXNp9lcYDZI=;
+	s=arc-20240116; t=1710199049; c=relaxed/simple;
+	bh=Yyx2SljWGGhoQy/gF540D+08seq/pSyWBT/BUFx9wo4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R73yrlO65s2VijNixat9uCkuOwYV2NBBznUvVAYDFB4FudwOLxB0JIe26LGBliYrYHleG4Wqr3u2EXgy4adedatF7LyzphwPdS1gAyOkF9xIqKGP7G4q+G5xqYEB49bFVQ9zopjteMKrO8pvv6azWM2uIg5YZ0DaWaCdJvZWqOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IzMq/1Pg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33365C433C7;
-	Mon, 11 Mar 2024 23:05:57 +0000 (UTC)
+	 MIME-Version:Content-Type; b=jrE4IusoWLB62WnpsEiPnETLpsKy5br9HCrqKmipSnwcxBUR9gLWGYsNkPzW+pD/FmR+iR12/pqNF2Q47gxgSgkGByj8L5V2hTfjmbivFBfF1VblIynq4h/XQOup2WI/aS+eRlt8lYOuRP681rcoQKBAVuG57L9yf9HGEBe5S8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sM2kfcYv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3690C433C7;
+	Mon, 11 Mar 2024 23:17:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710198358;
-	bh=EatrB5D9TJSPm3YFnPCenxX91s899LOVNXNp9lcYDZI=;
+	s=k20201202; t=1710199049;
+	bh=Yyx2SljWGGhoQy/gF540D+08seq/pSyWBT/BUFx9wo4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IzMq/1Pgg5gY88lOO25I/1MfWii0PtNjbBjIdDG1XL8gdZHoZSjg6162q9sBnlqP4
-	 EHVunXQkYyy5HOAXQrAPvOr4W0cylwZbBslbsaBf9RqmvN5xQ8cfcc7sbAMcXQVZvx
-	 EmmJXCy5212FyrDWeq1YSAv3u6UnqQkW67uBqkXQEQMKeqbhdaOcAdrW7Yxku5cVUb
-	 N3U88cEojFghEOUQo9iTUkOHgPOhdJ4N6RqU7rRjNrXbpexZH7Yqawpv1EGliYY3Ag
-	 cVZDsWS2mFkDOqRWclQ7aRY6oImw7Ph1bP3so0RUZ6kBR1+VTBvQhqW7AxjYtS9zCs
-	 EtKDSmqY11grg==
-Date: Mon, 11 Mar 2024 16:05:56 -0700
+	b=sM2kfcYvtsVLPBQPJYNs+z8HCxp33ssQCLonJP3rVVS1mh5DJb1Gch3TXE7ElPw/T
+	 2FX5KZKDvmDig9b4O6PP1Xd1ggzf0ZUaqemdoduVpuIaDLRYahUHg5uhDfyGG0AGya
+	 mFJ5qFoVIPaY19D3rhlJiwcv4fBUspb/9krTu3zVNiGyd9bmvdUv4yEkfageWQAKhm
+	 Hpdp7DkiLq9tGjEa2wCg/p2j2rNH+KyIpjjlv5TsBxTUXQilusQGHGyiPNgPvFBsI2
+	 /F2HcXW3pJObvPtd3uvC/046ZpU8vM+ZbqIlbyRGKUHcu8j5UyWpe+eRfRh94Cw1M+
+	 8T8LPtmDzoYYw==
+Date: Mon, 11 Mar 2024 16:17:27 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Lukasz Majewski <lukma@denx.de>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, Eric Dumazet
- <edumazet@google.com>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir
- Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Oleksij Rempel <o.rempel@pengutronix.de>, Tristram.Ha@microchip.com,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Paolo Abeni
- <pabeni@redhat.com>, Ravi Gunasekaran <r-gunasekaran@ti.com>, Simon Horman
- <horms@kernel.org>, Wojciech Drewek <wojciech.drewek@intel.com>, Nikita
- Zhandarovich <n.zhandarovich@fintech.ru>, Murali Karicheri
- <m-karicheri2@ti.com>, Dan Carpenter <dan.carpenter@linaro.org>, Ziyang
- Xuan <william.xuanziyang@huawei.com>, Kristian Overskeid
- <koverskeid@gmail.com>, Matthieu Baerts <matttbe@kernel.org>,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3] net: hsr: Provide RedBox support
-Message-ID: <20240311160556.02da78e3@kernel.org>
-In-Reply-To: <20240311115644.823829-1-lukma@denx.de>
-References: <20240311115644.823829-1-lukma@denx.de>
+To: thomas.perrot@bootlin.com
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
+ <claudiu.beznea@tuxon.dev>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v3] net: macb: remove change_mtu callback
+Message-ID: <20240311161727.629c0bab@kernel.org>
+In-Reply-To: <20240311154315.2575297-1-thomas.perrot@bootlin.com>
+References: <20240311154315.2575297-1-thomas.perrot@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,16 +61,36 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 11 Mar 2024 12:56:44 +0100 Lukasz Majewski wrote:
-> Introduce RedBox support (HSR-SAN to be more precise) for HSR networks.
-> Following traffic reduction optimizations have been implemented:
-> - Do not send HSR supervisory frames to Port C (interlink)
-> - Do not forward to HSR ring frames addressed to Port C
-> - Do not forward to Port C frames from HSR ring
-> - Do not send duplicate HSR frame to HSR ring when destination is Port C
+On Mon, 11 Mar 2024 16:43:15 +0100 thomas.perrot@bootlin.com wrote:
+> Because it doesn't allow MTU changes when the interface is up, although
+> it is not necessary.
+> 
+> This callback has been added to add in a first implementation of the Jumbo
+> support [1],since it has been reworked and moved to the probe [2].
+> 
+> With this patch the core will set the MTU, regardless of if the interface
+> is up or not.
+> 
+> [1] commit a5898ea09aad ("net: macb: Add change_mtu callback with
+>     jumbo support")
+> [2] commit 44770e1180de ("ethernet: use core min/max MTU checking")
+> 
+> Fixes: 44770e1180de ("ethernet: use core min/max MTU checking")
 
-Linus tagged v6.8 and the merge window for v6.9 has started.
-Please repost in 2 weeks once the merge window is over.
+static void macb_init_rx_buffer_size(struct macb *bp, size_t size)
+{
+	if (!macb_is_gem(bp)) {
+		bp->rx_buffer_size = MACB_RX_BUFFER_SIZE;
+	} else {
+		bp->rx_buffer_size = size;
+
+where size is:
+
+	size_t bufsz = dev->mtu + ETH_HLEN + ETH_FCS_LEN + NET_IP_ALIGN;
+
+I guess you tested this on a platform where !macb_is_gem(bp) ?
+Otherwise the buffer size seems to be based on MTU and the proposed
+change won't be correct.
 -- 
-pw-bot: defer
+pw-bot: cr
 
