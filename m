@@ -1,124 +1,117 @@
-Return-Path: <netdev+bounces-79078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64FA3877C53
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 10:12:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C55B1877C7A
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 10:18:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1ABF41F21118
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 09:12:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C22A1C20DEB
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 09:18:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5F217996;
-	Mon, 11 Mar 2024 09:12:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AA0614296;
+	Mon, 11 Mar 2024 09:18:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="I+lmVv4d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YoNP/pKR"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A961426D;
-	Mon, 11 Mar 2024 09:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8B511725;
+	Mon, 11 Mar 2024 09:18:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710148358; cv=none; b=aZG8XBdSzGiUZVv7ZdAaMzPQzMddGB3YRZr1u8V5TB8QFQVZnGNTQ7yprcAbGjBiJ7qQsIHbtN2dkpu9SFRV9wEdrWuveGh9N/ZbjqtR/rL6CG6opm2u0Hl2vA0ut2FAY6Ihrok1UB3iv+iD6i/uLkL1/2C0wfdqSWO7nvUgt+w=
+	t=1710148716; cv=none; b=OTlMUlsNwqQIC4XGcEm2ZAZpLet9g/gTlBQEX/kEaGEb9yEwaZMhAujQSIp4+tNU2o66nllbtqeOb7RtxgZfXUfact+J2KPOwR/ic50MSHekqhWrxo29nHxaW8D/Gt23tSVlV5TFohTYp5JZ6Ie8IVMPCLjOpx6gyGbqC+VxPgU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710148358; c=relaxed/simple;
-	bh=SAc/EnxQvVa1nAkHB7jbIyuOAeTu3YjIhhYZtAjcfac=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UC6TMepTMj+77wML6Cls3ksFMwLHkU9sfg2GG52PWq7LTHHYmqPbd6YljTrZsnXzL6XoCGHwQ09qwf6oPlNNvs482b8wV83HG+14fPp/4YAKfyzFAL4VyDdw8ptGKd3pdIJfxS9XeCkEnB0QqL4MKHGrADXCTIFJJ7X3aUnQSIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=I+lmVv4d; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3301D1BF209;
-	Mon, 11 Mar 2024 09:12:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1710148347;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=gU39HWmt7vQXPoC0F5cGz/jFZZTEQpLyvJ+SBbbV034=;
-	b=I+lmVv4dqnKFMorHIQ/de1PkYy3gyiQGebRJHgckf+cIS8/q9V4Pgt5GycAVOGbc1BlcSo
-	vovg2yXNxnGdTeWHxLupcCuHiLX5A1XYPDbdN86jbK7hiursA75Mw+NDtsl1rgmM8DJKQd
-	QspGuTVnF0YwXd4ZFIwGFVRw9F+J4dREpEKUe1vjzELnHH5vk+yQxe5IGboDrXmZKvqOww
-	xVYeQPZWnD1rjOXSv2T2CgW+myhBoBPBpNQFak5Q1xGb9jWY6/9R1wthZHntmbaUb7atLG
-	Dfihf7XeNe0buevzjlT9R1MNpA/544kUhJaNW/lsEoDLgIdn1+tFQWQogoBvwA==
-From: thomas.perrot@bootlin.com
-To: Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Thomas Perrot <thomas.perrot@bootlin.com>
-Subject: [PATCH v2] net: macb: remove change_mtu callback
-Date: Mon, 11 Mar 2024 10:12:11 +0100
-Message-ID: <20240311091211.720789-1-thomas.perrot@bootlin.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1710148716; c=relaxed/simple;
+	bh=J4jr8Nj1C74GgqQYi+iZpfykkkAoiiD0M5AXL0/pJwQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O7kT/6X/2/8r1oiAKp9fRZaLv0YFt1rCtiMsoGULlGJgwVCCkuERHteDtKQ/OPbH/d2wLxOHEKXo574niIIxb4Rka5bRRazwS5ZxrNnHsdqUZLXxRR4o3L2G8dhsydoyTZjeL5XNAU8ujIXiiVMJY6jn6nAX7446HMc8Dmc5etI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YoNP/pKR; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4132a436086so3808925e9.2;
+        Mon, 11 Mar 2024 02:18:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710148713; x=1710753513; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=JbqKzLJ5nYzAiRDltlyNyfUgOESvxNq1tUNr15ZO288=;
+        b=YoNP/pKRhnzKC6sRXr9m83SY678QVF1oz8XYV9XkZkmsw5Tnae95actDvA6UY0XJcS
+         9EMW+okI2l123VqzwGHph5MUrNF71hr/+qOrwesmwU4BuAbjAjfu4PbqRN77+WURDXip
+         /6UZSCAD1SFNr2uypSxIXG09oXnNHQ+KJY+/hCDL++jJ0yODd5stonmKoeUi6W8/3tNj
+         V359DrN6e2oeDzHHmrc3P1nz/Xmns51TUrM50BIcRgStqAofg1FOe1E+kbyM5LjEwhUF
+         Eb+IaADh/nDUsuQTior7DXiXuOcKqwUZgxJ62ppdYderhLJHzfJzGWDa8UXoIpkjJlBt
+         Eg7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710148713; x=1710753513;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=JbqKzLJ5nYzAiRDltlyNyfUgOESvxNq1tUNr15ZO288=;
+        b=LziIExIbc4rzgmeaiuwnuCqN0JTv8ts7w0cpxHAviTKp7S+Dsmz7C+P8k79Dwkg1Nt
+         z53madpNJDUMVz7Ock51i5iNHtV9AxH2rnOCtzgx2DouFFknP1ruHtF8QndtJSFv6VgH
+         PCgNlnLHftxqbqsOc89Nny87xjyZETZfBn+ULk7q9yZfHsmtSugOiOBu8omLa4fMbVxk
+         iDKRAbwnpEhIrAhTveTIOtRW+hKNll9wtm6xn+Of9Z4DYjEBh+zbEPTnh7nrB2xliVVk
+         41+8P36eBfV+uqQb3x87+ysZM/ydSDWBd1Oy1eebDGgQNfHev0plpTE09f0kxnnqP5aT
+         GPSQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVsdT2x6iKnMeodft4kuFJv97z7RWMobZZxH4+LiQ3yLhoSr0hUmR7s+PmIP/11QcEgNOlGhsRDWH3fjerVrlhIOJeSVxlyqP054G6jZk8FbmKEXa/3T+gLcPrECnQE7MpGNkLVHOEPWOJ2qOeuwlXEuCpWj02dJOemCbxhV8VmRFTfGYRA
+X-Gm-Message-State: AOJu0YxD5viyIKRFx/SSi8Eh2qC20W9r1FOJDk6O3p9etTKpaormUGKJ
+	LSzxQpxmU1ovFkuH2yAB5uopz9FcPXRXrerlXyaYfunY8LmqfGdl
+X-Google-Smtp-Source: AGHT+IHz6EhEngVFDAog7ttdlt/LibXaHDHHwuT07CnNnxofI4EM5T/eUx7a+P3GTAt+O/gwngnHyg==
+X-Received: by 2002:a05:600c:3556:b0:413:1013:cc7f with SMTP id i22-20020a05600c355600b004131013cc7fmr4250696wmq.29.1710148712913;
+        Mon, 11 Mar 2024 02:18:32 -0700 (PDT)
+Received: from debian ([146.70.204.204])
+        by smtp.gmail.com with ESMTPSA id l18-20020a05600c1d1200b004132f3ace5csm269938wms.37.2024.03.11.02.18.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 11 Mar 2024 02:18:32 -0700 (PDT)
+Message-ID: <967ed173-b556-4bfc-b3c8-ff0fc902b951@gmail.com>
+Date: Mon, 11 Mar 2024 10:18:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH net-next v3 4/4] net: gro: move L3 flush checks to
+ tcp_gro_receive
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ willemdebruijn.kernel@gmail.com, dsahern@kernel.org, xeb@mail.ru,
+ shuah@kernel.org, idosch@nvidia.com, razor@blackwall.org,
+ amcohen@nvidia.com, petrm@nvidia.com, jbenc@redhat.com, bpoirier@nvidia.com,
+ b.galvani@gmail.com, gavinl@nvidia.com, liujian56@huawei.com,
+ horms@kernel.org, linyunsheng@huawei.com, therbert@google.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <f939c84a-2322-4393-a5b0-9b1e0be8ed8e@gmail.com>
+ <88831c36-a589-429f-8e8b-2ecb66a30263@gmail.com>
+ <CANn89iK5+wqYdqMt_Rg3+jO+Xf4n4yO4kOK0kzNdqh99qgL3iQ@mail.gmail.com>
+From: Richard Gobert <richardbgobert@gmail.com>
+In-Reply-To: <CANn89iK5+wqYdqMt_Rg3+jO+Xf4n4yO4kOK0kzNdqh99qgL3iQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: thomas.perrot@bootlin.com
 
-From: Thomas Perrot <thomas.perrot@bootlin.com>
+Eric Dumazet wrote:
+> On Sat, Mar 9, 2024 at 4:35 PM Richard Gobert <richardbgobert@gmail.com> wrote:
+>>
+>> {inet,ipv6}_gro_receive functions perform flush checks (ttl, flags,
+>> iph->id, ...) against all packets in a loop. These flush checks are
+>> relevant only to tcp flows, and as such they're used to determine whether
+>> the packets can be merged later in tcp_gro_receive.
+>>
+>> These checks are not relevant to UDP packets.
+> 
+> I do not think this claim is true.
+> 
+> Incoming packets  ->  GRO -> GSO -> forwarded packets
+> 
+> The {GRO,GSO} step must be transparent, GRO is not LRO.
 
-Because it doesn't allow MTU changes when the interface is up, although
-it is not necessary.
-
-This callback has been added to add in a first implementation of the Jumbo
-support [1],since it has been reworked and moved to the probe [2].
-
-With this patch the core will set the MTU, regardless of if the interface
-is up or not.
-
-[1] commit a5898ea09aad ("net: macb: Add change_mtu callback with
-    jumbo support")
-[2] commit 44770e1180de ("ethernet: use core min/max MTU checking")
-
-Signed-off-by: Thomas Perrot <thomas.perrot@bootlin.com>
----
-
-Changes since v2:
- - Update the commit message.
-
- drivers/net/ethernet/cadence/macb_main.c | 11 -----------
- 1 file changed, 11 deletions(-)
-
-diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-index 898debfd4db3..0532215e5236 100644
---- a/drivers/net/ethernet/cadence/macb_main.c
-+++ b/drivers/net/ethernet/cadence/macb_main.c
-@@ -3017,16 +3017,6 @@ static int macb_close(struct net_device *dev)
- 	return 0;
- }
-
--static int macb_change_mtu(struct net_device *dev, int new_mtu)
--{
--	if (netif_running(dev))
--		return -EBUSY;
--
--	dev->mtu = new_mtu;
--
--	return 0;
--}
--
- static int macb_set_mac_addr(struct net_device *dev, void *addr)
- {
- 	int err;
-@@ -3897,7 +3887,6 @@ static const struct net_device_ops macb_netdev_ops = {
- 	.ndo_get_stats		= macb_get_stats,
- 	.ndo_eth_ioctl		= macb_ioctl,
- 	.ndo_validate_addr	= eth_validate_addr,
--	.ndo_change_mtu		= macb_change_mtu,
- 	.ndo_set_mac_address	= macb_set_mac_addr,
- #ifdef CONFIG_NET_POLL_CONTROLLER
- 	.ndo_poll_controller	= macb_poll_controller,
---
-2.44.0
+Sorry, I should rephrase myself. The patch preserves the
+current logic in GRO. These L3 checks (ttl, flags, etc.) are written to
+NAPI_GRO_CB(p)->{flush,flush_id}, and NAPI_GRO_CB(skb)->is_atomic - and
+all of these are currently used only in tcp_gro_receive.
 
