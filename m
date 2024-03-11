@@ -1,62 +1,64 @@
-Return-Path: <netdev+bounces-79188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94F8F878330
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:20:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97C7187833E
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:22:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C61E41C214CF
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:20:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3828F1F274AB
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:22:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D29935D720;
-	Mon, 11 Mar 2024 15:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FD435FF16;
+	Mon, 11 Mar 2024 15:13:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ppofodmH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K9QWlWqa"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15EA5D478;
-	Mon, 11 Mar 2024 15:13:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FE9D5FDC4;
+	Mon, 11 Mar 2024 15:13:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710170003; cv=none; b=BazuytoCzeu69PXQFih9Q6WK+Sx/vtYBkpzQ5guDe2mbd2ZMeP0mc+zsdcMbrSyQUtF4afszwZrPlqX6Bbu4ouCwfpBQQS1TDIFEkyomzHV9cKxmUqd7U5K934J5oOEu9mKZYURtwaQl3A3FaasywRclx3yqViAvagqvNlqKl04=
+	t=1710170011; cv=none; b=euejs2DLLOOq1TvVV0dWQ+ZbgS16F7hzdOdkb9ksZ2qpTyBJ9RroScAmD8tGAP8Dsh4V10Y2lSjcm19lXswXh2oB8xOE/fUnYicUMj1NA6D+uFdA4LjF3WCm8qN+f/hlJwLyZp13R2wGZpUG51aPzomNPb01VFQY77IWOwJCsvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710170003; c=relaxed/simple;
-	bh=S9i6rVDTLrc92ZdyKfg4Ixk7H6eGpB3PH6E05e+MPh0=;
+	s=arc-20240116; t=1710170011; c=relaxed/simple;
+	bh=jkL9pcfs3sRnSPlvjikdgvSxArB73ECs5GBn3OKS72M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=WQHprln3CG9QEXi+Jh2UFZNA9Em8VT1C+bqnEGRkRCNrA1Ts4j5RmAOgQVIGcCBKdiqH/4o6X0rWySrTdVYHtwicG1e/zDAZk9OtUqBekOECyoRlTAQIZrqVqxxKeZ5U8XBdTmuV6sSU7OMZXcWRyQaxQAhMNn6LleE/d329iZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ppofodmH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE355C433F1;
-	Mon, 11 Mar 2024 15:13:21 +0000 (UTC)
+	 MIME-Version; b=gENI335pp6riwPCax9UP1HV4RSSVk69SOrHScCMuKhM3/lrGpEhFBjFtzfGn22dKy69hcXT/w16xc73h5qF024W8Q/yxbHME7M9MhII9K9X+hPc/6ExaHknloDMt0ikdPKRBo7JfriVlvQTK8kzGnYswcl7uU+MJMIbWfJP6eIo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K9QWlWqa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E755C43390;
+	Mon, 11 Mar 2024 15:13:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710170003;
-	bh=S9i6rVDTLrc92ZdyKfg4Ixk7H6eGpB3PH6E05e+MPh0=;
+	s=k20201202; t=1710170010;
+	bh=jkL9pcfs3sRnSPlvjikdgvSxArB73ECs5GBn3OKS72M=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ppofodmHbVK1DKp9osxVgBljmkNyxz+AKN4+vOTN7dMG2oyzuQsAuLFGguTMEKrcl
-	 LYfjKrsRs4wyqrqdCIf0akKPISge4X3qPoYteQWwy6KhX+//Nu5Zo9sjUyv+VeOKYe
-	 xALK6Vcune5XheIwBS9O9GMYN0GsrbWJWyBgC1khmd0fy9MGsoFKnW7C1arBwoKxbV
-	 cd413iO+bb2Z1k88VGof0ZJxUcNuKhmBntislTHRgt/YG6g6sGvUZ/XV73d9SXBLTp
-	 i0jBgBFeXZjEbNtX8/G3NCXCqOP3z5XNkstbZp2c5QQ9xj0c8pl7ljPJ5IKgB5NbRy
-	 WHuL3FQfM9tkg==
+	b=K9QWlWqabci0aYqlvGxyzbo/QVzT4Bp0zl3AgOdgTbNGNFn5PG+AOlJqebJDclynF
+	 X/LFEhvpU0xJDBxrt4QJq5+Y6QVEbK3zA0soyo6bnTWp5LG9c4OPaQDC/5lA6sAxD/
+	 pO4rtklwxvBjh+PrUTtyI/e9ulO1SnNfYM0J+8rzjmg8UciD/4GR6KvU8zfZ6AEwug
+	 s1IaA25VPK8K5w5QO2DLuUTvi7Ewagu+BLkwox35V+1bW9LKowDYPdWsAFsRs/QF0I
+	 l2WbUPy5zf8BMuGE4XlCQ1pBnKfPqTsPMRlpgFc4/x4W1vudmwqp5l+KkmEGD8rMYe
+	 pT161nPGrKpIQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Felix Fietkau <nbd@nbd.name>,
-	Johannes Berg <johannes.berg@intel.com>,
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	Matthieu Baerts <matttbe@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	johannes@sipsolutions.net,
+	martineau@kernel.org,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 05/17] wifi: mac80211: only call drv_sta_rc_update for uploaded stations
-Date: Mon, 11 Mar 2024 11:12:56 -0400
-Message-ID: <20240311151314.317776-5-sashal@kernel.org>
+	shuah@kernel.org,
+	netdev@vger.kernel.org,
+	mptcp@lists.linux.dev,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 09/17] selftests: mptcp: explicitly trigger the listener diag code-path
+Date: Mon, 11 Mar 2024 11:13:00 -0400
+Message-ID: <20240311151314.317776-9-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240311151314.317776-1-sashal@kernel.org>
 References: <20240311151314.317776-1-sashal@kernel.org>
@@ -71,37 +73,87 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.21
 Content-Transfer-Encoding: 8bit
 
-From: Felix Fietkau <nbd@nbd.name>
+From: Paolo Abeni <pabeni@redhat.com>
 
-[ Upstream commit 413dafc8170fcb925fb17af8842f06af305f8e0b ]
+[ Upstream commit b4b51d36bbaa3ddb93b3e1ca3a1ef0aa629d6521 ]
 
-When a station has not been uploaded yet, receiving SMPS or channel width
-notification action frames can lead to rate_control_rate_update calling
-drv_sta_rc_update with uninitialized driver private data.
-Fix this by adding a missing check for sta->uploaded.
+The mptcp diag interface already experienced a few locking bugs
+that lockdep and appropriate coverage have detected in advance.
 
-Signed-off-by: Felix Fietkau <nbd@nbd.name>
-Link: https://msgid.link/20240221140535.16102-1-nbd@nbd.name
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Let's add a test-case triggering the relevant code path, to prevent
+similar issues in the future.
+
+Be careful to cope with very slow environments.
+
+Note that we don't need an explicit timeout on the mptcp_connect
+subprocess to cope with eventual bug/hang-up as the final cleanup
+terminating the child processes will take care of that.
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Link: https://lore.kernel.org/r/20240223-upstream-net-20240223-misc-fixes-v1-10-162e87e48497@kernel.org
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/mac80211/rate.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ tools/testing/selftests/net/mptcp/diag.sh | 30 ++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
-diff --git a/net/mac80211/rate.c b/net/mac80211/rate.c
-index d5ea5f5bcf3a0..9d33fd2377c88 100644
---- a/net/mac80211/rate.c
-+++ b/net/mac80211/rate.c
-@@ -119,7 +119,8 @@ void rate_control_rate_update(struct ieee80211_local *local,
- 		rcu_read_unlock();
- 	}
+diff --git a/tools/testing/selftests/net/mptcp/diag.sh b/tools/testing/selftests/net/mptcp/diag.sh
+index 4d8c59be1b30c..ff9a4f45f852f 100755
+--- a/tools/testing/selftests/net/mptcp/diag.sh
++++ b/tools/testing/selftests/net/mptcp/diag.sh
+@@ -20,7 +20,7 @@ flush_pids()
  
--	drv_sta_rc_update(local, sta->sdata, &sta->sta, changed);
-+	if (sta->uploaded)
-+		drv_sta_rc_update(local, sta->sdata, &sta->sta, changed);
+ 	ip netns pids "${ns}" | xargs --no-run-if-empty kill -SIGUSR1 &>/dev/null
+ 
+-	for _ in $(seq 10); do
++	for _ in $(seq $((timeout_poll * 10))); do
+ 		[ -z "$(ip netns pids "${ns}")" ] && break
+ 		sleep 0.1
+ 	done
+@@ -91,6 +91,15 @@ chk_msk_nr()
+ 	__chk_msk_nr "grep -c token:" "$@"
  }
  
- int ieee80211_rate_control_register(const struct rate_control_ops *ops)
++chk_listener_nr()
++{
++	local expected=$1
++	local msg="$2"
++
++	__chk_nr "ss -inmlHMON $ns | wc -l" "$expected" "$msg - mptcp" 0
++	__chk_nr "ss -inmlHtON $ns | wc -l" "$expected" "$msg - subflows"
++}
++
+ wait_msk_nr()
+ {
+ 	local condition="grep -c token:"
+@@ -306,5 +315,24 @@ flush_pids
+ chk_msk_inuse 0 "many->0"
+ chk_msk_cestab 0 "many->0"
+ 
++chk_listener_nr 0 "no listener sockets"
++NR_SERVERS=100
++for I in $(seq 1 $NR_SERVERS); do
++	ip netns exec $ns ./mptcp_connect -p $((I + 20001)) \
++		-t ${timeout_poll} -l 0.0.0.0 >/dev/null 2>&1 &
++done
++
++for I in $(seq 1 $NR_SERVERS); do
++	mptcp_lib_wait_local_port_listen $ns $((I + 20001))
++done
++
++chk_listener_nr $NR_SERVERS "many listener sockets"
++
++# graceful termination
++for I in $(seq 1 $NR_SERVERS); do
++	echo a | ip netns exec $ns ./mptcp_connect -p $((I + 20001)) 127.0.0.1 >/dev/null 2>&1 &
++done
++flush_pids
++
+ mptcp_lib_result_print_all_tap
+ exit $ret
 -- 
 2.43.0
 
