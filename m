@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-79320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31160878B75
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:20:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5E05878B78
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:20:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60FD51C210E8
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:20:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3DD40B21130
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BBED58ABF;
-	Mon, 11 Mar 2024 23:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D09E59B43;
+	Mon, 11 Mar 2024 23:20:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KCybjNwF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ekh67TvR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E8658AAC;
-	Mon, 11 Mar 2024 23:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37CF759B4B
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 23:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710199231; cv=none; b=rDn0Xvy4c0CnB7WrVoO7FroZfTBw4JL2I3igxUux0Pu+xz13RStYjzwTVsAPEiL6tThQAQ0wqZ28dqgQ46jD75sNY9yYvAYJOb60Vbxoz0llFcN2frfvaN/tPvPfRFyYgfsYYIhOtVoMo6IVlyHE1Z0isYImkZtQ8yJa/lOh/9c=
+	t=1710199233; cv=none; b=YpKWfao1wentUWx2wYigERrrEBeAaBGASyDAI+/0UHQRud4a+DPryINHzpBer65hfOu4AN2uYcjAW6RPvMtW1yWH1boEvaMc8T4d6hjR09aufSoyWC2yiSmdYJlVbFoaVQQrMrOFEehfmlu5EKCUcM08Rw3nrlBypJBZ54n38fg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710199231; c=relaxed/simple;
-	bh=/SfPJdQLLpKy4wOW1GxWa5+tTB7sghSqtQujy4vtbq0=;
+	s=arc-20240116; t=1710199233; c=relaxed/simple;
+	bh=kNjFZaVSzFXIHWXCnW5npiWMUPAOcU1WoSstQFL2Sdc=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ItahqO6lb2itWHBSxHvf8dYtWU6vzkX3XxWG/EU10FLBzlQYxKyTFwlbykOLUNP8FwntbWL8jFJwCetp6VGQz82e4PE0xia3TjmsoqVGS5/m8ADcd1DZSLMO2UWbAvCB0lApTcMFcfRx6UcNuEjJrUroAMabrZYnBeO6eE8OZF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KCybjNwF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B3354C43394;
+	 In-Reply-To:To:Cc; b=deg542mkiz/WGltmgh0/W4syVYK5Q/tmEs5NsWBI4nk7CZ84YSs7EaM0Puvg85Tspf1TX4nLC5/Ayu7cL051Evm1TiYCrXdRso+V6f0t1UkExJIeQHxRsfFMnG2YTDzk0dHcdun7LiZoMJvwvMDomBdjPPOIgXPT8hNnlBc/Eaw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ekh67TvR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BD1F8C43399;
 	Mon, 11 Mar 2024 23:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1710199231;
-	bh=/SfPJdQLLpKy4wOW1GxWa5+tTB7sghSqtQujy4vtbq0=;
+	bh=kNjFZaVSzFXIHWXCnW5npiWMUPAOcU1WoSstQFL2Sdc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KCybjNwF7Gn0mJVZZaXAIQq5RXZLm8oglHmJZVvtsNleZcGXS6Xn9WBnfUuhYwMHL
-	 IhtatKt9GdpfsAHXUk/C5tHm30vaIKCDJEqqgQifNoEbHJ4ie+vWeWOpKrAUNbeKvO
-	 amG+3zDoZKzAw2FEehrTumEtpTZ18MvnmGdJr0nyOMnelMqfN+gVQ3VBdfjfLQZ8rN
-	 YUGjwhSnFDNY9OFTun0yyo7EySBnpiL3JXFGESSOstqao0NpUOYXoMDvIY96wwNAfo
-	 wBz8yNY9qjyRK/6nDTAkbzK+YUWZ6SqwWsXHNxdc29qnWg31YbYRVmGOtvuXlVIMRo
-	 0nqKiA8SfSoFw==
+	b=Ekh67TvRZbt3hyYsq6qhYjt5KW36bFlY7DPcsTnozf/Fr+bhH8oSdgP4OFXj+ocrJ
+	 uZocPORLiaJ9Uipst8622h02s48gFfszsEAswXVGZHkyJz2pzBqt7jMrOFMsPNP9/M
+	 sjQp1He2ed3MotCp/xvyGg4zgq18GX7wPfF0S3PMS36d/tp3+E/zUNePYOSp4sFWIN
+	 gjj7i4ZKDWHfXQFYR1lwoMFxKmhSqfo54WBHq0rAiVMusg8KTxlySGeiAlFg04b06Z
+	 nB6sjT7dHdYHZR9xzvyU9X0LjG9uTm45BsaireCTgEF754+CNpQyjiRX8nZCYgUZuC
+	 cPRyeP+wEeO2A==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9C956D95055;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A4621C39563;
 	Mon, 11 Mar 2024 23:20:31 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v4 net-next] ptp: Move from simple ida to xarray
+Subject: Re: [PATCH v2 net-next] devlink: Add comments to use netlink gen tool
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171019923163.27198.3435432996838063390.git-patchwork-notify@kernel.org>
+ <171019923167.27198.682455526947159595.git-patchwork-notify@kernel.org>
 Date: Mon, 11 Mar 2024 23:20:31 +0000
-References: <20240311144730.1239594-1-kory.maincent@bootlin.com>
-In-Reply-To: <20240311144730.1239594-1-kory.maincent@bootlin.com>
-To: =?utf-8?q?K=C3=B6ry_Maincent_=3Ckory=2Emaincent=40bootlin=2Ecom=3E?=@codeaurora.org
-Cc: kuba@kernel.org, horms@kernel.org, przemyslaw.kitszel@intel.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- thomas.petazzoni@bootlin.com, richardcochran@gmail.com
+References: <20240310145503.32721-1-witu@nvidia.com>
+In-Reply-To: <20240310145503.32721-1-witu@nvidia.com>
+To: William Tu <witu@nvidia.com>
+Cc: netdev@vger.kernel.org, jiri@nvidia.com, bodong@nvidia.com,
+ kuba@kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 11 Mar 2024 15:47:29 +0100 you wrote:
-> Move from simple ida to xarray for storing and loading the ptp_clock
-> pointer. This prepares support for future hardware timestamp selection by
-> being able to link the ptp clock index to its pointer.
+On Sun, 10 Mar 2024 16:55:03 +0200 you wrote:
+> Add the comment to remind people not to manually modify
+> the net/devlink/netlink_gen.c, but to use tools/net/ynl/ynl-regen.sh
+> to generate it.
 > 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: William Tu <witu@nvidia.com>
+> Suggested-by: Jiri Pirko <jiri@nvidia.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v4,net-next] ptp: Move from simple ida to xarray
-    https://git.kernel.org/netdev/net-next/c/f095fefacdd3
+  - [v2,net-next] devlink: Add comments to use netlink gen tool
+    https://git.kernel.org/netdev/net-next/c/eaf657f7adba
 
 You are awesome, thank you!
 -- 
