@@ -1,178 +1,132 @@
-Return-Path: <netdev+bounces-79192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92EF38783AE
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:31:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AC478783C5
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:34:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C46E41C21B16
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:31:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70C291C21B3C
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:34:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76ABF446D1;
-	Mon, 11 Mar 2024 15:19:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179EF481C7;
+	Mon, 11 Mar 2024 15:28:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iWKnN6KR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y1IfIw1V"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4375446B3
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 15:19:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D597F4436C;
+	Mon, 11 Mar 2024 15:28:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710170377; cv=none; b=Nn5VCAnO2/fDXKUQ6qM5F3nnOAMIlfEPwmcYQWDE61QmqP1wqi6omNT1YO7X0WS168HKV+84Tmz1yjskT0TFjxTYOSnxEZCmB+Q/gBDC4Wr2tOJ+aco5ujKGgiaCAN3bjLJCaxgRyz/7zHoAEMQaZzpm0EmWbuVxJarqWYRvOno=
+	t=1710170889; cv=none; b=aLOmtUj4BXT3cQ7prxDaHZJXh1ijux2Mngu6Y00V1YFZulgBkdzomofj2NcjnTZEM1GRtvfLu9iWRvvWBm0JJ6Atg4BKydeNhhRY7zM/1zdUfuj2AKihllsIXqnDWWSkULL+KwBtWLu6QFsBk4Rznbfqjbt2fsq/yogFEUyRCSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710170377; c=relaxed/simple;
-	bh=6purTBGXMSzgXgDUt3noQW//iEtgHnYwOwtaTihgO5U=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ueXJB6KGz1XLKDpng1OXml+lWI8eTFUS5DnFo05XU3CwK202wevMoqku6WsJ6qz82TOvlkoqJHBb40+SMJAZ6WDPHnJjrmTTlRieGdj9oEvhbtNs+RJvr7TNX8J5kCtSX4BKky5RzzhyFvEd3xArZj1JT1zrY8h2IvQ8231og48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iWKnN6KR; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710170374;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7WwvIiwXdQYZuIUIWyh9vmS2DWFC4qIuMLUdct0AxWw=;
-	b=iWKnN6KR+U7rwT8IR3DfFBiq4WsEbYZOKmguDrctIWhFkM0xiNwjWEy8bd0xhyjQrlMNFV
-	HqBOgvMzvRLGv88HQQxskVo02mzKKRiGwdGp0X8c7JGC4RzTiVokhHjx5GAiMaInZqqaiH
-	V3V7xvgNzsEMlAeYtldSMd4yQhTIQVw=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-144-nJ0954ixMZKGBcWIQmQ68A-1; Mon, 11 Mar 2024 11:19:33 -0400
-X-MC-Unique: nJ0954ixMZKGBcWIQmQ68A-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a462e4d8c44so57958166b.1
-        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 08:19:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710170371; x=1710775171;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7WwvIiwXdQYZuIUIWyh9vmS2DWFC4qIuMLUdct0AxWw=;
-        b=UqHruPVmILB0RbPWOfWbF0KWFxE72YrMDWYjHa05GHsZ1HOaQ+K/kk3cX3nVtG8BpL
-         0jH62VNvjZBSBFlQ5RJ+c5mI+ltWZTL/tM0DuVpSf86p4EegJeB5Vh+hIpx1fBx3O6yz
-         xzNhpe0WeXXRaz5CW5MVP7GQjH6z6Q67AYEdDrrEa2w5X8THE6Axep/l4VknQbHh4eVc
-         CnTZj3U2wVmRpy2TVnW3dp14D15khDbmfomPmgODokXZ1tJyJobRYPwjkknLKrWh/gQg
-         gD3qP3Ft9kailPRyFHIPAN4FqjrAwZ860U29IrTt+kU9i+Qd90wOVun9iJOYTVAEBku0
-         b7Rg==
-X-Forwarded-Encrypted: i=1; AJvYcCV2X5QcPHNJXfvo0yIQELAcNrW0cLwTE1knyLVGZlf95doL55uQq78VSsthtRgyNKKHWXfq1zcByDcGagiKtSM4fad4KgRG
-X-Gm-Message-State: AOJu0Yxe8YAnQMVYBDfy/BC6gWcRKov12gxgoqTFua+nuW4aTkYjUbxj
-	vTxE+BnWXecAFLYcEDk3Hcsj4gKYDnheMBJWyK4Gee5nJSS6WmpPmisb7G5LpZ0kKx+AmEhgksS
-	MOVMzgvSnye8cY+ZofDKP9heZhJ7aOaZfsX9IYfOr6+pZ5ThTYjdnP7bGDnFCYQ==
-X-Received: by 2002:a17:906:66ce:b0:a3e:d5ac:9995 with SMTP id k14-20020a17090666ce00b00a3ed5ac9995mr4131441ejp.59.1710170371674;
-        Mon, 11 Mar 2024 08:19:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGMpEjDw/QZvVMgViaMGK3VHe9J5FVW2b/sdnNQOFRhbckT6T3ow18it/xCh22vxdRPTjXofQ==
-X-Received: by 2002:a17:906:66ce:b0:a3e:d5ac:9995 with SMTP id k14-20020a17090666ce00b00a3ed5ac9995mr4131432ejp.59.1710170371345;
-        Mon, 11 Mar 2024 08:19:31 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id gc14-20020a170906c8ce00b00a4629cab2b9sm963969ejb.4.2024.03.11.08.19.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Mar 2024 08:19:30 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 98EFF112FA3B; Mon, 11 Mar 2024 16:19:29 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Antonio Quartulli <antonio@openvpn.net>, netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Sergey Ryazanov
- <ryazanov.s.a@gmail.com>, Paolo Abeni <pabeni@redhat.com>, Eric Dumazet
- <edumazet@google.com>
-Subject: Re: [PATCH net-next v2 08/22] ovpn: implement basic TX path (UDP)
-In-Reply-To: <0273cf51-fbca-453d-81da-777b9462ce3c@openvpn.net>
-References: <20240304150914.11444-1-antonio@openvpn.net>
- <20240304150914.11444-9-antonio@openvpn.net> <87ttlgrb86.fsf@toke.dk>
- <0273cf51-fbca-453d-81da-777b9462ce3c@openvpn.net>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Mon, 11 Mar 2024 16:19:29 +0100
-Message-ID: <87edcgre2m.fsf@toke.dk>
+	s=arc-20240116; t=1710170889; c=relaxed/simple;
+	bh=em3Se+P5Xrx+0GAaBd00VDrmf7quAlX2gF/aXmOjg44=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=B4PP2hE+a8EvM0TRX4g8NlfObo46QpLIG1bkTFQWuUKKI4FtU7xtaanmiXGQQ0o+9LYYeRLkJQBinl3rb8Qipo5WpfsDLJyh323qlEe0m4wTwCNrAJP07/r9PhZHjSZh2daywWF1GQT0U82f5URQq0PsBFKNPZBi/E8BlgqAK4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y1IfIw1V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78064C433F1;
+	Mon, 11 Mar 2024 15:28:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710170888;
+	bh=em3Se+P5Xrx+0GAaBd00VDrmf7quAlX2gF/aXmOjg44=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Y1IfIw1VUAO6yVnYWHqnM6x3qLyaUGPSZ3qSWE620X0mQMIuJc/CJN3QOYlILZZWD
+	 b6Ym8qqIc/7i/HhouTgEmCykq8SSfTLEji6qb2nwFoZe1po1trqNgZW5BuV7aJ0ANP
+	 mbCqfNiX6Wlasdg7uJBi7ybloBpi/5dwTWd7xVIsxF64eEIkb4N9rAbkvPUhNvfp0V
+	 IBixDJCT999m5RpBVCDuAF8XC3czA+d2QI+ff2ei0Xxj7638VxSgNWIOlW/CMjBvsU
+	 Gt48mLTWEp84D46PDDy3nKxyhe69K/9UoY9fWjE+nGVFqp1p71YVCt8js6brMJ3oL9
+	 hxet0uBW3DISQ==
+Message-ID: <afd248db-921f-4067-b917-a7ea3e807816@kernel.org>
+Date: Mon, 11 Mar 2024 16:28:01 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH AUTOSEL 6.7 14/23] selftests: mptcp: explicitly trigger
+ the listener diag code-path
+Content-Language: en-US
+To: Sasha Levin <sashal@kernel.org>, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Cc: Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jakub Kicinski <kuba@kernel.org>, martineau@kernel.org, davem@davemloft.net,
+ edumazet@google.com, shuah@kernel.org, netdev@vger.kernel.org,
+ mptcp@lists.linux.dev, linux-kselftest@vger.kernel.org
+References: <20240311151217.317068-1-sashal@kernel.org>
+ <20240311151217.317068-14-sashal@kernel.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20240311151217.317068-14-sashal@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Antonio Quartulli <antonio@openvpn.net> writes:
+Hi Sasha,
 
-> Hi Toke,
->
-> On 08/03/2024 16:31, Toke H=C3=B8iland-J=C3=B8rgensen wrote:
->> Antonio Quartulli <antonio@openvpn.net> writes:
->>=20
->>> +/* send skb to connected peer, if any */
->>> +static void ovpn_queue_skb(struct ovpn_struct *ovpn, struct sk_buff *s=
-kb, struct ovpn_peer *peer)
->>> +{
->>> +	int ret;
->>> +
->>> +	if (likely(!peer))
->>> +		/* retrieve peer serving the destination IP of this packet */
->>> +		peer =3D ovpn_peer_lookup_by_dst(ovpn, skb);
->>> +	if (unlikely(!peer)) {
->>> +		net_dbg_ratelimited("%s: no peer to send data to\n", ovpn->dev->name=
-);
->>> +		goto drop;
->>> +	}
->>> +
->>> +	ret =3D ptr_ring_produce_bh(&peer->tx_ring, skb);
->>> +	if (unlikely(ret < 0)) {
->>> +		net_err_ratelimited("%s: cannot queue packet to TX ring\n", peer->ov=
-pn->dev->name);
->>> +		goto drop;
->>> +	}
->>> +
->>> +	if (!queue_work(ovpn->crypto_wq, &peer->encrypt_work))
->>> +		ovpn_peer_put(peer);
->>> +
->>> +	return;
->>> +drop:
->>> +	if (peer)
->>> +		ovpn_peer_put(peer);
->>> +	kfree_skb_list(skb);
->>> +}
->>=20
->> So this puts packets on a per-peer 1024-packet FIFO queue with no
->> backpressure? That sounds like a pretty terrible bufferbloat situation.
->> Did you do any kind of latency-under-load testing of this, such as
->> running the RRUL test[0] through it?
->
-> Thanks for pointing this out.
->
-> Andrew Lunn just raised a similar point about these rings being=20
-> potential bufferbloat pitfalls.
->
-> And I totally agree.
->
-> I haven't performed any specific test, but I have already seen latency=20
-> bumping here and there under heavy load.
->
-> Andrew suggested at least reducing rings size to something like 128 and=20
-> then looking at BQL.
->
-> Do you have any hint as to what may make sense for a first=20
-> implementation, balancing complexity and good results?
+On 11/03/2024 16:11, Sasha Levin wrote:
+> From: Paolo Abeni <pabeni@redhat.com>
+> 
+> [ Upstream commit b4b51d36bbaa3ddb93b3e1ca3a1ef0aa629d6521 ]
 
-Hmm, I think BQL may actually be fairly straight forward to implement
-for this; if you just call netdev_tx_sent_queue() when the packet has
-been encrypted and sent on to the lower layer, the BQL algorithm should
-keep the ring buffer occupancy just at the level it needs to be to keep
-the encryption worker busy. I am not sure if there is some weird reason
-this won't work for something like this, but I can't think of any off
-the top of my head. And implementing this should be fairly simple (it's
-just a couple of function calls in the right places). As an example, see
-this commit adding it to the mvneta driver:
+Thank you for having backported this patch to v6.7 and v6.6 versions.
+But it looks like it depends on commit 9369777c2939 ("selftests: mptcp:
+add mptcp_lib_wait_local_port_listen") which is not in these versions.
 
-a29b6235560a ("net: mvneta: add BQL support")
+Because CIs will soon use the kselftests from the new v6.8, I think it
+is better to drop this patch from v6.7 and v6.6 versions.
 
-Not sure if some additional mechanism is needed to keep a bunch of
-encrypted packets from piling up in the physical device qdisc (after
-encryption), but that will be in addition, in that case.
-
--Toke
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
