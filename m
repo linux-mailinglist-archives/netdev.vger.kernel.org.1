@@ -1,240 +1,182 @@
-Return-Path: <netdev+bounces-79169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68D7987817B
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:17:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9036687817F
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:20:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5B1B1F236FB
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 14:17:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 08C351F2362B
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 14:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3255E3FBA8;
-	Mon, 11 Mar 2024 14:17:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 741893FBAD;
+	Mon, 11 Mar 2024 14:20:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lYy4ESWZ"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0hm4noYM";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YzdGOfXf";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="0hm4noYM";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="YzdGOfXf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4653E3FB2E;
-	Mon, 11 Mar 2024 14:17:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.9
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710166649; cv=fail; b=X6cpehle4P2BpGrG6vUaF6Gvnn/ezgVPYljBPlcoQimveVj62xJAlLCDqF/SONQqP53pBfMKEsaCB+uX8rOJcpsXCPJAhlwHZ9pCfBx86f0AaDBBIwo4RCsgRwZeJEpI7YovXaEFGWyKePHMg2OAjROlVgo9z9daJDaTh2Ok1vU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710166649; c=relaxed/simple;
-	bh=PR5aA3TGQzSKZfg8QT2Go5+/eP4dRLDBN/E45P5Ck7g=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=eGx/VoRvfooXvhobFbJCtEq6O5P4pmbyjm+6H0UCa0Bf2nQP0N7Tl+JqoWNnjCtB4jQoNNTFUqz676MzxTrZ5u+SqZs3kHpAEXvE+vktO5CLQ6jGZBoF4zWqGFNeG2ay4DbG1KCvZqdE+ZQNf8jUKK/vLrjzh71LwHaeqBrnS48=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lYy4ESWZ; arc=fail smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710166647; x=1741702647;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=PR5aA3TGQzSKZfg8QT2Go5+/eP4dRLDBN/E45P5Ck7g=;
-  b=lYy4ESWZxd6jdzwi2Qc7U9ePVwz8IgDfHdnityhGCBh0TA8MQ60EaIkm
-   b+4bHtHtjxGSr+agHpNHakd0qvM+MuU/cU+VxmQVpNVfxYpQv3qKwFT5n
-   e8gElB7Y6FETuEBz+iyeC0/kXJkwif3v/mlfZmSDqfE3609U3ivGuGboW
-   NhcovdPE1AebrxNc4DIRNRG5PaYxfkjswuVDV08yBw/D2XJPaiKvyblvp
-   j0u/xAHR0b6oiSbGd6JSw2z73om/+FObmljFlrE8QPhC0P4LVldCDRpuY
-   wHLZzEbBmsgw48lp6BZ/677+LVJUAx0xd00Zfb8CgospBzIYu6DgJrYX7
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11009"; a="15561158"
-X-IronPort-AV: E=Sophos;i="6.07,116,1708416000"; 
-   d="scan'208";a="15561158"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 07:17:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,116,1708416000"; 
-   d="scan'208";a="42101865"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Mar 2024 07:17:26 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 11 Mar 2024 07:17:25 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 11 Mar 2024 07:17:25 -0700
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 11 Mar 2024 07:17:25 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=h/fWIq6LDMGYRbu22P9NlTkuIiFurgIqb3W2Uj4t+N7UCu6D95UlsGq8/9xOWH0PxG4AZE9b3x/1+ktW7SfM96wqaZHJh+ubsO6IiuEts1F8OktE7vqQOAB+DNAqNfH+PgynE28yQ7TwmIfqjdsYZ4Zkqp93jn0Hcwdphg2eckOvpeLFwX4j3jc65qELIAOeftjHjX0EH9wVQ8j3SQa5/03nPj+0d+vriAfAYT6nNoUz8Dx0ucZmxswipzOUnufSrOwdozOVrr6vqsrvu165uPuMf7WqffI+HfzNxmrDDzdvfWJGSIOvJtUB9QDUEfhJczWXeZYfJoqW0dRVnInWnw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/vERb4ExLECwaIJ0ARO70+SMd21Q3SU2kbQwjX2+1l8=;
- b=lk5n0iIkpU8sAhVFlOb2+epBU1jnqR8ShXaf7RzZKWTcct0X3QCgDzgiqxoapm+Znf6d5x1ZDv9Kc7oAo8qB4JhXoJzOEG8SwC2BZXqXaApHis5wKh/3FoFplNW66gZz+uN0k9DUxP2uCwlv/glx5HVb10RBQ2dnc6tgdbFTe7DAYRrPpENyjCEsWXF+WvKzd6bp0tY0eOuWSbRl3XuKBih87cAvbDr7pPyfF4ZNvanLQEUk5JFRqV/U4j8gFg38oFChHBvy5jIvaqE9smcICKQK0ZGC7SW/YTfmdjPoxZSuMR8yvUFGPKR+Nbvl2RPnZ9WtYB9Ia4welgqr6B90iA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by SJ1PR11MB6156.namprd11.prod.outlook.com (2603:10b6:a03:45d::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.16; Mon, 11 Mar
- 2024 14:17:22 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::618b:b1ee:1f99:76ea]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::618b:b1ee:1f99:76ea%5]) with mapi id 15.20.7386.015; Mon, 11 Mar 2024
- 14:17:22 +0000
-Message-ID: <43b0b4ad-69ac-450f-8b39-ae264355622e@intel.com>
-Date: Mon, 11 Mar 2024 15:17:15 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 net-next] ptp: Move from simple ida to xarray
-Content-Language: en-US
-To: Kory Maincent <kory.maincent@bootlin.com>, Jakub Kicinski
-	<kuba@kernel.org>, Simon Horman <horms@kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-CC: <thomas.petazzoni@bootlin.com>, Richard Cochran <richardcochran@gmail.com>
-References: <20240311135949.1180157-1-kory.maincent@bootlin.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20240311135949.1180157-1-kory.maincent@bootlin.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0377.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:f7::13) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76D63D993
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 14:20:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710166837; cv=none; b=KSyIyOb/tpLI+fwrqvZMApPXQHLFwNi3QzZvt46/1+totj4/lYzHJ3j8kH/xoyaOv/bgQQ7jQadi+iy26++zRsFb65lbsALsH9cuXb8Fs5tqNr9zzqjJDIeMrziqOrKk9CnugEXT6qbZwmFk754/X27SmY1kNtz1+uX1CDtKAxc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710166837; c=relaxed/simple;
+	bh=hXWNF0GxhRMKCxdZ2uE0LU72vRNOJwOImsi6K2omx7Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I1ptj1er8eZYV7Zy+LzA0QKO84DwCkk4l+OLxEFZftAahpBMg1brz8Od+NaHI/KM4t6KKWfexQ1WtZbOPjM7Jqtfps0Od7ZTkPQo0I1t00g/FUEKCH5vgCsDmgkf2rpVn8hAspQZO4HuAeHQFXYTXAvj+Wmc93yglkHLZAYwH8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0hm4noYM; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YzdGOfXf; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=0hm4noYM; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=YzdGOfXf; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id D601334D30;
+	Mon, 11 Mar 2024 14:20:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1710166832; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CM2pCHrQdr3+5aEgD55FdaZHO6j7BGKnuPcYF6cJMCk=;
+	b=0hm4noYMzg+o9SYnyZfB7aCObdYihvVggg0Bp2EjA+tsJact+y9UuKHQK79Jl3fbJvBjPm
+	eWjQjD2qOstaEbHYhW1/pHC89JEK1uq3XZz1N/LgbolWusRmhDHTqohXJezuyXCyIjCl2e
+	2pYvO6ygo2O3U/2cEuxQSUYIqsQhcrI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1710166832;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CM2pCHrQdr3+5aEgD55FdaZHO6j7BGKnuPcYF6cJMCk=;
+	b=YzdGOfXfQUtRRjEUNk84xnJVlBOKSsUHPRMbtn5drgv/zrHPw8cvxxlkdTQneA0+w7kWuA
+	mKCb57h8sP0P1WAA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1710166832; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CM2pCHrQdr3+5aEgD55FdaZHO6j7BGKnuPcYF6cJMCk=;
+	b=0hm4noYMzg+o9SYnyZfB7aCObdYihvVggg0Bp2EjA+tsJact+y9UuKHQK79Jl3fbJvBjPm
+	eWjQjD2qOstaEbHYhW1/pHC89JEK1uq3XZz1N/LgbolWusRmhDHTqohXJezuyXCyIjCl2e
+	2pYvO6ygo2O3U/2cEuxQSUYIqsQhcrI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1710166832;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=CM2pCHrQdr3+5aEgD55FdaZHO6j7BGKnuPcYF6cJMCk=;
+	b=YzdGOfXfQUtRRjEUNk84xnJVlBOKSsUHPRMbtn5drgv/zrHPw8cvxxlkdTQneA0+w7kWuA
+	mKCb57h8sP0P1WAA==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7979D136BA;
+	Mon, 11 Mar 2024 14:20:32 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id qQkFGjAT72V2aQAAD6G6ig
+	(envelope-from <dkirjanov@suse.de>); Mon, 11 Mar 2024 14:20:32 +0000
+Message-ID: <4c58ab4f-e1c8-4267-a4ba-518986d03125@suse.de>
+Date: Mon, 11 Mar 2024 17:20:31 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SJ1PR11MB6156:EE_
-X-MS-Office365-Filtering-Correlation-Id: a85e017b-5e6f-477d-65d0-08dc41d5f7db
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: UbivDJ1KLuOkMtN9yKTEGyVHDMw3Mc92BN038qsMWggm7xh7QUiYuckGTpL44AaJLVVgkKSFxoDawKsYu5KkxoNcZGHBhRH8/IzJ8HSySlGX/+myl7DxQiVkCAsrHmcHiKtTCslfjHnYXjU34Lxpk+uOek1FfdZyBZeB3sa9HZQVw6zun7ng9B8r5uzuY9lPdZP3z8tQIrK/KWRWu1Hq0kPB4nq8dpjvk0aCML11ILikasxGKrsb1/Jx208UryKmMApIPlxUnOpc9XBZtdtILkS3vCHOgrnOBPTRkVaZ6dBD2topOnrwZokCWsuSrpRiG8LCw2LnmyYrBnqcHDNuSDeq5kRMCYkCOYyKfhZ3SrYOW8ya/JUvNWJuudJ5qvMX2xDh/i+Zc4rPqPDEfA/mgokFAq9ZblZtiUKJmHZzdxhFtrfNp72dsQkj0GXkXB0AaY2AaUrglo+iup9AdUaZcG1J6+ZTPpyCWRc1F6Yl3D5r/RP9N6DoyDi/oAnAJ0T+2NlrJwr0fIOADVKhx6Iow5XMysSgQzZI1O9V9bl63UckOcp9hAoIqC3nzDHw5zTKHzXLESCpHWpddXtJw2IsNTZwil+FBDSsCPucGMCNKNXzNyu+tBRVwwBJv7D/ZtD8hYDzeajcCEwpWRJIpGsoZQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eDFNZkxTUkRkUFRwc0R1QXYzclRxdm1WSzdTcHFVTUtpTEFMME5zSEJLWGpw?=
- =?utf-8?B?S1dac3VXSGpNVGNESjZ1a1V5Z293NVVBdU42SldhNGw5NVFTYXhIb3UvQWg0?=
- =?utf-8?B?ankrQVZWdEdIQkl1V0RPcEhjTjVtclVEZUlqYmpKSnpVQzRQcXVQd2tmN0to?=
- =?utf-8?B?cUZUKzFBZVJjVldMZmlwMVlGT29EVmJTSTJQZytDTlNrL3VsbnBESUozQnRq?=
- =?utf-8?B?K2hibGVOUittUm03eXFjc0JKNlRRM0NaRmh5ZTF2bDlvMitNdE5Gc1o3Nm5E?=
- =?utf-8?B?N0QvQThGZTJzRlp4aXBXdTQyVVNhamRrVnJ5K3QzbDJ1V0ZpMG5EWE1GOFZ3?=
- =?utf-8?B?YXpISCt4Wmp6UUtjbkpsalVWVEdGUnIzcDE4UVgwOERFWTViREVxVVVadHlz?=
- =?utf-8?B?SEd5N1ltWVh5eGU1M0V0cERobTVPUDY5QitVNnBubTBPYThjZlUzSStHeHov?=
- =?utf-8?B?NEZ1N240QnBjSXBpTlhITE5Ka05oT3dhOEszc09RTlBubVdPOXRmUGl3bzRz?=
- =?utf-8?B?RXpVajFGbXV0WXpWaXFTczZxWWxCUkVkVFkxQlloN2R3Ni9HQkI1YW93SnNT?=
- =?utf-8?B?Nml1bWFTYzl2Mkx0aFIyb0psQVFiTERYb2dYWjdCanFLbDBCT25GcmgrVk13?=
- =?utf-8?B?a0NRcjkvNStUalIrTnE3eXM2dDQrSDk2T05pWGZMRjlTdE5XOVVFQWlkSnpl?=
- =?utf-8?B?UUNhRFJCL1duQkJ0MTJPUHE3VXBsSm1XbVB4T25oL2hHM0xkKzZQNGludkVY?=
- =?utf-8?B?RkNNdTdlQ1VYTGtiOXNCNGR4ZlZKK0pQcmZnODVMNDFoQXhiWVlESEZDTDhn?=
- =?utf-8?B?LzV3azNHUDZWTTNiL3RVaHFPbkl0TUdkNTVvWTJjdjI5Mnd5SGc1bW41aGdo?=
- =?utf-8?B?ZDNMMGVNOUJ6bEppZm1YaU43K0c5RXlhRTZRd09JaUZKL1h0a3dvblcrRmZm?=
- =?utf-8?B?UXB6VVB0Z3VYM09BZk1lbVB0dVZudnMxRHVQdGdOblh0WFpIM2pqMXp5bVdO?=
- =?utf-8?B?eE1FYjN2T05lVGtxcnhVTmlEN1Zzc0lDZ1ZaS2s2SVdnSEdVcVorMW50ZHFh?=
- =?utf-8?B?V3NWL1pSNVEvbHJCZlREME52djJrcnpKU2lMZVM4RDFydXBzWGVDWkVEUFlx?=
- =?utf-8?B?eFBrZFJhdUk0K0pFU2ZQNVRzVm44Zk5Na1dBck5ZR1hqQS9DYXZPdDRHb05B?=
- =?utf-8?B?d0hnUlFibXFkREtLUUc2aVE1bmRPS2ZSQnlLejc3UmtnZC9RdkpkUkpZazFK?=
- =?utf-8?B?ZFRuVUJLb3p1dTYvM0pVbTV3TzIzZytuNzZINlgyWVNUSnpzMnJHTkl0SDhu?=
- =?utf-8?B?RHJ6M0xoUllYQ3MvUVpZSGxyRTJIdVVkNjZrZUJhLzFWOXY1cHp4ODNkUTEr?=
- =?utf-8?B?cVBrbkRXS1VTZkFuL3JpVm5Galh3eEV2K1d4UnUwbnYxK3EvVWtldzZFVnhk?=
- =?utf-8?B?Wno2UndTNVB3bUR4Z0lXYzJWbHdWQWJHVzlXTlh3QlVlNG1WZDQ1b3VQMmIw?=
- =?utf-8?B?T0NXSUdvb0ttN0lUL1VEd1NJUzIrNWJ4cFQ5TE1SLzJuNFl3UUFUTW82WFVK?=
- =?utf-8?B?MVRGQmhDRTliWDhtMFN3OVNyeHdpanhyOWRVczg3a1l0S1RBSWpOSUdLQThk?=
- =?utf-8?B?WVd4ZXlzeXBFS2l4WVV2eUxzbXhyZThqQjB4dWNlS0E3cTkvcWU0QkI5N1ox?=
- =?utf-8?B?YjZRanFDN0Q0cm90bzA0a2M0d1BUZVVLb0dZWkhnQ2FwSmRXcXF1amFYMUJs?=
- =?utf-8?B?TlpuZXJjNUZFb2FWb0YxNHRyOXl0Q0lPNEEwNitRemhNYmJUbmtLMFR1Wi93?=
- =?utf-8?B?akxZWnlEeVhSbUtXUE9hZ291SUovb0tEbEhnN3lIRnF6dWd2dlVsMWFJa1ZK?=
- =?utf-8?B?QkpoNTRzcTZhQnJqTUJ5ZmVkRUgwNW1rU0hyRDhPeWJhOVpYL1kyUVFKUEpi?=
- =?utf-8?B?TUNkRXpUWDVqZ0kxZFE0THNDU1k5M09ZM05NMDNOVzRWMFJuZFNsUUdyNWJ5?=
- =?utf-8?B?bk9IM3J4RW5zaC8zWnFQRmd2VkljZ2dHZW82UHdibE5oWEcrQkJnbW5WZkVq?=
- =?utf-8?B?eXZncTFCTnJvZXdEUURZU0tCK2lwcmFzV0J5N1hGdnBTbnJUVVpDL2F0dWNw?=
- =?utf-8?B?dXBPUDc0QTVwbkhVR3JydGRxUWN1KzNCRFExZ1B2QU9WeHBYS003S0xIMmhO?=
- =?utf-8?Q?Cd2dRE/X5afFSPOAE/uD7KM=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a85e017b-5e6f-477d-65d0-08dc41d5f7db
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2024 14:17:22.2663
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uKxwzVJiz4VNx3Rxm2krhRM6eZZSr/jSZMuXvSlbGPsBZznYIlWcoCMMc6VtPeAI/YOtXrgx1JD16g2E/QlZeOTB/gmy1eS+W6D5NJEKfGo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6156
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next] ss: fix the compiler warning
+Content-Language: en-US
+To: David Ahern <dsahern@kernel.org>, Denis Kirjanov <kirjanov@gmail.com>,
+ stephen@networkplumber.org
+Cc: netdev@vger.kernel.org
+References: <20240307105327.2559-1-dkirjanov@suse.de>
+ <cd48d41f-b9ee-4906-a806-760284a3eeb4@kernel.org>
+From: Denis Kirjanov <dkirjanov@suse.de>
+In-Reply-To: <cd48d41f-b9ee-4906-a806-760284a3eeb4@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -1.42
+X-Spamd-Result: default: False [-1.42 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 RCPT_COUNT_THREE(0.00)[4];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 TO_DN_SOME(0.00)[];
+	 BAYES_HAM(-0.13)[67.47%];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[gnu.org:url,suse.de:email];
+	 FREEMAIL_TO(0.00)[kernel.org,gmail.com,networkplumber.org];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Flag: NO
 
-On 3/11/24 14:59, Kory Maincent wrote:
-> Move from simple ida to xarray for storing and loading the ptp_clock
-> pointer. This prepares support for future hardware timestamp selection by
-> being able to link the ptp clock index to its pointer.
+
+
+On 3/9/24 21:22, David Ahern wrote:
+> On 3/7/24 3:53 AM, Denis Kirjanov wrote:
+>> the patch fixes the following compiler warning:
+>>
+>> ss.c:1064:53: warning: format string is not a string literal [-Wformat-nonliteral]
+>>         len = vsnprintf(pos, buf_chunk_avail(buffer.tail), fmt, _args);
+>>                                                            ^~~
+>> 1 warning generated.
+>>     LINK     ss
+>>
+>> Fixes: e3ecf0485 ("ss: pretty-print BPF socket-local storage")
+>> Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
+>> ---
+>>  misc/ss.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>>
+>> diff --git a/misc/ss.c b/misc/ss.c
+>> index 87008d7c..038905f3 100644
+>> --- a/misc/ss.c
+>> +++ b/misc/ss.c
+>> @@ -1042,6 +1042,7 @@ static int buf_update(int len)
+>>  }
+>>  
+>>  /* Append content to buffer as part of the current field */
+>> +__attribute__((format(printf, 1, 0)))
+>>  static void vout(const char *fmt, va_list args)
+>>  {
+>>  	struct column *f = current_field;
 > 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> ---
+> The error message does not align with the change - and it does not fix
+> the warning.
+
+since vout is not a variadic arguments function I put 0 into the 3rd argument since we 
+already have a check in out function.
+doc[0] states that:
+"For functions where the arguments are not available to be checked (such as vprintf),
+specify the third parameter as zero. 
+In this case the compiler only checks the format string for consistency." 
+
+[0]: https://gcc.gnu.org/onlinedocs/gcc/Common-Function-Attributes.html
 > 
-> Change in v2:
-> - Update an err value missing.
+> pw-bot: cr
 > 
-> Change in v3:
-> - Refactor err management.
-> ---
->   drivers/ptp/ptp_clock.c | 28 ++++++++++++++++------------
->   1 file changed, 16 insertions(+), 12 deletions(-)
-> 
-
-sorry for not commenting more on v2 :/
-
-As you change (the intent of*) underlying data structure you should also 
-change included header file.
-
-*ida is an xarray wrapper by now so the change is on semantic level only
-
-> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-> index 3aaf1a3430c5..8eebf1373ca3 100644
-> --- a/drivers/ptp/ptp_clock.c
-> +++ b/drivers/ptp/ptp_clock.c
-> @@ -31,7 +31,7 @@ struct class *ptp_class;
->   
->   static dev_t ptp_devt;
->   
-> -static DEFINE_IDA(ptp_clocks_map);
-> +static DEFINE_XARRAY_ALLOC(ptp_clocks_map);
->   
->   /* time stamp event queue operations */
->   
-> @@ -201,7 +201,7 @@ static void ptp_clock_release(struct device *dev)
->   	bitmap_free(tsevq->mask);
->   	kfree(tsevq);
->   	debugfs_remove(ptp->debugfs_root);
-> -	ida_free(&ptp_clocks_map, ptp->index);
-> +	xa_erase(&ptp_clocks_map, ptp->index);
->   	kfree(ptp);
->   }
->   
-> @@ -241,16 +241,16 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
->   		return ERR_PTR(-EINVAL);
->   
->   	/* Initialize a clock structure. */
-> -	err = -ENOMEM;
-
-you could remove 0-init of err in this commit too
-
->   	ptp = kzalloc(sizeof(struct ptp_clock), GFP_KERNEL);
-> -	if (ptp == NULL)
-> +	if (!ptp) {
-> +		err = -ENOMEM;
->   		goto no_memory;
-> +	}
->   
-
-[snip]
-
-Thanks a lot!
-Only nitpicks left, so:
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-
 
