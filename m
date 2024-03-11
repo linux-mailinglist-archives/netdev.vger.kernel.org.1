@@ -1,70 +1,71 @@
-Return-Path: <netdev+bounces-79107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0B06877D1B
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 10:43:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8666D877D1F
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 10:43:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4471A281C55
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 09:43:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B60CC1C21090
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 09:43:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91FBC182CF;
-	Mon, 11 Mar 2024 09:43:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD76518659;
+	Mon, 11 Mar 2024 09:43:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA2317578;
-	Mon, 11 Mar 2024 09:43:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DD8617BA1;
+	Mon, 11 Mar 2024 09:43:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710150200; cv=none; b=I1LoDMYP03jvHGgzOCRDHHx9rW+qybloOsKw0fkCuGECudYgioHddSIRhEeAKiQsQD8ck0SYJqYSY30jnsGUrWK4or44TLOpqdCPV1ZLnITZepu+RAQr9WD2pDADF8Mq3TyulHyPY/2wNBIUXkdxu2JxbIwqRRU37CrUMOR2ZNM=
+	t=1710150216; cv=none; b=KR7jCYUilwQbGpmbERLTqErcI/KSxp6Y9bJGZ6N6/Aa3IAy4N/I7PE7eaOzsbU8+G0LDhTo2A7l6Pl/2N7SVofpVIetY4HyFx+ETTPHdj6AXUI3BwVu/dFKTbwW6/fC/1A/W0cZT6g6zNfx8ZAIjNcrGhlbd5d26mq66P9jY0zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710150200; c=relaxed/simple;
-	bh=ntKFM4IAn00AoGiPHpx0tEZsUtien5xXsLMyxO2C2Qs=;
+	s=arc-20240116; t=1710150216; c=relaxed/simple;
+	bh=Cj1/33qi3GNppvfePk5/WIg6MglQ7s/hn6w2TWXaCa0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ELhbYIuhN0zVzpl+QZDRLu/zmHcaSyrDDlv2LHca8EseDoHNVQ7YRfF7F/GPBkQ7aGp3PDwemr82d4TNtObF7+8YirVdwjkVFVnEVj2mPQIRTWO75uYKDQUp2RIHYOl2w7OVDMdhIqvp/lJHWZjsyUWqHGHWNAHMltiG7PyYJko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
+	 Content-Type:Content-Disposition:In-Reply-To; b=g99ZcHdrQ1fgGIN4ioKqSw9Sw5HZy08yJA50G3I2UVTkvdJLA0G5GIDWw5itxvzGir6LLkV+bfZklf5h4qDCWE9PgQeS4jXn5Y2ApscNIPcZ4OZSxajoxo0VYR07HN4+f6N6cDIlOQrTuD/hi17kJg0QhmahzA73CsubxbgUe4o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a45fd0a0980so199977366b.2;
-        Mon, 11 Mar 2024 02:43:18 -0700 (PDT)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-55a179f5fa1so5418596a12.0;
+        Mon, 11 Mar 2024 02:43:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710150197; x=1710754997;
+        d=1e100.net; s=20230601; t=1710150213; x=1710755013;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OSyrdXqp3jtgY6jvF/E2QaWM25cbVZ+h2KPhZvu2LP4=;
-        b=PrkKnFMJVgYdhjtK2G5h/bmOY4USE1QDuXnPi3Ki6FOkGHL99EM7B8IBg/ZftzliOg
-         zA4DDNMRkWU4RszCZh86YgGykiGuuUO5qf9g3fJ7ytZJEXqCQcudV/UmphTNiaLvTYZf
-         tCTr0+qPnV67B/53ENiCkrZDD1z7TwTY8MKrBwabFs+QAMsEPMoxgEibMxNql4VOa+Gn
-         TWjh70/RG8ugUCAar2tVEyxA6NvH+YYWeNVmtGuLBF7oL4ABzPdCvj64Zugannyxecfl
-         Bu2uhH0PWHpV3tXsPpzRBngGp2ukkWsircg4TszeqfykigoZaAgC6NxjHjO622jbXSIb
-         QouQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUA1HPwMwo+2hZ17aeq4qX+Gy/qXWwc+W6qC6VT4kIgQvon8r6TFPCZ9oo0mNOGJ5FiSXPYq3Q2yVLWeyx0Wlz2NPGHsa4RzNruAg5+S5MmadPdlSJy/lJr2nWURv3AKvgG3kw1ON5RfNE4A4xR6nF1Ea8RgtTgIk3MtIECWJiQ
-X-Gm-Message-State: AOJu0YxSoguUXit123BKrePJLS2VpsVyNaSVZkH88YSw62+5VDrs8c4B
-	NO6W/EikBGQWT0biMY8L4s2ZH0TT3qqIsOhFcUmyqnSVhuLsN9Jj
-X-Google-Smtp-Source: AGHT+IF6mW6mi/T1LUxRvaBKxnf41VSHh5CktQtafSrWqGE0tuEakBbKqJRCognliCboXprZYrQimQ==
-X-Received: by 2002:a17:907:97d0:b0:a46:2c70:2226 with SMTP id js16-20020a17090797d000b00a462c702226mr1178381ejc.56.1710150196726;
-        Mon, 11 Mar 2024 02:43:16 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
-        by smtp.gmail.com with ESMTPSA id se13-20020a170906ce4d00b00a45a8c4edb4sm2676520ejb.48.2024.03.11.02.43.15
+        bh=472ntTQJuYHJsEv7z4LlYOPd8nn+YNyDn677YGOjcrw=;
+        b=LDaEYMD0xQn2ZkfaaaLF77i4UMP4QqTTrTBGZSivZRaqz9VCLuUF9we5K+mRzNLt2B
+         o6ASW+fCGQ37EqlGOAYktQ7rQ2es64iHndTp7tc6EWEPOBeyC9wuZewV8L1v1WFLlkgQ
+         WKjbXtZZJSUCGM2ketWTXpTKCGGsYbTSmwbqUGxPJRiKM554yJ8ky3GM4PAEuKsttt5E
+         h2ToJemH5St0fqUdK2IYR0uMv1gIrfR3XmQdI5AogYUOyUcYVbThTwx9LA9BEW9KgO+J
+         IXR/VaNhtDMrMjNu2v7l/FDNXFUR4rcZPWVusA9X9tEgKyglMOe/KF4AY4NSz7HkRlWc
+         ko9Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUH0NHQ1rIcDoIqOS7gfMs+euKR8gByHV9gCLz1dGTI47JHHorNlSiFQ5sdZdoyGZZTPxIjHTq+Cf44fniBNFLlwuHoToP371XJk0vXLQPfO5vXmA59NaDEaRN1FSNYSqvuBrD/1rqjCe/9fCRCjYaILzRfikkxgqfUdald08wV
+X-Gm-Message-State: AOJu0YzyqV5fAbYZqvN1yQI7mZjpIgJDfJHXVzeCvtNouirIdFLbErXs
+	T+uH4eAonw5MJtmIEc5XuSXw+0HQy+AEfydCTSCgQ8XGu8W4kLh3
+X-Google-Smtp-Source: AGHT+IFL91Hb14rmPEw8qOSXIsU1i6Gvi/0AB+QZUtjciiVtlXuLkNKojNel443SysQ5aGIG2Z5oPw==
+X-Received: by 2002:a17:906:a14c:b0:a3d:4ed8:f5bf with SMTP id bu12-20020a170906a14c00b00a3d4ed8f5bfmr3349896ejb.2.1710150213303;
+        Mon, 11 Mar 2024 02:43:33 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-004.fbsv.net. [2a03:2880:30ff:4::face:b00c])
+        by smtp.gmail.com with ESMTPSA id e3-20020a170906314300b00a4558314ea0sm2739025eje.15.2024.03.11.02.43.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Mar 2024 02:43:16 -0700 (PDT)
-Date: Mon, 11 Mar 2024 02:43:12 -0700
+        Mon, 11 Mar 2024 02:43:33 -0700 (PDT)
+Date: Mon, 11 Mar 2024 02:43:30 -0700
 From: Breno Leitao <leitao@debian.org>
-To: Matthew Wood <thepacketgeek@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Matthew Wood <thepacketgeek@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
 	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
 	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH net-next v4] net: netconsole: Add continuation line
  prefix to userdata messages
-Message-ID: <Ze7SMBzfaNP41xcO@gmail.com>
+Message-ID: <Ze7SQlSOxLd+cOPA@gmail.com>
 References: <20240308002525.248672-1-thepacketgeek@gmail.com>
+ <20240308201728.59e2e0ff@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,39 +74,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240308002525.248672-1-thepacketgeek@gmail.com>
+In-Reply-To: <20240308201728.59e2e0ff@kernel.org>
 
-On Thu, Mar 07, 2024 at 04:25:24PM -0800, Matthew Wood wrote:
-> Add a space (' ') prefix to every userdata line to match docs for
-> dev-kmsg. To account for this extra character in each userdata entry,
-> reduce userdata entry names (directory name) from 54 characters to 53.
+On Fri, Mar 08, 2024 at 08:17:28PM -0800, Jakub Kicinski wrote:
+> On Thu,  7 Mar 2024 16:25:24 -0800 Matthew Wood wrote:
+> > Fixes: df03f830d099 ("net: netconsole: cache userdata formatted string in netconsole_target")
+> > Signed-off-by: Matthew Wood <thepacketgeek@gmail.com>
 > 
-> According to the dev-kmsg docs, a space is used for subsequent lines to
-> mark them as continuation lines.
-> 
-> > A line starting with ' ', is a continuation line, adding
-> > key/value pairs to the log message, which provide the machine
-> > readable context of the message, for reliable processing in
-> > userspace.
-> 
-> Testing for this patch::
-> 
->  cd /sys/kernel/config/netconsole && mkdir cmdline0
->  cd cmdline0
->  mkdir userdata/test && echo "hello" > userdata/test/value
->  mkdir userdata/test2 && echo "hello2" > userdata/test2/value
->  echo "message" > /dev/kmsg
-> 
-> Outputs::
-> 
->  6.8.0-rc5-virtme,12,493,231373579,-;message
->   test=hello
->   test2=hello2
-> 
-> And I confirmed all testing works as expected from the original patchset
-> 
-> Fixes: df03f830d099 ("net: netconsole: cache userdata formatted string in netconsole_target")
-> Signed-off-by: Matthew Wood <thepacketgeek@gmail.com>
+> Breno, LG?
 
-Reviewed-by: Breno Leitao <leitao@debian.rog>
+Yes, I've just added my "Reviwed-by"
 
