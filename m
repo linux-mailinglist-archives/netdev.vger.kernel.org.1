@@ -1,53 +1,56 @@
-Return-Path: <netdev+bounces-79081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF2FB877C7E
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 10:20:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FB31877C81
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 10:20:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D3D61C20506
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 09:20:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3584B20A7A
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 09:20:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C671314291;
-	Mon, 11 Mar 2024 09:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F398415AF6;
+	Mon, 11 Mar 2024 09:20:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ImhaLKh/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bqVmI5x8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A275B14F86
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 09:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE39B14296
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 09:20:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710148805; cv=none; b=g51UaTZI3UHoZHoc9UszwXhusNmPseFHRLgjtWYqlD0MGY4von6WD+O6DxT1uWoExKt7myFfD0bV9x2lZfLg7Am/WaACPh1a0ObA742EkpRcIwZ9sGVD+2H9QgQwUbT4G0ZWesto4AUTIivvwhgObgkOpSOk7GXMCYN4u0mL8cg=
+	t=1710148843; cv=none; b=XZMvn0OwSm450tbUZBhnhbD45of9pP9tigApTG2rgshMqO6BXUBw9su1Wx67pxySrXml1oGIqb9K+4g5wifXiNwbrKCY+JpHorVOZjcyjtb6WxdYXBxAfUD69Uo9r+EGsxr8a3dCRdbZocSKgX3RjDrzi7hB/qRoke6ALLRd7GM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710148805; c=relaxed/simple;
-	bh=1ZiMUTyyeo0Z2XlLdCasELZ6tHnvHUQMcSQALkw8vsU=;
+	s=arc-20240116; t=1710148843; c=relaxed/simple;
+	bh=qxi5+TOjcyya8fuII4LhWu35JwnGT9JmbLofTAmXndA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n2PTw708lkDqQaGKOkTulariqVcddMY28xfNhiKxij09n4cqr6oFtQqBkwM+aLocBPfwbUTuI/oNXLZOmUiCWAmGmMpYTeRuu+9cUzJWTEVzYbwh1bfFjlUBXtfqCUqZy23xOdA2x4oD4X1xSxVHirMCEfYIf6tfXoXXug2GvEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ImhaLKh/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B3A1C433F1;
-	Mon, 11 Mar 2024 09:20:02 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ohGQxnbPscrVX67psTH1I/9hyma/FYAFT76omOwdE5aYGV2VAJXFCNdFW9T7UZXGES0Icq4IstnwwTbu1KfthRDUacGg6ICqo3plyLTfyOKzpV83yZ7vIpjFRA8XQk0v/hhm5q5ArjuEVfucsbaa1n8sffAQ5FDlHFk0ZIfhOKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bqVmI5x8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E20E6C433C7;
+	Mon, 11 Mar 2024 09:20:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710148805;
-	bh=1ZiMUTyyeo0Z2XlLdCasELZ6tHnvHUQMcSQALkw8vsU=;
+	s=k20201202; t=1710148843;
+	bh=qxi5+TOjcyya8fuII4LhWu35JwnGT9JmbLofTAmXndA=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ImhaLKh/sklgFpDP+QecQSNCvPQ60CMSmle7HMQ3ToNFo9JA6F8cptz9Y3t6bRthk
-	 8XX9W6wU7r66lPdKO7mODntjvv/trk294ZxBo33Fio7ql6EzRiV3UlG8WhFpkLWoWo
-	 16zovr9QkEAGfyQePrBVwI/poISCjfyQJvVf59unXuRmRQRM5l2yT++AvoyyMa85+A
-	 KEUrvy5XaJPkAj0vyePj1DU5wRieHf4dbJ6E40Lf/hRrjSSa6Ya+qLYZMN+Y17xrqD
-	 q531FugF7hD8z6TyPRYZX0uhXKl2xVPIQVwAojSCgejUOMGwZrIzUg5jz3ZVi49lH7
-	 mrzagGp1QGVPQ==
-Date: Mon, 11 Mar 2024 09:19:59 +0000
+	b=bqVmI5x83bTZvZdRgsr3jFXennCqv3MZ9XIVAix9YWqJzPtIRhUr/pVl+zxh+yYdY
+	 s9LtpIpAOJVws7PoE2so5rn68s7z69S3vRhwYcx9bmIbvwl1nY1JYmf2mksSAQv7Ju
+	 G9bdWTNWT5ujnkCuUbLAVeVHKIo3nhUgtZdVoSl4aoygh7ACYvuF6EvkbDstwM7E90
+	 1wQvO0QGhTawmDuMGUzceGQZ/bW3YtyTVN2DBtCA0at+Kwe+otwT4PHft7lh965tmS
+	 qQpPGICIWpkw+c+3aszeflXXFAdhG3TM0OLoKNlpy2sQnQ4TvEObKzYDDw8MGaVzvQ
+	 k9bHT6uJCwF8g==
+Date: Mon, 11 Mar 2024 09:20:37 +0000
 From: Simon Horman <horms@kernel.org>
-To: William Tu <witu@nvidia.com>
-Cc: netdev@vger.kernel.org, jiri@nvidia.com, bodong@nvidia.com
-Subject: Re: [PATCH net] devlink: Fix length of eswitch inline-mode
-Message-ID: <20240311091959.GB24043@kernel.org>
-References: <20240310164547.35219-1-witu@nvidia.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next] net: gro: move two declarations to
+ include/net/gro.h
+Message-ID: <20240311092037.GC24043@kernel.org>
+References: <20240308102230.296224-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,27 +59,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240310164547.35219-1-witu@nvidia.com>
+In-Reply-To: <20240308102230.296224-1-edumazet@google.com>
 
-On Sun, Mar 10, 2024 at 06:45:47PM +0200, William Tu wrote:
-> Set eswitch inline-mode to be u8, not u16. Otherwise, errors below
+On Fri, Mar 08, 2024 at 10:22:30AM +0000, Eric Dumazet wrote:
+> Move gro_find_receive_by_type() and gro_find_complete_by_type()
+> to include/net/gro.h where they belong.
 > 
-> $ devlink dev eswitch set pci/0000:08:00.0 mode switchdev \
->   inline-mode network
->     Error: Attribute failed policy validation.
->     kernel answers: Numerical result out of rang
->     netlink: 'devlink': attribute type 26 has an invalid length.
+> Also use _NET_GRO_H instead of _NET_IPV6_GRO_H to protect
+> include/net/gro.h from multiple inclusions.
 > 
-> Fixes: f2f9dd164db0 ("netlink: specs: devlink: add the remaining command to generate complete split_ops")
-> Signed-off-by: William Tu <witu@nvidia.com>
-> ---
-> Or we can fix the iproute2 to use u16?
-
-My understanding is that it was u8, prior to changes moving the
-code to use specs, so I think that fixing the kernel to once again use u8
-is appropriate.
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
-...
 
