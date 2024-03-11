@@ -1,62 +1,109 @@
-Return-Path: <netdev+bounces-79183-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79184-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47C8C878283
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:58:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 837118782ED
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:14:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79B191C2168D
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 14:58:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B495F1C21178
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:14:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 038875B697;
-	Mon, 11 Mar 2024 14:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D988B4AED9;
+	Mon, 11 Mar 2024 15:12:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o4Xl5fW4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HbTII3uh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E445B691;
-	Mon, 11 Mar 2024 14:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5E14AECC;
+	Mon, 11 Mar 2024 15:12:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710168678; cv=none; b=cFsIT5+nUo6nbZpxIDbqGqKExU1hQGsaLdIieQvCZNa45FHzgDc4z4fzHkOClG67RUIy13o+Fdd2NVVWZICQFCVhpHoEO6tdW2nuw1MUQqq3zcEmsEfsjhhN9+dxs3ND3z4ZokZlDv7LrS421cnjbXScBDuaPcle6OXn9wH8GX4=
+	t=1710169958; cv=none; b=NX6wCwKp6ocD4idicArg8JjiWryhENUViGMh00Ad1psyUzBCi1dCCuD256Q3+1FZJb6D88obSth1xYbFWBiLFKRNZxfqgNA1GquZdfFcOvREsj5x/x62mHiApfgvq+7nhjxmlrvhcs9c+87i18czUCzLoTTWQZz6a4fFSQKcQlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710168678; c=relaxed/simple;
-	bh=H6XqpghiAiKVb08HOVLpeYOx97PwCKItgaLe6ym55Ok=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=CS2wD3QPS5krZLWtThmZx97s/+9VkVWsbUm/40aPsjTjx9G4d78PEO74oKWECco0ZWmDS/qjMuv/vDvQM0pUS1Rrf98+2F4X9MSZ47t2LOewkUfH+eEiqoerMNRbenul6uo2SoVyQjrzHqmd6aqtHxh61B9BykVYVOOryiDvh4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o4Xl5fW4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52A5FC433C7;
-	Mon, 11 Mar 2024 14:51:18 +0000 (UTC)
+	s=arc-20240116; t=1710169958; c=relaxed/simple;
+	bh=d+U/DMyqrJmz9isk37XQbdH4HzIhR5FvXPZ0QF5sqY0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=oBDCPr598WSWBX4UncJ3I52MYNed7RSPziOQO2KLExBwGcQpZnpIXWsUryaKrVA8KjY5tRXxdzxoZjicSgKqZF5TOxShVE9y+PEgxPoSKcR/93f6RZY8Si1fiDdfBeYjXTp+VaQBS/TMO9v/Aa7eZDaMvmQaIpAQJM4ztQNjvjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HbTII3uh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECE7AC433F1;
+	Mon, 11 Mar 2024 15:12:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710168678;
-	bh=H6XqpghiAiKVb08HOVLpeYOx97PwCKItgaLe6ym55Ok=;
-	h=Date:From:To:Subject:From;
-	b=o4Xl5fW404lhQPMORlXDO0TiOheWT/aqK9MPFeM1IoU02PNaXUsHGDDxVQBRTV9Zv
-	 k3A3Qam500MgTvXVMh3q8sHFTVEfev9aaSSVajPOAKCguoT+/ukUZKUNeIjs1KJaM7
-	 mzT/GH6ELuir1KT+4IP/un009GLgfFsGzu42Cxr0sMZ66Uwb2WawO35xloi5ijQErY
-	 5YUVC3uSFcF75vazeXwMU6Hk+fYz6STgjftfIxZ0YCo9oBlqbbSWOlJ0ouBFBDocbz
-	 P6xz7D3BuTG0F45T80WEpWK3FF93eZ5HpoNOFTbuFPG2kIB924P5H1XGRw7xZ7jmmh
-	 HgpOXRr7cwpjQ==
-Date: Mon, 11 Mar 2024 07:51:17 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: [ANN] net-next is CLOSED
-Message-ID: <20240311075117.2857ae10@kernel.org>
+	s=k20201202; t=1710169958;
+	bh=d+U/DMyqrJmz9isk37XQbdH4HzIhR5FvXPZ0QF5sqY0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=HbTII3uhi/g8b2QMB6EQJtbcOigywKsx0O36GpD+Nn5J8fkxTHmsZN5RrZGOG1ru+
+	 IFOWpk8eqOjec/tgxZ6q/YfvxcndJeWtCv2uEC2fbWv51McZ4DFoF7WDs6CQMQkILh
+	 lXTKu62Z6hvTRIIl5FzSj6W936uRv5vIFCpKo8IUyHcZN2UFI0u3F+Oxb4h+44J2V8
+	 pSN6vASrgxsxBORXXiGmCuLg2DpLBVTwxobEKdsXNRrDyNRcDx0z/ON+m7LAATkdf4
+	 h0W7waZ9nC5b18XcTduIhWjHD/By0+C/FC7tS5MoMraDrMZPjYV55zycTtOLegOUXn
+	 ykCKuG9vHJgWw==
+From: Sasha Levin <sashal@kernel.org>
+To: linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Cc: Andre Werner <andre.werner@systec-electronic.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Sasha Levin <sashal@kernel.org>,
+	steve.glendinning@shawell.net,
+	UNGLinuxDriver@microchip.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.7 09/23] net: smsc95xx: add support for SYS TEC USB-SPEmodule1
+Date: Mon, 11 Mar 2024 11:11:49 -0400
+Message-ID: <20240311151217.317068-9-sashal@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20240311151217.317068-1-sashal@kernel.org>
+References: <20240311151217.317068-1-sashal@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-stable: review
+X-Patchwork-Hint: Ignore
+X-stable-base: Linux 6.7.9
+Content-Transfer-Encoding: 8bit
 
-Hi!
+From: Andre Werner <andre.werner@systec-electronic.com>
 
-Linus tagged v6.8 and, as is tradition, for the duration of the 6.9
-merge window net-next is closed for new submissions, until 6.9-rc1 
-is tagged (on March 24th).
+[ Upstream commit 45532b21dc2a692444b6ad5f71c253cca53e8103 ]
+
+This patch adds support for the SYS TEC USB-SPEmodule1 10Base-T1L
+ethernet device to the existing smsc95xx driver by adding the new
+USB VID/PID pair.
+
+Signed-off-by: Andre Werner <andre.werner@systec-electronic.com>
+Link: https://lore.kernel.org/r/20240219053413.4732-1-andre.werner@systec-electronic.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+---
+ drivers/net/usb/smsc95xx.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/net/usb/smsc95xx.c b/drivers/net/usb/smsc95xx.c
+index a530f20ee2575..2fa46baa589e5 100644
+--- a/drivers/net/usb/smsc95xx.c
++++ b/drivers/net/usb/smsc95xx.c
+@@ -2104,6 +2104,11 @@ static const struct usb_device_id products[] = {
+ 		USB_DEVICE(0x0424, 0x9E08),
+ 		.driver_info = (unsigned long) &smsc95xx_info,
+ 	},
++	{
++		/* SYSTEC USB-SPEmodule1 10BASE-T1L Ethernet Device */
++		USB_DEVICE(0x0878, 0x1400),
++		.driver_info = (unsigned long)&smsc95xx_info,
++	},
+ 	{
+ 		/* Microchip's EVB-LAN8670-USB 10BASE-T1S Ethernet Device */
+ 		USB_DEVICE(0x184F, 0x0051),
+-- 
+2.43.0
+
 
