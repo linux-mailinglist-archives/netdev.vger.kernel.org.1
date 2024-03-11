@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-79278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BDCC887897D
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 21:30:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF90A87897B
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 21:30:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78FF5282273
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 20:30:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAB7B282287
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 20:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC96433CC;
-	Mon, 11 Mar 2024 20:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2C4B1BDF4;
+	Mon, 11 Mar 2024 20:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V6rYB0a7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="umIEwck1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 163DB40C14
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 20:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB83BEAE7;
+	Mon, 11 Mar 2024 20:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710189031; cv=none; b=ZDtLMnxsTvRUFoZi0rSZuXmVne/T/BGay8qcAfkZiBLlpLpWf1HSEpNeRkrayS17jDEnQZVkxutFIFSjfVA6SAY5S3Ae8e189GtAw2R3B8FSqEVw17FrsEtenOPWyf4uA99n5rfgniNyPklF4by7dZNqszJpsDBAemmtbnz1sow=
+	t=1710189030; cv=none; b=P1EZf8ZH5iBkXu5hfPeMgJniOUW5cBYLhjZ84wxvmNIxShXJvxdzuFboesGFI9+TiVzwVo/I0/6o2XCIIPiM/vih2/nR5kZx0riB3XkRSOSKdFj96J2ubkoh/tAPNV/C95weRxizsWOTSdP6m5SrMWDUmpyK6JvC7Um5tUJYMJA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710189031; c=relaxed/simple;
-	bh=l8uemGVXNgv9DKNFsyTXt66EJ1DbsqY4iOzbwjBXRHI=;
+	s=arc-20240116; t=1710189030; c=relaxed/simple;
+	bh=SxyxkMIY/oCMY73rFgud0ZVLMYIPPk7U1ri3ZPOF3C4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HW4joweyscF32FG9cvP/wAoGfKX4hw4qq5ZkKlYSfPVioQMQH5Rn4FlrRp4oFTdTKKJNDTl43COiSx4ucA9dewBVW8JHKVZW/dPHf8E+82iD51VAkbrSNdkiwfTfrxkLxR+z38aKTeQyDC6Yykb/8U96EUT6x13UORJA8OPLR3w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V6rYB0a7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8F1FEC433C7;
+	 In-Reply-To:To:Cc; b=slS9fQTTmA0uJNcwxGJSPXSTPZRfzuDGE3JQbO1gP8Dd+xPQbLBh2Ds686xWvtuluzRvd8uG2LfYmu4cCi9+J1zg/ecnTkCbzybRPDoIvwHQphQQEDykzelT4zznMMGQdT1/E5Mv+E47Ub9LLOW9nYwMGvaufn7QOflXH6QxJNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=umIEwck1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 84009C43394;
 	Mon, 11 Mar 2024 20:30:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1710189030;
-	bh=l8uemGVXNgv9DKNFsyTXt66EJ1DbsqY4iOzbwjBXRHI=;
+	bh=SxyxkMIY/oCMY73rFgud0ZVLMYIPPk7U1ri3ZPOF3C4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=V6rYB0a7l83+eLGdjQZcJEUaumJepfJqlNK0IKbkpCxb7O4Uw/TPs1RL9uds143ZP
-	 rraW739dz9NpYVIwBCpmfcdzGuBKExenLvMspePOu4ET0jtGUY2eO7/ESjVY6qEowc
-	 tjJ1+0lj30P095cC/tdMA+WlgEVak9Q95m/S0qLo2V6VJZrx/WEfXrE3DmSQXWZ2m/
-	 RAJbTC2QYX63c8qZTddI+/I4jxlzvJffl3Ez4XiMKlbXwT+8NwjfimETF1jKn4XBYk
-	 lc3v903MtVnulNsnwvdj+APJwVNBhIutU+QFyO+QiuXG0ftxOGieCOw8TZ8HqGzTC6
-	 OOLy26hEJGzpw==
+	b=umIEwck1yAUY37zdmJzln3BPwQq7fmG/WYsV2ybZ3v89b5vveiHrjASiaa5SF6ASt
+	 9nph721w6Inv9vsVKG3uOLXjMGwWUuryqfPOTX4t0EDm2WZz5FK+ZOVsURMABEe7Tc
+	 LURY6CTm422sELORUd0kM3XeCj3KEVeA/CqCNFNwICCxpXcmTut4ufdgHspAgchbuU
+	 ltkBEzU0RG2hBTChhB3dCcDSRA64zt3gcxtHwCX1Q2Cg3IXmfzWWM0YspNI1lgV5Sx
+	 wigH88McOYClKCJSpuuS/x7GUrdIoNi/fjbctGFNL6BaTTktkiv1VsJL5QAu0Hq/rf
+	 +EWPqxZZ3XptA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 75952C39563;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6C8CDD95055;
 	Mon, 11 Mar 2024 20:30:30 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,37 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCHv3 net-next] tools: ynl-gen: support using pre-defined values
- in attr checks
+Subject: Re: [PATCH net-next v1] net: page_pool: factor out page_pool recycle
+ check
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171018903047.23953.11898489671712287164.git-patchwork-notify@kernel.org>
+ <171018903044.23953.7319316878916850808.git-patchwork-notify@kernel.org>
 Date: Mon, 11 Mar 2024 20:30:30 +0000
-References: <20240311140727.109562-1-liuhangbin@gmail.com>
-In-Reply-To: <20240311140727.109562-1-liuhangbin@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, donald.hunter@gmail.com,
- jiri@resnulli.us, nicolas.dichtel@6wind.com
+References: <20240308204500.1112858-1-almasrymina@google.com>
+In-Reply-To: <20240308204500.1112858-1-almasrymina@google.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, hawk@kernel.org,
+ ilias.apalodimas@linaro.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linyunsheng@huawei.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 11 Mar 2024 22:07:27 +0800 you wrote:
-> Support using pre-defined values in checks so we don't need to use hard
-> code number for the string, binary length. e.g. we have a definition like
+On Fri,  8 Mar 2024 12:44:58 -0800 you wrote:
+> The check is duplicated in 2 places, factor it out into a common helper.
 > 
->  #define TEAM_STRING_MAX_LEN 32
-> 
-> Which defined in yaml like:
-> 
-> [...]
+> Signed-off-by: Mina Almasry <almasrymina@google.com>
+> Reviewed-by: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+>  net/core/page_pool.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
 
 Here is the summary with links:
-  - [PATCHv3,net-next] tools: ynl-gen: support using pre-defined values in attr checks
-    https://git.kernel.org/netdev/net-next/c/8d0c314c30c9
+  - [net-next,v1] net: page_pool: factor out page_pool recycle check
+    https://git.kernel.org/netdev/net-next/c/46f40172b681
 
 You are awesome, thank you!
 -- 
