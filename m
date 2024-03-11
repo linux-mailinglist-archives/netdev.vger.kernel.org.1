@@ -1,142 +1,113 @@
-Return-Path: <netdev+bounces-79115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E72FF877D67
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 10:55:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80928877D85
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 11:01:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0F4428144E
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 09:55:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B1F651C20B06
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 10:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC267224D7;
-	Mon, 11 Mar 2024 09:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D85199AD;
+	Mon, 11 Mar 2024 10:01:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="l17wbK5B"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="V7hbzxs0"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8901C199AD;
-	Mon, 11 Mar 2024 09:55:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD9C2E3F9
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 10:01:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710150927; cv=none; b=O6UrKaLG2rHAljFzIiY1Ea9BcrTM+zkXYMTQMgsnnmzdXYOLJnilLDDgDyqpj0TJ5Rg+I+UNezmGCd+ew34lsLixUXV4ByEZ7XXE67pTIXQt0ILeYzi71rxsWCLGz2fLkxBo49TlbOepA+dmdWq6/0gpUGErZdU9svsoSQz5fd0=
+	t=1710151266; cv=none; b=kkDzevH+6y4StBkkMo7qXMM8nuNbqLb+TZbgPlNKQOcWqAgw/byIeql1NJxB1fcPSQQeZK6H8g+WtfyBGa/OEB7nrWJk8j3gJ/jZ6HmUniZ6oyMGMr8nuK7yjHtWyHctnH1YNGiPL9SUULG/VqKsKR2gqJjBHEPD1i5dFxe8muw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710150927; c=relaxed/simple;
-	bh=rvrImScrre1QyGkyNvp89/1N9MkOxvI5xA8HqVsAHKc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=URYB8849AzU+cNmHAF0QEAb4xPye1zc4nzTiD+/Dy6kuTuQJmFX5ZDj/TC314CcZ3BlQ7TsXoJ2IcYwqq+KuXxQGU8rhTS59L7QAkO1wenmZ5NY0jeBegweU2EJOMuGSC7tDeZnGeuRUdFtc93nocnHjoFRTSCL3879BQPlEhMY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=l17wbK5B; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 11D90E000D;
-	Mon, 11 Mar 2024 09:55:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1710150924;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O8MBjRw+XjYP4AGNDE/5givq5CD6fzEROYjULWNw0vo=;
-	b=l17wbK5BJQVM/h4alNuTUS8p+qSeFP7D1MlWeKY2o2Cg9O8EDoYZJ/f0yBObu85uB5f7pI
-	6V16FTiSYweJHOvvXHzX32krAApJW2nbNYsErNmxPbHvz1ywAD2ymt97W3yFQ3hDBJos+E
-	u5W3UwwpbAkS8FTuAF/hxWiZBi1dUs+/HM+5EAfVzkP/aBKvo8k6K1hSJlhh7sbGvPuqcJ
-	dxf2nRBmCChBX97MF+jfqJ2ocbklsWobhU4m4wSOUNTUxUlKjd28F7Wqbn+V3CSbhHN7Ly
-	SMVPBQ85E5xafPp4YU0IMBbmtu2QDYWDzkCP3mLs3g1m3qUPLElFt+QjhAOm9g==
-From: Romain Gantois <romain.gantois@bootlin.com>
-Date: Mon, 11 Mar 2024 10:55:50 +0100
-Subject: [PATCH net-next v6 7/7] net: pcs: rzn1-miic: Init RX clock early
- if MAC requires it
+	s=arc-20240116; t=1710151266; c=relaxed/simple;
+	bh=zKjzyi61+cKiGXB1eb9jj5q7YL5px2kJANb0CTHwR6M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AANT0imAf8CqRWRaVfm8sMj8BR7Ddighn94IbiKKR7uxhE848Px2bukEOsJYP6SeYAyMs91VLET241VNH1HV2J7ZHM7w7tq8eovP54+fGaaaNXi++5ThCHBbkgWojenSWLJnLKrRpAhCDIP1BTu/FhGLst1rQv0tuwTYLe0YWPU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=V7hbzxs0; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710151265; x=1741687265;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=zKjzyi61+cKiGXB1eb9jj5q7YL5px2kJANb0CTHwR6M=;
+  b=V7hbzxs0yVIofTOq2iBBk7HOejUrxZDdqRDPHuRLiffAYFmkV6rzPyU7
+   QhMuQVkcT7blhrFJTfNTpiq03HA4n/gqKvisjPCfItIxUBNW+vbng/I87
+   /cmBrjoeH1Zjpqk3MVc27gfXU0n2AqH9Z830s5K21eLP0h1GAy31NloUL
+   WZVwP5PA67njHea3T1ocFpYzRtIsMRZTsIsWG+WRwStT8RLg4s9sJVV6v
+   RBe3DgN9wlMKglzQRiYpjkrI2+ziF4hV033mh/1HGH6Y4lmftM6ms7y8q
+   Ydo8y5Eg7E3ZT0Kiv2lbEV9OJeX/HrDk390EKyEPvK1uWOlJHWJAaffXc
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11009"; a="4941271"
+X-IronPort-AV: E=Sophos;i="6.07,116,1708416000"; 
+   d="scan'208";a="4941271"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 03:01:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,11009"; a="914354455"
+X-IronPort-AV: E=Sophos;i="6.07,116,1708416000"; 
+   d="scan'208";a="914354455"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 03:01:00 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1rjcSn-0000000BaPF-0v4c;
+	Mon, 11 Mar 2024 12:00:57 +0200
+Date: Mon, 11 Mar 2024 12:00:56 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, jiri@resnulli.us, Jason@zx2c4.com,
+	mareklindner@neomailbox.ch, sw@simonwunderlich.de, a@unstable.cc,
+	sven@narfation.org, pshelar@ovn.org, wireguard@lists.zx2c4.com,
+	dev@openvswitch.org
+Subject: Re: [PATCH net-next 3/3] genetlink: remove linux/genetlink.h
+Message-ID: <Ze7WWLK-xcFHsJyo@smile.fi.intel.com>
+References: <20240309183458.3014713-1-kuba@kernel.org>
+ <20240309183458.3014713-4-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20240311-rxc_bugfix-v6-7-adf5133829a2@bootlin.com>
-References: <20240311-rxc_bugfix-v6-0-adf5133829a2@bootlin.com>
-In-Reply-To: <20240311-rxc_bugfix-v6-0-adf5133829a2@bootlin.com>
-To: Russell King <linux@armlinux.org.uk>, Andrew Lunn <andrew@lunn.ch>, 
- Heiner Kallweit <hkallweit1@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Jose Abreu <joabreu@synopsys.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- =?utf-8?q?Cl=C3=A9ment_L=C3=A9ger?= <clement.leger@bootlin.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>, 
- Miquel Raynal <miquel.raynal@bootlin.com>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
- linux-stm32@st-md-mailman.stormreply.com, 
- linux-arm-kernel@lists.infradead.org, linux-renesas-soc@vger.kernel.org, 
- Romain Gantois <romain.gantois@bootlin.com>
-X-Mailer: b4 0.13.0
-X-GND-Sasl: romain.gantois@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240309183458.3014713-4-kuba@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-The GMAC1 controller in the RZN1 IP requires the RX MII clock signal to be
-started before it initializes its own hardware, thus before it calls
-phylink_start.
+On Sat, Mar 09, 2024 at 10:34:58AM -0800, Jakub Kicinski wrote:
+> genetlink.h is a shell of what used to be a combined uAPI
+> and kernel header over a decade ago. It has fewer than
+> 10 lines of code. Merge it into net/genetlink.h.
+> In some ways it'd be better to keep the combined header
+> under linux/ but it would make looking through git history
+> harder.
 
-Implement the pcs_pre_init() callback so that the RX clock signal can be
-enabled early if necessary.
+...
 
-Reported-by: Clément Léger <clement.leger@bootlin.com>
-Link: https://lore.kernel.org/linux-arm-kernel/20230116103926.276869-4-clement.leger@bootlin.com/
-Signed-off-by: Romain Gantois <romain.gantois@bootlin.com>
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
----
- drivers/net/pcs/pcs-rzn1-miic.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+> +/* All generic netlink requests are serialized by a global lock.  */
+> +extern void genl_lock(void);
+> +extern void genl_unlock(void);
 
-diff --git a/drivers/net/pcs/pcs-rzn1-miic.c b/drivers/net/pcs/pcs-rzn1-miic.c
-index 4bd66fdde367..d0a722d43368 100644
---- a/drivers/net/pcs/pcs-rzn1-miic.c
-+++ b/drivers/net/pcs/pcs-rzn1-miic.c
-@@ -279,10 +279,38 @@ static int miic_validate(struct phylink_pcs *pcs, unsigned long *supported,
- 	return -EINVAL;
- }
- 
-+static int miic_pre_init(struct phylink_pcs *pcs)
-+{
-+	struct miic_port *miic_port = phylink_pcs_to_miic_port(pcs);
-+	struct miic *miic = miic_port->miic;
-+	u32 val, mask;
-+
-+	/* Start RX clock if required */
-+	if (pcs->rxc_always_on) {
-+		/* In MII through mode, the clock signals will be driven by the
-+		 * external PHY, which might not be initialized yet. Set RMII
-+		 * as default mode to ensure that a reference clock signal is
-+		 * generated.
-+		 */
-+		miic_port->interface = PHY_INTERFACE_MODE_RMII;
-+
-+		val = FIELD_PREP(MIIC_CONVCTRL_CONV_MODE, CONV_MODE_RMII) |
-+		      FIELD_PREP(MIIC_CONVCTRL_CONV_SPEED, CONV_MODE_100MBPS);
-+		mask = MIIC_CONVCTRL_CONV_MODE | MIIC_CONVCTRL_CONV_SPEED;
-+
-+		miic_reg_rmw(miic, MIIC_CONVCTRL(miic_port->port), mask, val);
-+
-+		miic_converter_enable(miic, miic_port->port, 1);
-+	}
-+
-+	return 0;
-+}
-+
- static const struct phylink_pcs_ops miic_phylink_ops = {
- 	.pcs_validate = miic_validate,
- 	.pcs_config = miic_config,
- 	.pcs_link_up = miic_link_up,
-+	.pcs_pre_init = miic_pre_init,
- };
- 
- struct phylink_pcs *miic_create(struct device *dev, struct device_node *np)
+Do you need to inherit unneeded 'extern' here?
+
+...
+
+> +#define MODULE_ALIAS_GENL_FAMILY(family) \
+> + MODULE_ALIAS_NET_PF_PROTO_NAME(PF_NETLINK, NETLINK_GENERIC, "-family-" family)
+
+This is using the macro defined in net.h which seems not being included.
 
 -- 
-2.44.0
+With Best Regards,
+Andy Shevchenko
+
 
 
