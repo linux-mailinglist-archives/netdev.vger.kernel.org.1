@@ -1,120 +1,149 @@
-Return-Path: <netdev+bounces-79054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58BE1877A21
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 04:29:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8867877A2D
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 04:46:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 611C61C209E3
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 03:29:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 436F81F21C89
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 03:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98FDC15B3;
-	Mon, 11 Mar 2024 03:29:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A06315B3;
+	Mon, 11 Mar 2024 03:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YFmuZRJa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gPTto8Cq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D272A15A5;
-	Mon, 11 Mar 2024 03:29:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF5017D2;
+	Mon, 11 Mar 2024 03:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710127768; cv=none; b=ZlilX282k5zpfcfEe2WNuav41S28C5G1JKdVo0WMp7++x1lBi2kFrk1y5HKRB/SSJMcVHJPKafyIAWVVMtUq/f8pyeTbd3NBACCVgkNbrkt7hj/Js3cr1RfhnvpgNWHT2M/BoPr1maWeleV9gEgkSunB7+OFDMgJvRMv4kR3JRE=
+	t=1710128809; cv=none; b=Cgcs/phrF7aVgu0PDyGacQoUd7C82BJypkjglpB4fOz6bReamEjRBe87pNh91hHXrmaRlH8JyfUDg7sMqApcZTrjyD2IU6SqBqJ8XkIbwSKP4ZbsFkJMSKhNcARXngovaIJSrWv8bVEQ03VRY9RVtlwD7xDGpV8MQVd2U2kKYQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710127768; c=relaxed/simple;
-	bh=AkY5uDurSfrXwDY5iZzPAPWoaJANqVcywj1NHkU5EtI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tBfg72cGIO/ilVAoi+SScLhfpQX+B6pmirgGWSUCwwCWLzD4vwrwZPw8mC9pVNZFsMiI2CbjPCAiS7heGVHFLbM5nvE+kMc3Kv7cCINkX9+fuNf1HOMN7V7nsGAi5lkX5xGPOZfoa8O2ZFhx9AndEgsnveL6OHhGrQV5UtLZijY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YFmuZRJa; arc=none smtp.client-ip=209.85.167.41
+	s=arc-20240116; t=1710128809; c=relaxed/simple;
+	bh=4M49E5RBOZslEbutTMVGYMXeYTJ0D0KOkpYhEZ/x4xg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nKZKovus0BQhBIp2CGbxhRdgsTK5kglEfD7SL7cVAAIE2jAB0lphsIuBAXFkQN2dsnGb411+IKBUc1D7I5tqUoIfvJWWAk7qbAkA5PsOQbFGQC3aYpWWX2K11x9OEYBBuzNVLfPS6OCqcSwaJL2KPBJ9/6F02QzAueBLXl2g3ps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gPTto8Cq; arc=none smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-512e39226efso3770573e87.0;
-        Sun, 10 Mar 2024 20:29:26 -0700 (PDT)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6e55b33ad14so1951798b3a.1;
+        Sun, 10 Mar 2024 20:46:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710127765; x=1710732565; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DBCQ803QUzwyKr/m9OfBVscOO+uM7S6n4+xPEUUdKfI=;
-        b=YFmuZRJa7hFp5/Ei3rf1M4tp/xCDT74I065r5Wd60a0axPWiKpHiLqMWseAI9EVwbg
-         3WOthdbIzGk9gHuCSgtF8kIQ/lXB5iGI+6cXkRO+8/3IghgDQGNNXVJ8IeBvupJDjhoK
-         YSLxlu8TkONB+exuregU9LXwZSbVrNXGRFJfgZ6tkjnhM0Zk/jmy7kFXmuACkKzzxSDS
-         XP23W310cU4cmmmZ5X3iqb3SSlY+cZroEeWslrPtp34LTJ1fHM5gABPWDNfEvTcuNWWG
-         g5+OY0aPJUdXWU8yIj6wJYwPB/lmAzV2LWofrwTcV/8G3gqlERzkajKxeMSgf4LhiD7d
-         81xA==
+        d=gmail.com; s=20230601; t=1710128807; x=1710733607; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Yi7CCN4vCmOHYDaTS1I6t6Q+hFwD+FXKGoxAKDwi63g=;
+        b=gPTto8CqjeblQuqt5NHqzqAm0CuIYnYVOEd4wWBXGzoen4MGR9wa/qt02+Xr4rX5XF
+         p1ADbDmqhhye2Sl7lkxUzgNyZauiWD5wP6JAJsRA9neY6mP/jv8fzZpqQ1x04LYLd5ia
+         INJ5ZvZ7T14gBYgGLkcqhL4277TExbxru+4VJJkZV8vc0S5Kiof9QS5lHlSvLTTbYB5X
+         D1fHPqAUtw3QjWuBeAgoBp+GyvUe1C98ifyT+jRXCOPohUOD4oIIz3E3+IlwMSkRe6cb
+         lGS3940L53o1VK31Cpy38FtFVXZPQpWpkUSKyLaNut1IG+qBkZpmDbOxbpF2R+FjxfwP
+         9ojg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710127765; x=1710732565;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DBCQ803QUzwyKr/m9OfBVscOO+uM7S6n4+xPEUUdKfI=;
-        b=qbYPU/A9+msIfb8oijSqPY/qKkmanhamLSsIydQT67cYktJqshexz72T4XyNxxQe4B
-         GdAMKRFfarepf5DV6V6KY8/r/MqmJqNRs7RZbKdNXGbJJPIZD59cKyOXivzPwmngPCSv
-         gCrkgTJeEPv1Q7HqlGyw6G4Pl5wn7T6JRf7IWUw1zbTbJeRB07G8EvX8m4jT+uEvVE04
-         DEKjwQHuwkPeq1wDT5Q4SqmuzoAaBZS41eJIiHLVdqArMEhSnorzXgOZ2RrmedNJjFaY
-         HXZ0BrPc1+DjJcnXZxFihnnUL2ov6VQMet0ib9L48TBZx6yZUTB855B6YE3bwM/2WRFB
-         gkjg==
-X-Forwarded-Encrypted: i=1; AJvYcCXGqIXXhCDXNdB8VUDa3B3DYTNPV3JDW7/Et6lo5J57TxVrctU55Zn+EfHol8z/9o/GqnAmNlmOFhDWADYW/kK4eYnxyrlIIBaNnJmzDSkZHNQZxWWYoZDs/SNV7foZ+afoN0d81c9OoDWl
-X-Gm-Message-State: AOJu0Yxh3JvlEdhm5DtmOujX23xN7iIlHKhWlXw/M/hPBjOvObBxdoyK
-	NqfX3ZVCSTSu2r7AbmQezJlef3esRotGPHVuLZkebx/fpozo5LsWD2IXGBu262H4gVCiyjL4PRo
-	QL8Zyobbqr6dAPLj631UUHVzpfus=
-X-Google-Smtp-Source: AGHT+IEGqx6tOXsV1NDhtw/esCPZ4I0z48q2YqBl4r6W3XEYHysoNdIyBolAOa8iuLVZPkMdnOxTy9Alw87vtaUl3MA=
-X-Received: by 2002:a05:6512:3ee:b0:513:e21:2a64 with SMTP id
- n14-20020a05651203ee00b005130e212a64mr3009071lfq.31.1710127764797; Sun, 10
- Mar 2024 20:29:24 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710128807; x=1710733607;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yi7CCN4vCmOHYDaTS1I6t6Q+hFwD+FXKGoxAKDwi63g=;
+        b=uWRYM43dBO4kstMVRrM88xc3ReDA/ftHhinsJWr6PeekrL4vmyIyfP/fZDHTohhYO+
+         KLrzvVr9Pc2xGXxrvlvTg2V+c0nALFTd0QxStN6MYZO/+W43mEkRVVjQIMvdPbJybMI0
+         L32I2fU5a4aH+M+U0zUhVwQafzSurg2gapuu4erex7HBJ/bjMMS5LU37pDpwxSgz75TG
+         R/P0zDgW72DvKoM+4EhnFqJJm/GHR3wr/oJ7NPhPBppNC5sj3H25hrmyDDGDjYb1WmbC
+         dsQsk9nQez4/CU7z4ergB81qM21idyCwnYn3d/MeRfay0MY5Uw+nAto++1HKIA9zisSe
+         rNWg==
+X-Forwarded-Encrypted: i=1; AJvYcCXs4TqLqDdZ9oQZifIijW/2tiFA48PQUkTfk/ckIOfWBy+ElNXr7oHNuOmSHfSfuhe75Jc6KoX/KUsOASKGxU3ohFGn3U54zZeGCzJC
+X-Gm-Message-State: AOJu0YwVh2Hpx471CHu4s25RvAB/c2T/GoUnlxDYouT4D2RMxgc1xCew
+	7esxacIY/jdqkgcsa/tFvb1klmNnzbwH1WFNzUguTvkFyDUEFEaheeEhKMLdwnc=
+X-Google-Smtp-Source: AGHT+IG6TossFkpumnOXt1LIFx73hYCDgJ7MO+pTJiMc+v9QDSF8XNJD6T1r6CFI/EnNAWRRClKWXA==
+X-Received: by 2002:a05:6a20:8f04:b0:1a1:6f26:8c1d with SMTP id b4-20020a056a208f0400b001a16f268c1dmr3382087pzk.53.1710128807192;
+        Sun, 10 Mar 2024 20:46:47 -0700 (PDT)
+Received: from [172.25.138.193] ([203.246.171.161])
+        by smtp.gmail.com with ESMTPSA id i10-20020a170902c94a00b001db81640315sm3473663pla.91.2024.03.10.20.46.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 10 Mar 2024 20:46:46 -0700 (PDT)
+Message-ID: <8b013d18-2568-46d5-a808-ce9cc1b2ff98@gmail.com>
+Date: Mon, 11 Mar 2024 12:46:42 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240311024104.67522-1-kerneljasonxing@gmail.com>
- <20240311024104.67522-2-kerneljasonxing@gmail.com> <20240311032341.GA1241282@maili.marvell.com>
-In-Reply-To: <20240311032341.GA1241282@maili.marvell.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 11 Mar 2024 11:28:48 +0800
-Message-ID: <CAL+tcoAfz2xhfqGt4AnrfsRx8FhRGzND7mOPrx8ZH7b9bbkehA@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] trace: adjust TP_STORE_ADDR_PORTS_SKB() parameters
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: edumazet@google.com, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
-	rostedt@goodmis.org, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
-	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/2] net: amt: Move stats allocation to core
+To: Breno Leitao <leitao@debian.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org,
+ dsahern@kernel.org
+References: <20240308162606.1597287-1-leitao@debian.org>
+Content-Language: ko
+From: Taehee Yoo <ap420073@gmail.com>
+In-Reply-To: <20240308162606.1597287-1-leitao@debian.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 11, 2024 at 11:23=E2=80=AFAM Ratheesh Kannoth <rkannoth@marvell=
-.com> wrote:
->
-> On 2024-03-11 at 08:11:03, Jason Xing (kerneljasonxing@gmail.com) wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Introducing entry_saddr and entry_daddr parameters in this macro
-> > for later use can help us record the reverse 4-turple by analyzing
-> Did you mean tuple ? what is turple ?
->
-> > the 4-turple of the incoming skb when receiving.
 
-Oh, thanks for reminding me. I always remember the wrong word... Yes,
-it is tuple.
 
-Thanks,
-Jason
+On 3/9/24 1:26 AM, Breno Leitao wrote:
+> With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core and
+> convert veth & vrf"), stats allocation could be done on net core instead
+> of this driver.
+> 
+> With this new approach, the driver doesn't have to bother with error
+> handling (allocation failure checking, making sure free happens in the
+> right spot, etc). This is core responsibility now.
+> 
+> Move amt driver to leverage the core allocation.
+> 
+> Signed-off-by: Breno Leitao <leitao@debian.org>
+> ---
+>   drivers/net/amt.c | 9 ++-------
+>   1 file changed, 2 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/amt.c b/drivers/net/amt.c
+> index 68e79b1272f6..cb31d1990660 100644
+> --- a/drivers/net/amt.c
+> +++ b/drivers/net/amt.c
+> @@ -3063,15 +3063,10 @@ static int amt_dev_init(struct net_device *dev)
+>   	int err;
+>   
+>   	amt->dev = dev;
+> -	dev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
+> -	if (!dev->tstats)
+> -		return -ENOMEM;
+>   
+>   	err = gro_cells_init(&amt->gro_cells, dev);
+> -	if (err) {
+> -		free_percpu(dev->tstats);
+> +	if (err)
+>   		return err;
+> -	}
+>   
+>   	return 0;
+>   }
+> @@ -3081,7 +3076,6 @@ static void amt_dev_uninit(struct net_device *dev)
+>   	struct amt_dev *amt = netdev_priv(dev);
+>   
+>   	gro_cells_destroy(&amt->gro_cells);
+> -	free_percpu(dev->tstats);
+>   }
+>   
+>   static const struct net_device_ops amt_netdev_ops = {
+> @@ -3111,6 +3105,7 @@ static void amt_link_setup(struct net_device *dev)
+>   	dev->hw_features	|= NETIF_F_SG | NETIF_F_HW_CSUM;
+>   	dev->hw_features	|= NETIF_F_FRAGLIST | NETIF_F_RXCSUM;
+>   	dev->hw_features	|= NETIF_F_GSO_SOFTWARE;
+> +	dev->pcpu_stat_type	= NETDEV_PCPU_STAT_TSTATS;
+>   	eth_hw_addr_random(dev);
+>   	eth_zero_addr(dev->broadcast);
+>   	ether_setup(dev);
 
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  include/trace/events/tcp.h | 21 +++++++++++----------
-> >  1 file changed, 11 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-> > index 699dafd204ea..2495a1d579be 100644
-> > --- a/include/trace/events/tcp.h
-> > +++ b/include/trace/events/tcp.h
-> > @@ -302,15 +302,15 @@ TRACE_EVENT(tcp_probe,
-> >                 __entry->skbaddr, __entry->skaddr)
-> >  );
+Reviewed-by: Taehee Yoo <ap420073@gmail.com>
 
