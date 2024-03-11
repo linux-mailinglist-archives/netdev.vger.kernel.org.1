@@ -1,110 +1,80 @@
-Return-Path: <netdev+bounces-79298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A37DA878A7F
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:06:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65597878A9A
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:14:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C506E1C20F08
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 22:06:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6085281F67
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 22:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B794057304;
-	Mon, 11 Mar 2024 22:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 175F457323;
+	Mon, 11 Mar 2024 22:14:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="vYnFcRP6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="plfarEhs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31EE56B90;
-	Mon, 11 Mar 2024 22:05:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC2C5730E;
+	Mon, 11 Mar 2024 22:14:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710194759; cv=none; b=XVxs3ON8TLtLyYoLDgWs4KSE60vwQAZykkXbNgLLMDW+UlseKCaqihqa2BWJsiZiPQQ+UhEpRQgdYqC4IwJp0/+TNXMCRSzzVH2zZIseae9TRBLm9HsnkXJC9HJOtoNVsgH7u41e9pjVpZS+27bJv3XNAYTC8kuahRbQ4JLzo5A=
+	t=1710195254; cv=none; b=cztF3YTEN0EqQGu2t7u6zGs3b+8X9npX72R8OUxKiGPeyXiAO1bgtrrZVe0UsIK1mlWw1ELsNqa4B6nxQZiRfKmUEmhXhJQB/9qpBqt0jyLenWE8KCI8DkadbsKSGsJTONW9EQX3z827wWgk/dIQrs4lDisEFwvfit2DIN4Wnp4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710194759; c=relaxed/simple;
-	bh=R+IxDTVIV1VoIdKEZSyusXOyCtEViHcb5yqmR70/jdY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=otfSzi4N5KeRFo3rJ+sNS69FjzVwxAINREA5sFSOYvG9k95ZI+66uIFBmPcVyip0OmikIgapAV8mu2beJi4e1V7hCqFhHXzUrtGCnF8NHNvVfXNhHLgRAfSVWCHgDIylca+gRuHnzXI+MFGUCAvuMnst8GmGpebunH482PYwbYI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=vYnFcRP6; arc=none smtp.client-ip=193.104.135.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
-Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
-	by mail1.fiberby.net (Postfix) with ESMTPSA id 269236030A;
-	Mon, 11 Mar 2024 22:05:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
-	s=202008; t=1710194747;
-	bh=R+IxDTVIV1VoIdKEZSyusXOyCtEViHcb5yqmR70/jdY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=vYnFcRP6nlepiX2TGdUdMK/hlrOkZMUa054TkbGZhe/BI7rO26n7W1ARTkIaLr87R
-	 h12UHloYr2IRztBWNrIOpWpF2xo+xyqDhEYaioty3GzNHV+UuYWGkKG4O+4dXldRmD
-	 3tkx1/6OCGxXDT8d8tqI3uozy383QuaxaUpdTRzHBbH3Maya4bqJJnupnKLRkhP9HQ
-	 BBOBg2NlG0eBHTxYM9bEEUfYV9v+ewVl3hzLnfysM9vUGVIIh6DI8OWoHf1APbhQe/
-	 6CWdYSqQaQGgyeyffYN9CGS1PL+x7DnPx9vS1XviOxU04OPvV+hyJOdptdTIlBXJKt
-	 mIAeS2XY7hJMg==
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by x201s (Postfix) with ESMTP id 29750200B46;
-	Mon, 11 Mar 2024 22:05:29 +0000 (UTC)
-Message-ID: <08ba1c0f-4496-45c1-ab77-df127ac8bf54@fiberby.net>
-Date: Mon, 11 Mar 2024 22:05:28 +0000
+	s=arc-20240116; t=1710195254; c=relaxed/simple;
+	bh=DyXVd2erYi7cgFiInrXLteo7vDevNRgbCpZy7RFr1ew=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=NqQcwKZIMBErbDEnRpcQccNfdvUdY23G6srXoURd54+1eruFFv3KjSHzBPjxLi56LPiH3hdYzAi7znplwyM1YTe/573zxnvMe/ypoJzA9O7xzWbfaDZHzJ8sFZ72GscjQBO0JwJjWVyxOpWCz5p8QDFUTsO0SLG5tO3JxxuMoRU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=plfarEhs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1608FC433C7;
+	Mon, 11 Mar 2024 22:14:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710195253;
+	bh=DyXVd2erYi7cgFiInrXLteo7vDevNRgbCpZy7RFr1ew=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=plfarEhsZ+V6nU+mwwfWbYvl9TSYKzDpwMZWwpoCykLBWg83q669C2uAsv2SMEgeq
+	 X7FV3G33g5NMhUQIfXbtimciUgGcUdFAZvCb5cm+PJ6Cl1dWno4nic+2ojeKlHQ9Ze
+	 vayphPSD6Anp3yJG4GGgt6ws1jMMIFJsOVc08jbT9nrgKLG4SVHTZ7O+62Axh3AN7w
+	 /m+OTjrtJc7fLB1dbi3q7ZJld9g6/P7DtBC1gIk1UaKDMlruy9td5Gc/APJRSTXQue
+	 baXMcWPZy1LI9FuCV2xTBxHGRTAkgvVlCj1ysnwxsSENT6THhWW7JyF/V6ecu3qsfh
+	 cTbZi3tjhOJiQ==
+Date: Mon, 11 Mar 2024 15:14:12 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Sai Krishna <saikrishnag@marvell.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <sgoutham@marvell.com>, <gakula@marvell.com>, <hkelam@marvell.com>,
+ <sbhatta@marvell.com>
+Subject: Re: [net-next PATCH v3] octeontx2-pf: Reset MAC stats during probe
+Message-ID: <20240311151412.18639483@kernel.org>
+In-Reply-To: <20240308181544.806928-1-saikrishnag@marvell.com>
+References: <20240308181544.806928-1-saikrishnag@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 0/3] make skip_sw actually skip software
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, Cong Wang
- <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>,
- Daniel Borkmann <daniel@iogearbox.net>, Vlad Buslov <vladbu@nvidia.com>,
- Marcelo Ricardo Leitner <mleitner@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, llu@fiberby.dk
-References: <20240306165813.656931-1-ast@fiberby.net>
- <20240311134435.19393f98@kernel.org>
-From: =?UTF-8?Q?Asbj=C3=B8rn_Sloth_T=C3=B8nnesen?= <ast@fiberby.net>
-In-Reply-To: <20240311134435.19393f98@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Kuba,
+On Fri, 8 Mar 2024 23:45:44 +0530 Sai Krishna wrote:
+> @@ -3048,6 +3065,9 @@ static int otx2_probe(struct pci_dev *pdev, const struct pci_device_id *id)
+>  
+>  	otx2_qos_init(pf, qos_txqs);
+>  
+> +	/* reset CGX/RPM MAC stats */
+> +	otx2_reset_mac_stats(pf);
+> +
+>  	return 0;
 
-On 3/11/24 8:44 PM, Jakub Kicinski wrote:
-> On Wed,  6 Mar 2024 16:58:08 +0000 Asbjørn Sloth Tønnesen wrote:
->> During development of flower-route[1], which I
->> recently presented at FOSDEM[2], I noticed that
->> CPU usage, would increase the more rules I installed
->> into the hardware for IP forwarding offloading.
->>
->> Since we use TC flower offload for the hottest
->> prefixes, and leave the long tail to the normal (non-TC)
->> Linux network stack for slow-path IP forwarding.
->> We therefore need both the hardware and software
->> datapath to perform well.
->>
->> I found that skip_sw rules, are quite expensive
->> in the kernel datapath, since they must be evaluated
->> and matched upon, before the kernel checks the
->> skip_sw flag.
->>
->> This patchset optimizes the case where all rules
->> are skip_sw, by implementing a TC bypass for these
->> cases, where TC is only used as a control plane
->> for the hardware path.
-> 
-> Linus tagged v6.8 and the merge window for v6.9 has started.
-> This feels a bit too risky for me to apply last minute,
-> could you repost in 2 weeks once the merge window is over?
-
-Sure, I will repost once net-next opens back up again.
-
+Looks suspicious, all sort of resets should be usually done before the
+netdev / devlink instances are registered. As soon as you register those
+they may get brought up and used (including synchronously by an
+in-kernel user).
 -- 
-Best regards
-Asbjørn Sloth Tønnesen
-Network Engineer
-Fiberby - AS42541
+pw-bot: cr
 
