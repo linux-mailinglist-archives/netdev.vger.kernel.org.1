@@ -1,97 +1,101 @@
-Return-Path: <netdev+bounces-79270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15825878900
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 20:39:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 643EC878905
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 20:40:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2C1A2816D4
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 19:39:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95E3C1C20B0D
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 19:40:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A579F55E72;
-	Mon, 11 Mar 2024 19:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C1DD54FA9;
+	Mon, 11 Mar 2024 19:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MEn3l/E5"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="w4AtlwYL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7916E5579F;
-	Mon, 11 Mar 2024 19:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDE6C40847
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 19:40:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710185962; cv=none; b=EPwmJcdg0Mho97XCtQ00UzK46lF3kb2pyZ2N27Vm73UR8qEGPhmFaYoBhpwESYX3eOisisJikcn+pB2IGHJ+EgAbLwxxOaVLHhef8mzM0puIfz9oGcSUWdrDUZ95rpQhWqKD5hzWYGgP380MUrSPeM0quazKXDi/DaZhYJ5T9mw=
+	t=1710186008; cv=none; b=PObEQOAEtet5RSv7l6QXXg4b1NWAnBzjp7wQbQwcyXVaAhdcFf6bkx5uJGyC0/yKlcr9bnSh1ZtkuiCaizJzZVqfDBz6l9cMCJXM0bdx4n2ZLNlFLWHfg17f/vKLoIwpXXR78okUJwaM5qvsdH4GWHREBW9UQy5u/F56cNXm8TQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710185962; c=relaxed/simple;
-	bh=RxFF2//vLuW1+4v7hEe9axSby27a7ZHrxc8sIlCocZk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hToFR3tizzgtT7Ap+REjuGE11OKfJoV0Ga41vFP8pdppuAf6X8Ket3cRkWxJhPOSu5RfPYGMQV1RWAlVJ6Zd4S99JJoimyPnVCg7DRBrRV2PsPyBvlBS31BAstXy2KGHEiGHXWhlkmFgb2TiQl5sjiM5NP24Gl7dEXrEOOhz1tM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MEn3l/E5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 29E26C43601;
-	Mon, 11 Mar 2024 19:39:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710185962;
-	bh=RxFF2//vLuW1+4v7hEe9axSby27a7ZHrxc8sIlCocZk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MEn3l/E5kTFDtiG36YggELNTNkmcui+sOaC9uL1aKDHvJbSWZK1g5l4bo3MMdH2JD
-	 w3BwfvBb/t6+9VIT2mlIoLH1A0ef8dCB/EW12WFF6dB0RpPzdLBI9EuR46WM6HtjHL
-	 k9KUGHbxCAcrjEn/dNtaLBtWcMjkCIRD3QPl3o8Nl+DorfcZQsXgII74ZyUbmQGlVD
-	 pBgNGeJ1WmRin4ZpU75uC3XBeLYnKuIrbLonzKuvgF6f2E1X53rheezcColrfdPUCY
-	 xkkwT+XOe5H6bfp+rqucms4sAvIPPrYyQ0PSVsM5g+OPdCRSltIwOotEiuPKmjK1Ic
-	 NU1LyWIqBLqWw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 05E76D9505A;
-	Mon, 11 Mar 2024 19:39:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1710186008; c=relaxed/simple;
+	bh=O9VVRULAjwcUhvDhUqr00ZKxfpoT6Ig2yEPT0Jw08uM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=A+q0ljObVu9ym7mbkiKEcFo871jASjC5DuMuTllPjCfb93wmWc/bCqLiPMmn7ToiCNYEFebBR2IpILhAOsUXEffVYMCaHAk/AdzVsuZV5tF01a3GaNOqq/P00RIMnAXdklD13TV8K/Ab9PVrS6QbkwwAZp2E/FJ+2exNrFbRlY4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=w4AtlwYL; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1dd9b6098aeso10905495ad.0
+        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 12:40:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1710186006; x=1710790806; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QW4qrF3dYJC9Jt83dM4tJZJpWXSN0XPQWbIDUth95wk=;
+        b=w4AtlwYL8TzLatDz5RD/xsf+SwNlCrMnopZAL3Mp/sdI79wJElO8YG1OE2Z+quRkQB
+         9WZ7Lko8XHXtReYglalwkKS1C/Pbvw4iFJDV0RMt+RxgRByhjhWIe/zuO5sRMUazSuJJ
+         l9R1qrZhtGoseMfAVekL+hjXimkLRHwdiZOPKlLN1qQi3AScInbH63YMZWnBk7JgElLE
+         XfsRYznSNeZ5lmJg9VxsCQ0xkv4jhQJ4ucsLODmxq+kYvFkWq3iRwjHqjuXL9gDkw1HB
+         5d6O0YbhvWDNjmE/CDhaXoeZsHsZLa1gDyotu/XfqwUMn/U5C+6n1zab/Mn20iWnvTlJ
+         de7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710186006; x=1710790806;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QW4qrF3dYJC9Jt83dM4tJZJpWXSN0XPQWbIDUth95wk=;
+        b=xMPCR4m1DBLm72SP8JipAWqRFfW5eUBbN8GvCRlkuO+FOkZorTEqsQvPLS08TuPEcP
+         06xNRE/sAPr2u2BvEj9bfsqnLpCdDncb3eNbHJAk4vpA292sLIwi2dbmkX7wIjvik/9d
+         p64OB6szI5vDUDRiPtUvnXDLikOqPzDvJLzGuGAHoxBLPUA2W6YWXorMrPONccAfr5IY
+         JZ9U8PM6ZcFbXt7uRiD+lw/SdhS142E6QxcnRGW84CVlyGtqIXuXTDoXAhQNXIN30un0
+         LTdeVdNX1Bg9ryVOGUQ/4RklLXryQisEDJ+nr1jWt3wixfQBON48Hi8bDQc0dsO6r9Et
+         CQ1A==
+X-Gm-Message-State: AOJu0YwPbD5gqDIroeUMaCqFjvHBc/RcdwZqJZa648m99J4ikGUOHwLH
+	oeYnEQWnOTQI0vA/Ul7KHQNDtbpT4uHcDFG+7k9IEkcUqxww0GjEapEFpXlQVfU=
+X-Google-Smtp-Source: AGHT+IGA4aBvqBuQuowmadkSQkyYejGUXNJyFF57lHzrMmXGadO042nWtM7AFKFDnWH0uSFSdos0tw==
+X-Received: by 2002:a17:902:ee4d:b0:1dd:2b9a:a1b6 with SMTP id 13-20020a170902ee4d00b001dd2b9aa1b6mr8084753plo.25.1710186006099;
+        Mon, 11 Mar 2024 12:40:06 -0700 (PDT)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id t18-20020a170902e85200b001dcfc68e7desm5063506plg.75.2024.03.11.12.40.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Mar 2024 12:40:05 -0700 (PDT)
+Date: Mon, 11 Mar 2024 12:40:03 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Max Gautier <mg@max.gautier.name>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2-next] Makefile: use systemd-tmpfiles to create
+ /var/lib/arpd
+Message-ID: <20240311124003.583053a6@hermes.local>
+In-Reply-To: <20240311165803.62431-1-mg@max.gautier.name>
+References: <20240311165803.62431-1-mg@max.gautier.name>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] annotate data-races around sysctl_tcp_wmem[0]
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171018596201.1144.18058014960608498774.git-patchwork-notify@kernel.org>
-Date: Mon, 11 Mar 2024 19:39:22 +0000
-References: <20240308112504.29099-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20240308112504.29099-1-kerneljasonxing@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: edumazet@google.com, dsahern@kernel.org, matttbe@kernel.org,
- martineau@kernel.org, geliang@kernel.org, kuba@kernel.org, pabeni@redhat.com,
- davem@davemloft.net, mptcp@lists.linux.dev, netdev@vger.kernel.org,
- kernelxing@tencent.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 11 Mar 2024 17:57:27 +0100
+Max Gautier <mg@max.gautier.name> wrote:
 
-This series was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
-
-On Fri,  8 Mar 2024 19:25:02 +0800 you wrote:
-> From: Jason Xing <kernelxing@tencent.com>
+> Only apply on systemd systems (detected in the configure script).
+> The motivation is to build distributions packages without /var to go
+> towards stateless systems, see link below (TL;DR: provisionning anything
+> outside of /usr on boot).
 > 
-> Adding simple READ_ONCE() can avoid reading the sysctl knob meanwhile
-> someone is trying to change it.
+> The feature flag can be overridden on make invocation:
+> `make USE_TMPFILES_D=n DESTDIR=<install_loc> install`
 > 
-> Jason Xing (2):
->   mptcp: annotate a data-race around sysctl_tcp_wmem[0]
->   tcp: annotate a data-race around sysctl_tcp_wmem[0]
-> 
-> [...]
+> Links: https://0pointer.net/blog/projects/stateless.html
 
-Here is the summary with links:
-  - [net-next,1/2] mptcp: annotate a data-race around sysctl_tcp_wmem[0]
-    https://git.kernel.org/netdev/net-next/c/9eb430d40e44
-  - [net-next,2/2] tcp: annotate a data-race around sysctl_tcp_wmem[0]
-    https://git.kernel.org/netdev/net-next/c/683a67da9561
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Why does arpd need such hand holding, it is rarely used, maybe should just not be built.
 
