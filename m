@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-79274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E86B87893F
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 21:07:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42E75878979
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 21:30:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C10BA1F2169F
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 20:07:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF4D928220C
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 20:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1EF455E75;
-	Mon, 11 Mar 2024 20:07:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C141A56B68;
+	Mon, 11 Mar 2024 20:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UTzsQufX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="napyVu9g"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF2E52F82
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 20:07:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99AFC5675F;
+	Mon, 11 Mar 2024 20:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710187627; cv=none; b=k0UJLwPg+eweGLA/QtKp9EqtNknE5epJq0kXWyzMqcTKjSNSaPiH4Rg7Egemd1TQyORw2ayEb6b+pJUVywIOaHIdvszwdnJR8qwjKyGVjImh/Aq3hePmXTa2XZe8RJHVP2qYnEJNdAGSgguvYqwvndBy7ZMCSX2+T5p0bn6hyyU=
+	t=1710189012; cv=none; b=SrgceWFa26ySqAQeU8yxVF1cR2FazdElYIav7qTN542qGb5EAH1WHjx22URC7GvzZ5ZXjobZF5BAbSLyqkBkDkmW6ugrulhuJGWbmBu70nWd7AnOy0X+0E8CTSv42fcj5XbhforNWFjaMz06PmevPQQ2ah66d2LHF6iO5tSmzqQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710187627; c=relaxed/simple;
-	bh=QVKWXgA0QWWVBfoVKKqIeGVnlJ8LxVXtsJRm9NNd4RA=;
+	s=arc-20240116; t=1710189012; c=relaxed/simple;
+	bh=0tS+vxfg8HDQU1ELwiYHWm6/ey7BA5p+nRLEIii4sbA=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qS3ABHhOnLZ5IEQNlv7YNrM2LH5UB+HMG/Va8iDaancKZYSSJSSUMU7TSZcdHNp5G1ohr4obBNM4bpjuSDcloCEUDHtNWp3/LBuPphePt3sXlvq2zzgd23EaxKP2yPYzW581VZ3c8/Z2iRjkcUKdlWKpftte9I5uP24h0LWR46s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UTzsQufX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1B200C433C7;
-	Mon, 11 Mar 2024 20:07:07 +0000 (UTC)
+	 MIME-Version:Content-Type; b=udWTKXfpNnms+672ASMyjefexOVYH1fThVVcPluqwzUU6wNH8uPN57BNxpnklewmeUFk0Xo3t4ZNUlnp5jM7e1fRtFVSroEHHPfRTFTwn9fX7+naBQ7kbHwjIDRmVTznajGeGGAqXSBViuKn2EPKu10pBUdG5g0++Lc2P4PVdYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=napyVu9g; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 339ACC433F1;
+	Mon, 11 Mar 2024 20:30:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710187627;
-	bh=QVKWXgA0QWWVBfoVKKqIeGVnlJ8LxVXtsJRm9NNd4RA=;
+	s=k20201202; t=1710189012;
+	bh=0tS+vxfg8HDQU1ELwiYHWm6/ey7BA5p+nRLEIii4sbA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UTzsQufXmc/jjD3JdsGut8hICP1FiSueHvrDqnoHOu+BTRY0H60w7/DdNLs6YFA70
-	 fTyc4eiBi5wmoo1fG9AmTpgFeuuYiRqAqckh7aRR7za5U8rPJZ7vEYXDfcY1D4OQ+W
-	 s/C39q/R89k+KL75oRR2DLsDYIj3yuGehwfWjaU7w6BGrfGuBnEaDCy0EAb8R/mamU
-	 3yenXZS4j3B3msUVGxkPEQt1sTmUX3sOna06NN0SnXHmS0q4dKvWFILrZsGZfgmn7z
-	 d81NTE7oXIbP8pvJKERJo24KXzlXvhX4rwxVb3YrBtmer8WdOIHZCzJ8US5ppU3uo6
-	 V9Za2Afa5NcwQ==
-Date: Mon, 11 Mar 2024 13:07:06 -0700
+	b=napyVu9gbFaWdcdGETPbBSu48gI6089fqm14WR3nQWP8Jzk+3rSjWJebxJlN9MD+V
+	 n97OpRePO3CRoPyBnfJyZngPwA3gC7GuVXlsOYgVWIGCfz9OBLhxlEXuuntWdVomlQ
+	 8ocqNYCcJ9UrdO7Fn6eZfWm+AL+duqbl5OKwm1iu8gB9BU+BOFb9RHw2Z4p0UzYl2U
+	 GK8dVAs7SNpoF5+E2IlDR+f068V+3MjDfOjcBreEXg5ro8SxwBaHfzHz2ucba/AQzy
+	 SzYnw+rLl9GIJSx+efUX9GcY3BiPmO+dFatWhZ7Vnt+TSo8qdlBCA0H4vsbUUNCLz1
+	 2RUjDosx9ggMA==
+Date: Mon, 11 Mar 2024 13:30:11 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v1] netdevsim: replace pr_err with
- {dev,netdev,}_err wherever possible
-Message-ID: <20240311130706.09f35fdd@kernel.org>
-In-Reply-To: <20240310015215.4011872-1-dw@davidwei.uk>
-References: <20240310015215.4011872-1-dw@davidwei.uk>
+To: Ignat Korchagin <ignat@cloudflare.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-team@cloudflare.com
+Subject: Re: [PATCH] net: veth: do not manipulate GRO when using XDP
+Message-ID: <20240311133011.2f9236da@kernel.org>
+In-Reply-To: <20240311124015.38106-1-ignat@cloudflare.com>
+References: <20240311124015.38106-1-ignat@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,16 +61,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat,  9 Mar 2024 17:52:15 -0800 David Wei wrote:
-> -		pr_err("Failed to get snapshot id\n");
-> +		dev_err(&nsim_dev->nsim_bus_dev->dev, "Failed to get snapshot id\n");
+On Mon, 11 Mar 2024 12:40:15 +0000 Ignat Korchagin wrote:
+> Commit d3256efd8e8b ("veth: allow enabling NAPI even without XDP") tried to fix
+> the fact that GRO was not possible without XDP, because veth did not use NAPI
+> without XDP. However, it also introduced the behaviour that GRO is always
+> enabled, when XDP is enabled.
+> 
+> While it might be desired for most cases, it is confusing for the user at best
+> as the GRO flag sudddenly changes, when an XDP program is attached. It also
 
-We seem to use dev_err(&nsim_dev->nsim_bus_dev->dev, ...
-in quite a few places after this patch, how about we add a wrapper
+s/ddd/dd/ spellcheck the whole message, pls
 
-#define nsim_err(ns_dev, args...) \
-	dev_err(&(ns_dev)->nsim_bus_dev->dev(dev), ##args)
-?
--- 
-pw-bot: cr
+> introduces some complexities in state management as was partially addressed in
+> commit fe9f801355f0 ("net: veth: clear GRO when clearing XDP even when down").
+> 
+> But the biggest problem is that it is not possible to disable GRO at all, when
+> an XDP program is attached, which might be needed for some use cases.
+> 
+> Fix this by not touching the GRO flag on XDP enable/disable as the code already
+> supports switching to NAPI if either GRO or XDP is requested.
+
+Sound legit, AFAIU. But please also adjust
+tools/testing/selftests/net/veth.sh because it's failing now.
 
