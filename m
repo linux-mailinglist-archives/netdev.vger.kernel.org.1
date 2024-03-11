@@ -1,290 +1,222 @@
-Return-Path: <netdev+bounces-79172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0E7787819C
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:28:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65E928781A3
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:30:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF5771C20BDB
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 14:28:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E61CB1F212DD
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 14:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7E2D3FE3F;
-	Mon, 11 Mar 2024 14:28:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8480940850;
+	Mon, 11 Mar 2024 14:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fEVWUki4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0497F2C68A
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 14:28:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710167313; cv=none; b=JYrXaUbKVEGtkLEqgGEcav8NXsiQiMeOje7qPqzS6/uPLFLwkqouUqYorguW/uj0h9geWtPOWiavqBbzT9iXch1kwJvjo+hACe79EftSNKG4tVHo/dg2eRXUb5Vv3/pzQdHqsFz6IicpCFhcu8e1x/DuQYUJxZnuC9dV03BzZcY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710167313; c=relaxed/simple;
-	bh=u3xgcg5vMS+GWQF8joWVSVPj0ArKx3mNng2pMz4X5/o=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dvcSncjigBufCoxW21Jb1slnty2cASaBB8OgNy/TzNYemZ7hca/2BhOI9yX6gTcFZMTVau0oI2wjM6enhv/xHN5HD1l5d6+GbZr2WqIHw8IDnY1kIEF5pHJen00+fW3DhVAsAu1kEjGh8zKaOjQY3ovQdsuUtIab6tamwPX3DsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7c7e21711d0so348367639f.3
-        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 07:28:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710167311; x=1710772111;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=otpyQD2PGNyjaN7oKV6ZdeT7sdo7A7EKKdn/KmDT/ew=;
-        b=DhN/ePeKbhCRtL5SLCsWB9kCGv9UvcGTamW4+dl3r8irgpek1F1Kgjt4lUe5kGShwf
-         ZOxlueg2NaZgUng5X4T6+ZUh1Sakw7TuskK2tGd3sfJP2LV7VKgvr2f9zkqgN+Ma272E
-         zd+cp6uExG8iP+Ke8DDLDygkZx4PhsxAnY+3FazLBrML/DMy35VNc44rxwMZUEDlQJml
-         P1zBuKpZKE8OKA5zQjGPFdoa8yZgcCQF3w8vAmcYfqXxab7umHvm/xnu6MkvygUOqZR9
-         SbWOz29+jL/okmPjyaWJKKvHZO1GoJIZ9aYLU0l14bKLbDrroGJcxB4BE9G92SKaUYcw
-         1cmg==
-X-Forwarded-Encrypted: i=1; AJvYcCXWZjIeU6/YYJfjNqOEwwtWk/C5Za5rmEO+u/67YeJ6c1ei3cGrUwGXmIojVJsSzKO0a0OlDywC5/N6jrFe73AXJQEBXiWe
-X-Gm-Message-State: AOJu0Yyzj3Hb0HMSglmwBeUbS43iO/SlUdeKm6MN3zZvhdsiO4LOheps
-	DWOBOJX820CoN78hUrWMErFNiDT1hhkhvd9r+pGTrukQVYHzKvZFGKwcC4qPv+TCcT83BP5hWzl
-	jS1ek35YoUGSIObuV08/7U3fq5Yb/GKD38xQnxx9QL9hoJ1sc+NQq0Rc=
-X-Google-Smtp-Source: AGHT+IG4n8tj0f9lXUWqJS/Bk8nsI2GC+Gk3aT7ssMTZUtLlZWSnSvWqx1w4/tnFuxqwnXkLo5mVQMUQOwbdaKz3dAZpUFgLFlIt
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C633405CB;
+	Mon, 11 Mar 2024 14:30:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.15
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710167405; cv=fail; b=PwLL3FdRhQsqdc9dGZ2SqjKsc7AGA7RYoYElgqfKuw8y1NjlQImFIh7YdNLv5xtgqSeuftkFa+1HGXmZrB1fGxOIBE06XN8wY+8RyghlJDHlw7GKcd/P3IHR96UESJPLMB2ipGMG4JMgiGgL8jVkd9rmkiFI2+KdnezAp7uujVA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710167405; c=relaxed/simple;
+	bh=RMa4rB9O9VpR4TK1JZMPga5eOoTIJ8U9HcqMEn3jgYQ=;
+	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=oOQg/G0l+jDY6me8YzR+1b1QSaVgFShjUtyZRPQvcZ9kMZYwFoVeRMHy7UibbJa7xnUkSnnz2oMxevQ6IdA+9lDRSPjs7EhvvjfFAeRT+cQzAUzyMEaPINbDK6bo3v3uEb5mItXD4C+kmXyaO6Qc0lt3TjPv1BaRIh+5KYKjR2I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fEVWUki4; arc=fail smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710167404; x=1741703404;
+  h=message-id:date:subject:to:references:from:in-reply-to:
+   content-transfer-encoding:mime-version;
+  bh=RMa4rB9O9VpR4TK1JZMPga5eOoTIJ8U9HcqMEn3jgYQ=;
+  b=fEVWUki43BHDcsE+X/wVul/i5qrTPqJFej6vmKu1K1dCmx/sSyv/sv6a
+   oQcUGOzBCnnvOB8dAT4e22RlCY4Yd4tWUUM0osPseWlCOhAom90rKygG1
+   UPcIgMthPjt4xCamy6hIwouNuD+CcLSSAEdfWD+6aCenfApLCXnHwxYqj
+   GLP3uAbM0RhgaSt8a+WZgL8PNHVTw2gm9/BrZW0EojjaN43vHLfwl4Okd
+   NwIBCubSD/GKMGZbWB9DHoI6MCdL9mFFk47+m1aowg1Ldb37bVSOm0TUC
+   OiJUZmsmLVjEyrXrMEeAspjiPVAZazHF+gVqS1Su3HK90h+zryTRFPZan
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11009"; a="4996373"
+X-IronPort-AV: E=Sophos;i="6.07,116,1708416000"; 
+   d="scan'208";a="4996373"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 07:30:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,116,1708416000"; 
+   d="scan'208";a="11073279"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Mar 2024 07:30:02 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 11 Mar 2024 07:30:01 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 11 Mar 2024 07:30:01 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 11 Mar 2024 07:30:01 -0700
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 11 Mar 2024 07:30:01 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=G3zzbRupW7QfehERg+T22aaBvXoNiPzf9VYRvKVXYjnjJOWF7z0MBIPneem1QbNWnTqFzil+Rc3yvpRAHDEBHd2Q55rGRScjcHl3m3QE5iQkMDGaKROqSKmir46OFaAIoWX92YnUS6LxKmDeT4f0h99Ii07bsy41YnG/TyPeHXuoAM4goNAePmrZot3+suiU9VZQvMX641vhw03JQEvf+CjLJi/N49Z96xGdZ8x2/dMBEGGgrwLRd2nS1jvuyUGX1njjtkKNMUoJcrFhKr1NgWRTGni5PzWEyTBgfMUwx6HWf5uwW0pDYzUKd06MUeP0r74UPIaWJI5Rd7ruFc+IIw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Py47f9xgeYhSA0atAqskDp/okOY9rSm/z0WN3k0xZNo=;
+ b=RRwhdclpmZ0AhgnkD5PMmcfcJlOU6gj3f1clV+G+LVSSC28l8qPyxyUBOkZbfK8pjyI7UAz749dpYhswnpzB2VhEQyHB++qVMi8HqoIt0yibm2iwE/+Kr3OgsPHyKdzJ1Ji8rrwaKY35caQLRHYE/HNP5oawIUo1PjqTsuuPmu9sp3fU6+O99rr2HhyKJWYW5nshoDlrPZcpSk8OF1QTAlaNkirYNbdPZFSHZgXptVmAYkNbl0LG1KFSxwUX9IdhZyYvlo0jw6mUwWTLVJlOINnxQV4HR7dyTuX6aXq+i5vra2aO1tq97MkD3w8ifOoiJa1i5+WSaLis9B48CclBxg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by DM6PR11MB4548.namprd11.prod.outlook.com (2603:10b6:5:2ad::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.16; Mon, 11 Mar
+ 2024 14:29:59 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::618b:b1ee:1f99:76ea]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::618b:b1ee:1f99:76ea%5]) with mapi id 15.20.7386.015; Mon, 11 Mar 2024
+ 14:29:59 +0000
+Message-ID: <10dcb1bd-1a61-46e8-81c3-bc87542b72c4@intel.com>
+Date: Mon, 11 Mar 2024 15:29:51 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] net: marvell: prestera: force good base mac
+Content-Language: en-US
+To: Elad Nachman <enachman@marvell.com>, <taras.chornyi@plvision.eu>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <andrew@lunn.ch>, <kory.maincent@bootlin.com>,
+	<thomas.petazzoni@bootlin.com>, <miquel.raynal@bootlin.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240311135112.2642491-1-enachman@marvell.com>
+ <20240311135112.2642491-4-enachman@marvell.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+In-Reply-To: <20240311135112.2642491-4-enachman@marvell.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR0P281CA0213.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:ac::7) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:3f81:b0:7c8:4874:5eec with SMTP id
- fb1-20020a0566023f8100b007c848745eecmr168320iob.0.1710167311172; Mon, 11 Mar
- 2024 07:28:31 -0700 (PDT)
-Date: Mon, 11 Mar 2024 07:28:31 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000016d7240613635b86@google.com>
-Subject: [syzbot] [wireless?] BUG: soft lockup in mac80211_hwsim_beacon (2)
-From: syzbot <syzbot+7e51ea277ea81fe6935d@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, kvalo@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|DM6PR11MB4548:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3f4b0e6f-e98c-496b-ad16-08dc41d7baf9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: HIJwzHcGb4xfHFPw3CMGDpg3sE/XAuOYrzvt9hPUuoCAsSpgNUbBTzGOiw6hQGyKpcgb+4oPzX88L5oK2leIwOTz7KakyugPKyYVerMR0dbuFnc9axFKKHjIsPnmGyHQesQPpUFRaTpsM6ERilkf/dtRg82Sx8tzGUgTjtZQtHKdKAZUDyWTT2CgXPPcVof4tmJytEw/Rt71mB6ljFWweaTMBVR2a7+hWKFHswkqPVr0YYsB0QfI3oVv8WFKGG7BQUvJuFmKdfR8UUdkVsQZbQRktHmef10YSWeZo5uk5CLfDeUmkcN63DVfelorMbqW1FrJixpJmw9fXshYqH1GfCKYn4ifL3pBcFQFPmcj3gvGaX6cgNyua4OBk5LK6emJDezdF+2xwuP+wxS5bUyboPbj2IqmvvPQayu5c85NoRWOZRTWZFPpPuWoCHIJzOzTl1VP2LXdvoscPNpCm2UooPbYLeM6lcLkbuMJ9OF7I2ZVnQFwu7gcNZMpHvFh5RtX5KZnI6blirTL+K1w3XCrbEhm7dfZ0JWIkvkMw6uV+XtHkNF2RYMkVKjD+UEJezVpOc+qTBVfnVyszUWboNEQ+qWsTZQNJgZ1SGHnybqkVh3d3rxdxl/z40R6uDPKJO9X2Wa1hutPJsAnD5wahfV5ZWRCgUN/MPKtiWt0uNKtLaZjVjPpEg8OrkKvI7cEqTZZp8weHrIBUNn8K8NJ5JtGaA==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(7416005)(921011);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a2oxVkdTV2Q1UGpMSkxnYVFIQmM4QkZpbUU4bjBWSXNDb1FVeFhHK2hJR2Zp?=
+ =?utf-8?B?Wm4rMWNjZlh1SWlRRnY5VGlZRzNqcEVVVVRKVkxQYnp2bWhzTTYzRW4zNG5Q?=
+ =?utf-8?B?QmVveTczT3pPbXRROTVkUU1aOUJnYnByNnk0TlVrS0hIQmVWazdkUGh0aE0x?=
+ =?utf-8?B?M0QrVjNIam5yTzlRZE1VaTNESzVJZStlYUJIYkIrb3RLZmlROGloeWJCVnJm?=
+ =?utf-8?B?b3RnRlFjUzhRcEhTb0Roa1F2SXJ0RzVOemQ3TlBYNzZrdllJcC9HeWxGL2pM?=
+ =?utf-8?B?ODN6UnNsOHJFUm5XREh1Q2tSeVNnd2tMTzI3cXVNdWZjZkc0N0lQenJKRlRk?=
+ =?utf-8?B?aW9BamJGMHRERUUvUEFlakFyOWR1bDhHZ1pXMXdqQnF1cXkzdjhuL1c3MXVC?=
+ =?utf-8?B?UjV2N3lIZzJTb0Y2blkxaDRnaktJdmhIVFV4ZDg2bmY2MGE2bHUzV0ZHWnZ5?=
+ =?utf-8?B?S05FK2piZUpPeExZd3krS1lNVGNBM1ZpYVdpanFHblAwK2JWOU1kSWMxYmpz?=
+ =?utf-8?B?Y3BjdFA2N2pkaFFOOWt1bm5MdWVSak51d2pqTm90RGQzM3JUcy9iMXg4NlNi?=
+ =?utf-8?B?Z3ZIYWdhcm5obStYOXFyaXlmRnEwSGFZaktrUHkyVnZERVJ5NVBPQzdLZjlL?=
+ =?utf-8?B?TFhaVEdxU0ljT2VBSEFuWVdjMnhodHlISEYzcURSRkw0d3pEWVRLQnUwTVdJ?=
+ =?utf-8?B?VVgxd3hQbXY3dThCQWptM3NpdlRRK25zckZyblVQUUpiTkJQajJpUVdzbWpJ?=
+ =?utf-8?B?OWhrZVFDdHgrUkNGWjJpcHkwMHVjdTZndk5rQWlnRk82dGhwVkNQNkJrQXRE?=
+ =?utf-8?B?eGxIVGhjbU8zcHpPUDNSYUpWRHZEQVNkVE95N29EbDhia1QvRHNkZjV3T0xy?=
+ =?utf-8?B?UkRudVhSNzY4aWgzSXorZVczZmhFcTZDaUFOWkg5dmJWVjdMeUlZOTNyU1lC?=
+ =?utf-8?B?SU1VdjV1V2grUXhOUUpLS3R3ZUZ6cTBXWWNmN2s4enptZ3pDbEZmaHFicS9a?=
+ =?utf-8?B?Uy9vYTEybGN0RHlVeTVuSVFrUUJzZnRwQmpRZW80QXF4SmdKNWlMRWExQmkz?=
+ =?utf-8?B?UzBuR0xZb0xFNlhyUklLSWJlZHIvVHA2OWI5MWsvd1hmejdOSmQwLzMxZDhv?=
+ =?utf-8?B?c2d2bHNreFdPTnpidzlreFZ3K29QRC92VzdMcFlaYkRTa3ZlaE4wTXArZldk?=
+ =?utf-8?B?bDVYZm1QVFQrT3A2clQ3ZzQzWEhNSFUybGZ6elIxMENjaEpDdmJRMGtSTUFw?=
+ =?utf-8?B?RGNlaVB0K0Z0NmZKOWc5MERiT2pyTmFYMUdocURuMzRuMEtveWR5NFNuSTBL?=
+ =?utf-8?B?YkJxcTlUcFdiVTVQaVJqSlVzR2l1TWdoazRXNHFObng3WGs4dk5BeURkOEtr?=
+ =?utf-8?B?QmxZbnFyYnpIa2p4T1RVSjQzZzRqd2RydGVnYzR2b2RoMTVybVJ1L2FCVzJW?=
+ =?utf-8?B?MnBReCtoVHVYRmVvVW9tckxzYzY2MHVBLzZKUExQM2JkREFCOVQzUHZNRURF?=
+ =?utf-8?B?N25CdGFscHk5MVQ4QlIwZXcvRXpFV2Vhb1BXamF3OVFrRmRZdEg1WUxpV2dn?=
+ =?utf-8?B?c1FHS3JXTkN4UTQrV0tzT0ttVUo3QzcxTDcvdXBHaVp2M1IwSWJCNGRTWTBP?=
+ =?utf-8?B?dTJYeHNWaDMyYXBJenkxNUlyOWlrSGtTeFczTWpJa1lHQVpTcmlkVkp2V0dP?=
+ =?utf-8?B?SERkeGp1eW8vcTVTN1dUdXAyWFdBUUtIQ0d6Zm5DZ2FvWHBwdDFQL3NCdDhx?=
+ =?utf-8?B?MGI4c0Mxa1Z6YUowemsrNHRjVkt2RDQ0Q0o3UjlNMjFQM09xY0MwaXNGNnpo?=
+ =?utf-8?B?b2dkVEVtWVNLSjhDOWt6OGhHS2FHWHl2cW55RVBNc3llTVdhL21zc0YvN2dO?=
+ =?utf-8?B?aS82ZzBqUUtiNDIzekpLdnhIa0ZmNkxHMUN0dkxKemlPM3VRekF6dE1VVlpH?=
+ =?utf-8?B?NWdnVlZ0VEljM1p2eFFTYzdQVDMxZGxaczZHQnFDSXZLbURXbUJSRzhaeTdp?=
+ =?utf-8?B?M2prSWU3SDViZVg2ck11RnBHYlE3T3p2OGVTeUZCSXNnNFJzbHNvZTVjajZi?=
+ =?utf-8?B?RkVockdqc2VUb0NqRFZzNkNvc3c2akc0cEplb0pCZWN3YVgwUXlQc08rcWNp?=
+ =?utf-8?B?eVpDbTRxZlZLdStGUjAyWUI5N0xONEYvc1hOY0FPeFZRUmVCUWxndjRRTktt?=
+ =?utf-8?Q?p3ujlPqHBj3KaZKpBwmKRz4=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3f4b0e6f-e98c-496b-ad16-08dc41d7baf9
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2024 14:29:59.2169
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: suvDM5FjFzoR2kI69/5Kdd/U760SeZQpCfjReZS6pv36jcLiAIQ3CmPLWfBclAxvno8y6WZYtjYXxpdudWj+/GmJlNnPcG5FTrUIAob1pVA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4548
+X-OriginatorOrg: intel.com
 
-Hello,
+On 3/11/24 14:51, Elad Nachman wrote:
+> From: Elad Nachman <enachman@marvell.com>
+> 
+> Since each switchport MAC address uses the switch base mac address
+> and adds the physical port number to it,
+> Force the last byte of the switch base mac address to be at
+> least 128, so when adding to it, we will not wrap around the
 
-syzbot found the following issue on:
+to be at *most* 128
 
-HEAD commit:    afe0cbf23373 mm: Introduce vmap_page_range() to map pages ..
-git tree:       bpf-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1014c63e180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=92e06b597766606e
-dashboard link: https://syzkaller.appspot.com/bug?extid=7e51ea277ea81fe6935d
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> previous (more significant) mac address byte, resulting in a
+> warning message.
+> 
+> Signed-off-by: Elad Nachman <enachman@marvell.com>
+> ---
+>   drivers/net/ethernet/marvell/prestera/prestera_main.c | 4 +++-
+>   1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/marvell/prestera/prestera_main.c b/drivers/net/ethernet/marvell/prestera/prestera_main.c
+> index bcaa8ea27b49..e17b1a24fe18 100644
+> --- a/drivers/net/ethernet/marvell/prestera/prestera_main.c
+> +++ b/drivers/net/ethernet/marvell/prestera/prestera_main.c
+> @@ -859,7 +859,9 @@ static int prestera_switch_set_base_mac_addr(struct prestera_switch *sw)
+>   	if (sw->np)
+>   		ret = of_get_mac_address(sw->np, sw->base_mac);
+>   	if (!is_valid_ether_addr(sw->base_mac) || ret) {
+> -		eth_random_addr(sw->base_mac);
+> +		do {
+> +			eth_random_addr(sw->base_mac);
+> +		} while (sw->base_mac[5] > 0x80);
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Instead of this loop, that uses 6 bytes of random data at each step,
+I would just fix the last byte.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/03e310611053/disk-afe0cbf2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ebf9a3ff28a5/vmlinux-afe0cbf2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c4747941c346/bzImage-afe0cbf2.xz
+Either by calling get_random_u8() in a loop, or perhaps better, just
+toggle of MSB unconditionally:
+sw->base_mac[5] &= ~0x80; // or '&= 127'
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+7e51ea277ea81fe6935d@syzkaller.appspotmail.com
+what would change your condition in commit message to "to be at most
+127", but I think that should be fine, granted simpler code.
 
-watchdog: BUG: soft lockup - CPU#0 stuck for 143s! [syz-executor.0:27055]
-Modules linked in:
-irq event stamp: 19856771
-hardirqs last  enabled at (19856770): [<ffffffff8b6bbe43>] irqentry_exit+0x63/0x90 kernel/entry/common.c:351
-hardirqs last disabled at (19856771): [<ffffffff8b6b9ade>] sysvec_apic_timer_interrupt+0xe/0xb0 arch/x86/kernel/apic/apic.c:1076
-softirqs last  enabled at (19856234): [<ffffffff81592661>] invoke_softirq kernel/softirq.c:427 [inline]
-softirqs last  enabled at (19856234): [<ffffffff81592661>] __irq_exit_rcu+0xf1/0x1c0 kernel/softirq.c:632
-softirqs last disabled at (19856237): [<ffffffff81592661>] invoke_softirq kernel/softirq.c:427 [inline]
-softirqs last disabled at (19856237): [<ffffffff81592661>] __irq_exit_rcu+0xf1/0x1c0 kernel/softirq.c:632
-CPU: 0 PID: 27055 Comm: syz-executor.0 Not tainted 6.8.0-rc6-syzkaller-gafe0cbf23373 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-RIP: 0010:unwind_next_frame+0x78c/0x29e0 arch/x86/kernel/unwind_orc.c:512
-Code: 0f b6 04 28 84 c0 0f 85 2b 1a 00 00 48 89 d8 48 c1 e8 03 42 0f b6 04 28 84 c0 4d 89 f7 0f 85 38 1a 00 00 0f b7 5d 00 c1 eb 0b <80> e3 01 48 8b 44 24 78 42 0f b6 04 28 84 c0 4c 8b 74 24 48 0f 85
-RSP: 0018:ffffc90000007268 EFLAGS: 00000246
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffff888022cf9dc0
-RDX: ffffc90000007375 RSI: ffffffff8dfa0160 RDI: 0000000000000002
-RBP: ffffffff90827e78 R08: 0000000000000003 R09: ffffffff81405417
-R10: 0000000000000002 R11: ffff888022cf9dc0 R12: ffffffff8fe836bc
-R13: dffffc0000000000 R14: 1ffff92000000e68 R15: 1ffff92000000e68
-FS:  0000000000000000(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f295c0d56c6 CR3: 0000000041be4000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000600
-Call Trace:
- <IRQ>
- arch_stack_walk+0x150/0x1b0 arch/x86/kernel/stacktrace.c:25
- stack_trace_save+0x117/0x1d0 kernel/stacktrace.c:122
- kasan_save_stack mm/kasan/common.c:47 [inline]
- kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
- unpoison_slab_object mm/kasan/common.c:312 [inline]
- __kasan_slab_alloc+0x66/0x80 mm/kasan/common.c:338
- kasan_slab_alloc include/linux/kasan.h:201 [inline]
- slab_post_alloc_hook mm/slub.c:3813 [inline]
- slab_alloc_node mm/slub.c:3860 [inline]
- kmem_cache_alloc_node+0x18f/0x380 mm/slub.c:3903
- kmalloc_reserve+0x8a/0x260 net/core/skbuff.c:578
- __alloc_skb+0x1b1/0x420 net/core/skbuff.c:669
- skb_copy+0xef/0x770 net/core/skbuff.c:2131
- mac80211_hwsim_tx_frame_no_nl+0x1068/0x18d0 drivers/net/wireless/virtual/mac80211_hwsim.c:1854
- mac80211_hwsim_tx_frame+0x1cc/0x220 drivers/net/wireless/virtual/mac80211_hwsim.c:2200
- mac80211_hwsim_beacon_tx+0x3be/0x7e0 drivers/net/wireless/virtual/mac80211_hwsim.c:2300
- __iterate_interfaces+0x223/0x4c0 net/mac80211/util.c:772
- ieee80211_iterate_active_interfaces_atomic+0xd8/0x170 net/mac80211/util.c:808
- mac80211_hwsim_beacon+0xd4/0x1f0 drivers/net/wireless/virtual/mac80211_hwsim.c:2326
- __run_hrtimer kernel/time/hrtimer.c:1689 [inline]
- __hrtimer_run_queues+0x594/0xd00 kernel/time/hrtimer.c:1753
- hrtimer_run_softirq+0x19a/0x2c0 kernel/time/hrtimer.c:1770
- __do_softirq+0x2bb/0x942 kernel/softirq.c:553
- invoke_softirq kernel/softirq.c:427 [inline]
- __irq_exit_rcu+0xf1/0x1c0 kernel/softirq.c:632
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:644
- sysvec_irq_work+0x94/0xb0 arch/x86/kernel/irq_work.c:17
- </IRQ>
- <TASK>
- asm_sysvec_irq_work+0x1a/0x20 arch/x86/include/asm/idtentry.h:674
-RIP: 0010:preempt_schedule_irq+0xf6/0x1c0 kernel/sched/core.c:7047
-Code: 89 f5 49 c1 ed 03 eb 0d 48 f7 03 08 00 00 00 0f 84 8a 00 00 00 bf 01 00 00 00 e8 45 68 ef f5 e8 20 b8 25 f6 fb bf 01 00 00 00 <e8> 85 ae ff ff 43 80 7c 3d 00 00 74 08 4c 89 f7 e8 e5 87 81 f6 48
-RSP: 0018:ffffc900132674c0 EFLAGS: 00000282
-RAX: aac9d4750a501f00 RBX: 1ffff9200264cea0 RCX: ffffffff8171895a
-RDX: dffffc0000000000 RSI: ffffffff8baab660 RDI: 0000000000000001
-RBP: ffffc90013267570 R08: ffffffff92ca8457 R09: 1ffffffff259508a
-R10: dffffc0000000000 R11: fffffbfff259508b R12: 1ffff9200264ce98
-R13: 1ffff9200264ce9c R14: ffffc900132674e0 R15: dffffc0000000000
- irqentry_exit+0x5e/0x90 kernel/entry/common.c:348
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:649
-RIP: 0010:unmap_single_vma+0x0/0x2b0 mm/memory.c:1678
-Code: 8b 3c 24 e8 a2 23 18 00 e9 77 fc ff ff e8 98 66 8d 09 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 <55> 41 57 41 56 41 55 41 54 53 48 83 ec 30 44 89 4c 24 0c 4c 89 04
-RSP: 0018:ffffc90013267638 EFLAGS: 00000246
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: ffffffffffffffff
-RDX: 0000000000000000 RSI: ffff88807cd27600 RDI: ffffc90013267840
-RBP: ffffc900132677c8 R08: ffffc90013267710 R09: 0000000000000000
-R10: 0000000000000002 R11: ffff888022cf9dc0 R12: 1ffff1100f9a4ec4
-R13: ffff88807cd27600 R14: 0000000000000000 R15: ffff88807cd27620
- unmap_vmas+0x3cc/0x5f0 mm/memory.c:1758
- exit_mmap+0x2c6/0xd40 mm/mmap.c:3279
- __mmput+0x115/0x3c0 kernel/fork.c:1343
- exit_mm+0x21f/0x310 kernel/exit.c:569
- do_exit+0x9af/0x2740 kernel/exit.c:858
- do_group_exit+0x206/0x2c0 kernel/exit.c:1020
- get_signal+0x176d/0x1850 kernel/signal.c:2893
- arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:310
- exit_to_user_mode_loop kernel/entry/common.c:105 [inline]
- exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
- __syscall_exit_to_user_mode_work kernel/entry/common.c:201 [inline]
- syscall_exit_to_user_mode+0xc8/0x360 kernel/entry/common.c:212
- do_syscall_64+0x108/0x240 arch/x86/entry/common.c:89
- entry_SYSCALL_64_after_hwframe+0x6f/0x77
-RIP: 0033:0x7f3ca5e7dda9
-Code: Unable to access opcode bytes at 0x7f3ca5e7dd7f.
-RSP: 002b:00007f3ca6bdb0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffed RBX: 00007f3ca5fabf80 RCX: 00007f3ca5e7dda9
-RDX: 0000000020000040 RSI: 0000000000008923 RDI: 0000000000000004
-RBP: 00007f3ca5eca47a R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f3ca5fabf80 R15: 00007fffb9292628
- </TASK>
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 PID: 27047 Comm: syz-executor.1 Not tainted 6.8.0-rc6-syzkaller-gafe0cbf23373 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-RIP: 0010:native_safe_halt arch/x86/include/asm/irqflags.h:48 [inline]
-RIP: 0010:arch_safe_halt arch/x86/include/asm/irqflags.h:86 [inline]
-RIP: 0010:kvm_wait+0x250/0x2c0 arch/x86/kernel/kvm.c:1059
-Code: 3b 45 0f b6 f6 44 89 ff 44 89 f6 e8 0a c6 53 00 e8 f5 f3 5a 00 45 38 f7 75 15 66 90 e8 79 c5 53 00 0f 00 2d a2 7b 68 0a fb f4 <e9> 50 fe ff ff e8 66 c5 53 00 fb e9 45 fe ff ff 89 d9 80 e1 07 38
-RSP: 0018:ffffc900001f0660 EFLAGS: 00000246
-RAX: ffffffff813fa7f7 RBX: ffffffff8ec7e200 RCX: ffff88807d793b80
-RDX: 0000000000000103 RSI: ffffffff8baab660 RDI: ffffffff8bfe81a0
-RBP: ffffc900001f0730 R08: ffffffff92ca848f R09: 1ffffffff2595091
-R10: dffffc0000000000 R11: fffffbfff2595092 R12: 1ffff9200003e0d0
-R13: dffffc0000000000 R14: 0000000000000003 R15: 0000000000000003
-FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b32223000 CR3: 000000007f3e6000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <NMI>
- </NMI>
- <IRQ>
- pv_wait arch/x86/include/asm/paravirt.h:596 [inline]
- pv_wait_head_or_lock kernel/locking/qspinlock_paravirt.h:470 [inline]
- __pv_queued_spin_lock_slowpath+0x6ff/0xc60 kernel/locking/qspinlock.c:511
- pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:584 [inline]
- queued_spin_lock_slowpath+0x42/0x50 arch/x86/include/asm/qspinlock.h:51
- queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
- do_raw_spin_lock+0x271/0x370 kernel/locking/spinlock_debug.c:116
- spin_lock include/linux/spinlock.h:351 [inline]
- mac80211_hwsim_tx_frame_no_nl+0x97f/0x18d0 drivers/net/wireless/virtual/mac80211_hwsim.c:1805
- mac80211_hwsim_tx_frame+0x1cc/0x220 drivers/net/wireless/virtual/mac80211_hwsim.c:2200
- mac80211_hwsim_beacon_tx+0x3be/0x7e0 drivers/net/wireless/virtual/mac80211_hwsim.c:2300
- __iterate_interfaces+0x223/0x4c0 net/mac80211/util.c:772
- ieee80211_iterate_active_interfaces_atomic+0xd8/0x170 net/mac80211/util.c:808
- mac80211_hwsim_beacon+0xd4/0x1f0 drivers/net/wireless/virtual/mac80211_hwsim.c:2326
- __run_hrtimer kernel/time/hrtimer.c:1689 [inline]
- __hrtimer_run_queues+0x594/0xd00 kernel/time/hrtimer.c:1753
- hrtimer_run_softirq+0x19a/0x2c0 kernel/time/hrtimer.c:1770
- __do_softirq+0x2bb/0x942 kernel/softirq.c:553
- invoke_softirq kernel/softirq.c:427 [inline]
- __irq_exit_rcu+0xf1/0x1c0 kernel/softirq.c:632
- irq_exit_rcu+0x9/0x30 kernel/softirq.c:644
- sysvec_irq_work+0x94/0xb0 arch/x86/kernel/irq_work.c:17
- </IRQ>
- <TASK>
- asm_sysvec_irq_work+0x1a/0x20 arch/x86/include/asm/idtentry.h:674
-RIP: 0010:rcu_read_unlock_special+0x88/0x550 kernel/rcu/tree_plugin.h:682
-Code: f1 f1 f1 00 f2 f2 f2 49 89 04 17 66 41 c7 44 17 09 f3 f3 41 c6 44 17 0b f3 65 44 8b 25 f9 19 88 7e 41 f7 c4 00 00 f0 00 74 49 <48> c7 44 24 20 0e 36 e0 45 4a c7 04 3a 00 00 00 00 66 42 c7 44 3a
-RSP: 0018:ffffc900132b77e0 EFLAGS: 00000206
-RAX: c8b0ea340731d000 RBX: 1ffff92002656f04 RCX: ffffffff8171895a
-RDX: dffffc0000000000 RSI: ffffffff8baab660 RDI: ffffffff8bfe81a0
-RBP: ffffc900132b78b0 R08: ffffffff92ca845f R09: 1ffffffff259508b
-R10: dffffc0000000000 R11: fffffbfff259508c R12: 0000000000000000
-R13: ffff88807d793fd8 R14: ffffc900132b7820 R15: 1ffff92002656f00
- __rcu_read_unlock+0xa0/0x110 kernel/rcu/tree_plugin.h:426
- rcu_read_unlock+0x85/0xa0 include/linux/rcupdate.h:782
- dput+0x197/0x2b0 fs/dcache.c:844
- __fput+0x678/0x8a0 fs/file_table.c:384
- task_work_run+0x24e/0x310 kernel/task_work.c:180
- exit_task_work include/linux/task_work.h:38 [inline]
- do_exit+0xa2c/0x2740 kernel/exit.c:871
- do_group_exit+0x206/0x2c0 kernel/exit.c:1020
- get_signal+0x176d/0x1850 kernel/signal.c:2893
- arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:310
- exit_to_user_mode_loop kernel/entry/common.c:105 [inline]
- exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
- __syscall_exit_to_user_mode_work kernel/entry/common.c:201 [inline]
- syscall_exit_to_user_mode+0xc8/0x360 kernel/entry/common.c:212
- do_syscall_64+0x108/0x240 arch/x86/entry/common.c:89
- entry_SYSCALL_64_after_hwframe+0x6f/0x77
-RIP: 0033:0x7f0ffb87dda9
-Code: Unable to access opcode bytes at 0x7f0ffb87dd7f.
-RSP: 002b:00007f0ffc6af0c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: 0000000000000000 RBX: 00007f0ffb9ac050 RCX: 00007f0ffb87dda9
-RDX: 0000000020000000 RSI: 0000000000008914 RDI: 0000000000000006
-RBP: 00007f0ffb8ca47a R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f0ffb9ac050 R15: 00007ffdcaf26e88
- </TASK>
+>   		dev_info(prestera_dev(sw), "using random base mac address\n");
+>   	}
+>   
 
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
