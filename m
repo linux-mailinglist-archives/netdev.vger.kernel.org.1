@@ -1,76 +1,113 @@
-Return-Path: <netdev+bounces-79293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32047878A55
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 22:58:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 707CA878A5A
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 22:59:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 625191C214EE
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 21:58:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 10F721F21F97
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 21:59:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBEE556B8F;
-	Mon, 11 Mar 2024 21:58:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k54CMSEg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DC7B56B98;
+	Mon, 11 Mar 2024 21:59:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A282D607;
-	Mon, 11 Mar 2024 21:58:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 527F356B63;
+	Mon, 11 Mar 2024 21:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710194282; cv=none; b=NwSbh01q/pge3Z9u8nBPQE02mhBRy1YoPxdj0LcG5UwRg7WFG8rUbKhPzh5wKFZJEJJIPd35vgiFzc2XWYJN9Sq/H5upC0uEK5QKtoPXujFG3OEG9odz3XrGJBkc7doHuAZbMuyU8uPZ7oKPPHlV0DgtFOBkcvzN6M/jrYTmO20=
+	t=1710194353; cv=none; b=g5z9FNj/QKdv6bqkZRoRT/LXXftLP5Er93FCd7vCVdu7Zcjsh61SHam8AEIb3U1SJFc5H/vsk4uf/tK3fqrg1vGWXkFMHvql3OsJ4KiteMt48L5Rr366kLbfgkdedkTwg+WzXlELOG60snTlgq5Rn8Dwfl5dfmtBipQtJpP2S4I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710194282; c=relaxed/simple;
-	bh=mVrQf39TcGT+LrRP/p0MKvKDXKZM5ggz/eiWJSGusAk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=anvAR79SpXzdFyEmhmr5lv07qjnil7fttthYsPkWUtdW6sob79Ne5uV0OHJKwuEZfylI4HNZSAVasqDETkRYwHyFZl5aaa+PZurRSNZXVtlZIOjUFC4ccOboFEsk+bQXCzrxYGHSeGnphgpgDOyGN/fi8nNO7EoMxu1beT8DBx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k54CMSEg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86DA8C433F1;
-	Mon, 11 Mar 2024 21:58:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710194282;
-	bh=mVrQf39TcGT+LrRP/p0MKvKDXKZM5ggz/eiWJSGusAk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=k54CMSEgi3w6zyiaudhxVRr/v/UMZYF1Z8C/raMDJbP4DIswaMpuwDk8oUQ9PscGA
-	 MMHvrHlrwAH28/hhr/Vy2XHAfcssTlV+7AlfATgtU/jllJUGwkVptnvyAkmpwW7tUT
-	 WhWT4yE9qdmma+kez/UxHl7JPeGQYFlEGpZu6RBoVNRFuE8TMU1id2I+0ibX6web67
-	 YfrRsjVrSlATJWpMB+Ln3MoKmkHQIR64bhldEfaqOQBt6o6ma0MHbvG3pMB/8h+dOC
-	 /AjNLmn2KlmcCtfFE5WdK4KCVIJ9XaVoIFsKe3NGKlHd28hAQ3Sj4mXslkkiQK73ME
-	 H+DVaoTqHQ+wQ==
-Date: Mon, 11 Mar 2024 14:58:00 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: patchwork-bot+netdevbpf@kernel.org, Justin Swartz
- <justin.swartz@risingedge.co.za>, daniel@makrotopia.org, dqfext@gmail.com,
- sean.wang@mediatek.com, andrew@lunn.ch, f.fainelli@gmail.com,
- olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, matthias.bgg@gmail.com,
- angelogioacchino.delregno@collabora.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
+	s=arc-20240116; t=1710194353; c=relaxed/simple;
+	bh=sTG2XFQ2KYK7RVyLq4QyS0pByj6YUcGmkE+qM/HjAUA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eYsl5LdI5mmL797I2YBkyRwzvcxPhgf3cZyFm5kH8KYJFCCxWAXOmzmQCM/LoX5ahcss7zjhhATw2HzIerSp7GMkM3S+9T2T/VC6Tr26ssvIUUNcIecM3/plRReYSihcAy0Ghu6uEOtbzlgSWyyCm5ktp3gYh96VuILxmNaxOTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1rjnfa-0001zA-0X;
+	Mon, 11 Mar 2024 21:58:54 +0000
+Date: Mon, 11 Mar 2024 21:58:50 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: patchwork-bot+netdevbpf@kernel.org,
+	Justin Swartz <justin.swartz@risingedge.co.za>, dqfext@gmail.com,
+	sean.wang@mediatek.com, andrew@lunn.ch, f.fainelli@gmail.com,
+	olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
+	angelogioacchino.delregno@collabora.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
 Subject: Re: [PATCH] net: dsa: mt7530: disable LEDs before reset
-Message-ID: <20240311145800.3840dc27@kernel.org>
-In-Reply-To: <2d206dbb-a27b-4139-a49e-331797d8ba34@arinc9.com>
+Message-ID: <Ze9-mp269h43WGD3@makrotopia.org>
 References: <20240305043952.21590-1-justin.swartz@risingedge.co.za>
-	<171019143163.14853.15330891015381229970.git-patchwork-notify@kernel.org>
-	<2d206dbb-a27b-4139-a49e-331797d8ba34@arinc9.com>
+ <171019143163.14853.15330891015381229970.git-patchwork-notify@kernel.org>
+ <2d206dbb-a27b-4139-a49e-331797d8ba34@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2d206dbb-a27b-4139-a49e-331797d8ba34@arinc9.com>
 
-On Tue, 12 Mar 2024 00:22:48 +0300 Ar=C4=B1n=C3=A7 =C3=9CNAL wrote:
+On Tue, Mar 12, 2024 at 12:22:48AM +0300, Arınç ÜNAL wrote:
 > Why was this applied? I already explained it did not achieve anything.
 
-Daniel disagreed and you didn't reply to him.
+I agree that we were still debating about it, however, I do believe
+Justin that he truely observed this problem and the fix seemed
+appropriate to me.
 
-Please don't top post.
+I've explained this in my previous email which you did not notice
+or at least haven't repied to:
+
+https://patchwork.kernel.org/project/netdevbpf/patch/20240305043952.21590-1-justin.swartz@risingedge.co.za/#25753421
+
+In the end it probably depends on the electric capacity of the circuit
+connecting each LED, so it may not be reproducible on all boards and/or
+under all circumstances (temperature, humindity, ...).
+
+Disabling the LEDs and waiting for around 1mS before reset seems like
+a sensible thing to do, and I'm glad Justin took care of it.
+
+
+> 
+> Arınç
+> 
+> On 12.03.2024 00:10, patchwork-bot+netdevbpf@kernel.org wrote:
+> > Hello:
+> > 
+> > This patch was applied to netdev/net-next.git (main)
+> > by Jakub Kicinski <kuba@kernel.org>:
+> > 
+> > On Tue,  5 Mar 2024 06:39:51 +0200 you wrote:
+> > > Disable LEDs just before resetting the MT7530 to avoid
+> > > situations where the ESW_P4_LED_0 and ESW_P3_LED_0 pin
+> > > states may cause an unintended external crystal frequency
+> > > to be selected.
+> > > 
+> > > The HT_XTAL_FSEL (External Crystal Frequency Selection)
+> > > field of HWTRAP (the Hardware Trap register) stores a
+> > > 2-bit value that represents the state of the ESW_P4_LED_0
+> > > and ESW_P4_LED_0 pins (seemingly) sampled just after the
+> > > MT7530 has been reset, as:
+> > > 
+> > > [...]
+> > 
+> > Here is the summary with links:
+> >    - net: dsa: mt7530: disable LEDs before reset
+> >      https://git.kernel.org/netdev/net-next/c/2920dd92b980
+> > 
+> > You are awesome, thank you!
 
