@@ -1,149 +1,169 @@
-Return-Path: <netdev+bounces-79161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A0168780EF
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 14:52:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D4E7887811D
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 14:59:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E77CF284A40
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 13:52:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 756E9B21613
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 13:59:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F9E23DB8C;
-	Mon, 11 Mar 2024 13:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE0B3EA92;
+	Mon, 11 Mar 2024 13:59:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="FCjhUJjY"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MFXVQPP2"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 912F841C75;
-	Mon, 11 Mar 2024 13:51:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E385F3F9F8;
+	Mon, 11 Mar 2024 13:59:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710165115; cv=none; b=RescJhxne2pyf5noKID8yVYVj7JD91SHftaZzXHU7aTxWNlDo3a417UWO3B/mwM2b5MP1ETofOFq5HBDuihQ45T0OtIW5AclgMP3rk8CD/jdhptnbWVeBV+/UoFQkwikF13MVEcsxOYeFzBTfwpLSbPM5HItDVE9Moq1qqQMUEk=
+	t=1710165594; cv=none; b=K5MVteW33HSGOYH6C308IOBetAmjKiGUDahiuqKRxGkVbffLOutyxJDYkF6NFmGcpZCKG8C59mC4QHm2CUapApo603lN2Dr8xnrpC7XFJDrCX+E4P4Jjd7DiIaN7A8+y5StDiY8VvdosrMmcBM0u22AvvlRNs/M8p2FJySHMwZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710165115; c=relaxed/simple;
-	bh=fk8+pHNwZ+V+8pwYHpfe6hlSCZDViN8UYNJwkK5pIq8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R7QQ6yAs+8tP55lJf+5t0stY9AmG6wtBBxByo5FEtX6OXOl4QR+ijB58tKEIzI2CUjSx97YfrW9eS/m97cPjC8rWpVVn3SbWRZkbbAuPYfA0gwibAudAMXJo75Ptyn6E3r01QaD5uIyQMVLpKImwVcVowlw/afBW90ct1G0hjp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=FCjhUJjY; arc=none smtp.client-ip=217.70.183.195
+	s=arc-20240116; t=1710165594; c=relaxed/simple;
+	bh=w0U72Ycmq844X9KX4KpHGr0JX6G/1oC6LAYxW4A8Lyo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ny2ENuNSvRfv3G/C0jXyJV8KXp7YFbVY+OuEJ6sDfYV8Tf/Mxw99HaT5I6wT1pI4ZDiOZz5ehRvjDnDKrD0jgpmDBXb19sgdq7iHInJZqi0CVTvLfg9QsiQZtGgoRX7RzoTy3OkMEz/ICNLpW8nTN5RU9S+w4li1fX8TQjMZP2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MFXVQPP2; arc=none smtp.client-ip=217.70.183.196
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 5F01160008;
-	Mon, 11 Mar 2024 13:51:44 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 937C5E000E;
+	Mon, 11 Mar 2024 13:59:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1710165105;
+	t=1710165590;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wqvBp7CTjNGNq3lMlyQxO2tIzGlpj4RvXf7GeO4YvHI=;
-	b=FCjhUJjYOsF7o6Jhz1pQAUlOve06jtPRI2fntcRFQib57uk4O0EB4Z/CglfIikkxVE3n36
-	d7dPrWLhsQUtFQv3SMXP+OaUKe+zOOjLmTx/j4/479JILNcx2IH2GE2Jkiap444Qhgec83
-	SeB9i01Ba7IFvYq9L+IhaqHpCZvaAXahfddUkn+nftyciIdk/bVDlAmcknKd/+mTeIT7tu
-	0XU9sp6r6m17WlWaviKMvaEVFwEWV4h6j/e85A7r0VKWkN1zI99GDsb5m+25w+AbJNex6D
-	Ybh9Frhz+vfRTwshaSfudbJ/6UUoI+BijEgHdQiWT98ykGl/acXo0T8LNGdiRw==
-Date: Mon, 11 Mar 2024 14:51:43 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: thomas.perrot@bootlin.com
-Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
- <claudiu.beznea@tuxon.dev>, "David S . Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] net: macb: remove change_mtu callback
-Message-ID: <20240311145143.2d0e492a@device-28.home>
-In-Reply-To: <20240311091211.720789-1-thomas.perrot@bootlin.com>
-References: <20240311091211.720789-1-thomas.perrot@bootlin.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BIqCSEXEHAQQ7uGBrLNSPsM/8U6DguluqZGvnINBf78=;
+	b=MFXVQPP2fSaleun8lVC/lcWcQXSTFneu2IzH5/ZmYQDKRBhqifKx9mDV1UccOtdvroDLNa
+	zG3nKJB2tQ6zPUSLKa3J54cQVjDPkynHr1bzmfC4Ih/CpTnzL8OZAINZqNjoJOoV+EXmMZ
+	tw82OAkNvSwHCLze3Q3rwmQS1M9rVCw4rK+OmbGDoUzHuJDkwqqNAOgQ0tdIu5BgdcOzaJ
+	lKllUEF9dhqg80plRlrQKfGhbGRsm7uuyFlTxmkjfxK+KOI/8o/F/nBhTAIsvYn5LA40aU
+	XHHbi+f+HXqYXYksLO61LcmHNj37YdROpdynr088rxQsSdvRyBB9jy0jZHA0jQ==
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: thomas.petazzoni@bootlin.com,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: [PATCH v3 net-next] ptp: Move from simple ida to xarray
+Date: Mon, 11 Mar 2024 14:59:47 +0100
+Message-Id: <20240311135949.1180157-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: kory.maincent@bootlin.com
 
-Hello Thomas,
+Move from simple ida to xarray for storing and loading the ptp_clock
+pointer. This prepares support for future hardware timestamp selection by
+being able to link the ptp clock index to its pointer.
 
-On Mon, 11 Mar 2024 10:12:11 +0100
-thomas.perrot@bootlin.com wrote:
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
 
-> Subject: [PATCH v2] net: macb: remove change_mtu callback
+Change in v2:
+- Update an err value missing.
 
-You need to specify in the subject whether this patch targets net (for
-bug fixes, in which case you need a Fixes: tag) or net-next for new
-features/improvements.
+Change in v3:
+- Refactor err management.
+---
+ drivers/ptp/ptp_clock.c | 28 ++++++++++++++++------------
+ 1 file changed, 16 insertions(+), 12 deletions(-)
 
-You can use this parameter in your git format-patch command to have it
-set properly :
-
---subject-prefix="PATCH net-next" (or net)
-
-Thanks,
-
-Maxime
-
-> From: Thomas Perrot <thomas.perrot@bootlin.com>
-> 
-> Because it doesn't allow MTU changes when the interface is up, although
-> it is not necessary.
-> 
-> This callback has been added to add in a first implementation of the Jumbo
-> support [1],since it has been reworked and moved to the probe [2].
-> 
-> With this patch the core will set the MTU, regardless of if the interface
-> is up or not.
-> 
-> [1] commit a5898ea09aad ("net: macb: Add change_mtu callback with
->     jumbo support")
-> [2] commit 44770e1180de ("ethernet: use core min/max MTU checking")
-> 
-> Signed-off-by: Thomas Perrot <thomas.perrot@bootlin.com>
-> ---
-> 
-> Changes since v2:
->  - Update the commit message.
-> 
->  drivers/net/ethernet/cadence/macb_main.c | 11 -----------
->  1 file changed, 11 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
-> index 898debfd4db3..0532215e5236 100644
-> --- a/drivers/net/ethernet/cadence/macb_main.c
-> +++ b/drivers/net/ethernet/cadence/macb_main.c
-> @@ -3017,16 +3017,6 @@ static int macb_close(struct net_device *dev)
->  	return 0;
->  }
-> 
-> -static int macb_change_mtu(struct net_device *dev, int new_mtu)
-> -{
-> -	if (netif_running(dev))
-> -		return -EBUSY;
-> -
-> -	dev->mtu = new_mtu;
-> -
-> -	return 0;
-> -}
-> -
->  static int macb_set_mac_addr(struct net_device *dev, void *addr)
->  {
->  	int err;
-> @@ -3897,7 +3887,6 @@ static const struct net_device_ops macb_netdev_ops = {
->  	.ndo_get_stats		= macb_get_stats,
->  	.ndo_eth_ioctl		= macb_ioctl,
->  	.ndo_validate_addr	= eth_validate_addr,
-> -	.ndo_change_mtu		= macb_change_mtu,
->  	.ndo_set_mac_address	= macb_set_mac_addr,
->  #ifdef CONFIG_NET_POLL_CONTROLLER
->  	.ndo_poll_controller	= macb_poll_controller,
-> --
-> 2.44.0
-> 
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 3aaf1a3430c5..8eebf1373ca3 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -31,7 +31,7 @@ struct class *ptp_class;
+ 
+ static dev_t ptp_devt;
+ 
+-static DEFINE_IDA(ptp_clocks_map);
++static DEFINE_XARRAY_ALLOC(ptp_clocks_map);
+ 
+ /* time stamp event queue operations */
+ 
+@@ -201,7 +201,7 @@ static void ptp_clock_release(struct device *dev)
+ 	bitmap_free(tsevq->mask);
+ 	kfree(tsevq);
+ 	debugfs_remove(ptp->debugfs_root);
+-	ida_free(&ptp_clocks_map, ptp->index);
++	xa_erase(&ptp_clocks_map, ptp->index);
+ 	kfree(ptp);
+ }
+ 
+@@ -241,16 +241,16 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 		return ERR_PTR(-EINVAL);
+ 
+ 	/* Initialize a clock structure. */
+-	err = -ENOMEM;
+ 	ptp = kzalloc(sizeof(struct ptp_clock), GFP_KERNEL);
+-	if (ptp == NULL)
++	if (!ptp) {
++		err = -ENOMEM;
+ 		goto no_memory;
++	}
+ 
+-	index = ida_alloc_max(&ptp_clocks_map, MINORMASK, GFP_KERNEL);
+-	if (index < 0) {
+-		err = index;
++	err = xa_alloc(&ptp_clocks_map, &index, ptp, xa_limit_31b,
++		       GFP_KERNEL);
++	if (err)
+ 		goto no_slot;
+-	}
+ 
+ 	ptp->clock.ops = ptp_clock_ops;
+ 	ptp->info = info;
+@@ -258,13 +258,17 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	ptp->index = index;
+ 	INIT_LIST_HEAD(&ptp->tsevqs);
+ 	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
+-	if (!queue)
++	if (!queue) {
++		err = -ENOMEM;
+ 		goto no_memory_queue;
++	}
+ 	list_add_tail(&queue->qlist, &ptp->tsevqs);
+ 	spin_lock_init(&ptp->tsevqs_lock);
+ 	queue->mask = bitmap_alloc(PTP_MAX_CHANNELS, GFP_KERNEL);
+-	if (!queue->mask)
++	if (!queue->mask) {
++		err = -ENOMEM;
+ 		goto no_memory_bitmap;
++	}
+ 	bitmap_set(queue->mask, 0, PTP_MAX_CHANNELS);
+ 	spin_lock_init(&queue->lock);
+ 	mutex_init(&ptp->pincfg_mux);
+@@ -378,7 +382,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	list_del(&queue->qlist);
+ 	kfree(queue);
+ no_memory_queue:
+-	ida_free(&ptp_clocks_map, index);
++	xa_erase(&ptp_clocks_map, index);
+ no_slot:
+ 	kfree(ptp);
+ no_memory:
+@@ -511,7 +515,7 @@ static void __exit ptp_exit(void)
+ {
+ 	class_destroy(ptp_class);
+ 	unregister_chrdev_region(ptp_devt, MINORMASK + 1);
+-	ida_destroy(&ptp_clocks_map);
++	xa_destroy(&ptp_clocks_map);
+ }
+ 
+ static int __init ptp_init(void)
+-- 
+2.25.1
 
 
