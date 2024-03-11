@@ -1,79 +1,67 @@
-Return-Path: <netdev+bounces-79131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 538A0877EFC
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 12:25:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EB65877F13
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 12:35:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 862781C210BB
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 11:25:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07180B20FE0
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 11:35:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C85DD3AC0C;
-	Mon, 11 Mar 2024 11:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BED633A1BC;
+	Mon, 11 Mar 2024 11:34:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XjTWPuYa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048673C493;
-	Mon, 11 Mar 2024 11:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC2F93C060
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 11:34:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710156302; cv=none; b=A1XTmy/Uxl98JXCCaRqKGo5tPeXWmjHCFnzu9mZUrMfb91FX7eP13e1L7MK64qYfOiMTnELQg0sYRpVo4DwrGHO30/BFEnuBeQYCHwEo8WROPGbIH01aaTSiRm4OqENZxtn5kcHMnR021wOhGEJjQdMXyu7TBxcoRpcUBb5/V7k=
+	t=1710156893; cv=none; b=igHtXzkraGLky4Ajqgx3VCjqt0D0NlqES5tp2kkKCWP3KWuKRGOXb9YHERG/0NrbxNC+z/P+7+EN8opVmeEqIMooKh9j9ALQh2xF9yX410Ee4TRC6lATdSswLswk5kWSSycmiqL0S85AJOnTheg3QFyckM4aaFfYG2zGXUv858w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710156302; c=relaxed/simple;
-	bh=4pDVnZkHej3RuwF5nxZLKJSsv+DmPh3nKITPhTPBN/U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Mw2b03VdF7HrlyYNRPFN929QA9H6X9XRlu4vdhBcaUoKA7/BV0V3QQRmulyMrUhsodC6Hcrs4lPdxMsSuoyuZOKkqAs0GTHMeGRjIaRY+D29Ejb6giom501uEN5heESwNaiNtsgmFv23MOIlGlLHvHU5di5PfomXp9kNTtZje3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5683576ea18so3148915a12.3;
-        Mon, 11 Mar 2024 04:25:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710156299; x=1710761099;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Tn6DoL4XiC/1sb436SFq4XKysqpuHz83glo8mzdMNKA=;
-        b=webuKl6a8bMD5uI8zBfuXQ+7PCNltcSy1cUx71RtwhXnEQQ0NGOa7HpQc5daMURovV
-         pDpuZQYu2wvvBToQqD+bwhTaOSD9PHV0ngNoCh5F8jSpU0rjzsjAj8cL0pGdegHxgcgc
-         E3L5aSXaVlYGP5iqRSYTft6BIbhBQF1eJT1dGntPPrqxw4E2UtaV5btmd5d0Wgif0gmr
-         XD9BkZLCSnwP+AfEBo3HJ1MjpaHGyw9FBDFabLww0JUrtvG/4eYKH08N8HfUR49R/l59
-         d1S2zJWqndIHmd3x+J0OVJit6FAsVk39doywEEAc0GZOWnuljmYSej1Qma736tWOz3/p
-         w6Kg==
-X-Forwarded-Encrypted: i=1; AJvYcCX5cTJd2iv3JXqAJNhvModqmpIIZjVoSAWPxcBeL1B2oMgOBM7BY/LbgwSGQMKIV4SfaEFDnBYKm/dlnzG7lupuX4jkY2tI7dY5pQegC3Jenypnmefx0O3r10Cn/gpeVqHuB9/S
-X-Gm-Message-State: AOJu0YxrTXNSfMfDu+13wr9FbrIte+KamM0X7A5q7LXmkzaR3HQqI2IS
-	e5Vv1pyKSTBj2W1STS2Vne93zBJicYdVYp72Q9Yy/p4KDJP3Zcyw
-X-Google-Smtp-Source: AGHT+IFpol4GKbefX4gxusREijrPiCVSvlLD2YwUl3LIMYtv+crpJlIwGpJ9CLa9SEwoEMWtDjfNBA==
-X-Received: by 2002:a05:6402:907:b0:566:b91f:1980 with SMTP id g7-20020a056402090700b00566b91f1980mr4312961edz.31.1710156299225;
-        Mon, 11 Mar 2024 04:24:59 -0700 (PDT)
-Received: from localhost (fwdproxy-lla-005.fbsv.net. [2a03:2880:30ff:5::face:b00c])
-        by smtp.gmail.com with ESMTPSA id ev19-20020a056402541300b0056742460f68sm2780020edb.66.2024.03.11.04.24.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Mar 2024 04:24:58 -0700 (PDT)
-From: Breno Leitao <leitao@debian.org>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: keescook@chromium.org,
-	Ido Schimmel <idosch@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Amit Cohen <amcohen@nvidia.com>,
-	Petr Machata <petrm@nvidia.com>,
-	Jiri Benc <jbenc@redhat.com>,
-	Beniamino Galvani <b.galvani@gmail.com>,
-	Gavin Li <gavinl@nvidia.com>,
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 2/2] vxlan: Remove generic .ndo_get_stats64
-Date: Mon, 11 Mar 2024 04:24:31 -0700
-Message-ID: <20240311112437.3813987-2-leitao@debian.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240311112437.3813987-1-leitao@debian.org>
-References: <20240311112437.3813987-1-leitao@debian.org>
+	s=arc-20240116; t=1710156893; c=relaxed/simple;
+	bh=egt+hDh7frGVAH0p8J4DU480QnRcBMYZgZ/WQsjM2OI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=UlP4NoVnRPCTMB4Y/XWYfp7/XJiELT3oDwj96FDrKQrYCfSS5pz5k/EttOsC6ERLMUYFSQwVusqlDL6CltrBnZdYEJy+s3ADAnaEX8iVjHfL5QQSkxgud6jitpMnRDjgjZDQ8oESo9oI9M2jB3WfrAn6F5/P+Q9LDd+zB5XCkV0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XjTWPuYa; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710156892; x=1741692892;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=egt+hDh7frGVAH0p8J4DU480QnRcBMYZgZ/WQsjM2OI=;
+  b=XjTWPuYagPC3m1Vr67ed8eTKb7H43bC/oRxaM1bf/oHqA98z9DjdASKU
+   a0sG2P0X4baiZ/LNLiE9U947QRUnjxgyMkHheHuUQXNXCz1hgthjQ1D97
+   ikR7Qpu2d2clT/JoEnFkKpDvTru+u4FNy90R2lUP+QepFKfHYfsxT08zw
+   ZDxvB+J4J7CM0cCmKEwI3mD2GLHHcXZNpzdCnCZ5xl8lR53gp2fEfV3Wu
+   4vi0D9c1MrdQV2/PvzgbAABE6Fb2HqdCL51+oRoFqy2eremB9RXM2Fhaf
+   Hk4vNIVIEvIbIQURFuEl97ovydbBgv2m8yx+hjXCs1+IGlelMqQ+yVdIa
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11009"; a="4690873"
+X-IronPort-AV: E=Sophos;i="6.07,116,1708416000"; 
+   d="scan'208";a="4690873"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 04:34:51 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,116,1708416000"; 
+   d="scan'208";a="15731836"
+Received: from os-delivery.igk.intel.com ([10.102.18.218])
+  by fmviesa004.fm.intel.com with ESMTP; 11 Mar 2024 04:34:49 -0700
+From: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com
+Cc: netdev@vger.kernel.org
+Subject: [PATCH iwl-net] i40e: fix vf may be used uninitialized in this function warning
+Date: Mon, 11 Mar 2024 12:25:03 +0100
+Message-Id: <20240311112503.19768-1-aleksandr.loktionov@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,41 +70,145 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Commit 3e2f544dd8a33 ("net: get stats64 if device if driver is
-configured") moved the callback to dev_get_tstats64() to net core, so,
-unless the driver is doing some custom stats collection, it does not
-need to set .ndo_get_stats64.
+To fix the regression introduced by 52424f974bc5 commit, wchich causes
+servers hang in very hard to reproduce conditions with resets races.
 
-Since this driver is now relying in NETDEV_PCPU_STAT_TSTATS, then, it
-doesn't need to set the dev_get_tstats64() generic .ndo_get_stats64
-function pointer.
+Remove redundant "v" variable and iterate via single VF pointer across
+whole function instead to guarantee VF pointer validity.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
+Fixes: 52424f974bc5 ("i40e: Fix VF hang when reset is triggered on another VF")
+Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
 ---
- drivers/net/vxlan/vxlan_core.c | 2 --
- 1 file changed, 2 deletions(-)
+ .../ethernet/intel/i40e/i40e_virtchnl_pf.c    | 34 +++++++++----------
+ 1 file changed, 16 insertions(+), 18 deletions(-)
 
-diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 6f26003a3064..3495591a5c29 100644
---- a/drivers/net/vxlan/vxlan_core.c
-+++ b/drivers/net/vxlan/vxlan_core.c
-@@ -3214,7 +3214,6 @@ static const struct net_device_ops vxlan_netdev_ether_ops = {
- 	.ndo_open		= vxlan_open,
- 	.ndo_stop		= vxlan_stop,
- 	.ndo_start_xmit		= vxlan_xmit,
--	.ndo_get_stats64	= dev_get_tstats64,
- 	.ndo_set_rx_mode	= vxlan_set_multicast_list,
- 	.ndo_change_mtu		= vxlan_change_mtu,
- 	.ndo_validate_addr	= eth_validate_addr,
-@@ -3238,7 +3237,6 @@ static const struct net_device_ops vxlan_netdev_raw_ops = {
- 	.ndo_open		= vxlan_open,
- 	.ndo_stop		= vxlan_stop,
- 	.ndo_start_xmit		= vxlan_xmit,
--	.ndo_get_stats64	= dev_get_tstats64,
- 	.ndo_change_mtu		= vxlan_change_mtu,
- 	.ndo_fill_metadata_dst	= vxlan_fill_metadata_dst,
- };
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+index b34c717..f7c4654 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+@@ -1628,105 +1628,103 @@ bool i40e_reset_all_vfs(struct i40e_pf *pf, bool flr)
+ {
+ 	struct i40e_hw *hw = &pf->hw;
+ 	struct i40e_vf *vf;
+-	int i, v;
+ 	u32 reg;
++	int i;
+ 
+ 	/* If we don't have any VFs, then there is nothing to reset */
+ 	if (!pf->num_alloc_vfs)
+ 		return false;
+ 
+ 	/* If VFs have been disabled, there is no need to reset */
+ 	if (test_and_set_bit(__I40E_VF_DISABLE, pf->state))
+ 		return false;
+ 
+ 	/* Begin reset on all VFs at once */
+-	for (v = 0; v < pf->num_alloc_vfs; v++) {
+-		vf = &pf->vf[v];
++	for (vf = &pf->vf[0]; vf < &pf->vf[pf->num_alloc_vfs]; ++vf) {
+ 		/* If VF is being reset no need to trigger reset again */
+ 		if (!test_bit(I40E_VF_STATE_RESETTING, &vf->vf_states))
+-			i40e_trigger_vf_reset(&pf->vf[v], flr);
++			i40e_trigger_vf_reset(vf, flr);
+ 	}
+ 
+ 	/* HW requires some time to make sure it can flush the FIFO for a VF
+ 	 * when it resets it. Poll the VPGEN_VFRSTAT register for each VF in
+ 	 * sequence to make sure that it has completed. We'll keep track of
+ 	 * the VFs using a simple iterator that increments once that VF has
+ 	 * finished resetting.
+ 	 */
+-	for (i = 0, v = 0; i < 10 && v < pf->num_alloc_vfs; i++) {
++	for (i = 0, vf = &pf->vf[0]; i < 10 && vf < &pf->vf[pf->num_alloc_vfs]; ++i) {
+ 		usleep_range(10000, 20000);
+ 
+ 		/* Check each VF in sequence, beginning with the VF to fail
+ 		 * the previous check.
+ 		 */
+-		while (v < pf->num_alloc_vfs) {
+-			vf = &pf->vf[v];
++		while (vf < &pf->vf[pf->num_alloc_vfs]) {
+ 			if (!test_bit(I40E_VF_STATE_RESETTING, &vf->vf_states)) {
+ 				reg = rd32(hw, I40E_VPGEN_VFRSTAT(vf->vf_id));
+ 				if (!(reg & I40E_VPGEN_VFRSTAT_VFRD_MASK))
+ 					break;
+ 			}
+ 
+ 			/* If the current VF has finished resetting, move on
+ 			 * to the next VF in sequence.
+ 			 */
+-			v++;
++			++vf;
+ 		}
+ 	}
+ 
+ 	if (flr)
+ 		usleep_range(10000, 20000);
+ 
+ 	/* Display a warning if at least one VF didn't manage to reset in
+ 	 * time, but continue on with the operation.
+ 	 */
+-	if (v < pf->num_alloc_vfs)
++	if (vf < &pf->vf[pf->num_alloc_vfs])
+ 		dev_err(&pf->pdev->dev, "VF reset check timeout on VF %d\n",
+-			pf->vf[v].vf_id);
++			vf->vf_id);
+ 	usleep_range(10000, 20000);
+ 
+ 	/* Begin disabling all the rings associated with VFs, but do not wait
+ 	 * between each VF.
+ 	 */
+-	for (v = 0; v < pf->num_alloc_vfs; v++) {
++	for (vf = &pf->vf[0]; vf < &pf->vf[pf->num_alloc_vfs]; ++vf) {
+ 		/* On initial reset, we don't have any queues to disable */
+-		if (pf->vf[v].lan_vsi_idx == 0)
++		if (vf->lan_vsi_idx == 0)
+ 			continue;
+ 
+ 		/* If VF is reset in another thread just continue */
+ 		if (test_bit(I40E_VF_STATE_RESETTING, &vf->vf_states))
+ 			continue;
+ 
+-		i40e_vsi_stop_rings_no_wait(pf->vsi[pf->vf[v].lan_vsi_idx]);
++		i40e_vsi_stop_rings_no_wait(pf->vsi[vf->lan_vsi_idx]);
+ 	}
+ 
+ 	/* Now that we've notified HW to disable all of the VF rings, wait
+ 	 * until they finish.
+ 	 */
+-	for (v = 0; v < pf->num_alloc_vfs; v++) {
++	for (vf = &pf->vf[0]; vf < &pf->vf[pf->num_alloc_vfs]; ++vf) {
+ 		/* On initial reset, we don't have any queues to disable */
+-		if (pf->vf[v].lan_vsi_idx == 0)
++		if (vf->lan_vsi_idx == 0)
+ 			continue;
+ 
+ 		/* If VF is reset in another thread just continue */
+ 		if (test_bit(I40E_VF_STATE_RESETTING, &vf->vf_states))
+ 			continue;
+ 
+-		i40e_vsi_wait_queues_disabled(pf->vsi[pf->vf[v].lan_vsi_idx]);
++		i40e_vsi_wait_queues_disabled(pf->vsi[vf->lan_vsi_idx]);
+ 	}
+ 
+ 	/* Hw may need up to 50ms to finish disabling the RX queues. We
+ 	 * minimize the wait by delaying only once for all VFs.
+ 	 */
+ 	mdelay(50);
+ 
+ 	/* Finish the reset on each VF */
+-	for (v = 0; v < pf->num_alloc_vfs; v++) {
++	for (vf = &pf->vf[0]; vf < &pf->vf[pf->num_alloc_vfs]; ++vf) {
+ 		/* If VF is reset in another thread just continue */
+ 		if (test_bit(I40E_VF_STATE_RESETTING, &vf->vf_states))
+ 			continue;
+ 
+-		i40e_cleanup_reset_vf(&pf->vf[v]);
++		i40e_cleanup_reset_vf(vf);
+ 	}
+ 
+ 	i40e_flush(hw);
 -- 
-2.43.0
+2.25.1
 
 
