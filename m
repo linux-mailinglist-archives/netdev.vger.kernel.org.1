@@ -1,77 +1,90 @@
-Return-Path: <netdev+bounces-79253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37BD88787D6
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 19:43:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5942B878830
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 19:52:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CBE94B22A23
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 18:43:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0530C1F2306E
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 18:52:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AC16605D2;
-	Mon, 11 Mar 2024 18:38:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B89E65B5BB;
+	Mon, 11 Mar 2024 18:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IaqatR1h"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="T1oFG8Kx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 457D7605CC
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 18:38:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8759F5BAD7;
+	Mon, 11 Mar 2024 18:40:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710182293; cv=none; b=Ga2q6ZdhmQJ5pkqiopPxLou6HmuNvbUmm+TyPj4pNmpAGpio/9P0eCkdLq/H+Z+zzwxuh72JablKgxMXG2/lXrGNPbgg+w77mL9ir3vYeAyyczV6Vp6z/SAJtYjh7Tsi2ud0scPvGEE3p7Ehw3jEfQdk+wTiauy81+B31hK+oac=
+	t=1710182445; cv=none; b=BNzA943TAS0hwNGSmnKaAY3K3QQM1+ClNSxcbiIliTt2Am1CV5AMIDcSqWtEwzb402kPieyKWrVT9TekXE5Mgjst3b5q4jLZtlEvIyeo7+fmrYD5UpxfvFThBHql2tnSeGqN7Qm46RONRkIW1KlfG+0pXUxkBCbz25CbeCrCjxc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710182293; c=relaxed/simple;
-	bh=YCVvrNarbmR3C+Arb/8JQFTXtQ1+yZpI9pLP/OsjiGQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ELVhr8lj3XYOvPb9aYtDClk1N/AUaqgBsUViBxO/vuhagJ+eXywaKXlnhXx56M6Rnsdvct/aUYCJuqFlgngiZvaW4Vi7iBRaK+vDagmpAVlyOB+6YxWoGLNSjYMPFHPGDSIKSjwG3KSGfXQ3/hb3J9md5bBEFK2+A9KRYISx+yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IaqatR1h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 95E34C43390;
-	Mon, 11 Mar 2024 18:38:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710182292;
-	bh=YCVvrNarbmR3C+Arb/8JQFTXtQ1+yZpI9pLP/OsjiGQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IaqatR1h5x81lRsYfktnWSAQxH9hwBi1NNjjlrEObz5csHEvOegV0PQEVN2BQHEBD
-	 KH0Tj3U/mLogaOX6pebYdzzIHhP4UBHCVC8S2PtC1i/P8RGd04VMi4KdaV1CnS2eaB
-	 0zNJmY+h9WCYHqIHfLYpj+q3kBIQqOFXqLxNxnp78V8EU3gWTR+dRJaqlOVigJYkuM
-	 eYvXwishfiE9oguZ7UsnP7GdICCDaJ9UUa8xsQDSW0OcqZiP6QY5E1JYfIGZdqehlO
-	 PCXtz8DQkfl8sQARCY/UVSzpvAXWesYQuNRLyfKn0RvYWchcjQUhsP76azDff2UsEp
-	 cmo5t5uSAYk8A==
-Date: Mon, 11 Mar 2024 11:38:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Wei <dw@davidwei.uk>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, jiri@resnulli.us, kuniyu@amazon.com
-Subject: Re: [PATCH net-next 1/3] netlink: create a new header for internal
- genetlink symbols
-Message-ID: <20240311113811.4b878ddb@kernel.org>
-In-Reply-To: <dce00532-d893-40c6-9ec4-df7ad3f47d7b@davidwei.uk>
-References: <20240309183458.3014713-1-kuba@kernel.org>
-	<20240309183458.3014713-2-kuba@kernel.org>
-	<dce00532-d893-40c6-9ec4-df7ad3f47d7b@davidwei.uk>
+	s=arc-20240116; t=1710182445; c=relaxed/simple;
+	bh=7QgKIaP0/c6SHvgH07U88g9EjC4h7z7/QxEQtSagdEQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SLVhLRTmZkOr2oo6oxxAr0KRZ7b3M0jgEhyz6AC8U3EpDE78dhssLkdtV3XooF6iHcXDKfrLOmr3iDA9N1hqJSdM0W7kRTDPhihZeeA8wpjbAb7UKfdLAjzeMbsaFEeQmYjP7HgFoSp0lHAvp0u3jTaQIuw6zp5ItbtI0OXBcmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=T1oFG8Kx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17DE4C433F1;
+	Mon, 11 Mar 2024 18:40:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1710182445;
+	bh=7QgKIaP0/c6SHvgH07U88g9EjC4h7z7/QxEQtSagdEQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=T1oFG8KxDff2oPYjT41rHf5VSCQZrmhiUs46Nx6XyMTn7TmO70UNEZ8rwtwadwh0s
+	 v8ubwKGotwqP1BbwAI5ShIZR1cJwuCsypNYN+Icwsf+rrkmFmZfZlGp9+2b9fL+7iJ
+	 DqTk+ROJ46nw4HjEdfaeMVY/PbHVNeored29YxZU=
+Date: Mon, 11 Mar 2024 14:40:44 -0400
+From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Krzysztof Kozlowski <krzk@kernel.org>, Simon Horman <horms@kernel.org>, 
+	Luiz Angelo Daros de Luca <luizluca@gmail.com>, Linus Walleij <linus.walleij@linaro.org>, 
+	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/4] net: dsa: realtek: keep default LED state
+ in rtl8366rb
+Message-ID: <20240311-chowchow-of-premium-piety-9e4a0d@lemur>
+References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com>
+ <20240310-realtek-led-v1-2-4d9813ce938e@gmail.com>
+ <388b435f-13c5-446f-b265-6da98ccfd313@kernel.org>
+ <20240310113738.GA1623@kernel.org>
+ <09793a72-bfe5-4cb5-a6da-ffee565e6956@kernel.org>
+ <20240311091111.53191e08@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20240311091111.53191e08@kernel.org>
 
-On Sat, 9 Mar 2024 14:35:30 -0800 David Wei wrote:
-> On 2024-03-09 10:34, Jakub Kicinski wrote:
-> > There are things in linux/genetlink.h which are only used
-> > under net/netlink/. Move them to a new local header.
-> > A new header with just 2 externs isn't great, but alternative
-> > would be to include af_netlink.h in genetlink.c which feels
-> > even worse.  
+On Mon, Mar 11, 2024 at 09:11:11AM -0700, Jakub Kicinski wrote:
+> > OK, then this is v2. RFC is state of patch, not some sort of version. Or
+> > just use b4 which handles this automatically...
 > 
-> Why is including af_netlink.h worse?
+> Eh, hum. He does according to the X-Mailer header. More importantly
+> I thought the RFC to PATCH transition resetting version numbering
+> is how we always operated. Maybe b4 should be fixed?
 
-It exposes the internals of the lower layer of the protocol stack.
-genetlink.c doesn't really need to know those details.
+There is no way to make it work reliably the way you propose, so I strongly
+suggest that we do it the way b4 currently works:
+
+- a series can start with RFC in the prefixes to indicate that it's not
+  something to be considered for inclusion
+- when the author feels that the series is ready for maintainers'
+  consideration, they simply drop the RFC and keep the same change-id and
+  versioning info; e.g. [PATCH RFC v3] -> [PATCH v4]
+
+Resetting the versioning requires resetting the change-id of the series, or a
+lot of automation breaks.
+
+-K
 
