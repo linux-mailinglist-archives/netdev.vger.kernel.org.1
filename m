@@ -1,76 +1,92 @@
-Return-Path: <netdev+bounces-79318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F290878B73
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:20:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31160878B75
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:20:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEF751C20BE5
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:20:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60FD51C210E8
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3008158AB9;
-	Mon, 11 Mar 2024 23:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BBED58ABF;
+	Mon, 11 Mar 2024 23:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pO0jIfPv"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KCybjNwF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0924C58AAC
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 23:20:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9E8658AAC;
+	Mon, 11 Mar 2024 23:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710199206; cv=none; b=uR4lBYDVuUheby/04pPexQ6SBX2DKbIetouUUVJXJt4dm5q9vA39KoRLWIBnHvh5NnJ+Mlncl/wxSz8M6uoHTg9fJXmPPO29L2ZRxCOnvFL8vvU8YEhmsSt3eaIM6oA8fuRfTgfqavDNShDInsyfuhN/dsiJPVqafvh+FLZJjvk=
+	t=1710199231; cv=none; b=rDn0Xvy4c0CnB7WrVoO7FroZfTBw4JL2I3igxUux0Pu+xz13RStYjzwTVsAPEiL6tThQAQ0wqZ28dqgQ46jD75sNY9yYvAYJOb60Vbxoz0llFcN2frfvaN/tPvPfRFyYgfsYYIhOtVoMo6IVlyHE1Z0isYImkZtQ8yJa/lOh/9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710199206; c=relaxed/simple;
-	bh=IbBZ1ill7oXGlNPAar3DqvVmnFCQBGb3pO4nt/R/sQs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MXZqlHr63KNF4CMuU1dnFuo2wKZ3RivvStYMZhOP5/V82glZG/OHyYXedb/Zl/pA1FTnFA7lNjuimkHPWWeF5lIf7eY0yGnZsLoseuy2camJO+xUz9HCFUN4V7IXMIEK2W91vJlTYtjZXcfYLU3S4JzwVtsxa9PUYOsN0xrZ6hk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pO0jIfPv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74438C433F1;
-	Mon, 11 Mar 2024 23:20:05 +0000 (UTC)
+	s=arc-20240116; t=1710199231; c=relaxed/simple;
+	bh=/SfPJdQLLpKy4wOW1GxWa5+tTB7sghSqtQujy4vtbq0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ItahqO6lb2itWHBSxHvf8dYtWU6vzkX3XxWG/EU10FLBzlQYxKyTFwlbykOLUNP8FwntbWL8jFJwCetp6VGQz82e4PE0xia3TjmsoqVGS5/m8ADcd1DZSLMO2UWbAvCB0lApTcMFcfRx6UcNuEjJrUroAMabrZYnBeO6eE8OZF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KCybjNwF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B3354C43394;
+	Mon, 11 Mar 2024 23:20:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710199205;
-	bh=IbBZ1ill7oXGlNPAar3DqvVmnFCQBGb3pO4nt/R/sQs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pO0jIfPv3vOCBlbpdH005IraQYbH27aXSDk0CMTlpnBFwP8d0ojeRLdSVswCyH5Fh
-	 +ByliuLphzw3l1YeWPkE/yzX7gFnKccWqHhXXPAZt4cNORWZnyYXqd2o0lOhNmqfFz
-	 YY3sXCb47ycwWESxukGz4/p6X6mgT4yKFwAauXhM0z5in6kwOecIOEE+R4zRHh2T/b
-	 Gvn53t4IlpKVZeYTTOon6WcT+JiRpRE2H3I8tvQL9/dGmcThRocbcwwD060Waq6R9c
-	 1IGUxIppgMkh/+PaJR+3J7iiylW5V8wMMiy1WfHzQp9TP/Ff2Jb9qfbOFiiVbukkVo
-	 eHI/vJolOtZeA==
-Date: Mon, 11 Mar 2024 16:20:04 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Thomas Gleixner <tglx@linutronix.de>,
- Wander Lairson Costa <wander@redhat.com>, Yan Zhai <yan@cloudflare.com>
-Subject: Re: [PATCH v5 net-next 0/4] net: Provide SMP threads for backlog
- NAPI
-Message-ID: <20240311162004.2322cf84@kernel.org>
-In-Reply-To: <20240309090824.2956805-1-bigeasy@linutronix.de>
-References: <20240309090824.2956805-1-bigeasy@linutronix.de>
+	s=k20201202; t=1710199231;
+	bh=/SfPJdQLLpKy4wOW1GxWa5+tTB7sghSqtQujy4vtbq0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=KCybjNwF7Gn0mJVZZaXAIQq5RXZLm8oglHmJZVvtsNleZcGXS6Xn9WBnfUuhYwMHL
+	 IhtatKt9GdpfsAHXUk/C5tHm30vaIKCDJEqqgQifNoEbHJ4ie+vWeWOpKrAUNbeKvO
+	 amG+3zDoZKzAw2FEehrTumEtpTZ18MvnmGdJr0nyOMnelMqfN+gVQ3VBdfjfLQZ8rN
+	 YUGjwhSnFDNY9OFTun0yyo7EySBnpiL3JXFGESSOstqao0NpUOYXoMDvIY96wwNAfo
+	 wBz8yNY9qjyRK/6nDTAkbzK+YUWZ6SqwWsXHNxdc29qnWg31YbYRVmGOtvuXlVIMRo
+	 0nqKiA8SfSoFw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 9C956D95055;
+	Mon, 11 Mar 2024 23:20:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v4 net-next] ptp: Move from simple ida to xarray
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171019923163.27198.3435432996838063390.git-patchwork-notify@kernel.org>
+Date: Mon, 11 Mar 2024 23:20:31 +0000
+References: <20240311144730.1239594-1-kory.maincent@bootlin.com>
+In-Reply-To: <20240311144730.1239594-1-kory.maincent@bootlin.com>
+To: =?utf-8?q?K=C3=B6ry_Maincent_=3Ckory=2Emaincent=40bootlin=2Ecom=3E?=@codeaurora.org
+Cc: kuba@kernel.org, horms@kernel.org, przemyslaw.kitszel@intel.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, richardcochran@gmail.com
 
-On Sat,  9 Mar 2024 10:05:08 +0100 Sebastian Andrzej Siewior wrote:
-> The RPS code and "deferred skb free" both send IPI/ function call
-> to a remote CPU in which a softirq is raised. This leads to a warning on
-> PREEMPT_RT because raising softiqrs from function call led to undesired
-> behaviour in the past. I had duct tape in RT for the "deferred skb free"
-> and Wander Lairson Costa reported the RPS case.
+Hello:
 
-Seems a bit risky to apply this last minute, could you repost first
-thing after the merge window? Sorry..
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 11 Mar 2024 15:47:29 +0100 you wrote:
+> Move from simple ida to xarray for storing and loading the ptp_clock
+> pointer. This prepares support for future hardware timestamp selection by
+> being able to link the ptp clock index to its pointer.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> 
+> [...]
+
+Here is the summary with links:
+  - [v4,net-next] ptp: Move from simple ida to xarray
+    https://git.kernel.org/netdev/net-next/c/f095fefacdd3
+
+You are awesome, thank you!
 -- 
-pw-bot: defer
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
