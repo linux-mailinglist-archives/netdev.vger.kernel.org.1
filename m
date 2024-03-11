@@ -1,325 +1,156 @@
-Return-Path: <netdev+bounces-79147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18C2187800C
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 13:34:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09CBD878013
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 13:40:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 82E401F210BF
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 12:34:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1BDD3B21495
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 12:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AA5A1E87F;
-	Mon, 11 Mar 2024 12:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE4502E64E;
+	Mon, 11 Mar 2024 12:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I62iU/3q"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="KWjn9wkd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A6CE8460
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 12:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710160456; cv=fail; b=apJ2g+1emRh1mWknDhIHu41Rducca+M42E04sDlOCtTZB0CY2nFEdy9IX+3d+cylU4kGcEFf2Liy2KBK2cLoBtJUWy+HM7zPRg9GFtQznYEo7CL9sPzZ9NRFPUCEXbliz8yfUYdx6mrb2ub7JQ7BhkBiX3Fmih6aSdPtye8b9tU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710160456; c=relaxed/simple;
-	bh=kACbUsodCTMMCVFAv2bhWC4+IDwbsdt1wNP6PDbVO+0=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=s29UJPWiw6vIo2jDpwlBtXGBONXGVpwFkh5+ZSkBCux3DIZ/bBWByF6wXPjLR5ThcZAec/aBQisHFQCuHrcdTJhzT8VTDjNNncV6pBJdmDuMaB9lv9eBMrgKHEAydokb6jQjaqZnHDTJZqxPtLhZxKUXBg4AoLYA1OTlMmac5zM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I62iU/3q; arc=fail smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710160454; x=1741696454;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=kACbUsodCTMMCVFAv2bhWC4+IDwbsdt1wNP6PDbVO+0=;
-  b=I62iU/3q/P82oa+B6feX7oYtghi/tcxK57+Smo76Cuy3rSWihNipLXpV
-   TooEmcp5WExPmJ3AK5MengsAjvnU8oF87IwbCX3Hm3vTAJW+F8QTDLY0N
-   LsiMbEuzwTq6+SIe5tMwxm0/GNeWGv1jPJvV54jh380kleSYc0myGTUKw
-   jtKMsphvjui78qxUY6vFqXlgezywCBTP6/lcdMuJTv9MlJ/k16EQ+oyNY
-   EkLyEgR/BDXKjxjLteVaQUS3Jh5ESX2TB/xUS09adhpZgf+PQKDDbisQy
-   qV7Cga5SU+dslFlS4ioffU9R/Ys7hMXb5SxbqHSkuy5kGeYgnVhdbjxlN
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11009"; a="15457267"
-X-IronPort-AV: E=Sophos;i="6.07,116,1708416000"; 
-   d="scan'208";a="15457267"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 05:34:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,116,1708416000"; 
-   d="scan'208";a="11037022"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 11 Mar 2024 05:34:13 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 11 Mar 2024 05:34:12 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 11 Mar 2024 05:34:12 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 11 Mar 2024 05:34:12 -0700
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.41) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 11 Mar 2024 05:34:11 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iHr30pg/4fptWsG5ooJrGNuEPsgVF5Jb4LWvwKskjyFrg9yDajM1t6bYvD/WVB1K48jZmKBOr+k5jg8GoZpsx/ETuCpuQLX4loPbSnXxMPQtyOUhA7ry6hsOjmqzhck28+lNupaVT2UHHtU2kOXn8e3Yl2jfmg2qbJj2Xpyj6kffxs98wBjTnz6YCgna33jmNls+A95dO5tgdxLzQFrCVpyuegtdVL3J8tIjO7AWGLw6gIigIRkDM5KZsrLVNp35ZjKCiPIXF7CcApHn8Z58APdcdGECjTuzqbuwHZzJhB2uikRsqeKYUGcaoZIybgagj9MhfUr8Ywav7vPNYkXEgA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=AreOawfPX7acK4QT6BKAz2O1rth/DUSUsPfhQ4joiBI=;
- b=PVJ47EKydIINs6B5ozbAnZ0UgeFEu1njtnZeJFZvBIchOOPMZPfaZv1CRlKeoy8PHg90pPJZ50TbSS+7MDHof2ppoWTkwietrdLIaFqZRyOkNplq3DyZaS3oPdQQRuEtp9ZFx274ohMAk2POBMAM3i7hIFvajUlEXQg7B2zgkPaebVznoxW9OfwNVzjoaxmJoXd6hVVTGvK/DZJCNhwGy46ohLRqCI9bvOgcPrh6aDNhDTcwbqKNHOBRLwWeK1J+wC6SooLlVIvt7Gda8NNOZ25DxU3opD+LdhZOOiPnbjMj6xZZBBX61ahuiiCiR4l7JCLUy5bUPmFCWiXl3bEMcw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by IA1PR11MB7317.namprd11.prod.outlook.com (2603:10b6:208:427::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.15; Mon, 11 Mar
- 2024 12:34:09 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::618b:b1ee:1f99:76ea]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::618b:b1ee:1f99:76ea%5]) with mapi id 15.20.7386.015; Mon, 11 Mar 2024
- 12:34:09 +0000
-Message-ID: <b03abadc-eb9a-4025-afed-a4eb7c4a5e2c@intel.com>
-Date: Mon, 11 Mar 2024 13:34:03 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net] i40e: fix vf may be used uninitialized in this
- function warning
-Content-Language: en-US
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>,
-	<intel-wired-lan@lists.osuosl.org>, <anthony.l.nguyen@intel.com>
-CC: <netdev@vger.kernel.org>
-References: <20240311112503.19768-1-aleksandr.loktionov@intel.com>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20240311112503.19768-1-aleksandr.loktionov@intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR4P281CA0357.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:f4::18) To CH0PR11MB8086.namprd11.prod.outlook.com
- (2603:10b6:610:190::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3880022F07
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 12:40:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710160842; cv=none; b=TsmYIA8TxkqYzyeuM+XL45BNrrYUbXMiNjQZDwmyup/yN4br8ueM2xqzECcmy9dLLUVasMOk6YK0TfODNcKZZ4SwSwgf0jSb28KHLKLFBUGLGkSGp2yxVPnfwpoE0egNcf4p5bmkRPSRzM180r0IB4k2jcZkDOtsExFHmlxS/8U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710160842; c=relaxed/simple;
+	bh=7iyN0obiYCS+6q+ebCFwc+JmlfO9przc4D5Z134DvjU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=n/3r6Re6tNFJu5dHpFk2GOTrxsDnUvOdHF1SpkJ71bOYnh9JfN7ONdAoRbOy866dK+5qDeXU7rVpXOQX4yY3bh7/JA1ECD0w/+14MPJq7zC4844uPXeE5V2ynBkjXyangvCrrBg5ufr0QX15Mmns8YHn/LotJP2lp5Rq4HtDW9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=KWjn9wkd; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4132cc37e21so3172395e9.0
+        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 05:40:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1710160838; x=1710765638; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=CUeKqYGVxUsunuJQG4tec02NEsEnm7zmFbvtCQVCYHg=;
+        b=KWjn9wkdgjPZq1ztzOIEVSE13iOZsXsTh5/YI8IZDivNa4MjLRiLEEMeABVrAKzl0A
+         jKf9+nudKWBe1fiBGwzYtsTIYFKP03YfzI6aXpYHU7Hi9xHC/a6iLkmEkfzCevG2jwt2
+         FyvpDz8SsstPvhPnDksUZ3hJMgl1NtC3VBDLgdeWolwojqfj0p1C3AVWhW+cdw4KpYoJ
+         9pXJA2uRqrlk7ADdwCKezhNYeEFLic/FNZ29tdTYS9fSEscLjY14Ap7sJ7bmkoHVL9Ze
+         cMB752GZXnwq5Uvqdd3x7SRiJwVmPkN/Xs19y++G4cVnFdIE4FEeL8YFftEFVXN98/HD
+         GB/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710160838; x=1710765638;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=CUeKqYGVxUsunuJQG4tec02NEsEnm7zmFbvtCQVCYHg=;
+        b=uZ+0rXsLmJKhXKEEkJyhm0iHORGuimtHJy8AY1ViEeywU6TXg0AABn3HBsIqr05Z/Q
+         fIN/PaDaqla3T8nl6Y/ZLmNiGdg6su9NuWJ7OWmSTsDpRFb+7oEqYttgDHK2W2eteEBY
+         os8+Sp/U/MkBxTbeb7p1glRoOBiNNc/PUzNhdVipKAorqDX19kriNJvCDiRZfLjNW9ZE
+         QTeaPhgk2prjy4gDI4zH2YORc157u5rZ09H9vbEwnR+4RIhc55SntDU/6ePZpV97xNCX
+         1UVOeOZNcPqd7HTtANfXZK5NHVJVXXLgqHyuyl8Id6BS3kcH58keQZ0zO+62MugQjYkN
+         blKg==
+X-Forwarded-Encrypted: i=1; AJvYcCV3PlOv2TIApEiLoW3hh/AMj5Bnx/iXH+eC6cG/JL0+GU+sYEkOcZyjI8vZJexbOcB1AsfSwYPLXmCJ0i16dw5nmCsDBc9A
+X-Gm-Message-State: AOJu0Yzq9L7Npahz88A06uCjrILQdQtxU0PTQGybv+ipJvlhfi7+BsfM
+	8qjGcyeUoN8ws9geeMtoP7kED0eAq5XrVvEAmAF8Lxr2ccfbrPbKXJaTAGthw+I=
+X-Google-Smtp-Source: AGHT+IGrWrKeOoeIXZ88Juws7JMAQU223c+6sOcyECtWdOTk8c7M3KTrvXuOfFZ0ZFTmwCOXsQgdNg==
+X-Received: by 2002:a05:600c:358f:b0:413:216c:9d67 with SMTP id p15-20020a05600c358f00b00413216c9d67mr4729237wmq.14.1710160838502;
+        Mon, 11 Mar 2024 05:40:38 -0700 (PDT)
+Received: from localhost.localdomain ([104.28.232.6])
+        by smtp.gmail.com with ESMTPSA id p14-20020a05600c358e00b00412d4c8b743sm8983383wmq.30.2024.03.11.05.40.37
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 11 Mar 2024 05:40:37 -0700 (PDT)
+From: Ignat Korchagin <ignat@cloudflare.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: kernel-team@cloudflare.com,
+	Ignat Korchagin <ignat@cloudflare.com>
+Subject: [PATCH] net: veth: do not manipulate GRO when using XDP
+Date: Mon, 11 Mar 2024 12:40:15 +0000
+Message-Id: <20240311124015.38106-1-ignat@cloudflare.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|IA1PR11MB7317:EE_
-X-MS-Office365-Filtering-Correlation-Id: f281937d-cbc1-4727-27ba-08dc41c78c44
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: vY5Qz7FsgBa3Rp91FEQBXFdhQNLOu12oDNJj3TR3YPANJWCXUDwv15BM2jNGIh4Fvrt2NnfMT1kXRm/2b0znt5C98p848BZi9a6wALt1WidvNDQnsmtX5ydYweE+u00kPN62mxOz7Mm9eU8Cuon+mHkm1YmQDWN3BJvg8BDL75mnKYKIU32Hc+6vchz/vIDDTLfgIrVNH78P7rzbNGendEW+MhXh9KDEKX8GVnNpdH/HgeDuy7J/nLKwvjCenAx9sc80HdzQJWSMxJWUej5cpXkmm3g2qVmMflPFhh2loU2WXDoU2PfnEwUqkaZic8/FXvKA0WxxDmwu5HKaLQ5O6RuPHSDyJ2hs+pHX3Ab2fmwQMNKXx8a8kHi9yj4qjCIweYwRtZlu/h/l6qXOyDhF2K2id9n8xR/1jZUFR56QPgPukDqaFPLjVawBjM0M+bIMiZgDRsZp37eoe0sO5c7zd61J7kWSmv/n9bBUIHXlBBmWdHg4AN/C0ydZkYUb94MuZ0yyMhik8CLN91i6DAVpp5Uqbu0oUX8Uu3mQiU9w8FubgBVBzDK9mGC+aKW2jfHFENw4sxbOIO6ZtyuLm8zbujcuJ9FIxABATueUXMS+gF5HrSarJViKPw7xeWU6PG4sYAuwO/ab4SpwKTPMJh9EQMtbpEuG58DsD1b20o4lymo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZlFLNnRIbmM5dG5xYXRHZTFqK014ZVNCdUxjbmpKOE1GMklsa0ROZjRHdUxT?=
- =?utf-8?B?b2pVbExqVGt4MytLMEtuL3c4SWRSVnRidnlDTWNrSFBZYmZVNHRtcDIxc0k3?=
- =?utf-8?B?dlhRZUl4eDQ1dzVqaEwzYVpIaElYTXpBSWlqTmdzK09lWTFtay8yZERSVTJK?=
- =?utf-8?B?SkRMUVRiOXZDVGNFRzJVck1GNEQ1TVFObkkzSjQyMjF3anFEU1g1Ni8xQ2Rn?=
- =?utf-8?B?Y1lVQUY5MENDd1FHTmx1NHFZYWhURU1lbmRubHRNRG9PYnRjN3FZWTNBSWJK?=
- =?utf-8?B?M0xqaU9JV0dxQWw3bW9BMkRJVDBtMWxWQ3R4R1VmbXUzTExaT3BJaHVZcGI4?=
- =?utf-8?B?T2ZvNHVhK1pyOTJzemJBcW83NjBXTEdkcVVtenVZYmxwenF0NnpxeXNhalBh?=
- =?utf-8?B?RFE5eXpZenFPemlpTWNnM0dHT2ZMYjhSeGI4RkVYMzhWY1ZhWUtndWZYMEI2?=
- =?utf-8?B?OGtMTjBKczhXeXpVZFNQbmtnVHpXUkI3MDJySXprZmtkT1hzTGV3TjhBL1Zv?=
- =?utf-8?B?MThobnJOMnZaemZRd3lhaElQMUJHZGVCUXd5THdjNWJ6TE1heWJ4K0F5T3ky?=
- =?utf-8?B?V3owY21KNnB0ZEF5MTVwanM3akdqVi9qSFc4MnpwMlh5bkZ5NnFMV3JRRFZv?=
- =?utf-8?B?aVZXMUVZTEV3eHpPa0lZMzVZcXhETEZ3QmtIdllMWmxZWkVUd2FxU3Z1L0pJ?=
- =?utf-8?B?V2dUYm8rYWhTS2J6ZDJVSENHZlhTTzFkQkFVZjY4SFMxQ3pUNE1Ba0JZNVRj?=
- =?utf-8?B?K1hZdTUvNXlCdCtGeGQ3WVZERWVSSW8zMW1ISkRaeWpDa09HVE1TRlFmTUNI?=
- =?utf-8?B?aW9RTGRPTUNnZU5ZQ050aTRDZVcvRnhHbmdrdmFtaWM3RHRGQVA1NjlHcTcv?=
- =?utf-8?B?ZzcyY2d2UlRnbzdBK0ExMlNQcmtWbUJRZVh5Uk14MlBOZkE2b1o5aVY0TnZp?=
- =?utf-8?B?bXlxOStwUm92MHh1VmNFV0xjeEw5N2xnOGZBQml6MkZEVG5POWxaNjZtWUw5?=
- =?utf-8?B?TkxKeGlEeXJJUXBkY0dHTjdId2dtYmhoTGh4K2tyL3RpYkNtUkFLV0NNQjc2?=
- =?utf-8?B?VjVCM3dWd3ZvVTVtWERxYWRTVllXTFNtd1orWlVhV1hJSDFJaGVGQW90dlB1?=
- =?utf-8?B?SnQ1Um55UWVoeTczT1RnWUVrYkdCSHVmUjZrTVJVdUl5dHBBdkpDMFg0SUd3?=
- =?utf-8?B?dGNNbjhHNmwvQm5BYlcyY2dMb0E0eDVTYjd0ek03Q01YL1ZSZU12Vjc5QjI0?=
- =?utf-8?B?RzZnYmZwZ0JKaVRMN0tEVS9POVFHbUZIYWZmUXE0RVFXb2dlL1Nidm1uaEI5?=
- =?utf-8?B?ZXF2ZXNBVDhCRDdvNEhBVU12U0Z3NmdYS21ZY1g1WisrNXUvSkpCdlIrbnZR?=
- =?utf-8?B?dmY4SjBrRm9FRGNhMlYwUGtjdHV5citLWDJYbkRGUjVDMVVWWTRENmRNZFpK?=
- =?utf-8?B?bk9OMGY1Y3JvYVY0MXZMazd6M2N3czRzQzA3bWFzamFrQWh5d2dYOG9Ua2dZ?=
- =?utf-8?B?MkQzUTAxaDRIS1Y4L2IzNW9NMStWT1V1TWdRamJ0akN4Z09MZGhhcHRIcUh3?=
- =?utf-8?B?VkQ4MGJSNXNXWHdBTnlPMFdjZU9EOEhpL01xTEtKaEdiZzJZeGxRWEwwZklR?=
- =?utf-8?B?ZHRxT2llQ0k1R3B6MEJ0OWI5SDdjd252aEtuc1d4eW9LTEh0L1pFSEg0cUtN?=
- =?utf-8?B?U0lLdTVNV3o3aGRUc3ErNGdBemI2OW5tRFVvaFY2MGRiaHVsM2dsSkM1OXFG?=
- =?utf-8?B?aVM2VUxFb1hlY2hlcm1PbEhncll0M25kaWJLcCtxTnVVY01kc2kyY29FKytJ?=
- =?utf-8?B?VW5VQVczYmQzM2xYdWI3R2RHT1VjQU5xbXFVTUNHMEU4OU0rbU5uemhoK3ky?=
- =?utf-8?B?YTN2NmYxNkZuM2g5QXNJNmxKZVdvK2FEVkZ2b0tyU2lmeE11SmNmRm9WSnVs?=
- =?utf-8?B?WUpDVE56YUtvMWIwb0g1OGJ0eTdtbTFEMEpua0F4dlVMcUpEeERib1oxRndT?=
- =?utf-8?B?SWZyRStZMlFNYzJFdU9Ob2JkeFMvaU9ERFpMdWlzS1RxZjdkSkU3L2Q1aW1m?=
- =?utf-8?B?bVlUQlgxNytSNUdpMUphTDBPS0RkNGJ3dmdyQlhsYWY4bEVaU0tLY1RDbU9P?=
- =?utf-8?B?NzlqckFkTE0rdnQ4STV3ZTdqR3FLcFE2TlBwNUppTDF5TCtpZDdTTk5Vcjda?=
- =?utf-8?Q?wjivQ33LGQBniL6Ybt38yGs=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: f281937d-cbc1-4727-27ba-08dc41c78c44
-X-MS-Exchange-CrossTenant-AuthSource: CH0PR11MB8086.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2024 12:34:09.7263
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6z6GJMgZ/21RwJr7VPSVp2nN4QHVttTS6uiiHjLSJvsfa1K9/fRDJ9FWmI5D6bRPm9vc0BsBwq3sfEh0uiU1thnDxJid67C8aLgSNHs4rm8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7317
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-On 3/11/24 12:25, Aleksandr Loktionov wrote:
-> To fix the regression introduced by 52424f974bc5 commit, wchich causes
-> servers hang in very hard to reproduce conditions with resets races.
-> 
-> Remove redundant "v" variable and iterate via single VF pointer across
-> whole function instead to guarantee VF pointer validity.
-> 
-> Fixes: 52424f974bc5 ("i40e: Fix VF hang when reset is triggered on another VF")
-> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-> ---
->   .../ethernet/intel/i40e/i40e_virtchnl_pf.c    | 34 +++++++++----------
->   1 file changed, 16 insertions(+), 18 deletions(-)
-> 
+Commit d3256efd8e8b ("veth: allow enabling NAPI even without XDP") tried to fix
+the fact that GRO was not possible without XDP, because veth did not use NAPI
+without XDP. However, it also introduced the behaviour that GRO is always
+enabled, when XDP is enabled.
 
-While reading carefully I could tell that you are indeed only changing
-int v; &vf = pf->vf[v]; into pointer, and the scope is limited to just
-one function, and commit message makes it clear what the error was.
+While it might be desired for most cases, it is confusing for the user at best
+as the GRO flag sudddenly changes, when an XDP program is attached. It also
+introduces some complexities in state management as was partially addressed in
+commit fe9f801355f0 ("net: veth: clear GRO when clearing XDP even when down").
 
-With that:
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+But the biggest problem is that it is not possible to disable GRO at all, when
+an XDP program is attached, which might be needed for some use cases.
 
+Fix this by not touching the GRO flag on XDP enable/disable as the code already
+supports switching to NAPI if either GRO or XDP is requested.
 
+Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
+---
+ drivers/net/veth.c | 18 ------------------
+ 1 file changed, 18 deletions(-)
 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> index b34c717..f7c4654 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> @@ -1628,105 +1628,103 @@ bool i40e_reset_all_vfs(struct i40e_pf *pf, bool flr)
->   {
->   	struct i40e_hw *hw = &pf->hw;
->   	struct i40e_vf *vf;
-> -	int i, v;
->   	u32 reg;
-> +	int i;
->   
->   	/* If we don't have any VFs, then there is nothing to reset */
->   	if (!pf->num_alloc_vfs)
->   		return false;
->   
->   	/* If VFs have been disabled, there is no need to reset */
->   	if (test_and_set_bit(__I40E_VF_DISABLE, pf->state))
->   		return false;
->   
->   	/* Begin reset on all VFs at once */
-> -	for (v = 0; v < pf->num_alloc_vfs; v++) {
-> -		vf = &pf->vf[v];
-> +	for (vf = &pf->vf[0]; vf < &pf->vf[pf->num_alloc_vfs]; ++vf) {
->   		/* If VF is being reset no need to trigger reset again */
->   		if (!test_bit(I40E_VF_STATE_RESETTING, &vf->vf_states))
-> -			i40e_trigger_vf_reset(&pf->vf[v], flr);
-> +			i40e_trigger_vf_reset(vf, flr);
->   	}
->   
->   	/* HW requires some time to make sure it can flush the FIFO for a VF
->   	 * when it resets it. Poll the VPGEN_VFRSTAT register for each VF in
->   	 * sequence to make sure that it has completed. We'll keep track of
->   	 * the VFs using a simple iterator that increments once that VF has
->   	 * finished resetting.
->   	 */
-> -	for (i = 0, v = 0; i < 10 && v < pf->num_alloc_vfs; i++) {
-> +	for (i = 0, vf = &pf->vf[0]; i < 10 && vf < &pf->vf[pf->num_alloc_vfs]; ++i) {
->   		usleep_range(10000, 20000);
->   
->   		/* Check each VF in sequence, beginning with the VF to fail
->   		 * the previous check.
->   		 */
-> -		while (v < pf->num_alloc_vfs) {
-> -			vf = &pf->vf[v];
-> +		while (vf < &pf->vf[pf->num_alloc_vfs]) {
->   			if (!test_bit(I40E_VF_STATE_RESETTING, &vf->vf_states)) {
->   				reg = rd32(hw, I40E_VPGEN_VFRSTAT(vf->vf_id));
->   				if (!(reg & I40E_VPGEN_VFRSTAT_VFRD_MASK))
->   					break;
->   			}
->   
->   			/* If the current VF has finished resetting, move on
->   			 * to the next VF in sequence.
->   			 */
-> -			v++;
-> +			++vf;
->   		}
->   	}
->   
->   	if (flr)
->   		usleep_range(10000, 20000);
->   
->   	/* Display a warning if at least one VF didn't manage to reset in
->   	 * time, but continue on with the operation.
->   	 */
-> -	if (v < pf->num_alloc_vfs)
-> +	if (vf < &pf->vf[pf->num_alloc_vfs])
->   		dev_err(&pf->pdev->dev, "VF reset check timeout on VF %d\n",
-> -			pf->vf[v].vf_id);
-> +			vf->vf_id);
->   	usleep_range(10000, 20000);
->   
->   	/* Begin disabling all the rings associated with VFs, but do not wait
->   	 * between each VF.
->   	 */
-> -	for (v = 0; v < pf->num_alloc_vfs; v++) {
-> +	for (vf = &pf->vf[0]; vf < &pf->vf[pf->num_alloc_vfs]; ++vf) {
->   		/* On initial reset, we don't have any queues to disable */
-> -		if (pf->vf[v].lan_vsi_idx == 0)
-> +		if (vf->lan_vsi_idx == 0)
->   			continue;
->   
->   		/* If VF is reset in another thread just continue */
->   		if (test_bit(I40E_VF_STATE_RESETTING, &vf->vf_states))
->   			continue;
->   
-> -		i40e_vsi_stop_rings_no_wait(pf->vsi[pf->vf[v].lan_vsi_idx]);
-> +		i40e_vsi_stop_rings_no_wait(pf->vsi[vf->lan_vsi_idx]);
->   	}
->   
->   	/* Now that we've notified HW to disable all of the VF rings, wait
->   	 * until they finish.
->   	 */
-> -	for (v = 0; v < pf->num_alloc_vfs; v++) {
-> +	for (vf = &pf->vf[0]; vf < &pf->vf[pf->num_alloc_vfs]; ++vf) {
->   		/* On initial reset, we don't have any queues to disable */
-> -		if (pf->vf[v].lan_vsi_idx == 0)
-> +		if (vf->lan_vsi_idx == 0)
->   			continue;
->   
->   		/* If VF is reset in another thread just continue */
->   		if (test_bit(I40E_VF_STATE_RESETTING, &vf->vf_states))
->   			continue;
->   
-> -		i40e_vsi_wait_queues_disabled(pf->vsi[pf->vf[v].lan_vsi_idx]);
-> +		i40e_vsi_wait_queues_disabled(pf->vsi[vf->lan_vsi_idx]);
->   	}
->   
->   	/* Hw may need up to 50ms to finish disabling the RX queues. We
->   	 * minimize the wait by delaying only once for all VFs.
->   	 */
->   	mdelay(50);
->   
->   	/* Finish the reset on each VF */
-> -	for (v = 0; v < pf->num_alloc_vfs; v++) {
-> +	for (vf = &pf->vf[0]; vf < &pf->vf[pf->num_alloc_vfs]; ++vf) {
->   		/* If VF is reset in another thread just continue */
->   		if (test_bit(I40E_VF_STATE_RESETTING, &vf->vf_states))
->   			continue;
->   
-> -		i40e_cleanup_reset_vf(&pf->vf[v]);
-> +		i40e_cleanup_reset_vf(vf);
->   	}
->   
->   	i40e_flush(hw);
+diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+index cd4a6fe458f9..f0b2c4d5fe43 100644
+--- a/drivers/net/veth.c
++++ b/drivers/net/veth.c
+@@ -1533,8 +1533,6 @@ static netdev_features_t veth_fix_features(struct net_device *dev,
+ 		if (peer_priv->_xdp_prog)
+ 			features &= ~NETIF_F_GSO_SOFTWARE;
+ 	}
+-	if (priv->_xdp_prog)
+-		features |= NETIF_F_GRO;
+ 
+ 	return features;
+ }
+@@ -1638,14 +1636,6 @@ static int veth_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 		}
+ 
+ 		if (!old_prog) {
+-			if (!veth_gro_requested(dev)) {
+-				/* user-space did not require GRO, but adding
+-				 * XDP is supposed to get GRO working
+-				 */
+-				dev->features |= NETIF_F_GRO;
+-				netdev_features_change(dev);
+-			}
+-
+ 			peer->hw_features &= ~NETIF_F_GSO_SOFTWARE;
+ 			peer->max_mtu = max_mtu;
+ 		}
+@@ -1661,14 +1651,6 @@ static int veth_xdp_set(struct net_device *dev, struct bpf_prog *prog,
+ 			if (dev->flags & IFF_UP)
+ 				veth_disable_xdp(dev);
+ 
+-			/* if user-space did not require GRO, since adding XDP
+-			 * enabled it, clear it now
+-			 */
+-			if (!veth_gro_requested(dev)) {
+-				dev->features &= ~NETIF_F_GRO;
+-				netdev_features_change(dev);
+-			}
+-
+ 			if (peer) {
+ 				peer->hw_features |= NETIF_F_GSO_SOFTWARE;
+ 				peer->max_mtu = ETH_MAX_MTU;
+-- 
+2.39.2
 
 
