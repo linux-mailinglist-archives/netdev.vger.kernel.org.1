@@ -1,142 +1,277 @@
-Return-Path: <netdev+bounces-79126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF2D9877E84
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 11:59:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96662877E81
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 11:59:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3C4A4B20527
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 10:59:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CABE2814C8
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 10:59:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52AC0381DA;
-	Mon, 11 Mar 2024 10:59:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAAED381DA;
+	Mon, 11 Mar 2024 10:59:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="IJb9K/aC"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="dZlizvyf"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2041.outbound.protection.outlook.com [40.107.236.41])
+Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADF31364BE
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 10:59:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710154788; cv=fail; b=fs9di99GBiRowPPVD2F3AP8mw/4ufMZtkXdTmbpD2u2qKG0KgyIecwPbiraXHLGt8hz6e8IWHzT98tGw37DEtCck1129qHaOaxww9qqJ7YkGr7ndw04oFLgOPwBTH/w7hCkSf4s8lLOqoo8gGwr6aRghRhR47s9LV14ZyUVH+h4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710154788; c=relaxed/simple;
-	bh=vcrhkpUaZh0egNcTxHF33yQkaEJfn7cuckD7lN1fwN4=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=AStMtOnXGLcgBWIUWDkjgIPFlLCXGcwRcyR31F6gjyRFhJUeef/6JJqnBJ4A4MtznFbkaZqphJpbSH2dCzCBazsSQ3PRFjgKD5GCKizVaidaArsSSDm+cl2jnVp+Fh/+B5LaDUS2+C0LpvWBS0cLUm1kx9rDvunZu9+uneCX9hA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=IJb9K/aC; arc=fail smtp.client-ip=40.107.236.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b1CnBTo6ueoFLpWDUJTMjD42RgazvBFkm4PNyofjkuW4Xz6+UHlptZlxYm8yzZvxV/FTHH0rE+In8i1SNwt2rSv577X41AnT7rA+vRLJ79zxPNAQV+raba3vmaf/fDXmnjw+tgFtKy5gEkWPX22RSMdaSMzJ1QupzZEJnscL63J136oJyuDWnjDcYHkvaw583sUlxr+TuOTbhvTFXWSpv00IYjPrT3VmAsPt619Up9AL/mh9rKOMWXcfD0LiaU+eZ4B7uMLy1XJffGzGnGj7YPf0xrLhZRabiIiosW5cDege/zohLO0x228Xv/oHjf5riq0J5j5/X9PezpSGE5EOMA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+vdzdTa4KO5pD8a3eSSdbPbKwTcyu+XPa/u0hI10JN4=;
- b=HX/4FTVJDW7TTq5PkmfB9lp5vv2sS7rDJkvdYlxfVtLqRVVK90MgHPVcIuuN+u0ovYafG4lDn1PPOa3Zhkitfnuyv9b3U5Q3t+NTDAfnSJJYOl20O6YJhZ3Om2wAblJC14xXonYFSUL+Lp+0dtwYaC3xAbe2fl5bFjgguIeNZPgFJDv2DJB0dfoWbxej4miLxVNgLtNe/yCYjRNDSgYPGZteyJewcIHCpoUVtDfMF3NCjYyKAa+y98kPmArRJBFC1ohTy6o1myX/AMVlsuTvbp3F+6R7aBtIWSvkg059/NBGXbIukCWGh8hTw9em1eyLaaCkDUuIlnTVSD4k1Po7ig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+vdzdTa4KO5pD8a3eSSdbPbKwTcyu+XPa/u0hI10JN4=;
- b=IJb9K/aC/xvwwgb9ugbTsy2wyzT/8t+oR3Bdd6K7LFDVXyZHHLAWoI8iPkRQl0H1HAZqKbunGXhUvNdYRr2eJ0Xzk82RNzmeCokhmEWYDNx71MlHYxujEqgk95t9pVG9+8nm/G12tko8yptiOLW+7uOM5QgCYCuDSP7juv/VyGTDtf6B4AGEdFOkOaJKw/OdyNYQJgG/VZxKK9scuXYhRcrkVnppCKQAnaRbAR1dxZ2XDRVKxrfJ42h1moFR9ekoXRW5GEh7hf3bDTO46I4CQ0eZx3ZTHnyi7N69ocFFcG7PCiPSCT/h/t2DTpDZ0fFtEFAD2k5YEAUAyk7yboRONw==
-Received: from DS7PR03CA0126.namprd03.prod.outlook.com (2603:10b6:5:3b4::11)
- by SA3PR12MB7952.namprd12.prod.outlook.com (2603:10b6:806:316::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.34; Mon, 11 Mar
- 2024 10:59:42 +0000
-Received: from CY4PEPF0000FCBE.namprd03.prod.outlook.com
- (2603:10b6:5:3b4:cafe::ad) by DS7PR03CA0126.outlook.office365.com
- (2603:10b6:5:3b4::11) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.35 via Frontend
- Transport; Mon, 11 Mar 2024 10:59:42 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CY4PEPF0000FCBE.mail.protection.outlook.com (10.167.242.100) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7386.12 via Frontend Transport; Mon, 11 Mar 2024 10:59:42 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 11 Mar
- 2024 03:59:34 -0700
-Received: from yaviefel (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Mon, 11 Mar
- 2024 03:59:28 -0700
-References: <cover.1709901020.git.petrm@nvidia.com>
- <2a424c54062a5f1efd13b9ec5b2b0e29c6af2574.1709901020.git.petrm@nvidia.com>
- <20240308090333.4d59fc49@kernel.org> <87sf10l5fy.fsf@nvidia.com>
- <20240308194853.7619538a@kernel.org>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Petr Machata <petrm@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>, David Ahern
-	<dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>, <mlxsw@nvidia.com>
-Subject: Re: [PATCH net-next 11/11] selftests: forwarding: Add a test for NH
- group stats
-Date: Mon, 11 Mar 2024 11:59:09 +0100
-In-Reply-To: <20240308194853.7619538a@kernel.org>
-Message-ID: <87frwxkp9v.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DDC61B599;
+	Mon, 11 Mar 2024 10:59:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710154760; cv=none; b=A+HOnEvhxL/liMycZFMpdSeAvSwVgG9bvsRwg2dGFktOdRBJuq64412GD2IPPx91gEtEfI3Opo5RncRqvtUJ0phDEjJ2dlehORuSKq9i4Q8VZUJL73hdkhvYoedWgpFiCkcLGFi91BMsQ/cHcSPQMFMZY9hT82C6qMYEm2l485k=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710154760; c=relaxed/simple;
+	bh=oXZqPOZ6YIXTm+WG3dgEh3MLHaLjbWnhRyHghOoWAP0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RrzIhkU0DyA6/bxcjE/055hVZQouSDQNYK0sZzXliOAa8Haq3AbJfJnkT3lTQW5zssiQFj38v0Y8QZV6PMwxGz0Ji4LDX24paWfmx1fIyc9msqyPIlZT+ukQd92uyTGraCDdf2FdQGfKccelRU3gs9GcERXwJAgf+H0uBZkLcqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=dZlizvyf; arc=none smtp.client-ip=115.124.30.99
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1710154754; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=IcfjheDQ5kV24cq9Mvp8h+viyjO4uKlMJPaqsPHtqgU=;
+	b=dZlizvyfLA2e1s/alWGuZ0mTpSw7DUtdEV/KI3y1q0K0tVdZeRMz4E4YeN3cdxtSVGcY46dg4c8MOaIbe0Pm4086Q1npZK1ykfq8SeElZjf+93i7Jes+9JWmZWmEJ5LSSXJuN4SgfV6bmzWUmzcaYzWoobamLobiokJSnWqm6bQ=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R171e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=15;SR=0;TI=SMTPD_---0W2FTvzX_1710154752;
+Received: from 30.221.129.118(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W2FTvzX_1710154752)
+          by smtp.aliyun-inc.com;
+          Mon, 11 Mar 2024 18:59:13 +0800
+Message-ID: <d145d2c7-5cbd-4da5-be14-b25d00baad19@linux.alibaba.com>
+Date: Mon, 11 Mar 2024 18:59:12 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000FCBE:EE_|SA3PR12MB7952:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4b33cef5-5777-465d-dc76-08dc41ba5ac9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	MplMWsKaZvmiJNYBIJSOB9OAXxMc0Qp1IeSt/+6ivURWoSROLfQ5XkR1kO/7+t3RpH6YNy8IHylo5yHuhPgtSEZJMnJyuT5F81iSr+XkEVZ625toMN+CG3n4MDMgSgVZV9JzTOcDHsTpov/CteYher7F4i7oBSLA4c6d3MLBKMoz8IAGVCL07O/yJuvOCPlct1QX6YegVaf5eHX5IrrjDH/6J8mOI7iUhKgKzFcDzg+iO95sSzREsEfWO66iQkrqSP+Y82hKP/ZrUIdiMX/3uNYOUalDiHxYXINqGeh21dPoytSP1omyxvGYXNtawM6+mB6q14D1/iXYOxlM+flW35ajbr3/sBgdEQUEKnxD6jBENTQTAiEa7wqTM/sZDOYbVt47ItNjtczY0CXes/5bV29+xvgRf4NH4CuwGEj1c/T1VUDAOdrQfQxw9UAz6iASk87QqnLe8rhRNZODcZp3PbJ3Omx8VguLA1uw9Aq/72NjBedNtJsVPaCocK/y3IkZxUUIKQZKr/L/uHmohHLIl8KKcI583YiWyEimhH0eSfmO3/jJuhhETHUnaE3dCAkYLjGnEoX0JyjYDS1ap2axw5LStCi+WXzdyr5DDWfXlk/7dN3MMCZvShaLvEOjcauj95s3DIZ+sqXYXC9Jc6B7TirOVtpIYPmxO4EWSgZi7WhV/evxyXpEWTwATcyH0MAdMhbaF+WhuoKOgyR8iVcvUxykbfuHpLGiYpOUoH9IzzuebzdFYlRO+FZ4pB3Scpnx
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(1800799015)(36860700004)(376005);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2024 10:59:42.1575
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4b33cef5-5777-465d-dc76-08dc41ba5ac9
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000FCBE.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB7952
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH][next] net/smc: Avoid -Wflex-array-member-not-at-end
+ warnings
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>,
+ Jan Karcher <jaka@linux.ibm.com>, "Gustavo A. R. Silva"
+ <gustavoars@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>,
+ "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ Kees Cook <keescook@chromium.org>
+References: <ZeIhOT44ON5rjPiP@neat>
+ <71aa847b-2edc-44a2-beb7-3610bf744937@linux.alibaba.com>
+ <1cb9a110-c877-4420-9b23-1e7980f1300a@linux.ibm.com>
+ <82c1dc9e-d5b6-40e3-9d81-d18cc270724b@embeddedor.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <82c1dc9e-d5b6-40e3-9d81-d18cc270724b@embeddedor.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
-Jakub Kicinski <kuba@kernel.org> writes:
 
-> On Fri, 8 Mar 2024 23:31:57 +0100 Petr Machata wrote:
->> > Are the iproute2 patches still on their way?
->> > I can't find them and the test is getting skipped.  
->> 
->> I only just sent it. The code is here FWIW:
->> 
->>     https://github.com/pmachata/iproute2/commits/nh_stats
->
-> I tried but I'll need to also sync the kernel headers.
-> Maybe I'll wait until David applies :S
-> Will the test still skip, tho, when running on veth?
+On 2024/3/8 07:46, Gustavo A. R. Silva wrote:
+> 
+> 
+> On 3/7/24 02:17, Jan Karcher wrote:
+>>
+>>
+>> On 04/03/2024 10:00, Wen Gu wrote:
+>>>
+>>>
+>>> On 2024/3/2 02:40, Gustavo A. R. Silva wrote:
+>>>> -Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
+>>>> ready to enable it globally.
+>>>>
+>>>> There are currently a couple of objects in `struct smc_clc_msg_proposal_area`
+>>>> that contain a couple of flexible structures:
+>>>>
+>>
+>> Thank you Gustavo for the proposal.
+>> I had to do some reading to better understand what's happening and how your patch solves this.
+>>
+>>>> struct smc_clc_msg_proposal_area {
+>>>>     ...
+>>>>     struct smc_clc_v2_extension             pclc_v2_ext;
+>>>>     ...
+>>>>     struct smc_clc_smcd_v2_extension        pclc_smcd_v2_ext;
+>>>>     ...
+>>>> };
+>>>>
+>>>> So, in order to avoid ending up with a couple of flexible-array members
+>>>> in the middle of a struct, we use the `struct_group_tagged()` helper to
+>>>> separate the flexible array from the rest of the members in the flexible
+>>>> structure:
+>>>>
+>>>> struct smc_clc_smcd_v2_extension {
+>>>>          struct_group_tagged(smc_clc_smcd_v2_extension_hdr, hdr,
+>>>>                              u8 system_eid[SMC_MAX_EID_LEN];
+>>>>                              u8 reserved[16];
+>>>>          );
+>>>>          struct smc_clc_smcd_gid_chid gidchid[];
+>>>> };
+>>>>
+>>>> With the change described above, we now declare objects of the type of
+>>>> the tagged struct without embedding flexible arrays in the middle of
+>>>> another struct:
+>>>>
+>>>> struct smc_clc_msg_proposal_area {
+>>>>          ...
+>>>>          struct smc_clc_v2_extension_hdr        pclc_v2_ext;
+>>>>          ...
+>>>>          struct smc_clc_smcd_v2_extension_hdr    pclc_smcd_v2_ext;
+>>>>          ...
+>>>> };
+>>>>
+>>>> We also use `container_of()` when we need to retrieve a pointer to the
+>>>> flexible structures.
+>>>>
+>>>> So, with these changes, fix the following warnings:
+>>>>
+>>>> In file included from net/smc/af_smc.c:42:
+>>>> net/smc/smc_clc.h:186:49: warning: structure containing a flexible array member is not at the end of another 
+>>>> structure [-Wflex-array-member-not-at-end]
+>>>>    186 |         struct smc_clc_v2_extension             pclc_v2_ext;
+>>>>        |                                                 ^~~~~~~~~~~
+>>>> net/smc/smc_clc.h:188:49: warning: structure containing a flexible array member is not at the end of another 
+>>>> structure [-Wflex-array-member-not-at-end]
+>>>>    188 |         struct smc_clc_smcd_v2_extension pclc_smcd_v2_ext;
+>>>>        |                                                 ^~~~~~~~~~~~~~~~
+>>>>
+>>>> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+>>>> ---
+>>>>   net/smc/smc_clc.c |  5 +++--
+>>>>   net/smc/smc_clc.h | 24 ++++++++++++++----------
+>>>>   2 files changed, 17 insertions(+), 12 deletions(-)
+>>>>
+>>>> diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
+>>>> index e55026c7529c..3094cfa1c458 100644
+>>>> --- a/net/smc/smc_clc.c
+>>>> +++ b/net/smc/smc_clc.c
+>>>> @@ -853,8 +853,9 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
+>>>>       pclc_smcd = &pclc->pclc_smcd;
+>>>>       pclc_prfx = &pclc->pclc_prfx;
+>>>>       ipv6_prfx = pclc->pclc_prfx_ipv6;
+>>>> -    v2_ext = &pclc->pclc_v2_ext;
+>>>> -    smcd_v2_ext = &pclc->pclc_smcd_v2_ext;
+>>>> +    v2_ext = container_of(&pclc->pclc_v2_ext, struct smc_clc_v2_extension, _hdr);
+>>>> +    smcd_v2_ext = container_of(&pclc->pclc_smcd_v2_ext,
+>>>> +                   struct smc_clc_smcd_v2_extension, hdr);
+>>>>       gidchids = pclc->pclc_gidchids;
+>>>>       trl = &pclc->pclc_trl;
+>>>> diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
+>>>> index 7cc7070b9772..5b91a1947078 100644
+>>>> --- a/net/smc/smc_clc.h
+>>>> +++ b/net/smc/smc_clc.h
+>>>> @@ -134,12 +134,14 @@ struct smc_clc_smcd_gid_chid {
+>>>>                */
+>>>>   struct smc_clc_v2_extension {
+>>>> -    struct smc_clnt_opts_area_hdr hdr;
+>>>> -    u8 roce[16];        /* RoCEv2 GID */
+>>>> -    u8 max_conns;
+>>>> -    u8 max_links;
+>>>> -    __be16 feature_mask;
+>>>> -    u8 reserved[12];
+>>>> +    struct_group_tagged(smc_clc_v2_extension_hdr, _hdr,
+>>>> +        struct smc_clnt_opts_area_hdr hdr;
+>>>> +        u8 roce[16];        /* RoCEv2 GID */
+>>>> +        u8 max_conns;
+>>>> +        u8 max_links;
+>>>> +        __be16 feature_mask;
+>>>> +        u8 reserved[12];
+>>>> +    );
+>>>>       u8 user_eids[][SMC_MAX_EID_LEN];
+>>>>   };
+>>>> @@ -159,8 +161,10 @@ struct smc_clc_msg_smcd {    /* SMC-D GID information */
+>>>>   };
+>>>>   struct smc_clc_smcd_v2_extension {
+>>>> -    u8 system_eid[SMC_MAX_EID_LEN];
+>>>> -    u8 reserved[16];
+>>>> +    struct_group_tagged(smc_clc_smcd_v2_extension_hdr, hdr,
+>>>> +        u8 system_eid[SMC_MAX_EID_LEN];
+>>>> +        u8 reserved[16];
+>>>> +    );
+>>>>       struct smc_clc_smcd_gid_chid gidchid[];
+>>>>   };
+>>>> @@ -183,9 +187,9 @@ struct smc_clc_msg_proposal_area {
+>>>>       struct smc_clc_msg_smcd            pclc_smcd;
+>>>>       struct smc_clc_msg_proposal_prefix    pclc_prfx;
+>>>>       struct smc_clc_ipv6_prefix pclc_prfx_ipv6[SMC_CLC_MAX_V6_PREFIX];
+>>>> -    struct smc_clc_v2_extension        pclc_v2_ext;
+>>>> +    struct smc_clc_v2_extension_hdr        pclc_v2_ext;
+>>>>       u8            user_eids[SMC_CLC_MAX_UEID][SMC_MAX_EID_LEN];
+>>>> -    struct smc_clc_smcd_v2_extension    pclc_smcd_v2_ext;
+>>>> +    struct smc_clc_smcd_v2_extension_hdr    pclc_smcd_v2_ext;
+>>>>       struct smc_clc_smcd_gid_chid
+>>>>                   pclc_gidchids[SMCD_CLC_MAX_V2_GID_ENTRIES];
+>>>>       struct smc_clc_msg_trail        pclc_trl;
+>>>
+>>> Thank you! Gustavo. This patch can fix this warning well, just the name
+>>> '*_hdr' might not be very accurate, but I don't have a good idea ATM.
+>>
+>> I agree. Should we chose this option we should come up for a better name.
+>>
+>>>
+>>> Besides, I am wondering if this can be fixed by moving
+>>> user_eids of smc_clc_msg_proposal_area into smc_clc_v2_extension,
+>>> and
+>>> pclc_gidchids of smc_clc_msg_proposal_area into smc_clc_smcd_v2_extension.
+>>>
+>>> so that we can avoid to use the flexible-array in smc_clc_v2_extension
+>>> and smc_clc_smcd_v2_extension.
+>>
+>> I like the idea and put some thought into it. The only thing that is not perfectly clean IMO is the following:
+>> By the current definition it is easily visible that we are dealing with a variable sized array. If we move them into 
+>> the structs one could think they are always at their MAX size which they are not.
+>> E.g.: An incoming proposal can have 0 UEIDs indicated by the eid_cnt.
+>> That said nothing a comment can't fix.
+>>
+>>  From what i have seen the offset and length calculations regarding the "real" size of those structs is fine with your 
+>> proposal.
+>>
+>> Can you verify that your changes also resolve the warnings?
+> 
+> I can confirm that the changes Wen Gu is proposing also resolve the warnings.
+> 
+> Wen,
+> 
+> If you send a proper patch, you can include the following tags:
+> 
+> Reviewed-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> Build-tested-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> 
 
-It should run the SW parts and skip the HW ones.
+Hi Gustavo, thank you for the confirmation that my proposal can fix the warning.
+
+But I found that I may have something missed in my proposal when I think further.
+My proposal changed the sizes of struct smc_clc_v2_extension and smc_clc_smcd_v2_extension,
+and some places in SMC need them, such as the fill of kvec in smc_clc_send_proposal().
+
+So my proposal may involve more changes to current SMC code, and I think it is
+not as clean as your solution. So I perfer yours now.
+
+And as for the name, I think maybe we can use '*_elems' as a suffix, at least it
+is unambiguous. So it will be smc_clc_v2_extension_elems and smc_clc_smcd_v2_extension_elems.
+
+
+Jan, what do you think of the name '*_elems' ?
+
+Thanks!
+
+> Thanks!
+> -- 
+> Gustavo
+> 
+>>
+>> [...]
+>>
+>>>   };
+>>>
+>>>
+>>> Thanks!
+>>> Wen Gu
+>>
+>> Thanks you
+>> - Jan
 
