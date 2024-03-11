@@ -1,126 +1,255 @@
-Return-Path: <netdev+bounces-79056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC16D877A2F
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 04:47:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24A68877A3A
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 05:01:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8813D282132
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 03:47:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1C611C210A9
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 04:01:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57BA31851;
-	Mon, 11 Mar 2024 03:47:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1BB023A6;
+	Mon, 11 Mar 2024 04:01:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IsdeE7TR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cZFSRK0x"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0BA517D2;
-	Mon, 11 Mar 2024 03:47:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077991851
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 04:01:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710128860; cv=none; b=b8JClcnn7kojg8d+MAseKOBT0p9KPJ2DftmnusCo2pgO+JcIwwRlx2l1lCmw2ritEAhvHJrYaWtGIyDsBzckSNtg+kvrTY+nni9GmH/7SCYvedmn1SA49x37OCYKXKqa6xLN7zeFEZ0yvX2hVFC2MHDWluWQLtaRDtsoh4c63ks=
+	t=1710129666; cv=none; b=Fw/d5VBIz3RqDSexNVbQfqhPvs0beBSAb4k1unnzkwrHM1sGtVShzHf9tJK8HfiVMLow9cqC6Br0a6zqEP/ScK7bJvYQ6h1PLOqxfvvYlx0HXawAr5nkJlfkwofQDdCP9+s7MEEO+myl3XsoYEiFvLdy52PofhahyvLGQmswgPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710128860; c=relaxed/simple;
-	bh=o+Ro6Csb4bfa8KbJPdc9vupzBdRpY9n9Vn5CibybW/0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dNZ8LqRD0WCRewPCRfT9Ce8HcH8z9oDEHGo+fX13NmNrKxsgz/05pBvi/72Z2at/4rWMDObDhzAO04Mu0mIQAaB4Tuw8iCvuorKO+Cd0dDJAvTmedYgCpZsG2byzKMuNVG0Og15h+vAkV99qpGKiIvagRwjnU/Ex3CRzUnGJMAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IsdeE7TR; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-1dc29f1956cso14941995ad.0;
-        Sun, 10 Mar 2024 20:47:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710128858; x=1710733658; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hht2czhX+1Q9FeZ+0sJkAD72ju8vKKUzrmWsyC3pja4=;
-        b=IsdeE7TRTo+YvywNS9t+pYyY3+kj9Wce1ohwMc1GLFAv2XSRTip/dY/o76Jpf+5n0N
-         s8xMRpU+BAcoPAloPHYclGlyP8IEcqCOgV/ruzFN8MyU2nL+Ayh1vyvqt7TTddkt51mx
-         JfRCvRv0zoK9V6XBAdHk+ZtS7CdrAOskaE4EGaN5EK5L3fJb5Fl2bcG589SSUphvognw
-         YO+CC45uR0E8R86wnUDS0a9S8WslFzBwFOLbCtxjA+VuKB2U9PxAbEiXCvUhJe5NYlNs
-         FgLQEbQ2jtIga4aqBVv8xHRELAzLhaqm4mnqGimH9KG7UnCe4n4srJ0ILvNa352ksg6j
-         Ym+Q==
+	s=arc-20240116; t=1710129666; c=relaxed/simple;
+	bh=rZi0TGzdyLW1WeqbJYHxPHjlp/Ci1sJz1HPaw88Nqks=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AM8Ot9A7ny2vWfRMBQ+Ny4dFBDs4Dkf9j3B/MW9RXibyCBNGe/kRpX0iRrZ1nBbKQcC80AWVp7noEn0a8xi0LbuDL+xWVwSqRJlqFp/VDOwnvazo0ukRslBdFAt7ggfReaqGKzMvWl5lf1stl3+wyK06t4YcmSWmudZVBk0v+Ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cZFSRK0x; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710129663;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=M2U/8cLx3dve7P4IJjHpYHx0RULwN13Wx0LsSxS6gyA=;
+	b=cZFSRK0xWKiZdPEUcCWtp6aCGldohi//gJIEqDvd1YNj1EB7m7fRhFXe07NKJVsrwNIQb9
+	XPm5r9kF9s9FSEmKlnYnc65o1qR1H73vK7zJtm81ZvSoeC7xzVnNvJOn4scUnN7xg6y/8G
+	TQjm41NMXQ8QAa4f+nErCLC5vnt619k=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-33-zZo69bNsPSaIHn3j7kR8xQ-1; Mon, 11 Mar 2024 00:01:01 -0400
+X-MC-Unique: zZo69bNsPSaIHn3j7kR8xQ-1
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-29c15898c6cso49059a91.2
+        for <netdev@vger.kernel.org>; Sun, 10 Mar 2024 21:01:01 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710128858; x=1710733658;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hht2czhX+1Q9FeZ+0sJkAD72ju8vKKUzrmWsyC3pja4=;
-        b=D39FsCBNIWAvoQr4g1OD/QMffYqWXVgDBQQcI/T8LFAxbAHBaVl4mgOiuyVYyAhVyG
-         8nS2LQ95i3t1yCD3YAY6hokg/HumKEQyhidYRZvgeZALWTl/s/L0mKqdKleYXWnqENXf
-         VkNJ6ETBONYADISkLRAew0xEaufrccvcRrwSZ88CYfvBjPFG2N8NYMXpa2SaqyvEThR7
-         O+NyKnNNjUc9gPQ7QmTjEArIJtHpV6SXqitP0+THf6X+TegdjLuncgtKLLkCxfmb93Rx
-         QGUIyInH5zy0KwOh4rNgNTMvAN4+NjCk0B0gCtBQqKvOLAtzq475+GkZunnKLIsMFKh1
-         8v0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV3Pn/06v9u2bxlw0rrFoAGaWfSLu9tJZyRPss4GwEq2/EhYjhmgrO7laoHufONgKrle+PzWbNjCx7WDqMaGYrI3rpEs8juVyeBLLEO
-X-Gm-Message-State: AOJu0Yzt+BChqWKS9ySUq9RoKKLkmdSXnGjQUteOzZpv2SzVRk6HxPLS
-	5YH75H4v4qCOd408k3mvl9VZFWR30rZYem1p/O008kesSSG+2ukm
-X-Google-Smtp-Source: AGHT+IFjGnYsnp8eZzvZcALM5YBbKCk0+hFYW5/huHEt1PhBpzl79DoDpzn+/LZRW0A3uYbQTKchxg==
-X-Received: by 2002:a17:903:41c1:b0:1db:e494:4b5d with SMTP id u1-20020a17090341c100b001dbe4944b5dmr5019637ple.16.1710128858153;
-        Sun, 10 Mar 2024 20:47:38 -0700 (PDT)
-Received: from [172.25.138.193] ([203.246.171.161])
-        by smtp.gmail.com with ESMTPSA id i10-20020a170902c94a00b001db81640315sm3473663pla.91.2024.03.10.20.47.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 10 Mar 2024 20:47:37 -0700 (PDT)
-Message-ID: <35bef6a0-26e7-471a-8224-c59b2acdcc1f@gmail.com>
-Date: Mon, 11 Mar 2024 12:47:35 +0900
+        d=1e100.net; s=20230601; t=1710129660; x=1710734460;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M2U/8cLx3dve7P4IJjHpYHx0RULwN13Wx0LsSxS6gyA=;
+        b=csagCv+Nvcy4aD/6HvUSuzCcjSTXbfDFamHxyuxzGasNEoV0O314PGDS3139ULycz1
+         J6k5cHFAJARAu1YVET9fMA+9ZKe6/c5vDvuQT2Zr5nwj4ZD9mLEVkPOclZW9IUe2J89m
+         Zsb700MYRWbEnjcnGmzc1Lj8EP8jTBJ2L4rISGQpqSM/jtHDW9BF55kqKkBE5mVLASO1
+         Gkyq+t8ydAzAXGwgQ1ctM2+8sIIVnRX/C83EXQ57JiSSYQvdpES6T7WoZMo/navUfbdt
+         M1ArCtXgzm/qoDzv4NA6kNdgSr4uJSyt5iHm8JUOGi5nbDD3iztJA2/DWNyMClwOsQ0/
+         sY1A==
+X-Forwarded-Encrypted: i=1; AJvYcCWbFeY2kLT/qbZylYdAJR5d1r+c5wsVnUITOSqEs3xX8A2GIlaprObMyuwaSxBuDs2hF7iym9yrlK5SCOT32Dmih+AI8B+v
+X-Gm-Message-State: AOJu0Yycsaa7yQyOb6N+w0ZJeLNiViIiEVcmb8fxVip5VZGTsZLvAMgN
+	6ofCW3SVmLZvrulK9g3LTYxk7/BKufHRaYOug9MmU++ZP/MyyjwwwgAfG0VF/Qgl9v450hfnhYT
+	CrOj2ejcRW5JTDS6tnp4sr3GEkfVWxf1W6wghDTHkQEEgGIfjSDIruqPRX6qicb802FsExxWWvI
+	hX8enbQLUCkSNPx1cNp5LPMu7lJBfo
+X-Received: by 2002:a17:90a:fd92:b0:29b:bd2c:7238 with SMTP id cx18-20020a17090afd9200b0029bbd2c7238mr3908743pjb.7.1710129659796;
+        Sun, 10 Mar 2024 21:00:59 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFlzVpYifmiq3kPP1nBEaLaTDBKlwZXFbqzpZKku1ileIZWpeswDU4nOMch5iZXL/GpxbvnXQOshFnSjHN0OS4=
+X-Received: by 2002:a17:90a:fd92:b0:29b:bd2c:7238 with SMTP id
+ cx18-20020a17090afd9200b0029bbd2c7238mr3908714pjb.7.1710129659509; Sun, 10
+ Mar 2024 21:00:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/2] net: amt: Remove generic .ndo_get_stats64
-Content-Language: ko
-To: Breno Leitao <leitao@debian.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, horms@kernel.org,
- dsahern@kernel.org
-References: <20240308162606.1597287-1-leitao@debian.org>
- <20240308162606.1597287-2-leitao@debian.org>
-From: Taehee Yoo <ap420073@gmail.com>
-In-Reply-To: <20240308162606.1597287-2-leitao@debian.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <1709118356-133960-1-git-send-email-wangyunjian@huawei.com>
+ <7d478cb842e28094f4d6102e593e3de25ab27dfe.camel@redhat.com>
+ <223aeca6435342ec8a4d57c959c23303@huawei.com> <20240301065141-mutt-send-email-mst@kernel.org>
+ <ffbe60c2732842a3b81e6ae0f58d2556@huawei.com>
+In-Reply-To: <ffbe60c2732842a3b81e6ae0f58d2556@huawei.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 11 Mar 2024 12:00:47 +0800
+Message-ID: <CACGkMEsFtJTMFVHt8pJ39Ge8nTJcsX=R_dYghz_93+_Yn--ZDQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
+To: wangyunjian <wangyunjian@huawei.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, Paolo Abeni <pabeni@redhat.com>, 
+	"willemdebruijn.kernel@gmail.com" <willemdebruijn.kernel@gmail.com>, "kuba@kernel.org" <kuba@kernel.org>, 
+	"bjorn@kernel.org" <bjorn@kernel.org>, "magnus.karlsson@intel.com" <magnus.karlsson@intel.com>, 
+	"maciej.fijalkowski@intel.com" <maciej.fijalkowski@intel.com>, 
+	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>, 
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, "kvm@vger.kernel.org" <kvm@vger.kernel.org>, 
+	"virtualization@lists.linux.dev" <virtualization@lists.linux.dev>, xudingke <xudingke@huawei.com>, 
+	"liwei (DT)" <liwei395@huawei.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Mar 4, 2024 at 9:45=E2=80=AFPM wangyunjian <wangyunjian@huawei.com>=
+ wrote:
+>
+>
+>
+> > -----Original Message-----
+> > From: Michael S. Tsirkin [mailto:mst@redhat.com]
+> > Sent: Friday, March 1, 2024 7:53 PM
+> > To: wangyunjian <wangyunjian@huawei.com>
+> > Cc: Paolo Abeni <pabeni@redhat.com>; willemdebruijn.kernel@gmail.com;
+> > jasowang@redhat.com; kuba@kernel.org; bjorn@kernel.org;
+> > magnus.karlsson@intel.com; maciej.fijalkowski@intel.com;
+> > jonathan.lemon@gmail.com; davem@davemloft.net; bpf@vger.kernel.org;
+> > netdev@vger.kernel.org; linux-kernel@vger.kernel.org; kvm@vger.kernel.o=
+rg;
+> > virtualization@lists.linux.dev; xudingke <xudingke@huawei.com>; liwei (=
+DT)
+> > <liwei395@huawei.com>
+> > Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy support
+> >
+> > On Fri, Mar 01, 2024 at 11:45:52AM +0000, wangyunjian wrote:
+> > > > -----Original Message-----
+> > > > From: Paolo Abeni [mailto:pabeni@redhat.com]
+> > > > Sent: Thursday, February 29, 2024 7:13 PM
+> > > > To: wangyunjian <wangyunjian@huawei.com>; mst@redhat.com;
+> > > > willemdebruijn.kernel@gmail.com; jasowang@redhat.com;
+> > > > kuba@kernel.org; bjorn@kernel.org; magnus.karlsson@intel.com;
+> > > > maciej.fijalkowski@intel.com; jonathan.lemon@gmail.com;
+> > > > davem@davemloft.net
+> > > > Cc: bpf@vger.kernel.org; netdev@vger.kernel.org;
+> > > > linux-kernel@vger.kernel.org; kvm@vger.kernel.org;
+> > > > virtualization@lists.linux.dev; xudingke <xudingke@huawei.com>;
+> > > > liwei (DT) <liwei395@huawei.com>
+> > > > Subject: Re: [PATCH net-next v2 3/3] tun: AF_XDP Tx zero-copy
+> > > > support
+> > > >
+> > > > On Wed, 2024-02-28 at 19:05 +0800, Yunjian Wang wrote:
+> > > > > @@ -2661,6 +2776,54 @@ static int tun_ptr_peek_len(void *ptr)
+> > > > >         }
+> > > > >  }
+> > > > >
+> > > > > +static void tun_peek_xsk(struct tun_file *tfile) {
+> > > > > +       struct xsk_buff_pool *pool;
+> > > > > +       u32 i, batch, budget;
+> > > > > +       void *frame;
+> > > > > +
+> > > > > +       if (!ptr_ring_empty(&tfile->tx_ring))
+> > > > > +               return;
+> > > > > +
+> > > > > +       spin_lock(&tfile->pool_lock);
+> > > > > +       pool =3D tfile->xsk_pool;
+> > > > > +       if (!pool) {
+> > > > > +               spin_unlock(&tfile->pool_lock);
+> > > > > +               return;
+> > > > > +       }
+> > > > > +
+> > > > > +       if (tfile->nb_descs) {
+> > > > > +               xsk_tx_completed(pool, tfile->nb_descs);
+> > > > > +               if (xsk_uses_need_wakeup(pool))
+> > > > > +                       xsk_set_tx_need_wakeup(pool);
+> > > > > +       }
+> > > > > +
+> > > > > +       spin_lock(&tfile->tx_ring.producer_lock);
+> > > > > +       budget =3D min_t(u32, tfile->tx_ring.size, TUN_XDP_BATCH)=
+;
+> > > > > +
+> > > > > +       batch =3D xsk_tx_peek_release_desc_batch(pool, budget);
+> > > > > +       if (!batch) {
+> > > >
+> > > > This branch looks like an unneeded "optimization". The generic loop
+> > > > below should have the same effect with no measurable perf delta - a=
+nd
+> > smaller code.
+> > > > Just remove this.
+> > > >
+> > > > > +               tfile->nb_descs =3D 0;
+> > > > > +               spin_unlock(&tfile->tx_ring.producer_lock);
+> > > > > +               spin_unlock(&tfile->pool_lock);
+> > > > > +               return;
+> > > > > +       }
+> > > > > +
+> > > > > +       tfile->nb_descs =3D batch;
+> > > > > +       for (i =3D 0; i < batch; i++) {
+> > > > > +               /* Encode the XDP DESC flag into lowest bit for c=
+onsumer to
+> > differ
+> > > > > +                * XDP desc from XDP buffer and sk_buff.
+> > > > > +                */
+> > > > > +               frame =3D tun_xdp_desc_to_ptr(&pool->tx_descs[i])=
+;
+> > > > > +               /* The budget must be less than or equal to tx_ri=
+ng.size,
+> > > > > +                * so enqueuing will not fail.
+> > > > > +                */
+> > > > > +               __ptr_ring_produce(&tfile->tx_ring, frame);
+> > > > > +       }
+> > > > > +       spin_unlock(&tfile->tx_ring.producer_lock);
+> > > > > +       spin_unlock(&tfile->pool_lock);
+> > > >
+> > > > More related to the general design: it looks wrong. What if
+> > > > get_rx_bufs() will fail (ENOBUF) after successful peeking? With no
+> > > > more incoming packets, later peek will return 0 and it looks like
+> > > > that the half-processed packets will stay in the ring forever???
+> > > >
+> > > > I think the 'ring produce' part should be moved into tun_do_read().
+> > >
+> > > Currently, the vhost-net obtains a batch descriptors/sk_buffs from th=
+e
+> > > ptr_ring and enqueue the batch descriptors/sk_buffs to the
+> > > virtqueue'queue, and then consumes the descriptors/sk_buffs from the
+> > > virtqueue'queue in sequence. As a result, TUN does not know whether
+> > > the batch descriptors have been used up, and thus does not know when =
+to
+> > return the batch descriptors.
+> > >
+> > > So, I think it's reasonable that when vhost-net checks ptr_ring is
+> > > empty, it calls peek_len to get new xsk's descs and return the descri=
+ptors.
+> > >
+> > > Thanks
+> >
+> > What you need to think about is that if you peek, another call in paral=
+lel can get
+> > the same value at the same time.
+>
+> Thank you. I have identified a problem. The tx_descs array was created wi=
+thin xsk's pool.
+> When xsk is freed, the pool and tx_descs are also freed. Howerver, some d=
+escs may
+> remain in the virtqueue'queue, which could lead to a use-after-free scena=
+rio.
 
+This can probably solving by when xsk pool is disabled, signal the
+vhost_net to drop those descriptors.
 
-On 3/9/24 1:26 AM, Breno Leitao wrote:
-> Commit 3e2f544dd8a33 ("net: get stats64 if device if driver is
-> configured") moved the callback to dev_get_tstats64() to net core, so,
-> unless the driver is doing some custom stats collection, it does not
-> need to set .ndo_get_stats64.
-> 
-> Since this driver is now relying in NETDEV_PCPU_STAT_TSTATS, then, it
-> doesn't need to set the dev_get_tstats64() generic .ndo_get_stats64
-> function pointer.
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
->   drivers/net/amt.c | 1 -
->   1 file changed, 1 deletion(-)
-> 
-> diff --git a/drivers/net/amt.c b/drivers/net/amt.c
-> index cb31d1990660..6d15ab3bfbbc 100644
-> --- a/drivers/net/amt.c
-> +++ b/drivers/net/amt.c
-> @@ -3084,7 +3084,6 @@ static const struct net_device_ops amt_netdev_ops = {
->   	.ndo_open		= amt_dev_open,
->   	.ndo_stop		= amt_dev_stop,
->   	.ndo_start_xmit         = amt_dev_xmit,
-> -	.ndo_get_stats64        = dev_get_tstats64,
->   };
->   
->   static void amt_link_setup(struct net_device *dev)
+Thanks
 
-Hi Breno, Thanks a lot for this series!
+> Currently,
+> I do not have an idea to solve this concurrency problem and believe this =
+scenario may
+> not be appropriate for reusing the ptr_ring.
+>
+> Thanks
+>
+> >
+> >
+> > > >
+> > > > Cheers,
+> > > >
+> > > > Paolo
+> > >
+>
 
-Reviewed-by: Taehee Yoo <ap420073@gmail.com>
 
