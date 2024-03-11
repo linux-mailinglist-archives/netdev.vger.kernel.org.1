@@ -1,156 +1,140 @@
-Return-Path: <netdev+bounces-79222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8877878547
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 17:26:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA90587856D
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 17:30:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E442B221D0
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:26:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 707F128201D
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:30:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A3E55C35;
-	Mon, 11 Mar 2024 16:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDEF450A8F;
+	Mon, 11 Mar 2024 16:24:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rqbCp4MM"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="MEat6ItC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA895FDD1;
-	Mon, 11 Mar 2024 16:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710174005; cv=none; b=RXi8xeMD0AxjTnSKi3QV85kwXLEyxrBB3NLrXLlQMULQgO2VGaajPlbkL3s+TzoMbJxKGe/y0hvtlx3mRYRF3m60IPMHhNgHrtDC4ZGCvknDuiqdQlL6E3x+HDtH2FsfM+6zfDFcb7kUeOtxljZpPiCJJFvvbivqTwmFF5JK/OQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710174005; c=relaxed/simple;
-	bh=bsjANis9pyyIfMKzj2iYqOY/tXcCFN8bOMvzR8V7TQk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CKOlATx/Bg9Yoz6SZAMSKR9YHiIPkJhztoxMl/0+BieILdzMzGrappKz2rkM0eXcdl6H+wUIXlkeg/jyv7DCNw3M9gCYdjhMEOaRvIjPtnTzn3vO33AldUfd28PNCZgq73Yb6LOWOuOky8X4OR0sMKtquRiitTCqu1FVGNTnUho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rqbCp4MM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15B00C433C7;
-	Mon, 11 Mar 2024 16:20:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710174005;
-	bh=bsjANis9pyyIfMKzj2iYqOY/tXcCFN8bOMvzR8V7TQk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=rqbCp4MM3WtRpspyO14gn/KiYr5ko7tINaHOP4PdfuXV9umuLDeU0Wv4mXPjR0Hoc
-	 7XnjPwAw1MdDRkDEO/5Fod6HqKrjwpwKInlL+zPur+PjZErb1JVkMXr9P3WxFF4+tG
-	 DvxWQZTvlUrn3onhBcgq/IfuqNgdsYTQ+A/hBjnPeSgUkpBEW4LOTkRee3G9PuEsn1
-	 XvrddyPbs+aZjcMvdzFdDMXhAfIQCtjZRWYg38BAPa5YEhw0lBMd7B9mIWDRQMiHba
-	 WYpD523/hzdcGG+5DYP41ljI5WqS9xcXtBQ9mmqHkgSQRqXKeXjrpwpfdX+I9ypGVn
-	 0oCw5dXuuK1VQ==
-Message-ID: <82d38961-8792-49ea-8c9c-5214669e0ef6@kernel.org>
-Date: Mon, 11 Mar 2024 17:19:59 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0F950260
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 16:24:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710174258; cv=fail; b=Be0BWvSH4CVjAFAGuCjxesGCisaSwawDAoG0pzNsOIHtebH0np4gHILgLnSfVCEDHEqyTJuJQjm8HSyI0h+yWHMMYab/x0GRQYGTkFZuLXIxe/DduAezjnlgCpFJQFOVK12l9mctdVlQyMHVn6G0hJmRWDom2YzMypnPkvD3h+M=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710174258; c=relaxed/simple;
+	bh=UDHYmcXrwVQMCluQo+HhjbFoz2sxqx/XZ8zZHGc2Ma0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=PM+VulbQcOqAXVmuZ45dboXL1QBDT5b64/VG/1VPdXSICFRMZM+g6GuhiPd1VPCD5z6CVyqwx4M/j2pFYAbMpEoNmQ502+dcUF6LDgI9HaW1+FsHQIG5Ntz7OJ8P9GDJvU9nHAaWQ6r70eySQYXAGBAa5Fvz+rOoF/ulWbPilHs=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=MEat6ItC; arc=fail smtp.client-ip=40.107.236.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SHCubFM6M09agoRjwKZZBAt/z0HAeXNQt2kDb89sHeeP1pUXaXYAT2c3WiF8F3mWX8dmCrOFGpXn4LH3PYFDdcO1E1m6GcXCinahS7lPaSG8R6C3Co0gVytCGNn3pmGoSXgLIxiXlyytbU2/EfYirjOrTjCpGzUxIj6cnmXyOeb7TKlklBXR809ZVafQxa1tfYE1FF3Qu6TBaAyQotbiu2Z+FJxWp8sq0yK1mpFsSQzZAYr1YS6Y71xvnfMtf3FROWREb5OncmetEFKbJ7CuTkYfFEp4rT1sgpIrPe1gkCYlmt+X0ZZEIHL03MyPU0zgTDyTwa3gIcZxlzkCCzoKJw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uS+jnc+C95sSzfHEX6NZV/2zqlFfnHVwK0HMeRMdYV0=;
+ b=cRUfokcWYQGy7QDcc077e9redJuERyKsTKXtgpsQn7u6auJ1/9Rf0uL7kzubo2z/1QESRXyI9bc5eSKtJuEReqfbnzwJmUjaNekSy9HGOfe2+ubJUmPL8tfsKBPrGesuL03Uva1yRHlBnXxOY+WZLFr4bE/RxN+ZXLFaqBAMOq7p7/HOVehhU0NRzrBJYx9mcBbssOOM6v40boAAfQ87/JEyWY1/duOCnG4MGWNoIXYH+NA+QEwEaXc3pnsW5OwXJwJ5Enncy+MsJ3Xh72CHa8qFSAQAy56sT1pxu5vDwiUbTz7mPV+s2cFVlQ4cbUy/jMn33ALvkr6LYy8L8kx+9Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uS+jnc+C95sSzfHEX6NZV/2zqlFfnHVwK0HMeRMdYV0=;
+ b=MEat6ItCizHapVMRzkc98kAvu4I1OLcPzLxtsRtw3wBt1PlSpd2J+o119IZ6135ehLZHS9h1FLY2b+fNu1zlHxfaTigQytYbP80B5zpj6MRYul+L2DOP1Cr1wJ/A+YABbdsT4HwLSdEvqDldDetYySWaNt+T8BB9dBZN+P+KrHw2Rhljs0sM0uojxLtE0j3Kf6cRKMyiPsm/jD2MorbYJpQhbQKr1nxNOAUy37ZAUPq9v0+M3WTRfNeTUoUbjd1omZuPcm/pdH6mFwkWIUdY5vqI0zQTnhrtaui/NZFaOvP3k6ydRjS98C5yowwY0EZUdNzjxlUJRk8oLKXOo30Dzg==
+Received: from BLAPR05CA0020.namprd05.prod.outlook.com (2603:10b6:208:36e::23)
+ by DM4PR12MB7693.namprd12.prod.outlook.com (2603:10b6:8:103::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.34; Mon, 11 Mar
+ 2024 16:24:12 +0000
+Received: from MN1PEPF0000ECD8.namprd02.prod.outlook.com
+ (2603:10b6:208:36e:cafe::da) by BLAPR05CA0020.outlook.office365.com
+ (2603:10b6:208:36e::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.17 via Frontend
+ Transport; Mon, 11 Mar 2024 16:24:12 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ MN1PEPF0000ECD8.mail.protection.outlook.com (10.167.242.137) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7386.12 via Frontend Transport; Mon, 11 Mar 2024 16:24:11 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 11 Mar
+ 2024 09:23:45 -0700
+Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Mon, 11 Mar 2024 09:23:42 -0700
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <petrm@nvidia.com>, <dsahern@kernel.org>, Ido Schimmel
+	<idosch@nvidia.com>
+Subject: [PATCH net-next v2 0/4] nexthop: Fix two nexthop group statistics issues
+Date: Mon, 11 Mar 2024 18:23:03 +0200
+Message-ID: <20240311162307.545385-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 2/4] net: dsa: realtek: keep default LED state in
- rtl8366rb
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Simon Horman <horms@kernel.org>,
- Luiz Angelo Daros de Luca <luizluca@gmail.com>,
- Linus Walleij <linus.walleij@linaro.org>,
- =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com>
- <20240310-realtek-led-v1-2-4d9813ce938e@gmail.com>
- <388b435f-13c5-446f-b265-6da98ccfd313@kernel.org>
- <20240310113738.GA1623@kernel.org>
- <09793a72-bfe5-4cb5-a6da-ffee565e6956@kernel.org>
- <20240311091111.53191e08@kernel.org>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20240311091111.53191e08@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000ECD8:EE_|DM4PR12MB7693:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5d4fc7a6-2c60-4c5a-cd42-08dc41e7afb3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	D6zZSB1KmZbo21u0dri/JbVBclmu257xNiSMEUsamoIDPD4hjs97RSYJzJGYb09wV6hFafbS6sprACAlQON6dcvMfWboFfy59ZkJ91UB7XQjC3TXuPGo2Wd4Ma7OMcaWcFKNHsGS1jQBRUMkp4GWcQ7ykLI0PT19jGJXOwPC+ghvM94VCrEfb7k+sW0ND1VrpFiKZLZtEN3ykIyuGUhdxE3XvTcc8sOrqMEJ3jOXgvhv1iUtItR10XffiyxXGZZ1qTZCc7UvwiWDNTUP8r9vL2xNF5WQHKUrnlNAmBGc9k9a4e4Dni1wLhLPHO2XkmE8edRjaXMvcltiGlm5C6laMQndKEThVREOM9bq24pVADDQrgOzD+v2BUf3zWGy23S0Mb2v8ka0pG/daHwHcpwANEMBnOoCo9RKknY437Hcnoz1h/wx5MlOyO+FqtBLlzcpGaWBw+9jP0DGD3s/Q30GaGziiGBI/yMPZ6ORwTQgxFdzNmjXU5lNG9uPn30y4IL0E14epDcYjVydgHH7W3HQ7iHU/deha+4MVOn3+CbRG+kO4wYh72RZE5TbWv4+26PKxetpqcv1suKdI0jMuwT+Fr/h7DjSzKxJNbs4qD5xgsb00PE4j91JK5qQ7LFHGOQcXqA5sMl5RR2Moec1jGsPjeYHS/n8xynf5cZzFZOmEqSKvamL2/qEuQjFTfVFEweCAt8mv2r7YCs1hTMtd18/DTA91IE9dxPOA1YXiyoQHGQTsa2CtSI6Ge3jcCCD/012
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(36860700004)(82310400014)(1800799015);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2024 16:24:11.8783
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d4fc7a6-2c60-4c5a-cd42-08dc41e7afb3
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	MN1PEPF0000ECD8.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7693
 
-On 11/03/2024 17:11, Jakub Kicinski wrote:
-> On Sun, 10 Mar 2024 12:47:19 +0100 Krzysztof Kozlowski wrote:
->>> FWIIW, I think this relates to review of an RFC of this patch-set.
->>>
->>> https://lore.kernel.org/netdev/CACRpkda8tQ2u4+jCrpOQXbBd84oW98vmiDgU+GgdYCHuZfn49A@mail.gmail.com/  
->>
->> OK, then this is v2. RFC is state of patch, not some sort of version. Or
->> just use b4 which handles this automatically...
-> 
-> Eh, hum. He does according to the X-Mailer header. More importantly
-> I thought the RFC to PATCH transition resetting version numbering
-> is how we always operated. Maybe b4 should be fixed?
+Fix two issues that were introduced as part of the recent nexthop group
+statistics submission. See the commit messages for more details.
 
-No, it does not reset the version number, because RFC->PATCH does not
-mean that suddenly there were no reviews or changes. We all count in
-brains from 1, so whatever we see - RFC, RFT, RFkisses or hugs - is the
-first version we see. Then next one, whatever it is called PATCH,
-RF-non-comments, RFmorekisses, is v2.
+v2:
+* Only parse NHA_OP_FLAGS for messages that require it (patches #1-#2
+  are new)
+* Resize 'tb' using ARRAY_SIZE (new change in patch #3)
 
-There are RFCs which go to "v4", with significant discussion and review,
-thus natural next version is "5", not "1".
+Ido Schimmel (4):
+  nexthop: Only parse NHA_OP_FLAGS for get messages that require it
+  nexthop: Only parse NHA_OP_FLAGS for dump messages that require it
+  nexthop: Fix out-of-bounds access during attribute validation
+  nexthop: Fix splat with CONFIG_DEBUG_PREEMPT=y
 
-It's extremely confusing for me to be involved in some sort four
-revisions of RFC and the suddenly see v1. What happened with my
-comments? Why its state should be the same as new submission state?
+ net/ipv4/nexthop.c                          | 58 ++++++++++++---------
+ tools/testing/selftests/net/fib_nexthops.sh |  6 +++
+ 2 files changed, 38 insertions(+), 26 deletions(-)
 
-Plus, people do not understand or do not have the same meaning of RFC.
-Some people send RFC with meaning "do not apply, just some
-work-in-progress" but some send as regular patch with intention to
-apply. I really, really saw exactly these two approaches.
-
-So no, after RFC v1, goes PATCH v2, after RFC v5, goes PATCH v6.
-
-Best regards,
-Krzysztof
+-- 
+2.43.0
 
 
