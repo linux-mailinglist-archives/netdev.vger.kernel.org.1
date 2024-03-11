@@ -1,87 +1,199 @@
-Return-Path: <netdev+bounces-79179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63E978781F3
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:47:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D22158781F4
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:47:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F16131F23187
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 14:47:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70EB91F2110F
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 14:47:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B35140870;
-	Mon, 11 Mar 2024 14:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00D9E3FE52;
+	Mon, 11 Mar 2024 14:47:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eGZ94rUW"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ME9I65hw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 182F840860
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 14:47:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CAE41E4A4;
+	Mon, 11 Mar 2024 14:47:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710168424; cv=none; b=GRbLXuAqsISHGuOAvqAUNGPLiefSjtlGZ0AGk4h/uEph9zShxUVvZY1W4jnMcQKi3NSrp2r3L5IatuzacxSzh5KiB6vggJnFp3J1bEAad9Y75TLqfwWyCHR9Yv2a6nTYQqDUozSKp9kxVEzZfNnM9ydlY+SW35lTU5pDWh5fAJA=
+	t=1710168455; cv=none; b=JuTunmowsRBjYBOx94XHhbhF2zpS2g1QG905O+71kGfo77Nbb0c+DqLVWNMJkNrFkWyPc9aT3QTvU2ARUjKLDjeH1iwOq7mWnKimiCZGRrkYbv+WPykU7PgdUE011kCczrROZtxm48NqoSNp/aJACyKBQ1GIwKc+HUSbWbjRiS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710168424; c=relaxed/simple;
-	bh=qPfnPac/OYRyBcbEgKzaCkMOfZ8PT/+3AnwdxCO+P1o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BaP/Tr7SyGGbKRzhnZqMexc3cLFygWXMvpAvQpDhpK69Rt1yVbKZtv08/k2iSRtYgGElivsH8E6UeBlachQOX6bpAty0NLTNWUWB8D94Q0154nlfVMcK0VdA9EQZ7Ont9/qWSh1LVIu6Q0TjAGsixgzPR3ft3QmI9/JZHRNMuMA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eGZ94rUW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 33D32C43394;
-	Mon, 11 Mar 2024 14:47:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710168423;
-	bh=qPfnPac/OYRyBcbEgKzaCkMOfZ8PT/+3AnwdxCO+P1o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eGZ94rUWfMW+MCz6bUlqITFhzb6f7zMf6UyOlGNygF1I1ij8V/RdapOPW3c+HNfDh
-	 VfWwerM4t0CpGrupLdulkQUV5nZMcCDmDYErFV7D3DEaRzWUDMACuUN3D4MZofKH4H
-	 reeV/ZAzjMYVUEpZvoYnOgBgxuSOQ4Zq1wizxy0oKGjr8MgxvuQLa+MNKxattBLxoN
-	 wn/5hjmpFXRoSohGPfeNiUdcN+/sGUhHp6E8wGzsZJx9FVAUnbtOSisnfcnsqlxr3e
-	 BaKsK3F3XzgLp+yhO3YHowme24fUDvFqzbpGM0me+8RNoZQgv3EKJUGBZrkJnHK4E1
-	 bPcOwRoAELCIw==
-Date: Mon, 11 Mar 2024 07:47:02 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
- davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
- petrm@nvidia.com
-Subject: Re: [PATCH net-next 1/2] nexthop: Fix out-of-bounds access during
- attribute validation
-Message-ID: <20240311074702.340dafcf@kernel.org>
-In-Reply-To: <Ze4pIe_E4BgkCP6w@shredder>
-References: <20240310173215.200791-1-idosch@nvidia.com>
-	<20240310173215.200791-2-idosch@nvidia.com>
-	<a92e609b-f5c4-4e9a-8eb8-7e2c54f75215@kernel.org>
-	<Ze4pIe_E4BgkCP6w@shredder>
+	s=arc-20240116; t=1710168455; c=relaxed/simple;
+	bh=mQXbuf91ZGqc0/FW7JST9LvaYVs66Pk9EWKyVUxqaOk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rt9EQGaTJbWLxvHZxD+CeKePsJ7AKUADiiv+r5qNA8UmJ1SbhMxkfPVrK/O2x1PsSzUO+FmQkIHtmzK8ujddBzvtnOX6O4d5NvIxNbUHd2beCL58JP6R5YPYtzD3hydLlVzcjmAb5V5s1SjltjYRhDlIvxw8vKjAjUtk3KcrrJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ME9I65hw; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 9181120004;
+	Mon, 11 Mar 2024 14:47:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1710168451;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=HE2HlRBk0CBdOeSYlTEx7Aew3iPhhdjEpCgk9BsO9gQ=;
+	b=ME9I65hwjLbO2WQWF9QhXRqs2ZIq/wUMSUiT6DcXHioA0Vn52PY+Kv5C4MEagpn0CBOzzN
+	kEoDSOSWs23+4zjGB2edNFf+68spN5UiP0hyOamcAfDgULY60OoZWJSUcdFoU/xgrLSUg5
+	xkwk5mJYoRsuwKvOd239R2mwZ/spHcUHrvz0M7I9YeE1RMgyVd+MmdWFaOS8kMi6sojsLw
+	TzQB1Tdw9vhmtsJsINlCo5XiQ+GTPlJDC4qvigITzqTEQAEb5VjWPDfZjgfEMsfmpwcKYI
+	reGN4+MzM2fAy2TqoKtCHUKaaoBlrgYoNdPYpVdSOjkV9QEENRM750PGgLVZKw==
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: thomas.petazzoni@bootlin.com,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: [PATCH v4 net-next] ptp: Move from simple ida to xarray
+Date: Mon, 11 Mar 2024 15:47:29 +0100
+Message-Id: <20240311144730.1239594-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Sun, 10 Mar 2024 23:41:53 +0200 Ido Schimmel wrote:
-> > 'tb' on the stack only needs to be ARRAY_SIZE as well; that's the
-> > benefit of the approach - only declare what you need.  
-> 
-> The reasoning for that is explained in Petr's commit message:
-> 
-> "
->     - To allow querying for presence of the attribute, have all the attribute
->       arrays sized to NHA_MAX, regardless of what is permitted by policy, and
->       pass the corresponding value to nlmsg_parse() as well.
-> "
-> 
-> IOW, with resizing 'tb' to ARRAY_SIZE:
-> 
-> rtm_del_nexthop
->     nh_valid_get_del_req
->         if (tb[NHA_OP_FLAGS]) -> BOOM
+Move from simple ida to xarray for storing and loading the ptp_clock
+pointer. This prepares support for future hardware timestamp selection by
+being able to link the ptp clock index to its pointer.
 
-v2 coming, right? Please repost as soon as possible. v1 crashes AFAICT
-because tb is not 0-initialized so tb[NHA_OP_FLAGS] reads garbage.
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+---
+
+Change in v2:
+- Update an err value missing.
+
+Change in v3:
+- Refactor err management.
+
+Change in v4:
+- Remove useless 0-init of err in ptp_clock_register.
+- Use the right xarray header.
+---
+ drivers/ptp/ptp_clock.c | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
+
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 3aaf1a3430c5..dd024bb33426 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -4,7 +4,6 @@
+  *
+  * Copyright (C) 2010 OMICRON electronics GmbH
+  */
+-#include <linux/idr.h>
+ #include <linux/device.h>
+ #include <linux/err.h>
+ #include <linux/init.h>
+@@ -16,6 +15,7 @@
+ #include <linux/syscalls.h>
+ #include <linux/uaccess.h>
+ #include <linux/debugfs.h>
++#include <linux/xarray.h>
+ #include <uapi/linux/sched/types.h>
+ 
+ #include "ptp_private.h"
+@@ -31,7 +31,7 @@ struct class *ptp_class;
+ 
+ static dev_t ptp_devt;
+ 
+-static DEFINE_IDA(ptp_clocks_map);
++static DEFINE_XARRAY_ALLOC(ptp_clocks_map);
+ 
+ /* time stamp event queue operations */
+ 
+@@ -201,7 +201,7 @@ static void ptp_clock_release(struct device *dev)
+ 	bitmap_free(tsevq->mask);
+ 	kfree(tsevq);
+ 	debugfs_remove(ptp->debugfs_root);
+-	ida_free(&ptp_clocks_map, ptp->index);
++	xa_erase(&ptp_clocks_map, ptp->index);
+ 	kfree(ptp);
+ }
+ 
+@@ -233,7 +233,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ {
+ 	struct ptp_clock *ptp;
+ 	struct timestamp_event_queue *queue = NULL;
+-	int err = 0, index, major = MAJOR(ptp_devt);
++	int err, index, major = MAJOR(ptp_devt);
+ 	char debugfsname[16];
+ 	size_t size;
+ 
+@@ -241,16 +241,16 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 		return ERR_PTR(-EINVAL);
+ 
+ 	/* Initialize a clock structure. */
+-	err = -ENOMEM;
+ 	ptp = kzalloc(sizeof(struct ptp_clock), GFP_KERNEL);
+-	if (ptp == NULL)
++	if (!ptp) {
++		err = -ENOMEM;
+ 		goto no_memory;
++	}
+ 
+-	index = ida_alloc_max(&ptp_clocks_map, MINORMASK, GFP_KERNEL);
+-	if (index < 0) {
+-		err = index;
++	err = xa_alloc(&ptp_clocks_map, &index, ptp, xa_limit_31b,
++		       GFP_KERNEL);
++	if (err)
+ 		goto no_slot;
+-	}
+ 
+ 	ptp->clock.ops = ptp_clock_ops;
+ 	ptp->info = info;
+@@ -258,13 +258,17 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	ptp->index = index;
+ 	INIT_LIST_HEAD(&ptp->tsevqs);
+ 	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
+-	if (!queue)
++	if (!queue) {
++		err = -ENOMEM;
+ 		goto no_memory_queue;
++	}
+ 	list_add_tail(&queue->qlist, &ptp->tsevqs);
+ 	spin_lock_init(&ptp->tsevqs_lock);
+ 	queue->mask = bitmap_alloc(PTP_MAX_CHANNELS, GFP_KERNEL);
+-	if (!queue->mask)
++	if (!queue->mask) {
++		err = -ENOMEM;
+ 		goto no_memory_bitmap;
++	}
+ 	bitmap_set(queue->mask, 0, PTP_MAX_CHANNELS);
+ 	spin_lock_init(&queue->lock);
+ 	mutex_init(&ptp->pincfg_mux);
+@@ -378,7 +382,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	list_del(&queue->qlist);
+ 	kfree(queue);
+ no_memory_queue:
+-	ida_free(&ptp_clocks_map, index);
++	xa_erase(&ptp_clocks_map, index);
+ no_slot:
+ 	kfree(ptp);
+ no_memory:
+@@ -511,7 +515,7 @@ static void __exit ptp_exit(void)
+ {
+ 	class_destroy(ptp_class);
+ 	unregister_chrdev_region(ptp_devt, MINORMASK + 1);
+-	ida_destroy(&ptp_clocks_map);
++	xa_destroy(&ptp_clocks_map);
+ }
+ 
+ static int __init ptp_init(void)
+-- 
+2.25.1
+
 
