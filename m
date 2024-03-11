@@ -1,141 +1,82 @@
-Return-Path: <netdev+bounces-79214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67E7C8784C8
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 17:17:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DACB8784FC
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 17:22:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B3D12812E3
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:17:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A00A2847E7
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:22:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45BE451037;
-	Mon, 11 Mar 2024 16:16:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 506095645B;
+	Mon, 11 Mar 2024 16:17:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Vkbp4KIk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hCVnqZyH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81F073AC01;
-	Mon, 11 Mar 2024 16:16:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21BA158ADB;
+	Mon, 11 Mar 2024 16:17:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710173792; cv=none; b=PRe+bg422+GbOin8bSBzX7AphefWK6naJpVUnbo/btwhYifwQuVFFBL9qAJQH3TjE1XFNUzz0n9041JeVl5YFtCWaOm8gyX7ocnLge/pYhJq6n7+DtZTCGHnGhLwRMU6AALThOUf1JXRh8b5Waohy5U2aRRnDCA5Pqx3N5emIxc=
+	t=1710173873; cv=none; b=Ox8GfD0gN9LaClF1e1Q3S+j4A9yI2jZ+BANnodeH+BP7US07zPL5YpPe/zJcj1C9hI3HKgHix8MsZXfAJHFmPOg69AweF4TGjhkvDU3C2sjEyJ4EcqkwMzegyTeWtWqmnXyD8DwFK49Q2d+uuGt6+2uzYPSm5mAyLHer0sQZsgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710173792; c=relaxed/simple;
-	bh=NygHFgsfK9/f07Xn51o7Jdn2t0u6vgatLn5MNtO4zD8=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=CPky9wFWTPMyZJBSmu+vNeyf+Jd1tN1+uZvXj/uwn9xANNek9aXkGytLIjNDm8+iTuYUMau129JHSvDfnm8tnIkSYh2Eicb/5GbkpD6XEQqx/qF1/jJTM2dgg2+GJoSQxOFftN0yJ/HorlFBfhn0lsJzSkFENr8L1lfFW9F4G8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Vkbp4KIk; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6e5c0be115aso2957299b3a.3;
-        Mon, 11 Mar 2024 09:16:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710173790; x=1710778590; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:reply-to:references
-         :in-reply-to:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Wigfq/6aRq72xOj/aIlxvJ6fFfc6HnyBCglftePM4e4=;
-        b=Vkbp4KIkBADE3+iAjfcgU4BTgvmKzl4WPEixmExZlMIo9VncixUW9ApacJCeiHnmyX
-         Wqqju846KUQ7zlWTb5OdmWDm6Q6kIee9E78WCXj2m8aoWIm0rgtWRANx55x9jag0z8lv
-         Gjip16FD6UkBC1iavnE9v2Jt55auExDhCC8oMuS4z7A5DdsngN/54MBfCFdY6hb8b6Bf
-         1Aby54HmxHeaAJfhnXHQVpHVYCldNNR0GOAUF261iIBEI6p1jF9+PTJa3HC/9XGhQneR
-         XQGHncZyxVOyU50MQFcbiL/UgWQkuQ6XB3tfs8wKcd0kHD+bnxkX8tCbH/bOKR1NhPWy
-         84+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710173790; x=1710778590;
-        h=content-transfer-encoding:mime-version:reply-to:references
-         :in-reply-to:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Wigfq/6aRq72xOj/aIlxvJ6fFfc6HnyBCglftePM4e4=;
-        b=W9G2ZE2NPikrO+dP+w3QKfEBi7jxLRRSLTIYSjQt2Tq1jNL/NGddFwefhDfoJQOf43
-         WrvrMbc/Gf1KQN2EeDzcYPJW6XpsXaJjQAIfteYvZwz5YUiIDukcwpC++0F14LF3eWFK
-         X3bgftMOmaHEf6lBQtSIY6ymCa8cjRlYMJ5v2f9Y8DSj4XGxJM2ICjbcHyyCsMzdn18y
-         2IDVQaHGrGiclIl3SiZKdi19GG2Qkn0FgKlSQZCj/kp/zj82BlD/HTVfOywbHMg3bpQA
-         FAarxh5o+ZY7oKiOkMeLANflHxTAbARmnWbzpjJ6A2IbXNWpkJwxCWlolLIyRwWYRWM6
-         M3BA==
-X-Forwarded-Encrypted: i=1; AJvYcCX3pOYpBSvagUfvjJ6pN+IL+JhqOynySDj2s8SHU96dtWyirBPyTDt1JXXYt9Tcmf8OLMWJb5oa3tdti0c1ECq7PJQ3pWxTbogwEcHmtd2mgYL98JwmflhIDYQJNqeQbKjL72J+rIA5A7znSp00rUE7+dWnVowfzjLt4I+xxKNmmjrj
-X-Gm-Message-State: AOJu0Yz6Awex5O/zcfxVneC12tjcjhLHCuW7sbtPdkHEd4Qu4ClOGf+M
-	xjbmNXukf2ytXdJoDAZ32f+1K0ETsC3fhIrfQY/R5uPUXRwn4Epp
-X-Google-Smtp-Source: AGHT+IGYeEcPUzCbQFJrHGPuOeb50x9Z9GqcTz5epYFi2KgNUbGR2sGlA+8oJcaOvFdPFMhABQHcYQ==
-X-Received: by 2002:a05:6a20:3d87:b0:1a1:4848:98af with SMTP id s7-20020a056a203d8700b001a1484898afmr5407838pzi.1.1710173789816;
-        Mon, 11 Mar 2024 09:16:29 -0700 (PDT)
-Received: from localhost.localdomain (c-73-254-87-52.hsd1.wa.comcast.net. [73.254.87.52])
-        by smtp.gmail.com with ESMTPSA id m22-20020a056a00081600b006e52ce4ee2fsm4576325pfk.20.2024.03.11.09.16.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Mar 2024 09:16:29 -0700 (PDT)
-From: mhkelley58@gmail.com
-X-Google-Original-From: mhklinux@outlook.com
-To: rick.p.edgecombe@intel.com,
-	kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	gregkh@linuxfoundation.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	kirill.shutemov@linux.intel.com,
-	dave.hansen@linux.intel.com,
-	linux-kernel@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-coco@lists.linux.dev
-Cc: sathyanarayanan.kuppuswamy@linux.intel.com,
-	elena.reshetova@intel.com
-Subject: [PATCH v2 5/5] Drivers: hv: vmbus: Don't free ring buffers that couldn't be re-encrypted
-Date: Mon, 11 Mar 2024 09:15:58 -0700
-Message-Id: <20240311161558.1310-6-mhklinux@outlook.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20240311161558.1310-1-mhklinux@outlook.com>
-References: <20240311161558.1310-1-mhklinux@outlook.com>
-Reply-To: mhklinux@outlook.com
+	s=arc-20240116; t=1710173873; c=relaxed/simple;
+	bh=fxy8Bas3XPLuH2tOB6qbRr0HANQEqxNF3SMRFOMH+dg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=espqDREoeOQ+/cTUFB42agvbwFfwz9c/vNsF9WgMobLo/+Chirb+f3dpnoanthU5AiNXWoJiCbWp24DJfzrLAo5cY+wUAbMnOOy+Fzp4NckWmz24HxWOIhOoDPtM8SAkMo+raa889MnmxrESUc93bIQF08Zz96Cp2aTTH4cQYIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hCVnqZyH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64910C433C7;
+	Mon, 11 Mar 2024 16:17:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710173872;
+	bh=fxy8Bas3XPLuH2tOB6qbRr0HANQEqxNF3SMRFOMH+dg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hCVnqZyHStwcshm/LpUyPhbvatBuvyPQK9rm3Txg85kF7gcBsFm8XKMnNQ++/RZoE
+	 f30dL32Jyl7+53Z6wH4eDEiIaLZJ9FJpPhBI7FKAd76FK3ZHcAbYzYFrdk5sf9oBdv
+	 UH0zC+SioWzSid4v8ScQbf8FAEIpZdsjGQ/Nk29xiGcbcMe5+d1+oAyZ4e0vFfn2BN
+	 yN0DXXm4P4d5copcRKxfvV7d8Ec8cfGwb36aIYlG86VOJV9bMyJlV/tJqI2PiLkV+4
+	 yGOlnClLluJi99aJCcAK13nTImM5GDayxsgG7TROBeq6dNlFhnpdo/GRqL8YDl5fa9
+	 wOKKxB7DA2sGQ==
+Date: Mon, 11 Mar 2024 09:17:51 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Cc: netdev@vger.kernel.org, Guillaume Nault <gnault@redhat.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org, David Ahern
+ <dsahern@gmail.com>
+Subject: Re: [BUG net-next] fcnal-test.sh: 4 (four) tests FAIL
+Message-ID: <20240311091751.5c4f2947@kernel.org>
+In-Reply-To: <9f24a9c3-4813-4518-9cc4-3923c11981cd@alu.unizg.hr>
+References: <9f24a9c3-4813-4518-9cc4-3923c11981cd@alu.unizg.hr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Michael Kelley <mhklinux@outlook.com>
+On Sat, 9 Mar 2024 19:45:15 +0100 Mirsad Todorovac wrote:
+> In the vanilla net-next tree build of v6.8-rc7-2348-g75c2946db360, with up-to-date
+> iproute2 built tools, fcnal-test.sh reports certain failures:
+> 
+> --------------------------------------------------------------------------------------
+> # TEST: ping local, VRF bind - VRF IP                                           [FAIL]
+> # TEST: ping local, device bind - ns-A IP                                       [FAIL]
+> # TEST: ping local, VRF bind - VRF IP                                           [FAIL]
+> # TEST: ping local, device bind - ns-A IP                                       [FAIL]
+> --------------------------------------------------------------------------------------
 
-In CoCo VMs it is possible for the untrusted host to cause
-set_memory_encrypted() or set_memory_decrypted() to fail such that an
-error is returned and the resulting memory is shared. Callers need to
-take care to handle these errors to avoid returning decrypted (shared)
-memory to the page allocator, which could lead to functional or security
-issues.
+Adding David A to CC.
 
-The VMBus ring buffer code could free decrypted/shared pages if
-set_memory_decrypted() fails. Check the decrypted field in the struct
-vmbus_gpadl for the ring buffers to decide whether to free the memory.
-
-Signed-off-by: Michael Kelley <mhklinux@outlook.com>
----
- drivers/hv/channel.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/hv/channel.c b/drivers/hv/channel.c
-index bb5abdcda18f..47e1bd8de9fc 100644
---- a/drivers/hv/channel.c
-+++ b/drivers/hv/channel.c
-@@ -153,7 +153,9 @@ void vmbus_free_ring(struct vmbus_channel *channel)
- 	hv_ringbuffer_cleanup(&channel->inbound);
- 
- 	if (channel->ringbuffer_page) {
--		__free_pages(channel->ringbuffer_page,
-+		/* In a CoCo VM leak the memory if it didn't get re-encrypted */
-+		if (!channel->ringbuffer_gpadlhandle.decrypted)
-+			__free_pages(channel->ringbuffer_page,
- 			     get_order(channel->ringbuffer_pagecount
- 				       << PAGE_SHIFT));
- 		channel->ringbuffer_page = NULL;
--- 
-2.25.1
-
+It rings a bell. We also build ping from source when running the tests
+locally, I have in my notes "AWS iputils are buggy, use iputils.git"
+but unfortunately I didn't make a note which tests were failing without
+it. David might remember..
 
