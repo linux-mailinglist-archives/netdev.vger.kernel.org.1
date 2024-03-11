@@ -1,200 +1,130 @@
-Return-Path: <netdev+bounces-79164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79166-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8313687814F
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:07:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36EC187816C
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 15:13:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11D11B23064
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 14:07:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C39521F23FD1
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 14:13:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410FF3FB2D;
-	Mon, 11 Mar 2024 14:07:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D063405CF;
+	Mon, 11 Mar 2024 14:12:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aqEycfHN"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="NlZYhheI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9DCB3D986
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 14:07:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB5633FE3F
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 14:12:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710166058; cv=none; b=W/BBT0Db3kBLBmY349uun14x6vFcByudnm+vD/OA7T0d9xDT8qYVSG+urpYodUJm0DJmVUntVFawjMP3272n6GRpnz9Sq0sxg9ZrVB3Cf0np6scAxtQSm+VcfC7ysxJx10wrbELBIhkv76MsUTVDM4UN6Ys4FVospMzu1CZTGPo=
+	t=1710166354; cv=none; b=i5upWbZWcIvHdu1zFhR7dmqJMiBVWR0cl3tlErfbbyiwSndCbNV+bvYOTUIRaO2qukdzNerkjd8CRwHbHGa6pXaEOTPo1iS/nzEpNGoVA2wcijnn6KwHe+rM/1i5j32XuIDJHf98gpG3laJbeSJuQPOG4g84uU+5NB306tBgq+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710166058; c=relaxed/simple;
-	bh=VTZozU3fvTIYRT/5FNjIDNW07GdYS1vWclel/o5A0Jc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UprHfs83L+xjHEA3pz6aVaVmyd5E1ZHbM1+XbwgG7B3DDKyNsbpsJOvGeGYac1cZxxdRcFsdgjcvJa/DVSqUeXpXLK/f/l81lZqTdK6n0PFnWYSzN1Q17VkVtu92d5F2kLTfjZcgwejEkPbSftluU5CcAnJ1iQqNwFxzmX05BV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aqEycfHN; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1dd10ae77d8so32992655ad.0
-        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 07:07:36 -0700 (PDT)
+	s=arc-20240116; t=1710166354; c=relaxed/simple;
+	bh=VBIdS/UlQSzStdPHLVSkmkdiD3oLzRYhAHd84C/7QNo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=etIUNw/GYD7RIo2Kum3aJpB8i3ga8QrSgIallH/+FgNF66Dzvn6sk7FKMYF7WvztUiBLEco3BWiREOfTA5ZRcvOlZhhoQxK9eca1mux1uUQpacxU9EkVD4gR83m+xI5tC9ZAziZvAp9pGVeUzO+UKvyTq9yq79YHGDypLWz0A2E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=NlZYhheI; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a44d084bfe1so371417966b.1
+        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 07:12:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710166056; x=1710770856; darn=vger.kernel.org;
+        d=ragnatech.se; s=google; t=1710166349; x=1710771149; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=rTSAwCyTAgVkMwdpzs1jGvtnlsvnxtbVScClSpYyDTs=;
-        b=aqEycfHN69ttM2XjGhFIAp7Fn5Z88CHByvd9etZqVQNRwm/lvHeHJJIKP+igouUMCC
-         vojsylcva3SR1S7UrdrRB2cG8wK8VPDr+QZ43aXYRlOqSUijUW56XZgrj9vIvhOzwH/r
-         Pj+pCbNus/6IIlzdsRZx+9ticeT+CkvCXanHcSJFJUbbIMaA4phR6xBmlngcjvTS7SQX
-         DEblEuueugJFMzbIkLz/VuEz9JAh5D1AzRkbr1GytPBq1ZliNR7nhgZBDNbkn2dvjr65
-         VDyGCpBHO6isb0ST85TK5Iix5PYeIA8NEAMfmpbNG3MQjXpyL/fnGAVUhopbCf3VClIC
-         w7Yw==
+        bh=ps8i6xtkxMp0Zvly/37wcJc+RtBvwNAObQIyBi27L+U=;
+        b=NlZYhheIcItqCE5HdjVhxv7b2o/oSIpG0btc6yzkfIQjyPabpBFP52x9l6EslbMqh6
+         YtXrxnVBOO14Re9MFjOMc04b9+N50R8WPO8HOWM8UICfShN0y/eKIDohJWw8xnA7tk27
+         LGiilzMVphENAhZLAyCC0MKg6IrDDLswDDpdvWZ9xxIIqw4IXffSMj8kZD+T6O88qdAi
+         ytly3Xiy8+B73n9WRBojMBD7+yplubm6xgENxm7ubBt6+e4EgQSqxhOuioXQxSz88+wy
+         FnVK5nuDBfI9E+7cjzFtPFFCp7D3U8j3Xvg5ewtOeQuIu/COQn3wKQwxA+rwfnGRcIph
+         PFsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710166056; x=1710770856;
+        d=1e100.net; s=20230601; t=1710166349; x=1710771149;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=rTSAwCyTAgVkMwdpzs1jGvtnlsvnxtbVScClSpYyDTs=;
-        b=mZYY0N9V0UrlYIzVPot19KOxpgcyN3PFrrNk8SPGw/adzFGgXn0SVMOX2ImAJpmnuq
-         bOdGo6FmwCLHWSMRpLE5pXHDKjg/KIhkOnfYZZqwL0W3jNhPCyPJYA4PLZ9MM7Qsa4nj
-         kHZsrskoRwbu8I9jmMtqMEg+va0TShrGY/Dqwtjq0TbcKbPAPM0wlvrSOU093AdIZMjt
-         mAUcK8k3G6uZegBwkqV4mFCW+0DMTCjAWtbbaAiWvOEo0u4Sgldig96V717DCqL1vmcU
-         9Mn0gdhW3xO7uRQ9iBFHHMyYudgqAtMmcc/qwYkA8imtqNmMU8o4YLM0/GxuRyTMU3Wn
-         bdYQ==
-X-Gm-Message-State: AOJu0YyEJ9ddFg+fbfWpQjBbybW/u1ectbL6VYOruCn095y+1EsRcUFI
-	gWa0zpOJE1Fj1VtaE5oH12GXIofzgLwXtT5tHuvp7DJUleY7/w+0jKQfqWQnfwXHGA==
-X-Google-Smtp-Source: AGHT+IFl1udJrdmKeousKGfDAq/8100QBfQbhmg0YoYOJYZBA5bJ/o5gRRAoiqjSsqJHKrKP7BUVTw==
-X-Received: by 2002:a17:902:cf0b:b0:1dd:a88d:9294 with SMTP id i11-20020a170902cf0b00b001dda88d9294mr1404651plg.6.1710166055838;
-        Mon, 11 Mar 2024 07:07:35 -0700 (PDT)
-Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id n17-20020a170903111100b001dd6412cbe9sm4713105plh.252.2024.03.11.07.07.32
+        bh=ps8i6xtkxMp0Zvly/37wcJc+RtBvwNAObQIyBi27L+U=;
+        b=As8SUVxQQjfKeJwXfc2EG2A7qowa1Bs0vbftFWLIRbo65mrMQaxc1ZmIaczfeCszJQ
+         E5Hx+LJPP0HnHQLlSDAlye6pwAQHyQ21BnKjq/GBjFzh7GUVi4AlvlppYbZDs1DCzazb
+         XY/Isd90NceOnq+h5uwjbRD11uK410hSJRnJ5HoXjKIm9xS3Kv7yE9jaj1dkot9wb7Oq
+         Wc12+Y/Y2Gh0Y7aBSoSy0MH3+X3Ihj504HQJkWRNGzspZbGkoEsWnd015xgXFTAUVQKW
+         MWQ1XPsQqrppHKiP42ZNxbgMoeXLPKzTNidkyq5H4PZGrWWSAvFNH18F2+YMzEzFKiWl
+         qbZg==
+X-Forwarded-Encrypted: i=1; AJvYcCWQX17qWzwJW6wcZfA3dO2oGrg5DnjdNELujh/dHOIRqqgZViWuWLsEGFC3653KS3S0Yg/maP20pznywslCswlAq/BCZdhu
+X-Gm-Message-State: AOJu0YyvRdiDUXt/wFKlJOP9Q+16ZfWw+Bxn3VZnDc2dYlJOj6Mo1FRL
+	LaffrfqIzpKa9GH2mP9wMUzFoXOSlpHNfzay/OwWJCg6GMRmOu6v0/DUQHmB0l7YKaHQd+Lx47J
+	j
+X-Google-Smtp-Source: AGHT+IFqioQX9gpTIxeYolk9thiVfgab//cOM4gCkN1/ka/pcpcihbNEdsPgh/+kEYespOs7HBdoqA==
+X-Received: by 2002:a17:907:c28c:b0:a45:373:cff with SMTP id tk12-20020a170907c28c00b00a4503730cffmr4257652ejc.68.1710166349036;
+        Mon, 11 Mar 2024 07:12:29 -0700 (PDT)
+Received: from sleipner.berto.se (p4fcc8c6a.dip0.t-ipconnect.de. [79.204.140.106])
+        by smtp.googlemail.com with ESMTPSA id kn11-20020a170906aa4b00b00a45efdfdd1esm2863154ejb.40.2024.03.11.07.12.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Mar 2024 07:07:35 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
+        Mon, 11 Mar 2024 07:12:28 -0700 (PDT)
+From: =?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv3 net-next] tools: ynl-gen: support using pre-defined values in attr checks
-Date: Mon, 11 Mar 2024 22:07:27 +0800
-Message-ID: <20240311140727.109562-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Cc: linux-renesas-soc@vger.kernel.org,
+	=?UTF-8?q?Niklas=20S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Subject: [net-next,v3 0/2] ravb: Support describing the MDIO bus
+Date: Mon, 11 Mar 2024 15:11:04 +0100
+Message-ID: <20240311141106.3200743-1-niklas.soderlund+renesas@ragnatech.se>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Support using pre-defined values in checks so we don't need to use hard
-code number for the string, binary length. e.g. we have a definition like
+Hello,
 
- #define TEAM_STRING_MAX_LEN 32
+This series adds support to the binding and driver of the Renesas
+Ethernet AVB to described the MDIO bus. Currently the driver uses the OF
+node of the device itself when registering the MDIO bus. This forces any
+MDIO bus properties the MDIO core should react on to be set on the
+device OF node. This is confusing and non of the MDIO bus properties are
+described in the Ethernet AVB bindings.
 
-Which defined in yaml like:
+Patch 1/2 extends the bindings with an optional mdio child-node to the
+device that can be used to contain the MDIO bus settings. While patch
+2/2 changes the driver to use this node (if present) when registering
+the MDIO bus.
 
- definitions:
-   -
-     name: string-max-len
-     type: const
-     value: 32
+If the new optional mdio child-node is not present the driver fallback
+to the old behavior and uses the device OF node like before. This change
+is fully backward compatible with existing usage of the bindings.
 
-It can be used in the attribute-sets like
+For changelog see individual patches.
 
-attribute-sets:
-  -
-    name: attr-option
-    name-prefix: team-attr-option-
-    attributes:
-      -
-        name: name
-        type: string
-        checks:
-          len: string-max-len
+Niklas Söderlund (2):
+  dt-bindings: net: renesas,etheravb: Add optional MDIO bus node
+  ravb: Add support for an optional MDIO mode
 
-With this patch it will be converted to
+ .../devicetree/bindings/net/renesas,etheravb.yaml        | 8 ++++++++
+ drivers/net/ethernet/renesas/ravb_main.c                 | 9 ++++++++-
+ 2 files changed, 16 insertions(+), 1 deletion(-)
 
-[TEAM_ATTR_OPTION_NAME] = { .type = NLA_STRING, .len = TEAM_STRING_MAX_LEN, }
-
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
-v3: iterating over self.family.consts as self.family['definitions'] is optional (Jakub Kicinski)
-v2: Update the commit description. Drop other controversial patches.
-v1 link: lore.kernel.org/netdev/20231215035009.498049-3-liuhangbin@gmail.com
----
- Documentation/netlink/genetlink-c.yaml      | 2 +-
- Documentation/netlink/genetlink-legacy.yaml | 2 +-
- Documentation/netlink/genetlink.yaml        | 2 +-
- Documentation/netlink/netlink-raw.yaml      | 2 +-
- tools/net/ynl/ynl-gen-c.py                  | 2 ++
- 5 files changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/Documentation/netlink/genetlink-c.yaml b/Documentation/netlink/genetlink-c.yaml
-index 3ebd50d78820..24692a9343f0 100644
---- a/Documentation/netlink/genetlink-c.yaml
-+++ b/Documentation/netlink/genetlink-c.yaml
-@@ -11,7 +11,7 @@ $defs:
-     minimum: 0
-   len-or-define:
-     type: [ string, integer ]
--    pattern: ^[0-9A-Za-z_]+( - 1)?$
-+    pattern: ^[0-9A-Za-z_-]+( - 1)?$
-     minimum: 0
-   len-or-limit:
-     # literal int or limit based on fixed-width type e.g. u8-min, u16-max, etc.
-diff --git a/Documentation/netlink/genetlink-legacy.yaml b/Documentation/netlink/genetlink-legacy.yaml
-index 1d3fe3637707..b0b7e8bab8a9 100644
---- a/Documentation/netlink/genetlink-legacy.yaml
-+++ b/Documentation/netlink/genetlink-legacy.yaml
-@@ -11,7 +11,7 @@ $defs:
-     minimum: 0
-   len-or-define:
-     type: [ string, integer ]
--    pattern: ^[0-9A-Za-z_]+( - 1)?$
-+    pattern: ^[0-9A-Za-z_-]+( - 1)?$
-     minimum: 0
-   len-or-limit:
-     # literal int or limit based on fixed-width type e.g. u8-min, u16-max, etc.
-diff --git a/Documentation/netlink/genetlink.yaml b/Documentation/netlink/genetlink.yaml
-index 3283bf458ff1..d7edb8855563 100644
---- a/Documentation/netlink/genetlink.yaml
-+++ b/Documentation/netlink/genetlink.yaml
-@@ -11,7 +11,7 @@ $defs:
-     minimum: 0
-   len-or-define:
-     type: [ string, integer ]
--    pattern: ^[0-9A-Za-z_]+( - 1)?$
-+    pattern: ^[0-9A-Za-z_-]+( - 1)?$
-     minimum: 0
-   len-or-limit:
-     # literal int or limit based on fixed-width type e.g. u8-min, u16-max, etc.
-diff --git a/Documentation/netlink/netlink-raw.yaml b/Documentation/netlink/netlink-raw.yaml
-index 40fc8ab1ee44..57490e5c1ddf 100644
---- a/Documentation/netlink/netlink-raw.yaml
-+++ b/Documentation/netlink/netlink-raw.yaml
-@@ -11,7 +11,7 @@ $defs:
-     minimum: 0
-   len-or-define:
-     type: [ string, integer ]
--    pattern: ^[0-9A-Za-z_]+( - 1)?$
-+    pattern: ^[0-9A-Za-z_-]+( - 1)?$
-     minimum: 0
- 
- # Schema for specs
-diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
-index 67bfaff05154..5bb7ca01fe51 100755
---- a/tools/net/ynl/ynl-gen-c.py
-+++ b/tools/net/ynl/ynl-gen-c.py
-@@ -80,6 +80,8 @@ class Type(SpecAttr):
-         value = self.checks.get(limit, default)
-         if value is None:
-             return value
-+        elif value in self.family.consts:
-+            return c_upper(f"{self.family['name']}-{value}")
-         if not isinstance(value, int):
-             value = limit_to_number(value)
-         return value
 -- 
-2.43.0
+2.44.0
 
 
