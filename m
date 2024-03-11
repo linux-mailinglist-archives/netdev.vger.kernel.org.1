@@ -1,355 +1,269 @@
-Return-Path: <netdev+bounces-79123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C15A4877E65
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 11:52:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6F5F877F9F
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 13:09:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 19EF8B20802
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 10:52:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5E6C1C2169E
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 12:09:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F13272EB08;
-	Mon, 11 Mar 2024 10:52:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E79E3BBF0;
+	Mon, 11 Mar 2024 12:09:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HNYZoQVy"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="yhqkeBvF"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2070.outbound.protection.outlook.com [40.107.244.70])
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 219D51B599
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 10:52:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.70
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710154363; cv=fail; b=ujh12mmlRHgWObO3LZ+FwmrLw4knc1zJPjnU2RRLQlMoCQM8XdaD5Aun6FtHMP0sA5HEJnKjf5rYpGZ+7FKGY6X0WDslHNclN6PfF577di7GybIXtQeGAsnQKR5jhz5N6JVbNaPTJ+o/00IfgMWHNTVyTnpo2bteQYaVBgV9IQ0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710154363; c=relaxed/simple;
-	bh=6ivPePTUkZgwMTkZGYLBJ01e9uSYM9h62u7EupVqbRY=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=Xq6bGEKpSHu5By5pncgAH1OZ53NFRA95LL+Y9q3aR2+4Oa2bNT3z/hyG140VJMD20nbbdjkHS2qr5l9qZeMrMxWfPZCC4sUOtFbjviM5VPlzNPA3gMYkQuqHYCmIjmNi8hyg8mIj0cF0WovnPV6ZwbgQ7ASyIJOVklIyJg2s6eg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HNYZoQVy; arc=fail smtp.client-ip=40.107.244.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a/hLWLMpVzfb22vrNhzzNWFu19nOXRDPORUIWZeDTEum3uE3iNjVzCxO8oGB3YZKNQKcqpmd1rx7v+sITTuvhJUgTBzc1emxlnMvAWJhwzfUpuBsx8C9izymDLOwZlvocRBsuzWWgtLcGvUUoXzf2c4Fvh4vqX5vWEsiLLWhFSgJ2BplKIUNfb7MHwCy/I/dENludP90MSvkOhkrgFjOdkMHP9xf6JSahOS/S/KrqOA3Q/vICjK9RU2iorB/qLkIY3B+37yJtu+3SolM9E78hGkHs8oJc73ombXZRlWXks3L9BNbjGPNFQYpBvRbW69gWwnkKci7L6RxaLHiTA8EZQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6NCAzFn/r99dOv1XEqMUnrFuHm1F1TWNz61+DKTeq00=;
- b=ATU2li8ozeuHIqcJyzpRUxm2PRIUHruGL/5mhG7Ppc4r6L1duYwYqzbhScwHy8TEoqiQrL4eqGJl6i0W3k5gfaQ4PpTfnf5vd0oY+EIRJ6Pm7maStPyn+eIdT9gYLCJRVDxh/W/kSUkiDwE8pcHSvdBbtLXGlwk3HHaAvDQluhU0QLWJAFephAA1ugY/JB1CmPEUMJLJaElsvEddpZXy0xYs5YHlNeJrr8M3piCLdz1sWySSdqm62J0ZSOYm7uKaHfCHBr70+qr3uE4M+tF2QbdxhvJTTOT6Louo3Kd9qIC5Fmx4QKkIYY37u9e0VWeSy9siFtCvI+tIbnq7tOBfvA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=google.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6NCAzFn/r99dOv1XEqMUnrFuHm1F1TWNz61+DKTeq00=;
- b=HNYZoQVyGAhGTyGp5GwwXNyVqWk/9KF9VVJwEQF41tBMjeloHdOiNeJc5tRrp777LKtIputnt9jOEiapIVFS4idmxcHlKx3iRLvtkcWUYfvPzTbsDiW5j+9agHpm/geBLAmODz/JT8yMDi47xPnZqzTcKwHc/LcNej+1f8RIT/Mc9tw/8/hclmb42kBzVL3RxhxzbGsWtHnGXQsWcu2Chk1qFRXIq3PtRNaBso3YKRSGcUJ7twJqHeChbStY27msFHGYWt5yGPl3o/NGs8UZ7kOdV1HC0sIap4lj2OPUJLZuDwMGxSQE4fqyIEu0TcQpjx033otbDINQcmZoYa2qQw==
-Received: from MW4PR03CA0010.namprd03.prod.outlook.com (2603:10b6:303:8f::15)
- by CY8PR12MB8066.namprd12.prod.outlook.com (2603:10b6:930:70::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7339.39; Mon, 11 Mar
- 2024 10:52:38 +0000
-Received: from CO1PEPF000066E8.namprd05.prod.outlook.com
- (2603:10b6:303:8f:cafe::48) by MW4PR03CA0010.outlook.office365.com
- (2603:10b6:303:8f::15) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.33 via Frontend
- Transport; Mon, 11 Mar 2024 10:52:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CO1PEPF000066E8.mail.protection.outlook.com (10.167.249.6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7386.12 via Frontend Transport; Mon, 11 Mar 2024 10:52:38 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 11 Mar
- 2024 03:52:24 -0700
-Received: from yaviefel (10.126.230.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Mon, 11 Mar
- 2024 03:52:20 -0700
-References: <20240310173215.200791-1-idosch@nvidia.com>
- <20240310173215.200791-2-idosch@nvidia.com>
- <a92e609b-f5c4-4e9a-8eb8-7e2c54f75215@kernel.org>
- <Ze4pIe_E4BgkCP6w@shredder>
-User-agent: mu4e 1.8.11; emacs 28.3
-From: Petr Machata <petrm@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-CC: David Ahern <dsahern@kernel.org>, <netdev@vger.kernel.org>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <petrm@nvidia.com>
-Subject: Re: [PATCH net-next 1/2] nexthop: Fix out-of-bounds access during
- attribute validation
-Date: Mon, 11 Mar 2024 11:27:23 +0100
-In-Reply-To: <Ze4pIe_E4BgkCP6w@shredder>
-Message-ID: <87o7blkplr.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56F91383AA
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 12:09:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710158966; cv=none; b=BZAVu2qq4cVYuntRYreZi/cjaGAaFYFpswMixkd+0zuI0i7+vXV9qFRspU3WoGDiZK2aq4ya6AzxMZwghi8Fl5u3sIFnfIUUI9iMHANzQ9Z29gaLdJ7YjspY7Qo7hQGRIMGpFudA3T8r0fJl3lp9y/VSewv65TZWS+2W14DF/rs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710158966; c=relaxed/simple;
+	bh=nqy34pYg198XpJLO9ypWndCUgumbnx5qxRl29Tbf1iw=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=NeSbbxc8DTX09A3JxxoeQt5T7BMIh6tX5epKIPfN4883vS6Iad40qqPAO70RGn85NYcv0qT7s2PHvr7UFVKVY+5C0COLqc36V+SDRBG8f/kaNqs5VSa1Qij3iSjMkjfWwQ5KIr5/NDb9FjSWDf+GzvWhd4z+4AFt4CUVMSCNCMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=yhqkeBvF; arc=none smtp.client-ip=115.124.30.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1710158961; h=Message-ID:Subject:Date:From:To;
+	bh=hrmZX3PRwUYkfvLn6mEOlu/CT3oFk/p5veIc/efHDsA=;
+	b=yhqkeBvF8umesXs7aEjLCafMgbU4dQl3wAQOKeALM1zAsKnd2cAKzjjCS4G8C4G5vR8J+bP4i/ta6e6rUkU0ohaS3r8Tjo4J9rwMDUzNMvzNJkJ7/LEEqPi1WRgl+ajO4fNWBIa3UR9+GE7aSyQx5ia7TiijkVDhHICcE7O7bIo=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R261e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W2HdLt1_1710158959;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W2HdLt1_1710158959)
+          by smtp.aliyun-inc.com;
+          Mon, 11 Mar 2024 20:09:20 +0800
+Message-ID: <1710154125.7529383-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v3 3/6] virtio_net: support device stats
+Date: Mon, 11 Mar 2024 18:48:45 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason  Wang <jasowang@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric  Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ virtualization@lists.linux.dev,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Tariq Toukan <tariqt@nvidia.com>,
+ Michael Chan <michael.chan@broadcom.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Shannon Nelson <shannon.nelson@amd.com>
+References: <20240227080303.63894-1-xuanzhuo@linux.alibaba.com>
+ <20240227080303.63894-4-xuanzhuo@linux.alibaba.com>
+ <20240307085021.1081777d@kernel.org>
+In-Reply-To: <20240307085021.1081777d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PEPF000066E8:EE_|CY8PR12MB8066:EE_
-X-MS-Office365-Filtering-Correlation-Id: 628b4475-feb8-4edb-4c5d-08dc41b95e0f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	97A7ULQfi80jh8hLovmATgpTsGvT6dIlXmnNb/AgxpVu7lzZJgP9lFPEdtMkFpiBUWPXWVEw67IP9tfQWrhK4oOQY2Hy5BKuXFM8SrjyQ4DS4tM2ue0r79mFa2lkPlkrwSC9kfEm1aXgrYw+mxtOFQgOg043s2s66TGRAgpHhIOPbs8/oo76xAynBJUsT7aT5vWeSZA9PTY/Z9/CTqaPNp9atq6X6VCuxulzF9Bl5790mY7SYMCAv+4FdRgKaHoVcb4tyTWQSE6MmJ/WUJnThATkaxVR5fCgonhvG7L2YxnmHQJS1BAWCTidHsuIES9qjNaIhbmP6Swu9AJfyV179Tc3dB30NBQJg+H4cWZ6LzlBKsC79lIeg/UJSXEUetvRSp6bHVM+qNMKYx/93Ln8wLZHPitkyaOaD7zFzbPva13j/A6ZmBTBpjF/L+i6o5TL21Rf8b1B4xGJrxF+sC8/PjaRy0EfiJ2I8rIxv7YAq/JCnTvhmxWo16iKurm5DqLKuVfuvRvogZA5o18XgCxjEwSUPUFUYpH4Ev0xnAInzh2tjE7VG4pVYuwwvq1/dE80s9XqV2BsKh3pXN+ky5ChnQHO5Utx6sjMDeesrfR4y0WUX/35IeOtjRkyFsITFlC4YDqI2lW4jXf5lQfaXwb0TQZ6LZ5k3RMh9yWagISkIgQNri4DA3fqCUqNxPHPCtg1E0LfUpo5HQKRi9MyurH0+LMpghqYyPTMtNltJ4viEbbqIzxAyoyYk4Yzme7KAbdR
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(376005)(1800799015)(82310400014)(36860700004);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Mar 2024 10:52:38.1177
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 628b4475-feb8-4edb-4c5d-08dc41b95e0f
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CO1PEPF000066E8.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB8066
+
+On Thu, 7 Mar 2024 08:50:21 -0800, Jakub Kicinski <kuba@kernel.org> wrote:
+> CC: Willem and some driver folks for more input, context: extending
+> https://lore.kernel.org/all/20240306195509.1502746-1-kuba@kernel.org/
+> to cover virtio stats.
+>
+> On Tue, 27 Feb 2024 16:03:00 +0800 Xuan Zhuo wrote:
+> > +static const struct virtnet_stat_desc virtnet_stats_rx_basic_desc[] = {
+> > +	VIRTNET_STATS_DESC(rx, basic, packets),
+> > +	VIRTNET_STATS_DESC(rx, basic, bytes),
+>
+> Covered.
+
+About "packets" and "bytes", here is coming from the hw device.
+Actually the driver also count "packets" and "bytes" in SW.
+So there are HW and SW versions. Do we need to distinguish them?
+
+>
+> > +	VIRTNET_STATS_DESC(rx, basic, notifications),
+> > +	VIRTNET_STATS_DESC(rx, basic, interrupts),
+>
+> I haven't seen HW devices count interrupts coming from a specific
+> queue (there's usually a lot more queues than IRQs these days),
+> let's keep these in ethtool -S for now, unless someone has a HW use
+> case.
+
+OK.
+
+>
+> > +	VIRTNET_STATS_DESC(rx, basic, drops),
+> > +	VIRTNET_STATS_DESC(rx, basic, drop_overruns),
+>
+> These are important, but we need to make sure we have a good definition
+> for vendors to follow...
+>
+> drops I'd define as "sum of all packets which came into the device, but
+> never left it, including but not limited to: packets dropped due to
+> lack of buffer space, processing errors, explicitly set policies and
+> packet filters."
+> Call it hw-rx-drops ?
+
+I agree.
+
+>
+> overruns is a bit harder to precisely define. I was thinking of
+> something more broad, like: "packets dropped due to transient lack of
+> resources, such as buffer space, host descriptors etc."
+>
+> For context why not just go with virtio spec definition of "no
+> descriptors" - for HW devices, what exact point in the pipeline drops
+> depends on how back pressure is configured/implemented, and fetching
+> descriptors is high latency, so differentiating between "PCIe is slow"
+> and "host didn't post descriptors" is hard in practice.
+> Call it hw-rx-drop-overruns ?
+
+OK.
+
+>
+> > +static const struct virtnet_stat_desc virtnet_stats_tx_basic_desc[] = {
+> > +	VIRTNET_STATS_DESC(tx, basic, packets),
+> > +	VIRTNET_STATS_DESC(tx, basic, bytes),
+> > +
+> > +	VIRTNET_STATS_DESC(tx, basic, notifications),
+> > +	VIRTNET_STATS_DESC(tx, basic, interrupts),
+> > +
+> > +	VIRTNET_STATS_DESC(tx, basic, drops),
+>
+> These 5 same as rx.
+>
+> > +	VIRTNET_STATS_DESC(tx, basic, drop_malformed),
+>
+> These I'd call hw-tx-drop-errors, "packets dropped because they were
+> invalid or malformed"?
+
+OK.
+
+>
+> > +static const struct virtnet_stat_desc virtnet_stats_rx_csum_desc[] = {
+> > +	VIRTNET_STATS_DESC(rx, csum, csum_valid),
+>
+> I think in kernel parlance that would translate to CHECKSUM_UNNECESSARY?
+> So let's call it rx-csum-unnecessary ?
+> I'd skip the hw- prefix for this one, it doesn't matter to the user if
+> the HW or SW counted it.
+
+OK.
+
+>
+> > +	VIRTNET_STATS_DESC(rx, csum, needs_csum),
+>
+> Hm, I think this is a bit software/virt device specific, presumably
+> rx-csum-partial for the kernel, up to you whether to make it ethtool -S
+> or netlink.
+
+YES. This is specific for virt device.
+I will make it ethtool -S. So somebody has other advice.
+
+>
+> > +	VIRTNET_STATS_DESC(rx, csum, csum_none),
+> > +	VIRTNET_STATS_DESC(rx, csum, csum_bad),
+>
+> These two make sense as is in netlink, should be fairly commonly
+> reported by devices. Maybe add a note in "bad" that packets with
+> bad csum are not discarded, but still delivered to the stack.
+
+OK.
 
 
-Ido Schimmel <idosch@nvidia.com> writes:
+>
+> > +static const struct virtnet_stat_desc virtnet_stats_tx_csum_desc[] = {
+> > +	VIRTNET_STATS_DESC(tx, csum, needs_csum),
+> > +	VIRTNET_STATS_DESC(tx, csum, csum_none),
+>
+> tx- version of what names we pick for rx-, netlink seems appropriate.
+>
+> > +static const struct virtnet_stat_desc virtnet_stats_rx_gso_desc[] = {
+> > +	VIRTNET_STATS_DESC(rx, gso, gso_packets),
+> > +	VIRTNET_STATS_DESC(rx, gso, gso_bytes),
+>
+> I used the term "GSO" in conversations about Rx and it often confuses
+> people. Let's use "GRO", so hw-gro-packets, and hw-gro-bytes ?
+> Or maybe coalesce? "hw-rx-coalesce" ? That's quite a bit longer..
 
-> On Sun, Mar 10, 2024 at 11:54:59AM -0600, David Ahern wrote:
->> On 3/10/24 11:32 AM, Ido Schimmel wrote:
->> > diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
->> > index 5eb3ba568f4e..f3df80d2b980 100644
->> > --- a/net/ipv4/nexthop.c
->> > +++ b/net/ipv4/nexthop.c
->> > @@ -3253,8 +3253,9 @@ static int rtm_del_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
->> >  	int err;
->> >  	u32 id;
->> >  
->> > -	err = nlmsg_parse(nlh, sizeof(struct nhmsg), tb, NHA_MAX,
->> > -			  rtm_nh_policy_del, extack);
->> > +	err = nlmsg_parse(nlh, sizeof(struct nhmsg), tb,
->> > +			  ARRAY_SIZE(rtm_nh_policy_del) - 1, rtm_nh_policy_del,
->> 
->> 'tb' on the stack only needs to be ARRAY_SIZE as well; that's the
->> benefit of the approach - only declare what you need.
->
-> The reasoning for that is explained in Petr's commit message:
->
-> "
->     - To allow querying for presence of the attribute, have all the attribute
->       arrays sized to NHA_MAX, regardless of what is permitted by policy, and
->       pass the corresponding value to nlmsg_parse() as well.
-> "
->
-> IOW, with resizing 'tb' to ARRAY_SIZE:
->
-> rtm_del_nexthop
->     nh_valid_get_del_req
->         if (tb[NHA_OP_FLAGS]) -> BOOM
+GRO may also confuse people.
 
-Yep. I passed NHA_MAX to nlmsg_parse to get the tb array properly
-initialized, but missed the obvious fact that it will then expect the
-policy arrays to be this long as well. Oops.
+I like hw-rx-coalesce-packets, hw-rx-coalesce-bytes.
 
-One way would be to just initialize the arrays:
+>
+> Ah, and please mention in the doc that these counters "do not cover LRO
+> i.e. any coalescing implementation which doesn't follow GRO rules".
 
-modified   net/ipv4/nexthop.c
-@@ -3243,7 +3243,7 @@ static int rtm_del_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			   struct netlink_ext_ack *extack)
- {
- 	struct net *net = sock_net(skb->sk);
--	struct nlattr *tb[NHA_MAX + 1];
-+	struct nlattr *tb[NHA_MAX + 1] = {};
- 	struct nl_info nlinfo = {
- 		.nlh = nlh,
- 		.nl_net = net,
+OK.
 
-But what you propose below looks OK to me as well, and conserves the
-stack space. (Until the policies grow again anyway.)
+>
+> > +	VIRTNET_STATS_DESC(rx, gso, gso_packets_coalesced),
+>
+> hw-gro-wire-packets ?
+> No strong preference on the naming, but I find that saying -wire
+> makes it 100% clear to everyone what the meaning is.
 
-> However, I can add [1] and [2] as patches #1 and #2 and then squash [3]
-> into the current patch.
+ok.
+
+
 >
-> [1]
-> commit bf5184cc9a3596d3185c91f2f7986e7c6f2dba9c
-> Author: Ido Schimmel <idosch@nvidia.com>
-> Date:   Sun Mar 10 21:56:21 2024 +0200
+> > +	VIRTNET_STATS_DESC(rx, gso, gso_bytes_coalesced),
 >
->     nexthop: Only parse NHA_OP_FLAGS for get messages that require it
->     
->     The attribute is parsed into 'op_flags' in nh_valid_get_del_req() which
->     is called from the handlers of three message types: RTM_DELNEXTHOP,
->     RTM_GETNEXTHOPBUCKET and RTM_GETNEXTHOP. The attribute is only used by
->     the latter and rejected by the policies of the other two.
->     
->     Pass 'op_flags' as NULL from the handlers of the other two and only
->     parse the attribute when the argument is not NULL.
->     
->     This is a preparation for a subsequent patch.
->     
->     Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> The documentation in the virtio spec seems to be identical
+> to the one for gso_packets, which gotta be unintentional?
+
+One for num, one for bytes.
+
+
+> I'm guessing this is hw-gro-wire-bytes? I.e. headers counted
+> multiple times?
+
+This is used to count the bytes of the small packets before coalescing.
+
+> > +static const struct virtnet_stat_desc virtnet_stats_tx_gso_desc[] = {
+> > +	VIRTNET_STATS_DESC(tx, gso, gso_packets),
+> > +	VIRTNET_STATS_DESC(tx, gso, gso_bytes),
+> > +	VIRTNET_STATS_DESC(tx, gso, gso_segments),
+> > +	VIRTNET_STATS_DESC(tx, gso, gso_segments_bytes),
 >
-> diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-> index 5eb3ba568f4e..03bacf9c0502 100644
-> --- a/net/ipv4/nexthop.c
-> +++ b/net/ipv4/nexthop.c
-> @@ -3229,10 +3229,12 @@ static int nh_valid_get_del_req(const struct nlmsghdr *nlh,
->                 return -EINVAL;
->         }
->  
-> -       if (tb[NHA_OP_FLAGS])
-> -               *op_flags = nla_get_u32(tb[NHA_OP_FLAGS]);
-> -       else
-> -               *op_flags = 0;
-> +       if (op_flags) {
-> +               if (tb[NHA_OP_FLAGS])
-> +                       *op_flags = nla_get_u32(tb[NHA_OP_FLAGS]);
-> +               else
-> +                       *op_flags = 0;
-> +       }
->  
->         return 0;
->  }
-> @@ -3249,7 +3251,6 @@ static int rtm_del_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
->                 .portid = NETLINK_CB(skb).portid,
->         };
->         struct nexthop *nh;
-> -       u32 op_flags;
->         int err;
->         u32 id;
->  
-> @@ -3258,7 +3259,7 @@ static int rtm_del_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
->         if (err < 0)
->                 return err;
->  
-> -       err = nh_valid_get_del_req(nlh, tb, &id, &op_flags, extack);
-> +       err = nh_valid_get_del_req(nlh, tb, &id, NULL, extack);
->         if (err)
->                 return err;
->  
-> @@ -3715,7 +3716,6 @@ static int nh_valid_get_bucket_req(const struct nlmsghdr *nlh,
->                                    struct netlink_ext_ack *extack)
->  {
->         struct nlattr *tb[NHA_MAX + 1];
-> -       u32 op_flags;
->         int err;
->  
->         err = nlmsg_parse(nlh, sizeof(struct nhmsg), tb, NHA_MAX,
-> @@ -3723,7 +3723,7 @@ static int nh_valid_get_bucket_req(const struct nlmsghdr *nlh,
->         if (err < 0)
->                 return err;
->  
-> -       err = nh_valid_get_del_req(nlh, tb, id, &op_flags, extack);
-> +       err = nh_valid_get_del_req(nlh, tb, id, NULL, extack);
->         if (err)
->                 return err;
+> these 4 make sense as mirror of the Rx
 >
-> [2]
-> commit 585183403a6b692d71746527938b037f50feed65
-> Author: Ido Schimmel <idosch@nvidia.com>
-> Date:   Sun Mar 10 22:54:53 2024 +0200
+> > +	VIRTNET_STATS_DESC(tx, gso, gso_packets_noseg),
+> > +	VIRTNET_STATS_DESC(tx, gso, gso_bytes_noseg),
 >
->     nexthop: Only parse NHA_OP_FLAGS for dump messages that require it
->     
->     The attribute is parsed in __nh_valid_dump_req() which is called by the
->     dump handlers of RTM_GETNEXTHOP and RTM_GETNEXTHOPBUCKET although it is
->     only used by the former and rejected by the policy of the latter.
->     
->     Move the parsing to nh_valid_dump_req() which is only called by the dump
->     handler of RTM_GETNEXTHOP.
->     
->     This is a preparation for a subsequent patch.
->     
->     Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> Not sure what these are :) unless someone knows what it is and that
+> HW devices report it, let's keep them in ethtool -S ?
+
+Just for the virtio. Let's keep them in ethtool -S.
+
 >
-> diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-> index 03bacf9c0502..573da3660cb3 100644
-> --- a/net/ipv4/nexthop.c
-> +++ b/net/ipv4/nexthop.c
-> @@ -3397,11 +3397,6 @@ static int __nh_valid_dump_req(const struct nlmsghdr *nlh, struct nlattr **tb,
->                 return -EINVAL;
->         }
->  
-> -       if (tb[NHA_OP_FLAGS])
-> -               filter->op_flags = nla_get_u32(tb[NHA_OP_FLAGS]);
-> -       else
-> -               filter->op_flags = 0;
-> -
->         return 0;
->  }
->  
-> @@ -3417,6 +3412,11 @@ static int nh_valid_dump_req(const struct nlmsghdr *nlh,
->         if (err < 0)
->                 return err;
->  
-> +       if (tb[NHA_OP_FLAGS])
-> +               filter->op_flags = nla_get_u32(tb[NHA_OP_FLAGS]);
-> +       else
-> +               filter->op_flags = 0;
-> +
->         return __nh_valid_dump_req(nlh, tb, filter, cb->extack);
->  }
+> > +static const struct virtnet_stat_desc virtnet_stats_rx_speed_desc[] = {
+> > +	VIRTNET_STATS_DESC(rx, speed, packets_allowance_exceeded),
 >
-> [3]
-> diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-> index f6c9d834b989..0011b0076c5b 100644
-> --- a/net/ipv4/nexthop.c
-> +++ b/net/ipv4/nexthop.c
-> @@ -3243,8 +3243,8 @@ static int nh_valid_get_del_req(const struct nlmsghdr *nlh,
->  static int rtm_del_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
->                            struct netlink_ext_ack *extack)
->  {
-> +       struct nlattr *tb[ARRAY_SIZE(rtm_nh_policy_del)];
->         struct net *net = sock_net(skb->sk);
-> -       struct nlattr *tb[NHA_MAX + 1];
->         struct nl_info nlinfo = {
->                 .nlh = nlh,
->                 .nl_net = net,
-> @@ -3277,8 +3277,8 @@ static int rtm_del_nexthop(struct sk_buff *skb, struct nlmsghdr *nlh,
->  static int rtm_get_nexthop(struct sk_buff *in_skb, struct nlmsghdr *nlh,
->                            struct netlink_ext_ack *extack)
->  {
-> +       struct nlattr *tb[ARRAY_SIZE(rtm_nh_policy_get)];
->         struct net *net = sock_net(in_skb->sk);
-> -       struct nlattr *tb[NHA_MAX + 1];
->         struct sk_buff *skb = NULL;
->         struct nexthop *nh;
->         u32 op_flags;
-> @@ -3406,7 +3406,7 @@ static int nh_valid_dump_req(const struct nlmsghdr *nlh,
->                              struct nh_dump_filter *filter,
->                              struct netlink_callback *cb)
->  {
-> -       struct nlattr *tb[NHA_MAX + 1];
-> +       struct nlattr *tb[ARRAY_SIZE(rtm_nh_policy_dump)];
->         int err;
->  
->         err = nlmsg_parse(nlh, sizeof(struct nhmsg), tb,
-> @@ -3550,7 +3550,7 @@ static int nh_valid_dump_bucket_req(const struct nlmsghdr *nlh,
->                                     struct netlink_callback *cb)
->  {
->         struct nlattr *res_tb[ARRAY_SIZE(rtm_nh_res_bucket_policy_dump)];
-> -       struct nlattr *tb[NHA_MAX + 1];
-> +       struct nlattr *tb[ARRAY_SIZE(rtm_nh_policy_dump_bucket)];
->         int err;
->  
->         err = nlmsg_parse(nlh, sizeof(struct nhmsg), tb,
-> @@ -3719,7 +3719,7 @@ static int nh_valid_get_bucket_req(const struct nlmsghdr *nlh,
->                                    u32 *id, u16 *bucket_index,
->                                    struct netlink_ext_ack *extack)
->  {
-> -       struct nlattr *tb[NHA_MAX + 1];
-> +       struct nlattr *tb[ARRAY_SIZE(rtm_nh_policy_get_bucket)];
->         int err;
->  
->         err = nlmsg_parse(nlh, sizeof(struct nhmsg), tb,
+> hw-rx-drop-ratelimits ?
+> "Allowance exceeded" is a bit of a mouthful to me, perhaps others
+> disagree. The description from the virtio spec is quite good.
+
+OK.
+
+>
+> > +	VIRTNET_STATS_DESC(rx, speed, bytes_allowance_exceeded),
+>
+> No strong preference whether to expose this as a standard stat or
+> ethtool -S, we don't generally keep byte counters for drops, so
+> this would be special.
+
+OK.
+>
+> > +static const struct virtnet_stat_desc virtnet_stats_tx_speed_desc[] = {
+> > +	VIRTNET_STATS_DESC(tx, speed, packets_allowance_exceeded),
+> > +	VIRTNET_STATS_DESC(tx, speed, packets_allowance_exceeded),
+>
+> same as rx
+
+
+Thanks.
 
