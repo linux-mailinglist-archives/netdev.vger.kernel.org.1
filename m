@@ -1,75 +1,139 @@
-Return-Path: <netdev+bounces-79082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FB31877C81
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 10:20:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 004BB877C82
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 10:21:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3584B20A7A
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 09:20:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 946F91F210CE
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 09:21:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F398415AF6;
-	Mon, 11 Mar 2024 09:20:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F94714F75;
+	Mon, 11 Mar 2024 09:21:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bqVmI5x8"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="H2QXL4op"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE39B14296
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 09:20:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCC1B12E48;
+	Mon, 11 Mar 2024 09:21:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710148843; cv=none; b=XZMvn0OwSm450tbUZBhnhbD45of9pP9tigApTG2rgshMqO6BXUBw9su1Wx67pxySrXml1oGIqb9K+4g5wifXiNwbrKCY+JpHorVOZjcyjtb6WxdYXBxAfUD69Uo9r+EGsxr8a3dCRdbZocSKgX3RjDrzi7hB/qRoke6ALLRd7GM=
+	t=1710148874; cv=none; b=d84sBBRStYHjavB6kcr1jlJCJNYtLE2BGguTha/xunxNXa8bdW7oelZK/04L+qAMG0h+wIrdy0NhFohasAThiIkH3ZUEWo+wfDyehYkl8KAHU7m/WB4p33rZC1LyI1Mv0nhepw4DohYt0B6FJSUu1zAh7Jd4+QPXcYLdYJYMIBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710148843; c=relaxed/simple;
-	bh=qxi5+TOjcyya8fuII4LhWu35JwnGT9JmbLofTAmXndA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ohGQxnbPscrVX67psTH1I/9hyma/FYAFT76omOwdE5aYGV2VAJXFCNdFW9T7UZXGES0Icq4IstnwwTbu1KfthRDUacGg6ICqo3plyLTfyOKzpV83yZ7vIpjFRA8XQk0v/hhm5q5ArjuEVfucsbaa1n8sffAQ5FDlHFk0ZIfhOKg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bqVmI5x8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E20E6C433C7;
-	Mon, 11 Mar 2024 09:20:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710148843;
-	bh=qxi5+TOjcyya8fuII4LhWu35JwnGT9JmbLofTAmXndA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=bqVmI5x83bTZvZdRgsr3jFXennCqv3MZ9XIVAix9YWqJzPtIRhUr/pVl+zxh+yYdY
-	 s9LtpIpAOJVws7PoE2so5rn68s7z69S3vRhwYcx9bmIbvwl1nY1JYmf2mksSAQv7Ju
-	 G9bdWTNWT5ujnkCuUbLAVeVHKIo3nhUgtZdVoSl4aoygh7ACYvuF6EvkbDstwM7E90
-	 1wQvO0QGhTawmDuMGUzceGQZ/bW3YtyTVN2DBtCA0at+Kwe+otwT4PHft7lh965tmS
-	 qQpPGICIWpkw+c+3aszeflXXFAdhG3TM0OLoKNlpy2sQnQ4TvEObKzYDDw8MGaVzvQ
-	 k9bHT6uJCwF8g==
-Date: Mon, 11 Mar 2024 09:20:37 +0000
-From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] net: gro: move two declarations to
- include/net/gro.h
-Message-ID: <20240311092037.GC24043@kernel.org>
-References: <20240308102230.296224-1-edumazet@google.com>
+	s=arc-20240116; t=1710148874; c=relaxed/simple;
+	bh=/hIauNCwOFr9GvZ1GLOdhxActQlNhMaVI4JUq639/L8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=nlefkK+g4JJRPxy5ZM4eqh/Ejw9FB+wRPxs364RjqomryOcRCeJNAIAr4mlXR0CB+eEp5NkhM4SecBMbYESBGdPo4LZCv9kyp6ZyCg3VHgYCqxukw2TjO4dePteVH9RHkth+8e0hSJmhUhQSMtJMBzZmhDwm4EWzUGl/uxTWTYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=H2QXL4op; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 7C5E0FF806;
+	Mon, 11 Mar 2024 09:21:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1710148863;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=MvrNB1vjlyglGsDHgQXajdb9Gf1WVPwiADdBQtMXZkU=;
+	b=H2QXL4opmZYFbaUOWr9UTc7MgjztMfmCZq/K2E9iWv1x6544XITdkjjgaQM4fQUUsIoYnx
+	JwLOPk7OKA/7iMa3c7+uHWmL8lH8AZ/YFxrr8t6JY4Zdq20fLczpGVX3g/hMN24Nj3htNK
+	rK74orgXDgOwacFqPfJ7oOVZS9jzQLnbER0H7/kTQV7Wa+BIZ4jtwG/K6VVnMslgorzX8h
+	JwLyFpTpIsMpecmadie9eq7l6SRBb891LiWj5z+F2XDJ3SECNAUnPDub43GN0ZqlM9DeNy
+	nHZ4AdHPqoIFmunV+v4vGkzW0x+HjA+lCzBa7ejILHp2CFZD6n+RW77PbjPMlw==
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: thomas.petazzoni@bootlin.com,
+	Richard Cochran <richardcochran@gmail.com>
+Subject: [PATCH v2 net-next] ptp: Move from simple ida to xarray
+Date: Mon, 11 Mar 2024 10:21:01 +0100
+Message-Id: <20240311092101.1114687-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240308102230.296224-1-edumazet@google.com>
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Fri, Mar 08, 2024 at 10:22:30AM +0000, Eric Dumazet wrote:
-> Move gro_find_receive_by_type() and gro_find_complete_by_type()
-> to include/net/gro.h where they belong.
-> 
-> Also use _NET_GRO_H instead of _NET_IPV6_GRO_H to protect
-> include/net/gro.h from multiple inclusions.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+Move from simple ida to xarray for storing and loading the ptp_clock
+pointer. This prepares support for future hardware timestamp selection by
+being able to link the ptp clock index to its pointer.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+---
+
+Change in v2:
+- Update an err value missing
+---
+ drivers/ptp/ptp_clock.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 3aaf1a3430c5..9339fd475df0 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -31,7 +31,7 @@ struct class *ptp_class;
+ 
+ static dev_t ptp_devt;
+ 
+-static DEFINE_IDA(ptp_clocks_map);
++static DEFINE_XARRAY_ALLOC(ptp_clocks_map);
+ 
+ /* time stamp event queue operations */
+ 
+@@ -201,7 +201,7 @@ static void ptp_clock_release(struct device *dev)
+ 	bitmap_free(tsevq->mask);
+ 	kfree(tsevq);
+ 	debugfs_remove(ptp->debugfs_root);
+-	ida_free(&ptp_clocks_map, ptp->index);
++	xa_erase(&ptp_clocks_map, ptp->index);
+ 	kfree(ptp);
+ }
+ 
+@@ -246,12 +246,12 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	if (ptp == NULL)
+ 		goto no_memory;
+ 
+-	index = ida_alloc_max(&ptp_clocks_map, MINORMASK, GFP_KERNEL);
+-	if (index < 0) {
+-		err = index;
++	err = xa_alloc(&ptp_clocks_map, &index, ptp, xa_limit_31b,
++		       GFP_KERNEL);
++	if (err)
+ 		goto no_slot;
+-	}
+ 
++	err = -ENOMEM;
+ 	ptp->clock.ops = ptp_clock_ops;
+ 	ptp->info = info;
+ 	ptp->devid = MKDEV(major, index);
+@@ -378,7 +378,7 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+ 	list_del(&queue->qlist);
+ 	kfree(queue);
+ no_memory_queue:
+-	ida_free(&ptp_clocks_map, index);
++	xa_erase(&ptp_clocks_map, index);
+ no_slot:
+ 	kfree(ptp);
+ no_memory:
+@@ -511,7 +511,7 @@ static void __exit ptp_exit(void)
+ {
+ 	class_destroy(ptp_class);
+ 	unregister_chrdev_region(ptp_devt, MINORMASK + 1);
+-	ida_destroy(&ptp_clocks_map);
++	xa_destroy(&ptp_clocks_map);
+ }
+ 
+ static int __init ptp_init(void)
+-- 
+2.25.1
 
 
