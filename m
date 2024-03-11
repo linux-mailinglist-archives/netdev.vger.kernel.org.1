@@ -1,96 +1,110 @@
-Return-Path: <netdev+bounces-79300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D306878AA3
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:20:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87434878AC1
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:30:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E63C1C20DA2
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 22:20:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2534F1F21DF7
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 22:30:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 221AD57323;
-	Mon, 11 Mar 2024 22:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB18D54736;
+	Mon, 11 Mar 2024 22:30:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b4MRZsPZ"
+	dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b="zb+vy165"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from taslin.fdn.fr (taslin.fdn.fr [80.67.169.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2A3458100
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 22:20:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A52125CE
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 22:30:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.67.169.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710195632; cv=none; b=R6p+ojoSCotiwoFstOwrEbVlD2iFxS3Kjt4olEZuFygwG0s0RTVVGBYASpZubMgmnmKKhP4dIjs7Ar0oZNZqzR7bAnorqA8kQTniSkn7bT7dX+vOoWLQLEL1MA8b56WcjstJHDBW1tAC4qicCzkUkJv/w1biasAsfIZzTaRMxJI=
+	t=1710196239; cv=none; b=kRr2d0H96Kg+IUdWwN5ifMll2Vp8elc5yexAuwwFgsFc5yUlUdJmUJcNt6Mc3nzoebmIxEkfVveiCTm2H81K6DCDlBXb+BDyxvN7I49jTbHrT/lFeGnLRecIYEk5r+tF5kX+8HB0UKFNgSUrXrj4II41+wuVCRQzhl83YAfOSkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710195632; c=relaxed/simple;
-	bh=nabhkSU6CaBpxlwRrt3a5IaEXZGVfr8nABdgY6Pclj4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gHFlkf0PwkO/MZUM7/XftUIgkylfW7HE0SftSHR35dLDrp+98VEzLO6ebUkPHVn17bVbkaR++R9poBVlkj+J775HRJESTlAd6wT4RDYprKuPDx6oakp1asGfgzf41sdXmehOeavppQNkMaUxuBUadDbRMfB1biXdLJRGKW6TvvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b4MRZsPZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9AC48C43394;
-	Mon, 11 Mar 2024 22:20:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710195631;
-	bh=nabhkSU6CaBpxlwRrt3a5IaEXZGVfr8nABdgY6Pclj4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=b4MRZsPZnofuJ3M3/A5jJMXtiMufFb8981jFLGR15obH8E04unZFUABCB1OxsEwAY
-	 gEm8ORloGUDMRtSgN4EupTFKXPVt4ouxpoVVCfSzNZIpCUyknDsjRfZVwXVPz4oBCX
-	 R0dysB/e0ANMbGHYDtQuM6pL1GDHsDYwe9Vt139Rauc7eh80yrSDWzVrVBGnPU05gY
-	 A0g0uEdcj6cYkGpVsuAUeTV3grf8yEc+EPt6wxo1oXmRQT54YFn0Wt3CiXW/bOAMEo
-	 uwWtNXjZfOQWku7gprRC7NysAr8HrF9ql33p4DLWOOJ8TyCFwRlDv59QCPiNl7sr2z
-	 YI/Q5blD57/GQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7DE03C395F1;
-	Mon, 11 Mar 2024 22:20:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1710196239; c=relaxed/simple;
+	bh=1mRfN5k5UQO5um5QUdO3+MzyJKPm0w+3onfS79A/tgk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Gm1NEaULobeb82AULPX12DG1Pk+FXBcyrj2ndC1xfK+FXXV6CXrbwL00Zjg4VFXwaJDtvukDF8tEqoQXj4A2E6nGpBs6L/k1UUdB2EQfalv2QZ70u4Zhgd35uQriFeEvt7WNcbwDbpDe83p43mp6PiHlmRw+gWqfCNcPUhR34Mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name; spf=pass smtp.mailfrom=max.gautier.name; dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b=zb+vy165; arc=none smtp.client-ip=80.67.169.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=max.gautier.name
+Received: from localhost (reverse-238.fdn.fr [80.67.176.238])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by taslin.fdn.fr (Postfix) with ESMTPSA id 2CAAA60260;
+	Mon, 11 Mar 2024 23:30:34 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=max.gautier.name;
+	s=fdn; t=1710196234;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nR6ZuzHevSLrrSe9pqAjXycStXW5X84qRUQjm2nTePU=;
+	b=zb+vy165QOQyiW1DGyo+lV3KgcYKH9Gv9Xo4X88hXL4aeMI0NZ2tnDbLUNgNq1QQa9AVbE
+	KYqf7sRTim4c/eyxechAZxv8mI7+TeqEEruYCtQuZvPoxpEW0jn6Z5+jkcg6oMVpRz3mCt
+	JG76no2bYHf+A5GmPAPf4G2wXGclToAe5PnaH637qJNe2s6nsdKFXe4DOs5MTR+I0lULwM
+	5n7KE2ijdxqkAd5wkrTomRbCZxRg2lUrMXD4rSRNfjABznVDw9kWrEGEobEEsl51L5+TsM
+	qFMOlWrchmoNCl8RDEXmNEBB6cbiFuAAuWacQVZFJXCKJupj3LNNK6UZgr4x4w==
+Date: Mon, 11 Mar 2024 23:28:31 +0100
+From: Max Gautier <mg@max.gautier.name>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2-next] Makefile: use systemd-tmpfiles to create
+ /var/lib/arpd
+Message-ID: <Ze-Fj2RwYnM0WgWi@framework>
+References: <20240311165803.62431-1-mg@max.gautier.name>
+ <20240311124003.583053a6@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: wan: framer/pef2256: Convert to platform remove callback
- returning void
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171019563151.21986.7590357224357705934.git-patchwork-notify@kernel.org>
-Date: Mon, 11 Mar 2024 22:20:31 +0000
-References: <9684419fd714cc489a3ef36d838d3717bb6aec6d.1709886922.git.u.kleine-koenig@pengutronix.de>
-In-Reply-To: <9684419fd714cc489a3ef36d838d3717bb6aec6d.1709886922.git.u.kleine-koenig@pengutronix.de>
-To: =?utf-8?q?Uwe_Kleine-K=C3=B6nig_=3Cu=2Ekleine-koenig=40pengutronix=2Ede=3E?=@codeaurora.org
-Cc: herve.codina@bootlin.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- kernel@pengutronix.de
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240311124003.583053a6@hermes.local>
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri,  8 Mar 2024 09:51:09 +0100 you wrote:
-> The .remove() callback for a platform driver returns an int which makes
-> many driver authors wrongly assume it's possible to do error handling by
-> returning an error code. However the value returned is ignored (apart
-> from emitting a warning) and this typically results in resource leaks.
+On Mon, Mar 11, 2024 at 12:40:03PM -0700, Stephen Hemminger wrote:
+> On Mon, 11 Mar 2024 17:57:27 +0100
+> Max Gautier <mg@max.gautier.name> wrote:
 > 
-> To improve here there is a quest to make the remove callback return
-> void. In the first step of this quest all drivers are converted to
-> .remove_new(), which already returns void. Eventually after all drivers
-> are converted, .remove_new() will be renamed to .remove().
+> > Only apply on systemd systems (detected in the configure script).
+> > The motivation is to build distributions packages without /var to go
+> > towards stateless systems, see link below (TL;DR: provisionning anything
+> > outside of /usr on boot).
+> > 
+> > The feature flag can be overridden on make invocation:
+> > `make USE_TMPFILES_D=n DESTDIR=<install_loc> install`
+> > 
+> > Links: https://0pointer.net/blog/projects/stateless.html
 > 
-> [...]
+> Why does arpd need such hand holding, it is rarely used, maybe should just not be built.
 
-Here is the summary with links:
-  - net: wan: framer/pef2256: Convert to platform remove callback returning void
-    https://git.kernel.org/netdev/net-next/c/0d1a7a8fac5b
+The commit introducing the install of that directory is quite old
 
-You are awesome, thank you!
+> commit e48f73d6a5e90d2f883e15ccedf4f53d26bb6e74
+> Author: Olaf Rempel <razzor@kopf-tisch.de>
+> Date:   Wed Nov 9 15:25:40 2005 +0100
+> 
+>     iproute2-2.6.14-051107: missing arpd directory
+>     
+>     arpd requires a directory (/var/lib/arpd/) to run.
+>     see attached patch, which lets iproute create this directroy during install.
+
+For the why, arpd.c, L.671:
+
+dbase = dbopen(dbname, O_CREAT|O_RDWR, 0644, DB_HASH, NULL);
+if (dbase == NULL) {
+    perror("db_open");
+    exit(-1);
+}
+
+You think arpd should create its directory itself if it does not exists
+?
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Max Gautier
 
