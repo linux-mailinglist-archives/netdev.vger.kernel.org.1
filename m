@@ -1,73 +1,150 @@
-Return-Path: <netdev+bounces-79322-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79323-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 302C6878B79
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:21:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 755E2878B80
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:27:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C45AC1F21F46
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:21:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13D3F1F21808
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 23:27:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0679959170;
-	Mon, 11 Mar 2024 23:21:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 987E558ABF;
+	Mon, 11 Mar 2024 23:27:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uuTpSnOj"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="eL1SKczc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4DE459168;
-	Mon, 11 Mar 2024 23:21:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F8A058AAC;
+	Mon, 11 Mar 2024 23:27:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710199273; cv=none; b=tA8is4EC7CKCQtuIIJwIAdP0BYPoiAucpr+EBw3Yl4iRNOP3o8PKLya7NeFtDIw1JJpBuje7qHWK2MBWYZcfzAolIJs+W9bM2YNk9rDGlfmVmcxa1nYfBgaGXSqZxffnlQbu6aSUVYK/yPT1VjEW9ZXiEfNIaeXaGh68xyNUSOI=
+	t=1710199666; cv=none; b=bB9MVoSFSSiinEk6XelHyrGfrvclp1GgkkEEMsIe+E9BesoqzEVhljxKj4OnmcJTm+vokTdvoDboNG5UWG9LgOSNyH8jeKl0PK68dpGylbEpEENECRfNgcwwq/B8d4gMizhRMxp106NRVrqb+dVITFLObPrl5Jb0azjXYObONWc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710199273; c=relaxed/simple;
-	bh=XPimoA/KY43IGicBOhobqeqOF4qVaAB057YdtvyGzxk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RzQkMaKV8Isb9K9ZS2uGQroxmKSDL0IJf1AoZq/cl9myl5aobduMgwfYT2G3FIPWnemibc8yovTWkKD1fRzZN6OaBdCaXJ+ByGwNF5C84PnycNxnfb+8ui+TrhvxQu8JLRXBZoIRF1c9Zs3p52jMfOUtp3+d7bYuGHM26lmsVFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uuTpSnOj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6ABAC433C7;
-	Mon, 11 Mar 2024 23:21:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710199273;
-	bh=XPimoA/KY43IGicBOhobqeqOF4qVaAB057YdtvyGzxk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=uuTpSnOjG+wTQWRXmZ4HEA7JLb7EDuE3wONM8d9HJ6dFrXd1FCVZnJwYOyWEtbEUn
-	 GWd53CAXHEfb+qy5nmy6wE0c3LOYGg8U/z7xPiLHPDaEG5ziYOUvX22dY5TZf4ewBy
-	 R9Mi9iZnsXJNoo7SskMWlw6aCkmb8YLGS98cROYQ22XZiXTZ+9bH0/uvrb6KDV47x7
-	 0bWF6wXvsf1H/YShwK1W6ARriFOQNXzeKV32DDHdbqyVahzEZu8aNKcGL7zfKtynZH
-	 yrnrO0d8egVdHXhWrILE/w5/fqu8pqWku8Sp5lUpG+dtem940xO5CzIJGUiz61ffKS
-	 iHMsbZwQtmlAw==
-Date: Mon, 11 Mar 2024 16:21:12 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: edumazet@google.com, mhiramat@kernel.org,
- mathieu.desnoyers@efficios.com, rostedt@goodmis.org, pabeni@redhat.com,
- davem@davemloft.net, netdev@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next 0/3] trace: use TP_STORE_ADDRS macro
-Message-ID: <20240311162112.2e421c9f@kernel.org>
-In-Reply-To: <20240310121406.17422-1-kerneljasonxing@gmail.com>
-References: <20240310121406.17422-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1710199666; c=relaxed/simple;
+	bh=T14r/g1PhLqoZnfy+1cvwOKrEiY9E1q1H2roRLAZ7kU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JmSvQYEO6cTfjJitFAtKdve/DZVCJ45UiFCV+noCBA0Jjto2vQv2FqgfIHER60ghBBphmRKbypQPmAbrcsOk3a3MdVY36NK1Eb/zfWY6/gbJORq4/ry27Wn2fRWov5/Z/i0rE7U4j07ymWzpi9TIfZR6LolpMkdnxUkbuy/0eYQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=eL1SKczc; arc=none smtp.client-ip=217.70.183.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E112360003;
+	Mon, 11 Mar 2024 23:27:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1710199661;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=YWde9/RxgAOXD0QltJ01CiWNxoLjuof+4KqeqTguWDg=;
+	b=eL1SKczcX7Wm0LaFbj3auDMNYOkOivrXZQZwduAw6eTbSCLQeKxenVuovzWJ406RurRzg/
+	QWsxKeWEkjrl+mAdXo/7D/gUYIcXiYvPfuBnii4S5H5+Eu7HwQbPB0eXVmquHm28TljmeY
+	xQ17zFz0xpujDzZ3h36Kh+GnBz4k9sIGwItYt5RiSGAkk0pg//HkkJu0Zt3+HacLMEbHBN
+	aCJrIFm3Q7mn91w4PKtcV3mRKiZWTJpWdLGL6Jl7ZWIC9QXYFD3GEKINer/p8jog8hl9/f
+	g9QMboHpo1vHxzt0daB8nCdWX9sDRR8f1A++k4cmPjSdNr2m9HDUp3YQ+GDErQ==
+Message-ID: <2846b377-f45b-45fd-9fe2-cb22615e0fd5@arinc9.com>
+Date: Tue, 12 Mar 2024 02:27:25 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: dsa: mt7530: disable LEDs before reset
+Content-Language: en-US
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: patchwork-bot+netdevbpf@kernel.org,
+ Justin Swartz <justin.swartz@risingedge.co.za>, dqfext@gmail.com,
+ sean.wang@mediatek.com, andrew@lunn.ch, f.fainelli@gmail.com,
+ olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240305043952.21590-1-justin.swartz@risingedge.co.za>
+ <171019143163.14853.15330891015381229970.git-patchwork-notify@kernel.org>
+ <2d206dbb-a27b-4139-a49e-331797d8ba34@arinc9.com>
+ <Ze9-mp269h43WGD3@makrotopia.org>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <Ze9-mp269h43WGD3@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: yes
+X-Spam-Level: **************************
+X-GND-Spam-Score: 400
+X-GND-Status: SPAM
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On Sun, 10 Mar 2024 20:14:03 +0800 Jason Xing wrote:
-> Using the macro for other tracepoints use to be more concise.
-> No functional change.
+On 12.03.2024 00:58, Daniel Golle wrote:
+> On Tue, Mar 12, 2024 at 12:22:48AM +0300, Arınç ÜNAL wrote:
+>> Why was this applied? I already explained it did not achieve anything.
+> 
+> I agree that we were still debating about it, however, I do believe
+> Justin that he truely observed this problem and the fix seemed
+> appropriate to me.
+> 
+> I've explained this in my previous email which you did not notice
+> or at least haven't repied to:
+> 
+> https://patchwork.kernel.org/project/netdevbpf/patch/20240305043952.21590-1-justin.swartz@risingedge.co.za/#25753421
 
-The merge window for 6.9 has started and we try not to apply patches 
-to net-next during the merge window. Please repost in 2 weeks, once
-Linus has tagged v6.9-rc1.
--- 
-pw-bot: defer
+I did read that and I did not respond because you did not argue over any of
+the technical points I've made. All you said was did I repeat the test
+enough, on a technical matter that I consider adding two and two together
+and expecting a result other than four.
+
+How I interpreted your response was: I don't know much about this, maybe
+you're wrong. Justin must've made this patch for a reason so let's have
+them elaborate further.
+
+> 
+> In the end it probably depends on the electric capacity of the circuit
+> connecting each LED, so it may not be reproducible on all boards and/or
+> under all circumstances (temperature, humindity, ...).
+
+I'm sorry, this makes no sense to me. I simply fail to see how this fits
+here. Could you base your argument over my points please?
+
+Do you agree that the LED controller starts manipulating the state of the
+pins used for LEDs and bootstrapping after a link is established?
+
+Do you agree that after power is cut from the switch IC and then given
+back, any active link from before will go away, meaning the pins will go
+back to the state that is being dictated by the bootstrapping design of the
+board?
+
+Do you agree that with power given back, the HWTRAP register will be
+populated before a link is established?
+
+> 
+> Disabling the LEDs and waiting for around 1mS before reset seems like
+> a sensible thing to do, and I'm glad Justin took care of it.
+
+Let's ask Justin if they tested this on a standalone MT7530. Because I did.
+The switch chip won't even be powered on before the switch chip reset
+operation is done. So the operation this patch brings does not do anything
+at all for standalone MT7530.
+
+My conclusion to this patch is Justin tested this only on an MCM MT7530
+where the switch IC still has power before the DSA subdriver kicks in. And
+assumed that disabling the LED controller before switch chip reset would
+"reduce" the possibility of having these pins continue being manipulated by
+the LED controller AFTER power is cut off and given back to the switch
+chip, where the state of these pins would be back to being dictated by the
+bootstrapping design of the board.
+
+Jakub, please revert this. And please next time do not apply any patch that
+modifies this driver without my approval if I've already made an argument
+against it. I'm actively maintaining this driver, if there's a need to
+respond, I will do so.
+
+This patch did not have any ACKs. It also did not have the tree described
+on the subject. More reasons as to why this shouldn't have been applied in
+its current state.
+
+Arınç
 
