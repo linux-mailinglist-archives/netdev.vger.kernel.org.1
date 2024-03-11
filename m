@@ -1,198 +1,102 @@
-Return-Path: <netdev+bounces-79136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 788A8877F25
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 12:38:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 459AA877F39
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 12:44:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E47E91F22254
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 11:38:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D983E1F21C1E
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 11:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BB2E3A1CD;
-	Mon, 11 Mar 2024 11:38:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C1C3A268;
+	Mon, 11 Mar 2024 11:44:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KIXUJ69w"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OzvxGsX1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14D83BBD6;
-	Mon, 11 Mar 2024 11:37:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3953C3B78E
+	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 11:44:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710157081; cv=none; b=osOmgv5f2L2vcBHeZ3gEaMQjWFjHRw4xxk/OGQNAvKIzc/4mwGD1jOyR/eYN5PsvCuFf/MJHrppdbEZyddZf4s8WSeT8Zj3rpnpn3YlTiaIv7mj3Z1GxL3vpPKVWKAltPzsgo7HdASCnD1EqyXJt4byPZFD0rg8sRwsp5uMHwNI=
+	t=1710157485; cv=none; b=G3jvLtJNwACF6nzLbH1X5c3mTYv6l04I4/F99fKqlmqilDDaeIwwBTjwXYgw3Euw/U2aaPXXE+JtYRt7Ij0QRn+OeNbSPG/VHDbbm6aykO1LUlV/dNC37xg0lttDU3F31KfsEIHvauojq5d9lmjtTTzgzEh2atQav4SnKucvZoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710157081; c=relaxed/simple;
-	bh=Xww2rG6IPqeBhdEBP4tj86oP6xhbOOQM6z+2Z8fryGE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=lMjDmaZeBVNuI6rhR/KoAYFaqvgTG8g5NwK84jmtD++34Pl2z1Ok4aBw47XDlLIHD3LR1JUySxDBdDpyZi8U7UfMZU3XkI2h3sM1zD4ZQwlw3zAEmip2qNPS4vhQFzcao0jM3g18C40Kq8RIcVtFoQxoprb1EqGp5/30lPwW9u4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KIXUJ69w; arc=none smtp.client-ip=209.85.221.52
+	s=arc-20240116; t=1710157485; c=relaxed/simple;
+	bh=AKd86koyfwBfcumKpDfpr+YVSyvnmxZPDPbes8DXjCE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VWJgCNVrPMF4f/i+ZrjQyd7R3V/6AVjTKsHKUIxNGEyrue6gCwQekGMI47JrIFM7n+4EYT5AWoa/Xt/sOCB8cl4zPU5xpkKOgfgdUp/xwxsoJlRrZ0Wlpkurdj7GTLTImeM37ENAMHWuJw8zq6b1tfm5+RPAm17ks8cF6Kv1Tcw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OzvxGsX1; arc=none smtp.client-ip=209.85.210.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-33e70d71756so2106252f8f.1;
-        Mon, 11 Mar 2024 04:37:59 -0700 (PDT)
+Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-6e64997a934so3260323b3a.0
+        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 04:44:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710157078; x=1710761878; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=UNidjb7UaHC40jeV6l+KqsqSEZYYut5toBjevl2L6WA=;
-        b=KIXUJ69wYjAin6U0fUPNLGOsTITi3zuMiEIL0yI5rB2uFTHC0lTSeW54c7tb9rpKxd
-         Xm+ZCk8fzXtBfuD9lE50BINvjATDdpJd0c13FfAR03TzFLAtYO3LbCceCmSnPORm7e2N
-         bQy4Qf4EkB3zncZwgglHmU9qk5G8F4iJjwNrGSHZJlrnTI/jGyMO/jybNG1omLjs3lNe
-         J7oLLQj1h926APPSHE7Cm3YDu2yGTM/UxR+jvxx59Y2/LGdtiu3oYEhgtpQnq2+PGty0
-         SLcYrRCy2BWTMKi9MwrJJ9bx9LecYaJpmu02qOud8Cn9XxVM2Qj95ydSZ3QT7M/+KN7x
-         0U+A==
+        d=gmail.com; s=20230601; t=1710157483; x=1710762283; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=6T0UNjqr8f4BqOYV/Wf+JZvk2j4FjJ+sWuTiIamEBZg=;
+        b=OzvxGsX1BQ8ngQTYABuYIDQDjsAZRXsYicHcDWJtG/k5g2IJK6BLSHZJb80xCbV0Fn
+         fSl5dBzrVSm3s1zeEeq+SlwU1u7UMPFjrbvB04FGMoM3qk3DuhM45D1oMcJF/fduxD8w
+         T5Hk7Dhp2vsh4mxb/46rE5nQMrfDqrLoRnlcP2i+toIl8PaADod/aKQs2T15VO4OgH3m
+         gAja97bgqSBCt+jD68ok4Nh3oAp/hqpI7BL3HnffY0bv+jDl4aKu94qvrTpIwDeLcwq6
+         tjJugop8zsVjvABac8cfDMjOGi0cv9OcI4pa24uJHB3EpNYx/OAiIlv25KeFibEJj6ih
+         sCDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710157078; x=1710761878;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=UNidjb7UaHC40jeV6l+KqsqSEZYYut5toBjevl2L6WA=;
-        b=nab/wU0jr4ok5IDwm/WvXdzRA8vMWNIoD4lsajCxzm10vaRH0mKvmDn4cz1V+G7dux
-         V3Ovzp9QdMkAgbE6KMK7FLDDDPqu/tvoTNyVZkB3G6rMboGvnQurYxJb2v4ODLcfN6AW
-         buDPudFh+dhWlDDmBNPV6nzVsiA6hY93MboO5vlGicIvcCwjzUHNFAms+dWoBH7oA6lx
-         03x6OsqbEffD7rH6SG+k5loHj2Qohui329nawlaHSzBZCS5lPUbtfiDzJN3qDKQkVrrz
-         /o2n3bsR8i8VISQqkOmKzTYubYvLtqvw/prD1z+z5ZMiNf19GXjTp/E4l2CMXosUcMTW
-         mgQw==
-X-Forwarded-Encrypted: i=1; AJvYcCXAMqWHLwlNjeVb779tkZYEwBySi8xXpc9LZGJE8zBKDPW3IPJlNCKnT9RG/F3qIthmRSP5yKJK01R14czsnKijfnaC/Dm7NSLR3KvVmeUxfBLRO01mbxWyIv89JLSsL3uUuINDmoVa5EL9Dy5A3DZOFWrkVNONdyjsiIs+KTMSxZuBaYrwfHaOkr2t6ikOX5u9j88gBWgy
-X-Gm-Message-State: AOJu0YyH8Gh9Qm/JBy6REsUbzw/lmdAtqtGmVXqdIO14dzbV83Ffl8TK
-	09PckZzMunl8HDgcfJ7xwn79+yDAaR8t0rsgIZkvTXa+YdbhmitnwPj/fiZVJ4g=
-X-Google-Smtp-Source: AGHT+IEIsQ6yMMM4IwsxEM3/4H66Xu2AGlncrFEnzBj5tNJTfxJSRuQi3ZDMKFXTcMcwoBI8gKnocg==
-X-Received: by 2002:adf:a15a:0:b0:33e:9ce8:407a with SMTP id r26-20020adfa15a000000b0033e9ce8407amr966868wrr.13.1710157077815;
-        Mon, 11 Mar 2024 04:37:57 -0700 (PDT)
-Received: from vitor-nb.. ([2001:8a0:e60f:3100:f272:bc42:d450:41d1])
-        by smtp.gmail.com with ESMTPSA id y3-20020adff143000000b0033dc3f3d689sm6213976wro.93.2024.03.11.04.37.56
+        d=1e100.net; s=20230601; t=1710157483; x=1710762283;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6T0UNjqr8f4BqOYV/Wf+JZvk2j4FjJ+sWuTiIamEBZg=;
+        b=tq2y6d6wd6CmlYYCubeHRi9C59wIYx79Q8wGEsUaoVUCLVOcIPH3aYFE4zbU346I7e
+         QFpgemTOFl2FbvGUT+JepOramZV1TN7p4Nzbje/o9VYBAB8narFO8VuH3vdsNpgqzc14
+         SSDGHVvySgoWv4M/dIlYI4jhlg1KldHYNRkthJXUxkyjH4WI+vDIdpw1P6wxj31Dzatw
+         6TRFBOPquYFUCZ7uEehH/BP3n1mudNGU9doCPmbSdRgCdELSiHaFsiJbrRrlKMPbFK/H
+         n/oMezB/5eBO1vF3gcGdH650ShM8SmFSxMPZzEuKTO4sAXdKMz9xM89O8wok87wxuJJE
+         JLUA==
+X-Gm-Message-State: AOJu0YxeZcGwCPAbm8OLhNvQtDwI5VGQyA6x6L6DZ4TdbJ3E7oI8znCe
+	RZkXH9WtVXVL6EcLfcG1BAxyztK6qUjUmZWbFZXJ6O/XJmN/UYTI
+X-Google-Smtp-Source: AGHT+IFhZ03vXc/CLpPN25M3t1Lanu4UfYz+2sNOwU8Lxl70c9Z3MCWxmLyxBfJOOXZJTmab4kC6qw==
+X-Received: by 2002:a05:6a20:8f21:b0:1a1:3812:aa2d with SMTP id b33-20020a056a208f2100b001a13812aa2dmr169783pzk.9.1710157483474;
+        Mon, 11 Mar 2024 04:44:43 -0700 (PDT)
+Received: from Laptop-X1 ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d5-20020a170902654500b001dd652ef8d6sm4623543pln.152.2024.03.11.04.44.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Mar 2024 04:37:57 -0700 (PDT)
-From: Vitor Soares <ivitro@gmail.com>
-To: mkl@pengutronix.de,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Thomas Kopp <thomas.kopp@microchip.com>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Vitor Soares <vitor.soares@toradex.com>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH] can: mcp251xfd: fix infinite loop when xmit fails
-Date: Mon, 11 Mar 2024 11:37:48 +0000
-Message-Id: <20240311113748.302566-1-ivitro@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        Mon, 11 Mar 2024 04:44:43 -0700 (PDT)
+Date: Mon, 11 Mar 2024 19:44:39 +0800
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jay Vosburgh <jay.vosburgh@canonical.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: bonding: Do we need netlink events for LACP status?
+Message-ID: <Ze7up2WpWa3Yv5Ap@Laptop-X1>
+References: <ZeaSkudOInw5rjbj@Laptop-X1>
+ <32499.1709620407@famine>
+ <Zefg0-ovyt5KV8WD@Laptop-X1>
+ <15143.1710040289@famine>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <15143.1710040289@famine>
 
-From: Vitor Soares <vitor.soares@toradex.com>
+On Sat, Mar 09, 2024 at 07:11:29PM -0800, Jay Vosburgh wrote:
+> 	Generally speaking, I don't see an issue with adding these type
+> of netlink events, as in normal usage the volume will be low.
+> 
+> 	Looking at the code, I think it would be a matter of adding the
+> new IFLA_BOND_LACP_STUFF labels, updating bond_fill_slave_info() and
+> maybe bond_fill_info() to populate the netlink message for those new
+> IFLAs.  Add a call to call_netdevice_notifiers() in ad_mux_machine()
+> when the state changes, using a new event type that would need to be
+> handled by rtnetlink_event().
 
-When the mcp251xfd_start_xmit() function fails, the driver stops
-processing messages, and the interrupt routine does not return,
-running indefinitely even after killing the running application.
+Thank Jay, I will add this on my todo list.
 
-Error messages:
-[  441.298819] mcp251xfd spi2.0 can0: ERROR in mcp251xfd_start_xmit: -16
-[  441.306498] mcp251xfd spi2.0 can0: Transmit Event FIFO buffer not empty. (seq=0x000017c7, tef_tail=0x000017cf, tef_head=0x000017d0, tx_head=0x000017d3).
-... and repeat forever.
-
-The issue can be triggered when multiple devices share the same
-SPI interface. And there is concurrent access to the bus.
-
-The problem occurs because tx_ring->head increments even if
-mcp251xfd_start_xmit() fails. Consequently, the driver skips one
-TX package while still expecting a response in
-mcp251xfd_handle_tefif_one().
-
-This patch resolves the issue by decreasing tx_ring->head if
-mcp251xfd_start_xmit() fails. With the fix, if we trigger the issue and
-the err = -EBUSY, the driver returns NETDEV_TX_BUSY. The network stack
-retries to transmit the message.
-Otherwise, it prints an error and discards the message.
-
-Fixes: 55e5b97f003e ("can: mcp25xxfd: add driver for Microchip MCP25xxFD SPI CAN")
-Cc: stable@vger.kernel.org
-Signed-off-by: Vitor Soares <vitor.soares@toradex.com>
----
-
-V2->V3:
-  - Add tx_dropped stats.
-  - netdev_sent_queue() only if can_put_echo_skb() succeed.
-
-V1->V2:
-  - Return NETDEV_TX_BUSY if mcp251xfd_tx_obj_write() == -EBUSY.
-  - Rework the commit message to address the change above.
-  - Change can_put_echo_skb() to be called after mcp251xfd_tx_obj_write() succeed.
-    Otherwise, we get Kernel NULL pointer dereference error.
-
- drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c | 34 ++++++++++++--------
- 1 file changed, 21 insertions(+), 13 deletions(-)
-
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
-index 160528d3cc26..146c44e47c60 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tx.c
-@@ -166,6 +166,7 @@ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
- 				 struct net_device *ndev)
- {
- 	struct mcp251xfd_priv *priv = netdev_priv(ndev);
-+	struct net_device_stats *stats = &ndev->stats;
- 	struct mcp251xfd_tx_ring *tx_ring = priv->tx;
- 	struct mcp251xfd_tx_obj *tx_obj;
- 	unsigned int frame_len;
-@@ -181,25 +182,32 @@ netdev_tx_t mcp251xfd_start_xmit(struct sk_buff *skb,
- 	tx_obj = mcp251xfd_get_tx_obj_next(tx_ring);
- 	mcp251xfd_tx_obj_from_skb(priv, tx_obj, skb, tx_ring->head);
- 
--	/* Stop queue if we occupy the complete TX FIFO */
- 	tx_head = mcp251xfd_get_tx_head(tx_ring);
--	tx_ring->head++;
--	if (mcp251xfd_get_tx_free(tx_ring) == 0)
--		netif_stop_queue(ndev);
--
- 	frame_len = can_skb_get_frame_len(skb);
--	err = can_put_echo_skb(skb, ndev, tx_head, frame_len);
--	if (!err)
--		netdev_sent_queue(priv->ndev, frame_len);
-+
-+	tx_ring->head++;
- 
- 	err = mcp251xfd_tx_obj_write(priv, tx_obj);
--	if (err)
--		goto out_err;
-+	if (err) {
-+		tx_ring->head--;
- 
--	return NETDEV_TX_OK;
-+		if (err == -EBUSY)
-+			return NETDEV_TX_BUSY;
- 
-- out_err:
--	netdev_err(priv->ndev, "ERROR in %s: %d\n", __func__, err);
-+		stats->tx_dropped++;
-+
-+		if (net_ratelimit())
-+			netdev_err(priv->ndev,
-+				   "ERROR in %s: %d\n", __func__, err);
-+	} else {
-+		err = can_put_echo_skb(skb, ndev, tx_head, frame_len);
-+		if (!err)
-+			netdev_sent_queue(priv->ndev, frame_len);
-+
-+		/* Stop queue if we occupy the complete TX FIFO */
-+		if (mcp251xfd_get_tx_free(tx_ring) == 0)
-+			netif_stop_queue(ndev);
-+	}
- 
- 	return NETDEV_TX_OK;
- }
--- 
-2.34.1
-
+Hangbin
 
