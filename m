@@ -1,147 +1,121 @@
-Return-Path: <netdev+bounces-79143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B4DB877FB7
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 13:12:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42C48877FEA
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 13:25:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9844281E7D
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 12:12:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE3061F226F4
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 12:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE193C47B;
-	Mon, 11 Mar 2024 12:11:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57FC03C097;
+	Mon, 11 Mar 2024 12:24:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K0acgCqd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DUDGwidr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D4213BB48;
-	Mon, 11 Mar 2024 12:11:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F8FF519;
+	Mon, 11 Mar 2024 12:24:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710159113; cv=none; b=ZrKU6ipbQrS2YckT6mD89lZD8T61gezuZ3bEHkeywop3w6uhRH5ng3UWnA4LWg/gEjMEgasAzlD/CoDJ1t59Thjsqg2NrgHMDd93Uc5BKcfY3DDP1sd9K0G3XH72uJVVNef+uafNjCv9ax9W//lyVYggF05xGYy3IK6KLvqaaTI=
+	t=1710159895; cv=none; b=M54ya5rvgrC0CBVNAWJOBKaZ0Ceyb5FBo780RzXCTvMWUh65qzbHAjGAhiiq0RITj305Bt7f4UTM5hF35UVQLTGg7vG4xx0OWYACYtKuXIesnnb5Y2E17pjSstnYwibdYlNzeWIsTyNej1Kmnwv0swdbk+rIHCoL0rQ0yB2g0No=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710159113; c=relaxed/simple;
-	bh=do5Fzw84xe03KvWmx+Hc5C9ekh46v1TkZG4CX1Wrtdc=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Wpv3MTzrucld8rHWPa5vCxdxpVaUR/RdjQ0U3QOQ06xdAQ2bpead41hXNoD/qFwPE4DU4O600V0zkuz9xYawQQXLMx4uivRtkKQK5Yktj8SiKWUiq/2SIw8BIrW/gcIudG/YN1OQrA3Icbg15WRMkDNkBw+8rpUPMPvZ24OC7hQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K0acgCqd; arc=none smtp.client-ip=209.85.160.179
+	s=arc-20240116; t=1710159895; c=relaxed/simple;
+	bh=LluHyhjKemLvziSLq4mu73Bj2Ez4L1mtMOYpKAIdpW8=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=Jahq4AfxTBidA+pDAUhzGweIwQpoFAg8OOFnEBeEV+W1+emM/eCTxiYY19ixtUhzRoOo3KEehYcdhGh7uee3OzTeUTT1qGOQqk6B+mzYrTm812dr7XxIaG1DPdT0EZNnKjiOW4R9k/q7SjyMGfyZpsFpQcBxB9rvslRUuvFh1O4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DUDGwidr; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-42edb7a1114so14458661cf.1;
-        Mon, 11 Mar 2024 05:11:51 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1dd8ee2441dso2357485ad.1;
+        Mon, 11 Mar 2024 05:24:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710159111; x=1710763911; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1710159893; x=1710764693; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=t4Xg+fbI3bvOXLt2U1Rug0LW8HB70pTO+WPSQxPgpRE=;
-        b=K0acgCqdYsrsiSPrtt09zm5gRnVwSYZ9k4DVJGxV64+QF40hfzd5kzEh6uIK90vSnO
-         JyAnw7snRFXtCFfutjqGjb6NePaFGDrYnpWwTClH5XqfF+hpMrW0lyfll+Qo/Q+Oj9po
-         bYZ1U/1Fsbxhd3BS004gYyTY4DOsZJPGWOP6fWLr4nEzM4VLGWyGQx0RVMJoIxc0DVzz
-         mZSM3P0wLNga3JUEZD8mUM2xG0K5/46MOJ0mt4kWAjOpSsKGIPsCoFSRFVDxkJyAfXk0
-         sV5Ajtcthavyw+7Z05K2adfxC4mzW5LzkduR6AS68gKg9nV2QbZM8SwpSmo4CRMgM7yT
-         vo0w==
+        bh=NJV6iNofzvP9/1KByDDXNTrF5EbVufMaGdHaNE1qGbU=;
+        b=DUDGwidrhzU+TsTaXz6zPbjio/2q/ICe6r2zTffe9JP+zw+y4wy3uBiIcOh4LeN9p2
+         uTgww5iH+BXkauAygiPOFyUXnSIvVDYleloifYDmtOYOyE7X4IawfQPIxHdxyjF9M3sJ
+         r3DiV1iRnrgvfcbR6U1Rs0X/UEu6RNh87cQ4EOq1KQRcRk/fVfv9fEQQb5USqgasTCxl
+         3cgtS18P1bH1g1+p5dxlwvuzzwZO3pV1TcbMqrE6/AgNQjCZJh0wyjvtxRUARSEXSEAL
+         UBqYijAkzET92quzZXugrq2rBCSycnGHGcOPpihkDLy2HvHJTP3In41dFmFMQ6DS1sDi
+         MNuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710159111; x=1710763911;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=t4Xg+fbI3bvOXLt2U1Rug0LW8HB70pTO+WPSQxPgpRE=;
-        b=nELyggMWI7X5MoXnk4IDv76w8MvqE3fQTVoGDp8nuVyXb4G3DZ0DalHRuuG7Xg++yd
-         x7zAvNbojT73d9UeKFIRwAwx6u3O6UYWM/I6eoPevGybvx0ZK5kotnZu1W8Ot6auJeAJ
-         IK+DWk+8+btqe/oMkrRD4+1fNOzGHxGdVR0fQYcN/MmRJ9xw+ifPzqulaIKRmJs8cAuf
-         RGTv/2xDJUpAmo1KZATbgHgis4Wj1YfKz9poI5TTuLZ2X6wUwWaBmX3wkJXOvA3erZbr
-         qbq2Qv6TNE93SzYsjWiprfQwAwPkhwph3R0Z+fjLJPNS/ZqaX/AfW1NcXTbEuioyorvu
-         bLcg==
-X-Forwarded-Encrypted: i=1; AJvYcCU4q7xhk7avHsXDzZ3zeFRQiWEgBrwzV78pOke/wc4kEh+HRV5tGx9xShmlK9Z790cthlMmBjICiXLHNr/+8i+XiFinMq+r4hpFQRofQRF8m3lgjXe0U88phSHcmxRE3mv6WvHMu/hFouxlBpzK6e3wYtvjwgJuUf6TkiTQkbtc9ElJQaBW
-X-Gm-Message-State: AOJu0Yybqq47+9gzLTpCl0T1KErCRN9uQmvghYX34iVhozkiC+7gSMEI
-	LEQsIcgwlkw1+cB6HgkWslShgUHTPM8lc5x1RZRZepg132ldgXn7
-X-Google-Smtp-Source: AGHT+IHklVTd5o7UKWkApU2MI7ymCi2nWEWhmzGewC9PGTNlIhp2Xg8zYorcs6MTDTUZ18JGNneJmQ==
-X-Received: by 2002:a05:622a:489:b0:42e:c111:7662 with SMTP id p9-20020a05622a048900b0042ec1117662mr8498312qtx.16.1710159110890;
-        Mon, 11 Mar 2024 05:11:50 -0700 (PDT)
-Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
-        by smtp.gmail.com with ESMTPSA id v13-20020a05620a090d00b007884103dfcesm2606265qkv.87.2024.03.11.05.11.50
+        d=1e100.net; s=20230601; t=1710159893; x=1710764693;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NJV6iNofzvP9/1KByDDXNTrF5EbVufMaGdHaNE1qGbU=;
+        b=Ub67cpu3aoBLQvBt+9ZNBx0gflUP9cwDWZMjFuf50E4e1HTaUcBrqpU1DkpIFAo5tI
+         oCZp8d0kTh5YEjNU/yfp1L0ryuh8xJqplzQtpyUTCyo+J6vPo4a59MGPVMEeWQF0EtRz
+         0Ou4eGcom6u+yH8UMqnRXCFpLm+8UAHjgAeCTu+BgykcrNugoKIcU2GsmfFKMeYeekcp
+         1C8kgxmjnJvKJIpsnMvlTuFzpAl90m+peLQuceXuXcCZ1uciTXv2e8KMkmL38+H4w5hH
+         TVvUNkHeAirdjqQgS9MrGikEZhOQXWv8mClqMaqt+2YIc7zwnKlI7WCB5mqliKbyaeRI
+         V4zg==
+X-Forwarded-Encrypted: i=1; AJvYcCW+V86w8cUGGbOhH8OLH06fCgt372grMH14so5x7M5udG8FJniucuhLv765g+/znlZ5A+e5eC6Rxskfa+GzmMqomnYG8kjk
+X-Gm-Message-State: AOJu0YxIrwajbXb2oKwDD5Sdn63pCondr8NWhV+QNudAfqCeXVgJq7pE
+	7TcO1CCIoHTgT9hdY13C8jVuLjb4KS2S6FBjtDml5h/dn8p7Qz+tP+w9mjFHBP/1RF1c
+X-Google-Smtp-Source: AGHT+IHck0HQwvtlHJQzVHVrty9+g5PpjZj7C8mI81TwnrdjValzLLBDT+ZhtfYoISQ5QsL8BOBcIg==
+X-Received: by 2002:a05:6a20:9587:b0:1a1:67a6:511e with SMTP id iu7-20020a056a20958700b001a167a6511emr8859997pzb.2.1710159892844;
+        Mon, 11 Mar 2024 05:24:52 -0700 (PDT)
+Received: from localhost.localdomain ([111.194.45.84])
+        by smtp.gmail.com with ESMTPSA id p48-20020a056a0026f000b006e69a142458sm1075106pfw.213.2024.03.11.05.24.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Mar 2024 05:11:50 -0700 (PDT)
-Date: Mon, 11 Mar 2024 08:11:50 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Richard Gobert <richardbgobert@gmail.com>, 
- Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- willemdebruijn.kernel@gmail.com, 
- dsahern@kernel.org, 
- xeb@mail.ru, 
- shuah@kernel.org, 
- idosch@nvidia.com, 
- razor@blackwall.org, 
- amcohen@nvidia.com, 
- petrm@nvidia.com, 
- jbenc@redhat.com, 
- bpoirier@nvidia.com, 
- b.galvani@gmail.com, 
- gavinl@nvidia.com, 
- liujian56@huawei.com, 
- horms@kernel.org, 
- linyunsheng@huawei.com, 
- therbert@google.com, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org
-Message-ID: <65eef506331e8_1db78c2941c@willemb.c.googlers.com.notmuch>
-In-Reply-To: <967ed173-b556-4bfc-b3c8-ff0fc902b951@gmail.com>
-References: <f939c84a-2322-4393-a5b0-9b1e0be8ed8e@gmail.com>
- <88831c36-a589-429f-8e8b-2ecb66a30263@gmail.com>
- <CANn89iK5+wqYdqMt_Rg3+jO+Xf4n4yO4kOK0kzNdqh99qgL3iQ@mail.gmail.com>
- <967ed173-b556-4bfc-b3c8-ff0fc902b951@gmail.com>
-Subject: Re: [PATCH net-next v3 4/4] net: gro: move L3 flush checks to
- tcp_gro_receive
+        Mon, 11 Mar 2024 05:24:52 -0700 (PDT)
+From: Zheng Li <lizheng043@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	nhorman@tuxdriver.com,
+	davem@davemloft.net,
+	jmorris@namei.org
+Cc: James.Z.Li@Dell.com
+Subject: [PATCH] neighbour: guarantee the localhost connections be established successfully even the ARP table is full
+Date: Mon, 11 Mar 2024 20:24:01 +0800
+Message-Id: <20240311122401.6549-1-lizheng043@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
 
-Richard Gobert wrote:
-> Eric Dumazet wrote:
-> > On Sat, Mar 9, 2024 at 4:35=E2=80=AFPM Richard Gobert <richardbgobert=
-@gmail.com> wrote:
-> >>
-> >> {inet,ipv6}_gro_receive functions perform flush checks (ttl, flags,
-> >> iph->id, ...) against all packets in a loop. These flush checks are
-> >> relevant only to tcp flows, and as such they're used to determine wh=
-ether
-> >> the packets can be merged later in tcp_gro_receive.
-> >>
-> >> These checks are not relevant to UDP packets.
-> > =
+From: Zheng Li <James.Z.Li@Dell.com>
 
-> > I do not think this claim is true.
-> > =
+Inter-process communication on localhost should be established successfully even the ARP table is full,
+many processes on server machine use the localhost to communicate such as command-line interface (CLI),
+servers hope all CLI commands can be executed successfully even the arp table is full.
+Right now CLI commands got timeout when the arp table is full.
+Set the parameter of exempt_from_gc to be true for LOOPBACK net device to
+keep localhost neigh in arp table, not removed by gc.
 
-> > Incoming packets  ->  GRO -> GSO -> forwarded packets
-> > =
+the steps of reproduced:
+server with "gc_thresh3 = 1024" setting, ping server from more than 1024 IPv4 addresses,
+run "ssh localhost" on console interface, then the command will get timeout.
 
-> > The {GRO,GSO} step must be transparent, GRO is not LRO.
-> =
+Signed-off-by: Zheng Li <James.Z.Li@Dell.com>
+---
+ net/core/neighbour.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-> Sorry, I should rephrase myself. The patch preserves the
-> current logic in GRO. These L3 checks (ttl, flags, etc.) are written to=
+diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+index 552719c3bbc3..d96dee3d4af6 100644
+--- a/net/core/neighbour.c
++++ b/net/core/neighbour.c
+@@ -734,7 +734,10 @@ ___neigh_create(struct neigh_table *tbl, const void *pkey,
+ struct neighbour *__neigh_create(struct neigh_table *tbl, const void *pkey,
+ 				 struct net_device *dev, bool want_ref)
+ {
+-	return ___neigh_create(tbl, pkey, dev, 0, false, want_ref);
++	if (dev->flags & IFF_LOOPBACK)
++		return ___neigh_create(tbl, pkey, dev, 0, true, want_ref);
++	else
++		return ___neigh_create(tbl, pkey, dev, 0, false, want_ref);
+ }
+ EXPORT_SYMBOL(__neigh_create);
+ 
+-- 
+2.17.1
 
-> NAPI_GRO_CB(p)->{flush,flush_id}, and NAPI_GRO_CB(skb)->is_atomic - and=
-
-> all of these are currently used only in tcp_gro_receive.
-
-That was perhaps an oversight when adding UDP GRO?
-
-Simply because the flush is determined in the innermost callback.
 
