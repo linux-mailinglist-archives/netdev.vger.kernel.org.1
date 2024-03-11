@@ -1,83 +1,162 @@
-Return-Path: <netdev+bounces-79244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A14238786B6
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 18:52:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DF118786EA
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 19:02:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D237B1C2116F
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 17:52:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC9F028124D
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 18:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB69524AE;
-	Mon, 11 Mar 2024 17:52:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20B652F78;
+	Mon, 11 Mar 2024 18:02:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aJ4oEThA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K6hOpfN1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE144EB4A
-	for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 17:52:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E738854F8D;
+	Mon, 11 Mar 2024 18:02:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710179571; cv=none; b=RQNjOmyXRmCnB8BrVNsdHZJZL/hwOb/h7ektOIqMUQAalHiuF6BeeI3iXH0GgvO4SF1eno18antUQsJur0G421a4f6+MYnqFczotymM7R52PVP9BXwgJG9ZWRuJuk1AOSQlfDaakYJzUE4THm445JdVxqIQvR+hLrFDIh/h9W3s=
+	t=1710180127; cv=none; b=l0aw9Fl9hEPq0OFf7y0/1Gd17iNB8+aJj6mKDiJ33V3OtlvXjZhp4h0iGQoCWYD2q5Y3itq9z4xs8VnlU7S3d0TIZZsF/sLU93/wP/j4YGOR+CaX2uMofm7A128qCJxWzd0DoUUxwMkZc6vDANBd0doEPdtA5xjntu5kD7gF/Hg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710179571; c=relaxed/simple;
-	bh=Pq/VrGYoi5wgkMhwkZQuka2x8JaohAlIJV57NTIwyEg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RcciIp7Km58BXqumQsju6sUQYr8ESF3gk8e5O6WfQQ+1J1N6pRb7cpiILX1dYaJ8jA/b/9FK5aVdaNEfeSWShmNLddNjRyl5FIsIMKnqZBqyw2Gf41X+HTPTJS/5z7AOZEMBuslEh6mGymsO7qJY0gDSAGYn4NvuhBJVdmL/1KI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aJ4oEThA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24513C433F1;
-	Mon, 11 Mar 2024 17:52:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710179570;
-	bh=Pq/VrGYoi5wgkMhwkZQuka2x8JaohAlIJV57NTIwyEg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=aJ4oEThAjDsk8xudEVnKnuZrY88dH9XuGf+eZS1Eyqc/krTXCwwmSFBvOWbBZCjdU
-	 dbVva/M+HQKKgtdVUCG+MkMy2oIxoZcuiemZ+s4DxDZcDy0asyliSkgIMj3AGlv/j1
-	 fM2C8nTQNyCEJP7k4O58dKTPRcOnztMTPZtlTCpUsZt33F/yrcIsD839fIVeW8ZTKz
-	 v9BmF8fKMQlCfFyZ5r9++O8Bgqx0uaG+bdK1PQAssokMwr9ItGWdwW+Y2S0AfWYl6f
-	 Sa1ZS/NvkPUlz1i03up313ABqz48+LwrA6h81kD1psauHeVGnsVK4nRFuC9Eq/6XnX
-	 aSW8O4W/KMAWg==
-Date: Mon, 11 Mar 2024 10:52:49 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Petr Machata <petrm@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- <netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>, David Ahern
- <dsahern@kernel.org>, Shuah Khan <shuah@kernel.org>, <mlxsw@nvidia.com>
-Subject: Re: [PATCH net-next 11/11] selftests: forwarding: Add a test for NH
- group stats
-Message-ID: <20240311105249.5c350e75@kernel.org>
-In-Reply-To: <8734swlmjh.fsf@nvidia.com>
-References: <cover.1709901020.git.petrm@nvidia.com>
-	<2a424c54062a5f1efd13b9ec5b2b0e29c6af2574.1709901020.git.petrm@nvidia.com>
-	<20240308090333.4d59fc49@kernel.org>
-	<87sf10l5fy.fsf@nvidia.com>
-	<20240308194853.7619538a@kernel.org>
-	<87frwxkp9v.fsf@nvidia.com>
-	<87bk7lkp5n.fsf@nvidia.com>
-	<20240311085912.5a149182@kernel.org>
-	<8734swlmjh.fsf@nvidia.com>
+	s=arc-20240116; t=1710180127; c=relaxed/simple;
+	bh=rkJoFU+8RUcVvUJAcqdZvMWhYKXiwBRaY37lui0QE2U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oNIKJyP3L1Dpeyt67uP16J39ezyB30Sjltxea1KIh4qwCyXP7XwvGDLC554fu9YUmrGAK9lAkxvWWXfWyh/hMIFSbqZBtGZH1pXjQNnnRwe++tzzbfyb6MuelzyKie5oFAvvssAEhbKzQ8bZry3SlWYxoKOLnBA6VNOfuUUhJiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K6hOpfN1; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6e66601f082so2857602b3a.0;
+        Mon, 11 Mar 2024 11:02:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710180125; x=1710784925; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o4R9ADmuK2FzMV+uyNo5OY4V3RZjV78H/xpdInlrSUI=;
+        b=K6hOpfN16tdkcx1IoNQhnhY85iNzGR6aBAR77VXORPZyRXkSjgeUiJw/Wt/VnQXavL
+         6EoDYwzoVee6ARQ58yU71mNQ6Osisd7JA42vq390MOT9iAZSYfuekVOTgGJn53vHrG6v
+         sGAiAqir0/n6fKerRnsy5k1Eo66Bb8hFY5PEWqVDcV+V90vMTaF5qG06+IqOwanlbtga
+         1Ec/UAgcKQqYVqzs/xoEXLztaGK0k2gOtHwSP+lpivqLaaCCrtLzQVurRU7Va5Kamc5J
+         1LLSvWBDRumG1PLQ0GSfbcdM1Z5G5uZyDvpb5a95Ac2YwBH6oUa4U6eJOmms5a29mGs0
+         kadA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710180125; x=1710784925;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o4R9ADmuK2FzMV+uyNo5OY4V3RZjV78H/xpdInlrSUI=;
+        b=fu/6UUVssjiCREhcmXJ5mluJiLdSsC7LBbeTECfP1qgclsd23O9eTb59MpTeQLg6WE
+         xt4qK5ia5JxVSGCI6B/AgCFuYpKbBHwqiA5kUt6JFexCB6TiCry7s/5A5+sQFsTvz+29
+         yTlideJFQpgzqwzez9YsUUL55BlPuIXYrGoxKlu282gidktWGLVdNHKx5tX0PC7/CyjS
+         tbJuJqifTyox+a2Rlf3dMgIMs3s23d7qBqdnEOWskVoSlyp2fywd+7ICXxQUaEI1BSmy
+         WSUbn/lXIxw/JEUbjVAjEIBLsWBBCcolsgxB7kVDTHQJE2WPS1si4+7GYjFkqbOLc49X
+         /o3A==
+X-Forwarded-Encrypted: i=1; AJvYcCUoIBZGD2sr/eKeZ2T3+q0lJrpTWwR0koBh5OGPwkTLWgtIecNFmkPGi/jfSzqp8glGm45nqDV+XKWxj8nMiXacE+nVyME7x4DmgdVFem9f7SRKlsaJcC7/6QVkQM5BNpPn+SUEUVZLZfutdSsYZCtZE+fM1Kih14iu
+X-Gm-Message-State: AOJu0YxtsDyt+VGpixIjM6fjuRzHQuLBqco8CL2Hm7tNZWb9c6+zytTd
+	uB431YzMsXjD7fJfr1935GO1SCb7OoHcU/N1KOdi3+ZSZtvn6YerX38bQB6+ovC/kb+IxVNgHUv
+	ye74QMY9h1HfT5/Onc33IL04fgt0=
+X-Google-Smtp-Source: AGHT+IE0HXRVILcbLRkdcMQ91Ff+mSiLMeMoLaa8RV2aeF2XJTB8yy92gHL1YS2H9RjfeX/2ibS2+rn6n0/Ttk+24y4=
+X-Received: by 2002:a05:6a20:3d87:b0:1a1:4848:98af with SMTP id
+ s7-20020a056a203d8700b001a1484898afmr5735907pzi.1.1710180124799; Mon, 11 Mar
+ 2024 11:02:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <00000000000081fb0d06135eb3ca@google.com> <tencent_E4EB1B6A2584BA2BBBB733409EAE1B524B08@qq.com>
+ <5f1446d409322de91946a569edc0b836daa52aae.camel@gmail.com>
+In-Reply-To: <5f1446d409322de91946a569edc0b836daa52aae.camel@gmail.com>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Mon, 11 Mar 2024 11:01:52 -0700
+Message-ID: <CAEf4BzbbvBEwy6_S1MRjiGWWfS_nxy6qNsEc0_Jdro1c10b8Vw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next] bpf: fix oob in btf_name_valid_section
+To: Eduard Zingerman <eddyz87@gmail.com>
+Cc: Edward Adam Davis <eadavis@qq.com>, syzbot+cc32304f6487ebff9b70@syzkaller.appspotmail.com, 
+	andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net, 
+	haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org, 
+	kpsingh@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	netdev@vger.kernel.org, sdf@google.com, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 11 Mar 2024 17:30:54 +0100 Petr Machata wrote:
-> But I don't think SKIP should trump PASS. IMHO SKIP is the weakest
-> status, soon as you have one PASS, that's what the overall outcome
-> should be. I guess the logic behind it was that it's useful to see the
-> tests that skip?
+On Mon, Mar 11, 2024 at 7:48=E2=80=AFAM Eduard Zingerman <eddyz87@gmail.com=
+> wrote:
+>
+> On Mon, 2024-03-11 at 21:16 +0800, Edward Adam Davis wrote:
+> > Check the first char of the BTF DATASEC names.
+> >
+> > Fixes: bd70a8fb7ca4 ("bpf: Allow all printable characters in BTF DATASE=
+C names")
+> > Reported-and-tested-by: syzbot+cc32304f6487ebff9b70@syzkaller.appspotma=
+il.com
+> > Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> > ---
+> >  kernel/bpf/btf.c | 2 ++
+> >  1 file changed, 2 insertions(+)
+> >
+> > diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+> > index 170d017e8e4a..dda0aa0d7175 100644
+> > --- a/kernel/bpf/btf.c
+> > +++ b/kernel/bpf/btf.c
+> > @@ -816,6 +816,8 @@ static bool btf_name_valid_section(const struct btf=
+ *btf, u32 offset)
+> >       const char *src =3D btf_str_by_offset(btf, offset);
+> >       const char *src_limit;
+> >
+> > +     if (!isprint(*src))
+> > +             return false;
+> >       /* set a limit on identifier length */
+> >       src_limit =3D src + KSYM_NAME_LEN;
+> >       src++;
+>
+> Hi Edward,
+>
+> Thank you for fixing this.
+> I wonder, maybe something like below would be simpler?
+>
+> Thanks,
+> Eduard
+>
+> ---
+>
+> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+> index 170d017e8e4a..3d95d5398c8a 100644
+> --- a/kernel/bpf/btf.c
+> +++ b/kernel/bpf/btf.c
+> @@ -818,7 +818,6 @@ static bool btf_name_valid_section(const struct btf *=
+btf, u32 offset)
+>
+>         /* set a limit on identifier length */
+>         src_limit =3D src + KSYM_NAME_LEN;
+> -       src++;
 
-SKIP is a signal that something could not be run. People maintaining
-CIs will try to investigate why. The signal for "everything is working
-as expected" is PASS, possibly XFAIL if you want to signal that
-the test didn't run/pass but that's expected.
+ah, __btf_name_valid() has a separate __btf_name_char_ok(*src, true)
+check and then skips first character :(
+
+What Eduard proposes makes sense, we shouldn't advance src before the loop.
+
+Eduard, I'd also say we should make __btf_name_valid() a bit more
+uniform by dropping that first if and then doing
+
+if (!__btf_name_char_ok(*src, src =3D=3D src_orig))
+    return false;
+
+where we just remember original string pointer in src_orig.
+
+WDYT?
+
+
+>         while (*src && src < src_limit) {
+>                 if (!isprint(*src))
+>                         return false;
+>
 
