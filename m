@@ -1,106 +1,85 @@
-Return-Path: <netdev+bounces-79204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 727A487846A
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 17:02:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 447A087848D
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 17:05:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 118381F21001
-	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:02:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0020F282E00
+	for <lists+netdev@lfdr.de>; Mon, 11 Mar 2024 16:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C516D482C3;
-	Mon, 11 Mar 2024 16:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C80CA41C7A;
+	Mon, 11 Mar 2024 16:03:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LVm7v3Q0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jqQi97d/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12587481C7;
-	Mon, 11 Mar 2024 16:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 997174CDE0;
+	Mon, 11 Mar 2024 16:03:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710172877; cv=none; b=Pd3B1RPQVcAPxB4UJYdcApx0eJyhnA/O6u8CXUN8vUjEvp/IMIqsL6s+Ohus8SdV1vI45WK2YvvsTF3GYj2SIOjfThTeAO5hgaQwmm7KJonVY0PcWoCinI06l/dvcIUFC6cH5m+F44aWRmlR/nOpRElPGBI/ZyBhibfJw02Zoog=
+	t=1710173023; cv=none; b=bCRLvhrv6t41JQwYNBTIlZI8nTXB9kib/fCHbvL6XRQIKFAqqgaN3h1cpXh/HbHRpbVEBEvOm7Tm4ggjLciZHzYysmTRVJ5qwhnVqz0tW1PIOM+jOYUTPkuScuirZwsDhoc+pQpWHxUXOj3srZvgdtlHjb0HEI/5hFpeKszdDwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710172877; c=relaxed/simple;
-	bh=41zQ+Cg5MleRSicMlSKoc5t0f5kKFmpCToYhvnKVog0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eOrz6HnzXHvKo59J/xJq3Yzxorum6brE9CgBOhkOjRCV3bCDVszbdjT4eFayz8sQjt3cP8rqZmCKan19YhVeVpLUcprtVqJOF5LlWjAsuyG3SPjTHOw/XJZcW3a9MW4QDIyW+A/puoP+kFknB40ErkdCtq+EHZrRLJyBDNLID+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LVm7v3Q0; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-563c403719cso5481994a12.2;
-        Mon, 11 Mar 2024 09:01:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710172874; x=1710777674; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=41zQ+Cg5MleRSicMlSKoc5t0f5kKFmpCToYhvnKVog0=;
-        b=LVm7v3Q0nyEEvDH0HcDCtPrmDx2hsc+6vv/R2ILYdcn0VLdzH4xenw9f2WT0/73mfd
-         ipHmdZqJ9mV+k8lGuoFhLnh52gOpJ6ezmDn67AbVV7p2bLTqMoR6MJ5pt1CI1oA0Sq2p
-         wHPFBlJkWDDoQF+j2+tioIlkWFxjMqwIFkdgHXIuXaclgqsc1VJa16WdnYmSNzV6RaA5
-         btkB8fPbV596cXOqrNJDzTBS2iIObRt4W2k+bmabDxTz8j+272VKQFrk96PheKeVc+LD
-         FeSYXbGpnhKb6nUOr8JmhkW76dKL70qLFAEYvMW//6rbb9gJxQpRKusXEEF+a/tbFXDl
-         frJA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710172874; x=1710777674;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=41zQ+Cg5MleRSicMlSKoc5t0f5kKFmpCToYhvnKVog0=;
-        b=YLsh3aATjRSWRh3Xe2nGr2MUo0WL14hK3HyYloY7h0U17lbWdm8cWqRYVIEwoOozUo
-         8n9s5mUZpLWiuzwr5+OXcxqyn2a63InaxzHiEjy3c5xxeKw+PQ6DFSRrLf0NngsYu+DQ
-         yRQmzAj/m3jFM38W6WWdn8HJuJAv1boQmpBpt+BW+HnYvVpQH69wQMMOLgOVbHAvcmEn
-         D00Gg/OkpNubVR0YyxrIepusLbgKPBOuM/a1fMSIHJKmSdac4npCTXjJRLKiCgRZ/5aK
-         EzO7DeEIRGcnDPQB2D1r4NSyzTVoks18TYwJyBcaskBNJZ/qHSj5EgclDWmj4TY0vFQ5
-         UEQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUIMc61b74/bW4yxBxzXXLIoFQO/hxp40nDze1f3Ily8GVhTcbm2lHSX/uuFCZpF71eMC+k2XSXiGnlzWbtvH/pZiavdu50frOVFN3Grl2YwDqg6seoXwrbB0WUtMQkP/0sQ1xzcTda
-X-Gm-Message-State: AOJu0YyNHunRA6qXkshJcwgZnLWhaIDFUZ3eI2yFxGkdTOtfgF0xA2IQ
-	MGxEYiveGaon5rTrKG33KPunt8B9vuT+jiYhCOjiZAFqPT3Pg3ZhFve9bViZpK8l88yFI5UHe+o
-	FbwVVb3rX64pdebgJahKxUd2M36E=
-X-Google-Smtp-Source: AGHT+IEnl1HMkP8uN8zzAUacU+gQbLT6o2a0BYYMzppWl3gat0wOwOYaShNr8zSLjLtEZkIyN5isMSlMi1SVVADQS30=
-X-Received: by 2002:a17:906:71cb:b0:a46:2729:c42b with SMTP id
- i11-20020a17090671cb00b00a462729c42bmr581058ejk.71.1710172874178; Mon, 11 Mar
- 2024 09:01:14 -0700 (PDT)
+	s=arc-20240116; t=1710173023; c=relaxed/simple;
+	bh=IQ2AfFxikmk5U+8nWeI3XB2vOqdm6NYFDmK5mhJMrjw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uc7VYOjN4ZaKJ4cFy1s136KDlswyn21WOLSpOQnWPL5T1fGyaBHGvO6CZfRRxdYczZ0Qd3r1TRt5p34Uremya1L2vhxh86Hl+KYjDzxa7P1uFhtgk1WngoRsC1oqDUmy6Qmd+nEsUau0IfoIDOIImcvWM1dYifZ9GkAoGe93ssM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jqQi97d/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD972C433F1;
+	Mon, 11 Mar 2024 16:03:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710173023;
+	bh=IQ2AfFxikmk5U+8nWeI3XB2vOqdm6NYFDmK5mhJMrjw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jqQi97d/3zBbY8YxDP7/y+JGZYkqLDyXP5Zylg4mrmY9V499OoKyW9ha19xDT1s2j
+	 cG9Lfgs/cCWdJDIGOWQOJeZDvM3zDY6xi8HIbCvhizDoI8s5HIMiQnyzqh7xaTp2up
+	 Onpyy/703Z6kVFkWiIZ/b238xKS88I0RVTRcV2wZEg9lTdGqd31OZzEGbCj9hG4zAi
+	 OXo0mx9W6G0S0CudeQnmh5eql5XEzc2M6QMsS7w2npJjATNpLNw0MI0ujSi2vuVFfZ
+	 BZYBvl7T9lKAE5/Nqb5wt4p0r70E7e+C7Rj3tjlrTyRr8Z7GMm/+THMOQHuo4PlOv4
+	 w3PueFmKlJAdA==
+Date: Mon, 11 Mar 2024 09:03:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yang Xiwen <forbidden405@outlook.com>
+Cc: Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
+ <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, Krzysztof
+ Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH net-next v11 4/9] dt-bindings: net: convert
+ hisi-femac.txt to YAML
+Message-ID: <20240311090341.32509303@kernel.org>
+In-Reply-To: <SEZPR06MB6959090F2C45C3E5D6B3F9F496262@SEZPR06MB6959.apcprd06.prod.outlook.com>
+References: <20240309-net-v11-0-eb99b76e4a21@outlook.com>
+	<20240309-net-v11-4-eb99b76e4a21@outlook.com>
+	<SEZPR06MB6959090F2C45C3E5D6B3F9F496262@SEZPR06MB6959.apcprd06.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240308092915.9751-1-kerneljasonxing@gmail.com>
- <CAL+tcoBsTjTRMiFzq_EHyYSBr9rROO-QFY5PZ3Aj-M4YDLpr=g@mail.gmail.com> <20240311085632.2d0742e6@kernel.org>
-In-Reply-To: <20240311085632.2d0742e6@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 12 Mar 2024 00:00:37 +0800
-Message-ID: <CAL+tcoAv=nBRyRVFhgKkAWu1v5Uhs4aNxBxTRPs5YE89R7sf-w@mail.gmail.com>
-Subject: Re: [PATCH net-next] netfilter: conntrack: dccp: try not to drop skb
- in conntrack
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: edumazet@google.com, pablo@netfilter.org, kadlec@netfilter.org, 
-	fw@strlen.de, pabeni@redhat.com, davem@davemloft.net, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 11, 2024 at 11:56=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Mon, 11 Mar 2024 14:37:25 +0800 Jason Xing wrote:
-> > I saw the status in patchwork was changed, but I've not received the
-> > comments. So I spent some time learning how it works in the netfilter
-> > area.
-> >
-> > I just noticed that there are two trees (nf and nf-next), so should I
-> > target nf-next and resend this patch and another one[1]?
->
-> I don't think you need to repost, you CCed the right people, they
-> should be able to process the patches. But do keep in mind the
-> netfilter trees on next patches.
+On Sat, 9 Mar 2024 20:30:21 +0800 Yang Xiwen wrote:
+> > +  clock-names:
+> > +    items:
+> > +      - const: mac
+> > +      - const: macif
+> > +      - const: phy  
+> 
+> Still not very correct here. In downstream the core can also have an 
+> external PHY. The internal phy is also optional. So maybe this clock 
+> should be optional.
 
-Thanks for the clarification :)
+You are responding to yourself 4 min after posting?
+What is the purpose of your comments?
 
