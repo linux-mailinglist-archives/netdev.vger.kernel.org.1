@@ -1,115 +1,220 @@
-Return-Path: <netdev+bounces-79441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D34128793DE
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 13:13:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3143E8793FD
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 13:17:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5B040B212AC
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 12:13:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B156F1F22C75
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 12:17:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83FC479B92;
-	Tue, 12 Mar 2024 12:13:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D4E7B3C1;
+	Tue, 12 Mar 2024 12:16:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="XsIkcYpm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VOeyputJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CAC679DBB
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 12:13:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E5E47A707;
+	Tue, 12 Mar 2024 12:16:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710245607; cv=none; b=YtXJezt8NcrqbJIAbFMg6p1b6Q4uFKw+Dx1kW+6I+jb/dWEPs8ypapG3Uen81GedhN3Jwh1M8nDmnTYgVWdRaYMTEbsv1m912X/jXa3QQnULDs4Z2wFYtxMPKRgu7suqtOGpWb1ytgiHdzpY8uUtV/vjZqKoRNwlJStH97GQbyA=
+	t=1710245771; cv=none; b=GOu/9y47vPmSeZ/xSj/Uk0ENsnlb7DQsgS7RCOojGQZU9nvFvb4i8JmEGR7+CYN6bzauZmxB+jn4ryfGjcsMSeyn+BWr9dg6JWpuvPhGdntiYiitnYS2aaChZ6XU2dGSycUQBVStSlJMEfsuVQmdQrxTHavq2FNfkVHz3YwsIJY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710245607; c=relaxed/simple;
-	bh=NtXlbKnL5euhiw52oyQxA4wkkiqfbzjgbCHftvNmB6s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c8FLm25GxoxmcCfm7J5kBOyFjeAn6FYzsFZgsPvjR4KSHcsbkHq1A/Ti1ApLSg96vd9hlhE6HQVeq0z3ujuG5IYVhYr8Kmus0LFypdLTXztY7wDRtjPvtPpWdYIuHkMYjwJQeVnI0XKgriLG0ttIJvN8Nw77p23QGrsrAAC1sGo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=XsIkcYpm; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-56829f41f81so6054631a12.2
-        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 05:13:25 -0700 (PDT)
+	s=arc-20240116; t=1710245771; c=relaxed/simple;
+	bh=Od215/XrPMqF4+aWXTeN/DubjcXHAzjLof05GAiv7mw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Gghpa8ILHsW7naHeUJqirfSvhBlEUH9tspX6P2AkYlLdL3Cc5bvsAll0/s6jEKOTD8PkB+PFSNwIoLjZyV/ObboI8Vubo8iXjkMTAau0Zewp5FSBa/Z0VrUxyuEldtGnZo+Qqvzd2PjYERzGsv6NF5hlkvKSUe9e5fsXxhk04Zw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VOeyputJ; arc=none smtp.client-ip=209.85.219.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-dccb1421bdeso5001060276.1;
+        Tue, 12 Mar 2024 05:16:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710245604; x=1710850404; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NtXlbKnL5euhiw52oyQxA4wkkiqfbzjgbCHftvNmB6s=;
-        b=XsIkcYpmAB74HJN8LsYIXHJg/B3a8pwyDYnciKdbMKFpUIj3+SbujzFlVHyQiJV2fi
-         7EniJnKPPr6aKtzTzMZKHp5WtTso24nmQhtpl0qBM5vVU4kk3YcoHNZduogoOcs6CiBx
-         jEV2rHevJTQMHIJWAiz6VPRBLEZPVcOx0oPjTvQ+L2hWPqU2aki5qBRPng35kmYoanoJ
-         R0xd2iqdHHiX/EleX0gHe34J1P/pbazsy2FGk6H/rXH2c/hsITriCqX2BhRXNpl2jtL4
-         Yq0mho72gsKjGoTqQ+3i/2YUJ48XNgWCV+Ob7qiBNJ4ipIIhR0PosTMrOfY9wG/nh4C7
-         T15A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710245604; x=1710850404;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1710245768; x=1710850568; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NtXlbKnL5euhiw52oyQxA4wkkiqfbzjgbCHftvNmB6s=;
-        b=nSJHIMCxIUM1QTmETrWysZtcI+1/TU7jKhwtSaQF0kq2BfKZcXHAh83qyAQEmHLb0u
-         kOv7cn1py8//hYz/iaTY14KJcuUyIn3BLZxLhkQA4cVeZcMSopAcKIdixxH75okGt+1+
-         RlJZO+DRfl5cxwcEUWCwetdCdID+kcYmJAhKAqXFKY3oXsXzWIdPNy5NWQU7reO8Ocl5
-         rVRc/WY/BlLUs5pSeUWfJY6V9flZaD9xPECgujkv3RhqrfXCHA/yI8zADPCTL41fB6hS
-         j4ii2Vm7PVs4b8oNFKKcGOFhcxpEUAp0inIxak5eLqIFNXQCeY09X3e80SS9IRX0Dpuv
-         ylAQ==
-X-Gm-Message-State: AOJu0YyhwMNwtLM4bKqdh0AwV6jLmi02nj3R9NsJCs8/r9BKzvOXnfRt
-	a8tZmoQ3ZIgVVpTbkfTSMPKOa4tCFtTzPJsJqVfAxAXn0Tbw/CjXNLYPp+nY7wg=
-X-Google-Smtp-Source: AGHT+IF/p6JnFr8eUGfWti58rQ1XC4/IDWOdST/E6IMJoTZDitucNFt2DifeeGEmhFfYxXInhd5HtQ==
-X-Received: by 2002:a50:955e:0:b0:568:1b18:1d11 with SMTP id v30-20020a50955e000000b005681b181d11mr5543751eda.41.1710245603495;
-        Tue, 12 Mar 2024 05:13:23 -0700 (PDT)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id et3-20020a056402378300b005687a473947sm293645edb.28.2024.03.12.05.13.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Mar 2024 05:13:23 -0700 (PDT)
-Date: Tue, 12 Mar 2024 13:13:21 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Shay Drory <shayd@nvidia.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	kuba@kernel.org, edumazet@google.com, jiri@nvidia.com
-Subject: Re: [PATCH net v2] devlink: Fix devlink parallel commands processing
-Message-ID: <ZfBG4Z8Jd54QJl0G@nanopsycho>
-References: <20240312105238.296278-1-shayd@nvidia.com>
+        bh=HyFCwjdYDVIsztUBry/f8bsBjuN4jiZlFF7Qs0any0A=;
+        b=VOeyputJx4gB+FKpzjuGz/mJQOfFyhRO+LkMvQEl9ZH0JRUTBcCoMSuXONZbnHoqEq
+         75cJtEYRP4jauCzuJpqThyhz016lY3Yef0bu7ATe5bmU+E9nF2MAieHoFXHG965ryGY/
+         KzdSdjZtF5vAqetOnDGNT2AotDOAoRzjMhkpq0gw+huzEi08bzLG/KROpmgcEzVX/mi8
+         LNlcWfo9Z3p8zOajfhV7Jd6f6YagxUMiqSAlmKAfyBQt2HafTOPVasM9iH5Sm1fDXnd5
+         EDOCn51nh7S86Dwk+uaMzd3dOrdoklB20h3rfHoiAQaKmOOY6wToOlBOkatsHhE0YddK
+         rwww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710245768; x=1710850568;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HyFCwjdYDVIsztUBry/f8bsBjuN4jiZlFF7Qs0any0A=;
+        b=acJP4WN3ti81tKV1rVhg2OCj1Q7nXdFS5dp1ajT36fdJXjl6pCUAsqGOeMVZHx9edI
+         Qoe1xwCBr0gSHX8tuRY9OlOaaa0e/6tbFtjaChSjPgYEVRtLKhqGwvI1bYWo2e+qUCPK
+         woShZKKpTeAOBtso7NMOiuirUkkkdbsnxLrt5VT1ItoK+6rIMf+iyXCkqsQh+hXCCXu9
+         XrXtQ7cVvsJrtY69I0/fskOK/ib1YnfMzN1/089MZkTCqbqD0Na6vQeFGeJ9bD/0CO9U
+         nCmUL55hCv8E6RJAdkuEGv8xQ8KUQP4jnnxig6B7zBlq6VtYhUwZU6nEgbBBD4e9uo+A
+         0n5w==
+X-Forwarded-Encrypted: i=1; AJvYcCUJU0ASCsaf1j31I2vx01HsS/CpUnNtl7o2IC/B9pfSKQi6lyOarnrddfbqEv76RL+00xADqNdTJBkJDmcnqPJ9UXfOelt7AQXqehBX2BtaQ1/3fSqFr2UGy/JtrQNM6yiU7YFOEGIdeTR7jPVLTTgdOL+fODDEKWiPAuysNFz4Z9vST30+7Xyx6tn3QUfy8PXbCzNVO7m9j9T5eQ==
+X-Gm-Message-State: AOJu0Yz4wmzeByUnpdC1oCpKQDxVrsjpCVjMxeWLUcjVp5/59mmFy+hu
+	KVJki0jpr1/FBp5+6aqqMtD1L2eg4U8aiyWJOXxSb46QNfVxwl3sKx0s8tFeZRbtjsFZ7jKmcLa
+	gnC89DXOx8sSsGU75kymIA7oyY3k=
+X-Google-Smtp-Source: AGHT+IGsSqgV1J0+s8AAEp+Hw6N2iqJsbKQk1JL5Q7CLDKpFxVnD6clDIdy/25mD+Q8JAgZGZR7sLNILrtt3WOl8e/0=
+X-Received: by 2002:a25:c846:0:b0:dd0:129f:16 with SMTP id y67-20020a25c846000000b00dd0129f0016mr1385426ybf.11.1710245768623;
+ Tue, 12 Mar 2024 05:16:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240312105238.296278-1-shayd@nvidia.com>
+References: <20240312095005.8909-1-maimon.sagi@gmail.com> <7bf7d444-4a08-4df4-9aa1-9cd28609d166@app.fastmail.com>
+In-Reply-To: <7bf7d444-4a08-4df4-9aa1-9cd28609d166@app.fastmail.com>
+From: Sagi Maimon <maimon.sagi@gmail.com>
+Date: Tue, 12 Mar 2024 14:15:57 +0200
+Message-ID: <CAMuE1bGkZ=ifyofCUfm4JVS__dgYG41kecS4TxBaHJvyJ607PQ@mail.gmail.com>
+Subject: Re: [PATCH v6] posix-timers: add clock_compare system call
+To: Arnd Bergmann <arnd@arndb.de>
+Cc: Richard Cochran <richardcochran@gmail.com>, Andy Lutomirski <luto@kernel.org>, datglx@linutronix.de, 
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, 
+	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org, 
+	"H. Peter Anvin" <hpa@zytor.com>, Geert Uytterhoeven <geert@linux-m68k.org>, 
+	Peter Zijlstra <peterz@infradead.org>, Johannes Weiner <hannes@cmpxchg.org>, 
+	Sohil Mehta <sohil.mehta@intel.com>, Rick Edgecombe <rick.p.edgecombe@intel.com>, 
+	Nhat Pham <nphamcs@gmail.com>, Palmer Dabbelt <palmer@sifive.com>, Kees Cook <keescook@chromium.org>, 
+	Alexey Gladkov <legion@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
+	Miklos Szeredi <mszeredi@redhat.com>, Casey Schaufler <casey@schaufler-ca.com>, reibax@gmail.com, 
+	"David S . Miller" <davem@davemloft.net>, Christian Brauner <brauner@kernel.org>, linux-kernel@vger.kernel.org, 
+	linux-api@vger.kernel.org, Linux-Arch <linux-arch@vger.kernel.org>, 
+	Netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Tue, Mar 12, 2024 at 11:52:38AM CET, shayd@nvidia.com wrote:
->Commit 870c7ad4a52b ("devlink: protect devlink->dev by the instance
->lock") added devlink instance locking inside a loop that iterates over
->all the registered devlink instances on the machine in the pre-doit
->phase. This can lead to serialization of devlink commands over
->different devlink instances.
+Hi Arnd
+Thanks for you comments.
+
+On Tue, Mar 12, 2024 at 1:19=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> wrote=
+:
 >
->For example: While the first devlink instance is executing firmware
->flash, all commands to other devlink instances on the machine are
->forced to wait until the first devlink finishes.
+> On Tue, Mar 12, 2024, at 10:50, Sagi Maimon wrote:
+> > Some user space applications need to read a couple of different clocks.
+> > Each read requires moving from user space to kernel space.
+> > Reading each clock separately (syscall) introduces extra
+> > unpredictable/unmeasurable delay. Minimizing this delay contributes to =
+user
+> > space actions on these clocks (e.g. synchronization etc).
+> >
+> > Introduce a new system call clock_compare, which can be used to measure
+> > the offset between two clocks, from variety of types: PHC, virtual PHC
+> > and various system clocks (CLOCK_REALTIME, CLOCK_MONOTONIC, etc).
+> > The system call returns the clocks timestamps.
+> >
+> > When possible, use crosstimespec to sync read values.
+> > Else, read clock A twice (before, and after reading clock B) and averag=
+e these
+> > times =E2=80=93 to be as close as possible to the time we read clock B.
+> >
+> > Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
 >
->Therefore, in the pre-doit phase, take the devlink instance lock only
->for the devlink instance the command is targeting. Devlink layer is
->taking a reference on the devlink instance, ensuring the devlink->dev
->pointer is valid. This reference taking was introduced by commit
->a380687200e0 ("devlink: take device reference for devlink object").
->Without this commit, it would not be safe to access devlink->dev
->lockless.
+> I like this a lot better than the previous versions I looked at,
+> so just a few ideas here how this might be improved further.
 >
->Fixes: 870c7ad4a52b ("devlink: protect devlink->dev by the instance lock")
->Signed-off-by: Shay Drory <shayd@nvidia.com>
->---
->v1->v2:
-> - Simplify the code by removing the goto
-
-Indeed nicer. Thanks!
-
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-
+> > +/**
+> > + * clock_compare - Get couple of clocks time stamps
+> > + * @clock_a: clock a ID
+> > + * @clock_b: clock b ID
+> > + * @tp_a:            Pointer to a user space timespec64 for clock a st=
+orage
+> > + * @tp_b:            Pointer to a user space timespec64 for clock b st=
+orage
+> > + *
+> > + * clock_compare gets time sample of two clocks.
+> > + * Supported clocks IDs: PHC, virtual PHC and various system clocks.
+> > + *
+> > + * In case of PHC that supports crosstimespec and the other clock is
+> > Monotonic raw
+> > + * or system time, crosstimespec will be used to synchronously capture
+> > + * system/device time stamp.
+> > + *
+> > + * In other cases: Read clock_a twice (before, and after reading
+> > clock_b) and
+> > + * average these times =E2=80=93 to be as close as possible to the tim=
+e we
+> > read clock_b.
+> > + *
+> > + * Returns:
+> > + *   0               Success. @tp_a and @tp_b contains the time stamps
+> > + *   -EINVAL         @clock a or b ID is not a valid clock ID
+> > + *   -EFAULT         Copying the time stamp to @tp_a or @tp_b faulted
+> > + *   -EOPNOTSUPP     Dynamic POSIX clock does not support crosstimespe=
+c()
+> > + **/
+> > +SYSCALL_DEFINE5(clock_compare, const clockid_t, clock_a, const
+> > clockid_t, clock_b,
+> > +             struct __kernel_timespec __user *, tp_a, struct __kernel_=
+timespec
+> > __user *,
+> > +             tp_b, int64_t __user *, offs_err)
+>
+> The system call is well-formed in the way that the ABI is the
+> same across all supported architectures, good.
+>
+> A minor issue is the use of int64_t, which in user interfaces
+> can cause namespace problems. Please change that to the kernel
+> side __s64 type.
+>
+you are right - it will be fixed on the next patch
+> > +     kc_a =3D clockid_to_kclock(clock_a);
+> > +     if (!kc_a) {
+> > +             error =3D -EINVAL;
+> > +             return error;
+> > +     }
+> > +
+> > +     kc_b =3D clockid_to_kclock(clock_b);
+> > +     if (!kc_b) {
+> > +             error =3D -EINVAL;
+> > +             return error;
+> > +     }
+>
+> I'm not sure if we really need to have it generic enough to
+> support any combination of clocks here. It complicates the
+> implementation a bit but it also generalizes the user space
+> side of it.
+>
+> Can you think of cases where you want to compare against
+> something other than CLOCK_MONOTONIC_RAW or CLOCK_REALTIME,
+> or are these going to be the ones that you expect to
+> be used anyway?
+>
+sure, one example is syncing two different PHCs (which was originally
+why we needed this syscall)
+I hope that I have understand your note and that answers your question.
+> > +     if (crosstime_support_a) {
+> > +             ktime_a1 =3D xtstamp_a1.device;
+> > +             ktime_a2 =3D xtstamp_a2.device;
+> > +     } else {
+> > +             ktime_a1 =3D timespec64_to_ktime(ts_a1);
+> > +             ktime_a2 =3D timespec64_to_ktime(ts_a2);
+> > +     }
+> > +
+> > +     ktime_a =3D ktime_add(ktime_a1, ktime_a2);
+> > +
+> > +     ts_offs =3D ktime_divns(ktime_a, 2);
+> > +
+> > +     ts_a1 =3D ns_to_timespec64(ts_offs);
+>
+> Converting nanoseconds to timespec64 is rather expensive,
+> so I wonder if this could be changed to something cheaper,
+> either by returning nanoseconds in the end and consistently
+> working on those, or by doing the calculation on the
+> timespec64 itself.
+>
+I prefer returning timespec64, so this system call aligns with other
+system calls like clock_gettime for example.
+As far as doing the calculation on timespec64 itself, that looks more
+expansive to me, but I might be wrong.
+Sagi
+>      Arnd
 
