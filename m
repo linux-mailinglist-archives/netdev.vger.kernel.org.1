@@ -1,113 +1,154 @@
-Return-Path: <netdev+bounces-79333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7622F878C47
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 02:30:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E6F5878C6F
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 02:44:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A30CB1C21361
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 01:30:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F8A91C2117F
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 01:44:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86F94AD24;
-	Tue, 12 Mar 2024 01:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA12210E3;
+	Tue, 12 Mar 2024 01:44:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Ud0ir6jo"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="H+DBPEeS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44BBC4430
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 01:30:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A2A10782
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 01:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710207013; cv=none; b=TDN/AE1LaXKIUWyOfNlyiwF4qwDj96tx28DPgz/edCqPsIQagcvTSGHZCBJrrZXpcMpbCln4HcAipHH7aD8AVKpUikFyDfxK0rA0dx7GEnizWGnlaspkeWw7+dtKURqaCL8rv1mnXr9Hr7SRudvgRTmk1UH0qGFXUgml2ultMM0=
+	t=1710207847; cv=none; b=fm0YMHdH1oNk7fw1P/nvjIN+4tQJp+1zc7g+zQTwjk+G+dv2v5fdAwAvl1ozmoqjkCee68C5yFu+/0G6OQAT8gUQ2YLapt8aUghyWESxd1mPZTjOwg+TqIyGwjQu7yBlbSXHqWrkB/93+g6s90/av4tm4CWF7TnLUTNQlqwBZdM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710207013; c=relaxed/simple;
-	bh=Yhwbrg8dXkzpSicbSax0azK78ku2wTh8ToGewIpOKOc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YwDzeecpEVLb1s4Wb3rGZjHWsHvr2tn/X81uvQfNN1EDldaW0JoDQcS8NwBaGgqNvx1yGIIBNH9Se9HNuCD8H+nbtG3rWlkeSan1ByXNWwMOX3FeFo2y2cFjEpTRcdKDBuPOI2nyoFC2lppv4ho1P4gQtRbrFTNqka2PZyw4cFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Ud0ir6jo; arc=none smtp.client-ip=209.85.167.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3bbbc6b4ed1so3864063b6e.2
-        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 18:30:09 -0700 (PDT)
+	s=arc-20240116; t=1710207847; c=relaxed/simple;
+	bh=uFfJuhQfHN1jJpmCHkndoERuZP2CwvzUJu70xuEeI4g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g54d+bjXeXcbccXlN5VbfE19zUUirav9ZP/GvbjGglZQdn3an6T2aG8DmJW2aBvGo0O5otEZDBhvGXlbHxAFrsUr98KwiNqJuzdEDUbAeqJYsdb+TpgL4KAWGeJ7XZww/YN8jfPRQX80cJQYF5w/pLMBjIFIexnVEr/WHijrYy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=H+DBPEeS; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1dda8e5fa8dso9177015ad.2
+        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 18:44:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1710207009; x=1710811809; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=bytedance.com; s=google; t=1710207845; x=1710812645; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Ivwu9CIgTm2rBxaFuJJEcPZ6YSCpmRNHLW0HQhaxaxs=;
-        b=Ud0ir6jot1/k528/ofWdVU2A152/o5eTSTeeMLS2lImGOOJj09dBGEFBjtbfvD0yAY
-         FU9ABZ42ZTrPoJWymVnX2cC/omJI2GcsPohXWjUt0Ns4YxtpFax7XYX5tsjjG/u7kcTK
-         Rvpgvm+KaKdE5TPOPJGoVKIVhLB9PavgQWFeZ3kxhmqYRWaMlKV/wFAaQpP+PEKdNN8j
-         e0+9tvYJM3Rj13bTDBZPwaPeaSmg0I/WYehouvV5cQ4Ab/5OiT19Xg1w1qgSnYapE2e4
-         fvZqqwg3e1biEhtCCRinwBjSVcOXOseUIiQsMi9eAOeWH8owQz3DGFTNB2pr2srJulxG
-         +p6A==
+        bh=labtf93chunomZqW/vUnTTFsyT2Ay36RYxUH/Np39t8=;
+        b=H+DBPEeS8Lo4eGaJw42yL0NKrh5JZqnsWD3PJpXg2WdV4On3zuOHa2pbKkEgp8KgwM
+         E2gP8b13VIWjQYcoCeuhArpvokd5JPO5fsNtVwnB/qaxDMFcreS226XksmTrSa7JTv6E
+         RPJWY/AtdnRcVYO86O+5aSQgsaFXt8B+isQzQ5Kg1o32qIEg8JYYvZ3TAG/7rYPTab1/
+         5mqMlB9JV0TRkzsuiFWkAk9F+Lej9LlqyFzG6wJDAHCrsuroI4IN2wTKEI+oiiyU4JDN
+         XgH4iScQ5bjCUuvNDlESAh3oT+EP13BKSPPpBl72W+mokQpqrdCAkiKQ68bb6nOnmir8
+         O0nQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710207009; x=1710811809;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1710207845; x=1710812645;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Ivwu9CIgTm2rBxaFuJJEcPZ6YSCpmRNHLW0HQhaxaxs=;
-        b=qXOcbAYOoiSQsHN3Rs5+ADt7AtjA/KSl/PGMcaVAdrThGZEBZEomrJsdiX7xiGyOgp
-         bDk+6pblPMMr5VPQ+lxdBboohNCavUBh8KWJaDVM8KL4dkX6P83tPbPWlgVFVsU+ANL4
-         ClMqr9RS5jhpJJl6x3+veFKXDbaP/zpOvjA/UgKCoug4cKZFiUJ8MM4i0zu5hFsBaOoo
-         y20k97LQdIi/Jra0nLCCazHFIOiP01/os+QdexaDAeTblJtrWH9uSBHoZ3/sGQis3yfa
-         Z598lrsp1N6vkpZ3gfzx73Nsb1xjXwMs5xWnYc8xZbgrzfKmHV50Ly+j3/N3pVU2IZbP
-         RIQw==
-X-Gm-Message-State: AOJu0YyQtZf5t9hTJ6TVrv5SusxjKi7V0AL2QBUMclAOdPPwpSp+OEA+
-	a5Rj6NJ+sE4s4LaRCz8ZVyS4oTlxmnFvfvDPMHZ20hNHDPiChlrPzkmqrV1jEDnbS8MHydfqQ3V
-	E
-X-Google-Smtp-Source: AGHT+IFzu0+ldzwZ6E9R/D/WZFe9DhyII7Rvjz+vbRzBBXJYlXZLupV9wOyGxFKPUs0MblNOt7nWCQ==
-X-Received: by 2002:a05:6808:3d0:b0:3c2:51f0:5f7d with SMTP id o16-20020a05680803d000b003c251f05f7dmr2477550oie.15.1710207009237;
-        Mon, 11 Mar 2024 18:30:09 -0700 (PDT)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id r9-20020aa78b89000000b006e5597994c8sm4973116pfd.5.2024.03.11.18.30.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 11 Mar 2024 18:30:08 -0700 (PDT)
-Date: Mon, 11 Mar 2024 18:30:07 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Max Gautier <mg@max.gautier.name>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2-next] Makefile: use systemd-tmpfiles to create
- /var/lib/arpd
-Message-ID: <20240311183007.4a119eeb@hermes.local>
-In-Reply-To: <Ze-Fj2RwYnM0WgWi@framework>
-References: <20240311165803.62431-1-mg@max.gautier.name>
-	<20240311124003.583053a6@hermes.local>
-	<Ze-Fj2RwYnM0WgWi@framework>
+        bh=labtf93chunomZqW/vUnTTFsyT2Ay36RYxUH/Np39t8=;
+        b=mqqsfeYCJK2WO6pBtiLqMHZuw8FOqNjhe8WDXs5iwT6YP8ObcmWJ5UqkB/r8XVL1Va
+         430RcCCJRF37naicLt8VP9s5o1cix+y1Tv78N/F/CrdHgqG7dSn11Df1WUgNBMAlM8MX
+         4LjvWeIg5k1Vu9WEp1XxNwegobKILhndEUAUKo69oB8RlpgNxBdn8R8I+d7WEdWfePB2
+         dCF6d+TphQqD4W3zH/zPbTWt/1U/BtMH4oKwiJzWu1Va3pzpDyO5hh/EzCRbPJXNi819
+         4t2/BR54fP8Wamn7KzJU/+cQ7ySW4OXaXcIPQqOos2t4H4erlzXDcKca9zUsi3pFHPO+
+         AIxg==
+X-Forwarded-Encrypted: i=1; AJvYcCWGynoChFYyM/wHyARu/wFnoDe8WmXZNYk6mMwa586SNFpwUg6asJAzcwLkbsStGISuqS6FoOomRno2KP5fJyG+wtCcb/1y
+X-Gm-Message-State: AOJu0YwT3onrqk6YqsYbG2MdGX52oyJwep8Gn7tOyFrpUsQhIhc3HCYf
+	w1dssKWLeIsOl/1ljg8GqkDqd1hUpsJxIVpuAtj6kdUY6Vais7ATCF4lqbBekhFkImy/A8GOzEs
+	4EM0T7h8X6HpjTPlYjqDczfTGl1vXg7YlF+sNLw==
+X-Google-Smtp-Source: AGHT+IErV3iMJSVZsOorpKVzsGY2UytkCGuC6pmqJE2LbhhD8namNE+eDxsMMlkkIxKkEYQlxwMbWYmXWufoMcMT79A=
+X-Received: by 2002:a17:90a:8991:b0:29b:aee2:cc8f with SMTP id
+ v17-20020a17090a899100b0029baee2cc8fmr6097802pjn.9.1710207845560; Mon, 11 Mar
+ 2024 18:44:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240311093526.1010158-1-dongmenglong.8@bytedance.com>
+ <20240311093526.1010158-9-dongmenglong.8@bytedance.com> <e8f37842-1ddf-4241-97f3-b83ffcb32ddc@isovalent.com>
+In-Reply-To: <e8f37842-1ddf-4241-97f3-b83ffcb32ddc@isovalent.com>
+From: =?UTF-8?B?5qKm6b6Z6JGj?= <dongmenglong.8@bytedance.com>
+Date: Tue, 12 Mar 2024 09:43:54 +0800
+Message-ID: <CALz3k9hDuUgT0bQWXRKVogJ9=UF0_zWu6dAJVYE380BHBy85JA@mail.gmail.com>
+Subject: Re: [External] Re: [PATCH bpf-next v2 8/9] libbpf: add support for
+ the multi-link of tracing
+To: Quentin Monnet <quentin@isovalent.com>
+Cc: andrii@kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@google.com, haoluo@google.com, jolsa@kernel.org, agordeev@linux.ibm.com, 
+	borntraeger@linux.ibm.com, svens@linux.ibm.com, davem@davemloft.net, 
+	dsahern@kernel.org, dave.hansen@linux.intel.com, x86@kernel.org, 
+	rostedt@goodmis.org, mathieu.desnoyers@efficios.com, bpf@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, 11 Mar 2024 23:28:31 +0100
-Max Gautier <mg@max.gautier.name> wrote:
+On Mon, Mar 11, 2024 at 11:29=E2=80=AFPM Quentin Monnet <quentin@isovalent.=
+com> wrote:
+>
+> 2024-03-11 09:35 UTC+0000 ~ Menglong Dong <dongmenglong.8@bytedance.com>
+> > Add support for the attach types of:
+> >
+> > BPF_TRACE_FENTRY_MULTI
+> > BPF_TRACE_FEXIT_MULTI
+> > BPF_MODIFY_RETURN_MULTI
+> >
+> > Signed-off-by: Menglong Dong <dongmenglong.8@bytedance.com>
+> > ---
+> >  tools/bpf/bpftool/common.c |   3 +
+> >  tools/lib/bpf/bpf.c        |  10 +++
+> >  tools/lib/bpf/bpf.h        |   6 ++
+> >  tools/lib/bpf/libbpf.c     | 168 ++++++++++++++++++++++++++++++++++++-
+> >  tools/lib/bpf/libbpf.h     |  14 ++++
+> >  tools/lib/bpf/libbpf.map   |   1 +
+> >  6 files changed, 199 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/tools/bpf/bpftool/common.c b/tools/bpf/bpftool/common.c
+> > index cc6e6aae2447..ffc85256671d 100644
+> > --- a/tools/bpf/bpftool/common.c
+> > +++ b/tools/bpf/bpftool/common.c
+> > @@ -1089,6 +1089,9 @@ const char *bpf_attach_type_input_str(enum bpf_at=
+tach_type t)
+> >       case BPF_TRACE_FENTRY:                  return "fentry";
+> >       case BPF_TRACE_FEXIT:                   return "fexit";
+> >       case BPF_MODIFY_RETURN:                 return "mod_ret";
+> > +     case BPF_TRACE_FENTRY_MULTI:            return "fentry_multi";
+> > +     case BPF_TRACE_FEXIT_MULTI:             return "fexit_multi";
+> > +     case BPF_MODIFY_RETURN_MULTI:           return "mod_ret_multi";
+> >       case BPF_SK_REUSEPORT_SELECT:           return "sk_skb_reuseport_=
+select";
+> >       case BPF_SK_REUSEPORT_SELECT_OR_MIGRATE:        return "sk_skb_re=
+useport_select_or_migrate";
+> >       default:        return libbpf_bpf_attach_type_str(t);
+>
+> Hi, please drop this part in bpftool.
+>
+> bpf_attach_type_input_str() is used for legacy attach type names that
+> were used before bpftool switched to libbpf_bpf_attach_type_str(), and
+> that are still supported today. The names for new attach types should
+> just be retrieved with libbpf_bpf_attach_type_str(). And function
+> bpf_attach_type_input_str() is also only used for attaching
+> cgroup-related programs with "bpftool cgroup (at|de)tach".
 
-> On Mon, Mar 11, 2024 at 12:40:03PM -0700, Stephen Hemminger wrote:
-> > On Mon, 11 Mar 2024 17:57:27 +0100
-> > Max Gautier <mg@max.gautier.name> wrote:
-> >   
-> > > Only apply on systemd systems (detected in the configure script).
-> > > The motivation is to build distributions packages without /var to go
-> > > towards stateless systems, see link below (TL;DR: provisionning anything
-> > > outside of /usr on boot).
-> > > 
-> > > The feature flag can be overridden on make invocation:
-> > > `make USE_TMPFILES_D=n DESTDIR=<install_loc> install`
-> > > 
-> > > Links: https://0pointer.net/blog/projects/stateless.html  
-> > 
-> > Why does arpd need such hand holding, it is rarely used, maybe should just not be built.  
-> 
-> The commit introducing the install of that directory is quite old
+Okay! I was confused about this function, which has reduplicated
+information about the attach type name, and I understand it now.
 
-The problem is that build environment != runtime environment for embedded systems.
-But arpd really is legacy/dead/rotting code at this point.
+Thanks!
+Menglong Dong
+
+>
+> Thanks,
+> Quentin
+>
 
