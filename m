@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-79359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E64A878D7C
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 04:28:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28699878D7D
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 04:29:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64D2BB2095C
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 03:28:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BBDB01F21F44
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 03:28:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3422DAD4B;
-	Tue, 12 Mar 2024 03:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8220AD53;
+	Tue, 12 Mar 2024 03:28:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qOSUbhhh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YBNCOOpD"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E140AD2C
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 03:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 844B6AD4B
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 03:28:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710214112; cv=none; b=sdomhAHbfxe+XCVIrnWMWBtQNh36fWRouedEF0FClISwnQDH+GAf0fjXyTbffNqpI+WdS0VRO0D3C7zAi6U2lLyGtfeluJJnfofQDQinGJL8G9vrzYPu3nv9V+FTHgUZQ4axG1wKQuTiRzNH3pzPNi/2ihG68CUPiP1C6XnwHcE=
+	t=1710214135; cv=none; b=JGddP5eQg0ITH5kFzeBUrmp6siSQ9fkiMco55HVIUgnvOX3j4jZqKWbeXxaYdlk3WmV+qYqWTY0bX9Fb3fg49WTcNp0I8Tdm7iyKKW4OjrWFuOSGluJzXB5LrLPf70gOiVWPFojTI56s1mNTtQEJwyKKX86lfXAylrbUi7qqK98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710214112; c=relaxed/simple;
-	bh=jJq6B7IbtZEaYrH4UHaPChse1S7kCWwrdwWpim7Ij/o=;
+	s=arc-20240116; t=1710214135; c=relaxed/simple;
+	bh=wWsb3jNGG7p37/spo1MKPPAS3oWHeRrEErQZKntRCrA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ax9F8/fHwgNJL2g1SSXPV8COjTlz/CWaA+ZoHflxvzIOJyYxm8t2ivJ+ag73RQcMquYf5rcxG5XLrTcRbXTqcnVwJu5SQJwcjBF8YKmH2NTmoE8dNU7KTnIfFnCR7IMd45l/clcLvdu4+R+ycBBpKCrB58g/bWdBS/Q6TiJnf70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qOSUbhhh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68973C433C7;
-	Tue, 12 Mar 2024 03:28:31 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=KXAf/6DgpRD1k7Vd76RWJMWDDGsM7AVCToBfrdTiDLjkTs72+VY0ez+1fKJ/Wog9gLqq7Rp6dqKllYxTG+ThAWU0+qbNjj5qTJ7yffPHwB3BdJhTKRUSIyGrQJKt0Oe50il+TeocEo90jIl2OIQCPda3FaiUGl9mUe9dsf1FMiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YBNCOOpD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9317C433C7;
+	Tue, 12 Mar 2024 03:28:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710214111;
-	bh=jJq6B7IbtZEaYrH4UHaPChse1S7kCWwrdwWpim7Ij/o=;
+	s=k20201202; t=1710214135;
+	bh=wWsb3jNGG7p37/spo1MKPPAS3oWHeRrEErQZKntRCrA=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=qOSUbhhh2SrRUZjftvANVH37TC39XXtJbqlZagOl+0RiRj2LnN9pzIErKkL4ACQuL
-	 18DWN4QO6I9PpMeqO5ARUwyeV14WxvG3cEO6bCW+HCAUp+BpoKQzFlQU1rAPQ8aWfO
-	 anvwIiAYUf0ZIIj5WHI8IVGrU5Rfj1IJVwt+1XaMVibkpZ4SLil+BrgE3ixRszheBW
-	 wYIeLGkavnp3USpziE1xjGK3aUgC0HWRXFOR+2JiPcyx4cgAnTPAO3Cj4i4NWL56Kv
-	 Kys0G109MbBlfEFsmRRz80yR27ZFEIQG9eOMvmiPpspWpV69hhB03WV7bfOkUYslB4
-	 SfHRkheBhVgeQ==
-Message-ID: <2a064df1-9c43-4224-aa35-6c7939852d1b@kernel.org>
-Date: Mon, 11 Mar 2024 21:28:30 -0600
+	b=YBNCOOpDCSLNDD6M1J5duEzxyUreAXViahUkU5nTgHLAIYXWhNpjZxNOAk2/DmYqI
+	 2j6EP2dHzjtAKZc+GZlfg0s7+exQZn9GRhd0NbyxfomS8vkuDWF4ByNK/WuSWxpDuM
+	 WLXhvqj5OZ1iZb/UjLiY+Gn8ebguS8xsv3Z8VuzNV8VqnMEEp+pli4cZUjbmVHX7eL
+	 iFGil4oxC1mbwWV0COeCMdprooAzo2oLc2qwu0rUNZRPlmb3KPvRPKL/ZfMh7H7XFm
+	 307vNMpn3KeVIQUGee4vBAxK2wbOc1jEhLlCW8eLKrxquvsfz/YGtcjjy4q4LZakEd
+	 WIQd7bN7lwi1Q==
+Message-ID: <d3f29160-e44e-418e-967c-321b78ffc66b@kernel.org>
+Date: Mon, 11 Mar 2024 21:28:54 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,102 +50,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 3/4] nexthop: Fix out-of-bounds access during
- attribute validation
+Subject: Re: [PATCH net-next v2 4/4] nexthop: Fix splat with
+ CONFIG_DEBUG_PREEMPT=y
 Content-Language: en-US
 To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
  edumazet@google.com, petrm@nvidia.com
 References: <20240311162307.545385-1-idosch@nvidia.com>
- <20240311162307.545385-4-idosch@nvidia.com>
+ <20240311162307.545385-5-idosch@nvidia.com>
 From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240311162307.545385-4-idosch@nvidia.com>
+In-Reply-To: <20240311162307.545385-5-idosch@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 3/11/24 10:23 AM, Ido Schimmel wrote:
-> Passing a maximum attribute type to nlmsg_parse() that is larger than
-> the size of the passed policy will result in an out-of-bounds access [1]
-> when the attribute type is used as an index into the policy array.
+> Locally generated packets can increment the new nexthop statistics from
+> process context, resulting in the following splat [1] due to preemption
+> being enabled. Fix by using get_cpu_ptr() / put_cpu_ptr() which will
+> which take care of disabling / enabling preemption.
 > 
-> Fix by setting the maximum attribute type according to the policy size,
-> as is already done for RTM_NEWNEXTHOP messages. Add a test case that
-> triggers the bug.
-> 
-> No regressions in fib nexthops tests:
-> 
->  # ./fib_nexthops.sh
->  [...]
->  Tests passed: 236
->  Tests failed:   0
-> 
-> [1]
-> BUG: KASAN: global-out-of-bounds in __nla_validate_parse+0x1e53/0x2940
-> Read of size 1 at addr ffffffff99ab4d20 by task ip/610
-> 
-> CPU: 3 PID: 610 Comm: ip Not tainted 6.8.0-rc7-custom-gd435d6e3e161 #9
+> BUG: using smp_processor_id() in preemptible [00000000] code: ping/949
+> caller is nexthop_select_path+0xcf8/0x1e30
+> CPU: 12 PID: 949 Comm: ping Not tainted 6.8.0-rc7-custom-gcb450f605fae #11
 > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc38 04/01/2014
 > Call Trace:
 >  <TASK>
->  dump_stack_lvl+0x8f/0xe0
->  print_report+0xcf/0x670
->  kasan_report+0xd8/0x110
->  __nla_validate_parse+0x1e53/0x2940
->  __nla_parse+0x40/0x50
->  rtm_del_nexthop+0x1bd/0x400
->  rtnetlink_rcv_msg+0x3cc/0xf20
->  netlink_rcv_skb+0x170/0x440
->  netlink_unicast+0x540/0x820
->  netlink_sendmsg+0x8d3/0xdb0
->  ____sys_sendmsg+0x31f/0xa60
->  ___sys_sendmsg+0x13a/0x1e0
->  __sys_sendmsg+0x11c/0x1f0
+>  dump_stack_lvl+0xbd/0xe0
+>  check_preemption_disabled+0xce/0xe0
+>  nexthop_select_path+0xcf8/0x1e30
+>  fib_select_multipath+0x865/0x18b0
+>  fib_select_path+0x311/0x1160
+>  ip_route_output_key_hash_rcu+0xe54/0x2720
+>  ip_route_output_key_hash+0x193/0x380
+>  ip_route_output_flow+0x25/0x130
+>  raw_sendmsg+0xbab/0x34a0
+>  inet_sendmsg+0xa2/0xe0
+>  __sys_sendto+0x2ad/0x430
+>  __x64_sys_sendto+0xe5/0x1c0
 >  do_syscall_64+0xc5/0x1d0
 >  entry_SYSCALL_64_after_hwframe+0x63/0x6b
 > [...]
 > 
-> The buggy address belongs to the variable:
->  rtm_nh_policy_del+0x20/0x40
-> 
-> Fixes: 2118f9390d83 ("net: nexthop: Adjust netlink policy parsing for a new attribute")
-> Reported-by: Eric Dumazet <edumazet@google.com>
-> Closes: https://lore.kernel.org/netdev/CANn89i+UNcG0PJMW5X7gOMunF38ryMh=L1aeZUKH3kL4UdUqag@mail.gmail.com/
-> Reported-by: syzbot+65bb09a7208ce3d4a633@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/00000000000088981b06133bc07b@google.com/
+> Fixes: f4676ea74b85 ("net: nexthop: Add nexthop group entry stats")
 > Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 > ---
-> 
-> Notes:
->     v2:
->     * Resize 'tb' using ARRAY_SIZE
-> 
->  net/ipv4/nexthop.c                          | 29 ++++++++++++---------
->  tools/testing/selftests/net/fib_nexthops.sh |  6 +++++
->  2 files changed, 23 insertions(+), 12 deletions(-)
+>  net/ipv4/nexthop.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 > 
 
 Reviewed-by: David Ahern <dsahern@kernel.org>
 
-
-> diff --git a/tools/testing/selftests/net/fib_nexthops.sh b/tools/testing/selftests/net/fib_nexthops.sh
-> index d5a281aadbac..ac0b2c6a5761 100755
-> --- a/tools/testing/selftests/net/fib_nexthops.sh
-> +++ b/tools/testing/selftests/net/fib_nexthops.sh
-> @@ -2066,6 +2066,12 @@ basic()
->  	run_cmd "$IP nexthop get id 1"
->  	log_test $? 2 "Nexthop get on non-existent id"
->  
-> +	run_cmd "$IP nexthop del id 1"
-> +	log_test $? 2 "Nexthop del with non-existent id"
-> +
-> +	run_cmd "$IP nexthop del id 1 group 1/2/3/4/5/6/7/8"
-> +	log_test $? 2 "Nexthop del with non-existent id and extra attributes"
-> +
->  	# attempt to create nh without a device or gw - fails
->  	run_cmd "$IP nexthop add id 1"
->  	log_test $? 2 "Nexthop with no device or gateway"
-
-The basic() group of tests do not have a delete, so this is a good
-addition. However, the ipv6_fcnal and ipv4_fcnal do have a del - seems
-like those tests should have caught the out of bounds access.
 
