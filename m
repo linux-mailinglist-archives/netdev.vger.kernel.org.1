@@ -1,201 +1,174 @@
-Return-Path: <netdev+bounces-79519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12A0C879ADA
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 18:55:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A065879B4E
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 19:24:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EBA6B22033
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 17:55:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4E6D2859FD
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 18:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B591F1386B8;
-	Tue, 12 Mar 2024 17:55:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6898B139571;
+	Tue, 12 Mar 2024 18:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ph3tY+Cq"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="blukgp81"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from forward200a.mail.yandex.net (forward200a.mail.yandex.net [178.154.239.93])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D46A40864;
-	Tue, 12 Mar 2024 17:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CBF7273FC
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 18:24:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.93
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710266123; cv=none; b=JhhkhCBDtjslRhjExBgFHhUiGU2eccrocthvtskqRf6su0aExEVRbYQECj+HKq1jrJaohwB02nBCmRggyhRzJT4X+JM5pB18hu+R16imSYU5y0KQYJo6veXLX55nMknj9KLQWEjCOVMtgkiPSKlXoyU3alfxwmkTUI962AatHLc=
+	t=1710267867; cv=none; b=ebjHLoMYiS9Eu/iLPFbmB1wFHP7N7ykP3AUQgqOcQ1pgJDDZExWPXvT5erZM1cw2Xh3EkyUVX4buhkO3+NkvsO1S3gYRuJwD7eFi/h+yOUlRqGA8lkOCb3fEyhLCm6mUfTEKDzHBQW0cZZTCv4ZhnO8vaTzB221oAubxVRIAwmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710266123; c=relaxed/simple;
-	bh=8vWFn+lk7XrMdfCu+84+a7Fv41SKYL44pFn0ywSR89U=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=QxpfsfYVRwM/VZBFZQ2rfGAU6kpSkzuUAOikrEZIeyGna3iosZXplBcucC4kbiKs0DZ3sLEEMloyXozF0QoktltpzgkypAHfsAScTAzFczla7PRXSqduVIGedj3uMJLYFTANLMSXPYFA/GckfvtyBQjTtRBGXo6SSGp3Hfm3ORM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ph3tY+Cq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB874C433C7;
-	Tue, 12 Mar 2024 17:55:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710266123;
-	bh=8vWFn+lk7XrMdfCu+84+a7Fv41SKYL44pFn0ywSR89U=;
-	h=Date:From:To:Cc:Subject:From;
-	b=Ph3tY+CqN7KEru+aVmh+ium4/oqzZ3jkHyA6HnHtsfTSzzbZRRIsx96fza+q8B6b/
-	 jdl4Dd4cxkZ2PIMGvv8/EQ3IWIVslfVKfJx4YtDWZW26UNW+sinsZ9imvy7/61r2aj
-	 uI9WBCxVOIATcXvTStluwlF6Fk11tJeiLVJyUUqDIUUcSWKtdwxGSyT7f7QWOXHAWv
-	 w5d9Dvsi2i4LN5D2AnPNNkLYy1aRdxrWW4Tvt0lNHT3NEcm+wpZYQ3ubIMJkvC+WoH
-	 TYpOFJgVO33JZ/QY0kJGIClsYbm9U/1k5As2+GBYY+Jp/MyKtMrFxO9FIBN77ORdsQ
-	 BHisaQsiK8KRQ==
-Date: Tue, 12 Mar 2024 11:55:19 -0600
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	Wen Gu <guwen@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-hardening@vger.kernel.org, Kees Cook <keescook@chromium.org>
-Subject: [PATCH v2][next] net/smc: Avoid -Wflex-array-member-not-at-end
- warnings
-Message-ID: <ZfCXBykRw5XqBvf0@neat>
+	s=arc-20240116; t=1710267867; c=relaxed/simple;
+	bh=noKRIZa3z8ahG781JAMkOlhIyOyQ4CABCp76eFR5XDs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Tak2RfRBl+kmFas4BCSHiAYrwQGS8IHv12O8GqStXl1tBCWH2M602dlOKMB0uRL7nO/JqjLRs7Jr394rbpz4823lVl/Qol2TUOmAGJmE44Fi6o0zdTmLpasDZruC/SDQrIQZSx8K4pPcXhAf3bofgn04ZTlbZ6AUzt0w7aKsmu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=blukgp81; arc=none smtp.client-ip=178.154.239.93
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from forward101a.mail.yandex.net (forward101a.mail.yandex.net [IPv6:2a02:6b8:c0e:500:1:45:d181:d101])
+	by forward200a.mail.yandex.net (Yandex) with ESMTPS id 9B79665255
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 21:18:25 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-67.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-67.vla.yp-c.yandex.net [IPv6:2a02:6b8:c15:2c95:0:640:f90:0])
+	by forward101a.mail.yandex.net (Yandex) with ESMTPS id 45AFD608F2;
+	Tue, 12 Mar 2024 21:18:18 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-67.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id GIrKTj0ZpGk0-rcqrrxig;
+	Tue, 12 Mar 2024 21:18:17 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1710267497; bh=o/jEyIn0N1qjBhCbDmOuWB1YSE6SbgxzJw3WAakd7MI=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=blukgp81coHZyPihJK8DJqeo+lDXjwExPsAJgZVcsvswHmF42KT9ZlMpZ1rE4Wg/5
+	 lNqgdiOcwhVQkDGWR4AGIRIWwvB2w6RxC3FTNZT9jg0jObQFGR4gimARlwz/c6oWig
+	 2PqFq2ygGitxF133F64HYtUQt69tMs9lzszovlcQ=
+Authentication-Results: mail-nwsmtp-smtp-production-main-67.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Sven Eckelmann <sven@narfation.org>
+Cc: Simon Wunderlich <sw@simonwunderlich.de>,
+	Jakub Kicinski <kuba@kernel.org>,
+	b.a.t.m.a.n@lists.open-mesh.org,
+	netdev@vger.kernel.org,
+	Dmitry Antipov <dmantipov@yandex.ru>
+Subject: [PATCH] batman-adv: prefer kfree_rcu() over call_rcu() with free-only callbacks
+Date: Tue, 12 Mar 2024 21:16:28 +0300
+Message-ID: <20240312181628.2013091-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 
--Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
-ready to enable it globally.
+Drop 'batadv_tt_local_entry_free_rcu()', 'batadv_tt_global_entry_free_rcu()'
+and 'batadv_tt_orig_list_entry_free_rcu()' in favor of 'kfree_rcu()' in
+'batadv_tt_local_entry_release()', 'batadv_tt_global_entry_release()' and
+'batadv_tt_orig_list_entry_release()', respectively.
 
-There are currently a couple of objects in `struct smc_clc_msg_proposal_area`
-that contain a couple of flexible structures:
-
-struct smc_clc_msg_proposal_area {
-	...
-	struct smc_clc_v2_extension             pclc_v2_ext;
-	...
-	struct smc_clc_smcd_v2_extension        pclc_smcd_v2_ext;
-	...
-};
-
-So, in order to avoid ending up with a couple of flexible-array members
-in the middle of a struct, we use the `struct_group_tagged()` helper to
-separate the flexible array from the rest of the members in the flexible
-structure:
-
-struct smc_clc_smcd_v2_extension {
-        struct_group_tagged(smc_clc_smcd_v2_extension_fixed, fixed,
-                            u8 system_eid[SMC_MAX_EID_LEN];
-                            u8 reserved[16];
-        );
-        struct smc_clc_smcd_gid_chid gidchid[];
-};
-
-With the change described above, we now declare objects of the type of
-the tagged struct without embedding flexible arrays in the middle of
-another struct:
-
-struct smc_clc_msg_proposal_area {
-        ...
-        struct smc_clc_v2_extension_fixed	pclc_v2_ext;
-        ...
-        struct smc_clc_smcd_v2_extension_fixed	pclc_smcd_v2_ext;
-        ...
-};
-
-We also use `container_of()` when we need to retrieve a pointer to the
-flexible structures.
-
-So, with these changes, fix the following warnings:
-
-In file included from net/smc/af_smc.c:42:
-net/smc/smc_clc.h:186:49: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-  186 |         struct smc_clc_v2_extension             pclc_v2_ext;
-      |                                                 ^~~~~~~~~~~
-net/smc/smc_clc.h:188:49: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-  188 |         struct smc_clc_smcd_v2_extension        pclc_smcd_v2_ext;
-      |                                                 ^~~~~~~~~~~~~~~~
-
-Reviewed-by: Kees Cook <keescook@chromium.org>
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
 ---
-Changes in v2:
- - Name the tagged struct *_fixed instead of *_hdr.
- - Add Kees' RB tag.
+ net/batman-adv/translation-table.c | 47 ++----------------------------
+ 1 file changed, 3 insertions(+), 44 deletions(-)
 
- net/smc/smc_clc.c |  5 +++--
- net/smc/smc_clc.h | 24 ++++++++++++++----------
- 2 files changed, 17 insertions(+), 12 deletions(-)
-
-diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
-index e55026c7529c..63bb5745ab54 100644
---- a/net/smc/smc_clc.c
-+++ b/net/smc/smc_clc.c
-@@ -853,8 +853,9 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
- 	pclc_smcd = &pclc->pclc_smcd;
- 	pclc_prfx = &pclc->pclc_prfx;
- 	ipv6_prfx = pclc->pclc_prfx_ipv6;
--	v2_ext = &pclc->pclc_v2_ext;
--	smcd_v2_ext = &pclc->pclc_smcd_v2_ext;
-+	v2_ext = container_of(&pclc->pclc_v2_ext, struct smc_clc_v2_extension, fixed);
-+	smcd_v2_ext = container_of(&pclc->pclc_smcd_v2_ext,
-+				   struct smc_clc_smcd_v2_extension, fixed);
- 	gidchids = pclc->pclc_gidchids;
- 	trl = &pclc->pclc_trl;
+diff --git a/net/batman-adv/translation-table.c b/net/batman-adv/translation-table.c
+index b95c36765d04..0555cb611489 100644
+--- a/net/batman-adv/translation-table.c
++++ b/net/batman-adv/translation-table.c
+@@ -208,20 +208,6 @@ batadv_tt_global_hash_find(struct batadv_priv *bat_priv, const u8 *addr,
+ 	return tt_global_entry;
+ }
  
-diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
-index 7cc7070b9772..2bfb51daf468 100644
---- a/net/smc/smc_clc.h
-+++ b/net/smc/smc_clc.h
-@@ -134,12 +134,14 @@ struct smc_clc_smcd_gid_chid {
- 			 */
+-/**
+- * batadv_tt_local_entry_free_rcu() - free the tt_local_entry
+- * @rcu: rcu pointer of the tt_local_entry
+- */
+-static void batadv_tt_local_entry_free_rcu(struct rcu_head *rcu)
+-{
+-	struct batadv_tt_local_entry *tt_local_entry;
+-
+-	tt_local_entry = container_of(rcu, struct batadv_tt_local_entry,
+-				      common.rcu);
+-
+-	kmem_cache_free(batadv_tl_cache, tt_local_entry);
+-}
+-
+ /**
+  * batadv_tt_local_entry_release() - release tt_local_entry from lists and queue
+  *  for free after rcu grace period
+@@ -236,7 +222,7 @@ static void batadv_tt_local_entry_release(struct kref *ref)
  
- struct smc_clc_v2_extension {
--	struct smc_clnt_opts_area_hdr hdr;
--	u8 roce[16];		/* RoCEv2 GID */
--	u8 max_conns;
--	u8 max_links;
--	__be16 feature_mask;
--	u8 reserved[12];
-+	struct_group_tagged(smc_clc_v2_extension_fixed, fixed,
-+		struct smc_clnt_opts_area_hdr hdr;
-+		u8 roce[16];		/* RoCEv2 GID */
-+		u8 max_conns;
-+		u8 max_links;
-+		__be16 feature_mask;
-+		u8 reserved[12];
-+	);
- 	u8 user_eids[][SMC_MAX_EID_LEN];
- };
+ 	batadv_softif_vlan_put(tt_local_entry->vlan);
  
-@@ -159,8 +161,10 @@ struct smc_clc_msg_smcd {	/* SMC-D GID information */
- };
+-	call_rcu(&tt_local_entry->common.rcu, batadv_tt_local_entry_free_rcu);
++	kfree_rcu(tt_local_entry, common.rcu);
+ }
  
- struct smc_clc_smcd_v2_extension {
--	u8 system_eid[SMC_MAX_EID_LEN];
--	u8 reserved[16];
-+	struct_group_tagged(smc_clc_smcd_v2_extension_fixed, fixed,
-+		u8 system_eid[SMC_MAX_EID_LEN];
-+		u8 reserved[16];
-+	);
- 	struct smc_clc_smcd_gid_chid gidchid[];
- };
+ /**
+@@ -254,20 +240,6 @@ batadv_tt_local_entry_put(struct batadv_tt_local_entry *tt_local_entry)
+ 		 batadv_tt_local_entry_release);
+ }
  
-@@ -183,9 +187,9 @@ struct smc_clc_msg_proposal_area {
- 	struct smc_clc_msg_smcd			pclc_smcd;
- 	struct smc_clc_msg_proposal_prefix	pclc_prfx;
- 	struct smc_clc_ipv6_prefix	pclc_prfx_ipv6[SMC_CLC_MAX_V6_PREFIX];
--	struct smc_clc_v2_extension		pclc_v2_ext;
-+	struct smc_clc_v2_extension_fixed	pclc_v2_ext;
- 	u8			user_eids[SMC_CLC_MAX_UEID][SMC_MAX_EID_LEN];
--	struct smc_clc_smcd_v2_extension	pclc_smcd_v2_ext;
-+	struct smc_clc_smcd_v2_extension_fixed	pclc_smcd_v2_ext;
- 	struct smc_clc_smcd_gid_chid
- 				pclc_gidchids[SMCD_CLC_MAX_V2_GID_ENTRIES];
- 	struct smc_clc_msg_trail		pclc_trl;
+-/**
+- * batadv_tt_global_entry_free_rcu() - free the tt_global_entry
+- * @rcu: rcu pointer of the tt_global_entry
+- */
+-static void batadv_tt_global_entry_free_rcu(struct rcu_head *rcu)
+-{
+-	struct batadv_tt_global_entry *tt_global_entry;
+-
+-	tt_global_entry = container_of(rcu, struct batadv_tt_global_entry,
+-				       common.rcu);
+-
+-	kmem_cache_free(batadv_tg_cache, tt_global_entry);
+-}
+-
+ /**
+  * batadv_tt_global_entry_release() - release tt_global_entry from lists and
+  *  queue for free after rcu grace period
+@@ -282,7 +254,7 @@ void batadv_tt_global_entry_release(struct kref *ref)
+ 
+ 	batadv_tt_global_del_orig_list(tt_global_entry);
+ 
+-	call_rcu(&tt_global_entry->common.rcu, batadv_tt_global_entry_free_rcu);
++	kfree_rcu(tt_global_entry, common.rcu);
+ }
+ 
+ /**
+@@ -407,19 +379,6 @@ static void batadv_tt_global_size_dec(struct batadv_orig_node *orig_node,
+ 	batadv_tt_global_size_mod(orig_node, vid, -1);
+ }
+ 
+-/**
+- * batadv_tt_orig_list_entry_free_rcu() - free the orig_entry
+- * @rcu: rcu pointer of the orig_entry
+- */
+-static void batadv_tt_orig_list_entry_free_rcu(struct rcu_head *rcu)
+-{
+-	struct batadv_tt_orig_list_entry *orig_entry;
+-
+-	orig_entry = container_of(rcu, struct batadv_tt_orig_list_entry, rcu);
+-
+-	kmem_cache_free(batadv_tt_orig_cache, orig_entry);
+-}
+-
+ /**
+  * batadv_tt_orig_list_entry_release() - release tt orig entry from lists and
+  *  queue for free after rcu grace period
+@@ -433,7 +392,7 @@ static void batadv_tt_orig_list_entry_release(struct kref *ref)
+ 				  refcount);
+ 
+ 	batadv_orig_node_put(orig_entry->orig_node);
+-	call_rcu(&orig_entry->rcu, batadv_tt_orig_list_entry_free_rcu);
++	kfree_rcu(orig_entry, rcu);
+ }
+ 
+ /**
 -- 
-2.34.1
+2.44.0
 
 
