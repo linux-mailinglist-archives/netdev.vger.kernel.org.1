@@ -1,115 +1,108 @@
-Return-Path: <netdev+bounces-79492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD3B58797C6
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 16:39:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B28128797D4
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 16:42:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 837CD28A2E3
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 15:39:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52A3C1F227FD
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 15:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E0B7D402;
-	Tue, 12 Mar 2024 15:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 216CB7C0B1;
+	Tue, 12 Mar 2024 15:42:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RnNij+wl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ks2tX6Iy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f65.google.com (mail-lf1-f65.google.com [209.85.167.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEEB17D3ED;
-	Tue, 12 Mar 2024 15:38:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A6C1E534;
+	Tue, 12 Mar 2024 15:42:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710257916; cv=none; b=e2caNAd7g0LQPrzf/W6bC8HZaRVpzrwNc9eaM2nblL9ECBlPj1g/GE7ZypWj/BmMng7s3R8euC2gmb0zOMbCZMST+miENl0xI43wT4B0KBgm+pIiE1QY6KHj1d2i7I9anoo+fWfkghDbTU0DUQnegInaQIlShILhbbv3upqQnqA=
+	t=1710258139; cv=none; b=UOsnW1CGnDaqyJHqklqKpFrNOuZWCvyZGjFeFOhleD+dR8WbJ76kz1nicPLgVPZ4m3XIKVY5nnbWRxG76ALHISRt5hOljRrMFXNUa2nmCuSZHZw7ou3hrLJ/vEJ8XfExUuK8yNy3GeFDhx1xFO6sKFOBofqqwzEVjNLDQFMMSsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710257916; c=relaxed/simple;
-	bh=0Rva4MDeT0xT+wbucis/QAB8TKQhRHatjKufsZEJH3U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=t27EQ7Y88oAFZLYX7xYYSb3ReHsUnn1YuM9MHYgZvl4EG3s50wFJJ09SuacuLdwyylMeIEtG5G5P4BmvZeAi3bu9kH4mcmjdLNYa3Fp260+kQhJVE06ZF1j1pHpjpBduTg20n7sagcfyfMBCSvsrqqogTTRV8XLhhJqA/czHE6E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RnNij+wl; arc=none smtp.client-ip=209.85.167.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f65.google.com with SMTP id 2adb3069b0e04-513c1434283so14537e87.3;
-        Tue, 12 Mar 2024 08:38:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710257913; x=1710862713; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MpYZYXFYiMHqF9KEGRX59SN9aENbkML8CEYB3aujr40=;
-        b=RnNij+wlv0+dXUi2I+0i9grp5iBwU3ez8eNnPCmmSZ7+0OIK7cHwlnAkLqiLEtqHMR
-         ZJJk7UPxk4vIriH/QU8L6PPOd+AZRddLutNPa+MaAl+i7yIfoZ6VnApCCKxEBy3gXXOL
-         xt+Cye2cHeru0BCSAmuTjzDz1ydnJd55Sr0EJNoYX1d8W7Cry19SErscQN3qcZHpc/3/
-         Q9gKuLDtPAL4YwLIhvmLQrncm2uGXk/PHvSI4W5uwgE+uzyB7lnayaf+rbgbJuLOzijl
-         X3tg/ecEU/dveDPtEDMhqgR376OZomKprbrczP8/PWUBv33uSPqZFEamE6YDM0/I+ms8
-         BWwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710257913; x=1710862713;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MpYZYXFYiMHqF9KEGRX59SN9aENbkML8CEYB3aujr40=;
-        b=ttoLXbVJwXShDE+xeqX0fa1ERhVpMu3LqG4l4Hib7A7Y3ZXoVQ85ScpyXd5Jvz8Qkz
-         JJ1i2cMg2pLH663H0siNhwLpF6nN5vvyfH+jp2cDHUbFgmkH0HkrhuHiMbQF8mDw9IqQ
-         z+uf0LWkLFXnCzSbrwbmyD33bwEnKN/9zw6aVYeX3rmGiXYwyXpBSa7L1nKDEhYz7JkT
-         yPiuAcB1D8OhJKOPSawzS8wU/AEK0rXZ8oxWPs7PqmM0NBHL4xERUjGapmL0wNdzf9j+
-         uE5zhfbZN1sVBK/dZmlwyPHVtaq1zRb4RZEOyrx3U++3Fxh5nSff0E+augOPjHgLIRFW
-         2tfA==
-X-Forwarded-Encrypted: i=1; AJvYcCV3aGERnI5SQZBbGlW4gUEPB4L5J4WXwpiOLZO9TF1FojhPYUQgY/u4WFuUgh5S5vBtuDQBr6YJxijF67UKIXclfBxFu2YZ0xPS5Uv4
-X-Gm-Message-State: AOJu0Yz2BbMEJZ7T7E9c9LHqzolYH5Bg6Oyx6dGNvvOMdpQcEdtDVbz5
-	e6uijurxGpqcFxCfA9ahKD8LtWzj7IjZEyujXBemlTsEnxufZ3nS
-X-Google-Smtp-Source: AGHT+IGzuHtxEkX2jKr0g66lDy+8pZDNTTQ1lJX6sCTXlKhXXHyfZMozBdZQyQCScO/+JaftgPGEsw==
-X-Received: by 2002:a05:6512:46e:b0:513:c5b7:9ee3 with SMTP id x14-20020a056512046e00b00513c5b79ee3mr417013lfd.6.1710257912789;
-        Tue, 12 Mar 2024 08:38:32 -0700 (PDT)
-Received: from localhost ([217.212.240.67])
-        by smtp.gmail.com with ESMTPSA id i17-20020a05600c355100b00413079f9065sm12813145wmq.8.2024.03.12.08.38.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Mar 2024 08:38:32 -0700 (PDT)
-Message-ID: <e1167dbc-db51-487d-bf6c-9bb5c73539d0@gmail.com>
-Date: Tue, 12 Mar 2024 16:38:02 +0100
+	s=arc-20240116; t=1710258139; c=relaxed/simple;
+	bh=kaba+pIokp3zp1EHJULsrdS8rJZbUpsA1bC4dzl0xGs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ellM1oIZaQ4MSyEWNQRZ5ejujpOYkVSBobm+bPbzFTFuWczHSLNzYVD5WflPgQHNvnH6kKdGIcEV3Rn8UcEWvpoO0jLUBI3sJXk1fjNCwRXDOj/CB5wFRcPaIFP828HAoU6qGifKuaWF2YypaTgmCrVutsHVvf/VeIuQO7StJhM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ks2tX6Iy; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710258138; x=1741794138;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=kaba+pIokp3zp1EHJULsrdS8rJZbUpsA1bC4dzl0xGs=;
+  b=ks2tX6IyUT7k1/RdctKWzv/Zfi0GrUDFDj3GXGsD0MmiNbvOx9RsRoMW
+   jJGdDDQPvyLY2/0LOzYfNSfDurFg9f8a7bYHE6Ia45Gn9kVUcoMLThyp5
+   KeZdRaDPcbCy018VEU6gKiBVkV+/J+GubgEkeJXEpKJYzjWBvgoguuNFs
+   rD+pF1PC11O7QJgaWwfXxuV6IuKDybEHhgl5fzRVpqN+EM12Acshk7e+i
+   i6eFleacjZ2uUDhphylOQncKaG2nbbblBZCKZmS4EMbIy2I6Xv26pXf7/
+   x/96ZYgHfTiCqFhHF35JVkYV6Rbns7qJwnst0D9y1h6QSqS//tO6eSP80
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="4838967"
+X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
+   d="scan'208";a="4838967"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 08:42:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="914400083"
+X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
+   d="scan'208";a="914400083"
+Received: from smile.fi.intel.com ([10.237.72.54])
+  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 08:42:14 -0700
+Received: from andy by smile.fi.intel.com with local (Exim 4.97)
+	(envelope-from <andriy.shevchenko@linux.intel.com>)
+	id 1rk4GZ-0000000Bvt2-2J1i;
+	Tue, 12 Mar 2024 17:42:11 +0200
+Date: Tue, 12 Mar 2024 17:42:11 +0200
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH] lib/bitmap: Fix bitmap_scatter() and bitmap_gather()
+ kernel doc
+Message-ID: <ZfB30-rLXEnJtjrY@smile.fi.intel.com>
+References: <20240312085403.224248-1-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next 0/4] net: route: improve route hinting
-Content-Language: en-US
-To: David Ahern <dsahern@kernel.org>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, willemb@google.com
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240307171202.232684-1-leone4fernando@gmail.com>
- <9ce73c04-ee8f-4aa5-ab15-c31dbe409401@kernel.org>
-From: Leone Fernando <leone4fernando@gmail.com>
-In-Reply-To: <9ce73c04-ee8f-4aa5-ab15-c31dbe409401@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240312085403.224248-1-herve.codina@bootlin.com>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-David Ahern wrote:
-> I have looked at all of the sets sent. I can not convince myself this is
-> a good idea, but at the same time I do not have constructive feedback on
-> why it is not acceptable. The gains are modest at best.
+On Tue, Mar 12, 2024 at 09:54:03AM +0100, Herve Codina wrote:
+> The make htmldoc command failed with the following error
+>   ... include/linux/bitmap.h:524: ERROR: Unexpected indentation.
+>   ... include/linux/bitmap.h:524: CRITICAL: Unexpected section title or transition.
 > 
+> Move the visual representation to a literal block.
 
-Thanks for the comment.
+...
 
-I believe an improvement of 5-8% in PPS is significant. 
-Note that the cache is per-cpu (e.g., for a machine with 10 CPUs, the improvement
-affects 10X the conns mentioned).
+> This patch fixes de5f84338970 ("lib/bitmap: Introduce bitmap_scatter() and bitmap_gather() helpers")
+> available in net-next and linux-next
 
-Could you please provide more information about what you don't like
-in the patch?
+Not sure about rules of net-next, but I would add Fixes FWIW:
 
-Some possible issues I can think of:
-- Do you think the improvement is not affecting the common case?
-In this case, it can be solved by tweaking the cache parameters.
+Fixes: de5f84338970 ("lib/bitmap: Introduce bitmap_scatter() and bitmap_gather() helpers")
 
-- In case performance degradation for some # of conns is problematic - we can
-find ways to reduce it. For example, the degradation for 1 connection can
-probably be solved by keeping the route hints.
+-- 
+With Best Regards,
+Andy Shevchenko
 
-Leone
 
 
