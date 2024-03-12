@@ -1,99 +1,97 @@
-Return-Path: <netdev+bounces-79372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19C8D878DA7
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 04:40:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F031C878DA8
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 04:43:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B66D2281A0F
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 03:40:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 112371C20BE8
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 03:43:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879E0B651;
-	Tue, 12 Mar 2024 03:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i1jA03X+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC5A7B657;
+	Tue, 12 Mar 2024 03:43:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62793AD58
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 03:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FC4EAD53;
+	Tue, 12 Mar 2024 03:43:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710214830; cv=none; b=sJUFHWb8vRb/rhY0iFj9Xaacvm43nRCkKJ4b5xKBSyO8+SyUqOigizFhiBwjCULeVuyGjB06yAfLRbnWg0sKLQflOwXl85w/KI8cVeI7zyrDeCcEl1pjnTe+Tqc8AXgfEVIRK269WJxRO3kLrxbeAIAEa3hAGucapevE4Du3oEg=
+	t=1710214990; cv=none; b=BrItZhzpNDpMLCwpVxK2tGxjPUmZJAYZ6JishbRgWeDgDP2rrl7BqZOOeetXaULsbSUD1snVeDdbdJWKLqg+CoYur+JqNwr/MHTX6TPv49z8M/+vZtmagLEgco/T7lTc/mRQNG3GVhc+GJ1Fn7yn/LrK4kMvGxCQToHqTDU14/Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710214830; c=relaxed/simple;
-	bh=N9w5sH0ctblHemrfMfTT12hjculgaFHT7o1KAXdfIS4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=CA/b8v0FzyJz6F3lbs3SGgo6oNNIyIe6a73RF6MUH5h+DtHZLHw+LZKZHCFSj1vRvKEr2q9yUo93VFGQHBKNvLP44GkkPa4Qjgo8Zm5bULh0WcmaXSWFeZHKQo44MqtT8yLTbDobbgvpdxulAdKXftELpb+rbjsX2lrUfIjv4Cg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i1jA03X+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3573DC43390;
-	Tue, 12 Mar 2024 03:40:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710214830;
-	bh=N9w5sH0ctblHemrfMfTT12hjculgaFHT7o1KAXdfIS4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=i1jA03X+7Fpm4pnvu92vTWoKd6MyPBSWRl5n56O1t6tkT0MH9NUIHDcuW+/hG84fn
-	 qOsOkIuXENHTxWTs34Wo7x4ENkwblmiVnM5u6U1JWGkb14tdE2ARqSmgnVFeX1aq5b
-	 2ZGKTphVbPhc/lVt7xcK4jhsFXSdFKhnHMVat0GzhLk8ErLgiN7RO6wmLL0428MWiN
-	 rgx6sjRO8C20cvYYjpf+CdCL+suighZ03j6Gdk1v1tZxw4GnY4if5qGjMuGpPr0NH3
-	 u04E/82NJ6UpwdsCnXYRiScJevDVzN6jQDHD3fhShvKLU9I+QgJlghQZ7BG1jHTYXp
-	 SzYXMpc6Hyhaw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1670DC395F1;
-	Tue, 12 Mar 2024 03:40:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1710214990; c=relaxed/simple;
+	bh=6WSjm7CvPPrA7TmhGrbPaQ53sA4F2yuCdRSKCOLEdz8=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=sHltJxilR7Ttiqov4EiV0tvtQUyBAhzeF0t6fxB2h3er9I0CYOc0iwkud10IJ2ZMbxqK6DuGBGU7GVz3K9TUXYufYdMea21QX/3EiVSU6vwTGsHDqAHTGODDhI5lJLD90fyaxvnWaZ4K2pNyHYouaeH1xTlNjw1mckVsOvX+8F0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Ttztl3RHBz1h21S;
+	Tue, 12 Mar 2024 11:40:31 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 664FA14025A;
+	Tue, 12 Mar 2024 11:42:57 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 12 Mar 2024 11:42:56 +0800
+Message-ID: <b9b04261-a6e8-4dae-9b41-3b8045811a74@huawei.com>
+Date: Tue, 12 Mar 2024 11:42:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2 0/4] nexthop: Fix two nexthop group statistics
- issues
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171021483008.13560.10002878328772043549.git-patchwork-notify@kernel.org>
-Date: Tue, 12 Mar 2024 03:40:30 +0000
-References: <20240311162307.545385-1-idosch@nvidia.com>
-In-Reply-To: <20240311162307.545385-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, petrm@nvidia.com, dsahern@kernel.org
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
+	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <jiri@resnulli.us>,
+	<shenjian15@huawei.com>, <wangjie125@huawei.com>, <liuyonglong@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V5 net-next 3/4] net: hns3: dump more reg info based on
+ ras mod
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+References: <20240309100044.2351166-1-shaojijie@huawei.com>
+ <20240309100044.2351166-4-shaojijie@huawei.com>
+ <20240312030303.GA1249254@maili.marvell.com>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <20240312030303.GA1249254@maili.marvell.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-Hello:
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+on 2024/3/12 11:03, Ratheesh Kannoth wrote:
+> On 2024-03-09 at 15:30:43, Jijie Shao (shaojijie@huawei.com) wrote:
+>> +		}
+>> +
+>> +		pos = scnprintf(buf, HCLGE_MOD_REG_INFO_LEN_MAX, "%s",
+>> +				reg_info[i].reg_name);
+>> +		if (reg_info[i].has_suffix)
+>> +			pos += scnprintf(buf + pos,
+>> +					 HCLGE_MOD_REG_INFO_LEN_MAX - pos, "%u",
+>> +					 le32_to_cpu(desc->data[0]));
+>> +		pos += scnprintf(buf + pos,
+>> +				 HCLGE_MOD_REG_INFO_LEN_MAX - pos,
+>> +				 ":");
+>> +		for (j = 0; j < reg_info[i].group_size; j++) {
+>> +			offset = reg_info[i].reg_offset_group[j];
+>> +			index = offset % HCLGE_DESC_DATA_LEN;
+>> +			bd_idx = offset / HCLGE_DESC_DATA_LEN;
+>> +			pos += scnprintf(buf + pos,
+>> +					 HCLGE_MOD_REG_INFO_LEN_MAX - pos,
+>> +					 " %08x",
+>> +					 le32_to_cpu(desc[bd_idx].data[index]));
+>> +		}
+>> +		buf[pos] = '\0';
+> ASFAIK, scnprintf does null terminate the string.
 
-On Mon, 11 Mar 2024 18:23:03 +0200 you wrote:
-> Fix two issues that were introduced as part of the recent nexthop group
-> statistics submission. See the commit messages for more details.
-> 
-> v2:
-> * Only parse NHA_OP_FLAGS for messages that require it (patches #1-#2
->   are new)
-> * Resize 'tb' using ARRAY_SIZE (new change in patch #3)
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v2,1/4] nexthop: Only parse NHA_OP_FLAGS for get messages that require it
-    https://git.kernel.org/netdev/net-next/c/dc5e0141ff19
-  - [net-next,v2,2/4] nexthop: Only parse NHA_OP_FLAGS for dump messages that require it
-    https://git.kernel.org/netdev/net-next/c/262a68aa46f8
-  - [net-next,v2,3/4] nexthop: Fix out-of-bounds access during attribute validation
-    https://git.kernel.org/netdev/net-next/c/d8a21070b6e1
-  - [net-next,v2,4/4] nexthop: Fix splat with CONFIG_DEBUG_PREEMPT=y
-    https://git.kernel.org/netdev/net-next/c/e006858f1a1c
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Yeah, you're right. I will send v6 to delete it
 
 
