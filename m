@@ -1,174 +1,152 @@
-Return-Path: <netdev+bounces-79579-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DED4B879F22
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:55:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 343F8879F1A
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:53:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25FF31C21D2F
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 22:55:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 522551C21AE7
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 22:53:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D25B84205A;
-	Tue, 12 Mar 2024 22:55:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 629AB2EAF7;
+	Tue, 12 Mar 2024 22:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="gLZL5uqb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gLO/Y7kd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37FFD2EAF7
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 22:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB5EB2C9D;
+	Tue, 12 Mar 2024 22:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710284110; cv=none; b=K300+nP5LDkwdBNjipnAdOHSPpUhLsi3PnD6MFzJQrOAMTMsrASAyW6qRXPt0vnPOXkKTukVcRqDMubLMWhbdHXOoBVF5PbkTYavgIsXfbJCh9f77lreCt0gGkOMfxOv3rtjlstACkO7YA3mONv4Wss1gy8VVbnm94Syz7+Y31s=
+	t=1710284015; cv=none; b=J14YSipTsW4/eCZf+5WehGq3wdBxTNkAghlMpfkQGdv5HRuaCegPgRON8p+cy21Wu4aCdW1LLrTD2u+dlTtfvrHSJJn0S76uhqkOeLvfwYti8noL5ncJw55iGdkSZJxcgJIDNbbR98Zykt+FwlY8j0pyP9aCjrOoFlEqQZ2OYSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710284110; c=relaxed/simple;
-	bh=svRJEBM+C3QE064pQ/pEML8YbGL/qqMDURCpWAG8Mz4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=dDD8gt2z+d4NLTqg7HrFaLOlK0FA7m17ZTh0aER77LDYDK8O6TDZcUa5TwvuNJ4qSR1QACx9HdEIYaUAYUJN4ZYS8ELoU4TBC5B7ErmGEXQpGVbTZxqoLQDEER4r5jyfCrY7ljER7vcektGp1m0AxhfgZLxJRgL6sbabWi7ybS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=gLZL5uqb; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-29c09ee1bceso2036875a91.2
-        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 15:55:08 -0700 (PDT)
+	s=arc-20240116; t=1710284015; c=relaxed/simple;
+	bh=oiHBupg3hKTNDZyDCbcsnZhSvrtP3cmmac4MXjYgg3E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kyDELppB+/VYB4fzTYCYaOsIXqjfWyr93j/MintaTltMsLiZCbk1SE97IcH7GQ7ESENUA3rARovjdp5a2fisZdV3nkGpjy39Wo92nu6vwAFt1vXWLPf19g7WPiBJrTYBJbuMq4VBcciAKc+C5hxHKeQW0py7HocrIoKyJYiEeuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gLO/Y7kd; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-5ce6b5e3c4eso3099391a12.2;
+        Tue, 12 Mar 2024 15:53:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1710284108; x=1710888908; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/Ib/pb+kLOd5ocoVhOz3+USGBF+/XkIcYOjmle2ItM4=;
-        b=gLZL5uqbxtOYm+eQxnqUzQG7w7gvwiPIw9xYmQww2PSMKGvyoOrMuF9eZQhHh1Jp/K
-         jREAEf+Kro5gRL9nW2IgP6LA/6u15WmepjYnkjeK3fVW+60xk6ROEtR1QH46PISaDyww
-         mi3DaZjymviouq7+E601aJqeNYebPORhcnzIxHiYPK3Q9nvVzndGU74hbl9FTuwxGoVs
-         4XX1FdNJpc31wG5ONg/Jdh5kSPkXvkbeu6ucioqj/YQ7wJNPOK6tLGU2LtWt2nLFCvvr
-         ORps+q5dGCbFwkEYU1U92OJFf5fC2JHuvuljuTDlEfyMbrBajBfGO0al9DjmPA09SlO7
-         L3WA==
+        d=gmail.com; s=20230601; t=1710284013; x=1710888813; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Ws0GCecP3gtok9CdydFBjF3vhcGqXsT8MJwMPrN7s4I=;
+        b=gLO/Y7kdAlWve1YKBH5MCxjA15grt7f56uLYMMXAjHHMlg+b24hiz1Gwya1Hun0F2K
+         js0KyRJVuXSYuXbOi6ORzZfuIBrYjaEHUqa/P11Ar5HDUrxRDlKpyG0SKz9oWebiqLgc
+         27o1RT33i0JVuEYXGnm1fg3mrR+nL336od1/EJmAT5HaCE/lD+njhdhrWP3LR2PKtP0d
+         8H4xsNlkS0QCaqpoU197iH4pnO+I25E7CzWolxx1ZOmIsYzTdc4mgS1Cv7urPl4BRfzD
+         7etTjBu57UrrX4dPTjyWfUZMPs1AFut1UiA9NpYAT7TQkilP+tnmvJyo42xMJttMwRxR
+         G40g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710284108; x=1710888908;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/Ib/pb+kLOd5ocoVhOz3+USGBF+/XkIcYOjmle2ItM4=;
-        b=aelo9Zb6KRMopSEg9+2LzOYXt/cMi4FqAKWKePXtmDM1KaR7D4K9GcZYMGkqlfoMEM
-         v2E/KlR/OCrUF1XsHS7CqaASJBUbqKIRtNKgNhxc6crwrdaRHrJlFOAVHX+pgfYGBKuu
-         UQd2k9P/4+z4yJLs1ZOnUcoaRLqD898KBMZepW5eKp3vYjWdyPzRfX9mNy7vMAm+0g1q
-         6dt1vvALYIy0trvwWZsInmSIGZc6voiKOOTbbR9LbiKapFFPs7BHiGFQR8R2GSYQ8fpq
-         UAEVD+Si2HSqjx71paEIod3XzBPWTml5pN8yp00zEim/3atL7jBtgmHeGv6oVYkKnEVg
-         B8NA==
-X-Gm-Message-State: AOJu0YyDfETlsxeixgfBHcK65ZWb83h+3j0VIBqa5MI+NWj/yllNeKVj
-	0onJqdMEOmyB1ypGWPHRlUVNEDOgMy1fdEfyh//QG10OMna4iFMx7o39JTg+ThXB6uoYZbMGSp/
-	v
-X-Google-Smtp-Source: AGHT+IGeOTf6zq8oES+yQxInSoGIoS7cLEMqBTBkHF+luuaklFfFm3Oe4AZblVJUknzT5toGmlmsTQ==
-X-Received: by 2002:a17:90b:4d90:b0:29c:3af5:e274 with SMTP id oj16-20020a17090b4d9000b0029c3af5e274mr2710931pjb.28.1710284108490;
-        Tue, 12 Mar 2024 15:55:08 -0700 (PDT)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id y8-20020a17090a8b0800b0029bb8ebdc23sm98947pjn.37.2024.03.12.15.55.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Mar 2024 15:55:08 -0700 (PDT)
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute2 3/5] skbmod: support json in print
+        d=1e100.net; s=20230601; t=1710284013; x=1710888813;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ws0GCecP3gtok9CdydFBjF3vhcGqXsT8MJwMPrN7s4I=;
+        b=WkPBz1udna+/r4zVx8BNvJQkRKKT/q0JcTWe4EKjIKoam8HDXSkwvfa8vv1dToQdl3
+         MZOwzp6r6VpdNAVo50hU5sr2+uVmnTh3hvzheDOxP/xRRZePW79osG4R8zIM70+9WX8f
+         19j68OzTYR6inGQ7WCkB6kfc8+LYsikSf5U/EgSsj2e2FoOLAhCz7wTxWF+M/AKL8Toa
+         b2GxItj8OQDW+dRLPVDj0lNgPtNHeFsKUz4kcEhHX9NFbAWQt3mdCpOzTJxkZ7C7J9Bw
+         EbC1NHh0i+Tefjy6TgipyyJngmfRwbypo+NucICHRpqnYrSGbDxYJZ+wbSo7IB1Q8elY
+         WMvw==
+X-Forwarded-Encrypted: i=1; AJvYcCVxC5Ofp3dS5+948ni+2Fz2WWMhVYs14vS/xt5x681FNGoFDHFydqGHx2LMHr0C3cYaTtAGHEdFTOQUn5sLQrte8FkuTitU+sCV5PNjGWrUtW2Vvlm257/XPVyQ5vbdxbGF3x6F
+X-Gm-Message-State: AOJu0YzWTb/Ylag4t+bBopk9PSx0Z4M+ZIt7jDtPrLynMgn9QTtlpwXW
+	DoABlnuNUtwBbaDRYWi2yw80nLgo+GKFc6MJebXbB84dWptMtpGA
+X-Google-Smtp-Source: AGHT+IGgUc908mpe9CvZd5TjoTqUBzD5lc8ql9iD5ivS6tRq+62jKxgFTufh2kq7KuswUAkIOKSchw==
+X-Received: by 2002:a05:6a21:998e:b0:1a3:318f:bc69 with SMTP id ve14-20020a056a21998e00b001a3318fbc69mr442423pzb.4.1710284013162;
+        Tue, 12 Mar 2024 15:53:33 -0700 (PDT)
+Received: from [10.69.40.148] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id c12-20020a17090aa60c00b0029c0cc16888sm104797pjq.1.2024.03.12.15.53.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Mar 2024 15:53:32 -0700 (PDT)
+Message-ID: <ae35799d-5560-4761-848f-578051a9fca3@gmail.com>
 Date: Tue, 12 Mar 2024 15:53:30 -0700
-Message-ID: <20240312225456.87937-4-stephen@networkplumber.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240312225456.87937-1-stephen@networkplumber.org>
-References: <20240312225456.87937-1-stephen@networkplumber.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: phy: mdio-bcm-unimac: Cast denominator to
+ unsigned long to avoid overflow
+Content-Language: en-US
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, Daniil Dulov
+ <d.dulov@aladdin.ru>, Jakub Kicinski <kuba@kernel.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+References: <20240312165358.7712-1-d.dulov@aladdin.ru>
+ <ZfCOb4x/+41y+SW3@shell.armlinux.org.uk>
+ <df295be9-d33e-45d2-914f-c9c1554e5ac0@gmail.com>
+ <b1acf9d0-872c-487a-9938-6d667959d0d3@gmail.com>
+ <ZfCwGF3JRiFdJ353@shell.armlinux.org.uk>
+From: Doug Berger <opendmb@gmail.com>
+In-Reply-To: <ZfCwGF3JRiFdJ353@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-This tc action never got jsonized.
+On 3/12/2024 12:42 PM, Russell King (Oracle) wrote:
+> On Tue, Mar 12, 2024 at 12:23:20PM -0700, Doug Berger wrote:
+>> On 3/12/2024 10:23 AM, Florian Fainelli wrote:
+>>> On 3/12/24 10:18, Russell King (Oracle) wrote:
+>>>> On Tue, Mar 12, 2024 at 07:53:58PM +0300, Daniil Dulov wrote:
+>>>>> The expression priv->clk_freq * 2 can lead to overflow that will cause
+>>>>> a division by zero. So, let's cast it to unsigned long to avoid it.
+>>>>
+>>>> How does casting this help? "unsigned long" can still be 32-bit.
+>>>> Maybe unimac_mdio_probe() should be validating the value it read from
+>>>> DT won't overflow? I suspect that a value of 2.1GHz is way too large
+>>>> for this property in any case.
+>>>>
+>>>> https://en.wikipedia.org/wiki/Management_Data_Input/Output#Electrical_specification
+>>>>
+>>>> (note, this driver is clause-22 only.)
+>>>>
+>>>
+>>> Had commented on the previous version (not sure why this was not
+>>> prefixed with v2) that the maximum clock frequency for this clock is
+>>> 250MHz, the driver could check that to prevent for an overflow, most
+>>> certainly.
+>>
+>> Could also use:
+>> -	div = (rate / (2 * priv->clk_freq)) - 1;
+>> +	div = ((rate / priv->clk_freq) >> 1) - 1;
+>> which is mathematically equivalent without the risk of overflow.
+> 
+> What's the point when the maximum clock frequency that the driver should
+> allow fits within u32, nay u28?
+I'm assuming this question is rhetorical since I agree there is little 
+point to this change.
 
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
----
- tc/m_skbmod.c | 37 +++++++++++++++++++++----------------
- 1 file changed, 21 insertions(+), 16 deletions(-)
+However, in case it's not, the point is to make the SVACE tool happy. 
+The tool has correctly identified that it is possible for the devicetree 
+to specify values that would produce an intermediate overflow. The fact 
+that there is no existing hardware for which those values are legitimate 
+may be very relevant, but the binding documentation does not specify any 
+such limitations and the future has a tendency to make numbers that seem 
+ludicrous today less ludicrous ;). The brcm,unimac-mdio IP could find 
+itself in some future piece of silicon where it would be capable of 
+dividing such unlikely clocks since software has a knack for outliving 
+the hardware for which it may have been originally written.
 
-diff --git a/tc/m_skbmod.c b/tc/m_skbmod.c
-index b1c8d00dfe47..87de59cf60bb 100644
---- a/tc/m_skbmod.c
-+++ b/tc/m_skbmod.c
-@@ -177,43 +177,48 @@ static int print_skbmod(struct action_util *au, FILE *f, struct rtattr *arg)
- 
- 	p = RTA_DATA(tb[TCA_SKBMOD_PARMS]);
- 
--	fprintf(f, "skbmod ");
-+	print_string(PRINT_FP, NULL, "skbmod ", NULL);
- 	print_action_control(f, "", p->action, " ");
- 
- 	if (tb[TCA_SKBMOD_ETYPE]) {
- 		skbmod_etype = rta_getattr_u16(tb[TCA_SKBMOD_ETYPE]);
- 		has_optional = 1;
--		fprintf(f, "set etype 0x%X ", skbmod_etype);
-+		print_0xhex(PRINT_ANY, "etype", "set etype 0x%X ", skbmod_etype);
- 	}
- 
- 	if (has_optional)
--		fprintf(f, "\n\t ");
-+		print_string(PRINT_FP, NULL, "%s\t ", _SL_);
- 
- 	if (tb[TCA_SKBMOD_DMAC]) {
- 		has_optional = 1;
--		fprintf(f, "set dmac %s ",
--			ll_addr_n2a(RTA_DATA(tb[TCA_SKBMOD_DMAC]),
--				    RTA_PAYLOAD(tb[TCA_SKBMOD_DMAC]), 0, b1,
--				    sizeof(b1)));
-+		print_color_string(PRINT_ANY, COLOR_MAC, "dmac",
-+				   "set dmac %s ",
-+				   ll_addr_n2a(RTA_DATA(tb[TCA_SKBMOD_DMAC]),
-+					       RTA_PAYLOAD(tb[TCA_SKBMOD_DMAC]), 0, b1,
-+					       sizeof(b1)));
- 
- 	}
- 
- 	if (tb[TCA_SKBMOD_SMAC]) {
- 		has_optional = 1;
--		fprintf(f, "set smac %s ",
--			ll_addr_n2a(RTA_DATA(tb[TCA_SKBMOD_SMAC]),
--				    RTA_PAYLOAD(tb[TCA_SKBMOD_SMAC]), 0, b2,
--				    sizeof(b2)));
-+		print_color_string(PRINT_ANY, COLOR_MAC, "smac",
-+				   "set smac %s ",
-+				   ll_addr_n2a(RTA_DATA(tb[TCA_SKBMOD_SMAC]),
-+					       RTA_PAYLOAD(tb[TCA_SKBMOD_SMAC]), 0, b2,
-+					       sizeof(b2)));
- 	}
- 
- 	if (p->flags & SKBMOD_F_SWAPMAC)
--		fprintf(f, "swap mac ");
-+		print_null(PRINT_ANY, "swapmac", "swap mac ", NULL);
- 
- 	if (p->flags & SKBMOD_F_ECN)
--		fprintf(f, "ecn ");
-+		print_null(PRINT_ANY, "ecn", "ecn ", NULL);
-+
-+	print_nl();
-+	print_uint(PRINT_ANY, "index", "\t index %u ", p->index);
-+	print_int(PRINT_ANY, "ref", "ref %d ", p->refcnt);
-+	print_int(PRINT_ANY, "bind", "bind %d", p->bindcnt);
- 
--	fprintf(f, "\n\t index %u ref %d bind %d", p->index, p->refcnt,
--		p->bindcnt);
- 	if (show_stats) {
- 		if (tb[TCA_SKBMOD_TM]) {
- 			struct tcf_t *tm = RTA_DATA(tb[TCA_SKBMOD_TM]);
-@@ -222,7 +227,7 @@ static int print_skbmod(struct action_util *au, FILE *f, struct rtattr *arg)
- 		}
- 	}
- 
--	fprintf(f, "\n");
-+	print_string(PRINT_FP, NULL, "\n", NULL);
- 
- 	return 0;
- }
--- 
-2.43.0
+My suggestion was merely an attempt to remove the possibility of 
+overflow (the unrealized bug) without altering existing functionality 
+and without needlessly promoting to a larger data type.
 
+Best regards,
+     Doug
 
