@@ -1,91 +1,251 @@
-Return-Path: <netdev+bounces-79537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F9DC879D90
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 22:40:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 129DC879DB3
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 22:46:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A97828338C
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 21:40:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BCE5E28287D
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 21:46:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2579A143738;
-	Tue, 12 Mar 2024 21:40:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7677A143C77;
+	Tue, 12 Mar 2024 21:44:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Tr2/bmlG"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="flv4yFm4"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A3AB13B2BF;
-	Tue, 12 Mar 2024 21:40:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7E4F143C6F
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 21:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710279612; cv=none; b=skk0tSoUnwwbXQt3FQhJIej53kRBs/XCqd6qXtZ/F76s0IGvRJ1bfkIL6ohBkToHaw6xoBCpYmIiJADa+1FMTGPjTCg+zkVJCLMehfmNGf3qHazE+4qHlzWXjyUGY+wfm1PGHOITmcyvPFw8LLdrvFc4APb7nh2prpK0ikcrVtg=
+	t=1710279876; cv=none; b=du0OWMKiwjlFFJkRuOtDKDmhvnWZZp1wRfdowjbt39BbGgn63Z6zDUloIeoi5NZWTwaJxaFvFqnhympKmZ19EZTpbUfFJhou9LTfqZvcVSChGYAEO1PQdw47Gbudrc8bPqnFH8Mj5dy3d79Th9H2I64YolxvXq5FEjPpHzKf62s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710279612; c=relaxed/simple;
-	bh=+80JYJzoe18PwUCOYAW7gnfaLZghFUWOhMTo6ihGcoI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hpjP0x49XVSMcYTlnw48EjGcrNyr7S1yZVqwCjcBlxDuBHgT6xOuqcATsADzEulBTA7kA2jRxxyDZYorTD7BfsuAa73UtKjiT0FqpuTGROridplL5HErGeCTSqEvtn2b0tuzrf2JTF2FD4ZDLSacwxRHZyvRug6FD7veQEOEJyM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Tr2/bmlG; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=pB0npZBb02/Y7AXQyoSQVHyq17wriRhZ0GXXdXTPYXU=; b=Tr2/bmlGtLutH42IYRuYmfOZZy
-	+nc0B3WD8q8J/rMNBisjeLQBjUFU3EHvIDDJwrYYMqCXgvMJqQ4gZr6ElT321sVZyoq4gZBBEqW4i
-	RQa97YJ1CdlThAjWpELSF7yt9vE6NtS1pxwKZ2YAnXXVRIXeDGMhc1GjJk+WtjqBLoIk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rk9rT-00A570-D4; Tue, 12 Mar 2024 22:40:39 +0100
-Date: Tue, 12 Mar 2024 22:40:39 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Ronnie.Kunin@microchip.com
-Cc: Raju.Lakkaraju@microchip.com, netdev@vger.kernel.org,
-	davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org,
-	Bryan.Whitehead@microchip.com, richardcochran@gmail.com,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net 3/3] net: lan743x: Address problems with wake option
- flags configuration sequences
-Message-ID: <fd22d022-cad4-489c-9861-36765dd98a87@lunn.ch>
-References: <20240226080934.46003-1-Raju.Lakkaraju@microchip.com>
- <20240226080934.46003-4-Raju.Lakkaraju@microchip.com>
- <78d7e538-9fa0-490e-bcfb-0a5943ad80c9@lunn.ch>
- <LV8PR11MB87008454A629EE15B9CE14099F272@LV8PR11MB8700.namprd11.prod.outlook.com>
- <PH8PR11MB79656DCF7806D7390C7100DE95272@PH8PR11MB7965.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1710279876; c=relaxed/simple;
+	bh=HbMLQ0HD1E7UHtw4VSX38KM+HT5CUH3L0YK3XDrE/18=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JWXCXvJhaHnsf+oarzYlezvNo+i9wdgynK4803/kaaaK+vAdJDzYn7wfbrcwwPEmKd/lS7u9PcUA5Vb+2k8AVd+2cDDRgnfWNoBDfokeNmkeeztWS8zFfDp+0evTtKuJXdWbGAifgW6/A9zxv5vA7ndAQJ6mrVL9+Xc1/iSzuEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=flv4yFm4; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1d944e8f367so3462895ad.0
+        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 14:44:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1710279874; x=1710884674; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5eO8gM2RtZqrOolc6NogGR6fkDkvymdIIdLJNjiyriQ=;
+        b=flv4yFm40E4U6N+ZsvdOzskCxYQnpxUacbcyoj0qIRmkJBW9rvKK453qylFvWNkoto
+         m9pYh3kOtiV3g11jo2j6iJP5elc8SExR+S64a9gfh9TCZ86blnDbwQ8mr7cAj/b83UBH
+         AJLMe5jm3CEU4ekw2jSUUupn5PyKp66FyJEjmUhNqg0mf8Q9bdhYII1lvn/QcM0yF1A5
+         vDBx5wJ37mC3I3G/P6hLbYhrBQNiSPXlHzcL0n6DeQ4N2VG007LOCwBj/tjxSWOUvq1B
+         dX/Ha7nDnou+mK1OWztFTGwx+UCsVJVtY6UBGQBx1UQlmPXvM5B/GXnwrFfga1bDSamo
+         KGSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710279874; x=1710884674;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5eO8gM2RtZqrOolc6NogGR6fkDkvymdIIdLJNjiyriQ=;
+        b=t9hi7zBeiS+cpYZcBbFJ/DcJPCM+SHITExJQxQKmFhk4FFoEi+Bu25iu0OjRqF4BSq
+         ng+dHJH88Os+7C4aVIOHFT6vYLfXV+IjXafx23D2HfQr1mtCB7xzHd4mnBF+BMXSh6OM
+         JcFlxvgf+g9ILPIMnYTm9iXtlg9206nv7eQG2GE87/j18p5wgp7nzjcmtoBcAvQ4E+tL
+         00HeKlX0SQCVZPdaY1KHY1NbLQeCsJz8ceESWxO98JLPmLJamerC7DZ7/y8ZqBZ5C2gz
+         Nz8el9JPBwtleh/cEM1lpJNJ64iCGKxb2HxC6cnxtOQxNVTtwqnwotkAVD7w19EWcN6/
+         QN9A==
+X-Forwarded-Encrypted: i=1; AJvYcCXfTKFHAOFd7FNFaJUhxST8kNp10J0LnSJ7M98Q81kv0sY3OMo03Wk8APBceMbAki1C8SdSPkOtLVkB+8xR2fWCE8Gv2TSy
+X-Gm-Message-State: AOJu0YzilHhSwK+YrD9lSdoWRia+0MSwbyssYNlM7GoS/OHDuCWTjoIF
+	uvOY8lmPQWv2grBlOzpPq85V1dlj0//Hsibh3Q2CQzNswxdf494SuDB3YCarAm4=
+X-Google-Smtp-Source: AGHT+IGUZlbyBfpryoFo8y1ZZRCIJc9MaGPPUkOazFNOkaPw8jH3LQWVOeCb8g9FlTX8rjpYBtp/ww==
+X-Received: by 2002:a17:903:110c:b0:1dc:cbaa:f5dd with SMTP id n12-20020a170903110c00b001dccbaaf5ddmr1844263plh.39.1710279873881;
+        Tue, 12 Mar 2024 14:44:33 -0700 (PDT)
+Received: from localhost (fwdproxy-prn-014.fbsv.net. [2a03:2880:ff:e::face:b00c])
+        by smtp.gmail.com with ESMTPSA id t8-20020a170902e84800b001c407fac227sm7162255plg.41.2024.03.12.14.44.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Mar 2024 14:44:33 -0700 (PDT)
+From: David Wei <dw@davidwei.uk>
+To: io-uring@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Mina Almasry <almasrymina@google.com>
+Subject: [RFC PATCH v4 00/16] Zero copy Rx using io_uring
+Date: Tue, 12 Mar 2024 14:44:14 -0700
+Message-ID: <20240312214430.2923019-1-dw@davidwei.uk>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PH8PR11MB79656DCF7806D7390C7100DE95272@PH8PR11MB7965.namprd11.prod.outlook.com>
+Content-Transfer-Encoding: 8bit
 
-> I understand that the TI devices give the *impression* of supporting
-> both, but based on what I explained above, even if you accept
-> WAKE_MAGIC and WAKE_MAGICSEGURE on a set and report them both back
-> as enabled on a get; whatever behavior your hardware does will not
-> be fully compliant to both specs simultaneously anyway. I discussed
-> this with Raju and what we decided to do for our driver/device is
-> that if you pass both WAKE_MAGIC and WAKE_MAGICSEGURE flags to us we
-> will report them back as both being enabled in a subsequent get as
-> you suggested, but the behavior of our driver/hardware will be as if
-> you had only enabled WAKE_MAGIC.
+This patchset is a proposal that adds zero copy network Rx to io_uring.
+With it, userspace can register a region of host memory for receiving
+data directly from a NIC using DMA, without needing a kernel to user
+copy.
 
-So i agree having WAKE_MAGIC and WAKE_MAGICSECURE at the same time
-seems very odd. So i see no real problem limiting the driver to only
-one or the other. However, if the user does ask for both, i would say
-silently ignoring one is incorrect. You should return -EOPNOTUPP to
-make it clear you don't support both at the same time.
+This is still a WIP and has a list of known issues. We're looking for
+feedback on the overall approach.
 
-I would also say that silently ignore the Secure version is probably
-the worst choice. Things should be secure by default...
+Full kernel tree including some out of tree BNXT changes:
 
-     Andrew
+https://github.com/spikeh/linux/tree/zcrx
+
+On the userspace side, support is added to both liburing and Netbench:
+
+https://github.com/spikeh/liburing/tree/zcrx2
+https://github.com/spikeh/netbench/tree/zcrx
+
+Hardware support is added to the Broadcom BNXT driver. This patchset +
+userspace code was tested on an Intel Xeon Platinum 8321HC CPU and
+Broadcom BCM57504 NIC.
+
+Early benchmarks using this prototype, with iperf3 as a load generator,
+showed a ~50% reduction in overall system memory bandwidth as measured
+using perf counters. Note that DDIO must be disabled on Intel systems.
+Build Netbench using the modified liburing above.
+
+This patchset is based on the work by Jonathan Lemon
+<jonathan.lemon@gmail.com>:
+https://lore.kernel.org/io-uring/20221108050521.3198458-1-jonathan.lemon@gmail.com/
+
+Changes in RFC v4:
+------------------
+
+* Rebased on top of Mina Almasry's TCP devmem patchset and latest
+  net-next, now sharing common infra e.g.:
+    * netmem_t and net_iovs
+    * Page pool memory provider
+* The registered buffer (rbuf) completion queue where completions from
+  io_recvzc requests are posted is removed. Now these post into the main
+  completion queue, using big (32-byte) CQEs. The first 16 bytes is an
+  ordinary CQE, while the latter 16 bytes contain the io_uring_rbuf_cqe
+  as before. This vastly simplifies the uAPI and removes a level of
+  indirection in userspace when looking for payloads.
+  * The rbuf refill queue is still needed for userspace to return
+    buffers to kernel.
+* Simplified code and uAPI on the io_uring side, particularly
+  io_recvzc() and io_zc_rx_recv(). Many unnecessary lines were removed
+  e.g. extra msg flags, readlen, etc.
+
+Changes in RFC v3:
+------------------
+
+* Rebased on top of Jakub Kicinski's memory provider API RFC. The ZC
+  pool added is now a backend for memory provider.
+* We're also reusing ppiov infrastructure. The refcounting rules stay
+  the same but it's shifted into ppiov->refcount. That lets us to
+  flexibly manage buffer lifetimes without adding any extra code to the
+  common networking paths. It'd also make it easier to support dmabufs
+  and device memory in the future.
+  * io_uring also knows about pages, and so ppiovs might unnecessarily
+    break tools inspecting data, that can easily be solved later.
+
+Many patches are not for upstream as they depend on work in progress,
+namely from Mina:
+
+* struct netmem_t
+* Driver ndo commands for Rx queue configs
+* struct page_pool_iov and shared pp infra
+
+Changes in RFC v2:
+------------------
+
+* Added copy fallback support if userspace memory allocated for ZC Rx
+  runs out, or if header splitting or flow steering fails.
+* Added veth support for ZC Rx, for testing and demonstration. We will
+  need to figure out what driver would be best for such testing
+  functionality in the future. Perhaps netdevsim?
+* Added socket registration API to io_uring to associate specific
+  sockets with ifqs/Rx queues for ZC.
+* Added multi-socket support, such that multiple connections can be
+  steered into the same hardware Rx queue.
+* Added Netbench server/client support.
+
+Known deficiencies that we will address in a future patchset:
+
+* Proper test driver + selftests, maybe netdevsim.
+* Revisiting userspace API.
+* Multi-region support.
+* Steering setup.
+* Further optimisation work.
+* ...and more.
+
+If you would like to try out this patchset, build and run the kernel
+tree then build Netbench using liburing, all from forks above.
+
+Run setup.sh first:
+
+https://gist.github.com/isilence/e6a28ce41a545a261566672104afa461
+
+Then run the following commands:
+
+sudo ip netns exec nsserv ./netbench --server_only 1 --v6 false \
+    --rx "io_uring --provide_buffers 0 --use_zc 1 \
+    --zc_pool_pages 16384 --zc_ifname ptp-serv" --use_port 9999
+
+sudo ip netns exec nscl ./netbench --client_only 1 --v6 false \
+    --tx "epoll --threads 1 --per_thread 1 --size 2800" \
+    --host 10.10.10.20 --use_port 9999
+
+David Wei (7):
+  io_uring: introduce interface queue
+  io_uring: add mmap support for shared ifq ringbuffers
+  netdev: add XDP_SETUP_ZC_RX command
+  io_uring: setup ZC for an Rx queue when registering an ifq
+  io_uring: add zero copy buf representation and pool
+  io_uring: add io_recvzc request
+  io_uring/zcrx: add copy fallback
+
+Pavel Begunkov (9):
+  net: generalise pp provider params passing
+  io_uring: delayed cqe commit
+  net: page_pool: add ->scrub mem provider callback
+  io_uring: separate header for exported net bits
+  io_uring/zcrx: implement socket registration
+  io_uring: implement pp memory provider for zc rx
+  io_uring/zcrx: implement PP_FLAG_DMA_* handling
+  net: execute custom callback from napi
+  veth: add support for io_uring zc rx
+
+ drivers/net/veth.c             | 214 +++++++-
+ include/linux/io_uring.h       |   6 -
+ include/linux/io_uring/net.h   |  30 ++
+ include/linux/io_uring_types.h |   5 +
+ include/linux/net.h            |   2 +
+ include/linux/netdevice.h      |   6 +
+ include/net/busy_poll.h        |   7 +
+ include/net/netdev_rx_queue.h  |   3 +
+ include/net/page_pool/types.h  |   2 +
+ include/uapi/linux/io_uring.h  |  50 ++
+ io_uring/Makefile              |   3 +-
+ io_uring/io_uring.c            |  15 +-
+ io_uring/io_uring.h            |  10 +
+ io_uring/net.c                 | 108 +++-
+ io_uring/opdef.c               |  16 +
+ io_uring/register.c            |  13 +
+ io_uring/uring_cmd.c           |   1 +
+ io_uring/zc_rx.c               | 916 +++++++++++++++++++++++++++++++++
+ io_uring/zc_rx.h               |  83 +++
+ net/core/dev.c                 |  48 +-
+ net/core/page_pool.c           |   8 +-
+ net/socket.c                   |   3 +-
+ 22 files changed, 1530 insertions(+), 19 deletions(-)
+ create mode 100644 include/linux/io_uring/net.h
+ create mode 100644 io_uring/zc_rx.c
+ create mode 100644 io_uring/zc_rx.h
+
+-- 
+2.43.0
+
 
