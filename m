@@ -1,106 +1,118 @@
-Return-Path: <netdev+bounces-79395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 063EE878F9B
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 09:22:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35882878FD2
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 09:38:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFADA1F21887
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 08:22:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E69CB2824CB
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 08:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC92969D00;
-	Tue, 12 Mar 2024 08:22:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E928A77656;
+	Tue, 12 Mar 2024 08:38:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b="uDQct1sW"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="da+a25s0"
 X-Original-To: netdev@vger.kernel.org
-Received: from taslin.fdn.fr (taslin.fdn.fr [80.67.169.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B97F6997E
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 08:22:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.67.169.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00DB0C8DD;
+	Tue, 12 Mar 2024 08:38:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710231736; cv=none; b=roZ09vUuWq7HXCtSrmfu+Ahcxmu28IRQmsnGTeDNtO0QNAFnaxV/2nRG7+OqbWmWfokU5x6ZaXlUubQeEiMx0EWmSGGxFyRpy5nEcTZ2sXo9DZDVbEXiwbp/cMt8K/IjRupUZUvkAWX30ceAad793aGSfMFw9k8hoFpb8jOo73A=
+	t=1710232710; cv=none; b=MJiflShcxrhy+AYTr2KRISM+KtKE1O/RhzeVkXjTjVaCLRrcSWiqrf1loLLXctnTCkIUFgPe+OJeHG1yoWUDVlfvBqLH/suRiOo4L+w6psI2z5zD9PKdwdtlqysR8G0/3B3MbADfeIeVNI+HKD1lBAhQTjjPHxmTBNvs+NIFWb8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710231736; c=relaxed/simple;
-	bh=ocnfBw9s9NdEsh0cXrfgz6rAXjlFH8k5MagF3W7Gizs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a8ozzLF7apB/YbWlMi5ZC43B/lbUQNgo8D0Ssc0T69d/+1EiEen+Q6Ks90pa6GydDR12roZ+o572ZwFb2ZODTjP3t3Bd+AT1y2IEIbl3f9DBqSEy4KjmeKnYNtwFaYc4pSR7OwNgNGXrCwkVqHa99w3I8OPPrJfFlCCNGM8Tn0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name; spf=pass smtp.mailfrom=max.gautier.name; dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b=uDQct1sW; arc=none smtp.client-ip=80.67.169.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=max.gautier.name
-Received: from localhost (unknown [IPv6:2001:910:10ee:0:6a9a:1db7:4d8d:d1a9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by taslin.fdn.fr (Postfix) with ESMTPSA id C22396023D;
-	Tue, 12 Mar 2024 09:22:10 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=max.gautier.name;
-	s=fdn; t=1710231730;
+	s=arc-20240116; t=1710232710; c=relaxed/simple;
+	bh=cADERAidf+JiG6/MllhsUnCwa5dSvHrvwMt2pI41UK4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rEeW5MF4sbLOGX6eSbEVOZQVQnRbkgtVSWATiAEXn8BdGqS9THKzqsmpIonky2v8q9jQYHtuAUWnvVlTihYprmS+x0J+LDYjU6YX0jsz8S7y2YzzIykvaSfCI/u3jJH6jdSBgUSioONRtoXEBAmzXUkG9/DKDAYAF+SPdHIXzUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=da+a25s0; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D340FE0005;
+	Tue, 12 Mar 2024 08:38:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1710232706;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=r6eXsFxLFxfdVKvdFRJhhqA9qgh76+a5sExwyl+fWhs=;
-	b=uDQct1sW4BOHQrZ5FKkZfezcEOF+dieBHM1ESX354tMKTX/X+KHC/qFaMAGOa8DeMs6/VS
-	/xBh57zJLCMwT45fFetgqfE9utwu5TCM8726u3+fJP2HgkA7g0xizRGXo4u0am2Q5eb/om
-	vCNtLs0NZtTTHj6YS/K3nKFuNPidvSSOUXZ8LMdoCRkmarjIYiUGYicXaJrT4iClxaBCyb
-	7QQWrlwOIjwoHnUtEkMDBOUnRl9qZkGbKmaRI+LNqM0e1nr0id6SbCna1sGoHWgxrwKeD3
-	bLZs+NgkS7tCazbBt5TvHCLLJngE8PuQbZ5pRoAurW+TmWffY87mvDel12gDuw==
-Date: Tue, 12 Mar 2024 09:22:20 +0100
-From: Max Gautier <mg@max.gautier.name>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2-next] Makefile: use systemd-tmpfiles to create
- /var/lib/arpd
-Message-ID: <ZfAQvGTYe7eBcY3e@framework>
-References: <20240311165803.62431-1-mg@max.gautier.name>
- <20240311124003.583053a6@hermes.local>
- <Ze-Fj2RwYnM0WgWi@framework>
- <20240311183007.4a119eeb@hermes.local>
+	bh=+y2WCRg38vZjx+jg3Hy0I1hvQc4HDSJn/8wv1tgeMPA=;
+	b=da+a25s08RVCs6ZnhisGvFDQsAwIINFRgmU2YyAgUGEky+9XVBVrD8SXHePUa0Q8LMJbTa
+	27ZdBhTElzHzH9F5CbB+v4OmAbnfa2YlAi4lImVz97hgEZw2TRD7HyIEZCYtiPzGIHX/Zl
+	frEVAuK40PeKHO7E5Y6LGUeeHnCJ+vPQyqq2RPrQJ53r4X0NEBjizcv30H3tw+yhtr9Zkb
+	/R+MqMyHc28Xk0cX4q8rcczB4edWo26nmLsuldu7mhTxj9iqwMswUdHVGRyc2UjCLKH89d
+	bu7Khks1iQYqWt/rY7J1ZDc1QB0BajOi/4dJiJfmZ4sni/4oKI9MLHSf3ml3cQ==
+Message-ID: <7780460c-abc3-4009-9f95-28d123a9a23d@arinc9.com>
+Date: Tue, 12 Mar 2024 11:38:08 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240311183007.4a119eeb@hermes.local>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: dsa: mt7530: disable LEDs before reset
+To: patchwork-bot+netdevbpf@kernel.org,
+ Justin Swartz <justin.swartz@risingedge.co.za>
+Cc: daniel@makrotopia.org, dqfext@gmail.com, sean.wang@mediatek.com,
+ andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240305043952.21590-1-justin.swartz@risingedge.co.za>
+ <171019143163.14853.15330891015381229970.git-patchwork-notify@kernel.org>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <171019143163.14853.15330891015381229970.git-patchwork-notify@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: yes
+X-Spam-Level: **************************
+X-GND-Spam-Score: 400
+X-GND-Status: SPAM
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On Mon, Mar 11, 2024 at 06:30:07PM -0700, Stephen Hemminger wrote:
-> On Mon, 11 Mar 2024 23:28:31 +0100
-> Max Gautier <mg@max.gautier.name> wrote:
+On 12.03.2024 00:10, patchwork-bot+netdevbpf@kernel.org wrote:
+> Hello:
 > 
-> > On Mon, Mar 11, 2024 at 12:40:03PM -0700, Stephen Hemminger wrote:
-> > > On Mon, 11 Mar 2024 17:57:27 +0100
-> > > Max Gautier <mg@max.gautier.name> wrote:
-> > >   
-> > > > Only apply on systemd systems (detected in the configure script).
-> > > > The motivation is to build distributions packages without /var to go
-> > > > towards stateless systems, see link below (TL;DR: provisionning anything
-> > > > outside of /usr on boot).
-> > > > 
-> > > > The feature flag can be overridden on make invocation:
-> > > > `make USE_TMPFILES_D=n DESTDIR=<install_loc> install`
-> > > > 
-> > > > Links: https://0pointer.net/blog/projects/stateless.html  
-> > > 
-> > > Why does arpd need such hand holding, it is rarely used, maybe should just not be built.  
-> > 
-> > The commit introducing the install of that directory is quite old
+> This patch was applied to netdev/net-next.git (main)
+> by Jakub Kicinski <kuba@kernel.org>:
 > 
-> The problem is that build environment != runtime environment for embedded systems.
+> On Tue,  5 Mar 2024 06:39:51 +0200 you wrote:
+>> Disable LEDs just before resetting the MT7530 to avoid
+>> situations where the ESW_P4_LED_0 and ESW_P3_LED_0 pin
+>> states may cause an unintended external crystal frequency
+>> to be selected.
+>>
+>> The HT_XTAL_FSEL (External Crystal Frequency Selection)
+>> field of HWTRAP (the Hardware Trap register) stores a
+>> 2-bit value that represents the state of the ESW_P4_LED_0
+>> and ESW_P4_LED_0 pins (seemingly) sampled just after the
+>> MT7530 has been reset, as:
+>>
+>> [...]
+> 
+> Here is the summary with links:
+>    - net: dsa: mt7530: disable LEDs before reset
+>      https://git.kernel.org/netdev/net-next/c/2920dd92b980
+> 
+> You are awesome, thank you!
 
-That's the same for anything detected by the configure script, right ?
-Hence the override capability.
+I am once again calling for this patch to be reverted on the net-next tree
+on the basis of:
 
-> But arpd really is legacy/dead/rotting code at this point.
+- This patch did not go through a proper reviewing process. There are
+   proposed changes on the code it changes regarding the scope and the
+   method of the patch, and improvements to be made on the patch log.
 
-Yeah I can see that, not touched since 2016 (mostly). You would rather
-just drop it ?
+- This patch should be backported to stable releases, therefore it
+   shouldn't be on the net-next tree and should be submitted to the net tree
+   instead.
 
--- 
-Max Gautier
+Arınç
 
