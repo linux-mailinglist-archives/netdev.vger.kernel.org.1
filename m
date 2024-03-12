@@ -1,361 +1,362 @@
-Return-Path: <netdev+bounces-79326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5663E878BE4
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 01:23:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34CA8878BF6
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 01:37:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D53B71F2266E
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:23:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A0090B211D3
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 00:36:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCAB28FD;
-	Tue, 12 Mar 2024 00:23:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CE5D63A;
+	Tue, 12 Mar 2024 00:36:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="on3AX2wL";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="Ugp8m4t6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PPEqiwD5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897FF28E7;
-	Tue, 12 Mar 2024 00:23:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710202987; cv=fail; b=WXPslKKhZ9630EKaRg1PGHYu8TQ1cjEDW06O9MvqAAiq+v7PS3DUwo+0ggMf9h0OvW6ULmxpSySFuzm1Uex7JDxKRLumwLbZqKHGufBID3ZCE5YP9v+brVthMuydnWBu3TthkQL6WjDwOk2Hz8jMnzn/RO4grdU9tb0lwUIo2l4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710202987; c=relaxed/simple;
-	bh=QutcXQOT4+hGePXOwkL4eDKdZPD9EoV+hzjnnKU7txs=;
-	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=sCqfV9XmZHt1vAxQOLlhyCKhxZUu8iDjzqlvfASVkzuf10BAeH0JLviT9YoY0Y9sj+wDH7+vYCky5gbKevNwS9KMJ1YzAmucCwDK7JfGpzzkd7MA5YR0g6qR78Iia+mSTUtJ6ZtFooFSB875IkIpDpShl7SPtBK/28qPEB53vbc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=on3AX2wL; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=Ugp8m4t6; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42BMT4Ej002012;
-	Tue, 12 Mar 2024 00:22:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=message-id : date :
- subject : from : to : cc : references : in-reply-to : content-type :
- content-transfer-encoding : mime-version; s=corp-2023-11-20;
- bh=X7MrArq3qJFhCe0ow8sj8Uv91jqfAhtk9erRXxEOrWc=;
- b=on3AX2wLIkn5Yl9TmCSZuvq3qg3upJr0DCaDMCPL9qz9KqrSBnc/OP5wmYBCWHmtlGoC
- iAXDTZ7dLxiGyXm739x1U6Ei7fBP6UrEIDsh3v44OFRQvUzTb6/SiRU51Ag1JRK/mU+1
- wUXIHepAynLvBe36rGI3E8ezOFPuYENLtdwIIOPdlE+U3AJ56ZBYlZTZwgUgv3lxU5ft
- LFM8jthHQysM6/pZqhrK53PqAa0KUjfmONfjmnhqhnVuzdgSAPyAuQDe/r9WkpdjfJoN
- Ep1LFvfNWYyUGeT5b9bfjH6kIDo/DOMByQdw1Z0TG2JaEYqjXUSyIqJQaEL/GGi2JlfC iQ== 
-Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3wrftdcp5e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 12 Mar 2024 00:22:42 +0000
-Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 42BN1NCT033740;
-	Tue, 12 Mar 2024 00:22:41 GMT
-Received: from nam02-sn1-obe.outbound.protection.outlook.com (mail-sn1nam02lp2041.outbound.protection.outlook.com [104.47.57.41])
-	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3wre768g07-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 12 Mar 2024 00:22:41 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S8S5PZE3LPwz6ySambaLX6GHgWZOWBdLI1fvCmhI8B5/yzSXrrbQCSqzIqdFgHMaZhwenCj0H5HBz3KRChVXiDiIUWKNJlkH0PQHeXNzPu8GKtfYBGf+e/KkvH3BgsoO9W9Py8tDbig0gC3Lj98jnQC3u1H4orHOtBMJmxcV2ERfbOWEtm70SZC19jGg4jBy+hmwIn28h9n5qAV+PwkrgqwRQW85xPsytAj2QDlsee2vw0Fn5KepZ7qwTuDXTHNYXgva84argxXS/emJTey5MudoVybZQzZOstlFNrNrGsmrUuU7bFgJtB2spe/hDMKMabICVC/BO79QPZe+3BZCSQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=X7MrArq3qJFhCe0ow8sj8Uv91jqfAhtk9erRXxEOrWc=;
- b=ni8NkQOl0qrYZ2BZ5GlBC5RC2iGrUXKbVEgONsjeCYB/uAXCExAd+YuuVWh/oyo1PBpYcadV2rpqrmqc3S4Oshi5f1KQsrGCVbPL1cUoVenqSA+EZ7SOd8say2+Or+TXEMFxox/rr7/vDpRBBp5rHDmkUr8z/mfRwzETimoi3uXP0YwUvoaqtDrZPg6Fq1tF859wXJPEuRwb+vN/pSHKrDhN/vqlN93LPjqJ9twyFLv+eUdXqwK/BvUoET3YMlDtntMaC+TTTGdJf1EayZuRgngjTDI5bkyEMKd2ST3GGFjAXqgsXJkeQRMQ/Dcgy+mgMlSEHy/lJDPgZNt+fRKnuw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 523824687;
+	Tue, 12 Mar 2024 00:36:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710203813; cv=none; b=pZI9IMdl/pGCxxcl9IuPIRKDyEeWbrp9rQKxs03zevFaJlnlCq4uLmmHkLFFVX4sQ7zR/MryJ/5pihwciy27OMtsJg/Cn3dMWAYkN8DWcVr6cIyLDSR6fstIapo8o6wfKxuSra27hFNnKVgjcl/AaBDnvX5INRKJTN556Ia5a9E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710203813; c=relaxed/simple;
+	bh=tKAUDJRw6CpCHFms5iUDu8kC5V+30VfEW2JZG4adGMU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=Xf0oynCELSTovWz0MDTY0k0JsOSA/VNbbxEmCN9wtmL8fut2H/eiUax5fczxNGex0X7CDyA2E/Cx7tUyCGZpKU+1YbsWZKSA6vM8YWBQRUsLI3Ei1o6NdQOCFs6al3YMm6cKNk6hmMl1T0UEV3VHlehg1zGLjuBjofJaNOeGpQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PPEqiwD5; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-1dc1ff3ba1aso37062305ad.3;
+        Mon, 11 Mar 2024 17:36:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=X7MrArq3qJFhCe0ow8sj8Uv91jqfAhtk9erRXxEOrWc=;
- b=Ugp8m4t6107HfhRWn9qMMEuQR8TXPG+LbwrAiPPbdAGXbAOgAcTN3bzEOJdFZT+oGdhjABh/WSjYBYVo4N0WA2Bbu+0hhxHY9iaz+02F7NPwP2O+gL4VnQRD1HJKex5l2IAJENoIempo6k4AMXc/6CHCksYljx1rzcaZlk1yBVM=
-Received: from SA1PR10MB7634.namprd10.prod.outlook.com (2603:10b6:806:38a::17)
- by SJ0PR10MB4767.namprd10.prod.outlook.com (2603:10b6:a03:2d1::23) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.35; Tue, 12 Mar
- 2024 00:22:39 +0000
-Received: from SA1PR10MB7634.namprd10.prod.outlook.com
- ([fe80::bfed:27b9:fd50:e26d]) by SA1PR10MB7634.namprd10.prod.outlook.com
- ([fe80::bfed:27b9:fd50:e26d%6]) with mapi id 15.20.7362.035; Tue, 12 Mar 2024
- 00:22:39 +0000
-Message-ID: <109c30c7-f269-4ad4-887c-c69b6f4cfab4@oracle.com>
-Date: Mon, 11 Mar 2024 17:22:36 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH Linux-6.8-rc5 1/1] ixgbevf: start
- negotiate with api version 1.4
-From: yifei.l.liu@oracle.com
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: "jesse.brandeburg@intel.com" <jesse.brandeburg@intel.com>,
-        "anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
-        "davem@davemloft.net" <davem@davemloft.net>,
-        "edumazet@google.com" <edumazet@google.com>,
-        "kuba@kernel.org" <kuba@kernel.org>,
-        "pabeni@redhat.com"
- <pabeni@redhat.com>,
-        "lihong.yang@intel.com" <lihong.yang@intel.com>,
-        Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-        Jack Vogel <jack.vogel@oracle.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        Ramanan Govindarajan <ramanan.govindarajan@oracle.com>
-References: <20240301235837.3741422-1-yifei.l.liu@oracle.com>
- <51b6c48b-a33e-46cd-9b00-5568ccc529ca@molgen.mpg.de>
- <SA1PR10MB76341C15C41F8AD36254A572C5232@SA1PR10MB7634.namprd10.prod.outlook.com>
- <SA1PR10MB76342477B5AB2541FB8D6EABC5222@SA1PR10MB7634.namprd10.prod.outlook.com>
-Content-Language: en-US
-In-Reply-To: <SA1PR10MB76342477B5AB2541FB8D6EABC5222@SA1PR10MB7634.namprd10.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SJ0PR03CA0258.namprd03.prod.outlook.com
- (2603:10b6:a03:3a0::23) To SA1PR10MB7634.namprd10.prod.outlook.com
- (2603:10b6:806:38a::17)
+        d=gmail.com; s=20230601; t=1710203810; x=1710808610; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=rX8uBvZD4AKffPJTrsk23iXdoaVCF5CM1k/lf1ZZjDE=;
+        b=PPEqiwD5pwsxKT0hsFJqZdoZNjwJ1OCtKBbkFHqvRoBB2RBq/DwdJBZL7/OlaAb5/r
+         o0xyJERTcKF6FjmvEj+0gXFu36Ow3K+XDko1ps0BFk1bDZcPLS0Dn6Q6cQbUVPBjsWPL
+         9RZBuqPiLIFQ9zYwWfJpeH8Sq/7Rs8VMgJdEsKJxAFMPHzkNoLqBG4Z08HgyiMKPDqJU
+         AwoGGALD/8Wh+4B4fk+NJDLTiD2NicoahNrf5zcL4ISgJyHDGWO8D3dcZrtKygInMpaS
+         2HgFfo6kaHySDgLnRwYtkv7PnGpz+2LHH0K+6OZU+sBbYLhHzvacSNyKohD7nRevCY5t
+         lkzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710203810; x=1710808610;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=rX8uBvZD4AKffPJTrsk23iXdoaVCF5CM1k/lf1ZZjDE=;
+        b=l5iMct+v6R3d51IWQP0Oy7ujU2ZUp1jcbWR9ru3D1fBpjRU1Z0Kchp3ifgDlc1Aapd
+         ChhHRde79pSdgnAayfstXxYAvWi/icC/8M1LXCs+m13pgVshUTqkM6y108/I0kP+p/sL
+         zw98JWYLVBi2ApBurE+3VD6LDHmlaVrHC8CnWtzaBwERGy+hwFLF86N6zGMFvPW3PzPC
+         GVL8OdlByq/yWEIB/KQvHK0oMz4bPKZdlLOoq+JbGgBQIgVEpk24atotoqY8ZMkEsOsv
+         HD9h6iLqTRnOQibWoCQjrx28m1P6xndo3No41GLmjGiuZsLkHDpKRhpErmPgNLlp82ab
+         R0EA==
+X-Forwarded-Encrypted: i=1; AJvYcCUuMkg66wSApsdRXhXPL5x2OaIV2jLhGMz5cDooFLfQpz/QCqi/zo3P8GH2O5ps77Lp+IAB2yWRlFZeUY/Cf4fFmfnpyjqJBHy0KlXLcyIHePF0koyI+T93m6bd
+X-Gm-Message-State: AOJu0YwjQQBUUj0u1wmB3r55HvrgXg4LEygqNgoqK9lgzIS1mu84VZ1Q
+	ugdqY9/nXIHvY3x7wNMNjKN1jDxFvnF4duaI+yaFWIgRZVCMwQmY
+X-Google-Smtp-Source: AGHT+IF453M2j8cVeXwvdt6yGuVMugTkVSLm1RR2AbPGo7CXsL4Yveq9ihzCpd9Utk8CGHkhkF8BPA==
+X-Received: by 2002:a17:902:d487:b0:1dd:b77a:70c6 with SMTP id c7-20020a170902d48700b001ddb77a70c6mr542467plg.32.1710203810385;
+        Mon, 11 Mar 2024 17:36:50 -0700 (PDT)
+Received: from macbook-pro-49.dhcp.thefacebook.com ([2620:10d:c090:400::5:36f6])
+        by smtp.gmail.com with ESMTPSA id w12-20020a170902e88c00b001dd7d66aa18sm4991845plg.67.2024.03.11.17.36.49
+        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
+        Mon, 11 Mar 2024 17:36:50 -0700 (PDT)
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+To: kuba@kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@kernel.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	kernel-team@fb.com
+Subject: pull-request: bpf-next 2024-03-11
+Date: Mon, 11 Mar 2024 17:36:46 -0700
+Message-Id: <20240312003646.8692-1-alexei.starovoitov@gmail.com>
+X-Mailer: git-send-email 2.39.3 (Apple Git-145)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR10MB7634:EE_|SJ0PR10MB4767:EE_
-X-MS-Office365-Filtering-Correlation-Id: dcce74a6-e9d5-4b49-9ea4-08dc422a8650
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	cRNy9MUf2jdad4M01ndmV6ESD5pD6gy+Tyj2co74oV7uvX2Xuhb9hwVkKstmuPKAi5xeG9+SAM51oYlaDt9LRhHfbFZsmPg5/HwoHPPKcMFiGrzdMBpYnnM2NmC9TdPMYJUz242+iWfdfP0hXpjMxOuqBQfquSPQAx4vGGsc6INpeUFnsXzZSh8XEsNct7QQ91BDoHGfE0xgEdOiRxCBkhEbhtaYGRisazGOJJsstw1NKX3Smf62WFo5cPdbIOuatkT07xikgG3hNdZjGncbFtnot80yQn3SBYDDvOndwokQBp8BQIeRLJwZ9XOYsIu9PZ1FL4LQjTcFLMBLwRuymoz22HP4mT5Hmd+X7jXvf3vTE/2zOzybBeiyqVwacrVGULP9hISZ8GrqSw6TYyd7KK9nmM2eYkGXkWmgxhPSOtG2bRlHWRXWIYlKPIJH0X80hIpApOQlPJvooYW7SQ9z2OsGIdM4xFb2rKWnYEPv0LhIQdHEU+VU8qUbzouGuzZRIIo93hCtiVSzItCXTcrT/4A7YjF8SCdpqkA4S87HDlB2Iboo1Ex6gxpCKDw8+j3wpSMssGaQbhW3VUgponhMlI0iNecNa4u2V8wnPiTytDC9RK5sDRMPzxdyxqqgOXpCnEyP1N/Kh5QPS+zsqnCrdy0JFsY00ZnZ1THWIiBKeu8=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR10MB7634.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(7416005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?utf-8?B?SU5DdzZJRGZQbWNySEt4cWdLNEQ4NTg2T3kzc0svYTZSeVdIMkg5bFZBa2FY?=
- =?utf-8?B?b2syQXJHcmhZYUdnR1ltZUtiUjR2U25rYU9Jd1hmTk1RWjZPeTBmZ3h6T2hN?=
- =?utf-8?B?U0R1akZXOWZsY085ZGYyS0NRZUZMbDREVi9DUnJtMzJmc3VISW01N3k3M05t?=
- =?utf-8?B?OHZVZ0lKSVNsWitWUFVxRmhDU2FCZ2lsWWVxSmN1WS9wZnJ2blREZVFwVE43?=
- =?utf-8?B?MmMyd3JtZmd0dEQ3Rm56NVI3c2dPeElKWDEvejR1SjhYOWdwa2RkTjBmdG9r?=
- =?utf-8?B?RDh0dm0vWHpBUkZjWHJXK2JPYVpRdVNaSUQyU09OTkVTaHY0Vmhya0VpNW5J?=
- =?utf-8?B?WWFJaWkwblJyZWJvM1k2TDVtVDdLUm4xTDdMRjUzaVRiMGYzWDhXcnY5YVdN?=
- =?utf-8?B?OVl1V3ZsVU9zQ1hQby9MWHFKY2UvUVY3VEN2MFRVajNUQloyMDZMRmtqVExG?=
- =?utf-8?B?MHNJODRIbTRGMmVFSFRmUW9WdkNFV1dxSVpldWRVQjBxeFJtLzhETGZyL2Nx?=
- =?utf-8?B?cUN1V210RFBWdGtZWFM4WDNDc1RtK1JvZ0tCTWUweEsrNk1BRWw4RitJeWhy?=
- =?utf-8?B?UWpUTGNteUtuVUwwcEVzWDhPNXdSV2xFekh4Z2lmVkFwOUxJRXhlVzBrcHJB?=
- =?utf-8?B?NDhmck5Uc05iZjBlSjhOb040OGcvTjBEamV4N1BOZTNUd0g3ekN3UWRGSXE4?=
- =?utf-8?B?VTV6OE5JQkRWMnB1MDAvbk91Y01URm5vblV2MlRrNnl1Q2J0UWEwR2lIajhj?=
- =?utf-8?B?VkVmN2ZwYlh5dVhxeUtSWFlrZDl2YjZkb0pvQjBsSUdFRlBGQzRBT2dWQVlM?=
- =?utf-8?B?dk5qYlFKb0crd21KS2VqZ0V0OERwZTZDWUNmRXE4SEtvejd6c29OeU9ockVh?=
- =?utf-8?B?UnVLMTZHTjMzSFNia29vUTEzVjcyWVZNWnd4blZybjcrQklmOUxqMjBQSE1V?=
- =?utf-8?B?bERqMXBlRlVEV2tOTDR1YU0vOC9CTm5IZWw0NmY1MTNLVHhnZm5kMGtZYTQ5?=
- =?utf-8?B?NmFWeU9ZYVBjclhaSGYyMU52ZzBsenhYMUR5N3A0VUFCOHU2eFd0U3YydWVQ?=
- =?utf-8?B?WmxuMHRMcGs3UWxkZmVDcWhmTFRXK3k1aHB0emdLb3hqUkpFL3B6dUhUWFN2?=
- =?utf-8?B?UVBwRndLa3JrTVR2dnQxV0FxMFVQenlIaHdPcXJ1VVJYcitZeEdVZWVRUGx2?=
- =?utf-8?B?VzhGbnJGZnZJNUdmRDBWSDZJa2RSM1hsQTlxUkEyWTBFYjcvQkxCUzVwTEJJ?=
- =?utf-8?B?aVYybDF0WGlkMktMTEtlbSsxanE5ZmJOcGl2SmJLcmpENzhlS0J6OXl4cTJD?=
- =?utf-8?B?a1ZUc0hURXpCY2ZHWFJuU0FuRCtnL3RYU251a1lDWTN0a3FmR0UyN0c3SUlB?=
- =?utf-8?B?VDFqeU5uUE1qa2VnVm1KUXVlZWQxWjF5ZXJkd0sxakV1c0FuRlRNRk5nYVNa?=
- =?utf-8?B?czIwTVNtSjI1Z014RHpUL0xBTVlBb3lCeGdLUGZsWis3elE2Vyt2SUtVZnBT?=
- =?utf-8?B?dzhYUG1JVi9RRHNBZUtDRkk2bGRzWXR5dlBRV3NVT1JDWENVYnpqYjd1M3k4?=
- =?utf-8?B?L0xUSFQveXpDUXcvbjJ6ZmovZ3RtdUp5dmI2Qi9XQzdVUU5kQVE4d3VDbWht?=
- =?utf-8?B?UjBNa3h5cUk2SjRkK2JkODV1THVaQUEwTmdFZXJYZGdpRTA3a3JPLzM5TmZO?=
- =?utf-8?B?bkNlclNRSDB0NFB2WVE3TVNZbU85YjNQMUtzZGQyWG92ZHVPVWUrSGpQQzVi?=
- =?utf-8?B?TW9TbVZXaXlxdW9CRzhHaFVGS1ZuK2tqZkh5NG92d09CRk9CdFZzSXdrZ3Nu?=
- =?utf-8?B?QnJSR05Ha2NwOW9JYk9IejdwVFhoYUt5Z0pJOWZHQ09NNHpWSmt1bjJSUk92?=
- =?utf-8?B?WWc5cmJBcktML3phbk9VSEUxZEZZRUk3enFHZmVpN01tTHNQd3ZzWGhoOEJY?=
- =?utf-8?B?VFBQR3RIdmJEcmQxRVh5Mk0vSUNiZmIyaHV2akJIZEVwTmlFSy9lZWFOOXlB?=
- =?utf-8?B?MXBoTnB5dWRkRDZ3WGFwTlpSYnNMY2NrbnRwdlh4ZEN6bzlJOUNBWkJNdnl0?=
- =?utf-8?B?SHpLMjhoZFdNR3M2SkJaWGFlWXFUemZZWWdqYVFKampzaTJTUVpISnNDbXNs?=
- =?utf-8?Q?gXYujlHbKURgOwM7IMVbNGRcz?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	7ja4FCE6nBW/Z1x/CeAhLkzodc4cmV5KJSxksULppx5DYUmNvnfeWjadNcenwGcIamyPc/dDTgttHtEQTBk8Yivx3/1UZzZS5YuFq9KZp7x+D0aDmAxf2jIFgBkUnceCymULsykgyCG7Xdgxulr8HzPuxxVaeOFuuiiG58rNuVwHAE0sDO7P27JC0Ydr5QeYO88abFP3Zj658tjOFZ3YrZ4NnKTNgRH8wNpKkWADw7q/Dwwt+5lQdbhu+yUnt6zFbrRExX0ij0z071PytXdZprKS7mDXZP9GXsaACOk+DOOBLnQUK/LllNVQ3PdsjT+WFMwLKfaDDKHS2rssPAMKdnO/FqE2CbCMJ+yLdiJpzJmsWRiOJBoailihpK6MHRbDJsruU3CmsN//xBgE9I5PyPG9TkRR5qUsvyK5mYx66ZN29NQbUyicx5+CfSB96vw5SoQjmK5Ag6I3Jiy8SZV3IuqcVXejOJ/ri5JH6v9X4wej0SjyeY8K5rqqz2dp7VDxTYypp/Jnw2Jg1xhfDAyRH8OiA/KAyB8U/jE5ZbRadRMdGrw5AX86qmZhJf3CQQX4KR8MbzqUZCT4L44tE8HcdZGI+/4oBX6fUIS/INbLAYM=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dcce74a6-e9d5-4b49-9ea4-08dc422a8650
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR10MB7634.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Mar 2024 00:22:39.1793
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JaYFDUMbjFXvW1D/7SZrqzkV3rIlE+A2mUX3ARYgsIgsZqCtUkO/SJp196fdQpGVgHsbITKhKR6U0jYV5Br8Xw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR10MB4767
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-11_12,2024-03-11_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 phishscore=0
- mlxlogscore=999 malwarescore=0 mlxscore=0 bulkscore=0 spamscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2403120000
-X-Proofpoint-ORIG-GUID: Aetunu7I5vZYSI-tISofpGHNwiZWaDmQ
-X-Proofpoint-GUID: Aetunu7I5vZYSI-tISofpGHNwiZWaDmQ
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-> Hi Paul,
-> I apologize for possible html text in the previous email. I cleared 
-> the format and resend them as plain text.
-> Thank you.
-> Yifei
->
-> From: Yifei Liu <yifei.l.liu@oracle.com>
-> Sent: Monday, March 4, 2024 1:48 PM
-> To: Paul Menzel <pmenzel@molgen.mpg.de>
-> Cc: jesse.brandeburg@intel.com <jesse.brandeburg@intel.com>; 
-> anthony.l.nguyen@intel.com <anthony.l.nguyen@intel.com>; 
-> davem@davemloft.net <davem@davemloft.net>; edumazet@google.com 
-> <edumazet@google.com>; kuba@kernel.org <kuba@kernel.org>; 
-> pabeni@redhat.com <pabeni@redhat.com>; lihong.yang@intel.com 
-> <lihong.yang@intel.com>; Harshit Mogalapalli 
-> <harshit.m.mogalapalli@oracle.com>; linux-kernel@vger.kernel.org 
-> <linux-kernel@vger.kernel.org>; intel-wired-lan@lists.osuosl.org 
-> <intel-wired-lan@lists.osuosl.org>; Jack Vogel 
-> <jack.vogel@oracle.com>; netdev@vger.kernel.org 
-> <netdev@vger.kernel.org>; Ramanan Govindarajan 
-> <ramanan.govindarajan@oracle.com>
-> Subject: Re: [Intel-wired-lan] [PATCH Linux-6.8-rc5 1/1] ixgbevf: 
-> start negotiate with api version 1.4
-> Hi Paul
-> Thank you for your replay. Please see inline.
-> From: Paul Menzel <pmenzel@molgen.mpg.de>
-> Date: Saturday, March 2, 2024 at 12:20 AM
-> To: Yifei Liu <yifei.l.liu@oracle.com>
-> Cc: jesse.brandeburg@intel.com <jesse.brandeburg@intel.com>, 
-> anthony.l.nguyen@intel.com <anthony.l.nguyen@intel.com>, 
-> davem@davemloft.net <davem@davemloft.net>, edumazet@google.com 
-> <edumazet@google.com>, kuba@kernel.org <kuba@kernel.org>, 
-> pabeni@redhat.com <pabeni@redhat.com>, lihong.yang@intel.com 
-> <lihong.yang@intel.com>, Harshit Mogalapalli 
-> <harshit.m.mogalapalli@oracle.com>, linux-kernel@vger.kernel.org 
-> <linux-kernel@vger.kernel.org>, intel-wired-lan@lists.osuosl.org 
-> <intel-wired-lan@lists.osuosl.org>, Jack Vogel 
-> <jack.vogel@oracle.com>, netdev@vger.kernel.org 
-> <netdev@vger.kernel.org>, Ramanan Govindarajan 
-> <ramanan.govindarajan@oracle.com>
-> Subject: Re: [Intel-wired-lan] [PATCH Linux-6.8-rc5 1/1] ixgbevf: 
-> start negotiate with api version 1.4
-> Dear Yifei,
->
->
-> Thank you very much for your patch.
->
-> Am 02.03.24 um 00:58 schrieb Yifei Liu:
-> > ixgbevf updates to api version to 1.5 via
-> >        commit 339f28964147d ("ixgbevf: Add support for new mailbox
-> >        communication between PF and VF")
-> > while the pf side is not updated to 1.5 properly. It will lead to a
-> > failure of negotiation of api version 1.5 This commit will enforce
-> > the negotiation to start with 1.4 which is working fine.
-> >
-> > Normally the pf and vf side should be updated together. Example:
-> >        commit adef9a26d6c39 ("ixgbevf: add defines for IPsec offload 
-> request")
-> >        commit 7269824046376 ("ixgbe: add VF IPsec offload request 
-> message handling")
->
-> Why can’t the PF side not be updated to version 1.5 too?
->
-> I tried to add the new api version to the switch in pf side. However, 
-> that would lead to another issue. Function ixgbe_read_mbx_pf() returns 
-> an error code -100, which should be IXGBE_ERR_MBX. The root cause of 
-> this is function ixgbe_obtain_mbx_lock_pf returns that error code. It 
-> is likely to be a hardware issue communicating with the Ethernet card 
-> (IXGBE_READ_REG returns a failure)
->
-> If you don’t mind, I’d format the commit message like below.
->
-> Sure thanks
->
-> Commit 339f28964147d ("ixgbevf: Add support for new mailbox communication
-> between PF and VF") updates the driver ixgbevf to API version 1.5 
-> while the
-> pf side is not updated to 1.5 properly. This leads to a negotiation 
-> failure
-> of api version 1.5. So, enforce the negotiation to start with 1.4 which is
-> working fine.
->
-> Normally the pf and vf side should be updated together. Example:
->
-> 1.  commit adef9a26d6c39 ("ixgbevf: add defines for IPsec offload 
-> request")
-> 2.  commit 7269824046376 ("ixgbe: add VF IPsec offload request message
-> handling")
->
-> > Reported-by: Manjunatha Gowda <manjunatha.gowda@oracle.com>
-> > Signed-off-by: Yifei Liu <yifei.l.liu@oracle.com>
-> > Reviewed-by: Jack Vogel <jack.vogel@oracle.com>
->
-> Please add a Fixes: tag.
->
-> Fixes: 39f28964147d ("ixgbevf: Add support for new mailbox communication
-> between PF and VF")
->
-> Sure. Do I need to resend the patch with the fixes tag and new commit 
-> message?
->
-> Unfortunately, I am unable to find this commit hash. What archive/tree
-> is it from?
-> The commit message is 339f28964147d. It seems you missed the one of 
-> the double 3 at the very beginning. It is in linux-stable from Linux 
-> 5.17.y
->
-> > ---
-> >   drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c | 6 ++++++
-> >   1 file changed, 6 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c 
-> b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-> > index a44e4bd56142..a1b9b789d1d4 100644
-> > --- a/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-> > +++ b/drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-> > @@ -2286,6 +2286,12 @@ static void ixgbevf_negotiate_api(struct 
-> ixgbevf_adapter *adapter)
-> >
-> >        spin_lock_bh(&adapter->mbx_lock);
-> >
-> > +     /* There is no corresponding drivers in pf for
-> > +      * api version 1.5. Try to negociate with version
->
-> negotiate
->
-> > +      * 1.5 will always fail. Start to negociate with
-> > +      * version 1.4.
->
-> Could you please use the fully allowed line length, so less lines are 
-> used?
->
-> > +      */
-> > +     idx = 1; >       while (api[idx] != ixgbe_mbox_api_unknown) {
-> >                err = hw->mac.ops.negotiate_api_version(hw, api[idx]);
-> >                if (!err)
->
-> Where is `idx` set before?
->
-> idx was 0 before in line 2285.
-> int err, idx = 0;
->
-> Unrelated to the problem at hand, but enums or macros should be used for
-> the API version.
->
-> I agree. But for this case, there is an integer array defined before 
-> with a reversed sequence of the api version enum. (the desired attempt 
-> sequence is from newest to oldest) It may be more readable to use 
-> index of the api array. (e.g. api[0] means ixgbe_mbox_api_15, which is 
-> enum 6)
-> FYI, the api array starting from line 2276 in 
-> /drivers/net/ethernet/intel/ixgbevf/ixgbevf_main.c
-> static const int api[] = {
-> ixgbe_mbox_api_15,
-> ixgbe_mbox_api_14,
-> ixgbe_mbox_api_13,
-> ixgbe_mbox_api_12,
-> ixgbe_mbox_api_11,
-> ixgbe_mbox_api_10,
-> ixgbe_mbox_api_unknown
-> };
->
->
-> Kind regards,
->
-> Paul
-> Thank you again.
-> Yifei
+The following pull-request contains BPF updates for your *net-next* tree.
+
+We've added 59 non-merge commits during the last 9 day(s) which contain
+a total of 88 files changed, 4181 insertions(+), 590 deletions(-).
+
+The main changes are:
+
+1) Enforce VM_IOREMAP flag and range in ioremap_page_range and introduce
+   VM_SPARSE kind and vm_area_[un]map_pages to be used in bpf_arena,
+   from Alexei.
+
+2) Introduce bpf_arena which is sparse shared memory region between bpf
+   program and user space where structures inside the arena can have
+   pointers to other areas of the arena, and pointers work seamlessly for
+   both user-space programs and bpf programs, from Alexei and Andrii.
+
+3) Introduce may_goto instruction that is a contract between the verifier
+   and the program. The verifier allows the program to loop assuming it's
+   behaving well, but reserves the right to terminate it, from Alexei.
+
+4) Use IETF format for field definitions in the BPF standard
+   document, from Dave.
+
+5) Extend struct_ops libbpf APIs to allow specify version suffixes for
+   stuct_ops map types, share the same BPF program between several map
+   definitions, and other improvements, from Eduard.
+
+6) Enable struct_ops support for more than one page in trampolines,
+   from Kui-Feng.
+
+7) Support kCFI + BPF on riscv64, from Puranjay.
+
+8) Use bpf_prog_pack for arm64 bpf trampoline, from Puranjay.
+
+9) Fix roundup_pow_of_two undefined behavior on 32-bit archs, from Toke.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+Note, there will be a trivial conflict in verifier_iterating_callbacks.c
+take both hunks.
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Andrii Nakryiko, Barret Rhoden, Björn Töpel, Bui Quang Minh, Christoph 
+Hellwig, David Vernet, Eduard Zingerman, Jiri Olsa, John Fastabend, 
+"kernelci.org bot", kernel test robot, Kumar Kartikeya Dwivedi, Miguel 
+Ojeda, Pasha Tatashin, Pu Lehui, Quentin Monnet, Stanislav Fomichev, 
+Yonghong Song
+
+----------------------------------------------------------------
+
+The following changes since commit 4b2765ae410abf01154cf97876384d8a58c43953:
+
+  Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next (2024-03-02 20:50:59 -0800)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+for you to fetch changes up to 66c8473135c62f478301a0e5b3012f203562dfa6:
+
+  bpf: move sleepable flag from bpf_prog_aux to bpf_prog (2024-03-11 16:41:25 -0700)
+
+----------------------------------------------------------------
+for-netdev
+
+----------------------------------------------------------------
+Alexei Starovoitov (26):
+      mm: Enforce VM_IOREMAP flag and range in ioremap_page_range.
+      mm: Introduce VM_SPARSE kind and vm_area_[un]map_pages().
+      bpf: Introduce may_goto instruction
+      bpf: Recognize that two registers are safe when their ranges match
+      bpf: Add cond_break macro
+      selftests/bpf: Test may_goto
+      bpf: Allow kfuncs return 'void *'
+      bpf: Recognize '__map' suffix in kfunc arguments
+      bpf: Plumb get_unmapped_area() callback into bpf_map_ops
+      libbpf: Allow specifying 64-bit integers in map BTF.
+      bpf: Tell bpf programs kernel's PAGE_SIZE
+      Merge branch 'fix-hash-bucket-overflow-checks-for-32-bit-arches'
+      mm: Introduce vmap_page_range() to map pages in PCI address space
+      bpf: Introduce bpf_arena.
+      bpf: Disasm support for addr_space_cast instruction.
+      bpf: Add x86-64 JIT support for PROBE_MEM32 pseudo instructions.
+      bpf: Add x86-64 JIT support for bpf_addr_space_cast instruction.
+      bpf: Recognize addr_space_cast instruction in the verifier.
+      bpf: Recognize btf_decl_tag("arg: Arena") as PTR_TO_ARENA.
+      libbpf: Add __arg_arena to bpf_helpers.h
+      libbpf: Add support for bpf_arena.
+      bpftool: Recognize arena map type
+      bpf: Add helper macro bpf_addr_space_cast()
+      selftests/bpf: Add unit tests for bpf_arena_alloc/free_pages
+      selftests/bpf: Add bpf_arena_list test.
+      selftests/bpf: Add bpf_arena_htab test.
+
+Andrii Nakryiko (9):
+      selftests/bpf: Extend uprobe/uretprobe triggering benchmarks
+      Merge branch 'mm-enforce-ioremap-address-space-and-introduce-sparse-vm_area'
+      Merge branch 'bpf-introduce-may_goto-and-cond_break'
+      Merge branch 'libbpf-type-suffixes-and-autocreate-flag-for-struct_ops-maps'
+      bpftool: rename is_internal_mmapable_map into is_mmapable_map
+      selftests/bpf: Add fexit and kretprobe triggering benchmarks
+      libbpf: Recognize __arena global variables.
+      Merge branch 'bpf-introduce-bpf-arena'
+      bpf: move sleepable flag from bpf_prog_aux to bpf_prog
+
+Chen Shen (1):
+      libbpf: Correct debug message in btf__load_vmlinux_btf
+
+Dave Thaler (2):
+      bpf, docs: Use IETF format for field definitions in instruction-set.rst
+      bpf, docs: Rename legacy conformance group to packet
+
+Eduard Zingerman (15):
+      libbpf: Allow version suffixes (___smth) for struct_ops types
+      libbpf: Tie struct_ops programs to kernel BTF ids, not to local ids
+      libbpf: Honor autocreate flag for struct_ops maps
+      selftests/bpf: Test struct_ops map definition with type suffix
+      selftests/bpf: Utility functions to capture libbpf log in test_progs
+      selftests/bpf: Bad_struct_ops test
+      selftests/bpf: Test autocreate behavior for struct_ops maps
+      libbpf: Sync progs autoload with maps autocreate for struct_ops maps
+      selftests/bpf: Verify struct_ops autoload/autocreate sync
+      libbpf: Replace elf_state->st_ops_* fields with SEC_ST_OPS sec_type
+      libbpf: Struct_ops in SEC("?.struct_ops") / SEC("?.struct_ops.link")
+      libbpf: Rewrite btf datasec names starting from '?'
+      selftests/bpf: Test case for SEC("?.struct_ops")
+      bpf: Allow all printable characters in BTF DATASEC names
+      selftests/bpf: Test cases for '?' in BTF names
+
+Jiri Olsa (1):
+      selftests/bpf: Add kprobe multi triggering benchmarks
+
+Kui-Feng Lee (3):
+      bpf, net: validate struct_ops when updating value.
+      bpf: struct_ops supports more than one page for trampolines.
+      selftests/bpf: Test struct_ops maps with a large number of struct_ops program.
+
+Martin KaFai Lau (2):
+      Merge branch 'Allow struct_ops maps with a large number of programs'
+      Merge branch 'bpf: arena prerequisites'
+
+Puranjay Mohan (3):
+      bpf, riscv64/cfi: Support kCFI + BPF on riscv64
+      arm64, bpf: Use bpf_prog_pack for arm64 bpf trampoline
+      bpf: hardcode BPF_PROG_PACK_SIZE to 2MB * num_possible_nodes()
+
+Song Yoong Siang (1):
+      selftests/bpf: xdp_hw_metadata reduce sleep interval
+
+Toke Høiland-Jørgensen (3):
+      bpf: Fix DEVMAP_HASH overflow check on 32-bit arches
+      bpf: Fix hashtab overflow check on 32-bit arches
+      bpf: Fix stackmap overflow check on 32-bit arches
+
+ .../bpf/standardization/instruction-set.rst        | 535 +++++++++++---------
+ arch/arm/mm/ioremap.c                              |   8 +-
+ arch/arm64/net/bpf_jit_comp.c                      |  55 +-
+ arch/loongarch/kernel/setup.c                      |   2 +-
+ arch/mips/loongson64/init.c                        |   2 +-
+ arch/powerpc/kernel/isa-bridge.c                   |   4 +-
+ arch/riscv/include/asm/cfi.h                       |  17 +
+ arch/riscv/kernel/cfi.c                            |  53 ++
+ arch/riscv/net/bpf_jit.h                           |   2 +-
+ arch/riscv/net/bpf_jit_comp32.c                    |   2 +-
+ arch/riscv/net/bpf_jit_comp64.c                    |  14 +-
+ arch/riscv/net/bpf_jit_core.c                      |   9 +-
+ arch/x86/net/bpf_jit_comp.c                        | 231 ++++++++-
+ drivers/pci/pci.c                                  |   4 +-
+ include/linux/bpf.h                                |  25 +-
+ include/linux/bpf_types.h                          |   1 +
+ include/linux/bpf_verifier.h                       |   3 +
+ include/linux/filter.h                             |   4 +
+ include/linux/io.h                                 |   7 +
+ include/linux/vmalloc.h                            |   5 +
+ include/uapi/linux/bpf.h                           |  19 +
+ kernel/bpf/Makefile                                |   3 +
+ kernel/bpf/arena.c                                 | 558 +++++++++++++++++++++
+ kernel/bpf/bpf_iter.c                              |   4 +-
+ kernel/bpf/bpf_struct_ops.c                        | 141 ++++--
+ kernel/bpf/btf.c                                   |  35 +-
+ kernel/bpf/core.c                                  |  33 +-
+ kernel/bpf/devmap.c                                |  11 +-
+ kernel/bpf/disasm.c                                |  14 +
+ kernel/bpf/hashtab.c                               |  14 +-
+ kernel/bpf/log.c                                   |   3 +
+ kernel/bpf/stackmap.c                              |   9 +-
+ kernel/bpf/syscall.c                               |  64 ++-
+ kernel/bpf/trampoline.c                            |   4 +-
+ kernel/bpf/verifier.c                              | 366 +++++++++++---
+ kernel/events/core.c                               |   2 +-
+ kernel/trace/bpf_trace.c                           |   2 +-
+ mm/vmalloc.c                                       |  83 ++-
+ net/bpf/bpf_dummy_struct_ops.c                     |  14 +-
+ net/ipv4/tcp_cong.c                                |   6 +-
+ tools/bpf/bpftool/Documentation/bpftool-map.rst    |   2 +-
+ tools/bpf/bpftool/gen.c                            |  31 +-
+ tools/bpf/bpftool/map.c                            |   2 +-
+ tools/include/uapi/linux/bpf.h                     |  19 +
+ tools/lib/bpf/bpf_helpers.h                        |   2 +
+ tools/lib/bpf/btf.c                                |   2 +-
+ tools/lib/bpf/features.c                           |  22 +
+ tools/lib/bpf/libbpf.c                             | 416 ++++++++++++---
+ tools/lib/bpf/libbpf.h                             |   2 +-
+ tools/lib/bpf/libbpf_internal.h                    |   2 +
+ tools/lib/bpf/libbpf_probes.c                      |   7 +
+ tools/testing/selftests/bpf/DENYLIST.aarch64       |   2 +
+ tools/testing/selftests/bpf/DENYLIST.s390x         |   3 +
+ tools/testing/selftests/bpf/Makefile               |   2 +-
+ tools/testing/selftests/bpf/bench.c                |  28 +-
+ tools/testing/selftests/bpf/benchs/bench_trigger.c | 182 +++++--
+ .../selftests/bpf/benchs/run_bench_uprobes.sh      |   9 +
+ tools/testing/selftests/bpf/bpf_arena_alloc.h      |  67 +++
+ tools/testing/selftests/bpf/bpf_arena_common.h     |  70 +++
+ tools/testing/selftests/bpf/bpf_arena_htab.h       | 100 ++++
+ tools/testing/selftests/bpf/bpf_arena_list.h       |  92 ++++
+ tools/testing/selftests/bpf/bpf_experimental.h     |  55 ++
+ .../selftests/bpf/bpf_testmod/bpf_testmod.c        |  26 +
+ .../selftests/bpf/bpf_testmod/bpf_testmod.h        |  48 ++
+ .../testing/selftests/bpf/prog_tests/arena_htab.c  |  88 ++++
+ .../testing/selftests/bpf/prog_tests/arena_list.c  |  68 +++
+ .../selftests/bpf/prog_tests/bad_struct_ops.c      |  67 +++
+ tools/testing/selftests/bpf/prog_tests/btf.c       |  29 ++
+ .../bpf/prog_tests/struct_ops_autocreate.c         | 159 ++++++
+ .../bpf/prog_tests/test_struct_ops_module.c        |  33 +-
+ .../bpf/prog_tests/test_struct_ops_multi_pages.c   |  30 ++
+ tools/testing/selftests/bpf/prog_tests/verifier.c  |   2 +
+ tools/testing/selftests/bpf/progs/arena_htab.c     |  48 ++
+ tools/testing/selftests/bpf/progs/arena_htab_asm.c |   5 +
+ tools/testing/selftests/bpf/progs/arena_list.c     |  87 ++++
+ tools/testing/selftests/bpf/progs/bad_struct_ops.c |  25 +
+ .../testing/selftests/bpf/progs/bad_struct_ops2.c  |  14 +
+ .../selftests/bpf/progs/struct_ops_autocreate.c    |  52 ++
+ .../selftests/bpf/progs/struct_ops_autocreate2.c   |  32 ++
+ .../selftests/bpf/progs/struct_ops_module.c        |  21 +-
+ .../selftests/bpf/progs/struct_ops_multi_pages.c   | 102 ++++
+ tools/testing/selftests/bpf/progs/trigger_bench.c  |  28 ++
+ tools/testing/selftests/bpf/progs/verifier_arena.c | 146 ++++++
+ .../bpf/progs/verifier_iterating_callbacks.c       | 103 +++-
+ tools/testing/selftests/bpf/test_loader.c          |   9 +-
+ tools/testing/selftests/bpf/test_progs.c           |  59 +++
+ tools/testing/selftests/bpf/test_progs.h           |   3 +
+ tools/testing/selftests/bpf/xdp_hw_metadata.c      |   2 +-
+ 88 files changed, 4181 insertions(+), 590 deletions(-)
+ create mode 100644 kernel/bpf/arena.c
+ create mode 100755 tools/testing/selftests/bpf/benchs/run_bench_uprobes.sh
+ create mode 100644 tools/testing/selftests/bpf/bpf_arena_alloc.h
+ create mode 100644 tools/testing/selftests/bpf/bpf_arena_common.h
+ create mode 100644 tools/testing/selftests/bpf/bpf_arena_htab.h
+ create mode 100644 tools/testing/selftests/bpf/bpf_arena_list.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/arena_htab.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/arena_list.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/bad_struct_ops.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/struct_ops_autocreate.c
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_struct_ops_multi_pages.c
+ create mode 100644 tools/testing/selftests/bpf/progs/arena_htab.c
+ create mode 100644 tools/testing/selftests/bpf/progs/arena_htab_asm.c
+ create mode 100644 tools/testing/selftests/bpf/progs/arena_list.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bad_struct_ops.c
+ create mode 100644 tools/testing/selftests/bpf/progs/bad_struct_ops2.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_autocreate.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_autocreate2.c
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_multi_pages.c
+ create mode 100644 tools/testing/selftests/bpf/progs/verifier_arena.c
 
