@@ -1,304 +1,203 @@
-Return-Path: <netdev+bounces-79507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79509-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7C82879931
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 17:42:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BB8A879963
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 17:51:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14C02B23BC1
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 16:42:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 76DFFB22157
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 16:51:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B61D57E57A;
-	Tue, 12 Mar 2024 16:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 303F5137771;
+	Tue, 12 Mar 2024 16:51:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d/iSciIw"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="i067e7ge"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B41A015BF;
-	Tue, 12 Mar 2024 16:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710261754; cv=none; b=JSgeGS0tVWvZHHOYhnYS9B7j2omVCZT+7DmyCEVa/DB1HpUYhmkZea/Nvgg1VDJNaYaoWhhSdaVDQWHHSMHdpDDExtmo/0R3JLs//VSF+nq2Sas0zx6qoyqXWk3IDtXxZcO0TMR0p+Qp9Y9LBpy4qhXmjn1rpKrIPYXrEWANa4E=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710261754; c=relaxed/simple;
-	bh=IOgqkFC+7YdtEWrDEG6VjFtw1asWxY5nI0CrswHAChw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AirsjUnB326vLJHYVfcOpl8EJhyJUYObcTbvo92ujtEPioQlfOIV1YHkxAwMRNqurXlcY0gcNr9ODJhSktIAXX4diTthGWBU8Up27IK09A5mKeZsj2dLaE0Z9i0isftffBUq4Og4kSbGryrdROgIYUKY8et3ch2v52cLXhch7Xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d/iSciIw; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-33e9df3416bso1255106f8f.3;
-        Tue, 12 Mar 2024 09:42:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710261751; x=1710866551; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OLfmcQWu5XXgWrSqV2rZUXevRLdZ2i834nrQ0vcBR5U=;
-        b=d/iSciIwroGieURQlgA8fpaiaFKGNwcyk4A5FC2l9dhiKW6spTNPbw824j8YQbxmJn
-         VaB1YYFXAw6zMZpjeJ8ybd6gVqTIcQ8SECsb9Gnq5t8WpFswyAocjSaErpZXlq/BJmcH
-         KwTPcDoxYZakRsMKF4gbErmSAYHTPFQDtHIdKUTZ1M6tqsIzYjHudZNrU3MqBHWTtnnc
-         mLG1OMez6Qc9U//258c1SDybIw5CFRqg4DJemZMoTV4VJSu3zWZNIjRM2ol4PeDbUUwf
-         nptpMqqrc7XZfW6H2Hz0bKYvgzb5R/RJM9xGf1FL0KwBGe7NHyNWMCH79dbAwYso6FYZ
-         bSDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710261751; x=1710866551;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OLfmcQWu5XXgWrSqV2rZUXevRLdZ2i834nrQ0vcBR5U=;
-        b=KQ29HysbZoOwqUlT5JGrEL05JJ0+wffQIvkiU7SxZ1Adjzyf1VLJh+hAy2V4BLY2PX
-         jjNMRr5hG89XcjAHXnXBP4WJT8lDWqYtD3tVKPJKrIS/gd5rLJHUnorigb0DEn9mV7uy
-         rtAuBYb0VUtJr6kiW3NIKZ0YFym6ic/0hIt/rcmXxeln5s30mUkZ5ZX7DBq60oj6TkdV
-         ntwRbzkeeuTEbmYHpVUl5CVTWpP20y95y97V72HZ79PYMgwJsOayXXepxfyBOWcrhZUT
-         VkFCzTkyORul1m1CLZzO9ebmpfD+HQTMCMmW89jP1FNB25xOYKX//FIv2bezUfg9YRXE
-         yHTw==
-X-Forwarded-Encrypted: i=1; AJvYcCVNssiKARFpffZ8LoFSbrjGVSAKhQXuefJJFx41gcDFjND5KLa3vPRqxsTM4wa0CCYlkJDjb5BW78pkswMq8V/BMe+Q891K3xaq6iOJgUVVkZistZI7i2ZBJEHJBBs0XAkH2pm+x8ASHdHFPA/f4Qkhk8594XPW+YTG8PWdR6pUB70qTtOiOOekI8y1OABLrihS9A+JPTyQOWhnH3/qdRuAcG6psA0ixnNyyDERJ4EbbTkj8IXs7pK0dCpq7L7WRBMeTxdisQ1i4o26e1b6Mhqh8hSRr5Bn3LhxSQ==
-X-Gm-Message-State: AOJu0Yx4f6A3li4NgbiVm58JtzoXKBefug+tQwcyttaSpOxX5RWiDfuU
-	QKXIk84fwa6J3YFyeIuU2cI9Lfw7kuNqaIJ6yPj5DTuTH7cQnLFq3VxpLIcNXFji9x68OAeB90l
-	7ghPlqBXrzQiHMVduxhgbAKbv/ok=
-X-Google-Smtp-Source: AGHT+IEa+4UMJem4Fp/QIrh+BONIvwnIkZaOvOjaYS7rj5IxmTt11nQG4gevX9xIkt30Kg19GjMMdC27opnimO5UKuk=
-X-Received: by 2002:adf:fa91:0:b0:33e:11c3:7ebf with SMTP id
- h17-20020adffa91000000b0033e11c37ebfmr6854846wrr.62.1710261750841; Tue, 12
- Mar 2024 09:42:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B5286AC5;
+	Tue, 12 Mar 2024 16:51:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710262283; cv=fail; b=f4jsqlLnScPcckEGCsp4VKS9PQDvp4DP26V7uNvIK3nLzQSHdIyNteQZmp2RbYubkN5P1T/4pZUz5aOKe68Moy3ssdex6IwvWm6rPTCW2QZ7t16EwkpmHXpDYAh1xLaFxLKfZb3aZQzQzQ9QDxjILXtohftWKAiBNJBXq2nK6EE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710262283; c=relaxed/simple;
+	bh=uQlIRzi2joBdXdwzOo8rKYGenautgdtNgSsGZg3W11I=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=N42qlWKaqKyq0eMkfKSRkNROO+Vz0XaGVP/B5gMFka16hhOuocql8V16NqC2T0xHBttHuGtXxIr5Tp0pukzr3lhC0SYGJ3Fm0UnsJecyu4pIPDuvlHOm4ZAY1BbpywY2PyIdVBgM7FJRhpQN5EQyBmYM8yGU/QWiV/Dmx4rGomc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=i067e7ge; arc=fail smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42CEHUUW025258;
+	Tue, 12 Mar 2024 09:51:08 -0700
+Received: from nam04-dm6-obe.outbound.protection.outlook.com (mail-dm6nam04lp2040.outbound.protection.outlook.com [104.47.73.40])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3wswdcx5k9-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Mar 2024 09:51:07 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PEyM5Cckti70wSAYPZBUhHHoy6KZF1cE0nakMQLVpJA9SN1nGIybVoo32OO2vP3mQ4xXgwi0zR8u04U0UqL6Aw9pA6NveWN1JYuu2LiwJLQrFyrQ5SoqVq1hUoCJZIFoHddI4PA50b14xUtLRj+92yRntsmrVr/CwD7x5vGFWyc3d7FiLekx3QEZEMygOPDK9YHNOErp2Wq8sgIHiwFHzVIGmgzz3xhWKSCjuMDGLt19MPsd5PjPr2CTFt2BWad7aD3oKElgaxQ2T7UX5W/sdXjQcDaV4hK1JDNiwaZ1Du0djoHOONGz7bWglWnJHlL1ehvor3kXXnJgPydwdI2NZA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uQlIRzi2joBdXdwzOo8rKYGenautgdtNgSsGZg3W11I=;
+ b=BA+p/8Ep8Ku08kXMN9kAUl9rFaffo7yib/foSxRXwn0iUgB0YY6sh1vnZ4o805a3FhMO4UEi0KjI9lQsmcI65x6xaWP0C0FpO84H8cgbhhWVLxFwA84aUfBdvSK/1z6KOLuKjCZFIrrsP8C+8IaiXVzrwuixplobhwGx20LoSrAYJlFqXH6LI9w+k7eFaIuRC/fDqJ4HGlqc/obkPLhVPY8QV80yyic9eKznyYV6/q+VX8+y10hLjZBXyxsC5O2ttrso7wCKg6F6yXvzQ6l37nezywgwtyr38wegcNVymTSLxYJheKEGB6tY0beY/KbuhOktxYJGNJPJCEqMZspgMQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=uQlIRzi2joBdXdwzOo8rKYGenautgdtNgSsGZg3W11I=;
+ b=i067e7gem82PAYQicp0y5EkW2ETNzJwzTtoJbxD8scrMP6QfuCj/ayW3vcEEp4yvxrJc+F9aS8DyBktg7hf1JNZXiOchHrmpiEs2/wiRfQ3h3OEIzlEZ4idgLgnZrGjZlO3FJ1YwbfsLTnaP8BsXNVl3uNFEPbhy7LMXNWmKl7I=
+Received: from BN9PR18MB4251.namprd18.prod.outlook.com (2603:10b6:408:11c::10)
+ by DM6PR18MB3457.namprd18.prod.outlook.com (2603:10b6:5:2a1::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.35; Tue, 12 Mar
+ 2024 16:51:05 +0000
+Received: from BN9PR18MB4251.namprd18.prod.outlook.com
+ ([fe80::7471:7657:9316:1494]) by BN9PR18MB4251.namprd18.prod.outlook.com
+ ([fe80::7471:7657:9316:1494%7]) with mapi id 15.20.7362.035; Tue, 12 Mar 2024
+ 16:51:05 +0000
+From: Elad Nachman <enachman@marvell.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+CC: Taras Chornyi <taras.chornyi@plvision.eu>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "andrew@lunn.ch" <andrew@lunn.ch>,
+        "thomas.petazzoni@bootlin.com"
+	<thomas.petazzoni@bootlin.com>,
+        "miquel.raynal@bootlin.com"
+	<miquel.raynal@bootlin.com>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: RE: [EXTERNAL] Re: [PATCH 2/3] net: marvell: prestera: fix memory use
+ after free
+Thread-Topic: [EXTERNAL] Re: [PATCH 2/3] net: marvell: prestera: fix memory
+ use after free
+Thread-Index: AQHac7s3vUK8tZMPLUKr+ABWB9D8bLE0QSMAgAASMCA=
+Date: Tue, 12 Mar 2024 16:51:05 +0000
+Message-ID: 
+ <BN9PR18MB4251EB4DD8EFD839342FDC9ADB2B2@BN9PR18MB4251.namprd18.prod.outlook.com>
+References: <20240311135112.2642491-1-enachman@marvell.com>
+	<20240311135112.2642491-3-enachman@marvell.com>
+ <20240312164526.4a0e242a@kmaincent-XPS-13-7390>
+In-Reply-To: <20240312164526.4a0e242a@kmaincent-XPS-13-7390>
+Accept-Language: he-IL, en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR18MB4251:EE_|DM6PR18MB3457:EE_
+x-ms-office365-filtering-correlation-id: 89ddacd6-b0c2-40e3-662c-08dc42b49b91
+x-ld-processed: 70e1fb47-1155-421d-87fc-2e58f638b6e0,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ A/6jTif4jLaZaFMIMWXcPVHis67AfHDyun3lWysLHVzv+Jhwvuzr8frWysNkEYzqa8qAYF+u5g+2gx9h49mvBU7mIAZMLF+Zj4/PSZK3QnnZ149EKfGEicDAoz9PC2Q2kQMRSYkYmv8NFSAN/Qe0tMduKnqJEXUc7s79R6ilg/G1qS6FCUbiqiUw0M203VK4S9dJy4MO6E9koDrggoqg1z/rClYczR4PMfzU0GEbK02Xlil0jSnVXac4IRdlMRAkicAxkjdjp5tzix1YlKMh1lJ3AT2dxBH4ZRQzF3Vn4rCLl5ZAa1+IcWePylk3X7vrqkhy2b1Y4EsER/s5Ke2axDBPjW8+oK2HkcJHJuDpJANAzdw4EtNdhJLZXLpjEebCErEJOMy54qvW7wr5sF16HFTBa0cnKRvgd1z5PTcrK+0PeHIMouPAxZZropO7NNcd+mxnhatTTJIe4Hp0W0N67XXS+zsW1c9Itc7uipD87gOpfojuevibCzjIZk3YEuhY2S9Qmd43V5WdTgx/dLXPS6pTFdLDLjk3UBpUU5XhA+sGIS+0WPozjPi5OVQ1WdGf2bzz8a8tsbZ9aLsS3Gas0OuLR9ZfaJ+6ns88aY+mUF/KoAPdKHn390N9dTojf3+DNacLCsEkLyjjPrsQJkicqeT9GO2GejrdLsCka9hXxes=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR18MB4251.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?utf-8?B?RVhYcTNFelA4T1N6VldzbE80ZzJjR0V3LzlyT2JmMS9iQlY2TjNiNkNDQnVC?=
+ =?utf-8?B?aWRUenpGR2lGNDkzR1lZd3BxRlZ5aW8yU1dTV01IdmZ2K2pUVTRkMDZyeStn?=
+ =?utf-8?B?UnZ5ZGpYdWlrMzM0eGVsMFVVRXNoS015ajl6RXUwbHlvSURRNXFJK2VHTUpC?=
+ =?utf-8?B?YlJXQzRtU0h4eFpHcDFRUHB1UTlSQVRibzB5alBEQ0tTWlM5cUI5dFhTbkdm?=
+ =?utf-8?B?eExSY0w0aVhjTW1KNWNwL1IramNSVlExOXh4dmZ4THV2WFB3VUtha25yaHEr?=
+ =?utf-8?B?ZFUwS0ZhN2dkU2VvQmRLenU0K0NUUEIxK2Fsa1AxUjd5aEdqajFTbk9MQlI0?=
+ =?utf-8?B?L3h3aVFkbUx3ZThhNGtGVFYwSmZJbFA4Uml6UW5EMlpEZ0k4UlVkeGtZMXNP?=
+ =?utf-8?B?UDlBMmpwcURBRnk0S0pJQU9YN3RrYjFoRFVHZFNVS0ZrNmdzSVVmNjdGNTJ4?=
+ =?utf-8?B?dDdsY24wVWVjdzJaa2ViMG9FbWk0VDRQVS91QTlleTRTT1ZjN0VDaitxZGY5?=
+ =?utf-8?B?Nms3WFpEckZEY0FuOW1oV3BhSnEzWUN1ZlNqRjFzQTdxcHVHa1Vsc2Q0WkhC?=
+ =?utf-8?B?WmV0UjExZUQ5UW5ubUNMcHBrKy9qbThTcHYzMytLQ2dYMEtNRUQ4RlduS0Ns?=
+ =?utf-8?B?YWJLUXlObXc0aEc4QjNZY21ONXhCT2Q4QzNHUTNuR0txM3lhSWo3bStwUjlu?=
+ =?utf-8?B?TTY2NGRESDRlb3lLOFVzcDc0UGRVUC85ZnNvVlhrbWVlYndnRXp5VENwSXpa?=
+ =?utf-8?B?OGJQNjR3cEZRYXdoeGV2cTBVSURnclpXTVN4VFV0eG5TcSswMDlOT21LZTEw?=
+ =?utf-8?B?eHU3VFdYeXdyUjdjZ2VqZytGbVN2enY5M2NId2VtRHFIK3JzV2lIRXpIdXFX?=
+ =?utf-8?B?S2pDVmZ4MmFuV3FCVTlRMnM2Znh4clRFUnJwTkY5TUo5M2NtL2syeEVjT29t?=
+ =?utf-8?B?RWI0RnU0eGNjbVZSbHk5dktIZDYvQ3dleXFsVFQwbCs3bnBKZ3AxZzBOY0ND?=
+ =?utf-8?B?VWloWDJpRmh3MHFlcExmaE1Cc3FXQXppdGd5STB6OWZ5bDhlVllHVTR1amV5?=
+ =?utf-8?B?bXJROVJQTWdadHgydzgvNkl5WWF0U1NYT3had0dXZkxCdFdNUEhSNHZqYWtl?=
+ =?utf-8?B?THI3OU1EeTYzNm5lenJKTUZ3cDlJdUFwMSt3M1hOVWdsM01nOW5QVnltRXdz?=
+ =?utf-8?B?b0FKaFhWUXlEU0lQRFJ0eVZuTlp6RkhjcU03MG12QjBibU5UYXNra3ZmUzlj?=
+ =?utf-8?B?VENoaUdNbm80citKdmZ3SDNONEs5Tk9KS1h4WXJka0RncXNabEhaRkt3blRj?=
+ =?utf-8?B?ZFFyZENXeEdyUWpFYTR0bG1ybHVHWVRZQnlMSHY2T2xzMmpxNjhEY3dmT3NP?=
+ =?utf-8?B?c3l2TFJoVit5ZGpOaXNFaVB4akE0NnlxdlJ5dDI4OWIzL043ZnJIUWV6aE1L?=
+ =?utf-8?B?ZHplRVpKV0N0UVVxVFA0VDc3dkZRRWlSLzF3UTVhR3ZpN1lpVms3SzJqMUxk?=
+ =?utf-8?B?MEV2RmxETk13cVB1TjN6cHdKV1d1T1ZxM0daYzZnZnMwbEJ5UHhoL3ZQaHdR?=
+ =?utf-8?B?T295RmRWSmsyK1pzYUJtdTQxZlhwT2N0YmwyV1YrcFJpZVAyREt1aTBSZjhT?=
+ =?utf-8?B?SU8zcEZ6MHFJTnhDaFlGUTRTc1dyamJSMmZzdm1uTmg1bjF5Ri9GT3lMRmNW?=
+ =?utf-8?B?YVZHQXhlMm13cEk2L29QWnMzczRBMUMvUFl0MklHTDlQaGxMN25wWjh6dUxk?=
+ =?utf-8?B?MnFqdUIyQkVMc0VSRFBtMGYwUXdIWkNFTWtQRXhzRG0zakdYOEdXcHJ5RkV5?=
+ =?utf-8?B?d243RTBwU3NacU9NOVJ1RUNyT2s2cFlZS3AyM1N0cWR3aVZId2puUTdIVm44?=
+ =?utf-8?B?cXp6d3UxQ1N1UE5WeVRjTXVMbHgyNkNYSWNuZnZPWUZ3bElxQUlFaEs3aXJu?=
+ =?utf-8?B?Rys1SEpvdndxOEJCY3g4RTg1MytXek9YaTN2RytSeXBPSGo4cDBESkxUNjY0?=
+ =?utf-8?B?Q3Y0cHVDWnMzSVZZbjg2TjJ1Z2xjdlZRV0ZLRUtWMkViMjJYOUxGZ3dBemY3?=
+ =?utf-8?B?TXVBTTBkYzBjb3FDSVVYVnhCR25KUHBhOHorenlTRTU2aFdhdUJ4RFc4QjQ0?=
+ =?utf-8?B?dW1GeDMzSGpmWWNja25Pb1BUdU5zV0o2VVdQYmVOdFpFd2tiYTdRK2RhbWYr?=
+ =?utf-8?Q?TEjUJzKm2XUpNbbLSCgo8eLnGKNTtt+8ZZ5NbqUbvqXS?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240311093526.1010158-1-dongmenglong.8@bytedance.com>
- <20240311093526.1010158-2-dongmenglong.8@bytedance.com> <CAADnVQKQPS5NcvEouH4JqZ2fKgQAC+LtcwhX9iXYoiEkF_M94Q@mail.gmail.com>
- <CALz3k9i5G5wWi+rtvHPwVLOUAXVMCiU_8QUZs87TEYgR_0wpPA@mail.gmail.com>
- <CAADnVQJ_ZCzMmT1aBsNXEBFfYNSVBdBXmLocjR0PPEWtYQrQFw@mail.gmail.com> <CALz3k9icPePb0c4FE67q=u1U0hrePorN9gDpQrKTR_sXbLMfDA@mail.gmail.com>
-In-Reply-To: <CALz3k9icPePb0c4FE67q=u1U0hrePorN9gDpQrKTR_sXbLMfDA@mail.gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 12 Mar 2024 09:42:17 -0700
-Message-ID: <CAADnVQLwgw8bQ7OHBbqLhcPJ2QpxiGw3fkMFur+2cjZpM_78oA@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH bpf-next v2 1/9] bpf: tracing: add support
- to record and check the accessed args
-To: =?UTF-8?B?5qKm6b6Z6JGj?= <dongmenglong.8@bytedance.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	X86 ML <x86@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Quentin Monnet <quentin@isovalent.com>, 
-	bpf <bpf@vger.kernel.org>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>, linux-s390 <linux-s390@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, linux-trace-kernel@vger.kernel.org, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR18MB4251.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 89ddacd6-b0c2-40e3-662c-08dc42b49b91
+X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Mar 2024 16:51:05.0864
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: loEapC637NKRnE1OZpQLsl5B3QmRRYt09HSUjEJdPpH3b+lMQ7T539TQ66XCDYv/qeoRkAAGH5x88+My9pkCrg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR18MB3457
+X-Proofpoint-ORIG-GUID: B0RTz4Ql_NUYG2nrnPS0KzDQ4CZsPBTJ
+X-Proofpoint-GUID: B0RTz4Ql_NUYG2nrnPS0KzDQ4CZsPBTJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-12_10,2024-03-12_01,2023-05-22_02
 
-On Mon, Mar 11, 2024 at 7:42=E2=80=AFPM =E6=A2=A6=E9=BE=99=E8=91=A3 <dongme=
-nglong.8@bytedance.com> wrote:
->
-> On Tue, Mar 12, 2024 at 10:09=E2=80=AFAM Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
-> >
-> > On Mon, Mar 11, 2024 at 7:01=E2=80=AFPM =E6=A2=A6=E9=BE=99=E8=91=A3 <do=
-ngmenglong.8@bytedance.com> wrote:
-> > >
-> > > On Tue, Mar 12, 2024 at 9:46=E2=80=AFAM Alexei Starovoitov
-> > > <alexei.starovoitov@gmail.com> wrote:
-> > > >
-> > > > On Mon, Mar 11, 2024 at 2:34=E2=80=AFAM Menglong Dong
-> > > > <dongmenglong.8@bytedance.com> wrote:
-> > > > >
-> > > > > In this commit, we add the 'accessed_args' field to struct bpf_pr=
-og_aux,
-> > > > > which is used to record the accessed index of the function args i=
-n
-> > > > > btf_ctx_access().
-> > > > >
-> > > > > Meanwhile, we add the function btf_check_func_part_match() to com=
-pare the
-> > > > > accessed function args of two function prototype. This function w=
-ill be
-> > > > > used in the following commit.
-> > > > >
-> > > > > Signed-off-by: Menglong Dong <dongmenglong.8@bytedance.com>
-> > > > > ---
-> > > > >  include/linux/bpf.h |   4 ++
-> > > > >  kernel/bpf/btf.c    | 108 ++++++++++++++++++++++++++++++++++++++=
-+++++-
-> > > > >  2 files changed, 110 insertions(+), 2 deletions(-)
-> > > > >
-> > > > > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> > > > > index 95e07673cdc1..0f677fdcfcc7 100644
-> > > > > --- a/include/linux/bpf.h
-> > > > > +++ b/include/linux/bpf.h
-> > > > > @@ -1461,6 +1461,7 @@ struct bpf_prog_aux {
-> > > > >         const struct btf_type *attach_func_proto;
-> > > > >         /* function name for valid attach_btf_id */
-> > > > >         const char *attach_func_name;
-> > > > > +       u64 accessed_args;
-> > > > >         struct bpf_prog **func;
-> > > > >         void *jit_data; /* JIT specific data. arch dependent */
-> > > > >         struct bpf_jit_poke_descriptor *poke_tab;
-> > > > > @@ -2565,6 +2566,9 @@ struct bpf_reg_state;
-> > > > >  int btf_prepare_func_args(struct bpf_verifier_env *env, int subp=
-rog);
-> > > > >  int btf_check_type_match(struct bpf_verifier_log *log, const str=
-uct bpf_prog *prog,
-> > > > >                          struct btf *btf, const struct btf_type *=
-t);
-> > > > > +int btf_check_func_part_match(struct btf *btf1, const struct btf=
-_type *t1,
-> > > > > +                             struct btf *btf2, const struct btf_=
-type *t2,
-> > > > > +                             u64 func_args);
-> > > > >  const char *btf_find_decl_tag_value(const struct btf *btf, const=
- struct btf_type *pt,
-> > > > >                                     int comp_idx, const char *tag=
-_key);
-> > > > >  int btf_find_next_decl_tag(const struct btf *btf, const struct b=
-tf_type *pt,
-> > > > > diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-> > > > > index 170d017e8e4a..c2a0299d4358 100644
-> > > > > --- a/kernel/bpf/btf.c
-> > > > > +++ b/kernel/bpf/btf.c
-> > > > > @@ -6125,19 +6125,24 @@ static bool is_int_ptr(struct btf *btf, c=
-onst struct btf_type *t)
-> > > > >  }
-> > > > >
-> > > > >  static u32 get_ctx_arg_idx(struct btf *btf, const struct btf_typ=
-e *func_proto,
-> > > > > -                          int off)
-> > > > > +                          int off, int *aligned_idx)
-> > > > >  {
-> > > > >         const struct btf_param *args;
-> > > > >         const struct btf_type *t;
-> > > > >         u32 offset =3D 0, nr_args;
-> > > > >         int i;
-> > > > >
-> > > > > +       if (aligned_idx)
-> > > > > +               *aligned_idx =3D -ENOENT;
-> > > > > +
-> > > > >         if (!func_proto)
-> > > > >                 return off / 8;
-> > > > >
-> > > > >         nr_args =3D btf_type_vlen(func_proto);
-> > > > >         args =3D (const struct btf_param *)(func_proto + 1);
-> > > > >         for (i =3D 0; i < nr_args; i++) {
-> > > > > +               if (aligned_idx && offset =3D=3D off)
-> > > > > +                       *aligned_idx =3D i;
-> > > > >                 t =3D btf_type_skip_modifiers(btf, args[i].type, =
-NULL);
-> > > > >                 offset +=3D btf_type_is_ptr(t) ? 8 : roundup(t->s=
-ize, 8);
-> > > > >                 if (off < offset)
-> > > > > @@ -6207,7 +6212,7 @@ bool btf_ctx_access(int off, int size, enum=
- bpf_access_type type,
-> > > > >                         tname, off);
-> > > > >                 return false;
-> > > > >         }
-> > > > > -       arg =3D get_ctx_arg_idx(btf, t, off);
-> > > > > +       arg =3D get_ctx_arg_idx(btf, t, off, NULL);
-> > > > >         args =3D (const struct btf_param *)(t + 1);
-> > > > >         /* if (t =3D=3D NULL) Fall back to default BPF prog with
-> > > > >          * MAX_BPF_FUNC_REG_ARGS u64 arguments.
-> > > > > @@ -6217,6 +6222,9 @@ bool btf_ctx_access(int off, int size, enum=
- bpf_access_type type,
-> > > > >                 /* skip first 'void *__data' argument in btf_trac=
-e_##name typedef */
-> > > > >                 args++;
-> > > > >                 nr_args--;
-> > > > > +               prog->aux->accessed_args |=3D (1 << (arg + 1));
-> > > > > +       } else {
-> > > > > +               prog->aux->accessed_args |=3D (1 << arg);
-> > > >
-> > > > What do you need this aligned_idx for ?
-> > > > I'd expect that above "accessed_args |=3D (1 << arg);" is enough.
-> > > >
-> > >
-> > > Which aligned_idx? No aligned_idx in the btf_ctx_access(), and
-> > > aligned_idx is only used in the btf_check_func_part_match().
-> > >
-> > > In the btf_check_func_part_match(), I need to compare the
-> > > t1->args[i] and t2->args[j], which have the same offset. And
-> > > the aligned_idx is to find the "j" according to the offset of
-> > > t1->args[i].
-> >
-> > And that's my question.
-> > Why you don't do the max of accessed_args across all attach
-> > points and do btf_check_func_type_match() to that argno
-> > instead of nargs1.
-> > This 'offset +=3D btf_type_is_ptr(t1) ? 8 : roundup...
-> > is odd.
->
-> Hi, I'm trying to make the bpf flexible enough. Let's take an example,
-> now we have the bpf program:
->
-> int test1_result =3D 0;
-> int BPF_PROG(test1, int a, long b, char c)
-> {
->     test1_result =3D a + c;
->     return 0;
-> }
->
-> In this program, only the 1st and 3rd arg is accessed. So all kernel
-> functions whose 1st arg is int and 3rd arg is char can be attached
-> by this bpf program, even if their 2nd arg is different.
->
-> And let's take another example for struct. This is our bpf program:
->
-> int test1_result =3D 0;
-> int BPF_PROG(test1, long a, long b, char c)
-> {
->     test1_result =3D c;
->     return 0;
-> }
->
-> Only the 3rd arg is accessed. And we have following kernel function:
->
-> int kernel_function1(long a, long b, char c)
-> {
-> xxx
-> }
->
-> struct test1 {
->     long a;
->     long b;
-> };
-> int kernel_function2(struct test1 a, char b)
-> {
-> xxx
-> }
->
-> The kernel_function1 and kernel_function2 should be compatible,
-> as the bpf program only accessed the ctx[2], whose offset is 16.
-> And the arg in kernel_function1() with offset 16 is "char c", the
-> arg in kernel_function2() with offset 16 is "char b", which is
-> compatible.
-
-I see.
-I thought you're sharing the trampoline across attachments.
-(since bpf prog is the same).
-But above approach cannot possibly work with a shared trampoline.
-You need to create individual trampoline for all attachment
-and point them to single bpf prog.
-
-tbh I'm less excited about this feature now, since sharing
-the prog across different attachments is nice, but it won't scale
-to thousands of attachments.
-I assumed that there will be a single trampoline with max(argno)
-across attachments and attach/detach will scale to thousands.
-
-With individual trampoline this will work for up to a hundred
-attachments max.
-
-Let's step back.
-What is the exact use case you're trying to solve?
-Not an artificial one as selftest in patch 9, but the real use case?
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogS29yeSBNYWluY2VudCA8
+a29yeS5tYWluY2VudEBib290bGluLmNvbT4NCj4gU2VudDogVHVlc2RheSwgTWFyY2ggMTIsIDIw
+MjQgNTo0NSBQTQ0KPiBUbzogRWxhZCBOYWNobWFuIDxlbmFjaG1hbkBtYXJ2ZWxsLmNvbT4NCj4g
+Q2M6IFRhcmFzIENob3JueWkgPHRhcmFzLmNob3JueWlAcGx2aXNpb24uZXU+OyBkYXZlbUBkYXZl
+bWxvZnQubmV0Ow0KPiBlZHVtYXpldEBnb29nbGUuY29tOyBrdWJhQGtlcm5lbC5vcmc7IHBhYmVu
+aUByZWRoYXQuY29tOw0KPiBhbmRyZXdAbHVubi5jaDsgdGhvbWFzLnBldGF6em9uaUBib290bGlu
+LmNvbTsNCj4gbWlxdWVsLnJheW5hbEBib290bGluLmNvbTsgbmV0ZGV2QHZnZXIua2VybmVsLm9y
+ZzsgbGludXgtDQo+IGtlcm5lbEB2Z2VyLmtlcm5lbC5vcmcNCj4gU3ViamVjdDogW0VYVEVSTkFM
+XSBSZTogW1BBVENIIDIvM10gbmV0OiBtYXJ2ZWxsOiBwcmVzdGVyYTogZml4IG1lbW9yeSB1c2UN
+Cj4gYWZ0ZXIgZnJlZQ0KPiANCj4gUHJpb3JpdGl6ZSBzZWN1cml0eSBmb3IgZXh0ZXJuYWwgZW1h
+aWxzOiBDb25maXJtIHNlbmRlciBhbmQgY29udGVudCBzYWZldHkNCj4gYmVmb3JlIGNsaWNraW5n
+IGxpbmtzIG9yIG9wZW5pbmcgYXR0YWNobWVudHMNCj4gDQo+IC0tLS0tLS0tLS0tLS0tLS0tLS0t
+LS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0tLS0NCj4gT24g
+TW9uLCAxMSBNYXIgMjAyNCAxNTo1MToxMSArMDIwMA0KPiBFbGFkIE5hY2htYW4gPGVuYWNobWFu
+QG1hcnZlbGwuY29tPiB3cm90ZToNCj4gDQo+ID4gRnJvbTogRWxhZCBOYWNobWFuIDxlbmFjaG1h
+bkBtYXJ2ZWxsLmNvbT4NCj4gPg0KPiA+IFByZXN0ZXJhIGRyaXZlciByb3V0aW5nIG1vZHVsZSBj
+bGVhbnVwIHByb2Nlc3Mgd291bGQgcmVsZWFzZSBtZW1vcnkNCj4gPiBhbmQgdGhlbiByZWZlcmVu
+Y2UgaXQgYWdhaW4sIGFuZCBldmVudHVhbGx5IGZyZWUgaXQgYWdhaW4uDQo+ID4gUmVtb3ZlIHRo
+ZSByZWR1bmRhbnQgZmlyc3QgbWVtb3J5IGZyZWUgY2FsbC4NCj4gPiBBbGwgc3VjaCBkb3VibGUg
+ZnJlZSBjYWxscyB3ZXJlIGRldGVjdGVkIHVzaW5nIEtBU0FOLg0KPiANCj4gTm90IGRpcmVjdGx5
+IHJlbGF0ZWQgdG8gdGhpcyBwYXRjaCBidXQgSSBhbSB3b25kZXJpbmcgaWYgdGhlIGNhbGwgdG8N
+Cj4gcHJlc3RlcmFfcG9ydF9zZnBfdW5iaW5kKHBvcnQpIGlzIG5vdCBtaXNzaW5nIGluDQo+IHBy
+ZXN0ZXJhX2Rlc3Ryb3lfcG9ydHMoKSBmdW5jdGlvbj8NCg0KWWVzLCBpdCBpcy4NCg0KPiANCj4g
+UmVnYXJkcywNCj4gLS0NCj4gS8O2cnkgTWFpbmNlbnQsIEJvb3RsaW4NCj4gRW1iZWRkZWQgTGlu
+dXggYW5kIGtlcm5lbCBlbmdpbmVlcmluZw0KPiBodHRwczovL3VybGRlZmVuc2UucHJvb2Zwb2lu
+dC5jb20vdjIvdXJsP3U9aHR0cHMtDQo+IDNBX19ib290bGluLmNvbSZkPUR3SUZhUSZjPW5Laldl
+YzJiNlIwbU95UGF6N3h0ZlEmcj1lVGVOVExFSzUtDQo+IFR4WGN6ak9jS1BoQU5JRnRsQjlwUDRs
+cTlxaGRsRnJ3USZtPVZuandVQnE0UVNfT25sXzA3Z3AxT1VwMlhvRw0KPiBwVC0NCj4gYlo1c25F
+T0FnNWdmM0NNM2w1R1BnWFExcGIzR3pFYTZiYiZzPUdjaHpxSTNsSHlHdUZLaGVwRUZNRnNYd3AN
+Cj4gNW9NU0g5aXF3Qlp1VHR6aGpjJmU9DQoNCkVsYWQuDQo=
 
