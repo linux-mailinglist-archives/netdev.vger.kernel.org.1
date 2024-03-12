@@ -1,170 +1,151 @@
-Return-Path: <netdev+bounces-79398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72BCA878FD8
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 09:40:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0B3687901E
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 09:54:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 285151F2229C
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 08:40:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B50D28533A
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 08:54:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D174C7765C;
-	Tue, 12 Mar 2024 08:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A56C777F07;
+	Tue, 12 Mar 2024 08:54:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0iQfbo45";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="58qL5OOc"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="cqRA9V1x"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAF0377653;
-	Tue, 12 Mar 2024 08:40:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66D3477F00;
+	Tue, 12 Mar 2024 08:54:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710232828; cv=none; b=X87+84GnYW4ASkXJnWctiarR03wzb82vltqZB7+/6uwW3ZvFaWezv2WFlrwNeQkipwYOb0srmndJEwfnnS7e45Oq5G0FK5hnnF4Lk1RFRU6VubBaSZNKEe0/9eFNxeWZ3LMx7nzQynqLUtJ2xEkHKmqVgBmWHFC/eNbyEZWtuok=
+	t=1710233664; cv=none; b=kv6qJWdkHxKXflZre0HLhPCp3p89foQpL7K+tFz3ZP2+x5otLZ/KWf+PXiz6cuj5MGp9xbmEy2DjjwV+ldXubm06n2ErTNUm+6AdxcPmwipmjV9tSvE7UcStAcPzYrNhVxfQO/DTQEOyC5H6yfC5kHs3J5wc4361irj3vk4ksqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710232828; c=relaxed/simple;
-	bh=uhupKSGZ8brO6SESSNZiXmPFnfE/zOMs9qWCvyo6Hp0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AMMxrehGRcp4VrTulySyJAvA3BPDZHKR7LcwdH45pWE5PlCsNjDHxpFOO7DibpK+8bGqF1PKIzcr2N8bazNX+77wkq9IzH0ZboouJSf/u1GR7fsW8RsRXfyMSjnrT4B/4rdiGXMePIVghy/SaUh3Aek8qsbTiclU8N98DrTIMWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0iQfbo45; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=58qL5OOc; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Tue, 12 Mar 2024 09:40:17 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1710232817;
+	s=arc-20240116; t=1710233664; c=relaxed/simple;
+	bh=v/q1qVsAjFqdy95pGh+TCh2GnS5R55nwOsexJepHNlc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Il3iJZRPJgKgCdaimHCZqHhU4FioWG/x6cbN6VMDnDZ+oHhXtDdRCXEmlqMYKeAr+FplpChxJyV6JXGfzarOwSfHQ8WwNEPEOkElKGBrVWD0PcCmxZXNiZm4vEY8iGt9GKW6y6u2vJc3S/PDMtR/bt26+UeGVBtD8mwN6YxME50=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=cqRA9V1x; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPA id 946E21C000B;
+	Tue, 12 Mar 2024 08:54:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1710233659;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zhVeoon9Fn+c5RdP92l8KQA07KAunlR8dxh2qnkPF34=;
-	b=0iQfbo45WVUn9rzAkxPoSIC+a94J1GcW0ystQxyXSeNgu47vU3Sp2NL5lnenFWzPKccutO
-	B54+W4fFTO3rNdUbFVYarR3de3FMG6hdLaeGv+Ei3TFokqjN9EGQ+HReBU+mPPdb9nMAyK
-	QPK82ecnL14Z5Jp8knZeE/lIlZU+xFZCxerLOvvwReeqTPxpGxZrj7mwDJrg0qSSfR9yMc
-	HPuOivC2BFtVTmmRzPsEPiVtPKm1guJOxo6Fo/rvreI4tA8sBGcW+V8mqCnVCqpOXWhjBj
-	zYClZqtmhoSoTOOVUwP1M2+aD/W0Q5UPzVAswLRvjmFulq7Tt7S4OpQcscNT5Q==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1710232817;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zhVeoon9Fn+c5RdP92l8KQA07KAunlR8dxh2qnkPF34=;
-	b=58qL5OOcqms30JBQfobSKYyToJr6HupatuhIU1QW2oI0EsMdZl4cNK4nhU+mA0PksSV3sw
-	2Ce1rj1JBiG82PAw==
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-To: Chris Leech <cleech@redhat.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	Nilesh Javali <njavali@marvell.com>, Christoph Hellwig <hch@lst.de>, 
-	John Meneghini <jmeneghi@redhat.com>, Lee Duncan <lduncan@suse.com>, 
-	Mike Christie <michael.christie@oracle.com>, Hannes Reinecke <hare@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	GR-QLogic-Storage-Upstream@marvell.com
-Subject: Re: [PATCH 1/2] uio: introduce UIO_MEM_DMA_COHERENT type
-Message-ID: <20240312093238-3025dd50-b84c-4165-9d02-0568b440dd58@linutronix.de>
-References: <20240131191732.3247996-1-cleech@redhat.com>
- <20240131191732.3247996-2-cleech@redhat.com>
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Va/V9kPpijtdOzFWFEkjafB4xSVQdTFezkUKicaC9OU=;
+	b=cqRA9V1xbTouunLrxjD3nnEn+2V9SWcHA34VbAFTqx2GIDGi+MwFLb3pmfdQODmG8kW18W
+	2HmS5uIComnwj3s2166gAM7fxMCf/7wxxxGRuoBuo8X27uBFR3FiEg5OkLFiPpM3oDfsVg
+	jF3/X5+WOuCJwKq5HqgpnR2bxcaomiAtj5AbfKmoJF3uGa4YItqKhis2GGvTpgFI/+4Iyl
+	83xRcGIIEt4MAyCZn7upFjoHzAMxf5utorKa6mWCqym7yZxj/ueXQHq5CER2pdjE/xVCV1
+	3J06oR94mVRw9/x5qkHS9gDIwrGqUvNG82riHVxe7h0x2CczAYBfzOkawdkqOw==
+From: Herve Codina <herve.codina@bootlin.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: [PATCH] lib/bitmap: Fix bitmap_scatter() and bitmap_gather() kernel doc
+Date: Tue, 12 Mar 2024 09:54:03 +0100
+Message-ID: <20240312085403.224248-1-herve.codina@bootlin.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240131191732.3247996-2-cleech@redhat.com>
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: herve.codina@bootlin.com
 
-Hi,
+The make htmldoc command failed with the following error
+  ... include/linux/bitmap.h:524: ERROR: Unexpected indentation.
+  ... include/linux/bitmap.h:524: CRITICAL: Unexpected section title or transition.
 
-On Wed, Jan 31, 2024 at 11:17:31AM -0800, Chris Leech wrote:
-> Add a UIO memtype specifically for sharing dma_alloc_coherent
-> memory with userspace, backed by dma_mmap_coherent.
-> 
-> This is mainly for the bnx2/bnx2x/bnx2i "cnic" interface, although there
-> are a few other uio drivers which map dma_alloc_coherent memory and
-> could be converted to use dma_mmap_coherent as well.
-> 
-> Signed-off-by: Nilesh Javali <njavali@marvell.com>
-> Signed-off-by: Chris Leech <cleech@redhat.com>
-> ---
->  drivers/uio/uio.c          | 40 ++++++++++++++++++++++++++++++++++++++
->  include/linux/uio_driver.h |  3 +++
->  2 files changed, 43 insertions(+)
-> 
-> diff --git a/drivers/uio/uio.c b/drivers/uio/uio.c
-> index 2d572f6c8ec83..dde3f49855233 100644
-> --- a/drivers/uio/uio.c
-> +++ b/drivers/uio/uio.c
-> @@ -24,6 +24,7 @@
+Move the visual representation to a literal block.
 
-[..]
+Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+---
 
-> +static int uio_mmap_dma_coherent(struct vm_area_struct *vma)
-> +{
-> +	struct uio_device *idev = vma->vm_private_data;
-> +	struct uio_mem *mem;
-> +	void *addr;
-> +	int ret = 0;
-> +	int mi;
-> +
-> +	mi = uio_find_mem_index(vma);
-> +	if (mi < 0)
-> +		return -EINVAL;
-> +
-> +	mem = idev->info->mem + mi;
-> +
-> +	if (mem->dma_addr & ~PAGE_MASK)
-> +		return -ENODEV;
-> +	if (vma->vm_end - vma->vm_start > mem->size)
-> +		return -EINVAL;
-> +
-> +	/*
-> +	 * UIO uses offset to index into the maps for a device.
-> +	 * We need to clear vm_pgoff for dma_mmap_coherent.
-> +	 */
-> +	vma->vm_pgoff = 0;
-> +
-> +	addr = (void *)mem->addr;
+This patch fixes de5f84338970 ("lib/bitmap: Introduce bitmap_scatter() and bitmap_gather() helpers")
+available in net-next and linux-next
 
-This cast introduces a build error when building with
-sizeof(void *) != sizeof(phys_addr_t).
+ include/linux/bitmap.h | 44 ++++++++++++++++++++++--------------------
+ 1 file changed, 23 insertions(+), 21 deletions(-)
 
-For example on i386 with PHYS_ADDR_T_64BIT.
-(Enabled through allmodconfig)
+diff --git a/include/linux/bitmap.h b/include/linux/bitmap.h
+index 049ba20911c5..ac87c8292f08 100644
+--- a/include/linux/bitmap.h
++++ b/include/linux/bitmap.h
+@@ -507,17 +507,18 @@ static inline void bitmap_replace(unsigned long *dst,
+  *
+  * (Bits 0, 1, 2, 3, 4, 5 are copied to the bits 0, 1, 4, 8, 9, 12)
+  *
+- * A more 'visual' description of the operation:
+- * src:  0000000001011010
+- *                 ||||||
+- *          +------+|||||
+- *          |  +----+||||
+- *          |  |+----+|||
+- *          |  ||   +-+||
+- *          |  ||   |  ||
+- * mask: ...v..vv...v..vv
+- *       ...0..11...0..10
+- * dst:  0000001100000010
++ * A more 'visual' description of the operation::
++ *
++ *	src:  0000000001011010
++ *	                ||||||
++ *	         +------+|||||
++ *	         |  +----+||||
++ *	         |  |+----+|||
++ *	         |  ||   +-+||
++ *	         |  ||   |  ||
++ *	mask: ...v..vv...v..vv
++ *	      ...0..11...0..10
++ *	dst:  0000001100000010
+  *
+  * A relationship exists between bitmap_scatter() and bitmap_gather().
+  * bitmap_gather() can be seen as the 'reverse' bitmap_scatter() operation.
+@@ -553,16 +554,17 @@ static inline void bitmap_scatter(unsigned long *dst, const unsigned long *src,
+  *
+  * (Bits 0, 1, 4, 8, 9, 12 are copied to the bits 0, 1, 2, 3, 4, 5)
+  *
+- * A more 'visual' description of the operation:
+- * mask: ...v..vv...v..vv
+- * src:  0000001100000010
+- *          ^  ^^   ^   0
+- *          |  ||   |  10
+- *          |  ||   > 010
+- *          |  |+--> 1010
+- *          |  +--> 11010
+- *          +----> 011010
+- * dst:  0000000000011010
++ * A more 'visual' description of the operation::
++ *
++ *	mask: ...v..vv...v..vv
++ *	src:  0000001100000010
++ *	         ^  ^^   ^   0
++ *	         |  ||   |  10
++ *	         |  ||   > 010
++ *	         |  |+--> 1010
++ *	         |  +--> 11010
++ *	         +----> 011010
++ *	dst:  0000000000011010
+  *
+  * A relationship exists between bitmap_gather() and bitmap_scatter(). See
+  * bitmap_scatter() for the bitmap scatter detailed operations.
+-- 
+2.44.0
 
-drivers/uio/uio.c: In function 'uio_mmap_dma_coherent':
-drivers/uio/uio.c:795:16: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
-  795 |         addr = (void *)mem->addr;
-      |                ^
-drivers/uio/uio_pruss.c: In function 'pruss_probe':
-drivers/uio/uio_pruss.c:194:34: error: cast from pointer to integer of different size [-Werror=pointer-to-int-cast]
-  194 |                 p->mem[2].addr = (phys_addr_t) gdev->ddr_vaddr;
-      |                                  ^
-drivers/uio/uio_dmem_genirq.c: In function 'uio_dmem_genirq_open':
-drivers/uio/uio_dmem_genirq.c:63:39: error: cast from pointer to integer of different size [-Werror=pointer-to-int-cast]
-   63 |                 uiomem->addr = addr ? (phys_addr_t) addr : DMEM_MAP_ERROR;
-      |                                       ^
-drivers/uio/uio_dmem_genirq.c: In function 'uio_dmem_genirq_release':
-drivers/uio/uio_dmem_genirq.c:92:43: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
-   92 |                                           (void *) uiomem->addr,
-
-As you can see some other files are also affected, which seem to be
-triggered by other but related patches.
-
-This is on next-20240312.
-
-> +	ret = dma_mmap_coherent(mem->dma_device,
-> +				vma,
-> +				addr,
-> +				mem->dma_addr,
-> +				vma->vm_end - vma->vm_start);
-> +	vma->vm_pgoff = mi;
-> +
-> +	return ret;
-> +}
-> +
-
-[..]
-
-Thomas
 
