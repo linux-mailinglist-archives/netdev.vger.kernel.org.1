@@ -1,137 +1,752 @@
-Return-Path: <netdev+bounces-79353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2AED878D39
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 03:56:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7233C878D58
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 04:03:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41FD91F226D3
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 02:56:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7A65B207DE
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 03:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26CA779E0;
-	Tue, 12 Mar 2024 02:56:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10F1883C;
+	Tue, 12 Mar 2024 03:03:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="d2Ova4t3"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="iHYX3lqj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F572B669
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 02:56:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67B127482;
+	Tue, 12 Mar 2024 03:03:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710212195; cv=none; b=Va1zEQSD92b2EoPRBlYT0Tw5SjgZow2UQnnE/283BmXvPq0AMv7D1vILaso3Yiz30cIhWN4hiRfM7ibG0WSPYUTDkwB63NFmarGObQM4eW88Q/WjmhoE9OL8i4HKTiuRZAm4t1NcCt3G+YGjuSQ/jZ0pmhUmgOoibfX+ZW1enL8=
+	t=1710212616; cv=none; b=G5x0jg59/VBl+7R5sJGFnl9BzaTPLtHvB/2/lFw4RXyyl30RXqsSQUkn3uk9IHsnpNLFG3moOl8Mz2bK0m7RR8SW4JWf57rQmHxMEi0t2pioRZ4RelYOlVrieXUlvIXYP0z0sXXgcrAxWvDjs0w0S6kFtqWmYTSOMmn593g8910=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710212195; c=relaxed/simple;
-	bh=8duYlw7yiLaMQiEjvPs64/nXpWh4xT1l7do/uy0Ifvk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HagPZUrwZOCzDoPRxuK8qtlqBDVdU2yyfqIjL7URJVjz2lHrQ8jP57j+79S6rWJhGo4rfjq1qAf5VUwgSeO61W7pqESy+MT9PGjUbpkKX9hZ4DXQf0NCtk4guahbU8q4KTl9E2/cdnU0c8XEeVFa3sLS33LK+r2UIZLpEEdES94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=d2Ova4t3; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-29b7b9a4908so2250020a91.1
-        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 19:56:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1710212192; x=1710816992; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8duYlw7yiLaMQiEjvPs64/nXpWh4xT1l7do/uy0Ifvk=;
-        b=d2Ova4t3LH8K/YV1te1DCzhVl3PLbvJaG/iY2pzTDJkcosWx6A/MdUZ/mM4MW9sfUR
-         GQ5sY5+buMi0xl8pZAl6oybDues4UiLqfZLkGdHy7hPxqm0DSdeog5UKj7At1YM1DJbF
-         l6UuGZe+F+ck+GPIQFyxK9ZWsB8KHcJnj8TP5e3nSaFDsrIcxIZjimixhc84Rouc2Ru1
-         jU20/9p6MyfoCzVO+QitGrjhtK31dySWPAfyxG2PMVfo2ka/f/+TxRDVMZ2SEVhhX4tC
-         +C70CU73YnvAnGtEokTXbWYERGIAFzRa+RhVapWsKkGeZhM3DUaa0u5ykhQUncKB7WlF
-         EL8g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710212192; x=1710816992;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8duYlw7yiLaMQiEjvPs64/nXpWh4xT1l7do/uy0Ifvk=;
-        b=O6DVmH4KRpl2t3ifGKFaN++iLLtJIxDRMZUhPOFQeWgsCjXvG3ZofX1FLwAF14UVGg
-         /OXobRmEBouHOmen7z/nE199+3SWZaKfKzT1mbTDdNSiOFHY6oisqwMmkFRaftkQ7lLs
-         ZtdXy/LFsJpnqSd6eW246PQxrz4ZEm95pNsV4fdxpR7qgIUbe7Z1Qylw/rtgwHO8WJjF
-         c0S4+J+sY/5V75WW/QUhikPsbSsm+2m13uHbt+C5/inLzo8ElTT36X9prJa2weHMGJRT
-         0RcGx9M7o8k3mgST3CcOGYJ8+k+MSDY3lbhr9jOHdF+MSqxGYA5LOFOjQEc4XGq2Wgl8
-         782A==
-X-Forwarded-Encrypted: i=1; AJvYcCUt+XlEOlGwnj3/ouiacjNu10weFDjjRQrX2OMZFL7ooxmrlQagsRYAVWFLto2Y5n4tm2GUHnF2HM0jEQsT58XHSeKMjDCr
-X-Gm-Message-State: AOJu0Yxi0v85WGAZOAIojXhemEXiusHh8whlf6EQTL1H47Q9PcFJmGCK
-	86mXo0yulV0GrQ5bYAoDY5/TSmQkqehXlwTTWHxSQzyIcEBOW4xAkhGY1E+GXEll1vTztEVSbZ2
-	FLMowQPm83qfBUqj+/3AAmPKikfh41A7b6Vok9A==
-X-Google-Smtp-Source: AGHT+IEEbNdZpfvWrZfgFQVH2ecv7uQ4oHjBsb6d+e9PBZQkR1FkO3HlcgN1IPWibJVLKEs+f74flvYnRRAAWujNw0M=
-X-Received: by 2002:a17:90a:f305:b0:299:63fe:3a27 with SMTP id
- ca5-20020a17090af30500b0029963fe3a27mr5454778pjb.19.1710212192599; Mon, 11
- Mar 2024 19:56:32 -0700 (PDT)
+	s=arc-20240116; t=1710212616; c=relaxed/simple;
+	bh=bAaeYI5tXJ41UTbjSmsjHrS3C/aXkIuLaTW0uaGTagg=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fyxpdl2EwAcGvsubhCcBY1tonArzSL82SZDRwiyhPFqYDaQmets9XESgbUD8ZSML4T6ZBCoXoZZk3PHoLyVNl8Cwe4N6+uqdbWoINgDc33Yr+xw4L2ggvKxodTKj2Bo6RP6heZN5YH4BthnFhg3NumkJxq7Y/KWkWiuzG6Qn8GQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=iHYX3lqj; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42BIWdMF004951;
+	Mon, 11 Mar 2024 20:03:15 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	date:from:to:cc:subject:message-id:references:mime-version
+	:content-type:in-reply-to; s=pfpt0220; bh=bHcS0xWCivDkdsIOpL+vp2
+	qjUskwBgTvlL6VkxEiMno=; b=iHYX3lqjaMv/rimQj4TGjx3Z0DcklYEZ+bAIby
+	Kw+34wOTxDXfYsGZtI9jrZP1px5FDoSJCDK1lB8Yx+jSxrAbkTkD2G7LGnIpMCgC
+	/xqg9c36Kuw6rmZSSUknOcQypnJ1z4ZE3UMxuL/PtAsJswAXp2xLNpu0LzKpopp3
+	Js8jzw6SkPzW5hGw+VC7fth66U/4enqNZbN+b5cou19CjoGzDZeQ8gI5LkGgavKE
+	Xry7YERP0oT5A7MI3Nv9xspPllh+fKaaGlsvLnuZs/1WNsbQhF1u2VZZWCPFiAMu
+	kcx5TE8iMj02VvTjnHUSgrZ5OoQVfSphVP94+2Ww3Atbu00g==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3wt54n1p65-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 11 Mar 2024 20:03:14 -0700 (PDT)
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Mon, 11 Mar
+ 2024 20:03:13 -0700
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH02.marvell.com (10.69.176.39) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.48; Mon, 11 Mar 2024 20:03:09 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
+ Transport; Mon, 11 Mar 2024 20:03:09 -0700
+Received: from maili.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with SMTP id E69A65B6927;
+	Mon, 11 Mar 2024 20:03:04 -0700 (PDT)
+Date: Tue, 12 Mar 2024 08:33:03 +0530
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: Jijie Shao <shaojijie@huawei.com>
+CC: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <jiri@resnulli.us>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+        <liuyonglong@huawei.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V5 net-next 3/4] net: hns3: dump more reg info based on
+ ras mod
+Message-ID: <20240312030303.GA1249254@maili.marvell.com>
+References: <20240309100044.2351166-1-shaojijie@huawei.com>
+ <20240309100044.2351166-4-shaojijie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240311093526.1010158-1-dongmenglong.8@bytedance.com>
- <20240311093526.1010158-8-dongmenglong.8@bytedance.com> <CAADnVQK4tdefa3s=sim69Sc+ztd-hHohPEDXaUNVTU-mLNYUiw@mail.gmail.com>
- <CALz3k9iabeOwHSrPb9mkfCuOebanh3+bAfi7xh3kBBN0DzHC3A@mail.gmail.com> <CAADnVQKsrLB-2bD53R4ZdzUVdx1aqkgom1rzGCGKK0M3Uc+csQ@mail.gmail.com>
-In-Reply-To: <CAADnVQKsrLB-2bD53R4ZdzUVdx1aqkgom1rzGCGKK0M3Uc+csQ@mail.gmail.com>
-From: =?UTF-8?B?5qKm6b6Z6JGj?= <dongmenglong.8@bytedance.com>
-Date: Tue, 12 Mar 2024 10:56:21 +0800
-Message-ID: <CALz3k9jJtxVRmgGM4F-33m1wp=aCShnqdaX+7pZ9UmHwntFgXw@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH bpf-next v2 7/9] libbpf: don't free btf if
- program of multi-link tracing existing
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	X86 ML <x86@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Quentin Monnet <quentin@isovalent.com>, 
-	bpf <bpf@vger.kernel.org>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>, linux-s390 <linux-s390@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, linux-trace-kernel@vger.kernel.org, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240309100044.2351166-4-shaojijie@huawei.com>
+X-Proofpoint-ORIG-GUID: t9pKaOkAnOAryR3VNF1tcPge4sNTWd4P
+X-Proofpoint-GUID: t9pKaOkAnOAryR3VNF1tcPge4sNTWd4P
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-12_02,2024-03-11_01,2023-05-22_02
 
-On Tue, Mar 12, 2024 at 10:13=E2=80=AFAM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
+On 2024-03-09 at 15:30:43, Jijie Shao (shaojijie@huawei.com) wrote:
 >
-> On Mon, Mar 11, 2024 at 7:05=E2=80=AFPM =E6=A2=A6=E9=BE=99=E8=91=A3 <dong=
-menglong.8@bytedance.com> wrote:
-> >
-> > > >
-> > > > +LIBBPF_API void bpf_object__free_btfs(struct bpf_object *obj);
-> > > > +
-> > >
-> > > It shouldn't be exported.
-> > > libbpf should clean it up when bpf_object is freed.
-> >
-> > Yes, libbpf will clean up the btfs when bpf_object is freed in
-> > this commit. And I'm trying to offer a way to early free the btfs
-> > by the users manual to reduce the memory usage. Or, the
-> > btfs that we opened will keep existing until we close the
-> > bpf_object.
-> >
-> > This is optional, I can remove it if you prefer.
+> Dump more reg info base on ras mod before reset, which is useful to
+> analyze the ras error.
 >
-> Let's not extend libbpf api unless we really need to.
-> bpf_program__attach_trace_multi_opts() and
-> *skel*__attach() can probably free them.
+> Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
+> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> ---
+>  drivers/net/ethernet/hisilicon/hns3/hnae3.h   |   4 +
+>  .../hns3/hns3_common/hclge_comm_cmd.c         |   1 +
+>  .../hns3/hns3_common/hclge_comm_cmd.h         |   2 +
+>  .../hisilicon/hns3/hns3pf/hclge_debugfs.c     |   6 +-
+>  .../hisilicon/hns3/hns3pf/hclge_debugfs.h     |   3 +
+>  .../hisilicon/hns3/hns3pf/hclge_err.c         | 434 +++++++++++++++++-
+>  .../hisilicon/hns3/hns3pf/hclge_err.h         |  36 ++
+>  7 files changed, 478 insertions(+), 8 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+> index f19f1e1d1f9f..e9266c65b331 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+> @@ -104,6 +104,7 @@ enum HNAE3_DEV_CAP_BITS {
+>  	HNAE3_DEV_SUPPORT_WOL_B,
+>  	HNAE3_DEV_SUPPORT_TM_FLUSH_B,
+>  	HNAE3_DEV_SUPPORT_VF_FAULT_B,
+> +	HNAE3_DEV_SUPPORT_ERR_MOD_GEN_REG_B,
+>  };
+>
+>  #define hnae3_ae_dev_fd_supported(ae_dev) \
+> @@ -181,6 +182,9 @@ enum HNAE3_DEV_CAP_BITS {
+>  #define hnae3_ae_dev_vf_fault_supported(ae_dev) \
+>  	test_bit(HNAE3_DEV_SUPPORT_VF_FAULT_B, (ae_dev)->caps)
+>
+> +#define hnae3_ae_dev_gen_reg_dfx_supported(hdev) \
+> +	test_bit(HNAE3_DEV_SUPPORT_ERR_MOD_GEN_REG_B, (hdev)->ae_dev->caps)
+> +
+>  enum HNAE3_PF_CAP_BITS {
+>  	HNAE3_PF_SUPPORT_VLAN_FLTR_MDF_B = 0,
+>  };
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c
+> index 11df6fbd641d..ea40b594dbac 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.c
+> @@ -158,6 +158,7 @@ static const struct hclge_comm_caps_bit_map hclge_pf_cmd_caps[] = {
+>  	{HCLGE_COMM_CAP_WOL_B, HNAE3_DEV_SUPPORT_WOL_B},
+>  	{HCLGE_COMM_CAP_TM_FLUSH_B, HNAE3_DEV_SUPPORT_TM_FLUSH_B},
+>  	{HCLGE_COMM_CAP_VF_FAULT_B, HNAE3_DEV_SUPPORT_VF_FAULT_B},
+> +	{HCLGE_COMM_CAP_ERR_MOD_GEN_REG_B, HNAE3_DEV_SUPPORT_ERR_MOD_GEN_REG_B},
+>  };
+>
+>  static const struct hclge_comm_caps_bit_map hclge_vf_cmd_caps[] = {
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
+> index e6a087576df6..a2bc5a9adaa3 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_cmd.h
+> @@ -91,6 +91,7 @@ enum hclge_opcode_type {
+>  	HCLGE_OPC_DFX_RCB_REG		= 0x004D,
+>  	HCLGE_OPC_DFX_TQP_REG		= 0x004E,
+>  	HCLGE_OPC_DFX_SSU_REG_2		= 0x004F,
+> +	HCLGE_OPC_DFX_GEN_REG		= 0x7038,
+>
+>  	HCLGE_OPC_QUERY_DEV_SPECS	= 0x0050,
+>  	HCLGE_OPC_GET_QUEUE_ERR_VF      = 0x0067,
+> @@ -353,6 +354,7 @@ enum HCLGE_COMM_CAP_BITS {
+>  	HCLGE_COMM_CAP_LANE_NUM_B = 27,
+>  	HCLGE_COMM_CAP_WOL_B = 28,
+>  	HCLGE_COMM_CAP_TM_FLUSH_B = 31,
+> +	HCLGE_COMM_CAP_ERR_MOD_GEN_REG_B = 32,
+>  };
+>
+>  enum HCLGE_COMM_API_CAP_BITS {
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
+> index 243be19a7557..debf143e9940 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.c
+> @@ -801,10 +801,8 @@ static int hclge_dbg_get_dfx_bd_num(struct hclge_dev *hdev, int offset,
+>  	return 0;
+>  }
+>
+> -static int hclge_dbg_cmd_send(struct hclge_dev *hdev,
+> -			      struct hclge_desc *desc_src,
+> -			      int index, int bd_num,
+> -			      enum hclge_opcode_type cmd)
+> +int hclge_dbg_cmd_send(struct hclge_dev *hdev, struct hclge_desc *desc_src,
+> +		       int index, int bd_num, enum hclge_opcode_type cmd)
+>  {
+>  	struct hclge_desc *desc = desc_src;
+>  	int ret, i;
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.h
+> index 31a775fb032b..2b998cbed826 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.h
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_debugfs.h
+> @@ -131,4 +131,7 @@ struct hclge_dbg_vlan_cfg {
+>  	u8 pri_only2;
+>  };
+>
+> +int hclge_dbg_cmd_send(struct hclge_dev *hdev, struct hclge_desc *desc_src,
+> +		       int index, int bd_num, enum hclge_opcode_type cmd);
+> +
+>  #endif
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.c
+> index d63e114f93d0..468372b7253d 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.c
+> @@ -1198,6 +1198,426 @@ static const struct hclge_hw_error hclge_rocee_qmm_ovf_err_int[] = {
+>  	}
+>  };
+>
+> +static const struct hclge_mod_reg_info hclge_ssu_reg_0_info[] = {
+> +	{
+> +		.reg_name = "SSU_BP_STATUS_0~5",
+> +		.reg_offset_group = { 5, 6, 7, 8, 9, 10},
+> +		.group_size = 6
+> +	}, {
+> +		.reg_name = "LO_PRI_UNICAST_CUR_CNT",
+> +		.reg_offset_group = {54},
+> +		.group_size = 1
+> +	}, {
+> +		.reg_name = "HI/LO_PRI_MULTICAST_CUR_CNT",
+> +		.reg_offset_group = {55, 56},
+> +		.group_size = 2
+> +	}, {
+> +		.reg_name = "SSU_MB_RD_RLT_DROP_CNT",
+> +		.reg_offset_group = {29},
+> +		.group_size = 1
+> +	}, {
+> +		.reg_name = "SSU_PPP_MAC_KEY_NUM",
+> +		.reg_offset_group = {31, 30},
+> +		.group_size = 2
+> +	}, {
+> +		.reg_name = "SSU_PPP_HOST_KEY_NUM",
+> +		.reg_offset_group = {33, 32},
+> +		.group_size = 2
+> +	}, {
+> +		.reg_name = "PPP_SSU_MAC/HOST_RLT_NUM",
+> +		.reg_offset_group = {35, 34, 37, 36},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "FULL/PART_DROP_NUM",
+> +		.reg_offset_group = {18, 19},
+> +		.group_size = 2
+> +	}, {
+> +		.reg_name = "PPP_KEY/RLT_DROP_NUM",
+> +		.reg_offset_group = {20, 21},
+> +		.group_size = 2
+> +	}, {
+> +		.reg_name = "NIC/ROC_L2_ERR_DROP_PKT_CNT",
+> +		.reg_offset_group = {48, 49},
+> +		.group_size = 2
+> +	}, {
+> +		.reg_name = "NIC/ROC_L2_ERR_DROP_PKT_CNT_RX",
+> +		.reg_offset_group = {50, 51},
+> +		.group_size = 2
+> +	},
+> +};
+> +
+> +static const struct hclge_mod_reg_info hclge_ssu_reg_1_info[] = {
+> +	{
+> +		.reg_name = "RX_PACKET_IN/OUT_CNT",
+> +		.reg_offset_group = {13, 12, 15, 14},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "TX_PACKET_IN/OUT_CNT",
+> +		.reg_offset_group = {17, 16, 19, 18},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "RX_PACKET_TC0_IN/OUT_CNT",
+> +		.reg_offset_group = {25, 24, 41, 40},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "RX_PACKET_TC1_IN/OUT_CNT",
+> +		.reg_offset_group = {27, 26, 43, 42},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "RX_PACKET_TC2_IN/OUT_CNT",
+> +		.reg_offset_group = {29, 28, 45, 44},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "RX_PACKET_TC3_IN/OUT_CNT",
+> +		.reg_offset_group = {31, 30, 47, 46},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "RX_PACKET_TC4_IN/OUT_CNT",
+> +		.reg_offset_group = {33, 32, 49, 48},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "RX_PACKET_TC5_IN/OUT_CNT",
+> +		.reg_offset_group = {35, 34, 51, 50},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "RX_PACKET_TC6_IN/OUT_CNT",
+> +		.reg_offset_group = {37, 36, 53, 52},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "RX_PACKET_TC7_IN/OUT_CNT",
+> +		.reg_offset_group = {39, 38, 55, 54},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "TX_PACKET_TC0_IN/OUT_CNT",
+> +		.reg_offset_group = {57, 56, 73, 72},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "TX_PACKET_TC1_IN/OUT_CNT",
+> +		.reg_offset_group = {59, 58, 75, 74},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "TX_PACKET_TC2_IN/OUT_CNT",
+> +		.reg_offset_group = {61, 60, 77, 76},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "TX_PACKET_TC3_IN/OUT_CNT",
+> +		.reg_offset_group = {63, 62, 79, 78},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "TX_PACKET_TC4_IN/OUT_CNT",
+> +		.reg_offset_group = {65, 64, 81, 80},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "TX_PACKET_TC5_IN/OUT_CNT",
+> +		.reg_offset_group = {67, 66, 83, 82},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "TX_PACKET_TC6_IN/OUT_CNT",
+> +		.reg_offset_group = {69, 68, 85, 84},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "TX_PACKET_TC7_IN/OUT_CNT",
+> +		.reg_offset_group = {71, 70, 87, 86},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "PACKET_TC0~3_CURR_BUFFER_CNT",
+> +		.reg_offset_group = {1, 2, 3, 4},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "PACKET_TC4~7_CURR_BUFFER_CNT",
+> +		.reg_offset_group = {5, 6, 7, 8},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "ROC_RX_PACKET_IN_CNT",
+> +		.reg_offset_group = {21, 20},
+> +		.group_size = 2
+> +	}, {
+> +		.reg_name = "ROC_TX_PACKET_OUT_CNT",
+> +		.reg_offset_group = {23, 22},
+> +		.group_size = 2
+> +	}
+> +};
+> +
+> +static const struct hclge_mod_reg_info hclge_rpu_reg_0_info[] = {
+> +	{
+> +		.reg_name = "RPU_FSM_DFX_ST0/ST1_TNL",
+> +		.has_suffix = true,
+> +		.reg_offset_group = {1, 2},
+> +		.group_size = 2
+> +	}, {
+> +		.reg_name = "RPU_RX_PKT_DROP_CNT_TNL",
+> +		.has_suffix = true,
+> +		.reg_offset_group = {3},
+> +		.group_size = 1
+> +	}
+> +};
+> +
+> +static const struct hclge_mod_reg_info hclge_rpu_reg_1_info[] = {
+> +	{
+> +		.reg_name = "FIFO_DFX_ST0_1_2_4",
+> +		.reg_offset_group = {1, 2, 3, 5},
+> +		.group_size = 4
+> +	}
+> +};
+> +
+> +static const struct hclge_mod_reg_info hclge_igu_egu_reg_info[] = {
+> +	{
+> +		.reg_name = "IGU_RX_ERR_PKT",
+> +		.reg_offset_group = {1},
+> +		.group_size = 1
+> +	}, {
+> +		.reg_name = "IGU_RX_OUT_ALL_PKT",
+> +		.reg_offset_group = {29, 28},
+> +		.group_size = 2
+> +	}, {
+> +		.reg_name = "EGU_TX_OUT_ALL_PKT",
+> +		.reg_offset_group = {39, 38},
+> +		.group_size = 2
+> +	}, {
+> +		.reg_name = "EGU_TX_ERR_PKT",
+> +		.reg_offset_group = {5},
+> +		.group_size = 1
+> +	}
+> +};
+> +
+> +static const struct hclge_mod_reg_info hclge_gen_reg_info_tnl[] = {
+> +	{
+> +		.reg_name = "SSU2RPU_TNL_WR_PKT_CNT_TNL",
+> +		.has_suffix = true,
+> +		.reg_offset_group = {1},
+> +		.group_size = 1
+> +	}, {
+> +		.reg_name = "RPU2HST_TNL_WR_PKT_CNT_TNL",
+> +		.has_suffix = true,
+> +		.reg_offset_group = {12},
+> +		.group_size = 1
+> +	}
+> +};
+> +
+> +static const struct hclge_mod_reg_info hclge_gen_reg_info[] = {
+> +	{
+> +		.reg_name = "SSU_OVERSIZE_DROP_CNT",
+> +		.reg_offset_group = {12},
+> +		.group_size = 1
+> +	}, {
+> +		.reg_name = "ROCE_RX_BYPASS_5NS_DROP_NUM",
+> +		.reg_offset_group = {13},
+> +		.group_size = 1
+> +	}, {
+> +		.reg_name = "RX_PKT_IN/OUT_ERR_CNT",
+> +		.reg_offset_group = {15, 14, 19, 18},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "TX_PKT_IN/OUT_ERR_CNT",
+> +		.reg_offset_group = {17, 16, 21, 20},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "ETS_TC_READY",
+> +		.reg_offset_group = {22},
+> +		.group_size = 1
+> +	}, {
+> +		.reg_name = "MIB_TX/RX_BAD_PKTS",
+> +		.reg_offset_group = {19, 18, 29, 28},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "MIB_TX/RX_GOOD_PKTS",
+> +		.reg_offset_group = {21, 20, 31, 30},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "MIB_TX/RX_TOTAL_PKTS",
+> +		.reg_offset_group = {23, 22, 33, 32},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "MIB_TX/RX_PAUSE_PKTS",
+> +		.reg_offset_group = {25, 24, 35, 34},
+> +		.group_size = 4
+> +	}, {
+> +		.reg_name = "MIB_TX_ERR_ALL_PKTS",
+> +		.reg_offset_group = {27, 26},
+> +		.group_size = 2
+> +	}, {
+> +		.reg_name = "MIB_RX_FCS_ERR_PKTS",
+> +		.reg_offset_group = {37, 36},
+> +		.group_size = 2
+> +	}, {
+> +		.reg_name = "IGU_EGU_AUTO_GATE_EN",
+> +		.reg_offset_group = {42},
+> +		.group_size = 1
+> +	}, {
+> +		.reg_name = "IGU_EGU_INT_SRC",
+> +		.reg_offset_group = {43},
+> +		.group_size = 1
+> +	}, {
+> +		.reg_name = "EGU_READY_NUM_CFG",
+> +		.reg_offset_group = {44},
+> +		.group_size = 1
+> +	}, {
+> +		.reg_name = "IGU_EGU_TNL_DFX",
+> +		.reg_offset_group = {45},
+> +		.group_size = 1
+> +	}, {
+> +		.reg_name = "TX_TNL_NOTE_PKT",
+> +		.reg_offset_group = {46},
+> +		.group_size = 1
+> +	}
+> +};
+> +
+> +static const struct hclge_mod_reg_common_msg hclge_ssu_reg_common_msg[] = {
+> +	{
+> +		.cmd = HCLGE_OPC_DFX_SSU_REG_0,
+> +		.result_regs = hclge_ssu_reg_0_info,
+> +		.bd_num = HCLGE_BD_NUM_SSU_REG_0,
+> +		.result_regs_size = ARRAY_SIZE(hclge_ssu_reg_0_info)
+> +	}, {
+> +		.cmd = HCLGE_OPC_DFX_SSU_REG_1,
+> +		.result_regs = hclge_ssu_reg_1_info,
+> +		.bd_num = HCLGE_BD_NUM_SSU_REG_1,
+> +		.result_regs_size = ARRAY_SIZE(hclge_ssu_reg_1_info)
+> +	}, {
+> +		.cmd = HCLGE_OPC_DFX_RPU_REG_0,
+> +		.result_regs = hclge_rpu_reg_0_info,
+> +		.bd_num = HCLGE_BD_NUM_RPU_REG_0,
+> +		.result_regs_size = ARRAY_SIZE(hclge_rpu_reg_0_info),
+> +		.need_para = true
+> +	}, {
+> +		.cmd = HCLGE_OPC_DFX_RPU_REG_1,
+> +		.result_regs = hclge_rpu_reg_1_info,
+> +		.bd_num = HCLGE_BD_NUM_RPU_REG_1,
+> +		.result_regs_size = ARRAY_SIZE(hclge_rpu_reg_1_info)
+> +	}, {
+> +		.cmd = HCLGE_OPC_DFX_IGU_EGU_REG,
+> +		.result_regs = hclge_igu_egu_reg_info,
+> +		.bd_num = HCLGE_BD_NUM_IGU_EGU_REG,
+> +		.result_regs_size = ARRAY_SIZE(hclge_igu_egu_reg_info)
+> +	}, {
+> +		.cmd = HCLGE_OPC_DFX_GEN_REG,
+> +		.result_regs = hclge_gen_reg_info_tnl,
+> +		.bd_num = HCLGE_BD_NUM_GEN_REG,
+> +		.result_regs_size = ARRAY_SIZE(hclge_gen_reg_info_tnl),
+> +		.need_para = true
+> +	}, {
+> +		.cmd = HCLGE_OPC_DFX_GEN_REG,
+> +		.result_regs = hclge_gen_reg_info,
+> +		.bd_num = HCLGE_BD_NUM_GEN_REG,
+> +		.result_regs_size = ARRAY_SIZE(hclge_gen_reg_info)
+> +	}
+> +};
+> +
+> +static int
+> +hclge_print_mod_reg_info(struct device *dev, struct hclge_desc *desc,
+> +			 const struct hclge_mod_reg_info *reg_info, int size)
+> +{
+> +	int i, j, pos, actual_len;
+> +	u8 offset, bd_idx, index;
+> +	char *buf;
+> +
+> +	buf = kzalloc(HCLGE_MOD_REG_INFO_LEN_MAX, GFP_KERNEL);
+> +	if (!buf)
+> +		return -ENOMEM;
+> +
+> +	for (i = 0; i < size; i++) {
+> +		actual_len = strlen(reg_info[i].reg_name) +
+> +			     HCLGE_MOD_REG_EXTRA_LEN +
+> +			     HCLGE_MOD_REG_VALUE_LEN * reg_info[i].group_size;
+> +		if (actual_len > HCLGE_MOD_REG_INFO_LEN_MAX) {
+> +			dev_info(dev, "length of reg(%s) is invalid, len=%d\n",
+> +				 reg_info[i].reg_name, actual_len);
+> +			continue;
+> +		}
+> +
+> +		pos = scnprintf(buf, HCLGE_MOD_REG_INFO_LEN_MAX, "%s",
+> +				reg_info[i].reg_name);
+> +		if (reg_info[i].has_suffix)
+> +			pos += scnprintf(buf + pos,
+> +					 HCLGE_MOD_REG_INFO_LEN_MAX - pos, "%u",
+> +					 le32_to_cpu(desc->data[0]));
+> +		pos += scnprintf(buf + pos,
+> +				 HCLGE_MOD_REG_INFO_LEN_MAX - pos,
+> +				 ":");
+> +		for (j = 0; j < reg_info[i].group_size; j++) {
+> +			offset = reg_info[i].reg_offset_group[j];
+> +			index = offset % HCLGE_DESC_DATA_LEN;
+> +			bd_idx = offset / HCLGE_DESC_DATA_LEN;
+> +			pos += scnprintf(buf + pos,
+> +					 HCLGE_MOD_REG_INFO_LEN_MAX - pos,
+> +					 " %08x",
+> +					 le32_to_cpu(desc[bd_idx].data[index]));
+> +		}
+> +		buf[pos] = '\0';
+ASFAIK, scnprintf does null terminate the string.
 
-That's a good idea! Should we add a "bool free_btf" field
-to struct bpf_trace_multi_opts? bpf_program__attach_trace_multi_opts()
-can be called multi times for a bpf_object, which has multi bpf
-program of type tracing multi-link. Or, can we free the btfs
-automatically if we found all tracing multi-link programs are attached?
-
-Thanks!
-Menglong Dong
-
-> I don't see a use case where you'd want to keep them afterwards.
+> +		dev_info(dev, "%s\n", buf);
+> +	}
+> +
+> +	kfree(buf);
+> +	return 0;
+> +}
+> +
+> +static bool hclge_err_mod_check_support_cmd(enum hclge_opcode_type opcode,
+> +					    struct hclge_dev *hdev)
+> +{
+> +	if (opcode == HCLGE_OPC_DFX_GEN_REG &&
+> +	    !hnae3_ae_dev_gen_reg_dfx_supported(hdev))
+> +		return false;
+> +	return true;
+> +}
+> +
+> +/* For each common msg, send cmdq to IMP and print result reg info.
+> + * If there is a parameter, loop it and request.
+> + */
+> +static void
+> +hclge_query_reg_info(struct hclge_dev *hdev,
+> +		     struct hclge_mod_reg_common_msg *msg, u32 loop_time,
+> +		     u32 *loop_para)
+> +{
+> +	int desc_len, i, ret;
+> +
+> +	desc_len = msg->bd_num * sizeof(struct hclge_desc);
+> +	msg->desc = kzalloc(desc_len, GFP_KERNEL);
+> +	if (!msg->desc) {
+> +		dev_err(&hdev->pdev->dev, "failed to query reg info, ret=%d",
+> +			-ENOMEM);
+> +		return;
+> +	}
+> +
+> +	for (i = 0; i < loop_time; i++) {
+> +		ret = hclge_dbg_cmd_send(hdev, msg->desc, *loop_para,
+> +					 msg->bd_num, msg->cmd);
+> +		loop_para++;
+> +		if (ret)
+> +			continue;
+> +		ret = hclge_print_mod_reg_info(&hdev->pdev->dev, msg->desc,
+> +					       msg->result_regs,
+> +					       msg->result_regs_size);
+> +		if (ret)
+> +			dev_err(&hdev->pdev->dev, "failed to print mod reg info, ret=%d\n",
+> +				ret);
+> +	}
+> +
+> +	kfree(msg->desc);
+> +}
+> +
+> +static void hclge_query_reg_info_of_ssu(struct hclge_dev *hdev)
+> +{
+> +	u32 loop_para[HCLGE_MOD_MSG_PARA_ARRAY_MAX_SIZE] = {0};
+> +	struct hclge_mod_reg_common_msg msg;
+> +	u8 i, j, num;
+> +	u32 loop_time;
+> +
+> +	num = ARRAY_SIZE(hclge_ssu_reg_common_msg);
+> +	for (i = 0; i < num; i++) {
+> +		msg = hclge_ssu_reg_common_msg[i];
+> +		if (!hclge_err_mod_check_support_cmd(msg.cmd, hdev))
+> +			continue;
+> +		loop_time = 1;
+> +		loop_para[0] = 0;
+> +		if (msg.need_para) {
+> +			loop_time = hdev->ae_dev->dev_specs.tnl_num;
+> +			for (j = 0; j < loop_time; j++)
+> +				loop_para[j] = j + 1;
+> +		}
+> +		hclge_query_reg_info(hdev, &msg, loop_time, loop_para);
+> +	}
+> +}
+> +
+>  static const struct hclge_hw_module_id hclge_hw_module_id_st[] = {
+>  	{
+>  		.module_id = MODULE_NONE,
+> @@ -1210,7 +1630,8 @@ static const struct hclge_hw_module_id hclge_hw_module_id_st[] = {
+>  		.msg = "MODULE_GE"
+>  	}, {
+>  		.module_id = MODULE_IGU_EGU,
+> -		.msg = "MODULE_IGU_EGU"
+> +		.msg = "MODULE_IGU_EGU",
+> +		.query_reg_info = hclge_query_reg_info_of_ssu
+>  	}, {
+>  		.module_id = MODULE_LGE,
+>  		.msg = "MODULE_LGE"
+> @@ -1231,7 +1652,8 @@ static const struct hclge_hw_module_id hclge_hw_module_id_st[] = {
+>  		.msg = "MODULE_RTC"
+>  	}, {
+>  		.module_id = MODULE_SSU,
+> -		.msg = "MODULE_SSU"
+> +		.msg = "MODULE_SSU",
+> +		.query_reg_info = hclge_query_reg_info_of_ssu
+>  	}, {
+>  		.module_id = MODULE_TM,
+>  		.msg = "MODULE_TM"
+> @@ -2762,7 +3184,7 @@ void hclge_handle_occurred_error(struct hclge_dev *hdev)
+>  }
+>
+>  static bool
+> -hclge_handle_error_type_reg_log(struct device *dev,
+> +hclge_handle_error_type_reg_log(struct hclge_dev *hdev,
+>  				struct hclge_mod_err_info *mod_info,
+>  				struct hclge_type_reg_err_info *type_reg_info)
+>  {
+> @@ -2770,6 +3192,7 @@ hclge_handle_error_type_reg_log(struct device *dev,
+>  #define HCLGE_ERR_TYPE_IS_RAS_OFFSET 7
+>
+>  	u8 mod_id, total_module, type_id, total_type, i, is_ras;
+> +	struct device *dev = &hdev->pdev->dev;
+>  	u8 index_module = MODULE_NONE;
+>  	u8 index_type = NONE_ERROR;
+>  	bool cause_by_vf = false;
+> @@ -2810,6 +3233,9 @@ hclge_handle_error_type_reg_log(struct device *dev,
+>  	for (i = 0; i < type_reg_info->reg_num; i++)
+>  		dev_err(dev, "0x%08x\n", type_reg_info->hclge_reg[i]);
+>
+> +	if (hclge_hw_module_id_st[index_module].query_reg_info)
+> +		hclge_hw_module_id_st[index_module].query_reg_info(hdev);
+> +
+>  	return cause_by_vf;
+>  }
+>
+> @@ -2850,7 +3276,7 @@ static void hclge_handle_error_module_log(struct hnae3_ae_dev *ae_dev,
+>
+>  			type_reg_info = (struct hclge_type_reg_err_info *)
+>  					    &buf[offset++];
+> -			if (hclge_handle_error_type_reg_log(dev, mod_info,
+> +			if (hclge_handle_error_type_reg_log(hdev, mod_info,
+>  							    type_reg_info))
+>  				cause_by_vf = true;
+>
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.h
+> index 68b738affa66..45a783a50643 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.h
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_err.h
+> @@ -5,6 +5,7 @@
+>  #define __HCLGE_ERR_H
+>
+>  #include "hclge_main.h"
+> +#include "hclge_debugfs.h"
+>  #include "hnae3.h"
+>
+>  #define HCLGE_MPF_RAS_INT_MIN_BD_NUM	10
+> @@ -115,6 +116,18 @@
+>  #define HCLGE_REG_NUM_MAX			256
+>  #define HCLGE_DESC_NO_DATA_LEN			8
+>
+> +#define HCLGE_BD_NUM_SSU_REG_0		10
+> +#define HCLGE_BD_NUM_SSU_REG_1		15
+> +#define HCLGE_BD_NUM_RPU_REG_0		1
+> +#define HCLGE_BD_NUM_RPU_REG_1		2
+> +#define HCLGE_BD_NUM_IGU_EGU_REG	9
+> +#define HCLGE_BD_NUM_GEN_REG		8
+> +#define HCLGE_MOD_REG_INFO_LEN_MAX	256
+> +#define HCLGE_MOD_REG_EXTRA_LEN		11
+> +#define HCLGE_MOD_REG_VALUE_LEN		9
+> +#define HCLGE_MOD_REG_GROUP_MAX_SIZE	6
+> +#define HCLGE_MOD_MSG_PARA_ARRAY_MAX_SIZE	8
+> +
+>  enum hclge_err_int_type {
+>  	HCLGE_ERR_INT_MSIX = 0,
+>  	HCLGE_ERR_INT_RAS_CE = 1,
+> @@ -191,6 +204,7 @@ struct hclge_hw_error {
+>  struct hclge_hw_module_id {
+>  	enum hclge_mod_name_list module_id;
+>  	const char *msg;
+> +	void (*query_reg_info)(struct hclge_dev *hdev);
+>  };
+>
+>  struct hclge_hw_type_id {
+> @@ -218,6 +232,28 @@ struct hclge_type_reg_err_info {
+>  	u32 hclge_reg[HCLGE_REG_NUM_MAX];
+>  };
+>
+> +struct hclge_mod_reg_info {
+> +	const char *reg_name;
+> +	bool has_suffix; /* add suffix for register name */
+> +	/* the positions of reg values in hclge_desc.data */
+> +	u8 reg_offset_group[HCLGE_MOD_REG_GROUP_MAX_SIZE];
+> +	u8 group_size;
+> +};
+> +
+> +/* This structure defines cmdq used to query the hardware module debug
+> + * regisgers.
+> + */
+> +struct hclge_mod_reg_common_msg {
+> +	enum hclge_opcode_type cmd;
+> +	struct hclge_desc *desc;
+> +	u8 bd_num; /* the bd number of hclge_desc used */
+> +	bool need_para; /* whether this cmdq needs to add para */
+> +
+> +	/* the regs need to print */
+> +	const struct hclge_mod_reg_info *result_regs;
+> +	u16 result_regs_size;
+> +};
+> +
+>  int hclge_config_mac_tnl_int(struct hclge_dev *hdev, bool en);
+>  int hclge_config_nic_hw_error(struct hclge_dev *hdev, bool state);
+>  int hclge_config_rocee_ras_interrupt(struct hclge_dev *hdev, bool en);
+> --
+> 2.30.0
+>
 
