@@ -1,212 +1,355 @@
-Return-Path: <netdev+bounces-79526-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17331879C5B
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 20:43:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87EFD879C81
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 20:59:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70A7C2856FD
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 19:43:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 11E4B1F21820
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 19:59:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AEDC14263A;
-	Tue, 12 Mar 2024 19:43:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF7FC142636;
+	Tue, 12 Mar 2024 19:59:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="plkEPgd+"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="gPyxzKHd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55791386A8;
-	Tue, 12 Mar 2024 19:43:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 629575914E
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 19:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710272628; cv=none; b=EpTyLQN6L+VVkbKRWUlKLjfwFRsizIMtWzHkrVFpsdj+Fuu+XP/7S6JWuZWqWapperj9Z0+3evg7Fe88ZlfdRvFcTOhadHHtqZQDrG+Bd5DqlAahCMqRDyK518njuim9fTkWBi6bJlI9zcH9Cnkss8dZbzisxSQvYGGMG1JuCTg=
+	t=1710273583; cv=none; b=qohXFT1jJx2FmfAOSPcxGEtztXu8j673XDqrEQFmxZ0sMw0441fhcLP17EcoIpgn5mazglamxF7mUssN++i66A05dcOIyskkWEM/IMywg65seowXj095Rlldr5oW5kMWSaRQPrfZ3pDCWSgrGGSe/2MHGaVz4DmXKXs5BSqEvos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710272628; c=relaxed/simple;
-	bh=kiStTp/ySzQ6315CNx7mDnm0kab042TrheunRjBr2vg=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=gRsck4EI7zRMsHkg9PiVxwM/7smXPJ1T/tDxc/Q1bqqTNWcFEYKHAdMhGLm2g94Xd/Dfv7C99NkFGd3a3VLmJ72bbeErGwX+220WV2tZdNCK1eXPFQlwW18nmUVqt2MBisygVKC38yhncmoIo5o6mnpzixoaVGZ+ieK9r8/JyGY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=plkEPgd+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B28FC433C7;
-	Tue, 12 Mar 2024 19:43:47 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710272627;
-	bh=kiStTp/ySzQ6315CNx7mDnm0kab042TrheunRjBr2vg=;
-	h=Date:From:To:Subject:From;
-	b=plkEPgd++rcPp8OovlAWaJ9WLkPwhHO4mfQXik/PtRsURkWjRQjKsx8wxGTFELRwM
-	 nUpagUJrJ1jxB8FPzmp0PrdgYMPYHGNhQiaM+nmA7myzAC3LY1jYaV8sXnFP0Q/KkS
-	 kHvpJEKHL6w9djogrQ0ssZBDTbGtpUsZuv8D8VWF8044KiVP0DhcMujvL29Y4sSdeT
-	 NzQAV+8WFO8vOJvTu6pPclbtTnNuLFb7KNowIAl3YzVQ3D+omemRvbjFDVV0/8VR3E
-	 mpeJcbdkSJVNToGfSqVkP7S0rcBYFz1AB0D+nogpI7PsE3yjpQpyLMdRG+F+1bgukA
-	 rTe+ffQno6hKQ==
-Date: Tue, 12 Mar 2024 12:43:46 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: [ANN] netdev development stats for 6.9
-Message-ID: <20240312124346.5aa3b14a@kernel.org>
+	s=arc-20240116; t=1710273583; c=relaxed/simple;
+	bh=h96eFwmvs/ETyfyxJMpGxWcYg81zWxPjx+EBIPuy4to=;
+	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=IadU5LPffym0S3JPJPPfOZh2lnkGqowxp5kpZNhVfGpbEf90WUh6+HMu1Qr3X/8eZVX/JOA8LfqNoJjH5dKcPqzJx8FBVmhUDcJ4LfEz375LYprImWId/TEbO6IBm1JtU2ETtfhiR2u5MOiNCz04eRErYaMOZXTYO0IEsLHhnaM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=gPyxzKHd; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 44BA4208ED;
+	Tue, 12 Mar 2024 20:59:38 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id uXXPDFf9CH8v; Tue, 12 Mar 2024 20:59:37 +0100 (CET)
+Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 71B3A208E8;
+	Tue, 12 Mar 2024 20:59:37 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 71B3A208E8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1710273577;
+	bh=aF0gstejfALHcu8Prg1k2LQ0dAcwngvRa91SYNicFC0=;
+	h=Date:From:To:CC:Subject:Reply-To:From;
+	b=gPyxzKHdEBRrntsggcLrIHNmDHWdb9atE/NFf+Pjp8Q6ac+bnTR7p6Uiq5vxzkdlo
+	 jowzgDzhJNcarGCJrcYpuINrqH6Lf/bEOxFNo+PglJ8lexloeq/BNCbQ/kD/cSTmvy
+	 fHwT5+vTNcl7BrYp4Mp3SWhRcNL+1WfFjGWlCuuMpzdkme3N/eC1SlpLC5vqheTP9i
+	 fZMJvyv2mfm64sh67PbSir3Dyc07vVgIwnn2rEpOoVdSTXT04G4bCeaAxWJqR+A7bF
+	 MQMi0YlqqG5A5wLhdQntEbi3PgDJRpcqT+ukdP9YCky85C80QD2OY2Rw/DepPaVB5G
+	 0RSkKjKv4S1fQ==
+Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
+	by mailout2.secunet.com (Postfix) with ESMTP id 6394B80004A;
+	Tue, 12 Mar 2024 20:59:37 +0100 (CET)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 12 Mar 2024 20:59:37 +0100
+Received: from moon.secunet.de (172.18.149.1) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 12 Mar
+ 2024 20:59:36 +0100
+Date: Tue, 12 Mar 2024 20:59:29 +0100
+From: Antony Antony <antony.antony@secunet.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
+	<herbert@gondor.apana.org.au>
+CC: <netdev@vger.kernel.org>, <devel@linux-ipsec.org>, Antony Antony
+	<antony.antony@secunet.com>, Leon Romanovsky <leon@kernel.org>, Eyal Birger
+	<eyal.birger@gmail.com>
+Subject: [PATCH ipsec-next v3] xfrm: Add Direction to the SA in or out
+Message-ID: <8ca32bd68d6e2eee1976fd06c7bc65f8ed7e24d3.1710273084.git.antony.antony@secunet.com>
+Reply-To: <antony.antony@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+Precedence: first-class
+Priority: normal
+Organization: secunet
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-Intro
------
+This patch introduces the 'dir' attribute, 'in' or 'out', to the
+xfrm_state, SA, enhancing usability by delineating the scope of values
+based on direction. An input SA will now exclusively encompass values
+pertinent to input, effectively segregating them from output-related
+values. This change aims to streamline the configuration process and
+improve the overall clarity of SA attributes.
 
-We have posted our pull requests with networking changes for the 6.9
-kernel release last night. As is tradition here are the development
-statistics based on mailing list traffic on netdev@vger.
+Signed-off-by: Antony Antony <antony.antony@secunet.com>
+---
+v2->v3:
+ - delete redundant XFRM_SA_DIR_USET
+ - use u8 for "dir"
+ - fix HW OFFLOAD DIR check
 
-These stats are somewhat like LWN stats: https://lwn.net/Articles/956765/
-but more focused on review participation.
+v1->v2:
+ - use .strict_start_type in struct nla_policy xfrma_policy
+ - delete redundant XFRM_SA_DIR_MAX enum
+---
+ include/net/xfrm.h        |  1 +
+ include/uapi/linux/xfrm.h |  6 +++++
+ net/xfrm/xfrm_compat.c    |  7 ++++--
+ net/xfrm/xfrm_device.c    |  5 +++++
+ net/xfrm/xfrm_state.c     |  1 +
+ net/xfrm/xfrm_user.c      | 46 +++++++++++++++++++++++++++++++++++----
+ 6 files changed, 60 insertions(+), 6 deletions(-)
 
-Previous stats (for 6.8): https://lore.kernel.org/all/20240109134053.33d317dd@kernel.org/
+diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+index 1d107241b901..9ff8a0e0f477 100644
+--- a/include/net/xfrm.h
++++ b/include/net/xfrm.h
+@@ -289,6 +289,7 @@ struct xfrm_state {
+ 	/* Private data of this transformer, format is opaque,
+ 	 * interpreted by xfrm_type methods. */
+ 	void			*data;
++	u8			dir;
+ };
 
-Testing
--------
+ static inline struct net *xs_net(struct xfrm_state *x)
+diff --git a/include/uapi/linux/xfrm.h b/include/uapi/linux/xfrm.h
+index 6a77328be114..18ceaba8486e 100644
+--- a/include/uapi/linux/xfrm.h
++++ b/include/uapi/linux/xfrm.h
+@@ -141,6 +141,11 @@ enum {
+ 	XFRM_POLICY_MAX	= 3
+ };
 
-The selftest runner went live early during this release.
-I don't have any great ideas on how to quantify the progress
-but, first, I'd like to thank everyone who contributed to improving
-and fixing the tests, and those who contributed to NIPA directly.
-We are reporting results from 243 tests to patchwork (not counting
-kunit tests), each test on two kernel flavors and with many sub-cases. 
++enum xfrm_sa_dir {
++	XFRM_SA_DIR_IN	= 1,
++	XFRM_SA_DIR_OUT = 2
++};
++
+ enum {
+ 	XFRM_SHARE_ANY,		/* No limitations */
+ 	XFRM_SHARE_SESSION,	/* For this session only */
+@@ -315,6 +320,7 @@ enum xfrm_attr_type_t {
+ 	XFRMA_SET_MARK_MASK,	/* __u32 */
+ 	XFRMA_IF_ID,		/* __u32 */
+ 	XFRMA_MTIMER_THRESH,	/* __u32 in seconds for input SA */
++	XFRMA_SA_DIR,		/* __u8 */
+ 	__XFRMA_MAX
 
-There's still work to be done fixing some of the tests but we made
-more progress than I anticipated! There are 66 test + kernel config
-combinations which we currently ignore, either because they permanently
-skip / fail or are too flaky. I should mention that those tests do matter,
-recently the ignored pmtu test would have caught a last minute xfrm
-regression :(
+ #define XFRMA_OUTPUT_MARK XFRMA_SET_MARK	/* Compatibility */
+diff --git a/net/xfrm/xfrm_compat.c b/net/xfrm/xfrm_compat.c
+index 655fe4ff8621..007dee03b1bc 100644
+--- a/net/xfrm/xfrm_compat.c
++++ b/net/xfrm/xfrm_compat.c
+@@ -98,6 +98,7 @@ static const int compat_msg_min[XFRM_NR_MSGTYPES] = {
+ };
 
-Speaking of catching regressions, I do not have an objective count but
-subjectively our tests do in fact catch bugs. In fact the signal to noise
-ratio is higher than I initially expected. I wish it was easier to write
-driver tests and use YNL in the tests, but we'll get there..
+ static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
++	[XFRMA_UNSPEC]          = { .strict_start_type = XFRMA_SA_DIR },
+ 	[XFRMA_SA]		= { .len = XMSGSIZE(compat_xfrm_usersa_info)},
+ 	[XFRMA_POLICY]		= { .len = XMSGSIZE(compat_xfrm_userpolicy_info)},
+ 	[XFRMA_LASTUSED]	= { .type = NLA_U64},
+@@ -129,6 +130,7 @@ static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
+ 	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
+ 	[XFRMA_IF_ID]		= { .type = NLA_U32 },
+ 	[XFRMA_MTIMER_THRESH]	= { .type = NLA_U32 },
++	[XFRMA_SA_DIR]          = { .type = NLA_U8}
+ };
 
-General stats
--------------
+ static struct nlmsghdr *xfrm_nlmsg_put_compat(struct sk_buff *skb,
+@@ -277,9 +279,10 @@ static int xfrm_xlate64_attr(struct sk_buff *dst, const struct nlattr *src)
+ 	case XFRMA_SET_MARK_MASK:
+ 	case XFRMA_IF_ID:
+ 	case XFRMA_MTIMER_THRESH:
++	case XFRMA_SA_DIR:
+ 		return xfrm_nla_cpy(dst, src, nla_len(src));
+ 	default:
+-		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
++		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
+ 		pr_warn_once("unsupported nla_type %d\n", src->nla_type);
+ 		return -EOPNOTSUPP;
+ 	}
+@@ -434,7 +437,7 @@ static int xfrm_xlate32_attr(void *dst, const struct nlattr *nla,
+ 	int err;
 
-Cycle started on Tue, 09 Jan, ended Mon, 11 Mar. That's 63 days,
-one week shorter than the previous cycle.
+ 	if (type > XFRMA_MAX) {
+-		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
++		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
+ 		NL_SET_ERR_MSG(extack, "Bad attribute");
+ 		return -EOPNOTSUPP;
+ 	}
+diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+index 3784534c9185..481a374eff3b 100644
+--- a/net/xfrm/xfrm_device.c
++++ b/net/xfrm/xfrm_device.c
+@@ -253,6 +253,11 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
+ 		return -EINVAL;
+ 	}
 
-We have seen 264 msg/day on the list, and 24 commits/day.
-The number of messages is back to the level we have seen in 6.6,
-and has recovered after couple of slower releases (last one being
-particularly slow due to the winter break). The number of commits
-applied directly by netdev maintainers is 9% higher than in 6.6 
-and highest on the record.
++	if (xuo->flags & XFRM_OFFLOAD_INBOUND && x->dir == XFRM_SA_DIR_OUT) {
++		NL_SET_ERR_MSG(extack, "Mismatched SA and offload direction");
++		return -EINVAL;
++	}
++
+ 	is_packet_offload = xuo->flags & XFRM_OFFLOAD_PACKET;
 
-The total number of review tags in git history have dipped again,
-61% of commits contain a review tag (down from 69%). The number
-of commits with a review tag from an email domain different than
-the author, however, dropped only by 1% to 53%. Similarly our statistic
-of series which received at least one ack / review tag on the list did
-not change much, increasing by 1% to 67%.
+ 	/* We don't yet support UDP encapsulation and TFC padding. */
+diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+index bda5327bf34d..0d6f5a49002f 100644
+--- a/net/xfrm/xfrm_state.c
++++ b/net/xfrm/xfrm_state.c
+@@ -1744,6 +1744,7 @@ static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig,
+ 	x->lastused = orig->lastused;
+ 	x->new_mapping = 0;
+ 	x->new_mapping_sport = 0;
++	x->dir = orig->dir;
 
-Rankings
---------
+ 	return x;
 
-As promised last time, the left side of the stats is now in "change
-sets" (cs) rather than threads, IOW trying to track multiple revisions 
-of the same series as one.
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index ad01997c3aa9..e2b734c6eb3d 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -360,6 +360,16 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
+ 		}
+ 	}
 
-Top reviewers (cs):                  Top reviewers (msg):                
-   1 ( +1) [30] Jakub Kicinski          1 (   ) [66] Jakub Kicinski      
-   2 ( -1) [26] Simon Horman            2 (   ) [45] Simon Horman        
-   3 (   ) [14] Andrew Lunn             3 (   ) [44] Andrew Lunn         
-   4 ( +1) [12] Paolo Abeni             4 ( +3) [25] Jiri Pirko          
-   5 ( +4) [11] Jiri Pirko              5 (   ) [23] Eric Dumazet        
-   6 ( -2) [10] Eric Dumazet            6 ( +3) [20] Paolo Abeni         
-   7 (   ) [ 5] David Ahern             7 ( +1) [15] Krzysztof Kozlowski 
-   8 ( +6) [ 4] Stephen Hemminger       8 ( +2) [11] David Ahern         
-   9 ( +2) [ 4] Willem de Bruijn        9 ( +4) [10] Florian Fainelli    
-  10 (   ) [ 4] Krzysztof Kozlowski    10 ( -6) [10] Vladimir Oltean     
-  11 ( +1) [ 4] Florian Fainelli       11 ( -5) [ 9] Russell King        
-  12 ( -6) [ 4] Russell King           12 (   ) [ 9] Willem de Bruijn    
-  13 ( +3) [ 2] Jacob Keller           13 ( -2) [ 8] Sergey Shtylyov     
-  14 ( +1) [ 2] Rob Herring            14 ( +6) [ 7] Jacob Keller        
-  15 ( +2) [ 2] Jamal Hadi Salim       15 (+16) [ 7] Jason Wang          
++	if (attrs[XFRMA_SA_DIR]) {
++		u8 sa_dir = nla_get_u8(attrs[XFRMA_SA_DIR]);
++
++		if (sa_dir != XFRM_SA_DIR_IN && sa_dir != XFRM_SA_DIR_OUT)  {
++			NL_SET_ERR_MSG(extack, "XFRMA_SA_DIR attribute is out of range");
++			err = -EINVAL;
++			goto out;
++		}
++	}
++
+ out:
+ 	return err;
+ }
+@@ -627,6 +637,7 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
+ 	struct nlattr *et = attrs[XFRMA_ETIMER_THRESH];
+ 	struct nlattr *rt = attrs[XFRMA_REPLAY_THRESH];
+ 	struct nlattr *mt = attrs[XFRMA_MTIMER_THRESH];
++	struct nlattr *dir = attrs[XFRMA_SA_DIR];
 
-Jiri jumps into top 5, reviewing various driver and netlink changes.
-Stephen largely works on iproute2 reviews. Russell and Vladimir have
-indicated that they are occupied outside of netdev, and slip by a few
-positions.
+ 	if (re && x->replay_esn && x->preplay_esn) {
+ 		struct xfrm_replay_state_esn *replay_esn;
+@@ -661,6 +672,9 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
 
-Thank you all for your work!
+ 	if (mt)
+ 		x->mapping_maxage = nla_get_u32(mt);
++
++	if (dir)
++		x->dir = nla_get_u8(dir);
+ }
 
-Top authors (cs):                    Top authors (msg):                  
-   1 ( +1) [7] Eric Dumazet             1 (+35) [40] Eric Dumazet        
-   2 ( -1) [7] Jakub Kicinski           2 ( +5) [26] Jakub Kicinski      
-   3 (+46) [4] Breno Leitao             3 ( +1) [20] Saeed Mahameed      
-   4 (   ) [3] Heiner Kallweit          4 (+18) [17] Xuan Zhuo           
-   5 ( +8) [2] Stephen Hemminger        5 (***) [15] Jason Xing          
-   6 (+24) [2] Paolo Abeni              6 (***) [15] Matthieu Baerts     
-   7 (+11) [2] Kuniyuki Iwashima        7 (***) [14] Breno Leitao        
-   8 (***) [2] Maks Mishin              8 ( -3) [14] Tony Nguyen         
-   9 ( +6) [2] Kunwu Chan               9 ( -3) [13] Kuniyuki Iwashima   
-  10 (***) [2] Matthieu Baerts         10 ( -8) [11] Christian Marangi   
+ static void xfrm_smark_init(struct nlattr **attrs, struct xfrm_mark *m)
+@@ -1182,8 +1196,13 @@ static int copy_to_user_state_extra(struct xfrm_state *x,
+ 		if (ret)
+ 			goto out;
+ 	}
+-	if (x->mapping_maxage)
++	if (x->mapping_maxage) {
+ 		ret = nla_put_u32(skb, XFRMA_MTIMER_THRESH, x->mapping_maxage);
++		if (ret)
++			goto out;
++	}
++	if (x->dir)
++		ret = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
+ out:
+ 	return ret;
+ }
+@@ -2399,7 +2418,8 @@ static inline unsigned int xfrm_aevent_msgsize(struct xfrm_state *x)
+ 	       + nla_total_size_64bit(sizeof(struct xfrm_lifetime_cur))
+ 	       + nla_total_size(sizeof(struct xfrm_mark))
+ 	       + nla_total_size(4) /* XFRM_AE_RTHR */
+-	       + nla_total_size(4); /* XFRM_AE_ETHR */
++	       + nla_total_size(4) /* XFRM_AE_ETHR */
++	       + nla_total_size(sizeof(x->dir)); /* XFRMA_SA_DIR */
+ }
 
-Thanks to switching from threads to changes sets we see Eric rightfully
-claim the #1 spot, previously occupied by yours truly. Breno added
-missing MODULE_DESCRIPTION()s and refactored drivers using per-cpu
-stats. Paolo contributed a number of MPTCP changes and many selftest
-improvements. Maks Mishin sent a lot of individual iproute2 patches.
-Xuan Zhuo is working on vhost / virtio changes for AF_XDP.
+ static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
+@@ -2456,6 +2476,12 @@ static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct
+ 	if (err)
+ 		goto out_cancel;
 
-Top scores (positive):               Top scores (negative):              
-   1 ( +1) [398] Jakub Kicinski         1 ( +2) [80] Saeed Mahameed      
-   2 ( -1) [371] Simon Horman           2 (+17) [60] Xuan Zhuo           
-   3 (   ) [243] Andrew Lunn            3 (***) [46] Jason Xing          
-   4 ( +8) [160] Jiri Pirko             4 (***) [43] Yang Xiwen via B4 Relay
-   5 ( +2) [152] Paolo Abeni            5 (***) [42] Matthieu Baerts     
-   6 ( +2) [ 78] Krzysztof Kozlowski    6 ( -2) [40] Tony Nguyen         
-   7 ( +2) [ 76] David Ahern            7 ( -6) [38] David Howells       
-   8 ( +2) [ 68] Willem de Bruijn       8 ( -6) [37] Christian Marangi   
-   9 ( +2) [ 60] Florian Fainelli       9 (+30) [37] Kory Maincent       
-  10 ( -5) [ 54] Russell King          10 (***) [36] Breno Leitao        
++	if (x->dir) {
++		err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
++		if (err)
++			goto out_cancel;
++	}
++
+ 	nlmsg_end(skb, nlh);
+ 	return 0;
 
-Corporate stats
----------------
+@@ -3015,6 +3041,7 @@ EXPORT_SYMBOL_GPL(xfrm_msg_min);
+ #undef XMSGSIZE
 
-Top reviewers (cs):                  Top reviewers (msg):                
-   1 (   ) [42] RedHat                  1 (   ) [98] RedHat              
-   2 (   ) [32] Meta                    2 (   ) [74] Meta                
-   3 ( +2) [16] Google                  3 (   ) [44] Andrew Lunn         
-   4 (   ) [14] Andrew Lunn             4 ( +1) [43] Google              
-   5 ( -2) [13] Intel                   5 ( -1) [36] Intel               
-   6 ( +1) [13] nVidia                  6 ( +2) [31] Linaro              
-   7 ( +1) [ 8] Linaro                  7 (   ) [31] nVidia      
+ const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
++	[XFRMA_UNSPEC]		= { .strict_start_type = XFRMA_SA_DIR },
+ 	[XFRMA_SA]		= { .len = sizeof(struct xfrm_usersa_info)},
+ 	[XFRMA_POLICY]		= { .len = sizeof(struct xfrm_userpolicy_info)},
+ 	[XFRMA_LASTUSED]	= { .type = NLA_U64},
+@@ -3046,6 +3073,7 @@ const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
+ 	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
+ 	[XFRMA_IF_ID]		= { .type = NLA_U32 },
+ 	[XFRMA_MTIMER_THRESH]   = { .type = NLA_U32 },
++	[XFRMA_SA_DIR]          = { .type = NLA_U8 }
+ };
+ EXPORT_SYMBOL_GPL(xfrma_policy);
 
-Top authors (cs):                    Top authors (msg):                  
-   1 ( +1) [12] RedHat                  1 (   ) [69] Intel               
-   2 ( +2) [12] Meta                    2 ( +2) [60] Meta                
-   3 ( -2) [10] Intel                   3 ( +2) [55] Google              
-   4 ( -1) [10] Google                  4 ( -1) [50] nVidia              
-   5 (   ) [ 7] nVidia                  5 ( -3) [47] RedHat              
-   6 ( +2) [ 3] Huawei                  6 ( +4) [32] Bootlin             
-   7 ( +7) [ 3] Wirecard                7 ( -1) [23] Alibaba    
+@@ -3186,8 +3214,9 @@ static void xfrm_netlink_rcv(struct sk_buff *skb)
 
-Top scores (positive):               Top scores (negative):              
-   1 (   ) [496] RedHat                 1 ( +7) [89] Bootlin             
-   2 (   ) [303] Meta                   2 (   ) [79] Alibaba             
-   3 (   ) [243] Andrew Lunn            3 (***) [46] Tencent             
-   4 ( +2) [138] Linaro                 4 (***) [43] Yang Xiwen
-   5 (   ) [ 79] Google                 5 (***) [42] Tessares            
-   6 ( +2) [ 76] Enfabrica              6 ( +6) [38] AMD                 
-   7 ( -3) [ 60] Oracle                 7 ( -6) [37] Christian Marangi   
+ static inline unsigned int xfrm_expire_msgsize(void)
+ {
+-	return NLMSG_ALIGN(sizeof(struct xfrm_user_expire))
+-	       + nla_total_size(sizeof(struct xfrm_mark));
++	return NLMSG_ALIGN(sizeof(struct xfrm_user_expire)) +
++	       nla_total_size(sizeof(struct xfrm_mark)) +
++	       nla_total_size(sizeof_field(struct xfrm_state, dir));
+ }
 
-RedHat remains unbeatable with the combined powers of Simon and Paolo,
-as well as high participation of the less active authors.
-Alibaba maintains its strongly net-negative review score.
-Tencent (Jason Xing) joins them (Tencent doesn't use their email
-domain so it's likely under-counted). Yang Xiwen makes the negative
-list as well, cost of reposting large series too often...
--- 
-Code: https://github.com/kuba-moo/ml-stat
-Raw output: https://netdev.bots.linux.dev/static/nipa/stats-6.9/stdout
+ static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
+@@ -3214,6 +3243,12 @@ static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct
+ 	if (err)
+ 		return err;
+
++	if (x->dir) {
++		err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
++		if (err)
++			return err;
++	}
++
+ 	nlmsg_end(skb, nlh);
+ 	return 0;
+ }
+@@ -3321,6 +3356,9 @@ static inline unsigned int xfrm_sa_len(struct xfrm_state *x)
+ 	if (x->mapping_maxage)
+ 		l += nla_total_size(sizeof(x->mapping_maxage));
+
++	if (x->dir)
++		l += nla_total_size(sizeof(x->dir));
++
+ 	return l;
+ }
+
+--
+2.30.2
+
 
