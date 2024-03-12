@@ -1,86 +1,163 @@
-Return-Path: <netdev+bounces-79564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 108AC879E34
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:08:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE75B879E46
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:14:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C03C528403F
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 22:08:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B56D1C21E84
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 22:14:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5676C143C4D;
-	Tue, 12 Mar 2024 22:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B3D0143C7C;
+	Tue, 12 Mar 2024 22:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pw0LDRaw"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="DTySSMRi"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECF114375A;
-	Tue, 12 Mar 2024 22:08:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2D5143C4D
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 22:14:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710281316; cv=none; b=W4gvygOw/oUV4Pbd9MfNoMMwHbd3D14bBlYaqpUdcXz7Tz+vvGTRdQvzWyNW59s2LNLgz42Ylplqz496P0EDZ1m+3JYN/Vy5YZnk4MaP9QAYlZRZGTF/RiIWnKZrONxXEr9cfib9cbBtLdzjHFuJXPIYNQ3sCr7W6hCJzJdQ5Ys=
+	t=1710281675; cv=none; b=qtZr2h8vOrWO622GH09h48VRDbTr84RfCNBHIneuO6iJRuMi2PtEhzHj7HEVEgHb154ArGOlFbMOe218zebnaofwS7BRNnbt8sPCvRH5tWjCp41rnCYBTtnHceKtOIC9Iu47+50AJM/hyuA/LDeEq/KXfbTkAn67fBDCb6ra4Fk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710281316; c=relaxed/simple;
-	bh=EwLB/Uj8ergRJBNGwWQlW4XkmUVZZ9flY4qHr8CZgQc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rpn/FXZVHSJnE9hr/wxeIkIFys4Z11lmFoa94CLw3GkmJpBxyPO/MgJRywGPOojkp0jM+DuXoGPo8a8m/WoqfJ30QGaDBJk4+lNOAob5khU/eiQHME4aFhm2KNuXJyN4UHH5DsqSZVPx20fgV00eXVH4+HD1vD7SxfkTSeTbqMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pw0LDRaw; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=NaYmM985J2Hs7IMwWlZXXpYWlwHkuTD2tIFBINip91s=; b=pw
-	0LDRawXce8PbFmKpEv5C+mxdma2weSF/7nHhSfnB3MHAMZIP7pNEkxqU4+oxS257Z70TbGOFYU3nF
-	wNxXRd4L86yzHL6KGbLIEC8Gs4fV06pTHTbCgL+diOkXxGwL4t5keIu5n8gcboCus+ZwhfbYE1OeL
-	E1kcmWJ9Ysy1lZo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rkAIy-00A5Hs-Dj; Tue, 12 Mar 2024 23:09:04 +0100
-Date: Tue, 12 Mar 2024 23:09:04 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-renesas-soc@vger.kernel.org
-Subject: Re: [net-next] dt-bindings: net: renesas,ethertsn: Create child-node
- for MDIO bus
-Message-ID: <be37815e-f47b-4f26-9921-38cae0d4b545@lunn.ch>
-References: <20240311143507.3239566-1-niklas.soderlund+renesas@ragnatech.se>
+	s=arc-20240116; t=1710281675; c=relaxed/simple;
+	bh=2Yc1OAr6mqT7sNtO4XBI3qo5BBJa4i20jWBzWGdBMng=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TyS+VEiTMvsnxqEIUzth4JMqUIYgZjZr5MVYr7p2q7LT9XSfayzcjXXHmHhp7vjsCkwuwIa1NRWt8KVOvdO/s3cUOtweb3+gzGL/CoUPbDxE2Dqz1xFymWvN/BZel8gKgvK2//DzaU0VC9sWzzpPj1UshCGvYvxcowOf1CxQitQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=DTySSMRi; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1dc29f1956cso30964065ad.0
+        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 15:14:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1710281672; x=1710886472; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nrng/1C7LlgnoxA4UaT/AkwTqWn/aRjOAZiED+a20Iw=;
+        b=DTySSMRiJCPqIgQqbCXBB02EhJgWYHcxQQs3ufizXD8OpeWen9haSWMe9OSztPxF6k
+         gZutFoetHY+VXeoyzvp/whfILRjP6vK7bUb95YKcTAxGcY6ldvSS2iudA+BcQo4hTpny
+         D1/788JSPBEtMdxgKfl9vDMW5RDkweZzDs+k7vvEiDpNcg9AsoyHN0Me4dmOPsaEGw3Z
+         GRjSGvEsAL1iX/jzREwpOMsREhTwuWiuY46naqLI1qopl36O0fXJB76rizY8eF43k7iv
+         BgJ6W7aospcCKVkW69YJRQf+VjbP8Ukrdus9a0fOurv+aRTrMiEeOHZ/8INIEIr5UE9L
+         8A9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710281672; x=1710886472;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nrng/1C7LlgnoxA4UaT/AkwTqWn/aRjOAZiED+a20Iw=;
+        b=ORv0fYIvHMRZBP6nyKpYqs1cX7ksNBL/sQWubeY9WhaVSTxtCX+7LniBteTaQqUbef
+         O11FmK83nkq5YYbBJ7iH5TMZmc6vyTFFr2fo+q38UKjQx8JLSDKG2aycEsfBBs4bi8pX
+         GrCuUZHhJhkIB0DOdyQDajhbccg20X8p2KOiBxnm/5fUyxGOIyYlw8BmScp5zRjqPy4Q
+         S9wU7KtqrETHSJgtQmbRDNC7DIpjgDrVlx6WnJ/usIuIP8Xhtmsj10CXQEfzZvthDCa0
+         Vp7egXVQUTUm3y1v7rHnnjsh7ke5dMYoR0X42fVjqyP5s4vOZD1CHJ7pLVe6J3c8tL35
+         bMNA==
+X-Gm-Message-State: AOJu0YxMqWz/vAVtMIuDr1H6i/UYOLtXF8ucDR/NPsejCggMnFnmeXej
+	azoh/VFhRPTtCGInUXrew+MFWfoGx973K/bLChu6vi4PRc6YX2wS+qL/4E8Pnz7CtgbhC3dRKZZ
+	W
+X-Google-Smtp-Source: AGHT+IGyOy5OFZBok0bKW2N5F31YkxRKMIHKYCYicpSYswZ4OR2f7oc+wIwLs8PjFJyxy1IgiMfqgg==
+X-Received: by 2002:a17:903:a8c:b0:1dd:6356:8dfc with SMTP id mo12-20020a1709030a8c00b001dd63568dfcmr8270393plb.15.1710281672591;
+        Tue, 12 Mar 2024 15:14:32 -0700 (PDT)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id o10-20020a170902e28a00b001dcfaab3457sm7240473plc.104.2024.03.12.15.14.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Mar 2024 15:14:32 -0700 (PDT)
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>
+Subject: [PATCH iproute2 0/4] constify tc XXX_util structures
+Date: Tue, 12 Mar 2024 15:12:38 -0700
+Message-ID: <20240312221422.81253-1-stephen@networkplumber.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240311143507.3239566-1-niklas.soderlund+renesas@ragnatech.se>
 
-On Mon, Mar 11, 2024 at 03:35:07PM +0100, Niklas Söderlund wrote:
-> The design for this driver followed that of other Renesas Ethernet
-> drivers and thus did not force a child-node for the MDIO bus. As there
-> are no upstream drivers or users of this binding yet take the
-> opportunity to correct this and force the usage of a child-node for the
-> MDIO bus.
+Constify the pointers to tc util struct. Only place it needs
+to mutable is when discovering and linking in new util structs.
 
-Could you expand on the history. When was renesas,ethertsn.yaml added
-and via which tree? Is this currently only in net-next and just sent
-to Linus as part of this merge window? Or has it been around longer?
+Stephen Hemminger (4):
+  tc: make qdisc_util arg const
+  tc: make filter_util args const
+  tc: make action_util arg const
+  tc: make exec_util arg const
 
-   Andrew
+ tc/e_bpf.c        |  2 +-
+ tc/f_basic.c      |  4 ++--
+ tc/f_bpf.c        |  4 ++--
+ tc/f_cgroup.c     |  4 ++--
+ tc/f_flow.c       |  4 ++--
+ tc/f_flower.c     |  4 ++--
+ tc/f_fw.c         |  4 ++--
+ tc/f_matchall.c   |  4 ++--
+ tc/f_route.c      |  4 ++--
+ tc/f_u32.c        |  4 ++--
+ tc/m_action.c     |  4 ++--
+ tc/m_bpf.c        |  4 ++--
+ tc/m_connmark.c   |  4 ++--
+ tc/m_csum.c       |  4 ++--
+ tc/m_ct.c         |  4 ++--
+ tc/m_ctinfo.c     |  4 ++--
+ tc/m_gact.c       |  4 ++--
+ tc/m_gate.c       |  8 ++++----
+ tc/m_ife.c        |  4 ++--
+ tc/m_mirred.c     |  6 +++---
+ tc/m_mpls.c       |  4 ++--
+ tc/m_nat.c        |  4 ++--
+ tc/m_pedit.c      |  4 ++--
+ tc/m_police.c     |  8 ++++----
+ tc/m_sample.c     |  4 ++--
+ tc/m_simple.c     |  4 ++--
+ tc/m_skbedit.c    |  4 ++--
+ tc/m_skbmod.c     |  4 ++--
+ tc/m_tunnel_key.c |  4 ++--
+ tc/m_vlan.c       |  4 ++--
+ tc/q_cake.c       |  6 +++---
+ tc/q_cbs.c        |  4 ++--
+ tc/q_choke.c      |  6 +++---
+ tc/q_clsact.c     |  4 ++--
+ tc/q_codel.c      |  6 +++---
+ tc/q_drr.c        |  8 ++++----
+ tc/q_etf.c        |  4 ++--
+ tc/q_ets.c        |  8 ++++----
+ tc/q_fifo.c       |  4 ++--
+ tc/q_fq.c         |  6 +++---
+ tc/q_fq_codel.c   |  6 +++---
+ tc/q_fq_pie.c     |  6 +++---
+ tc/q_gred.c       |  6 +++---
+ tc/q_hfsc.c       | 10 +++++-----
+ tc/q_hhf.c        |  6 +++---
+ tc/q_htb.c        |  8 ++++----
+ tc/q_ingress.c    |  4 ++--
+ tc/q_mqprio.c     |  4 ++--
+ tc/q_multiq.c     |  4 ++--
+ tc/q_netem.c      |  4 ++--
+ tc/q_pie.c        |  6 +++---
+ tc/q_plug.c       |  4 ++--
+ tc/q_prio.c       |  4 ++--
+ tc/q_qfq.c        |  6 +++---
+ tc/q_red.c        |  8 ++++----
+ tc/q_sfb.c        |  6 +++---
+ tc/q_sfq.c        |  6 +++---
+ tc/q_skbprio.c    |  4 ++--
+ tc/q_taprio.c     |  6 +++---
+ tc/q_tbf.c        |  4 ++--
+ tc/tc.c           | 12 ++++++------
+ tc/tc_class.c     |  6 +++---
+ tc/tc_exec.c      |  2 +-
+ tc/tc_filter.c    |  6 +++---
+ tc/tc_qdisc.c     |  6 +++---
+ tc/tc_util.h      | 35 ++++++++++++++++++-----------------
+ 66 files changed, 182 insertions(+), 181 deletions(-)
+
+-- 
+2.43.0
+
 
