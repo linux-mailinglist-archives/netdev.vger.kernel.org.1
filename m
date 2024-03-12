@@ -1,81 +1,62 @@
-Return-Path: <netdev+bounces-79518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FB79879AC9
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 18:42:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12A0C879ADA
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 18:55:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B1AC284F87
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 17:42:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EBA6B22033
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 17:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B5531386AC;
-	Tue, 12 Mar 2024 17:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B591F1386B8;
+	Tue, 12 Mar 2024 17:55:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lAPLBx3+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ph3tY+Cq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82B61386D8;
-	Tue, 12 Mar 2024 17:42:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D46A40864;
+	Tue, 12 Mar 2024 17:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710265352; cv=none; b=seOI7nmEFPDz1POlgKxX6TXGyTBo/JMntP5rrUVHwQFXnXV3iMJYFUTEBfaxQgDYzYaylf3jOri31C/+7GPT554ZXMx41TSvGqOr/GAd9RbqG5978tbOvUWqLONebcfJXyEO7VFWrDwEKO7QesOWdnymT/W1u0BPyJGFdzM5YuI=
+	t=1710266123; cv=none; b=JhhkhCBDtjslRhjExBgFHhUiGU2eccrocthvtskqRf6su0aExEVRbYQECj+HKq1jrJaohwB02nBCmRggyhRzJT4X+JM5pB18hu+R16imSYU5y0KQYJo6veXLX55nMknj9KLQWEjCOVMtgkiPSKlXoyU3alfxwmkTUI962AatHLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710265352; c=relaxed/simple;
-	bh=Z4Ik8phlcUVlj3tqxGVHV23CtIi0k+ugcQnwd25QMdg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iD4B+7DQfPvAtmbHnyvcxHC4imD7tLIbwIFnaDvgo4FX7wqNZWItUiIqdmwV/lX/ziGtrxAIgbsJdZaGXWztJEikJIidms6K/2as38yyPAozvr2QsU5IG97X46xErxddp2rODFSbrn4YIXyUAWA4p3WHkR+r9s/vijTndpxvjJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lAPLBx3+; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710265350; x=1741801350;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Z4Ik8phlcUVlj3tqxGVHV23CtIi0k+ugcQnwd25QMdg=;
-  b=lAPLBx3+FpHfCrG49XCzS80FB6E7eaPFeZUG65QJi9pRs5ACTHBPhLXh
-   /ubzhPe2qwJcsE6FpdBK9ztG7T7SoRc7rsS600h9owK/BPUuWBa7KlC1o
-   yMiNGm1RPaaOQc9jj9Y5sq52oCxqbUHBx3qyR4TJmU6i+y2P2i/mvTurR
-   GAeXxQ5r16OBXdqVPehYJItyXLZkoucZYnMkbdY626MjUYxog2OgZU/st
-   PcVA2I5wLD/UQuwmdr1Y32Ww1xSCt4xdRTqxvgjBjK9MF3LHrRmsPGFRx
-   XxxeQfXD5t/bluTBB2eE0M1rZc9oqHjRwMa5rFdifY5h6oHA+QE6V1CDy
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="15718810"
-X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
-   d="scan'208";a="15718810"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 10:42:30 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="914403002"
-X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
-   d="scan'208";a="914403002"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 10:42:27 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.97)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1rk68u-0000000ByQa-2Ogu;
-	Tue, 12 Mar 2024 19:42:24 +0200
-Date: Tue, 12 Mar 2024 19:42:24 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH] lib/bitmap: Fix bitmap_scatter() and bitmap_gather()
- kernel doc
-Message-ID: <ZfCUAMS5JWnkTbR5@smile.fi.intel.com>
-References: <20240312085403.224248-1-herve.codina@bootlin.com>
- <ZfB30-rLXEnJtjrY@smile.fi.intel.com>
- <ZfB4BOknvWRFbn6O@smile.fi.intel.com>
- <20240312173556.4727ebbf@bootlin.com>
+	s=arc-20240116; t=1710266123; c=relaxed/simple;
+	bh=8vWFn+lk7XrMdfCu+84+a7Fv41SKYL44pFn0ywSR89U=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=QxpfsfYVRwM/VZBFZQ2rfGAU6kpSkzuUAOikrEZIeyGna3iosZXplBcucC4kbiKs0DZ3sLEEMloyXozF0QoktltpzgkypAHfsAScTAzFczla7PRXSqduVIGedj3uMJLYFTANLMSXPYFA/GckfvtyBQjTtRBGXo6SSGp3Hfm3ORM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ph3tY+Cq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB874C433C7;
+	Tue, 12 Mar 2024 17:55:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710266123;
+	bh=8vWFn+lk7XrMdfCu+84+a7Fv41SKYL44pFn0ywSR89U=;
+	h=Date:From:To:Cc:Subject:From;
+	b=Ph3tY+CqN7KEru+aVmh+ium4/oqzZ3jkHyA6HnHtsfTSzzbZRRIsx96fza+q8B6b/
+	 jdl4Dd4cxkZ2PIMGvv8/EQ3IWIVslfVKfJx4YtDWZW26UNW+sinsZ9imvy7/61r2aj
+	 uI9WBCxVOIATcXvTStluwlF6Fk11tJeiLVJyUUqDIUUcSWKtdwxGSyT7f7QWOXHAWv
+	 w5d9Dvsi2i4LN5D2AnPNNkLYy1aRdxrWW4Tvt0lNHT3NEcm+wpZYQ3ubIMJkvC+WoH
+	 TYpOFJgVO33JZ/QY0kJGIClsYbm9U/1k5As2+GBYY+Jp/MyKtMrFxO9FIBN77ORdsQ
+	 BHisaQsiK8KRQ==
+Date: Tue, 12 Mar 2024 11:55:19 -0600
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org, Kees Cook <keescook@chromium.org>
+Subject: [PATCH v2][next] net/smc: Avoid -Wflex-array-member-not-at-end
+ warnings
+Message-ID: <ZfCXBykRw5XqBvf0@neat>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,33 +65,137 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240312173556.4727ebbf@bootlin.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
 
-On Tue, Mar 12, 2024 at 05:35:56PM +0100, Herve Codina wrote:
-> On Tue, 12 Mar 2024 17:43:00 +0200
-> Andy Shevchenko <andriy.shevchenko@linux.intel.com> wrote:
-> > On Tue, Mar 12, 2024 at 05:42:11PM +0200, Andy Shevchenko wrote:
-> > > On Tue, Mar 12, 2024 at 09:54:03AM +0100, Herve Codina wrote:  
+-Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
+ready to enable it globally.
 
-...
+There are currently a couple of objects in `struct smc_clc_msg_proposal_area`
+that contain a couple of flexible structures:
 
-> > > Not sure about rules of net-next, but I would add Fixes FWIW:
-> > > 
-> > > Fixes: de5f84338970 ("lib/bitmap: Introduce bitmap_scatter() and bitmap_gather() helpers")
-> 
-> I think I cannot add the Fixes tag as the de5f84338970 commit is not yet
-> merged in Torvald's tree and I am not sure that the commit hash will not
-> change during the merge process.
+struct smc_clc_msg_proposal_area {
+	...
+	struct smc_clc_v2_extension             pclc_v2_ext;
+	...
+	struct smc_clc_smcd_v2_extension        pclc_smcd_v2_ext;
+	...
+};
 
-It may change if and only if there will be rebase done. For the merge the SHA
-will be kept the same.
+So, in order to avoid ending up with a couple of flexible-array members
+in the middle of a struct, we use the `struct_group_tagged()` helper to
+separate the flexible array from the rest of the members in the flexible
+structure:
 
-> > And probably Reported-by...
+struct smc_clc_smcd_v2_extension {
+        struct_group_tagged(smc_clc_smcd_v2_extension_fixed, fixed,
+                            u8 system_eid[SMC_MAX_EID_LEN];
+                            u8 reserved[16];
+        );
+        struct smc_clc_smcd_gid_chid gidchid[];
+};
 
+With the change described above, we now declare objects of the type of
+the tagged struct without embedding flexible arrays in the middle of
+another struct:
+
+struct smc_clc_msg_proposal_area {
+        ...
+        struct smc_clc_v2_extension_fixed	pclc_v2_ext;
+        ...
+        struct smc_clc_smcd_v2_extension_fixed	pclc_smcd_v2_ext;
+        ...
+};
+
+We also use `container_of()` when we need to retrieve a pointer to the
+flexible structures.
+
+So, with these changes, fix the following warnings:
+
+In file included from net/smc/af_smc.c:42:
+net/smc/smc_clc.h:186:49: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+  186 |         struct smc_clc_v2_extension             pclc_v2_ext;
+      |                                                 ^~~~~~~~~~~
+net/smc/smc_clc.h:188:49: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+  188 |         struct smc_clc_smcd_v2_extension        pclc_smcd_v2_ext;
+      |                                                 ^~~~~~~~~~~~~~~~
+
+Reviewed-by: Kees Cook <keescook@chromium.org>
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+Changes in v2:
+ - Name the tagged struct *_fixed instead of *_hdr.
+ - Add Kees' RB tag.
+
+ net/smc/smc_clc.c |  5 +++--
+ net/smc/smc_clc.h | 24 ++++++++++++++----------
+ 2 files changed, 17 insertions(+), 12 deletions(-)
+
+diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
+index e55026c7529c..63bb5745ab54 100644
+--- a/net/smc/smc_clc.c
++++ b/net/smc/smc_clc.c
+@@ -853,8 +853,9 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
+ 	pclc_smcd = &pclc->pclc_smcd;
+ 	pclc_prfx = &pclc->pclc_prfx;
+ 	ipv6_prfx = pclc->pclc_prfx_ipv6;
+-	v2_ext = &pclc->pclc_v2_ext;
+-	smcd_v2_ext = &pclc->pclc_smcd_v2_ext;
++	v2_ext = container_of(&pclc->pclc_v2_ext, struct smc_clc_v2_extension, fixed);
++	smcd_v2_ext = container_of(&pclc->pclc_smcd_v2_ext,
++				   struct smc_clc_smcd_v2_extension, fixed);
+ 	gidchids = pclc->pclc_gidchids;
+ 	trl = &pclc->pclc_trl;
+ 
+diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
+index 7cc7070b9772..2bfb51daf468 100644
+--- a/net/smc/smc_clc.h
++++ b/net/smc/smc_clc.h
+@@ -134,12 +134,14 @@ struct smc_clc_smcd_gid_chid {
+ 			 */
+ 
+ struct smc_clc_v2_extension {
+-	struct smc_clnt_opts_area_hdr hdr;
+-	u8 roce[16];		/* RoCEv2 GID */
+-	u8 max_conns;
+-	u8 max_links;
+-	__be16 feature_mask;
+-	u8 reserved[12];
++	struct_group_tagged(smc_clc_v2_extension_fixed, fixed,
++		struct smc_clnt_opts_area_hdr hdr;
++		u8 roce[16];		/* RoCEv2 GID */
++		u8 max_conns;
++		u8 max_links;
++		__be16 feature_mask;
++		u8 reserved[12];
++	);
+ 	u8 user_eids[][SMC_MAX_EID_LEN];
+ };
+ 
+@@ -159,8 +161,10 @@ struct smc_clc_msg_smcd {	/* SMC-D GID information */
+ };
+ 
+ struct smc_clc_smcd_v2_extension {
+-	u8 system_eid[SMC_MAX_EID_LEN];
+-	u8 reserved[16];
++	struct_group_tagged(smc_clc_smcd_v2_extension_fixed, fixed,
++		u8 system_eid[SMC_MAX_EID_LEN];
++		u8 reserved[16];
++	);
+ 	struct smc_clc_smcd_gid_chid gidchid[];
+ };
+ 
+@@ -183,9 +187,9 @@ struct smc_clc_msg_proposal_area {
+ 	struct smc_clc_msg_smcd			pclc_smcd;
+ 	struct smc_clc_msg_proposal_prefix	pclc_prfx;
+ 	struct smc_clc_ipv6_prefix	pclc_prfx_ipv6[SMC_CLC_MAX_V6_PREFIX];
+-	struct smc_clc_v2_extension		pclc_v2_ext;
++	struct smc_clc_v2_extension_fixed	pclc_v2_ext;
+ 	u8			user_eids[SMC_CLC_MAX_UEID][SMC_MAX_EID_LEN];
+-	struct smc_clc_smcd_v2_extension	pclc_smcd_v2_ext;
++	struct smc_clc_smcd_v2_extension_fixed	pclc_smcd_v2_ext;
+ 	struct smc_clc_smcd_gid_chid
+ 				pclc_gidchids[SMCD_CLC_MAX_V2_GID_ENTRIES];
+ 	struct smc_clc_msg_trail		pclc_trl;
 -- 
-With Best Regards,
-Andy Shevchenko
-
+2.34.1
 
 
