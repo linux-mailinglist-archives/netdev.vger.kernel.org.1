@@ -1,93 +1,87 @@
-Return-Path: <netdev+bounces-79480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F058879703
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 16:00:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3A5787970D
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 16:03:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A46B281170
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 15:00:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 51A101F22281
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 15:03:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E0D7BAEC;
-	Tue, 12 Mar 2024 15:00:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334BA7BAE7;
+	Tue, 12 Mar 2024 15:03:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T7CJNLB4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="AYwOY1dp"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F51A7B3ED
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 15:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E2FF6FB9
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 15:03:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710255633; cv=none; b=Dg1E9bF2MLV6NHybtwYh4C4/pVzgLP7gKfGPJUDaV/jfTJcHKB/J9A1zhfegc+krRVKpVd9mNXDMpJFnz/Bda6Bzu2B9cq/pwUDYm/Uk3G9+vlhLz971dmBX/k0bi8TVCqwkDaR3btfseXc17Leoia6HENHlFMuTZzjA5ozZ1lA=
+	t=1710255802; cv=none; b=Di2vHPIEVA/QHYoHm7sBKgCd9WO+PzUnShyENuxNCHG6NtgrKH78suPnWlie6rrcpWLlRvRqaKvr6Zm/3Mi3dBcdBMzCM9lhRadokcaPQcWNXAU7wW/R6yYyKAwXTean1eejrsMvBTq6LnMKSX2Y0WRJg/dJMZskRx7KHdlDQn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710255633; c=relaxed/simple;
-	bh=UDFmtGwIfchIvDyqfrqk65J4W82jwYC/WlPflUtH67s=;
+	s=arc-20240116; t=1710255802; c=relaxed/simple;
+	bh=emG0uRK+XJLKe/YG7pqcTEeftgDEDCPB1VreVdfmH/8=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=cX4coDCmRgHiOEUR0DBnCp45Y06U4DaKPAA/oyNAMVeIWqqcxC1wr1tOFm+CHJzdJw3mkNOYOGelBXgnm+vPfshhup7l/URAbQAXtldObMIiIDBgUSZTvLC6heUgkX2qHSaESCLb5ESPz3lggiivWiylFWp4nKeut1yvMXCnDT0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T7CJNLB4; arc=none smtp.client-ip=170.10.133.124
+	 Content-Type:MIME-Version; b=BDdrvVLACKtBkf7BUxH8d85ew/6v/hTyYaXxjsBZqIC1LLBxN/WLioZPBZPJuMHsrO6EZZ7tFh8rtKm/HNiUTS9dJPdpjYETIx8XEgBquBchnDwnpdm/VVuWbGUkbSaI5y7yXRRxiC6lQyeaqGlqerGf5ZFTZ7/3U8x4iHRbHJQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=AYwOY1dp; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710255630;
+	s=mimecast20190719; t=1710255799;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=/xER+E4UBqJBEhmSghH9B9OEgRDRYGkaPc9qJ9kFVqA=;
-	b=T7CJNLB4tlX9jPED6BXxP5sYAWh2MdDTlPWNfVTkiuIQJiPJWI7qdNmZlIiRucOvXvrcAs
-	ZSGXX0Ju1j6EjW6l/XsnThh0titKg7QSdqTWwnwcgS5Qeqnl9cJT2dQEmRbeCDcV8KWM3l
-	n7vpwPi0U0tm8NoCQn0UKS9GMFGf/Eg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=emG0uRK+XJLKe/YG7pqcTEeftgDEDCPB1VreVdfmH/8=;
+	b=AYwOY1dpi+ApmRQ3f6WmdHsmTKgDpms/9hJQplNhxrWJWPqKq26BTFLAORjGGwrJ9RhsTe
+	yadGKPu5AxULNqcxhgtwqUf8jYQzbmc7Djk4nhROqIFU8tOVuMxuMXC7RxmEhrJkR9EluV
+	qzXMqjAABuSWo+fbiIzU9ajIgAQUlJ4=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-610-qOepqHlGNMCeDiec-kIf-w-1; Tue, 12 Mar 2024 11:00:26 -0400
-X-MC-Unique: qOepqHlGNMCeDiec-kIf-w-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-33e7be5ffabso765007f8f.1
-        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 08:00:26 -0700 (PDT)
+ us-mta-590-U5zZ4E22OYy9Tbhx8GOOSw-1; Tue, 12 Mar 2024 11:03:18 -0400
+X-MC-Unique: U5zZ4E22OYy9Tbhx8GOOSw-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33eae728148so89048f8f.0
+        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 08:03:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710255625; x=1710860425;
+        d=1e100.net; s=20230601; t=1710255797; x=1710860597;
         h=mime-version:user-agent:content-transfer-encoding:autocrypt
          :references:in-reply-to:date:cc:to:from:subject:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/xER+E4UBqJBEhmSghH9B9OEgRDRYGkaPc9qJ9kFVqA=;
-        b=vHkrlplsU9JGYHZwWVdeoy3jHRnySdiO/JOhKDrzKZyIwEqRTPWrd2fvkr3obmoPb7
-         fp0l6r34MxIP1XTzMV7YB2torMgpG/CWnTlLTlJ4adCVL2VUFzExRFYmuewGuq/sM14D
-         Ns88y4anzGoJMZftrjr0hEsBYHIJGeQDn1qamQv7i5NKE3jsvUlc/QTT8L2o9k6nSIn5
-         DDf0BmXSbSTMD3FBBFpK57ftBjCnZEa0pJLGf9EYPnYlIXoSkyFaq1Q6G36YV2p/v45P
-         1v3Vz9T8vvih8iKLzwcUWVi1X1zBSHZoF2ZXaqhAp1CPRy3+s6KV3YK1WtFYV78b/Ujn
-         R4ig==
-X-Forwarded-Encrypted: i=1; AJvYcCWUEw9AAh4O6sQgo3JTtNjx/He5ulVZTE8Aazr3S7biyHkyJ6miCYy+ZY6fZWlyiCebGys4u9ys3ll0RtD1KR4lypInpBuL
-X-Gm-Message-State: AOJu0Yxko15Qg5JBAd1BbnDaS6/m2jD/mF5T30iahGsVZPsF5UdNr66p
-	OqTQ6c/76woIQQobGJwCayeK/EVBfxLwD2o3GKO3qmqxgBIC+rju+j915ZyNO9UU/A86lj/dUtj
-	0oqfdZ1cQyMIg9l8j0cS5mQx00miVcaYTmsUel/D+gTEpaxbvCGf2hQ==
-X-Received: by 2002:a05:600c:1c0a:b0:412:ebfe:6891 with SMTP id j10-20020a05600c1c0a00b00412ebfe6891mr1747979wms.4.1710255625654;
-        Tue, 12 Mar 2024 08:00:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFaONmo049B88KNui0sys45H/HsQtDmQNHEC1YCVMmei/+uc/7Izo+26oLLe0VtVSCAQC9/ng==
-X-Received: by 2002:a05:600c:1c0a:b0:412:ebfe:6891 with SMTP id j10-20020a05600c1c0a00b00412ebfe6891mr1747932wms.4.1710255625037;
-        Tue, 12 Mar 2024 08:00:25 -0700 (PDT)
+        bh=emG0uRK+XJLKe/YG7pqcTEeftgDEDCPB1VreVdfmH/8=;
+        b=LSqBuxZlChtrC4pBaBHkKsNxKtg0HCRGLWD/EoX/f6GwP5EzNwPDnJm+OkP2D/OjXe
+         G30d6hAhKZDAxrbpQAdLv6WyaVxC358fxgBoWOT0RoDDVHYihn0Xj6FBPAZHGhmgQJ3B
+         YBCemSXxmHu40Djb8Ckbol4Se1SStz7FvcJy3iQFrfWp2m+a3BXpxkhS2eOsBLCrRS8F
+         6FDcYMYFpWyJxYEOC8XTVqmgFG+7KijNtQmyS9kmWfcUqhOiFzmzZ9AqrJeXkm500pcT
+         T06izESSNwozTosxV78y+o6VP1AODjQD+mbq0+xTsdZ2QgfKvRUuXHt7e2vSNx81mYPR
+         6U4A==
+X-Forwarded-Encrypted: i=1; AJvYcCWMVF5YvFA1cnKpUFyIOY7PQPRrdspGmhbcoxW8GibHu1xQRhgNcCkaAR0ksIbn2xRD77Jgw9Ow38/qik6UuQu1eZ5FvzUK
+X-Gm-Message-State: AOJu0Yze6vAh2Ghh6d2GMr8rT/mpLYaZ2OGCI74znB++SPyuJPSz9EHu
+	n4ibFe6qnm2qIzAWThD0vAIV2aUnxfmC0AmEqHngLOxZEhV543pQstU184GSgwQtsDZEf8QKbwh
+	L5PopeukO3Qyf1pQbL4s8hXLPBnxxnXSd48kNj7f4TcMEDgM8mASIvg==
+X-Received: by 2002:a05:600c:1d1f:b0:413:388f:e609 with SMTP id l31-20020a05600c1d1f00b00413388fe609mr1415634wms.1.1710255796477;
+        Tue, 12 Mar 2024 08:03:16 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGzxV6yONuboP9H9QKhqDCFpr6/SUIfE+LWcMLj7xEUYVp5SiTT2PgddjnBTtreqDLjZq+rrQ==
+X-Received: by 2002:a05:600c:1d1f:b0:413:388f:e609 with SMTP id l31-20020a05600c1d1f00b00413388fe609mr1415620wms.1.1710255796108;
+        Tue, 12 Mar 2024 08:03:16 -0700 (PDT)
 Received: from gerbillo.redhat.com (146-241-226-128.dyn.eolo.it. [146.241.226.128])
-        by smtp.gmail.com with ESMTPSA id je20-20020a05600c1f9400b004131fb3bac4sm11811900wmb.17.2024.03.12.08.00.23
+        by smtp.gmail.com with ESMTPSA id l9-20020a05600c4f0900b004128fa77216sm19225688wmq.1.2024.03.12.08.03.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Mar 2024 08:00:24 -0700 (PDT)
-Message-ID: <29944ce3f034f5373a99b2dcb0d5a5cef906e28e.camel@redhat.com>
-Subject: Re: [PATCH net-next v3 00/11] net/smc: SMC intra-OS shortcut with
- loopback-ism
+        Tue, 12 Mar 2024 08:03:15 -0700 (PDT)
+Message-ID: <f8864a9e5f987a2dc50cb4e0d605198b4760c139.camel@redhat.com>
+Subject: Re: [PATCH v2 net-next] Documentation: Add documentation for
+ eswitch attribute
 From: Paolo Abeni <pabeni@redhat.com>
-To: Wen Gu <guwen@linux.alibaba.com>, wintera@linux.ibm.com, 
- twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com, 
- agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org,  wenjia@linux.ibm.com, jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com,  tonylu@linux.alibaba.com,
- linux-kernel@vger.kernel.org,  linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
-Date: Tue, 12 Mar 2024 16:00:22 +0100
-In-Reply-To: <20240312142743.41406-1-guwen@linux.alibaba.com>
-References: <20240312142743.41406-1-guwen@linux.alibaba.com>
+To: William Tu <witu@nvidia.com>, netdev@vger.kernel.org
+Cc: jiri@nvidia.com, bodong@nvidia.com, kuba@kernel.org
+Date: Tue, 12 Mar 2024 16:03:14 +0100
+In-Reply-To: <20240312142055.70610-1-witu@nvidia.com>
+References: <20240312142055.70610-1-witu@nvidia.com>
 Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
@@ -102,233 +96,11 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Tue, 2024-03-12 at 22:27 +0800, Wen Gu wrote:
-> This patch set acts as the second part of the new version of [1] (The fir=
-st
-> part can be referred from [2]), the updated things of this version are li=
-sted
-> at the end.
+On Tue, 2024-03-12 at 16:20 +0200, William Tu wrote:
+> Provide devlink documentation for three eswitch attributes:
+> mode, inline-mode, and encap-mode.
 >=20
-> - Background
->=20
-> SMC-D is now used in IBM z with ISM function to optimize network intercon=
-nect
-> for intra-CPC communications. Inspired by this, we try to make SMC-D avai=
-lable
-> on the non-s390 architecture through a software-implemented Emulated-ISM =
-device,
-> that is the loopback-ism device here, to accelerate inter-process or
-> inter-containers communication within the same OS instance.
->=20
-> - Design
->=20
-> This patch set includes 3 parts:
->=20
->  - Patch #1-#2: some prepare work for loopback-ism.
->  - Patch #3-#7: implement loopback-ism device. Noted that loopback-ism no=
-w
->    serves only SMC and no userspace interface exposed.
->  - Patch #10-#15: memory copy optimization for intra-OS scenario.
->=20
-> The loopback-ism device is designed as an ISMv2 device and not be limited=
- to
-> a specific net namespace, ends of both inter-process connection (1/1' in =
-diagram
-> below) or inter-container connection (2/2' in diagram below) can find the=
- same
-> available loopback-ism and choose it during the CLC handshake.
->=20
->  Container 1 (ns1)                              Container 2 (ns2)
->  +-----------------------------------------+    +------------------------=
--+
->  | +-------+      +-------+      +-------+ |    |        +-------+       =
- |
->  | | App A |      | App B |      | App C | |    |        | App D |<-+    =
- |
->  | +-------+      +---^---+      +-------+ |    |        +-------+  |(2')=
- |
->  |     |127.0.0.1 (1')|             |192.168.0.11       192.168.0.12|    =
- |
->  |  (1)|   +--------+ | +--------+  |(2)   |    | +--------+   +--------+=
- |
->  |     `-->|   lo   |-` |  eth0  |<-`      |    | |   lo   |   |  eth0  |=
- |
->  +---------+--|---^-+---+-----|--+---------+    +-+--------+---+-^------+=
--+
->               |   |           |                                  |
->  Kernel       |   |           |                                  |
->  +----+-------v---+-----------v----------------------------------+---+---=
--+
->  |    |                            TCP                               |   =
- |
->  |    |                                                              |   =
- |
->  |    +--------------------------------------------------------------+   =
- |
->  |                                                                       =
- |
->  |                           +--------------+                            =
- |
->  |                           | smc loopback |                            =
- |
->  +---------------------------+--------------+----------------------------=
--+
->=20
-> loopback-ism device creates DMBs (shared memory) for each connection peer=
-.
-> Since data transfer occurs within the same kernel, the sndbuf of each pee=
-r
-> is only a descriptor and point to the same memory region as peer DMB, so =
-that
-> the data copy from sndbuf to peer DMB can be avoided in loopback-ism case=
-.
->=20
->  Container 1 (ns1)                              Container 2 (ns2)
->  +-----------------------------------------+    +------------------------=
--+
->  | +-------+                               |    |        +-------+       =
- |
->  | | App C |-----+                         |    |        | App D |       =
- |
->  | +-------+     |                         |    |        +-^-----+       =
- |
->  |               |                         |    |          |             =
- |
->  |           (2) |                         |    |     (2') |             =
- |
->  |               |                         |    |          |             =
- |
->  +---------------|-------------------------+    +----------|-------------=
--+
->                  |                                         |
->  Kernel          |                                         |
->  +---------------|-----------------------------------------|-------------=
--+
->  | +--------+ +--v-----+                           +--------+ +--------+ =
- |
->  | |dmb_desc| |snd_desc|                           |dmb_desc| |snd_desc| =
- |
->  | +-----|--+ +--|-----+                           +-----|--+ +--------+ =
- |
->  | +-----|--+    |                                 +-----|--+            =
- |
->  | | DMB C  |    +---------------------------------| DMB D  |            =
- |
->  | +--------+                                      +--------+            =
- |
->  |                                                                       =
- |
->  |                           +--------------+                            =
- |
->  |                           | smc loopback |                            =
- |
->  +---------------------------+--------------+----------------------------=
--+
->=20
-> - Benchmark Test
->=20
->  * Test environments:
->       - VM with Intel Xeon Platinum 8 core 2.50GHz, 16 GiB mem.
->       - SMC sndbuf/DMB size 1MB.
->=20
->  * Test object:
->       - TCP: run on TCP loopback.
->       - SMC lo: run on SMC loopback-ism.
->=20
-> 1. ipc-benchmark (see [3])
->=20
->  - ./<foo> -c 1000000 -s 100
->=20
->                             TCP                  SMC-lo
-> Message
-> rate (msg/s)              81433                  143938(+76.75%)
->=20
-> 2. sockperf
->=20
->  - serv: <smc_run> taskset -c <cpu> sockperf sr --tcp
->  - clnt: <smc_run> taskset -c <cpu> sockperf { tp | pp } --tcp --msg-size=
-=3D{ 64000 for tp | 14 for pp } -i 127.0.0.1 -t 30
->=20
->                             TCP                  SMC-lo
-> Bandwidth(MBps)         4903.07                 7978.69(+62.73%)
-> Latency(us)               6.095                   3.539(-41.94%)
->=20
-> 3. nginx/wrk
->=20
->  - serv: <smc_run> nginx
->  - clnt: <smc_run> wrk -t 8 -c 1000 -d 30 http://127.0.0.1:80
->=20
->                            TCP                   SMC-lo
-> Requests/s           161665.67                244272.41(+51.10%)
->=20
-> 4. redis-benchmark
->=20
->  - serv: <smc_run> redis-server
->  - clnt: <smc_run> redis-benchmark -h 127.0.0.1 -q -t set,get -n 400000 -=
-c 200 -d 1024
->=20
->                            TCP                   SMC-lo
-> GET(Requests/s)       88790.23                117474.30(+32.31%)
-> SET(Requests/s)       87508.20                118623.96(+35.57%)
->=20
->=20
-> Change log:
->=20
-> v3->v2:
-> - Patch #11: use tasklet_schedule(&conn->rx_tsklet) instead of smcd_cdc_r=
-x_handler()
->   to avoid possible recursive locking of conn->send_lock and use {read|wr=
-ite}_lock_bh()
->   to acquire dmb_ht_lock.
->=20
-> v2->v1:
-> Link: https://lore.kernel.org/netdev/20240307095536.29648-1-guwen@linux.a=
-libaba.com/
-> - All the patches: changed the term virtual-ISM to Emulated-ISM as define=
-d by SMCv2.1.
-> - Patch #3: optimized the description of SMC_LO config. Avoid exposing lo=
-opback-ism
->   to sysfs and remove all the knobs until future definition clear.
-> - Patch #3: try to make lockdep happy by using read_lock_bh() in smc_lo_m=
-ove_data().
-> - Patch #6: defaultly use physical contiguous DMB buffers.
-> - Patch #11: defaultly enable DMB no-copy for loopback-ism and free the D=
-MB in
->   unregister_dmb or detach_dmb when dmb_node->refcnt reaches 0, instead o=
-f using
->   wait_event to keep waiting in unregister_dmb.
->=20
-> v1->RFC:
-> Link: https://lore.kernel.org/netdev/20240111120036.109903-1-guwen@linux.=
-alibaba.com/
-> - Patch #9: merge rx_bytes and tx_bytes as xfer_bytes statistics:
->   /sys/devices/virtual/smc/loopback-ism/xfer_bytes
-> - Patch #10: add support_dmb_nocopy operation to check if SMC-D device su=
-pports
->   merging sndbuf with peer DMB.
-> - Patch #13 & #14: introduce loopback-ism device control of DMB memory ty=
-pe and
->   control of whether to merge sndbuf and DMB. They can be respectively se=
-t by:
->   /sys/devices/virtual/smc/loopback-ism/dmb_type
->   /sys/devices/virtual/smc/loopback-ism/dmb_copy
->   The motivation for these two control is that a performance bottleneck w=
-as
->   found when using vzalloced DMB and sndbuf is merged with DMB, and there=
- are
->   many CPUs and CONFIG_HARDENED_USERCOPY is set [4]. The bottleneck is ca=
-used
->   by the lock contention in vmap_area_lock [5] which is involved in memcp=
-y_from_msg()
->   or memcpy_to_msg(). Currently, Uladzislau Rezki is working on mitigatin=
-g the
->   vmap lock contention [6]. It has significant effects, but using virtual=
- memory
->   still has additional overhead compared to using physical memory.
->   So this new version provides controls of dmb_type and dmb_copy to suit
->   different scenarios.
-> - Some minor changes and comments improvements.
->=20
+> Signed-off-by: William Tu <witu@nvidia.com>
 ## Form letter - net-next-closed
 
 The merge window for v6.9 has begun and we have already posted our pull
@@ -346,6 +118,5 @@ ment-cycle
 
 --=20
 pw-bot: defer
-
 
 
