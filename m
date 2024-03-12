@@ -1,114 +1,158 @@
-Return-Path: <netdev+bounces-79588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C63F879FE1
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 00:53:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FEEC879FE9
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 00:54:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 153B0B20ECE
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:53:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC4C71F2231F
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88A747796;
-	Tue, 12 Mar 2024 23:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C089524C3;
+	Tue, 12 Mar 2024 23:53:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ncLNkFzU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fXgBWYl+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D6D4F897
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 23:53:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2A651C3B;
+	Tue, 12 Mar 2024 23:53:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710287591; cv=none; b=RHuxwCgVt3a5/rFeQedZTYuTDnXi8Ma/QGpRPKyAvamK1ukK8No82EaqQZ1+GrZtrv95VsFs6WuOntiuG4wWFU7xeQWxaIYkvw47d/5y74xukwp+Wq+dmUc4Q1gq1r74blsEtkm8tuHblDyMcy7AyGhrQz6adMz2rwbniIkEEoE=
+	t=1710287629; cv=none; b=Muh06ZoXi+J+ThHFynRmjXD0J4V0aQSB9bMZ0qFEkuAL40xGuENo3gLMBqR0g4h8Np/hY8LB1DLYa2QVazmsEjUjLVdsNhZ/YfxqOI1rBUFfip2wtB87N3gB0VSTTW1mNrU/IP/M2z3a5Eh7ANhKgpXxigQ58818+ClHF+8asTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710287591; c=relaxed/simple;
-	bh=2Ql1pouZHlKg1FTlweC7vW/fpZtUlaBTyah42JkgvpI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PHRNMWm4d3HT8NOrWYfr2elbUzVOPP5PfKu9FHeHtN2ul5sT3aZ+UOnNLZu9yfm8PY6GbMYksTYt3I7YdmbLGXZq3fqe3+9gkArYhsEFSbUYaSOv7Y6j+n6R/YXy4PGyY+C/t+YYb0OvdflTw2kZYb0jetjkjX291N64zvHOJPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ncLNkFzU; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <2a4cb416-5d95-459d-8c1c-3fb225240363@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1710287587;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nLl+NDi9Pq4wqH+MIJSBbYaoK01Y8BsOP+TM5utTVpg=;
-	b=ncLNkFzUrhOaHVCuetngKJyq2z+07yW3B+q9MY6A2QQI5gVMsmzHqfmeoinY2JTZJjFOli
-	k3bhhs7QMPqrjJ+YRqQNMyPZbzf+Ji2ryUAFRRUJPzm0GCoDbu7yIh3ISYjTh2rFWfzBCj
-	jRms52n2CL8fvPznonqB6DuFidhUx88=
-Date: Tue, 12 Mar 2024 16:52:58 -0700
+	s=arc-20240116; t=1710287629; c=relaxed/simple;
+	bh=QyUcVoiFBH6lEX6Up734N1/h/U5ZNuzaTmYYuEdRf30=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HqKnbtyfH8GobbAjhPdxPuqQgOikBO5Gp6WcbF2jm2Wp+FyEn8C0kUAnaWQih+wdeuDvev/huJX4l37J7faUe+34Ls8ZgkR2IG0TzxnOkTP56GZSP66DWcTv8csaGiWDG7Lrd6FL2E5BDj0IoaBQq03+/fUAAEAznwJbyPY/Au0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fXgBWYl+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7657AC433F1;
+	Tue, 12 Mar 2024 23:53:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710287628;
+	bh=QyUcVoiFBH6lEX6Up734N1/h/U5ZNuzaTmYYuEdRf30=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fXgBWYl+S4cHuj5SvafvgWUAIUbapF+Lc6Im8xuIj2QZNLDbxPDpWngAf0RK+yn2g
+	 8WIVUDN1N7v0rZglYiR1iuMLn39lLK7ZV4WiT/XtbF1+B5wawCY9QtSnkLOo4Rv6uJ
+	 Y6kNH4UiqaeLA/vBMcIHIcgSADXe6OmNgQGcUmNh3YoPtcOPNvwx3/OlCNjFLn67Lb
+	 Xc4Rp6XBAwOF2qaXHvyND5T33SXkiKBoWPV8SI82uubhCuS1OJ93CY/DDPmf/SxHp/
+	 +Icm6dqeA5DTFFe4Ecaqs3+GMbzHxN4USNF79niJW+ekEBNzXnZGeYfZJqDAneYF9X
+	 jHjS3G0SWY9uQ==
+Date: Tue, 12 Mar 2024 16:53:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Cc: ahmed.zaki@intel.com, aleksander.lobakin@intel.com,
+ alexandre.torgue@foss.st.com, andrew@lunn.ch, corbet@lwn.net,
+ davem@davemloft.net, dtatulea@nvidia.com, edumazet@google.com,
+ gal@nvidia.com, hkallweit1@gmail.com, jacob.e.keller@intel.com,
+ jiri@resnulli.us, joabreu@synopsys.com, justinstitt@google.com,
+ kory.maincent@bootlin.com, leon@kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, liuhangbin@gmail.com,
+ maxime.chevallier@bootlin.com, netdev@vger.kernel.org, pabeni@redhat.com,
+ paul.greenwalt@intel.com, przemyslaw.kitszel@intel.com,
+ rdunlap@infradead.org, richardcochran@gmail.com, saeed@kernel.org,
+ tariqt@nvidia.com, vadim.fedorenko@linux.dev, vladimir.oltean@nxp.com,
+ wojciech.drewek@intel.com
+Subject: Re: [PATCH RFC v2 1/6] ethtool: add interface to read Tx hardware
+ timestamping statistics
+Message-ID: <20240312165346.14ec1941@kernel.org>
+In-Reply-To: <20240309084440.299358-2-rrameshbabu@nvidia.com>
+References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
+	<20240309084440.299358-1-rrameshbabu@nvidia.com>
+	<20240309084440.299358-2-rrameshbabu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v4] net: Re-use and set mono_delivery_time bit
- for userspace tstamp packets
-Content-Language: en-US
-To: Abhishek Chauhan <quic_abchauha@quicinc.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: kernel@quicinc.com, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
- Martin KaFai Lau <martin.lau@kernel.org>, bpf <bpf@vger.kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>
-References: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 3/1/24 12:13 PM, Abhishek Chauhan wrote:
-> Bridge driver today has no support to forward the userspace timestamp
-> packets and ends up resetting the timestamp. ETF qdisc checks the
-> packet coming from userspace and encounters to be 0 thereby dropping
-> time sensitive packets. These changes will allow userspace timestamps
-> packets to be forwarded from the bridge to NIC drivers.
-> 
-> Setting the same bit (mono_delivery_time) to avoid dropping of
-> userspace tstamp packets in the forwarding path.
-> 
-> Existing functionality of mono_delivery_time remains unaltered here,
-> instead just extended with userspace tstamp support for bridge
-> forwarding path.
+On Sat,  9 Mar 2024 00:44:35 -0800 Rahul Rameshbabu wrote:
+> Multiple network devices that support hardware timestamping appear to have
+> common behavior with regards to timestamp handling. Implement common Tx
+> hardware timestamping statistics in a tx_stats struct_group. Common Rx
+> hardware timestamping statistics can subsequently be implemented in a
+> rx_stats struct_group for ethtool_ts_stats.
 
-The patch currently broke the bpf selftest test_tc_dtime: 
-https://github.com/kernel-patches/bpf/actions/runs/8242487344/job/22541746675
+>  Documentation/netlink/specs/ethtool.yaml | 20 +++++++++
+>  include/linux/ethtool.h                  | 21 ++++++++++
+>  include/uapi/linux/ethtool_netlink.h     | 15 +++++++
+>  net/ethtool/tsinfo.c                     | 52 +++++++++++++++++++++++-
+>  4 files changed, 107 insertions(+), 1 deletion(-)
 
-In particular, there is a uapi field __sk_buff->tstamp_type which currently has 
-BPF_SKB_TSTAMP_DELIVERY_MONO to mean skb->tstamp has the MONO "delivery" time. 
-BPF_SKB_TSTAMP_UNSPEC means everything else (this could be a rx timestamp at 
-ingress or a delivery time set by user space).
+Feels like we should mention the new stats somehow in 
+Documentation/networking/ethtool-netlink.rst
 
-__sk_buff->tstamp_type depends on skb->mono_delivery_time which does not 
-necessarily mean mono after this patch. I thought about fixing it on the bpf 
-side such that reading __sk_buff->tstamp_type only returns 
-BPF_SKB_TSTAMP_DELIVERY_MONO when the skb->mono_delivery_time is set and skb->sk 
-is IPPROTO_TCP. However, it won't work because of bpf_skb_set_tstamp().
+> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+> index 197208f419dc..f99b003c78c0 100644
+> --- a/Documentation/netlink/specs/ethtool.yaml
+> +++ b/Documentation/netlink/specs/ethtool.yaml
+> @@ -559,6 +559,21 @@ attribute-sets:
+>        -
+>          name: tx-lpi-timer
+>          type: u32
+> +  -
+> +    name: ts-stat
+> +    attributes:
+> +      -
+> +        name: pad
+> +        type: pad
 
-There is a bpf helper, bpf_skb_set_tstamp(skb, tstamp, 
-BPF_SKB_TSTAMP_DELIVERY_MONO). This helper changes both the skb->tstamp and the 
-skb->mono_delivery_time. The expectation is this could change skb->tstamp in the 
-ingress skb and redirect to egress sch_fq. It could also set a mono time to 
-skb->tstamp where the udp sk->sk_clockid may not be necessary in mono and then 
-bpf_redirect to egress sch_fq. When bpf_skb_set_tstamp(skb, tstamp, 
-BPF_SKB_TSTAMP_DELIVERY_MONO) succeeds, reading __sk_buff->tstamp_type expects 
-BPF_SKB_TSTAMP_DELIVERY_MONO also.
+You can remove the pad entry, and...
 
-I ran out of idea to solve this uapi breakage.
+> +      -
+> +        name: tx-pkts
+> +        type: u64
 
-I am afraid it may need to go back to v1 idea and use another bit 
-(user_delivery_time) in the skb.
+...use the uint type for the stats
 
+> +      -
+> +        name: tx-lost
+> +        type: u64
+> +      -
+> +        name: tx-err
+> +        type: u64
+>    -
+>      name: tsinfo
+>      attributes:
+
+> +/**
+> + * struct ethtool_ts_stats - HW timestamping statistics
+> + * @tx_stats: struct group for TX HW timestamping
+> + *	@pkts: Number of packets successfully timestamped by the queried
+> + *	      layer.
+> + *	@lost: Number of packet timestamps that failed to get applied on a
+> + *	      packet by the queried layer.
+> + *	@err: Number of timestamping errors that occurred on the queried
+> + *	     layer.
+
+the kdocs for @lost and @err are not very clear
+
+> + * @get_ts_stats: Query the device hardware timestamping statistics.
+
+Let's copy & paste the "Drivers must not zero" text in here?
+People seem to miss that requirement anyway, but at least we'll
+have something to point at in review.
+
+> +enum {
+> +	ETHTOOL_A_TS_STAT_UNSPEC,
+> +	ETHTOOL_A_TS_STAT_PAD,
+> +
+> +	ETHTOOL_A_TS_STAT_TX_PKT,			/* array, u64 */
+> +	ETHTOOL_A_TS_STAT_TX_LOST,			/* array, u64 */
+> +	ETHTOOL_A_TS_STAT_TX_ERR,			/* array, u64 */
+
+I don't think these are arrays.
+
+> +
+> +	/* add new constants above here */
+> +	__ETHTOOL_A_TS_STAT_CNT,
+> +	ETHTOOL_A_TS_STAT_MAX = (__ETHTOOL_A_TS_STAT_CNT - 1)
+> +
+> +};
 
