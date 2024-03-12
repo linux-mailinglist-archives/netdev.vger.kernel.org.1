@@ -1,73 +1,72 @@
-Return-Path: <netdev+bounces-79500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8A2C87988F
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 17:10:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07C45879892
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 17:10:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2C921C2141C
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 16:10:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67FD428185E
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 16:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB4E7D3EC;
-	Tue, 12 Mar 2024 16:10:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 636B87E585;
+	Tue, 12 Mar 2024 16:10:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="TKm3kokM"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="WfeGElob"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A20557D071
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 16:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4EF7E561
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 16:10:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710259806; cv=none; b=MjYv7oyUPcgt8WkrcbJI+hX4RoSUeq6k9RjRTc9gWINp2bn2jKkpBpIJGlTrNUDdfbmzX5z+TpTYCP9FbShEHQADE1xInS2Wc0FrUEd7h19U1bBZI+tHd6zBVKB5UMXjASb2sgUa16WRB19VXEfL9KCCj3QiAbIizj5pNTFfqf4=
+	t=1710259813; cv=none; b=ANoEO582/OVhkkYDW8Cn6fsCm74qS9PgQhy+aGKzknI71wIskRcMjrFr5Qm8Sj0dXigyrKY2OYAmOo5as0CNwMqbHh4iA0tSHiv2BMQ3VgV17jn42keGE8gWosArHA6Gi7kgo2Zgm9vl2hGfWKD4NF8SMIDkA85Mz1wND9MCl08=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710259806; c=relaxed/simple;
-	bh=G8C1oEjdrYjzoN8BtMudNJ3vM/Hhj9cwGQ+yfqEivJk=;
+	s=arc-20240116; t=1710259813; c=relaxed/simple;
+	bh=Fc7O8sfBRRb8zOY1eOkMRYKNnB5ApRvE6ZnNgsRMbYg=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ep8p6spDuw/FeOgcFQET1rC+HoKdfd3zidp1vO4LgWrPFg24NGxJZXCKmPfFAf6xpq3fShtzadT6hrYlPZX0L4QpSQhjwdcFBmsQxanyDxSw+leUvcursjeTup5RkrXKUi+wTJzUEN+2vYBrV2P/Kv7KfQeKyO24Z2YtqA3X6LU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=TKm3kokM; arc=none smtp.client-ip=209.85.128.48
+	 MIME-Version; b=AAmEDVdp1fd+OnFI3HSaY21vumA/n9+u82wD0czknwnIU5slh1EOh+SfeCts2JIIAzgXF+UFF9tF3+Sj5463Zdd+7s9is11cpcMZzIGNZyfg/5VMUb0vcoj9ZDuV8VVtBTW0ycfHtZEHErguVlraZGe1061xPp7HiBkl8ozof/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=WfeGElob; arc=none smtp.client-ip=209.85.128.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-413328344acso7539465e9.3
-        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 09:10:04 -0700 (PDT)
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-41330d48a29so9465075e9.3
+        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 09:10:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1710259803; x=1710864603; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1710259809; x=1710864609; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=T8y9cotcn2YcwHYQkWcYzADrL0CgjgqPVI4Ap8W1Z/w=;
-        b=TKm3kokMRVibK+WzOzuaGfhJbhQ4n22ai8Auf/duBPG0PIWjk1rm+6uH9Ga7ndfbh5
-         XlejJexZyRAICGAwSM8VUg0fPlhf+gq9JDjmchvi8MYY4rY1xhAuNZnfLloOgG/nGOom
-         VPGzmRrxN8apNaq9l8hPzuL6z7DNZjGCAqilVETc822LkGVPDhm2ey7UgkIGomg36wpo
-         l/hq5gxqkaEmh5RRTsGicqmMl+UbMAwaMr7DHav13jyXNqvH+kFpJHDKka2po3rVrEvM
-         h0zCEhk4ZJMwpXDwNFctnykCxiX1yWJbf0lQvDAtYiu6++7iHrBxY0IVfAXxGZ+OUuGB
-         wuJw==
+        bh=9wNUX9DZCZhkOtkzBdWY6lDTHbYdRFBZXQzvAC4CccA=;
+        b=WfeGElob94iVcNvEUrLD+hD8IJpTbHvgaI3ykcUz8EI9MyeYXhnmblK0VLvuzDGKsL
+         oKXQtHwEO1cmNl5w4j2qseyBWbAazM1QmqOzgOthxNx3OKFIaDhZvU42AKfwwmZPg41m
+         LTLf0BDBJ99PkNAT0M+hff4C6aieJsbpfwCIIKuxlr8cN0lFON4R11oxp3GvHnXUbfSA
+         xr1NKAzkqFqX7YSCTYWTrypKMyBQ8XsxnNzDIEFQ8cl5BSKKXdD4lH6W7ylDOYOIm8Sg
+         D/U7aPYXT43vgaGjOPX2iVG0G1YsD/AvjjK9SJtEZ/ckdrLLgN6USca979ApfivmtwpI
+         ILeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710259803; x=1710864603;
+        d=1e100.net; s=20230601; t=1710259809; x=1710864609;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=T8y9cotcn2YcwHYQkWcYzADrL0CgjgqPVI4Ap8W1Z/w=;
-        b=WlaRbTX+gCVyQIyUYzM4xZuvawkualIFapfD2idNWVl4A11r8lF/bt0pxarrO2nFm8
-         cMhvQa+Oa4SmKcuOMDl7P4271EAriQl6Jg0uzhE3ON91Tp8oo1i6p624wpb+098AeT4v
-         NunJuXy99K0FVoD7DGyh7mVy6KfRqLM31xsprWS0RecQHVu/MJPzbob0nI5QYXQUPuhP
-         rYYUnyU5d15dwFQ6bE1IOS8XnWLyt3KqPg1Cdr/3D1/zCC4Af/VNREnVhNRKOqt56DPL
-         /h8ETZb4n58CV3Fuc/XacJ8Gq1p7SqdH3tjAxkYkCLBbqOyT919+KWGZ1cpVEto6HrdS
-         qqZA==
-X-Forwarded-Encrypted: i=1; AJvYcCUGbTXiyvtbiY+fsR3m4FCDvGHCuDcnxq/mX5MrSryAcwKZnXNGd+r1IiyQWUDbnGp2v5WOzFLQ19URvWqjpWTzI4I9NRsk
-X-Gm-Message-State: AOJu0YySNNz/jUAIuS7HC44LBnuuPgQOpp4eWubpSdFtljnYqHb1x/xj
-	IHXvd0Vx8yZj1EXQ+FXFMCdUR/SGIzPDyUVouAOmvPwWs0FTYgbgDqmwEbhBiJGJmha+30a6FoR
-	4bg8=
-X-Google-Smtp-Source: AGHT+IHqfxZojQFqGYalatcTwN7r4+eqL0JqCeWkKtamZQWH4DLqUok57Uowustec7URYbqzuvnK8w==
-X-Received: by 2002:a05:600c:4508:b0:413:2a10:8a29 with SMTP id t8-20020a05600c450800b004132a108a29mr4223456wmo.13.1710259802871;
-        Tue, 12 Mar 2024 09:10:02 -0700 (PDT)
+        bh=9wNUX9DZCZhkOtkzBdWY6lDTHbYdRFBZXQzvAC4CccA=;
+        b=g4yARKAU7Voh0g78V1ERNXFQbC4UO/Q42jifxHcTROePlTHDA9c3v/FTdESe3SVYnU
+         T5LYcjD+FvWygR1y/caQL/7OhHyTjgloNLE30EdomCqRAOIdzQNTweZOa9OKeKxfVh/R
+         kE1oeWrmXiRd5KyJLelOcRVa6elRWfDH2sCPZykqrgBLQOJP7kG05Z4ddoC4o/1bWgNS
+         FihxCOtBl2N6jVhNmn8qY1HBlr1gs49PjuYGpGRBGo9kieJMceVB2Of9ZGgvgFR66o6x
+         c7h3LP0FAncds+T0luuNGAeHQmxqSh31GQyMrF3OWrNoSLXBEmvi7guBPC7s1KnsIyrP
+         vv8g==
+X-Forwarded-Encrypted: i=1; AJvYcCX/axtR/9vl0PnI4QM0yop8jqYyHAR/uvaold9lDRG6aFkvub27jO9r8yTGw3ZFrK93NRMnnxwPNHTTDPs8pXpRo9isbLD+
+X-Gm-Message-State: AOJu0YyhMBVvCB/j6lw2HjjcybzONvLEtbPpfVBw7V4CvC12g/EWTfBl
+	jT1bVauOasF8jd9SMBTPaf4ahb2MLNtiMt5brK9Aw4LRHSycCwj0OlkOOyhpB58=
+X-Google-Smtp-Source: AGHT+IF+bWouiIFf+uP88Mr8eQSuWHP1533kqdq4LfgBW7SC7cEl/s7h/DffeGifPPsn3+G8rECSuw==
+X-Received: by 2002:a05:600c:4690:b0:412:95fb:e41 with SMTP id p16-20020a05600c469000b0041295fb0e41mr1840249wmo.24.1710259809271;
+        Tue, 12 Mar 2024 09:10:09 -0700 (PDT)
 Received: from localhost.localdomain ([104.28.232.7])
-        by smtp.gmail.com with ESMTPSA id fl8-20020a05600c0b8800b00413e523b7f9sm474253wmb.43.2024.03.12.09.10.01
+        by smtp.gmail.com with ESMTPSA id fl8-20020a05600c0b8800b00413e523b7f9sm474253wmb.43.2024.03.12.09.10.08
         (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 12 Mar 2024 09:10:02 -0700 (PDT)
+        Tue, 12 Mar 2024 09:10:08 -0700 (PDT)
 From: Ignat Korchagin <ignat@cloudflare.com>
 To: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -76,11 +75,10 @@ To: "David S . Miller" <davem@davemloft.net>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
 Cc: kernel-team@cloudflare.com,
-	Ignat Korchagin <ignat@cloudflare.com>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Subject: [PATCH net v2 1/2] net: veth: do not manipulate GRO when using XDP
-Date: Tue, 12 Mar 2024 16:05:51 +0000
-Message-Id: <20240312160551.73184-2-ignat@cloudflare.com>
+	Ignat Korchagin <ignat@cloudflare.com>
+Subject: [PATCH net v2 2/2] selftests: net: veth: test the ability to independently manipulate GRO and XDP
+Date: Tue, 12 Mar 2024 16:05:52 +0000
+Message-Id: <20240312160551.73184-3-ignat@cloudflare.com>
 X-Mailer: git-send-email 2.39.3 (Apple Git-146)
 In-Reply-To: <20240312160551.73184-1-ignat@cloudflare.com>
 References: <20240312160551.73184-1-ignat@cloudflare.com>
@@ -90,81 +88,70 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Commit d3256efd8e8b ("veth: allow enabling NAPI even without XDP") tried to fix
-the fact that GRO was not possible without XDP, because veth did not use NAPI
-without XDP. However, it also introduced the behaviour that GRO is always
-enabled, when XDP is enabled.
+We should be able to independently flip either XDP or GRO states and toggling
+one should not affect the other.
 
-While it might be desired for most cases, it is confusing for the user at best
-as the GRO flag suddenly changes, when an XDP program is attached. It also
-introduces some complexities in state management as was partially addressed in
-commit fe9f801355f0 ("net: veth: clear GRO when clearing XDP even when down").
-
-But the biggest problem is that it is not possible to disable GRO at all, when
-an XDP program is attached, which might be needed for some use cases.
-
-Fix this by not touching the GRO flag on XDP enable/disable as the code already
-supports switching to NAPI if either GRO or XDP is requested.
-
-Changes in v2:
-  * add Fixes reference to commit description
-  * fix commit message spelling
-
-Link: https://lore.kernel.org/lkml/20240311124015.38106-1-ignat@cloudflare.com/
-Fixes: d3256efd8e8b ("veth: allow enabling NAPI even without XDP")
-Fixes: fe9f801355f0 ("net: veth: clear GRO when clearing XDP even when down")
 Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
-Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
 ---
- drivers/net/veth.c | 18 ------------------
- 1 file changed, 18 deletions(-)
+ tools/testing/selftests/net/veth.sh | 24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/veth.c b/drivers/net/veth.c
-index cd4a6fe458f9..f0b2c4d5fe43 100644
---- a/drivers/net/veth.c
-+++ b/drivers/net/veth.c
-@@ -1533,8 +1533,6 @@ static netdev_features_t veth_fix_features(struct net_device *dev,
- 		if (peer_priv->_xdp_prog)
- 			features &= ~NETIF_F_GSO_SOFTWARE;
- 	}
--	if (priv->_xdp_prog)
--		features |= NETIF_F_GRO;
+diff --git a/tools/testing/selftests/net/veth.sh b/tools/testing/selftests/net/veth.sh
+index 5ae85def0739..3a394b43e274 100755
+--- a/tools/testing/selftests/net/veth.sh
++++ b/tools/testing/selftests/net/veth.sh
+@@ -249,9 +249,9 @@ cleanup
+ create_ns
+ ip -n $NS_DST link set dev veth$DST up
+ ip -n $NS_DST link set dev veth$DST xdp object ${BPF_FILE} section xdp
+-chk_gro_flag "gro vs xdp while down - gro flag on" $DST on
++chk_gro_flag "gro vs xdp while down - gro flag off" $DST off
+ ip -n $NS_DST link set dev veth$DST down
+-chk_gro_flag "                      - after down" $DST on
++chk_gro_flag "                      - after down" $DST off
+ ip -n $NS_DST link set dev veth$DST xdp off
+ chk_gro_flag "                      - after xdp off" $DST off
+ ip -n $NS_DST link set dev veth$DST up
+@@ -260,6 +260,21 @@ ip -n $NS_SRC link set dev veth$SRC xdp object ${BPF_FILE} section xdp
+ chk_gro_flag "                      - after peer xdp" $DST off
+ cleanup
  
- 	return features;
- }
-@@ -1638,14 +1636,6 @@ static int veth_xdp_set(struct net_device *dev, struct bpf_prog *prog,
- 		}
++create_ns
++ip -n $NS_DST link set dev veth$DST up
++ip -n $NS_DST link set dev veth$DST xdp object ${BPF_FILE} section xdp
++ip netns exec $NS_DST ethtool -K veth$DST generic-receive-offload on
++chk_gro_flag "gro vs xdp while down - gro flag on" $DST on
++ip -n $NS_DST link set dev veth$DST down
++chk_gro_flag "                      - after down" $DST on
++ip -n $NS_DST link set dev veth$DST xdp off
++chk_gro_flag "                      - after xdp off" $DST on
++ip -n $NS_DST link set dev veth$DST up
++chk_gro_flag "                      - after up" $DST on
++ip -n $NS_SRC link set dev veth$SRC xdp object ${BPF_FILE} section xdp
++chk_gro_flag "                      - after peer xdp" $DST on
++cleanup
++
+ create_ns
+ chk_channels "default channels" $DST 1 1
  
- 		if (!old_prog) {
--			if (!veth_gro_requested(dev)) {
--				/* user-space did not require GRO, but adding
--				 * XDP is supposed to get GRO working
--				 */
--				dev->features |= NETIF_F_GRO;
--				netdev_features_change(dev);
--			}
--
- 			peer->hw_features &= ~NETIF_F_GSO_SOFTWARE;
- 			peer->max_mtu = max_mtu;
- 		}
-@@ -1661,14 +1651,6 @@ static int veth_xdp_set(struct net_device *dev, struct bpf_prog *prog,
- 			if (dev->flags & IFF_UP)
- 				veth_disable_xdp(dev);
+@@ -327,11 +342,14 @@ if [ $CPUS -gt 2 ]; then
+ fi
  
--			/* if user-space did not require GRO, since adding XDP
--			 * enabled it, clear it now
--			 */
--			if (!veth_gro_requested(dev)) {
--				dev->features &= ~NETIF_F_GRO;
--				netdev_features_change(dev);
--			}
--
- 			if (peer) {
- 				peer->hw_features |= NETIF_F_GSO_SOFTWARE;
- 				peer->max_mtu = ETH_MAX_MTU;
+ ip -n $NS_DST link set dev veth$DST xdp object ${BPF_FILE} section xdp 2>/dev/null
+-chk_gro_flag "with xdp attached - gro flag" $DST on
++chk_gro_flag "with xdp attached - gro flag" $DST off
+ chk_gro_flag "        - peer gro flag" $SRC off
+ chk_tso_flag "        - tso flag" $SRC off
+ chk_tso_flag "        - peer tso flag" $DST on
+ ip netns exec $NS_DST ethtool -K veth$DST rx-udp-gro-forwarding on
++chk_gro "        - no aggregation" 10
++ip netns exec $NS_DST ethtool -K veth$DST generic-receive-offload on
++chk_gro_flag "        - gro flag with GRO on" $DST on
+ chk_gro "        - aggregation" 1
+ 
+ 
 -- 
 2.39.2
 
