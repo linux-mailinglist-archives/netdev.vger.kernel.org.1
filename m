@@ -1,299 +1,162 @@
-Return-Path: <netdev+bounces-79351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B62D878D2E
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 03:49:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A464878D36
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 03:56:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 526161C216D7
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 02:49:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A88051C21747
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 02:56:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B65718F47;
-	Tue, 12 Mar 2024 02:49:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2C098821;
+	Tue, 12 Mar 2024 02:56:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="WfkGS4Xb"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TI6RKdtH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D781D8BFA
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 02:49:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E6A79C3;
+	Tue, 12 Mar 2024 02:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710211763; cv=none; b=ln8gLzW4g6uiPKdaDEsdQvB0SLV6knweLMnnETQh9di3t6btfQkQ6J5mlo5fQB/hhqg40Ef6BB9PXGZO+p3fxNxE//O2BYNGKpQfEMpBmfRRQDk3fHuN5byKnq0FXeE2dP5GkSPh7vaKut6RyPeJF3+KR2p7hOWMwvQstDMqwrg=
+	t=1710212175; cv=none; b=TJ0rKAAx3NldJFWjBGM4udEr2/n5m0GkU7HChYjrCNGPlZF7FeM0iyrmVspFU00sIgsH71t5J3UHIh8Qi3CPWmJ+lreu/Xpna2XNZFHWnPBsijkPUUD8IORhlE6JR1yinVmxeZCK/f70QqfFg49DDpeooMt+Ky+Rxy+7c29uN/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710211763; c=relaxed/simple;
-	bh=LG8tjvBnuxxg899SAnLnow23FrwucP99leAXJLBMDyk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L14HfBnWKRZioStr+bKtGkKAC2sBLjD4oED1S8IF0PjYu3jh5Ov1HrOncJGM85d/x4IawYsrL0gsiNfwMlO00rv7eQfhXOQq/jcxP8cAxYSa9A7J2f8jOyktOQi4VXC26IxVX4F7E4vaLEcEWVSIcjVZpcQ6vsJNb0r94ONkUKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=WfkGS4Xb; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-29bcc1c7cc4so1832317a91.2
-        for <netdev@vger.kernel.org>; Mon, 11 Mar 2024 19:49:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1710211761; x=1710816561; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kp8FDAIHogCGtdOtPeOiQYNfgQ9IDPgMIvR+XSfvvHk=;
-        b=WfkGS4XbLbTYwVv62QrPovHbbApLL4JUmXpJ5WtAN8jlZ2e8FnXxGgwOUWChToIaXF
-         UTkx+bcDlDJ3zvesem2GDR1fhYpTNdBGRYj9WOriUb2b6kaxoFs+5gzBpoayhAxb/k8V
-         2HIdfu88t+uPRer8yK8vOV1F0L5MT4BOx8P5fs3ZFRD5RaxiwHGmmIYnwfYymT4ObgHz
-         Ka4IpN7Cdus8aQWbxWdB4rd2WfaAK8ZAtlDE1a0xPGJkU4jPulzyvaBi6TxawtDx5Bfv
-         jA9dmIT37wn27bNd06h99C34fj/XvJmYxvT4C2Z9aiomAiV9nAdCuA5El4iCK8d+/YAB
-         Xscg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710211761; x=1710816561;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kp8FDAIHogCGtdOtPeOiQYNfgQ9IDPgMIvR+XSfvvHk=;
-        b=ejKa7lk7BM/0HwdRnkDkHMiQ0CRNigSkqWp/GcXqwi7jNKpW5PedM2EHW9VQkCWHYd
-         cLk1xkbh5Xv6kLBPBBu/0nb4tiNDwGC5tK/QgiiNN6Wh+5t7BrAt5nPl4plHKqWvjL1f
-         /ozUxSyUyLF0bWZJkq/meNUFPHIo17Zy6pjo6dHZqM1rcU5R6YC5/KGtom0cX/Syq5oI
-         rt8aLRkZupx6BjUQrfl/wYEL0ZX5ybUGyrxiG6IyYUHlwa8kztMsiJJKKWprUCJSf0cj
-         0rkj3Qk0EZSbArR2UnEL2qgRv+OFj18DskAVDwPjbGqNfNA+XKQQz5CpO7d9lTPMUjMk
-         CJNA==
-X-Forwarded-Encrypted: i=1; AJvYcCX8DEk/r8g+TUDRQrGduRVbgoxqQ8YMU6xfq+Wmpp7/9WfM0IgFlfHuoJxzKKV4lP8oyAezJ4oRZEAKNzuDjZxAH88TgvrY
-X-Gm-Message-State: AOJu0YzOyCw5bmvzW5RJSfdhEHEYhBBviQzMqmQsa7FwKH59iI8IRUHL
-	QUpKNjus6MCImFTkV2McHqqgCTEleu1deJZo2FIbZ+UjNWJFPxSJm4LOenfvrCRsdGtx1lLcBtx
-	siWbYxvvNVsBswincj7irxPFyWWJjJjveV13AXA==
-X-Google-Smtp-Source: AGHT+IETNLgyzh6uZkS12wgDyCLo8umv6nNmoijBBhhnpR8bMML+3pXMk3jZN+hl1DDgFHg+n8EoqP5QSNQlrqeKH1w=
-X-Received: by 2002:a17:90a:5d8c:b0:29a:2860:28b9 with SMTP id
- t12-20020a17090a5d8c00b0029a286028b9mr6080591pji.48.1710211761009; Mon, 11
- Mar 2024 19:49:21 -0700 (PDT)
+	s=arc-20240116; t=1710212175; c=relaxed/simple;
+	bh=Byby3dPab9clHdBpqGNxzWvALlnFyqoIXHFndqlr3zc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UuNzHOhItCO6TRO7DPrk2NGnfbpirGOLb4NxAXTPhvK9/nN2g012GKjazwmNa9d1P+Jw0al3CXFutj5gnElcnKIAzUtnGsibOc2jjmpMU5TeZuY0+rvkoi5QGVgBzaVEAPMRtLm9D+e+BGSlLTGZbLKTDpA5GYWNHQlJvRWM7Lo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TI6RKdtH; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710212173; x=1741748173;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=Byby3dPab9clHdBpqGNxzWvALlnFyqoIXHFndqlr3zc=;
+  b=TI6RKdtHYFAADlZ20p78s6EnKUM1JO1Kdp3ORiB7yW+OCEVBX8CXfey3
+   zQ5h5g3nPreCzW6i3VCTGPnzYTHPStdF8M99r1L9V9Ts1qhHSRL7+cwBm
+   g6WfLqjvzqDHi92IyKWJNQxJhYWsNSrmU/eyiECLDpB9upN5zYUDA/nqI
+   33XYKRhy14ttWWq2kV4gPQOq2HKx7nPghxDaCg6Csf7XXAiZlRcNIlPZJ
+   TBl1xAGsX4/LdOEVAZLODzQ9eMi5B1ROzNdRBuPTNyrUE+8/M49lmTCIb
+   DldAwBqLg/e0d8b7sAoDT0Lq6Tb6OTKYkVvBnCnrR42ItXjlRq5xuqV/S
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11010"; a="4762026"
+X-IronPort-AV: E=Sophos;i="6.07,118,1708416000"; 
+   d="scan'208";a="4762026"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 19:56:12 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,118,1708416000"; 
+   d="scan'208";a="11478107"
+Received: from sbrowne-mobl.amr.corp.intel.com (HELO [10.209.68.239]) ([10.209.68.239])
+  by fmviesa008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 19:56:11 -0700
+Message-ID: <d861ff54-e3db-4beb-999b-05e60c99945d@linux.intel.com>
+Date: Mon, 11 Mar 2024 19:56:10 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240311093526.1010158-1-dongmenglong.8@bytedance.com>
- <20240311093526.1010158-2-dongmenglong.8@bytedance.com> <CAADnVQKQPS5NcvEouH4JqZ2fKgQAC+LtcwhX9iXYoiEkF_M94Q@mail.gmail.com>
- <CALz3k9i5G5wWi+rtvHPwVLOUAXVMCiU_8QUZs87TEYgR_0wpPA@mail.gmail.com>
- <CAADnVQJ_ZCzMmT1aBsNXEBFfYNSVBdBXmLocjR0PPEWtYQrQFw@mail.gmail.com> <CALz3k9icPePb0c4FE67q=u1U0hrePorN9gDpQrKTR_sXbLMfDA@mail.gmail.com>
-In-Reply-To: <CALz3k9icPePb0c4FE67q=u1U0hrePorN9gDpQrKTR_sXbLMfDA@mail.gmail.com>
-From: =?UTF-8?B?5qKm6b6Z6JGj?= <dongmenglong.8@bytedance.com>
-Date: Tue, 12 Mar 2024 10:49:10 +0800
-Message-ID: <CALz3k9jy43zLe6DFjjA8K4mMFPNOxkagOEs2o8RY468ZWwfVSw@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH bpf-next v2 1/9] bpf: tracing: add support
- to record and check the accessed args
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	X86 ML <x86@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Quentin Monnet <quentin@isovalent.com>, 
-	bpf <bpf@vger.kernel.org>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>, linux-s390 <linux-s390@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, linux-trace-kernel@vger.kernel.org, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/5] Drivers: hv: vmbus: Leak pages if
+ set_memory_encrypted() fails
+Content-Language: en-US
+To: mhklinux@outlook.com, rick.p.edgecombe@intel.com, kys@microsoft.com,
+ haiyangz@microsoft.com, wei.liu@kernel.org, decui@microsoft.com,
+ gregkh@linuxfoundation.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, kirill.shutemov@linux.intel.com,
+ dave.hansen@linux.intel.com, linux-kernel@vger.kernel.org,
+ linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+ linux-coco@lists.linux.dev
+Cc: elena.reshetova@intel.com
+References: <20240311161558.1310-1-mhklinux@outlook.com>
+ <20240311161558.1310-2-mhklinux@outlook.com>
+From: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>
+In-Reply-To: <20240311161558.1310-2-mhklinux@outlook.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 12, 2024 at 10:42=E2=80=AFAM =E6=A2=A6=E9=BE=99=E8=91=A3 <dongm=
-englong.8@bytedance.com> wrote:
->
-> On Tue, Mar 12, 2024 at 10:09=E2=80=AFAM Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
-> >
-> > On Mon, Mar 11, 2024 at 7:01=E2=80=AFPM =E6=A2=A6=E9=BE=99=E8=91=A3 <do=
-ngmenglong.8@bytedance.com> wrote:
-> > >
-> > > On Tue, Mar 12, 2024 at 9:46=E2=80=AFAM Alexei Starovoitov
-> > > <alexei.starovoitov@gmail.com> wrote:
-> > > >
-> > > > On Mon, Mar 11, 2024 at 2:34=E2=80=AFAM Menglong Dong
-> > > > <dongmenglong.8@bytedance.com> wrote:
-> > > > >
-> > > > > In this commit, we add the 'accessed_args' field to struct bpf_pr=
-og_aux,
-> > > > > which is used to record the accessed index of the function args i=
-n
-> > > > > btf_ctx_access().
-> > > > >
-> > > > > Meanwhile, we add the function btf_check_func_part_match() to com=
-pare the
-> > > > > accessed function args of two function prototype. This function w=
-ill be
-> > > > > used in the following commit.
-> > > > >
-> > > > > Signed-off-by: Menglong Dong <dongmenglong.8@bytedance.com>
-> > > > > ---
-> > > > >  include/linux/bpf.h |   4 ++
-> > > > >  kernel/bpf/btf.c    | 108 ++++++++++++++++++++++++++++++++++++++=
-+++++-
-> > > > >  2 files changed, 110 insertions(+), 2 deletions(-)
-> > > > >
-> > > > > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> > > > > index 95e07673cdc1..0f677fdcfcc7 100644
-> > > > > --- a/include/linux/bpf.h
-> > > > > +++ b/include/linux/bpf.h
-> > > > > @@ -1461,6 +1461,7 @@ struct bpf_prog_aux {
-> > > > >         const struct btf_type *attach_func_proto;
-> > > > >         /* function name for valid attach_btf_id */
-> > > > >         const char *attach_func_name;
-> > > > > +       u64 accessed_args;
-> > > > >         struct bpf_prog **func;
-> > > > >         void *jit_data; /* JIT specific data. arch dependent */
-> > > > >         struct bpf_jit_poke_descriptor *poke_tab;
-> > > > > @@ -2565,6 +2566,9 @@ struct bpf_reg_state;
-> > > > >  int btf_prepare_func_args(struct bpf_verifier_env *env, int subp=
-rog);
-> > > > >  int btf_check_type_match(struct bpf_verifier_log *log, const str=
-uct bpf_prog *prog,
-> > > > >                          struct btf *btf, const struct btf_type *=
-t);
-> > > > > +int btf_check_func_part_match(struct btf *btf1, const struct btf=
-_type *t1,
-> > > > > +                             struct btf *btf2, const struct btf_=
-type *t2,
-> > > > > +                             u64 func_args);
-> > > > >  const char *btf_find_decl_tag_value(const struct btf *btf, const=
- struct btf_type *pt,
-> > > > >                                     int comp_idx, const char *tag=
-_key);
-> > > > >  int btf_find_next_decl_tag(const struct btf *btf, const struct b=
-tf_type *pt,
-> > > > > diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
-> > > > > index 170d017e8e4a..c2a0299d4358 100644
-> > > > > --- a/kernel/bpf/btf.c
-> > > > > +++ b/kernel/bpf/btf.c
-> > > > > @@ -6125,19 +6125,24 @@ static bool is_int_ptr(struct btf *btf, c=
-onst struct btf_type *t)
-> > > > >  }
-> > > > >
-> > > > >  static u32 get_ctx_arg_idx(struct btf *btf, const struct btf_typ=
-e *func_proto,
-> > > > > -                          int off)
-> > > > > +                          int off, int *aligned_idx)
-> > > > >  {
-> > > > >         const struct btf_param *args;
-> > > > >         const struct btf_type *t;
-> > > > >         u32 offset =3D 0, nr_args;
-> > > > >         int i;
-> > > > >
-> > > > > +       if (aligned_idx)
-> > > > > +               *aligned_idx =3D -ENOENT;
-> > > > > +
-> > > > >         if (!func_proto)
-> > > > >                 return off / 8;
-> > > > >
-> > > > >         nr_args =3D btf_type_vlen(func_proto);
-> > > > >         args =3D (const struct btf_param *)(func_proto + 1);
-> > > > >         for (i =3D 0; i < nr_args; i++) {
-> > > > > +               if (aligned_idx && offset =3D=3D off)
-> > > > > +                       *aligned_idx =3D i;
-> > > > >                 t =3D btf_type_skip_modifiers(btf, args[i].type, =
-NULL);
-> > > > >                 offset +=3D btf_type_is_ptr(t) ? 8 : roundup(t->s=
-ize, 8);
-> > > > >                 if (off < offset)
-> > > > > @@ -6207,7 +6212,7 @@ bool btf_ctx_access(int off, int size, enum=
- bpf_access_type type,
-> > > > >                         tname, off);
-> > > > >                 return false;
-> > > > >         }
-> > > > > -       arg =3D get_ctx_arg_idx(btf, t, off);
-> > > > > +       arg =3D get_ctx_arg_idx(btf, t, off, NULL);
-> > > > >         args =3D (const struct btf_param *)(t + 1);
-> > > > >         /* if (t =3D=3D NULL) Fall back to default BPF prog with
-> > > > >          * MAX_BPF_FUNC_REG_ARGS u64 arguments.
-> > > > > @@ -6217,6 +6222,9 @@ bool btf_ctx_access(int off, int size, enum=
- bpf_access_type type,
-> > > > >                 /* skip first 'void *__data' argument in btf_trac=
-e_##name typedef */
-> > > > >                 args++;
-> > > > >                 nr_args--;
-> > > > > +               prog->aux->accessed_args |=3D (1 << (arg + 1));
-> > > > > +       } else {
-> > > > > +               prog->aux->accessed_args |=3D (1 << arg);
-> > > >
-> > > > What do you need this aligned_idx for ?
-> > > > I'd expect that above "accessed_args |=3D (1 << arg);" is enough.
-> > > >
-> > >
-> > > Which aligned_idx? No aligned_idx in the btf_ctx_access(), and
-> > > aligned_idx is only used in the btf_check_func_part_match().
-> > >
-> > > In the btf_check_func_part_match(), I need to compare the
-> > > t1->args[i] and t2->args[j], which have the same offset. And
-> > > the aligned_idx is to find the "j" according to the offset of
-> > > t1->args[i].
-> >
-> > And that's my question.
-> > Why you don't do the max of accessed_args across all attach
-> > points and do btf_check_func_type_match() to that argno
-> > instead of nargs1.
-> > This 'offset +=3D btf_type_is_ptr(t1) ? 8 : roundup...
-> > is odd.
->
-> Hi, I'm trying to make the bpf flexible enough. Let's take an example,
-> now we have the bpf program:
->
-> int test1_result =3D 0;
-> int BPF_PROG(test1, int a, long b, char c)
-> {
->     test1_result =3D a + c;
->     return 0;
-> }
->
-> In this program, only the 1st and 3rd arg is accessed. So all kernel
-> functions whose 1st arg is int and 3rd arg is char can be attached
-> by this bpf program, even if their 2nd arg is different.
->
-> And let's take another example for struct. This is our bpf program:
->
-> int test1_result =3D 0;
-> int BPF_PROG(test1, long a, long b, char c)
-> {
->     test1_result =3D c;
->     return 0;
-> }
->
-> Only the 3rd arg is accessed. And we have following kernel function:
->
-> int kernel_function1(long a, long b, char c)
-> {
-> xxx
-> }
->
-> struct test1 {
->     long a;
->     long b;
-> };
-> int kernel_function2(struct test1 a, char b)
-> {
-> xxx
-> }
->
-> The kernel_function1 and kernel_function2 should be compatible,
-> as the bpf program only accessed the ctx[2], whose offset is 16.
-> And the arg in kernel_function1() with offset 16 is "char c", the
-> arg in kernel_function2() with offset 16 is "char b", which is
-> compatible.
->
-> That's why we need to check the consistency of accessed args
-> by offset instead of function arg index.
->
+Hi,
 
-And that's why I didn't share the code with btf_check_func_type_match().
-In btf_check_func_part_match(), I'm trying to check the "real" accessed
-args of t1 and t2, not by the function index, which has quite a difference
-with btf_check_func_type_match().
-
-> I'm not sure if I express my idea clearly, is this what you are
-> asking?
+On 3/11/24 9:15 AM, mhkelley58@gmail.com wrote:
+> From: Rick Edgecombe <rick.p.edgecombe@intel.com>
 >
-> Thanks!
-> Menglong Dong
+> In CoCo VMs it is possible for the untrusted host to cause
+> set_memory_encrypted() or set_memory_decrypted() to fail such that an
+> error is returned and the resulting memory is shared. Callers need to
+> take care to handle these errors to avoid returning decrypted (shared)
+> memory to the page allocator, which could lead to functional or security
+> issues.
+>
+> VMBus code could free decrypted pages if set_memory_encrypted()/decrypted()
+> fails. Leak the pages if this happens.
+>
+> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
+> Signed-off-by: Michael Kelley <mhklinux@outlook.com>
+> ---
+LGTM
+
+Reviewed-by: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>
+>  drivers/hv/connection.c | 29 ++++++++++++++++++++++-------
+>  1 file changed, 22 insertions(+), 7 deletions(-)
+>
+> diff --git a/drivers/hv/connection.c b/drivers/hv/connection.c
+> index 3cabeeabb1ca..f001ae880e1d 100644
+> --- a/drivers/hv/connection.c
+> +++ b/drivers/hv/connection.c
+> @@ -237,8 +237,17 @@ int vmbus_connect(void)
+>  				vmbus_connection.monitor_pages[0], 1);
+>  	ret |= set_memory_decrypted((unsigned long)
+>  				vmbus_connection.monitor_pages[1], 1);
+> -	if (ret)
+> +	if (ret) {
+> +		/*
+> +		 * If set_memory_decrypted() fails, the encryption state
+> +		 * of the memory is unknown. So leak the memory instead
+> +		 * of risking returning decrypted memory to the free list.
+> +		 * For simplicity, always handle both pages the same.
+> +		 */
+> +		vmbus_connection.monitor_pages[0] = NULL;
+> +		vmbus_connection.monitor_pages[1] = NULL;
+>  		goto cleanup;
+> +	}
+>  
+>  	/*
+>  	 * Set_memory_decrypted() will change the memory contents if
+> @@ -337,13 +346,19 @@ void vmbus_disconnect(void)
+>  		vmbus_connection.int_page = NULL;
+>  	}
+>  
+> -	set_memory_encrypted((unsigned long)vmbus_connection.monitor_pages[0], 1);
+> -	set_memory_encrypted((unsigned long)vmbus_connection.monitor_pages[1], 1);
+> +	if (vmbus_connection.monitor_pages[0]) {
+> +		if (!set_memory_encrypted(
+> +			(unsigned long)vmbus_connection.monitor_pages[0], 1))
+> +			hv_free_hyperv_page(vmbus_connection.monitor_pages[0]);
+> +		vmbus_connection.monitor_pages[0] = NULL;
+> +	}
+>  
+> -	hv_free_hyperv_page(vmbus_connection.monitor_pages[0]);
+> -	hv_free_hyperv_page(vmbus_connection.monitor_pages[1]);
+> -	vmbus_connection.monitor_pages[0] = NULL;
+> -	vmbus_connection.monitor_pages[1] = NULL;
+> +	if (vmbus_connection.monitor_pages[1]) {
+> +		if (!set_memory_encrypted(
+> +			(unsigned long)vmbus_connection.monitor_pages[1], 1))
+> +			hv_free_hyperv_page(vmbus_connection.monitor_pages[1]);
+> +		vmbus_connection.monitor_pages[1] = NULL;
+> +	}
+>  }
+>  
+>  /*
+
+-- 
+Sathyanarayanan Kuppuswamy
+Linux Kernel Developer
+
 
