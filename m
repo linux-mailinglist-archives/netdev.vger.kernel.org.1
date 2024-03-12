@@ -1,134 +1,140 @@
-Return-Path: <netdev+bounces-79416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 359558791C7
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 11:18:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 51C1F879204
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 11:29:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 671A81C22253
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 10:18:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50F211C2234D
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 10:29:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB94578663;
-	Tue, 12 Mar 2024 10:18:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82A5D7867A;
+	Tue, 12 Mar 2024 10:29:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Stw4074s"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="C8t6XGs3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f41.google.com (mail-vs1-f41.google.com [209.85.217.41])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 247427828D;
-	Tue, 12 Mar 2024 10:18:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1D0AD53
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 10:29:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710238711; cv=none; b=hjBGk381Xbt2g+PNQhGdvQgGlslNftGVdAHxvOxwfPSzZaUyCMM43Msuu35B7yKneExYKw7oTPARH+m7gZVFvVSj9ZwPdQUajt7jIOeyF1VgJQ90GvZl9Upa69l9lAZ/fNdyBJk3h+y1cFGKXRlcgrECFnvWY1mAWC7dBKvV/rg=
+	t=1710239345; cv=none; b=qbkMfNSeNNcqwgrHxaWbgfhsUcggvYkH3xk0iyXtGw53pqRrOZ26jegJWCZ18cqphYBuTZ3qeg/kVpT4wi6/JdzFzL/dw0PqEa8f+fGCKhVB2ZE7VavAZ7FtYukKgGeyezWeal3iE++gj+BsHpdl2Q4gU4gHE9d+K3fponAmPfI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710238711; c=relaxed/simple;
-	bh=+vzRwUzxMTDEpVxojsrJfPSG+44198EEiXVjMk0b4lc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DQGmC0oxI+PAleX1PCRVI2ie3fxDKOvRfDvhrVWNnKFiQBTaBVnW12S5TKgotmq/x5LBQKVosor/Z21L2YtB2qq9QWxf98SZy6B+/uty3dkKoTfrotyZfvfvt/dmmGqZcZyfSLahdgghBya2l1WMM503/V+5c53zEPkfI2HIEU4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Stw4074s; arc=none smtp.client-ip=209.85.217.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f41.google.com with SMTP id ada2fe7eead31-4727e38ec10so761046137.1;
-        Tue, 12 Mar 2024 03:18:29 -0700 (PDT)
+	s=arc-20240116; t=1710239345; c=relaxed/simple;
+	bh=JLDcBgW+3vtGMYoTcRPuT4brcDBaHRWE2L0AAL86eQA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iqq1wkXiAdEk/lbL7KU2L2iNflOk6Tc1elEPzrWXXxKNwWouM7iMVkNJ15qaPAxTmznP9WDotnjKfQGCacjRVHIbi7wI6kACIPQPGJtx1IK+TcCIPLtvefntaM+sJ5L/HQSpNix4rR4vS40nK2DLa9tWS30factkgJUVxIrG/U4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=C8t6XGs3; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4132f37e0acso8093685e9.2
+        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 03:29:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710238709; x=1710843509; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=v/TtoKF7cuacbpGcpjgtdgMi1EiHHySKw9WaAnGkjzM=;
-        b=Stw4074sgdE9AP5hnID13kQYwLbicDbVjcuO+DX27zkZK7NYleyxY0qGGw4iuX9YME
-         iy/CFVldq/CjXJdig/1JvYM28G6aegjk+/CulBb8soIcdpfwDIh4PrXnk/lhM3cQWfTp
-         7U0GTSmUVqYEXcnU+P93RY77RzWbizDy5EQ/2QGccZgd1Q3FexYMRhJUN+zLrzkhceCK
-         Mh8HdxOFOCicRDIlOy+XVQ3wY0nX0PkJprvEHXukGseDP0Qv/v87zzTCHiYlrzfSw7U5
-         m2EBv1ldgh/cC3GNxKyagknxMQaU6ZvojF9M65cUARk7QNbJBd9dA3K4cwwOLKvaaQqR
-         crAA==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1710239342; x=1710844142; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5d4B/pAoZQB5tS1BWWn28qe/xI29Jo7qr/wZ2JnyTFg=;
+        b=C8t6XGs3CoziosSQAiUwj0PiG6auvS5pl2sHBvguqIx7BvfhSiXEkr5iGwblD1+IHd
+         sueCvPQFHklTGp7t+V6MbMQrv/XMaBhmXa0+lpZrr8Yri/yyrhgWN+B2lIuc5PxYoKnI
+         QktorKAQXEAclLo4ITnG0tIvbwzsQeisSF02kPnKGbLphmWTtbhDQZh/EeWbfRzs7Wlv
+         eJaS3pyXWeOIb++WEp9JS0MECQfIYSQggHZ50kgG9KtA5PTMQ9Xuiybam2jZ6QLyvH4n
+         9us7luNsZ58t0s057CHyIM+dOHbR7kov5mjNT9j7zSasF8SvtUAEsa/FVw0mgOiKezKC
+         Ut8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710238709; x=1710843509;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=v/TtoKF7cuacbpGcpjgtdgMi1EiHHySKw9WaAnGkjzM=;
-        b=RKG5KSCtj1ac37F7M1Gtwjxu8T50MwvjqKqxGg9kLrFHRCzRHn0t/MRHjxKO76LNi4
-         ZUMFmpvV8WaBCQ5MGHjsgU3PyjMEglvxnkDAZfHRPyGk+a4ElD4gIcT1oLgis4Paan76
-         YopXkIu+d9by3rsmd8c4EQcFhEK+9NQNr8JLgdLTCM7RIUnjnDBIcZZ6Gz0CrZus8OZ3
-         JNjjXqKaRbK/ASfxl3OuwZNI23v043HsumxR0ZUplOyF6Do7Np264zJLw6Sh+AVlLzo9
-         Rk/JBcXEioLSyvv6J5sP3x3mhMgIjfMyVPKzpjwZ90yim46i9+r2jy7aXle7tuWhtmn0
-         xFdQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXul2iPYk6U122Pjhmk8TFoztW39gOd0tDQzh1hYP2AbhYisMRhLOSk+DWhP01y4yoeeV8IkgD2pV8T09+fLvOP/NfYHaY4kn95RVzvXOq2WSdE3aQFfjEX94/yO6gGFiNwAuib
-X-Gm-Message-State: AOJu0YynZ23wCo1syx4X88e1pKdLRDtaJpcOmCgWyAqdFUFfpbKzv4do
-	4/PfBz8dswBL81YA7vLK09pCpC9HEQmggv4ySMISewPAa9p2b+Dgx9QCJCZ1w0GV/vnTVfpZz7I
-	WAbuo1VAUkAM/rY77yK3T/tKtGsU=
-X-Google-Smtp-Source: AGHT+IHg34ksh5Vb8nFOPwXj8ahKVbhIjUruuiOlKBdvSNe99Anup77tCH67cK21OhJVVEyLM9Hc3BDc70tkwVkn0OQ=
-X-Received: by 2002:a67:f041:0:b0:472:64f5:f0a5 with SMTP id
- q1-20020a67f041000000b0047264f5f0a5mr5959821vsm.18.1710238708956; Tue, 12 Mar
- 2024 03:18:28 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710239342; x=1710844142;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5d4B/pAoZQB5tS1BWWn28qe/xI29Jo7qr/wZ2JnyTFg=;
+        b=Jq1JFF0rzQgADjoHRP4saRYH5/AhS+UfmIGu+h1pz7prqexSXQCcaxb3+lCZ55I7JI
+         3kUmk7GAjIsLXZPHBzgi14yzG4w7m+W5Vkum1p2tIBiWfzrqffIR+i/QSb1zj2j4bctf
+         yKK1VGpXyfaMLKjN39x82Y6wkeFczWAemSeQt+nLLs9jW92RbfqQOKP3ORtbcX9FzJgJ
+         6ga07w54EJk33ChlCcHQa0mt1kHb1W9F9hdutxQeM12K2cNCPdBjZL+UWFznkdU+CbEy
+         VpPxoapIeh7byZnOA+o/pZzqbJzOG786LFMus9gDDkrrU9ithhGHeYELyykdYQ5gLkbt
+         bb/g==
+X-Forwarded-Encrypted: i=1; AJvYcCWURJfStt9pBADTUMH3Zu4waBH8N7DpBxzJ7iIww74jji++u7sH1bW3OkyFKS47H0mvKrGovOpS8X7IJ5OJJykVQZL/pPLp
+X-Gm-Message-State: AOJu0Yxd5fMOhXIKXe6CgjQvJ/x/nPwHddlkTnsReexKsCco0eLwPKYr
+	Q5O0dbqf92XfIkd3l2UYKi20+d0+wuKqh+FvBKmusiyH4koGp78gOuqDuHABTpE=
+X-Google-Smtp-Source: AGHT+IEtUTnilAGbJcn+GRXMX4RNIS078U7C8s6e6rzHKdm5WSpVA53oIuu5hDIUApB8xtk4QdMhSg==
+X-Received: by 2002:a05:600c:5101:b0:413:2966:4bfb with SMTP id o1-20020a05600c510100b0041329664bfbmr4277240wms.1.1710239341697;
+        Tue, 12 Mar 2024 03:29:01 -0700 (PDT)
+Received: from [10.3.5.130] (laubervilliers-657-1-248-155.w90-24.abo.wanadoo.fr. [90.24.137.155])
+        by smtp.gmail.com with ESMTPSA id z11-20020a05600c0a0b00b00412f428aedasm18656971wmp.46.2024.03.12.03.29.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Mar 2024 03:29:01 -0700 (PDT)
+Message-ID: <88856abb-f5f8-4dbf-9b26-30915bfaee7a@baylibre.com>
+Date: Tue, 12 Mar 2024 11:28:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240312094259.770554-1-e.velu@criteo.com> <fd37860e-306f-42bf-9a1d-e4d98ddf338c@molgen.mpg.de>
-In-Reply-To: <fd37860e-306f-42bf-9a1d-e4d98ddf338c@molgen.mpg.de>
-From: Erwan Velu <erwanaliasr1@gmail.com>
-Date: Tue, 12 Mar 2024 11:18:17 +0100
-Message-ID: <CAL2JzuzjRTHzKPVU9+zfFeEgfDQPeRDUuaUjsqgDfgQ865en8Q@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] [PATCH v3] i40e: Prevent setting MTU if greater
- than MFS
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: Erwan Velu <e.velu@criteo.com>, linux-kernel@vger.kernel.org, 
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
-	Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] net: ethernet: ti: am65-cpsw: Add minimal XDP
+ support
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org
+References: <20240223-am65-cpsw-xdp-basic-v2-0-01c6caacabb6@baylibre.com>
+ <20240223-am65-cpsw-xdp-basic-v2-2-01c6caacabb6@baylibre.com>
+ <356f4dd4-eb0e-49fa-a9eb-4dffbe5c7e7c@lunn.ch>
+ <3a5f3950-e47f-409a-b881-0c8545778b91@baylibre.com>
+ <be16d069-062e-489d-b8e9-19ef3ef90029@lunn.ch>
+ <f0a9524a-08cd-4ec2-89f8-4dff9dd3e09e@baylibre.com>
+ <ff4ba8c9-8a34-41c3-92ed-910e46e1ca99@lunn.ch>
+From: Julien Panis <jpanis@baylibre.com>
+In-Reply-To: <ff4ba8c9-8a34-41c3-92ed-910e46e1ca99@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-> Am 12.03.24 um 10:42 schrieb Erwan Velu:
-> > Commit 6871a7de705b6f6a4046f0d19da9bcd689c3bc8e from iPXE project is
-> > setting the MFS to 0x600 = 1536.
+On 3/5/24 17:43, Andrew Lunn wrote:
+>> 3) From 2), am65_cpsw_alloc_skb() function removed and replaced by
+>> netdev_alloc_skb_ip_align(), as used by the driver before -> res = 506
+>> Conclusion: Here is where the loss comes from.
+>> IOW, My am65_cpsw_alloc_skb() function is not good.
+>>
+>> Initially, I mainly created this 'custom' am65_cpsw_alloc_skb() function
+>> because I thought that none of XDP memory models could be used along
+>> with netdev_alloc_skb_ip_align() function. Was I wrong ?
+>> By creating this custom am65_cpsw_alloc_skb(), I also wanted to handle
+>> the way headroom is reserved differently.
+> What is special about your device? Why would
+> netdev_alloc_skb_ip_align() not work?
 >
-> Please add a link, as most people do not have the iPXE archive checked
-> out. Maybe also add the commit message summary.
-I will, thanks.
+> 	Andrew
 
-> > At boot time the i40e driver complains about it with
-> > the following message but continues.
-> >
-> >       MFS for port 1 has been set below the default: 600
-> Hmm, but 1536 > 600. So the log message is incorrect?
+Nothing special about my device, I just misunderstood.
 
-As mentioned earlier in the commit message, the 600 is 0x600 = 1536.
-I can offer a patch to report it in decimal or add an explicit 0x prefix.
+Regarding page pool, I now have better performance.
+Two things were missing:
+- I did not call skb_mark_for_recycle(), so pages were freed instead of
+being recycled !
+- In page_pool_params, that's better when I specify the "napi" parameter.
 
-> > If the MTU size is increased, the driver accept it but large packets will not
-> accept*s*
-Fixed.
+Performance improvement is not that impressive, but it's better:
+505 Mbits/sec (with page pool) instead of 495 Mbits/sec (without).
+There is a ~ 5 Mbits/sec loss due to additional processing in the path, for XDP stuffs.
+So, the difference in favor of page pool using is ~ 15 Mbits/sec.
 
+I'll send a v4 soon.
 
-[...]
-> > At least, this commit prevents setting up an MTU greater than the current MFS.
-> > It will avoid being in the position of having an MTU set to 9000 on the
-> > netdev with a firmware refusing packets larger than 1536.
-> Maybe add the new log message.
-Done.
+Julien
 
-> One last formal nit: Please use a line length limit of 75 characters per
-> line.
-Done.
-
-> > +     mfs = pf->hw.phy.link_info.max_frame_size;
-> > +     max_mtu = mfs - I40E_PACKET_HDR_PAD;
-> > +     if (new_mtu > max_mtu) {
-> > +             netdev_err(netdev, "Error changing mtu to %d, Max is %d. MFS is too small.\n",
-> > +                        new_mtu, max_mtu);
->
-> The other log messages capitalize MTU.
-Yeah but the exact previous one was in the same case. Shall I bump all
-of them to upper or lower cast ?
-
-
-> The rest looks reasonable.
-Thx for the review.
 
