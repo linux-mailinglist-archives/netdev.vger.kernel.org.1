@@ -1,69 +1,122 @@
-Return-Path: <netdev+bounces-79514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C823E879A84
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 18:18:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4766C879A8F
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 18:23:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83CD42831C2
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 17:18:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04D8D1F2288D
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 17:23:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB3A137C5A;
-	Tue, 12 Mar 2024 17:18:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 375B413848C;
+	Tue, 12 Mar 2024 17:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WZAZzHsC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T8g0aGq2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A6067D409
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 17:18:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE50979B88;
+	Tue, 12 Mar 2024 17:23:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710263925; cv=none; b=f393F8pB9EonZOaqBfJ5P2FRf4ulIpn38KXNl2L1fVJgDF30F/TCtaM7u7Bb2sXKJqCHBwjtKpFFmJQ6FQCGMV3WgObtbSY8uvmtEUfUPykRzlixZkblFqKBVibY6FM3Y2HaLVLqD+g1ynUFw5wPN0JgR+zG4cHNJGMaLSt/+O0=
+	t=1710264191; cv=none; b=Qxoyv9fAS4lkmsSzaIKJN9oxf45FFKjwig7NNFeZcJkvawFVS4ia1LWAFNaMQCd+4wq8IJZ4cirTRXAaYWqcHnP2bXRKGit4ag8YtAFRioOlox9lDiqhXwxFYqBAVNRWD+8bQkrdL9Na9PhdPUOsLtYrGLf9tBD5uWzYR1ZlYXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710263925; c=relaxed/simple;
-	bh=59e8XOEgURT+yN7LujIPZkyV0bQVVLC9oroDL0VptYw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=khKmieqXnrF5yYjQ1rRu3TLAztSuRv9wi1jVezS6fSkVe4A3DJBWFamxNJ3LyEfEjWY2T05kfBXavesib9zu47vXiDuHZtYoquIbrJWO1qVB3eZxWfVRJqwQ1GEGtb/gIcI0Hf6EUP5U9kCD2vDtrgxwVjslGoRxHAg0c96gxv8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WZAZzHsC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9D46C433C7;
-	Tue, 12 Mar 2024 17:18:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710263925;
-	bh=59e8XOEgURT+yN7LujIPZkyV0bQVVLC9oroDL0VptYw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WZAZzHsCIN74ueL6m1CPKNvYg6gjCwbbl80ynzo3ukMldl5huv7JdLZxkW7lscF1u
-	 6vQx3XuHi77toElkKw0V6RbpyaiTbdMaomOlOUAcz/Atairy33pd8TPEe4vVzSGDUC
-	 xRaI9B5GuSjMJSRg/xMj+C1RY4JLRnOZEa+SxvqwsU3CpkkG/OX/4FQjMPxCF1dztv
-	 aeUZguTupoyZNH9exnEIByTcIdrvue8Qw7YNz0nRm1D1kBmXtJ3L4B3DpMUVvVRt6i
-	 70Kz4ot/uMmjzug5XR/gah6Pf1Rq4QDSPifA0CrK4cyyaBPzCkkv40Povy1qSUVqCn
-	 lAKrZagzF/zag==
-Date: Tue, 12 Mar 2024 10:18:43 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: William Tu <witu@nvidia.com>
-Cc: <netdev@vger.kernel.org>, <jiri@nvidia.com>, <bodong@nvidia.com>
-Subject: Re: [PATCH v2 net-next] Documentation: Add documentation for
- eswitch attribute
-Message-ID: <20240312101843.36ad2e95@kernel.org>
-In-Reply-To: <20240312142055.70610-1-witu@nvidia.com>
-References: <20240312142055.70610-1-witu@nvidia.com>
+	s=arc-20240116; t=1710264191; c=relaxed/simple;
+	bh=0a7EMDpWvPfg2ojGzSsT+iLINndhAewsaVLKf59PvLk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lAVMW9t7jRjceLQjBuPIMnH/x1vxzW8TIAc+eIUEZPq1ginu9jOGRCKdUgwiO0jdZmT1GW1wzZzfM6i6HC2qvNF57NLvArS9meOlDOIpzy7OBG3reoO0demCucAuPQiO1hVycJKx6lVCOwAfDREZx46eiDiY1HbPmEGAW4Y6g84=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T8g0aGq2; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1dd6412da28so1134655ad.3;
+        Tue, 12 Mar 2024 10:23:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710264189; x=1710868989; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DHdbgeohDa82fmXgO4FmYAwJRfJ2HfOOlJtiNr0xqjA=;
+        b=T8g0aGq2Pqgx6xAMcxjR74ZlmLLDyUi+eIhNwBF089hqugy4oDiLsdnIelAtY8fzpy
+         ROl+pG2pByyq8rtlOcDUTK9Gem+E8dDi+iEpwQ6NVnxOrbpL7wng0WnnbS1yGIS6n5dW
+         j/6CpmmeuWwdoU9ubmwbCzHCAxiFfcjYqSzTy0RT9aFKMHO4iEQ7dlt0c2Y2FXNJSKK0
+         e8XfPdwFqCeuXo6HLNQdCB2X9l4KCzNMneUypDR/E3T2rqDqRMVIlrU4UlJ6fixyCKdm
+         OuCa7uejxAo54wPHTI7pZZvmBdTKlRAKEGsnjT53Nxir3sAQMba9NEWORmtil9+YDsIC
+         3xhQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710264189; x=1710868989;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DHdbgeohDa82fmXgO4FmYAwJRfJ2HfOOlJtiNr0xqjA=;
+        b=VbvwdoAr5NLvy/hPeU6Te7RJS20f9jkcVTS157BU6CwasMdMBMm/vhs01Cz08CJsrH
+         0Z/t8r4ChPAMTb7BZ3P3Gl/qHTEYJU05jn7dfytNx2CQYH+MJiV1kWnk9a4UDv6s8IH4
+         bmqmo5vN38pLtWoi2p5t6kLlAuL1/oLOHxazgnr8bEpPyzTdL7eJ2A+NtgcQ5zj/w9XT
+         cUkTdKbsVuHoq/dVkf5uLdCS49rrK9lsNt5LVZOc21fLbu0t+ZG7pIhdxGANAbMhuJZb
+         EPGys2I7oQBdkaeCCBwekOvBK2f1XgnkNPi/YdSx1W8sc3wItD+im5toalg40WwNvJ7P
+         D5cQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVZ3+NrYk6ptWWpFR8iJswJueuxky0ScaR3QHPYzdHdxu3h7GiQjtEetPQgm4cWHfIiCx7pUfnCR9SRPBCPdBh5luBDFYu6QOMvs+AY+7c7KCCfKxPGj8i1Svmc3sHz7qogDkGw
+X-Gm-Message-State: AOJu0YxIk/KBy2Tdtb/VH+xaKpn8mr8Y1S0Pc0Y7Vi3lWSqGmcYv4pq4
+	5nz1TGioaETOTTEtWQcm+NpBzqEZt/nZyJtIS1L/cx159KDZrfkdQhx7u0cKcno=
+X-Google-Smtp-Source: AGHT+IGQC2hKW9T2l+vgfWqWBPmPBvQMJRsIcHScSePfrxDNLvIOS0iJEaCRQojYX7hAd6WxAdjGqA==
+X-Received: by 2002:a17:902:c405:b0:1db:933b:4566 with SMTP id k5-20020a170902c40500b001db933b4566mr4769380plk.38.1710264189065;
+        Tue, 12 Mar 2024 10:23:09 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id f14-20020a170902ce8e00b001dd38bce653sm6996236plg.99.2024.03.12.10.23.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Mar 2024 10:23:08 -0700 (PDT)
+Message-ID: <df295be9-d33e-45d2-914f-c9c1554e5ac0@gmail.com>
+Date: Tue, 12 Mar 2024 10:23:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: phy: mdio-bcm-unimac: Cast denominator to
+ unsigned long to avoid overflow
+Content-Language: en-US
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Daniil Dulov <d.dulov@aladdin.ru>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Doug Berger <opendmb@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org
+References: <20240312165358.7712-1-d.dulov@aladdin.ru>
+ <ZfCOb4x/+41y+SW3@shell.armlinux.org.uk>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <ZfCOb4x/+41y+SW3@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On Tue, 12 Mar 2024 16:20:55 +0200 William Tu wrote:
-> Provide devlink documentation for three eswitch attributes:
-> mode, inline-mode, and encap-mode.
+On 3/12/24 10:18, Russell King (Oracle) wrote:
+> On Tue, Mar 12, 2024 at 07:53:58PM +0300, Daniil Dulov wrote:
+>> The expression priv->clk_freq * 2 can lead to overflow that will cause
+>> a division by zero. So, let's cast it to unsigned long to avoid it.
 > 
-> Signed-off-by: William Tu <witu@nvidia.com>
+> How does casting this help? "unsigned long" can still be 32-bit.
+> Maybe unimac_mdio_probe() should be validating the value it read from
+> DT won't overflow? I suspect that a value of 2.1GHz is way too large
+> for this property in any case.
+> 
+> https://en.wikipedia.org/wiki/Management_Data_Input/Output#Electrical_specification
+> 
+> (note, this driver is clause-22 only.)
+> 
 
-Reviewed-by: Jakub Kicinski <kuba@kernel.org>
+Had commented on the previous version (not sure why this was not 
+prefixed with v2) that the maximum clock frequency for this clock is 
+250MHz, the driver could check that to prevent for an overflow, most 
+certainly.
+-- 
+Florian
+
 
