@@ -1,148 +1,130 @@
-Return-Path: <netdev+bounces-79429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45E048792DD
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 12:21:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDA3B8792E1
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 12:22:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9A0AB23E91
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 11:20:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7286EB20E14
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 11:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E6F879B69;
-	Tue, 12 Mar 2024 11:20:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF91E79B6F;
+	Tue, 12 Mar 2024 11:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="wj0BoyDH"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="e2rYS5fY"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3415A79B73
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 11:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17A520304;
+	Tue, 12 Mar 2024 11:22:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710242456; cv=none; b=V52RvDwtGVD7MJ6NYyxdhgf1Suc18nF8t8eoz/2ScOi2vmbNxsd98I88rbdiBkwkAXRs0D07UZtg9CDXUtEsPWfumeKQHb6RilwZ1H45deNj6E1Z0I5wfUyrx7MdDhHIvY1+ANe6VA2SESJxEVLJ/NhJCWkOU44fRhzGSd5PbIE=
+	t=1710242525; cv=none; b=JQNzKE6GFdG/iwTjNLpzBpzxFwLlzKlt0Dsoy9lb5qSQlppbrS1cRokztVZ4wo8fn53AauHM5hA4POakBfOX1vcty5NggaDXtcldT4+pFcUNLOW/B2Wpvk57sgr7kPvqYiyLRVPciDsKf5Ys0fb2GOHLptkMsSzbDFjmXDZjY2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710242456; c=relaxed/simple;
-	bh=OTca8ekV6r4/5e5k7YjJinx+VHTLXxT3NAZ6B9Zk9ho=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sRP2BDPx+GKcLh+AI6G3HNiti4le/4qgmc/tDqttEB74IW2eNA6yXzVAyJvONXI2rPRfPIKn/1y8oS8w3GgP11okr/UUs62gWqlkqoIu7FkMA4ge1xeUZZSIlD/qaWgNRb/uqynEpBOM8s3f2/iiPGlfyVx/fxywfM3xH18NLMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=wj0BoyDH; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 3FA6C20758;
-	Tue, 12 Mar 2024 12:20:51 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id d9setOEyrNTT; Tue, 12 Mar 2024 12:20:50 +0100 (CET)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 57632205DD;
-	Tue, 12 Mar 2024 12:20:50 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 57632205DD
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1710242450;
-	bh=x6EE4LXXtCscXe7/3w+bGHO/aq9fItFtiLgNcOe1YcA=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=wj0BoyDHHfyklZrSxkiXZxibYAx4XSaOlR4uSGOXkNBwCTRZjjs9QB911IsO9bY/m
-	 +EPUGUx6Bdl4GWvR98+bs9HmFbrxz4cMMoIJ3jiYHtp1FOTSRB0L+0HfWB41w67QNO
-	 jja8Na0r/w7bVBoS67wsQGNivDictVE+VKZ+YLdLOC6cQNYJQAFl07N9qvAd02fuzT
-	 OZKzpWf7eKzlLpUksH0kHuJZc8rFp5OhMlHR2AhvdI/sUyNEs/8X6fe7sVunC3u5ys
-	 GO2muX9tyWOUX7KKEGPDu4Cv9ErGVLCHfHpG2HoqajMdy3tfLCMGi9e8RZwuy7aFdQ
-	 wVCBKmF1EDJ6w==
-Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout2.secunet.com (Postfix) with ESMTP id 48AEB80004A;
-	Tue, 12 Mar 2024 12:20:50 +0100 (CET)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 12 Mar 2024 12:20:50 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 12 Mar
- 2024 12:20:49 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 6A0CE3182A2D; Tue, 12 Mar 2024 12:20:49 +0100 (CET)
-Date: Tue, 12 Mar 2024 12:20:49 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Paolo Abeni <pabeni@redhat.com>, David Miller <davem@davemloft.net>,
-	"Jakub Kicinski" <kuba@kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>,
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH 2/5] xfrm: Pass UDP encapsulation in TX packet offload
-Message-ID: <ZfA6kauSNCbPLIuM@gauss3.secunet.de>
-References: <20240306100438.3953516-1-steffen.klassert@secunet.com>
- <20240306100438.3953516-3-steffen.klassert@secunet.com>
- <a650221ae500f0c7cf496c61c96c1b103dcb6f67.camel@redhat.com>
- <Ze/0Fi5oqkcqwbIX@gauss3.secunet.de>
- <20240312111528.GT12921@unreal>
+	s=arc-20240116; t=1710242525; c=relaxed/simple;
+	bh=Z0TSylZlSlnWy9qRsvC4bqqwk7tdSqUZP0+E5DtexE4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jPDmKw/LNP9u5fFFTvW7FMuRRtwfQ/u+AVcDik8nAT3MJgV68JAPZHuS2Cpm50X0YVuHJ/FIEAiUU6Eib8PFL7BGQl3662wKBy4lF6czmStS3XD2WgQlTQaMfOLUWyCq/jdMi8EsABCdiT0gxKlLxd/VW/TeNVFSmYqlbDNh+yQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=e2rYS5fY; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BAF94C0002;
+	Tue, 12 Mar 2024 11:21:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1710242515;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hOdo/1mCWJYcxEKaBRYTzgE0ZAGk9OmOvt81SZQggfg=;
+	b=e2rYS5fYWK1UsqRzdoJvxmWsFEW5R/stulHvr/IRvZMqd8xQ1kXaphv1yGlWUkqMm3sbqt
+	mDkD+/xCZ19gLSuDFIe4REOLdWMIz6ysjUjOmU5WRdq/breAHOft0O4/yNbdSn4RLibxWz
+	l/2UKwNDAgfDaA6Z5EBVyFBs4DgShMIDfuK/HmsYa55/INONdz7yFYMNKlJ2HNNToR1IjL
+	hHHyIOQkbMtZjGELXf/D67xTTQjHdEKBllaTjK4ayndNwL+3zawidrcmV+PATJoWbsJJSI
+	ZS5Y5uum0JmJi9ELMRMlDZD6g+0DIclL2Bvw4PqpNsT5vPu5WkhZZR92L/sTPg==
+Message-ID: <941e7c70-a90f-4e6b-a2b7-867fc798d693@arinc9.com>
+Date: Tue, 12 Mar 2024 14:21:37 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240312111528.GT12921@unreal>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: dsa: mt7530: disable LEDs before reset
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, patchwork-bot+netdevbpf@kernel.org,
+ Justin Swartz <justin.swartz@risingedge.co.za>
+Cc: daniel@makrotopia.org, dqfext@gmail.com, sean.wang@mediatek.com,
+ andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20240305043952.21590-1-justin.swartz@risingedge.co.za>
+ <171019143163.14853.15330891015381229970.git-patchwork-notify@kernel.org>
+ <7780460c-abc3-4009-9f95-28d123a9a23d@arinc9.com>
+ <4fb0b96fe4049578718befc41f2121ce18c30fbe.camel@redhat.com>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <4fb0b96fe4049578718befc41f2121ce18c30fbe.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: yes
+X-Spam-Level: **************************
+X-GND-Spam-Score: 400
+X-GND-Status: SPAM
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On Tue, Mar 12, 2024 at 01:15:28PM +0200, Leon Romanovsky wrote:
-> On Tue, Mar 12, 2024 at 07:20:06AM +0100, Steffen Klassert wrote:
-> > On Mon, Mar 11, 2024 at 05:25:03PM +0100, Paolo Abeni wrote:
-> > > Hi,
-> > > 
-> > > On Wed, 2024-03-06 at 11:04 +0100, Steffen Klassert wrote:
-> > > > From: Leon Romanovsky <leonro@nvidia.com>
-> > > > 
-> > > > In addition to citied commit in Fixes line, allow UDP encapsulation in
-> > > > TX path too.
-> > > > 
-> > > > Fixes: 89edf40220be ("xfrm: Support UDP encapsulation in packet offload mode")
-> > > > CC: Steffen Klassert <steffen.klassert@secunet.com>
-> > > > Reported-by: Mike Yu <yumike@google.com>
-> > > > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > > > Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-> > > > Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
-> > > 
-> > > This is causing self-test failures:
-> > > 
-> > > https://netdev.bots.linux.dev/flakes.html?tn-needle=pmtu-sh
-> > > 
-> > > reverting this change locally resolves the issue.
-> > > 
-> > > @Leon, @Steffen: could you please have a look?
-> > 
-> > Looks like the check for x->encap was removed unconditionally.
-> > I should just be removed when XFRM_DEV_OFFLOAD_PACKET is set,
-> > otherwise we might create a GSO packet with UPD encapsulation.
-> > 
-> > Leon?
+On 12.03.2024 13:46, Paolo Abeni wrote:
+> On Tue, 2024-03-12 at 11:38 +0300, Arınç ÜNAL wrote:
+>> I am once again calling for this patch to be reverted on the net-next tree
+>> on the basis of:
+>>
+>> - This patch did not go through a proper reviewing process. There are
+>>     proposed changes on the code it changes regarding the scope and the
+>>     method of the patch, and improvements to be made on the patch log.
+>>
+>> - This patch should be backported to stable releases, therefore it
+>>     shouldn't be on the net-next tree and should be submitted to the net tree
+>>     instead.
 > 
-> Right, I missed IPsec SW path, that x->encap check can be removed
-> in packet offload because HW supports it and in crypto offload, because
-> there is a check in xfrm_dev_state_add() to prevent it.
+> The net-next pull request is out:
 > 
-> What about this fix?
+> https://lore.kernel.org/netdev/20240312042504.1835743-1-kuba@kernel.org/
 > 
-> diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-> index 653e51ae3964..6e3e5a09cfeb 100644
-> --- a/net/xfrm/xfrm_device.c
-> +++ b/net/xfrm/xfrm_device.c
-> @@ -407,7 +407,7 @@ bool xfrm_dev_offload_ok(struct sk_buff *skb, struct xfrm_state *x)
->         struct xfrm_dst *xdst = (struct xfrm_dst *)dst;
->         struct net_device *dev = x->xso.dev;
-> 
-> -       if (!x->type_offload)
-> +       if (!x->type_offload || x->xso.type == XFRM_DEV_OFFLOAD_UNSPECIFIED)
->                 return false;
+> at this point I believe we can't retract it unless there is a very
+> serious regression affecting most/all users. This does not look such
+> case.
 
-Then we can't generate GSO packets for the SW path anymore. We just need
-to reject UDP enacpsulation in SW here.
+It seems so. This patch was not tested on standalone MT7530 at submission.
+Whilst the patch is useless for standalone MT7530, it doesn't seem to break
+anything either, from my simple test on a board with it.
+
+> 
+> I think the better option is follow-up on net with follow-up fixes if
+> any.
+> 
+> All the relevant patches could be sent to the stable tree later:
+> 
+> https://elixir.bootlin.com/linux/latest/source/Documentation/process/stable-kernel-rules.rst#L47
+> 
+> To try to reduce the possibilities of this kind of situation in the
+> future, may I kindly ask you to invest some more little time to help
+> the reviewers and the maintainers? e.g. trimming the replies explicitly
+> cutting all the unneeded parts in the quoted code/text would make the
+> whole conversation much easier to follow (at least to me). The netdev
+> volume is insane, it's very easy to get lost in a given thread and miss
+> relevant part of it.
+
+I already try to do this. Here's my proposal that would not reduce but
+completely avoid this kind of situation in the future, and at the same time
+reduce the workload of the netdev maintainers. Do not apply patches without
+ACKs. Ask for reviews at least once if the patch had been stale for a
+while, and wait a bit for reviews. Only then apply the patch with/without
+ACKs.
+
+Arınç
 
