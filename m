@@ -1,108 +1,97 @@
-Return-Path: <netdev+bounces-79561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3E57879E25
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:05:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96E18879E28
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:05:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 010431C208CA
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 22:05:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 271C3B21E4B
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 22:05:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC42A143732;
-	Tue, 12 Mar 2024 22:05:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B5D143C43;
+	Tue, 12 Mar 2024 22:05:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="ITB2grNF"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gxGzxolD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f41.google.com (mail-oo1-f41.google.com [209.85.161.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86B2816FF3B
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 22:05:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1EC3143732;
+	Tue, 12 Mar 2024 22:05:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710281103; cv=none; b=cMT2mOJH3biHIK5UsWoJjQTd46cimZRiGpMpJvgZEYPy1DxwJm4qLt8+aNDLBHPLeVXoduNhMta94cP2kLaDpuf0r9StMCdp39AO8RKQs1rae9GL4ZlTI28kJ2Opb8815ZtYX97NqOLwVIj2MkYNlry6O7cJUdjOAEYuqTYCsAw=
+	t=1710281112; cv=none; b=PxJjLjAo4ExXaPVqjFiGMapp912CSXmrjoM+rTz8+HruJMzG5jI9HRZBYne/Sq5GbPbxySqZY6mgMZEO6XkQdVrNLGoh+3QfrdiXcOesCx+M2fo0sD0CumJLaFO3MqMtotb6Mj3xYEhRUQEh2rbJV8x9QIywLF4oxBn1VJ58KtM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710281103; c=relaxed/simple;
-	bh=/PoB0RRVuC6fI46h4yzJnWSx0Jrl1UtqVAvu8WCoLKA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PL2dryNotWw9q/BbcRKyVlJdyugb0mP5gaQ8607GZUAj55uUNcAI8IFtTq+1SH1+nuh6Ia5j69gK1W5CMWxkcx50won4Plzsa1robifDtbUAdewwtzE5O2vPmqNxl3cCgsQMyA3803dVLmsmmu/dT/VzLf+aMebsCUzPIJusCk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=ITB2grNF; arc=none smtp.client-ip=209.85.161.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-oo1-f41.google.com with SMTP id 006d021491bc7-5a19de33898so277251eaf.0
-        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 15:05:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1710281101; x=1710885901; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wuc2v1ew0Tr1mD+CMcQ2s2sj7iFWQgYVx8fv+jAZi7g=;
-        b=ITB2grNFdeXQSAO4YApvttgHr1jqCrEWk5p1D+W4E+LpcKlB9gnQoKYSpB++9IDR6z
-         xPVejBwaVQJdeXQPc4mchthmK1ypi7fW8a/cK3JBKjUNtc9brxBe9PrlSa/PG9Fd5qfU
-         C9yNDC347ChxAX2zrcLTxsw3ca77ZfHGl1TSw09UPagmkqBtD9wJV68A7hi6k36lrZB3
-         hv2Jf99AoFDaSjFYyUWrLqsXaCcJQb4RrPelrzNABhH509kEyGy1uSwVUjxv5SXVA9iJ
-         hDuaHJjxFG9lkBo+zJGAiP8pMm9DsgK+Oo2MNvFtOyedzeq/+ZkFZ8jXhRUIwGTWCg6l
-         Q/Aw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710281101; x=1710885901;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wuc2v1ew0Tr1mD+CMcQ2s2sj7iFWQgYVx8fv+jAZi7g=;
-        b=dkwGoZjv1DEx0SHIiGAlMHrtQ/uWdNkzIYIcysfo4+caJ8hg1xSF+Kq9gl58EZatY7
-         48A0XZ3bduq5/qN0rmzmipaAvqQiE2XlfR/VU3SIxZbOW273DVs+1EdZIu8wUMShXU4I
-         eGJgQ8uRm+m5gM+MtOpf8e//flWkd4VTef5yy5IVTbGh/l6uM/Ve9ytg9h5ssYVnfk1U
-         MUVs/VAFihD/7bJs/EWkmZX4Ev7zhIOPM/5/juWscgF3qgFzNQW0LvxUciIIfRnF2Ux3
-         uUCP7yvbLkEBl8SeEO0//vWxAk4HHFDuWYlo3RpafYeO0TZ4ewBd5MrFypRhN5UW2Tce
-         SpeA==
-X-Forwarded-Encrypted: i=1; AJvYcCXiQSdeo6LxHTaagg8jl0H97CuDjMZM8CJtzvLNXmp0bM63QBwF6ysvLJhRp4DqMLUOMFnxpGJbsYbcO+UHIOjlEEydHhBZ
-X-Gm-Message-State: AOJu0YyA4wS7JM2WmAQqDRPL2Ux4jXk5R4NYjnhjurvU0uLf3ksrZlbD
-	KFR9fDdUTSKwMCci5E2UFKUFyIMsZeg0XA9guOnNdgEDRDSvSjarI81x4iwMfts=
-X-Google-Smtp-Source: AGHT+IE5K1+U+OtrBj9WPxI9SBLKISMj6BcI52gCOjXEINy6PfJyLdT0n0aGdbv/DI4lVZTyNG4eEw==
-X-Received: by 2002:a05:6358:63a7:b0:17e:8a04:3fb3 with SMTP id k39-20020a05635863a700b0017e8a043fb3mr3621774rwh.12.1710281101437;
-        Tue, 12 Mar 2024 15:05:01 -0700 (PDT)
-Received: from ?IPV6:2a03:83e0:1156:1:1cbd:da2b:a9f2:881? ([2620:10d:c090:500::6:d1e3])
-        by smtp.gmail.com with ESMTPSA id cl12-20020a056a02098c00b005e438fe702dsm5679966pgb.65.2024.03.12.15.05.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Mar 2024 15:05:01 -0700 (PDT)
-Message-ID: <7b1abd98-ee3c-416a-b929-ed4cc9d646b1@davidwei.uk>
-Date: Tue, 12 Mar 2024 15:04:59 -0700
+	s=arc-20240116; t=1710281112; c=relaxed/simple;
+	bh=ELExRnyyQft/d3yTHHKTBI0MgLMqv2PTqtyynbm8f7c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cz4G5Ar3U6sWwsBZdlwQJNgX6B5sE/ddmupPloew7lzImeTxBDywXR81JXb2nXxezlW7jRhvsb9qY+1Qe/Tz3NrGp+/zxzORN+ZAk2+IE1boK5AhTF9Hslxw4kAPFc62n6jEYyznzN1l6b07MlqhXHOOmTTJTyOkHyd2TMxbxw8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gxGzxolD; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=SY2RqLdZFChLPLAviRsAsP9PDiXlVjdiL9oodKrSpMA=; b=gx
+	GzxolD8ggyww3BSSxAIUgOqr3KwzQCkBxb8WUMYaPMOu9EkXMRruXvdUrKUFDR+Ou3KB7vh1SHFf+
+	+MTl+wZx9tLdlcZs91q4G9HAoj6xokqo9nIsnH098PoNDpH8Vpq3SJ9tK/mNzZ/6p6+q/8qkJu5yd
+	Dr6JZmbobjFw3cg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rkAFb-00A5Gi-3x; Tue, 12 Mar 2024 23:05:35 +0100
+Date: Tue, 12 Mar 2024 23:05:35 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Biju Das <biju.das.jz@bp.renesas.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-renesas-soc@vger.kernel.org
+Subject: Re: [net-next,v3 2/2] ravb: Add support for an optional MDIO mode
+Message-ID: <fc6b2bc7-cdd8-4b9a-a698-618cf144e387@lunn.ch>
+References: <20240311141106.3200743-1-niklas.soderlund+renesas@ragnatech.se>
+ <20240311141106.3200743-3-niklas.soderlund+renesas@ragnatech.se>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1] netdevsim: replace pr_err with
- {dev,netdev,}_err wherever possible
-Content-Language: en-GB
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>
-References: <20240310015215.4011872-1-dw@davidwei.uk>
- <20240311130706.09f35fdd@kernel.org>
-From: David Wei <dw@davidwei.uk>
-In-Reply-To: <20240311130706.09f35fdd@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240311141106.3200743-3-niklas.soderlund+renesas@ragnatech.se>
 
-On 2024-03-11 13:07, Jakub Kicinski wrote:
-> On Sat,  9 Mar 2024 17:52:15 -0800 David Wei wrote:
->> -		pr_err("Failed to get snapshot id\n");
->> +		dev_err(&nsim_dev->nsim_bus_dev->dev, "Failed to get snapshot id\n");
+On Mon, Mar 11, 2024 at 03:11:06PM +0100, Niklas Söderlund wrote:
+> The driver used the DT node of the device itself when registering the
+> MDIO bus. While this works, it creates a problem: it forces any MDIO bus
+> properties to also be set on the devices DT node. This mixes the
+> properties of two distinctly different things and is confusing.
 > 
-> We seem to use dev_err(&nsim_dev->nsim_bus_dev->dev, ...
-> in quite a few places after this patch, how about we add a wrapper
+> This change adds support for an optional mdio node to be defined as a
+> child to the device DT node. The child node can then be used to describe
+> MDIO bus properties that the MDIO core can act on when registering the
+> bus.
 > 
-> #define nsim_err(ns_dev, args...) \
-> 	dev_err(&(ns_dev)->nsim_bus_dev->dev(dev), ##args)
-> ?
+> If no mdio child node is found the driver fallback to the old behavior
+> and register the MDIO bus using the device DT node. This change is
+> backward compatible with old bindings in use.
+> 
+> Signed-off-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+> Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
 
-Yeah SG, I'll define it in netdevsim.h.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-I'll re-send once net-next is open again.
+    Andrew
 
