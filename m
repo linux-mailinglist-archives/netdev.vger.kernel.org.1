@@ -1,158 +1,155 @@
-Return-Path: <netdev+bounces-79501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07C45879892
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 17:10:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DDD19879899
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 17:12:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67FD428185E
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 16:10:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7FB47B23757
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 16:12:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 636B87E585;
-	Tue, 12 Mar 2024 16:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 515E57D3EE;
+	Tue, 12 Mar 2024 16:11:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="WfeGElob"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aQZF+FKV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C4EF7E561
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 16:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AF637A733;
+	Tue, 12 Mar 2024 16:11:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710259813; cv=none; b=ANoEO582/OVhkkYDW8Cn6fsCm74qS9PgQhy+aGKzknI71wIskRcMjrFr5Qm8Sj0dXigyrKY2OYAmOo5as0CNwMqbHh4iA0tSHiv2BMQ3VgV17jn42keGE8gWosArHA6Gi7kgo2Zgm9vl2hGfWKD4NF8SMIDkA85Mz1wND9MCl08=
+	t=1710259916; cv=none; b=eInpm4tDVgOHP66sP3aTVBJg6RwNiKwwiq73lRLThnUFKZuhw5tAkasGPcLpNYHzyu+8fteOI54uGvtfs7V3Fr6/L18bFXLCOeVqm5ujSdNNML6iqcDA2u/yYgNQwpxXFXhafwAoAlOE2kR0zfB+yFrZW675i9i6UjWwOWtzPNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710259813; c=relaxed/simple;
-	bh=Fc7O8sfBRRb8zOY1eOkMRYKNnB5ApRvE6ZnNgsRMbYg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=AAmEDVdp1fd+OnFI3HSaY21vumA/n9+u82wD0czknwnIU5slh1EOh+SfeCts2JIIAzgXF+UFF9tF3+Sj5463Zdd+7s9is11cpcMZzIGNZyfg/5VMUb0vcoj9ZDuV8VVtBTW0ycfHtZEHErguVlraZGe1061xPp7HiBkl8ozof/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=WfeGElob; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-41330d48a29so9465075e9.3
-        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 09:10:10 -0700 (PDT)
+	s=arc-20240116; t=1710259916; c=relaxed/simple;
+	bh=pK5/KZXV6dGLZcSbEQLvyxdyemAdcpgwpgjSR+FzciQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=T9cJOC/ut3JGPGi0vjF6lJd2GPsmbv9vKQog2VFLsJJDxnjT7lrjkjyADjSGMIpXgwE4QkOecMYrT0h4YuA2YiuUupycb/RSoKvoth3H40wTECYEwxO9jPSPPZRKQ7KL/44EbrJN0JNweqWUnq43kJ3fd3Hyf2mgHw3VdLE3Y5U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aQZF+FKV; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-33e99b639e0so1410165f8f.0;
+        Tue, 12 Mar 2024 09:11:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1710259809; x=1710864609; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1710259913; x=1710864713; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9wNUX9DZCZhkOtkzBdWY6lDTHbYdRFBZXQzvAC4CccA=;
-        b=WfeGElob94iVcNvEUrLD+hD8IJpTbHvgaI3ykcUz8EI9MyeYXhnmblK0VLvuzDGKsL
-         oKXQtHwEO1cmNl5w4j2qseyBWbAazM1QmqOzgOthxNx3OKFIaDhZvU42AKfwwmZPg41m
-         LTLf0BDBJ99PkNAT0M+hff4C6aieJsbpfwCIIKuxlr8cN0lFON4R11oxp3GvHnXUbfSA
-         xr1NKAzkqFqX7YSCTYWTrypKMyBQ8XsxnNzDIEFQ8cl5BSKKXdD4lH6W7ylDOYOIm8Sg
-         D/U7aPYXT43vgaGjOPX2iVG0G1YsD/AvjjK9SJtEZ/ckdrLLgN6USca979ApfivmtwpI
-         ILeg==
+        bh=mlMGohocih4/vv8NN3ExYyD4aDTNUoH7ERTwZOWg+9o=;
+        b=aQZF+FKVulDD0cD6twny7vFQuct4bMGN7AEwkOwIR3HS+hs4inJmjoZg5bzKqLbGHp
+         0kuOsotVuQtutGuq4sR7//h5NP2HJw+Zam6DgZpluUiOH9d+KUgrQImpOMfo9TStuCF9
+         PFUP70DjifLJStO30F0BeNoJxjHfbd4/6Hq32nfz+8RRj5ix1+1zjuFrqio9hh11ApV+
+         tc2iHR2fiicsH8ls8POlBJb9PiVDPiF4lcVtqF/II6kFahdp3Qd8n7K36FZU38lU4LFY
+         4DxapN8kj9fn9Krh8JvFXoaHQak4wVIxd3hf+gaa6cc/zfzHSuXZoGx/EA/dltX0DpK2
+         mLfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710259809; x=1710864609;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1710259913; x=1710864713;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9wNUX9DZCZhkOtkzBdWY6lDTHbYdRFBZXQzvAC4CccA=;
-        b=g4yARKAU7Voh0g78V1ERNXFQbC4UO/Q42jifxHcTROePlTHDA9c3v/FTdESe3SVYnU
-         T5LYcjD+FvWygR1y/caQL/7OhHyTjgloNLE30EdomCqRAOIdzQNTweZOa9OKeKxfVh/R
-         kE1oeWrmXiRd5KyJLelOcRVa6elRWfDH2sCPZykqrgBLQOJP7kG05Z4ddoC4o/1bWgNS
-         FihxCOtBl2N6jVhNmn8qY1HBlr1gs49PjuYGpGRBGo9kieJMceVB2Of9ZGgvgFR66o6x
-         c7h3LP0FAncds+T0luuNGAeHQmxqSh31GQyMrF3OWrNoSLXBEmvi7guBPC7s1KnsIyrP
-         vv8g==
-X-Forwarded-Encrypted: i=1; AJvYcCX/axtR/9vl0PnI4QM0yop8jqYyHAR/uvaold9lDRG6aFkvub27jO9r8yTGw3ZFrK93NRMnnxwPNHTTDPs8pXpRo9isbLD+
-X-Gm-Message-State: AOJu0YyhMBVvCB/j6lw2HjjcybzONvLEtbPpfVBw7V4CvC12g/EWTfBl
-	jT1bVauOasF8jd9SMBTPaf4ahb2MLNtiMt5brK9Aw4LRHSycCwj0OlkOOyhpB58=
-X-Google-Smtp-Source: AGHT+IF+bWouiIFf+uP88Mr8eQSuWHP1533kqdq4LfgBW7SC7cEl/s7h/DffeGifPPsn3+G8rECSuw==
-X-Received: by 2002:a05:600c:4690:b0:412:95fb:e41 with SMTP id p16-20020a05600c469000b0041295fb0e41mr1840249wmo.24.1710259809271;
-        Tue, 12 Mar 2024 09:10:09 -0700 (PDT)
-Received: from localhost.localdomain ([104.28.232.7])
-        by smtp.gmail.com with ESMTPSA id fl8-20020a05600c0b8800b00413e523b7f9sm474253wmb.43.2024.03.12.09.10.08
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Tue, 12 Mar 2024 09:10:08 -0700 (PDT)
-From: Ignat Korchagin <ignat@cloudflare.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: kernel-team@cloudflare.com,
-	Ignat Korchagin <ignat@cloudflare.com>
-Subject: [PATCH net v2 2/2] selftests: net: veth: test the ability to independently manipulate GRO and XDP
-Date: Tue, 12 Mar 2024 16:05:52 +0000
-Message-Id: <20240312160551.73184-3-ignat@cloudflare.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
-In-Reply-To: <20240312160551.73184-1-ignat@cloudflare.com>
-References: <20240312160551.73184-1-ignat@cloudflare.com>
+        bh=mlMGohocih4/vv8NN3ExYyD4aDTNUoH7ERTwZOWg+9o=;
+        b=EJnhgzG+e2kx5raLIy1y7mWK5x855plVwFeTwqE8q/Qj7ueLFHBk5XPQriZSiFbylA
+         jX1sFx0ww94nWrVJj5VLyyWTjNt39sHTNnKRRQ1QYvzacOmAvLoOUniVEUe8U0iXXH38
+         Ol1tnt9XpJSAdeJpfcS3cR3+t163bwJHOV+yDLjcVFdlsxEJ4gw4hgeLYUke5PMEPPXO
+         1TcgZRf3e3tFx+YWodFJsW2oNOR3Ge3m+XzvNZMSgLk6dv7ONiSswWdXWYNS7YZXTPnq
+         ncwW8h1Z+pIQFtouenLiqVh17DLlVnMMErk+QjKzPEQ7dK0nqP7r+ghLbtI+ky9Y+spE
+         M86Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUPKXvDBXb3yAv7Tj4DYSdnjYksswD+BXRS7tNZb198Ky5/cbuSaNSfrS+3BP+YHc8bHzHjQaMRMvKVxCpWYgFVLnUvTyQ9NQbhpvZJla/H1Qo0x0Jy/x8pa1C9izyiTGDJYvcW2FC40puqPPauHlRshTtQsYpqImrEJxXUeA2bgIpoOk1WmfwM501N+oJVReIEuxamNLGy2nrY5aJPKSGLMlu6RK8ziJcay5WX3M29F7spwRiGS4IS6UTr0yqs9qgL17uoOufB6HnZ1bXJf6j5jxWlkRCQKPsE3A==
+X-Gm-Message-State: AOJu0YwR0ICy4wGJrRYu9dNdob3cmLuuh+oIGyQm4I001mDVoINHS45Y
+	54cMSmOfG9eje96VI/1IVz66AmhkCKXOjRATUcXuFh+sxKTeaefaffAE4FvsAn2v7Mh4z+4dnQs
+	7BdIMpK19V4A9MCsYg+DBQ4CHmnM=
+X-Google-Smtp-Source: AGHT+IEluJaPH2ZbEhOuqEk+ZR7WjEJU3XS86GzKec4PZE8B7+fsWbUJbxd+Mrhd/TndoYPK/al8v9EOlZQdZgQXq3Y=
+X-Received: by 2002:adf:f60a:0:b0:33c:e396:b035 with SMTP id
+ t10-20020adff60a000000b0033ce396b035mr458814wrp.69.1710259912730; Tue, 12 Mar
+ 2024 09:11:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240311093526.1010158-1-dongmenglong.8@bytedance.com>
+ <20240311093526.1010158-9-dongmenglong.8@bytedance.com> <CAADnVQK+s3XgSYhpSdh7_9Qhq4DimmSO-D9d5+EsSZQMX4TxxA@mail.gmail.com>
+ <CALz3k9hZxsbUGoe5JoWpMEV0URykRwiKWLKZNj4nhvnXg3V=Zg@mail.gmail.com>
+In-Reply-To: <CALz3k9hZxsbUGoe5JoWpMEV0URykRwiKWLKZNj4nhvnXg3V=Zg@mail.gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 12 Mar 2024 09:11:41 -0700
+Message-ID: <CAADnVQJ87Ov6ny2hj-0_WymGB3TeuEZu373EmqmRJqZv-8Ze_Q@mail.gmail.com>
+Subject: Re: [External] Re: [PATCH bpf-next v2 8/9] libbpf: add support for
+ the multi-link of tracing
+To: =?UTF-8?B?5qKm6b6Z6JGj?= <dongmenglong.8@bytedance.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	X86 ML <x86@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Quentin Monnet <quentin@isovalent.com>, 
+	bpf <bpf@vger.kernel.org>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>, linux-s390 <linux-s390@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, linux-trace-kernel@vger.kernel.org, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-We should be able to independently flip either XDP or GRO states and toggling
-one should not affect the other.
+On Mon, Mar 11, 2024 at 7:44=E2=80=AFPM =E6=A2=A6=E9=BE=99=E8=91=A3 <dongme=
+nglong.8@bytedance.com> wrote:
+>
+> On Tue, Mar 12, 2024 at 9:56=E2=80=AFAM Alexei Starovoitov
+> <alexei.starovoitov@gmail.com> wrote:
+> >
+> > On Mon, Mar 11, 2024 at 2:35=E2=80=AFAM Menglong Dong
+> > <dongmenglong.8@bytedance.com> wrote:
+> > >
+> > >
+> > > -               err =3D libbpf_find_attach_btf_id(prog, attach_name, =
+&btf_obj_fd, &btf_type_id);
+> > > +               name_end =3D strchr(attach_name, ',');
+> > > +               /* for multi-link tracing, use the first target symbo=
+l during
+> > > +                * loading.
+> > > +                */
+> > > +               if ((def & SEC_ATTACH_BTF_MULTI) && name_end) {
+> > > +                       int len =3D name_end - attach_name + 1;
+> > > +                       char *first_tgt;
+> > > +
+> > > +                       first_tgt =3D malloc(len);
+> > > +                       if (!first_tgt)
+> > > +                               return -ENOMEM;
+> > > +                       strncpy(first_tgt, attach_name, len);
+> > > +                       first_tgt[len - 1] =3D '\0';
+> > > +                       err =3D libbpf_find_attach_btf_id(prog, first=
+_tgt, &btf_obj_fd,
+> > > +                                                       &btf_type_id)=
+;
+> > > +                       free(first_tgt);
+> > > +               } else {
+> > > +                       err =3D libbpf_find_attach_btf_id(prog, attac=
+h_name, &btf_obj_fd,
+> > > +                                                       &btf_type_id)=
+;
+> > > +               }
+> >
+> > Pls use glob_match the way [ku]probe multi are doing
+> > instead of exact match.
+>
+> Hello,
+>
+> I'm a little suspecting the effect of glob_match. I seldom found
+> the use case that the kernel functions which we want to trace
+> have the same naming pattern. And the exact match seems more
+> useful.
+>
+> Can we use both exact and glob match here?
 
-Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
----
- tools/testing/selftests/net/veth.sh | 24 +++++++++++++++++++++---
- 1 file changed, 21 insertions(+), 3 deletions(-)
-
-diff --git a/tools/testing/selftests/net/veth.sh b/tools/testing/selftests/net/veth.sh
-index 5ae85def0739..3a394b43e274 100755
---- a/tools/testing/selftests/net/veth.sh
-+++ b/tools/testing/selftests/net/veth.sh
-@@ -249,9 +249,9 @@ cleanup
- create_ns
- ip -n $NS_DST link set dev veth$DST up
- ip -n $NS_DST link set dev veth$DST xdp object ${BPF_FILE} section xdp
--chk_gro_flag "gro vs xdp while down - gro flag on" $DST on
-+chk_gro_flag "gro vs xdp while down - gro flag off" $DST off
- ip -n $NS_DST link set dev veth$DST down
--chk_gro_flag "                      - after down" $DST on
-+chk_gro_flag "                      - after down" $DST off
- ip -n $NS_DST link set dev veth$DST xdp off
- chk_gro_flag "                      - after xdp off" $DST off
- ip -n $NS_DST link set dev veth$DST up
-@@ -260,6 +260,21 @@ ip -n $NS_SRC link set dev veth$SRC xdp object ${BPF_FILE} section xdp
- chk_gro_flag "                      - after peer xdp" $DST off
- cleanup
- 
-+create_ns
-+ip -n $NS_DST link set dev veth$DST up
-+ip -n $NS_DST link set dev veth$DST xdp object ${BPF_FILE} section xdp
-+ip netns exec $NS_DST ethtool -K veth$DST generic-receive-offload on
-+chk_gro_flag "gro vs xdp while down - gro flag on" $DST on
-+ip -n $NS_DST link set dev veth$DST down
-+chk_gro_flag "                      - after down" $DST on
-+ip -n $NS_DST link set dev veth$DST xdp off
-+chk_gro_flag "                      - after xdp off" $DST on
-+ip -n $NS_DST link set dev veth$DST up
-+chk_gro_flag "                      - after up" $DST on
-+ip -n $NS_SRC link set dev veth$SRC xdp object ${BPF_FILE} section xdp
-+chk_gro_flag "                      - after peer xdp" $DST on
-+cleanup
-+
- create_ns
- chk_channels "default channels" $DST 1 1
- 
-@@ -327,11 +342,14 @@ if [ $CPUS -gt 2 ]; then
- fi
- 
- ip -n $NS_DST link set dev veth$DST xdp object ${BPF_FILE} section xdp 2>/dev/null
--chk_gro_flag "with xdp attached - gro flag" $DST on
-+chk_gro_flag "with xdp attached - gro flag" $DST off
- chk_gro_flag "        - peer gro flag" $SRC off
- chk_tso_flag "        - tso flag" $SRC off
- chk_tso_flag "        - peer tso flag" $DST on
- ip netns exec $NS_DST ethtool -K veth$DST rx-udp-gro-forwarding on
-+chk_gro "        - no aggregation" 10
-+ip netns exec $NS_DST ethtool -K veth$DST generic-receive-offload on
-+chk_gro_flag "        - gro flag with GRO on" $DST on
- chk_gro "        - aggregation" 1
- 
- 
--- 
-2.39.2
-
+exact is a subset of glob_match.
+Pls follow the pattern that[ku]probe multi established
+in terms of user interface expectations.
 
