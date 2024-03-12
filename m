@@ -1,139 +1,141 @@
-Return-Path: <netdev+bounces-79569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79565-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91810879E4A
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:15:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED23C879E44
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:14:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E14A284852
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 22:15:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9C1E2847C4
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 22:14:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDD0C14405D;
-	Tue, 12 Mar 2024 22:14:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0273143C59;
+	Tue, 12 Mar 2024 22:14:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="0HvPLUWe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PVwgfL0m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2600A14402F
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 22:14:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4482714375A;
+	Tue, 12 Mar 2024 22:14:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710281677; cv=none; b=m/ltINcuyeyo+PuCLmre6AXmxSs8unX/EkbiOmk37R59YBcy/3g8pmlH8TkuuIUk7m9RvY5oCcHty0jQhJGpu1cGMfLHyjtyYfRx584niTBkf9H9M6i/ZGMXZFJCD5jeKWT5zZzkNiRO4lYewdIgoxsqfLGNjSqtgCWDT4257H8=
+	t=1710281674; cv=none; b=YdeuuB9bLAKRkt+Y7JuZi8/uH+9BBx1jqGJIh3stPln5m2Pgw6bu834v3MDtE039+85/2D2vn9Ys8pNj6GGuM0qUfP1iHbV17lFYLQ1H16+J7XuPYfSACMok4piiwpAxXyRdvtQFAe8hoJ75VouUVNr0FwV6g12EqKRRPm+X274=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710281677; c=relaxed/simple;
-	bh=5ZwCF+rs7lCtGdo8KOoL+qGcDQAW7t/YnIkrC77Nd2w=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CMFCZRzyLq5Ea/d8ftidPb72X6dknr8C34nPeruKbO6OpxiYkHHYCB88+fLaRPm98dHsm1Bl4WfeoiqrkERIv0emrFdvoVAZtiFgJrvzMiWY6aUZ3qZyb6Jk4A3/BNfnqh2YJlbE9wfb/HZGVDY+4A6rlnaqAAjPUcPk6bmQsAg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=0HvPLUWe; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1dd68d4cff1so34127565ad.2
-        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 15:14:35 -0700 (PDT)
+	s=arc-20240116; t=1710281674; c=relaxed/simple;
+	bh=qYIO1lEZjXWQG6vPC0J4Y9X67kpBQycga3CudFSq98s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cW40w1X87IW6/tXlIz43eReITs7PtQoMMIVOTBA3jrT8nCo/NJV6UnOIYUbZVlRzQbXSFqzAECeZu0uGNJCwLnW3MlydrjKEPQQMCf4X/qGF1IYQ0JAYPpmDnWAqF4rY1PswUGxM6RtazLdb+6IR3b8edlFbg84jUKqqecdhas4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PVwgfL0m; arc=none smtp.client-ip=209.85.161.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=kernel.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5a1aa46c975so176325eaf.3;
+        Tue, 12 Mar 2024 15:14:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1710281675; x=1710886475; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YqUagkvWJXywn2IxPi0bRayOpXinOg94l8rLXSzDkU8=;
-        b=0HvPLUWeqdEdeckTab8pRqvjJmUSZWX6zPeeJXllo+Di5AjPrm02lFCjvqKHQQhCm0
-         IEAhwtu2HzWLnFLm15x2dDz5ZgbFsQKFyR8p1YRGtfANRSKrPUyaDgLy58WU0udp7EBC
-         inneIbRk18sB8DtktGDaGIOwW5TV7qVQ2mbYNSKtmfQ1iy2bIF48dsQporlK1iMg0Vtr
-         2/8n5Rrp0EgTXqBG/7dHf6LJDUUD4rslYDH4VTHa602m8bMM24Um1qRCcYDsbmfLAcMt
-         pZyeJ9v+Quq5QqW3MOf7QEYgns95+CJykG7wYAN+OcAiuQ6OmvoRex8R1xrt38UxoACq
-         uhbw==
+        d=gmail.com; s=20230601; t=1710281672; x=1710886472; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6c6wUX3sbOlM55YAg2meo6Cj+EsM3Jg6xyNcl4PPWJQ=;
+        b=PVwgfL0mpS0R4WcmSzEqhMquSHwtoCbcMMfoispivLkvHWrypwXultdzmlq4sjCMjb
+         SI91OfNXJIC4/Mm+xGvg5ShyhW7UkbxRPiP+zYMl3N816ViIs3GBWYfKbeSS6oMue7CX
+         2qZf8E4ONcb3H26lCtCB4ztIpRoMYJcBcZgFj9DKoAMqLfPnaMraQ5YUtp44A4hIpJQa
+         ap9WaPlikOl3ybIurQ5nMBl2RoN4XfOoVc/R0aa1Uxj3gZduWTFqkXA7wzR02heV8JEa
+         rAL0L+exDEXTKay3m/Vxt+0VNludHkFUwXhks8dOtNIIltqv2M5sMhrsMYumFakJXbX4
+         HBDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710281675; x=1710886475;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1710281672; x=1710886472;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=YqUagkvWJXywn2IxPi0bRayOpXinOg94l8rLXSzDkU8=;
-        b=iSQHyVMe2EiNpGd9P/M4HKduu6sKXmlC4YxexgCUVu/74A5ZXUQ6EW0217QQHG1Sle
-         tf+AKW2XCXBC8BTIOurL/EjZDIiErAMBBsyO1vMxjfvfM3AT79Fe84gpFk3zHOyUxWH8
-         GnvZBA5QTK/8++B6rBDfdsZe0x8FDTXy+uhhmlI7HuiQ2z0OhxGDAYtACO3xkdDldsWk
-         BlJYwhndFEhQOdSzGJ3gJM/qx7ShiGN/m/a6SaHpUq04HTbMuzfh0Fab7oWhJyUroWx1
-         HYXCJmt8NHqsZbVrA6507eSEi0SO7mkrvZtLxMPEDzX8u09eswMDFnNBVzvbxYIMwXKG
-         vRAg==
-X-Gm-Message-State: AOJu0YwCiWZFApqwQXI2RbYR8i89qUf5sifdmmZEkQHfPfvOnb80xF6x
-	RQGIIgUa3gaI/O2uCzdbOdaOFumabV+2gtgjYefkNAYNM4XPilimCwj1DDyfTiF0FyZW4z2WQxs
-	M
-X-Google-Smtp-Source: AGHT+IGXa0W0ae6kEQwbD/BZzW3iwdkIex3PIj7J3cpTFfgch0OV4AnuHwwrnaAs06mURTnhyPyARA==
-X-Received: by 2002:a17:902:d486:b0:1dd:7d20:63ef with SMTP id c6-20020a170902d48600b001dd7d2063efmr12248619plg.11.1710281675452;
-        Tue, 12 Mar 2024 15:14:35 -0700 (PDT)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id o10-20020a170902e28a00b001dcfaab3457sm7240473plc.104.2024.03.12.15.14.34
+        bh=6c6wUX3sbOlM55YAg2meo6Cj+EsM3Jg6xyNcl4PPWJQ=;
+        b=RCXyAzRmec0sK4reBevF9fLjUepjubHC0HxjvIxdJ1k9PZekUHMMipdMnRjIdMpfNJ
+         ipWYvwekPWNf/GoWNvH1BPfnPTAZEofq3xt/Udo80j+M18K4KDYE+ZsfL2D+C9+YfUFc
+         02cyOtRUj+VK6JiwLBf3X9GFQTUsHs0qDHv7GK2F6fkeaoUXKi66gbDehPRQD7sUpwHc
+         rcKh1FbINuHocB9KznpzMq94ip1n0kzbQ1IYgpILfhPm2T5371Vus0GZLMQDHKubmGMr
+         hQgfD8mi1cXQ7CABqSlktAwhya6gxSMCxfyHxxXtpMSLuVeVRDZVQIMcKfT62AEsG4fR
+         QH6w==
+X-Forwarded-Encrypted: i=1; AJvYcCVjdzmvN4BwlHycWyzmPqFydSKysnuvhoXPTc1sCETpz/BxFxNiKSiWnbLgLyPuouGtTdDU8H88x1AnlxcK8qcxSxP0G2OoLsmWMGLvCm9mQbKNrQx2ZX+lTzKFFeVlrAuoozm+IbE7UaT+qdOFdcI1OJhNs9n6Hxz+
+X-Gm-Message-State: AOJu0Yws8KhEZ9IBCGvc8uvAlHTegNz4DjcdIlksv0YBX8YPIxJ9cZ7w
+	On/x0FccHu5/7uMDpJtAkC9M6yk++6BfukOXHbqYjMNzS5aq3dB2
+X-Google-Smtp-Source: AGHT+IGLAfJoyoRCDZdiRbLiJmk0PBjAy3mgWufwB3FmwP88QIS0T79LTKLeJhKU6OA5D+gTzxYdbw==
+X-Received: by 2002:a05:6358:7525:b0:178:e2b3:98da with SMTP id k37-20020a056358752500b00178e2b398damr1978712rwg.28.1710281672119;
+        Tue, 12 Mar 2024 15:14:32 -0700 (PDT)
+Received: from localhost ([2620:10d:c090:400::5:2875])
+        by smtp.gmail.com with ESMTPSA id 16-20020a631350000000b005dcc8a3b26esm6499419pgt.16.2024.03.12.15.14.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Mar 2024 15:14:35 -0700 (PDT)
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute2 4/4] tc: make exec_util arg const
-Date: Tue, 12 Mar 2024 15:12:42 -0700
-Message-ID: <20240312221422.81253-5-stephen@networkplumber.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240312221422.81253-1-stephen@networkplumber.org>
-References: <20240312221422.81253-1-stephen@networkplumber.org>
+        Tue, 12 Mar 2024 15:14:31 -0700 (PDT)
+Sender: Tejun Heo <htejun@gmail.com>
+Date: Tue, 12 Mar 2024 12:14:30 -1000
+From: Tejun Heo <tj@kernel.org>
+To: Jens Axboe <axboe@kernel.dk>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Johannes Thumshirn <johannes.thumshirn@wdc.com>,
+	davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, pabeni@redhat.com,
+	bpf@vger.kernel.org
+Subject: Re: [GIT PULL] Networking for v6.9
+Message-ID: <ZfDTxhn34fihYQ_o@slm.duckdns.org>
+References: <20240312042504.1835743-1-kuba@kernel.org>
+ <CAHk-=wgknyB6yR+X50rBYDyTnpcU4MukJ2iQ5mQQf+Xzm9N9Dw@mail.gmail.com>
+ <20240312133427.1a744844@kernel.org>
+ <20240312134739.248e6bd3@kernel.org>
+ <CAHk-=wiOaBLqarS2uFhM1YdwOvCX4CZaWkeyNDY1zONpbYw2ig@mail.gmail.com>
+ <39c3c4dc-d852-40b3-a662-6202c5422acf@kernel.dk>
+ <20240312144806.5f9c5d8e@kernel.org>
+ <20240312145455.403b713f@kicinski-fedora-PC1C0HJN>
+ <fee2fccf-ef4d-4595-8f20-07ba4dc67d42@kernel.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fee2fccf-ef4d-4595-8f20-07ba4dc67d42@kernel.dk>
 
-The callbacks in exec_util should not be modifying underlying
-qdisc operations structure.
+Hello,
 
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
----
- tc/e_bpf.c   | 2 +-
- tc/tc_exec.c | 2 +-
- tc/tc_util.h | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+On Tue, Mar 12, 2024 at 04:02:08PM -0600, Jens Axboe wrote:
+> diff --git a/block/blk.h b/block/blk.h
+> index a19b7b42e650..5cac4e29ae17 100644
+> --- a/block/blk.h
+> +++ b/block/blk.h
+> @@ -534,7 +534,7 @@ static inline u64 blk_time_get_ns(void)
+>  {
+>  	struct blk_plug *plug = current->plug;
+>  
+> -	if (!plug)
+> +	if (!plug || !in_task())
+>  		return ktime_get_ns();
 
-diff --git a/tc/e_bpf.c b/tc/e_bpf.c
-index 79cddace96a4..cca853f95299 100644
---- a/tc/e_bpf.c
-+++ b/tc/e_bpf.c
-@@ -49,7 +49,7 @@ static int bpf_num_env_entries(void)
- 	return num;
- }
- 
--static int parse_bpf(struct exec_util *eu, int argc, char **argv)
-+static int parse_bpf(const struct exec_util *eu, int argc, char **argv)
- {
- 	char **argv_run = argv_default, **envp_run, *tmp;
- 	int ret, i, env_old, env_num, env_map;
-diff --git a/tc/tc_exec.c b/tc/tc_exec.c
-index 182fbb4c35c9..fe9fdb1b5aa6 100644
---- a/tc/tc_exec.c
-+++ b/tc/tc_exec.c
-@@ -26,7 +26,7 @@ static void usage(void)
- 		"OPTIONS := ... try tc exec <desired EXEC_KIND> help\n");
- }
- 
--static int parse_noeopt(struct exec_util *eu, int argc, char **argv)
-+static int parse_noeopt(const struct exec_util *eu, int argc, char **argv)
- {
- 	if (argc) {
- 		fprintf(stderr, "Unknown exec \"%s\", hence option \"%s\" is unparsable\n",
-diff --git a/tc/tc_util.h b/tc/tc_util.h
-index 5ae3fafd2dd2..bbb2961dfe93 100644
---- a/tc/tc_util.h
-+++ b/tc/tc_util.h
-@@ -68,7 +68,7 @@ struct action_util {
- struct exec_util {
- 	struct exec_util *next;
- 	char id[FILTER_NAMESZ];
--	int (*parse_eopt)(struct exec_util *eu, int argc, char **argv);
-+	int (*parse_eopt)(const struct exec_util *eu, int argc, char **argv);
- };
- 
- const char *get_tc_lib(void);
+Late to the party but I think the following is what iocost is doing:
+
+1. A cgroup overspends and needs to wait before issuing further IOs. It
+   takes the current time, add the duratoin that it'd need to wait to issue
+   further IOs and then schedules the hrtimer.
+
+2. The timer triggers and runs iocg_waitq_timer_fn() which takes the current
+   time and calculates its current budget (which gets replenished as time
+   passes). If the pending IOs fit in the current budget, it issues them. If
+   there are still pending IOs, it calculates the next timer wakeup point as
+   the read current time + the time needed to resume IO processing.
+
+3. If the read current time is sufficiently in the past, the hrtimer
+   scheduled in #2 would expire immediately and if it still reads the same
+   cached current time, the calculated budget would be zero. It won't be
+   able to issue any more IOs and will schedule the hrtimer on the same
+   exact expire time as before, falling into an infinite loop.
+
+So, whatever that can feed actual time to iocg_wait_timer_fn() should fix
+the issue.
+
+Thanks.
+
 -- 
-2.43.0
-
+tejun
 
