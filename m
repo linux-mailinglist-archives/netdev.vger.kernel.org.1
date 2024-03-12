@@ -1,205 +1,172 @@
-Return-Path: <netdev+bounces-79422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A32A879270
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 11:50:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FB7D879282
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 11:53:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1973D1F22B5A
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 10:50:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EEB54B22D01
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 10:53:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5E0578288;
-	Tue, 12 Mar 2024 10:50:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B26C7867B;
+	Tue, 12 Mar 2024 10:53:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e9fb7J6P"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="KJm8kJtR"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2087.outbound.protection.outlook.com [40.107.93.87])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D908369D0C
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 10:50:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710240638; cv=none; b=he2R6khuOdLsTjoSd2n4E+tzbKgHFUAwtvdGqZwsFMqYqbLbUFsoJfCU6pYwCacfRTy0Fv5iZuUYpinkpEoRpHpgopSqfNg1YYzZtVaNVsNa4ftDMkZxhJYkjlVOGT/HuA6ZL1/8kpdL8yvorRTDsChrHJegrJ5bcuSHwCC2ybc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710240638; c=relaxed/simple;
-	bh=I2NqWB5cKvQto9fV3SpLZWdY5q6ODb3FJ2D3h10i79s=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ZuI4tIA93fft7aBC0lXvL5PQkTqdOf6ELy00iaS5v6ocLmhjddL9dV9BC20ptE7L+OxThH5XsHYm+gWzTWOJQMOaHhdD6Vd4UWF6Q/rZuh+Neel0GsfOSdb9Ncbu3tuwAvKMTHMY5EjLvjMAUI+nMiAdSGZA8odrz3U1TxGYDcc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e9fb7J6P; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710240635;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=svJBs6ZSFI76DADWJEw/YqilQwWjyKwiwB1uTQI4XK8=;
-	b=e9fb7J6Pp9OdXqvjzOE5/e/JMjLOuxnoTCaYxYwE09K+XNLw9Of40m+buobdRVVwMJIFER
-	vNvsnl105VJIx8nHWEj9AgbMIeX1mEMxrlSz3D9W7hWgT+4HQ28SEHp7m5GWBVkQyFbjib
-	B2SEzeAvYAxrGErKm7W978xRc//74JE=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-186-EA7Vw6_uNV2_0w-2XBoFIw-1; Tue, 12 Mar 2024 06:50:34 -0400
-X-MC-Unique: EA7Vw6_uNV2_0w-2XBoFIw-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-56827399088so932670a12.0
-        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 03:50:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710240633; x=1710845433;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=svJBs6ZSFI76DADWJEw/YqilQwWjyKwiwB1uTQI4XK8=;
-        b=tK1eaktc5m4gESQqYI7ZTUS5zPlZLv0YqOiGb5g9PWyDsVpfzz6zdkHFDZvvZYTTNs
-         q7viPiVGA/xelVUfFHwL3PmcVdm+9H97BNJBvoaPrd2wkLUTF7RCFBVDotThH5rDUBlL
-         EnTb0oRDvjVoAWz7NUWcHd02edQpTDq/1Ia1gEmwIDrEXbG23E1i9Q2QIbLCZoKCZP2L
-         uWmJ9L5ZEvzZr05vEdNdovBoY3OxuZ3Y1OGAnxkPKALdh+iVF5CHUOYkyUSpwr0VoBow
-         YYpF9OUbutQchxBWnbd/HsMCVyZR1W0IiCSIEe6LyQtGYgpAE1j6TdosxV24IHU63G7u
-         oePQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWM14n8ShdUGHZFgwJnF1e1ZwOnz+OEtyz3BctxgHGXb5j2VHe6w+uaXtNCEhVAU3QFyGwTu9nKwjR7jabbH0L8jErU26oP
-X-Gm-Message-State: AOJu0Yz4rFvLcbsFh/SJ8871jhXIAixq48MQpWLMKUa0oX4ar+UGwH2d
-	oU80uhkALGKV0aRdQHZeKdpLl4+DcOG7NO5t9zKwBbjvK7CFR3zo2Ca6SlndOCN54ILb+EUwYnF
-	hzkYXHc7HxSEFVFrCYXuvxviosLA0EzuBTstK9SUXEJTvpVAhYDatMA==
-X-Received: by 2002:a17:906:32c3:b0:a45:dd12:5e30 with SMTP id k3-20020a17090632c300b00a45dd125e30mr5999624ejk.2.1710240633352;
-        Tue, 12 Mar 2024 03:50:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFnr9LGg24EFk270v0L0Icz46pXvIKsHHvzlQoL7Ha5x66Egqq2zQ2lXh2tD1brF8F13sYTLw==
-X-Received: by 2002:a17:906:32c3:b0:a45:dd12:5e30 with SMTP id k3-20020a17090632c300b00a45dd125e30mr5999597ejk.2.1710240632946;
-        Tue, 12 Mar 2024 03:50:32 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-226-128.dyn.eolo.it. [146.241.226.128])
-        by smtp.gmail.com with ESMTPSA id gt20-20020a1709072d9400b00a46025483c7sm3449266ejc.72.2024.03.12.03.50.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Mar 2024 03:50:32 -0700 (PDT)
-Message-ID: <dc45f4f104a0d0691715398d2f7efa6a0a3447b8.camel@redhat.com>
-Subject: Re: [PATCH v2 1/3] net: ethernet: ti: am65-cpts: Enable PTP RX HW
- timestamp using CPTS FIFO
-From: Paolo Abeni <pabeni@redhat.com>
-To: Chintan Vankar <c-vankar@ti.com>, Dan Carpenter
- <dan.carpenter@linaro.org>,  Siddharth Vadapalli <s-vadapalli@ti.com>,
- Heiner Kallweit <hkallweit1@gmail.com>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, Grygorii Strashko <grygorii.strashko@ti.com>, 
- Andrew Lunn <andrew@lunn.ch>, Roger Quadros <rogerq@kernel.org>, Richard
- Cochran <richardcochran@gmail.com>,  Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Date: Tue, 12 Mar 2024 11:50:30 +0100
-In-Reply-To: <20240312100233.941763-1-c-vankar@ti.com>
-References: <20240312100233.941763-1-c-vankar@ti.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 834AA77655
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 10:53:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.87
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710240789; cv=fail; b=MWqvTVfD6WVI3z0QP/vD8Vb3Co9DjEAAQwxugvC82ImuMIs3NLIZmbenHSt+TM6kP6uTXT4SEJ4JrYub4JbFyXTwlmOwFtHzoqht6UnghCuD8Fg2k6QbafhExtOXFPQsHCqhoT8w3vYlGhGFz9mrBYHxYZ6fb1E05xmjRE5s1pM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710240789; c=relaxed/simple;
+	bh=qQba5fqjYTCr7FenMU4MllSHZWOnxtxB0gxIr5Nnimc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=RMVFfKGZqXLP1znPKwQmlr3yxwOAgGQrElePbpqFJc3X6y1+MeZ/t8IsptVP0HdaobLGu3XgtoWdxyRPifcAmsoNUCPQv9kfAiHLgbu94+YqN5ns4sapmKEFseYGHc5OxknP6v2r4zYujwwMt9UI+gYjHmgDqXOS0lb++yBSDr8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=KJm8kJtR; arc=fail smtp.client-ip=40.107.93.87
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EkonD36YhswAOLEt4tYTnjYMV0S3C/vFOq19VJfxEJzgHMpAYPrajx5DaUUVnAp11DxXv61gIxlXQPGVllGLln2NiAzqbw48PY62vfMBjMD2pCj704zFH/EqA0pOsopqn1kLbSQGrcYWOdyuaY2Kga/pinV8I6Rsfh9NqGuOMRczVwSOEDsumkX5GbDpZ8yX6VlvRbKsxgLnSGosAlMUhLKDgC91eS/wyavV9ic1HcEcaYnBS+P7/hNoqf+tWxcPZqJC+sI9o3tIxiegkeBEaKujnG5KiO0k76DAkAO27JVuFxq5eXasNaY7KDzulzslZer+l2PFCaNA6prmRzmJ3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ETZ8H5suMGWSDxfIPBoLXarzxqGLKJv6xfjZQPnAexw=;
+ b=RBkOpo1tnQIxIdRm3hbiIp93oXj7zF1CqDBqpj8mVO/lr1+0qIMEy2HXwLIXkU2S7ZVw28yt34iYMHlGpOyT8y8wXqTBWsnFjsWxlHU0Tc/OMTfXbKmiZfWwW54YARs5jumVX0tLMR0PRJxNUqxqBdHeyWXD/ScnU0PBqmx6Pr/mt9P20Et6FqEDDJRyOFnnWqX8DIe8R64bIKSxAdUt36aiufn82IVBlD7nkJxXXTJIM+kE5ee2cS8lrECYsNLmuc1H6J25Y9EiC4GAS62LUlE+E5R9yS2KUXMW56QkII+VU/rlhHYeZwdxPP4skc/C4PLVAGLuD8iw3uHj66+7+w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ETZ8H5suMGWSDxfIPBoLXarzxqGLKJv6xfjZQPnAexw=;
+ b=KJm8kJtREKRolDjHZchv5jOFJNa+R8sXVJhegOjsbsDA2jaODWLN3jGtj6KK0m6acsm84NJv1IJ+14V/94iitT6P8PMBXM5DtGrCPEhP58gMAuDgTunIrY5lbMlCBhwPE1sxe6oCD3xTilp3q04B4duR0CSctmskcebyM3lijbjR2ApHA+w0er22z5yIxBwCS7v7yO/13AdPyaU6jbhxCb8bAblR53YKIHeMok7aUjqoAcLBpwDx29B+prvzvPoApW9CLQFVEYXTICEvw+j/HAtZ8ASWfrzZUKBSG/FgFt/XiPsRc6q7ai1H+noUqAL5W7VPZB+yR/ZCwn1qU7LoEg==
+Received: from BN8PR04CA0009.namprd04.prod.outlook.com (2603:10b6:408:70::22)
+ by DS0PR12MB9038.namprd12.prod.outlook.com (2603:10b6:8:f2::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.36; Tue, 12 Mar
+ 2024 10:53:03 +0000
+Received: from BN2PEPF000044A7.namprd04.prod.outlook.com
+ (2603:10b6:408:70:cafe::4f) by BN8PR04CA0009.outlook.office365.com
+ (2603:10b6:408:70::22) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.36 via Frontend
+ Transport; Tue, 12 Mar 2024 10:53:03 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN2PEPF000044A7.mail.protection.outlook.com (10.167.243.101) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7386.12 via Frontend Transport; Tue, 12 Mar 2024 10:53:02 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 12 Mar
+ 2024 03:52:50 -0700
+Received: from nps-server-23.mtl.labs.mlnx (10.126.231.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Tue, 12 Mar 2024 03:52:48 -0700
+From: Shay Drory <shayd@nvidia.com>
+To: <netdev@vger.kernel.org>, <pabeni@redhat.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <edumazet@google.com>
+CC: <jiri@nvidia.com>, Shay Drory <shayd@nvidia.com>
+Subject: [PATCH net v2] devlink: Fix devlink parallel commands processing
+Date: Tue, 12 Mar 2024 12:52:38 +0200
+Message-ID: <20240312105238.296278-1-shayd@nvidia.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044A7:EE_|DS0PR12MB9038:EE_
+X-MS-Office365-Filtering-Correlation-Id: a190dcc7-3726-45a6-2074-08dc4282974b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	d0pGmXD+OWPcSAe45M3BRRAfj3zzyBiCVJ1HpqjC9Ye+MuRdlaa/MDD/SyGJolpVh7pnyBmv62lTs4PeSiQXB7XQdAU+nlaa6+uw/YGxlnz8wHVDEPiV9CnGPyGnoHeE0UL5gaVXscjb3OAn0vD+3At6OQA4XFUAB3nB3oWtauc/oVtHc+K5ppVLu/USxYgKscpNTToRheNKn1WS08lb8b7DdhEBzabh/qWlnUf4AwpzHsjHDNgxERlxvQooOQGN8Xhl8Ih5I7D3/DAvGGKNhL2mqULoK1D/OV3ln6iMByOLFhe5eMtVRoYSG9AAe1U5WkN6QwX6syDeEPedSGmFgqKNxydYbWfUXBg6y9xUYgnRh/4jUczH7uMiVhwHoOcv1UOPf1wMJDVdj4ihzaY3hK4qsGBmi6yPY3YuW3PRRtBmmbkgt+V9caA1Yxr/6ejWr/EIQCZM4pe4/OIY18FJKKfd1hBiGWSFZayG+WxPCxd8uj09rkIFutJ9W1ICE41KqmzRIznBCO+BJ+mLXfITdqr0Ak7U5bfi0b41KoPdbLfClT9VNoUFU6igptv51i4Appc8+kTDGB+wcGLnM8zJfk+iVDcYqjmmvHfEmckLFvlSTl1TJJCuU1fNIiqsPd2R7lQTYtoj6PCnTCaH4GUjowgb1rb2xl1J6biLbJg9UdZZTY2xD7Qygy2GDpsUoPceZF+P8qwuh5TQ1z4BwcdMeYHZHKKK2z+mkLBjHcHig4K2YLN5/fGXzaJljFKdxwYK
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(36860700004)(376005)(1800799015)(82310400014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Mar 2024 10:53:02.9357
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: a190dcc7-3726-45a6-2074-08dc4282974b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF000044A7.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB9038
 
-On Tue, 2024-03-12 at 15:32 +0530, Chintan Vankar wrote:
-> diff --git a/drivers/net/ethernet/ti/am65-cpts.c b/drivers/net/ethernet/t=
-i/am65-cpts.c
-> index c66618d91c28..6c1d571c5e0b 100644
-> --- a/drivers/net/ethernet/ti/am65-cpts.c
-> +++ b/drivers/net/ethernet/ti/am65-cpts.c
-> @@ -859,29 +859,6 @@ static long am65_cpts_ts_work(struct ptp_clock_info =
-*ptp)
->  	return delay;
->  }
-> =20
-> -/**
-> - * am65_cpts_rx_enable - enable rx timestamping
-> - * @cpts: cpts handle
-> - * @en: enable
-> - *
-> - * This functions enables rx packets timestamping. The CPTS can timestam=
-p all
-> - * rx packets.
-> - */
-> -void am65_cpts_rx_enable(struct am65_cpts *cpts, bool en)
-> -{
-> -	u32 val;
-> -
-> -	mutex_lock(&cpts->ptp_clk_lock);
-> -	val =3D am65_cpts_read32(cpts, control);
-> -	if (en)
-> -		val |=3D AM65_CPTS_CONTROL_TSTAMP_EN;
-> -	else
-> -		val &=3D ~AM65_CPTS_CONTROL_TSTAMP_EN;
-> -	am65_cpts_write32(cpts, val, control);
-> -	mutex_unlock(&cpts->ptp_clk_lock);
-> -}
-> -EXPORT_SYMBOL_GPL(am65_cpts_rx_enable);
+Commit 870c7ad4a52b ("devlink: protect devlink->dev by the instance
+lock") added devlink instance locking inside a loop that iterates over
+all the registered devlink instances on the machine in the pre-doit
+phase. This can lead to serialization of devlink commands over
+different devlink instances.
 
-It looks like the above chunk will cause a transient build break, as
-the function is still in use and the caller will be removed by the next
-patch. I guess you should move this chunk there.
+For example: While the first devlink instance is executing firmware
+flash, all commands to other devlink instances on the machine are
+forced to wait until the first devlink finishes.
 
-> -
->  static int am65_skb_get_mtype_seqid(struct sk_buff *skb, u32 *mtype_seqi=
-d)
->  {
->  	unsigned int ptp_class =3D ptp_classify_raw(skb);
-> @@ -906,6 +883,72 @@ static int am65_skb_get_mtype_seqid(struct sk_buff *=
-skb, u32 *mtype_seqid)
->  	return 1;
->  }
-> =20
-> +static u64 am65_cpts_find_rx_ts(struct am65_cpts *cpts, struct sk_buff *=
-skb,
-> +				int ev_type, u32 skb_mtype_seqid)
-> +{
-> +	struct list_head *this, *next;
-> +	struct am65_cpts_event *event;
-> +	unsigned long flags;
-> +	u32 mtype_seqid;
-> +	u64 ns =3D 0;
-> +
-> +	am65_cpts_fifo_read(cpts);
-> +	spin_lock_irqsave(&cpts->lock, flags);
-> +	list_for_each_safe(this, next, &cpts->events) {
-> +		event =3D list_entry(this, struct am65_cpts_event, list);
-> +		if (time_after(jiffies, event->tmo)) {
-> +			list_del_init(&event->list);
-> +			list_add(&event->list, &cpts->pool);
-> +			continue;
-> +		}
-> +
-> +		mtype_seqid =3D event->event1 &
-> +			      (AM65_CPTS_EVENT_1_MESSAGE_TYPE_MASK |
-> +			       AM65_CPTS_EVENT_1_SEQUENCE_ID_MASK |
-> +			       AM65_CPTS_EVENT_1_EVENT_TYPE_MASK);
-> +
-> +		if (mtype_seqid =3D=3D skb_mtype_seqid) {
-> +			ns =3D event->timestamp;
-> +			list_del_init(&event->list);
-> +			list_add(&event->list, &cpts->pool);
-> +			break;
-> +		}
-> +	}
-> +	spin_unlock_irqrestore(&cpts->lock, flags);
+Therefore, in the pre-doit phase, take the devlink instance lock only
+for the devlink instance the command is targeting. Devlink layer is
+taking a reference on the devlink instance, ensuring the devlink->dev
+pointer is valid. This reference taking was introduced by commit
+a380687200e0 ("devlink: take device reference for devlink object").
+Without this commit, it would not be safe to access devlink->dev
+lockless.
 
-Ouch, you have to acquire an additional lock per packet and a lot of
-cacheline dithering.
+Fixes: 870c7ad4a52b ("devlink: protect devlink->dev by the instance lock")
+Signed-off-by: Shay Drory <shayd@nvidia.com>
+---
+v1->v2:
+ - Simplify the code by removing the goto
+---
+ net/devlink/netlink.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-Not strictly necessary for this series, but I suggest to invest some
-time reconsidering this schema, it looks bad from performance pov.
-
-Possibly protecting the list with RCU and leaving the recycle to the
-producer could help.
-
-Additionally net-next is currently closed for the merge window, please
-post the new revision (including the target tree in the subj prefix)
-when net-next will re-open in ~2weeks.
-
-Cheers,
-
-Paolo
+diff --git a/net/devlink/netlink.c b/net/devlink/netlink.c
+index 499885c8b9ca..593605c1b1ef 100644
+--- a/net/devlink/netlink.c
++++ b/net/devlink/netlink.c
+@@ -193,12 +193,13 @@ devlink_get_from_attrs_lock(struct net *net, struct nlattr **attrs,
+ 	devname = nla_data(attrs[DEVLINK_ATTR_DEV_NAME]);
+ 
+ 	devlinks_xa_for_each_registered_get(net, index, devlink) {
+-		devl_dev_lock(devlink, dev_lock);
+-		if (devl_is_registered(devlink) &&
+-		    strcmp(devlink->dev->bus->name, busname) == 0 &&
+-		    strcmp(dev_name(devlink->dev), devname) == 0)
+-			return devlink;
+-		devl_dev_unlock(devlink, dev_lock);
++		if (strcmp(devlink->dev->bus->name, busname) == 0 &&
++		    strcmp(dev_name(devlink->dev), devname) == 0) {
++			devl_dev_lock(devlink, dev_lock);
++			if (devl_is_registered(devlink))
++				return devlink;
++			devl_dev_unlock(devlink, dev_lock);
++		}
+ 		devlink_put(devlink);
+ 	}
+ 
+-- 
+2.38.1
 
 
