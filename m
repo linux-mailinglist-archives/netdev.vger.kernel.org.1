@@ -1,264 +1,244 @@
-Return-Path: <netdev+bounces-79458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 295A28795BA
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 15:11:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23CE98795F5
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 15:22:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDF2B2830FC
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 14:11:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A29791F22A72
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 14:22:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F6307A72E;
-	Tue, 12 Mar 2024 14:11:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 492CB7A72D;
+	Tue, 12 Mar 2024 14:22:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="K+/mmyJO"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="JYV9ibE0"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2089.outbound.protection.outlook.com [40.107.95.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484D758AD4;
-	Tue, 12 Mar 2024 14:11:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710252708; cv=none; b=GRRMMs6HwdS2bwY6ZiO0YnqWJufcOhbmCy9mllSMrMs1YAVt4JM3m3ma0mlLXznyyGIshM5gSYIce5pFLDNTR6JJ7pi5uroefCNOCX6bntOwSHzIafPQBiuOmmJzcolbSjMBk5vAb2wNiSdHCVmUj+HDbJS1tijnS6C0bLwUo9g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710252708; c=relaxed/simple;
-	bh=hpk/qMl6bJ8R4kXVvpMSCJMeC9KLpt9ro1qhKIzk9r4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FtMLO9epZcYPx3e40JoRj/5+45XSe2WuyzvL4pEv9VWx4NuQin5erY+yc5jJqZRRoD7vwQHWrY2/iWXINL/djxWq5DuhvudNpuA+GqUov/qGknBJJVURx3xS+qxiurXGbph2hLsEpvK1OdTDgMVxetAWiakuIcoPU4pE3AbUFfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=K+/mmyJO; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1710252702; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=hMXHxPYE/bFxI+Al/MR6iqYqKg8ejsTGgWPkQD/Dibk=;
-	b=K+/mmyJO+ny/EUH679X5e7cHmsKxhjKV4r6U+o5FnEKlzL6cOvlLbgdaFXDHkIpoT6uJNLjmY59b18KmE2AyYzoJxu7CW2ETxOWOvtsf48wR0erpTfvEsql/9Y0wKn8XS90J9rEWnhT7Nn6ST89L1EUvNLU/25abEEqAZcyI5qI=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R121e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046050;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W2MAPD._1710252700;
-Received: from 30.221.129.234(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W2MAPD._1710252700)
-          by smtp.aliyun-inc.com;
-          Tue, 12 Mar 2024 22:11:42 +0800
-Message-ID: <d8d657d4-c55b-44bd-a234-4b9c7cdad7cf@linux.alibaba.com>
-Date: Tue, 12 Mar 2024 22:11:40 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 241BC58AD4
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 14:22:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.89
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710253324; cv=fail; b=I+Sl3dV+1gJFp+Un1WD41zTIfeYzh2PG0q84tZFmKdLBLKoc3c17R3LRjZ6XdeKNSzXPq3Q9xp1dB5cTM1kewfT+yamERrjnjebiocBHSJFaX5+OGkK0bQQTL8KuMO0VlCFCGXujVjlFeeuFsULaNZmFj5LNS/o/RWo5T56JBPo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710253324; c=relaxed/simple;
+	bh=CoJgeR1nSimEr5bXHETLTaPDV9DpT0J4oFh8gRaUM20=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=bYwE+WNYObMHHUN5em8qf9Bmu0xCbQX7tEY6/hrh1Fpet7J20cTpo62104guMMKWu8gd7JxUF/0VUJhU7dtLwrKoj9azFO+wh51fz7G7RU2pk1qfppJFiwtCptwrL5cSpVlN/hCtaoOgjJMg0eVVLQ9dfgAUFEqUczrBVpKKkfc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=JYV9ibE0; arc=fail smtp.client-ip=40.107.95.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=disJ8Zj0XHNNDrbGncoCIh51XdJrJGOfP2CEstFr+1EbA+hjKBxr5RdGqS9p6zDDmSuVS+F/79JxC+Ga3q2kMNqD3pJ48NqV6/GEI78e9wBzAi8AzvvpNVC43hs9E/bGWTnu743j9nVz3Jed2a97nw5Cc1TE9z9WgZ8RYcJ7sMpJ4zpJyObm8M96NAHmGA0SeL3JPHuPES6a9PGOsyUxHiQ2M1t2PpBf1wAoqOQw1EJkaTOj7pD+pZ++lTj6rnmIRWvK+hggo9hhfB4Mpu6dwPQIo7x3vE0xB9ejb6ld/etJjhAQEBBjB1dFYDz28IKfIuq3+CsrVrwINhRYSZ97SQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fuG02a0Sg/Ky0j6Sr236zdAZZ0LJgnbFewm9ODRRBek=;
+ b=bPRcrdda5o+EEQx31YPP5EJlbmB9w8Jgql3pV/FEnO1JP0rw8J6WhuCX3nL+6R23mLBDJRR2NArkLDz15M/ofPF9AVfhbIP3cFi4MJ3EIz9LzH2wie48B8Yr7emw4ZZNn0g084tp0YPZYIP3op6qsYtl86SLb5vNMUXlRKEGo0ZzauFRlNmyRTISl0BXjM+fzl73+DXja8vZv3vvwCIwNOwB/cVqTHFBqSj14CNgZ2m7OJVM+XkG3V9HptIJll09lD+IMb0wQBoXavT0GNk9Zubz59hACJqF5dZ/a2xO4h2S+bL1pCYIiK2d9RMt+ZreCZD5fZe7Wlyw7IxJRHdxFQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fuG02a0Sg/Ky0j6Sr236zdAZZ0LJgnbFewm9ODRRBek=;
+ b=JYV9ibE0feYkU1JeWSXz4khRG6gcFIXvcYTTjcADQkNNIKVqZiRQY00hyqRu5rfmW5V8HtP4hZiVClv0Rz7FoJTZxeSU6mUc+AnBabElXisVPDANGNGOHNzB8K8mJv+sSR1qtqubfn/mwGYbCe+/Cw8kwZwkFhpvzobquQTr0xjBV1sGe3pknLWYYXi49ZaIAOcDRXzHc40+QVIGbC4/dwKdGV8CXoXdA/NFK/MMK/YJiECyXOQViaeAcwkRg+Wt7nvRGPRV+MKzj8zT+Nslpghcrl8Btg7Aoxf8sBAcmMeB9VaKxvIHhbnCXbnHmopwbCx148kQURPjTpwW3bI5SA==
+Received: from BN6PR17CA0039.namprd17.prod.outlook.com (2603:10b6:405:75::28)
+ by DM6PR12MB4465.namprd12.prod.outlook.com (2603:10b6:5:28f::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.35; Tue, 12 Mar
+ 2024 14:21:59 +0000
+Received: from BN2PEPF000044AC.namprd04.prod.outlook.com
+ (2603:10b6:405:75:cafe::b6) by BN6PR17CA0039.outlook.office365.com
+ (2603:10b6:405:75::28) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.18 via Frontend
+ Transport; Tue, 12 Mar 2024 14:21:59 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ BN2PEPF000044AC.mail.protection.outlook.com (10.167.243.107) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7386.12 via Frontend Transport; Tue, 12 Mar 2024 14:21:59 +0000
+Received: from rnnvmail204.nvidia.com (10.129.68.6) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 12 Mar
+ 2024 07:21:43 -0700
+Received: from rnnvmail203.nvidia.com (10.129.68.9) by rnnvmail204.nvidia.com
+ (10.129.68.6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Tue, 12 Mar
+ 2024 07:21:43 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.9)
+ with Microsoft SMTP Server id 15.2.1258.12 via Frontend Transport; Tue, 12
+ Mar 2024 07:21:41 -0700
+From: William Tu <witu@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <jiri@nvidia.com>, <bodong@nvidia.com>, <kuba@kernel.org>,
+	<witu@nvidia.com>
+Subject: [PATCH v2 net-next] Documentation: Add documentation for eswitch attribute
+Date: Tue, 12 Mar 2024 16:20:55 +0200
+Message-ID: <20240312142055.70610-1-witu@nvidia.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 11/11] net/smc: implement DMB-merged
- operations of loopback-ism
-To: Jan Karcher <jaka@linux.ibm.com>, wintera@linux.ibm.com,
- twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
- agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240307095536.29648-1-guwen@linux.alibaba.com>
- <20240307095536.29648-12-guwen@linux.alibaba.com>
- <36141145-6838-45eb-a6d6-1c052b6fb076@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <36141145-6838-45eb-a6d6-1c052b6fb076@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN2PEPF000044AC:EE_|DM6PR12MB4465:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5d93476b-6c59-4f9a-7b6e-08dc429fc773
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	+GuoKD4A5h9TKKtfMFvHq5rMZRcQNww+JywPJmFcY9CPqK7F75Nyc/dN5zyQYPHJn8jviknZOb+Q9641e0JLWLJZYyB4S1bJMqPbaGpavNzEqoaqiH+iynVp4t1UcUQNVjvrea+n9P2KA53c5ir/+iVUjBWrapPKzcHisn25/YLFBBbqGqP11RZSll/LCp4Xli5u2UjFuALxNMJQF3VSkxTK2r5BqL4Sie17vtcaf29VUAGxaCT7kVLEe+7YOhS9g8MUI+FSMdGD/JA7ozG/NfspN5dKia+ENuXZgivExFEPISUT+M5kB+YAySKnDIQyEaKiIazWWE7nKlkuTXvtlfjddiuqvfVuWIuBRU8QIUpaJhzynpi5MvZBD4ChKEDzJo0fXizchMe+ab6OVkbf9SAoNZPhLCAj2EFkYRn3TMk3r6hDjhsjgji7IvVg08GFJ5uBoRTSWegHh90Ew2mW13Sq3YkfFm7JZtiG+rMszmeDd5qnMEFUtxxfuBkDmbF7bD5RNZC7LNfHsY16IiBdcQ9UOHbDxaUMNvwPXh38klvDqcH+e4ain+smHUdNg+LoVlVmXjPfK6D5BW9gO9K9sfS8UhJCp0Cltf3YW4kwAKqDUXJEoByrK97Dw158oWlrquHSscYfTqrbX7tujhenPkC45Tfr79MuJhxS+GDxSs4iXXBc6vCt1HKkz2Ubc1M8/4baVbrUIZb1xKgz9xgItU8rMaloXaFu72/VuU+RGHMxbGoOjCdhTWIlUl77IIy0
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(1800799015)(82310400014)(376005)(36860700004);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Mar 2024 14:21:59.1047
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5d93476b-6c59-4f9a-7b6e-08dc429fc773
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN2PEPF000044AC.namprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4465
 
+Provide devlink documentation for three eswitch attributes:
+mode, inline-mode, and encap-mode.
 
+Signed-off-by: William Tu <witu@nvidia.com>
+---
+v2: feedback from Jakub
+- add link to switchdev and representor
+- emphasize "mode"
+- document that inline-mode and encap-mode can be use either with
+  legacy or switchdev mode
+---
+ .../devlink/devlink-eswitch-attr.rst          | 76 +++++++++++++++++++
+ Documentation/networking/devlink/index.rst    |  1 +
+ Documentation/networking/representors.rst     |  1 +
+ 3 files changed, 78 insertions(+)
+ create mode 100644 Documentation/networking/devlink/devlink-eswitch-attr.rst
 
-On 2024/3/12 16:06, Jan Karcher wrote:
-> 
-> 
-> On 07/03/2024 10:55, Wen Gu wrote:
->> This implements operations related to merging sndbuf with peer DMB in
->> loopback-ism. The DMB won't be freed until no sndbuf is attached to it.
-> 
-> Hi Wen Gu,
-> 
-> while I'm still reviewing let me drop a lockdep finding.
-> 
->>
->> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
->> ---
->>   net/smc/smc_loopback.c | 136 +++++++++++++++++++++++++++++++++++------
->>   net/smc/smc_loopback.h |   3 +
->>   2 files changed, 119 insertions(+), 20 deletions(-)
->>
->> diff --git a/net/smc/smc_loopback.c b/net/smc/smc_loopback.c
->> index 6828e0ad3e90..7e772f3772de 100644
->> --- a/net/smc/smc_loopback.c
->> +++ b/net/smc/smc_loopback.c
-> 
-> [...]
-> 
->> @@ -170,8 +249,22 @@ static int smc_lo_move_data(struct smcd_dev *smcd, u64 dmb_tok,
->>   {
->>       struct smc_lo_dmb_node *rmb_node = NULL, *tmp_node;
->>       struct smc_lo_dev *ldev = smcd->priv;
->> -
->> -    read_lock(&ldev->dmb_ht_lock);
->> +    struct smc_connection *conn;
->> +
->> +    if (!sf)
->> +        /* since sndbuf is merged with peer DMB, there is
->> +         * no need to copy data from sndbuf to peer DMB.
->> +         */
->> +        return 0;
->> +
->> +    /* read_lock_bh() is used here just to make lockdep
->> +     * happy, because spin_(un)lock_bh(&conn->send_lock) wraps
->> +     * smc_lo_move_data() and if we use read_lock() here, lockdep
->> +     * will complain about SOFTIRQ-safe -> SOFTIRQ-unsafe lock
->> +     * order detected, but in fact ldev->dmb_ht_lock will never
->> +     * be held in bh context.
->> +     */
->> +    read_lock_bh(&ldev->dmb_ht_lock);
->>       hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb_tok) {
->>           if (tmp_node->token == dmb_tok) {
->>               rmb_node = tmp_node;
->> @@ -182,19 +275,14 @@ static int smc_lo_move_data(struct smcd_dev *smcd, u64 dmb_tok,
->>           read_unlock(&ldev->dmb_ht_lock);
->>           return -EINVAL;
->>       }
->> -    read_unlock(&ldev->dmb_ht_lock);
->> +    read_unlock_bh(&ldev->dmb_ht_lock);
->>       memcpy((char *)rmb_node->cpu_addr + offset, data, size);
->> -    if (sf) {
->> -        struct smc_connection *conn =
->> -            smcd->conn[rmb_node->sba_idx];
->> -
->> -        if (conn && !conn->killed)
->> -            smcd_cdc_rx_handler(conn);
->> -        else
->> -            return -EPIPE;
->> -    }
->> +    conn = smcd->conn[rmb_node->sba_idx];
->> +    if (!conn || conn->killed)
->> +        return -EPIPE;
->> +    smcd_cdc_rx_handler(conn);
-> 
-> [ 2385.528515] ============================================
-> [ 2385.528517] WARNING: possible recursive locking detected
-> [ 2385.528519] 6.8.0-loopback_ism-g30af186e8a18-dirty #12 Not tainted
-> [ 2385.528521] --------------------------------------------
-> [ 2385.528522] smcapp/51326 is trying to acquire lock:
-> [ 2385.528524] 000000018707a128 (&smc->conn.send_lock){+...}-{2:2}, at: smc_tx_sndbuf_nonempty+0xba/0x1c0 [smc]
-> [ 2385.528552]
->                 but task is already holding lock:
-> [ 2385.528554] 0000000187078728 (&smc->conn.send_lock){+...}-{2:2}, at: smc_cdc_get_slot_and_msg_send+0x66/0xa0 [smc]
-> [ 2385.528568]
->                 other info that might help us debug this:
-> [ 2385.528570]  Possible unsafe locking scenario:
-> 
-> [ 2385.528572]        CPU0
-> [ 2385.528573]        ----
-> [ 2385.528574]   lock(&smc->conn.send_lock);
-> [ 2385.528576]   lock(&smc->conn.send_lock);
-> [ 2385.528579]
->                  *** DEADLOCK ***
-> 
-> [ 2385.528580]  May be due to missing lock nesting notation
-> 
-> [ 2385.528582] 3 locks held by smcapp/51326:
-> [ 2385.528584]  #0: 0000000187078378 (sk_lock-AF_SMC){+.+.}-{0:0}, at: smc_recvmsg+0x3c/0x2b0 [smc]
-> [ 2385.528598]  #1: 0000000187078728 (&smc->conn.send_lock){+...}-{2:2}, at: smc_cdc_get_slot_and_msg_send+0x66/0xa0 [smc]
-> [ 2385.528613]  #2: 0000000187079ce8 (slock-AF_SMC){+...}-{2:2}, at: smc_cdc_msg_recv+0x56/0xe0 [smc]
-> [ 2385.528627]
->                 stack backtrace:
-> [ 2385.528660] CPU: 3 PID: 51326 Comm: smcapp Not tainted 6.8.0-loopback_ism-g30af186e8a18-dirty #12
-> [ 2385.528663] Hardware name: IBM 3906 M04 704 (LPAR)
-> [ 2385.528664] Call Trace:
-> [ 2385.528666]  [<000000012db60788>] dump_stack_lvl+0x90/0x120
-> [ 2385.528671]  [<000000012cc6d088>] validate_chain+0x560/0x960
-> [ 2385.528677]  [<000000012cc6f644>] __lock_acquire+0x654/0xd58
-> [ 2385.528680]  [<000000012cc70a04>] lock_acquire.part.0+0xec/0x260
-> [ 2385.528683]  [<000000012cc70c24>] lock_acquire+0xac/0x170
-> [ 2385.528687]  [<000000012dba4ccc>] _raw_spin_lock_bh+0x5c/0xb0
-> [ 2385.528690]  [<000003ff80453b32>] smc_tx_sndbuf_nonempty+0xba/0x1c0 [smc]
-> [ 2385.528702]  [<000003ff8045428a>] smc_tx_pending+0x32/0x60 [smc]
-> [ 2385.528712]  [<000003ff80451f02>] smc_cdc_msg_recv_action+0x3c2/0x528 [smc]
-> [ 2385.528723]  [<000003ff804520cc>] smc_cdc_msg_recv+0x64/0xe0 [smc]
-> [ 2385.528734]  [<000003ff80452a4c>] smcd_cdc_rx_handler+0x64/0x70 [smc]
-> [ 2385.528745]  [<000003ff80459f7e>] smc_lo_move_data+0xde/0x100 [smc]
-> [ 2385.528755]  [<000003ff804533e0>] smcd_tx_ism_write+0x68/0x90 [smc]
-> [ 2385.528766]  [<000003ff804528a4>] smcd_cdc_msg_send+0x74/0x118 [smc]
-> [ 2385.528776]  [<000003ff804529b8>] smc_cdc_get_slot_and_msg_send+0x70/0xa0 [smc]
-> [ 2385.528788]  [<000003ff804543ec>] smc_tx_consumer_update+0xe4/0x1b0 [smc]
-> [ 2385.528798]  [<000003ff8045458e>] smc_rx_update_consumer+0x86/0x170 [smc]
-> [ 2385.528809]  [<000003ff80455ba8>] smc_rx_recvmsg+0x3b8/0x6e8 [smc]
-> [ 2385.528820]  [<000003ff804388a4>] smc_recvmsg+0xdc/0x2b0 [smc]
-> [ 2385.528831]  [<000000012d8a6d58>] sock_recvmsg+0x70/0xb0
-> [ 2385.528837]  [<000000012d8aa0c8>] __sys_recvfrom+0xa8/0x128
-> [ 2385.528840]  [<000000012d8ab3ca>] __do_sys_socketcall+0x1ca/0x398
-> [ 2385.528844]  [<000000012db8d4c4>] __do_syscall+0x244/0x308
-> [ 2385.528847]  [<000000012dba6140>] system_call+0x70/0x98
-> [ 2385.528850] INFO: lockdep is turned off.
-> 
-> 
-> I did not investigate deeper, yet. Just an early heads up that there might be something broken.
-> 
+diff --git a/Documentation/networking/devlink/devlink-eswitch-attr.rst b/Documentation/networking/devlink/devlink-eswitch-attr.rst
+new file mode 100644
+index 000000000000..08bb39ab1528
+--- /dev/null
++++ b/Documentation/networking/devlink/devlink-eswitch-attr.rst
+@@ -0,0 +1,76 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++==========================
++Devlink E-Switch Attribute
++==========================
++
++Devlink E-Switch supports two modes of operation: legacy and switchdev.
++Legacy mode operates based on traditional MAC/VLAN steering rules. Switching
++decisions are made based on MAC addresses, VLANs, etc. There is limited ability
++to offload switching rules to hardware.
++
++On the other hand, switchdev mode allows for more advanced offloading
++capabilities of the E-Switch to hardware. In switchdev mode, more switching
++rules and logic can be offloaded to the hardware switch ASIC. It enables
++representor netdevices that represent the slow path of virtual functions (VFs)
++or scalable-functions (SFs) of the device. See more information about
++:ref:`Documentation/networking/switchdev.rst <switchdev>` and
++:ref:`Documentation/networking/representors.rst <representors>`.
++
++In addition, the devlink E-Switch also comes with other attributes listed
++in the following section.
++
++Attributes Description
++======================
++
++The following is a list of E-Switch attributes.
++
++.. list-table:: E-Switch attributes
++   :widths: 8 5 45
++
++   * - Name
++     - Type
++     - Description
++   * - ``mode``
++     - enum
++     - The mode of the device. The mode can be one of the following:
++
++       * ``legacy`` operates based on traditional MAC/VLAN steering
++         rules.
++       * ``switchdev`` allows for more advanced offloading capabilities of
++         the E-Switch to hardware.
++   * - ``inline-mode``
++     - enum
++     - Some HWs need the VF driver to put part of the packet
++       headers on the TX descriptor so the e-switch can do proper
++       matching and steering. Support for both switchdev mode and legacy mode.
++
++       * ``none`` none.
++       * ``link`` L2 mode.
++       * ``network`` L3 mode.
++       * ``transport`` L4 mode.
++   * - ``encap-mode``
++     - enum
++     - The encapsulation mode of the device. Support for both switchdev mode
++       and legacy mode. The mode can be one of the following:
++
++       * ``none`` Disable encapsulation support.
++       * ``basic`` Enable encapsulation support.
++
++Example Usage
++=============
++
++.. code:: shell
++
++    # enable switchdev mode
++    $ devlink dev eswitch set pci/0000:08:00.0 mode switchdev
++
++    # set inline-mode and encap-mode
++    $ devlink dev eswitch set pci/0000:08:00.0 inline-mode none encap-mode basic
++
++    # display devlink device eswitch attributes
++    $ devlink dev eswitch show pci/0000:08:00.0
++      pci/0000:08:00.0: mode switchdev inline-mode none encap-mode basic
++
++    # enable encap-mode with legacy mode
++    $ devlink dev eswitch set pci/0000:08:00.0 mode legacy inline-mode none encap-mode basic
+diff --git a/Documentation/networking/devlink/index.rst b/Documentation/networking/devlink/index.rst
+index e14d7a701b72..948c8c44e233 100644
+--- a/Documentation/networking/devlink/index.rst
++++ b/Documentation/networking/devlink/index.rst
+@@ -67,6 +67,7 @@ general.
+    devlink-selftests
+    devlink-trap
+    devlink-linecard
++   devlink-eswitch-attr
+ 
+ Driver-specific documentation
+ -----------------------------
+diff --git a/Documentation/networking/representors.rst b/Documentation/networking/representors.rst
+index decb39c19b9e..5e23386f6968 100644
+--- a/Documentation/networking/representors.rst
++++ b/Documentation/networking/representors.rst
+@@ -1,4 +1,5 @@
+ .. SPDX-License-Identifier: GPL-2.0
++.. _representors:
+ 
+ =============================
+ Network Function Representors
+-- 
+2.38.1
 
-Thank you for reminding, Jan. I think it is because that I used smcd_cdc_rx_handler(),
-which may acquire conn->send_lock, in smc_lo_move_data() where the send_lock has been
-held. I reproduced this issue and will fix it in v3.
-
-Thanks!
-
-> Thank you
-> - Jan
-> 
-> 
->>       return 0;
->>   }
->> @@ -226,6 +314,9 @@ static const struct smcd_ops lo_ops = {
->>       .query_remote_gid = smc_lo_query_rgid,
->>       .register_dmb = smc_lo_register_dmb,
->>       .unregister_dmb = smc_lo_unregister_dmb,
->> +    .support_dmb_nocopy = smc_lo_support_dmb_nocopy,
->> +    .attach_dmb = smc_lo_attach_dmb,
->> +    .detach_dmb = smc_lo_detach_dmb,
->>       .add_vlan_id = smc_lo_add_vlan_id,
->>       .del_vlan_id = smc_lo_del_vlan_id,
->>       .set_vlan_required = smc_lo_set_vlan_required,
->> @@ -304,12 +395,17 @@ static int smc_lo_dev_init(struct smc_lo_dev *ldev)
->>       smc_lo_generate_id(ldev);
->>       rwlock_init(&ldev->dmb_ht_lock);
->>       hash_init(ldev->dmb_ht);
->> +    atomic_set(&ldev->dmb_cnt, 0);
->> +    init_waitqueue_head(&ldev->ldev_release);
->> +
->>       return smcd_lo_register_dev(ldev);
->>   }
->>   static void smc_lo_dev_exit(struct smc_lo_dev *ldev)
->>   {
->>       smcd_lo_unregister_dev(ldev);
->> +    if (atomic_read(&ldev->dmb_cnt))
->> +        wait_event(ldev->ldev_release, !atomic_read(&ldev->dmb_cnt));
->>   }
->>   static void smc_lo_dev_release(struct device *dev)
->> diff --git a/net/smc/smc_loopback.h b/net/smc/smc_loopback.h
->> index 24ab9d747613..9156a6c37e65 100644
->> --- a/net/smc/smc_loopback.h
->> +++ b/net/smc/smc_loopback.h
->> @@ -30,6 +30,7 @@ struct smc_lo_dmb_node {
->>       u32 sba_idx;
->>       void *cpu_addr;
->>       dma_addr_t dma_addr;
->> +    refcount_t refcnt;
->>   };
->>   struct smc_lo_dev {
->> @@ -37,9 +38,11 @@ struct smc_lo_dev {
->>       struct device dev;
->>       u16 chid;
->>       struct smcd_gid local_gid;
->> +    atomic_t dmb_cnt;
->>       rwlock_t dmb_ht_lock;
->>       DECLARE_BITMAP(sba_idx_mask, SMC_LO_MAX_DMBS);
->>       DECLARE_HASHTABLE(dmb_ht, SMC_LO_DMBS_HASH_BITS);
->> +    wait_queue_head_t ldev_release;
->>   };
->>   #endif
 
