@@ -1,231 +1,292 @@
-Return-Path: <netdev+bounces-79487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9BA687976B
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 16:22:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8835987977D
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 16:26:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED63E1C20FF6
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 15:22:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F977B22245
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 15:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285AD7C0AE;
-	Tue, 12 Mar 2024 15:22:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 792F87C0A2;
+	Tue, 12 Mar 2024 15:26:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jOcCkFbf"
+	dkim=pass (2048-bit key) header.d=risingedge.co.za header.i=@risingedge.co.za header.b="TSsh+C57"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from outgoing1.flk.host-h.net (outgoing1.flk.host-h.net [188.40.0.86])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46C787C0A3;
-	Tue, 12 Mar 2024 15:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF38E7BB08;
+	Tue, 12 Mar 2024 15:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.0.86
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710256930; cv=none; b=Xa6L33daDuFmpS0pDrBckUq6xIsuCqp2igkyw65DfEm0X5ex+b9IPeE98MUQjV5BcDIMz9DULvYPkT9Y1iX2DuJgv0m9f/r/AefOp0TAaNLIjo8OcHK9V3EokgTeLx2ipP3nwPkAEw47EmocIqTpydl6cjbRpsUbW/oGh1/pQYc=
+	t=1710257186; cv=none; b=LbXsOpnz6pX8LGF7iD7ux6rE54Lpx1wwzPQFxlflvxbmlMwRZmhqgIiXx+DXGZ/c3SV8iuwaYCs/ypU40E96c0KHcWIayl2JsmcuKQqv9eILVPPfF5gPXyJHCArZmcrv+2/KHt8i8tzlHkRcTHswdE1evdjkphjnciiSjPfS+uI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710256930; c=relaxed/simple;
-	bh=/Ijo8rHPf1fyrPquGh0hCXAuvhCZNBSsRG3Zru7uFyM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u3OSDvbkUvozDCvppX3oZSyogi9EOCftmDXxTNJTDA2qzAyHakEqfBRyl1YVlQN5auM+FUpuITZfYAgbV2eJbVorHVVPMYeLj1K4IDL8fdxmSwnqOAiMSF6RyqbOznMC58KRjWMKAa5ph+6X1kDE/OH089sRSRZnhnnGxcjEvsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jOcCkFbf; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710256929; x=1741792929;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=/Ijo8rHPf1fyrPquGh0hCXAuvhCZNBSsRG3Zru7uFyM=;
-  b=jOcCkFbf2yBifM4x9VufuOXdMSquzzrPwWj9IdpdpZIEjIVabCAL6jLT
-   sxWw+Yot+XIFoTi1nSv6s0SbqJgpIHHvDuEHnZDXi76FU8T9ReuSgWzIX
-   osjqigxiseo09n3i4DvUH6OIaLlw2NOcA2VW1cC7QOJV47ZHkd/JhWMzg
-   bibAcK8EHQKjzxEXTEpHRxfrsWqJJ5/wqFbzWSuv7dOGtUPRIeIXUWZij
-   WkaOWMRzgGYdYgjte74mEL7PNc+HlfQqgsap9UuJoLLoSkPeAwuKFC/Ji
-   ZXmt79oMWx1EkK7HndYxkfStV+F1OubYasL61tqxMaiWw7wz+DK0mKKGL
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="5103847"
-X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
-   d="scan'208";a="5103847"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 08:22:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
-   d="scan'208";a="11534111"
-Received: from hhutton-mobl1.amr.corp.intel.com (HELO [10.209.25.241]) ([10.209.25.241])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 08:22:07 -0700
-Message-ID: <4e6627b2-30cd-4c50-bf2f-24cf845cd4bc@linux.intel.com>
-Date: Tue, 12 Mar 2024 08:22:06 -0700
+	s=arc-20240116; t=1710257186; c=relaxed/simple;
+	bh=BlcNaRS2BfOhRIBUWeiUQSa+/oYiDbPZSHV9OCJ42CM=;
+	h=MIME-Version:Content-Type:Date:From:To:Cc:Subject:In-Reply-To:
+	 References:Message-ID; b=jLbmtBzWWjnelBvPVf4MElA+fEUww773nMjLdM9jCRi8gJe5ENhgqVbdLzc3I4FGE8fD3VAY0ltND62UuJqy0y+FfF2NJ5JOa4tBmY7FZq2/b4FuZIMbxqQQUauCR7mzeYSkdD5C394zmDeTqpFIXsfZpXlsZTVTRCzf+icYfLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=risingedge.co.za; spf=pass smtp.mailfrom=risingedge.co.za; dkim=pass (2048-bit key) header.d=risingedge.co.za header.i=@risingedge.co.za header.b=TSsh+C57; arc=none smtp.client-ip=188.40.0.86
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=risingedge.co.za
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=risingedge.co.za
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=risingedge.co.za; s=xneelo; h=Message-ID:References:In-Reply-To:Subject:Cc:
+	To:From:Date:Content-Transfer-Encoding:Content-Type:MIME-Version:reply-to:
+	sender:bcc; bh=gbDwYUROXNM2O+x3xQy95KV7qywRuIIQTUYJjssMCUw=; b=TSsh+C57H5sx55
+	HSKJfKYRhO6frDbhsHKDuoSHQyqdTxufQRaY+PlKxTjVHIZgYxW78htXgus6zGhYiaTfmIHjvBTJ/
+	OLhlu0i4bU2hqTQYR5TN5x4iwUrCS4Ich5n2qKuqIDqJPdA+b01hEMiqmTzRrzB22H3nM1YWQOMrE
+	dXJPF3/WtmLQSbLdty9pZshSbv2Ck+K1MzM6jxVIc0RP/d6m7RfuiDKqUZ4uLbFTsemdkWZC7siHr
+	RL/VlsJ8cnE5fYWGz2Hvaw33XZTWtF23orOZxJmgGsU8gLFRJsu3srzXWk1oHvPhE10nNFT+MKeY6
+	DI2tYBj2pHKrN5+aNvnA==;
+Received: from www31.flk1.host-h.net ([188.40.1.173])
+	by antispam3-flk1.host-h.net with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <justin.swartz@risingedge.co.za>)
+	id 1rk40x-00G4ad-V6; Tue, 12 Mar 2024 17:26:07 +0200
+Received: from roundcubeweb1.flk1.host-h.net ([138.201.244.33] helo=webmail9.konsoleh.co.za)
+	by www31.flk1.host-h.net with esmtpa (Exim 4.92)
+	(envelope-from <justin.swartz@risingedge.co.za>)
+	id 1rk40t-00070T-Sz; Tue, 12 Mar 2024 17:25:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/5] Drivers: hv: vmbus: Track decrypted status in
- vmbus_gpadl
-Content-Language: en-US
-To: Michael Kelley <mhklinux@outlook.com>,
- "rick.p.edgecombe@intel.com" <rick.p.edgecombe@intel.com>,
- "kys@microsoft.com" <kys@microsoft.com>,
- "haiyangz@microsoft.com" <haiyangz@microsoft.com>,
- "wei.liu@kernel.org" <wei.liu@kernel.org>,
- "decui@microsoft.com" <decui@microsoft.com>,
- "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>,
- "kirill.shutemov@linux.intel.com" <kirill.shutemov@linux.intel.com>,
- "dave.hansen@linux.intel.com" <dave.hansen@linux.intel.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-coco@lists.linux.dev" <linux-coco@lists.linux.dev>
-Cc: "elena.reshetova@intel.com" <elena.reshetova@intel.com>
-References: <20240311161558.1310-1-mhklinux@outlook.com>
- <20240311161558.1310-3-mhklinux@outlook.com>
- <13581af9-e5f0-41ca-939f-33948b2133e7@linux.intel.com>
- <SN6PR02MB415742AEEE7F1389D80B6E51D42B2@SN6PR02MB4157.namprd02.prod.outlook.com>
-From: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>
-In-Reply-To: <SN6PR02MB415742AEEE7F1389D80B6E51D42B2@SN6PR02MB4157.namprd02.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
 Content-Transfer-Encoding: 8bit
+Date: Tue, 12 Mar 2024 17:25:59 +0200
+From: Justin Swartz <justin.swartz@risingedge.co.za>
+To: =?UTF-8?Q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
+Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, Florian
+ Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH] net: dsa: mt7530: disable LEDs before reset
+In-Reply-To: <6df6db7e-7842-4194-b429-ab7443a18ccb@arinc9.com>
+References: <20240305043952.21590-1-justin.swartz@risingedge.co.za>
+ <6064ba52-2470-4c56-958c-35632187f148@arinc9.com>
+ <d45083788db8b0b1ace051adecfe6a3a@risingedge.co.za>
+ <1bfd93f1-36d5-436e-818e-2ebdcf475b44@arinc9.com>
+ <0439f80319127b6a4a9c19108bcc0065@risingedge.co.za>
+ <6df6db7e-7842-4194-b429-ab7443a18ccb@arinc9.com>
+Message-ID: <9a7c29b51575083201b963638bdb9fa5@risingedge.co.za>
+X-Sender: justin.swartz@risingedge.co.za
+User-Agent: Roundcube Webmail/1.3.17
+X-Authenticated-Sender: justin.swartz@risingedge.co.za
+X-Virus-Scanned: Clear
+X-SpamExperts-Domain: risingedge.co.za
+X-SpamExperts-Username: 
+Authentication-Results: host-h.net; auth=pass (login) smtp.auth=@risingedge.co.za
+X-SpamExperts-Outgoing-Class: ham
+X-SpamExperts-Outgoing-Evidence: Combined (0.06)
+X-Recommended-Action: accept
+X-Filter-ID: Pt3MvcO5N4iKaDQ5O6lkdGlMVN6RH8bjRMzItlySaT9TyjqxmnVSjLe3LUILSAncPUtbdvnXkggZ
+ 3YnVId/Y5jcf0yeVQAvfjHznO7+bT5wCPRB8bAzJcv2cv+UqiTTc2+CpNcmBnO4XM3Sck4bwNogU
+ WCl1nkLBzZX0KuJ9bXiS85Z42w/+2OBolTNFbPomXFWCX8oNdggW7HE9XDTdSejrkEpbuUvwMvHx
+ 3T+KSG//gbuP7hnUK8NQdLwsVWKIv+fXqqb3FJ1Z7kkAIev0U9CKH/oA07tJunDPm536TODb5GPR
+ oyaaXp1VNA9dXvxV+mFktoWo3CKg4C3LDJ75vu2U4GT70q7ZqN/P49BncZ5XB7lfx9K88uL/WnJE
+ LAEP514Y/yfAEbrTclu3OeNcbACmFr3ts0d2E6vXySsvfMaT9Bjf4etJ827HW1/sdZ81dz6BqXHU
+ oYg+nmOeSIjjxA24TPuOyBrko5yKpcR03QEJ9DjWmjcfK/FpTD0spWG+rMYoj8CdNq4vLYsMDbt4
+ 2oUP1Ae/eGZl2OLANHAHEjHENEhX9cq65nsXPA0MIFDIPOMDW/6+MC+5Mq5RH9OoW0W22an/ubzj
+ InB/ImqScRfGyrhHVstPeAuxsRhUFJC4TtSvIahFt3uEpT0304dV2Yoz1SesQUA6bnjJZT6m9lal
+ 9vikoy50DqR3hu/rL5PGAoTDzn0QdoxFeruM0Uhu+TDN1MfKxpvQx1BwwF9G5DEihnVW8zB2Qi26
+ vkVALycwzSdeC1kd8cXa71WqOc72jXbRpMw6Agze1f399OurHEyYS7nq+EBNvgiWKNNSkdVDZOrL
+ 5kxgO94lq2025NSImfKeGaSpuwkt9kMFaoxOFH2cp4YsTYwGNGW12ki18UnPMs4VIrisX+dtrxYn
+ /0jYEvj5QBAPtzfeVlNHdCJmwgf0M7fnqgzRvCMiN68tcHQey84mBB4XoB473XOJmIRPynE3O7YZ
+ oFBs6I7QuC1BjGNT52hVLEr/9PrrMm81h6IAYzikeIJfw26MB/V1E5BP9Gv0xI1YXOxC1lZqyFpL
+ AwQr6muMti2YanICQnMITeB2fd0UyjU/MIq3Vtx6CgQGHtezYqxGMqsKjARq8PBC4qgGsfAERwCB
+ JFs7XjZYbJPBsmpIto2O4JO2fx1gIuNHgi11AwJSTGCrOFs22K1ZnDqAw3gLmOBPHazhChxq9nGW
+ aSi6bFHidB1VgzDzDZn/+QEiRQv+PVjjwa+Z5RFCOMTMctdsTl1csEqhToiNz8IDdfFYVDBYJee7
+ gx/u82RtUz+q9amw8AuFhDmQdF5MpRw0mVfWLKEgol9rYV4JEcNP1rJoln/cD8h/RIvkzXRTCYvX
+ WLQhlD92+1l+zHfJg1FMwntsduNBxKPaTpE5L8d4VqFy6yKUFQtzhTlGiGL9BwIzkmvJREfBLui5
+ jZGa6GhjCOO2HhD88MS3lvGH/VLGIIDSVMZhrIoAWTF5tIdhy/UIEBYDcZg+Q8UhuRLyBn1+pvlH
+ hV6a5QjptwQBGybQyDQ2/GYwPjlMcE57ESN6G+kn87CtwPdB/10jfVNpDbYnXJdSRQj8460WHJib
+ IxmU2pb4i4DTkMZeMiNI9JSIyUbtnrlbG4BI8o81FOo91axhCaqPShJzgHH7y4ZfQxML
+X-Report-Abuse-To: spam@antispamquarantine.host-h.net
+
+On 2024-03-12 16:06, Arınç ÜNAL wrote:
+> On 12.03.2024 15:01, Justin Swartz wrote:
+>> Arınç
+>> 
+>> On 2024-03-12 04:41, Arınç ÜNAL wrote:
+>>> Wouldn't it be a better idea to increase the delay between
+>>> reset_control_assert() and reset_control_deassert(), and
+>>> gpiod_set_value_cansleep(priv->reset, 0) and
+>>> gpiod_set_value_cansleep(priv->reset, 1) instead of disabling the LED
+>>> controller and delaying before reset?
+>> 
+>> I've done some additional tests to see what the difference would be
+>> between increasing the reset hold period vs. disabling the LEDs then
+>> sleeping before reset.
+>> 
+>> 
+>> I wanted to know:
+>> 
+>> When an active link is present on Port 3 at boot, what are the
+>> minimum, maximum and average periods between ESW_P3_LED_0
+>> going low and the signal inversion that seems to co-incide with
+>> reset_control_deassert() for each approach?
+>> 
+>> 
+>> I created two patches:
+>> 
+>> WITH INCREASED RESET DELAY
+>> 
+>> As I submitted a patch that added an intended 1000 - 1100 usec delay
+>> before reset, I thought it would be fair to increase the reset hold
+>> period by the same value.
+>> 
+>> ---%---
+>> --- a/drivers/net/dsa/mt7530.c
+>> +++ b/drivers/net/dsa/mt7530.c
+>> @@ -2243,11 +2243,11 @@ mt7530_setup(struct dsa_switch *ds)
+>>           */
+>>          if (priv->mcm) {
+>>                  reset_control_assert(priv->rstc);
+>> -               usleep_range(1000, 1100);
+>> +               usleep_range(2000, 2200);
+>>                  reset_control_deassert(priv->rstc);
+>>          } else {
+>>                  gpiod_set_value_cansleep(priv->reset, 0);
+>> -               usleep_range(1000, 1100);
+>> +               usleep_range(2000, 2200);
+>>                  gpiod_set_value_cansleep(priv->reset, 1);
+>>          }
+>> ---%---
+>> 
+>> 
+>> DISABLE LEDS BEFORE RESET
+>> 
+>> Reset hold period unchanged from the intended 1000 - 1100 usec.
+>> 
+>> ---%---
+>> --- a/drivers/net/dsa/mt7530.c
+>> +++ b/drivers/net/dsa/mt7530.c
+>> @@ -2238,6 +2238,12 @@ mt7530_setup(struct dsa_switch *ds)
+>>                  }
+>>          }
+>> 
+>> +       /* Disable LEDs before reset to prevent the MT7530 sampling a
+>> +        * potentially incorrect HT_XTAL_FSEL value.
+>> +        */
+>> +       mt7530_write(priv, MT7530_LED_EN, 0);
+>> +       usleep_range(1000, 1100);
+>> +
+>>          /* Reset whole chip through gpio pin or memory-mapped 
+>> registers for
+>>           * different type of hardware
+>>           */
+>> ---%---
+>> 
+>> 
+>> I ran 20 tests per patch, applied exclusively. 40 tests in total.
+>> 
+>>       <-- ESW_P3_LED_0 Low Period before Reset Deassertion -->
+>> 
+>>    TEST    WITH INCREASED RESET DELAY    DISABLE LEDS BEFORE RESET
+>>       #                        (usec)                       (usec)
+>> -------------------------------------------------------------------
+>>       1                           182                         4790
+>>       2                           370                         3470
+>>       3                           240                         4635
+>>       4                          1475                         4850
+>>       5                            70                         4775
+>>       6                          2730                         4575
+>>       7                          3180                         4565
+>>       8                           265                         5650
+>>       9                           270                         4690
+>>      10                          1525                         4450
+>>      11                          3210                         4735
+>>      12                           120                         4690
+>>      13                           185                         4625
+>>      14                           305                         7020
+>>      15                          2975                         4720
+>>      16                           245                         4675
+>>      17                           350                         4740
+>>      18                            80                        17920
+>>      19                           150                        17665
+>>      20                           100                         4620
+>> 
+>>     Min                            70                         3470
+>>     Max                          3210                        17920
+>> 
+>>    Mean                           270                         4720
+-1s/  Mean/Median/
+
+>>     Avg                       923.421                     6161.579
+>> 
+>> 
+>> Every test resulted in a 40MHz HT_XTAL_FSEL, but after seeing 70 usec
+>> and 80 usec periods I wondered how many more tests it may take before
+>> an 25MHz HT_XTAL_FSEL appears.
+>> 
+>> I was also surprised by the 17920 usec and 17665 usec periods listed
+>> under the DISABLED LEDS BEFORE RESET column. Nothing unusual seemed
+>> to be happening, at least as far as the kernel message output was
+>> concerned.
+>> 
+>> What do you make of these results?
+> 
+> What I see is setting ESW_P3_LED_0 low via reset assertion is much more
+> efficient than doing so by setting the LED controller off. So I'd 
+> prefer
+> increasing the delay between assertion and reassertion. For example, 
+> the
+> Realtek DSA subdriver has a much more generous delay. 25ms after reset
+> assertion [1].
+> 
+> Looking at your results, 2000 - 2200 usec delay still seems too close, 
+> so
+> let's agree on an amount that will ensure that boards in any 
+> circumstances
+> will have these pins back to the bootstrapping configuration before 
+> reset
+> deassertion. What about 5000 - 5100 usec?
+
+    TEST    ESW_P3_LED_0 LOW PERIOD
+       #                     (usec)
+----------------------------------
+       1                       5410
+       2                       5440
+       3                       4375
+       4                       5490
+       5                       5475
+       6                       4335
+       7                       4370
+       8                       5435
+       9                       4205
+      10                       4335
+      11                       3750
+      12                       3170
+      13                       4395
+      14                       4375
+      15                       3515
+      16                       4335
+      17                       4220
+      18                       4175
+      19                       4175
+      20                       4350
+
+     Min                       3170
+     Max                       5490
+
+  Median                   4342.500
+     Avg                   4466.500
+
+Looks reasonable to me.
 
 
-On 3/11/24 11:07 PM, Michael Kelley wrote:
-> From: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>
->> On 3/11/24 9:15 AM, mhkelley58@gmail.com wrote:
->>> From: Rick Edgecombe <rick.p.edgecombe@intel.com>
->>>
->>> In CoCo VMs it is possible for the untrusted host to cause
->>> set_memory_encrypted() or set_memory_decrypted() to fail such that an
->>> error is returned and the resulting memory is shared. Callers need to
->>> take care to handle these errors to avoid returning decrypted (shared)
->>> memory to the page allocator, which could lead to functional or security
->>> issues.
->>>
->>> In order to make sure callers of vmbus_establish_gpadl() and
->>> vmbus_teardown_gpadl() don't return decrypted/shared pages to
->>> allocators, add a field in struct vmbus_gpadl to keep track of the
->>> decryption status of the buffers. This will allow the callers to
->>> know if they should free or leak the pages.
->>>
->>> Signed-off-by: Rick Edgecombe <rick.p.edgecombe@intel.com>
->>> Signed-off-by: Michael Kelley <mhklinux@outlook.com>
->>> ---
-Reviewed-by: Kuppuswamy Sathyanarayanan <sathyanarayanan.kuppuswamy@linux.intel.com>
->>>  drivers/hv/channel.c   | 25 +++++++++++++++++++++----
->>>  include/linux/hyperv.h |  1 +
->>>  2 files changed, 22 insertions(+), 4 deletions(-)
->>>
->>> diff --git a/drivers/hv/channel.c b/drivers/hv/channel.c
->>> index 56f7e06c673e..bb5abdcda18f 100644
->>> --- a/drivers/hv/channel.c
->>> +++ b/drivers/hv/channel.c
->>> @@ -472,9 +472,18 @@ static int __vmbus_establish_gpadl(struct vmbus_channel *channel,
->>>  		(atomic_inc_return(&vmbus_connection.next_gpadl_handle) - 1);
->>>
->>>  	ret = create_gpadl_header(type, kbuffer, size, send_offset, &msginfo);
->>> -	if (ret)
->>> +	if (ret) {
->>> +		gpadl->decrypted = false;
->> Why not set it by default at the beginning of the function?
-> I considered doing that.  But it's an extra step to execute in the normal
-> path, because a couple of lines below it is always set to "true".  But
-> I don't have a strong preference either way.
->
-
-Got it. I am fine either way.
-
->>>  		return ret;
->>> +	}
->>>
->>> +	/*
->>> +	 * Set the "decrypted" flag to true for the set_memory_decrypted()
->>> +	 * success case. In the failure case, the encryption state of the
->>> +	 * memory is unknown. Leave "decrypted" as true to ensure the
->>> +	 * memory will be leaked instead of going back on the free list.
->>> +	 */
->>> +	gpadl->decrypted = true;
->>>  	ret = set_memory_decrypted((unsigned long)kbuffer,
->>>  				   PFN_UP(size));
->>>  	if (ret) {
->>> @@ -563,9 +572,15 @@ static int __vmbus_establish_gpadl(struct vmbus_channel *channel,
->>>
->>>  	kfree(msginfo);
->>>
->>> -	if (ret)
->>> -		set_memory_encrypted((unsigned long)kbuffer,
->>> -				     PFN_UP(size));
->>> +	if (ret) {
->>> +		/*
->>> +		 * If set_memory_encrypted() fails, the decrypted flag is
->>> +		 * left as true so the memory is leaked instead of being
->>> +		 * put back on the free list.
->>> +		 */
->>> +		if (!set_memory_encrypted((unsigned long)kbuffer, PFN_UP(size)))
->>> +			gpadl->decrypted = false;
->>> +	}
->>>
->>>  	return ret;
->>>  }
->>> @@ -886,6 +901,8 @@ int vmbus_teardown_gpadl(struct vmbus_channel *channel, struct vmbus_gpadl *gpad
->>>  	if (ret)
->>>  		pr_warn("Fail to set mem host visibility in GPADL teardown %d.\n", ret);
->> Will this be called only if vmbus_establish_gpad() is successful? If not, you
->> might want to skip set_memory_encrypted() call for decrypted = false case.
-> It's only called if vmbus_establish_gpadl() is successful.  I agree
-> we don't want to call set_memory_encrypted() if the
-> set_memory_decrypted() wasn't executed or it failed.  But 
-> vmbus_teardown_gpadl() is never called with decrypted = false.
-
-Since you rely on  vmbus_teardown_gpadl() callers, personally I think it
-is better to add that check. It is up to you.
-
->>> +	gpadl->decrypted = ret;
->>> +
->> IMO, you can set it to false by default. Any way with non zero return, user
->> know about the decryption failure.
-> I don’t agree, but feel free to explain further if my thinking is
-> flawed.
->
-> If set_memory_encrypted() fails, we want gpadl->decrypted = true.
-> Yes, the caller can see that vmbus_teardown_gpadl() failed,
-> but there's also a memory allocation failure, so the caller
-> would have to distinguish error codes.  And the caller isn't
-> necessarily where the memory is freed (or leaked).  We
-> want the decrypted flag to be correct so the code that
-> eventually frees the memory can decide to leak instead of
-> freeing.
-
-I agree. I understood this part after looking at the rest of the series.
-
->
-> Michael
->
->>>  	return ret;
->>>  }
->>>  EXPORT_SYMBOL_GPL(vmbus_teardown_gpadl);
->>> diff --git a/include/linux/hyperv.h b/include/linux/hyperv.h
->>> index 2b00faf98017..5bac136c268c 100644
->>> --- a/include/linux/hyperv.h
->>> +++ b/include/linux/hyperv.h
->>> @@ -812,6 +812,7 @@ struct vmbus_gpadl {
->>>  	u32 gpadl_handle;
->>>  	u32 size;
->>>  	void *buffer;
->>> +	bool decrypted;
->>>  };
->>>
->>>  struct vmbus_channel {
->> --
->> Sathyanarayanan Kuppuswamy
->> Linux Kernel Developer
-
--- 
-Sathyanarayanan Kuppuswamy
-Linux Kernel Developer
-
+> [1]
+> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/drivers/net/dsa/realtek/rtl83xx.c#n205
+> 
+> Arınç
 
