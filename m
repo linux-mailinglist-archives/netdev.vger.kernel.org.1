@@ -1,119 +1,212 @@
-Return-Path: <netdev+bounces-79525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66C0F879C59
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 20:42:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17331879C5B
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 20:43:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF78528214D
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 19:42:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70A7C2856FD
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 19:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB5857D406;
-	Tue, 12 Mar 2024 19:42:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AEDC14263A;
+	Tue, 12 Mar 2024 19:43:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="kOEdfTja"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="plkEPgd+"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1808123A6;
-	Tue, 12 Mar 2024 19:42:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E55791386A8;
+	Tue, 12 Mar 2024 19:43:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710272554; cv=none; b=T4hrfiQF/ToRL3i1fJV0Sdw/TanshCiOIwHJsM8wO4F2ecE/zux3UZux0NCLZEZLvIdl9WXEpKSK8WZ1MfjZx3k9wBP8zs7vwNpjfF0FmLfedYC2CKDFldg4HZLmn5EqFsbkslDS6PCWv+V+ss2Xh+NNd2fpgbOXpyu7AnnWwAA=
+	t=1710272628; cv=none; b=EpTyLQN6L+VVkbKRWUlKLjfwFRsizIMtWzHkrVFpsdj+Fuu+XP/7S6JWuZWqWapperj9Z0+3evg7Fe88ZlfdRvFcTOhadHHtqZQDrG+Bd5DqlAahCMqRDyK518njuim9fTkWBi6bJlI9zcH9Cnkss8dZbzisxSQvYGGMG1JuCTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710272554; c=relaxed/simple;
-	bh=68ALfO905AYUlS53YoIMyGx+1CjoW/ERgDY1HwnqKyM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=osypJZP+/FgeYKj1ELwZOBg02s2rADZiVntSjz84cNNxcVqGN187CL0lgjehal4S0YLIkJvVLmh+6M8eIYj29TeauZ6WXjWvCZdN4G1IJXwSKPD9tCwkLanSxSTFDlK6vRjurfuJ23j1Kp+LskrxkZmg7YI7OcIOWpMw7Y8cvvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=kOEdfTja; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=jQDsOwuAAPx1Ek5GFlKu13YSBeA1J7htLKf6fXH4K/4=; b=kOEdfTja/SP3czPoQDuH0Qgb6y
-	XXOoFSOI3Zrr7xGIO2sqKJXsFgSUzyS/XcDM/fJgvHhHWF1eQLtUm1B9HOJkWQPKcvl59nhYiXoSq
-	XpM5qLdNVROYUvoDHkhYfaScouzQsPs0oAy2dW0VgYIs9mhiVUeNzH0zb5YpkUo4VM7TjiZObP3Rw
-	I1c6CKXVS5RCVzFf7m3GCd/45VS4TYG4i7uMlrBSbhw9g6yFi4u+gsSCJ7enu+PigdMO+8/tHEIAl
-	oBbvMVJnSY94YJXXsswkIsplMCqakeXbNPUBP8yVPHtLV35SVGaRBU0K2TwduWP9VW/DRmz/BBpy7
-	8cnsIKmQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37158)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rk80y-0006vH-1d;
-	Tue, 12 Mar 2024 19:42:20 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rk80u-0003oA-J8; Tue, 12 Mar 2024 19:42:16 +0000
-Date: Tue, 12 Mar 2024 19:42:16 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Doug Berger <opendmb@gmail.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	Daniil Dulov <d.dulov@aladdin.ru>, Jakub Kicinski <kuba@kernel.org>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: Re: [PATCH net-next] net: phy: mdio-bcm-unimac: Cast denominator to
- unsigned long to avoid overflow
-Message-ID: <ZfCwGF3JRiFdJ353@shell.armlinux.org.uk>
-References: <20240312165358.7712-1-d.dulov@aladdin.ru>
- <ZfCOb4x/+41y+SW3@shell.armlinux.org.uk>
- <df295be9-d33e-45d2-914f-c9c1554e5ac0@gmail.com>
- <b1acf9d0-872c-487a-9938-6d667959d0d3@gmail.com>
+	s=arc-20240116; t=1710272628; c=relaxed/simple;
+	bh=kiStTp/ySzQ6315CNx7mDnm0kab042TrheunRjBr2vg=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=gRsck4EI7zRMsHkg9PiVxwM/7smXPJ1T/tDxc/Q1bqqTNWcFEYKHAdMhGLm2g94Xd/Dfv7C99NkFGd3a3VLmJ72bbeErGwX+220WV2tZdNCK1eXPFQlwW18nmUVqt2MBisygVKC38yhncmoIo5o6mnpzixoaVGZ+ieK9r8/JyGY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=plkEPgd+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B28FC433C7;
+	Tue, 12 Mar 2024 19:43:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710272627;
+	bh=kiStTp/ySzQ6315CNx7mDnm0kab042TrheunRjBr2vg=;
+	h=Date:From:To:Subject:From;
+	b=plkEPgd++rcPp8OovlAWaJ9WLkPwhHO4mfQXik/PtRsURkWjRQjKsx8wxGTFELRwM
+	 nUpagUJrJ1jxB8FPzmp0PrdgYMPYHGNhQiaM+nmA7myzAC3LY1jYaV8sXnFP0Q/KkS
+	 kHvpJEKHL6w9djogrQ0ssZBDTbGtpUsZuv8D8VWF8044KiVP0DhcMujvL29Y4sSdeT
+	 NzQAV+8WFO8vOJvTu6pPclbtTnNuLFb7KNowIAl3YzVQ3D+omemRvbjFDVV0/8VR3E
+	 mpeJcbdkSJVNToGfSqVkP7S0rcBYFz1AB0D+nogpI7PsE3yjpQpyLMdRG+F+1bgukA
+	 rTe+ffQno6hKQ==
+Date: Tue, 12 Mar 2024 12:43:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
+Subject: [ANN] netdev development stats for 6.9
+Message-ID: <20240312124346.5aa3b14a@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b1acf9d0-872c-487a-9938-6d667959d0d3@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 12, 2024 at 12:23:20PM -0700, Doug Berger wrote:
-> On 3/12/2024 10:23 AM, Florian Fainelli wrote:
-> > On 3/12/24 10:18, Russell King (Oracle) wrote:
-> > > On Tue, Mar 12, 2024 at 07:53:58PM +0300, Daniil Dulov wrote:
-> > > > The expression priv->clk_freq * 2 can lead to overflow that will cause
-> > > > a division by zero. So, let's cast it to unsigned long to avoid it.
-> > > 
-> > > How does casting this help? "unsigned long" can still be 32-bit.
-> > > Maybe unimac_mdio_probe() should be validating the value it read from
-> > > DT won't overflow? I suspect that a value of 2.1GHz is way too large
-> > > for this property in any case.
-> > > 
-> > > https://en.wikipedia.org/wiki/Management_Data_Input/Output#Electrical_specification
-> > > 
-> > > (note, this driver is clause-22 only.)
-> > > 
-> > 
-> > Had commented on the previous version (not sure why this was not
-> > prefixed with v2) that the maximum clock frequency for this clock is
-> > 250MHz, the driver could check that to prevent for an overflow, most
-> > certainly.
-> 
-> Could also use:
-> -	div = (rate / (2 * priv->clk_freq)) - 1;
-> +	div = ((rate / priv->clk_freq) >> 1) - 1;
-> which is mathematically equivalent without the risk of overflow.
+Intro
+-----
 
-What's the point when the maximum clock frequency that the driver should
-allow fits within u32, nay u28?
+We have posted our pull requests with networking changes for the 6.9
+kernel release last night. As is tradition here are the development
+statistics based on mailing list traffic on netdev@vger.
 
+These stats are somewhat like LWN stats: https://lwn.net/Articles/956765/
+but more focused on review participation.
+
+Previous stats (for 6.8): https://lore.kernel.org/all/20240109134053.33d317dd@kernel.org/
+
+Testing
+-------
+
+The selftest runner went live early during this release.
+I don't have any great ideas on how to quantify the progress
+but, first, I'd like to thank everyone who contributed to improving
+and fixing the tests, and those who contributed to NIPA directly.
+We are reporting results from 243 tests to patchwork (not counting
+kunit tests), each test on two kernel flavors and with many sub-cases. 
+
+There's still work to be done fixing some of the tests but we made
+more progress than I anticipated! There are 66 test + kernel config
+combinations which we currently ignore, either because they permanently
+skip / fail or are too flaky. I should mention that those tests do matter,
+recently the ignored pmtu test would have caught a last minute xfrm
+regression :(
+
+Speaking of catching regressions, I do not have an objective count but
+subjectively our tests do in fact catch bugs. In fact the signal to noise
+ratio is higher than I initially expected. I wish it was easier to write
+driver tests and use YNL in the tests, but we'll get there..
+
+General stats
+-------------
+
+Cycle started on Tue, 09 Jan, ended Mon, 11 Mar. That's 63 days,
+one week shorter than the previous cycle.
+
+We have seen 264 msg/day on the list, and 24 commits/day.
+The number of messages is back to the level we have seen in 6.6,
+and has recovered after couple of slower releases (last one being
+particularly slow due to the winter break). The number of commits
+applied directly by netdev maintainers is 9% higher than in 6.6 
+and highest on the record.
+
+The total number of review tags in git history have dipped again,
+61% of commits contain a review tag (down from 69%). The number
+of commits with a review tag from an email domain different than
+the author, however, dropped only by 1% to 53%. Similarly our statistic
+of series which received at least one ack / review tag on the list did
+not change much, increasing by 1% to 67%.
+
+Rankings
+--------
+
+As promised last time, the left side of the stats is now in "change
+sets" (cs) rather than threads, IOW trying to track multiple revisions 
+of the same series as one.
+
+Top reviewers (cs):                  Top reviewers (msg):                
+   1 ( +1) [30] Jakub Kicinski          1 (   ) [66] Jakub Kicinski      
+   2 ( -1) [26] Simon Horman            2 (   ) [45] Simon Horman        
+   3 (   ) [14] Andrew Lunn             3 (   ) [44] Andrew Lunn         
+   4 ( +1) [12] Paolo Abeni             4 ( +3) [25] Jiri Pirko          
+   5 ( +4) [11] Jiri Pirko              5 (   ) [23] Eric Dumazet        
+   6 ( -2) [10] Eric Dumazet            6 ( +3) [20] Paolo Abeni         
+   7 (   ) [ 5] David Ahern             7 ( +1) [15] Krzysztof Kozlowski 
+   8 ( +6) [ 4] Stephen Hemminger       8 ( +2) [11] David Ahern         
+   9 ( +2) [ 4] Willem de Bruijn        9 ( +4) [10] Florian Fainelli    
+  10 (   ) [ 4] Krzysztof Kozlowski    10 ( -6) [10] Vladimir Oltean     
+  11 ( +1) [ 4] Florian Fainelli       11 ( -5) [ 9] Russell King        
+  12 ( -6) [ 4] Russell King           12 (   ) [ 9] Willem de Bruijn    
+  13 ( +3) [ 2] Jacob Keller           13 ( -2) [ 8] Sergey Shtylyov     
+  14 ( +1) [ 2] Rob Herring            14 ( +6) [ 7] Jacob Keller        
+  15 ( +2) [ 2] Jamal Hadi Salim       15 (+16) [ 7] Jason Wang          
+
+Jiri jumps into top 5, reviewing various driver and netlink changes.
+Stephen largely works on iproute2 reviews. Russell and Vladimir have
+indicated that they are occupied outside of netdev, and slip by a few
+positions.
+
+Thank you all for your work!
+
+Top authors (cs):                    Top authors (msg):                  
+   1 ( +1) [7] Eric Dumazet             1 (+35) [40] Eric Dumazet        
+   2 ( -1) [7] Jakub Kicinski           2 ( +5) [26] Jakub Kicinski      
+   3 (+46) [4] Breno Leitao             3 ( +1) [20] Saeed Mahameed      
+   4 (   ) [3] Heiner Kallweit          4 (+18) [17] Xuan Zhuo           
+   5 ( +8) [2] Stephen Hemminger        5 (***) [15] Jason Xing          
+   6 (+24) [2] Paolo Abeni              6 (***) [15] Matthieu Baerts     
+   7 (+11) [2] Kuniyuki Iwashima        7 (***) [14] Breno Leitao        
+   8 (***) [2] Maks Mishin              8 ( -3) [14] Tony Nguyen         
+   9 ( +6) [2] Kunwu Chan               9 ( -3) [13] Kuniyuki Iwashima   
+  10 (***) [2] Matthieu Baerts         10 ( -8) [11] Christian Marangi   
+
+Thanks to switching from threads to changes sets we see Eric rightfully
+claim the #1 spot, previously occupied by yours truly. Breno added
+missing MODULE_DESCRIPTION()s and refactored drivers using per-cpu
+stats. Paolo contributed a number of MPTCP changes and many selftest
+improvements. Maks Mishin sent a lot of individual iproute2 patches.
+Xuan Zhuo is working on vhost / virtio changes for AF_XDP.
+
+Top scores (positive):               Top scores (negative):              
+   1 ( +1) [398] Jakub Kicinski         1 ( +2) [80] Saeed Mahameed      
+   2 ( -1) [371] Simon Horman           2 (+17) [60] Xuan Zhuo           
+   3 (   ) [243] Andrew Lunn            3 (***) [46] Jason Xing          
+   4 ( +8) [160] Jiri Pirko             4 (***) [43] Yang Xiwen via B4 Relay
+   5 ( +2) [152] Paolo Abeni            5 (***) [42] Matthieu Baerts     
+   6 ( +2) [ 78] Krzysztof Kozlowski    6 ( -2) [40] Tony Nguyen         
+   7 ( +2) [ 76] David Ahern            7 ( -6) [38] David Howells       
+   8 ( +2) [ 68] Willem de Bruijn       8 ( -6) [37] Christian Marangi   
+   9 ( +2) [ 60] Florian Fainelli       9 (+30) [37] Kory Maincent       
+  10 ( -5) [ 54] Russell King          10 (***) [36] Breno Leitao        
+
+Corporate stats
+---------------
+
+Top reviewers (cs):                  Top reviewers (msg):                
+   1 (   ) [42] RedHat                  1 (   ) [98] RedHat              
+   2 (   ) [32] Meta                    2 (   ) [74] Meta                
+   3 ( +2) [16] Google                  3 (   ) [44] Andrew Lunn         
+   4 (   ) [14] Andrew Lunn             4 ( +1) [43] Google              
+   5 ( -2) [13] Intel                   5 ( -1) [36] Intel               
+   6 ( +1) [13] nVidia                  6 ( +2) [31] Linaro              
+   7 ( +1) [ 8] Linaro                  7 (   ) [31] nVidia      
+
+Top authors (cs):                    Top authors (msg):                  
+   1 ( +1) [12] RedHat                  1 (   ) [69] Intel               
+   2 ( +2) [12] Meta                    2 ( +2) [60] Meta                
+   3 ( -2) [10] Intel                   3 ( +2) [55] Google              
+   4 ( -1) [10] Google                  4 ( -1) [50] nVidia              
+   5 (   ) [ 7] nVidia                  5 ( -3) [47] RedHat              
+   6 ( +2) [ 3] Huawei                  6 ( +4) [32] Bootlin             
+   7 ( +7) [ 3] Wirecard                7 ( -1) [23] Alibaba    
+
+Top scores (positive):               Top scores (negative):              
+   1 (   ) [496] RedHat                 1 ( +7) [89] Bootlin             
+   2 (   ) [303] Meta                   2 (   ) [79] Alibaba             
+   3 (   ) [243] Andrew Lunn            3 (***) [46] Tencent             
+   4 ( +2) [138] Linaro                 4 (***) [43] Yang Xiwen
+   5 (   ) [ 79] Google                 5 (***) [42] Tessares            
+   6 ( +2) [ 76] Enfabrica              6 ( +6) [38] AMD                 
+   7 ( -3) [ 60] Oracle                 7 ( -6) [37] Christian Marangi   
+
+RedHat remains unbeatable with the combined powers of Simon and Paolo,
+as well as high participation of the less active authors.
+Alibaba maintains its strongly net-negative review score.
+Tencent (Jason Xing) joins them (Tencent doesn't use their email
+domain so it's likely under-counted). Yang Xiwen makes the negative
+list as well, cost of reposting large series too often...
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Code: https://github.com/kuba-moo/ml-stat
+Raw output: https://netdev.bots.linux.dev/static/nipa/stats-6.9/stdout
 
