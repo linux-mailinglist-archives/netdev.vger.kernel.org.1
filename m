@@ -1,112 +1,93 @@
-Return-Path: <netdev+bounces-79494-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A67438797DB
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 16:43:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DC888797E2
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 16:45:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D90301C217D5
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 15:43:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6EEEF1C21659
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 15:45:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCB27D065;
-	Tue, 12 Mar 2024 15:43:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4007C6C8;
+	Tue, 12 Mar 2024 15:45:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LUIH071w"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Ln2Ui+Nm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618177CF10;
-	Tue, 12 Mar 2024 15:43:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 504007C6D6;
+	Tue, 12 Mar 2024 15:45:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710258188; cv=none; b=h0Ax0VHw7h7GWvBOoo+dyRnQdAZz+HmyvsSpPxVM4uZkm48AsK/zayRHdIvnRm39qJyceYiLxktSAuRnqZMOUg8AGM/1D/8U0vTgIkNay2wwtDFVto//PlUPMxzkvGhAMu4hfu0Y6Y067jccdGuqSN2pAeYdI8ut2kwK4Gw1Pcw=
+	t=1710258335; cv=none; b=PC7NEogFKcdFnjOpBPXcj+3BDnX9PaZWhL6hekbKvPVHoUT3+BUJvGYhvL6dteDWOBjcoup6Br7GTJbcpJQGDTsvQnEvFDD6Pzofv72sRnBOBP29XAATrMLqEn5UIZm79UZ9RrA6o1/QRn1258J5EwfPQ4cVKqUpOEAed3CWfyA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710258188; c=relaxed/simple;
-	bh=bZ7KFfWAgmonZ5xuDLjCI1VRdG2i0RpJPL/iyHsbdeM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D/I8hUo3CHofMk1MTZMBmFatu0k4c2BkUdglEIjG2ULea8/5iADJ+F1y+z8nTiaoXE2LNG4xW+dOMLiqyOqmOqXkCjMJwyvNxdYTC9Kg/bsj/s93i04hUeH2WOfIfoqvFgQdaG1ZBd4WP15yVCPvic/qwlPrl6NLEyonvnoRu2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LUIH071w; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710258188; x=1741794188;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=bZ7KFfWAgmonZ5xuDLjCI1VRdG2i0RpJPL/iyHsbdeM=;
-  b=LUIH071wAlNjLERXfleCFJiuLaWQ9EszcCJWJwXzySVVXzm8CwwJ62FT
-   YWnYHcS5j3qwwtuyZaXcjbztu9WB8ocS1qJUyqJQwyY2NKyiA4+NlKvb/
-   LhPeYYOwWDyBfPy7g3SUIqjFh3y2X/2ArJY5O9mzDfvgkOhKE/trL4QAJ
-   QyTglyp2Ftik0hc8TvfWV9dHtdsUye+dY/PiWBAykB8MZUsnCS0YnkyUn
-   fxGGQhfYMYns1B/SB/PLNC4RiGd2NyLBj59b9cq5apDpyb5mljMpgkK9q
-   cHT8R1N2UXPn66CfdHrYWsZVEYVDz3D+l1OJuMTfV37fN+0scuSbsdf6U
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="4839026"
-X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
-   d="scan'208";a="4839026"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 08:43:07 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="914400103"
-X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
-   d="scan'208";a="914400103"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 08:43:03 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.97)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1rk4HN-0000000BvuI-0qCL;
-	Tue, 12 Mar 2024 17:43:01 +0200
-Date: Tue, 12 Mar 2024 17:43:00 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Stephen Rothwell <sfr@canb.auug.org.au>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH] lib/bitmap: Fix bitmap_scatter() and bitmap_gather()
- kernel doc
-Message-ID: <ZfB4BOknvWRFbn6O@smile.fi.intel.com>
-References: <20240312085403.224248-1-herve.codina@bootlin.com>
- <ZfB30-rLXEnJtjrY@smile.fi.intel.com>
+	s=arc-20240116; t=1710258335; c=relaxed/simple;
+	bh=plViXgocX+43FaFVTkiMAQknhg2JZxGAilsVKhvdKAk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=G2MYBNOIWfwYZg4timqI6782OwP/c2VJ0d//d0byDgxn09mdZgai5zL7MLrt6nIyUlicJp4dyq96IsW0xz7PfLJBru5GVAO8OeG85pruJk/RgiMquke+GGoYpW+X0+pXIo3pvJUG0XmCrFP26mYYFHxifltjoVyWApi2ctf4Zeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Ln2Ui+Nm; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 42CE6240004;
+	Tue, 12 Mar 2024 15:45:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1710258328;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=plViXgocX+43FaFVTkiMAQknhg2JZxGAilsVKhvdKAk=;
+	b=Ln2Ui+NmcUK/CDH0MoZtYntEKO5E7fhSSA5YIBgdEajx0GBy6VQvfTz4y2ZgbDybP/ruPd
+	+LL/SNBbO1lALCSNU6lMI1MxdqdT4HBr3lEIE9vujPy609D4g3kP8x2xXUYIoIfpnx4MX7
+	U95J13boUNeOCw8NDAnFj9hcv+bu+EGXYObP1wdbVwniZH4j0LZk268E61rzhdJATID5/J
+	w+dMNTtdn1yBVkmkrHwxjyLzImO2iM75OEss1rBJyEriwXA9bc0o/0lBoczmYDTLC57fXA
+	NLdQlYOUgs49UYWYqO/sQXZxFRqAkzpWhSqFZ95koU1qw118qyPSAKq9SJ6vhg==
+Date: Tue, 12 Mar 2024 16:45:26 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Elad Nachman <enachman@marvell.com>
+Cc: <taras.chornyi@plvision.eu>, <davem@davemloft.net>,
+ <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+ <andrew@lunn.ch>, <thomas.petazzoni@bootlin.com>,
+ <miquel.raynal@bootlin.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH 2/3] net: marvell: prestera: fix memory use after free
+Message-ID: <20240312164526.4a0e242a@kmaincent-XPS-13-7390>
+In-Reply-To: <20240311135112.2642491-3-enachman@marvell.com>
+References: <20240311135112.2642491-1-enachman@marvell.com>
+	<20240311135112.2642491-3-enachman@marvell.com>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZfB30-rLXEnJtjrY@smile.fi.intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Tue, Mar 12, 2024 at 05:42:11PM +0200, Andy Shevchenko wrote:
-> On Tue, Mar 12, 2024 at 09:54:03AM +0100, Herve Codina wrote:
-> > The make htmldoc command failed with the following error
-> >   ... include/linux/bitmap.h:524: ERROR: Unexpected indentation.
-> >   ... include/linux/bitmap.h:524: CRITICAL: Unexpected section title or transition.
-> > 
-> > Move the visual representation to a literal block.
+On Mon, 11 Mar 2024 15:51:11 +0200
+Elad Nachman <enachman@marvell.com> wrote:
 
-...
+> From: Elad Nachman <enachman@marvell.com>
+>=20
+> Prestera driver routing module cleanup process would
+> release memory and then reference it again, and eventually
+> free it again.
+> Remove the redundant first memory free call.
+> All such double free calls were detected using KASAN.
+=20
+Not directly related to this patch but I am wondering if
+the call to prestera_port_sfp_unbind(port) is not missing in
+prestera_destroy_ports() function?
 
-> > This patch fixes de5f84338970 ("lib/bitmap: Introduce bitmap_scatter() and bitmap_gather() helpers")
-> > available in net-next and linux-next
-> 
-> Not sure about rules of net-next, but I would add Fixes FWIW:
-> 
-> Fixes: de5f84338970 ("lib/bitmap: Introduce bitmap_scatter() and bitmap_gather() helpers")
-
-And probably Reported-by...
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
