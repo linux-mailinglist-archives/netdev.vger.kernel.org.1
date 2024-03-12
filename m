@@ -1,148 +1,128 @@
-Return-Path: <netdev+bounces-79523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB581879C36
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 20:22:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D9B5879C39
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 20:23:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B3941F23C2A
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 19:22:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0380B1F24D19
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 19:23:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F31142630;
-	Tue, 12 Mar 2024 19:22:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0190142648;
+	Tue, 12 Mar 2024 19:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=risingedge.co.za header.i=@risingedge.co.za header.b="Soqzl2Tj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GzlSzqRr"
 X-Original-To: netdev@vger.kernel.org
-Received: from outgoing6.flk.host-h.net (outgoing6.flk.host-h.net [188.40.0.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D93FF79DD4;
-	Tue, 12 Mar 2024 19:22:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.0.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FB06139584;
+	Tue, 12 Mar 2024 19:23:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710271371; cv=none; b=P9hjxEx8S3xhrp6vGY9fHhQNxzgddry3WsA3lwzDBLAIRjktDHQLm4Vt+ByOCaXzKGStsbEF5TXdZomkebKyIo3/r4i5+HplNjRM83n/eMKrhjT88SOzzOdDsNftz56/ENxDbw6FzWep5LvhbnyAC/NSz4pHV0PAbEm6kHT1SyY=
+	t=1710271406; cv=none; b=GODZJac/cIwM1ZW6Rs1rPWtCXO9G2feVA2JPJnbSgpzOuuBUUy41BNqnzLQELsou//a/+DVmSaDc8BPFHIh3oU+0AxfSJfXUhGggfhVcasT8ErkRpGO9nGd24MTQznjE5ghDOwsevgt7w0b3MudFBaIa6gSt/+mN80yu7xQgFX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710271371; c=relaxed/simple;
-	bh=psC31IFm83RTVqO4iPQpQus/MKQVYcscq4nl44rPdqU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=tc1aRDvIKEwCUN3q9GUIK8Du0MQV+AF0nRnhAgtgObhJnRJzfOaTXurnkVyWKviNJQM6Ae6L87TU3EVSOJ+d2DOYBtqLllM9U6xtp2QK+TV9Nmu8OR04G6IUycRFVi+Cd1c347LTxzVJeW+p4SXFyUt285bG5+BnmA7eYXOg6ks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=risingedge.co.za; spf=pass smtp.mailfrom=risingedge.co.za; dkim=pass (2048-bit key) header.d=risingedge.co.za header.i=@risingedge.co.za header.b=Soqzl2Tj; arc=none smtp.client-ip=188.40.0.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=risingedge.co.za
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=risingedge.co.za
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=risingedge.co.za; s=xneelo; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:reply-to:sender:bcc
-	:content-type; bh=dDhe8upHNIje6ztlFroovkjVGuP3Nsdes/r4eKaZPZE=; b=Soqzl2TjpbG
-	Fp97gQzE6LJrt8lItlPJMj3x1JwrN4babuh5pOY/6TuTYUWuzjxfuNdyGr0ff0wSuo4rJXohPAoqO
-	2qZ4qzir+2h/BKYiCHwXLHTlXDRAcdAYAnY6FwWq65xScZT3B9hXxjl3yuQxxfnmp/LUUub8lpXmV
-	N7Dw3UnojmxqCRYD1Fo/HUxfhOopfk1cu4cU7ieVVWQMxZ6t5ZfRxHHQOx1juDIcskHiPsWztjsFI
-	EVVfk2UEswA43OkGA3ulPDhVpyVn0euD6ucs1w1mGKEO19cWfbeicGBWqQaBv8KRWYRLKbEwdpol+
-	e0r3+WSysoVi7xfHAtxJUug==;
-Received: from www31.flk1.host-h.net ([188.40.1.173])
-	by antispam2-flk1.host-h.net with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <justin.swartz@risingedge.co.za>)
-	id 1rk7hr-008bLw-R8; Tue, 12 Mar 2024 21:22:39 +0200
-Received: from [41.144.0.96] (helo=localhost.localdomain)
-	by www31.flk1.host-h.net with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <justin.swartz@risingedge.co.za>)
-	id 1rk7hm-0003HQ-5Y; Tue, 12 Mar 2024 21:22:30 +0200
-From: Justin Swartz <justin.swartz@risingedge.co.za>
-To: =?UTF-8?q?Ar=C4=B1n=C3=A7=20=C3=9CNAL?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Justin Swartz <justin.swartz@risingedge.co.za>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: [PATCH] net: dsa: mt7530: increase reset hold time
-Date: Tue, 12 Mar 2024 21:21:16 +0200
-Message-Id: <20240312192117.7789-1-justin.swartz@risingedge.co.za>
-In-Reply-To: <f594a72a91d12f1d027a06962caa9750@risingedge.co.za>
-References: <f594a72a91d12f1d027a06962caa9750@risingedge.co.za>
+	s=arc-20240116; t=1710271406; c=relaxed/simple;
+	bh=Fkz2cYg/UnQpPqJ5/T0UskGLn9+Ts8M5l8TckPJfqSA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E9F37f6L+3Y0zXOvUOOeX1VXUhB4Qf7OAwhkiINSEnuwcukhh3eGqQ0CXYSTReZ5U6qUza5xC5Pxgb3rfrNPsv7fT8u62b79qItOyVZtOw9JIXT8fPYJFOvpGsaKQ/Jl8PgKZuEFvmljNMMSHb30eBK34BaqTg+dFcW6iFRpauY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GzlSzqRr; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-29be5386b74so2116280a91.3;
+        Tue, 12 Mar 2024 12:23:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710271403; x=1710876203; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QRX2IqHBUCJP6dnshTrjNT5jXrHx160FIBk6BJm/QvM=;
+        b=GzlSzqRrNePAd4Sa8yf9bpt45Ll9FclPjhrkYmfxXTCV3O/KlfLkAIBuc7hVe4aPDz
+         lQDI5rDxcgYxMXXWpyJcie/TCT9TuxcY/dBdb8QBmJnji2p3XyENHcmaeXS+mAd+AZBb
+         plsy8aaLD/dO+01ypw3ipdALEEI9uANWhnD1MJO9/Q5pml9zbogz9WgsLIPOjWX/rpCM
+         356jkYoY6QpOUlBiazkl/+G4UIdYqM7dOS0CAFQ5ifwd7F3LvpPTRQ/R2J0zE4oA7vnC
+         7LtANNjlaslXHw/BoByL9u6/jOYby+3oTrO1yIBb5v2RDcN3YPU8MVdC1ftwFOkulYTw
+         vXyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710271403; x=1710876203;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QRX2IqHBUCJP6dnshTrjNT5jXrHx160FIBk6BJm/QvM=;
+        b=bO86q1r/qXUvGMELzfEHXRhFZ756zV7UfwYRBph2mnSjuZao4T8rQg5p1Ol5RIQBY/
+         gtDPl8zd6ZmF7BKpMaF0bdMMlfarTueCrMlnHG4tFDod+19iGUZHLyp62x2rOqslSniC
+         HajzLamu9Hm7TtVwb1EP243Pao29wqgbnrNjl3nGi6JbemSSwOmlPbo9jSevNg8xIKUP
+         LEcqG98G4MphoN/3JHmbyya3yGENdjkGk8S5WAfrWO7A07EHiD9OhNo//PQunBoHUSkH
+         ycT+UV6SV5Chemlw+ZqhN2CT2V7og/g05fSyW58kNJbgnAO0WUdXcURxBmXAuRchqoQQ
+         8zEg==
+X-Forwarded-Encrypted: i=1; AJvYcCV/OPkUmrsf08JdCtgrSlaN74oKYOao8bjGvpYkUMZzxTDO+Zl0GH/ZAgZOmw1vzm9aWRedopseSxmK1cfwuj6xG6E6F9j96lflAbPSrIMfpHJJSjrEmWFGx6SqtwdDkWlVjH1x
+X-Gm-Message-State: AOJu0YyHhMJMQU6VCk1YKXo3lO+PHSnoUQf97K1OYr1tWSxpiBC7AXB2
+	xMYZSX17GqDFi1EHKvlKHVVztQvzfYvVJx6dUFFgq8JOKOrkCCBw
+X-Google-Smtp-Source: AGHT+IGiHISrqyiGbygnsGOH+T001ziYgxBsvT03/4mPcUqK+Ap3w5HJL0qY0g23WW+kVW1dG14MKw==
+X-Received: by 2002:a17:90b:3010:b0:29b:bcea:c17e with SMTP id hg16-20020a17090b301000b0029bbceac17emr2698389pjb.1.1710271403343;
+        Tue, 12 Mar 2024 12:23:23 -0700 (PDT)
+Received: from [10.69.40.148] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id ay3-20020a17090b030300b0029ba5f434a8sm6164608pjb.26.2024.03.12.12.23.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Mar 2024 12:23:23 -0700 (PDT)
+Message-ID: <b1acf9d0-872c-487a-9938-6d667959d0d3@gmail.com>
+Date: Tue, 12 Mar 2024 12:23:20 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: justin.swartz@risingedge.co.za
-X-Virus-Scanned: Clear
-X-SpamExperts-Domain: risingedge.co.za
-X-SpamExperts-Username: 
-Authentication-Results: host-h.net; auth=pass (login) smtp.auth=@risingedge.co.za
-X-SpamExperts-Outgoing-Class: ham
-X-SpamExperts-Outgoing-Evidence: Combined (0.02)
-X-Recommended-Action: accept
-X-Filter-ID: Pt3MvcO5N4iKaDQ5O6lkdGlMVN6RH8bjRMzItlySaT+t8iDdwM/SRX7A1ILMHJJVPUtbdvnXkggZ
- 3YnVId/Y5jcf0yeVQAvfjHznO7+bT5wCPRB8bAzJcv2cv+UqiTTc2+CpNcmBnO4XM3Sck4bwNogU
- WCl1nkLBzZX0KuJ9bXiS85Z42w/+2OBolTNFbPomXFWCX8oNdggW7HE9XDTdSejrkEpbuUvwMvHx
- 3T+KSG//gbuP7hnUK8NQdLwsVWKIv+fXqqb3FJ1Z7kkAIev0U9CKH/oA07tJunDPm536TODb5GPR
- oyaaXp1VNA9dXvxV+mFktoWo3CKg4C3LDJ75vu2U4GT70q7ZqN/P49BncZ5XB7lfx9K88uL/WnJE
- LAEP514Y/yfAEbrTclu3OeNcbACmFr3ts0d2E6vXySsvfMaT9Bjf4etJ827HW1/sdZ81dz6BqXHU
- oYg+nmOeSIjjxA24TPuOyBrko5yKpcR03QEJ9DjWmjcfK/FpTD0spWG+rMYoj8CdNq4vLYsMDbt4
- 2oUP1Ae/eGZl2OLANHAHEjHENEhX9cq65nsXPA0MIFDIPOMDW/6+MC+5Mq5RH9OoW0W22an/ubzj
- InB/ImqScRfGyrhHVstPeAuxsRhUFJC4TtSvIahFt3uEpT0304dV2Yoz1SesQUA6bnjJZT6m9lal
- 9vikoy50DqR3hu/rL5PGAoTDzn0QdoxFeruM0Uhu+a5zAQNPcSMsiFCtWHmZQ2oihnVW8zB2Qi26
- vkVALycwzSdeC1kd8cXa71WqOc72jXbRpMw6Agze1f399OurHEyYS7nq+EBNvgiWKNNSkdVDZOrL
- 5kxgO94lq2025NSImfKeGaSpuwkt9kMFaoxOFH3nT6Zph4wUZj+IQLUKRJzeMs4VIrisX+dtrxYn
- /0jYEvj5QBAPtzfeVlNHdCJmwgf0M7fnqgzRvCMiN68tcHQey84mBB4XoB473XOJmIRPynE3O7YZ
- oFBs6I7QuC1BjGNT52hVLEr/9PrrMm81h6IAYzikeIJfw26MB/V1E5BP9Gv0xI1YXOxC1lZqyFpL
- AwQr6muMti2YanICQnMITeB2fd0UyjU/MIq3Vtx6CgQGHtezYqxGMqsKjARq8PBC4qgGsfAERwCB
- JFs7XjZYbJPBsmpIto2O4JO2fx1gIuNHgi11AwJSTGCrOFs22K1ZnDqAw3gLmOBPHazhChxq9nGW
- aSi6bFHidB1VgzDzDZn/+QEiRQv+PVjjwa+Z5RFCOMRmYvGVP5J/K7tDFQHNyAqzdfFYVDBYJee7
- gx/u82RtU+yubYqj/NabI0Gzj7MISJI0mVfWLKEgol9rYV4JEcNP1rJoln/cD8h/RIvkzXRTCYvX
- WLQhlD92+1l+zHfJg1FMwntsduNBxKPaTpE5L8d4VqFy6yKUFQtzhTlGiGL9B2DNnmg1IESUkfXd
- J2y28kcLlchcAuXmtnEOIOir0GDIIIDSVMZhrIoAWTF5tIdhy/UIEBYDcZg+Q8UhuRLyBn1+pvlH
- hV6a5QjptwQBGybQyDQ2/GYwPjlMcE57ESN6G+kn87CtwPdB/10jfVNpDbYnXJdSRQj8460WHJib
- IxmU2pb4i4DTkMZeMiNI9JSIyUbtnrlbG4BI8o81FOo91axhCaqPShJzgHH7y4ZfQxML
-X-Report-Abuse-To: spam@antispamquarantine.host-h.net
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: phy: mdio-bcm-unimac: Cast denominator to
+ unsigned long to avoid overflow
+To: Florian Fainelli <f.fainelli@gmail.com>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Daniil Dulov <d.dulov@aladdin.ru>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+ Florian Fainelli <florian.fainelli@broadcom.com>,
+ Broadcom internal kernel review list
+ <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+References: <20240312165358.7712-1-d.dulov@aladdin.ru>
+ <ZfCOb4x/+41y+SW3@shell.armlinux.org.uk>
+ <df295be9-d33e-45d2-914f-c9c1554e5ac0@gmail.com>
+Content-Language: en-US
+From: Doug Berger <opendmb@gmail.com>
+In-Reply-To: <df295be9-d33e-45d2-914f-c9c1554e5ac0@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Increase the MT7530 reset hold period from 1000-1100 usec
-to 5000-5100 usec.
+On 3/12/2024 10:23 AM, Florian Fainelli wrote:
+> On 3/12/24 10:18, Russell King (Oracle) wrote:
+>> On Tue, Mar 12, 2024 at 07:53:58PM +0300, Daniil Dulov wrote:
+>>> The expression priv->clk_freq * 2 can lead to overflow that will cause
+>>> a division by zero. So, let's cast it to unsigned long to avoid it.
+>>
+>> How does casting this help? "unsigned long" can still be 32-bit.
+>> Maybe unimac_mdio_probe() should be validating the value it read from
+>> DT won't overflow? I suspect that a value of 2.1GHz is way too large
+>> for this property in any case.
+>>
+>> https://en.wikipedia.org/wiki/Management_Data_Input/Output#Electrical_specification
+>>
+>> (note, this driver is clause-22 only.)
+>>
+> 
+> Had commented on the previous version (not sure why this was not 
+> prefixed with v2) that the maximum clock frequency for this clock is 
+> 250MHz, the driver could check that to prevent for an overflow, most 
+> certainly.
 
-This should reduce the likelihood of an incorrect external
-crystal frequency selection which may occur when reset is
-deasserted too early under certain link conditions.
+Could also use:
+-	div = (rate / (2 * priv->clk_freq)) - 1;
++	div = ((rate / priv->clk_freq) >> 1) - 1;
+which is mathematically equivalent without the risk of overflow.
 
-Signed-off-by: Justin Swartz <justin.swartz@risingedge.co.za>
----
- drivers/net/dsa/mt7530.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 3c1f65759..5e9e1381a 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -2243,11 +2243,11 @@ mt7530_setup(struct dsa_switch *ds)
- 	 */
- 	if (priv->mcm) {
- 		reset_control_assert(priv->rstc);
--		usleep_range(1000, 1100);
-+		usleep_range(5000, 5100);
- 		reset_control_deassert(priv->rstc);
- 	} else {
- 		gpiod_set_value_cansleep(priv->reset, 0);
--		usleep_range(1000, 1100);
-+		usleep_range(5000, 5100);
- 		gpiod_set_value_cansleep(priv->reset, 1);
- 	}
- 
--- 
-
+-Doug
 
