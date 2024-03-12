@@ -1,118 +1,78 @@
-Return-Path: <netdev+bounces-79584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3050879FB9
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 00:37:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D22F879FBF
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 00:42:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 35FB2283261
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:37:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7149282D15
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:42:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C2EF4D11B;
-	Tue, 12 Mar 2024 23:37:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7788C46421;
+	Tue, 12 Mar 2024 23:42:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RwWmBRsQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WRGMJLFF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9014482FE
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 23:37:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3004779C;
+	Tue, 12 Mar 2024 23:42:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710286657; cv=none; b=E3pkv7rdDbgpacLP4ID3H6O2vB5wn6t7joNx+4NDMGOm2F/QFN8RsEyLOlKyhit5gFAxcLoTsFEFJ3TGytwGFw/PyylB/nptUDTpYVrE2Fmf2kGPrnmOhfzYQM/CLKTK3clNXyxHTT1+BN2vx3PJabs1eo13aIGPdsFVBO/0Nak=
+	t=1710286943; cv=none; b=CaggXcyTBG6KRTTeX45Vf9VHIaFbh9RyQ6l08oYlfhztdpfbncF62BdDkkJrYXYUEudpJGVe5Z1ppu94oQ6M8num5NH+HlzrfRAeM3KhlMXXytPbraTXFUH70jt99ZxYAbkq/TwLBm4e2/uzed10oWgwJWsEZ+fYUeJrlnpelR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710286657; c=relaxed/simple;
-	bh=w8JCsLSjSA3OkQoV28nEFem36dFCa/7sa9d7M6Kmb8g=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LPjEJHc0eoB5xXTNNmWyiLBid7m+I3ely3vKvPn7/RuWb5rTqCblRaR57jGwP5LDXdJNffCtDFOVPy4hbJImJd6CqTiQSXB/lW/3yzW9hGp8e/7tZxCImguItpUfeUhv7lWdOtKCLHdRimaLVsOLeNngpVa61YVIFmRk7DvZYHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RwWmBRsQ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710286654;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9OX7Txmvz9CCuXto10fOD2XvYnGo3IOMbl07Vyopd3Y=;
-	b=RwWmBRsQvm4iAsDjYPWINIGLJ8A4fEq3K3KieqexqPNg6hMlvoYa4JNMkzqRRQhanhtZ50
-	FS03V9GyqZUjF3JaJZ4tPcufTco8ynnGYagtTZSnbFM9hxeFanlMmZuc+xTDBSKkWOmy/7
-	DOyoMf6ELx+jThPbMMEWLV0UPh+qwe4=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-343-uMavIwFdNDGV7jNNc5g8HA-1; Tue, 12 Mar 2024 19:37:33 -0400
-X-MC-Unique: uMavIwFdNDGV7jNNc5g8HA-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C4527101A552;
-	Tue, 12 Mar 2024 23:37:32 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.10])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 8C54F10F53;
-	Tue, 12 Mar 2024 23:37:31 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 2/2] rxrpc: Fix error check on ->alloc_txbuf()
-Date: Tue, 12 Mar 2024 23:37:18 +0000
-Message-ID: <20240312233723.2984928-3-dhowells@redhat.com>
-In-Reply-To: <20240312233723.2984928-1-dhowells@redhat.com>
-References: <20240312233723.2984928-1-dhowells@redhat.com>
+	s=arc-20240116; t=1710286943; c=relaxed/simple;
+	bh=05A/YBD+rxHHpBthb4+S+Ak7pHZr1GBzLlmla4nXVNI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AMXFZp+Z149p6kfrLvY9WkGT3b8vRaSZ4ZW4HkXwwn6NHrfSOLcCghRi60RxflOaa8kwa7eQNZLWPIDuI0i0xqVICDIUaKUMe433zQKB22aaRFRqS0mrgUdVl/+sFSbrcpMlu8W2EWFjh5/bBxnbvU+T5q577+OoKdzUOEjeAg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WRGMJLFF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73C77C433F1;
+	Tue, 12 Mar 2024 23:42:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710286942;
+	bh=05A/YBD+rxHHpBthb4+S+Ak7pHZr1GBzLlmla4nXVNI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WRGMJLFFOQJLSoqERFYLaPswoGKHmCUfQ6TcGzkU52htuvbVI+u72CioLu2qrtAdX
+	 o8KlDlBON6/nyO+gN2MjCLkwhTBRk7v8pp1l95DoFbRaYt+kkjmEhXY9uuOGpmFvhQ
+	 KQ9940j/auy1AgriACE212Eig8Ol29Jz9VQQq8tHudS9LISZ7XjB9TEz9oPBe/3LBB
+	 EtIJ/7ktz8uN3tvjYqh3P7oEc7J/FhElqo2GDLfrrl0D9fIzYEpwE/vDb7g/Ywjx5z
+	 3dxf9pnvmc9xaXS8r04eTB/vAyhtMLzbVXx71DX/LTGpClFQ43ZJUSEP0fx4e6Zu0R
+	 xKt2Ru8RGN8LA==
+Date: Tue, 12 Mar 2024 16:42:21 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Ignat Korchagin <ignat@cloudflare.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-team@cloudflare.com
+Subject: Re: [PATCH net v2 0/2] net: veth: ability to toggle GRO and XDP
+ independently
+Message-ID: <20240312164221.5bf92fd0@kernel.org>
+In-Reply-To: <20240312160551.73184-1-ignat@cloudflare.com>
+References: <20240312160551.73184-1-ignat@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-rxrpc_alloc_*_txbuf() and ->alloc_txbuf() return NULL to indicate no
-memory, but rxrpc_send_data() uses IS_ERR().
+On Tue, 12 Mar 2024 16:05:49 +0000 Ignat Korchagin wrote:
+> It is rather confusing that GRO is automatically enabled, when an XDP program
+> is attached to a veth interface. Moreover, it is not possible to disable GRO
+> on a veth, if an XDP program is attached (which might be desirable in some use
+> cases).
+> 
+> Make GRO and XDP independent for a veth interface.
 
-Fix rxrpc_send_data() to check for NULL only and set -ENOMEM if it sees
-that.
+Looks like the udpgro_fwd.sh test also needs tweakin'
 
-Fixes: 49489bb03a50 ("rxrpc: Do zerocopy using MSG_SPLICE_PAGES and page frags")
-Signed-off-by: David Howells <dhowells@redhat.com>
-Reported-by: Marc Dionne <marc.dionne@auristor.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: linux-afs@lists.infradead.org
-cc: netdev@vger.kernel.org
----
- net/rxrpc/sendmsg.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/rxrpc/sendmsg.c b/net/rxrpc/sendmsg.c
-index 6f765768c49c..894b8fa68e5e 100644
---- a/net/rxrpc/sendmsg.c
-+++ b/net/rxrpc/sendmsg.c
-@@ -349,8 +349,8 @@ static int rxrpc_send_data(struct rxrpc_sock *rx,
- 			 */
- 			remain = more ? INT_MAX : msg_data_left(msg);
- 			txb = call->conn->security->alloc_txbuf(call, remain, sk->sk_allocation);
--			if (IS_ERR(txb)) {
--				ret = PTR_ERR(txb);
-+			if (!txb) {
-+				ret = -ENOMEM;
- 				goto maybe_error;
- 			}
- 		}
-
+https://netdev-3.bots.linux.dev/vmksft-net/results/504620/17-udpgro-fwd-sh/stdout
+-- 
+pw-bot: cr
 
