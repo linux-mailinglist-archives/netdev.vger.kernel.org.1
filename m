@@ -1,78 +1,264 @@
-Return-Path: <netdev+bounces-79586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D22F879FBF
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 00:42:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E88F879FDC
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 00:51:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7149282D15
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:42:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70A421C21736
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7788C46421;
-	Tue, 12 Mar 2024 23:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37CE482F4;
+	Tue, 12 Mar 2024 23:51:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WRGMJLFF"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="bYEbldRC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3004779C;
-	Tue, 12 Mar 2024 23:42:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB66E47A52;
+	Tue, 12 Mar 2024 23:51:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710286943; cv=none; b=CaggXcyTBG6KRTTeX45Vf9VHIaFbh9RyQ6l08oYlfhztdpfbncF62BdDkkJrYXYUEudpJGVe5Z1ppu94oQ6M8num5NH+HlzrfRAeM3KhlMXXytPbraTXFUH70jt99ZxYAbkq/TwLBm4e2/uzed10oWgwJWsEZ+fYUeJrlnpelR4=
+	t=1710287483; cv=none; b=s8/BqeLUKrLdPugBBX9urQ+wChjV7gMNJujsEPUFO5LcNoX0nQdNX/zNEQChM5dXhbr5bBPhZDR3z5oI6uetGkZm7aCakX/aT25anCPxLdtOuLmCNQIYsE4B2xdX8NpcEAH+8PdlB3YAhHEszvzs2CHu1ec7qt9PB4EcIpQ5eiI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710286943; c=relaxed/simple;
-	bh=05A/YBD+rxHHpBthb4+S+Ak7pHZr1GBzLlmla4nXVNI=;
+	s=arc-20240116; t=1710287483; c=relaxed/simple;
+	bh=X7Pm5RoAdj55evPiJMvqxK1W5YPJTErKGzSKaroow58=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=AMXFZp+Z149p6kfrLvY9WkGT3b8vRaSZ4ZW4HkXwwn6NHrfSOLcCghRi60RxflOaa8kwa7eQNZLWPIDuI0i0xqVICDIUaKUMe433zQKB22aaRFRqS0mrgUdVl/+sFSbrcpMlu8W2EWFjh5/bBxnbvU+T5q577+OoKdzUOEjeAg4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WRGMJLFF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73C77C433F1;
-	Tue, 12 Mar 2024 23:42:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710286942;
-	bh=05A/YBD+rxHHpBthb4+S+Ak7pHZr1GBzLlmla4nXVNI=;
+	 MIME-Version:Content-Type; b=pF+QJyyU9/DSCgfXZNOCnVNh1vZz7GJGtihZfEA4mrPM1FYY6j0P93xD7iU8h32Vo6Q0oTzk0w6y+HBDkBs3jZ15h5v74eiPEqgSnfxiywYZSLguFlJs07bcbf/jHHiR2Mbq6VYZ4pYYZd64lAMOR9Vwq1O83A33Nuv6/eYdP1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=bYEbldRC; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1710287479;
+	bh=UodvkJ5UEPNHTE1gtYxLGz+q1xnZJ07gSgPcwxaWF9c=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WRGMJLFFOQJLSoqERFYLaPswoGKHmCUfQ6TcGzkU52htuvbVI+u72CioLu2qrtAdX
-	 o8KlDlBON6/nyO+gN2MjCLkwhTBRk7v8pp1l95DoFbRaYt+kkjmEhXY9uuOGpmFvhQ
-	 KQ9940j/auy1AgriACE212Eig8Ol29Jz9VQQq8tHudS9LISZ7XjB9TEz9oPBe/3LBB
-	 EtIJ/7ktz8uN3tvjYqh3P7oEc7J/FhElqo2GDLfrrl0D9fIzYEpwE/vDb7g/Ywjx5z
-	 3dxf9pnvmc9xaXS8r04eTB/vAyhtMLzbVXx71DX/LTGpClFQ43ZJUSEP0fx4e6Zu0R
-	 xKt2Ru8RGN8LA==
-Date: Tue, 12 Mar 2024 16:42:21 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ignat Korchagin <ignat@cloudflare.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-team@cloudflare.com
-Subject: Re: [PATCH net v2 0/2] net: veth: ability to toggle GRO and XDP
- independently
-Message-ID: <20240312164221.5bf92fd0@kernel.org>
-In-Reply-To: <20240312160551.73184-1-ignat@cloudflare.com>
-References: <20240312160551.73184-1-ignat@cloudflare.com>
+	b=bYEbldRCdLIt6oYNRPPF8TYvU+vJr/g49398b/QE5R+asPhOYeT/wQ377CZwVhjVZ
+	 4o3EwmKCXZd87SILQ6mNGSNVEd4icyqmTFFq8KWzVt1FxbMUhycBwvzXd7RFIuP6yy
+	 BzJn8yRcIb5T8Ym1OGTKlrATz0yO++vgiSGjFvjFEDBYxoGlrYYEAYzsrHACwLednn
+	 ggaSp7qgM2FdavlBYipLsURqyRq7lFDpoCGCeuNPMp+pEpUaa42uhBvBWwW3L8N0Uc
+	 0r3pAu56QedBToNWym5rohNm3w5pHv031FN7a7AxBjwQmltWF0r3n4RfTd+GNzloTW
+	 FWkdJ7U36T3ZA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TvVlp0bKyz4wcJ;
+	Wed, 13 Mar 2024 10:51:17 +1100 (AEDT)
+Date: Wed, 13 Mar 2024 10:51:17 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Networking <netdev@vger.kernel.org>, Andrew Morton
+ <akpm@linux-foundation.org>, David Miller <davem@davemloft.net>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
+ <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, bpf
+ <bpf@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, "Uladzislau Rezki (Sony)" <urezki@gmail.com>
+Subject: Re: linux-next: manual merge of the bpf-next tree with the
+ mm-stable tree
+Message-ID: <20240313105117.699dc720@canb.auug.org.au>
+In-Reply-To: <20240307123619.159f1c4c@canb.auug.org.au>
+References: <20240307123619.159f1c4c@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="Sig_/yT0EdgRsoNW8+yPN=MLDvoO";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+
+--Sig_/yT0EdgRsoNW8+yPN=MLDvoO
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 12 Mar 2024 16:05:49 +0000 Ignat Korchagin wrote:
-> It is rather confusing that GRO is automatically enabled, when an XDP program
-> is attached to a veth interface. Moreover, it is not possible to disable GRO
-> on a veth, if an XDP program is attached (which might be desirable in some use
-> cases).
-> 
-> Make GRO and XDP independent for a veth interface.
+Hi all,
 
-Looks like the udpgro_fwd.sh test also needs tweakin'
+On Thu, 7 Mar 2024 12:36:19 +1100 Stephen Rothwell <sfr@canb.auug.org.au> w=
+rote:
+>=20
+> Today's linux-next merge of the bpf-next tree got a conflict in:
+>=20
+>   mm/vmalloc.c
+>=20
+> between commit:
+>=20
+>   8e1d743f2c26 ("mm: vmalloc: support multiple nodes in vmallocinfo")
+>=20
+> from the mm-stable tree and commit:
+>=20
+>   e6f798225a31 ("mm: Introduce VM_SPARSE kind and vm_area_[un]map_pages()=
+.")
+>=20
+> from the bpf-next tree.
+>=20
+> I fixed it up (I think - see below) and can carry the fix as necessary.
+> This is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+>=20
+>=20
+> diff --cc mm/vmalloc.c
+> index 25a8df497255,e5b8c70950bc..000000000000
+> --- a/mm/vmalloc.c
+> +++ b/mm/vmalloc.c
+> @@@ -4755,81 -4423,70 +4820,84 @@@ static void show_numa_info(struct seq_f
+>  =20
+>   static void show_purge_info(struct seq_file *m)
+>   {
+>  +	struct vmap_node *vn;
+>   	struct vmap_area *va;
+>  +	int i;
+>  =20
+>  -	spin_lock(&purge_vmap_area_lock);
+>  -	list_for_each_entry(va, &purge_vmap_area_list, list) {
+>  -		seq_printf(m, "0x%pK-0x%pK %7ld unpurged vm_area\n",
+>  -			(void *)va->va_start, (void *)va->va_end,
+>  -			va->va_end - va->va_start);
+>  -	}
+>  -	spin_unlock(&purge_vmap_area_lock);
+>  -}
+>  +	for (i =3D 0; i < nr_vmap_nodes; i++) {
+>  +		vn =3D &vmap_nodes[i];
+>  =20
+>  -static int s_show(struct seq_file *m, void *p)
+>  -{
+>  -	struct vmap_area *va;
+>  -	struct vm_struct *v;
+>  -
+>  -	va =3D list_entry(p, struct vmap_area, list);
+>  -
+>  -	if (!va->vm) {
+>  -		if (va->flags & VMAP_RAM)
+>  -			seq_printf(m, "0x%pK-0x%pK %7ld vm_map_ram\n",
+>  +		spin_lock(&vn->lazy.lock);
+>  +		list_for_each_entry(va, &vn->lazy.head, list) {
+>  +			seq_printf(m, "0x%pK-0x%pK %7ld unpurged vm_area\n",
+>   				(void *)va->va_start, (void *)va->va_end,
+>   				va->va_end - va->va_start);
+>  -
+>  -		goto final;
+>  +		}
+>  +		spin_unlock(&vn->lazy.lock);
+>   	}
+>  +}
+>  =20
+>  -	v =3D va->vm;
+>  +static int vmalloc_info_show(struct seq_file *m, void *p)
+>  +{
+>  +	struct vmap_node *vn;
+>  +	struct vmap_area *va;
+>  +	struct vm_struct *v;
+>  +	int i;
+>  =20
+>  -	seq_printf(m, "0x%pK-0x%pK %7ld",
+>  -		v->addr, v->addr + v->size, v->size);
+>  +	for (i =3D 0; i < nr_vmap_nodes; i++) {
+>  +		vn =3D &vmap_nodes[i];
+>  =20
+>  -	if (v->caller)
+>  -		seq_printf(m, " %pS", v->caller);
+>  +		spin_lock(&vn->busy.lock);
+>  +		list_for_each_entry(va, &vn->busy.head, list) {
+>  +			if (!va->vm) {
+>  +				if (va->flags & VMAP_RAM)
+>  +					seq_printf(m, "0x%pK-0x%pK %7ld vm_map_ram\n",
+>  +						(void *)va->va_start, (void *)va->va_end,
+>  +						va->va_end - va->va_start);
+>  =20
+>  -	if (v->nr_pages)
+>  -		seq_printf(m, " pages=3D%d", v->nr_pages);
+>  +				continue;
+>  +			}
+>  =20
+>  -	if (v->phys_addr)
+>  -		seq_printf(m, " phys=3D%pa", &v->phys_addr);
+>  +			v =3D va->vm;
+>  =20
+>  -	if (v->flags & VM_IOREMAP)
+>  -		seq_puts(m, " ioremap");
+>  +			seq_printf(m, "0x%pK-0x%pK %7ld",
+>  +				v->addr, v->addr + v->size, v->size);
+>  =20
+>  -	if (v->flags & VM_SPARSE)
+>  -		seq_puts(m, " sparse");
+>  +			if (v->caller)
+>  +				seq_printf(m, " %pS", v->caller);
+>  =20
+>  -	if (v->flags & VM_ALLOC)
+>  -		seq_puts(m, " vmalloc");
+>  +			if (v->nr_pages)
+>  +				seq_printf(m, " pages=3D%d", v->nr_pages);
+>  =20
+>  -	if (v->flags & VM_MAP)
+>  -		seq_puts(m, " vmap");
+>  +			if (v->phys_addr)
+>  +				seq_printf(m, " phys=3D%pa", &v->phys_addr);
+>  =20
+>  -	if (v->flags & VM_USERMAP)
+>  -		seq_puts(m, " user");
+>  +			if (v->flags & VM_IOREMAP)
+>  +				seq_puts(m, " ioremap");
+>  =20
+>  -	if (v->flags & VM_DMA_COHERENT)
+>  -		seq_puts(m, " dma-coherent");
+> ++			if (v->flags & VM_SPARSE)
+> ++				seq_puts(m, " sparse");
+> +=20
+>  -	if (is_vmalloc_addr(v->pages))
+>  -		seq_puts(m, " vpages");
+>  +			if (v->flags & VM_ALLOC)
+>  +				seq_puts(m, " vmalloc");
+>  =20
+>  -	show_numa_info(m, v);
+>  -	seq_putc(m, '\n');
+>  +			if (v->flags & VM_MAP)
+>  +				seq_puts(m, " vmap");
+>  +
+>  +			if (v->flags & VM_USERMAP)
+>  +				seq_puts(m, " user");
+>  +
+>  +			if (v->flags & VM_DMA_COHERENT)
+>  +				seq_puts(m, " dma-coherent");
+>  +
+>  +			if (is_vmalloc_addr(v->pages))
+>  +				seq_puts(m, " vpages");
+>  +
+>  +			show_numa_info(m, v);
+>  +			seq_putc(m, '\n');
+>  +		}
+>  +		spin_unlock(&vn->busy.lock);
+>  +	}
+>  =20
+>   	/*
+>   	 * As a final step, dump "unpurged" areas.
 
-https://netdev-3.bots.linux.dev/vmksft-net/results/504620/17-udpgro-fwd-sh/stdout
--- 
-pw-bot: cr
+This is now a conflict between the net-next tree and the mm-stable tree.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/yT0EdgRsoNW8+yPN=MLDvoO
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmXw6nUACgkQAVBC80lX
+0Gya7Af/eanjo0KqtUdKrpWYcPSmSO1QHXGP9/SE4P3qCeVYHvN19R2jZLzaou9a
+fGAjvSvop62RTF22Fz4qHDee9W7Lv/fIWb8ZP6Qf+z9heyPqLHl848oRFK7iIOzb
+f9Z3AnUz7iwg8aBxn42HNA1i+wHXH/r/QdNtKLLDnIhQTGeH17Cv1TJRx32hWlOj
+4yPWa8QtzZLIq1fwaWY487mXIjALPrFC6lIZ4gbtZpQ/AxT3+lfZbi515nIm6kMk
+F68Qb61VEuwWHW120bsVzogE0ZSKxGrNHQchW6CEOfC8QEYh+8eaKD8RT/Kuduro
+ufS2iZdqvtdej+4JXPBQhj+QTH4eNw==
+=4mUn
+-----END PGP SIGNATURE-----
+
+--Sig_/yT0EdgRsoNW8+yPN=MLDvoO--
 
