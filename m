@@ -1,86 +1,106 @@
-Return-Path: <netdev+bounces-79582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6DDF879F96
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 00:17:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D5DB879FB5
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 00:37:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 730A7B2239C
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:17:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 639581C2160F
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:37:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ACAA4655F;
-	Tue, 12 Mar 2024 23:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4A5A47768;
+	Tue, 12 Mar 2024 23:37:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RWrnTYyG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aBv/QX0h"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3B8946447;
-	Tue, 12 Mar 2024 23:16:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC8C01E511
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 23:37:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710285412; cv=none; b=Mu89EE8/IwovUkuA4kPL5uW4yEZRtJ4zFDJtQbWVcslr/x1oQtZwiJKXK5Dob5hBeGtfkZSSuFOkLj4p+oaFx03ErZHha4eMvMzc4CYn2ydnchsCxazcCS0WXHoWK0yIhuT1Hux+oeR1apQDBS6Sz+I+Cens0+fXoRuP14LMyCU=
+	t=1710286654; cv=none; b=HQsnscE7D1piIu7y8/QM9nsmuGr+Lw66HhxXOZ0brwL7Jyr4gq2sqhkHl3nm1oaEzQYTwPj+3UjkIjTGOpqvKueYhKDA0kj2yQ9zh/+DOgeSG9Dy4vu2/MQ3MZqIU4Pu24wNkODYZQcZ+XrQ7wlHwhpYd3PPiSOdSZ2llTp0/dE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710285412; c=relaxed/simple;
-	bh=oaPJDLki3A3HqO5AiIrDHVFKQWx9bMTXxeJGXgBQDE0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZEZ8ngmjjxaT87xT/uzwIBGrBtdVf9GF8Wh/TX3C07ZVtak097ePnEwfu0sOyCcUZQanlPM+XCMNruquQ8URoQuHJoBnLGCHlZRVmE4r8Iljt9JTIWQIzCBCkrFkAzWjmYO9SnSISNibQYOmuC137ixVGD8io5FkBRxyfvfT2Ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RWrnTYyG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFF90C433F1;
-	Tue, 12 Mar 2024 23:16:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710285412;
-	bh=oaPJDLki3A3HqO5AiIrDHVFKQWx9bMTXxeJGXgBQDE0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=RWrnTYyG6x4Kw84+kFFPVSxbR5imBb6tHgJVsTSmrLk3pD4Do1gZKlvg+Cw3jKnV0
-	 QOKGp8/QeZWwOubiWWj3zcSauxI7n2XGDRwzbAvJSUm967+WoON/Kw3ubZsxYas/rR
-	 uTEL0ocMIO0F/J3LbgC4SqgMUSgg6Uc3K8nxQLTpo0C9BqLbOLTxQrYYQS5/DzMEVr
-	 ohmF6cFhoQlYvk1UDfG8CQhOCVfApH7/3m94SVf/BQWBlY3W1n/jqAT7AwfxxI0ZHJ
-	 AocgUaxbs1Oi3tq+/9oytzxfdL71r6SZn/ZvPmQA6vmxtbFkUB6aSts3qgrw6UL+Pl
-	 ybPuvDNRawbAw==
-Date: Tue, 12 Mar 2024 16:16:50 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
- "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
- Wen Gu <guwen@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, Kees Cook
- <keescook@chromium.org>
-Subject: Re: [PATCH v2][next] net/smc: Avoid -Wflex-array-member-not-at-end
- warnings
-Message-ID: <20240312161650.2799f6be@kernel.org>
-In-Reply-To: <ZfCXBykRw5XqBvf0@neat>
-References: <ZfCXBykRw5XqBvf0@neat>
+	s=arc-20240116; t=1710286654; c=relaxed/simple;
+	bh=sORqIWNE5pVZeCpAkrvOfyLvuvyrqYzdWFV3rMd6lFI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=plTaowxjThIxfQOxCoJt5zsACkQnGPPN2tLSA5XdGJy888e8hVYeUwaNAI68vL21iRUyUOMji2hvxAq3nR+pbCi0inmt6v+W8iKsb05rPMuhQ7MLNQn6wdAZDjKk20HlvtXDYHjbDn57JqCRahQ0Ha2JEn7JzC5efqQsKzHvqPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aBv/QX0h; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710286651;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=r3wV6mjrmbOYtgkKlQ1vhr8VmTlakhpayL5vbSQu//g=;
+	b=aBv/QX0hT0u7WxOj99U57RgumrrC2wUXIpCCBojJOXQPq5sm2yjdOAAG28Kqpa99UavP7m
+	J7Q32GZfUWVF3nWTtZ1DxXh/QMgmyPnREun6TvbomoT0qCdBTChobfC2T78oZvJB5x/reO
+	0W+gP4QRn3Qhuc2g1inr1kkhvuCVHpE=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-235--pGCYMqpNLaoidRRNBp53Q-1; Tue,
+ 12 Mar 2024 19:37:29 -0400
+X-MC-Unique: -pGCYMqpNLaoidRRNBp53Q-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A9A2C1C07266;
+	Tue, 12 Mar 2024 23:37:28 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.10])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 11524492BC7;
+	Tue, 12 Mar 2024 23:37:26 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-afs@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/2] rxrpc: Fixes for AF_RXRPC
+Date: Tue, 12 Mar 2024 23:37:16 +0000
+Message-ID: <20240312233723.2984928-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-On Tue, 12 Mar 2024 11:55:19 -0600 Gustavo A. R. Silva wrote:
-> -Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
-> ready to enable it globally.
+Here are a couple of fixes for the AF_RXRPC changes[1] in net-next.
 
-## Form letter - net-next-closed
+ (1) Fix a runtime warning introduced by a patch that changed how
+     page_frag_alloc_align() works.
 
-The merge window for v6.9 has begun and we have already posted our pull
-request. Therefore net-next is closed for new drivers, features, code
-refactoring and optimizations. We are currently accepting bug fixes only.
+ (2) Fix an is-NULL vs IS_ERR error handling bug.
 
-Please repost when net-next reopens after March 25th.
+The patches are tagged here:
 
-RFC patches sent for review only are obviously welcome at any time.
+	git://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git tags/rxrpc-iothread-20240312
 
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
--- 
-pw-bot: defer
+And can be found on this branch:
+
+	http://git.kernel.org/cgit/linux/kernel/git/dhowells/linux-fs.git/log/?h=rxrpc-iothread
+
+David
+
+Link: https://lore.kernel.org/r/20240306000655.1100294-1-dhowells@redhat.com/ [1]
+
+David Howells (2):
+  rxrpc: Fix use of changed alignment param to page_frag_alloc_align()
+  rxrpc: Fix error check on ->alloc_txbuf()
+
+ net/rxrpc/sendmsg.c | 4 ++--
+ net/rxrpc/txbuf.c   | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
 
