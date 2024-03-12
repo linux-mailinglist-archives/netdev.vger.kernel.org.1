@@ -1,82 +1,109 @@
-Return-Path: <netdev+bounces-79510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FBC387996C
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 17:55:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDE51879988
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 18:01:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A978283D99
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 16:55:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F04281C21C70
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 17:01:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B75E2137C25;
-	Tue, 12 Mar 2024 16:54:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A0B7137C36;
+	Tue, 12 Mar 2024 17:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j8jfK6Qz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-out.aladdin-rd.ru (mail-out.aladdin-rd.ru [91.199.251.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED68137C22;
-	Tue, 12 Mar 2024 16:54:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.199.251.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C1D137937
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 17:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710262490; cv=none; b=YwLSEYsLZ9SIPAfQCAhyMySTKnQgJ83ghUctbtvLAxfgiHcyuje8FmT9Af6tIu+4JAGpAZI5m5PnFFW2bnKgGI96RQxPKIqN8xoVvU466F2BEl1jUjqNTPrCmulVCFazaI6VwdwTW5COhJ8eshZ/45eCVS23YgqvJVrplm/xod8=
+	t=1710262867; cv=none; b=fiSpLOMcWIPMFxKoNwf2t229+LAR8aztK2rPOk1orSYYCxRUhVhSrsiVrCSwWDoLSVexjpHixYj7DE16bwOft6pccJRvyFsRStx3hpSQqOqheLD7LpNB4DGJYrbrZz8mTaLhQ77g/mUvKLQGOyAXsTaU65KmwTQr9n6lPYh60PI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710262490; c=relaxed/simple;
-	bh=IatuUoyah9BqPO/PBrdSSVVhJx3+CGn5xo0Pwxl1H+o=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nlAgdkfUWGIt7m7oF61pl4TkH/t2IJl4iuQWQZdWN6xbLh3Fv6XATUJ69dn75KWv+y1AtfOTgNTG4y9VKfTiSDGdfj1qmRSJY14TFc+85E0ofGqR9mOwM4GhsJK6RyJXSfT6X35QtgtpNWKaRfV1sWVZ7y7fRgp/+ZYpuFT6aAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aladdin.ru; spf=pass smtp.mailfrom=aladdin.ru; arc=none smtp.client-ip=91.199.251.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=aladdin.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aladdin.ru
-From: Daniil Dulov <d.dulov@aladdin.ru>
-To: Jakub Kicinski <kuba@kernel.org>, Florian Fainelli
-	<florian.fainelli@broadcom.com>
-CC: Daniil Dulov <d.dulov@aladdin.ru>, Broadcom internal kernel review list
-	<bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Doug
- Berger <opendmb@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH net-next] net: phy: mdio-bcm-unimac: Cast denominator to unsigned long to avoid overflow
-Date: Tue, 12 Mar 2024 19:53:58 +0300
-Message-ID: <20240312165358.7712-1-d.dulov@aladdin.ru>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1710262867; c=relaxed/simple;
+	bh=LFEAlJYiHP9dghkatG9KVTKAC4gwYZAElDPm6lw9PQU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JDXoDrBNTrD15ibzkZbnLFk6/fhaL6dimh83DtIk6unTTFGiP7hK39ao5nOa5Zhn2eTc0XWdj05bul5ZktBWd/EyJxB2gP8XREl0WPy7Zo+gVfjaJPuL0V2RuRdZq6LsT5cQT+9dCkilHT15KvDN2/QnoTcUIXDZCs+KD4Y/0jk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j8jfK6Qz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 656ACC433C7;
+	Tue, 12 Mar 2024 17:01:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710262866;
+	bh=LFEAlJYiHP9dghkatG9KVTKAC4gwYZAElDPm6lw9PQU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=j8jfK6Qzh6gFf0caDzM5bC70pNDpXQJNbFdJ2JwKR6xILLXS4okAemhwtc47K7i7r
+	 jkIR7kYXo8WmpX0/bCepykkFwzfaZorDvutHQ4Lr9wkkLQj5tfFzA+fu4gdwEzCS+O
+	 UBtdHQEhifAEkm0jBOA8B6woMVutVh1wI0oTB3HFFi7NYp6NbOZqAjDIl4oOsmJYsx
+	 AnE33wWIlkjGkV91ogHGmxmEUoFoU7sZpcotHQCZTybvae66dO5hKWLG5ZpgWfMMm3
+	 89WBilyxu/XguXBONd+Pl2MGo/eXYDSCwyCYZ6sEK7m/fRcdBbVAiIYzoRnGYo3Bjt
+	 AJBGQ5XMqnNZw==
+Date: Tue, 12 Mar 2024 10:01:05 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko <jiri@resnulli.us>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org
+Subject: Re: How to display IPv4 array?
+Message-ID: <20240312100105.16a59086@kernel.org>
+In-Reply-To: <CAD4GDZwxS1Av6XNkKnC-pmOWTwuc_u7JRLRkCXO5kJyy6wvwkA@mail.gmail.com>
+References: <ZfApoTpVaiaoH1F0@Laptop-X1>
+	<ZfBGrqVYRz6ZRmT-@nanopsycho>
+	<CAD4GDZwxS1Av6XNkKnC-pmOWTwuc_u7JRLRkCXO5kJyy6wvwkA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EXCH-2016-02.aladdin.ru (192.168.1.102) To
- EXCH-2016-01.aladdin.ru (192.168.1.101)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-The expression priv->clk_freq * 2 can lead to overflow that will cause
-a division by zero. So, let's cast it to unsigned long to avoid it.
+On Tue, 12 Mar 2024 16:04:56 +0000 Donald Hunter wrote:
+> > "nested-array" would tell the parser to expect a nest that has attr
+> > type of value of array index, "type" is the same for all array members.
+> > The output will be the same as in case of "multi-attr", array index
+> > ignored (I don't see what it would be good for to the user).  
+> 
+> I'd say that this construct looks more like nest-type-value
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+type-value is sort of a decomposed array, if we have all the entries
+under one nest I reckon array extension may be more appropriate.
 
-Signed-off-by: Daniil Dulov <d.dulov@aladdin.ru>
----
- drivers/net/mdio/mdio-bcm-unimac.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+My gut feeling is that we should generalize the array-nest type,
+when I wrote the initial spec we didn't have sub-type. How about
+we replace array-nest with indexed-array (good name TBD), and instead
+of assuming the value is always a nest pass the type via sub-type?
 
-diff --git a/drivers/net/mdio/mdio-bcm-unimac.c b/drivers/net/mdio/mdio-bcm-unimac.c
-index f40eb50bb978..0425b622c09f 100644
---- a/drivers/net/mdio/mdio-bcm-unimac.c
-+++ b/drivers/net/mdio/mdio-bcm-unimac.c
-@@ -214,7 +214,7 @@ static int unimac_mdio_clk_set(struct unimac_mdio_priv *priv)
- 	else
- 		rate = clk_get_rate(priv->clk);
- 
--	div = (rate / (2 * priv->clk_freq)) - 1;
-+	div = (rate / (2 * (unsigned long)priv->clk_freq)) - 1;
- 	if (div & ~MDIO_CLK_DIV_MASK) {
- 		pr_warn("Incorrect MDIO clock frequency, ignoring\n");
- 		ret = 0;
--- 
-2.25.1
+For bonding probably something like:
 
+  -
+    name: linkinfo-bond-attrs
+    name-prefix: ifla-bond-
+    attributes:
+      -
+        name: arp-ip-target
+        type: indexed-array
+        sub-type: u32
+	byte-order: big-endian
+
+how does that sound?
+
+exiting array-nests would change from:
+
+ -
+   name: bla
+   type: array-nest
+   nested-attributes: bla-attrs
+
+to
+
+ -
+   name: bla
+   type: indexed-array
+   sub-type: nest
+   nested-attributes: bla-attrs
+
+But that'd mean updating all existing specs and codegen.
 
