@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-79547-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E975879DC5
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 22:47:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74AE9879DC7
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 22:47:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15D41282B27
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 21:47:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0347B1F21B47
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 21:47:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D946214533F;
-	Tue, 12 Mar 2024 21:44:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02CE8145B28;
+	Tue, 12 Mar 2024 21:44:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="JkleoP2c"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="kuW/KzYd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578651448E1
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 21:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41FD5145333
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 21:44:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710279883; cv=none; b=en/z/z34IMyvnZ/anGr5iGfrYK0WUAiPIvBcriZYrJUbrqt0qg7uRawRZnMdCHoho35zyt2H71TFHSG9WaKltK5mZ7bsb38MSMboS4T+ZDpvMbAjUgj5DP82FNow6s2w8f9pP4vghiXMg0OBeeLz2LMsvJsq8d+XwEZNKJopC0c=
+	t=1710279884; cv=none; b=I4Yb8rUO1/hBpOdmH76V72HedO+gkMBUT3fuOfkhAJlxMFII5anAcUMM5hHY+E9slGOu4MADv2DbIVEm2H3j+iVQ35atPrXtlkNLPddtAZmrMKnLHggerQhJxcKyp1S6RNWq2NT9euWOdMrv91LiWxMcaZnxpyk4Fq10sNw+wXw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710279883; c=relaxed/simple;
-	bh=B6RRKQIm2WKzMYtzsA77lI1a0FvklUtMlXfjfN0wIbw=;
+	s=arc-20240116; t=1710279884; c=relaxed/simple;
+	bh=jq3KJoKRpx3fmCjnE4Ssin7zDmiZaX04toiitKi+c6k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=VNIp9X5ejHtEKHSUM0H/9lHv9+hD491Yi5U5Zwskr1bLQW6M01XiYnFkmxhrH92XtKjvtXHRc49krgTMGfKTV6vCV5KYCA2MxqbO4DuybY5ye23OJNJIjSjuILdPbL+74d5tRtiw9lXaLQ8UkgwIcBgyrkxIo4dEkUN+ZEMlpCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=JkleoP2c; arc=none smtp.client-ip=209.85.214.169
+	 MIME-Version; b=fv37uS72iWKsLoDXaPQBK8nBFIztlyIsEJ+jAp2SWxK7SbwcJt+63DATGvAKHyiZwxkkVBePG3F8rV3JWk7L5u6904R8emdPCukljzTC7s6S7snYqBvl4QJ9qfhw7ID+F5ON+1Ssn/pHNzS3v3d+LUPWEagrS7ZVJ8PU0sJ6IU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=kuW/KzYd; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-1dd9066b7c3so3118385ad.2
-        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 14:44:42 -0700 (PDT)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-6e6b22af648so239824b3a.0
+        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 14:44:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1710279882; x=1710884682; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1710279883; x=1710884683; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rj0cYgShXYH5VhmSnGepet0UkxqjvpM473hZF/0XZ3c=;
-        b=JkleoP2ciwhG1a0lGMoEm507wXF8Rl4UE4M6rxhXOsvkkiMXsDIzDMZXMbq5xXteJ4
-         r7xqc8Wg6WtHDXh3HUEK0pPzqVXK1CxkyVNM6dm8aI6MFHyF21yrdx52HPuoehDCYeZB
-         ml5/Ls6v2tI1yb4/TPBmpzXXa3F/KGwrXfJFVgtNKp8njXrWz+m6XfDpqQwlhFx3ooev
-         Mv2ip/9QeQuZy4pOgaBk/66zok6u9+pYm//2jbqgeyphMT2XTIuxxoexCRcEYPtgWEYv
-         BoeO31snbw/44oXtBy+sD65qfkd/ND0lQzgWBfDbqD255LQahE0xumGXvgRWR96zeaRd
-         RVtg==
+        bh=1e150jmPmcmnhUwqwkgkSEpSo+j9RzHXKffT0azea6k=;
+        b=kuW/KzYdlboaUiJr8cZG++jpTJOCEXicDox+JBgn0WvYs0sBYaMLZRHG9jjMxOyDv/
+         FEdbUy7HibOvi6hjxXi/LypGDibkCVIJfqu2/vvCF/0HtGlCtgIsxsN2pp4loDGuqsHj
+         PC0ETXP87eEOXH6n+8Rp9vTX9BibUXDnDRbFF5/fUanThkc7Mb2TKcUv4zMB2BswQwWO
+         yHCZdA+caFAHLSKoYV0I+QH0JJPQU5aKorJCBugvbgXjBJRpVJlMOmfB87fnrCe9nBkU
+         lljI/K0YwsqjJSacGWFT7mGiicBJAmB2kz5aQTrWsZDkSRl5xmwpRYsUFQeDkxQh23Da
+         4GjA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710279882; x=1710884682;
+        d=1e100.net; s=20230601; t=1710279883; x=1710884683;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rj0cYgShXYH5VhmSnGepet0UkxqjvpM473hZF/0XZ3c=;
-        b=vd7AeZIGTIC9KqXR/6iSCE+GiCl8umRaZsO01rJOUyesduZUTnalxbN+cYlNacKzaE
-         SAku6UYmp8HM/jfDxZBVQWT2USlUTVqxI+i2yXdbRoATs042na3/ywmh6z3+jH6vl9MO
-         G15BU6P/uCFwgNaNImWLlnyN0k7GyHyiEQD0p9lEcLFUVnCTRXvE6mUI8+s/eiAyfuQA
-         GWNIRXNjORSNY0P9ld3ol9J5JCQeeERV/S1w/ZPcWRfO9jrWCOlAh5g4LEgZh1uL1/v9
-         oT8Rv2UPpKoSG+oeWfTQIPRvcHx+quOtLPnXe7N2iJ39ZMl7VLZIJmv8Cg9DPFRYtBFI
-         gAYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWXiEf+JvH0XUqjkiut4ZovkdcSPJZxtw0Bn9efRmEUQGEJbMHwHx0q7P4gMeY2WUKEx+DItdmrkPDt2NkquUQ4zKhCSKUq
-X-Gm-Message-State: AOJu0YyXXRfvmaNqWbl02VD6/DJp58jvbz7mcs50DZzZSipzUAnYCw5S
-	vsZW2gKnaaheFpZZs0sr+1Imf4s36cpGfvx4enD9hdPPS98G3W0rXI9Y/O38gjRVL1XRsmi33qZ
-	V
-X-Google-Smtp-Source: AGHT+IHXWW1fnHlG+Rl1vWCNUw0xrcw6qZRHYrzDZb+F06rysW+Ft1xEAXTu1TEH4AuY3fi9w6AfTg==
-X-Received: by 2002:a17:902:f68b:b0:1db:e74b:5bbf with SMTP id l11-20020a170902f68b00b001dbe74b5bbfmr5003902plg.0.1710279881660;
-        Tue, 12 Mar 2024 14:44:41 -0700 (PDT)
-Received: from localhost (fwdproxy-prn-017.fbsv.net. [2a03:2880:ff:11::face:b00c])
-        by smtp.gmail.com with ESMTPSA id u12-20020a170902e80c00b001ddb73e719dsm2049257plg.27.2024.03.12.14.44.41
+        bh=1e150jmPmcmnhUwqwkgkSEpSo+j9RzHXKffT0azea6k=;
+        b=Rn9WvwtNdhdjcJOvRwriQvF+ncN4aBu5lmj48GWLKPY5ktIuXXEubuxNe6IZDOz14g
+         Vsho8NGIphL5iEEz2YY5KP9ht/7Pm5nOjePJuDiGJtYhtWjj7c8aXeXcWbl30w92SwNh
+         +rxOBs3QHyLjW7TB5AhajTNgaSxiYxPXbvZhcSOYJhatW2oSN8paBsEIM40YUy45NA1d
+         Op2L42nKXBGibV/EfLMcbuQHJEhdBDADhDOqRQK/vx7Gjq/p9YTgAmK29d53o1ff5CM9
+         mWNbZJwgMyV4lUpuqCo+CD4etUOsRrxMYCH2ou0apZQArS0j5z7u2u/r8IoA7/FTDbMs
+         DSzA==
+X-Forwarded-Encrypted: i=1; AJvYcCV4OkndiB+WK5ue1QbL5KSHT87yCtjmYSIhGI9AmwftbOTU8royzpFhgbu8UpcEu4Lby+hOLfHrVJ1qnG4u6DQoLkJx8vaR
+X-Gm-Message-State: AOJu0YzEr0cpeqNrjbXlxoZ9jCZX1BYJn46zCFD/XE1UUVkwvjEVstPc
+	YkR7CY04fplEYByaH5VezUJ+CvbvR2ieEAqkOWmsHG1UJbsrEpV+HZzgBXiu6l2mJYpuRJtCT0n
+	W
+X-Google-Smtp-Source: AGHT+IHOcvscYPKCK8J8fb8jWUvnptRIGd04d9aE24Qi4deIrOQGZ1H1ukCkgOC6LYYroq04Cm9CVQ==
+X-Received: by 2002:a05:6a20:3d02:b0:1a1:841a:33ef with SMTP id y2-20020a056a203d0200b001a1841a33efmr1130568pzi.3.1710279882656;
+        Tue, 12 Mar 2024 14:44:42 -0700 (PDT)
+Received: from localhost (fwdproxy-prn-006.fbsv.net. [2a03:2880:ff:6::face:b00c])
+        by smtp.gmail.com with ESMTPSA id w2-20020aa79a02000000b006e6931a50e8sm4177179pfj.79.2024.03.12.14.44.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Mar 2024 14:44:41 -0700 (PDT)
+        Tue, 12 Mar 2024 14:44:42 -0700 (PDT)
 From: David Wei <dw@davidwei.uk>
 To: io-uring@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -80,9 +80,9 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
 	David Ahern <dsahern@kernel.org>,
 	Mina Almasry <almasrymina@google.com>
-Subject: [RFC PATCH v4 08/16] io_uring: setup ZC for an Rx queue when registering an ifq
-Date: Tue, 12 Mar 2024 14:44:22 -0700
-Message-ID: <20240312214430.2923019-9-dw@davidwei.uk>
+Subject: [RFC PATCH v4 09/16] io_uring/zcrx: implement socket registration
+Date: Tue, 12 Mar 2024 14:44:23 -0700
+Message-ID: <20240312214430.2923019-10-dw@davidwei.uk>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240312214430.2923019-1-dw@davidwei.uk>
 References: <20240312214430.2923019-1-dw@davidwei.uk>
@@ -94,109 +94,321 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: David Wei <davidhwei@meta.com>
+From: Pavel Begunkov <asml.silence@gmail.com>
 
-RFC only, not for upstream
+We want userspace to explicitly list all sockets it'll be using with a
+particular zc ifq, so we can properly configure them, e.g. binding the
+sockets to the corresponding interface and setting steering rules. We'll
+also need it to better control ifq lifetime and for
+termination / unregistration purposes.
 
-Just as with the previous patch, it will be migrated from ndo_bpf
+TODO: remove zc_rx_idx from struct socket, which will fix zc_rx_idx
+token init races and re-registration bug.
 
-This patch sets up ZC for an Rx queue in a net device when an ifq is
-registered with io_uring. The Rx queue is specified in the registration
-struct.
-
-For now since there is only one ifq, its destruction is implicit during
-io_uring cleanup.
-
+Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- io_uring/zc_rx.c | 43 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 43 insertions(+)
+ include/linux/net.h           |  2 +
+ include/uapi/linux/io_uring.h |  7 +++
+ io_uring/net.c                | 20 ++++++++
+ io_uring/register.c           |  6 +++
+ io_uring/zc_rx.c              | 91 +++++++++++++++++++++++++++++++++--
+ io_uring/zc_rx.h              | 17 +++++++
+ net/socket.c                  |  1 +
+ 7 files changed, 141 insertions(+), 3 deletions(-)
 
+diff --git a/include/linux/net.h b/include/linux/net.h
+index c9b4a63791a4..867061a91d30 100644
+--- a/include/linux/net.h
++++ b/include/linux/net.h
+@@ -126,6 +126,8 @@ struct socket {
+ 	const struct proto_ops	*ops; /* Might change with IPV6_ADDRFORM or MPTCP. */
+ 
+ 	struct socket_wq	wq;
++
++	unsigned		zc_rx_idx;
+ };
+ 
+ /*
+diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
+index a085ed60478f..26e945e6258d 100644
+--- a/include/uapi/linux/io_uring.h
++++ b/include/uapi/linux/io_uring.h
+@@ -579,6 +579,7 @@ enum {
+ 
+ 	/* register a network interface queue for zerocopy */
+ 	IORING_REGISTER_ZC_RX_IFQ		= 29,
++	IORING_REGISTER_ZC_RX_SOCK		= 30,
+ 
+ 	/* this goes last */
+ 	IORING_REGISTER_LAST,
+@@ -824,6 +825,12 @@ struct io_uring_zc_rx_ifq_reg {
+ 	struct io_rbuf_rqring_offsets rq_off;
+ };
+ 
++struct io_uring_zc_rx_sock_reg {
++	__u32	sockfd;
++	__u32	zc_rx_ifq_idx;
++	__u32	__resv[2];
++};
++
+ #ifdef __cplusplus
+ }
+ #endif
+diff --git a/io_uring/net.c b/io_uring/net.c
+index 54dff492e064..1fa7c1fa6b5d 100644
+--- a/io_uring/net.c
++++ b/io_uring/net.c
+@@ -16,6 +16,7 @@
+ #include "net.h"
+ #include "notif.h"
+ #include "rsrc.h"
++#include "zc_rx.h"
+ 
+ #if defined(CONFIG_NET)
+ struct io_shutdown {
+@@ -1033,6 +1034,25 @@ int io_recv(struct io_kiocb *req, unsigned int issue_flags)
+ 	return ret;
+ }
+ 
++static __maybe_unused
++struct io_zc_rx_ifq *io_zc_verify_sock(struct io_kiocb *req,
++					struct socket *sock)
++{
++	unsigned token = READ_ONCE(sock->zc_rx_idx);
++	unsigned ifq_idx = token >> IO_ZC_IFQ_IDX_OFFSET;
++	unsigned sock_idx = token & IO_ZC_IFQ_IDX_MASK;
++	struct io_zc_rx_ifq *ifq;
++
++	if (ifq_idx)
++		return NULL;
++	ifq = req->ctx->ifq;
++	if (!ifq || sock_idx >= ifq->nr_sockets)
++		return NULL;
++	if (ifq->sockets[sock_idx] != req->file)
++		return NULL;
++	return ifq;
++}
++
+ void io_send_zc_cleanup(struct io_kiocb *req)
+ {
+ 	struct io_sr_msg *zc = io_kiocb_to_cmd(req, struct io_sr_msg);
+diff --git a/io_uring/register.c b/io_uring/register.c
+index 760f0b6a051c..7f40403a1716 100644
+--- a/io_uring/register.c
++++ b/io_uring/register.c
+@@ -570,6 +570,12 @@ static int __io_uring_register(struct io_ring_ctx *ctx, unsigned opcode,
+ 			break;
+ 		ret = io_register_zc_rx_ifq(ctx, arg);
+ 		break;
++	case IORING_REGISTER_ZC_RX_SOCK:
++		ret = -EINVAL;
++		if (!arg || nr_args != 1)
++			break;
++		ret = io_register_zc_rx_sock(ctx, arg);
++		break;
+ 	default:
+ 		ret = -EINVAL;
+ 		break;
 diff --git a/io_uring/zc_rx.c b/io_uring/zc_rx.c
-index 6987bb991418..521eeea04f9d 100644
+index 521eeea04f9d..77459c0fc14b 100644
 --- a/io_uring/zc_rx.c
 +++ b/io_uring/zc_rx.c
-@@ -4,6 +4,7 @@
- #include <linux/errno.h>
+@@ -5,12 +5,15 @@
  #include <linux/mm.h>
  #include <linux/io_uring.h>
-+#include <linux/netdevice.h>
+ #include <linux/netdevice.h>
++#include <net/tcp.h>
++#include <net/af_unix.h>
  
  #include <uapi/linux/io_uring.h>
  
-@@ -11,6 +12,34 @@
+ #include "io_uring.h"
  #include "kbuf.h"
  #include "zc_rx.h"
++#include "rsrc.h"
  
-+typedef int (*bpf_op_t)(struct net_device *dev, struct netdev_bpf *bpf);
-+
-+static int __io_queue_mgmt(struct net_device *dev, struct io_zc_rx_ifq *ifq,
-+			   u16 queue_id)
-+{
-+	struct netdev_bpf cmd;
-+	bpf_op_t ndo_bpf;
-+
-+	ndo_bpf = dev->netdev_ops->ndo_bpf;
-+	if (!ndo_bpf)
-+		return -EINVAL;
-+
-+	cmd.command = XDP_SETUP_ZC_RX;
-+	cmd.zc_rx.ifq = ifq;
-+	cmd.zc_rx.queue_id = queue_id;
-+	return ndo_bpf(dev, &cmd);
-+}
-+
-+static int io_open_zc_rxq(struct io_zc_rx_ifq *ifq)
-+{
-+	return __io_queue_mgmt(ifq->dev, ifq, ifq->if_rxq_id);
-+}
-+
-+static int io_close_zc_rxq(struct io_zc_rx_ifq *ifq)
-+{
-+	return __io_queue_mgmt(ifq->dev, NULL, ifq->if_rxq_id);
-+}
-+
- static int io_allocate_rbuf_ring(struct io_zc_rx_ifq *ifq,
- 				 struct io_uring_zc_rx_ifq_reg *reg)
- {
-@@ -49,6 +78,10 @@ static struct io_zc_rx_ifq *io_zc_rx_ifq_alloc(struct io_ring_ctx *ctx)
+ typedef int (*bpf_op_t)(struct net_device *dev, struct netdev_bpf *bpf);
  
- static void io_zc_rx_ifq_free(struct io_zc_rx_ifq *ifq)
- {
-+	if (ifq->if_rxq_id != -1)
-+		io_close_zc_rxq(ifq);
-+	if (ifq->dev)
-+		dev_put(ifq->dev);
- 	io_free_rbuf_ring(ifq);
- 	kfree(ifq);
+@@ -76,10 +79,31 @@ static struct io_zc_rx_ifq *io_zc_rx_ifq_alloc(struct io_ring_ctx *ctx)
+ 	return ifq;
  }
-@@ -79,9 +112,18 @@ int io_register_zc_rx_ifq(struct io_ring_ctx *ctx,
- 	if (ret)
- 		goto err;
  
-+	ret = -ENODEV;
-+	ifq->dev = dev_get_by_index(current->nsproxy->net_ns, reg.if_idx);
-+	if (!ifq->dev)
-+		goto err;
+-static void io_zc_rx_ifq_free(struct io_zc_rx_ifq *ifq)
++static void io_shutdown_ifq(struct io_zc_rx_ifq *ifq)
+ {
+-	if (ifq->if_rxq_id != -1)
++	int i;
 +
- 	ifq->rq_entries = reg.rq_entries;
- 	ifq->if_rxq_id = reg.if_rxq_id;
- 
-+	ret = io_open_zc_rxq(ifq);
-+	if (ret)
-+		goto err;
++	if (!ifq)
++		return;
 +
- 	ring_sz = sizeof(struct io_uring);
- 	rqes_sz = sizeof(struct io_uring_rbuf_rqe) * ifq->rq_entries;
- 	reg.mmap_sz = ring_sz + rqes_sz;
-@@ -90,6 +132,7 @@ int io_register_zc_rx_ifq(struct io_ring_ctx *ctx,
++	for (i = 0; i < ifq->nr_sockets; i++) {
++		if (ifq->sockets[i]) {
++			fput(ifq->sockets[i]);
++			ifq->sockets[i] = NULL;
++		}
++	}
++	ifq->nr_sockets = 0;
++
++	if (ifq->if_rxq_id != -1) {
+ 		io_close_zc_rxq(ifq);
++		ifq->if_rxq_id = -1;
++	}
++}
++
++static void io_zc_rx_ifq_free(struct io_zc_rx_ifq *ifq)
++{
++	io_shutdown_ifq(ifq);
++
+ 	if (ifq->dev)
+ 		dev_put(ifq->dev);
+ 	io_free_rbuf_ring(ifq);
+@@ -132,7 +156,6 @@ int io_register_zc_rx_ifq(struct io_ring_ctx *ctx,
  	reg.rq_off.tail = offsetof(struct io_uring, tail);
  
  	if (copy_to_user(arg, &reg, sizeof(reg))) {
-+		io_close_zc_rxq(ifq);
+-		io_close_zc_rxq(ifq);
  		ret = -EFAULT;
  		goto err;
  	}
+@@ -153,6 +176,8 @@ void io_unregister_zc_rx_ifqs(struct io_ring_ctx *ctx)
+ 	if (!ifq)
+ 		return;
+ 
++	WARN_ON_ONCE(ifq->nr_sockets);
++
+ 	ctx->ifq = NULL;
+ 	io_zc_rx_ifq_free(ifq);
+ }
+@@ -160,6 +185,66 @@ void io_unregister_zc_rx_ifqs(struct io_ring_ctx *ctx)
+ void io_shutdown_zc_rx_ifqs(struct io_ring_ctx *ctx)
+ {
+ 	lockdep_assert_held(&ctx->uring_lock);
++
++	io_shutdown_ifq(ctx->ifq);
++}
++
++int io_register_zc_rx_sock(struct io_ring_ctx *ctx,
++			   struct io_uring_zc_rx_sock_reg __user *arg)
++{
++	struct io_uring_zc_rx_sock_reg sr;
++	struct io_zc_rx_ifq *ifq;
++	struct socket *sock;
++	struct file *file;
++	int ret = -EEXIST;
++	int idx;
++
++	if (copy_from_user(&sr, arg, sizeof(sr)))
++		return -EFAULT;
++	if (sr.__resv[0] || sr.__resv[1])
++		return -EINVAL;
++	if (sr.zc_rx_ifq_idx != 0 || !ctx->ifq)
++		return -EINVAL;
++
++	ifq = ctx->ifq;
++	if (ifq->nr_sockets >= ARRAY_SIZE(ifq->sockets))
++		return -EINVAL;
++
++	BUILD_BUG_ON(ARRAY_SIZE(ifq->sockets) > IO_ZC_IFQ_IDX_MASK);
++
++	file = fget(sr.sockfd);
++	if (!file)
++		return -EBADF;
++
++	if (!!unix_get_socket(file)) {
++		fput(file);
++		return -EBADF;
++	}
++
++	sock = sock_from_file(file);
++	if (unlikely(!sock || !sock->sk)) {
++		fput(file);
++		return -ENOTSOCK;
++	}
++
++	idx = ifq->nr_sockets;
++	lock_sock(sock->sk);
++	if (!sock->zc_rx_idx) {
++		unsigned token;
++
++		token = idx + (sr.zc_rx_ifq_idx << IO_ZC_IFQ_IDX_OFFSET);
++		WRITE_ONCE(sock->zc_rx_idx, token);
++		ret = 0;
++	}
++	release_sock(sock->sk);
++
++	if (ret) {
++		fput(file);
++		return ret;
++	}
++	ifq->sockets[idx] = file;
++	ifq->nr_sockets++;
++	return 0;
+ }
+ 
+ #endif
+diff --git a/io_uring/zc_rx.h b/io_uring/zc_rx.h
+index 35b019b275e0..d7b8397d525f 100644
+--- a/io_uring/zc_rx.h
++++ b/io_uring/zc_rx.h
+@@ -2,6 +2,13 @@
+ #ifndef IOU_ZC_RX_H
+ #define IOU_ZC_RX_H
+ 
++#include <linux/io_uring_types.h>
++#include <linux/skbuff.h>
++
++#define IO_ZC_MAX_IFQ_SOCKETS		16
++#define IO_ZC_IFQ_IDX_OFFSET		16
++#define IO_ZC_IFQ_IDX_MASK		((1U << IO_ZC_IFQ_IDX_OFFSET) - 1)
++
+ struct io_zc_rx_ifq {
+ 	struct io_ring_ctx		*ctx;
+ 	struct net_device		*dev;
+@@ -11,6 +18,9 @@ struct io_zc_rx_ifq {
+ 
+ 	/* hw rx descriptor ring id */
+ 	u32				if_rxq_id;
++
++	unsigned			nr_sockets;
++	struct file			*sockets[IO_ZC_MAX_IFQ_SOCKETS];
+ };
+ 
+ #if defined(CONFIG_PAGE_POOL)
+@@ -18,6 +28,8 @@ int io_register_zc_rx_ifq(struct io_ring_ctx *ctx,
+ 			  struct io_uring_zc_rx_ifq_reg __user *arg);
+ void io_unregister_zc_rx_ifqs(struct io_ring_ctx *ctx);
+ void io_shutdown_zc_rx_ifqs(struct io_ring_ctx *ctx);
++int io_register_zc_rx_sock(struct io_ring_ctx *ctx,
++			   struct io_uring_zc_rx_sock_reg __user *arg);
+ #else
+ static inline int io_register_zc_rx_ifq(struct io_ring_ctx *ctx,
+ 			  struct io_uring_zc_rx_ifq_reg __user *arg)
+@@ -30,6 +42,11 @@ static inline void io_unregister_zc_rx_ifqs(struct io_ring_ctx *ctx)
+ static inline void io_shutdown_zc_rx_ifqs(struct io_ring_ctx *ctx)
+ {
+ }
++static inline int io_register_zc_rx_sock(struct io_ring_ctx *ctx,
++				struct io_uring_zc_rx_sock_reg __user *arg)
++{
++	return -EOPNOTSUPP;
++}
+ #endif
+ 
+ #endif
+diff --git a/net/socket.c b/net/socket.c
+index c69cd0e652b8..18181a4e0295 100644
+--- a/net/socket.c
++++ b/net/socket.c
+@@ -637,6 +637,7 @@ struct socket *sock_alloc(void)
+ 
+ 	sock = SOCKET_I(inode);
+ 
++	sock->zc_rx_idx = 0;
+ 	inode->i_ino = get_next_ino();
+ 	inode->i_mode = S_IFSOCK | S_IRWXUGO;
+ 	inode->i_uid = current_fsuid();
 -- 
 2.43.0
 
