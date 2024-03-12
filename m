@@ -1,57 +1,51 @@
-Return-Path: <netdev+bounces-79448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCFD98794AC
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 13:58:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B36558794F9
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 14:21:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E8F92812AB
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 12:58:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 666541F2353F
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 13:21:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8552F58112;
-	Tue, 12 Mar 2024 12:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="spPciKRK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFA9C79DD0;
+	Tue, 12 Mar 2024 13:21:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B1127711
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 12:58:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D568978298;
+	Tue, 12 Mar 2024 13:21:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710248320; cv=none; b=WdBaY/10kXL7+e0IiQOVJ5eWRj4xKych1EepHouFW0f6qUCLPTrlQhtv2SSJEg2/XeTaNBConqz05/UisviaenIDm5iHWCXqFVXeZ3KfTdxcK5n2woBjis1CqjV8z2vOwabkg1RKlzINffhfxHbRD2M7mFtsMBI4547SDwIokBs=
+	t=1710249678; cv=none; b=BE/4ELeI8hoBFILnLYOwIrsMsZVzkJGznBUSS0wPLK28PFG1jxCnLF3S5ISoXHmTi54gSnFTBIMIDbVo5MxZIXP39PTuqXmkfNdcPeu+VS46MDMc2sFERTGx96D2eYZaeW7+mW/1meNuRPcLA+ohO6tAODlf9G7X9df4FyaHE4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710248320; c=relaxed/simple;
-	bh=M8z+3ZKQrccTZsT6PKf6jkLxJKx6W7r5XtnE/A/yC9Y=;
+	s=arc-20240116; t=1710249678; c=relaxed/simple;
+	bh=tjDje4SaiRrTQc6DecP8S8++V0lhjuccYXfYjHPoXJE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SR5UbiUxijn4EHMutuhOeYmwS1BG5l/+CK2WL4X0J23Vm/1K3uP9VUJzs068C7ncrObyOHds7Cvc3A9HD6OLpZiTId6xe8v9kcXMH/5rseSfM1T5lSmY0D4Au8vmuYzdNZmifGFoAsBQOb9bO5xLheluYNQVhrMIMFLk+mzPFIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=spPciKRK; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=WtqmHXGgHtIZ6DnzZaq7SY2tmaIJKS9HVcEognB7D4M=; b=spPciKRKMvWs1lDnuag5Fq/WUz
-	SdfYX303plWtYfOD3VcUQaz6EVTFaEq6ciA30nrYsJFTZfMfu5AQ2iLsul5OIJnpS4q20UmbqsvLT
-	fNxH4ud6D6RVf/BhegiA0p19EPARKxHjUKU4kk6JCxwPrD/5Mk6JO/BFykLmEIIF5h/I=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rk1io-00A3Ff-NU; Tue, 12 Mar 2024 13:59:10 +0100
-Date: Tue, 12 Mar 2024 13:59:10 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: mahendra <mahendra.sp1812@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: USGV6 test v6LC.2.2.23: Processing Router Advertisement failure
- on version 5.10
-Message-ID: <4d156374-c1d9-453a-8a98-30b1c38a2dd2@lunn.ch>
-References: <CAF6A85__pPB_K1iuzVSrKXd+AWXkO4NDYBWbeDfGJEphvvuzzQ@mail.gmail.com>
- <ec033a36-c352-43c9-b769-41252ff18521@lunn.ch>
- <CAF6A85_31JO3-9UxYb=AqDW98bVgqhTufN3mUYtgtKuoyWNB2A@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VuyC212idw5D8h1B3UrFb+RQuHz9n4TpiOntvkEivL2GcrxZ20mM7kKKal6cp7my0JNfdkpOrOD9rg6oB8oHWediZ2gDRjxShdBzgayQS+dUw8pRGeq1bzUynXDEoM1SGl6/C/v+jt+7SNYT0PT98xxhCBeyoVqUb4Bx2XLSInk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1rk243-00010Z-Qy; Tue, 12 Mar 2024 14:21:07 +0100
+Date: Tue, 12 Mar 2024 14:21:07 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Florian Westphal <fw@strlen.de>, xingwei lee <xrivendell7@gmail.com>,
+	pabeni@redhat.com, davem@davemloft.net, kuba@kernel.org,
+	linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, ralf@linux-mips.org,
+	syzkaller-bugs@googlegroups.com, samsun1006219@gmail.com
+Subject: Re: KASAN: slab-use-after-free Read in ip_finish_output
+Message-ID: <20240312132107.GA1529@breakpoint.cc>
+References: <CABOYnLwtfAxS7WoMw-1_uxVe3EYajXRuzZfwaQEk0+7m6-B+ug@mail.gmail.com>
+ <CANn89i+qLwyPLztPt6Mavjimyv0H_UihVVNfJXWLjcwrqOudTw@mail.gmail.com>
+ <20240306103632.GC4420@breakpoint.cc>
+ <CANn89iLe0KGjbSim5Qxxr6o0AjJVs7-h79UvMMXKOgGKQUosiA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,23 +54,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAF6A85_31JO3-9UxYb=AqDW98bVgqhTufN3mUYtgtKuoyWNB2A@mail.gmail.com>
+In-Reply-To: <CANn89iLe0KGjbSim5Qxxr6o0AjJVs7-h79UvMMXKOgGKQUosiA@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-On Tue, Mar 12, 2024 at 11:16:02AM +0530, mahendra wrote:
-> Hi Andrew, All,
+Eric Dumazet <edumazet@google.com> wrote:
+> > so skb->sk gets propagated down to __ip_finish_output(), long
+> > after connrack defrag has called skb_orphan().
+> >
+> > No idea yet how to fix it,
 > 
-> Update on this:
-> We used 6.7.6 and the test case passed. However it failed in the 6.1 version.
-> So from our testing, a change between 6.2 and 6.7.6 has fixed the issue.
-> Looking at the change log, there are many commits and also related to
-> IPv6 and it would be difficult to determine a specific commit that has
-> addressed this issue.
+> My plan was to refine "inet: frag: Always orphan skbs inside
+> ip_defrag()" and only do the skb_orphan()
+> for skb added to a frag_list.
 > 
-> Could someone please help if you know the commit details that might
-> have fixed it?
+> The head skb would keep a reference to the socket.
 
-git bisect will help you find the patch which fixed the issue. Once
-you know, we can get it back ported to stable kernels.
+I tried to follow this but its beyond my abilities.
 
-    Andrew
+Defrag messes with skb->truesize, and I do not know how to
+fix that up safely so later calls to destructor won't underflow sk
+accouting.
+
+Furthermore, depending on delivery order, the skb that gets
+passed to rest of stack might not be the head skb (the one with
+full l4 header and sk reference), its always the last one that arrived.
+
+Existing code skb_morphs() this, see inet_frag_reasm_prepare() and also
+the ->truesize munging (which is fine only because all skbs are
+orphans...).
+
+So in order to not pass already-released sk to inet output somehow
+the skb->sk reference needs to be stolen and moved from one sk
+to another.
+
+No idea how to do this, let alone do regression testing for this.
+see e.g. 48cac18ecf1de82f76259a54402c3adb7839ad01 which added
+unconditional orphaning in ipv6 netfilter defrag.
+
+ATM the only "solution" I see is to completely remove netfilter defrag
+support for outgoing packets.
 
