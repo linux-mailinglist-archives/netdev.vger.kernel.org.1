@@ -1,102 +1,89 @@
-Return-Path: <netdev+bounces-79330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63C9C878C16
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 02:03:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9ACA878C1E
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 02:09:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FAA91C21859
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 01:03:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBAC91C21851
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 01:08:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D73D7E2;
-	Tue, 12 Mar 2024 01:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6721D7E9;
+	Tue, 12 Mar 2024 01:08:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Kr3vSSyP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="imYFvMpX"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4961653;
-	Tue, 12 Mar 2024 01:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 384887E2;
+	Tue, 12 Mar 2024 01:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710205398; cv=none; b=S2mQwskGk3x9rpf7uocujA+l68gxnmlf4q/27Hq9Fxp9tmdR0YVG3vhDyKrfflI2KUPW2Y2efE786oUQ9sJ0yokHUwNQlgNmjq7JDZoB+cveX4IofoifSCM83FWk5CpStxrDg7+yTawlc5/sd57jr9fs84+T1vYPTbdaNOH8qos=
+	t=1710205735; cv=none; b=YFfYI+x/Y+Tap2Bx24XPIRG+PsZU/Miq+BesnJ0ny6elz1yn1q2/Y7AdoR+i2QVWDZdFk2PVLPHP7WstlCfKSBlA203c/cOsKR6NpPE09njRQQhfSZzHZZYO5srt2WBMVZrHRZh1TkQtGckik2MOBG1LfMvDsu42thN8vydLRd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710205398; c=relaxed/simple;
-	bh=4EA1F03Y5lBS4e+B0GkGj9LBCoZMKjVs2nvhaANcl3s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HKn4ItCb1FHzvUUfYuZRGJhY3WFJywNaTnFYkyHzt8MGaXDVopnp5h+pfBXQQLM4/feh0BDL89GQM4IsksqfpmF5d4fm8SvniJ0NGxxO7tZwLovjgLICkjjJLahg6NlZE6whPNO0ndltXmmFxL7Ux5H+xTj7H73Dzf69k4x8D60=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Kr3vSSyP; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8OttdZlrG4D6n3/bWArb231lKpBo0dIW6y37zc5CZQ4=; b=Kr3vSSyP3usEfrbHqWqNQT6C3v
-	p8ShX6NQ0jQ0h6m7vLjc0kJjht6nXakuEFxRF0jMi95vopHMnAJK96GYqyHC6vlvrPH1hh27rTUwW
-	FbNrpLsqLKooJJhCEjSJTbW26m8N8loFhsU10SR0qFZaTnBBI561QPHuuJQ6vh9baJ3k=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rjqY5-00A0Ed-2W; Tue, 12 Mar 2024 02:03:21 +0100
-Date: Tue, 12 Mar 2024 02:03:21 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Justin Swartz <justin.swartz@risingedge.co.za>
-Cc: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH] net: dsa: mt7530: disable LEDs before reset
-Message-ID: <0793ba6a-6cc9-4764-a2eb-f2766d860315@lunn.ch>
-References: <20240305043952.21590-1-justin.swartz@risingedge.co.za>
- <6064ba52-2470-4c56-958c-35632187f148@arinc9.com>
- <d45083788db8b0b1ace051adecfe6a3a@risingedge.co.za>
+	s=arc-20240116; t=1710205735; c=relaxed/simple;
+	bh=TxXimNigu2jc8mFmQSAEvcxnaz7nmbWqb5sDCHugcRI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Z3Ou0tyJHqZObPbpQbQcnwKM6FT/cUsYJgGnE68Bu26rLoKV8d2ldHtoOA33vdTxMrSvQbsNuec+mZOW2mO6YBguci8M7F9ZRDBNIFPkHGfSLGZfVjyQKZUjL4f6ckForEMdPUe83nogZ40Vn0zY7DsW+ibqHQUcGHXLALJtRfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=imYFvMpX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14E07C433C7;
+	Tue, 12 Mar 2024 01:08:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710205734;
+	bh=TxXimNigu2jc8mFmQSAEvcxnaz7nmbWqb5sDCHugcRI=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=imYFvMpXDN2U3ixgZX1yDV8jBWFy2ANoWaWUFzC4foQOAAWMVzWhc9CGVkKTP/4Z5
+	 OmH9C3wCNFrb3/FMFO3QeAx3OG5YJHvo1rHg09L67BGCJdMIWtBOkUYScP5DvM6LYu
+	 oRa3w0ZNyHCeAo0gW12K/vzuIrJb+yywwyK0fiNuOoc5JZA6UsAmznsOq7b8t6ohh8
+	 EvaWdIHifHRAhbP7nVhaVhRZp0WT0nzcIK97KW2NJOfh+8JdhDbviMjNqfbY+uXTNc
+	 4v6u4szqnX3ihJT3g8qEY/azt9q06y6dya6gcjW8Q2ksCUBl9ctBdTnvA556JPki+9
+	 E33P24MSugbCw==
+Date: Mon, 11 Mar 2024 18:08:53 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Yang Xiwen <forbidden405@outlook.com>
+Cc: Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
+ <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Rob Herring
+ <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, devicetree@vger.kernel.org, Krzysztof
+ Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH net-next v11 4/9] dt-bindings: net: convert
+ hisi-femac.txt to YAML
+Message-ID: <20240311180853.5e3a6a41@kernel.org>
+In-Reply-To: <SEZPR06MB69596EB6D2097DB14FF5C9C6962B2@SEZPR06MB6959.apcprd06.prod.outlook.com>
+References: <20240309-net-v11-0-eb99b76e4a21@outlook.com>
+	<20240309-net-v11-4-eb99b76e4a21@outlook.com>
+	<SEZPR06MB6959090F2C45C3E5D6B3F9F496262@SEZPR06MB6959.apcprd06.prod.outlook.com>
+	<20240311090341.32509303@kernel.org>
+	<SEZPR06MB69596EB6D2097DB14FF5C9C6962B2@SEZPR06MB6959.apcprd06.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d45083788db8b0b1ace051adecfe6a3a@risingedge.co.za>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> (b) When a cable attached to an active peer is connected to
-> Port 3 (lan4) before reset, the incorrect crystal frequency
-> selection (0b11 = 25MHz) always occurs:
+On Tue, 12 Mar 2024 08:49:21 +0800 Yang Xiwen wrote:
+> >> Still not very correct here. In downstream the core can also have an
+> >> external PHY. The internal phy is also optional. So maybe this clock
+> >> should be optional.  
+> > You are responding to yourself 4 min after posting?
+> > What is the purpose of your comments?  
 > 
->               [7]      [8]     [10]    [12]
->               :        :       :       :
->               _________         ______________________________________
-> ESW_P4_LED_0           |_______|
->               _________         _______
-> ESW_P3_LED_0           |_______|       |______________________________
-> 
->                         :     : :     :
->                         [9]...: [11]..:
-> 
->  [7] Port 4 LED Off. Port 3 LED Off.
->  [8] Signals inverted. (reset_control_assert; reset_control_deassert)
->  [9] Period of 320 usec.
-> [10] Signals inverted.
-> [11] Period of 300 usec.
-> [12] Signals reflect the bootstrapped configuration.
+> Just to remind others or myself this can be improved. But i think it's 
+> ready to be applied. There won't be similar design in mainline soon i think.
 
-Shame the patch has already been accepted. The text in this email
-would of made a cool commit message.
+It's a fairly uncommon thing to do, normally such notes should either
+be comments in the code or notes in the commit message.
 
-      Andrew
+In any case - the merge window for v6.9 has started, we won't be able
+to merge these changes for the next 2 weeks :(
 
