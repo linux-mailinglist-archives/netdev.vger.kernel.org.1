@@ -1,264 +1,114 @@
-Return-Path: <netdev+bounces-79587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E88F879FDC
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 00:51:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C63F879FE1
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 00:53:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70A421C21736
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:51:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 153B0B20ECE
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 23:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C37CE482F4;
-	Tue, 12 Mar 2024 23:51:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88A747796;
+	Tue, 12 Mar 2024 23:53:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="bYEbldRC"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ncLNkFzU"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB66E47A52;
-	Tue, 12 Mar 2024 23:51:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6D6D4F897
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 23:53:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710287483; cv=none; b=s8/BqeLUKrLdPugBBX9urQ+wChjV7gMNJujsEPUFO5LcNoX0nQdNX/zNEQChM5dXhbr5bBPhZDR3z5oI6uetGkZm7aCakX/aT25anCPxLdtOuLmCNQIYsE4B2xdX8NpcEAH+8PdlB3YAhHEszvzs2CHu1ec7qt9PB4EcIpQ5eiI=
+	t=1710287591; cv=none; b=RHuxwCgVt3a5/rFeQedZTYuTDnXi8Ma/QGpRPKyAvamK1ukK8No82EaqQZ1+GrZtrv95VsFs6WuOntiuG4wWFU7xeQWxaIYkvw47d/5y74xukwp+Wq+dmUc4Q1gq1r74blsEtkm8tuHblDyMcy7AyGhrQz6adMz2rwbniIkEEoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710287483; c=relaxed/simple;
-	bh=X7Pm5RoAdj55evPiJMvqxK1W5YPJTErKGzSKaroow58=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pF+QJyyU9/DSCgfXZNOCnVNh1vZz7GJGtihZfEA4mrPM1FYY6j0P93xD7iU8h32Vo6Q0oTzk0w6y+HBDkBs3jZ15h5v74eiPEqgSnfxiywYZSLguFlJs07bcbf/jHHiR2Mbq6VYZ4pYYZd64lAMOR9Vwq1O83A33Nuv6/eYdP1k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=bYEbldRC; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1710287479;
-	bh=UodvkJ5UEPNHTE1gtYxLGz+q1xnZJ07gSgPcwxaWF9c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bYEbldRCdLIt6oYNRPPF8TYvU+vJr/g49398b/QE5R+asPhOYeT/wQ377CZwVhjVZ
-	 4o3EwmKCXZd87SILQ6mNGSNVEd4icyqmTFFq8KWzVt1FxbMUhycBwvzXd7RFIuP6yy
-	 BzJn8yRcIb5T8Ym1OGTKlrATz0yO++vgiSGjFvjFEDBYxoGlrYYEAYzsrHACwLednn
-	 ggaSp7qgM2FdavlBYipLsURqyRq7lFDpoCGCeuNPMp+pEpUaa42uhBvBWwW3L8N0Uc
-	 0r3pAu56QedBToNWym5rohNm3w5pHv031FN7a7AxBjwQmltWF0r3n4RfTd+GNzloTW
-	 FWkdJ7U36T3ZA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TvVlp0bKyz4wcJ;
-	Wed, 13 Mar 2024 10:51:17 +1100 (AEDT)
-Date: Wed, 13 Mar 2024 10:51:17 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Networking <netdev@vger.kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, David Miller <davem@davemloft.net>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, bpf
- <bpf@vger.kernel.org>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, "Uladzislau Rezki (Sony)" <urezki@gmail.com>
-Subject: Re: linux-next: manual merge of the bpf-next tree with the
- mm-stable tree
-Message-ID: <20240313105117.699dc720@canb.auug.org.au>
-In-Reply-To: <20240307123619.159f1c4c@canb.auug.org.au>
-References: <20240307123619.159f1c4c@canb.auug.org.au>
+	s=arc-20240116; t=1710287591; c=relaxed/simple;
+	bh=2Ql1pouZHlKg1FTlweC7vW/fpZtUlaBTyah42JkgvpI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PHRNMWm4d3HT8NOrWYfr2elbUzVOPP5PfKu9FHeHtN2ul5sT3aZ+UOnNLZu9yfm8PY6GbMYksTYt3I7YdmbLGXZq3fqe3+9gkArYhsEFSbUYaSOv7Y6j+n6R/YXy4PGyY+C/t+YYb0OvdflTw2kZYb0jetjkjX291N64zvHOJPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ncLNkFzU; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <2a4cb416-5d95-459d-8c1c-3fb225240363@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1710287587;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nLl+NDi9Pq4wqH+MIJSBbYaoK01Y8BsOP+TM5utTVpg=;
+	b=ncLNkFzUrhOaHVCuetngKJyq2z+07yW3B+q9MY6A2QQI5gVMsmzHqfmeoinY2JTZJjFOli
+	k3bhhs7QMPqrjJ+YRqQNMyPZbzf+Ji2ryUAFRRUJPzm0GCoDbu7yIh3ISYjTh2rFWfzBCj
+	jRms52n2CL8fvPznonqB6DuFidhUx88=
+Date: Tue, 12 Mar 2024 16:52:58 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/yT0EdgRsoNW8+yPN=MLDvoO";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Subject: Re: [PATCH net-next v4] net: Re-use and set mono_delivery_time bit
+ for userspace tstamp packets
+Content-Language: en-US
+To: Abhishek Chauhan <quic_abchauha@quicinc.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: kernel@quicinc.com, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
+ Martin KaFai Lau <martin.lau@kernel.org>, bpf <bpf@vger.kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>
+References: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
---Sig_/yT0EdgRsoNW8+yPN=MLDvoO
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+On 3/1/24 12:13 PM, Abhishek Chauhan wrote:
+> Bridge driver today has no support to forward the userspace timestamp
+> packets and ends up resetting the timestamp. ETF qdisc checks the
+> packet coming from userspace and encounters to be 0 thereby dropping
+> time sensitive packets. These changes will allow userspace timestamps
+> packets to be forwarded from the bridge to NIC drivers.
+> 
+> Setting the same bit (mono_delivery_time) to avoid dropping of
+> userspace tstamp packets in the forwarding path.
+> 
+> Existing functionality of mono_delivery_time remains unaltered here,
+> instead just extended with userspace tstamp support for bridge
+> forwarding path.
 
-Hi all,
+The patch currently broke the bpf selftest test_tc_dtime: 
+https://github.com/kernel-patches/bpf/actions/runs/8242487344/job/22541746675
 
-On Thu, 7 Mar 2024 12:36:19 +1100 Stephen Rothwell <sfr@canb.auug.org.au> w=
-rote:
->=20
-> Today's linux-next merge of the bpf-next tree got a conflict in:
->=20
->   mm/vmalloc.c
->=20
-> between commit:
->=20
->   8e1d743f2c26 ("mm: vmalloc: support multiple nodes in vmallocinfo")
->=20
-> from the mm-stable tree and commit:
->=20
->   e6f798225a31 ("mm: Introduce VM_SPARSE kind and vm_area_[un]map_pages()=
-.")
->=20
-> from the bpf-next tree.
->=20
-> I fixed it up (I think - see below) and can carry the fix as necessary.
-> This is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
->=20
->=20
-> diff --cc mm/vmalloc.c
-> index 25a8df497255,e5b8c70950bc..000000000000
-> --- a/mm/vmalloc.c
-> +++ b/mm/vmalloc.c
-> @@@ -4755,81 -4423,70 +4820,84 @@@ static void show_numa_info(struct seq_f
->  =20
->   static void show_purge_info(struct seq_file *m)
->   {
->  +	struct vmap_node *vn;
->   	struct vmap_area *va;
->  +	int i;
->  =20
->  -	spin_lock(&purge_vmap_area_lock);
->  -	list_for_each_entry(va, &purge_vmap_area_list, list) {
->  -		seq_printf(m, "0x%pK-0x%pK %7ld unpurged vm_area\n",
->  -			(void *)va->va_start, (void *)va->va_end,
->  -			va->va_end - va->va_start);
->  -	}
->  -	spin_unlock(&purge_vmap_area_lock);
->  -}
->  +	for (i =3D 0; i < nr_vmap_nodes; i++) {
->  +		vn =3D &vmap_nodes[i];
->  =20
->  -static int s_show(struct seq_file *m, void *p)
->  -{
->  -	struct vmap_area *va;
->  -	struct vm_struct *v;
->  -
->  -	va =3D list_entry(p, struct vmap_area, list);
->  -
->  -	if (!va->vm) {
->  -		if (va->flags & VMAP_RAM)
->  -			seq_printf(m, "0x%pK-0x%pK %7ld vm_map_ram\n",
->  +		spin_lock(&vn->lazy.lock);
->  +		list_for_each_entry(va, &vn->lazy.head, list) {
->  +			seq_printf(m, "0x%pK-0x%pK %7ld unpurged vm_area\n",
->   				(void *)va->va_start, (void *)va->va_end,
->   				va->va_end - va->va_start);
->  -
->  -		goto final;
->  +		}
->  +		spin_unlock(&vn->lazy.lock);
->   	}
->  +}
->  =20
->  -	v =3D va->vm;
->  +static int vmalloc_info_show(struct seq_file *m, void *p)
->  +{
->  +	struct vmap_node *vn;
->  +	struct vmap_area *va;
->  +	struct vm_struct *v;
->  +	int i;
->  =20
->  -	seq_printf(m, "0x%pK-0x%pK %7ld",
->  -		v->addr, v->addr + v->size, v->size);
->  +	for (i =3D 0; i < nr_vmap_nodes; i++) {
->  +		vn =3D &vmap_nodes[i];
->  =20
->  -	if (v->caller)
->  -		seq_printf(m, " %pS", v->caller);
->  +		spin_lock(&vn->busy.lock);
->  +		list_for_each_entry(va, &vn->busy.head, list) {
->  +			if (!va->vm) {
->  +				if (va->flags & VMAP_RAM)
->  +					seq_printf(m, "0x%pK-0x%pK %7ld vm_map_ram\n",
->  +						(void *)va->va_start, (void *)va->va_end,
->  +						va->va_end - va->va_start);
->  =20
->  -	if (v->nr_pages)
->  -		seq_printf(m, " pages=3D%d", v->nr_pages);
->  +				continue;
->  +			}
->  =20
->  -	if (v->phys_addr)
->  -		seq_printf(m, " phys=3D%pa", &v->phys_addr);
->  +			v =3D va->vm;
->  =20
->  -	if (v->flags & VM_IOREMAP)
->  -		seq_puts(m, " ioremap");
->  +			seq_printf(m, "0x%pK-0x%pK %7ld",
->  +				v->addr, v->addr + v->size, v->size);
->  =20
->  -	if (v->flags & VM_SPARSE)
->  -		seq_puts(m, " sparse");
->  +			if (v->caller)
->  +				seq_printf(m, " %pS", v->caller);
->  =20
->  -	if (v->flags & VM_ALLOC)
->  -		seq_puts(m, " vmalloc");
->  +			if (v->nr_pages)
->  +				seq_printf(m, " pages=3D%d", v->nr_pages);
->  =20
->  -	if (v->flags & VM_MAP)
->  -		seq_puts(m, " vmap");
->  +			if (v->phys_addr)
->  +				seq_printf(m, " phys=3D%pa", &v->phys_addr);
->  =20
->  -	if (v->flags & VM_USERMAP)
->  -		seq_puts(m, " user");
->  +			if (v->flags & VM_IOREMAP)
->  +				seq_puts(m, " ioremap");
->  =20
->  -	if (v->flags & VM_DMA_COHERENT)
->  -		seq_puts(m, " dma-coherent");
-> ++			if (v->flags & VM_SPARSE)
-> ++				seq_puts(m, " sparse");
-> +=20
->  -	if (is_vmalloc_addr(v->pages))
->  -		seq_puts(m, " vpages");
->  +			if (v->flags & VM_ALLOC)
->  +				seq_puts(m, " vmalloc");
->  =20
->  -	show_numa_info(m, v);
->  -	seq_putc(m, '\n');
->  +			if (v->flags & VM_MAP)
->  +				seq_puts(m, " vmap");
->  +
->  +			if (v->flags & VM_USERMAP)
->  +				seq_puts(m, " user");
->  +
->  +			if (v->flags & VM_DMA_COHERENT)
->  +				seq_puts(m, " dma-coherent");
->  +
->  +			if (is_vmalloc_addr(v->pages))
->  +				seq_puts(m, " vpages");
->  +
->  +			show_numa_info(m, v);
->  +			seq_putc(m, '\n');
->  +		}
->  +		spin_unlock(&vn->busy.lock);
->  +	}
->  =20
->   	/*
->   	 * As a final step, dump "unpurged" areas.
+In particular, there is a uapi field __sk_buff->tstamp_type which currently has 
+BPF_SKB_TSTAMP_DELIVERY_MONO to mean skb->tstamp has the MONO "delivery" time. 
+BPF_SKB_TSTAMP_UNSPEC means everything else (this could be a rx timestamp at 
+ingress or a delivery time set by user space).
 
-This is now a conflict between the net-next tree and the mm-stable tree.
+__sk_buff->tstamp_type depends on skb->mono_delivery_time which does not 
+necessarily mean mono after this patch. I thought about fixing it on the bpf 
+side such that reading __sk_buff->tstamp_type only returns 
+BPF_SKB_TSTAMP_DELIVERY_MONO when the skb->mono_delivery_time is set and skb->sk 
+is IPPROTO_TCP. However, it won't work because of bpf_skb_set_tstamp().
 
---=20
-Cheers,
-Stephen Rothwell
+There is a bpf helper, bpf_skb_set_tstamp(skb, tstamp, 
+BPF_SKB_TSTAMP_DELIVERY_MONO). This helper changes both the skb->tstamp and the 
+skb->mono_delivery_time. The expectation is this could change skb->tstamp in the 
+ingress skb and redirect to egress sch_fq. It could also set a mono time to 
+skb->tstamp where the udp sk->sk_clockid may not be necessary in mono and then 
+bpf_redirect to egress sch_fq. When bpf_skb_set_tstamp(skb, tstamp, 
+BPF_SKB_TSTAMP_DELIVERY_MONO) succeeds, reading __sk_buff->tstamp_type expects 
+BPF_SKB_TSTAMP_DELIVERY_MONO also.
 
---Sig_/yT0EdgRsoNW8+yPN=MLDvoO
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+I ran out of idea to solve this uapi breakage.
 
------BEGIN PGP SIGNATURE-----
+I am afraid it may need to go back to v1 idea and use another bit 
+(user_delivery_time) in the skb.
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmXw6nUACgkQAVBC80lX
-0Gya7Af/eanjo0KqtUdKrpWYcPSmSO1QHXGP9/SE4P3qCeVYHvN19R2jZLzaou9a
-fGAjvSvop62RTF22Fz4qHDee9W7Lv/fIWb8ZP6Qf+z9heyPqLHl848oRFK7iIOzb
-f9Z3AnUz7iwg8aBxn42HNA1i+wHXH/r/QdNtKLLDnIhQTGeH17Cv1TJRx32hWlOj
-4yPWa8QtzZLIq1fwaWY487mXIjALPrFC6lIZ4gbtZpQ/AxT3+lfZbi515nIm6kMk
-F68Qb61VEuwWHW120bsVzogE0ZSKxGrNHQchW6CEOfC8QEYh+8eaKD8RT/Kuduro
-ufS2iZdqvtdej+4JXPBQhj+QTH4eNw==
-=4mUn
------END PGP SIGNATURE-----
-
---Sig_/yT0EdgRsoNW8+yPN=MLDvoO--
 
