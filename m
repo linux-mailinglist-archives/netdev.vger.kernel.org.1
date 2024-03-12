@@ -1,160 +1,213 @@
-Return-Path: <netdev+bounces-79454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A79C087951B
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 14:29:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07DAE87954B
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 14:48:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B6F32848A7
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 13:29:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E94561C21761
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 13:48:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628117A135;
-	Tue, 12 Mar 2024 13:29:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58CC17A700;
+	Tue, 12 Mar 2024 13:48:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b="a0mDb4pR";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="lDFatT0+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wfout2-smtp.messagingengine.com (wfout2-smtp.messagingengine.com [64.147.123.145])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B095A7A149
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 13:29:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 270715B1E1;
+	Tue, 12 Mar 2024 13:47:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710250165; cv=none; b=g/a0M17g896m0auxT1/Ob0Z2juJWL5S7nK9xyMTzv9wYJbj53DVUhxG4j05dHFmGS32bggcG7sUrCEpfFwUSjnBoTRPou2jAgqFb2hv+FtJbZrNwimqSGUXzdWTkg2MntU5bDk6UvMr7Q9BSjJSu6+3LQMfBRpty2LzFk/3bAm4=
+	t=1710251281; cv=none; b=C61Tlq9wpPL0nUlqZ4AH03jE/5XGYGQgtha7AS5yx/gmBl1gFSccYI0mXIjtknYGgECc4OiWSPWJAZweLSEFvXthZ+1LlV0go9kGL6KEisDG3AVI6RKoWQa9dde89NWw7eJyBm+RW6BUrMg3PUuE73XgUzcLL2opI39nC6+ry2A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710250165; c=relaxed/simple;
-	bh=9zDWvzr+Z/USZHV5GgIfmY6ihcfdVLNoDxi/gf9ye2s=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EwoUUv123b1Lqnn4haBgd/gVeByt+QSMigQBKlffjTXOZd7AIi3MkGGFcoB1szfq+nve+tR7kK5DcwJAk/mIOKZxzA+90+Z56P/p+lCBn9nDnIcgNM0cL9M1Vbhn6Ct7zlQ3TF0hFAbd+AOk0GXx5+zu/eweTHWwOwnMh1MwSAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c88a694b46so490474539f.1
-        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 06:29:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710250163; x=1710854963;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bq8oySasJniwgrTVTRjL6eVYP1UAR0wtRyHJzV1J4yQ=;
-        b=cvq9ZjeoVK6LJHh+OwAfTUtmcp+RwBBvcxFYFr7Gl9zWYeuAbwpDF5z9ojNy/8ue+g
-         Mf+3QhGOFDE409noqbTJ+i+L/3W0hSeRgiY7ZUIkeB54DLQNEJUgkDErEobnR2Yr+zAj
-         4wXOgzk7VITt2dyRpWt/tVKvVJSdR21kDxB4oSZOtvBQFSYrNQcAMkvA/90srq+h99xq
-         8JyaNjbpGkAE8BQbklzfdBvC7WNMbfdumMJI9/flnTJZr6QWY5/1bCRgFxYpWgI/nS3T
-         NuzuaUHqi2hDZMnacmvyaF7+IyRG8mnQWtm4H2OACrD+vpQNNHVZZa+Gg3Y1MWP9pzzm
-         g89g==
-X-Forwarded-Encrypted: i=1; AJvYcCWdjTdKEk2inLtgcuaHARXMuMruDNUoba+yEsKj4C5uDPNeJ/qHMOTsqdfXSAi7MiQ7l/By/iN2Qw8vG93g0YyzkUBCeFTp
-X-Gm-Message-State: AOJu0YztD0vC+2NXqcK9ob4dNep/6o1RUx0NLOZrMSk/Ls+q7NUVSMOT
-	09ooyEkxRetCCIebkwn9aNWUgV9/QCeQvPpiGgTVYC95cWfkUmteBngcbtMzjABV1f1jTyoiIee
-	uiTqekjyahAYl0uc6n/WhKrkC25zRza5QQffe7npFIsrmQW4RrtQpE/g=
-X-Google-Smtp-Source: AGHT+IGZeZXXf8bH1DA0X3MAx8JZZLhiIrMrnaS65+hIG+wrDzDFoNAll+p4zbvX73DtHyoDMbY6aHVDzjeMhO65SD2eaihZWCxn
+	s=arc-20240116; t=1710251281; c=relaxed/simple;
+	bh=3PLdIJmYTKB6gkGFZ9Bne0cSJ5xec83W3smNXqUjWso=;
+	h=MIME-Version:Message-Id:In-Reply-To:References:Date:From:To:Cc:
+	 Subject:Content-Type; b=QUwEUZDeT0FbTV58vV5LmOh1cKsqTlbQczCSxxMJhjjnH77wDtgeek9vrhuQfbw0bmBPpK+LXOoiJw8ZzjqWeIQ6+LytWe1QcInbajogIxYUz27I1xV+G+vn7t3+GMiSzS8TktDNpeJba8V97LK8RK3qqBKNtJamP6i7DwTSOOY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de; spf=pass smtp.mailfrom=arndb.de; dkim=pass (2048-bit key) header.d=arndb.de header.i=@arndb.de header.b=a0mDb4pR; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=lDFatT0+; arc=none smtp.client-ip=64.147.123.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arndb.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arndb.de
+Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
+	by mailfout.west.internal (Postfix) with ESMTP id CCA9A1C000A3;
+	Tue, 12 Mar 2024 09:47:55 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute5.internal (MEProxy); Tue, 12 Mar 2024 09:47:58 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1710251275;
+	 x=1710337675; bh=Bjy1wqXHISa4mvQY02jG8JIIsUcNLSlrmrkVMNTQWAQ=; b=
+	a0mDb4pRPVrLP1HPtkBSgW5ZnB73TtkkPT/FZBnpMqxewQgvPuWImXb3uDemLx/m
+	wSvjez4eA0/rIa1hZphVSvBUDbfuiNFsBl2VpcfTrTktFUy/J0PfsGGcg+sIxMUG
+	9DQRTtKVZ8CU6I24rKRRhdpmSDAiWDHQM+k6TYBv4xG1pe34dOYklPduJmIoFhpS
+	CrAzShryLlcID3SwMGy2utRETRh/LOuzSFiausMAYvZ/Uxxat6Nqx8w+P6ccrbET
+	gXnzd1Dz9q6/RYQhp6beKDT1olhi+7dRcUKjJy1xMJa4GqkfeQQcCkESrG/lKobW
+	Y0ll+aRUbwddS/axfJWbag==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1710251275; x=
+	1710337675; bh=Bjy1wqXHISa4mvQY02jG8JIIsUcNLSlrmrkVMNTQWAQ=; b=l
+	DFatT0+nF31R7ZyBzAe8mHgWuGi+srr48TLHIeBwT4u5C1KeQc3pKqj0sk7w6Lqc
+	N2FyBjNcrgu5GBOEwZts/IFFVATcmzvDgx1rDTgGImMMqKxPXRkhIS+PmDaH1Isw
+	KTqSbP7U3dpgoK95KM6l9Iig8lRwh4nM7CuwYxeGwvg2q6xACelIyOvP5bwgJC9g
+	BXsjLudbuM7r10pO4VKbrARM1qCajmRD5WCFGArCa8URjWrAz+K/WrINwB73npMR
+	QiWrmvpe7HGRxh1UXdSXwgt/yufpBxFksDod08NIuFZKJ7nGnj3BAykGvVJF8ter
+	4O+SqYaU4F1kcF7SGIULA==
+X-ME-Sender: <xms:CV3wZZWs9P2zX9yCI8RlclX0s0av5QUUrtKdQO6JzPxaznGMxGvAQg>
+    <xme:CV3wZZl1jYtKseL0Oji4Uy3tb54p3lbwswOzMKrqDcc-5v0e7pEhPDaK3pijRwLA8
+    Kdf7HafcHX7jADKjo0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrjeefgdehiecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpefofgggkfgjfhffhffvvefutgfgsehtqhertderreejnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepgeefjeehvdelvdffieejieejiedvvdfhleeivdelveehjeelteegudektdfg
+    jeevnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:CV3wZVbgTpEeWDXrLXE4N0-I43eo4OF7LhSGGIX-fmoGMnDWP1pDFQ>
+    <xmx:CV3wZcU0TmTecnXndyvJG_ls_NoyU3abBFWCmBnnsBMXA72Bo8Lnuw>
+    <xmx:CV3wZTk6lbB_Vd0gtjRgz0uuMUUrd08nj2Dx3KR_fu41JBuOTpEj1Q>
+    <xmx:CV3wZZecS909lb2jNM3D0mMNkhNEuuHtMGODT63XkGUlMgKkFgbSAw>
+    <xmx:C13wZXyNzd7ziPJAGYzgNhfiJVr7M3VjwuKuW8M3dg-HEXju4t1XwCi0-TI>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 3AE4CB6008F; Tue, 12 Mar 2024 09:47:53 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.11.0-alpha0-251-g8332da0bf6-fm-20240305.001-g8332da0b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:2dc2:b0:7c8:de8:83c with SMTP id
- l2-20020a0566022dc200b007c80de8083cmr141541iow.2.1710250162968; Tue, 12 Mar
- 2024 06:29:22 -0700 (PDT)
-Date: Tue, 12 Mar 2024 06:29:22 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000070f071061376a5b6@google.com>
-Subject: [syzbot] [net?] [afs?] WARNING in rxrpc_alloc_data_txbuf
-From: syzbot <syzbot+150fa730f40bce72aa05@syzkaller.appspotmail.com>
-To: davem@davemloft.net, dhowells@redhat.com, edumazet@google.com, 
-	kuba@kernel.org, linux-afs@lists.infradead.org, linux-fsdevel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, marc.dionne@auristor.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Message-Id: <0a4e4505-cf04-4481-955c-1e35cf97ff8d@app.fastmail.com>
+In-Reply-To: 
+ <CAMuE1bGkZ=ifyofCUfm4JVS__dgYG41kecS4TxBaHJvyJ607PQ@mail.gmail.com>
+References: <20240312095005.8909-1-maimon.sagi@gmail.com>
+ <7bf7d444-4a08-4df4-9aa1-9cd28609d166@app.fastmail.com>
+ <CAMuE1bGkZ=ifyofCUfm4JVS__dgYG41kecS4TxBaHJvyJ607PQ@mail.gmail.com>
+Date: Tue, 12 Mar 2024 14:47:32 +0100
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Sagi Maimon" <maimon.sagi@gmail.com>
+Cc: "Richard Cochran" <richardcochran@gmail.com>,
+ "Andy Lutomirski" <luto@kernel.org>, datglx@linutronix.de,
+ "Ingo Molnar" <mingo@redhat.com>, "Borislav Petkov" <bp@alien8.de>,
+ "Dave Hansen" <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>,
+ "Geert Uytterhoeven" <geert@linux-m68k.org>,
+ "Peter Zijlstra" <peterz@infradead.org>,
+ "Johannes Weiner" <hannes@cmpxchg.org>,
+ "Sohil Mehta" <sohil.mehta@intel.com>,
+ "Rick Edgecombe" <rick.p.edgecombe@intel.com>,
+ "Nhat Pham" <nphamcs@gmail.com>, "Palmer Dabbelt" <palmer@sifive.com>,
+ "Kees Cook" <keescook@chromium.org>,
+ "Alexey Gladkov" <legion@kernel.org>,
+ "Mark Rutland" <mark.rutland@arm.com>,
+ "Miklos Szeredi" <mszeredi@redhat.com>,
+ "Casey Schaufler" <casey@schaufler-ca.com>, reibax@gmail.com,
+ "David S . Miller" <davem@davemloft.net>,
+ "Christian Brauner" <brauner@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-api@vger.kernel.org, Linux-Arch <linux-arch@vger.kernel.org>,
+ Netdev <netdev@vger.kernel.org>
+Subject: Re: [PATCH v6] posix-timers: add clock_compare system call
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Tue, Mar 12, 2024, at 13:15, Sagi Maimon wrote:
+> On Tue, Mar 12, 2024 at 1:19=E2=80=AFPM Arnd Bergmann <arnd@arndb.de> =
+wrote:
+>> On Tue, Mar 12, 2024, at 10:50, Sagi Maimon wrote:
+>> > +     kc_a =3D clockid_to_kclock(clock_a);
+>> > +     if (!kc_a) {
+>> > +             error =3D -EINVAL;
+>> > +             return error;
+>> > +     }
+>> > +
+>> > +     kc_b =3D clockid_to_kclock(clock_b);
+>> > +     if (!kc_b) {
+>> > +             error =3D -EINVAL;
+>> > +             return error;
+>> > +     }
+>>
+>> I'm not sure if we really need to have it generic enough to
+>> support any combination of clocks here. It complicates the
+>> implementation a bit but it also generalizes the user space
+>> side of it.
+>>
+>> Can you think of cases where you want to compare against
+>> something other than CLOCK_MONOTONIC_RAW or CLOCK_REALTIME,
+>> or are these going to be the ones that you expect to
+>> be used anyway?
+>>
+> sure, one example is syncing two different PHCs (which was originally
+> why we needed this syscall)
+> I hope that I have understand your note and that answers your question.
 
-syzbot found the following issue on:
+Right, that is clearly a sensible use case.
 
-HEAD commit:    75c2946db360 Merge tag 'wireless-next-2024-03-08' of git:/..
-git tree:       net-next
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=16700bf2180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=bc4c0052bd7e51d8
-dashboard link: https://syzkaller.appspot.com/bug?extid=150fa730f40bce72aa05
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=163dfe92180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17818449180000
+I'm still trying to understand the implementation for the case
+where you have two different PHCs and both implement=20
+clock_get_crosstimespec(). Rather than averaging between
+two snapshots here, I would expect this to result in
+something like
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/b9317816c71d/disk-75c2946d.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/0d18e4d62eff/vmlinux-75c2946d.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9089b556e6fd/bzImage-75c2946d.xz
+      ktime_a1 +=3D xtstamp_b.sys_monoraw - xtstamp_a1.sys_monoraw;
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+150fa730f40bce72aa05@syzkaller.appspotmail.com
+in order get two device timestamps ktime_a1 and ktime_b
+that reflect the snapshots as if they were taken
+simulatenously. Am I missing some finer detail here,
+or is this something you should do?
 
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 5074 at include/linux/gfp.h:323 page_frag_alloc_align include/linux/gfp.h:323 [inline]
-WARNING: CPU: 1 PID: 5074 at include/linux/gfp.h:323 rxrpc_alloc_data_txbuf+0x7cf/0xda0 net/rxrpc/txbuf.c:36
-Modules linked in:
-CPU: 1 PID: 5074 Comm: syz-executor206 Not tainted 6.8.0-rc7-syzkaller-02348-g75c2946db360 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-RIP: 0010:page_frag_alloc_align include/linux/gfp.h:323 [inline]
-RIP: 0010:rxrpc_alloc_data_txbuf+0x7cf/0xda0 net/rxrpc/txbuf.c:36
-Code: 96 01 f7 4c 89 f7 e8 a0 f1 58 f7 45 31 f6 4c 89 f0 48 83 c4 40 5b 41 5c 41 5d 41 5e 41 5f 5d c3 cc cc cc cc e8 42 96 01 f7 90 <0f> 0b 90 e9 8d f9 ff ff 44 89 fe 83 e6 01 31 ff e8 6c 9a 01 f7 44
-RSP: 0018:ffffc9000398f328 EFLAGS: 00010293
-RAX: ffffffff8a91d8de RBX: 0000000000000000 RCX: ffff8880284f5940
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000001
-RBP: 0000000000000000 R08: ffffffff8a91d266 R09: 1ffffffff1f0c0fd
-R10: dffffc0000000000 R11: fffffbfff1f0c0fe R12: ffff88802e3a4390
-R13: ffff88801b6b5280 R14: ffff88801caf4900 R15: 0000000000000cc0
-FS:  0000555556094380(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020005c08 CR3: 00000000755e2000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- rxrpc_send_data+0xb17/0x2800 net/rxrpc/sendmsg.c:351
- rxrpc_do_sendmsg+0x1569/0x1910 net/rxrpc/sendmsg.c:718
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:745
- ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
- ___sys_sendmsg net/socket.c:2638 [inline]
- __sys_sendmmsg+0x3b2/0x740 net/socket.c:2724
- __do_sys_sendmmsg net/socket.c:2753 [inline]
- __se_sys_sendmmsg net/socket.c:2750 [inline]
- __x64_sys_sendmmsg+0xa0/0xb0 net/socket.c:2750
- do_syscall_64+0xf9/0x240
- entry_SYSCALL_64_after_hwframe+0x6f/0x77
-RIP: 0033:0x7fb02c0cf369
-Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffdc045a3f8 EFLAGS: 00000246 ORIG_RAX: 0000000000000133
-RAX: ffffffffffffffda RBX: 00007ffdc045a5c8 RCX: 00007fb02c0cf369
-RDX: 0000000000000001 RSI: 0000000020005c00 RDI: 0000000000000003
-RBP: 00007fb02c142610 R08: 00007ffdc045a5c8 R09: 00007ffdc045a5c8
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
-R13: 00007ffdc045a5b8 R14: 0000000000000001 R15: 0000000000000001
- </TASK>
+>> > +     if (crosstime_support_a) {
+>> > +             ktime_a1 =3D xtstamp_a1.device;
+>> > +             ktime_a2 =3D xtstamp_a2.device;
+>> > +     } else {
+>> > +             ktime_a1 =3D timespec64_to_ktime(ts_a1);
+>> > +             ktime_a2 =3D timespec64_to_ktime(ts_a2);
+>> > +     }
+>> > +
+>> > +     ktime_a =3D ktime_add(ktime_a1, ktime_a2);
+>> > +
+>> > +     ts_offs =3D ktime_divns(ktime_a, 2);
+>> > +
+>> > +     ts_a1 =3D ns_to_timespec64(ts_offs);
+>>
+>> Converting nanoseconds to timespec64 is rather expensive,
+>> so I wonder if this could be changed to something cheaper,
+>> either by returning nanoseconds in the end and consistently
+>> working on those, or by doing the calculation on the
+>> timespec64 itself.
+>>
+> I prefer returning timespec64, so this system call aligns with other
+> system calls like clock_gettime for example.
+> As far as doing the calculation on timespec64 itself, that looks more
+> expansive to me, but I might be wrong.
 
+In the general case, dividing a 64-bit variable by some other
+variable is really expensive and will take hundreds of cycles.
+This one is a bit cheaper because the division is done using
+a constant divider of NS_PER_SEC, which can get optimized fairly
+well on many systems by turning it into an equivalent 128-bit
+multiplication plus shift.
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+For the case where you start out with a timespec64, I would
+expect it to be cheaper to calculate the nanosecond difference
+between ts_a1 and ts_a2 to add half of that to the timespec
+than to average two large 64-bit values and convert that back
+to a timespec afterwards. This should be fairly easy to try
+out if you can test a 32-bit kernel. We could decide that
+there is no need to care about anything bug 64-bit kernels
+here, in which case your current version should be just as
+good for both the crosstime_support_a and !crosstime_support_a
+cases.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+     Arnd
 
