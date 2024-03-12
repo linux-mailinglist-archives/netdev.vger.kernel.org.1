@@ -1,166 +1,242 @@
-Return-Path: <netdev+bounces-79530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2965E879D0E
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 21:47:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3C25879D27
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 22:02:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56ACD1C216AA
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 20:47:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 845661F225CB
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 21:02:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3B7C14290C;
-	Tue, 12 Mar 2024 20:47:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6203C142916;
+	Tue, 12 Mar 2024 21:02:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TfqpOZxl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nB+7Gqo5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86D08365;
-	Tue, 12 Mar 2024 20:47:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4257E10A;
+	Tue, 12 Mar 2024 21:02:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710276461; cv=none; b=E0ONBndsqBMm3lzDeK+XPAFnCX79Zh+rzFhicmEY1mxVpfXJn+IwGFYQOSCbEefTN052mRTIYNreXeeNFPshYgOHFBEdwZxiZtjob2oyqewQaZpgq9kRj+kjVm3vX9YKZaP1f/Ph1GGwgS1HicyM7N20SLdyx6w67vsqLpzCRyk=
+	t=1710277354; cv=none; b=kbqSWwqvttqH/0l3yd282e8GoMxxQXQRT49BfAseTH9hXwpSGabJm30AwKGZjkmzoe2zIAEZ227HU7VfZF4q1x40wrOZfOEkQiWeFqZHOxTqR9BAw59fr6RmMJ7GDABts/xSscUkhUg7xJN0TJ5W+zIstRD+vK1UYuzCKUBNOf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710276461; c=relaxed/simple;
-	bh=GERHLPdEbleoVprwdXIvMQsUSqq4hz0J9Q1eneTgSfM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q5hmhtQic0VbOWRggiV2wLcxG2fBAoI5BPOP1cGzVOuZxR7bvponntuczPsBT+GLhuZv0wMIQxflnLoYXdQpVYifMqSvusDOIPL5Ovrz7JMCf2sRCNENEbfOEEOHS5iHBJsGvCWdEShMZDa08CUHzYiCBgWDFPTPkgOjOI6q3iM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TfqpOZxl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80439C433C7;
-	Tue, 12 Mar 2024 20:47:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710276460;
-	bh=GERHLPdEbleoVprwdXIvMQsUSqq4hz0J9Q1eneTgSfM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TfqpOZxlbp1/ZQysY1Ooa+fzuHT7ckobUVJhPz4G0CA3j0bOpHZVXPR5R5ex8XbjI
-	 5Amx8e7xxoQ+4RsGaaY1aiAOtqAvjDDrYT9/Ll+EiriP+I6SS/7O//TE1bF1WGx0/l
-	 6LvvTTDJP9EIDFuA/G0G5dwDYK1vyW5rEtNgkcrFU+AKgMXQwxPu5/0W5DArZzPkCl
-	 naip2IpDT1ABCgBDOXVrFgT5zYPwyVXvHDMPHIbeNo7v5/Vxg4NVU7IbczCoohGSy8
-	 g4sewARaurO7PFTtLIbjCJTRe8E4TAy2UM960AIhymslPVOaXkgB1znBExbWV0+xRd
-	 wmpFwf62ChXiQ==
-Date: Tue, 12 Mar 2024 13:47:39 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, pabeni@redhat.com, bpf@vger.kernel.org, Tejun
- Heo <tj@kernel.org>
-Subject: Re: [GIT PULL] Networking for v6.9
-Message-ID: <20240312134739.248e6bd3@kernel.org>
-In-Reply-To: <20240312133427.1a744844@kernel.org>
-References: <20240312042504.1835743-1-kuba@kernel.org>
-	<CAHk-=wgknyB6yR+X50rBYDyTnpcU4MukJ2iQ5mQQf+Xzm9N9Dw@mail.gmail.com>
-	<20240312133427.1a744844@kernel.org>
+	s=arc-20240116; t=1710277354; c=relaxed/simple;
+	bh=0sCr4WabJZpDD15XRa8avQrNFDfqqV+pYS21qqJm4no=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ddFnovLOAmx1luVVa9XB1pqhCnwXVvjbhXvYaVofqN0WZ94zpG0cdxgf/JZl+WbjRijSC7Y8IT4Br31BxaNN/JA/5stLVZDZLKbw6DOQFcJV+uqHRy9rh+BbnXFHG5ksatcVz96ps1IH13ZgNVktap9WiG26+of0IjczT1X4/7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nB+7Gqo5; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a44665605f3so844410666b.2;
+        Tue, 12 Mar 2024 14:02:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710277350; x=1710882150; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ry2mBoH+c5gWLgzcnH2ecU7709nJqaqvy6mrJBpg2fE=;
+        b=nB+7Gqo54G5qqECiAMJdm6FGCBEyxpFMldXfaTX9+JIZgX2Q7ztrSts0CD7MLF9+VF
+         q9nIDP8MjofWWChBmjm1j3WDHmfFKGJukJZHymasoETiPWFUPtn8c4dDg6xjozA40uNa
+         V/JHfx6nDzoINm9HoBItC8LIcYxRt3RFZwFHeV6MF0iWoWF3aAsyqpluepZIL5wRQF4q
+         s+lS6cRVbIghUKkg65B7hCuoKz7GNMTKCgOuqT+fhcLM72A6IQM9jyZWrB2/8fe7w/K9
+         8rTKLaKu6sw9XDYzOmmLtSnLM07H7aWBzhK3SWZyIfPmTpHW7ZpHBjg90ovqRjjowZMq
+         /9tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710277350; x=1710882150;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ry2mBoH+c5gWLgzcnH2ecU7709nJqaqvy6mrJBpg2fE=;
+        b=hq04Ki5SoWUL4ddm0gCPwYIkFtFKpu3VakqZYK4VAGpy+JJqbI65B9LuijSifP4HdP
+         aFQE4D06xbzdqAcFMCnlEH9HDx4CbiHLrdwGt/3N8guHKDGcDZ//gYGz2p+mtIj8aVoO
+         k55ZM7/wj+b5v2HL9Qm8NZ8t59PBHXVf8N0Z/JbVRYtq7pQdR5d8bbKkCzJ49DADbA7/
+         81wevIGmcdkkFmqvHj3ATFpDr1uVtYZLP2Av7L3tJHUEkggVPtrWHgU11HBOiRJehe3F
+         Re5iWun0CKF4UecWhoftME/2sE5E1dsUFu8Ip6CG6jDGszkjdXzqIHOHFryqDa9yLUNI
+         w9tw==
+X-Forwarded-Encrypted: i=1; AJvYcCUCvHbEWAGM4JHp47do0wRYdRNwKCsAXjZNz4n7Zo/nzVE3N4bkqWhuRk7X4H5PTl9yP5SG1xQ1vxQZhZWXySWYVxg+wZKZxIlc5Gffj5rYiZi4RZka7R4/MTYEaekmzZbPhKQwffJuUDPcf+HUwK1Y2H+Fezlqytn8
+X-Gm-Message-State: AOJu0YwcXAhjQ5ZU5DLaVdJiozqD1uAirBwPRkiBvZVOOq7cmc4czS3g
+	TE7TUk/jqh3r9QZuMzISnerm9Z6qWVVIVld5pHz954B3FZWaOS+v
+X-Google-Smtp-Source: AGHT+IFgeZdARShQLqCLz1NFeRDkjg6NsszAvHH7T8ul/1Jezc977E5Znk0coLPKu4DBWlmdqREc6A==
+X-Received: by 2002:a17:907:a642:b0:a46:4c8e:18a9 with SMTP id vu2-20020a170907a64200b00a464c8e18a9mr1490067ejc.48.1710277349373;
+        Tue, 12 Mar 2024 14:02:29 -0700 (PDT)
+Received: from krava ([83.240.63.214])
+        by smtp.gmail.com with ESMTPSA id a10-20020a17090640ca00b00a4550e8ae70sm4218538ejk.63.2024.03.12.14.02.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Mar 2024 14:02:29 -0700 (PDT)
+From: Jiri Olsa <olsajiri@gmail.com>
+X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
+Date: Tue, 12 Mar 2024 22:02:27 +0100
+To: syzbot <syzbot+850aaf14624dc0c6d366@syzkaller.appspotmail.com>
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
+	daniel@iogearbox.net, haoluo@google.com, john.fastabend@gmail.com,
+	kpsingh@kernel.org, linux-kernel@vger.kernel.org,
+	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@google.com,
+	song@kernel.org, syzkaller-bugs@googlegroups.com,
+	yonghong.song@linux.dev
+Subject: Re: [syzbot] [bpf?] possible deadlock in __bpf_ringbuf_reserve
+Message-ID: <ZfDC45Kc1VEvBMuW@krava>
+References: <0000000000004aa700061379547e@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0000000000004aa700061379547e@google.com>
 
-On Tue, 12 Mar 2024 13:34:27 -0700 Jakub Kicinski wrote:
-> I was testing with net-next on top of b0402403e54a ("Merge tag
-> 'edac_updates_for_v6.9' of git://git.kernel.org/pub/scm/linux/kernel/git/ras/ras").
-> IOW with the revert of 8e0ef4128694.
+On Tue, Mar 12, 2024 at 09:41:26AM -0700, syzbot wrote:
+> Hello,
 > 
-> I have various debug options enabled, and I only captured the stack
-> trace from a kdump kernel, with hung_task_panic=1 which dies with
-> the traces below. Let me retest now and try to capture the real
-> crash..
+> syzbot found the following issue on:
+> 
+> HEAD commit:    df4793505abd Merge tag 'net-6.8-rc8' of git://git.kernel.o..
+> git tree:       bpf
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=11fd0092180000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=c11c5c676adb61f0
+> dashboard link: https://syzkaller.appspot.com/bug?extid=850aaf14624dc0c6d366
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1509c4ae180000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10babc01180000
+> 
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/d2e80ee1112b/disk-df479350.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/b35ea54cd190/vmlinux-df479350.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/59f69d999ad2/bzImage-df479350.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+850aaf14624dc0c6d366@syzkaller.appspotmail.com
+> 
+> ============================================
+> WARNING: possible recursive locking detected
+> 6.8.0-rc7-syzkaller-gdf4793505abd #0 Not tainted
+> --------------------------------------------
+> strace-static-x/5063 is trying to acquire lock:
+> ffffc900096f10d8 (&rb->spinlock){-.-.}-{2:2}, at: __bpf_ringbuf_reserve+0x211/0x4f0 kernel/bpf/ringbuf.c:424
+> 
+> but task is already holding lock:
+> ffffc900098410d8 (&rb->spinlock){-.-.}-{2:2}, at: __bpf_ringbuf_reserve+0x211/0x4f0 kernel/bpf/ringbuf.c:424
+> 
+> other info that might help us debug this:
+>  Possible unsafe locking scenario:
+> 
+>        CPU0
+>        ----
+>   lock(&rb->spinlock);
+>   lock(&rb->spinlock);
+> 
+>  *** DEADLOCK ***
+> 
+>  May be due to missing lock nesting notation
+> 
+> 4 locks held by strace-static-x/5063:
+>  #0: ffff88807857e068 (&pipe->mutex/1){+.+.}-{3:3}, at: __pipe_lock fs/pipe.c:103 [inline]
+>  #0: ffff88807857e068 (&pipe->mutex/1){+.+.}-{3:3}, at: pipe_write+0x1cc/0x1a40 fs/pipe.c:465
+>  #1: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+>  #1: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+>  #1: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2380 [inline]
+>  #1: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run2+0x114/0x420 kernel/trace/bpf_trace.c:2420
+>  #2: ffffc900098410d8 (&rb->spinlock){-.-.}-{2:2}, at: __bpf_ringbuf_reserve+0x211/0x4f0 kernel/bpf/ringbuf.c:424
+>  #3: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+>  #3: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+>  #3: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2380 [inline]
+>  #3: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run2+0x114/0x420 kernel/trace/bpf_trace.c:2420
+> 
+> stack backtrace:
+> CPU: 0 PID: 5063 Comm: strace-static-x Not tainted 6.8.0-rc7-syzkaller-gdf4793505abd #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:88 [inline]
+>  dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
+>  check_deadlock kernel/locking/lockdep.c:3062 [inline]
+>  validate_chain+0x15c0/0x58e0 kernel/locking/lockdep.c:3856
+>  __lock_acquire+0x1345/0x1fd0 kernel/locking/lockdep.c:5137
+>  lock_acquire+0x1e3/0x530 kernel/locking/lockdep.c:5754
+>  __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+>  _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
+>  __bpf_ringbuf_reserve+0x211/0x4f0 kernel/bpf/ringbuf.c:424
+>  ____bpf_ringbuf_reserve kernel/bpf/ringbuf.c:459 [inline]
+>  bpf_ringbuf_reserve+0x5c/0x70 kernel/bpf/ringbuf.c:451
+>  bpf_prog_9efe54833449f08e+0x2d/0x47
+>  bpf_dispatcher_nop_func include/linux/bpf.h:1231 [inline]
+>  __bpf_prog_run include/linux/filter.h:651 [inline]
+>  bpf_prog_run include/linux/filter.h:658 [inline]
+>  __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
 
-With your tree as of 65d287c7eb1d it gets to prompt but dies soon after
-when prod services kick in (dunno what rpm Kdump does but says iocost
-so adding Tejun):
+hum, scratching my head how this could passed through the prog->active check,
+will try to reproduce
 
-[  115.832425] WARNING: CPU: 59 PID: 6473 at block/blk-iocost.c:2255 ioc_timer_fn+0x1dd4/0x2060
-[  115.851797] Modules linked in: tls act_gact cls_bpf kvm_amd kvm irqbypass acpi_cpufreq ipmi_si ipmi_devintf ipmi_msghandler button tpm_crb sch_fq_codel xhci_pci nvme xhci_hcd nvme_core fuse loop efivarfs autofs4 cbc cts ghash_generic gcm
-[  115.898730] CPU: 59 PID: 6473 Comm: rpm Kdump: loaded Not tainted 6.8.0-04854-gd99b04ab6218 #111
-[  115.918472] Hardware name: cheese!
-[  115.937746] RIP: 0010:ioc_timer_fn+0x1dd4/0x2060
-[  115.948369] Code: ff ff 0f 0b e9 04 f8 ff ff 48 8b 5c 24 10 48 8d bb f0 00 00 00 e8 1c 05 94 ff 48 c7 83 f0 00 00 00 00 00 00 00 e9 1b f7 ff ff <0f> 0b 48 8b bc 24 c0 00 00 00 e8 0d 35 a4 00 e9 97 f8 ff ff 48 8b
-[  115.990256] RSP: 0018:ffff888fced89ac8 EFLAGS: 00010046
-[  116.002156] RAX: 0000000000000000 RBX: 0000000000000000 RCX: ffffffff81c354dc
-[  116.018379] RDX: dffffc0000000000 RSI: ffffffff82a86800 RDI: ffff8881612561e8
-[  116.034485] RBP: ffffe8ffffdc8000 R08: ffffffff81c31dbb R09: fffffbfff090ead6
-[  116.050519] R10: ffffffff848756b7 R11: 0000000000000000 R12: ffff888fced89cd8
-[  116.066741] R13: ffffe8ffffdc8010 R14: ffffe8ffffdc7fd0 R15: ffff888161256120
-[  116.083079] FS:  00007fae6679f780(0000) GS:ffff888fced80000(0000) knlGS:0000000000000000
-[  116.101394] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  116.114610] CR2: 00007f45dde301b0 CR3: 00000001a25cd002 CR4: 0000000000f70ef0
-[  116.131019] PKRU: 55555554
-[  116.137732] Call Trace:
-[  116.143788]  <IRQ>
-[  116.148583]  ? __warn+0xa0/0x230
-[  116.156470]  ? ioc_timer_fn+0x1dd4/0x2060
-[  116.165729]  ? report_bug+0x229/0x240
-[  116.174266]  ? handle_bug+0x3c/0x70
-[  116.182311]  ? exc_invalid_op+0x14/0x40
-[  116.191286]  ? asm_exc_invalid_op+0x16/0x20
-[  116.200909]  ? ioc_now+0x19b/0x240
-[  116.208973]  ? ioc_timer_fn+0x3ac/0x2060
-[  116.218090]  ? ioc_timer_fn+0x1dd4/0x2060
-[  116.227521]  ? ioc_timer_fn+0x3ac/0x2060
-[  116.236616]  ? transfer_surpluses+0xdc0/0xdc0
-[  116.246621]  ? lock_acquire+0x184/0x440
-[  116.255451]  ? lock_sync+0x110/0x110
-[  116.263832]  ? __lock_acquire+0x8f2/0x3440
-[  116.273202]  ? do_raw_spin_unlock+0x92/0xf0
-[  116.282808]  ? transfer_surpluses+0xdc0/0xdc0
-[  116.292776]  ? transfer_surpluses+0xdc0/0xdc0
-[  116.302815]  call_timer_fn+0x13d/0x3a0
-[  116.311489]  ? timer_shutdown_sync+0x10/0x10
-[  116.321782]  ? lock_downgrade+0x3a0/0x3a0
-[  116.331131]  ? transfer_surpluses+0xdc0/0xdc0
-[  116.341050]  ? mark_held_locks+0x65/0x90
-[  116.350113]  ? transfer_surpluses+0xdc0/0xdc0
-[  116.360151]  __run_timers+0x445/0x570
-[  116.368667]  ? call_timer_fn+0x3a0/0x3a0
-[  116.377777]  ? lock_sync+0x110/0x110
-[  116.386245]  ? do_raw_spin_lock+0x10f/0x1a0
-[  116.395904]  ? spin_bug+0xe0/0xe0
-[  116.403775]  run_timer_base+0x66/0x80
-[  116.412431]  run_timer_softirq+0x16/0x30
-[  116.421505]  __do_softirq+0x105/0x5de
-[  116.430031]  irq_exit_rcu+0x94/0xf0
-[  116.438197]  sysvec_apic_timer_interrupt+0x93/0xc0
-[  116.449178]  </IRQ>
-[  116.454325]  <TASK>
-[  116.459342]  asm_sysvec_apic_timer_interrupt+0x16/0x20
-[  116.471096] RIP: 0010:_raw_spin_unlock_irqrestore+0x33/0x50
-[  116.483858] Code: 48 83 c7 18 53 48 89 f3 48 8b 74 24 10 e8 85 97 b6 fe 48 89 ef e8 ed e0 b6 fe 80 e7 02 74 06 e8 03 dc c9 fe fb bf 01 00 00 00 <e8> b8 b6 af fe 65 8b 05 59 1e 9c 7d 85 c0 74 03 5b 5d c3 e8 a5 96
-[  116.525813] RSP: 0018:ffff8881cf28f1d0 EFLAGS: 00000206
-[  116.537931] RAX: 0000000000034ad1 RBX: 0000000000000282 RCX: ffffffff811de87d
-[  116.554120] RDX: 0000000000000000 RSI: ffffffff82a86540 RDI: 0000000000000001
-[  116.570384] RBP: ffffffff8436c200 R08: 0000000000000001 R09: fffffbfff0c2dd7d
-[  116.586506] R10: 0000000000000001 R11: 0000000000000000 R12: ffff888241b3fc80
-[  116.602344] R13: 0000000000000080 R14: 0000000000000001 R15: 0000000000000282
-[  116.618234]  ? mark_lock.part.0+0x10d/0x1790
-[  116.627775]  __create_object+0x5e/0x80
-[  116.636199]  kmem_cache_alloc+0x2f3/0x3b0
-[  116.645206]  alloc_extent_state+0x1e/0x1a0
-[  116.654355]  __set_extent_bit+0x32b/0xb30
-[  116.663374]  lock_extent+0xc1/0x430
-[  116.671221]  ? memcg_list_lru_alloc+0x580/0x580
-[  116.681348]  ? try_lock_extent+0xf0/0xf0
-[  116.690125]  ? preempt_count_sub+0x14/0xc0
-[  116.699283]  ? folio_add_lru+0x1b6/0x2c0
-[  116.708079]  ? filemap_add_folio+0xd0/0x130
-[  116.717417]  ? __filemap_add_folio+0x7a0/0x7a0
-[  116.727382]  add_ra_bio_pages.constprop.0.isra.0+0x294/0x650
-[  116.740055]  btrfs_submit_compressed_read+0x339/0x490
-[  116.751363]  ? btrfs_submit_compressed_write+0x2d0/0x2d0
-[  116.763251]  ? lock_downgrade+0x3a0/0x3a0
-[  116.772238]  submit_one_bio+0x6e/0x70
-[  116.780431]  extent_readahead+0x9b4/0xa60
-[  116.789403]  ? extent_readahead+0x19d/0xa60
-[  116.798755]  ? extent_writepages+0x150/0x150
-[  116.808347]  ? end_page_read+0x2a0/0x2a0
-[  116.817152]  ? lockdep_hardirqs_on_prepare+0x220/0x220
-[  116.828633]  ? __filemap_add_folio+0x439/0x7a0
-[  116.838619]  ? folio_add_lru+0x1a7/0x2c0
-[  116.847426]  ? lock_downgrade+0x3a0/0x3a0
+jirka
+
+>  bpf_trace_run2+0x204/0x420 kernel/trace/bpf_trace.c:2420
+>  __traceiter_contention_end+0x7b/0xb0 include/trace/events/lock.h:122
+>  trace_contention_end+0xf6/0x120 include/trace/events/lock.h:122
+>  __pv_queued_spin_lock_slowpath+0x939/0xc60 kernel/locking/qspinlock.c:560
+>  pv_queued_spin_lock_slowpath arch/x86/include/asm/paravirt.h:584 [inline]
+>  queued_spin_lock_slowpath+0x42/0x50 arch/x86/include/asm/qspinlock.h:51
+>  queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
+>  do_raw_spin_lock+0x271/0x370 kernel/locking/spinlock_debug.c:116
+>  __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:111 [inline]
+>  _raw_spin_lock_irqsave+0xe1/0x120 kernel/locking/spinlock.c:162
+>  __bpf_ringbuf_reserve+0x211/0x4f0 kernel/bpf/ringbuf.c:424
+>  ____bpf_ringbuf_reserve kernel/bpf/ringbuf.c:459 [inline]
+>  bpf_ringbuf_reserve+0x5c/0x70 kernel/bpf/ringbuf.c:451
+>  bpf_prog_9efe54833449f08e+0x2d/0x47
+>  bpf_dispatcher_nop_func include/linux/bpf.h:1231 [inline]
+>  __bpf_prog_run include/linux/filter.h:651 [inline]
+>  bpf_prog_run include/linux/filter.h:658 [inline]
+>  __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
+>  bpf_trace_run2+0x204/0x420 kernel/trace/bpf_trace.c:2420
+>  __traceiter_contention_end+0x7b/0xb0 include/trace/events/lock.h:122
+>  trace_contention_end+0xd7/0x100 include/trace/events/lock.h:122
+>  __mutex_lock_common kernel/locking/mutex.c:617 [inline]
+>  __mutex_lock+0x2e4/0xd70 kernel/locking/mutex.c:752
+>  __pipe_lock fs/pipe.c:103 [inline]
+>  pipe_write+0x1cc/0x1a40 fs/pipe.c:465
+>  call_write_iter include/linux/fs.h:2087 [inline]
+>  new_sync_write fs/read_write.c:497 [inline]
+>  vfs_write+0xa81/0xcb0 fs/read_write.c:590
+>  ksys_write+0x1a0/0x2c0 fs/read_write.c:643
+>  do_syscall_64+0xf9/0x240
+>  entry_SYSCALL_64_after_hwframe+0x6f/0x77
+> RIP: 0033:0x4e8593
+> Code: c7 c2 a8 ff ff ff f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 64 8b 04 25 18 00 00 00 85 c0 75 14 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 55 c3 0f 1f 40 00 48 83 ec 28 48 89 54 24 18
+> RSP: 002b:00007ffeda768928 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+> RAX: ffffffffffffffda RBX: 0000000000000012 RCX: 00000000004e8593
+> RDX: 0000000000000012 RSI: 0000000000817140 RDI: 0000000000000002
+> RBP: 0000000000817140 R08: 0000000000000010 R09: 0000000000000090
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000012
+> R13: 000000000063f460 R14: 0000000000000012 R15: 0000000000000001
+>  </TASK>
+> 
+> 
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+> 
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+> 
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+> 
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
+> 
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+> 
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+> 
+> If you want to undo deduplication, reply with:
+> #syz undup
 
