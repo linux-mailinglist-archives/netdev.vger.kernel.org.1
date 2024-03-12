@@ -1,124 +1,99 @@
-Return-Path: <netdev+bounces-79345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DC58878CE8
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 03:13:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39D5A878D00
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 03:30:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 981EFB21706
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 02:13:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 626521C20C45
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 02:30:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF4846FBF;
-	Tue, 12 Mar 2024 02:13:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7EF316FF2B;
+	Tue, 12 Mar 2024 02:30:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EI8/DEW4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gNUxPaCz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9B71EB5C;
-	Tue, 12 Mar 2024 02:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC7123A0
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 02:30:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710209599; cv=none; b=Mb1Rlkdu4BnLyZF85yRbVZ8/SwmD92mZQ7kvVXyxrXP69/+DnT702rZRlp1UVw7ARwZr34yaST0ITJ77QapGXWfCGWcfxwIXvlKwFRYvmRHTr2MDdAyzTPX511lHOdb5r0qiR1P64KeT1NpJ4mnoCLhlSt+lcKroWT10Ob/8FL0=
+	t=1710210610; cv=none; b=qOD/2mruXjz1CnCilV5r6daDTv2wnSflHgaNTIUV5CA9hk8McqfN0I/vdRdYiIBD3HSsiEAr9OYImIjCYinf2SV7tBnurswZZTMA2R2k40N55zamJ2eralubUREVgUuCOGxVdKIHrDCfS8NchTQA8k3NquThzQaG+XVE+tK5ez0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710209599; c=relaxed/simple;
-	bh=xxgkr5eNkvW5q1zkcYlUGp+GjUJ5hPdmOjnvJkUucnk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Dn/iiSEex6TiwnyGjOdH5lhsGnQRNz1Hmx1HTyquVyxTzFYSgeC1dcK1F1AzvleOzVGUdQSOobgkZvTrXbWQ2eoyds/zPB6ZcsJi1aLXd8cRwHhxJfHfXUX9AWgc1kbMrHgxmg9kI0dyjVlpitPdPklSy91FRKIMlD8vO737y6I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EI8/DEW4; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-33e899ce9e3so1805288f8f.1;
-        Mon, 11 Mar 2024 19:13:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710209596; x=1710814396; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xxgkr5eNkvW5q1zkcYlUGp+GjUJ5hPdmOjnvJkUucnk=;
-        b=EI8/DEW4FPp43ofgqsH2qBfW49i50NoDCrizUb6IYCuupG45uqgzh0Exxt7Isq63pw
-         fbg5COrtcmXD63Qu2BfHZL2/skr4dnSx8BufGb+fH3xb93d1jOmCMWMdQfcSOUqk5UNh
-         WGrgQ3qV0zStRiyHj655rMmMDIUNftrzZvoHv3npiGzAN57p1pLmHQIlQ0go8EOXhkcG
-         En1ujhLOX29nn6LpGrjX44RbCS4WOVFnOcH1SOc33lAF4xhMq1RtE6DYnEnFaZL2Db39
-         fw5O35I8YtGn2lik5fJPZ+X/zyyM7oLK3W3HtCMZM15vHuw2Dn1SEpxbEVNGlV3qx8+z
-         216g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710209596; x=1710814396;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xxgkr5eNkvW5q1zkcYlUGp+GjUJ5hPdmOjnvJkUucnk=;
-        b=dgSs3a2MIyxDxomMuoq0dNeZsgmiKXA7gcUbcULgc/W8xoB6fcK6IPkNFqIXF2ix8C
-         zOB2T8KCL1BzVVO0EHy8WGsGrFWVTKtQ+xPl+ZPNUzQ1b8WGGSsD0Xd9xRzFc7zBnNXi
-         kfjAIkHMPBsSz3fE+RFUz2uRyU0TiWwlNveYirzLfH1WJclFivqEgfYDWR1c+6W0nGQw
-         qX93w3vQdEyJ/p8ivuIdEnLtkLIPE04MYnJY03+CqVRpNgMI21QJIOcYoGxtLfeWXQE5
-         RQIiR4lr2W8rEDPTvPzVvDoAq9Nicad6LXXyUzBuOf2FwMZqWaVLrHZiBPlgD549KdRf
-         GzfA==
-X-Forwarded-Encrypted: i=1; AJvYcCVCvbMxEXCNkSmEeKEMjaD4seLhhkiEkzWipJXMFGHN95lPfC6WXvjkqL6pyCK0noLLpBFPK7KXWhUjMvVwZYQxCaz2DwlJtHhn+czXAt7TV58+7mrgl8FnjlNyBFE1fxlqMIWPsn0YWt8PaA1jAH6oa9rolni47ezC2njkdNshk2oNbyBbz1dNsk/hjK+2DExpVfiwKqLyna/f90bj34y64PAfgIXl1jHQNb7MPCUjuqM0nJoA8NLA5HnHLNmx6WeDdamWU7yz2Drxcjxb1LOl0gDxAziRUeGkSA==
-X-Gm-Message-State: AOJu0YxsgvTpIp43h+AalndypjPsQB29bSwBY+JRm1vAbxqOQVPlLRDa
-	lpcvfydqZZ4YZ7cekcpDpalRrG70mcu6SnoeqjYEP+NvijXs8F++KZcK9E3gkNt63TCqkggmh+G
-	BcM8SKxYoKSLBlv+CC1Vhd44tPsE=
-X-Google-Smtp-Source: AGHT+IGaeIqJnZOJ/SuZRPtu+8MtD/3nozajQZ94fUgHlD7gwqeVkMLfFrTcgwoFQp9lHB+TsWg3BU+ivdAF6tyjFJM=
-X-Received: by 2002:a5d:4112:0:b0:33e:74c6:bcb2 with SMTP id
- l18-20020a5d4112000000b0033e74c6bcb2mr5165378wrp.16.1710209596408; Mon, 11
- Mar 2024 19:13:16 -0700 (PDT)
+	s=arc-20240116; t=1710210610; c=relaxed/simple;
+	bh=yEnH/acpM541agRe7qHU1yFlavkSJr3HsbepFl8mdmI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ZcU04c9qJDo/jvU6UzSZ7z6Jg+idBwt7o4uC7S4UPinpfZntEyxBs+W6YG+V/Y7tgDQYpGg6WS5/QFpgHRNKL9Nwclk/s8mzjmAYAZ6PpyYy/twY2BtYgIC4xAw8tYoqRQ5XpkynE6qAZzMBudaJyOa4MNUfqiPlLsx7Q1FGJXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gNUxPaCz; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710210608; x=1741746608;
+  h=date:from:to:cc:subject:message-id:mime-version;
+  bh=yEnH/acpM541agRe7qHU1yFlavkSJr3HsbepFl8mdmI=;
+  b=gNUxPaCzcSzsDHvTp0pES9qmxJeqU9ds0cPlutFtfBueFnnvtzIqWNoY
+   EPt4xEUVeLNzPo3dxvfaS1B11po/+2puwtcd8K7x4ONwaDSiUq47W+vDY
+   DeUiF2xotZgCnIUmlniNerxAuz4XMzUXm/CzpERmV9Nb75ScsXbwJnOlA
+   A+tqXmb1x3ji3neHppqSm/yohL2T1yfsGqX3ziNNTRFgYNz0odoKD6sUk
+   uSmqMC7KMDwhJv2tos533U9ZwYzNO3NlE00EwFAOzNFC8YBtkgwnLgZWr
+   gUu5T3QZ+3NKhArHIciHKXF3U492KWofTSxj3w7sfE41MWRiXrfwKJ3Dp
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11010"; a="16344364"
+X-IronPort-AV: E=Sophos;i="6.07,118,1708416000"; 
+   d="scan'208";a="16344364"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Mar 2024 19:30:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,118,1708416000"; 
+   d="scan'208";a="42290517"
+Received: from lkp-server01.sh.intel.com (HELO b21307750695) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 11 Mar 2024 19:30:07 -0700
+Received: from kbuild by b21307750695 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1rjru0-0009fB-1i;
+	Tue, 12 Mar 2024 02:30:04 +0000
+Date: Tue, 12 Mar 2024 10:29:16 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	Herve Codina <herve.codina@bootlin.com>
+Subject: [net-next:main 4/19] WARNING: modpost: vmlinux: section mismatch in
+ reference: bitmap_copy_clear_tail+0x58 (section: .text.unlikely) ->
+ __setup_str_initcall_blacklist (section: .init.rodata)
+Message-ID: <202403121032.WDY8ftKq-lkp@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240311093526.1010158-1-dongmenglong.8@bytedance.com>
- <20240311093526.1010158-8-dongmenglong.8@bytedance.com> <CAADnVQK4tdefa3s=sim69Sc+ztd-hHohPEDXaUNVTU-mLNYUiw@mail.gmail.com>
- <CALz3k9iabeOwHSrPb9mkfCuOebanh3+bAfi7xh3kBBN0DzHC3A@mail.gmail.com>
-In-Reply-To: <CALz3k9iabeOwHSrPb9mkfCuOebanh3+bAfi7xh3kBBN0DzHC3A@mail.gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 11 Mar 2024 19:13:05 -0700
-Message-ID: <CAADnVQKsrLB-2bD53R4ZdzUVdx1aqkgom1rzGCGKK0M3Uc+csQ@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH bpf-next v2 7/9] libbpf: don't free btf if
- program of multi-link tracing existing
-To: =?UTF-8?B?5qKm6b6Z6JGj?= <dongmenglong.8@bytedance.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	X86 ML <x86@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Quentin Monnet <quentin@isovalent.com>, 
-	bpf <bpf@vger.kernel.org>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>, linux-s390 <linux-s390@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, linux-trace-kernel@vger.kernel.org, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Mon, Mar 11, 2024 at 7:05=E2=80=AFPM =E6=A2=A6=E9=BE=99=E8=91=A3 <dongme=
-nglong.8@bytedance.com> wrote:
->
-> > >
-> > > +LIBBPF_API void bpf_object__free_btfs(struct bpf_object *obj);
-> > > +
-> >
-> > It shouldn't be exported.
-> > libbpf should clean it up when bpf_object is freed.
->
-> Yes, libbpf will clean up the btfs when bpf_object is freed in
-> this commit. And I'm trying to offer a way to early free the btfs
-> by the users manual to reduce the memory usage. Or, the
-> btfs that we opened will keep existing until we close the
-> bpf_object.
->
-> This is optional, I can remove it if you prefer.
+tree:   https://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git main
+head:   f095fefacdd35b4ea97dc6d88d054f2749a73d07
+commit: de5f84338970815b9fdd3497a975fb572d11e0b5 [4/19] lib/bitmap: Introduce bitmap_scatter() and bitmap_gather() helpers
+config: xtensa-randconfig-001-20240311 (https://download.01.org/0day-ci/archive/20240312/202403121032.WDY8ftKq-lkp@intel.com/config)
+compiler: xtensa-linux-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240312/202403121032.WDY8ftKq-lkp@intel.com/reproduce)
 
-Let's not extend libbpf api unless we really need to.
-bpf_program__attach_trace_multi_opts() and
-*skel*__attach() can probably free them.
-I don't see a use case where you'd want to keep them afterwards.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202403121032.WDY8ftKq-lkp@intel.com/
+
+All warnings (new ones prefixed by >>, old ones prefixed by <<):
+
+WARNING: modpost: missing MODULE_DESCRIPTION() in vmlinux.o
+WARNING: modpost: vmlinux: section mismatch in reference: put_page+0x58 (section: .text.unlikely) -> initcall_level_names (section: .init.data)
+>> WARNING: modpost: vmlinux: section mismatch in reference: bitmap_copy_clear_tail+0x58 (section: .text.unlikely) -> __setup_str_initcall_blacklist (section: .init.rodata)
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
