@@ -1,169 +1,147 @@
-Return-Path: <netdev+bounces-79434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4EA879323
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 12:37:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B04BC879330
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 12:39:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87162B21AEF
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 11:37:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E31281C218E9
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 11:39:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1E0B79B7F;
-	Tue, 12 Mar 2024 11:37:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527DD79B7F;
+	Tue, 12 Mar 2024 11:39:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="mvy3VH/e"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e7Xi4doz"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F047569D0A;
-	Tue, 12 Mar 2024 11:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D31679B88;
+	Tue, 12 Mar 2024 11:39:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710243458; cv=none; b=bmZyPmPl+DejmJjM/W2QOR9VSbKHYDYlEIRdbdKk8WimCBTdzkS8EYN6RZ3qfWbKBZM+9AyEj0naBj5NF9m19Kd9wclsXqCAuzLBqL0tESmyKIrca+0mPuoknt96LVVnK4b2bHJTgAHTiKpDRCBp493OyVny1BdPQgjYBGSG1eo=
+	t=1710243592; cv=none; b=UXGqoRoy83LFoBjwTZQ2L7RdwmdlSFgN0xkg/is6MenIb/9r2W/x7rbo7DA7oD6v6NZPIGTs+gPmK6QGbWdW1R9WhuxWnrnSez9AVjoZ+Ozm8/pi7xW85E4MTRPf4G35kJr9+SBoz3FE+KqmEfzclxzFW1XLDt+WD7VxvedXDmQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710243458; c=relaxed/simple;
-	bh=rtuJJhJjSwhFXk7Mc165YJQ7+x0VBGrwR9b8fPEb5Ok=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=C6EDGkhaxhg86Xc+D1Py30tYonUjtHcgVopxgMOsYPs/YcADnAzOxKpw6mHY3auePiwUAbAOzzWr7IMUr2Nnh+nuNzSS1hHf1ySmkAJSbPos6SZ94B9h2TOHQiECRIvr2vVFyG/93ji/uDJrdcGAjShxZvCIxQ2AMxRaJv0lzWg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=mvy3VH/e; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 42CBarAg101235;
-	Tue, 12 Mar 2024 06:36:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1710243414;
-	bh=AgcSXIuIsHjzqNhDCxq2Q4wqwn8Izu4O6Ezov89bPYk=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=mvy3VH/eO7/opZUOgyKRE5ZmhdYoYw3xiVbQ7rWps770MChgthluQNvwXoxN+DoTX
-	 h73WPUMnU3dGMT045Isk2Tcdtb7nPF2QjlyOuYsMrPEGOYBZOOzt5P0xkJs8MOhg5k
-	 1KJv21BFL8UFzpRQlsrv+s9OqlfIPn+Dwmyg0YW4=
-Received: from DLEE102.ent.ti.com (dlee102.ent.ti.com [157.170.170.32])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 42CBar4k022480
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 12 Mar 2024 06:36:53 -0500
-Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE102.ent.ti.com
- (157.170.170.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 12
- Mar 2024 06:36:53 -0500
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 12 Mar 2024 06:36:53 -0500
-Received: from [10.24.69.25] (danish-tpc.dhcp.ti.com [10.24.69.25])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 42CBakVX058269;
-	Tue, 12 Mar 2024 06:36:46 -0500
-Message-ID: <6de512c3-5511-4fee-bd38-8200d87eafa9@ti.com>
-Date: Tue, 12 Mar 2024 17:06:45 +0530
+	s=arc-20240116; t=1710243592; c=relaxed/simple;
+	bh=kmn47PjIzR/ky/MylPma5T02SFEFUmtYpRq0lKTAiBM=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=nSPv5ixxAh1+T+OaT+EvDa7CfgNxHgOYLj1ps5kLmoymyLMoVlfqeU6OIY4lDmgwSucxyPOHpUxcLWRea/OmruRDbK5mcuL4mF8jEEyVPkjnzhH7zlRtt+snbY3h6Jx7rPPpgYPHp8nCc1mhjfLy19rRplgo327Q3VhDEkk8E7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e7Xi4doz; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-33e1207bba1so3057770f8f.1;
+        Tue, 12 Mar 2024 04:39:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710243589; x=1710848389; darn=vger.kernel.org;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=02lCA0MSv28asgZut0YsYn3wWri4elbaoE+v7i1YFLw=;
+        b=e7Xi4dozGJ10MgpdFNHRlwHO5UmRDbCAt+beUfNDnLA3D54Jd9aVBgXbFgt13ldipQ
+         13C+WPdsYgDD5+6n2Zo+Rok3CNO0VY7kLH+tAUNOhonwo6tvf3iaMx+er2l1a6oRV4Od
+         4Kbn1jIAxns9nYnLpgISMTozQHmfaybYMur4HznJJAuO6EPuslVe6FOrO03g0Lyz6BM0
+         U27JXDTXPtcvHfNKnCW/gu7BwqFGOSouFgi9q0ajYrJLW6TCTgrh3TFa6pLrIGPrLven
+         P2nRjAm4VISBKzgiEoM2Q5jIRylYZPi1+ww+0EUC9WdH5CNQz9N75S/637b8sv4uHr1r
+         ecaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710243589; x=1710848389;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=02lCA0MSv28asgZut0YsYn3wWri4elbaoE+v7i1YFLw=;
+        b=TkAAzKBnYdzf8vSDn+L8HYaAJfMdTp44ef3p+X6V8DndDsVSOHCHctLqaH7AdTNtvB
+         lDc+e96T8FprassyFMD4y3u3UzcyeFDThtIXkKUyczD9xvILs6wT3JKxQkFQMj51ZUeS
+         xEbVVukYqxOJjSG2btViAOwzU6gm1EGFXLg/IOqhcseswltKEX4K7gMKKJnfEZ6uAdPi
+         5n0C+bWaHPu4ZdZ5sM3KT3Piiz0UAZDopcl+aePppOsOxU+fBtZTCQVcRQ5SJaAkticg
+         EbDdsYwUVznd+D/yDCZEckKKbsF+QfwO6keZmXvpRCNhlPVPNqijGQdeitq6jQak/AYo
+         EJAw==
+X-Forwarded-Encrypted: i=1; AJvYcCXph87stzGr/2qUMOzcW53zDCs/nRJksHdEnfpIg9hHlUAuGul7pGKMPydNRMCs6pgDHbkxpoX3Tkj0hbZYcT4OihvRFV46dcN41GNObd+UrAbU4d2azs0Igi1o
+X-Gm-Message-State: AOJu0Ywyl3EYW9s5guOu0tle9ohUlvYlqT47LLXgj34D+MFOmrs9ja5F
+	Or8ryFv2cyrKM9oy9Rx7ViIqClIySjEdC7yDhE2snPuiYhiF4kQY
+X-Google-Smtp-Source: AGHT+IHQBl+UWKjLX3p5eZIQbVauEokUqAyym2VUlqgCqF0aL56whTuvCJzroBIfz+r4ZR3RxRvbbw==
+X-Received: by 2002:adf:f54d:0:b0:33d:7ea3:5b90 with SMTP id j13-20020adff54d000000b0033d7ea35b90mr5799614wrp.65.1710243588701;
+        Tue, 12 Mar 2024 04:39:48 -0700 (PDT)
+Received: from smtpclient.apple ([178.254.237.20])
+        by smtp.gmail.com with ESMTPSA id l5-20020a056000022500b0033e712b1d9bsm8904129wrz.77.2024.03.12.04.39.46
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Tue, 12 Mar 2024 04:39:47 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 00/10] Support ICSSG-based Ethernet on AM65x
- SR1.0 devices
-Content-Language: en-US
-To: Diogo Ivo <diogo.ivo@siemens.com>, <rogerq@kernel.org>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <andrew@lunn.ch>, <dan.carpenter@linaro.org>,
-        <jacob.e.keller@intel.com>, <robh@kernel.org>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <vigneshr@ti.com>, <wsa+renesas@sang-engineering.com>,
-        <hkallweit1@gmail.com>, <arnd@arndb.de>, <vladimir.oltean@nxp.com>,
-        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>
-CC: <jan.kiszka@siemens.com>
-References: <20240305114045.388893-1-diogo.ivo@siemens.com>
-From: MD Danish Anwar <danishanwar@ti.com>
-In-Reply-To: <20240305114045.388893-1-diogo.ivo@siemens.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.400.31\))
+Subject: Re: [PATCH net] vmxnet3: Fix missing reserved tailroom
+From: Martin Zaharinov <micron10@gmail.com>
+In-Reply-To: <5092d0d0c4b034e66645ffc974cf9d694f2bbb7f.camel@redhat.com>
+Date: Tue, 12 Mar 2024 13:39:36 +0200
+Cc: William Tu <witu@nvidia.com>,
+ netdev <netdev@vger.kernel.org>,
+ William Tu <u9012063@gmail.com>,
+ Alexander Duyck <alexanderduyck@fb.com>,
+ "<alexandr.lobakin@intel.com> <;hawk@kernel.org>" <daniel@iogearbox.net>,
+ bpf@vger.kernel.org,
+ john.fastabend@gmail.com,
+ pv-drivers@vmware.com,
+ doshir@vmware.com
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <D33EF776-A902-43A7-82DF-7D7B43608EED@gmail.com>
+References: <20240309183147.28222-1-witu@nvidia.com>
+ <5092d0d0c4b034e66645ffc974cf9d694f2bbb7f.camel@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+X-Mailer: Apple Mail (2.3774.400.31)
 
-Hi Diogo,
+Hi Paolo,
 
-On 05/03/24 5:10 pm, Diogo Ivo wrote:
-> Hello,
-> 
-> This series extends the current ICSSG-based Ethernet driver to support
-> AM65x Silicon Revision 1.0 devices.
-> 
-> Notable differences between the Silicon Revisions are that there is
-> no TX core in SR1.0 with this being handled by the firmware, requiring
-> extra DMA channels to manage communication with the firmware (with the
-> firmware being different as well) and in the packet classifier.
-> 
-> The motivation behind it is that a significant number of Siemens
-> devices containing SR1.0 silicon have been deployed in the field
-> and need to be supported and updated to newer kernel versions
-> without losing functionality.
-> 
-> This series is based on TI's 5.10 SDK [1].
-> 
-> The third version of this patch series can be found in [2].
-> 
-> Detailed descriptions of the changes in this series can be found in
-> each commit's message.
-> 
-> However, in its current form the driver has two problems:
->  - Setting the link to 100Mbit/s and half duplex results in slower than
->    expected speeds. We have identified that this comes from
->    icssg_rgmii_get_fullduplex() misreporting a full duplex connection
->    and thus we send the wrong command to the firmware.
-> 
->  - When using 3 TX channels we observe a timeout on TX queue 0. We have
->    made no real progress on this front in identifying the root cause.
-> 
-> For both of these topics help from someone more familiar with the hardware
-> would be greatly appreciated so that we can support these features rather
-> than disable them in the final driver version.
-> 
-> [1]: https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tree/?h=ti-linux-5.10.y
-> [2]: https://lore.kernel.org/netdev/20240221152421.112324-1-diogo.ivo@siemens.com/
-> 
-> Diogo Ivo (10):
->   dt-bindings: net: Add support for AM65x SR1.0 in ICSSG
->   eth: Move IPv4/IPv6 multicast address bases to their own symbols
->   net: ti: icssg-prueth: Move common functions into a separate file
->   net: ti: icssg-prueth: Add SR1.0-specific configuration bits
->   net: ti: icssg-prueth: Add SR1.0-specific description bits
->   net: ti: icssg-prueth: Adjust IPG configuration for SR1.0
->   net: ti: icssg-prueth: Adjust the number of TX channels for SR1.0
->   net: ti: icssg-prueth: Add functions to configure SR1.0 packet
->     classifier
->   net: ti: icssg-prueth: Modify common functions for SR1.0
->   net: ti: icssg-prueth: Add ICSSG Ethernet driver for AM65x SR1.0
->     platforms
-> 
->  .../bindings/net/ti,icssg-prueth.yaml         |   35 +-
->  drivers/net/ethernet/ti/Kconfig               |   15 +
->  drivers/net/ethernet/ti/Makefile              |    9 +
->  .../net/ethernet/ti/icssg/icssg_classifier.c  |  113 +-
->  drivers/net/ethernet/ti/icssg/icssg_common.c  | 1222 +++++++++++++++++
->  drivers/net/ethernet/ti/icssg/icssg_config.c  |   14 +-
->  drivers/net/ethernet/ti/icssg/icssg_config.h  |   56 +
->  drivers/net/ethernet/ti/icssg/icssg_ethtool.c |   10 +
->  drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 1189 +---------------
->  drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   79 +-
->  .../net/ethernet/ti/icssg/icssg_prueth_sr1.c  | 1171 ++++++++++++++++
->  include/linux/etherdevice.h                   |   12 +-
->  12 files changed, 2715 insertions(+), 1210 deletions(-)
->  create mode 100644 drivers/net/ethernet/ti/icssg/icssg_common.c
->  create mode 100644 drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
-> 
+Patch tested and work fine without any error.
+tested on latest 6.7.9 kernel=20
+m.
 
-This series doesn't break any existing functionality of ICSSG driver on
-AM654x SR2.0. The series looks ok to me.
+> On 12 Mar 2024, at 12:56, Paolo Abeni <pabeni@redhat.com> wrote:
+>=20
+> On Sat, 2024-03-09 at 20:31 +0200, William Tu wrote:
+>> Use rbi->len instead of rcd->len for non-dataring packet.
+>>=20
+>> Found issue:
+>>  XDP_WARN: xdp_update_frame_from_buff(line:278): Driver BUG: missing =
+reserved tailroom
+>>  WARNING: CPU: 0 PID: 0 at net/core/xdp.c:586 xdp_warn+0xf/0x20
+>>  CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W  O       6.5.1 #1
+>>  RIP: 0010:xdp_warn+0xf/0x20
+>>  ...
+>>  ? xdp_warn+0xf/0x20
+>>  xdp_do_redirect+0x15f/0x1c0
+>>  vmxnet3_run_xdp+0x17a/0x400 [vmxnet3]
+>>  vmxnet3_process_xdp+0xe4/0x760 [vmxnet3]
+>>  ? vmxnet3_tq_tx_complete.isra.0+0x21e/0x2c0 [vmxnet3]
+>>  vmxnet3_rq_rx_complete+0x7ad/0x1120 [vmxnet3]
+>>  vmxnet3_poll_rx_only+0x2d/0xa0 [vmxnet3]
+>>  __napi_poll+0x20/0x180
+>>  net_rx_action+0x177/0x390
+>>=20
+>> Reported-by: Martin Zaharinov <micron10@gmail.com>
+>> Tested-by: Martin Zaharinov <micron10@gmail.com>
+>> Link: =
+https://lore.kernel.org/netdev/74BF3CC8-2A3A-44FF-98C2-1E20F110A92E@gmail.=
+com/
+>> Fixes: 54f00cce1178 ("vmxnet3: Add XDP support.")
+>> Signed-off-by: William Tu <witu@nvidia.com>
+>> ---
+>> Note: this is a while ago in 2023, I forgot to send.
+>> =
+https://lore.kernel.org/netdev/74BF3CC8-2A3A-44FF-98C2-1E20F110A92E@gmail.=
+com/
+>=20
+> The patch LGTM, but you omitted a quite long list of relevant
+> recipients, added now. Let's wait a bit more for some feedback.
+>=20
+> Cheers,
+>=20
+> Paolo
 
-For this series,
-Reviewed-by: MD Danish Anwar <danishanwar@ti.com>
 
--- 
-Thanks and Regards,
-Danish
 
