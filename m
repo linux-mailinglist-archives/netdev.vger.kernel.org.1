@@ -1,60 +1,72 @@
-Return-Path: <netdev+bounces-79513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8759E879A7A
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 18:17:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AA93879A86
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 18:19:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B95C71C226E8
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 17:17:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EA9FB24C66
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 17:19:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA4F41384B4;
-	Tue, 12 Mar 2024 17:16:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB42138483;
+	Tue, 12 Mar 2024 17:19:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XRiwiPAF"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="Z0vu9EUV"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2BD51384AC;
-	Tue, 12 Mar 2024 17:16:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D980137C5A;
+	Tue, 12 Mar 2024 17:19:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710263810; cv=none; b=YoDug9bRdXFWwNZls/4TzWXE5neQ2rhQXUPFEK4FeEar9u41oIzfAoSPI0egLGG8jJ3/SxQDZzHzPt0njrkyCJSmxpAMwmBaa0DnT9yqG4YKHQ/BZfFn/ojwoUYf4443q58+x/niWKFv3t/6hGCAkombx8CW8fpUmkKySRlEUnE=
+	t=1710263945; cv=none; b=MqegrwEHXlmJAEXZao0hCz2GSPBw+zBWlhNrelDc4cSizGrnW00+LBuoJ912WGqWYxeQh9/NYEtAaKf7UYuQhNjI/faNrdq2ijppsEBJcJfgkSNtsvR4USareQ5/blS57aDVzG4A1X7VgmsulUCksHrliPT+yS2WsePu3A8OXQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710263810; c=relaxed/simple;
-	bh=aQeZaK+TULHgRWkvv2I+BpJx4y9OlHXVOYa9vHfBBy4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gvwInpcTYGYlYez6NlcE5Pwi/f8sNGPLyYzfreusnYPC2mQgYgjZmHp4rNEFe8/sri90XbeZtF6qIEIK1hZXWrlaSJBf8rr8NPSpn0eWevU2MlfJCbVsw/FOijLt0PX0wcT4JAnakJ47BaCGC2RmR13kUpe1dkwIemvrWvqp0cg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XRiwiPAF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85AA7C43399;
-	Tue, 12 Mar 2024 17:16:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710263810;
-	bh=aQeZaK+TULHgRWkvv2I+BpJx4y9OlHXVOYa9vHfBBy4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=XRiwiPAFaEGmafJCxxNLa1ivfAv5L1cEU+bXPOJhOxJ2AEqEok7LcfLwCHCcMrMpr
-	 3WSX2S1lnp3wGe/W60SopIDVr2IUXu8vIy5fOq5e/9q3PBzuOvPvnKTZ4u8zKJS4VI
-	 duhoG9v/4a6lz+AtB3iYSdRTrS9gLUcDeKW7ZGcBlBQnNSqUJxNfr06SWFS49kdu+8
-	 nsv4m830llErNUPM5km2Uvegj8tX2xgGD8PnZ0eC6fK1KTzJpbDKdSExtAuHMdPnb8
-	 AbPnOffsQXzer7x8Iux1SkXXDod8dhbgN5z1p3ZMw/Kx33PrVJm8mx5wfO1mA8nOT2
-	 Sjb4yxMdXOEig==
-Date: Tue, 12 Mar 2024 10:16:48 -0700
-From: Jakub Kicinski <kuba@kernel.org>
+	s=arc-20240116; t=1710263945; c=relaxed/simple;
+	bh=bp3DPapmLXS9Ig/m12t4o90H2TRiUcDtfkduFK1MMjQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=b2c+yKwkO8M0bIiNxR1Yt32sxBsisHbfJ+jL3/k287WRPBSKXff0RpoxKStMfQm4LvWFAddIIkzUk+5/10I7yEncNjX0Opz5bgz9eLhYs7r//XmICujg2DJ40a/Gbha/BqhvGe15TNe7uSRmu712yFIIJknuyWxBXfyUzaTCa08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=Z0vu9EUV; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Q3wlt+VAJLwYZMvvvsupUuGC/FaDNVJETwt8qAhUif0=; b=Z0vu9EUV9RylD3PZqkvmkGc6jL
+	dRHDaikwOZFuJ0VTPDAKAhUf7XFq9KEx0NijUIbcR02TiC09ZxWGR0xG+g9Tj8Tuz0rBAvwONr9/r
+	N+eFNQ5fbE+pOH5srUiYscLkIaiZYmIqbom5Xb+sT3Xzlm5ZsgFPrgdUxrkc9w/csuRloepqZLo/D
+	p+gbaZfy7gIctkJTm6uD45I+FZCItWiekuK6sxy1bC2PR13yuamBbaDjYzjkaFPnK3Ox4bnU4fxlk
+	8Voz3DRCYpF1i7TdpXpvlR3JVU6CPZVQv6sQCN0utzq4g9RpW4j51RsYQ9Lzo3A50XNJweFxrGjpB
+	j+efElHA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55750)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rk5lz-0006mM-25;
+	Tue, 12 Mar 2024 17:18:43 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rk5lv-0003ih-Ue; Tue, 12 Mar 2024 17:18:39 +0000
+Date: Tue, 12 Mar 2024 17:18:39 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
 To: Daniil Dulov <d.dulov@aladdin.ru>
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>, Broadcom internal
- kernel review list <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Doug Berger <opendmb@gmail.com>, Paolo Abeni
- <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Doug Berger <opendmb@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
 Subject: Re: [PATCH net-next] net: phy: mdio-bcm-unimac: Cast denominator to
  unsigned long to avoid overflow
-Message-ID: <20240312101648.14a23b5c@kernel.org>
-In-Reply-To: <20240312165358.7712-1-d.dulov@aladdin.ru>
+Message-ID: <ZfCOb4x/+41y+SW3@shell.armlinux.org.uk>
 References: <20240312165358.7712-1-d.dulov@aladdin.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,24 +74,25 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240312165358.7712-1-d.dulov@aladdin.ru>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, 12 Mar 2024 19:53:58 +0300 Daniil Dulov wrote:
+On Tue, Mar 12, 2024 at 07:53:58PM +0300, Daniil Dulov wrote:
 > The expression priv->clk_freq * 2 can lead to overflow that will cause
 > a division by zero. So, let's cast it to unsigned long to avoid it.
 
-## Form letter - net-next-closed
+How does casting this help? "unsigned long" can still be 32-bit.
+Maybe unimac_mdio_probe() should be validating the value it read from
+DT won't overflow? I suspect that a value of 2.1GHz is way too large
+for this property in any case.
 
-The merge window for v6.9 has begun and we have already posted our pull
-request. Therefore net-next is closed for new drivers, features, code
-refactoring and optimizations. We are currently accepting bug fixes only.
+https://en.wikipedia.org/wiki/Management_Data_Input/Output#Electrical_specification
 
-Please repost when net-next reopens after March 25th.
+(note, this driver is clause-22 only.)
 
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
 -- 
-pw-bot: defer
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
