@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-79450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F4A5879500
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 14:23:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B244879502
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 14:23:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CB29B23C6D
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 13:23:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB9981C21C1D
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 13:23:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 700CB7A707;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEAC47A71A;
 	Tue, 12 Mar 2024 13:22:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="NLIvukKn"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="dyiZTgoN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7997827711
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 13:22:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A11067A143
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 13:22:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710249777; cv=none; b=TvuxdabgwBouEiGxuPKPEq+0ysxRUgLwz2XgO3H9yKvo1o7J4wJm4NwVPjzkkJKH7gp8BrSrk/YDAbf6zIzoNTvWNKlzSTOSvLaGhQwVcbqxxcSe5EQ/Lxnt7CmT69SkBWemDdLqjMnECbLVeNB2skqnrkxB2EjCG2mzm0VEm+s=
+	t=1710249777; cv=none; b=kPBcU3gAW+cg/abj2rEXf74irwTJ4NLK6tK8boiy2vCQxhFzttQ3diHv514m9qwuFkEH0Avpep4WNoS0BDhDyCttXaqQUoE7054dfLn94wuVrXvDroGrXJ0SMsJvOF6TkkxhJrzvsHR+RwFjXZKl0CAU1x6ooUBLblUpbep9MZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1710249777; c=relaxed/simple;
-	bh=wqQe2DJZDzzMYImWv6Ki1IImWaVqSXITlgGJEpik5FA=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=nL1r+tIFilUQMckGIe5ZreGQPPE2QQv4bARBkDZNAhIhGAUtTkBA3j5hqQB9z/isf+Hi2ZZE+T9kvg4ygvn1GwLu7as4IM8v/lKscoivU/wCnODB7FW8+XjJ43QGw9mYrlC4obZton/0GO4sJLGKf9+pBBRhDcbdmt+l/Vhr810=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=NLIvukKn; arc=none smtp.client-ip=209.85.128.51
+	bh=jlmDA8j5BPsGTQCQEi11/ZrPzSbTV7KDqXuvMXnrWBo=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=ZY8MolGZf72ZtZpopGCt7f58dE+4RkZ63DChRKO3cluaQFvUwVIxls3j/vu1qjLz/w4wEMr8t2WypIZ0Ovjz4dI7uVazMw/vyJYgsCCFfMAx536hjA9gPIwRMcC5axkUZyOvdgfhdJElEabkfhw7poj6JzClOM9Nj24Ubau4IhA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=dyiZTgoN; arc=none smtp.client-ip=209.85.128.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-412e784060cso38500475e9.1
-        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 06:22:54 -0700 (PDT)
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4132cc37e21so11860225e9.0
+        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 06:22:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1710249773; x=1710854573; darn=vger.kernel.org;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=XguyOTPW8SaIMkmqZ21Rgli3joUrKCpC0w2AVoDmBo8=;
-        b=NLIvukKnWo9W/tbwGD7lUP9O/LitrDMHKSjR1ch+NCQPgcLUu9JzwwH3g/7Vgjhnph
-         Q8rgs9YOvwsUuPH40z/40bayig7VzDuz9EJHwd+D1q3i4CteHW2njkfmHk9vZB/lagt8
-         5ZG0Vf6A7tZazTE610SPOxSeONLOURHaQOQUf5E1DQETICI9ayGHNbK0QIIeKSo5Wbtx
-         J2VpEp5VnAPjiirfpEM88uFn086UOENevm+HM2OmOR3gek1jDiHrXT93mrwpxOOIxToL
-         vxVMufdNur1bb+7BfRRWVjEz+tjAwcNbXmqss5UfmZVC7KSwhiaA3kUdeK3yrtvZBafq
-         gRLg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710249773; x=1710854573;
-        h=cc:to:content-transfer-encoding:mime-version:message-id:date
-         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1710249774; x=1710854574; darn=vger.kernel.org;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=XguyOTPW8SaIMkmqZ21Rgli3joUrKCpC0w2AVoDmBo8=;
-        b=SSv5N7P6P22O8PV6tLC57IXerYbU37pEWupXS3l6WMR+y0AqYFbtzpHa2pTFNjZNJW
-         NY6fJ5ORo19c/SbnsqBNN24dpNALYbPrT+uMFgYWj4hOCkqzPu0ZvZ8IVrAG5wB5BMct
-         OQv8Nma2GxJY1d0RMHmhQlhQvimd3kyQoMzCWV6xg2gSTm8YLIQZPXDfBSGd2NU75QQA
-         r2SVjRLoDQU3h7I/4sGPgUrppMMme+qv2Q9na3pPlOW4Huyb87mIMVQmrhixERKrvrYQ
-         vQB/UmVYWqWQfkZwt8MR4HJ1MSlknwMiZXdyvO2qmdW149/dxFyGWe+uocD7jcIoULtm
-         CMrw==
-X-Gm-Message-State: AOJu0Yz30tOVyWmI1+bC2YsafBlVosbk7RLKvVg31xHlEta3hp8Bn1zo
-	mxUgR7vr1xavL/ByElKA0ALjka8blIim6h5zkdmJBKITmKJDrnu5+oIF5kqHkfo=
-X-Google-Smtp-Source: AGHT+IEFEOnsskmi8fJKjEHWQFqnqg32ZRzKau2ZUnrv1se7UxcgZ+VfM9jul+nu6p2zo1WC/Cdhcg==
-X-Received: by 2002:adf:a38c:0:b0:33e:5970:e045 with SMTP id l12-20020adfa38c000000b0033e5970e045mr8556122wrb.21.1710249772871;
-        Tue, 12 Mar 2024 06:22:52 -0700 (PDT)
+        bh=qEaZoF9mx7Xkycbcd21LmA2/00TCeHKVbh1e2Dzr7Vc=;
+        b=dyiZTgoN45XsRfXvpv4SfJR59VJUf+jjoF0z6RvIpSxgMafbhMT0cos+2ItXOOfF4l
+         Td9QSk/XXkQu+cy31AmUwgAuJSFNIMeAaoSzH2tVMxlZ0FtsdzLzsYh9cx8+/QcJckRa
+         DZakH0bEiYkAStBsKigpN2maloFb2/luF5qN4dk1sK2E96pkNZGElD0BkkDBMvHGcQuB
+         RWGsaZtJIgEKhgv+KzVJ2WA27oT6DOvjmxtjfg+tIjX/ltj/D1UySqf4hDTOZ69zU63J
+         EeG6arvg9P7yuO8aPac9lzcaAp0gqAQ64icD+qvo81jRsXMTVh5lri7sDyX1XESUo0sU
+         wBIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710249774; x=1710854574;
+        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
+         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qEaZoF9mx7Xkycbcd21LmA2/00TCeHKVbh1e2Dzr7Vc=;
+        b=LPu3c/ykOz53x6C7EbDyBV8eidn0NNIDTrzxaPCSnnD8mwfbou/6uao/gODoGK7INd
+         N0Ehy181S/8qQjQ9DWQ3RR80QoDAkLuJoxT636up907C5L1HMOBf3DTnmZzWHHS9Y5sN
+         SntVbVYaSC6eg/athjShXlWQJZxgVr27/9rKq7oR2u7LS3C1Uf/hAb0DbbFTuKvrTkyj
+         1eDy2fCdJx6is5MjXNbyXw4NftIK1+38c16srBPS4dKVT2PouFDLlpaAkzYdi0QMisuv
+         RsDgMd1WWy2tzpekBrOkChe+NqEQibBNQOXvJ0sissNxW6NboiW86frZsZiVJFAYBjWv
+         0jug==
+X-Gm-Message-State: AOJu0YwXUxkYSZZLLSieOI1hi6mm76pybIjHwM/pGf/0yBFR5hGYXfoA
+	r4P6hB9kaRGKwguPndkbW8D6CjKc4W8/JJmJhNQZJnZ3s/NbFTtiINPG0Ck1eMg=
+X-Google-Smtp-Source: AGHT+IHlytHdEXscr/W+dSAr2nTXoxgxrjyAq7hvZ/powmwJ49KYk2NF7VEmNWzayQm3bD8Elvc57g==
+X-Received: by 2002:a05:600c:458c:b0:413:2c3e:c323 with SMTP id r12-20020a05600c458c00b004132c3ec323mr3370255wmo.38.1710249773976;
+        Tue, 12 Mar 2024 06:22:53 -0700 (PDT)
 Received: from [127.0.1.1] (laubervilliers-657-1-248-155.w90-24.abo.wanadoo.fr. [90.24.137.155])
-        by smtp.gmail.com with ESMTPSA id r13-20020adff10d000000b0033b278cf5fesm8980167wro.102.2024.03.12.06.22.51
+        by smtp.gmail.com with ESMTPSA id r13-20020adff10d000000b0033b278cf5fesm8980167wro.102.2024.03.12.06.22.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Mar 2024 06:22:52 -0700 (PDT)
+        Tue, 12 Mar 2024 06:22:53 -0700 (PDT)
 From: Julien Panis <jpanis@baylibre.com>
-Subject: [PATCH v4 0/3] Add minimal XDP support to TI AM65 CPSW Ethernet
- driver
-Date: Tue, 12 Mar 2024 14:22:39 +0100
-Message-Id: <20240223-am65-cpsw-xdp-basic-v4-0-38361a63a48b@baylibre.com>
+Date: Tue, 12 Mar 2024 14:22:40 +0100
+Subject: [PATCH v4 1/3] net: ethernet: ti: Add accessors for struct
+ k3_cppi_desc_pool members
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,11 +78,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAB9X8GUC/42OwW7CMBBEfwX53AXbcSKHU/+jQmjXNmQr4kQ2c
- kEo/16HI6oqjjOaeTMPkUPikMV+8xApFM48xSrMx0a4AeM5APuqhZbaSK0bwLFrwc35B25+BsL
- MDownq20rLRkrarO6AShhdMPa/Z4xct7V/HFEjheO4VjkGpxTOPHtOf91qHrgfJ3S/fmmqNX9f
- 7goUNCfJHWOPDZKfhLeL0wpbN00ihVZ9BsYDRKkcp1DdEjU/YFp3sA0FdP63hjsvTX4+mZZll9
- hpGJ2cAEAAA==
+Message-Id: <20240223-am65-cpsw-xdp-basic-v4-1-38361a63a48b@baylibre.com>
+References: <20240223-am65-cpsw-xdp-basic-v4-0-38361a63a48b@baylibre.com>
+In-Reply-To: <20240223-am65-cpsw-xdp-basic-v4-0-38361a63a48b@baylibre.com>
 To: "David S. Miller" <davem@davemloft.net>, 
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
  Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, 
@@ -96,61 +95,59 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
  Julien Panis <jpanis@baylibre.com>
 X-Mailer: b4 0.12.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1710249771; l=2133;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1710249771; l=1852;
  i=jpanis@baylibre.com; s=20230526; h=from:subject:message-id;
- bh=wqQe2DJZDzzMYImWv6Ki1IImWaVqSXITlgGJEpik5FA=;
- b=HmUezjz9lmpONlJhbBP6IRegsF/dgO1FNHWsEtwF4sZ1ZCh/yXfBCwi9V5pCb3ZDGJ4JUJx8N
- gPsTooMTbBtD/k6ajbTUJNmWqxhKmfSLPAn8IeIi5FZnZWjDyzW2E9r
+ bh=jlmDA8j5BPsGTQCQEi11/ZrPzSbTV7KDqXuvMXnrWBo=;
+ b=Hv8qFAJaCv6kB2joBPWZNghBiio/tb9H7gUNxrjl4zJ1hbySQ4ZrUI17WPbsgLUJJGcO8W8rA
+ 8wJzf0mor2KBFT1SmQ6ACzZMR0wREU/bfp6sf0fRwAbqrnAk9um/rP2
 X-Developer-Key: i=jpanis@baylibre.com; a=ed25519;
  pk=8eSM4/xkiHWz2M1Cw1U3m2/YfPbsUdEJPCWY3Mh9ekQ=
 
-This patch adds XDP support to TI AM65 CPSW Ethernet driver.
-
-The following features are implemented: NETDEV_XDP_ACT_BASIC,
-NETDEV_XDP_ACT_REDIRECT, and NETDEV_XDP_ACT_NDO_XMIT.
-
-Zero-copy and non-linear XDP buffer supports are NOT implemented.
-
-Besides, the page pool memory model is used to get better performance.
+This patch adds accessors for desc_size and cpumem members. They may be
+used, for instance, to compute a descriptor index.
 
 Signed-off-by: Julien Panis <jpanis@baylibre.com>
 ---
-Changes in v4:
-- Add skb_mark_for_recycle() in am65_cpsw_nuss_rx_packets() function.
-- Specify napi page pool parameter in am65_cpsw_create_xdp_rxqs() function.
-- Add benchmark numbers (with VS without page pool) in the commit description.
-- Add xdp_do_flush() in am65_cpsw_run_xdp() function for XDP_REDIRECT case.
-- Link to v3: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v3-0-5d944a9d84a0@baylibre.com
+ drivers/net/ethernet/ti/k3-cppi-desc-pool.c | 12 ++++++++++++
+ drivers/net/ethernet/ti/k3-cppi-desc-pool.h |  2 ++
+ 2 files changed, 14 insertions(+)
 
-Changes in v3:
-- Fix a potential issue with TX buffer type, which is now set for each buffer.
-- Link to v2: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v2-0-01c6caacabb6@baylibre.com
+diff --git a/drivers/net/ethernet/ti/k3-cppi-desc-pool.c b/drivers/net/ethernet/ti/k3-cppi-desc-pool.c
+index 05cc7aab1ec8..fe8203c05731 100644
+--- a/drivers/net/ethernet/ti/k3-cppi-desc-pool.c
++++ b/drivers/net/ethernet/ti/k3-cppi-desc-pool.c
+@@ -132,5 +132,17 @@ size_t k3_cppi_desc_pool_avail(struct k3_cppi_desc_pool *pool)
+ }
+ EXPORT_SYMBOL_GPL(k3_cppi_desc_pool_avail);
+ 
++size_t k3_cppi_desc_pool_desc_size(struct k3_cppi_desc_pool *pool)
++{
++	return pool->desc_size;
++}
++EXPORT_SYMBOL_GPL(k3_cppi_desc_pool_desc_size);
++
++void *k3_cppi_desc_pool_cpuaddr(struct k3_cppi_desc_pool *pool)
++{
++	return pool->cpumem;
++}
++EXPORT_SYMBOL_GPL(k3_cppi_desc_pool_cpuaddr);
++
+ MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("TI K3 CPPI5 descriptors pool API");
+diff --git a/drivers/net/ethernet/ti/k3-cppi-desc-pool.h b/drivers/net/ethernet/ti/k3-cppi-desc-pool.h
+index a7e3fa5e7b62..149d5579a5e2 100644
+--- a/drivers/net/ethernet/ti/k3-cppi-desc-pool.h
++++ b/drivers/net/ethernet/ti/k3-cppi-desc-pool.h
+@@ -26,5 +26,7 @@ k3_cppi_desc_pool_dma2virt(struct k3_cppi_desc_pool *pool, dma_addr_t dma);
+ void *k3_cppi_desc_pool_alloc(struct k3_cppi_desc_pool *pool);
+ void k3_cppi_desc_pool_free(struct k3_cppi_desc_pool *pool, void *addr);
+ size_t k3_cppi_desc_pool_avail(struct k3_cppi_desc_pool *pool);
++size_t k3_cppi_desc_pool_desc_size(struct k3_cppi_desc_pool *pool);
++void *k3_cppi_desc_pool_cpuaddr(struct k3_cppi_desc_pool *pool);
+ 
+ #endif /* K3_CPPI_DESC_POOL_H_ */
 
-Changes in v2:
-- Use page pool memory model instead of MEM_TYPE_PAGE_ORDER0.
-- In am65_cpsw_alloc_skb(), release reference on the page pool page
-in case of error returned by build_skb().
-- [nit] Cleanup am65_cpsw_nuss_common_open/stop() functions.
-- [nit] Arrange local variables in reverse xmas tree order.
-- Link to v1: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v1-1-9f0b6cbda310@baylibre.com
-
----
-Julien Panis (3):
-      net: ethernet: ti: Add accessors for struct k3_cppi_desc_pool members
-      net: ethernet: ti: Add desc_infos member to struct k3_cppi_desc_pool
-      net: ethernet: ti: am65-cpsw: Add minimal XDP support
-
- drivers/net/ethernet/ti/am65-cpsw-nuss.c    | 536 +++++++++++++++++++++++++---
- drivers/net/ethernet/ti/am65-cpsw-nuss.h    |  13 +
- drivers/net/ethernet/ti/k3-cppi-desc-pool.c |  36 ++
- drivers/net/ethernet/ti/k3-cppi-desc-pool.h |   4 +
- 4 files changed, 539 insertions(+), 50 deletions(-)
----
-base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
-change-id: 20240223-am65-cpsw-xdp-basic-4db828508b48
-
-Best regards,
 -- 
-Julien Panis <jpanis@baylibre.com>
+2.37.3
 
 
