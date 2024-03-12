@@ -1,123 +1,168 @@
-Return-Path: <netdev+bounces-79536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC70F879D88
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 22:35:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 67C9F879D92
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 22:40:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE1A71C20F86
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 21:35:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAE842833BF
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 21:40:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F1FB143737;
-	Tue, 12 Mar 2024 21:35:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A97A143C46;
+	Tue, 12 Mar 2024 21:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b="hcsknrZP"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="j+n4Me0M"
 X-Original-To: netdev@vger.kernel.org
-Received: from taslin.fdn.fr (taslin.fdn.fr [80.67.169.77])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4938D143733
-	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 21:34:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.67.169.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E87143728
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 21:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710279302; cv=none; b=Ev9fNsUargS3up62WGmiyPBeoM41AcL6CW8y3NKBNMp7vd3SNHejm1psUl23a4rHo/W7mP5QfVUdmwDTIERttPVjDlT0B5q3nZFsXb2orM0/r9tWXVl6YiaGSHaF7UayQ6dLpS/i3gBVXFJbsR5lv1O85/Gulsg83LnAFHRa6eA=
+	t=1710279613; cv=none; b=kl9dcRzUW2ZH/73bTnagpYu3Te4gDyYbaDTmoNHRYsd6Wc490KvtNfuX93K8vvhe1dYPG7VFm4FwzDhKsJ6hE7ydKWGjfjkL+SqtfmfAxute9+wyI/9my/gCGW6UntZcnPRVerq1VmnTg4sZuvZVLaXnKl0olJUBJ/o1kKCoyzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710279302; c=relaxed/simple;
-	bh=O5Xdh11NPiLII661A1yUwjIQCPL9DVeG8jST4oezlGs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=L0/UjI5hggDEBKi3oSUDxMfTCRtbXNa1xPsUXISmw6pYEnld5n4N+J5indS4rh+0kpVVro0+ZYgjEl3ZxTX7sNnR9jTMmlA/ovTuTRmGTBDn3IsuBUJGQQh2YhDMQN8FNggQoLaap/0O0gOw5wI4c0HClcOxdoCxZnyftkzyakM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name; spf=pass smtp.mailfrom=max.gautier.name; dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b=hcsknrZP; arc=none smtp.client-ip=80.67.169.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=max.gautier.name
-Received: from localhost (reverse-238.fdn.fr [80.67.176.238])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by taslin.fdn.fr (Postfix) with ESMTPSA id 0596C6023D;
-	Tue, 12 Mar 2024 22:34:49 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=max.gautier.name;
-	s=fdn; t=1710279290;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TlSkheADaLDcsz6/Z7dUa1gCytkS4OjR6tZU4w7KpqU=;
-	b=hcsknrZP4RK4Q6APAQeVVt6ZDNLIsxgrWk7nard+g8I5MXVrpLG2fxwTGKZSnN3Mbz82CU
-	zaQ+fSO6xnwnlNBd7VdnOFDtG4cvmDBcdoJEw9odWx+8HT3wraikH3tKS+gBa/u9pev4SQ
-	e08fLoSZSTufnKpNuHO0WJcnxlOkXe7TOCTityyc0IGu+cVneBgz0F2ypeUKb4jWIPRR/9
-	Qwv7jUnyQU3oUaZfpyI2TgPyGuSvOlrBDZxaRgjfOuCcP4hKvauJ7YUkxD3Lyh68QI7GHS
-	Eg1l9Qpj9F7j0btq7yXgYqC0SFAq3Qn4SBoAAhIvO3pRKExYh72kxCWNLpAseg==
-Date: Tue, 12 Mar 2024 22:34:59 +0100
-From: Max Gautier <mg@max.gautier.name>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2-next] Makefile: use systemd-tmpfiles to create
- /var/lib/arpd
-Message-ID: <ZfDKg3uKqy3T7BW5@framework>
-References: <20240311165803.62431-1-mg@max.gautier.name>
- <20240311124003.583053a6@hermes.local>
- <Ze-Fj2RwYnM0WgWi@framework>
- <20240311183007.4a119eeb@hermes.local>
- <ZfAQvGTYe7eBcY3e@framework>
- <20240312142420.53e35ab4@hermes.local>
+	s=arc-20240116; t=1710279613; c=relaxed/simple;
+	bh=+oBn997uJy8z3i7Q2nllLFrjuAE+yfb7uicD9sTksS4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O7OFIf98qf9RqdjFAl7aaTQM2tYtiUc8ZBLDZH60MQO3Gk/+hEy7uw2ZD1g4IUEOdDhPNglJqp7iihNRBM6w1dUwCTzh38IsmpqWOVlhE3hJJq9TIU3WlRZ8WeSVlLvR6o2qsLm8cTx5Sg0c6Yb1vJNrxNu0lEBZshsUdBIas8Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=j+n4Me0M; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1dd6dbcc622so15095315ad.1
+        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 14:40:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710279610; x=1710884410; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=13av1ABYbiDWPdHc/R8lHWJKgGvE+CGOg+xLBagHaA0=;
+        b=j+n4Me0Mj8GkIVow7fO085ckPWgxKscTmbxh8OP9y+9WxUZwqYyoAd7vmmzxzf1bR3
+         M2ax98fIgA0dRR7Mg1XklfDNoZdMn3j1xLuvgehkrjv2spL8Dwcwipr80l8UcAXBRW7m
+         6oUvMAY6sThSMK4bwd/WtMzf4aGGV3pg3G5XxdAbF6+Os2BlFJvBGoKw7ofL78AcOd3P
+         nuN/IS7w+Ka0shlR1/ktrJHPD9U7U7jnTifnNYqBL0POomQ2QRcTyzJbi3sFTYSBOXF9
+         ygJpVL/u8HCbIMxO1iUNKMtbYPlJmIUHzLf6bphNeD0IGoPge1wJWfoQ7fxOv7OCk0aG
+         m+Ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710279610; x=1710884410;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=13av1ABYbiDWPdHc/R8lHWJKgGvE+CGOg+xLBagHaA0=;
+        b=H2YHlSKuNKQpNHoujjqKVvuREQfWIBaF0SIuQAJeSw2P5onziYa4JYEYyol5rGLyu8
+         2TXgrRvjMD27NRXX8QfAxiHRQRMKPfZxJov1JUbth/2KTiUNsjKQlp2vfHFdzq0BgMYP
+         uq+yxUcvArR7/usJJGqkjLJDwBfxIVNQEStJLCpp9lXdz3Rx+cyekT7q3C4JmX50iKwb
+         OMFJHnLN97QFudK9YcwXWsu8TrbFvL8PZ0ULSp6k1wMRjm8ierCSco8KGL/75WCNZmKT
+         YuKr+iHOJZU+v5KDr5CSXBa7jo2WKhWGnmUJvka33rXpK2a/aeJVBkLpcEnMDFmF5Fj0
+         7+4A==
+X-Forwarded-Encrypted: i=1; AJvYcCWQ+ySP0ICl+v57N/TzWp0vGxKLOoZWS6fKYdFU0B8m2EaFp6mgrzWaNjeCE1+6DoTyjXNbMx2IeG4EdMD5Dvd1kiNmncjW
+X-Gm-Message-State: AOJu0YxLFWJRuSaUXQqdVr4+gQgQuJI2RNvi62Yz4L9XcMDxFzwPio5P
+	O3GB0aM1XgESMrQuFeP6Z/rO2Bn4YfA80u0uZltit8zSQmzldvBtO5Bh+LUfwmc=
+X-Google-Smtp-Source: AGHT+IGdYi2xZX0kb/ozpi6PxI13btmek8Z08XjtS6L9vyMY2hkWQRaJtCAcvjr2u6yGZr5py/o1qQ==
+X-Received: by 2002:a17:902:ac96:b0:1dd:67ce:4a09 with SMTP id h22-20020a170902ac9600b001dd67ce4a09mr11971479plr.0.1710279609732;
+        Tue, 12 Mar 2024 14:40:09 -0700 (PDT)
+Received: from [192.168.1.150] ([198.8.77.194])
+        by smtp.gmail.com with ESMTPSA id g6-20020a1709026b4600b001dd79b9b5c7sm7066176plt.161.2024.03.12.14.40.08
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Mar 2024 14:40:09 -0700 (PDT)
+Message-ID: <39c3c4dc-d852-40b3-a662-6202c5422acf@kernel.dk>
+Date: Tue, 12 Mar 2024 15:40:07 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240312142420.53e35ab4@hermes.local>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [GIT PULL] Networking for v6.9
+Content-Language: en-US
+To: Linus Torvalds <torvalds@linux-foundation.org>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Johannes Thumshirn <johannes.thumshirn@wdc.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, pabeni@redhat.com, bpf@vger.kernel.org,
+ Tejun Heo <tj@kernel.org>
+References: <20240312042504.1835743-1-kuba@kernel.org>
+ <CAHk-=wgknyB6yR+X50rBYDyTnpcU4MukJ2iQ5mQQf+Xzm9N9Dw@mail.gmail.com>
+ <20240312133427.1a744844@kernel.org> <20240312134739.248e6bd3@kernel.org>
+ <CAHk-=wiOaBLqarS2uFhM1YdwOvCX4CZaWkeyNDY1zONpbYw2ig@mail.gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <CAHk-=wiOaBLqarS2uFhM1YdwOvCX4CZaWkeyNDY1zONpbYw2ig@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 12, 2024 at 02:24:20PM -0700, Stephen Hemminger wrote:
-> On Tue, 12 Mar 2024 09:22:20 +0100
-> Max Gautier <mg@max.gautier.name> wrote:
+On 3/12/24 3:11 PM, Linus Torvalds wrote:
+> On Tue, 12 Mar 2024 at 13:47, Jakub Kicinski <kuba@kernel.org> wrote:
+>>
+>> With your tree as of 65d287c7eb1d it gets to prompt but dies soon after
+>> when prod services kick in (dunno what rpm Kdump does but says iocost
+>> so adding Tejun):
 > 
-> > On Mon, Mar 11, 2024 at 06:30:07PM -0700, Stephen Hemminger wrote:
-> > > On Mon, 11 Mar 2024 23:28:31 +0100
-> > > Max Gautier <mg@max.gautier.name> wrote:
-> > >   
-> > > > On Mon, Mar 11, 2024 at 12:40:03PM -0700, Stephen Hemminger wrote:  
-> > > > > On Mon, 11 Mar 2024 17:57:27 +0100
-> > > > > Max Gautier <mg@max.gautier.name> wrote:
-> > > > >     
-> > > > > > Only apply on systemd systems (detected in the configure script).
-> > > > > > The motivation is to build distributions packages without /var to go
-> > > > > > towards stateless systems, see link below (TL;DR: provisionning anything
-> > > > > > outside of /usr on boot).
-> > > > > > 
-> > > > > > The feature flag can be overridden on make invocation:
-> > > > > > `make USE_TMPFILES_D=n DESTDIR=<install_loc> install`
-> > > > > > 
-> > > > > > Links: https://0pointer.net/blog/projects/stateless.html    
-> > > > > 
-> > > > > Why does arpd need such hand holding, it is rarely used, maybe should just not be built.    
-> > > > 
-> > > > The commit introducing the install of that directory is quite old  
-> > > 
-> > > The problem is that build environment != runtime environment for embedded systems.  
-> > 
-> > That's the same for anything detected by the configure script, right ?
-> > Hence the override capability.
+> Both of your traces are timers that seem to either lock up in ioc_now():
 > 
-> Configure is mostly about what packages are missing from the build.
-> It would be better if arpd was just smarter about where to put its
-> file.
+>    https://lore.kernel.org/all/20240312133427.1a744844@kernel.org/
+> 
+> and now it looks like ioc_timer_fn():
+> 
+>   https://lore.kernel.org/all/20240312134739.248e6bd3@kernel.org/
+> 
+> But in neither case does it actually look like it's a lockup on a *lock*.
+> 
+> IOW, the NMI isn't happening on some spin_lock sequence or anything like that.
+> 
+> Yes, ioc_now() could have been looping on the seq read-lock if the
+> sequence number was odd. But the writers do seem to be done with
+> interrupts disabled, plus then you wouldn't have this lockup in
+> ioc_timer_fn, so it's probably not that.
+> 
+> And yes, ioc_timer_fn() does take locks, but again, that doesn't seem
+> to be where it is hanging.
+> 
+> So it smells like it's an endless loop in ioc_timer_fn() to me, or
+> perhaps retriggering the timer itself infinitely.
+> 
+> Which would then explain both of those traces (that endless loop would
+> call ioc_now() as part of it).
+> 
+> The blk-iocost.c code itself hasn't changed, but the timer code has
+> gone through big changes.
+> 
+> That said, there's a more blk-related change: da4c8c3d0975 ("block:
+> cache current nsec time in struct blk_plug").
+> 
+> *And* your second dump is from that
+> 
+>         period_vtime = now.vnow - ioc->period_at_vtime;
+>         if (WARN_ON_ONCE(!period_vtime)) {
+> 
+> so it smells like the blk-iocost code is just completely confused by
+> the time caching. Jens?
+> 
+> Jakub, it might be worth seeing if just reverting that commit
+> da4c8c3d0975 makes the problem go away. Otherwise a bisect might be
+> needed...
 
-What do you mean by smarter ? Trying to found an existing directory
-rather than a fixed one ?
+Hmm, I wonder if the below will fix it. At least from the timer side,
+we should not be using the cached clock.
 
-> 
-> > 
-> > > But arpd really is legacy/dead/rotting code at this point.  
-> > 
-> > Yeah I can see that, not touched since 2016 (mostly). You would rather
-> > just drop it ?
-> > 
-> 
+
+diff --git a/block/blk-iocost.c b/block/blk-iocost.c
+index 9a85bfbbc45a..646b50e1c914 100644
+--- a/block/blk-iocost.c
++++ b/block/blk-iocost.c
+@@ -1044,7 +1044,7 @@ static void ioc_now(struct ioc *ioc, struct ioc_now *now)
+ 	unsigned seq;
+ 	u64 vrate;
+ 
+-	now->now_ns = blk_time_get_ns();
++	now->now_ns = ktime_get_ns();
+ 	now->now = ktime_to_us(now->now_ns);
+ 	vrate = atomic64_read(&ioc->vtime_rate);
+ 
 
 -- 
-Max Gautier
+Jens Axboe
+
 
