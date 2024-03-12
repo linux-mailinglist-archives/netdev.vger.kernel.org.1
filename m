@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-79403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38277879114
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 10:40:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AB41879146
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 10:47:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69EAD1C20B20
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 09:40:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CC901C21282
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 09:47:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D56E78264;
-	Tue, 12 Mar 2024 09:40:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1176E79B7B;
+	Tue, 12 Mar 2024 09:43:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hQDHc8T6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Zj+Zw/g1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C980E77F2F;
-	Tue, 12 Mar 2024 09:40:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 411A479B6D;
+	Tue, 12 Mar 2024 09:43:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710236442; cv=none; b=FmbseeIJ7a0ZrpX3u7Nd9mhdhPbxpeS4fRjz2ro+1D0nVwIU/0iIaQ9uSv3EnwGKnibgjTrQpvQFo+zv7sI34dBHjA9OmfbxhnEFbnquU96BY1mn49wTYS8c3CslC8/XIPYU6b3SPSF2nneBEDVDUPC1nSQqpmQbypi+VamDOwM=
+	t=1710236595; cv=none; b=tIQdgDQ0+x7BfGUFIlLbtUElcF+z+9aQYfHQboXe9DLmFFsukl3Ybmv5n0DGpvbO+YxWf9vjFko4DFgBhb46reIBSYBWvSGrsjBZQlC5y7qoHwbq5462OaHAvzCn5PlBAwDv0PowYWQnmz4jfHbYXVdWderRlm3gXJ4A8mtgNi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710236442; c=relaxed/simple;
-	bh=tmePU1iEUeptB/usXESyaF9rgBcN4g4YCoYahzxHmIs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=HlryOA4jbPj9A2hYSsFZzVKIhLz5fMKoSApC6QbkflbMImZYQbhILu9ChnYc5/Xd10F9C91vpiThyS5wKgtFOlKzrYgM3Qusj+eSku/1jNLQWaM+CoKxn6LCeDxd+QLTi+COm4HAmGiAi2WeD6C/X5fQuPkFI2hokLCOb98m6xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hQDHc8T6; arc=none smtp.client-ip=209.85.208.181
+	s=arc-20240116; t=1710236595; c=relaxed/simple;
+	bh=OFg+gCBlE1ZCLP+REg//gFqNi/VsWKx1JrATPBH90IU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k+PgEhAs2ZSD9d4Ngqy8Nb2iq0y7VnYHKFnNJo5a0GncJRBINzd+4s6IdxG50ghr2n365l7UeElWlJjHq8+weh9CjFBFdSU4vXPJ1pdUblYbi4vq4U4g2c8aQOAzbnY1hFtpRSNeSBYemeEmExheKql0+HREKRfYRUSAFHurgXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Zj+Zw/g1; arc=none smtp.client-ip=209.85.128.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2d26227d508so80419541fa.2;
-        Tue, 12 Mar 2024 02:40:40 -0700 (PDT)
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-41330d48a29so6371385e9.3;
+        Tue, 12 Mar 2024 02:43:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710236439; x=1710841239; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1710236591; x=1710841391; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=B9fbTW88c5dd+uJ3t+O23Zk0Rd2E0M+rmOigqz72HeI=;
-        b=hQDHc8T6GrHQKyaE43cFy+nXwSzBAoterJVXXC8d4XzrC1TtI9tGhn4g0NUD9spuQC
-         MdsChiCwSEK6cCd4N+uBV5ewqfrF0GMoTS6qTUoQHOmuXNWv5MiStHesIFWlUM+jBEZH
-         5yJKB00qM7QU1O1+NQLcNXwrMQ7n9o9HRxCiRCIZThTCbbnte+MTMhD6X5IwjU/CqMLf
-         sSAsypw7lV+KsnAHsuDQk+xmVIqffWJJmrFMQO9rAE0D2BPtDbbMKy3ctn8PKBxNPUDI
-         vTuSjvRxaCxr/NVnwJTiOEqibaNPD/lMkVZQnSJY+lt8VCqb4DmRZuXHezn2+6ETg81o
-         KfzQ==
+        bh=uoqfNTOher8F7aZMvhGDS1s31WUJBL1ec+Cnak2BGb8=;
+        b=Zj+Zw/g13VRBlNf4IULwzDoREvsX3xSdzhH1CQqsdPE24JQvNSDpMjhQBEqHtFH1Rq
+         UGaU3yLb/9cqZVL0bIwk5Nl6bVLmIDQbppNZLnuHuAnKEBrw3hNfoZRQp5GqryrA5tkz
+         L8H4pN7cCwDrNnu7zKbpte+uxrVr7pBV69r0IziEH2varowtB7TD3FtVSbWyuIMzVBWJ
+         sUXE/xv/gFJ9j+8UH4OlGunrH37GzEXD3XoKyvDdn8yqfdjh0SGWD0Ke7TZL0F+QfZts
+         npk0sjmmke+MYuAu5WBcgEZlrK6ClgPdXXqnoFCP0EZziMJgiDjVWAUywxGz92inOnh7
+         gFuw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710236439; x=1710841239;
+        d=1e100.net; s=20230601; t=1710236591; x=1710841391;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=B9fbTW88c5dd+uJ3t+O23Zk0Rd2E0M+rmOigqz72HeI=;
-        b=FuaJchLJlQS3QBAsSrHb9R3r8eJjKizE7b/UqUHUZNRaoFQoGAdCO+zBRCi9hOkF3R
-         USMqyb82fHM4POI3Yz3vtNU10oNyBgISu0CYhzthLxFBLFZaeQF0ZZ4MOAOZAsR6E6Mi
-         t8iI7TkmQCZNMZqssA/GcwGZrqY0tN8RsyZMfo9Z10MuWnlUznzrgAhtt4Li3Tb4g3b3
-         SCESEeHzJ8LdHai5oi/zI/2lKTe62GrJXhnISRa8hfDdAF47FWA8fg8DMSeReeDG4DzY
-         v+t5J7wLDRTEWzknDKmgS9+hafonEgckSD7cwnkz64tj0h4AxvRww97J4rp9VkG6Nxrd
-         CYzA==
-X-Forwarded-Encrypted: i=1; AJvYcCVdbTb5Hxw0NDYNyVlukyQFlfUy+uvIT+NbElwvTB78iQWV2OzxjUmA2GnLRFdzEJIEdaeoMcLIbxuaISMjXCNjEdxAuLQXri0R0elDq3W5GqSTEaWOTp+f0Zneg749AWTi8JnV
-X-Gm-Message-State: AOJu0YzN3pqR9UkiK/uKfp99qnUb48T6mxpKlLLVUd+biKwXTLQPTRty
-	cenWRcvUHNg2uY2OgoDPpe6QKLSJVhTs2uUR4j5MgwCSGhMgNtk9
-X-Google-Smtp-Source: AGHT+IFuSl2KQf9S7ZnfmhVEsHDRf9lt5h2kPj4tW55Giijk7aCci9Cl7tyOz1BXGzJ4nqu7VKAttg==
-X-Received: by 2002:ac2:5042:0:b0:513:9d46:5fec with SMTP id a2-20020ac25042000000b005139d465fecmr6006986lfm.15.1710236438599;
-        Tue, 12 Mar 2024 02:40:38 -0700 (PDT)
+        bh=uoqfNTOher8F7aZMvhGDS1s31WUJBL1ec+Cnak2BGb8=;
+        b=pVFx/tKZXmot26WJCfQ7OY8zlzqq35KiApmmOGhwPOXEVJKi/J/6q6xYk+q37oBF3Y
+         pceAr+w7GnyOqCUMzXiPwW0fTfaG9MuuqyjqDwkq3187IOFKuJEojv0YgVFvmSMIBvmY
+         iPBtXWI2/6Aph/EjYDAbXlSlvOtEgxfACvj7UaxXZk7pN2bIadU2sSTwyPNoOYhSXR7L
+         ck3fbTo+wpXTrwX0G0wLghhGOZ+97l4ry4SOSemTEEccSeTQHk4O9+TFIHAWQINjQyZg
+         hgaKSrjKvph5J7FnUlxzglDV6wx1DqpMC5ST+qAU6BBvdh7SEFRNn+Jo+Ewc7+TCd3lO
+         Adgw==
+X-Forwarded-Encrypted: i=1; AJvYcCXyzM8uz5hb14+UnI0DeFs6n/fRXm/MknvRv2eWCalTkSZwk/P7KBVyKrGN3WYo+VY5CTz+Fz1rU28jumrgxQi135eYKQUkDJ+TaqCDWN/sMQY5IfFmvz5ZUq7vaIPCxPEB+hOk
+X-Gm-Message-State: AOJu0YyMpTLeNueTL/4qwMuv+qlBBX/s9cNwbFeroHECNDq/bUFOSEJ9
+	mF/yZ9JxusrrA+sXI1xloIB7VMAFF6OnbAfOzEz2+SB4lmBnc6Ye
+X-Google-Smtp-Source: AGHT+IECjFuMZy1SfLMIE60ClZtCBQcRzU0eZOk1kmor4I0WnatKXFkXhxVgKRFmtao5WFP3qSOoew==
+X-Received: by 2002:a05:600c:4ed4:b0:413:3b75:2b36 with SMTP id g20-20020a05600c4ed400b004133b752b36mr733113wmq.1.1710236591300;
+        Tue, 12 Mar 2024 02:43:11 -0700 (PDT)
 Received: from macminim1.retailmedia.com ([2a01:e0a:b14:c1f0:617b:c61e:d65f:861e])
-        by smtp.googlemail.com with ESMTPSA id jt23-20020a05600c569700b00412f4afab4csm515346wmb.1.2024.03.12.02.40.37
+        by smtp.googlemail.com with ESMTPSA id o17-20020a05600c4fd100b00413320f795fsm2178049wmq.35.2024.03.12.02.43.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Mar 2024 02:40:37 -0700 (PDT)
+        Tue, 12 Mar 2024 02:43:10 -0700 (PDT)
 From: Erwan Velu <erwanaliasr1@gmail.com>
 X-Google-Original-From: Erwan Velu <e.velu@criteo.com>
 To: 
@@ -78,9 +78,9 @@ Cc: Erwan Velu <e.velu@criteo.com>,
 	intel-wired-lan@lists.osuosl.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] i40e: Prevent setting MTU if greater than MFS
-Date: Tue, 12 Mar 2024 10:37:55 +0100
-Message-ID: <20240312093757.770283-1-e.velu@criteo.com>
+Subject: [PATCH v3] i40e: Prevent setting MTU if greater than MFS
+Date: Tue, 12 Mar 2024 10:42:58 +0100
+Message-ID: <20240312094259.770554-1-e.velu@criteo.com>
 X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -104,14 +104,11 @@ silent for users. i.e doing TCP in such context will generates lots of
 retransmissions until the proper window size (below 1500) will be used.
 
 To fix this case, it would have been ideal to increase the MFS,
-via i40e_aqc_opc_set_mac_config, but I didn't found a reliable way to do it.
+via i40e_aqc_opc_set_mac_config, incoming patch will take care of it.
 
 At least, this commit prevents setting up an MTU greater than the current MFS.
 It will avoid being in the position of having an MTU set to 9000 on the
 netdev with a firmware refusing packets larger than 1536.
-
-A typical trace looks like the following :
-[  377.548696] i40e 0000:5d:00.0 eno5: Error changing mtu to 9000 which is greater than the current mfs: 1536
 
 Signed-off-by: Erwan Velu <e.velu@criteo.com>
 ---
