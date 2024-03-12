@@ -1,105 +1,193 @@
-Return-Path: <netdev+bounces-79478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 230FF8796E8
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 15:52:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32D698796FB
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 15:57:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABD69284073
-	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 14:52:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FBF21F267A0
+	for <lists+netdev@lfdr.de>; Tue, 12 Mar 2024 14:57:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08CD07B3F6;
-	Tue, 12 Mar 2024 14:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFDC57BB13;
+	Tue, 12 Mar 2024 14:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jNSads/v"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eKMYiWhH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470B17B3F8;
-	Tue, 12 Mar 2024 14:52:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7856997A
+	for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 14:57:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710255165; cv=none; b=j60tQrZuo8menCNqwUntpViXFrMvYklO8rAOyGR33cPU19J2JGvUWYtP8qESaR2rKskmCf1BrvKCNqqMGYa8DCYFvkz867EKj1ZOnOW52kTcOTdA5P4i2AJoxHYKppyr315igqGARUV3Qri0/iVtLcHhc9EY17p3hZ4EyhaB0no=
+	t=1710255462; cv=none; b=twP60fgMjaY2YH0TLTobEuooRRHttDYrOF/CBetcBeNXPqzSIWaBroGhVWzoU4AFmKULyAFCYkUb8x9LsS3DjnMLgaPSdq32i9zCYHAMHBMWjpt3OZ39yqekRg2D0FeyUH7xxTNY+njnxz2cgF+4/3oDxdVv6LA/VsMerHwYeV0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710255165; c=relaxed/simple;
-	bh=hcVQn7I4DVIFWHwTEXd0MZq0+Qko6RLpLkLPp0r0R+E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EEG/b06zxA1MHRDKmDfXWXAKwggKbS9Iwgv9rWWQwPAaeEWd3agMjl/CrODKSlkm3xKUPI34ngdeDqe2oVamu3x3udM/zwyLgaboZCLdb/WFC+yUt4jn4RkUn4SFxlfSUdGoq7WbKByeLE2ndSXZfDVMPHPi78AtJfjgA/TWpfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jNSads/v; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710255164; x=1741791164;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=hcVQn7I4DVIFWHwTEXd0MZq0+Qko6RLpLkLPp0r0R+E=;
-  b=jNSads/vOMf8eOHlOoe/GIXnzXMey3rWCs7HmkCOI9IetKHdYkW5FzLT
-   4ibWdt1FEsE+prOBnTtLGLgL6oQYjXBvEtVpAAPmDvhYhe3ks2PgLyNdc
-   90EU3R2HLJLGBFTqdztvOVvHb2jr6pFNujVz9GZORktjLzC/KrvUpTUoM
-   cN5K38NGwdEb3eIIe+LOuyjHGIs30Jxzy7NC6FdMRXrm+ZGUqzp/zv8ei
-   x0AEncKFxrLv13b2BIqi09EN/rUENjnSlct4a16eCXCgv++Y6/uRcBsAh
-   p8X8eCPa0KqYbhGyJb+gIx9uuZEVAgNK9chTtFwZQWHMu0v6xc+ejebGS
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="8786001"
-X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
-   d="scan'208";a="8786001"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Mar 2024 07:52:43 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="937051896"
-X-IronPort-AV: E=Sophos;i="6.07,119,1708416000"; 
-   d="scan'208";a="937051896"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga001.fm.intel.com with ESMTP; 12 Mar 2024 07:52:39 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1000)
-	id 4B7D12B7; Tue, 12 Mar 2024 16:52:38 +0200 (EET)
-Date: Tue, 12 Mar 2024 16:52:38 +0200
-From: "Kirill A. Shutemov" <kirill.shutemov@linux.intel.com>
-To: mhklinux@outlook.com
-Cc: rick.p.edgecombe@intel.com, kys@microsoft.com, haiyangz@microsoft.com, 
-	wei.liu@kernel.org, decui@microsoft.com, gregkh@linuxfoundation.org, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	dave.hansen@linux.intel.com, linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-coco@lists.linux.dev, 
-	sathyanarayanan.kuppuswamy@linux.intel.com, elena.reshetova@intel.com
-Subject: Re: [PATCH 0/5] Handle set_memory_XXcrypted() errors in Hyper-V
-Message-ID: <fvtb2pwt2gzeottujs67kw3psxxjqrp6j2n6jeqiiqnsrhw4kg@til7ozahrbbm>
-References: <20240311161558.1310-1-mhklinux@outlook.com>
+	s=arc-20240116; t=1710255462; c=relaxed/simple;
+	bh=iyeA3ldOlLNqP+PVU2TvhcjBexR+SvedX+3ahGGpIlo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=acx2DqBM/IB4Y9z+rwvKKEpw09XSWM3roGQSEvpP5OABPaRxmblHW9wsbcQ5M5STg4cdT3nl936C0Uew4hcjxDSWWZDgg9h/fCL8vw3EMGc2IAzV4+oJGZE9CMZw5g3Tgsdd2fiPt/AdXgRJFTARSqN/oV1EPcjOVVvFvpxa5hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eKMYiWhH; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710255460;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ZAdnTnvxDrDZykPQQJFdxyq5N99S9alZWcJMrW7QCuE=;
+	b=eKMYiWhHvhWxbLSgC/PM5s5ZEHLrTo1r6rZ2E2hreKlbmCypGXHU+moM9iaLsR5UA/XHpz
+	Mn5F9syf8BaT/qhvYRa5fRYkrYo6J1UJTC5sRB/tyo9wpz6df1hBy0u6F4ZnSbU5WadbYR
+	ifoNM05fQyDF3lqQ2AQXAXIwHV/gWQ4=
+Received: from mail-pl1-f197.google.com (mail-pl1-f197.google.com
+ [209.85.214.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-338-6the9GWNOmyoYASLejd9jQ-1; Tue, 12 Mar 2024 10:57:36 -0400
+X-MC-Unique: 6the9GWNOmyoYASLejd9jQ-1
+Received: by mail-pl1-f197.google.com with SMTP id d9443c01a7336-1dd8dc37495so26218975ad.1
+        for <netdev@vger.kernel.org>; Tue, 12 Mar 2024 07:57:36 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710255455; x=1710860255;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZAdnTnvxDrDZykPQQJFdxyq5N99S9alZWcJMrW7QCuE=;
+        b=f0A6PJiQjC9DXvoZlC7nCXr6yBN19cywk64mIkMDFjkggGx+YhLgXE5H5C8WPaMSly
+         bpgCcAebuU5Xa34sR2I3e/wMAL8k8ujmHVXXDxflYePd8XT+rkKbIGsw3U5o2492euSy
+         7r4qeNSedsyFTpj2i1UfmT8VcpMFMivr5Plxf4H9+9W81A6Bqub+r1sVui2cu3p8Y3ZI
+         ujysZatRxkT6dpBmof5hieq0FZwm7QqNVymkimVEPh2YtWCv/YkpAT5V1XPenffseseX
+         v/9WHNqhigVr9oDy/HY2xq+kcbK0oP73NaARUAuCsNgHcDMqDVQ6UUv0yKNXRM8HHynD
+         q2/A==
+X-Forwarded-Encrypted: i=1; AJvYcCVHRqfvKIb9TeKFiKi40fJO9rIl9DGa+isGSEHF5tAfVEC+hikgn+lQp5j1dYHs/ANzgEn5DZiApI0LKBhOiCFxvfi4xlku
+X-Gm-Message-State: AOJu0YyKJAXdQZHWZpUzYI3bPlT2hNNi79pQt5NiYg4SkpkwTZVM/L+U
+	jhVF5CxZ8FIMO0tYoOJqFEGUPzm9SX3y/FI7+i1zIJfpuzJcB9ufJbKNzBD6ZIVNepiQKSiJzur
+	kOHWWvybvzOzoiQXrnJFtPFp1vA528uwPT17gbB73zDFU9r/ZJrzVyQ==
+X-Received: by 2002:a17:903:40c3:b0:1dc:d50d:f669 with SMTP id t3-20020a17090340c300b001dcd50df669mr8425370pld.12.1710255455619;
+        Tue, 12 Mar 2024 07:57:35 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEue6WlmlzSOSEynvjd6J79HQiHq8+QVhfK8iQwIxyW4oLsTLypjTRPqvzH+LyoQ/rTAwsi6A==
+X-Received: by 2002:a17:903:40c3:b0:1dc:d50d:f669 with SMTP id t3-20020a17090340c300b001dcd50df669mr8425353pld.12.1710255455263;
+        Tue, 12 Mar 2024 07:57:35 -0700 (PDT)
+Received: from zeus.elecom ([240b:10:83a2:bd00:6e35:f2f5:2e21:ae3a])
+        by smtp.gmail.com with ESMTPSA id p9-20020a1709027ec900b001ddb2256f1fsm2273357plb.93.2024.03.12.07.57.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Mar 2024 07:57:34 -0700 (PDT)
+From: Ryosuke Yasuoka <ryasuoka@redhat.com>
+To: krzysztof.kozlowski@linaro.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: Ryosuke Yasuoka <ryasuoka@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	syoshida@redhat.com,
+	syzbot+7ea9413ea6749baf5574@syzkaller.appspotmail.com
+Subject: [PATCH net] nfc: nci: Fix uninit-value in nci_dev_up
+Date: Tue, 12 Mar 2024 23:56:57 +0900
+Message-ID: <20240312145658.417288-1-ryasuoka@redhat.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240311161558.1310-1-mhklinux@outlook.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 11, 2024 at 09:15:53AM -0700, mhkelley58@gmail.com wrote:
-> From: Michael Kelley <mhklinux@outlook.com>
-> Michael Kelley (1):
->   Drivers: hv: vmbus: Don't free ring buffers that couldn't be
->     re-encrypted
-> 
-> Rick Edgecombe (4):
->   Drivers: hv: vmbus: Leak pages if set_memory_encrypted() fails
->   Drivers: hv: vmbus: Track decrypted status in vmbus_gpadl
->   hv_netvsc: Don't free decrypted memory
->   uio_hv_generic: Don't free decrypted memory
-> 
->  drivers/hv/channel.c         | 16 ++++++++++++----
->  drivers/hv/connection.c      | 11 +++++++----
->  drivers/net/hyperv/netvsc.c  |  7 +++++--
->  drivers/uio/uio_hv_generic.c | 12 ++++++++----
->  include/linux/hyperv.h       |  1 +
->  5 files changed, 33 insertions(+), 14 deletions(-)
+syzbot reported the following unitit-value access issue [1]:
 
-Acked-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+nci_ntf_packet() calls each ntf operation parsed from skb->data. When
+the payload length is zero, each operation handler reads uninitialized
+payload and KMSAN detects this issue. Such notification packet should be
+silently discarded since it is unexpected for any notification handlers.
 
+This patch resolved this issue by checking payload size before calling
+each notification handler codes.
+
+BUG: KMSAN: uninit-value in nci_init_req net/nfc/nci/core.c:177 [inline]
+BUG: KMSAN: uninit-value in __nci_request net/nfc/nci/core.c:108 [inline]
+BUG: KMSAN: uninit-value in nci_open_device net/nfc/nci/core.c:521 [inline]
+BUG: KMSAN: uninit-value in nci_dev_up+0xfec/0x1b10 net/nfc/nci/core.c:632
+ nci_init_req net/nfc/nci/core.c:177 [inline]
+ __nci_request net/nfc/nci/core.c:108 [inline]
+ nci_open_device net/nfc/nci/core.c:521 [inline]
+ nci_dev_up+0xfec/0x1b10 net/nfc/nci/core.c:632
+ nfc_dev_up+0x26e/0x440 net/nfc/core.c:118
+ nfc_genl_dev_up+0xfe/0x1d0 net/nfc/netlink.c:770
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:972 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1052 [inline]
+ genl_rcv_msg+0x11ec/0x1290 net/netlink/genetlink.c:1067
+ netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2545
+ genl_rcv+0x40/0x60 net/netlink/genetlink.c:1076
+ netlink_unicast_kernel net/netlink/af_netlink.c:1342 [inline]
+ netlink_unicast+0xf47/0x1250 net/netlink/af_netlink.c:1368
+ netlink_sendmsg+0x1238/0x13d0 net/netlink/af_netlink.c:1910
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg net/socket.c:745 [inline]
+ ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+ __sys_sendmsg net/socket.c:2667 [inline]
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x6d/0x140 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+Uninit was stored to memory at:
+ nci_core_reset_ntf_packet net/nfc/nci/ntf.c:36 [inline]
+ nci_ntf_packet+0x19dc/0x39c0 net/nfc/nci/ntf.c:782
+ nci_rx_work+0x213/0x500 net/nfc/nci/core.c:1522
+ process_one_work kernel/workqueue.c:2633 [inline]
+ process_scheduled_works+0x104e/0x1e70 kernel/workqueue.c:2706
+ worker_thread+0xf45/0x1490 kernel/workqueue.c:2787
+ kthread+0x3ed/0x540 kernel/kthread.c:388
+ ret_from_fork+0x66/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:242
+
+Uninit was created at:
+ slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
+ slab_alloc_node mm/slub.c:3478 [inline]
+ kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
+ __alloc_skb+0x318/0x740 net/core/skbuff.c:651
+ alloc_skb include/linux/skbuff.h:1286 [inline]
+ virtual_ncidev_write+0x6d/0x280 drivers/nfc/virtual_ncidev.c:120
+ vfs_write+0x48b/0x1200 fs/read_write.c:588
+ ksys_write+0x20f/0x4c0 fs/read_write.c:643
+ __do_sys_write fs/read_write.c:655 [inline]
+ __se_sys_write fs/read_write.c:652 [inline]
+ __x64_sys_write+0x93/0xd0 fs/read_write.c:652
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0x6d/0x140 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x63/0x6b
+
+CPU: 1 PID: 5012 Comm: syz-executor935 Not tainted 6.7.0-syzkaller-00562-g9f8413c4a66f #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+
+Fixes: 6a2968aaf50c ("NFC: basic NCI protocol implementation")
+Reported-and-tested-by: syzbot+7ea9413ea6749baf5574@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=7ea9413ea6749baf5574 [1]
+Signed-off-by: Ryosuke Yasuoka <ryasuoka@redhat.com>
+---
+ net/nfc/nci/ntf.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
+index 994a0a1efb58..56624387e253 100644
+--- a/net/nfc/nci/ntf.c
++++ b/net/nfc/nci/ntf.c
+@@ -765,6 +765,9 @@ void nci_ntf_packet(struct nci_dev *ndev, struct sk_buff *skb)
+ 		 nci_opcode_oid(ntf_opcode),
+ 		 nci_plen(skb->data));
+ 
++	if (!nci_plen(skb->data))
++		goto end;
++
+ 	/* strip the nci control header */
+ 	skb_pull(skb, NCI_CTRL_HDR_SIZE);
+ 
 -- 
-  Kiryl Shutsemau / Kirill A. Shutemov
+2.44.0
+
 
