@@ -1,189 +1,153 @@
-Return-Path: <netdev+bounces-79674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECCB487A88F
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:36:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 376A587A892
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:39:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1A792884CE
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:36:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B0021C22110
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:39:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4966B40BF5;
-	Wed, 13 Mar 2024 13:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2BDE4087C;
+	Wed, 13 Mar 2024 13:39:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="I+vtFS5h"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="UGZkqgQj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94CF440872;
-	Wed, 13 Mar 2024 13:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69DB740BE1;
+	Wed, 13 Mar 2024 13:39:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710336992; cv=none; b=VUwcn+ft/LKRpaZZMAbU2wX3apaUOU7UqTzqa2BA1So4VCDS6xjpWFHulPQGqKk2sVjqm1kv1BLdnxlaRDMCnggHhry+3LJ2YK/7yflhwqrrXrzJtECQUwPl0wuq9ckgve1NOF0XYhci5k1lQPS0xP3z8jauMI+OmypTOYsaQ0M=
+	t=1710337158; cv=none; b=VqcnjVk4QqPM1j4rCQ6XdLmNTvIcGfOmopIgnL97DxqU3U7NCUsfA+E/CcDTJh3+96rqk/yCjJtRF+SwrcPOX/iuIf1ipVz7UX89RERLW5B6jKlJWueJ7Zw2Qax436TJWsTtbl0wVv92rOpcv/z/YZYvx5Ov8AO7nEhryH1Vtbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710336992; c=relaxed/simple;
-	bh=btb1SHUYCqO+8fD8qTU38TpwlDzeH5YwyiyceJigGNk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u/9UmeZ1HQSusUTJCQhwRQCcyZXgHRosNMVYK2kabc2iTbAZuLKbFIY5xiZ/SiL7clihS2Ads50CWJZp6hh5YVYoX76RQSBCVikNq5GUrnxtxHfwnw2a11nrFF1H9m4zWLunT+4hhNfgDPil+XDOc2XTwUK4kkX3ytFct8x3g0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=I+vtFS5h; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42D9Wib0022081;
-	Wed, 13 Mar 2024 06:36:09 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	date:from:to:cc:subject:message-id:references:mime-version
-	:content-type:in-reply-to; s=pfpt0220; bh=S3k3UGSaMW22BSoOxHWpzG
-	XLOO1X22H060qF0fLZNwM=; b=I+vtFS5hB+0xUKSd3aTTrqxSvUN/cPEmwirTgW
-	RzZVH5xWfHlGGRUr9bos3ED57Y6/yYghRlNlyAANsLP3xTPV6FofTD1dUxiAdCfn
-	NfcK0MD/Shp6sShdMkqoLn7wtfGnjSEZi8QoFcB9FMYNX0tsj4t5YNGdf9/BJrT+
-	dEcSD0R9Hpy5y7aImV0sH2T/cATJ9X8HjRurC7nNWkPepnzI48tWvMq48v/GlwJw
-	Bz8gPCgoyfeRc/xDwg3dVVR+fUKexQ8blQdRvKKeFRkgJIf+8DER4pY4eOhQ8Z6t
-	YcD2I4GbyCleWloiXDf57RHtcY43D7Ns7D1TGrg/Xx7FaWVg==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3wu9kvrr00-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Mar 2024 06:36:08 -0700 (PDT)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.12; Wed, 13 Mar 2024 06:36:07 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
- Transport; Wed, 13 Mar 2024 06:36:07 -0700
-Received: from maili.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 2B2AA3F705C;
-	Wed, 13 Mar 2024 06:36:03 -0700 (PDT)
-Date: Wed, 13 Mar 2024 19:06:02 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Mark Cilissen <mark@yotsuba.nl>
-CC: <netdev@vger.kernel.org>, Hans de Goede <hdegoede@redhat.com>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Breno Leitao
-	<leitao@debian.org>, Ingo Molnar <mingo@redhat.com>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Paolo Abeni <pabeni@redhat.com>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] netpoll: support sending over raw IP interfaces
-Message-ID: <20240313133602.GA1263314@maili.marvell.com>
-References: <20240313124613.51399-1-mark@yotsuba.nl>
+	s=arc-20240116; t=1710337158; c=relaxed/simple;
+	bh=vK73uYI8Vxy7OroeXl4DurknrQfBeM/0gM/pIFpXnz0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=U4GYLkZRquokEnCedUmaIKHDyvinkIR9k/Q4EyEmKly3dbDW9YPpUAx/mi50XvxeFaGsCx1dSNKBS6gtpxwPB7lwnaAmLMfvUFuX+ODzr0tOr0zmurMLwNz7J0af1RC2FiB1r5CNYm6/VS1QB4OFoC0a04cPzFJq1kv3DnbVOlo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=UGZkqgQj; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 13F651BF203;
+	Wed, 13 Mar 2024 13:39:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1710337147;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=0Bicd0MobasMR69S0J0ZR+LESgqwadmjj5jzewTxOFc=;
+	b=UGZkqgQjBuQWRDSbsBJcj9tSbHmSSMqrrXGdSrV1lJakRo5Nw8r0HtMpq9VOIlFDARoY5d
+	dPuT/HoGEHXHC1tC6sRTUELctEwG0Od+JbwVkc3EdpaG0ol0SagF/UP3P8cbuPoN5lCyZ9
+	P2YjyZDketjsISPfMJdH8Y6cDdnQyW4TvZgYVVADEVGawQqxRe1bRJPRBto54I2mmTEy+f
+	f7WDHvLk5Uq2oh7mb+EJR33edrVrw0IZl+K0AiK7meN7l4x69/MDePS93fjCb7drmFy9ko
+	LG2Bxjd//mzqO5+Htz9zggoDh+u+jSvWvqCutClznq5K1eNelgTVjoTJ/1tUKw==
+Message-ID: <21ec269340a83f436bbf7a23a2be4289c88b70dd.camel@bootlin.com>
+Subject: Re: [PATCH net v3] net: macb: remove change_mtu callback
+From: Thomas Perrot <thomas.perrot@bootlin.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
+ <claudiu.beznea@tuxon.dev>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Date: Wed, 13 Mar 2024 14:39:05 +0100
+In-Reply-To: <20240311161727.629c0bab@kernel.org>
+References: <20240311154315.2575297-1-thomas.perrot@bootlin.com>
+	 <20240311161727.629c0bab@kernel.org>
+Autocrypt: addr=thomas.perrot@bootlin.com; prefer-encrypt=mutual;
+ keydata=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
+Content-Type: multipart/signed; micalg="pgp-sha256";
+	protocol="application/pgp-signature"; boundary="=-ejHT/lGTQBdmCNEHSl5Q"
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240313124613.51399-1-mark@yotsuba.nl>
-X-Proofpoint-GUID: WfduN_LFavjnjhcDqmIw6cJIOIFP2Gqm
-X-Proofpoint-ORIG-GUID: WfduN_LFavjnjhcDqmIw6cJIOIFP2Gqm
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-13_08,2024-03-12_01,2023-05-22_02
+X-GND-Sasl: thomas.perrot@bootlin.com
 
-On 2024-03-13 at 18:16:13, Mark Cilissen (mark@yotsuba.nl) wrote:
-> Currently, netpoll only supports interfaces with an ethernet-compatible
-> link layer. Certain interfaces like SLIP do not have a link layer
-> on the network interface level at all and expect raw IP packets,
-> and could benefit from being supported by netpoll.
->
-> This commit adds support for such interfaces by using the network device's
-> `hard_header_len` field as an indication that no link layer is present.
-> If that is the case we simply skip adding the ethernet header, causing
-> a raw IP packet to be sent over the interface. This has been confirmed
-> to add netconsole support to at least SLIP and WireGuard interfaces.
->
-> Signed-off-by: Mark Cilissen <mark@yotsuba.nl>
-> ---
->  Documentation/networking/netconsole.rst |  3 ++-
->  net/core/netpoll.c                      | 30 ++++++++++++++++---------
->  2 files changed, 22 insertions(+), 11 deletions(-)
->
-> diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
-> index d55c2a22ec7a..434ce0366027 100644
-> --- a/Documentation/networking/netconsole.rst
-> +++ b/Documentation/networking/netconsole.rst
-> @@ -327,4 +327,5 @@ enable the logging of even the most critical kernel bugs. It works
->  from IRQ contexts as well, and does not enable interrupts while
->  sending packets. Due to these unique needs, configuration cannot
->  be more automatic, and some fundamental limitations will remain:
-> -only IP networks, UDP packets and ethernet devices are supported.
-> +only UDP packets over IP networks, over ethernet links if a
-> +hardware layer is required, are supported.
-> diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-> index 543007f159f9..0299fb71b456 100644
-> --- a/net/core/netpoll.c
-> +++ b/net/core/netpoll.c
-> @@ -399,7 +399,7 @@ EXPORT_SYMBOL(netpoll_send_skb);
->
->  void netpoll_send_udp(struct netpoll *np, const char *msg, int len)
->  {
-> -	int total_len, ip_len, udp_len;
-> +	int total_len, ip_len, udp_len, link_len;
->  	struct sk_buff *skb;
->  	struct udphdr *udph;
->  	struct iphdr *iph;
-> @@ -416,7 +416,10 @@ void netpoll_send_udp(struct netpoll *np, const char *msg, int len)
->  	else
->  		ip_len = udp_len + sizeof(*iph);
->
-> -	total_len = ip_len + LL_RESERVED_SPACE(np->dev);
-> +	/* if there's a hardware header assume ethernet, else raw IP */
-Taking an assumption based on dev's lower layer does not look to be good.
-why not transmit packet from skb_network_header() in your driver (by making
-changes in your driver)
 
-> +	eth = NULL;
-> +	link_len = np->dev->hard_header_len ? LL_RESERVED_SPACE(np->dev) : 0;
-> +	total_len = ip_len + link_len;
->
->  	skb = find_skb(np, total_len + np->dev->needed_tailroom,
->  		       total_len - len);
-> @@ -458,9 +461,11 @@ void netpoll_send_udp(struct netpoll *np, const char *msg, int len)
->  		ip6h->saddr = np->local_ip.in6;
->  		ip6h->daddr = np->remote_ip.in6;
->
-> -		eth = skb_push(skb, ETH_HLEN);
-> -		skb_reset_mac_header(skb);
-> -		skb->protocol = eth->h_proto = htons(ETH_P_IPV6);
-> +		skb->protocol = htons(ETH_P_IPV6);
-> +		if (link_len) {
-> +			eth = skb_push(skb, ETH_HLEN);
-> +			skb_reset_mac_header(skb);
-> +		}
->  	} else {
->  		udph->check = 0;
->  		udph->check = csum_tcpudp_magic(np->local_ip.ip,
-> @@ -487,13 +492,18 @@ void netpoll_send_udp(struct netpoll *np, const char *msg, int len)
->  		put_unaligned(np->remote_ip.ip, &(iph->daddr));
->  		iph->check    = ip_fast_csum((unsigned char *)iph, iph->ihl);
->
-> -		eth = skb_push(skb, ETH_HLEN);
-> -		skb_reset_mac_header(skb);
-> -		skb->protocol = eth->h_proto = htons(ETH_P_IP);
-> +		skb->protocol = htons(ETH_P_IP);
-> +		if (link_len) {
-> +			eth = skb_push(skb, ETH_HLEN);
-> +			skb_reset_mac_header(skb);
-> +		}
->  	}
->
-> -	ether_addr_copy(eth->h_source, np->dev->dev_addr);
-> -	ether_addr_copy(eth->h_dest, np->remote_mac);
-> +	if (eth) {
-> +		eth->h_proto = skb->protocol;
-> +		ether_addr_copy(eth->h_source, np->dev->dev_addr);
-> +		ether_addr_copy(eth->h_dest, np->remote_mac);
-> +	}
->
->  	skb->dev = np->dev;
->
-> --
-> 2.43.0
->
+--=-ejHT/lGTQBdmCNEHSl5Q
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+
+Hello,
+
+On Mon, 2024-03-11 at 16:17 -0700, Jakub Kicinski wrote:
+> On Mon, 11 Mar 2024 16:43:15 +0100 thomas.perrot@bootlin.com=C2=A0wrote:
+> > Because it doesn't allow MTU changes when the interface is up,
+> > although
+> > it is not necessary.
+> >=20
+> > This callback has been added to add in a first implementation of
+> > the Jumbo
+> > support [1],since it has been reworked and moved to the probe [2].
+> >=20
+> > With this patch the core will set the MTU, regardless of if the
+> > interface
+> > is up or not.
+> >=20
+> > [1] commit a5898ea09aad ("net: macb: Add change_mtu callback with
+> > =C2=A0=C2=A0=C2=A0 jumbo support")
+> > [2] commit 44770e1180de ("ethernet: use core min/max MTU checking")
+> >=20
+> > Fixes: 44770e1180de ("ethernet: use core min/max MTU checking")
+>=20
+> static void macb_init_rx_buffer_size(struct macb *bp, size_t size)
+> {
+> 	if (!macb_is_gem(bp)) {
+> 		bp->rx_buffer_size =3D MACB_RX_BUFFER_SIZE;
+> 	} else {
+> 		bp->rx_buffer_size =3D size;
+>=20
+> where size is:
+>=20
+> 	size_t bufsz =3D dev->mtu + ETH_HLEN + ETH_FCS_LEN +
+> NET_IP_ALIGN;
+>=20
+> I guess you tested this on a platform where !macb_is_gem(bp) ?
+
+Thank you for your review, indeed that won=E2=80=99t be correct on GEM in w=
+hen
+the MTU used to initialize the RX buffer is lower than the new MTU.
+
+So, I will suggest another patch with an acceptable solution.
+
+Kind regards,
+Thomas Perrot
+
+> Otherwise the buffer size seems to be based on MTU and the proposed
+> change won't be correct.
+
+--=20
+Thomas Perrot, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
+
+
+--=-ejHT/lGTQBdmCNEHSl5Q
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAABCAAdFiEEh0B3xqajCiMDqBIhn8ALBXH+Cu0FAmXxrHkACgkQn8ALBXH+
+Cu0e2wv6A0yb8620vWwKOceSKAQ9PGXx6VVDpiEBk1S7Ga6L1FXgL6bYeXleE/t4
+MhfEXjGpeQEjIgCc0UPtWs3il9LsWiGla6sAJAs9wNCcckQiOkHUFPJdA/jM5OM3
++03DqH3ybJ0prSZYKPmwiDp/I7UivzsIY/TtY8wLabeyV7kSZTVNWRrxUB0Eo2ST
+zo156o/RINOH1uyo/M6v+3au3gpaag+mUUr9YTumTTMwusEo/sbVDaBnCrRIjz+r
+xSKdSyKnbvLoHp5ImCCBtWXAV4boNVrbKImnX/U056YYqgcMe9Fi+Uik0F7HZWgV
+m4ePL0F1X+eqcgET017IYuWhgMoZZe7hRSaRojJZiu4bLt/DGcaa/mAzyrA+Ry7r
+u+veh3PNbG9StWGhcDJ91TlOkEtVemFwoEaGfLAYbyjOxdZnCbKLDRJtzFQ79vyt
+VB3AKmtfvCNosRtOqOdYfCiJdK1tmzTJeUROYaphdJ7KvhRG4+qbpr0gEo9F2D9c
+RYDgFzPj
+=8JL7
+-----END PGP SIGNATURE-----
+
+--=-ejHT/lGTQBdmCNEHSl5Q--
 
