@@ -1,275 +1,179 @@
-Return-Path: <netdev+bounces-79656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79657-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95C3F87A70D
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 12:25:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3382487A719
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 12:29:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E90061F225DA
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 11:25:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 572501C20AF3
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 11:29:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345D93EA95;
-	Wed, 13 Mar 2024 11:25:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F7A13F8D1;
+	Wed, 13 Mar 2024 11:29:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UbL5fwOe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l3N8xdpJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BBBB3EA72;
-	Wed, 13 Mar 2024 11:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710329136; cv=none; b=crP1umV2vr3twZUIZn4wHiy/OxTiYpfcb4TCzx30lQYkOg/rIsDpOQkGwnf1HNM+uyeoTQuEYNDy3IsNzRmCbab3ojp24HS8a9A7++8mbJ94hpcRm4dskDZgCPJX4Hl6//OYeeGs1gM381tbj1gSGuE8yGQR/4b7DfafScKhiXE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710329136; c=relaxed/simple;
-	bh=LYcNh8f/VUH2gSW2953XdtfYjWbGSG8COCLwOqFU9ss=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Ts0v3/PSqx1OrFjsaLmyS85NaWyXYKuW5WqBOXJBrFhxJBTSb1+0KE88/z9gTbHjxFvBS/wf1hTwIt1RCewQJAHVTuaraRZiFALCCb/CmjRg8gtwQ5d+7Q3qo8n74T3DexRhDoVwtFeXL62Vo+l1LkjI8r+GC0pmSXY9lPYrxUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UbL5fwOe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8D208C433C7;
-	Wed, 13 Mar 2024 11:25:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710329135;
-	bh=LYcNh8f/VUH2gSW2953XdtfYjWbGSG8COCLwOqFU9ss=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=UbL5fwOesmZxDjwGCadSLhlMetEzhhV4Sk6MRiBZPi7LHDafsiZ6rtdallYJqmKiM
-	 79yeNbQpI9PHxcxAoF7Etf1rVvKhH8EZ0hAXLqHgMBzVHs1vWpU2iuwGcDT3/uPDIv
-	 qbNYSTqmojPupxOpwiIC7PyLYq96LuxCM89+phSPRnLP57O/ViLtUG4b2o+OzwSJXl
-	 cSLK2aGj+Y1mT7eDUipud8VnAtU1K4RBjfW3lW58ZPteo1JsrpKl+iB7xQJSQ+Egul
-	 sZaN/0scE39HIUN15P74xpLI1w0J1c6lGwjAmtIghqbsXfpnk/AaJPjXQ0QpW4Myqg
-	 iMkw97lR19y+A==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 682FCC54791;
-	Wed, 13 Mar 2024 11:25:35 +0000 (UTC)
-From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= via B4 Relay
- <devnull+arinc.unal.arinc9.com@kernel.org>
-Date: Wed, 13 Mar 2024 14:25:07 +0300
-Subject: [PATCH net] net: dsa: mt7530: prevent possible incorrect XTAL
- frequency selection
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3D83F8C7;
+	Wed, 13 Mar 2024 11:29:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710329347; cv=fail; b=dN6Nh8cON8+AbP/WJdrMhU6aTbY4ucDp3poQjulw7N7QMUwkjZYkVfPUfk/KVXgDYEDWaXeCvGWbbvX+cmUbRR2xrYnYsiC6MlHgg/SFbjYv+m1CPf74JGlZRGhqwlcDfDNm2v6xBKqiODJewHnt4eKDihu2s8yTvo7QSL9+3as=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710329347; c=relaxed/simple;
+	bh=KDpVAvEVgfKwPZGUmlWzI4jecyJyiLzCj7cSel2ZB1s=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=qu6ZKTXHb0u4CvHldltCk3WwBKbVkkBcyzYLUM3ux3NTIhnfQy3v0emceQLf8/kEatwUu1ikaTTSFO1fvdPRDn1pjY7TlfLleod8/LHheMdQY4D2+I/a7BH+vO+bcFVQZe7mn1sqOpSK4MvkGDoef1mH1G6t2biVzwSwCrQCj3k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l3N8xdpJ; arc=fail smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710329346; x=1741865346;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=KDpVAvEVgfKwPZGUmlWzI4jecyJyiLzCj7cSel2ZB1s=;
+  b=l3N8xdpJOeytjlsa89vQng6FMDEjhmS2VXv4aN3qHX54b5BeByTyVdgO
+   z0CNHTxkkE3o8NIrtFcVIohkb0B4AUFsV9OjTT8IazEfi2TyzCQMuwHom
+   QTqUYf7T7jZpkaXxAZz09c41W9FvaamMRDs/bEVnjgFJ9CeoG+EhPitZQ
+   84US7cToP0ym4g9RaynR4gDA76JtZnSrn6jxBGrVrdmqpjg0gtAupmUlQ
+   3kmt5dxZU6qEq2l6jYuLkfILb+uk5YmUrMsepA62ytH3NEVlqYfSqLVuQ
+   CmOA0qVXFGU9TUICYECR72Tz5h9RNn73QE9v8EmCsY8/Pv+qmhYdsNsrN
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="5016831"
+X-IronPort-AV: E=Sophos;i="6.07,122,1708416000"; 
+   d="scan'208";a="5016831"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2024 04:29:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,122,1708416000"; 
+   d="scan'208";a="16545004"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 13 Mar 2024 04:29:05 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 13 Mar 2024 04:29:04 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 13 Mar 2024 04:29:03 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 13 Mar 2024 04:29:03 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 13 Mar 2024 04:29:03 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jYSKFiZ4mdl4beXzX8VE93706r48esVSV435ryAUN87WL6ChZL/N4W7rqXvtqAEmZtgvvcm5C6Ht45wj7PEqOBI09ONifpOYdg2GqIPgPnNKxxcGm2+xgXjyPjmzz+g2pFvwGYc7KFJgEMYygFJLgX2zUzsJRXi4JYJsr5khAbZ5n0ibrLn3xj17wAdHLe2o4IDfbcOSlVdg+W696XGzxVoOEnzy3Tf5j8in3mjZ8xm98uP//jDDXZIvoIZ+rCxj02u3DgFzsxZ2IgjlDhmED7TeYkSyJK+mBAdPDeMg4u1FW/R8SSEduC3XJSdcMvB3tdlfKas7hxgvotEAIkStXQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2zRLQi2IFyde4U/nv/r4x1WzDBxYFpQ6UTbYzoVoINQ=;
+ b=L68FgAdV6fQwKnOVvchHFKUd5DlSqJdpDltwjLKH+FCn1+I9ZR316qEBQEQHiXvt1l79StAFXjcdMKlx28ZVYuC6O5pwIzF0c6GowQcioy/g3hogMD77tIlb8+FQo/0dr9EFrIHplP78ftAkyWp8fY7PYp8aDRPZnAudzW93p6cs0iytHdbSNg3k6/Fzxi5H4C2oWCYlSOPNrxDazYfuUINyujEb7A1HKJL1ecqMoYflyMr7T+NRjab9RUC8XEk0rxw8P6RorqW/XgRlXy/+KN2ESbh7AVgHihRZqgL44zpImVufZ2VkGqCWuKPgwndf7FgKU3Am2SJ37TofAKZ57w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB5782.namprd11.prod.outlook.com (2603:10b6:510:147::11)
+ by IA0PR11MB7401.namprd11.prod.outlook.com (2603:10b6:208:433::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.18; Wed, 13 Mar
+ 2024 11:28:55 +0000
+Received: from PH0PR11MB5782.namprd11.prod.outlook.com
+ ([fe80::d48a:df79:97ac:9630]) by PH0PR11MB5782.namprd11.prod.outlook.com
+ ([fe80::d48a:df79:97ac:9630%4]) with mapi id 15.20.7386.017; Wed, 13 Mar 2024
+ 11:28:55 +0000
+Date: Wed, 13 Mar 2024 12:28:41 +0100
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: Ignat Korchagin <ignat@cloudflare.com>
+CC: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel-team@cloudflare.com>
+Subject: Re: [PATCH net v2 2/2] selftests: net: veth: test the ability to
+ independently manipulate GRO and XDP
+Message-ID: <ZfGN6RTBCbEm6uSO@localhost.localdomain>
+References: <20240312160551.73184-1-ignat@cloudflare.com>
+ <20240312160551.73184-3-ignat@cloudflare.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20240312160551.73184-3-ignat@cloudflare.com>
+X-ClientProxiedBy: DU2PR04CA0226.eurprd04.prod.outlook.com
+ (2603:10a6:10:2b1::21) To PH0PR11MB5782.namprd11.prod.outlook.com
+ (2603:10b6:510:147::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: =?utf-8?q?=3C20240313-for-netnext-mt7530-better-fix-xtal-frequen?=
- =?utf-8?q?cy-v1-1-5a50df99f51a=40arinc9=2Ecom=3E?=
-X-B4-Tracking: v=1; b=H4sIABKN8WUC/x2NzQrCMBAGX6Xs2YX8WEt9FemhrV80oKluVkkpf
- XeDx4FhZqMMich0bjYSfGOOS6pgDw3N9zHdwPFamZxxR+Ot47AIJ2hCUX5q13rDE1QhHGLhouO
- Dg+D9QZpX9han0Pa9t12gmnwJqvXfXahWaNj3H5EuS5uDAAAA
-To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
- Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Philipp Zabel <p.zabel@pengutronix.de>, 
- Landen Chao <Landen.Chao@mediatek.com>
-Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>, 
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, 
- Justin Swartz <justin.swartz@risingedge.co.za>, 
- =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1710329122; l=6561;
- i=arinc.unal@arinc9.com; s=arinc9-patatt; h=from:subject:message-id;
- bh=L64g+46HN+S29jthqvg493sRpkqBmVTreKHISDH47E8=;
- b=QETKrDhCZGIxxkfvVHrUw+tUQmz/zGwkbwSTF7U2X5bdPBFZKtDOmY0SPiSsK98/qW7i0Kty1
- Fo+cDhkeTl+DLsjd42I1KWahApVmEMICNgNOyCa7nk9iV2a8eGtGNzy
-X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
- pk=VmvgMWwm73yVIrlyJYvGtnXkQJy9CvbaeEqPQO9Z4kA=
-X-Endpoint-Received:
- by B4 Relay for arinc.unal@arinc9.com/arinc9-patatt with auth_id=115
-X-Original-From: =?utf-8?b?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Reply-To: <arinc.unal@arinc9.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB5782:EE_|IA0PR11MB7401:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5650e9b6-5959-4773-f79f-08dc4350c46a
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: Lm+kKiOyd0uXPnegOZHHTyi0234Pjyhp1R39IfEp97mj97eSx74Cf5R4OcQfXs7ZMJR0ItKQRxVZsfWRHU2u3pD2xvCDzFhPUUk75IUBb60y6x7LZsd6hx+U9De1HSy2hRYKmVmYfbnAcSM+ABMRNb6UGFK/4ySxeVj4ZPpndPSwAh/jPrqpJti5BWYhJYDk9fsVQ8cfi2O4r7bplR9/7ZxJxOj3nvwLmBv9Jcq59suCEcp0lwwPHWwd3nC7nuaMW0MPR1PWBkGF6DSyWPXIBVkGgDRYBYDlz+H5HWL7h7hVA65WmhdEFEUx6DHNVb4fGsRkiUNDTvVpxx7kWOozkfF+/rkbJsqwCc5gOsv/Fjdq8V6LgGtvAgb33tTNuNaeO4SlaX6xg2Ww3QmZmzq63IBDSyjGuxNeb8Thtls2Hva/AFiGM21FuoulCq1SUgkvf4pIFhOKl7usg+oqtOT6xyooagHO1utPiCtyBFCBs7lgn7lfoY517+qGeNZzFZ5z4dt0COa2G6QZeujzG01fTqgC6kkAjTZC+9sux9xX1WzF8xsqv9TI6OyEB/H2bSkMUxIgut+lb8ZTOkzoDNSylMKJq6cB4+K+GtSyzZuFs6kguxWM7XQjEXhJD3zkesrJz0l54lC/6pe+oD10ZsupCi4/c6CcMZIFwvix+ENm9GI=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5782.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Y+SvTG1NSVYH5hotwSi9huVRX5CSGs6G0FELYNL1cuSxLuZazFwYMqOa0n+p?=
+ =?us-ascii?Q?YTkAi5YiNF50Cwhoqz5QtG7Gzkcjmf9FCpwtEOy4U9wxxx/wekcXGXe7bBYr?=
+ =?us-ascii?Q?Qp3U4HCCcOji/izzUxKTUisbttbYveSQkqQMVox3Em/N+UngrfmDy7oPZsdL?=
+ =?us-ascii?Q?aKHo8aAHPf/QG7ei+T8f3FhjRITgVVmMTyDx+1v/ZXzHxc946aeIv4fifnHH?=
+ =?us-ascii?Q?ZDvegC5QvjRWccAjdrA6Bgb2YrRyyOFYhc0nL1gl8mOPX1RI29ZvIaac3ov9?=
+ =?us-ascii?Q?MebQU6FJc9F7i40f/TYMP7nOVt5NeVA7m1XmALKDMrPUG5VFEmqcW1IkY+aq?=
+ =?us-ascii?Q?/7oXZergB8taJUFLPrlU2EKIVTwK/hUgVqi3zDkT9yWo7l16AUZ9SmfkSpGl?=
+ =?us-ascii?Q?2AOPslLM/lBgZ7urY1jdR7VblE/fmzPoCGtgZevjETuF7UyMuTFKcLNTNPLA?=
+ =?us-ascii?Q?tOmW8W37GXChBufBlH2c5wPqxZ+FNDw3x25UxRJymbgRb/65kNrQ3rpqvVXj?=
+ =?us-ascii?Q?a1tQF2jIt3UutAtkKQ3r0hDGDveUC3n2D8ckNUv097krVCXZCM9NfnOErbWI?=
+ =?us-ascii?Q?uNXiX8rLuvnBi9JfxKPsX5Q0wSfN7I0q39/QFnb6tAzOgQouqFVbr1DwktEU?=
+ =?us-ascii?Q?Otr4dd1LiDZJfh4qMeHYg0u37rDOiCryJWWYQ+z/VmRE1upmxtYCL5f0RXuY?=
+ =?us-ascii?Q?gS5mPeeDjiNEF+VbSoGlNFT3+jfqUepU09Cpd3N4OEuBemyfZpbr3XRBrn4G?=
+ =?us-ascii?Q?lEk6/GoNXHt1LW1DWyQrAx1UPvJ2b9UvaDG611WZ/eDFI8N6jJcE6JlKaIfB?=
+ =?us-ascii?Q?2Qpr2JHJiPRArnGNMWFkDmUIdWH90JeorKdcESWGgvH7VKC/foDj3fQ08GA4?=
+ =?us-ascii?Q?Snp14Q6aEcLFkeBg1AECJHVuXJnqJ6JPKZs8JEGW6cjnp7IEq+vPShXNzCIZ?=
+ =?us-ascii?Q?DZE2QBESW4Du0fOTkLAN+zJyZa3mYlZY7HulhBxiDJPa0v0lRj8dSol1azZB?=
+ =?us-ascii?Q?RYQfe8eIUu1FnmYLs7TSaSAJgiVTFjmM/VxC9fvgKCbM1VZHATO/375I0wl3?=
+ =?us-ascii?Q?O/YTmgcoQcOdhcBREzHmbpW5/Mlal4TwJu557xfAQZnSutmIPQ1q2lz87+32?=
+ =?us-ascii?Q?LZeGqJZSulRiYoE7JSlQXnS4rovQ1mCmnCJqT3RqL8iAUFU19/JlwUxwyQMB?=
+ =?us-ascii?Q?4k8SfQoZV27Ybalm0QNPeze9SuO7I2ZwMqneNKgVbs2qo9F1uDjqym6YVKwp?=
+ =?us-ascii?Q?1rrKzG+IT1W+tu/91LUfYf+i32NNOIuKTLVzV89I9Mo7gh0fkPbV4SNDKBc8?=
+ =?us-ascii?Q?5VVP3I2aJOB0j1B7GDeJhK6ZgZ0Hr3CowYl2+rPAI50FAxZZSLK0aPvhIgqu?=
+ =?us-ascii?Q?8C9pG03Kc65fQHqZyQ/S6/Gp6S/BtmQGayMJlS5lyNcHltc5I6ofUQoXG8lL?=
+ =?us-ascii?Q?wf0YyALNHQROum37MEiyGRNEfkAcIS6FTGm2XY155csCQ7gFnXnyJeZf6iCS?=
+ =?us-ascii?Q?s7HIWZH3njW2CcCQXRyn60WwxS2UJQwo4OPBBO+9sDyq4UKckfIzLquJtT24?=
+ =?us-ascii?Q?Ky1MAsnnTuilCs7AlSu4vmcrllNCUCb/90wH1qw50gVZimPbK22d7QcqONY+?=
+ =?us-ascii?Q?gA=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5650e9b6-5959-4773-f79f-08dc4350c46a
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5782.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2024 11:28:55.2940
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7hkMqTv+uHhVtd71URS+SajN3FQ5suxUakasbkUyHxbB5mWF0clI+tmSlVbN3U4b7K3jzT9OP7cetRDILYM4Tw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7401
+X-OriginatorOrg: intel.com
 
-From: Arınç ÜNAL <arinc.unal@arinc9.com>
+On Tue, Mar 12, 2024 at 04:05:52PM +0000, Ignat Korchagin wrote:
+> We should be able to independently flip either XDP or GRO states and toggling
+> one should not affect the other.
+> 
+> Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>
 
-On MT7530, the HT_XTAL_FSEL field of the HWTRAP register stores a 2-bit
-value that represents the frequency of the crystal oscillator connected to
-the switch IC. The field is populated by the state of the ESW_P4_LED_0 and
-ESW_P4_LED_0 pins, which is done right after reset is deasserted.
+Missing "Fixes" tag for the patch targeted to the "net" tree.
 
-  ESW_P4_LED_0    ESW_P3_LED_0    Frequency
-  -----------------------------------------
-  0               0               Reserved
-  0               1               20MHz
-  1               0               40MHz
-  1               1               25MHz
-
-On MT7531, the XTAL25 bit of the STRAP register stores this. The LAN0LED0
-pin is used to populate the bit. 25MHz when the pin is high, 40MHz when
-it's low.
-
-These pins are also used with LEDs, therefore, their state can be set to
-something other than the bootstrapping configuration. For example, a link
-may be established on port 3 before the DSA subdriver takes control of the
-switch which would set ESW_P3_LED_0 to high.
-
-Currently on mt7530_setup() and mt7531_setup(), 1000 - 1100 usec delay is
-described between reset assertion and deassertion. Some switch ICs in real
-life conditions cannot always have these pins set back to the bootstrapping
-configuration before reset deassertion in this amount of delay. This causes
-wrong crystal frequency to be selected which puts the switch in a
-nonfunctional state after reset deassertion.
-
-The tests below are conducted on an MT7530 with a 40MHz crystal oscillator
-by Justin Swartz.
-
-With a cable from an active peer connected to port 3 before reset, an
-incorrect crystal frequency (0b11 = 25MHz) is selected:
-
-                      [1]                  [3]     [5]
-                      :                    :       :
-              _____________________________         __________________
-ESW_P4_LED_0                               |_______|
-              _____________________________
-ESW_P3_LED_0                               |__________________________
-
-                       :                  : :     :
-                       :                  : [4]...:
-                       :                  :
-                       [2]................:
-
-[1] Reset is asserted.
-[2] Period of 1000 - 1100 usec.
-[3] Reset is deasserted.
-[4] Period of 315 usec. HWTRAP register is populated with incorrect
-    XTAL frequency.
-[5] Signals reflect the bootstrapped configuration.
-
-Increase the delay between reset_control_assert() and
-reset_control_deassert(), and gpiod_set_value_cansleep(priv->reset, 0) and
-gpiod_set_value_cansleep(priv->reset, 1) to 5000 - 5100 usec. This amount
-ensures a higher possibility that the switch IC will have these pins back
-to the bootstrapping configuration before reset deassertion.
-
-With a cable from an active peer connected to port 3 before reset, the
-correct crystal frequency (0b10 = 40MHz) is selected:
-
-                      [1]        [2-1]     [3]     [5]
-                      :          :         :       :
-              _____________________________         __________________
-ESW_P4_LED_0                               |_______|
-              ___________________           _______
-ESW_P3_LED_0                     |_________|       |__________________
-
-                       :          :       : :     :
-                       :          [2-2]...: [4]...:
-                       [2]................:
-
-[1] Reset is asserted.
-[2] Period of 5000 - 5100 usec.
-[2-1] ESW_P3_LED_0 goes low.
-[2-2] Remaining period of 5000 - 5100 usec.
-[3] Reset is deasserted.
-[4] Period of 310 usec. HWTRAP register is populated with bootstrapped
-    XTAL frequency.
-[5] Signals reflect the bootstrapped configuration.
-
-ESW_P3_LED_0 low period before reset deassertion:
-
-              5000 usec
-            - 5100 usec
-    TEST     RESET HOLD
-       #         (usec)
-  ---------------------
-       1           5410
-       2           5440
-       3           4375
-       4           5490
-       5           5475
-       6           4335
-       7           4370
-       8           5435
-       9           4205
-      10           4335
-      11           3750
-      12           3170
-      13           4395
-      14           4375
-      15           3515
-      16           4335
-      17           4220
-      18           4175
-      19           4175
-      20           4350
-
-     Min           3170
-     Max           5490
-
-  Median       4342.500
-     Avg       4466.500
-
-Revert commit 2920dd92b980 ("net: dsa: mt7530: disable LEDs before reset").
-Changing the state of pins via reset assertion is simpler and more
-efficient than doing so by setting the LED controller off.
-
-Reported-by: Justin Swartz <justin.swartz@risingedge.co.za>
-Fixes: b8f126a8d543 ("net-next: dsa: add dsa support for Mediatek MT7530 switch")
-Fixes: c288575f7810 ("net: dsa: mt7530: Add the support of MT7531 switch")
-Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
----
- drivers/net/dsa/mt7530.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
-
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 678b51f9cea6..6986f538a4d0 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -2192,22 +2192,16 @@ mt7530_setup(struct dsa_switch *ds)
- 		}
- 	}
- 
--	/* Disable LEDs before reset to prevent the MT7530 sampling a
--	 * potentially incorrect HT_XTAL_FSEL value.
--	 */
--	mt7530_write(priv, MT7530_LED_EN, 0);
--	usleep_range(1000, 1100);
--
- 	/* Reset whole chip through gpio pin or memory-mapped registers for
- 	 * different type of hardware
- 	 */
- 	if (priv->mcm) {
- 		reset_control_assert(priv->rstc);
--		usleep_range(1000, 1100);
-+		usleep_range(5000, 5100);
- 		reset_control_deassert(priv->rstc);
- 	} else {
- 		gpiod_set_value_cansleep(priv->reset, 0);
--		usleep_range(1000, 1100);
-+		usleep_range(5000, 5100);
- 		gpiod_set_value_cansleep(priv->reset, 1);
- 	}
- 
-@@ -2420,11 +2414,11 @@ mt7531_setup(struct dsa_switch *ds)
- 	 */
- 	if (priv->mcm) {
- 		reset_control_assert(priv->rstc);
--		usleep_range(1000, 1100);
-+		usleep_range(5000, 5100);
- 		reset_control_deassert(priv->rstc);
- 	} else {
- 		gpiod_set_value_cansleep(priv->reset, 0);
--		usleep_range(1000, 1100);
-+		usleep_range(5000, 5100);
- 		gpiod_set_value_cansleep(priv->reset, 1);
- 	}
- 
-
----
-base-commit: d7d75124965aee23e5e4421d78376545cf070b0a
-change-id: 20240312-for-netnext-mt7530-better-fix-xtal-frequency-31e6f599317f
-
-Best regards,
--- 
-Arınç ÜNAL <arinc.unal@arinc9.com>
+Thanks,
+Michal
 
 
