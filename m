@@ -1,192 +1,137 @@
-Return-Path: <netdev+bounces-79736-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79737-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E7A787B160
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 20:14:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A8F687B21C
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 20:43:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2483128D074
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 19:14:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89161B2AB74
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 19:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8599F762FB;
-	Wed, 13 Mar 2024 18:42:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1D060DEE;
+	Wed, 13 Mar 2024 19:13:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tgdjjBVW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="hK2bScIl"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B1D6024B
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 18:42:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A035360DD6;
+	Wed, 13 Mar 2024 19:13:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710355357; cv=none; b=p215xObFZILMT0tjxhRFI3KbIh60pQWhLLSusnd07khHoNFWDdTfB5ggFY3e9reF7pcWW5j94IgPVlxkI+xOHOq60bi6S3l3jEL+I+3/kDk3elIkag3DTm347BOp2G1klxwDgvHrN46KUs4Fk+q9vfSq9hsOf49lKgcvSu0wrN4=
+	t=1710357206; cv=none; b=UvovGXnUL5BUy0GIQMU2Ra6vuo2lFlPbimIG2vli5Ri4ZGiskljBP1UakSQI22TKpvg+VRwK39KYApGW3LpTjN9QqcgYGkJVG4FANqu+BF+CCOfWfEc6tHU37gABdWdXiCzPDTSPFNtS1BoYhNrF1uJg75UEvzwmcziFBJkMWEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710355357; c=relaxed/simple;
-	bh=h2s/HeHGv2cjNU9NqXHxp66hRlwq9Ft3Pc/wOqKN1sE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PcdLJ/yLR7pDw0ZZHLRAld8OHgc1ndmvzyqcLLqy0vi1GQGJ4AeQaE+KXf6rOKfLliuSmFAqBmZLy5bJ8mmlEIVZmXcAIrtxOp5h0HJ0trj8G/OD8ioBAwiDB8iUhuvcFeXxQkmI7yZOsFTwRceNF3le3+eaKFCMBq+J2vcT8xQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tgdjjBVW; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <28282905-065a-4233-a0a2-53aa9b85f381@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1710355352;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=WxQDoEE3/Fbbj9TMadguG+N8bpicfYLRU/3GYTYKZFs=;
-	b=tgdjjBVWjrWjp3qvXPEIbMRp5/xMrXSwJYp0emYEWOK4qEUQocB3Zdd7/jzlyvyjW1Uelz
-	KBEgQfwM4NUt9cdHJu/daDs2jW2/Ic5tsnVnIAXYP+o0+XuNgdLFSqD4sLKl5A6GAp6s3z
-	8sXV7P05yxegPG63+chPkFQmAoNdFZI=
-Date: Wed, 13 Mar 2024 11:42:24 -0700
+	s=arc-20240116; t=1710357206; c=relaxed/simple;
+	bh=Sbu7s5cRzT2+JBOIU5iBfi04JYiRAz5mbhHb5ik8btU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MuasFgveFoG8/K+PTd9K9srkyZ8gw7w/aTtSz1UFrTO3oUW0uSSukIzQwyo5VqvQyB2Ht4pmBwHEi4KBDhaQIps4RHtHUsiedFe0EkqvzJMwRybfRMZP+GHJVgN98mQK65b60SoRVRK5lxkaD/qD2bTVVRwupvUMbFvHTOu+9c8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=hK2bScIl; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=x+qZONr6YbvwJyGwyuaj5Ota3n6M4e55YF2EBPfxwwo=; b=hK2bScIlHaMdfudaOjJZfcJutS
+	PU5PIbzx8+T5vEIkwmy+4gF0ed/CXuNcmJzTOrUbR35VSj6WaFUcuhQOovb5Y0aeBYfORRM0uY9g+
+	y/2s/uLpzva+K3DDYq4pyZQG3lDU/i9zEHoNpiIxpAOR01bFjOEpAxOpV3r4I73i5CDJ4Y6Hwhlsx
+	urFtU5lHm+OkvVvM5dBY1CnjjTpNGFe0urPg15HCbiJhzEP+oLgblkfqPyFvIF4EF3o+AldcLO/D7
+	0CEJt4Ye/U5F3MxriJ/9hOAlZBZtPQhDfXHHbePR8rJJU9gKB2QZ5MaHafipvza0AuSZPScbEJ0Mv
+	JaKxmZGg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51196)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rkU2C-000858-33;
+	Wed, 13 Mar 2024 19:13:05 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rkU28-0004j5-2D; Wed, 13 Mar 2024 19:13:00 +0000
+Date: Wed, 13 Mar 2024 19:12:59 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Nikita Kiryushin <kiryushin@ancud.ru>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: phy: fix phy_read_poll_timeout argument type in
+ genphy_loopback
+Message-ID: <ZfH6u/njccckwT1K@shell.armlinux.org.uk>
+References: <>
+ <e2ef8067-bac7-45c1-96cf-1160625aef3d@ancud.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v4] net: Re-use and set mono_delivery_time bit
- for userspace tstamp packets
-Content-Language: en-US
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Abhishek Chauhan <quic_abchauha@quicinc.com>
-Cc: kernel@quicinc.com, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
- Martin KaFai Lau <martin.lau@kernel.org>, bpf <bpf@vger.kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>
-References: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
- <2a4cb416-5d95-459d-8c1c-3fb225240363@linux.dev>
- <65f16946cd33e_344ff1294fc@willemb.c.googlers.com.notmuch>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <65f16946cd33e_344ff1294fc@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e2ef8067-bac7-45c1-96cf-1160625aef3d@ancud.ru>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 3/13/24 1:52 AM, Willem de Bruijn wrote:
-> Martin KaFai Lau wrote:
->> On 3/1/24 12:13 PM, Abhishek Chauhan wrote:
->>> Bridge driver today has no support to forward the userspace timestamp
->>> packets and ends up resetting the timestamp. ETF qdisc checks the
->>> packet coming from userspace and encounters to be 0 thereby dropping
->>> time sensitive packets. These changes will allow userspace timestamps
->>> packets to be forwarded from the bridge to NIC drivers.
->>>
->>> Setting the same bit (mono_delivery_time) to avoid dropping of
->>> userspace tstamp packets in the forwarding path.
->>>
->>> Existing functionality of mono_delivery_time remains unaltered here,
->>> instead just extended with userspace tstamp support for bridge
->>> forwarding path.
->>
->> The patch currently broke the bpf selftest test_tc_dtime:
->> https://github.com/kernel-patches/bpf/actions/runs/8242487344/job/22541746675
->>
->> In particular, there is a uapi field __sk_buff->tstamp_type which currently has
->> BPF_SKB_TSTAMP_DELIVERY_MONO to mean skb->tstamp has the MONO "delivery" time.
->> BPF_SKB_TSTAMP_UNSPEC means everything else (this could be a rx timestamp at
->> ingress or a delivery time set by user space).
->>
->> __sk_buff->tstamp_type depends on skb->mono_delivery_time which does not
->> necessarily mean mono after this patch. I thought about fixing it on the bpf
->> side such that reading __sk_buff->tstamp_type only returns
->> BPF_SKB_TSTAMP_DELIVERY_MONO when the skb->mono_delivery_time is set and skb->sk
->> is IPPROTO_TCP. However, it won't work because of bpf_skb_set_tstamp().
->>
->> There is a bpf helper, bpf_skb_set_tstamp(skb, tstamp,
->> BPF_SKB_TSTAMP_DELIVERY_MONO). This helper changes both the skb->tstamp and the
->> skb->mono_delivery_time. The expectation is this could change skb->tstamp in the
->> ingress skb and redirect to egress sch_fq. It could also set a mono time to
->> skb->tstamp where the udp sk->sk_clockid may not be necessary in mono and then
->> bpf_redirect to egress sch_fq. When bpf_skb_set_tstamp(skb, tstamp,
->> BPF_SKB_TSTAMP_DELIVERY_MONO) succeeds, reading __sk_buff->tstamp_type expects
->> BPF_SKB_TSTAMP_DELIVERY_MONO also.
->>
->> I ran out of idea to solve this uapi breakage.
->>
->> I am afraid it may need to go back to v1 idea and use another bit
->> (user_delivery_time) in the skb.
+On Wed, Mar 13, 2024 at 09:13:23PM +0300, Nikita Kiryushin wrote:
+> read_poll_timeout inside phy_read_poll_timeout can set val negative
+> in some cases (for example, __mdiobus_read inside phy_read can return
+> -EOPNOTSUPP).
 > 
-> Is the only conflict when bpf_skb_set_tstamp is called for an skb from
-> a socket with sk_clockid set (and thus SO_TXTIME called)?
-
-Right, because skb->mono_delivery_time does not mean skb->tstamp is mono now and 
-its interpretation depends on skb->sk->sk_clockid.
-
-> Interpreting skb->tstamp as mono if skb->mono_delivery_time is set and
-> skb->sk is NULL is fine. This is the ingress to egress redirect case.
-
-skb->sk == NULL is fine. I tried something like this in 
-bpf_convert_tstamp_type_read() for reading __sk_buff->tstamp_type:
-
-__sk_buff->tstamp_type is BPF_SKB_TSTAMP_DELIVERY_MONO when:
-
-	skb->mono_delivery_time == 1 &&
-	(!skb->sk ||
-	 !sk_fullsock(skb->sk) /* tcp tw or req sk */ ||
-	 skb->sk->sk_protocol == IPPROTO_TCP)
-
-Not a small bpf instruction addition to bpf_convert_tstamp_type_read() but doable.
-
+> Supposedly, commit 4ec732951702 ("net: phylib: fix
+> phy_read*_poll_timeout()")
+> should fix problems with wrong-signed vals, but I do not see how
+> as val is sent to phy_read as is and __val = phy_read (not val)
+> is checked for sign.
 > 
-> I don't see an immediate use for this BPF function on egress where it
-> would overwrite an SO_TXTIME timestamp and now skb->tstamp is mono,
-> but skb->sk != NULL and skb->sk->sk_clockid != CLOCK_MONOTONIC.
-
-The bpf prog may act as a traffic shaper that limits the bandwidth usage of all 
-outgoing packets (tcp/udp/...) by setting the mono EDT in skb->tstamp before 
-sending to the sch_fq.
-
-I currently also don't have a use case for skb->sk->sk_clockid != 
-CLOCK_MONOTONIC. However, it is something that bpf_skb_set_tstamp() can do now 
-before queuing to sch_fq.
-
-The container (in netns + veth) may use other sk_clockid/qdisc (e.g. sch_etf) 
-setup and the non mono skb->tstamp is not cleared now during dev_forward_skb() 
-between the veth pair.
-
+> Change val type for signed to allow better error handling as done in other
+> phy_read_poll_timeout callers. This will not fix any error handling
+> by itself, but allows, for example, to modify cond with appropriate
+> sign check or check resulting val separately.
 > 
-> Perhaps bpf_skb_set_tstamp() can just fail if another delivery time is
-> already explicitly programmed?
-
-This will change the existing bpf_skb_set_tstamp() behavior, so probably not 
-acceptable.
-
+> Found by Linux Verification Center (linuxtesting.org) with SVACE.
 > 
->      skb->sk &&
->      sock_flag(sk, SOCK_TXTIME) &&
->      skb->sk->sk_clockid != CLOCK_MONOTONIC
+> Fixes: 014068dcb5b1 ("net: phy: genphy_loopback: add link speed
+> configuration")
 
-> Either that, or unset SOCK_TXTIME to make sk_clockid undefined and
-> fall back on interpreting as monotonic.
+Fixes lines must not be wrapped.
 
-Change sk->sk_flags in tc bpf prog? hmm... I am not sure this will work well also.
+> Signed-off-by: Nikita Kiryushin <kiryushin@ancud.ru>
+> ---
+>  drivers/net/phy/phy_device.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
+> index 8297ef681bf5..6c6ec9475709 100644
+> --- a/drivers/net/phy/phy_device.c
+> +++ b/drivers/net/phy/phy_device.c
+> @@ -2831,8 +2831,8 @@ EXPORT_SYMBOL(genphy_resume);
+>  int genphy_loopback(struct phy_device *phydev, bool enable)
+>  {
+>  	if (enable) {
+> -		u16 val, ctl = BMCR_LOOPBACK;
+> -		int ret;
+> +		u16 ctl = BMCR_LOOPBACK;
+> +		int ret, val;
+>   		ctl |= mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
+>  -- 2.34.1
 
-sock_valbool_flag(SOCK_TXTIME) should require a lock_sock() to make changes. The 
-tc bpf prog cannot take the lock_sock, so bpf_skb_set_tstamp() currently only 
-changes skb and does not change skb->sk.
+The patch seems broken - blank lines appear to be missing.
 
-I think changing sock_valbool_flag(SOCK_TXTIME) will also have a new user space 
-visible side effect. The sendmsg for cmsg with SCM_TXTIME will start failing 
-from looking at __sock_cmsg_send().
+I think the change itself is correct however - "val" passed into
+phy_read_poll_timeout() must be signed.
 
-There may be a short period of disconnect between what is in sk->sk_flags and 
-what is set in skb->tstamp. e.g. what if user space does setsockopt(SO_TXTIME) 
-again after skb->tstamp is set by bpf. This could be considered a small glitch 
-for some amount of skb(s) until the user space settled on setsockopt(SO_TXTIME).
+Lastly, as you need to indicate which tree your patch is targetting,
+which is done via the subject line prefix. As this is in mainline, then
+[PATCH net] would be the correct prefix.
 
-I think all this is crying for another bit in skb to mean user_delivery_time 
-(skb->tstamp depends on skb->sk->sk_clockid) while mono_delivery_time is the 
-mono time either set by kernel-tcp or bpf. If we need to revert the 
-mono_delivery_time reuse patch later, we will need to revert the netdev patch 
-and the (to-be-made) bpf patch.
+Thanks.
 
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
