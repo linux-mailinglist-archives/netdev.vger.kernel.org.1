@@ -1,309 +1,255 @@
-Return-Path: <netdev+bounces-79592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97C0987A020
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 01:22:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F18C87A04B
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 01:53:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DB54282009
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 00:22:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CD7F1F2243C
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 00:53:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF2EC320C;
-	Wed, 13 Mar 2024 00:22:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36D1479EF;
+	Wed, 13 Mar 2024 00:53:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="EU30Eq7e";
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="G8klFv/B"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gCtO5NE/"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECFB12F35;
-	Wed, 13 Mar 2024 00:22:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.153.233
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710289355; cv=fail; b=LHW9dQwY3tjvFdJEJqWE5VSzTwi1rddtxinaUDgakjrKGpPpcc2jhpvVG6Cc3gPJdKhph+ASSFeCTdfvXy9WuCqZxduSo3VizJEZV219uzpkG560qFHl65WEPtVmw7TZCmlUC+30x9NvtSuk41LSAfehq49vl5jhIUblQzmSBIM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710289355; c=relaxed/simple;
-	bh=7V/qXz/Aq+OevAekFRZhXYymvndjpn6ZRdV4Q+xmxl8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Hv6Xd4QKMCSnjKLgufysjvJHD89rsE4KiVSl5T+w6N5D2J5ktglnU/KZTuzCtRf9a1JLOUNNEEvLJZlSCr6ISAAKAXIZkh+F2j9vKf1Ss59rUH4oZf8+vQkxbxfcNsk6BHkm1SHnMwUaqcnu7j7fNDDDboquVb5hmdeI6dsNvKE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=EU30Eq7e; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=G8klFv/B; arc=fail smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1710289353; x=1741825353;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=7V/qXz/Aq+OevAekFRZhXYymvndjpn6ZRdV4Q+xmxl8=;
-  b=EU30Eq7e25CUO1dsLKpFiypM232vJyH89skcwg8jFAigsYgJkLWksKrQ
-   o9oSRLCHX1jI0FegnjxmQzsksYVjGGxmtNg1x/6tVgCNcXUTniveKLPlI
-   OLuo3ItEi4uqCJJ2YEi7rPP6CpMYPzDreDDd6x12V0u6TJYRPvoORTsfC
-   SHRUduAccMhfUHdXn+Or+87n3SflCurE1Z94KJL5b0QeO1bi0yMpSzEbl
-   EhI2KCYvC+Yi3h+ifr63iqGIYCZlm85fJ0+R6bdg6g+0WrJv4u9vYkfhz
-   MGr/8/BRkPMXK0zzTguXAlm9i9lIX6Zy2btMw7HFlZ8eQz2m67Mjv3JXU
-   g==;
-X-CSE-ConnectionGUID: KhRUKrT3TA6Eg+gH2POjgg==
-X-CSE-MsgGUID: kuHwPgwzSayTYzgB8WwNTQ==
-X-IronPort-AV: E=Sophos;i="6.07,119,1708412400"; 
-   d="scan'208";a="248349673"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 12 Mar 2024 17:22:26 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 12 Mar 2024 17:22:07 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (10.10.215.250)
- by email.microchip.com (10.10.87.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Tue, 12 Mar 2024 17:22:06 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=X/BLJ2r1JtBLdC2gyvM2iv4wiGOeKTTXEIBP2ymeSfajNma+BcAzVQJpX1zSK4/aMv3H7GmkpcFlrxEcrhGuJGrP468c/CaBOg9oAo9oF2kh3TMzUTzmXILrX+pGJED+r0wL7qkZcKno8rSTKV5cstGlmeuyT8Cfj+Cahjhcym/yWd8dDEG1/NSKt5sX2l5GVCNP46W2AxgvwjAw9KQJHMzV9JYZUaS7rMsWvqo+gXhlBgU3clJvXuw6URkpk7yXc7NWNlU7XcZDJEgbInctJRAgcdUtaGOP7mcHR1xGd+KvhDrZahthuRnUM5c2h1/9S5pvTtQQB5VNM6j0pby9CA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=u5Y2PelhGziS/gBZ1em0+JRIBX4fa00hNGZ0zI6popc=;
- b=lLJFum+iFS1dUlQDjnSu7FGf5MhDyK8WYpjh0zKIHE7T/nkC4K2BGovhaA7ZFWLgDgMtJpo8zILwgH2DBLa5EN04Ol6stttBpfp4eZh+Wy7SifFtPeUIWi1jpE7a5UglgvAhYCpUMYn9nKTbkVmc79yHHOVXBULhWrHLU0ddXY1M1YHYnY4gnv0Zttde9JWkml5SdVL4xyZmyONkYzC6HFD8bktC78BTiEVSOvO3IwokxrisgAB+3M29mGE5fNeBLQuDQtUuLHCvD4SJTlGB8QdiNcZDiom4NqdPZqEiqVeAMYbOBsYUnae1WRRZxql6rdtSQi0vJ12ZigGAQmbgQQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microchip.com; dmarc=pass action=none
- header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=u5Y2PelhGziS/gBZ1em0+JRIBX4fa00hNGZ0zI6popc=;
- b=G8klFv/Bs2e2aJ9pT2KbNXo/5MBGmBeA3Zg+OLj0wisYDQjE1Or0ZeO2D94SI3X0EIbpN1cY+T3wjbIvwcQQgE8EYOyzyA/vYYfUtUfFGyqbawqGfDv/0Xk08FeIqLWt5r45j5m17fUJ+GrpmfOwsRlQTwSxvbOgsNL/I/HxqQVA0iObjUTKn0RRqCk9FEOIJacO3PgdrLy6eQWxFEvC+PH8xpB0acq3QeqPt3WYkSzvNxiW/zuKghHczT17u2Zx4lYkK4v002R/O19QPO4FhbLurDK13BXM9K8JG9tc7b5jzuY+zhdD3khsaEJLIvKiBRCxMmW+yRqE/2JlEhZF2g==
-Received: from PH8PR11MB7965.namprd11.prod.outlook.com (2603:10b6:510:25c::13)
- by SN7PR11MB6775.namprd11.prod.outlook.com (2603:10b6:806:264::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.16; Wed, 13 Mar
- 2024 00:22:03 +0000
-Received: from PH8PR11MB7965.namprd11.prod.outlook.com
- ([fe80::1a3a:422d:1406:cd7]) by PH8PR11MB7965.namprd11.prod.outlook.com
- ([fe80::1a3a:422d:1406:cd7%5]) with mapi id 15.20.7386.017; Wed, 13 Mar 2024
- 00:22:03 +0000
-From: <Ronnie.Kunin@microchip.com>
-To: <andrew@lunn.ch>
-CC: <Raju.Lakkaraju@microchip.com>, <netdev@vger.kernel.org>,
-	<davem@davemloft.net>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<Bryan.Whitehead@microchip.com>, <richardcochran@gmail.com>,
-	<UNGLinuxDriver@microchip.com>
-Subject: RE: [PATCH net 3/3] net: lan743x: Address problems with wake option
- flags configuration sequences
-Thread-Topic: [PATCH net 3/3] net: lan743x: Address problems with wake option
- flags configuration sequences
-Thread-Index: AQHaaIt9/9VvJ3PDJ0OgsYtGoeCEQLErcdiAgAIgIYCAAJu7MIAGjQ6AgAAJaUA=
-Disposition-Notification-To: <Ronnie.Kunin@microchip.com>
-Date: Wed, 13 Mar 2024 00:22:03 +0000
-Message-ID: <PH8PR11MB79655416A331370D3496854A952A2@PH8PR11MB7965.namprd11.prod.outlook.com>
-References: <20240226080934.46003-1-Raju.Lakkaraju@microchip.com>
- <20240226080934.46003-4-Raju.Lakkaraju@microchip.com>
- <78d7e538-9fa0-490e-bcfb-0a5943ad80c9@lunn.ch>
- <LV8PR11MB87008454A629EE15B9CE14099F272@LV8PR11MB8700.namprd11.prod.outlook.com>
- <PH8PR11MB79656DCF7806D7390C7100DE95272@PH8PR11MB7965.namprd11.prod.outlook.com>
- <fd22d022-cad4-489c-9861-36765dd98a87@lunn.ch>
-In-Reply-To: <fd22d022-cad4-489c-9861-36765dd98a87@lunn.ch>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microchip.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PH8PR11MB7965:EE_|SN7PR11MB6775:EE_
-x-ms-office365-filtering-correlation-id: ad6a9c98-bd35-45a8-78d8-08dc42f39bb5
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: TkLOC8Pk+YRR38nFB5B3HajrEg3lYUEQPGBblnihPci+YY0l7DWZV6ODkkNis13aa3qnDVThIe4YtolZBGgY2r1roExLIbW2VTLioOjITKpQo+XYNTG/nOHQM1NkFdaJT+yU0bkar5Gm+n8q6ocqiTGO9E+ZcR4qD7aV04430EzySDKr+hteNUZCz8bMQdd7W9/f8KoCCIpy+7f4Z7gKVCa4lFY/Oudp2FJ9sKfChzppQif54iUtk0S2U6iFutgyX1YgmisnyZpF0aYOFn0b0d3uhNW53idRSlDmVHO/AHPcO2RJcn1W739XjlhXWViZSg0v3M9ffXRZjiHrolthch5BIZ/DbP0vvmO8mqcoqTDwIuGY7w0KcEVdzvGJfFFin6ivZ17cGG/63k66RiessDHGVInw/H/pBglZvoRG1Nr4+HoisvV/HFOgH9f4uG6kHSwUzwfhpPegUsKu8rdP6F5zCmCEX4zcZsRyC4alZGRhUz0PWzX8w4ufXTMR9h/KpvnG04Tx+3o0Ur0fmQ4t+5VWa62SNeB3qFpm24UrOdy/shqQU12AGFdp4LUSxwoSTCEPMc+0GhdAm2e+QWsoQdMvHYSjUD6wR9i/LSXml4zUyj7ufjLxcSHDQqCIRkA0WVfP1rR9rExPj7wUAJWlxsK6qIUIsKbMvhqbFeZGhuk=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB7965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?L8zeplNdxKXr74rznsup0BHtLcXWEsnZ63UihnoCgk1ChM5nPjmy6tLEZzlg?=
- =?us-ascii?Q?zHMPlG+AknY8tR1UDLIStDelllJsc1rr8W6tTtVxfJ1Yb+IdKle1wdQ5uYnM?=
- =?us-ascii?Q?ltU3lf88uwlGU69lxG6op3GFlL0hpXgZb4AUh5D0YxS0a90oFNRXxVWaJkMC?=
- =?us-ascii?Q?rkin4CMdKqSXJ7NIzOOIfioN62w/UUK9p8RrO9GSOZ6mlRv4nFflrJ3wWbvz?=
- =?us-ascii?Q?O+gauF8cLV/TQd9fg0zvBrnaDKWDeYIdQ9j/1NsHnDh+YIluduk7yrBNg6bB?=
- =?us-ascii?Q?o8LG48rrzU1T8TpxvVkpqP/M3xXQhM36vkXIELTOXbk5h+ZLom+riBZ29Mgr?=
- =?us-ascii?Q?a8iX5PLJFgAa4YJx3cY5ptRdpJ4VA3411vNfuhum5FkBgyR5VPHndzCMirdN?=
- =?us-ascii?Q?WhyahJs3oKEJj6NDFq1QMMQ/bXYET9UEppcNzmfEHtCW5DoKF5KoZEQbgKch?=
- =?us-ascii?Q?TKRnnGszEnOkslf8nSwP6tcSjKboqVy98uxVMt3t8XNoFDVqCPeKoYASfbBm?=
- =?us-ascii?Q?G3KwX1kPAeyYOgnkw6gsK+duC8wUL1Cf7W8IN7BiUL0k2nwogDm4RQ9H85MQ?=
- =?us-ascii?Q?o4SqBM9yHX83RjVu1l6oIMmtmkuf03+gRI/FEQJpMGiQFuTdPsTKSyRPCScb?=
- =?us-ascii?Q?8pKfh5XOZpasgXycIGB9ZH4sFmkbLRGLjDWBzvenqDFIZokRAyrHuAFnILl7?=
- =?us-ascii?Q?oEkpU8wRf0QKZ5Vtshx0GdqQFM+mgPmUguFwCy79VuwhFgTjA6aRKuoJpWWX?=
- =?us-ascii?Q?YHAS7zBnePsellYD5sQW9K4UG9vmA8S4LVo6QQz6mmmAYam2AH06qnAuAMbK?=
- =?us-ascii?Q?dQUP0RsdOHzIMbKtpiVRR8yOo0Zgp6KubuCABXACep5WKM39IiWTgY4tiQs6?=
- =?us-ascii?Q?NKMptNSz/fsWq3WZo2IYCstAKnOZuWJGsupLFIpJhnGnt3wSYFfpQovy5vfK?=
- =?us-ascii?Q?6la7vRoXhuAiGjiYSDcBztKkmnErOWTd4T9f9/kHxTQlvapOel+m0T5J9fD8?=
- =?us-ascii?Q?oRTyJcvePX99kKJjY4Tyzyat6Szj9b5FifKNrBVgWxqnk2qd5r9v75EM1Z6D?=
- =?us-ascii?Q?bKu+3Xl5rYD8O1mWMOd971UXIrhePFvEH+q1qIJhtTssuR9rF8/UB1jtMx+S?=
- =?us-ascii?Q?ppQcuwnKgjflPOdHSH6MO7C6BRdRNDxfiSOqueD+qk3bZCB6rFbMauY1pKrT?=
- =?us-ascii?Q?P6bADEKIUb3jW9t058wsAfZ6TFNQ3TdsAz4C5WHX8flNk/7LKcfmmOWiLdeD?=
- =?us-ascii?Q?e+KxnKzJoKR2pCwGcsl7dz8bHu4g/aLab4JlKgZGKZJUKPEbOFbmoArT5/8T?=
- =?us-ascii?Q?VuRvpMpKhuSVReGx7ntvim3TZlll1xdNzBKEnY4fyEXzUavRquU6Z8Pshlkc?=
- =?us-ascii?Q?WZtffrBIqMHWaaX8GbG5JTr37mgDMOrNy+CXLc6zW4Bxl1GseP1R19WUr4np?=
- =?us-ascii?Q?nKwboDX2ncKfEuq663t8cTfRmkaRYf6rbP1iUSaI/khULPdrIguMPK+eqSPy?=
- =?us-ascii?Q?F/S2g1rk/VVXXk1gamNcmgF4XLd5s5aIx6rXF9ow74BcbiBb8oP0Wx37gMJx?=
- =?us-ascii?Q?qSBuzYnugw572pjparRcYiLEVSaHgwHDMJHJY6ag?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829B36FCB;
+	Wed, 13 Mar 2024 00:53:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710291233; cv=none; b=FCUG+9DWndDL8X5hc4VeKErVOhkyMHiuZoXAwQ/+U+Clj/nl8VqU069BhNWp/hmnlOApxYJPXZwtbOHLlFNQh/WGRcuauVSZPzRuxYveGxwhXlW+82G3kTB2k849TIOa+FRdyVlEC449D2vvTxWnOJiajlL0a3AdHVZsOhusttM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710291233; c=relaxed/simple;
+	bh=EN3DqD5pQ7mog0RBXk8W0/RBIznhtTREbfQ2U47Wiow=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=M7LGReUqTzXHhnot+abdD8rEd0Cwg2f3W7yHO9NmgT6Ca/QsCyhkm50QPNxO53Ru90KURq88ZR+KfdPR9Ouvz1akxiHfqLuS/nHtLRHS32tO8MwWTmylQuebGbvBgRSK9XlVHJPDalN3U5eSJdoDVerM0Wm7E6R3g5SnwD3QLKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gCtO5NE/; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-5d81b08d6f2so4201880a12.0;
+        Tue, 12 Mar 2024 17:53:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710291231; x=1710896031; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eCu7qP8kGoacD6jyN5z8MIwYru8L3XakVidOTwO7XFA=;
+        b=gCtO5NE/3Gm6/Muutj3OB6F/P2j6ZM5ghA8kn+1+Vr2NJ1Ui3VXkfOYQ8o77U1MrKU
+         +VTBPYcPc5Oj7xAaY2AM7FjBM6K8NPmK0Teob2I6EhsnsaldpgHls/LrqUOcDFHtvLyp
+         aYhhVk2N1hN8saf9mFHSCSw3ZvizIwpT9ateuvGmGmJ3HuB/SAZmCtNnU0NKkEVVESpa
+         645EHywx/Yiq4OxpvwAibCfD3L/EDQW030awEseR/P7+ZSYNcjla078i/tkOO4YX6//S
+         dTV3lr+hjTAYwELIWNN5iG4i7Xlw7X6qG5DU/yXXB2VwPQdUZWkvxwy6q9AXoAIogq0Z
+         hsPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710291231; x=1710896031;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=eCu7qP8kGoacD6jyN5z8MIwYru8L3XakVidOTwO7XFA=;
+        b=R+8VO8hI0oQ8OZ+uaoEAPSUoek3oii6PMImHGGK3ZIvlnGuwG2YvVN3FLASeFR6H9M
+         6QSeodJTVMRx+ALm22dkwofR2quJ3DE8KPX3odMHUxT+zV/tmlgEhs6NmXUC9wNkiDCB
+         h6UGneUkwehaqtHt76Jn9W7xbOISuK1CD2bbpQVMMRfrn6KIhoBhgziRugPXoPOXLORL
+         PpNnS801SNH97qh7ph9XvrnkH1T/ajQlnUhH2/H+yPcJG9unZmI9B3y1NtaVFTZ/+hau
+         sATpnFzQ1mt3TrHMvnC++nMxHZKZH/7DS9KUmU/sbE2kpLXhZjT5MqnipRgFctHrDaqn
+         ZgOg==
+X-Forwarded-Encrypted: i=1; AJvYcCXUUvGKyjZShXibxItHvsO7j7WVmOC3xRlLxTP+W1657gjPySJFv0+R2T6L1W5/SyoXyDkT/mmOZ7F6I/eraL0XubVkusnFTAEDoLTks7Vadspw50Ktl9ysASLD8QVNbXLJKvCv
+X-Gm-Message-State: AOJu0YxKuYfI9ZJ2bba6zCgKRpXiWQBKwC6E8nMer9b+ANM9Bta0Uu+K
+	So2fUy4ZJAZDxhfnvhBx+FxrtjqmGjTa0bftYWxw7cPXobV8AzixxKb/ah9N1eU=
+X-Google-Smtp-Source: AGHT+IGbB9EAMh2Cns5yRNX7ITItrtBERakI51ryjoKsmZyDY7ZpXMVW517iENepPMfv+28xd+2MfQ==
+X-Received: by 2002:a05:6a21:9217:b0:1a1:1f7b:9b08 with SMTP id tl23-20020a056a21921700b001a11f7b9b08mr1822683pzb.47.1710291230564;
+        Tue, 12 Mar 2024 17:53:50 -0700 (PDT)
+Received: from ?IPV6:2600:8802:b00:ba1:c5e3:e8e1:573:b323? ([2600:8802:b00:ba1:c5e3:e8e1:573:b323])
+        by smtp.gmail.com with ESMTPSA id w20-20020a1709027b9400b001db3361bc1dsm7328885pll.102.2024.03.12.17.53.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 12 Mar 2024 17:53:50 -0700 (PDT)
+Message-ID: <3e84e1c9-f680-47fa-aa59-615ce57b65da@gmail.com>
+Date: Tue, 12 Mar 2024 17:53:48 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB7965.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ad6a9c98-bd35-45a8-78d8-08dc42f39bb5
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Mar 2024 00:22:03.6408
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: zBVe+qRYEZNgmvNvhx3I+W0OP0ZAhFB3TOICiJnPOYo/jOUy9GEySg93jnSET56QW5qa2TcAMH2baKkK4NKkfzbrm9I4Nw3grEffleIrvro=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB6775
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 3/3] net: lan743x: Address problems with wake option
+ flags configuration sequences
+Content-Language: en-US
+To: Ronnie.Kunin@microchip.com, andrew@lunn.ch
+Cc: Raju.Lakkaraju@microchip.com, netdev@vger.kernel.org,
+ davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org,
+ Bryan.Whitehead@microchip.com, richardcochran@gmail.com,
+ UNGLinuxDriver@microchip.com
+References: <20240226080934.46003-1-Raju.Lakkaraju@microchip.com>
+ <20240226080934.46003-4-Raju.Lakkaraju@microchip.com>
+ <78d7e538-9fa0-490e-bcfb-0a5943ad80c9@lunn.ch>
+ <LV8PR11MB87008454A629EE15B9CE14099F272@LV8PR11MB8700.namprd11.prod.outlook.com>
+ <PH8PR11MB79656DCF7806D7390C7100DE95272@PH8PR11MB7965.namprd11.prod.outlook.com>
+ <fd22d022-cad4-489c-9861-36765dd98a87@lunn.ch>
+ <PH8PR11MB79655416A331370D3496854A952A2@PH8PR11MB7965.namprd11.prod.outlook.com>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
+ xGlkaOSDuu09rxuW+69Y2f1TzjFuGpBk4ysWOR85O2Nx8AJ6fYGCoeTbovrNlGT1M9obSFGQ
+ X3IzRnWoqlfudjTO5TKoqkbOgpYqIo5n1QbEjCCwCwCg3DOH/4ug2AUUlcIT9/l3pGvoRJ0E
+ AICDzi3l7pmC5IWn2n1mvP5247urtHFs/uusE827DDj3K8Upn2vYiOFMBhGsxAk6YKV6IP0d
+ ZdWX6fqkJJlu9cSDvWtO1hXeHIfQIE/xcqvlRH783KrihLcsmnBqOiS6rJDO2x1eAgC8meAX
+ SAgsrBhcgGl2Rl5gh/jkeA5ykwbxA/9u1eEuL70Qzt5APJmqVXR+kWvrqdBVPoUNy/tQ8mYc
+ nzJJ63ng3tHhnwHXZOu8hL4nqwlYHRa9eeglXYhBqja4ZvIvCEqSmEukfivk+DlIgVoOAJbh
+ qIWgvr3SIEuR6ayY3f5j0f2ejUMYlYYnKdiHXFlF9uXm1ELrb0YX4GMHz80nRmxvcmlhbiBG
+ YWluZWxsaSA8Zi5mYWluZWxsaUBnbWFpbC5jb20+wmYEExECACYCGyMGCwkIBwMCBBUCCAME
+ FgIDAQIeAQIXgAUCVF/S8QUJHlwd3wAKCRBhV5kVtWN2DvCVAJ4u4/bPF4P3jxb4qEY8I2gS
+ 6hG0gACffNWlqJ2T4wSSn+3o7CCZNd7SLSDOw00ESM+4EhAQAL/o09boR9D3Vk1Tt7+gpYr3
+ WQ6hgYVON905q2ndEoA2J0dQxJNRw3snabHDDzQBAcqOvdi7YidfBVdKi0wxHhSuRBfuOppu
+ pdXkb7zxuPQuSveCLqqZWRQ+Cc2QgF7SBqgznbe6Ngout5qXY5Dcagk9LqFNGhJQzUGHAsIs
+ hap1f0B1PoUyUNeEInV98D8Xd/edM3mhO9nRpUXRK9Bvt4iEZUXGuVtZLT52nK6Wv2EZ1TiT
+ OiqZlf1P+vxYLBx9eKmabPdm3yjalhY8yr1S1vL0gSA/C6W1o/TowdieF1rWN/MYHlkpyj9c
+ Rpc281gAO0AP3V1G00YzBEdYyi0gaJbCEQnq8Vz1vDXFxHzyhgGz7umBsVKmYwZgA8DrrB0M
+ oaP35wuGR3RJcaG30AnJpEDkBYHznI2apxdcuTPOHZyEilIRrBGzDwGtAhldzlBoBwE3Z3MY
+ 31TOpACu1ZpNOMysZ6xiE35pWkwc0KYm4hJA5GFfmWSN6DniimW3pmdDIiw4Ifcx8b3mFrRO
+ BbDIW13E51j9RjbO/nAaK9ndZ5LRO1B/8Fwat7bLzmsCiEXOJY7NNpIEpkoNoEUfCcZwmLrU
+ +eOTPzaF6drw6ayewEi5yzPg3TAT6FV3oBsNg3xlwU0gPK3v6gYPX5w9+ovPZ1/qqNfOrbsE
+ FRuiSVsZQ5s3AAMFD/9XjlnnVDh9GX/r/6hjmr4U9tEsM+VQXaVXqZuHKaSmojOLUCP/YVQo
+ 7IiYaNssCS4FCPe4yrL4FJJfJAsbeyDykMN7wAnBcOkbZ9BPJPNCbqU6dowLOiy8AuTYQ48m
+ vIyQ4Ijnb6GTrtxIUDQeOBNuQC/gyyx3nbL/lVlHbxr4tb6YkhkO6shjXhQh7nQb33FjGO4P
+ WU11Nr9i/qoV8QCo12MQEo244RRA6VMud06y/E449rWZFSTwGqb0FS0seTcYNvxt8PB2izX+
+ HZA8SL54j479ubxhfuoTu5nXdtFYFj5Lj5x34LKPx7MpgAmj0H7SDhpFWF2FzcC1bjiW9mjW
+ HaKaX23Awt97AqQZXegbfkJwX2Y53ufq8Np3e1542lh3/mpiGSilCsaTahEGrHK+lIusl6mz
+ Joil+u3k01ofvJMK0ZdzGUZ/aPMZ16LofjFA+MNxWrZFrkYmiGdv+LG45zSlZyIvzSiG2lKy
+ kuVag+IijCIom78P9jRtB1q1Q5lwZp2TLAJlz92DmFwBg1hyFzwDADjZ2nrDxKUiybXIgZp9
+ aU2d++ptEGCVJOfEW4qpWCCLPbOT7XBr+g/4H3qWbs3j/cDDq7LuVYIe+wchy/iXEJaQVeTC
+ y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
+ X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
+ HGuUuzv+GKZ6nsysJw==
+In-Reply-To: <PH8PR11MB79655416A331370D3496854A952A2@PH8PR11MB7965.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
-> -----Original Message-----
-> From: Andrew Lunn <andrew@lunn.ch>
-> Sent: Tuesday, March 12, 2024 5:41 PM
-> To: Ronnie Kunin - C21729 <Ronnie.Kunin@microchip.com>
-> Cc: Raju Lakkaraju - I30499 <Raju.Lakkaraju@microchip.com>; netdev@vger.k=
-ernel.org;
-> davem@davemloft.net; kuba@kernel.org; linux-kernel@vger.kernel.org; Bryan=
- Whitehead - C21958
-> <Bryan.Whitehead@microchip.com>; richardcochran@gmail.com; UNGLinuxDriver
-> <UNGLinuxDriver@microchip.com>
-> Subject: Re: [PATCH net 3/3] net: lan743x: Address problems with wake opt=
-ion flags configuration
-> sequences
->=20
-> EXTERNAL EMAIL: Do not click links or open attachments unless you know th=
-e content is safe
->=20
-> > I understand that the TI devices give the *impression* of supporting
-> > both, but based on what I explained above, even if you accept
-> > WAKE_MAGIC and WAKE_MAGICSEGURE on a set and report them both back as
-> > enabled on a get; whatever behavior your hardware does will not be
-> > fully compliant to both specs simultaneously anyway. I discussed this
-> > with Raju and what we decided to do for our driver/device is that if
-> > you pass both WAKE_MAGIC and WAKE_MAGICSEGURE flags to us we will
-> > report them back as both being enabled in a subsequent get as you
-> > suggested, but the behavior of our driver/hardware will be as if you
-> > had only enabled WAKE_MAGIC.
->=20
-> So i agree having WAKE_MAGIC and WAKE_MAGICSECURE at the same time seems =
-very odd. So i see no
 
-To me it is not just a little odd, *strictly speaking* as mentioned before =
-it is an impossibility, since no=20
-hardware can do both at the same time because they have mutually exclusive =
-requirements=20
-for some frames.
+On 3/12/2024 5:22 PM, Ronnie.Kunin@microchip.com wrote:
+> 
+>> -----Original Message-----
+>> From: Andrew Lunn <andrew@lunn.ch>
+>> Sent: Tuesday, March 12, 2024 5:41 PM
+>> To: Ronnie Kunin - C21729 <Ronnie.Kunin@microchip.com>
+>> Cc: Raju Lakkaraju - I30499 <Raju.Lakkaraju@microchip.com>; netdev@vger.kernel.org;
+>> davem@davemloft.net; kuba@kernel.org; linux-kernel@vger.kernel.org; Bryan Whitehead - C21958
+>> <Bryan.Whitehead@microchip.com>; richardcochran@gmail.com; UNGLinuxDriver
+>> <UNGLinuxDriver@microchip.com>
+>> Subject: Re: [PATCH net 3/3] net: lan743x: Address problems with wake option flags configuration
+>> sequences
+>>
+>> EXTERNAL EMAIL: Do not click links or open attachments unless you know the content is safe
+>>
+>>> I understand that the TI devices give the *impression* of supporting
+>>> both, but based on what I explained above, even if you accept
+>>> WAKE_MAGIC and WAKE_MAGICSEGURE on a set and report them both back as
+>>> enabled on a get; whatever behavior your hardware does will not be
+>>> fully compliant to both specs simultaneously anyway. I discussed this
+>>> with Raju and what we decided to do for our driver/device is that if
+>>> you pass both WAKE_MAGIC and WAKE_MAGICSEGURE flags to us we will
+>>> report them back as both being enabled in a subsequent get as you
+>>> suggested, but the behavior of our driver/hardware will be as if you
+>>> had only enabled WAKE_MAGIC.
+>>
+>> So i agree having WAKE_MAGIC and WAKE_MAGICSECURE at the same time seems very odd. So i see no
+> 
+> To me it is not just a little odd, *strictly speaking* as mentioned before it is an impossibility, since no
+> hardware can do both at the same time because they have mutually exclusive requirements
+> for some frames.
 
-> real problem limiting the driver to only one or the other. However, if th=
-e user does ask for both, i would
-> say silently ignoring one is incorrect. You should return -EOPNOTUPP to m=
-ake it clear you don't support
-> both at the same time.
->=20
-> I would also say that silently ignore the Secure version is probably the =
-worst choice. Things should be
-> secure by default...
->=20
->      Andrew
+Agreed, this is definitively the case for the hardware that I maintain.
 
-We were just trying to accommodate your previous request to accept both "if=
- the hardware supports it".=20
-And even though I didn't like it, this was an attempt to answer my previous=
- question: "what does it=20
-mean to support both magic and secure magic at the same time ?" in some way=
- that might make sense.=20
-It is not that the purpose was to "silently ignore" the secure flag (that's=
- why we would still return it as being=20
-set on a subsequent get), we just took the interpretation that both flags t=
-ogether meant the user wanted=20
-to do an "OR" of both matching conditions (secure and non secure). I see yo=
-ur preference would be to do=20
-an "AND" of the two matching conditions citing security concerns. Honestly,=
- I don't think there is a best or=20
-worse way, in my opinion the user does not really understand what he is doi=
-ng if he Is asking to enable both=20
-secure and non-secure behaviors simultaneously, so security is probably dow=
-n the drain already anyway.=20
+> 
+>> real problem limiting the driver to only one or the other. However, if the user does ask for both, i would
+>> say silently ignoring one is incorrect. You should return -EOPNOTUPP to make it clear you don't support
+>> both at the same time.
+>>
+>> I would also say that silently ignore the Secure version is probably the worst choice. Things should be
+>> secure by default...
+>>
+>>       Andrew
+> 
+> We were just trying to accommodate your previous request to accept both "if the hardware supports it".
+> And even though I didn't like it, this was an attempt to answer my previous question: "what does it
+> mean to support both magic and secure magic at the same time ?" in some way that might make sense.
+> It is not that the purpose was to "silently ignore" the secure flag (that's why we would still return it as being
+> set on a subsequent get), we just took the interpretation that both flags together meant the user wanted
+> to do an "OR" of both matching conditions (secure and non secure). I see your preference would be to do
+> an "AND" of the two matching conditions citing security concerns. Honestly, I don't think there is a best or
+> worse way, in my opinion the user does not really understand what he is doing if he Is asking to enable both
+> secure and non-secure behaviors simultaneously, so security is probably down the drain already anyway.
+> 
+> In that sense I would have agreed with your recommendation that the best course of action would have
+> been to only accept one flag individually and fail with -EOPNOTUPP if both come simultaneously.  And
+> being mutually exclusive at the definition level that really should have applied to all drivers and hardware
+> (not just Microchip's).
+> 
+> But then I looked at the actual definition of the flags themselves in the header file and I see this:
+> https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/ethtool.h#L1993
+> 
+> #define WAKE_MAGIC		(1 << 5)
+> #define WAKE_MAGICSECURE	(1 << 6) /* only meaningful if WAKE_MAGIC */
+> 
+> And even the ethtool manual says this
+> 
+>                    g   Wake on MagicPacket(tm)
+>                    s   Enable SecureOn(tm) password for MagicPacket(tm)
+> 
+> So the "only meaningful" comment seems to imply the original intention of these flags was that
+> WAKE_MAGICSECURE is an optional  modifier for WAKE_MAGIC. Since as Raju showed the ethertool
+> application always overwrites previous settings (does not preserve anything) then you can only use
+> WAKE_MAGICSECURE *simultaneously* with WAKE_MAGIC and not in a standalone manner.
+> The ethtool manual seems to me to reinforce this since if says "Enable SecureOn password FOR magic
+> packet", rather that "Enable SecureON MagicPacket", so the 's' option is something that enables the
+> addition of a password to the 'g' Option.
+> 
+> So back to the beginning it is unclear what should happen...
+> I'd say we seem to have 3 different approaches. Which way should we go now?
+> 1. Follow the definition of the flags in ethtool.h and ethtool manual:
+>       - accept WAKE_MAGIC standalone and wake on regular magic packet matching
+>       - accept WAKE_MAGIC and WAKE_MAGICSECURE simultaneously and only wake on secure magic
+>          packet with valid password matching.
+>       - reject WAKE_MAGICSECURE standalone
+>       Note that this is not how any of the current drivers work and does not follow the conclusions from your
+>       last email either
 
-In that sense I would have agreed with your recommendation that the best co=
-urse of action would have=20
-been to only accept one flag individually and fail with -EOPNOTUPP if both =
-come simultaneously.  And=20
-being mutually exclusive at the definition level that really should have ap=
-plied to all drivers and hardware=20
-(not just Microchip's).=20
+This seems reasonable to me, and as you say it matches the header 
+comment. Question is whether the enforcement of WAKE_MAGICSECURE implies 
+WAKE_MAGIC at the core ethtool level, or if this is up to individual 
+drivers. Also, how many drivers need to be fixed?
 
-But then I looked at the actual definition of the flags themselves in the h=
-eader file and I see this:
-https://elixir.bootlin.com/linux/latest/source/include/uapi/linux/ethtool.h=
-#L1993
+> 2. Treat WAKE_MAGIC as a request for magic packet behavior; and WAKE_MAGICSECURE as a request for
+>       secure-on magic packet behavior. Since they are mutually exclusive only accept them individually and
+>       reject it if they come simultaneously. This does not match the flags definitions or documentation, and
+>       it is not how any of the existing drivers work, but it has consistency to it and it is the way you were
+>       leaning in the last email based on what we knew by them.
 
-#define WAKE_MAGIC		(1 << 5)
-#define WAKE_MAGICSECURE	(1 << 6) /* only meaningful if WAKE_MAGIC */
+I suspect this might be breaking user-space in surprising ways and we 
+would eventually get a report about that requesting the behavior to be 
+changed.
 
-And even the ethtool manual says this=20
+> 3. Follow some of the other existing drivers' code behavior (Broadcom,  TI or MSCC), which do not seem to
+>      match the flag definitions (because they all accept WAKE_MAGICSECURE standalone) and we do not really
+>      know what the hardware exactly does in some of the flag combinations / received frame stimuli. I'd rather
+>      not do this since we (Microchip) will probably end up behaving in yet some different behavior from
+>      everybody else for at least some frame stimuli and not match any documentation either.
 
-                  g   Wake on MagicPacket(tm)
-                  s   Enable SecureOn(tm) password for MagicPacket(tm)
+I agree about the not clear behavior though for bcm-phy-lib.c, 
+specifying both will eventually have WAKE_MAGICSECURE "win" given how 
+the code is structured (assuming I can remember my own code properly).
 
-So the "only meaningful" comment seems to imply the original intention of t=
-hese flags was that=20
-WAKE_MAGICSECURE is an optional  modifier for WAKE_MAGIC. Since as Raju sho=
-wed the ethertool=20
-application always overwrites previous settings (does not preserve anything=
-) then you can only use=20
-WAKE_MAGICSECURE *simultaneously* with WAKE_MAGIC and not in a standalone m=
-anner.=20
-The ethtool manual seems to me to reinforce this since if says "Enable Secu=
-reOn password FOR magic=20
-packet", rather that "Enable SecureON MagicPacket", so the 's' option is so=
-mething that enables the=20
-addition of a password to the 'g' Option.
+> 
+> My opinion with this latest info from headers / man is that we should follow #1. What do you think Andrew?
 
-So back to the beginning it is unclear what should happen...=20
-I'd say we seem to have 3 different approaches. Which way should we go now?
-1. Follow the definition of the flags in ethtool.h and ethtool manual:=20
-     - accept WAKE_MAGIC standalone and wake on regular magic packet matchi=
-ng=20
-     - accept WAKE_MAGIC and WAKE_MAGICSECURE simultaneously and only wake =
-on secure magic=20
-        packet with valid password matching.=20
-     - reject WAKE_MAGICSECURE standalone
-     Note that this is not how any of the current drivers work and does not=
- follow the conclusions from your=20
-     last email either
-2. Treat WAKE_MAGIC as a request for magic packet behavior; and WAKE_MAGICS=
-ECURE as a request for=20
-     secure-on magic packet behavior. Since they are mutually exclusive onl=
-y accept them individually and=20
-     reject it if they come simultaneously. This does not match the flags d=
-efinitions or documentation, and=20
-     it is not how any of the existing drivers work, but it has consistency=
- to it and it is the way you were=20
-     leaning in the last email based on what we knew by them.
-3. Follow some of the other existing drivers' code behavior (Broadcom,  TI =
-or MSCC), which do not seem to=20
-    match the flag definitions (because they all accept WAKE_MAGICSECURE st=
-andalone) and we do not really=20
-    know what the hardware exactly does in some of the flag combinations / =
-received frame stimuli. I'd rather=20
-    not do this since we (Microchip) will probably end up behaving in yet s=
-ome different behavior from=20
-    everybody else for at least some frame stimuli and not match any docume=
-ntation either.
-
-My opinion with this latest info from headers / man is that we should follo=
-w #1. What do you think Andrew?
-
-Ronnie
+That would be my inclination for new drivers, or drivers that we are 
+fixing, like lan743x. For existing drivers unfortunately we might have 
+to preserve the incorrect behavior.
+-- 
+Florian
 
