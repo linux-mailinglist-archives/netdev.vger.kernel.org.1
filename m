@@ -1,270 +1,153 @@
-Return-Path: <netdev+bounces-79627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A12687A488
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 10:04:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D0D087A4A2
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 10:08:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DB961C219B1
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 09:04:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8E1D41F22C71
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 09:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2111A1B7EF;
-	Wed, 13 Mar 2024 09:04:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 626A51B97C;
+	Wed, 13 Mar 2024 09:07:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S8gPwY9q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lyvQnFev"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 216941B59B;
-	Wed, 13 Mar 2024 09:04:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E356199D9;
+	Wed, 13 Mar 2024 09:07:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710320659; cv=none; b=mJdIxn7j2owmeo1AI61OvYGfuHgitzLO1X+9ovXt8/2u0eWl2saAGuXoefCFBJ0MDrvuvxxdy4U+kFAcPtJs/3IkSbr/ZV+p5amK3Mz0th5LLtrpt8NJW9D3qs1jMPcS1g4K50pHtUZbwJwBQuuQKWTbAPeH/qriCmwcqBIkyFk=
+	t=1710320879; cv=none; b=FeDYDhfgmQ6UlqgJRFaVMgniCQBZR55hIEX3/Y7gNFxt3eJ/K9mFLB33iaycRCP73g/uMrm/KMMfIPnFft8sVtdnvSqQ1R/rcS0mmwfsQqTGD05zuyomMvfBSJIVTTKnZEpm94KCpF0HfXdos54Xvugmx19ehLgvGpgotIxlmqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710320659; c=relaxed/simple;
-	bh=OY7dmVLts/l8qSevFTkHGMcjHfepEVJnm07/K15atac=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PuxMv9zRTWkbYWQM8XZT3LEnt2GcN9Brt3zXkTrJ/ZoaDOcmUXcSTfoYXj0kEpspPx00qoPA5FhCUNcU+Uh1NIFMZlmkvhdV3qkOs8QqcgHlWkb4n/mToQ0+uLi2F4secidtWQzF+dPXtkkrCANSGom0ndniA9UaFRk217LIXww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S8gPwY9q; arc=none smtp.client-ip=209.85.128.53
+	s=arc-20240116; t=1710320879; c=relaxed/simple;
+	bh=XZNlIFgmzShsfg9UcQ9/lW6wWH908ZSqZdC/i19FpbM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Pgza6r8RKWP7qexEK7e03IT6g63F16NlyvSjGonK0K2tK/GOOmHItYwI08Psyf8EckOoIOI/Gw3XQlez7vD6P1DmyQweC4wcH46M04yKF0HMbs/XlfqEtwafhxaLssnpS8hJl2yJwD7Br5ODQrItYB7eQkCs8TlnOF7FFRd6CXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lyvQnFev; arc=none smtp.client-ip=209.85.221.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4132f37e170so15165835e9.2;
-        Wed, 13 Mar 2024 02:04:16 -0700 (PDT)
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-33e8f906f3dso3678328f8f.3;
+        Wed, 13 Mar 2024 02:07:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710320655; x=1710925455; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=QjqI0UtI7NlkaSgyzcRJ5GhIlnZWE1jspTguoc6XJII=;
-        b=S8gPwY9qhaZVR6Bb09+d5LLt9+hBoDdNWpgKUAGzap7aZPiQNNOOD/AAFwP7esWLPV
-         IQa2U/BbnVOcANfyAPU490C85yL8mMSCBFPln4QggI7Mc4tJiEsLqITWt/UaRfDF5va9
-         KWkhMDsZhVpfzfVrCR9lTlbkB+Hwkitiv0Lb/wbf5pZdtFNi5qO58GdjpwagXyr+SlaR
-         wiSfBzpROgA4Mp7xGynIqDjy/3A6HP2rYIpSBCheH+22aISUP/yyhI1oGTNN7qNNE5qx
-         185XxU07u8s6z3ofN1w67HMRJDUamdm/8q4QkD+RY3dxyQ3na1Htzfv0j+NWow6dgJlc
-         AZUQ==
+        d=gmail.com; s=20230601; t=1710320876; x=1710925676; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=qeyRcTWGmV3/k4pJx5f4EP1VJdXvmC5lkMw80S3xkUw=;
+        b=lyvQnFev4WZO52dLPIt17ujvRSFMc6NgC5KyESUysnVJ9bzt40TeWf0dZmT6Renltg
+         pnOIcBXgC/4ep0vko8syKXNcUKBQdX7dAlx1qaZ/K8z7ZpyZK0GHP3JkGj67brziYCLM
+         vAMdd5FmcRh5pbE5nH3ZHUYMsh+LfsvTNgKMLsmtRQAyCTwhdpIJug1qLoZi2M0F9xKG
+         xI42ZQwxe5hyQOhmDBUpkXaViSjSgeO+DCPXS+DQdEwc4hfNtVpaulz9PSlH2ay2j4V3
+         kC6mJPrDCet5OeiolMyVmLkorMCF0tHlSZpsh39olDIOfMPYd0S+Tq4S9Qdgbg+jQnq2
+         B73Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710320655; x=1710925455;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=QjqI0UtI7NlkaSgyzcRJ5GhIlnZWE1jspTguoc6XJII=;
-        b=Z2piCzEA74RQw+qmY5lQ7sEzSSAqAL0qYXJoyIXTc637TYp/nIyNga9xvhk+R1SxG3
-         wTQQdXAfjkIpa1ecN23g1X/q6rqv7/fMsC40ThhAXmHNcmH8eWTRoz/evGXftR2zGzwx
-         nqJtjQdd/43swGBQEmTbD1nKuSZL6792ojZZEqMNC5JJeQo4CkGCKCzPSmgLfgLSCqL3
-         Bgtgd5Ht399Hb3gA0vDUprRjEGMywfKRDS0MY2kwzxHXsEjawV3bLepqhydg8uxpi0AR
-         VviXMd8PFFOMZ1NbH2UsU5mf8YI2DHuersIZm77ZTkGnTCeZJBef0RTdoMd7QcDqqzFH
-         O0MA==
-X-Forwarded-Encrypted: i=1; AJvYcCUU9vP/dCQWlNvkivUgva7ZI8bBljfW/cASVIbjhA4he5jtbuLJBZtWNMC/HAivNHKK1tfAoeJvqWTB6FZfFUHUCGy/XMizhUS7NWtLO53c60L5tMIgN8q4L+bhBtrIQhGohYMK37if67bsW/ai5tKMfUyS6MzdIWgB
-X-Gm-Message-State: AOJu0YwlvGbmgLq/KwMqQCVG69fq/ERxoaTL9vaWO+vhiBchSf3EaSAB
-	w+HYAeLMmKluCy4CKtXjVTpTojozT0XooCm8j/bxBn0kZK3f6lfG
-X-Google-Smtp-Source: AGHT+IH3UHABTxaiQniABaOfSvf4/sZ4Ay97aD9Qzeat6erm1yzjN60nJJ7df8qTsrC+qywcrJ+eMQ==
-X-Received: by 2002:a05:600c:524c:b0:412:eb6e:1fdb with SMTP id fc12-20020a05600c524c00b00412eb6e1fdbmr1520565wmb.40.1710320654430;
-        Wed, 13 Mar 2024 02:04:14 -0700 (PDT)
-Received: from krava (2001-1ae9-1c2-4c00-726e-c10f-8833-ff22.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:726e:c10f:8833:ff22])
-        by smtp.gmail.com with ESMTPSA id n2-20020adfe782000000b0033e7715bafasm11155874wrm.59.2024.03.13.02.04.12
+        d=1e100.net; s=20230601; t=1710320876; x=1710925676;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qeyRcTWGmV3/k4pJx5f4EP1VJdXvmC5lkMw80S3xkUw=;
+        b=AWElkcrFS2ybux2jhUVkZJON0S9NbAFUnVh16cMYBybNorM8xVBAcNpebWKe7tFsVP
+         vQeKtEOVHYYUKSYSUsnufto2aJDR9YYie1UCR4SqIhPiDz1zyoDJB/u68sWjWmuNoi5y
+         0cPDEkG9/b7JR2a8x1AU/TKXIkJ6BfJjhCYvcXBE31ujBt0DWqwYc+BGO8FR42XXUB6f
+         cWsn9Zka7fjVSCByc3cVEU1u1B3nvUbc0UipS+5ZdR4NHCMhGPseOtAPQqW8zofzuipn
+         q0ubeY/E99bOPoo+F0x7zJ2GKBWiEau5Vp1rA12185WWaDFKU3J7rnoF7Lsa71pdhYwS
+         wD1Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW/WNj7iyGkDFqGurmtaHeTJVPe0u2yzzcsd+m/gTwP2pwCNcb9w8eaafTAv7ikeXPmBl4NCJjg3zirfC5XGSsbagnXjU37dih2fa8f8yDQ2CHPBzkTXiHfY8Bc0pCIk1waypn5
+X-Gm-Message-State: AOJu0YyRvIBthPc0f7Horgh2bZrz9sJKM3Ax9SOAYcE3H22jdWRW9lrf
+	z3hPawWkgJd/heEJheilFvEYHG2Q9hi5GiwqDj6c3QqnpNEU5KcE
+X-Google-Smtp-Source: AGHT+IGQtxdwxe8pKAZExDB4/7R09XkTOzJiihwXGrw5ONx4PGCG032jr3RFNQifqzfamZvvJyvPeQ==
+X-Received: by 2002:a05:6000:400d:b0:33d:2d2c:f404 with SMTP id cp13-20020a056000400d00b0033d2d2cf404mr1749690wrb.15.1710320875703;
+        Wed, 13 Mar 2024 02:07:55 -0700 (PDT)
+Received: from macminim1.retailmedia.com ([2a01:e0a:b14:c1f0:617b:c61e:d65f:861e])
+        by smtp.googlemail.com with ESMTPSA id y9-20020a056000108900b0033e206a0a7asm11200676wrw.26.2024.03.13.02.07.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Mar 2024 02:04:13 -0700 (PDT)
-From: Jiri Olsa <olsajiri@gmail.com>
-X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
-Date: Wed, 13 Mar 2024 10:04:11 +0100
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: Jiri Olsa <olsajiri@gmail.com>,
-	syzbot <syzbot+850aaf14624dc0c6d366@syzkaller.appspotmail.com>,
-	andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
-	daniel@iogearbox.net, haoluo@google.com, john.fastabend@gmail.com,
-	kpsingh@kernel.org, linux-kernel@vger.kernel.org,
-	martin.lau@linux.dev, netdev@vger.kernel.org, sdf@google.com,
-	song@kernel.org, syzkaller-bugs@googlegroups.com,
-	yonghong.song@linux.dev
-Subject: Re: [syzbot] [bpf?] possible deadlock in __bpf_ringbuf_reserve
-Message-ID: <ZfFsC6zyrUCtTxK-@krava>
-References: <0000000000004aa700061379547e@google.com>
- <ZfDC45Kc1VEvBMuW@krava>
- <ZfDGmoOcUqrHPSkq@krava>
- <CAEf4Bza8iH4_JY_sN-6GYeSfn6iuUsLMzxd=xRkCC7q-3_StNQ@mail.gmail.com>
+        Wed, 13 Mar 2024 02:07:55 -0700 (PDT)
+From: Erwan Velu <erwanaliasr1@gmail.com>
+X-Google-Original-From: Erwan Velu <e.velu@criteo.com>
+To: 
+Cc: Erwan Velu <e.velu@criteo.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v4 iwl-net] i40e: Prevent setting MTU if greater than MFS
+Date: Wed, 13 Mar 2024 10:07:16 +0100
+Message-ID: <20240313090719.33627-2-e.velu@criteo.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAEf4Bza8iH4_JY_sN-6GYeSfn6iuUsLMzxd=xRkCC7q-3_StNQ@mail.gmail.com>
 
-On Tue, Mar 12, 2024 at 03:37:16PM -0700, Andrii Nakryiko wrote:
-> On Tue, Mar 12, 2024 at 2:18 PM Jiri Olsa <olsajiri@gmail.com> wrote:
-> >
-> > On Tue, Mar 12, 2024 at 10:02:27PM +0100, Jiri Olsa wrote:
-> > > On Tue, Mar 12, 2024 at 09:41:26AM -0700, syzbot wrote:
-> > > > Hello,
-> > > >
-> > > > syzbot found the following issue on:
-> > > >
-> > > > HEAD commit:    df4793505abd Merge tag 'net-6.8-rc8' of git://git.kernel.o..
-> > > > git tree:       bpf
-> > > > console+strace: https://syzkaller.appspot.com/x/log.txt?x=11fd0092180000
-> > > > kernel config:  https://syzkaller.appspot.com/x/.config?x=c11c5c676adb61f0
-> > > > dashboard link: https://syzkaller.appspot.com/bug?extid=850aaf14624dc0c6d366
-> > > > compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> > > > syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1509c4ae180000
-> > > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10babc01180000
-> > > >
-> > > > Downloadable assets:
-> > > > disk image: https://storage.googleapis.com/syzbot-assets/d2e80ee1112b/disk-df479350.raw.xz
-> > > > vmlinux: https://storage.googleapis.com/syzbot-assets/b35ea54cd190/vmlinux-df479350.xz
-> > > > kernel image: https://storage.googleapis.com/syzbot-assets/59f69d999ad2/bzImage-df479350.xz
-> > > >
-> > > > IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> > > > Reported-by: syzbot+850aaf14624dc0c6d366@syzkaller.appspotmail.com
-> > > >
-> > > > ============================================
-> > > > WARNING: possible recursive locking detected
-> > > > 6.8.0-rc7-syzkaller-gdf4793505abd #0 Not tainted
-> > > > --------------------------------------------
-> > > > strace-static-x/5063 is trying to acquire lock:
-> > > > ffffc900096f10d8 (&rb->spinlock){-.-.}-{2:2}, at: __bpf_ringbuf_reserve+0x211/0x4f0 kernel/bpf/ringbuf.c:424
-> > > >
-> > > > but task is already holding lock:
-> > > > ffffc900098410d8 (&rb->spinlock){-.-.}-{2:2}, at: __bpf_ringbuf_reserve+0x211/0x4f0 kernel/bpf/ringbuf.c:424
-> > > >
-> > > > other info that might help us debug this:
-> > > >  Possible unsafe locking scenario:
-> > > >
-> > > >        CPU0
-> > > >        ----
-> > > >   lock(&rb->spinlock);
-> > > >   lock(&rb->spinlock);
-> > > >
-> > > >  *** DEADLOCK ***
-> > > >
-> > > >  May be due to missing lock nesting notation
-> > > >
-> > > > 4 locks held by strace-static-x/5063:
-> > > >  #0: ffff88807857e068 (&pipe->mutex/1){+.+.}-{3:3}, at: __pipe_lock fs/pipe.c:103 [inline]
-> > > >  #0: ffff88807857e068 (&pipe->mutex/1){+.+.}-{3:3}, at: pipe_write+0x1cc/0x1a40 fs/pipe.c:465
-> > > >  #1: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
-> > > >  #1: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
-> > > >  #1: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2380 [inline]
-> > > >  #1: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run2+0x114/0x420 kernel/trace/bpf_trace.c:2420
-> > > >  #2: ffffc900098410d8 (&rb->spinlock){-.-.}-{2:2}, at: __bpf_ringbuf_reserve+0x211/0x4f0 kernel/bpf/ringbuf.c:424
-> > > >  #3: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
-> > > >  #3: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
-> > > >  #3: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2380 [inline]
-> > > >  #3: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run2+0x114/0x420 kernel/trace/bpf_trace.c:2420
-> > > >
-> > > > stack backtrace:
-> > > > CPU: 0 PID: 5063 Comm: strace-static-x Not tainted 6.8.0-rc7-syzkaller-gdf4793505abd #0
-> > > > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/25/2024
-> > > > Call Trace:
-> > > >  <TASK>
-> > > >  __dump_stack lib/dump_stack.c:88 [inline]
-> > > >  dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
-> > > >  check_deadlock kernel/locking/lockdep.c:3062 [inline]
-> > > >  validate_chain+0x15c0/0x58e0 kernel/locking/lockdep.c:3856
-> > > >  __lock_acquire+0x1345/0x1fd0 kernel/locking/lockdep.c:5137
-> > > >  lock_acquire+0x1e3/0x530 kernel/locking/lockdep.c:5754
-> > > >  __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-> > > >  _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
-> > > >  __bpf_ringbuf_reserve+0x211/0x4f0 kernel/bpf/ringbuf.c:424
-> > > >  ____bpf_ringbuf_reserve kernel/bpf/ringbuf.c:459 [inline]
-> > > >  bpf_ringbuf_reserve+0x5c/0x70 kernel/bpf/ringbuf.c:451
-> > > >  bpf_prog_9efe54833449f08e+0x2d/0x47
-> > > >  bpf_dispatcher_nop_func include/linux/bpf.h:1231 [inline]
-> > > >  __bpf_prog_run include/linux/filter.h:651 [inline]
-> > > >  bpf_prog_run include/linux/filter.h:658 [inline]
-> > > >  __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
-> > >
-> > > hum, scratching my head how this could passed through the prog->active check,
-> >
-> > nah could be 2 instances of the same program, got confused by the tag
-> >
-> > trace_contention_end
-> >   __bpf_trace_run(prog1)
-> >     bpf_prog_9efe54833449f08e
-> >       bpf_ringbuf_reserve
-> >         trace_contention_end
-> >           __bpf_trace_run(prog1)  prog1->active check fails
-> >           __bpf_trace_run(prog2)
-> >             bpf_prog_9efe54833449f08e
-> >               bpf_ringbuf_reserve
-> >                 lockup
-> >
-> > we had similar issue in [1] and we replaced the lock with extra buffers,
-> > not sure that's possible in bpf_ringbuf_reserve
-> >
-> 
-> Having trace_contention_begin and trace_contention_end in such
-> low-level parts of ringbuf (and I'm sure anything in BPF that's using
-> spinlock) is unfortunate. I'm not sure what's the best solution, but
-> it would be great if we had ability to disable these tracepoints when
-> taking lock in low-level BPF infrastructure. Given BPF programs can
-> attach to these tracepoints, it's best to avoid this arbitrary nesting
-> of BPF ringbuf calls. Also note, no per-program protection will help,
-> because it can be independent BPF programs using the same map.
+Commit 6871a7de705 ("[intelxl] Use admin queue to set port MAC address
+and maximum frame size") from iPXE project set the MFS to 0x600 = 1536.
+See https://github.com/ipxe/ipxe/commit/6871a7de705
 
-one of the initial attempts for the previous problem was to deny
-the attach of programs calling printk to printk tracepoint:
-  https://lore.kernel.org/bpf/20221121213123.1373229-1-jolsa@kernel.org/
+At boot time the i40e driver complains about it with
+the following message but continues.
 
-how about we overload the bpf contention tracepoints callbacks and
-make it conditional like outlined below.. but not sure it'd be
-feasible on the lock/unlock calling sides to use this
+	MFS for port 1 has been set below the default: 600
 
-jirka
+If the MTU size is increased, the driver accepts it but large packets will
+not be processed by the firmware generating tx_errors. The issue is pretty
+silent for users. i.e doing TCP in such context will generates lots of
+retransmissions until the proper window size (below 1500) will be used.
 
+To fix this case, it would have been ideal to increase the MFS,
+via i40e_aqc_opc_set_mac_config, incoming patch will take care of it.
 
+At least, commit prevents setting up an MTU greater than the current MFS.
+It will avoid being in the position of having an MTU set to 9000 on the
+netdev with a firmware refusing packets larger than 1536.
+
+A typical trace looks like:
+[  377.548696] i40e 0000:5d:00.0 eno5: Error changing mtu to 9000, Max is 1500. MFS is too small.
+
+Signed-off-by: Erwan Velu <e.velu@criteo.com>
 ---
-diff --git a/kernel/trace/bpf_trace.c b/kernel/trace/bpf_trace.c
-index 0a5c4efc73c3..c17b7eaab440 100644
---- a/kernel/trace/bpf_trace.c
-+++ b/kernel/trace/bpf_trace.c
-@@ -2347,13 +2347,42 @@ int perf_event_query_prog_array(struct perf_event *event, void __user *info)
- extern struct bpf_raw_event_map __start__bpf_raw_tp[];
- extern struct bpf_raw_event_map __stop__bpf_raw_tp[];
+ drivers/net/ethernet/intel/i40e/i40e_main.c | 10 +++++++++-
+ 1 file changed, 9 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index f86578857e8a..85ecf2f3de18 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -2946,7 +2946,7 @@ static int i40e_change_mtu(struct net_device *netdev, int new_mtu)
+ 	struct i40e_netdev_priv *np = netdev_priv(netdev);
+ 	struct i40e_vsi *vsi = np->vsi;
+ 	struct i40e_pf *pf = vsi->back;
+-	int frame_size;
++	int frame_size, mfs, max_mtu;
  
-+extern struct tracepoint __tracepoint_contention_begin;
-+
-+#define __CAST_TO_U64(x) ({ \
-+	typeof(x) __src = (x); \
-+	UINTTYPE(sizeof(x)) __dst; \
-+	memcpy(&__dst, &__src, sizeof(__dst)); \
-+	(u64)__dst; })
-+
-+int contention_tps_disable;
-+
-+static notrace void
-+__bpf_trace_contention_begin_overload(void *__data, void *lock, unsigned int flags)
-+{
-+	struct bpf_prog *prog = __data;
-+
-+	if (contention_tps_disable)
-+		return;
-+
-+	bpf_trace_run2(prog, __CAST_TO_U64(lock), __CAST_TO_U64(flags));
-+}
-+
-+static struct bpf_raw_event_map* fixup(struct bpf_raw_event_map *btp)
-+{
-+	if (btp->tp == &__tracepoint_contention_begin)
-+		btp->bpf_func = __bpf_trace_contention_begin_overload;
-+
-+	return btp;
-+}
-+
- struct bpf_raw_event_map *bpf_get_raw_tracepoint(const char *name)
- {
- 	struct bpf_raw_event_map *btp = __start__bpf_raw_tp;
- 
- 	for (; btp < __stop__bpf_raw_tp; btp++) {
- 		if (!strcmp(btp->tp->name, name))
--			return btp;
-+			return fixup(btp);
+ 	frame_size = i40e_max_vsi_frame_size(vsi, vsi->xdp_prog);
+ 	if (new_mtu > frame_size - I40E_PACKET_HDR_PAD) {
+@@ -2955,6 +2955,14 @@ static int i40e_change_mtu(struct net_device *netdev, int new_mtu)
+ 		return -EINVAL;
  	}
  
- 	return bpf_get_raw_tracepoint_module(name);
++	mfs = pf->hw.phy.link_info.max_frame_size;
++	max_mtu = mfs - I40E_PACKET_HDR_PAD;
++	if (new_mtu > max_mtu) {
++		netdev_err(netdev, "Error changing mtu to %d, Max is %d. MFS is too small.\n",
++			   new_mtu, max_mtu);
++		return -EINVAL;
++	}
++
+ 	netdev_dbg(netdev, "changing MTU from %d to %d\n",
+ 		   netdev->mtu, new_mtu);
+ 	netdev->mtu = new_mtu;
+-- 
+2.44.0
+
 
