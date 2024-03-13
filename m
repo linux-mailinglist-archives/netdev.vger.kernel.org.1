@@ -1,105 +1,99 @@
-Return-Path: <netdev+bounces-79741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CF2C87B20E
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 20:41:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B1BD87B226
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 20:44:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23CFB1F2365D
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 19:41:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB1CA28D7B6
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 19:44:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6243FB1C;
-	Wed, 13 Mar 2024 19:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 325074BAA6;
+	Wed, 13 Mar 2024 19:44:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m+lHgNSp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.aperture-lab.de (mail.aperture-lab.de [116.203.183.178])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9197A4CE11;
-	Wed, 13 Mar 2024 19:41:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=116.203.183.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED3F4776A;
+	Wed, 13 Mar 2024 19:44:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710358868; cv=none; b=XLu5yaPk+k7ozb6g+vpede9bGYSaoW70E+LK8MRpkZL+VM4Hrcuz20JQkLNVgZQcZNAkZFAMRqntt4VN+JZm9sxkvk3BKANwhcVdLuBWsbnMGrmtwbQQedCHe5m+42EVGhE1VCkc53L3VLApZU4+AHtG0CWlCcn3n0h44pHnmbo=
+	t=1710359066; cv=none; b=pmthT7VxFmPBUiL+OTRNIUHMGNQyfr/FNYhbj81Sdl7Kke7FioK5H5oP4cnkt4+LNxCZBd0AFGhUuHQRvMgu1Y58cH1/lmOXMLxdVbJtdxyHqgyW9gaUSoZWg83mzpw4r8ja9d8AZ4oNu/WcAxDWoQRn8/fAmbAh8XmZoMniDMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710358868; c=relaxed/simple;
-	bh=G/HV2rkBpLvlZFMNXRNboGfFRvkIxzCR/w0qKB3g1D8=;
+	s=arc-20240116; t=1710359066; c=relaxed/simple;
+	bh=y4IkOkfDTy6Hf5RFlO9oP6K871NhGp6uazdYCzXOG5o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DtISN1m+okw++iEChXhVWGf8KvQ47MEygt8S6q19XEoLNXCySOiAXkls5aoIY1tdlznCfahmHkUGLWrXiclLYUv5lkfoBmkpCmjEOaaDG3mXJNrdk4pSzkEQ99sHiPkc+vq2b3Hm43+DS5CVE0mc35Ie4kjebq5lyYeoeJwtbus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue; spf=pass smtp.mailfrom=c0d3.blue; arc=none smtp.client-ip=116.203.183.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=c0d3.blue
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=c0d3.blue
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 13B733F07B;
-	Wed, 13 Mar 2024 20:40:50 +0100 (CET)
-Date: Wed, 13 Mar 2024 20:40:49 +0100
-From: Linus =?utf-8?Q?L=C3=BCssing?= <linus.luessing@c0d3.blue>
-To: Simon Horman <horms@kernel.org>
-Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Dietmar Maurer <dietmar@proxmox.com>,
-	Thomas Lamprecht <t.lamprecht@proxmox.com>,
-	Wolfgang Bumiller <w.bumiller@proxmox.com>,
-	Alexandre Derumier <aderumier@odiso.com>
-Subject: Re: [PATCH net] netfilter: conntrack: fix ct-state for ICMPv6
- Multicast Router Discovery
-Message-ID: <ZfIBQbPeP8SYc3jf@sellars>
-References: <20240306141805.17679-1-linus.luessing@c0d3.blue>
- <20240307101254.GL281974@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=YjjqEgF/Ig42wOKYGZE6Esr5KjrfJXhS1FrmR/qqrjsgiV0YV0Ufhgkh/LvFLSUcAargJd9awgJqqcHpwLmz0Iveqlqif2uQAoQ+q1GlBosNDT0Kbnmguycm0ke9eURaeHFKnTOkFw49dtbgE5B7EzxTpQDQ4pwMFo+avp7xM64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m+lHgNSp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DD9B6C433F1;
+	Wed, 13 Mar 2024 19:44:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710359065;
+	bh=y4IkOkfDTy6Hf5RFlO9oP6K871NhGp6uazdYCzXOG5o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=m+lHgNSpmOVZFWHTL9/c1q9/BAn+Hs2c1s3lqTXVoGwnLWhY7ebljIWs+Di9lmYPq
+	 qXxJTCDpoiM7OxydG+AfbATKxYHfO32qhDAHBzPR0ycn1LuXPzCJNyE8PopCBIoZ0M
+	 VwhveDYuplvMxkTUkwzkykT4bQqyHomo7QVmqsp1/ZjJfE9/gcUTM1Q3+1xPmgCX7G
+	 I5dWqE2e/Uh5P0Z0lGYULRAIvr/aFXnaHeV5yTMsJ1D3VxEfHcvff3RKqfp8Y3iGSm
+	 eNptZnJxrvjBkgKQV7nTr0N1VrlxJ7XMFIUOIIqlrwLGQqZYj6y7WNi7DkErD8bqC8
+	 uaVnhthnNyIfw==
+Date: Wed, 13 Mar 2024 12:44:23 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: James Prestwood <prestwoj@gmail.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+	Karel Balej <balejk@matfyz.cz>, dimitri.ledkov@canonical.com,
+	alexandre.torgue@foss.st.com, davem@davemloft.net,
+	dhowells@redhat.com, herbert@gondor.apana.org.au,
+	keyrings@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-modules@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com, mcgrof@kernel.org,
+	mcoquelin.stm32@gmail.com, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, iwd@lists.linux.dev
+Subject: Re: [REGRESSION] Re: [PATCH] crypto: pkcs7: remove sha1 support
+Message-ID: <20240313194423.GA1111@sol.localdomain>
+References: <CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz>
+ <005f998ec59e27633b1b99fdf929e40ccfd401c1.camel@sipsolutions.net>
+ <f2dcbe55-0f0e-4173-8e21-f899c6fc802a@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240307101254.GL281974@kernel.org>
-X-Last-TLS-Session-Version: TLSv1.3
+In-Reply-To: <f2dcbe55-0f0e-4173-8e21-f899c6fc802a@gmail.com>
 
-On Thu, Mar 07, 2024 at 10:12:54AM +0000, Simon Horman wrote:
-> Hi Linus,
+On Wed, Mar 13, 2024 at 10:26:06AM -0700, James Prestwood wrote:
+> Hi,
 > 
-> this appears to be a fix and as such I think it warrants a Fixes tag.
-> You should be able to just add it to this thread if no other changes
-> are required - no need for a v2 just to address this.
+> On 3/13/24 1:56 AM, Johannes Berg wrote:
+> > Not sure why you're CC'ing the world, but I guess adding a few more
+> > doesn't hurt ...
+> > 
+> > On Wed, 2024-03-13 at 09:50 +0100, Karel Balej wrote:
+> > >   and I use iwd
+> > This is your problem, the wireless stack in the kernel doesn't use any
+> > kernel crypto code for 802.1X.
 > 
-> ...
+> Yes, the wireless stack has zero bearing on the issue. I think that's what
+> you meant by "problem".
+> 
+> IWD has used the kernel crypto API forever which was abruptly broken, that
+> is the problem.
+> 
+> The original commit says it was to remove support for sha1 signed kernel
+> modules, but it did more than that and broke the keyctl API.
+> 
 
-Hi Simon,
+Which specific API is iwd using that is relevant here?
+I cloned https://kernel.googlesource.com/pub/scm/network/wireless/iwd
+and grepped for keyctl and AF_ALG, but there are no matches.
 
-From reading the code and git logs I suspect this
-commit, which introduced icmpv6_error():
-
-  9fb9cbb1082d [NETFILTER]: Add nf_conntrack subsystem.
-
-  (introduced in: Linux v2.6.15 / 2006)
-
-Unfortunately, I was only able to reproduce it in practice
-on a Debian 5 / Linux 2.6.26 in a VM so far.
-
-I could boot a Debian 4 + Linux 2.6.15, but wasn't able to
-insert conntrack rules with ip6tables there though, even
-with some iptables + kernel rebuilds/reconfigure attempts.
-
-
-
-Also this related fix introduced in v2.6.29 should hint to the
-age of this issue:
-
-  3f9007135c1d netfilter: nf_conntrack_ipv6: don't track ICMPv6 negotiation message
-
-Which only picked/fixed a few ICMPv6 types but not ICMPv6 MRD
-though.
-
-
-tl;dr: for me this would be ok, if it were ok for others, too, that I
-couldn't fully bisect to it in practice... :
-
-Fixes: 9fb9cbb1082d ("[NETFILTER]: Add nf_conntrack subsystem.")
+- Eric
 
