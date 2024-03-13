@@ -1,129 +1,115 @@
-Return-Path: <netdev+bounces-79684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8320E87A8EE
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 15:02:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF60C87A8F1
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 15:02:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0ADBFB2198D
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:02:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82F35283E31
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:02:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58FE94437D;
-	Wed, 13 Mar 2024 14:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0459545C07;
+	Wed, 13 Mar 2024 14:02:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="pkxwMElx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="K9U/IfQj"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward501b.mail.yandex.net (forward501b.mail.yandex.net [178.154.239.145])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53C244369;
-	Wed, 13 Mar 2024 14:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 713834502E
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 14:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710338530; cv=none; b=sKx57rwQIrQGx0nT+Kq/oaKEo7ME6Xhd8uZDllwZOquo78jgVhW3aADl6t4Q/8dnj6gvM7TT4opZm7hf0YwBDhsVCl/H62M9Umng7pQVYSYxQe1PXOQbJsD0zssXA3SEYKFCZJ8RTjz5MOVwt8rQxyM/cuEKUSFA0FP/rjlaGqo=
+	t=1710338538; cv=none; b=OHhaGPIU39O5eF069LKCTL1U0JhLc41+Akc/Upq49xP/RoQuY9Srm33MxeNqS0v8pr7MFjQt4wJf7a0YoFeibbQ9+DvRmXWGFF5J05l4ejJvrb1mXHV/jt5zvfAgbD8VUY4z0XvMqO7QISBF2a+WlRbXq720HoEV2VacHJQ3H1M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710338530; c=relaxed/simple;
-	bh=albKVDxa6WBCxRIQORvmBW7Fv/6r5aQXoimE7Gx7FiA=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
-	 In-Reply-To:Content-Type; b=AsKr32f/TuEFdMeo4UAhdcFlGfvXkGAMedEA54X9jAVAWaflBlC/TaFGiYNM676Ag4i595TDCBeB5zIfv5qp+HXfMuGlJzJvXqXneqGqPGGPG4m6FyQyLZ0dQJ/xAK3RiCnWeAibdFNk3SQIS1otVpVoeh8rCe0ovqocIQBa4Nk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=pkxwMElx; arc=none smtp.client-ip=178.154.239.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from mail-nwsmtp-smtp-production-main-37.myt.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-37.myt.yp-c.yandex.net [IPv6:2a02:6b8:c12:291a:0:640:791e:0])
-	by forward501b.mail.yandex.net (Yandex) with ESMTPS id 79D7B6177E;
-	Wed, 13 Mar 2024 17:01:58 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-37.myt.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id v1oRpYWpIiE0-mvlIvCQ3;
-	Wed, 13 Mar 2024 17:01:57 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1710338517; bh=dnlqSzeaqFDMpy+Z2/AUDnYXO5DxajV9g8D5Rxohq3g=;
-	h=In-Reply-To:Subject:To:From:Cc:Date:References:Message-ID;
-	b=pkxwMElxOZCLp55QcPd5qQ3ceZP7lzhlNkxewM/jZRqfG01UzfAWh/FMCIsuWwFRh
-	 p9CF2N/9y7LWVMUXlUp8o+9JcqZqr3Tw2xkaLaBKEyvaAx3/P8XE4atN/fQCUxZqRx
-	 aSKA8x6OHi6C6OEpM+ARjiIRg7EoRrmuGOfQtmpo=
-Authentication-Results: mail-nwsmtp-smtp-production-main-37.myt.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <12d61b93-fd89-4557-8c0f-2a72437ded6f@yandex.ru>
-Date: Wed, 13 Mar 2024 17:01:57 +0300
+	s=arc-20240116; t=1710338538; c=relaxed/simple;
+	bh=SCZx7ld+0pZNGXKFkqD5Wl1gMgA6owvxSFCp49mEDiA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=FZz50PvjeTwbjRDW93DJftKxWXUFJEzyNHPqQiCMqnwnEZZo7R2CyUifsLMc1Mvgu4XW9098JdTJohGjsOzuqt4kqWJhNCkNi5sVBB41z8Gh1Q5uOTuiQDZU4mDlukz4ZFug17Fjy6x8PpEtu3K3YTnLMkwE8VcZlHRVW/fVhF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=K9U/IfQj; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710338536;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Q8MmG9ZfffEOvAQ5aBIJd7vUV/m+wEaVtyn6f6e6lQI=;
+	b=K9U/IfQjemC46yWo8KRMFC0RXYzMBIaEdLqHiHRuRpW1sXRFC8TYVuhPvJHE29MVkC2IWa
+	XOt2AUvYaMoBTbiFJ2zd8P0WvozexLEl1gDoG2vkd6Mu09uyvwFTpozhHIpYYsD6JiKQE4
+	hrjr2SCRJhafBOQio6JGJY2BYSEw+DM=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-435-8A2WoyWRP4SgzGcEfk9i9Q-1; Wed, 13 Mar 2024 10:02:10 -0400
+X-MC-Unique: 8A2WoyWRP4SgzGcEfk9i9Q-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D0F928F4768;
+	Wed, 13 Mar 2024 14:02:09 +0000 (UTC)
+Received: from alecto.usersys.redhat.com (unknown [10.45.224.120])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id DA48C492BC7;
+	Wed, 13 Mar 2024 14:02:07 +0000 (UTC)
+From: Artem Savkov <asavkov@redhat.com>
+To: Xi Wang <xi.wang@gmail.com>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Artem Savkov <asavkov@redhat.com>
+Subject: [PATCH bpf-next] arm64: bpf: zero upper bits after rev32
+Date: Wed, 13 Mar 2024 15:02:05 +0100
+Message-ID: <20240313140205.3191564-1-asavkov@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>,
- Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240313094207.70334-1-dmantipov@yandex.ru>
- <CANn89iLCK10J_6=1xSDquYpToZ-YNG3TzjS60L-g5Cyng92gFw@mail.gmail.com>
- <aa191780-c625-4e13-8dc0-6ea3760b6104@yandex.ru>
- <CANn89iJNBHnCPNovYE9tjQT1eN4DE-OFOhE9P86xX_F0HxWfrQ@mail.gmail.com>
-From: Dmitry Antipov <dmantipov@yandex.ru>
-Autocrypt: addr=dmantipov@yandex.ru; keydata=
- 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
- tx98MCutXbJWn55RtnVKbpIiMfBrcB8=
-Subject: Re: [PATCH] can: gw: prefer kfree_rcu() over call_rcu() with
- cgw_job_free_rcu()
-In-Reply-To: <CANn89iJNBHnCPNovYE9tjQT1eN4DE-OFOhE9P86xX_F0HxWfrQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-On 3/13/24 13:55, Eric Dumazet wrote:
+Commit d63903bbc30c7 ("arm64: bpf: fix endianness conversion bugs")
+added upper bits zeroing to byteswap operations, but it assumes they
+will be already zeroed after rev32, which is not the case on some
+systems at least:
 
-> kmem_cache_free(struct kmem_cache *s, void *x) has additional checks
-> to make sure the object @x was allocated
-> from the @s kmem_cache.
-> 
-> Look for SLAB_CONSISTENCY_CHECKS and CONFIG_SLAB_FREELIST_HARDENED
+[ 9757.262607] test_bpf: #312 BSWAP 16: 0x0123456789abcdef -> 0xefcd jited:1 8 PASS
+[ 9757.264435] test_bpf: #313 BSWAP 32: 0x0123456789abcdef -> 0xefcdab89 jited:1 ret 1460850314 != -271733879 (0x5712ce8a != 0xefcdab89)FAIL (1 times)
+[ 9757.266260] test_bpf: #314 BSWAP 64: 0x0123456789abcdef -> 0x67452301 jited:1 8 PASS
+[ 9757.268000] test_bpf: #315 BSWAP 64: 0x0123456789abcdef >> 32 -> 0xefcdab89 jited:1 8 PASS
+[ 9757.269686] test_bpf: #316 BSWAP 16: 0xfedcba9876543210 -> 0x1032 jited:1 8 PASS
+[ 9757.271380] test_bpf: #317 BSWAP 32: 0xfedcba9876543210 -> 0x10325476 jited:1 ret -1460850316 != 271733878 (0xa8ed3174 != 0x10325476)FAIL (1 times)
+[ 9757.273022] test_bpf: #318 BSWAP 64: 0xfedcba9876543210 -> 0x98badcfe jited:1 7 PASS
+[ 9757.274721] test_bpf: #319 BSWAP 64: 0xfedcba9876543210 >> 32 -> 0x10325476 jited:1 9 PASS
 
-Yes. Using kfree_rcu() bypasses these (optional) debugging/consistency
-checks.
+Fixes: d63903bbc30c7 ("arm64: bpf: fix endianness conversion bugs")
+Signed-off-by: Artem Savkov <asavkov@redhat.com>
+---
+ arch/arm64/net/bpf_jit_comp.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> Your patch is not 'trivial' as you think.
-
-You're shifting from "not going to work" to "not trivial" so nicely.
-
-> Otherwise, we will soon have dozen of patches submissions replacing
-> kmem_cache_free() with kfree()
-
-No. The question is about freeing on some (where the freeing callback
-function is trivial) RCU-protected paths only.
-
-Dmitry
+diff --git a/arch/arm64/net/bpf_jit_comp.c b/arch/arm64/net/bpf_jit_comp.c
+index c5b461dda4385..e86e5ba74dca2 100644
+--- a/arch/arm64/net/bpf_jit_comp.c
++++ b/arch/arm64/net/bpf_jit_comp.c
+@@ -944,7 +944,8 @@ static int build_insn(const struct bpf_insn *insn, struct jit_ctx *ctx,
+ 			break;
+ 		case 32:
+ 			emit(A64_REV32(is64, dst, dst), ctx);
+-			/* upper 32 bits already cleared */
++			/* zero-extend 32 bits into 64 bits */
++			emit(A64_UXTW(is64, dst, dst), ctx);
+ 			break;
+ 		case 64:
+ 			emit(A64_REV64(dst, dst), ctx);
+-- 
+2.44.0
 
 
