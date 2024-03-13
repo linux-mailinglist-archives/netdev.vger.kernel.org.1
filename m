@@ -1,98 +1,75 @@
-Return-Path: <netdev+bounces-79665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5398D87A7C4
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:46:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7273C87A7E0
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:55:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D48FA1F24FC8
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 12:46:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28A8F28628F
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 12:55:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1A5D1CF9C;
-	Wed, 13 Mar 2024 12:46:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A04DF1F958;
+	Wed, 13 Mar 2024 12:55:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yotsuba.nl header.i=@yotsuba.nl header.b="kAJNGphh";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="HHcl5cpc"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="a++qMQSq"
 X-Original-To: netdev@vger.kernel.org
-Received: from wfhigh1-smtp.messagingengine.com (wfhigh1-smtp.messagingengine.com [64.147.123.152])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0641392;
-	Wed, 13 Mar 2024 12:46:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705A743AAF
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 12:55:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710333991; cv=none; b=k6VV/guIAqDWjN3i0Zv8DXorUVZsjdV+oUnZZhwUFoElUBhMp3m7goa98Ubm084JL+R9PyU1cGM5T9vwE/R3wH2rwuUE/Ffh/OQHm2xDkyQECnnKJc7TY8IdEICHux+i1OhOpdiNZTlppIzqosShgwaIfbyEhml48RmT2JQFdvc=
+	t=1710334509; cv=none; b=u3hu+s5MSmRdrTE0ZmarmXY4nBV1XzFfYyUeURjG+hYpAA2/N5DFWNfGopDBqWR+R+b1CuRQSlwznWypTsbFnmKqj1QI/R8eygy4q3lIpL8d5We2CWfj2E/2b4gPMryuC5MoH/hS1xbCv7764EV6NE92WL8mo/WXEwVboxfvyXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710333991; c=relaxed/simple;
-	bh=Jf+wu1IZHLSWPSiVXKPRin5lWsBglxHwN2VUQsB6oqI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b0rkeuhseD9Z7OPCY52+vEXxKPJzBVNRHzhe8P64K2psUQzCVH5j3+sYAzai+t/HaEDBeVMleMX1O64U/EbQbTLFmsutGsQhUrFNd9suz0y4GFNKZYsul4S9GY/XZz07njM7Vg0AVBkRSnKFiNt191zzN4TIhV51v3sfnOz/0JA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yotsuba.nl; spf=pass smtp.mailfrom=yotsuba.nl; dkim=pass (2048-bit key) header.d=yotsuba.nl header.i=@yotsuba.nl header.b=kAJNGphh; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=HHcl5cpc; arc=none smtp.client-ip=64.147.123.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yotsuba.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yotsuba.nl
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailfhigh.west.internal (Postfix) with ESMTP id 60B0918001BB;
-	Wed, 13 Mar 2024 08:46:26 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Wed, 13 Mar 2024 08:46:27 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yotsuba.nl; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm3; t=1710333985; x=1710420385; bh=l1HL0LHZYJaa4pEADEaCe
-	pA+q5O8TlifflcHnra0QqM=; b=kAJNGphhutQWSqDwIPVWxfX4B2Ls6qyt5SRAb
-	7mscMZZWQjWk9d+DKHTAELnkGvKlB+8017xTnuA0HnjRMUM5g8TUfnUcAvNsdjCh
-	gjOQ6+XVDbVyOaulxtW1oJVax6oyX6W1e0RFolTaTQf4l55MsmLsT5/sP6xipVtT
-	NhppMje77RVMp6ELAF06ZcshSnRL0TSlhrbYY2bg+H2kFtjVA/ugWkDMo+XT6o05
-	RNTff7PTG+Hb69F/EtKaH5pzBiUs+6OHCnYon3tMDe3rOEFnnd5OqV8h+dViddqa
-	vsp/7rMcNeXnNDWYa7Gg3V0AqF9m+7t1UtGYzt0IK4OTuqiSw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm1; t=1710333985; x=1710420385; bh=l1HL0LHZYJaa4pEADEaCepA+q5O8
-	TlifflcHnra0QqM=; b=HHcl5cpcVWs3sCINvtq5T/1HVVqtVnSoaqDJ+lfZFmng
-	mQqHieWuRJlf1YvxUFGlAExb9NtoygRgJV9P58Ymh7Iv6CIwB0DTpVFnY6MhESQY
-	MtaL3z8ekwp+SoxerKuDxc4TcxmJasCCmDa/+qUJdFFUtTdRU1E0OBftZ4JnujMW
-	/nsvKmBA2UjcAghK23tB3NkOjVMUzO569kalXSsHUOKoPwSL8cb0X045OlKn2jEH
-	Yths4QGBRbuh8gXsP6bv/z5uGcgZxo49qXoyTMTxP43rqMMJsk/zQP3oxXhFmGd/
-	NEaM21O/4nwY30ZvdqGnX9xDbaiY+3X9l2Q7Ycokkw==
-X-ME-Sender: <xms:IaDxZap81TWSO2g5QIK2km_GZu-LqECRZhOdYSRnu8puVCP0b1yRYw>
-    <xme:IaDxZYrslFq5N23pWbj6KYIxMca8VkhZvVPk9u-z4DBq9fOYTEYkUF1nnh9czCjcv
-    RShwgVxVpMGh3FZaWk>
-X-ME-Received: <xmr:IaDxZfMKhRCJtpIYUzx0H4T3cBDZpcOOjIhCymrcXvvI2wpnr6GYUZjDqHJrkw9vIZPnuaUuePjrVSAvHmdpIMADbSiupw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrjeehgdegfecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeforghrkhcuvehi
-    lhhishhsvghnuceomhgrrhhkseihohhtshhusggrrdhnlheqnecuggftrfgrthhtvghrnh
-    epfffftdevgfffgfdvveduteeufeetfeejueehledvtdekjeeuleegvdfhtdettdetnecu
-    vehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmhgrrhhkse
-    ihohhtshhusggrrdhnlh
-X-ME-Proxy: <xmx:IaDxZZ5nY6ciN-dnoz249BIkV0vJ0mxOO1rE7le5f-YEqH5awpdhZA>
-    <xmx:IaDxZZ7WVlpXExDIQcdJzm1JEmWOXhC0xDG6RPRBw0rrmt2Mwjbvhg>
-    <xmx:IaDxZZjxWdqI7JAy1tBwd36_lPFw9NncOVUVHPF-RT1cZrxl4MWDHA>
-    <xmx:IaDxZT7_F8LrOOMz4-fDHVjrTCZ3b-zHG_PkJhCRAivz4JFjALnOLw>
-    <xmx:IaDxZViaL9wJmMDlfb23u4TaU6iNF4-GoTRXawbb6mFcQkqe5xczD5ugnK4>
-Feedback-ID: i85e1472c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 13 Mar 2024 08:46:24 -0400 (EDT)
-From: Mark Cilissen <mark@yotsuba.nl>
+	s=arc-20240116; t=1710334509; c=relaxed/simple;
+	bh=sh7lOn799mdRNo9SNh2T7fssV2zC50KXVdJoi0KTXRE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=prsd12jUMyaFCsrx0oNT5c7ARPBkUI5ISMOprrdqgfwkmCtHbgSgbmUUT3kUHJM1y2vKfakYJAHORox2kmGfQRIN7T6Wd4ybt1qUIgefm+zC1G1fUVaQaDupmUyOi0i30DTylg/6/gpeWR2kZ9lEMwdslcG07rtdxu4CXCfy198=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=a++qMQSq; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710334506;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=h/UYi6EhK4kWHCiuuewAtpIQWiza2uvSvfzWNm0vBG0=;
+	b=a++qMQSqiGHWV3kjZDFLfflUvxeQo3RfGd8sSBz+oGrTnDV0jFMO1w6ecYx/uDOAJQCB2o
+	JzGg9DC1V7byHbrJNkdaMaarlO81fcg1UqcJyEFgnSgC8SFWl6DtqJ49lXj+m2XLCohGrn
+	EZ5oF9ubF7AORwnvL2ziPcm9IAWnDc0=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-615-N9sYoLSWOzi0ey4wgDZ8yA-1; Wed, 13 Mar 2024 08:55:00 -0400
+X-MC-Unique: N9sYoLSWOzi0ey4wgDZ8yA-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 33595101A56C;
+	Wed, 13 Mar 2024 12:55:00 +0000 (UTC)
+Received: from p1.luc.cera.cz (unknown [10.45.224.236])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 074503C22;
+	Wed, 13 Mar 2024 12:54:57 +0000 (UTC)
+From: Ivan Vecera <ivecera@redhat.com>
 To: netdev@vger.kernel.org
-Cc: Mark Cilissen <mark@yotsuba.nl>,
-	Hans de Goede <hdegoede@redhat.com>,
+Cc: pawel.chmielewski@intel.com,
+	aleksandr.loktionov@intel.com,
+	mschmidt@redhat.com,
+	Hugo Ferreira <hferreir@redhat.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Breno Leitao <leitao@debian.org>,
-	Ingo Molnar <mingo@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
 	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] netpoll: support sending over raw IP interfaces
-Date: Wed, 13 Mar 2024 13:46:13 +0100
-Message-ID: <20240313124613.51399-1-mark@yotsuba.nl>
-X-Mailer: git-send-email 2.44.0
+	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH net] i40e: Enforce software interrupt during busy-poll exit
+Date: Wed, 13 Mar 2024 13:54:56 +0100
+Message-ID: <20240313125457.19475-1-ivecera@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,99 +77,250 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-Currently, netpoll only supports interfaces with an ethernet-compatible
-link layer. Certain interfaces like SLIP do not have a link layer
-on the network interface level at all and expect raw IP packets,
-and could benefit from being supported by netpoll.
+As for ice bug fixed by commit b7306b42beaf ("ice: manage interrupts
+during poll exit") I'm seeing the similar issue also with i40e driver.
 
-This commit adds support for such interfaces by using the network device's
-`hard_header_len` field as an indication that no link layer is present.
-If that is the case we simply skip adding the ethernet header, causing
-a raw IP packet to be sent over the interface. This has been confirmed
-to add netconsole support to at least SLIP and WireGuard interfaces.
+In certain situation when busy-loop is enabled together with adaptive
+coalescing, the driver occasionally miss that there are outstanding
+descriptors to clean when exiting busy poll.
 
-Signed-off-by: Mark Cilissen <mark@yotsuba.nl>
+Try to catch the remaining work by triggering a software interrupt
+when exiting busy poll. No extra interrupts will be generated when
+busy polling is not used.
+
+The issue was found when running sockperf ping-pong tcp test with
+adaptive coalescing and busy poll enabled (50 as value busy_pool
+and busy_read sysctl knobs) and results in huge latency spikes
+with more than 100000us.
+
+The fix is inspired from the ice driver and do the following:
+1) During napi poll exit in case of busy-poll (napo_complete_done()
+   returns false) this is recorded to q_vector that we were in busy
+   loop.
+2) In i40e_update_enable_itr()
+   - updates refreshed ITR intervals directly using PFINT_ITRN register
+   - if we are exiting ordinary poll then just enables the interrupt
+     using PFINT_DYN_CTLN
+   - if we are exiting busy poll then enables the interrupt and
+     additionally triggers an immediate software interrupt to catch any
+     pending clean-ups
+3) Reuses unused 3rd ITR (interrupt throttle) index and set it to
+   20K interrupts per second to limit the number of these sw interrupts.
+
+Test results
+============
+Prior:
+[root@dell-per640-07 net]# sockperf ping-pong -i 10.9.9.1 --tcp -m 1000 --mps=max -t 120
+sockperf: == version #3.10-no.git ==
+sockperf[CLIENT] send on:sockperf: using recvfrom() to block on socket(s)
+
+[ 0] IP = 10.9.9.1        PORT = 11111 # TCP
+sockperf: Warmup stage (sending a few dummy messages)...
+sockperf: Starting test...
+sockperf: Test end (interrupted by timer)
+sockperf: Test ended
+sockperf: [Total Run] RunTime=119.999 sec; Warm up time=400 msec; SentMessages=2438563; ReceivedMessages=2438562
+sockperf: ========= Printing statistics for Server No: 0
+sockperf: [Valid Duration] RunTime=119.549 sec; SentMessages=2429473; ReceivedMessages=2429473
+sockperf: ====> avg-latency=24.571 (std-dev=93.297, mean-ad=4.904, median-ad=1.510, siqr=1.063, cv=3.797, std-error=0.060, 99.0% ci=[24.417, 24.725])
+sockperf: # dropped messages = 0; # duplicated messages = 0; # out-of-order messages = 0
+sockperf: Summary: Latency is 24.571 usec
+sockperf: Total 2429473 observations; each percentile contains 24294.73 observations
+sockperf: ---> <MAX> observation = 103294.331
+sockperf: ---> percentile 99.999 =   45.633
+sockperf: ---> percentile 99.990 =   37.013
+sockperf: ---> percentile 99.900 =   35.910
+sockperf: ---> percentile 99.000 =   33.390
+sockperf: ---> percentile 90.000 =   28.626
+sockperf: ---> percentile 75.000 =   27.741
+sockperf: ---> percentile 50.000 =   26.743
+sockperf: ---> percentile 25.000 =   25.614
+sockperf: ---> <MIN> observation =   12.220
+
+After:
+[root@dell-per640-07 net]# sockperf ping-pong -i 10.9.9.1 --tcp -m 1000 --mps=max -t 120
+sockperf: == version #3.10-no.git ==
+sockperf[CLIENT] send on:sockperf: using recvfrom() to block on socket(s)
+
+[ 0] IP = 10.9.9.1        PORT = 11111 # TCP
+sockperf: Warmup stage (sending a few dummy messages)...
+sockperf: Starting test...
+sockperf: Test end (interrupted by timer)
+sockperf: Test ended
+sockperf: [Total Run] RunTime=119.999 sec; Warm up time=400 msec; SentMessages=2400055; ReceivedMessages=2400054
+sockperf: ========= Printing statistics for Server No: 0
+sockperf: [Valid Duration] RunTime=119.549 sec; SentMessages=2391186; ReceivedMessages=2391186
+sockperf: ====> avg-latency=24.965 (std-dev=5.934, mean-ad=4.642, median-ad=1.485, siqr=1.067, cv=0.238, std-error=0.004, 99.0% ci=[24.955, 24.975])
+sockperf: # dropped messages = 0; # duplicated messages = 0; # out-of-order messages = 0
+sockperf: Summary: Latency is 24.965 usec
+sockperf: Total 2391186 observations; each percentile contains 23911.86 observations
+sockperf: ---> <MAX> observation =  195.841
+sockperf: ---> percentile 99.999 =   45.026
+sockperf: ---> percentile 99.990 =   39.009
+sockperf: ---> percentile 99.900 =   35.922
+sockperf: ---> percentile 99.000 =   33.482
+sockperf: ---> percentile 90.000 =   28.902
+sockperf: ---> percentile 75.000 =   27.821
+sockperf: ---> percentile 50.000 =   26.860
+sockperf: ---> percentile 25.000 =   25.685
+sockperf: ---> <MIN> observation =   12.277
+
+Reported-by: Hugo Ferreira <hferreir@redhat.com>
+Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 ---
- Documentation/networking/netconsole.rst |  3 ++-
- net/core/netpoll.c                      | 30 ++++++++++++++++---------
- 2 files changed, 22 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/intel/i40e/i40e.h        |  1 +
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |  6 +++
+ .../net/ethernet/intel/i40e/i40e_register.h   |  2 +
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c   | 46 ++++++++++++++-----
+ drivers/net/ethernet/intel/i40e/i40e_txrx.h   |  1 +
+ 5 files changed, 45 insertions(+), 11 deletions(-)
 
-diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
-index d55c2a22ec7a..434ce0366027 100644
---- a/Documentation/networking/netconsole.rst
-+++ b/Documentation/networking/netconsole.rst
-@@ -327,4 +327,5 @@ enable the logging of even the most critical kernel bugs. It works
- from IRQ contexts as well, and does not enable interrupts while
- sending packets. Due to these unique needs, configuration cannot
- be more automatic, and some fundamental limitations will remain:
--only IP networks, UDP packets and ethernet devices are supported.
-+only UDP packets over IP networks, over ethernet links if a
-+hardware layer is required, are supported.
-diff --git a/net/core/netpoll.c b/net/core/netpoll.c
-index 543007f159f9..0299fb71b456 100644
---- a/net/core/netpoll.c
-+++ b/net/core/netpoll.c
-@@ -399,7 +399,7 @@ EXPORT_SYMBOL(netpoll_send_skb);
+diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/ethernet/intel/i40e/i40e.h
+index 9b701615c7c6..4d2b05de6c63 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e.h
++++ b/drivers/net/ethernet/intel/i40e/i40e.h
+@@ -908,6 +908,7 @@ struct i40e_q_vector {
+ 	struct rcu_head rcu;	/* to avoid race with update stats on free */
+ 	char name[I40E_INT_NAME_STR_LEN];
+ 	bool arm_wb_state;
++	bool in_busy_poll;
+ 	int irq_num;		/* IRQ assigned to this q_vector */
+ } ____cacheline_internodealigned_in_smp;
  
- void netpoll_send_udp(struct netpoll *np, const char *msg, int len)
- {
--	int total_len, ip_len, udp_len;
-+	int total_len, ip_len, udp_len, link_len;
- 	struct sk_buff *skb;
- 	struct udphdr *udph;
- 	struct iphdr *iph;
-@@ -416,7 +416,10 @@ void netpoll_send_udp(struct netpoll *np, const char *msg, int len)
- 	else
- 		ip_len = udp_len + sizeof(*iph);
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+index 89a3401d20ab..1ea6d06b0acc 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_main.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+@@ -3915,6 +3915,12 @@ static void i40e_vsi_configure_msix(struct i40e_vsi *vsi)
+ 		     q_vector->tx.target_itr >> 1);
+ 		q_vector->tx.current_itr = q_vector->tx.target_itr;
  
--	total_len = ip_len + LL_RESERVED_SPACE(np->dev);
-+	/* if there's a hardware header assume ethernet, else raw IP */
-+	eth = NULL;
-+	link_len = np->dev->hard_header_len ? LL_RESERVED_SPACE(np->dev) : 0;
-+	total_len = ip_len + link_len;
++		/* Set ITR for software interrupts triggered after exiting
++		 * busy-loop polling.
++		 */
++		wr32(hw, I40E_PFINT_ITRN(I40E_SW_ITR, vector - 1),
++		     I40E_ITR_20K);
++
+ 		wr32(hw, I40E_PFINT_RATEN(vector - 1),
+ 		     i40e_intrl_usec_to_reg(vsi->int_rate_limit));
  
- 	skb = find_skb(np, total_len + np->dev->needed_tailroom,
- 		       total_len - len);
-@@ -458,9 +461,11 @@ void netpoll_send_udp(struct netpoll *np, const char *msg, int len)
- 		ip6h->saddr = np->local_ip.in6;
- 		ip6h->daddr = np->remote_ip.in6;
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_register.h b/drivers/net/ethernet/intel/i40e/i40e_register.h
+index 14ab642cafdb..baa6bb68bcf8 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_register.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_register.h
+@@ -335,6 +335,8 @@
+ #define I40E_PFINT_DYN_CTLN_INTERVAL_SHIFT 5
+ #define I40E_PFINT_DYN_CTLN_SW_ITR_INDX_ENA_SHIFT 24
+ #define I40E_PFINT_DYN_CTLN_SW_ITR_INDX_ENA_MASK I40E_MASK(0x1, I40E_PFINT_DYN_CTLN_SW_ITR_INDX_ENA_SHIFT)
++#define I40E_PFINT_DYN_CTLN_SW_ITR_INDX_SHIFT 25
++#define I40E_PFINT_DYN_CTLN_SW_ITR_INDX_MASK I40E_MASK(0x3, I40E_PFINT_DYN_CTLN_SW_ITR_INDX_SHIFT)
+ #define I40E_PFINT_ICR0 0x00038780 /* Reset: CORER */
+ #define I40E_PFINT_ICR0_INTEVENT_SHIFT 0
+ #define I40E_PFINT_ICR0_INTEVENT_MASK I40E_MASK(0x1, I40E_PFINT_ICR0_INTEVENT_SHIFT)
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+index 0d7177083708..356c3140adf3 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+@@ -2658,8 +2658,22 @@ static inline u32 i40e_buildreg_itr(const int type, u16 itr)
+ 	return val;
+ }
  
--		eth = skb_push(skb, ETH_HLEN);
--		skb_reset_mac_header(skb);
--		skb->protocol = eth->h_proto = htons(ETH_P_IPV6);
-+		skb->protocol = htons(ETH_P_IPV6);
-+		if (link_len) {
-+			eth = skb_push(skb, ETH_HLEN);
-+			skb_reset_mac_header(skb);
-+		}
+-/* a small macro to shorten up some long lines */
+-#define INTREG I40E_PFINT_DYN_CTLN
++static inline u32 i40e_buildreg_swint(int type)
++{
++	u32 val;
++
++	/* 1. Enable the interrupt
++	 * 2. Do not modify any ITR interval
++	 * 3. Trigger a SW interrupt specified by type
++	 */
++	val = I40E_PFINT_DYN_CTLN_INTENA_MASK |
++	      I40E_PFINT_DYN_CTLN_ITR_INDX_MASK | /* set noitr */
++	      I40E_PFINT_DYN_CTLN_SWINT_TRIG_MASK |
++	      I40E_PFINT_DYN_CTLN_SW_ITR_INDX_ENA_MASK |
++	      FIELD_PREP(I40E_PFINT_DYN_CTLN_SW_ITR_INDX_MASK, type);
++
++	return val;
++}
+ 
+ /* The act of updating the ITR will cause it to immediately trigger. In order
+  * to prevent this from throwing off adaptive update statistics we defer the
+@@ -2702,8 +2716,8 @@ static inline void i40e_update_enable_itr(struct i40e_vsi *vsi,
+ 	 */
+ 	if (q_vector->rx.target_itr < q_vector->rx.current_itr) {
+ 		/* Rx ITR needs to be reduced, this is highest priority */
+-		intval = i40e_buildreg_itr(I40E_RX_ITR,
+-					   q_vector->rx.target_itr);
++		wr32(hw, I40E_PFINT_ITRN(I40E_RX_ITR, q_vector->reg_idx),
++		     q_vector->rx.target_itr >> 1);
+ 		q_vector->rx.current_itr = q_vector->rx.target_itr;
+ 		q_vector->itr_countdown = ITR_COUNTDOWN_START;
+ 	} else if ((q_vector->tx.target_itr < q_vector->tx.current_itr) ||
+@@ -2712,25 +2726,33 @@ static inline void i40e_update_enable_itr(struct i40e_vsi *vsi,
+ 		/* Tx ITR needs to be reduced, this is second priority
+ 		 * Tx ITR needs to be increased more than Rx, fourth priority
+ 		 */
+-		intval = i40e_buildreg_itr(I40E_TX_ITR,
+-					   q_vector->tx.target_itr);
++		wr32(hw, I40E_PFINT_ITRN(I40E_TX_ITR, q_vector->reg_idx),
++		     q_vector->tx.target_itr >> 1);
+ 		q_vector->tx.current_itr = q_vector->tx.target_itr;
+ 		q_vector->itr_countdown = ITR_COUNTDOWN_START;
+ 	} else if (q_vector->rx.current_itr != q_vector->rx.target_itr) {
+ 		/* Rx ITR needs to be increased, third priority */
+-		intval = i40e_buildreg_itr(I40E_RX_ITR,
+-					   q_vector->rx.target_itr);
++		wr32(hw, I40E_PFINT_ITRN(I40E_RX_ITR, q_vector->reg_idx),
++		     q_vector->rx.target_itr >> 1);
+ 		q_vector->rx.current_itr = q_vector->rx.target_itr;
+ 		q_vector->itr_countdown = ITR_COUNTDOWN_START;
  	} else {
- 		udph->check = 0;
- 		udph->check = csum_tcpudp_magic(np->local_ip.ip,
-@@ -487,13 +492,18 @@ void netpoll_send_udp(struct netpoll *np, const char *msg, int len)
- 		put_unaligned(np->remote_ip.ip, &(iph->daddr));
- 		iph->check    = ip_fast_csum((unsigned char *)iph, iph->ihl);
- 
--		eth = skb_push(skb, ETH_HLEN);
--		skb_reset_mac_header(skb);
--		skb->protocol = eth->h_proto = htons(ETH_P_IP);
-+		skb->protocol = htons(ETH_P_IP);
-+		if (link_len) {
-+			eth = skb_push(skb, ETH_HLEN);
-+			skb_reset_mac_header(skb);
-+		}
+ 		/* No ITR update, lowest priority */
+-		intval = i40e_buildreg_itr(I40E_ITR_NONE, 0);
+ 		if (q_vector->itr_countdown)
+ 			q_vector->itr_countdown--;
  	}
  
--	ether_addr_copy(eth->h_source, np->dev->dev_addr);
--	ether_addr_copy(eth->h_dest, np->remote_mac);
-+	if (eth) {
-+		eth->h_proto = skb->protocol;
-+		ether_addr_copy(eth->h_source, np->dev->dev_addr);
-+		ether_addr_copy(eth->h_dest, np->remote_mac);
+-	if (!test_bit(__I40E_VSI_DOWN, vsi->state))
+-		wr32(hw, INTREG(q_vector->reg_idx), intval);
++	/* Do not enable interrupt if VSI is down */
++	if (test_bit(__I40E_VSI_DOWN, vsi->state))
++		return;
++
++	if (!q_vector->in_busy_poll) {
++		intval = i40e_buildreg_itr(I40E_ITR_NONE, 0);
++	} else {
++		q_vector->in_busy_poll = false;
++		intval = i40e_buildreg_swint(I40E_SW_ITR);
 +	}
++	wr32(hw, I40E_PFINT_DYN_CTLN(q_vector->reg_idx), intval);
+ }
  
- 	skb->dev = np->dev;
+ /**
+@@ -2845,6 +2867,8 @@ int i40e_napi_poll(struct napi_struct *napi, int budget)
+ 	 */
+ 	if (likely(napi_complete_done(napi, work_done)))
+ 		i40e_update_enable_itr(vsi, q_vector);
++	else
++		q_vector->in_busy_poll = true;
  
+ 	return min(work_done, budget - 1);
+ }
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.h b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
+index abf15067eb5d..2cdc7de6301c 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_txrx.h
++++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
+@@ -68,6 +68,7 @@ enum i40e_dyn_idx {
+ /* these are indexes into ITRN registers */
+ #define I40E_RX_ITR    I40E_IDX_ITR0
+ #define I40E_TX_ITR    I40E_IDX_ITR1
++#define I40E_SW_ITR    I40E_IDX_ITR2
+ 
+ /* Supported RSS offloads */
+ #define I40E_DEFAULT_RSS_HENA ( \
 -- 
 2.43.0
 
