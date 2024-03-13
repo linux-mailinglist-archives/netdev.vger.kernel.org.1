@@ -1,180 +1,269 @@
-Return-Path: <netdev+bounces-79767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64C8387B43A
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 23:10:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C237187B45E
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 23:30:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 069181F22EDF
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 22:10:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A06428400F
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 22:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F59159B4D;
-	Wed, 13 Mar 2024 22:10:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6CDA5C90B;
+	Wed, 13 Mar 2024 22:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hlrZKybJ"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="JxAR7SLr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7535917C;
-	Wed, 13 Mar 2024 22:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD4EC1A38ED;
+	Wed, 13 Mar 2024 22:30:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710367846; cv=none; b=mpaRoZx8xyVP1CmslbZ/fBNhxNUTI3TefKb+HiO8fIDVfy4sXTiR9eh4VwGe83LfyHWsi3FRCdU7MoVN1bGmQ+/fZefxYhPE5K+kX1wzWU6ZUQOoPRROh0p2DaNZNE83b27ycp9zPkC62spRblmrZV/C8PuWsTHYUu9lsaBLgAI=
+	t=1710369020; cv=none; b=X+IU4GVnA3JqQOaPlgQgtuhQgbrJrny8OEVJv73VyBmz1oj6zvFhljB0W+4rQGQZLBLrVfjOuj/h/3WXHdY8W6ZjCgE/zm3aopVvf8LqI5j8c8B7986/SsZ79x5y9jx1yrDcQo1g9yp9AXUm88KKIYpcHOqcFVwRIfdaHwhD9lY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710367846; c=relaxed/simple;
-	bh=5APNX9joY8E9yLLTfEuVlbvQ/cODNID0jd3oX4Dqksg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pC4dxYuYHW6KNvXXXe0iRiVIzsnMmompUYig7Dj93Nw+odxJV+17Q4JSyHdYbb/AtkV0fj7FiJgIknTM8Fp5uNSwtiOzR0/b0FKtKdD8186L/slRXbVBTZSOrsB7ci54pdDZdvv02uO81CYic6lUGl6EZOsVSdFWBu7geX7wIFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hlrZKybJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AAEEC433F1;
-	Wed, 13 Mar 2024 22:10:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710367845;
-	bh=5APNX9joY8E9yLLTfEuVlbvQ/cODNID0jd3oX4Dqksg=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hlrZKybJJe3Ws3NMMxCNeEsHHbw+o6y1ncI16R6kzSspIO+mmP6NvDgwf4y8KiWzB
-	 ISriQDG/umtsjSLZngtc4bWRPmhaVLTwDEOJycCVs9T3pb2db6630MGkmEU1X9BTXf
-	 C/FR1pn4FLZNh7+e2vIRbE75VMM25aAR7Ehz3Q5So2rhXs8lMAJ/BPam+hhyEE2RK8
-	 TKJzV2JoGANM/fguI5enojXimqQG14HPKu1bLHKGoszu/nNEhNHQE4sQ1LLPnOn7gz
-	 zp7GTVMs3MuZxyJr6kTsKeJA9ylvnISwYysl+bpNM9dmNSZ3Hug4u0zZxEyvRICWYD
-	 MYiWylj9cA9LA==
-Date: Wed, 13 Mar 2024 15:10:43 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: James Prestwood <prestwoj@gmail.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-	Karel Balej <balejk@matfyz.cz>, dimitri.ledkov@canonical.com,
-	alexandre.torgue@foss.st.com, davem@davemloft.net,
-	dhowells@redhat.com, herbert@gondor.apana.org.au,
-	keyrings@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-modules@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com, mcgrof@kernel.org,
-	mcoquelin.stm32@gmail.com, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, iwd@lists.linux.dev
-Subject: Re: [REGRESSION] Re: [PATCH] crypto: pkcs7: remove sha1 support
-Message-ID: <20240313221043.GC1111@sol.localdomain>
-References: <CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz>
- <005f998ec59e27633b1b99fdf929e40ccfd401c1.camel@sipsolutions.net>
- <f2dcbe55-0f0e-4173-8e21-f899c6fc802a@gmail.com>
- <20240313194423.GA1111@sol.localdomain>
- <b838e729-dc30-4e18-b928-c34c16b08606@gmail.com>
- <20240313202223.GB1111@sol.localdomain>
- <db86cba4-0e61-441d-8e66-405a13b61a3c@gmail.com>
+	s=arc-20240116; t=1710369020; c=relaxed/simple;
+	bh=CCIs2EhXWX9ha6OhlSM03eisveA0v/CDu7Xhq3qO7/Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nrs0Sykpl/UI5rO/61OPCJCvS6zlAbzExbWgJQd2/WWq3H4FKCVtWIxMqf+lIc0wAOXi4KeP4ItVy7YnM9+2GQ14/Opx35v3SfPYiJHOUPJRvItb9yJi7n8norjapn+Xn5WhVPQGRDbHLzjituNFzMAtzmxJk6iBRUNP2qt75Fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=JxAR7SLr; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1710369015;
+	bh=6Sc7A23YGrKfvDPxXLh29IDC/guj7D4h0krd4QzL1DA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JxAR7SLrFiXaB4tuxeUeSsxGfq835w9kPqkN+x4fe4NYU0PXmB5I2oiGhDHzD6N/T
+	 Zf6jw4U97alpslDuqE07jxT/RZF02fvzN6tB4Rhnm2WL0+NG19FQVSy9gKvWHyEbdl
+	 gwmKKuA7/3SKy5DOji8qSPYqt2N4ANdfFkPH9i5pPsoZzZIsJZw+HpgPhQRZwa8EXI
+	 clHWS6xY+ZBaE8yC4ujvTg9gbmtxzsxKffVppxZIVacc75TfBH8DiMi1mX74G+D/xZ
+	 +OvMeEMFKcIV4r8hbRYRi58w00nYCEK0ZmgVehWSBhLZTBTkiFTSutUm+ZO4jJahB0
+	 wmDFDJolO4+ww==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Tw4vp0MVGz4wck;
+	Thu, 14 Mar 2024 09:30:14 +1100 (AEDT)
+Date: Thu, 14 Mar 2024 09:30:12 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Networking <netdev@vger.kernel.org>, David Miller <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Daniel
+ Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, Linux
+ Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, "Uladzislau Rezki (Sony)" <urezki@gmail.com>
+Subject: Re: linux-next: manual merge of the bpf-next tree with the
+ mm-stable tree
+Message-ID: <20240314093012.3dba692a@canb.auug.org.au>
+In-Reply-To: <20240313105117.699dc720@canb.auug.org.au>
+References: <20240307123619.159f1c4c@canb.auug.org.au>
+	<20240313105117.699dc720@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <db86cba4-0e61-441d-8e66-405a13b61a3c@gmail.com>
+Content-Type: multipart/signed; boundary="Sig_/X.LwiEanwP1pFLelG86SM1D";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Wed, Mar 13, 2024 at 02:17:29PM -0700, James Prestwood wrote:
-> Hi,
-> 
-> On 3/13/24 1:22 PM, Eric Biggers wrote:
-> > On Wed, Mar 13, 2024 at 01:12:54PM -0700, James Prestwood wrote:
-> > > Hi,
-> > > 
-> > > On 3/13/24 12:44 PM, Eric Biggers wrote:
-> > > > On Wed, Mar 13, 2024 at 10:26:06AM -0700, James Prestwood wrote:
-> > > > > Hi,
-> > > > > 
-> > > > > On 3/13/24 1:56 AM, Johannes Berg wrote:
-> > > > > > Not sure why you're CC'ing the world, but I guess adding a few more
-> > > > > > doesn't hurt ...
-> > > > > > 
-> > > > > > On Wed, 2024-03-13 at 09:50 +0100, Karel Balej wrote:
-> > > > > > >     and I use iwd
-> > > > > > This is your problem, the wireless stack in the kernel doesn't use any
-> > > > > > kernel crypto code for 802.1X.
-> > > > > Yes, the wireless stack has zero bearing on the issue. I think that's what
-> > > > > you meant by "problem".
-> > > > > 
-> > > > > IWD has used the kernel crypto API forever which was abruptly broken, that
-> > > > > is the problem.
-> > > > > 
-> > > > > The original commit says it was to remove support for sha1 signed kernel
-> > > > > modules, but it did more than that and broke the keyctl API.
-> > > > > 
-> > > > Which specific API is iwd using that is relevant here?
-> > > > I cloned https://kernel.googlesource.com/pub/scm/network/wireless/iwd
-> > > > and grepped for keyctl and AF_ALG, but there are no matches.
-> > > IWD uses ELL for its crypto, which uses the AF_ALG API:
-> > > 
-> > > https://git.kernel.org/pub/scm/libs/ell/ell.git/
-> > Thanks for pointing out that the relevant code is really in that separate
-> > repository.  Note, it seems that keyctl() is the problem here, not AF_ALG.  The
-> > blamed commit didn't change anything for AF_ALG.
-> > 
-> > > I believe the failure is when calling:
-> > > 
-> > > KEYCTL_PKEY_QUERY enc="x962" hash="sha1"
-> > > 
-> > >  From logs Michael posted on the IWD list, the ELL API that fails is:
-> > > 
-> > > l_key_get_info (ell.git/ell/key.c:416)
-> > Okay, I guess that's what's actually causing the problem.  KEYCTL_PKEY_* are a
-> > weird set of APIs where userspace can ask the kernel to do asymmetric key
-> > operations.  It's unclear why they exist, as the same functionality is available
-> > in userspace crypto libraries.
-> > 
-> > I suppose that the blamed commit, or at least part of it, will need to be
-> > reverted to keep these weird keyctls working.
-> > 
-> > For the future, why doesn't iwd just use a userspace crypto library such as
-> > OpenSSL?
-> 
-> I was not around when the original decision was made, but a few reasons I
-> know we don't use openSSL:
-> 
->  - IWD has virtually zero dependencies.
+--Sig_/X.LwiEanwP1pFLelG86SM1D
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Depending on something in the kernel does not eliminate a dependency; it just
-adds that particular kernel UAPI to your list of dependencies.  The reason that
-we're having this discussion in the first place is because iwd is depending on
-an obscure kernel UAPI that is not well defined.  Historically it's been hard to
-avoid "breaking" changes in these crypto-related UAPIs because of the poor
-design where a huge number of algorithms are potentially supported, but the list
-is undocumented and it varies from one system to another based on configuration.
-Also due to their obscurity many kernel developers don't know that these UAPIs
-even exist.  (The reaction when someone finds out is usually "Why!?")
+Hi all,
 
-It may be worth looking at if iwd should make a different choice for this
-dependency.  It's understandable to blame dependencies when things go wrong, but
-at the same time the choice of dependency is very much a choice, and some
-choices can be more technically sound and cause fewer problems than others...
+On Wed, 13 Mar 2024 10:51:17 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
+>
+> On Thu, 7 Mar 2024 12:36:19 +1100 Stephen Rothwell <sfr@canb.auug.org.au>=
+ wrote:
+> >=20
+> > Today's linux-next merge of the bpf-next tree got a conflict in:
+> >=20
+> >   mm/vmalloc.c
+> >=20
+> > between commit:
+> >=20
+> >   8e1d743f2c26 ("mm: vmalloc: support multiple nodes in vmallocinfo")
+> >=20
+> > from the mm-stable tree and commit:
+> >=20
+> >   e6f798225a31 ("mm: Introduce VM_SPARSE kind and vm_area_[un]map_pages=
+().")
+> >=20
+> > from the bpf-next tree.
+> >=20
+> > I fixed it up (I think - see below) and can carry the fix as necessary.
+> > This is now fixed as far as linux-next is concerned, but any non trivial
+> > conflicts should be mentioned to your upstream maintainer when your tree
+> > is submitted for merging.  You may also want to consider cooperating
+> > with the maintainer of the conflicting tree to minimise any particularly
+> > complex conflicts.
+> >=20
+> >=20
+> > diff --cc mm/vmalloc.c
+> > index 25a8df497255,e5b8c70950bc..000000000000
+> > --- a/mm/vmalloc.c
+> > +++ b/mm/vmalloc.c
+> > @@@ -4755,81 -4423,70 +4820,84 @@@ static void show_numa_info(struct se=
+q_f
+> >  =20
+> >   static void show_purge_info(struct seq_file *m)
+> >   {
+> >  +	struct vmap_node *vn;
+> >   	struct vmap_area *va;
+> >  +	int i;
+> >  =20
+> >  -	spin_lock(&purge_vmap_area_lock);
+> >  -	list_for_each_entry(va, &purge_vmap_area_list, list) {
+> >  -		seq_printf(m, "0x%pK-0x%pK %7ld unpurged vm_area\n",
+> >  -			(void *)va->va_start, (void *)va->va_end,
+> >  -			va->va_end - va->va_start);
+> >  -	}
+> >  -	spin_unlock(&purge_vmap_area_lock);
+> >  -}
+> >  +	for (i =3D 0; i < nr_vmap_nodes; i++) {
+> >  +		vn =3D &vmap_nodes[i];
+> >  =20
+> >  -static int s_show(struct seq_file *m, void *p)
+> >  -{
+> >  -	struct vmap_area *va;
+> >  -	struct vm_struct *v;
+> >  -
+> >  -	va =3D list_entry(p, struct vmap_area, list);
+> >  -
+> >  -	if (!va->vm) {
+> >  -		if (va->flags & VMAP_RAM)
+> >  -			seq_printf(m, "0x%pK-0x%pK %7ld vm_map_ram\n",
+> >  +		spin_lock(&vn->lazy.lock);
+> >  +		list_for_each_entry(va, &vn->lazy.head, list) {
+> >  +			seq_printf(m, "0x%pK-0x%pK %7ld unpurged vm_area\n",
+> >   				(void *)va->va_start, (void *)va->va_end,
+> >   				va->va_end - va->va_start);
+> >  -
+> >  -		goto final;
+> >  +		}
+> >  +		spin_unlock(&vn->lazy.lock);
+> >   	}
+> >  +}
+> >  =20
+> >  -	v =3D va->vm;
+> >  +static int vmalloc_info_show(struct seq_file *m, void *p)
+> >  +{
+> >  +	struct vmap_node *vn;
+> >  +	struct vmap_area *va;
+> >  +	struct vm_struct *v;
+> >  +	int i;
+> >  =20
+> >  -	seq_printf(m, "0x%pK-0x%pK %7ld",
+> >  -		v->addr, v->addr + v->size, v->size);
+> >  +	for (i =3D 0; i < nr_vmap_nodes; i++) {
+> >  +		vn =3D &vmap_nodes[i];
+> >  =20
+> >  -	if (v->caller)
+> >  -		seq_printf(m, " %pS", v->caller);
+> >  +		spin_lock(&vn->busy.lock);
+> >  +		list_for_each_entry(va, &vn->busy.head, list) {
+> >  +			if (!va->vm) {
+> >  +				if (va->flags & VMAP_RAM)
+> >  +					seq_printf(m, "0x%pK-0x%pK %7ld vm_map_ram\n",
+> >  +						(void *)va->va_start, (void *)va->va_end,
+> >  +						va->va_end - va->va_start);
+> >  =20
+> >  -	if (v->nr_pages)
+> >  -		seq_printf(m, " pages=3D%d", v->nr_pages);
+> >  +				continue;
+> >  +			}
+> >  =20
+> >  -	if (v->phys_addr)
+> >  -		seq_printf(m, " phys=3D%pa", &v->phys_addr);
+> >  +			v =3D va->vm;
+> >  =20
+> >  -	if (v->flags & VM_IOREMAP)
+> >  -		seq_puts(m, " ioremap");
+> >  +			seq_printf(m, "0x%pK-0x%pK %7ld",
+> >  +				v->addr, v->addr + v->size, v->size);
+> >  =20
+> >  -	if (v->flags & VM_SPARSE)
+> >  -		seq_puts(m, " sparse");
+> >  +			if (v->caller)
+> >  +				seq_printf(m, " %pS", v->caller);
+> >  =20
+> >  -	if (v->flags & VM_ALLOC)
+> >  -		seq_puts(m, " vmalloc");
+> >  +			if (v->nr_pages)
+> >  +				seq_printf(m, " pages=3D%d", v->nr_pages);
+> >  =20
+> >  -	if (v->flags & VM_MAP)
+> >  -		seq_puts(m, " vmap");
+> >  +			if (v->phys_addr)
+> >  +				seq_printf(m, " phys=3D%pa", &v->phys_addr);
+> >  =20
+> >  -	if (v->flags & VM_USERMAP)
+> >  -		seq_puts(m, " user");
+> >  +			if (v->flags & VM_IOREMAP)
+> >  +				seq_puts(m, " ioremap");
+> >  =20
+> >  -	if (v->flags & VM_DMA_COHERENT)
+> >  -		seq_puts(m, " dma-coherent");
+> > ++			if (v->flags & VM_SPARSE)
+> > ++				seq_puts(m, " sparse");
+> > +=20
+> >  -	if (is_vmalloc_addr(v->pages))
+> >  -		seq_puts(m, " vpages");
+> >  +			if (v->flags & VM_ALLOC)
+> >  +				seq_puts(m, " vmalloc");
+> >  =20
+> >  -	show_numa_info(m, v);
+> >  -	seq_putc(m, '\n');
+> >  +			if (v->flags & VM_MAP)
+> >  +				seq_puts(m, " vmap");
+> >  +
+> >  +			if (v->flags & VM_USERMAP)
+> >  +				seq_puts(m, " user");
+> >  +
+> >  +			if (v->flags & VM_DMA_COHERENT)
+> >  +				seq_puts(m, " dma-coherent");
+> >  +
+> >  +			if (is_vmalloc_addr(v->pages))
+> >  +				seq_puts(m, " vpages");
+> >  +
+> >  +			show_numa_info(m, v);
+> >  +			seq_putc(m, '\n');
+> >  +		}
+> >  +		spin_unlock(&vn->busy.lock);
+> >  +	}
+> >  =20
+> >   	/*
+> >   	 * As a final step, dump "unpurged" areas. =20
+>=20
+> This is now a conflict between the net-next tree and the mm-stable tree.
 
->  - OpenSSL + friends are rather large libraries.
+ ... and now a conflict between te mm-stable tree and Linus' tree.
+--=20
+Cheers,
+Stephen Rothwell
 
-The Linux kernel is also large, and it's made larger by having to support
-obsolete crypto algorithms for backwards compatibility with iwd.
+--Sig_/X.LwiEanwP1pFLelG86SM1D
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
->  - AF_ALG has transparent hardware acceleration (not sure if openSSL does
-> too).
+-----BEGIN PGP SIGNATURE-----
 
-OpenSSL takes advantage of CPU-based hardware acceleration, e.g. AES-NI.
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmXyKPQACgkQAVBC80lX
+0GwlxQf/eCrMYHEYG7MSNkVQBOK/HNe6zEdclVJJ9hZMYItowVZn+cAtXqMfMl98
+XimL1lFZVTMWBTCvPTvVWcle8LDPDX/RymqePh2S/roMVI31uPKHV6YnA0zm86sn
+nkgsaJyiuRqHj0wQzAS+X5UUnOW1wYw9C1fEchCXLiFkzBoz3fJul/k7v0DvS5Zi
+iCRSvYDFAEE1wVf7DkWjZ5J2B0W/+fORMWzf8ljakfi4KH+HRTF6mpLlRPnKI7gw
+n1tc6lv3ZJsycrZf2h3D48jw8CQ1FwSdReWioCZZaq2fUH63318j3A4wiiOUm3DD
+KEs+PRyq44sMFcT18czjvkX9kL6iCA==
+=A/F9
+-----END PGP SIGNATURE-----
 
-> Another consideration is once you support openSSL someone wants wolfSSL,
-> then boringSSL etc. Even if users implement support it just becomes a huge
-> burden to carry for the project. Just look at wpa_supplicant's src/crypto/
-> folder, nearly 40k LOC in there, compared to ELL's crypto modules which is
-> ~5k. You have to sort out all the nitty gritty details of each library, and
-> provide a common driver/API for the core code, differences between openssl
-> versions, the list goes on.
-
-What is the specific functionality that you're actually relying on that you
-think would need 40K lines of code to replace, even using OpenSSL?  I see you
-are using KEYCTL_PKEY_*, but what specifically are you using them for?  What
-operations are being performed, and with which algorithms and key formats?
-Also, is the kernel behavior that you're relying on documented anywhere?  There
-are man pages for those keyctls, but they don't say anything about any
-particular hash algorithm, SHA-1 or otherwise, being supported.
-
-- Eric
+--Sig_/X.LwiEanwP1pFLelG86SM1D--
 
