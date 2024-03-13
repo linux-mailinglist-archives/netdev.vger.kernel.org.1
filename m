@@ -1,130 +1,213 @@
-Return-Path: <netdev+bounces-79668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79669-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AAA387A800
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:03:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACD7C87A80D
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:06:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B168285C3A
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:03:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6374A284F7F
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:06:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86B8E225AD;
-	Wed, 13 Mar 2024 13:03:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07EFB3F9CE;
+	Wed, 13 Mar 2024 13:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="RV2gzj+d";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="6NgVkPPJ"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="kXsSJdn0"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0741F41A81
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 13:03:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2864E4205F
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 13:06:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710334997; cv=none; b=SlKAvZWnVMzcyX6yw2QOO4LfHgoRnhKztlktdIRhhTifRz6PZVulmfYefvBEyv2MuJaPvtPAPsHofYO1nkpOVFm4KNTJCL3sAsZPWADHz6WOkXZQceSdyjT8x+8H74b60Nh1JGKmaqKRyDtP6Q8s8gOECqXcjwPQcYDor/LLRx4=
+	t=1710335186; cv=none; b=aWcZjy18SuDTM2VxmLFWNns325162DEibAGAYhc6JeOxrB5IHA1s0bs6sCnRixwsHUzgaA2D3aoQqbZh/zxV7RMQvhkrTIKyrevFQG+0zzPqqALYxGYz90dRAVb3N4XtlNFsQzqNupWczB3HO6FyKA7NQVABslHDt7ktDy9HQcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710334997; c=relaxed/simple;
-	bh=GrNnKDgkIMZeLbHmwfq5U1uNGlGFk+4T0DFZQ8Vk9go=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=PdEj3WG8fZXXQdyb4tYrPI+vIf2zDbtMRU/QxkLrakj60xhisxaR640SK3RceUiU7r4dO+eqScOfGi/01/uPr8H+uEt3CQRlRboGMc6UQJdecyD2qfcvGuBeu9pDlZoLKV4Y5LHAtmTUCYzq+y43hDQFEgymbcQXAiQCobGRXcw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=RV2gzj+d; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=6NgVkPPJ; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1710334993;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=5JMrvmDVNALmWdwq0fCgL0UHXuNvWW+anwgA6EwkPqc=;
-	b=RV2gzj+dCW8xw37tVDj2YSLi7Nv90UaTOWCY3JB+vr3nHyhdrpfasjXbp+aKcrO1OPjdXE
-	Qpvuvzx1zpa7Fs1mNCpJOlOuQAbcPQ2oWUA3XxcTzWShKZN6iIv4mglzhWiCsvKvoWs02/
-	Ni55KS6MczGaD4W4wz2qt5Kftx42ezWpFPbldcBUnVxzl0siz5vT662vWY1SyTxzmoak5P
-	AY01XxtWnwiwY3/Xb1dDdvyB1jtYlyy65yF9zECSi3Bta5EqBBbyoGTAvqWGVp1madLR2A
-	NNcHyc80IBEuonaVoZWzhOdcnRBWvknsJah8Jkc0FmHSlBmrLYnPISeLrBFUSg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1710334993;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=5JMrvmDVNALmWdwq0fCgL0UHXuNvWW+anwgA6EwkPqc=;
-	b=6NgVkPPJINeGy0Adfw9i7RnU9OCzxKqZOjWVza8+hMuIsEJrX8DhJxQZv+BC9iFN4eOZix
-	TO/v2dl/1OhVvZBA==
-Date: Wed, 13 Mar 2024 14:03:10 +0100
-Subject: [PATCH iwl-net] igc: Remove stale comment about Tx timestamping
+	s=arc-20240116; t=1710335186; c=relaxed/simple;
+	bh=nu2TU/efmJVyyNzdPZmhd4lX/ZlvA6rNHIqxiz0oydA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pt8vteNacpqbWO7TwETdLSb/ifE8GubZN8Ead7EHYnR8KInySWflAFT+mRjWlUlIUij6H9yRtirdAK4/zgWLopJ+0tOcP4Wj8f5d7uexLaVzooKrVy5nytmIaJlcqg8VzboKUlUGW9viS1W/gqxGzUCEEbntnU+SvQj2cQcjnCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=kXsSJdn0; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-413ea2c7fcfso3244965e9.1
+        for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 06:06:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1710335183; x=1710939983; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=M4NpWuidE/6XLSodKBBeg9UI/bSbAFivtpB+E/WZivo=;
+        b=kXsSJdn0zpgvJUENwPnovJmkrcdx5f3wcKrVe4lE0UE12bVzHZFsTIJRc7NrABlacG
+         aeMm0EMsWXowzFEz0XvBHaPuBA0mDK+CDXBw/47084sDW1vhj5FXKI6RfIjU9jRcJyXz
+         /8m08C+dkq9AMGpPC01k+vXXL/tIIeefFOrmi9knkRxEvEGrs/GS5u0Rq7jQA+Ca7jTj
+         7QLvO8Jo5QRGfx2cLSJNBYB3GvGwz1s/nCuvT1t2fq+24rdeRPXyK054ntH0+HZTrNxv
+         vWSK8VvebUHHdYb5H/W24fPDJ4O5GriLn9U4AhUWBm35w4c3WkrKiqi85psGqjCiI/B6
+         U/7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710335183; x=1710939983;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=M4NpWuidE/6XLSodKBBeg9UI/bSbAFivtpB+E/WZivo=;
+        b=VvAKaZav0mN2TogCvGZA+4qPy6cg9U7J/BqxazfmXDFiethUNMy68PfP8tYw8Q1bYL
+         Ar5U20AxQyIAH4hDuuC+3oRZ6cyudR/zDXgK87u0ZW53q+jHiPL1rKXkcmlyytxV1BBF
+         +pizzoYu/hQyamlNenLsZTesdy1Lab1560dPZ9z0Yr37Rxgeyk49zbxQWnX8vCI7dvDN
+         TomlOjpENfnTpgF6iclEZGApobNSFTGFiJVrJ36pPHf11zo5IHvbeHuyr75OOR46B5d4
+         mxfaPrAZ/LE9ZjJ0h/L7Fz2VLsg319b99R0sNySH4uljYsl3TUwBT+DuYEMLgF9KM6jo
+         UJLw==
+X-Gm-Message-State: AOJu0YxOWB2HZxKO0v2uTYh95NOwN5wB7LP7JpsktoD9bQSx0zpIHeOG
+	urPb/EqVoa4m8mR49iJ63k4mIW5oCLc7cBe/yQPY8xdDpOeWQFCoY8VfEfIqCxU=
+X-Google-Smtp-Source: AGHT+IGa1okwKTE1e2wF6mpSHWKi5YQtwtGwhXyfrBB3D3LwsSoevUjXgSUkdVD+/wK963THVidm5Q==
+X-Received: by 2002:a05:600c:1c05:b0:412:fe95:b6c5 with SMTP id j5-20020a05600c1c0500b00412fe95b6c5mr3950944wms.7.1710335183472;
+        Wed, 13 Mar 2024 06:06:23 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.222.97])
+        by smtp.gmail.com with ESMTPSA id l15-20020a05600012cf00b0033ce727e728sm11589432wrx.94.2024.03.13.06.06.21
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Mar 2024 06:06:23 -0700 (PDT)
+Message-ID: <e2a98098-8ccd-4b8f-9a4b-1cbc0776a9c2@linaro.org>
+Date: Wed, 13 Mar 2024 14:06:20 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 2/2] dt-bindings: net: add new property st,ext-phyclk
+ in documentation for stm32
+Content-Language: en-US
+To: Christophe ROULLIER <christophe.roullier@foss.st.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Richard Cochran <richardcochran@gmail.com>, Jose Abreu
+ <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240307135957.303481-1-christophe.roullier@foss.st.com>
+ <20240307135957.303481-3-christophe.roullier@foss.st.com>
+ <578f421c-ca06-45d4-8380-8b2b423d4d47@linaro.org>
+ <50ee6122-b160-48ea-8c44-1046b5907d7c@foss.st.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <50ee6122-b160-48ea-8c44-1046b5907d7c@foss.st.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240313-igc_txts_comment-v1-1-4e8438739323@linutronix.de>
-X-B4-Tracking: v=1; b=H4sIAA2k8WUC/x2N0QqDMAwAf0XyvICtY3T7lTGkjVEDax1NcYL47
- 6t7PI7jdlDOwgqPZofMq6gsqYK5NECzTxOjDJXBtvbadqZDmagvW9Gelhg5FXTmZu/DSC44DzU
- LXhlD9onmM4xeC+dTfDKPsv1fT5DvGxMXeB3HD8lXVSWEAAAA
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>, 
- Tony Nguyen <anthony.l.nguyen@intel.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Vladimir Oltean <vladimir.oltean@nxp.com>, 
- Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
- Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
- Kurt Kanzenbach <kurt@linutronix.de>
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1346; i=kurt@linutronix.de;
- h=from:subject:message-id; bh=GrNnKDgkIMZeLbHmwfq5U1uNGlGFk+4T0DFZQ8Vk9go=;
- b=owEBbQKS/ZANAwAKAcGT0fKqRnOCAcsmYgBl8aQQArPq6T4wA6zJH+1VgFG4zSS7YIU5yt0r7
- /BPCQNQtQ6JAjMEAAEKAB0WIQS8ub+yyMN909/bWZLBk9HyqkZzggUCZfGkEAAKCRDBk9HyqkZz
- gnATD/4qjnv7e0lk7C4Hw4IY/ikKKbBjy3+2DJAeM3HV1l/WwqZP/0+ZcxKj1chuI5JKcoP2YMw
- w9vP637Aw3UGbN+2gUpSQGBhP+++NwG20YhASVfZsOMrSuNh0Rjb7exwtrUkUWSUYJaUq9lxH1d
- 2P78YoL1qbhMLv3lZJl6sNKo571H0nMhb0rPS5239Aw+h9vmccFQPxviiBa6wCn+QpLQkSVRcd0
- 3IygfA03DFdH83MnwmjAVlXRja+N/UVXLWuEN6vZgV26C2GHkjwtcY3gjQjcmV+tYLRX1rNE4BO
- 8QsO0/zxn/eVVGRThaqFsE0KNXYTTvnKTqLf8lYg/UbjgLTdLoisoDml12yAYkGXFRpg/Cg/ms1
- 948aMlgvtINJAPel7L8pRlIiJQWLT7qqt+ydwSa7HS1juP4exhnFb8hOaDOZ2gaZXxRodEQA4KI
- 8JAH5sJpUYN8BjN4jXSKLzfMgSrlM2HJ7OsJKR7BrxX4DcgviwcseHgoNcGl35akQX/Uh2yy0rh
- 6NL6z+U8vONlSpc4qHJQLerqxWKlq84+Gw3ju8hCbMatfSRcXqJsZRBWlfrMMXEu+JwhEONPcCH
- 3w/SneL9lCk0eY7DSgB0hy8zORHUTpKSo/0umhrPkndzYULZyKxRGmca6beKvBZIM9pDntjeRiL
- JrLa2JATiNUmzvg==
-X-Developer-Key: i=kurt@linutronix.de; a=openpgp;
- fpr=BCB9BFB2C8C37DD3DFDB5992C193D1F2AA467382
 
-The initial igc Tx timestamping implementation used only one register for
-retrieving Tx timestamps. Commit 3ed247e78911 ("igc: Add support for
-multiple in-flight TX timestamps") added support for utilizing all four of
-them e.g., for multiple domain support. Remove the stale comment/FIXME.
+On 13/03/2024 11:39, Christophe ROULLIER wrote:
+> 
+> On 3/8/24 09:28, Krzysztof Kozlowski wrote:
+>> On 07/03/2024 14:59, Christophe Roullier wrote:
+>>> Add property st,ext-phyclk to manage cases when PHY have no cristal/quartz
+>>> This property can be used with RMII phy without cristal 50Mhz and when we
+>>> want to select RCC clock instead of ETH_REF_CLK
+>>> Can be used also with RGMII phy with no cristal and we select RCC clock
+>>> instead of ETH_CLK125
+>>>
+>> Nothing improved here. You say you add new property (wrote it explicitly
+>> in the subject), but where is it? Where is the user?
+>>
+>> I think we talked about this. Rob also asked quite clear:
+>>
+>>> That is obvious from the diff. What is not obvious is why we need a new
+>>> property and what is the problem with the existing ones.
+>> How did you solve it?
+> 
+> Hi,
+> 
+> I do not understand your questions.
 
-Fixes: 3ed247e78911 ("igc: Add support for multiple in-flight TX timestamps")
-Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
----
- drivers/net/ethernet/intel/igc/igc_main.c | 4 ----
- 1 file changed, 4 deletions(-)
+OK, I will clarify some questions, but are you sure that this question:
+"How did you solve it?"
+needs clarification?
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 2e1cfbd82f4f..35ad40a803cb 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -1642,10 +1642,6 @@ static netdev_tx_t igc_xmit_frame_ring(struct sk_buff *skb,
- 
- 	if (unlikely(test_bit(IGC_RING_FLAG_TX_HWTSTAMP, &tx_ring->flags) &&
- 		     skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)) {
--		/* FIXME: add support for retrieving timestamps from
--		 * the other timer registers before skipping the
--		 * timestamping request.
--		 */
- 		unsigned long flags;
- 		u32 tstamp_flags;
- 
+If so, then let me clarify:
+Rob pointed issue. How did you resolve Rob's comment? How did you
+address it? What changed in your patch, that Rob's comment should be
+considered as addressed/resolved/done?
 
----
-base-commit: 67072c314f5f0ec12a7a51a19f7156eebb073654
-change-id: 20240313-igc_txts_comment-81629dfc8b8a
+Now about my other question:
+"but where is it? Where is the user?"
+
+Your subject and commit message claim you add new property. This means
+such property was not existing so far in the Linux kernel. If you add
+new property in the binding, then I expect adding the user of that
+binding, thus my question: where is the user of that binding?
+
+> 
+> That I would like to do, it is property "st,ext-phyclk" was introduced 
+> in driver
+> 
+> "drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c" in 2020, and YAML 
+> was not updated at the time.
+
+Are you saying you document existing property or add a new one?
+
+> 
+> Goal of this patch it is to update YAML to avoid dtbs check issue if 
+> someone use this property :
+> 
+>   dtbs check issue : views/kernel/upstream/net-next/arch/arm/boot/dts/st/stm32mp157c-dk2.dtb:
+> ethernet@5800a000: Unevaluated properties are not allowed
+> ('st,ext-phyclk' was unexpected)
+
+So DTS uses it?
+
+Are my questions now clear? BTW, I asked some of them before and you
+just sent the same patch, so looks like ignored my questions.
 
 Best regards,
--- 
-Kurt Kanzenbach <kurt@linutronix.de>
+Krzysztof
 
 
