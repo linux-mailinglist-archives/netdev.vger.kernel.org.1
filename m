@@ -1,115 +1,95 @@
-Return-Path: <netdev+bounces-79659-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79660-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3778987A762
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:06:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3819887A77D
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:23:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 688541C22AC6
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 12:06:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31896B210F7
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 12:23:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 723713F9C8;
-	Wed, 13 Mar 2024 12:06:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="E/IpBBLu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27563FE5F;
+	Wed, 13 Mar 2024 12:23:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6ED921CD00;
-	Wed, 13 Mar 2024 12:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51DDD3FE2E
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 12:23:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710331585; cv=none; b=jd5r37EfDN1HFRZMl3YzgLlVyzrZtPeNAEztWBMfx/erPVkNzkKvnIfBuk0AoakRF/JEqS7Qz6Pus/3J95HbnN9IajIwEzqxFNNraGLDx/qNBSH96Nwr+i9Hr0eV3nwdyKMfYe/H8Wh0NYbmolHO1+oqNhx5zR1LQIVWz17V4qQ=
+	t=1710332586; cv=none; b=Q5Y1XfgUo61WDQHHj2WdIPSNjBnbiovNK+xXBRBrbKoMNEUlCJunJFGf8ThJzjyb3j3STWJF00cTgZxQhp5+H21JBf0hEcAPkxGuKQzTSOOKKYsf+apZKv7llgqjOM8xYAgywe15T7DOp7NdS8xmwCue/wh4iSIP1S4/Hu6pp7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710331585; c=relaxed/simple;
-	bh=G33yJ0hd6fYJ103h6Wuuwm4C6XCXponRb0+ARfXFBJA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fex3ZmmLXZyaKS3IMSh2V9fMR2XFb3r7UOcjDgNKaYzEtueGk4WeYGdsnuIM0pMSGSC/HhDqzOAAFbYhilDgQVe4aOQv7x3aybxYgaJ21tde5Pnp8xGRgbra6gGvqJse7Y6p7qb0bZeDiA0boYNAjwM0f2DFP3zdt1UQaJ+PogY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=E/IpBBLu; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 07BCDE000D;
-	Wed, 13 Mar 2024 12:06:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1710331580;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9En6uzyrXqEpXMyli+a5bbxKTYmfpSeoH7e6bqHXIiQ=;
-	b=E/IpBBLuJBUaF1nTLhkj0clPsXeXOXtqG75qHpr/AVJ1aTjlVT21OMhyXGkpR+bpiWuG0j
-	dUjfrM6hzo4yaJgWljTIc3wqJz+rCFpDqcHZskzh7aP2wtcQezWwjX79pzhZR7eTrY3b9j
-	+fApCe8Na+0M6PeDYARhae3X7kNi7BMTvLDZUQeG6KkJiFQ2b9LAMH4s4x/D1+keTLLvhn
-	CWC8DZ+/4XERrEe0jJFN0+RSbX9wwyKgXE6Nf694GNk4xkK3vJ40ChxPy4RDeCIyJoVdkv
-	cYoNvo+hWM25HLfFHCO/L++ZcWLunYW1aWYbPMZjVcNjLDT6F9JsKktOuNl1OA==
-Message-ID: <2640a495-97a0-4669-a53a-e367af956a78@arinc9.com>
-Date: Wed, 13 Mar 2024 15:06:04 +0300
+	s=arc-20240116; t=1710332586; c=relaxed/simple;
+	bh=CMx0+K0+od6gAAfqGFuKrClz/7QMgfg21jkqF8+bk0U=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=FkT/WnIL275lclgX1JU1r82rgQXZmCac/U3iFuVY/BGyRQMvHwZwyYmXietxVHsZnpi/EJ3IZESdrEiBXzVSmffXhsY3FaAIAbqvsumUGwCQp3l7LyA0TV0htZiWmbQiaCpbpJPNgrZd7LRUyJzUA06Qkbpy6ekojPAcrqbUF6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c8af56060aso313247639f.3
+        for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 05:23:05 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710332584; x=1710937384;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8/RQ7ulMJ/8EuK5QcToN/BsgCLIW1fJL8XxtmY+wQjs=;
+        b=bv/x/geHu+cPfjlTF22L48muiU39EBHe3Blw4vi45rrR8z3zpDdz5P8VvtJ0P+saEa
+         7t9kdceWSzmgYxiuIMUbibiQCIGSffiH0Jc5ixDBsl3G4BFYDVQaq4iLZJOGTnQbUVa3
+         a7XfX5W0fyfX6XAIFSB4YCchtvxjLkXhuZHhLXLNVr2N+GT1tmGysb1qLoMqWivZ/fPw
+         C/l7AZoF/pE/chfZsMBsRCpy48ciExVsUEOENvQsRjKS2M9nuUbJj39u50QYx0P5gvGO
+         bHzpvsnBGv5WVyN/IZ1gz5xpio5w3zrNSiMNZO7rKoYHuuiXqzZM/FWglu+YvgHBnWPW
+         Jn3g==
+X-Forwarded-Encrypted: i=1; AJvYcCUAwMiv0QWldTI0jmQE9/4sF4WrJ4nFJ4rIvaS+8HvWRfqDixGLl4pw3k1FxzC31oTB1vzV72/xwHbyZxskQvi30e9qa6T1
+X-Gm-Message-State: AOJu0YxH7nGcRvioDacH1ZtpV82ZjFPBwnjFGxBs4NKxqaZGTjwfLqLk
+	bYeWSQh3/BmbCaFP3iIQVc7yGOmaCgh0hXXqIu4PlFfRMDIj0b61bEaw307e/1M0pgciq3vsSat
+	FBUSZiLI5GXLOtaqBqI60BdH4Wp58UUvtT7Nz1JOEo3IsHfAF50GvG1k=
+X-Google-Smtp-Source: AGHT+IGVTtQ4uojG97WNJ0uwB0YBDq59+qtV5IZ/3cDnbc7YourhmR/GosPslCuD+dZwEelAMVRAygeYYtaFyq8wBk2Nc0aMcF63
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: dsa: mt7530: increase reset hold time
-To: Justin Swartz <justin.swartz@risingedge.co.za>
-Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <f594a72a91d12f1d027a06962caa9750@risingedge.co.za>
- <20240312192117.7789-1-justin.swartz@risingedge.co.za>
- <bf0ed70f-e106-4a7f-a98c-de34658feb4d@arinc9.com>
- <e6525cac666a033a5866465abb3e63f1@risingedge.co.za>
-Content-Language: en-US
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <e6525cac666a033a5866465abb3e63f1@risingedge.co.za>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: yes
-X-Spam-Level: **************************
-X-GND-Spam-Score: 400
-X-GND-Status: SPAM
-X-GND-Sasl: arinc.unal@arinc9.com
+X-Received: by 2002:a05:6602:1693:b0:7c8:bd8e:a88 with SMTP id
+ s19-20020a056602169300b007c8bd8e0a88mr143010iow.4.1710332584607; Wed, 13 Mar
+ 2024 05:23:04 -0700 (PDT)
+Date: Wed, 13 Mar 2024 05:23:04 -0700
+In-Reply-To: <00000000000095640f05cb78af37@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000002755ce061389d67b@google.com>
+Subject: Re: [syzbot] [can?] possible deadlock in j1939_sk_queue_drop_all
+From: syzbot <syzbot+3bd970a1887812621b4c@syzkaller.appspotmail.com>
+To: astrajoan@yahoo.com, davem@davemloft.net, edumazet@google.com, 
+	hdanton@sina.com, kernel@pengutronix.de, kuba@kernel.org, 
+	linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux@rempel-privat.de, mkl@pengutronix.de, netdev@vger.kernel.org, 
+	o.rempel@pengutronix.de, pabeni@redhat.com, robin@protonic.nl, 
+	socketcan@hartkopp.net, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 13.03.2024 14:52, Justin Swartz wrote:
-> 
-> On 2024-03-13 10:59, Arınç ÜNAL wrote:
->> This ship has sailed anyway. Now the changes the first patch did must be
->> reverted too. I will deal with this from now on, you can stop sending
->> patches regarding this.
-> 
-> At least if the first patch isn't reverted, the approach used is
-> less likely to result in the problem occuring, IMHO.
+syzbot suspects this issue was fixed by commit:
 
-I disagree that the previous approach is less likely to result in the
-problem occurring. If you don't like the delay amount we agreed on, feel
-free to express a higher amount.
+commit 6cdedc18ba7b9dacc36466e27e3267d201948c8d
+Author: Ziqi Zhao <astrajoan@yahoo.com>
+Date:   Fri Jul 21 16:22:26 2023 +0000
 
-I also disagree on introducing a solution that is in addition to another
-solution, both of which fix the same problem.
+    can: j1939: prevent deadlock by changing j1939_socks_lock to rwlock
 
-> 
-> The delay between deliberately switching the LEDs off, instead of
-> only waiting on chip reset logic to handle that, and the reset
-> assertion could be considered a "reset setup" period to complement
-> the original reset hold period.
-> 
-> Increasing the hold period to what should be 5000 - 5100 usec,
-> definitely made the problem go away my testing, but the previous
-> approach is (if nothing else) more explicit in its intent.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10e4d371180000
+start commit:   dd72f9c7e512 Merge tag 'spi-fix-v6-6-rc4' of git://git.ker..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=12abf4cc4f802b24
+dashboard link: https://syzkaller.appspot.com/bug?extid=3bd970a1887812621b4c
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17602089680000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13398a9d680000
 
-I don't want any unnecessary complications on the code I'm maintaining. I
-already gave a clear intent on the patch log that introduces a simpler and
-more efficient approach, it doesn't need to be on the code.
+If the result looks correct, please mark the issue as fixed by replying with:
 
-Arınç
+#syz fix: can: j1939: prevent deadlock by changing j1939_socks_lock to rwlock
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
