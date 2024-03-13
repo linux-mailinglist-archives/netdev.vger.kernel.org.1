@@ -1,48 +1,62 @@
-Return-Path: <netdev+bounces-79698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79699-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED07C87AA1B
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 16:11:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92B9687AA39
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 16:16:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32B41283750
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 15:11:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B742283B0C
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 15:16:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82C4D4596D;
-	Wed, 13 Mar 2024 15:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DF444778C;
+	Wed, 13 Mar 2024 15:16:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BQTqO5RK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cSlUNBLb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E5E53D0DD;
-	Wed, 13 Mar 2024 15:10:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91641446D6
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 15:16:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710342655; cv=none; b=BIiIPhMokPBnB2X06b/d245xTxq4J3nKxipS9gsxLwdWaCnL7waHFXrTqlpujV8NcP/j6GwaxJED0uyU8PQQN8D/B4s679zHnY8kqx+0fcM/R1I/5wL5lAcwOfmpr5Npb3imKRwcJY6HiCgZd8CVzAbX2SKok/I11kqQtcCTfro=
+	t=1710342962; cv=none; b=BkfAjQXODKCIWciJFbOE83BLtXkrG9EMkg43c8Nw5xOiJWhXpsH7GHVqUQHzKHl6YUMoS+BpuHd6CU0SXOR/dA8lrVUxxfAvs0c/VAAeKe+1bc2lpKJSHrEWdbUGaphzYrT7Qw5B18sKCknCORsOfLS68nJ0k3DjVkm8FzJOD6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710342655; c=relaxed/simple;
-	bh=Ocy8geFE9kPb4bFGq3+89/S58bGkARoG+qV87/35muY=;
+	s=arc-20240116; t=1710342962; c=relaxed/simple;
+	bh=wo+8XUVZ6ioK9G4Sp1j0QYOyDvxZDEEvuVlcXX0TV+U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IVq4akUdvLdaR1rx/IgxUS2eDR0ZNElcnFEEKK1h2Nq3okYYZKybUQJ3UxoLqYUXJsm4kvwTTN6paUnys7OkNxFlOqKvOHeRuuOp35FwUO4FSTZ7zh9E8isnBSXlscb1r9Iow7R5OYPHUPlS6Kz+cp6KF0MrnUwms0JIgwL2P5I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BQTqO5RK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5857CC43390;
-	Wed, 13 Mar 2024 15:10:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710342654;
-	bh=Ocy8geFE9kPb4bFGq3+89/S58bGkARoG+qV87/35muY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=BQTqO5RKQ54EJbv1S8P4pENDD44OtCvTkL9lM0F/BjZDviqG3B0fDJJK/mP93C5AD
-	 e9TBae3uLVN8p+c9QD+Cgcg5BhM0SQ+cbTJVjY48VqldBqjhoxy/kKJ5GZr+iYgyDD
-	 fMap9HtRVG7CVD0kHcCT7P/XpbW1oiZ5e3mTERWJg34aNJRfbiC6lAgjQ3bdjLyQUc
-	 5F2CmhbUXwmkDQLp5Dbww4+yg9bG3nIQNdrd3luSRaFR4fmxe1IG1k6USgNsRoMmQU
-	 m7Z7qjL5d+9JQOr9qOo3eGbT3GtBTePzlKT0Am8DiS2uvcVVYuktEKspVo05H7FTg5
-	 8XlUR3jJv1Mkg==
-Message-ID: <bb1cbf09-53dd-42d9-bce5-9ac1ba94be2c@kernel.org>
-Date: Wed, 13 Mar 2024 16:10:49 +0100
+	 In-Reply-To:Content-Type; b=maIx0sNF80XB5SxbCtvg+EkJIOL9TUCouLPmJ57B2v2FJnNxKjmK7JXBfHd4eQR/gPyLgMZkuMagzpFBnojroE4DR4xRyX41wRxI7Q3iXqaXRn8TEAOUhaZMCHBYqcUs4Fgo3JDO80y5NT94rVVlnV5IBkhVcl+/0YHs/osG00g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cSlUNBLb; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710342959;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zitympJcMqQpZuvfBggEaIHiO0WpMlfnPdF8UjN+huc=;
+	b=cSlUNBLbVpjv9sk0YX6pZkD79Ln+kzDRjra3Av6qSYopP+SLIksl/H3EXQOdIgA/RKSFUz
+	fg+tI6wvekdLJPbZAmFV04RO0wSbwPAZ6GNb12cNirTHrLK6PRyaayRhMWAp5Os+S7cvDp
+	kGp+Z8sv4N/8rpIqpB5MdwD8eyTgYeU=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-632-HkdNa89aMmqpz2KCcnIf3g-1; Wed,
+ 13 Mar 2024 11:15:54 -0400
+X-MC-Unique: HkdNa89aMmqpz2KCcnIf3g-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8FDD43C0C8A1;
+	Wed, 13 Mar 2024 15:15:53 +0000 (UTC)
+Received: from [10.45.224.236] (unknown [10.45.224.236])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C0D213C23;
+	Wed, 13 Mar 2024 15:15:51 +0000 (UTC)
+Message-ID: <3f934c7b-867c-4550-93ea-4f567807fa98@redhat.com>
+Date: Wed, 13 Mar 2024 16:15:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,56 +64,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [EXTERNAL] Re: [PATCH v4 0/3] Add minimal XDP support to TI AM65
- CPSW Ethernet driver
-To: Ratheesh Kannoth <rkannoth@marvell.com>,
- Julien Panis <jpanis@baylibre.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- John Fastabend <john.fastabend@gmail.com>,
- Sumit Semwal <sumit.semwal@linaro.org>,
- =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
- Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-media@vger.kernel.org" <linux-media@vger.kernel.org>,
- "dri-devel@lists.freedesktop.org" <dri-devel@lists.freedesktop.org>,
- "linaro-mm-sig@lists.linaro.org" <linaro-mm-sig@lists.linaro.org>
-References: <20240223-am65-cpsw-xdp-basic-v4-0-38361a63a48b@baylibre.com>
- <20240313134441.GA1263398@maili.marvell.com>
- <9016930f-d90b-4a7a-b6fb-80cf56a94bd8@baylibre.com>
- <MWHPR1801MB19184E6AFDEAF4062FB1C4B3D32A2@MWHPR1801MB1918.namprd18.prod.outlook.com>
+Subject: Re: [PATCH net] i40e: Enforce software interrupt during busy-poll
+ exit
+To: Michal Schmidt <mschmidt@redhat.com>
+Cc: netdev@vger.kernel.org, pawel.chmielewski@intel.com,
+ aleksandr.loktionov@intel.com, Hugo Ferreira <hferreir@redhat.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+ open list <linux-kernel@vger.kernel.org>
+References: <20240313125457.19475-1-ivecera@redhat.com>
+ <CADEbmW3NQ7SQpccOqTD=p_czpBbOY=41kS7krwx2ZEDmFfcgrg@mail.gmail.com>
 Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <MWHPR1801MB19184E6AFDEAF4062FB1C4B3D32A2@MWHPR1801MB1918.namprd18.prod.outlook.com>
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <CADEbmW3NQ7SQpccOqTD=p_czpBbOY=41kS7krwx2ZEDmFfcgrg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
 
 
-On 13/03/2024 15.31, Ratheesh Kannoth wrote:
->> From: Julien Panis <jpanis@baylibre.com>
->> Sent: Wednesday, March 13, 2024 7:34 PM
->> On 3/13/24 14:44, Ratheesh Kannoth wrote:
->>> On 2024-03-12 at 18:52:39, Julien Panis (jpanis@baylibre.com) wrote:
->>>> This patch adds XDP support to TI AM65 CPSW Ethernet driver.
->>> is this a net-next item ?
->>
->> Initially I worked on top of mainline kernel v6.8-rc1. Then, I also ensured that
->> the series could be applied on top of net-next/main.
->>
-> Please post to net-next ; once it is open
->  > https://patchwork.hopto.org/net-next.html
+On 13. 03. 24 14:47, Michal Schmidt wrote:
+>> -/* a small macro to shorten up some long lines */
+>> -#define INTREG I40E_PFINT_DYN_CTLN
+>> +static inline u32 i40e_buildreg_swint(int type)
+>> +{
+>> +       u32 val;
+>> +
+>> +       /* 1. Enable the interrupt
+>> +        * 2. Do not modify any ITR interval
+>> +        * 3. Trigger a SW interrupt specified by type
+>> +        */
+>> +       val = I40E_PFINT_DYN_CTLN_INTENA_MASK |
+>> +             I40E_PFINT_DYN_CTLN_ITR_INDX_MASK | /* set noitr */
+>> +             I40E_PFINT_DYN_CTLN_SWINT_TRIG_MASK |
+>> +             I40E_PFINT_DYN_CTLN_SW_ITR_INDX_ENA_MASK |
+>> +             FIELD_PREP(I40E_PFINT_DYN_CTLN_SW_ITR_INDX_MASK, type);
+>> +
+>> +       return val;
+>> +}
+> This function is called only from one place and with a constant
+> argument. Does it  really need to be a function, as opposed to a
+> constant? Or are you going to add more callers soon?
 
-Funny link, as I usually use:
-  https://netdev.bots.linux.dev/net-next.html
+This can be reused also from i40e_force_wb() but I didn't want to make 
+such refactors in this fix. Lets do it later in -next.
 
-As documented in:
-  https://kernel.org/doc/html/latest/process/maintainer-netdev.html
-
---Jesper
+Ivan
 
 
