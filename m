@@ -1,271 +1,169 @@
-Return-Path: <netdev+bounces-79677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB0C587A8B2
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:47:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8008787A8C2
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:53:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18946B2187D
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:47:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CD74287823
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D38DC44369;
-	Wed, 13 Mar 2024 13:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B2F41A8F;
+	Wed, 13 Mar 2024 13:53:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hQpBTSKw"
+	dkim=pass (2048-bit key) header.d=yotsuba.nl header.i=@yotsuba.nl header.b="Z4/lruuK";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kTiGgZnV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from wfhigh1-smtp.messagingengine.com (wfhigh1-smtp.messagingengine.com [64.147.123.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D648A42069
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 13:47:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9D5D3FB96;
+	Wed, 13 Mar 2024 13:53:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710337657; cv=none; b=hvud+wjRH0mhC8UsNyE4Dnh/zK7aJYNauUvbw52QvuWSxhFE4ilyQRvBvqmJju8E9cF1c3prYpyaWPjGl2ss64aYvHrKoBwc39lZgZv6YlRj/Lcd1aT/eMiK+QXm+Trmx9WxIiFdnoDTztGoLD9DfC4ZNvOeQd7oCyQsg8A7pBc=
+	t=1710338022; cv=none; b=dczPnopUrW2W+Hdyjp3zeEE/9MsA/xYnPmsKyAdzYLqbhvFKqa5XWwn7cctklKGYdQiKRKCewb/JWNF4x0ABG/y2aEXH7yQmbuPPDHj9PLxSV1YM/PcOPJ/dscglHgCDLbOIJdwOruEDI7MtuwJagGAsI4npmeMsfMCLO2GQWtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710337657; c=relaxed/simple;
-	bh=9/dw73MZ1B7UIIGQkyR0OGzndhExa1cPWv5TXntkIIQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I8Vjp3dH0i3Yg1DR9aNalD4gIR2P0sHR4vRP5pSy/+ph5wEGwbnYXoCSuBp2OVyP837OehHzPKq5DE+5OnTLm8/46bUr18YfU8OSoHNPvBAZ1ynJtFsGZ/G48Uh/FTatWMeJzfTFwNJc3jw4FcRt53Gg29HpxflXIF8eIFvST+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hQpBTSKw; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710337654;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=lto8TWMjEVdFuevVc7/99LmKN94KTvc/sJ/quGAixZg=;
-	b=hQpBTSKwtlifPyYcgIknufNa1GXRk+I7BLJOIcDjz5+bn8jwsCPV4fyoKLpgCP9iQUtWop
-	3Okejbef3ldjiAqDW2GwoE1FydD4ZRaFyh2RmGsZg89Zlg+/wihn1Okio936LBkUm/kQFe
-	JzsffSMB6g9iA/w1aox5D8tIrNJJ8gs=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-537-cHXJI7WRO9uP_eVySySBYw-1; Wed, 13 Mar 2024 09:47:33 -0400
-X-MC-Unique: cHXJI7WRO9uP_eVySySBYw-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a4651c22fd2so67120866b.3
-        for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 06:47:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710337649; x=1710942449;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lto8TWMjEVdFuevVc7/99LmKN94KTvc/sJ/quGAixZg=;
-        b=GonTxybak97DmDT/vGKJX+GMcNTJ4/quROINqYs5S83lXNKPwCGhjC9S1HfTcsJ8AW
-         xyWaZp1Vdc++H4DQqC5cAtuVIrgBDb1YulETwRhe5vMmXXTQEa7n7DpzdHHKPud1CUqb
-         9t02BkFiPT6RhzxcYJRZvdhAbRjDrGC13dyn7O10m9Tdy+rE5AStq/iFX/Jd/0bkrBOM
-         aDUdZUXOqbD8vOWGP0C52VsbVb+tIzeAknA9R78MmffGc68plufqYwW4HrrfJx9DiXBd
-         J2A2L65D3Ud7o1Hubo2H8bCkHbg1IAihIVdu4xm3ikUFfa3wJYpcMbH1zs9X916Sj9Hy
-         eR9g==
-X-Gm-Message-State: AOJu0Yw09ItohQufcOBJVHza2xg4q3ah6Nl6yQKK1AOT2LpjsuTK7BAQ
-	sTciplCUzF+Tg8lirk+E4hq6Kxn7yi8gr+WOIUyf7rUc5zp43QCdYawy037qjuF6UNgINolWWYP
-	xtDaSgODC5+tOH0SaVoMHuUhJx9eRamcJzjbKP+Rj60Hw67kMd7nlip8qRFFzN+JqKylSUsBRHe
-	bUUodCJQuCc2xxbvHlg7sV0lysPYtH
-X-Received: by 2002:a17:907:cbc7:b0:a45:f6de:ed18 with SMTP id vk7-20020a170907cbc700b00a45f6deed18mr9073960ejc.33.1710337649146;
-        Wed, 13 Mar 2024 06:47:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFGJcXvlWwReaRwLW3NSJHwQRUHzlMHgiH4ScCAv1zMBjYi4W2IspS4yfNyP51M1go2REeZir7h7rG2Yxttg6w=
-X-Received: by 2002:a17:907:cbc7:b0:a45:f6de:ed18 with SMTP id
- vk7-20020a170907cbc700b00a45f6deed18mr9073943ejc.33.1710337648756; Wed, 13
- Mar 2024 06:47:28 -0700 (PDT)
+	s=arc-20240116; t=1710338022; c=relaxed/simple;
+	bh=jOmLX9ygpmZOCRGB3UnwkgJ3dC6PNOA9d5iZ5hUwSno=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=eKDCQS7S5x12fVXR8zM25EyURfhjschq5FgEVO/5pIfluaT0CMaYxvuKDyAuxIf8DpoMYhNi0tDV23RynEbrqtgUoXoqHdSgnm5bfwPmFVPlsHr1T7KRbGaD5GUACRcVCOSdc+r90A8iOqkbyPorkfrA6WbUZZx2DMyOZFYE3zU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yotsuba.nl; spf=pass smtp.mailfrom=yotsuba.nl; dkim=pass (2048-bit key) header.d=yotsuba.nl header.i=@yotsuba.nl header.b=Z4/lruuK; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kTiGgZnV; arc=none smtp.client-ip=64.147.123.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yotsuba.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yotsuba.nl
+Received: from compute7.internal (compute7.nyi.internal [10.202.2.48])
+	by mailfhigh.west.internal (Postfix) with ESMTP id 9D0291800179;
+	Wed, 13 Mar 2024 09:53:37 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute7.internal (MEProxy); Wed, 13 Mar 2024 09:53:38 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yotsuba.nl; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm3; t=1710338017;
+	 x=1710424417; bh=hlJNMnPDZ47iGewL2R5tNcfmY0Ncoyko7ICHGM78HtI=; b=
+	Z4/lruuKIlDPERzDJJKOi47zVhtM07JblQBSOg/x1KOj64WuSuVs+ZwEHwaNKVCE
+	PvBcH1atP8EzMsH/I6L2OHwOdyYiR6HRFlzeoGGNd5NlW/SeJhNPQH2Iw1QAuQNm
+	RJS61lGMLY30GfbbQHln0yu2wdF98lwH0mBFcvWBukALOhtk3IRRsLN+DlhYLjHb
+	qFWoVbjOlZobQTQ1ckABWDZNQun5//NhQuEBTAuMFWsYknHoGnf0ZFT9U+fmCMXa
+	GlqjxLkXHcbGBekRzD0L2djv+I9NlqUsdJBlIRe2uDaoh1rldsQqr4Zj4jfap52W
+	5DX7ELjKEykC6bxH2YHr6A==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm1; t=1710338017; x=
+	1710424417; bh=hlJNMnPDZ47iGewL2R5tNcfmY0Ncoyko7ICHGM78HtI=; b=k
+	TiGgZnVa9MBX8K1GO3PvlKjJz9UvRRqGLnzhq78PKh27BZ/2dI9Pgs79lzkADe8I
+	2vcCnYb2MeN5weAgd3MVepWVKXEusr/pp4iIojp9ZuwPA28wwoidFNbCbil2tJ20
+	gGitIXS7OgnUmK82WUTZ4lSDnagfJmxpmflL0gLzBL+GIRIDV5UrHYgl+ZuopMmv
+	A6MQRvGkjdmtHAJjyIetLUck8TruyNvZwdl/7X8k9+cDGzi1woMPhY3hg6VfecAf
+	j+ka1/UEkRnOqaQtIbjSg4l4X5FM1+S1Myrkg1G2jkd4FzZ7YXOdM8G5Zu0qgjEm
+	ld/xatpNm7BX7Akx5dn2w==
+X-ME-Sender: <xms:4K_xZTuBcXi8RVwvkv5ZCsJhwtiR80on4mi3EGDb-VqFBqOAXxFtvw>
+    <xme:4K_xZUckydZDVAk1OpUXsXCQYsnkbphL8ijyrGhuoCg5GW5YUonBQW86PExvY9yR_
+    3nNUiMl4IH8LkjA6RM>
+X-ME-Received: <xmr:4K_xZWyUECXhLI52dhlvPSPiee9Vy8FmhPZe1URMcCvSkOwS9srSdMbwlAyB43tcS_5BW1GxnYb8Swgho6US9EdCHLd3wrqlz9J1EEY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrjeehgdehiecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpegtggfuhfgjffevgffkfhfvofesthhqmhdthhdtjeenucfhrhhomhepofgrrhhk
+    uceomhgrrhhkseihohhtshhusggrrdhnlheqnecuggftrfgrthhtvghrnhephfffjeefje
+    eutedvjeekleduteettdehkeeugefgjedvgfevteffffeukefggedtnecuvehluhhsthgv
+    rhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmhgrrhhkseihohhtshhusg
+    grrdhnlh
+X-ME-Proxy: <xmx:4K_xZSOm220sVy8E_uXhX_wepleI3WNqGeJ0ny-L4oB0PaJ2dRww_g>
+    <xmx:4K_xZT_zUNygdaO7A1-689aCqaHBF7N5jV0eADHaywsjbbJwwQZaTA>
+    <xmx:4K_xZSXI_OmVhTIZuBhxZls1nSwgrU6YUVL5kjcAIP6F7E--QNoNZg>
+    <xmx:4K_xZUcHLMdobRnn0h0j0_EkPupyAuDoPhxlsARFQvUPipztqo-GYw>
+    <xmx:4a_xZSUuGTJQgYIcedNWuZR87CNUwLq561iZq36G-QQhWnpTjkREfUdPXF8>
+Feedback-ID: i85e1472c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 13 Mar 2024 09:53:35 -0400 (EDT)
+Content-Type: text/plain;
+	charset=utf-8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240313125457.19475-1-ivecera@redhat.com>
-In-Reply-To: <20240313125457.19475-1-ivecera@redhat.com>
-From: Michal Schmidt <mschmidt@redhat.com>
-Date: Wed, 13 Mar 2024 14:47:17 +0100
-Message-ID: <CADEbmW3NQ7SQpccOqTD=p_czpBbOY=41kS7krwx2ZEDmFfcgrg@mail.gmail.com>
-Subject: Re: [PATCH net] i40e: Enforce software interrupt during busy-poll exit
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, pawel.chmielewski@intel.com, 
-	aleksandr.loktionov@intel.com, Hugo Ferreira <hferreir@redhat.com>, 
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.300.61.1.2\))
+Subject: Re: [PATCH] netpoll: support sending over raw IP interfaces
+From: Mark <mark@yotsuba.nl>
+In-Reply-To: <20240313133602.GA1263314@maili.marvell.com>
+Date: Wed, 13 Mar 2024 14:53:23 +0100
+Cc: netdev@vger.kernel.org,
+ Hans de Goede <hdegoede@redhat.com>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Breno Leitao <leitao@debian.org>,
+ Ingo Molnar <mingo@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: quoted-printable
+Message-Id: <7C42FC4B-D803-4194-8FBB-19A432D37124@yotsuba.nl>
+References: <20240313124613.51399-1-mark@yotsuba.nl>
+ <20240313133602.GA1263314@maili.marvell.com>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+X-Mailer: Apple Mail (2.3774.300.61.1.2)
 
-On Wed, Mar 13, 2024 at 1:55=E2=80=AFPM Ivan Vecera <ivecera@redhat.com> wr=
-ote:
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/etherne=
-t/intel/i40e/i40e.h
-> index 9b701615c7c6..4d2b05de6c63 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
-> @@ -908,6 +908,7 @@ struct i40e_q_vector {
->         struct rcu_head rcu;    /* to avoid race with update stats on fre=
-e */
->         char name[I40E_INT_NAME_STR_LEN];
->         bool arm_wb_state;
-> +       bool in_busy_poll;
->         int irq_num;            /* IRQ assigned to this q_vector */
->  } ____cacheline_internodealigned_in_smp;
->
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/et=
-hernet/intel/i40e/i40e_main.c
-> index 89a3401d20ab..1ea6d06b0acc 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> @@ -3915,6 +3915,12 @@ static void i40e_vsi_configure_msix(struct i40e_vs=
-i *vsi)
->                      q_vector->tx.target_itr >> 1);
->                 q_vector->tx.current_itr =3D q_vector->tx.target_itr;
->
-> +               /* Set ITR for software interrupts triggered after exitin=
-g
-> +                * busy-loop polling.
-> +                */
-> +               wr32(hw, I40E_PFINT_ITRN(I40E_SW_ITR, vector - 1),
-> +                    I40E_ITR_20K);
-> +
->                 wr32(hw, I40E_PFINT_RATEN(vector - 1),
->                      i40e_intrl_usec_to_reg(vsi->int_rate_limit));
->
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_register.h b/drivers/ne=
-t/ethernet/intel/i40e/i40e_register.h
-> index 14ab642cafdb..baa6bb68bcf8 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_register.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_register.h
-> @@ -335,6 +335,8 @@
->  #define I40E_PFINT_DYN_CTLN_INTERVAL_SHIFT 5
->  #define I40E_PFINT_DYN_CTLN_SW_ITR_INDX_ENA_SHIFT 24
->  #define I40E_PFINT_DYN_CTLN_SW_ITR_INDX_ENA_MASK I40E_MASK(0x1, I40E_PFI=
-NT_DYN_CTLN_SW_ITR_INDX_ENA_SHIFT)
-> +#define I40E_PFINT_DYN_CTLN_SW_ITR_INDX_SHIFT 25
-> +#define I40E_PFINT_DYN_CTLN_SW_ITR_INDX_MASK I40E_MASK(0x3, I40E_PFINT_D=
-YN_CTLN_SW_ITR_INDX_SHIFT)
->  #define I40E_PFINT_ICR0 0x00038780 /* Reset: CORER */
->  #define I40E_PFINT_ICR0_INTEVENT_SHIFT 0
->  #define I40E_PFINT_ICR0_INTEVENT_MASK I40E_MASK(0x1, I40E_PFINT_ICR0_INT=
-EVENT_SHIFT)
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/et=
-hernet/intel/i40e/i40e_txrx.c
-> index 0d7177083708..356c3140adf3 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
-> @@ -2658,8 +2658,22 @@ static inline u32 i40e_buildreg_itr(const int type=
-, u16 itr)
->         return val;
->  }
->
-> -/* a small macro to shorten up some long lines */
-> -#define INTREG I40E_PFINT_DYN_CTLN
-> +static inline u32 i40e_buildreg_swint(int type)
-> +{
-> +       u32 val;
-> +
-> +       /* 1. Enable the interrupt
-> +        * 2. Do not modify any ITR interval
-> +        * 3. Trigger a SW interrupt specified by type
-> +        */
-> +       val =3D I40E_PFINT_DYN_CTLN_INTENA_MASK |
-> +             I40E_PFINT_DYN_CTLN_ITR_INDX_MASK | /* set noitr */
-> +             I40E_PFINT_DYN_CTLN_SWINT_TRIG_MASK |
-> +             I40E_PFINT_DYN_CTLN_SW_ITR_INDX_ENA_MASK |
-> +             FIELD_PREP(I40E_PFINT_DYN_CTLN_SW_ITR_INDX_MASK, type);
-> +
-> +       return val;
-> +}
+Hi Ratheesh,
 
-This function is called only from one place and with a constant
-argument. Does it  really need to be a function, as opposed to a
-constant? Or are you going to add more callers soon?
+> Op 13 mrt 6 Reiwa, om 14:36 heeft Ratheesh Kannoth =
+<rkannoth@marvell.com> het volgende geschreven:
+>=20
+> On 2024-03-13 at 18:16:13, Mark Cilissen (mark@yotsuba.nl) wrote:
+>> [=E2=80=A6]
+> Taking an assumption based on dev=E2=80=99s lower layer does not look =
+to be good.
+> why not transmit packet from skb_network_header() in your driver (by =
+making
+> changes in your driver)
 
->
->  /* The act of updating the ITR will cause it to immediately trigger. In =
-order
->   * to prevent this from throwing off adaptive update statistics we defer=
- the
-> @@ -2702,8 +2716,8 @@ static inline void i40e_update_enable_itr(struct i4=
-0e_vsi *vsi,
->          */
->         if (q_vector->rx.target_itr < q_vector->rx.current_itr) {
->                 /* Rx ITR needs to be reduced, this is highest priority *=
-/
-> -               intval =3D i40e_buildreg_itr(I40E_RX_ITR,
-> -                                          q_vector->rx.target_itr);
-> +               wr32(hw, I40E_PFINT_ITRN(I40E_RX_ITR, q_vector->reg_idx),
-> +                    q_vector->rx.target_itr >> 1);
->                 q_vector->rx.current_itr =3D q_vector->rx.target_itr;
->                 q_vector->itr_countdown =3D ITR_COUNTDOWN_START;
->         } else if ((q_vector->tx.target_itr < q_vector->tx.current_itr) |=
-|
-> @@ -2712,25 +2726,33 @@ static inline void i40e_update_enable_itr(struct =
-i40e_vsi *vsi,
->                 /* Tx ITR needs to be reduced, this is second priority
->                  * Tx ITR needs to be increased more than Rx, fourth prio=
-rity
->                  */
-> -               intval =3D i40e_buildreg_itr(I40E_TX_ITR,
-> -                                          q_vector->tx.target_itr);
-> +               wr32(hw, I40E_PFINT_ITRN(I40E_TX_ITR, q_vector->reg_idx),
-> +                    q_vector->tx.target_itr >> 1);
->                 q_vector->tx.current_itr =3D q_vector->tx.target_itr;
->                 q_vector->itr_countdown =3D ITR_COUNTDOWN_START;
->         } else if (q_vector->rx.current_itr !=3D q_vector->rx.target_itr)=
- {
->                 /* Rx ITR needs to be increased, third priority */
-> -               intval =3D i40e_buildreg_itr(I40E_RX_ITR,
-> -                                          q_vector->rx.target_itr);
-> +               wr32(hw, I40E_PFINT_ITRN(I40E_RX_ITR, q_vector->reg_idx),
-> +                    q_vector->rx.target_itr >> 1);
->                 q_vector->rx.current_itr =3D q_vector->rx.target_itr;
->                 q_vector->itr_countdown =3D ITR_COUNTDOWN_START;
->         } else {
->                 /* No ITR update, lowest priority */
-> -               intval =3D i40e_buildreg_itr(I40E_ITR_NONE, 0);
->                 if (q_vector->itr_countdown)
->                         q_vector->itr_countdown--;
->         }
->
-> -       if (!test_bit(__I40E_VSI_DOWN, vsi->state))
-> -               wr32(hw, INTREG(q_vector->reg_idx), intval);
-> +       /* Do not enable interrupt if VSI is down */
-> +       if (test_bit(__I40E_VSI_DOWN, vsi->state))
-> +               return;
-> +
-> +       if (!q_vector->in_busy_poll) {
-> +               intval =3D i40e_buildreg_itr(I40E_ITR_NONE, 0);
-> +       } else {
-> +               q_vector->in_busy_poll =3D false;
-> +               intval =3D i40e_buildreg_swint(I40E_SW_ITR);
-> +       }
-> +       wr32(hw, I40E_PFINT_DYN_CTLN(q_vector->reg_idx), intval);
->  }
->
->  /**
-> @@ -2845,6 +2867,8 @@ int i40e_napi_poll(struct napi_struct *napi, int bu=
-dget)
->          */
->         if (likely(napi_complete_done(napi, work_done)))
->                 i40e_update_enable_itr(vsi, q_vector);
-> +       else
-> +               q_vector->in_busy_poll =3D true;
->
->         return min(work_done, budget - 1);
->  }
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.h b/drivers/net/et=
-hernet/intel/i40e/i40e_txrx.h
-> index abf15067eb5d..2cdc7de6301c 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_txrx.h
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
-> @@ -68,6 +68,7 @@ enum i40e_dyn_idx {
->  /* these are indexes into ITRN registers */
->  #define I40E_RX_ITR    I40E_IDX_ITR0
->  #define I40E_TX_ITR    I40E_IDX_ITR1
-> +#define I40E_SW_ITR    I40E_IDX_ITR2
->
->  /* Supported RSS offloads */
->  #define I40E_DEFAULT_RSS_HENA ( \
-> --
-> 2.43.0
->
+There=E2=80=99s two assumptions at play here:
+- The lower layer is ethernet: this has always been present in netpoll, =
+and is even
+  documented in netconsole.rst. This comment just mentions it because we =
+add a way
+  to bypass the assumption; it is not an assumption this patch adds to =
+the code.
+- hard_header_len=3D=3D0 means that there is no exposed link layer: this =
+is a rather
+  conservative assumption in my opinion, and is also mentioned in the =
+definition
+  of LL_RESERVED_SPACE:
 
+> * Alternative is:
+> *   dev->hard_header_len ? (dev->hard_header_len +
+> *                            (HH_DATA_MOD - 1)) & ~(HH_DATA_MOD - 1) : =
+0
+
+  The same assumption is also made in more places in the core network =
+code, like af_packet:
+
+>   - If the device has no dev->header_ops->create, there is no LL =
+header
+>     visible above the device. In this case, its hard_header_len should =
+be 0.
+>     The device may prepend its own header internally. In this case, =
+its
+>     needed_headroom should be set to the space needed for it to add =
+its
+>     internal header.
+
+I could change it to, like af_packet, check `dev->header_ops` instead if =
+that is preferred,
+but I don=E2=80=99t think that patching every single raw IP driver to =
+deal with skbs that managed
+to somehow have link layer data would be preferred here, especially =
+since netpoll is kind
+of a special case to begin with. I am open to suggestions and ideas, =
+though.
+
+> [=E2=80=A6]
+
+Thanks and regards,
+Mark=
 
