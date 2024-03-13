@@ -1,116 +1,78 @@
-Return-Path: <netdev+bounces-79704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07FBB87AABE
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 16:51:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D463587AAC9
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 16:55:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B76582840C5
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 15:51:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64CBEB21D7A
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 15:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5434E47F51;
-	Wed, 13 Mar 2024 15:51:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 038E247F64;
+	Wed, 13 Mar 2024 15:55:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="dCjpL1Qh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kzSum1Sc"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6591447F45;
-	Wed, 13 Mar 2024 15:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1A247F46;
+	Wed, 13 Mar 2024 15:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710345084; cv=none; b=hDi9vCYo/oqwEG6CP5msLnIb308DHpU9fX+YKO4SR7OtWcWtIeexbSjBM3RW4ch9spCUW2gzMFIas+tU1UvQ0ZvbNUUxndtMzAR8yfN2yz2uYHr5ZX+Dv+ooJTRoAcFTqzkWvD3PJK/FGDGtJo+pu10PCRtEtPyfGawhqNSTff0=
+	t=1710345348; cv=none; b=Ujf3fhc2zkBX46HpmYfn/Y4m2w0POWJoURvILOVhtemwYHYCIXEmDwjisSGkBlw0F87H9s1pvWCIJyPBi3DgVD88QghyVlitTjBg0lSln4iibUh7xMYtZlNP9jozUiB2+m+BxJwQzEnQHZgOTnBfc1jm3e6h6jGW1orte1olLLs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710345084; c=relaxed/simple;
-	bh=2t109cGdjRddVihzmzHhWDx/v8hS77zLbeiHFkAORB4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=smvIX0I23H7sMDYfxDqVsX7u/wQowdHu5ba9GzMOqt8dotD05WYCylzhKUR0/BaDSfyDZmhqwcCpcfEV2fyQWu34v0JirCEC0AXt3ZnVe4R2oi7g7ga1KGYQI9+3Q5duHTWr4cCXLpxZ4ngl/woju7GnV93vCrqqLshFGohGpBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=dCjpL1Qh; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 0741CC0002;
-	Wed, 13 Mar 2024 15:51:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1710345079;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zmEhZmVSZBopL5MK9mOGygoyzG2onSwohVKSkd/C5f4=;
-	b=dCjpL1Qhypjdy9xlWHCA/0s3JSgZwPFzSzJHfAufqhwzFSQnY0+zHNZjLYvDXAlw0/LawK
-	RDx8xDVnYHshm2m0NrGmnkPQDWIBGnvKiYvxhLRlypYgqMngW3pU9CyIxh0kSafHPT+hhY
-	swkdzbS3JIH+qJ/PXMaqmQUuUrrxxoqq/xOtdYCSEWT5KTZM0jUYkHij2g5ubg/rD86p7g
-	tQhMDJsq5axO88mK1AWI3lpN7C2ChszAxiZvqc1wHXVVVGuMeAUfGqhvEotfO42uiUtjOz
-	9Ow132l3YSiEod4DqhAiKq5s6qZwH6Ma40k97EpgnTbhOHrmXMZgdrb3LRq5aA==
-Message-ID: <757e7f93-9ebd-49e3-afd6-a40eb81a1a49@arinc9.com>
-Date: Wed, 13 Mar 2024 18:51:03 +0300
+	s=arc-20240116; t=1710345348; c=relaxed/simple;
+	bh=FiJ+R0V8x+iDU6ytEfCje6FfFVIFSI4Ytd3TAwhjQD4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=AosUPVDchGTaUcfDqhn6SxEghUwZiF+mW7S/BywoynNIpanTY0YPJcjgq4aUaTUd6+LXVg1zZYaKK773/+ddlmu1SwsC7uAaaPMjJqpPJUcEGDKVZ0/tT5ZA6GJ0yMfpVKnO6J8UclqZ0EYP1EtIiFYtdgipafsGsQGJnzK5XsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kzSum1Sc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72F10C433F1;
+	Wed, 13 Mar 2024 15:55:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710345348;
+	bh=FiJ+R0V8x+iDU6ytEfCje6FfFVIFSI4Ytd3TAwhjQD4=;
+	h=Date:From:To:Cc:Subject:From;
+	b=kzSum1ScGGvWkqjI0i2EWiz26fP3/TQ7CGCK3CH2Lgm6UgqWH1VdPAgdlbnSQJAMY
+	 /Bor3LPUvjkJrYhe+Rv2FWImgdPxm8IaLpymjvNsOmn8BZYvMppIf6Ml5CXST6M+8F
+	 hIilklsxSvv3tsEEajUbjuNyVHVlzzXp3rLV4dWt4dfsqzyrkrnu60JhL5A2/ijGof
+	 f1h4uLz0yA8XMlIEVn89Cl2mAE7fd24vg6dyXIn3QiG1CVD12xnERPsnUXtlFBVN8o
+	 qae8WKPkIIN6VhweNx/uS4zNvkRhDHLmkp9VLCU++ADewu3E2D+dKwFmzZdjzvO2Zw
+	 3TkrK8qjUz1yw==
+Date: Wed, 13 Mar 2024 08:55:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= via B4 Relay
+ <devnull+arinc.unal.arinc9.com@kernel.org>
+Cc: <arinc.unal@arinc9.com>, Daniel Golle <daniel@makrotopia.org>, DENG
+ Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, Andrew
+ Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, Vladimir
+ Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Matthias
+ Brugger <matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>, Philipp Zabel
+ <p.zabel@pengutronix.de>, Landen Chao <Landen.Chao@mediatek.com>, Bartel
+ Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, Justin Swartz
+ <justin.swartz@risingedge.co.za>
+Subject: Re: [PATCH net] net: dsa: mt7530: prevent possible incorrect XTAL
+ frequency selection
+Message-ID: <20240313085546.710679b0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: dsa: mt7530: increase reset hold time
-To: Justin Swartz <justin.swartz@risingedge.co.za>
-Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <f594a72a91d12f1d027a06962caa9750@risingedge.co.za>
- <20240312192117.7789-1-justin.swartz@risingedge.co.za>
- <bf0ed70f-e106-4a7f-a98c-de34658feb4d@arinc9.com>
- <e6525cac666a033a5866465abb3e63f1@risingedge.co.za>
- <2640a495-97a0-4669-a53a-e367af956a78@arinc9.com>
- <c4590e9519d0cd788d157a1e1510cc45@risingedge.co.za>
- <997db446-030b-4e6a-beea-0ae7d990e7e2@arinc9.com>
- <3146df060620f08a620417cfcf2b2179@risingedge.co.za>
-Content-Language: en-US
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <3146df060620f08a620417cfcf2b2179@risingedge.co.za>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: yes
-X-Spam-Level: **************************
-X-GND-Spam-Score: 400
-X-GND-Status: SPAM
-X-GND-Sasl: arinc.unal@arinc9.com
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On 13.03.2024 18:38, Justin Swartz wrote:
-> On 2024-03-13 17:04, Arınç ÜNAL wrote:
->> On 13.03.2024 16:13, Justin Swartz wrote:
->> I think you've missed that your patch is already applied. And it won't be
->> reverted for reasons explained by Paolo in this mail thread.
->>
->> https://git.kernel.org/netdev/net-next/c/2920dd92b980
->>
->> So if your patch here were to be applied too, the final mt7530.c would have
->> the LEDs disabled AND before reset deassertion delay increased.
-> 
-> Yes, I seem to have missed that. I thought your request for the
-> patch to be reverted definitely would have been performed, or at
-> least queued, seeing as you're the maintainer.
+On Wed, 13 Mar 2024 14:25:07 +0300 Ar=C4=B1n=C3=A7 =C3=9CNAL via B4 Relay w=
+rote:
+> Reported-by: Justin Swartz <justin.swartz@risingedge.co.za>
 
-Yeah, one would think. :D Since your patch was applied in a good intent of
-not having it miss the current development cycle, it was a bit rushed. So
-before I could present a valid reason to revert the patch, the pull request
-that included your patch was already submitted to Linus. So unless the
-patch is something very bad which it's not, nobody's going to bother
-reverting it.
-
-I've sent another patch an hour or so ago that reverts it and implements
-what we've discussed here. I will also make sure it is applied to stable
-trees.
-
-https://lore.kernel.org/all/20240313-for-netnext-mt7530-better-fix-xtal-frequency-v1-1-5a50df99f51a@arinc9.com/
-
-Arınç
+That's way insufficient for the amount of diligence and work Justin did.
+Co-developed-by, at least, please.
 
