@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-79722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D534387AFA7
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 19:31:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3D5F87AFA6
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 19:31:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AE1E1F2BCA1
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 18:31:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 315081C25C4D
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 18:31:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CF478296;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 219F57828A;
 	Wed, 13 Mar 2024 17:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EhNpFhXH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A7jqSP62"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35D178273
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0E1178272
 	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 17:10:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710349829; cv=none; b=um13rxywikHwNcnfmxm9sMs6QTteSsYuFV6S4ppBsFPz0GHYPX2pdYTQGUpVHaPcuIahTkW2TuM++Q2YIyF7FMo1J0suDkI27KGx3C/IHUHndi8c/xpHYU8WeyD5GdkVgnt5n20KqmiugWl5ko/0d/QP+ZHNn/fM6z+Z8Tqmtjg=
+	t=1710349829; cv=none; b=PYLY5qZ18oOaZD5qZ+977PlERw0B69vZdllRVfUVWqv0CPYsFML0Z255YSB8MEGsgtQIbwr1ICLOs2w4epqxoKP3Q6/tQtYgtL3CiOh/63B8NnWazVOX+iCSNZL5MkaaC06oq2dgj/cagb4/2mJaUb6BYHg8j+GStwcYfoOCyWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1710349829; c=relaxed/simple;
-	bh=YSI1ZkeG+jQ78/jWn35N2JUL2sM71jOcBzjFswvwMAg=;
+	bh=tGIt1HHRqlVkCQekn36oUmcViRJRBjVa2265jkthPaM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=oe2FadORwE4FNSc+w5fXS+p2bH8c1pp2M3fNFKgyCiu7Ta2s2AfCfgktx8dF81VBEs6nG40m8f4JDOChDiGah+9aMir07J7fXUkUPyAhW8b4NMu6/vWxF6jWkl9OnL8lWSfo5+bq7OXBIYeMg0tCrFrIzBl8bZ0dDHHJ8F34dWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EhNpFhXH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id A6246C433B2;
+	 In-Reply-To:To:Cc; b=BhhQHZOt2F6wBVU2593ov5luNRi7ffCMfAFWbnlE0ci3sClWWURwMRaZBdFt6wJi7hj51JdC9psau46vrJInPF4cS8u+mxept9Qc+AtIWjKgnELErm8kYy9dKQoYLullzj5b0H03KlgenTRBS5UdZPElHeLkzcBjTYuD/V+3tfw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A7jqSP62; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A0AA4C43330;
 	Wed, 13 Mar 2024 17:10:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1710349828;
-	bh=YSI1ZkeG+jQ78/jWn35N2JUL2sM71jOcBzjFswvwMAg=;
+	bh=tGIt1HHRqlVkCQekn36oUmcViRJRBjVa2265jkthPaM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EhNpFhXHej3t173XSe2sBdGY2GKt/hlmMG1ltvlMj9L1zvvF19Wz8MkZhvOKYE1Eq
-	 1gsMTPzJRykN/inCYtdG6N75wMLGR/LEZnmcZkefYaVZ2uGHCrPZOnANYz4huVsEpq
-	 bLUY2o4erq14lqK7mMCBTVEBwoEUjRhFWRwg4qJbOd+zTz4K4qxZRzrSnOKbtBMSC+
-	 jlTIOBLsn8jRkHP0ffDWFjhCIQJxZmtb+SR/IjLp7id4g8r9sSHKGPXcbKRrUT1Bmz
-	 Y8Tl7hVE5E3cGWrxL5xQ8pHyysbBSBSJ/Hu4U6/Mfy8EFu95Yxanr14ffAvPlMBoTN
-	 +ntt4y9v4SwBA==
+	b=A7jqSP62x/5D11X2l1kdY+cBZhB3m3qz5bIDAmUxYJ5bkPskNKUEhWkkQpT3Epwoe
+	 WgntMdgRr5q39eotnw8tkRirkFpBrRn4zaK6mZrQ2n1T6xFofijHU6qMOiZJNGNEB0
+	 PCe6viE7cEM15LIO1K5BW4KaA9Qe27mmxBAbpJ7bGOyUxcVKk3IYlqJzqG5jN46piD
+	 Lu5re/kDUvxqBvGlTpft5OGWnYKYjlvLzEf9SmVxLRnH/r+kheztvSDJT3DAsuOuQt
+	 /ee40yIgwK5jxjGUl74I50MAWUi3KNnau1lZ6zO+LaBPSyUL6RUvflHbxNuyI+zQsp
+	 mCQAm9MQqbW2A==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8C094D95054;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 82DE6C595C3;
 	Wed, 13 Mar 2024 17:10:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,32 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2] man: fix typo found by Lintian
+Subject: Re: [PATCH iproute2-next 1/3] README: add note about kernel version
+ compatibility
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171034982856.13122.386503104325664882.git-patchwork-notify@kernel.org>
+ <171034982853.13122.13414393394060836778.git-patchwork-notify@kernel.org>
 Date: Wed, 13 Mar 2024 17:10:28 +0000
-References: <20240312222422.2494767-1-luca.boccassi@gmail.com>
-In-Reply-To: <20240312222422.2494767-1-luca.boccassi@gmail.com>
-To: Luca Boccassi <luca.boccassi@gmail.com>
+References: <20240308171656.9034-1-stephen@networkplumber.org>
+In-Reply-To: <20240308171656.9034-1-stephen@networkplumber.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
 Cc: netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to iproute2/iproute2.git (main)
+This series was applied to iproute2/iproute2.git (main)
 by Stephen Hemminger <stephen@networkplumber.org>:
 
-On Tue, 12 Mar 2024 22:24:22 +0000 you wrote:
-> From: Luca Boccassi <bluca@debian.org>
+On Fri,  8 Mar 2024 09:15:59 -0800 you wrote:
+> Since next netem changes will break some usages of out of support kernels,
+> add an explicit policy about range of kernel versions.
 > 
-> Signed-off-by: Luca Boccassi <bluca@debian.org>
+> Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 > ---
->  man/man8/tc-mirred.8 | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+>  README | 13 +++++++++++++
+>  1 file changed, 13 insertions(+)
 
 Here is the summary with links:
-  - [iproute2] man: fix typo found by Lintian
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=f31afe64d6d8
+  - [iproute2-next,1/3] README: add note about kernel version compatibility
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=56511223ef26
+  - [iproute2-next,2/3] netem: use 64 bit value for latency and jitter
+    (no matching commit)
+  - [iproute2-next,3/3] tc: remove no longer used helpers
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=38656eeb35bd
 
 You are awesome, thank you!
 -- 
