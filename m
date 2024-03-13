@@ -1,71 +1,84 @@
-Return-Path: <netdev+bounces-79672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79671-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A76587A867
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:30:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92D1487A84A
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:27:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD02F1C213F6
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:30:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32BDB1F21D7F
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:27:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEA254C635;
-	Wed, 13 Mar 2024 13:28:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 192A04085A;
+	Wed, 13 Mar 2024 13:27:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u/xac1zT"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E94A43AA4;
-	Wed, 13 Mar 2024 13:28:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D63224FA;
+	Wed, 13 Mar 2024 13:27:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710336485; cv=none; b=dSOuWcjmkgIbRtph9/TU+s+1fwxUr+pqz9KW8o00hbdORYlNPKF7xYgWuTFuVKbanYwM+XFzEtvROlwUeG12mkpVpH49Mgazj8tv6m29NFy/bfnjrbrfagdno8GzIuIgn+6rRGjSBfY7FXoh+WYtp6OvdwiIMPapJu0pPiT0PCQ=
+	t=1710336430; cv=none; b=Acg7Gr7vXt3FpklBRsMlk0luZIy0lqTdL+CNjGZsIlbvdkxC4L76csXq807bF0SaEwTMKz2+UoCP40o6ODtVQpZ0jtGzfIFp7y+3Cey6HUHQWNfNAY5AndNNYuDHUUfkKp5m6eGLI7reFmqjwdpTyV+QUuLwADkGiM9ptT/5Ibc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710336485; c=relaxed/simple;
-	bh=CHtNAQTIT1rvRWPPhR3rIHeiRbGPnmXiD2gTyBFLaGs=;
-	h=From:To:Cc:In-Reply-To:References:Subject:Message-Id:Date:
-	 MIME-Version:Content-Type; b=byF4RuIMTWcCErhOkBA3Q0uIphiz3X9oxe2UDzfK6Es6eAKKDuuzv95ahGbMlFUPC53+/HqtfE3XZGUGV4jyhRwapYYlKg5PHZZmeSOheeRn+mwVZ1kwQhTnVdqle/mi0kolXvjf9q4mg16J8BakWHygG2Jqi1uylunumszfqtc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Tvrt96D1qz4x4T;
-	Thu, 14 Mar 2024 00:28:01 +1100 (AEDT)
-From: Michael Ellerman <patch-notifications@ellerman.id.au>
-To: Dawei Li <set_pte_at@outlook.com>
-Cc: npiggin@gmail.com, christophe.leroy@csgroup.eu, linuxppc-dev@lists.ozlabs.org, linux-ide@vger.kernel.org, netdev@vger.kernel.org, linux-wireless@vger.kernel.org, linux-scsi@vger.kernel.org, linux-serial@vger.kernel.org, alsa-devel@alsa-project.org, linux-kernel@vger.kernel.org
-In-Reply-To: <TYCP286MB232391520CB471E7C8D6EA84CAD19@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
-References: <TYCP286MB232391520CB471E7C8D6EA84CAD19@TYCP286MB2323.JPNP286.PROD.OUTLOOK.COM>
-Subject: Re: [PATCH v3] powerpc: macio: Make remove callback of macio driver void returned
-Message-Id: <171033598348.517247.10069683831844972530.b4-ty@ellerman.id.au>
-Date: Thu, 14 Mar 2024 00:19:43 +1100
+	s=arc-20240116; t=1710336430; c=relaxed/simple;
+	bh=B0fnba4gidZQvyTEXxciojWjcwOMuZEEiz9uPq80vZw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jg+eqdRwm1sT/StpsarVy3zFP1LwAQP8GQs4+ont7iZyLpqAr68Ux11Uz6RvoE+ojqLHEBWj6gIyo3t2Fmabwrf40l7TrpxzabQcV++Z4tM6j79IkKKVxPLYe65OUhNw4GudG2vpDYyJZycEJ2+jWrBg4Z0WL4NSH0bCL/Imr/g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u/xac1zT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 400B2C433F1;
+	Wed, 13 Mar 2024 13:27:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710336429;
+	bh=B0fnba4gidZQvyTEXxciojWjcwOMuZEEiz9uPq80vZw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=u/xac1zTA5lEiNKP/cD0WonmASiVASqgXcq69tM9Hxta4vbONFhv4pLhEurK3rDSI
+	 n7qrCMhv2Ig/jIP7A7nfTL70aDgBrgyD9CyDuZmEO54cVqcaGZOFOlmz7W0EsSz70u
+	 3uU5aUDAxTDB8oPt9vQYTsrunFO8Q3OMzaxf8fP3bJVmwMm2240ZRwhWoAMjRlb68I
+	 x9UwPnJ/Mk+hj3lKdmptOsuSavGPVff4Tr9k3n9p2SJClPtYSLaTg7V9WcY49z/QNH
+	 8YhISL8fLr8EpaaYnjM2ayvMsDHKyn2WVERuLjO07/ts3wCN+d2dH4trvB/5ZE9AtT
+	 xNcsnqZ5ov4hA==
+Date: Wed, 13 Mar 2024 06:27:08 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
+Subject: Re: [ANN] netdev development stats for 6.9
+Message-ID: <20240313062708.3bc51347@kernel.org>
+In-Reply-To: <CAL+tcoBzHNt86-4OC7Jck1WBG+YuadWDhQrkyEPBaxQxcET6YQ@mail.gmail.com>
+References: <20240312124346.5aa3b14a@kernel.org>
+	<CAL+tcoBzHNt86-4OC7Jck1WBG+YuadWDhQrkyEPBaxQxcET6YQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 01 Feb 2023 22:36:19 +0800, Dawei Li wrote:
-> Commit fc7a6209d571 ("bus: Make remove callback return void") forces
-> bus_type::remove be void-returned, it doesn't make much sense for any
-> bus based driver implementing remove callbalk to return non-void to
-> its caller.
+On Wed, 13 Mar 2024 10:13:43 +0800 Jason Xing wrote:
+> > RedHat remains unbeatable with the combined powers of Simon and Paolo,
+> > as well as high participation of the less active authors.
+> > Alibaba maintains its strongly net-negative review score.
+> > Tencent (Jason Xing) joins them (Tencent doesn't use their email
+> > domain so it's likely under-counted). Yang Xiwen makes the negative  
 > 
-> This change is for macio bus based drivers.
+> Interesting numbers.
 > 
-> [...]
+> Well, actually, I always send patches by using the company address and
+> review patches by using my personal address, which probably makes my
+> scores negative :S
+> 
+> Next time I'll try to use the same address. Hope I will not appear on
+> the top of the negative scores list.
 
-Applied to powerpc/next.
+I can add an alias to map multiple addresses to the same person locally.
+Feel free to send me the addresses (on- or off-list).
 
-[1/1] powerpc: macio: Make remove callback of macio driver void returned
-      https://git.kernel.org/powerpc/c/9db2235326c4b868b6e065dfa3a69011ee570848
-
-cheers
+Some goes for everyone else, please feel free to send me your mappings
+and company affiliations. I don't have access to the Greg KH/LWN gitdm
+db and Linux Foundation remains unwilling to help.
 
