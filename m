@@ -1,84 +1,87 @@
-Return-Path: <netdev+bounces-79743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3B4187B22A
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 20:44:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7520D87B249
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 20:52:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 310B11C2549A
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 19:44:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A9AC1F23551
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 19:52:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA379481DB;
-	Wed, 13 Mar 2024 19:44:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029171A38EB;
+	Wed, 13 Mar 2024 19:52:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Wteln205"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301F679DD;
-	Wed, 13 Mar 2024 19:44:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 333FB50243;
+	Wed, 13 Mar 2024 19:52:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710359085; cv=none; b=jJwawDDydHcStaEIatBrW6yyamGHb2TeNjaN7BuD51JTxB6iwOX1b4DZNg2/nlranDRHlKIDnhex6Y8Wm9ofv/26fD4mD+1mawwdBxOcIIinNCkQimwthz6g1abyvBkGzuw+Sl55R61LraYk/FS9G3bczBedTrbwJzGLP8UKsT0=
+	t=1710359533; cv=none; b=ocodyFSPJgsoQ7gYZPsQm+azqSyQGV4h/tDZlQ+dBtwkrzdaDj9QoRCS9VUl1znT/eWH3Y/sDoVr9RvG08SevMgQ8EA1WGvG+t09ObmwkpGZg10LG2oKQKCd/ZP2ZKrzb0+wdk++CRhvRMiIcj3wje3KEy/Nh8okn4WbqS1FIXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710359085; c=relaxed/simple;
-	bh=xfzrj84MmcdTlfzKc7G9HIN3Vlh4qU4DUvE050cAj9Y=;
+	s=arc-20240116; t=1710359533; c=relaxed/simple;
+	bh=2ZkDECGgCzxUfGsarTHx62/lL7Cs0OVqL8S2PP9gs3Y=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JjgFL9AxI7GGTzK8OW3RhvKGuIK9tAGwcYInGPOMjlUB/Ixz8sDLaTahlB+ian2uUCiQ7RJkA962tAh5BPoEJ1SR7zAQG+8Pw4Bl7sRGp4FOc93mx1OPe4cyMII3iq2DqDOu2kCkI/5+7UKV3dkO+lf/3t4/Frq6vIjLJIDFz2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1rkUWl-0002Gm-Th; Wed, 13 Mar 2024 20:44:39 +0100
-Date: Wed, 13 Mar 2024 20:44:39 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Linus =?iso-8859-15?Q?L=FCssing?= <linus.luessing@c0d3.blue>
-Cc: Simon Horman <horms@kernel.org>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Dietmar Maurer <dietmar@proxmox.com>,
-	Thomas Lamprecht <t.lamprecht@proxmox.com>,
-	Wolfgang Bumiller <w.bumiller@proxmox.com>,
-	Alexandre Derumier <aderumier@odiso.com>
-Subject: Re: [PATCH net] netfilter: conntrack: fix ct-state for ICMPv6
- Multicast Router Discovery
-Message-ID: <20240313194439.GA7400@breakpoint.cc>
-References: <20240306141805.17679-1-linus.luessing@c0d3.blue>
- <20240307101254.GL281974@kernel.org>
- <ZfIBQbPeP8SYc3jf@sellars>
+	 Content-Type:Content-Disposition:In-Reply-To; b=OTcDIRFdbx26PCmKyPDhimGqbZEJhG3dPWtpJ1aECy9ZRIVGQfT0WdCdu/bW89X56SKFcfL3w4Ov8ctxgdXLezBr0AloujAOTFDYx4YIW01xfuVBSY4AuiGlFfsLsV+mGMpCQVxWlQrcpvneaffEORawdmKEfgRFRY2ZJqks5hg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Wteln205; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=KjmiZg3EAJQ/7RoTwqomd7rnaA5S0FajGsdfSKsK+LI=; b=Wteln2055cbwnePEQiiE5RkPGW
+	BGbP4EIngHKXaoxI2XDXI/AfSmQx6qs8O616KuIqy8gKlkHGUB7U8r9PjGauF/bwK7+Fi+ukaC55R
+	eezoS5aL2c+RFePjdDoM/a1oqCKjeQiXyVZa6WMazXaSNOR6CxBp+D9BxsP5NipvgLhg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rkUeY-00AGIU-0m; Wed, 13 Mar 2024 20:52:42 +0100
+Date: Wed, 13 Mar 2024 20:52:42 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Ronnie.Kunin@microchip.com, Raju.Lakkaraju@microchip.com,
+	netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	linux-kernel@vger.kernel.org, Bryan.Whitehead@microchip.com,
+	richardcochran@gmail.com, UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net 3/3] net: lan743x: Address problems with wake option
+ flags configuration sequences
+Message-ID: <725e8182-50de-4469-9f87-fa58179f8922@lunn.ch>
+References: <20240226080934.46003-1-Raju.Lakkaraju@microchip.com>
+ <20240226080934.46003-4-Raju.Lakkaraju@microchip.com>
+ <78d7e538-9fa0-490e-bcfb-0a5943ad80c9@lunn.ch>
+ <LV8PR11MB87008454A629EE15B9CE14099F272@LV8PR11MB8700.namprd11.prod.outlook.com>
+ <PH8PR11MB79656DCF7806D7390C7100DE95272@PH8PR11MB7965.namprd11.prod.outlook.com>
+ <fd22d022-cad4-489c-9861-36765dd98a87@lunn.ch>
+ <PH8PR11MB79655416A331370D3496854A952A2@PH8PR11MB7965.namprd11.prod.outlook.com>
+ <3e84e1c9-f680-47fa-aa59-615ce57b65da@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-15
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ZfIBQbPeP8SYc3jf@sellars>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <3e84e1c9-f680-47fa-aa59-615ce57b65da@gmail.com>
 
-Linus Lüssing <linus.luessing@c0d3.blue> wrote:
-> Also this related fix introduced in v2.6.29 should hint to the
-> age of this issue:
-> 
->   3f9007135c1d netfilter: nf_conntrack_ipv6: don't track ICMPv6 negotiation message
-> 
-> Which only picked/fixed a few ICMPv6 types but not ICMPv6 MRD
-> though.
-> 
-> tl;dr: for me this would be ok, if it were ok for others, too, that I
-> couldn't fully bisect to it in practice... :
-> 
-> Fixes: 9fb9cbb1082d ("[NETFILTER]: Add nf_conntrack subsystem.")
+So i think we need to agree on best practices for new drivers and
+document what that is, probably in both the ethtool man page and
+include/uapi/linux/ethtool.h
 
-Thats fine, its clear that this is isn't a regression this way.
+* WAKE_MAGIC on its own is O.K.
+* WAKE_MAGICSECURE without WAKE_MAGIC is invalid. -EINVAL
+* WAKE_MAGIC + WAKE_MAGICSECURE means only secure magic WoL.
+* Each driver needs to enforce this, due to backwards compatibility.
+  Some may decide not to.
+
+Can we agree on this?
+
+    Andrew
+
 
