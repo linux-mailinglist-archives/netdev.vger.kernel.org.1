@@ -1,103 +1,172 @@
-Return-Path: <netdev+bounces-79708-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1A7B87AAF0
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 17:11:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 544FD87AA94
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 16:41:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A32481F220FA
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 16:11:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C17E61F2301D
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 15:41:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FDE947F7A;
-	Wed, 13 Mar 2024 16:11:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 369D946B83;
+	Wed, 13 Mar 2024 15:41:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="iOId/y0Z"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KRkhO/Q/"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9843B481B3
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 16:10:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D6DC481BA
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 15:41:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710346260; cv=none; b=sxEbYfHFW4gHfolA6l733NuG4zemC60K0XmrSck+rfg6A1VaE7WWU3RhMjh4ZpqHmYdFSP9Q4WiIhe/WA+tcIWMZeYVeP2033MHNdojYcskfS91Z7n3JrHYtJancfSW7pcndiABzXdDm8yvGWr/hydJjP55o3+xR6vHp/r5dLnQ=
+	t=1710344484; cv=none; b=aSmekPPF18nDYtf7rCfr11qknZj+ZIMCQfa4OZgWFlQ2EWe1OMt4nnlSNFlujWdM9Q7OAY/FfBZVqmghLBLK9VepHDJRvyJR1nfbMQffUM6wCgOwH666lpSCu6PDHWUYRwTBLAfOZb7ayF4uFmkYUu0c9pXh/auFAu6X5qF+woA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710346260; c=relaxed/simple;
-	bh=s0VJuqZTcWPwBBsjpeg40Nzefkzjz6OIT5W3n/xwA3E=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=fhwm2pJ7KY3uHtIGYjHKQIBFnJ3tsP0JJh5/KZMIpWwdH+SAkRjJpiV28+IE4ctWf5rKcoTxzC8A4ANX3pWKfx8bx+e9A3T3D82g5XQ13co1LY9piWRWytWrjZrVub2o9gjAqveKn/3VvOZ74MCXh/kUB83cgq9u3jY6GDhedQ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=iOId/y0Z; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=Content-Disposition:Content-Type:MIME-Version:Message-ID:
-	Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:Date:Message-ID:To:Cc:
-	MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=8kKC9A07oJ9EW+OTI/elilaag+/RMGD/lRFw0VD9nkA=; b=iOId/y0ZxYmdALfv2+N/ieSl1N
-	TxVTPXwOTatWTSlorjUU71UZCVHpZ9LVFxrw5xRVjnK7DAj1tp3WZS+juxRg9SAwNA43FHzwGsjbz
-	jx54kO3IuM68sp3jCasGyixQYJqlu2C2hKvnmByBvB6IjpugNpmuC1CZxuknOA+sKrsM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rkQih-00AExf-2Q; Wed, 13 Mar 2024 16:40:43 +0100
-Date: Wed, 13 Mar 2024 16:40:43 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Nikolay Aleksandrov <razor@blackwall.org>,
-	Ido Schimmel <idosch@nvidia.com>
-Cc: netdev <netdev@vger.kernel.org>
-Subject: VLAN aware bridge multicast and quierer problems
-Message-ID: <123ce9de-7ca1-4380-891b-cdbab4c4a10b@lunn.ch>
+	s=arc-20240116; t=1710344484; c=relaxed/simple;
+	bh=145LGBIIbFGitWjkjqb+xZP1asaiY34xwZaQtZhXB/s=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=XjPQ2wZd4xpO3mzz4SD6EuNQnRWNEsWMqX+967e1g3CdHi+OmL5yrqOG2rDbkJdQ9aQ7Oz/XbFnGuFRtylV3XWf5vSHqz0viBSVADNGrRAhMdTywFEUmYiFOnVGryXfjFFI9s5GSmxE8fdEwp3e8oSCr5mp0i0eD2Jfn62meUCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KRkhO/Q/; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710344481;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=4m99PKufR99CbJzmaNHgQ9BpyX8a7GHA951gGV1Wgwc=;
+	b=KRkhO/Q/SqhiLdl2OYIZeco+BnP2Nle9K5wLO31kj+tmmV/1zrhu9UbXK3cPbRMstjYi8V
+	rQmFsB1uu6LuBAnmYoCzPWdsRo/HBSLNJCfAw8q0l+laj1/JjtSzw0Ko1cEqwjoay8XM8m
+	cTlDs9Wj8XveIyETERYo99SgTFBxT5E=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-56-uiG95bIQOUyoUVv5set-zg-1; Wed, 13 Mar 2024 11:41:20 -0400
+X-MC-Unique: uiG95bIQOUyoUVv5set-zg-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-40e4303fceaso7236255e9.1
+        for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 08:41:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710344479; x=1710949279;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4m99PKufR99CbJzmaNHgQ9BpyX8a7GHA951gGV1Wgwc=;
+        b=C+76k/Y5ZVwHNHkmFrYaqpFPYRhKAEaWXj0teceNGNevUEbTfZHPKuIHR/eCNYTMUC
+         jSh/kB04vndAS95Z3YPRM9U873fDkWTKaqlG/xzu9Z15s0BRm3RNGZGnnbY9/3GeOzyf
+         xZ7sVVGQ1CbROnxQsPmbN4lBr1q8wXckHyfAtMyYaQcVTgkuyc3Yw7geJ8sHKrhM0DgC
+         dE6/5FDOMBshZ4eZxgDNqMBWk+NWQv0XwDBLfZrjfMpEqzPNJefvcdS5XNUx9j23I9oj
+         kNwj6mQkObLkSy5KWhS1CVpMdiFI8cQLZoVBcSfWF2/BtXbMUBuvjxrtQQP/8/mVllFO
+         NZlw==
+X-Gm-Message-State: AOJu0YyfnAg6PqYm7thUVz7bHh7p6x/KBkTmDkzK5OzG2bHsjhjXOhjy
+	cSd/lb1vIFN6K34PQ5l8jGE4ppQfgxsMhcgF+ILnrTejvnF41/u/c5m98G/ARzaF4Dd9rfC2ZSO
+	iAiiZpTczEWB5EdUqlrA6/qJSQRL/ahmMt/+LrDdfYXoVxj8aQh+xRA==
+X-Received: by 2002:a05:600c:1f0a:b0:412:ddee:e66f with SMTP id bd10-20020a05600c1f0a00b00412ddeee66fmr1617030wmb.2.1710344478984;
+        Wed, 13 Mar 2024 08:41:18 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFuxcedPNKR3ChMcgAsmRfgZCiVheZQmFQRxZQf9+ZjawsgxJkCbYOoPtFPns8Dy+ezQ4MM1g==
+X-Received: by 2002:a05:600c:1f0a:b0:412:ddee:e66f with SMTP id bd10-20020a05600c1f0a00b00412ddeee66fmr1617013wmb.2.1710344478571;
+        Wed, 13 Mar 2024 08:41:18 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-239-131.dyn.eolo.it. [146.241.239.131])
+        by smtp.gmail.com with ESMTPSA id fc6-20020a05600c524600b00413ee7921b4sm382424wmb.15.2024.03.13.08.41.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Mar 2024 08:41:18 -0700 (PDT)
+Message-ID: <e826f337c3db612852c5f543d123ee53adc885bb.camel@redhat.com>
+Subject: Re: [PATCH net] udp: fix segmentation crash for untrusted source
+ packet
+From: Paolo Abeni <pabeni@redhat.com>
+To: Shiming Cheng <shiming.cheng@mediatek.com>, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	lena.wang@mediatek.com
+Date: Wed, 13 Mar 2024 16:41:16 +0100
+In-Reply-To: <20240313133402.9027-1-shiming.cheng@mediatek.com>
+References: <20240313133402.9027-1-shiming.cheng@mediatek.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
 
-Hi Nikolay, Ido
+On Wed, 2024-03-13 at 21:34 +0800, Shiming Cheng wrote:
+> Kernel exception is reported when making udp frag list segmentation.
+> Backtrace is as below:
+>     at out/android15-6.6/kernel-6.6/kernel-6.6/net/ipv4/udp_offload.c:229
+>     at out/android15-6.6/kernel-6.6/kernel-6.6/net/ipv4/udp_offload.c:262
+> features=3Dfeatures@entry=3D19, is_ipv6=3Dfalse)
+>     at out/android15-6.6/kernel-6.6/kernel-6.6/net/ipv4/udp_offload.c:289
+> features=3D19)
+>     at out/android15-6.6/kernel-6.6/kernel-6.6/net/ipv4/udp_offload.c:399
+> features=3D19)
+>     at out/android15-6.6/kernel-6.6/kernel-6.6/net/ipv4/af_inet.c:1418
+> skb@entry=3D0x0, features=3D19, features@entry=3D0)
+>     at out/android15-6.6/kernel-6.6/kernel-6.6/net/core/gso.c:53
+> tx_path=3D<optimized out>)
+>     at out/android15-6.6/kernel-6.6/kernel-6.6/net/core/gso.c:124
 
-I have a colleague who is using a VLAN aware bridge with
-multicast. IGMP snooping is causing problems in this setup. The setup
-periodically sends IPv6 router solicitations towards the router and
-expects router advertisements back. After a while, the router
-solicitations were no longer forwarded/flooded by the bridge.
+A full backtrace would help better understanding the issue.
 
-The bridge doesn't drop the RS frames, but instead of forwarding them
-using br_flood(), it calls br_mulricast_flood() with an empty
-destination list. MC snooping is on by default and is VLAN-aware by
-default, so it should work in this context. If he disable it for
-testing purposes, the RS get forwarded.
+> This packet's frag list is null while gso_type is not 0. Then it is treat=
+ed
+> as a GRO-ed packet and sent to segment frag list. Function call path is
+> udp_rcv_segment =3D> config features value
+>     __udpv4_gso_segment  =3D> skb_gso_ok returns false. Here it should be
+>                             true.=C2=A0
 
-We then checked how the destination list gets computed. Not very
-surprisingly, this is based on MC group membership reports in
-combination with MC querier tracking (no querier -> no MC snooping,
-i.e. br_flood() instead of br_multicast_flood()). So far, so good. We
-don't have a querier on the VLAN in question but we do have one on
-another VLAN running over the same bridge. And then he noticed that
-br_multicast_querier_exists() which is called by
-br_handle_frame_finish() to decide whether it can rely on snooped MC
-groups doesn't get any VLAN information, only the global bridge
-multicast context. So it can't possibly know whether there's a querier
-on the VLAN the frame to be forwarded is on. As soon as there's a
-querier on one VLAN, the code seems to assume that there are queriers
-on all of them. And on those without an actual querier, this means
-that destination lists are empty because there are no membership
-reports on these VLANs (at least not after the initial reports right
-after joining a group).
+Why? If I read correctly the above, this is GSO packet landing in an
+UDP socket with no UDP_GRO sockopt. The packet is expected to be
+segmented again.
 
-It seems odd that you spent a lot of time adding code to track group
-memberships by VLAN but then left our the last tiny bit to also track
-queriers by VLAN? So we are wondering if we are missing something,
-some configuration somewhere?
+>				Failed reason is features doesn't
+match
+>                             gso_type.
+>         __udp_gso_segment_list
+>             skb_segment_list =3D> packet is linear with skb->next =3D NUL=
+L
+>             __udpv4_gso_segment_list_csum =3D> use skb->next directly and
+>                                              crash happens
+>=20
+> In rx-gro-list GRO-ed packet is set gso type as
+> NETIF_F_GSO_UDP_L4 | NETIF_F_GSO_FRAGLIST in napi_gro_complete. In gso
+> flow the features should also set them to match with gso_type. Or else it
+> will always return false in skb_gso_ok. Then it can't discover the
+> untrusted source packet and result crash in following function.
 
-We have a test script which sets up a bridge in a network name space,
-and uses scapy and tcpdump to show the problem. I can send it to you
-if you are interested.
+What is the 'untrusted source' here? I read the above as the packet
+aggregation happened in the GRO engine???
 
-Thanks
-	Andrew
+Could you please give a complete description of the relevant scenario?
+
+> Fixes: f2696099c6c6 ("udp: Avoid post-GRO UDP checksum recalculation")
+> Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+> Signed-off-by: Lena Wang <lena.wang@mediatek.com>
+> ---
+>  include/net/udp.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/include/net/udp.h b/include/net/udp.h
+> index 488a6d2babcc..c87baa23b9da 100644
+> --- a/include/net/udp.h
+> +++ b/include/net/udp.h
+> @@ -464,7 +464,7 @@ void udpv6_encap_enable(void);
+>  static inline struct sk_buff *udp_rcv_segment(struct sock *sk,
+>  					      struct sk_buff *skb, bool ipv4)
+>  {
+> -	netdev_features_t features =3D NETIF_F_SG;
+> +	netdev_features_t features =3D NETIF_F_SG | NETIF_F_GSO_UDP_L4 | NETIF_=
+F_GSO_FRAGLIST;
+
+This looks wrong: real UDP_L4 GSO packets will not segmented anymore
+and should be dropped (?!?)
+
+
 
