@@ -1,155 +1,271 @@
-Return-Path: <netdev+bounces-79676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B90287A8A7
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:45:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB0C587A8B2
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:47:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE31C28109A
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:45:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18946B2187D
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:47:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADDBD4174F;
-	Wed, 13 Mar 2024 13:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D38DC44369;
+	Wed, 13 Mar 2024 13:47:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="aiFrZAyj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hQpBTSKw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DFE4120B;
-	Wed, 13 Mar 2024 13:45:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D648A42069
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 13:47:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710337535; cv=none; b=dJs9EnGPoIjgVkNNTLowRMIPWt3rLN1M0IULFr3x6tna/5N2MX/x+DMw7nSSPzI3SKpwm3nKiy748HzfBhdeW5iNe4GfPGxbSbWWqYgQm9dEuiFoYQZ4mS4oYHZUcgRMSUJyvm/sy9ove5uAUDrXSFMmzh/WWMlJIOrr/mmI+yo=
+	t=1710337657; cv=none; b=hvud+wjRH0mhC8UsNyE4Dnh/zK7aJYNauUvbw52QvuWSxhFE4ilyQRvBvqmJju8E9cF1c3prYpyaWPjGl2ss64aYvHrKoBwc39lZgZv6YlRj/Lcd1aT/eMiK+QXm+Trmx9WxIiFdnoDTztGoLD9DfC4ZNvOeQd7oCyQsg8A7pBc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710337535; c=relaxed/simple;
-	bh=WeOGJedFmOM2Tgb4d1S3JinQzz4nZviTh118O1gKX1M=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rKunXNDvuxL4uL1cWxIE4isq/NNCSbpHbM1JL/2EAvgPY5RDmN/A5mPApEnOkd4SzK0UulDH080d4K1eOyVL9AwA+gsYFPsq3ZAr1mkdgjvNRo1235gc5fwIyku9pYG6alr09VDin/BTL8TTBQvQMOM5mSUaBD5tByHIfoTWPyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=aiFrZAyj; arc=none smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42DCnvlb016200;
-	Wed, 13 Mar 2024 06:44:50 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	date:from:to:cc:subject:message-id:references:mime-version
-	:content-type:in-reply-to; s=pfpt0220; bh=VwuvIBp1UpDExbuSxSKOlP
-	wsFLpAOE9AYw6mEBoQvp8=; b=aiFrZAyj1AcWXCRSRkWzRXR9iU7achTNcubWf/
-	HnaZBig1tmq8DhuJhVS8RNmEColRN5JxuwFTRTMFVJ2Y4I/vwvXdSpNp7oMIb/Ka
-	ADrchOCED650x9vCEVM2FhN38jqAyMuZc8YGdxbjlrkWKK/yJmqJiSYKJDkABpRW
-	5YfZW4RXfDF3mjJMhYNgwMfqS7sc/UngRNGCm5TcNC/UjUn41uIC+qBVOo0tnU1c
-	brBmMVL/4CpdDtywZjUqG4poI8gfuRSRb8c4EsCpirh4HDWglDB3l0q3e9DpOjP2
-	7qVgnG997jmN8ytlJ0kcko012RMiDVJiDKfsO3CBGALNLUrg==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3wucg2r6nn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 13 Mar 2024 06:44:49 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.12; Wed, 13 Mar 2024 06:44:48 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
- Transport; Wed, 13 Mar 2024 06:44:48 -0700
-Received: from maili.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with SMTP id 5879A3F704F;
-	Wed, 13 Mar 2024 06:44:42 -0700 (PDT)
-Date: Wed, 13 Mar 2024 19:14:41 +0530
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Julien Panis <jpanis@baylibre.com>
-CC: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
-        Alexei Starovoitov
-	<ast@kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        Jesper Dangaard
- Brouer <hawk@kernel.org>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Sumit
- Semwal <sumit.semwal@linaro.org>,
-        Christian =?iso-8859-1?Q?K=F6nig?=
-	<christian.koenig@amd.com>,
-        Simon Horman <horms@kernel.org>, Andrew Lunn
-	<andrew@lunn.ch>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <bpf@vger.kernel.org>, <linux-media@vger.kernel.org>,
-        <dri-devel@lists.freedesktop.org>, <linaro-mm-sig@lists.linaro.org>
-Subject: Re: [PATCH v4 0/3] Add minimal XDP support to TI AM65 CPSW Ethernet
- driver
-Message-ID: <20240313134441.GA1263398@maili.marvell.com>
-References: <20240223-am65-cpsw-xdp-basic-v4-0-38361a63a48b@baylibre.com>
+	s=arc-20240116; t=1710337657; c=relaxed/simple;
+	bh=9/dw73MZ1B7UIIGQkyR0OGzndhExa1cPWv5TXntkIIQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=I8Vjp3dH0i3Yg1DR9aNalD4gIR2P0sHR4vRP5pSy/+ph5wEGwbnYXoCSuBp2OVyP837OehHzPKq5DE+5OnTLm8/46bUr18YfU8OSoHNPvBAZ1ynJtFsGZ/G48Uh/FTatWMeJzfTFwNJc3jw4FcRt53Gg29HpxflXIF8eIFvST+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hQpBTSKw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710337654;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lto8TWMjEVdFuevVc7/99LmKN94KTvc/sJ/quGAixZg=;
+	b=hQpBTSKwtlifPyYcgIknufNa1GXRk+I7BLJOIcDjz5+bn8jwsCPV4fyoKLpgCP9iQUtWop
+	3Okejbef3ldjiAqDW2GwoE1FydD4ZRaFyh2RmGsZg89Zlg+/wihn1Okio936LBkUm/kQFe
+	JzsffSMB6g9iA/w1aox5D8tIrNJJ8gs=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-537-cHXJI7WRO9uP_eVySySBYw-1; Wed, 13 Mar 2024 09:47:33 -0400
+X-MC-Unique: cHXJI7WRO9uP_eVySySBYw-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a4651c22fd2so67120866b.3
+        for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 06:47:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710337649; x=1710942449;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lto8TWMjEVdFuevVc7/99LmKN94KTvc/sJ/quGAixZg=;
+        b=GonTxybak97DmDT/vGKJX+GMcNTJ4/quROINqYs5S83lXNKPwCGhjC9S1HfTcsJ8AW
+         xyWaZp1Vdc++H4DQqC5cAtuVIrgBDb1YulETwRhe5vMmXXTQEa7n7DpzdHHKPud1CUqb
+         9t02BkFiPT6RhzxcYJRZvdhAbRjDrGC13dyn7O10m9Tdy+rE5AStq/iFX/Jd/0bkrBOM
+         aDUdZUXOqbD8vOWGP0C52VsbVb+tIzeAknA9R78MmffGc68plufqYwW4HrrfJx9DiXBd
+         J2A2L65D3Ud7o1Hubo2H8bCkHbg1IAihIVdu4xm3ikUFfa3wJYpcMbH1zs9X916Sj9Hy
+         eR9g==
+X-Gm-Message-State: AOJu0Yw09ItohQufcOBJVHza2xg4q3ah6Nl6yQKK1AOT2LpjsuTK7BAQ
+	sTciplCUzF+Tg8lirk+E4hq6Kxn7yi8gr+WOIUyf7rUc5zp43QCdYawy037qjuF6UNgINolWWYP
+	xtDaSgODC5+tOH0SaVoMHuUhJx9eRamcJzjbKP+Rj60Hw67kMd7nlip8qRFFzN+JqKylSUsBRHe
+	bUUodCJQuCc2xxbvHlg7sV0lysPYtH
+X-Received: by 2002:a17:907:cbc7:b0:a45:f6de:ed18 with SMTP id vk7-20020a170907cbc700b00a45f6deed18mr9073960ejc.33.1710337649146;
+        Wed, 13 Mar 2024 06:47:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFGJcXvlWwReaRwLW3NSJHwQRUHzlMHgiH4ScCAv1zMBjYi4W2IspS4yfNyP51M1go2REeZir7h7rG2Yxttg6w=
+X-Received: by 2002:a17:907:cbc7:b0:a45:f6de:ed18 with SMTP id
+ vk7-20020a170907cbc700b00a45f6deed18mr9073943ejc.33.1710337648756; Wed, 13
+ Mar 2024 06:47:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240223-am65-cpsw-xdp-basic-v4-0-38361a63a48b@baylibre.com>
-X-Proofpoint-ORIG-GUID: G5PU32WzbO9uPZplymCr0TA-d_XXXYnV
-X-Proofpoint-GUID: G5PU32WzbO9uPZplymCr0TA-d_XXXYnV
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-13_08,2024-03-12_01,2023-05-22_02
+References: <20240313125457.19475-1-ivecera@redhat.com>
+In-Reply-To: <20240313125457.19475-1-ivecera@redhat.com>
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Wed, 13 Mar 2024 14:47:17 +0100
+Message-ID: <CADEbmW3NQ7SQpccOqTD=p_czpBbOY=41kS7krwx2ZEDmFfcgrg@mail.gmail.com>
+Subject: Re: [PATCH net] i40e: Enforce software interrupt during busy-poll exit
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, pawel.chmielewski@intel.com, 
+	aleksandr.loktionov@intel.com, Hugo Ferreira <hferreir@redhat.com>, 
+	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024-03-12 at 18:52:39, Julien Panis (jpanis@baylibre.com) wrote:
-> This patch adds XDP support to TI AM65 CPSW Ethernet driver.
+On Wed, Mar 13, 2024 at 1:55=E2=80=AFPM Ivan Vecera <ivecera@redhat.com> wr=
+ote:
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/etherne=
+t/intel/i40e/i40e.h
+> index 9b701615c7c6..4d2b05de6c63 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e.h
+> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
+> @@ -908,6 +908,7 @@ struct i40e_q_vector {
+>         struct rcu_head rcu;    /* to avoid race with update stats on fre=
+e */
+>         char name[I40E_INT_NAME_STR_LEN];
+>         bool arm_wb_state;
+> +       bool in_busy_poll;
+>         int irq_num;            /* IRQ assigned to this q_vector */
+>  } ____cacheline_internodealigned_in_smp;
+>
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/et=
+hernet/intel/i40e/i40e_main.c
+> index 89a3401d20ab..1ea6d06b0acc 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -3915,6 +3915,12 @@ static void i40e_vsi_configure_msix(struct i40e_vs=
+i *vsi)
+>                      q_vector->tx.target_itr >> 1);
+>                 q_vector->tx.current_itr =3D q_vector->tx.target_itr;
+>
+> +               /* Set ITR for software interrupts triggered after exitin=
+g
+> +                * busy-loop polling.
+> +                */
+> +               wr32(hw, I40E_PFINT_ITRN(I40E_SW_ITR, vector - 1),
+> +                    I40E_ITR_20K);
+> +
+>                 wr32(hw, I40E_PFINT_RATEN(vector - 1),
+>                      i40e_intrl_usec_to_reg(vsi->int_rate_limit));
+>
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_register.h b/drivers/ne=
+t/ethernet/intel/i40e/i40e_register.h
+> index 14ab642cafdb..baa6bb68bcf8 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_register.h
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_register.h
+> @@ -335,6 +335,8 @@
+>  #define I40E_PFINT_DYN_CTLN_INTERVAL_SHIFT 5
+>  #define I40E_PFINT_DYN_CTLN_SW_ITR_INDX_ENA_SHIFT 24
+>  #define I40E_PFINT_DYN_CTLN_SW_ITR_INDX_ENA_MASK I40E_MASK(0x1, I40E_PFI=
+NT_DYN_CTLN_SW_ITR_INDX_ENA_SHIFT)
+> +#define I40E_PFINT_DYN_CTLN_SW_ITR_INDX_SHIFT 25
+> +#define I40E_PFINT_DYN_CTLN_SW_ITR_INDX_MASK I40E_MASK(0x3, I40E_PFINT_D=
+YN_CTLN_SW_ITR_INDX_SHIFT)
+>  #define I40E_PFINT_ICR0 0x00038780 /* Reset: CORER */
+>  #define I40E_PFINT_ICR0_INTEVENT_SHIFT 0
+>  #define I40E_PFINT_ICR0_INTEVENT_MASK I40E_MASK(0x1, I40E_PFINT_ICR0_INT=
+EVENT_SHIFT)
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/et=
+hernet/intel/i40e/i40e_txrx.c
+> index 0d7177083708..356c3140adf3 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+> @@ -2658,8 +2658,22 @@ static inline u32 i40e_buildreg_itr(const int type=
+, u16 itr)
+>         return val;
+>  }
+>
+> -/* a small macro to shorten up some long lines */
+> -#define INTREG I40E_PFINT_DYN_CTLN
+> +static inline u32 i40e_buildreg_swint(int type)
+> +{
+> +       u32 val;
+> +
+> +       /* 1. Enable the interrupt
+> +        * 2. Do not modify any ITR interval
+> +        * 3. Trigger a SW interrupt specified by type
+> +        */
+> +       val =3D I40E_PFINT_DYN_CTLN_INTENA_MASK |
+> +             I40E_PFINT_DYN_CTLN_ITR_INDX_MASK | /* set noitr */
+> +             I40E_PFINT_DYN_CTLN_SWINT_TRIG_MASK |
+> +             I40E_PFINT_DYN_CTLN_SW_ITR_INDX_ENA_MASK |
+> +             FIELD_PREP(I40E_PFINT_DYN_CTLN_SW_ITR_INDX_MASK, type);
+> +
+> +       return val;
+> +}
 
-is this a net-next item ?
+This function is called only from one place and with a constant
+argument. Does it  really need to be a function, as opposed to a
+constant? Or are you going to add more callers soon?
 
 >
-> The following features are implemented: NETDEV_XDP_ACT_BASIC,
-> NETDEV_XDP_ACT_REDIRECT, and NETDEV_XDP_ACT_NDO_XMIT.
+>  /* The act of updating the ITR will cause it to immediately trigger. In =
+order
+>   * to prevent this from throwing off adaptive update statistics we defer=
+ the
+> @@ -2702,8 +2716,8 @@ static inline void i40e_update_enable_itr(struct i4=
+0e_vsi *vsi,
+>          */
+>         if (q_vector->rx.target_itr < q_vector->rx.current_itr) {
+>                 /* Rx ITR needs to be reduced, this is highest priority *=
+/
+> -               intval =3D i40e_buildreg_itr(I40E_RX_ITR,
+> -                                          q_vector->rx.target_itr);
+> +               wr32(hw, I40E_PFINT_ITRN(I40E_RX_ITR, q_vector->reg_idx),
+> +                    q_vector->rx.target_itr >> 1);
+>                 q_vector->rx.current_itr =3D q_vector->rx.target_itr;
+>                 q_vector->itr_countdown =3D ITR_COUNTDOWN_START;
+>         } else if ((q_vector->tx.target_itr < q_vector->tx.current_itr) |=
+|
+> @@ -2712,25 +2726,33 @@ static inline void i40e_update_enable_itr(struct =
+i40e_vsi *vsi,
+>                 /* Tx ITR needs to be reduced, this is second priority
+>                  * Tx ITR needs to be increased more than Rx, fourth prio=
+rity
+>                  */
+> -               intval =3D i40e_buildreg_itr(I40E_TX_ITR,
+> -                                          q_vector->tx.target_itr);
+> +               wr32(hw, I40E_PFINT_ITRN(I40E_TX_ITR, q_vector->reg_idx),
+> +                    q_vector->tx.target_itr >> 1);
+>                 q_vector->tx.current_itr =3D q_vector->tx.target_itr;
+>                 q_vector->itr_countdown =3D ITR_COUNTDOWN_START;
+>         } else if (q_vector->rx.current_itr !=3D q_vector->rx.target_itr)=
+ {
+>                 /* Rx ITR needs to be increased, third priority */
+> -               intval =3D i40e_buildreg_itr(I40E_RX_ITR,
+> -                                          q_vector->rx.target_itr);
+> +               wr32(hw, I40E_PFINT_ITRN(I40E_RX_ITR, q_vector->reg_idx),
+> +                    q_vector->rx.target_itr >> 1);
+>                 q_vector->rx.current_itr =3D q_vector->rx.target_itr;
+>                 q_vector->itr_countdown =3D ITR_COUNTDOWN_START;
+>         } else {
+>                 /* No ITR update, lowest priority */
+> -               intval =3D i40e_buildreg_itr(I40E_ITR_NONE, 0);
+>                 if (q_vector->itr_countdown)
+>                         q_vector->itr_countdown--;
+>         }
 >
-> Zero-copy and non-linear XDP buffer supports are NOT implemented.
+> -       if (!test_bit(__I40E_VSI_DOWN, vsi->state))
+> -               wr32(hw, INTREG(q_vector->reg_idx), intval);
+> +       /* Do not enable interrupt if VSI is down */
+> +       if (test_bit(__I40E_VSI_DOWN, vsi->state))
+> +               return;
+> +
+> +       if (!q_vector->in_busy_poll) {
+> +               intval =3D i40e_buildreg_itr(I40E_ITR_NONE, 0);
+> +       } else {
+> +               q_vector->in_busy_poll =3D false;
+> +               intval =3D i40e_buildreg_swint(I40E_SW_ITR);
+> +       }
+> +       wr32(hw, I40E_PFINT_DYN_CTLN(q_vector->reg_idx), intval);
+>  }
 >
-> Besides, the page pool memory model is used to get better performance.
+>  /**
+> @@ -2845,6 +2867,8 @@ int i40e_napi_poll(struct napi_struct *napi, int bu=
+dget)
+>          */
+>         if (likely(napi_complete_done(napi, work_done)))
+>                 i40e_update_enable_itr(vsi, q_vector);
+> +       else
+> +               q_vector->in_busy_poll =3D true;
 >
-> Signed-off-by: Julien Panis <jpanis@baylibre.com>
-> ---
-> Changes in v4:
-> - Add skb_mark_for_recycle() in am65_cpsw_nuss_rx_packets() function.
-> - Specify napi page pool parameter in am65_cpsw_create_xdp_rxqs() function.
-> - Add benchmark numbers (with VS without page pool) in the commit description.
-> - Add xdp_do_flush() in am65_cpsw_run_xdp() function for XDP_REDIRECT case.
-> - Link to v3: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v3-0-5d944a9d84a0@baylibre.com
+>         return min(work_done, budget - 1);
+>  }
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.h b/drivers/net/et=
+hernet/intel/i40e/i40e_txrx.h
+> index abf15067eb5d..2cdc7de6301c 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_txrx.h
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.h
+> @@ -68,6 +68,7 @@ enum i40e_dyn_idx {
+>  /* these are indexes into ITRN registers */
+>  #define I40E_RX_ITR    I40E_IDX_ITR0
+>  #define I40E_TX_ITR    I40E_IDX_ITR1
+> +#define I40E_SW_ITR    I40E_IDX_ITR2
 >
-> Changes in v3:
-> - Fix a potential issue with TX buffer type, which is now set for each buffer.
-> - Link to v2: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v2-0-01c6caacabb6@baylibre.com
->
-> Changes in v2:
-> - Use page pool memory model instead of MEM_TYPE_PAGE_ORDER0.
-> - In am65_cpsw_alloc_skb(), release reference on the page pool page
-> in case of error returned by build_skb().
-> - [nit] Cleanup am65_cpsw_nuss_common_open/stop() functions.
-> - [nit] Arrange local variables in reverse xmas tree order.
-> - Link to v1: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v1-1-9f0b6cbda310@baylibre.com
->
-> ---
-> Julien Panis (3):
->       net: ethernet: ti: Add accessors for struct k3_cppi_desc_pool members
->       net: ethernet: ti: Add desc_infos member to struct k3_cppi_desc_pool
->       net: ethernet: ti: am65-cpsw: Add minimal XDP support
->
->  drivers/net/ethernet/ti/am65-cpsw-nuss.c    | 536 +++++++++++++++++++++++++---
->  drivers/net/ethernet/ti/am65-cpsw-nuss.h    |  13 +
->  drivers/net/ethernet/ti/k3-cppi-desc-pool.c |  36 ++
->  drivers/net/ethernet/ti/k3-cppi-desc-pool.h |   4 +
->  4 files changed, 539 insertions(+), 50 deletions(-)
-> ---
-> base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
-> change-id: 20240223-am65-cpsw-xdp-basic-4db828508b48
->
-> Best regards,
+>  /* Supported RSS offloads */
+>  #define I40E_DEFAULT_RSS_HENA ( \
 > --
-> Julien Panis <jpanis@baylibre.com>
+> 2.43.0
 >
+
 
