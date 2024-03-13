@@ -1,138 +1,88 @@
-Return-Path: <netdev+bounces-79622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B7B587A454
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 09:57:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEC1A87A45A
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 09:57:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F15A1C21A77
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 08:57:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F16601C21A44
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 08:57:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1D501AAD4;
-	Wed, 13 Mar 2024 08:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85DE41B5BA;
+	Wed, 13 Mar 2024 08:57:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="PrIwJ+KC"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Ab3VxTqE"
 X-Original-To: netdev@vger.kernel.org
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED8C71B277;
-	Wed, 13 Mar 2024 08:56:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0488E1AAD4;
+	Wed, 13 Mar 2024 08:57:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710320218; cv=none; b=oH/LoX5OTY6uutQLSSCUjkvZ+AfMgohdFmOgp1CNr8gCbBTakbI7dKm1PvOJncN8mgN2gIVu5JEBDeIAMO9KaNgKDfE2Ce09N1AfOaGFdbjCbdP+BiPs1BxO9eyLgrIBCKoPgBDKeNb6vLq/plTSdNtzb8Tgu1RWgDBJNIFSYk8=
+	t=1710320236; cv=none; b=FdKTjixzT4uQtnzwzaZFzePfb/kFoXpI5aOaIyPABAtyjT93SHnvm9UZO4h8PICsTlXQt8x/QiBjfiA1sM4glkjim+ICEBC9a7JhfTRXL65wps7MunBVvzVjP7Gl+t+DzrlX9WJJjA05PCrPq9ewTDtohnC47huvJsMTBMpmlRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710320218; c=relaxed/simple;
-	bh=f0YlFyPkHWlvhTBYP+sm+BbkzPsVZQaFGDLAO92H5n4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VGHF/76VmSaxS5GvqSD0nvu+pG4sF8OSAPO18OGk4uUcGyagjVb+/38ec3WINdbhTAfMEz3k9soauD6DgU0uVTwQ2+VBdVCJE7UmIhVsAGa+ASt1EduDrwvbI3KDKKWDYmnzlXzAi8GVQ8O2ATzF87kNAAUZZ1R4KQrLzVE+v8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=PrIwJ+KC; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=xATN+fNLVBW0nteqrTdPZMmMoa9Qs0vDSOCiZfaH0lg=; b=PrIwJ+KCxV6PSDaxTUgT33tXBI
-	VrFziHv26mOylNEZR+pli8jUbx0FO8s8je8jIcW4sMj3AL0CyOD1T9GnV2G5l9/OVZ2dbVWNIpWnj
-	wAL98punqFnsGrTMDZLbhmmPHIVP4g0Gn9CZtOyOKX6OMYQF+fFD1Owv2NkiBdiJjPLCjxQHShWSM
-	cZPtCc/6qIaYkfccOXpvY6O8CC38Tc63E+9WF0pIzk5q3ouRu3vOZTWpxkjfYGlENxygtS8K0fGF8
-	exdgMuDYhDm1TZQaNh2GQG2SN6QXNIb0AmVZY/kfFm9kk+Ei0FAqNjTkzcBrRJLtDtZEg2u9g5MwY
-	o3t/sWAQVkgH9sgN/UFoDxTjCqADtRbqE00Uo0MJPH4WleVXAtKLvobTxUhednqiSFZZX4TikZIFE
-	Dk8ZmWGBytateOQaH7csYP55mHfBjLj04wiknvGf2k7Ujtgycht7YI2ke6Lf9TkXbRkqv4pKvt5qi
-	pIJcbk84ByAHzbr0J6v6XY5d;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1rkKPl-000dql-00;
-	Wed, 13 Mar 2024 08:56:45 +0000
-Message-ID: <74d5db09-6b5c-4054-b9d3-542f34769083@samba.org>
-Date: Wed, 13 Mar 2024 09:56:41 +0100
+	s=arc-20240116; t=1710320236; c=relaxed/simple;
+	bh=qMFjOw5oWXHTNwfAIdt5NPZlOtPArHhvm1xObO8VH44=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=VpA+nCygPwfzXAVsONPwYhfuI6A5xuUxxMlIal/EriqTked0hPgYP9zF4qMVZMREL6k1Omz2WmMwmCqEGYV/s/hmZ+o0EarfxaX5pf1KG+rtPY6AZH+PF+2Ze+vBRobItYlj3Gnk6QgEQC/BUeKKzaYXSDhDiTv6FOFCxILcQEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Ab3VxTqE; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=7Z3xpgxMC3SabrhTXAHSyPXqOmddBGRm2jLKIlBKce0=;
+	t=1710320234; x=1711529834; b=Ab3VxTqE9GZ/mGpgNWdO20gXFpnG8sqFCd4Dfl1/7f8lbDF
+	IevLjr0RN7NoCLrp8O7XfRLjtbLQ6F54xkWZd51cIvoQGdPLjR4P1Z1fhdf4AxOzWLm3J2OCdZLPm
+	tMOlP10dZt3Bmfwy2gnLtHHUO4+vI+sRrTegBw8rpcQSA7LCT/BVRzySJynIKnuRavwXJ0XOVE1v/
+	rJuBY3nVDIVURI0HntM5cr74WFg4Cm1wTuO5MqMdY1BC44CYOPU4RnM19fsb/mQtl59/jgbFuwcI8
+	BBiJapuJt54Jpdq1hihdCAd5WYpKdG1aRhAl2UoPbxFzguk9N5ZBMifA4g42F8+w==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rkKPv-0000000F7E9-0rbB;
+	Wed, 13 Mar 2024 09:56:55 +0100
+Message-ID: <005f998ec59e27633b1b99fdf929e40ccfd401c1.camel@sipsolutions.net>
+Subject: Re: [REGRESSION] Re: [PATCH] crypto: pkcs7: remove sha1 support
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Karel Balej <balejk@matfyz.cz>, dimitri.ledkov@canonical.com
+Cc: alexandre.torgue@foss.st.com, davem@davemloft.net, dhowells@redhat.com, 
+	herbert@gondor.apana.org.au, keyrings@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, mcgrof@kernel.org, 
+	mcoquelin.stm32@gmail.com, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, iwd@lists.linux.dev
+Date: Wed, 13 Mar 2024 09:56:53 +0100
+In-Reply-To: <CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz>
+References: <CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next 0/5] net: In-kernel QUIC implementation with
- Userspace handshake
-To: Xin Long <lucien.xin@gmail.com>, network dev <netdev@vger.kernel.org>
-Cc: davem@davemloft.net, kuba@kernel.org, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Steve French <smfrench@gmail.com>,
- Namjae Jeon <linkinjeon@kernel.org>, Chuck Lever III
- <chuck.lever@oracle.com>, Jeff Layton <jlayton@kernel.org>,
- Sabrina Dubroca <sd@queasysnail.net>, Tyler Fanelli <tfanelli@redhat.com>,
- Pengtao He <hepengtao@xiaomi.com>,
- "linux-cifs@vger.kernel.org" <linux-cifs@vger.kernel.org>,
- Samba Technical <samba-technical@lists.samba.org>
-References: <cover.1710173427.git.lucien.xin@gmail.com>
-Content-Language: en-US, de-DE
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <cover.1710173427.git.lucien.xin@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-malware-bazaar: not-scanned
 
-Hi Xin Long,
+Not sure why you're CC'ing the world, but I guess adding a few more
+doesn't hurt ...
 
-first many thanks for working on this topic!
+On Wed, 2024-03-13 at 09:50 +0100, Karel Balej wrote:
+>=20
+>  and I use iwd
 
-> Usage
-> =====
-> 
-> This implementation supports a mapping of QUIC into sockets APIs. Similar
-> to TCP and SCTP, a typical Server and Client use the following system call
-> sequence to communicate:
-> 
->         Client                    Server
->      ------------------------------------------------------------------
->      sockfd = socket(IPPROTO_QUIC)      listenfd = socket(IPPROTO_QUIC)
->      bind(sockfd)                       bind(listenfd)
->                                         listen(listenfd)
->      connect(sockfd)
->      quic_client_handshake(sockfd)
->                                         sockfd = accecpt(listenfd)
->                                         quic_server_handshake(sockfd, cert)
-> 
->      sendmsg(sockfd)                    recvmsg(sockfd)
->      close(sockfd)                      close(sockfd)
->                                         close(listenfd)
-> 
-> Please note that quic_client_handshake() and quic_server_handshake() functions
-> are currently sourced from libquic in the github lxin/quic repository, and might
-> be integrated into ktls-utils in the future. These functions are responsible for
-> receiving and processing the raw TLS handshake messages until the completion of
-> the handshake process.
+This is your problem, the wireless stack in the kernel doesn't use any
+kernel crypto code for 802.1X.
 
-I see a problem with this design for the server, as one reason to
-have SMB over QUIC is to use udp port 443 in order to get through
-firewalls. As QUIC has the concept of ALPN it should be possible
-let a conumer only listen on a specif ALPN, so that the smb server
-and web server on "h3" could both accept connections.
+I suppose iwd wants to use the kernel infrastructure but has no
+fallbacks to other implementations.
 
-So the server application should have a way to specify the desired
-ALPN before or during the bind() call. I'm not sure if the
-ALPN is available in cleartext before any crypto is needed,
-so if the ALPN is encrypted it might be needed to also register
-a server certificate and key together with the ALPN.
-Because multiple application may not want to share the same key.
-
-This needs to work indepented of kernel or userspace application.
-
-We may want ksmbd (kernel smb server) and apache or smbd (Samba's userspace smb server)
-together with apache. And maybe event ksmbd with one certificate for
-ksmbd.example.com and smbd with a certificate for smbd.example.com
-both on ALPN "smb", while apache uses "h3" with a certificate for
-apache.example.com and nginx with "h3" and a certificate for
-nginx.example.com.
-
-But also smbd with "smb" as well as apache with "h3" both using
-a certificate for quic.example.com.
-
-I guess TLS Server Name Indication also works for QUIC, correct?
-
-For the client side I guess dynamic udp ports are used and
-there's no problem with multiple applications...
-
-metze
+johannes
 
