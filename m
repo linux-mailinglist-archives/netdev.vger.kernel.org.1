@@ -1,157 +1,209 @@
-Return-Path: <netdev+bounces-79642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DA1287A5A8
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 11:18:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BCF0C87A5AD
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 11:19:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31CE81F222A7
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 10:18:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C4951F22351
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 10:19:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D8D38DFB;
-	Wed, 13 Mar 2024 10:18:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="P2iiMFmB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17F0038DFB;
+	Wed, 13 Mar 2024 10:19:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6A41CF87
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 10:18:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A93491CF87
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 10:19:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710325116; cv=none; b=p4rDb/ERNBIMZtMrdufbHv3IXW+lzI6xlfuabhmlzD8F7Qm2wOVr+yNmT6FEai8aew997y0ZjQPsBbta/KoWdBSv7iOpBjbhpcmnhVTnIi6t8Uz00wYqjHhFipvS4IVdN9qCkm6IJ5mSza4A66DRRKRth5cujNr1CazUmWkoK4c=
+	t=1710325195; cv=none; b=qo/EHsK2RaPTqP7pZCYHmf8FRgZbo9ZN63wbP2QKGB6Ff8WEPu7etm5Igq3I3YnHBdxEHaoh0Y51xnv6XxWWmRHFk2FvSJenEMpxmGhF2k6DDPHH6tHIuxW/khn32F6TZnF6ISVMIVL5/p6H9wmKvERlbP0U/NMF/XdREEhWLKA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710325116; c=relaxed/simple;
-	bh=Qyl4j8P/tDntqCs0XgdK6YL19GAwUcjXl2O0gs4B2+w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Cin77zEZSqBiRoaxRxTHTdhOiJhmbbgfeuZLn2ezXeQCtaUPTVqW+mVxVvIZe1fsCfEA1livKdLiYCk5DziD7hgnLNesa3NsAD8pSUv/tM8SBceSVrexijgLhsjq2TFEYEDzsYwl6dpiWmy1Wp0ZEdQ4vbY67CXREq2NnQN5XQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=P2iiMFmB; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5687ebddd8eso14673a12.0
-        for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 03:18:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710325113; x=1710929913; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a/1jpTLtdDidJX4Wr/95qpLr/EL3WQRiA7nPpeNQ1M4=;
-        b=P2iiMFmBbkEuNC8wsruc0uJQ+a0MncprL+sSlTdIkBszuHhqJj0/UHLhyY3dNLFWLK
-         yPIEdhcGYQHa8lvwwEiVxzFw9qHRqLTfdcUqbPH3F5PuEMdP7nzqDvx0uNU11fXs15mG
-         4zNhI8TUpcXDanqJFlSRwmpcDDe1vmR7COhmI5eo75RPFQY5mwyKiylYUlYd6BWW7RE5
-         7vR5150GAAMeD2fxxMhjm8WcDSkNo8irEtlHCPMlxAYV+8DWpeZ6hCU3HD5aHcyJ6AAS
-         td045CBKGpYEcI04RefBOHKpnHcfaXpzUJc+cjA4WSH4ankqDm8BdnnhSlucMHwdL8Ui
-         jFWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710325113; x=1710929913;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a/1jpTLtdDidJX4Wr/95qpLr/EL3WQRiA7nPpeNQ1M4=;
-        b=UGTJwPYKlv/S+ojOPRnIlfoddgE0qJCm6MraerXKgnAfe1kg760ZwTJX12UdDsD8Pf
-         oKZP06WgiGuEMuXBLxSbXAG5Ir2XtHQYJoUMZtaL269130hvidkWxVXGD0CTNnX1N0Xf
-         5OVg/k2ehzDxkzzdVTVkm/eWDdmxxB17EPpUo5iHsjqMUSiRwEJT+Ox5hutBUe5IhTwu
-         NsFBkyA+8nsnShvDJQtB251bP4k3CBvFeMYwH47VRDTDtsgW5sfN65QQUlXVDv5hVsPX
-         Yyxn7vGhpX2sZyeRae0EsDyJgrOO3Nv/IEHauNJ4yz//qhLAZsoYApHwPkrIAfalVbQV
-         uCpw==
-X-Forwarded-Encrypted: i=1; AJvYcCUnrtxhw9+FcvjPZuoThtsq+UBqAmpQ6jpkqSTP+kzmRi9N0dVIv3anWmHz+PmUEMpp3oxvigjaDFjMSTVml+tpJxqJ9Uu/
-X-Gm-Message-State: AOJu0YxlJvGB0uHRc0uzB0QZfZbvaYUpnwvyBkW2iWi/othsobde5kDa
-	+eSy68MNeDRStqzGXAVWgxsYkGrrNWLjg40tc1/y/n2KPww0uiCzQjIF4jJDSXIVdHACF6LtXqE
-	CInvy4xsfN+2E017SN7K/vTbPV9pvXtbMVhcm
-X-Google-Smtp-Source: AGHT+IF6v2VCIxdT+D1s7StXU+Fuvw9x7dw5sx/poqbH9j7lCgMeAIKdeRkFmHihz8/oZexhPkGBrY72OMYCA4tsYoE=
-X-Received: by 2002:aa7:cccd:0:b0:568:271a:8c0f with SMTP id
- y13-20020aa7cccd000000b00568271a8c0fmr117697edt.7.1710325112885; Wed, 13 Mar
- 2024 03:18:32 -0700 (PDT)
+	s=arc-20240116; t=1710325195; c=relaxed/simple;
+	bh=get/DkW1k5+d5sJePZR8x9BkdbZyZI5wx8A1EdQmQ58=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=TdQ97HPWmirDczuKXJzk45SRPH8wBe92xU2ThvS+exX8eU5I/2Ah+smc3pGCLGYpfhQEu2o47qf3G6KS24PUqMaeqayuXBqnRV9jrle0a+H9Gb1po04+KGZ39dmrQaXU/Ij/qPHhs9rbyCSPfr8JPHLAskPEQAArs7QDm5D32oM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.109.198])
+	by gateway (Coremail) with SMTP id _____8DxaOjGffFlMWYYAA--.39623S3;
+	Wed, 13 Mar 2024 18:19:50 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.109.198])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8DxPBPDffFl_HNYAA--.36477S3;
+	Wed, 13 Mar 2024 18:19:48 +0800 (CST)
+Message-ID: <f373b652-e65c-4f7c-9605-9b387567c513@loongson.cn>
+Date: Wed, 13 Mar 2024 18:19:47 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240313094207.70334-1-dmantipov@yandex.ru>
-In-Reply-To: <20240313094207.70334-1-dmantipov@yandex.ru>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 13 Mar 2024 11:18:19 +0100
-Message-ID: <CANn89iLCK10J_6=1xSDquYpToZ-YNG3TzjS60L-g5Cyng92gFw@mail.gmail.com>
-Subject: Re: [PATCH] can: gw: prefer kfree_rcu() over call_rcu() with cgw_job_free_rcu()
-To: Dmitry Antipov <dmantipov@yandex.ru>
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>, Marc Kleine-Budde <mkl@pengutronix.de>, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 11/11] net: stmmac: dwmac-loongson: Disable
+ coe for some Loongson GNET
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+References: <cover.1706601050.git.siyanteng@loongson.cn>
+ <151e688e8977376c3c97548540f8e15d272685cb.1706601050.git.siyanteng@loongson.cn>
+ <52aodgfoh35zxpube73w53jv7rno5k7vfwdy276zjqpcbewk5t@4f2igj76y5ri>
+ <6ba83c5c-a993-4d79-86cf-789505a893ed@loongson.cn>
+In-Reply-To: <6ba83c5c-a993-4d79-86cf-789505a893ed@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8DxPBPDffFl_HNYAA--.36477S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3GF4fWF15Jw18Gry7tw4UZFc_yoW7Xw48pr
+	n7JayUuryUKr95Ja1xtrZ8JFy5CrWFgay7XF4Iqa1xGrsFkF1agr17Zr1q9r1DXa1kXr1U
+	ZF18urnxZF98J3cCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Jr0_Gr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r1q6r43MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
+	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8uc_3UUUUU==
 
-On Wed, Mar 13, 2024 at 10:43=E2=80=AFAM Dmitry Antipov <dmantipov@yandex.r=
-u> wrote:
->
-> Drop trivial free-only 'cgw_job_free_rcu()' RCU callback and
-> switch to 'kfree_rcu()' in 'cgw_notifier()', 'cgw_remove_job()'
-> and 'cgw_remove_all_jobs()'. Compile tested only.
->
-> Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
-> ---
->  net/can/gw.c | 13 +++----------
->  1 file changed, 3 insertions(+), 10 deletions(-)
->
-> diff --git a/net/can/gw.c b/net/can/gw.c
-> index 37528826935e..ffb9870e2d01 100644
-> --- a/net/can/gw.c
-> +++ b/net/can/gw.c
-> @@ -577,13 +577,6 @@ static inline void cgw_unregister_filter(struct net =
-*net, struct cgw_job *gwj)
->                           gwj->ccgw.filter.can_mask, can_can_gw_rcv, gwj)=
-;
->  }
->
-> -static void cgw_job_free_rcu(struct rcu_head *rcu_head)
-> -{
-> -       struct cgw_job *gwj =3D container_of(rcu_head, struct cgw_job, rc=
-u);
-> -
-> -       kmem_cache_free(cgw_cache, gwj);
 
-kmem_cache_free() is not the same than kfree()
+在 2024/3/13 17:52, Yanteng Si 写道:
+>
+> 在 2024/2/6 06:18, Serge Semin 写道:
+>> On Tue, Jan 30, 2024 at 04:49:16PM +0800, Yanteng Si wrote:
+>>> Some chips of Loongson GNET does not support coe, so disable them.
+>> s/coe/Tx COE
+> OK.
+>>
+>>> Set dma_cap->tx_coe to 0 and overwrite get_hw_feature.
+>>>
+>>> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+>>> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+>>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+>>> ---
+>>>   .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 46 
+>>> +++++++++++++++++++
+>>>   1 file changed, 46 insertions(+)
+>>>
+>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c 
+>>> b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>>> index b78a73ea748b..8018d7d5f31b 100644
+>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>>> @@ -196,6 +196,51 @@ static int dwlgmac_dma_interrupt(struct 
+>>> stmmac_priv *priv, void __iomem *ioaddr,
+>>>       return ret;
+>>>   }
+>>>   +static int dwlgmac_get_hw_feature(void __iomem *ioaddr,
+>> Please use GNET-specific prefix.
+> OK. loongson_gnet_get_hw_feature()
+>>
+>>> +                  struct dma_features *dma_cap)
+>>> +{
+>>> +    u32 hw_cap = readl(ioaddr + DMA_HW_FEATURE);
+>>> +
+>>> +    if (!hw_cap) {
+>>> +        /* 0x00000000 is the value read on old hardware that does not
+>>> +         * implement this register
+>>> +         */
+>>> +        return -EOPNOTSUPP;
+>>> +    }
+>> This doesn't seems like possible. All your devices have the
+>> HW-features register. If so please drop.
+> OK, drop it.
+>>
+>>> +
+>>> +    dma_cap->mbps_10_100 = (hw_cap & DMA_HW_FEAT_MIISEL);
+>>> +    dma_cap->mbps_1000 = (hw_cap & DMA_HW_FEAT_GMIISEL) >> 1;
+>>> +    dma_cap->half_duplex = (hw_cap & DMA_HW_FEAT_HDSEL) >> 2;
+>>> +    dma_cap->hash_filter = (hw_cap & DMA_HW_FEAT_HASHSEL) >> 4;
+>>> +    dma_cap->multi_addr = (hw_cap & DMA_HW_FEAT_ADDMAC) >> 5;
+>>> +    dma_cap->pcs = (hw_cap & DMA_HW_FEAT_PCSSEL) >> 6;
+>>> +    dma_cap->sma_mdio = (hw_cap & DMA_HW_FEAT_SMASEL) >> 8;
+>>> +    dma_cap->pmt_remote_wake_up = (hw_cap & DMA_HW_FEAT_RWKSEL) >> 9;
+>>> +    dma_cap->pmt_magic_frame = (hw_cap & DMA_HW_FEAT_MGKSEL) >> 10;
+>>> +    /* MMC */
+>>> +    dma_cap->rmon = (hw_cap & DMA_HW_FEAT_MMCSEL) >> 11;
+>>> +    /* IEEE 1588-2002 */
+>>> +    dma_cap->time_stamp =
+>>> +        (hw_cap & DMA_HW_FEAT_TSVER1SEL) >> 12;
+>>> +    /* IEEE 1588-2008 */
+>>> +    dma_cap->atime_stamp = (hw_cap & DMA_HW_FEAT_TSVER2SEL) >> 13;
+>>> +    /* 802.3az - Energy-Efficient Ethernet (EEE) */
+>>> +    dma_cap->eee = (hw_cap & DMA_HW_FEAT_EEESEL) >> 14;
+>>> +    dma_cap->av = (hw_cap & DMA_HW_FEAT_AVSEL) >> 15;
+>>> +    /* TX and RX csum */
+>>> +    dma_cap->tx_coe = 0;
+>>> +    dma_cap->rx_coe_type1 = (hw_cap & DMA_HW_FEAT_RXTYP1COE) >> 17;
+>>> +    dma_cap->rx_coe_type2 = (hw_cap & DMA_HW_FEAT_RXTYP2COE) >> 18;
+>>> +    dma_cap->rxfifo_over_2048 = (hw_cap & DMA_HW_FEAT_RXFIFOSIZE) 
+>>> >> 19;
+>>> +    /* TX and RX number of channels */
+>>> +    dma_cap->number_rx_channel = (hw_cap & DMA_HW_FEAT_RXCHCNT) >> 20;
+>>> +    dma_cap->number_tx_channel = (hw_cap & DMA_HW_FEAT_TXCHCNT) >> 22;
+>>> +    /* Alternate (enhanced) DESC mode */
+>>> +    dma_cap->enh_desc = (hw_cap & DMA_HW_FEAT_ENHDESSEL) >> 24;
+>> I am not sure whether you need to parse the capability register at all
+>> seeing this is a GNET-specific method. For that device all the
+>> capabilities are already known and can be just initialized in this
+>> method.
+> -dma_cap->tx_coe = (hw_cap & DMA_HW_FEAT_TXCOESEL) >> 16;
+>
+> +dma_cap->tx_coe = 0;
+>
+> I'm a little confused. Actually, I only modified this line, which is 
+> used to fix the checksum.
+>
+> 2k2000  of Loongson GNET does not support coe.
 
-Unless I have missed something in mm territory , your patch is not
-going to work.
+Specifically, it is to ensure the normal operation of multiple channels, 
+as other channels except for channel 0 cannot perform checksum.
 
-> -}
-> -
->  static int cgw_notifier(struct notifier_block *nb,
->                         unsigned long msg, void *ptr)
->  {
-> @@ -603,7 +596,7 @@ static int cgw_notifier(struct notifier_block *nb,
->                         if (gwj->src.dev =3D=3D dev || gwj->dst.dev =3D=
-=3D dev) {
->                                 hlist_del(&gwj->list);
->                                 cgw_unregister_filter(net, gwj);
-> -                               call_rcu(&gwj->rcu, cgw_job_free_rcu);
-> +                               kfree_rcu(gwj, rcu);
->                         }
->                 }
->         }
-> @@ -1168,7 +1161,7 @@ static void cgw_remove_all_jobs(struct net *net)
->         hlist_for_each_entry_safe(gwj, nx, &net->can.cgw_list, list) {
->                 hlist_del(&gwj->list);
->                 cgw_unregister_filter(net, gwj);
-> -               call_rcu(&gwj->rcu, cgw_job_free_rcu);
-> +               kfree_rcu(gwj, rcu);
->         }
->  }
+Thanks,
+
+Yanteng
+
+
 >
-> @@ -1236,7 +1229,7 @@ static int cgw_remove_job(struct sk_buff *skb, stru=
-ct nlmsghdr *nlh,
 >
->                 hlist_del(&gwj->list);
->                 cgw_unregister_filter(net, gwj);
-> -               call_rcu(&gwj->rcu, cgw_job_free_rcu);
-> +               kfree_rcu(gwj, rcu);
->                 err =3D 0;
->                 break;
->         }
-> --
-> 2.44.0
+> Thanks,
+> Yanteng
 >
+>>
+>> -Serge(y)
+>>
+>>> +
+>>> +    return 0;
+>>> +}
+>>> +
+>>>   struct stmmac_pci_info {
+>>>       int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data 
+>>> *plat);
+>>>       int (*config)(struct pci_dev *pdev, struct 
+>>> plat_stmmacenet_data *plat,
+>>> @@ -542,6 +587,7 @@ static int loongson_dwmac_probe(struct pci_dev 
+>>> *pdev,
+>>>           ld->dwlgmac_dma_ops = dwmac1000_dma_ops;
+>>>           ld->dwlgmac_dma_ops.init_chan = dwlgmac_dma_init_channel;
+>>>           ld->dwlgmac_dma_ops.dma_interrupt = dwlgmac_dma_interrupt;
+>>> +        ld->dwlgmac_dma_ops.get_hw_feature = dwlgmac_get_hw_feature;
+>>>             plat->setup = loongson_setup;
+>>>           ret = loongson_dwmac_config_multi_msi(pdev, plat, &res, 
+>>> np, 8);
+>>> -- 
+>>> 2.31.4
+>>>
+
 
