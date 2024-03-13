@@ -1,195 +1,234 @@
-Return-Path: <netdev+bounces-79608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F07787A2FA
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 07:33:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E696A87A3C7
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 08:58:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B2E5282FA4
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 06:33:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0DE611C20A28
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 07:58:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0B912E76;
-	Wed, 13 Mar 2024 06:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 091FB171AC;
+	Wed, 13 Mar 2024 07:58:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="K55qBZTE"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YcgoJy59"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B420ABA5E;
-	Wed, 13 Mar 2024 06:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C13A168D2
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 07:58:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710311613; cv=none; b=iQN874hRelOakZ2oVA01IjdSLBPNqIsx02KjNNNrGu6HcehjJIlHLKRHeusrQHoe1mb4cESLec0HYXr+0Hg0TsVfGMFLMIfMOOqPvK6PvmqooYWuPPvB2n4HPQleD7dWo7Vg8KCRldgGZVhLS6OCGpAhuaV3sNEYlCDC4Ygm4p8=
+	t=1710316685; cv=none; b=Mvtsl5BLZagO6EbVNQJJXv1AqBH6vqDp+SFozfBwfOM1hHGuoKQ8ohCyPaZcEVIC0XzvWJHPw3XjTkyT1vhiWmuYaeDAmqHNkj+9U361earHJXi1BPCqOUE+aH2u6RP44Ox+4CvabFSZGA+m36kLZazLLUNh63DEhZ/v6fQhw3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710311613; c=relaxed/simple;
-	bh=9Zs1KGyWNWhmAejwgtyMJIfOriycRX1MdIXZB6Zlp3w=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gl9vpSibE20QeeO1jI8uhIcfhKbqN/hh/iOB9iV7InDIX/IBaVcV376Q9QHiXqxTyKC4q4vBIM8xMdKM+Bbc0ZVObZSFpw5LMlRq86OQgBcoYJDphHDcDn8SoDW+1RQ0tbyFuN0u1Iba8FCsjqoEJ9NH/iUdOHJcxdwlUFhvzzI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=K55qBZTE; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42D3BMFs015050;
-	Tue, 12 Mar 2024 23:33:11 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version:content-type; s=
-	pfpt0220; bh=j9SqWvWQBt7wm9bpLwobyyiq2bV0O/zls6CGCynDx8Y=; b=K55
-	qBZTE9x/5sDJTAQVAm3g0N1cdtJRKM6EhZROyGBYBJDHRu/bLBsaXXNyIbONqQAs
-	Xijzg6lyorOllNfL1Pmvibw40DAl0/gebPKpZpOpfiwyaiGNWp6E1wJmRvV2BGtl
-	loV/rq2uCNb3jTGjYcuUjVdyg4XeKDFlur3avGbEq2TCJ4yrJS8wvgDXjOjZ38u5
-	N7yPYyEvBi6g95DTTOTYkFA9CaWZpXiTyNR+dGFsiYr6yhBThSrRB92IFDJkxnC7
-	a3SwK2uXrLUkibMIE+yd18Ovc/PcMVsIVc+lG53j48PAbV9xuwmZ/Z8GuZrCQoBU
-	XuTDVl3ZFZpj+UkABsA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3wtt8htq8t-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 12 Mar 2024 23:33:11 -0700 (PDT)
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 12 Mar
- 2024 23:33:10 -0700
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH02.marvell.com (10.69.176.39) with Microsoft SMTP Server (TLS) id
- 15.0.1497.48; Tue, 12 Mar 2024 23:33:10 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
- Transport; Tue, 12 Mar 2024 23:33:10 -0700
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 3CA103F7082;
-	Tue, 12 Mar 2024 23:33:06 -0700 (PDT)
-From: Geetha sowjanya <gakula@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
-        <sbhatta@marvell.com>, <hkelam@marvell.com>
-Subject: [v2 net PATCH] octeontx2-pf: Disable HW TSO for seg size < 16B
-Date: Wed, 13 Mar 2024 12:03:06 +0530
-Message-ID: <20240313063306.32571-1-gakula@marvell.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1710316685; c=relaxed/simple;
+	bh=zpVj8pyqyOguX/knzqVNsnnWNu90us2LsZ/oEuAvwBg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FaTFnNICQPKhvrMO/zNTdekZmOwwGV+uEhkTYe7aqpTTFKWjMkXOqPPrzm7tBQqx+UqiegshtgABszQz/8RROMYpf85J57+5XqbKTTqkIHZ7DTHE77Dx+uOkyWP1z3UOt0Klz+wGo7gRagH/R02VY1vLd+CmBNvwYDVKYNGUWGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YcgoJy59; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-513c56f3512so2389e87.0
+        for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 00:58:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710316682; x=1710921482; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gyI5FAXtWQkxERpfKZsZMwqi1GPHG/mW7Kqn81tTW6o=;
+        b=YcgoJy59n2KQW8h6GITHM2DSmhuewo9aDxstnrqfpRc9Vypz6unfJb/ppzk6hUpPBY
+         1w7EsxhMGA079Sa3aDAygJVBPrZ2t3HYoAgdVE00Ut2XxPTzSk7pG0sF5/O6xM8zSUnC
+         ucVOpfp0hp2FolJ237gebWWRxvTYnwXKZcLjZ4z0fujczYVFM+cKSd7BJR++onDYLIx6
+         qhHALhrhxMnoXP+VghRCeosWjAEEXCsSVyT6fJYAbgVBmi3OietC7O4pPKGkg7t+epWh
+         /XANH9lKXur3WJ3a1HzuS02uCEydmHSjQi3VDcSuWOQGsMu2p1S1ChdPACY/c6j/SDgH
+         Msuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710316682; x=1710921482;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gyI5FAXtWQkxERpfKZsZMwqi1GPHG/mW7Kqn81tTW6o=;
+        b=uy+P3REXT9IZ+K/gr/KSrHnO0sOruEMNaLrayWlV+eagMvi0zoeFeFH+WNZwxw+T9D
+         N7DPF5Sig3w+IJ4rR124bY8bvvRDc+WK8d0wzD3My/Jhl+5vojaKT+WvEqbb718QFO5j
+         pIQ6tH82+r0Q5VMDofo6lD0ZMsQUfO+SsAHfVNQHcDzxOOTcugIqaAwvPaQJt6fgpDBL
+         354D4APNgBmuw4j1EtcAGbraiWyNwRaLxg04dD7e6m3xx31Y3wy5bkBMoKfeIHzq7mG3
+         IzkR9FBW6mPPLN3UxIuoerGFFf0NhOKuGvhNdKynovbTPw/VIY+ZdJJRI1DtcK2Lndn/
+         S3aA==
+X-Gm-Message-State: AOJu0Yz9qGxxZywJcTPvo1SfzNbCPCddC/3rLz7eicIh3IOsH97i+eRT
+	yoKkkLW6hylzxtcn2dU6lndG7GzN6r7Tz2I0I0THcYzPN6OXHnfI9hbGRmuihTo5mXR5j3GbfYb
+	CKQkCFE3YLP2X10KN3UJjUpeKQUZzaMWe3k/m
+X-Google-Smtp-Source: AGHT+IHM0WdL9YTTo7yhCq8E0OaBp5S7ioOj3YHzWu4iyKfgo1WVJSL5Maf+Diz0yFmQk1tLUHXQcq6N89vCkqPghoY=
+X-Received: by 2002:a19:3803:0:b0:513:574a:c043 with SMTP id
+ f3-20020a193803000000b00513574ac043mr76704lfa.6.1710316681848; Wed, 13 Mar
+ 2024 00:58:01 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: ysWmEXmgCdF5PXVpake7vdK5iiKJ0SAA
-X-Proofpoint-GUID: ysWmEXmgCdF5PXVpake7vdK5iiKJ0SAA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-13_06,2024-03-12_01,2023-05-22_02
+References: <20240313063306.32571-1-gakula@marvell.com>
+In-Reply-To: <20240313063306.32571-1-gakula@marvell.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 13 Mar 2024 08:57:50 +0100
+Message-ID: <CANn89i++jodT8mzqY82LuxL2WXA4DF6XD5nCmHcsAyKe22Jxbw@mail.gmail.com>
+Subject: Re: [v2 net PATCH] octeontx2-pf: Disable HW TSO for seg size < 16B
+To: Geetha sowjanya <gakula@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org, 
+	davem@davemloft.net, pabeni@redhat.com, sgoutham@marvell.com, 
+	sbhatta@marvell.com, hkelam@marvell.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Current NIX hardware do not support TSO for the
-segment size less 16 bytes. This patch disable hw
-TSO for such packets.
+On Wed, Mar 13, 2024 at 7:33=E2=80=AFAM Geetha sowjanya <gakula@marvell.com=
+> wrote:
+>
+> Current NIX hardware do not support TSO for the
+> segment size less 16 bytes. This patch disable hw
+> TSO for such packets.
+>
+> Fixes: 86d7476078b8 ("octeontx2-pf: TCP segmentation offload support").
+> Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+> ---
+>
+> v1-v2:
+>  - As suggested by Eric Dumazet used ndo_features_check().
+>  - Moved the max fargments support check to ndo_features_check.
+>
+>  .../marvell/octeontx2/nic/otx2_common.c        | 18 ++++++++++++++++++
+>  .../marvell/octeontx2/nic/otx2_common.h        |  3 +++
+>  .../ethernet/marvell/octeontx2/nic/otx2_pf.c   |  1 +
+>  .../ethernet/marvell/octeontx2/nic/otx2_txrx.c | 11 -----------
+>  .../ethernet/marvell/octeontx2/nic/otx2_vf.c   |  1 +
+>  5 files changed, 23 insertions(+), 11 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/d=
+rivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> index 02d0b707aea5..de61c69370be 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+> @@ -221,6 +221,24 @@ int otx2_set_mac_address(struct net_device *netdev, =
+void *p)
+>  }
+>  EXPORT_SYMBOL(otx2_set_mac_address);
+>
+> +netdev_features_t
+> +otx2_features_check(struct sk_buff *skb, struct net_device *dev,
+> +                   netdev_features_t features)
+> +{
+> +       /* Due to hw issue segment size less than 16 bytes
+> +        * are not supported. Hence do not offload such TSO
+> +        * segments.
+> +        */
+> +       if (skb_is_gso(skb) && skb_shinfo(skb)->gso_size < 16)
+> +               features &=3D ~NETIF_F_GSO_MASK;
+> +
+> +       if (skb_shinfo(skb)->nr_frags + 1 > OTX2_MAX_FRAGS_IN_SQE)
+> +               features &=3D ~NETIF_F_SG;
+> +
 
-Fixes: 86d7476078b8 ("octeontx2-pf: TCP segmentation offload support").
-Signed-off-by: Geetha sowjanya <gakula@marvell.com>
----
+This is a bit extreme. I would attempt to remove NETIF_F_GSO_MASK instead.
 
-v1-v2:
- - As suggested by Eric Dumazet used ndo_features_check().
- - Moved the max fargments support check to ndo_features_check.
+if (skb_is_gso(skb)) {
+     if (skb_shinfo(skb)->gso_size < 16 ||
+         skb_shinfo(skb)->nr_frags + 1 > OTX2_MAX_FRAGS_IN_SQE))
+           features &=3D ~NETIF_F_GSO_MASK;
+}
 
- .../marvell/octeontx2/nic/otx2_common.c        | 18 ++++++++++++++++++
- .../marvell/octeontx2/nic/otx2_common.h        |  3 +++
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c   |  1 +
- .../ethernet/marvell/octeontx2/nic/otx2_txrx.c | 11 -----------
- .../ethernet/marvell/octeontx2/nic/otx2_vf.c   |  1 +
- 5 files changed, 23 insertions(+), 11 deletions(-)
+This would very often end up with 1-MSS packets with fewer fragments.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 02d0b707aea5..de61c69370be 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -221,6 +221,24 @@ int otx2_set_mac_address(struct net_device *netdev, void *p)
- }
- EXPORT_SYMBOL(otx2_set_mac_address);
- 
-+netdev_features_t
-+otx2_features_check(struct sk_buff *skb, struct net_device *dev,
-+		    netdev_features_t features)
-+{
-+	/* Due to hw issue segment size less than 16 bytes
-+	 * are not supported. Hence do not offload such TSO
-+	 * segments.
-+	 */
-+	if (skb_is_gso(skb) && skb_shinfo(skb)->gso_size < 16)
-+		features &= ~NETIF_F_GSO_MASK;
-+
-+	if (skb_shinfo(skb)->nr_frags + 1 > OTX2_MAX_FRAGS_IN_SQE)
-+		features &= ~NETIF_F_SG;
-+
-+	return features;
-+}
-+EXPORT_SYMBOL(otx2_features_check);
-+
- int otx2_hw_set_mtu(struct otx2_nic *pfvf, int mtu)
+-> No copy involved, and no high order page allocations.
+
+> +       return features;
+> +}
+> +EXPORT_SYMBOL(otx2_features_check);
+> +
+>  int otx2_hw_set_mtu(struct otx2_nic *pfvf, int mtu)
+>  {
+>         struct nix_frs_cfg *req;
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/d=
+rivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+> index 06910307085e..6a4bf43bc77e 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+> @@ -961,6 +961,9 @@ void otx2_get_mac_from_af(struct net_device *netdev);
+>  void otx2_config_irq_coalescing(struct otx2_nic *pfvf, int qidx);
+>  int otx2_config_pause_frm(struct otx2_nic *pfvf);
+>  void otx2_setup_segmentation(struct otx2_nic *pfvf);
+> +netdev_features_t otx2_features_check(struct sk_buff *skb,
+> +                                     struct net_device *dev,
+> +                                     netdev_features_t features);
+>
+>  /* RVU block related APIs */
+>  int otx2_attach_npa_nix(struct otx2_nic *pfvf);
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drive=
+rs/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> index e5fe67e73865..2364eb8d6732 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> @@ -2737,6 +2737,7 @@ static const struct net_device_ops otx2_netdev_ops =
+=3D {
+>         .ndo_xdp_xmit           =3D otx2_xdp_xmit,
+>         .ndo_setup_tc           =3D otx2_setup_tc,
+>         .ndo_set_vf_trust       =3D otx2_ndo_set_vf_trust,
+> +       .ndo_features_check     =3D otx2_features_check,
+>  };
+>
+>  static int otx2_wq_init(struct otx2_nic *pf)
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/dri=
+vers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+> index f828d32737af..9b89aff42eb0 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+> @@ -1158,17 +1158,6 @@ bool otx2_sq_append_skb(struct net_device *netdev,=
+ struct otx2_snd_queue *sq,
+>
+>         num_segs =3D skb_shinfo(skb)->nr_frags + 1;
+>
+> -       /* If SKB doesn't fit in a single SQE, linearize it.
+> -        * TODO: Consider adding JUMP descriptor instead.
+> -        */
+> -       if (unlikely(num_segs > OTX2_MAX_FRAGS_IN_SQE)) {
+> -               if (__skb_linearize(skb)) {
+> -                       dev_kfree_skb_any(skb);
+> -                       return true;
+> -               }
+> -               num_segs =3D skb_shinfo(skb)->nr_frags + 1;
+> -       }
+
+Then you need to keep this check for  non GSO packets.
+
+One way to trigger this is to run netperf with tiny fragments.
+TCP is unable to cook GSO packets, because we hit MAX_SKB_FRAGS before
+even filling a single MSS.
+
+netperf -H $remote -t TCP_SENDFILE -- -m 10
+
+
+
+> -
+>         if (skb_shinfo(skb)->gso_size && !is_hw_tso_supported(pfvf, skb))=
  {
- 	struct nix_frs_cfg *req;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index 06910307085e..6a4bf43bc77e 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -961,6 +961,9 @@ void otx2_get_mac_from_af(struct net_device *netdev);
- void otx2_config_irq_coalescing(struct otx2_nic *pfvf, int qidx);
- int otx2_config_pause_frm(struct otx2_nic *pfvf);
- void otx2_setup_segmentation(struct otx2_nic *pfvf);
-+netdev_features_t otx2_features_check(struct sk_buff *skb,
-+				      struct net_device *dev,
-+				      netdev_features_t features);
- 
- /* RVU block related APIs */
- int otx2_attach_npa_nix(struct otx2_nic *pfvf);
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-index e5fe67e73865..2364eb8d6732 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-@@ -2737,6 +2737,7 @@ static const struct net_device_ops otx2_netdev_ops = {
- 	.ndo_xdp_xmit           = otx2_xdp_xmit,
- 	.ndo_setup_tc		= otx2_setup_tc,
- 	.ndo_set_vf_trust	= otx2_ndo_set_vf_trust,
-+	.ndo_features_check	= otx2_features_check,
- };
- 
- static int otx2_wq_init(struct otx2_nic *pf)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-index f828d32737af..9b89aff42eb0 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-@@ -1158,17 +1158,6 @@ bool otx2_sq_append_skb(struct net_device *netdev, struct otx2_snd_queue *sq,
- 
- 	num_segs = skb_shinfo(skb)->nr_frags + 1;
- 
--	/* If SKB doesn't fit in a single SQE, linearize it.
--	 * TODO: Consider adding JUMP descriptor instead.
--	 */
--	if (unlikely(num_segs > OTX2_MAX_FRAGS_IN_SQE)) {
--		if (__skb_linearize(skb)) {
--			dev_kfree_skb_any(skb);
--			return true;
--		}
--		num_segs = skb_shinfo(skb)->nr_frags + 1;
--	}
--
- 	if (skb_shinfo(skb)->gso_size && !is_hw_tso_supported(pfvf, skb)) {
- 		/* Insert vlan tag before giving pkt to tso */
- 		if (skb_vlan_tag_present(skb))
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-index 35e06048356f..04aab04e4ba2 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
-@@ -483,6 +483,7 @@ static const struct net_device_ops otx2vf_netdev_ops = {
- 	.ndo_tx_timeout = otx2_tx_timeout,
- 	.ndo_eth_ioctl	= otx2_ioctl,
- 	.ndo_setup_tc = otx2_setup_tc,
-+	.ndo_features_check	= otx2_features_check,
- };
- 
- static int otx2_wq_init(struct otx2_nic *vf)
--- 
-2.25.1
-
+>                 /* Insert vlan tag before giving pkt to tso */
+>                 if (skb_vlan_tag_present(skb))
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c b/drive=
+rs/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+> index 35e06048356f..04aab04e4ba2 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+> @@ -483,6 +483,7 @@ static const struct net_device_ops otx2vf_netdev_ops =
+=3D {
+>         .ndo_tx_timeout =3D otx2_tx_timeout,
+>         .ndo_eth_ioctl  =3D otx2_ioctl,
+>         .ndo_setup_tc =3D otx2_setup_tc,
+> +       .ndo_features_check     =3D otx2_features_check,
+>  };
+>
+>  static int otx2_wq_init(struct otx2_nic *vf)
+> --
+> 2.25.1
+>
 
