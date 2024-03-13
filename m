@@ -1,470 +1,434 @@
-Return-Path: <netdev+bounces-79725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66A5287B011
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 19:42:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F69D87B066
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 19:53:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D135285B57
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 18:42:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B9ED1F2A9E8
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 18:53:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7321612BEA1;
-	Wed, 13 Mar 2024 17:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A293913AA57;
+	Wed, 13 Mar 2024 17:51:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JnvVy/G3"
+	dkim=pass (2048-bit key) header.d=opensynergy.com header.i=@opensynergy.com header.b="pBm/Pqcy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from refb02.tmes.trendmicro.eu (refb02.tmes.trendmicro.eu [18.185.115.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B946340D;
-	Wed, 13 Mar 2024 17:34:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710351246; cv=none; b=tuOjRCGKsUiUVyW6gWnfuNIoa+amfmIcEIeng2q+YzLJckAeshi2yQvQ2ZG1yVJz4gn090QhkCtXuCvjfbS35GmHJ+9ZQDCujVRY0o+d3D4Nx0ylKZfkb8homv1LJvlsvh11PwkxpwetVDsisxmNH1hLRsDaOkWli8EYWgnlKwA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710351246; c=relaxed/simple;
-	bh=9NL1iZe2rciwfl3izliToDB8kw9Da33sdvbnGahTlhs=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=FZt2mXL/BRbJoqXHwhlQnLW5UxST5pS2YK0jg0OFAImfGQcz+6a8uAtkGphl+UVMc+VvAtNwr+ivKwiPrGx3YwjTG4PHpcCNoGK4l6V5DxO69+mTKj9MVm4CVxaRL/a5mwPbwP5czpR0jelxy0DPfNA6syEcUIBAnWICnEz01VU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JnvVy/G3; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710351244; x=1741887244;
-  h=date:from:to:cc:subject:message-id;
-  bh=9NL1iZe2rciwfl3izliToDB8kw9Da33sdvbnGahTlhs=;
-  b=JnvVy/G3wzl6dAVbG+WZY7cJ9Cv6jkn0VWA2xTfvQ6vU4wm+SWf2K/+4
-   BZ7/kTbOkbcKotySVYHPWKk2PCUwTK17HDl2LRadnY20Tcn0UBO3QZiUF
-   Dh97wPlTuo9sH28M9MaJr0qkchfvSZjEzX1n3AuBfDff0nc5CopqrvDxC
-   qMcH6AmVzjEXzTx16D4OG2R6QgPskwa3WWDaCk9i+ixy6MKqD9zCP+D5w
-   EQQ/V3TK3uiKGXdI4s57ugzKQThNG/H1GYWDszWnAqf8ywVctvMBJVE+8
-   /WcG9WNoBCMoukSO025qjea4LyQsfRc8zSFs037OLE0aQpxgSMmqV5Q36
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11012"; a="15772779"
-X-IronPort-AV: E=Sophos;i="6.07,123,1708416000"; 
-   d="scan'208";a="15772779"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2024 10:34:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,123,1708416000"; 
-   d="scan'208";a="35132772"
-Received: from lkp-server01.sh.intel.com (HELO b21307750695) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 13 Mar 2024 10:33:57 -0700
-Received: from kbuild by b21307750695 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rkSUF-000Ccl-0z;
-	Wed, 13 Mar 2024 17:33:55 +0000
-Date: Thu, 14 Mar 2024 01:33:26 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Linux Memory Management List <linux-mm@kvack.org>,
- bpf@vger.kernel.org, devicetree@vger.kernel.org,
- intel-gfx@lists.freedesktop.org, intel-xe@lists.freedesktop.org,
- io-uring@vger.kernel.org, linux-fsdevel@vger.kernel.org,
- linux-mtd@lists.infradead.org, linux-omap@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org, speakup@linux-speakup.org
-Subject: [linux-next:master] BUILD REGRESSION
- dad309222e4c3fc7f88b20ce725ce1e0eea07cc7
-Message-ID: <202403140118.SIPOZHQD-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3744313AA51
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 17:51:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=18.185.115.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710352270; cv=fail; b=HvgSzPSSpnjWECPJgYIxtxL01Cs27u7dKynDWgBgXQfHZDLr4WiE8xQLdZOk2JJ3qc9HjHsy/BXbbGfitaHBIlQago2qbvOmt9repOa/RbNZf++CsANIt+4Bg7RdVkiXhZgJ+yq+iwf1twKsu9mJT2ilAJQpZnLL1rkQePqpc2U=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710352270; c=relaxed/simple;
+	bh=ZmtBXCbxSA2HR9TCOs6O5zv2YO9vzQckVX06YVDbUFw=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=m/5uUkZfU0a7ON5O4yAt7Yf9nsM07pIZnJowa9vJ9rXtbIgfRVeRmyZDaJrTfLQLVHRFQEvFI0qedV0siGS4eIRp/U876N+ZPvdLtbzC4O0dK6IV71Wj5GwL/9MJYXqOXMppggHSscvQV/gnrWoEzVXFRV6Zo9IWMulhDr2xu84=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=opensynergy.com; spf=pass smtp.mailfrom=opensynergy.com; dkim=pass (2048-bit key) header.d=opensynergy.com header.i=@opensynergy.com header.b=pBm/Pqcy; arc=fail smtp.client-ip=18.185.115.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=opensynergy.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=opensynergy.com
+Received: from 104.47.7.168_.trendmicro.com (unknown [172.21.10.202])
+	by refb02.tmes.trendmicro.eu (Postfix) with ESMTPS id 4F454102350C0
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 17:51:01 +0000 (UTC)
+Received: from 104.47.7.168_.trendmicro.com (unknown [172.21.192.213])
+	by repost01.tmes.trendmicro.eu (Postfix) with SMTP id 06F3E10001747;
+	Wed, 13 Mar 2024 17:50:54 +0000 (UTC)
+X-TM-MAIL-RECEIVED-TIME: 1710352252.968000
+X-TM-MAIL-UUID: eed62366-b5fa-494c-aaa6-904b944f62ea
+Received: from DEU01-BE0-obe.outbound.protection.outlook.com (unknown [104.47.7.168])
+	by repre01.tmes.trendmicro.eu (Trend Micro Email Security) with ESMTPS id EC7BF1000031E;
+	Wed, 13 Mar 2024 17:50:52 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=L1U4GWXpBEC2J3+O2TNt4Z5+5ifC4r8zFcC+0QMGaIbgYN1thRF7OE9ur6dBQv/nwEBZcanGi9GoJq7GeFFj9kH7la4A4bK30Y9MbdRG2r25WZxA2oVbwHVWODHfJEqY8PRA6AQkuL8IMcf3tiTjRggImbt7tUKKvUS+U7iTMc4Yz+4KvXN7jh42B8CnCxE4f9FbMa3XsiRI7fuLNGZLB+YQu7lH8jogyBOtzveCRbtMOz8p65TgBU9wBmwNRjDlK85e3VcqADhZMIx+AJIncwCv+xrXyA19r4yzPVnUerXF7oVd4gFffD/HNeD0MllnzvFyMomm3Xty67IAyigTaQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ifdM/0oIYQVfbDthqXCUBrcS22xbKb0sssMaBkslkOc=;
+ b=lE2c1HTHEinxNPozX8tSPzO7zF1Z5t91VdpOLF7CZFdiPNcq1agDu5k1Las6zA8cF9ypSse4uGd7phb6/Oq5BzxgobPFX8CIspCCc7BUrvDpi1nFboCswNU1gQ/U+IrwcIR0WsglAN3YuzOeBJEHZUgXmfeZLAzEjvKe67EresVT0X2IaHte3VwAa4gvhGWxy0pLU8eOoGdQW2NaOoKC1ZojIFgsOu0qF8x9W/Fw39KgZ5Tm6rIYZy9sETQaiZQVE0OJsu514/wuT35io4Jo1Yrid6jMyLlZo4rjxOONotkadrilRJPoRi4ZyLX11Pm2jPEE3+h7EOeHW/nB6hGVcg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=opensynergy.com; dmarc=pass action=none
+ header.from=opensynergy.com; dkim=pass header.d=opensynergy.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=opensynergy.com;
+Message-ID: <60607bcc-93c5-4a6f-832d-ea4dbd81178e@opensynergy.com>
+Date: Wed, 13 Mar 2024 18:50:48 +0100
+Subject: Re: [RFC PATCH v3 0/7] Add virtio_rtc module and related changes
+Content-Language: en-US
+To: David Woodhouse <dwmw2@infradead.org>, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, virtio-dev@lists.oasis-open.org,
+ linux-arm-kernel@lists.infradead.org, linux-rtc@vger.kernel.org,
+ "virtio-comment@lists.oasis-open.org" <virtio-comment@lists.oasis-open.org>
+Cc: "Christopher S. Hall" <christopher.s.hall@intel.com>,
+ Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+ Richard Cochran <richardcochran@gmail.com>, Stephen Boyd <sboyd@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Marc Zyngier <maz@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Alessandro Zummo <a.zummo@towertech.it>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ "Ridoux, Julien" <ridouxj@amazon.com>
+References: <20231218073849.35294-1-peter.hilber@opensynergy.com>
+ <0e21e3e2be26acd70b5575b9932b3a911c9fe721.camel@infradead.org>
+ <204c6339-e80d-4a98-8d07-a11eeb729497@opensynergy.com>
+ <667c8d944ce9ea5c570b82b1858a70cc67b2f3e4.camel@infradead.org>
+ <f6940954-334a-458b-af32-f03d8efbe607@opensynergy.com>
+ <57704b2658e643fce30468dffd8c1477607f59fb.camel@infradead.org>
+ <d796d9a5-8eda-4528-a6d8-1c4eba24aa1e@opensynergy.com>
+ <47bf0757de3268c420d2cd3bbffaf5897b67b661.camel@infradead.org>
+From: Peter Hilber <peter.hilber@opensynergy.com>
+Autocrypt: addr=peter.hilber@opensynergy.com; keydata=
+ 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
+In-Reply-To: <47bf0757de3268c420d2cd3bbffaf5897b67b661.camel@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BE1P281CA0198.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:89::6) To BEZP281MB3267.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:b10:77::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BEZP281MB3267:EE_|FR5P281MB4033:EE_
+X-MS-Office365-Filtering-Correlation-Id: 986d1bb2-03d4-41cb-eb43-08dc43861f8f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	n2HcWXxn7fx9rU4UI+o0FW84oQZ8sDWaY/U+EfzJu2I0z9+P51/6+TPI8Fl4GixHV2YA4WVtghCYxLdhcIVj4K+FKpBoAOjH8jHFsfTdhyNMSt2cbGHk3bdOHRf9JWNrN8oS1q6w4c9Cuo6OgIEdM+1CC6jciuqQB78P27txVTxUc4m52FGMQbWR/eU1g7644eCwbkIOF9LAhc09Z/mWuyOUIpJ/zkS2OYkjlFkMq0Zm60W/Y6TJYzAOPH23Yk+TjMG6T5xdh1mLjTPSOXo0lk7AhrKkN/Do4h+W/wLFwZDfqA98gm83QDzvJYLFEpEj0o9hVv7e0KMeGHIna9Pa8S0EjKOdDY4uV/KIC+2zTOsc31OZ4N4lkVNiTGUgNFWTvK/brzs1QIdMX3f9yLAJFFQ2CNye3EEGrNnoI+GnSOmf08KBrf3+Wi5CLiLHhR+7Q2AWN2RJn8svsZyOE5EAQIg99a74CFDE3IYSCwoe3yy3ySPUmhFDEiFDKEctYwpqkS4S8H+5mWwhPPD6mMfldcDZ9o+NFLKhKvprQ1d7hgvsgow1vdMFWE7SGSYL6+hRTr5dD+lFLpwfidCIT4fI/Rq8XIi6Cm/M5Ntq5yvnFRM=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BEZP281MB3267.DEUP281.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230031)(376005)(7416005)(1800799015);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ejlSQ2ZnalF0aDB4cmNjREdmY3NwcUpKL2hxRHVHczcrSFF4UkhZdWxLL2M1?=
+ =?utf-8?B?QmpMbnlEOXlsNEZIb0E5cFZkU0JuTFZreFBWV2FqTTNiNDJyTFAxQTBTYnNr?=
+ =?utf-8?B?ZlJOcU1WSisvUnpCUmZJSDE0MHdKc3NEMzdwY3VEUjJ2WXZjQzgvb2YreWRq?=
+ =?utf-8?B?L04ybWhjNit0dEVXd1ZBMHlBK2h2bXNPcVRaWDdpUkVnVGJ6LzVVYlBWVitB?=
+ =?utf-8?B?amJEOU8rUFJZRTEwWmh4REtOYkcwMXlGcnAvYUR6TEt6VG5tZFFlN1U2WVdM?=
+ =?utf-8?B?QnkxaVVqc0J1VTJWQ0xCTFk3eTFOVDBSRVNwMUVwZlZXbDRJcnRPT3BPZUdP?=
+ =?utf-8?B?RzVJc0xzanQzWU85WlZjTy9kamR3c0dOTVg0VUdWTmtKcWg0M0JwUFJkQjhw?=
+ =?utf-8?B?RVNhSTMrYkU0RUdmMEtCZkQyRlZhbFI0dmNQRXFpVmVKQmhwUk1yc0doZEVL?=
+ =?utf-8?B?TzFaMitqekVTY3VwNUNQLzVHeFZuUDdJeDE4K2V6WnZvT2dpWjN0cVduZkRD?=
+ =?utf-8?B?ZEJPZ0Y2WW0yNHJZS1BWWUN4MmQ1RFJjZ0NKbS9ncFc1TGN1REIrQVkzMldE?=
+ =?utf-8?B?M0FjUFdjaFhMWjByWFZBcFpxdGxDYzlDZTc3OFBPZ1NzZzFFZGpYS0JCdE82?=
+ =?utf-8?B?M0ZzOHo3Q1Jyb0VzcnI0Z085ZEpHUnhjYnQxT2hKbjVpaFl0a1YzV3hFMC8x?=
+ =?utf-8?B?TFoyRHVZbXhRd0ZUTWtmYTdwMG9NWGJ4Q1R2K2twQTJlVlVwNG5xS0tiT0tD?=
+ =?utf-8?B?QVJ0b21xNTZ6QTFFQkNDdWtiOEh1Y3grSmFSUEhuOU1wTW5kOFpLOWJWeWtp?=
+ =?utf-8?B?N0NEWmVwMHlkU0tjOEd1djVJM2JaTWNtb3FFM1VyVkJYbFZoaGZmQ2VnOWp5?=
+ =?utf-8?B?cGdpb1dsaVVxem5oeWptS2NZRlJFUXU1bU9CWjBuWldaM2hkUkZISXdBYXFP?=
+ =?utf-8?B?WnQ1SUdKYWJ0VDBqVVJSVUMreTRlS285UkRYQnl0dXFSUERvVVIweldEajhy?=
+ =?utf-8?B?OGZtU2FNRHhwbzVxalNnUWJmN3VNa2tVbHdaeW05ZFhGM1I3QU55ZW5DQ3A3?=
+ =?utf-8?B?eXlsWUYya05GNDFxT0QzNlBNV3dSZmYwcGdFNWFSNDV3cnljcUltc2tKZ045?=
+ =?utf-8?B?T0NVTnE0bEJOOFJGandQRkZ6cW4zRHVvUGNXQXF6cEM1ZjVlQ3J4ZUhFWDJS?=
+ =?utf-8?B?WlhJaGFtSVZGcURrZ2JRY1BsMXFYcUY5cDNHMVNRNzhhY1JvMXEyTm01WitV?=
+ =?utf-8?B?VHc0elI2bU1mOFFnT3FPRWFYVlp1SFJhL1pnTWw3KzJjbktHTHdBcnJOMXdZ?=
+ =?utf-8?B?RzN5L1B0OW1zczhsWWRpWmJ4dVhrVjVSY2hmVmFDK01HdnhaQm1YNzhKTXJL?=
+ =?utf-8?B?S3lyUVdWUDg4dUl4OFpaWWVVMm1WUkl6bTBUaC80MlluZWNkejBCd2xCdnZx?=
+ =?utf-8?B?T0s5WFBCVnJkMit0cURFc0YxUmZUMVZDWCt0VTk5RFBwdkI3VTk4Vmp3N1I5?=
+ =?utf-8?B?U3Facnd6ODgrU241L1NjTlgwUm01OFRWQ0QvWG9GRUNIMXk0YWVmeU95MEtl?=
+ =?utf-8?B?RThPbGtqRGRPdXN4TTdXUVQ1UFhSUFgwR1Q0WnlNeTV6aytsU0R1U08vV2lY?=
+ =?utf-8?B?TGFSK2tBemdtNmFvemYxZXBYMnFQS0dQNWcySUx5eHRjNUJ6eUhEcW9HYUhl?=
+ =?utf-8?B?RkRUVVduTmdKWWpneC8ydjV3ZmtzbWhQcFM0TFM2YW9QR2FjWk8rb0VvdUFX?=
+ =?utf-8?B?UGxGZGxVSlNhV2RFNjc1Yzk0NXh5YUVwOFBMNm9HYUJwUXpQS3lHZW1sMzFP?=
+ =?utf-8?B?Zlp5NFQ2SWtvZGkyWllCRUxmQTVnS25MYkdMQW1kd0tkNmFoQ3UwVjNUWi9i?=
+ =?utf-8?B?WTZXbHI0cjhHaUE5ZFpqNGE3NGluZVd2RlFHcWdyOFd2OUNMZktJaVdkVW1D?=
+ =?utf-8?B?WFNPbnNLL1hBSFNVWTZvMHdtYmptR05hcEFlck5tclBDQUhkRElUM2ZqTEVy?=
+ =?utf-8?B?Y3V5TzhMZzVUZE8rRmxJbTlBdktXa1IxTGtjUVR1S3dMZUdxaG5UbENKSDg5?=
+ =?utf-8?B?WklsK2VXalhNaXVOSmRVU0YwcFhkQlVvbWwrb05tUGJUQ1dpdWdtczl5eERh?=
+ =?utf-8?B?RkRzT3pVaFFYMmllZVBuaFVmT2JGYzFmSE1HWUU0UUZwcFk3anRFbjl1akpH?=
+ =?utf-8?Q?808cJAhwz+G8bnVfNQvEHo0xiBnBLQVavKimwhguVEQb?=
+X-OriginatorOrg: opensynergy.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 986d1bb2-03d4-41cb-eb43-08dc43861f8f
+X-MS-Exchange-CrossTenant-AuthSource: BEZP281MB3267.DEUP281.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 13 Mar 2024 17:50:51.5206
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 800fae25-9b1b-4edc-993d-c939c4e84a64
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jmKeOnrrb2C9Tlxxav8MX4jKclBNYURJcwdGO67ioRxavs3OCLHVSASSCK6zdDltnH5YZFW+PZd1WycCuNdRiA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: FR5P281MB4033
+X-TM-AS-ERS: 104.47.7.168-0.0.0.0
+X-TMASE-Version: StarCloud-1.3-9.1.1015-28250.001
+X-TMASE-Result: 10--36.231900-4.000000
+X-TMASE-MatchedRID: jFqw+1pFnMz5ETspAEX/ngw4DIWv1jSVpolXqDXvwwrQXKc7SWQXhV5O
+	0ZcKtJ+3ZwtVhsMoo+es13uOHE2/TJ+6mDgGLOel6x+Q+uPsJqqJnltxZVUTwMhgx7IMKlK+A57
+	5Fgb9o5XCGBTHaIx6t1MoTp7f0vYrSdh0GhWtPnkQ9JMcGBx+/lIzqo1F8yQSZ/Fsy/Dmu1OLOr
+	/4qeMXbkMOBMsSXDvuDLK81XvTJQNrDuWoylbl+ro2KXQsvVZSH4dNxokwGCrPxctgaqKz4SFFg
+	1hSC6gbHjM937hQG5syrPZ1IMi52Om0aBkKFibTXAeS+w5YgSWTR6juYHRwGYvXantxmoFYjIMg
+	84C3nGPdUhbreRF2wMmWCN8o9r3PFiY4JxbOOO+gbRFHRBZMHlt0YEdszvuKOoV8iQCgGXwPmg0
+	2aADwvwosa9tvll+RGtu2AyLNVwfXYXKnv16lizqPTEE7CIv/VxlZxoe7dBaF5sLHIpSs1+7AmV
+	tWDTd41K/luJYJ4Wc3bl+lYKOWM6BigdDViTQPsX4aFYAMIYOVmuhG06IIbSGQvSAIyHoOzcBB0
+	bEuwyoFzfm6JG46yVnsY8qqXwUliRz4gknBIqBY1D+2ejl29Bnz+kO152KHtP+boK6EYrH0j0Hw
+	Tz6xs8g564WfrYNxUsPcexNest7SYCEMZZUxHYO2sppVKEGOROuHdMXD18V711la2x2QybD8lcJ
+	8FcxM9wErSH35F0aLXecWa0NBz49PSu81svLw0RneM2u5ms+Q5+XNR1q3on8vya8oLBt91H4sQE
+	OG1IAf51Geh2ygkcnIJXNwrshOojFeM1oohOlCPQBD3xA/3aryV/2jRq/XEgg3cwDHl/1O85Jco
+	T0w/W9dYCMo3/8LM/fFuVUUdhuiWLhmiI4dP+k/y0w7JiZo
+X-TMASE-XGENCLOUD: 430dd9bf-1681-4885-bfaf-322ef8bec8b2-0-0-200-0
+X-TM-Deliver-Signature: 4F7F338E99FF07BA4B398EDE53F5D6B1
+X-TM-Addin-Auth: 9MwyxFgWo4JG53yoC2lPFuwIspZcsMzf2kPMdqRALTTuhyL5ggEAT0H+GSJ
+	lSKpTu6SyZlTpcAZMNLeh8BJia3mQcNCChMB8RMggLQh2VuRVGzihEcVJeTLUZRW04O+zFaevzv
+	cAe9k3cG+tVBxHsOII2JSqZSfUgvSHvCqwtA5pw8ARkLYv4W8V8cU+od7Ss5ZNtJ1azuiz+F5/L
+	YBgh8D8ikr8+xaK+M38rnvvCWcPzFztvIPDyW9TXRJKfsx6OoNMm/THeYAQiG8TKPyThOwl/+7Q
+	42+cegLB1b+KQIA=.L3XLOOqvH4eDo74Dd5JLvYgIKucO3s9g2O5BaoAQCEKQWN7ciQQuKU10r8
+	vhBIvKULRzgfd7OVgqwTRq8JSdNPvVACwDTyvryRoUvrA0rbPkXi9qGPmFLlqb3dI7vVOgjP+7d
+	g39BrWeZLIkdFpQAcQObFeXmH6AvVwF5I0/r2AuTXL4QC2rNNACH4FHWToOg7KzCE/r3fxlLKHW
+	fHBqizDnfPC1USNgBiKnFKCp0glR42pIxvsmcuhPKhwGvc8XYlEYoQ5PIKeF99/P/61ot4cHvru
+	hFj9qtfP2r1Pl0TGTmv6I73D+KfV9x8f0CmSWchozO0Ln0WS/LJWNzHdDqQ==
+X-TM-Addin-ProductCode: EMS
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=opensynergy.com;
+	s=TM-DKIM-20210503141657; t=1710352253;
+	bh=ZmtBXCbxSA2HR9TCOs6O5zv2YO9vzQckVX06YVDbUFw=; l=9364;
+	h=Date:To:From;
+	b=pBm/PqcyvWpPXKrqOCgTpLXz0HEuGsiqsYlRQ7eDAGetT22RngDIhOp3myPBUgBPK
+	 jECicVya+CGueWzUFs9go4Nk7knC8aafTrSh1aS9eLdLyamFMhP5V5TSQbYDvBfTur
+	 BHb4NQqNB64qlSPMovyHgf9qhuPl5XCwY9ABCK5snHGtp3/bEFpsuCVfqGxiyGzke3
+	 hvmBsnxGqZGJF2gOn6PPXOe1Bi4aWUY+3h3gs74rxCfczZj66aGfp+JIj4ptGJRFLX
+	 qPNup9x9b6o3ylYThaf/8mavIS6NEChmDJ+TFpUIAT+yOXofBNO+5HNXwx8fEu7Flc
+	 3pyWJuoXjjGmg==
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: dad309222e4c3fc7f88b20ce725ce1e0eea07cc7  Add linux-next specific files for 20240313
+On 13.03.24 13:45, David Woodhouse wrote:
+> On Wed, 2024-03-13 at 10:45 +0100, Peter Hilber wrote:
+>> On 12.03.24 18:15, David Woodhouse wrote:
+>>> On Mon, 2024-03-11 at 19:24 +0100, Peter Hilber wrote:
+>>>> On 08.03.24 13:33, David Woodhouse wrote:
+>>>>> On Fri, 2024-03-08 at 11:32 +0100, Peter Hilber wrote:
+>>>>>> On 07.03.24 15:02, David Woodhouse wrote:
+>>>>>>> Hm, should we allow UTC? If you tell me the time in UTC, then
+>>>>>>> (sometimes) I still don't actually know what the time is, because some
+>>>>>>> UTC seconds occur twice. UTC only makes sense if you provide the TAI
+>>>>>>> offset, surely? Should the virtio_rtc specification make it mandatory
+>>>>>>> to provide such?
+>>>>>>>
+>>>>>>> Otherwise you're just designing it to allow crappy hypervisors to
+>>>>>>> expose incomplete information.
+>>>>>>>
+>>>>>>
+>>>>>> Hi David,
+>>>>>>
+>>>>>> (adding virtio-comment@lists.oasis-open.org for spec discussion),
+>>>>>>
+>>>>>> thank you for your insightful comments. I think I take a broadly similar
+>>>>>> view. The reason why the current spec and driver is like this is that I
+>>>>>> took a pragmatic approach at first and only included features which work
+>>>>>> out-of-the-box for the current Linux ecosystem.
+>>>>>>
+>>>>>> The current virtio_rtc features work similar to ptp_kvm, and therefore
+>>>>>> can work out-of-the-box with time sync daemons such as chrony.
+>>>>>>
+>>>>>> As of RFC spec v3, UTC clock only is allowed. If mandating a TAI clock
+>>>>>> as well, I am afraid that
+>>>>>>
+>>>>>> - in some (embedded) scenarios, the TAI clock may not be available
+>>>>>>
+>>>>>> - crappy hypervisors will pass off the UTC clock as the TAI clock.
+>>>>>>
+>>>>>> For the same reasons, I am also not sure about adding a *mandatory* TAI
+>>>>>> offset to each readout. I don't know user-space software which would
+>>>>>> leverage this already (at least not through the PTP clock interface).
+>>>>>> And why would such software not go straight for the TAI clock instead?
+>>>>>>
+>>>>>> How about adding a requirement to the spec that the virtio-rtc device
+>>>>>> SHOULD expose the TAI clock whenever it is available - would this
+>>>>>> address your concerns?
+>>>>>
+>>>>> I think that would be too easy for implementors to miss, or decide not
+>>>>> to obey. Or to get *wrong*, by exposing a TAI clock but actually
+>>>>> putting UTC in it.
+>>>>>
+>>>>> I think I prefer to mandate the tai_offset field with the UTC clock.
+>>>>> Crappy implementations will just set it to zero, but at least that
+>>>>> gives a clear signal to the guests that it's *their* problem to
+>>>>> resolve.
+>>>>
+>>>> To me there are some open questions regarding how this would work. Is there
+>>>> a use case for this with the v3 clock reading methods, or would it be
+>>>> enough to address this with the Virtio timekeeper?
+>>>>
+>>>> Looking at clock_adjtime(2), the tai_offset could be exposed, but probably
+>>>> best alongside some additional information about leap seconds. I am not
+>>>> aware about any user-space user. In addition, leap second smearing should
+>>>> also be addressed.
+>>>>
+>>>
+>>> Is there even a standard yet for leap-smearing? Will it be linear over
+>>> 1000 seconds like UTC-SLS? Or semi-raised-cosine over 24 hours, which I
+>>> think is what Google does? Meta does something different again, don't
+>>> they?
+>>>
+>>> Exposing UTC as the only clock reference is bad enough; when leap
+>>> seconds happen there's a whole second during which you don't *know*
+>>> which second it is. It seems odd to me, for a precision clock to be
+>>> deliberately ambiguous about what the time is!
+>>
+>> Just to be clear, the device can perfectly expose only a TAI reference
+>> clock (or both UTC and TAI), the spec is just completely open about this,
+>> as it tries to work for diverse use cases.
+> 
+> As long as the guest *knows* what it's getting, sure.
+> 
+>>>
+>>> But if the virtio-rtc clock is defined as UTC and then expose something
+>>> *different* in it, that's even worse. You potentially end up providing
+>>> inaccurate time for a whole *day* leading up to the leap second.
+>>>
+>>> I think you're right that leap second smearing should be addressed. At
+>>> the very least, by making it clear that the virtio-rtc clock which
+>>> advertises UTC shall be used *only* for UTC, never UTC-SLS or any other
+>>> yet-to-be-defined variant.
+>>>
+>>
+>> Agreed.
+>>
+>>> Please make it explicit that any hypervisor which wants to advertise a
+>>> smeared clock shall define a new type which specifies the precise
+>>> smearing algorithm and cannot be conflated with the one you're defining
+>>> here.
+>>>
+>>
+>> I will add a requirement that the UTC clock can never have smeared/smoothed
+>> leap seconds.
+> 
+> Thanks.
+> 
+>> I think that not every vendor would bother to first add a definition of a
+>> smearing algorithm. Also, I think in some cases knowing the precise
+>> smearing algorithm might not be important (when having the same time as the
+>> hypervisor is enough and accuracy w.r.t. actual time is less important).
+>>
+>> So maybe I should add a VIRTIO_RTC_CLOCK_UTC_SMEARED clock type, which for
+>> now could catch every UTC-like clock which smears/smoothes leap seconds,
+>> where the vendor cannot be bothered to add the smearing algorithm to spec
+>> and implementations.
+> 
+> Please $DEITY no.
+> 
+> Surely the whole point of this effort is to provide guests with precise
+> and *unambiguous* knowledge of what the time is? 
 
-Error/Warning reports:
+I would say, a fundamental point of this effort is to enable such
+implementations, and to detect if a device is promising to support this.
 
-https://lore.kernel.org/oe-kbuild-all/202403131859.SZdCjzFY-lkp@intel.com
+Where we might differ is as to whether the Virtio clock *for every
+implementation* has to be *continuously* accurate w.r.t. a time standard,
+or whether *for some implementations* it could be enough that all guests in
+the local system have the same, precise local notion of time, which might
+be off from the actual time standard.
 
-Error/Warning: (recently discovered and may have been fixed)
+Also, cf. ptp_kvm, which AFAIU doesn't address leap seconds at all...
 
-ERROR: modpost: "__aeabi_uldivmod" [drivers/gpu/drm/sun4i/sun4i-drm-hdmi.ko] undefined!
-drivers/gpu/drm/xe/xe_hw_engine_class_sysfs.c:574:33: error: unused function 'pdev_to_xe_device' [-Werror,-Wunused-function]
-drivers/gpu/drm/xe/xe_hw_engine_class_sysfs.c:579:33: error: unused function 'to_xe_device' [-Werror,-Wunused-function]
-include/linux/of.h:946:(.text+0x2be): undefined reference to `__udivdi3'
-ld.lld: error: undefined symbol: __aeabi_uldivmod
-powerpc-linux-ld: warning: orphan section `.bss..Lubsan_data772' from `kernel/ptrace.o' being placed in section `.bss..Lubsan_data772'
+With your described use case the UTC_SMEARED clock should of course not be
+used. The UTC_SMEARED clock would get a distinct name through udev, like
+/dev/ptp_virtio_utc_smeared, so the incompatibility could at least be
+detected.
 
-Unverified Error/Warning (likely false positive, please contact us if interested):
+> 
+> Using UTC is bad enough, because for a UTC timestamp in the middle of a
+> leap second the guest can't know know *which* occurrence of that leap
+> second it is, so it might be wrong by a second. To resolve that
+> ambiguity needs a leap indicator and/or tai_offset field.
 
-drivers/accessibility/speakup/devsynth.c:110:1: error: label at end of compound statement
+I agree that virtio-rtc should communicate this. The question is, what
+exactly, and for which clock read request?
 
-Error/Warning ids grouped by kconfigs:
+As for PTP clocks:
 
-gcc_recent_errors
-|-- alpha-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arc-allmodconfig
-|   |-- drivers-gpu-drm-i915-display-intel_bios.c:error:implicit-declaration-of-function-intel_opregion_vbt_present
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arc-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arc-randconfig-002-20240313
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arm-allmodconfig
-|   |-- arch-arm-mach-omap2-prm33xx.c:warning:expecting-prototype-for-am33xx_prm_global_warm_sw_reset().-Prototype-was-for-am33xx_prm_global_sw_reset()-instead
-|   |-- drivers-gpu-drm-i915-display-intel_bios.c:error:implicit-declaration-of-function-intel_opregion_vbt_present
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arm-allyesconfig
-|   |-- arch-arm-mach-omap2-prm33xx.c:warning:expecting-prototype-for-am33xx_prm_global_warm_sw_reset().-Prototype-was-for-am33xx_prm_global_sw_reset()-instead
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arm64-defconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- csky-allmodconfig
-|   |-- drivers-gpu-drm-i915-display-intel_bios.c:error:implicit-declaration-of-function-intel_opregion_vbt_present
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- csky-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- csky-randconfig-001-20240313
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- csky-randconfig-r122-20240313
-|   `-- io_uring-io_uring.c:sparse:sparse:cast-to-restricted-io_req_flags_t
-|-- i386-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- i386-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- i386-buildonly-randconfig-006-20240313
-|   `-- drivers-gpu-drm-i915-display-intel_bios.c:error:implicit-declaration-of-function-intel_opregion_vbt_present
-|-- i386-randconfig-141-20240313
-|   |-- drivers-mtd-devices-mchp48l640.c-mchp48l640_read_page()-warn:Please-consider-using-kzalloc-instead-of-kmalloc
-|   |-- drivers-mtd-devices-mchp48l640.c-mchp48l640_write_page()-warn:Please-consider-using-kzalloc-instead-of-kmalloc
-|   |-- drivers-usb-dwc2-hcd.c-dwc2_alloc_split_dma_aligned_buf()-warn:Please-consider-using-kmem_cache_zalloc-instead-of-kmem_cache_alloc
-|   |-- drivers-usb-typec-tcpm-tcpm.c-tcpm_pd_svdm()-error:uninitialized-symbol-modep_prime-.
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- loongarch-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- loongarch-defconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- m68k-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- m68k-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- microblaze-allmodconfig
-|   |-- drivers-gpu-drm-i915-display-intel_bios.c:error:implicit-declaration-of-function-intel_opregion_vbt_present
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- microblaze-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- mips-allyesconfig
-|   |-- (.ref.text):relocation-truncated-to-fit:R_MIPS_26-against-start_secondary
-|   |-- (.text):relocation-truncated-to-fit:R_MIPS_26-against-kernel_entry
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- nios2-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- nios2-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- openrisc-allyesconfig
-|   |-- (.head.text):relocation-truncated-to-fit:R_OR1K_INSN_REL_26-against-no-symbol
-|   |-- (.text):relocation-truncated-to-fit:R_OR1K_INSN_REL_26-against-no-symbol
-|   |-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|   `-- main.c:(.text):relocation-truncated-to-fit:R_OR1K_INSN_REL_26-against-symbol-__muldi3-defined-in-.text-section-in-..-lib-gcc-or1k-linux-..-libgcc.a(_muldi3.o)
-|-- parisc-allmodconfig
-|   |-- drivers-gpu-drm-i915-display-intel_bios.c:error:implicit-declaration-of-function-intel_opregion_vbt_present
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- parisc-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- powerpc-allmodconfig
-|   |-- drivers-gpu-drm-i915-display-intel_bios.c:error:implicit-declaration-of-function-intel_opregion_vbt_present
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- powerpc-randconfig-r026-20220530
-|   `-- powerpc-linux-ld:warning:orphan-section-bss..Lubsan_data772-from-kernel-ptrace.o-being-placed-in-section-.bss..Lubsan_data772
-|-- s390-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- s390-randconfig-001-20240313
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- s390-randconfig-r132-20240313
-|   `-- io_uring-io_uring.c:sparse:sparse:cast-to-restricted-io_req_flags_t
-|-- sh-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- sh-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- sparc-allmodconfig
-|   |-- drivers-gpu-drm-i915-display-intel_bios.c:error:implicit-declaration-of-function-intel_opregion_vbt_present
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- sparc64-allmodconfig
-|   |-- drivers-gpu-drm-i915-display-intel_bios.c:error:implicit-declaration-of-function-intel_opregion_vbt_present
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- sparc64-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- sparc64-randconfig-r112-20240313
-|   `-- io_uring-io_uring.c:sparse:sparse:cast-to-restricted-io_req_flags_t
-|-- um-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- x86_64-randconfig-002-20240313
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- x86_64-randconfig-004-20240313
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- x86_64-randconfig-015-20240313
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- x86_64-randconfig-102-20240313
-|   `-- drivers-accessibility-speakup-devsynth.c:error:label-at-end-of-compound-statement
-|-- x86_64-randconfig-121-20240313
-|   `-- io_uring-io_uring.c:sparse:sparse:cast-to-restricted-io_req_flags_t
-|-- x86_64-randconfig-161-20240313
-|   `-- mm-userfaultfd.c-uffd_move_lock()-error:we-previously-assumed-src_vmap-could-be-null-(see-line-)
-`-- xtensa-randconfig-r024-20220829
-    `-- include-linux-of.h:(.text):undefined-reference-to-__udivdi3
-clang_recent_errors
-|-- arm-defconfig
-|   |-- ERROR:__aeabi_uldivmod-drivers-gpu-drm-sun4i-sun4i-drm-hdmi.ko-undefined
-|   |-- arch-arm-mach-omap2-prm33xx.c:warning:expecting-prototype-for-am33xx_prm_global_warm_sw_reset().-Prototype-was-for-am33xx_prm_global_sw_reset()-instead
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arm-imx_v4_v5_defconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arm-randconfig-002-20240313
-|   |-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|   `-- kernel-bpf-bpf_struct_ops.c:warning:bitwise-operation-between-different-enumeration-types-(-enum-bpf_type_flag-and-enum-bpf_reg_type-)
-|-- arm-randconfig-004-20240313
-|   `-- ld.lld:error:undefined-symbol:__aeabi_uldivmod
-|-- arm64-allmodconfig
-|   |-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|   `-- kernel-bpf-bpf_struct_ops.c:warning:bitwise-operation-between-different-enumeration-types-(-enum-bpf_type_flag-and-enum-bpf_reg_type-)
-|-- arm64-randconfig-002-20240313
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arm64-randconfig-003-20240313
-|   `-- kernel-bpf-bpf_struct_ops.c:warning:bitwise-operation-between-different-enumeration-types-(-enum-bpf_type_flag-and-enum-bpf_reg_type-)
-|-- arm64-randconfig-004-20240313
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- hexagon-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- hexagon-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- hexagon-randconfig-002-20240313
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- hexagon-randconfig-r121-20240313
-|   |-- fs-libfs.c:sparse:sparse:Using-plain-integer-as-NULL-pointer
-|   `-- io_uring-io_uring.c:sparse:sparse:cast-to-restricted-io_req_flags_t
-|-- i386-buildonly-randconfig-004-20240313
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- i386-buildonly-randconfig-005-20240313
-|   |-- drivers-gpu-drm-i915-display-intel_bios.c:error:call-to-undeclared-function-intel_opregion_vbt_present-ISO-C99-and-later-do-not-support-implicit-function-declarations
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- i386-randconfig-061-20240313
-|   |-- io_uring-io_uring.c:sparse:sparse:cast-to-restricted-io_req_flags_t
-|   |-- kernel-power-energy_model.c:sparse:sparse:incorrect-type-in-argument-(different-address-spaces)-expected-struct-em_perf_state-table-got-struct-em_perf_state-noderef-__rcu
-|   |-- kernel-power-energy_model.c:sparse:sparse:incorrect-type-in-argument-(different-address-spaces)-expected-struct-kref-kref-got-struct-kref-noderef-__rcu
-|   |-- kernel-power-energy_model.c:sparse:sparse:incorrect-type-in-argument-(different-address-spaces)-expected-void-const-objp-got-struct-em_perf_table-noderef-__rcu-assigned-em_table
-|   `-- kernel-power-energy_model.c:sparse:sparse:incorrect-type-in-assignment-(different-address-spaces)-expected-struct-em_perf_state-new_ps-got-struct-em_perf_state-noderef-__rcu
-|-- powerpc-allyesconfig
-|   |-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|   `-- kernel-bpf-bpf_struct_ops.c:warning:bitwise-operation-between-different-enumeration-types-(-enum-bpf_type_flag-and-enum-bpf_reg_type-)
-|-- powerpc64-randconfig-r111-20240313
-|   `-- io_uring-io_uring.c:sparse:sparse:cast-to-restricted-io_req_flags_t
-|-- riscv-allmodconfig
-|   |-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|   `-- kernel-bpf-bpf_struct_ops.c:warning:bitwise-operation-between-different-enumeration-types-(-enum-bpf_type_flag-and-enum-bpf_reg_type-)
-|-- riscv-allyesconfig
-|   |-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|   `-- kernel-bpf-bpf_struct_ops.c:warning:bitwise-operation-between-different-enumeration-types-(-enum-bpf_type_flag-and-enum-bpf_reg_type-)
-|-- s390-allmodconfig
-|   |-- drivers-gpu-drm-i915-display-intel_bios.c:error:call-to-undeclared-function-intel_opregion_vbt_present-ISO-C99-and-later-do-not-support-implicit-function-declarations
-|   |-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|   `-- kernel-bpf-bpf_struct_ops.c:warning:bitwise-operation-between-different-enumeration-types-(-enum-bpf_type_flag-and-enum-bpf_reg_type-)
-|-- s390-defconfig
-|   `-- kernel-bpf-bpf_struct_ops.c:warning:bitwise-operation-between-different-enumeration-types-(-enum-bpf_type_flag-and-enum-bpf_reg_type-)
-|-- x86_64-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- x86_64-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- x86_64-buildonly-randconfig-003-20240313
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- x86_64-buildonly-randconfig-006-20240313
-|   |-- drivers-gpu-drm-i915-display-intel_bios.c:error:call-to-undeclared-function-intel_opregion_vbt_present-ISO-C99-and-later-do-not-support-implicit-function-declarations
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- x86_64-randconfig-001-20240313
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- x86_64-randconfig-012-20240313
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- x86_64-randconfig-075-20240313
-|   |-- drivers-gpu-drm-xe-xe_hw_engine_class_sysfs.c:error:unused-function-pdev_to_xe_device-Werror-Wunused-function
-|   |-- drivers-gpu-drm-xe-xe_hw_engine_class_sysfs.c:error:unused-function-to_xe_device-Werror-Wunused-function
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-`-- x86_64-randconfig-103-20240313
-    |-- drivers-gpu-drm-xe-xe_hw_engine_class_sysfs.c:error:unused-function-pdev_to_xe_device-Werror-Wunused-function
-    `-- drivers-gpu-drm-xe-xe_hw_engine_class_sysfs.c:error:unused-function-to_xe_device-Werror-Wunused-function
+- It doesn't fit into the ioctl PTP_SYS_OFFSET_PRECISE2.
 
-elapsed time: 723m
+- The clock_adjtime(2) tai_offset and return value could be set (if
+  upstream will accept this). Would this help? As discussed, user space
+  would need to interpret this (and currently no dynamic POSIX clock sets
+  this).
 
-configs tested: 168
-configs skipped: 3
+> 
+> But if you allow and encourage the use of smeared time without even a
+> specification of *how* it's smeared... that's even worse. You have an
+> unknown inaccuracy of up to a second for whole periods of time around a
+> leap second. That's surely the *antithesis* of what we're trying to do
+> here? Without an actual definition of the smearing, how is a guest
+> actually supposed to know what time it is?
 
-tested configs:
-alpha                             allnoconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                               allnoconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                          axs103_defconfig   gcc  
-arc                                 defconfig   gcc  
-arc                   randconfig-001-20240313   gcc  
-arc                   randconfig-002-20240313   gcc  
-arm                              allmodconfig   gcc  
-arm                               allnoconfig   clang
-arm                              allyesconfig   gcc  
-arm                                 defconfig   clang
-arm                       imx_v4_v5_defconfig   clang
-arm                   randconfig-001-20240313   gcc  
-arm                   randconfig-002-20240313   clang
-arm                   randconfig-003-20240313   gcc  
-arm                   randconfig-004-20240313   clang
-arm                          sp7021_defconfig   gcc  
-arm                        spear6xx_defconfig   clang
-arm64                            allmodconfig   clang
-arm64                             allnoconfig   gcc  
-arm64                               defconfig   gcc  
-arm64                 randconfig-001-20240313   clang
-arm64                 randconfig-002-20240313   clang
-arm64                 randconfig-003-20240313   clang
-arm64                 randconfig-004-20240313   clang
-csky                             allmodconfig   gcc  
-csky                              allnoconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                                defconfig   gcc  
-csky                  randconfig-001-20240313   gcc  
-csky                  randconfig-002-20240313   gcc  
-hexagon                          allmodconfig   clang
-hexagon                           allnoconfig   clang
-hexagon                          allyesconfig   clang
-hexagon                             defconfig   clang
-hexagon               randconfig-001-20240313   clang
-hexagon               randconfig-002-20240313   clang
-i386                             allmodconfig   gcc  
-i386                              allnoconfig   gcc  
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-001-20240313   gcc  
-i386         buildonly-randconfig-002-20240313   gcc  
-i386         buildonly-randconfig-003-20240313   clang
-i386         buildonly-randconfig-004-20240313   clang
-i386         buildonly-randconfig-005-20240313   clang
-i386         buildonly-randconfig-006-20240313   gcc  
-i386                                defconfig   clang
-i386                  randconfig-001-20240313   clang
-i386                  randconfig-002-20240313   clang
-i386                  randconfig-003-20240313   clang
-i386                  randconfig-004-20240313   gcc  
-i386                  randconfig-005-20240313   gcc  
-i386                  randconfig-006-20240313   clang
-i386                  randconfig-011-20240313   gcc  
-i386                  randconfig-012-20240313   clang
-i386                  randconfig-013-20240313   gcc  
-i386                  randconfig-014-20240313   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch             randconfig-001-20240313   gcc  
-loongarch             randconfig-002-20240313   gcc  
-m68k                             allmodconfig   gcc  
-m68k                              allnoconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                        allnoconfig   gcc  
-microblaze                       allyesconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                              allnoconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                      maltaaprp_defconfig   clang
-nios2                         10m50_defconfig   gcc  
-nios2                            allmodconfig   gcc  
-nios2                             allnoconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                               defconfig   gcc  
-nios2                 randconfig-001-20240313   gcc  
-nios2                 randconfig-002-20240313   gcc  
-openrisc                          allnoconfig   gcc  
-openrisc                         allyesconfig   gcc  
-openrisc                            defconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                            allnoconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc                randconfig-001-20240313   gcc  
-parisc                randconfig-002-20240313   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                          allyesconfig   clang
-powerpc                        cell_defconfig   gcc  
-powerpc                     ep8248e_defconfig   gcc  
-powerpc                   lite5200b_defconfig   clang
-powerpc                 mpc8313_rdb_defconfig   gcc  
-powerpc               randconfig-001-20240313   gcc  
-powerpc               randconfig-002-20240313   gcc  
-powerpc               randconfig-003-20240313   clang
-powerpc                      tqm8xx_defconfig   clang
-powerpc64                        alldefconfig   clang
-powerpc64             randconfig-001-20240313   clang
-powerpc64             randconfig-002-20240313   gcc  
-powerpc64             randconfig-003-20240313   clang
-riscv                            allmodconfig   clang
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   clang
-riscv                               defconfig   clang
-riscv                 randconfig-001-20240313   clang
-s390                             allmodconfig   clang
-s390                              allnoconfig   clang
-s390                             allyesconfig   gcc  
-s390                                defconfig   clang
-s390                  randconfig-001-20240313   gcc  
-s390                  randconfig-002-20240313   gcc  
-sh                               allmodconfig   gcc  
-sh                                allnoconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                                  defconfig   gcc  
-sh                     magicpanelr2_defconfig   gcc  
-sh                          sdk7780_defconfig   gcc  
-sh                           se7722_defconfig   gcc  
-sh                   sh7770_generic_defconfig   gcc  
-sparc                            allmodconfig   gcc  
-sparc                             allnoconfig   gcc  
-sparc                               defconfig   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64                             defconfig   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   gcc  
-um                                  defconfig   clang
-um                             i386_defconfig   gcc  
-um                           x86_64_defconfig   clang
-x86_64                            allnoconfig   clang
-x86_64                           allyesconfig   clang
-x86_64       buildonly-randconfig-001-20240313   clang
-x86_64       buildonly-randconfig-002-20240313   gcc  
-x86_64       buildonly-randconfig-003-20240313   clang
-x86_64       buildonly-randconfig-004-20240313   clang
-x86_64       buildonly-randconfig-005-20240313   gcc  
-x86_64       buildonly-randconfig-006-20240313   clang
-x86_64                              defconfig   gcc  
-x86_64                randconfig-001-20240313   clang
-x86_64                randconfig-002-20240313   gcc  
-x86_64                randconfig-003-20240313   clang
-x86_64                randconfig-004-20240313   gcc  
-x86_64                randconfig-005-20240313   gcc  
-x86_64                randconfig-006-20240313   clang
-x86_64                randconfig-011-20240313   clang
-x86_64                randconfig-012-20240313   clang
-x86_64                randconfig-013-20240313   clang
-x86_64                randconfig-014-20240313   clang
-x86_64                randconfig-015-20240313   gcc  
-x86_64                randconfig-016-20240313   gcc  
-x86_64                randconfig-071-20240313   gcc  
-x86_64                randconfig-072-20240313   clang
-x86_64                randconfig-073-20240313   clang
-x86_64                randconfig-074-20240313   gcc  
-x86_64                randconfig-075-20240313   clang
-x86_64                randconfig-076-20240313   clang
-x86_64                          rhel-8.3-rust   clang
-xtensa                            allnoconfig   gcc  
+As discussed above, I think in some use cases it is enough for the guest to
+have a precise notion of time shared with the other guests.
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+> 
+> (I suppose you could add a tai_offset_nanoseconds field? I don't know
+> that I want to *encourage* that thought process...)
+> 
+>> As for UTC-SLS, this *could* also be added, although [1] says
+>>
+>>         It is inappropriate to use Internet-Drafts as reference material or
+>>         to cite them other than as "work in progress."
+>>
+>> [1] https://datatracker.ietf.org/doc/html/draft-kuhn-leapsecond-00
+>>
+>>>>> One other thing to note is I think we're being very naïve about the TSC
+>>>>> on x86 hosts. Theoretically, the TSC for every vCPU might run at a
+>>>>> different frequency, and even if they run at the same frequency they
+>>>>> might be offset from each other. I'm happy to be naïve but I think we
+>>>>> should be *explicitly* so, and just say for example that it's defined
+>>>>> against vCPU0 so if other vCPUs are different then all bets are off.
+>>>>
+>>>> ATM Virtio has no notion of vCPUs, or vCPU topology. So I wonder if you
+>>>> have an opinion on how to represent this in a platform-independent way.
+>>>
+>>> Well, it doesn't have a notion of TSCs either; you include that by
+>>> implicit reference don't you?
+>>
+>> I think I can add a SHOULD requirement which vaguely refers to vCPU 0, or
+>> boot vCPU. But the Virtio device is not necessarily hosted by a hypervisor,
+>> so the device might not even know which vCPUs there are. E.g. there is even
+>> interest to make virtio-rtc work as part of the virtio-net device (which
+>> might be implemented in hardware).
+> 
+> Sure, but those implementations aren't going to offer the TSC pairing
+> at all, are they?
+> 
+
+They could offer an Intel ART pairing (some physical PTP NICs are already
+doing this, look for the convert_art_to_tsc() users).
+
+Thanks for the comments,
+
+Peter
 
