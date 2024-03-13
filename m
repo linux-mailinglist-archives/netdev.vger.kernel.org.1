@@ -1,77 +1,84 @@
-Return-Path: <netdev+bounces-79681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BF8087A8D5
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:57:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 100A187A8E5
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:59:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14685B22D59
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:57:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A49E31F24BBF
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:59:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04E5D42077;
-	Wed, 13 Mar 2024 13:57:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hQrq4V1M"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F21F43AC3;
+	Wed, 13 Mar 2024 13:59:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD99743AB2;
-	Wed, 13 Mar 2024 13:57:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8193B47784
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 13:59:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710338246; cv=none; b=k2X7/34H0iX7jbfjjVVUhSUiVwsbcPVe9NH6/LdGyWNXcaFcvl0lMHJIjbvsRwzyEV8YlFE4s5UObz5Hj5sxb2Dt9PxrnvyZNn4F4ArULYIEXzBD8xja95SjRXy7qGpX0T/3nmaFtuZyEnsEfs4o3jY47soseJd6WFV4SexfneE=
+	t=1710338375; cv=none; b=VYjpaOL37IVK2YNI1/O2lnop2+2Y8DZZelsVmTPJKST472+dikgYqAPNjpbYNi33265rRjRRsZ/RUACCpqLv3y2HkWbBWqMt5jj8oD06vQZxYqvj5TmbGWZUS2zUw2XCWAd7q99mZ4gDxIvnLr3gMqCnbaedxUReK4HhnLDQWQA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710338246; c=relaxed/simple;
-	bh=KK7opGThc5jVikuIZOARKvcqSgweVwoAbK4+fL+Z7i8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aeKS3PsqAwNHROKYg149tcO8glTDT2tuxn/FTY78VS1ycT75/AY+wt8vHYZTArFOdJzrFQL6cuYt+fUPSvJKFwuf5Ixy1tkmZSMnFbsZI4LNc7q/UT0xCjIgGjd7U1axtUsXG4PTeWlRpf25lS6jCpSnqkR8i6u0ZrJc1iw/5J8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hQrq4V1M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1073BC433C7;
-	Wed, 13 Mar 2024 13:57:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710338246;
-	bh=KK7opGThc5jVikuIZOARKvcqSgweVwoAbK4+fL+Z7i8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hQrq4V1MDwQCQbkfiWfTuBhrm3ro/rZ+y/D+/Q7pUR/BySOCVcjwGZe4ycQTSaesQ
-	 KdYFvR0n12l8Cx0EXso3LMYSGgUA2gWzwpldGaL9a0Ba7Vw/qFgCWxRVD2ubg0D1cY
-	 asxYK1AGTNj63+c8gihwd45nwVogogSN4VLs9pIDT1ombW0q8FPBetp9HoWhh3qXK0
-	 hNgE68Bx2Sq9UlMfyO4hx3QLG8xnmCjEnEhE+geJs+UMJ+X69oEIw3GGrG1jeLzKTG
-	 U9mojRHusR5SNubDqfNnGZALhsua0vN5Um1Sz7qD19/dJAaRyEv2SVIzOmzvwnYPO2
-	 rfRhdBDEmU8TQ==
-Date: Wed, 13 Mar 2024 06:57:25 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Michal Kubiak <michal.kubiak@intel.com>
-Cc: Ignat Korchagin <ignat@cloudflare.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <kernel-team@cloudflare.com>
-Subject: Re: [PATCH net v2 2/2] selftests: net: veth: test the ability to
- independently manipulate GRO and XDP
-Message-ID: <20240313065725.46a50ea8@kernel.org>
-In-Reply-To: <ZfGN6RTBCbEm6uSO@localhost.localdomain>
-References: <20240312160551.73184-1-ignat@cloudflare.com>
-	<20240312160551.73184-3-ignat@cloudflare.com>
-	<ZfGN6RTBCbEm6uSO@localhost.localdomain>
+	s=arc-20240116; t=1710338375; c=relaxed/simple;
+	bh=iPjtTXtGBNqqHtpmj/RD96a/h3FsCnTbifhUxkUft74=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZIZRXvVMZ9Xrx03AcjwGSp+LJxd+CbBojgmU8CvfMChafbAV9jx1TgSJkwY8A50pix7JCT+S7FAJCeulq5zQjiw/ZF6+mEDnCOWxx1bqXqldQITuzl/xmnsQVbLhL0jVl8Wp7VS8fgw5hJ8MTb0cxuU7WvBo39LvT1utCCApIAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rkP8Q-0000WY-Vx; Wed, 13 Mar 2024 14:59:11 +0100
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rkP8K-0067ui-OF; Wed, 13 Mar 2024 14:59:04 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1rkP8K-00FZqY-26;
+	Wed, 13 Mar 2024 14:59:04 +0100
+Date: Wed, 13 Mar 2024 14:59:04 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: syzbot <syzbot+3bd970a1887812621b4c@syzkaller.appspotmail.com>
+Cc: astrajoan@yahoo.com, davem@davemloft.net, edumazet@google.com,
+	hdanton@sina.com, kernel@pengutronix.de, kuba@kernel.org,
+	linux-can@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux@rempel-privat.de, mkl@pengutronix.de, netdev@vger.kernel.org,
+	pabeni@redhat.com, robin@protonic.nl, socketcan@hartkopp.net,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [can?] possible deadlock in j1939_sk_queue_drop_all
+Message-ID: <ZfGxKE126E_INT_w@pengutronix.de>
+References: <00000000000095640f05cb78af37@google.com>
+ <0000000000002755ce061389d67b@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <0000000000002755ce061389d67b@google.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Wed, 13 Mar 2024 12:28:41 +0100 Michal Kubiak wrote:
-> On Tue, Mar 12, 2024 at 04:05:52PM +0000, Ignat Korchagin wrote:
-> > We should be able to independently flip either XDP or GRO states and toggling
-> > one should not affect the other.
-> > 
-> > Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>  
-> 
-> Missing "Fixes" tag for the patch targeted to the "net" tree.
+#syz fix: can: j1939: prevent deadlock by changing j1939_socks_lock to rwlock
 
-it's adjusting a selftest, I don't think we need a Fixes tag for that
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
