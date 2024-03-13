@@ -1,84 +1,146 @@
-Return-Path: <netdev+bounces-79671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92D1487A84A
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:27:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A69287A8B3
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:48:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32BDB1F21D7F
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:27:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F2161F224CF
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:48:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 192A04085A;
-	Wed, 13 Mar 2024 13:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A89C4205B;
+	Wed, 13 Mar 2024 13:48:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u/xac1zT"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="oGfDetpX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2D63224FA;
-	Wed, 13 Mar 2024 13:27:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F64E4174F;
+	Wed, 13 Mar 2024 13:48:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710336430; cv=none; b=Acg7Gr7vXt3FpklBRsMlk0luZIy0lqTdL+CNjGZsIlbvdkxC4L76csXq807bF0SaEwTMKz2+UoCP40o6ODtVQpZ0jtGzfIFp7y+3Cey6HUHQWNfNAY5AndNNYuDHUUfkKp5m6eGLI7reFmqjwdpTyV+QUuLwADkGiM9ptT/5Ibc=
+	t=1710337695; cv=none; b=DoIWb2Ry74SEPRERqyrTrE2sYw1GiigbNR4n+zPZlkJ5pzpgbFMYgilDDxg0G+i8ayl8WjUXaMo5Lgax+G7PN2Qq8pNvaMphXKbseZqMDH7xpRxjVr6Z7NFTqEC4E0Gv1hMlwQM5mSh1Xj+h3Cv+8NwIUdnEyYbf0oDMsgLhUVg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710336430; c=relaxed/simple;
-	bh=B0fnba4gidZQvyTEXxciojWjcwOMuZEEiz9uPq80vZw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jg+eqdRwm1sT/StpsarVy3zFP1LwAQP8GQs4+ont7iZyLpqAr68Ux11Uz6RvoE+ojqLHEBWj6gIyo3t2Fmabwrf40l7TrpxzabQcV++Z4tM6j79IkKKVxPLYe65OUhNw4GudG2vpDYyJZycEJ2+jWrBg4Z0WL4NSH0bCL/Imr/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u/xac1zT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 400B2C433F1;
-	Wed, 13 Mar 2024 13:27:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710336429;
-	bh=B0fnba4gidZQvyTEXxciojWjcwOMuZEEiz9uPq80vZw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=u/xac1zTA5lEiNKP/cD0WonmASiVASqgXcq69tM9Hxta4vbONFhv4pLhEurK3rDSI
-	 n7qrCMhv2Ig/jIP7A7nfTL70aDgBrgyD9CyDuZmEO54cVqcaGZOFOlmz7W0EsSz70u
-	 3uU5aUDAxTDB8oPt9vQYTsrunFO8Q3OMzaxf8fP3bJVmwMm2240ZRwhWoAMjRlb68I
-	 x9UwPnJ/Mk+hj3lKdmptOsuSavGPVff4Tr9k3n9p2SJClPtYSLaTg7V9WcY49z/QNH
-	 8YhISL8fLr8EpaaYnjM2ayvMsDHKyn2WVERuLjO07/ts3wCN+d2dH4trvB/5ZE9AtT
-	 xNcsnqZ5ov4hA==
-Date: Wed, 13 Mar 2024 06:27:08 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: Re: [ANN] netdev development stats for 6.9
-Message-ID: <20240313062708.3bc51347@kernel.org>
-In-Reply-To: <CAL+tcoBzHNt86-4OC7Jck1WBG+YuadWDhQrkyEPBaxQxcET6YQ@mail.gmail.com>
-References: <20240312124346.5aa3b14a@kernel.org>
-	<CAL+tcoBzHNt86-4OC7Jck1WBG+YuadWDhQrkyEPBaxQxcET6YQ@mail.gmail.com>
+	s=arc-20240116; t=1710337695; c=relaxed/simple;
+	bh=YRfQD+t2dkUzHEULs3NlLIIcIZaaDOWzomGtk1FtK3Y=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UDY1sYNxeQgegoJdfQlLvDnuslnHVG/WeoY4QG/8YjO+R3TqwKvZZJRf881kdeL0Frzsx0ycOubjiVQ0hRxucZs/QCCy8StNZQnoxBE7MLIFDCBPT2I4g/87Z+2rh3LQk+jOe47xuxHYfI4zSIEY4orfLgvDeriSYzRASWfpzc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=oGfDetpX; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: 50dcf980e14011eeb8927bc1f75efef4-20240313
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=L4w20N+otfg7LwiYSgZBTvkCN/wv91X1s34i/ad5CCw=;
+	b=oGfDetpXML9V4gCa5zrrGvflXDfgBD950x4waeaDoTDUBe4hUAIU5I/ta2RUpqEJdxFb2Mt3vk5lJNDNKt5e1KiF3i4Oe5ZE9BACbRq1BaSyPkfrLuncWkNrr7eutK0gECQ+YRguwUBNj/QBJrvGsQyXuvulZjFHfkNCmS5Ycz0=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.37,REQID:60f705f5-bd61-4bfa-ad4b-07ab2bc4ba90,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:6f543d0,CLOUDID:31555c90-e2c0-40b0-a8fe-7c7e47299109,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: 50dcf980e14011eeb8927bc1f75efef4-20240313
+Received: from mtkmbs13n2.mediatek.inc [(172.21.101.108)] by mailgw01.mediatek.com
+	(envelope-from <shiming.cheng@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1696624639; Wed, 13 Mar 2024 21:48:04 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 13 Mar 2024 21:48:01 +0800
+Received: from mbjsdccf07.gcn.mediatek.inc (10.15.20.246) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Wed, 13 Mar 2024 21:48:01 +0800
+From: Shiming Cheng <shiming.cheng@mediatek.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lena.wang@mediatek.com>, <shiming.cheng@mediatek.com>
+Subject: [PATCH net] udp: fix segmentation crash for untrusted source packet
+Date: Wed, 13 Mar 2024 21:34:02 +0800
+Message-ID: <20240313133402.9027-1-shiming.cheng@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-AS-Result: No-10--0.036400-8.000000
+X-TMASE-MatchedRID: wpfAD6xEq/UmcsJib2IjaZyebS/i2xjjRf40pT7Zmv4AhmnHHeGnvd5N
+	RzJ0gz5Ho2jEjZ+uot2x/IsbGBsvcXHPBvSspzfjlUgQqGVMqmw+alo1+UETifgnJH5vm2+gE1H
+	sA1hANbFWqgnWQ924PABrzRY/wC05Z4gQbTRJ1T0poxDq3DugMkyQ5fRSh265DpCUEeEFm7B91D
+	unZtIaFuLzNWBegCW2wgn7iDBesS1YF3qW3Je6+3Cl2j/T96VWClrgwgRb4DTA1+j5xhROnF/E0
+	Qms4izZ9dXR8igG1pZpqUV/1/kckl6hsFytkdpyBzxJxdddetpD1vQ6Bk4NMYCE5xpCtDRTUbJF
+	yh4XXyqYo/TPOlMB4bCh3zE4wqa8wIE77PEBbml+3BndfXUhXQ==
+X-TM-AS-User-Approved-Sender: No
+X-TM-AS-User-Blocked-Sender: No
+X-TMASE-Result: 10--0.036400-8.000000
+X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-SNTS-SMTP: EB00A10A7E0B78C7CD380D35C873753B8267A33E8C1FB10F0EF5AEE09A8965CE2000:8
+X-MTK: N
 
-On Wed, 13 Mar 2024 10:13:43 +0800 Jason Xing wrote:
-> > RedHat remains unbeatable with the combined powers of Simon and Paolo,
-> > as well as high participation of the less active authors.
-> > Alibaba maintains its strongly net-negative review score.
-> > Tencent (Jason Xing) joins them (Tencent doesn't use their email
-> > domain so it's likely under-counted). Yang Xiwen makes the negative  
-> 
-> Interesting numbers.
-> 
-> Well, actually, I always send patches by using the company address and
-> review patches by using my personal address, which probably makes my
-> scores negative :S
-> 
-> Next time I'll try to use the same address. Hope I will not appear on
-> the top of the negative scores list.
+Kernel exception is reported when making udp frag list segmentation.
+Backtrace is as below:
+    at out/android15-6.6/kernel-6.6/kernel-6.6/net/ipv4/udp_offload.c:229
+    at out/android15-6.6/kernel-6.6/kernel-6.6/net/ipv4/udp_offload.c:262
+features=features@entry=19, is_ipv6=false)
+    at out/android15-6.6/kernel-6.6/kernel-6.6/net/ipv4/udp_offload.c:289
+features=19)
+    at out/android15-6.6/kernel-6.6/kernel-6.6/net/ipv4/udp_offload.c:399
+features=19)
+    at out/android15-6.6/kernel-6.6/kernel-6.6/net/ipv4/af_inet.c:1418
+skb@entry=0x0, features=19, features@entry=0)
+    at out/android15-6.6/kernel-6.6/kernel-6.6/net/core/gso.c:53
+tx_path=<optimized out>)
+    at out/android15-6.6/kernel-6.6/kernel-6.6/net/core/gso.c:124
 
-I can add an alias to map multiple addresses to the same person locally.
-Feel free to send me the addresses (on- or off-list).
+This packet's frag list is null while gso_type is not 0. Then it is treated
+as a GRO-ed packet and sent to segment frag list. Function call path is
+udp_rcv_segment => config features value
+    __udpv4_gso_segment  => skb_gso_ok returns false. Here it should be
+                            true. Failed reason is features doesn't match
+                            gso_type.
+        __udp_gso_segment_list
+            skb_segment_list => packet is linear with skb->next = NULL
+            __udpv4_gso_segment_list_csum => use skb->next directly and
+                                             crash happens
 
-Some goes for everyone else, please feel free to send me your mappings
-and company affiliations. I don't have access to the Greg KH/LWN gitdm
-db and Linux Foundation remains unwilling to help.
+In rx-gro-list GRO-ed packet is set gso type as
+NETIF_F_GSO_UDP_L4 | NETIF_F_GSO_FRAGLIST in napi_gro_complete. In gso
+flow the features should also set them to match with gso_type. Or else it
+will always return false in skb_gso_ok. Then it can't discover the
+untrusted source packet and result crash in following function.
+
+Fixes: f2696099c6c6 ("udp: Avoid post-GRO UDP checksum recalculation")
+Signed-off-by: Shiming Cheng <shiming.cheng@mediatek.com>
+Signed-off-by: Lena Wang <lena.wang@mediatek.com>
+---
+ include/net/udp.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/net/udp.h b/include/net/udp.h
+index 488a6d2babcc..c87baa23b9da 100644
+--- a/include/net/udp.h
++++ b/include/net/udp.h
+@@ -464,7 +464,7 @@ void udpv6_encap_enable(void);
+ static inline struct sk_buff *udp_rcv_segment(struct sock *sk,
+ 					      struct sk_buff *skb, bool ipv4)
+ {
+-	netdev_features_t features = NETIF_F_SG;
++	netdev_features_t features = NETIF_F_SG | NETIF_F_GSO_UDP_L4 | NETIF_F_GSO_FRAGLIST;
+ 	struct sk_buff *segs;
+ 
+ 	/* Avoid csum recalculation by skb_segment unless userspace explicitly
+-- 
+2.18.0
+
 
