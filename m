@@ -1,252 +1,180 @@
-Return-Path: <netdev+bounces-79766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA00387B42E
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 23:09:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64C8387B43A
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 23:10:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C5A9B222C7
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 22:09:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 069181F22EDF
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 22:10:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E4F59B4A;
-	Wed, 13 Mar 2024 22:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F59159B4D;
+	Wed, 13 Mar 2024 22:10:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WdYC+z/I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hlrZKybJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7B25916B
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 22:08:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7535917C;
+	Wed, 13 Mar 2024 22:10:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710367732; cv=none; b=HzvvRdWu38mnF+7SDF+Ckdc5c1GHN4ZQLcvuNbmnVtV+le6N0H4JpB6AplkJ15PKsh2temtkTUGcHOzCSjWjnKhv1BhifoGw5PZKHr9Z1RsmZnh/MgpXw+ylep2hBGW4UqEMvwsh8R8brbyIYtfIfplBwebsSkqpRniUaowfUD4=
+	t=1710367846; cv=none; b=mpaRoZx8xyVP1CmslbZ/fBNhxNUTI3TefKb+HiO8fIDVfy4sXTiR9eh4VwGe83LfyHWsi3FRCdU7MoVN1bGmQ+/fZefxYhPE5K+kX1wzWU6ZUQOoPRROh0p2DaNZNE83b27ycp9zPkC62spRblmrZV/C8PuWsTHYUu9lsaBLgAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710367732; c=relaxed/simple;
-	bh=3RMd42OKBnTs8lFwFkyQxqdyYrBfVYzAW6T1Ssc1euo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YqmNm07qN1au/MvBH+eCresQMQaVxMraGzS80pLZCPa7vKI/cF9BIYSCB6d/hcMzmDbr5WB9qgPh0WN1jBkvmDFMHzqfJvHnYSbgwTSxpO+rUuGazcLGxTPSixhnZjxsuHtTURo3qXxDwChnD5zfag9uNoRYc1USUheX/fOa6fs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WdYC+z/I; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1710367727;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Z2HdPiIovJbdghrRlh4PL9g0ZeAvHwquMNTuldIiGxE=;
-	b=WdYC+z/IPaY9REsIKGH/tFpEPnuZ1hY0fPoLRhWgWlpN0Lb7E5SCQCD+Qb7CzHIZs5KdtO
-	+VWjXaBMqK4WBfc7/Z6tvKdE842RRqohxR2z3he9VrKrmkVCBb11p5rKrJPh5KLHmeILgX
-	xuUjP0Imr9In+iCFyphO4fNirIwKlEk=
-Date: Wed, 13 Mar 2024 15:08:39 -0700
+	s=arc-20240116; t=1710367846; c=relaxed/simple;
+	bh=5APNX9joY8E9yLLTfEuVlbvQ/cODNID0jd3oX4Dqksg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pC4dxYuYHW6KNvXXXe0iRiVIzsnMmompUYig7Dj93Nw+odxJV+17Q4JSyHdYbb/AtkV0fj7FiJgIknTM8Fp5uNSwtiOzR0/b0FKtKdD8186L/slRXbVBTZSOrsB7ci54pdDZdvv02uO81CYic6lUGl6EZOsVSdFWBu7geX7wIFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hlrZKybJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AAEEC433F1;
+	Wed, 13 Mar 2024 22:10:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710367845;
+	bh=5APNX9joY8E9yLLTfEuVlbvQ/cODNID0jd3oX4Dqksg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hlrZKybJJe3Ws3NMMxCNeEsHHbw+o6y1ncI16R6kzSspIO+mmP6NvDgwf4y8KiWzB
+	 ISriQDG/umtsjSLZngtc4bWRPmhaVLTwDEOJycCVs9T3pb2db6630MGkmEU1X9BTXf
+	 C/FR1pn4FLZNh7+e2vIRbE75VMM25aAR7Ehz3Q5So2rhXs8lMAJ/BPam+hhyEE2RK8
+	 TKJzV2JoGANM/fguI5enojXimqQG14HPKu1bLHKGoszu/nNEhNHQE4sQ1LLPnOn7gz
+	 zp7GTVMs3MuZxyJr6kTsKeJA9ylvnISwYysl+bpNM9dmNSZ3Hug4u0zZxEyvRICWYD
+	 MYiWylj9cA9LA==
+Date: Wed, 13 Mar 2024 15:10:43 -0700
+From: Eric Biggers <ebiggers@kernel.org>
+To: James Prestwood <prestwoj@gmail.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+	Karel Balej <balejk@matfyz.cz>, dimitri.ledkov@canonical.com,
+	alexandre.torgue@foss.st.com, davem@davemloft.net,
+	dhowells@redhat.com, herbert@gondor.apana.org.au,
+	keyrings@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-modules@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com, mcgrof@kernel.org,
+	mcoquelin.stm32@gmail.com, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, iwd@lists.linux.dev
+Subject: Re: [REGRESSION] Re: [PATCH] crypto: pkcs7: remove sha1 support
+Message-ID: <20240313221043.GC1111@sol.localdomain>
+References: <CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz>
+ <005f998ec59e27633b1b99fdf929e40ccfd401c1.camel@sipsolutions.net>
+ <f2dcbe55-0f0e-4173-8e21-f899c6fc802a@gmail.com>
+ <20240313194423.GA1111@sol.localdomain>
+ <b838e729-dc30-4e18-b928-c34c16b08606@gmail.com>
+ <20240313202223.GB1111@sol.localdomain>
+ <db86cba4-0e61-441d-8e66-405a13b61a3c@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v4] net: Re-use and set mono_delivery_time bit
- for userspace tstamp packets
-Content-Language: en-US
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-Cc: kernel@quicinc.com, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
- Martin KaFai Lau <martin.lau@kernel.org>, bpf <bpf@vger.kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>
-References: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
- <2a4cb416-5d95-459d-8c1c-3fb225240363@linux.dev>
- <65f16946cd33e_344ff1294fc@willemb.c.googlers.com.notmuch>
- <28282905-065a-4233-a0a2-53aa9b85f381@linux.dev>
- <65f2004e65802_3d1e792943e@willemb.c.googlers.com.notmuch>
- <0dff8f05-e18d-47c8-9f19-351c44ea8624@linux.dev>
- <e5da91bc-5827-4347-ab38-36c92ae2dfa2@quicinc.com>
- <65f21d65820fc_3d934129463@willemb.c.googlers.com.notmuch>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <65f21d65820fc_3d934129463@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+In-Reply-To: <db86cba4-0e61-441d-8e66-405a13b61a3c@gmail.com>
 
-On 3/13/24 2:40 PM, Willem de Bruijn wrote:
-> Abhishek Chauhan (ABC) wrote:
->>
->>
->> On 3/13/2024 2:01 PM, Martin KaFai Lau wrote:
->>> On 3/13/24 12:36 PM, Willem de Bruijn wrote:
->>>> Martin KaFai Lau wrote:
->>>>> On 3/13/24 1:52 AM, Willem de Bruijn wrote:
->>>>>> Martin KaFai Lau wrote:
->>>>>>> On 3/1/24 12:13 PM, Abhishek Chauhan wrote:
->>>>>>>> Bridge driver today has no support to forward the userspace timestamp
->>>>>>>> packets and ends up resetting the timestamp. ETF qdisc checks the
->>>>>>>> packet coming from userspace and encounters to be 0 thereby dropping
->>>>>>>> time sensitive packets. These changes will allow userspace timestamps
->>>>>>>> packets to be forwarded from the bridge to NIC drivers.
->>>>>>>>
->>>>>>>> Setting the same bit (mono_delivery_time) to avoid dropping of
->>>>>>>> userspace tstamp packets in the forwarding path.
->>>>>>>>
->>>>>>>> Existing functionality of mono_delivery_time remains unaltered here,
->>>>>>>> instead just extended with userspace tstamp support for bridge
->>>>>>>> forwarding path.
->>>>>>>
->>>>>>> The patch currently broke the bpf selftest test_tc_dtime:
->>>>>>> https://github.com/kernel-patches/bpf/actions/runs/8242487344/job/22541746675
->>>>>>>
->>>>>>> In particular, there is a uapi field __sk_buff->tstamp_type which currently has
->>>>>>> BPF_SKB_TSTAMP_DELIVERY_MONO to mean skb->tstamp has the MONO "delivery" time.
->>>>>>> BPF_SKB_TSTAMP_UNSPEC means everything else (this could be a rx timestamp at
->>>>>>> ingress or a delivery time set by user space).
->>>>>>>
->>>>>>> __sk_buff->tstamp_type depends on skb->mono_delivery_time which does not
->>>>>>> necessarily mean mono after this patch. I thought about fixing it on the bpf
->>>>>>> side such that reading __sk_buff->tstamp_type only returns
->>>>>>> BPF_SKB_TSTAMP_DELIVERY_MONO when the skb->mono_delivery_time is set and skb->sk
->>>>>>> is IPPROTO_TCP. However, it won't work because of bpf_skb_set_tstamp().
->>>>>>>
->>>>>>> There is a bpf helper, bpf_skb_set_tstamp(skb, tstamp,
->>>>>>> BPF_SKB_TSTAMP_DELIVERY_MONO). This helper changes both the skb->tstamp and the
->>>>>>> skb->mono_delivery_time. The expectation is this could change skb->tstamp in the
->>>>>>> ingress skb and redirect to egress sch_fq. It could also set a mono time to
->>>>>>> skb->tstamp where the udp sk->sk_clockid may not be necessary in mono and then
->>>>>>> bpf_redirect to egress sch_fq. When bpf_skb_set_tstamp(skb, tstamp,
->>>>>>> BPF_SKB_TSTAMP_DELIVERY_MONO) succeeds, reading __sk_buff->tstamp_type expects
->>>>>>> BPF_SKB_TSTAMP_DELIVERY_MONO also.
->>>>>>>
->>>>>>> I ran out of idea to solve this uapi breakage.
->>>>>>>
->>>>>>> I am afraid it may need to go back to v1 idea and use another bit
->>>>>>> (user_delivery_time) in the skb.
->>>>>>
->>>>>> Is the only conflict when bpf_skb_set_tstamp is called for an skb from
->>>>>> a socket with sk_clockid set (and thus SO_TXTIME called)?
->>>>>
->>>>> Right, because skb->mono_delivery_time does not mean skb->tstamp is mono now and
->>>>> its interpretation depends on skb->sk->sk_clockid.
->>>>>
->>>>>> Interpreting skb->tstamp as mono if skb->mono_delivery_time is set and
->>>>>> skb->sk is NULL is fine. This is the ingress to egress redirect case.
->>>>>
->>>>> skb->sk == NULL is fine. I tried something like this in
->>>>> bpf_convert_tstamp_type_read() for reading __sk_buff->tstamp_type:
->>>>>
->>>>> __sk_buff->tstamp_type is BPF_SKB_TSTAMP_DELIVERY_MONO when:
->>>>>
->>>>>      skb->mono_delivery_time == 1 &&
->>>>>      (!skb->sk ||
->>>>>       !sk_fullsock(skb->sk) /* tcp tw or req sk */ ||
->>>>>       skb->sk->sk_protocol == IPPROTO_TCP)
->>>>>
->>>>> Not a small bpf instruction addition to bpf_convert_tstamp_type_read() but doable.
->>>>>
->>>>>>
->>>>>> I don't see an immediate use for this BPF function on egress where it
->>>>>> would overwrite an SO_TXTIME timestamp and now skb->tstamp is mono,
->>>>>> but skb->sk != NULL and skb->sk->sk_clockid != CLOCK_MONOTONIC.
->>>>>
->>>>> The bpf prog may act as a traffic shaper that limits the bandwidth usage of all
->>>>> outgoing packets (tcp/udp/...) by setting the mono EDT in skb->tstamp before
->>>>> sending to the sch_fq.
->>>>>
->>>>> I currently also don't have a use case for skb->sk->sk_clockid !=
->>>>> CLOCK_MONOTONIC. However, it is something that bpf_skb_set_tstamp() can do now
->>>>> before queuing to sch_fq.
->>>>>
->>>>> The container (in netns + veth) may use other sk_clockid/qdisc (e.g. sch_etf)
->>>>> setup and the non mono skb->tstamp is not cleared now during dev_forward_skb()
->>>>> between the veth pair.
->>>>>
->>>>>>
->>>>>> Perhaps bpf_skb_set_tstamp() can just fail if another delivery time is
->>>>>> already explicitly programmed?
->>>>>
->>>>> This will change the existing bpf_skb_set_tstamp() behavior, so probably not
->>>>> acceptable.
->>>>>
->>>>>>
->>>>>>        skb->sk &&
->>>>>>        sock_flag(sk, SOCK_TXTIME) &&
->>>>>>        skb->sk->sk_clockid != CLOCK_MONOTONIC
->>>>>
->>>>>> Either that, or unset SOCK_TXTIME to make sk_clockid undefined and
->>>>>> fall back on interpreting as monotonic.
->>>>>
->>>>> Change sk->sk_flags in tc bpf prog? hmm... I am not sure this will work well also.
->>>>>
->>>>> sock_valbool_flag(SOCK_TXTIME) should require a lock_sock() to make changes. The
->>>>> tc bpf prog cannot take the lock_sock, so bpf_skb_set_tstamp() currently only
->>>>> changes skb and does not change skb->sk.
->>>>>
->>>>> I think changing sock_valbool_flag(SOCK_TXTIME) will also have a new user space
->>>>> visible side effect. The sendmsg for cmsg with SCM_TXTIME will start failing
->>>>> from looking at __sock_cmsg_send().
->>>>>
->>>>> There may be a short period of disconnect between what is in sk->sk_flags and
->>>>> what is set in skb->tstamp. e.g. what if user space does setsockopt(SO_TXTIME)
->>>>> again after skb->tstamp is set by bpf. This could be considered a small glitch
->>>>> for some amount of skb(s) until the user space settled on setsockopt(SO_TXTIME).
->>>>>
->>>>> I think all this is crying for another bit in skb to mean user_delivery_time
->>>>> (skb->tstamp depends on skb->sk->sk_clockid) while mono_delivery_time is the
->>>>> mono time either set by kernel-tcp or bpf.
->>>>
->>>> It does sound like the approach with least side effects.
->>>>
->>>> If we're going to increase to two bits per skb, it's perhaps
->>>> better to just encode the (selected supported) CLOCK_ type, rather
->>>> than only supporting clockid through skb->sk->sk_clockid.
->>>
->>> Good idea. May be starting with mono and tai (Abishek's use case?), only forward these two clocks and reset the skb->tstamp for others.
->>>
->>>>
->>>> This BPF function is the analogue to SO_TXTIME. It is clearly
->>>> extensible to additional BPF_SKB_TSTAMP_DELIVERY_.. types. To
->>>> work with sch_etf, say.
->>>
->>> Yes, if there are bits in skb to describe the clock in the skb->tstamp, BPF_SKB_TSTAMP_DELIVERY_ can be extended to match it. It will be easier if the values in the skb bits is the same as the BPF_SKB_TSTAMP_DELIVERY_*.
->>>
->>> The bpf_convert_tstamp_*() and the bpf_skb_set_tstamp helper will need changes to include the consideration of these two bits. I think we have mostly settled with the approach (thanks for the discussion!). Abhishek, not sure how much can be reused from this patch for the two bits apporach, do you want to revert the current patch first and then start from clean?
->>>
->> Yes , I think since we have concluded the two bit .(Thanks for discussion again, Martin and Willem)
->>
->> Here is what i will do from myside
->> 1. Revert the v4 patch :-  net: Re-use and set mono_delivery_time bit for userspace tstamp packets
->> 2. Keep mono_delivery_time as ease
->> 3. Add user_delivery_time as a new bitfield
->> 4. Add BPF_SKB_TSTAMP_DELIVERY_TAI in the bpf.h for etf support
->> 5. do not reset the time if either mono_delivery_time or user_delivery_time is set.
->>
->> Let me know if i have covered all the design details or add if i missed anything.
+On Wed, Mar 13, 2024 at 02:17:29PM -0700, James Prestwood wrote:
+> Hi,
 > 
-> Thanks for revising this.
+> On 3/13/24 1:22 PM, Eric Biggers wrote:
+> > On Wed, Mar 13, 2024 at 01:12:54PM -0700, James Prestwood wrote:
+> > > Hi,
+> > > 
+> > > On 3/13/24 12:44 PM, Eric Biggers wrote:
+> > > > On Wed, Mar 13, 2024 at 10:26:06AM -0700, James Prestwood wrote:
+> > > > > Hi,
+> > > > > 
+> > > > > On 3/13/24 1:56 AM, Johannes Berg wrote:
+> > > > > > Not sure why you're CC'ing the world, but I guess adding a few more
+> > > > > > doesn't hurt ...
+> > > > > > 
+> > > > > > On Wed, 2024-03-13 at 09:50 +0100, Karel Balej wrote:
+> > > > > > >     and I use iwd
+> > > > > > This is your problem, the wireless stack in the kernel doesn't use any
+> > > > > > kernel crypto code for 802.1X.
+> > > > > Yes, the wireless stack has zero bearing on the issue. I think that's what
+> > > > > you meant by "problem".
+> > > > > 
+> > > > > IWD has used the kernel crypto API forever which was abruptly broken, that
+> > > > > is the problem.
+> > > > > 
+> > > > > The original commit says it was to remove support for sha1 signed kernel
+> > > > > modules, but it did more than that and broke the keyctl API.
+> > > > > 
+> > > > Which specific API is iwd using that is relevant here?
+> > > > I cloned https://kernel.googlesource.com/pub/scm/network/wireless/iwd
+> > > > and grepped for keyctl and AF_ALG, but there are no matches.
+> > > IWD uses ELL for its crypto, which uses the AF_ALG API:
+> > > 
+> > > https://git.kernel.org/pub/scm/libs/ell/ell.git/
+> > Thanks for pointing out that the relevant code is really in that separate
+> > repository.  Note, it seems that keyctl() is the problem here, not AF_ALG.  The
+> > blamed commit didn't change anything for AF_ALG.
+> > 
+> > > I believe the failure is when calling:
+> > > 
+> > > KEYCTL_PKEY_QUERY enc="x962" hash="sha1"
+> > > 
+> > >  From logs Michael posted on the IWD list, the ELL API that fails is:
+> > > 
+> > > l_key_get_info (ell.git/ell/key.c:416)
+> > Okay, I guess that's what's actually causing the problem.  KEYCTL_PKEY_* are a
+> > weird set of APIs where userspace can ask the kernel to do asymmetric key
+> > operations.  It's unclear why they exist, as the same functionality is available
+> > in userspace crypto libraries.
+> > 
+> > I suppose that the blamed commit, or at least part of it, will need to be
+> > reverted to keep these weird keyctls working.
+> > 
+> > For the future, why doesn't iwd just use a userspace crypto library such as
+> > OpenSSL?
 > 
-> No need to add the BPF part here.
+> I was not around when the original decision was made, but a few reasons I
+> know we don't use openSSL:
 > 
-> I was mistaken that we can encode the clock_id in two skb bits.
-> SO_TXTIME allows essentially all CLOCK_...
+> �- IWD has virtually zero dependencies.
 
-The two bits could potentially only encode the delivery time that is allowed to 
-be forwarded without reset. 0 could mean refering back to sk_clockid and don't 
-forward. The final consumer of the forwarded skb->tstamp is the qdisc which 
-currently only has mono and tai. The concern is more on future extension to 
-allow more clock type to be forwarded?
+Depending on something in the kernel does not eliminate a dependency; it just
+adds that particular kernel UAPI to your list of dependencies.  The reason that
+we're having this discussion in the first place is because iwd is depending on
+an obscure kernel UAPI that is not well defined.  Historically it's been hard to
+avoid "breaking" changes in these crypto-related UAPIs because of the poor
+design where a huge number of algorithms are potentially supported, but the list
+is undocumented and it varies from one system to another based on configuration.
+Also due to their obscurity many kernel developers don't know that these UAPIs
+even exist.  (The reaction when someone finds out is usually "Why!?")
 
-I don't have a use case for having BPF_SKB_TSTAMP_DELIVERY_TAI but curious on 
-how other clock types are used now.
+It may be worth looking at if iwd should make a different choice for this
+dependency.  It's understandable to blame dependencies when things go wrong, but
+at the same time the choice of dependency is very much a choice, and some
+choices can be more technically sound and cause fewer problems than others...
 
-Thanks.
+> �- OpenSSL + friends are rather large libraries.
 
-> 
-> So indeed we will need a user_delivery_time bit and use that to look
-> at sk_clockid.
+The Linux kernel is also large, and it's made larger by having to support
+obsolete crypto algorithms for backwards compatibility with iwd.
 
+> �- AF_ALG has transparent hardware acceleration (not sure if openSSL does
+> too).
+
+OpenSSL takes advantage of CPU-based hardware acceleration, e.g. AES-NI.
+
+> Another consideration is once you support openSSL someone wants wolfSSL,
+> then boringSSL etc. Even if users implement support it just becomes a huge
+> burden to carry for the project. Just look at wpa_supplicant's src/crypto/
+> folder, nearly 40k LOC in there, compared to ELL's crypto modules which is
+> ~5k. You have to sort out all the nitty gritty details of each library, and
+> provide a common driver/API for the core code, differences between openssl
+> versions, the list goes on.
+
+What is the specific functionality that you're actually relying on that you
+think would need 40K lines of code to replace, even using OpenSSL?  I see you
+are using KEYCTL_PKEY_*, but what specifically are you using them for?  What
+operations are being performed, and with which algorithms and key formats?
+Also, is the kernel behavior that you're relying on documented anywhere?  There
+are man pages for those keyctls, but they don't say anything about any
+particular hash algorithm, SHA-1 or otherwise, being supported.
+
+- Eric
 
