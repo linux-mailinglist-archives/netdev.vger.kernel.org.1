@@ -1,359 +1,182 @@
-Return-Path: <netdev+bounces-79758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17B3A87B335
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 22:05:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 990F987B357
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 22:17:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 814D91F289FA
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 21:05:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4F9922860C6
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 21:17:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283844E1CE;
-	Wed, 13 Mar 2024 21:05:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E950753811;
+	Wed, 13 Mar 2024 21:17:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="CW/I8OO3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f3eVJzyT"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2AB24D108
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 21:05:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B0234E1CE;
+	Wed, 13 Mar 2024 21:17:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710363904; cv=none; b=u+pQwYtDJpxW4V1Huji8YGiTmaxKbWN6Rnx3kgllpZTcUNzT6kh/eC/9DO6//0LBiRN1UsTX8k1rLt59PzpiiUDZ+mwOblsNjmD3w8hToOv6JWHPYqNlnPT+bLo2a7IF4X/52lLaCitLJWmEX73gzA9Gto9/XYcSyzkemxqgFY0=
+	t=1710364652; cv=none; b=DPq/v8gdFdjgr2bQHfSsnylPuBKa9Rm8A+AR96ZrO1yF+u0Haayf+vptTBbKLGPtyZcIB+b5Kpty1sivD9ax/TIHsEyuQMrprDQpY8P/kCkRDz6shMhK3zc4hJHPoavQwyY1NrJiI3O6gIyt7kL3wsAMopflD+QFUv0jVTAZkAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710363904; c=relaxed/simple;
-	bh=1rDk/D/w82cRC2xi0EcgIC8GSeJb0wsXT5W5m8dPGjE=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=pH4BwbNcWB6ZDLZSCKA46cQZV4P7grhpPUaK8iym2bGR8os/cekT7V/6pRaUPK7rawINhYqrXkznGnTM3BsQrUCpgPSDc5EvkA1VvVvfzxeR634fXJChx90kbP3JpB99t9EKWkb369KhWgulkPq3MmOqdXetJRoJbDpRYBUASB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=CW/I8OO3; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 29719208C8;
-	Wed, 13 Mar 2024 22:05:00 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id dj8U9BazO5fo; Wed, 13 Mar 2024 22:04:59 +0100 (CET)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 4BD7D208C0;
-	Wed, 13 Mar 2024 22:04:59 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 4BD7D208C0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1710363899;
-	bh=4fKBJqIrh4VHAxcbOfP3zeg5LBObJ2aFKO2N6+BTLXM=;
-	h=Date:From:To:CC:Subject:Reply-To:From;
-	b=CW/I8OO3IrLuFOizbV8rXuoPfKPRgB/JmS65LO7IrQWqx9wFvP1tMZ1H0DUubj2K4
-	 DSfevJWPSFztaIfhOf09XfdM9nRwB9I5WwaAVNe04HpvrsmW71kPGq+rUVHjHRHMgF
-	 LuZfht5ZfLwT9u99odOKO9AtU7kyV5uo8GZq8uu/05hjD2dmoa7TF5spLrY4d/u4G0
-	 xsB+M1ounpKJY8V42Kwyb+47/57Jt4UZkUxiZP2teqvoVcjtTT1UZhi50bdP7O607q
-	 ACRY3hAXCInn4Il1+pLJ2+XXt4lHGigznddZAcA54SW5tW5sPJT3fxDwCVLViEmCSk
-	 hpeCbG9DLm5kA==
-Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout2.secunet.com (Postfix) with ESMTP id 3D50280004A;
-	Wed, 13 Mar 2024 22:04:59 +0100 (CET)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 13 Mar 2024 22:04:59 +0100
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 13 Mar
- 2024 22:04:58 +0100
-Date: Wed, 13 Mar 2024 22:04:51 +0100
-From: Antony Antony <antony.antony@secunet.com>
-To: Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>
-CC: <netdev@vger.kernel.org>, <devel@linux-ipsec.org>, Antony Antony
-	<antony.antony@secunet.com>, Leon Romanovsky <leon@kernel.org>, Eyal Birger
-	<eyal.birger@gmail.com>
-Subject: [PATCH ipsec-next v4] xfrm: Add Direction to the SA in or out
-Message-ID: <515e7c749459afdd61af95bd40ce0d5f2173fc30.1710363570.git.antony.antony@secunet.com>
-Reply-To: <antony.antony@secunet.com>
+	s=arc-20240116; t=1710364652; c=relaxed/simple;
+	bh=ZZ1yvqhV88L8Fdbidzu5N0f/JeBcdFJbua0aS7dkUOg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=VTSNP7zcg1FHc34KEFpVfBkNpSTpBPVsQ22LeuelJuW5mx3jmlqkVGz21Ve47cf635YFDeiXlY+oYzCi77lE/X/NEZr5kzJGWpzAfyGDvp2tvSmN5e2Dmw66PAbkVtO3aIrs38N5m6wNFCVebK36S70WH7bCyKoW1CbLRaNe180=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f3eVJzyT; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1dd59b95677so2330925ad.1;
+        Wed, 13 Mar 2024 14:17:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710364650; x=1710969450; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NUlXrKT9EnIj18amwCty7VMhLzOsFE6rwuzLJc3R0iA=;
+        b=f3eVJzyTSVrVC6aY0ja27V+r/mYulVtK3rD8Y2ml2pZ5OcYoL2Ul1pmZk9/FuAaC7+
+         1Zdvmf2GYtnAnBGL3VH/1Tq2+aK5xlQD+27SNy41RKjwfsRUF9XflftkU0YxZkswDfTo
+         xRWP6hQx3HQRArRu+Z8JY9eW5EKhgFxQ++k++JA5aWS/7RNcGCxSRjUUz8oVCXSf9Z7+
+         GrIaqDXFYk79NGXofE+VBpa0N1SeYriVBv8obStiL6jEQ4imYfPyl9jNwUTtj8kTRazG
+         9N/YUDPuu+Zxdx18cw9V6OKylsIsTnZjk8k3MD3Um8RApZne9SdPC013Igs+j584P4C3
+         mN4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710364650; x=1710969450;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NUlXrKT9EnIj18amwCty7VMhLzOsFE6rwuzLJc3R0iA=;
+        b=IEe8Q+PqWHojaNydeL2FlXi1ci3xlRcRl/77GN7cMluE+LIXzM5PfXG413dqRZEyL2
+         XZS/uUixP25t/sOCRBaAJ4GjCF8MFxiFewmchnVZ7bur55NskUHD9oHvoSmAI00Fq+Rl
+         i1YALtJMgimqSBbdvdj0W8JPgjAz+54Bvm1ciIzth64tyJ4Nv78c4Ep6godQGBfjX/XL
+         oD7wwitRLpME2tVQIRkIV54Cn4c0Xj5f2rreK9dCEPqn7iy3VN6A95zIN/zQMn3Rh/+C
+         gZ7PdqHsII0U5qPIpDe2qxXmjDAOQAS61q/Qz2ja4LOTR+mcS75v1W1UvDKlIeYN+QkR
+         XSvg==
+X-Forwarded-Encrypted: i=1; AJvYcCX9/tvwMxJGKhR2rrZ7kcAEccpSnc+DAKCi2KBR//i+EYv4Q027qF41bO+RyM7wlGZG4vfLZ7ukWaKqnAW2GXY8dGFh5kOTmy9hmwgq40dy8OSjk88AwRcxmLYlgXi/Db8QYc4h4OHey/tCpKtYKlQEchh3cbW5CWhqeI3jlDQz3nk4o+cQhr4VqzV36N9PoHN9CTocg9mcY6Rlw/khU4bHayyyRT8DE1zLmXDUaMzYkJl2FCKG8h1ME+UxpuCtcmhkE2J+b3gktJOkvdS76NrZ05//DpQrI8qhdb8=
+X-Gm-Message-State: AOJu0YxHQBe/6JfifRyRkHH47qsVS2TYB9JvICyD7sn9QT4FF5BRu/Qx
+	m9GNgHer9Cw+TQPeEFNvOdjYpw/2va0IiDu0tZCZh6twjpH7Ju93
+X-Google-Smtp-Source: AGHT+IG9I+hDSxyD1Im6G/LLTkYoz1TmcbofHmjXyd16Vyd3jct6bToKtjs1/z8pGQeFpGSefzEBMg==
+X-Received: by 2002:a17:902:ea01:b0:1db:55cc:d226 with SMTP id s1-20020a170902ea0100b001db55ccd226mr14449454plg.66.1710364650361;
+        Wed, 13 Mar 2024 14:17:30 -0700 (PDT)
+Received: from [192.168.254.38] ([50.39.172.77])
+        by smtp.gmail.com with ESMTPSA id j7-20020a170902da8700b001da15580ca8sm65107plx.52.2024.03.13.14.17.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Mar 2024 14:17:29 -0700 (PDT)
+Message-ID: <db86cba4-0e61-441d-8e66-405a13b61a3c@gmail.com>
+Date: Wed, 13 Mar 2024 14:17:29 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+User-Agent: Mozilla Thunderbird
+Subject: Re: [REGRESSION] Re: [PATCH] crypto: pkcs7: remove sha1 support
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: Johannes Berg <johannes@sipsolutions.net>, Karel Balej
+ <balejk@matfyz.cz>, dimitri.ledkov@canonical.com,
+ alexandre.torgue@foss.st.com, davem@davemloft.net, dhowells@redhat.com,
+ herbert@gondor.apana.org.au, keyrings@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, mcgrof@kernel.org,
+ mcoquelin.stm32@gmail.com, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org, iwd@lists.linux.dev
+References: <CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz>
+ <005f998ec59e27633b1b99fdf929e40ccfd401c1.camel@sipsolutions.net>
+ <f2dcbe55-0f0e-4173-8e21-f899c6fc802a@gmail.com>
+ <20240313194423.GA1111@sol.localdomain>
+ <b838e729-dc30-4e18-b928-c34c16b08606@gmail.com>
+ <20240313202223.GB1111@sol.localdomain>
+Content-Language: en-US
+From: James Prestwood <prestwoj@gmail.com>
+In-Reply-To: <20240313202223.GB1111@sol.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-This patch introduces the 'dir' attribute, 'in' or 'out', to the
-xfrm_state, SA, enhancing usability by delineating the scope of values
-based on direction. An input SA will now exclusively encompass values
-pertinent to input, effectively segregating them from output-related
-values. This change aims to streamline the configuration process and
-improve the overall clarity of SA attributes.
+Hi,
 
-Signed-off-by: Antony Antony <antony.antony@secunet.com>
----
-v3->v4:
- - improve HW OFFLOAD DIR check check other direction
+On 3/13/24 1:22 PM, Eric Biggers wrote:
+> On Wed, Mar 13, 2024 at 01:12:54PM -0700, James Prestwood wrote:
+>> Hi,
+>>
+>> On 3/13/24 12:44 PM, Eric Biggers wrote:
+>>> On Wed, Mar 13, 2024 at 10:26:06AM -0700, James Prestwood wrote:
+>>>> Hi,
+>>>>
+>>>> On 3/13/24 1:56 AM, Johannes Berg wrote:
+>>>>> Not sure why you're CC'ing the world, but I guess adding a few more
+>>>>> doesn't hurt ...
+>>>>>
+>>>>> On Wed, 2024-03-13 at 09:50 +0100, Karel Balej wrote:
+>>>>>>     and I use iwd
+>>>>> This is your problem, the wireless stack in the kernel doesn't use any
+>>>>> kernel crypto code for 802.1X.
+>>>> Yes, the wireless stack has zero bearing on the issue. I think that's what
+>>>> you meant by "problem".
+>>>>
+>>>> IWD has used the kernel crypto API forever which was abruptly broken, that
+>>>> is the problem.
+>>>>
+>>>> The original commit says it was to remove support for sha1 signed kernel
+>>>> modules, but it did more than that and broke the keyctl API.
+>>>>
+>>> Which specific API is iwd using that is relevant here?
+>>> I cloned https://kernel.googlesource.com/pub/scm/network/wireless/iwd
+>>> and grepped for keyctl and AF_ALG, but there are no matches.
+>> IWD uses ELL for its crypto, which uses the AF_ALG API:
+>>
+>> https://git.kernel.org/pub/scm/libs/ell/ell.git/
+> Thanks for pointing out that the relevant code is really in that separate
+> repository.  Note, it seems that keyctl() is the problem here, not AF_ALG.  The
+> blamed commit didn't change anything for AF_ALG.
+>
+>> I believe the failure is when calling:
+>>
+>> KEYCTL_PKEY_QUERY enc="x962" hash="sha1"
+>>
+>>  From logs Michael posted on the IWD list, the ELL API that fails is:
+>>
+>> l_key_get_info (ell.git/ell/key.c:416)
+> Okay, I guess that's what's actually causing the problem.  KEYCTL_PKEY_* are a
+> weird set of APIs where userspace can ask the kernel to do asymmetric key
+> operations.  It's unclear why they exist, as the same functionality is available
+> in userspace crypto libraries.
+>
+> I suppose that the blamed commit, or at least part of it, will need to be
+> reverted to keep these weird keyctls working.
+>
+> For the future, why doesn't iwd just use a userspace crypto library such as
+> OpenSSL?
 
-v2->v3:
- - delete redundant XFRM_SA_DIR_USET
- - use u8 for "dir"
- - fix HW OFFLOAD DIR check
+I was not around when the original decision was made, but a few reasons 
+I know we don't use openSSL:
 
-v1->v2:
- - use .strict_start_type in struct nla_policy xfrma_policy
- - delete redundant XFRM_SA_DIR_MAX enum
----
- include/net/xfrm.h        |  1 +
- include/uapi/linux/xfrm.h |  6 +++++
- net/xfrm/xfrm_compat.c    |  7 ++++--
- net/xfrm/xfrm_device.c    |  6 +++++
- net/xfrm/xfrm_state.c     |  1 +
- net/xfrm/xfrm_user.c      | 46 +++++++++++++++++++++++++++++++++++----
- 6 files changed, 61 insertions(+), 6 deletions(-)
+  - IWD has virtually zero dependencies.
 
-diff --git a/include/net/xfrm.h b/include/net/xfrm.h
-index 1d107241b901..9ff8a0e0f477 100644
---- a/include/net/xfrm.h
-+++ b/include/net/xfrm.h
-@@ -289,6 +289,7 @@ struct xfrm_state {
- 	/* Private data of this transformer, format is opaque,
- 	 * interpreted by xfrm_type methods. */
- 	void			*data;
-+	u8			dir;
- };
+  - OpenSSL + friends are rather large libraries.
 
- static inline struct net *xs_net(struct xfrm_state *x)
-diff --git a/include/uapi/linux/xfrm.h b/include/uapi/linux/xfrm.h
-index 6a77328be114..18ceaba8486e 100644
---- a/include/uapi/linux/xfrm.h
-+++ b/include/uapi/linux/xfrm.h
-@@ -141,6 +141,11 @@ enum {
- 	XFRM_POLICY_MAX	= 3
- };
+  - AF_ALG has transparent hardware acceleration (not sure if openSSL 
+does too).
 
-+enum xfrm_sa_dir {
-+	XFRM_SA_DIR_IN	= 1,
-+	XFRM_SA_DIR_OUT = 2
-+};
-+
- enum {
- 	XFRM_SHARE_ANY,		/* No limitations */
- 	XFRM_SHARE_SESSION,	/* For this session only */
-@@ -315,6 +320,7 @@ enum xfrm_attr_type_t {
- 	XFRMA_SET_MARK_MASK,	/* __u32 */
- 	XFRMA_IF_ID,		/* __u32 */
- 	XFRMA_MTIMER_THRESH,	/* __u32 in seconds for input SA */
-+	XFRMA_SA_DIR,		/* __u8 */
- 	__XFRMA_MAX
+Another consideration is once you support openSSL someone wants wolfSSL, 
+then boringSSL etc. Even if users implement support it just becomes a 
+huge burden to carry for the project. Just look at wpa_supplicant's 
+src/crypto/ folder, nearly 40k LOC in there, compared to ELL's crypto 
+modules which is ~5k. You have to sort out all the nitty gritty details 
+of each library, and provide a common driver/API for the core code, 
+differences between openssl versions, the list goes on.
 
- #define XFRMA_OUTPUT_MARK XFRMA_SET_MARK	/* Compatibility */
-diff --git a/net/xfrm/xfrm_compat.c b/net/xfrm/xfrm_compat.c
-index 655fe4ff8621..007dee03b1bc 100644
---- a/net/xfrm/xfrm_compat.c
-+++ b/net/xfrm/xfrm_compat.c
-@@ -98,6 +98,7 @@ static const int compat_msg_min[XFRM_NR_MSGTYPES] = {
- };
+Thanks,
 
- static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
-+	[XFRMA_UNSPEC]          = { .strict_start_type = XFRMA_SA_DIR },
- 	[XFRMA_SA]		= { .len = XMSGSIZE(compat_xfrm_usersa_info)},
- 	[XFRMA_POLICY]		= { .len = XMSGSIZE(compat_xfrm_userpolicy_info)},
- 	[XFRMA_LASTUSED]	= { .type = NLA_U64},
-@@ -129,6 +130,7 @@ static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
- 	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
- 	[XFRMA_IF_ID]		= { .type = NLA_U32 },
- 	[XFRMA_MTIMER_THRESH]	= { .type = NLA_U32 },
-+	[XFRMA_SA_DIR]          = { .type = NLA_U8}
- };
+James
 
- static struct nlmsghdr *xfrm_nlmsg_put_compat(struct sk_buff *skb,
-@@ -277,9 +279,10 @@ static int xfrm_xlate64_attr(struct sk_buff *dst, const struct nlattr *src)
- 	case XFRMA_SET_MARK_MASK:
- 	case XFRMA_IF_ID:
- 	case XFRMA_MTIMER_THRESH:
-+	case XFRMA_SA_DIR:
- 		return xfrm_nla_cpy(dst, src, nla_len(src));
- 	default:
--		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
-+		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
- 		pr_warn_once("unsupported nla_type %d\n", src->nla_type);
- 		return -EOPNOTSUPP;
- 	}
-@@ -434,7 +437,7 @@ static int xfrm_xlate32_attr(void *dst, const struct nlattr *nla,
- 	int err;
 
- 	if (type > XFRMA_MAX) {
--		BUILD_BUG_ON(XFRMA_MAX != XFRMA_MTIMER_THRESH);
-+		BUILD_BUG_ON(XFRMA_MAX != XFRMA_SA_DIR);
- 		NL_SET_ERR_MSG(extack, "Bad attribute");
- 		return -EOPNOTSUPP;
- 	}
-diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-index 3784534c9185..1d1b1494b71f 100644
---- a/net/xfrm/xfrm_device.c
-+++ b/net/xfrm/xfrm_device.c
-@@ -253,6 +253,12 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
- 		return -EINVAL;
- 	}
-
-+	if ((xuo->flags & XFRM_OFFLOAD_INBOUND && x->dir == XFRM_SA_DIR_OUT) ||
-+	    (!(xuo->flags & XFRM_OFFLOAD_INBOUND) && x->dir == XFRM_SA_DIR_IN)) {
-+		NL_SET_ERR_MSG(extack, "Mismatched SA and offload direction");
-+		return -EINVAL;
-+	}
-+
- 	is_packet_offload = xuo->flags & XFRM_OFFLOAD_PACKET;
-
- 	/* We don't yet support UDP encapsulation and TFC padding. */
-diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-index bda5327bf34d..0d6f5a49002f 100644
---- a/net/xfrm/xfrm_state.c
-+++ b/net/xfrm/xfrm_state.c
-@@ -1744,6 +1744,7 @@ static struct xfrm_state *xfrm_state_clone(struct xfrm_state *orig,
- 	x->lastused = orig->lastused;
- 	x->new_mapping = 0;
- 	x->new_mapping_sport = 0;
-+	x->dir = orig->dir;
-
- 	return x;
-
-diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-index ad01997c3aa9..e2b734c6eb3d 100644
---- a/net/xfrm/xfrm_user.c
-+++ b/net/xfrm/xfrm_user.c
-@@ -360,6 +360,16 @@ static int verify_newsa_info(struct xfrm_usersa_info *p,
- 		}
- 	}
-
-+	if (attrs[XFRMA_SA_DIR]) {
-+		u8 sa_dir = nla_get_u8(attrs[XFRMA_SA_DIR]);
-+
-+		if (sa_dir != XFRM_SA_DIR_IN && sa_dir != XFRM_SA_DIR_OUT)  {
-+			NL_SET_ERR_MSG(extack, "XFRMA_SA_DIR attribute is out of range");
-+			err = -EINVAL;
-+			goto out;
-+		}
-+	}
-+
- out:
- 	return err;
- }
-@@ -627,6 +637,7 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
- 	struct nlattr *et = attrs[XFRMA_ETIMER_THRESH];
- 	struct nlattr *rt = attrs[XFRMA_REPLAY_THRESH];
- 	struct nlattr *mt = attrs[XFRMA_MTIMER_THRESH];
-+	struct nlattr *dir = attrs[XFRMA_SA_DIR];
-
- 	if (re && x->replay_esn && x->preplay_esn) {
- 		struct xfrm_replay_state_esn *replay_esn;
-@@ -661,6 +672,9 @@ static void xfrm_update_ae_params(struct xfrm_state *x, struct nlattr **attrs,
-
- 	if (mt)
- 		x->mapping_maxage = nla_get_u32(mt);
-+
-+	if (dir)
-+		x->dir = nla_get_u8(dir);
- }
-
- static void xfrm_smark_init(struct nlattr **attrs, struct xfrm_mark *m)
-@@ -1182,8 +1196,13 @@ static int copy_to_user_state_extra(struct xfrm_state *x,
- 		if (ret)
- 			goto out;
- 	}
--	if (x->mapping_maxage)
-+	if (x->mapping_maxage) {
- 		ret = nla_put_u32(skb, XFRMA_MTIMER_THRESH, x->mapping_maxage);
-+		if (ret)
-+			goto out;
-+	}
-+	if (x->dir)
-+		ret = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
- out:
- 	return ret;
- }
-@@ -2399,7 +2418,8 @@ static inline unsigned int xfrm_aevent_msgsize(struct xfrm_state *x)
- 	       + nla_total_size_64bit(sizeof(struct xfrm_lifetime_cur))
- 	       + nla_total_size(sizeof(struct xfrm_mark))
- 	       + nla_total_size(4) /* XFRM_AE_RTHR */
--	       + nla_total_size(4); /* XFRM_AE_ETHR */
-+	       + nla_total_size(4) /* XFRM_AE_ETHR */
-+	       + nla_total_size(sizeof(x->dir)); /* XFRMA_SA_DIR */
- }
-
- static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
-@@ -2456,6 +2476,12 @@ static int build_aevent(struct sk_buff *skb, struct xfrm_state *x, const struct
- 	if (err)
- 		goto out_cancel;
-
-+	if (x->dir) {
-+		err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
-+		if (err)
-+			goto out_cancel;
-+	}
-+
- 	nlmsg_end(skb, nlh);
- 	return 0;
-
-@@ -3015,6 +3041,7 @@ EXPORT_SYMBOL_GPL(xfrm_msg_min);
- #undef XMSGSIZE
-
- const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
-+	[XFRMA_UNSPEC]		= { .strict_start_type = XFRMA_SA_DIR },
- 	[XFRMA_SA]		= { .len = sizeof(struct xfrm_usersa_info)},
- 	[XFRMA_POLICY]		= { .len = sizeof(struct xfrm_userpolicy_info)},
- 	[XFRMA_LASTUSED]	= { .type = NLA_U64},
-@@ -3046,6 +3073,7 @@ const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
- 	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
- 	[XFRMA_IF_ID]		= { .type = NLA_U32 },
- 	[XFRMA_MTIMER_THRESH]   = { .type = NLA_U32 },
-+	[XFRMA_SA_DIR]          = { .type = NLA_U8 }
- };
- EXPORT_SYMBOL_GPL(xfrma_policy);
-
-@@ -3186,8 +3214,9 @@ static void xfrm_netlink_rcv(struct sk_buff *skb)
-
- static inline unsigned int xfrm_expire_msgsize(void)
- {
--	return NLMSG_ALIGN(sizeof(struct xfrm_user_expire))
--	       + nla_total_size(sizeof(struct xfrm_mark));
-+	return NLMSG_ALIGN(sizeof(struct xfrm_user_expire)) +
-+	       nla_total_size(sizeof(struct xfrm_mark)) +
-+	       nla_total_size(sizeof_field(struct xfrm_state, dir));
- }
-
- static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct km_event *c)
-@@ -3214,6 +3243,12 @@ static int build_expire(struct sk_buff *skb, struct xfrm_state *x, const struct
- 	if (err)
- 		return err;
-
-+	if (x->dir) {
-+		err = nla_put_u8(skb, XFRMA_SA_DIR, x->dir);
-+		if (err)
-+			return err;
-+	}
-+
- 	nlmsg_end(skb, nlh);
- 	return 0;
- }
-@@ -3321,6 +3356,9 @@ static inline unsigned int xfrm_sa_len(struct xfrm_state *x)
- 	if (x->mapping_maxage)
- 		l += nla_total_size(sizeof(x->mapping_maxage));
-
-+	if (x->dir)
-+		l += nla_total_size(sizeof(x->dir));
-+
- 	return l;
- }
-
---
-2.30.2
-
+>
+> - Eric
 
