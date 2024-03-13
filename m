@@ -1,135 +1,77 @@
-Return-Path: <netdev+bounces-79680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A7F287A8D1
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:56:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BF8087A8D5
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:57:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1913B1F22CCF
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:56:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14685B22D59
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 13:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9B4341C7F;
-	Wed, 13 Mar 2024 13:56:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04E5D42077;
+	Wed, 13 Mar 2024 13:57:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KnK/O+lL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hQrq4V1M"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A8F045BED
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 13:56:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD99743AB2;
+	Wed, 13 Mar 2024 13:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710338189; cv=none; b=gwl3nGH7orvrd7qldo4IXVpKbBIUj8sfwXvvM6LDdY4o+s8W39r7bmXq/6E9q84jD/UrX9Isco/ar/C4CMhOVIN4XZCPIjac1fziUgDuyAR6NKtrg3vWCqD5sCsjC2RyXPE8J2v5VSY5VpJ0hazQgyr2HwRineTnIcZYEvRaPx8=
+	t=1710338246; cv=none; b=k2X7/34H0iX7jbfjjVVUhSUiVwsbcPVe9NH6/LdGyWNXcaFcvl0lMHJIjbvsRwzyEV8YlFE4s5UObz5Hj5sxb2Dt9PxrnvyZNn4F4ArULYIEXzBD8xja95SjRXy7qGpX0T/3nmaFtuZyEnsEfs4o3jY47soseJd6WFV4SexfneE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710338189; c=relaxed/simple;
-	bh=PwEPuxMUo5/sKc+Junep3vDKZCEW5PDExzGK+M8LuGA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iGEEFSqssE33J/OY2zIxggpehUtVg385QFYj8otlMABrphKt9zvVySgrAAg1KSEAB4oZcT0ocPnvLIljQDsfhlQQsv72UHDP9pkLVT2gddRs189mUkWJG1usFfNEpULypiEFw019e5YzB/VmFJQyWJKU9DA4cxCS9ZwGnTXfHYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KnK/O+lL; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710338187;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=YY7GeN9xZf21MLc2UbS3lntZ4saklnuJyBZ7lW6jh1c=;
-	b=KnK/O+lL4SUXOO1bS4bnw6UZK4XjvSuMKJnIz9pxHrl1ETtlwo5l/oPefhNJzO1ki6sKFq
-	SMC7WunhoheykuHoNo28u16fHJHBOY0eL8ZEELDZr/dVUVj5/yCB03ToM7tJa2ZWKHA5hd
-	OnG+zCLuaosulB7F+qtsJh7k+5S1Rks=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-635-VcupKPbuOvKv81gJxYr70g-1; Wed, 13 Mar 2024 09:56:21 -0400
-X-MC-Unique: VcupKPbuOvKv81gJxYr70g-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C65B01875701;
-	Wed, 13 Mar 2024 13:56:20 +0000 (UTC)
-Received: from p1.luc.cera.cz (unknown [10.45.224.236])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id ECA6517A93;
-	Wed, 13 Mar 2024 13:56:18 +0000 (UTC)
-From: Ivan Vecera <ivecera@redhat.com>
-To: netdev@vger.kernel.org
-Cc: aleksandr.loktionov@intel.com,
-	mschmidt@redhat.com,
-	horms@kernel.org,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net] i40e: Fix VF MAC filter removal
-Date: Wed, 13 Mar 2024 14:56:17 +0100
-Message-ID: <20240313135618.20930-1-ivecera@redhat.com>
+	s=arc-20240116; t=1710338246; c=relaxed/simple;
+	bh=KK7opGThc5jVikuIZOARKvcqSgweVwoAbK4+fL+Z7i8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aeKS3PsqAwNHROKYg149tcO8glTDT2tuxn/FTY78VS1ycT75/AY+wt8vHYZTArFOdJzrFQL6cuYt+fUPSvJKFwuf5Ixy1tkmZSMnFbsZI4LNc7q/UT0xCjIgGjd7U1axtUsXG4PTeWlRpf25lS6jCpSnqkR8i6u0ZrJc1iw/5J8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hQrq4V1M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1073BC433C7;
+	Wed, 13 Mar 2024 13:57:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710338246;
+	bh=KK7opGThc5jVikuIZOARKvcqSgweVwoAbK4+fL+Z7i8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hQrq4V1MDwQCQbkfiWfTuBhrm3ro/rZ+y/D+/Q7pUR/BySOCVcjwGZe4ycQTSaesQ
+	 KdYFvR0n12l8Cx0EXso3LMYSGgUA2gWzwpldGaL9a0Ba7Vw/qFgCWxRVD2ubg0D1cY
+	 asxYK1AGTNj63+c8gihwd45nwVogogSN4VLs9pIDT1ombW0q8FPBetp9HoWhh3qXK0
+	 hNgE68Bx2Sq9UlMfyO4hx3QLG8xnmCjEnEhE+geJs+UMJ+X69oEIw3GGrG1jeLzKTG
+	 U9mojRHusR5SNubDqfNnGZALhsua0vN5Um1Sz7qD19/dJAaRyEv2SVIzOmzvwnYPO2
+	 rfRhdBDEmU8TQ==
+Date: Wed, 13 Mar 2024 06:57:25 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Michal Kubiak <michal.kubiak@intel.com>
+Cc: Ignat Korchagin <ignat@cloudflare.com>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <kernel-team@cloudflare.com>
+Subject: Re: [PATCH net v2 2/2] selftests: net: veth: test the ability to
+ independently manipulate GRO and XDP
+Message-ID: <20240313065725.46a50ea8@kernel.org>
+In-Reply-To: <ZfGN6RTBCbEm6uSO@localhost.localdomain>
+References: <20240312160551.73184-1-ignat@cloudflare.com>
+	<20240312160551.73184-3-ignat@cloudflare.com>
+	<ZfGN6RTBCbEm6uSO@localhost.localdomain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Commit 73d9629e1c8c ("i40e: Do not allow untrusted VF to remove
-administratively set MAC") fixed an issue where untrusted VF was
-allowed to remove its own MAC address although this was assigned
-administratively from PF. Unfortunately the introduced check
-is wrong because it causes that MAC filters for other MAC addresses
-including multi-cast ones are not removed.
+On Wed, 13 Mar 2024 12:28:41 +0100 Michal Kubiak wrote:
+> On Tue, Mar 12, 2024 at 04:05:52PM +0000, Ignat Korchagin wrote:
+> > We should be able to independently flip either XDP or GRO states and toggling
+> > one should not affect the other.
+> > 
+> > Signed-off-by: Ignat Korchagin <ignat@cloudflare.com>  
+> 
+> Missing "Fixes" tag for the patch targeted to the "net" tree.
 
-<snip>
-	if (ether_addr_equal(addr, vf->default_lan_addr.addr) &&
-	    i40e_can_vf_change_mac(vf))
-		was_unimac_deleted = true;
-	else
-		continue;
-
-	if (i40e_del_mac_filter(vsi, al->list[i].addr)) {
-	...
-</snip>
-
-The else path with `continue` effectively skips any MAC filter
-removal except one for primary MAC addr when VF is allowed to do so.
-Fix the check condition so the `continue` is only done for primary
-MAC address.
-
-Fixes: 73d9629e1c8c ("i40e: Do not allow untrusted VF to remove administratively set MAC")
-Signed-off-by: Ivan Vecera <ivecera@redhat.com>
----
- drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 11 ++++++-----
- 1 file changed, 6 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-index b34c71770887..10267a300770 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-@@ -3143,11 +3143,12 @@ static int i40e_vc_del_mac_addr_msg(struct i40e_vf *vf, u8 *msg)
- 		/* Allow to delete VF primary MAC only if it was not set
- 		 * administratively by PF or if VF is trusted.
- 		 */
--		if (ether_addr_equal(addr, vf->default_lan_addr.addr) &&
--		    i40e_can_vf_change_mac(vf))
--			was_unimac_deleted = true;
--		else
--			continue;
-+		if (ether_addr_equal(addr, vf->default_lan_addr.addr)) {
-+			if (i40e_can_vf_change_mac(vf))
-+				was_unimac_deleted = true;
-+			else
-+				continue;
-+		}
- 
- 		if (i40e_del_mac_filter(vsi, al->list[i].addr)) {
- 			ret = -EINVAL;
--- 
-2.43.0
-
+it's adjusting a selftest, I don't think we need a Fixes tag for that
 
