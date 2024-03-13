@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-79711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50DA487AB11
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 17:26:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AF0E87AB13
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 17:26:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DCC91C2120E
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 16:26:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DB181C2112E
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 16:26:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC49A4D5A5;
-	Wed, 13 Mar 2024 16:25:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACD44482DA;
+	Wed, 13 Mar 2024 16:25:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="RdSU3EY0"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="OgTGHzNv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A7F34CB2B
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 16:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0BC34E1B3
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 16:25:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710347155; cv=none; b=Mp3jszhva0GdAW1iDghtZF5AEdydtYsnCYIy/i7rmOutrgDwTzVdVh+nJgruwu/96Df4IyEw8NpQmBQH/czveDI1+fk/O73kWHVlKMIevK8f0YCNX8D+mUBN1J2T2l9I4nrUn/QiuqKOBkYrtgzB7xbKiZZcPsK1Uk3AM2FQv7g=
+	t=1710347158; cv=none; b=aEF37hHAXecuslU6pfLrWW9zKihDanmg1gtJxS5z9rz9gr1f8IkYxSIXgXqlzFQ7TNzXf7uv6XiXxPcy+OVmOB7XjAehI4yB/WU3mqzPKuzGChOxDAcW0Kyx43emp6q5wN+UdEZI/04UUE8kIbiYQ4lIOpGcb6ds8zriFEFVPe0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710347155; c=relaxed/simple;
-	bh=waophCxTcodcZBiaZRBq4Vcy/9u+Db/aHwd0TOyESlA=;
+	s=arc-20240116; t=1710347158; c=relaxed/simple;
+	bh=1+v+hX17pdDJJ6b6jYIIjDKh50fBpD8puF0YHUfUemQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hjNGCYBUrU7qpuaboIxw366T7rXYAQzsx+JCFnGi99sUyRyQlda7S4tY/XIKJRRqaKgVx9uDjAy6Z/htkfoR2Q2b/pUgjr7v29b+64R6vJ8yDHQOMWr8WkTQk5M7VLlcM06uKXSeLteguG7uGkjQHkNe4C9XUYL+ubuPl7DTYyw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=RdSU3EY0; arc=none smtp.client-ip=209.85.222.172
+	 Content-Type:Content-Disposition:In-Reply-To; b=QMn8nPX8IwNqkQ2OwaCmXijaKn0ISo1NvGUwtLUBE4JxuRIqPD8syvq25hZzEXADBOp8EG+7Xu+rZIKfjkq7sDM0pVP/EiGaZpzu1Qrs7hChJ4R8NyNjoYyhFgdr/wz7oacpivne+voFRoPbIrtS2DZcZ5M9j1ADdSl06Ge83m8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=OgTGHzNv; arc=none smtp.client-ip=209.85.160.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7882e8f99eeso800485a.0
-        for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 09:25:53 -0700 (PDT)
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-42f4250a382so20346971cf.1
+        for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 09:25:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1710347152; x=1710951952; darn=vger.kernel.org;
+        d=cloudflare.com; s=google09082023; t=1710347155; x=1710951955; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=hz52VDhsyBUm+rkXRTpJXcM4FSy0vt7HjYW4U4Q0pQw=;
-        b=RdSU3EY000ormZCobNVsi8X8ZcmHO2hUrQybNRFpiTKEhAbnstxVmtInPHXSt2aKxb
-         PS3A5Z9vFgtBWo3OPKELMRGKXRFnYFn8oEm0OKdRZqBg8XqlpdTDHmYxlpIMgtpWIHro
-         jzi7Vw1k9/zp0D+bp8lbe8/J0BOahc1XAJakEumFQ0uR9j3An0CbhrWPdBJMZc6eUzy1
-         zYo0kk+DpgXL9eMpD62O/sjKMw4puhi8quHZVoOpGurS7WHZkzM4GR2S6jxq55FJZFoc
-         jAX2H1BZSlt7eZcJQ/IwKdhWWSjdo/fakbvzyJD7sBBG28olu8Ns0gmSrQ9khAJMSaXx
-         P/Dg==
+        bh=zuZkoM/pNXkg3fwRgcPCCwXFIp95GZp6NoxUGsneVz4=;
+        b=OgTGHzNv8DL7sPU+pYpZcazNi/0ETXxuLOa5V1z097C80bO+gxIi4ImuaAne7AgEpQ
+         nB4wzP19UO0aWqwcHTrcpMWHYDVlQGzXbkKIIizx5Jq+Gb12ZZXplh+Z2efe0DDkFF8S
+         9y5YSC5TB1e1PjQoTbMJtbTv7x3nzriddVec0+NWiojZ2Ivdlm4L43V19Rn3C90NHJpw
+         P9D4utQNZM4ZSpJB27cafYC4MingLA1wHKTcVQa3hL/b+D0GorfVwRXMj5ajVo7KL0rb
+         I2pxn7VQIZWUlia3hln/UUZDTHacIy+mi891u4BcLdfMqcfgI0kB+6We8lJjkCxXF474
+         cOGg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710347152; x=1710951952;
+        d=1e100.net; s=20230601; t=1710347155; x=1710951955;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=hz52VDhsyBUm+rkXRTpJXcM4FSy0vt7HjYW4U4Q0pQw=;
-        b=hsuGCxkf/aDM08NJ+RpTeDmHRUQf3e01D/8+sTqeRKJD5kgzpVMJ6DH+9vMYchhZGJ
-         b97u5rOfbl/kB73+igcA1WBfsefaWNBzaEKaDCY1pzWNDtDes3TXIDsRipYE1eCDaWyu
-         M7V76f+HJ6Xhp9O1PZVlLl2qJGAo97wnQtYM536dQmgZxMt1FlGph8aAE9peP4mV828I
-         jlFV9VoBW3FDiA5Tz/CVXDu849U0nxEvxO1kM075O5c0ppYzjzuvY7gh1ki3tPAFVfwX
-         s0HpggOl/ZBHHBtj/vRtleKOI2MwclvJyNacGTXplYquIgzmEc1ybOQDSrSJv6srKwwf
-         2bTQ==
-X-Gm-Message-State: AOJu0YxowrHRAOb2P/hICCBjXkFFbI1peGpLj8w+/uhXRzl4RQC0CBv6
-	HwvOSpRE0QQM5SOjrKsj0m0XFzUzxENHsCRkPNJat8F1BCyETOOvGKALxF/f0v330jvswAQJ9A6
-	bYaQ=
-X-Google-Smtp-Source: AGHT+IHG2Wo7WJzKa6z0HU+as2odTaqY/F5UrV7eoi67pzTk35M3ZippREVklQyBwoPl9T2v05w+XQ==
-X-Received: by 2002:a05:620a:28d1:b0:788:2dd5:6f12 with SMTP id l17-20020a05620a28d100b007882dd56f12mr467010qkp.67.1710347152457;
-        Wed, 13 Mar 2024 09:25:52 -0700 (PDT)
+        bh=zuZkoM/pNXkg3fwRgcPCCwXFIp95GZp6NoxUGsneVz4=;
+        b=OaOCaexVksiGjWoa/Ia/bpLfeXh5vnuPfhsjqoGWGbhQAG6mFk5/jpEA+Btl/F2/Bh
+         BD/7tnsM9AvKbqkH2CyZpgZTzbt53V11lhLJRXSgi2kqby0sv0bVZEdZrYQuZ7/yDgbO
+         +w9uUIfurdOS0CjFpYH9RPahkmy0I55n37Z37diH9v9swDah67F6X7h/YftxyxhTfqOj
+         pEIPcn2snd5NnkdB0mI9rQZnDx7GWbYj5TY64K6fBEXMNCMclni6NqP1UqpNjNxvI4ID
+         ZQHWW3T4AZPQi3Ng0CuG6piYzRbdj7gHJuf1lpc/orVLsIvfykBjENpJjZDBJq/uwO7K
+         G45Q==
+X-Gm-Message-State: AOJu0YyEnpvOTaQ4sqbekaSV7tSD1SWueEbGRbyT3LwDGostLxzrkm8f
+	6k2OX/kxI4GeIkN7dtv4zMf7sjOONgVReIXUnHAnRbqM7oX7n361CQ/ad3k7NNUQvDEvujWx4gR
+	pBIQ=
+X-Google-Smtp-Source: AGHT+IE4RSELlhIjyVIl9mdoB2c6/y2ghhFHfvK2xWIoar8kwAstJE8efv21r1w2Khjmt3u/eHzNNw==
+X-Received: by 2002:ac8:7d55:0:b0:42e:7a9a:f13b with SMTP id h21-20020ac87d55000000b0042e7a9af13bmr17444916qtb.58.1710347155602;
+        Wed, 13 Mar 2024 09:25:55 -0700 (PDT)
 Received: from debian.debian ([2a09:bac5:7a49:f91::18d:37])
-        by smtp.gmail.com with ESMTPSA id az39-20020a05620a172700b00789ca2c923esm818990qkb.114.2024.03.13.09.25.50
+        by smtp.gmail.com with ESMTPSA id k10-20020ac8474a000000b0042f1c348853sm4948440qtp.21.2024.03.13.09.25.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Mar 2024 09:25:51 -0700 (PDT)
-Date: Wed, 13 Mar 2024 09:25:49 -0700
+        Wed, 13 Mar 2024 09:25:55 -0700 (PDT)
+Date: Wed, 13 Mar 2024 09:25:52 -0700
 From: Yan Zhai <yan@cloudflare.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -86,8 +86,8 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
 	Steven Rostedt <rostedt@goodmis.org>, mark.rutland@arm.com,
 	Jesper Dangaard Brouer <hawk@kernel.org>
-Subject: [PATCH v3 net 1/3] rcu: add a helper to report consolidated flavor QS
-Message-ID: <f71214e6221c5c50b32a62a33697473c756e604e.1710346410.git.yan@cloudflare.com>
+Subject: [PATCH v3 net 2/3] net: report RCU QS on threaded NAPI repolling
+Message-ID: <c8c7a84eca24c900c154f4b284067b13520fa37c.1710346410.git.yan@cloudflare.com>
 References: <cover.1710346410.git.yan@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -99,52 +99,85 @@ Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <cover.1710346410.git.yan@cloudflare.com>
 
-There are several scenario in network processing that can run
-extensively under heavy traffic. In such situation, RCU synchronization
-might not observe desired quiescent states for indefinitely long period.
-Create a helper to safely raise the desired RCU quiescent states for
-such scenario.
+NAPI threads can keep polling packets under load. Currently it is only
+calling cond_resched() before repolling, but it is not sufficient to
+clear out the holdout of RCU tasks, which prevent BPF tracing programs
+from detaching for long period. This can be reproduced easily with
+following set up:
 
+ip netns add test1
+ip netns add test2
+
+ip -n test1 link add veth1 type veth peer name veth2 netns test2
+
+ip -n test1 link set veth1 up
+ip -n test1 link set lo up
+ip -n test2 link set veth2 up
+ip -n test2 link set lo up
+
+ip -n test1 addr add 192.168.1.2/31 dev veth1
+ip -n test1 addr add 1.1.1.1/32 dev lo
+ip -n test2 addr add 192.168.1.3/31 dev veth2
+ip -n test2 addr add 2.2.2.2/31 dev lo
+
+ip -n test1 route add default via 192.168.1.3
+ip -n test2 route add default via 192.168.1.2
+
+for i in `seq 10 210`; do
+ for j in `seq 10 210`; do
+    ip netns exec test2 iptables -I INPUT -s 3.3.$i.$j -p udp --dport 5201
+ done
+done
+
+ip netns exec test2 ethtool -K veth2 gro on
+ip netns exec test2 bash -c 'echo 1 > /sys/class/net/veth2/threaded'
+ip netns exec test1 ethtool -K veth1 tso off
+
+Then run an iperf3 client/server and a bpftrace script can trigger it:
+
+ip netns exec test2 iperf3 -s -B 2.2.2.2 >/dev/null&
+ip netns exec test1 iperf3 -c 2.2.2.2 -B 1.1.1.1 -u -l 1500 -b 3g -t 100 >/dev/null&
+bpftrace -e 'kfunc:__napi_poll{@=count();} interval:s:1{exit();}'
+
+Report RCU quiescent states periodically will resolve the issue.
+
+Fixes: 29863d41bb6e ("net: implement threaded-able napi poll loop support")
+Suggested-by: Paul E. McKenney <paulmck@kernel.org>
 Reviewed-by: Jesper Dangaard Brouer <hawk@kernel.org>
 Signed-off-by: Yan Zhai <yan@cloudflare.com>
----
- include/linux/rcupdate.h | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
 
-diff --git a/include/linux/rcupdate.h b/include/linux/rcupdate.h
-index 0746b1b0b663..e91ae38c33e3 100644
---- a/include/linux/rcupdate.h
-+++ b/include/linux/rcupdate.h
-@@ -247,6 +247,29 @@ do { \
- 	cond_resched(); \
- } while (0)
+---
+v2->v3: abstracted the work into a RCU helper
+v1->v2: moved rcu_softirq_qs out from bh critical section, and only
+raise it after a second of repolling. Added some brief perf test result.
+
+v2: https://lore.kernel.org/bpf/ZeFPz4D121TgvCje@debian.debian/
+v1: https://lore.kernel.org/lkml/Zd4DXTyCf17lcTfq@debian.debian/#t
+---
+ net/core/dev.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 76e6438f4858..6b7fc42d4b3e 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -6708,6 +6708,8 @@ static int napi_threaded_poll(void *data)
+ 	void *have;
  
-+/**
-+ * rcu_softirq_qs_periodic - Periodically report consolidated quiescent states
-+ *
-+ * This helper is for network processing in non-RT kernels, where there could
-+ * be busy polling threads that block RCU synchronization indefinitely.  In
-+ * such context, simply calling cond_resched is insufficient, so give it a
-+ * stronger push to eliminate potential blockage of all RCU types.
-+ *
-+ * NOTE: unless absolutely sure, this helper should in general be called
-+ * outside of bh lock section to avoid reporting a surprising QS to updaters,
-+ * who could be expecting RCU read critical section to end at local_bh_enable().
-+ */
-+#define rcu_softirq_qs_periodic(old_ts) \
-+do { \
-+	if (!IS_ENABLED(CONFIG_PREEMPT_RT) && \
-+	    time_after(jiffies, (old_ts) + HZ / 10)) { \
-+		preempt_disable(); \
-+		rcu_softirq_qs(); \
-+		preempt_enable(); \
-+		(old_ts) = jiffies; \
-+	} \
-+} while (0)
+ 	while (!napi_thread_wait(napi)) {
++		unsigned long last_qs = jiffies;
 +
- /*
-  * Infrastructure to implement the synchronize_() primitives in
-  * TREE_RCU and rcu_barrier_() primitives in TINY_RCU.
+ 		for (;;) {
+ 			bool repoll = false;
+ 
+@@ -6732,6 +6734,7 @@ static int napi_threaded_poll(void *data)
+ 			if (!repoll)
+ 				break;
+ 
++			rcu_softirq_qs_periodic(last_qs);
+ 			cond_resched();
+ 		}
+ 	}
 -- 
 2.30.2
 
