@@ -1,111 +1,129 @@
-Return-Path: <netdev+bounces-79683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79684-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3565987A8EA
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 15:01:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8320E87A8EE
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 15:02:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 673ED1C217F8
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:01:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0ADBFB2198D
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 14:02:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 981E74436C;
-	Wed, 13 Mar 2024 14:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58FE94437D;
+	Wed, 13 Mar 2024 14:02:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Fp/SyNwZ"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="pkxwMElx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from forward501b.mail.yandex.net (forward501b.mail.yandex.net [178.154.239.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C173043AC8;
-	Wed, 13 Mar 2024 14:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53C244369;
+	Wed, 13 Mar 2024 14:02:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710338469; cv=none; b=OdYkvNSjaxwgzueaKOqQFXv/PqQnC1xgyAukIoWZ0c9sHSOG7bLX5KB8TabCJa26WxvZi3yO8NjJWfpvAzgJmYNvISIcDu2p27sYaJYhmR5t+y5cui0sIsgVfSRWWofT7xr07Z0UNrhCeQWxUCF93EMcaAWmZMgRlRSUFGAgHKs=
+	t=1710338530; cv=none; b=sKx57rwQIrQGx0nT+Kq/oaKEo7ME6Xhd8uZDllwZOquo78jgVhW3aADl6t4Q/8dnj6gvM7TT4opZm7hf0YwBDhsVCl/H62M9Umng7pQVYSYxQe1PXOQbJsD0zssXA3SEYKFCZJ8RTjz5MOVwt8rQxyM/cuEKUSFA0FP/rjlaGqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710338469; c=relaxed/simple;
-	bh=Z2ZljK5Kj5Bt/65uyORbNA11jaYxXEraoiN2nsNmfZs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EiXmVaMVCXmx4w5f3HHxdkCU4OLfruOin9wcpku2AT/TLWnDOxqlcUJqi8w0Mkowe1xp77jy00rrSNvx81XVln5Gh7lQU89JQPLCLHUhZp7w9HzkDYzON9Ev386M8AHFdbTccb4SOt0WolyV7YCmP/Hc+sTeYgdaf/Navz8pu6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Fp/SyNwZ; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710338468; x=1741874468;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Z2ZljK5Kj5Bt/65uyORbNA11jaYxXEraoiN2nsNmfZs=;
-  b=Fp/SyNwZpFpb0tFRQbkZk9LweFg4uUlsDDVN5Llu3TQj4FLzN08OsiGN
-   fdZZig7j4srF+HS340rutbTsMSsmFZkSYouyZY79PD1T/o8CG2iVBzUeg
-   lqUPUqjr1fFpgXp/XuESihoGiM/7+CF3WUVEnDXSKDF04Z+8JH2/DRman
-   2tGL0KNZiaFPKGbVxXMlxqbA/PkvecSwriQiiUXCuUhd5W9K3RrF8Ydrc
-   aDnACGMEERCI18bFo+gX4ZcxpFupIg8jmtLj3LQGSlCHRr+XgW2qSkaCE
-   xfqC/K4y8L5Ft/yy9U+KC5kuCQZhOqvuqVRzboTVnxoIOh+oiUlH7UPPb
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="5226034"
-X-IronPort-AV: E=Sophos;i="6.07,122,1708416000"; 
-   d="scan'208";a="5226034"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2024 07:01:02 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,11011"; a="937054173"
-X-IronPort-AV: E=Sophos;i="6.07,122,1708416000"; 
-   d="scan'208";a="937054173"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga001.fm.intel.com with ESMTP; 13 Mar 2024 07:00:59 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 06F584EB; Wed, 13 Mar 2024 16:00:57 +0200 (EET)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Sebastian Reichel <sebastian.reichel@collabora.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Subject: [PATCH v1 1/1] net: stmmac: dwmac-rk: Remove unused of_gpio.h
-Date: Wed, 13 Mar 2024 16:00:57 +0200
-Message-ID: <20240313140057.2088667-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.43.0.rc1.1.gbec44491f096
+	s=arc-20240116; t=1710338530; c=relaxed/simple;
+	bh=albKVDxa6WBCxRIQORvmBW7Fv/6r5aQXoimE7Gx7FiA=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:From:Subject:
+	 In-Reply-To:Content-Type; b=AsKr32f/TuEFdMeo4UAhdcFlGfvXkGAMedEA54X9jAVAWaflBlC/TaFGiYNM676Ag4i595TDCBeB5zIfv5qp+HXfMuGlJzJvXqXneqGqPGGPG4m6FyQyLZ0dQJ/xAK3RiCnWeAibdFNk3SQIS1otVpVoeh8rCe0ovqocIQBa4Nk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=pkxwMElx; arc=none smtp.client-ip=178.154.239.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-37.myt.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-37.myt.yp-c.yandex.net [IPv6:2a02:6b8:c12:291a:0:640:791e:0])
+	by forward501b.mail.yandex.net (Yandex) with ESMTPS id 79D7B6177E;
+	Wed, 13 Mar 2024 17:01:58 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-37.myt.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id v1oRpYWpIiE0-mvlIvCQ3;
+	Wed, 13 Mar 2024 17:01:57 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1710338517; bh=dnlqSzeaqFDMpy+Z2/AUDnYXO5DxajV9g8D5Rxohq3g=;
+	h=In-Reply-To:Subject:To:From:Cc:Date:References:Message-ID;
+	b=pkxwMElxOZCLp55QcPd5qQ3ceZP7lzhlNkxewM/jZRqfG01UzfAWh/FMCIsuWwFRh
+	 p9CF2N/9y7LWVMUXlUp8o+9JcqZqr3Tw2xkaLaBKEyvaAx3/P8XE4atN/fQCUxZqRx
+	 aSKA8x6OHi6C6OEpM+ARjiIRg7EoRrmuGOfQtmpo=
+Authentication-Results: mail-nwsmtp-smtp-production-main-37.myt.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <12d61b93-fd89-4557-8c0f-2a72437ded6f@yandex.ru>
+Date: Wed, 13 Mar 2024 17:01:57 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>,
+ Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240313094207.70334-1-dmantipov@yandex.ru>
+ <CANn89iLCK10J_6=1xSDquYpToZ-YNG3TzjS60L-g5Cyng92gFw@mail.gmail.com>
+ <aa191780-c625-4e13-8dc0-6ea3760b6104@yandex.ru>
+ <CANn89iJNBHnCPNovYE9tjQT1eN4DE-OFOhE9P86xX_F0HxWfrQ@mail.gmail.com>
+From: Dmitry Antipov <dmantipov@yandex.ru>
+Autocrypt: addr=dmantipov@yandex.ru; keydata=
+ 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
+ tx98MCutXbJWn55RtnVKbpIiMfBrcB8=
+Subject: Re: [PATCH] can: gw: prefer kfree_rcu() over call_rcu() with
+ cgw_job_free_rcu()
+In-Reply-To: <CANn89iJNBHnCPNovYE9tjQT1eN4DE-OFOhE9P86xX_F0HxWfrQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-of_gpio.h is deprecated and subject to remove.
-The driver doesn't use it, simply remove the unused header.
+On 3/13/24 13:55, Eric Dumazet wrote:
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 2 --
- 1 file changed, 2 deletions(-)
+> kmem_cache_free(struct kmem_cache *s, void *x) has additional checks
+> to make sure the object @x was allocated
+> from the @s kmem_cache.
+> 
+> Look for SLAB_CONSISTENCY_CHECKS and CONFIG_SLAB_FREELIST_HARDENED
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index 382e8de1255d..7ae04d8d291c 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -12,10 +12,8 @@
- #include <linux/clk.h>
- #include <linux/phy.h>
- #include <linux/of_net.h>
--#include <linux/gpio.h>
- #include <linux/module.h>
- #include <linux/of.h>
--#include <linux/of_gpio.h>
- #include <linux/platform_device.h>
- #include <linux/regulator/consumer.h>
- #include <linux/delay.h>
--- 
-2.43.0.rc1.1.gbec44491f096
+Yes. Using kfree_rcu() bypasses these (optional) debugging/consistency
+checks.
+
+> Your patch is not 'trivial' as you think.
+
+You're shifting from "not going to work" to "not trivial" so nicely.
+
+> Otherwise, we will soon have dozen of patches submissions replacing
+> kmem_cache_free() with kfree()
+
+No. The question is about freeing on some (where the freeing callback
+function is trivial) RCU-protected paths only.
+
+Dmitry
 
 
