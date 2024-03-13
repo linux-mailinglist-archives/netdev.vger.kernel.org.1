@@ -1,130 +1,174 @@
-Return-Path: <netdev+bounces-79749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C888887B2D4
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 21:23:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DB9A87B2D8
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 21:25:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 27528B22A3F
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 20:22:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 690411C24917
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 20:25:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A006B4F20E;
-	Wed, 13 Mar 2024 20:22:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 048FE4F20E;
+	Wed, 13 Mar 2024 20:25:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mFlAHNW2"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="V1r53fQl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5927051005;
-	Wed, 13 Mar 2024 20:22:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1868C225DE
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 20:25:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710361346; cv=none; b=kyD7y5f7Tjk7xgCP3NY/hdSUlVyDownKKnWFghgUuZx+7k9hJKmz7FpsV00CSkCc2HxLHkStEk8SwDg9udejT5HECjBR/l16OVYWliS20oODtBwhpAUyUkA3NuXmt/QjN2ReN3lfbLqrrfKUoKpkNWuIryDJ+iOw8UtlLCJId2A=
+	t=1710361547; cv=none; b=RlyliQo0FYlfYnlnqiwRJiuErxKAsCSNGY3JzuPqBKr8fZDnm1+8JyIpFGDbNWF/LvNIXupZXYMOl+RLYT9YAjtQ81dzpehbz45S1c2pVMP7phE0IvDuDhtCPFC8L4v3FzeRvW44KNUGcuKnIyXQtg29UTFzsUmcWY3zDyFf9c0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710361346; c=relaxed/simple;
-	bh=rgukJbYU+P6pCiW7WPZ0odGPFMvz8t4VPdQBD930lsY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bhu9IkpsssbsjbQA2KLKAEHwwCXU7B48lDfe4rqEWUQS0OtdMJlR+aGA1o0Zcc2nEl18n3zKrSU2aIeVMqeVQsCImF3Z+UFdahS1Qcf/E+Q0J/aX8jVdfJ6WVWEPzqpz73iQCLsFUHKmUP1bmF8L+TMgHx4/XWQy6ZrgSDDz4F8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mFlAHNW2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BA20C433F1;
-	Wed, 13 Mar 2024 20:22:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710361345;
-	bh=rgukJbYU+P6pCiW7WPZ0odGPFMvz8t4VPdQBD930lsY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mFlAHNW2U31SD7nKmJI4b7+wEklDjsk/bQ8BQxWUr206VF6u/NDhARmY7EwziZWHL
-	 uJgVdR0u8oJWsY9qOkLBXcvaQbnOCHpSwkW+0tZNeu7an3CwLwVzuJ8M3ZXzQGhx6r
-	 pN78QKRGcle4kw748mX/YLsb8xJuqGGiXJ5o+YimikW5hqKEQw2jh7UKz5fxbIBaeV
-	 FjN4xBzuITH1CzB8PEfUlA9uicYznEVUw9SW7+8ZZuIantuoR49VinlAU4aSSf8wHo
-	 y83rkovNZggjXEvqkM53hVvea0wF74bMh7LULVEAK1qIy+KmP1EihrCLfs61vEqTfZ
-	 GCDKedIzuPVWg==
-Date: Wed, 13 Mar 2024 13:22:23 -0700
-From: Eric Biggers <ebiggers@kernel.org>
-To: James Prestwood <prestwoj@gmail.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-	Karel Balej <balejk@matfyz.cz>, dimitri.ledkov@canonical.com,
-	alexandre.torgue@foss.st.com, davem@davemloft.net,
-	dhowells@redhat.com, herbert@gondor.apana.org.au,
-	keyrings@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-modules@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com, mcgrof@kernel.org,
-	mcoquelin.stm32@gmail.com, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, iwd@lists.linux.dev
-Subject: Re: [REGRESSION] Re: [PATCH] crypto: pkcs7: remove sha1 support
-Message-ID: <20240313202223.GB1111@sol.localdomain>
-References: <CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz>
- <005f998ec59e27633b1b99fdf929e40ccfd401c1.camel@sipsolutions.net>
- <f2dcbe55-0f0e-4173-8e21-f899c6fc802a@gmail.com>
- <20240313194423.GA1111@sol.localdomain>
- <b838e729-dc30-4e18-b928-c34c16b08606@gmail.com>
+	s=arc-20240116; t=1710361547; c=relaxed/simple;
+	bh=18UqDE8iEw7H0Rml5t9PCx9hHai9milRMrmBUKQ7CcY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MiR+w3A0ef44zI1/eeTPm4RsTiWQL57u3yeEBLgU4IFDlATXoM5JDHhVCI13ciaB0w/o8Tkn6Co4az8L3RNoOMepMeaDsaci74XCJx1m1pcix4CYDXFlVHGgYm6UC0e0gWrTUost9vaijXY0mEBGr4wX1bqLrqkPCCMvvzro9Ik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=V1r53fQl; arc=none smtp.client-ip=209.85.166.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-365c0dfc769so356995ab.1
+        for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 13:25:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710361544; x=1710966344; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=40C778T+ejGldiYJzfi31MQU9t5D58fRK5xoTPYIFco=;
+        b=V1r53fQlUneX2ccgmY3xC/rA/mptJH9LgFMdNzag0IBOUSsGcyQYrqhiR0WTWl89fE
+         JvgL8LY8T3tSkVhTKEvMfzhtxP7vlQIsPKJis5EmwiM2mFD/OzoK8ryY2IGHNT8NQTLC
+         Smr+KYiqlXGEsU4vqNfEgBB0MUVnAmUOMN+gp5JnJtAuTTxcNCZrOePDV9UZgwpcmGRG
+         GLb97AX30eOJXytNeHqPHMHsz82hviPty5P1li1JflTOjcJmYwlbsMeEpB1tD6OrUh1b
+         //4H6MRRhVosEELx7Hc96F+VIJ4XwUv4dg+cucLnfwuxtysyIhw/JpCOLdAqFKPGDBXG
+         7GtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710361544; x=1710966344;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=40C778T+ejGldiYJzfi31MQU9t5D58fRK5xoTPYIFco=;
+        b=s5B0R4/CWq5eptedMCp9Rov7qjqn81aJvfCAEYu4WaDuMuhvatliVaSEIJMXS9oLLk
+         B7m2carhmQpxiPFA38RrNJ4lezx7Jg/ICOqNQANTCghFQm9S660g2v0fuiQRCkKIWYHW
+         NVomBeJeVenrucwBz2LhiovrdyBsuxHwcWDn1PwGM9h1BQ5sWgdk6ms1rTF1GZCFEgGi
+         a0JPqXjEmo/WfQKPGWZfMGu+TFvGhkdYXd9ztpPx4iZHQLA2/wlJcuDbY/NVxP2JLT0z
+         gVztAXIwFqHIaRElXSW7/zTOOSgP02P8NNumVHA3wTV7oLKptz8VX1X5w9bG+Xa5n+mm
+         4msQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV5pYo/9HHvRs/ZrD0BL30gmOx/Mv4aO4tntTQQRRd65Y9kJczbLbXNYEbtHjWBz8MX5AqZjOszIBWZNY4/LyBA40QzlBgU
+X-Gm-Message-State: AOJu0Yz0wzLmNJ8Mpx9o4Xfbfl1oSdl4k26YUWDSIfvSKs5bNLSx6GlP
+	Ii+p90ROEb4BbI7VdmZO3IgIhwvQjvTaMPoYPNb/hm3QsX29dpa36lgLiQ+9Ftw=
+X-Google-Smtp-Source: AGHT+IHcpDZpTJECPXSKCB67XCzRSPHuGU0xoJfmPpiUOTXqTCEbIuRvUX3y0L5h+VcnUxcPdDC+Rg==
+X-Received: by 2002:a5d:9253:0:b0:7c8:bd77:b321 with SMTP id e19-20020a5d9253000000b007c8bd77b321mr22985iol.2.1710361544177;
+        Wed, 13 Mar 2024 13:25:44 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id d73-20020a0285cf000000b00476eb3ec820sm1906691jai.51.2024.03.13.13.25.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Mar 2024 13:25:43 -0700 (PDT)
+Message-ID: <7752a08c-f55c-48d5-87f2-70f248381e48@kernel.dk>
+Date: Wed, 13 Mar 2024 14:25:42 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b838e729-dc30-4e18-b928-c34c16b08606@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v4 13/16] io_uring: add io_recvzc request
+Content-Language: en-US
+To: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>
+References: <20240312214430.2923019-1-dw@davidwei.uk>
+ <20240312214430.2923019-14-dw@davidwei.uk>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240312214430.2923019-14-dw@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Mar 13, 2024 at 01:12:54PM -0700, James Prestwood wrote:
-> Hi,
+On 3/12/24 3:44 PM, David Wei wrote:
+> Add an io_uring opcode OP_RECV_ZC for doing ZC reads from a socket that
+> is set up for ZC Rx. The request reads skbs from a socket. Completions
+> are posted into the main CQ for each page frag read.
 > 
-> On 3/13/24 12:44 PM, Eric Biggers wrote:
-> > On Wed, Mar 13, 2024 at 10:26:06AM -0700, James Prestwood wrote:
-> > > Hi,
-> > > 
-> > > On 3/13/24 1:56 AM, Johannes Berg wrote:
-> > > > Not sure why you're CC'ing the world, but I guess adding a few more
-> > > > doesn't hurt ...
-> > > > 
-> > > > On Wed, 2024-03-13 at 09:50 +0100, Karel Balej wrote:
-> > > > >    and I use iwd
-> > > > This is your problem, the wireless stack in the kernel doesn't use any
-> > > > kernel crypto code for 802.1X.
-> > > Yes, the wireless stack has zero bearing on the issue. I think that's what
-> > > you meant by "problem".
-> > > 
-> > > IWD has used the kernel crypto API forever which was abruptly broken, that
-> > > is the problem.
-> > > 
-> > > The original commit says it was to remove support for sha1 signed kernel
-> > > modules, but it did more than that and broke the keyctl API.
-> > > 
-> > Which specific API is iwd using that is relevant here?
-> > I cloned https://kernel.googlesource.com/pub/scm/network/wireless/iwd
-> > and grepped for keyctl and AF_ALG, but there are no matches.
+> Big CQEs (CQE32) is required as the OP_RECV_ZC specific metadata (ZC
+> region, offset, len) are stored in the extended 16 bytes as a
+> struct io_uring_rbuf_cqe.
 > 
-> IWD uses ELL for its crypto, which uses the AF_ALG API:
+> For now there is no limit as to how much work each OP_RECV_ZC request
+> does. It will attempt to drain a socket of all available data.
 > 
-> https://git.kernel.org/pub/scm/libs/ell/ell.git/
+> Multishot requests are also supported. The first time an io_recvzc
+> request completes, EAGAIN is returned which arms an async poll. Then, in
+> subsequent runs in task work, IOU_ISSUE_SKIP_COMPLETE is returned to
+> continue async polling.
 
-Thanks for pointing out that the relevant code is really in that separate
-repository.  Note, it seems that keyctl() is the problem here, not AF_ALG.  The
-blamed commit didn't change anything for AF_ALG.
+I'd probably drop that last paragraph, this is how all multishot
+requests work and is implementation detail that need not go in the
+commit message. Probably suffices just to say it supports multishot.
 
-> I believe the failure is when calling:
-> 
-> KEYCTL_PKEY_QUERY enc="x962" hash="sha1"
-> 
-> From logs Michael posted on the IWD list, the ELL API that fails is:
-> 
-> l_key_get_info (ell.git/ell/key.c:416)
+> @@ -695,7 +701,7 @@ static inline bool io_recv_finish(struct io_kiocb *req, int *ret,
+>  	unsigned int cflags;
+>  
+>  	cflags = io_put_kbuf(req, issue_flags);
+> -	if (msg->msg_inq && msg->msg_inq != -1)
+> +	if (msg && msg->msg_inq && msg->msg_inq != -1)
+>  		cflags |= IORING_CQE_F_SOCK_NONEMPTY;
+>  
+>  	if (!(req->flags & REQ_F_APOLL_MULTISHOT)) {
+> @@ -723,7 +729,7 @@ static inline bool io_recv_finish(struct io_kiocb *req, int *ret,
+>  			goto enobufs;
+>  
+>  		/* Known not-empty or unknown state, retry */
+> -		if (cflags & IORING_CQE_F_SOCK_NONEMPTY || msg->msg_inq == -1) {
+> +		if (cflags & IORING_CQE_F_SOCK_NONEMPTY || (msg && msg->msg_inq == -1)) {
+>  			if (sr->nr_multishot_loops++ < MULTISHOT_MAX_RETRY)
+>  				return false;
+>  			/* mshot retries exceeded, force a requeue */
 
-Okay, I guess that's what's actually causing the problem.  KEYCTL_PKEY_* are a
-weird set of APIs where userspace can ask the kernel to do asymmetric key
-operations.  It's unclear why they exist, as the same functionality is available
-in userspace crypto libraries.
+Maybe refactor this a bit so that you don't need to add these NULL
+checks? That seems pretty fragile, hard to read, and should be doable
+without extra checks.
 
-I suppose that the blamed commit, or at least part of it, will need to be
-reverted to keep these weird keyctls working.
+> @@ -1053,6 +1058,85 @@ struct io_zc_rx_ifq *io_zc_verify_sock(struct io_kiocb *req,
+>  	return ifq;
+>  }
+>  
+> +int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+> +{
+> +	struct io_recvzc *zc = io_kiocb_to_cmd(req, struct io_recvzc);
+> +
+> +	/* non-iopoll defer_taskrun only */
+> +	if (!req->ctx->task_complete)
+> +		return -EINVAL;
 
-For the future, why doesn't iwd just use a userspace crypto library such as
-OpenSSL?
+What's the reasoning behind this?
 
-- Eric
+> +	struct io_recvzc *zc = io_kiocb_to_cmd(req, struct io_recvzc);
+> +	struct io_zc_rx_ifq *ifq;
+> +	struct socket *sock;
+> +	int ret;
+> +
+> +	/*
+> +	 * We're posting CQEs deeper in the stack, and to avoid taking CQ locks
+> +	 * we serialise by having only the master thread modifying the CQ with
+> +	 * DEFER_TASkRUN checked earlier and forbidding executing it from io-wq.
+> +	 * That's similar to io_check_multishot() for multishot CQEs.
+> +	 */
+> +	if (issue_flags & IO_URING_F_IOWQ)
+> +		return -EAGAIN;
+> +	if (WARN_ON_ONCE(!(issue_flags & IO_URING_F_NONBLOCK)))
+> +		return -EAGAIN;
+
+If rebased on the current tree, does this go away?
+
+-- 
+Jens Axboe
+
 
