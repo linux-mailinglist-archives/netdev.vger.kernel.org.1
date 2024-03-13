@@ -1,94 +1,120 @@
-Return-Path: <netdev+bounces-79619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E37387A42B
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 09:40:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A15687A4B4
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 10:14:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B6B191F21F42
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 08:40:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39CECB20EEB
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 09:14:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21DEC18E12;
-	Wed, 13 Mar 2024 08:40:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OBYE3DKF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32491B95E;
+	Wed, 13 Mar 2024 09:14:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp1.ms.mff.cuni.cz (smtp-in1.ms.mff.cuni.cz [195.113.20.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F15CC1B943
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 08:40:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15AE81C6AB
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 09:14:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.113.20.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710319230; cv=none; b=k+PP4P+aIdDOPLWCKzy9WbgMCtvAgNksbPAPqekJegn3iiK3hST7y32H3smbB2FNEyj4a81fau1JDkMJttJV+Vjlo1DKjvXgeGJFBEysXT4ucH5blP69Marf3OySdMA4y1wWVmQubTX/J6BtqPLHZ3TRY166zwkkTbKlsVKdyuY=
+	t=1710321268; cv=none; b=Q/+etCTIJpYzlHKh0qWDVM3u1K5TXeGvWdIPkAjl5YDRP7wP/URTaLISoAuB5NA1Py3CUQB1wjBeLt6pvF3TPQZC9A81oZ47Ar8nZcqDA3gcQggiBLPUjC75ulSZcdekL6BIVXz87HtXYvNFcyVsT78+y2oLa5aXUYALvAeT0/E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710319230; c=relaxed/simple;
-	bh=s/Vz3C9TJIavbFhIhAiD+vwFuRFpT/9IAv4MLuF3FW4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tKnH4BVNBlMJrvQlVuzj0F6BbaJrtt+z4ycsPIEKY6OCCVYlbQFIBHJI8lk8eJUnVBDGJ/Fqzke7EVepchfY+oREAUzLiAHQwM4nah+tAqINIeqa18iQp17I1uejkNw2E1SF4dirR33OZp4SNGEBAVUkKPDxTNZZWUhNX+n6MPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OBYE3DKF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 80A8EC43390;
-	Wed, 13 Mar 2024 08:40:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710319229;
-	bh=s/Vz3C9TJIavbFhIhAiD+vwFuRFpT/9IAv4MLuF3FW4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=OBYE3DKF8CLj4IbKqUAuU5Eva95Z8f//GSvr+SLpD9PSI/C8wjKkVOv/zjj7bQU9t
-	 5RBVEkdElr4P9ZsBnIGYBKyNJckVH6rOug/UMIfp/3DSDB6cT9xY62piVQpkymPOVN
-	 /J6eV92XyL6WrIzsJHlHYl9WrH4bfSZe0yPDxl6q9UfzTFLtl/h7aGmmgztYpAokw7
-	 fayRg+Msvx2EevWUa51ZSfoaibU7yLJqB2+Gx7hvc/WHGRBEpYa5u8N4569quHwuI1
-	 EG420OynZzj6XIj+KoK5t3qXMrl3YQtAu+rRDwdDpntudCnu31m4l3gj3No0xxUjqB
-	 tCeujFNvE+9Tw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 67F18D95060;
-	Wed, 13 Mar 2024 08:40:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1710321268; c=relaxed/simple;
+	bh=+NePArLWJMB57UThWlpn3BKXqneliUUo+Wa39GBb6SQ=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:To:From:
+	 In-Reply-To; b=WOzkOI8uxk8h3oaAeyf3dAMBzGJbqHmXam/xJ/k5a7zwGm2XhicB1Nh7o2++22KqRbczn7EnKww2UQU62JvFuHlQBcxPps7IbjmIYSUEUm2OUvo0UISt+Bpwi1qpB8xk2z0Q2FLnhzm9OxXaIJd67oIQCAkIj2jOsx2Pd71WC6U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=matfyz.cz; spf=pass smtp.mailfrom=matfyz.cz; arc=none smtp.client-ip=195.113.20.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=matfyz.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=matfyz.cz
+Received: from localhost (koleje-wifi-0013.koleje.cuni.cz [78.128.191.13])
+	(authenticated)
+	by smtp1.ms.mff.cuni.cz (8.16.1/8.16.1) with ESMTPS id 42D8neSJ059445
+	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
+	Wed, 13 Mar 2024 09:49:41 +0100 (CET)
+	(envelope-from balejk@matfyz.cz)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] devlink: Fix devlink parallel commands processing
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171031922942.8351.16226368528415050004.git-patchwork-notify@kernel.org>
-Date: Wed, 13 Mar 2024 08:40:29 +0000
-References: <20240312105238.296278-1-shayd@nvidia.com>
-In-Reply-To: <20240312105238.296278-1-shayd@nvidia.com>
-To: Shay Drory <shayd@nvidia.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- kuba@kernel.org, edumazet@google.com, jiri@nvidia.com
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 13 Mar 2024 09:50:11 +0100
+Message-Id: <CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz>
+Cc: <alexandre.torgue@foss.st.com>, <davem@davemloft.net>,
+        <dhowells@redhat.com>, <herbert@gondor.apana.org.au>,
+        <keyrings@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-modules@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>, <mcgrof@kernel.org>,
+        <mcoquelin.stm32@gmail.com>, <linux-wireless@vger.kernel.org>,
+        <netdev@vger.kernel.org>
+Subject: [REGRESSION] Re: [PATCH] crypto: pkcs7: remove sha1 support
+To: <dimitri.ledkov@canonical.com>,
+        "Johannes Berg"
+ <johannes@sipsolutions.net>
+From: "Karel Balej" <balejk@matfyz.cz>
+In-Reply-To: <20231010212240.61637-1-dimitri.ledkov@canonical.com>
 
-Hello:
+Dimitri, Johannes,
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+ever since upgrading to Linux v6.7 I am unable to connect to a 802.1X
+wireless network (specifically, eduroam). In my dmesg, the following
+messages appear:
 
-On Tue, 12 Mar 2024 12:52:38 +0200 you wrote:
-> Commit 870c7ad4a52b ("devlink: protect devlink->dev by the instance
-> lock") added devlink instance locking inside a loop that iterates over
-> all the registered devlink instances on the machine in the pre-doit
-> phase. This can lead to serialization of devlink commands over
-> different devlink instances.
-> 
-> For example: While the first devlink instance is executing firmware
-> flash, all commands to other devlink instances on the machine are
-> forced to wait until the first devlink finishes.
-> 
-> [...]
+	[   68.161621] wlan0: authenticate with xx:xx:xx:xx:xx:xx (local address=
+=3Dxx:xx:xx:xx:xx:xx)
+	[   68.163733] wlan0: send auth to xx:xx:xx:xx:xx:xx (try 1/3)
+	[   68.165773] wlan0: authenticated
+	[   68.166785] wlan0: associate with xx:xx:xx:xx:xx:xx (try 1/3)
+	[   68.168498] wlan0: RX AssocResp from xx:xx:xx:xx:xx:xx (capab=3D0x1411 =
+status=3D0 aid=3D4)
+	[   68.172445] wlan0: associated
+	[   68.204956] wlan0: Limiting TX power to 23 (23 - 0) dBm as advertised b=
+y xx:xx:xx:xx:xx:xx
+	[   70.262032] wlan0: deauthenticated from xx:xx:xx:xx:xx:xx (Reason: 23=
+=3DIEEE8021X_FAILED)
+	[   73.065966] wlan0: authenticate with xx:xx:xx:xx:xx:xx (local address=
+=3Dxx:xx:xx:xx:xx:xx)
+	[   73.068006] wlan0: send auth to xx:xx:xx:xx:xx:xx (try 1/3)
+	[   73.070166] wlan0: authenticated
+	[   73.070756] wlan0: associate with xx:xx:xx:xx:xx:xx (try 1/3)
+	[   73.072807] wlan0: RX AssocResp from xx:xx:xx:xx:xx:xx (capab=3D0x1411 =
+status=3D0 aid=3D4)
+	[   73.076676] wlan0: associated
+	[   73.120396] wlan0: Limiting TX power to 23 (23 - 0) dBm as advertised b=
+y xx:xx:xx:xx:xx:xx
+	[   75.148376] wlan0: deauthenticating from xx:xx:xx:xx:xx:xx by local cho=
+ice (Reason: 23=3DIEEE8021X_FAILED)
+	[   77.718016] wlan0: authenticate with xx:xx:xx:xx:xx:xx (local address=
+=3Dxx:xx:xx:xx:xx:xx)
+	[   77.720137] wlan0: send auth to xx:xx:xx:xx:xx:xx (try 1/3)
+	[   77.722670] wlan0: authenticated
+	[   77.724737] wlan0: associate with xx:xx:xx:xx:xx:xx (try 1/3)
+	[   77.726172] wlan0: RX AssocResp from xx:xx:xx:xx:xx:xx (capab=3D0x1411 =
+status=3D0 aid=3D4)
+	[   77.730822] wlan0: associated
+	[   77.830763] wlan0: Limiting TX power to 23 (23 - 0) dBm as advertised b=
+y xx:xx:xx:xx:xx:xx
+	[   79.784199] wlan0: deauthenticating from xx:xx:xx:xx:xx:xx by local cho=
+ice (Reason: 23=3DIEEE8021X_FAILED)
 
-Here is the summary with links:
-  - [net,v2] devlink: Fix devlink parallel commands processing
-    https://git.kernel.org/netdev/net/c/d7d75124965a
+The connection works fine with v6.6 and I have bisected the problem to
+the revision introduced by this patch (16ab7cb5825f mainline).
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+My wireless kernel driver is iwlwifi and I use iwd. I started the bisect
+with a config copied from my distribution package [1].
 
+Would you please help me with this? Please let me know if I forgot to
+mention something which could be helpful in resolving this.
 
+[1] https://raw.githubusercontent.com/void-linux/void-packages/master/srcpk=
+gs/linux6.6/files/x86_64-dotconfig
+
+Thank you very much, kind regards,
+K. B.
 
