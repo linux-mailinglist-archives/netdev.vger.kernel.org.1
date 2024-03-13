@@ -1,85 +1,110 @@
-Return-Path: <netdev+bounces-79700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA65F87AA6B
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 16:31:17 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23AB287AA83
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 16:36:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBDB11C21592
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 15:31:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7289B23C14
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 15:36:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0773F8C7;
-	Wed, 13 Mar 2024 15:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00B4146436;
+	Wed, 13 Mar 2024 15:36:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I+vu4nEX"
+	dkim=pass (2048-bit key) header.d=rosalinux.ru header.i=@rosalinux.ru header.b="IU1f/G9R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.rosalinux.ru (mail.rosalinux.ru [195.19.76.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB1C145978
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 15:31:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CAD546441;
+	Wed, 13 Mar 2024 15:35:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.19.76.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710343872; cv=none; b=T387rS6FUduLqd8QxYJcD2Mbtum0aM5gVe14oQLkXTaIFvS4QuvsDOr78B1QhJwAunNCJzzgJJLvFPJDY7wLpF9KNn6fl4+tQbJTxJLSSHkTiUjr+UwJpABR42lqVOHsmJWt/zASd8VRuPLaY7zU9UWvjX+Ve5mDmJWjYx/XmFc=
+	t=1710344169; cv=none; b=o9fHmB1k8uu96f6Bn31DZ8Zv6gO9nDzlCzVRkZYt9ZPXXkaQ/2OTiIEfnygqroOZyfDbr6AWO0vIuAtA2pN1todpCgGcOkv9+78JWT1Ott+mOSYH2tOb3EIQ8gFRxTed7N8n8eG7+OzqwwDqduT8K449+iyo4oEtCoIVs4fRd3s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710343872; c=relaxed/simple;
-	bh=GCDDZL4RSOwLqhzKGuj2sPZuyhUfO+FSbpErQ7LKahE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r/RCmVGhFVmTqr+JnK4u6g+2htMF1fxddC/S6zD86tglU7FMiCkxSunOQFgG2QXNJe+sc4dwwaUy7zVdJ4+ZxYAccgASscZi7MXZsnf3cqEPVVMUiy4geENo8KfnELiIJODJUP1aIsAWNTCg9nTK/u+KpbMBM4xrienePEP+zFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I+vu4nEX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D6BDC433F1;
-	Wed, 13 Mar 2024 15:31:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710343872;
-	bh=GCDDZL4RSOwLqhzKGuj2sPZuyhUfO+FSbpErQ7LKahE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=I+vu4nEXdQsVka920jGIomzVIM8NwXGJSnBr2Zqvp0+OxSgK766NU/WbjVE1C1cqz
-	 xukC6AurosY+80dCdsaP0cB1Si7PkhNYw6bTcaUE/wYDBYd1ebNX5mGgtSb6vQrb8I
-	 y4lApu3y6Isbuxhr/6JPFS8h/sRsShZJQXYVNbhqPYv+zVuPCrVupf7fr/JX7wtUob
-	 n2n0TTiP2xeGWNKakJPOalBxBfKmV9kIhdwMoa7bbbHmHZHwkIFH2jsEqAIe3B+DXN
-	 xCw4KnCmENHTx3WKoOdIxbfs4ex2YUXhn5gHAob310FU+AOHvkXYmhreGlJPFMtNEe
-	 8D7fpkqaaVuYQ==
-Date: Wed, 13 Mar 2024 08:31:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
- edumazet@google.com, arkadiusz.kubalewski@intel.com,
- vadim.fedorenko@linux.dev
-Subject: Re: [patch net-next] dpll: spec: use proper enum for pin
- capabilities attribute
-Message-ID: <20240313083111.4591590d@kernel.org>
-In-Reply-To: <ZfG_C6wi4EeBj9l3@nanopsycho>
-References: <20240306120739.1447621-1-jiri@resnulli.us>
-	<ZeiK7gDRUZYA8378@nanopsycho>
-	<20240306073419.4557bd37@kernel.org>
-	<20240313072608.1dc45382@kernel.org>
-	<ZfG_C6wi4EeBj9l3@nanopsycho>
+	s=arc-20240116; t=1710344169; c=relaxed/simple;
+	bh=O7uOKiFVPAmuNg68j9at/KETUNZl0bI/kM2wWFUizh8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ofcet0SfAQgZ92wBKK5ElPf0KVgpPZRdznlD5wPlWGKZ339QeWr4mhdq8BP5cVSeogzKaImrTMKSl4i+ze8a7SlGoIVddD026y1yS6Oc68wpseKFRQhV3MpWp5U5Hc7itNC9np5V5o93klKlZ/s/zWj3EsU40FK+rxGup5EMoKw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosalinux.ru; spf=pass smtp.mailfrom=rosalinux.ru; dkim=pass (2048-bit key) header.d=rosalinux.ru header.i=@rosalinux.ru header.b=IU1f/G9R; arc=none smtp.client-ip=195.19.76.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=rosalinux.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rosalinux.ru
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rosalinux.ru (Postfix) with ESMTP id 59DD3DFBBDDDA;
+	Wed, 13 Mar 2024 18:35:53 +0300 (MSK)
+Received: from mail.rosalinux.ru ([127.0.0.1])
+	by localhost (mail.rosalinux.ru [127.0.0.1]) (amavisd-new, port 10032)
+	with ESMTP id zvWePlngsIes; Wed, 13 Mar 2024 18:35:53 +0300 (MSK)
+Received: from localhost (localhost [127.0.0.1])
+	by mail.rosalinux.ru (Postfix) with ESMTP id 1E113DFBBDDD8;
+	Wed, 13 Mar 2024 18:35:53 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.10.3 mail.rosalinux.ru 1E113DFBBDDD8
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=rosalinux.ru;
+	s=1D4BB666-A0F1-11EB-A1A2-F53579C7F503; t=1710344153;
+	bh=Zn7e/vbnoFOlSvvvgW+KMY6UzRzOSfRxr3SxgN8pnw8=;
+	h=From:To:Date:Message-ID:MIME-Version;
+	b=IU1f/G9RZN2S7tK1x8h2PbJgYIgunLztFCGVz3xYlPjo5EsMOz8WGDueB6FtjShra
+	 pVJ9O3TdAfeTwri4DZAfvuIwykJr+U5VfSo3bcO0ig9WCGG3ZjK7+m/KQRvA5ggIMZ
+	 dH2peLUAu3ij3EdFA6fwNjSFufoGhQN8ZS3W6TIDYf6XOMYQdgoM5lhq3B7xIQWnwn
+	 yRT2qFTeTU+LF7ViTQWVL9Ib3Ogs60GMM80DlbvZB5qZJ5JunHrOQ8t5vU/uXzbSp7
+	 YYru0aittpo6zRw+HLEyJBm0jvW3k0m17fNIgE6HdWErafvrwGSrLdg19EqQakxo2n
+	 qHXNL8oG2NwVg==
+X-Virus-Scanned: amavisd-new at rosalinux.ru
+Received: from mail.rosalinux.ru ([127.0.0.1])
+	by localhost (mail.rosalinux.ru [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id iMZCX_rECthx; Wed, 13 Mar 2024 18:35:53 +0300 (MSK)
+Received: from localhost.localdomain (unknown [62.217.186.174])
+	by mail.rosalinux.ru (Postfix) with ESMTPSA id D8557DFBBDDD7;
+	Wed, 13 Mar 2024 18:35:52 +0300 (MSK)
+From: Mikhail Lobanov <m.lobanov@rosalinux.ru>
+To: Raju Rangoju <rajur@chelsio.com>
+Cc: Mikhail Lobanov <m.lobanov@rosalinux.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org (open list:CXGB4 ETHERNET DRIVER (CXGB4)),
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH] cxgb4: unnecessary check for 0 in the free_sge_txq_uld() function
+Date: Wed, 13 Mar 2024 11:34:36 -0400
+Message-ID: <20240313153437.124749-1-m.lobanov@rosalinux.ru>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 13 Mar 2024 15:58:19 +0100 Jiri Pirko wrote:
-> >> I think I have his private email, let me follow up off list and either
-> >> put his @intel.com address in the mailmap or the ignore list.  
-> >
-> >Hi Jiri! Do you still want to add him to the ignore list?  
-> 
-> If we are going to start to use .get_maintainer.ignore for this purpose,
-> yes please. Should I send the patch? net-next is closed anyway...
+The free_sge_txq_old() function has an unnecessary txq check of 0.
+This check is not necessary, since the txq pointer is initialized by the
+uldtxq[i] address from the operation &txq_info->uldtxq[i], which ensures
+that txq is not equal to 0.
 
-With the current tooling I think it's the best we can do.
-If someone disagrees let them shout at us.
-And we'll shout back that LF should take care of creating
-appropriate tooling.
-But shouting seems unlikely, I sent a patch to add Jeff K 
-and nobody batted an eyelid so far.
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Send it for net, it's like a MAINTAINERS update.
+Fixes: ab677ff4ad15 ("cxgb4: Allocate Tx queues dynamically")
+Signed-off-by: Mikhail Lobanov <m.lobanov@rosalinux.ru>
+---
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.c b/drivers/net=
+/ethernet/chelsio/cxgb4/cxgb4_uld.c
+index 17faac715882..5c13bcb4550d 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.c
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4_uld.c
+@@ -406,7 +406,7 @@ free_sge_txq_uld(struct adapter *adap, struct sge_uld=
+_txq_info *txq_info)
+ 	for (i =3D 0; i < nq; i++) {
+ 		struct sge_uld_txq *txq =3D &txq_info->uldtxq[i];
+=20
+-		if (txq && txq->q.desc) {
++		if (txq->q.desc) {
+ 			tasklet_kill(&txq->qresume_tsk);
+ 			t4_ofld_eq_free(adap, adap->mbox, adap->pf, 0,
+ 					txq->q.cntxt_id);
+--=20
+2.43.0
+
 
