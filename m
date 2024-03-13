@@ -1,120 +1,168 @@
-Return-Path: <netdev+bounces-79630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A15687A4B4
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 10:14:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 93B6E87A447
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 09:53:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 39CECB20EEB
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 09:14:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DFA20B2194D
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 08:52:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C32491B95E;
-	Wed, 13 Mar 2024 09:14:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75CFB1AAD4;
+	Wed, 13 Mar 2024 08:52:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="brZqD1Xh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.ms.mff.cuni.cz (smtp-in1.ms.mff.cuni.cz [195.113.20.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15AE81C6AB
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 09:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.113.20.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9061F93F;
+	Wed, 13 Mar 2024 08:52:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710321268; cv=none; b=Q/+etCTIJpYzlHKh0qWDVM3u1K5TXeGvWdIPkAjl5YDRP7wP/URTaLISoAuB5NA1Py3CUQB1wjBeLt6pvF3TPQZC9A81oZ47Ar8nZcqDA3gcQggiBLPUjC75ulSZcdekL6BIVXz87HtXYvNFcyVsT78+y2oLa5aXUYALvAeT0/E=
+	t=1710319947; cv=none; b=qd8l+eFjvnEydkbuHKTYBedLNJDFH37xVQHpaVfc/funS3KZWnemBWbRpiwDTMnyT354HoWOG/V5hPJir0H9dil+4pOZXwmVF6Amp43LQAj3qjN7mYFcwvk3GgaMJvCoHxrSmyJHM9+I7yLb+GQKQ2+2CU1YugpmY9AnoDjKHsM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710321268; c=relaxed/simple;
-	bh=+NePArLWJMB57UThWlpn3BKXqneliUUo+Wa39GBb6SQ=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:To:From:
-	 In-Reply-To; b=WOzkOI8uxk8h3oaAeyf3dAMBzGJbqHmXam/xJ/k5a7zwGm2XhicB1Nh7o2++22KqRbczn7EnKww2UQU62JvFuHlQBcxPps7IbjmIYSUEUm2OUvo0UISt+Bpwi1qpB8xk2z0Q2FLnhzm9OxXaIJd67oIQCAkIj2jOsx2Pd71WC6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=matfyz.cz; spf=pass smtp.mailfrom=matfyz.cz; arc=none smtp.client-ip=195.113.20.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=matfyz.cz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=matfyz.cz
-Received: from localhost (koleje-wifi-0013.koleje.cuni.cz [78.128.191.13])
-	(authenticated)
-	by smtp1.ms.mff.cuni.cz (8.16.1/8.16.1) with ESMTPS id 42D8neSJ059445
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Wed, 13 Mar 2024 09:49:41 +0100 (CET)
-	(envelope-from balejk@matfyz.cz)
+	s=arc-20240116; t=1710319947; c=relaxed/simple;
+	bh=MBGoPePJfGD927BQzBl+0QOCTgtJGQa5eqdTJMY7LcM=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=UtJgmrPPcqrdctG71G8qIFf6w3QBX0fj2oElYA9JhnA8IK9uK9mOPbu9kX5hSnv7fsH/WBPY6qgng6b/mu3sown17Y9P9Wxtf5vQf4kJFYKM4wI0FRx6MUd1tsMvLsC0+I9xrx+o5f69to7LlnuAffUqDcHNSTIUs17NjE8SBTQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=brZqD1Xh; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-78810ba2ff1so233169485a.3;
+        Wed, 13 Mar 2024 01:52:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710319943; x=1710924743; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NiyXUYdI9F2JA3CsusbHXE/Pdh1jVbsVBwhd+PEGfCY=;
+        b=brZqD1Xh35m0etdW7y9eHKDAVI92YU6Gx/ZIIgyLvtP7k9nTkinahOu6WE2zx3UzPV
+         Y9dMBKQ72PRQIxmqVb8G9AYaiAWLgMbyxVsvoXssdrn14AG6umc/hOqd6A0kf6qpwsoQ
+         UTEgYT0AA7wTTQTTSCvChmGZlhS80TAsARxYDDULolzA8mxbqBZBU+oNic+tdPcWlI4H
+         fow2nJmtxpzq4VX+7Ah8oq6F4c1Ioqn+KNxuwBNDzZg1hoowVaS4pQpd0V63/r6Ab3zq
+         8R+qI8QekRDvkI1xe2yIUeiVBOWoeHefYdlfpkkpvCYxIYnhxrO929UUUNwL2efMsV11
+         Y7Xw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710319943; x=1710924743;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=NiyXUYdI9F2JA3CsusbHXE/Pdh1jVbsVBwhd+PEGfCY=;
+        b=WA98mBItfk7aYRCSpEWQmFPLgyqWE9fb9Fcv5r5fU+Y96wZ637Tm6c8jV/srqVi9M/
+         renkJ4lkqvul6JR9sikgIQ3nlKt+rbROH/dUaITIpVXcZ7MkbD58dIwiQsIHIL5L9rOu
+         YOC0sNXSwY/dSTuxMuI333xdEr7c85oXKhyBhFK12RfbJsIzAyClkOvD19/4hIzhpGIs
+         8kG6Y4GddkFvNp7wGICH+smwgXa+hBWBdGuo6Vq73rO+BUkEPrn17cdZ/cA33Bdqtt0t
+         qXDORqBU82VNSz7LnSa1mEaqwqo8AURcL0QIfRoy8j/SOyw/7SpYsJit5+osZfbHDOiN
+         sKkw==
+X-Forwarded-Encrypted: i=1; AJvYcCWhS+UUMqnMtEo6eaGWOihlAiOeqOwJlZlpnm8BD/jMWVNry/Y1KXQ0cRl7nXP9RMBk96+lAldxeApGXUGUuXZpDlqNe5cWAsE4Lf0hLxy1xRei4HnsNvWtMAEizt05F184TWzgHWhWW7peppZUeVDPcoRMVteja4HF
+X-Gm-Message-State: AOJu0YykB6Et1lGdkw7uhF2SzewKhkC3pjj1K4BXQMmdiLWDY0ECbJxO
+	hYdTaELXxC1413MAkLB5hT/3AMzHX1GsbAcIxkloNhvwXw/CkCmb
+X-Google-Smtp-Source: AGHT+IENqpNPUVCBD2bYLTHTCzOlVlxtqfauB/mV5DQpC8fHVxO4vHszbRwC1Xogc4MtuxBvNUDr+g==
+X-Received: by 2002:a05:620a:1a0f:b0:788:5866:788a with SMTP id bk15-20020a05620a1a0f00b007885866788amr15818667qkb.9.1710319943582;
+        Wed, 13 Mar 2024 01:52:23 -0700 (PDT)
+Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
+        by smtp.gmail.com with ESMTPSA id 26-20020a05620a04da00b0078838695dfasm4466818qks.59.2024.03.13.01.52.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Mar 2024 01:52:23 -0700 (PDT)
+Date: Wed, 13 Mar 2024 04:52:22 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>, 
+ Abhishek Chauhan <quic_abchauha@quicinc.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: kernel@quicinc.com, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Andrew Halaney <ahalaney@redhat.com>, 
+ Martin KaFai Lau <martin.lau@kernel.org>, 
+ bpf <bpf@vger.kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Andrii Nakryiko <andrii@kernel.org>
+Message-ID: <65f16946cd33e_344ff1294fc@willemb.c.googlers.com.notmuch>
+In-Reply-To: <2a4cb416-5d95-459d-8c1c-3fb225240363@linux.dev>
+References: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
+ <2a4cb416-5d95-459d-8c1c-3fb225240363@linux.dev>
+Subject: Re: [PATCH net-next v4] net: Re-use and set mono_delivery_time bit
+ for userspace tstamp packets
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 13 Mar 2024 09:50:11 +0100
-Message-Id: <CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz>
-Cc: <alexandre.torgue@foss.st.com>, <davem@davemloft.net>,
-        <dhowells@redhat.com>, <herbert@gondor.apana.org.au>,
-        <keyrings@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-        <linux-crypto@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-modules@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>, <mcgrof@kernel.org>,
-        <mcoquelin.stm32@gmail.com>, <linux-wireless@vger.kernel.org>,
-        <netdev@vger.kernel.org>
-Subject: [REGRESSION] Re: [PATCH] crypto: pkcs7: remove sha1 support
-To: <dimitri.ledkov@canonical.com>,
-        "Johannes Berg"
- <johannes@sipsolutions.net>
-From: "Karel Balej" <balejk@matfyz.cz>
-In-Reply-To: <20231010212240.61637-1-dimitri.ledkov@canonical.com>
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Dimitri, Johannes,
+Martin KaFai Lau wrote:
+> On 3/1/24 12:13 PM, Abhishek Chauhan wrote:
+> > Bridge driver today has no support to forward the userspace timestamp
+> > packets and ends up resetting the timestamp. ETF qdisc checks the
+> > packet coming from userspace and encounters to be 0 thereby dropping
+> > time sensitive packets. These changes will allow userspace timestamps
+> > packets to be forwarded from the bridge to NIC drivers.
+> > 
+> > Setting the same bit (mono_delivery_time) to avoid dropping of
+> > userspace tstamp packets in the forwarding path.
+> > 
+> > Existing functionality of mono_delivery_time remains unaltered here,
+> > instead just extended with userspace tstamp support for bridge
+> > forwarding path.
+> 
+> The patch currently broke the bpf selftest test_tc_dtime: 
+> https://github.com/kernel-patches/bpf/actions/runs/8242487344/job/22541746675
+> 
+> In particular, there is a uapi field __sk_buff->tstamp_type which currently has 
+> BPF_SKB_TSTAMP_DELIVERY_MONO to mean skb->tstamp has the MONO "delivery" time. 
+> BPF_SKB_TSTAMP_UNSPEC means everything else (this could be a rx timestamp at 
+> ingress or a delivery time set by user space).
+> 
+> __sk_buff->tstamp_type depends on skb->mono_delivery_time which does not 
+> necessarily mean mono after this patch. I thought about fixing it on the bpf 
+> side such that reading __sk_buff->tstamp_type only returns 
+> BPF_SKB_TSTAMP_DELIVERY_MONO when the skb->mono_delivery_time is set and skb->sk 
+> is IPPROTO_TCP. However, it won't work because of bpf_skb_set_tstamp().
+> 
+> There is a bpf helper, bpf_skb_set_tstamp(skb, tstamp, 
+> BPF_SKB_TSTAMP_DELIVERY_MONO). This helper changes both the skb->tstamp and the 
+> skb->mono_delivery_time. The expectation is this could change skb->tstamp in the 
+> ingress skb and redirect to egress sch_fq. It could also set a mono time to 
+> skb->tstamp where the udp sk->sk_clockid may not be necessary in mono and then 
+> bpf_redirect to egress sch_fq. When bpf_skb_set_tstamp(skb, tstamp, 
+> BPF_SKB_TSTAMP_DELIVERY_MONO) succeeds, reading __sk_buff->tstamp_type expects 
+> BPF_SKB_TSTAMP_DELIVERY_MONO also.
+> 
+> I ran out of idea to solve this uapi breakage.
+> 
+> I am afraid it may need to go back to v1 idea and use another bit 
+> (user_delivery_time) in the skb.
 
-ever since upgrading to Linux v6.7 I am unable to connect to a 802.1X
-wireless network (specifically, eduroam). In my dmesg, the following
-messages appear:
+Is the only conflict when bpf_skb_set_tstamp is called for an skb from
+a socket with sk_clockid set (and thus SO_TXTIME called)?
 
-	[   68.161621] wlan0: authenticate with xx:xx:xx:xx:xx:xx (local address=
-=3Dxx:xx:xx:xx:xx:xx)
-	[   68.163733] wlan0: send auth to xx:xx:xx:xx:xx:xx (try 1/3)
-	[   68.165773] wlan0: authenticated
-	[   68.166785] wlan0: associate with xx:xx:xx:xx:xx:xx (try 1/3)
-	[   68.168498] wlan0: RX AssocResp from xx:xx:xx:xx:xx:xx (capab=3D0x1411 =
-status=3D0 aid=3D4)
-	[   68.172445] wlan0: associated
-	[   68.204956] wlan0: Limiting TX power to 23 (23 - 0) dBm as advertised b=
-y xx:xx:xx:xx:xx:xx
-	[   70.262032] wlan0: deauthenticated from xx:xx:xx:xx:xx:xx (Reason: 23=
-=3DIEEE8021X_FAILED)
-	[   73.065966] wlan0: authenticate with xx:xx:xx:xx:xx:xx (local address=
-=3Dxx:xx:xx:xx:xx:xx)
-	[   73.068006] wlan0: send auth to xx:xx:xx:xx:xx:xx (try 1/3)
-	[   73.070166] wlan0: authenticated
-	[   73.070756] wlan0: associate with xx:xx:xx:xx:xx:xx (try 1/3)
-	[   73.072807] wlan0: RX AssocResp from xx:xx:xx:xx:xx:xx (capab=3D0x1411 =
-status=3D0 aid=3D4)
-	[   73.076676] wlan0: associated
-	[   73.120396] wlan0: Limiting TX power to 23 (23 - 0) dBm as advertised b=
-y xx:xx:xx:xx:xx:xx
-	[   75.148376] wlan0: deauthenticating from xx:xx:xx:xx:xx:xx by local cho=
-ice (Reason: 23=3DIEEE8021X_FAILED)
-	[   77.718016] wlan0: authenticate with xx:xx:xx:xx:xx:xx (local address=
-=3Dxx:xx:xx:xx:xx:xx)
-	[   77.720137] wlan0: send auth to xx:xx:xx:xx:xx:xx (try 1/3)
-	[   77.722670] wlan0: authenticated
-	[   77.724737] wlan0: associate with xx:xx:xx:xx:xx:xx (try 1/3)
-	[   77.726172] wlan0: RX AssocResp from xx:xx:xx:xx:xx:xx (capab=3D0x1411 =
-status=3D0 aid=3D4)
-	[   77.730822] wlan0: associated
-	[   77.830763] wlan0: Limiting TX power to 23 (23 - 0) dBm as advertised b=
-y xx:xx:xx:xx:xx:xx
-	[   79.784199] wlan0: deauthenticating from xx:xx:xx:xx:xx:xx by local cho=
-ice (Reason: 23=3DIEEE8021X_FAILED)
+Interpreting skb->tstamp as mono if skb->mono_delivery_time is set and
+skb->sk is NULL is fine. This is the ingress to egress redirect case.
 
-The connection works fine with v6.6 and I have bisected the problem to
-the revision introduced by this patch (16ab7cb5825f mainline).
+I don't see an immediate use for this BPF function on egress where it
+would overwrite an SO_TXTIME timestamp and now skb->tstamp is mono,
+but skb->sk != NULL and skb->sk->sk_clockid != CLOCK_MONOTONIC.
 
-My wireless kernel driver is iwlwifi and I use iwd. I started the bisect
-with a config copied from my distribution package [1].
+Perhaps bpf_skb_set_tstamp() can just fail if another delivery time is
+already explicitly programmed?
 
-Would you please help me with this? Please let me know if I forgot to
-mention something which could be helpful in resolving this.
+    skb->sk &&
+    sock_flag(sk, SOCK_TXTIME) &&
+    skb->sk->sk_clockid != CLOCK_MONOTONIC
 
-[1] https://raw.githubusercontent.com/void-linux/void-packages/master/srcpk=
-gs/linux6.6/files/x86_64-dotconfig
+Either that, or unset SOCK_TXTIME to make sk_clockid undefined and
+fall back on interpreting as monotonic.
 
-Thank you very much, kind regards,
-K. B.
+
 
