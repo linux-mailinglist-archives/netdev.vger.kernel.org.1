@@ -1,157 +1,188 @@
-Return-Path: <netdev+bounces-79756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6482787B330
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 22:03:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1516287B331
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 22:03:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 203DC289365
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 21:03:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D5AF1C2325B
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 21:03:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00F744D108;
-	Wed, 13 Mar 2024 21:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B054B53395;
+	Wed, 13 Mar 2024 21:03:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="yNXU/Ss4"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="2t7JIm64"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1D1A524BE
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 21:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FF16524BE
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 21:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710363824; cv=none; b=e+gCNwRT0Z7+HVgoB86317sqQJCl2IYD9RuRxH6IY8rAPSL6y0d8DOogGBpjyiWxd/64n/dgJFAwYagDdcQZgwSDfeAqcJkbDkRGKwQTyfYnxuSiWTxgtp77kZ19iubkOP+EoNxSWIxLRdr/gxuS9blYAsSp6k0+1PdNCpdxReQ=
+	t=1710363828; cv=none; b=nfSmdgAyeeYT9W8JdY4b61WKzteX2Iim1sSYGRsUnJ1zJNZKOIP3QcRz0AluUDEUwhCDBzyee2nn1C1b5NLuixIFjRtrKuprsyfHiHwqetiA30HrBVFr6PDrr6n5UWzm999XKmQyTDwI5vHinqWYuO4rblhvjE0te69ewm3ceu8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710363824; c=relaxed/simple;
-	bh=mIgh25kypXsYr/q7XEic0PWYqLW/V95ZOJ+vof1HV5g=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=caEHdkVZpHj7QOGSaMKLPfmWQh1aRi9qtiSV2CfX3sJe28zDHPJfK9UkvWac1s96lBLjIJSIERN6CxWgeAl3fVVcGcMGC27i8F7xmE7srpjezJ+ikF08guaSYDCIB8QzDUiEj8Z9nCNwD2LAYKz6PHQphv7NNOcB6kSoG+T4Vds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=yNXU/Ss4; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 130FB208C8;
-	Wed, 13 Mar 2024 22:03:39 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id NwuVrbz1McJQ; Wed, 13 Mar 2024 22:03:38 +0100 (CET)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 79818208C0;
-	Wed, 13 Mar 2024 22:03:38 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 79818208C0
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1710363818;
-	bh=/dCJrKE6vyO1K/ahZsV4CFGg35JASAgx9ENV69t8zio=;
-	h=Date:From:To:CC:Subject:Reply-To:References:In-Reply-To:From;
-	b=yNXU/Ss4Zye6c3jjqP3KQ5R767rhLjsYf8S6v9lgsrxxJ7N78eQ6LXekmHknjQAc2
-	 ZTob4F/cgoPwcTiewh4RKbZpOraDTDqu+LrT30nmzVdH+kKfvoAFyUW58z7UMHAKNQ
-	 gyd2UKKLQ6D+IY3GlTtBPvzk8io7o/q2eqGy7bXTkjYDgiVQuKJF4GQqDrhkxyGh7R
-	 Rbk/1SegldE5YuR2465GcqKAPdbovbuXXu7+S/N1zFsPBfwQL/G4Q3B2h9kTTIMMwT
-	 P8LsZt33feOl/kkCtnM6SiKvTbxQG8cPdRlsjdB66StcGfE9Ee0aNzyLLhh6XOBJuh
-	 lpXkcBuxs7eMA==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout1.secunet.com (Postfix) with ESMTP id 6B5E680004A;
-	Wed, 13 Mar 2024 22:03:38 +0100 (CET)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 13 Mar 2024 22:03:38 +0100
-Received: from moon.secunet.de (172.18.149.1) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 13 Mar
- 2024 22:03:37 +0100
-Date: Wed, 13 Mar 2024 22:03:35 +0100
-From: Antony Antony <antony.antony@secunet.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Antony Antony <antony.antony@secunet.com>, Steffen Klassert
-	<steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>,
-	<netdev@vger.kernel.org>, <devel@linux-ipsec.org>, Eyal Birger
-	<eyal.birger@gmail.com>
-Subject: Re: [PATCH ipsec-next v3] xfrm: Add Direction to the SA in or out
-Message-ID: <ZfIUpy2u7VeuiAgU@moon.secunet.de>
-Reply-To: <antony.antony@secunet.com>
-References: <8ca32bd68d6e2eee1976fd06c7bc65f8ed7e24d3.1710273084.git.antony.antony@secunet.com>
- <20240313085430.GW12921@unreal>
+	s=arc-20240116; t=1710363828; c=relaxed/simple;
+	bh=2LhrZSZGfs3pLlFLvMFm1jKmS8XK98hQPV3FPwhIbY8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Nz6fmM63sannsga/WU1fXL0u8L7jwd32181kH378xa88TfmA8wI9JrKA+4kOMHOAHAlb10aEcM0QjBIYv8DqwxLonsscKwd96JxkCUYlNSUnkrbf1POxYKTVZxC1F6B1nJdEtRQp9Q2mcBeXEpw71h3/74DSQz9ZURJwsOq2b0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=2t7JIm64; arc=none smtp.client-ip=209.85.166.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-365c0dfc769so400305ab.1
+        for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 14:03:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710363826; x=1710968626; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7wVU99eoCj78Pm8h38UW/lWlyGyYU2qflgtnNcsqD20=;
+        b=2t7JIm64wn+s9mSKHKVcg7YM6UROnM7r/B+QZmsilTUyqmmGnroJwBWOUUQCQvKIkz
+         mQoODLZwKklUT0U7O0j++4h7o+StL5nv+gHc2apgsxQcMuHszv9ngOAKNhB1lMFjfXHE
+         heC3wzb/kIRBy/TgTAlp4YiY0qbcVQGNB3zv8tNLQ7luEUo5rbhBMMwM5G1+pFD6W33K
+         vlGf8L75ae5jIgp2iE+WQW8GfNidarVtWHwVWjKsIzWDsb/1EsENuZmQUtiF9Bu5Pt83
+         cVYvQcZ76buLPbRISi6pk4jshKDJSlEVOfbJS8+uyOki6bhdrG7FmOYpv3QPeGkE1Qdu
+         UrCA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710363826; x=1710968626;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7wVU99eoCj78Pm8h38UW/lWlyGyYU2qflgtnNcsqD20=;
+        b=ZMS18MhFFLbQBkHuEq5nKA02bKstpTGLV028Hz/rTQ1o7He8lLa9CdgpzGoUfbW11S
+         er2f1wa3+LEdM4sUQuwg+H8n9T01xokHfwwhnxrmTFjMSCZV32hGaX3fOXyduvP1Jv33
+         2SjpZGrs1mboMFFblvIV3BqTHKoLgBReF7kK8Y5W75rW+PP3h0/wpBL3oyhR+aT6GBQm
+         sgyMqfRpqxylpn6VJYLn5qRFsN6+jHWm/ux17dB30FwAknM8BkLXA4KPKNOOiwhFBqPt
+         ukwrXw8viTw8av0OylLt/EIJvC7Zs4ExZE7F2q+anaHak2h1fwje9BVyczh75A23dwS3
+         VSHg==
+X-Forwarded-Encrypted: i=1; AJvYcCUsZaCquFgPeViv8W/zjtIMgan4Vs3B+pbSIErBdaXUWdJtvVSJ+jYGB9zN7BKz7RT1bfXDPNF5HHI3jnHG0janZaNkRbsB
+X-Gm-Message-State: AOJu0Yzv55LtA6IOkCKJlzagnlY8YSyS1dlc6mlWXyTgamE1448WHKgl
+	nv30bu8RUZtFiLBHnxyirvg6oqriZ2WQr5hsnGslKqY+niayroN/L3iakSsdxKs=
+X-Google-Smtp-Source: AGHT+IEBoSQ0ayAn08GRm0f7iuEs4qxQf8gRC3enze76lDpG/eQP0FK1b07dxb3wzdukDIMfxvnGLA==
+X-Received: by 2002:a5d:9253:0:b0:7c8:bd77:b321 with SMTP id e19-20020a5d9253000000b007c8bd77b321mr107807iol.2.1710363826269;
+        Wed, 13 Mar 2024 14:03:46 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id k18-20020a02ccd2000000b004767d9bc182sm2967056jaq.139.2024.03.13.14.03.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 13 Mar 2024 14:03:45 -0700 (PDT)
+Message-ID: <8efd8232-fd4f-4f7a-a061-2f82cda8df4b@kernel.dk>
+Date: Wed, 13 Mar 2024 15:03:44 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240313085430.GW12921@unreal>
-Precedence: first-class
-Priority: normal
-Organization: secunet
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v4 13/16] io_uring: add io_recvzc request
+Content-Language: en-US
+To: Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
+ io-uring@vger.kernel.org, netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>
+References: <20240312214430.2923019-1-dw@davidwei.uk>
+ <20240312214430.2923019-14-dw@davidwei.uk>
+ <7752a08c-f55c-48d5-87f2-70f248381e48@kernel.dk>
+ <4343cff7-37d9-4b78-af70-a0d7771b04bc@gmail.com>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <4343cff7-37d9-4b78-af70-a0d7771b04bc@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Hi Leon,
-
-On Wed, Mar 13, 2024 at 10:54:30 +0200, Leon Romanovsky wrote:
-> On Tue, Mar 12, 2024 at 08:59:29PM +0100, Antony Antony wrote:
-> > This patch introduces the 'dir' attribute, 'in' or 'out', to the
-> > xfrm_state, SA, enhancing usability by delineating the scope of values
-> > based on direction. An input SA will now exclusively encompass values
-> > pertinent to input, effectively segregating them from output-related
-> > values. This change aims to streamline the configuration process and
-> > improve the overall clarity of SA attributes.
-> > 
-> > Signed-off-by: Antony Antony <antony.antony@secunet.com>
-> > ---
-> > v2->v3:
-> >  - delete redundant XFRM_SA_DIR_USET
-> >  - use u8 for "dir"
-> >  - fix HW OFFLOAD DIR check
-> > 
-> > v1->v2:
-> >  - use .strict_start_type in struct nla_policy xfrma_policy
-> >  - delete redundant XFRM_SA_DIR_MAX enum
-> > ---
-> >  include/net/xfrm.h        |  1 +
-> >  include/uapi/linux/xfrm.h |  6 +++++
-> >  net/xfrm/xfrm_compat.c    |  7 ++++--
-> >  net/xfrm/xfrm_device.c    |  5 +++++
-> >  net/xfrm/xfrm_state.c     |  1 +
-> >  net/xfrm/xfrm_user.c      | 46 +++++++++++++++++++++++++++++++++++----
-> >  6 files changed, 60 insertions(+), 6 deletions(-)
+On 3/13/24 2:26 PM, Pavel Begunkov wrote:
+> On 3/13/24 20:25, Jens Axboe wrote:
+>> On 3/12/24 3:44 PM, David Wei wrote:
+>>> Add an io_uring opcode OP_RECV_ZC for doing ZC reads from a socket that
+>>> is set up for ZC Rx. The request reads skbs from a socket. Completions
+>>> are posted into the main CQ for each page frag read.
+>>>
+>>> Big CQEs (CQE32) is required as the OP_RECV_ZC specific metadata (ZC
+>>> region, offset, len) are stored in the extended 16 bytes as a
+>>> struct io_uring_rbuf_cqe.
+>>>
+>>> For now there is no limit as to how much work each OP_RECV_ZC request
+>>> does. It will attempt to drain a socket of all available data.
+>>>
+>>> Multishot requests are also supported. The first time an io_recvzc
+>>> request completes, EAGAIN is returned which arms an async poll. Then, in
+>>> subsequent runs in task work, IOU_ISSUE_SKIP_COMPLETE is returned to
+>>> continue async polling.
+>>
+>> I'd probably drop that last paragraph, this is how all multishot
+>> requests work and is implementation detail that need not go in the
+>> commit message. Probably suffices just to say it supports multishot.
+>>
+>>> @@ -695,7 +701,7 @@ static inline bool io_recv_finish(struct io_kiocb *req, int *ret,
+>>>       unsigned int cflags;
+>>>         cflags = io_put_kbuf(req, issue_flags);
+>>> -    if (msg->msg_inq && msg->msg_inq != -1)
+>>> +    if (msg && msg->msg_inq && msg->msg_inq != -1)
+>>>           cflags |= IORING_CQE_F_SOCK_NONEMPTY;
+>>>         if (!(req->flags & REQ_F_APOLL_MULTISHOT)) {
+>>> @@ -723,7 +729,7 @@ static inline bool io_recv_finish(struct io_kiocb *req, int *ret,
+>>>               goto enobufs;
+>>>             /* Known not-empty or unknown state, retry */
+>>> -        if (cflags & IORING_CQE_F_SOCK_NONEMPTY || msg->msg_inq == -1) {
+>>> +        if (cflags & IORING_CQE_F_SOCK_NONEMPTY || (msg && msg->msg_inq == -1)) {
+>>>               if (sr->nr_multishot_loops++ < MULTISHOT_MAX_RETRY)
+>>>                   return false;
+>>>               /* mshot retries exceeded, force a requeue */
+>>
+>> Maybe refactor this a bit so that you don't need to add these NULL
+>> checks? That seems pretty fragile, hard to read, and should be doable
+>> without extra checks.
 > 
-> <...>
+> That chunk can be completely thrown away, we're not using
+> io_recv_finish() here anymore
 > 
-> > diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
-> > index 3784534c9185..481a374eff3b 100644
-> > --- a/net/xfrm/xfrm_device.c
-> > +++ b/net/xfrm/xfrm_device.c
-> > @@ -253,6 +253,11 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_state *x,
-> >  		return -EINVAL;
-> >  	}
-> > 
-> > +	if (xuo->flags & XFRM_OFFLOAD_INBOUND && x->dir == XFRM_SA_DIR_OUT) {
-> > +		NL_SET_ERR_MSG(extack, "Mismatched SA and offload direction");
-> > +		return -EINVAL;
-> > +	}
 > 
-> It is only one side, the more comprehensive check should be done for
-> XFRM_SA_DIR_IN too.
+>>> @@ -1053,6 +1058,85 @@ struct io_zc_rx_ifq *io_zc_verify_sock(struct io_kiocb *req,
+>>>       return ifq;
+>>>   }
+>>>   +int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+>>> +{
+>>> +    struct io_recvzc *zc = io_kiocb_to_cmd(req, struct io_recvzc);
+>>> +
+>>> +    /* non-iopoll defer_taskrun only */
+>>> +    if (!req->ctx->task_complete)
+>>> +        return -EINVAL;
+>>
+>> What's the reasoning behind this?
 > 
-> if ((xuo->flags & XFRM_OFFLOAD_INBOUND && x->dir == XFRM_SA_DIR_OUT) ||
-> !((xuo->flags & XFRM_OFFLOAD_INBOUND) && x->dir == XFRM_SA_DIR_IN))
-> ....
+> CQ locking, see the comment a couple lines below
+> 
+> 
+>>> +    struct io_recvzc *zc = io_kiocb_to_cmd(req, struct io_recvzc);
+>>> +    struct io_zc_rx_ifq *ifq;
+>>> +    struct socket *sock;
+>>> +    int ret;
+>>> +
+>>> +    /*
+>>> +     * We're posting CQEs deeper in the stack, and to avoid taking CQ locks
+>>> +     * we serialise by having only the master thread modifying the CQ with
+>>> +     * DEFER_TASkRUN checked earlier and forbidding executing it from io-wq.
+>>> +     * That's similar to io_check_multishot() for multishot CQEs.
+>>> +     */
+> 
+> This one ^^, though it doesn't read well, I should reword it for
+> next time.
+> 
+>>> +    if (issue_flags & IO_URING_F_IOWQ)
+>>> +        return -EAGAIN;
+>>> +    if (WARN_ON_ONCE(!(issue_flags & IO_URING_F_NONBLOCK)))
+>>> +        return -EAGAIN;
+>>
+>> If rebased on the current tree, does this go away?
+> 
+> It's just a little behind not to have that change
+> 
 
-I added this check too. With "!" inside ,  (!( )
+-- 
+Jens Axboe
 
-> and IMHO, it is better to have this check in verify_newsa_info().
 
-That function does not have xuo extracted. And xfrm_dev_state_add() has
-other checks already. So I think this is a better place for now.
-
-thanks,
--antony
 
