@@ -1,96 +1,99 @@
-Return-Path: <netdev+bounces-79747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3AD387B2A4
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 21:12:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77CF287B29E
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 21:12:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FF6A28B3A7
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 20:12:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9A1F1C20B99
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 20:12:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09C344D108;
-	Wed, 13 Mar 2024 20:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B24A24CE11;
+	Wed, 13 Mar 2024 20:12:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="WzTIhz4N"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="uyO/mUu3"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8EF51010;
-	Wed, 13 Mar 2024 20:12:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F03E225AF;
+	Wed, 13 Mar 2024 20:12:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710360764; cv=none; b=rz7xSRQuBnoslqI/tj2PxGGDvhU82lcS1ctJk+OgQlnd7owXN4LBSHoqS8kLxXMvrzmpAoSdmbt5InBeuwXaNTUSCvtWl1NUY1zwFhcDhJ3fLvw9qPVXFQ7gdJ3GVGCxHcLvqlWZzjIoLEi2CE7lNzJtzQZyV9qgugCZ4W0JN8Q=
+	t=1710360731; cv=none; b=knbnzCY8VMT1+6hbzRejxNX5dc28qz+FsOg7CLeTXdPP9QSWY/jh4B8hmhED1rUq39c2g0ZPhScNxNqPfs9++cBgxazdcWYaJGOl4yCSLuNx3xWPDC2tCOlZTkWyMMKHdGDXoxjEEiNmrTzHYk8cJmPUfVJtKXP6KnmMV3ZcIvQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710360764; c=relaxed/simple;
-	bh=S+PiGnOT6Rj42pB5IBf6tfImQCiJJZJG+AO254zHo1o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O0F952OBhcBhxklhe+stZ8zjUS2kZDBn2umvWUCYhV2Tf39UfcpRB0o8ACT6bfLdS4zDe19d8MOZLnlCt6lLJWA5cw/6v0Y2U5fLcwaitEkeB1ryx+dBmz3pdpqfjofTvVbaAnhh1UXUfyR06h92LTQw01CjqtDdwll96iZPNec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=WzTIhz4N; arc=none smtp.client-ip=217.70.183.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 98BFCFF803;
-	Wed, 13 Mar 2024 20:12:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1710360756;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0L9q2h8CYQgav6n1YqnS/t2FEJImcD0uzrXWt33zLYY=;
-	b=WzTIhz4NH+AgR1EkATjBon5oOy+42v7M5LraE2D1hM726qOvt60LMbr0NHMMvYx0CSQVe3
-	KmyyAvSCcIJ932cUajDFov4Xt+SOUhWdnKSLOwwKn6Rc7O5YseMAagkzf2h9Unhg5Khj6l
-	noeCKKIpuYMfns0efz6lwMK6y8T8eBGdcgRnosXPUwzdIOjEQ4plA7SbnYxJ8VMSzowcbx
-	JTcs+N0/dsVqR6Gb5TsTLFHpPD+921X90J7JTwokRi4Ad3OyabHYdvZNP977VUrDp2TjlH
-	IrVU8DBgb/eq1ku0CKjYfa1Fwh6X4HvChT8lUU/Qt1vmAyiE/OTM+PjB+faw1g==
-Message-ID: <48fadb58-4b81-4271-919c-102943354c01@arinc9.com>
-Date: Wed, 13 Mar 2024 23:12:19 +0300
+	s=arc-20240116; t=1710360731; c=relaxed/simple;
+	bh=vxiSIG1jZQwlWtR6AV5q/3NgPvGpxmDe0qfJ03T7J/I=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ugvHWAn7wYkK6pouxzkfDHXmb464PSxAVf8JEetUepNvw/PAZcoiD9fxDh9LooOnRkQUueyg0MbBmVzE7bvd9f059qzt90AoYDWvSiNuM0GTxFOH1o4LxpiYQeILcKHg/lRFfix6G+roN9lNF/b9TgnVHNdg+GDrLuDeKcPdhIc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=uyO/mUu3; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Xp82gEIbZeLnmlswzlNrQpFNfajF/0oeJJd0n1Kue3M=; b=uyO/mUu37qErfYKSWEqKd3wmSq
+	R92vQ0Yv/x3wGFeS61sdERP3c8R58AiQJcDKZWMDD2tYjU7aAfpuSODq8UsXekoI0N+bYq8lpWfoj
+	5mZtGQ4mTrXRiz83cgieU7Sw/vfr469Fi6WdYPCEebdmgUvvXdQsJhMbOrBqKgYnW6CI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rkUxr-00AGOu-Ik; Wed, 13 Mar 2024 21:12:39 +0100
+Date: Wed, 13 Mar 2024 21:12:39 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexandre Belloni <alexandre.belloni@bootlin.com>
+Cc: David Woodhouse <dwmw2@infradead.org>,
+	Peter Hilber <peter.hilber@opensynergy.com>,
+	linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+	virtio-dev@lists.oasis-open.org,
+	linux-arm-kernel@lists.infradead.org, linux-rtc@vger.kernel.org,
+	"virtio-comment@lists.oasis-open.org" <virtio-comment@lists.oasis-open.org>,
+	"Christopher S. Hall" <christopher.s.hall@intel.com>,
+	Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+	Richard Cochran <richardcochran@gmail.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Alessandro Zummo <a.zummo@towertech.it>,
+	"Ridoux, Julien" <ridouxj@amazon.com>
+Subject: Re: [RFC PATCH v3 0/7] Add virtio_rtc module and related changes
+Message-ID: <04246331-e890-4c9a-95fb-9673580e6d30@lunn.ch>
+References: <204c6339-e80d-4a98-8d07-a11eeb729497@opensynergy.com>
+ <667c8d944ce9ea5c570b82b1858a70cc67b2f3e4.camel@infradead.org>
+ <f6940954-334a-458b-af32-f03d8efbe607@opensynergy.com>
+ <57704b2658e643fce30468dffd8c1477607f59fb.camel@infradead.org>
+ <d796d9a5-8eda-4528-a6d8-1c4eba24aa1e@opensynergy.com>
+ <202403131118010e7ed5bf@mail.local>
+ <dcd07f0b733a90ac3f3c43a4614967bbb3ef14ad.camel@infradead.org>
+ <20240313125813ec78d5a9@mail.local>
+ <96be7312f7bddaf06c690e082a8028fa8b511deb.camel@infradead.org>
+ <202403131450547f373268@mail.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: dsa: mt7530: prevent possible incorrect XTAL
- frequency selection
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Philipp Zabel <p.zabel@pengutronix.de>,
- Landen Chao <Landen.Chao@mediatek.com>,
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org,
- Justin Swartz <justin.swartz@risingedge.co.za>
-References: <20240313085546.710679b0@kernel.org>
-Content-Language: en-US
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <20240313085546.710679b0@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: yes
-X-Spam-Level: **************************
-X-GND-Spam-Score: 400
-X-GND-Status: SPAM
-X-GND-Sasl: arinc.unal@arinc9.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <202403131450547f373268@mail.local>
 
-On 13.03.2024 18:55, Jakub Kicinski wrote:
-> On Wed, 13 Mar 2024 14:25:07 +0300 Arınç ÜNAL via B4 Relay wrote:
->> Reported-by: Justin Swartz <justin.swartz@risingedge.co.za>
-> 
-> That's way insufficient for the amount of diligence and work Justin did.
-> Co-developed-by, at least, please.
+> As long as it doesn't behave differently from the other RTC, I'm fine
+> with this. This is important because I don't want to carry any special
+> infrastructure for this driver or to have to special case this driver
+> later on because it is incompatible with some evolution of the
+> subsystem.
 
-Fine by me. Do I need to resubmit or can you add it while applying?
+Maybe deliberately throw away all the sub-second accuracy when
+accessing the time via the RTC API? That helps to make it look like an
+RTC. And when doing the rounding, add a constant offset of 10ms to
+emulate the virtual i2c bus it is hanging off, like most RTCs?
 
-Arınç
+	  Andrew
 
