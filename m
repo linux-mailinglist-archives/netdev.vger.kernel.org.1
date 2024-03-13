@@ -1,93 +1,94 @@
-Return-Path: <netdev+bounces-79614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6D6E87A404
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 09:17:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A3D387A40D
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 09:20:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C0111F21576
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 08:17:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB7491C217F8
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 08:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A09917588;
-	Wed, 13 Mar 2024 08:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0715318EC3;
+	Wed, 13 Mar 2024 08:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UhlKzV7C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fIwnd13/"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B228A18629
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 08:17:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D20AC18EAD;
+	Wed, 13 Mar 2024 08:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710317841; cv=none; b=R6mafyaIzMu1oRllhjc+JcfimVv1if2zqnimxrLLRgQJdlqZtrkaYv5xSasbuKBGzDJFkuQFG35IzcNPtYjljkPfwP/24h9rppQxk8OeP04uQZT4wxcN8mWUhsWIyzgYXq4Nk3hy55LQB9M2gLd8/y1jOmFuq941W3reonfUgww=
+	t=1710318029; cv=none; b=metS2POgNe9e/xJ4P+KN6Xvm/j8OmSkfXpFvWXMZgt3KrgginoWlsTH8fWAgh30sG25hH1sB9ohOg2RZnetMOkVXJW+tm1oDa4Eq9DpPq7UCRgb1WiZ27kcf8h9mDG0UFJSyGltlMO9JsvOaWISfzcETrRCa/GdEDe45z03pvFY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710317841; c=relaxed/simple;
-	bh=R7UrPyomiogXTOEePhUSBvSOHyrsJBsiTYmFkWgfznk=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=OOCUTvD7oBi/FDTS71C+Cu6QY7ci9bmAvLD5oyyRuQZlgg58K3n8UrLTCg6Wbxy3GwnRCaC67Tqu7BbRfaY3df9R8hxYhLmS4Ai8ePTjw5xhoVP59jdWbIFAajQOzrUQF+ljMYO7fnjMmyJoyvk49dMeQEJqNtsny6EnoccV75c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UhlKzV7C; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710317838;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=R7UrPyomiogXTOEePhUSBvSOHyrsJBsiTYmFkWgfznk=;
-	b=UhlKzV7CYrv4UoWrIDKYp2ohJu9qd4XMVNLeR/0L49Qq6FAR+CRWqa60PQEoBf6kN+JTpd
-	rHKOTHXCq5gcWe0cTabuiWn2HciwUy93/PxrjXB+pjiJ5+6S0NM6Su9+vHBY/6jpKV5Lqk
-	PNl+mpTjr6VvU03RTVLLm0sWKACMRBg=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-632-sASfXibLP_KkMwtU8aFqsQ-1; Wed, 13 Mar 2024 04:17:14 -0400
-X-MC-Unique: sASfXibLP_KkMwtU8aFqsQ-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id CF9CE80026D;
-	Wed, 13 Mar 2024 08:17:13 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.10])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 624AA1C060A4;
-	Wed, 13 Mar 2024 08:17:12 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20240312233723.2984928-1-dhowells@redhat.com>
-References: <20240312233723.2984928-1-dhowells@redhat.com>
-To: netdev@vger.kernel.org
-Cc: dhowells@redhat.com, Marc Dionne <marc.dionne@auristor.com>,
-    Yunsheng Lin <linyunsheng@huawei.com>,
-    "David S.
- Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, linux-afs@lists.infradead.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 0/2] rxrpc: Fixes for AF_RXRPC
+	s=arc-20240116; t=1710318029; c=relaxed/simple;
+	bh=oUsOL6hxMKKQ73cx4GRRn7cptHqRBCUzVvGVhHwPBhM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=H8T0WLWVZY47HueCFrFHBQuK1Bk1IeqbN7mouYdIDfGgCopUB1xUgDJRWfKzBhQ75lmpOy+aZxMy/j3guWsiBILa+542c0Vru+cLrc71f6vi8n/0xHR1fhhW6iwUrD2nvJM+vQ66I5mCqoEAobNaOcVqELnuAufK8uoKtPUC+Y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fIwnd13/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6D9C3C43394;
+	Wed, 13 Mar 2024 08:20:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710318029;
+	bh=oUsOL6hxMKKQ73cx4GRRn7cptHqRBCUzVvGVhHwPBhM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fIwnd13/YmSHEt7lU1Dn9wEomsuhuBGK+sCUhUOHlCM7WB4NAkQrzT+gSudkKVyjg
+	 1lYOW0QC16NeMglK8WjPrXeCFovQbAam+tPQb2JKTta8iLkAe8PivPsa5bWQoZebCC
+	 qq8szawNSmwjXRguzmfXZo/JEnLYHrzlH1WzURIMT5AFByprkc1kz+mOeh/TjJbmJE
+	 YDSCJeHMZbV8Y+BFcpESmekhIrcFXG6uXwtkRfyeEtWwSbA4UIgdaar9Eh/sksW8i/
+	 DqDaoWoxXEw3V62JCofs28Ej3w0lFXgbgOiAmuta+yUdF5DRKhzEdZP6LHJehP0fep
+	 6ixf/bA/65mdw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 56593D95054;
+	Wed, 13 Mar 2024 08:20:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3060407.1710317831.1@warthog.procyon.org.uk>
-Date: Wed, 13 Mar 2024 08:17:11 +0000
-Message-ID: <3060408.1710317831@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net PATCH] octeontx2-af: Use matching wake_up API variant in CGX
+ command interface
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171031802935.29357.8241782552356760374.git-patchwork-notify@kernel.org>
+Date: Wed, 13 Mar 2024 08:20:29 +0000
+References: <20240312070622.844546-1-lcherian@marvell.com>
+In-Reply-To: <20240312070622.844546-1-lcherian@marvell.com>
+To: Linu Cherian <lcherian@marvell.com>
+Cc: davem@davemloft.net, sgoutham@marvell.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, gakula@marvell.com, hkelam@marvell.com,
+ sbhatta@marvell.com, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 
-David Howells <dhowells@redhat.com> wrote:
+Hello:
 
-> Here are a couple of fixes for the AF_RXRPC changes[1] in net-next.
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Actually, this should be aimed at net now that net-next got merged.
+On Tue, 12 Mar 2024 12:36:22 +0530 you wrote:
+> Use wake_up API instead of wake_up_interruptible, since
+> wait_event_timeout API is used for waiting on command completion.
+> 
+> Fixes: 1463f382f58d ("octeontx2-af: Add support for CGX link management")
+> Signed-off-by: Linu Cherian <lcherian@marvell.com>
+> Signed-off-by: Sunil Goutham <sgoutham@marvell.com>
+> Signed-off-by: Subbaraya Sundeep <sbhatta@marvell.com>
+> 
+> [...]
 
-David
+Here is the summary with links:
+  - [net] octeontx2-af: Use matching wake_up API variant in CGX command interface
+    https://git.kernel.org/netdev/net/c/e642921dfeed
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
