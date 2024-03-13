@@ -1,109 +1,241 @@
-Return-Path: <netdev+bounces-79738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 369DA87B1C6
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 20:26:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E9D87B202
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 20:36:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 612F31C29B33
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 19:26:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4089128D278
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 19:36:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 980E54D9FB;
-	Wed, 13 Mar 2024 19:22:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E71654A07;
+	Wed, 13 Mar 2024 19:36:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fdnQSew4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MqWQ4oy1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7FA83FB1C
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 19:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 296FF210E9;
+	Wed, 13 Mar 2024 19:36:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710357739; cv=none; b=YbuCSYGSA+hJLz3jTAe6q9bK0D3WUBpsla8g1Kq38Vp6hg8Ffb2sK02aE1et4kN/Oaszdy2zqgj7inD+fohgKpiKux8VLDO2nho6WwhHQ/JRD5DCbyHirVHMILM8JHfwYgSgxkK7G+/PGPFoYnn2Ig8XPP2wAF2uqao4A1eZRRk=
+	t=1710358609; cv=none; b=Btfnga0XEdaR6Jqq8EpHE5aRoZ0LuwL1ssUW+PKLxLjJRJv9bmQYRLqMGiR1yNatRwxsZQCBo9QLiVFTQAkgqonb0nbVQSITKeE7VAqEgSLwtGYgry8BiVJyRftkgLDGKB2GhRRDydd9Ft4DdyfXc96u5y+1wZcjzuleAp8k8to=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710357739; c=relaxed/simple;
-	bh=GMeaC8jNUNxm2ktaqQ9ficVlGCIxcpuk1L2dtdcseZs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hw82BYPeYgKK8pJmbVkwd04Z5BDsnjW35IbMf/eCQFv6pcqE1uXTra5bDbmLObzmRUyYuzraNpOdLRIeOS2LtawJYvyjhbmcHIaYyKQi/19IP/8TnvK9Kie4gWxSO39g64tlCYKrXHRfeOX/a4N8vk/NaPWCBvAsvuXdiX0OE84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fdnQSew4; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710357738; x=1741893738;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=GMeaC8jNUNxm2ktaqQ9ficVlGCIxcpuk1L2dtdcseZs=;
-  b=fdnQSew46gKmUUtXqrOx8gHIziaanpIy/dJnt345xU8nWQ+aPMDfWMP4
-   idGH1KI1OGcdyjU4JulZwTvLiwE9GshzbuHSXzjZN1yEcYba76XOTWoHf
-   UQHE2ceqCoDei1k1sLfi0YIDf35Jd6CbKjNPeiqFsjovtU+ucAUUnRbn3
-   pGdmkHKYCc9/m3TYeX78idQNJA/nhQSC/9cOgUVsm+EFyIfdwxr+vKcZW
-   fnBkgqfx/DMZ6udAFNz09EwunDG+wgw6Od86g8hU0DQ7+dzzBxVzUUblM
-   6SPwpzS2kKYROtrgDw8m1eo4+Sa4hBRS9xo1msZ5Hi+Xrd3jmowk+M4o5
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11012"; a="15875801"
-X-IronPort-AV: E=Sophos;i="6.07,123,1708416000"; 
-   d="scan'208";a="15875801"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2024 12:22:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,11012"; a="914439669"
-X-IronPort-AV: E=Sophos;i="6.07,123,1708416000"; 
-   d="scan'208";a="914439669"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Mar 2024 12:22:15 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.97)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1rkUB3-0000000CJ6M-1rKn;
-	Wed, 13 Mar 2024 21:22:13 +0200
-Date: Wed, 13 Mar 2024 21:22:13 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: kernel test robot <lkp@intel.com>, jcmvbkbc@gcc.gnu.org
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Herve Codina <herve.codina@bootlin.com>
-Subject: Re: [net-next:main 4/19] WARNING: modpost: vmlinux: section mismatch
- in reference: bitmap_copy_clear_tail+0x58 (section: .text.unlikely) ->
- __setup_str_initcall_blacklist (section: .init.rodata)
-Message-ID: <ZfH85ScHmojydKlw@smile.fi.intel.com>
-References: <202403121032.WDY8ftKq-lkp@intel.com>
+	s=arc-20240116; t=1710358609; c=relaxed/simple;
+	bh=799tM95udsQ7H+IHk4Yau0GNh2KboPOpDuGINwz7Yjc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=mjAQogXa/3tTpl6+xzcW+gJDZIAoyiDjAvGP9Vplo0aByLX9/g/ZL47LMexKjNArk2f3uA8ckErEmu81nVyn00UiGOpKt4iMjKLD58RUXmKwXUI6xOjCNvr40aLFKEHrCFRFcu3y6VaVKo3defrhq8mVDQBF09N4GH6TMxpUPpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MqWQ4oy1; arc=none smtp.client-ip=209.85.222.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-787edfea5adso8216385a.2;
+        Wed, 13 Mar 2024 12:36:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710358607; x=1710963407; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rSQ074WaC5hJeQNbrmwBtZbI9ZTWGrNyYsVRhC9muZs=;
+        b=MqWQ4oy1mKDDh+i28Xc614FT1TUP5lOemo2+/y6z8yXmG2Jh9EiFcskopZgJJqsrP0
+         sVpHKTvwrOzoBbIdyBFzvmwmWColx4BmuIzHEAkVn9Gysvnz2MO6NeSey969sv9wysud
+         jCr/iqF1HGi8vIxVNy3J6QCaYqvJGky2y5dA/cLKJIwDFRidgSJyPOMF3LGQx69cPUQs
+         MOHc5e80AzfOTB6NDhjdjL3MUNWougdiIxrKLA9AWvHQgJtdeusFys5wPZpIyj9Heuky
+         Q6BnGn6ANQNEYYgDrFKSsrhYuYzaq2pJ6enUbJ/6/vs7+1nkz4dCGMoUs3xz84h586Xo
+         RHJQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710358607; x=1710963407;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=rSQ074WaC5hJeQNbrmwBtZbI9ZTWGrNyYsVRhC9muZs=;
+        b=KFsw7cs5aDdtrcUa6EgW4jJD+T1dLSePqBVWq1Z+2HPZ3u9dxvwPtXs0QsGWSDsvGp
+         LGLsMM5xVOGYIc3clOGQBWiFEDy4pwXbL+FIMHK1Gh7uxYicSwm2mJkQKyW9IHA9w9HD
+         H3PFw45HxlynEvyg1A/UVG6kOKeUeT6QQMoQemnUXYmCAY2tvkn+5TMezdOfM/4dbKlL
+         SwMHXU3zh98avn3IQnKUdiDGSY8azY5mYk1/dy95mWgSyX4laD29o2F3Oi50cYaDmVqD
+         nQuuHjL9+211GUmGjKK4kZgHPlgSba+Er4cL4Ra7qrHyKP2RzjCcXDHxKCPTVFQYZmfU
+         clRA==
+X-Forwarded-Encrypted: i=1; AJvYcCX5Y/w5eW3Q++Xq0tsyzmaocIjF65EDTYB7kIIBcrd3f5dRtwSh4CihEMLr7K/iahzzBGfpduaXG7OyE6a8RqroOtX4UevYUJoP+ChgWcIOJnN7vFtmM20taL1GDJXRVN7GHGPh99CDaXtL6hUeHpEC7Dy0g/zxkaHy
+X-Gm-Message-State: AOJu0YxSrCJNJ1EIcaxjSXg6eX7vf2aVAL/44EhOrcjzOnol4xd583yj
+	Urc2uapYgML2j6mh7AN1hZhNxySO01LW0PN5tivLe7Jy96+NrBx3
+X-Google-Smtp-Source: AGHT+IEEpTuJaeyUoYMxU098Zc7iPktQRRlq5d+/M0Bslhapib+5W7stE9v60zOFyaPonDvY3aXMHw==
+X-Received: by 2002:a05:620a:a85:b0:788:1b28:b977 with SMTP id v5-20020a05620a0a8500b007881b28b977mr895655qkg.39.1710358606948;
+        Wed, 13 Mar 2024 12:36:46 -0700 (PDT)
+Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
+        by smtp.gmail.com with ESMTPSA id bq10-20020a05620a468a00b0078813c3b1fdsm5050976qkb.19.2024.03.13.12.36.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Mar 2024 12:36:46 -0700 (PDT)
+Date: Wed, 13 Mar 2024 15:36:46 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Abhishek Chauhan <quic_abchauha@quicinc.com>
+Cc: kernel@quicinc.com, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Andrew Halaney <ahalaney@redhat.com>, 
+ Martin KaFai Lau <martin.lau@kernel.org>, 
+ bpf <bpf@vger.kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Andrii Nakryiko <andrii@kernel.org>
+Message-ID: <65f2004e65802_3d1e792943e@willemb.c.googlers.com.notmuch>
+In-Reply-To: <28282905-065a-4233-a0a2-53aa9b85f381@linux.dev>
+References: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
+ <2a4cb416-5d95-459d-8c1c-3fb225240363@linux.dev>
+ <65f16946cd33e_344ff1294fc@willemb.c.googlers.com.notmuch>
+ <28282905-065a-4233-a0a2-53aa9b85f381@linux.dev>
+Subject: Re: [PATCH net-next v4] net: Re-use and set mono_delivery_time bit
+ for userspace tstamp packets
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202403121032.WDY8ftKq-lkp@intel.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 12, 2024 at 10:29:16AM +0800, kernel test robot wrote:
-> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git main
-> head:   f095fefacdd35b4ea97dc6d88d054f2749a73d07
-> commit: de5f84338970815b9fdd3497a975fb572d11e0b5 [4/19] lib/bitmap: Introduce bitmap_scatter() and bitmap_gather() helpers
-> config: xtensa-randconfig-001-20240311 (https://download.01.org/0day-ci/archive/20240312/202403121032.WDY8ftKq-lkp@intel.com/config)
-> compiler: xtensa-linux-gcc (GCC) 13.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240312/202403121032.WDY8ftKq-lkp@intel.com/reproduce)
+Martin KaFai Lau wrote:
+> On 3/13/24 1:52 AM, Willem de Bruijn wrote:
+> > Martin KaFai Lau wrote:
+> >> On 3/1/24 12:13 PM, Abhishek Chauhan wrote:
+> >>> Bridge driver today has no support to forward the userspace timestamp
+> >>> packets and ends up resetting the timestamp. ETF qdisc checks the
+> >>> packet coming from userspace and encounters to be 0 thereby dropping
+> >>> time sensitive packets. These changes will allow userspace timestamps
+> >>> packets to be forwarded from the bridge to NIC drivers.
+> >>>
+> >>> Setting the same bit (mono_delivery_time) to avoid dropping of
+> >>> userspace tstamp packets in the forwarding path.
+> >>>
+> >>> Existing functionality of mono_delivery_time remains unaltered here,
+> >>> instead just extended with userspace tstamp support for bridge
+> >>> forwarding path.
+> >>
+> >> The patch currently broke the bpf selftest test_tc_dtime:
+> >> https://github.com/kernel-patches/bpf/actions/runs/8242487344/job/22541746675
+> >>
+> >> In particular, there is a uapi field __sk_buff->tstamp_type which currently has
+> >> BPF_SKB_TSTAMP_DELIVERY_MONO to mean skb->tstamp has the MONO "delivery" time.
+> >> BPF_SKB_TSTAMP_UNSPEC means everything else (this could be a rx timestamp at
+> >> ingress or a delivery time set by user space).
+> >>
+> >> __sk_buff->tstamp_type depends on skb->mono_delivery_time which does not
+> >> necessarily mean mono after this patch. I thought about fixing it on the bpf
+> >> side such that reading __sk_buff->tstamp_type only returns
+> >> BPF_SKB_TSTAMP_DELIVERY_MONO when the skb->mono_delivery_time is set and skb->sk
+> >> is IPPROTO_TCP. However, it won't work because of bpf_skb_set_tstamp().
+> >>
+> >> There is a bpf helper, bpf_skb_set_tstamp(skb, tstamp,
+> >> BPF_SKB_TSTAMP_DELIVERY_MONO). This helper changes both the skb->tstamp and the
+> >> skb->mono_delivery_time. The expectation is this could change skb->tstamp in the
+> >> ingress skb and redirect to egress sch_fq. It could also set a mono time to
+> >> skb->tstamp where the udp sk->sk_clockid may not be necessary in mono and then
+> >> bpf_redirect to egress sch_fq. When bpf_skb_set_tstamp(skb, tstamp,
+> >> BPF_SKB_TSTAMP_DELIVERY_MONO) succeeds, reading __sk_buff->tstamp_type expects
+> >> BPF_SKB_TSTAMP_DELIVERY_MONO also.
+> >>
+> >> I ran out of idea to solve this uapi breakage.
+> >>
+> >> I am afraid it may need to go back to v1 idea and use another bit
+> >> (user_delivery_time) in the skb.
+> > 
+> > Is the only conflict when bpf_skb_set_tstamp is called for an skb from
+> > a socket with sk_clockid set (and thus SO_TXTIME called)?
 > 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202403121032.WDY8ftKq-lkp@intel.com/
+> Right, because skb->mono_delivery_time does not mean skb->tstamp is mono now and 
+> its interpretation depends on skb->sk->sk_clockid.
 > 
-> All warnings (new ones prefixed by >>, old ones prefixed by <<):
+> > Interpreting skb->tstamp as mono if skb->mono_delivery_time is set and
+> > skb->sk is NULL is fine. This is the ingress to egress redirect case.
 > 
-> WARNING: modpost: missing MODULE_DESCRIPTION() in vmlinux.o
-> WARNING: modpost: vmlinux: section mismatch in reference: put_page+0x58 (section: .text.unlikely) -> initcall_level_names (section: .init.data)
-> >> WARNING: modpost: vmlinux: section mismatch in reference: bitmap_copy_clear_tail+0x58 (section: .text.unlikely) -> __setup_str_initcall_blacklist (section: .init.rodata)
+> skb->sk == NULL is fine. I tried something like this in 
+> bpf_convert_tstamp_type_read() for reading __sk_buff->tstamp_type:
+> 
+> __sk_buff->tstamp_type is BPF_SKB_TSTAMP_DELIVERY_MONO when:
+> 
+> 	skb->mono_delivery_time == 1 &&
+> 	(!skb->sk ||
+> 	 !sk_fullsock(skb->sk) /* tcp tw or req sk */ ||
+> 	 skb->sk->sk_protocol == IPPROTO_TCP)
+> 
+> Not a small bpf instruction addition to bpf_convert_tstamp_type_read() but doable.
+> 
+> > 
+> > I don't see an immediate use for this BPF function on egress where it
+> > would overwrite an SO_TXTIME timestamp and now skb->tstamp is mono,
+> > but skb->sk != NULL and skb->sk->sk_clockid != CLOCK_MONOTONIC.
+> 
+> The bpf prog may act as a traffic shaper that limits the bandwidth usage of all 
+> outgoing packets (tcp/udp/...) by setting the mono EDT in skb->tstamp before 
+> sending to the sch_fq.
+> 
+> I currently also don't have a use case for skb->sk->sk_clockid != 
+> CLOCK_MONOTONIC. However, it is something that bpf_skb_set_tstamp() can do now 
+> before queuing to sch_fq.
+> 
+> The container (in netns + veth) may use other sk_clockid/qdisc (e.g. sch_etf) 
+> setup and the non mono skb->tstamp is not cleared now during dev_forward_skb() 
+> between the veth pair.
+> 
+> > 
+> > Perhaps bpf_skb_set_tstamp() can just fail if another delivery time is
+> > already explicitly programmed?
+> 
+> This will change the existing bpf_skb_set_tstamp() behavior, so probably not 
+> acceptable.
+>
+> > 
+> >      skb->sk &&
+> >      sock_flag(sk, SOCK_TXTIME) &&
+> >      skb->sk->sk_clockid != CLOCK_MONOTONIC
+> 
+> > Either that, or unset SOCK_TXTIME to make sk_clockid undefined and
+> > fall back on interpreting as monotonic.
+> 
+> Change sk->sk_flags in tc bpf prog? hmm... I am not sure this will work well also.
+> 
+> sock_valbool_flag(SOCK_TXTIME) should require a lock_sock() to make changes. The 
+> tc bpf prog cannot take the lock_sock, so bpf_skb_set_tstamp() currently only 
+> changes skb and does not change skb->sk.
+> 
+> I think changing sock_valbool_flag(SOCK_TXTIME) will also have a new user space 
+> visible side effect. The sendmsg for cmsg with SCM_TXTIME will start failing 
+> from looking at __sock_cmsg_send().
+> 
+> There may be a short period of disconnect between what is in sk->sk_flags and 
+> what is set in skb->tstamp. e.g. what if user space does setsockopt(SO_TXTIME) 
+> again after skb->tstamp is set by bpf. This could be considered a small glitch 
+> for some amount of skb(s) until the user space settled on setsockopt(SO_TXTIME).
+> 
+> I think all this is crying for another bit in skb to mean user_delivery_time 
+> (skb->tstamp depends on skb->sk->sk_clockid) while mono_delivery_time is the 
+> mono time either set by kernel-tcp or bpf.
 
-Reminds me of https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92938
+It does sound like the approach with least side effects.
 
--- 
-With Best Regards,
-Andy Shevchenko
+If we're going to increase to two bits per skb, it's perhaps
+better to just encode the (selected supported) CLOCK_ type, rather
+than only supporting clockid through skb->sk->sk_clockid.
+
+This BPF function is the analogue to SO_TXTIME. It is clearly
+extensible to additional BPF_SKB_TSTAMP_DELIVERY_.. types. To
+work with sch_etf, say.
+
+> If we need to revert the 
+> mono_delivery_time reuse patch later, we will need to revert the netdev patch 
+> and the (to-be-made) bpf patch.
+
+
+ 
 
 
 
