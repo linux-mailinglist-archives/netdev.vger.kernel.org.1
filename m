@@ -1,116 +1,90 @@
-Return-Path: <netdev+bounces-79645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DE5C87A5D9
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 11:28:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 669B487A5F0
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 11:32:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7EA2281264
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 10:28:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22A2D282192
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 10:32:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C62439AC3;
-	Wed, 13 Mar 2024 10:28:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BF03B299;
+	Wed, 13 Mar 2024 10:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="D76sZ5VG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GBYuKTvc"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward501c.mail.yandex.net (forward501c.mail.yandex.net [178.154.239.209])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D21CA3B299;
-	Wed, 13 Mar 2024 10:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708341B298
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 10:32:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710325699; cv=none; b=CARNJOOqjtb2kRaq8K0g3p2RjCGETRQamztuduwYsaF20T0M0iarQscOAWFfp1ZspeAHt0o8QLn2ZP1FUsowwFxSpM77UHwYnvIGY9CV0eXRqGOxc6fLC//KQlGPKyQE8afAgVrkTRURvRVY2GSv79A2SzkFtxkYG/hMPe8XC5U=
+	t=1710325963; cv=none; b=VVQtZvYWt+CYJA+Libq2B3ugLoDrX3zsxIEsUJ/Sr14ony/mw6f0kKjXZWXwh4EUpmjfpoEn4J0hy/ODXrtwkzWjHDj/qtZSem08jJFJgIL9CynK9vu16vynfgowqWeFdj5AN+y+ZlWp0FoJV+HV5GVU1gP4QhPlo2XTY2rK94Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710325699; c=relaxed/simple;
-	bh=OcVluCKvsHlq0d156Dzb5r66fC5wAogsfZjtJ83l4DE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oIF+a4SIXgyRMU6UPJIPYMUdyF10wAYWyCYGYtV3J0X+4chyZZCyjlAAsMYUUZzwOOA5SsTPzFBWf3waXYCXZiPMBFPw7C9c4yJae9X/LrQh4hEbEWnkW75JxQ1XoNM67GdmLaWT0PwhWjb4+WT3xlpfGKADtxBn42jnU6wgp+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=D76sZ5VG; arc=none smtp.client-ip=178.154.239.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from mail-nwsmtp-smtp-production-main-45.myt.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-45.myt.yp-c.yandex.net [IPv6:2a02:6b8:c12:1726:0:640:5719:0])
-	by forward501c.mail.yandex.net (Yandex) with ESMTPS id 63E2D611FB;
-	Wed, 13 Mar 2024 13:28:13 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-45.myt.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id CSkdcjQWq8c0-yaVBqGy8;
-	Wed, 13 Mar 2024 13:28:12 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1710325693; bh=YKCTwRKb6XAnKOv3scbCMs8KzYk2kMKEqIvgIzp2vVs=;
-	h=In-Reply-To:To:From:Cc:Date:References:Subject:Message-ID;
-	b=D76sZ5VGIXpEEuDpmpEJm1RoXKCvTHA3EKU2vV9ix2nyGiVsIiBtIQV1BmqmFVqhu
-	 dXEVdNG3bNfyoXf4UaNdDkqoutjoJGNWxyayjlPaYtseVbrgmgnPR4UTy0ht0d7TWx
-	 osIJuuvk3kr/02s2cmWp7JvY1yKNVe/4ApAUyrIU=
-Authentication-Results: mail-nwsmtp-smtp-production-main-45.myt.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <aa191780-c625-4e13-8dc0-6ea3760b6104@yandex.ru>
-Date: Wed, 13 Mar 2024 13:28:12 +0300
+	s=arc-20240116; t=1710325963; c=relaxed/simple;
+	bh=820ZHoXzuLaboM5PK8MjSP3EKOAlDtuGMQouEyuY76Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C+dCPsXZf6dFxCtrlknY8Y5IC42L0lrY1/y2sGPF2gFmzHQ/oV082kpEE0cT97hfAcoAd/76XlDuZuqyFoEyycIcsGdOepdbg3cbbNa5Tb0Hx+y8atwY8thdo+Qg/gbUW8Rhguo8FAQJ0sa0YQZSMGjc7IRHNxewOlSziHk2LJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GBYuKTvc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B28CC433F1;
+	Wed, 13 Mar 2024 10:32:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710325962;
+	bh=820ZHoXzuLaboM5PK8MjSP3EKOAlDtuGMQouEyuY76Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=GBYuKTvchAyh+oq5MZKIJvt3N3oCMo0ca4ooCmPySnNAIBl1gqgawZ4XNTHhmfi8N
+	 rF8ftXsVnpNqrx6wPnm2oP+gplbO/ixCy6CcMJqyYCHy99MguzjqEvOdd6EuAvE8vR
+	 1WT9QmeU4dJLwTrax5YC4ypla7mOgMu9YAa/wMqiS7yVQBpscXh0HwUxnMCrP5CPSV
+	 qNfUyE8qHb6mYxmxmJFO3ECTtfhB9YVE9PNJmjbIwTNvpp5YZUcv47c5u2GroetENb
+	 Az2y9pIIuxTLgMF1uZcQhf0xlMnUYWiFkslZsqTmkH3VXTkdaDzCCSmQD2zT1BRQ+/
+	 v/Ejh7tfWYGrQ==
+Date: Wed, 13 Mar 2024 12:32:38 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH xfrm] xfrm: Allow UDP encapsulation only in offload modes
+Message-ID: <20240313103238.GY12921@unreal>
+References: <3d3a34ffce4f66b8242791d1e6b3091aec8a2c25.1710244420.git.leonro@nvidia.com>
+ <37a7a9fb76f295cf8babb8251dea0033add4c40b.camel@redhat.com>
+ <ZfF7M7C/EAu8Umb0@gauss3.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] can: gw: prefer kfree_rcu() over call_rcu() with
- cgw_job_free_rcu()
-To: Eric Dumazet <edumazet@google.com>
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>,
- Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240313094207.70334-1-dmantipov@yandex.ru>
- <CANn89iLCK10J_6=1xSDquYpToZ-YNG3TzjS60L-g5Cyng92gFw@mail.gmail.com>
-Content-Language: en-US
-From: Dmitry Antipov <dmantipov@yandex.ru>
-Autocrypt: addr=dmantipov@yandex.ru; keydata=
- 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
- tx98MCutXbJWn55RtnVKbpIiMfBrcB8=
-In-Reply-To: <CANn89iLCK10J_6=1xSDquYpToZ-YNG3TzjS60L-g5Cyng92gFw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZfF7M7C/EAu8Umb0@gauss3.secunet.de>
 
-On 3/13/24 13:18, Eric Dumazet wrote:
-
-> kmem_cache_free() is not the same than kfree()
+On Wed, Mar 13, 2024 at 11:08:51AM +0100, Steffen Klassert wrote:
+> On Tue, Mar 12, 2024 at 01:24:31PM +0100, Paolo Abeni wrote:
+> > On Tue, 2024-03-12 at 13:55 +0200, Leon Romanovsky wrote:
+> > > From: Leon Romanovsky <leonro@nvidia.com>
+> > > 
+> > > The missing check of x->encap caused to the situation where GSO packets
+> > > were created with UDP encapsulation.
+> > > 
+> > > As a solution return the encap check for non-offloaded SA.
+> > > 
+> > > Fixes: 9f2b55961a80 ("xfrm: Pass UDP encapsulation in TX packet offload")
+> > 
+> > Should be:
+> > 
+> > Fixes: 983a73da1f99 ("xfrm: Pass UDP encapsulation in TX packet offload")
+> > 
+> > @Steffen: I guess you want to apply it first in your tree and send it later as PR?
+> > In such case, could you please adjust the fixes hash while at it?
 > 
-> Unless I have missed something in mm territory , your patch is not
-> going to work.
+> Yes, I'll adjust the fixes tag.
+> 
 
-Hm... it seems that you're better to check include/linux/rcupdate.h
-and the comment before kfree_rcu() definition in particular.
-
-Dmitry
-
+Thanks
 
