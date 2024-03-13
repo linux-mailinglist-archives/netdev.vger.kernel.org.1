@@ -1,117 +1,195 @@
-Return-Path: <netdev+bounces-79607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C674D87A2DB
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 07:07:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F07787A2FA
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 07:33:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8013428324D
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 06:07:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B2E5282FA4
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 06:33:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E7FE1170A;
-	Wed, 13 Mar 2024 06:07:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0B912E76;
+	Wed, 13 Mar 2024 06:33:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hhfxvCcw"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="K55qBZTE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A5513AD8;
-	Wed, 13 Mar 2024 06:07:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B420ABA5E;
+	Wed, 13 Mar 2024 06:33:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710310064; cv=none; b=HJpyXwj93LpwByDKwAZ3I8luQe5dJbJ5QgizHaluFk7zvoGab9n9TdT5ksQpE5qm2WCAirdi76Jgg7lYyTPezMwaH01T5oLW/CD7nqkzjiWhLQjPC4T72+CuEQcDUkP+vCivzgkb51TV3TCEAsFk76u9cerau23xpmIRU7XMMy8=
+	t=1710311613; cv=none; b=iQN874hRelOakZ2oVA01IjdSLBPNqIsx02KjNNNrGu6HcehjJIlHLKRHeusrQHoe1mb4cESLec0HYXr+0Hg0TsVfGMFLMIfMOOqPvK6PvmqooYWuPPvB2n4HPQleD7dWo7Vg8KCRldgGZVhLS6OCGpAhuaV3sNEYlCDC4Ygm4p8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710310064; c=relaxed/simple;
-	bh=JAbRJULUtYT2FEB8ljTZpY/ho/ffWxibZ2qZnzPZNhc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XNuDqEoTRsFfhmQIPmd6pS6hoynqcIS2hEGzGrQjd4gJZdZeyxH6ZuvUItSYpoFFxDEkygrPdu40+iQHC8AIuiCRWmtzNr8tB2Dy6uzsFJRkKJv1GaIPsROIsLn2/4Dw3mPvubNl3IV7e+pNVSnOX+7wI+TUkaJNkMNe8Ym5+5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hhfxvCcw; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-4132e548343so14829645e9.1;
-        Tue, 12 Mar 2024 23:07:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710310061; x=1710914861; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Zt1/IkK5JgRgujlk5e4o+Oqepqb7MAzE8ZFCroiaUF4=;
-        b=hhfxvCcwT+BJPQvaoX1GEbTm2Ibwm7TvAf8RhV16XnrUVxGsRHIU3SwBHwYU9OQ5N6
-         7/KUOU7oHyqdV7J7vFef+U50a9KY4SCaMvGzydBaX+ATJSqkWgWWgGmMfYYfzCIiefvx
-         c+Ko765WJUveJsrCTNuJFUnkHKtzruSnmSMezdTHRAUtsqYixJ1++p8pkfNZpQfjTOhI
-         lQPnGxCzxpMWVA+wGW0/dQsMsfOqc/cxxvUHfXhT7rlbwPV6REuVh8S6n9mth9d72wZ4
-         1vED5QAuakkYH7HMjA8xFAr1POo7/N6GroqspMfacBZiz1Do3988bQTE9cuLZTR8MFyd
-         7kBA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710310061; x=1710914861;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zt1/IkK5JgRgujlk5e4o+Oqepqb7MAzE8ZFCroiaUF4=;
-        b=QoVtfL3xNcxGsaOyPnQt32KkqQ8T9JDKDfyUJNqcYTuPNxMIpWjTXEMH5ufU/nODIx
-         m+gWd9Yk/QekUXl0gMZqgkmh7h2jLSYCKvMWvbRU4tKSN/OLMPiHdtpKmJohHt2bBd8Q
-         WdzR35YbyEuO1D6vtTySisjIChrft71cbe7eWxhXopPFemDaM7ogQomUxskplssbo8OH
-         MKh3nsfVv7rqXWNZ33CZxiNVVG2sKeuSZBYN8afIVfK/6nlDZzIcvpO5SUUGf52S2oD4
-         uyVhUhT4CkpoctCBlZltcMkOiAWFdZqyB0uGJ/kqlDPgFVaDZJbuPa9Mao8gYRI+LuSb
-         z/bA==
-X-Forwarded-Encrypted: i=1; AJvYcCUYlBKuNl75jWMFZC+Td5wZ+DQXyEfb3UzNU7qKZWMqWXEg9VrN5M7uibsRkaL5Y/oyIySGrqfsFsiFSj2NcmSEnibNPFD7sVo6
-X-Gm-Message-State: AOJu0Yx+9i3qVJEZ5/IKfo0/go6Oul9D4jD11XerW6+xA4EeIIl6PkmS
-	NyqLwrxeL2P8hi1k3xhoah8KRhZkLF6RWkUSxWqVnuborAZ0yyXe
-X-Google-Smtp-Source: AGHT+IHTwYUgtaPx0ePNCfE2/mWwH/M9hKKNgiW1BIhs8sN4Cj0EpZpNrEllxwEJHPrEm0uOenpiKw==
-X-Received: by 2002:a05:600c:5120:b0:413:2852:2835 with SMTP id o32-20020a05600c512000b0041328522835mr1511986wms.17.1710310060923;
-        Tue, 12 Mar 2024 23:07:40 -0700 (PDT)
-Received: from [172.27.52.25] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id bn16-20020a056000061000b0033ea59bc00bsm3598809wrb.73.2024.03.12.23.07.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 12 Mar 2024 23:07:40 -0700 (PDT)
-Message-ID: <2ab5b453-494c-409b-82c4-f2c62adb43ca@gmail.com>
-Date: Wed, 13 Mar 2024 08:07:38 +0200
+	s=arc-20240116; t=1710311613; c=relaxed/simple;
+	bh=9Zs1KGyWNWhmAejwgtyMJIfOriycRX1MdIXZB6Zlp3w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gl9vpSibE20QeeO1jI8uhIcfhKbqN/hh/iOB9iV7InDIX/IBaVcV376Q9QHiXqxTyKC4q4vBIM8xMdKM+Bbc0ZVObZSFpw5LMlRq86OQgBcoYJDphHDcDn8SoDW+1RQ0tbyFuN0u1Iba8FCsjqoEJ9NH/iUdOHJcxdwlUFhvzzI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=K55qBZTE; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42D3BMFs015050;
+	Tue, 12 Mar 2024 23:33:11 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	pfpt0220; bh=j9SqWvWQBt7wm9bpLwobyyiq2bV0O/zls6CGCynDx8Y=; b=K55
+	qBZTE9x/5sDJTAQVAm3g0N1cdtJRKM6EhZROyGBYBJDHRu/bLBsaXXNyIbONqQAs
+	Xijzg6lyorOllNfL1Pmvibw40DAl0/gebPKpZpOpfiwyaiGNWp6E1wJmRvV2BGtl
+	loV/rq2uCNb3jTGjYcuUjVdyg4XeKDFlur3avGbEq2TCJ4yrJS8wvgDXjOjZ38u5
+	N7yPYyEvBi6g95DTTOTYkFA9CaWZpXiTyNR+dGFsiYr6yhBThSrRB92IFDJkxnC7
+	a3SwK2uXrLUkibMIE+yd18Ovc/PcMVsIVc+lG53j48PAbV9xuwmZ/Z8GuZrCQoBU
+	XuTDVl3ZFZpj+UkABsA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3wtt8htq8t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 12 Mar 2024 23:33:11 -0700 (PDT)
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Tue, 12 Mar
+ 2024 23:33:10 -0700
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH02.marvell.com (10.69.176.39) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.48; Tue, 12 Mar 2024 23:33:10 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
+ Transport; Tue, 12 Mar 2024 23:33:10 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id 3CA103F7082;
+	Tue, 12 Mar 2024 23:33:06 -0700 (PDT)
+From: Geetha sowjanya <gakula@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>
+Subject: [v2 net PATCH] octeontx2-pf: Disable HW TSO for seg size < 16B
+Date: Wed, 13 Mar 2024 12:03:06 +0530
+Message-ID: <20240313063306.32571-1-gakula@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] docs: networking: fix indentation errors in
- multi-pf-netdev
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- Stephen Rothwell <sfr@canb.auug.org.au>, corbet@lwn.net,
- przemyslaw.kitszel@intel.com, tariqt@nvidia.com, saeedm@nvidia.com,
- linux-doc@vger.kernel.org
-References: <20240313032329.3919036-1-kuba@kernel.org>
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20240313032329.3919036-1-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: ysWmEXmgCdF5PXVpake7vdK5iiKJ0SAA
+X-Proofpoint-GUID: ysWmEXmgCdF5PXVpake7vdK5iiKJ0SAA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-13_06,2024-03-12_01,2023-05-22_02
 
+Current NIX hardware do not support TSO for the
+segment size less 16 bytes. This patch disable hw
+TSO for such packets.
 
+Fixes: 86d7476078b8 ("octeontx2-pf: TCP segmentation offload support").
+Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+---
 
-On 13/03/2024 5:23, Jakub Kicinski wrote:
-> Stephen reports new warnings in the docs:
-> 
-> Documentation/networking/multi-pf-netdev.rst:94: ERROR: Unexpected indentation.
-> Documentation/networking/multi-pf-netdev.rst:106: ERROR: Unexpected indentation.
-> 
-> Fixes: 77d9ec3f6c8c ("Documentation: networking: Add description for multi-pf netdev")
-> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-> Link: https://lore.kernel.org/all/20240312153304.0ef1b78e@canb.auug.org.au/
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> Turns out our build test for docs was broken.
-> ---
-> CC: corbet@lwn.net
-> CC: przemyslaw.kitszel@intel.com
-> CC: tariqt@nvidia.com
-> CC: saeedm@nvidia.com
-> CC: linux-doc@vger.kernel.org
+v1-v2:
+ - As suggested by Eric Dumazet used ndo_features_check().
+ - Moved the max fargments support check to ndo_features_check.
 
-Thanks for taking care of this.
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+ .../marvell/octeontx2/nic/otx2_common.c        | 18 ++++++++++++++++++
+ .../marvell/octeontx2/nic/otx2_common.h        |  3 +++
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c   |  1 +
+ .../ethernet/marvell/octeontx2/nic/otx2_txrx.c | 11 -----------
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c   |  1 +
+ 5 files changed, 23 insertions(+), 11 deletions(-)
+
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+index 02d0b707aea5..de61c69370be 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
+@@ -221,6 +221,24 @@ int otx2_set_mac_address(struct net_device *netdev, void *p)
+ }
+ EXPORT_SYMBOL(otx2_set_mac_address);
+ 
++netdev_features_t
++otx2_features_check(struct sk_buff *skb, struct net_device *dev,
++		    netdev_features_t features)
++{
++	/* Due to hw issue segment size less than 16 bytes
++	 * are not supported. Hence do not offload such TSO
++	 * segments.
++	 */
++	if (skb_is_gso(skb) && skb_shinfo(skb)->gso_size < 16)
++		features &= ~NETIF_F_GSO_MASK;
++
++	if (skb_shinfo(skb)->nr_frags + 1 > OTX2_MAX_FRAGS_IN_SQE)
++		features &= ~NETIF_F_SG;
++
++	return features;
++}
++EXPORT_SYMBOL(otx2_features_check);
++
+ int otx2_hw_set_mtu(struct otx2_nic *pfvf, int mtu)
+ {
+ 	struct nix_frs_cfg *req;
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+index 06910307085e..6a4bf43bc77e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
+@@ -961,6 +961,9 @@ void otx2_get_mac_from_af(struct net_device *netdev);
+ void otx2_config_irq_coalescing(struct otx2_nic *pfvf, int qidx);
+ int otx2_config_pause_frm(struct otx2_nic *pfvf);
+ void otx2_setup_segmentation(struct otx2_nic *pfvf);
++netdev_features_t otx2_features_check(struct sk_buff *skb,
++				      struct net_device *dev,
++				      netdev_features_t features);
+ 
+ /* RVU block related APIs */
+ int otx2_attach_npa_nix(struct otx2_nic *pfvf);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index e5fe67e73865..2364eb8d6732 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -2737,6 +2737,7 @@ static const struct net_device_ops otx2_netdev_ops = {
+ 	.ndo_xdp_xmit           = otx2_xdp_xmit,
+ 	.ndo_setup_tc		= otx2_setup_tc,
+ 	.ndo_set_vf_trust	= otx2_ndo_set_vf_trust,
++	.ndo_features_check	= otx2_features_check,
+ };
+ 
+ static int otx2_wq_init(struct otx2_nic *pf)
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+index f828d32737af..9b89aff42eb0 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+@@ -1158,17 +1158,6 @@ bool otx2_sq_append_skb(struct net_device *netdev, struct otx2_snd_queue *sq,
+ 
+ 	num_segs = skb_shinfo(skb)->nr_frags + 1;
+ 
+-	/* If SKB doesn't fit in a single SQE, linearize it.
+-	 * TODO: Consider adding JUMP descriptor instead.
+-	 */
+-	if (unlikely(num_segs > OTX2_MAX_FRAGS_IN_SQE)) {
+-		if (__skb_linearize(skb)) {
+-			dev_kfree_skb_any(skb);
+-			return true;
+-		}
+-		num_segs = skb_shinfo(skb)->nr_frags + 1;
+-	}
+-
+ 	if (skb_shinfo(skb)->gso_size && !is_hw_tso_supported(pfvf, skb)) {
+ 		/* Insert vlan tag before giving pkt to tso */
+ 		if (skb_vlan_tag_present(skb))
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+index 35e06048356f..04aab04e4ba2 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_vf.c
+@@ -483,6 +483,7 @@ static const struct net_device_ops otx2vf_netdev_ops = {
+ 	.ndo_tx_timeout = otx2_tx_timeout,
+ 	.ndo_eth_ioctl	= otx2_ioctl,
+ 	.ndo_setup_tc = otx2_setup_tc,
++	.ndo_features_check	= otx2_features_check,
+ };
+ 
+ static int otx2_wq_init(struct otx2_nic *vf)
+-- 
+2.25.1
 
 
