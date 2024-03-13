@@ -1,116 +1,88 @@
-Return-Path: <netdev+bounces-79720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D04F87AE91
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 19:02:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D534387AFA7
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 19:31:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 237D9B23D2A
-	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 18:02:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AE1E1F2BCA1
+	for <lists+netdev@lfdr.de>; Wed, 13 Mar 2024 18:31:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B7D160260;
-	Wed, 13 Mar 2024 17:01:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23CF478296;
+	Wed, 13 Mar 2024 17:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="IsMfkX7S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EhNpFhXH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0DA60277
-	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 17:00:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35D178273
+	for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 17:10:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710349261; cv=none; b=KL66ZPI0zLDiEVrQewCYmftZgY/Tj+YE3IGsx8T2AJyQ1/vZ+6oRig9jnTu3paErqPEl3BDDJNK+W/TKA+C4/47J52TX4rga0OOEystnIQpPjQ+FwTX3r5jyiuFbc/L2y46vZRpph41AG45E7yVSKcUspVIdxtTIR8wP+EIRXUA=
+	t=1710349829; cv=none; b=um13rxywikHwNcnfmxm9sMs6QTteSsYuFV6S4ppBsFPz0GHYPX2pdYTQGUpVHaPcuIahTkW2TuM++Q2YIyF7FMo1J0suDkI27KGx3C/IHUHndi8c/xpHYU8WeyD5GdkVgnt5n20KqmiugWl5ko/0d/QP+ZHNn/fM6z+Z8Tqmtjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710349261; c=relaxed/simple;
-	bh=QA853/51M2V6z21GLQ0hNeCb35G+JLCb7Q0l/p09yaA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Uzlkk9Arb0IOkcVgiF30S+9sgtSsIqDyxbms2EM1sglGY+z0LGBqvJidmxtynnyxhTTRURdAJ+TmeNCOEisi4VgkAPjY1p0YujwspFYW04RyTWTrsELFLc5vdqErNBN/SsDsTKCuHngzoSXoneZn61QH1LsRS9HHij7c8pH+4WE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=IsMfkX7S; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-1dd10ae77d8so383615ad.0
-        for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 10:00:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1710349258; x=1710954058; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kenTMv3VI7rNcYueiGp6Av/1fPTmtYg+OaG3lMlkCwA=;
-        b=IsMfkX7SE5khdp2l5M3T8BsYFOnY6UVJXqdIpf9j2q83amZ28prLHQZrx6WzCpnow7
-         jTda3IaDoIeaHXj4fsz6gIvOZERI/1uS3qPavdaX7jtkqPWYs0sDYQ0izfpBtrnbOu6N
-         FaQTHdWxK28mBjJ7DqP2Ydw7w8E5iZxJvCNZ75Wm+wbImuvpwBlr0xMT/ld1VAK7RCjg
-         FpG94ShgLX0TMIx4CTqfZnqgc0r7co95ikbhz9PRTd9Y9zwVqpgqEe+9CU5gDLVfmJPl
-         dO/DnFxV416jyoLMoFUxKuQdqNd/ejTbLFM6KQSFceX6ORG+BJDsSQxgCKOuDrUh1JhW
-         Zryw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710349258; x=1710954058;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kenTMv3VI7rNcYueiGp6Av/1fPTmtYg+OaG3lMlkCwA=;
-        b=VKslhKxtfZ6wi0uzZEdadYfjVQgtS5bXA5ov4PkEpDkNU+e1UlQS0oxgkJcBiJiAQf
-         DWq83hEyDwyK6T7dM5WyC8hHjC/K/Ynad83vUKtehaQlNuoHmfoj5HUWb7eaKOFPCx5i
-         /qgZbjXUzIY3zN748iFMiObR3xRHj2enfHMcsiGVxdFVLRYyZIIOd09weuzw6UWKz7gF
-         viCgJWrdC7WYcagHdMzOfVdqulKG7kH5sMdxEYUSM99DJ7AFVP05RGclfLja5n22GK7o
-         QXfWXTRXbtTQ19yA7ATNxt9RUBUAkw+htLcHAIWNM49cV9vTAKULVFUmXri0B0xma0vg
-         RM+g==
-X-Gm-Message-State: AOJu0YyXpbKVX+e/bc2yZJ5Ippl4RMTKL00sLJcWEPgocNlV1lXWYZ4V
-	P7DArlSN7zGiq+1f7xjlStYnCUdwQiiqD9kao2y9mVHE+V9GnZYOXZvFT6M4qaItVbCU9LuMXNz
-	C
-X-Google-Smtp-Source: AGHT+IHkre+ZvlX1GvsDIpHaX3Wx/JzSpNz57e+DA4TkcMu1gcSNBup1QkL3g7qkMm1570KOw+/k4A==
-X-Received: by 2002:a17:902:db09:b0:1dd:8360:df84 with SMTP id m9-20020a170902db0900b001dd8360df84mr6862563plx.3.1710349258039;
-        Wed, 13 Mar 2024 10:00:58 -0700 (PDT)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id d5-20020a170902654500b001dd652ef8d6sm9076840pln.152.2024.03.13.10.00.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Mar 2024 10:00:57 -0700 (PDT)
-Date: Wed, 13 Mar 2024 10:00:56 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Denis Kirjanov <dkirjanov@suse.de>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2 0/5] tc: more JSON fixes
-Message-ID: <20240313100056.5d583411@hermes.local>
-In-Reply-To: <051e50e1-9351-4db3-b62d-e7a042115ddb@suse.de>
-References: <20240312225456.87937-1-stephen@networkplumber.org>
-	<051e50e1-9351-4db3-b62d-e7a042115ddb@suse.de>
+	s=arc-20240116; t=1710349829; c=relaxed/simple;
+	bh=YSI1ZkeG+jQ78/jWn35N2JUL2sM71jOcBzjFswvwMAg=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=oe2FadORwE4FNSc+w5fXS+p2bH8c1pp2M3fNFKgyCiu7Ta2s2AfCfgktx8dF81VBEs6nG40m8f4JDOChDiGah+9aMir07J7fXUkUPyAhW8b4NMu6/vWxF6jWkl9OnL8lWSfo5+bq7OXBIYeMg0tCrFrIzBl8bZ0dDHHJ8F34dWw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EhNpFhXH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A6246C433B2;
+	Wed, 13 Mar 2024 17:10:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710349828;
+	bh=YSI1ZkeG+jQ78/jWn35N2JUL2sM71jOcBzjFswvwMAg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=EhNpFhXHej3t173XSe2sBdGY2GKt/hlmMG1ltvlMj9L1zvvF19Wz8MkZhvOKYE1Eq
+	 1gsMTPzJRykN/inCYtdG6N75wMLGR/LEZnmcZkefYaVZ2uGHCrPZOnANYz4huVsEpq
+	 bLUY2o4erq14lqK7mMCBTVEBwoEUjRhFWRwg4qJbOd+zTz4K4qxZRzrSnOKbtBMSC+
+	 jlTIOBLsn8jRkHP0ffDWFjhCIQJxZmtb+SR/IjLp7id4g8r9sSHKGPXcbKRrUT1Bmz
+	 Y8Tl7hVE5E3cGWrxL5xQ8pHyysbBSBSJ/Hu4U6/Mfy8EFu95Yxanr14ffAvPlMBoTN
+	 +ntt4y9v4SwBA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8C094D95054;
+	Wed, 13 Mar 2024 17:10:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2] man: fix typo found by Lintian
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171034982856.13122.386503104325664882.git-patchwork-notify@kernel.org>
+Date: Wed, 13 Mar 2024 17:10:28 +0000
+References: <20240312222422.2494767-1-luca.boccassi@gmail.com>
+In-Reply-To: <20240312222422.2494767-1-luca.boccassi@gmail.com>
+To: Luca Boccassi <luca.boccassi@gmail.com>
+Cc: netdev@vger.kernel.org
 
-On Wed, 13 Mar 2024 14:08:27 +0300
-Denis Kirjanov <dkirjanov@suse.de> wrote:
+Hello:
 
-> On 3/13/24 01:53, Stephen Hemminger wrote:
-> > Some more places in TC where JSON output is missing or could
-> > be corrupted. And some things found while reviewing tc-simple
-> > man page.  
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
+
+On Tue, 12 Mar 2024 22:24:22 +0000 you wrote:
+> From: Luca Boccassi <bluca@debian.org>
 > 
-> The series mixes the fixes with new features like json support.
-> It makes sense to split fixes and new features  
-> 
-> > 
-> > Stephen Hemminger (5):
-> >   tc: support JSON for legacy stats
-> >   pedit: log errors to stderr
-> >   skbmod: support json in print
-> >   simple: support json output
-> >   tc-simple.8: take Jamal's prompt off examples
-> > 
-> >  man/man8/tc-simple.8 | 12 ++++++------
-> >  tc/m_pedit.c         |  6 +++---
-> >  tc/m_simple.c        |  8 +++++---
-> >  tc/m_skbmod.c        | 37 +++++++++++++++++++++----------------
-> >  tc/tc_util.c         | 28 +++++++++++++++-------------
-> >  5 files changed, 50 insertions(+), 41 deletions(-)
-> >   
+> Signed-off-by: Luca Boccassi <bluca@debian.org>
+> ---
+>  man/man8/tc-mirred.8 | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
-Not supporting JSON is a bug at this point
+Here is the summary with links:
+  - [iproute2] man: fix typo found by Lintian
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=f31afe64d6d8
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
