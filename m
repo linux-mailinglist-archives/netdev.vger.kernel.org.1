@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-79990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0DCA87C559
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 23:49:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ED9AC87C55A
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 23:49:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F30761C20FCF
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 22:49:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D3E71F22229
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 22:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA0DC4A11;
-	Thu, 14 Mar 2024 22:49:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CF1EFC09;
+	Thu, 14 Mar 2024 22:49:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KSXaWa3S"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Dho5XwqT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E02FC09
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 22:49:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173B51A38F6
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 22:49:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710456575; cv=none; b=JKDpu8mjT8ZcYE2lcX3bVlCh13rgi/+NFcLKIn9oC26846xOKw2eXPRZVZi2FO+7LG8FaR/XREpMVChsncSNzSb31wyXctZ9rI3PhxIwLqYDXS6UFe8uGuJ/QGHq21g4z2/9vYqoKhsQZz92/vSOSof4SJoNfN0r8Hu5V8KP/bM=
+	t=1710456578; cv=none; b=HwGj+d862ZRDg0WQ6E/8CYT/DmeGie5Jo5D2Hk85SkQahAqDUsxPPopoeiQ6aFylFc/ARWZD5Xwn/jTiioMCn+tMbbHvLMB2Ewu2liIYu5dtL1dWazFgYjl8U9NaO8n6PHxyfljDc07TJBhGnAETlW2b/3nST9Nc1JicY46dqi4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710456575; c=relaxed/simple;
-	bh=+oTe+hBfa0aQpugI7WzWEpwgjpZu2EHvmoEqIHnyllA=;
+	s=arc-20240116; t=1710456578; c=relaxed/simple;
+	bh=Rb6VGQ6fQuJ1kItmWGWZ/UZCph3rADuYS2nrOD5wlqY=;
 	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=pXV6eTKsCwjhwCA1/WIwfvJDD6occ4jYxc5BgTyPy/VWaYiz+fmdmoyrvBIhGGPh+/DfgKJRL3mD+vr7hJnSh9D+v1dXWLe4Npza+E/uvv2BDKvQcuNbpNPLUQEWSPGpd8QAjKfbjo5uzWsyid8DSRg5NE4zHP7K6/GcvIXpk5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=KSXaWa3S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CAFACC433C7;
-	Thu, 14 Mar 2024 22:49:34 +0000 (UTC)
+	 MIME-Version; b=Jhpx44Tk3IjP8NmoudOTUj1qbAAni93/0y+dhXah5jj/FviFv63t1/Wp0hQ4Tntm90u2/by8k+NYRNixqhGvYGsPS5+anj0G9hWENaNze+WHv2VrYsmEWkAd3EoZMHmJjn+Tdkb4znPS/92SofOlIjqUg+JT+AFIk1E4cInf5KU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=Dho5XwqT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 840F3C433C7;
+	Thu, 14 Mar 2024 22:49:37 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="KSXaWa3S"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="Dho5XwqT"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1710456572;
+	t=1710456576;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=c/aFDQVnZYf/0SMALBb3qNKTfWdlxu70J44C4NGowpg=;
-	b=KSXaWa3S+M6EJnIEroTw5vfujpp8bh6QmuWcOME/LF3qFrm6QaE24fHhm2MFGafzxUtod9
-	ttPPDJgaiDmdC6jNZXck3JSSZT5+y9bOngYEkXiAJNzPUMQMRh3yHVbfN35PXGkUqVRPae
-	B6zmTKKlD+71G4NwcS7aDLq4Wu+z5Ds=
+	bh=ONzSgUSSJR4+w+0GGNLm2Fs6cV/TL8+9tLp9WRSxE20=;
+	b=Dho5XwqTE6iyiihy8gTq4qapsUh84iQNva8QXRpkAOBZIo/+WTnjT/Nn7Ol8KteimSLgsG
+	uIlx5pLYX6tBp+Qg22gS7yJwKfaPME3wn8J8w1pU+Zxi9+F2bk/kF5QgshLBODZnKOrqRp
+	t48f7HdtuKEhTC0K1galZctGOL1BSDU=
 Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 0b56b9f8 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Thu, 14 Mar 2024 22:49:32 +0000 (UTC)
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a2ab8b36 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Thu, 14 Mar 2024 22:49:35 +0000 (UTC)
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
 To: netdev@vger.kernel.org,
 	davem@davemloft.net,
 	kuba@kernel.org
-Subject: [PATCH net 2/6] wireguard: device: leverage core stats allocator
-Date: Thu, 14 Mar 2024 16:49:07 -0600
-Message-ID: <20240314224911.6653-3-Jason@zx2c4.com>
+Subject: [PATCH net 3/6] wireguard: device: remove generic .ndo_get_stats64
+Date: Thu, 14 Mar 2024 16:49:08 -0600
+Message-ID: <20240314224911.6653-4-Jason@zx2c4.com>
 In-Reply-To: <20240314224911.6653-1-Jason@zx2c4.com>
 References: <20240314224911.6653-1-Jason@zx2c4.com>
 Precedence: bulk
@@ -65,69 +65,34 @@ Content-Transfer-Encoding: 8bit
 
 From: Breno Leitao <leitao@debian.org>
 
-With commit 34d21de99cea9 ("net: Move {l,t,d}stats allocation to core
-and convert veth & vrf"), stats allocation could be done on net core
-instead of in this driver.
+Commit 3e2f544dd8a33 ("net: get stats64 if device if driver is
+configured") moved the callback to dev_get_tstats64() to net core, so,
+unless the driver is doing some custom stats collection, it does not
+need to set .ndo_get_stats64.
 
-With this new approach, the driver doesn't have to bother with error
-handling (allocation failure checking, making sure free happens in the
-right spot, etc). This is core responsibility now.
-
-Remove the allocation in this driver and leverage the network core
-allocation instead.
+Since this driver is now relying in NETDEV_PCPU_STAT_TSTATS, then, it
+doesn't need to set the dev_get_tstats64() generic .ndo_get_stats64
+function pointer.
 
 Signed-off-by: Breno Leitao <leitao@debian.org>
 Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Jason A. Donenfeld <Jason@zx2c4.com>
 ---
- drivers/net/wireguard/device.c | 10 ++--------
- 1 file changed, 2 insertions(+), 8 deletions(-)
+ drivers/net/wireguard/device.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/drivers/net/wireguard/device.c b/drivers/net/wireguard/device.c
-index deb9636b0ecf..6aa071469e1c 100644
+index 6aa071469e1c..3feb36ee5bfb 100644
 --- a/drivers/net/wireguard/device.c
 +++ b/drivers/net/wireguard/device.c
-@@ -262,7 +262,6 @@ static void wg_destruct(struct net_device *dev)
- 	rcu_barrier(); /* Wait for all the peers to be actually freed. */
- 	wg_ratelimiter_uninit();
- 	memzero_explicit(&wg->static_identity, sizeof(wg->static_identity));
--	free_percpu(dev->tstats);
- 	kvfree(wg->index_hashtable);
- 	kvfree(wg->peer_hashtable);
- 	mutex_unlock(&wg->device_update_lock);
-@@ -297,6 +296,7 @@ static void wg_setup(struct net_device *dev)
- 	dev->hw_enc_features |= WG_NETDEV_FEATURES;
- 	dev->mtu = ETH_DATA_LEN - overhead;
- 	dev->max_mtu = round_down(INT_MAX, MESSAGE_PADDING_MULTIPLE) - overhead;
-+	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+@@ -237,7 +237,6 @@ static const struct net_device_ops netdev_ops = {
+ 	.ndo_open		= wg_open,
+ 	.ndo_stop		= wg_stop,
+ 	.ndo_start_xmit		= wg_xmit,
+-	.ndo_get_stats64	= dev_get_tstats64
+ };
  
- 	SET_NETDEV_DEVTYPE(dev, &device_type);
- 
-@@ -331,14 +331,10 @@ static int wg_newlink(struct net *src_net, struct net_device *dev,
- 	if (!wg->index_hashtable)
- 		goto err_free_peer_hashtable;
- 
--	dev->tstats = netdev_alloc_pcpu_stats(struct pcpu_sw_netstats);
--	if (!dev->tstats)
--		goto err_free_index_hashtable;
--
- 	wg->handshake_receive_wq = alloc_workqueue("wg-kex-%s",
- 			WQ_CPU_INTENSIVE | WQ_FREEZABLE, 0, dev->name);
- 	if (!wg->handshake_receive_wq)
--		goto err_free_tstats;
-+		goto err_free_index_hashtable;
- 
- 	wg->handshake_send_wq = alloc_workqueue("wg-kex-%s",
- 			WQ_UNBOUND | WQ_FREEZABLE, 0, dev->name);
-@@ -397,8 +393,6 @@ static int wg_newlink(struct net *src_net, struct net_device *dev,
- 	destroy_workqueue(wg->handshake_send_wq);
- err_destroy_handshake_receive:
- 	destroy_workqueue(wg->handshake_receive_wq);
--err_free_tstats:
--	free_percpu(dev->tstats);
- err_free_index_hashtable:
- 	kvfree(wg->index_hashtable);
- err_free_peer_hashtable:
+ static void wg_destruct(struct net_device *dev)
 -- 
 2.44.0
 
