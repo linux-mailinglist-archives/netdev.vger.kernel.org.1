@@ -1,131 +1,145 @@
-Return-Path: <netdev+bounces-79923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79922-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EB0D87C0C8
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 16:59:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CAA3787C0BF
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 16:58:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0C4F1C218FC
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:59:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6BC741F224D1
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:58:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744FD7317A;
-	Thu, 14 Mar 2024 15:59:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8595173171;
+	Thu, 14 Mar 2024 15:58:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63116EB74;
-	Thu, 14 Mar 2024 15:59:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6652071B37;
+	Thu, 14 Mar 2024 15:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710431993; cv=none; b=fRes4FBxBIt0NkAdOboqNDGwPsOiYzisq+WDKBxVqZIVvKetFsUtsSqXNG4WZ7fk/EVEGiSEmdlBBFe/n1DwFbKZeWrJg1mbuWRsce6HnpZE3Lzyh6oKvrws1kBPfAytnSitliVDkN26W3t7BiSKac/iGgkMR+i75MleB3ep0Mo=
+	t=1710431898; cv=none; b=J5F43Ik6WRv6bk84HdqmJaJFrkKtnSLFjUWcmI3BBqC+UWFN423mFb/w6TVqKoXnxNQTUjn2nfcckRaorFNcHvoghW+++yOGYOFiOI6ZdsCVHp6/Tzdv2uYBUAtToCEGS++oADR7FgKxC6/hKgBr70UqMJ9jQW/Z6rSnTmc0Q4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710431993; c=relaxed/simple;
-	bh=okaw4O3R57c6tEMT0TJSs1UtnZZCStffxFfDr2xlyHw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aeNHzxxsVnfkXCjyuZrVl9Yz4ZPzdStJRtSAp7dmCJ1Du41C1qBhU6mOltq7qPkTa/O0eJyh8Q6AeHY3mBOTCOUh3ghvnlLSdVXRlMZdXEA0ZLuBFj09hKbZSFheR37EzmMe2h0yZBVIxmPMxTwr7lESVOgnFc4oHEGSbu0jx7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CCA7E1007;
-	Thu, 14 Mar 2024 09:00:25 -0700 (PDT)
-Received: from FVFF77S0Q05N (unknown [10.57.69.235])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 281FB3F762;
-	Thu, 14 Mar 2024 08:59:45 -0700 (PDT)
-Date: Thu, 14 Mar 2024 15:59:39 +0000
-From: Mark Rutland <mark.rutland@arm.com>
-To: Sagi Maimon <maimon.sagi@gmail.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>, richardcochran@gmail.com,
-	luto@kernel.org, datglx@linutronix.de, mingo@redhat.com,
-	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
-	hpa@zytor.com, arnd@arndb.de, geert@linux-m68k.org,
-	peterz@infradead.org, hannes@cmpxchg.org, sohil.mehta@intel.com,
-	rick.p.edgecombe@intel.com, nphamcs@gmail.com, palmer@sifive.com,
-	keescook@chromium.org, legion@kernel.org, mszeredi@redhat.com,
-	casey@schaufler-ca.com, reibax@gmail.com, davem@davemloft.net,
-	brauner@kernel.org, linux-kernel@vger.kernel.org,
-	linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v7] posix-timers: add clock_compare system call
-Message-ID: <ZfMe66MfHBEfxrdd@FVFF77S0Q05N>
-References: <20240314090540.14091-1-maimon.sagi@gmail.com>
- <87a5n1m5j1.ffs@tglx>
- <CAMuE1bH_H9E+Zx365G9AtmWSmhW-kPPB+-=8s2rH4hpxqE+dHQ@mail.gmail.com>
+	s=arc-20240116; t=1710431898; c=relaxed/simple;
+	bh=DXQqwJJ63DZa7xAit6S7SqD2kBPUmGIXS/NWXgZYEwA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=kCkNn9ETjCf6CiXzS3ovC7Y8ngSgqgNR/2nUIFZ2MGHdFdko01znAitKCow9QC/bKLB8nCofB6Zxzs1DXkZCV6w18GQnj3T1eHqEwJ3CqJOsKYgA0ue/90YwO7rKqYG5fJ6aCQ0WvOOGPOi6cdTsXf9Pqti9J2RQE6RFmctJNK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E21BC433C7;
+	Thu, 14 Mar 2024 15:58:16 +0000 (UTC)
+Date: Thu, 14 Mar 2024 12:00:27 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: LKML <linux-kernel@vger.kernel.org>, Linux Trace Kernel
+ <linux-trace-kernel@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
+ Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
+ <salil.mehta@huawei.com>, Jijie Shao <shaojijie@huawei.com>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Yufeng Mo <moyufeng@huawei.com>, Huazhong Tan
+ <tanhuazhong@huawei.com>
+Subject: Re: [PATCH] net: hns3: tracing: fix hclgevf trace event strings
+Message-ID: <20240314120027.088e850d@gandalf.local.home>
+In-Reply-To: <8607787b42e80503e0259f41e0bcc2d3ff770355.camel@redhat.com>
+References: <20240313093454.3909afe7@gandalf.local.home>
+	<8607787b42e80503e0259f41e0bcc2d3ff770355.camel@redhat.com>
+X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMuE1bH_H9E+Zx365G9AtmWSmhW-kPPB+-=8s2rH4hpxqE+dHQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 14, 2024 at 02:19:39PM +0200, Sagi Maimon wrote:
-> On Thu, Mar 14, 2024 at 1:12 PM Thomas Gleixner <tglx@linutronix.de> wrote:
-> > On Thu, Mar 14 2024 at 11:05, Sagi Maimon wrote:
-> > > +     if (crosstime_support_a) {
-> > > +             ktime_a = ktime_sub(xtstamp_a2.device, xtstamp_a1.device);
-> > > +             ts_offs_err = ktime_divns(ktime_a, 2);
-> > > +             ktime_a = ktime_add_ns(xtstamp_a1.device, (u64)ts_offs_err);
-> > > +             ts_a1 = ktime_to_timespec64(ktime_a);
-> >
-> > This is just wrong.
-> >
-> >      read(a1);
-> >      read(b);
-> >      read(a2);
-> >
-> > You _CANNOT_ assume that (a1 + ((a2 - a1) / 2) is anywhere close to the
-> > point in time where 'b' is read. This code is preemtible and
-> > interruptible. I explained this to you before.
-> >
-> > Your explanation in the comment above the function is just wishful
-> > thinking.
-> >
-> you explained it before, but still it is better then two consecutive
-> user space calls which are also preemptible
-> and the userspace to kernel context switch time is added.
+On Thu, 14 Mar 2024 15:39:28 +0100
+Paolo Abeni <pabeni@redhat.com> wrote:
 
-How much "better" is that in reality?
+> On Wed, 2024-03-13 at 09:34 -0400, Steven Rostedt wrote:
+> > From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
+> >=20
+> > [
+> >    Note, I need to take this patch through my tree, so I'm looking for =
+acks. =20
+>=20
+> Note that this device driver is changing quite rapidly, so I expect
+> some conflicts here later. I guess Liuns will have to handle them ;)
 
-The time for a user<->kernel transition should be trivial relative to the time
-a task spends not running after having been preempted.
+Well, it merges fine with linux-next and linus's current master. ;-)
 
-Either:
+>=20
+> >    This causes the build to fail when I add the __assign_str() check, w=
+hich
+> >    I was about to push to Linus, but it breaks allmodconfig due to this=
+ error.
+> > ]
+> >=20
+> > The __string() and __assign_str() helper macros of the TRACE_EVENT() ma=
+cro
+> > are going through some optimizations where only the source string of
+> > __string() will be used and the __assign_str() source will be ignored a=
+nd
+> > later removed.
+> >=20
+> > To make sure that there's no issues, a new check is added between the
+> > __string() src argument and the __assign_str() src argument that does a
+> > strcmp() to make sure they are the same string.
+> >=20
+> > The hclgevf trace events have:
+> >=20
+> >   __assign_str(devname, &hdev->nic.kinfo.netdev->name);
+> >=20
+> > Which triggers the warning:
+> >=20
+> > hclgevf_trace.h:34:39: error: passing argument 1 of =E2=80=98strcmp=E2=
+=80=99 from incompatible pointer type [-Werror=3Dincompatible-pointer-types]
+> >    34 |                 __assign_str(devname, &hdev->nic.kinfo.netdev->=
+name);
+> >  [..]
+> > arch/x86/include/asm/string_64.h:75:24: note: expected =E2=80=98const c=
+har *=E2=80=99 but argument is of type =E2=80=98char (*)[16]=E2=80=99
+> >    75 | int strcmp(const char *cs, const char *ct);
+> >       |            ~~~~~~~~~~~~^~
+> >=20
+> >=20
+> > Because __assign_str() now has:
+> >=20
+> > 	WARN_ON_ONCE(__builtin_constant_p(src) ?		\
+> > 		     strcmp((src), __data_offsets.dst##_ptr_) :	\
+> > 		     (src) !=3D __data_offsets.dst##_ptr_);	\
+> >=20
+> > The problem is the '&' on hdev->nic.kinfo.netdev->name. That's because
+> > that name is:
+> >=20
+> > 	char			name[IFNAMSIZ]
+> >=20
+> > Where passing an address '&' of a char array is not compatible with str=
+cmp().
+> >=20
+> > The '&' is not necessary, remove it.
+> >=20
+> > Fixes: d8355240cf8fb ("net: hns3: add trace event support for PF/VF mai=
+lbox") =20
+>=20
+> checkpactch in strict mode complains the hash is not 12 char long.
 
-(a) Your userspace application can handle the arbitrary delta resulting from a
-    preemption, in which case the trivial cost shouldn't matter.
+Hmm, I wonder why my git blame gives me 13 characters in the sha. (I cut
+and pasted it from git blame). My git config has:
 
-    i.e. this patch *is not necessary* to solve your problem.
+[core] =20
+        abbrev =3D 12
 
-(b) Your userspace application cannot handle the arbitrary delta resulting from
-    a preemption, in which case you need to do something to handle that, which
-    you haven't described at all.
-  
-    i.e. with the information you have provided so far, this patch is
-    *insufficient* to solve your problem.
 
-> > > + * In other cases: Read clock_a twice (before, and after reading clock_b) and
-> > > + * average these times – to be as close as possible to the time we read clock_b.
-> >
-> > Can you please sit down and provide a precise technical description of
-> > the problem you are trying to solve and explain your proposed solution
-> > at the conceptual level instead of throwing out random implementations
-> > every few days?
+>=20
+> > Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org> =20
+>=20
+> FWIW
+>=20
+> Acked-by: Paolo Abeni <pabeni@redhat.com>
 
-100% agreed.
+Thanks!
 
-Please, explain the actual problem you are solving here. What *specifically*
-are you trying to do in userspace with these values? "Synchronization" is too
-vague a description.
-
-Making what is already the best case *marginally better* without handling the
-common and worst cases is a waste of time. It doesn't actually solve the
-problem, and it misleads people into thinknig that a problem is solved when it
-is not.
-
-Mark.
+-- Steve
 
