@@ -1,134 +1,143 @@
-Return-Path: <netdev+bounces-79872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82B4287BCFC
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 13:48:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72CF187BD18
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 13:57:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A54FD1C20CD2
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:48:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 245E428166A
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB5858AA7;
-	Thu, 14 Mar 2024 12:48:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 853A05789B;
+	Thu, 14 Mar 2024 12:57:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gAVW0sSQ"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="GX6Rk+sN"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13BB74D9ED
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 12:48:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB305266A7
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 12:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710420488; cv=none; b=oAr8eLb62Et3VvlxY76gopQdeV+/2laUtCRdPD4L3d/8ygdSJtnsdO6/d3ajoe0NakawpahsZbDd3r0sv8KeJ7fq5p5tJ2BHUxwhqPBZeN40pUe/wIQRx4ULiGxwX9HylLaEWt4sYrIB7usuYpAkDW1c63TMkN1lxBXIDWdqmck=
+	t=1710421049; cv=none; b=FiHy4NFoAZTiQKaWILpnVqAESJVtwMfHOwGGGjjZwg5OqLirqhABE4EZYcybgKLBGuoBgS3NxAHm+ePxT/8ttSuILPB+uVd6f9cq9ZPKs+OJW6YdXoqMsZ3Mctquk/ynuG8wtA4hgzJ6Zb/gNprNliMuOCz3bv4awd6CorAuEbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710420488; c=relaxed/simple;
-	bh=KI/C5nDqFAm+WQg5YcNuTy5wVj5/EmHvsqDZ4sMKIS8=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=eLNsChx662JkOs7xFSPKgUDvNr78u94LFyVIpZTYuXiOvTYf4W3mAaVkAtd+0IQNa6F2Zjatvu7unQFnu8nfdDvJm6+a51gCmapkyQbGDbQbpMLaq1aV2BvdHAuMNe1OH29jK2ynMlk+u9oclntVYvaR3KpVfcBB1VadSbhAYJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gAVW0sSQ; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710420486;
+	s=arc-20240116; t=1710421049; c=relaxed/simple;
+	bh=6GfFJjlfDTajxioHQ4PR/rr6PYCiHEtUONdjE5qqDnU=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=fYABa7yn89ZLGeDkR1OAGHNHNvn/VKUIKKTwsAZhZCsBXV9+e4/+BWl4+y5C53UuO784xdYFmhF/EW9/LpGpHsFWnGErLs9PgyMa8gSC8USe/tgRncTbzBgsRf43ib3qxL85ZhYJQSVHMVe4erx5S7dCWmwSgOFgiMV2BDlt5t0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=GX6Rk+sN; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 609C41C0006;
+	Thu, 14 Mar 2024 12:57:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1710421045;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=KI/C5nDqFAm+WQg5YcNuTy5wVj5/EmHvsqDZ4sMKIS8=;
-	b=gAVW0sSQqpr6HeRYRwadwQneltId32AA3dgmV4CFSSwqAuO0bAlqtmxPoyR5BvkD/TEXSa
-	M1kUaCHQ2EJUqSyEuFF9WQo2sZUWsOhs+ASysceOUlYL4twHidVMcPu0VkuY+JTeK6Pl53
-	KQangGrOdWq6PijigmKsHnEpb6EHvVw=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-29-hPPuWm_-NnKlG0FoBB2oBg-1; Thu, 14 Mar 2024 08:48:03 -0400
-X-MC-Unique: hPPuWm_-NnKlG0FoBB2oBg-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33e8983205aso150320f8f.1
-        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 05:48:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710420483; x=1711025283;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KI/C5nDqFAm+WQg5YcNuTy5wVj5/EmHvsqDZ4sMKIS8=;
-        b=iQrFrvAyY8vIwWDltSqSdyBdf2m4VCAdh8qnPYGHCRypZFG5R7oU7Y1aF9LttjEB/b
-         xz9Pdeb10jZqHtsFyvV/VetKvp/OESghUt38PT34C06s2AVB1aF25895D7lTwpluTvBf
-         rvBabDBY8JtiJ6i4eCLh1Af8qrpEQZL6r/d/UeqVVzXijNdX93kffpA8kNZp4rK6Kdlo
-         lGaOewV6yvozF97E829pZgKWFFAm4BUFeJeA8vAqx5XHYxVEFUsrQ9cetIgCrO16suDN
-         89PR37zHyUKsFRTL1dB/2aMQA99ZecI+aQEckGUpFFEATS/WKZRYBQk2aNBcXcZprahv
-         7QRg==
-X-Forwarded-Encrypted: i=1; AJvYcCWLc2B3ZMkKANmzsWQ822CZfH0JfJzHl3lG4xmaTcIQrVaBX+bmMb7a7lKaIDHuK7NIHVg727AYyRsK9/fgO8VSp/mGOLN3
-X-Gm-Message-State: AOJu0YwZAf5CXCZzorguzgC2DqV/7iJw7ABZt/jT18fBgvfF1o0fGHZ+
-	esj+VcsZ3NYKoiJkTB05Ygy3cEGcbpioOwBcMk4h/KC3wZ6nKRdHlp/ckAUpuc3WJlz9dDMZebn
-	C3JyLgkHm2As5aa9q1OqOx4x9vAl3eM58iovp8D7On2+tdiQJxC1G/g==
-X-Received: by 2002:adf:f28f:0:b0:33e:7132:7994 with SMTP id k15-20020adff28f000000b0033e71327994mr1018633wro.2.1710420482788;
-        Thu, 14 Mar 2024 05:48:02 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEjK81fcaFYkisBz2ix8oUMtLRu495xVfkU3GpCSPWETyFggRX9ip6GLIFWFVFa197cb7lrfQ==
-X-Received: by 2002:adf:f28f:0:b0:33e:7132:7994 with SMTP id k15-20020adff28f000000b0033e71327994mr1018619wro.2.1710420482414;
-        Thu, 14 Mar 2024 05:48:02 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-230-217.dyn.eolo.it. [146.241.230.217])
-        by smtp.gmail.com with ESMTPSA id z18-20020adfec92000000b0033e7de97214sm692269wrn.40.2024.03.14.05.48.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Mar 2024 05:48:02 -0700 (PDT)
-Message-ID: <d4a698b0deafac0aaed6f357c7768cfdcdc6f766.camel@redhat.com>
-Subject: Re: [PATCH] netpoll: support sending over raw IP interfaces
-From: Paolo Abeni <pabeni@redhat.com>
-To: Mark Cilissen <mark@yotsuba.nl>, netdev@vger.kernel.org
-Cc: Hans de Goede <hdegoede@redhat.com>, Eric Dumazet <edumazet@google.com>,
-  Jakub Kicinski <kuba@kernel.org>, Breno Leitao <leitao@debian.org>, Ingo
- Molnar <mingo@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
- linux-kernel@vger.kernel.org
-Date: Thu, 14 Mar 2024 13:48:00 +0100
-In-Reply-To: <20240313124613.51399-1-mark@yotsuba.nl>
-References: <20240313124613.51399-1-mark@yotsuba.nl>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BKTABrW66JyvVQYwdyjL7ZY8/qBVfLI8e6pxuRKLM40=;
+	b=GX6Rk+sNj1KaydUjPY+XQKpmDMMrt0LrLXF5C3zrQvUfGhi860kgrOxcXnRdOXE1yHbd6w
+	gxC4F3rEdG7Qx19xJ1KrezIyua9V0b7JzBfS8DaNJTRepURLYFj+dnfSpOU6H1mLjmq0+M
+	1Hug/AGYx/zYKkuC12SkS/6a7vr7qh4rESibQX8gLaQgY2aU+nYKZoInoXrQGqv0wTubrV
+	FpO5UmN3n0TbbwpRkefC58ehVFjVIpTI3bQTvP/fHO7hFQIeFK1A3EOBw336PZCoRBtXGC
+	/U8rEksglR8+TBi1fHyflTjIN/OoZG3JDZ1Tx99gP8IdTUMESvXmdGDmqwQg5g==
+Message-ID: <5f1f8827-730e-4f36-bc0a-fec6f5558e93@arinc9.com>
+Date: Thu, 14 Mar 2024 15:57:09 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US
+To: Frank Wunderlich <frank-w@public-files.de>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Subject: Energy Efficient Ethernet on MT7531 switch
+Cc: Daniel Golle <daniel@makrotopia.org>, netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: yes
+X-Spam-Level: **************************
+X-GND-Spam-Score: 400
+X-GND-Status: SPAM
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On Wed, 2024-03-13 at 13:46 +0100, Mark Cilissen wrote:
-> Currently, netpoll only supports interfaces with an ethernet-compatible
-> link layer. Certain interfaces like SLIP do not have a link layer
-> on the network interface level at all and expect raw IP packets,
-> and could benefit from being supported by netpoll.
->=20
-> This commit adds support for such interfaces by using the network device'=
-s
-> `hard_header_len` field as an indication that no link layer is present.
-> If that is the case we simply skip adding the ethernet header, causing
-> a raw IP packet to be sent over the interface. This has been confirmed
-> to add netconsole support to at least SLIP and WireGuard interfaces.
->=20
-> Signed-off-by: Mark Cilissen <mark@yotsuba.nl>
+Hi Frank.
 
-## Form letter - net-next-closed
+Do you have a board with an external PHY that supports EEE connected to an
+MT7531 switch? I've stumbled across an option on the trap register of
+MT7531 that claims that EEE is disabled switch-wide by default after reset.
 
-The merge window for v6.9 has begun and we have already posted our pull
-request. Therefore net-next is closed for new drivers, features, code
-refactoring and optimizations. We are currently accepting bug fixes
-only.
+I'm specifically asking for an external PHY because the MT7531 switch PHYs
+don't support EEE yet. But the MT753X DSA subdriver claims to support EEE,
+so the remaining option is external PHYs.
 
-Please repost when net-next reopens after March 25th.
+It'd be great if you can test with and without this diff [1] and see if you
+see EEE supported on ethtool on a computer connected to the external PHY.
 
-RFC patches sent for review only are obviously welcome at any time.
+Example output on the computer side:
 
-See:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#develop=
-ment-cycle
+$ sudo ethtool --show-eee eno1
+EEE settings for eno1:
+	EEE status: enabled - active
+	Tx LPI: 17 (us)
+	Supported EEE link modes:  100baseT/Full
+	                           1000baseT/Full
+	Advertised EEE link modes:  100baseT/Full
+	                            1000baseT/Full
+	Link partner advertised EEE link modes:  100baseT/Full
+	                                         1000baseT/Full
 
---
-pw-bot: defer
+I'm also CC'ing Daniel and the netdev mailing list, if someone else would
+like to chime in.
 
+[1]
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index b347d8ab2541..4ef3948d310d 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -2499,6 +2499,8 @@ mt7531_setup(struct dsa_switch *ds)
+  	mt7531_ind_c45_phy_write(priv, MT753X_CTRL_PHY_ADDR, MDIO_MMD_VEND2,
+  				 CORE_PLL_GROUP4, val);
+  
++	mt7530_rmw(priv, MT7530_MHWTRAP, CHG_STRAP | EEE_DIS, CHG_STRAP);
++
+  	mt7531_setup_common(ds);
+  
+  	/* Setup VLAN ID 0 for VLAN-unaware bridges */
+diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
+index 3c3e7ae0e09b..1b3e81f6c90e 100644
+--- a/drivers/net/dsa/mt7530.h
++++ b/drivers/net/dsa/mt7530.h
+@@ -299,11 +299,15 @@ enum mt7530_vlan_port_acc_frm {
+  #define  MT7531_FORCE_DPX		BIT(29)
+  #define  MT7531_FORCE_RX_FC		BIT(28)
+  #define  MT7531_FORCE_TX_FC		BIT(27)
++#define  MT7531_FORCE_EEE100		BIT(26)
++#define  MT7531_FORCE_EEE1G		BIT(25)
+  #define  MT7531_FORCE_MODE		(MT7531_FORCE_LNK | \
+  					 MT7531_FORCE_SPD | \
+  					 MT7531_FORCE_DPX | \
+  					 MT7531_FORCE_RX_FC | \
+-					 MT7531_FORCE_TX_FC)
++					 MT7531_FORCE_TX_FC | \
++					 MT7531_FORCE_EEE100 | \
++					 MT7531_FORCE_EEE1G)
+  #define  PMCR_LINK_SETTINGS_MASK	(PMCR_TX_EN | PMCR_FORCE_SPEED_1000 | \
+  					 PMCR_RX_EN | PMCR_FORCE_SPEED_100 | \
+  					 PMCR_TX_FC_EN | PMCR_RX_FC_EN | \
+@@ -457,6 +461,7 @@ enum mt7531_clk_skew {
+  #define  XTAL_FSEL_M			BIT(7)
+  #define  PHY_EN				BIT(6)
+  #define  CHG_STRAP			BIT(8)
++#define  EEE_DIS			BIT(4)
+  
+  /* Register for hw trap modification */
+  #define MT7530_MHWTRAP			0x7804
+
+Thanks a lot!
+Arınç
 
