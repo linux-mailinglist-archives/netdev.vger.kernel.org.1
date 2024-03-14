@@ -1,221 +1,179 @@
-Return-Path: <netdev+bounces-79979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FD8D87C4DA
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 22:47:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 940A687C4DC
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 22:49:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16023281725
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 21:47:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 870A81C216C3
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 21:49:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDED4768E0;
-	Thu, 14 Mar 2024 21:47:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2870768EE;
+	Thu, 14 Mar 2024 21:49:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j/ISSiD8"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BzvnEIZg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17BE7640B
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 21:47:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AED876416
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 21:49:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710452861; cv=none; b=rjfkPE+iVwIbziP0/AnoQDabxaSdt9dHQjr/RCehCZGmtg+9QwAOkv30WXAK8sGh53d2Ra2BbuU4VopYMeFlGKVRtuNgkC47oYg+FNHKWuvgMiRAMjtG8lm+1Tayf6L6XalcOPy8eSD1AYq2HKFtt2eOZaxHtzzYTPaefJ2z3wk=
+	t=1710452948; cv=none; b=cjXSGiEQhZJsOwnO6cddTDk9/mFZc+RDu4hF9QIthWzFjpCoVHSMEGWHK/Anl0X5yFwxZ1xoQHlBTeawkwz56MLcY/+21yAJwtc17Vy2stFIa8pDEmfj2lZeUxgqh77wcl2VyieeWTj3PSwhzNh8ZPdgJ9f9F4G+FL5uQcrEgZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710452861; c=relaxed/simple;
-	bh=rArz5PbsMjiqZkHOTckxHGuhSAZSJrOy+i6L9VPx9W4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BJTn3wsCjpxJSbuYIx/sn+wX9P5tclKaBuvJ+A0k0926B51EdiVbQ8zhTdbML3nYoPc6DWYvO3YxR9RDzgbQJM8fz8ye6AfYXyMBJpAUu3rHqGfEsL2wQUMWD/1UbvU/t3/ALYWP70y6A9W1pWhEyBRHgPJ7+eK9ar9mj5ORGf0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j/ISSiD8; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-568898e47e2so5907a12.0
-        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 14:47:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710452858; x=1711057658; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yj5f/ytrcbQ9bq8jRGc8O12ypIGwxmWYCX3kg31Cwh4=;
-        b=j/ISSiD8DYOyQAi42i9CHYc319DgJwAOGqobThRi+NfrFyGq+YuOTo2f+ngU4oeT05
-         o6UioGMnZxrfpjPaKMXLk9O4c1EQKVuh+muxwx0CKB+xaiuEQCW0UQ+yqS33NdQUF99G
-         R4ZLY3RqAd0PzIzeQm/0yfc9dPQEVC56j6z3Hh27OGwIlUcOCKNx1AMa8boOhVGo9kHk
-         iIpG8GFCFSWNbShDdp4dfCPNB8fG4LCnEen8xzZtFs9LrL1bxA8oWyRUX+nIMn5ISi08
-         O8Lj6xXHpVgrHG/8bjKIs253r6knKoRXtkajUYELmobV0P1bs/Pz2kGey4niZu0oUiPO
-         TFPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710452858; x=1711057658;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yj5f/ytrcbQ9bq8jRGc8O12ypIGwxmWYCX3kg31Cwh4=;
-        b=Wk7gCey7lkaNOgAWx4DsGITLDQNuUdkpZqmY6sMF1SJQd10g/Ob+SKAbmJaGmcSqnb
-         SYJ0fKB1FYHzY+y8w2/s6gdRtx01E8YEYv5pKdb1FwPk1mZZSECWkxubp3dmT+V+yC1V
-         H005ti6dp9QfQ7g8MColjDTxoAHM4Lg6V5+RaGVd5Vp5Mpul0JOZiV3SKkwZbqdVB50A
-         S8OwpBoedxp7TluCNZlXzkMc7V3PgJQ3oJJRnDaPXQmhlzcrd1QVnbpgut0Ki196dpSs
-         znDH6bEIyB7YADj688CHgiJe0Sh6oPomD8DiIBH89OL2F2mdGS9dExbfe5MNow/xWxQa
-         1FMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWnLk7IYAZkJEsNHu4VVLCDL+Et7yHJj7hy18regLIlA1O7c5JDqhu1bGINeIG+rswelVSwp8Zzzi8POWpMG5PdvyIRe7Cj
-X-Gm-Message-State: AOJu0YyZ9j1MLeQuuBhintt3xJZEF04X/5iE1lkdWHuf+K6fUWfl60mg
-	Q9dDLzZgUuSag7D1pBxsVJPUxgBWQJrczBJwvDopYR3+lk8A+FN/5EJkIR+3rhbmHi18i/QqHM/
-	paYyiUa5Q3KWRNOqMQYYX2SoO2RirJukA8R7J
-X-Google-Smtp-Source: AGHT+IEVsQzYZM0gMMFcJFJcO/fLFugCS83znhcv0H9buTdOu9WX9O2QVgdpdmkJlnSz+3qkH8JKZJiSJ86DMXmSXW4=
-X-Received: by 2002:a05:6402:2024:b0:568:5e6c:a3c4 with SMTP id
- ay4-20020a056402202400b005685e6ca3c4mr44213edb.0.1710452858029; Thu, 14 Mar
- 2024 14:47:38 -0700 (PDT)
+	s=arc-20240116; t=1710452948; c=relaxed/simple;
+	bh=FeBtDwOwx7bWu5qqepAggjxF5zHLaj9k63HtMHOYRCs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=N3qcXEP3Ma4u2yOf8pufUyityO21zh6f4HYr3No4u3gHjP14RdNyxoSr6HGqmCStql4asOky/V6iYnyFbTA9IC0nbOGMOVprdAK0q2sG5nB1fXWygJR6My/elLIG/JTkQ/Pcex3PUdKmLuwZ1ispRTtquzD6ywH4INMlFWQBKAk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BzvnEIZg; arc=none smtp.client-ip=95.215.58.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8d245f5a-0c75-4634-9513-3d420eb2c88f@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1710452944;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QiN7/QrqzPkJR7UExDk5VS/K0g1YOEpPfbnDYYLfHKA=;
+	b=BzvnEIZguvRsFkfCMDSsqBRA0YDLTewPY+PyvE54orrRY00M8cT+U55PL+AIx5KowPs0Zi
+	PyblWOHzvDbfeLcaGRyHiqxCT/8AF4WvCkDUufefzIHP466E85+N7i3IVlPQHygwlaW1MD
+	uMZfBzmTV/FSHjTOodeLuBMkonw/c94=
+Date: Thu, 14 Mar 2024 14:48:54 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240314210740.GA2823176@perftesting>
-In-Reply-To: <20240314210740.GA2823176@perftesting>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 14 Mar 2024 22:47:25 +0100
-Message-ID: <CANn89i+Bid4YkwFEmxSvF22Gk0jY+hH7P=mjEKR=LBPc+vG_PA@mail.gmail.com>
-Subject: Re: [BUG] Panic in ipv6 on old NFS sockets from destroyed network namespace
-To: Josef Bacik <josef@toxicpanda.com>
-Cc: kuba@kernel.org, netdev@vger.kernel.org, linux-nfs@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next v4] net: Re-use and set mono_delivery_time bit
+ for userspace tstamp packets
+Content-Language: en-US
+To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, kernel@quicinc.com,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Andrew Halaney <ahalaney@redhat.com>,
+ Martin KaFai Lau <martin.lau@kernel.org>, bpf <bpf@vger.kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>
+References: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
+ <2a4cb416-5d95-459d-8c1c-3fb225240363@linux.dev>
+ <65f16946cd33e_344ff1294fc@willemb.c.googlers.com.notmuch>
+ <28282905-065a-4233-a0a2-53aa9b85f381@linux.dev>
+ <65f2004e65802_3d1e792943e@willemb.c.googlers.com.notmuch>
+ <0dff8f05-e18d-47c8-9f19-351c44ea8624@linux.dev>
+ <e5da91bc-5827-4347-ab38-36c92ae2dfa2@quicinc.com>
+ <65f21d65820fc_3d934129463@willemb.c.googlers.com.notmuch>
+ <bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev>
+ <65f2c81fc7988_3ee61729465@willemb.c.googlers.com.notmuch>
+ <5692ddb3-9558-4440-a7bf-47fcc47401ed@linux.dev>
+ <65f35e00a83c0_2132294f5@willemb.c.googlers.com.notmuch>
+ <e270b646-dae0-41cf-9ef8-e991738b9c57@quicinc.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <e270b646-dae0-41cf-9ef8-e991738b9c57@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, Mar 14, 2024 at 10:07=E2=80=AFPM Josef Bacik <josef@toxicpanda.com>=
- wrote:
->
-> Hello,
->
-> We've been hitting the following panic in production, and I've root cause=
-d
-> what's happening, but I'm at a loss on how to fix it.
->
-> The panic we're seeing is this
->
->     BUG: kernel NULL pointer dereference, address: 0000000000000000
->     RIP: 0010:ip6_pol_route+0x59/0x7a0
->     Call Trace:
->      <IRQ>
->      ? __die+0x78/0xc0
->      ? page_fault_oops+0x286/0x380
->      ? fib6_table_lookup+0x95/0xf40
->      ? exc_page_fault+0x5d/0x110
->      ? asm_exc_page_fault+0x22/0x30
->      ? ip6_pol_route+0x59/0x7a0
->      ? unlink_anon_vmas+0x370/0x370
->      fib6_rule_lookup+0x56/0x1b0
->      ? update_blocked_averages+0x2c6/0x6a0
->      ip6_route_output_flags+0xd2/0x130
->      ip6_dst_lookup_tail+0x3b/0x220
->      ip6_dst_lookup_flow+0x2c/0x80
->      inet6_sk_rebuild_header+0x14c/0x1e0
->      ? tcp_release_cb+0x150/0x150
->      __tcp_retransmit_skb+0x68/0x6b0
->      ? tcp_current_mss+0xca/0x150
->      ? tcp_release_cb+0x150/0x150
->      tcp_send_loss_probe+0x8e/0x220
->      tcp_write_timer+0xbe/0x2d0
->      run_timer_softirq+0x272/0x840
->      ? hrtimer_interrupt+0x2c9/0x5f0
->      ? sched_clock_cpu+0xc/0x170
->      irq_exit_rcu+0x171/0x330
->      sysvec_apic_timer_interrupt+0x6d/0x80
->      </IRQ>
->      <TASK>
->      asm_sysvec_apic_timer_interrupt+0x16/0x20
->     RIP: 0010:cpuidle_enter_state+0xe7/0x243
->
-> Inspecting the vmcore with drgn you can see why this is a NULL pointer de=
-ref
->
->       >>> prog.crashed_thread().stack_trace()[0]
->       #0 at 0xffffffff810bfa89 (ip6_pol_route+0x59/0x796) in ip6_pol_rout=
-e at net/ipv6/route.c:2212:40
->
->       2212        if (net->ipv6.devconf_all->forwarding =3D=3D 0)
->       2213              strict |=3D RT6_LOOKUP_F_REACHABLE;
->
->       >>> prog.crashed_thread().stack_trace()[0]['net'].ipv6.devconf_all
->       (struct ipv6_devconf *)0x0
->
-> Looking at the socket you can see that it's been closed
->
->       >>> decode_enum_type_flags(prog.crashed_thread().stack_trace()[11][=
-'sk'].__sk_common.skc_flags, prog.type('enum sock_flags'))
->       'SOCK_DEAD|SOCK_KEEPOPEN|SOCK_ZAPPED|SOCK_USE_WRITE_QUEUE'
->       >>> decode_enum_type_flags(1 << prog.crashed_thread().stack_trace()=
-[11]['sk'].__sk_common.skc_state.value_(), prog["TCPF_CLOSE"].type_, bit_nu=
-mbers=3DFalse)
->       'TCPF_FIN_WAIT1'
->
-> The way this reproduces is with our NFS setup.  We have an NFS mount insi=
-de of a
-> container, which has it's own network namespace.  We setup the mount insi=
-de of
-> this network namespace.
->
-> On container shutdown sometimes we trigger this panic, it's pretty reliab=
-ly
-> reproduced, with a stress tier of 200 machines I can usually trigger it o=
-n ~10
-> machines by stopping the jobs.
->
-> My initial thought was that NFS wasn't properly shutting down the sockets=
-, but
-> this doesn't appear to be the case.  The sock is always marked with SOCK_=
-DEAD.
-> My second thought was that we had some pending timers when we call
-> kernel_sock_shutdown(), so I added tcp_clear_xmit_timers(sk); to tcp_shut=
-down()
-> to make sure the timers were cleared.  This didn't fix the issue.
->
-> I added some debugging to the socket and flagged the socket when NFS call=
-ed
-> kernel_sock_shutdown() and then had a WARN_ON(sock_flag(sk,
-> JOSEFS_SPECIAL_FLAG)) where we arm the timer, and that trips constantly. =
- So
-> we're definitely arming the sock after NFS has shutdown the socket.
->
-> This is where we leave my ability to figure out what's going on and how t=
-o fix
-> it.  What seems to be happening is this
->
-> 1. NFS calls kernel_sock_shutdown() when we unmount.
-> 2. We get an ACK on the socket and the timer gets armed.
-> 3. We shutdown the container and tear down the network namespace.
-> 4. The timer fires and we try to send the loss probe and we panic because=
- the
->    network namespace teardown removes the devconf as part of its teardown=
-.
->
-> It appears to me that sock's will just hang around forever past the end o=
-f an
-> application being done with it, tho I'm not sure if I'm correct in this. =
- If
-> that's the case then I don't know the correct way to handle this, other t=
-han
-> adding an extra case for the timer to simply not run when SOCK_DEAD is se=
-t.  But
-> this seems to be done on purpose, so seems like that's a bad fix.
->
-> Let me know if you have debug patches or other information you'd like fro=
-m a
-> vmcore, I have plenty.  Like I said I can reproduce reliably, it does tak=
-e a few
-> hours to deploy a test kernel, but I can have a turn around of about a da=
-y for
-> debug patches.  Thanks,
->
-> Josef
+On 3/14/24 1:53 PM, Abhishek Chauhan (ABC) wrote:
+>>> The bpf_convert_tstamp_{read,write} and the helper bpf_skb_set_tstamp need to be
+>>> changed to handle the new "user_delivery_time" bit anyway, e.g.
+>>> bpf_skb_set_tstamp(BPF_SKB_TSTAMP_DELIVERY_MONO) needs to clear the
+>>> "user_delivery_time" bit.
+>>>
+>>> I think the "struct inet_frag_queue" also needs a new "user_delivery_time"
+>>> field. "mono_delivery_time" is already in there.
 
-  If NFS is using kernel sockets, it is NFS responsibility to remove
-all of them when the netns is destroyed.
+[ ... ]
 
-Also look at recent relevant  patches
+I would think the first step is to revert this patch. I don't think much of the 
+current patch can be reused.
 
-2a750d6a5b365265dbda33330a6188547ddb5c24 rds: tcp: Fix use-after-free
-of net in reqsk_timer_handler().
-1c4e97dd2d3c9a3e84f7e26346aa39bc426d3249 tcp: Fix NEW_SYN_RECV
-handling in inet_twsk_purge()
+> 1. I will raise one patch to introduce rename mono_delivery_time to
+> tstamp_type
+
+Right, I expect something like this:
+
+struct sk_buff {
+		/* ... */
+-	        __u8                    mono_delivery_time:1;
++		__u8			tstamp_type:1;
+		/* ... */
+};
+
+> 2. I will introduce setting of userspace timestamp type as the second bit
+> whem transmit_time is set.
+
+I expect the second patch should be introducing the enum first
+
+enum skb_tstamp_type {
+	SKB_TSTAMP_TYPE_RX_REAL = 0, /* A RX (receive) time in real */
+	SKB_TSTAMP_TYPE_TX_MONO = 1, /* A TX (delivery) time in mono */
+};
+
+and start doing "skb->tstamp_type = SKB_TSTAMP_TYPE_TX_MONO;" instead of
+"skb->tstamp_type = 1;"
+
+and the same for "skb->tstamp_type = SKB_TSTAMP_TYPE_RX_REAL;" instead of
+"skb->tstamp_type = 0;"
+
+
+This one I am not sure but probably need to change the skb_set_delivery_time() 
+function signature also:
+
+static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
+-                                        bool mono)
++					 enum skb_tstamp_type tstamp_type)
+
+The third patch is to change tstamp_type from 1 bit to 2 bits and add 
+SKB_TSTAMP_TYPE_TX_USER.
+
+struct sk_buff {
+		/* ... */
+-		__u8			tstamp_type:1;
++		__u8			tstamp_type:2;
+		/* ... */
+};
+
+enum skb_tstamp_type {
+	SKB_TSTAMP_TYPE_RX_REAL = 0,	/* A RX (receive) time in real */
+	SKB_TSTAMP_TYPE_TX_MONO = 1,	/* A TX (delivery) time in mono */
++	SKB_TSTAMP_TYPE_TX_USER = 2,	/* A TX (delivery) time and its clock
+					 * is in skb->sk->sk_clockid.
+					 */
+				
+};
+
+This will shift a bit out of the byte where tstamp_type lives. It should be the 
+"inner_protocol_type" bit by my hand count. Please check if it is directly used 
+in bpf instruction (filter.c). As far as I look, it is not, so should be fine. 
+Some details about bpf instruction accessible skb bit field here: 
+https://lore.kernel.org/all/20230321014115.997841-1-kuba@kernel.org/
+
+
+> 3. This will be a first step to make the design scalable.
+> 4. Tomorrow if we have more timestamp to support, upstream community has to do is
+> update the enum and increase the bitfield from 2=>3 and so on.
+> 
+> I need help from Martin to test the patch which renames the mono_delivery_time
+> to tstamp_type (Which i feel should be straight forward as the value of the bit is 1)
+
+The bpf change is not a no-op rename of mono_delivery_time. It needs to take 
+care of the new bit added to the tstamp_type. Please see the previous email (and 
+I also left it in the beginning of this email).
+
+Thus, you need to compile the selftests/bpf/ and run it to verify the changes 
+when handling the new bit. The Documentation/bpf/bpf_devel_QA.rst has the howto 
+details. You probably only need the newer llvm (newer gcc should work also as 
+bpf CI has been using it) and the newer pahole. I can definitely help if there 
+is issue in running the test_progs in selftests/bpf or you have question on 
+making the changes in filter.c. To run the test: "./test_progs -t 
+tc_redirect/tc_redirect_dtime"
+
 
