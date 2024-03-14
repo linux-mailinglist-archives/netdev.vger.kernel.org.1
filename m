@@ -1,180 +1,125 @@
-Return-Path: <netdev+bounces-79848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 150B987BBD4
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:20:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F2C487BBD9
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:21:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE2911F23343
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:20:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A707283CE1
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC726EB7C;
-	Thu, 14 Mar 2024 11:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018386EB5A;
+	Thu, 14 Mar 2024 11:21:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RPTKJx2b"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632696E610
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 11:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B931E4A6;
+	Thu, 14 Mar 2024 11:21:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710415228; cv=none; b=Br2B7502Xqnmi3J6OAqMx0ngpTdJ5hL3fkCxjpL47+kMc4mhXYXwljxMB06ab3xLkEXfRLI+E6/L62LzIlmnB8qRVCRiQSwMB4pECpRSd7gvtqXLrP1ubMGYbh4FynNyNXC0QoCVIYEsqLQ4fA7/CmIOsl9h4/P0w12t/zu/xBU=
+	t=1710415302; cv=none; b=hUtIqmCgK4VpufkuRRblsA+JlyECsh9z8iogIeGwFctKNgmHPKaVTqlw5q79dfiIMuLEEUQQc3ZppoafPZVwMO01Qvgk3tU2Z5KrpZYK8XrM55U+lPwa2VK3wMUr4iD2Cx/xd9Nl2wzpIR61/dn48xlxJ4u7JIlV4lh9m4phH50=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710415228; c=relaxed/simple;
-	bh=l2HLYYn4UeEUpgV+L5wQ37S45Vthf/ftyRXt+AAR1fA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=snzk7+6gpzEGrzhhI50NGyrRnLZn6MXJNJD/UiiKiN+o18foUJp507W7elUKfueSGvlJFkbxJjIrI8VNEeYvbBLEw+HiOExe98qsmrH7wZVJDUlqYCiKs3wG9N+Di7xynvNIKSELiHg3YpsW7lFqxja3KFquVDxP74lSAP6bZ8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rkj89-0004J1-22; Thu, 14 Mar 2024 12:20:13 +0100
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rkj87-006Ihj-Ay; Thu, 14 Mar 2024 12:20:11 +0100
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id EE8582A50C4;
-	Thu, 14 Mar 2024 11:20:10 +0000 (UTC)
-Date: Thu, 14 Mar 2024 12:20:10 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Francesco Valla <valla.francesco@gmail.com>
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, fabio@redaril.me, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] Documentation: networking: document CAN ISO-TP
-Message-ID: <20240314-nurture-apricot-d4707bc77a00-mkl@pengutronix.de>
-References: <20240313223445.87170-1-valla.francesco@gmail.com>
- <20240313223445.87170-2-valla.francesco@gmail.com>
+	s=arc-20240116; t=1710415302; c=relaxed/simple;
+	bh=/e4egWfyHLEr6CKVlApdU6rX/Pl05FzCsMuWzLLtWuI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ZAZztBcTzs7dSdjDhzGbGBSVaFZ3XDdHvM+9xrnPjwoJnstiOOleHvM2aCMjGqcwvZavO5pngecn46pPwyOTdLcNR4+EqufMXycLM+rpK6hSPEete9iZs/9m6Gex7BZnSfAjCiJFpo2TFgk9+aGWiUY80MN+egiP/Xb49BrP8Yg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RPTKJx2b; arc=none smtp.client-ip=209.85.210.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6e6ca3fc613so655326b3a.3;
+        Thu, 14 Mar 2024 04:21:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710415301; x=1711020101; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=6AeW2q5R52plyXVS3rUk/RqZo0VpJ2WOdd43z+DAb70=;
+        b=RPTKJx2brrjIq/TihSRrQ2dAuPx0YcqnSr572272tzVuQEcO4QJklJxLsgJviU6enK
+         fH6xhEHqGVgxdX5RL3jMpJbcoXYuvtq7g01/I00iunrxGCB7uGKWCoCJf1ITUxV+Y1yq
+         LeR12CFjtVFhUlfRSkb77Fh/MsjVm2I+b8/JglvXCcaivVImt5FvERTNfjS9VcZmF9u4
+         cOfrmXBE8H1uc3JmVB5cAXLB7rqEl81JH2+9QzialYjIi7x8/kkjaURDgFSZJqtU+JPk
+         2pZEjF3K7stAd6lciE4G1PFxHNUHWhtbCZVx4CA004/7AKNPvuYD0dkpWoziQ9QwlHT+
+         75mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710415301; x=1711020101;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=6AeW2q5R52plyXVS3rUk/RqZo0VpJ2WOdd43z+DAb70=;
+        b=mEy3uqZK7nCqrW9P+0ux5FoYdRnJYQeyExDJMi6wCf5J0Y0Zf0Easehet66cEnp+tc
+         f9jeynmPT2Q16qSK5y46YBKJ2CziICfT8XTL+LH4gYd041aIUSBHoQtluJuu8mQWAlGA
+         DoOAjn2IjK1wic3oYE0z8te+0dA38LJyYeKvwNyG2qPvlOZKrQBzwuzJ67IqAvh4rf9C
+         xr72Ym5dS8g70SjW1+Vjsp7J9V6wz4IXB8y90Y+c6Al+DlUPduhkavTUGGOjVyLUZdR4
+         5zNfs9kDDdIf5mAwoakW+zXTTusdSJ50NRtlqpv9QxOjt7dJjgAETudfDHf3x87n0dEq
+         OC9w==
+X-Forwarded-Encrypted: i=1; AJvYcCWYKWe/vg4CvPc+ccCeUqrKrCAxbFW/JG2mWbZOcxXaf9HVjLUKuKCU6Tw8IAJn7WeU0BfAuDWTMh44cNaUmdNzvU3MhyUzaspNS5UHKhHEIclglV72c1qWkKJ3n/f1xy7/oe2k8UB8yQb/QA4byovF5jJ+/VQsjC1sSt1wgI0JBg==
+X-Gm-Message-State: AOJu0Yy0ka3ush9gHQaYJAzXCNr0uegaLQDOZ1fq/KTpv5mLmua4wFNJ
+	3blZzsdUgkpv+37OUKR1uHexP9MswuOhPjWD7Eoxm+tpbj38Gj4F
+X-Google-Smtp-Source: AGHT+IH1qTv+002pcVWpFQ6wjJkyWYtmkGCa5KRii43/enzZq51zlGHAIAtz2cl8q0jE+qGj0eEBKg==
+X-Received: by 2002:a05:6a21:3a46:b0:1a1:484b:bb72 with SMTP id zu6-20020a056a213a4600b001a1484bbb72mr1637487pzb.51.1710415300659;
+        Thu, 14 Mar 2024 04:21:40 -0700 (PDT)
+Received: from libra05 ([143.248.188.128])
+        by smtp.gmail.com with ESMTPSA id z1-20020a170903018100b001ddc83fda95sm1424238plg.186.2024.03.14.04.21.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Mar 2024 04:21:40 -0700 (PDT)
+Date: Thu, 14 Mar 2024 20:21:35 +0900
+From: Yewon Choi <woni9911@gmail.com>
+To: Allison Henderson <allison.henderson@oracle.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	rds-devel@oss.oracle.com, linux-kernel@vger.kernel.org
+Cc: "Dae R. Jeong" <threeearcat@gmail.com>
+Subject: [PATCH net] rds: introduce acquire/release ordering in
+ acquire/release_in_xmit()
+Message-ID: <ZfLdv5DZvBg0wajJ@libra05>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="23lpoqgne2axyrjj"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240313223445.87170-2-valla.francesco@gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
+acquire/release_in_xmit() work as bit lock in rds_send_xmit(), so they
+are expected to ensure acquire/release memory ordering semantics.
+However, test_and_set_bit/clear_bit() don't imply such semantics, on
+top of this, following smp_mb__after_atomic() does not guarantee release
+ordering (memory barrier actually should be placed before clear_bit()).
 
---23lpoqgne2axyrjj
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Instead, we use clear_bit_unlock/test_and_set_bit_lock() here.
 
-Hello Francesco,
+Signed-off-by: Yewon Choi <woni9911@gmail.com>
+---
+ net/rds/send.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
-thanks for your contribution! I've some remarks to make it a valid rst
-file.
+diff --git a/net/rds/send.c b/net/rds/send.c
+index 5e57a1581dc6..8f38009721b7 100644
+--- a/net/rds/send.c
++++ b/net/rds/send.c
+@@ -103,13 +103,12 @@ EXPORT_SYMBOL_GPL(rds_send_path_reset);
+ 
+ static int acquire_in_xmit(struct rds_conn_path *cp)
+ {
+-	return test_and_set_bit(RDS_IN_XMIT, &cp->cp_flags) == 0;
++	return test_and_set_bit_lock(RDS_IN_XMIT, &cp->cp_flags) == 0;
+ }
+ 
+ static void release_in_xmit(struct rds_conn_path *cp)
+ {
+-	clear_bit(RDS_IN_XMIT, &cp->cp_flags);
+-	smp_mb__after_atomic();
++	clear_bit_unlock(RDS_IN_XMIT, &cp->cp_flags);
+ 	/*
+ 	 * We don't use wait_on_bit()/wake_up_bit() because our waking is in a
+ 	 * hot path and finding waiters is very rare.  We don't want to walk
+-- 
+2.43.0
 
-On 13.03.2024 23:34:31, Francesco Valla wrote:
-> Document basic concepts, APIs and behaviour of the CAN ISO-TP (ISO
-> 15765-2) stack.
->=20
-> Signed-off-by: Francesco Valla <valla.francesco@gmail.com>
-> ---
->  Documentation/networking/index.rst |   1 +
->  Documentation/networking/isotp.rst | 347 +++++++++++++++++++++++++++++
->  2 files changed, 348 insertions(+)
->  create mode 100644 Documentation/networking/isotp.rst
->=20
-> diff --git a/Documentation/networking/index.rst b/Documentation/networkin=
-g/index.rst
-> index 473d72c36d61..ba22acfae389 100644
-> --- a/Documentation/networking/index.rst
-> +++ b/Documentation/networking/index.rst
-> @@ -19,6 +19,7 @@ Contents:
->     caif/index
->     ethtool-netlink
->     ieee802154
-> +   isotp
->     j1939
->     kapi
->     msg_zerocopy
-> diff --git a/Documentation/networking/isotp.rst b/Documentation/networkin=
-g/isotp.rst
-> new file mode 100644
-> index 000000000000..d0c49fd1f5c9
-> --- /dev/null
-> +++ b/Documentation/networking/isotp.rst
-> @@ -0,0 +1,347 @@
-> +.. SPDX-License-Identifier: (GPL-2.0 OR BSD-3-Clause)
-> +
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> +ISO-TP (ISO 15765-2) Transport Protocol
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-Please make the "=3D" as long as the text it encloses.
-
-> +
-> +Overview
-> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-
-Same here
-
-[...]
-
-> +Reception stmin
-> +~~~~~~~~~~~~~~~
-> +
-> +The reception minimum separaton time (stmin) can be forced using the
-> +``CAN_ISOTP_RX_STMIN`` optname and providing an stmin value in microseco=
-nds as
-> +a 32bit unsigned integer; received Consecutive Frames (CF) which timesta=
-mps
-> +differ less than this value will be ignored:
-> +
-> +.. code-block:: C
-> +
-> +    uint32_t stmin;
-> +    ret =3D setsockopt(s, SOL_CAN_ISOTP, CAN_ISOTP_RX_STMIN, &stmin, siz=
-eof(stmin));
-> +
-> +Multi-frame transport support
-> +--------------------------
-
-same here
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---23lpoqgne2axyrjj
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmXy3WcACgkQKDiiPnot
-vG8lzQgAjaKShUuD1SFxYlmma7i0p2rGshpvscLbncWKuBmBQN65xPJAYZ7JOFzC
-szKLUoekrIZmvAu519OYEq9uEqAwPg2SLtgjferHxwSLs3h+ovhyvlrXkYVDXuor
-vwXpM362eJOIGf8b/LkqkMtrTPmwvZ2QLewJbyf8MUVpCYlYjfkrywZS701hvdok
-RetPkO0jKVV5x9+5KJ4F3APspGgZ/rXikZhV2XBMxTshg0OeS1o/+iiZIF1YspYB
-xCgS1UmVtx/8nrJeAIwWd3DFOffbccWDM87hj4+egf2uIuBFe/91CxGsGavgpzBB
-+qKs9Fw+bAslSu+U0wZ7a/QQUpEUmA==
-=K/bN
------END PGP SIGNATURE-----
-
---23lpoqgne2axyrjj--
 
