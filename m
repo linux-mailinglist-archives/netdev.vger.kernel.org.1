@@ -1,75 +1,72 @@
-Return-Path: <netdev+bounces-79955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B15287C34D
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 20:05:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FE8B87C352
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 20:07:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7914A1C21457
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 19:05:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5178C1C2145B
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 19:07:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8821474E31;
-	Thu, 14 Mar 2024 19:05:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F5337581D;
+	Thu, 14 Mar 2024 19:06:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s7lgmnIb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jMrajfA9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C5F43AD7;
-	Thu, 14 Mar 2024 19:05:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5141975817;
+	Thu, 14 Mar 2024 19:06:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710443131; cv=none; b=alpOaqKMt4QRCo4lJ2CdppOnsZq1W3Kg0TIJYOSIOahS+zPoVKQorEXoWYzsa/CKRBaoYpSdVz9PbWB005OGVIhOl+Il09YLd+ZPAvCJUF9UqhneDjWbMX8A0zvhHTQp02w6CzWGPRT8FTerAwMpuE1HA/9rqK6P/P3ApPMZ1m8=
+	t=1710443210; cv=none; b=LMrhf1TvnCRe4skG/9/cMDLw7tkpE628tWo20Q9yhot9m2Gd404vNYjlA8HuHNpW9RN5h6H2oCGgenL+E6qpXzKE/8p+i1SoNM2LJppMjbbXwj6CyzgU8beNW1/aktzopFriYCezMRGVGJ2ys0nmhdFMBjHbKgl6LckTR95doRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710443131; c=relaxed/simple;
-	bh=qZFoNjK7/mZ/PeVekRSJtmaHMzHJsH0JeAgm3Vvoj2M=;
+	s=arc-20240116; t=1710443210; c=relaxed/simple;
+	bh=/kHdQkq4OzkGwuYzv5B3Opu/m2md+OM/9SG0MAC9LX4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bqlGr8IMWV7ZucdcOrLxKA0p5faZVw1df8nAfmPf5g8A5nSz+nju8ROPQkvqsX93KXv1Bu0QqKJVYCBJ7hINFwlxK+XFZkdiLY35oe/1VTK8cW2JrlpqEPvr4RJGZPhcBHB8OOin/cN7IrAwZdm5L5xEP0BhcqlzOrpZ11FpyVQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s7lgmnIb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8A82C433C7;
-	Thu, 14 Mar 2024 19:05:29 +0000 (UTC)
+	 MIME-Version:Content-Type; b=LT0CTaoivRdrbv2xNPprQqW4dXoMPSHhjR6wP5KxElh+njbPYEeGsrDmYENr3N7bmgf13PWjYcBxCRcrCkCzaiveh4mh2T0Fu5v8tNLUtXcm2K0iwa7vf9BNNx1RJ4d8FilIZfwWGP8v2b4twW5DJEZDZoSAH2gpaL5kHD0u5mA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jMrajfA9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7FB48C433C7;
+	Thu, 14 Mar 2024 19:06:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710443130;
-	bh=qZFoNjK7/mZ/PeVekRSJtmaHMzHJsH0JeAgm3Vvoj2M=;
+	s=k20201202; t=1710443209;
+	bh=/kHdQkq4OzkGwuYzv5B3Opu/m2md+OM/9SG0MAC9LX4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=s7lgmnIbdC1nn4gqbhJLDJTjGfmbSXQqbPqdIJXWyAJ6eC5VxPE5zPozOy63sgPTo
-	 WAQfOo6rhNNpoVir6ADJCp0Hb+PLaFiN5pplALmNSYhP2Bj+KHjWrUcvdJolWmX7Zm
-	 8wptTSjXcVsgOXdp+Dk6rtWACB4kwZlsFSQoSOb1WlTDH9JHdEmy9kSndJwaSytM3/
-	 tivwnUBURT9aaQ2WZg4k7HaU0TG3c8wZ3WbIDY60o3ROiBeGzCa9+n9xuY7BNr7RNF
-	 /uKrdsxFOMyuCxZZ9ZJb9wr0YTUDfV/slLXyHiVdu+K5V2gMcAiAs0a8VwGjmoRIQa
-	 Q4/2sv9RPr3/A==
-Date: Thu, 14 Mar 2024 12:05:28 -0700
+	b=jMrajfA90/K1p0xZrGsb/s7fDYT32BDLUgU258wSQNLXKWdOY9rnXDt2+BZBIda9+
+	 HvchsNsUsKawokejMEZmlmaqwGq8LrEHfYpABtXmHOCh6fDxa1KnjPSdDxcSRlTvIC
+	 9A7K8xH+SvIFnJVi4SMFtRzyk8ekC+6ACwykKtikI8zj/F724JUTzLPB6NOVzxIiZU
+	 mHqhD9sJ9Sen3qP1RVP5TLXzOFSl0XwBQjUqDCTT55j8lvz+C+iPc6epysLs1ErByO
+	 QA57SOpZ6TKvDsSUI4Cvkkc3C27neo8rJn+ibhTUHt6KoHD50P/s23MyUBdDiTgOnh
+	 AGuVwTqUU5w4Q==
+Date: Thu, 14 Mar 2024 12:06:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Haiyang Zhang <haiyangz@microsoft.com>
-Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>, Shradha Gupta
- <shradhagupta@microsoft.com>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
- <linux-hyperv@vger.kernel.org>, "linux-rdma@vger.kernel.org"
- <linux-rdma@vger.kernel.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Ajay Sharma <sharmaajay@microsoft.com>, Leon
- Romanovsky <leon@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>, KY Srinivasan
- <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
- <decui@microsoft.com>, Long Li <longli@microsoft.com>, Michael Kelley
- <mikelley@microsoft.com>, Alireza Dabagh <alid@microsoft.com>, Paul
- Rosswurm <paulros@microsoft.com>
-Subject: Re: [PATCH] net :mana : Add per-cpu stats for MANA device
-Message-ID: <20240314120528.1ac154d1@kernel.org>
-In-Reply-To: <DM6PR21MB14819A8CDB1431EBF88216ABCA292@DM6PR21MB1481.namprd21.prod.outlook.com>
-References: <1709823132-22411-1-git-send-email-shradhagupta@linux.microsoft.com>
-	<20240307072923.6cc8a2ba@kernel.org>
-	<DM6PR21MB14817597567C638DEF020FE3CA202@DM6PR21MB1481.namprd21.prod.outlook.com>
-	<20240307090145.2fc7aa2e@kernel.org>
-	<CH2PR21MB1480D3ACADFFD2FC3B1BB7ECCA272@CH2PR21MB1480.namprd21.prod.outlook.com>
-	<20240308112244.391b3779@kernel.org>
-	<20240311041950.GA19647@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-	<20240314025720.GA13853@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-	<20240314112734.5f1c9f7e@kernel.org>
-	<DM6PR21MB14819A8CDB1431EBF88216ABCA292@DM6PR21MB1481.namprd21.prod.outlook.com>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Cc: ahmed.zaki@intel.com, aleksander.lobakin@intel.com,
+ alexandre.torgue@foss.st.com, andrew@lunn.ch, corbet@lwn.net,
+ davem@davemloft.net, dtatulea@nvidia.com, edumazet@google.com,
+ gal@nvidia.com, hkallweit1@gmail.com, jacob.e.keller@intel.com,
+ jiri@resnulli.us, joabreu@synopsys.com, justinstitt@google.com,
+ kory.maincent@bootlin.com, leon@kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, liuhangbin@gmail.com,
+ maxime.chevallier@bootlin.com, netdev@vger.kernel.org, pabeni@redhat.com,
+ paul.greenwalt@intel.com, przemyslaw.kitszel@intel.com,
+ rdunlap@infradead.org, richardcochran@gmail.com, saeed@kernel.org,
+ tariqt@nvidia.com, vadim.fedorenko@linux.dev, vladimir.oltean@nxp.com,
+ wojciech.drewek@intel.com
+Subject: Re: [PATCH RFC v2 1/6] ethtool: add interface to read Tx hardware
+ timestamping statistics
+Message-ID: <20240314120647.58a07d94@kernel.org>
+In-Reply-To: <87jzm4vejp.fsf@nvidia.com>
+References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
+	<20240309084440.299358-1-rrameshbabu@nvidia.com>
+	<20240309084440.299358-2-rrameshbabu@nvidia.com>
+	<20240312165346.14ec1941@kernel.org>
+	<87v85ovj4d.fsf@nvidia.com>
+	<20240314105943.7bc6f2ef@kernel.org>
+	<87jzm4vejp.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,15 +76,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 14 Mar 2024 18:54:31 +0000 Haiyang Zhang wrote:
-> We understand irqbalance may be a "bad idea", and recommended some 
-> customers to disable it when having problems with it... But it's 
-> still enabled by default, and we cannot let all distro vendors 
-> and custom image makers to disable the irqbalance. So, our host-
-> networking team is eager to have per-CPU stats for analyzing CPU 
-> usage related to irqbalance or other issues.
+On Thu, 14 Mar 2024 11:43:07 -0700 Rahul Rameshbabu wrote:
+> > I don't understand.
+> > Are you sure you changef the kernel to use uint, rebuilt and
+> > there is no ETHTOOL_A_TS_STAT_PAD anywhere, anymore?  
+> 
+> Sorry, I was not as clear as I could have been with my last reply. I did
+> leave ETHTOOL_A_TS_STAT_PAD in when I tested (intentionally). I was
+> trying to mimic other ethtool stats implementations, but you are saying
+> that in general there is no need for this padding (which I agree with)
+> and I can remove that unnecessary offset. It'll be different from the
+> existing stats, but I am ok with that.
 
-You need a use case to get the stats upstream.
-"CPU usage related to irqbalance or other issues" is both too vague,
-and irqbalance is a user space problem.
+Yes, the small divergence is fine - uint is pretty recent addition.
 
