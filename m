@@ -1,82 +1,53 @@
-Return-Path: <netdev+bounces-79849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F2C487BBD9
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:21:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62FE087BBE3
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:27:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A707283CE1
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:21:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03C251F21A13
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:27:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 018386EB5A;
-	Thu, 14 Mar 2024 11:21:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RPTKJx2b"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B6396EB5C;
+	Thu, 14 Mar 2024 11:27:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B931E4A6;
-	Thu, 14 Mar 2024 11:21:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1DA86CDD7;
+	Thu, 14 Mar 2024 11:26:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710415302; cv=none; b=hUtIqmCgK4VpufkuRRblsA+JlyECsh9z8iogIeGwFctKNgmHPKaVTqlw5q79dfiIMuLEEUQQc3ZppoafPZVwMO01Qvgk3tU2Z5KrpZYK8XrM55U+lPwa2VK3wMUr4iD2Cx/xd9Nl2wzpIR61/dn48xlxJ4u7JIlV4lh9m4phH50=
+	t=1710415622; cv=none; b=os1C0NkHzNlZD9wv8TGK4Eebzaq/5JEJVNk+h5pW5H/yp+K3bTOO/JPljDpGtN+jjOQArr9Hdligy6oI+kZHliaKTDPBfxQavb7Bfk8jowwLr9h/RgomdZFA+2RgQeLCjGdnOWtsogOBP6DxDcCzsxPib85J9yhpp5ACm5sRPbM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710415302; c=relaxed/simple;
-	bh=/e4egWfyHLEr6CKVlApdU6rX/Pl05FzCsMuWzLLtWuI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ZAZztBcTzs7dSdjDhzGbGBSVaFZ3XDdHvM+9xrnPjwoJnstiOOleHvM2aCMjGqcwvZavO5pngecn46pPwyOTdLcNR4+EqufMXycLM+rpK6hSPEete9iZs/9m6Gex7BZnSfAjCiJFpo2TFgk9+aGWiUY80MN+egiP/Xb49BrP8Yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RPTKJx2b; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6e6ca3fc613so655326b3a.3;
-        Thu, 14 Mar 2024 04:21:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710415301; x=1711020101; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6AeW2q5R52plyXVS3rUk/RqZo0VpJ2WOdd43z+DAb70=;
-        b=RPTKJx2brrjIq/TihSRrQ2dAuPx0YcqnSr572272tzVuQEcO4QJklJxLsgJviU6enK
-         fH6xhEHqGVgxdX5RL3jMpJbcoXYuvtq7g01/I00iunrxGCB7uGKWCoCJf1ITUxV+Y1yq
-         LeR12CFjtVFhUlfRSkb77Fh/MsjVm2I+b8/JglvXCcaivVImt5FvERTNfjS9VcZmF9u4
-         cOfrmXBE8H1uc3JmVB5cAXLB7rqEl81JH2+9QzialYjIi7x8/kkjaURDgFSZJqtU+JPk
-         2pZEjF3K7stAd6lciE4G1PFxHNUHWhtbCZVx4CA004/7AKNPvuYD0dkpWoziQ9QwlHT+
-         75mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710415301; x=1711020101;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6AeW2q5R52plyXVS3rUk/RqZo0VpJ2WOdd43z+DAb70=;
-        b=mEy3uqZK7nCqrW9P+0ux5FoYdRnJYQeyExDJMi6wCf5J0Y0Zf0Easehet66cEnp+tc
-         f9jeynmPT2Q16qSK5y46YBKJ2CziICfT8XTL+LH4gYd041aIUSBHoQtluJuu8mQWAlGA
-         DoOAjn2IjK1wic3oYE0z8te+0dA38LJyYeKvwNyG2qPvlOZKrQBzwuzJ67IqAvh4rf9C
-         xr72Ym5dS8g70SjW1+Vjsp7J9V6wz4IXB8y90Y+c6Al+DlUPduhkavTUGGOjVyLUZdR4
-         5zNfs9kDDdIf5mAwoakW+zXTTusdSJ50NRtlqpv9QxOjt7dJjgAETudfDHf3x87n0dEq
-         OC9w==
-X-Forwarded-Encrypted: i=1; AJvYcCWYKWe/vg4CvPc+ccCeUqrKrCAxbFW/JG2mWbZOcxXaf9HVjLUKuKCU6Tw8IAJn7WeU0BfAuDWTMh44cNaUmdNzvU3MhyUzaspNS5UHKhHEIclglV72c1qWkKJ3n/f1xy7/oe2k8UB8yQb/QA4byovF5jJ+/VQsjC1sSt1wgI0JBg==
-X-Gm-Message-State: AOJu0Yy0ka3ush9gHQaYJAzXCNr0uegaLQDOZ1fq/KTpv5mLmua4wFNJ
-	3blZzsdUgkpv+37OUKR1uHexP9MswuOhPjWD7Eoxm+tpbj38Gj4F
-X-Google-Smtp-Source: AGHT+IH1qTv+002pcVWpFQ6wjJkyWYtmkGCa5KRii43/enzZq51zlGHAIAtz2cl8q0jE+qGj0eEBKg==
-X-Received: by 2002:a05:6a21:3a46:b0:1a1:484b:bb72 with SMTP id zu6-20020a056a213a4600b001a1484bbb72mr1637487pzb.51.1710415300659;
-        Thu, 14 Mar 2024 04:21:40 -0700 (PDT)
-Received: from libra05 ([143.248.188.128])
-        by smtp.gmail.com with ESMTPSA id z1-20020a170903018100b001ddc83fda95sm1424238plg.186.2024.03.14.04.21.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Mar 2024 04:21:40 -0700 (PDT)
-Date: Thu, 14 Mar 2024 20:21:35 +0900
-From: Yewon Choi <woni9911@gmail.com>
-To: Allison Henderson <allison.henderson@oracle.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com, linux-kernel@vger.kernel.org
-Cc: "Dae R. Jeong" <threeearcat@gmail.com>
-Subject: [PATCH net] rds: introduce acquire/release ordering in
- acquire/release_in_xmit()
-Message-ID: <ZfLdv5DZvBg0wajJ@libra05>
+	s=arc-20240116; t=1710415622; c=relaxed/simple;
+	bh=Pfd2z0WcwpHP46x04wMSW5dBhXIY/2MfqS+g3TP/9Sc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=c0yTYRQjtnfHshBti3p29+hm67Q7rnfREn8V0Ng3wLYNOe0l5pTvTyKlFJdi8ZIBzpolVeKLwX1G8aRa0VRth8yUT3mmejFUug8GtoKq5TfmfSzwbAUGNqApoR4m5uU184SG18jOIprov+aQyyQbEdNhUWQg2qkttSdFhd/WpKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1rkjEZ-0006nC-0U; Thu, 14 Mar 2024 12:26:51 +0100
+Date: Thu, 14 Mar 2024 12:26:50 +0100
+From: Florian Westphal <fw@strlen.de>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Florian Westphal <fw@strlen.de>, xingwei lee <xrivendell7@gmail.com>,
+	pabeni@redhat.com, davem@davemloft.net, kuba@kernel.org,
+	linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, ralf@linux-mips.org,
+	syzkaller-bugs@googlegroups.com, samsun1006219@gmail.com
+Subject: Re: KASAN: slab-use-after-free Read in ip_finish_output
+Message-ID: <20240314112650.GE1038@breakpoint.cc>
+References: <CABOYnLwtfAxS7WoMw-1_uxVe3EYajXRuzZfwaQEk0+7m6-B+ug@mail.gmail.com>
+ <CANn89i+qLwyPLztPt6Mavjimyv0H_UihVVNfJXWLjcwrqOudTw@mail.gmail.com>
+ <20240306103632.GC4420@breakpoint.cc>
+ <CANn89iLe0KGjbSim5Qxxr6o0AjJVs7-h79UvMMXKOgGKQUosiA@mail.gmail.com>
+ <20240312132107.GA1529@breakpoint.cc>
+ <CANn89iLkDwnZdBY8CwkrQwCk2o7EAM9J1sv+uxU1tjKb=VB=Ag@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,41 +56,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
+In-Reply-To: <CANn89iLkDwnZdBY8CwkrQwCk2o7EAM9J1sv+uxU1tjKb=VB=Ag@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 
-acquire/release_in_xmit() work as bit lock in rds_send_xmit(), so they
-are expected to ensure acquire/release memory ordering semantics.
-However, test_and_set_bit/clear_bit() don't imply such semantics, on
-top of this, following smp_mb__after_atomic() does not guarantee release
-ordering (memory barrier actually should be placed before clear_bit()).
+Eric Dumazet <edumazet@google.com> wrote:
+> Thanks for taking a look Florian.
+> 
+> Perhaps not messing with truesize at all would help ?
+>
+> Something based on this POC :
+> 
+>                 spin_lock(&qp->q.lock);
+> +               if (!qp->q.sk) {
+> +                       struct sock *sk = skb->sk;
+> 
+> +                       if (sk && refcount_inc_not_zero(&sk->sk_refcnt))
+> +                               qp->q.sk = sk;
 
-Instead, we use clear_bit_unlock/test_and_set_bit_lock() here.
+Unfortunetely I did not get this to work.
 
-Signed-off-by: Yewon Choi <woni9911@gmail.com>
----
- net/rds/send.c | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
+sk_refcnt is 0.  sk is kept alive by sock_wfree destructor.
 
-diff --git a/net/rds/send.c b/net/rds/send.c
-index 5e57a1581dc6..8f38009721b7 100644
---- a/net/rds/send.c
-+++ b/net/rds/send.c
-@@ -103,13 +103,12 @@ EXPORT_SYMBOL_GPL(rds_send_path_reset);
- 
- static int acquire_in_xmit(struct rds_conn_path *cp)
- {
--	return test_and_set_bit(RDS_IN_XMIT, &cp->cp_flags) == 0;
-+	return test_and_set_bit_lock(RDS_IN_XMIT, &cp->cp_flags) == 0;
- }
- 
- static void release_in_xmit(struct rds_conn_path *cp)
- {
--	clear_bit(RDS_IN_XMIT, &cp->cp_flags);
--	smp_mb__after_atomic();
-+	clear_bit_unlock(RDS_IN_XMIT, &cp->cp_flags);
- 	/*
- 	 * We don't use wait_on_bit()/wake_up_bit() because our waking is in a
- 	 * hot path and finding waiters is very rare.  We don't want to walk
--- 
-2.43.0
+I don't know how to recover from this, refcnt cannot be "repaired"
+anymore.
 
+I could artificially inflate sk_wmem counter by 1, to prevent release,
+but that needs yet another sock_wfree-like destructor.
+
+I'm already not sure how this existing scheme works, there are
+multiple places that check for skb->destructor == sock_wfree,
+yet we have is_skb_wmem helper that checks __sock_wfree and tcp_wfree.
+
+Removing defrag from output seems like best option, but it will
+surely break some scenarios.
+
+Or, I could just fail reasm if sk refcount is already 0, that would
+likely work too?
 
