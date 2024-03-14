@@ -1,129 +1,158 @@
-Return-Path: <netdev+bounces-79905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C861887BFB2
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 16:16:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 630A887BFC9
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 16:21:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 578FE282471
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:16:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9579A1C220F7
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:21:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E8D71756;
-	Thu, 14 Mar 2024 15:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A964471B31;
+	Thu, 14 Mar 2024 15:21:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Kf+VIT+H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SSPPS5gY"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0224158104
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 15:16:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 125BF71B27;
+	Thu, 14 Mar 2024 15:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710429397; cv=none; b=End+gmJ4RDvq3ZhA0A7nCESYKx0FcRCtGsQzLmg2kSA26FL/irMhZPWYTxZuYUan5aRDw3620oFNJftW0oNLSbRXhVH0ZdwwP++rals971nvulmoJnPALXEs+BtjNrmWUMtzZ/OFrKis6VSF149A0XqUkm9uJkQPSCSwconAGCc=
+	t=1710429686; cv=none; b=HmjbJY2ZMFMgHo4lBzrvwdc+ROKkpkc137njjcaXhQnG/k0903J9wjMDmepJHZgydfJyfPobg44fl472rQjqBHM8uRFTZJRNSOBlSVRMfEy0F3oMbWrCuWU0MxgcFUA5zh8T5P26ryUol10b4JJo76oTihOVTCJVn688oCq8Qnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710429397; c=relaxed/simple;
-	bh=jz61kBlhSie4U5QPCzxlomY23Lf41qL87N90PmvRC9k=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=k+AlJiv9+sShznD2y2kL1Fy6t6CT7SSiFsuvt1AktBb2k5za3+iAkj9DV1tgMqM7byLn+Bg77yr5nkr4ZSJLnyMFiaZ68pQ01+g2ZJd49I09+oKZ6jBMcwoScmYdC05sULcbOQNmlimG1WEwkmVWGa99KNjS7/bPgLkeFGbTBHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Kf+VIT+H; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710429394;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=jz61kBlhSie4U5QPCzxlomY23Lf41qL87N90PmvRC9k=;
-	b=Kf+VIT+HImwnvo50IKZW+Cl0NsNixrmkVT7pMrwv46MT/NNsr4NlAvAO5o/EwSREOfQN0k
-	VKkIRqOwVnZ2jdJmVuquDkCtvNAuh4I9RDNSnAo1DRpe9BbmISh+2xlSWbTPiRXDciSZQu
-	XZOqEISCxdLmaZI9yk2JeqA5U3S9rfM=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-563-sldqp6orMHOlp3W9D2NQBA-1; Thu, 14 Mar 2024 11:16:32 -0400
-X-MC-Unique: sldqp6orMHOlp3W9D2NQBA-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-513a7f378afso85339e87.0
-        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 08:16:30 -0700 (PDT)
+	s=arc-20240116; t=1710429686; c=relaxed/simple;
+	bh=Nxn5JtOFrYpN0fHpacI2byBmMGBLKNGEX9bKalqA2BM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P4mYLpLCybJWMgdgLa75wCRn+q/jmRgALQ/AP4CRftc5MY0C6174ZC2Nx+hwXrlE+d2caL+Vf0bx5VKWyHAiMC8o8gSnMavhqZeGjUogizbEdkHy9r0C4SX1T8wWBH0FnfQvS5ZXJnNdH3hLIJSes17yuJlNrAw/3eJ3pNcysQM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SSPPS5gY; arc=none smtp.client-ip=209.85.210.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-6e6082eab17so1030223b3a.1;
+        Thu, 14 Mar 2024 08:21:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710429684; x=1711034484; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=G7sWNt577aBHDyddBZ3kkUFNs3z9eJyKWD9qgLbpckE=;
+        b=SSPPS5gYQlIWQSZo7CBjX/wMs/KE7HrADgJAG6jtVjIdi7ym4YlpkI9vwUcgQ59PBr
+         41ZaPQONVQD8K0bW29Uc7tebV/rpN8xWUkZ8gzX7qIsIYKA9w33zzlpzwFwCE6/7fPDu
+         R5FJalb1YI3D71e9TUMHZCNPUVY13A+OIe4irFRuUb9GnE7so6JA7/fmtXtttUm3lOTj
+         m6DlhweXnWWMCh4+dapnT0rRfTDCwa3rYOwm5a6VGCGTpdV4dXrWpJ5UIxwp+LdrVpGw
+         mmTswOQ8Ogb00e0xQlDVC5S+0ELqN5HO0iedWWTKQsu+bB17vR5a/trbo0SPJNyDQ2Vp
+         HCbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710429389; x=1711034189;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jz61kBlhSie4U5QPCzxlomY23Lf41qL87N90PmvRC9k=;
-        b=CFp9XZHHiN6g3gwMO9xAoBkOaMye8IwRGXU8MM3Fk84at8hESdDsFX5isTafyNTDGS
-         3K10FOwhE2m6LeEnPVm+Z63SOEM4ZOP8nTLbNcrVsXaPNX1gmgRppjrbhszekXUgmY1Q
-         B8FmV5+F/PNqqVrzXkN2viYXLoIJq9IPq7XGYSx6xibtw1n6ZcoABf+X7o2+rfIRnU3V
-         0gL9wdCQsb38Gu4R6NCj+gSEZkX3o9x7aYgzKhn67zBo09G1/7ojPNOFvcAV/De7wFOR
-         yKYztmwIOnZz1V4mI2BXnRT8EJ/QVyfzx6ln4T+ysw/9yOoTigOpd9PguLOWTOAxo4w8
-         NJsw==
-X-Forwarded-Encrypted: i=1; AJvYcCVFx8UinTgWqeopLcTdJnHU/6wLwrcgIBHYcdDv2PlWoA0XylpItW+eefV5KdQDq1dk8yfOdMsRa5VSsTzSg1VWBjSS0LEN
-X-Gm-Message-State: AOJu0YzmdDkaynqomuEr+Ms2lFJFqisQa5xPgAKKGCmCLfkWBTqCbIka
-	wLAxgrLt0MBV4rh7eA64tiUWRdoYvfceG3aGC3iZnHRd51pF7LMacTx1USWJYHePa4VvEiq/FnQ
-	jQA6aXAnISRxngRlO0LT1lF8qU9eBXM8ghoxXg8L4aW0h7efEvMkVbqNavTxY1Q==
-X-Received: by 2002:a19:6914:0:b0:513:c9ea:5e with SMTP id e20-20020a196914000000b00513c9ea005emr1265604lfc.3.1710429389092;
-        Thu, 14 Mar 2024 08:16:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHC7lr3DrZX2Ge/MxnGyrJ0jiGBkm3nPLm4vHtoOZxfOuruda3AjlnGJW9JxEoghEjFLpqYCA==
-X-Received: by 2002:a19:6914:0:b0:513:c9ea:5e with SMTP id e20-20020a196914000000b00513c9ea005emr1265592lfc.3.1710429388678;
-        Thu, 14 Mar 2024 08:16:28 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-230-217.dyn.eolo.it. [146.241.230.217])
-        by smtp.gmail.com with ESMTPSA id h15-20020a05600c314f00b00412b0e51ef9sm2697114wmo.31.2024.03.14.08.16.27
+        d=1e100.net; s=20230601; t=1710429684; x=1711034484;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=G7sWNt577aBHDyddBZ3kkUFNs3z9eJyKWD9qgLbpckE=;
+        b=D4uQlRLURbq2gmGCJwnSLrP+onxV85oANQvEiJvbSP5u3doFCveSCWq4vVlIbwxFK2
+         e2D0VQtPPmFaOQJoIRC75SF6mE2/CA1dD806oA1TpkaaoQ5sKhtUGIUyNA3jl+CEhp76
+         2qABSdlV2+/4t0gteH48UI8k9zAcUGzdrk/7BZWPEjyx9OH4RXol3S/NdKqzjaLMin79
+         M2P4LCzOycNBLvR7lC3+zAOc8vaJRQZc4FT7rHkbj//VTf6AA/efrxjltEWFfJ94PuFc
+         GMgzjJj3PLoZmL2nBya3JIAUmb1TsWUCUS1nNmZ2sa8ZuXfxFo1KzEnaKG/RhVRJOS0i
+         H8vA==
+X-Forwarded-Encrypted: i=1; AJvYcCXX1Qj1MDIwPhcywOBfM9SMbA7CcExmMvktcZKdm5rfO+UaF8/deRKUnre9Aook3Gc2jH+DFZW9Cx/F2kUgzitjAi/vYA5jcmSAOcCEXFHRQHQKpHkswvfzGbQ8dk1VkylGqyAZ5Crg56trFT8w7QDqYu3vCFis3RA/9Z7JOAvRkZ/vO8vE35XrYeIsWTUzlDxjAgd0S9VjZ38A2g4=
+X-Gm-Message-State: AOJu0YwFckHrbvZ5xWZx3J1KLYWVkl+2VVZxhIWlbYIEPr7zpKYtMX0h
+	idZc1K5N8Xsf4z02W5+nAnqnkP7gFvPwfSkM7gQzFiEGrehNY0FR
+X-Google-Smtp-Source: AGHT+IE976LiIs3J+wZRKHFMiWO2GPc/z1HYI5pokfTUW/WlvRcrsBtERWAE0daVU3yJUtEiJynjHA==
+X-Received: by 2002:a05:6a00:2312:b0:6e5:eab8:4db8 with SMTP id h18-20020a056a00231200b006e5eab84db8mr2351181pfh.17.1710429684285;
+        Thu, 14 Mar 2024 08:21:24 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id y1-20020aa793c1000000b006e6795932a4sm1618767pff.80.2024.03.14.08.21.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Mar 2024 08:16:28 -0700 (PDT)
-Message-ID: <cb9b4e2c09131901a97c233ab2e18cb8970e09a3.camel@redhat.com>
-Subject: Re: [PATCH] net: remove {revc,send}msg_copy_msghdr() from exports
-From: Paolo Abeni <pabeni@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>, netdev <netdev@vger.kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>
-Date: Thu, 14 Mar 2024 16:16:26 +0100
-In-Reply-To: <b44a7fe3ec2c595786d520382045cf7b5ffce3da.camel@redhat.com>
-References: <1b6089d3-c1cf-464a-abd3-b0f0b6bb2523@kernel.dk>
-	 <b44a7fe3ec2c595786d520382045cf7b5ffce3da.camel@redhat.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        Thu, 14 Mar 2024 08:21:23 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Thu, 14 Mar 2024 08:21:22 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+To: Herve Codina <herve.codina@bootlin.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew@lunn.ch>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Lee Jones <lee@kernel.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Qiang Zhao <qiang.zhao@nxp.com>, Li Yang <leoyang.li@nxp.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+	Takashi Iwai <tiwai@suse.com>,
+	Shengjiu Wang <shengjiu.wang@gmail.com>,
+	Xiubo Li <Xiubo.Lee@gmail.com>, Fabio Estevam <festevam@gmail.com>,
+	Nicolin Chen <nicoleotsuka@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Randy Dunlap <rdunlap@infradead.org>, netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, alsa-devel@alsa-project.org,
+	Simon Horman <horms@kernel.org>,
+	Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v9 07/27] net: wan: Add support for QMC HDLC
+Message-ID: <bd7b7714-1e73-444a-a175-675039d4f6e4@roeck-us.net>
+References: <20231115144007.478111-1-herve.codina@bootlin.com>
+ <20231115144007.478111-8-herve.codina@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20231115144007.478111-8-herve.codina@bootlin.com>
 
-On Thu, 2024-03-14 at 11:46 +0100, Paolo Abeni wrote:
-> On Tue, 2024-03-12 at 09:55 -0600, Jens Axboe wrote:
-> > The only user of these was io_uring, and it's not using them anymore.
-> > Make them static and remove them from the socket header file.
-> >=20
-> > Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> ## Form letter - net-next-closed
->=20
-> The merge window for v6.9 has begun and we have already posted our pull
-> request. Therefore net-next is closed for new drivers, features, code
-> refactoring and optimizations. We are currently accepting bug fixes
-> only.
->=20
-> Please repost when net-next reopens after March 25th.
->=20
-> RFC patches sent for review only are obviously welcome at any time.
->=20
-> See:
-> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#devel=
-opment-cycle
+On Wed, Nov 15, 2023 at 03:39:43PM +0100, Herve Codina wrote:
+> The QMC HDLC driver provides support for HDLC using the QMC (QUICC
+> Multichannel Controller) to transfer the HDLC data.
+> 
+> Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+> Reviewed-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> Acked-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+[ ... ]
 
-Jakub noted that waiting another cycle just to do a very safe cleanup
-would be a pity. I guess we can do a one-off exception here for good
-reason.
+> +
+> +static const struct of_device_id qmc_hdlc_id_table[] = {
+> +	{ .compatible = "fsl,qmc-hdlc" },
+> +	{} /* sentinel */
+> +};
+> +MODULE_DEVICE_TABLE(of, qmc_hdlc_driver);
 
-Cheers,
+I am a bit puzzled. How does this even compile ?
 
-Paolo
+Building powerpc:ppc32_allmodconfig ... failed
+--------------
+Error log:
+In file included from include/linux/device/driver.h:21,
+                 from include/linux/device.h:32,
+                 from include/linux/dma-mapping.h:8,
+                 from drivers/net/wan/fsl_qmc_hdlc.c:14:
+drivers/net/wan/fsl_qmc_hdlc.c:783:25: error: 'qmc_hdlc_driver' undeclared here (not in a function); did you mean 'qmc_hdlc_probe'?
+  783 | MODULE_DEVICE_TABLE(of, qmc_hdlc_driver);
 
+Guenter
+
+> +
+> +static struct platform_driver qmc_hdlc_driver = {
+> +	.driver = {
+> +		.name = "fsl-qmc-hdlc",
+> +		.of_match_table = qmc_hdlc_id_table,
+> +	},
+> +	.probe = qmc_hdlc_probe,
+> +	.remove = qmc_hdlc_remove,
+> +};
+> +module_platform_driver(qmc_hdlc_driver);
+> +
+> +MODULE_AUTHOR("Herve Codina <herve.codina@bootlin.com>");
+> +MODULE_DESCRIPTION("QMC HDLC driver");
+> +MODULE_LICENSE("GPL");
+> -- 
+> 2.41.0
+> 
 
