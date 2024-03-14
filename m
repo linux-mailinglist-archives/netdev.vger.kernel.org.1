@@ -1,181 +1,233 @@
-Return-Path: <netdev+bounces-79880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D54D087BD57
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:10:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEDB487BD60
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:13:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89EEA1F2162E
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 13:10:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D8B41C20D46
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 13:13:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD3886F06E;
-	Thu, 14 Mar 2024 13:09:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="UVSs7tnx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1304B5A4D1;
+	Thu, 14 Mar 2024 13:12:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D735B696;
-	Thu, 14 Mar 2024 13:09:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B825B053
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 13:12:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710421784; cv=none; b=aYf2LfEXBK9wgVcNfw5PqS5J0fBsthM+kQc7+tsmC2lDTjix2jAtqjjoD+q/k65COlR1fDjW4/EMgZC3GzLli72ZE98Nbvjeyvi6PTXEhDrMv2lIg7zXn/B6TuuG9TcnpE313C6MJ2WFYWUmgys60lVaaiaTfuya0nZ8v7xr8dM=
+	t=1710421979; cv=none; b=VX6x2ZZYtCxw2SUSMHdRMtxucueeuHvXe0gGJGRTFeRx0NgKDfCIkS9bJLl87AkCrhScnoBbL5Xus2ZVdwSCa0NJdB2st9i1vZr/Xe09J3E0m0eUZatLNG9IuNdY+TbZ9rNyVkP/wJpLPkLxwL7P6SJ2TqKtbmgQP6DPbvcP5LU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710421784; c=relaxed/simple;
-	bh=nFGOTN66EYBHIJFSdfRwFSbLVouTuRCdSp1XGYuXmsM=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References; b=OVXBy2mam+Qakn3vgk7ocwaivfambC7C5MjkPZxmK3GnBOsAdCou/WalPyInJNIoIKrENgbt6s/F7pGg890sQz4yb1iXrJZJ/LjvxLycbk3XCUkWitUSf0KYyJtnl86UiPR6vT6j6kqOLjPG7sB/K8dbtk2HxR9ouGH2k6SPasM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=UVSs7tnx; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1710421780; h=From:To:Subject:Date:Message-Id;
-	bh=9cg0YmvU1dEAlXAmjaFA5LI9pkxdwF3xbmIa6kg2jwc=;
-	b=UVSs7tnxsyfQk/vg7At6US+kiCxq1OM3+4kNLMCo8UAnEkW4Joxajkvp62AGzqBva5MDw7ejODSBMBm5Or4UwqCdBJmiNaHmGDiHFjSqC1H9ASOdbYONgPKRmkaj0DrhBBR0sgbyhCbVu2lD1MGR7hrCKfaz8ldmz7BKze6RCOg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0W2Sx1l3_1710421776;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W2Sx1l3_1710421776)
-          by smtp.aliyun-inc.com;
-          Thu, 14 Mar 2024 21:09:37 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Tal Gilboa <talgi@nvidia.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Randy Dunlap <rdunlap@infradead.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Breno Leitao <leitao@debian.org>,
-	Johannes Berg <johannes.berg@intel.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	virtualization@lists.linux.dev
-Subject: [RFC PATCH 2/2] virtio-net: support net sysfs to fine-tune dim profile
-Date: Thu, 14 Mar 2024 21:09:33 +0800
-Message-Id: <1710421773-61277-3-git-send-email-hengqi@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1710421773-61277-1-git-send-email-hengqi@linux.alibaba.com>
-References: <1710421773-61277-1-git-send-email-hengqi@linux.alibaba.com>
+	s=arc-20240116; t=1710421979; c=relaxed/simple;
+	bh=y7v2WM4R162BQcaFvEDhbzd32dW66CZGE4L+4q/IVTE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=IMF1fSZOE6JF3z8F+bavujb5OYB/YqGqiaR8hNQVgLishZ6A38+EML5Fx0d1YzXa8XvUDmss/NFz3TRrzA9VDqSV+D/HnxbpwijvTNi9QHXVeY8hou2/+AnlkggUAPZVjHUU5wS9Jr4UeeUmnXjCpeMGDrMAAQEX9Tt8FN3SHOk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.109.198])
+	by gateway (Coremail) with SMTP id _____8BxOPDV9_JlIRoZAA--.61231S3;
+	Thu, 14 Mar 2024 21:12:53 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.109.198])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxLBPR9_JloxxaAA--.40622S3;
+	Thu, 14 Mar 2024 21:12:52 +0800 (CST)
+Message-ID: <466f138d-0baa-4a86-88af-c690105e650e@loongson.cn>
+Date: Thu, 14 Mar 2024 21:12:49 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 06/11] net: stmmac: dwmac-loongson: Add GNET
+ support
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+References: <cover.1706601050.git.siyanteng@loongson.cn>
+ <027b4ee29d4d7c8a22d2f5c551f5c21ced3fb046.1706601050.git.siyanteng@loongson.cn>
+ <ftqxjh67a7s4iprpiuw5xxmncj3bveezf5vust7cej3kowwcvj@m7nqrxq7oe2f>
+ <d0e56c9b-9549-4061-8e44-2504b6b96897@loongson.cn>
+In-Reply-To: <d0e56c9b-9549-4061-8e44-2504b6b96897@loongson.cn>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8CxLBPR9_JloxxaAA--.40622S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3Xry5tryUGw1kXr1kKF13ZFc_yoW7ArWkpr
+	WfAayUKrZ8Xr1Yk3ZYqFWDZryYyrWftr97uF47t343GF9Fk342qry5KFWYk3W7CrWDuF12
+	vr4jkrZxuFs8GFXCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	tVWrXwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r4j6ryUMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
+	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8_gA5UUUUU==
 
-Virtio-net has different types of back-end device
-implementations. In order to effectively optimize
-the dim library's gains for different device
-implementations, let's use the interface provided
-by net-sysfs to fine-tune the profile list.
 
-Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
----
- drivers/net/virtio_net.c | 64 +++++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 63 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index e709d44..7fae737 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -57,6 +57,16 @@
- 
- #define VIRTNET_DRIVER_VERSION "1.0.0"
- 
-+/* This is copied from NET_DIM_RX_EQE_PROFILES in DIM library */
-+#define VIRTNET_DIM_RX_PKTS 256
-+static struct dim_cq_moder rx_itr_conf[] = {
-+	{.usec = 1,   .pkts = VIRTNET_DIM_RX_PKTS,},
-+	{.usec = 8,   .pkts = VIRTNET_DIM_RX_PKTS,},
-+	{.usec = 64,  .pkts = VIRTNET_DIM_RX_PKTS,},
-+	{.usec = 128, .pkts = VIRTNET_DIM_RX_PKTS,},
-+	{.usec = 256, .pkts = VIRTNET_DIM_RX_PKTS,}
-+};
-+
- static const unsigned long guest_offloads[] = {
- 	VIRTIO_NET_F_GUEST_TSO4,
- 	VIRTIO_NET_F_GUEST_TSO6,
-@@ -3584,7 +3594,10 @@ static void virtnet_rx_dim_work(struct work_struct *work)
- 		if (!rq->dim_enabled)
- 			continue;
- 
--		update_moder = net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
-+		if (dim->profile_ix >= ARRAY_SIZE(rx_itr_conf))
-+			dim->profile_ix = ARRAY_SIZE(rx_itr_conf) - 1;
-+
-+		update_moder = rx_itr_conf[dim->profile_ix];
- 		if (update_moder.usec != rq->intr_coal.max_usecs ||
- 		    update_moder.pkts != rq->intr_coal.max_packets) {
- 			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, qnum,
-@@ -4170,6 +4183,53 @@ static void virtnet_tx_timeout(struct net_device *dev, unsigned int txqueue)
- 		   jiffies_to_usecs(jiffies - READ_ONCE(txq->trans_start)));
- }
- 
-+static int virtnet_dim_moder_valid(struct net_device *dev, struct dim_profs_list *list)
-+{
-+	struct virtnet_info *vi = netdev_priv(dev);
-+
-+	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL))
-+		return -EOPNOTSUPP;
-+
-+	if (!list || list->direction != DIM_RX_DIRECTION ||
-+	    list->num != NET_DIM_PARAMS_NUM_PROFILES ||
-+	    list->mode != DIM_CQ_PERIOD_MODE_START_FROM_EQE) {
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int virtnet_dim_moder_get(struct net_device *dev, struct dim_profs_list *list)
-+{
-+	int ret;
-+
-+	ret = virtnet_dim_moder_valid(dev, list);
-+	if (ret)
-+		return ret;
-+
-+	memcpy(list->profs, rx_itr_conf, sizeof(*list->profs) * list->num);
-+
-+	return 0;
-+}
-+
-+static int virtnet_dim_moder_set(struct net_device *dev, struct dim_profs_list *list)
-+{
-+	int i, ret;
-+
-+	ret = virtnet_dim_moder_valid(dev, list);
-+	if (ret)
-+		return ret;
-+
-+	for (i = 0; i < list->num; i++) {
-+		rx_itr_conf[i].usec = list->profs[i].usec;
-+		rx_itr_conf[i].pkts = list->profs[i].pkts;
-+		if (list->profs[i].comps)
-+			return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
- static const struct net_device_ops virtnet_netdev = {
- 	.ndo_open            = virtnet_open,
- 	.ndo_stop   	     = virtnet_close,
-@@ -4186,6 +4246,8 @@ static void virtnet_tx_timeout(struct net_device *dev, unsigned int txqueue)
- 	.ndo_get_phys_port_name	= virtnet_get_phys_port_name,
- 	.ndo_set_features	= virtnet_set_features,
- 	.ndo_tx_timeout		= virtnet_tx_timeout,
-+	.ndo_dim_moder_get      = virtnet_dim_moder_get,
-+	.ndo_dim_moder_set      = virtnet_dim_moder_set,
- };
- 
- static void virtnet_config_changed_work(struct work_struct *work)
--- 
-1.8.3.1
+在 2024/3/14 16:27, Yanteng Si 写道:
+> 在 2024/2/6 04:58, Serge Semin 写道:
+> > On Tue, Jan 30, 2024 at 04:48:18PM +0800, Yanteng Si wrote:
+> >> Add Loongson GNET (GMAC with PHY) support, override
+> >> stmmac_priv.synopsys_id with 0x37.
+> > Please add more details of all the device capabilities: supported
+> > speeds, duplexness, IP-core version, DMA-descriptors type
+> > (normal/enhanced), MTL Tx/Rx FIFO size, Perfect and Hash-based MAC
+> > Filter tables size, L3/L4 filters availability, VLAN hash table
+> > filter, PHY-interface (GMII, RGMII, etc), EEE support,
+> > AV-feature/Multi-channels support, IEEE 1588 Timestamp support, Magic
+> > Frame support, Remote Wake-up support, IP Checksum, Tx/Rx TCP/IP
+> > Checksum, Mac Management Counters (MMC), SMA/MDIO interface,
+> The gnet (2k2000) of 0x10 supports full-duplex and half-duplex at 1000/100/10M.
+> The gnet of 0x37 (i.e. the gnet of 7a2000) supports 1000/100/10M full duplex.
+>
+> The gnet with 0x10 has 8 DMA channels, except for channel 0, which does not
+> support sending hardware checksums.
+>
+> Supported AV features are Qav, Qat, and Qas, and other features should be
+> consistent with the 3.73 IP.
+>
+> >
+> >> Signed-off-by: Yanteng Si<siyanteng@loongson.cn>
+> >> Signed-off-by: Feiyang Chen<chenfeiyang@loongson.cn>
+> >> Signed-off-by: Yinggang Gu<guyinggang@loongson.cn>
+> >> ---
+> >>   .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 44 +++++++++++++++++++
+> >>   1 file changed, 44 insertions(+)
+> >>
+> >> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> >> index 3b3578318cc1..584f7322bd3e 100644
+> >> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> >> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> >> @@ -318,6 +318,8 @@ static struct mac_device_info *loongson_setup(void *apriv)
+> >>   	if (!mac)
+> >>   		return NULL;
+> >>   
+> >> +	priv->synopsys_id = 0x37;	/*Overwrite custom IP*/
+> >> +
+> > Please add a more descriptive comment _above_ the subjected line. In
+> > particular note why the override is needed, what is the real DW GMAC
+> > IP-core version and what is the original value the statement above
+> > overrides.
+>
+> The IP-core version of the gnet device on the loongson 2k2000 is 0x10, which is
+> a custom IP.
+>
+> Compared to 0x37, we have split some of the dma registers into two (tx and rx).
+> After overwriting stmmac_dma_ops.dma_interrupt() and stmmac_dma_ops.init_chan(),
+> the logic is consistent with 0x37,
+>
+> so we overwrite synopsys_id to 0x37.
+>
+> >>   	ld = priv->plat->bsp_priv;
+> >>   	mac->dma = &ld->dwlgmac_dma_ops;
+> >>   
+> >> @@ -350,6 +352,46 @@ static struct mac_device_info *loongson_setup(void *apriv)
+> >>   	return mac;
+> >>   }
+> >>   
+> >> +static int loongson_gnet_data(struct pci_dev *pdev,
+> >> +			      struct plat_stmmacenet_data *plat)
+> >> +{
+> >> +	loongson_default_data(pdev, plat);
+> >> +
+> >> +	plat->multicast_filter_bins = 256;
+> >> +
+> >> +	plat->mdio_bus_data->phy_mask =  ~(u32)BIT(2);
+> >> +
+> >> +	plat->phy_addr = 2;
+> >> +	plat->phy_interface = PHY_INTERFACE_MODE_INTERNAL;
+> > Are you sure PHY-interface is supposed to be defined as "internal"?
+>
+> Yes, because the gnet hardware has a integrated PHY, so we set it to internal，
+>
+> Correspondingly, our gmac hardware PHY is external.
+>
+> >> +
+> >> +	plat->bsp_priv = &pdev->dev;
+> >> +
+> >> +	plat->dma_cfg->pbl = 32;
+> >> +	plat->dma_cfg->pblx8 = true;
+> >> +
+> >> +	plat->clk_ref_rate = 125000000;
+> >> +	plat->clk_ptp_rate = 125000000;
+> >> +
+> >> +	return 0;
+> >> +}
+> >> +
+> >> +static int loongson_gnet_config(struct pci_dev *pdev,
+> >> +				struct plat_stmmacenet_data *plat,
+> >> +				struct stmmac_resources *res,
+> >> +				struct device_node *np)
+> >> +{
+> >> +	int ret;
+> >> +
+> >> +	ret = loongson_dwmac_config_legacy(pdev, plat, res, np);
+> > Again. This will be moved to the probe() method in one of the next
+> > patches leaving loongson_gnet_config() empty. What was the problem
+> > with doing that right away with no intermediate change?
+>
+> No problem. My original intention is to break the patches down into smaller pieces.
+>
+> In the next version, I will try to re-break them based on your comments.
+>
+> >
+> >> +
+> >> +	return ret;
+> >> +}
+> >> +
+> >> +static struct stmmac_pci_info loongson_gnet_pci_info = {
+> >> +	.setup = loongson_gnet_data,
+> >> +	.config = loongson_gnet_config,
+> >> +};
+> >> +
+> >>   static int loongson_dwmac_probe(struct pci_dev *pdev,
+> >>   				const struct pci_device_id *id)
+> >>   {
+> >> @@ -516,9 +558,11 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
+> >>   			 loongson_dwmac_resume);
+> >>   
+> >>   #define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
+> >> +#define PCI_DEVICE_ID_LOONGSON_GNET	0x7a13
+> >>   
+> >>   static const struct pci_device_id loongson_dwmac_id_table[] = {
+> >>   	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
+> >> +	{ PCI_DEVICE_DATA(LOONGSON, GNET, &loongson_gnet_pci_info) },
+> > After this the driver is supposed to correctly handle the Loongson
+> > GNET devices. Based on the patches introduced further it isn't.
+> > Please consider re-arranging the changes (see my comments in the
+> > further patches).
+>
+> OK.
+>
+>
+> Thanks,
+>
+> Yanteng
+>
+>
+> >
+> > -Serge(y)
+> >
+> >>   	{}
+> >>   };
+> >>   MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
+> >> -- 
+> >> 2.31.4
+> >>
 
 
