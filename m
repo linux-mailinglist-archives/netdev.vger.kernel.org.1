@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-79798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD9BD87B6DA
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 04:27:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4145A87B6E2
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 04:36:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87C652829DD
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 03:27:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 299F11C20E52
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 03:36:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 991861C01;
-	Thu, 14 Mar 2024 03:27:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20544A1B;
+	Thu, 14 Mar 2024 03:35:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mGJ5hLTz"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BEIMofJj"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1BB8BE5;
-	Thu, 14 Mar 2024 03:27:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881305382;
+	Thu, 14 Mar 2024 03:35:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710386856; cv=none; b=oww+hpnM+j8+Acj6W61l3hcQ81C26dNrk7CBplQ7eopH25qHCrsm8WWyoLpkEvH4MdKhSRGRJOTn6OfRejM5dlRpMtkQgHN6GyDUO+lf92SJWa+Jh0OSx42cQZQMQaBmCWE59f3uCfkEs46YVaegklgj5NTuCRhR1x3hwywW14I=
+	t=1710387359; cv=none; b=AVxLuSFl/pQfZgKiSOL8f9QrBKMRKgTc/lfniPdQvVPobseOzvXzSYrP+gjSogZjlabAcPJ3Q+87pnkPpSG8mY2grInSU1PekB5xKBA4TOFWXElyV35nogQHypucwkJwMp4pYA3HgifzwUZAnYrL/EH5e2AT4eHwDD/P2QoU/Zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710386856; c=relaxed/simple;
-	bh=mvHFDPgOfKDs4ElWYSlkdgyoAPxlTvHb6gfuyj65NzE=;
+	s=arc-20240116; t=1710387359; c=relaxed/simple;
+	bh=ufLxwUri9oF1Ju7jFdR1vSsQE/010F+BadmW8nZ4azo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rQh7sW5ob5ZYrHx5ShvLOZt2tF2UbYsjxIEf2o6xvQPD7vG6Ju4ljc7D+FqAtpRAuv0ieQqKcEVwTvvBlqCHPryFekj5mZP3Oo+Tdpse91k+aNVggRXsQhu0ivhMsmzS+wSEKVXBxVxceyCrYhZQ/KB9Osibl85VzUHG+W7Rlyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=mGJ5hLTz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E4F5C43394;
-	Thu, 14 Mar 2024 03:27:35 +0000 (UTC)
+	 To:Cc:Content-Type; b=IVDeJN4f7YRPwwnmoo2d8Q2nugU8ZvdJIJ5E99QtffY4UrUsIOOyz8ImpZGiX/48bcIJrAeG856norLheXxI+jVZQnOBRshYP8g+CrBBI7cAtzQlOjbaa33iiBgyNHl9A67wTwc21zkuD7kI6lEo2L3M9omiwQKpZ75eziXX6Ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=BEIMofJj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC9F0C43394;
+	Thu, 14 Mar 2024 03:35:58 +0000 (UTC)
 Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="mGJ5hLTz"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BEIMofJj"
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1710386854;
+	t=1710387356;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mvHFDPgOfKDs4ElWYSlkdgyoAPxlTvHb6gfuyj65NzE=;
-	b=mGJ5hLTz9O+W9CMwAzNGFBmRO1n5/Gqxz9yPeV2eZpDqINyVKsEYMw701YJWriWfgKxg/H
-	2GWEYEbkH2dYzhmiRkrwE38Iy/E52ZaRPxoJRhb4rFEgCp3aaG3x11nLjLjibH4X2yo1Qm
-	jz28KQyeaPZ5amNRUoJyQ/an044XWlI=
+	bh=ufLxwUri9oF1Ju7jFdR1vSsQE/010F+BadmW8nZ4azo=;
+	b=BEIMofJja6FJPbS0D4BCmOSOP5We16lRSkupRoio0Bsefglkxq59tI8PtUWz+mxGScPggl
+	nnzfk+dXAQpAFpDjP6kKhsXLjJ6yh8bVDbmjQsL948nCNDUriGLP2qkrQuIlWR4RhJG7cM
+	s+LHUDHYcOrIwl2bAAdfw6NzaMaq/lQ=
 Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 128074d6 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Thu, 14 Mar 2024 03:27:33 +0000 (UTC)
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-dd02fb9a31cso368559276.3;
-        Wed, 13 Mar 2024 20:27:33 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUkY78+s/7JYl2PzICKtZnkZuMxrckierF/sfXMWDKBedUjjfsW3EQU+EfLEkYvsfGXyargdveteuEraaoDoIEtjrc7Xs1Vioppdua6zXQ4ELIuOBWt6CM1ChBil4jnbQH2bLVM
-X-Gm-Message-State: AOJu0YzIuUuXXLXqyh5Csg20q5Ql/CcvgSdhvv91u09DvOy+7oo1VMO1
-	LsTP35Pu8KIm9z+uiDt41BbozXSSMpFpkUyiDN/GywwgteIxeGt/+hAZBuOUqrLHHDfNV2V5GLw
-	MhOTXxEMnKhTbww/laLV2n35LQVQ=
-X-Google-Smtp-Source: AGHT+IGipbRUywjVyzfyxsuyOdfop1QdmEURhyUqVShack9PjxKn4e+Wp5XMqX4UTwrQK7k0qQflfCUqvZnmp+9H3+s=
-X-Received: by 2002:a05:6902:110:b0:dd0:471:712 with SMTP id
- o16-20020a056902011000b00dd004710712mr569095ybh.33.1710386851905; Wed, 13 Mar
- 2024 20:27:31 -0700 (PDT)
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 01dbd829 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Thu, 14 Mar 2024 03:35:56 +0000 (UTC)
+Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-dcc4de7d901so404710276.0;
+        Wed, 13 Mar 2024 20:35:56 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCVmd71sAgewmFy70qdRqoHbjoIe8eXAvse/15kB0t53gRbrVXZCtstkyG26+C20yYnxwhjoLMMS2nuzdr6yObrM+7AZPqE0Lh55diB2XLZngO0mtYvjscGW4ow66p9hF9aSebVQ
+X-Gm-Message-State: AOJu0YxX+IdDwDuF5eDkCvsHfIwvJ21KMguZTXk7lOKl7r1CszHjsKWN
+	UKBgxTXAbZzY2AyW9dAigeTdK7bmLdOWMls1XD9cz4+1pLWx1/NEskdlR1tyoz0wKRVn7JfCaL7
+	uE2xV/s1OajmXR4cVB5d2e1VKRWs=
+X-Google-Smtp-Source: AGHT+IGUdgKF/dbUVT5otlmUuvnWc2bC3zUXkuCsUJ2i/Uqok9paRwhbAvJI8AHnKgDRCdykiRdMzw+jO45j6wnIV6c=
+X-Received: by 2002:a25:bfd1:0:b0:dc2:5553:ca12 with SMTP id
+ q17-20020a25bfd1000000b00dc25553ca12mr555095ybm.14.1710387355458; Wed, 13 Mar
+ 2024 20:35:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,11 +63,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240308112746.2290505-1-leitao@debian.org> <ZfJtzhKJV4yo3LRF@zx2c4.com>
-In-Reply-To: <ZfJtzhKJV4yo3LRF@zx2c4.com>
+ <CAHmME9prrtWu8jkj20WKvTZV6mjQE2Vt_mFWGOuy9St1FOrEOg@mail.gmail.com>
+In-Reply-To: <CAHmME9prrtWu8jkj20WKvTZV6mjQE2Vt_mFWGOuy9St1FOrEOg@mail.gmail.com>
 From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Wed, 13 Mar 2024 21:27:19 -0600
-X-Gmail-Original-Message-ID: <CAHmME9prrtWu8jkj20WKvTZV6mjQE2Vt_mFWGOuy9St1FOrEOg@mail.gmail.com>
-Message-ID: <CAHmME9prrtWu8jkj20WKvTZV6mjQE2Vt_mFWGOuy9St1FOrEOg@mail.gmail.com>
+Date: Wed, 13 Mar 2024 21:35:43 -0600
+X-Gmail-Original-Message-ID: <CAHmME9oPPtJXd8DsA+xXvbdN7T0PbAM5kYpQj32KZXv9bKP1ng@mail.gmail.com>
+Message-ID: <CAHmME9oPPtJXd8DsA+xXvbdN7T0PbAM5kYpQj32KZXv9bKP1ng@mail.gmail.com>
 Subject: Re: [PATCH net-next v2 1/2] wireguard: Leverage core stats allocator
 To: Breno Leitao <leitao@debian.org>
 Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -77,13 +78,20 @@ Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 13, 2024 at 9:24=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.com=
+On Wed, Mar 13, 2024 at 9:27=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.com=
 > wrote:
 >
-> I applied this series to the wireguard tree. Thanks for the patches.
+> On Wed, Mar 13, 2024 at 9:24=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.c=
+om> wrote:
+> >
+> > I applied this series to the wireguard tree. Thanks for the patches.
+>
+> Actually, sorry, nevermind. 1/2 is fine, but 2/2 results in `ip -stats
+> link ...` returning all zeros.
 
-Actually, sorry, nevermind. 1/2 is fine, but 2/2 results in `ip -stats
-link ...` returning all zeros.
+Ahh, okay, required some more commits from 6.8. Okay, seems to be
+working. I'll let this cook a bit and then push it up in a while.
+
 
 Jason
 
