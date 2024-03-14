@@ -1,103 +1,207 @@
-Return-Path: <netdev+bounces-79892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D518A87BEC0
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:20:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC03687BEC9
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:21:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73A821F233F8
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:20:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6742128827E
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:21:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4826FE3E;
-	Thu, 14 Mar 2024 14:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dLRdWswQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8ACC70CCA;
+	Thu, 14 Mar 2024 14:21:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D646FE25;
-	Thu, 14 Mar 2024 14:20:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA69470CC0;
+	Thu, 14 Mar 2024 14:21:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710426005; cv=none; b=P5VJIsMh7CT8qeYi1K4msLLFxUHOVmKFisirj0qBdgSiygUXaldVNB65d+k2En4g/D7VbXuriAbynpmTJpy+DtTGtXSp5cMsXjM+eGq7FhIF3yLq5kNv4NQMuBCByy8rJ/sDcRGzWCADNAZQfFoVxwPx02rHSpDmTg0eX1mzeUw=
+	t=1710426084; cv=none; b=LqwwFzXULYvKpcT6O3/XqZI/wB4ij3HEmyZbhNzx9DycLAaxk4dqaBmMeJQE223OnmK09FsI4SEtFim6iSTuBZIPjEjFL8YoIDv/FKUWYnCF7GcMyJcNL6zpKMxBEn0mnP7bvHQIRhbOI6mvqxjsYAOiXIOpvcN2IbeVN+O7W6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710426005; c=relaxed/simple;
-	bh=4H7LF9xic1h2s2SK9pUmAgHDyT+hWOLMRCNt/9GcopY=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
-	 MIME-Version:Content-Type; b=OSzFzajXpESF+4xTt6nfLcuTvNZM98q5TGJ4DpT+cJ6uy75605MuY39vq6BXIIF/yAu7oEZ4a4OhxugzjJ4kg6ORAcOBAU0arO4G/37NZ56Qpwk7RtCIRJTCDmZZPcGjGf7VomMVKotvjSnpRusFH3OnpYsEROVhZ39qTgElXlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dLRdWswQ; arc=none smtp.client-ip=90.155.92.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
-	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=4H7LF9xic1h2s2SK9pUmAgHDyT+hWOLMRCNt/9GcopY=; b=dLRdWswQiOdn/5ZfCwgv+BcmnZ
-	MavcWDrKg+fI81HsMu1+QsmlnIPBKDANlNkB1KR5EtJ7BO4z1u7IGaG0yIysccG2EtBhhZFhThz3F
-	IjOB5V9ptVMAEh/B2txmxf7iJMxnurWe5ZcTpmRCm5PxOB+KGvLb6+KAYa3FPrnSjsUPHj5OEFpf9
-	7p36zwfWH/TwxECdok37fgJcWCNOjENsB7Jh67Vh7cG27X6nZ0qiJI4IlBiOB18pSh81SmGqedsVV
-	Ee6cSi8b46TNWHIWEahZFqqzWgpZxovQjtef2HiEJHR9WXDFHhGxCGFgdWopQey/+57vXQy7TZ+ss
-	gfMsib9g==;
-Received: from [31.94.26.231] (helo=[127.0.0.1])
-	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rklw3-0000000AW6m-201T;
-	Thu, 14 Mar 2024 14:19:56 +0000
-Date: Thu, 14 Mar 2024 15:19:53 +0100
-From: David Woodhouse <dwmw2@infradead.org>
-To: Peter Hilber <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, virtio-dev@lists.oasis-open.org,
- linux-arm-kernel@lists.infradead.org, linux-rtc@vger.kernel.org,
- "virtio-comment@lists.oasis-open.org" <virtio-comment@lists.oasis-open.org>
-CC: "Christopher S. Hall" <christopher.s.hall@intel.com>,
- Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
- Richard Cochran <richardcochran@gmail.com>, Stephen Boyd <sboyd@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
- Daniel Lezcano <daniel.lezcano@linaro.org>,
- Alessandro Zummo <a.zummo@towertech.it>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>,
- "Ridoux, Julien" <ridouxj@amazon.com>, Cornelia Huck <cohuck@redhat.com>
-Subject: Re: [RFC PATCH v3 0/7] Add virtio_rtc module and related changes
-User-Agent: K-9 Mail for Android
-In-Reply-To: <2eb5a616-eeb3-446a-85fd-fff376c15f55@opensynergy.com>
-References: <20231218073849.35294-1-peter.hilber@opensynergy.com> <0e21e3e2be26acd70b5575b9932b3a911c9fe721.camel@infradead.org> <204c6339-e80d-4a98-8d07-a11eeb729497@opensynergy.com> <667c8d944ce9ea5c570b82b1858a70cc67b2f3e4.camel@infradead.org> <f6940954-334a-458b-af32-f03d8efbe607@opensynergy.com> <57704b2658e643fce30468dffd8c1477607f59fb.camel@infradead.org> <d796d9a5-8eda-4528-a6d8-1c4eba24aa1e@opensynergy.com> <47bf0757de3268c420d2cd3bbffaf5897b67b661.camel@infradead.org> <60607bcc-93c5-4a6f-832d-ea4dbd81178e@opensynergy.com> <89268C36-E8FB-4A17-8F81-1DED4BF47400@infradead.org> <2eb5a616-eeb3-446a-85fd-fff376c15f55@opensynergy.com>
-Message-ID: <9455F710-E38C-45DA-9883-EC034495ADEF@infradead.org>
+	s=arc-20240116; t=1710426084; c=relaxed/simple;
+	bh=gh+s32d1vpsepJ1j28wwn4mGeO+mRxbbskY1P++hY1Y=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type; b=E8v4NcoAwjh9IGbjV6gzdNNqkptAyHwmTM+Qwl0L/5w6BS7gdXfhFwOKDPxOmtwBp9ovFFt3frEHd1xqjadSBvUUL/54O0e8vdDCpBb/4urZ/BZ31FiFTwvwqx/QIUzqn16rm44ZTV/j87DGDeIflQSvgff0ylbrDppIJLWR+GA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DA10C4167E;
+	Thu, 14 Mar 2024 14:21:24 +0000 (UTC)
+Received: from rostedt by gandalf with local (Exim 4.97)
+	(envelope-from <rostedt@goodmis.org>)
+	id 1rklzb-00000002dfu-3MQH;
+	Thu, 14 Mar 2024 10:23:35 -0400
+Message-ID: <20240314142335.659018886@goodmis.org>
+User-Agent: quilt/0.67
+Date: Thu, 14 Mar 2024 10:23:08 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: linux-kernel@vger.kernel.org
+Cc: Masami Hiramatsu <mhiramat@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Andrew Morton <akpm@linux-foundation.org>,
+ netdev <netdev@vger.kernel.org>,
+ Yisen Zhuang <yisen.zhuang@huawei.com>,
+ Salil Mehta <salil.mehta@huawei.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Yufeng Mo <moyufeng@huawei.com>,
+ Huazhong Tan <tanhuazhong@huawei.com>,
+ Jijie Shao <shaojijie@huawei.com>
+Subject: [for-next][PATCH 7/8] net: hns3: tracing: fix hclgevf trace event strings
+References: <20240314142301.170713485@goodmis.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
+Content-Type: text/plain; charset=UTF-8
 
-On 14 March 2024 11:13:37 CET, Peter Hilber <peter=2Ehilber@opensynergy=2Ec=
-om> wrote:
->> To a certain extent, as long as the virtio-rtc device is designed to ex=
-pose time precisely and unambiguously, it's less important if the Linux ker=
-nel *today* can use that=2E Although of course we should strive for that=2E=
- Let's be=2E=2E=2Ewell, *unambiguous*, I suppose=2E=2E=2E that we've change=
-d topics to discuss that though=2E
->>=20
->
->As Virtio is extensible (unlike hardware), my approach is to mostly speci=
-fy
->only what also has a PoC user and a use case=2E
+From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
 
-If we get memory-mapped (X, Y, Z, =C2=B1x, =C2=B1y) I'll have a user and a=
- use case on day one=2E Otherwise, as I said in my first response, I can go=
- do that as a separate device and decide that virtio_rtc doesn't meet our n=
-eeds (especially for maintaining accuracy over LM)=2E
+The __string() and __assign_str() helper macros of the TRACE_EVENT() macro
+are going through some optimizations where only the source string of
+__string() will be used and the __assign_str() source will be ignored and
+later removed.
 
-My main concern for virto_rtc is that we avoid *ambiguity*=2E Yes, I get t=
-hat it's extensible but we don't want a v1=2E0 of the spec, implemented by =
-various hypervisors, which still leaves guests not knowing what the actual =
-time is=2E That would not be good=2E And even UTC without a leap second ind=
-icator has that problem=2E
+To make sure that there's no issues, a new check is added between the
+__string() src argument and the __assign_str() src argument that does a
+strcmp() to make sure they are the same string.
+
+The hclgevf trace events have:
+
+  __assign_str(devname, &hdev->nic.kinfo.netdev->name);
+
+Which triggers the warning:
+
+hclgevf_trace.h:34:39: error: passing argument 1 of ‘strcmp’ from incompatible pointer type [-Werror=incompatible-pointer-types]
+   34 |                 __assign_str(devname, &hdev->nic.kinfo.netdev->name);
+ [..]
+arch/x86/include/asm/string_64.h:75:24: note: expected ‘const char *’ but argument is of type ‘char (*)[16]’
+   75 | int strcmp(const char *cs, const char *ct);
+      |            ~~~~~~~~~~~~^~
+
+Because __assign_str() now has:
+
+	WARN_ON_ONCE(__builtin_constant_p(src) ?		\
+		     strcmp((src), __data_offsets.dst##_ptr_) :	\
+		     (src) != __data_offsets.dst##_ptr_);	\
+
+The problem is the '&' on hdev->nic.kinfo.netdev->name. That's because
+that name is:
+
+	char			name[IFNAMSIZ]
+
+Where passing an address '&' of a char array is not compatible with strcmp().
+
+The '&' is not necessary, remove it.
+
+Link: https://lore.kernel.org/linux-trace-kernel/20240313093454.3909afe7@gandalf.local.home
+
+Cc: netdev <netdev@vger.kernel.org>
+Cc: Yisen Zhuang <yisen.zhuang@huawei.com>
+Cc: Salil Mehta <salil.mehta@huawei.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Yufeng Mo <moyufeng@huawei.com>
+Cc: Huazhong Tan <tanhuazhong@huawei.com>
+Reviewed-by: Jijie Shao <shaojijie@huawei.com>
+Fixes: d8355240cf8fb ("net: hns3: add trace event support for PF/VF mailbox")
+Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
+---
+ drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_trace.h  | 8 ++++----
+ .../net/ethernet/hisilicon/hns3/hns3vf/hclgevf_trace.h    | 8 ++++----
+ 2 files changed, 8 insertions(+), 8 deletions(-)
+
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_trace.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_trace.h
+index 8510b88d4982..f3cd5a376eca 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_trace.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_trace.h
+@@ -24,7 +24,7 @@ TRACE_EVENT(hclge_pf_mbx_get,
+ 		__field(u8, code)
+ 		__field(u8, subcode)
+ 		__string(pciname, pci_name(hdev->pdev))
+-		__string(devname, &hdev->vport[0].nic.kinfo.netdev->name)
++		__string(devname, hdev->vport[0].nic.kinfo.netdev->name)
+ 		__array(u32, mbx_data, PF_GET_MBX_LEN)
+ 	),
+ 
+@@ -33,7 +33,7 @@ TRACE_EVENT(hclge_pf_mbx_get,
+ 		__entry->code = req->msg.code;
+ 		__entry->subcode = req->msg.subcode;
+ 		__assign_str(pciname, pci_name(hdev->pdev));
+-		__assign_str(devname, &hdev->vport[0].nic.kinfo.netdev->name);
++		__assign_str(devname, hdev->vport[0].nic.kinfo.netdev->name);
+ 		memcpy(__entry->mbx_data, req,
+ 		       sizeof(struct hclge_mbx_vf_to_pf_cmd));
+ 	),
+@@ -56,7 +56,7 @@ TRACE_EVENT(hclge_pf_mbx_send,
+ 		__field(u8, vfid)
+ 		__field(u16, code)
+ 		__string(pciname, pci_name(hdev->pdev))
+-		__string(devname, &hdev->vport[0].nic.kinfo.netdev->name)
++		__string(devname, hdev->vport[0].nic.kinfo.netdev->name)
+ 		__array(u32, mbx_data, PF_SEND_MBX_LEN)
+ 	),
+ 
+@@ -64,7 +64,7 @@ TRACE_EVENT(hclge_pf_mbx_send,
+ 		__entry->vfid = req->dest_vfid;
+ 		__entry->code = le16_to_cpu(req->msg.code);
+ 		__assign_str(pciname, pci_name(hdev->pdev));
+-		__assign_str(devname, &hdev->vport[0].nic.kinfo.netdev->name);
++		__assign_str(devname, hdev->vport[0].nic.kinfo.netdev->name);
+ 		memcpy(__entry->mbx_data, req,
+ 		       sizeof(struct hclge_mbx_pf_to_vf_cmd));
+ 	),
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_trace.h b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_trace.h
+index 5d4895bb57a1..b259e95dd53c 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_trace.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_trace.h
+@@ -23,7 +23,7 @@ TRACE_EVENT(hclge_vf_mbx_get,
+ 		__field(u8, vfid)
+ 		__field(u16, code)
+ 		__string(pciname, pci_name(hdev->pdev))
+-		__string(devname, &hdev->nic.kinfo.netdev->name)
++		__string(devname, hdev->nic.kinfo.netdev->name)
+ 		__array(u32, mbx_data, VF_GET_MBX_LEN)
+ 	),
+ 
+@@ -31,7 +31,7 @@ TRACE_EVENT(hclge_vf_mbx_get,
+ 		__entry->vfid = req->dest_vfid;
+ 		__entry->code = le16_to_cpu(req->msg.code);
+ 		__assign_str(pciname, pci_name(hdev->pdev));
+-		__assign_str(devname, &hdev->nic.kinfo.netdev->name);
++		__assign_str(devname, hdev->nic.kinfo.netdev->name);
+ 		memcpy(__entry->mbx_data, req,
+ 		       sizeof(struct hclge_mbx_pf_to_vf_cmd));
+ 	),
+@@ -55,7 +55,7 @@ TRACE_EVENT(hclge_vf_mbx_send,
+ 		__field(u8, code)
+ 		__field(u8, subcode)
+ 		__string(pciname, pci_name(hdev->pdev))
+-		__string(devname, &hdev->nic.kinfo.netdev->name)
++		__string(devname, hdev->nic.kinfo.netdev->name)
+ 		__array(u32, mbx_data, VF_SEND_MBX_LEN)
+ 	),
+ 
+@@ -64,7 +64,7 @@ TRACE_EVENT(hclge_vf_mbx_send,
+ 		__entry->code = req->msg.code;
+ 		__entry->subcode = req->msg.subcode;
+ 		__assign_str(pciname, pci_name(hdev->pdev));
+-		__assign_str(devname, &hdev->nic.kinfo.netdev->name);
++		__assign_str(devname, hdev->nic.kinfo.netdev->name);
+ 		memcpy(__entry->mbx_data, req,
+ 		       sizeof(struct hclge_mbx_vf_to_pf_cmd));
+ 	),
+-- 
+2.43.0
+
+
 
