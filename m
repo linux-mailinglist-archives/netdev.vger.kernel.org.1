@@ -1,340 +1,243 @@
-Return-Path: <netdev+bounces-79934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EEEC87C233
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:46:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D32E787C23B
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:50:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34C601C21673
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 17:46:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6215A2836AC
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 17:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4E374BE3;
-	Thu, 14 Mar 2024 17:46:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F6E674BEC;
+	Thu, 14 Mar 2024 17:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jt3Tjsy9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F66nx3EO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155587443F;
-	Thu, 14 Mar 2024 17:46:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710438393; cv=none; b=XS+xrpvWL6WHTSsIQi4Mg3l/mH3lo41EDMVRQsQbgnSkI/t8lPnseRM18813m6AI+zITD8DtNn77FAhjfWzaNhv6zc9x+VEbDAWy9keqPZ3xt+mcCWCbtGwvSMPZ3UZjZ8SJrjppDs4sDL6dtpfSWHYal+GGCW8NWtYXS/HH8IQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710438393; c=relaxed/simple;
-	bh=agKTTomEz4kA+n4rL2OUGP6ABhhFhpO2Zl2XImbNJrE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BniQ4zsP3P1SCjJbaONpvYyHGxWNvUt5NFSNLl7h/yt17qsCZsKmZ8aG2na+msgioek3xE72Lhkh/+lV7ViO1uNOxRcDsNkKcSljPuoskVqmZfN0Zf/9mvhI/xtXP6JBq0Y8VSaXZWlixp7LtaJeHr1Yja2SD5+dbmNNmcnapjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jt3Tjsy9; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-33e9990da78so1016014f8f.0;
-        Thu, 14 Mar 2024 10:46:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710438389; x=1711043189; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=z4I/hbAEGvzlzslG7GDyeJP5iYQIKOeg2en3UKGStes=;
-        b=Jt3Tjsy9L4k5j5sfbiIhCu+nvDKYi7Avj2cnxxxtAbLuYOCuBfB932WAK4uzTsJua+
-         6QhNCf4XYLjfh7263+LtrPXzrjPZUvYWjLYAHCbtPq8a35kwJ/0CUwgwD591HP8MWAXu
-         NMBmEuRrsAA9DZQNWMJ81o0oOCSd79XVAorDHikGIAA402WbF1wXIxWunopQOb0sgPRE
-         PW9NHBlg+eA3JPS/ylG28XWOJW315NIVz/36c44WonYYUINQzCAVBKkToLOiO2qpVBdD
-         AuofhJwzIDFYALTNC9L61hz1snMNcHlCumWsSJn0AQDbtBl2wHxtuIrPrlDaHdKSCNtg
-         NAgw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710438389; x=1711043189;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=z4I/hbAEGvzlzslG7GDyeJP5iYQIKOeg2en3UKGStes=;
-        b=tRf140xGEPYVjzeXu/hFirk5hiJRfPVe1iMdfUrUWtp1sScUdgO/zuoDf/ynJnCmRp
-         o3U1tx/4oxl6Ada4iC9cp1hrOFe6i54zXkjXE1s/t6Txj5TU3rhbmmfdkNrxuaKOpL6F
-         2w8yOcP+2AIwtdk1wiCwh8X7riA7lgBwxancyVP/hRiZAwLOOVHFNpBFsRSNAvOaSdfK
-         Z8ZetE86Y7EVq6uwK6iH19YkXbLefDU3dRCeZAz4/gR4B8/k2SwUd0rihdwP/aBz5tTh
-         W8sYeczO33sDlJtZf8xlPxXytr96010DBPKj4v3vRI8E6v2d26qklGPRkQLGOQfOdcYV
-         1skw==
-X-Forwarded-Encrypted: i=1; AJvYcCXmgB01HA/yjt6PmgBTsgqen2v1sJ6qg0xxfGL4Rq+ELAAQ3p3DeB24Zlxx3BAotBe+HtTTotbjCNq9TUQ/xPS1PDPd4B+MJCp6/2Pa7EYwrgygGlQ53j3SzNN/NNoebkcLYBtGVyJiOsTxwOoLeB4NOmzFHq4UvFG6WIBHo78dsfhdESYhAuvd2WhMBczG4y4icmMeQQ==
-X-Gm-Message-State: AOJu0Yxeov4ssXYLHBpTFgGHXvk8qMq1xcCopiCL/Kbao/RthiN1HymK
-	gy72+tEJIki2OgAMyxzSIjIq5uOdcwxDVHyOXI3v2ebHInYd76+wVz63eJmgJWJH8z3me4wTtW+
-	/3wbGVbDbs9KNqakFDM2F/l3XsoRY+oOmlD8=
-X-Google-Smtp-Source: AGHT+IFFxixUpVKaMDQ0ST25az6uKrSdahJaFVI4ZiUZI2qk5WssR4jx9vxjvViv3ooNXrvDQ4x3Tz7pzCcwqdsjJUI=
-X-Received: by 2002:a5d:594d:0:b0:33d:5484:e451 with SMTP id
- e13-20020a5d594d000000b0033d5484e451mr1740326wri.34.1710438389228; Thu, 14
- Mar 2024 10:46:29 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D23974BE0;
+	Thu, 14 Mar 2024 17:50:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710438619; cv=fail; b=GM5T8Ub3ctwivtJVSOEp2rl2t3/VQ6TlZtZkp/QqNph/ltOAv4TUcIFTm4ZCAMVg73S5XSwbI8y+sqSK04c4vqoQLB0FlKQY+2DPZcbhGWo04cFMj3OPEfYFE92vTTD18svN05MwZZWOO3fRFnekXgX7Dsgrcxd+1HSRX9j7IDM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710438619; c=relaxed/simple;
+	bh=ad4tuo55fxbhUBJFWvfULseTsWrxwiyNsZHJZua87VE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=lYJZGwcgLO0eJOIopf7l5P4iRI5KyZ6VtXoE/BEp7m6RXQK6qtbJ5kfc8utsHTYOP1odFhzcWv5SG32qrnb1ruLHy6DucjqgT7UEHb5TBaDg52cm6SI45gG0Vl+4+yk2Ib0LcuPFR4+ulM8ncUBndCbp6aZfbgNEB8NtFnsUlls=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F66nx3EO; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710438618; x=1741974618;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ad4tuo55fxbhUBJFWvfULseTsWrxwiyNsZHJZua87VE=;
+  b=F66nx3EOibBMeNqT8ZiAbVIh3DbrWNco9h8/MFBC3+wBEW1D7LZey+ze
+   zkdSL5R2NbtNhL+CBG2/yWZ3vCGk8YMqtdBScnyLGs6I4RBT/W9c6hn+F
+   F+i4VHncABraO55CRrMe4iW85T8XgNixpuYkTqh7Wx0NqLgtRRDY6Pn3l
+   zlPcCuG78oGHxRPWHIs+3Z+1b6F3VJ5/6kVW4IBfs7WKCU5ZYXuUgQ8+t
+   Wb3nZ2gyfcno5oYRqzjhOVBHiaLbUaokkjFpSkfF+kKp/KkUsDEwrgnV9
+   DG6O3AxMXafpXy57iMsTcIhse/8FhxXsb4LuM+ArbSrfC9ruks55bTH0P
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11013"; a="16676390"
+X-IronPort-AV: E=Sophos;i="6.07,126,1708416000"; 
+   d="scan'208";a="16676390"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 10:50:16 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,126,1708416000"; 
+   d="scan'208";a="35496767"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Mar 2024 10:50:15 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Mar 2024 10:50:15 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Mar 2024 10:50:14 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 14 Mar 2024 10:50:14 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 14 Mar 2024 10:50:13 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UxT5FVfDkdZsJ+njewJXAfDredesEUM1f0YJW8Gyuma/60Y+qF814ahTq6UW399W1/6r8L7OjH35VyoZLr2zaSZHl9pEWRQlKUDksNBKJJT7W+Haw3aUJmclKgRMAyPQMxHadmdgU8nuFz+KLkMcU8NRx3CtccMlTCIMx892KG2K5W6qLDReri2YKS0yFrEITyxK3krZ5tZ9hfDiJq3o1320qLilaaox+iaaCuUrEjlDZycjRHoI3TNUy6SNNA+qiSKLREY3Jy95f9u2lr42+h3LM9QZsqLwwm2OQUoLUzIluKVWv66L+HXUQ/jL5OoxR0DDvvZpqZv9xbHH68A8Hw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0s7USlX5PmbGv+2P5Pz5ggDEBqlblYiWbjEVQHsUaCw=;
+ b=njlrFEJgtoK27Jz5xl8rEbILP/hi466Io3A3IevStHczcpCR2VXOqloO2ecnu0JhJbXoxcr/c6oLKSRVoo5xHgul8vC7sd9rQ5H6cqtIWbw+BBOq+pnCKojTwuY85bIuickJsgJCL5+waYOJY2ZO4hqb6fAREipzxvdma8shXrarWyOYVo5RVFutS/mH+EJ8DDWwY5OX4iK586y9thbpwaUoK9+hoMH7XJ7/zFQI9f8uQo3QU99BfSkNWZmG7oq1tZwZsqJb/FVsD8iVs9TqNhDiJQ/Xl4hfzvUGE7YrJ+T+9wMngaG1FLQvWPR+cdGChZxqazWytlDNNclWnQu7nw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by PH7PR11MB6980.namprd11.prod.outlook.com (2603:10b6:510:208::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.18; Thu, 14 Mar
+ 2024 17:50:10 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::b383:e86d:874:245a]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::b383:e86d:874:245a%5]) with mapi id 15.20.7386.017; Thu, 14 Mar 2024
+ 17:50:10 +0000
+From: "Keller, Jacob E" <jacob.e.keller@intel.com>
+To: Jakub Kicinski <kuba@kernel.org>, Rahul Rameshbabu
+	<rrameshbabu@nvidia.com>
+CC: "Zaki, Ahmed" <ahmed.zaki@intel.com>, "Lobakin, Aleksander"
+	<aleksander.lobakin@intel.com>, "alexandre.torgue@foss.st.com"
+	<alexandre.torgue@foss.st.com>, "andrew@lunn.ch" <andrew@lunn.ch>,
+	"corbet@lwn.net" <corbet@lwn.net>, "davem@davemloft.net"
+	<davem@davemloft.net>, "dtatulea@nvidia.com" <dtatulea@nvidia.com>,
+	"edumazet@google.com" <edumazet@google.com>, "gal@nvidia.com"
+	<gal@nvidia.com>, "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"jiri@resnulli.us" <jiri@resnulli.us>, "joabreu@synopsys.com"
+	<joabreu@synopsys.com>, "justinstitt@google.com" <justinstitt@google.com>,
+	"kory.maincent@bootlin.com" <kory.maincent@bootlin.com>, "leon@kernel.org"
+	<leon@kernel.org>, "linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
+	"maxime.chevallier@bootlin.com" <maxime.chevallier@bootlin.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, "Greenwalt, Paul" <paul.greenwalt@intel.com>, "Kitszel,
+ Przemyslaw" <przemyslaw.kitszel@intel.com>, "rdunlap@infradead.org"
+	<rdunlap@infradead.org>, "richardcochran@gmail.com"
+	<richardcochran@gmail.com>, "saeed@kernel.org" <saeed@kernel.org>,
+	"tariqt@nvidia.com" <tariqt@nvidia.com>, "vadim.fedorenko@linux.dev"
+	<vadim.fedorenko@linux.dev>, "vladimir.oltean@nxp.com"
+	<vladimir.oltean@nxp.com>, "Drewek, Wojciech" <wojciech.drewek@intel.com>
+Subject: RE: [PATCH RFC v2 1/6] ethtool: add interface to read Tx hardware
+ timestamping statistics
+Thread-Topic: [PATCH RFC v2 1/6] ethtool: add interface to read Tx hardware
+ timestamping statistics
+Thread-Index: AQHacf4WBtsLQqAxuESeM9XGdjpqArE0zQ4AgAGbY4CAAAQtgIAAAqmAgAAN34CAAQ7JQA==
+Date: Thu, 14 Mar 2024 17:50:10 +0000
+Message-ID: <CO1PR11MB50896031737DD807D071C34BD6292@CO1PR11MB5089.namprd11.prod.outlook.com>
+References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
+	<20240309084440.299358-1-rrameshbabu@nvidia.com>
+	<20240309084440.299358-2-rrameshbabu@nvidia.com>
+	<20240312165346.14ec1941@kernel.org>	<87le6lbqsa.fsf@nvidia.com>
+	<20240313174107.68ca4ff1@kernel.org>	<87h6h9bpm1.fsf@nvidia.com>
+ <20240313184017.794a2044@kernel.org>
+In-Reply-To: <20240313184017.794a2044@kernel.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CO1PR11MB5089:EE_|PH7PR11MB6980:EE_
+x-ms-office365-filtering-correlation-id: 8b9f904f-2f72-44f4-84d8-08dc444f3164
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: DgwjX8r/uZQmVhEXQJiuElltiKVtdaooq8jlNKccOjD1xNSTE4oPJG3WhE+AggVqNEllN/YTNDZ8pFT5ekrmGbGlbqOJetglejrIJNJaRhsvSewi++J74J4kz8EvcNM5f04KMmMRBe/Tj78h6aRDUuhngyWWcBu7vG0eWJ5PQ/mnFUs6JRhvePiLAf4DH1VxOwcKEJJ7HFqjEXKHDvVvFwOHEFOLWRKx56blMV7uwAxvNKeUe51WUG3jH5VtblIjlS1mphoPfyd/KtLEPaDMWiD7fLJjmSF6gPXubrbxGWK6H+E7TkCWjtkWuCRXcisxhBFMThO20G25YuyqXxzw8RxpPVl0yPxFOJneDfzpvdIVfzGVqLXlVwyxNaBmSgcQ8E2U+8yTt6UHaDoEbCOA7nsJWtkWUhagHMuqpQ6CDU9RJ0bcmJJkwDLCK6cJANS3qW/35aS/ov08KGRua0/aOHrJ+F8ayXX9pYZPrPbc17xYoqRuTBQytEkAKPTSmnVECTaDsqtSAA3fOQvw6mdNJN5K+E7M9QLuH7wfganuJ/PFNKhD7Hx17FyZUhKga/kX7KLqMDelzikQUa8CQ857kwS+pyqHUsNLOS+hOqHESB3u/0dFOm8M47G7EF22+1etD9DfgVwqY0sg2m/IO8Ey7qA6NW8tTpPmtUGnUJeIwzVDi5H0kqDCHNqqq0jnouVURBxg8hsa3tCv4E/RHSr1ug==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(7416005)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?HrF9+XAgVEkf0f+4OtcDTtASar+oIpn5Ysf6VICPG+cbEUMtHPsoJ3knI9S3?=
+ =?us-ascii?Q?r2oajb2vpdo0m/wA7tvpq3YOs1B0Plu51nNAfLohZw1BIjel+8RsM/dVWmaz?=
+ =?us-ascii?Q?pY2m6RBfnZQRqA6KP9EmQ5vretTyN2n8pV7JZIso7M60OeZkhPqVuqI4XD/o?=
+ =?us-ascii?Q?funKsjNtvGmySdbDmZfrxaB0GW9ROMO+NDgXJMkYTcc9KyxELm3I01Jiw8pQ?=
+ =?us-ascii?Q?sbu8kzcPe0CmPE0AN9oafgFAqaIvThcbAVLbZ9l6JzuRvqF/sGwwec/9/8Oz?=
+ =?us-ascii?Q?5HAF/+oREH66GcCW/zlIRYsMGEVh8E9FzBVr0VAsFc5WyxjTUkkMeISA20yE?=
+ =?us-ascii?Q?YuRtWlyp8ceyERI5Ma9oQKBBQBXJGToGnryj9BT+IlT+DsETB954uqgVT21e?=
+ =?us-ascii?Q?R2+rfMnRVanoDH06+yEy40t/BybwKn2mfDOQQvPq5lKHJczOI+/vxuLyGwgd?=
+ =?us-ascii?Q?KgcTyjcsTl7CBCYynp5cVz+SsAnTD2BafemnGlIzcB4YTh4BLq51wGYWi9Cs?=
+ =?us-ascii?Q?0Bt8cWC6OF05CRc6A3gKRXC+Xq7EDPjNoV9fmT7PA75PdVv2oooMkqpYuQFx?=
+ =?us-ascii?Q?YJ8vqWwLMFMM5a7zO5GwduWjU8m0xY+W+B+1wI169YMU4Iz2PzaBj9vhLw0i?=
+ =?us-ascii?Q?uEG+ad15vzs2D288IEWyLiO3eWW03sNNxFb+yxxuZDqad+ldQfAhPfNv6t8e?=
+ =?us-ascii?Q?I7phCh8G0TVsS6GuxkQc2wR3ltimWAQ1LIBjO+P0pfBkKDMEnlukZH0fh9V6?=
+ =?us-ascii?Q?WTY6SE+pARm3TJu0t/+eFYDKPHBon9hjeSlpRELGE1qed6L8Rtm3iKzrxzTI?=
+ =?us-ascii?Q?QsWFu5MTJZ3i7YzL80n++AdeeZlg6BfLD3sC7wwI7HySAwz4dkWRHtCQa+Bk?=
+ =?us-ascii?Q?dSXA6esX24wij2NUkhsiS1aaSEEZSDkY8SYnuXIVy57kniLCoQ1xtbQoBEzR?=
+ =?us-ascii?Q?npR665oRc0SQVxNIb/vYnarugD5BilxCeQyU0lHcS8+ythYG53Or8KfwP2T7?=
+ =?us-ascii?Q?J0+Ny3v4yyeNXY9mVYsYywMi9GTza+3FQDp+oEnKeZ6dgTtBV4P0nZT+d50x?=
+ =?us-ascii?Q?Xlpf9zkgh535Ork7DQGr2WmtcQm6QZJ5OhnSTat3ETITnUG3wtkJq9yyQTU+?=
+ =?us-ascii?Q?ihlrt6iEIITwOSDiA7HK7Gplk8AAJWtMRM4U0lRsbnllNCmyKV37s2QdpxZZ?=
+ =?us-ascii?Q?NZpEIk00XUqWKoCgs0W2DRrNdbFGKtSZkqwxfHJKmS7QqHO5N5hrF5I76MTZ?=
+ =?us-ascii?Q?cZkCwaYu9i/6yag/7oFzKbptlLOSDDPpbpcjP8Di2mXAm6XVBlaV4qW5HOBK?=
+ =?us-ascii?Q?6pjkUTFh9SJr7HrgsxwYNCa0W3Cr5k63hzRuDyRRk7E6QalvaG4vnL6fn4PU?=
+ =?us-ascii?Q?2By7eV/k3KOasMyn79zGTNGMMsgJ4RMnV5G7P7JanUqZYL8m4mpnYGXmwOzo?=
+ =?us-ascii?Q?ZJpnvCIariVyUBcHb9/2ahDjZxHhn/8K4YOozJj0bp+FqcbiJRlqyNhUzccQ?=
+ =?us-ascii?Q?jULjRgFrEN7n9aLy9OWNjgG59ChkRTyupuxw1pDfc/UXIMa6vU/4adQUOIcA?=
+ =?us-ascii?Q?6Fl6TMl6JptnbNedotfEWe5o0BQeLGZ/5SVWKWkl?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240307123619.159f1c4c@canb.auug.org.au> <20240313105117.699dc720@canb.auug.org.au>
- <20240314093012.3dba692a@canb.auug.org.au> <ZfLElrAT3RMLuWdB@pc636>
-In-Reply-To: <ZfLElrAT3RMLuWdB@pc636>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 14 Mar 2024 10:46:18 -0700
-Message-ID: <CAADnVQJpoBCL6r9BM09-kcMeB4Cm0H0y+UD-i8NX5YtvcCpffw@mail.gmail.com>
-Subject: Re: linux-next: manual merge of the bpf-next tree with the mm-stable tree
-To: Uladzislau Rezki <urezki@gmail.com>
-Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Andrew Morton <akpm@linux-foundation.org>, 
-	Networking <netdev@vger.kernel.org>, David Miller <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
-	Linux Next Mailing List <linux-next@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8b9f904f-2f72-44f4-84d8-08dc444f3164
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Mar 2024 17:50:10.1211
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 08nB/pgxQEjiK18Qxvuag09rMGHwCFmpeEuGayLt8QQ/LcfPpUVYcDMHKgWBqZxq7IP2mm87Sk/tka6RmhSSKe14tznoQgJ8hXExwbuAQyI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6980
+X-OriginatorOrg: intel.com
 
-On Thu, Mar 14, 2024 at 2:34=E2=80=AFAM Uladzislau Rezki <urezki@gmail.com>=
- wrote:
->
-> > Hi all,
-> >
-> > On Wed, 13 Mar 2024 10:51:17 +1100 Stephen Rothwell <sfr@canb.auug.org.=
-au> wrote:
+
+
+> -----Original Message-----
+> From: Jakub Kicinski <kuba@kernel.org>
+> Sent: Wednesday, March 13, 2024 6:40 PM
+> To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+> Cc: Zaki, Ahmed <ahmed.zaki@intel.com>; Lobakin, Aleksander
+> <aleksander.lobakin@intel.com>; alexandre.torgue@foss.st.com;
+> andrew@lunn.ch; corbet@lwn.net; davem@davemloft.net; dtatulea@nvidia.com;
+> edumazet@google.com; gal@nvidia.com; hkallweit1@gmail.com; Keller, Jacob =
+E
+> <jacob.e.keller@intel.com>; jiri@resnulli.us; joabreu@synopsys.com;
+> justinstitt@google.com; kory.maincent@bootlin.com; leon@kernel.org; linux=
+-
+> doc@vger.kernel.org; linux-kernel@vger.kernel.org; liuhangbin@gmail.com;
+> maxime.chevallier@bootlin.com; netdev@vger.kernel.org; pabeni@redhat.com;
+> Greenwalt, Paul <paul.greenwalt@intel.com>; Kitszel, Przemyslaw
+> <przemyslaw.kitszel@intel.com>; rdunlap@infradead.org;
+> richardcochran@gmail.com; saeed@kernel.org; tariqt@nvidia.com;
+> vadim.fedorenko@linux.dev; vladimir.oltean@nxp.com; Drewek, Wojciech
+> <wojciech.drewek@intel.com>
+> Subject: Re: [PATCH RFC v2 1/6] ethtool: add interface to read Tx hardwar=
+e
+> timestamping statistics
+>=20
+> On Wed, 13 Mar 2024 17:50:39 -0700 Rahul Rameshbabu wrote:
+> > > Should we give some guidance to drivers which "ignore" time stamping
+> > > requests if they used up all the "slots"? Even if just temporary unti=
+l
+> > > they are fixed? Maybe we can add after all the fields something like:
 > > >
-> > > On Thu, 7 Mar 2024 12:36:19 +1100 Stephen Rothwell <sfr@canb.auug.org=
-.au> wrote:
-> > > >
-> > > > Today's linux-next merge of the bpf-next tree got a conflict in:
-> > > >
-> > > >   mm/vmalloc.c
-> > > >
-> > > > between commit:
-> > > >
-> > > >   8e1d743f2c26 ("mm: vmalloc: support multiple nodes in vmallocinfo=
-")
-> > > >
-> > > > from the mm-stable tree and commit:
-> > > >
-> > > >   e6f798225a31 ("mm: Introduce VM_SPARSE kind and vm_area_[un]map_p=
-ages().")
-> > > >
-> > > > from the bpf-next tree.
-> > > >
-> > > > I fixed it up (I think - see below) and can carry the fix as necess=
-ary.
-> > > > This is now fixed as far as linux-next is concerned, but any non tr=
-ivial
-> > > > conflicts should be mentioned to your upstream maintainer when your=
- tree
-> > > > is submitted for merging.  You may also want to consider cooperatin=
-g
-> > > > with the maintainer of the conflicting tree to minimise any particu=
-larly
-> > > > complex conflicts.
-> > > >
-> > > >
-> > > > diff --cc mm/vmalloc.c
-> > > > index 25a8df497255,e5b8c70950bc..000000000000
-> > > > --- a/mm/vmalloc.c
-> > > > +++ b/mm/vmalloc.c
-> > > > @@@ -4755,81 -4423,70 +4820,84 @@@ static void show_numa_info(struc=
-t seq_f
-> > > >
-> > > >   static void show_purge_info(struct seq_file *m)
-> > > >   {
-> > > >  +        struct vmap_node *vn;
-> > > >           struct vmap_area *va;
-> > > >  +        int i;
-> > > >
-> > > >  -        spin_lock(&purge_vmap_area_lock);
-> > > >  -        list_for_each_entry(va, &purge_vmap_area_list, list) {
-> > > >  -                seq_printf(m, "0x%pK-0x%pK %7ld unpurged vm_area\=
-n",
-> > > >  -                        (void *)va->va_start, (void *)va->va_end,
-> > > >  -                        va->va_end - va->va_start);
-> > > >  -        }
-> > > >  -        spin_unlock(&purge_vmap_area_lock);
-> > > >  -}
-> > > >  +        for (i =3D 0; i < nr_vmap_nodes; i++) {
-> > > >  +                vn =3D &vmap_nodes[i];
-> > > >
-> > > >  -static int s_show(struct seq_file *m, void *p)
-> > > >  -{
-> > > >  -        struct vmap_area *va;
-> > > >  -        struct vm_struct *v;
-> > > >  -
-> > > >  -        va =3D list_entry(p, struct vmap_area, list);
-> > > >  -
-> > > >  -        if (!va->vm) {
-> > > >  -                if (va->flags & VMAP_RAM)
-> > > >  -                        seq_printf(m, "0x%pK-0x%pK %7ld vm_map_ra=
-m\n",
-> > > >  +                spin_lock(&vn->lazy.lock);
-> > > >  +                list_for_each_entry(va, &vn->lazy.head, list) {
-> > > >  +                        seq_printf(m, "0x%pK-0x%pK %7ld unpurged =
-vm_area\n",
-> > > >                                   (void *)va->va_start, (void *)va-=
->va_end,
-> > > >                                   va->va_end - va->va_start);
-> > > >  -
-> > > >  -                goto final;
-> > > >  +                }
-> > > >  +                spin_unlock(&vn->lazy.lock);
-> > > >           }
-> > > >  +}
-> > > >
-> > > >  -        v =3D va->vm;
-> > > >  +static int vmalloc_info_show(struct seq_file *m, void *p)
-> > > >  +{
-> > > >  +        struct vmap_node *vn;
-> > > >  +        struct vmap_area *va;
-> > > >  +        struct vm_struct *v;
-> > > >  +        int i;
-> > > >
-> > > >  -        seq_printf(m, "0x%pK-0x%pK %7ld",
-> > > >  -                v->addr, v->addr + v->size, v->size);
-> > > >  +        for (i =3D 0; i < nr_vmap_nodes; i++) {
-> > > >  +                vn =3D &vmap_nodes[i];
-> > > >
-> > > >  -        if (v->caller)
-> > > >  -                seq_printf(m, " %pS", v->caller);
-> > > >  +                spin_lock(&vn->busy.lock);
-> > > >  +                list_for_each_entry(va, &vn->busy.head, list) {
-> > > >  +                        if (!va->vm) {
-> > > >  +                                if (va->flags & VMAP_RAM)
-> > > >  +                                        seq_printf(m, "0x%pK-0x%p=
-K %7ld vm_map_ram\n",
-> > > >  +                                                (void *)va->va_st=
-art, (void *)va->va_end,
-> > > >  +                                                va->va_end - va->=
-va_start);
-> > > >
-> > > >  -        if (v->nr_pages)
-> > > >  -                seq_printf(m, " pages=3D%d", v->nr_pages);
-> > > >  +                                continue;
-> > > >  +                        }
-> > > >
-> > > >  -        if (v->phys_addr)
-> > > >  -                seq_printf(m, " phys=3D%pa", &v->phys_addr);
-> > > >  +                        v =3D va->vm;
-> > > >
-> > > >  -        if (v->flags & VM_IOREMAP)
-> > > >  -                seq_puts(m, " ioremap");
-> > > >  +                        seq_printf(m, "0x%pK-0x%pK %7ld",
-> > > >  +                                v->addr, v->addr + v->size, v->si=
-ze);
-> > > >
-> > > >  -        if (v->flags & VM_SPARSE)
-> > > >  -                seq_puts(m, " sparse");
-> > > >  +                        if (v->caller)
-> > > >  +                                seq_printf(m, " %pS", v->caller);
-> > > >
-> > > >  -        if (v->flags & VM_ALLOC)
-> > > >  -                seq_puts(m, " vmalloc");
-> > > >  +                        if (v->nr_pages)
-> > > >  +                                seq_printf(m, " pages=3D%d", v->n=
-r_pages);
-> > > >
-> > > >  -        if (v->flags & VM_MAP)
-> > > >  -                seq_puts(m, " vmap");
-> > > >  +                        if (v->phys_addr)
-> > > >  +                                seq_printf(m, " phys=3D%pa", &v->=
-phys_addr);
-> > > >
-> > > >  -        if (v->flags & VM_USERMAP)
-> > > >  -                seq_puts(m, " user");
-> > > >  +                        if (v->flags & VM_IOREMAP)
-> > > >  +                                seq_puts(m, " ioremap");
-> > > >
-> > > >  -        if (v->flags & VM_DMA_COHERENT)
-> > > >  -                seq_puts(m, " dma-coherent");
-> > > > ++                        if (v->flags & VM_SPARSE)
-> > > > ++                                seq_puts(m, " sparse");
-> > > > +
-> > > >  -        if (is_vmalloc_addr(v->pages))
-> > > >  -                seq_puts(m, " vpages");
-> > > >  +                        if (v->flags & VM_ALLOC)
-> > > >  +                                seq_puts(m, " vmalloc");
-> > > >
-> > > >  -        show_numa_info(m, v);
-> > > >  -        seq_putc(m, '\n');
-> > > >  +                        if (v->flags & VM_MAP)
-> > > >  +                                seq_puts(m, " vmap");
-> > > >  +
-> > > >  +                        if (v->flags & VM_USERMAP)
-> > > >  +                                seq_puts(m, " user");
-> > > >  +
-> > > >  +                        if (v->flags & VM_DMA_COHERENT)
-> > > >  +                                seq_puts(m, " dma-coherent");
-> > > >  +
-> > > >  +                        if (is_vmalloc_addr(v->pages))
-> > > >  +                                seq_puts(m, " vpages");
-> > > >  +
-> > > >  +                        show_numa_info(m, v);
-> > > >  +                        seq_putc(m, '\n');
-> > > >  +                }
-> > > >  +                spin_unlock(&vn->busy.lock);
-> > > >  +        }
-> > > >
-> > > >           /*
-> > > >            * As a final step, dump "unpurged" areas.
-> > >
-> > > This is now a conflict between the net-next tree and the mm-stable tr=
-ee.
+> > >   For drivers which ignore further timestamping requests when there a=
+re
+> > >   too many in flight, the ignored requests are currently not counted =
+by
+> > >   any of the statistics.
 > >
-> >  ... and now a conflict between te mm-stable tree and Linus' tree.
-> >
-> If you need some help with resolving conflicts i can help. The problem
-> to me looks like:
->
-> <snip>
-> commit d7bca9199a27b8690ae1c71dc11f825154af7234
-> Author: Alexei Starovoitov <ast@kernel.org>
-> Date:   Fri Mar 8 09:12:54 2024 -0800
->
->     mm: Introduce vmap_page_range() to map pages in PCI address space
->
-> commit e6f798225a31485e47a6e4f6aa07ee9fdf80c2cb
-> Author: Alexei Starovoitov <ast@kernel.org>
-> Date:   Mon Mar 4 19:05:16 2024 -0800
->
->     mm: Introduce VM_SPARSE kind and vm_area_[un]map_pages().
->
-> commit 3e49a866c9dcbd8173e4f3e491293619a9e81fa4
-> Author: Alexei Starovoitov <ast@kernel.org>
-> Date:   Mon Mar 4 19:05:15 2024 -0800
->
->     mm: Enforce VM_IOREMAP flag and range in ioremap_page_range.
-> <snip>
->
-> those three patches were not based on linux-next and are currently
-> in the Linus tree(bypassing mm-tree?). Whereas below work:
->
-> mm: vmalloc: refactor vmalloc_dump_obj() function
-> mm: vmalloc: improve description of vmap node layer
-> mm: vmalloc: add a shrinker to drain vmap pools
-> mm: vmalloc: set nr_nodes based on CPUs in a system
-> mm: vmalloc: support multiple nodes in vmallocinfo
-> mm: vmalloc: support multiple nodes in vread_iter
-> mm: vmalloc: add a scan area of VA only once
-> mm: vmalloc: offload free_vmap_area_lock lock
-> mm: vmalloc: remove global purge_vmap_area_root rb-tree
-> mm/vmalloc: remove vmap_area_list
-> mm: vmalloc: remove global vmap_area_root rb-tree
-> mm: vmalloc: move vmap_init_free_space() down in vmalloc.c
-> mm: vmalloc: rename adjust_va_to_fit_type() function
-> mm: vmalloc: add va_alloc() helper
->
-> now should be based on Alexei Starovoitov base in order to resolve
-> a small conflict.
+> > I was actually thinking it would be better to merge them into the error
+> > counter temporarily. Reason being is that in the case Intel notices tha=
+t
+> > their slots are full, they just drop traffic from my understanding
+> > today. If the error counters increment in that situation, it helps with
+> > the debug to a degree. EBUSY is an error in general.
+>=20
+> That works, too, let's recommend it (FWIW no preference whether
+> in the entry for @err or somewhere separately in the kdoc).
 
-Pls don't rebase anything.
-
-> But you better know how to proceed. Just in case, if you need some
-> support please let me know i can help with conflict resolving.
-
-As Stephen said these two conflict:
-
-> > >   8e1d743f2c26 ("mm: vmalloc: support multiple nodes in vmallocinfo")
-> > >
-> > >   e6f798225a31 ("mm: Introduce VM_SPARSE kind and vm_area_[un]map_pag=
-es().")
-
-and conflict is trivial. It just looks big due to the indent change.
+We don't drop traffic, we send the packets just fine.. We just never report=
+ a timestamp for them, since we don't program the hardware to capture that =
+timestamp.
 
