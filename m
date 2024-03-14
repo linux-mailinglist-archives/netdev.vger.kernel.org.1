@@ -1,216 +1,203 @@
-Return-Path: <netdev+bounces-79836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDB9A87BB2D
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:22:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 553CA87BB30
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:23:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 47277B21079
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 10:22:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A7A92843F4
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 10:23:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB28E6E5FE;
-	Thu, 14 Mar 2024 10:22:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A456E611;
+	Thu, 14 Mar 2024 10:23:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nMAiW8nS"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="l8x5zZk4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 192996BB37
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 10:22:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710411734; cv=fail; b=ULtDlDz/0xTHtfLA/ZJl/AT0GXCH2nU31PIZ0XVZGuMHqKxrGJgfcX+C7ovGaRxs6LHsI7qMV+mMO7IOG+xdn+8Ekqx9NZIbG6S72ftQL53UY9dTuu3mrs8gn1kTyUg1CRHZbUbxRY/xwuVI9JGDZMaCoU8AbF0wAi48d+mtoAQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710411734; c=relaxed/simple;
-	bh=qLMvhUk1aWuxdiVMyebj9iSR8NtqsGLt6pks+UeW3eM=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=bb8UDs6rPo4nDIpTjp3LDOd28VA0P+dHqYKm7N/KaEuDcaJxgaYdjfv2Lm8AYhhu2zOF7SngAztzWq9PiHHFyf4Vwctsj44rHbDCv88aZ4VACj6DutB140o4xtixmldOG4NXDebeYbchGNBWca6Z/jnd+Gjy2lal52bdrjmMOIM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nMAiW8nS; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710411733; x=1741947733;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=qLMvhUk1aWuxdiVMyebj9iSR8NtqsGLt6pks+UeW3eM=;
-  b=nMAiW8nSaN4QYVXK7dsXXasfAhBunZMLrvOyLNl7mZNpoWhj1G6LgRjF
-   ROD/4fLY064MuypZL6oJqte40+LACr7XUGGkMijbWMfOsPGSiA0FjTZw3
-   VEZ421BwIVn2+vsjx5Vby/c9yXyHO5D+6oRztSGKTK1jupyvky8pJ3kfc
-   QvHNzhCNoGjrTfNAHOoVnczIHtc9hRKT2PEvbEULT64ABRP78TKutTgfV
-   mCqf6N4D6p3UWrtEPFTe3XrPieZIzh33B5aO0yUWngm63+2LnhnH0gP+T
-   fbBk6nJ2lwdC2xLAW9BAPaxoQVB0/d+UYa+rU1r4PN3yw1I5JrTsPNgf7
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11012"; a="5825327"
-X-IronPort-AV: E=Sophos;i="6.07,125,1708416000"; 
-   d="scan'208";a="5825327"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 03:22:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,125,1708416000"; 
-   d="scan'208";a="12695485"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Mar 2024 03:22:03 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 14 Mar 2024 03:22:02 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 14 Mar 2024 03:22:02 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.100)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 14 Mar 2024 03:22:02 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Z1WRMNhuiIzIOnsDsSPMb4t8YVdssuoRbXNJGEF+eiC/Io8BE6MMiWzXFNj2y2J7hjVFNbea80pKIBYlshqBahb5arVssU7h1Xpe2uoPmDa+b+BzwL3eeRY+cIjsorE4sbxt9Zi9HocQ1EQX9XXN0ay9KvRm3gjKBekRf9oHnzlYWLXioZLunVLJeQjcShd4eH6bVqj49XNVqRbnxciQa5aCIo7suQDjIvgs3CMV43AYnuYy9EtInf5cyqMsSXLh+q9kz66/FpTLtP3UYtIs+w8paaMoYacQhJH63DAQegNnZUXJMhob2X2koAjXcUG+rtLKcMiV6MZbUmmvCmAUiA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Ly0PHD4MmJQSOx+kycW2Ryr8qilj2sXvsPw+rEmGLvw=;
- b=Sxj7tA1uvezRijPfrE66PJLCfBuTscyhNva3e+66GAK6i56TWrjGxjU6xUBjDTFzTwT/l/JXbeExdUmDh1ngI9CLT6DdCyt5E1G8gOAOgKGdms4GswL4rPgUtB1swKlzjF88GC7Y9cZb7qIu07i7ENzVFAerBxbeo/OKb35YQhqTPZoM5M6FYsK/YMkMLjKToF+AV7fHTZbElt/UMUL8PXzQeEp82URBKh+beUSu2t2uPGVQxUjoA6L+0NT04vRaAPtb142NtdeWS6UtFJSxacf5FfNEH81GiDrta2sZhCkFGh8vEyBVTpiLR+8+ahXAFus5PxFbs0HnYkgVQVWC9w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by PH7PR11MB8249.namprd11.prod.outlook.com (2603:10b6:510:1a7::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.17; Thu, 14 Mar
- 2024 10:21:59 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::618b:b1ee:1f99:76ea]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::618b:b1ee:1f99:76ea%5]) with mapi id 15.20.7386.015; Thu, 14 Mar 2024
- 10:21:59 +0000
-Message-ID: <d87f0752-a7ea-45b6-9a79-aac0c6cac882@intel.com>
-Date: Thu, 14 Mar 2024 11:21:38 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net] igc: Remove stale comment about Tx timestamping
-Content-Language: en-US
-To: Kurt Kanzenbach <kurt@linutronix.de>, Jesse Brandeburg
-	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Vladimir
- Oltean" <vladimir.oltean@nxp.com>, Vinicius Costa Gomes
-	<vinicius.gomes@intel.com>, Muhammad Husaini Zulkifli
-	<muhammad.husaini.zulkifli@intel.com>
-CC: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>
-References: <20240313-igc_txts_comment-v1-1-4e8438739323@linutronix.de>
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20240313-igc_txts_comment-v1-1-4e8438739323@linutronix.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DB8PR09CA0013.eurprd09.prod.outlook.com
- (2603:10a6:10:a0::26) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7820C6BB37;
+	Thu, 14 Mar 2024 10:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710411814; cv=none; b=jaG0c94kl0DCf6LLBWn4NVUebOmNPAIGJlFlhq8Ot2LL3M2uJV7V5tCDp+4sfyuklc0Pq2fXi7fCrtQb28ZEh5O4SlG6fTTmvMSH94+KGz7Z7aqVkOeR7+ysIbbgnTY4NBoMqp7ArCgxPXGnW4mkjYfJVosDwwm/1YeJpbnjnfE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710411814; c=relaxed/simple;
+	bh=5wPDrmN6cu9x1bCdqz8DXqPYL7YSUk8hpryHCstTnFE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZhiOtYu+ogjp9LJfl8/DXZ8S+pQfgG3rQA3Ttykxp4JGAUW81iyeqKJMHRxQ3Q5jT3JYj/H5/QA/V3FYLB8qYRRKnb5P9FdboxUs5+eOWbL64OwjdLfRgsDJBjCnRr4Tfh1v+r1JtrR3AGEpH4/wMtwJpYbsfsyyDnJ9Dcn3bA4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=l8x5zZk4; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42EA0iog015160;
+	Thu, 14 Mar 2024 10:23:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=DvBNskAxLoqsqCG/2Fpkv5K9t8pITrKn7B68jbgbvJA=;
+ b=l8x5zZk4dhZ0LjQxoItFIqEuh/MkekY27DJfHxrQjugLvzTckln7X73nwYLdNXu0+6ec
+ zcp1BaeIO6B15I89VZFnP7ZKETn1ennz8qSk1+lWia3mIGCztpA0IiJ/5DPk6Wot6v2E
+ 8nm4v1KkvrbV3sdOCVoUDLKxFdGRfrxacxF5f8BkMr5ANGGYUXgdAQvyiabHwHIxWYtH
+ Xj9LxD5bd4tNUub2BDpOfQJh8mwidUzjWBiEMG4DmfGNMy1pJoKHhH/FtQdzZiTyuITk
+ F/shOlfFu3xAvJ541cQjgitiToO9Y4UL4B3VjMBXmZP3ehkDMO54DY0Z7vWvpfz/xNbg lA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wuxm60rc1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Mar 2024 10:23:21 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42EALrk0005638;
+	Thu, 14 Mar 2024 10:23:20 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wuxm60rba-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Mar 2024 10:23:20 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42E8DgOL013484;
+	Thu, 14 Mar 2024 10:23:19 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ws4akkwdg-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 14 Mar 2024 10:23:19 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42EANE1U32768488
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 14 Mar 2024 10:23:16 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0AE7520043;
+	Thu, 14 Mar 2024 10:23:14 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1285B20040;
+	Thu, 14 Mar 2024 10:23:13 +0000 (GMT)
+Received: from [9.171.77.106] (unknown [9.171.77.106])
+	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 14 Mar 2024 10:23:12 +0000 (GMT)
+Message-ID: <caab067b-f5c3-490f-9259-262624c236b4@linux.ibm.com>
+Date: Thu, 14 Mar 2024 11:23:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PH7PR11MB8249:EE_
-X-MS-Office365-Filtering-Correlation-Id: a6661b22-7921-46dc-40f9-08dc44109575
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 4pmvYm6ApUu5id41mKcaEoXCYEEGqkiFINXaGQdU2OAbWyxSLvJ6BZJHhKQZcDTa0k6/kNj8vYxwUz5V+VBa+N4b/sshbQrT6r3FhsuPuXxQiUcsnI+M8ebsbv9fyymaOxz7lzZqkmb1TWKdsKH5ATdFk4jHp3rFS7qIIPNSkIZPP2WfLSB1fjhxNlJFjkp+VQCuMMOn81S94XJCL8qmhLVZHNQZTdDnSiMbJkry3EwH3EdhJD/xG6xvdlL3g9H7xgyxeFdF09zV4Wh+Uln1qp2GmjnCYqPMgciRg7oT9ZugNSIoiyGRH8Obrh9xlckXf0JdIaUakvsEArdmjFTEPvoaQ5RlWd+tJzm7ANKvzKZitwZ7xuTEInqiUiyc1dQMcZENZ2IFOZa/BeO18ldrDqHt5sAWYTvMsiHqEPeFKRZPWukNkyYKSU50oCg79h/gfZMxwo8jRU8UkFCn3Al8s6fru66xNP6HF7LG7dr4Zj6rNPdFsPP3YlQ2CVCt1pDeAMUwBId3fACf9jo0MSVd58Atu9SllKh6Q4LhJgImOwlECN1j303WlhguGwR6jIoa5dLVqRGrelpzQ2mmgFV+DsPW6Kwt0PkpdP4FIth3VLHole/8I7Ezj542VSeU6p8gh7eNrt8etBX/y6GOBlvdd9RPyw6Lc2k+uUAf1i9LkB8/5oD4L4Q4+LValog9vx45Fu6kDamUDEJmoyky50E7wQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(921011);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?K3ArbDVpVTRZZnpscGlHeFpTNkF2UHplbFZQdUlJa3diMDJjTU00c2YvYmt3?=
- =?utf-8?B?UUhrckR5VldTQjd2TzJIeVJEaUYzS2VoUzRxSVFOWWEzendvNXhFVDRya2tj?=
- =?utf-8?B?cnpKZ3pLU0t3eE16enlHZlVPcEZMaGt3L2lCYThsSVZYZ3gydWMvZDhuU0Fi?=
- =?utf-8?B?eGdZdDhSaGg2OHdRNnh1N3oyNlJLZFJkRnR1SXNyRU04VEVJR0dpN205UFNS?=
- =?utf-8?B?bW9MTENWVVVpRU8yWTR6R2x6R2JMckJEWENDSmRJUERsZXF5Q0hlL1Fkcmw4?=
- =?utf-8?B?TTFjL0x5L3hqTEJteGExQ2dsMkEwcVF5V3JzcW8yNG9Vc0FCTFM4Z0hWOU9o?=
- =?utf-8?B?djM2MTRVdUtYSE5QWXFESkIxeVkzUkI2VkQ4SFVtU05TT3ZEdWVpVDZsNnJm?=
- =?utf-8?B?dVNza08zNXhYbk5wdzdud1hLZUdkKzhVckxzRDBtUHB5REQzQ0FDNHNtYlhl?=
- =?utf-8?B?NVZ4a1cvTkdOcDNHS29rK3RFemJGeVdtS05UUTZrVGRMUURCNDV0MUVlSkVK?=
- =?utf-8?B?U0VTcGl1NFJJR09pNDNzY29XZHBXeWdmOU55ZG1PdExJMjlDTkRmcTBBSTJJ?=
- =?utf-8?B?Ym1yMDA5NWIvazlhTWp1VkpmdEpoK2FsMVZCbnQyM1VOWXNVYkJnR1lTVUFV?=
- =?utf-8?B?UEl1dUVtcDdSSUo0Q214dkJrY0dabTlaczB5NUxidXMxTGNqYW1zWGxEQ05H?=
- =?utf-8?B?SktWdlVVRjNQellKNnpYYjdweXN6RnB1cThtc0ZVeitNV2NHKzhzaDMzTUIz?=
- =?utf-8?B?K2Fzc3YwQzdvbGJNNWtOS2R1MkZFZklPK0ZsRE5veHliN1BWQ09vTFNDajd4?=
- =?utf-8?B?Mng3ck0yb2xuUFd6bGFzOUNPNDFGZXA0NTl3NmRsYmFXVUd2NEdiL1NaYktl?=
- =?utf-8?B?NzN6UjFlRTZnUGFkNEZlZUo2aHNQQS9hSXNwYmVmNDlRdDVyNEJJdGU1YmJY?=
- =?utf-8?B?QXVvVlRyODNYYjdyN0g5cXYvdjJJUjZCVFNsZnpnTmhlSTcvcWxwZkdVVDZo?=
- =?utf-8?B?c2JmSDVrZGljbmp4THp1aFZpaXJJSDZtaytYRFVoVkJrWlQvcXFqRStaeHps?=
- =?utf-8?B?VGUwR3dIbU9hVGlJaHFGVnJkVEZxNHVPZFR2bGEvTkY0emVmRTgwTVhhb1Ex?=
- =?utf-8?B?YWRjNkl2dGQ1amdWOXlnNXJLM0RQcXZ4RkZPMTBmQkNPV2JlRisyZ1c1cUEv?=
- =?utf-8?B?eGtHcFFub3FqNzdhRzZOZXZtSVd5L0Q3Q1NHa2NIMWZFMS80SUYvaFFOL05V?=
- =?utf-8?B?eW50OTdjd1M1aFR3OC81UTBYZS9POFVLQjd1K3ZKM3hIQkR6R2dib0hjVVB0?=
- =?utf-8?B?WGlPWVRZZTU5WW1LNlVMVVBsc2hQVDBvN1UyUjVISTZzVGV2eGlWUVpLUTh6?=
- =?utf-8?B?YjVrZXg3UVhodlA2dHlLOU9rVW82bHA2M2NjRXc0MGVvcnhOYTVnbmdhaUwv?=
- =?utf-8?B?WUFuSUJDbDY5L2NJZEZkTTB0TDFNOHVoRnQ2aTlabXpoRld0U0VpZngvMDR3?=
- =?utf-8?B?RDV2djk3ZlBsbDA5OUhlTklBa09iekRGUThnTjkvZGNyVWk1VzhkS3JFZjJs?=
- =?utf-8?B?bGo2Yy9YMlp6elV4RHUyOC94c3NQbEtEMHhxMnRWT2dYN3NFL1ZWb1JYdEd5?=
- =?utf-8?B?QXJ2bmZuVnRwWWVVTEM0VGpWSzdadlAyUzg1QlpjM2JvZGhzVXNldFRkRFpu?=
- =?utf-8?B?eG1RcWgyQWh4MnVkZkdHakVYZzhXWWlJZFFZZ3h1WEwwaDVlTmpLMGo2c3ZW?=
- =?utf-8?B?Q2N0SlRLWGhsS3dFK1YwRTA4MmNaaW50VXpLa0ExU3FxOXd3d1dzUFJ2Qzd3?=
- =?utf-8?B?RHkzZ2RHc25UMFlZVWhtbmpodVVIYXNFaUNGMGJvT242RyttZnZZekZrVHdk?=
- =?utf-8?B?QWppNlFnYktzclcwczdhbFdVNGRSdDRVY2N0UEt0Y3NhWkRDWGlOZ2JZTUFU?=
- =?utf-8?B?TW43TlVGR0xnQkdqN0syNFVlSStXRGEvcmxsRzZhdWRoNzd0MUg2QkJJVi8z?=
- =?utf-8?B?NDJ2Z0k1YUpCYXUxUDBYOHhTbzVyUUlRRHIxU2I1aEROL29HVE9wbWlNa3dK?=
- =?utf-8?B?WEdRWWRTYnV5dTlhWXBNZnhzeHR3ZVl0VEhHS1hoSXJNWmFDOGtrN2NaVTBh?=
- =?utf-8?B?R21CdlRIMnZmcG1LMnZPVTlBcWE5RldCY2ppajdmaWlCNWNBNk1uR2FxazhD?=
- =?utf-8?Q?xHkabebx820HK0yWg0N8cy0=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a6661b22-7921-46dc-40f9-08dc44109575
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 10:21:59.8172
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Zqdr0Y8VNuVl5kiSsmcQtOFDgh0uCZbWtd5/z3ODtQsDm8vDVUBaSkXACqnovUfAdstsnDK58aDjMrf6PvghxplLq/o3RJtCox6byiiAy3U=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB8249
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 01/11] net/smc: adapt SMC-D device dump for
+ Emulated-ISM
+To: Wen Gu <guwen@linux.alibaba.com>, wintera@linux.ibm.com,
+        twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+        agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
+        tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org
+References: <20240312142743.41406-1-guwen@linux.alibaba.com>
+ <20240312142743.41406-2-guwen@linux.alibaba.com>
+From: Jan Karcher <jaka@linux.ibm.com>
+Organization: IBM - Network Linux on Z
+In-Reply-To: <20240312142743.41406-2-guwen@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: gbaUvl_hnFnGnA-Ov_FXC1VTTPGNJdyR
+X-Proofpoint-ORIG-GUID: rXYW3pWjXFS85FSH9KC0bLPqfaVQG4Z1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-14_08,2024-03-13_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ impostorscore=0 priorityscore=1501 spamscore=0 malwarescore=0
+ mlxlogscore=999 bulkscore=0 suspectscore=0 adultscore=0 phishscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2311290000 definitions=main-2403140073
 
-On 3/13/24 14:03, Kurt Kanzenbach wrote:
-> The initial igc Tx timestamping implementation used only one register for
-> retrieving Tx timestamps. Commit 3ed247e78911 ("igc: Add support for
-> multiple in-flight TX timestamps") added support for utilizing all four of
-> them e.g., for multiple domain support. Remove the stale comment/FIXME.
+
+
+On 12/03/2024 15:27, Wen Gu wrote:
+> The introduction of Emulated-ISM requires adaptation of SMC-D device
+> dump. Software implemented non-PCI device (loopback-ism) should be
+> handled correctly and the CHID reserved for Emulated-ISM should be got
+> from smcd_ops interface instead of PCI information.
 > 
-> Fixes: 3ed247e78911 ("igc: Add support for multiple in-flight TX timestamps")
-
-I would remove fixes tag (but keep the mention in commit msg).
-And I would also target it to iwl-next when the window will open.
-
-Rationale: it's really not a fix.
-
-> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
 > ---
->   drivers/net/ethernet/intel/igc/igc_main.c | 4 ----
->   1 file changed, 4 deletions(-)
+>   net/smc/smc_ism.c | 13 ++++++++++---
+>   1 file changed, 10 insertions(+), 3 deletions(-)
 > 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-> index 2e1cfbd82f4f..35ad40a803cb 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_main.c
-> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-> @@ -1642,10 +1642,6 @@ static netdev_tx_t igc_xmit_frame_ring(struct sk_buff *skb,
+> diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
+> index ac88de2a06a0..b6eca4231913 100644
+> --- a/net/smc/smc_ism.c
+> +++ b/net/smc/smc_ism.c
+> @@ -252,12 +252,11 @@ static int smc_nl_handle_smcd_dev(struct smcd_dev *smcd,
+>   	char smc_pnet[SMC_MAX_PNETID_LEN + 1];
+>   	struct smc_pci_dev smc_pci_dev;
+>   	struct nlattr *port_attrs;
+> +	struct device *device;
+>   	struct nlattr *attrs;
+> -	struct ism_dev *ism;
+>   	int use_cnt = 0;
+>   	void *nlh;
 >   
->   	if (unlikely(test_bit(IGC_RING_FLAG_TX_HWTSTAMP, &tx_ring->flags) &&
->   		     skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)) {
-> -		/* FIXME: add support for retrieving timestamps from
-> -		 * the other timer registers before skipping the
-> -		 * timestamping request.
-> -		 */
->   		unsigned long flags;
->   		u32 tstamp_flags;
->   
-> 
-> ---
-> base-commit: 67072c314f5f0ec12a7a51a19f7156eebb073654
-> change-id: 20240313-igc_txts_comment-81629dfc8b8a
-> 
-> Best regards,
+> -	ism = smcd->priv;
+>   	nlh = genlmsg_put(skb, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg_seq,
+>   			  &smc_gen_nl_family, NLM_F_MULTI,
+>   			  SMC_NETLINK_GET_DEV_SMCD);
+> @@ -272,7 +271,15 @@ static int smc_nl_handle_smcd_dev(struct smcd_dev *smcd,
+>   	if (nla_put_u8(skb, SMC_NLA_DEV_IS_CRIT, use_cnt > 0))
+>   		goto errattr;
+>   	memset(&smc_pci_dev, 0, sizeof(smc_pci_dev));
+> -	smc_set_pci_values(to_pci_dev(ism->dev.parent), &smc_pci_dev);
+> +	device = smcd->ops->get_dev(smcd);
+> +	if (device->parent)
+> +		smc_set_pci_values(to_pci_dev(device->parent), &smc_pci_dev);
+> +	if (smc_ism_is_emulated(smcd)) {
+> +		smc_pci_dev.pci_pchid = smc_ism_get_chid(smcd);
+> +		if (!device->parent)
+> +			snprintf(smc_pci_dev.pci_id, sizeof(smc_pci_dev.pci_id),
+> +				 "%s", dev_name(device));
+> +	}
 
+Hi Wen Gu,
+
+playing around with the loopback-ism device and testing it, i developed 
+some concerns regarding this exposure. Basically this enables us to see 
+the loopback device in the `smcd device` tool without any changes.
+E.g.:
+```
+# smcd device
+FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
+0000 0     loopback-ism  ffff   No        0
+102a ISM   0000:00:00.0  07c2   No        0  NET1
+```
+
+Now the problem with this is that "loopback-ism" is no valid PCI-ID and 
+should not be there. My first thought was to put an "n/a" instead, but 
+that opens up another problem. Currently you could set - even if it does 
+not make sense - a PNET_ID for the loopback device:
+```
+# smc_pnet -a -D loopback-ism NET1
+# smcd device
+FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
+0000 0     loopback-ism  ffff   No        0  *NET1
+102a ISM   0000:00:00.0  07c2   No        0  NET1
+```
+If we would change the PCI-ID to "n/a" it would be a valid input 
+parameter for the tooling which is... to put it nice... not so beautiful.
+I brainstormed this with them team and the problem is more complex.
+In theory there shouldn't be PCI information set for the loopback 
+device. There should be a better abstraction in the netlink interface 
+that creates this output and the tooling should be made aware of it.
+
+Do you rely on the output currently? What are your thoughts about it?
+If not I'd ask you to not fill the netlink interface for the loopback 
+device and refactor it with the next stage when we create a right 
+interface for it.
+
+Since the Merge-Window is closed feel free to send new versions as RFC.
+Thank you
+- Jan
+
+>   	if (nla_put_u32(skb, SMC_NLA_DEV_PCI_FID, smc_pci_dev.pci_fid))
+>   		goto errattr;
+>   	if (nla_put_u16(skb, SMC_NLA_DEV_PCI_CHID, smc_pci_dev.pci_pchid))
 
