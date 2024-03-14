@@ -1,238 +1,165 @@
-Return-Path: <netdev+bounces-79929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2888387C1C2
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:02:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5237D87C1DF
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:11:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BEC11C209EC
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 17:02:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 167C4B21F4E
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 17:11:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DEE71750;
-	Thu, 14 Mar 2024 17:02:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 088FB74431;
+	Thu, 14 Mar 2024 17:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bP2ATjot"
+	dkim=pass (2048-bit key) header.d=criteo.com header.i=@criteo.com header.b="akUxFeHJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2044.outbound.protection.outlook.com [40.107.249.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3907316C
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 17:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710435723; cv=none; b=aUbYqj09AMtKrYeAkay7MlCfs8sHYhK8EAREp8y3SuBt1dQ4qUQC2uVDV+u6mXVuntMFDxKNJ2UnmgYwiSQ/dbbMdDDP5xS8ug7SFHtGTOWFhib4nVH5dOxwmNvrPH7m6LYLNlLhiVDIuQtJpY7j8gljUNyP2zCxfvQqSicJ47M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710435723; c=relaxed/simple;
-	bh=TnBsISUWC2qlv8V8tprDZhAAqFTVtbXiMF1wHw2KojE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nehRJISfPnwSMF7qJuiq5l4DrKSnpDj8ixeogUp1bhpn+vu58fwoMufjNHXblfJMb45AXAp0hRGrqDVRfMzg10FhXqJnkpzSm9Hjy4+AxDpPTB/n3rXeuMw/UUgYLyb9S7XYzQuCU7lZXDF50X1BJx131O7jK5Xaes/wzDS/MoM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bP2ATjot; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-412e784060cso14308475e9.1
-        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 10:02:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710435720; x=1711040520; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=XjcADWLsDuWyyG5SreWRYKWkkzeL4Tg0NMQEOz56dDA=;
-        b=bP2ATjot413PbWkHARjQG1463Kn0rpfAWA3LETCHvPNQ8S0zyyU1QBhP3yUrYHEW9Q
-         +6wWIvNGPT4x6BX5b887U6HVC6ftsv3UlseS6uD+sB0iSqeAJ0yDgrWLj6iinSUGKfVm
-         mF0V3FdgV/FrsVcFwGioUAG2HD51LEhq+2r/ZwywQf7PYi8mJSqE41cpZ2NgRtnq6hPE
-         Ooo7DNPsKN9QkE02fTw/pce2W9vf1dnLFPB5rRceG+7+PWp4QeNAiOmY9E7ONHXW0G+d
-         OwOONa3g1FQ/ENGPYD9+hrHysoDcGWroBU9CLCCg4e19zXLPqPX6gP8boDI1iI8iOnVK
-         5SJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710435720; x=1711040520;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XjcADWLsDuWyyG5SreWRYKWkkzeL4Tg0NMQEOz56dDA=;
-        b=uE4WfbvgJcA8yxhT1sTYPN8beNxkfVF/vyfdtRtEh7DPpXt0ooVMuThqe7ha2SLw+k
-         2fQbqzrKnTHvKF6yKzX7yFlkGk9c55p10nCZ1tBWtARkFElbDxc2DQ66uYUpnEIRfEqt
-         5noR5DzAdRlR+jc35+bmReBVN0Lb76kl2hKK/Mu2ZXWgkcrHdZE+Zd1n1avlUppSkM13
-         C4qZKc2uoYTaVygOpoCH6zs4jYwZ7V6CbmeW1WHG0IXB2Zad1BKKH43EEPFLVmTzOXct
-         nW2rQG8gFNOOoxw94BWYyVj+orKeGxWxZMicaAOXWA6ETpRe2/my62fFtRse3o4lz5ER
-         o2kg==
-X-Forwarded-Encrypted: i=1; AJvYcCUwKEaHjQamKVtFo3kUEQeAS+n9wHUL5uem6BX987ZRkj9xldBzV0BK+AwVhYZtDvC+vhvY3u62nGUdVv9Q59hzYf9Ti2YU
-X-Gm-Message-State: AOJu0YzXyIlufRR/jkUTDdHqJa99ALovCNBLht0Do0BctjjKQl8LTJ96
-	uLtKkcHeuwHuKFFeukNkBA1HINOyyAcSqy268d/Fm4sjVEeE4n8L
-X-Google-Smtp-Source: AGHT+IHS7h1upUTW0+dUXDNpD71vkVtZNpMltU1FrYRnL3eO+puXxn2MWbv5/E+y7coSnaeG0jwQQA==
-X-Received: by 2002:a05:600c:1c9e:b0:413:f157:f677 with SMTP id k30-20020a05600c1c9e00b00413f157f677mr2390756wms.0.1710435719462;
-        Thu, 14 Mar 2024 10:01:59 -0700 (PDT)
-Received: from ?IPV6:2a01:c22:7a90:7b00:844c:788b:a2cb:c2b7? (dynamic-2a01-0c22-7a90-7b00-844c-788b-a2cb-c2b7.c22.pool.telefonica.de. [2a01:c22:7a90:7b00:844c:788b:a2cb:c2b7])
-        by smtp.googlemail.com with ESMTPSA id j30-20020a05600c1c1e00b004133825e6cfsm6150563wms.24.2024.03.14.10.01.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Mar 2024 10:01:58 -0700 (PDT)
-Message-ID: <80c585f5-4c79-4c97-8f14-5ff4a24fbaa9@gmail.com>
-Date: Thu, 14 Mar 2024 18:01:58 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A2C7441E;
+	Thu, 14 Mar 2024 17:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710436260; cv=fail; b=Yjj/CxDvKQUeQzY2liSLlQBKE2F8iyBP/BavYzycVm/d4lOTxjM8Lk2xgjC7EUzF7p3wNQXPHLFbUt+0ULSJYyc4yy43BqJ7HDtaeXK3vVOINN6AAToRcsLv7wR0SO0fahttA62Y9SQsIbBhqxm+g3DMPqn009x0OC6J+14eFVQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710436260; c=relaxed/simple;
+	bh=VFxtvec4lKBvbhB0+lLOXGMYZaMT8ACPWJLcfkyUepM=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=kHNqnrM0ZfLosKaIJWJeNe0vDlmcjotKEX0UOctUrAzTiUynMDRdeBnRGs1kSQYeR2gna9CDPRIfuSODP4zWZZmXDovYGgst9vFFmyxPnjhztl7TDm8ZHiWG/ytOdUqDFd8ziZZgxRtr61VJgGwHQA0e3OHyijqhdYFBi5khq08=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=criteo.com; spf=pass smtp.mailfrom=criteo.com; dkim=pass (2048-bit key) header.d=criteo.com header.i=@criteo.com header.b=akUxFeHJ; arc=fail smtp.client-ip=40.107.249.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=criteo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=criteo.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=eOu4A4NU/IDz3c/PZn8EAxMnx8V91QOoVT3JtSnWuX8PS4+LHx5J/M3zXVZznA1STmrThovqNjVYMpB87stJ3BQs6HBxR/Q71+mMqqMsjD0t70V8IX3/HcXBSB6HkWUbmBFVqJtIcP3HiY8JqfAXfl1D6gS4iDhbj0JkVkqVmhJmeUduVk5fafRoMfT1XpI6t/GypD4D53dIPEEULN5zsDfxbnu4LFRmTo1rgMUo5n38hRcNrUjnSqWAxM+vCQkYFK+CeHkaVHZOM0KVkRBGHC7+MJ707+etLwOc1Fdh47lqO7I5yHiHjxkjRgSGSR+bn97WnAU6Gr6wlgToCPNtnA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8GfkSxjQtCspKgywt4dLTD4cE3UbCh5ybjoGOUC88rw=;
+ b=VY/Rs+pru7M+7MQLxbZYDGHc7wL5xPhW2c4CAIjIhKoHoo/UVa9AxH9YbrCbZoWL3poOjwgHoxWkCj9eSuLMZiI9pxBq6xhYF89nPi7Wx6WkYk2PHXNZ2dTGS4JWS5AZLtIo+sbw4Q6zQi6cAb+sZShR7aCWwWiaw5F98tKEkvxUkPlDs0iQB3TBmKi2+OT2rk7bj/K1A+NNEiWPb8YlPvWe9Xc52XIBE3qL6EomCYYUX0TgAoNmHX3bRq9AuQqWr3lKavcwyAJfNjLb692RK2X6tAf9iUkbC5qePPF0ndOSbE6mxUfHuVq5UXnk1tyipoEbsKCfVUiPqPzrPSWGxw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=criteo.com; dmarc=pass action=none header.from=criteo.com;
+ dkim=pass header.d=criteo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=criteo.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8GfkSxjQtCspKgywt4dLTD4cE3UbCh5ybjoGOUC88rw=;
+ b=akUxFeHJtav2EIeTK7l3cbxnlWQOzLwGwHu1+8r4Vrtl7CfaTlU115EIcpzbN7iwANFZB+Q22bNBoG9TKo2Ngh0TgW4FOBAhWXdw3TedcMsm1Tx8a1ZdBE9Myt9I/6oqTAZ3ZDghLbL8Ni+75nu5EVxvRJd9/x7nwPDSlpw7pCFnee3xRdpIyIrmDSTyxTkWXvDhBArK/EM8YS3/mdpPGaI3ALvX4YNJ68aCEdDuBdsl5SfyqeeSjdZwUI8ekAWdm2gVAYyEZhE7SGQ2yuiLda1NeQZCvW8WGvr2AghigETZ3cMWG95qfg5fZ3Gd4HZMGGAiC6rVoGI3h+IjrtJ2iw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=criteo.com;
+Received: from PAXPR04MB8989.eurprd04.prod.outlook.com (2603:10a6:102:20c::11)
+ by PA1PR04MB10177.eurprd04.prod.outlook.com (2603:10a6:102:465::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.18; Thu, 14 Mar
+ 2024 17:10:55 +0000
+Received: from PAXPR04MB8989.eurprd04.prod.outlook.com
+ ([fe80::c508:de0c:3808:6f2]) by PAXPR04MB8989.eurprd04.prod.outlook.com
+ ([fe80::c508:de0c:3808:6f2%4]) with mapi id 15.20.7386.020; Thu, 14 Mar 2024
+ 17:10:55 +0000
+Message-ID: <c0ccaef6-44eb-4851-b336-cdb06647e1d2@criteo.com>
+Date: Thu, 14 Mar 2024 18:10:52 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 iwl-net] i40e: Prevent setting MTU if greater than MFS
+Content-Language: en-US
+To: Brett Creeley <bcreeley@amd.com>, Erwan Velu <erwanaliasr1@gmail.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240313090719.33627-2-e.velu@criteo.com>
+ <4e203331-62f7-44e7-acd9-f684c30662de@amd.com>
+From: Erwan Velu <e.velu@criteo.com>
+In-Reply-To: <4e203331-62f7-44e7-acd9-f684c30662de@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: PA7P264CA0490.FRAP264.PROD.OUTLOOK.COM
+ (2603:10a6:102:3dc::9) To PAXPR04MB8989.eurprd04.prod.outlook.com
+ (2603:10a6:102:20c::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Energy Efficient Ethernet on MT7531 switch
-To: Daniel Golle <daniel@makrotopia.org>, =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?=
- <arinc.unal@arinc9.com>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
- netdev <netdev@vger.kernel.org>
-References: <5f1f8827-730e-4f36-bc0a-fec6f5558e93@arinc9.com>
- <ZfMQkL2iizhG96Wh@makrotopia.org>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <ZfMQkL2iizhG96Wh@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8989:EE_|PA1PR04MB10177:EE_
+X-MS-Office365-Filtering-Correlation-Id: 48bd102b-5909-41c5-00a1-08dc4449b586
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	IljjuwnepYzHvmHCs/2HLGyiLqeR9UXOhBywPVLUtanMcAYqETGHzgN228QzMW0WDcP1d5M5HeBF5aZVTl8C+eod/jczXgFx1ejDqo2A/ZCMgEkw/uYyLCLFiGKIoyO+Acf+RE+4BAsGW0U7woJTvunM7UKZTyTlg6Nxe4rAP4mLWY7arLFR4aPfoolVIi5S5zZuV4jqL5/PZsMWUhSRSOeoEkr+YhqRsaJ0AD/l+ilv6gQT/LHgjlIeRiMDw9uqPPSIHXHrJ09mDPEFNlzW3XCxG5BJOxW05k7XccSpQyoEmt+exTo33y0lMoIVCiE8JQYkBujhiST/GzkWIwVB8tZfvJfXqAd409tPErO4jjSNd8ZZKTRKtbWXPngOVb/qCEVImiMtW1IWvvMeFjM+PmUmMULjPouWtw1Hf1qtYGvZwJSVIiVqwsDXDlnDRdR5hTYXvB+6A+SyCmJXsqBve115IESea/VTaZU4IqegBCfINVb8f9QVEZ7VGnHJbqfAaB4eGh/+HDf5yoDyGKvnQ6XnFTwu40mu+lb5ox77KEpi8LuLv3X9iXPc+Z97S/Q0il1/6x3nj04JR3FjEoVnIcW1djRlBpXRaWLWalRFSRR5g3/OamzktWlahnIaEzYBWmpzUo8FBpScbyrXHnyn3pXXQgL0PDl7dauaOCSZJD8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8989.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NTN6dzg5cmpVZHF3eWM2VTA2UllyQ01CNStMcHZYaDFkaXhZZFFhSzR1Mlkz?=
+ =?utf-8?B?RERMTWlnTHJOYmM2V0phV1RqQVVSQWlrcjVJQklFTCs4eFduTWFIdHhFYWJP?=
+ =?utf-8?B?UzVtMHdCNDZZV0VZNFl4bHBjSmdPdENlMUNrdGVRU1pZRWU3TVA3N2RCbU1l?=
+ =?utf-8?B?eHdvZ3pZRVlQakduQkhqQTZEUnVjek9FYWZraVZOL2ttczVTMGMzSkJNMERu?=
+ =?utf-8?B?eklydnZhYWI4UXBVZS9XWUp6WUhuRDJYTURibytreHVIem5SaE1FNmZWN2sw?=
+ =?utf-8?B?cTVUc1hpckttZHV1VnJVRFMwTXFjbEdvQmlWV0tJT3ZsNURvQTJXeU5iRmdU?=
+ =?utf-8?B?VGZCVWRnMyt6ZnlSSjFqdG5BUU9TOW5Qa09rQno4OE5xQ3dVNW9ZY1ZHVkta?=
+ =?utf-8?B?akVIa1V6U0RMR0pwOURoK1lOZkNOTVZSaFEySTh1Y1Y2VGx0Z0MxU1JnYlQ1?=
+ =?utf-8?B?akR3cVYzakMyYUkwV0NQTS81RWdhbU5sczRRTWp2S0p3ZWZ6cTZRczBWU3M2?=
+ =?utf-8?B?eGZEazQyUFNlL2V3SGJKd1plQ1Avcjd0OHBtemhxUVplcVhBS2srUWlLZ2di?=
+ =?utf-8?B?bUNib1QwL3M2UTl0TjNEdXl3OUtEMmFDQmEzY0I4OE5JTDFCV0RlQWNoSHF0?=
+ =?utf-8?B?YStCTkhFR0lLMHdta2NTQThrVTN1czBzdWFjbjd3bm9sL04vMTlwaGdyY0E4?=
+ =?utf-8?B?aGJVa3kyR0hXemhXcTdBaFhIQnVXRDdTVi9UazE1SklyaGh4cWhxT3ZRV1hP?=
+ =?utf-8?B?czZueVlBWXBjbVY4R1hhTHhiS1hlOUgzc2xrc2tIVkMzQlBPbEZIdTNBNmZZ?=
+ =?utf-8?B?NVhyWXJXUmVOaEJkMURlalJwVTBOdzcyQVlHMWdIeSs0ck5hay9yRW5FTjZH?=
+ =?utf-8?B?Q0FvUDArVkZXWmlLSW5WODVlWWt0amx1Wjkvek9hRFFvUnNpU1FodmlQU0RG?=
+ =?utf-8?B?RVNqaERqYUtGdk10V2ZwWlEyU2xNR2RJM1VYRVpuNkxReGJCWUx0WXZ2cEVE?=
+ =?utf-8?B?V013QWtnZHNWeThMbHBzdlB1Tm9SR09udGx4WjF1Z0ZRLzBNY0IrVVhSaXRj?=
+ =?utf-8?B?MnJERytrek9OMnV1MWJBSjdkb2NzZWtGK2lETC9OTnJxYVZ2bDB4amNpaHpV?=
+ =?utf-8?B?N1dUNjdXWEVnR2hMajEyQi9Ya0tJZG11SjRsWWE2NFo1SHFQK3pTeW95eDAx?=
+ =?utf-8?B?SGhua3pySE10TDdabU5jd2tSQUtaNndMZXVXM05VMFNTV0RqaU5wNzkrblhJ?=
+ =?utf-8?B?SkxqM2VYbDBhSXEzNUNVWVl3cGhITDNoTE5JT2UxbTJtckpnOStpdU12YlNs?=
+ =?utf-8?B?NTFaODR1QnY1U09FeDA1bkp5WTdPbndKZHBlUVVocVR5b3JUVk50V3BXRmlq?=
+ =?utf-8?B?SkdJQnIwV08vREdDTzdTNHBLMkFaVWNtVFdZb3hCVVJRcTVaNjRJNjZFaHNa?=
+ =?utf-8?B?Y1pXOVpjMGtUY2paRFNaUEJEc3pqSWdxaUEySzd0N2NvckFBWGZIUCtNVUFa?=
+ =?utf-8?B?VDdBTUJ6SmRVVGtpTnh5dUJxeWFhM09PcEhwdGhXOG1XYnFWaDBjbHo2cXRW?=
+ =?utf-8?B?Z0xSaGx3OWxvYWhiVXdXMjdlODh4QVc4UkVCZTY0MnZxa1RUTStpOW1oT3Bk?=
+ =?utf-8?B?b1JRSmlkUTVOQW1oNmx0S0MxWHBMZ1VRbkpVU1h6a2hRWkJNQWNRbGFiN1ln?=
+ =?utf-8?B?SmRwcm5wTGh6NWJWMEMzcCtERGV6UW83d3BHSXoxMjN4bUc0Y0VpS0VZam5F?=
+ =?utf-8?B?MDFkNjlRd091R1FmeDRsRXFGVUFlZERVYjVpR015aHA5NlhmbE1UTTdmK1k4?=
+ =?utf-8?B?bWlOblRzc0g2N2hGaEpMalpFMWpCWjJxbUNHMDB2UWYzeHlXbzdwcERLTHdw?=
+ =?utf-8?B?NUxYR21vNlQ5ZStCblNRUGFHeStYZnBFVjc1bTM1L0hZaHRmVm5na2ZmNkR4?=
+ =?utf-8?B?dllVRlBWUHhjVE5wdGVHMSszSG5zNUU3ODllaXRJc0lUTjczakF6NjBpK0tm?=
+ =?utf-8?B?azNTTTVEVlRyazFPYnAwc1hRb1VkVUk0TXRzcGkxZC9FNC9zYUFBVjBMendz?=
+ =?utf-8?B?aW1mN3hEQVIrQkZyU2FhclRVRmpqNXc1NUtLcWVaZ05iSWF5RjYrQjRpclNK?=
+ =?utf-8?B?NzlFN0dsSXFKRC9EL2JGeHE5ZzMzYWgzOXpIWmVTODJkekdlYk40UnpQUmVO?=
+ =?utf-8?Q?sQeEcSKr3qHrkU4xSbKVt2Fq19uDlTMVYGyBlPwsugPf?=
+X-OriginatorOrg: criteo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 48bd102b-5909-41c5-00a1-08dc4449b586
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8989.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 17:10:54.9657
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 2a35d8fd-574d-48e3-927c-8c398e225a01
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OehxWiFxaBNFccW1Ag22wVGbM9C+twf9Ytj7ITxQ5AbPek++9o3kTaaa1PN2He26cr75DYhDpjI6OyfpvevzDA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB10177
 
-On 14.03.2024 15:58, Daniel Golle wrote:
-> Hi,
-> 
-> On Thu, Mar 14, 2024 at 03:57:09PM +0300, Arınç ÜNAL wrote:
->> Hi Frank.
->>
->> Do you have a board with an external PHY that supports EEE connected to an
->> MT7531 switch?
-> 
-> Good to hear you are working on supporting EEE -- something which has
-> been neglected for too long imho.
-> 
-> I got a bunch of such boards, all of them with different generations
-> of RealTek RTL8226 or RTL8221 2.5G PHY which in theory supports EEE
-> but the PHY driver in Linux at this point does not support EEE.
-> 
+Le 14/03/2024 à 17:10, Brett Creeley a écrit :
+[...]
+> If this is how the max_mtu is determined, does it make sense to set this
+> before registering the netdev, i.e. netdev->max_mtu in 
+> i40e_config_netdev()? 
 
-With linux-next / net-next also 2.5G EEE should be configurable for these
-PHY's. Or what are you missing in the Realtek PHY driver?
 
-> However, as one of the SFP cages of the BPi-R3 is connected to the on-board
-> MT7531 switch port 5 this would provide the option to basically test EEE
-> with practically every PHY you could find inside an RJ-45 SFP module
-> (spoiler: you will mostly find Marvell 88E1111, and I don't see support for
-> EEE in neither the datasheet nor the responsible sub-driver in Linux).
-> 
-> So looks like we will have to implement support for EEE for either
-> RealTek's RTL8221B or the built-in PHYs of any of the MT753x, MT7621
-> or MT7988 switch first.
-> 
->> I've stumbled across an option on the trap register of
->> MT7531 that claims that EEE is disabled switch-wide by default after reset.
->>
->> I'm specifically asking for an external PHY because the MT7531 switch PHYs
->> don't support EEE yet. But the MT753X DSA subdriver claims to support EEE,
->> so the remaining option is external PHYs.
->>
->> It'd be great if you can test with and without this diff [1] and see if you
->> see EEE supported on ethtool on a computer connected to the external PHY.
->>
->> Example output on the computer side:
->>
->> $ sudo ethtool --show-eee eno1
->> EEE settings for eno1:
->> 	EEE status: enabled - active
->> 	Tx LPI: 17 (us)
->> 	Supported EEE link modes:  100baseT/Full
->> 	                           1000baseT/Full
->> 	Advertised EEE link modes:  100baseT/Full
->> 	                            1000baseT/Full
->> 	Link partner advertised EEE link modes:  100baseT/Full
->> 	                                         1000baseT/Full
->>
->> I'm also CC'ing Daniel and the netdev mailing list, if someone else would
->> like to chime in.
->>
->> [1]
->> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
->> index b347d8ab2541..4ef3948d310d 100644
->> --- a/drivers/net/dsa/mt7530.c
->> +++ b/drivers/net/dsa/mt7530.c
->> @@ -2499,6 +2499,8 @@ mt7531_setup(struct dsa_switch *ds)
->>  	mt7531_ind_c45_phy_write(priv, MT753X_CTRL_PHY_ADDR, MDIO_MMD_VEND2,
->>  				 CORE_PLL_GROUP4, val);
->> +	mt7530_rmw(priv, MT7530_MHWTRAP, CHG_STRAP | EEE_DIS, CHG_STRAP);
->> +
->>  	mt7531_setup_common(ds);
->>  	/* Setup VLAN ID 0 for VLAN-unaware bridges */
->> diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
->> index 3c3e7ae0e09b..1b3e81f6c90e 100644
->> --- a/drivers/net/dsa/mt7530.h
->> +++ b/drivers/net/dsa/mt7530.h
->> @@ -299,11 +299,15 @@ enum mt7530_vlan_port_acc_frm {
->>  #define  MT7531_FORCE_DPX		BIT(29)
->>  #define  MT7531_FORCE_RX_FC		BIT(28)
->>  #define  MT7531_FORCE_TX_FC		BIT(27)
->> +#define  MT7531_FORCE_EEE100		BIT(26)
->> +#define  MT7531_FORCE_EEE1G		BIT(25)
->>  #define  MT7531_FORCE_MODE		(MT7531_FORCE_LNK | \
->>  					 MT7531_FORCE_SPD | \
->>  					 MT7531_FORCE_DPX | \
->>  					 MT7531_FORCE_RX_FC | \
->> -					 MT7531_FORCE_TX_FC)
->> +					 MT7531_FORCE_TX_FC | \
->> +					 MT7531_FORCE_EEE100 | \
->> +					 MT7531_FORCE_EEE1G)
->>  #define  PMCR_LINK_SETTINGS_MASK	(PMCR_TX_EN | PMCR_FORCE_SPEED_1000 | \
->>  					 PMCR_RX_EN | PMCR_FORCE_SPEED_100 | \
->>  					 PMCR_TX_FC_EN | PMCR_RX_FC_EN | \
->> @@ -457,6 +461,7 @@ enum mt7531_clk_skew {
->>  #define  XTAL_FSEL_M			BIT(7)
->>  #define  PHY_EN				BIT(6)
->>  #define  CHG_STRAP			BIT(8)
->> +#define  EEE_DIS			BIT(4)
->>  /* Register for hw trap modification */
->>  #define MT7530_MHWTRAP			0x7804
->>
->> Thanks a lot!
->> Arınç
->>
-> 
+The absolute max is properly set but I think that's only true if we 
+ensure the value of the MFS.
+
+So if with another patch to set the MFS to the right value when asking a 
+bigger MTU, having this value makes sense this is the absolute max for 
+this device.
+
+
+Erwan,
 
 
