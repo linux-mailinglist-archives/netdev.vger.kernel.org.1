@@ -1,136 +1,221 @@
-Return-Path: <netdev+bounces-79978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A81187C4BA
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 22:23:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FD8D87C4DA
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 22:47:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC1B41C21612
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 21:23:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16023281725
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 21:47:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6304C76418;
-	Thu, 14 Mar 2024 21:23:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDED4768E0;
+	Thu, 14 Mar 2024 21:47:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="O0l5V/9x"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j/ISSiD8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C979D7351E;
-	Thu, 14 Mar 2024 21:23:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17BE7640B
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 21:47:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710451392; cv=none; b=cVLkjqhPseCqztg5/XWf3l7YmFhK2s4P4j2smq8C8+cHhAYBVA6mfKjUfekus43iUP/hkad28lpIxBPSxYJOpWH4zL60jR6sG5dLn1VKu4NaxLkE0DxulTgjl5qrsGY2fapSYl5ccw732TbeQestrkzhj46sri8Isvvd5ujzzbM=
+	t=1710452861; cv=none; b=rjfkPE+iVwIbziP0/AnoQDabxaSdt9dHQjr/RCehCZGmtg+9QwAOkv30WXAK8sGh53d2Ra2BbuU4VopYMeFlGKVRtuNgkC47oYg+FNHKWuvgMiRAMjtG8lm+1Tayf6L6XalcOPy8eSD1AYq2HKFtt2eOZaxHtzzYTPaefJ2z3wk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710451392; c=relaxed/simple;
-	bh=hYJrU2J6p32htXqnma2iNBASIUiMkBEvYwQKnOgxtys=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=SnfS03sXmVkWuuD4k3+4b3j9xV/Row5sjfhZG5A16gzhizWOQOv9/5uWJh4j2923UVOsGUZbvlB/TdFcqs0D8z2YhqDTwZskwKdX2DCwHvh910Y2cGE2QVEMdT7St7EHh3IKoAp1czc0k2/su1UM+c4ACvYFN/9wUwLQYFi0Sp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=O0l5V/9x; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42EJo0uf023824;
-	Thu, 14 Mar 2024 21:23:01 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:date:subject:mime-version:content-type
-	:content-transfer-encoding:message-id:to:cc; s=qcppdkim1; bh=BQe
-	++yJkxQ8pGxa4Gxw7WzFWkIVLRYyZRZ6c3OPJJ6A=; b=O0l5V/9xBhyJSNYiqHv
-	SXhsLVcBJsV2GiAxX6OxslpHD5aB+1rJCcdRrbf11y0Lm/HzAsxCMbT/XqFdPV9/
-	D1yMeO6Bu8TeRWxQBzjI3ml+TFkVIL1+wWKOKTrGFcx7ahXQEbQfpouGjSXGtn+6
-	ucgIS15o5QJBQDVXUTWBxAUK9LY2cSMHUlyjxWMqkLxE/vG1659FyNT8jW5gK/s3
-	O/w6NaDeHVgTeugZdy+NPfDavnnwMGRwgF7dUahAS7+Y4vbqP4FJGo+ecRTRGwj0
-	bXumBTH6uWkdtsuBU8d1EPcmA54PXDIkUcYjbhZdhwDxNk8x9GX+phtfu4NvqEaZ
-	Wsg==
-Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wv1njs31u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Mar 2024 21:23:01 +0000 (GMT)
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42ELN0U4007019
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Mar 2024 21:23:00 GMT
-Received: from [169.254.0.1] (10.49.16.6) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Thu, 14 Mar
- 2024 14:23:00 -0700
-From: Jeff Johnson <quic_jjohnson@quicinc.com>
-Date: Thu, 14 Mar 2024 14:23:00 -0700
-Subject: [PATCH] wifi: mac80211: fix ieee80211_bss_*_flags kernel-doc
+	s=arc-20240116; t=1710452861; c=relaxed/simple;
+	bh=rArz5PbsMjiqZkHOTckxHGuhSAZSJrOy+i6L9VPx9W4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BJTn3wsCjpxJSbuYIx/sn+wX9P5tclKaBuvJ+A0k0926B51EdiVbQ8zhTdbML3nYoPc6DWYvO3YxR9RDzgbQJM8fz8ye6AfYXyMBJpAUu3rHqGfEsL2wQUMWD/1UbvU/t3/ALYWP70y6A9W1pWhEyBRHgPJ7+eK9ar9mj5ORGf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j/ISSiD8; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-568898e47e2so5907a12.0
+        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 14:47:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710452858; x=1711057658; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yj5f/ytrcbQ9bq8jRGc8O12ypIGwxmWYCX3kg31Cwh4=;
+        b=j/ISSiD8DYOyQAi42i9CHYc319DgJwAOGqobThRi+NfrFyGq+YuOTo2f+ngU4oeT05
+         o6UioGMnZxrfpjPaKMXLk9O4c1EQKVuh+muxwx0CKB+xaiuEQCW0UQ+yqS33NdQUF99G
+         R4ZLY3RqAd0PzIzeQm/0yfc9dPQEVC56j6z3Hh27OGwIlUcOCKNx1AMa8boOhVGo9kHk
+         iIpG8GFCFSWNbShDdp4dfCPNB8fG4LCnEen8xzZtFs9LrL1bxA8oWyRUX+nIMn5ISi08
+         O8Lj6xXHpVgrHG/8bjKIs253r6knKoRXtkajUYELmobV0P1bs/Pz2kGey4niZu0oUiPO
+         TFPg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710452858; x=1711057658;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yj5f/ytrcbQ9bq8jRGc8O12ypIGwxmWYCX3kg31Cwh4=;
+        b=Wk7gCey7lkaNOgAWx4DsGITLDQNuUdkpZqmY6sMF1SJQd10g/Ob+SKAbmJaGmcSqnb
+         SYJ0fKB1FYHzY+y8w2/s6gdRtx01E8YEYv5pKdb1FwPk1mZZSECWkxubp3dmT+V+yC1V
+         H005ti6dp9QfQ7g8MColjDTxoAHM4Lg6V5+RaGVd5Vp5Mpul0JOZiV3SKkwZbqdVB50A
+         S8OwpBoedxp7TluCNZlXzkMc7V3PgJQ3oJJRnDaPXQmhlzcrd1QVnbpgut0Ki196dpSs
+         znDH6bEIyB7YADj688CHgiJe0Sh6oPomD8DiIBH89OL2F2mdGS9dExbfe5MNow/xWxQa
+         1FMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWnLk7IYAZkJEsNHu4VVLCDL+Et7yHJj7hy18regLIlA1O7c5JDqhu1bGINeIG+rswelVSwp8Zzzi8POWpMG5PdvyIRe7Cj
+X-Gm-Message-State: AOJu0YyZ9j1MLeQuuBhintt3xJZEF04X/5iE1lkdWHuf+K6fUWfl60mg
+	Q9dDLzZgUuSag7D1pBxsVJPUxgBWQJrczBJwvDopYR3+lk8A+FN/5EJkIR+3rhbmHi18i/QqHM/
+	paYyiUa5Q3KWRNOqMQYYX2SoO2RirJukA8R7J
+X-Google-Smtp-Source: AGHT+IEVsQzYZM0gMMFcJFJcO/fLFugCS83znhcv0H9buTdOu9WX9O2QVgdpdmkJlnSz+3qkH8JKZJiSJ86DMXmSXW4=
+X-Received: by 2002:a05:6402:2024:b0:568:5e6c:a3c4 with SMTP id
+ ay4-20020a056402202400b005685e6ca3c4mr44213edb.0.1710452858029; Thu, 14 Mar
+ 2024 14:47:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20240314-kdoc-ieee80211_i-v1-1-72b91b55b257@quicinc.com>
-X-B4-Tracking: v=1; b=H4sIALNq82UC/x3MWwqAIBBG4a3IPCc4ZnTZSkSI/dUQVChEEO096
- fF7OOehhChI1KmHIi5JcuwZXCgKq98XaJmyyRrrTMlOb9MRtABojGUeRbOvMaP2vuKWcnZGzHL
- /y3543w9u4KJjYgAAAA==
-To: Johannes Berg <johannes@sipsolutions.net>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-CC: <linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Jeff Johnson <quic_jjohnson@quicinc.com>
-X-Mailer: b4 0.13.0
-X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: PkDuVwM3FD5O8Tnl69D9DqXLSVj0aMmz
-X-Proofpoint-GUID: PkDuVwM3FD5O8Tnl69D9DqXLSVj0aMmz
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-14_13,2024-03-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 impostorscore=0
- clxscore=1015 malwarescore=0 priorityscore=1501 adultscore=0 phishscore=0
- mlxlogscore=749 spamscore=0 suspectscore=0 lowpriorityscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2402120000
- definitions=main-2403140164
+References: <20240314210740.GA2823176@perftesting>
+In-Reply-To: <20240314210740.GA2823176@perftesting>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 14 Mar 2024 22:47:25 +0100
+Message-ID: <CANn89i+Bid4YkwFEmxSvF22Gk0jY+hH7P=mjEKR=LBPc+vG_PA@mail.gmail.com>
+Subject: Re: [BUG] Panic in ipv6 on old NFS sockets from destroyed network namespace
+To: Josef Bacik <josef@toxicpanda.com>
+Cc: kuba@kernel.org, netdev@vger.kernel.org, linux-nfs@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Running kernel-doc on ieee80211_i.h flagged the following:
-net/mac80211/ieee80211_i.h:145: warning: expecting prototype for enum ieee80211_corrupt_data_flags. Prototype was for enum ieee80211_bss_corrupt_data_flags instead
-net/mac80211/ieee80211_i.h:162: warning: expecting prototype for enum ieee80211_valid_data_flags. Prototype was for enum ieee80211_bss_valid_data_flags instead
+On Thu, Mar 14, 2024 at 10:07=E2=80=AFPM Josef Bacik <josef@toxicpanda.com>=
+ wrote:
+>
+> Hello,
+>
+> We've been hitting the following panic in production, and I've root cause=
+d
+> what's happening, but I'm at a loss on how to fix it.
+>
+> The panic we're seeing is this
+>
+>     BUG: kernel NULL pointer dereference, address: 0000000000000000
+>     RIP: 0010:ip6_pol_route+0x59/0x7a0
+>     Call Trace:
+>      <IRQ>
+>      ? __die+0x78/0xc0
+>      ? page_fault_oops+0x286/0x380
+>      ? fib6_table_lookup+0x95/0xf40
+>      ? exc_page_fault+0x5d/0x110
+>      ? asm_exc_page_fault+0x22/0x30
+>      ? ip6_pol_route+0x59/0x7a0
+>      ? unlink_anon_vmas+0x370/0x370
+>      fib6_rule_lookup+0x56/0x1b0
+>      ? update_blocked_averages+0x2c6/0x6a0
+>      ip6_route_output_flags+0xd2/0x130
+>      ip6_dst_lookup_tail+0x3b/0x220
+>      ip6_dst_lookup_flow+0x2c/0x80
+>      inet6_sk_rebuild_header+0x14c/0x1e0
+>      ? tcp_release_cb+0x150/0x150
+>      __tcp_retransmit_skb+0x68/0x6b0
+>      ? tcp_current_mss+0xca/0x150
+>      ? tcp_release_cb+0x150/0x150
+>      tcp_send_loss_probe+0x8e/0x220
+>      tcp_write_timer+0xbe/0x2d0
+>      run_timer_softirq+0x272/0x840
+>      ? hrtimer_interrupt+0x2c9/0x5f0
+>      ? sched_clock_cpu+0xc/0x170
+>      irq_exit_rcu+0x171/0x330
+>      sysvec_apic_timer_interrupt+0x6d/0x80
+>      </IRQ>
+>      <TASK>
+>      asm_sysvec_apic_timer_interrupt+0x16/0x20
+>     RIP: 0010:cpuidle_enter_state+0xe7/0x243
+>
+> Inspecting the vmcore with drgn you can see why this is a NULL pointer de=
+ref
+>
+>       >>> prog.crashed_thread().stack_trace()[0]
+>       #0 at 0xffffffff810bfa89 (ip6_pol_route+0x59/0x796) in ip6_pol_rout=
+e at net/ipv6/route.c:2212:40
+>
+>       2212        if (net->ipv6.devconf_all->forwarding =3D=3D 0)
+>       2213              strict |=3D RT6_LOOKUP_F_REACHABLE;
+>
+>       >>> prog.crashed_thread().stack_trace()[0]['net'].ipv6.devconf_all
+>       (struct ipv6_devconf *)0x0
+>
+> Looking at the socket you can see that it's been closed
+>
+>       >>> decode_enum_type_flags(prog.crashed_thread().stack_trace()[11][=
+'sk'].__sk_common.skc_flags, prog.type('enum sock_flags'))
+>       'SOCK_DEAD|SOCK_KEEPOPEN|SOCK_ZAPPED|SOCK_USE_WRITE_QUEUE'
+>       >>> decode_enum_type_flags(1 << prog.crashed_thread().stack_trace()=
+[11]['sk'].__sk_common.skc_state.value_(), prog["TCPF_CLOSE"].type_, bit_nu=
+mbers=3DFalse)
+>       'TCPF_FIN_WAIT1'
+>
+> The way this reproduces is with our NFS setup.  We have an NFS mount insi=
+de of a
+> container, which has it's own network namespace.  We setup the mount insi=
+de of
+> this network namespace.
+>
+> On container shutdown sometimes we trigger this panic, it's pretty reliab=
+ly
+> reproduced, with a stress tier of 200 machines I can usually trigger it o=
+n ~10
+> machines by stopping the jobs.
+>
+> My initial thought was that NFS wasn't properly shutting down the sockets=
+, but
+> this doesn't appear to be the case.  The sock is always marked with SOCK_=
+DEAD.
+> My second thought was that we had some pending timers when we call
+> kernel_sock_shutdown(), so I added tcp_clear_xmit_timers(sk); to tcp_shut=
+down()
+> to make sure the timers were cleared.  This didn't fix the issue.
+>
+> I added some debugging to the socket and flagged the socket when NFS call=
+ed
+> kernel_sock_shutdown() and then had a WARN_ON(sock_flag(sk,
+> JOSEFS_SPECIAL_FLAG)) where we arm the timer, and that trips constantly. =
+ So
+> we're definitely arming the sock after NFS has shutdown the socket.
+>
+> This is where we leave my ability to figure out what's going on and how t=
+o fix
+> it.  What seems to be happening is this
+>
+> 1. NFS calls kernel_sock_shutdown() when we unmount.
+> 2. We get an ACK on the socket and the timer gets armed.
+> 3. We shutdown the container and tear down the network namespace.
+> 4. The timer fires and we try to send the loss probe and we panic because=
+ the
+>    network namespace teardown removes the devconf as part of its teardown=
+.
+>
+> It appears to me that sock's will just hang around forever past the end o=
+f an
+> application being done with it, tho I'm not sure if I'm correct in this. =
+ If
+> that's the case then I don't know the correct way to handle this, other t=
+han
+> adding an extra case for the timer to simply not run when SOCK_DEAD is se=
+t.  But
+> this seems to be done on purpose, so seems like that's a bad fix.
+>
+> Let me know if you have debug patches or other information you'd like fro=
+m a
+> vmcore, I have plenty.  Like I said I can reproduce reliably, it does tak=
+e a few
+> hours to deploy a test kernel, but I can have a turn around of about a da=
+y for
+> debug patches.  Thanks,
+>
+> Josef
 
-Fix these warnings.
+  If NFS is using kernel sockets, it is NFS responsibility to remove
+all of them when the netns is destroyed.
 
-Signed-off-by: Jeff Johnson <quic_jjohnson@quicinc.com>
----
- net/mac80211/ieee80211_i.h | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Also look at recent relevant  patches
 
-diff --git a/net/mac80211/ieee80211_i.h b/net/mac80211/ieee80211_i.h
-index b6fead612b66..bd507d6b65e3 100644
---- a/net/mac80211/ieee80211_i.h
-+++ b/net/mac80211/ieee80211_i.h
-@@ -131,7 +131,7 @@ struct ieee80211_bss {
- };
- 
- /**
-- * enum ieee80211_corrupt_data_flags - BSS data corruption flags
-+ * enum ieee80211_bss_corrupt_data_flags - BSS data corruption flags
-  * @IEEE80211_BSS_CORRUPT_BEACON: last beacon frame received was corrupted
-  * @IEEE80211_BSS_CORRUPT_PROBE_RESP: last probe response received was corrupted
-  *
-@@ -144,7 +144,7 @@ enum ieee80211_bss_corrupt_data_flags {
- };
- 
- /**
-- * enum ieee80211_valid_data_flags - BSS valid data flags
-+ * enum ieee80211_bss_valid_data_flags - BSS valid data flags
-  * @IEEE80211_BSS_VALID_WMM: WMM/UAPSD data was gathered from non-corrupt IE
-  * @IEEE80211_BSS_VALID_RATES: Supported rates were gathered from non-corrupt IE
-  * @IEEE80211_BSS_VALID_ERP: ERP flag was gathered from non-corrupt IE
-
----
-base-commit: a368b0a9854ee2a466a55f95c0ce2208e4aaf0b0
-change-id: 20240314-kdoc-ieee80211_i-1a7efe7aa519
-
+2a750d6a5b365265dbda33330a6188547ddb5c24 rds: tcp: Fix use-after-free
+of net in reqsk_timer_handler().
+1c4e97dd2d3c9a3e84f7e26346aa39bc426d3249 tcp: Fix NEW_SYN_RECV
+handling in inet_twsk_purge()
 
