@@ -1,59 +1,72 @@
-Return-Path: <netdev+bounces-79941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7BA387C283
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 19:22:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 89B7C87C2A0
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 19:27:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72B792856BE
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:22:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F04B2855AE
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCC3776408;
-	Thu, 14 Mar 2024 18:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB24A74BFB;
+	Thu, 14 Mar 2024 18:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="akz8x/La"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pcgIDNo6"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9611F763FB;
-	Thu, 14 Mar 2024 18:20:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66FD1A38D0;
+	Thu, 14 Mar 2024 18:27:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710440436; cv=none; b=ONZBHUWSNw/9HuEqz3ApurWa0a/koh7fnePYClQfTBVsyYkbgD6k1TmdmVkCqpy57VwLgn23fyBvz1HBjm8IEbOmEQM9GKgto694oIWUbHv49/hgo77spIhUiMhzXMpDvC2uc6iBqPny/ScQEq2cQcn3eQsm4B8xmbt386YDp3o=
+	t=1710440856; cv=none; b=uEMakciQGoqU96NluZsVAosGoACRx+mI9vMfM7NJeFG+TojDvQYNZhkcWnj03SwKyA0OBW9Ipa+tdsCVqxTrs/acGoVl1s+uDvKIhxLhbKEM3tyxHOafQAqi/WwVl8wpn+NLJfT7UuadOVUOuBZOO76vKf18KoxwXlUrR1DytLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710440436; c=relaxed/simple;
-	bh=cupGIYIVve9aQcafgMSEc6NGWaSioxOEh6ILdwcTumg=;
+	s=arc-20240116; t=1710440856; c=relaxed/simple;
+	bh=wvZQ6EkK3Zr78gZKY6mbHSxOYjMQ/6C07pm5tHfcalc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=llsNK4SDUED15GUwWg7cQzU9NIOrlGKQoVHNbw7EE6ZvPSwGxG0cvMF6iwKejFhkrraQ0XB97R8wdJcNd96wq2WUO0R+p73PJBvkTSls7gflHM+BNkjntoarHnWLfWZWjPJ07jZf1s7XtfkNnSDGxd6pq/libJ08Xh8xMKbGrWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=akz8x/La; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14720C433B1;
-	Thu, 14 Mar 2024 18:20:36 +0000 (UTC)
+	 MIME-Version:Content-Type; b=PPG6gHrMruWzQSGGUi2CRrahFsAQjZChMQUDwgvtCpIRtmSZ6DfWFhzJ4BUViennWyiRskm9HBiAwVsCwCJfkGax/xMHEyJM309smc7JfhqW2K//wFBo+02pMZTFneYCgg2ujxD4KmYJxSNWte8thVXU3pv/Xa/xbIL4HsY6J/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pcgIDNo6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FD3CC433C7;
+	Thu, 14 Mar 2024 18:27:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710440436;
-	bh=cupGIYIVve9aQcafgMSEc6NGWaSioxOEh6ILdwcTumg=;
+	s=k20201202; t=1710440856;
+	bh=wvZQ6EkK3Zr78gZKY6mbHSxOYjMQ/6C07pm5tHfcalc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=akz8x/Lar3H1CIuFLysuBt+sFcBVNNbwj9qZTm3q+vr1Jgr4IV13w/rgnQEg3u+/6
-	 aFryOQ7vKxOvd92pW7HrNhZCbWRRtyRAsZwj6aMqLnv7ucZ1uPrvxd7oJAOScrJmQL
-	 p8x1ABJnYMo/Z4iHAUDfZIejw9R0yYi27Pmoqj2z479pVxGg9EmIrIabJr46FO9QCq
-	 z+gvtBjfwJJ15PSKTT2GBP66UX5gOb2EMumQ8+3RD4a2QMy2PvZ/MTuDD4dX+rbLVP
-	 lz53/QeHjfSMuXSzoEFfo9flZInXQiQInwYGKw/esevv4JfHvBlVYERiuF5pvOj/qJ
-	 XmxvuSayZvdvQ==
-Date: Thu, 14 Mar 2024 11:20:35 -0700
+	b=pcgIDNo6+Jx9g1FVdyq37yqerQyrpShtUOjQ9n27jtT7YMvFQeCuV1qZCgb3XcWQK
+	 Q/v3tSCHmPIW56Zim33p+Env+4YdDQ5ztgPOHSZblgNt+Rv3GNKuzlRGtbcyC6jgj4
+	 /af/RGyDWDWZirAiycP/RBEe58UHQvEe45XUragt5UhSnnTk3kM0COQ25ickIbMGkP
+	 EGQ5Mq8rpuCWU09X2cKeOeJiuTCSnT6SdndVccRrpIm9eGM15t5TpZmzKZ8ANms1Om
+	 3nW5JwaAM1NxFDPdn05JGGb0VsDv2KFc3PU+Z+qi0kPracqutTqUlTyvdwEtCHres0
+	 BA13Ud52d9jNA==
+Date: Thu, 14 Mar 2024 11:27:34 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Leone Fernando <leone4fernando@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- dsahern@kernel.org, willemb@google.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/4] net: dst_cache: add input_dst_cache API
-Message-ID: <20240314112035.69dbcd20@kernel.org>
-In-Reply-To: <b90d127a-ec5a-4c24-8ddf-4c592dae28f1@gmail.com>
-References: <20240307171202.232684-1-leone4fernando@gmail.com>
-	<20240307171202.232684-3-leone4fernando@gmail.com>
-	<20240308195529.57b1a4fa@kernel.org>
-	<b90d127a-ec5a-4c24-8ddf-4c592dae28f1@gmail.com>
+To: Shradha Gupta <shradhagupta@linux.microsoft.com>
+Cc: Haiyang Zhang <haiyangz@microsoft.com>, Shradha Gupta
+ <shradhagupta@microsoft.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
+ <linux-hyperv@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+ <linux-rdma@vger.kernel.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Ajay Sharma <sharmaajay@microsoft.com>, Leon
+ Romanovsky <leon@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, KY Srinivasan
+ <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, Long Li <longli@microsoft.com>, Michael Kelley
+ <mikelley@microsoft.com>
+Subject: Re: [PATCH] net :mana : Add per-cpu stats for MANA device
+Message-ID: <20240314112734.5f1c9f7e@kernel.org>
+In-Reply-To: <20240314025720.GA13853@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1709823132-22411-1-git-send-email-shradhagupta@linux.microsoft.com>
+	<20240307072923.6cc8a2ba@kernel.org>
+	<DM6PR21MB14817597567C638DEF020FE3CA202@DM6PR21MB1481.namprd21.prod.outlook.com>
+	<20240307090145.2fc7aa2e@kernel.org>
+	<CH2PR21MB1480D3ACADFFD2FC3B1BB7ECCA272@CH2PR21MB1480.namprd21.prod.outlook.com>
+	<20240308112244.391b3779@kernel.org>
+	<20240311041950.GA19647@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	<20240314025720.GA13853@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,10 +76,39 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 14 Mar 2024 15:04:02 +0100 Leone Fernando wrote:
-> Thanks Jakub. I'll fix it and submit a v2.
-> What do you think about the patch in general?
+On Wed, 13 Mar 2024 19:57:20 -0700 Shradha Gupta wrote:
+> Default interrupts affinity for each queue:
+> 
+>  25:          1        103          0    2989138  Hyper-V PCIe MSI 4138200989697-edge      mana_q0@pci:7870:00:00.0
+>  26:          0          1    4005360          0  Hyper-V PCIe MSI 4138200989698-edge      mana_q1@pci:7870:00:00.0
+>  27:          0          0          1    2997584  Hyper-V PCIe MSI 4138200989699-edge      mana_q2@pci:7870:00:00.0
+>  28:    3565461          0          0          1  Hyper-V PCIe MSI 4138200989700-edge      mana_q3
+> @pci:7870:00:00.0
+> 
+> As seen the CPU-queue mapping is not 1:1, Queue 0 and Queue 2 are both mapped 
+> to cpu3. From this knowledge we can figure out the total RX stats processed by
+> each CPU by adding the values of mana_q0 and mana_q2 stats for cpu3. But if
+> this data changes dynamically using irqbalance or smp_affinity file edits, the
+> above assumption fails. 
+> 
+> Interrupt affinity for mana_q2 changes and the affinity table looks as follows
+>  25:          1        103          0    3038084  Hyper-V PCIe MSI 4138200989697-edge      mana_q0@pci:7870:00:00.0
+>  26:          0          1    4012447          0  Hyper-V PCIe MSI 4138200989698-edge      mana_q1@pci:7870:00:00.0
+>  27:     157181         10          1    3007990  Hyper-V PCIe MSI 4138200989699-edge      mana_q2@pci:7870:00:00.0
+>  28:    3593858          0          0          1  Hyper-V PCIe MSI 4138200989700-edge      mana_q3@pci:7870:00:00.0 
+> 
+> And during this time we might end up calculating the per-CPU stats incorrectly,
+> messing up the understanding of CPU usage by MANA driver that is consumed by 
+> monitoring services. 
 
-Dunno.. it's a bit hard to judge how much benefit we'd get
-in real life scenarios. But I'm not a routing expert.
+Like Stephen said, forget about irqbalance for networking.
+
+Assume that the IRQs are affinitized and XPS set, correctly.
+
+Now, presumably you can use your pcpu stats to "trade queues",
+e.g. 4 CPUs / 4 queues, if CPU 0 insists on using queue 1
+instead of queue 0, you can swap the 0 <> 1 assignment.
+That's just an example of an "algorithm", maybe you have other
+use cases. But if the problem is "user runs broken irqbalance"
+the solution is not in the kernel...
 
