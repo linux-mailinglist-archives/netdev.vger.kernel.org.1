@@ -1,89 +1,89 @@
-Return-Path: <netdev+bounces-79871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B35B487BCF7
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 13:46:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82B4287BCFC
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 13:48:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19F451F21F90
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:46:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A54FD1C20CD2
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:48:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02D458AB4;
-	Thu, 14 Mar 2024 12:46:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB5858AA7;
+	Thu, 14 Mar 2024 12:48:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bVPGyPfW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gAVW0sSQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FEBE5810D
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 12:46:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13BB74D9ED
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 12:48:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710420369; cv=none; b=Drjq74zzwwy5keF1wLMAzvU6UP/TVQK69pKFGfzb7IoaeCWIOcohrL3X2MeO9NhxHp5tXbV5P0pdvsu2TG52dQnTNZ9BxojkC/xHh6VleDBcTpHijhb6s854Ec6CKWJu9Sg4W06sueVU51rIjjQVZvniFu/ggxzhNm2vDEoX/rQ=
+	t=1710420488; cv=none; b=oAr8eLb62Et3VvlxY76gopQdeV+/2laUtCRdPD4L3d/8ygdSJtnsdO6/d3ajoe0NakawpahsZbDd3r0sv8KeJ7fq5p5tJ2BHUxwhqPBZeN40pUe/wIQRx4ULiGxwX9HylLaEWt4sYrIB7usuYpAkDW1c63TMkN1lxBXIDWdqmck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710420369; c=relaxed/simple;
-	bh=2u/MtyPUOuwJV9gWG4DIkvMCxw0gFRHn9F3Oqc19+1g=;
+	s=arc-20240116; t=1710420488; c=relaxed/simple;
+	bh=KI/C5nDqFAm+WQg5YcNuTy5wVj5/EmHvsqDZ4sMKIS8=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=LFhwHJzjMi/i2V2xGFOQkNliLg0BY4DRvy3c6HkpOkANfI0aeZ5JqaRk1qgWq7dSkV/FTgbiOfB+tq+TSvyD7NdnPCrGWOs26ZoR3Lla+mHJPVRRjT9abOZSdO3wm/Yk5xvIgWquhbUZdHLK06XT4rEwhDVsDa4d55bYl7/JjJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bVPGyPfW; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:MIME-Version; b=eLNsChx662JkOs7xFSPKgUDvNr78u94LFyVIpZTYuXiOvTYf4W3mAaVkAtd+0IQNa6F2Zjatvu7unQFnu8nfdDvJm6+a51gCmapkyQbGDbQbpMLaq1aV2BvdHAuMNe1OH29jK2ynMlk+u9oclntVYvaR3KpVfcBB1VadSbhAYJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gAVW0sSQ; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710420366;
+	s=mimecast20190719; t=1710420486;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=2u/MtyPUOuwJV9gWG4DIkvMCxw0gFRHn9F3Oqc19+1g=;
-	b=bVPGyPfWk27C+MQ8L7qae0IN3JUhWzzxBqlJgAjnxLqvNOm2SuckbvfGNFjR3zENxmQVbX
-	Ve/MaTMI630rPpZxlyXG3JyHY0Q5RVLINa8F+MAkl6jnhbW+CFfU1/Rv012wpOWmVWEgPG
-	WNaIpyt2x66NZQpJoMxXVEQ8W9xFx+M=
+	bh=KI/C5nDqFAm+WQg5YcNuTy5wVj5/EmHvsqDZ4sMKIS8=;
+	b=gAVW0sSQqpr6HeRYRwadwQneltId32AA3dgmV4CFSSwqAuO0bAlqtmxPoyR5BvkD/TEXSa
+	M1kUaCHQ2EJUqSyEuFF9WQo2sZUWsOhs+ASysceOUlYL4twHidVMcPu0VkuY+JTeK6Pl53
+	KQangGrOdWq6PijigmKsHnEpb6EHvVw=
 Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
  [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-45-YWCW9D0_P4eZ86wwWQmuLg-1; Thu, 14 Mar 2024 08:46:04 -0400
-X-MC-Unique: YWCW9D0_P4eZ86wwWQmuLg-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33ec826d427so125983f8f.0
-        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 05:46:04 -0700 (PDT)
+ us-mta-29-hPPuWm_-NnKlG0FoBB2oBg-1; Thu, 14 Mar 2024 08:48:03 -0400
+X-MC-Unique: hPPuWm_-NnKlG0FoBB2oBg-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33e8983205aso150320f8f.1
+        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 05:48:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710420363; x=1711025163;
+        d=1e100.net; s=20230601; t=1710420483; x=1711025283;
         h=mime-version:user-agent:content-transfer-encoding:autocrypt
          :references:in-reply-to:date:cc:to:from:subject:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2u/MtyPUOuwJV9gWG4DIkvMCxw0gFRHn9F3Oqc19+1g=;
-        b=lLkvTqv2FnEQEflQVndqEuaUBHKxNhY2kPd1VYn+uCUIAiGr0n6YcNdty/y8EbxSsp
-         ofUmca+sb2uewUf55tH/KrMQ4GP/cjo55ecm8//vBJVi/uESjWeTkniTrpEn2n/ifvKw
-         gQKIDJpNDTxuxN/3KRqI4YvQ9nhYWWT9MTTYZ+QR/i6tzG3cQWPPZT1/MQug1RBav9Dl
-         chbAy3NqR9rxTcOXtLj9gmArslOdr4bGG+LlF5/XpHjRnUj1vJUcPte573CxOSyPoGXR
-         SXGUKLxV3fbt4POf9s0DHBIgFD48lIMjyyYDrIMfzlr5jo5HzLe0bhtwkJPEEMl6orVw
-         LYUA==
-X-Forwarded-Encrypted: i=1; AJvYcCXseVG452jimSW/hlO+l6D9Q4T6pOOrwLTWW+DmygMqR0aQUeMlf1ZpwJjhTqaaa29K2DtiKqoT8MyMVC9vcOOysWTDbb56
-X-Gm-Message-State: AOJu0YyPaDveFC+IEqWNFE19Vhkzp7HaKJTcHLD21OWzBcuw9XBsjKFx
-	FlTTQ3crXCMqx2JteA+as9YAGXyHzquyrxeClI4B/UFoLP6fQkOR/xOgqe/M8q4hzMFssorYXFn
-	3cOnNLS8sRxlWL6BR3VMmUcFORGgvxd9cxBTKzzsMMqQTl5+ZMbb2iw==
-X-Received: by 2002:adf:a34d:0:b0:33e:1f2e:bdde with SMTP id d13-20020adfa34d000000b0033e1f2ebddemr1109722wrb.3.1710420363504;
-        Thu, 14 Mar 2024 05:46:03 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEgL1cdkWxEpa3yx6JeKY0EXVo9XQOQzRnWJGB/Vf6kZuP5ocz59FK0YRgB3P1+C1ahsYQWtA==
-X-Received: by 2002:adf:a34d:0:b0:33e:1f2e:bdde with SMTP id d13-20020adfa34d000000b0033e1f2ebddemr1109701wrb.3.1710420363143;
-        Thu, 14 Mar 2024 05:46:03 -0700 (PDT)
+        bh=KI/C5nDqFAm+WQg5YcNuTy5wVj5/EmHvsqDZ4sMKIS8=;
+        b=iQrFrvAyY8vIwWDltSqSdyBdf2m4VCAdh8qnPYGHCRypZFG5R7oU7Y1aF9LttjEB/b
+         xz9Pdeb10jZqHtsFyvV/VetKvp/OESghUt38PT34C06s2AVB1aF25895D7lTwpluTvBf
+         rvBabDBY8JtiJ6i4eCLh1Af8qrpEQZL6r/d/UeqVVzXijNdX93kffpA8kNZp4rK6Kdlo
+         lGaOewV6yvozF97E829pZgKWFFAm4BUFeJeA8vAqx5XHYxVEFUsrQ9cetIgCrO16suDN
+         89PR37zHyUKsFRTL1dB/2aMQA99ZecI+aQEckGUpFFEATS/WKZRYBQk2aNBcXcZprahv
+         7QRg==
+X-Forwarded-Encrypted: i=1; AJvYcCWLc2B3ZMkKANmzsWQ822CZfH0JfJzHl3lG4xmaTcIQrVaBX+bmMb7a7lKaIDHuK7NIHVg727AYyRsK9/fgO8VSp/mGOLN3
+X-Gm-Message-State: AOJu0YwZAf5CXCZzorguzgC2DqV/7iJw7ABZt/jT18fBgvfF1o0fGHZ+
+	esj+VcsZ3NYKoiJkTB05Ygy3cEGcbpioOwBcMk4h/KC3wZ6nKRdHlp/ckAUpuc3WJlz9dDMZebn
+	C3JyLgkHm2As5aa9q1OqOx4x9vAl3eM58iovp8D7On2+tdiQJxC1G/g==
+X-Received: by 2002:adf:f28f:0:b0:33e:7132:7994 with SMTP id k15-20020adff28f000000b0033e71327994mr1018633wro.2.1710420482788;
+        Thu, 14 Mar 2024 05:48:02 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEjK81fcaFYkisBz2ix8oUMtLRu495xVfkU3GpCSPWETyFggRX9ip6GLIFWFVFa197cb7lrfQ==
+X-Received: by 2002:adf:f28f:0:b0:33e:7132:7994 with SMTP id k15-20020adff28f000000b0033e71327994mr1018619wro.2.1710420482414;
+        Thu, 14 Mar 2024 05:48:02 -0700 (PDT)
 Received: from gerbillo.redhat.com (146-241-230-217.dyn.eolo.it. [146.241.230.217])
-        by smtp.gmail.com with ESMTPSA id v18-20020adfe4d2000000b0033ec9936909sm687559wrm.39.2024.03.14.05.46.02
+        by smtp.gmail.com with ESMTPSA id z18-20020adfec92000000b0033e7de97214sm692269wrn.40.2024.03.14.05.48.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Mar 2024 05:46:02 -0700 (PDT)
-Message-ID: <24a7051fdcd1f156c3704bca39e4b3c41dfc7c4b.camel@redhat.com>
-Subject: Re: [PATCH] net: txgbe: fix clk_name exceed MAX_DEV_ID limits
+        Thu, 14 Mar 2024 05:48:02 -0700 (PDT)
+Message-ID: <d4a698b0deafac0aaed6f357c7768cfdcdc6f766.camel@redhat.com>
+Subject: Re: [PATCH] netpoll: support sending over raw IP interfaces
 From: Paolo Abeni <pabeni@redhat.com>
-To: kuba@kernel.org, Ido Schimmel <idosch@nvidia.com>
-Cc: Duanqiang Wen <duanqiangwen@net-swift.com>, netdev@vger.kernel.org, 
-	mengyuanlou@net-swift.com, davem@davemloft.net, edumazet@google.com, 
-	maciej.fijalkowski@intel.com, andrew@lunn.ch, wangxiongfeng2@huawei.com, 
-	linux-kernel@vger.kernel.org
-Date: Thu, 14 Mar 2024 13:46:01 +0100
-In-Reply-To: <20240313080634.459523-1-duanqiangwen@net-swift.com>
-References: <20240313080634.459523-1-duanqiangwen@net-swift.com>
+To: Mark Cilissen <mark@yotsuba.nl>, netdev@vger.kernel.org
+Cc: Hans de Goede <hdegoede@redhat.com>, Eric Dumazet <edumazet@google.com>,
+  Jakub Kicinski <kuba@kernel.org>, Breno Leitao <leitao@debian.org>, Ingo
+ Molnar <mingo@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+ linux-kernel@vger.kernel.org
+Date: Thu, 14 Mar 2024 13:48:00 +0100
+In-Reply-To: <20240313124613.51399-1-mark@yotsuba.nl>
+References: <20240313124613.51399-1-mark@yotsuba.nl>
 Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
@@ -98,26 +98,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 
-On Wed, 2024-03-13 at 16:06 +0800, Duanqiang Wen wrote:
-> txgbe register clk which name is i2c_designware.pci_dev_id(),
-> clk_name will be stored in clk_lookup_alloc. If PCIe bus number
-> is larger than 0x39, clk_name size will be larger than 20 bytes.
-> It exceeds clk_lookup_alloc MAX_DEV_ID limits. So the driver
-> shortened clk_name.
+On Wed, 2024-03-13 at 13:46 +0100, Mark Cilissen wrote:
+> Currently, netpoll only supports interfaces with an ethernet-compatible
+> link layer. Certain interfaces like SLIP do not have a link layer
+> on the network interface level at all and expect raw IP packets,
+> and could benefit from being supported by netpoll.
 >=20
-> Fixes: b63f20485e43 ("net: txgbe: Register fixed rate clock")
-> Signed-off-by: Duanqiang Wen <duanqiangwen@net-swift.com>
+> This commit adds support for such interfaces by using the network device'=
+s
+> `hard_header_len` field as an indication that no link layer is present.
+> If that is the case we simply skip adding the ethernet header, causing
+> a raw IP packet to be sent over the interface. This has been confirmed
+> to add netconsole support to at least SLIP and WireGuard interfaces.
+>=20
+> Signed-off-by: Mark Cilissen <mark@yotsuba.nl>
 
-Unrelated to this patch, but more related to the self-test burst this
-patch landed into: it looks like that since roughly the net-next PR was
-merged back forwarding debug variant of the vxlan-bridge-1q-ipv6-sh and
-vxlan-bridge-1d-port-8472-ipv6-sh tests become less stable.
+## Form letter - net-next-closed
 
-IDK if that was due to some glitch in the AWS hosts or what else. Just
-an head-up.
+The merge window for v6.9 has begun and we have already posted our pull
+request. Therefore net-next is closed for new drivers, features, code
+refactoring and optimizations. We are currently accepting bug fixes
+only.
 
-Cheers,
+Please repost when net-next reopens after March 25th.
 
-Paolo
+RFC patches sent for review only are obviously welcome at any time.
+
+See:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#develop=
+ment-cycle
+
+--
+pw-bot: defer
 
 
