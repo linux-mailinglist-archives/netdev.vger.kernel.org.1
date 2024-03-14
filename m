@@ -1,95 +1,101 @@
-Return-Path: <netdev+bounces-79838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4A8A87BB41
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:30:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4666B87BB5E
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:35:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A7921F21E9C
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 10:30:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D35AA1F217A8
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 10:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC6F037155;
-	Thu, 14 Mar 2024 10:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00A115A0F9;
+	Thu, 14 Mar 2024 10:35:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GFQGiysg"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="r+HbErt/";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Zo7EGD0L"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87CD2CA4
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 10:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1D15A0F8
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 10:35:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710412229; cv=none; b=BSAggwQtVsM5KxqtZa4a+T4UTecTShae5oLqzrmu1cZ34Gf/gsKhoPO3cgBI+r9dmVznxOfmAUK8O6er4U4M816z7kj5u/WG13b2soKqr7eb849778/sa9TSy3VPxNebnvIeLd3xhJXEt8xryUUpdW0UpMPduSNy9/iwHUAW5+s=
+	t=1710412549; cv=none; b=Vz5zDBuauw2WzRt1FmiY3jkPhgwr6F+UQ5KkxR3D+ZF6HR3CDhKjV6ZXjcSfvgCedXmW7r2GhdBFXGdxpEGZ3uIzhbQjy7CZXH79WA3RT6m+AEwfqnoAjr2MADiUWz4klScMKOhPpOLp4E5AfPC7OAM/CQb+Aub/y/I4YMvVyqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710412229; c=relaxed/simple;
-	bh=f12IFfXxQ2kcJcyzDaKMCOwKfucld2bvgaX/OKNdro8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=L7MW+DKORCqcXsG2uAYkgqh7vcQg/Hmu4VfBnB/RIuKDLRXqaK0l7gEdUrgIpI/lBBkQx7L4kPGtFUdojN3hO+YNwV2QdrcO1MrSYovj7qZjN5YIxik/XfbHHyHRgkaIpTriFQqDLWiIlOMqQJhpqIu48b8wWp3ivmiCNhA9HNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GFQGiysg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 57EA7C43390;
-	Thu, 14 Mar 2024 10:30:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710412229;
-	bh=f12IFfXxQ2kcJcyzDaKMCOwKfucld2bvgaX/OKNdro8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GFQGiysg7XzJ3DOJLEVMrIGXPM2SJzv+yj2O2nwi4RbqgKnvOsVTns95lhh5Fkmla
-	 NUaBGcYuMcudwhk0Mszplr13FXx2CL1KhO/6bV+ZMgPHXpFNkxyBRduwxtqcsEdinF
-	 cfAzQoELX6SNNaAvwJb0nR1kL0+jeurogfV4AeCTzESDph9RtTy167qYBtCqQ0IdLy
-	 GUjJ1wRJ6QoRzVwpamExLuBRZqcCqsPAj6khznFvciJ5aN2EnvbZleynmLx91btkzd
-	 4o6FliLzsAiihyxKBWGbuphHDrDxYsTIrndTJTu8TUd7OqXhyBnBx8f7CDDBIOS+JU
-	 EVy0o6oZ6Hemw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4C4E6D95055;
-	Thu, 14 Mar 2024 10:30:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1710412549; c=relaxed/simple;
+	bh=QWKX+IhAuTZ7aiXvz7zXh6RN8U1KrMJ2pSNff8V6+Aw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bXtDeLo/+sznTG1Oobd1Wae0oLu6OGIxBH2clZFW4NfO7FG4S2K7SSdccWCrAAEZ09GF8AegLYrBWDeTNxJH6GmbZhXBVw83H4dEY41xtDBOMYnUhhkD+MmiH5bZ73c4v0w8/IX1+qyM0oPVoYeGUtqwxIlqlfsB6yGNePwTyWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=r+HbErt/; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Zo7EGD0L; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Thu, 14 Mar 2024 11:35:45 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1710412546;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0OL4LzRBFl80pfUqgwbmr9DML9X2re08EQDheZVyXs8=;
+	b=r+HbErt/F+5Gy8G53OnnF6CbJ72Yan3ossy7LKaGnU5DkTJ1TgrXsSrb3PMb4m4N7QWmFb
+	dJATEIE8EZdz1VjVVGXcb7TBEps7ycRpDFILGPtiQMd+rv4o8i8MvTEP/WL+Di913oDGIx
+	RHUggNgw9XbvWQImP6fOb7ZogmGswHbaWRYwCwCHkAmru2JFsmmqTrcCiOzudfFc1acCH4
+	vKC4MfZslrpTnOumkZETpKYpJBcG84U49TlG2bUdh6PpXKRZlx9pODB5FjhjJQ6OUwcKVl
+	PcgVdUM+M6JwWLkxFsAVMEVz5JjuRx+PRbvE7Wy0mBD8gI9kC9buyh/9KCTn5A==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1710412546;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0OL4LzRBFl80pfUqgwbmr9DML9X2re08EQDheZVyXs8=;
+	b=Zo7EGD0L2JlZp/xDGcf7aSMkWDJGphoZ5Q2pD49k2TQCix70rv5pLjW9tYtuZiCVC4+5v2
+	6H8IpOplKfyWw8Dw==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Kurt Kanzenbach <kurt@linutronix.de>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH iwl-net] igc: Remove stale comment about Tx timestamping
+Message-ID: <20240314103545.Ljj-g-iS@linutronix.de>
+References: <20240313-igc_txts_comment-v1-1-4e8438739323@linutronix.de>
+ <d87f0752-a7ea-45b6-9a79-aac0c6cac882@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net] tcp: Fix refcnt handling in __inet_hash_connect().
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171041222930.21784.1498217095730507058.git-patchwork-notify@kernel.org>
-Date: Thu, 14 Mar 2024 10:30:29 +0000
-References: <20240308201623.65448-1-kuniyu@amazon.com>
-In-Reply-To: <20240308201623.65448-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, joannelkoong@gmail.com,
- kuni1840@gmail.com, netdev@vger.kernel.org,
- syzbot+12c506c1aae251e70449@syzkaller.appspotmail.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <d87f0752-a7ea-45b6-9a79-aac0c6cac882@intel.com>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 8 Mar 2024 12:16:23 -0800 you wrote:
-> syzbot reported a warning in sk_nulls_del_node_init_rcu().
+On 2024-03-14 11:21:38 [+0100], Przemek Kitszel wrote:
+> On 3/13/24 14:03, Kurt Kanzenbach wrote:
+> > The initial igc Tx timestamping implementation used only one register for
+> > retrieving Tx timestamps. Commit 3ed247e78911 ("igc: Add support for
+> > multiple in-flight TX timestamps") added support for utilizing all four of
+> > them e.g., for multiple domain support. Remove the stale comment/FIXME.
+> > 
+> > Fixes: 3ed247e78911 ("igc: Add support for multiple in-flight TX timestamps")
 > 
-> The commit 66b60b0c8c4a ("dccp/tcp: Unhash sk from ehash for tb2 alloc
-> failure after check_estalblished().") tried to fix an issue that an
-> unconnected socket occupies an ehash entry when bhash2 allocation fails.
+> I would remove fixes tag (but keep the mention in commit msg).
+> And I would also target it to iwl-next when the window will open.
 > 
-> In such a case, we need to revert changes done by check_established(),
-> which does not hold refcnt when inserting socket into ehash.
-> 
-> [...]
+> Rationale: it's really not a fix.
 
-Here is the summary with links:
-  - [v1,net] tcp: Fix refcnt handling in __inet_hash_connect().
-    https://git.kernel.org/netdev/net/c/04d9d1fc428a
+It is a fix as it removes something that is not accurate. But it only
+changes a comment so it has not outcome in the binary. I think what you
+mean is that you wish that it will not be backported stable. Still
+people reading the code of a v6.6 kernel might get confused.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Sebastian
 
