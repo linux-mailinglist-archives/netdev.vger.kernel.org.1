@@ -1,166 +1,180 @@
-Return-Path: <netdev+bounces-79847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E25C987BBD1
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:18:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 150B987BBD4
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:20:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9973E283136
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:18:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE2911F23343
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:20:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3CD86EB53;
-	Thu, 14 Mar 2024 11:18:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BC726EB7C;
+	Thu, 14 Mar 2024 11:20:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F11341A80
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 11:18:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 632696E610
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 11:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710415130; cv=none; b=FO4ikwI/Wv9QckyL1e5DUYoGMuQrpogwG7vatRGH5DYrVt0EyA7M96f82MEjyAh2Kjs4H4krONemzCHmuZ0saK/06TSBJ3Kv8+mbAGiebP0BdCHibGVY0HdZK6H4SqU10oL2bEjWOOF5bSaprrYHgDdzlS3hnm1Yzhmk85OeIo4=
+	t=1710415228; cv=none; b=Br2B7502Xqnmi3J6OAqMx0ngpTdJ5hL3fkCxjpL47+kMc4mhXYXwljxMB06ab3xLkEXfRLI+E6/L62LzIlmnB8qRVCRiQSwMB4pECpRSd7gvtqXLrP1ubMGYbh4FynNyNXC0QoCVIYEsqLQ4fA7/CmIOsl9h4/P0w12t/zu/xBU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710415130; c=relaxed/simple;
-	bh=PTGgiiA6/A6UvU9ezCqegelJt5WtNaS/F6VAc2LrNXY=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YMSxeybVNerH2od+/J7fgxOCjhSP1wnorJzPKsVLNJJD9klZS2evzbqABQENxNQniZjTjGu+sUiZP5FYsqyi1WGUHJfV/XIXKdLxBs2VOIukdrcoLhSrK9jy2FhfCoe6A8VRer9MUttALBNpORZFou/vsDl4iH6gKQWk1DX6n6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TwPwS5wP6z1xrD8;
-	Thu, 14 Mar 2024 19:16:56 +0800 (CST)
-Received: from dggpemd100005.china.huawei.com (unknown [7.185.36.102])
-	by mail.maildlp.com (Postfix) with ESMTPS id 3B9D514011F;
-	Thu, 14 Mar 2024 19:18:43 +0800 (CST)
-Received: from localhost.huawei.com (10.137.16.214) by
- dggpemd100005.china.huawei.com (7.185.36.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 14 Mar 2024 19:18:42 +0800
-From: renmingshuai <renmingshuai@huawei.com>
-To: <jhs@mojatatu.com>, <xiyou.wangcong@gmail.com>, <jiri@resnulli.us>,
-	<davem@davemloft.net>, <vladbu@nvidia.com>
-CC: <netdev@vger.kernel.org>, <yanan@huawei.com>, <liaichun@huawei.com>,
-	<caowangbao@huawei.com>, <renmingshuai@huawei.com>
-Subject: [PATCH] net/sched: Forbid assigning mirred action to a filter attached to the egress
-Date: Thu, 14 Mar 2024 19:17:13 +0800
-Message-ID: <20240314111713.5979-1-renmingshuai@huawei.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1710415228; c=relaxed/simple;
+	bh=l2HLYYn4UeEUpgV+L5wQ37S45Vthf/ftyRXt+AAR1fA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=snzk7+6gpzEGrzhhI50NGyrRnLZn6MXJNJD/UiiKiN+o18foUJp507W7elUKfueSGvlJFkbxJjIrI8VNEeYvbBLEw+HiOExe98qsmrH7wZVJDUlqYCiKs3wG9N+Di7xynvNIKSELiHg3YpsW7lFqxja3KFquVDxP74lSAP6bZ8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rkj89-0004J1-22; Thu, 14 Mar 2024 12:20:13 +0100
+Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1rkj87-006Ihj-Ay; Thu, 14 Mar 2024 12:20:11 +0100
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id EE8582A50C4;
+	Thu, 14 Mar 2024 11:20:10 +0000 (UTC)
+Date: Thu, 14 Mar 2024 12:20:10 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Francesco Valla <valla.francesco@gmail.com>
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, fabio@redaril.me, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] Documentation: networking: document CAN ISO-TP
+Message-ID: <20240314-nurture-apricot-d4707bc77a00-mkl@pengutronix.de>
+References: <20240313223445.87170-1-valla.francesco@gmail.com>
+ <20240313223445.87170-2-valla.francesco@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemd100005.china.huawei.com (7.185.36.102)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="23lpoqgne2axyrjj"
+Content-Disposition: inline
+In-Reply-To: <20240313223445.87170-2-valla.francesco@gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-As we all know the mirred action is used to mirroring or redirecting the
-packet it receives. Howerver, add mirred action to a filter attached to
-a egress qdisc might cause a deadlock. To reproduce the problem, perform
-the following steps:
-(1)tc qdisc add dev eth0 root handle 1: htb default 30 \n
-(2)tc filter add dev eth2 protocol ip prio 2 flower verbose \
-     action police rate 100mbit burst 12m conform-exceed jump 1 \
-     / pipe mirred egress redirect dev eth2 action drop
 
-The stack is show as below:
-[28848.883915]  _raw_spin_lock+0x1e/0x30
-[28848.884367]  __dev_queue_xmit+0x160/0x850
-[28848.884851]  ? 0xffffffffc031906a
-[28848.885279]  tcf_mirred_act+0x3ab/0x596 [act_mirred]
-[28848.885863]  tcf_action_exec.part.0+0x88/0x130
-[28848.886401]  fl_classify+0x1ca/0x1e0 [cls_flower]
-[28848.886970]  ? dequeue_entity+0x145/0x9e0
-[28848.887464]  ? newidle_balance+0x23f/0x2f0
-[28848.887973]  ? nft_lookup_eval+0x57/0x170 [nf_tables]
-[28848.888566]  ? nft_do_chain+0xef/0x430 [nf_tables]
-[28848.889137]  ? __flush_work.isra.0+0x35/0x80
-[28848.889657]  ? nf_ct_get_tuple+0x1cf/0x210 [nf_conntrack]
-[28848.890293]  ? do_select+0x637/0x870
-[28848.890735]  tcf_classify+0x52/0xf0
-[28848.891177]  htb_classify+0x9d/0x1c0 [sch_htb]
-[28848.891722]  htb_enqueue+0x3a/0x1c0 [sch_htb]
-[28848.892251]  __dev_queue_xmit+0x2d8/0x850
-[28848.892738]  ? nf_hook_slow+0x3c/0xb0
-[28848.893198]  ip_finish_output2+0x272/0x580
-[28848.893692]  __ip_queue_xmit+0x193/0x420
-[28848.894179]  __tcp_transmit_skb+0x8cc/0x970
+--23lpoqgne2axyrjj
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-In this case, the process has hold the qdisc spin lock in __dev_queue_xmit
-before the egress packets are mirred, and it will attempt to obtain the
-spin lock again after packets are mirred, which cause a deadlock.
+Hello Francesco,
 
-Fix the issue by forbidding assigning mirred action to a filter attached
-to the egress.
+thanks for your contribution! I've some remarks to make it a valid rst
+file.
 
-Signed-off-by: Mingshuai Ren <renmingshuai@huawei.com>
----
- net/sched/act_mirred.c                        |  4 +++
- .../tc-testing/tc-tests/actions/mirred.json   | 32 +++++++++++++++++++
- 2 files changed, 36 insertions(+)
+On 13.03.2024 23:34:31, Francesco Valla wrote:
+> Document basic concepts, APIs and behaviour of the CAN ISO-TP (ISO
+> 15765-2) stack.
+>=20
+> Signed-off-by: Francesco Valla <valla.francesco@gmail.com>
+> ---
+>  Documentation/networking/index.rst |   1 +
+>  Documentation/networking/isotp.rst | 347 +++++++++++++++++++++++++++++
+>  2 files changed, 348 insertions(+)
+>  create mode 100644 Documentation/networking/isotp.rst
+>=20
+> diff --git a/Documentation/networking/index.rst b/Documentation/networkin=
+g/index.rst
+> index 473d72c36d61..ba22acfae389 100644
+> --- a/Documentation/networking/index.rst
+> +++ b/Documentation/networking/index.rst
+> @@ -19,6 +19,7 @@ Contents:
+>     caif/index
+>     ethtool-netlink
+>     ieee802154
+> +   isotp
+>     j1939
+>     kapi
+>     msg_zerocopy
+> diff --git a/Documentation/networking/isotp.rst b/Documentation/networkin=
+g/isotp.rst
+> new file mode 100644
+> index 000000000000..d0c49fd1f5c9
+> --- /dev/null
+> +++ b/Documentation/networking/isotp.rst
+> @@ -0,0 +1,347 @@
+> +.. SPDX-License-Identifier: (GPL-2.0 OR BSD-3-Clause)
+> +
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> +ISO-TP (ISO 15765-2) Transport Protocol
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
 
-diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-index 5b3814365924..fc96705285fb 100644
---- a/net/sched/act_mirred.c
-+++ b/net/sched/act_mirred.c
-@@ -120,6 +120,10 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
- 		NL_SET_ERR_MSG_MOD(extack, "Mirred requires attributes to be passed");
- 		return -EINVAL;
- 	}
-+	if (tp->chain->block->q->parent != TC_H_INGRESS) {
-+		NL_SET_ERR_MSG_MOD(extack, "Mirred can only be assigned to the filter attached to ingress");
-+		return -EINVAL;
-+	}
- 	ret = nla_parse_nested_deprecated(tb, TCA_MIRRED_MAX, nla,
- 					  mirred_policy, extack);
- 	if (ret < 0)
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
-index b73bd255ea36..50c6153bf34c 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
-@@ -1052,5 +1052,37 @@
-             "$TC qdisc del dev $DEV1 ingress_block 21 clsact",
-             "$TC actions flush action mirred"
-         ]
-+    },
-+    {
-+        "id": "fdda",
-+        "name": "Add mirred mirror to the filter which attached to engress",
-+        "category": [
-+            "actions",
-+            "mirred"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            [
-+                "$TC actions flush action mirred",
-+                0,
-+                1,
-+                255
-+            ],
-+            [
-+                "$TC qdisc add dev $DEV1 root handle 1: htb default 1",
-+                0
-+            ]
-+        ],
-+        "cmdUnderTest": "$TC filter add dev $DEV1 protocol ip u32 match ip protocol 1 0xff action mirred egress mirror dev $DEV1",
-+        "expExitCode": "2",
-+        "verifyCmd": "$TC action list action mirred",
-+        "matchPattern": "^[ \t]+index [0-9]+ ref",
-+        "matchCount": "0",
-+        "teardown": [
-+            "$TC qdisc del dev $DEV1 root handle 1: htb default 1",
-+            "$TC actions flush action mirred"
-+        ]
-     }
- ]
--- 
-2.33.0
+Please make the "=3D" as long as the text it encloses.
 
+> +
+> +Overview
+> +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+
+Same here
+
+[...]
+
+> +Reception stmin
+> +~~~~~~~~~~~~~~~
+> +
+> +The reception minimum separaton time (stmin) can be forced using the
+> +``CAN_ISOTP_RX_STMIN`` optname and providing an stmin value in microseco=
+nds as
+> +a 32bit unsigned integer; received Consecutive Frames (CF) which timesta=
+mps
+> +differ less than this value will be ignored:
+> +
+> +.. code-block:: C
+> +
+> +    uint32_t stmin;
+> +    ret =3D setsockopt(s, SOL_CAN_ISOTP, CAN_ISOTP_RX_STMIN, &stmin, siz=
+eof(stmin));
+> +
+> +Multi-frame transport support
+> +--------------------------
+
+same here
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--23lpoqgne2axyrjj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmXy3WcACgkQKDiiPnot
+vG8lzQgAjaKShUuD1SFxYlmma7i0p2rGshpvscLbncWKuBmBQN65xPJAYZ7JOFzC
+szKLUoekrIZmvAu519OYEq9uEqAwPg2SLtgjferHxwSLs3h+ovhyvlrXkYVDXuor
+vwXpM362eJOIGf8b/LkqkMtrTPmwvZ2QLewJbyf8MUVpCYlYjfkrywZS701hvdok
+RetPkO0jKVV5x9+5KJ4F3APspGgZ/rXikZhV2XBMxTshg0OeS1o/+iiZIF1YspYB
+xCgS1UmVtx/8nrJeAIwWd3DFOffbccWDM87hj4+egf2uIuBFe/91CxGsGavgpzBB
++qKs9Fw+bAslSu+U0wZ7a/QQUpEUmA==
+=K/bN
+-----END PGP SIGNATURE-----
+
+--23lpoqgne2axyrjj--
 
