@@ -1,96 +1,131 @@
-Return-Path: <netdev+bounces-79803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4E2187B7FE
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 07:36:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1199B87B858
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 08:12:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2C301C22820
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 06:36:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6C5DB2322B
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 07:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A2E62107;
-	Thu, 14 Mar 2024 06:36:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3D806127;
+	Thu, 14 Mar 2024 07:12:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="W7omPnN9"
 X-Original-To: netdev@vger.kernel.org
-Received: from new-mail.astralinux.ru (new-mail.astralinux.ru [51.250.53.244])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71D403D75;
-	Thu, 14 Mar 2024 06:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=51.250.53.244
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B4E17BA2;
+	Thu, 14 Mar 2024 07:12:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710398205; cv=none; b=RSji9eyl0A+wSm+z/4Hf7ufwHmtYFU+o7yeb8wxqUsRi+FpFtgtVmAQwtx2G61bT0YnYfZcaB5+KHKXSSqDGhPu6OG99OrnVtuIhhgmdcpk/mlLiWwj02ev1IAXMEhN18Jf0cWOpqLNUijfbgJ3Jge301huvGmYVMX7PeqNq994=
+	t=1710400328; cv=none; b=PgRjb3YoOwRBn6fC++AAXkX71V+w6nqpj4NtARpUoxgklugEX1gAb/pKCskphmYh5iNASoyLPKrCqOh2bGVpzaqLvM+/BznP6zYsAdy8ea2KCiGSGqpEBYavZT9Dk80LIioUxGwXZxJ959BQukg8LAXYOmSu74qgjnaHCjXNne8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710398205; c=relaxed/simple;
-	bh=zX99hBMYW1SD+MxJv3qVxndLjx1Q1X27Qhmz8T2Gi4Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZnWRLVoRp5CSIQGKH9rY+AZMmwY68SuFN9LvkyCED9puWdqourYA94NH0UvY+hwauZu51vkEsbZgvzINt2zAjWqqoz3hsJ67JKwz9ZP0nWbUzeIh2JtW2ftBz3vFWRD2fajezx7eJW3IObmIrheRHPj5Vh+PfxE2FM7zVvCTVWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru; spf=pass smtp.mailfrom=astralinux.ru; arc=none smtp.client-ip=51.250.53.244
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=astralinux.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=astralinux.ru
-Received: from rbta-msk-lt-302690.astralinux.ru (unknown [10.177.236.129])
-	by new-mail.astralinux.ru (Postfix) with ESMTPA id 4TwHYp3sdBzyQc;
-	Thu, 14 Mar 2024 09:30:22 +0300 (MSK)
-From: Alexandra Diupina <adiupina@astralinux.ru>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Alexandra Diupina <adiupina@astralinux.ru>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sebastian Reichel <sre@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org
-Subject: [PATCH] net: dsa: add return value check of genphy_read_status()
-Date: Thu, 14 Mar 2024 09:30:08 +0300
-Message-Id: <20240314063008.11214-1-adiupina@astralinux.ru>
-X-Mailer: git-send-email 2.30.2
+	s=arc-20240116; t=1710400328; c=relaxed/simple;
+	bh=M9/waeQYtjh2RVYctqjLxomU+TwqqnJNewvELUWzQTk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Ocw3rbXsPAQesjN0gO+uS4VvBzrxLod99z7EunGVSq4McE5a2ZDCTx7zk1seEUt9BXKaCVEITAB+kAXsQY5SkIS/SFfzPNR6or+jSBX+F6XFfat+HSLQR5+zs5SShxSV0TDg1NUf0oiDqm/E1tg2hwLlOu9uZF0lm7QbHtqeW9Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=W7omPnN9; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id F0D26FF803;
+	Thu, 14 Mar 2024 07:12:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1710400324;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=H5VEjuuC5AnU2gJMo8TZ6MI2cdvYkDyizNf/LUfFzY0=;
+	b=W7omPnN9K0mk9NXpTw72bzIAJRdqYDOB4XIotsYwt1WH+u6qMlbVPLpEEZSwvEg4IDpL+7
+	IHFiXNXdg8+0UcUURrxWX5sGoedCEAnUOidpf4on92uFdvTigr6aXeXgl1F/96AULv/dJA
+	SYAGlgYzd7fLLdRQ4IwYv/Cy5K2IbS9qyup091Tge8INdmBbq1IlOTsJ4afqPAkfdN95NS
+	Y/2x1IN9g1IqaU2FYIop4+XeXeoAVnv9cFViYR2HEHYTsP+lTn1n2x3ZLaWCxvMeLa+G4w
+	X3XKQAWsYE/YaiUcD5zq0KbsQdKy26xMnJUIDN/Rn2KmkfoNajoaL+9T4U8FwA==
+Date: Thu, 14 Mar 2024 08:12:00 +0100
+From: Herve Codina <herve.codina@bootlin.com>
+To: Michael Ellerman <mpe@ellerman.id.au>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yury Norov
+ <yury.norov@gmail.com>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, Rasmus Villemoes
+ <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, Andrew Lunn
+ <andrew@lunn.ch>, Mark Brown <broonie@kernel.org>, Ratheesh Kannoth
+ <rkannoth@marvell.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: Re: [PATCH v7 1/5] net: wan: Add support for QMC HDLC
+Message-ID: <20240314081200.5af62fab@bootlin.com>
+In-Reply-To: <87ttl93f7i.fsf@mail.lhotse>
+References: <20240307113909.227375-1-herve.codina@bootlin.com>
+	<20240307113909.227375-2-herve.codina@bootlin.com>
+	<87ttl93f7i.fsf@mail.lhotse>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-DrWeb-SpamScore: -100
-X-DrWeb-SpamState: legit
-X-DrWeb-SpamDetail: gggruggvucftvghtrhhoucdtuddrgedvfedrvdehuddgtddvucetufdoteggodetrfcurfhrohhfihhlvgemucfftfghgfeunecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeetlhgvgigrnhgurhgrucffihhuphhinhgruceorgguihhuphhinhgrsegrshhtrhgrlhhinhhugidrrhhuqeenucggtffrrghtthgvrhhnpeduleetfeehffekueeuffektefgudfgffeutdefudfghedvieffheehleeuieehteenucffohhmrghinheplhhinhhugihtvghsthhinhhgrdhorhhgnecukfhppedutddrudejjedrvdefiedruddvleenucfrrghrrghmpehhvghloheprhgsthgrqdhmshhkqdhlthdqfedtvdeiledtrdgrshhtrhgrlhhinhhugidrrhhupdhinhgvthepuddtrddujeejrddvfeeirdduvdelmeehudejgeekpdhmrghilhhfrhhomheprgguihhuphhinhgrsegrshhtrhgrlhhinhhugidrrhhupdhnsggprhgtphhtthhopeduvddprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegrughiuhhpihhnrgesrghsthhrrghlihhnuhigrdhruhdprhgtphhtthhopehfrdhfrghinhgvlhhlihesghhmrghilhdrtghomhdprhgtphhtthhopeholhhtvggrnhhvsehgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnh
- gvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepshhrvgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhvtgdqphhrohhjvggttheslhhinhhugihtvghsthhinhhgrdhorhhg
-X-DrWeb-SpamVersion: Vade Retro 01.423.251#02 AS+AV+AP Profile: DRWEB; Bailout: 300
-X-AntiVirus: Checked by Dr.Web [MailD: 11.1.19.2307031128, SE: 11.1.12.2210241838, Core engine: 7.00.62.01180, Virus records: 12498327, Updated: 2024-Mar-14 04:41:39 UTC]
+X-GND-Sasl: herve.codina@bootlin.com
 
-Need to check return value of genphy_read_status(),
-because higher in the call hierarchy is the
-dsa_register_switch() function,
-which is used in various drivers.
+Hi Michael,
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+On Thu, 14 Mar 2024 10:05:37 +1100
+Michael Ellerman <mpe@ellerman.id.au> wrote:
 
-Fixes: 33615367f378 ("net: dsa: Support internal phy on 'cpu' port")
-Signed-off-by: Alexandra Diupina <adiupina@astralinux.ru>
----
- net/dsa/port.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+> Hi Herve,
+> 
+> Herve Codina <herve.codina@bootlin.com> writes:
+...
+> This breaks when building as a module (eg. ppc32_allmodconfig):
+> 
+>   In file included from ../include/linux/device/driver.h:21,
+>                    from ../include/linux/device.h:32,
+>                    from ../include/linux/dma-mapping.h:8,
+>                    from ../drivers/net/wan/fsl_qmc_hdlc.c:13:
+>   ../drivers/net/wan/fsl_qmc_hdlc.c:405:25: error: ‘qmc_hdlc_driver’ undeclared here (not in a function); did you mean ‘qmc_hdlc_probe’?
+>     405 | MODULE_DEVICE_TABLE(of, qmc_hdlc_driver);
+>         |                         ^~~~~~~~~~~~~~~
+> 
+> 
+> IIUIC it should be pointing to the table, not the driver, so:
+> 
+> diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hdlc.c
+> index 5fd7ed325f5b..705c3681fb92 100644
+> --- a/drivers/net/wan/fsl_qmc_hdlc.c
+> +++ b/drivers/net/wan/fsl_qmc_hdlc.c
+> @@ -402,7 +402,7 @@ static const struct of_device_id qmc_hdlc_id_table[] = {
+>         { .compatible = "fsl,qmc-hdlc" },
+>         {} /* sentinel */
+>  };
+> -MODULE_DEVICE_TABLE(of, qmc_hdlc_driver);
+> +MODULE_DEVICE_TABLE(of, qmc_hdlc_id_table);
+> 
+>  static struct platform_driver qmc_hdlc_driver = {
+>         .driver = {
+> 
+> 
+> Which then builds correctly.
 
-diff --git a/net/dsa/port.c b/net/dsa/port.c
-index c42dac87671b..c411f30bb5f6 100644
---- a/net/dsa/port.c
-+++ b/net/dsa/port.c
-@@ -1765,7 +1765,9 @@ static int dsa_shared_port_fixed_link_register_of(struct dsa_port *dp)
- 		mode = PHY_INTERFACE_MODE_NA;
- 	phydev->interface = mode;
- 
--	genphy_read_status(phydev);
-+	err = genphy_read_status(phydev);
-+	if (err)
-+		return err;
- 
- 	if (ds->ops->adjust_link)
- 		ds->ops->adjust_link(ds, port, phydev);
+My bad, I missed that one.
+I fully agree with your modification.
+
+Do you want me to make a patch (copy/paste of your proposed modification)
+or do you plan to send the patch on your side ?
+
+Best regards,
+Hervé
+
 -- 
-2.30.2
-
+Hervé Codina, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
