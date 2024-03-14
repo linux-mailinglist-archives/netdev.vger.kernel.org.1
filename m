@@ -1,203 +1,95 @@
-Return-Path: <netdev+bounces-79837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 553CA87BB30
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:23:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4A8A87BB41
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:30:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A7A92843F4
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 10:23:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A7921F21E9C
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 10:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A456E611;
-	Thu, 14 Mar 2024 10:23:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC6F037155;
+	Thu, 14 Mar 2024 10:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="l8x5zZk4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GFQGiysg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7820C6BB37;
-	Thu, 14 Mar 2024 10:23:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C87CD2CA4
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 10:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710411814; cv=none; b=jaG0c94kl0DCf6LLBWn4NVUebOmNPAIGJlFlhq8Ot2LL3M2uJV7V5tCDp+4sfyuklc0Pq2fXi7fCrtQb28ZEh5O4SlG6fTTmvMSH94+KGz7Z7aqVkOeR7+ysIbbgnTY4NBoMqp7ArCgxPXGnW4mkjYfJVosDwwm/1YeJpbnjnfE=
+	t=1710412229; cv=none; b=BSAggwQtVsM5KxqtZa4a+T4UTecTShae5oLqzrmu1cZ34Gf/gsKhoPO3cgBI+r9dmVznxOfmAUK8O6er4U4M816z7kj5u/WG13b2soKqr7eb849778/sa9TSy3VPxNebnvIeLd3xhJXEt8xryUUpdW0UpMPduSNy9/iwHUAW5+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710411814; c=relaxed/simple;
-	bh=5wPDrmN6cu9x1bCdqz8DXqPYL7YSUk8hpryHCstTnFE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ZhiOtYu+ogjp9LJfl8/DXZ8S+pQfgG3rQA3Ttykxp4JGAUW81iyeqKJMHRxQ3Q5jT3JYj/H5/QA/V3FYLB8qYRRKnb5P9FdboxUs5+eOWbL64OwjdLfRgsDJBjCnRr4Tfh1v+r1JtrR3AGEpH4/wMtwJpYbsfsyyDnJ9Dcn3bA4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=l8x5zZk4; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42EA0iog015160;
-	Thu, 14 Mar 2024 10:23:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=DvBNskAxLoqsqCG/2Fpkv5K9t8pITrKn7B68jbgbvJA=;
- b=l8x5zZk4dhZ0LjQxoItFIqEuh/MkekY27DJfHxrQjugLvzTckln7X73nwYLdNXu0+6ec
- zcp1BaeIO6B15I89VZFnP7ZKETn1ennz8qSk1+lWia3mIGCztpA0IiJ/5DPk6Wot6v2E
- 8nm4v1KkvrbV3sdOCVoUDLKxFdGRfrxacxF5f8BkMr5ANGGYUXgdAQvyiabHwHIxWYtH
- Xj9LxD5bd4tNUub2BDpOfQJh8mwidUzjWBiEMG4DmfGNMy1pJoKHhH/FtQdzZiTyuITk
- F/shOlfFu3xAvJ541cQjgitiToO9Y4UL4B3VjMBXmZP3ehkDMO54DY0Z7vWvpfz/xNbg lA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wuxm60rc1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Mar 2024 10:23:21 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42EALrk0005638;
-	Thu, 14 Mar 2024 10:23:20 GMT
-Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3wuxm60rba-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Mar 2024 10:23:20 +0000
-Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42E8DgOL013484;
-	Thu, 14 Mar 2024 10:23:19 GMT
-Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
-	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3ws4akkwdg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Mar 2024 10:23:19 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42EANE1U32768488
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 14 Mar 2024 10:23:16 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0AE7520043;
-	Thu, 14 Mar 2024 10:23:14 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1285B20040;
-	Thu, 14 Mar 2024 10:23:13 +0000 (GMT)
-Received: from [9.171.77.106] (unknown [9.171.77.106])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 14 Mar 2024 10:23:12 +0000 (GMT)
-Message-ID: <caab067b-f5c3-490f-9259-262624c236b4@linux.ibm.com>
-Date: Thu, 14 Mar 2024 11:23:11 +0100
+	s=arc-20240116; t=1710412229; c=relaxed/simple;
+	bh=f12IFfXxQ2kcJcyzDaKMCOwKfucld2bvgaX/OKNdro8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=L7MW+DKORCqcXsG2uAYkgqh7vcQg/Hmu4VfBnB/RIuKDLRXqaK0l7gEdUrgIpI/lBBkQx7L4kPGtFUdojN3hO+YNwV2QdrcO1MrSYovj7qZjN5YIxik/XfbHHyHRgkaIpTriFQqDLWiIlOMqQJhpqIu48b8wWp3ivmiCNhA9HNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GFQGiysg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 57EA7C43390;
+	Thu, 14 Mar 2024 10:30:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710412229;
+	bh=f12IFfXxQ2kcJcyzDaKMCOwKfucld2bvgaX/OKNdro8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=GFQGiysg7XzJ3DOJLEVMrIGXPM2SJzv+yj2O2nwi4RbqgKnvOsVTns95lhh5Fkmla
+	 NUaBGcYuMcudwhk0Mszplr13FXx2CL1KhO/6bV+ZMgPHXpFNkxyBRduwxtqcsEdinF
+	 cfAzQoELX6SNNaAvwJb0nR1kL0+jeurogfV4AeCTzESDph9RtTy167qYBtCqQ0IdLy
+	 GUjJ1wRJ6QoRzVwpamExLuBRZqcCqsPAj6khznFvciJ5aN2EnvbZleynmLx91btkzd
+	 4o6FliLzsAiihyxKBWGbuphHDrDxYsTIrndTJTu8TUd7OqXhyBnBx8f7CDDBIOS+JU
+	 EVy0o6oZ6Hemw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4C4E6D95055;
+	Thu, 14 Mar 2024 10:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 01/11] net/smc: adapt SMC-D device dump for
- Emulated-ISM
-To: Wen Gu <guwen@linux.alibaba.com>, wintera@linux.ibm.com,
-        twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
-        agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com, alibuda@linux.alibaba.com,
-        tonylu@linux.alibaba.com, linux-kernel@vger.kernel.org,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org
-References: <20240312142743.41406-1-guwen@linux.alibaba.com>
- <20240312142743.41406-2-guwen@linux.alibaba.com>
-From: Jan Karcher <jaka@linux.ibm.com>
-Organization: IBM - Network Linux on Z
-In-Reply-To: <20240312142743.41406-2-guwen@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: gbaUvl_hnFnGnA-Ov_FXC1VTTPGNJdyR
-X-Proofpoint-ORIG-GUID: rXYW3pWjXFS85FSH9KC0bLPqfaVQG4Z1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-14_08,2024-03-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
- impostorscore=0 priorityscore=1501 spamscore=0 malwarescore=0
- mlxlogscore=999 bulkscore=0 suspectscore=0 adultscore=0 phishscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2311290000 definitions=main-2403140073
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 net] tcp: Fix refcnt handling in __inet_hash_connect().
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171041222930.21784.1498217095730507058.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Mar 2024 10:30:29 +0000
+References: <20240308201623.65448-1-kuniyu@amazon.com>
+In-Reply-To: <20240308201623.65448-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, joannelkoong@gmail.com,
+ kuni1840@gmail.com, netdev@vger.kernel.org,
+ syzbot+12c506c1aae251e70449@syzkaller.appspotmail.com
 
+Hello:
 
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-On 12/03/2024 15:27, Wen Gu wrote:
-> The introduction of Emulated-ISM requires adaptation of SMC-D device
-> dump. Software implemented non-PCI device (loopback-ism) should be
-> handled correctly and the CHID reserved for Emulated-ISM should be got
-> from smcd_ops interface instead of PCI information.
+On Fri, 8 Mar 2024 12:16:23 -0800 you wrote:
+> syzbot reported a warning in sk_nulls_del_node_init_rcu().
 > 
-> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
-> ---
->   net/smc/smc_ism.c | 13 ++++++++++---
->   1 file changed, 10 insertions(+), 3 deletions(-)
+> The commit 66b60b0c8c4a ("dccp/tcp: Unhash sk from ehash for tb2 alloc
+> failure after check_estalblished().") tried to fix an issue that an
+> unconnected socket occupies an ehash entry when bhash2 allocation fails.
 > 
-> diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
-> index ac88de2a06a0..b6eca4231913 100644
-> --- a/net/smc/smc_ism.c
-> +++ b/net/smc/smc_ism.c
-> @@ -252,12 +252,11 @@ static int smc_nl_handle_smcd_dev(struct smcd_dev *smcd,
->   	char smc_pnet[SMC_MAX_PNETID_LEN + 1];
->   	struct smc_pci_dev smc_pci_dev;
->   	struct nlattr *port_attrs;
-> +	struct device *device;
->   	struct nlattr *attrs;
-> -	struct ism_dev *ism;
->   	int use_cnt = 0;
->   	void *nlh;
->   
-> -	ism = smcd->priv;
->   	nlh = genlmsg_put(skb, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg_seq,
->   			  &smc_gen_nl_family, NLM_F_MULTI,
->   			  SMC_NETLINK_GET_DEV_SMCD);
-> @@ -272,7 +271,15 @@ static int smc_nl_handle_smcd_dev(struct smcd_dev *smcd,
->   	if (nla_put_u8(skb, SMC_NLA_DEV_IS_CRIT, use_cnt > 0))
->   		goto errattr;
->   	memset(&smc_pci_dev, 0, sizeof(smc_pci_dev));
-> -	smc_set_pci_values(to_pci_dev(ism->dev.parent), &smc_pci_dev);
-> +	device = smcd->ops->get_dev(smcd);
-> +	if (device->parent)
-> +		smc_set_pci_values(to_pci_dev(device->parent), &smc_pci_dev);
-> +	if (smc_ism_is_emulated(smcd)) {
-> +		smc_pci_dev.pci_pchid = smc_ism_get_chid(smcd);
-> +		if (!device->parent)
-> +			snprintf(smc_pci_dev.pci_id, sizeof(smc_pci_dev.pci_id),
-> +				 "%s", dev_name(device));
-> +	}
+> In such a case, we need to revert changes done by check_established(),
+> which does not hold refcnt when inserting socket into ehash.
+> 
+> [...]
 
-Hi Wen Gu,
+Here is the summary with links:
+  - [v1,net] tcp: Fix refcnt handling in __inet_hash_connect().
+    https://git.kernel.org/netdev/net/c/04d9d1fc428a
 
-playing around with the loopback-ism device and testing it, i developed 
-some concerns regarding this exposure. Basically this enables us to see 
-the loopback device in the `smcd device` tool without any changes.
-E.g.:
-```
-# smcd device
-FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
-0000 0     loopback-ism  ffff   No        0
-102a ISM   0000:00:00.0  07c2   No        0  NET1
-```
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Now the problem with this is that "loopback-ism" is no valid PCI-ID and 
-should not be there. My first thought was to put an "n/a" instead, but 
-that opens up another problem. Currently you could set - even if it does 
-not make sense - a PNET_ID for the loopback device:
-```
-# smc_pnet -a -D loopback-ism NET1
-# smcd device
-FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
-0000 0     loopback-ism  ffff   No        0  *NET1
-102a ISM   0000:00:00.0  07c2   No        0  NET1
-```
-If we would change the PCI-ID to "n/a" it would be a valid input 
-parameter for the tooling which is... to put it nice... not so beautiful.
-I brainstormed this with them team and the problem is more complex.
-In theory there shouldn't be PCI information set for the loopback 
-device. There should be a better abstraction in the netlink interface 
-that creates this output and the tooling should be made aware of it.
 
-Do you rely on the output currently? What are your thoughts about it?
-If not I'd ask you to not fill the netlink interface for the loopback 
-device and refactor it with the next stage when we create a right 
-interface for it.
-
-Since the Merge-Window is closed feel free to send new versions as RFC.
-Thank you
-- Jan
-
->   	if (nla_put_u32(skb, SMC_NLA_DEV_PCI_FID, smc_pci_dev.pci_fid))
->   		goto errattr;
->   	if (nla_put_u16(skb, SMC_NLA_DEV_PCI_CHID, smc_pci_dev.pci_pchid))
 
