@@ -1,233 +1,297 @@
-Return-Path: <netdev+bounces-79801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79802-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C62E87B7E4
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 07:25:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B1EB87B7F0
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 07:28:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27462285159
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 06:25:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31C6B285683
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 06:28:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DECFBDDB7;
-	Thu, 14 Mar 2024 06:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69F33DDDF;
+	Thu, 14 Mar 2024 06:28:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Iuhg8SSn"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UxAJg3a3"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2065.outbound.protection.outlook.com [40.107.92.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 115DCC8F3;
-	Thu, 14 Mar 2024 06:25:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710397538; cv=fail; b=J4nSpEeESv9NIYll3jEEO5ezm3QK5j0I7qzzbTrju/DGlHJRTELtcxGCfJVzv6vzjsnzL0qrTq9lI4vsUGXVMxa60gzSMkZIURbnnfwxrM910uBnwBxgHKAQCBwDwbN/00lmx1UK8ehxts9BsX5cxYyxA+sw6fpj11QCT7LPuvA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710397538; c=relaxed/simple;
-	bh=GM2APZvYheRKRInFIeoh9WcznM8xFkmOlhZHE/7AM24=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 Content-Type:MIME-Version; b=dLHvgNcnUxwu7hbkIGXSDahY0hmczSNFxeHgb88k6RtE4REozdgPgyYd/0AUoawqfQYr7eF78hYmcOPycOqUoT7kmDcjfV3ktzWMik0uVhvWbyOEx74bhwN9S7/U2sn9oiFXPgTFZIFTDBWosnpnv//KQSvHnR4pGlsjn6Wrjuo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Iuhg8SSn; arc=fail smtp.client-ip=40.107.92.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gXaPrcGt4Yihe0NJFeV6bdxi0B3mudTOi0+VCz6yzzzvbJTiO5dOB/e7XCMdoLBqu0D6enmO86j2MCLjzER/dVONZEX34p6eILuFUjZWPHLwwgI9Aqf9A8SmJ9qH505zgv6uXyd8BcbuVSG9KmBQNAWDMyimi0Btj3LjEH7VQyf6xzb81bzNeWp/Ap2TApjxOBkuOfS8p3bIK6RIxLGhvh/kKNIKlnMyFWgO1PTPUjQ8gJbe8qnpiGJU/4iS3eg3zDeVulXtvSxSYtrWwD49bA43h3oiGfuz2Bq8Mf8ceUf5tK2gakPBfk6q9m+rscS2HuWXrDfMQi02VfyztYoo1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jRjJ1alIFUENpX3pMk01BUQmdSzcYW1LLOKJoS3D6Cc=;
- b=iYcPeQZE4pqbCdS9BpKldMJnjFtGNBBT5E8COfGiK+BQHH0BZk4nBj4AEAsheN+z6hR7IIYYzlTBBsmDAe8l3hv5wlA8aBNKCuLVE5C+XsZ1o2kwwWjflBw0WlY0dAsZ6MlfZ42vFHXVC9pFXmj/Wprd62uXgnWVgYrhONjibXe9kysz9/N1ysFKTUVjkZww/EVUIGHXJe+2MuzM+TkAlNpMCrb95PqbqVIbG/ykq4iMVUh46vuOvgYtXbUrN03K2Zo0ST4cOfR2z8V1gryqG5FJ6drTvsw4jwbld5LWYVxXCwEnapb+mn/iFTxa5w1yMzlijoe1SJ3W1wGbKN98rg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jRjJ1alIFUENpX3pMk01BUQmdSzcYW1LLOKJoS3D6Cc=;
- b=Iuhg8SSnLxDcRuyi9/ppOPzks4glENy8dqLkt3TqnWXIUZsnF6L4FoU5NkMQuvtk0EtO2rWwUPP5l5HGSkf6czW5q9QZ5KHH2nbML94J8y16ZbDQ9mOyVKCWqy72yWFqMjBmnKesjTjKKEBV/AmpYOL7qJJVVTD1n5fDd7jeS/DMIg9i/V+tdDyTy5b+ezMaelmCA3xkNQJ9rvFm3aazS9OMPMsmQ9TgFR0umJ9MeWTaL8LRivc0oyGaH7Gh7yNAcv015tkom0QiU6FvfeUCDbxD66pXA7VswDXN5Ug7GSneebmjfeT6OkD7Afcfz/GeseoIljpYnZFLW6MkpFPBNQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by DM6PR12MB4122.namprd12.prod.outlook.com (2603:10b6:5:214::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.21; Thu, 14 Mar
- 2024 06:25:33 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::459b:b6fe:a74c:5fbf]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::459b:b6fe:a74c:5fbf%6]) with mapi id 15.20.7386.017; Thu, 14 Mar 2024
- 06:25:33 +0000
-References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
- <20240309084440.299358-1-rrameshbabu@nvidia.com>
- <20240309084440.299358-7-rrameshbabu@nvidia.com>
- <20240312165544.75ced7e1@kernel.org> <87plvxbqwy.fsf@nvidia.com>
- <20240313174707.38a71c84@kernel.org>
-User-agent: mu4e 1.10.8; emacs 28.2
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: ahmed.zaki@intel.com, aleksander.lobakin@intel.com,
- alexandre.torgue@foss.st.com, andrew@lunn.ch, corbet@lwn.net,
- davem@davemloft.net, dtatulea@nvidia.com, edumazet@google.com,
- gal@nvidia.com, hkallweit1@gmail.com, jacob.e.keller@intel.com,
- jiri@resnulli.us, joabreu@synopsys.com, justinstitt@google.com,
- kory.maincent@bootlin.com, leon@kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, liuhangbin@gmail.com,
- maxime.chevallier@bootlin.com, netdev@vger.kernel.org, pabeni@redhat.com,
- paul.greenwalt@intel.com, przemyslaw.kitszel@intel.com,
- rdunlap@infradead.org, richardcochran@gmail.com, saeed@kernel.org,
- tariqt@nvidia.com, vadim.fedorenko@linux.dev, vladimir.oltean@nxp.com,
- wojciech.drewek@intel.com
-Subject: Re: [PATCH RFC v2 6/6] tools: ynl: ethtool.py: Output timestamping
- statistics from tsinfo-get operation
-Date: Wed, 13 Mar 2024 23:07:22 -0700
-In-reply-to: <20240313174707.38a71c84@kernel.org>
-Message-ID: <87ttl9fhyd.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: BYAPR07CA0104.namprd07.prod.outlook.com
- (2603:10b6:a03:12b::45) To BYAPR12MB2743.namprd12.prod.outlook.com
- (2603:10b6:a03:61::28)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C04D27E;
+	Thu, 14 Mar 2024 06:27:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710397681; cv=none; b=jz/hOO5+UFyK+iNWi4R9EUzxbiLuZ3pQLA+0brzYknFIv8nphiJIYsThX/lohlS8LvbOFFZ0YgDm86k+nMfl7QQoiOW203Y/LodLgPY2BIl2ZUzepPk47qp/qZxznTQzQkrElRp5k8wrs8XNGiEzDZGhJzJzHc23vWVEeFC9uEU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710397681; c=relaxed/simple;
+	bh=9PJKp5d07U4cqQ+doLFO1wV2FwDX/AFcq+h6mLuajhA=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ik5ui+cXHlpMXwDYrvcJ97qBmaoNSjt7Hd8fEEwKAXU3dPJ7RkA5rB4UzfNyZBXNedBca7gAXuP1Sjyr6tNk4kv9nv5m7hCgCFkotRk2IMlGXcCRoc+4GL+lYSvT4Dou1aJ448uNSCLb832JBEc2gP5BkbtPGBduX5t62dJ5NDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UxAJg3a3; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a44f2d894b7so53194866b.1;
+        Wed, 13 Mar 2024 23:27:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710397676; x=1711002476; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:date:from:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Wy48BMq7k7tUA5PbAAKgjU/lgoVJFz6MN9TbVJQFsQM=;
+        b=UxAJg3a3Z+yT+HhNZCswgwLcX0lMVw/lOrUNh3ZZdeXorK0fIYY810Ti2siwbJb/x2
+         iQKD6YyHgbTXClQ7vpDG1py1frjvjmj1cn9L755waaoc5+8e1OiLbI3ppTDSnVyzjKpj
+         8jTK6JH8sxAH0qk0aWU47f2rUK1rZCoGLhtNvPDQMb5kR/DoR7cc3Ca3fbizS30nM90b
+         2jL4szJTzoLU7Qo2W3HIFTgGk7HrtUzWjqsdKEflBYzZ/kNVhyxc4ZZEluzHSDhgfSgs
+         9FSFHhJZZLB1s8aOrmFe1r4AtqDP1D5hE4hczL4IBB5AHm8ocTyz6QtBe96OFG2UZ2+D
+         weyg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710397676; x=1711002476;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:date:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wy48BMq7k7tUA5PbAAKgjU/lgoVJFz6MN9TbVJQFsQM=;
+        b=oGF0xO9MUwF9x7XT86KBHYWcVeGVLRG2nWSS2pk0xJjoXMv8NTsXfViLmm7iRyWe6W
+         1nPu28XTXH7TAs/qJuza1nQyw56TniBZzZWHZobBKx5clPXFQbRDo4pa4wAV6vpSGYPw
+         aKGEA61xQOYYwh9Bv7h6NS7k+bQ/fi8bnMjNswX/rOWuKSvQoJHkjbvPubV5n7eu1vXH
+         7odE5kCNELPQlrryi3wQtvVFtT15EPx/jcNh2/35+lfh1do2knTz6RSqb2dUYphyoOBT
+         t+WvlVnPzcY8ahYcZs1oJX+eiDyWf/pyRYDvapi/nQSQO2WLsiYEePXZxSfootmLPgEt
+         DaSw==
+X-Forwarded-Encrypted: i=1; AJvYcCVS9QQXVZkbh6HjwVVx+tCiamGDoMwR3C50rjNo/jD4UJUvZ+fJAw1LJIMufTZdYRrceaQ2L2LCU71xOmgBkYSt/PXS1JOESxxatfca4/1UsmpB4FuoF3NDZuVUnov++Pjer/QCdKhPNSzfA/Yl+6sQzLisTm3CBDM8wQxBPJdFtcQKh5sxo65DzDftg21gxRVxzaNgsDqxOB5TF5Hl6Y3AkYINPFKceZyEd5p1xHi4OUhlcnhkzVnsmIx262h+5KlV6XGq9q5xeSgsN+RPkfJS/dQjgVI5cIvHnw==
+X-Gm-Message-State: AOJu0YyMhHEBNBmHbQxVeZX/yZ4CuzjY5UuYQfXbTfB2fHMvcJlJdMPz
+	3Y91Aw1uABMjgnAgA5Da48JScs492pEMjBwonp8f8tw/o6pLukBh
+X-Google-Smtp-Source: AGHT+IF0pnR3t8OP32CidAqcEwLWVf5pxREHuVK53gI8rH7KwaQf04P9Mb0+ZaiK2iVNQgj+ScQKXQ==
+X-Received: by 2002:a17:906:b899:b0:a3f:5ad2:1ff0 with SMTP id hb25-20020a170906b89900b00a3f5ad21ff0mr391041ejb.46.1710397675813;
+        Wed, 13 Mar 2024 23:27:55 -0700 (PDT)
+Received: from krava (2001-1ae9-1c2-4c00-726e-c10f-8833-ff22.ip6.tmcz.cz. [2001:1ae9:1c2:4c00:726e:c10f:8833:ff22])
+        by smtp.gmail.com with ESMTPSA id ld8-20020a170906f94800b00a46754900a4sm104587ejb.33.2024.03.13.23.27.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Mar 2024 23:27:55 -0700 (PDT)
+From: Jiri Olsa <olsajiri@gmail.com>
+X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
+Date: Thu, 14 Mar 2024 07:27:52 +0100
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: =?utf-8?B?5qKm6b6Z6JGj?= <dongmenglong.8@bytedance.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Quentin Monnet <quentin@isovalent.com>, bpf <bpf@vger.kernel.org>,
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+	LKML <linux-kernel@vger.kernel.org>,
+	linux-riscv <linux-riscv@lists.infradead.org>,
+	linux-s390 <linux-s390@vger.kernel.org>,
+	Network Development <netdev@vger.kernel.org>,
+	linux-trace-kernel@vger.kernel.org,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+	linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [External] Re: [PATCH bpf-next v2 1/9] bpf: tracing: add support
+ to record and check the accessed args
+Message-ID: <ZfKY6E8xhSgzYL1I@krava>
+References: <20240311093526.1010158-1-dongmenglong.8@bytedance.com>
+ <20240311093526.1010158-2-dongmenglong.8@bytedance.com>
+ <CAADnVQKQPS5NcvEouH4JqZ2fKgQAC+LtcwhX9iXYoiEkF_M94Q@mail.gmail.com>
+ <CALz3k9i5G5wWi+rtvHPwVLOUAXVMCiU_8QUZs87TEYgR_0wpPA@mail.gmail.com>
+ <CAADnVQJ_ZCzMmT1aBsNXEBFfYNSVBdBXmLocjR0PPEWtYQrQFw@mail.gmail.com>
+ <CALz3k9icPePb0c4FE67q=u1U0hrePorN9gDpQrKTR_sXbLMfDA@mail.gmail.com>
+ <CAADnVQLwgw8bQ7OHBbqLhcPJ2QpxiGw3fkMFur+2cjZpM_78oA@mail.gmail.com>
+ <CALz3k9g9k7fEwdTZVLhrmGoXp8CE47Q+83r-AZDXrzzuR+CjVA@mail.gmail.com>
+ <CAADnVQLHpi3J6cBJ0QBgCQ2aY6fWGnVvNGdfi3W-jmoa9d1eVQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|DM6PR12MB4122:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4f4dfd92-9633-4377-af68-08dc43ef8db2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	5sdMCJidp8D9OzEVtgq4ehI0gr3VbofOTU6nB33vg+xQ54RyZg8sA3PlZ9dSeNCgewPien4hxQU+26ux/azisNjV7ViT3IVAL2L2ZiOEdzTSvf+8soTMuMsUqB1fs68BbunNlwbHxYUSINBwMjqK9zGufKLPTPwhOeGkXk4MJ0lFgKegYmz2k+gOr/4CFMDHxmwYP3NNlFrHtk9wZc7rX0mO7Lsdut6V4XW58UOtvLHG9I57smK0Je4P9vMx7zSsBie7pBkhL+LDJOy0MDWyebviv52l5apxvsLsqUNaNmkvI/U/unNzTnDc4z8NOek9PVkUdC2/TP46R8Pjp/0njX52mcXURBpAhd9P7aDYYaYSiFcOUfPcL0CWYZiAuSwi1dnBsHA49JAZv9Fsrpto403Cqfq8gaNnBcfUMVzSw9QzbX2l9IDU7fyZb2kgclk1coNlnZGONWLKJvzn+19JUAwMFmnL+xRUCPTIF55S48mDk8lg+UDp6+JV7ffDcmZNXFsvzh2QieCKzJaZD8GCYrYwR0HfwBod1Uj6/cUpB32CR2emZL/7ZQxA+Q4Yj1Cl/aGHuGoUzt8wp/wQBmJ8ulmHgT+sa/2stog1kgAmGrm6xb0Hs7BVTsaWc4vNu0HXt0tzwETwukIchm4Wx1hg6fxf9lncaRFQscK1F6lGYcY=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?XsPikQk1+d02kuwlVy0tZz3mqiPWRQaP8xOVmz5SUHQHE3P8XGzt5MgWwNA+?=
- =?us-ascii?Q?yFxIXWbQ6/9mNNZrBL+fXndJcRBq1FAdgeZuouubUWCPxIFgIYkYFE/Y6isd?=
- =?us-ascii?Q?6PhHx5rMnhx2LGUqD3KlRt3JeP+HkB5bJJpAdyQso5/nenrjmQic7JXwtqy6?=
- =?us-ascii?Q?ReRMuCQHdom5F/GzeuA3pJFzuW3+dobG/Bs24B2/NMcu5Hiy02zFUlcvsDAA?=
- =?us-ascii?Q?IuAB1Zb7hPjhm3zJ77CJx+16n8Bt4bFQMTCzmJa0BxcOh0D3A75GhL04k4b2?=
- =?us-ascii?Q?ZkmkDm90XapTH4NkOiAZ33HZhDSNYM07xcggjY005Rb3DtmwkDxhrNE5+XMm?=
- =?us-ascii?Q?/IDwvhWsDU+psQJ/ycfbvNcvsMA4rq3kwrZiTDdl/r7rgQX4qhFcqw0L/u9J?=
- =?us-ascii?Q?Vm8nj7l+tMmYh4H1PGSiUEXESflQTvVG9lnazUc0QrpmIcqM5ZJ9zLxGxF9k?=
- =?us-ascii?Q?QEb4jXRrHvszmIvXH4q/ABHZeqe6evr7yWmJZyabOufk77wjn38VGfy2xLjH?=
- =?us-ascii?Q?Zqqy92xPaPPrvA51C6CDJ1KT7SkgmRp8FCVefQ3H+TQ/i/4oGYIDLWrjvAmU?=
- =?us-ascii?Q?KN4Pa66LuxnnA+DR0j4mk7NubWAl8GPS83rvDbBtOt5TqN0SeJlrEUlLabCL?=
- =?us-ascii?Q?hvGsefIPF/fE175Qfnh+5bHFPECwripEUD7Za8XAMkjKn3EdJ92eOGFFEvrQ?=
- =?us-ascii?Q?GhKPZBH0nTeEJg1dCfg+Cu18gdKbsntpNY1mQMu3SSTsgVCKuK8nujRBvnQM?=
- =?us-ascii?Q?RVIULGbOjIohgll1nGtxeqJ93tq2ChbpN8iiD0wn/F+saFfj3TCxWKmtjfzm?=
- =?us-ascii?Q?5vxoWb+UXIisIa2sM1uX7WObd5RAG7uGthU6YCDFe29eeaPsBkZWF7vmvmOd?=
- =?us-ascii?Q?kbWoDLhe6vtueFE4ogDoNcThpThoYgPRQTTDzpDT1bIRZRqChzFdl6d0DKZs?=
- =?us-ascii?Q?DuHNBG24EF3rRZguKFzPL+qc9Z6AwQ78pFowwTXG3jKs2B3ntu0P05HFVkiD?=
- =?us-ascii?Q?t/557MQbfY6AiSk2/FZChZ8JU8tvhkOs2sCcZacT1sAOp5eg+Z73E02aWXWa?=
- =?us-ascii?Q?4aarLOU/L9pADQpJXRozyrjy4BCwqSXldXCRtA70TtN5g9yxnL9zdDunEeyW?=
- =?us-ascii?Q?h8+SfTZ+oEgtzuGowedINhV7Vdz/1OAGM9J+6F7axU7zzzTiiU1W7IgLf9ik?=
- =?us-ascii?Q?eTc9hhDwSm2AwshyYrRuBhB5E8iQErWJNmQH92YMvn5AftsVDfeb3iK9WqJg?=
- =?us-ascii?Q?zz/74O+ESVSamQXRuNd2lgF56tbxmtV+Fu+dvfBGf0ITuiM4UGm1SFLgWc+l?=
- =?us-ascii?Q?cbC2yewshXLj3N+tUAzfWPX963wGhjqafkIcnFm7LbaEyHDc30NX38h2QZk8?=
- =?us-ascii?Q?Nw1UGClwq1K5uW2fOEj+2Yyeq7Wg5tyd+GZgER4XEIDNzFqj7CYDWq51geZq?=
- =?us-ascii?Q?l1QvOBbfrPuv4z71R33GCATlh0748zknlptNMGy0gXA3aL98qqzAMfqvwuAK?=
- =?us-ascii?Q?Jk9OuoTH944bUXn+r3Cd+0/Jpyc04Zot1vqbU0aPmQOg6pU117LHJOZ54JY5?=
- =?us-ascii?Q?Ejxrf5Y+is6l5N9S3YkcA4MgyblxlUef6pV+0NwXouxd3cDtWlSn2Ai7dHFV?=
- =?us-ascii?Q?DA=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f4dfd92-9633-4377-af68-08dc43ef8db2
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 06:25:33.4795
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3w05cClPe4/Q3tPoG/WjUUwZQ7OYjitUnHPMTEe8dKEWoaNafNBBaChzci6UhrEap67tAYl5Hbw26NAiAKXEUQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4122
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAADnVQLHpi3J6cBJ0QBgCQ2aY6fWGnVvNGdfi3W-jmoa9d1eVQ@mail.gmail.com>
+
+On Wed, Mar 13, 2024 at 05:25:35PM -0700, Alexei Starovoitov wrote:
+> On Tue, Mar 12, 2024 at 6:53 PM 梦龙董 <dongmenglong.8@bytedance.com> wrote:
+> >
+> > On Wed, Mar 13, 2024 at 12:42 AM Alexei Starovoitov
+> > <alexei.starovoitov@gmail.com> wrote:
+> > >
+> > > On Mon, Mar 11, 2024 at 7:42 PM 梦龙董 <dongmenglong.8@bytedance.com> wrote:
+> > > >
+> > [......]
+> > >
+> > > I see.
+> > > I thought you're sharing the trampoline across attachments.
+> > > (since bpf prog is the same).
+> >
+> > That seems to be a good idea, which I hadn't thought before.
+> >
+> > > But above approach cannot possibly work with a shared trampoline.
+> > > You need to create individual trampoline for all attachment
+> > > and point them to single bpf prog.
+> > >
+> > > tbh I'm less excited about this feature now, since sharing
+> > > the prog across different attachments is nice, but it won't scale
+> > > to thousands of attachments.
+> > > I assumed that there will be a single trampoline with max(argno)
+> > > across attachments and attach/detach will scale to thousands.
+> > >
+> > > With individual trampoline this will work for up to a hundred
+> > > attachments max.
+> >
+> > What does "a hundred attachments max" means? Can't I
+> > trace thousands of kernel functions with a bpf program of
+> > tracing multi-link?
+> 
+> I mean what time does it take to attach one program
+> to 100 fentry-s ?
+> What is the time for 1k and for 10k ?
+> 
+> The kprobe multi test attaches to pretty much all funcs in
+> /sys/kernel/tracing/available_filter_functions
+> and it's fast enough to run in test_progs on every commit in bpf CI.
+> See get_syms() in prog_tests/kprobe_multi_test.c
+> 
+> Can this new multi fentry do that?
+> and at what speed?
+> The answer will decide how applicable this api is going to be.
+> Generating different trampolines for every attach point
+> is an approach as well. Pls benchmark it too.
+> 
+> > >
+> > > Let's step back.
+> > > What is the exact use case you're trying to solve?
+> > > Not an artificial one as selftest in patch 9, but the real use case?
+> >
+> > I have a tool, which is used to diagnose network problems,
+> > and its name is "nettrace". It will trace many kernel functions, whose
+> > function args contain "skb", like this:
+> >
+> > ./nettrace -p icmp
+> > begin trace...
+> > ***************** ffff889be8fbd500,ffff889be8fbcd00 ***************
+> > [1272349.614564] [dev_gro_receive     ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614579] [__netif_receive_skb_core] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614585] [ip_rcv              ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614592] [ip_rcv_core         ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614599] [skb_clone           ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614616] [nf_hook_slow        ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614629] [nft_do_chain        ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614635] [ip_rcv_finish       ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614643] [ip_route_input_slow ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614647] [fib_validate_source ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614652] [ip_local_deliver    ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614658] [nf_hook_slow        ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614663] [ip_local_deliver_finish] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614666] [icmp_rcv            ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614671] [icmp_echo           ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614675] [icmp_reply          ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614715] [consume_skb         ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614722] [packet_rcv          ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> > [1272349.614725] [consume_skb         ] ICMP: 169.254.128.15 ->
+> > 172.27.0.6 ping request, seq: 48220
+> >
+> > For now, I have to create a bpf program for every kernel
+> > function that I want to trace, which is up to 200.
+> >
+> > With this multi-link, I only need to create 5 bpf program,
+> > like this:
+> >
+> > int BPF_PROG(trace_skb_1, struct *skb);
+> > int BPF_PROG(trace_skb_2, u64 arg0, struct *skb);
+> > int BPF_PROG(trace_skb_3, u64 arg0, u64 arg1, struct *skb);
+> > int BPF_PROG(trace_skb_4, u64 arg0, u64 arg1, u64 arg2, struct *skb);
+> > int BPF_PROG(trace_skb_5, u64 arg0, u64 arg1, u64 arg2, u64 arg3, struct *skb);
+> >
+> > Then, I can attach trace_skb_1 to all the kernel functions that
+> > I want to trace and whose first arg is skb; attach trace_skb_2 to kernel
+> > functions whose 2nd arg is skb, etc.
+> >
+> > Or, I can create only one bpf program and store the index
+> > of skb to the attachment cookie, and attach this program to all
+> > the kernel functions that I want to trace.
+> >
+> > This is my use case. With the multi-link, now I only have
+> > 1 bpf program, 1 bpf link, 200 trampolines, instead of 200
+> > bpf programs, 200 bpf link and 200 trampolines.
+> 
+> I see. The use case makes sense to me.
+> Andrii's retsnoop is used to do similar thing before kprobe multi was
+> introduced.
+> 
+> > The shared trampoline you mentioned seems to be a
+> > wonderful idea, which can make the 200 trampolines
+> > to one. Let me have a look, we create a trampoline and
+> > record the max args count of all the target functions, let's
+> > mark it as arg_count.
+> >
+> > During generating the trampoline, we assume that the
+> > function args count is arg_count. During attaching, we
+> > check the consistency of all the target functions, just like
+> > what we do now.
+> 
+> For one trampoline to handle all attach points we might
+> need some arch support, but we can start simple.
+> Make btf_func_model with MAX_BPF_FUNC_REG_ARGS
+> by calling btf_distill_func_proto() with func==NULL.
+> And use that to build a trampoline.
+> 
+> The challenge is how to use minimal number of trampolines
+> when bpf_progA is attached for func1, func2, func3
+> and bpf_progB is attached to func3, func4, func5.
+> We'd still need 3 trampolines:
+> for func[12] to call bpf_progA,
+> for func3 to call bpf_progA and bpf_progB,
+> for func[45] to call bpf_progB.
+> 
+> Jiri was trying to solve it in the past. His slides from LPC:
+> https://lpc.events/event/16/contributions/1350/attachments/1033/1983/plumbers.pdf
+> 
+> Pls study them and his prior patchsets to avoid stepping on the same rakes.
+
+yep, I refrained from commenting not to take you down the same path
+I did, but if you insist.. ;-) 
+
+I managed to forgot almost all of it, but the IIRC the main pain point
+was that at some point I had to split existing trampoline which caused
+the whole trampolines management and error paths to become a mess
+
+I tried to explain things in [1] changelog and the latest patchset is in [0]
+
+feel free to use/take anything, but I advice strongly against it ;-)
+please let me know if I can help
+
+jirka
 
 
-On Wed, 13 Mar, 2024 17:47:07 -0700 Jakub Kicinski <kuba@kernel.org> wrote:
->
-> Ah, we're missing the enum definition and linking :S
->
-> I mean:
->
-> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-> index 197208f419dc..e1626c94d93b 100644
-> --- a/Documentation/netlink/specs/ethtool.yaml
-> +++ b/Documentation/netlink/specs/ethtool.yaml
-> @@ -16,6 +16,10 @@ doc: Partial family for Ethtool Netlink.
->      name: stringset
->      type: enum
->      entries: []
-> +  -
-> +    name: header-flags
-> +    type: flags
-> +    entries: [ compact-bitset, omit-reply, stats ]
-
-I am running into some strange issues with this even after regenerating
-ynl generated/ by running make under tools/net/ynl/.
-
-  Traceback (most recent call last):
-    File "/root/linux-ethtool-ts/./tools/net/ynl/ethtool.py", line 437, in <module>
-      main()
-    File "/root/linux-ethtool-ts/./tools/net/ynl/ethtool.py", line 333, in main
-      tsinfo = dumpit(ynl, args, 'tsinfo-get', req)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    File "/root/linux-ethtool-ts/./tools/net/ynl/ethtool.py", line 91, in dumpit
-      reply = ynl.dump(op_name, { 'header': {} } | extra)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    File "/root/linux-ethtool-ts/tools/net/ynl/lib/ynl.py", line 873, in dump
-      return self._op(method, vals, [], dump=True)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    File "/root/linux-ethtool-ts/tools/net/ynl/lib/ynl.py", line 824, in _op
-      msg += self._add_attr(op.attr_set.name, name, value, search_attrs)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    File "/root/linux-ethtool-ts/tools/net/ynl/lib/ynl.py", line 459, in _add_attr
-      attr_payload += self._add_attr(attr['nested-attributes'],
-                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    File "/root/linux-ethtool-ts/tools/net/ynl/lib/ynl.py", line 481, in _add_attr
-      attr_payload = format.pack(int(value))
-                                ^^^^^^^^^^
-  TypeError: int() argument must be a string, a bytes-like object or a real number, not 'dict'
-
-What's your expectation for how the request structure would look like? I
-have tried the following.
-
-  if args.show_time_stamping:
-      req = {
-        'header': {
-          'flags': 'stats',
-        },
-      }
-
-  if args.show_time_stamping:
-      req = {
-        'header': {
-          'flags': {
-             'stats': True,
-          },
-        },
-      }
-
-I tried looking through the lib/ynl.py code, but I did not understand
-how the 'flags' type was specifically handled.
-
->  
->  attribute-sets:
->    -
-> @@ -30,6 +34,7 @@ doc: Partial family for Ethtool Netlink.
->        -
->          name: flags
->          type: u32
-> +        enum: header-flags
->  
->    -
->      name: bitset-bit
->
-> See if that works and feel free to post it with my suggested-by
-
---
-Thanks,
-
-Rahul Rameshbabu
+[0] https://git.kernel.org/pub/scm/linux/kernel/git/jolsa/perf.git/log/?h=bpf/batch
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/jolsa/perf.git/commit/?h=bpf/batch&id=52a1d4acdf55df41e99ca2cea51865e6821036ce
 
