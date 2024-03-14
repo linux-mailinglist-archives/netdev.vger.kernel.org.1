@@ -1,97 +1,187 @@
-Return-Path: <netdev+bounces-79799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4145A87B6E2
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 04:36:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1795287B714
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 05:24:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 299F11C20E52
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 03:36:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D190285184
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 04:23:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B20544A1B;
-	Thu, 14 Mar 2024 03:35:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 820DE5CBD;
+	Thu, 14 Mar 2024 04:23:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BEIMofJj"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aVBZhnGD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2070.outbound.protection.outlook.com [40.107.243.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881305382;
-	Thu, 14 Mar 2024 03:35:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710387359; cv=none; b=AVxLuSFl/pQfZgKiSOL8f9QrBKMRKgTc/lfniPdQvVPobseOzvXzSYrP+gjSogZjlabAcPJ3Q+87pnkPpSG8mY2grInSU1PekB5xKBA4TOFWXElyV35nogQHypucwkJwMp4pYA3HgifzwUZAnYrL/EH5e2AT4eHwDD/P2QoU/Zg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710387359; c=relaxed/simple;
-	bh=ufLxwUri9oF1Ju7jFdR1vSsQE/010F+BadmW8nZ4azo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IVDeJN4f7YRPwwnmoo2d8Q2nugU8ZvdJIJ5E99QtffY4UrUsIOOyz8ImpZGiX/48bcIJrAeG856norLheXxI+jVZQnOBRshYP8g+CrBBI7cAtzQlOjbaa33iiBgyNHl9A67wTwc21zkuD7kI6lEo2L3M9omiwQKpZ75eziXX6Ys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=BEIMofJj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC9F0C43394;
-	Thu, 14 Mar 2024 03:35:58 +0000 (UTC)
-Authentication-Results: smtp.kernel.org;
-	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BEIMofJj"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
-	t=1710387356;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ufLxwUri9oF1Ju7jFdR1vSsQE/010F+BadmW8nZ4azo=;
-	b=BEIMofJja6FJPbS0D4BCmOSOP5We16lRSkupRoio0Bsefglkxq59tI8PtUWz+mxGScPggl
-	nnzfk+dXAQpAFpDjP6kKhsXLjJ6yh8bVDbmjQsL948nCNDUriGLP2qkrQuIlWR4RhJG7cM
-	s+LHUDHYcOrIwl2bAAdfw6NzaMaq/lQ=
-Received: 
-	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id 01dbd829 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
-	Thu, 14 Mar 2024 03:35:56 +0000 (UTC)
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-dcc4de7d901so404710276.0;
-        Wed, 13 Mar 2024 20:35:56 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVmd71sAgewmFy70qdRqoHbjoIe8eXAvse/15kB0t53gRbrVXZCtstkyG26+C20yYnxwhjoLMMS2nuzdr6yObrM+7AZPqE0Lh55diB2XLZngO0mtYvjscGW4ow66p9hF9aSebVQ
-X-Gm-Message-State: AOJu0YxX+IdDwDuF5eDkCvsHfIwvJ21KMguZTXk7lOKl7r1CszHjsKWN
-	UKBgxTXAbZzY2AyW9dAigeTdK7bmLdOWMls1XD9cz4+1pLWx1/NEskdlR1tyoz0wKRVn7JfCaL7
-	uE2xV/s1OajmXR4cVB5d2e1VKRWs=
-X-Google-Smtp-Source: AGHT+IGUdgKF/dbUVT5otlmUuvnWc2bC3zUXkuCsUJ2i/Uqok9paRwhbAvJI8AHnKgDRCdykiRdMzw+jO45j6wnIV6c=
-X-Received: by 2002:a25:bfd1:0:b0:dc2:5553:ca12 with SMTP id
- q17-20020a25bfd1000000b00dc25553ca12mr555095ybm.14.1710387355458; Wed, 13 Mar
- 2024 20:35:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65FBF33F6;
+	Thu, 14 Mar 2024 04:23:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.70
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710390232; cv=fail; b=C0h72g0hRjHEE13O91pWOcXfUJNr/9iG8CtILNv4lLiM+hEY03BICZ7QBpxytt/4i/CZ24fNtX4E7amjzK9N8pvWzhIAneHDacp3qhGBgWybn4dXRMK6GsQQJdHQfH3TmMk6a62pMYHbiopdXN9GglkK75vcR+9y8oH9KhyP2UY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710390232; c=relaxed/simple;
+	bh=UZlkCBdiYd7aTzPsqRA0XF8BErFB0BI3sHBPHli0fUM=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 Content-Type:MIME-Version; b=gCwSz7PT9IYGK6cbNEy70vZbWCzUTXXPc1eiZl0I+rEO3DvxARhHqH6FaeNvN7KY8bgi/CDCf1NK9LyHOQDsUgKoF75bLhKrbVT5HmJFueeKUJRrLvgLcVl7Ld1RAMqqN/pOJPGoWo6GNdvVH3jYkSOrK25pdN7JKKnOq9qiKkI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aVBZhnGD; arc=fail smtp.client-ip=40.107.243.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gI4MQdbeftVcfQkbKEbmZBb5D8mZA79gFdTn7AIUI29MjTdFOqHJXmyZMFd1pJhdvcBnWX4okdZ7AIFd84WOMsEFf8nNDgXC9X4OOLECFDj79WW7YHejuGpdqaA+o+gYJdZKn/T41oJV7nZddJzlHVX6ZwZQ3zerBjks4dpwjKCF8gq+SGecGeHfJF9MssqGTLCHDNiFXSEfTzEOaM2I9davuE2MDMc86zjtQyqd/5PUTcYTFPMFgrhT4wdT1BlcqgE8IKVagorU6UakiafsQX7yILlP3wQWY+hzPkXoSIq0RD132OgyusrISyfmrKhaScduiRyIEDUdV86n2XWAgg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Y5RkOKx61kXG/hON0foO6mIp7Khyfg/S6IEM4wVNVzI=;
+ b=j6eY4HZS0uLPtZlxnNDz7WzH23e2k4zLmikW3iLl9KtzDyN8Ptoe0dLFv6b+Yu+YcZhh4j2JkXwPe6WAAYJl/k0K+jy3xPXDKkJaHF3D6s1L0oDSU4AJnHqQvxgBnNVaKp4WC5mhlhvtcujuWs0t/w9jR3fPjY+AHQMudtvb/mY2xKsxNoJPsbHwSdg77IchOwj0lfBdHFk5mwNClghLbyFnNiZC/yhwl9fEQtvrGlIr8fVN553U4OWYvHCogFXOfwUrNiUH9T8JJ86s401Vvk9KMFeq6cmoKW+d01z0dEOYKVU+efSOGwA0BdUwEAMaa3fnoL/vyiFK9HFoEW/S8A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Y5RkOKx61kXG/hON0foO6mIp7Khyfg/S6IEM4wVNVzI=;
+ b=aVBZhnGD2BD1RGKk2givkYupNhZs0e0nPFmXmjJWEI7cdcvjQZIDgFtrqguJqR6AJslzm983arPTJJ01P9XH8RJI8afx9XQqTWQ+m69ncU6pLoxe4yEfhpR5bPFwWkiB8HhscAr2k5O/qnPwLOOi1nYDWyWiSkwK40etnNWzjZhWM/eRxn5j29XCgPpHs7bAm0XrbVifKhpXHobYyr4bR7/j7VXhMWqE+swdzDtmyewQfGg7QC74L7j+3dmnX3GhHEyHrWKo+BPY4S5mx6r3v5sU4q8+Gou9rOQ1Z9TppTpzTmDJOex7DDrVSnBC6Krg7yNKGwfqCpapHXJzQOAqIQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+ by MW4PR12MB6683.namprd12.prod.outlook.com (2603:10b6:303:1e2::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.18; Thu, 14 Mar
+ 2024 04:23:47 +0000
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::459b:b6fe:a74c:5fbf]) by BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::459b:b6fe:a74c:5fbf%6]) with mapi id 15.20.7386.017; Thu, 14 Mar 2024
+ 04:23:45 +0000
+References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
+ <20240309084440.299358-1-rrameshbabu@nvidia.com>
+ <20240309084440.299358-2-rrameshbabu@nvidia.com>
+ <20240312165346.14ec1941@kernel.org> <87le6lbqsa.fsf@nvidia.com>
+ <20240313174107.68ca4ff1@kernel.org> <87h6h9bpm1.fsf@nvidia.com>
+ <20240313184017.794a2044@kernel.org>
+User-agent: mu4e 1.10.8; emacs 28.2
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: ahmed.zaki@intel.com, aleksander.lobakin@intel.com,
+ alexandre.torgue@foss.st.com, andrew@lunn.ch, corbet@lwn.net,
+ davem@davemloft.net, dtatulea@nvidia.com, edumazet@google.com,
+ gal@nvidia.com, hkallweit1@gmail.com, jacob.e.keller@intel.com,
+ jiri@resnulli.us, joabreu@synopsys.com, justinstitt@google.com,
+ kory.maincent@bootlin.com, leon@kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, liuhangbin@gmail.com,
+ maxime.chevallier@bootlin.com, netdev@vger.kernel.org, pabeni@redhat.com,
+ paul.greenwalt@intel.com, przemyslaw.kitszel@intel.com,
+ rdunlap@infradead.org, richardcochran@gmail.com, saeed@kernel.org,
+ tariqt@nvidia.com, vadim.fedorenko@linux.dev, vladimir.oltean@nxp.com,
+ wojciech.drewek@intel.com
+Subject: Re: [PATCH RFC v2 1/6] ethtool: add interface to read Tx hardware
+ timestamping statistics
+Date: Wed, 13 Mar 2024 21:19:26 -0700
+In-reply-to: <20240313184017.794a2044@kernel.org>
+Message-ID: <871q8dh25r.fsf@nvidia.com>
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR03CA0204.namprd03.prod.outlook.com
+ (2603:10b6:a03:2ef::29) To BYAPR12MB2743.namprd12.prod.outlook.com
+ (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240308112746.2290505-1-leitao@debian.org> <ZfJtzhKJV4yo3LRF@zx2c4.com>
- <CAHmME9prrtWu8jkj20WKvTZV6mjQE2Vt_mFWGOuy9St1FOrEOg@mail.gmail.com>
-In-Reply-To: <CAHmME9prrtWu8jkj20WKvTZV6mjQE2Vt_mFWGOuy9St1FOrEOg@mail.gmail.com>
-From: "Jason A. Donenfeld" <Jason@zx2c4.com>
-Date: Wed, 13 Mar 2024 21:35:43 -0600
-X-Gmail-Original-Message-ID: <CAHmME9oPPtJXd8DsA+xXvbdN7T0PbAM5kYpQj32KZXv9bKP1ng@mail.gmail.com>
-Message-ID: <CAHmME9oPPtJXd8DsA+xXvbdN7T0PbAM5kYpQj32KZXv9bKP1ng@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 1/2] wireguard: Leverage core stats allocator
-To: Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, horms@kernel.org, dsahern@kernel.org, 
-	"open list:WIREGUARD SECURE NETWORK TUNNEL" <wireguard@lists.zx2c4.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|MW4PR12MB6683:EE_
+X-MS-Office365-Filtering-Correlation-Id: d1e52e3d-6a27-4f71-1f87-08dc43de89e1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	ESFq7YEsgyZlKCsNDNe31K2dxNwVWIPgRP6NnVRv4JVC7KPZ7B2kLJBM75mXztY6aAAit/rJi9A29A/b6sfckUm8U/Ex7jJRlaylIA36ORVLzsXVgelT7+k4ukoqYvQ1DwMRhgiI2AcBU0hThFaz8/yEq0Mlf5oMvwQu4qmemYvtQDWxVpb/2ryOW7Nl1Kw4bADsQjTvYW7YTga6NTzixm+tbBAHl6ognoLF4QQaaAskW+f7/0HJ+WbblAbH7vkAMar1qtozMyG77WrRZ4hdOIUTFPCRnOdo8rWegt3OX/V8+6zTI2eAww8TEDAt058iq+fDZKBS81kvS9GVC3XNEqbjW4Vq3EwnCjG2VxQFOnGC2m8rpD71wW1UkhYsHvXsUd6fIcJHCE0rVOD5ggcJWuDjuz1Xk013Vn5gYA2n5mvJy3ZKnSjiqejtIcI77evLhYYRAi9enT6/KDNRwRt/GOjU4SZSOMpClwtneIntgLu1lLxhX/6EclKls57bNeXyREX3rLJrxfWGk3i+g4lYe6k2Pk1u/ybrRC18i4zD2uyD5qRPvz0h5wOERsNFRR6eAGDpbW6Y8MROkRWsJ4fDIfAJbWF8NN8T8rjZRqE7lNVhjqwLpDOhL4IYGhZQ8aZz3FSYQU97StuCVcTm5QgYUwDsR//F/IMFjBqu2GKDVgs=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(376005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?CfkUmmHt2Qh1taLAERrcn3XKI06LHlEm1qKZXMLpzZQoVBIYiw5lMIGxWtFO?=
+ =?us-ascii?Q?sQshjiqY/UpE9iunJpTrZALEi46r1vchE12Z5CLS9Jgtr6PIMI9OZuliRSg/?=
+ =?us-ascii?Q?ZiS7cegq9zeg/kKnRUJjpjexwz5OYIeqSo3EZA7jcNFkxEFI9+BXkv2XnwRl?=
+ =?us-ascii?Q?H4Z/46vPb7uKN60AC2/Cx/7kB1VLe1Yy4Rl0YlGgirde5/5jtaJnNmT+5QLD?=
+ =?us-ascii?Q?CiFd+OjCuvWzmcNvPMCV1KWHseU1xmCKyl5j+azM5cFE3mpmlQ8X2wmBMARc?=
+ =?us-ascii?Q?ImLNkt8dNn2r04yKAooydnj+dAg2P04V4qUWq8Aq01Ab6D/zugKJ2e/Rqecr?=
+ =?us-ascii?Q?3l1Ht74/lH2tyDq+wDf8MAa7f/Hn5AJdbmhVsLLHzWhmsAO/41kKHOJFXIr3?=
+ =?us-ascii?Q?CwbXVJ25+aKCKj8FH6yByEMvtp8z1SqZE6qXp2vXZ8PrwjxW6lgQ1IpkENf9?=
+ =?us-ascii?Q?fmMjaR7QshrKficWVMiMX/VdIBlZ56oztX20YPW3DTSWDjsPYBxt2mmebyTf?=
+ =?us-ascii?Q?InNAiKZe31OZRx3AwQU3XZeZz0QT2ern46z4sPL+x6SPJSJY6Rp0zBkdgp3e?=
+ =?us-ascii?Q?lVfdyXNSChrch1K/ja6/X057pPoZ6X00riiPIC19cIhJPZ7ZCQJOhUhwAyRX?=
+ =?us-ascii?Q?0/R1pmIkOrnJXG9+f6H/KZJ0OeThCEjDdB1IGWxpgd/yarPXYyeHtmM4Xkz4?=
+ =?us-ascii?Q?1R8MAm6mHvqVSwZnDSr6z50DFzXkoObg4DkXRY2LrMS1ZrjNsb6Xiz5eK1z2?=
+ =?us-ascii?Q?2jVik4Q59PZThedXbgfRN9pIvrtlyYr+4K+nrWB+C0yp/uUp2RmQDb26mtX3?=
+ =?us-ascii?Q?FS2l8hzqDArirUwO/VO1HzFnnJ39NjDJnSTQ9yDhKEX1DSvqI2NdohJw72gG?=
+ =?us-ascii?Q?mvZtQcuOh0W/W9X4v5I1uzUCyMjJE5qntvWEfrMQg+KNNiOjqY3sCfID8+4T?=
+ =?us-ascii?Q?IMOO45L3miO/Wy97dHkJs0+wg9wT7i18210tLYcJt7BfUcjBDA0/L142sWgL?=
+ =?us-ascii?Q?DPy/sfZGfihx7R6eu3AkApgD7nRLR4KJfJI7BpiwOgQLZqwPdb7/KyoALFb3?=
+ =?us-ascii?Q?WNCTK8xAc4So95VwWZ6HbpFJfx9UWHd/57/KMXa5KfyRT5BE6N8jnwTKpQvu?=
+ =?us-ascii?Q?up18zZFfxS2F4Z00muxcqLVOXffbjWox5/aIGHZ/X5706xgUFS/Pe4Acr/PX?=
+ =?us-ascii?Q?6BUxQNFHDuxDEhNoWwvrMayH23TWZa3XpMrvrJUIyuaFKpFN266v8M/J02Ag?=
+ =?us-ascii?Q?nQ4LPYxxrRnEvB0Um2eigJG1eyqUCdvq5bGSaI3ekcxFu9dHphoA7Vo+HQ7g?=
+ =?us-ascii?Q?igrvk4L+jljidXDEPkLJPS3ttUwbDGVWJvTowIohCCQdiazROEl5LQG2yJcK?=
+ =?us-ascii?Q?c+FTdx75fF1+xEVN4nLihk8D94Zee03uuXUGgyXUUByGPDt574u4RT2Gs+0h?=
+ =?us-ascii?Q?bzHwRGS/1Z2xsvhMReCjGYU27cPHSj8FbKTkBO0HLvEYccOeMq3JWcFyiw+V?=
+ =?us-ascii?Q?SmSsQX5nWBXZRQoP2r7JGIJ8xliDVA9YNts7lV7jf68sP/YSF6fR71RJIn5v?=
+ =?us-ascii?Q?XHW5dN5eU/f8Tnd9I2ANKsVSaDq+xjrW57397cdT?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d1e52e3d-6a27-4f71-1f87-08dc43de89e1
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 04:23:45.7166
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: wNeKAsq9YtS9g72BVlkWtJG3QdDw1bUwJGZNYgmd5i1SjpKaDhVMqt81TfUO8/BCLupFM8BcpfMiB9DRGKBvkA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6683
 
-On Wed, Mar 13, 2024 at 9:27=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.com=
-> wrote:
+
+On Wed, 13 Mar, 2024 18:40:17 -0700 Jakub Kicinski <kuba@kernel.org> wrote:
+> On Wed, 13 Mar 2024 17:50:39 -0700 Rahul Rameshbabu wrote:
+>> > Should we give some guidance to drivers which "ignore" time stamping
+>> > requests if they used up all the "slots"? Even if just temporary until
+>> > they are fixed? Maybe we can add after all the fields something like:
+>> >
+>> >   For drivers which ignore further timestamping requests when there are
+>> >   too many in flight, the ignored requests are currently not counted by
+>> >   any of the statistics.  
+>> 
+>> I was actually thinking it would be better to merge them into the error
+>> counter temporarily. Reason being is that in the case Intel notices that
+>> their slots are full, they just drop traffic from my understanding
+>> today. If the error counters increment in that situation, it helps with
+>> the debug to a degree. EBUSY is an error in general.
 >
-> On Wed, Mar 13, 2024 at 9:24=E2=80=AFPM Jason A. Donenfeld <Jason@zx2c4.c=
-om> wrote:
-> >
-> > I applied this series to the wireguard tree. Thanks for the patches.
->
-> Actually, sorry, nevermind. 1/2 is fine, but 2/2 results in `ip -stats
-> link ...` returning all zeros.
+> That works, too, let's recommend it (FWIW no preference whether
+> in the entry for @err or somewhere separately in the kdoc).
 
-Ahh, okay, required some more commits from 6.8. Okay, seems to be
-working. I'll let this cook a bit and then push it up in a while.
+  /**
+   * struct ethtool_ts_stats - HW timestamping statistics
+   * @tx_stats: struct group for TX HW timestamping
+   *	@pkts: Number of packets successfully timestamped by the hardware.
+   *	@lost: Number of hardware timestamping requests where the timestamping
+   *		information from the hardware never arrived for submission with
+   *		the skb.
+   *	@err: Number of arbitrary timestamp generation error events that the
+   *		hardware encountered, exclusive of @lost statistics. Cases such
+   *		as resource exhaustion, unavailability, firmware errors, and
+   *		detected illogical timestamp values not submitted with the skb
+   *		are inclusive to this counter.
+   */
 
+Here is my current draft for the error counter documentation.
 
-Jason
+--
+Thanks,
+
+Rahul Rameshbabu
 
