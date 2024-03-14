@@ -1,495 +1,451 @@
-Return-Path: <netdev+bounces-79816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D995487B9D5
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 09:56:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD59887BA05
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 10:05:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 918AF28374F
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 08:56:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 420C81F2398E
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 09:05:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5CDA6D1B2;
-	Thu, 14 Mar 2024 08:55:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD1236BFA3;
+	Thu, 14 Mar 2024 09:05:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="qWypFDPt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="THgkgzhD"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E8B46BFDC;
-	Thu, 14 Mar 2024 08:55:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D9E3EA6C;
+	Thu, 14 Mar 2024 09:05:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710406516; cv=none; b=MaLxxd2/cdZdSeLne0/ThbVsXG9at6jDQhnL7XHPYZkNys1rRuR4/MZ/nhDrssy4NJFI6MVIUMOLmLiIHNlH66HW3OOGfqCAIHGu6LbX0SxobsV+2zNR4C3/gEL8h6HESAjEJJ6YrWieiYgxQpIPFw7ZA4NfbmRbqQmFk6o/noA=
+	t=1710407150; cv=none; b=RxwJZw5MmGkCIFfe6Km2xyhXOAuk/ODK0qql2vp1DVKjNYLKZzFo/Yk4uE/FZGJHT7hIaoW7JM154aEdNSxyq035vrfssa7TpY3JgQvwB8olJYgmbZNHw14el6qLnLCie/Z2+Cee3LN3BHvZw75FSZ1oPqYmApzX/Rd0XtzZ+TM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710406516; c=relaxed/simple;
-	bh=DO52Ju4188zpX06ZisrV189B78C+myiB2XCM8tpADNE=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VmUSF4Pv8DXNemY1KjbMelOv/49LMmpteuGjNhfnSVGVXgGU5iSEADQK7zTDXJQdB6ntkhJc2d2DfrVzlKq4xoOOVm5QHNyHC5q3uyosQQu5gF72v5XCIBO1+A9K1016XZCtwZSSv6hup0hWIOFjalPh32rmqIKLjeaP1oIMqy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=qWypFDPt; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1710406512; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=FQkFfqe9owyn4QRszlRMhlAjQzbUKIgXZsFJ9PU7xCQ=;
-	b=qWypFDPt8lGz5HiVUScI+vt1mKVM/1W1WAxKRoHhGOmV1TY9Bx0WSAILH+5jeH5v/pN9RmhANlg5wb3h6nR++xys62rUpFcglTehRT0upHrbOAuTga6bsHshnWktYcYgS/u1Svyllkp6cY+SpLwmfc3Y47ib9FcjheVHHn0xj2g=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R131e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0W2S1OGK_1710406509;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W2S1OGK_1710406509)
-          by smtp.aliyun-inc.com;
-          Thu, 14 Mar 2024 16:55:10 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@google.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	virtualization@lists.linux.dev,
-	bpf@vger.kernel.org
-Subject: [PATCH net-next v4 8/8] virtio-net: support queue stat
-Date: Thu, 14 Mar 2024 16:54:59 +0800
-Message-Id: <20240314085459.115933-9-xuanzhuo@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20240314085459.115933-1-xuanzhuo@linux.alibaba.com>
-References: <20240314085459.115933-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1710407150; c=relaxed/simple;
+	bh=RVDzzH5i1FlQl8rgsxI9QOfCaS4ddm1ZBzsF1v2cvDk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=JhowXM5wovLvAhEKNGzA3QMU8/Sp1iz06e6o9NDH79EMxr5l4d5ySsOp+GXKCnUNYpVpei71WdRMKm1Ia/b9dK2/lcnDJhF8n+SmLCxCm1/0wWK/EY2m0mhMEHoQN8PhAcx8mfQ9uve3HhaeIIVVWdbvnEXaDO7S2M08oJAH6OI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=THgkgzhD; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-33e9dfd343fso398345f8f.0;
+        Thu, 14 Mar 2024 02:05:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710407147; x=1711011947; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=01PS9MyjvZ+fa5ZtYejHf1bfKehy4wrijtyd8vZ9ETI=;
+        b=THgkgzhD9sqR8ZBYf9fvXIbOLmp6GRuPyZI85WK1tIH8kqH29o6HiTqYFQ28J7xKeX
+         3Vgh316DJeR8wffFNOBLwEOEIPY93EECmcIC/Ha7M9cMrcWl+sxrfa7WDSZmAD3tOu78
+         Us/S++ulLTDfsnnk8kgwj0lEkHUZUEL52n/1oVzeQ9aP8iRLVSNopT1ivo+Jmhl6g06L
+         dNA1bc5YeKmRDdhBpcJyEeYEy0GlTu7jJ+B2rgepEOPo06T7X4n38MivuPmOFyyjPhMi
+         THmoX6NOQ+UTBtvw7R7KbaGODBRG80fqVvRPrGzkLMgEUVrm6s2/ojjmk9+aG2OhZto4
+         2j3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710407147; x=1711011947;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=01PS9MyjvZ+fa5ZtYejHf1bfKehy4wrijtyd8vZ9ETI=;
+        b=o2ZBm2lkzFSk1n93jCKUrtM3wVJq437W45Lkcio8bX5P/ZKhN2daCRdPPdJsV+4OYc
+         0zNX3UOy9bIGTIALKZ5d1EqavbK4Spfi6gZ874t2TRjmPCrHCcR/N1eWIKI4/VqxY4Nw
+         rzm+umrZseW4mqixGo2yyPS713YMaldi/3ygHHYaMzEFliztp94F5z15BSe+ZX27etia
+         oner35yrcNE8k5Ujx2E58tqA+ITWxk3Vp19vrrz7JNn4IVrq1UvfevuV23xzJP38Zt5B
+         ZbOLsrCaofTBLzI+DRmZ0XsKsm6P1xm3hhsSqlSp/+nuyFe0DN3odx4XHCHJ6HEjjuJ5
+         EwJw==
+X-Forwarded-Encrypted: i=1; AJvYcCUqn9iXIY5bZ279Z8D5W5HFSE9N53c3OiSfmOb70D3DYXUUc2jRiYfeKyZlYlUhcR9bgK1MV71ieOPk1P0wN3LSwcQoebLe3q9sa21upoWf3L69F9Uv03kkRKt/2Dl38jQVDfvNAsDDTu3YALMPhVmI907/9P8UsbEgsUOKew==
+X-Gm-Message-State: AOJu0YyaTFCAyMT9REPDODCpGCGvThP2IaxBUbeA/6/hCUbXqvGwiKaV
+	MlUHxQKcU+nld7tRHrXKA7Q4wOY50tlcRNIIv3Rg0m98qxZXD+Pm
+X-Google-Smtp-Source: AGHT+IFFKd5FCs2i1AVIOZdOQmuDBOotWYgL/a1/GRZg2EFfeopIfGlwR3Fp1YHVJ9LqjKxUjgpRqw==
+X-Received: by 2002:a5d:4083:0:b0:33d:f56e:f867 with SMTP id o3-20020a5d4083000000b0033df56ef867mr647384wrp.67.1710407146731;
+        Thu, 14 Mar 2024 02:05:46 -0700 (PDT)
+Received: from ran.advaoptical.com ([82.166.23.19])
+        by smtp.gmail.com with ESMTPSA id w16-20020adfcd10000000b0033e5c54d0d9sm266265wrm.38.2024.03.14.02.05.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Mar 2024 02:05:46 -0700 (PDT)
+From: Sagi Maimon <maimon.sagi@gmail.com>
+To: richardcochran@gmail.com,
+	luto@kernel.org,
+	datglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
+	arnd@arndb.de,
+	geert@linux-m68k.org,
+	peterz@infradead.org,
+	hannes@cmpxchg.org,
+	sohil.mehta@intel.com,
+	rick.p.edgecombe@intel.com,
+	nphamcs@gmail.com,
+	palmer@sifive.com,
+	maimon.sagi@gmail.com,
+	keescook@chromium.org,
+	legion@kernel.org,
+	mark.rutland@arm.com,
+	mszeredi@redhat.com,
+	casey@schaufler-ca.com,
+	reibax@gmail.com,
+	davem@davemloft.net,
+	brauner@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-api@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v7] posix-timers: add clock_compare system call
+Date: Thu, 14 Mar 2024 11:05:40 +0200
+Message-Id: <20240314090540.14091-1-maimon.sagi@gmail.com>
+X-Mailer: git-send-email 2.26.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Git-Hash: 76259b0090f3
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-To enhance functionality, we now support reporting statistics through
-the netdev-generic netlink (netdev-genl) queue stats interface. However,
-this does not extend to all statistics, so a new field, qstat_offset,
-has been introduced. This field determines which statistics should be
-reported via netdev-genl queue stats.
+Some user space applications need to read a couple of different clocks.
+Each read requires moving from user space to kernel space.
+Reading each clock separately (syscall) introduces extra
+unpredictable/unmeasurable delay. Minimizing this delay contributes to user
+space actions on these clocks (e.g. synchronization etc).
 
-Given that queue stats are retrieved individually per queue, it's
-necessary for the virtnet_get_hw_stats() function to be capable of
-fetching statistics for a specific queue.
+Introduce a new system call clock_compare, which can be used to measure
+the offset between two clocks, from variety of types: PHC, virtual PHC
+and various system clocks (CLOCK_REALTIME, CLOCK_MONOTONIC, etc).
+The system call returns the clocks timestamps.
 
-python3 ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml
-    --dump qstats-get --json '{"scope": "queue"}'
-[{'ifindex': 2,
-  'queue-id': 0,
-  'queue-type': 'rx',
-  'rx-bytes': 157844011,
-  'rx-csum-bad': 0,
-  'rx-csum-none': 0,
-  'rx-csum-unnecessary': 2195386,
-  'rx-hw-drop-overruns': 0,
-  'rx-hw-drop-ratelimits': 0,
-  'rx-hw-drops': 12964,
-  'rx-packets': 598929},
- {'ifindex': 2,
-  'queue-id': 0,
-  'queue-type': 'tx',
-  'tx-bytes': 1938511,
-  'tx-csum-none': 0,
-  'tx-hw-drop-errors': 0,
-  'tx-hw-drop-ratelimits': 0,
-  'tx-hw-drops': 0,
-  'tx-needs-csum': 61263,
-  'tx-packets': 15515}]
+When possible, use crosstimespec to sync read values.
+Else, read clock A twice (before, and after reading clock B) and average these
+times – to be as close as possible to the time we read clock B.
 
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Signed-off-by: Sagi Maimon <maimon.sagi@gmail.com>
 ---
- drivers/net/virtio_net.c | 191 ++++++++++++++++++++++++++++++---------
- 1 file changed, 148 insertions(+), 43 deletions(-)
+ Addressed comments from:
+ - Arnd Bergman : https://www.spinics.net/lists/netdev/msg980859.html
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index d48985d61418..3e6ebfa1f4a5 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -24,6 +24,7 @@
- #include <net/xdp.h>
- #include <net/net_failover.h>
- #include <net/netdev_rx_queue.h>
-+#include <net/netdev_queues.h>
+ Changes since version 6:
+ - cheaper implantation regarding timespec64 operations. 
+  
+ arch/x86/entry/syscalls/syscall_64.tbl |   1 +
+ drivers/ptp/ptp_clock.c                |  34 ++++--
+ include/linux/posix-clock.h            |   2 +
+ include/linux/syscalls.h               |   4 +
+ include/uapi/asm-generic/unistd.h      |   5 +-
+ kernel/time/posix-clock.c              |  25 +++++
+ kernel/time/posix-timers.c             | 138 +++++++++++++++++++++++++
+ kernel/time/posix-timers.h             |   2 +
+ 8 files changed, 200 insertions(+), 11 deletions(-)
+
+diff --git a/arch/x86/entry/syscalls/syscall_64.tbl b/arch/x86/entry/syscalls/syscall_64.tbl
+index 7e8d46f4147f..727930d27e05 100644
+--- a/arch/x86/entry/syscalls/syscall_64.tbl
++++ b/arch/x86/entry/syscalls/syscall_64.tbl
+@@ -383,6 +383,7 @@
+ 459	common	lsm_get_self_attr	sys_lsm_get_self_attr
+ 460	common	lsm_set_self_attr	sys_lsm_set_self_attr
+ 461	common	lsm_list_modules	sys_lsm_list_modules
++462	common	clock_compare		sys_clock_compare
  
- static int napi_weight = NAPI_POLL_WEIGHT;
- module_param(napi_weight, int, 0444);
-@@ -78,6 +79,7 @@ static const unsigned long guest_offloads[] = {
- struct virtnet_stat_desc {
- 	char desc[ETH_GSTRING_LEN];
- 	size_t offset;
-+	int qstat_offset;
- };
- 
- struct virtnet_sq_stats {
-@@ -102,12 +104,27 @@ struct virtnet_rq_stats {
- 	u64_stats_t kicks;
- };
- 
--#define VIRTNET_SQ_STAT(name, m) {name, offsetof(struct virtnet_sq_stats, m)}
--#define VIRTNET_RQ_STAT(name, m) {name, offsetof(struct virtnet_rq_stats, m)}
-+#define VIRTNET_SQ_STAT(name, m) {name, offsetof(struct virtnet_sq_stats, m), -1}
-+#define VIRTNET_RQ_STAT(name, m) {name, offsetof(struct virtnet_rq_stats, m), -1}
-+
-+#define VIRTNET_SQ_STAT_QSTAT(name, m)				\
-+	{							\
-+		name,						\
-+		offsetof(struct virtnet_sq_stats, m),		\
-+		offsetof(struct netdev_queue_stats_tx, m),	\
-+	}
-+
-+#define VIRTNET_RQ_STAT_QSTAT(name, m)				\
-+	{							\
-+		name,						\
-+		offsetof(struct virtnet_rq_stats, m),		\
-+		offsetof(struct netdev_queue_stats_rx, m),	\
-+	}
- 
- static const struct virtnet_stat_desc virtnet_sq_stats_desc[] = {
--	VIRTNET_SQ_STAT("packets",      packets),
--	VIRTNET_SQ_STAT("bytes",        bytes),
-+	VIRTNET_SQ_STAT_QSTAT("packets", packets),
-+	VIRTNET_SQ_STAT_QSTAT("bytes",   bytes),
-+
- 	VIRTNET_SQ_STAT("xdp_tx",       xdp_tx),
- 	VIRTNET_SQ_STAT("xdp_tx_drops", xdp_tx_drops),
- 	VIRTNET_SQ_STAT("kicks",        kicks),
-@@ -115,8 +132,9 @@ static const struct virtnet_stat_desc virtnet_sq_stats_desc[] = {
- };
- 
- static const struct virtnet_stat_desc virtnet_rq_stats_desc[] = {
--	VIRTNET_RQ_STAT("packets",       packets),
--	VIRTNET_RQ_STAT("bytes",         bytes),
-+	VIRTNET_RQ_STAT_QSTAT("packets", packets),
-+	VIRTNET_RQ_STAT_QSTAT("bytes",   bytes),
-+
- 	VIRTNET_RQ_STAT("drops",         drops),
- 	VIRTNET_RQ_STAT("xdp_packets",   xdp_packets),
- 	VIRTNET_RQ_STAT("xdp_tx",        xdp_tx),
-@@ -129,10 +147,24 @@ static const struct virtnet_stat_desc virtnet_rq_stats_desc[] = {
- 	{#name, offsetof(struct virtio_net_stats_cvq, name)}
- 
- #define VIRTNET_STATS_DESC_RX(class, name) \
--	{#name, offsetof(struct virtio_net_stats_rx_ ## class, rx_ ## name)}
-+	{#name, offsetof(struct virtio_net_stats_rx_ ## class, rx_ ## name), -1}
- 
- #define VIRTNET_STATS_DESC_TX(class, name) \
--	{#name, offsetof(struct virtio_net_stats_tx_ ## class, tx_ ## name)}
-+	{#name, offsetof(struct virtio_net_stats_tx_ ## class, tx_ ## name), -1}
-+
-+#define VIRTNET_STATS_DESC_RX_QSTAT(class, name, qstat_field)			\
-+	{									\
-+		#name,								\
-+		offsetof(struct virtio_net_stats_rx_ ## class, rx_ ## name),	\
-+		offsetof(struct netdev_queue_stats_rx, qstat_field),		\
-+	}
-+
-+#define VIRTNET_STATS_DESC_TX_QSTAT(class, name, qstat_field)			\
-+	{									\
-+		#name,								\
-+		offsetof(struct virtio_net_stats_tx_ ## class, tx_ ## name),	\
-+		offsetof(struct netdev_queue_stats_tx, qstat_field),		\
-+	}
- 
- static const struct virtnet_stat_desc virtnet_stats_cvq_desc[] = {
- 	VIRTNET_STATS_DESC_CQ(command_num),
-@@ -146,8 +178,8 @@ static const struct virtnet_stat_desc virtnet_stats_rx_basic_desc[] = {
- 	VIRTNET_STATS_DESC_RX(basic, notifications),
- 	VIRTNET_STATS_DESC_RX(basic, interrupts),
- 
--	VIRTNET_STATS_DESC_RX(basic, drops),
--	VIRTNET_STATS_DESC_RX(basic, drop_overruns),
-+	VIRTNET_STATS_DESC_RX_QSTAT(basic, drops,         hw_drops),
-+	VIRTNET_STATS_DESC_RX_QSTAT(basic, drop_overruns, hw_drop_overruns),
- };
- 
- static const struct virtnet_stat_desc virtnet_stats_tx_basic_desc[] = {
-@@ -157,46 +189,47 @@ static const struct virtnet_stat_desc virtnet_stats_tx_basic_desc[] = {
- 	VIRTNET_STATS_DESC_TX(basic, notifications),
- 	VIRTNET_STATS_DESC_TX(basic, interrupts),
- 
--	VIRTNET_STATS_DESC_TX(basic, drops),
--	VIRTNET_STATS_DESC_TX(basic, drop_malformed),
-+	VIRTNET_STATS_DESC_TX_QSTAT(basic, drops,          hw_drops),
-+	VIRTNET_STATS_DESC_TX_QSTAT(basic, drop_malformed, hw_drop_errors),
- };
- 
- static const struct virtnet_stat_desc virtnet_stats_rx_csum_desc[] = {
--	VIRTNET_STATS_DESC_RX(csum, csum_valid),
--	VIRTNET_STATS_DESC_RX(csum, needs_csum),
-+	VIRTNET_STATS_DESC_RX_QSTAT(csum, csum_valid, csum_unnecessary),
-+	VIRTNET_STATS_DESC_RX_QSTAT(csum, csum_none,  csum_none),
-+	VIRTNET_STATS_DESC_RX_QSTAT(csum, csum_bad,   csum_bad),
- 
--	VIRTNET_STATS_DESC_RX(csum, csum_none),
--	VIRTNET_STATS_DESC_RX(csum, csum_bad),
-+	VIRTNET_STATS_DESC_RX(csum, needs_csum),
- };
- 
- static const struct virtnet_stat_desc virtnet_stats_tx_csum_desc[] = {
--	VIRTNET_STATS_DESC_TX(csum, needs_csum),
--	VIRTNET_STATS_DESC_TX(csum, csum_none),
-+	VIRTNET_STATS_DESC_TX_QSTAT(csum, csum_none,  csum_none),
-+	VIRTNET_STATS_DESC_TX_QSTAT(csum, needs_csum, needs_csum),
- };
- 
- static const struct virtnet_stat_desc virtnet_stats_rx_gso_desc[] = {
--	VIRTNET_STATS_DESC_RX(gso, gso_packets),
--	VIRTNET_STATS_DESC_RX(gso, gso_bytes),
--	VIRTNET_STATS_DESC_RX(gso, gso_packets_coalesced),
--	VIRTNET_STATS_DESC_RX(gso, gso_bytes_coalesced),
-+	VIRTNET_STATS_DESC_RX_QSTAT(gso, gso_packets,           hw_gro_packets),
-+	VIRTNET_STATS_DESC_RX_QSTAT(gso, gso_bytes,             hw_gro_bytes),
-+	VIRTNET_STATS_DESC_RX_QSTAT(gso, gso_packets_coalesced, hw_gro_wire_packets),
-+	VIRTNET_STATS_DESC_RX_QSTAT(gso, gso_bytes_coalesced,   hw_gro_wire_bytes),
- };
- 
- static const struct virtnet_stat_desc virtnet_stats_tx_gso_desc[] = {
--	VIRTNET_STATS_DESC_TX(gso, gso_packets),
--	VIRTNET_STATS_DESC_TX(gso, gso_bytes),
--	VIRTNET_STATS_DESC_TX(gso, gso_segments),
--	VIRTNET_STATS_DESC_TX(gso, gso_segments_bytes),
-+	VIRTNET_STATS_DESC_TX_QSTAT(gso, gso_packets,        hw_gso_packets),
-+	VIRTNET_STATS_DESC_TX_QSTAT(gso, gso_bytes,          hw_gso_bytes),
-+	VIRTNET_STATS_DESC_TX_QSTAT(gso, gso_segments,       hw_gso_wire_packets),
-+	VIRTNET_STATS_DESC_TX_QSTAT(gso, gso_segments_bytes, hw_gso_wire_bytes),
-+
- 	VIRTNET_STATS_DESC_TX(gso, gso_packets_noseg),
- 	VIRTNET_STATS_DESC_TX(gso, gso_bytes_noseg),
- };
- 
- static const struct virtnet_stat_desc virtnet_stats_rx_speed_desc[] = {
--	VIRTNET_STATS_DESC_RX(speed, packets_allowance_exceeded),
-+	VIRTNET_STATS_DESC_RX_QSTAT(speed, packets_allowance_exceeded, hw_drop_ratelimits),
- 	VIRTNET_STATS_DESC_RX(speed, bytes_allowance_exceeded),
- };
- 
- static const struct virtnet_stat_desc virtnet_stats_tx_speed_desc[] = {
--	VIRTNET_STATS_DESC_TX(speed, packets_allowance_exceeded),
-+	VIRTNET_STATS_DESC_TX_QSTAT(speed, packets_allowance_exceeded, hw_drop_ratelimits),
- 	VIRTNET_STATS_DESC_TX(speed, packets_allowance_exceeded),
- };
- 
-@@ -3458,6 +3491,9 @@ static void virtnet_get_stats_string(struct virtnet_info *vi, int type, int qid,
+ #
+ # Due to a historical design error, certain syscalls are numbered differently
+diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+index 15b804ba4868..37ce66d4159f 100644
+--- a/drivers/ptp/ptp_clock.c
++++ b/drivers/ptp/ptp_clock.c
+@@ -156,17 +156,31 @@ static int ptp_clock_adjtime(struct posix_clock *pc, struct __kernel_timex *tx)
+ 	return err;
  }
  
- struct virtnet_stats_ctx {
-+	/* the stats are write to qstats or ethtool -S */
-+	bool to_qstat;
++static int ptp_clock_getcrosstime(struct posix_clock *pc, struct system_device_crosststamp *xtstamp)
++{
++	struct ptp_clock *ptp = container_of(pc, struct ptp_clock, clock);
++	int err;
 +
- 	u32 desc_num[3];
++	if (!ptp->info->getcrosststamp)
++		err = -EOPNOTSUPP;
++	else
++		err = ptp->info->getcrosststamp(ptp->info, xtstamp);
++
++	return err;
++}
++
+ static struct posix_clock_operations ptp_clock_ops = {
+-	.owner		= THIS_MODULE,
+-	.clock_adjtime	= ptp_clock_adjtime,
+-	.clock_gettime	= ptp_clock_gettime,
+-	.clock_getres	= ptp_clock_getres,
+-	.clock_settime	= ptp_clock_settime,
+-	.ioctl		= ptp_ioctl,
+-	.open		= ptp_open,
+-	.release	= ptp_release,
+-	.poll		= ptp_poll,
+-	.read		= ptp_read,
++	.owner			= THIS_MODULE,
++	.clock_adjtime		= ptp_clock_adjtime,
++	.clock_gettime		= ptp_clock_gettime,
++	.clock_getres		= ptp_clock_getres,
++	.clock_settime		= ptp_clock_settime,
++	.clock_getcrosstime	= ptp_clock_getcrosstime,
++	.ioctl			= ptp_ioctl,
++	.open			= ptp_open,
++	.release		= ptp_release,
++	.poll			= ptp_poll,
++	.read			= ptp_read,
+ };
  
- 	u32 bitmap[3];
-@@ -3469,12 +3505,13 @@ struct virtnet_stats_ctx {
+ static void ptp_clock_release(struct device *dev)
+diff --git a/include/linux/posix-clock.h b/include/linux/posix-clock.h
+index ef8619f48920..3a5b4bb3f56b 100644
+--- a/include/linux/posix-clock.h
++++ b/include/linux/posix-clock.h
+@@ -47,6 +47,8 @@ struct posix_clock_operations {
  
- static void virtnet_stats_ctx_init(struct virtnet_info *vi,
- 				   struct virtnet_stats_ctx *ctx,
--				   u64 *data)
-+				   u64 *data, bool to_qstat)
- {
- 	struct virtnet_stats_map *m;
- 	int i;
+ 	int  (*clock_settime)(struct posix_clock *pc,
+ 			      const struct timespec64 *ts);
++	int  (*clock_getcrosstime)(struct posix_clock *pc,
++				   struct system_device_crosststamp *xtstamp);
  
- 	ctx->data = data;
-+	ctx->to_qstat = to_qstat;
+ 	/*
+ 	 * Optional character device methods:
+diff --git a/include/linux/syscalls.h b/include/linux/syscalls.h
+index 77eb9b0e7685..47c5de3bdb18 100644
+--- a/include/linux/syscalls.h
++++ b/include/linux/syscalls.h
+@@ -1188,6 +1188,10 @@ asmlinkage long sys_ni_syscall(void);
  
- 	for (i = 0; i < ARRAY_SIZE(virtio_net_stats_map); ++i) {
- 		m = &virtio_net_stats_map[i];
-@@ -3531,7 +3568,7 @@ static void virtnet_fill_total_fields(struct virtnet_info *vi,
- 	stats_sum_queue(data, num_tx, first_tx_q, vi->curr_queue_pairs);
+ asmlinkage long sys_ni_posix_timers(void);
+ 
++asmlinkage long clock_compare(const clockid_t clock_a, const clockid_t clock_b,
++			      struct __kernel_timespec __user *tp_a,
++			      struct __kernel_timespec __user *tp_b,
++				  s64 __user *offs_err);
+ /*
+  * Kernel code should not call syscalls (i.e., sys_xyzyyz()) directly.
+  * Instead, use one of the functions which work equivalently, such as
+diff --git a/include/uapi/asm-generic/unistd.h b/include/uapi/asm-generic/unistd.h
+index 75f00965ab15..537a35afd237 100644
+--- a/include/uapi/asm-generic/unistd.h
++++ b/include/uapi/asm-generic/unistd.h
+@@ -842,8 +842,11 @@ __SYSCALL(__NR_lsm_set_self_attr, sys_lsm_set_self_attr)
+ #define __NR_lsm_list_modules 461
+ __SYSCALL(__NR_lsm_list_modules, sys_lsm_list_modules)
+ 
++#define __NR_clock_compare 462
++__SYSCALL(__NR_clock_compare, sys_clock_compare)
++
+ #undef __NR_syscalls
+-#define __NR_syscalls 462
++#define __NR_syscalls 463
+ 
+ /*
+  * 32 bit systems traditionally used different
+diff --git a/kernel/time/posix-clock.c b/kernel/time/posix-clock.c
+index 9de66bbbb3d1..68b2d6741036 100644
+--- a/kernel/time/posix-clock.c
++++ b/kernel/time/posix-clock.c
+@@ -327,9 +327,34 @@ static int pc_clock_settime(clockid_t id, const struct timespec64 *ts)
+ 	return err;
  }
  
--/* virtnet_fill_stats - copy the stats to ethtool -S
-+/* virtnet_fill_stats - copy the stats to qstats or ethtool -S
-  * The stats source is the device or the driver.
-  *
-  * @vi: virtio net info
-@@ -3550,8 +3587,8 @@ static void virtnet_fill_stats(struct virtnet_info *vi, u32 qid,
- 	const struct virtnet_stat_desc *desc;
- 	struct virtnet_stats_map *m;
- 	const u64_stats_t *v_stat;
-+	u64 offset, value;
- 	const __le64 *v;
--	u64 offset;
- 	int i, j;
- 
- 	num_cq = ctx->desc_num[VIRTNET_Q_TYPE_CQ];
-@@ -3584,10 +3621,21 @@ static void virtnet_fill_stats(struct virtnet_info *vi, u32 qid,
- 			desc = &m->desc[j];
- 			if (!from_driver) {
- 				v = (const __le64 *)(base + desc->offset);
--				ctx->data[offset + j] = le64_to_cpu(*v);
-+				value = le64_to_cpu(*v);
- 			} else {
- 				v_stat = (const u64_stats_t *)(base + desc->offset);
--				ctx->data[offset + j] = u64_stats_read(v_stat);
-+				value = u64_stats_read(v_stat);
-+			}
++static int pc_clock_get_crosstime(clockid_t id, struct system_device_crosststamp *xtstamp)
++{
++	struct posix_clock_desc cd;
++	int err;
 +
-+			if (ctx->to_qstat) {
-+				/* store to the queue stats structure */
-+				if (desc->qstat_offset >= 0) {
-+					offset = desc->qstat_offset / sizeof(*ctx->data);
-+					ctx->data[offset] = value;
-+				}
++	err = get_clock_desc(id, &cd);
++	if (err)
++		return err;
++
++	if ((cd.fp->f_mode & FMODE_WRITE) == 0) {
++		err = -EACCES;
++		goto out;
++	}
++
++	if (cd.clk->ops.clock_getcrosstime)
++		err = cd.clk->ops.clock_getcrosstime(cd.clk, xtstamp);
++	else
++		err = -EOPNOTSUPP;
++out:
++	put_clock_desc(&cd);
++
++	return err;
++}
++
+ const struct k_clock clock_posix_dynamic = {
+ 	.clock_getres		= pc_clock_getres,
+ 	.clock_set		= pc_clock_settime,
+ 	.clock_get_timespec	= pc_clock_gettime,
+ 	.clock_adj		= pc_clock_adjtime,
++	.clock_get_crosstimespec	= pc_clock_get_crosstime,
+ };
+diff --git a/kernel/time/posix-timers.c b/kernel/time/posix-timers.c
+index b924f0f096fa..ea43527cd5e9 100644
+--- a/kernel/time/posix-timers.c
++++ b/kernel/time/posix-timers.c
+@@ -1426,6 +1426,144 @@ SYSCALL_DEFINE4(clock_nanosleep_time32, clockid_t, which_clock, int, flags,
+ 
+ #endif
+ 
++/**
++ * clock_compare - Get couple of clocks time stamps
++ * @clock_a:	clock a ID
++ * @clock_b:	clock b ID
++ * @tp_a:		Pointer to a user space timespec64 for clock a storage
++ * @tp_b:		Pointer to a user space timespec64 for clock b storage
++ *
++ * clock_compare gets time sample of two clocks.
++ * Supported clocks IDs: PHC, virtual PHC and various system clocks.
++ *
++ * In case of PHC that supports crosstimespec and the other clock is Monotonic raw
++ * or system time, crosstimespec will be used to synchronously capture
++ * system/device time stamp.
++ *
++ * In other cases: Read clock_a twice (before, and after reading clock_b) and
++ * average these times – to be as close as possible to the time we read clock_b.
++ *
++ * Returns:
++ *	0		Success. @tp_a and @tp_b contains the time stamps
++ *	-EINVAL		@clock a or b ID is not a valid clock ID
++ *	-EFAULT		Copying the time stamp to @tp_a or @tp_b faulted
++ *	-EOPNOTSUPP	Dynamic POSIX clock does not support crosstimespec()
++ **/
++SYSCALL_DEFINE5(clock_compare, const clockid_t, clock_a, const clockid_t, clock_b,
++		struct __kernel_timespec __user *, tp_a, struct __kernel_timespec __user *,
++		tp_b, s64 __user *, offs_err)
++{
++	struct timespec64 ts_a, ts_a1, ts_b, ts_a2;
++	struct system_device_crosststamp xtstamp_a1, xtstamp_a2, xtstamp_b;
++	const struct k_clock *kc_a, *kc_b;
++	ktime_t ktime_a;
++	s64 ts_offs_err = 0;
++	int error = 0;
++	bool crosstime_support_a = false;
++	bool crosstime_support_b = false;
++
++	kc_a = clockid_to_kclock(clock_a);
++	if (!kc_a) {
++		error = -EINVAL;
++		return error;
++	}
++
++	kc_b = clockid_to_kclock(clock_b);
++	if (!kc_b) {
++		error = -EINVAL;
++		return error;
++	}
++
++	// In case crosstimespec supported and b clock is Monotonic raw or system
++	// time, synchronously capture system/device time stamp
++	if (clock_a < 0) {
++		error = kc_a->clock_get_crosstimespec(clock_a, &xtstamp_a1);
++		if (!error) {
++			if (clock_b == CLOCK_MONOTONIC_RAW) {
++				ts_b = ktime_to_timespec64(xtstamp_a1.sys_monoraw);
++				ts_a1 = ktime_to_timespec64(xtstamp_a1.device);
++				goto out;
++			} else if (clock_b == CLOCK_REALTIME) {
++				ts_b = ktime_to_timespec64(xtstamp_a1.sys_realtime);
++				ts_a1 = ktime_to_timespec64(xtstamp_a1.device);
++				goto out;
 +			} else {
-+				/* store to the ethtool -S data area */
-+				ctx->data[offset + j] = value;
- 			}
- 		}
- 
-@@ -3648,21 +3696,33 @@ static void virtnet_make_stat_req(struct virtnet_info *vi,
- 	*idx += 1;
- }
- 
-+/* qid: -1: get stats of all vq.
-+ *     > 0: get the stats for the special vq. This must not be cvq.
-+ */
- static int virtnet_get_hw_stats(struct virtnet_info *vi,
--				struct virtnet_stats_ctx *ctx)
-+				struct virtnet_stats_ctx *ctx, int qid)
- {
-+	int qnum, i, j, res_size, qtype, last_vq, first_vq;
- 	struct virtio_net_ctrl_queue_stats *req;
--	int qnum, i, j, res_size, qtype, last_vq;
-+	bool enable_cvq;
- 	void *reply;
- 
- 	if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_DEVICE_STATS))
- 		return 0;
- 
--	last_vq = vi->curr_queue_pairs * 2 - 1;
-+	if (qid == -1) {
-+		last_vq = vi->curr_queue_pairs * 2 - 1;
-+		first_vq = 0;
-+		enable_cvq = true;
-+	} else {
-+		last_vq = qid;
-+		first_vq = qid;
-+		enable_cvq = false;
++				crosstime_support_a = true;
++			}
++		}
 +	}
- 
- 	qnum = 0;
- 	res_size = 0;
--	for (i = 0; i <= last_vq ; ++i) {
-+	for (i = first_vq; i <= last_vq ; ++i) {
- 		qtype = vq_type(vi, i);
- 		if (ctx->bitmap[qtype]) {
- 			++qnum;
-@@ -3670,7 +3730,7 @@ static int virtnet_get_hw_stats(struct virtnet_info *vi,
- 		}
- 	}
- 
--	if (ctx->bitmap[VIRTNET_Q_TYPE_CQ]) {
-+	if (enable_cvq && ctx->bitmap[VIRTNET_Q_TYPE_CQ]) {
- 		res_size += ctx->size[VIRTNET_Q_TYPE_CQ];
- 		qnum += 1;
- 	}
-@@ -3686,10 +3746,11 @@ static int virtnet_get_hw_stats(struct virtnet_info *vi,
- 	}
- 
- 	j = 0;
--	for (i = 0; i <= last_vq ; ++i)
-+	for (i = first_vq; i <= last_vq ; ++i)
- 		virtnet_make_stat_req(vi, ctx, req, i, &j);
- 
--	virtnet_make_stat_req(vi, ctx, req, vi->max_queue_pairs * 2, &j);
-+	if (enable_cvq)
-+		virtnet_make_stat_req(vi, ctx, req, vi->max_queue_pairs * 2, &j);
- 
- 	return __virtnet_get_hw_stats(vi, ctx, req, sizeof(*req) * j, reply, res_size);
- }
-@@ -3742,7 +3803,7 @@ static int virtnet_get_sset_count(struct net_device *dev, int sset)
- 			}
- 		}
- 
--		virtnet_stats_ctx_init(vi, &ctx, NULL);
-+		virtnet_stats_ctx_init(vi, &ctx, NULL, false);
- 
- 		pair_count = ctx.desc_num[VIRTNET_Q_TYPE_RX] + ctx.desc_num[VIRTNET_Q_TYPE_TX];
- 
-@@ -3761,8 +3822,8 @@ static void virtnet_get_ethtool_stats(struct net_device *dev,
- 	unsigned int start, i;
- 	const u8 *stats_base;
- 
--	virtnet_stats_ctx_init(vi, &ctx, data);
--	if (virtnet_get_hw_stats(vi, &ctx))
-+	virtnet_stats_ctx_init(vi, &ctx, data, false);
-+	if (virtnet_get_hw_stats(vi, &ctx, -1))
- 		dev_warn(&vi->dev->dev, "Failed to get hw stats.\n");
- 
- 	for (i = 0; i < vi->curr_queue_pairs; i++) {
-@@ -4301,6 +4362,49 @@ static const struct ethtool_ops virtnet_ethtool_ops = {
- 	.set_rxnfc = virtnet_set_rxnfc,
- };
- 
-+static void virtnet_get_queue_stats_rx(struct net_device *dev, int i,
-+				       struct netdev_queue_stats_rx *stats)
-+{
-+	struct virtnet_info *vi = netdev_priv(dev);
-+	struct receive_queue *rq = &vi->rq[i];
-+	struct virtnet_stats_ctx ctx = {0};
 +
-+	virtnet_stats_ctx_init(vi, &ctx, (void *)stats, true);
++	// In case crosstimespec supported and a clock is Monotonic raw or system
++	// time, synchronously capture system/device time stamp
++	if (clock_b < 0) {
++		// Synchronously capture system/device time stamp
++		error = kc_b->clock_get_crosstimespec(clock_b, &xtstamp_b);
++		if (!error) {
++			if (clock_a == CLOCK_MONOTONIC_RAW) {
++				ts_a1 = ktime_to_timespec64(xtstamp_b.sys_monoraw);
++				ts_b = ktime_to_timespec64(xtstamp_b.device);
++				goto out;
++			} else if (clock_a == CLOCK_REALTIME) {
++				ts_a1 = ktime_to_timespec64(xtstamp_b.sys_realtime);
++				ts_b = ktime_to_timespec64(xtstamp_b.device);
++				goto out;
++			} else {
++				crosstime_support_b = true;
++			}
++		}
++	}
 +
-+	virtnet_get_hw_stats(vi, &ctx, i * 2);
-+	virtnet_fill_stats(vi, i * 2, &ctx, (void *)&rq->stats, true, 0);
++	if (crosstime_support_a)
++		error = kc_a->clock_get_crosstimespec(clock_a, &xtstamp_a1);
++	else
++		error = kc_a->clock_get_timespec(clock_a, &ts_a1);
++
++	if (error)
++		return error;
++
++	if (crosstime_support_b)
++		error = kc_b->clock_get_crosstimespec(clock_b, &xtstamp_b);
++	else
++		error = kc_b->clock_get_timespec(clock_b, &ts_b);
++
++	if (error)
++		return error;
++
++	if (crosstime_support_a)
++		error = kc_a->clock_get_crosstimespec(clock_a, &xtstamp_a2);
++	else
++		error = kc_a->clock_get_timespec(clock_a, &ts_a2);
++
++	if (error)
++		return error;
++
++	if (crosstime_support_a) {
++		ktime_a = ktime_sub(xtstamp_a2.device, xtstamp_a1.device);
++		ts_offs_err = ktime_divns(ktime_a, 2);
++		ktime_a = ktime_add_ns(xtstamp_a1.device, (u64)ts_offs_err);
++		ts_a1 = ktime_to_timespec64(ktime_a);
++	} else {
++		ts_a = timespec64_sub(ts_a2, ts_a1);
++		ktime_a = timespec64_to_ktime(ts_a);
++		ts_offs_err = ktime_divns(ktime_a, 2);
++		timespec64_add_ns(&ts_a1, (u64)ts_offs_err);
++	}
++
++	if (crosstime_support_b)
++		ts_b = ktime_to_timespec64(xtstamp_b.device);
++out:
++	if (put_timespec64(&ts_a1, tp_a))
++		error = -EFAULT;
++
++	if (!error && put_timespec64(&ts_b, tp_b))
++		error = -EFAULT;
++
++	if (!error && copy_to_user(offs_err, &ts_offs_err, sizeof(ts_offs_err)))
++		error = -EFAULT;
++
++	return error;
 +}
 +
-+static void virtnet_get_queue_stats_tx(struct net_device *dev, int i,
-+				       struct netdev_queue_stats_tx *stats)
-+{
-+	struct virtnet_info *vi = netdev_priv(dev);
-+	struct send_queue *sq = &vi->sq[i];
-+	struct virtnet_stats_ctx ctx = {0};
-+
-+	virtnet_stats_ctx_init(vi, &ctx, (void *)stats, true);
-+
-+	virtnet_get_hw_stats(vi, &ctx, i * 2 + 1);
-+	virtnet_fill_stats(vi, i * 2 + 1, &ctx, (void *)&sq->stats, true, 0);
-+}
-+
-+static void virtnet_get_base_stats(struct net_device *dev,
-+				   struct netdev_queue_stats_rx *rx,
-+				   struct netdev_queue_stats_tx *tx)
-+{
-+	/* The queue stats of the virtio-net will not be reset. So here we
-+	 * return 0.
-+	 */
-+	memset(rx, 0, sizeof(*rx));
-+	memset(tx, 0, sizeof(*tx));
-+}
-+
-+static const struct netdev_stat_ops virtnet_stat_ops = {
-+	.get_queue_stats_rx	= virtnet_get_queue_stats_rx,
-+	.get_queue_stats_tx	= virtnet_get_queue_stats_tx,
-+	.get_base_stats		= virtnet_get_base_stats,
-+};
-+
- static void virtnet_freeze_down(struct virtio_device *vdev)
- {
- 	struct virtnet_info *vi = vdev->priv;
-@@ -5060,6 +5164,7 @@ static int virtnet_probe(struct virtio_device *vdev)
- 	dev->priv_flags |= IFF_UNICAST_FLT | IFF_LIVE_ADDR_CHANGE |
- 			   IFF_TX_SKB_NO_LINEAR;
- 	dev->netdev_ops = &virtnet_netdev;
-+	dev->stat_ops = &virtnet_stat_ops;
- 	dev->features = NETIF_F_HIGHDMA;
- 
- 	dev->ethtool_ops = &virtnet_ethtool_ops;
+ static const struct k_clock clock_realtime = {
+ 	.clock_getres		= posix_get_hrtimer_res,
+ 	.clock_get_timespec	= posix_get_realtime_timespec,
+diff --git a/kernel/time/posix-timers.h b/kernel/time/posix-timers.h
+index f32a2ebba9b8..b1f6075f35bb 100644
+--- a/kernel/time/posix-timers.h
++++ b/kernel/time/posix-timers.h
+@@ -11,6 +11,8 @@ struct k_clock {
+ 				      struct timespec64 *tp);
+ 	/* Returns the clock value in the root time namespace. */
+ 	ktime_t	(*clock_get_ktime)(const clockid_t which_clock);
++	int	(*clock_get_crosstimespec)(const clockid_t which_clock,
++					   struct system_device_crosststamp *xtstamp);
+ 	int	(*clock_adj)(const clockid_t which_clock, struct __kernel_timex *tx);
+ 	int	(*timer_create)(struct k_itimer *timer);
+ 	int	(*nsleep)(const clockid_t which_clock, int flags,
 -- 
-2.32.0.3.g01195cf9f
+2.26.3
 
 
