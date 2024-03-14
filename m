@@ -1,150 +1,232 @@
-Return-Path: <netdev+bounces-79888-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79889-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB9A987BE6A
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:06:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2468187BE92
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:10:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B0621F219A1
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:06:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D6C22881F2
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E9ED6FBB7;
-	Thu, 14 Mar 2024 14:06:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D67D870CC3;
+	Thu, 14 Mar 2024 14:09:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="DqEtNZJk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA826EB75
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 14:06:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCD096FE26
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 14:09:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710425200; cv=none; b=ji1Ctwzm6aio5Vlp7J2FjHYUMSkPGQgpHhJY5HzrRoQZwj33pnkzuTIm9cLhAgZn6cG5E2JNckjPruTX02EKXbTaivBD2RpHw9lx2vQcBN/PmP3a3OMYUjMjs8NYGfp8eXeEKoWn7qFHq5F9Vb7jcurdh+/KQHP2dacWUCz4qAQ=
+	t=1710425362; cv=none; b=UzaolSG9kKQFP9bwijw4MXs/gukr6+DNU1lAieDz237SLmU08bpbfX0RBmziRM7Ji/RhZQDcak05Aw+AmSdDqosTHqcA90gDBCEoSaRR49X2dZiXU7Vs3E4YOCBJiYySMG0IjxXqWgBvGtAV1knd4MdJ8cJOCisLqiVTPASqSRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710425200; c=relaxed/simple;
-	bh=UZuOmmwRfASoQKWo4geglWknyDomMsq10mOT60vTCig=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=hpZd5p8mcvmZwIZWpURPkRJH5ea0KwtbTmpwD33IyzyVF2TlFdEGbSENRdfdhT4JMv/D4BYFLwheR60n9FPb03mHiMWF9cLlO0+vnIajVu7dVFs5DEXGainC4A6qmOUq9EHFhGtwEF+WnWJjapx3jAX4+2+HOc26V506PvnWBYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c86ecb5b37so78650139f.2
-        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 07:06:38 -0700 (PDT)
+	s=arc-20240116; t=1710425362; c=relaxed/simple;
+	bh=y8brmKX45ZzZJPOYxXwPNDT83PMuCnG1y0vX9Gdz2Vo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fZd1WnWbr29us8AM4Xlv2lBvFQvxqCee3X7bS2aL1Sc5x4YFHoW20VjcDUNYdcAuq9RuiCnNnuNfj8QaNVAKlN2+lXu+lUpiUrPTwhygSzgTdmKC1X1sXM3auf3KFx3B1LAW9Qdw2lB56q/xbsh1g2tELZLobj1WdjbUFN6ol5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=DqEtNZJk; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5687ebddd8eso18160a12.0
+        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 07:09:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710425359; x=1711030159; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S++Vf8oj18wvwMBuvc+mlbBQAzlNbzY5FSl7qh9lRe0=;
+        b=DqEtNZJkp1/VllCbaJClU7QnKAuRCzVzodEVB5UW5DyJQAvLDmwYHT1lajwe++Y248
+         lObbMYVac8ZpUJhPxR1TJsYn3yR3U9uHj4Rm7cq6sZpaUI60enCkL2ppkHZ914Lxm3nE
+         TvFPxyChGU4EGQS56UGu5WxWfvI736u2oRs3SArZ99F709sTJLoyyf53D/CuURR6M77Z
+         kV0t1LY4fLAVd0d86oiBQVzk9XvdDW68XDblt59nFCknK6mp/fnjhO6L92RB5G+JbBuf
+         cyN1RA7Z6rjH4uGqzPo90XWVWVQ0ws0vHUU9krxz9Jf35mLh69ASmZlmpqM2UFzL5E+i
+         SFhw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710425198; x=1711029998;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sDAkd5UMH7mB7hZKOiwizlWb+VCYA9qCfshmpZCjJqg=;
-        b=LxiARxGmhIktsf9xXBSKqNn7cRscaUswqrb40MIjTXg8A9p59PP0PIDS/Kx2+bpM6G
-         qWSM8Al6ILdNwanWdPeHabZJh/hPXMxpyh8zMcNaoxTRAscryVGs8AUFfC3d5wW2YBOg
-         MtfyFBTbsU39x68Gj7GkpMoDkWVMWEh9qB3VYF6GB9GIckAC9pU1blhb1mmtz7MSaIOx
-         Ud1OBRBxd1f0kWKuDR31VZtcbLnoEFUEuZb1cIXZfqIv3MMCwfvQ4SXMbXZi1VAlq8cU
-         rYf8cf7PE5SvtJH3goo2CI9CGPTwIu2aXBlKNDOybmSQJEH5rI3UxQEQInVYieC0Wa++
-         OPGA==
-X-Forwarded-Encrypted: i=1; AJvYcCWd57Bu0r17ImOo4+s6nem400OoV0gPqoZ0aFYaVy9XXyWR+ew89JRR8Fvq/S9TqUhqHnS+JqF674kSMgUhi7KlGtHLH6C6
-X-Gm-Message-State: AOJu0YzcL911dtc49Iu3QJ7hOpSZzXAdvvvyAd7X2sabqoZpyE+a/G7r
-	Xb9gdxYwxwN3QLPBhDSq2/l7RQSuG6Rp5mCtM+83Ar/23oVHBd3ScynYqQO04sZUkGenhYAwMR4
-	PsuMvJ/bFWmiHpuInWlxlm851w46UN9nHtH5rQacqMIz/U4IB0n06KAM=
-X-Google-Smtp-Source: AGHT+IGLA0FjQR/ndgg1v0X+OtUhZ9n3w3GxaR8Kv9rXL93hD/4DvfSaFpEYmAFv4NWOTZ5sApFex7YV5DP61A9PyvwX3ndzZSa2
+        d=1e100.net; s=20230601; t=1710425359; x=1711030159;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S++Vf8oj18wvwMBuvc+mlbBQAzlNbzY5FSl7qh9lRe0=;
+        b=GU9b207bJizBZpdqj0IpKUgwywinXrrOGLoEUdfWYgGGYgDEzsTNd78Z5qb+0EfIkg
+         rEZYrFr5F59SCW0+vDkUHAYSY5pQOU1pF11ZBM8P8u5BUGkcuaiyxJtajMMewdnNV+68
+         Pq5jO+F1+hNUozL9CBWOil5sA1zqtapRE2ON4LSJliNR2RvTXoRrQy6CcGqqLxuOAv0H
+         5MeTO37dQaJBUsUFgHWtAUkd55XE00UWOfZvJmFO4NnznKAKGPxEWU/kgmlPrhc+Bj+J
+         zsTBn8iXOm8ZF8vJxdmcRC/6ro9CuegUUHwaZJkchcqoxlIYcHFM51GGZsCDAs5XspXq
+         iS9A==
+X-Forwarded-Encrypted: i=1; AJvYcCWdP1z8Q0QjgU4vtCNp1AKWIyMWIRm+sqVG6JMkYf47NpRhaY2F4LTpQ6/Iob2Pe4ilBIOp50JyhpAuqqIu4u0IAqwMB13s
+X-Gm-Message-State: AOJu0YwVYFbu0pOWN/Jse3ZBc4W3WIHuEBdhX8tq1JT5NOXJth9KTxQA
+	qYB+4B3hZlB/qabHKolkRcWwrhvM9k1k0T9Fsq91SOfKPX2ZagQt/oCGnwVzcKfFzqecW15Dp9a
+	cLf6YEBgma9DqPlmpxL3ZcMTQJe/81/fhBiaO
+X-Google-Smtp-Source: AGHT+IH+se+0PsSWJE7nQhdmEzMtgt2vtyaI5+PFVgBg7GHI4NBbE+z+XhFAHu2Vr+EbOonNdUAtgVNJFjtrH1+MB10=
+X-Received: by 2002:a05:6402:7d2:b0:568:9aca:8ae6 with SMTP id
+ u18-20020a05640207d200b005689aca8ae6mr158286edy.4.1710425358794; Thu, 14 Mar
+ 2024 07:09:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2644:b0:474:f191:6e20 with SMTP id
- n4-20020a056638264400b00474f1916e20mr113041jat.5.1710425198066; Thu, 14 Mar
- 2024 07:06:38 -0700 (PDT)
-Date: Thu, 14 Mar 2024 07:06:38 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000058907006139f66b4@google.com>
-Subject: [syzbot] [net?] KCSAN: data-race in dev_queue_xmit_nit / packet_setsockopt
-From: syzbot <syzbot+c669c1136495a2e7c31f@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, willemdebruijn.kernel@gmail.com
+References: <00000000000058907006139f66b4@google.com>
+In-Reply-To: <00000000000058907006139f66b4@google.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 14 Mar 2024 15:09:05 +0100
+Message-ID: <CANn89i+Z7MfbkBLOv=p7KZ7=K1rKHO4P1OL5LYDCtBiyqsa9oQ@mail.gmail.com>
+Subject: Re: [syzbot] [net?] KCSAN: data-race in dev_queue_xmit_nit / packet_setsockopt
+To: syzbot <syzbot+c669c1136495a2e7c31f@syzkaller.appspotmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	willemdebruijn.kernel@gmail.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Thu, Mar 14, 2024 at 3:06=E2=80=AFPM syzbot
+<syzbot+c669c1136495a2e7c31f@syzkaller.appspotmail.com> wrote:
+>
+> Hello,
+>
+> syzbot found the following issue on:
+>
+> HEAD commit:    480e035fc4c7 Merge tag 'drm-next-2024-03-13' of https://g=
+i..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=3D11e6a90118000=
+0
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D943916f31352d=
+d09
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3Dc669c1136495a2e=
+7c31f
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Deb=
+ian) 2.40
+>
+> Unfortunately, I don't have any reproducer for this issue yet.
+>
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/6e7a2dd336dc/dis=
+k-480e035f.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/8cb00a02987d/vmlinu=
+x-480e035f.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/f325a1992de8/b=
+zImage-480e035f.xz
+>
+> IMPORTANT: if you fix the issue, please add the following tag to the comm=
+it:
+> Reported-by: syzbot+c669c1136495a2e7c31f@syzkaller.appspotmail.com
+>
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> BUG: KCSAN: data-race in dev_queue_xmit_nit / packet_setsockopt
+>
+> write to 0xffff888107804542 of 1 bytes by task 22618 on cpu 0:
+>  packet_setsockopt+0xd83/0xfd0 net/packet/af_packet.c:4003
+>  do_sock_setsockopt net/socket.c:2311 [inline]
+>  __sys_setsockopt+0x1d8/0x250 net/socket.c:2334
+>  __do_sys_setsockopt net/socket.c:2343 [inline]
+>  __se_sys_setsockopt net/socket.c:2340 [inline]
+>  __x64_sys_setsockopt+0x66/0x80 net/socket.c:2340
+>  do_syscall_64+0xd3/0x1d0
+>  entry_SYSCALL_64_after_hwframe+0x6d/0x75
+>
+> read to 0xffff888107804542 of 1 bytes by task 27 on cpu 1:
+>  dev_queue_xmit_nit+0x82/0x620 net/core/dev.c:2248
+>  xmit_one net/core/dev.c:3527 [inline]
+>  dev_hard_start_xmit+0xcc/0x3f0 net/core/dev.c:3547
+>  __dev_queue_xmit+0xf24/0x1dd0 net/core/dev.c:4335
+>  dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+>  batadv_send_skb_packet+0x264/0x300 net/batman-adv/send.c:108
+>  batadv_send_broadcast_skb+0x24/0x30 net/batman-adv/send.c:127
+>  batadv_iv_ogm_send_to_if net/batman-adv/bat_iv_ogm.c:392 [inline]
+>  batadv_iv_ogm_emit net/batman-adv/bat_iv_ogm.c:420 [inline]
+>  batadv_iv_send_outstanding_bat_ogm_packet+0x3f0/0x4b0 net/batman-adv/bat=
+_iv_ogm.c:1700
+>  process_one_work kernel/workqueue.c:3254 [inline]
+>  process_scheduled_works+0x465/0x990 kernel/workqueue.c:3335
+>  worker_thread+0x526/0x730 kernel/workqueue.c:3416
+>  kthread+0x1d1/0x210 kernel/kthread.c:388
+>  ret_from_fork+0x4b/0x60 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+>
+> value changed: 0x00 -> 0x01
+>
+> Reported by Kernel Concurrency Sanitizer on:
+> CPU: 1 PID: 27 Comm: kworker/u8:1 Tainted: G        W          6.8.0-syzk=
+aller-08073-g480e035fc4c7 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 02/29/2024
+> Workqueue: bat_events batadv_iv_send_outstanding_bat_ogm_packet
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>
+> ---
+> This report is generated by a bot. It may contain errors.
+> See https://goo.gl/tpsmEJ for more information about syzbot.
+> syzbot engineers can be reached at syzkaller@googlegroups.com.
+>
+> syzbot will keep track of this issue. See:
+> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+>
+> If the report is already addressed, let syzbot know by replying with:
+> #syz fix: exact-commit-title
+>
+> If you want to overwrite report's subsystems, reply with:
+> #syz set subsystems: new-subsystem
+> (See the list of subsystem names on the web dashboard)
+>
+> If the report is a duplicate of another one, reply with:
+> #syz dup: exact-subject-of-another-report
+>
+> If you want to undo deduplication, reply with:
+> #syz undup
 
-syzbot found the following issue on:
+I will submit this fix soon:
 
-HEAD commit:    480e035fc4c7 Merge tag 'drm-next-2024-03-13' of https://gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11e6a901180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=943916f31352dd09
-dashboard link: https://syzkaller.appspot.com/bug?extid=c669c1136495a2e7c31f
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+diff --git a/net/core/dev.c b/net/core/dev.c
+index 0766a245816bdf70f6609dc7b6d694ae81e7a9e5..722787c3275527f1652ec98623f=
+61500ee753b45
+100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -2245,7 +2245,7 @@ void dev_queue_xmit_nit(struct sk_buff *skb,
+struct net_device *dev)
+        rcu_read_lock();
+ again:
+        list_for_each_entry_rcu(ptype, ptype_list, list) {
+-               if (ptype->ignore_outgoing)
++               if (READ_ONCE(ptype->ignore_outgoing))
+                        continue;
 
-Unfortunately, I don't have any reproducer for this issue yet.
+                /* Never send packets back to the socket
+diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+index 61270826b9ac73e66f9011c3230d4668f0bf7c77..7cfc7d301508fcead214fbdb4e9=
+62b0553a17916
+100644
+--- a/net/packet/af_packet.c
++++ b/net/packet/af_packet.c
+@@ -4000,7 +4000,7 @@ packet_setsockopt(struct socket *sock, int
+level, int optname, sockptr_t optval,
+                if (val < 0 || val > 1)
+                        return -EINVAL;
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6e7a2dd336dc/disk-480e035f.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8cb00a02987d/vmlinux-480e035f.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f325a1992de8/bzImage-480e035f.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+c669c1136495a2e7c31f@syzkaller.appspotmail.com
-
-==================================================================
-BUG: KCSAN: data-race in dev_queue_xmit_nit / packet_setsockopt
-
-write to 0xffff888107804542 of 1 bytes by task 22618 on cpu 0:
- packet_setsockopt+0xd83/0xfd0 net/packet/af_packet.c:4003
- do_sock_setsockopt net/socket.c:2311 [inline]
- __sys_setsockopt+0x1d8/0x250 net/socket.c:2334
- __do_sys_setsockopt net/socket.c:2343 [inline]
- __se_sys_setsockopt net/socket.c:2340 [inline]
- __x64_sys_setsockopt+0x66/0x80 net/socket.c:2340
- do_syscall_64+0xd3/0x1d0
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-read to 0xffff888107804542 of 1 bytes by task 27 on cpu 1:
- dev_queue_xmit_nit+0x82/0x620 net/core/dev.c:2248
- xmit_one net/core/dev.c:3527 [inline]
- dev_hard_start_xmit+0xcc/0x3f0 net/core/dev.c:3547
- __dev_queue_xmit+0xf24/0x1dd0 net/core/dev.c:4335
- dev_queue_xmit include/linux/netdevice.h:3091 [inline]
- batadv_send_skb_packet+0x264/0x300 net/batman-adv/send.c:108
- batadv_send_broadcast_skb+0x24/0x30 net/batman-adv/send.c:127
- batadv_iv_ogm_send_to_if net/batman-adv/bat_iv_ogm.c:392 [inline]
- batadv_iv_ogm_emit net/batman-adv/bat_iv_ogm.c:420 [inline]
- batadv_iv_send_outstanding_bat_ogm_packet+0x3f0/0x4b0 net/batman-adv/bat_iv_ogm.c:1700
- process_one_work kernel/workqueue.c:3254 [inline]
- process_scheduled_works+0x465/0x990 kernel/workqueue.c:3335
- worker_thread+0x526/0x730 kernel/workqueue.c:3416
- kthread+0x1d1/0x210 kernel/kthread.c:388
- ret_from_fork+0x4b/0x60 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-
-value changed: 0x00 -> 0x01
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 PID: 27 Comm: kworker/u8:1 Tainted: G        W          6.8.0-syzkaller-08073-g480e035fc4c7 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-Workqueue: bat_events batadv_iv_send_outstanding_bat_ogm_packet
-==================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-               po->prot_hook.ignore_outgoing =3D !!val;
++               WRITE_ONCE(po->prot_hook.ignore_outgoing, !!val);
+                return 0;
+        }
+        case PACKET_TX_HAS_OFF:
+@@ -4134,7 +4134,7 @@ static int packet_getsockopt(struct socket
+*sock, int level, int optname,
+                       0);
+                break;
+        case PACKET_IGNORE_OUTGOING:
+-               val =3D po->prot_hook.ignore_outgoing;
++               val =3D READ_ONCE(po->prot_hook.ignore_outgoing);
+                break;
+        case PACKET_ROLLOVER_STATS:
+                if (!po->rollover)
 
