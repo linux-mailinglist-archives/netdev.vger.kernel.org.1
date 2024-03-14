@@ -1,57 +1,61 @@
-Return-Path: <netdev+bounces-79944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C36687C2D3
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 19:35:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A222187C2E0
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 19:38:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 12AFD1F21C5D
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:35:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49D212875E3
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:37:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C53F374C05;
-	Thu, 14 Mar 2024 18:34:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB821745C9;
+	Thu, 14 Mar 2024 18:37:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a+jUWnHd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SKsqAyc+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB3B1A38FB;
-	Thu, 14 Mar 2024 18:34:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9440E1E480;
+	Thu, 14 Mar 2024 18:37:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710441297; cv=none; b=ctjqf5udzvARO1t2iCgg82LvhB3uXrzV1+hVc28B2HspZIsDq90EJE0PBXfhzZIemLHdW3MRJcYAce5+Wm5aAXkq5dpKj3bdoPbyjreO9gY9IXpSJNb48YTGKPXkTCkHU91QNC4loGNx5NSy7cmne8+D6FEZOMlaCXeffwR2YUg=
+	t=1710441472; cv=none; b=Jos6OyZTR0BXIo9pPnv4nvMcmWlpZUaDwZtKUqzz47FCbb0vqvYJ2BV+M7f2He0X9vbxPGoCvbBkDMbqTthlPyQTxxmwL5YVtCImAjDwAre7phPXTeOSePp1reLlwjRWJ2LsyaiL+fqUuQBE1ESVxYfZ+c3NtNHnlqPpirUCQIo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710441297; c=relaxed/simple;
-	bh=/Vt9G3MB7vSqqQzVnMSe8pAnjzC1rvozbwallsCWSnA=;
+	s=arc-20240116; t=1710441472; c=relaxed/simple;
+	bh=AdXleS6G42NaJO6wIWWlaMgfT66/GrpVGfRg8o5MFAs=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ZBxNSwI5Mz6pwMxD8gGh4mS/IdnAoWnb08FgYOHBPRzrG2H5F8RSFfN80xqy6VbJHrx6RMLu3BGjR+pD0W9esvTJN/OabTY1T1eydEtuKfsp0WxGwiy3xAigIAZ2YaE5+VRGp1voCz3O4MaRKDVNU4bjl0d5h7KXfpMPypKu8ZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a+jUWnHd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A675BC433F1;
-	Thu, 14 Mar 2024 18:34:56 +0000 (UTC)
+	 MIME-Version:Content-Type; b=fg42p1vxNHtvqoHrwSxVz8u7SzUhv/dC2hTnQ9FPm9cW+SDJZjNXPVqjb5axj6bt0bboURr//3wsjxie7561HdAYDtU2ljOx1wV2U24q1ewHd3l+1p0gKSRtzM5O4SPBcM9dB9XdwiNyiX8A+r2LGYX7uLcZ2cX17bZWKDV+A3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SKsqAyc+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87B56C433C7;
+	Thu, 14 Mar 2024 18:37:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710441297;
-	bh=/Vt9G3MB7vSqqQzVnMSe8pAnjzC1rvozbwallsCWSnA=;
+	s=k20201202; t=1710441472;
+	bh=AdXleS6G42NaJO6wIWWlaMgfT66/GrpVGfRg8o5MFAs=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=a+jUWnHdjSstOKo6slsJbBzqxJg2KgOYE/LzwCAW2IuXyAwhdvx47cUSqsngKZq3m
-	 RdvP9biRaZOiTnYAfdIQisCrNjHDVrLWVgv1wkwelsR6sr3Z0uYkf1eXfBCcWz6cDs
-	 UAxcE1R0Jk4GCLHj3EZ09u1xvmfbMC/UGNzu826vgCpSY9yVc0OXFgWq8ej0nNPZRH
-	 3h34o0IMd4TmrZJbD8Q4cBytN/Dsda9wO06QVg7pk1hhZ2QqkRT28Shj5Zkg2H25j1
-	 VVYx2NCdutNwOmdrD/Y1C9pMD5astVeTjJtFS9bfdqn2HOtrD2xpMV+hx1VlLPWbnv
-	 MiC7WP6z0ouew==
-Date: Thu, 14 Mar 2024 11:34:55 -0700
+	b=SKsqAyc+l4rgPjOLits/Ow4pfump+/uktbARxvuPEC63HVGI7dYGTgrcXrH5gUVEm
+	 60zGyyZvCJ6s5mSoRe0Im/vFurRksBYFJEFJUefhNuRK5eoArvbf1tv/K1t24t6nie
+	 zxNNouKRk+XB144ld5OXFl1CH2m0NfVPsmWPuA+94KsKxAT1fkK462+sc6VTxPqbAX
+	 rRlkKzGmpzI4SAYDt9IJ66Yv3ruIwPjkqwwgOEwkIBOIC8jgkr06lrVoAYHA+j13/X
+	 N2ruhV0zEoC+CGFv03g32Zdt2anUyPAu68wck2GBavg0v1Acc8J6J+fGjrZDp06XzI
+	 a15TmXgAPfiww==
+Date: Thu, 14 Mar 2024 11:37:50 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mark Cilissen <mark@yotsuba.nl>
-Cc: netdev@vger.kernel.org, Hans de Goede <hdegoede@redhat.com>, Eric
- Dumazet <edumazet@google.com>, Breno Leitao <leitao@debian.org>, Ingo
- Molnar <mingo@redhat.com>, "David S. Miller" <davem@davemloft.net>, Paolo
- Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netpoll: support sending over raw IP interfaces
-Message-ID: <20240314113455.152cebc9@kernel.org>
-In-Reply-To: <20240313124613.51399-1-mark@yotsuba.nl>
-References: <20240313124613.51399-1-mark@yotsuba.nl>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Abhishek Chauhan <quic_abchauha@quicinc.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Andrew Halaney <ahalaney@redhat.com>, Martin KaFai Lau
+ <martin.lau@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Daniel
+ Borkmann <daniel@iogearbox.net>, kernel@quicinc.com
+Subject: Re: [PATCH net-next v2] Revert "net: Re-use and set
+ mono_delivery_time bit for userspace tstamp packets"
+Message-ID: <20240314113750.5fa33ac6@kernel.org>
+In-Reply-To: <65f2c9468188_3ee617294f9@willemb.c.googlers.com.notmuch>
+References: <20240314010813.1418521-1-quic_abchauha@quicinc.com>
+	<65f2c9468188_3ee617294f9@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,19 +65,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 13 Mar 2024 13:46:13 +0100 Mark Cilissen wrote:
-> Currently, netpoll only supports interfaces with an ethernet-compatible
-> link layer. Certain interfaces like SLIP do not have a link layer
-> on the network interface level at all and expect raw IP packets,
-> and could benefit from being supported by netpoll.
+On Thu, 14 Mar 2024 05:54:14 -0400 Willem de Bruijn wrote:
+> Abhishek Chauhan wrote:
+> > This reverts commit 30bb896b98fce7d823a96fc02cd69be30384a5cc.  
 > 
-> This commit adds support for such interfaces by using the network device's
-> `hard_header_len` field as an indication that no link layer is present.
-> If that is the case we simply skip adding the ethernet header, causing
-> a raw IP packet to be sent over the interface. This has been confirmed
-> to add netconsole support to at least SLIP and WireGuard interfaces.
+> Upstream SHA1 is 885c36e59f46375c138de18ff1692f18eff67b7f ?
 
-Would be great if this could come with a simple selftest under
-tools/testing/selftests/net. Preferably using some simple tunnel
-device, rather than wg to limit tooling dependencies ;)
+Yes, and please also throw in a Fixes tag pointing at that
+commit.
 
