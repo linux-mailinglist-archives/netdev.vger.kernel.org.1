@@ -1,95 +1,78 @@
-Return-Path: <netdev+bounces-79875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C40587BD2B
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:00:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5133B87BD30
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:02:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD4251C20A68
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 13:00:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D608281CF2
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 13:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A3659168;
-	Thu, 14 Mar 2024 13:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E2759168;
+	Thu, 14 Mar 2024 13:02:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MieWM5Ec"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="T6V+5qj0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F250C58AD2;
-	Thu, 14 Mar 2024 13:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48EF855C35;
+	Thu, 14 Mar 2024 13:02:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710421230; cv=none; b=VsrtM+hHvvTteg7F1A4kJt5m/Y6pvfVdvGs5KgbfYBXiXI18ym4egf2XT0/c6Av4tjrDmhPeFMt7lwW/DloHga36FPXO+dvItpdTmYAWXvg4M5PSFxbAk5vggNAotLEJMQSKV4brqdOygxoSxB5wVlmndkmBqlwQuSaRwW5HnXA=
+	t=1710421325; cv=none; b=FBPC/6F2igJEbU5v42xD01qfVBGGSd0LW6KuKu1Vu4wREBWAZcyNf8OXEnl63V1zgkCon45uHaq1ow1OUn8pqKWCw5m61+hnz1Anft2Y55xY8I1IWwejHdxGaaHLGCtPo55OLot50ZYyPv9OQoWKY1Mpeg5uT3v6Y9xV4atFjps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710421230; c=relaxed/simple;
-	bh=DbVQHqNUOiF9cwvoomdtpUhXConL8TwOuW+UIdY8hTg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Qwk7j8TS+fHuBmLR0z7j8sVoxq9PQ4lVzPTrkh2+bBCF1t4A6uFuvHTyqawKeVD7EYzUsMnlh5xRQq++reUw/kSbWiOp0D3EoqdiFKTQlKtqqOspH75viz1i2vx8jim5peWoKjyLr1I+5lNqAnvPkz4zeOzXWNWlRQbKwKrryqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MieWM5Ec; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 7CF19C433F1;
-	Thu, 14 Mar 2024 13:00:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710421229;
-	bh=DbVQHqNUOiF9cwvoomdtpUhXConL8TwOuW+UIdY8hTg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=MieWM5EcNt82jf2c5sgvDJUcwqQ/UILDsGjkIzOYzoKJoJcHe0NT9JrBhX+NSPgHC
-	 nBf5QoHetRvMLFBvsk7qNTjmJDHy1c3z4vztKLjXG1kHMaxrfJnk/VdFBKyuR/wmmo
-	 GQYKQHOzxuf/FrKqe470PAbRtCkaSq0SW7Tt5n7XVPRylmw/EiiBGdZiik7ZD9xASB
-	 UxVPPLdmKV7MoUz2VDoEqlxHJTTK6QYbUO5qCFwo9YzfD1w6KwiSOpCzttHDT/Ogz9
-	 rNWIvJRLxESbpptN1GvaDZeiDaxfq92QZ1m2Z252fjR1PyMwwyY96w2AHkcVgrznTV
-	 rj64y9vLwfNwQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6AC14C595C3;
-	Thu, 14 Mar 2024 13:00:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1710421325; c=relaxed/simple;
+	bh=qAQB9FK88epVTyF/LeZpqM5y5+oOyaphSDCBPPScblw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fE5WO93139YKMV9SC9RcA1OdNbZH6272II5iJPXkN7jab6og4WjINCZxkZ9l8GRR+C+9JXdImW38p6vJkkIOaahKSb1Lr58qyi5LAtPlNSnzWWtEL6PYqodVZQitjrVuGWDk9PP1VF8uKabEzaKn10svztxUfJbp9d5AYuc2ge4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=T6V+5qj0; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=EVli0OmFTuK34nwbOdblGGUn4WUi0rrQKbNKDtrDklk=; b=T6V+5qj0xaMOJrB2glYk53Eafv
+	n2/VR9Pnz79XXEteuAxtf0EDuQkLwDObzh8LzRLOh1FS4OF4dSJgvf7QgNMAnzAlaJnKDE2nvAbAE
+	CWrNAPdZzrStDUQ89uzZ8VNUnVwIJLv2lIv6bHeJGUXpQmvvKhu63CuORqIqeCb3L5UU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rkkiy-00AJtH-8f; Thu, 14 Mar 2024 14:02:20 +0100
+Date: Thu, 14 Mar 2024 14:02:20 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexandra Diupina <adiupina@astralinux.ru>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Reichel <sre@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+Subject: Re: [PATCH] net: dsa: add return value check of genphy_read_status()
+Message-ID: <99631ba3-36f9-4eed-80d9-4a663ef46d80@lunn.ch>
+References: <20240314063008.11214-1-adiupina@astralinux.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: txgbe: fix clk_name exceed MAX_DEV_ID limits
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171042122943.11983.9169028322185914388.git-patchwork-notify@kernel.org>
-Date: Thu, 14 Mar 2024 13:00:29 +0000
-References: <20240313080634.459523-1-duanqiangwen@net-swift.com>
-In-Reply-To: <20240313080634.459523-1-duanqiangwen@net-swift.com>
-To: Duanqiang Wen <duanqiangwen@net-swift.com>
-Cc: netdev@vger.kernel.org, mengyuanlou@net-swift.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- maciej.fijalkowski@intel.com, andrew@lunn.ch, wangxiongfeng2@huawei.com,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240314063008.11214-1-adiupina@astralinux.ru>
 
-Hello:
+On Thu, Mar 14, 2024 at 09:30:08AM +0300, Alexandra Diupina wrote:
+> Need to check return value of genphy_read_status(),
+> because higher in the call hierarchy is the
+> dsa_register_switch() function,
+> which is used in various drivers.
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+I don't understand the commit message. Why is it important to
+dsa_register_switch()?
 
-On Wed, 13 Mar 2024 16:06:34 +0800 you wrote:
-> txgbe register clk which name is i2c_designware.pci_dev_id(),
-> clk_name will be stored in clk_lookup_alloc. If PCIe bus number
-> is larger than 0x39, clk_name size will be larger than 20 bytes.
-> It exceeds clk_lookup_alloc MAX_DEV_ID limits. So the driver
-> shortened clk_name.
-> 
-> Fixes: b63f20485e43 ("net: txgbe: Register fixed rate clock")
-> Signed-off-by: Duanqiang Wen <duanqiangwen@net-swift.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - net: txgbe: fix clk_name exceed MAX_DEV_ID limits
-    https://git.kernel.org/netdev/net/c/e30cef001da2
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+	Andrew
 
