@@ -1,101 +1,150 @@
-Return-Path: <netdev+bounces-79890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE0F387BEB5
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:18:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB9A987BE6A
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:06:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63795B22B04
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:18:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8B0621F219A1
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CC716FE06;
-	Thu, 14 Mar 2024 14:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E9ED6FBB7;
+	Thu, 14 Mar 2024 14:06:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AA796FE03
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 14:17:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA826EB75
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 14:06:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710425880; cv=none; b=utASkgN4xpoWQHN+GXDuGtnmk/RJcWJlXq7RU7YsKtF0BUIDM2tKguh4qtDn1tCyFr0VtmbovwzDbl4LV6Z6ktTHAME5YFTXdMXLH4GCNNv/RXac4HJG3zB/ubPcdYR+yY4n95A/0Fkt1A/H5xwM6RE59/vR2o6MtCvUyNHZxTI=
+	t=1710425200; cv=none; b=ji1Ctwzm6aio5Vlp7J2FjHYUMSkPGQgpHhJY5HzrRoQZwj33pnkzuTIm9cLhAgZn6cG5E2JNckjPruTX02EKXbTaivBD2RpHw9lx2vQcBN/PmP3a3OMYUjMjs8NYGfp8eXeEKoWn7qFHq5F9Vb7jcurdh+/KQHP2dacWUCz4qAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710425880; c=relaxed/simple;
-	bh=QJTM+yoIukNkHsnskXPzBT52aY04xci+PyNqa1OkG7g=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jzszCxNJOnTbPOd9ooQGBxk5xnXMZoTiohORJGY9jAaZfc0GmIlZIpPPkdofZCr2Pj5sp3/QvQnXjM5rmhGqqOSSsez2NQeYG3vNIWnlQQnwgr73DTZZCsYPTgnOyaVVewhgeCIZX9Tik1/1vyVgiESMXH/32FsLgP0ZIASf9D8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TwTtN6w81z2BgBX;
-	Thu, 14 Mar 2024 22:15:24 +0800 (CST)
-Received: from dggpemd100005.china.huawei.com (unknown [7.185.36.102])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4225D1A0172;
-	Thu, 14 Mar 2024 22:17:53 +0800 (CST)
-Received: from localhost.huawei.com (10.137.16.203) by
- dggpemd100005.china.huawei.com (7.185.36.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 14 Mar 2024 22:17:52 +0800
-From: renmingshuai <renmingshuai@huawei.com>
-To: <jiri@resnulli.us>
-CC: <caowangbao@huawei.com>, <davem@davemloft.net>, <jhs@mojatatu.com>,
-	<liaichun@huawei.com>, <netdev@vger.kernel.org>, <renmingshuai@huawei.com>,
-	<vladbu@nvidia.com>, <xiyou.wangcong@gmail.com>, <yanan@huawei.com>
-Subject: Re: [PATCH] net/sched: Forbid assigning mirred action to a filter attached to the egress
-Date: Thu, 14 Mar 2024 22:04:30 +0800
-Message-ID: <20240314140430.3682-1-renmingshuai@huawei.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <ZfLi17TuJpcd6KFb@nanopsycho>
-References: <ZfLi17TuJpcd6KFb@nanopsycho>
+	s=arc-20240116; t=1710425200; c=relaxed/simple;
+	bh=UZuOmmwRfASoQKWo4geglWknyDomMsq10mOT60vTCig=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=hpZd5p8mcvmZwIZWpURPkRJH5ea0KwtbTmpwD33IyzyVF2TlFdEGbSENRdfdhT4JMv/D4BYFLwheR60n9FPb03mHiMWF9cLlO0+vnIajVu7dVFs5DEXGainC4A6qmOUq9EHFhGtwEF+WnWJjapx3jAX4+2+HOc26V506PvnWBYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c86ecb5b37so78650139f.2
+        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 07:06:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710425198; x=1711029998;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sDAkd5UMH7mB7hZKOiwizlWb+VCYA9qCfshmpZCjJqg=;
+        b=LxiARxGmhIktsf9xXBSKqNn7cRscaUswqrb40MIjTXg8A9p59PP0PIDS/Kx2+bpM6G
+         qWSM8Al6ILdNwanWdPeHabZJh/hPXMxpyh8zMcNaoxTRAscryVGs8AUFfC3d5wW2YBOg
+         MtfyFBTbsU39x68Gj7GkpMoDkWVMWEh9qB3VYF6GB9GIckAC9pU1blhb1mmtz7MSaIOx
+         Ud1OBRBxd1f0kWKuDR31VZtcbLnoEFUEuZb1cIXZfqIv3MMCwfvQ4SXMbXZi1VAlq8cU
+         rYf8cf7PE5SvtJH3goo2CI9CGPTwIu2aXBlKNDOybmSQJEH5rI3UxQEQInVYieC0Wa++
+         OPGA==
+X-Forwarded-Encrypted: i=1; AJvYcCWd57Bu0r17ImOo4+s6nem400OoV0gPqoZ0aFYaVy9XXyWR+ew89JRR8Fvq/S9TqUhqHnS+JqF674kSMgUhi7KlGtHLH6C6
+X-Gm-Message-State: AOJu0YzcL911dtc49Iu3QJ7hOpSZzXAdvvvyAd7X2sabqoZpyE+a/G7r
+	Xb9gdxYwxwN3QLPBhDSq2/l7RQSuG6Rp5mCtM+83Ar/23oVHBd3ScynYqQO04sZUkGenhYAwMR4
+	PsuMvJ/bFWmiHpuInWlxlm851w46UN9nHtH5rQacqMIz/U4IB0n06KAM=
+X-Google-Smtp-Source: AGHT+IGLA0FjQR/ndgg1v0X+OtUhZ9n3w3GxaR8Kv9rXL93hD/4DvfSaFpEYmAFv4NWOTZ5sApFex7YV5DP61A9PyvwX3ndzZSa2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- dggpemd100005.china.huawei.com (7.185.36.102)
+X-Received: by 2002:a05:6638:2644:b0:474:f191:6e20 with SMTP id
+ n4-20020a056638264400b00474f1916e20mr113041jat.5.1710425198066; Thu, 14 Mar
+ 2024 07:06:38 -0700 (PDT)
+Date: Thu, 14 Mar 2024 07:06:38 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000058907006139f66b4@google.com>
+Subject: [syzbot] [net?] KCSAN: data-race in dev_queue_xmit_nit / packet_setsockopt
+From: syzbot <syzbot+c669c1136495a2e7c31f@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, willemdebruijn.kernel@gmail.com
+Content-Type: text/plain; charset="UTF-8"
 
->>---
->> net/sched/act_mirred.c                        |  4 +++
->> .../tc-testing/tc-tests/actions/mirred.json   | 32 +++++++++++++++++++
->> 2 files changed, 36 insertions(+)
->>
->>diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
->>index 5b3814365924..fc96705285fb 100644
->>--- a/net/sched/act_mirred.c
->>+++ b/net/sched/act_mirred.c
->>@@ -120,6 +120,10 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
->> 		NL_SET_ERR_MSG_MOD(extack, "Mirred requires attributes to be passed");
->> 		return -EINVAL;
->> 	}
->>+	if (tp->chain->block->q->parent != TC_H_INGRESS) {
->>+		NL_SET_ERR_MSG_MOD(extack, "Mirred can only be assigned to the filter attached to ingress");
->
->Hmm, that is quite restrictive. I'm pretty sure you would break some
->valid usecases.
-Hmm, that is really quite restrictive. It might be better to Forbid mirred attached to egress filter
-to mirror or redirect packets to the egress.
+Hello,
 
-diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-index fc96705285fb..ab3841470992 100644
---- a/net/sched/act_mirred.c
-+++ b/net/sched/act_mirred.c
-@@ -152,6 +152,11 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
-                return -EINVAL;
-        }
+syzbot found the following issue on:
 
-+       if ((tp->chain->block->q->parent != TC_H_INGRESS) && (parm->eaction == TCA_EGRESS_MIRROR || parm->eaction == TCA_EGRESS_REDIR)) {
-+               NL_SET_ERR_MSG_MOD(extack, "Mirred assigned to egress filter can only mirror or redirect to ingress");
-+               return -EINVAL;
-+       }
-+
-        switch (parm->eaction) {
-        case TCA_EGRESS_MIRROR:
-        case TCA_EGRESS_REDIR:
+HEAD commit:    480e035fc4c7 Merge tag 'drm-next-2024-03-13' of https://gi..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=11e6a901180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=943916f31352dd09
+dashboard link: https://syzkaller.appspot.com/bug?extid=c669c1136495a2e7c31f
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/6e7a2dd336dc/disk-480e035f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/8cb00a02987d/vmlinux-480e035f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f325a1992de8/bzImage-480e035f.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c669c1136495a2e7c31f@syzkaller.appspotmail.com
+
+==================================================================
+BUG: KCSAN: data-race in dev_queue_xmit_nit / packet_setsockopt
+
+write to 0xffff888107804542 of 1 bytes by task 22618 on cpu 0:
+ packet_setsockopt+0xd83/0xfd0 net/packet/af_packet.c:4003
+ do_sock_setsockopt net/socket.c:2311 [inline]
+ __sys_setsockopt+0x1d8/0x250 net/socket.c:2334
+ __do_sys_setsockopt net/socket.c:2343 [inline]
+ __se_sys_setsockopt net/socket.c:2340 [inline]
+ __x64_sys_setsockopt+0x66/0x80 net/socket.c:2340
+ do_syscall_64+0xd3/0x1d0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+read to 0xffff888107804542 of 1 bytes by task 27 on cpu 1:
+ dev_queue_xmit_nit+0x82/0x620 net/core/dev.c:2248
+ xmit_one net/core/dev.c:3527 [inline]
+ dev_hard_start_xmit+0xcc/0x3f0 net/core/dev.c:3547
+ __dev_queue_xmit+0xf24/0x1dd0 net/core/dev.c:4335
+ dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+ batadv_send_skb_packet+0x264/0x300 net/batman-adv/send.c:108
+ batadv_send_broadcast_skb+0x24/0x30 net/batman-adv/send.c:127
+ batadv_iv_ogm_send_to_if net/batman-adv/bat_iv_ogm.c:392 [inline]
+ batadv_iv_ogm_emit net/batman-adv/bat_iv_ogm.c:420 [inline]
+ batadv_iv_send_outstanding_bat_ogm_packet+0x3f0/0x4b0 net/batman-adv/bat_iv_ogm.c:1700
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0x465/0x990 kernel/workqueue.c:3335
+ worker_thread+0x526/0x730 kernel/workqueue.c:3416
+ kthread+0x1d1/0x210 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x60 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+
+value changed: 0x00 -> 0x01
+
+Reported by Kernel Concurrency Sanitizer on:
+CPU: 1 PID: 27 Comm: kworker/u8:1 Tainted: G        W          6.8.0-syzkaller-08073-g480e035fc4c7 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+Workqueue: bat_events batadv_iv_send_outstanding_bat_ogm_packet
+==================================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
