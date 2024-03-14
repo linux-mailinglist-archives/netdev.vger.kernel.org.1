@@ -1,259 +1,155 @@
-Return-Path: <netdev+bounces-79857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D75D87BC3F
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:52:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 592A387BC5C
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:57:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4666281542
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:52:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D35641F21365
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D8126F06E;
-	Thu, 14 Mar 2024 11:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6418F6F06C;
+	Thu, 14 Mar 2024 11:57:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GOTurZuq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dPSXTrzI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745E06EB41;
-	Thu, 14 Mar 2024 11:52:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C42EA6EB74
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 11:57:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710417172; cv=none; b=DKjWFnxLK1ecH9NmNmiOl0Y57PTI0PB3a5onEItMbVdEhZg1dRdw1W5FufqMXyfQkCTJHwNlnSA47cayRV8N0TKb96s7wuM6QQ+W3Xxft9jVCe0bv855hDOERSISMPYYJPy6hipk8BOA4U6O7V1De8RCHfz2z0oA1W0lIz47g/I=
+	t=1710417446; cv=none; b=WVzAEr3t+WD+AGAgzUkWdnvCCS5yTXJxhIV8e6dxjlvBaZHeseEkvMB4EtwM6aGva5WmqwfQxg8IOIVy3x5/t7hmOdL7b+0wertYSySgUjARf67qB3XkfWrNMql+rehrVGgD4XUGFX9MPfY8Kx1PX8rVcxMoQaOvkkgIKXhBMvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710417172; c=relaxed/simple;
-	bh=DR7uIQcQtirFNtRaxp4uGyTaLvC4VFi+/92L9+pR+Yw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XEDkh/vh7QRAlV6LPfajGm1bLOLwnnEfh1fJ+EiRE8Ltdtk25wEx4Us3J0CGsHxm5kO2A/k9sQTywIC638pFM2byoFBvljLJ/bOcSyH54HQmcU/VsoySJULlM733oLK2TB/XOj6D7ghJCO1IrgmjohFBtrzrd8nHU8zX+Gvfw1A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GOTurZuq; arc=none smtp.client-ip=209.85.161.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5a217378ad8so315140eaf.2;
-        Thu, 14 Mar 2024 04:52:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710417169; x=1711021969; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Tdifjv40tbAIgozYYTGFKCKIMm7LnNYUe3NS1/d4TCc=;
-        b=GOTurZuqO2xY72OF5w8SovnrNMYLUNykX64w9uZAAVk6VzAuDS5cWdPfcbUVeCgvIK
-         epECDrhCAeodqX2nAYwe5c+uqMRfi+yfoc0dtsZik8pWs93gcr0FFB6akiNOYg/Eggr9
-         PYbHzJvqMqexVfk9pK/VWuGqUXawXTkkLfJ3oAdv5bBBDBLqd0mtGQMQbHDDH8VJ4+nD
-         9IMVg18aRRftON2Jj0rNMNf2HDb2yV8RfZqg5ZlMtL/1iIgtt/pB6Zd1A3vygGp/jqiy
-         fRD86MTPepjv+RkEhT/u9E+V+99nKcbp8LlgPcU1Lphokc+ekWmN/r3n6GH54EwLsHLe
-         QguA==
+	s=arc-20240116; t=1710417446; c=relaxed/simple;
+	bh=AdMsm2idLYumEp0ZXOMFAz1fRELSXatQYvEc+3tGX+A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V11QQAKlPt316QCiFFSZcys5udFkoIgAOe4jQ7Ii9kIaaGlWgSxyx1jfdf8lZq453IX7Y64OQeddnScZJL0HcvMMHIWsWBg755xBB7IqXuiYlOf5MfLDftmM3uxwRgW3JNx64tJLIHcmmJwIGWYdsH20Xb+aTRQak//Ox3LDp5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dPSXTrzI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710417443;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W6Yj68QAc/GDKe4pAWzzjDhY33mBI0iwde75NIqen9o=;
+	b=dPSXTrzIMoV7B6aeCwoSvQ9J2gBNxTwLmLltloXuFQgBEAJvnktGnu3ySRx7ZAveTxlbYh
+	bi4y/01xbBlwWQ8racZ48YdTtc6IU7hvXUi7IIwIlmAahqZ62JB4zJ6XE108nPkJzyQYn6
+	eRCbYw2FE6hDOXwkX01pBh7stmKhpW0=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-681-qm6Bp9afOnSxYcxTr9oXTA-1; Thu, 14 Mar 2024 07:57:20 -0400
+X-MC-Unique: qm6Bp9afOnSxYcxTr9oXTA-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a4531df8727so25396866b.2
+        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 04:57:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710417169; x=1711021969;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tdifjv40tbAIgozYYTGFKCKIMm7LnNYUe3NS1/d4TCc=;
-        b=bQFClA2B/XYUsV+X1sVUJ6n6MaNjEzVftgchoBEbEX9F3RWc1XOWO8GqistR+6MSTe
-         Shxfdt2OBCaQh/HWIXzgvi+i7o1DwfL4YzOGnqCFLIrbxUB6T5Tef+aBHeZvWuM1wqp0
-         5powtAtEi0Wv43yAaDDhpVwufsrZ5XTa/jvK5MtGmjH3seQ2KUN+6tgod7tnlaGGkyb2
-         bqFcNO8JFUcplvx74XF3Mhy+ujNpj49jK21/Dq12kEK+ZKaVIPPF/auJ6q3b8ft8X59I
-         j2mgyDkqnO4fJL2APMQC796AWBvvBEy0HctmouNnLm6kn/ulU6Osmaerxil+IIrdJNNz
-         4p2g==
-X-Forwarded-Encrypted: i=1; AJvYcCVRgwxMODd0mt8Pq1JHd+e3ZSU5y9OS0bVVAow9mkeHoU5zzx1lKnaexaYIRo2XAw6cIfwF+iSNTqJh70lwlVWqw1gbgrLqxpRusdUAfKWXCk4cvwGHH5JwIzGZWu1WZgwqpf5f54Fann3I2MPYECSuMS6LWAqJEn+kljszIs2dLMjg+z26I2g4rlhrr5umUNo9Zu13t5CCDirFiqvRnN+eL+7am2re5iNlQMw/sbhcJVtrSlcq4c/+vF/Rf0VJgKcKJCsgBidJIBFLCOelHIt5Xk4cF4Dno/utM0s=
-X-Gm-Message-State: AOJu0YxzbiGsSvxL30Fkvxv0yHTyVxRuLa5oQucqTVq3BYMIjUdN87pQ
-	MX0nSwjue1/DHkhH1E75+GbBnw+i/msjSa22sAkZX4B3EmDh6oBy
-X-Google-Smtp-Source: AGHT+IHPtvNpbzsaayWywW7W8tum6qeCMeXLFKZPuvZvQSEuflx/ONggDCEzNvvaKOcLF8ZD/bugFA==
-X-Received: by 2002:a05:6358:6590:b0:17b:b52c:c121 with SMTP id x16-20020a056358659000b0017bb52cc121mr1728763rwh.13.1710417169288;
-        Thu, 14 Mar 2024 04:52:49 -0700 (PDT)
-Received: from [192.168.254.38] ([50.39.172.77])
-        by smtp.gmail.com with ESMTPSA id 192-20020a6301c9000000b005d7994a08dcsm522636pgb.36.2024.03.14.04.52.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Mar 2024 04:52:48 -0700 (PDT)
-Message-ID: <a4d24b2c-7dbf-4354-9514-f8a253aac14b@gmail.com>
-Date: Thu, 14 Mar 2024 04:52:47 -0700
+        d=1e100.net; s=20230601; t=1710417439; x=1711022239;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=W6Yj68QAc/GDKe4pAWzzjDhY33mBI0iwde75NIqen9o=;
+        b=fJKxIBMtbGemuFe6gTHPZ52O4OMWeIg9uJv6K0KLeZY6GTQyHLnOKQLJ42wxiUpU+K
+         buj0KdjOsG5lV+el89SjgORAK44aec1E8tJK7m7RR93mhWnoUMigGpb3tm04cNpLRC8N
+         dXPj6HxBHBQII5AJpDRq+iyk2Bdx77xzvYruaKpdTmw7gMZ9GPleVyxoq2irZEFMgszl
+         XXo/Hbwzhnz23bvr55a/IzRpP5sF8iQlmrGBptdRptHOZGn1n8iALw893e1gW5P9FODJ
+         jezVo+aiqXp41y9GAkH47wPp4/4rxJjkib2HCk6cdmOnF81nFWouEWxToqsi/AdyzzDT
+         uWdg==
+X-Gm-Message-State: AOJu0Yy1np8OCETNFqo7Wla7biyW1t441c127ZPSxfAEiUSCkE6cwIhS
+	W0Lc+FU3pJeubmkMub5bEjgY00sPCqcbByQxTw6+9pAQR0jj1ma/KZsTNxK76x8685O5Ka4Pvp4
+	N5TR5JN2QBlhfW6hHxjFDMUdwR/lzbf9Fn0cuVzxDp367dMQ5FwdL4eu5qZC+k7WotH9//7cAXd
+	w/uVF4hgV1M2uhXdJ6RLfX0rS4RclM
+X-Received: by 2002:a17:906:1194:b0:a45:c1a0:5c07 with SMTP id n20-20020a170906119400b00a45c1a05c07mr908081eja.17.1710417439446;
+        Thu, 14 Mar 2024 04:57:19 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEDd2Jv4Umtbk8PWZFo/vG9CwetRXLttChfYOuW/Phrx3fnFIjOrGAyZYjYrVlq16O3RjQTW7e3G7Su6kU5hIw=
+X-Received: by 2002:a17:906:1194:b0:a45:c1a0:5c07 with SMTP id
+ n20-20020a170906119400b00a45c1a05c07mr908069eja.17.1710417439108; Thu, 14 Mar
+ 2024 04:57:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [REGRESSION] Re: [PATCH] crypto: pkcs7: remove sha1 support
-Content-Language: en-US
-To: Eric Biggers <ebiggers@kernel.org>,
- Jeff Johnson <quic_jjohnson@quicinc.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>, Karel Balej
- <balejk@matfyz.cz>, dimitri.ledkov@canonical.com,
- alexandre.torgue@foss.st.com, davem@davemloft.net, dhowells@redhat.com,
- herbert@gondor.apana.org.au, keyrings@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-crypto@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-modules@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com, mcgrof@kernel.org,
- mcoquelin.stm32@gmail.com, linux-wireless@vger.kernel.org,
- netdev@vger.kernel.org, iwd@lists.linux.dev
-References: <CZSHRUIJ4RKL.34T4EASV5DNJM@matfyz.cz>
- <005f998ec59e27633b1b99fdf929e40ccfd401c1.camel@sipsolutions.net>
- <f2dcbe55-0f0e-4173-8e21-f899c6fc802a@gmail.com>
- <20240313194423.GA1111@sol.localdomain>
- <b838e729-dc30-4e18-b928-c34c16b08606@gmail.com>
- <20240313202223.GB1111@sol.localdomain>
- <db86cba4-0e61-441d-8e66-405a13b61a3c@gmail.com>
- <20240313221043.GC1111@sol.localdomain>
- <f0492c92-1015-48e3-bfce-598c7a4843d1@quicinc.com>
- <20240313230611.GD1111@sol.localdomain>
-From: James Prestwood <prestwoj@gmail.com>
-In-Reply-To: <20240313230611.GD1111@sol.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20240313135618.20930-1-ivecera@redhat.com>
+In-Reply-To: <20240313135618.20930-1-ivecera@redhat.com>
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Thu, 14 Mar 2024 12:57:07 +0100
+Message-ID: <CADEbmW1vis35ACawye9d2S11NHA-Zpemv1m_+6eurkroLCtqqQ@mail.gmail.com>
+Subject: Re: [PATCH net] i40e: Fix VF MAC filter removal
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, aleksandr.loktionov@intel.com, horms@kernel.org, 
+	Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
-
-On 3/13/24 4:06 PM, Eric Biggers wrote:
-> On Wed, Mar 13, 2024 at 03:51:10PM -0700, Jeff Johnson wrote:
->> On 3/13/2024 3:10 PM, Eric Biggers wrote:
->>> On Wed, Mar 13, 2024 at 02:17:29PM -0700, James Prestwood wrote:
->>>> Hi,
->>>>
->>>> On 3/13/24 1:22 PM, Eric Biggers wrote:
->>>>> On Wed, Mar 13, 2024 at 01:12:54PM -0700, James Prestwood wrote:
->>>>>> Hi,
->>>>>>
->>>>>> On 3/13/24 12:44 PM, Eric Biggers wrote:
->>>>>>> On Wed, Mar 13, 2024 at 10:26:06AM -0700, James Prestwood wrote:
->>>>>>>> Hi,
->>>>>>>>
->>>>>>>> On 3/13/24 1:56 AM, Johannes Berg wrote:
->>>>>>>>> Not sure why you're CC'ing the world, but I guess adding a few more
->>>>>>>>> doesn't hurt ...
->>>>>>>>>
->>>>>>>>> On Wed, 2024-03-13 at 09:50 +0100, Karel Balej wrote:
->>>>>>>>>>      and I use iwd
->>>>>>>>> This is your problem, the wireless stack in the kernel doesn't use any
->>>>>>>>> kernel crypto code for 802.1X.
->>>>>>>> Yes, the wireless stack has zero bearing on the issue. I think that's what
->>>>>>>> you meant by "problem".
->>>>>>>>
->>>>>>>> IWD has used the kernel crypto API forever which was abruptly broken, that
->>>>>>>> is the problem.
->>>>>>>>
->>>>>>>> The original commit says it was to remove support for sha1 signed kernel
->>>>>>>> modules, but it did more than that and broke the keyctl API.
->>>>>>>>
->>>>>>> Which specific API is iwd using that is relevant here?
->>>>>>> I cloned https://kernel.googlesource.com/pub/scm/network/wireless/iwd
->>>>>>> and grepped for keyctl and AF_ALG, but there are no matches.
->>>>>> IWD uses ELL for its crypto, which uses the AF_ALG API:
->>>>>>
->>>>>> https://git.kernel.org/pub/scm/libs/ell/ell.git/
->>>>> Thanks for pointing out that the relevant code is really in that separate
->>>>> repository.  Note, it seems that keyctl() is the problem here, not AF_ALG.  The
->>>>> blamed commit didn't change anything for AF_ALG.
->>>>>
->>>>>> I believe the failure is when calling:
->>>>>>
->>>>>> KEYCTL_PKEY_QUERY enc="x962" hash="sha1"
->>>>>>
->>>>>>   From logs Michael posted on the IWD list, the ELL API that fails is:
->>>>>>
->>>>>> l_key_get_info (ell.git/ell/key.c:416)
->>>>> Okay, I guess that's what's actually causing the problem.  KEYCTL_PKEY_* are a
->>>>> weird set of APIs where userspace can ask the kernel to do asymmetric key
->>>>> operations.  It's unclear why they exist, as the same functionality is available
->>>>> in userspace crypto libraries.
->>>>>
->>>>> I suppose that the blamed commit, or at least part of it, will need to be
->>>>> reverted to keep these weird keyctls working.
->>>>>
->>>>> For the future, why doesn't iwd just use a userspace crypto library such as
->>>>> OpenSSL?
->>>> I was not around when the original decision was made, but a few reasons I
->>>> know we don't use openSSL:
->>>>
->>>>   - IWD has virtually zero dependencies.
->>> Depending on something in the kernel does not eliminate a dependency; it just
->>> adds that particular kernel UAPI to your list of dependencies.  The reason that
->>> we're having this discussion in the first place is because iwd is depending on
->>> an obscure kernel UAPI that is not well defined.  Historically it's been hard to
->>> avoid "breaking" changes in these crypto-related UAPIs because of the poor
->>> design where a huge number of algorithms are potentially supported, but the list
->>> is undocumented and it varies from one system to another based on configuration.
->>> Also due to their obscurity many kernel developers don't know that these UAPIs
->>> even exist.  (The reaction when someone finds out is usually "Why!?")
->>>
->>> It may be worth looking at if iwd should make a different choice for this
->>> dependency.  It's understandable to blame dependencies when things go wrong, but
->>> at the same time the choice of dependency is very much a choice, and some
->>> choices can be more technically sound and cause fewer problems than others...
->>>
->>>>   - OpenSSL + friends are rather large libraries.
->>> The Linux kernel is also large, and it's made larger by having to support
->>> obsolete crypto algorithms for backwards compatibility with iwd.
->>>
->>>>   - AF_ALG has transparent hardware acceleration (not sure if openSSL does
->>>> too).
->>> OpenSSL takes advantage of CPU-based hardware acceleration, e.g. AES-NI.
->>>
->>>> Another consideration is once you support openSSL someone wants wolfSSL,
->>>> then boringSSL etc. Even if users implement support it just becomes a huge
->>>> burden to carry for the project. Just look at wpa_supplicant's src/crypto/
->>>> folder, nearly 40k LOC in there, compared to ELL's crypto modules which is
->>>> ~5k. You have to sort out all the nitty gritty details of each library, and
->>>> provide a common driver/API for the core code, differences between openssl
->>>> versions, the list goes on.
->>> What is the specific functionality that you're actually relying on that you
->>> think would need 40K lines of code to replace, even using OpenSSL?  I see you
->>> are using KEYCTL_PKEY_*, but what specifically are you using them for?  What
->>> operations are being performed, and with which algorithms and key formats?
->>> Also, is the kernel behavior that you're relying on documented anywhere?  There
->>> are man pages for those keyctls, but they don't say anything about any
->>> particular hash algorithm, SHA-1 or otherwise, being supported.
->> <https://lore.kernel.org/all/CA+55aFxW7NMAMvYhkvz1UPbUTUJewRt6Yb51QAx5RtrWOwjebg@mail.gmail.com/>
->> "And we simply do not break user space."
->> -Linus Torvalds
->>
->> Is this no longer applicable?
->>
-> As I said, the commit, or at least the part of it that broke iwd (it's not clear
-> that it's the whole commit), needs to be reverted.
+On Wed, Mar 13, 2024 at 2:56=E2=80=AFPM Ivan Vecera <ivecera@redhat.com> wr=
+ote:
+> Commit 73d9629e1c8c ("i40e: Do not allow untrusted VF to remove
+> administratively set MAC") fixed an issue where untrusted VF was
+> allowed to remove its own MAC address although this was assigned
+> administratively from PF. Unfortunately the introduced check
+> is wrong because it causes that MAC filters for other MAC addresses
+> including multi-cast ones are not removed.
 >
-> I just hope that, simultaneously, the iwd developers will consider improving the
-> design of iwd to avoid this type of recurring issue in the future.  After all,
-> this may be the only real chance for such a discussion before the next time iwd
-> breaks.
+> <snip>
+>         if (ether_addr_equal(addr, vf->default_lan_addr.addr) &&
+>             i40e_can_vf_change_mac(vf))
+>                 was_unimac_deleted =3D true;
+>         else
+>                 continue;
 >
-> Also, part of the reason I'm asking about what functionality that iwd is relying
-> on is so that, if necessary, it can be properly documented and supported...
+>         if (i40e_del_mac_filter(vsi, al->list[i].addr)) {
+>         ...
+> </snip>
 >
-> If we don't know what we are supporting, it is very hard to support it.
-
-IWD uses AF_ALG/keyctl for _all_ its crypto, cipher, and checksum needs. 
-Anything that wifi requires as far as crypto goes IWD uses the kernel, 
-except ECC is the only exception. The entire list of crypto requirements 
-(for full support at least) for IWD is here:
-
-https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/tools/test_runner_kernel_config
-
-For KEYCTL_PKEY_* specifically we use it for all asymmetric crypto 
-operations, (query), encrypt, decrypt, sign, verify.
-
-I'll be honest, the AF_ALG/keyctl support in ELL was mostly done by the 
-time I started working on IWD so I was not aware the documentation was 
-so poor. That is an entirely separate issue than this IMO, and I'm happy 
-to help with getting docs updated to include a proper list of supported 
-features. In addition maybe some automated testing that gets run on 
-kernel builds which actually exercises this API so it doesn't get 
-accidentally get broken in the future? Docs/tests IMO are the proper 
-"fix" here, not telling someone to stop using an API that has existed a 
-long time.
-
-I'm also not entirely sure why this stuff continues to be removed from 
-the kernel. First MD4, then it got reverted, then this (now reverted, 
-thanks). Both cases there was not clear justification of why it was 
-being removed.
-
-Thanks,
-
-James
-
+> The else path with `continue` effectively skips any MAC filter
+> removal except one for primary MAC addr when VF is allowed to do so.
+> Fix the check condition so the `continue` is only done for primary
+> MAC address.
 >
-> - Eric
+> Fixes: 73d9629e1c8c ("i40e: Do not allow untrusted VF to remove administr=
+atively set MAC")
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 11 ++++++-----
+>  1 file changed, 6 insertions(+), 5 deletions(-)
 >
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers=
+/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> index b34c71770887..10267a300770 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> @@ -3143,11 +3143,12 @@ static int i40e_vc_del_mac_addr_msg(struct i40e_v=
+f *vf, u8 *msg)
+>                 /* Allow to delete VF primary MAC only if it was not set
+>                  * administratively by PF or if VF is trusted.
+>                  */
+> -               if (ether_addr_equal(addr, vf->default_lan_addr.addr) &&
+> -                   i40e_can_vf_change_mac(vf))
+> -                       was_unimac_deleted =3D true;
+> -               else
+> -                       continue;
+> +               if (ether_addr_equal(addr, vf->default_lan_addr.addr)) {
+> +                       if (i40e_can_vf_change_mac(vf))
+> +                               was_unimac_deleted =3D true;
+> +                       else
+> +                               continue;
+> +               }
+>
+>                 if (i40e_del_mac_filter(vsi, al->list[i].addr)) {
+>                         ret =3D -EINVAL;
+> --
+> 2.43.0
+
+Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
+
 
