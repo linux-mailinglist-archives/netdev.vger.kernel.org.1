@@ -1,137 +1,182 @@
-Return-Path: <netdev+bounces-79896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AFC887BF44
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:47:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D189B87BF59
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:56:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4CBEE1C2104C
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:47:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5AEAD1F21FF8
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:56:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A124C70CDC;
-	Thu, 14 Mar 2024 14:47:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F087C70CDE;
+	Thu, 14 Mar 2024 14:56:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="fO78BxL1"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dPnKBNqC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2089.outbound.protection.outlook.com [40.107.94.89])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25E370CC5
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 14:47:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710427643; cv=none; b=OjVlkCIWWw2g1wuT/NC3EbnC2YyEEJo2J9wISRKg9XU6QujnQD0lZTMgIgxhm30So6+oicgAqh12UICrKxZDCPKsbwSLb1grozCvpcqE8ocheRSzHrk6HlZl3vjPxrhcXF5rAWW3cFu6N+L4mStelZaOy+qOYmIPbiL6jCiWvIc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710427643; c=relaxed/simple;
-	bh=lQz5Wi2CNI7mutEpsleqj+UaSfRjHL4NIvHI1DHFPnM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u9Ec2/ep/gCSyEpG4J+N/Idf63HF75ERfcKKSgjEubdomG+FQTVb4mZA9vCybWcnjPmdNCFL71yzGWein7/J1qpXnaL8JxP5zb9t61YMyK4QmE+PT/6kqw9HSvgx6K9XbDjRWaNj3QPPUTKwJSHKs/6Ver3oM1QcgIqHf5vs388=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=fO78BxL1; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6e622b46f45so875229b3a.1
-        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 07:47:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1710427641; x=1711032441; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YLAyFzYwKoQSCER8lGxmEQW44ebFW2QrRZ71aBXPTY0=;
-        b=fO78BxL19WY36+aGucLwA7XCmINtS7YybY+ur7z1DcVesWgrb9/j549Ri67KtZpZ00
-         d4QYjv75qGFIJUbVnGOmykfRzhwET1nHXOzYyfvHREyvQYOmz4lJd/3g7J9mB94gb3HN
-         6xsyF/0HrYyRgdkf0K1K4JVbC2CkBA+TtgLxTKNMpL7E0G0uF5j8S7GzUtHjVKMbchWu
-         +De7fNE3k1CVmLFJab445lg/Tlc64fgq5eemIKcIIbVac0IBFoybMYSSnbaeVN6mXim/
-         PBxcp6yr+Hpxc3VJ42PhOFG7jgAuSERyi4ZTRWulVwqtpehEoqrKXYatCWXb1ysWTI9O
-         NMFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710427641; x=1711032441;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YLAyFzYwKoQSCER8lGxmEQW44ebFW2QrRZ71aBXPTY0=;
-        b=l8Mhm1EVfPKIbPC2/BniYO5dyXEF5uFT3zZnhVXBdfUlVVq6miOTXIDM6eJOXYntFX
-         KGyZ8v3cJg1zUg6nKYEgi6GWRCn6w/CgtGhpqXoJNocxjDAc+BNjvV90bnpAenvu+sZF
-         zcNdqLzzL34yZU/oyk5wuO0auOPZ86BF0/4gRILFwTEqbyGGZWCJPXN3FGYRUJipq2ql
-         89EX8IoVzUc8B6qyZeLOQW/8hq8+txDrAn9VkOmnxvucawT87ikS+dDohf03WnaNEcfp
-         aN0ErL28I8Vw1xexdUs4xWGBaAsg089aP1gcRLZBN/JY2BFGg1G1huhQStJ4OXXFcdqU
-         Q6Vw==
-X-Forwarded-Encrypted: i=1; AJvYcCUjCoxDoBXWLEO5wEi1NvjRQC5pVR9t0tACgvyC8nkvSRVMXoLJ9tsPMMB3d2Jrq9+IQ1qBPYjrSHo0vrsCHXhxaqXP0Y54
-X-Gm-Message-State: AOJu0Yxifv9rPpVcEUEaIDmpsTd6P4c5ApwItwbzMTdBcpLU4bY/RShS
-	22cloSinc8SVEeS4pjjhBv5CNv9m5gVjh6CDMDPyCOs3FgGO4rNgGEEEn9PGVA==
-X-Google-Smtp-Source: AGHT+IECoo5ZWrowZUyhuI5rqcvTkeyY+WJigpkGzww9EfsDwNC//M/YezqUuq3iZXOORJXX/WISeQ==
-X-Received: by 2002:a17:903:2446:b0:1dd:9cb3:8f96 with SMTP id l6-20020a170903244600b001dd9cb38f96mr220893pls.42.1710427640808;
-        Thu, 14 Mar 2024 07:47:20 -0700 (PDT)
-Received: from ?IPV6:2804:14d:5c5e:44fb:52c2:1319:f04d:938b? ([2804:14d:5c5e:44fb:52c2:1319:f04d:938b])
-        by smtp.gmail.com with ESMTPSA id t20-20020a170902dcd400b001dc9893b03bsm1766281pll.272.2024.03.14.07.47.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Mar 2024 07:47:20 -0700 (PDT)
-Message-ID: <af05ea48-75c3-444c-86cb-ebf5c7bee2ec@mojatatu.com>
-Date: Thu, 14 Mar 2024 11:47:15 -0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8C0F3A8FF
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 14:56:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.89
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710428173; cv=fail; b=TR7aEtcdiPe06RJuAr5ToONAcsYZxDlFrCLZZj1lc4dZPOcA/k9y2PlhrjzZoZiGp7ea4M13U/EPb4wFprK1/VNBtXyBfLWp80NrFY4c7fsNi49EZmbkFuZu60ImFe39krmkVuNZ7i+yYDMJkKQknbdYn0YefPxiJySANoRpMGE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710428173; c=relaxed/simple;
+	bh=RxwDHk4OpSl7UC96sEZhBGCKtnCPxDPTIqgnu2wawOI=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=FKTDXvCjmZRxv/9fQxsKJDMsuyBqH3bU0sximBx3MCySI3FcVVji4uo9b1A5+A4DB+Zx4jRJuqFeWI67qZeHx0jMsU1B3+z8RNxiLckWpkf05ZOUTbN2aYt2yoxaNj0YjLRSfI8UAjchwC6yixtxXJZpQbOAX3J2IF4M2HGPoos=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dPnKBNqC; arc=fail smtp.client-ip=40.107.94.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=iom/WgWtCs2QNbXUpk4UycRh6qgRPP3JJLhRoZS2Rp1Ax8nVLyftQ35wAxA6pNGQCKcrIPR87nJMGPSS8AkfKY21cAkJPvoiiUqXHnlBmEj10k3ecBKEaGGNXhETXalSvkg6jkXZ3PdKdI989ZKgC/JYmI1VPQ/l2pXTi7EPas3fafhh504PWaSmPF1q79UEs4ubVtqTyRirA6NvXwqbo6seK6k+utNj32oMDP0wWjWJcpUZbZsEmmR0NLzr3B5CwZQPyV3N8HHW7if5IM3iYBPsvmH5Iut+kcr1KPDdqW2X4GDk9/aK8HeGLHL6VBfw/oAbifTVs+zvevko348Mxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=z2c7wdZyiOyX0TZM+GqKgTcSKk2v+VjifsU3FmrllTE=;
+ b=HcN5QoCBE40SO9rzLpuox1U0TuDaOZoV14JFf52EjkAXWUw9WKw8w3nVMMwWXcCYZ9lKlQ4K8tJSjGPXnP5d1Nv+2Ci2cNy8/rBXG0l89GGh30hrEpOdBrX+aEKRFfa63z2guM9g9OXXUnkAmbbyRIuUoA2tx3+RzSkxgzJcCbGnJl+VY393CRQhA/5uFsGnoEHs5YQiZJowIE7iku/6jJsf8Ubn+zfB+UKWZsR8MammOvgABgYHThlsZj5sQ1kjT2EhVzZocYvStWtUJ9z4SQDoGbrlgewLfAmtQmufvP2sCZu8bCaBatO8F14t/+MRUz6lTg8BtI+b/VE0jGsI3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z2c7wdZyiOyX0TZM+GqKgTcSKk2v+VjifsU3FmrllTE=;
+ b=dPnKBNqCo34SpKMFuWrmyX9kpYI7dfSihyCitbQffcxvpCZTHppZvUoJfmOmBQeLs060aop9qVGVObR5k2so6K0zIGk8aRnE0Llk1Bdytd0sA/R/x885DrG/D0T7yhaoSsinP0yQufu8o5VS4om2WuoRrgBh/HkN4lqhgo0WNePKhfZ8WverdMAymSe7+oUWjRrdzkcrGwmR8lrzoTBSZV4DFiJZ1V4ByhPGE8nHblm2N9TBxez1jQovoeUjXWVoPWCp+EI7cVCJ5M5X7t93Xl60dmUWUiuVUEllUxp2ZB2iIO4qH2GrDPKMmp4Io4exQr4aYepuywh83K2nGRIKvA==
+Received: from BY5PR04CA0005.namprd04.prod.outlook.com (2603:10b6:a03:1d0::15)
+ by MW6PR12MB8707.namprd12.prod.outlook.com (2603:10b6:303:241::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.36; Thu, 14 Mar
+ 2024 14:56:08 +0000
+Received: from SJ5PEPF000001D1.namprd05.prod.outlook.com
+ (2603:10b6:a03:1d0:cafe::8) by BY5PR04CA0005.outlook.office365.com
+ (2603:10b6:a03:1d0::15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.20 via Frontend
+ Transport; Thu, 14 Mar 2024 14:56:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ SJ5PEPF000001D1.mail.protection.outlook.com (10.167.242.53) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7386.12 via Frontend Transport; Thu, 14 Mar 2024 14:56:08 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Thu, 14 Mar
+ 2024 07:55:52 -0700
+Received: from localhost.localdomain (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Thu, 14 Mar
+ 2024 07:55:49 -0700
+From: Petr Machata <petrm@nvidia.com>
+To: David Ahern <dsahern@kernel.org>, Stephen Hemminger
+	<stephen@networkplumber.org>, <netdev@vger.kernel.org>
+CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, <mlxsw@nvidia.com>
+Subject: [PATCH iproute2-next v2 0/4] Support for nexthop group statistics
+Date: Thu, 14 Mar 2024 15:52:11 +0100
+Message-ID: <cover.1710427655.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net/sched: Forbid assigning mirred action to a filter
- attached to the egress
-To: renmingshuai <renmingshuai@huawei.com>, jiri@resnulli.us
-Cc: caowangbao@huawei.com, davem@davemloft.net, jhs@mojatatu.com,
- liaichun@huawei.com, netdev@vger.kernel.org, vladbu@nvidia.com,
- xiyou.wangcong@gmail.com, yanan@huawei.com
-References: <ZfLi17TuJpcd6KFb@nanopsycho>
- <20240314140430.3682-1-renmingshuai@huawei.com>
-Content-Language: en-US
-From: Pedro Tammela <pctammela@mojatatu.com>
-In-Reply-To: <20240314140430.3682-1-renmingshuai@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ5PEPF000001D1:EE_|MW6PR12MB8707:EE_
+X-MS-Office365-Filtering-Correlation-Id: d86bbfcf-75f4-4315-6243-08dc4436e17e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	r3294S4ld58NNs7OlDY4mNtXoBhD7dBxzggpRVGJaeeaE1mYfe6HcugiUAhU6K0xiOH9mUR/I/pwpYGL9dfCvQM7JGQhwp/TSQnUgwyeDgfPJ2hgFupmAOvqQO32FUTFGOJtj2PBF3F58tBZR2xSMSquNIWXB0JtTInSlw4JN45x3PinnYJ4ra6TGgV+KBB2m+Q/+EojeWsyMgUWACOUK7qtWtGO0J0Z+pSn2vIuZN5qRLZRBtzLkSJV/WzY8KPVO0UX7qHD4LN1XNuJvDHkeiNP6bZ9KoVxUBhOfJEHKId3stdaXa8h8CXt0yzAxRG2rxKJKUkapZktqXlsULrYxjoZ5NtYEarP6xFcdshZOn1zAidK/S/xRJctWVi53xEFvNeNKNb4TK33kFtyi9QmyLkLmSTlST3Q/CBgTEcvdP4r/PfX7US6KzV0A5P0EwN/Pkgh0ZRsqgluhSIuzXcV7TY7DoZ7VjCPRd5hTGZ6IvDDsnQ73y8LYIl+WCPymzBZ8rcd6I9Fxe+Ck+71EvjIFaJa6VRkuLCZbWn9HXrbSkzYEDuv1YzwM6HylanonyVH3bNwa3UOZn10uj+ykGbyZZKdGL+zQE5yIXFbdGRqCWbmiDraa+R5lURFNU8HZJgAb8n5sVYlnYMjcsREA9okLk6WDSfPsme/T8KMZ531vmvQJtXTPvlrugut83GZe/N0HrL5jI6YhZSCUPXMrt5qS5/NEj0JSYwEw2mwg6u2NHaOaB6EIpjL/EVGHWI6f/HK
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(82310400014)(1800799015)(36860700004)(376005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 14:56:08.1534
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d86bbfcf-75f4-4315-6243-08dc4436e17e
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ5PEPF000001D1.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW6PR12MB8707
 
-On 14/03/2024 11:04, renmingshuai wrote:
->>> ---
->>> net/sched/act_mirred.c                        |  4 +++
->>> .../tc-testing/tc-tests/actions/mirred.json   | 32 +++++++++++++++++++
->>> 2 files changed, 36 insertions(+)
->>>
->>> diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
->>> index 5b3814365924..fc96705285fb 100644
->>> --- a/net/sched/act_mirred.c
->>> +++ b/net/sched/act_mirred.c
->>> @@ -120,6 +120,10 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
->>> 		NL_SET_ERR_MSG_MOD(extack, "Mirred requires attributes to be passed");
->>> 		return -EINVAL;
->>> 	}
->>> +	if (tp->chain->block->q->parent != TC_H_INGRESS) {
->>> +		NL_SET_ERR_MSG_MOD(extack, "Mirred can only be assigned to the filter attached to ingress");
->>
->> Hmm, that is quite restrictive. I'm pretty sure you would break some
->> valid usecases.
-> Hmm, that is really quite restrictive. It might be better to Forbid mirred attached to egress filter
-> to mirror or redirect packets to the egress.
-> 
-> diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-> index fc96705285fb..ab3841470992 100644
-> --- a/net/sched/act_mirred.c
-> +++ b/net/sched/act_mirred.c
-> @@ -152,6 +152,11 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
->                  return -EINVAL;
->          }
-> 
-> +       if ((tp->chain->block->q->parent != TC_H_INGRESS) && (parm->eaction == TCA_EGRESS_MIRROR || parm->eaction == TCA_EGRESS_REDIR)) {
-> +               NL_SET_ERR_MSG_MOD(extack, "Mirred assigned to egress filter can only mirror or redirect to ingress");
-> +               return -EINVAL;
-> +       }
-> +
->          switch (parm->eaction) {
->          case TCA_EGRESS_MIRROR:
->          case TCA_EGRESS_REDIR:
+Next hop group stats allow verification of balancedness of a next hop
+group. The feature was merged in kernel commit 7cf497e5a122 ("Merge branch
+'nexthop-group-stats'"). This patchset adds to ip the corresponding
+support.
 
+NH group stats come in two flavors: as statistics for SW and for HW
+datapaths. The former is shown when -s is given to "ip nexthop". The latter
+demands more work from the kernel, and possibly driver and HW, and might
+not be always necessary. Therefore tie it to -s -s, similarly to how ip
+link shows more detailed stats when -s is given twice.
 
-Are you sure this happens to egress mirred to netdevs other than the one 
-used to attach the filter?
-It seems like in your example you are forcing mirred egress to the same 
-netdev as the filter
+Here's an example usage:
+
+ # ip link add name gre1 up type gre \
+      local 172.16.1.1 remote 172.16.1.2 tos inherit
+ # ip nexthop replace id 1001 dev gre1
+ # ip nexthop replace id 1002 dev gre1
+ # ip nexthop replace id 1111 group 1001/1002 hw_stats on
+ # ip -s -s -j -p nexthop show id 1111
+ [ {
+ 	[ ...snip... ]
+         "hw_stats": {
+             "enabled": true,
+             "used": true
+         },
+         "group_stats": [ {
+                 "id": 1001,
+                 "packets": 0,
+                 "packets_hw": 0
+             },{
+                 "id": 1002,
+                 "packets": 0,
+                 "packets_hw": 0
+             } ]
+     } ]
+
+hw_stats.enabled shows whether hw_stats have been requested for the given
+group. hw_stats.used shows whether any driver actually implemented the
+counter. group_stats[].packets show the total stats, packets_hw only the
+HW-datapath stats.
+
+v2:
+- Patch #1:
+    - have rta_getattr_uint() support 8- and 16-bit quantities as well
+- Patch #2:
+    - Use print_nl() for the newlines
+
+Petr Machata (4):
+  libnetlink: Add rta_getattr_uint()
+  ip: ipnexthop: Support dumping next hop group stats
+  ip: ipnexthop: Support dumping next hop group HW stats
+  ip: ipnexthop: Allow toggling collection of nexthop group HW
+    statistics
+
+ include/libnetlink.h  |  14 +++++
+ ip/ipnexthop.c        | 129 ++++++++++++++++++++++++++++++++++++++++++
+ ip/nh_common.h        |  11 ++++
+ man/man8/ip-nexthop.8 |   2 +
+ 4 files changed, 156 insertions(+)
+
+-- 
+2.43.0
+
 
