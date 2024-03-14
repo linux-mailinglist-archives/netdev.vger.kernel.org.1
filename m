@@ -1,194 +1,127 @@
-Return-Path: <netdev+bounces-79909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96E5087C065
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 16:36:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EEC587C06A
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 16:36:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBA601C20C19
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:36:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 00C7F1F238CE
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB5073532;
-	Thu, 14 Mar 2024 15:33:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37BE171B27;
+	Thu, 14 Mar 2024 15:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZjoBcKp2"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="QnpQFYBw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2779A7175B
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 15:33:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2454671741
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 15:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710430430; cv=none; b=ftvK4o8CPm1QNNCp28APC9ks2U0LQGhg3Z/SFjfZbDGg+hyfwlEWkGPfAnjZB8NP4CQ7aUKRyw3zSPPw9JDqJhZQmbgL0P0Y6KGB/pKhbw3glCU/f/kgFYlr3KIS/1aX1AnTVoQWsQ4uu14NZ2+LTMvnnqpBY0jyz4SWzFE7YBk=
+	t=1710430561; cv=none; b=U6pIxzQ8oq/6Bg8ZhQkNnA4xfYgXvGFQP0o9jd6neAF0dK6VVXerwRCchGHd2j9Sx5H3DsEaJMxvSufBUQFpWSfra9oH5zfbgHxK2JhQzBhiyGd4h81T+rCndfok7Ob+OnxRIQ6JUiRKjhFNTY1hE17JVNrxeAih95oFZnRR7Q8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710430430; c=relaxed/simple;
-	bh=8CHQLlYKOEH7+re8etQ3ezRPCim6YS834e/EOPacqU8=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ZCNwkqSQYgCXKL3xrG8eWBBVyvU6xsEngNn9oFKm/D1oCBrcIsoBmjjT475IjQK0cQ3+grU4+FxGZ4dLHHAU1gb4vxSvY8l1OfXqxtaZZCz2xKLQFoWBRqfTiLCWBcvnd/0aBhU4B6r+bB76hzwgw+o+pSo6Q97aOelAcAumWic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZjoBcKp2; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-78848933458so49726885a.1
-        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 08:33:48 -0700 (PDT)
+	s=arc-20240116; t=1710430561; c=relaxed/simple;
+	bh=eM734vb9xUexlVACzQFX/BVRnw+6JF6fzxbUKHT2tkQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RiV34strYJSFt/5qIgklpXBUrH4SoYBNkYN3ElghFz9CIlHNyfEEqSxywVPtJngvt+abSJQ6ge3Nvus8BWfQaVvR9REkKsztyrRai+rRq2D3DWP1O4DcrQpZOBIPcYMAVmfXqOrT5gBxLqaLMKQ1MRg4EZ0Ipj3S59WcZc+4Esw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=QnpQFYBw; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-366478a02baso1914755ab.0
+        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 08:35:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710430428; x=1711035228; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HUaCeSSILlYZXbBOem507vj1pNd6fa6cZJEJwa4SmpY=;
-        b=ZjoBcKp22Ec1q7dXZGoeb7QcLzCHJDL1se6Xb5/nAaL2dti6JoyDhXGavREOxrOWqr
-         bQOt+U2bCI7I0VD92JeHOfKKaixCIUS9IZh6w9CNk/gSIE+XvRudqJP5u3FZ1Bbei7ll
-         5eFeSnviEFP2quL8YQ/bZcvgUJOyUGzt7Dd8DOlZ61rIF9bdIJbIUl5KAo96RLLjql09
-         CcYYQ7fjg73qodJvJeDo6aeuRwpqegr9N8Sv77+DvX3TNvWnfx8lDRGPqZGPcMtKQP0N
-         lIXQe+A9QMtiilIbK6g0r+WAP+IpHExL86EvnZI9oKFVETjJ09O1Ri/meSHWWiLyx5GW
-         Ujkg==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710430557; x=1711035357; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=m8m6RYp3Or4a+DPO1B3zljGsIMd+DNLdiEhGRBtPs78=;
+        b=QnpQFYBw5nOHE9/P2JG0/jHKV/WhbLf+fCiWhVKVjpLaWuO2dD5ENy3Qr8C40NH3A6
+         lUaiTPY7pLUI+aXAkUan+eDb3qXSmlp78ZuItBK4qt0h2yKnbbLT2fsvOmloIfB5eDRV
+         a3qQeIQd1I7cV1VAaboCN7Qcp4ApWdOgMbhBW8UyRW46uhZ8wg9sOb0uyXlS2Wjkyfzk
+         EAdPiSXfKQf6UJ+Xvww2XdYurUumLbtgVCSo46y2tFf2+CWSeao20KWR6sRa5WW42rBL
+         Hzm0TG0O9l739aDALgV9Xm8Uu+iTiyu7klqhACKI9rhzwcdlGO970Ut9hDrkTdRWq7QP
+         2mnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710430428; x=1711035228;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=HUaCeSSILlYZXbBOem507vj1pNd6fa6cZJEJwa4SmpY=;
-        b=DZJ83vbzcY4zDC56f0rThPt9F0p6aBIWO1LPyCAh3MxcGymrQv0LKOmZOhCKDc+zwt
-         uzdvy8zalw/ZTviLgRwOy8nngFsSmvf3VVuYkK2E05TjeTL+tJlzqgOcULuTu72O2hHF
-         A3jDW9GQl438zSKdIBYicjA5ZXimY07RW8483dKVxT5TKQbx98ldEJE/Mc1uq941njGc
-         KGmUhkkqpu4B5yjB2DlE7k2EFOzBi8p7o53qulId5kk1pAIwOTfrWytoybaIrCRf9+14
-         C3mwaRIhUPed35023ZfpYQaOrjS2z/nxDjVuIOQAqZRs96YJbW4AIBDdYBSaHxN0VVZb
-         8jcA==
-X-Gm-Message-State: AOJu0Ywsvrw396D4NPMTkCwpnV9ZGHv8zK/S06y+p7a2vOcv+ZHaPR+4
-	56A9l1ni/EWyXvEaFFqcewDIK1qqg9sBtZnjSflHBUZ7taiOe9UZ
-X-Google-Smtp-Source: AGHT+IGBbY2BWNYEkO+GGKQA6+0nKt3p4lMSdhtb6C+RdvVvOdFjInHOSr9g307Ou5fXV7hSPfzFkw==
-X-Received: by 2002:ad4:4e14:0:b0:691:5bcd:6326 with SMTP id dl20-20020ad44e14000000b006915bcd6326mr1136388qvb.53.1710430427964;
-        Thu, 14 Mar 2024 08:33:47 -0700 (PDT)
-Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
-        by smtp.gmail.com with ESMTPSA id jx5-20020a0562142b0500b0068f4520e42dsm591743qvb.16.2024.03.14.08.33.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Mar 2024 08:33:47 -0700 (PDT)
-Date: Thu, 14 Mar 2024 11:33:47 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, 
- eric.dumazet@gmail.com, 
- Eric Dumazet <edumazet@google.com>, 
- syzbot+c669c1136495a2e7c31f@syzkaller.appspotmail.com, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Message-ID: <65f318db70f3f_3f8f5b2945b@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240314141816.2640229-1-edumazet@google.com>
-References: <20240314141816.2640229-1-edumazet@google.com>
-Subject: Re: [PATCH net] packet: annotate data-races around ignore_outgoing
+        d=1e100.net; s=20230601; t=1710430557; x=1711035357;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=m8m6RYp3Or4a+DPO1B3zljGsIMd+DNLdiEhGRBtPs78=;
+        b=DtIxQhBvEuGYlNLUFMkafZzhnsbGXQlZ6s03quOv9PW62PTZS9t4whVNxOzn7Q99FY
+         7smrnKI7cufcND0q5kijhiIqub1jJKHNYCcdVyGYRYJY7OJ7NmGx8GFM9jBOIMaimZXd
+         CNWPxUHvdVbkqgb/JOWkBp7m9cjoRiprtyVJT4P9XGq397BSSaqTQ1syQVj7ke+iAPK6
+         KAFa2HZFKVSMMv8901gcaxemEIlHyvSAKFLeqZaT9uL3diBbpUsOdM39DZlYNv/Rispk
+         mTBLsEHSEBbsp80N/RvFKyoHrFT/SD6p0N5kjxkoaXAI6T7r/WUmlyaC3MCRBWc7W/So
+         rBUg==
+X-Forwarded-Encrypted: i=1; AJvYcCUQSH13Qgali+j53TAC8se9a1pIwE9QhZlwgrMBu3mNA76yisrpLk5ZH5hpqwbK5D2sFcuFDfyIBN0Is1px7Syj0YCOdvxA
+X-Gm-Message-State: AOJu0YwFi8QkMYKvO4TtM6Ph+fuPodozAOebHtbXTY4XrGm031pOqWEy
+	I9U62ZbV780PbPdCzI6ym5nWNCfu1csuyf5oeysbIeI9B5JG7JWM7mG/yffRXyg=
+X-Google-Smtp-Source: AGHT+IHmMET+XQkb9fCPqsFHuiuWejVcRYpOpiE2dYaty3xKoiZUV6r+NlK8JpLekSdI/s3pte2XNQ==
+X-Received: by 2002:a92:6f10:0:b0:366:7d03:eb51 with SMTP id k16-20020a926f10000000b003667d03eb51mr1756525ilc.2.1710430556924;
+        Thu, 14 Mar 2024 08:35:56 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id a20-20020a056e02121400b0036671d56e27sm202119ilq.58.2024.03.14.08.35.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Mar 2024 08:35:56 -0700 (PDT)
+Message-ID: <b24043fc-ceee-4e84-8c92-de412a7557ae@kernel.dk>
+Date: Thu, 14 Mar 2024 09:35:55 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: remove {revc,send}msg_copy_msghdr() from exports
+To: Paolo Abeni <pabeni@redhat.com>, netdev <netdev@vger.kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>
+References: <1b6089d3-c1cf-464a-abd3-b0f0b6bb2523@kernel.dk>
+ <b44a7fe3ec2c595786d520382045cf7b5ffce3da.camel@redhat.com>
+ <cb9b4e2c09131901a97c233ab2e18cb8970e09a3.camel@redhat.com>
+Content-Language: en-US
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <cb9b4e2c09131901a97c233ab2e18cb8970e09a3.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Eric Dumazet wrote:
-> ignore_outgoing is read locklessly from dev_queue_xmit_nit()
-> and packet_getsockopt()
+On 3/14/24 9:16 AM, Paolo Abeni wrote:
+> On Thu, 2024-03-14 at 11:46 +0100, Paolo Abeni wrote:
+>> On Tue, 2024-03-12 at 09:55 -0600, Jens Axboe wrote:
+>>> The only user of these was io_uring, and it's not using them anymore.
+>>> Make them static and remove them from the socket header file.
+>>>
+>>> Signed-off-by: Jens Axboe <axboe@kernel.dk>
+>> ## Form letter - net-next-closed
+>>
+>> The merge window for v6.9 has begun and we have already posted our pull
+>> request. Therefore net-next is closed for new drivers, features, code
+>> refactoring and optimizations. We are currently accepting bug fixes
+>> only.
+>>
+>> Please repost when net-next reopens after March 25th.
+>>
+>> RFC patches sent for review only are obviously welcome at any time.
+>>
+>> See:
+>> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
 > 
-> Add appropriate READ_ONCE()/WRITE_ONCE() annotations.
-> 
-> syzbot reported:
-> 
-> BUG: KCSAN: data-race in dev_queue_xmit_nit / packet_setsockopt
-> 
-> write to 0xffff888107804542 of 1 bytes by task 22618 on cpu 0:
->  packet_setsockopt+0xd83/0xfd0 net/packet/af_packet.c:4003
->  do_sock_setsockopt net/socket.c:2311 [inline]
->  __sys_setsockopt+0x1d8/0x250 net/socket.c:2334
->  __do_sys_setsockopt net/socket.c:2343 [inline]
->  __se_sys_setsockopt net/socket.c:2340 [inline]
->  __x64_sys_setsockopt+0x66/0x80 net/socket.c:2340
->  do_syscall_64+0xd3/0x1d0
->  entry_SYSCALL_64_after_hwframe+0x6d/0x75
-> 
-> read to 0xffff888107804542 of 1 bytes by task 27 on cpu 1:
->  dev_queue_xmit_nit+0x82/0x620 net/core/dev.c:2248
->  xmit_one net/core/dev.c:3527 [inline]
->  dev_hard_start_xmit+0xcc/0x3f0 net/core/dev.c:3547
->  __dev_queue_xmit+0xf24/0x1dd0 net/core/dev.c:4335
->  dev_queue_xmit include/linux/netdevice.h:3091 [inline]
->  batadv_send_skb_packet+0x264/0x300 net/batman-adv/send.c:108
->  batadv_send_broadcast_skb+0x24/0x30 net/batman-adv/send.c:127
->  batadv_iv_ogm_send_to_if net/batman-adv/bat_iv_ogm.c:392 [inline]
->  batadv_iv_ogm_emit net/batman-adv/bat_iv_ogm.c:420 [inline]
->  batadv_iv_send_outstanding_bat_ogm_packet+0x3f0/0x4b0 net/batman-adv/bat_iv_ogm.c:1700
->  process_one_work kernel/workqueue.c:3254 [inline]
->  process_scheduled_works+0x465/0x990 kernel/workqueue.c:3335
->  worker_thread+0x526/0x730 kernel/workqueue.c:3416
->  kthread+0x1d1/0x210 kernel/kthread.c:388
->  ret_from_fork+0x4b/0x60 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-> 
-> value changed: 0x00 -> 0x01
-> 
-> Reported by Kernel Concurrency Sanitizer on:
-> CPU: 1 PID: 27 Comm: kworker/u8:1 Tainted: G        W          6.8.0-syzkaller-08073-g480e035fc4c7 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-> Workqueue: bat_events batadv_iv_send_outstanding_bat_ogm_packet
-> 
-> Fixes: fa788d986a3a ("packet: add sockopt to ignore outgoing packets")
-> Reported-by: syzbot+c669c1136495a2e7c31f@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/CANn89i+Z7MfbkBLOv=p7KZ7=K1rKHO4P1OL5LYDCtBiyqsa9oQ@mail.gmail.com/T/#t
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> ---
->  net/core/dev.c         | 2 +-
->  net/packet/af_packet.c | 4 ++--
->  2 files changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 0766a245816bdf70f6609dc7b6d694ae81e7a9e5..722787c3275527f1652ec98623f61500ee753b45 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -2245,7 +2245,7 @@ void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev)
->  	rcu_read_lock();
->  again:
->  	list_for_each_entry_rcu(ptype, ptype_list, list) {
-> -		if (ptype->ignore_outgoing)
-> +		if (READ_ONCE(ptype->ignore_outgoing))
->  			continue;
->  
->  		/* Never send packets back to the socket
-> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> index 61270826b9ac73e66f9011c3230d4668f0bf7c77..7cfc7d301508fcead214fbdb4e962b0553a17916 100644
-> --- a/net/packet/af_packet.c
-> +++ b/net/packet/af_packet.c
-> @@ -4000,7 +4000,7 @@ packet_setsockopt(struct socket *sock, int level, int optname, sockptr_t optval,
->  		if (val < 0 || val > 1)
->  			return -EINVAL;
->  
-> -		po->prot_hook.ignore_outgoing = !!val;
-> +		WRITE_ONCE(po->prot_hook.ignore_outgoing, !!val);
+> Jakub noted that waiting another cycle just to do a very safe cleanup
+> would be a pity. I guess we can do a one-off exception here for good
+> reason.
 
-Should we also include a WRITE_ONCE on the fanout prot_hook:
+Thanks, seemed pretty silly to defer, and given the nature of the patch,
+there's no way it could've been sent "in time" anyway as the io_uring
+pull needed to go in first.
 
-        match->prot_hook.ignore_outgoing = type_flags & PACKET_FANOUT_FLAG_IGNORE_OUTGOING;
+Besides, I would never remember to resend the cleanup and hence it
+would've been lost.
 
->  		return 0;
->  	}
->  	case PACKET_TX_HAS_OFF:
-> @@ -4134,7 +4134,7 @@ static int packet_getsockopt(struct socket *sock, int level, int optname,
->  		       0);
->  		break;
->  	case PACKET_IGNORE_OUTGOING:
-> -		val = po->prot_hook.ignore_outgoing;
-> +		val = READ_ONCE(po->prot_hook.ignore_outgoing);
->  		break;
->  	case PACKET_ROLLOVER_STATS:
->  		if (!po->rollover)
-> -- 
-> 2.44.0.278.ge034bb2e1d-goog
-> 
-
+-- 
+Jens Axboe
 
 
