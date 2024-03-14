@@ -1,175 +1,103 @@
-Return-Path: <netdev+bounces-79891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CEE287BEB8
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:18:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D518A87BEC0
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:20:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60D8F1C20BBF
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:18:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 73A821F233F8
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A6BF6FBB8;
-	Thu, 14 Mar 2024 14:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D4826FE3E;
+	Thu, 14 Mar 2024 14:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CTePn8kx"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="dLRdWswQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C9FD6FE06
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 14:18:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D646FE25;
+	Thu, 14 Mar 2024 14:20:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710425901; cv=none; b=ZyUChXooJxkO22iarFL4LNhGW0L721le6E+Sbc3NKt0bxsGWfyPAj0Oqq8pGrRmu2832hpeeVVmt+Fc/8PVLasdn3qW5DpjjOTKuofO331hf+11zB7xkBSryM5s0mGQDcES5KSfhdspoAN1JZME5xMaEBklPOPeovIxPOBqIxPw=
+	t=1710426005; cv=none; b=P5VJIsMh7CT8qeYi1K4msLLFxUHOVmKFisirj0qBdgSiygUXaldVNB65d+k2En4g/D7VbXuriAbynpmTJpy+DtTGtXSp5cMsXjM+eGq7FhIF3yLq5kNv4NQMuBCByy8rJ/sDcRGzWCADNAZQfFoVxwPx02rHSpDmTg0eX1mzeUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710425901; c=relaxed/simple;
-	bh=pjP4WENKr8rRaajWGUR/ri4zzoAy8yOgOfShfJkKBWo=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=EZVKKrF2vE1uesjTpeMnJUymKY7yr1C7+IQwdb9Bs7gkF8hQORjcu/aswSLapsJvPQBxqtwFWyHzr6k9Gupy32atmfjS5E1ZwhRng075xgwcKpH8XKEJmzsiURjDtObjY1bdZfp0Si8WPZczvA782AVXOzfbbe8bpFxJv/Iymjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CTePn8kx; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dbf216080f5so1412273276.1
-        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 07:18:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710425898; x=1711030698; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BZp9l6e5lWy9HD+MMXNWuQUDngomkZLkCLaBGKO4JoY=;
-        b=CTePn8kx3Shpm+vEBEzTN8rInAwEbqFWdiZojZPw2ji7O+JUIi262o0P6S2AbCeb4v
-         5+75yqdvqLFEuSAm1CxdpNK/Rlagernv3HiEwuK3a9BhzsSgkax986AtgaDxDb/1kK8B
-         gu8dnpwzDValht66yOrj47gKv7Lx01D+qsMAdz2zyeIOlvhXisY+gKigy2qcm2Qf8YO7
-         MWSgLY1AfpCi2OpAK/+tIZC5hBL99hgUSGYxFF5SkOHddVq05jHTCU2yUEPHh5cICtJm
-         h6uxqYhGIxX/cYnU01EdnkkYrQV8rKqTF3/MftauRr9Ok25aO0JEvtLNTxg5G8Lm3uLh
-         GoFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710425898; x=1711030698;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BZp9l6e5lWy9HD+MMXNWuQUDngomkZLkCLaBGKO4JoY=;
-        b=NdGqZJZCsVCl00FrJPhDI6AmtcF5Dc9Pfpp5VyrRQutXStR+xKmC2cNQoYs2SJlzQd
-         RbWvHGLN6AHt9o4iydn/TPo+MGWYXs1d7xkSeY1u0/i5bRb3NurlUHvefV9KJWBGmeP5
-         YO+W7VN4BsdaUi72H3wi2wr8HwYw6F6+e90dhD0+zZHKJ16Z0JDO4Nc5Zm38gYfzld9/
-         VzPbkfMqUvjgFb4r8WVjJPi7BbrPmHJMB5+PxwMCfzB0KPfyGrfyUW7rZKzzCcsXNfgJ
-         aCN85Nkhia6YmVmWqR6PFKa2NIiaSzhZYAzzNDiiYU+/moerW/HSYsVbKQA5yAKCjkrN
-         bwiA==
-X-Gm-Message-State: AOJu0YxN/s4REmFSthwXrp00JsOd8roGXoqJUm9MCjypWwCUC6VDQfsx
-	w55ZfzTrwn2WtaNbH9zPrsolOW2kwrtOKHs7eGANz7pBxKKxJMOj6g84nbJ53NFUtCu8aBzFqAy
-	nXP9STuyj5w==
-X-Google-Smtp-Source: AGHT+IEZARZbi9Qxxiolg+9KvQPeuIJ7hIz8XeqNI/1nxlVaVS3zFkwGXh/Ae/yu+2fjv5QIy6o56fUCC2ZAVg==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1026:b0:dc7:5aad:8965 with SMTP
- id x6-20020a056902102600b00dc75aad8965mr539575ybt.0.1710425898449; Thu, 14
- Mar 2024 07:18:18 -0700 (PDT)
-Date: Thu, 14 Mar 2024 14:18:16 +0000
+	s=arc-20240116; t=1710426005; c=relaxed/simple;
+	bh=4H7LF9xic1h2s2SK9pUmAgHDyT+hWOLMRCNt/9GcopY=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=OSzFzajXpESF+4xTt6nfLcuTvNZM98q5TGJ4DpT+cJ6uy75605MuY39vq6BXIIF/yAu7oEZ4a4OhxugzjJ4kg6ORAcOBAU0arO4G/37NZ56Qpwk7RtCIRJTCDmZZPcGjGf7VomMVKotvjSnpRusFH3OnpYsEROVhZ39qTgElXlw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=desiato.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=dLRdWswQ; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=desiato.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=Content-Transfer-Encoding:Content-Type
+	:MIME-Version:Message-ID:References:In-Reply-To:Subject:CC:To:From:Date:
+	Sender:Reply-To:Content-ID:Content-Description;
+	bh=4H7LF9xic1h2s2SK9pUmAgHDyT+hWOLMRCNt/9GcopY=; b=dLRdWswQiOdn/5ZfCwgv+BcmnZ
+	MavcWDrKg+fI81HsMu1+QsmlnIPBKDANlNkB1KR5EtJ7BO4z1u7IGaG0yIysccG2EtBhhZFhThz3F
+	IjOB5V9ptVMAEh/B2txmxf7iJMxnurWe5ZcTpmRCm5PxOB+KGvLb6+KAYa3FPrnSjsUPHj5OEFpf9
+	7p36zwfWH/TwxECdok37fgJcWCNOjENsB7Jh67Vh7cG27X6nZ0qiJI4IlBiOB18pSh81SmGqedsVV
+	Ee6cSi8b46TNWHIWEahZFqqzWgpZxovQjtef2HiEJHR9WXDFHhGxCGFgdWopQey/+57vXQy7TZ+ss
+	gfMsib9g==;
+Received: from [31.94.26.231] (helo=[127.0.0.1])
+	by desiato.infradead.org with esmtpsa (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rklw3-0000000AW6m-201T;
+	Thu, 14 Mar 2024 14:19:56 +0000
+Date: Thu, 14 Mar 2024 15:19:53 +0100
+From: David Woodhouse <dwmw2@infradead.org>
+To: Peter Hilber <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, virtio-dev@lists.oasis-open.org,
+ linux-arm-kernel@lists.infradead.org, linux-rtc@vger.kernel.org,
+ "virtio-comment@lists.oasis-open.org" <virtio-comment@lists.oasis-open.org>
+CC: "Christopher S. Hall" <christopher.s.hall@intel.com>,
+ Jason Wang <jasowang@redhat.com>, John Stultz <jstultz@google.com>,
+ "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org,
+ Richard Cochran <richardcochran@gmail.com>, Stephen Boyd <sboyd@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Marc Zyngier <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>,
+ Daniel Lezcano <daniel.lezcano@linaro.org>,
+ Alessandro Zummo <a.zummo@towertech.it>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>,
+ "Ridoux, Julien" <ridouxj@amazon.com>, Cornelia Huck <cohuck@redhat.com>
+Subject: Re: [RFC PATCH v3 0/7] Add virtio_rtc module and related changes
+User-Agent: K-9 Mail for Android
+In-Reply-To: <2eb5a616-eeb3-446a-85fd-fff376c15f55@opensynergy.com>
+References: <20231218073849.35294-1-peter.hilber@opensynergy.com> <0e21e3e2be26acd70b5575b9932b3a911c9fe721.camel@infradead.org> <204c6339-e80d-4a98-8d07-a11eeb729497@opensynergy.com> <667c8d944ce9ea5c570b82b1858a70cc67b2f3e4.camel@infradead.org> <f6940954-334a-458b-af32-f03d8efbe607@opensynergy.com> <57704b2658e643fce30468dffd8c1477607f59fb.camel@infradead.org> <d796d9a5-8eda-4528-a6d8-1c4eba24aa1e@opensynergy.com> <47bf0757de3268c420d2cd3bbffaf5897b67b661.camel@infradead.org> <60607bcc-93c5-4a6f-832d-ea4dbd81178e@opensynergy.com> <89268C36-E8FB-4A17-8F81-1DED4BF47400@infradead.org> <2eb5a616-eeb3-446a-85fd-fff376c15f55@opensynergy.com>
+Message-ID: <9455F710-E38C-45DA-9883-EC034495ADEF@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.278.ge034bb2e1d-goog
-Message-ID: <20240314141816.2640229-1-edumazet@google.com>
-Subject: [PATCH net] packet: annotate data-races around ignore_outgoing
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+c669c1136495a2e7c31f@syzkaller.appspotmail.com, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-SRS-Rewrite: SMTP reverse-path rewritten from <dwmw2@infradead.org> by desiato.infradead.org. See http://www.infradead.org/rpr.html
 
-ignore_outgoing is read locklessly from dev_queue_xmit_nit()
-and packet_getsockopt()
+On 14 March 2024 11:13:37 CET, Peter Hilber <peter=2Ehilber@opensynergy=2Ec=
+om> wrote:
+>> To a certain extent, as long as the virtio-rtc device is designed to ex=
+pose time precisely and unambiguously, it's less important if the Linux ker=
+nel *today* can use that=2E Although of course we should strive for that=2E=
+ Let's be=2E=2E=2Ewell, *unambiguous*, I suppose=2E=2E=2E that we've change=
+d topics to discuss that though=2E
+>>=20
+>
+>As Virtio is extensible (unlike hardware), my approach is to mostly speci=
+fy
+>only what also has a PoC user and a use case=2E
 
-Add appropriate READ_ONCE()/WRITE_ONCE() annotations.
+If we get memory-mapped (X, Y, Z, =C2=B1x, =C2=B1y) I'll have a user and a=
+ use case on day one=2E Otherwise, as I said in my first response, I can go=
+ do that as a separate device and decide that virtio_rtc doesn't meet our n=
+eeds (especially for maintaining accuracy over LM)=2E
 
-syzbot reported:
-
-BUG: KCSAN: data-race in dev_queue_xmit_nit / packet_setsockopt
-
-write to 0xffff888107804542 of 1 bytes by task 22618 on cpu 0:
- packet_setsockopt+0xd83/0xfd0 net/packet/af_packet.c:4003
- do_sock_setsockopt net/socket.c:2311 [inline]
- __sys_setsockopt+0x1d8/0x250 net/socket.c:2334
- __do_sys_setsockopt net/socket.c:2343 [inline]
- __se_sys_setsockopt net/socket.c:2340 [inline]
- __x64_sys_setsockopt+0x66/0x80 net/socket.c:2340
- do_syscall_64+0xd3/0x1d0
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-read to 0xffff888107804542 of 1 bytes by task 27 on cpu 1:
- dev_queue_xmit_nit+0x82/0x620 net/core/dev.c:2248
- xmit_one net/core/dev.c:3527 [inline]
- dev_hard_start_xmit+0xcc/0x3f0 net/core/dev.c:3547
- __dev_queue_xmit+0xf24/0x1dd0 net/core/dev.c:4335
- dev_queue_xmit include/linux/netdevice.h:3091 [inline]
- batadv_send_skb_packet+0x264/0x300 net/batman-adv/send.c:108
- batadv_send_broadcast_skb+0x24/0x30 net/batman-adv/send.c:127
- batadv_iv_ogm_send_to_if net/batman-adv/bat_iv_ogm.c:392 [inline]
- batadv_iv_ogm_emit net/batman-adv/bat_iv_ogm.c:420 [inline]
- batadv_iv_send_outstanding_bat_ogm_packet+0x3f0/0x4b0 net/batman-adv/bat_iv_ogm.c:1700
- process_one_work kernel/workqueue.c:3254 [inline]
- process_scheduled_works+0x465/0x990 kernel/workqueue.c:3335
- worker_thread+0x526/0x730 kernel/workqueue.c:3416
- kthread+0x1d1/0x210 kernel/kthread.c:388
- ret_from_fork+0x4b/0x60 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-
-value changed: 0x00 -> 0x01
-
-Reported by Kernel Concurrency Sanitizer on:
-CPU: 1 PID: 27 Comm: kworker/u8:1 Tainted: G        W          6.8.0-syzkaller-08073-g480e035fc4c7 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-Workqueue: bat_events batadv_iv_send_outstanding_bat_ogm_packet
-
-Fixes: fa788d986a3a ("packet: add sockopt to ignore outgoing packets")
-Reported-by: syzbot+c669c1136495a2e7c31f@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/CANn89i+Z7MfbkBLOv=p7KZ7=K1rKHO4P1OL5LYDCtBiyqsa9oQ@mail.gmail.com/T/#t
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
----
- net/core/dev.c         | 2 +-
- net/packet/af_packet.c | 4 ++--
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 0766a245816bdf70f6609dc7b6d694ae81e7a9e5..722787c3275527f1652ec98623f61500ee753b45 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -2245,7 +2245,7 @@ void dev_queue_xmit_nit(struct sk_buff *skb, struct net_device *dev)
- 	rcu_read_lock();
- again:
- 	list_for_each_entry_rcu(ptype, ptype_list, list) {
--		if (ptype->ignore_outgoing)
-+		if (READ_ONCE(ptype->ignore_outgoing))
- 			continue;
- 
- 		/* Never send packets back to the socket
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index 61270826b9ac73e66f9011c3230d4668f0bf7c77..7cfc7d301508fcead214fbdb4e962b0553a17916 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -4000,7 +4000,7 @@ packet_setsockopt(struct socket *sock, int level, int optname, sockptr_t optval,
- 		if (val < 0 || val > 1)
- 			return -EINVAL;
- 
--		po->prot_hook.ignore_outgoing = !!val;
-+		WRITE_ONCE(po->prot_hook.ignore_outgoing, !!val);
- 		return 0;
- 	}
- 	case PACKET_TX_HAS_OFF:
-@@ -4134,7 +4134,7 @@ static int packet_getsockopt(struct socket *sock, int level, int optname,
- 		       0);
- 		break;
- 	case PACKET_IGNORE_OUTGOING:
--		val = po->prot_hook.ignore_outgoing;
-+		val = READ_ONCE(po->prot_hook.ignore_outgoing);
- 		break;
- 	case PACKET_ROLLOVER_STATS:
- 		if (!po->rollover)
--- 
-2.44.0.278.ge034bb2e1d-goog
-
+My main concern for virto_rtc is that we avoid *ambiguity*=2E Yes, I get t=
+hat it's extensible but we don't want a v1=2E0 of the spec, implemented by =
+various hypervisors, which still leaves guests not knowing what the actual =
+time is=2E That would not be good=2E And even UTC without a leap second ind=
+icator has that problem=2E
 
