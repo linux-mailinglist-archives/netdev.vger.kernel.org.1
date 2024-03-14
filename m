@@ -1,40 +1,40 @@
-Return-Path: <netdev+bounces-79881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79882-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEDB487BD60
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:13:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B06CE87BD63
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 14:14:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D8B41C20D46
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 13:13:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89BDA1C20D44
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 13:14:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1304B5A4D1;
-	Thu, 14 Mar 2024 13:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56415A11A;
+	Thu, 14 Mar 2024 13:14:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04B825B053
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 13:12:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7FDA5811C
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 13:14:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710421979; cv=none; b=VX6x2ZZYtCxw2SUSMHdRMtxucueeuHvXe0gGJGRTFeRx0NgKDfCIkS9bJLl87AkCrhScnoBbL5Xus2ZVdwSCa0NJdB2st9i1vZr/Xe09J3E0m0eUZatLNG9IuNdY+TbZ9rNyVkP/wJpLPkLxwL7P6SJ2TqKtbmgQP6DPbvcP5LU=
+	t=1710422049; cv=none; b=SHUNkjzyItuFwijqAahENJlJi3elWHh4n9xNFcs+mJlFsEqONrZCvWpLoASOKa0zRt3jbKsMRU115BK8CWNBNzyg39wD86WqEK5YmxofiMjnDIGhBOrGJW55cBjmGP0QzIe/Ra7ZTIMjfch9k/Al75cdtdE7tbdCP/nLUNatCRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710421979; c=relaxed/simple;
-	bh=y7v2WM4R162BQcaFvEDhbzd32dW66CZGE4L+4q/IVTE=;
+	s=arc-20240116; t=1710422049; c=relaxed/simple;
+	bh=nF33gnFkDMmYaJGi5zw2ff2GBVZgINRh9XfAG1anKi4=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=IMF1fSZOE6JF3z8F+bavujb5OYB/YqGqiaR8hNQVgLishZ6A38+EML5Fx0d1YzXa8XvUDmss/NFz3TRrzA9VDqSV+D/HnxbpwijvTNi9QHXVeY8hou2/+AnlkggUAPZVjHUU5wS9Jr4UeeUmnXjCpeMGDrMAAQEX9Tt8FN3SHOk=
+	 In-Reply-To:Content-Type; b=Vzs9izQvrqoqj34V14vHJNh4AVADNu1NVq9IP5jltIb6JD5Lg/OHFd+HYT/kRz7IOY2IOIdTz88uvIOODSCzhYmwopdu8kMiE/aulW4w8aN5IS1KL7gMZ2DfaItsviq51iIHjoYZfsDN3AktFUOCvwCe2FGEpiFfDaLmXZF5GL0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
 Received: from loongson.cn (unknown [112.20.109.198])
-	by gateway (Coremail) with SMTP id _____8BxOPDV9_JlIRoZAA--.61231S3;
-	Thu, 14 Mar 2024 21:12:53 +0800 (CST)
+	by gateway (Coremail) with SMTP id _____8Axuugb+PJlPRoZAA--.40894S3;
+	Thu, 14 Mar 2024 21:14:03 +0800 (CST)
 Received: from [192.168.100.8] (unknown [112.20.109.198])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8CxLBPR9_JloxxaAA--.40622S3;
-	Thu, 14 Mar 2024 21:12:52 +0800 (CST)
-Message-ID: <466f138d-0baa-4a86-88af-c690105e650e@loongson.cn>
-Date: Thu, 14 Mar 2024 21:12:49 +0800
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8Cxf88W+PJl8BxaAA--.39924S3;
+	Thu, 14 Mar 2024 21:14:01 +0800 (CST)
+Message-ID: <f9c5c697-6c3f-4cfb-aa60-2031b450a470@loongson.cn>
+Date: Thu, 14 Mar 2024 21:13:58 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -42,8 +42,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 06/11] net: stmmac: dwmac-loongson: Add GNET
- support
+Subject: Re: [PATCH net-next v8 07/11] net: stmmac: dwmac-loongson: Add
+ multi-channel supports for loongson
 Content-Language: en-US
 From: Yanteng Si <siyanteng@loongson.cn>
 To: Serge Semin <fancer.lancer@gmail.com>
@@ -52,21 +52,21 @@ Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
  chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
  netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
 References: <cover.1706601050.git.siyanteng@loongson.cn>
- <027b4ee29d4d7c8a22d2f5c551f5c21ced3fb046.1706601050.git.siyanteng@loongson.cn>
- <ftqxjh67a7s4iprpiuw5xxmncj3bveezf5vust7cej3kowwcvj@m7nqrxq7oe2f>
- <d0e56c9b-9549-4061-8e44-2504b6b96897@loongson.cn>
-In-Reply-To: <d0e56c9b-9549-4061-8e44-2504b6b96897@loongson.cn>
+ <bec0d6bf78c0dcf4797a148e3509058e46ccdb13.1706601050.git.siyanteng@loongson.cn>
+ <eqecwmi3guwda3wloxcttkx2xlteupvrsetb5ro5abupwhxqyu@ypliwpyswy23>
+ <e1c7b5fa-f3f8-4aa3-af4d-ca72b54d9c8c@loongson.cn>
+In-Reply-To: <e1c7b5fa-f3f8-4aa3-af4d-ca72b54d9c8c@loongson.cn>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8CxLBPR9_JloxxaAA--.40622S3
+X-CM-TRANSID:AQAAf8Cxf88W+PJl8BxaAA--.39924S3
 X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3Xry5tryUGw1kXr1kKF13ZFc_yoW7ArWkpr
-	WfAayUKrZ8Xr1Yk3ZYqFWDZryYyrWftr97uF47t343GF9Fk342qry5KFWYk3W7CrWDuF12
-	vr4jkrZxuFs8GFXCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
+X-Coremail-Antispam: 1Uk129KBj93XoW3Xw48ZryxXFy7WFW3Ar4UZFc_yoWxAF17pr
+	W3CayakrWjqry3WanFva15WF1YyrZxtrWxWr43tw1ru3yqyr9FqryUKayjk3yxCrZ8JF18
+	Zr48CFs7uFn8ArXCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
 	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
 	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
 	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
 	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
 	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
 	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
@@ -79,153 +79,194 @@ X-Coremail-Antispam: 1Uk129KBj93XoW3Xry5tryUGw1kXr1kKF13ZFc_yoW7ArWkpr
 	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8_gA5UUUUU==
 
 
-在 2024/3/14 16:27, Yanteng Si 写道:
-> 在 2024/2/6 04:58, Serge Semin 写道:
-> > On Tue, Jan 30, 2024 at 04:48:18PM +0800, Yanteng Si wrote:
-> >> Add Loongson GNET (GMAC with PHY) support, override
-> >> stmmac_priv.synopsys_id with 0x37.
-> > Please add more details of all the device capabilities: supported
-> > speeds, duplexness, IP-core version, DMA-descriptors type
-> > (normal/enhanced), MTL Tx/Rx FIFO size, Perfect and Hash-based MAC
-> > Filter tables size, L3/L4 filters availability, VLAN hash table
-> > filter, PHY-interface (GMII, RGMII, etc), EEE support,
-> > AV-feature/Multi-channels support, IEEE 1588 Timestamp support, Magic
-> > Frame support, Remote Wake-up support, IP Checksum, Tx/Rx TCP/IP
-> > Checksum, Mac Management Counters (MMC), SMA/MDIO interface,
-> The gnet (2k2000) of 0x10 supports full-duplex and half-duplex at 1000/100/10M.
-> The gnet of 0x37 (i.e. the gnet of 7a2000) supports 1000/100/10M full duplex.
->
-> The gnet with 0x10 has 8 DMA channels, except for channel 0, which does not
-> support sending hardware checksums.
->
-> Supported AV features are Qav, Qat, and Qas, and other features should be
-> consistent with the 3.73 IP.
->
+在 2024/3/14 17:33, Yanteng Si 写道:
+> 在 2024/2/6 05:28, Serge Semin 写道:
+> > On Tue, Jan 30, 2024 at 04:48:19PM +0800, Yanteng Si wrote:
+> >> Request allocation for MSI for specific versions.
+> >>
+> > Please elaborate what is actually done in the patch. What device
+> > version it is dedicated for (Loongson GNET?), what IRQs the patch
+> > adds, etc.
+> gnet_device   core IP    IRQ
+> 7a2000        0x37    legacy
+> 2k2000        0x10    multi_msi
+> >
+> > BTW will GNET device work without this patch? If no you need to either
+> > merge it into the patch introducing the GNET-device support or place
+> > it before that patch (6/11).
+> OK, GNET device work need this patch.
+> >   
+> >> Some features of Loongson platforms are bound to the GMAC_VERSION
+> >> register. We have to read its value in order to get the correct channel
+> >> number.
+> > This message seems misleading. I don't see you doing that in the patch below...
+> Because part of our gnet hardware (7a2000) core IP is 0x37
 > >
 > >> Signed-off-by: Yanteng Si<siyanteng@loongson.cn>
 > >> Signed-off-by: Feiyang Chen<chenfeiyang@loongson.cn>
 > >> Signed-off-by: Yinggang Gu<guyinggang@loongson.cn>
 > >> ---
-> >>   .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 44 +++++++++++++++++++
-> >>   1 file changed, 44 insertions(+)
+> >>   .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 57 +++++++++++++++----
+> >>   1 file changed, 46 insertions(+), 11 deletions(-)
 > >>
 > >> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> >> index 3b3578318cc1..584f7322bd3e 100644
+> >> index 584f7322bd3e..60d0a122d7c9 100644
 > >> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
 > >> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> >> @@ -318,6 +318,8 @@ static struct mac_device_info *loongson_setup(void *apriv)
-> >>   	if (!mac)
-> >>   		return NULL;
+> >> @@ -98,10 +98,10 @@ static void dwlgmac_dma_init_channel(struct stmmac_priv *priv,
+> >>   	if (dma_cfg->aal)
+> >>   		value |= DMA_BUS_MODE_AAL;
+> >>
+> >   
+> >> -	writel(value, ioaddr + DMA_BUS_MODE);
+> >> +	writel(value, ioaddr + DMA_CHAN_BUS_MODE(chan));
 > >>   
-> >> +	priv->synopsys_id = 0x37;	/*Overwrite custom IP*/
-> >> +
-> > Please add a more descriptive comment _above_ the subjected line. In
-> > particular note why the override is needed, what is the real DW GMAC
-> > IP-core version and what is the original value the statement above
-> > overrides.
->
-> The IP-core version of the gnet device on the loongson 2k2000 is 0x10, which is
-> a custom IP.
->
-> Compared to 0x37, we have split some of the dma registers into two (tx and rx).
-> After overwriting stmmac_dma_ops.dma_interrupt() and stmmac_dma_ops.init_chan(),
-> the logic is consistent with 0x37,
->
-> so we overwrite synopsys_id to 0x37.
->
-> >>   	ld = priv->plat->bsp_priv;
-> >>   	mac->dma = &ld->dwlgmac_dma_ops;
-> >>   
-> >> @@ -350,6 +352,46 @@ static struct mac_device_info *loongson_setup(void *apriv)
-> >>   	return mac;
+> >>   	/* Mask interrupts by writing to CSR7 */
+> >> -	writel(DMA_INTR_DEFAULT_MASK_LOONGSON, ioaddr + DMA_INTR_ENA);
+> >> +	writel(DMA_INTR_DEFAULT_MASK_LOONGSON, ioaddr + DMA_CHAN_INTR_ENA(chan));
+> > Em, why is this here? There is a patch
+> > [PATCH net-next v8 05/11] net: stmmac: dwmac-loongson: Add Loongson-specific register definitions
+> > in this series which was supposed to introduce the fully functional
+> > GNET-specific callbacks. Move this change in there.
+> OK.
+> >
 > >>   }
 > >>   
-> >> +static int loongson_gnet_data(struct pci_dev *pdev,
-> >> +			      struct plat_stmmacenet_data *plat)
+> >>   static int dwlgmac_dma_interrupt(struct stmmac_priv *priv, void __iomem *ioaddr,
+> >> @@ -238,6 +238,45 @@ static int loongson_dwmac_config_legacy(struct pci_dev *pdev,
+> >>   	return 0;
+> >>   }
+> >>   
+> >> +static int loongson_dwmac_config_multi_msi(struct pci_dev *pdev,
+> > This method seems like the GNET-specific one. What about using the
+> > appropriate prefix then?
+> OK. loongson_gnet_config_multi_msi()
+>
+> >
+> >> +					   struct plat_stmmacenet_data *plat,
+> >> +					   struct stmmac_resources *res,
+> >> +					   struct device_node *np,
+> >> +					   int channel_num)
+> > Why do you need this parametrization? Since this method is
+> > GNET-specific what about defining a macro with the channels amount and
+> > using it here?
+>
+> OK.
+>
+> #define CHANNEL_NUM    8
+>
+> >
 > >> +{
-> >> +	loongson_default_data(pdev, plat);
+> >> +	int i, ret, vecs;
 > >> +
-> >> +	plat->multicast_filter_bins = 256;
+> >> +	vecs = roundup_pow_of_two(channel_num * 2 + 1);
+> >> +	ret = pci_alloc_irq_vectors(pdev, vecs, vecs, PCI_IRQ_MSI);
+> >> +	if (ret < 0) {
+> >> +		dev_info(&pdev->dev,
+> >> +			 "MSI enable failed, Fallback to legacy interrupt\n");
+> >> +		return loongson_dwmac_config_legacy(pdev, plat, res, np);
+> > In what conditions is this possible? Will the
+> > loongson_dwmac_config_legacy() method work in that case? Did you test
+> > it out?
+> Failed to apply for msi interrupt when the interrupt number is not enough，For
+> example, there are a large number of devices。
+> >> +	}
 > >> +
-> >> +	plat->mdio_bus_data->phy_mask =  ~(u32)BIT(2);
+> >> +	plat->rx_queues_to_use = channel_num;
+> >> +	plat->tx_queues_to_use = channel_num;
+> > This is supposed to be initialized in the setup() methods. Please move
+> > it to the dedicated patch.
+> No, referring to my previous reply, only the 0x10 gnet device has 8 channels,
+> and the 0x37 device has a single channel.
+> >
 > >> +
-> >> +	plat->phy_addr = 2;
-> >> +	plat->phy_interface = PHY_INTERFACE_MODE_INTERNAL;
-> > Are you sure PHY-interface is supposed to be defined as "internal"?
+> >> +	res->irq = pci_irq_vector(pdev, 0);
+> >> +	res->wol_irq = res->irq;
+> > Once again. wol_irq is optional. If there is no dedicated WoL IRQ
+> > leave the field as zero.
+> OK.
 >
-> Yes, because the gnet hardware has a integrated PHY, so we set it to internal，
+> res->wol_irq = 0;
 >
-> Correspondingly, our gmac hardware PHY is external.
+> >
+> >> +
+> >> +	/* INT NAME | MAC | CH7 rx | CH7 tx | ... | CH0 rx | CH0 tx |
+> >> +	 * --------- ----- -------- --------  ...  -------- --------
+> >> +	 * IRQ NUM  |  0  |   1    |   2    | ... |   15   |   16   |
+> >> +	 */
+> >> +	for (i = 0; i < channel_num; i++) {
+> >> +		res->rx_irq[channel_num - 1 - i] =
+> >> +			pci_irq_vector(pdev, 1 + i * 2);
+> >> +		res->tx_irq[channel_num - 1 - i] =
+> >> +			pci_irq_vector(pdev, 2 + i * 2);
+> >> +	}
+> >> +
+> >> +	plat->flags |= STMMAC_FLAG_MULTI_MSI_EN;
+> >> +	dev_info(&pdev->dev, "%s: multi MSI enablement successful\n", __func__);
+> > What's the point in printing this message especially with the __func__
+> > prefix?  You'll always be able to figure out the allocated IRQs by
+> > means of procfs. I suggest to drop it.
 >
-> >> +
-> >> +	plat->bsp_priv = &pdev->dev;
-> >> +
-> >> +	plat->dma_cfg->pbl = 32;
-> >> +	plat->dma_cfg->pblx8 = true;
-> >> +
-> >> +	plat->clk_ref_rate = 125000000;
-> >> +	plat->clk_ptp_rate = 125000000;
+> OK.
+>
+> >
 > >> +
 > >> +	return 0;
 > >> +}
 > >> +
-> >> +static int loongson_gnet_config(struct pci_dev *pdev,
-> >> +				struct plat_stmmacenet_data *plat,
-> >> +				struct stmmac_resources *res,
-> >> +				struct device_node *np)
-> >> +{
-> >> +	int ret;
-> >> +
-> >> +	ret = loongson_dwmac_config_legacy(pdev, plat, res, np);
-> > Again. This will be moved to the probe() method in one of the next
-> > patches leaving loongson_gnet_config() empty. What was the problem
-> > with doing that right away with no intermediate change?
->
-> No problem. My original intention is to break the patches down into smaller pieces.
->
-> In the next version, I will try to re-break them based on your comments.
->
-> >
-> >> +
-> >> +	return ret;
-> >> +}
-> >> +
-> >> +static struct stmmac_pci_info loongson_gnet_pci_info = {
-> >> +	.setup = loongson_gnet_data,
-> >> +	.config = loongson_gnet_config,
-> >> +};
-> >> +
-> >>   static int loongson_dwmac_probe(struct pci_dev *pdev,
-> >>   				const struct pci_device_id *id)
+> >>   static void loongson_default_data(struct pci_dev *pdev,
+> >>   				  struct plat_stmmacenet_data *plat)
 > >>   {
-> >> @@ -516,9 +558,11 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
-> >>   			 loongson_dwmac_resume);
+> >> @@ -296,11 +335,8 @@ static int loongson_gmac_config(struct pci_dev *pdev,
+> >>   				struct stmmac_resources *res,
+> >>   				struct device_node *np)
+> >>   {
+> >> -	int ret;
+> >> -
+> >> -	ret = loongson_dwmac_config_legacy(pdev, plat, res, np);
 > >>   
-> >>   #define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
-> >> +#define PCI_DEVICE_ID_LOONGSON_GNET	0x7a13
+> >> -	return ret;
+> >> +	return 0;
+> >>   }
 > >>   
-> >>   static const struct pci_device_id loongson_dwmac_id_table[] = {
-> >>   	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
-> >> +	{ PCI_DEVICE_DATA(LOONGSON, GNET, &loongson_gnet_pci_info) },
-> > After this the driver is supposed to correctly handle the Loongson
-> > GNET devices. Based on the patches introduced further it isn't.
-> > Please consider re-arranging the changes (see my comments in the
-> > further patches).
->
-> OK.
->
+> >>   static struct stmmac_pci_info loongson_gmac_pci_info = {
+> >> @@ -380,11 +416,7 @@ static int loongson_gnet_config(struct pci_dev *pdev,
+> >>   				struct stmmac_resources *res,
+> >>   				struct device_node *np)
+> >>   {
+> >> -	int ret;
+> >> -
+> >> -	ret = loongson_dwmac_config_legacy(pdev, plat, res, np);
+> >> -
+> >> -	return ret;
+> >> +	return 0;
+> >>   }
+> > Here you are dropping the changes you just introduced leaving the
+> > config() methods empty... Why not to place the
+> > loongson_dwmac_config_legacy() invocation in the probe() method right
+> > at the patches introducing the config() functions and not to add the
+> > config() callback in the first place?
+> OK, I will try.
 >
 > Thanks,
 >
 > Yanteng
 >
->
 > >
 > > -Serge(y)
 > >
-> >>   	{}
-> >>   };
-> >>   MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
+> >>   
+> >>   static struct stmmac_pci_info loongson_gnet_pci_info = {
+> >> @@ -483,6 +515,9 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
+> >>   		ld->dwlgmac_dma_ops.dma_interrupt = dwlgmac_dma_interrupt;
+> >>   
+> >>   		plat->setup = loongson_setup;
+> >> +		ret = loongson_dwmac_config_multi_msi(pdev, plat, &res, np, 8);
+> >> +	} else {
+> >> +		ret = loongson_dwmac_config_legacy(pdev, plat, &res, np);
+> >>   	}
+> >>   
+> >>   	plat->bsp_priv = ld;
 > >> -- 
 > >> 2.31.4
 > >>
