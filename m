@@ -1,108 +1,166 @@
-Return-Path: <netdev+bounces-79853-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C91487BC17
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:44:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E25C987BBD1
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:18:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27996287736
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:44:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9973E283136
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:18:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E32A46EB73;
-	Thu, 14 Mar 2024 11:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3CD86EB53;
+	Thu, 14 Mar 2024 11:18:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay163.nicmail.ru (relay163.nicmail.ru [91.189.117.7])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2214617588;
-	Thu, 14 Mar 2024 11:44:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.189.117.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F11341A80
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 11:18:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710416647; cv=none; b=gCk79OL53kcL+NRC1DNXwyfmFLZQh16hZNYxZaq/0fFskbwUJtq06je2eKX5ofoU2Kh5eNcaf2wYkpp9C0Y3ulJl+DQ0jJqVgKjNBIb3sXsvg6NG7XrT2uUM2rVSaP2hEB9dlR9yjuZiILXMgV3hWA/lK6B+yD6YI3wesrI9KBU=
+	t=1710415130; cv=none; b=FO4ikwI/Wv9QckyL1e5DUYoGMuQrpogwG7vatRGH5DYrVt0EyA7M96f82MEjyAh2Kjs4H4krONemzCHmuZ0saK/06TSBJ3Kv8+mbAGiebP0BdCHibGVY0HdZK6H4SqU10oL2bEjWOOF5bSaprrYHgDdzlS3hnm1Yzhmk85OeIo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710416647; c=relaxed/simple;
-	bh=vCqx9xc2aCUVJ6wl9bag1zhUxchc7u8nmzyYAREAqNY=;
-	h=Message-ID:Date:MIME-Version:From:Subject:References:To:Cc:
-	 In-Reply-To:Content-Type; b=Z3TMcqu0+Xr7KdjKF1c9oxNmCrjfZLwISIeW027Pfmf8kwDupBk6eFZ+c6FMHpw3evoI7oLR3qYRJWZWRiqNTV+D8nFLRCQdEUYVNfVeugd1gxp6T87pZuBIP6rKSBLAyWtIYtKFoeep8uw35YfMQfn9V9gZ9glwIG3jJybh+GU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ancud.ru; spf=pass smtp.mailfrom=ancud.ru; arc=none smtp.client-ip=91.189.117.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ancud.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ancud.ru
-Received: from [10.28.138.149] (port=30558 helo=[192.168.95.111])
-	by relay.hosting.mail.nic.ru with esmtp (Exim 5.55)
-	(envelope-from <kiryushin@ancud.ru>)
-	id 1rkj3j-00077G-Ba;
-	Thu, 14 Mar 2024 14:15:40 +0300
-Received: from [87.245.155.195] (account kiryushin@ancud.ru HELO [192.168.95.111])
-	by incarp1102.mail.hosting.nic.ru (Exim 5.55)
-	with id 1rkj3j-006bkS-1f;
-	Thu, 14 Mar 2024 14:15:39 +0300
-Message-ID: <031a0fe6-79dc-464b-b8d9-946f75971378@ancud.ru>
-Date: Thu, 14 Mar 2024 14:15:37 +0300
+	s=arc-20240116; t=1710415130; c=relaxed/simple;
+	bh=PTGgiiA6/A6UvU9ezCqegelJt5WtNaS/F6VAc2LrNXY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YMSxeybVNerH2od+/J7fgxOCjhSP1wnorJzPKsVLNJJD9klZS2evzbqABQENxNQniZjTjGu+sUiZP5FYsqyi1WGUHJfV/XIXKdLxBs2VOIukdrcoLhSrK9jy2FhfCoe6A8VRer9MUttALBNpORZFou/vsDl4iH6gKQWk1DX6n6k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TwPwS5wP6z1xrD8;
+	Thu, 14 Mar 2024 19:16:56 +0800 (CST)
+Received: from dggpemd100005.china.huawei.com (unknown [7.185.36.102])
+	by mail.maildlp.com (Postfix) with ESMTPS id 3B9D514011F;
+	Thu, 14 Mar 2024 19:18:43 +0800 (CST)
+Received: from localhost.huawei.com (10.137.16.214) by
+ dggpemd100005.china.huawei.com (7.185.36.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Thu, 14 Mar 2024 19:18:42 +0800
+From: renmingshuai <renmingshuai@huawei.com>
+To: <jhs@mojatatu.com>, <xiyou.wangcong@gmail.com>, <jiri@resnulli.us>,
+	<davem@davemloft.net>, <vladbu@nvidia.com>
+CC: <netdev@vger.kernel.org>, <yanan@huawei.com>, <liaichun@huawei.com>,
+	<caowangbao@huawei.com>, <renmingshuai@huawei.com>
+Subject: [PATCH] net/sched: Forbid assigning mirred action to a filter attached to the egress
+Date: Thu, 14 Mar 2024 19:17:13 +0800
+Message-ID: <20240314111713.5979-1-renmingshuai@huawei.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Nikita Kiryushin <kiryushin@ancud.ru>
-Subject: [PATCH net] net: phy: fix phy_read_poll_timeout argument type in
- genphy_loopback
-References: <>
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Oleksij Rempel <o.rempel@pengutronix.de>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
-In-Reply-To: <>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-MS-Exchange-Organization-SCL: -1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemd100005.china.huawei.com (7.185.36.102)
 
+As we all know the mirred action is used to mirroring or redirecting the
+packet it receives. Howerver, add mirred action to a filter attached to
+a egress qdisc might cause a deadlock. To reproduce the problem, perform
+the following steps:
+(1)tc qdisc add dev eth0 root handle 1: htb default 30 \n
+(2)tc filter add dev eth2 protocol ip prio 2 flower verbose \
+     action police rate 100mbit burst 12m conform-exceed jump 1 \
+     / pipe mirred egress redirect dev eth2 action drop
 
-read_poll_timeout inside phy_read_poll_timeout can set val negative
-in some cases (for example, __mdiobus_read inside phy_read can return
--EOPNOTSUPP).
+The stack is show as below:
+[28848.883915]  _raw_spin_lock+0x1e/0x30
+[28848.884367]  __dev_queue_xmit+0x160/0x850
+[28848.884851]  ? 0xffffffffc031906a
+[28848.885279]  tcf_mirred_act+0x3ab/0x596 [act_mirred]
+[28848.885863]  tcf_action_exec.part.0+0x88/0x130
+[28848.886401]  fl_classify+0x1ca/0x1e0 [cls_flower]
+[28848.886970]  ? dequeue_entity+0x145/0x9e0
+[28848.887464]  ? newidle_balance+0x23f/0x2f0
+[28848.887973]  ? nft_lookup_eval+0x57/0x170 [nf_tables]
+[28848.888566]  ? nft_do_chain+0xef/0x430 [nf_tables]
+[28848.889137]  ? __flush_work.isra.0+0x35/0x80
+[28848.889657]  ? nf_ct_get_tuple+0x1cf/0x210 [nf_conntrack]
+[28848.890293]  ? do_select+0x637/0x870
+[28848.890735]  tcf_classify+0x52/0xf0
+[28848.891177]  htb_classify+0x9d/0x1c0 [sch_htb]
+[28848.891722]  htb_enqueue+0x3a/0x1c0 [sch_htb]
+[28848.892251]  __dev_queue_xmit+0x2d8/0x850
+[28848.892738]  ? nf_hook_slow+0x3c/0xb0
+[28848.893198]  ip_finish_output2+0x272/0x580
+[28848.893692]  __ip_queue_xmit+0x193/0x420
+[28848.894179]  __tcp_transmit_skb+0x8cc/0x970
 
-Supposedly, commit 4ec732951702 ("net: phylib: fix phy_read*_poll_timeout()")
-should fix problems with wrong-signed vals, but I do not see how
-as val is sent to phy_read as is and __val = phy_read (not val)
-is checked for sign.
+In this case, the process has hold the qdisc spin lock in __dev_queue_xmit
+before the egress packets are mirred, and it will attempt to obtain the
+spin lock again after packets are mirred, which cause a deadlock.
 
-Change val type for signed to allow better error handling as done in other
-phy_read_poll_timeout callers. This will not fix any error handling
-by itself, but allows, for example, to modify cond with appropriate
-sign check or check resulting val separately.
+Fix the issue by forbidding assigning mirred action to a filter attached
+to the egress.
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
-
-Fixes: 014068dcb5b1 ("net: phy: genphy_loopback: add link speed configuration")
-Signed-off-by: Nikita Kiryushin <kiryushin@ancud.ru>
+Signed-off-by: Mingshuai Ren <renmingshuai@huawei.com>
 ---
-  drivers/net/phy/phy_device.c | 4 ++--
-  1 file changed, 2 insertions(+), 2 deletions(-)
+ net/sched/act_mirred.c                        |  4 +++
+ .../tc-testing/tc-tests/actions/mirred.json   | 32 +++++++++++++++++++
+ 2 files changed, 36 insertions(+)
 
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 8297ef681bf5..6c6ec9475709 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -2831,8 +2831,8 @@ EXPORT_SYMBOL(genphy_resume);
-  int genphy_loopback(struct phy_device *phydev, bool enable)
-  {
-  	if (enable) {
--		u16 val, ctl = BMCR_LOOPBACK;
--		int ret;
-+		u16 ctl = BMCR_LOOPBACK;
-+		int ret, val;
-  
-  		ctl |= mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
-  
+diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+index 5b3814365924..fc96705285fb 100644
+--- a/net/sched/act_mirred.c
++++ b/net/sched/act_mirred.c
+@@ -120,6 +120,10 @@ static int tcf_mirred_init(struct net *net, struct nlattr *nla,
+ 		NL_SET_ERR_MSG_MOD(extack, "Mirred requires attributes to be passed");
+ 		return -EINVAL;
+ 	}
++	if (tp->chain->block->q->parent != TC_H_INGRESS) {
++		NL_SET_ERR_MSG_MOD(extack, "Mirred can only be assigned to the filter attached to ingress");
++		return -EINVAL;
++	}
+ 	ret = nla_parse_nested_deprecated(tb, TCA_MIRRED_MAX, nla,
+ 					  mirred_policy, extack);
+ 	if (ret < 0)
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
+index b73bd255ea36..50c6153bf34c 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
+@@ -1052,5 +1052,37 @@
+             "$TC qdisc del dev $DEV1 ingress_block 21 clsact",
+             "$TC actions flush action mirred"
+         ]
++    },
++    {
++        "id": "fdda",
++        "name": "Add mirred mirror to the filter which attached to engress",
++        "category": [
++            "actions",
++            "mirred"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [
++            [
++                "$TC actions flush action mirred",
++                0,
++                1,
++                255
++            ],
++            [
++                "$TC qdisc add dev $DEV1 root handle 1: htb default 1",
++                0
++            ]
++        ],
++        "cmdUnderTest": "$TC filter add dev $DEV1 protocol ip u32 match ip protocol 1 0xff action mirred egress mirror dev $DEV1",
++        "expExitCode": "2",
++        "verifyCmd": "$TC action list action mirred",
++        "matchPattern": "^[ \t]+index [0-9]+ ref",
++        "matchCount": "0",
++        "teardown": [
++            "$TC qdisc del dev $DEV1 root handle 1: htb default 1",
++            "$TC actions flush action mirred"
++        ]
+     }
+ ]
 -- 
-2.34.1
+2.33.0
 
 
