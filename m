@@ -1,204 +1,101 @@
-Return-Path: <netdev+bounces-79854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 503E087BC30
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:48:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 102FA87BC32
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:50:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA8551F21504
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:48:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B669C1F213FD
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:50:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F9236EB74;
-	Thu, 14 Mar 2024 11:48:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EA986F060;
+	Thu, 14 Mar 2024 11:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Tx9GaPpV"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DC146EB6D;
-	Thu, 14 Mar 2024 11:48:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FE656EB76
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 11:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710416927; cv=none; b=mEZAOY4V58FKAm3sUNz1AjhK6SD63nWe6ROfvx6QvZZIH7K+5Wsydry/c7i3/VQWv1iBEj+8cfr73AInzTlQtHymNz2NtRCFh2eXrz3mpTRD5vSv/Z+SfLV+SzDl7PuIP1ES2kngAgCLil0/p5+YiWXK2jgT7xyFRTXEhPzu6a4=
+	t=1710417030; cv=none; b=Tm04JQSogtUi2kKv26z+WExvS2Ufbae/52ZWUaHUjyieaKXH/oQCHRwl0cSt6GnN3B4UB0u3mgHLF7/TkkrQRPTQUWwM2n0kps3kJBo0tsHbSQgeNUEA7S8t8WJvoFsXG0XTa0JLc+FxZjmrfycQecTt+gJZxwS5jqRVZt7/tPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710416927; c=relaxed/simple;
-	bh=7ZiBPpdN/pRir9iGW2WDn9wd7ox5+ZWpl5rz4L8hPpM=;
-	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=HhNVcJuuK4QcruPysEGwnrJxJkIO/bEKUCZ1/pofYyJymEBZm9D2Lh05xnK8PI15L/wsu2M6JSUywL7LWgpMYo8rYmuJtnwARXZzIuEda8EQv0pV+QZjrvh8J2rqOaL3/quEghVIWK749GaaVJxj7IiWNAw4zRCE6RxeFhgdIrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TwQb24vv0z1xrD5;
-	Thu, 14 Mar 2024 19:46:54 +0800 (CST)
-Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 18715180061;
-	Thu, 14 Mar 2024 19:48:41 +0800 (CST)
-Received: from [10.67.120.192] (10.67.120.192) by
- kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 14 Mar 2024 19:48:40 +0800
-Message-ID: <da60f9b8-0ea7-4580-ab45-f294801605f9@huawei.com>
-Date: Thu, 14 Mar 2024 19:48:39 +0800
+	s=arc-20240116; t=1710417030; c=relaxed/simple;
+	bh=K6wdvdvaF5dlIYg2PERCB3sUhg2mnENdts9pDII/+rU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=GA5I6jDKjExY96IDFzIA3CTjqx/r32SWxKWKwYBW/jLhM41+GNQIf0+X++aELGpcPtLncUzg43EFJB13DLMhozz/vXorXDK48HqJvJs+qT7KtnOB6DlQcViOpGfDD8sap32ymupnsNex8vAXJncIrw6eLUvAh/+G/Zuhp+5AAPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Tx9GaPpV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id B3A65C43390;
+	Thu, 14 Mar 2024 11:50:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710417029;
+	bh=K6wdvdvaF5dlIYg2PERCB3sUhg2mnENdts9pDII/+rU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Tx9GaPpV/dECj/OyFnC75AXJB5NP4Wr+XQkOQbNdy8BMmn4fereJjsRgyJVUHKH+r
+	 uduHvdPNY1z5Uymr7+d0CMnAVO90Oomq/YC2Zh6SqUbO5Pwxox9hPgGgZRBVikVh05
+	 n8ULawuPfeNuXVNWT1WMIqFnOsZ+Frjnz3ZD2h5XUlNWcVIgU6vWOarCOc9drWy+j5
+	 JvHekP8D77FvQv3KaEDw29tpvEwWmNQPeML0usl9A8zPFeLU02BQjZ4OEANnZpriL1
+	 rwSd9fCl8GVzRZgUFn1OJX6BzDbTf4Vo7GNFsG0FU0iW6SL+tPYN9T9oFxf8/C+8Wd
+	 C64Y+N1K7CMdw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A3071D95055;
+	Thu, 14 Mar 2024 11:50:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-CC: <shaojijie@huawei.com>, Yisen Zhuang <yisen.zhuang@huawei.com>, Salil
- Mehta <salil.mehta@huawei.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Yufeng Mo <moyufeng@huawei.com>, Huazhong Tan
-	<tanhuazhong@huawei.com>
-Subject: Re: [PATCH] net: hns3: tracing: fix hclgevf trace event strings
-To: Steven Rostedt <rostedt@goodmis.org>, LKML <linux-kernel@vger.kernel.org>,
-	Linux Trace Kernel <linux-trace-kernel@vger.kernel.org>, netdev
-	<netdev@vger.kernel.org>
-References: <20240313093454.3909afe7@gandalf.local.home>
-From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <20240313093454.3909afe7@gandalf.local.home>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemm600007.china.huawei.com (7.193.23.208)
+Subject: Re: [PATCH net] vmxnet3: Fix missing reserved tailroom
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171041702966.3013.11175078666174379308.git-patchwork-notify@kernel.org>
+Date: Thu, 14 Mar 2024 11:50:29 +0000
+References: <20240309183147.28222-1-witu@nvidia.com>
+In-Reply-To: <20240309183147.28222-1-witu@nvidia.com>
+To: William Tu <witu@nvidia.com>
+Cc: netdev@vger.kernel.org, u9012063@gmail.com, micron10@gmail.com
 
-Reviewed-by: Jijie Shao<shaojijie@huawei.com>
+Hello:
 
-on 2024/3/13 21:34, Steven Rostedt wrote:
-> From: "Steven Rostedt (Google)" <rostedt@goodmis.org>
->
-> [
->     Note, I need to take this patch through my tree, so I'm looking for acks.
->     This causes the build to fail when I add the __assign_str() check, which
->     I was about to push to Linus, but it breaks allmodconfig due to this error.
-> ]
->
-> The __string() and __assign_str() helper macros of the TRACE_EVENT() macro
-> are going through some optimizations where only the source string of
-> __string() will be used and the __assign_str() source will be ignored and
-> later removed.
->
-> To make sure that there's no issues, a new check is added between the
-> __string() src argument and the __assign_str() src argument that does a
-> strcmp() to make sure they are the same string.
->
-> The hclgevf trace events have:
->
->    __assign_str(devname, &hdev->nic.kinfo.netdev->name);
->
-> Which triggers the warning:
->
-> hclgevf_trace.h:34:39: error: passing argument 1 of ‘strcmp’ from incompatible pointer type [-Werror=incompatible-pointer-types]
->     34 |                 __assign_str(devname, &hdev->nic.kinfo.netdev->name);
->   [..]
-> arch/x86/include/asm/string_64.h:75:24: note: expected ‘const char *’ but argument is of type ‘char (*)[16]’
->     75 | int strcmp(const char *cs, const char *ct);
->        |            ~~~~~~~~~~~~^~
->
->
-> Because __assign_str() now has:
->
-> 	WARN_ON_ONCE(__builtin_constant_p(src) ?		\
-> 		     strcmp((src), __data_offsets.dst##_ptr_) :	\
-> 		     (src) != __data_offsets.dst##_ptr_);	\
->
-> The problem is the '&' on hdev->nic.kinfo.netdev->name. That's because
-> that name is:
->
-> 	char			name[IFNAMSIZ]
->
-> Where passing an address '&' of a char array is not compatible with strcmp().
->
-> The '&' is not necessary, remove it.
->
-> Fixes: d8355240cf8fb ("net: hns3: add trace event support for PF/VF mailbox")
-> Signed-off-by: Steven Rostedt (Google) <rostedt@goodmis.org>
-> ---
->   drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_trace.h  | 8 ++++----
->   .../net/ethernet/hisilicon/hns3/hns3vf/hclgevf_trace.h    | 8 ++++----
->   2 files changed, 8 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_trace.h b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_trace.h
-> index 8510b88d4982..f3cd5a376eca 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_trace.h
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_trace.h
-> @@ -24,7 +24,7 @@ TRACE_EVENT(hclge_pf_mbx_get,
->   		__field(u8, code)
->   		__field(u8, subcode)
->   		__string(pciname, pci_name(hdev->pdev))
-> -		__string(devname, &hdev->vport[0].nic.kinfo.netdev->name)
-> +		__string(devname, hdev->vport[0].nic.kinfo.netdev->name)
->   		__array(u32, mbx_data, PF_GET_MBX_LEN)
->   	),
->   
-> @@ -33,7 +33,7 @@ TRACE_EVENT(hclge_pf_mbx_get,
->   		__entry->code = req->msg.code;
->   		__entry->subcode = req->msg.subcode;
->   		__assign_str(pciname, pci_name(hdev->pdev));
-> -		__assign_str(devname, &hdev->vport[0].nic.kinfo.netdev->name);
-> +		__assign_str(devname, hdev->vport[0].nic.kinfo.netdev->name);
->   		memcpy(__entry->mbx_data, req,
->   		       sizeof(struct hclge_mbx_vf_to_pf_cmd));
->   	),
-> @@ -56,7 +56,7 @@ TRACE_EVENT(hclge_pf_mbx_send,
->   		__field(u8, vfid)
->   		__field(u16, code)
->   		__string(pciname, pci_name(hdev->pdev))
-> -		__string(devname, &hdev->vport[0].nic.kinfo.netdev->name)
-> +		__string(devname, hdev->vport[0].nic.kinfo.netdev->name)
->   		__array(u32, mbx_data, PF_SEND_MBX_LEN)
->   	),
->   
-> @@ -64,7 +64,7 @@ TRACE_EVENT(hclge_pf_mbx_send,
->   		__entry->vfid = req->dest_vfid;
->   		__entry->code = le16_to_cpu(req->msg.code);
->   		__assign_str(pciname, pci_name(hdev->pdev));
-> -		__assign_str(devname, &hdev->vport[0].nic.kinfo.netdev->name);
-> +		__assign_str(devname, hdev->vport[0].nic.kinfo.netdev->name);
->   		memcpy(__entry->mbx_data, req,
->   		       sizeof(struct hclge_mbx_pf_to_vf_cmd));
->   	),
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_trace.h b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_trace.h
-> index 5d4895bb57a1..b259e95dd53c 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_trace.h
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_trace.h
-> @@ -23,7 +23,7 @@ TRACE_EVENT(hclge_vf_mbx_get,
->   		__field(u8, vfid)
->   		__field(u16, code)
->   		__string(pciname, pci_name(hdev->pdev))
-> -		__string(devname, &hdev->nic.kinfo.netdev->name)
-> +		__string(devname, hdev->nic.kinfo.netdev->name)
->   		__array(u32, mbx_data, VF_GET_MBX_LEN)
->   	),
->   
-> @@ -31,7 +31,7 @@ TRACE_EVENT(hclge_vf_mbx_get,
->   		__entry->vfid = req->dest_vfid;
->   		__entry->code = le16_to_cpu(req->msg.code);
->   		__assign_str(pciname, pci_name(hdev->pdev));
-> -		__assign_str(devname, &hdev->nic.kinfo.netdev->name);
-> +		__assign_str(devname, hdev->nic.kinfo.netdev->name);
->   		memcpy(__entry->mbx_data, req,
->   		       sizeof(struct hclge_mbx_pf_to_vf_cmd));
->   	),
-> @@ -55,7 +55,7 @@ TRACE_EVENT(hclge_vf_mbx_send,
->   		__field(u8, code)
->   		__field(u8, subcode)
->   		__string(pciname, pci_name(hdev->pdev))
-> -		__string(devname, &hdev->nic.kinfo.netdev->name)
-> +		__string(devname, hdev->nic.kinfo.netdev->name)
->   		__array(u32, mbx_data, VF_SEND_MBX_LEN)
->   	),
->   
-> @@ -64,7 +64,7 @@ TRACE_EVENT(hclge_vf_mbx_send,
->   		__entry->code = req->msg.code;
->   		__entry->subcode = req->msg.subcode;
->   		__assign_str(pciname, pci_name(hdev->pdev));
-> -		__assign_str(devname, &hdev->nic.kinfo.netdev->name);
-> +		__assign_str(devname, hdev->nic.kinfo.netdev->name);
->   		memcpy(__entry->mbx_data, req,
->   		       sizeof(struct hclge_mbx_vf_to_pf_cmd));
->   	),
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sat, 9 Mar 2024 20:31:47 +0200 you wrote:
+> Use rbi->len instead of rcd->len for non-dataring packet.
+> 
+> Found issue:
+>   XDP_WARN: xdp_update_frame_from_buff(line:278): Driver BUG: missing reserved tailroom
+>   WARNING: CPU: 0 PID: 0 at net/core/xdp.c:586 xdp_warn+0xf/0x20
+>   CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W  O       6.5.1 #1
+>   RIP: 0010:xdp_warn+0xf/0x20
+>   ...
+>   ? xdp_warn+0xf/0x20
+>   xdp_do_redirect+0x15f/0x1c0
+>   vmxnet3_run_xdp+0x17a/0x400 [vmxnet3]
+>   vmxnet3_process_xdp+0xe4/0x760 [vmxnet3]
+>   ? vmxnet3_tq_tx_complete.isra.0+0x21e/0x2c0 [vmxnet3]
+>   vmxnet3_rq_rx_complete+0x7ad/0x1120 [vmxnet3]
+>   vmxnet3_poll_rx_only+0x2d/0xa0 [vmxnet3]
+>   __napi_poll+0x20/0x180
+>   net_rx_action+0x177/0x390
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] vmxnet3: Fix missing reserved tailroom
+    https://git.kernel.org/netdev/net/c/e127ce7699c1
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
