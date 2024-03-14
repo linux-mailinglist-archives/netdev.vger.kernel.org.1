@@ -1,194 +1,214 @@
-Return-Path: <netdev+bounces-79971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BE1687C448
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 21:28:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68EE087C44F
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 21:31:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5B24282CBF
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 20:28:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D26631F22217
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 20:31:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5360776056;
-	Thu, 14 Mar 2024 20:28:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D2E762ED;
+	Thu, 14 Mar 2024 20:31:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RC4TESjg"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="faHS4s6h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CC486FE0B;
-	Thu, 14 Mar 2024 20:28:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710448132; cv=none; b=KCc0M9Z3+7ynYMrnOh10HjPbYmhD7aOiknAp9e8ePBReAO+PAF0Et8KQsqsyyoRfUtR77NmfZiWlBZj1WrTkBD/ySve4wG617yriFG20dysY/51N07hreaN6c7KTM4rSzFEyx9+NsCGm5Ob4cVLoQCwtoGvAjq8vio8Mb1lfN5M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710448132; c=relaxed/simple;
-	bh=CSLuRo45oS25PsjTaTFl3smBFMW61nQHF4/uB1uvbfY=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=O03mh7d2i18EqP/XufisSYDlEnYreRdYZlc3FD74gJBkRu8/EiyCZniWL5yy1aMRYkWBSUIvB5ISWdhT4A/fA6B6RgwaEjHeS66EZUL3M1fOta6TWDl5q+Z9moqo/ICQew5hKnEs57ZwEtp0F2dUOurJT1in+6nXzTKSogIl2sc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RC4TESjg; arc=none smtp.client-ip=209.85.222.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-788455430easo120568785a.0;
-        Thu, 14 Mar 2024 13:28:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710448129; x=1711052929; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CYqvlgz3fwOmk26mzvVlgzBO06xI1HS4SgqCSEg+b5c=;
-        b=RC4TESjg+RNd+U9F+L9Ct6JX7nEGooNiGgcfVhghmLLOCRgo2j4OpQEcnNtMoXUu+5
-         gZo5WM/2/TFaRZUyR9hrtkqcateGkAT7yaG6GkaCOaeBtt73OonIpQ/iXFSn7YVBhsK1
-         aqUp0znJK2g1TTcabqxuY3VK84S8nXYGV5Y487ZyC7pH66PGwp1jnHgUzwXyHJ0gYjbz
-         4ENu/n+4mAiJkrpjcBluG3UOkVo0znqadKdVBDGpKLZHF9WjihGnjeF2f+p40eXwVUP3
-         yEr3uXltB54W8dI6DiDcAIUDdLZTWjJRGTsPuj9/L0OZ0rMt/V0gx9fjHWSRJlVGsm9u
-         22qA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710448129; x=1711052929;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CYqvlgz3fwOmk26mzvVlgzBO06xI1HS4SgqCSEg+b5c=;
-        b=LhFEHZxbJL/WUAVr/mQcfw7IGElZSeioz+TD8DFYuLqYMAcXyzdLGXXmOrT/uvvINn
-         vhqyRZ66Dc/SArewK67IilmjA1BG4iCNgF6Zaz8gaY9NO67ySOJdxqtM8xeIiKMO6Wpp
-         AzSRLWC3ijEPErBouGnpBNrtmJZ9Ttjg3e28TD0+lnrlkF8UwRI6TPEX2QS0Wmtujgto
-         y89UxCB7s5EjqcCU/bcPjkd/R/cwHHVjSvpvC6nQDQGyn+aVWtHqwqKgiZ1ATkXNsxIs
-         If3EOiaPvsCMZhu4Ozla5AUEeMbBp137YmIjHhfu6VYUtMmmvaiuYO+QqVoR7a9fBqgR
-         WVZg==
-X-Forwarded-Encrypted: i=1; AJvYcCUWnfKPGwlW9vgjIuAhymb2webG3tdSoCDH+2TrD+Qm3ZI1I2E7ensqgDpfn2o6IojfI9BDezF0yLa01vI0I3lYc3kRtthtY1yJ7w6KT5lkMq2ZjPD8hl3BpLGvfqr4/0HnG4tBLMNYym1idDcWQ6f0vLPtECSrzPGO
-X-Gm-Message-State: AOJu0Yxa8esFFpgmSQmU215SnHH/gNxcsz4Clqo69DBrZEzbNypGqPYP
-	EW1K34zRWvwCsZJ3MQqLv2iGqrFmICAlhnARQfhCmN4T2CkJ9uF2
-X-Google-Smtp-Source: AGHT+IGUaNsIDJgU+eM5eb/wJkOEMlfh0za8eNyWdhZM8yhCLEQBESeVxfmkTFMxD2J+HIvCbDcDtg==
-X-Received: by 2002:a05:620a:29cb:b0:789:cfca:f59 with SMTP id s11-20020a05620a29cb00b00789cfca0f59mr7081354qkp.14.1710448129467;
-        Thu, 14 Mar 2024 13:28:49 -0700 (PDT)
-Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
-        by smtp.gmail.com with ESMTPSA id d2-20020a05620a158200b00789cd996cbcsm1201344qkk.134.2024.03.14.13.28.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Mar 2024 13:28:48 -0700 (PDT)
-Date: Thu, 14 Mar 2024 16:28:48 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-Cc: kernel@quicinc.com, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- Andrew Halaney <ahalaney@redhat.com>, 
- Martin KaFai Lau <martin.lau@kernel.org>, 
- bpf <bpf@vger.kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Andrii Nakryiko <andrii@kernel.org>
-Message-ID: <65f35e00a83c0_2132294f5@willemb.c.googlers.com.notmuch>
-In-Reply-To: <5692ddb3-9558-4440-a7bf-47fcc47401ed@linux.dev>
-References: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
- <2a4cb416-5d95-459d-8c1c-3fb225240363@linux.dev>
- <65f16946cd33e_344ff1294fc@willemb.c.googlers.com.notmuch>
- <28282905-065a-4233-a0a2-53aa9b85f381@linux.dev>
- <65f2004e65802_3d1e792943e@willemb.c.googlers.com.notmuch>
- <0dff8f05-e18d-47c8-9f19-351c44ea8624@linux.dev>
- <e5da91bc-5827-4347-ab38-36c92ae2dfa2@quicinc.com>
- <65f21d65820fc_3d934129463@willemb.c.googlers.com.notmuch>
- <bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev>
- <65f2c81fc7988_3ee61729465@willemb.c.googlers.com.notmuch>
- <5692ddb3-9558-4440-a7bf-47fcc47401ed@linux.dev>
-Subject: Re: [PATCH net-next v4] net: Re-use and set mono_delivery_time bit
- for userspace tstamp packets
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89EA77317E;
+	Thu, 14 Mar 2024 20:31:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710448304; cv=fail; b=ACNFjUkkDrcH7lXdqiXk2L0xbbbZF9G8/i3cPpSaoWsQ44uAwvEN6BWzQm2WiB6yEWnvDQXq72mE1BBFvkAo3WG18/1JbLRaNK7cu5T+wTPUScsTB45j9bqRdVvrTdsHjal+3saC0TkZz0sGEjtB+9Ckkc15pMBcgNa/Ccf30EM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710448304; c=relaxed/simple;
+	bh=psH04jx38aROT2qxal3IjRokhk1QKyRuXqHN2vWUAWQ=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=OrZq/jA2qk2h4t5hCK+/R8um3ABCP4DXoRcAhnKUpB9DgDZsJOFr7KGkDVDj8Nn7fgAP5GzZ17+Y1JSTG7Xi56tQGWT781FxDAax2BcAxO/hk02dLilEJ1j7RtV7Og1mq+josn6pQZKAUqDtDzENk1LpUy2hGfs5rzopUMpXk+o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=faHS4s6h; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710448302; x=1741984302;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=psH04jx38aROT2qxal3IjRokhk1QKyRuXqHN2vWUAWQ=;
+  b=faHS4s6he2YM7BFxenjAuMboVR9XVL9zHxkhC4KJIe2A2J2+9rF8v14S
+   fWiiTXC76Yar6ZUuLkUi0UqpxxdoIxR1ttIwnF93OKvQXbQPMDmbe+O9V
+   cA4n7eBF8DF/klaQuNjsdrFMWQchx3W4pBOllv3CUc33wJQ15Elf+gxKj
+   k+Z5U07/DojyaGvuKU2xgvCjlKHqqFw8JqEH6cyt4Kr//TAj4tTbfoILZ
+   iqV8h/m5iA1a9zyBs9SMglwFIs+DZvRnVvHcVI0GHEbyg5Ljuu4G90sna
+   sMzdeOrCfUV1T/db55ItxN+ZT8XMYzOXOERSLXxAwiwlJpn/xUIbKN/eV
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11013"; a="9127850"
+X-IronPort-AV: E=Sophos;i="6.07,126,1708416000"; 
+   d="scan'208";a="9127850"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 13:31:41 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,126,1708416000"; 
+   d="scan'208";a="12864912"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Mar 2024 13:31:42 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Mar 2024 13:31:41 -0700
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Mar 2024 13:31:40 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 14 Mar 2024 13:31:40 -0700
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.40) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 14 Mar 2024 13:31:40 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=l1RdBYExlLM/tUBccSxFdGs5c7Df0lX/lkZwU/5qpg8p5XGp74otnp6Lt72I43j7Y+NoZIIxhI7ulLu6XW+ui7EQmrhY14jFr9Q1lQZ2vndXaykzqmgmOALjlWuqSqjlQKp8ZLJTq1igLWFUFZ+cTWZBBvUIipUlOUm63EQ1dpbTN5+2YcKmhAmhi6IWHqee8xE/ORXsjv+PsgMBEZ2PpjaAh2eHYduhhUkbj8T2y8VTosd3ozW5zDMgWe8P2GOaJAD0wLerz+n2X9fLDyoVh7F2xla6XCOfZ3+yPFLiom/hfL3pmUKQQn2Iq793MNBTUjTvpVFupMgX+TsATohWxw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=kQkEHYLTKKUGUTG4wiie4CcTlojwpS4D6ePntqisDYc=;
+ b=FEpuUwNMD81StbNf/quVni6W86gZBVpuTAwDYlxPDU2r42qiCrn31rPmEY8Uhlp1D85/gvyDwS1BQYEy1XeuStBvLi2m+6TLXhdITa+DTbVuYBfov+cAl0BM8pnDrlQRP9ckqZRAtFo6jR49MfJpcz2nSNUrHmxYMA/EiDMoFm8XtlTB7mooFPoXgQepuuE8t/4DqdKbssydVO+pLLgEkO3nwoca/6Pxv4TqC/3HhGLrRhlrCQXmg184Lh5mhuf3Ys4b+LqvlQHsbO19NxE7Rcp8GlPDvF+MZfKcAxDzJDzjhozwaDMPQSZA96+kk77msD7pOj8JJn0u4nGzwEFsWg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com (2603:10b6:208:3bb::9)
+ by LV3PR11MB8768.namprd11.prod.outlook.com (2603:10b6:408:211::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.18; Thu, 14 Mar
+ 2024 20:31:37 +0000
+Received: from BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::9c80:a200:48a2:b308]) by BL3PR11MB6435.namprd11.prod.outlook.com
+ ([fe80::9c80:a200:48a2:b308%4]) with mapi id 15.20.7362.019; Thu, 14 Mar 2024
+ 20:31:37 +0000
+Message-ID: <8f4724f8-e831-12f6-d4e1-4700ea47b2a0@intel.com>
+Date: Thu, 14 Mar 2024 13:31:33 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.6.1
+Subject: Re: [PATCH v4 iwl-net] i40e: Prevent setting MTU if greater than MFS
+To: Erwan Velu <e.velu@criteo.com>, Brett Creeley <bcreeley@amd.com>, "Erwan
+ Velu" <erwanaliasr1@gmail.com>
+CC: Jesse Brandeburg <jesse.brandeburg@intel.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20240313090719.33627-2-e.velu@criteo.com>
+ <4e203331-62f7-44e7-acd9-f684c30662de@amd.com>
+ <c0ccaef6-44eb-4851-b336-cdb06647e1d2@criteo.com>
+ <d16ff01c-4a01-4871-93de-a5c26a352301@amd.com>
+ <7b612db6-cec6-4873-8a38-fb4c97192aa2@criteo.com>
+Content-Language: en-US
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+In-Reply-To: <7b612db6-cec6-4873-8a38-fb4c97192aa2@criteo.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: MW4P223CA0020.NAMP223.PROD.OUTLOOK.COM
+ (2603:10b6:303:80::25) To BL3PR11MB6435.namprd11.prod.outlook.com
+ (2603:10b6:208:3bb::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-
-Martin KaFai Lau wrote:
-> On 3/14/24 2:49 AM, Willem de Bruijn wrote:
-> >> The two bits could potentially only encode the delivery time that is allowed to
-> >> be forwarded without reset. 0 could mean refering back to sk_clockid and don't
-> >> forward. The final consumer of the forwarded skb->tstamp is the qdisc which
-> >> currently only has mono and tai.
-> > 
-> > So the followinng meaning of bit pair
-> > { skb->mono_delivery_time, skb->user_delivery_time } ?
-> >   
-> > - { 0, 0 } legacy skb->tstamp: realtime on rx
-> > - { 1, 0 } skb->tstamp is mono: existing behavior of mono_delivery_time bit
-> > - { 0, 1 } skb->tstamp is tai: analogous to mono case
-> > - { 1, 1 } skb->tstamp defined by skb->sk->sk_clockid
-> 
-> I was thinking only forward mono and tai until it is clearer how other clocks 
-> will be useful for forwarding between e/ingress. By resetting all skb->tstamp 
-> other than mono and tai, { 0, 0 } at ingress will mean realtime on rx and { 0, 0 
-> } at egress will mean go look skb->sk->sk_clockid.
-> 
-> I do like your scheme such that it is much clearer what is in skb->tstamp 
-> without depending on other bits like tc_at_ingress or not.
-> 
-> "{ 0, 1 } skb->tstamp is tai: analogous to mono case" can probably be dropped 
-> for now until bpf_skb_set_tstamp(BPF_SKB_TSTAMP_DELIVERY_TAI) is needed.
-> Otherwise, it is mostly a duplicate of "{ 1, 1 } skb->tstamp defined by 
-> skb->sk->sk_clockid".
-> 
-> The bpf_convert_tstamp_{read,write} and the helper bpf_skb_set_tstamp need to be 
-> changed to handle the new "user_delivery_time" bit anyway, e.g. 
-> bpf_skb_set_tstamp(BPF_SKB_TSTAMP_DELIVERY_MONO) needs to clear the 
-> "user_delivery_time" bit.
-> 
-> I think the "struct inet_frag_queue" also needs a new "user_delivery_time" 
-> field. "mono_delivery_time" is already in there.
-> 
-> It may as well be cleaner to combine mono_delivery_time and user_delivery_time 
-> into a 2 bits field like:
-> 
-> struct sk_buff {
-> 	__u8 tstamp_type:2;
-> };
-> 
-> enum {
-> 	SKB_TSTAMP_TYPE_RX_REAL = 0, /* A RX (receive) time in real */
-> 	SKB_TSTAMP_TYPE_TX_MONO = 1, /* A TX (delivery) time in mono */
-> 
-> 	/* A TX (delivery) time and its clock is in skb->sk->sk_clockid.
-> 	 *
-> 	 * BPF_SKB_TSTAMP_DELIVERY_USER should be added
-> 	 * such that reading __sk_buff->tstamp_type will match the
-> 	 * SKB_TSTAMP_TYPE_TX_USER.
-> 	 *
-> 	 * The bpf program can learn the clockid by
-> 	 * reading skb->sk->sk_clockid.
-> 	 *
-> 	 * bpf_skb_set_tstamp(BPF_SKB_TSTAMP_DELIVERY_USER)
-> 	 * should be disallowed for now until the use case
-> 	 * is more clear. Potentially, we could allow it
-> 	 * in the future as long as
-> 	 * the sock_flag(sk, SOCK_TXTIME) is true at that moment.
-> 	 */
-> 	SKB_TSTAMP_TYPE_TX_USER = 2,
-> 
-> 	/* UNUSED_FOR_FUTURE = 3, */
-> };
-> 
-> It will have more code churns in the first patch to rename 
-> s/mono_delivery_time/tstamp_type/.
-> 
-> wdyt?
-
-I asked for such code churn in the original patch. We then decided to
-leave the variable name as is, as the churn was significant.
-
-Long term, it is obviously cleaner.
-
-I don't have a strong opinion. If doing this, let's at least make it
-two separate patches, one that is a NOOP rename only.
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL3PR11MB6435:EE_|LV3PR11MB8768:EE_
+X-MS-Office365-Filtering-Correlation-Id: 97dd4382-6d41-4663-89f6-08dc4465bf4d
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: EmvVjVBUx5YMo9EE4TOMMsEfEt0VA3eV/TpzxQR2Z6rl11/UzC18R/XYiZUi58nzFhCEcYyC8/2m2cta/4regOdo1K3q81gaBLumkxl7KKZ7hIpkcEk4qDhtmHeMH/m0D8jN9nJ2ox2pNfnXMcJZvzNITxuyxvvJMhuTGSyaVkKLOxjdquhEaOtJQ6zwKe9lvIbpQfSe75lWIwDNFJXmnQrxWjvXmHg0ZcB2arzXS1Kqv8qWlT8Lg6G9AWTMaPvJuJgWi+C4ZNIGQr4RuZNLvEqMe6Y+M2XIKHVOFYec/qsZJVQqs9M1YW7g7lgbYnGgxGa4rkfwWwq1l+GEHoW6EUgse8RXrXdqM2JjU37E0deIapPY+sfVpptTHVjHD4vkdXEo2Wnzcci9PzqWHIc3U5g0Lp2MTYE3Llc1GRDNCdRbcB7XWR7xfeS3y/Wfrj6vSF/dIxxDedPDXLrkGhXP81KNNkjOahPiEHvGOULGUkVVxmc+nxiwK3fT4xCVR2kmz9q7ibbjUkoHmwy95oUcjbyhqLzQSqNcpgRK7GQJ4tqUWxVN3/5PsovfYZZsr3G/PUt2+6Jm0Mtu6N6sPRvKbmv59xjrzfxq4gB9rG4toS/OL5eweUQIHSSEos1ahTAp3CHCHMM8MHKP4S4/6GWhlP6dm16Hmu1iMeZ1o7+GA1E=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL3PR11MB6435.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(7416005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RlpVT1hYV2them5YREs1alhaYWhRbHh0d205N3c3MGVqOE9mTmxQQWdPdm0v?=
+ =?utf-8?B?d0RKcFQvU28zcFovbzU0RG5BYXl3TmovZGVmM1NFdU1Ja1REdG1kL2d0bmpT?=
+ =?utf-8?B?WWQ0RnVUR1ZJcE8yb2lOV0NKR2dHdE1ES0h1T1RIMUlVejF1R2VEcE5DWFJL?=
+ =?utf-8?B?WHo1TVkwZjZsN0ZaQVZHcWljVmFBRG9KVFhiekdLVHQ4c1duUnNsdlE0THJX?=
+ =?utf-8?B?bithdDMwUnJCMytWeTFaLzcxSU10blJxRXhnSjZtY2tyUjc0QUtvZUJXWGx6?=
+ =?utf-8?B?a0pCc1E5Qm5CaWxaRFlLZWZhY2RzcW5US3hvY2dXczZkRUREYU1ZMVdNOGkx?=
+ =?utf-8?B?Z1RQbFNMU2VkR2lTeWRYcitVTW90Szh4TE04dFBYQnJ1a3V1eUhSc2dhN2Vy?=
+ =?utf-8?B?RXFkWkcwMHUyWG5zejFQTGZFZlN5Q1N1dmJQU0k1SVRFdjY4R0NYV1F4SjV6?=
+ =?utf-8?B?Y0M0ZXREd0lyVnhZYU92Q2pONFdyVGU0RkNMd3dFZWdJbHNqbkxONEhqS3ht?=
+ =?utf-8?B?YmRRQ2VZdFVSMU5KbkdvbmpTZDNwdnRpOU9mTTNRb3FBNHRXRGJFMjd1MXNq?=
+ =?utf-8?B?LzN5b2RIdE5vdUROZitjYjJLOVAxN2syTEltenlsQXNydTlWcE5uWjM4ZHRV?=
+ =?utf-8?B?T09STlczRThjTGVrOUpubXJLYndkZ2JuYzdyMEtRc1FGbGttdUIwcXIvZDFw?=
+ =?utf-8?B?YjUvdURJeEpsQTVFS3hzdG80YTFYZzlHbWQ3QURHUTRnckpYRitYcmZ4cjZB?=
+ =?utf-8?B?UHkzOUsyZ202YzlJdEJNRUNVOG5GT3JWVDJuLzlvcTZGQTBDcXBLN2xrR0lK?=
+ =?utf-8?B?aUpydzhkN044cTNyd2pSZVJ1K3JPUTdldmhWRS93UUszQlJBVnpEQU9CNkIy?=
+ =?utf-8?B?MXptTHhKZFpQUG04L2pVOWY1ZTVocEllUDdNNkMyb0hhQnNTVEJnMkRwUDVt?=
+ =?utf-8?B?MnFRbHJvbW9lNDZBRUtLRXFYYS8xdm5sdTNycVJGUnN6ZDh3ZFczdzk3UFhk?=
+ =?utf-8?B?ZDVWVjRpbUlFSjRyTTJOOFZtb1dXK2p4YW1tRW1XMVVydFQyd2Z4WVFFRWpF?=
+ =?utf-8?B?RVBJNVJuZStSMmlZYWd2b2htNHZVWlFQYUs5dDZIUUF2d2dEYi9CQ3lzZUNV?=
+ =?utf-8?B?eXFxelk0RzdzVW1uejNGSFhiMGs5ODVjdWdyWDY2NlpxYXFNamJTYXNnRlNO?=
+ =?utf-8?B?ZFVhMVE5emFmekRPN2VTMGVJYVMwVG4vb1NZM0krV1Zzdkpua04vaDNCNFJP?=
+ =?utf-8?B?M0szQXpGblFNb0RSNmpsWDVraUFGWFpOQjJXY0ZsbGxYV29NZjFLV3MyRTgw?=
+ =?utf-8?B?RExaWmJZYkczSjdBR1hYM1A5Nng3UXdsQWljZXA0d3lYd1F3ck12eGdwb2JB?=
+ =?utf-8?B?VjJpVHhpMDJzY3BzRkZEeG00azBpNVM0SDBPMVRaSXpqODdNdzYrSFh0YXd3?=
+ =?utf-8?B?NG9rc3NOQjRpNjRJVlZVTTFnTjNQa3d0RDB0UUJhNU9zWVdlZzhwTEt3SG0x?=
+ =?utf-8?B?L2t5WG5hYjRuMWJIRGZTcUIwSEZmUFpwQ1FSSkFmaHY5N0FodU5HVU1FVmh0?=
+ =?utf-8?B?UDhyREV0QUhXSlY1VUVlZzFSVS9rSU8yeFpOdGhjazIxR2h2ZERySHhmbUtw?=
+ =?utf-8?B?dTBLU1BqdEtVOHdCbUE5Q0JYVjBqRkUrbU9DRmRPbjcwTWZwbWxMSmNMMm5K?=
+ =?utf-8?B?S0grS1FyLzh1UnYyQytFVUdvc3dhTzMwNGJtRUVtUXBoQ0oyN2FCWkV5Syt3?=
+ =?utf-8?B?K3hNWEt1WjJHK2hhQjN3K0NXbDk5M0xNdWxka1EzN3lUM0x4dkhucklaRmVv?=
+ =?utf-8?B?M2NGRkZsYWdwbnUxSTBCSTl6MHp0MXV5VEk5TEdQS1RZY25jcENlTkp2dVJZ?=
+ =?utf-8?B?Z251ajE0UVkxUlIzYWkvY3QzdGtWNkM2SVk2VktXbHM3VzAvYkVKNk8zaGtQ?=
+ =?utf-8?B?U3REcFZUL0VPOFZoTDZaQ1JaM0Q1VFVkcXB0cXF4aWg5RzNzZHI2dVkyL1pU?=
+ =?utf-8?B?WmJNM1ZIOXNObW1vYTRKOGVFeFBOK1hKQkVHWnEyaWo3U09CTUpVckUrWFU4?=
+ =?utf-8?B?SHJmamR1Q3A1NTFVWEw2Z3NuY1U4elBaSHdrL0Y4bWloOUMrTit5U0hXZmRN?=
+ =?utf-8?B?SDZCRTFwWkt4bVFJcEJLdjZQSm1BT2NNU2tmQWVMTm5rOWt3NVBpTDJVTDlG?=
+ =?utf-8?B?Mmc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 97dd4382-6d41-4663-89f6-08dc4465bf4d
+X-MS-Exchange-CrossTenant-AuthSource: BL3PR11MB6435.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 20:31:37.3224
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fhuJ2FjVBBsME+fgDlMxorJTS2ErR16bzzdQ608StYHbOAU37wWUs4osXqFYjohntH3GSG7M601uPImPJfBRVAsMk5hayKrBj9RqUT3J4bM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR11MB8768
+X-OriginatorOrg: intel.com
 
 
+
+On 3/14/2024 11:04 AM, Erwan Velu wrote:
+> 
+> Le 14/03/2024 à 18:55, Brett Creeley a écrit :
+>> [...]
+>> AFAIK there is no API for a user to change the max_mtu, so the only way
+>> the device's MFS would need to change is if it's done during
+>> initialization time, which should be done before netdev registration 
+>> anyway.
+> 
+> Sorry Brett, I was probably unclear and please note that I'm not a 
+> network developer, just a user that faced a bug.
+> 
+> My initial though was to check the mfs size in i40e_change_mtu() and if 
+> mfs is too small, then let's increase it.
+> 
+> Maybe just resetting it at init time to the largest value (which seems 
+> to be the default fw behavior) is a best approach.
+> 
+> I'd love to ear from Intel dev that knows this driver/cards/fw better on 
+> what's the best approach here.
+
+Setting the mfs size to max values during init and reset would better; 
+this is what the ice driver does. However, this would take implementing 
+new AdminQ calls. IMO this patch is ok to prevent the issue being 
+reported and allow for ease of backport.
+
+Thanks,
+Tony
 
