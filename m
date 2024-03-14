@@ -1,210 +1,153 @@
-Return-Path: <netdev+bounces-79920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CDFC87C0AF
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 16:54:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2792387C0BD
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 16:56:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B41A1B22B56
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:54:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6475282BDC
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:56:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1C4973175;
-	Thu, 14 Mar 2024 15:54:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C3871B3C;
+	Thu, 14 Mar 2024 15:56:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="g6OiwPMg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d64tRXuD"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2056.outbound.protection.outlook.com [40.107.244.56])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D525F73171;
-	Thu, 14 Mar 2024 15:54:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.56
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710431660; cv=fail; b=QETkCRwjHSetb8ZN8SRZZEn2NZSunnnN/CgMOlSPd5jeuVsnpK5CYzgUz9iCekpfvLV3ICycFh82IKCQtLcZ3TxOyZ6JLRJBPhHsEdHrWYmQZA6RjxAubIpZppuSAvLx4Ql4NS16azBd3CClZjmshyMDJhaNX+LasPOV0AgaVT4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710431660; c=relaxed/simple;
-	bh=uKgvklbYa/0ILDIsSpxcLyKO35yBnWxHlW17p+EzrQc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=VzefM3YrDtI7DslAZSASd52TabiAfI+OxwV21Nz4YMztwnRMjrK5WEiVyoUqr7ZoAzqdda2W0dJ3Sne6WgetKSBXFBhu5QMIq59BUDU1IGqtzc7EYGweE1V1+R6GL0FG0tFwRefOpT2TAOoGiEtBWaRDyQSB60t4KNAWtgxiwgk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=g6OiwPMg; arc=fail smtp.client-ip=40.107.244.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gGafjPmlYEwVfK28xz2kS3GwvmLkSW/8AFMMx3+AtAuG2eWYWWmZ3AHJgkwrm3gicG4Azh/c6wavq8+ywhDcsL543xfgxIZSSLtPUZgZasFVZOztIR4ZvhymOzmFZX/EwxNOLU8Vo8QTJTBWW+pj9tSI/yvqtg0we87mYjGReBoUD75wweV8JZ8vFFRftktCx3O5vv6XzGsChaenv6Gb8wEdUXwOJJT2dL0aKUgWLPLRghYJ3hJJkM1c4/aBbPq6QoDEChCZ/64086wapdrHeNftETlkCUDRgK68p7ch/xHuPMb/XO942c4QwR9p4GJ3ozcmeBzRc6ASbzerk4EVKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0CF2D1LdR3YGjipcaH2VdCpidOvJYda/43iSZJ/FGR0=;
- b=kmcOd6UWcFIEwQuFsM6ftqM0dkAknpNcaCWhIUApceJlgG12hLUnC2r3uWrQthuw6px+uxzMprxKdFmP693gLFHLnNxGGlCWJy7fGfSi5v7uaQBj3UJhhxEOePEJTeB38GQaYeL8WU/e01PNYJSDx1lYVpkI3L+/LRFflS4Pxel1HrvDoUrFTD2F93g3AVQBO0aMCVxy9+0mx5otKSayZre92cYsvQg4yyQ0dC6RjXNdO8H/N1LnfkPPDytEab9xO5ZKkD3pDBITyH6QAJCarks1xfBSyPHTKkSlosafaKs8O4vPpm33QqWfRKPFj4AgmTMl/LZMtxTqKH6O5ufK8g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0CF2D1LdR3YGjipcaH2VdCpidOvJYda/43iSZJ/FGR0=;
- b=g6OiwPMgwfsCD0vHyqJltHiBarUHaRP9NgwIWd0F8H5IjLEvx7RDUXBXQRs80ybIhG1Jb2a7/eFXEvGVum23KBz0Mlr3eLxmx3/cDfwnYv2COGVrAhBFo3oaKfqrsAbmrmTzI/GpvdGBs+lMFcV3Ba8tTeqHtnQE6+7SPyTAfI4=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com (2603:10b6:510:28d::5)
- by DS7PR12MB6335.namprd12.prod.outlook.com (2603:10b6:8:94::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.27; Thu, 14 Mar
- 2024 15:54:16 +0000
-Received: from PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::c325:df95:6683:b429]) by PH0PR12MB7982.namprd12.prod.outlook.com
- ([fe80::c325:df95:6683:b429%6]) with mapi id 15.20.7362.035; Thu, 14 Mar 2024
- 15:54:15 +0000
-Message-ID: <d66bc516-c5b1-433c-a128-a28d657efea7@amd.com>
-Date: Thu, 14 Mar 2024 08:54:12 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] i40e: Fix VF MAC filter removal
-Content-Language: en-US
-To: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org
-Cc: aleksandr.loktionov@intel.com, mschmidt@redhat.com, horms@kernel.org,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
- open list <linux-kernel@vger.kernel.org>
-References: <20240313135618.20930-1-ivecera@redhat.com>
-From: Brett Creeley <bcreeley@amd.com>
-In-Reply-To: <20240313135618.20930-1-ivecera@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BY5PR16CA0004.namprd16.prod.outlook.com
- (2603:10b6:a03:1a0::17) To PH0PR12MB7982.namprd12.prod.outlook.com
- (2603:10b6:510:28d::5)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30AE5C611
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 15:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710431803; cv=none; b=SHAqVV8cjRSWIWmh/OfR+dV5pYVNjxsCnPiYf63o4CDAvk3ZdrW1dpm3FiyqsNIpqW+G4D3sI8oaEegCXaP0VUTO7nIcUZVFO/0tdr1AnuAK5jzKDHS6QEkM4kl6Bp2Esk7MrGmG37o19tLawha9ZzJoboqROPK+zKSgB+tC+TA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710431803; c=relaxed/simple;
+	bh=ZmI2FwtVxhizi/aVXNZmngvE2Mq9lBQj5crTBmeXYTE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hskc4L7wWtalq8+N5hzgkmy4nHWWML/wP2GgrOI1q//+p0g9Y6ZTYQ4M+F82GzDSWJ1REZRfxanf60mGBpHsqR81Cc6eHN68EF+QxgiKxBpjUbSaSmWK2aS99Djk/rNJAU14sVDFZ05u5tNVmnwjGUofvPOuVpb7OMEdZCCo3GM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d64tRXuD; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710431800;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=raY59pnlJKW7cbwoKHkRYsm22tGbdRck+G1yUBJSQ7g=;
+	b=d64tRXuDN6XHFiI4n8x8ICrPy7EhNv5rzg+b6l/uq1Elh29R9kERPWbekKZ/C3SHO4+F7O
+	SnBRffSdqYbgOrAHpo3+2VF0t84fH4U2L9XyB3FuLiCh3ymj9ee23eiBm/vWf8wIfV8pRs
+	QM374J735GWdNZd5aFRUcqvajJ3KRvU=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-492--JNSKld4M-mdCvrX2dqwRw-1; Thu, 14 Mar 2024 11:56:38 -0400
+X-MC-Unique: -JNSKld4M-mdCvrX2dqwRw-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33e70016b4dso632687f8f.3
+        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 08:56:38 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710431797; x=1711036597;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=raY59pnlJKW7cbwoKHkRYsm22tGbdRck+G1yUBJSQ7g=;
+        b=Buu5bc38mTP6f52ewh2wNhiTAWUkkkqlx9b5HpbnJppmt93a2FbkKzTabxE5dW2IoB
+         F5PunkFbcAgObGzToOq4+nwdadWw3C2OIMbbMk4I85sNCLmX7NwOEEgbBhI22tTFd7qU
+         L0hJ3f6eYaO8bZOg+tFp7C0ckiRQSFXafe7XzMv5KIaw5kol02pU3gpHF9i1tih/hrxy
+         38rqxooxEm7ebcJ+W2/ErRra1M2SOftQGMk25OGKl30Gycm5H5pV3mxlepla6hJIyKby
+         yBPi6Fo2WhhVF1gv4/NoTPjeiJiv0TaEfo4YSRdkl0y8HCzLKar/HuMsG0O6Bo2J/hT2
+         jXEQ==
+X-Gm-Message-State: AOJu0Yw6mrv8NPOtbDHYKcHlpeJvLPUBx/Ku1ajES47U1iMshEEPZRfT
+	7HvBtEWvPo8r+kKD53lK0lwZbXPeRrFR99lsJzPh/3iPsuk46qIDuwRX9G+wc5Z64gwlQznq+Eu
+	LxWFF2vt9VcG+ZgDqvJYwLq0hMgQmmcnGs3bwZs1RP+3kyUafV9PiqQ==
+X-Received: by 2002:a5d:67c2:0:b0:33e:2a74:381c with SMTP id n2-20020a5d67c2000000b0033e2a74381cmr1489506wrw.71.1710431797570;
+        Thu, 14 Mar 2024 08:56:37 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG4x6eTU8teCC6CGJ52QOp8mBuUEuR7Eq2nl61GhPUb0gW3f0ZBDe+8DgwfB56vKRQvpNDc3Q==
+X-Received: by 2002:a5d:67c2:0:b0:33e:2a74:381c with SMTP id n2-20020a5d67c2000000b0033e2a74381cmr1489495wrw.71.1710431797184;
+        Thu, 14 Mar 2024 08:56:37 -0700 (PDT)
+Received: from [10.32.64.123] (nat-pool-muc-t.redhat.com. [149.14.88.26])
+        by smtp.gmail.com with ESMTPSA id d2-20020adfa402000000b0033e99b339a6sm1019851wra.62.2024.03.14.08.56.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Mar 2024 08:56:36 -0700 (PDT)
+Message-ID: <bd03c79a-39e9-4eb0-97b2-4ded536f8eb4@redhat.com>
+Date: Thu, 14 Mar 2024 16:56:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR12MB7982:EE_|DS7PR12MB6335:EE_
-X-MS-Office365-Filtering-Correlation-Id: 92ec08be-279b-4f49-e9c1-08dc443f000b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	s+zRhR65+ZXDbRrrm1c6rkGb+40HZmmYlrf5kQgrvo1Mc7Nlw6UV4wjB3HlcwI5+TNte4E9FYO7yPL0FsDQ1yDGmIdvcl8TI1aqUsHt/ErZABULRB8ik5hddp8esC2yF1am60Xr+NNUanDVg4NpoitmN+wGWpSb6KFNaMRZDIZPL9LQ688eAVflxAPg6B4NTL53x1VhvXgs5iIZ9ghSr+yfON9P2up9226VHRXhuQNL1lGI30IZ4ac2Bf3pVRyYD0Folp2lvQf5opOieTP5ilVsB+lIrGhNPtvK2xFke+zSfYE0CzbBankN3VnN4xunClQWLA/QuWJ6r9x0vEerclz/hjql9p5g/U/FWESxS/vW10skRs00k2msgC9fcT8U+zcgES+3ESEt844Jdj0O+Yv7X+6zNYK6S199friN1qdaKynZys3XOH8CZCDyolIrmmBq66V4gaYjto8pD6/WLL0fwRRaFN3+5rqxetdKZx2ep3DPww04jtIx4MgUH5dgKp8Zpi13IYE7DdQ3VQc4bY6S7LvvnKc+KXFHzP7gzt5h+T3ss9nkRq/ZxOzYnF12K+WJMb7/qhYnBP/uEOzxBK46TIyorxMm6b6YoS8961MRf7HO1PWIRqruIVDfIof/Kpz0n9xoKNK07g2UkPMzen8SaIIEzgjtk6lGort4bU0w=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR12MB7982.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?MU9tT3pNdXpMU2V1UENjcHdoNFVNTEkwcGJXUXlJNEZINEhRTHkzZ2hQNWR3?=
- =?utf-8?B?c2daVDhBeVpZcXJxNkZEYVZWaHdnUWI1ZjFwbjIyejl0dTZBdlpaZUdOTFVD?=
- =?utf-8?B?RUViNTY4cXhlendWWjNWM2ZPMlFVRXo1UWc2MUhvaWlubUZYVVQ1RGxUcnc4?=
- =?utf-8?B?M1hDaThoTXc0Z0cwOXF5VkxGbG5Sb1NvZFFTK3lZREp5MVNVQlF2a0pOWUZN?=
- =?utf-8?B?Z0lic3pRRmZZRDU1L1I5WXR2MENVMzltODk2OGx1WHdjalB4RVBYbjAxQ0Fz?=
- =?utf-8?B?aEdIamVwaGxqZUswai8zdG9VOTBzbjBCdEViUmRsUElrOTR2Zk1pTWoxaVBL?=
- =?utf-8?B?OFkwQnR6d1M1OFNxcUp3VGVYQkEyMzZJYkg1VkRXNndNNE0ySDhUQzFxamN3?=
- =?utf-8?B?YTlNamFpTE5JWGFveXBSUW1QY2UyUjNQdDZmZi8rL25MMzkzaFBaVlYyWHBF?=
- =?utf-8?B?UWhNUWlBcWVxSGdPVVY0bWNSOXFRenZTajlkK281eHRHY0h3Y2QvRFNWb3RT?=
- =?utf-8?B?OXFsQWxSbXgvMFFrcjYzcDU0TG04SEJQS2I1UDJQZVNqbVJTbTlFV0hQM0hn?=
- =?utf-8?B?d1NCZGIySVgwZCtGaytQc1FSM2x3dFhCWHlHOVI2WFBRMzNuSWllalJOVUtn?=
- =?utf-8?B?VkZ2c2xKWXhXL05CNEJFMUVOUjVyTjlMalRIVkQ4UEpMRzhSYUpEVHJ3OGlZ?=
- =?utf-8?B?a3lDdC9pb3h5b3dLV0M4MWp6dDRNcnlGSUUvdUlLYXczTVpLdCtWZitldFJG?=
- =?utf-8?B?MGZrcXBBcHdkbHk3ZVYrTFBJd1hZcDdYZzNIY2UwV1JDaG80a01JMmljR0xI?=
- =?utf-8?B?aFdqc3BkNys1SVVHc2NocVAxb0xKd0tKUURxV1dhbW9QUTJlM0I4bUFxVnRx?=
- =?utf-8?B?UC9rT3ZIL2lzT2E1OEM0VW9RcUZaY1B1K1NlQ3Z2SzVROHRjNFZMNHpyMjN1?=
- =?utf-8?B?TmdXTTlDRW5mYk90NmVheHA4WEVnN0ljSDVjVkcySjRqYmY5RHNqbTQvMkgz?=
- =?utf-8?B?ZW1RQzJIaGE5eGk0VEc5ckwwQ0ZRVjJJZFB5WVUySWdkb1JqNTVLdFZ5MG1w?=
- =?utf-8?B?QzJESGU3ZWhDeTNrOXNnWEZXWS9DR1ZJaVB2UEVPNVR2ZDVSdjVleHZzSHYy?=
- =?utf-8?B?c3I4eE5DQ0JnZWFha0VDM0VlS0s1STB4THoxMGJrbGVWclQ4SkZ6L2dLUHdk?=
- =?utf-8?B?VktRMXJPdnJuWEkzVmtLa1JlNWQySEJkQ0xjSGozY0Jzem5DMFlyUnlsN1hV?=
- =?utf-8?B?WjR5NkV4ZHRuYVlnb3JHMVB4T1ZrMjJMK2p2dkJCRXE0N0VPTWtvTDFCQU5J?=
- =?utf-8?B?M3cxYmxhcklCNDdLK1JIT2h6eWlkS1B0dWEwYVpaVCtZK3hmOVgwSWR1K1k3?=
- =?utf-8?B?aHpZb2t5NlE3UWxObW52SjFiUXpzejVaT2pCdEIwYlB0cDJPcVdPR0ZmNWpu?=
- =?utf-8?B?SmN1S1V2NFZBOHlaaE41VUorZGVqbHVCN0VJSjNyU012cU9ZaDlrRHYvTVdm?=
- =?utf-8?B?bXY1MHA4ZkJtNHFCZ0lKMUJhUUtZdmhYYUlUZmJQbXM4SDViWlJDQTdTeStM?=
- =?utf-8?B?d0ZlM2pxbHZZd2dTbittbDA2Wnl0NE9UUERYaTBkNUlSUzQxK2FXSkVhcjlo?=
- =?utf-8?B?QURzTUIzd3o1OWpaSHNUMUNIeTBZWWdNUkxWMEorbDljVHo2UzluU2t4cmdC?=
- =?utf-8?B?Y0VRTHhaSldLY2JLMWhKQUxWUzViRkYydU5ycTFlRXk4c1FvdGoyMUtISXpB?=
- =?utf-8?B?NGE4RHBQRGMzSGhETnhPTThsTzdUc3htblA0TVRFSFE4K0xZL3hJaUVZWjR2?=
- =?utf-8?B?V0ptVEVBVHpHajQ3dFdGYStidExIM0R6dldrWHRUVlBCdmk0a2lIaU9sZlE1?=
- =?utf-8?B?dkFaQ05tRnRGbURWRklpQ2tqcjA5OWtnWC9ZU0ZYQVNON2NBbXdRTmMyOU1M?=
- =?utf-8?B?MmtPWnlCVVhPVVdya1UrcWMvNURsZ2E2b01CTzNPMThrNklnUDhvZGU4RmhW?=
- =?utf-8?B?UHl2NTV5eHpJczJqdjlSb3lvS1BJRGhaWkVjMnhKN1RCNDJHQnR4SDZXcGN3?=
- =?utf-8?B?SE9sOWtZNitFWk52dHQ4eDZTNmdZaXI0U2NCaytXNWRCK082S3lDaUh2WVNp?=
- =?utf-8?Q?ZVjxPWGDkEVZbUP7pzjXpFoa8?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 92ec08be-279b-4f49-e9c1-08dc443f000b
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR12MB7982.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 15:54:15.5402
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: l3eEL/8arfDyjz2o9xBgl+01wTKY9kbYDLA1fyW47+xjYYvgKBgkmQFddrrUgNBa01RM35X1bCOH9xpA+/8+Cg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB6335
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] hsr: Handle failures in module init
+Content-Language: en-US
+To: Breno Leitao <leitao@debian.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+References: <0b718dd6cc28d09fd2478d8debdfc0a6755a8895.1710410183.git.fmaurer@redhat.com>
+ <ZfL0t5v3szkhEhiN@gmail.com>
+From: Felix Maurer <fmaurer@redhat.com>
+In-Reply-To: <ZfL0t5v3szkhEhiN@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 3/13/2024 6:56 AM, Ivan Vecera wrote:
-> Caution: This message originated from an External Source. Use proper caution when opening attachments, clicking links, or responding.
+On 14.03.24 13:59, Breno Leitao wrote:
+> On Thu, Mar 14, 2024 at 11:10:52AM +0100, Felix Maurer wrote:
+>> A failure during registration of the netdev notifier was not handled at
+>> all. A failure during netlink initialization did not unregister the netdev
+>> notifier.
+>>
+>> Handle failures of netdev notifier registration and netlink initialization.
+>> Both functions should only return negative values on failure and thereby
+>> lead to the hsr module not being loaded.
+>>
+>> Signed-off-by: Felix Maurer <fmaurer@redhat.com>
+>> ---
+>>  net/hsr/hsr_main.c | 18 ++++++++++++++----
+>>  1 file changed, 14 insertions(+), 4 deletions(-)
+>>
+>> diff --git a/net/hsr/hsr_main.c b/net/hsr/hsr_main.c
+>> index cb83c8feb746..1c4a5b678688 100644
+>> --- a/net/hsr/hsr_main.c
+>> +++ b/net/hsr/hsr_main.c
+>> @@ -148,14 +148,24 @@ static struct notifier_block hsr_nb = {
+>>  
+>>  static int __init hsr_init(void)
+>>  {
+>> -	int res;
+>> +	int err;
+>>  
+>>  	BUILD_BUG_ON(sizeof(struct hsr_tag) != HSR_HLEN);
+>>  
+>> -	register_netdevice_notifier(&hsr_nb);
+>> -	res = hsr_netlink_init();
+>> +	err = register_netdevice_notifier(&hsr_nb);
+>> +	if (err)
+>> +		goto out;
 > 
+> Can't you just 'return err' here? And avoid the `out` label below?
 > 
-> Commit 73d9629e1c8c ("i40e: Do not allow untrusted VF to remove
-> administratively set MAC") fixed an issue where untrusted VF was
-> allowed to remove its own MAC address although this was assigned
-> administratively from PF. Unfortunately the introduced check
-> is wrong because it causes that MAC filters for other MAC addresses
-> including multi-cast ones are not removed.
+>> +
+>> +	err = hsr_netlink_init();
+>> +	if (err)
+>> +		goto cleanup;
 > 
-> <snip>
->          if (ether_addr_equal(addr, vf->default_lan_addr.addr) &&
->              i40e_can_vf_change_mac(vf))
->                  was_unimac_deleted = true;
->          else
->                  continue;
+> Same here, you can do something like the following and remove the
+> all the labels below, making the function a bit clearer.
 > 
->          if (i40e_del_mac_filter(vsi, al->list[i].addr)) {
->          ...
-> </snip>
-> 
-> The else path with `continue` effectively skips any MAC filter
-> removal except one for primary MAC addr when VF is allowed to do so.
-> Fix the check condition so the `continue` is only done for primary
-> MAC address.
-> 
-> Fixes: 73d9629e1c8c ("i40e: Do not allow untrusted VF to remove administratively set MAC")
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> ---
->   drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c | 11 ++++++-----
->   1 file changed, 6 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> index b34c71770887..10267a300770 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
-> @@ -3143,11 +3143,12 @@ static int i40e_vc_del_mac_addr_msg(struct i40e_vf *vf, u8 *msg)
->                  /* Allow to delete VF primary MAC only if it was not set
->                   * administratively by PF or if VF is trusted.
->                   */
-> -               if (ether_addr_equal(addr, vf->default_lan_addr.addr) &&
-> -                   i40e_can_vf_change_mac(vf))
-> -                       was_unimac_deleted = true;
-> -               else
-> -                       continue;
-> +               if (ether_addr_equal(addr, vf->default_lan_addr.addr)) {
-> +                       if (i40e_can_vf_change_mac(vf))
-> +                               was_unimac_deleted = true;
-> +                       else
-> +                               continue;
-> +               }
+> 	if (err) {
+> 		unregister_netdevice_notifier(&hsr_nb);
+> 		return err;
+> 	}
 
-Seems okay to me.
+I usually follow the pattern with labels to make sure the cleanup is not
+forgotten later when extending the function. But there is likely not
+much change in the module init, I'll remove the labels in the next
+iteration.
 
-Reviewed-by: Brett Creeley <brett.creeley@amd.com>
+Thanks,
+   Felix
 
-> 
->                  if (i40e_del_mac_filter(vsi, al->list[i].addr)) {
->                          ret = -EINVAL;
-> --
-> 2.43.0
-> 
-> 
 
