@@ -1,315 +1,182 @@
-Return-Path: <netdev+bounces-79997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C960787C5DD
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 00:21:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F422E87C686
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 00:39:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40B311F2157D
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 23:21:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B4F4282CAF
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 23:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E39D2FC0B;
-	Thu, 14 Mar 2024 23:21:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39F4D111A5;
+	Thu, 14 Mar 2024 23:38:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EhNGG0Cq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SowCYaPC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B497E12E67;
-	Thu, 14 Mar 2024 23:21:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB84113FE7;
+	Thu, 14 Mar 2024 23:38:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710458504; cv=none; b=LfMFEEitUsC7sOwM3Bk190n1hYQ8YJe8J4scw34WLAQk/TFyih+XAivVREJnl852Lk4TPyG0iuXX3+YoJkCPHBaLJM30PjPphbl2l1MQBcDGLHaEtxjzFyX9RvHnQuoP7JwZE4SfkPCEmb/2jbkjjviqVyjDs4vNKagTSwYuiII=
+	t=1710459539; cv=none; b=Nv6m7LKbpHiTfU7SYeprMQLT3x/qrEKT4P6uOtsGb5bRwC9JJKzMnzU0AEjQVZd+rP/oqI1/uQD1CWZTjF1/L4k+xmSreoBaqurYtILR+A6oHwzDnmnf/XHC467zeMBkswJC6sosCIxyN27oEjW7oioE9Lgn5NpcXD7+95CEkno=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710458504; c=relaxed/simple;
-	bh=YuMhRaZvH093ZY63IA1EVCbrxTiyw6BfBGNhm7xZy7o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jKpMvgezmSQblqogB6YaLi/p+Nb7ptFtLJPTNVvneJLjgGzhv8PSocGq+rypKvuVPCJq5/lGHABoOJ6DJcfewuecsDPF1e295GZqNlLsQSQTDYWLylRyh/+SUPDnrF+m1YGzA+MN8Pp9abDhE/Osylmcb5/Txp0qZr3nNZYlIvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EhNGG0Cq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FA0FC433C7;
-	Thu, 14 Mar 2024 23:21:43 +0000 (UTC)
+	s=arc-20240116; t=1710459539; c=relaxed/simple;
+	bh=ToO7+GC40SPPq/DJBkYHMz5VkP5cIZgxtl9+T1qyeNw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FX4en9A/QOie8YbNpuWQN/z2ef0M8KeubaF9OiBzH7ymaaGPgdhX1XOqr4EHPpSUTHZZlky0dOtMQGih/pOC8Z8QLTjp++TWB2xEqOqx5ZeF7XU26Syr98VovRFh4fEXmgD0UTTocR9GFNhVDoMeELa2+AGH3S+NaY7iJCt06yY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SowCYaPC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 957B9C43601;
+	Thu, 14 Mar 2024 23:38:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710458504;
-	bh=YuMhRaZvH093ZY63IA1EVCbrxTiyw6BfBGNhm7xZy7o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EhNGG0CqUe6UF5gAXCruWkaggThAxoTkrXZ2JM/0mpBN+cF0eqA0bEZkTRl/CEddu
-	 gVvZcYBPdIKA/QdNhzCN23PNNiD3lcG/TKsbReHAgaYSQKiTgqnyowHPu6z/XAn9bA
-	 d8hL3hyemZrkR78KFUuNcXs/Thy1D/inL0sgtdRzkCHHMorykG3pDwBdrGtZxhC2hT
-	 zBm/9Z9mFpW4zu6MeNoR0ztb4SSqwjVgSzY51P8A6/ibRnezlcSJiGREAvX1Me2yBj
-	 gjp4VsJQNrLjllL8CQbqG54WEq1FfCh65IWaTooweu+N1IocGaq0nUJ9KCiqnSVCH4
-	 u0C/PMRCiZWNA==
-Date: Thu, 14 Mar 2024 16:21:42 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Michael S.
- Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@google.com>, Amritha
- Nambiar <amritha.nambiar@intel.com>, Larysa Zaremba
- <larysa.zaremba@intel.com>, Sridhar Samudrala
- <sridhar.samudrala@intel.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>, virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v4 7/8] netdev: add queue stats
-Message-ID: <20240314162142.36b8ff02@kernel.org>
-In-Reply-To: <20240314085459.115933-8-xuanzhuo@linux.alibaba.com>
-References: <20240314085459.115933-1-xuanzhuo@linux.alibaba.com>
-	<20240314085459.115933-8-xuanzhuo@linux.alibaba.com>
+	s=k20201202; t=1710459538;
+	bh=ToO7+GC40SPPq/DJBkYHMz5VkP5cIZgxtl9+T1qyeNw=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=SowCYaPCOLjEnDgHQ2XC7R0LqG8iVH1tSpqaCRt02cjOZBaHctbbQFmzEqjRcvhmj
+	 i/Zv0c3M92heLQdOgfA7NRi08RATmBjbXeesA48ueQQzaTtz4oMZJC+BryGvTZ5lm3
+	 hO56AiCBUqrXAEan0fgh5ziDS9R32mi6gkiDZJxFX6Tr8T275Z2BSpkjdh5qiRIEDa
+	 /g22lzM98Iq3qxplKJI1PJDely87LNSOCGJT/fh/f8iXg2Z/v7lVh3UzAkWK6HdC8Z
+	 bvJhRgLIhynwbMDwZicreJqGkqeTdLFI23xGNjsyjPB+cNlOpR29hGWDtjed/bGmM8
+	 7bHtbgf2uwG1Q==
+Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2d4360ab3daso19976631fa.3;
+        Thu, 14 Mar 2024 16:38:58 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCWd2Px/Af6sDtDIT8cbm+QE6lgHKXyCWAQCf3vBqr8tyO8+A83j8fPqfatAzq+Ag/2pojYzm1AWZC60+oeOL/mkfrRaHWXYHVwDYLb1JCaBy1pb1RChTMzSoCCSbD9/Hh6FewnSjf+JaeyqVrtTZXtEZrRP+z0P5DhCqugdfBPeBsb7+wNFI5dz8df9kf4iLenMbUMbo9j2FmGL7p+cEuKYnikYyOmUFVhwvknmgSPLXAhREwx7PhAV8mTuR9UTq37e0FXoKHQwfqByE7+6GBt1pmmaEJx41LIWL7c=
+X-Gm-Message-State: AOJu0YxhxQM6KkgZsEklxfjW5qw2KmMnrPUoyl9vT+Le4EedwOsVwDeO
+	d8u/W51X0Z7sa1wwOfOfPwffsTtzDfYNQQ1+/aKnGGeJoniGAAAIFLIbcYajObokB4O3c5TcpdA
+	RHU6s4MximEJPvz2HYU3TJcLUZxE=
+X-Google-Smtp-Source: AGHT+IF2/ImKbZWGcxV6yAg7OxnoINqcxhfzgB5aBbVZi8+MbYBftvaXns5kzEnVc2lBbJ0XnQ1q0SLbGXlAKuS4j2k=
+X-Received: by 2002:a2e:9a8a:0:b0:2d2:3fac:5fdc with SMTP id
+ p10-20020a2e9a8a000000b002d23fac5fdcmr2171806lji.10.1710459536886; Thu, 14
+ Mar 2024 16:38:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <005f998ec59e27633b1b99fdf929e40ccfd401c1.camel@sipsolutions.net>
+ <f2dcbe55-0f0e-4173-8e21-f899c6fc802a@gmail.com> <20240313194423.GA1111@sol.localdomain>
+ <b838e729-dc30-4e18-b928-c34c16b08606@gmail.com> <20240313202223.GB1111@sol.localdomain>
+ <db86cba4-0e61-441d-8e66-405a13b61a3c@gmail.com> <20240313221043.GC1111@sol.localdomain>
+ <f0492c92-1015-48e3-bfce-598c7a4843d1@quicinc.com> <20240313230611.GD1111@sol.localdomain>
+ <a4d24b2c-7dbf-4354-9514-f8a253aac14b@gmail.com> <20240314202011.GB1132@sol.localdomain>
+In-Reply-To: <20240314202011.GB1132@sol.localdomain>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 15 Mar 2024 00:38:45 +0100
+X-Gmail-Original-Message-ID: <CAMj1kXGxxRs6Rkhevm9NSY6TaJUsOmF3UqdHUo=NRg9kQKtSBA@mail.gmail.com>
+Message-ID: <CAMj1kXGxxRs6Rkhevm9NSY6TaJUsOmF3UqdHUo=NRg9kQKtSBA@mail.gmail.com>
+Subject: Re: [REGRESSION] Re: [PATCH] crypto: pkcs7: remove sha1 support
+To: Eric Biggers <ebiggers@kernel.org>
+Cc: James Prestwood <prestwoj@gmail.com>, Jeff Johnson <quic_jjohnson@quicinc.com>, 
+	Johannes Berg <johannes@sipsolutions.net>, Karel Balej <balejk@matfyz.cz>, 
+	dimitri.ledkov@canonical.com, alexandre.torgue@foss.st.com, 
+	davem@davemloft.net, dhowells@redhat.com, herbert@gondor.apana.org.au, 
+	keyrings@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-modules@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	mcgrof@kernel.org, mcoquelin.stm32@gmail.com, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, iwd@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 14 Mar 2024 16:54:58 +0800 Xuan Zhuo wrote:
-> +      -
-> +        name: rx-hw-drops
-> +        doc: |
-> +          Number of packets that arrived at the device but never left it,
-> +          encompassing packets dropped for reasons such as insufficient buffer
+On Thu, 14 Mar 2024 at 21:20, Eric Biggers <ebiggers@kernel.org> wrote:
+>
+> On Thu, Mar 14, 2024 at 04:52:47AM -0700, James Prestwood wrote:
+> > IWD uses AF_ALG/keyctl for _all_ its crypto, cipher, and checksum needs.
+> > Anything that wifi requires as far as crypto goes IWD uses the kernel,
+> > except ECC is the only exception. The entire list of crypto requirements
+> > (for full support at least) for IWD is here:
+> >
+> > https://git.kernel.org/pub/scm/network/wireless/iwd.git/tree/tools/test_runner_kernel_config
+>
+> That's quite an extensive list, and it's not documented in the iwd README.
+> Don't you get bug reports from users who are running a kernel that's missing one
+> of those options?
+>
+> > For KEYCTL_PKEY_* specifically we use it for all asymmetric crypto
+> > operations, (query), encrypt, decrypt, sign, verify.
+> >
+> > I'll be honest, the AF_ALG/keyctl support in ELL was mostly done by the time
+> > I started working on IWD so I was not aware the documentation was so poor.
+> > That is an entirely separate issue than this IMO, and I'm happy to help with
+> > getting docs updated to include a proper list of supported features. In
+> > addition maybe some automated testing that gets run on kernel builds which
+> > actually exercises this API so it doesn't get accidentally get broken in the
+> > future? Docs/tests IMO are the proper "fix" here, not telling someone to
+> > stop using an API that has existed a long time.
+>
+> I looked into the history, and it seems the KEYCTL_PKEY_* APIs were added as a
+> collaboration between the iwd developers and the kernel keyrings maintainer.
+> So, as far as I can tell, it's not that the kernel had an existing API that iwd
+> started using.  It's that iwd got some APIs added to the kernel for themselves.
+> KEYCTL_PKEY_* don't seem to have been adopted elsewhere; Debian Code Search
+> doesn't return any notable results.  keyctl does provide a command-line
+> interface to them, but I can't find any users of the keyctl commands either.
+>
+> Then, everyone disappeared and it got dumped on the next generation of kernel
+> developers, who often don't know that this API even exists.  And since the API
+> is also poorly specified and difficult to maintain (e.g., changing a seemingly
+> unrelated part of the kernel can break it), the results are predictable...  And
+> of course the only thing that breaks is iwd, since it's the only user.
+>
+> It would be worth taking a step back and looking at the overall system
+> architecture here.  Is this the best way to ensure a reliable wireless
+> experience for Linux users?
+>
+> Maybe it's time to admit that KEYCTL_PKEY_* was basically an experiment, and a
+> different direction (e.g. using OpenSSL) should be taken...
+>
+> (Another issue with the kernel keyrings stuff is that provides a significant
+> attack surface for the kernel to be exploited.)
+>
+> If you do decide to continue with the status quo, it may be necessary for the
+> iwd developers to take a more active role in maintaining this API in order to
+> ensure it continues working properly for you.
+>
+> AF_ALG is on *slightly* firmer ground since it's been around for longer, is
+> properly part of the crypto subsystem, and has a few other users.  Unfortunately
+> it still suffers from the same issues though, just to a slightly lesser degree.
+>
 
-s/encompassing/including/
+We dropped MD4 because there are no users in the kernel. It is not the
+kernel's job to run code on behalf of user space if it does not
+require any privileges and can therefore execute in user space
+directly.
 
-> +          space, processing errors, as well as those affected by explicitly
-> +          defined policies and packet filtering criteria.
+The fact that AF_ALG permits this is a huge oversight on the part of
+the kernel community, and a major maintenance burden. The point of
+AF_ALG was to expose hardware crypto accelerators (which are shared
+resources that /need/ to be managed by the kernel) to user space, and
+we inadvertently ended up allowing the kernel's pure-software
+algorithms to be used in the same way.
 
-I'm afraid the attempt to "correct my English" ended up decreasing the
-clarity. Maybe use what I suggested more directly?
+The fact that we even added APIs to the kernel to accommodate iwd is
+even worse. It means system call overhead (which has become worse due
+to all the speculation mitigations) to execute some code that could
+execute in user space just as well, which is a bad idea for other
+reasons too (for instance, accelerated crypto that uses SIMD in the
+kernel disables preemption on many architectures, resulting in
+scheduling jitter)
 
-  Number of all packets which entered the device, but never left it,
-  including but not limited to: packets dropped due to lack of buffer
-  space, processing errors, explicit or implicit policies and packet filters.
+Note that in the case of iwd, it is unlikely that the use of AF_ALG
+could ever result in meaningful use of hardware accelerators: today's
+wireless interfaces don't use software crypto for the bulk of the data
+(i.e., the packets themselves) and the wireless key exchange protocols
+etc are unlikely to be supported in generic crypto accelerators, and
+even if they were, the latency would likely result in worse
+performance overall than a software implementation.
 
-> +        type: uint
-> +      -
-> +        name: rx-hw-drop-overruns
-> +        doc: |
-> +          Number of packets that arrived at the device but never left it due to
-> +          no descriptors.
-
-I put a paragraph in my previous email explaining how tricky this is to
-state for HW devices and you just went with the virtio spec :|
-
-  Number of packets dropped due to transient lack of resources, such as
-  buffer space, host descriptors etc.
-
-> +      -
-> +        name: rx-csum-bad
-> +        doc: |
-> +          Number of packets that are dropped by device due to invalid checksum.
-
-Quoting myself:
-
->> Maybe add a note in "bad" that packets with bad csum are not
->> discarded, but still delivered to the stack.
-
-Devices should not drop packets due to invalid L4 checksums.
-
-> +        type: uint
-> +      -
-> +        name: rx-hw-gro-packets
-> +        doc: |
-> +          Number of packets that area coalesced from smaller packets by the device,
-> +          that do not cover LRO packets.
-
-s/area/were/ ?
-s/that do not cover LRO packets/Counts only packets coalesced with the
-HW-GRO netdevice feature, LRO-coalesced packets are not counted./
-
-> +        type: uint
-> +      -
-> +        name: rx-hw-gro-bytes
-> +        doc: see `rx-hw-gro-packets`.
-> +        type: uint
-> +      -
-> +        name: rx-hw-gro-wire-packets
-> +        doc: |
-> +          Number of packets that area coalesced to bigger packets(no LRO packets)
-> +          by the device.
-
-s/area/were/
-s/packets(no LRO packets)/packets by the HW-GRO feature of the device/
-
-> +        type: uint
-> +      -
-> +        name: rx-hw-gro-wire-bytes
-> +        doc: see `rx-hw-gro-wire-packets`.
-
-Please make sure the "See `xyz`." references are capitalized (See)
-and end with a full stop.
-
-> +        type: uint
-> +      -
-> +        name: rx-hw-drop-ratelimits
-> +        doc: |
-> +          Number of the packets dropped by the device due to the received
-> +          packets bitrate exceeding the device speed limit.
-
-Maybe s/speed/rate/
-
-> +        type: uint
-> +      -
-> +        name: tx-hw-drops
-> +        doc: |
-> +          Number of packets that arrived at the device but never left it,
-> +          encompassing packets dropped for reasons such as processing errors, as
-> +          well as those affected by explicitly defined policies and packet
-> +          filtering criteria.
-> +        type: uint
-> +      -
-> +        name: tx-hw-drop-errors
-> +        doc: Number of packets dropped because they were invalid or malformed.
-> +        type: uint
-> +      -
-> +        name: tx-csum-none
-> +        doc: |
-> +          Number of packets that do not require the device to calculate the
-> +          checksum.
-
-I think we should use past tense everywhere.
-
-> +        type: uint
-> +      -
-> +        name: tx-needs-csum
-> +        doc: |
-> +          Number of packets that require the device to calculate the
-> +          checksum.
-> +        type: uint
-> +      -
-> +        name: tx-hw-gso-packets
-> +        doc: |
-> +          Number of packets that necessitated segmentation into smaller packets
-> +          by the device.
-> +        type: uint
-> +      -
-> +        name: tx-hw-gso-bytes
-> +        doc: |
-> +          Successfully segmented into smaller packets by the device, see
-> +          `tx-hw-gso-packets`.
-
-Maybe stick to "see `tx-hw-gso-packets`", none of the other counters
-mention the send being "successful".
-
-> +        type: uint
-> +      -
-> +        name: tx-hw-gso-wire-packets
-> +        doc: |
-> +          Number of the small packets that segmented from bigger packets by the
-> +          device.
-
-Maybe
-
-  Number of wire-sized packets generated by processing
-  `tx-hw-gso-packets`
-
-?
-
-> +        type: uint
-> +      -
-> +        name: tx-hw-gso-wire-bytes
-> +        doc: See `tx-hw-gso-wire-packets`.
-> +
-> +        type: uint
-> +      -
-> +        name: tx-hw-drop-ratelimits
-> +        doc: |
-> +          Number of the packets dropped by the device due to the transmit
-> +          packets bitrate exceeding the device speed limit.
-
-s/speed/rate/
-
-> +        type: uint
->  
->  operations:
->    list:
-> diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-> index 1ec408585373..c7ac4539eafc 100644
-> --- a/include/net/netdev_queues.h
-> +++ b/include/net/netdev_queues.h
-> @@ -9,11 +9,38 @@ struct netdev_queue_stats_rx {
->  	u64 bytes;
->  	u64 packets;
->  	u64 alloc_fail;
-> +
-> +	u64 hw_drops;
-> +	u64 hw_drop_overruns;
-> +
-> +	u64 csum_unnecessary;
-> +	u64 csum_none;
-> +	u64 csum_bad;
-> +
-> +	u64 hw_gro_packets;
-> +	u64 hw_gro_bytes;
-> +	u64 hw_gro_wire_packets;
-> +	u64 hw_gro_wire_bytes;
-> +
-> +	u64 hw_drop_ratelimits;
->  };
->  
->  struct netdev_queue_stats_tx {
->  	u64 bytes;
->  	u64 packets;
-> +
-> +	u64 hw_drops;
-> +	u64 hw_drop_errors;
-> +
-> +	u64 csum_none;
-> +	u64 needs_csum;
-> +
-> +	u64 hw_gso_packets;
-> +	u64 hw_gso_bytes;
-> +	u64 hw_gso_wire_packets;
-> +	u64 hw_gso_wire_bytes;
-> +
-> +	u64 hw_drop_ratelimits;
->  };
->  
->  /**
-> diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-> index bb65ee840cda..702d69b09f14 100644
-> --- a/include/uapi/linux/netdev.h
-> +++ b/include/uapi/linux/netdev.h
-> @@ -147,6 +147,26 @@ enum {
->  	NETDEV_A_QSTATS_TX_BYTES,
->  	NETDEV_A_QSTATS_RX_ALLOC_FAIL,
->  
-
-Looks hand written. Once you update the yaml file, you should run:
-
-./tools/net/ynl/ynl-regen.sh
-
-This will generate the uAPI changes for you.
-
-> +	NETDEV_A_QSTATS_RX_HW_DROPS,
-> +	NETDEV_A_QSTATS_RX_HW_DROP_OVERRUNS,
-> +	NETDEV_A_QSTATS_RX_CSUM_UNNECESSARY,
-> +	NETDEV_A_QSTATS_RX_CSUM_NONE,
-> +	NETDEV_A_QSTATS_RX_CSUM_BAD,
-> +	NETDEV_A_QSTATS_RX_HW_GRO_PACKETS,
-> +	NETDEV_A_QSTATS_RX_HW_GRO_BYTES,
-> +	NETDEV_A_QSTATS_RX_HW_GRO_WIRE_PACKETS,
-> +	NETDEV_A_QSTATS_RX_HW_GRO_WIRE_BYTES,
-> +	NETDEV_A_QSTATS_RX_HW_DROP_RATELIMITS,
-> +	NETDEV_A_QSTATS_TX_HW_DROPS,
-> +	NETDEV_A_QSTATS_TX_HW_DROP_ERRORS,
-> +	NETDEV_A_QSTATS_TX_CSUM_NONE,
-> +	NETDEV_A_QSTATS_TX_NEEDS_CSUM,
-> +	NETDEV_A_QSTATS_TX_HW_GSO_PACKETS,
-> +	NETDEV_A_QSTATS_TX_HW_GSO_BYTES,
-> +	NETDEV_A_QSTATS_TX_HW_GSO_WIRE_PACKETS,
-> +	NETDEV_A_QSTATS_TX_HW_GSO_WIRE_BYTES,
-> +	NETDEV_A_QSTATS_TX_HW_DROP_RATELIMITS,
-> +
->  	__NETDEV_A_QSTATS_MAX,
->  	NETDEV_A_QSTATS_MAX = (__NETDEV_A_QSTATS_MAX - 1)
->  };
-
+So iwd's deliberate choice to use the kernel as a crypto library is
+severely misguided. I have made the same point 4 years ago when I
+replaced iwd's use of the kernel's ecb(arc4) code with a suitable
+software implementation (3 files changed, 53 insertions, 40
+deletions). Of course, replacing other algorithms will take more work
+than that, but it is the only sensible approach. We all know the cat
+is out of the bag when it comes to AF_ALG, and we simply have to
+retain all those broken algorithms as executable code at the kernel's
+privileged execution level, just in case some user space is still
+around that relies on it. But that doesn't mean we cannot be very
+clear about our preferred way forward.
 
