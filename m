@@ -1,574 +1,264 @@
-Return-Path: <netdev+bounces-79780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A57687B5BF
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 01:24:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 066B987B5C6
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 01:26:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC1511F2264B
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 00:24:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29E591C20F66
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 00:26:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9047D624;
-	Thu, 14 Mar 2024 00:24:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFFD210F7;
+	Thu, 14 Mar 2024 00:25:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="EYdry30j"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OdqMrdyl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEFD77F
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 00:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF96C7F;
+	Thu, 14 Mar 2024 00:25:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710375866; cv=none; b=qQnD1yiJ7WwLD8308LHvYxb+vfxASItTi0u2yIP8opvYsOzSTB1JcY8YwgWf3UfLDXiAXoq0ufIPN1XuIJW7qHZnS5rd7iCd2POonlpz0NkRICK1Yp5l9W2acepW4JGMfNZj0O5uHNIqtE0UjX8CAByoUVfIgB5ojsezwRBM/Zo=
+	t=1710375951; cv=none; b=PQOLe92SVYXfkAaiLnguOWR3vHcs1cEv/vmNO0gwkFUR4E3ng7W9Qh7DLBZjicGsZhhCiLJ2FGqiLHu7T79YG9gkS+DGCE6+shhMqx+/ryr7ED1Z11pl1Rt8xfcKG81yGVVt1oqvWzdKwQfcDig4HAg9VjIjQZLg4bl3mCeY6VA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710375866; c=relaxed/simple;
-	bh=L5O84ryike75MDybfkTk8/Zk67XcfCqweGycbcSyhMQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=skKa4v0WByqflVJQGmwbLchR9gwDeCsUVvayUYxeSKXYJ6acW4vmcuth+4iL9jHtEvC9keYtK7+Mw/8aGhvLBMoVRoS6p85W/53XcVRaa4+ACwLvIMcWDoW5rGCB1s82deR8KPU2qaVC2ed4njKgONBAMs8QF1YTirH5cWmaAc0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=EYdry30j; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6e6cb0f782bso162757b3a.1
-        for <netdev@vger.kernel.org>; Wed, 13 Mar 2024 17:24:23 -0700 (PDT)
+	s=arc-20240116; t=1710375951; c=relaxed/simple;
+	bh=9EoMAftd9vY6BGdahDlojvcesrBvYUJgWbCGJaD+H+c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=l1R0a3XYor+KmeTKYIJ4asID37ZsKdtnDnU+j2X5o8Zj6g92KVFmqgyIPthKrxDhJVdIx3xdEPN8XbG+GvLoDC1L0Hfoj2H6i8KHVXSp5FqhllVGo5WVEgHxuH6kXzdp/PnlHgq7fcWC0R898Z/Nsau+5IBOKvsicSn1UgH24mI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OdqMrdyl; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33e8e9a4edaso405846f8f.2;
+        Wed, 13 Mar 2024 17:25:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1710375863; x=1710980663; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=2YZ7ZIOWTfRsYMyBgPqVgLQEBTT9tUvKsFP1uwbGjVE=;
-        b=EYdry30jKUYdjP8CiO1T7fgqJt2kMQqIZQPR/ttrsxVd0PvtA8tmSfx5pryE757Dxd
-         Yq3EbEhYbeBbULv67U3FBaEC0qe8VdFSkbwivr8k/QXO+/TRDwZavmGm7XPgknhyXXTZ
-         cmEElr7xqL7ObRloDpOXvizcKo7LSuzeCo/n1Rm9FKIpR5RzKkPrjRvvVT7Ewr5uGcwq
-         VJGVNwTlvlZIrf+t8qRVa5UZyZKlUlhmxRorEG5R/nMiCPwBalst9OZUDa3hKMdW8a9s
-         2kUoN4wpCTErRkVGeJkjZPsVx8MQhtKhJB4ZAcCmxUQcNBihZkbwyPII/XsUS1TAXQDZ
-         DWJg==
+        d=gmail.com; s=20230601; t=1710375948; x=1710980748; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b1pXXVSLcJWs+QWrQ+i4P/taCr8L+0F6xiRmk8ycZXY=;
+        b=OdqMrdylzqEmk8VEhLX1MaecvtTmKmwYObl/HWkrJz2vxQmpRjFG9i7g8QGYsrvjIS
+         3B4axAft8v/tYcF4Gf34OYyjD5HXLwCu/fQk6dDB5SSUTT54DYmdhidhXRF5oA2YXlAt
+         bMrhze1VDqGgWJn6bURCARSVFag3rtodXL3MFiBzhrQOnbz2Ct8WRc/U76bVoBpsXL0b
+         fUWX1a4am4L1t4shFGn52EjdIYbWHjDksvo3e9tIZtqeVAbxDzo7kbJTYxqazVtuq7VX
+         5uJ1R0NgYUNHglDFpt5lMfQs9/yZ+8b6vvpBFAuqLbwiYr7H5NbhKdhb3DkoKBqdlrRo
+         H7NA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710375863; x=1710980663;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2YZ7ZIOWTfRsYMyBgPqVgLQEBTT9tUvKsFP1uwbGjVE=;
-        b=AFOJWXgDI/95Thm7E2TTuJ5BuCivB6jw4fK3azoq/UEQk5wpUmpw3QnHqRNcBHeJkp
-         1+xoP7xsFTAhwq7uBRl9baEJ0kDRnAhME4kShDGD1O+pZvjDtm/T+GfKZ8v2TR4mjBP4
-         74zHZqmm1UZnQ5le1KzvCMw4tKoVU2jp2fmUceXiMvtXIoVKISCvKzs4HnGhXqfZ7jAJ
-         dd5xL1chNg6sGqWMPiIfEsGaefXW0POcnAqJ3v8JXP5FOWFq1qiGZA0bbnzNZVj+KhaW
-         g40SS0z38iNkgZNsmUf8rksUDfHBSTOJQ/E3Y+O4UDR8MdgroODD2v+P6dXExvFVVepo
-         X0Ow==
-X-Gm-Message-State: AOJu0YxBsL5LJmbhcxkb5dxRyCllU0udFTGnEqKc8iLyCJC3ezrc94T2
-	j5mUvcaNT+pIpDhQUKRiVDOlXv/C3Y3D52kS1PUUqVE8HkYGFrB0GQHzBpB3sdDZ23MpNsKK6T0
-	v
-X-Google-Smtp-Source: AGHT+IE4gByrxJNavV1lnPykkrqnzLzVBvbxtfkTN6ykn4duc/2UCJctGKdWed3lKwVy3NgYJxpMVA==
-X-Received: by 2002:a05:6a20:94cd:b0:1a1:8c6c:2b91 with SMTP id ht13-20020a056a2094cd00b001a18c6c2b91mr563705pzb.27.1710375862867;
-        Wed, 13 Mar 2024 17:24:22 -0700 (PDT)
-Received: from hermes.lan (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id sz4-20020a17090b2d4400b0029bb1bb298dsm208895pjb.35.2024.03.13.17.24.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Mar 2024 17:24:22 -0700 (PDT)
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute2] ematch: support JSON output
-Date: Wed, 13 Mar 2024 17:24:08 -0700
-Message-ID: <20240314002415.26518-1-stephen@networkplumber.org>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1710375948; x=1710980748;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b1pXXVSLcJWs+QWrQ+i4P/taCr8L+0F6xiRmk8ycZXY=;
+        b=Gp3B4kqA1uQ7w4ERAzo0xDM1z2drDlO7/W3S6ugQ0teE3UfTsYmFufGLKN0RRBAgXq
+         HoJZBYgAy2aVkhXr9IskiPVpkVUmywVqUVAwR3A1FgNe1w3tdLHsFrAheyHAo2dYocSk
+         iclK+A4Pfzp/Kcm2q7IL1YvhBSYAoOFnTFoohQ9EKLmXOiIaH0lqzyL3g73lA2DxEFme
+         me/8jt86a13+mcB1E1hkOn7lGGRAhAKIozoBvDxriQGDSokksaEBUsxVHkBcdSkfPywR
+         rEJyeACyT7zYvfDTHyWuoQievp651My0kbqZDv45WXImnVtb03Hp/gX89DVgxJND75a5
+         O1tg==
+X-Forwarded-Encrypted: i=1; AJvYcCV+MoOvZgsUoUpQUJPyphFpdDWfJkSqlZfC4RY38bCxBm/0apLstsk9sY/xpTTBkIxVsiNqFrELE7a5mnqpky8QeqEhDrebejlrHmL6VKmoUCUqJT4i0ZJc/SQQ32YQwcVYP/5FE2I298QfePSlXH3NMc+oCSSZBv20cwIPrUG/dwNx4AojkkHcaBpyoHyIR+wpeiDPqqsD3dTH0tBxs/+76XJ0Y44TOwQgPwKbNOXTtHt250J65oGCbLyBj/M/8ghGUS7Scfr6cMx4iUNsJBLOZBQpj2HiJtwoFQ==
+X-Gm-Message-State: AOJu0YyPgXjJNakyVxQExxzx0wjcqTVdVdoGKvzlX6EkDqv5JtZqAkzh
+	vwywPgHZ1JzJQDp84w3Jci1F+ONBlX8zTWXgVAb6YrfiynGjevvSfUC3BPmhO3apr1Jn+VrwNAf
+	QjL+FiG2UxEKVveH8LSBgXj1Fyxs=
+X-Google-Smtp-Source: AGHT+IEluUxpksFRvEO4amy8bxc8cXhNS84YSmujwUrBqdFTzudYkIWBqt3bc5Ekgo5hTd/k08iQyCGhQiEqmdJKoSg=
+X-Received: by 2002:a5d:438e:0:b0:33e:44da:827 with SMTP id
+ i14-20020a5d438e000000b0033e44da0827mr112820wrq.57.1710375947716; Wed, 13 Mar
+ 2024 17:25:47 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240311093526.1010158-1-dongmenglong.8@bytedance.com>
+ <20240311093526.1010158-2-dongmenglong.8@bytedance.com> <CAADnVQKQPS5NcvEouH4JqZ2fKgQAC+LtcwhX9iXYoiEkF_M94Q@mail.gmail.com>
+ <CALz3k9i5G5wWi+rtvHPwVLOUAXVMCiU_8QUZs87TEYgR_0wpPA@mail.gmail.com>
+ <CAADnVQJ_ZCzMmT1aBsNXEBFfYNSVBdBXmLocjR0PPEWtYQrQFw@mail.gmail.com>
+ <CALz3k9icPePb0c4FE67q=u1U0hrePorN9gDpQrKTR_sXbLMfDA@mail.gmail.com>
+ <CAADnVQLwgw8bQ7OHBbqLhcPJ2QpxiGw3fkMFur+2cjZpM_78oA@mail.gmail.com> <CALz3k9g9k7fEwdTZVLhrmGoXp8CE47Q+83r-AZDXrzzuR+CjVA@mail.gmail.com>
+In-Reply-To: <CALz3k9g9k7fEwdTZVLhrmGoXp8CE47Q+83r-AZDXrzzuR+CjVA@mail.gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 13 Mar 2024 17:25:35 -0700
+Message-ID: <CAADnVQLHpi3J6cBJ0QBgCQ2aY6fWGnVvNGdfi3W-jmoa9d1eVQ@mail.gmail.com>
+Subject: Re: [External] Re: [PATCH bpf-next v2 1/9] bpf: tracing: add support
+ to record and check the accessed args
+To: =?UTF-8?B?5qKm6b6Z6JGj?= <dongmenglong.8@bytedance.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	X86 ML <x86@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Quentin Monnet <quentin@isovalent.com>, 
+	bpf <bpf@vger.kernel.org>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>, linux-s390 <linux-s390@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, linux-trace-kernel@vger.kernel.org, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The ematch in filter was missing support JSON output
-and therefore would generate bogus output.
+On Tue, Mar 12, 2024 at 6:53=E2=80=AFPM =E6=A2=A6=E9=BE=99=E8=91=A3 <dongme=
+nglong.8@bytedance.com> wrote:
+>
+> On Wed, Mar 13, 2024 at 12:42=E2=80=AFAM Alexei Starovoitov
+> <alexei.starovoitov@gmail.com> wrote:
+> >
+> > On Mon, Mar 11, 2024 at 7:42=E2=80=AFPM =E6=A2=A6=E9=BE=99=E8=91=A3 <do=
+ngmenglong.8@bytedance.com> wrote:
+> > >
+> [......]
+> >
+> > I see.
+> > I thought you're sharing the trampoline across attachments.
+> > (since bpf prog is the same).
+>
+> That seems to be a good idea, which I hadn't thought before.
+>
+> > But above approach cannot possibly work with a shared trampoline.
+> > You need to create individual trampoline for all attachment
+> > and point them to single bpf prog.
+> >
+> > tbh I'm less excited about this feature now, since sharing
+> > the prog across different attachments is nice, but it won't scale
+> > to thousands of attachments.
+> > I assumed that there will be a single trampoline with max(argno)
+> > across attachments and attach/detach will scale to thousands.
+> >
+> > With individual trampoline this will work for up to a hundred
+> > attachments max.
+>
+> What does "a hundred attachments max" means? Can't I
+> trace thousands of kernel functions with a bpf program of
+> tracing multi-link?
 
-Note: support for JSON output with ipt would be difficult
-to implement since xtables API doesn't have a JSON API,
-and anyway ipt is legacy. Therefore attempts to JSON
-output for ematch ipt generates an error.
+I mean what time does it take to attach one program
+to 100 fentry-s ?
+What is the time for 1k and for 10k ?
 
-Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
----
- tc/em_canid.c | 31 +++++++++-------
- tc/em_cmp.c   | 30 ++++++++++------
- tc/em_ipset.c |  9 +++--
- tc/em_ipt.c   |  6 ++++
- tc/em_meta.c  | 99 ++++++++++++++++++++++++++++-----------------------
- tc/em_nbyte.c | 12 ++++---
- tc/em_u32.c   | 10 +++---
- tc/m_ematch.c | 47 +++++++++++++++---------
- 8 files changed, 149 insertions(+), 95 deletions(-)
+The kprobe multi test attaches to pretty much all funcs in
+/sys/kernel/tracing/available_filter_functions
+and it's fast enough to run in test_progs on every commit in bpf CI.
+See get_syms() in prog_tests/kprobe_multi_test.c
 
-diff --git a/tc/em_canid.c b/tc/em_canid.c
-index 228547529134..815ed8c7bce0 100644
---- a/tc/em_canid.c
-+++ b/tc/em_canid.c
-@@ -154,24 +154,29 @@ static int canid_print_eopt(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
- 
- 		if (pcfltr->can_id & CAN_EFF_FLAG) {
- 			if (pcfltr->can_mask == (CAN_EFF_FLAG | CAN_EFF_MASK))
--				fprintf(fd, "eff 0x%"PRIX32,
--						pcfltr->can_id & CAN_EFF_MASK);
--			else
--				fprintf(fd, "eff 0x%"PRIX32":0x%"PRIX32,
--						pcfltr->can_id & CAN_EFF_MASK,
--						pcfltr->can_mask & CAN_EFF_MASK);
-+				print_0xhex(PRINT_ANY, "eff", "eff 0x%"PRIX32,
-+					    pcfltr->can_id & CAN_EFF_MASK);
-+			else {
-+				print_0xhex(PRINT_ANY, "eff", "eff 0x%"PRIX32,
-+					    pcfltr->can_id & CAN_EFF_MASK);
-+				print_0xhex(PRINT_ANY, "mask", ":0x%"PRIX32,
-+					    pcfltr->can_mask & CAN_EFF_MASK);
-+			}
- 		} else {
-+			
- 			if (pcfltr->can_mask == (CAN_EFF_FLAG | CAN_SFF_MASK))
--				fprintf(fd, "sff 0x%"PRIX32,
--						pcfltr->can_id & CAN_SFF_MASK);
--			else
--				fprintf(fd, "sff 0x%"PRIX32":0x%"PRIX32,
--						pcfltr->can_id & CAN_SFF_MASK,
--						pcfltr->can_mask & CAN_SFF_MASK);
-+				print_0xhex(PRINT_ANY, "sff", "sff 0x%"PRIX32,
-+					    pcfltr->can_id & CAN_SFF_MASK);
-+			else {
-+				print_0xhex(PRINT_ANY, "sff", "sff 0x%"PRIX32,
-+					    pcfltr->can_id & CAN_SFF_MASK);
-+				print_0xhex(PRINT_ANY, "mask", ":0x%"PRIX32,
-+					    pcfltr->can_mask & CAN_SFF_MASK);
-+			}
- 		}
- 
- 		if ((i + 1) < rules_count)
--			fprintf(fd, " ");
-+			print_string(PRINT_FP, NULL, " ", NULL);
- 	}
- 
- 	return 0;
-diff --git a/tc/em_cmp.c b/tc/em_cmp.c
-index dfd123df1e10..9e2d14077c6c 100644
---- a/tc/em_cmp.c
-+++ b/tc/em_cmp.c
-@@ -138,6 +138,8 @@ static int cmp_print_eopt(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
- 			  int data_len)
- {
- 	struct tcf_em_cmp *cmp = data;
-+	const char *align = NULL;
-+	const char *op = NULL;
- 
- 	if (data_len < sizeof(*cmp)) {
- 		fprintf(stderr, "CMP header size mismatch\n");
-@@ -145,28 +147,36 @@ static int cmp_print_eopt(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
- 	}
- 
- 	if (cmp->align == TCF_EM_ALIGN_U8)
--		fprintf(fd, "u8 ");
-+		align = "u8";
- 	else if (cmp->align == TCF_EM_ALIGN_U16)
--		fprintf(fd, "u16 ");
-+		align = "u16";
- 	else if (cmp->align == TCF_EM_ALIGN_U32)
--		fprintf(fd, "u32 ");
-+		align = "u32";
- 
--	fprintf(fd, "at %d layer %d ", cmp->off, cmp->layer);
-+	print_uint(PRINT_JSON, "align", "%u ", cmp->align);
-+	if (align)
-+		print_string(PRINT_FP, NULL, "%s ", align);
-+
-+	print_uint(PRINT_ANY, "offset", "at %u ", cmp->off);
-+	print_uint(PRINT_ANY, "layer", "layer %u ", cmp->layer);
- 
- 	if (cmp->mask)
--		fprintf(fd, "mask 0x%x ", cmp->mask);
-+		print_0xhex(PRINT_ANY, "mask", "mask 0x%x ", cmp->mask);
- 
- 	if (cmp->flags & TCF_EM_CMP_TRANS)
--		fprintf(fd, "trans ");
-+		print_null(PRINT_ANY, "trans", "trans ", NULL);
- 
- 	if (cmp->opnd == TCF_EM_OPND_EQ)
--		fprintf(fd, "eq ");
-+		op = "eq";
- 	else if (cmp->opnd == TCF_EM_OPND_LT)
--		fprintf(fd, "lt ");
-+		op = "lt";
- 	else if (cmp->opnd == TCF_EM_OPND_GT)
--		fprintf(fd, "gt ");
-+		op = "gt";
-+
-+	if (op)
-+		print_string(PRINT_ANY, "opnd", "%s ", op);
- 
--	fprintf(fd, "%d", cmp->val);
-+	print_uint(PRINT_ANY, "val", "%u", cmp->val);
- 
- 	return 0;
- }
-diff --git a/tc/em_ipset.c b/tc/em_ipset.c
-index f97abaf3cfb7..ce2c8e75fc58 100644
---- a/tc/em_ipset.c
-+++ b/tc/em_ipset.c
-@@ -243,10 +243,15 @@ static int ipset_print_eopt(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
- 
- 	if (get_set_byid(setname, set_info->index))
- 		return -1;
--	fputs(setname, fd);
-+
-+	open_json_array(PRINT_ANY, setname);
-+
- 	for (i = 1; i <= set_info->dim; i++) {
--		fprintf(fd, "%s%s", i == 1 ? " " : ",", set_info->flags & (1 << i) ? "src" : "dst");
-+		print_string(PRINT_FP, NULL, "%s", i == 1 ? " " : ",");
-+		print_string(PRINT_ANY, NULL, "%s", 
-+			     set_info->flags & (1 << i) ? "src" : "dst");
- 	}
-+	close_json_array(PRINT_JSON, NULL);
- 
- 	return 0;
- }
-diff --git a/tc/em_ipt.c b/tc/em_ipt.c
-index 69efefd8c5e3..6102b5513853 100644
---- a/tc/em_ipt.c
-+++ b/tc/em_ipt.c
-@@ -175,6 +175,12 @@ static int em_ipt_print_epot(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
- 	const char *mname;
- 	__u8 nfproto;
- 
-+	/* xtables-legacy doesn't support JSON print so skip it */
-+	if (is_json_context()) {
-+		fprintf(stderr, "xtables-legacy json not supported\n");
-+		return -1;
-+	}
-+	
- 	if (parse_rtattr(tb, TCA_EM_IPT_MAX, data, data_len) < 0)
- 		return -1;
- 
-diff --git a/tc/em_meta.c b/tc/em_meta.c
-index 6a5654f3a28b..662596283d12 100644
---- a/tc/em_meta.c
-+++ b/tc/em_meta.c
-@@ -406,29 +406,38 @@ static int meta_parse_eopt(struct nlmsghdr *n, struct tcf_ematch_hdr *hdr,
- }
- #undef PARSE_ERR
- 
--static inline void print_binary(FILE *fd, unsigned char *str, int len)
-+static void print_binary(const unsigned char *str, int len)
- {
- 	int i;
- 
-+	if (is_json_context()) {
-+		open_json_array(PRINT_JSON, "data");
-+
-+		for (i = 0; i < len; i++)
-+			print_0xhex(PRINT_JSON, NULL, NULL, str[i]);
-+		close_json_array(PRINT_JSON, NULL);
-+		return;
-+	}
-+	
- 	for (i = 0; i < len; i++)
- 		if (!isprint(str[i]))
- 			goto binary;
- 
- 	for (i = 0; i < len; i++)
--		fprintf(fd, "%c", str[i]);
-+		putchar(str[i]);
- 	return;
- 
- binary:
- 	for (i = 0; i < len; i++)
--		fprintf(fd, "%02x ", str[i]);
-+		printf("%02x ", str[i]);
- 
--	fprintf(fd, "\"");
-+	putchar ('"');
- 	for (i = 0; i < len; i++)
--		fprintf(fd, "%c", isprint(str[i]) ? str[i] : '.');
--	fprintf(fd, "\"");
-+		putchar(isprint(str[i]) ? str[i] : '.');
-+	putchar ('"');
- }
- 
--static inline int print_value(FILE *fd, int type, struct rtattr *rta)
-+static int print_value(int type, struct rtattr *rta)
- {
- 	if (rta == NULL) {
- 		fprintf(stderr, "Missing value TLV\n");
-@@ -436,53 +445,51 @@ static inline int print_value(FILE *fd, int type, struct rtattr *rta)
- 	}
- 
- 	switch (type) {
--		case TCF_META_TYPE_INT:
--			if (RTA_PAYLOAD(rta) < sizeof(__u32)) {
--				fprintf(stderr, "meta int type value TLV " \
--				    "size mismatch.\n");
--				return -1;
--			}
--			fprintf(fd, "%d", rta_getattr_u32(rta));
--			break;
-+	case TCF_META_TYPE_INT:
-+		if (RTA_PAYLOAD(rta) < sizeof(__u32)) {
-+			fprintf(stderr,
-+				"meta int type value TLV size mismatch.\n");
-+			return -1;
-+		}
-+		print_uint(PRINT_ANY, "value", "%u", rta_getattr_u32(rta));
-+		break;
- 
--		case TCF_META_TYPE_VAR:
--			print_binary(fd, RTA_DATA(rta), RTA_PAYLOAD(rta));
--			break;
-+	case TCF_META_TYPE_VAR:
-+		print_binary(RTA_DATA(rta), RTA_PAYLOAD(rta));
-+		break;
- 	}
- 
- 	return 0;
- }
- 
--static int print_object(FILE *fd, struct tcf_meta_val *obj, struct rtattr *rta)
-+static int print_object(struct tcf_meta_val *obj, struct rtattr *rta)
- {
- 	int id = TCF_META_ID(obj->kind);
- 	int type = TCF_META_TYPE(obj->kind);
- 	const struct meta_entry *entry;
- 
- 	if (id == TCF_META_ID_VALUE)
--		return print_value(fd, type, rta);
-+		return print_value(type, rta);
- 
- 	entry = lookup_meta_entry_byid(id);
- 
- 	if (entry == NULL)
--		fprintf(fd, "[unknown meta id %d]", id);
-+		print_int(PRINT_ANY, "id", "[unknown meta id %d]", id);
- 	else
--		fprintf(fd, "%s", entry->kind);
-+		print_string(PRINT_ANY, "id", "%s", entry->kind);
- 
- 	if (obj->shift)
--		fprintf(fd, " shift %d", obj->shift);
-+		print_int(PRINT_ANY, "shift", " shift %d", obj->shift);
- 
--	switch (type) {
--		case TCF_META_TYPE_INT:
--			if (rta) {
--				if (RTA_PAYLOAD(rta) < sizeof(__u32))
--					goto size_mismatch;
-+	if (type == TCF_META_TYPE_INT && rta) {
-+		__u32 mask;
-+			
-+		if (RTA_PAYLOAD(rta) < sizeof(__u32))
-+			goto size_mismatch;
- 
--				if (rta_getattr_u32(rta))
--					fprintf(fd, " mask 0x%08x",
--						rta_getattr_u32(rta));
--			}
--			break;
-+		mask = rta_getattr_u32(rta);
-+		if (mask)
-+			print_0xhex(PRINT_ANY, "mask", " mask 0x%08x", mask);
- 	}
- 
- 	return 0;
-@@ -498,6 +505,7 @@ static int meta_print_eopt(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
- {
- 	struct rtattr *tb[TCA_EM_META_MAX+1];
- 	struct tcf_meta_hdr *meta_hdr;
-+	const char *op = NULL;
- 
- 	if (parse_rtattr(tb, TCA_EM_META_MAX, data, data_len) < 0)
- 		return -1;
-@@ -514,22 +522,25 @@ static int meta_print_eopt(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
- 
- 	meta_hdr = RTA_DATA(tb[TCA_EM_META_HDR]);
- 
--	if (print_object(fd, &meta_hdr->left, tb[TCA_EM_META_LVALUE]) < 0)
-+	if (print_object(&meta_hdr->left, tb[TCA_EM_META_LVALUE]) < 0)
- 		return -1;
- 
- 	switch (meta_hdr->left.op) {
--		case TCF_EM_OPND_EQ:
--			fprintf(fd, " eq ");
--			break;
--		case TCF_EM_OPND_LT:
--			fprintf(fd, " lt ");
--			break;
--		case TCF_EM_OPND_GT:
--			fprintf(fd, " gt ");
--			break;
-+	case TCF_EM_OPND_EQ:
-+		op = "eq";
-+		break;
-+	case TCF_EM_OPND_LT:
-+		op = "lt";
-+		break;
-+	case TCF_EM_OPND_GT:
-+		op = "gt";
-+		break;
- 	}
- 
--	return print_object(fd, &meta_hdr->right, tb[TCA_EM_META_RVALUE]);
-+	if (op)
-+		print_string(PRINT_ANY, "opnd", " %s ", op);
-+
-+	return print_object(&meta_hdr->right, tb[TCA_EM_META_RVALUE]);
- }
- 
- struct ematch_util meta_ematch_util = {
-diff --git a/tc/em_nbyte.c b/tc/em_nbyte.c
-index 9f421fb423a6..cfcd1b413baa 100644
---- a/tc/em_nbyte.c
-+++ b/tc/em_nbyte.c
-@@ -116,13 +116,17 @@ static int nbyte_print_eopt(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
- 
- 	needle = data + sizeof(*nb);
- 
-+	open_json_array(PRINT_JSON, "needle");
- 	for (i = 0; i < nb->len; i++)
--		fprintf(fd, "%02x ", needle[i]);
-+		print_0xhex(PRINT_ANY, NULL, "%02x ", needle[i]);
- 
--	fprintf(fd, "\"");
-+	close_json_array(PRINT_ANY, "\"");
- 	for (i = 0; i < nb->len; i++)
--		fprintf(fd, "%c", isprint(needle[i]) ? needle[i] : '.');
--	fprintf(fd, "\" at %d layer %d", nb->off, nb->layer);
-+		print_0xhex(PRINT_FP, NULL, "%c",
-+			    isprint(needle[i]) ? needle[i] : '.');
-+
-+	print_uint(PRINT_ANY, "offset", "\" at %u ", nb->off);
-+	print_uint(PRINT_ANY, "layer", "layer %u", nb->layer);
- 
- 	return 0;
- }
-diff --git a/tc/em_u32.c b/tc/em_u32.c
-index a83382ba4417..88feb0de8317 100644
---- a/tc/em_u32.c
-+++ b/tc/em_u32.c
-@@ -153,11 +153,11 @@ static int u32_print_eopt(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
- 		return -1;
- 	}
- 
--	fprintf(fd, "%08x/%08x at %s%d",
--	    (unsigned int) ntohl(u_key->val),
--	    (unsigned int) ntohl(u_key->mask),
--	    u_key->offmask ? "nexthdr+" : "",
--	    u_key->off);
-+	print_0xhex(PRINT_ANY, "val", "%08x", ntohl(u_key->val));
-+	print_0xhex(PRINT_ANY, "mask", "/%08x at ", ntohl(u_key->mask));
-+	if (u_key->offmask)
-+		print_null(PRINT_ANY, "nexthdr", "nexthdr+", NULL);
-+	print_int(PRINT_ANY, "offset", "%d", u_key->off);
- 
- 	return 0;
- }
-diff --git a/tc/m_ematch.c b/tc/m_ematch.c
-index fefc78608d6f..81590ad18011 100644
---- a/tc/m_ematch.c
-+++ b/tc/m_ematch.c
-@@ -390,10 +390,18 @@ int parse_ematch(int *argc_p, char ***argv_p, int tca_id, struct nlmsghdr *n)
- 	return 0;
- }
- 
-+static void print_ematch_indent(int prefix)
-+{
-+	int n;
-+	
-+	for (n = 0; n < prefix; n++)
-+		print_string(PRINT_FP, NULL, "  ", NULL);
-+}
-+
- static int print_ematch_seq(FILE *fd, struct rtattr **tb, int start,
- 			    int prefix)
- {
--	int n, i = start;
-+	int i = start;
- 	struct tcf_ematch_hdr *hdr;
- 	int dlen;
- 	void *data;
-@@ -411,7 +419,7 @@ static int print_ematch_seq(FILE *fd, struct rtattr **tb, int start,
- 		hdr = RTA_DATA(tb[i]);
- 
- 		if (hdr->flags & TCF_EM_INVERT)
--			fprintf(fd, "NOT ");
-+			print_null(PRINT_ANY, "not", "NOT ", NULL);
- 
- 		if (hdr->kind == 0) {
- 			__u32 ref;
-@@ -420,40 +428,45 @@ static int print_ematch_seq(FILE *fd, struct rtattr **tb, int start,
- 				return -1;
- 
- 			ref = *(__u32 *) data;
--			fprintf(fd, "(\n");
--			for (n = 0; n <= prefix; n++)
--				fprintf(fd, "  ");
-+			print_string(PRINT_FP, NULL, "(%s", _SL_);
-+			print_ematch_indent(prefix);
-+			open_json_object("match");
-+			
- 			if (print_ematch_seq(fd, tb, ref + 1, prefix + 1) < 0)
- 				return -1;
--			for (n = 0; n < prefix; n++)
--				fprintf(fd, "  ");
--			fprintf(fd, ") ");
-+
-+			close_json_object();
-+			print_ematch_indent(prefix);
-+			print_string(PRINT_FP, NULL, ") ", NULL);
- 
- 		} else {
- 			struct ematch_util *e;
- 
- 			e = get_ematch_kind_num(hdr->kind);
- 			if (e == NULL)
--				fprintf(fd, "[unknown ematch %d]\n",
--				    hdr->kind);
-+				fprintf(stderr, "[unknown ematch %d]\n",
-+					hdr->kind);
- 			else {
--				fprintf(fd, "%s(", e->kind);
-+				print_string(PRINT_FP, NULL, "%s(", e->kind);
-+				open_json_object(e->kind);
-+
- 				if (e->print_eopt(fd, hdr, data, dlen) < 0)
- 					return -1;
--				fprintf(fd, ")\n");
-+
-+				close_json_object();
-+				print_string(PRINT_FP, NULL, ")%s", _SL_);
- 			}
- 			if (hdr->flags & TCF_EM_REL_MASK)
--				for (n = 0; n < prefix; n++)
--					fprintf(fd, "  ");
-+				print_ematch_indent(prefix);
- 		}
- 
- 		switch (hdr->flags & TCF_EM_REL_MASK) {
- 			case TCF_EM_REL_AND:
--				fprintf(fd, "AND ");
-+				print_null(PRINT_ANY, "and", "AND ", NULL);
- 				break;
- 
- 			case TCF_EM_REL_OR:
--				fprintf(fd, "OR ");
-+				print_null(PRINT_ANY, "or",  "OR ", NULL);
- 				break;
- 
- 			default:
-@@ -480,7 +493,7 @@ static int print_ematch_list(FILE *fd, struct tcf_ematch_tree_hdr *hdr,
- 		if (parse_rtattr_nested(tb, hdr->nmatches, rta) < 0)
- 			goto errout;
- 
--		fprintf(fd, "\n  ");
-+		print_string(PRINT_FP, NULL, "%s  ", _SL_);
- 		if (print_ematch_seq(fd, tb, 1, 1) < 0)
- 			goto errout;
- 	}
--- 
-2.43.0
+Can this new multi fentry do that?
+and at what speed?
+The answer will decide how applicable this api is going to be.
+Generating different trampolines for every attach point
+is an approach as well. Pls benchmark it too.
 
+> >
+> > Let's step back.
+> > What is the exact use case you're trying to solve?
+> > Not an artificial one as selftest in patch 9, but the real use case?
+>
+> I have a tool, which is used to diagnose network problems,
+> and its name is "nettrace". It will trace many kernel functions, whose
+> function args contain "skb", like this:
+>
+> ./nettrace -p icmp
+> begin trace...
+> ***************** ffff889be8fbd500,ffff889be8fbcd00 ***************
+> [1272349.614564] [dev_gro_receive     ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614579] [__netif_receive_skb_core] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614585] [ip_rcv              ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614592] [ip_rcv_core         ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614599] [skb_clone           ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614616] [nf_hook_slow        ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614629] [nft_do_chain        ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614635] [ip_rcv_finish       ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614643] [ip_route_input_slow ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614647] [fib_validate_source ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614652] [ip_local_deliver    ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614658] [nf_hook_slow        ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614663] [ip_local_deliver_finish] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614666] [icmp_rcv            ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614671] [icmp_echo           ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614675] [icmp_reply          ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614715] [consume_skb         ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614722] [packet_rcv          ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+> [1272349.614725] [consume_skb         ] ICMP: 169.254.128.15 ->
+> 172.27.0.6 ping request, seq: 48220
+>
+> For now, I have to create a bpf program for every kernel
+> function that I want to trace, which is up to 200.
+>
+> With this multi-link, I only need to create 5 bpf program,
+> like this:
+>
+> int BPF_PROG(trace_skb_1, struct *skb);
+> int BPF_PROG(trace_skb_2, u64 arg0, struct *skb);
+> int BPF_PROG(trace_skb_3, u64 arg0, u64 arg1, struct *skb);
+> int BPF_PROG(trace_skb_4, u64 arg0, u64 arg1, u64 arg2, struct *skb);
+> int BPF_PROG(trace_skb_5, u64 arg0, u64 arg1, u64 arg2, u64 arg3, struct =
+*skb);
+>
+> Then, I can attach trace_skb_1 to all the kernel functions that
+> I want to trace and whose first arg is skb; attach trace_skb_2 to kernel
+> functions whose 2nd arg is skb, etc.
+>
+> Or, I can create only one bpf program and store the index
+> of skb to the attachment cookie, and attach this program to all
+> the kernel functions that I want to trace.
+>
+> This is my use case. With the multi-link, now I only have
+> 1 bpf program, 1 bpf link, 200 trampolines, instead of 200
+> bpf programs, 200 bpf link and 200 trampolines.
+
+I see. The use case makes sense to me.
+Andrii's retsnoop is used to do similar thing before kprobe multi was
+introduced.
+
+> The shared trampoline you mentioned seems to be a
+> wonderful idea, which can make the 200 trampolines
+> to one. Let me have a look, we create a trampoline and
+> record the max args count of all the target functions, let's
+> mark it as arg_count.
+>
+> During generating the trampoline, we assume that the
+> function args count is arg_count. During attaching, we
+> check the consistency of all the target functions, just like
+> what we do now.
+
+For one trampoline to handle all attach points we might
+need some arch support, but we can start simple.
+Make btf_func_model with MAX_BPF_FUNC_REG_ARGS
+by calling btf_distill_func_proto() with func=3D=3DNULL.
+And use that to build a trampoline.
+
+The challenge is how to use minimal number of trampolines
+when bpf_progA is attached for func1, func2, func3
+and bpf_progB is attached to func3, func4, func5.
+We'd still need 3 trampolines:
+for func[12] to call bpf_progA,
+for func3 to call bpf_progA and bpf_progB,
+for func[45] to call bpf_progB.
+
+Jiri was trying to solve it in the past. His slides from LPC:
+https://lpc.events/event/16/contributions/1350/attachments/1033/1983/plumbe=
+rs.pdf
+
+Pls study them and his prior patchsets to avoid stepping on the same rakes.
 
