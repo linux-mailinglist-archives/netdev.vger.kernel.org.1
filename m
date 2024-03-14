@@ -1,238 +1,238 @@
-Return-Path: <netdev+bounces-79930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92D4187C1C9
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:06:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2888387C1C2
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:02:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CC551C20E16
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 17:06:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BEC11C209EC
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 17:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6379374419;
-	Thu, 14 Mar 2024 17:06:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42DEE71750;
+	Thu, 14 Mar 2024 17:02:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Y6KfIJrN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bP2ATjot"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2044.outbound.protection.outlook.com [40.107.237.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 673B07351C;
-	Thu, 14 Mar 2024 17:06:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710435963; cv=fail; b=QespXD0aVz5V77C91ZEZhsMX7/Wx5T+ve0iHYud3VcH/g1WQd3Lx/tOVTd4p/42K+dV4EYM6duSuRiKqSAq52IHiSqA43bHXfmjmFTE3kQnDcHKPLaRUMh+Ah9/0+qPuNtZtusUSzAdfePfTLTTBrX8tBpiaWHoqsmDxNKlVOtg=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710435963; c=relaxed/simple;
-	bh=YPnnMNYYaIMouwvU1TpY5KYCqbze+NhetAtLsX+OZlY=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 Content-Type:MIME-Version; b=APGoutOBdHzH+fNvef/Wy58u2z49uw7OE//oN+0B46jtXf7SWLykhQCiIjqSUwxyCX1L86KPuKLq8XdDHS+J7wn/MVzvukAizf4Amapd4gFE8zhIj0duR4koii5ln4JXidmtFUcuTWVQ6+8paqu+QSLxijhsM4FKHr+NPq+77dc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Y6KfIJrN; arc=fail smtp.client-ip=40.107.237.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=S9IFS0+UpLKHie9waF0QhSMAWZElqv5P1RuLzKWOLRHTN4+aN1vfov1CC/9e+j42mjKlzcJDEOokhDsMNiErnTpgpWNmM8WPI/Ej/nBy7FxUzwGZrdFSNng9GFDdR70s7sKI4pOKG0ab/Z7bPxMm2MVIq6bgLx+ml32N+nSfdMD/aZ3ujtVqUj9x6EU/ujrKg7EdWyE13hlKmpx2LzB/n8b6uQYF9eFT/5/zdDKcXM2YQXdF2xy222T+ZljRcXhQjknsY1Lyy5fJeIzhhOcyzx+B2Rf8TuVMCPxkZ+F9DDFrXXJvHhXJBhI+ZjI/21muGnrk5q5140U8/lWIP/1W4g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pREwHxAS7Q8wNFPjU5JGXzl/6uc8DyA1T++rmnUwTgU=;
- b=RKiAY7N+W+vohuzKX9uHMq76ELTLA01OxUxZFTUTje7wiSU15rV8vOtNd2bLzCrz1PBqdk6LefaOnU35jAlOu99+DITQYZZ/hsSLwgRNInTLEvGvXVq7SgZoGso6F8J+YY0iFMuhcXKuR2nV74C1Qe3zN3hroAL7MQ4tSe4MEdg2tOBYGAOzMvLHFGpuyMAt5G4LvAG8z/BRomcVfQJo/C0+0dmGIPOL03VHriZwnZm7AFMLMMFRrsRoi0AQj4pf8l85wbsmBZ/e1bpNW97VEP+3sas1cNEk8JzJ+UzpTVBOwNopDHa8S2psUZL0FYx4H55OT7GXfP1zwXmD3Irwpg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pREwHxAS7Q8wNFPjU5JGXzl/6uc8DyA1T++rmnUwTgU=;
- b=Y6KfIJrNOK6s0ziVUnKVY8QHoDK2TJ23nMUpXcqnWhhSHp4Dyfxe3PtIT56Dvu0KKdV3wzq0ZtAl8g4GdTfTa+s7D+Ak6zwcBMx7kzuxoKqgbX/NVAcN4LDBzxY7dQlSYVNdYXK+23EEl+isbBQYwrUq+FXqbFGi2r0WfFF6xO/jho/8WGYAKI4/dqZFBxOMuWkIXlbplyyy1S/a4TtdiiRgP+WIIcIUNeV9P5ni6+2Sm+IgTKZJD8GmNMyjCc3rZGVD195JtpLKWMhDXw/U27MPdQDbrtRV29nzegQ+kexlPQDm14mGZrFNbpgRuzWeJdgEekelsRrhl8dUSsrnyw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by DM4PR12MB7573.namprd12.prod.outlook.com (2603:10b6:8:10f::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.36; Thu, 14 Mar
- 2024 17:05:56 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::459b:b6fe:a74c:5fbf]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::459b:b6fe:a74c:5fbf%6]) with mapi id 15.20.7386.017; Thu, 14 Mar 2024
- 17:05:56 +0000
-References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
- <20240309084440.299358-1-rrameshbabu@nvidia.com>
- <20240309084440.299358-2-rrameshbabu@nvidia.com>
- <20240312165346.14ec1941@kernel.org>
-User-agent: mu4e 1.10.8; emacs 28.2
-From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: ahmed.zaki@intel.com, aleksander.lobakin@intel.com,
- alexandre.torgue@foss.st.com, andrew@lunn.ch, corbet@lwn.net,
- davem@davemloft.net, dtatulea@nvidia.com, edumazet@google.com,
- gal@nvidia.com, hkallweit1@gmail.com, jacob.e.keller@intel.com,
- jiri@resnulli.us, joabreu@synopsys.com, justinstitt@google.com,
- kory.maincent@bootlin.com, leon@kernel.org, linux-doc@vger.kernel.org,
- linux-kernel@vger.kernel.org, liuhangbin@gmail.com,
- maxime.chevallier@bootlin.com, netdev@vger.kernel.org, pabeni@redhat.com,
- paul.greenwalt@intel.com, przemyslaw.kitszel@intel.com,
- rdunlap@infradead.org, richardcochran@gmail.com, saeed@kernel.org,
- tariqt@nvidia.com, vadim.fedorenko@linux.dev, vladimir.oltean@nxp.com,
- wojciech.drewek@intel.com
-Subject: Re: [PATCH RFC v2 1/6] ethtool: add interface to read Tx hardware
- timestamping statistics
-Date: Thu, 14 Mar 2024 10:01:49 -0700
-In-reply-to: <20240312165346.14ec1941@kernel.org>
-Message-ID: <87v85ovj4d.fsf@nvidia.com>
-Content-Type: text/plain
-X-ClientProxiedBy: SJ0PR13CA0206.namprd13.prod.outlook.com
- (2603:10b6:a03:2c3::31) To BYAPR12MB2743.namprd12.prod.outlook.com
- (2603:10b6:a03:61::28)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3907316C
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 17:02:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710435723; cv=none; b=aUbYqj09AMtKrYeAkay7MlCfs8sHYhK8EAREp8y3SuBt1dQ4qUQC2uVDV+u6mXVuntMFDxKNJ2UnmgYwiSQ/dbbMdDDP5xS8ug7SFHtGTOWFhib4nVH5dOxwmNvrPH7m6LYLNlLhiVDIuQtJpY7j8gljUNyP2zCxfvQqSicJ47M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710435723; c=relaxed/simple;
+	bh=TnBsISUWC2qlv8V8tprDZhAAqFTVtbXiMF1wHw2KojE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nehRJISfPnwSMF7qJuiq5l4DrKSnpDj8ixeogUp1bhpn+vu58fwoMufjNHXblfJMb45AXAp0hRGrqDVRfMzg10FhXqJnkpzSm9Hjy4+AxDpPTB/n3rXeuMw/UUgYLyb9S7XYzQuCU7lZXDF50X1BJx131O7jK5Xaes/wzDS/MoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bP2ATjot; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-412e784060cso14308475e9.1
+        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 10:02:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710435720; x=1711040520; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=XjcADWLsDuWyyG5SreWRYKWkkzeL4Tg0NMQEOz56dDA=;
+        b=bP2ATjot413PbWkHARjQG1463Kn0rpfAWA3LETCHvPNQ8S0zyyU1QBhP3yUrYHEW9Q
+         +6wWIvNGPT4x6BX5b887U6HVC6ftsv3UlseS6uD+sB0iSqeAJ0yDgrWLj6iinSUGKfVm
+         mF0V3FdgV/FrsVcFwGioUAG2HD51LEhq+2r/ZwywQf7PYi8mJSqE41cpZ2NgRtnq6hPE
+         Ooo7DNPsKN9QkE02fTw/pce2W9vf1dnLFPB5rRceG+7+PWp4QeNAiOmY9E7ONHXW0G+d
+         OwOONa3g1FQ/ENGPYD9+hrHysoDcGWroBU9CLCCg4e19zXLPqPX6gP8boDI1iI8iOnVK
+         5SJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710435720; x=1711040520;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XjcADWLsDuWyyG5SreWRYKWkkzeL4Tg0NMQEOz56dDA=;
+        b=uE4WfbvgJcA8yxhT1sTYPN8beNxkfVF/vyfdtRtEh7DPpXt0ooVMuThqe7ha2SLw+k
+         2fQbqzrKnTHvKF6yKzX7yFlkGk9c55p10nCZ1tBWtARkFElbDxc2DQ66uYUpnEIRfEqt
+         5noR5DzAdRlR+jc35+bmReBVN0Lb76kl2hKK/Mu2ZXWgkcrHdZE+Zd1n1avlUppSkM13
+         C4qZKc2uoYTaVygOpoCH6zs4jYwZ7V6CbmeW1WHG0IXB2Zad1BKKH43EEPFLVmTzOXct
+         nW2rQG8gFNOOoxw94BWYyVj+orKeGxWxZMicaAOXWA6ETpRe2/my62fFtRse3o4lz5ER
+         o2kg==
+X-Forwarded-Encrypted: i=1; AJvYcCUwKEaHjQamKVtFo3kUEQeAS+n9wHUL5uem6BX987ZRkj9xldBzV0BK+AwVhYZtDvC+vhvY3u62nGUdVv9Q59hzYf9Ti2YU
+X-Gm-Message-State: AOJu0YzXyIlufRR/jkUTDdHqJa99ALovCNBLht0Do0BctjjKQl8LTJ96
+	uLtKkcHeuwHuKFFeukNkBA1HINOyyAcSqy268d/Fm4sjVEeE4n8L
+X-Google-Smtp-Source: AGHT+IHS7h1upUTW0+dUXDNpD71vkVtZNpMltU1FrYRnL3eO+puXxn2MWbv5/E+y7coSnaeG0jwQQA==
+X-Received: by 2002:a05:600c:1c9e:b0:413:f157:f677 with SMTP id k30-20020a05600c1c9e00b00413f157f677mr2390756wms.0.1710435719462;
+        Thu, 14 Mar 2024 10:01:59 -0700 (PDT)
+Received: from ?IPV6:2a01:c22:7a90:7b00:844c:788b:a2cb:c2b7? (dynamic-2a01-0c22-7a90-7b00-844c-788b-a2cb-c2b7.c22.pool.telefonica.de. [2a01:c22:7a90:7b00:844c:788b:a2cb:c2b7])
+        by smtp.googlemail.com with ESMTPSA id j30-20020a05600c1c1e00b004133825e6cfsm6150563wms.24.2024.03.14.10.01.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 14 Mar 2024 10:01:58 -0700 (PDT)
+Message-ID: <80c585f5-4c79-4c97-8f14-5ff4a24fbaa9@gmail.com>
+Date: Thu, 14 Mar 2024 18:01:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|DM4PR12MB7573:EE_
-X-MS-Office365-Filtering-Correlation-Id: a898300a-3c5a-4b34-4f77-08dc4449036b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	02ydfTkSYF19hICshItQ+HCqXVb5XiikBocXNJEX9QMYBlrK6lLaIWPrJZU9mR+5sh+NCbw7IHljSa8WctlfHzc0EKJVXrBNET7tR/PiDyZg67994st5Yl96DJYtF/g0GIe1E76Rdp2e/cPWxIpNSc7sj7I6Y5AOWpyOpPSc9c4trCoPxi25BC9RB0NawmS8ce3BhUrtrcZqxjDNR24yJ1as34BwaJIzwT7abn0hTLmtZFshvIWznwoweO0ydV1xcSqrk2H9cw2JVrTgArE2eHdJ6CPGHD5AlfwvH+JyGzgVCDZ2na0cx8ZQ5YQxXRHSuJvJl8kYa7cM9RzPrZ15rD+kfSVYws7kKm4PTXTSGclAh7MImdJsXMNBG0ctElCTdthDur0CQS2RextCHvyrdY0ZNsp9AhqNWwCC3Rhy90oyEs8DzZV/jfEUiqPsaFKUQYIl1g2L8hNxpNGeboMq6gZcQOitEUyz0wKtMSsOBZtmNEEO2q96/Q3bbS0Nx1zSCnUSnw0DRBIHgw/MWO0OTipTRR/aRh358jxid9xbg69H07WJqR+EqY7GAgZjmI4v1y4V/e9RMi4GxaX8Ib/i8/Tmc1maAUFNopu/NjG9PWYywERoATs4FlZ8KNCnsUGP2WiHBbmdWQeYV4gylEMeLEExWNpLWKf4PTjj++x8hEQ=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(7416005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?VN2BFuPYaPmzoW5msA5UyyR+mH8awecrEc4jnI/mCQ1aycj/MJNGC3VqO7eO?=
- =?us-ascii?Q?o5SmJXjcQiPOyE/Q/827lTvwse/JMlYKAlvDAgogzQhXhKctyPNU8yLuqIG1?=
- =?us-ascii?Q?3vfHAYIY05MoW+n1FUfLEn19JVyzQkEU6Gg08+F/ccAMkLfx5+oV5GCm/CoS?=
- =?us-ascii?Q?hZPjsnqE3hZZDyD1b/Zz0zNZXKwP0e9jVZf4QcTLhzoN6yWis4AFLKgoEoqN?=
- =?us-ascii?Q?NAsLvjQ9Vpwe7gS8CMgOqK0GxT/ZGhwWJvVxPWGakA+bczoE4Yjg+jAmUYRy?=
- =?us-ascii?Q?E5wRk9ssPJ/uLAR6g0OfG4KXzIvO+R+/Z/Z49/ymBDxWwoglIJjD5TIM3aTd?=
- =?us-ascii?Q?fdH/iVoqnWCfxnhltNNRMBj91vW6nvE7/vK6ZgKakKpiYClJ3VhaEHKrCQiv?=
- =?us-ascii?Q?LwNAlp/3GtsD8dmLnzqB3i5a8HZft/OkmCjdUBzTv74BvZTTTNX5W5M9WkGR?=
- =?us-ascii?Q?7UU5OM2xy1ccqRs0HPSdEgGmv9hG95wkiPxJLMXlhLSyGr1wYgTVOWIWhAG6?=
- =?us-ascii?Q?8Zb0CMdjQ+SPUuzEnB98oDIDhp0m6b1QPLwrDklXH3fjawIA3XNruyPug7b7?=
- =?us-ascii?Q?355CcezobwXsjTv6aPmOsPP0HNB69KCyT27CNhoCluxBT+cPNa7N5imryKAd?=
- =?us-ascii?Q?hjRlSsJ0pxerGmfSfZ5epfpI5aaB8d9ENkeRARWQDZMqsbGttVfqdgKB/bJ/?=
- =?us-ascii?Q?NGKcP0kt7ALX1BjBC053RcNSdn9gOXky6EiWWtB3ymHpTEnMrJmOM3HT7FtS?=
- =?us-ascii?Q?rh9QfayxfZGxMPkLKR2mrbSr7uqEOaVWW8UHs64ltKxqrSUq3A/XvKKHXxBu?=
- =?us-ascii?Q?0N3DgGHbNA97FEpbNQfjZcHAiBCX+EktA0SueW1ffL9tuc9qQgNoffzpIl5Z?=
- =?us-ascii?Q?m7dv3PxfA8DQu/jpPQRyfT56k4f7dbMbdYMswHcQn6xAu1DNyzRVV1e4t7Ss?=
- =?us-ascii?Q?KBZdmyBQvvdffWgqx6RoXCowT+6e3fTh/1lXbUtPQe84Ic+PEl/wqR7gGDIp?=
- =?us-ascii?Q?uREb+Vi25uV1AUgCDG8uppFZlYun7v/lFu96ubFkpacEvD2oE+Bp0dkNraeE?=
- =?us-ascii?Q?rYbfzB1glBifNZqCSnNUyUX+8rwmGsGSOqndnxKj8AYa9e8kk4RELNLB6qvm?=
- =?us-ascii?Q?Zr4ZFqeC++iBjycrlSskUsX6/ZwXEWryMEJ22EyH0b8tGefFfSi18kNcER1q?=
- =?us-ascii?Q?+drp11f5s+08Qs2brRuqYbhU6TuUvJirREG8oB+eRopqGMs7yO1Onxws5m7/?=
- =?us-ascii?Q?9GR4+J/ni6LU/9H00zXrxi4JsBpWlQllgceAFkMn3AYOo4qQqugxHnmj6Tqs?=
- =?us-ascii?Q?vNPdIiHN2d0ptlmtHF7bmDcWgZ+eSUt82tf6no+IJO0w2aWAfhszSLvUvQTK?=
- =?us-ascii?Q?yl+jkEwesmKmvwdvZ/WPe2hegnArnjKNWZNmEwSbopXgGdAS3fhoKgA15wkO?=
- =?us-ascii?Q?Xrur/7E6mcx03xq8nfSAx/klBBbHtsejHvbj9ngErTfdBJ9zza4mwH4tqe8a?=
- =?us-ascii?Q?14PEPCdaeu5ZdIqkm7MxddqLtEKFi4qTQOWRUlcbc594G898+K+pjrx7JgDa?=
- =?us-ascii?Q?5CLEmXvl8pdnjdpV1zVOmz5q+mRDUvu402/ToULeGkcy3B227bcZvCh/FPq9?=
- =?us-ascii?Q?Bw=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a898300a-3c5a-4b34-4f77-08dc4449036b
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 17:05:56.2661
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ipe8ROyK0zwhB4i4BZDoqkZcOvQhGXsx3exShxCaTgrfc0oTLBwBz/q5I+XAEPq4IqjZUNRHnecjmu22AC4fjg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7573
+User-Agent: Mozilla Thunderbird
+Subject: Re: Energy Efficient Ethernet on MT7531 switch
+To: Daniel Golle <daniel@makrotopia.org>, =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?=
+ <arinc.unal@arinc9.com>
+Cc: Frank Wunderlich <frank-w@public-files.de>,
+ netdev <netdev@vger.kernel.org>
+References: <5f1f8827-730e-4f36-bc0a-fec6f5558e93@arinc9.com>
+ <ZfMQkL2iizhG96Wh@makrotopia.org>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <ZfMQkL2iizhG96Wh@makrotopia.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+On 14.03.2024 15:58, Daniel Golle wrote:
+> Hi,
+> 
+> On Thu, Mar 14, 2024 at 03:57:09PM +0300, Arınç ÜNAL wrote:
+>> Hi Frank.
+>>
+>> Do you have a board with an external PHY that supports EEE connected to an
+>> MT7531 switch?
+> 
+> Good to hear you are working on supporting EEE -- something which has
+> been neglected for too long imho.
+> 
+> I got a bunch of such boards, all of them with different generations
+> of RealTek RTL8226 or RTL8221 2.5G PHY which in theory supports EEE
+> but the PHY driver in Linux at this point does not support EEE.
+> 
 
-On Tue, 12 Mar, 2024 16:53:46 -0700 Jakub Kicinski <kuba@kernel.org> wrote:
-> On Sat,  9 Mar 2024 00:44:35 -0800 Rahul Rameshbabu wrote:
->> Multiple network devices that support hardware timestamping appear to have
->> common behavior with regards to timestamp handling. Implement common Tx
->> hardware timestamping statistics in a tx_stats struct_group. Common Rx
->> hardware timestamping statistics can subsequently be implemented in a
->> rx_stats struct_group for ethtool_ts_stats.
->
->>  Documentation/netlink/specs/ethtool.yaml | 20 +++++++++
->>  include/linux/ethtool.h                  | 21 ++++++++++
->>  include/uapi/linux/ethtool_netlink.h     | 15 +++++++
->>  net/ethtool/tsinfo.c                     | 52 +++++++++++++++++++++++-
->>  4 files changed, 107 insertions(+), 1 deletion(-)
->
-> Feels like we should mention the new stats somehow in 
-> Documentation/networking/ethtool-netlink.rst
->
->> diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
->> index 197208f419dc..f99b003c78c0 100644
->> --- a/Documentation/netlink/specs/ethtool.yaml
->> +++ b/Documentation/netlink/specs/ethtool.yaml
->> @@ -559,6 +559,21 @@ attribute-sets:
->>        -
->>          name: tx-lpi-timer
->>          type: u32
->> +  -
->> +    name: ts-stat
->> +    attributes:
->> +      -
->> +        name: pad
->> +        type: pad
->
-> You can remove the pad entry, and...
->
+With linux-next / net-next also 2.5G EEE should be configurable for these
+PHY's. Or what are you missing in the Realtek PHY driver?
 
-You need the pad to match with ETHTOOL_A_TS_STAT_PAD (which similar to
-other ethtool stats currently defined). Otherwise, you run into the
-following.... mm-stat and fec-stat are good examples.
-
-  [root@binary-eater-vm-01 linux-ethtool-ts]# ./tools/net/ynl/ethtool.py --show-time-stamping mlx5_1
-  Traceback (most recent call last):
-    File "/root/linux-ethtool-ts/tools/net/ynl/lib/ynl.py", line 598, in _decode
-      attr_spec = attr_space.attrs_by_val[attr.type]
-                  ~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
-  KeyError: 4
-
-  During handling of the above exception, another exception occurred:
-
-  Traceback (most recent call last):
-    File "/root/linux-ethtool-ts/./tools/net/ynl/ethtool.py", line 437, in <module>
-      main()
-    File "/root/linux-ethtool-ts/./tools/net/ynl/ethtool.py", line 333, in main
-      tsinfo = dumpit(ynl, args, 'tsinfo-get', req)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    File "/root/linux-ethtool-ts/./tools/net/ynl/ethtool.py", line 91, in dumpit
-      reply = ynl.dump(op_name, { 'header': {} } | extra)
-              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    File "/root/linux-ethtool-ts/tools/net/ynl/lib/ynl.py", line 873, in dump
-      return self._op(method, vals, [], dump=True)
-            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    File "/root/linux-ethtool-ts/tools/net/ynl/lib/ynl.py", line 858, in _op
-      rsp_msg = self._decode(decoded.raw_attrs, op.attr_set.name)
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    File "/root/linux-ethtool-ts/tools/net/ynl/lib/ynl.py", line 607, in _decode
-      subdict = self._decode(NlAttrs(attr.raw), attr_spec['nested-attributes'], search_attrs)
-                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-    File "/root/linux-ethtool-ts/tools/net/ynl/lib/ynl.py", line 601, in _decode
-      raise Exception(f"Space '{space}' has no attribute with value '{attr.type}'")
-  Exception: Space 'ts-stat' has no attribute with value '4'
-
->> +enum {
->> +	ETHTOOL_A_TS_STAT_UNSPEC,
->> +	ETHTOOL_A_TS_STAT_PAD,
+> However, as one of the SFP cages of the BPi-R3 is connected to the on-board
+> MT7531 switch port 5 this would provide the option to basically test EEE
+> with practically every PHY you could find inside an RJ-45 SFP module
+> (spoiler: you will mostly find Marvell 88E1111, and I don't see support for
+> EEE in neither the datasheet nor the responsible sub-driver in Linux).
+> 
+> So looks like we will have to implement support for EEE for either
+> RealTek's RTL8221B or the built-in PHYs of any of the MT753x, MT7621
+> or MT7988 switch first.
+> 
+>> I've stumbled across an option on the trap register of
+>> MT7531 that claims that EEE is disabled switch-wide by default after reset.
+>>
+>> I'm specifically asking for an external PHY because the MT7531 switch PHYs
+>> don't support EEE yet. But the MT753X DSA subdriver claims to support EEE,
+>> so the remaining option is external PHYs.
+>>
+>> It'd be great if you can test with and without this diff [1] and see if you
+>> see EEE supported on ethtool on a computer connected to the external PHY.
+>>
+>> Example output on the computer side:
+>>
+>> $ sudo ethtool --show-eee eno1
+>> EEE settings for eno1:
+>> 	EEE status: enabled - active
+>> 	Tx LPI: 17 (us)
+>> 	Supported EEE link modes:  100baseT/Full
+>> 	                           1000baseT/Full
+>> 	Advertised EEE link modes:  100baseT/Full
+>> 	                            1000baseT/Full
+>> 	Link partner advertised EEE link modes:  100baseT/Full
+>> 	                                         1000baseT/Full
+>>
+>> I'm also CC'ing Daniel and the netdev mailing list, if someone else would
+>> like to chime in.
+>>
+>> [1]
+>> diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+>> index b347d8ab2541..4ef3948d310d 100644
+>> --- a/drivers/net/dsa/mt7530.c
+>> +++ b/drivers/net/dsa/mt7530.c
+>> @@ -2499,6 +2499,8 @@ mt7531_setup(struct dsa_switch *ds)
+>>  	mt7531_ind_c45_phy_write(priv, MT753X_CTRL_PHY_ADDR, MDIO_MMD_VEND2,
+>>  				 CORE_PLL_GROUP4, val);
+>> +	mt7530_rmw(priv, MT7530_MHWTRAP, CHG_STRAP | EEE_DIS, CHG_STRAP);
 >> +
->> +	ETHTOOL_A_TS_STAT_TX_PKT,			/* array, u64 */
->> +	ETHTOOL_A_TS_STAT_TX_LOST,			/* array, u64 */
->> +	ETHTOOL_A_TS_STAT_TX_ERR,			/* array, u64 */
->
-> I don't think these are arrays.
->
->> +
->> +	/* add new constants above here */
->> +	__ETHTOOL_A_TS_STAT_CNT,
->> +	ETHTOOL_A_TS_STAT_MAX = (__ETHTOOL_A_TS_STAT_CNT - 1)
->> +
->> +};
+>>  	mt7531_setup_common(ds);
+>>  	/* Setup VLAN ID 0 for VLAN-unaware bridges */
+>> diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
+>> index 3c3e7ae0e09b..1b3e81f6c90e 100644
+>> --- a/drivers/net/dsa/mt7530.h
+>> +++ b/drivers/net/dsa/mt7530.h
+>> @@ -299,11 +299,15 @@ enum mt7530_vlan_port_acc_frm {
+>>  #define  MT7531_FORCE_DPX		BIT(29)
+>>  #define  MT7531_FORCE_RX_FC		BIT(28)
+>>  #define  MT7531_FORCE_TX_FC		BIT(27)
+>> +#define  MT7531_FORCE_EEE100		BIT(26)
+>> +#define  MT7531_FORCE_EEE1G		BIT(25)
+>>  #define  MT7531_FORCE_MODE		(MT7531_FORCE_LNK | \
+>>  					 MT7531_FORCE_SPD | \
+>>  					 MT7531_FORCE_DPX | \
+>>  					 MT7531_FORCE_RX_FC | \
+>> -					 MT7531_FORCE_TX_FC)
+>> +					 MT7531_FORCE_TX_FC | \
+>> +					 MT7531_FORCE_EEE100 | \
+>> +					 MT7531_FORCE_EEE1G)
+>>  #define  PMCR_LINK_SETTINGS_MASK	(PMCR_TX_EN | PMCR_FORCE_SPEED_1000 | \
+>>  					 PMCR_RX_EN | PMCR_FORCE_SPEED_100 | \
+>>  					 PMCR_TX_FC_EN | PMCR_RX_FC_EN | \
+>> @@ -457,6 +461,7 @@ enum mt7531_clk_skew {
+>>  #define  XTAL_FSEL_M			BIT(7)
+>>  #define  PHY_EN				BIT(6)
+>>  #define  CHG_STRAP			BIT(8)
+>> +#define  EEE_DIS			BIT(4)
+>>  /* Register for hw trap modification */
+>>  #define MT7530_MHWTRAP			0x7804
+>>
+>> Thanks a lot!
+>> Arınç
+>>
+> 
 
---
-Thanks,
-
-Rahul Rameshbabu
 
