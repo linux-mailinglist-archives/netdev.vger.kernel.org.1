@@ -1,227 +1,96 @@
-Return-Path: <netdev+bounces-79789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDE6C87B5FF
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 02:08:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0679287B623
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 02:40:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 406421F23C7A
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 01:08:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CA0E1C21B12
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 01:40:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0920F1C01;
-	Thu, 14 Mar 2024 01:08:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 001221A38DB;
+	Thu, 14 Mar 2024 01:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="RVpEq+Hp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SMBAH9b5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28075EDE;
-	Thu, 14 Mar 2024 01:08:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE92B1C01;
+	Thu, 14 Mar 2024 01:40:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710378518; cv=none; b=dcIZz9J1HnK6tOqCcZzcoZpe/ddtE1OP8SBHsmMHA/EEFZJllnT5x98sKnWQlGRegBc+LdoWtHQ/91OCemRlbOIv+4wDBguzsgSm4NPyAH3W1sqeuoEp0LUHaQgpSCff80h63eZn0nBr9UmWQff+LjAkdtV449rZ1pDOVbJ9mok=
+	t=1710380419; cv=none; b=AiCqvoLZE3I0BSajQVaAXUxx3GReEcHgqtoeTXltt1kQKLaO5CiKbScyYbeYQPMgEa31ecV69hk423mXal4W49eZ1r3JEbD2JUPorUl0mqDu/qVph9tjwsD77bfP5mZh6vjbicY+ab8AZlZmLUV7KnW94dccM+jNOh/5/OalXhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710378518; c=relaxed/simple;
-	bh=XqNCIJl1Pym9vDNVkzFsSokqMLu6sTnESCYzT4jHpwE=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QfDWfPYuL3UTPh2ioTHWbIpkoVNxtzV7Ctx7xA4+TXk5EG4Z29Kx6IeBUjHnpViUt6WNzTa22ZJ80bIAoV960/3V9DmAeOXb4OdeHxvLXyn9SPGDi+VQEbI7q4Ta3AWnO1ByWZP0S8Z/jkTf04hmesbaS0BleeyN0rzH48Esh2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=RVpEq+Hp; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42E0IwhC023009;
-	Thu, 14 Mar 2024 01:08:15 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding; s=qcppdkim1; bh=rQRn35i/5qzLHiCY5o+G
-	ISQnAwW/YE8efP7u3FbpzFo=; b=RVpEq+HpyKPsjpvIxDsmQZW1vrbEMfHwMheE
-	0dmfEqyoYFfWIWFnsqfeT0ORCNG4s6xgyYllhrSafkuzcHwxAwBmXqFEX0678UNw
-	024Fc0hr0iKQUY80scoQhHGTknm3He6+SC5XDTqnO/ahlruLGQwgJej+MlYuE8Mr
-	uZqwLbadJutG1tMK0x7XeNpmHpB4XI0HYtgoYhq0O4lWA5EM4bW3OwE/VXtTVJxe
-	QypvjZUOt7ZX7QszEGQ4bwlXAfpzJ4Cuvs1xqPaUiiPQdWOcIM3wHaxqvm+Nlj7f
-	OwjF3SIgIJF9C0LhUj3P0hf/A0wtTbOycmQWRfPWDlKZLpEpPg==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wu9xasw0f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Mar 2024 01:08:15 +0000 (GMT)
-Received: from pps.filterd (NALASPPMTA02.qualcomm.com [127.0.0.1])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 42E18DFP001876;
-	Thu, 14 Mar 2024 01:08:13 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by NALASPPMTA02.qualcomm.com (PPS) with ESMTPS id 3wu54qg6va-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Mar 2024 01:08:13 +0000
-Received: from NALASPPMTA02.qualcomm.com (NALASPPMTA02.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42E18DMo001870;
-	Thu, 14 Mar 2024 01:08:13 GMT
-Received: from hu-devc-lv-u20-a-new.qualcomm.com (hu-abchauha-lv.qualcomm.com [10.81.25.35])
-	by NALASPPMTA02.qualcomm.com (PPS) with ESMTPS id 42E18Dtp001869
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 14 Mar 2024 01:08:13 +0000
-Received: by hu-devc-lv-u20-a-new.qualcomm.com (Postfix, from userid 214165)
-	id 5838B220ED; Wed, 13 Mar 2024 18:08:13 -0700 (PDT)
-From: Abhishek Chauhan <quic_abchauha@quicinc.com>
-To: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        Martin KaFai Lau <martin.lau@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Daniel Borkmann <daniel@iogearbox.net>
-Cc: kernel@quicinc.com
-Subject: [PATCH net-next v2] Revert "net: Re-use and set mono_delivery_time bit for userspace tstamp packets"
-Date: Wed, 13 Mar 2024 18:08:13 -0700
-Message-Id: <20240314010813.1418521-1-quic_abchauha@quicinc.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1710380419; c=relaxed/simple;
+	bh=kvXW8liJ0/hpqok4m5hQ/AwKwmRwkWmG+mHGEV5qkwo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iXxIzqGSYz3sfIOFX2vdUInGxa5I0DP4kaxc8Wzm8ipXixLB6U3bXOaNqxYCL7POS8Dq+38N5RrIShn4ziE0bhBusc8QWoJS8asfVuIY5aTdVGGjgZEDo69BPfp8CiMrM0QBcK8lrIccITzjBKr8WqtgYYZkYtPYKGSHst4wJ5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SMBAH9b5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A17DC433F1;
+	Thu, 14 Mar 2024 01:40:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710380419;
+	bh=kvXW8liJ0/hpqok4m5hQ/AwKwmRwkWmG+mHGEV5qkwo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=SMBAH9b5wtLQ8UT/duFA0ybn2luz4k/pIhOxu+Hu7J1LIZVt9tb3/DH0/5LmG8XNL
+	 ysakWHAa8csntrrYqYGqHqJQTklfzFHnvV5P/K0G0TYqrfM1XgvUwf0tHyTW5+GXr2
+	 BjbnWnYlHfpHPxdf/WWjlbgUpUR3PKZH8vlGYeAELTQ+39oh/y2P/qId8WbMzu6eP7
+	 1YNI/e4zrYhf+6OYrM4Wv07wBDa9YLaPc53od3feVCc0J8+aTJW6FMVvQlIAmDxBK0
+	 M4JTXK912gHBrXztDRYFO40KGeZOI2jrWjXhYE8uYLOfuqEZIy/BSS8ir7PopJ5MAh
+	 Jfw4St0Ps8M+w==
+Date: Wed, 13 Mar 2024 18:40:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Cc: ahmed.zaki@intel.com, aleksander.lobakin@intel.com,
+ alexandre.torgue@foss.st.com, andrew@lunn.ch, corbet@lwn.net,
+ davem@davemloft.net, dtatulea@nvidia.com, edumazet@google.com,
+ gal@nvidia.com, hkallweit1@gmail.com, jacob.e.keller@intel.com,
+ jiri@resnulli.us, joabreu@synopsys.com, justinstitt@google.com,
+ kory.maincent@bootlin.com, leon@kernel.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, liuhangbin@gmail.com,
+ maxime.chevallier@bootlin.com, netdev@vger.kernel.org, pabeni@redhat.com,
+ paul.greenwalt@intel.com, przemyslaw.kitszel@intel.com,
+ rdunlap@infradead.org, richardcochran@gmail.com, saeed@kernel.org,
+ tariqt@nvidia.com, vadim.fedorenko@linux.dev, vladimir.oltean@nxp.com,
+ wojciech.drewek@intel.com
+Subject: Re: [PATCH RFC v2 1/6] ethtool: add interface to read Tx hardware
+ timestamping statistics
+Message-ID: <20240313184017.794a2044@kernel.org>
+In-Reply-To: <87h6h9bpm1.fsf@nvidia.com>
+References: <20240223192658.45893-1-rrameshbabu@nvidia.com>
+	<20240309084440.299358-1-rrameshbabu@nvidia.com>
+	<20240309084440.299358-2-rrameshbabu@nvidia.com>
+	<20240312165346.14ec1941@kernel.org>
+	<87le6lbqsa.fsf@nvidia.com>
+	<20240313174107.68ca4ff1@kernel.org>
+	<87h6h9bpm1.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: ctpMd735h_uY3Tz4OX2vPJ6d44L9xKoS
-X-Proofpoint-GUID: ctpMd735h_uY3Tz4OX2vPJ6d44L9xKoS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-13_11,2024-03-13_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1015
- lowpriorityscore=0 impostorscore=0 adultscore=0 mlxlogscore=999 mlxscore=0
- priorityscore=1501 phishscore=0 malwarescore=0 bulkscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2402120000
- definitions=main-2403140004
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-This reverts commit 30bb896b98fce7d823a96fc02cd69be30384a5cc.
-The patch currently broke the bpf selftest test_tc_dtime because
-uapi field __sk_buff->tstamp_type depends on skb->mono_delivery_time which
-does not necessarily mean mono with the original fix as the bit was re-used
-for userspace timestamp as well to avoid tstamp reset in the forwarding 
-path. To solve this we need to keep mono_delivery_time as ease and 
-introduce another bit called user_delivery_time and fall back to the 
-initial proposal of setting the user_delivery_time bit based on 
-sk_clockid set from userspace.
+On Wed, 13 Mar 2024 17:50:39 -0700 Rahul Rameshbabu wrote:
+> > Should we give some guidance to drivers which "ignore" time stamping
+> > requests if they used up all the "slots"? Even if just temporary until
+> > they are fixed? Maybe we can add after all the fields something like:
+> >
+> >   For drivers which ignore further timestamping requests when there are
+> >   too many in flight, the ignored requests are currently not counted by
+> >   any of the statistics.  
+> 
+> I was actually thinking it would be better to merge them into the error
+> counter temporarily. Reason being is that in the case Intel notices that
+> their slots are full, they just drop traffic from my understanding
+> today. If the error counters increment in that situation, it helps with
+> the debug to a degree. EBUSY is an error in general.
 
-Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
-Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
----
-Changes since v1
-- Took care of Jakub's comment to explain more about the 
-  revert commit 
-- Added Link to the discussion of the problem found in the 
-  original commit. 
-
- include/linux/skbuff.h | 6 +++---
- net/ipv4/ip_output.c   | 1 -
- net/ipv4/raw.c         | 1 -
- net/ipv6/ip6_output.c  | 2 +-
- net/ipv6/raw.c         | 2 +-
- net/packet/af_packet.c | 4 +---
- 6 files changed, 6 insertions(+), 10 deletions(-)
-
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 4726298d4ed4..2dde34c29203 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -817,9 +817,9 @@ typedef unsigned char *sk_buff_data_t;
-  *	@decrypted: Decrypted SKB
-  *	@slow_gro: state present at GRO time, slower prepare step required
-  *	@mono_delivery_time: When set, skb->tstamp has the
-- *		delivery_time in mono clock base (i.e., EDT) or a clock base chosen
-- *		by SO_TXTIME. If zero, skb->tstamp has the (rcv) timestamp at
-- *		ingress.
-+ *		delivery_time in mono clock base (i.e. EDT).  Otherwise, the
-+ *		skb->tstamp has the (rcv) timestamp at ingress and
-+ *		delivery_time at egress.
-  *	@napi_id: id of the NAPI struct this skb came from
-  *	@sender_cpu: (aka @napi_id) source CPU in XPS
-  *	@alloc_cpu: CPU which did the skb allocation.
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index ff1df64c5697..5b5a0adb927f 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -1455,7 +1455,6 @@ struct sk_buff *__ip_make_skb(struct sock *sk,
- 	skb->priority = (cork->tos != -1) ? cork->priority: READ_ONCE(sk->sk_priority);
- 	skb->mark = cork->mark;
- 	skb->tstamp = cork->transmit_time;
--	skb->mono_delivery_time = !!skb->tstamp;
- 	/*
- 	 * Steal rt from cork.dst to avoid a pair of atomic_inc/atomic_dec
- 	 * on dst refcount
-diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
-index c4c29fc5b73f..aea89326c697 100644
---- a/net/ipv4/raw.c
-+++ b/net/ipv4/raw.c
-@@ -353,7 +353,6 @@ static int raw_send_hdrinc(struct sock *sk, struct flowi4 *fl4,
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = sockc->mark;
- 	skb->tstamp = sockc->transmit_time;
--	skb->mono_delivery_time = !!skb->tstamp;
- 	skb_dst_set(skb, &rt->dst);
- 	*rtp = NULL;
- 
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index 2fc1d03dc07d..a722a43dd668 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -1922,7 +1922,7 @@ struct sk_buff *__ip6_make_skb(struct sock *sk,
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = cork->base.mark;
- 	skb->tstamp = cork->base.transmit_time;
--	skb->mono_delivery_time = !!skb->tstamp;
-+
- 	ip6_cork_steal_dst(skb, cork);
- 	IP6_INC_STATS(net, rt->rt6i_idev, IPSTATS_MIB_OUTREQUESTS);
- 	if (proto == IPPROTO_ICMPV6) {
-diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
-index 13f54f8eea35..03dbb874c363 100644
---- a/net/ipv6/raw.c
-+++ b/net/ipv6/raw.c
-@@ -616,7 +616,7 @@ static int rawv6_send_hdrinc(struct sock *sk, struct msghdr *msg, int length,
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = sockc->mark;
- 	skb->tstamp = sockc->transmit_time;
--	skb->mono_delivery_time = !!skb->tstamp;
-+
- 	skb_put(skb, length);
- 	skb_reset_network_header(skb);
- 	iph = ipv6_hdr(skb);
-diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-index 0db31ca4982d..c9bbc2686690 100644
---- a/net/packet/af_packet.c
-+++ b/net/packet/af_packet.c
-@@ -2057,7 +2057,7 @@ static int packet_sendmsg_spkt(struct socket *sock, struct msghdr *msg,
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = READ_ONCE(sk->sk_mark);
- 	skb->tstamp = sockc.transmit_time;
--	skb->mono_delivery_time = !!skb->tstamp;
-+
- 	skb_setup_tx_timestamp(skb, sockc.tsflags);
- 
- 	if (unlikely(extra_len == 4))
-@@ -2586,7 +2586,6 @@ static int tpacket_fill_skb(struct packet_sock *po, struct sk_buff *skb,
- 	skb->priority = READ_ONCE(po->sk.sk_priority);
- 	skb->mark = READ_ONCE(po->sk.sk_mark);
- 	skb->tstamp = sockc->transmit_time;
--	skb->mono_delivery_time = !!skb->tstamp;
- 	skb_setup_tx_timestamp(skb, sockc->tsflags);
- 	skb_zcopy_set_nouarg(skb, ph.raw);
- 
-@@ -3065,7 +3064,6 @@ static int packet_snd(struct socket *sock, struct msghdr *msg, size_t len)
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = sockc.mark;
- 	skb->tstamp = sockc.transmit_time;
--	skb->mono_delivery_time = !!skb->tstamp;
- 
- 	if (unlikely(extra_len == 4))
- 		skb->no_fcs = 1;
--- 
-2.25.1
-
+That works, too, let's recommend it (FWIW no preference whether
+in the entry for @err or somewhere separately in the kdoc).
 
