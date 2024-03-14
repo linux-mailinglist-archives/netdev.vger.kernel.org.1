@@ -1,315 +1,195 @@
-Return-Path: <netdev+bounces-79827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5399E87BA85
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 10:35:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F412F87BAA6
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 10:47:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77C081C223E5
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 09:35:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5EFA282A35
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 09:47:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 043576CDC6;
-	Thu, 14 Mar 2024 09:34:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E69A6CDD7;
+	Thu, 14 Mar 2024 09:47:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WcW+0gAd"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="emdThMpl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F15CF6CDB9;
-	Thu, 14 Mar 2024 09:34:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710408860; cv=none; b=AIbMq84zrFTR96n4F3goU0peOrCcoRPUXhNBV13jzSFQ2YnUOMeB3k374auZb1yhsoOrlk+E7rSnJyVhbPHvuWl95A3AzOn0BNqZJfwZ5DI2ULMEatBN/zHAftw+hz4j3BI9REGtm7ut7vm/caG7yKyl3e3SelwapED4BO0bQNo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710408860; c=relaxed/simple;
-	bh=TtKloTKt+vs+msYtMieSZFtif9thqlkEzEJDwxV3fD4=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EGOxhAk+9Aec4w8zUVAJW0rUORewTlAZZQGH5J/Qhb5VvcnoQMgl95pgM6U+5B37/cgQhg9Xy36ombUMykJwMr81CZlvaEVImxURL8bsmheVHzXwN9W8U1La7eDoLixLWp+KBXg5/AqO2IUfa+XJyuV4AnWaX1ll8j0JhVZE098=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WcW+0gAd; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-563bb51c36eso920942a12.2;
-        Thu, 14 Mar 2024 02:34:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710408857; x=1711013657; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ILGaGiWtB+vOVzUENmPA1Ty/XwZ6Aazho4HgWe5ZzyU=;
-        b=WcW+0gAdi8Rvzr+iBcbNs6kSqpDXzqp3FkBEEtq+iU9ySlJSK/WFSXd5W+UkGmeNY/
-         8zU0OriN50s2dHUoYJV+AWym30cd5LV1Y2wYRrBCKg/LGAiBMOsMlnuPx9fjaKAIWU0p
-         1zXbAmD6ZUm4vMpwOBNCYVo6c4iXSrzHWzNzh2g1JXakZFvR2jwlwwPLorcIzUtXoGZZ
-         0ppbbfjxuAfwU4L1ar0XSRZooQgUcp3AK1rmRlxFJivlpL9SvBO6Q6B3bn1UWor9SOdW
-         oOPw4Gv+a9KVzRJbl/1VJV+qt+AV7nBccjI86DDcNeGRwdVS640ZtGaQFlFeqhT9RpyU
-         IdrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710408857; x=1711013657;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ILGaGiWtB+vOVzUENmPA1Ty/XwZ6Aazho4HgWe5ZzyU=;
-        b=UuKoeCjmQ3D/pzHpmf2GkuA+JnLf/QMtZW8J0uFXRsx7CYGzGYeYL2ZmgHS56lDYR0
-         DS44TmYRLoW0a8LswtJSrMI2vWFHLPcVMO4LzCNdHSMVN9IMXNGcBOgUmpWkxeoiO2qf
-         YK3XU+v817vAe/D4Ao8T85mlJkokbYM9YhZy/CslcuXCQmMQD5oO+OhPvDej4NG1Pwhc
-         MfAHXfqbuhrpWD1ryYzbz+L8Xg9+UHbmR6Bs5c7wOJNffj4llyviHkdr99CaiIoUOazx
-         J0ZUBbpRQTq4uZ96tu1S3t+EVNtZR8RojuTm+L62dzYK2rCiy+M4j8KB9b/myvPSNSDX
-         8T0Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVd7rzmpUiZWPpwcQIBZtLXIYcoHT7Mf2M7xe5QjRNuSmglvgjeZp3KwyG/IpvpCuV5mnG47ryckAbjYP3xAFvRzXrGT0TtkuVf3agiGVBJ3yA3DeLH8bF/a62Exv/yGGxSBzsqd4YTp/PJhst4IcZWU8xmu0wYYrJ2S5cZ50PkDyQEbAV9Cr1incj/oIXdJc4au0SY6w==
-X-Gm-Message-State: AOJu0Yxok9vGQ6ep5kh9Y2XAo3OxP6drIn/oTu9HREwx85KbJbPL8u2j
-	GI2lNsRLiQh5MMj31FR7UHdWyRPqaJ9wcWuEwFDosSG2K9NAtrKW
-X-Google-Smtp-Source: AGHT+IGeBKAZGfED4yLU+s/SkX31e8txpco9w0bZDKwjtjSw0/E6W4u0ke9VKjBtP2eTZfLI2egvNg==
-X-Received: by 2002:a05:6402:1f13:b0:567:564f:5bd8 with SMTP id b19-20020a0564021f1300b00567564f5bd8mr633655edb.32.1710408857084;
-        Thu, 14 Mar 2024 02:34:17 -0700 (PDT)
-Received: from pc636 (host-87-9-234-71.retail.telecomitalia.it. [87.9.234.71])
-        by smtp.gmail.com with ESMTPSA id 6-20020a0564021f4600b005682a0e915fsm521510edz.76.2024.03.14.02.34.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Mar 2024 02:34:16 -0700 (PDT)
-From: Uladzislau Rezki <urezki@gmail.com>
-X-Google-Original-From: Uladzislau Rezki <urezki@pc636>
-Date: Thu, 14 Mar 2024 10:34:14 +0100
-To: Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
-	Networking <netdev@vger.kernel.org>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Next Mailing List <linux-next@vger.kernel.org>,
-	"Uladzislau Rezki (Sony)" <urezki@gmail.com>
-Subject: Re: linux-next: manual merge of the bpf-next tree with the mm-stable
- tree
-Message-ID: <ZfLElrAT3RMLuWdB@pc636>
-References: <20240307123619.159f1c4c@canb.auug.org.au>
- <20240313105117.699dc720@canb.auug.org.au>
- <20240314093012.3dba692a@canb.auug.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D09726CDD3
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 09:47:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710409675; cv=fail; b=Hqf5IaUyvJRoq93Uo4iTfM4Al5hqiyDv3CC9fZsbAbM7ufiYMlUfmKcBSK8rpE7HNYLyzcpX0sUB5SyUpi4Yi0ZmjQjtk3SmnX6D8HytzDHP1WiYCuCrepg0jw3+SkYpMFFazqqB4/9/h1xBhy6Br+kvKorTbOg/fAMlxVd799k=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710409675; c=relaxed/simple;
+	bh=dkAuOXLEihjYJIiglYimeraCVa4Q7M4TKgyoMj9hJck=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=mZcwrxxjF/fWEplgwFipbG/qpKbmlyP2b8P5o9kgkt/43aLvURLURvcJRCC0UmgNHhNf11VvPj/LeCSDqzGb8QPFnLS0sxynBwBgB52wt3PKbsq7x5VlrjOWirQR0NwPfDLcPZ5FTYJrDgiRVzKtF/pWTUAOXWJIPywcCYex0f0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=emdThMpl; arc=fail smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710409673; x=1741945673;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=dkAuOXLEihjYJIiglYimeraCVa4Q7M4TKgyoMj9hJck=;
+  b=emdThMplwLSehTIgPv7V0PUqP4n8ExyGwtz8joz4nWz8QtYTugFVna7M
+   WmroMDrGZumHX2QwY+7Fz5i1QLpZX0bqgWmHHxR2poYOvWRWcf4gi/844
+   6Fr4UfPzOEMisXfl/aBx/DXYpK+TKW6OJQYUq4nfMp0nlKFtpHl79cyyQ
+   zdbP6hQ40Yn9WJfY2R/JI3i7spUD4mzknvCRPBIXmpuxCRTdQ/5sHgI0O
+   mfWPYpk9mwwqgzDD3wUFPXPYsfGiRvqvlDrR7uaDdh0glPDWBBMK1F6Qe
+   Rxo7uuAwiUGuu2rC/ny8rEUrjlSedBXZIJy98U4xa1GlkbFPaDJpLqlsd
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11012"; a="5069087"
+X-IronPort-AV: E=Sophos;i="6.07,125,1708416000"; 
+   d="scan'208";a="5069087"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 02:47:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,125,1708416000"; 
+   d="scan'208";a="12626848"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 14 Mar 2024 02:47:52 -0700
+Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Mar 2024 02:47:51 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 14 Mar 2024 02:47:50 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Thu, 14 Mar 2024 02:47:50 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Thu, 14 Mar 2024 02:47:50 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=RnsIKjnFewnZyIq0PhphaoYISgVtFvgDy9ispRkto7gUJWiFO34F/5+x85+v1VOAI6r29ZV50zSBI379bOqC33SoT5L1cXHAsCeZ9ldN+PINaw2193Cb/UrJ7Ni3mVbYedYVr6rkTosh+QWZ7UGYlsHxe5iVl5sIwLzzqs/1Ryv1gkzPib8S9z69/craqTeVxYlkw36yVn91TBx+GYobJcBwGv7ADZ7JKc9vZhGEgz5NmItzszQ5ndt8nTYIi+sWeJgDdh+Ouso8NHc6rvG2Ea3KFQ1SrT4JNG1PP9sD1carot54G7tMCKjPao2BPgwQTW2y8PDu2kZWIKJZTHpBQg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RF2S56FcOSSCJPoZHxhevHWQeF4+JE51rQLPCwcetwk=;
+ b=Um/9ShxktpjmgEiWU7+eoBNRRJ2CA4isTPdjB6oNxxvtaEHfvUOT37E6KAQSqjyuml3y3abRIDC+bkRtPLOrVuJ2hjbB+JbWAQ5nDhJ4mU3P6b/01hhUeD8vP939yRlNp9xRSqcH3iDgtvWwKMWERAKKQrSM7Tvs6j2j41BGb4kfOxt5Dvr89RnUCGogtGhl7KPpZTZ65rXNUD39YfSuAiJaXDoYmX29j/olkmEr1BdcRKHo5H1B8SZ2bZSGmwuji5UsLjpKCONAG2Ju3LXX3IVZ5P6zLzqMUjzfFZm8JRMn4IBxwucW+eKvBH4uGClxnExRgJgcMgWZbiVuL+th1g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CY5PR11MB6392.namprd11.prod.outlook.com (2603:10b6:930:37::15)
+ by SN7PR11MB8066.namprd11.prod.outlook.com (2603:10b6:806:2df::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.20; Thu, 14 Mar
+ 2024 09:47:48 +0000
+Received: from CY5PR11MB6392.namprd11.prod.outlook.com
+ ([fe80::7118:c3d4:7001:cf9d]) by CY5PR11MB6392.namprd11.prod.outlook.com
+ ([fe80::7118:c3d4:7001:cf9d%6]) with mapi id 15.20.7386.017; Thu, 14 Mar 2024
+ 09:47:48 +0000
+Date: Thu, 14 Mar 2024 17:41:02 +0800
+From: Yujie Liu <yujie.liu@intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+CC: kernel test robot <lkp@intel.com>, <jcmvbkbc@gcc.gnu.org>,
+	<oe-kbuild-all@lists.linux.dev>, <netdev@vger.kernel.org>, Herve Codina
+	<herve.codina@bootlin.com>
+Subject: Re: [net-next:main 4/19] WARNING: modpost: vmlinux: section mismatch
+ in reference: bitmap_copy_clear_tail+0x58 (section: .text.unlikely) ->
+ __setup_str_initcall_blacklist (section: .init.rodata)
+Message-ID: <ZfLGLmb3QAsIGlbB@yujie-X299>
+References: <202403121032.WDY8ftKq-lkp@intel.com>
+ <ZfH85ScHmojydKlw@smile.fi.intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <ZfH85ScHmojydKlw@smile.fi.intel.com>
+X-ClientProxiedBy: SI2P153CA0032.APCP153.PROD.OUTLOOK.COM
+ (2603:1096:4:190::23) To CY5PR11MB6392.namprd11.prod.outlook.com
+ (2603:10b6:930:37::15)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240314093012.3dba692a@canb.auug.org.au>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR11MB6392:EE_|SN7PR11MB8066:EE_
+X-MS-Office365-Filtering-Correlation-Id: 295a5418-f47e-4f7b-9233-08dc440bcee8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: +RaYDjHqmKkd1ihOGx/e9fglCv3hwbY/wfcHlruyOOckXtxqzjbzzsqp4JxQ1tv1dGMEPdMFYVPWU1/tFX1NpWUoi+VCIcr/xZLgNtySGZ62Ig0Ici6E4101HKSM5Pxppc3LIiSGWLiTgeAV6XeqbicCGasIRy8NNgnflHfb1SZMXy8uaG5qyFV3lFof8OGIjSH8udYwiYdvDwm/EbvCqgisX7ZjAI3+RSuTIQEJcwEstiUukFUfC5lcZmNL2lFH/P6sK1FN+rnXqEn7qaEjEu814CZ0iu6cKsSj7enL3bbRPPTs6e48zu7Z2pLcchh/mIJSnVcODvmpuy+/4rtyHHPaY6Ti1XyKUEKt1/KcMOONwJGEGwIpkqh6x4YDdzyDhAatdnftYFNeve65e9IuEB07dYlcDarhERP2UnODfPQbvj00dbOwIhRoAnZm9tR9NyyquMqV92pWa57WppJfiPZ2O9/LRZRIGx45Q+mBK42RN/KAOaks++CUOBy4/eRYGilzzFlq8gkJ5un7hbJP/qDuhu0znMGNNguWD3H3Np0w7YW0GJQ6+h5L5jc5LCoJ5dM2+RZymffCKt+8L83mSEbkwvGs3tYT7/TkZYPYFXLFZS4xdWReds0AE7gFxn39
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR11MB6392.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?0+oZorGvbPK2VWzL1c7mQXEwNjw/8m1o+8eoTirxiw+K4DQZtQF/P0clUYu5?=
+ =?us-ascii?Q?uVkSp3UbE5vbwTHAJvxWvcFcFnkv25otnXenOOiOA+QmNSv+uZ++DeY63ts3?=
+ =?us-ascii?Q?B0eHQ7ItUu2rayqd/8HTRhWykY2VJv03wLpPDuWnWUKXEmSJd4O/VZHNuEoq?=
+ =?us-ascii?Q?NfF7SJ1w+nkQ7bZEy0gdnbRsVHmamIwj0pQsEJHqULGjT3whFOsRGAeTHFB6?=
+ =?us-ascii?Q?UvqaUD5eGy8KryVchyxDVp6yImg34aLJ+RwoEy4CKfIwzqMYAX4ysIbWarOg?=
+ =?us-ascii?Q?S2O7xLYfZnVkCU7p2yrjBfrjeV/zgE1vuYU70Rg+EX+N/gqTrRVxzAw0RlYi?=
+ =?us-ascii?Q?qTEc5/aZCjMIdQbty7h/e+nfZZHEwsRswUx7Ep/fuREdAPc0Pyds7qTPF6iC?=
+ =?us-ascii?Q?vTTJ4GhKEhNXk1rDTvvBfFfvDNqvJ6ZoyrsXopfmLz4J5InBXrZgK6zGr05u?=
+ =?us-ascii?Q?Hft+Yc3yxolZs0WgxGwl3z4+C+aXEJsOMz/Xx+HrWJYchAoqAKWDtgyZUii2?=
+ =?us-ascii?Q?Kw5cGfiPz+U6f0m733t4TJBtTuw+q3qllwHNZTCFHiYNqUiTo7xlkLP92bHa?=
+ =?us-ascii?Q?Wb1CBE3i+GOHLQy8i3v/qQvKySzICZJdIF/uRfwE7sDnDkc1Kpr7/PdgESqU?=
+ =?us-ascii?Q?KicD0EO6ipZI2207cAEP7WbOAm1On4+pA920ADbyFOmjJpJljQLhtdVI2wmU?=
+ =?us-ascii?Q?IMlaiwyg1iWoaQtZMQaSOIWgVgSj+I19F0yG1thLV/5e4KqBy1/TRuOxFIGT?=
+ =?us-ascii?Q?TU52Hopeb6yL06jjsJ/fWylKb0/KfE5/6vZ9GvvOxYpWGfe2ktA+2Z8+t8tS?=
+ =?us-ascii?Q?TdQXY+b9DA6oaUIb+7Q3JdjkbixFTfMDd+ij5AXvnsfkrwZIFNDzcKCDh4hS?=
+ =?us-ascii?Q?/AI6S1yDcuWYevujhyV3Upy7tF5r2YTFg19nKOgoRmt14/lp+YZhvpjcHDvu?=
+ =?us-ascii?Q?SK4Y87cc7WZyq5uGD/E4O+u2figcwyFmQFVn2Qmlb5vAqZqjYyQvETk7Fh0u?=
+ =?us-ascii?Q?IKz+iXIWZ6RWprvSy33YAyTaQ9GUN0jmGCH/MPHujVC8bL3os9Duo+CXrixg?=
+ =?us-ascii?Q?lkkTScY3zTPnA82k6VcTzWkQn/1m6Z4I8wtoGdu1BiCzVzsIikIUmmjiTcjX?=
+ =?us-ascii?Q?yqiuOJtfFehkEimDI0LWg/+x0G6yTmHr2CfYkCyKOVvBcF3wNhbMkiX6SJSu?=
+ =?us-ascii?Q?8csnAmPpo9uLG4cKGyFxqRcipPxSK7JIgqjHv2azdtcEy+N4wMn0qshyJE4Z?=
+ =?us-ascii?Q?5JSJf9JIDHglgKrp50b/m6tdrn0PGCl2rQ1f0+X13OG1V/qLuN5ZNY0V/Aog?=
+ =?us-ascii?Q?KOZ9EGzWTjlzfQwj10fnf+P2fRu8HQTLd4sle7+ULfbqGF1HY7rdbIPPoXd7?=
+ =?us-ascii?Q?dYK+K1mYf2wyKlPvfJ0/3LamHHU6Jhg5AjjqFmyPPEEOhc+CrT/dJwbCZiqf?=
+ =?us-ascii?Q?rLzwzp28L21RtcdBNJ1g7ZwfkwlGOk+k+r/vACLLVLguPF2WgNjILSrIHGHC?=
+ =?us-ascii?Q?R8a3Dd0qdOgVXpokjA4Rt6eco4AJwxNUn/8+D2TPpVzD8CUVhKatg9+Xj3ss?=
+ =?us-ascii?Q?qR+hsiGjSLwQ3YiLvKUAhjlsyUXJ+pexpDK7/p2X?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 295a5418-f47e-4f7b-9233-08dc440bcee8
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR11MB6392.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 09:47:48.7411
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1O/20AbPPSByzVUqq9y0IChR0WaYRa7s+BGRCr+AJKoxC8L8bPOttoZRr//gmnZ/T9NTlnNKPWbL4RzwHsVrsw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB8066
+X-OriginatorOrg: intel.com
 
-> Hi all,
-> 
-> On Wed, 13 Mar 2024 10:51:17 +1100 Stephen Rothwell <sfr@canb.auug.org.au> wrote:
-> >
-> > On Thu, 7 Mar 2024 12:36:19 +1100 Stephen Rothwell <sfr@canb.auug.org.au> wrote:
-> > > 
-> > > Today's linux-next merge of the bpf-next tree got a conflict in:
-> > > 
-> > >   mm/vmalloc.c
-> > > 
-> > > between commit:
-> > > 
-> > >   8e1d743f2c26 ("mm: vmalloc: support multiple nodes in vmallocinfo")
-> > > 
-> > > from the mm-stable tree and commit:
-> > > 
-> > >   e6f798225a31 ("mm: Introduce VM_SPARSE kind and vm_area_[un]map_pages().")
-> > > 
-> > > from the bpf-next tree.
-> > > 
-> > > I fixed it up (I think - see below) and can carry the fix as necessary.
-> > > This is now fixed as far as linux-next is concerned, but any non trivial
-> > > conflicts should be mentioned to your upstream maintainer when your tree
-> > > is submitted for merging.  You may also want to consider cooperating
-> > > with the maintainer of the conflicting tree to minimise any particularly
-> > > complex conflicts.
-> > > 
-> > > 
-> > > diff --cc mm/vmalloc.c
-> > > index 25a8df497255,e5b8c70950bc..000000000000
-> > > --- a/mm/vmalloc.c
-> > > +++ b/mm/vmalloc.c
-> > > @@@ -4755,81 -4423,70 +4820,84 @@@ static void show_numa_info(struct seq_f
-> > >   
-> > >   static void show_purge_info(struct seq_file *m)
-> > >   {
-> > >  +	struct vmap_node *vn;
-> > >   	struct vmap_area *va;
-> > >  +	int i;
-> > >   
-> > >  -	spin_lock(&purge_vmap_area_lock);
-> > >  -	list_for_each_entry(va, &purge_vmap_area_list, list) {
-> > >  -		seq_printf(m, "0x%pK-0x%pK %7ld unpurged vm_area\n",
-> > >  -			(void *)va->va_start, (void *)va->va_end,
-> > >  -			va->va_end - va->va_start);
-> > >  -	}
-> > >  -	spin_unlock(&purge_vmap_area_lock);
-> > >  -}
-> > >  +	for (i = 0; i < nr_vmap_nodes; i++) {
-> > >  +		vn = &vmap_nodes[i];
-> > >   
-> > >  -static int s_show(struct seq_file *m, void *p)
-> > >  -{
-> > >  -	struct vmap_area *va;
-> > >  -	struct vm_struct *v;
-> > >  -
-> > >  -	va = list_entry(p, struct vmap_area, list);
-> > >  -
-> > >  -	if (!va->vm) {
-> > >  -		if (va->flags & VMAP_RAM)
-> > >  -			seq_printf(m, "0x%pK-0x%pK %7ld vm_map_ram\n",
-> > >  +		spin_lock(&vn->lazy.lock);
-> > >  +		list_for_each_entry(va, &vn->lazy.head, list) {
-> > >  +			seq_printf(m, "0x%pK-0x%pK %7ld unpurged vm_area\n",
-> > >   				(void *)va->va_start, (void *)va->va_end,
-> > >   				va->va_end - va->va_start);
-> > >  -
-> > >  -		goto final;
-> > >  +		}
-> > >  +		spin_unlock(&vn->lazy.lock);
-> > >   	}
-> > >  +}
-> > >   
-> > >  -	v = va->vm;
-> > >  +static int vmalloc_info_show(struct seq_file *m, void *p)
-> > >  +{
-> > >  +	struct vmap_node *vn;
-> > >  +	struct vmap_area *va;
-> > >  +	struct vm_struct *v;
-> > >  +	int i;
-> > >   
-> > >  -	seq_printf(m, "0x%pK-0x%pK %7ld",
-> > >  -		v->addr, v->addr + v->size, v->size);
-> > >  +	for (i = 0; i < nr_vmap_nodes; i++) {
-> > >  +		vn = &vmap_nodes[i];
-> > >   
-> > >  -	if (v->caller)
-> > >  -		seq_printf(m, " %pS", v->caller);
-> > >  +		spin_lock(&vn->busy.lock);
-> > >  +		list_for_each_entry(va, &vn->busy.head, list) {
-> > >  +			if (!va->vm) {
-> > >  +				if (va->flags & VMAP_RAM)
-> > >  +					seq_printf(m, "0x%pK-0x%pK %7ld vm_map_ram\n",
-> > >  +						(void *)va->va_start, (void *)va->va_end,
-> > >  +						va->va_end - va->va_start);
-> > >   
-> > >  -	if (v->nr_pages)
-> > >  -		seq_printf(m, " pages=%d", v->nr_pages);
-> > >  +				continue;
-> > >  +			}
-> > >   
-> > >  -	if (v->phys_addr)
-> > >  -		seq_printf(m, " phys=%pa", &v->phys_addr);
-> > >  +			v = va->vm;
-> > >   
-> > >  -	if (v->flags & VM_IOREMAP)
-> > >  -		seq_puts(m, " ioremap");
-> > >  +			seq_printf(m, "0x%pK-0x%pK %7ld",
-> > >  +				v->addr, v->addr + v->size, v->size);
-> > >   
-> > >  -	if (v->flags & VM_SPARSE)
-> > >  -		seq_puts(m, " sparse");
-> > >  +			if (v->caller)
-> > >  +				seq_printf(m, " %pS", v->caller);
-> > >   
-> > >  -	if (v->flags & VM_ALLOC)
-> > >  -		seq_puts(m, " vmalloc");
-> > >  +			if (v->nr_pages)
-> > >  +				seq_printf(m, " pages=%d", v->nr_pages);
-> > >   
-> > >  -	if (v->flags & VM_MAP)
-> > >  -		seq_puts(m, " vmap");
-> > >  +			if (v->phys_addr)
-> > >  +				seq_printf(m, " phys=%pa", &v->phys_addr);
-> > >   
-> > >  -	if (v->flags & VM_USERMAP)
-> > >  -		seq_puts(m, " user");
-> > >  +			if (v->flags & VM_IOREMAP)
-> > >  +				seq_puts(m, " ioremap");
-> > >   
-> > >  -	if (v->flags & VM_DMA_COHERENT)
-> > >  -		seq_puts(m, " dma-coherent");
-> > > ++			if (v->flags & VM_SPARSE)
-> > > ++				seq_puts(m, " sparse");
-> > > + 
-> > >  -	if (is_vmalloc_addr(v->pages))
-> > >  -		seq_puts(m, " vpages");
-> > >  +			if (v->flags & VM_ALLOC)
-> > >  +				seq_puts(m, " vmalloc");
-> > >   
-> > >  -	show_numa_info(m, v);
-> > >  -	seq_putc(m, '\n');
-> > >  +			if (v->flags & VM_MAP)
-> > >  +				seq_puts(m, " vmap");
-> > >  +
-> > >  +			if (v->flags & VM_USERMAP)
-> > >  +				seq_puts(m, " user");
-> > >  +
-> > >  +			if (v->flags & VM_DMA_COHERENT)
-> > >  +				seq_puts(m, " dma-coherent");
-> > >  +
-> > >  +			if (is_vmalloc_addr(v->pages))
-> > >  +				seq_puts(m, " vpages");
-> > >  +
-> > >  +			show_numa_info(m, v);
-> > >  +			seq_putc(m, '\n');
-> > >  +		}
-> > >  +		spin_unlock(&vn->busy.lock);
-> > >  +	}
-> > >   
-> > >   	/*
-> > >   	 * As a final step, dump "unpurged" areas.  
+Hi Andy,
+
+On Wed, Mar 13, 2024 at 09:22:13PM +0200, Andy Shevchenko wrote:
+> On Tue, Mar 12, 2024 at 10:29:16AM +0800, kernel test robot wrote:
+> > tree:   https://git.kernel.org/pub/scm/linux/kernel/git/davem/net-next.git main
+> > head:   f095fefacdd35b4ea97dc6d88d054f2749a73d07
+> > commit: de5f84338970815b9fdd3497a975fb572d11e0b5 [4/19] lib/bitmap: Introduce bitmap_scatter() and bitmap_gather() helpers
+> > config: xtensa-randconfig-001-20240311 (https://download.01.org/0day-ci/archive/20240312/202403121032.WDY8ftKq-lkp@intel.com/config)
+> > compiler: xtensa-linux-gcc (GCC) 13.2.0
+> > reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240312/202403121032.WDY8ftKq-lkp@intel.com/reproduce)
 > > 
-> > This is now a conflict between the net-next tree and the mm-stable tree.
+> > If you fix the issue in a separate patch/commit (i.e. not just a new version of
+> > the same patch/commit), kindly add following tags
+> > | Reported-by: kernel test robot <lkp@intel.com>
+> > | Closes: https://lore.kernel.org/oe-kbuild-all/202403121032.WDY8ftKq-lkp@intel.com/
+> > 
+> > All warnings (new ones prefixed by >>, old ones prefixed by <<):
+> > 
+> > WARNING: modpost: missing MODULE_DESCRIPTION() in vmlinux.o
+> > WARNING: modpost: vmlinux: section mismatch in reference: put_page+0x58 (section: .text.unlikely) -> initcall_level_names (section: .init.data)
+> > >> WARNING: modpost: vmlinux: section mismatch in reference: bitmap_copy_clear_tail+0x58 (section: .text.unlikely) -> __setup_str_initcall_blacklist (section: .init.rodata)
 > 
->  ... and now a conflict between te mm-stable tree and Linus' tree.
->
-If you need some help with resolving conflicts i can help. The problem
-to me looks like:
+> Reminds me of https://gcc.gnu.org/bugzilla/show_bug.cgi?id=92938
 
-<snip>
-commit d7bca9199a27b8690ae1c71dc11f825154af7234
-Author: Alexei Starovoitov <ast@kernel.org>
-Date:   Fri Mar 8 09:12:54 2024 -0800
+Thanks for the information. We will configure the bot to ignore this
+pattern thus to avoid false reports.
 
-    mm: Introduce vmap_page_range() to map pages in PCI address space
-
-commit e6f798225a31485e47a6e4f6aa07ee9fdf80c2cb
-Author: Alexei Starovoitov <ast@kernel.org>
-Date:   Mon Mar 4 19:05:16 2024 -0800
-
-    mm: Introduce VM_SPARSE kind and vm_area_[un]map_pages().
-
-commit 3e49a866c9dcbd8173e4f3e491293619a9e81fa4
-Author: Alexei Starovoitov <ast@kernel.org>
-Date:   Mon Mar 4 19:05:15 2024 -0800
-
-    mm: Enforce VM_IOREMAP flag and range in ioremap_page_range.
-<snip>
-
-those three patches were not based on linux-next and are currently
-in the Linus tree(bypassing mm-tree?). Whereas below work:
-
-mm: vmalloc: refactor vmalloc_dump_obj() function
-mm: vmalloc: improve description of vmap node layer
-mm: vmalloc: add a shrinker to drain vmap pools
-mm: vmalloc: set nr_nodes based on CPUs in a system
-mm: vmalloc: support multiple nodes in vmallocinfo
-mm: vmalloc: support multiple nodes in vread_iter
-mm: vmalloc: add a scan area of VA only once
-mm: vmalloc: offload free_vmap_area_lock lock
-mm: vmalloc: remove global purge_vmap_area_root rb-tree
-mm/vmalloc: remove vmap_area_list
-mm: vmalloc: remove global vmap_area_root rb-tree
-mm: vmalloc: move vmap_init_free_space() down in vmalloc.c
-mm: vmalloc: rename adjust_va_to_fit_type() function
-mm: vmalloc: add va_alloc() helper
-
-now should be based on Alexei Starovoitov base in order to resolve
-a small conflict.
-
-But you better know how to proceed. Just in case, if you need some
-support please let me know i can help with conflict resolving.
-
---
-Uladzislau Rezki
+Best Regards,
+Yujie
 
