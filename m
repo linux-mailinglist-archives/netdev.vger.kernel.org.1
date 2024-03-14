@@ -1,153 +1,131 @@
-Return-Path: <netdev+bounces-79921-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79923-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2792387C0BD
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 16:56:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EB0D87C0C8
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 16:59:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6475282BDC
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:56:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0C4F1C218FC
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 15:59:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72C3871B3C;
-	Thu, 14 Mar 2024 15:56:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d64tRXuD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744FD7317A;
+	Thu, 14 Mar 2024 15:59:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B30AE5C611
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 15:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63116EB74;
+	Thu, 14 Mar 2024 15:59:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710431803; cv=none; b=SHAqVV8cjRSWIWmh/OfR+dV5pYVNjxsCnPiYf63o4CDAvk3ZdrW1dpm3FiyqsNIpqW+G4D3sI8oaEegCXaP0VUTO7nIcUZVFO/0tdr1AnuAK5jzKDHS6QEkM4kl6Bp2Esk7MrGmG37o19tLawha9ZzJoboqROPK+zKSgB+tC+TA=
+	t=1710431993; cv=none; b=fRes4FBxBIt0NkAdOboqNDGwPsOiYzisq+WDKBxVqZIVvKetFsUtsSqXNG4WZ7fk/EVEGiSEmdlBBFe/n1DwFbKZeWrJg1mbuWRsce6HnpZE3Lzyh6oKvrws1kBPfAytnSitliVDkN26W3t7BiSKac/iGgkMR+i75MleB3ep0Mo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710431803; c=relaxed/simple;
-	bh=ZmI2FwtVxhizi/aVXNZmngvE2Mq9lBQj5crTBmeXYTE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Hskc4L7wWtalq8+N5hzgkmy4nHWWML/wP2GgrOI1q//+p0g9Y6ZTYQ4M+F82GzDSWJ1REZRfxanf60mGBpHsqR81Cc6eHN68EF+QxgiKxBpjUbSaSmWK2aS99Djk/rNJAU14sVDFZ05u5tNVmnwjGUofvPOuVpb7OMEdZCCo3GM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d64tRXuD; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710431800;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=raY59pnlJKW7cbwoKHkRYsm22tGbdRck+G1yUBJSQ7g=;
-	b=d64tRXuDN6XHFiI4n8x8ICrPy7EhNv5rzg+b6l/uq1Elh29R9kERPWbekKZ/C3SHO4+F7O
-	SnBRffSdqYbgOrAHpo3+2VF0t84fH4U2L9XyB3FuLiCh3ymj9ee23eiBm/vWf8wIfV8pRs
-	QM374J735GWdNZd5aFRUcqvajJ3KRvU=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-492--JNSKld4M-mdCvrX2dqwRw-1; Thu, 14 Mar 2024 11:56:38 -0400
-X-MC-Unique: -JNSKld4M-mdCvrX2dqwRw-1
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33e70016b4dso632687f8f.3
-        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 08:56:38 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710431797; x=1711036597;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=raY59pnlJKW7cbwoKHkRYsm22tGbdRck+G1yUBJSQ7g=;
-        b=Buu5bc38mTP6f52ewh2wNhiTAWUkkkqlx9b5HpbnJppmt93a2FbkKzTabxE5dW2IoB
-         F5PunkFbcAgObGzToOq4+nwdadWw3C2OIMbbMk4I85sNCLmX7NwOEEgbBhI22tTFd7qU
-         L0hJ3f6eYaO8bZOg+tFp7C0ckiRQSFXafe7XzMv5KIaw5kol02pU3gpHF9i1tih/hrxy
-         38rqxooxEm7ebcJ+W2/ErRra1M2SOftQGMk25OGKl30Gycm5H5pV3mxlepla6hJIyKby
-         yBPi6Fo2WhhVF1gv4/NoTPjeiJiv0TaEfo4YSRdkl0y8HCzLKar/HuMsG0O6Bo2J/hT2
-         jXEQ==
-X-Gm-Message-State: AOJu0Yw6mrv8NPOtbDHYKcHlpeJvLPUBx/Ku1ajES47U1iMshEEPZRfT
-	7HvBtEWvPo8r+kKD53lK0lwZbXPeRrFR99lsJzPh/3iPsuk46qIDuwRX9G+wc5Z64gwlQznq+Eu
-	LxWFF2vt9VcG+ZgDqvJYwLq0hMgQmmcnGs3bwZs1RP+3kyUafV9PiqQ==
-X-Received: by 2002:a5d:67c2:0:b0:33e:2a74:381c with SMTP id n2-20020a5d67c2000000b0033e2a74381cmr1489506wrw.71.1710431797570;
-        Thu, 14 Mar 2024 08:56:37 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG4x6eTU8teCC6CGJ52QOp8mBuUEuR7Eq2nl61GhPUb0gW3f0ZBDe+8DgwfB56vKRQvpNDc3Q==
-X-Received: by 2002:a5d:67c2:0:b0:33e:2a74:381c with SMTP id n2-20020a5d67c2000000b0033e2a74381cmr1489495wrw.71.1710431797184;
-        Thu, 14 Mar 2024 08:56:37 -0700 (PDT)
-Received: from [10.32.64.123] (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id d2-20020adfa402000000b0033e99b339a6sm1019851wra.62.2024.03.14.08.56.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 14 Mar 2024 08:56:36 -0700 (PDT)
-Message-ID: <bd03c79a-39e9-4eb0-97b2-4ded536f8eb4@redhat.com>
-Date: Thu, 14 Mar 2024 16:56:35 +0100
+	s=arc-20240116; t=1710431993; c=relaxed/simple;
+	bh=okaw4O3R57c6tEMT0TJSs1UtnZZCStffxFfDr2xlyHw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aeNHzxxsVnfkXCjyuZrVl9Yz4ZPzdStJRtSAp7dmCJ1Du41C1qBhU6mOltq7qPkTa/O0eJyh8Q6AeHY3mBOTCOUh3ghvnlLSdVXRlMZdXEA0ZLuBFj09hKbZSFheR37EzmMe2h0yZBVIxmPMxTwr7lESVOgnFc4oHEGSbu0jx7M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CCA7E1007;
+	Thu, 14 Mar 2024 09:00:25 -0700 (PDT)
+Received: from FVFF77S0Q05N (unknown [10.57.69.235])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 281FB3F762;
+	Thu, 14 Mar 2024 08:59:45 -0700 (PDT)
+Date: Thu, 14 Mar 2024 15:59:39 +0000
+From: Mark Rutland <mark.rutland@arm.com>
+To: Sagi Maimon <maimon.sagi@gmail.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>, richardcochran@gmail.com,
+	luto@kernel.org, datglx@linutronix.de, mingo@redhat.com,
+	bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org,
+	hpa@zytor.com, arnd@arndb.de, geert@linux-m68k.org,
+	peterz@infradead.org, hannes@cmpxchg.org, sohil.mehta@intel.com,
+	rick.p.edgecombe@intel.com, nphamcs@gmail.com, palmer@sifive.com,
+	keescook@chromium.org, legion@kernel.org, mszeredi@redhat.com,
+	casey@schaufler-ca.com, reibax@gmail.com, davem@davemloft.net,
+	brauner@kernel.org, linux-kernel@vger.kernel.org,
+	linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v7] posix-timers: add clock_compare system call
+Message-ID: <ZfMe66MfHBEfxrdd@FVFF77S0Q05N>
+References: <20240314090540.14091-1-maimon.sagi@gmail.com>
+ <87a5n1m5j1.ffs@tglx>
+ <CAMuE1bH_H9E+Zx365G9AtmWSmhW-kPPB+-=8s2rH4hpxqE+dHQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] hsr: Handle failures in module init
-Content-Language: en-US
-To: Breno Leitao <leitao@debian.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-References: <0b718dd6cc28d09fd2478d8debdfc0a6755a8895.1710410183.git.fmaurer@redhat.com>
- <ZfL0t5v3szkhEhiN@gmail.com>
-From: Felix Maurer <fmaurer@redhat.com>
-In-Reply-To: <ZfL0t5v3szkhEhiN@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAMuE1bH_H9E+Zx365G9AtmWSmhW-kPPB+-=8s2rH4hpxqE+dHQ@mail.gmail.com>
 
-On 14.03.24 13:59, Breno Leitao wrote:
-> On Thu, Mar 14, 2024 at 11:10:52AM +0100, Felix Maurer wrote:
->> A failure during registration of the netdev notifier was not handled at
->> all. A failure during netlink initialization did not unregister the netdev
->> notifier.
->>
->> Handle failures of netdev notifier registration and netlink initialization.
->> Both functions should only return negative values on failure and thereby
->> lead to the hsr module not being loaded.
->>
->> Signed-off-by: Felix Maurer <fmaurer@redhat.com>
->> ---
->>  net/hsr/hsr_main.c | 18 ++++++++++++++----
->>  1 file changed, 14 insertions(+), 4 deletions(-)
->>
->> diff --git a/net/hsr/hsr_main.c b/net/hsr/hsr_main.c
->> index cb83c8feb746..1c4a5b678688 100644
->> --- a/net/hsr/hsr_main.c
->> +++ b/net/hsr/hsr_main.c
->> @@ -148,14 +148,24 @@ static struct notifier_block hsr_nb = {
->>  
->>  static int __init hsr_init(void)
->>  {
->> -	int res;
->> +	int err;
->>  
->>  	BUILD_BUG_ON(sizeof(struct hsr_tag) != HSR_HLEN);
->>  
->> -	register_netdevice_notifier(&hsr_nb);
->> -	res = hsr_netlink_init();
->> +	err = register_netdevice_notifier(&hsr_nb);
->> +	if (err)
->> +		goto out;
-> 
-> Can't you just 'return err' here? And avoid the `out` label below?
-> 
->> +
->> +	err = hsr_netlink_init();
->> +	if (err)
->> +		goto cleanup;
-> 
-> Same here, you can do something like the following and remove the
-> all the labels below, making the function a bit clearer.
-> 
-> 	if (err) {
-> 		unregister_netdevice_notifier(&hsr_nb);
-> 		return err;
-> 	}
+On Thu, Mar 14, 2024 at 02:19:39PM +0200, Sagi Maimon wrote:
+> On Thu, Mar 14, 2024 at 1:12 PM Thomas Gleixner <tglx@linutronix.de> wrote:
+> > On Thu, Mar 14 2024 at 11:05, Sagi Maimon wrote:
+> > > +     if (crosstime_support_a) {
+> > > +             ktime_a = ktime_sub(xtstamp_a2.device, xtstamp_a1.device);
+> > > +             ts_offs_err = ktime_divns(ktime_a, 2);
+> > > +             ktime_a = ktime_add_ns(xtstamp_a1.device, (u64)ts_offs_err);
+> > > +             ts_a1 = ktime_to_timespec64(ktime_a);
+> >
+> > This is just wrong.
+> >
+> >      read(a1);
+> >      read(b);
+> >      read(a2);
+> >
+> > You _CANNOT_ assume that (a1 + ((a2 - a1) / 2) is anywhere close to the
+> > point in time where 'b' is read. This code is preemtible and
+> > interruptible. I explained this to you before.
+> >
+> > Your explanation in the comment above the function is just wishful
+> > thinking.
+> >
+> you explained it before, but still it is better then two consecutive
+> user space calls which are also preemptible
+> and the userspace to kernel context switch time is added.
 
-I usually follow the pattern with labels to make sure the cleanup is not
-forgotten later when extending the function. But there is likely not
-much change in the module init, I'll remove the labels in the next
-iteration.
+How much "better" is that in reality?
 
-Thanks,
-   Felix
+The time for a user<->kernel transition should be trivial relative to the time
+a task spends not running after having been preempted.
 
+Either:
+
+(a) Your userspace application can handle the arbitrary delta resulting from a
+    preemption, in which case the trivial cost shouldn't matter.
+
+    i.e. this patch *is not necessary* to solve your problem.
+
+(b) Your userspace application cannot handle the arbitrary delta resulting from
+    a preemption, in which case you need to do something to handle that, which
+    you haven't described at all.
+  
+    i.e. with the information you have provided so far, this patch is
+    *insufficient* to solve your problem.
+
+> > > + * In other cases: Read clock_a twice (before, and after reading clock_b) and
+> > > + * average these times – to be as close as possible to the time we read clock_b.
+> >
+> > Can you please sit down and provide a precise technical description of
+> > the problem you are trying to solve and explain your proposed solution
+> > at the conceptual level instead of throwing out random implementations
+> > every few days?
+
+100% agreed.
+
+Please, explain the actual problem you are solving here. What *specifically*
+are you trying to do in userspace with these values? "Synchronization" is too
+vague a description.
+
+Making what is already the best case *marginally better* without handling the
+common and worst cases is a waste of time. It doesn't actually solve the
+problem, and it misleads people into thinknig that a problem is solved when it
+is not.
+
+Mark.
 
