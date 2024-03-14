@@ -1,97 +1,110 @@
-Return-Path: <netdev+bounces-79869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C088387BCD3
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 13:31:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 70C2187BCE0
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 13:34:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79F2A28446C
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:31:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B1F6283C45
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 12:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F83A6FBB8;
-	Thu, 14 Mar 2024 12:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E4E32C85;
+	Thu, 14 Mar 2024 12:33:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GekcRJPi"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Bd4SJ205"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05BCA6F53D;
-	Thu, 14 Mar 2024 12:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176FA2581;
+	Thu, 14 Mar 2024 12:33:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710419429; cv=none; b=CPHaz6x5CHQ8J27LkdBU+aXc9ma/aUQppHe5jU49jAcYlOoA8VvWdJcAS4LT7jIz61eyMwzTx9D4Hs5Nsc1RCnHSeDIbwm8ffAvBw8IUHK0VgGoy4heQEkHW//Bc94UhrzJnNZi1t8suqOKqe9V8cawE0fN3/nmkYQgCm8eFSUc=
+	t=1710419637; cv=none; b=oONlBMo4Kt2O6S1I2NbrHOIYHoA26Z52I9qbwNtlrfCIsU1bmqleNb2qcv/ldULnTvOPyALUgIxvzWImxQKpwuyRoOua3sW0pRgWRus9Y/TbO8WMi3czTVCWpNhfKxv8ow8t5wH7DzdPlOeI8F8Rv0nZkQCxPr9s9TswiXmn12g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710419429; c=relaxed/simple;
-	bh=J2RgDspDz9zB2B0ZFrAgSC1an1n2rKhxw3KOCcNPe7Y=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=OLjeCOGxUziMEdwzgvrFjEcPvqQmcOSQDOY34tBd/qrymKYKy36bHKLe+NoDktowWjt2xtXgyLvlwLBQOTJu96Ku+aoeOtyY6O40eeOwr0Qe080Aq40wTZMX9T7iNTeQk8ahNAUQ8uA3bmYmHWxSfLvtgrzBZCVHUYjI/Cjf7hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GekcRJPi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 79286C433F1;
-	Thu, 14 Mar 2024 12:30:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710419428;
-	bh=J2RgDspDz9zB2B0ZFrAgSC1an1n2rKhxw3KOCcNPe7Y=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GekcRJPiaMgj7EkuWKYsLa2RAXOHqdf8JMlZdbxOBJ4cmNlY/ocbqOgPkKWTy1oDE
-	 BS7pyOCPKZcW0m4Pwmy91EAqg8Ax01D8JCJqcT7dArDxEk2JX8J9IXcjL2ybcyITpy
-	 cyNPiX81/vqnnUjXS5WN1eXwpPg05IyLPBmurdz9eRyFu1j0B05VbfIZzaSroDWizg
-	 azY+ctbNRA0faEhYedtahoHq2eVkveub3cQgiPnLH5/T6t6J0sJ+GOkEnOBl13xYxD
-	 5Pc36DJYy1CELgw3uR9/OTcwoKEl2C2IG3hZNOLtBxypF4BJ9kqiAkcV2hJ5a9sPNu
-	 1vwMs7MXL6wxQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6840FD95055;
-	Thu, 14 Mar 2024 12:30:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1710419637; c=relaxed/simple;
+	bh=eOILbvhVjxTSdQCJYFJD/gXXjuXv/ep0xzuGvycuRTc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JpqjPQ3TUtLb4SY7ZOpKlbs0z4nGkXZcGvXTV5FHfdyawRicZPB1DB8QfIisaCBofGbxlZvZgRm3vfGhvtk44EeLbipq8RQ0efwXqoFwdzuFbhLEk+4qVi6HSKj+ALpYGz3ukmX2cJJhEuy00REifBvGqBpV/kkMNU37bGtKUL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Bd4SJ205; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPA id 50D1BE000B;
+	Thu, 14 Mar 2024 12:33:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1710419632;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=vmS6pTNpvnT/R21GkQzH7oBRj9ygun2hL3GsI2Prl7k=;
+	b=Bd4SJ2052tDvqmPvwvYDCWFxDOPB/uPi0aNi9qDO27H3vwbviwTbcoJHZOzjFbK+CjEU7X
+	wB9bNmnYTzmhxegXTFhGucB/tqAB6sqmnT7QRhpGkdShDRykrBqNTAyzBbHu+PCJ/jUsDB
+	0bmcsLfMSe5AJtreGLtuzOo2zg/xa0gIfiz2RjJMUNu91ufYz06T+erwYijk3HH/wnEYz7
+	KJxBFx4fCqkN0aE1wtWWYJpKMvqq5Dss6mNZoOMpxsNKlK3K1JVB84dGFLNQ3tN85+phO5
+	Q4ybimPoXRvfNhQMWJrRmDMNZor+f7DA+lOxGgtCK2ybxVygKtleWTlvr6da3w==
+From: Herve Codina <herve.codina@bootlin.com>
+To: Michael Ellerman <mpe@ellerman.id.au>,
+	Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Mark Brown <broonie@kernel.org>,
+	Ratheesh Kannoth <rkannoth@marvell.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Subject: [PATCH] net: wan: fsl_qmc_hdlc: Fix module compilation
+Date: Thu, 14 Mar 2024 13:33:46 +0100
+Message-ID: <20240314123346.461350-1-herve.codina@bootlin.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] docs: networking: fix indentation errors in
- multi-pf-netdev
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171041942842.26728.5742592401938580391.git-patchwork-notify@kernel.org>
-Date: Thu, 14 Mar 2024 12:30:28 +0000
-References: <20240313032329.3919036-1-kuba@kernel.org>
-In-Reply-To: <20240313032329.3919036-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, sfr@canb.auug.org.au, corbet@lwn.net,
- przemyslaw.kitszel@intel.com, tariqt@nvidia.com, saeedm@nvidia.com,
- linux-doc@vger.kernel.org
+X-GND-Sasl: herve.codina@bootlin.com
 
-Hello:
+The fsl_qmc_driver does not compile as module:
+  error: ‘qmc_hdlc_driver’ undeclared here (not in a function);
+    405 | MODULE_DEVICE_TABLE(of, qmc_hdlc_driver);
+        |                         ^~~~~~~~~~~~~~~
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Fix the typo.
 
-On Tue, 12 Mar 2024 20:23:29 -0700 you wrote:
-> Stephen reports new warnings in the docs:
-> 
-> Documentation/networking/multi-pf-netdev.rst:94: ERROR: Unexpected indentation.
-> Documentation/networking/multi-pf-netdev.rst:106: ERROR: Unexpected indentation.
-> 
-> Fixes: 77d9ec3f6c8c ("Documentation: networking: Add description for multi-pf netdev")
-> Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
-> Link: https://lore.kernel.org/all/20240312153304.0ef1b78e@canb.auug.org.au/
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> 
-> [...]
+Fixes: b40f00ecd463 ("net: wan: Add support for QMC HDLC")
+Reported-by: Michael Ellerman <mpe@ellerman.id.au>
+Closes: https://lore.kernel.org/linux-kernel/87ttl93f7i.fsf@mail.lhotse/
+Signed-off-by: Herve Codina <herve.codina@bootlin.com>
+---
+ drivers/net/wan/fsl_qmc_hdlc.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Here is the summary with links:
-  - [net] docs: networking: fix indentation errors in multi-pf-netdev
-    https://git.kernel.org/netdev/net/c/1c6368679979
-
-You are awesome, thank you!
+diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hdlc.c
+index 960371df470a..f69b1f579a0c 100644
+--- a/drivers/net/wan/fsl_qmc_hdlc.c
++++ b/drivers/net/wan/fsl_qmc_hdlc.c
+@@ -780,7 +780,7 @@ static const struct of_device_id qmc_hdlc_id_table[] = {
+ 	{ .compatible = "fsl,qmc-hdlc" },
+ 	{} /* sentinel */
+ };
+-MODULE_DEVICE_TABLE(of, qmc_hdlc_driver);
++MODULE_DEVICE_TABLE(of, qmc_hdlc_id_table);
+ 
+ static struct platform_driver qmc_hdlc_driver = {
+ 	.driver = {
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.44.0
 
 
