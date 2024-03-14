@@ -1,115 +1,164 @@
-Return-Path: <netdev+bounces-79807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6B4487B970
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 09:43:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C60787B97B
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 09:46:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3019C282AC7
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 08:43:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1BE782832C7
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 08:46:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF5CC6BB45;
-	Thu, 14 Mar 2024 08:42:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7A966BFBF;
+	Thu, 14 Mar 2024 08:45:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="L0W9h3LX"
+	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="bFV17zQu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa2.hc1455-7.c3s2.iphmx.com (esa2.hc1455-7.c3s2.iphmx.com [207.54.90.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8410E6BB44
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 08:42:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA6E62177;
+	Thu, 14 Mar 2024 08:45:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.54.90.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710405779; cv=none; b=MP5Ip/TcsT4gBeI18uF+K/1aOXcULc+6kcgR6Q8l3w9BVG5zPP9T3o/O0ouRLlFGnWP1x62wXUgqsKh/+1wYYiDYZguXv28tjVbBnmPGltLkwaqrIWQgeU7SivJU6u0xKCs0a4pm5bHZ5Ppy8CCloq8l80ao7doiQxa9V2snuYc=
+	t=1710405950; cv=none; b=p/Bo0XQFgCQapgr4SBqUSerlo+oobsgI0NGR5j+5LFjVCffa/wOsKC9RZVGQn6MqHIvLV/F9yHWBbyEj0Pc8KbsP7IVy4UPtwW8llujxWYmdhh6+BaGRv7eRVq4j8FclwGdwtbO8golpEbvzJrknZB34voIlP31qmOz5EcHRt9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710405779; c=relaxed/simple;
-	bh=5Qy7A+3yh/jxzhgiI9waCD4izE6h56xvnNMXv5MW2Js=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pF0tpJDQPaflWoeIJHAD4EH5kVONo7ajC709SIRk/a0PLfCZZw3JxWeOi1rniXnAc8d3XWxWIlSe8HH3bioulkgDs715UHzNfb4Cd2haw6LW0hGdN6QDd05STymsRGwl5f2nLzRRK3SS0i8EWu12lutckN66Mhxvm7YqW7h3yCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=L0W9h3LX; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a2f22bfb4e6so89284766b.0
-        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 01:42:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710405776; x=1711010576; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tUGWohgtqFW6KZor37VjPpP8lG9O6dkSe/Pklw0cTyw=;
-        b=L0W9h3LXhrekCIA84KnaOwW5F4lE7h2NJ7C7Ea9PWYflKWvd8e2qL69C1CawKcT+zW
-         RTQjf4hGVtBfsvbU0pjKIang2HUUq4Eltudbb+tBFY+ojPj0J0gsfbhjrtd6bAj3pS1x
-         ly6fnFLcYMkIIp7T5rVQeoguqbSJqZQPpHFC4Rd12ytCqu5+JdV4uGTWdZYubS1HqECM
-         lpGZw/AjX33PYCAwaVlzZJX0zsC0H5vdJGQB8Yu6OZlgJ/ynbLtiEAOzUZdrOA7hOSWr
-         veLP6LbAsPzD+Q+6O0nHua9sXuMVHLgnWIKlnkDC0TpPHFbAdbuttfMKQJTMnB6kU5Hu
-         d2lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710405776; x=1711010576;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tUGWohgtqFW6KZor37VjPpP8lG9O6dkSe/Pklw0cTyw=;
-        b=jWaRMd04Z2qUxLpLc+iMaYSwDf4W23XK30+YY7It+MjOzqWxjvfisEYKXC/HNbRDMW
-         Ium0/ef2k9lvm8/TRA7uyZZF1Y1sf+7BAWiP2dNINcJsTuRxL5kaueYL7A+f8h3vZQ+l
-         wLjTV05b//Qb6w7YCObUfvDNC6GA814PZyXabj/FNXH9Y9KAKhK9XaYBpNE6/LNM7izN
-         Fv6NHGfdiaBFPO0TRVVO27wh3TBjff23NWR3O3jMBPntc0XeaqY/ybtMGQxrzQvJ7i/o
-         tLlNnyQ5BSNHQQqS2/5a3NJyDx6SDh/uCFAfyOo/c412zG/hCo1ee5C0cgu0gcafccpl
-         HXqg==
-X-Gm-Message-State: AOJu0Yzd95Ovr9G+5MCPRXXDwpt7BRZuiGIkc2ZyGKGEoTMGbAUcy7ie
-	E0LHBH0rnR7+4j/tcPqZkGy8Fxm9zSK+f0mF5jZ1XN2sTaorqdQtVkZgptZLzOw=
-X-Google-Smtp-Source: AGHT+IGttEkLQqtfi68Ei/o0QxqRMpSTNkML0l1pApWsLGsz6Q4bBeChny5p6LkBXe0qlDjiBHBvDQ==
-X-Received: by 2002:a17:907:c205:b0:a3d:ed30:11c8 with SMTP id ti5-20020a170907c20500b00a3ded3011c8mr825202ejc.15.1710405775338;
-        Thu, 14 Mar 2024 01:42:55 -0700 (PDT)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id j22-20020a170906051600b00a441a7a75b5sm476218eja.209.2024.03.14.01.42.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Mar 2024 01:42:54 -0700 (PDT)
-Date: Thu, 14 Mar 2024 09:42:53 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	edumazet@google.com, arkadiusz.kubalewski@intel.com,
-	vadim.fedorenko@linux.dev
-Subject: Re: [patch net-next] dpll: spec: use proper enum for pin
- capabilities attribute
-Message-ID: <ZfK4jdJCyVzKLTq4@nanopsycho>
-References: <20240306120739.1447621-1-jiri@resnulli.us>
- <ZeiK7gDRUZYA8378@nanopsycho>
- <20240306073419.4557bd37@kernel.org>
- <20240313072608.1dc45382@kernel.org>
- <ZfG_C6wi4EeBj9l3@nanopsycho>
- <20240313083111.4591590d@kernel.org>
+	s=arc-20240116; t=1710405950; c=relaxed/simple;
+	bh=2DdOfJQurkOikWWUqjVqkjARYQqV+0TU1E6g35KIw2o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=a112sL/iiSpL2LUHwpT5bcwkjxt89w3hVZRpBqa5KIu74BXNUQC/rGufAKtJ4Q01Qq+lN0YkFFEGQiV2ImLGrYQNJ3Y/PNyQZaGiV4am9cGT8wmY9EGktO5Pj/BcFt0xV1S8r7RK1HSEJtz0z+FmvAwDRPLhuqwzXiLk3OOIS9s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=bFV17zQu; arc=none smtp.client-ip=207.54.90.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fujitsu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
+  t=1710405949; x=1741941949;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2DdOfJQurkOikWWUqjVqkjARYQqV+0TU1E6g35KIw2o=;
+  b=bFV17zQulEsSuLPvdLTUFMFjmlHK86rYOzdBNpU7HBbTqBMHj9WeOs+a
+   TCuBiFmA0RpZaTEAxmWeTn7XSza720oGXWjwJcgQrCGvduXZUa2yBIF3W
+   jmLIVGnpl+VuW10aJUKzWs6MzoHvMlPN5q2Bn6uO43AxlVYqs6WP9VA+e
+   NwQJLpmFcgmdoMWh57HXEa7Kx1zOrnGL3OGMt8cji9aQO4AsQ3Mhj9uIB
+   Ipx+I3vmZCMaat5EGoIr/d0JflVfDQ+Wl3xMAG9lt+P83tzuDeKBnChFd
+   XM3i9F0F8G8RwBKfsT2DBjpeC31TH6pzXn4z6A4+VFI6ZXtwxrfb9NyGt
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11012"; a="152283218"
+X-IronPort-AV: E=Sophos;i="6.07,124,1708354800"; 
+   d="scan'208";a="152283218"
+Received: from unknown (HELO oym-r1.gw.nic.fujitsu.com) ([210.162.30.89])
+  by esa2.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 17:44:37 +0900
+Received: from oym-m4.gw.nic.fujitsu.com (oym-nat-oym-m4.gw.nic.fujitsu.com [192.168.87.61])
+	by oym-r1.gw.nic.fujitsu.com (Postfix) with ESMTP id 549AFD4802;
+	Thu, 14 Mar 2024 17:44:34 +0900 (JST)
+Received: from kws-ab4.gw.nic.fujitsu.com (kws-ab4.gw.nic.fujitsu.com [192.51.206.22])
+	by oym-m4.gw.nic.fujitsu.com (Postfix) with ESMTP id 81B8328730;
+	Thu, 14 Mar 2024 17:44:33 +0900 (JST)
+Received: from edo.cn.fujitsu.com (edo.cn.fujitsu.com [10.167.33.5])
+	by kws-ab4.gw.nic.fujitsu.com (Postfix) with ESMTP id 1AF1A6895D;
+	Thu, 14 Mar 2024 17:44:33 +0900 (JST)
+Received: from localhost.localdomain (unknown [10.167.226.45])
+	by edo.cn.fujitsu.com (Postfix) with ESMTP id 807971A006B;
+	Thu, 14 Mar 2024 16:44:32 +0800 (CST)
+From: Li Zhijian <lizhijian@fujitsu.com>
+To: linux-kernel@vger.kernel.org
+Cc: Li Zhijian <lizhijian@fujitsu.com>,
+	Chas Williams <3chas3@gmail.com>,
+	linux-atm-general@lists.sourceforge.net,
+	netdev@vger.kernel.org
+Subject: [PATCH] atm: Convert sprintf/snprintf to sysfs_emit
+Date: Thu, 14 Mar 2024 16:44:17 +0800
+Message-Id: <20240314084417.1321811-1-lizhijian@fujitsu.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240313083111.4591590d@kernel.org>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-TM-AS-Product-Ver: IMSS-9.1.0.1417-9.0.0.1002-28250.006
+X-TM-AS-User-Approved-Sender: Yes
+X-TMASE-Version: IMSS-9.1.0.1417-9.0.1002-28250.006
+X-TMASE-Result: 10--11.549400-10.000000
+X-TMASE-MatchedRID: HBunSHImBEI4ibokZ3+Q0CoiRKlBVkYIBXngI6jFvpfDqO6/8R69QE8U
+	roFNOGp7a6aAZTOwtJmRloiW1Kgftd2ZdKe8BPbS7pujb8urdzZlRzZAkKRGDWO0yVK/5LmcQiM
+	ingSlKoKMx5HzfQifbPE41045MrHXFDCN/1eC4ASdVNZaI2n6/8E5XPQnBzGXq8KsbROd9VSArq
+	oIZrVn1/qN7hjwl16poxeSyQcN+o9sfDeGISzthJ13aYUE0ivytu2nWc6kUj8GWfDd0b0zMaPFj
+	JEFr+olwXCBO/GKkVqOhzOa6g8Krf6vvEcuJykJRYjh96p4fnG5zx7u4S7Fr/QTAXOtV/tSLghn
+	a2wH2XI=
+X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
 
-Wed, Mar 13, 2024 at 04:31:11PM CET, kuba@kernel.org wrote:
->On Wed, 13 Mar 2024 15:58:19 +0100 Jiri Pirko wrote:
->> >> I think I have his private email, let me follow up off list and either
->> >> put his @intel.com address in the mailmap or the ignore list.  
->> >
->> >Hi Jiri! Do you still want to add him to the ignore list?  
->> 
->> If we are going to start to use .get_maintainer.ignore for this purpose,
->> yes please. Should I send the patch? net-next is closed anyway...
->
->With the current tooling I think it's the best we can do.
->If someone disagrees let them shout at us.
->And we'll shout back that LF should take care of creating
->appropriate tooling.
->But shouting seems unlikely, I sent a patch to add Jeff K 
->and nobody batted an eyelid so far.
->
->Send it for net, it's like a MAINTAINERS update.
+Per filesystems/sysfs.rst, show() should only use sysfs_emit()
+or sysfs_emit_at() when formatting the value to be returned to user space.
 
-Interesting, his email gets no longer returned by get_maintainers.
-perhaps there is some timeout there (I was looking but got a bit
-Perlsick :)
+coccinelle complains that there are still a couple of functions that use
+snprintf(). Convert them to sysfs_emit().
+
+sprintf() will be converted as weel if they have.
+
+Generally, this patch is generated by
+make coccicheck M=<path/to/file> MODE=patch \
+COCCI=scripts/coccinelle/api/device_attr_show.cocci
+
+No functional change intended
+
+CC: Chas Williams <3chas3@gmail.com>
+CC: linux-atm-general@lists.sourceforge.net
+CC: netdev@vger.kernel.org
+Signed-off-by: Li Zhijian <lizhijian@fujitsu.com>
+---
+This is a part of the work "Fix coccicheck device_attr_show warnings"[1]
+Split them per subsystem so that the maintainer can review it easily
+[1] https://lore.kernel.org/lkml/20240116041129.3937800-1-lizhijian@fujitsu.com/
+---
+ drivers/atm/solos-pci.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/atm/solos-pci.c b/drivers/atm/solos-pci.c
+index d3c30a28c410..369a7f414f05 100644
+--- a/drivers/atm/solos-pci.c
++++ b/drivers/atm/solos-pci.c
+@@ -198,8 +198,8 @@ static ssize_t solos_param_show(struct device *dev, struct device_attribute *att
+ 
+ 	header = skb_put(skb, sizeof(*header));
+ 
+-	buflen = snprintf((void *)&header[1], buflen - 1,
+-			  "L%05d\n%s\n", current->pid, attr->attr.name);
++	buflen = sysfs_emit((void *)&header[1], "L%05d\n%s\n", current->pid,
++			    attr->attr.name);
+ 	skb_put(skb, buflen);
+ 
+ 	header->size = cpu_to_le16(buflen);
+@@ -453,7 +453,7 @@ static ssize_t console_show(struct device *dev, struct device_attribute *attr,
+ 	skb = skb_dequeue(&card->cli_queue[SOLOS_CHAN(atmdev)]);
+ 	spin_unlock_bh(&card->cli_queue_lock);
+ 	if(skb == NULL)
+-		return sprintf(buf, "No data.\n");
++		return sysfs_emit(buf, "No data.\n");
+ 
+ 	len = skb->len;
+ 	memcpy(buf, skb->data, len);
+@@ -548,7 +548,7 @@ static ssize_t geos_gpio_show(struct device *dev, struct device_attribute *attr,
+ 	data32 = ioread32(card->config_regs + GPIO_STATUS);
+ 	data32 = (data32 >> gattr->offset) & 1;
+ 
+-	return sprintf(buf, "%d\n", data32);
++	return sysfs_emit(buf, "%d\n", data32);
+ }
+ 
+ static ssize_t hardware_show(struct device *dev, struct device_attribute *attr,
+@@ -569,7 +569,7 @@ static ssize_t hardware_show(struct device *dev, struct device_attribute *attr,
+ 		data32 = (data32 >> 5) & 0x0F;
+ 		break;
+ 	}
+-	return sprintf(buf, "%d\n", data32);
++	return sysfs_emit(buf, "%d\n", data32);
+ }
+ 
+ static DEVICE_ATTR_RW(console);
+-- 
+2.29.2
+
 
