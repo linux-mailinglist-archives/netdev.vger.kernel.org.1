@@ -1,55 +1,75 @@
-Return-Path: <netdev+bounces-79954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A87687C327
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 19:57:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B15287C34D
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 20:05:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2A223B21699
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:57:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7914A1C21457
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 19:05:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5E9F757EF;
-	Thu, 14 Mar 2024 18:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8821474E31;
+	Thu, 14 Mar 2024 19:05:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zhn0Vvzl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s7lgmnIb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80585757F4
-	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 18:55:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54C5F43AD7;
+	Thu, 14 Mar 2024 19:05:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710442534; cv=none; b=RoymWFo49QWxVs2RlNC+znRsqfo08cWfVue5kusne7c7IaP7GDHZgcxlJgYk4t3wigU/Vso4Ii33knCeHKdmoCXQqCzT696T1JZlOfeBATsJQZUiz74XSXPVg4svpVwyhGOrMAsNcNCD1z7F5AaOVo0R0aHhIjx0fiIYU5n/zso=
+	t=1710443131; cv=none; b=alpOaqKMt4QRCo4lJ2CdppOnsZq1W3Kg0TIJYOSIOahS+zPoVKQorEXoWYzsa/CKRBaoYpSdVz9PbWB005OGVIhOl+Il09YLd+ZPAvCJUF9UqhneDjWbMX8A0zvhHTQp02w6CzWGPRT8FTerAwMpuE1HA/9rqK6P/P3ApPMZ1m8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710442534; c=relaxed/simple;
-	bh=xHa6xnC3tIFFwidVVKUAzeaOc1QArxpqWh+wKs8HJoo=;
+	s=arc-20240116; t=1710443131; c=relaxed/simple;
+	bh=qZFoNjK7/mZ/PeVekRSJtmaHMzHJsH0JeAgm3Vvoj2M=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fZWiTAHECMW1c+8PTce0ZPPDMyC/nGhL7p4PZvsw8/oYNuabIFwWgiHI7QRLhU2nYxVAD4chGcHxA4qUR+bh7cKVvtRNVEsaHz/Bivx/eg080QSCLga/DNODM5nkpdVCDwOPGjY9nbRPgRJUAblNfcKZyMhKJrMurweE27Bf+ck=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zhn0Vvzl; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B75C1C433C7;
-	Thu, 14 Mar 2024 18:55:33 +0000 (UTC)
+	 MIME-Version:Content-Type; b=bqlGr8IMWV7ZucdcOrLxKA0p5faZVw1df8nAfmPf5g8A5nSz+nju8ROPQkvqsX93KXv1Bu0QqKJVYCBJ7hINFwlxK+XFZkdiLY35oe/1VTK8cW2JrlpqEPvr4RJGZPhcBHB8OOin/cN7IrAwZdm5L5xEP0BhcqlzOrpZ11FpyVQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s7lgmnIb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E8A82C433C7;
+	Thu, 14 Mar 2024 19:05:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710442534;
-	bh=xHa6xnC3tIFFwidVVKUAzeaOc1QArxpqWh+wKs8HJoo=;
+	s=k20201202; t=1710443130;
+	bh=qZFoNjK7/mZ/PeVekRSJtmaHMzHJsH0JeAgm3Vvoj2M=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Zhn0VvzlFUVcahbUaeaxPz70N27lWKj16Wz+72pTJfgrUY6hfFoulndiYc5akG8Pi
-	 IJ3Z3lUD9sy/A9tNfZ7kviJ5nXMNO06S3k3dlhGPOjqB3UqARIpBvQBdnV/KDxveZN
-	 8tuPWE29T+WGh1RPzWgzp8hnZ5muu10abbzqSEOgkQXTxCMzdb+UaHpvoeFOoG8Wy7
-	 stcK0sDvQkpXsOaEGVOGpJY0MIC/cZllepIMEm8wIXp8rN1mesxj/nOfpQi7iyePxV
-	 MuPWWcmXC1lyquxOrJWIYWR9c5LX3daIDb/dBUiPo+3v+SQ0fcrsJUU762rPoCBPAh
-	 xKvQGH5eUwsJw==
-Date: Thu, 14 Mar 2024 11:55:32 -0700
+	b=s7lgmnIbdC1nn4gqbhJLDJTjGfmbSXQqbPqdIJXWyAJ6eC5VxPE5zPozOy63sgPTo
+	 WAQfOo6rhNNpoVir6ADJCp0Hb+PLaFiN5pplALmNSYhP2Bj+KHjWrUcvdJolWmX7Zm
+	 8wptTSjXcVsgOXdp+Dk6rtWACB4kwZlsFSQoSOb1WlTDH9JHdEmy9kSndJwaSytM3/
+	 tivwnUBURT9aaQ2WZg4k7HaU0TG3c8wZ3WbIDY60o3ROiBeGzCa9+n9xuY7BNr7RNF
+	 /uKrdsxFOMyuCxZZ9ZJb9wr0YTUDfV/slLXyHiVdu+K5V2gMcAiAs0a8VwGjmoRIQa
+	 Q4/2sv9RPr3/A==
+Date: Thu, 14 Mar 2024 12:05:28 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Zijie Zhao <zzjas98@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org, chenyuan0y@gmail.com
-Subject: Re: [drivers/net/netdevsim] Question about possible memleak
-Message-ID: <20240314115532.5ac9a177@kernel.org>
-In-Reply-To: <ZfJdPoN7be+5ohpl@zijie-lab>
-References: <ZfJdPoN7be+5ohpl@zijie-lab>
+To: Haiyang Zhang <haiyangz@microsoft.com>
+Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>, Shradha Gupta
+ <shradhagupta@microsoft.com>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
+ <linux-hyperv@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+ <linux-rdma@vger.kernel.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Ajay Sharma <sharmaajay@microsoft.com>, Leon
+ Romanovsky <leon@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>, KY Srinivasan
+ <kys@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui
+ <decui@microsoft.com>, Long Li <longli@microsoft.com>, Michael Kelley
+ <mikelley@microsoft.com>, Alireza Dabagh <alid@microsoft.com>, Paul
+ Rosswurm <paulros@microsoft.com>
+Subject: Re: [PATCH] net :mana : Add per-cpu stats for MANA device
+Message-ID: <20240314120528.1ac154d1@kernel.org>
+In-Reply-To: <DM6PR21MB14819A8CDB1431EBF88216ABCA292@DM6PR21MB1481.namprd21.prod.outlook.com>
+References: <1709823132-22411-1-git-send-email-shradhagupta@linux.microsoft.com>
+	<20240307072923.6cc8a2ba@kernel.org>
+	<DM6PR21MB14817597567C638DEF020FE3CA202@DM6PR21MB1481.namprd21.prod.outlook.com>
+	<20240307090145.2fc7aa2e@kernel.org>
+	<CH2PR21MB1480D3ACADFFD2FC3B1BB7ECCA272@CH2PR21MB1480.namprd21.prod.outlook.com>
+	<20240308112244.391b3779@kernel.org>
+	<20240311041950.GA19647@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	<20240314025720.GA13853@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+	<20240314112734.5f1c9f7e@kernel.org>
+	<DM6PR21MB14819A8CDB1431EBF88216ABCA292@DM6PR21MB1481.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,31 +79,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 13 Mar 2024 21:13:18 -0500 Zijie Zhao wrote:
-> Here if the `err_nsim_bus_dev_id_free` label is entered,
-> `nsim_bus_dev` will be assigned `NULL` and then `kfree(nsim_bus_dev)`
-> will not free the allocated memory.
-> 
-> Please kindly correct us if we missed any key information. Looking
-> forward to your response!
+On Thu, 14 Mar 2024 18:54:31 +0000 Haiyang Zhang wrote:
+> We understand irqbalance may be a "bad idea", and recommended some 
+> customers to disable it when having problems with it... But it's 
+> still enabled by default, and we cannot let all distro vendors 
+> and custom image makers to disable the irqbalance. So, our host-
+> networking team is eager to have per-CPU stats for analyzing CPU 
+> usage related to irqbalance or other issues.
 
-/**
- * device_register - register a device with the system.
- * @dev: pointer to the device structure
- *
- * This happens in two clean steps - initialize the device
- * and add it to the system. The two steps can be called
- * separately, but this is the easiest and most common.
- * I.e. you should only call the two helpers separately if
- * have a clearly defined need to use and refcount the device
- * before it is added to the hierarchy.
- *
- * For more information, see the kerneldoc for device_initialize()
- * and device_add().
- *
- * NOTE: _Never_ directly free @dev after calling this function, even
- * if it returned an error! Always use put_device() to give up the
- * reference initialized in this function instead.
- */
-int device_register(struct device *dev)
+You need a use case to get the stats upstream.
+"CPU usage related to irqbalance or other issues" is both too vague,
+and irqbalance is a user space problem.
 
