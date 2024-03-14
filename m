@@ -1,61 +1,56 @@
-Return-Path: <netdev+bounces-79950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C08987C30B
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 19:50:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 827D187C312
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 19:51:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 05411281FF4
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:50:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B38191C20FFC
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:51:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6E9A7603B;
-	Thu, 14 Mar 2024 18:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E84E174E39;
+	Thu, 14 Mar 2024 18:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FgvF2cyB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZjmJfN7M"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85D0873509;
-	Thu, 14 Mar 2024 18:49:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9C974E31;
+	Thu, 14 Mar 2024 18:51:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710442197; cv=none; b=dnl0WZY1BGUQufqKISVR+Aq6uYhnalu22DhdmaT1/mtrjRouDg0s0AJSprMcxWQzZDXEQHKB9NB4lgQJEvzxWI9qm9ckAm3+zHrBEBCVvbTVWqvSKhwvxQZCIU1Yq8ieFYJjdD2Ugi0BnFPr3f7xpbYI+xzmmLxX+EqiWcRSxNs=
+	t=1710442306; cv=none; b=hIsJtxS8AlroJrRYxFvOsDWs6mF9ATgzsx3WvTSei68DlOcKuVvVSF05OJnVvloMTKxPjMoc29222aodVLExU9xtEBHXfKB9/Q7Q9EN+zVceLJMC3NFwgHx9whXNL1V1uViEN30pTj14aNf7Riob8XHYwiXtG0apBMMDoH9Gvr8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710442197; c=relaxed/simple;
-	bh=pb0vIzbYslsxt10rHOb4hxaHicDLWDRrEaXbbtynnbc=;
+	s=arc-20240116; t=1710442306; c=relaxed/simple;
+	bh=B0auFNMU0a2qEU1slHJdFpiMI6+4YftAqt/icEkgVKE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VTfBLu0BE6MELs6b41hFTzQDoOgir7P1UetQpjhSLkmrMnA2iEqX/lTEDH8RAi9c30z4gE8L7vSSDs9Rx1ZioJ/pYPUPF79rofISRZxgcR7HnKCDh83GXFPpcCxRwpP02e4TxcTVJksPlO8dg4qyVTtiZyVe6zHlNG3uc/kTyA0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FgvF2cyB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60025C433F1;
-	Thu, 14 Mar 2024 18:49:56 +0000 (UTC)
+	 MIME-Version:Content-Type; b=mHcNwBScT6qPMB7OXk5rRCtzBwta2p220hj+29wBKN7Ks3wpip54C8e4Xw58hjaIs5fLrw3CiHl9AuMDpCo0cNfLCPC5MeomZ8wvKKBPNk/5hqt8voOIWGE6NaMZXsbPxQfnMUNNacD0gVLezNQvDv7U1f9rOq7c7bZj09uWfGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZjmJfN7M; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9E8BC433C7;
+	Thu, 14 Mar 2024 18:51:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710442197;
-	bh=pb0vIzbYslsxt10rHOb4hxaHicDLWDRrEaXbbtynnbc=;
+	s=k20201202; t=1710442306;
+	bh=B0auFNMU0a2qEU1slHJdFpiMI6+4YftAqt/icEkgVKE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FgvF2cyB2dEhOJQTo+BV/LtO+QYJphhNwiRl9EzUgEmZhyEk6Cw+cRAj8HoVpHJ3u
-	 Bmg/byQz3KLSQ+8ztBi850ll+ahOLJ1795tY5/bwSVI8FDBXQGrpsWu7LKbai1nVwO
-	 PC61SeYguFEfd6DMInUBougdHgVtVXQ64fOoQDxv8MO3j/BH4WdgANoYn1YuLLFWrU
-	 Yu85fX5ZHmoU49tLjwI0g5pBMLraI81TktYDBu5Af6BE6kZceKJ/d7kWKX9T/5pvuv
-	 qSjxq5Lj1lIUuDlNyM/51f+J9MimnnN2U/Go0ExDFeS27ewuXiTGua/+5KC/YpbGuK
-	 PL7lnyJ31C6Ow==
-Date: Thu, 14 Mar 2024 11:49:55 -0700
+	b=ZjmJfN7MyaEbp4Xbutg1wA2Lo1MsCQTBKzs0/lewVbywhaT6mUeRjnmcO4B+NRC0F
+	 NZsFQENePXBG4AcMvR5LUNRgzk3//c2YKRQ/vMqSzhofey4shYU7u6piJygFHAITBb
+	 wx5BPwpjmJdQFUVZ9LbYuNcHF4unWChsD4Zp5nhXWq3C7Bq/Mn9E9ahByEGfTGU8Xq
+	 t0zX+cYbW7mNCqCj8YldRl3/Vq3KDHCzzju3RCCJONVtPPIjAlICRD+2+zWDiBX/dM
+	 brionX4mnMUTUilAMbOgNfrk62dvpsoGn53VWfCHOta9yKbfpssch46SHiwTYgjxhh
+	 AbL5gHwGun1JA==
+Date: Thu, 14 Mar 2024 11:51:44 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Tal Gilboa <talgi@nvidia.com>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jason
- Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, Xuan
- Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>, Randy
- Dunlap <rdunlap@infradead.org>, Bjorn Helgaas <bhelgaas@google.com>, Breno
- Leitao <leitao@debian.org>, Johannes Berg <johannes.berg@intel.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev
-Subject: Re: [RFC PATCH 0/2] net: provides dim profile fine-tuning channels
-Message-ID: <20240314114955.71ada20c@kernel.org>
-In-Reply-To: <1710421773-61277-1-git-send-email-hengqi@linux.alibaba.com>
-References: <1710421773-61277-1-git-send-email-hengqi@linux.alibaba.com>
+To: Min Li <lnimi@hotmail.com>
+Cc: richardcochran@gmail.com, lee@kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, Min Li <min.li.xe@renesas.com>
+Subject: Re: [PATCH net-next v7 1/5] ptp: clockmatrix: support 32-bit
+ address space
+Message-ID: <20240314115144.56836fe5@kernel.org>
+In-Reply-To: <LV3P220MB120256EDF5276AB8F65C1ABDA0292@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
+References: <LV3P220MB120256EDF5276AB8F65C1ABDA0292@LV3P220MB1202.NAMP220.PROD.OUTLOOK.COM>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,12 +60,29 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 14 Mar 2024 21:09:31 +0800 Heng Qi wrote:
-> The NetDIM library provides excellent acceleration for many modern
-> network cards. However, the default profiles of DIM limits its maximum
-> capabilities for different NICs, so providing a channel through which
-> the NIC can be custom configured is necessary.
+On Thu, 14 Mar 2024 11:37:03 -0400 Min Li wrote:
+> From: Min Li <min.li.xe@renesas.com>
+> 
+> We used to assume 0x2010xxxx address. Now that
+> we need to access 0x2011xxxx address, we need
+> to support read/write the whole 32-bit address space.
 
-Given that DIM is currently enabled and disable via ethtool
-why are you putting the API is sysfs and ops in ndo?
+Please provide cover letters for series longer than 2 patches.
+
+Apart from that:
+
+## Form letter - net-next-closed
+
+The merge window for v6.9 has begun and we have already posted our pull
+request. Therefore net-next is closed for new drivers, features, code
+refactoring and optimizations. We are currently accepting bug fixes only.
+
+Please repost when net-next reopens after March 25th.
+
+RFC patches sent for review only are obviously welcome at any time.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+-- 
+pw-bot: defer
+
 
