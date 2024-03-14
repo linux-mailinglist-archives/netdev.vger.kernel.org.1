@@ -1,165 +1,217 @@
-Return-Path: <netdev+bounces-79931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5237D87C1DF
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:11:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF99887C1F0
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:15:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 167C4B21F4E
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 17:11:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 834AF282C7D
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 17:15:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 088FB74431;
-	Thu, 14 Mar 2024 17:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3295D6FE10;
+	Thu, 14 Mar 2024 17:15:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=criteo.com header.i=@criteo.com header.b="akUxFeHJ"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="254VjyGl"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2044.outbound.protection.outlook.com [40.107.249.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f176.google.com (mail-yw1-f176.google.com [209.85.128.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A2C7441E;
-	Thu, 14 Mar 2024 17:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.44
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710436260; cv=fail; b=Yjj/CxDvKQUeQzY2liSLlQBKE2F8iyBP/BavYzycVm/d4lOTxjM8Lk2xgjC7EUzF7p3wNQXPHLFbUt+0ULSJYyc4yy43BqJ7HDtaeXK3vVOINN6AAToRcsLv7wR0SO0fahttA62Y9SQsIbBhqxm+g3DMPqn009x0OC6J+14eFVQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710436260; c=relaxed/simple;
-	bh=VFxtvec4lKBvbhB0+lLOXGMYZaMT8ACPWJLcfkyUepM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=kHNqnrM0ZfLosKaIJWJeNe0vDlmcjotKEX0UOctUrAzTiUynMDRdeBnRGs1kSQYeR2gna9CDPRIfuSODP4zWZZmXDovYGgst9vFFmyxPnjhztl7TDm8ZHiWG/ytOdUqDFd8ziZZgxRtr61VJgGwHQA0e3OHyijqhdYFBi5khq08=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=criteo.com; spf=pass smtp.mailfrom=criteo.com; dkim=pass (2048-bit key) header.d=criteo.com header.i=@criteo.com header.b=akUxFeHJ; arc=fail smtp.client-ip=40.107.249.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=criteo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=criteo.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eOu4A4NU/IDz3c/PZn8EAxMnx8V91QOoVT3JtSnWuX8PS4+LHx5J/M3zXVZznA1STmrThovqNjVYMpB87stJ3BQs6HBxR/Q71+mMqqMsjD0t70V8IX3/HcXBSB6HkWUbmBFVqJtIcP3HiY8JqfAXfl1D6gS4iDhbj0JkVkqVmhJmeUduVk5fafRoMfT1XpI6t/GypD4D53dIPEEULN5zsDfxbnu4LFRmTo1rgMUo5n38hRcNrUjnSqWAxM+vCQkYFK+CeHkaVHZOM0KVkRBGHC7+MJ707+etLwOc1Fdh47lqO7I5yHiHjxkjRgSGSR+bn97WnAU6Gr6wlgToCPNtnA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8GfkSxjQtCspKgywt4dLTD4cE3UbCh5ybjoGOUC88rw=;
- b=VY/Rs+pru7M+7MQLxbZYDGHc7wL5xPhW2c4CAIjIhKoHoo/UVa9AxH9YbrCbZoWL3poOjwgHoxWkCj9eSuLMZiI9pxBq6xhYF89nPi7Wx6WkYk2PHXNZ2dTGS4JWS5AZLtIo+sbw4Q6zQi6cAb+sZShR7aCWwWiaw5F98tKEkvxUkPlDs0iQB3TBmKi2+OT2rk7bj/K1A+NNEiWPb8YlPvWe9Xc52XIBE3qL6EomCYYUX0TgAoNmHX3bRq9AuQqWr3lKavcwyAJfNjLb692RK2X6tAf9iUkbC5qePPF0ndOSbE6mxUfHuVq5UXnk1tyipoEbsKCfVUiPqPzrPSWGxw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=criteo.com; dmarc=pass action=none header.from=criteo.com;
- dkim=pass header.d=criteo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=criteo.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8GfkSxjQtCspKgywt4dLTD4cE3UbCh5ybjoGOUC88rw=;
- b=akUxFeHJtav2EIeTK7l3cbxnlWQOzLwGwHu1+8r4Vrtl7CfaTlU115EIcpzbN7iwANFZB+Q22bNBoG9TKo2Ngh0TgW4FOBAhWXdw3TedcMsm1Tx8a1ZdBE9Myt9I/6oqTAZ3ZDghLbL8Ni+75nu5EVxvRJd9/x7nwPDSlpw7pCFnee3xRdpIyIrmDSTyxTkWXvDhBArK/EM8YS3/mdpPGaI3ALvX4YNJ68aCEdDuBdsl5SfyqeeSjdZwUI8ekAWdm2gVAYyEZhE7SGQ2yuiLda1NeQZCvW8WGvr2AghigETZ3cMWG95qfg5fZ3Gd4HZMGGAiC6rVoGI3h+IjrtJ2iw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=criteo.com;
-Received: from PAXPR04MB8989.eurprd04.prod.outlook.com (2603:10a6:102:20c::11)
- by PA1PR04MB10177.eurprd04.prod.outlook.com (2603:10a6:102:465::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.18; Thu, 14 Mar
- 2024 17:10:55 +0000
-Received: from PAXPR04MB8989.eurprd04.prod.outlook.com
- ([fe80::c508:de0c:3808:6f2]) by PAXPR04MB8989.eurprd04.prod.outlook.com
- ([fe80::c508:de0c:3808:6f2%4]) with mapi id 15.20.7386.020; Thu, 14 Mar 2024
- 17:10:55 +0000
-Message-ID: <c0ccaef6-44eb-4851-b336-cdb06647e1d2@criteo.com>
-Date: Thu, 14 Mar 2024 18:10:52 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 iwl-net] i40e: Prevent setting MTU if greater than MFS
-Content-Language: en-US
-To: Brett Creeley <bcreeley@amd.com>, Erwan Velu <erwanaliasr1@gmail.com>
-Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240313090719.33627-2-e.velu@criteo.com>
- <4e203331-62f7-44e7-acd9-f684c30662de@amd.com>
-From: Erwan Velu <e.velu@criteo.com>
-In-Reply-To: <4e203331-62f7-44e7-acd9-f684c30662de@amd.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: PA7P264CA0490.FRAP264.PROD.OUTLOOK.COM
- (2603:10a6:102:3dc::9) To PAXPR04MB8989.eurprd04.prod.outlook.com
- (2603:10a6:102:20c::11)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC7B874434
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 17:15:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.176
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710436509; cv=none; b=VrBBuX8zQUdtRtVxmdqz72Urjg7b1XHgctUmSQKS1DCaQKd68njgjxhT8R15NHrwMWFH98JEJImnf5FdzOAKzEmFcqpf3k7lSL7iZ5WDQoTDvk1jdBOaDbIjth+30qubmLWmo5WqDOTHMsi+N8ppaSq9X7MsOUJu3BcbNZuadQg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710436509; c=relaxed/simple;
+	bh=uLtV39/rPAialp/Aebz9EnHq7/GIHQxyduW9QvotHW4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=pRY7XIjJP9nkQA2OpvkB0ZI6MIYbxLaEPhRlNH01QDH/NcO2iLyp8860WoA528FFBY8b5cB+X9MHow1qlqpcfXj0j+V6RhaY7rp2LdA68Uc7NvF035BhAoefKY1NfA6XQO0sUv1Cf6a7A/QJNPg/v6wRELtW3DZzIy4HNAxqJ6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=254VjyGl; arc=none smtp.client-ip=209.85.128.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f176.google.com with SMTP id 00721157ae682-60cc4124a39so12081797b3.3
+        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 10:15:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1710436505; x=1711041305; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NxMrKw7HjXsBS7vMedoL9HdNARYspR60YCEBH2wMvow=;
+        b=254VjyGl5LGmwW0FSUI+AoEUg+l44pYX2vGJNelyCu/DYynUOMAhAfKwpMOUclHBfm
+         QMVzQtY/4Yb/UOdDYcOsYMaiz/bL7Nlz8VUq5ssvGI+qUKsZ8VQf9QLJDpxTyvqfT81G
+         xswntooB02B1yMwwfW0oJE/im72ujV3ieMIS0zzIoi2VnHIvXrfj1NhXReOPhMrm3aZH
+         fmdbfxWxcGs66t9KwlBHapZTgvjKgbIesdXBrEzGACDy833TfC3YfIfRcK8yGXQsWiim
+         hWP2zPfW4LSJ2cpOx00D8RsWB1vxilAgEKAd0Ol8P393CrtUXviKOEQentQWB0HmKbyo
+         TtOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710436505; x=1711041305;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NxMrKw7HjXsBS7vMedoL9HdNARYspR60YCEBH2wMvow=;
+        b=X9+xFCHcnFZ5lvnhFvgflIIpb1G818pLl75gZHVfsX679JhLNKrnb4AJds3aqhGBHf
+         pfLquH8TypMfOzkzpEA0yTbQWvpiCecVyN6DdWvNbXYD+HEL/BVsI2uSbOoiqWAYPKKG
+         I0fRB9wPzc6lBpeo9CTknt4xhaY21J/1sqPTtcagnw93erq2oOa96WQixpsy9+Ax5Rj2
+         lNdiTTNac1V4w3gYKjnncVp7MwCnhKzggg9orSBBxT4jsVhJ/fhIn9EoxsPxgSdqq+2v
+         gD5Wp/aEL9ed572Rbvr7hQICdi5ES1GnhxJJP3Y+CbboFdNxPSPokwI5CZx+UU7s94Cg
+         eP+w==
+X-Forwarded-Encrypted: i=1; AJvYcCU1vRmb9ZujjUVAkrl9qo0863dXVn1n3E/X7PchdxnNNBQGFnnUmVkONcvXPc9eLhDdjYDCvjSQ8m8N54YkqFgTHfjz0TfX
+X-Gm-Message-State: AOJu0Yyeq4v/hIUSzo0hVi2D78Goc/EvK0fLVx0fHaQ4iUS0kc1DvCKE
+	4zXu8GMkISe5oMjTYfgwNR89HXowCJAy6nTCbXrNYlykketZzBtbCA754OgNBkd8JsPnw12u59Q
+	+WugGlfLRfOELotloxkzRtg5X/TcIBXXtOGje
+X-Google-Smtp-Source: AGHT+IHfntwb1Rep3hKpuHeorwfeDuvandCXfIwA3yaASZP42Rf4i1rg90Q+iJUlETSiXuNXIqGxMqUvx7ClOCQh+h4=
+X-Received: by 2002:a0d:e286:0:b0:609:33dd:c63f with SMTP id
+ l128-20020a0de286000000b0060933ddc63fmr2287933ywe.34.1710436505663; Thu, 14
+ Mar 2024 10:15:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8989:EE_|PA1PR04MB10177:EE_
-X-MS-Office365-Filtering-Correlation-Id: 48bd102b-5909-41c5-00a1-08dc4449b586
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	IljjuwnepYzHvmHCs/2HLGyiLqeR9UXOhBywPVLUtanMcAYqETGHzgN228QzMW0WDcP1d5M5HeBF5aZVTl8C+eod/jczXgFx1ejDqo2A/ZCMgEkw/uYyLCLFiGKIoyO+Acf+RE+4BAsGW0U7woJTvunM7UKZTyTlg6Nxe4rAP4mLWY7arLFR4aPfoolVIi5S5zZuV4jqL5/PZsMWUhSRSOeoEkr+YhqRsaJ0AD/l+ilv6gQT/LHgjlIeRiMDw9uqPPSIHXHrJ09mDPEFNlzW3XCxG5BJOxW05k7XccSpQyoEmt+exTo33y0lMoIVCiE8JQYkBujhiST/GzkWIwVB8tZfvJfXqAd409tPErO4jjSNd8ZZKTRKtbWXPngOVb/qCEVImiMtW1IWvvMeFjM+PmUmMULjPouWtw1Hf1qtYGvZwJSVIiVqwsDXDlnDRdR5hTYXvB+6A+SyCmJXsqBve115IESea/VTaZU4IqegBCfINVb8f9QVEZ7VGnHJbqfAaB4eGh/+HDf5yoDyGKvnQ6XnFTwu40mu+lb5ox77KEpi8LuLv3X9iXPc+Z97S/Q0il1/6x3nj04JR3FjEoVnIcW1djRlBpXRaWLWalRFSRR5g3/OamzktWlahnIaEzYBWmpzUo8FBpScbyrXHnyn3pXXQgL0PDl7dauaOCSZJD8=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8989.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(7416005)(376005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NTN6dzg5cmpVZHF3eWM2VTA2UllyQ01CNStMcHZYaDFkaXhZZFFhSzR1Mlkz?=
- =?utf-8?B?RERMTWlnTHJOYmM2V0phV1RqQVVSQWlrcjVJQklFTCs4eFduTWFIdHhFYWJP?=
- =?utf-8?B?UzVtMHdCNDZZV0VZNFl4bHBjSmdPdENlMUNrdGVRU1pZRWU3TVA3N2RCbU1l?=
- =?utf-8?B?eHdvZ3pZRVlQakduQkhqQTZEUnVjek9FYWZraVZOL2ttczVTMGMzSkJNMERu?=
- =?utf-8?B?eklydnZhYWI4UXBVZS9XWUp6WUhuRDJYTURibytreHVIem5SaE1FNmZWN2sw?=
- =?utf-8?B?cTVUc1hpckttZHV1VnJVRFMwTXFjbEdvQmlWV0tJT3ZsNURvQTJXeU5iRmdU?=
- =?utf-8?B?VGZCVWRnMyt6ZnlSSjFqdG5BUU9TOW5Qa09rQno4OE5xQ3dVNW9ZY1ZHVkta?=
- =?utf-8?B?akVIa1V6U0RMR0pwOURoK1lOZkNOTVZSaFEySTh1Y1Y2VGx0Z0MxU1JnYlQ1?=
- =?utf-8?B?akR3cVYzakMyYUkwV0NQTS81RWdhbU5sczRRTWp2S0p3ZWZ6cTZRczBWU3M2?=
- =?utf-8?B?eGZEazQyUFNlL2V3SGJKd1plQ1Avcjd0OHBtemhxUVplcVhBS2srUWlLZ2di?=
- =?utf-8?B?bUNib1QwL3M2UTl0TjNEdXl3OUtEMmFDQmEzY0I4OE5JTDFCV0RlQWNoSHF0?=
- =?utf-8?B?YStCTkhFR0lLMHdta2NTQThrVTN1czBzdWFjbjd3bm9sL04vMTlwaGdyY0E4?=
- =?utf-8?B?aGJVa3kyR0hXemhXcTdBaFhIQnVXRDdTVi9UazE1SklyaGh4cWhxT3ZRV1hP?=
- =?utf-8?B?czZueVlBWXBjbVY4R1hhTHhiS1hlOUgzc2xrc2tIVkMzQlBPbEZIdTNBNmZZ?=
- =?utf-8?B?NVhyWXJXUmVOaEJkMURlalJwVTBOdzcyQVlHMWdIeSs0ck5hay9yRW5FTjZH?=
- =?utf-8?B?Q0FvUDArVkZXWmlLSW5WODVlWWt0amx1Wjkvek9hRFFvUnNpU1FodmlQU0RG?=
- =?utf-8?B?RVNqaERqYUtGdk10V2ZwWlEyU2xNR2RJM1VYRVpuNkxReGJCWUx0WXZ2cEVE?=
- =?utf-8?B?V013QWtnZHNWeThMbHBzdlB1Tm9SR09udGx4WjF1Z0ZRLzBNY0IrVVhSaXRj?=
- =?utf-8?B?MnJERytrek9OMnV1MWJBSjdkb2NzZWtGK2lETC9OTnJxYVZ2bDB4amNpaHpV?=
- =?utf-8?B?N1dUNjdXWEVnR2hMajEyQi9Ya0tJZG11SjRsWWE2NFo1SHFQK3pTeW95eDAx?=
- =?utf-8?B?SGhua3pySE10TDdabU5jd2tSQUtaNndMZXVXM05VMFNTV0RqaU5wNzkrblhJ?=
- =?utf-8?B?SkxqM2VYbDBhSXEzNUNVWVl3cGhITDNoTE5JT2UxbTJtckpnOStpdU12YlNs?=
- =?utf-8?B?NTFaODR1QnY1U09FeDA1bkp5WTdPbndKZHBlUVVocVR5b3JUVk50V3BXRmlq?=
- =?utf-8?B?SkdJQnIwV08vREdDTzdTNHBLMkFaVWNtVFdZb3hCVVJRcTVaNjRJNjZFaHNa?=
- =?utf-8?B?Y1pXOVpjMGtUY2paRFNaUEJEc3pqSWdxaUEySzd0N2NvckFBWGZIUCtNVUFa?=
- =?utf-8?B?VDdBTUJ6SmRVVGtpTnh5dUJxeWFhM09PcEhwdGhXOG1XYnFWaDBjbHo2cXRW?=
- =?utf-8?B?Z0xSaGx3OWxvYWhiVXdXMjdlODh4QVc4UkVCZTY0MnZxa1RUTStpOW1oT3Bk?=
- =?utf-8?B?b1JRSmlkUTVOQW1oNmx0S0MxWHBMZ1VRbkpVU1h6a2hRWkJNQWNRbGFiN1ln?=
- =?utf-8?B?SmRwcm5wTGh6NWJWMEMzcCtERGV6UW83d3BHSXoxMjN4bUc0Y0VpS0VZam5F?=
- =?utf-8?B?MDFkNjlRd091R1FmeDRsRXFGVUFlZERVYjVpR015aHA5NlhmbE1UTTdmK1k4?=
- =?utf-8?B?bWlOblRzc0g2N2hGaEpMalpFMWpCWjJxbUNHMDB2UWYzeHlXbzdwcERLTHdw?=
- =?utf-8?B?NUxYR21vNlQ5ZStCblNRUGFHeStYZnBFVjc1bTM1L0hZaHRmVm5na2ZmNkR4?=
- =?utf-8?B?dllVRlBWUHhjVE5wdGVHMSszSG5zNUU3ODllaXRJc0lUTjczakF6NjBpK0tm?=
- =?utf-8?B?azNTTTVEVlRyazFPYnAwc1hRb1VkVUk0TXRzcGkxZC9FNC9zYUFBVjBMendz?=
- =?utf-8?B?aW1mN3hEQVIrQkZyU2FhclRVRmpqNXc1NUtLcWVaZ05iSWF5RjYrQjRpclNK?=
- =?utf-8?B?NzlFN0dsSXFKRC9EL2JGeHE5ZzMzYWgzOXpIWmVTODJkekdlYk40UnpQUmVO?=
- =?utf-8?Q?sQeEcSKr3qHrkU4xSbKVt2Fq19uDlTMVYGyBlPwsugPf?=
-X-OriginatorOrg: criteo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 48bd102b-5909-41c5-00a1-08dc4449b586
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8989.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 14 Mar 2024 17:10:54.9657
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 2a35d8fd-574d-48e3-927c-8c398e225a01
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OehxWiFxaBNFccW1Ag22wVGbM9C+twf9Ytj7ITxQ5AbPek++9o3kTaaa1PN2He26cr75DYhDpjI6OyfpvevzDA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PA1PR04MB10177
+References: <20240314111713.5979-1-renmingshuai@huawei.com>
+In-Reply-To: <20240314111713.5979-1-renmingshuai@huawei.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 14 Mar 2024 13:14:54 -0400
+Message-ID: <CAM0EoMmqVHGC4_YVHj=rUPj+XBS_N99rCKk1S7wCi1wJ8__Pyw@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: Forbid assigning mirred action to a filter
+ attached to the egress
+To: renmingshuai <renmingshuai@huawei.com>
+Cc: xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
+	vladbu@nvidia.com, netdev@vger.kernel.org, yanan@huawei.com, 
+	liaichun@huawei.com, caowangbao@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Le 14/03/2024 à 17:10, Brett Creeley a écrit :
-[...]
-> If this is how the max_mtu is determined, does it make sense to set this
-> before registering the netdev, i.e. netdev->max_mtu in 
-> i40e_config_netdev()? 
+On Thu, Mar 14, 2024 at 7:18=E2=80=AFAM renmingshuai <renmingshuai@huawei.c=
+om> wrote:
+>
+> As we all know the mirred action is used to mirroring or redirecting the
+> packet it receives. Howerver, add mirred action to a filter attached to
+> a egress qdisc might cause a deadlock. To reproduce the problem, perform
+> the following steps:
+> (1)tc qdisc add dev eth0 root handle 1: htb default 30 \n
+> (2)tc filter add dev eth2 protocol ip prio 2 flower verbose \
+>      action police rate 100mbit burst 12m conform-exceed jump 1 \
+>      / pipe mirred egress redirect dev eth2 action drop
+>
+
+I think you meant both to be the same device eth0 or eth2?
+
+> The stack is show as below:
+> [28848.883915]  _raw_spin_lock+0x1e/0x30
+> [28848.884367]  __dev_queue_xmit+0x160/0x850
+> [28848.884851]  ? 0xffffffffc031906a
+> [28848.885279]  tcf_mirred_act+0x3ab/0x596 [act_mirred]
+> [28848.885863]  tcf_action_exec.part.0+0x88/0x130
+> [28848.886401]  fl_classify+0x1ca/0x1e0 [cls_flower]
+> [28848.886970]  ? dequeue_entity+0x145/0x9e0
+> [28848.887464]  ? newidle_balance+0x23f/0x2f0
+> [28848.887973]  ? nft_lookup_eval+0x57/0x170 [nf_tables]
+> [28848.888566]  ? nft_do_chain+0xef/0x430 [nf_tables]
+> [28848.889137]  ? __flush_work.isra.0+0x35/0x80
+> [28848.889657]  ? nf_ct_get_tuple+0x1cf/0x210 [nf_conntrack]
+> [28848.890293]  ? do_select+0x637/0x870
+> [28848.890735]  tcf_classify+0x52/0xf0
+> [28848.891177]  htb_classify+0x9d/0x1c0 [sch_htb]
+> [28848.891722]  htb_enqueue+0x3a/0x1c0 [sch_htb]
+> [28848.892251]  __dev_queue_xmit+0x2d8/0x850
+> [28848.892738]  ? nf_hook_slow+0x3c/0xb0
+> [28848.893198]  ip_finish_output2+0x272/0x580
+> [28848.893692]  __ip_queue_xmit+0x193/0x420
+> [28848.894179]  __tcp_transmit_skb+0x8cc/0x970
+>
+> In this case, the process has hold the qdisc spin lock in __dev_queue_xmi=
+t
+> before the egress packets are mirred, and it will attempt to obtain the
+> spin lock again after packets are mirred, which cause a deadlock.
+>
+> Fix the issue by forbidding assigning mirred action to a filter attached
+> to the egress.
+>
+> Signed-off-by: Mingshuai Ren <renmingshuai@huawei.com>
+> ---
+>  net/sched/act_mirred.c                        |  4 +++
+>  .../tc-testing/tc-tests/actions/mirred.json   | 32 +++++++++++++++++++
+>  2 files changed, 36 insertions(+)
+>
+> diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+> index 5b3814365924..fc96705285fb 100644
+> --- a/net/sched/act_mirred.c
+> +++ b/net/sched/act_mirred.c
+> @@ -120,6 +120,10 @@ static int tcf_mirred_init(struct net *net, struct n=
+lattr *nla,
+>                 NL_SET_ERR_MSG_MOD(extack, "Mirred requires attributes to=
+ be passed");
+>                 return -EINVAL;
+>         }
+> +       if (tp->chain->block->q->parent !=3D TC_H_INGRESS) {
+> +               NL_SET_ERR_MSG_MOD(extack, "Mirred can only be assigned t=
+o the filter attached to ingress");
+> +               return -EINVAL;
+> +       }
+
+Sorry, this is too restrictive as Jiri said. We'll try to reproduce. I
+am almost certain this used to work in the old days.
+
+cheers,
+jamal
+
+PS:- thanks for the tdc test, you are a hero just for submitting that!
 
 
-The absolute max is properly set but I think that's only true if we 
-ensure the value of the MFS.
 
-So if with another patch to set the MFS to the right value when asking a 
-bigger MTU, having this value makes sense this is the absolute max for 
-this device.
-
-
-Erwan,
-
+>         ret =3D nla_parse_nested_deprecated(tb, TCA_MIRRED_MAX, nla,
+>                                           mirred_policy, extack);
+>         if (ret < 0)
+> diff --git a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.j=
+son b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
+> index b73bd255ea36..50c6153bf34c 100644
+> --- a/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
+> +++ b/tools/testing/selftests/tc-testing/tc-tests/actions/mirred.json
+> @@ -1052,5 +1052,37 @@
+>              "$TC qdisc del dev $DEV1 ingress_block 21 clsact",
+>              "$TC actions flush action mirred"
+>          ]
+> +    },
+> +    {
+> +        "id": "fdda",
+> +        "name": "Add mirred mirror to the filter which attached to engre=
+ss",
+> +        "category": [
+> +            "actions",
+> +            "mirred"
+> +        ],
+> +        "plugins": {
+> +            "requires": "nsPlugin"
+> +        },
+> +        "setup": [
+> +            [
+> +                "$TC actions flush action mirred",
+> +                0,
+> +                1,
+> +                255
+> +            ],
+> +            [
+> +                "$TC qdisc add dev $DEV1 root handle 1: htb default 1",
+> +                0
+> +            ]
+> +        ],
+> +        "cmdUnderTest": "$TC filter add dev $DEV1 protocol ip u32 match =
+ip protocol 1 0xff action mirred egress mirror dev $DEV1",
+> +        "expExitCode": "2",
+> +        "verifyCmd": "$TC action list action mirred",
+> +        "matchPattern": "^[ \t]+index [0-9]+ ref",
+> +        "matchCount": "0",
+> +        "teardown": [
+> +            "$TC qdisc del dev $DEV1 root handle 1: htb default 1",
+> +            "$TC actions flush action mirred"
+> +        ]
+>      }
+>  ]
+> --
+> 2.33.0
+>
 
