@@ -1,190 +1,340 @@
-Return-Path: <netdev+bounces-79933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AF3687C1FC
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:16:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EEEC87C233
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 18:46:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E610FB2248A
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 17:16:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34C601C21673
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 17:46:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0218074BFA;
-	Thu, 14 Mar 2024 17:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4E374BE3;
+	Thu, 14 Mar 2024 17:46:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bLCoITag"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jt3Tjsy9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3DD7745EF;
-	Thu, 14 Mar 2024 17:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155587443F;
+	Thu, 14 Mar 2024 17:46:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710436573; cv=none; b=pa5eWWCTUVu23gIu9DLdzyelcGH3Rdm1Spjc+ExPpMzA7qTQbSxpnT4ofO1PC+fKVGud2yCg/OcnzAPTGIxZLgYKdvQai7IXBJDjmsP8u4hjkoATW3L+5MqQtmISZrzIG5JJic7o6/yRIIYStNaGPevFBvJu2HA2R5AOvLScq74=
+	t=1710438393; cv=none; b=XS+xrpvWL6WHTSsIQi4Mg3l/mH3lo41EDMVRQsQbgnSkI/t8lPnseRM18813m6AI+zITD8DtNn77FAhjfWzaNhv6zc9x+VEbDAWy9keqPZ3xt+mcCWCbtGwvSMPZ3UZjZ8SJrjppDs4sDL6dtpfSWHYal+GGCW8NWtYXS/HH8IQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710436573; c=relaxed/simple;
-	bh=L79tdLUwzaaRgRXL97CbprC3UX8xdukYNWJfNJ9rn8Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=eBmoVrhdHceeTiln6lyCinqE3bVDfq996CBG3VRinT4YLK99VnL1K/ar3uGeh3607Mr4uFXuNS8PTw4inT/hP6rfpCTCPQrJbTLfwqUY8204avPwyGdVzJURS7mhGENp4R3RFFBpd7SzKVEowT2uoM0UylC9mg0an/i43m3HP3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bLCoITag; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05C6BC433F1;
-	Thu, 14 Mar 2024 17:16:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710436573;
-	bh=L79tdLUwzaaRgRXL97CbprC3UX8xdukYNWJfNJ9rn8Y=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=bLCoITag/SuEtTrsO/sMEjHd4BnWeVtJvXB6210xjO0cdkxYMA8vA1JIb6pEd2Kfy
-	 Id8hEuP4GShaNC+PpogaxARWBhxMId5O2Cie8lL7/14MzwoABw+v7vAtpZtvsqvwVm
-	 j+7ReyKeR/gEjByLQxpMlRsVYXDEGyGeHFdCK6t+sjpJtjaZP9s/5wAN9lzVmWJr7r
-	 pLa+CQidixlNP3GHezj2k/ubGEQYBhmB8PMTnGZbFPbhqQ4aFXAmuJp6RUqrSv3XnA
-	 050p8/o022AJfkYOdhHhi7dvoS2VTcsuMhDFAH55Xucdvzdz4Rqw4PKJtaUCOfiv+R
-	 zUf5Dv5K5Grxg==
-Date: Thu, 14 Mar 2024 12:16:11 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
-Cc: linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Mahesh J Salgaonkar <mahesh@linux.ibm.com>,
-	Oliver O'Halloran <oohall@gmail.com>,
-	Tony Luck <tony.luck@intel.com>, Borislav Petkov <bp@alien8.de>,
-	linux-efi@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-edac@vger.kernel.org, Greg Rose <gvrose8192@gmail.com>,
-	Jeff Kirsher <tarbal@gmail.com>
-Subject: Re: [PATCH 2/4] PCI: Generalize TLP Header Log reading
-Message-ID: <20240314171611.GA958323@bhelgaas>
+	s=arc-20240116; t=1710438393; c=relaxed/simple;
+	bh=agKTTomEz4kA+n4rL2OUGP6ABhhFhpO2Zl2XImbNJrE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BniQ4zsP3P1SCjJbaONpvYyHGxWNvUt5NFSNLl7h/yt17qsCZsKmZ8aG2na+msgioek3xE72Lhkh/+lV7ViO1uNOxRcDsNkKcSljPuoskVqmZfN0Zf/9mvhI/xtXP6JBq0Y8VSaXZWlixp7LtaJeHr1Yja2SD5+dbmNNmcnapjA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jt3Tjsy9; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-33e9990da78so1016014f8f.0;
+        Thu, 14 Mar 2024 10:46:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710438389; x=1711043189; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=z4I/hbAEGvzlzslG7GDyeJP5iYQIKOeg2en3UKGStes=;
+        b=Jt3Tjsy9L4k5j5sfbiIhCu+nvDKYi7Avj2cnxxxtAbLuYOCuBfB932WAK4uzTsJua+
+         6QhNCf4XYLjfh7263+LtrPXzrjPZUvYWjLYAHCbtPq8a35kwJ/0CUwgwD591HP8MWAXu
+         NMBmEuRrsAA9DZQNWMJ81o0oOCSd79XVAorDHikGIAA402WbF1wXIxWunopQOb0sgPRE
+         PW9NHBlg+eA3JPS/ylG28XWOJW315NIVz/36c44WonYYUINQzCAVBKkToLOiO2qpVBdD
+         AuofhJwzIDFYALTNC9L61hz1snMNcHlCumWsSJn0AQDbtBl2wHxtuIrPrlDaHdKSCNtg
+         NAgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710438389; x=1711043189;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=z4I/hbAEGvzlzslG7GDyeJP5iYQIKOeg2en3UKGStes=;
+        b=tRf140xGEPYVjzeXu/hFirk5hiJRfPVe1iMdfUrUWtp1sScUdgO/zuoDf/ynJnCmRp
+         o3U1tx/4oxl6Ada4iC9cp1hrOFe6i54zXkjXE1s/t6Txj5TU3rhbmmfdkNrxuaKOpL6F
+         2w8yOcP+2AIwtdk1wiCwh8X7riA7lgBwxancyVP/hRiZAwLOOVHFNpBFsRSNAvOaSdfK
+         Z8ZetE86Y7EVq6uwK6iH19YkXbLefDU3dRCeZAz4/gR4B8/k2SwUd0rihdwP/aBz5tTh
+         W8sYeczO33sDlJtZf8xlPxXytr96010DBPKj4v3vRI8E6v2d26qklGPRkQLGOQfOdcYV
+         1skw==
+X-Forwarded-Encrypted: i=1; AJvYcCXmgB01HA/yjt6PmgBTsgqen2v1sJ6qg0xxfGL4Rq+ELAAQ3p3DeB24Zlxx3BAotBe+HtTTotbjCNq9TUQ/xPS1PDPd4B+MJCp6/2Pa7EYwrgygGlQ53j3SzNN/NNoebkcLYBtGVyJiOsTxwOoLeB4NOmzFHq4UvFG6WIBHo78dsfhdESYhAuvd2WhMBczG4y4icmMeQQ==
+X-Gm-Message-State: AOJu0Yxeov4ssXYLHBpTFgGHXvk8qMq1xcCopiCL/Kbao/RthiN1HymK
+	gy72+tEJIki2OgAMyxzSIjIq5uOdcwxDVHyOXI3v2ebHInYd76+wVz63eJmgJWJH8z3me4wTtW+
+	/3wbGVbDbs9KNqakFDM2F/l3XsoRY+oOmlD8=
+X-Google-Smtp-Source: AGHT+IFFxixUpVKaMDQ0ST25az6uKrSdahJaFVI4ZiUZI2qk5WssR4jx9vxjvViv3ooNXrvDQ4x3Tz7pzCcwqdsjJUI=
+X-Received: by 2002:a5d:594d:0:b0:33d:5484:e451 with SMTP id
+ e13-20020a5d594d000000b0033d5484e451mr1740326wri.34.1710438389228; Thu, 14
+ Mar 2024 10:46:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240206135717.8565-3-ilpo.jarvinen@linux.intel.com>
+References: <20240307123619.159f1c4c@canb.auug.org.au> <20240313105117.699dc720@canb.auug.org.au>
+ <20240314093012.3dba692a@canb.auug.org.au> <ZfLElrAT3RMLuWdB@pc636>
+In-Reply-To: <ZfLElrAT3RMLuWdB@pc636>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Thu, 14 Mar 2024 10:46:18 -0700
+Message-ID: <CAADnVQJpoBCL6r9BM09-kcMeB4Cm0H0y+UD-i8NX5YtvcCpffw@mail.gmail.com>
+Subject: Re: linux-next: manual merge of the bpf-next tree with the mm-stable tree
+To: Uladzislau Rezki <urezki@gmail.com>
+Cc: Stephen Rothwell <sfr@canb.auug.org.au>, Andrew Morton <akpm@linux-foundation.org>, 
+	Networking <netdev@vger.kernel.org>, David Miller <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, 
+	Linux Next Mailing List <linux-next@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-[+cc Greg, Jeff -- ancient history, I know, sorry!]
+On Thu, Mar 14, 2024 at 2:34=E2=80=AFAM Uladzislau Rezki <urezki@gmail.com>=
+ wrote:
+>
+> > Hi all,
+> >
+> > On Wed, 13 Mar 2024 10:51:17 +1100 Stephen Rothwell <sfr@canb.auug.org.=
+au> wrote:
+> > >
+> > > On Thu, 7 Mar 2024 12:36:19 +1100 Stephen Rothwell <sfr@canb.auug.org=
+.au> wrote:
+> > > >
+> > > > Today's linux-next merge of the bpf-next tree got a conflict in:
+> > > >
+> > > >   mm/vmalloc.c
+> > > >
+> > > > between commit:
+> > > >
+> > > >   8e1d743f2c26 ("mm: vmalloc: support multiple nodes in vmallocinfo=
+")
+> > > >
+> > > > from the mm-stable tree and commit:
+> > > >
+> > > >   e6f798225a31 ("mm: Introduce VM_SPARSE kind and vm_area_[un]map_p=
+ages().")
+> > > >
+> > > > from the bpf-next tree.
+> > > >
+> > > > I fixed it up (I think - see below) and can carry the fix as necess=
+ary.
+> > > > This is now fixed as far as linux-next is concerned, but any non tr=
+ivial
+> > > > conflicts should be mentioned to your upstream maintainer when your=
+ tree
+> > > > is submitted for merging.  You may also want to consider cooperatin=
+g
+> > > > with the maintainer of the conflicting tree to minimise any particu=
+larly
+> > > > complex conflicts.
+> > > >
+> > > >
+> > > > diff --cc mm/vmalloc.c
+> > > > index 25a8df497255,e5b8c70950bc..000000000000
+> > > > --- a/mm/vmalloc.c
+> > > > +++ b/mm/vmalloc.c
+> > > > @@@ -4755,81 -4423,70 +4820,84 @@@ static void show_numa_info(struc=
+t seq_f
+> > > >
+> > > >   static void show_purge_info(struct seq_file *m)
+> > > >   {
+> > > >  +        struct vmap_node *vn;
+> > > >           struct vmap_area *va;
+> > > >  +        int i;
+> > > >
+> > > >  -        spin_lock(&purge_vmap_area_lock);
+> > > >  -        list_for_each_entry(va, &purge_vmap_area_list, list) {
+> > > >  -                seq_printf(m, "0x%pK-0x%pK %7ld unpurged vm_area\=
+n",
+> > > >  -                        (void *)va->va_start, (void *)va->va_end,
+> > > >  -                        va->va_end - va->va_start);
+> > > >  -        }
+> > > >  -        spin_unlock(&purge_vmap_area_lock);
+> > > >  -}
+> > > >  +        for (i =3D 0; i < nr_vmap_nodes; i++) {
+> > > >  +                vn =3D &vmap_nodes[i];
+> > > >
+> > > >  -static int s_show(struct seq_file *m, void *p)
+> > > >  -{
+> > > >  -        struct vmap_area *va;
+> > > >  -        struct vm_struct *v;
+> > > >  -
+> > > >  -        va =3D list_entry(p, struct vmap_area, list);
+> > > >  -
+> > > >  -        if (!va->vm) {
+> > > >  -                if (va->flags & VMAP_RAM)
+> > > >  -                        seq_printf(m, "0x%pK-0x%pK %7ld vm_map_ra=
+m\n",
+> > > >  +                spin_lock(&vn->lazy.lock);
+> > > >  +                list_for_each_entry(va, &vn->lazy.head, list) {
+> > > >  +                        seq_printf(m, "0x%pK-0x%pK %7ld unpurged =
+vm_area\n",
+> > > >                                   (void *)va->va_start, (void *)va-=
+>va_end,
+> > > >                                   va->va_end - va->va_start);
+> > > >  -
+> > > >  -                goto final;
+> > > >  +                }
+> > > >  +                spin_unlock(&vn->lazy.lock);
+> > > >           }
+> > > >  +}
+> > > >
+> > > >  -        v =3D va->vm;
+> > > >  +static int vmalloc_info_show(struct seq_file *m, void *p)
+> > > >  +{
+> > > >  +        struct vmap_node *vn;
+> > > >  +        struct vmap_area *va;
+> > > >  +        struct vm_struct *v;
+> > > >  +        int i;
+> > > >
+> > > >  -        seq_printf(m, "0x%pK-0x%pK %7ld",
+> > > >  -                v->addr, v->addr + v->size, v->size);
+> > > >  +        for (i =3D 0; i < nr_vmap_nodes; i++) {
+> > > >  +                vn =3D &vmap_nodes[i];
+> > > >
+> > > >  -        if (v->caller)
+> > > >  -                seq_printf(m, " %pS", v->caller);
+> > > >  +                spin_lock(&vn->busy.lock);
+> > > >  +                list_for_each_entry(va, &vn->busy.head, list) {
+> > > >  +                        if (!va->vm) {
+> > > >  +                                if (va->flags & VMAP_RAM)
+> > > >  +                                        seq_printf(m, "0x%pK-0x%p=
+K %7ld vm_map_ram\n",
+> > > >  +                                                (void *)va->va_st=
+art, (void *)va->va_end,
+> > > >  +                                                va->va_end - va->=
+va_start);
+> > > >
+> > > >  -        if (v->nr_pages)
+> > > >  -                seq_printf(m, " pages=3D%d", v->nr_pages);
+> > > >  +                                continue;
+> > > >  +                        }
+> > > >
+> > > >  -        if (v->phys_addr)
+> > > >  -                seq_printf(m, " phys=3D%pa", &v->phys_addr);
+> > > >  +                        v =3D va->vm;
+> > > >
+> > > >  -        if (v->flags & VM_IOREMAP)
+> > > >  -                seq_puts(m, " ioremap");
+> > > >  +                        seq_printf(m, "0x%pK-0x%pK %7ld",
+> > > >  +                                v->addr, v->addr + v->size, v->si=
+ze);
+> > > >
+> > > >  -        if (v->flags & VM_SPARSE)
+> > > >  -                seq_puts(m, " sparse");
+> > > >  +                        if (v->caller)
+> > > >  +                                seq_printf(m, " %pS", v->caller);
+> > > >
+> > > >  -        if (v->flags & VM_ALLOC)
+> > > >  -                seq_puts(m, " vmalloc");
+> > > >  +                        if (v->nr_pages)
+> > > >  +                                seq_printf(m, " pages=3D%d", v->n=
+r_pages);
+> > > >
+> > > >  -        if (v->flags & VM_MAP)
+> > > >  -                seq_puts(m, " vmap");
+> > > >  +                        if (v->phys_addr)
+> > > >  +                                seq_printf(m, " phys=3D%pa", &v->=
+phys_addr);
+> > > >
+> > > >  -        if (v->flags & VM_USERMAP)
+> > > >  -                seq_puts(m, " user");
+> > > >  +                        if (v->flags & VM_IOREMAP)
+> > > >  +                                seq_puts(m, " ioremap");
+> > > >
+> > > >  -        if (v->flags & VM_DMA_COHERENT)
+> > > >  -                seq_puts(m, " dma-coherent");
+> > > > ++                        if (v->flags & VM_SPARSE)
+> > > > ++                                seq_puts(m, " sparse");
+> > > > +
+> > > >  -        if (is_vmalloc_addr(v->pages))
+> > > >  -                seq_puts(m, " vpages");
+> > > >  +                        if (v->flags & VM_ALLOC)
+> > > >  +                                seq_puts(m, " vmalloc");
+> > > >
+> > > >  -        show_numa_info(m, v);
+> > > >  -        seq_putc(m, '\n');
+> > > >  +                        if (v->flags & VM_MAP)
+> > > >  +                                seq_puts(m, " vmap");
+> > > >  +
+> > > >  +                        if (v->flags & VM_USERMAP)
+> > > >  +                                seq_puts(m, " user");
+> > > >  +
+> > > >  +                        if (v->flags & VM_DMA_COHERENT)
+> > > >  +                                seq_puts(m, " dma-coherent");
+> > > >  +
+> > > >  +                        if (is_vmalloc_addr(v->pages))
+> > > >  +                                seq_puts(m, " vpages");
+> > > >  +
+> > > >  +                        show_numa_info(m, v);
+> > > >  +                        seq_putc(m, '\n');
+> > > >  +                }
+> > > >  +                spin_unlock(&vn->busy.lock);
+> > > >  +        }
+> > > >
+> > > >           /*
+> > > >            * As a final step, dump "unpurged" areas.
+> > >
+> > > This is now a conflict between the net-next tree and the mm-stable tr=
+ee.
+> >
+> >  ... and now a conflict between te mm-stable tree and Linus' tree.
+> >
+> If you need some help with resolving conflicts i can help. The problem
+> to me looks like:
+>
+> <snip>
+> commit d7bca9199a27b8690ae1c71dc11f825154af7234
+> Author: Alexei Starovoitov <ast@kernel.org>
+> Date:   Fri Mar 8 09:12:54 2024 -0800
+>
+>     mm: Introduce vmap_page_range() to map pages in PCI address space
+>
+> commit e6f798225a31485e47a6e4f6aa07ee9fdf80c2cb
+> Author: Alexei Starovoitov <ast@kernel.org>
+> Date:   Mon Mar 4 19:05:16 2024 -0800
+>
+>     mm: Introduce VM_SPARSE kind and vm_area_[un]map_pages().
+>
+> commit 3e49a866c9dcbd8173e4f3e491293619a9e81fa4
+> Author: Alexei Starovoitov <ast@kernel.org>
+> Date:   Mon Mar 4 19:05:15 2024 -0800
+>
+>     mm: Enforce VM_IOREMAP flag and range in ioremap_page_range.
+> <snip>
+>
+> those three patches were not based on linux-next and are currently
+> in the Linus tree(bypassing mm-tree?). Whereas below work:
+>
+> mm: vmalloc: refactor vmalloc_dump_obj() function
+> mm: vmalloc: improve description of vmap node layer
+> mm: vmalloc: add a shrinker to drain vmap pools
+> mm: vmalloc: set nr_nodes based on CPUs in a system
+> mm: vmalloc: support multiple nodes in vmallocinfo
+> mm: vmalloc: support multiple nodes in vread_iter
+> mm: vmalloc: add a scan area of VA only once
+> mm: vmalloc: offload free_vmap_area_lock lock
+> mm: vmalloc: remove global purge_vmap_area_root rb-tree
+> mm/vmalloc: remove vmap_area_list
+> mm: vmalloc: remove global vmap_area_root rb-tree
+> mm: vmalloc: move vmap_init_free_space() down in vmalloc.c
+> mm: vmalloc: rename adjust_va_to_fit_type() function
+> mm: vmalloc: add va_alloc() helper
+>
+> now should be based on Alexei Starovoitov base in order to resolve
+> a small conflict.
 
-On Tue, Feb 06, 2024 at 03:57:15PM +0200, Ilpo Järvinen wrote:
-> Both AER and DPC RP PIO provide TLP Header Log registers (PCIe r6.1
-> secs 7.8.4 & 7.9.14) to convey error diagnostics but the struct is
-> named after AER as the struct aer_header_log_regs. Also, not all places
-> that handle TLP Header Log use the struct and the struct members are
-> named individually.
-> 
-> Generalize the struct name and members, and use it consistently where
-> TLP Header Log is being handled so that a pcie_read_tlp_log() helper
-> can be easily added.
-> 
-> Signed-off-by: Ilpo Järvinen <ilpo.jarvinen@linux.intel.com>
+Pls don't rebase anything.
 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> index bd541527c8c7..5fdf37968b2d 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> @@ -1,6 +1,7 @@
->  // SPDX-License-Identifier: GPL-2.0
->  /* Copyright(c) 1999 - 2018 Intel Corporation. */
->  
-> +#include <linux/aer.h>
->  #include <linux/types.h>
->  #include <linux/module.h>
->  #include <linux/pci.h>
-> @@ -391,22 +392,6 @@ u16 ixgbe_read_pci_cfg_word(struct ixgbe_hw *hw, u32 reg)
->  	return value;
->  }
->  
-> -#ifdef CONFIG_PCI_IOV
-> -static u32 ixgbe_read_pci_cfg_dword(struct ixgbe_hw *hw, u32 reg)
-> -{
-> -	struct ixgbe_adapter *adapter = hw->back;
-> -	u32 value;
-> -
-> -	if (ixgbe_removed(hw->hw_addr))
-> -		return IXGBE_FAILED_READ_CFG_DWORD;
-> -	pci_read_config_dword(adapter->pdev, reg, &value);
-> -	if (value == IXGBE_FAILED_READ_CFG_DWORD &&
-> -	    ixgbe_check_cfg_remove(hw, adapter->pdev))
-> -		return IXGBE_FAILED_READ_CFG_DWORD;
-> -	return value;
-> -}
-> -#endif /* CONFIG_PCI_IOV */
-> -
->  void ixgbe_write_pci_cfg_word(struct ixgbe_hw *hw, u32 reg, u16 value)
->  {
->  	struct ixgbe_adapter *adapter = hw->back;
-> @@ -11332,8 +11317,8 @@ static pci_ers_result_t ixgbe_io_error_detected(struct pci_dev *pdev,
->  #ifdef CONFIG_PCI_IOV
->  	struct ixgbe_hw *hw = &adapter->hw;
->  	struct pci_dev *bdev, *vfdev;
-> -	u32 dw0, dw1, dw2, dw3;
-> -	int vf, pos;
-> +	struct pcie_tlp_log tlp_log;
-> +	int vf, pos, ret;
->  	u16 req_id, pf_func;
->  
->  	if (adapter->hw.mac.type == ixgbe_mac_82598EB ||
-> @@ -11351,14 +11336,13 @@ static pci_ers_result_t ixgbe_io_error_detected(struct pci_dev *pdev,
->  	if (!pos)
->  		goto skip_bad_vf_detection;
->  
-> -	dw0 = ixgbe_read_pci_cfg_dword(hw, pos + PCI_ERR_HEADER_LOG);
-> -	dw1 = ixgbe_read_pci_cfg_dword(hw, pos + PCI_ERR_HEADER_LOG + 4);
-> -	dw2 = ixgbe_read_pci_cfg_dword(hw, pos + PCI_ERR_HEADER_LOG + 8);
-> -	dw3 = ixgbe_read_pci_cfg_dword(hw, pos + PCI_ERR_HEADER_LOG + 12);
-> -	if (ixgbe_removed(hw->hw_addr))
-> +	ret = pcie_read_tlp_log(pdev, pos + PCI_ERR_HEADER_LOG, &tlp_log);
-> +	if (ret < 0) {
-> +		ixgbe_check_cfg_remove(hw, pdev);
->  		goto skip_bad_vf_detection;
-> +	}
->  
-> -	req_id = dw1 >> 16;
-> +	req_id = tlp_log.dw[1] >> 16;
->  	/* On the 82599 if bit 7 of the requestor ID is set then it's a VF */
->  	if (!(req_id & 0x0080))
->  		goto skip_bad_vf_detection;
-> @@ -11369,9 +11353,8 @@ static pci_ers_result_t ixgbe_io_error_detected(struct pci_dev *pdev,
->  
->  		vf = FIELD_GET(0x7F, req_id);
->  		e_dev_err("VF %d has caused a PCIe error\n", vf);
-> -		e_dev_err("TLP: dw0: %8.8x\tdw1: %8.8x\tdw2: "
-> -				"%8.8x\tdw3: %8.8x\n",
-> -		dw0, dw1, dw2, dw3);
-> +		e_dev_err("TLP: dw0: %8.8x\tdw1: %8.8x\tdw2: %8.8x\tdw3: %8.8x\n",
-> +			  tlp_log.dw[0], tlp_log.dw[1], tlp_log.dw[2], tlp_log.dw[3]);
->  		switch (adapter->hw.mac.type) {
->  		case ixgbe_mac_82599EB:
->  			device_id = IXGBE_82599_VF_DEVICE_ID;
+> But you better know how to proceed. Just in case, if you need some
+> support please let me know i can help with conflict resolving.
 
-The rest of this patch is headed for v6.10, but I dropped this ixgbe
-change for now.
+As Stephen said these two conflict:
 
-These TLP Log registers are generic, not device-specific, and if
-there's something lacking in the PCI core that leads to ixgbe reading
-and dumping them itself, I'd rather improve the PCI core so all
-drivers will benefit without having to add code like this.
+> > >   8e1d743f2c26 ("mm: vmalloc: support multiple nodes in vmallocinfo")
+> > >
+> > >   e6f798225a31 ("mm: Introduce VM_SPARSE kind and vm_area_[un]map_pag=
+es().")
 
-83c61fa97a7d ("ixgbe: Add protection from VF invalid target DMA") [1]
-added the ixgbe TLP Log dumping way back in v3.2 (2012).  It does do
-some device-specific VF checking and so on, but even back then, it
-looks like the PCI core would have dumped the log itself [2], so I
-don't know why we needed the extra dumping in ixgbe.
-
-So what I'd really like is to remove the TLP Log reading and printing
-from ixgbe completely, but keep the VF checking.
-
-Bjorn
-
-[1] https://git.kernel.org/linus/83c61fa97a7d
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/pci/pcie/aer/aerdrv_errprint.c?id=83c61fa97a7d#n181
+and conflict is trivial. It just looks big due to the indent change.
 
