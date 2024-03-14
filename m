@@ -1,90 +1,73 @@
-Return-Path: <netdev+bounces-79796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E50FB87B6C3
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 04:17:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF80587B6D4
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 04:24:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C7B41C217E4
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 03:17:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73829B226A9
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 03:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EEE81C01;
-	Thu, 14 Mar 2024 03:17:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D09D24C96;
+	Thu, 14 Mar 2024 03:24:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="u4eZFYqP"
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BEIJUDTD"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9624696;
-	Thu, 14 Mar 2024 03:17:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BF44A15;
+	Thu, 14 Mar 2024 03:24:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710386223; cv=none; b=WzTdb1We6fDsDIp+z2L4mry/XnwKmSS299Zu5LN5hYEFgC6ZpT7f7rU2ahhc8BMtmLm9tQqRNqDqguRyhMXIEFkPNE+XWofqFuBp7KGTPyXiq5gJh7hiJClaj5Yfn9LMs+cL7hDewVuTMVDxtUvWP7QmyYimf7j9lOdypKti4DQ=
+	t=1710386646; cv=none; b=GIsbet5jrodpkGR7I4G5Mx67MtYSjCzn10rl2PVh3jE/7EAkyXyBAoVHYshs3gqOEthVO4oFeRUbbyriTiCFoVkwR+1Hv3ko1YSdX+7rX+ke3UguIxq+eGWvmoyqJzWkJK1AYdMVDmC4Rht3m6mamljydguvGz1A+s0MWp6kiYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710386223; c=relaxed/simple;
-	bh=2RUoR0XMlC0ukB2bDbtp4kG2XgPkgjcgNCItE8TpMIA=;
+	s=arc-20240116; t=1710386646; c=relaxed/simple;
+	bh=eZuRvmWgcpTPPgj9ycM/o+D8oj337tsMLnQUeUVCjfg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=H2GD/K3mplowWhQF+FXprxjGoK53wTRrGcweIE67gTQ3KnqQXqr8MwNsojqe/VF/EmIrjQf6GH8iyaQq+C4g0m3G4fgNa3LPIaT6UoN++MHMI7SOkQ6TiZJOvoi7MnJT1HVh5WkeIhMSta+UQGkr8vLQ3SayLjVcEKB9G2qB34Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=u4eZFYqP; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=kxI3PC1lCYf7lGzHYrEtRXfRT6nj6eYre9CeqNN6v0Q=; b=u4eZFYqP5qA3mh07q4/0qd8O9l
-	NhgN/gjtMEfqEHaeH3XNbj4GtIhPU3B0JbOW7syfBZ62PsWvu9L+WpS6sjB01l40Vpd6DDwT/1lkf
-	2TXgwVwKerLfQemomJNf370Q6rnwnf0TT66UpjVE32Ql8AUU6r7sPxJarAzMax4N+TMs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rkbb3-00AHd5-3z; Thu, 14 Mar 2024 04:17:33 +0100
-Date: Thu, 14 Mar 2024 04:17:33 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
-Cc: isdn@linux-pingi.de, ricardo@marliere.net, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Abaci Robot <abaci@linux.alibaba.com>
-Subject: Re: [PATCH] CAPI: return -ENOMEM when kmalloc failed
-Message-ID: <022e6eb0-2fc7-4115-b5b8-046084d845fe@lunn.ch>
-References: <20240314020103.54049-1-jiapeng.chong@linux.alibaba.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=NuoPwiegSywbfpQKkCYK/oIVcTqAjnOH5WVQIXTaLfsyqX+dWkmDMQfJB0WaDYpzJkYBWO4Ai6Gyypf9J9JItQuALpQIRWit8J7HMQi6hqb7k5dE4xlR2xzi7mJQprDhecgPqybbMrgMMWdLVvh8vvWvAebdmWNy7l4dcDsXQpk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b=BEIJUDTD; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2BCE4C43390;
+	Thu, 14 Mar 2024 03:24:05 +0000 (UTC)
+Authentication-Results: smtp.kernel.org;
+	dkim=pass (1024-bit key) header.d=zx2c4.com header.i=@zx2c4.com header.b="BEIJUDTD"
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=zx2c4.com; s=20210105;
+	t=1710386643;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eZuRvmWgcpTPPgj9ycM/o+D8oj337tsMLnQUeUVCjfg=;
+	b=BEIJUDTDI/ypsK5HykKPz4+WDrslSA51yjHA2iwec+V+FwVONbwptMVhFFYauWOvj7SrF+
+	S9uL0mR9pLpOCn0AXRRe8AERsw7DWP6Zkfn0tfRYBNme/w0DRQMIoSX43AT7Wnnvg+n0Im
+	bAH+sMJanbAJ4J4Q48s3atRF7K5dXUc=
+Received: 
+	by mail.zx2c4.com (ZX2C4 Mail Server) with ESMTPSA id a62e8f60 (TLSv1.3:TLS_AES_256_GCM_SHA384:256:NO);
+	Thu, 14 Mar 2024 03:24:03 +0000 (UTC)
+Date: Wed, 13 Mar 2024 21:23:58 -0600
+From: "Jason A. Donenfeld" <Jason@zx2c4.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	horms@kernel.org, dsahern@kernel.org,
+	"open list:WIREGUARD SECURE NETWORK TUNNEL" <wireguard@lists.zx2c4.com>
+Subject: Re: [PATCH net-next v2 1/2] wireguard: Leverage core stats allocator
+Message-ID: <ZfJtzhKJV4yo3LRF@zx2c4.com>
+References: <20240308112746.2290505-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240314020103.54049-1-jiapeng.chong@linux.alibaba.com>
+In-Reply-To: <20240308112746.2290505-1-leitao@debian.org>
 
-On Thu, Mar 14, 2024 at 10:01:03AM +0800, Jiapeng Chong wrote:
-> The driver is using -1 instead of the -ENOMEM defined macro to specify
-> that a buffer allocation failed.
-> 
-> drivers/isdn/capi/capi.c:154 capiminor_add_ack() warn: returning -1 instead of -ENOMEM is sloppy.
-> 
-> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
-> Closes: https://bugzilla.openanolis.cn/show_bug.cgi?id=8522
-> Signed-off-by: Jiapeng Chong <jiapeng.chong@linux.alibaba.com>
+I applied this series to the wireguard tree. Thanks for the patches.
 
-The patch itself looks reasonable. The caller only cares about is the
-return code negative or not. So returning -ENOMEM or -1 makes no
-difference.
-
-Please take a look at:
-
-https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
-
-You need to specify a tree you want this merged via.
-
-If you consider this a fix, you need to add a Fixes: tag. However, i
-don't see this patch meeting stable requirements.
-
-If this is just normal development, net-next is closed at the moment
-for the merge window. Please repost in two weeks time.
-
-    Andrew
+Jason
 
