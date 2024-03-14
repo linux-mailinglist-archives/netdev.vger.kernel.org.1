@@ -1,133 +1,114 @@
-Return-Path: <netdev+bounces-79843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-79844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F39887BB8B
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:51:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B378387BBA0
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 11:59:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E8741C20D6C
-	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 10:51:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E485B1C20A40
+	for <lists+netdev@lfdr.de>; Thu, 14 Mar 2024 10:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19B06BFC5;
-	Thu, 14 Mar 2024 10:51:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A5676D1AE;
+	Thu, 14 Mar 2024 10:59:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="EwLkY4XJ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PUYSXf6s"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B0F05DF0E;
-	Thu, 14 Mar 2024 10:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6342C6CDA3
+	for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 10:59:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710413471; cv=none; b=LAum1D/vfBTKk3IUj55H9d4AhgArxdhhEEG37AKY8H/YIt+ANCVGiKv8hT8CkGCYW4FRcvRsmOK0SEBmbPE1EEmaCCw3zx8gctzpY1p2PhUz6s/SSiJMld4qmxDrmJ0FUS13QVcth5Qw4TM8DP4RN0stXFuLfs4FeDNcQnCAa94=
+	t=1710413977; cv=none; b=HvGSAC3GRiTZ1rY3AdswV1Vz78+1QxA2J+XjTDglAmxGfyIgTVnDMpdcmjfedOpap4FB9/ZCH1Z/BJB5DFnpMXBC4a/sGHut8nYCDWXxfSiaFGU8xnBv/3MICmUfesScKjJhcSM0c8cEXPfZnO8lMmkEl6HXzRdAYE5h0cI8uE8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710413471; c=relaxed/simple;
-	bh=EWUlLis8X669AunKiPTK04qSVrQJU4W8sOADYKjgKR8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ehmMojLTjdQyRW3CAJhCh9fOX89XCPXuVEZz9Z6VVo1kxzOCQ+9jWCJ1PhBNwYFdwSP5/1gYK40htQDQuyUhibLTkkfDXQBES+HtKDngvIK5erQw5jW6ebV+eWceyRss+zNhPzRYNFVHX2Y0D/um8tJMls9nfHNm6pytBqngxRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=EwLkY4XJ; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1710413464;
-	bh=DRdiHGqYqxjEF8hsA5ZH+kEbHXJ9gHLyaDJurUBUBU8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=EwLkY4XJ/XL6m9O01lkeRqb+bFGM+QvljzvF4nbDCTUEioyZoYoIMNbpMjw/ibU28
-	 UaZLGEMxbKyyHXpBTLDqSOa9gMjkeg2wXcWsO6hB8FLPuII9r/uZvQoQ0axiGR9ZjI
-	 OJoivYUdbYAy72HQQGSNAgfMInJNDl8EOWJ+HVA5xsz7/fbUPckzgw0OYMh8LYCfrh
-	 AHfU/K+/T+ds+0JQChBbJxC55hFG5D9mFQW1g+NpydlfUrwdlDsmwljjoxuLlD129X
-	 mFlBgg//ha/jnCRFFGrUoPpkT996Tpp2gKmcMniglSQgR/+XtpLQBEQyF4GYKAqh/K
-	 6sl4QGJjol9Vw==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TwPLZ4lVKz4wnr;
-	Thu, 14 Mar 2024 21:51:02 +1100 (AEDT)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yury Norov
- <yury.norov@gmail.com>, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, Rasmus Villemoes
- <linux@rasmusvillemoes.dk>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linuxppc-dev@lists.ozlabs.org, Andrew Lunn
- <andrew@lunn.ch>, Mark Brown <broonie@kernel.org>, Ratheesh Kannoth
- <rkannoth@marvell.com>, Christophe Leroy <christophe.leroy@csgroup.eu>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v7 1/5] net: wan: Add support for QMC HDLC
-In-Reply-To: <20240314081200.5af62fab@bootlin.com>
-References: <20240307113909.227375-1-herve.codina@bootlin.com>
- <20240307113909.227375-2-herve.codina@bootlin.com>
- <87ttl93f7i.fsf@mail.lhotse> <20240314081200.5af62fab@bootlin.com>
-Date: Thu, 14 Mar 2024 21:51:01 +1100
-Message-ID: <87r0gd2iju.fsf@mail.lhotse>
+	s=arc-20240116; t=1710413977; c=relaxed/simple;
+	bh=LV2n7ZJ4SfgnAUxyrx7AXuTeLXof0s93S4VFQYctrSM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rlZMPHUoyWlW7V5l56f0+aUqbidvIRwl8lNctAdCRRTxcia9JZcgbltK1rTZp6BSvie3LhQp0IhAm/H7TP/VAcKPGaNEMxrGWtCerkrDh1g8P9jeH9OSN/dN0kz46r8VcYpg2wSUAFzw9uXw+uJDydkXFYQNu6AwpBXUWn7ZqYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PUYSXf6s; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710413975; x=1741949975;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=LV2n7ZJ4SfgnAUxyrx7AXuTeLXof0s93S4VFQYctrSM=;
+  b=PUYSXf6sJHiC2UcDHh4QqLlKnWIMDhs4TNJsbnYrifEoA6fNBrpfxWlr
+   Oq/FltMFOQfLb7svu4CdCtOnz6S9qQ1ulAlL7RO81eX/a3SG6qKNQWSxq
+   6gjjnfwpLNqnaxa1nT/QjYSYaXHZsDxYqtJRrsmfxY6mYM6NYVIgANdT9
+   PGaBkp9n0lKD3BWp7xpQWuFtVMGC1RHtLxapblQftzFqWw8Vg22rIVHcz
+   HBcWjjAnkWuUbaFequ5/Gr/2KAljDmVlkAK8kWo/Extw1xdyzaQiz1q6V
+   1R+yXbpCSAel15hI+hoH6pShwJ7FoL29qfEXuIqpvChfoty040/J5/35/
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11012"; a="30663933"
+X-IronPort-AV: E=Sophos;i="6.07,125,1708416000"; 
+   d="scan'208";a="30663933"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 03:59:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,125,1708416000"; 
+   d="scan'208";a="12267805"
+Received: from unknown (HELO mev-dev) ([10.237.112.144])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Mar 2024 03:59:33 -0700
+Date: Thu, 14 Mar 2024 11:59:23 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Simon Horman <horms@kernel.org>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	marcin.szycik@intel.com, sridhar.samudrala@intel.com,
+	wojciech.drewek@intel.com, pmenzel@molgen.mpg.de,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Subject: Re: [iwl-next v2 1/2] ice: tc: check src_vsi in case of traffic from
+ VF
+Message-ID: <ZfLYfpsVP32uJA9P@mev-dev>
+References: <20240222123956.2393-1-michal.swiatkowski@linux.intel.com>
+ <20240222123956.2393-2-michal.swiatkowski@linux.intel.com>
+ <20240226133448.GD13129@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240226133448.GD13129@kernel.org>
 
-Herve Codina <herve.codina@bootlin.com> writes:
-> Hi Michael,
->
-> On Thu, 14 Mar 2024 10:05:37 +1100
-> Michael Ellerman <mpe@ellerman.id.au> wrote:
->
->> Hi Herve,
->>=20
->> Herve Codina <herve.codina@bootlin.com> writes:
-> ..
->> This breaks when building as a module (eg. ppc32_allmodconfig):
->>=20
->>   In file included from ../include/linux/device/driver.h:21,
->>                    from ../include/linux/device.h:32,
->>                    from ../include/linux/dma-mapping.h:8,
->>                    from ../drivers/net/wan/fsl_qmc_hdlc.c:13:
->>   ../drivers/net/wan/fsl_qmc_hdlc.c:405:25: error: =E2=80=98qmc_hdlc_dri=
-ver=E2=80=99 undeclared here (not in a function); did you mean =E2=80=98qmc=
-_hdlc_probe=E2=80=99?
->>     405 | MODULE_DEVICE_TABLE(of, qmc_hdlc_driver);
->>         |                         ^~~~~~~~~~~~~~~
->>=20
->>=20
->> IIUIC it should be pointing to the table, not the driver, so:
->>=20
->> diff --git a/drivers/net/wan/fsl_qmc_hdlc.c b/drivers/net/wan/fsl_qmc_hd=
-lc.c
->> index 5fd7ed325f5b..705c3681fb92 100644
->> --- a/drivers/net/wan/fsl_qmc_hdlc.c
->> +++ b/drivers/net/wan/fsl_qmc_hdlc.c
->> @@ -402,7 +402,7 @@ static const struct of_device_id qmc_hdlc_id_table[]=
- =3D {
->>         { .compatible =3D "fsl,qmc-hdlc" },
->>         {} /* sentinel */
->>  };
->> -MODULE_DEVICE_TABLE(of, qmc_hdlc_driver);
->> +MODULE_DEVICE_TABLE(of, qmc_hdlc_id_table);
->>=20
->>  static struct platform_driver qmc_hdlc_driver =3D {
->>         .driver =3D {
->>=20
->>=20
->> Which then builds correctly.
->
-> My bad, I missed that one.
-> I fully agree with your modification.
->
-> Do you want me to make a patch (copy/paste of your proposed modification)
-> or do you plan to send the patch on your side ?
+On Mon, Feb 26, 2024 at 01:34:48PM +0000, Simon Horman wrote:
+> On Thu, Feb 22, 2024 at 01:39:55PM +0100, Michal Swiatkowski wrote:
+> > In case of traffic going from the VF (so ingress for port representor)
+> > source VSI should be consider during packet classification. It is
+> > needed for hardware to not match packets from different ports with
+> > filters added on other port.
+> > 
+> > It is only for "from VF" traffic, because other traffic direction
+> > doesn't have source VSI.
+> > 
+> > Set correct ::src_vsi in rule_info to pass it to the hardware filter.
+> > 
+> > For example this rule should drop only ipv4 packets from eth10, not from
+> > the others VF PRs. It is needed to check source VSI in this case.
+> > $tc filter add dev eth10 ingress protocol ip flower skip_sw action drop
+> > 
+> > Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> > Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> 
+> Hi Michal,
+> 
+> Should this be treated as a fix: have a Fixes tag; be targeted at 'iwl'?
+> 
+> That notwithstanding, this look good to me.
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> ...
 
-Yes if you can please turn it into a proper patch and submit it.
+Thanks Simon, you are right, it will go to net with correct fixes tag.
 
-No need to add my SoB, it's trivial.
-
-cheers
+Thanks,
+Michal
 
