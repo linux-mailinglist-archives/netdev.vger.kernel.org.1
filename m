@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-80100-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E33D87D005
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 16:17:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ED7B87D006
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 16:17:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E23C1C20A83
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 15:17:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F232528469E
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 15:17:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECE503D55F;
-	Fri, 15 Mar 2024 15:17:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46CB13D0C1;
+	Fri, 15 Mar 2024 15:17:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CiLuFzwt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T/Dq6K08"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93133D55D
-	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 15:17:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214963D0B4
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 15:17:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710515848; cv=none; b=HEhIxumjN5OJ4nFUT7731RsIgRTRYwng5f79iz10TAhBqVXfChn/xW8EotXB35l+3iVCtK8zeQ+rYOM/pv8fa6M2rmX+lqu3wi+a6eloIFx0lUW7SpZcs5XeJ46Jv6o6DCizzDsh1jFjv6bNMnlFXQRLbMQtyKubpOvFIkSCDIs=
+	t=1710515852; cv=none; b=pgwAnPR4lN96IiYxSQhtxre+5Y47UcUDKazYhOZrxWEtPSMaCtDOJobPeBys6ZouYprbzvsKtH/v+/ziEQIz40w3pf9uNK5YwnPcz84gGyHJZtg5yMpQf2eeyvFyz0Vh5ljN5II7PUhWQwL4Ia7485tMy5o3rpVmiDKFkgi0ziI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710515848; c=relaxed/simple;
-	bh=1HvF5NrOy50WvjvddMyHqrGPbDlUD72YxOTjbA5cHpA=;
+	s=arc-20240116; t=1710515852; c=relaxed/simple;
+	bh=q99DKJEWeU3UfVxyI6HLu+ddKQEwRVrE8+HEK5Y6MZc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=td/fIFoUr8SMV8GGpUkCj0IXh0tykZHv8kOOIq4i4oyT4waubpY7DSTTK2Rx/1z6B9h7/n9LEoCgcjx0LRYK1t/G+EREQqkOyN5QUTXGKGmTNSZGjY1/fkt3K1gqVPJ9YpmoLz9SIY5z690GiDlkgKgenWAWk5Vw8rqiNPnhmpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CiLuFzwt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D532C433C7;
-	Fri, 15 Mar 2024 15:17:28 +0000 (UTC)
+	 MIME-Version; b=F+YFvcSJfUcLuhjo7cr9LmMgecAKXZ03hnyorShPIZZ6BsYL5Q07PjG0drBuznRmEh3vHtw9ynYiDth9kSSIRB1nyxZjk44Ww9ZhEiC43pbZHv7JxafljaLv4I/T1TyJPUYiIadZoNA7JE1Q+0kzu4xB3mfv+NpgYMNIodLjyTY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T/Dq6K08; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47E1FC433C7;
+	Fri, 15 Mar 2024 15:17:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710515848;
-	bh=1HvF5NrOy50WvjvddMyHqrGPbDlUD72YxOTjbA5cHpA=;
+	s=k20201202; t=1710515851;
+	bh=q99DKJEWeU3UfVxyI6HLu+ddKQEwRVrE8+HEK5Y6MZc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=CiLuFzwtyzCLYF+9tMMlXYX2rMBQsmVMYitdj8umUP8Z5RB63eqtWVQ0IZeNCAPOF
-	 9/glA/gHcFPfbhVmO2YeXTFQHfzG2gOo9HVeAJe9EQ85q1cEMz6tmRR6ayb9iCi9ib
-	 /CzmDqArgns7/FMNmDMbXAmd31Y+LP/MGgJrW7GyJU/WsPKMmTkeIQi3Ze54KpfuKF
-	 WK8cwWmH2FWu3ZJhtf9gI9IKo1Gc7G+pF3BD5CxLgqFeybE7e8mBX5Pxt9ncQBSiaK
-	 n7lj3SXJg9y3xd4DBavws/2FiRlNvhahusG7/E+Nn111eCLSRwPBwWW8Y3s7oCjlNz
-	 ZoBGP51n34aHQ==
+	b=T/Dq6K08dvzxtkHSJ/2o+xcrqQZ3MCpleYAX7clpJA9a6r2Fw5UOzJbo0zPhT8KNd
+	 sVnbRXQTFLIeDua/xqO0qEls05vYYUOkuUNLbj/EkPJMiD6RUBiUJHirbQ2rJFQV0F
+	 +AfcLLMPU528hV0AZ5XyQiE9pMc3kAdkDJ9TjmTl6WRO8EHiglOeRx10Q9L8hs7qza
+	 8knUsPujsOxit2hDqJV9EGevO8SAe+KhKb+DEytYUrp0ViKDFgY12u7J+I1X+tlrCL
+	 fR5QxsRsl/+NFzIssqybouy3JRTbT7Fq3do2A/gGYEFF9jhozHph9YhZ4JhRh8sJ3y
+	 5lGY0dtx0T/Hg==
 From: Antoine Tenart <atenart@kernel.org>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -49,9 +49,9 @@ To: davem@davemloft.net,
 Cc: Antoine Tenart <atenart@kernel.org>,
 	steffen.klassert@secunet.com,
 	netdev@vger.kernel.org
-Subject: [PATCH net 1/4] udp: do not accept non-tunnel GSO skbs landing in a tunnel
-Date: Fri, 15 Mar 2024 16:17:17 +0100
-Message-ID: <20240315151722.119628-2-atenart@kernel.org>
+Subject: [PATCH net 2/4] gro: fix ownership transfer
+Date: Fri, 15 Mar 2024 16:17:18 +0100
+Message-ID: <20240315151722.119628-3-atenart@kernel.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240315151722.119628-1-atenart@kernel.org>
 References: <20240315151722.119628-1-atenart@kernel.org>
@@ -63,101 +63,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When rx-udp-gro-forwarding is enabled UDP packets might be GROed when
-being forwarded. If such packets might land in a tunnel this can cause
-various issues and udp_gro_receive makes sure this isn't the case by
-looking for a matching socket. This is performed in
-udp4/6_gro_lookup_skb but only in the current netns. This is an issue
-with tunneled packets when the endpoint is in another netns. In such
-cases the packets will be GROed at the UDP level, which leads to various
-issues later on. The same thing can happen with rx-gro-list.
+Issue was found while using rx-gro-list. If fragmented packets are GROed
+in skb_gro_receive_list, they might be segmented later on and continue
+their journey in the stack. In skb_segment_list those skbs can be reused
+as-is. This is an issue as their destructor was removed in
+skb_gro_receive_list but not the reference to their socket, and then
+they can't be orphaned. Fix this by also removing the reference to the
+socket.
 
-We saw this with geneve packets being GROed at the UDP level. In such
-case gso_size is set; later the packet goes through the geneve rx path,
-the geneve header is pulled, the offset are adjusted and frag_list skbs
-are not adjusted with regard to geneve. When those skbs hit
-skb_fragment, it will misbehave. Different outcomes are possible
-depending on what the GROed skbs look like; from corrupted packets to
-kernel crashes.
+For example this could be observed,
 
-One example is a BUG_ON[1] triggered in skb_segment while processing the
-frag_list. Because gso_size is wrong (geneve header was pulled)
-skb_segment thinks there is "geneve header size" of data in frag_list,
-although it's in fact the next packet. The BUG_ON itself has nothing to
-do with the issue. This is only one of the potential issues.
+  kernel BUG at include/linux/skbuff.h:3131!  (skb_orphan)
+  RIP: 0010:ip6_rcv_core+0x11bc/0x19a0
+  Call Trace:
+   ipv6_list_rcv+0x250/0x3f0
+   __netif_receive_skb_list_core+0x49d/0x8f0
+   netif_receive_skb_list_internal+0x634/0xd40
+   napi_complete_done+0x1d2/0x7d0
+   gro_cell_poll+0x118/0x1f0
 
-Looking up for a matching socket in udp_gro_receive is fragile: the
-lookup could be extended to all netns (not speaking about performances)
-but nothing prevents those packets from being modified in between and we
-could still not find a matching socket. It's OK to keep the current
-logic there as it should cover most cases but we also need to make sure
-we handle tunnel packets being GROed too early.
+A similar construction is found in skb_gro_receive, apply the same
+change there.
 
-This is done by extending the checks in udp_unexpected_gso: GSO packets
-lacking the SKB_GSO_UDP_TUNNEL/_CUSM bits and landing in a tunnel must
-be segmented.
-
-[1] kernel BUG at net/core/skbuff.c:4408!
-    RIP: 0010:skb_segment+0xd2a/0xf70
-    __udp_gso_segment+0xaa/0x560
-
-Fixes: 9fd1ff5d2ac7 ("udp: Support UDP fraglist GRO/GSO.")
-Fixes: 36707061d6ba ("udp: allow forwarding of plain (non-fraglisted) UDP GRO packets")
+Fixes: 5e10da5385d2 ("skbuff: allow 'slow_gro' for skb carring sock reference")
 Signed-off-by: Antoine Tenart <atenart@kernel.org>
 ---
- include/linux/udp.h    | 14 ++++++++++++++
- net/ipv4/udp_offload.c |  6 ++++--
- 2 files changed, 18 insertions(+), 2 deletions(-)
+ net/core/gro.c         | 3 ++-
+ net/ipv4/udp_offload.c | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/udp.h b/include/linux/udp.h
-index 3748e82b627b..51558d6527f0 100644
---- a/include/linux/udp.h
-+++ b/include/linux/udp.h
-@@ -150,6 +150,9 @@ static inline void udp_cmsg_recv(struct msghdr *msg, struct sock *sk,
+diff --git a/net/core/gro.c b/net/core/gro.c
+index ee30d4f0c038..83f35d99a682 100644
+--- a/net/core/gro.c
++++ b/net/core/gro.c
+@@ -192,8 +192,9 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
  	}
- }
  
-+DECLARE_STATIC_KEY_FALSE(udp_encap_needed_key);
-+DECLARE_STATIC_KEY_FALSE(udpv6_encap_needed_key);
-+
- static inline bool udp_unexpected_gso(struct sock *sk, struct sk_buff *skb)
- {
- 	if (!skb_is_gso(skb))
-@@ -163,6 +166,17 @@ static inline bool udp_unexpected_gso(struct sock *sk, struct sk_buff *skb)
- 	    !udp_test_bit(ACCEPT_FRAGLIST, sk))
- 		return true;
- 
-+	/* GSO packets lacking the SKB_GSO_UDP_TUNNEL/_CUSM bits might still
-+	 * land in a tunnel as the socket check in udp_gro_receive cannot be
-+	 * foolproof.
-+	 */
-+	if ((static_branch_unlikely(&udp_encap_needed_key) ||
-+	     static_branch_unlikely(&udpv6_encap_needed_key)) &&
-+	    READ_ONCE(udp_sk(sk)->encap_rcv) &&
-+	    !(skb_shinfo(skb)->gso_type &
-+	      (SKB_GSO_UDP_TUNNEL | SKB_GSO_UDP_TUNNEL_CSUM)))
-+		return true;
-+
- 	return false;
- }
- 
+ merge:
+-	/* sk owenrship - if any - completely transferred to the aggregated packet */
++	/* sk ownership - if any - completely transferred to the aggregated packet */
+ 	skb->destructor = NULL;
++	skb->sk = NULL;
+ 	delta_truesize = skb->truesize;
+ 	if (offset > headlen) {
+ 		unsigned int eat = offset - headlen;
 diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index b9880743765c..e9719afe91cf 100644
+index e9719afe91cf..3bb69464930b 100644
 --- a/net/ipv4/udp_offload.c
 +++ b/net/ipv4/udp_offload.c
-@@ -551,8 +551,10 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
- 	unsigned int off = skb_gro_offset(skb);
- 	int flush = 1;
+@@ -449,8 +449,9 @@ static int skb_gro_receive_list(struct sk_buff *p, struct sk_buff *skb)
+ 	NAPI_GRO_CB(p)->count++;
+ 	p->data_len += skb->len;
  
--	/* we can do L4 aggregation only if the packet can't land in a tunnel
--	 * otherwise we could corrupt the inner stream
-+	/* We can do L4 aggregation only if the packet can't land in a tunnel
-+	 * otherwise we could corrupt the inner stream. Detecting such packets
-+	 * cannot be foolproof and the aggregation might still happen in some
-+	 * cases. Such packets should be caught in udp_unexpected_gso later.
- 	 */
- 	NAPI_GRO_CB(skb)->is_flist = 0;
- 	if (!sk || !udp_sk(sk)->gro_receive) {
+-	/* sk owenrship - if any - completely transferred to the aggregated packet */
++	/* sk ownership - if any - completely transferred to the aggregated packet */
+ 	skb->destructor = NULL;
++	skb->sk = NULL;
+ 	p->truesize += skb->truesize;
+ 	p->len += skb->len;
+ 
 -- 
 2.44.0
 
