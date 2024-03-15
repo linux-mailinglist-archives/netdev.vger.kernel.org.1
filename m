@@ -1,115 +1,94 @@
-Return-Path: <netdev+bounces-80088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AC3687CF7E
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 15:54:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1704787CF85
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 15:55:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BA67282AE1
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 14:54:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1F901F2347F
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 14:55:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6C93B783;
-	Fri, 15 Mar 2024 14:54:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2343BB32;
+	Fri, 15 Mar 2024 14:55:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="IgljK7aV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EF3zP48R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAA2639FFA
-	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 14:54:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 786903A1DF
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 14:55:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710514463; cv=none; b=iRqAieHfn1d/hPwiiOFNUAeZkoJO7+Km9TyaF9aftFOwEolqRx5muMqW03uRtAtPZKQcgqnXGUrY5zKWUgRbZq0tYL4qj2+zWMJE7F7/zgvWTloJYht1yp9PuxfjbeDqeZSiMF8hZPt+AOEDYBkBHgqBy4nqBGuwuhF8AQj8kbg=
+	t=1710514503; cv=none; b=CQpRcrLovaLyd/wJ2yw0TySt65f24FpbbLBJOoSSa6jbhbmRj06uwWQ4ScQttokG/VgwFecLs1vEC7SlWzb9MCFWtzPevH/VE/shCJGSwyxO1qfvPxDsEc5kBqTQD/hDTsNvlnALMXgLh5M1Lo8gJxTddxoUTC3KZIV86Zu5Qh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710514463; c=relaxed/simple;
-	bh=q0sxlmWZ/FVV1zfz2VpYFEe+xwviTDIZ5JEWihPHwp8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VjRPGl3edZzxERAyj3jWAdvA6pmoAEDoIb1eqzPfkVLEXY4bBPMIgxWnR7oL7CxZIIdOKR9eDs9U5mTJ5ZHXScvm6nw7T1wO7Sj6+p6h/ZgSZ+r4OS9Rd3lj8kLXqUAyBHBQR3nkhWw6vKADaFiuE5FnXZmLWP5qdq7ApedyhWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=IgljK7aV; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-56845954ffeso2991781a12.2
-        for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 07:54:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1710514460; x=1711119260; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q0sxlmWZ/FVV1zfz2VpYFEe+xwviTDIZ5JEWihPHwp8=;
-        b=IgljK7aVz7mWTeCcuJciOzy5qhMHo0og5Gm486qtN0CqfaqiZdxFRnuQIxm1SdsMD1
-         NqpjwVbyCCdFeV1w+/Q/BnnJM6lzny6BvB8ib+HeXGUS8fsnLTURXZtcWHb2of2fy9sT
-         mUI3Qr2TquspS7KBq1cLk6L6fW8jmCTsjXk3btZ2qFHGnW1KFwq4jq2VLq9pYeq2Kha5
-         FQ9X7wufb4zrVI0JebZNTjbZdIhkgqMw9qV5Cgfd/ey43GpHyEB1dcGeuCQOZebRqFWL
-         mDKINfC35wpiE1iK9qIRUH2W8CjUz9ySDfoEcw71A9WOWwYdg9EVSDqswajQVQKDUfEB
-         bBuQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710514460; x=1711119260;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=q0sxlmWZ/FVV1zfz2VpYFEe+xwviTDIZ5JEWihPHwp8=;
-        b=aGmhl+fR1APV2C/xkaCKltmkt2r3KQM8/Hhl3srF8sHLaVyOrbBkCQOaTqnfuu8PQ2
-         eKeAqLfGaKIgVWAyAjp4EdZh5Pa6qF5/qnSrPhvgfrVo6uhnexKUsh7IqvbCDwZntgQk
-         Yd8TRLdWifLMIWhl2raoxvSUW0Ft1Fd2ntp3ASxmB0ch00mdxuFZsZMrcJAqbBle+ME3
-         WchM071RkNEs2bsQg+37zpH81GCu5t2cTIvC88zCL4/GQZJ/Yw50zqnwU0bQ66Jnihu8
-         v2/WURFkIYfWlmuDykgGJL2DFKxx50ltucQze/RJsEtJ3PZfvoMgzHDXZCymbAw8QJbJ
-         /goA==
-X-Gm-Message-State: AOJu0Ywdyp9afRFkBc8YvQdlmQqrwZPIA94Rtpt83TNgIEjYDY2Wonr+
-	FwvS5iEuA/y5fit8hbssEVz802Z7iqoomv8YeDlECvfvcYzjXnvH9SWT5rnZeSk1z99Am3waY0x
-	SX0BY7hjMpU5fOqGOoO/PRHL2NfTmQwqJ/uMV3w==
-X-Google-Smtp-Source: AGHT+IGAXuUW49fzljDaSHnEPf/5724NscYefKAehPQ4X765R6/8qKdPAaZTE8bvj8BPPDkeMk7rsijwG2UmAT6Fg4A=
-X-Received: by 2002:a05:6402:913:b0:568:b95e:8012 with SMTP id
- g19-20020a056402091300b00568b95e8012mr259127edz.14.1710514460320; Fri, 15 Mar
- 2024 07:54:20 -0700 (PDT)
+	s=arc-20240116; t=1710514503; c=relaxed/simple;
+	bh=MAYtjasQaxfso6wJHp0xmnAz2FQmx8v21kBvAdeElI8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QbxNU/HFtyguvZX4DVEM24zjZfCmSykiJGmANROYpXe1KN/fbOD9kURnjKmKA584SpChttvfChUsIBsgRvPQjGs1ilz13y/SnituB0B0Jesv1tmzig+RwnNsxy9w4ENO5/Sy8lv3U9GxJfSQf01v1SItkCoUkopYiGwrIUsWSbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EF3zP48R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0F22C433F1;
+	Fri, 15 Mar 2024 14:55:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710514503;
+	bh=MAYtjasQaxfso6wJHp0xmnAz2FQmx8v21kBvAdeElI8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=EF3zP48Rewd7F87+gPtwrzu/dGe7zxyWfgx59ZMWY7fQqoIawnIgeiUfLYLl2gS78
+	 nRxHvVck+F88dAUf809/YUNMH1iL2GuFR71PbhghJ82GJEgWKV2wyNtyDkdPwOOZuM
+	 5slibq3PGilQJSJEZsnOy1nfWMiFHu06wNanp6nTKTLiGbUV1m8Z8EfLs5KNnF7ixP
+	 MR0jF8BeTSra28z3u24Hy0gZ/Nq357n0n79auDSz4Sta/q4uhH86+H5WLL02MjsdT5
+	 U+kRLARl4tf/mZ2H6ntNXsJGYBCLKxlyv/sqv5jy/XYjhk4mg35Y2WViuHslD/v44N
+	 vuFETv7v30vSg==
+Message-ID: <4ebe673f-a758-45a5-914a-d6ed60400dee@kernel.org>
+Date: Fri, 15 Mar 2024 08:55:01 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1710346410.git.yan@cloudflare.com> <f71214e6221c5c50b32a62a33697473c756e604e.1710346410.git.yan@cloudflare.com>
- <20240314145459.7b3aedf1@kernel.org>
-In-Reply-To: <20240314145459.7b3aedf1@kernel.org>
-From: Yan Zhai <yan@cloudflare.com>
-Date: Fri, 15 Mar 2024 09:54:09 -0500
-Message-ID: <CAO3-PbqTzsTX9UBgdC2aV4pLdL6ddrSKHTXeYNoD_m5yK6qdrQ@mail.gmail.com>
-Subject: Re: [PATCH v3 net 1/3] rcu: add a helper to report consolidated
- flavor QS
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>, 
-	Alexander Duyck <alexanderduyck@fb.com>, Hannes Frederic Sowa <hannes@stressinduktion.org>, 
-	linux-kernel@vger.kernel.org, rcu@vger.kernel.org, bpf@vger.kernel.org, 
-	kernel-team@cloudflare.com, Joel Fernandes <joel@joelfernandes.org>, 
-	"Paul E. McKenney" <paulmck@kernel.org>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>, Steven Rostedt <rostedt@goodmis.org>, mark.rutland@arm.com, 
-	Jesper Dangaard Brouer <hawk@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ipv4: raw: Fix sending packets from raw sockets via
+ IPsec tunnels
+To: Tobias Brunner <tobias@strongswan.org>, nicolas.dichtel@6wind.com,
+ "David S. Miller" <davem@davemloft.net>
+Cc: netdev@vger.kernel.org, Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+References: <4f0d0955-8bfc-486e-a44f-0e12af8a403f@strongswan.org>
+ <6cb11d93-fb10-4ca0-a5b2-93513ccefd60@6wind.com>
+ <ec5aacb4-e38c-4c26-a469-69f3315a81d8@strongswan.org>
+Content-Language: en-US
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <ec5aacb4-e38c-4c26-a469-69f3315a81d8@strongswan.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 14, 2024 at 4:55=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Wed, 13 Mar 2024 09:25:49 -0700 Yan Zhai wrote:
-> > +/**
-> > + * rcu_softirq_qs_periodic - Periodically report consolidated quiescen=
-t states
->
-> > +#define rcu_softirq_qs_periodic(old_ts) \
->
-> scripts/kernel-doc says:
->
-TIL, thanks. Let me send v4 to amend the text.
+On 3/15/24 8:31 AM, Tobias Brunner wrote:
+>>> diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
+>>> index 42ac434cfcfa..322e389021c3 100644
+>>> --- a/net/ipv4/raw.c
+>>> +++ b/net/ipv4/raw.c
+>>> @@ -357,6 +357,7 @@ static int raw_send_hdrinc(struct sock *sk, struct flowi4 *fl4,
+>>>  		goto error;
+>>>  	skb_reserve(skb, hlen);
+>>>  
+>>> +	skb->protocol = htons(ETH_P_IP);
+>>>  	skb->priority = READ_ONCE(sk->sk_priority);
+>>>  	skb->mark = sockc->mark;
+>>>  	skb->tstamp = sockc->transmit_time;
+>> For !ipsec packet, dst_output()/ ip_output() is called. This last function set
+>> skb->protocol to htons(ETH_P_IP).
+>> What about doing the same in xfrm4_output() to avoid missing another path?
+> 
+> I took this approach because it worked and it aligns the code with the
+> IPv6 version.
 
-Yan
+I agree with that; setting it in raw_send_hdrinc makes it consistent
+across protocols.
 
-> include/linux/rcupdate.h:271: warning: Function parameter or struct membe=
-r 'old_ts' not described in 'rcu_softirq_qs_periodic'
-> --
-> pw-bot: cr
+
+Reviewed-by: David Ahern <dsahern@kernel.org>
+
 
