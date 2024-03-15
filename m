@@ -1,141 +1,94 @@
-Return-Path: <netdev+bounces-80143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70E6F87D275
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 18:10:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64C5487D2D9
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 18:34:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A22171C2230B
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 17:10:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20CFA281D1D
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 17:34:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F2FF45C08;
-	Fri, 15 Mar 2024 17:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E198487AE;
+	Fri, 15 Mar 2024 17:34:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o92RSMkm"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="UoknpB3+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 360C239AF0;
-	Fri, 15 Mar 2024 17:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D66314CDFB
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 17:33:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710522532; cv=none; b=A2hFwazgd7sRVVtB/Ozvn/veKQ+b9gNlbF9linzvq69J7Fd5tfeBohhYF4zoiGBTWZyWiWiDpD53wTQV1914H1gMj3vso1oU5KyiIr5ik1DZfOIhWQ+ABIfnJQDaRCLigHCeU2ACCzEIUcR1Uv9pF5XpksOHoTRUc9D2Fft3hz4=
+	t=1710524040; cv=none; b=cIN01t4ngSzxSJ2+zufnJmey7gGCPj5nza0bX5T0TBdLy1hQ0fK/1Iu1SOszrZblJEclg0q69nGPJsgNWDmFEHVL5xXTnzVAg060gKesBaUo7bjKk0HJYd4HRRRhTyUevaI3D7btqXyclQpAWDDu0P8Kbbw3v+vqlvA/RzDwMKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710522532; c=relaxed/simple;
-	bh=LAiO+oLFXMWQ/BVhBgoJWAKn509c7RuQ4nIeC9QIXKE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GSK64Ue1GIcDCVXM9AgxNGXHNzWlSlJOVIC4VNtCIxZ5S0UzyY+ini/E8IMe9eJt1/9ZGtNpU1VH8hS77VM+rvDcOv6DbxxRvDFXI4RwtaltGzP7JNJO26q3uFCrGwRyJnQk0YBtTsXWyg4NQgeRna32IiZH0zQ+KYWAUUCQtF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o92RSMkm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CBDCC433C7;
-	Fri, 15 Mar 2024 17:08:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710522531;
-	bh=LAiO+oLFXMWQ/BVhBgoJWAKn509c7RuQ4nIeC9QIXKE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=o92RSMkmambBzKExnTwpLGkzs0dwG0Q0KQPmrkctZSAR2822/m4Q+W3gxMCExw20G
-	 oFUGtKu3xl7asHmJmgejxx4W+HXQNb3pN9vKDHA5HTNOqUZH32kajipQmtZz/QmOn2
-	 O0Db4LsNCVmlx+mRRAsnk/cSGA18spJM0DsWKm75WqBFrqSBS+5Gnrsc2b2qqFaZiW
-	 gXZ+su6hqJe5JpM6vZfzFvrsl6t9azKyF12H0dcZBXe7lVCFQ/bb5WB9XNeu6Tgta+
-	 fP+FJaI4mb07U7E3pf2IkXdz5/yN2mMRp5ISjjimOyR61uweIJl9bi1Xc64rqPm//n
-	 o2m0yZktJqh6Q==
-Message-ID: <860f02ae-a8a8-4bcd-86d8-7a6da3f2056d@kernel.org>
-Date: Fri, 15 Mar 2024 18:08:48 +0100
+	s=arc-20240116; t=1710524040; c=relaxed/simple;
+	bh=zW1RW6GM8CBpvandVLUsZHvOh+bfZo24Q7rRlPrBWN0=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=t93ZjL0niqzKkzmXweyjpBJzFlu5rdmgqJ5XYCMo8HvOCAYMNgsqF7T10A8MrZZgyWrB9fHz2i5NcPFNkJMJ42B2wIk/GY8dSWP6ymX8da3KhfX44Cv8sp9K3hNLo60S1PhYdTDEx3nKYbNZ5Z8+TtCUYQPUmPb4HOdSJkxJBPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=UoknpB3+; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60cd62fa1f9so23591497b3.0
+        for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 10:33:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710524038; x=1711128838; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=zW1RW6GM8CBpvandVLUsZHvOh+bfZo24Q7rRlPrBWN0=;
+        b=UoknpB3+AMmuO7KAvTwvXNf3SzOtXF1VYlryO2UoVoPnW2tRn4AmLrryAlDXweS55t
+         aS1Xx+0KEEFumqH0wHksJGvO0q4kDCjQdIocWwptOaYNHwF8viSz41XxGQ4Thwtnk1EO
+         SJlpGYA2kOHjagZ2FB51o4UmwYn9ccegpYYIzps5+od4TKv/s8V9s9jzAgQXr4k9NIz+
+         SJpqG6jB0VVMQ1laoTH7tCIl4B6B7TMym6aHQi/1wqMZRZ/vbqKSCPwgg8Iyj3kldt/q
+         +OFbbQX1vy+vQGe8NnF4Mwe8OfglZ5zQznkjGlRBeR0cSl/yXrkHYQtp74OG35CatpJE
+         haaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710524038; x=1711128838;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zW1RW6GM8CBpvandVLUsZHvOh+bfZo24Q7rRlPrBWN0=;
+        b=jxKDtnjm914cBeEGoJERQW2L+MXmN214LC/r6C9mc5WM33ZQFBUnUImiyYj5tXC82o
+         HvLTYrFynQbZ4wZ8ctR0LjClflCPn6yOKOIWR4AGmvvxU/mcY9qbB5JDOCvxSVwlmWCH
+         GaAG+Ud3S9m808dEFKG2GacYmqP9cHh5QLjndRBQwQ4Tw2nhzeuYwAZ13nN3nAdm6QyD
+         rbRg/K3Qeb5eIfaDmLxd/JSTLRVQghqYfgyJXUmSyACRsVaOMZ7NGTYTdpJCo1DrAlfZ
+         vIXG86oHEXMOZ6Qh1ddsA//DPsdD/yYXALVC7aG7pu9Ry7asYr+TUoqY0vS74xIBiUsN
+         5T1A==
+X-Forwarded-Encrypted: i=1; AJvYcCVcqID42xXxPw+SDTKyk7s84T2e8bdMXLaWcXY9oG87D80fZFZccy5MxmrRZKKohQMAN7rYgnu4RNZQGfEObI8rw1Za3gCG
+X-Gm-Message-State: AOJu0YwtIRFi8Ry/b9BCDbtLUfPD94X7c5HN1rz+962voOlpvLP7ZYyZ
+	TvLuxI5dY4vpc43zugLLzeV0RsXZZE4TiM7dJ9+kJlCIvVObH0lj5CleH0bIZ910ag==
+X-Google-Smtp-Source: AGHT+IFxgCQ1Ymh7RTMQXWD/v9pxu5S2EZE0x98PfFjPfmNQVP1yNe7hV2Sl7mJynhtJKQYJ+k0nge0=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a81:6dd4:0:b0:60a:562:d3b9 with SMTP id
+ i203-20020a816dd4000000b0060a0562d3b9mr960614ywc.4.1710524037980; Fri, 15 Mar
+ 2024 10:33:57 -0700 (PDT)
+Date: Fri, 15 Mar 2024 10:33:56 -0700
+In-Reply-To: <20240315140726.22291-2-tushar.vyavahare@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next] bpf/lpm_trie: inline longest_prefix_match for
- fastpath
-Content-Language: en-US
-To: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <borkmann@iogearbox.net>, martin.lau@kernel.org,
- netdev@vger.kernel.org, kernel-team@cloudflare.com
-References: <171025648415.2098287.4441181253947701605.stgit@firesoul>
- <2c2d1b85-9c4a-5122-c471-e4a729b4df03@iogearbox.net>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <2c2d1b85-9c4a-5122-c471-e4a729b4df03@iogearbox.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+References: <20240315140726.22291-1-tushar.vyavahare@intel.com> <20240315140726.22291-2-tushar.vyavahare@intel.com>
+Message-ID: <ZfSGhI9hu_Yat9kI@google.com>
+Subject: Re: [PATCH bpf-next 1/6] tools/include: add ethtool_ringparam
+ definition to UAPI header
+From: Stanislav Fomichev <sdf@google.com>
+To: Tushar Vyavahare <tushar.vyavahare@intel.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, bjorn@kernel.org, 
+	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
+	jonathan.lemon@gmail.com, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, 
+	tirthendu.sarkar@intel.com
+Content-Type: text/plain; charset="utf-8"
 
+On 03/15, Tushar Vyavahare wrote:
+> Introduce the definition for ethtool_ringparam in the UAPI header located
+> in the include directory. This is needed by the next patches as they run
+> tests with various ring sizes.
 
-
-On 15/03/2024 16.03, Daniel Borkmann wrote:
-> On 3/12/24 4:17 PM, Jesper Dangaard Brouer wrote:
->> The BPF map type LPM (Longest Prefix Match) is used heavily
->> in production by multiple products that have BPF components.
->> Perf data shows trie_lookup_elem() and longest_prefix_match()
->> being part of kernels perf top.
-> 
-> You mention these are heavy hitters in prod ...
-> 
->> For every level in the LPM tree trie_lookup_elem() calls out
->> to longest_prefix_match().  The compiler is free to inline this
->> call, but chooses not to inline, because other slowpath callers
->> (that can be invoked via syscall) exists like trie_update_elem(),
->> trie_delete_elem() or trie_get_next_key().
->>
->>   bcc/tools/funccount -Ti 1 
->> 'trie_lookup_elem|longest_prefix_match.isra.0'
->>   FUNC                                    COUNT
->>   trie_lookup_elem                       664945
->>   longest_prefix_match.isra.0           8101507
->>
->> Observation on a single random metal shows a factor 12 between
->> the two functions. Given an average of 12 levels in the trie being
->> searched.
->>
->> This patch force inlining longest_prefix_match(), but only for
->> the lookup fastpath to balance object instruction size.
->>
->>   $ bloat-o-meter kernel/bpf/lpm_trie.o.orig-noinline 
->> kernel/bpf/lpm_trie.o
->>   add/remove: 1/1 grow/shrink: 1/0 up/down: 335/-4 (331)
->>   Function                                     old     new   delta
->>   trie_lookup_elem                             179     510    +331
->>   __BTF_ID__struct__lpm_trie__706741             -       4      +4
->>   __BTF_ID__struct__lpm_trie__706733             4       -      -4
->>   Total: Before=3056, After=3387, chg +10.83%
-> 
-> ... and here you quote bloat-o-meter instead. But do you also see an
-> observable perf gain in prod after this change? (No objection from my
-> side but might be good to mention here.. given if not then why do the
-> change?)
-> 
-
-I'm still waiting for more production servers to reboot into patched
-kernels.  I do have some "low-level" numbers from previous generation
-AMD servers, running kernel 6.1, which should be less affected by the
-SRSO (than our 6.6 kernels). Waiting for newer generation to get kernel
-updates, and especially 6.6 will be interesting.
-
- From production measurements the latency overhead of trie_lookup_elem:
-  - avg 1220 nsecs for patched kernel
-  - avg 1329 nsecs for non patched kernel
-  - around 8% improvement or 109 nanosec
-  - given approx 12 calls "saved" this is 9 ns per function call
-  - for reference on Intel I measured func call to cost 1.3ns
-  - this extra overhead is caused by __x86_return_thunk().
-
-I also see slight improvement in the graphs, but given how much
-production varies I don't want to draw conclusions yet.
-
-
->> Details: Due to AMD mitigation for SRSO (Speculative Return Stack 
->> Overflow)
->> these function calls have additional overhead. On newer kernels this 
->> shows
->> up under srso_safe_ret() + srso_return_thunk(), and on older kernels 
->> (6.1)
->> under __x86_return_thunk(). Thus, for production workloads the biggest 
->> gain
->> comes from avoiding this mitigation overhead.
->>
->> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+Any reason not to 'cp {,tools/}include/uapi/linux/ethtool.h' instead?
+Less divergence should be easier to support/understand.
 
