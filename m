@@ -1,183 +1,116 @@
-Return-Path: <netdev+bounces-80020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B047787C813
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 04:44:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 88DB687C857
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 05:46:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A3F22833B4
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 03:44:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E3AD282F62
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 04:46:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A943D52E;
-	Fri, 15 Mar 2024 03:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3C60DDB1;
+	Fri, 15 Mar 2024 04:46:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="wtGrj7ta"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="a7tk81tb"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3ABED2FA;
-	Fri, 15 Mar 2024 03:44:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D22FDDA9
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 04:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710474265; cv=none; b=oFfyDqqZn+ooTd6JDfIStijRTA3bO0B6ZsMGWKPMEe+6fqCxnluYbGxER/CaB4fAlbVEtskecXJ3mOroCIpbeZlCZSnh2fM7C976XercK41Gns4bl6ZiA7TDRIBBqCD2VQrncVqglKjuc+sahBa3E+QlYr4Oz9jMjAH3X28dsLQ=
+	t=1710478005; cv=none; b=nLaszQFfAxMfRWmkZvcloRiTtJoW3PEr4fhx4ukLzYboL5xT/dtT6l/gFT55s1V+xpKHCmSTh/BQXbl3xlJGTvnMRYWFfPrLjTZV+1MMpt6Mkx9JBlIv35HNi8uLfl5wfrebHW8vAqYUVEztcAi1rtX2uPGIr0DwyKHHWzE168I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710474265; c=relaxed/simple;
-	bh=Fn0B/Coflk0vxgWDCHHmvAX98GkytPf1UE1wsTKbreo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BaSOWrhu8gdThtv/VdxDhziRRnfON40KU/hwAX6cD/sFZvhAtbcgLL2L2Cs3SM8y+0ys4i55DDmxGsa2U2hMQamoSn/pSWQ1qQIiC0541hdpjN/kWnNi7hU3ZUdJdM6xL6J+wQ7tdBYmmxlC3Ff0f8vAcbGSwfFdZ0TAUrIgBzw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=wtGrj7ta; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1710474259; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=6SyGZ6Ypqn8jef/c0aiSjRosmRiUcfEDRiQ+bWS0vCM=;
-	b=wtGrj7ta5yD51JhrQ82iAD6U0LuGKHXpHOKAChYz/vbyMB5PttCG4rbiFoZQtwP05N4UjxLdZ7jZhP3YcmyhlgWOHlt/Fw3U5SpNw20tyD/xukJQDhHKYs/GbIb0qQvSKZduAgZKEavWQB+cEphyfM9lCqM+5cS3hC+f7aeWYAg=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W2UlN-f_1710474256;
-Received: from 30.221.129.129(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W2UlN-f_1710474256)
-          by smtp.aliyun-inc.com;
-          Fri, 15 Mar 2024 11:44:18 +0800
-Message-ID: <a6e4c563-e1d4-44ae-bfab-a0021584220f@linux.alibaba.com>
-Date: Fri, 15 Mar 2024 11:44:16 +0800
+	s=arc-20240116; t=1710478005; c=relaxed/simple;
+	bh=USPOvwETNygqrq8lQsfcxdTQonLApjSfO+Tu3XQAwLM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=T6u727yn6s8D/gyBgZcX1QhDpzwOG0nZcYtJYF2ODkO1w4uDrDFo/AbWa4I2vCyL+3HUMnBr8bAiHWFur/7WH2Fv2v6UtOnCLbOEf4Wqb3dxskyRi1AeDB2S/yqt2QKBiaaDnGYIxwzF81PiVvp874J+FpPT6Dhhy1Tmi7G9tRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=a7tk81tb; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-6e6b54a28d0so1486576b3a.2
+        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 21:46:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1710478003; x=1711082803; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GRhcBMHrXtlXWlGZhdypOLdlC8YORx05S7E+LlUDeu8=;
+        b=a7tk81tbmoGxDNK4jHJfqBcxo+86IDYNwLyu6IjuYjqSwR8AO6l8URbYQpqnAi3Fjr
+         m671YTAVflEVK1//ncUo/xylmENJchNz44cqQ8czJXRMvGTbK0UD7i2tN70RsO14Vn4F
+         Qwid3v/kcPIMA7omfj0bmNmDfse8spt/gtQb6BcbFTI0JTWmIMhVBX9H+XZ8PeI1gv71
+         K3lZftbetbKI2DpHf8X5jbIMkmMchMSLN1yyD51PHWkPqoBwCPRG6CzGiXd5OlgAASeo
+         yUU7dY2icMAWZfI1KfRaFoQ8lY2pTlmhHFe4BdHt0ryfiNDnUFu3NfH90hDlVR0vvCW2
+         AZIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710478003; x=1711082803;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GRhcBMHrXtlXWlGZhdypOLdlC8YORx05S7E+LlUDeu8=;
+        b=BRRVhYIgcTAwYb9M+ZMUZ9Ve4gYkgQMAcEpq4MT+escvYGAnvgXmVmByGzjUKu7fNe
+         +v8oyHvz5BuaNIqDV2xRsS/lffKYbHuxZsu0HDe7XP8jWlBDje+W97lojL0c747c4Cj2
+         3ZSgQNnblWQO3+29m4RqxAuCqaCXEBgA+QaFhXmpDdaYo8NGv/c7yysXyFjT0tuDBW5n
+         gs9EaWJrqpOv6YUMFQFbUq5HiScYu9Sd2gVwnoXWhZbh2iUTQvaOTuYhG9yEwZuYE0tt
+         LnzhLS3/RequrR26eA385uk9+RyaV1wVn0nalaFEyqxvLn1YaGFFPYBmqurLEFO4KQ3y
+         QZig==
+X-Forwarded-Encrypted: i=1; AJvYcCWc0c43VoBp4ToiMcZ+/Ms3oILvzZUlm2/x4CH7+ZU6c1eky27ezkaDXU9axFxbmkx7YXuvzgyJpDTpignuy3DDha/GnDfl
+X-Gm-Message-State: AOJu0Yzvs2Zh/GEdwVmcnYRR8NtdQm1gt8hZVp2L//gpGRU4kun+GkJs
+	/TTFz9KDVYBk7x4OSIk7kzH7XycyRsB4khdQYcHDGpYLBLLnjCDiwuotbxa8Iok=
+X-Google-Smtp-Source: AGHT+IHL1JgofBjBzOB3yP6jnjdh4gTTMUMaJCnr+uLZ9KcGga7yvrvHrNhkojVz8Uu0flr1VLKoLg==
+X-Received: by 2002:a05:6a20:12d5:b0:1a1:8c2f:39d7 with SMTP id v21-20020a056a2012d500b001a18c2f39d7mr2446156pzg.34.1710478002774;
+        Thu, 14 Mar 2024 21:46:42 -0700 (PDT)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id hg5-20020a17090b300500b0029c13f9bd7fsm1837854pjb.34.2024.03.14.21.46.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Mar 2024 21:46:42 -0700 (PDT)
+Date: Thu, 14 Mar 2024 21:46:40 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: Denis Kirjanov <kirjanov@gmail.com>, <dsahern@kernel.org>,
+ <netdev@vger.kernel.org>, Denis Kirjanov <dkirjanov@suse.de>
+Subject: Re: [PATCH iproute2] ifstat: handle strdup return value
+Message-ID: <20240314214640.09463821@hermes.local>
+In-Reply-To: <20240315022329.GA1295449@maili.marvell.com>
+References: <20240314122040.4644-1-dkirjanov@suse.de>
+	<20240315022329.GA1295449@maili.marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 01/11] net/smc: adapt SMC-D device dump for
- Emulated-ISM
-To: Jan Karcher <jaka@linux.ibm.com>, wintera@linux.ibm.com,
- twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
- agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240312142743.41406-1-guwen@linux.alibaba.com>
- <20240312142743.41406-2-guwen@linux.alibaba.com>
- <caab067b-f5c3-490f-9259-262624c236b4@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <caab067b-f5c3-490f-9259-262624c236b4@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, 15 Mar 2024 07:53:29 +0530
+Ratheesh Kannoth <rkannoth@marvell.com> wrote:
 
+> > diff --git a/misc/ifstat.c b/misc/ifstat.c
+> > index 685e66c9..f94b11bc 100644
+> > --- a/misc/ifstat.c
+> > +++ b/misc/ifstat.c
+> > @@ -140,6 +140,11 @@ static int get_nlmsg_extended(struct nlmsghdr *m, =
+void *arg)
+> >
+> >  	n->ifindex =3D ifsm->ifindex;
+> >  	n->name =3D strdup(ll_index_to_name(ifsm->ifindex));
+> > +	if (!n->name) {
+> > +		free(n);
+> > +		errno =3D ENOMEM; =20
+> strdup() will set the errno right ? why do you need to set it explicitly ?
+> > +		return -1;
 
-On 2024/3/14 18:23, Jan Karcher wrote:
-> 
-> 
-> On 12/03/2024 15:27, Wen Gu wrote:
->> The introduction of Emulated-ISM requires adaptation of SMC-D device
->> dump. Software implemented non-PCI device (loopback-ism) should be
->> handled correctly and the CHID reserved for Emulated-ISM should be got
->> from smcd_ops interface instead of PCI information.
->>
->> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
->> ---
->>   net/smc/smc_ism.c | 13 ++++++++++---
->>   1 file changed, 10 insertions(+), 3 deletions(-)
->>
->> diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
->> index ac88de2a06a0..b6eca4231913 100644
->> --- a/net/smc/smc_ism.c
->> +++ b/net/smc/smc_ism.c
->> @@ -252,12 +252,11 @@ static int smc_nl_handle_smcd_dev(struct smcd_dev *smcd,
->>       char smc_pnet[SMC_MAX_PNETID_LEN + 1];
->>       struct smc_pci_dev smc_pci_dev;
->>       struct nlattr *port_attrs;
->> +    struct device *device;
->>       struct nlattr *attrs;
->> -    struct ism_dev *ism;
->>       int use_cnt = 0;
->>       void *nlh;
->> -    ism = smcd->priv;
->>       nlh = genlmsg_put(skb, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg_seq,
->>                 &smc_gen_nl_family, NLM_F_MULTI,
->>                 SMC_NETLINK_GET_DEV_SMCD);
->> @@ -272,7 +271,15 @@ static int smc_nl_handle_smcd_dev(struct smcd_dev *smcd,
->>       if (nla_put_u8(skb, SMC_NLA_DEV_IS_CRIT, use_cnt > 0))
->>           goto errattr;
->>       memset(&smc_pci_dev, 0, sizeof(smc_pci_dev));
->> -    smc_set_pci_values(to_pci_dev(ism->dev.parent), &smc_pci_dev);
->> +    device = smcd->ops->get_dev(smcd);
->> +    if (device->parent)
->> +        smc_set_pci_values(to_pci_dev(device->parent), &smc_pci_dev);
->> +    if (smc_ism_is_emulated(smcd)) {
->> +        smc_pci_dev.pci_pchid = smc_ism_get_chid(smcd);
->> +        if (!device->parent)
->> +            snprintf(smc_pci_dev.pci_id, sizeof(smc_pci_dev.pci_id),
->> +                 "%s", dev_name(device));
->> +    }
-> 
-> Hi Wen Gu,
-> 
-> playing around with the loopback-ism device and testing it, i developed some concerns regarding this exposure. Basically 
-> this enables us to see the loopback device in the `smcd device` tool without any changes.
-> E.g.:
-> ```
-> # smcd device
-> FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
-> 0000 0     loopback-ism  ffff   No        0
-> 102a ISM   0000:00:00.0  07c2   No        0  NET1
-> ```
-> 
-> Now the problem with this is that "loopback-ism" is no valid PCI-ID and should not be there. My first thought was to put 
-> an "n/a" instead, but that opens up another problem. Currently you could set - even if it does not make sense - a 
-> PNET_ID for the loopback device:
-> ```
+Man page for strdup says:
 
-Yes, and we can exclude loopback-ism in smc_pnet_enter() if necessary.
+RETURN VALUE
+       On success, the strdup() function returns a pointer to  the  duplica=
+ted
+       string.  It returns NULL if insufficient memory was available, with =
+er=E2=80=90
+       rno set to indicate the error.
 
-> # smc_pnet -a -D loopback-ism NET1
-> # smcd device
-> FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
-> 0000 0     loopback-ism  ffff   No        0  *NET1
-> 102a ISM   0000:00:00.0  07c2   No        0  NET1
-> ```
-> If we would change the PCI-ID to "n/a" it would be a valid input parameter for the tooling which is... to put it nice... 
-> not so beautiful.
-
-FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
-0000 0     n/a           ffff   No        0
-
-IIUC, the problem is that the 'n/a', which would be an input for other tools, is somewhat strange?
-
-Since PCHID 0xffff is clear defined for loopback-ism, I am wondering if it can be a specific sign
-of loopback-ism for tooling to not take PCI-ID into account? Would you also consider that inelegant?
-
-> I brainstormed this with them team and the problem is more complex.
-> In theory there shouldn't be PCI information set for the loopback device. There should be a better abstraction in the 
-> netlink interface that creates this output and the tooling should be made aware of it.
-> 
-
-Yes, it is better. But I couldn't surely picture how the abstraction looks like, and if it is necessary
-to introduce it just for a special case of loopback-ism (note that virtio-ISM also has PCI information),
-since we can identify loopback-ism by CHID.
-
-> Do you rely on the output currently? What are your thoughts about it?
-> If not I'd ask you to not fill the netlink interface for the loopback device and refactor it with the next stage when we 
-> create a right interface for it.
-> 
-
-Currently we don't rely on the output, and I have no objection to the proposal that not fill the netlink
-interface for loopback-ism and refactor it in the next stage.
-
-> Since the Merge-Window is closed feel free to send new versions as RFC.
-
-OK, I will send the new version as an RFC.
-
-Thank you!
-
-> Thank you
-> - Jan
-> 
->>       if (nla_put_u32(skb, SMC_NLA_DEV_PCI_FID, smc_pci_dev.pci_fid))
->>           goto errattr;
->>       if (nla_put_u16(skb, SMC_NLA_DEV_PCI_CHID, smc_pci_dev.pci_pchid))
 
