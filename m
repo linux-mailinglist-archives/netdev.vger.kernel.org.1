@@ -1,56 +1,47 @@
-Return-Path: <netdev+bounces-80066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E532687CD4E
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 13:33:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7A5387CD3E
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 13:29:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AC481C20F5E
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 12:33:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 603B62838A7
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 12:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 733CB1AADF;
-	Fri, 15 Mar 2024 12:33:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35D6D1C2A6;
+	Fri, 15 Mar 2024 12:29:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b="KGhPZOUK"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ZaYhj6ml"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.codelabs.ch (mail.codelabs.ch [109.202.192.35])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81051A38E1
-	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 12:33:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.202.192.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0921C1AAD2;
+	Fri, 15 Mar 2024 12:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710505999; cv=none; b=dw86GyVbeGolI8q6z+JjTr1Vso+3wdjA6k+AfaYRUciCASV2JnZtSq+GMuIXsqhzkqoT9lfrYxi27xher/GFjMumVcXGvtMiGmG3+BL7EZvHV/dWpYwuRJAast3eKAUeTX/aBruPdkJebCJXoaEPtd31dIanDykOVajHk3ki5Ug=
+	t=1710505776; cv=none; b=kxy3eXM0CdPYY4FAnf1PyP6GiMDlY4pIEGgG7yVr6UuqqQMdEdNsYBn6JYRWfulLkNStAP6sAKqrrORLcXyRTw6vJ2IU3auFCDLfOFbmcsJ2MLxHMebXJzcOczjyKrMaEckxuHEfW8VKr0F35ehonHNuWpvV8RNRtn+w8zvPzK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710505999; c=relaxed/simple;
-	bh=TeThsepKwcYMzi6vRV1ofdWBdRt+ego0RAk4qLIWwN0=;
-	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=cC4nCp4iTKvDX6DCZkAzSB2h2ANebK8H3mX77kaIf5YDRbz7djtHbhhdA3OJ3e7aNq8SsMfdGUmT6f3YL1e65oOP/SiQRpCUBdKmvOVTkod6HWwAZEzzV27eA16ud1XSnAzkuQlcnfWczAAkVLUC+h2B2g4xl6bF+L9LLUvCGvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org; spf=pass smtp.mailfrom=strongswan.org; dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b=KGhPZOUK; arc=none smtp.client-ip=109.202.192.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strongswan.org
-Received: from localhost (localhost [127.0.0.1])
-	by mail.codelabs.ch (Postfix) with ESMTP id F3EDB633E5;
-	Fri, 15 Mar 2024 13:25:50 +0100 (CET)
-Received: from mail.codelabs.ch ([127.0.0.1])
- by localhost (fenrir.codelabs.ch [127.0.0.1]) (amavis, port 10024) with ESMTP
- id ZWz9QZs-HPlc; Fri, 15 Mar 2024 13:25:48 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=strongswan.org;
-	s=default; t=1710505548;
-	bh=TeThsepKwcYMzi6vRV1ofdWBdRt+ego0RAk4qLIWwN0=;
-	h=Date:From:To:Cc:Subject:From;
-	b=KGhPZOUKGvRwOgLWn/bd4hah0kusbO8tVLmdsGB/POHKsa40gmdW4Ujpkb+iD1npZ
-	 /YTvysdW3nbhHOwmkJeouODXZkFtmYJLpj+Whgelrr8V2ElcHg4y4UmXITjsYqbrHm
-	 nw2DYjIxtdQdsImSMcqXyZFip3HrnIFaW1BtmEp3EJ5wqHAiYsCoFGtqpK7pKEW+dJ
-	 zu5TSff/N7/D/yk++pq5GC7xMzq/NrLdIjsade2LiRLOxN9kWY8eBgZWUGOVRWLD6n
-	 d85P0bjpwT9Vq0yrQb4tbpXUzz4cK1+AnrUfrK/ei2762OPrB6A+zeu+DT4wb3cDgu
-	 Q6MS0yjF3idUw==
-Received: from [IPV6:2a01:8b81:5400:f500:d47c:2824:818f:c8a] (unknown [IPv6:2a01:8b81:5400:f500:d47c:2824:818f:c8a])
-	by mail.codelabs.ch (Postfix) with ESMTPSA id 556A7633CC;
-	Fri, 15 Mar 2024 13:25:48 +0100 (CET)
-Message-ID: <4f0d0955-8bfc-486e-a44f-0e12af8a403f@strongswan.org>
-Date: Fri, 15 Mar 2024 13:25:48 +0100
+	s=arc-20240116; t=1710505776; c=relaxed/simple;
+	bh=zSg0JLnzu3b+mexUHYjuBLoiSrX/RKbZ+snbm57/7eI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LGCvKW8dI07gUWRl9ho3a4S2I3lL6R24Mcm1rDYgE4a6IsHJreibLhZQ69S4fKD0J74g6VmqBWLon85EzDMIPILO2bB8UtRRbGcQp9BaDGprinLQM4uuXN7h+vEcpjiTHUwSKsX+AwBcVLetKVzr62kTGLGMClfAE8MyIWmYFWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ZaYhj6ml; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1710505769; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=DLwbbjen0CAQVgzQqgyS6vV9v1Bn0lmRB2jT8Yg8TYw=;
+	b=ZaYhj6mloaGhZQ70/6HNnAjHH9WmhExcnjLX+euJIqEX3VF2+/wN+5iS0erg2U8V9PR1ai3mXoC4EMKyyHKrMxW6eeY81wTDj65hGc5pItixveDf7qysQ60Te5OTXLlC16nK1wdFHMGgfB9NOZ32xbXqukYSvxqJcm6kvROVLwI=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R951e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W2XNO79_1710505767;
+Received: from 30.221.129.129(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W2XNO79_1710505767)
+          by smtp.aliyun-inc.com;
+          Fri, 15 Mar 2024 20:29:28 +0800
+Message-ID: <d69885a1-c85f-4d26-a615-fbf6968e2c40@linux.alibaba.com>
+Date: Fri, 15 Mar 2024 20:29:26 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,87 +49,205 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Content-Language: en-US, de-CH-frami
-From: Tobias Brunner <tobias@strongswan.org>
-To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, Steffen Klassert <steffen.klassert@secunet.com>,
- Herbert Xu <herbert@gondor.apana.org.au>
-Autocrypt: addr=tobias@strongswan.org; keydata=
- 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
- tvkh7XWO2ycrW1UlzUzM4KV3SDLIhfOU
-Subject: [PATCH net] ipv4: raw: Fix sending packets from raw sockets via IPsec
- tunnels
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH net-next v3 01/11] net/smc: adapt SMC-D device dump for
+ Emulated-ISM
+To: Jan Karcher <jaka@linux.ibm.com>, wintera@linux.ibm.com,
+ twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
+ agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com
+Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
+ alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240312142743.41406-1-guwen@linux.alibaba.com>
+ <20240312142743.41406-2-guwen@linux.alibaba.com>
+ <caab067b-f5c3-490f-9259-262624c236b4@linux.ibm.com>
+ <a6e4c563-e1d4-44ae-bfab-a0021584220f@linux.alibaba.com>
+ <ef98b16d-2965-4297-a2ed-143b0b592a25@linux.ibm.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <ef98b16d-2965-4297-a2ed-143b0b592a25@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Since the referenced commit, the xfrm_inner_extract_output() function
-uses the skb's protocol field to determine the address family.  So not
-setting it for IPv4 raw sockets meant that such packets couldn't be
-tunneled via IPsec anymore.
 
-IPv6 raw sockets are not affected as they already set the protocol since
-9c9c9ad5fae7 ("ipv6: set skb->protocol on tcp, raw and ip6_append_data
-genereated skbs").
 
-Fixes: 5f24f41e8ea6 ("xfrm: Remove inner/outer modes from input path")
-Signed-off-by: Tobias Brunner <tobias@strongswan.org>
----
- net/ipv4/raw.c | 1 +
- 1 file changed, 1 insertion(+)
+On 2024/3/15 18:27, Jan Karcher wrote:
+> 
+> 
+> On 15/03/2024 04:44, Wen Gu wrote:
+>>
+>>
+>> On 2024/3/14 18:23, Jan Karcher wrote:
+>>>
+>>>
+>>> On 12/03/2024 15:27, Wen Gu wrote:
+>>>> The introduction of Emulated-ISM requires adaptation of SMC-D device
+>>>> dump. Software implemented non-PCI device (loopback-ism) should be
+>>>> handled correctly and the CHID reserved for Emulated-ISM should be got
+>>>> from smcd_ops interface instead of PCI information.
+>>>>
+>>>> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>>>> ---
+>>>>   net/smc/smc_ism.c | 13 ++++++++++---
+>>>>   1 file changed, 10 insertions(+), 3 deletions(-)
+>>>>
+>>>> diff --git a/net/smc/smc_ism.c b/net/smc/smc_ism.c
+>>>> index ac88de2a06a0..b6eca4231913 100644
+>>>> --- a/net/smc/smc_ism.c
+>>>> +++ b/net/smc/smc_ism.c
+>>>> @@ -252,12 +252,11 @@ static int smc_nl_handle_smcd_dev(struct smcd_dev *smcd,
+>>>>       char smc_pnet[SMC_MAX_PNETID_LEN + 1];
+>>>>       struct smc_pci_dev smc_pci_dev;
+>>>>       struct nlattr *port_attrs;
+>>>> +    struct device *device;
+>>>>       struct nlattr *attrs;
+>>>> -    struct ism_dev *ism;
+>>>>       int use_cnt = 0;
+>>>>       void *nlh;
+>>>> -    ism = smcd->priv;
+>>>>       nlh = genlmsg_put(skb, NETLINK_CB(cb->skb).portid, cb->nlh->nlmsg_seq,
+>>>>                 &smc_gen_nl_family, NLM_F_MULTI,
+>>>>                 SMC_NETLINK_GET_DEV_SMCD);
+>>>> @@ -272,7 +271,15 @@ static int smc_nl_handle_smcd_dev(struct smcd_dev *smcd,
+>>>>       if (nla_put_u8(skb, SMC_NLA_DEV_IS_CRIT, use_cnt > 0))
+>>>>           goto errattr;
+>>>>       memset(&smc_pci_dev, 0, sizeof(smc_pci_dev));
+>>>> -    smc_set_pci_values(to_pci_dev(ism->dev.parent), &smc_pci_dev);
+>>>> +    device = smcd->ops->get_dev(smcd);
+>>>> +    if (device->parent)
+>>>> +        smc_set_pci_values(to_pci_dev(device->parent), &smc_pci_dev);
+>>>> +    if (smc_ism_is_emulated(smcd)) {
+>>>> +        smc_pci_dev.pci_pchid = smc_ism_get_chid(smcd);
+>>>> +        if (!device->parent)
+>>>> +            snprintf(smc_pci_dev.pci_id, sizeof(smc_pci_dev.pci_id),
+>>>> +                 "%s", dev_name(device));
+>>>> +    }
+>>>
+>>> Hi Wen Gu,
+>>>
+>>> playing around with the loopback-ism device and testing it, i developed some concerns regarding this exposure. 
+>>> Basically this enables us to see the loopback device in the `smcd device` tool without any changes.
+>>> E.g.:
+>>> ```
+>>> # smcd device
+>>> FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
+>>> 0000 0     loopback-ism  ffff   No        0
+>>> 102a ISM   0000:00:00.0  07c2   No        0  NET1
+>>> ```
+>>>
+>>> Now the problem with this is that "loopback-ism" is no valid PCI-ID and should not be there. My first thought was to 
+>>> put an "n/a" instead, but that opens up another problem. Currently you could set - even if it does not make sense - a 
+>>> PNET_ID for the loopback device:
+>>> ```
+>>
+>> Yes, and we can exclude loopback-ism in smc_pnet_enter() if necessary.
+> 
+> We could, but we have to make sure we implement those distinctions at the right location. E.g.: if virtio-ism is coming. 
+> Does a PNETID make sense for a virtio-ism device? Do we want to exclude is also there or do we want an abstracted 
+> layer/mechanism to recognize if a device has a PNETId capability or not?
+> 
 
-diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
-index 42ac434cfcfa..322e389021c3 100644
---- a/net/ipv4/raw.c
-+++ b/net/ipv4/raw.c
-@@ -357,6 +357,7 @@ static int raw_send_hdrinc(struct sock *sk, struct flowi4 *fl4,
- 		goto error;
- 	skb_reserve(skb, hlen);
- 
-+	skb->protocol = htons(ETH_P_IP);
- 	skb->priority = READ_ONCE(sk->sk_priority);
- 	skb->mark = sockc->mark;
- 	skb->tstamp = sockc->transmit_time;
--- 
-2.34.1
+Understand, a long-term view is better.
 
+>>
+>>> # smc_pnet -a -D loopback-ism NET1
+>>> # smcd device
+>>> FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
+>>> 0000 0     loopback-ism  ffff   No        0  *NET1
+>>> 102a ISM   0000:00:00.0  07c2   No        0  NET1
+>>> ```
+>>> If we would change the PCI-ID to "n/a" it would be a valid input parameter for the tooling which is... to put it 
+>>> nice... not so beautiful.
+>>
+>> FID  Type  PCI-ID        PCHID  InUse  #LGs  PNET-ID
+>> 0000 0     n/a           ffff   No        0
+>>
+>> IIUC, the problem is that the 'n/a', which would be an input for other tools, is somewhat strange?
+> 
+> Exactly.
+> 
+>>
+>> Since PCHID 0xffff is clear defined for loopback-ism, I am wondering if it can be a specific sign
+>> of loopback-ism for tooling to not take PCI-ID into account? Would you also consider that inelegant?
+> 
+> I think deciding on PCHID is the only way we can currently differentiate what kind of device we are talking about. So my 
+> guess would be that PCHID is going to play a big role in future design decisions.
+> 
+
+Make sense to me.
+
+>>
+>>> I brainstormed this with them team and the problem is more complex.
+>>> In theory there shouldn't be PCI information set for the loopback device. There should be a better abstraction in the 
+>>> netlink interface that creates this output and the tooling should be made aware of it.
+>>>
+>>
+>> Yes, it is better. But I couldn't surely picture how the abstraction looks like, and if it is necessary
+>> to introduce it just for a special case of loopback-ism (note that virtio-ISM also has PCI information),
+>> since we can identify loopback-ism by CHID.
+> 
+> Please take the following with a grain of salt. I just want to give you a bit insight of our current train of thought. 
+> None of it is final or set in stone. The idea would be to have device core information that contain the information 
+> which other fields are important for this device. And corresponding "extensions" that contain the information. The 
+> tooling cvould then decide soley on the core information which features are supported by a device and which are not.
+> If that is really needed: Not sure yet. Is this the best solution: Propably not.
+> E.g.:
+> 
+> SMC-D netlink abstraction
+> 
+> +------------------------------------+
+> | Core information                   |
+> | (e.g. PCHID, InUse, isPCI, isS390) |
+> +------------------------------------+
+> 
+> +----------------+
+> | s390 extension |
+> | (e.g.FID)      |
+> +----------------+
+> 
+> +--------------------+
+> | PCI extension      |
+> | (e.g. PCI-ID, ...) |
+> +--------------------+
+> 
+> 
+
+I like this diagram and it is very clear. So core information will be applicable to all ISM devices,
+and the extension information will be specific to some certain kinds.
+
+>>
+>>> Do you rely on the output currently? What are your thoughts about it?
+>>> If not I'd ask you to not fill the netlink interface for the loopback device and refactor it with the next stage when 
+>>> we create a right interface for it.
+>>>
+>>
+>> Currently we don't rely on the output, and I have no objection to the proposal that not fill the netlink
+>> interface for loopback-ism and refactor it in the next stage.
+> 
+> Thank you! If you have ideas regarding the design of the interface hit us up. As soon as we are going to think about 
+> this further I'm going to invite you to those discussions.
+>
+
+Sure! and thank you very much!
+
+
+Best regards,
+Wen Gu
+
+>> >>> Since the Merge-Window is closed feel free to send new versions as RFC.
+>>
+>> OK, I will send the new version as an RFC.
+>>
+>> Thank you!
+> 
+> Thanks!
+> - Jan
+> 
+>>
+>>> Thank you
+>>> - Jan
+>>>
+>>>>       if (nla_put_u32(skb, SMC_NLA_DEV_PCI_FID, smc_pci_dev.pci_fid))
+>>>>           goto errattr;
+>>>>       if (nla_put_u16(skb, SMC_NLA_DEV_PCI_CHID, smc_pci_dev.pci_pchid))
 
