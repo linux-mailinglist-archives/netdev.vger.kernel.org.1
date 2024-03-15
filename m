@@ -1,91 +1,180 @@
-Return-Path: <netdev+bounces-80007-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80008-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EDF687C6F4
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 02:10:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90FE487C701
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 02:16:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A37441F211C6
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 01:10:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D6A01F22249
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 01:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E90E10E4;
-	Fri, 15 Mar 2024 01:10:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2948763AC;
+	Fri, 15 Mar 2024 01:16:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NC7E+xXb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="br1nEQQQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8974C6E
-	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 01:10:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8086633CA
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 01:16:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710465029; cv=none; b=oDkHd+t6kGtHi6WS2rEZBjcje9Kb8N2ztjuf9D5+2z9WqUmQle2ZnUtQ3G1ycTUj3EGKyHXes6+nAv8hMJj5W+5db3vqGQqu+/BzxPmolqXS5AcwLwCtROJQqTe+WfUkT6R5l70BAo+3etgae0VJYgUDAPaQ6tEM5JawESY1Mes=
+	t=1710465373; cv=none; b=c5Kax4y83mVR9BbYpYNkit6iTsd3Hv3DfJdVnByU//QFDi/4jx402RmxX0NNbQLMcL6N0cFalE2178AcAJOtnV9lGM8kSAFTxPDYWpn7/qFpZSKTHcuWDuNXCpbY99ZYGB9XZWxBm8sQwY8aUeYHyw7whuM/h4nAJwzqbA8iu4s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710465029; c=relaxed/simple;
-	bh=Zcr+XrS+8EAha/4Z8gqmMALZLIb6KSbQHLwuBBeDjcI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=XZOvVITtYm9f2FfIX/Q4ccE7gV3kJ9vHXXgUkPsYovsPpOuFJVRlZ6eWGSd+pGCz4vyqZeoZBOBoPChJXL+xFLfhkdrkBM2GMbS7vaJJUy2WmJPk8Y8ihUlePkN4+1iu5qRkRWWVndeQM9XphZpoci2O0xf9bkNA8/eQCPFD4r8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NC7E+xXb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 054FDC43390;
-	Fri, 15 Mar 2024 01:10:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710465029;
-	bh=Zcr+XrS+8EAha/4Z8gqmMALZLIb6KSbQHLwuBBeDjcI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NC7E+xXbxqdCG+Xtjsq+6xQy+3RdKYtvUuwXKPxoBbzNJcUVLQuv35mn1hOW0MW2X
-	 AYB0RdkIlrAIRYloD23482NESsTf9yvvWXCjkK+qp130TEltrVUQpaRHJGsPXepCIC
-	 UiEBEqgau77+eyvcL9JC1tfiRImshpNydqstzs3Hixtp3cCbT65va6RLQQ1jlYSDig
-	 5svKjb8kCYoinJFJVrV5u7WeVem2fQIIepUT3eUeJ22BdmMMOJqIG8NMUlTZ1cLoP4
-	 zU1Qw4r+5pJveCF0p2l/iPy2DmX24uIWGh2VQQzs90PJNzAQ60icRxiLOsmFK2ziRs
-	 al579ou07i82Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E0606D84BAB;
-	Fri, 15 Mar 2024 01:10:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1710465373; c=relaxed/simple;
+	bh=MNA82EmzteSi42VLsPkxKVPHKWQQYJ45agqLLak3vJ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ZYi8J6TSGIGk4uw4Q4nyhfrH/VS1dp9KApdfHf4l4lkq5GS6sq2TMqcankVsZ7CLvdOzHAY+7ZzpIVRcyUHmOOWR2T0v1K0aoDGqPw5o85hL6yDe9bR9G0/8IEaXTpgVcysxmJRU8ACXmLZAqc125rCigD3e7/2GpruufrCE8Oo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=br1nEQQQ; arc=none smtp.client-ip=209.85.222.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-7db26980225so536541241.0
+        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 18:16:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710465370; x=1711070170; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=26PiiWvNs0Ey0RkM9xNmFa0zNTXoebLTqQZOwSO40SI=;
+        b=br1nEQQQkqyl9q9XWWkNxMA51Dwed9sYZgQ4IBMNsm174DgSJ0wsTOyFhUfOABYtJD
+         d4g5TDMgaN9KDdEapcGUH1dRItg6k3AsIxra7kEmNAEfy12JSUSg1+hrTa6LCQzxbhmj
+         RQ8dXOqzLK/gtRHZnFduBBhMXIjgge8dt2XM7r5W6MFD85ZLrHih6x/+L2E+ep0G2ojS
+         Tf4THCYp6hNFhBFiMfRZwOIy3dahA6jJQ5i8lGNnuyKO04kn6olKFnO+nQrgg2K/QMuY
+         RcAU7pA5G+vs2CNk2mgPOnaAjMdb6alSsKAe/wYVS5yFtT6b49EUqpjg3aRpW4WTCUW3
+         Zaow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710465370; x=1711070170;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=26PiiWvNs0Ey0RkM9xNmFa0zNTXoebLTqQZOwSO40SI=;
+        b=OFTz1XhxrDwegDl+Zw/wRQH+TqDL+pxuAJ9q7/UxMviaxsl1d7PV3J+LzVj5u1ge7Q
+         Bbmsrn7cz0WDK8bTAT3ZRULFE4mvU7BedhnSf5WxZ95trbQ99m0aofkw2amjPJZo8R4B
+         neljYLEFqgekoO1o7N3PImT7lkk3iADKetmPPhynleMdg4wS3ahAmkAcjppDl7br63tG
+         i5ykXTP85ocoXcnc+A3huhubFt93htj3LIy/XQPt8A3+FoKYUxRqBdxSnt0kB1bnnRwq
+         Qb8VTvOT6GkpjKN59FScguPrrZcdDOu5vp/jnl+m9bm+uhYKUou/+urVnUlAY/YB/2WZ
+         +W6Q==
+X-Gm-Message-State: AOJu0YyWPNHNk0yXuWepLwe73QCJGT0Gf9glzA4FvRiAKFyLaMS8N4Jd
+	h7HWhQgU+nrb0Q/FyRtIAqMtX/r5md+SJrdhjTL4hatRxPtTFmU=
+X-Google-Smtp-Source: AGHT+IG6Hre5udAfQx9NHDNEU1T9G4vAoPgC3Em/U/IMzIx/Ap0/Yje8+mAPSLh5Mp/xImpGzSz/Fg==
+X-Received: by 2002:a05:6102:3b81:b0:472:65b9:1c59 with SMTP id z1-20020a0561023b8100b0047265b91c59mr1965347vsu.23.1710465370440;
+        Thu, 14 Mar 2024 18:16:10 -0700 (PDT)
+Received: from cy-server ([2620:0:e00:550a:9f1b:4292:76f0:cb8c])
+        by smtp.gmail.com with ESMTPSA id gg8-20020a056214252800b00690befbe5a5sm1225503qvb.74.2024.03.14.18.16.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Mar 2024 18:16:09 -0700 (PDT)
+Date: Thu, 14 Mar 2024 20:16:09 -0500
+From: Chenyuan Yang <chenyuan0y@gmail.com>
+To: chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
+	haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com,
+	ricardo.martinez@linux.intel.com, loic.poulain@linaro.org,
+	ryazanov.s.a@gmail.com, johannes@sipsolutions.net,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org, zzjas98@gmail.com
+Subject: [drivers/net/wwan] Question about possible memory leaks in
+ t7xx_dpmaif_rx_buf_alloc() and t7xx_dpmaif_rx_frag_alloc()
+Message-ID: <ZfOhWVnTsE8JAhXk@cy-server>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net: remove {revc,send}msg_copy_msghdr() from exports
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171046502891.9608.8100318913100139171.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Mar 2024 01:10:28 +0000
-References: <1b6089d3-c1cf-464a-abd3-b0f0b6bb2523@kernel.dk>
-In-Reply-To: <1b6089d3-c1cf-464a-abd3-b0f0b6bb2523@kernel.dk>
-To: Jens Axboe <axboe@kernel.dk>
-Cc: netdev@vger.kernel.org, kuba@kernel.org, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Hello:
+Dear WWAN Driver Developers,
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+We are curious whether the functions `t7xx_dpmaif_rx_buf_alloc()` and `t7xx_dpmaif_rx_frag_alloc` might have memory leaks.
 
-On Tue, 12 Mar 2024 09:55:45 -0600 you wrote:
-> The only user of these was io_uring, and it's not using them anymore.
-> Make them static and remove them from the socket header file.
-> 
-> Signed-off-by: Jens Axboe <axboe@kernel.dk>
-> 
-> ---
-> 
-> [...]
+#1. The function `t7xx_dpmaif_rx_buf_alloc` is https://elixir.bootlin.com/linux/v6.8/source/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c#L164
+and the relevant code is
+```
+int t7xx_dpmaif_rx_buf_alloc(struct dpmaif_ctrl *dpmaif_ctrl,
+			     const struct dpmaif_bat_request *bat_req,
+			     const unsigned int q_num, const unsigned int buf_cnt,
+			     const bool initial)
+{
+	unsigned int i, bat_cnt, bat_max_cnt, bat_start_idx;
+	int ret;
+	...
+	for (i = 0; i < buf_cnt; i++) {
+		unsigned int cur_bat_idx = bat_start_idx + i;
+		struct dpmaif_bat_skb *cur_skb;
+		struct dpmaif_bat *cur_bat;
 
-Here is the summary with links:
-  - net: remove {revc,send}msg_copy_msghdr() from exports
-    https://git.kernel.org/netdev/net/c/e54e09c05c00
+		if (cur_bat_idx >= bat_max_cnt)
+			cur_bat_idx -= bat_max_cnt;
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+		cur_skb = (struct dpmaif_bat_skb *)bat_req->bat_skb + cur_bat_idx;
+		if (!cur_skb->skb &&
+		    !t7xx_alloc_and_map_skb_info(dpmaif_ctrl, bat_req->pkt_buf_sz, cur_skb))
+			break;
 
+		cur_bat = (struct dpmaif_bat *)bat_req->bat_base + cur_bat_idx;
+	}
+	...
+	ret = t7xx_dpmaif_update_bat_wr_idx(dpmaif_ctrl, q_num, i);
+	if (ret)
+		goto err_unmap_skbs;
+	...
+err_unmap_skbs:
+	while (--i > 0)
+		t7xx_unmap_bat_skb(dpmaif_ctrl->dev, bat_req->bat_skb, i);
+}
+```
 
+In the label `err_unmap_skbs`, the function will unmap the allocated memory for `bat_req->bat_skb` by checking `while (--i > 0)`. However, the first element (`i=0`) of `bat_req->bat_skb` is not unmapped since `i` is decremented before the check. 
+By contrast, in the function `t7xx_dpmaif_bat_free` (https://elixir.bootlin.com/linux/v6.8/source/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c#L984), the first element of `bat_req->bat_skb` is unmapped.
+
+Based on our understanding, a possible fix would be
+```
+-      while (--i > 0)
++      while (--i >= 0)
+```
+
+#2. For another function `t7xx_dpmaif_rx_frag_alloc`, the function is https://elixir.bootlin.com/linux/v6.8/source/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c#L319
+
+```
+int t7xx_dpmaif_rx_frag_alloc(struct dpmaif_ctrl *dpmaif_ctrl, struct dpmaif_bat_request *bat_req,
+			      const unsigned int buf_cnt, const bool initial)
+{
+	unsigned int buf_space, cur_bat_idx = bat_req->bat_wr_idx;
+	struct dpmaif_bat_page *bat_skb = bat_req->bat_skb;
+	int ret = 0, i;
+
+	if (!buf_cnt || buf_cnt > bat_req->bat_size_cnt)
+		return -EINVAL;
+	...
+	for (i = 0; i < buf_cnt; i++) {
+		struct dpmaif_bat_page *cur_page = bat_skb + cur_bat_idx;
+		struct dpmaif_bat *cur_bat;
+		dma_addr_t data_base_addr;
+		...
+		cur_bat = (struct dpmaif_bat *)bat_req->bat_base + cur_bat_idx;
+		cur_bat->buffer_addr_ext = upper_32_bits(data_base_addr);
+		cur_bat->p_buffer_addr = lower_32_bits(data_base_addr);
+		cur_bat_idx = t7xx_ring_buf_get_next_wr_idx(bat_req->bat_size_cnt, cur_bat_idx);
+	}
+	...
+	if (i < buf_cnt) {
+		ret = -ENOMEM;
+		if (initial) {
+			while (--i > 0)
+				t7xx_unmap_bat_page(dpmaif_ctrl->dev, bat_req->bat_skb, i);
+		}
+	}
+
+	return ret;
+}
+```
+
+Similarly, the function will unmap the allocated memory for `bat_req->bat_skb` by checking `while (--i > 0)`. However, the first element (`i=0`) of `bat_req->bat_skb` is not unmapped since `i` is decremented before the check.
+
+Please kindly correct us if we missed any key information. Looking forward to your response!
+
+Best,
+Chenyuan
 
