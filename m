@@ -1,145 +1,148 @@
-Return-Path: <netdev+bounces-80012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B07F87C766
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 03:15:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4817787C772
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 03:23:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB71EB22024
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 02:15:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3ED621C20899
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 02:23:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ACF96FAF;
-	Fri, 15 Mar 2024 02:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30ED16FB1;
+	Fri, 15 Mar 2024 02:23:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mtimcoJd"
 X-Original-To: netdev@vger.kernel.org
-Received: from outbound24.service-now.com (outbound24.service-now.com [149.96.6.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC7921A38CD;
-	Fri, 15 Mar 2024 02:15:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=149.96.6.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62211612E
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 02:23:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710468916; cv=none; b=MFdmUt5qYXxX+x2SdiRZzG6r7m9ZTrVRNRByY1ZTZlEo0YiW619/VNcTlxLYVEVahHOKHOr4MuVqhQzu+tiRPy1t/h+expWw5ZTjz/yHQWuvDjHPbx2n3woTvy37igQqv73B1wM9GhAhdihEwHf99yEfmAxZ5xge24zmAtdM2H8=
+	t=1710469413; cv=none; b=gI9iaA4mqQ0rTMuQGkpdkfSeVlwHcqAeYJHgDnz9e7orQ0AECRFIbWnKhpnrRNIG/GXTokqRV0WCqOC/oFQbZlkyjk4WG+kWcf8u7z0TdDFWczz67Lbwi9yMl/qZYNTxY9/LBdmhXr4zNIJ11mbUMh8a7PrLEZ/RhD3+bl7z2mw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710468916; c=relaxed/simple;
-	bh=uREuCvA2ZwkvR0x+FuEV8a7hjdww08RBXCd0/Pgn4HA=;
-	h=Date:From:To:Message-ID:Subject:MIME-Version:Content-Type; b=GmlgR4R7R0+3Ho6Q5fIet4NMQmPxKXGHtK8pUgOOZ+noAe5ziaIn7evQlt7SBWBdOtgYt8PMFiXx+5C9DedLtdRRWGfbBQa74D7CtbjaQhcZca+CzQzunb0LsSbPYYryw5bM24iWnuwsV8z3q9qn39w/xToi4KeRFogIN6ptTgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; arc=none smtp.client-ip=149.96.6.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-Received: from app142018.ycg3.service-now.com (unknown [10.248.3.236])
-	by outbound24.service-now.com (Postfix) with ESMTP id 240FC401621B;
-	Thu, 14 Mar 2024 19:15:13 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 outbound24.service-now.com 240FC401621B
-Date: Thu, 14 Mar 2024 19:15:13 -0700 (PDT)
-From: Red Hat Product Security <secalert@redhat.com>
-Reply-To: Red Hat Product Security <secalert@redhat.com>
-To: richardcochran@gmail.com, syzkaller@googlegroups.com,
-	liujingfeng@qianxin.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Message-ID: <5524723.20003.1710468913133@app142018.ycg3.service-now.com>
-Subject: Re: memory leak in posix_clock_open
+	s=arc-20240116; t=1710469413; c=relaxed/simple;
+	bh=v26r+iWkQ3ZsI3Kdcl6Qqdxz6+Hc5s0Q9UXwUlL0DGI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tNInsw9ja7gg0mAQ/V5LZiwQpFcPHa3YX1CIrD0dByrj8oxIPxRlGOW2ag/oVMfTKyPtlGujm9SXhiYyaaFS881/7101hM7IRF9ogXQ/3NBSEIBqUyO4lha2FtLnMbLjmNClPJV/NtQj++YM3qWmPh1LT+gPwZ4oUr8VEQdpJsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mtimcoJd; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a449c5411e1so204047766b.1
+        for <netdev@vger.kernel.org>; Thu, 14 Mar 2024 19:23:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710469409; x=1711074209; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SfnLMHFmgZCHu++QT09RzkmR1d7aMpSwbkxA0B3D3jU=;
+        b=mtimcoJdO3RQiZs1atVc53y3PVCwJFVgw3KM5pbEW6tVYGMclujaaUdu4vcA69c3Gx
+         GYwQ6nT68QFPUy1+Yhm4hl06UOlgq/A+lnS79a7gH1pDBjsqQ92UWnx2mk3/vf3GlUFu
+         NUNKBjF4e0WtpIinF6/mBZFkCzdzeh/LYfjZmI3JXKXTk5PpOqn9Y11kpR59DwdzSJTB
+         b+52efDBPkNgwBsVdpE1bPes6wrZNi9ldh66aU2sd8v6Z+/a/hPYG1WZyIDQYngp7ZJI
+         5tLqeaW9pBGE3BR7P0YcIoIIKBDMPvGRElUlojB+sD4keETtBIABWGM82+2d0NuiWzbf
+         6jkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710469409; x=1711074209;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SfnLMHFmgZCHu++QT09RzkmR1d7aMpSwbkxA0B3D3jU=;
+        b=VH3SN4hhxgpbdTh60rL6kKnqlmtCEySBS3e20zkY30flZUE2hoEsHzvz4HHmUGv3Zj
+         Hal0EyBtmhGK2uvL6v2OmwNOm+xy4yvjtROJ5VDblwFSmDz928/dHkGXkpLtmdzFd4zT
+         YemkRCLA2hy9XVRex7QrjHYg0P56gZlWhZW1AUe6xnS/rHJ7wTJjvR4BWNyP1VlRFx8W
+         j+Tp89B/x1gHixekL7VFnfuZHPskDw6ZmksdLDaTIPCa665enGYuW1hWGfVhaxMWMYk5
+         rJjp7sd8LbJVLFYh8re5wcXLDyK2sqr1E7m+FIx43YRSDwCX4oIreKr7zfLxVKk/bErH
+         85Cw==
+X-Forwarded-Encrypted: i=1; AJvYcCXB4wkU2hOUMdG0H15gHVHQZaohaXTu3oAo1mto9cB8yl1hU+Kz9mg6exFmrFWUy0mciISr2Uz0svAwfoEXJPOa+hdUXwoH
+X-Gm-Message-State: AOJu0YxqbGGs4u9rfb2nXhv1vHwT7uYppWP/3UKfA20Bwk+Zr0OvrMzU
+	kndwd3LJY0fIiSnwJGMi70DM/j2vHm+otMgh+FbLKP10Nct0PM4XGBSRz6+T6lfqx/zPwUhRmfD
+	+UtBITtQRSednkHQ7YYF94WZNh6U=
+X-Google-Smtp-Source: AGHT+IFU64CZXLY6h9ycVETCBlkgsMJC91lYnZcpq1OVKSLNK0kDw1Q+bANMM4u/ki4e4Gdo7znnsK3Lpqf3sCxoSF8=
+X-Received: by 2002:a17:906:f118:b0:a46:5597:596a with SMTP id
+ gv24-20020a170906f11800b00a465597596amr2303673ejb.45.1710469408693; Thu, 14
+ Mar 2024 19:23:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; 
-	boundary="----=_Part_20001_18246630.1710468913133"
-X-ServiceNow-Source: Notification-ec04d32213ede300196f7e276144b04e
-X-ServiceNow-SysEmail-Version: 2
-Precedence: bulk
-Auto-Submitted: auto-generated
-X-ServiceNow-Generated: true
-
-------=_Part_20001_18246630.1710468913133
-Content-Type: multipart/alternative; 
-	boundary="----=_Part_20002_27205147.1710468913133"
-
-------=_Part_20002_27205147.1710468913133
-Content-Transfer-Encoding: 7bit
-Content-Type: text/plain; charset=UTF-8
-
-Hello!
-
-INC2889741 (memory leak in posix_clock_open) has been updated.
-
-Opened for: liujingfeng@qianxin.com
-Followers: richardcochran@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, syzkaller@googlegroups.com
-
-A Guest updated your request with the following comments:
-
-Reply from: qiang.zhang1211@gmail.com [mailto:qiang.zhang1211@gmail.com]
- >
-> On Mon, Mar 11 2024 at 17:46, Z qiang wrote:
-> >
-> > diff --git a/kernel/time/posix-clock.c b/kernel/time/posix-clock.c
-> > index 9de66bbbb3d1..71d9d8c394fa 100644
-> > --- a/kernel/time/posix-clock.c
-> > +++ b/kernel/time/posix-clock.c
-> > @@ -137,6 +137,8 @@ static int posix_clock_open(struct inode *inode,
-> > struct file *fp)
-> >
-> > if (!err) {
-> > get_device(clk->dev);
-> > + } else {
-> > + kfree(pccontext);
-> > }
-> > out:
-> > up_read(&clk->rwsem);
->
-> Looks about right. Can you please send a proper patch?
- I will send a patch.
- Thanks,
-Zqiang
-
-How can I track and update my request?
-
-To respond, reply to this email. You may also create a new email and include the request number (INC2889741) in the subject.
-
-Thank you,
-Product Security
-
-Ref:MSG86727590
-------=_Part_20002_27205147.1710468913133
+References: <20240314141816.2640229-1-edumazet@google.com>
+In-Reply-To: <20240314141816.2640229-1-edumazet@google.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 15 Mar 2024 10:22:51 +0800
+Message-ID: <CAL+tcoCzSc2YONPuwgC7f9ogKVndHzUcX9PMizgHHQ=1wqChKw@mail.gmail.com>
+Subject: Re: [PATCH net] packet: annotate data-races around ignore_outgoing
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	syzbot+c669c1136495a2e7c31f@syzkaller.appspotmail.com, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/html; charset=UTF-8
 
-<html><head></head><body><div><p style=3D"margin-top:0;margin-bottom:10px;"=
->Hello!</p><p style=3D"margin-top:0;margin-bottom:10px;">INC2889741 (memory=
- leak in posix_clock_open) has been updated.</p><p style=3D"margin-top:0;ma=
-rgin-bottom:10px;">Opened for:&nbsp;liujingfeng@qianxin.com<br>Followers:&n=
-bsp;richardcochran@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.ker=
-nel.org, syzkaller@googlegroups.com</p></div>
-<p style=3D"margin-top: 10px; margin-bottom: 10px;">A Guest updated your re=
-quest with the following comments:</p>
-<div style=3D"padding: 10px 0 10px 10px; background-color: ivory;"><div>Rep=
-ly from: <a target=3D"_blank" href=3D"mailto:qiang.zhang1211@gmail.com" rel=
-=3D"noopener noreferrer nofollow">qiang.zhang1211@gmail.com</a></div><div>&=
-nbsp;</div><div>&gt;</div><div>&gt; On Mon, Mar 11 2024 at 17:46, Z qiang w=
-rote:</div><div>&gt; &gt;</div><div>&gt; &gt; diff --git a/kernel/time/posi=
-x-clock.c b/kernel/time/posix-clock.c</div><div>&gt; &gt; index 9de66bbbb3d=
-1..71d9d8c394fa 100644</div><div>&gt; &gt; --- a/kernel/time/posix-clock.c<=
-/div><div>&gt; &gt; +++ b/kernel/time/posix-clock.c</div><div>&gt; &gt; @@ =
--137,6 +137,8 @@ static int posix_clock_open(struct inode *inode,</div><div=
->&gt; &gt; struct file *fp)</div><div>&gt; &gt;</div><div>&gt; &gt;        =
- if (!err) {</div><div>&gt; &gt;                 get_device(clk-&gt;dev);</=
-div><div>&gt; &gt; +       } else {</div><div>&gt; &gt; +               kfr=
-ee(pccontext);</div><div>&gt; &gt;         }</div><div>&gt; &gt;  out:</div=
-><div>&gt; &gt;         up_read(&amp;clk-&gt;rwsem);</div><div>&gt;</div><d=
-iv>&gt; Looks about right. Can you please send a proper patch?</div><div>&n=
-bsp;</div><div>I will send a patch.</div><div>&nbsp;</div><div>Thanks,</div=
-><div>Zqiang</div></div>
-<div><p style=3D"margin-top:20px;margin-bottom:10px;"><strong>How can I tra=
-ck and update my request?</strong></p><p style=3D"margin-top:0;margin-botto=
-m:10px;">To respond, reply to this email. You may also create a new email a=
-nd include the request number (INC2889741) in the subject.</p></div>
-<p style=3D"margin-top: 14px; margin-bottom: 0;">Thank you,<br>Product Secu=
-rity</p><div>&nbsp;</div><div style=3D"display:inline">Ref:MSG86727590</div=
-></body></html>
-------=_Part_20002_27205147.1710468913133--
+On Thu, Mar 14, 2024 at 10:18=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> ignore_outgoing is read locklessly from dev_queue_xmit_nit()
+> and packet_getsockopt()
+>
+> Add appropriate READ_ONCE()/WRITE_ONCE() annotations.
+>
+> syzbot reported:
+>
+> BUG: KCSAN: data-race in dev_queue_xmit_nit / packet_setsockopt
+>
+> write to 0xffff888107804542 of 1 bytes by task 22618 on cpu 0:
+>  packet_setsockopt+0xd83/0xfd0 net/packet/af_packet.c:4003
+>  do_sock_setsockopt net/socket.c:2311 [inline]
+>  __sys_setsockopt+0x1d8/0x250 net/socket.c:2334
+>  __do_sys_setsockopt net/socket.c:2343 [inline]
+>  __se_sys_setsockopt net/socket.c:2340 [inline]
+>  __x64_sys_setsockopt+0x66/0x80 net/socket.c:2340
+>  do_syscall_64+0xd3/0x1d0
+>  entry_SYSCALL_64_after_hwframe+0x6d/0x75
+>
+> read to 0xffff888107804542 of 1 bytes by task 27 on cpu 1:
+>  dev_queue_xmit_nit+0x82/0x620 net/core/dev.c:2248
+>  xmit_one net/core/dev.c:3527 [inline]
+>  dev_hard_start_xmit+0xcc/0x3f0 net/core/dev.c:3547
+>  __dev_queue_xmit+0xf24/0x1dd0 net/core/dev.c:4335
+>  dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+>  batadv_send_skb_packet+0x264/0x300 net/batman-adv/send.c:108
+>  batadv_send_broadcast_skb+0x24/0x30 net/batman-adv/send.c:127
+>  batadv_iv_ogm_send_to_if net/batman-adv/bat_iv_ogm.c:392 [inline]
+>  batadv_iv_ogm_emit net/batman-adv/bat_iv_ogm.c:420 [inline]
+>  batadv_iv_send_outstanding_bat_ogm_packet+0x3f0/0x4b0 net/batman-adv/bat=
+_iv_ogm.c:1700
+>  process_one_work kernel/workqueue.c:3254 [inline]
+>  process_scheduled_works+0x465/0x990 kernel/workqueue.c:3335
+>  worker_thread+0x526/0x730 kernel/workqueue.c:3416
+>  kthread+0x1d1/0x210 kernel/kthread.c:388
+>  ret_from_fork+0x4b/0x60 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+>
+> value changed: 0x00 -> 0x01
+>
+> Reported by Kernel Concurrency Sanitizer on:
+> CPU: 1 PID: 27 Comm: kworker/u8:1 Tainted: G        W          6.8.0-syzk=
+aller-08073-g480e035fc4c7 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 02/29/2024
+> Workqueue: bat_events batadv_iv_send_outstanding_bat_ogm_packet
+>
+> Fixes: fa788d986a3a ("packet: add sockopt to ignore outgoing packets")
+> Reported-by: syzbot+c669c1136495a2e7c31f@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/CANn89i+Z7MfbkBLOv=3Dp7KZ7=3DK1rKH=
+O4P1OL5LYDCtBiyqsa9oQ@mail.gmail.com/T/#t
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 
-------=_Part_20001_18246630.1710468913133--
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+
+Thanks!
 
