@@ -1,331 +1,327 @@
-Return-Path: <netdev+bounces-80036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1000387C9D4
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 09:20:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94CC487C9BE
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 09:13:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46E89B22AFC
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 08:20:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26FCB2814C5
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 08:13:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A63C815E8B;
-	Fri, 15 Mar 2024 08:20:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0759914AB7;
+	Fri, 15 Mar 2024 08:13:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="ZY8EHCkA"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="NH9Un/u6";
+	dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b="kkNGtqmh"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D24E317BA3;
-	Fri, 15 Mar 2024 08:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710490832; cv=none; b=bslSon3F81CUniWxih1E19T5KeGfb+Gt0n01wjpHJTO6dADQIzs2A02vUHl6J9zPff13f3BhmYsGwVs5pfwRX8qiqmAOtHISs62BqJ7MGrwdqnYTEQGseAhu2NQaO26Gytx/ba5sNyl2wP2IJEi8SURgsLPYX5McaCs0ZpM6Coo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710490832; c=relaxed/simple;
-	bh=xUuE1iZyi4Wob8UCQdc96ObbDd1HQ8vDLq2+WEYq5Ok=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=GrktJzUE/I5djrH5OdW55xtniPkcjxO/vZac9jJ8xuHZDhl+vTVHZRT/y1ti7YwQN40sRdUL2hQPmPmESYlNBG6Wjs8c9R/aBRiYUJo4BSXNbgfy6kYsAz3aVyPWMswZcbG3M3VCVjeeTNu6JB8q6LUcGRiFws/sL1+F1LxkODQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=ZY8EHCkA; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1710490826; h=Message-ID:Subject:Date:From:To;
-	bh=edjWm6pjFHdaKcblPtA1wtYlkDRoGpaq6U1nkRYhcmg=;
-	b=ZY8EHCkAwJw5OydHeKAr9r0BTaaRcG+g8Oac9tcI5szQo6dTADEniHl9Vdg9+cLMx1CdlPqVLLSX/LYNW+ffTR3+AQN5UOU9WW9kob+a95+F/k6ruujRnCpTEm+oXllysxFW8/cvbEmDl/ZejqTxt3I1DYUMxWZCo9G4hekq2Lo=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W2Vjw7v_1710490825;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W2Vjw7v_1710490825)
-          by smtp.aliyun-inc.com;
-          Fri, 15 Mar 2024 16:20:26 +0800
-Message-ID: <1710490269.2113092-3-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v4 7/8] netdev: add queue stats
-Date: Fri, 15 Mar 2024 16:11:09 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric  Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>,
- "Michael S.  Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Alexei  Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@google.com>,
- Amritha  Nambiar <amritha.nambiar@intel.com>,
- Larysa Zaremba <larysa.zaremba@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240314085459.115933-1-xuanzhuo@linux.alibaba.com>
- <20240314085459.115933-8-xuanzhuo@linux.alibaba.com>
- <20240314162142.36b8ff02@kernel.org>
-In-Reply-To: <20240314162142.36b8ff02@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BADC817559;
+	Fri, 15 Mar 2024 08:12:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=60.244.123.138
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710490383; cv=fail; b=laayC40S4e98yJcdF7ldJl2TOmNYfy7L9HRUfaSqY+rLoQGLLFUNxFA2pFBz0otWVGxuJfB3/PP2bIBNF12nklNpkDfHPw6zKjriLJVTmY9SXsWqRVWhVir7zQP/9JW+rIHGqHRsp75petbtZDKkcwska8UCVTLc6YIugtsXL8Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710490383; c=relaxed/simple;
+	bh=ozbfC+AXU+fQubpUHXTXPGBZxvFR+StRaOmTYCNbiDw=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=NwLV0FzzqmjiOiDp9vkYqxTO7vh5/ihK4a4I135I0Hia+cn6ZlKytC8pr/DZbT1yBzOXtm/0n+PhxeBYNCw/Ze2aRTsWS9BC8JW140B7TnLJ2D2DPeeUHasAQ0qMnDeX2QfXRRQLexhhJ4lyLQ1uzCM6crnuz6u7vMQQN6eHzao=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=NH9Un/u6; dkim=pass (1024-bit key) header.d=mediateko365.onmicrosoft.com header.i=@mediateko365.onmicrosoft.com header.b=kkNGtqmh; arc=fail smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: d28498dae2a311eeb8927bc1f75efef4-20240315
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=MIME-Version:Content-Transfer-Encoding:Content-ID:Content-Type:In-Reply-To:References:Message-ID:Date:Subject:CC:To:From; bh=ozbfC+AXU+fQubpUHXTXPGBZxvFR+StRaOmTYCNbiDw=;
+	b=NH9Un/u6uyAjg55NK2olUUhISUYrfvmixmoC2Gg6zBdV4VN1qfyyX92/5fkhj93hW20XpffuA1b3B7L6nx8TEGV3CnTwDMt+N+8TjijZJj+VE3suyExDEmgO/W5LcxFBhTlCdHtbtRAv38kCNFhAhh4wVo6xv4mo39xQruXfwcg=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.37,REQID:d278eda4-fc03-435d-9f9c-a9ccc174f1f7,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:6f543d0,CLOUDID:308ceeff-c16b-4159-a099-3b9d0558e447,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES
+	:1,SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: d28498dae2a311eeb8927bc1f75efef4-20240315
+Received: from mtkmbs11n2.mediatek.inc [(172.21.101.187)] by mailgw01.mediatek.com
+	(envelope-from <lena.wang@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1889432486; Fri, 15 Mar 2024 16:12:53 +0800
+Received: from mtkmbs10n2.mediatek.inc (172.21.101.183) by
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 15 Mar 2024 16:12:51 +0800
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (172.21.101.237)
+ by mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Fri, 15 Mar 2024 16:12:51 +0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=UjByOceTuP7LhZYr2plnitWJBkz4SPa1LUkGEPj4o9ASqTQBr500eu/iHgp8gH8tJoXLtFmi2W0mHGyHyUslfDYY+cSRtOn4eBWdHXtoVRNcTV8S8Pt923HpIDECTI4hJN5GtvUvrLysKXaaNkw4kK7rucU2yJiNYwSprwyDRqqU6oSpxi4bTnZ6zBFTKNwstCUy/U2jgaN+CjJ7PCQXVCQPS7z+UPCXNqAPrlRoA3hbikXUeJbpgc1MVz5U4GxhcL+gdu5ObzW631wsgH6MCgyXDlfNVPN8JeI7Ow8ZxbqLkQyzL0Koflnc7bmwaZoBp+U3hyKG5h6Bsnalpx05lA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ozbfC+AXU+fQubpUHXTXPGBZxvFR+StRaOmTYCNbiDw=;
+ b=EbZYbuZo0oz4lIpThx8yYSd9E38vz9pwqmH7VkwbBHhgAVblpQKrqqDYD8zjB63XIfurN1T6maeIamzMaRMmvysulxhOqVGgVefWsS6GM1y0f3TbBvEmSZxqEm/LIlrGzGCZYXGiUSz2PNAyZgP1VYcL4rZG+k889r6oy36GbD3cDXSadY1EWNHQdUfnnQmqiitlB6eNrdxS4KNco7R2Qo1etvSI5jNOHMF9pJ2MA2hhXfTwLG8J9u9tiIzCWpHTSH6SCFC18DPDc93EupxcT940EfPIuSNQypq+2znYY/NDQ5qPEcrx/6S4UqmnJZhc7hKcRYNyvCSAhQV1WiI9rA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=mediatek.com; dmarc=pass action=none header.from=mediatek.com;
+ dkim=pass header.d=mediatek.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mediateko365.onmicrosoft.com; s=selector2-mediateko365-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ozbfC+AXU+fQubpUHXTXPGBZxvFR+StRaOmTYCNbiDw=;
+ b=kkNGtqmhDD5W7szf8M943WmVzttcj1K3qhGmT5ZZqcSqMWw0LM60mnMBCAGKsyLTJZScjHoUGhak9ZthBBesckLoYRco1LhRpBkIXZ4S3pR3jNEbDl4Oo8J2MS8CmajL706ufZYautpjoPL67kLKALpdrOWATyEogOVYLbxjmDo=
+Received: from SEZPR03MB6466.apcprd03.prod.outlook.com (2603:1096:101:4a::8)
+ by PUZPR03MB7062.apcprd03.prod.outlook.com (2603:1096:301:117::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.18; Fri, 15 Mar
+ 2024 08:12:49 +0000
+Received: from SEZPR03MB6466.apcprd03.prod.outlook.com
+ ([fe80::3b7d:ad2c:b2cf:def7]) by SEZPR03MB6466.apcprd03.prod.outlook.com
+ ([fe80::3b7d:ad2c:b2cf:def7%6]) with mapi id 15.20.7386.017; Fri, 15 Mar 2024
+ 08:12:49 +0000
+From: =?utf-8?B?TGVuYSBXYW5nICjnjovlqJwp?= <Lena.Wang@mediatek.com>
+To: "davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org"
+	<kuba@kernel.org>, =?utf-8?B?U2hpbWluZyBDaGVuZyAo5oiQ6K+X5piOKQ==?=
+	<Shiming.Cheng@mediatek.com>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net] udp: fix segmentation crash for untrusted source
+ packet
+Thread-Topic: [PATCH net] udp: fix segmentation crash for untrusted source
+ packet
+Thread-Index: AQHadU0V/KX9aGZU4EuMp/Fpo6HSuLE1zysAgAKnWgA=
+Date: Fri, 15 Mar 2024 08:12:49 +0000
+Message-ID: <ee5fb4ca84598f302f44ca9d4182d6f5b796232f.camel@mediatek.com>
+References: <20240313133402.9027-1-shiming.cheng@mediatek.com>
+	 <e826f337c3db612852c5f543d123ee53adc885bb.camel@redhat.com>
+In-Reply-To: <e826f337c3db612852c5f543d123ee53adc885bb.camel@redhat.com>
+Accept-Language: zh-CN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SEZPR03MB6466:EE_|PUZPR03MB7062:EE_
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: VMi3dG4M5m2xht0VfU9xU6r795G6liDaeow4im/Q7rmVUQINKyYqI770HyDLfhNzZGn/a83aQjVm9rJvZeg8HnFRzzmp3FwUex5MsohcvLS5O0BuDRjnyR1ix62Un8f1SKQhApQrkzvQeyD839i66RDu9koTJGki9ML9FF3oCswgARGbeKUuOGL61cRtnpOIx8HZvF841edk8uJvO/TZpBpwzVEl96kDuNyZVrqb3yqtnpTferaqMNIhUwGQGM8K2D8y+OrtC6SZ/GquHOhQgUfOcpA4XjLCNwQnndj+VdPHIsyRfodMxLDf57aDkKfeTU2RDL+nm7dlh5mePbdC0iIqZz5LF7DKMPUj1vw9HaixUPSXEjL9J1LulSJ/9Mn+hrNfHlXY+7hR9wmcJ6qAnUwqL4N6P/cl70vbyOXjMhMgl2KhTymu+lRZAYznR81RcB2/MzedZT83+j2iFkM6DZ+8WKmplS1Mndbd5NBqUcUdJb8Dqv3ZkCKfSJzcMUPDQT06IeIhkOwR38ELQCS/9UjJQUDBgT3HMEU/PHN/064Ebn5TyjUt/L6RMp68sEklIAnI+lmFJ0s/CogTUJKVzrNOB1WN3Bi1/mTlrrozzNI=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEZPR03MB6466.apcprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?RDBjc1kzMnNuOHA3b0JSMmVjbGZzZWY1VnB3VlFrbyt1ZU9say85dVI3cElS?=
+ =?utf-8?B?VG1jUG5GTUMxNW1XcUlMTnJOODFMM1o3dVQwN0ptcEZtTVcyejVubWJxSFQv?=
+ =?utf-8?B?K2FPY2JaU1dUczlaa0dpSXd1cW4yYUNDallWbUthaEh6bytzbDhmN2lQcC9F?=
+ =?utf-8?B?UWhIcFVqa21tbTRqUnA3ZlRXV3RBK2Z3U3owWnZPSWs1RzFUM1hFaE84U0Vx?=
+ =?utf-8?B?NFRIcnZvOWJpSFptV251cm5ocnI3ZlZuMVVmN3JMSDNPRitzbGhFSjJlZmZK?=
+ =?utf-8?B?OTk0T1B0bFF1aXUvY3poWGxLQTlPVmcxQ2ppU3d5ckhHZHNldEpFUWl6dk5q?=
+ =?utf-8?B?ZWE2OE5VU2U1WUNUa0d0Q2xuUEVEOVJha0VrZGcwZjNhanh5bXN6V1Y3UnJK?=
+ =?utf-8?B?Ly91S3dSY1dLLzZ1dGh0d091TTFyM0tQcjd4bXZCUndsU3UxQ3pCcXlLKzFD?=
+ =?utf-8?B?S0lkdE9ReE41clNiWFlpdytHZTdhMzNHbmFNYzVoNmZDaStZZWFVNTlNRHJj?=
+ =?utf-8?B?RURXSks1NFR6b0p1dk5RY21mUVBGWWdYVTBiclNxelBCK3JSWVdzZ0ZrK0FS?=
+ =?utf-8?B?VVEwL1M3dUFzOUUvMEJzaUpkNjJKQ1hTd3Y4c080UVdxZWNqMU05MzF2ajVm?=
+ =?utf-8?B?SlNXZUI3Y1RMcXBqNmJiMG1VZHFHL1Y0NlVHN1FEMzR0aTQyOGJQajhrM0oz?=
+ =?utf-8?B?QWVEeEhIdDlOQVBFRGZ4cnlPNENkVnhTejliYnJ3MjlIdSszdys1WVVMeWFE?=
+ =?utf-8?B?S1c3RDBzb0N5dVJST1FzbG40UitiaG5vL0lKMDhIWjhydlBvYTREQm8vZGhY?=
+ =?utf-8?B?UTdzeEhGM1lpalpUSUFXNStDeUoyZFFlTXpDUER2SjU5aWxac1V4aHllZU1V?=
+ =?utf-8?B?WHFoUWpZRU1yOFZWaW9LTGtPbks5UytlVjd4RnRpNE1NbEliTU1Ccmtxcm5m?=
+ =?utf-8?B?dFhjNVFpT1hvZmR3OCtaTGhkSzliUEhSL0dzMjdTK0dNOEVNVzFvS3BJSldo?=
+ =?utf-8?B?Y3cwTVVPSURnRlVOZUVPbC9FOUdsWmZIdTNnSDEyeWIveVQzRmlDNzkvSDIr?=
+ =?utf-8?B?MUMvKzNabzF0ellHdE50bDNvSWVjNjJxRmJvckg2bzBLSUtMMEZub2hIVlR0?=
+ =?utf-8?B?Z1FpMGRFeE1LU1crSUgzOGZiN25XR0VrZGNrUjU5RUVXWW9hK1phZmxGOTdi?=
+ =?utf-8?B?bFNjLzdBVjZWcE1CNTB2bkIvRkkxQkZ1Ymp2L0E4QW5mZHFRaEJPNWVDck9R?=
+ =?utf-8?B?d1ZFdGFZSUdnSUtXQTBGcjRqWUlLVWxtVHRMaUg2K0lOaWxRWXdQSzM1ckRH?=
+ =?utf-8?B?UzlUbzJqZG1ZRFF3WGd5WlAwTDNrWEFyMUFwVS9zSU9ueFM5aXNOQUtrRzBK?=
+ =?utf-8?B?ZnBOcEhWajdvUWc0eTBHSE5ocGdSMy9lNXBrZkhmRXhLTEJDSW15SU41N2sr?=
+ =?utf-8?B?Y3QwTVozdEpHcUtMenBsS1kvYTJZM0JwVU96TGpRN3drMkx2dTVNY0lydHVo?=
+ =?utf-8?B?cUY1K3hZVUpicVBjc3paNUdFRHFwUmRUSTUvRUxOUENDSi9EY3lObzdWTjZm?=
+ =?utf-8?B?emVORE9RbkJCZGdiNS9MMGdNRVpYTDdEd1hKS2VTNEVRTUZydFM2VFUxcU9t?=
+ =?utf-8?B?TmRtU2E2RXJ4Y2ZUb0JaYllsYW80Y2pYUXJidVlrMnJYRkZhUXV6a05nMjBO?=
+ =?utf-8?B?d3k3K3NrYVgxNzZUbzBpdzgveUxjbDNBUFJRenZ4MzlKcnB2Nk9Ndnh6elNv?=
+ =?utf-8?B?TXpvV1JNTnYybzZjZUdsUzM4NmJ5UnA5M3hMaE1oc1c3RmlZRWgrRFh5ekRD?=
+ =?utf-8?B?T01EdDllWk0xWUtqbStDSFlHQWtTSml2R04vSWo2dG5UVksyTVZ6dWpZWnhn?=
+ =?utf-8?B?M0RMVkhtQno2RmlNMDhxR3dqM0RrYkJVMG80OWJlelRYL00zZ0NXcGN6ZUdw?=
+ =?utf-8?B?YWsydUhsRW43enRsUFhHZitxcTc0eERZaHNjYUJYUnZsRmozbW9yZks4Uk9l?=
+ =?utf-8?B?VmR4bk5PMlpTVHUrZVpiSWgzbVIvZHpqK2J1ckZnK3BObHdaeG1MSjNJWmtL?=
+ =?utf-8?B?MTFybWZYMVM4Zmp4Qi9oWnV2ckpuZVhueTNCK1AzMFVSMTBlSlVxdFNxZ0Jy?=
+ =?utf-8?B?ZkZkc244Ky9ZV0MrRy9ubVFFYURGb2NHemNWQjFYN0R1akZJbUdmdTNDalJv?=
+ =?utf-8?B?NEE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <119B33B92F776043B1206D34566443E4@apcprd03.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR03MB6466.apcprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4e1b2a83-cfe9-4335-4629-08dc44c7b469
+X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Mar 2024 08:12:49.5221
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a7687ede-7a6b-4ef6-bace-642f677fbe31
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: +/EEx4xR/+O0vnVpsEqW4qpwUdNLFPD+i1YbZ/QsQmvu/k/gvni9XTOZJtQzljNFOrSazbPPoJPF7ZipZR896g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PUZPR03MB7062
+X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-AS-Result: No-10--21.616800-8.000000
+X-TMASE-MatchedRID: cxtZ8fwm3r8OwH4pD14DsPHkpkyUphL9meN8m2FdGic3xO2R3boBWFbu
+	qIY+/skQkABPgKBt/0rbaVyalxbpdBXfDcvxC40QQpxiLlDD9FU1TzP60UkdHVNtD3nNFtZWPm4
+	XxTeJls+705JGvJx6sw4pUdPS3FmTBrxTgoet7EQXrP0cYcrA23607foZgOWyTTgHSJZ8pKGgrk
+	Hr6pdTsCfObjr0HEyfohYR4snA9r0h3Xy1KnQIRIv2/i8VNqeOmdrHMkUHHq9NShtWKzkFv78lb
+	9JC4t9LT/dBt9e2zw/ARnogfcREiYAX6fAgrrYeVP9jNEQH04qWesyrtKuK7Q2G3vz8l/IEsvaG
+	BzHRZBBabSJ+A9nXoEd8giSoxo2X27P9OYpZ3ppsG7r4Qh7N3Fg3VqSTJ7So6bzeusRDJJCHOAs
+	eoIzKqEyl9ggbAv9c+SkBKCjcMCAAzT8btdR146IBnfMCFBiCrxZQ031Z6FoKA2OoGAlTk6IUIq
+	EDy9fuuMvZ/57j5rCgGCY/msA9A8ZEoJx1HltlkPoFsM336M4ueblP18IaqfwISQQqRiIBo8WMk
+	QWv6iUVR7DQWX/WkQGLeSok4rrZbdTuPa9VRGvEQdG7H66TyOk/y0w7JiZo
+X-TM-AS-User-Approved-Sender: No
+X-TM-AS-User-Blocked-Sender: No
+X-TMASE-Result: 10--21.616800-8.000000
+X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
+X-TM-SNTS-SMTP:
+	A7C0CF8072BFCF364E89ED3ECED26594A96B8959D754DE5C6FC2BD973F533C9D2000:8
 
-On Thu, 14 Mar 2024 16:21:42 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
-> On Thu, 14 Mar 2024 16:54:58 +0800 Xuan Zhuo wrote:
-> > +      -
-> > +        name: rx-hw-drops
-> > +        doc: |
-> > +          Number of packets that arrived at the device but never left it,
-> > +          encompassing packets dropped for reasons such as insufficient buffer
->
-> s/encompassing/including/
->
-> > +          space, processing errors, as well as those affected by explicitly
-> > +          defined policies and packet filtering criteria.
->
-> I'm afraid the attempt to "correct my English" ended up decreasing the
-> clarity.
-
-I apologize for the misunderstanding; that was not my intention. Your original
-phrasing is indeed clear and comprehensive. Let's use your suggested
-description.
-
-> Maybe use what I suggested more directly?
->
->   Number of all packets which entered the device, but never left it,
->   including but not limited to: packets dropped due to lack of buffer
->   space, processing errors, explicit or implicit policies and packet filters.
->
-> > +        type: uint
-> > +      -
-> > +        name: rx-hw-drop-overruns
-> > +        doc: |
-> > +          Number of packets that arrived at the device but never left it due to
-> > +          no descriptors.
->
-> I put a paragraph in my previous email explaining how tricky this is to
-> state for HW devices and you just went with the virtio spec :|
-
-Sorry, not native speaker, I misunderstood.
-
-Other is ok. I will fix in next version.
-
-Thanks.
-
->
->   Number of packets dropped due to transient lack of resources, such as
->   buffer space, host descriptors etc.
->
-> > +      -
-> > +        name: rx-csum-bad
-> > +        doc: |
-> > +          Number of packets that are dropped by device due to invalid checksum.
->
-> Quoting myself:
->
-> >> Maybe add a note in "bad" that packets with bad csum are not
-> >> discarded, but still delivered to the stack.
->
-> Devices should not drop packets due to invalid L4 checksums.
->
-> > +        type: uint
-> > +      -
-> > +        name: rx-hw-gro-packets
-> > +        doc: |
-> > +          Number of packets that area coalesced from smaller packets by the device,
-> > +          that do not cover LRO packets.
->
-> s/area/were/ ?
-> s/that do not cover LRO packets/Counts only packets coalesced with the
-> HW-GRO netdevice feature, LRO-coalesced packets are not counted./
->
-> > +        type: uint
-> > +      -
-> > +        name: rx-hw-gro-bytes
-> > +        doc: see `rx-hw-gro-packets`.
-> > +        type: uint
-> > +      -
-> > +        name: rx-hw-gro-wire-packets
-> > +        doc: |
-> > +          Number of packets that area coalesced to bigger packets(no LRO packets)
-> > +          by the device.
->
-> s/area/were/
-> s/packets(no LRO packets)/packets by the HW-GRO feature of the device/
->
-> > +        type: uint
-> > +      -
-> > +        name: rx-hw-gro-wire-bytes
-> > +        doc: see `rx-hw-gro-wire-packets`.
->
-> Please make sure the "See `xyz`." references are capitalized (See)
-> and end with a full stop.
->
-> > +        type: uint
-> > +      -
-> > +        name: rx-hw-drop-ratelimits
-> > +        doc: |
-> > +          Number of the packets dropped by the device due to the received
-> > +          packets bitrate exceeding the device speed limit.
->
-> Maybe s/speed/rate/
->
-> > +        type: uint
-> > +      -
-> > +        name: tx-hw-drops
-> > +        doc: |
-> > +          Number of packets that arrived at the device but never left it,
-> > +          encompassing packets dropped for reasons such as processing errors, as
-> > +          well as those affected by explicitly defined policies and packet
-> > +          filtering criteria.
-> > +        type: uint
-> > +      -
-> > +        name: tx-hw-drop-errors
-> > +        doc: Number of packets dropped because they were invalid or malformed.
-> > +        type: uint
-> > +      -
-> > +        name: tx-csum-none
-> > +        doc: |
-> > +          Number of packets that do not require the device to calculate the
-> > +          checksum.
->
-> I think we should use past tense everywhere.
->
-> > +        type: uint
-> > +      -
-> > +        name: tx-needs-csum
-> > +        doc: |
-> > +          Number of packets that require the device to calculate the
-> > +          checksum.
-> > +        type: uint
-> > +      -
-> > +        name: tx-hw-gso-packets
-> > +        doc: |
-> > +          Number of packets that necessitated segmentation into smaller packets
-> > +          by the device.
-> > +        type: uint
-> > +      -
-> > +        name: tx-hw-gso-bytes
-> > +        doc: |
-> > +          Successfully segmented into smaller packets by the device, see
-> > +          `tx-hw-gso-packets`.
->
-> Maybe stick to "see `tx-hw-gso-packets`", none of the other counters
-> mention the send being "successful".
->
-> > +        type: uint
-> > +      -
-> > +        name: tx-hw-gso-wire-packets
-> > +        doc: |
-> > +          Number of the small packets that segmented from bigger packets by the
-> > +          device.
->
-> Maybe
->
->   Number of wire-sized packets generated by processing
->   `tx-hw-gso-packets`
->
-> ?
->
-> > +        type: uint
-> > +      -
-> > +        name: tx-hw-gso-wire-bytes
-> > +        doc: See `tx-hw-gso-wire-packets`.
-> > +
-> > +        type: uint
-> > +      -
-> > +        name: tx-hw-drop-ratelimits
-> > +        doc: |
-> > +          Number of the packets dropped by the device due to the transmit
-> > +          packets bitrate exceeding the device speed limit.
->
-> s/speed/rate/
->
-> > +        type: uint
-> >
-> >  operations:
-> >    list:
-> > diff --git a/include/net/netdev_queues.h b/include/net/netdev_queues.h
-> > index 1ec408585373..c7ac4539eafc 100644
-> > --- a/include/net/netdev_queues.h
-> > +++ b/include/net/netdev_queues.h
-> > @@ -9,11 +9,38 @@ struct netdev_queue_stats_rx {
-> >  	u64 bytes;
-> >  	u64 packets;
-> >  	u64 alloc_fail;
-> > +
-> > +	u64 hw_drops;
-> > +	u64 hw_drop_overruns;
-> > +
-> > +	u64 csum_unnecessary;
-> > +	u64 csum_none;
-> > +	u64 csum_bad;
-> > +
-> > +	u64 hw_gro_packets;
-> > +	u64 hw_gro_bytes;
-> > +	u64 hw_gro_wire_packets;
-> > +	u64 hw_gro_wire_bytes;
-> > +
-> > +	u64 hw_drop_ratelimits;
-> >  };
-> >
-> >  struct netdev_queue_stats_tx {
-> >  	u64 bytes;
-> >  	u64 packets;
-> > +
-> > +	u64 hw_drops;
-> > +	u64 hw_drop_errors;
-> > +
-> > +	u64 csum_none;
-> > +	u64 needs_csum;
-> > +
-> > +	u64 hw_gso_packets;
-> > +	u64 hw_gso_bytes;
-> > +	u64 hw_gso_wire_packets;
-> > +	u64 hw_gso_wire_bytes;
-> > +
-> > +	u64 hw_drop_ratelimits;
-> >  };
-> >
-> >  /**
-> > diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-> > index bb65ee840cda..702d69b09f14 100644
-> > --- a/include/uapi/linux/netdev.h
-> > +++ b/include/uapi/linux/netdev.h
-> > @@ -147,6 +147,26 @@ enum {
-> >  	NETDEV_A_QSTATS_TX_BYTES,
-> >  	NETDEV_A_QSTATS_RX_ALLOC_FAIL,
-> >
->
-> Looks hand written. Once you update the yaml file, you should run:
->
-> ./tools/net/ynl/ynl-regen.sh
->
-> This will generate the uAPI changes for you.
->
-> > +	NETDEV_A_QSTATS_RX_HW_DROPS,
-> > +	NETDEV_A_QSTATS_RX_HW_DROP_OVERRUNS,
-> > +	NETDEV_A_QSTATS_RX_CSUM_UNNECESSARY,
-> > +	NETDEV_A_QSTATS_RX_CSUM_NONE,
-> > +	NETDEV_A_QSTATS_RX_CSUM_BAD,
-> > +	NETDEV_A_QSTATS_RX_HW_GRO_PACKETS,
-> > +	NETDEV_A_QSTATS_RX_HW_GRO_BYTES,
-> > +	NETDEV_A_QSTATS_RX_HW_GRO_WIRE_PACKETS,
-> > +	NETDEV_A_QSTATS_RX_HW_GRO_WIRE_BYTES,
-> > +	NETDEV_A_QSTATS_RX_HW_DROP_RATELIMITS,
-> > +	NETDEV_A_QSTATS_TX_HW_DROPS,
-> > +	NETDEV_A_QSTATS_TX_HW_DROP_ERRORS,
-> > +	NETDEV_A_QSTATS_TX_CSUM_NONE,
-> > +	NETDEV_A_QSTATS_TX_NEEDS_CSUM,
-> > +	NETDEV_A_QSTATS_TX_HW_GSO_PACKETS,
-> > +	NETDEV_A_QSTATS_TX_HW_GSO_BYTES,
-> > +	NETDEV_A_QSTATS_TX_HW_GSO_WIRE_PACKETS,
-> > +	NETDEV_A_QSTATS_TX_HW_GSO_WIRE_BYTES,
-> > +	NETDEV_A_QSTATS_TX_HW_DROP_RATELIMITS,
-> > +
-> >  	__NETDEV_A_QSTATS_MAX,
-> >  	NETDEV_A_QSTATS_MAX = (__NETDEV_A_QSTATS_MAX - 1)
-> >  };
->
+T24gV2VkLCAyMDI0LTAzLTEzIGF0IDE2OjQxICswMTAwLCBQYW9sbyBBYmVuaSB3cm90ZToNCj4g
+IAkgDQo+IEV4dGVybmFsIGVtYWlsIDogUGxlYXNlIGRvIG5vdCBjbGljayBsaW5rcyBvciBvcGVu
+IGF0dGFjaG1lbnRzIHVudGlsDQo+IHlvdSBoYXZlIHZlcmlmaWVkIHRoZSBzZW5kZXIgb3IgdGhl
+IGNvbnRlbnQuDQo+ICBPbiBXZWQsIDIwMjQtMDMtMTMgYXQgMjE6MzQgKzA4MDAsIFNoaW1pbmcg
+Q2hlbmcgd3JvdGU6DQo+ID4gS2VybmVsIGV4Y2VwdGlvbiBpcyByZXBvcnRlZCB3aGVuIG1ha2lu
+ZyB1ZHAgZnJhZyBsaXN0DQo+IHNlZ21lbnRhdGlvbi4NCj4gPiBCYWNrdHJhY2UgaXMgYXMgYmVs
+b3c6DQo+ID4gICAgIGF0IG91dC9hbmRyb2lkMTUtNi42L2tlcm5lbC02LjYva2VybmVsLQ0KPiA2
+LjYvbmV0L2lwdjQvdWRwX29mZmxvYWQuYzoyMjkNCj4gPiAgICAgYXQgb3V0L2FuZHJvaWQxNS02
+LjYva2VybmVsLTYuNi9rZXJuZWwtDQo+IDYuNi9uZXQvaXB2NC91ZHBfb2ZmbG9hZC5jOjI2Mg0K
+PiA+IGZlYXR1cmVzPWZlYXR1cmVzQGVudHJ5PTE5LCBpc19pcHY2PWZhbHNlKQ0KPiA+ICAgICBh
+dCBvdXQvYW5kcm9pZDE1LTYuNi9rZXJuZWwtNi42L2tlcm5lbC0NCj4gNi42L25ldC9pcHY0L3Vk
+cF9vZmZsb2FkLmM6Mjg5DQo+ID4gZmVhdHVyZXM9MTkpDQo+ID4gICAgIGF0IG91dC9hbmRyb2lk
+MTUtNi42L2tlcm5lbC02LjYva2VybmVsLQ0KPiA2LjYvbmV0L2lwdjQvdWRwX29mZmxvYWQuYzoz
+OTkNCj4gPiBmZWF0dXJlcz0xOSkNCj4gPiAgICAgYXQgb3V0L2FuZHJvaWQxNS02LjYva2VybmVs
+LTYuNi9rZXJuZWwtDQo+IDYuNi9uZXQvaXB2NC9hZl9pbmV0LmM6MTQxOA0KPiA+IHNrYkBlbnRy
+eT0weDAsIGZlYXR1cmVzPTE5LCBmZWF0dXJlc0BlbnRyeT0wKQ0KPiA+ICAgICBhdCBvdXQvYW5k
+cm9pZDE1LTYuNi9rZXJuZWwtNi42L2tlcm5lbC02LjYvbmV0L2NvcmUvZ3NvLmM6NTMNCj4gPiB0
+eF9wYXRoPTxvcHRpbWl6ZWQgb3V0PikNCj4gPiAgICAgYXQgb3V0L2FuZHJvaWQxNS02LjYva2Vy
+bmVsLTYuNi9rZXJuZWwtNi42L25ldC9jb3JlL2dzby5jOjEyNA0KPiANCj4gQSBmdWxsIGJhY2t0
+cmFjZSB3b3VsZCBoZWxwIGJldHRlciB1bmRlcnN0YW5kaW5nIHRoZSBpc3N1ZS4NCg0KQmVsb3cg
+aXMgZnVsbCBiYWNrdHJhY2U6DQogWyAxMTAwLjgxMjIwNV1bICAgIEMzXSBDUFU6IDMgUElEOiAw
+IENvbW06IHN3YXBwZXIvMyBUYWludGVkOg0KRyAgICAgICAgVyAgT0UgICAgICA2LjYuMTctYW5k
+cm9pZDE1LTAtZzM4MDM3MWVhOWJmMSAjMQ0KIFsgMTEwMC44MTIyMTFdWyAgICBDM10gSGFyZHdh
+cmUgbmFtZTogTVQ2OTkxKEVORykgKERUKQ0KIFsgMTEwMC44MTIyMTVdWyAgICBDM10gQ2FsbCB0
+cmFjZToNCiBbIDExMDAuODEyMjE4XVsgICAgQzNdICBkdW1wX2JhY2t0cmFjZSsweGVjLzB4MTM4
+DQogWyAxMTAwLjgxMjIyMl1bICAgIEMzXSAgc2hvd19zdGFjaysweDE4LzB4MjQNCiBbIDExMDAu
+ODEyMjI2XVsgICAgQzNdICBkdW1wX3N0YWNrX2x2bCsweDUwLzB4NmMNCiBbIDExMDAuODEyMjMy
+XVsgICAgQzNdICBkdW1wX3N0YWNrKzB4MTgvMHgyNA0KIFsgMTEwMC44MTIyMzddWyAgICBDM10g
+IG1yZHVtcF9jb21tb25fZGllKzB4MjRjLzB4Mzg4IFttcmR1bXBdDQogWyAxMTAwLjgxMjI1OV1b
+ICAgIEMzXSAgaXBhbmljX2RpZSsweDIwLzB4MzQgW21yZHVtcF0NCiBbIDExMDAuODEyMjY5XVsg
+ICAgQzNdICBub3RpZmllcl9jYWxsX2NoYWluKzB4OTAvMHgxNzQNCiBbIDExMDAuODEyMjc1XVsg
+ICAgQzNdICBub3RpZnlfZGllKzB4NTAvMHg4Yw0KIFsgMTEwMC44MTIyNzldWyAgICBDM10gIGRp
+ZSsweDk0LzB4MzA4DQogWyAxMTAwLjgxMjI4M11bICAgIEMzXSAgX19kb19rZXJuZWxfZmF1bHQr
+MHgyNDAvMHgyNmMNCiBbIDExMDAuODEyMjg4XVsgICAgQzNdICBkb19wYWdlX2ZhdWx0KzB4YTAv
+MHg0OGMNCiBbIDExMDAuODEyMjkzXVsgICAgQzNdICBkb190cmFuc2xhdGlvbl9mYXVsdCsweDM4
+LzB4NTQNCiBbIDExMDAuODEyMjk3XVsgICAgQzNdICBkb19tZW1fYWJvcnQrMHg1OC8weDEwNA0K
+IFsgMTEwMC44MTIzMDJdWyAgICBDM10gIGVsMV9hYm9ydCsweDNjLzB4NWMNCiBbIDExMDAuODEy
+MzA3XVsgICAgQzNdICBlbDFoXzY0X3N5bmNfaGFuZGxlcisweDU0LzB4OTANCiBbIDExMDAuODEy
+MzEzXVsgICAgQzNdICBlbDFoXzY0X3N5bmMrMHg2OC8weDZjDQogWyAxMTAwLjgxMjMxN11bICAg
+IEMzXSAgX191ZHBfZ3NvX3NlZ21lbnQrMHgyOTgvMHg0ZDQNCiBbIDExMDAuODEyMzIyXVsgICAg
+QzNdICB1ZHA0X3Vmb19mcmFnbWVudCsweDEzMC8weDE3NA0KIFsgMTEwMC44MTIzMjZdWyAgICBD
+M10gIGluZXRfZ3NvX3NlZ21lbnQrMHgxNjQvMHgzMzANCiBbIDExMDAuODEyMzMwXVsgICAgQzNd
+ICBza2JfbWFjX2dzb19zZWdtZW50KzB4YzQvMHgxM2MNCiBbIDExMDAuODEyMzM1XVsgICAgQzNd
+ICBfX3NrYl9nc29fc2VnbWVudCsweGM0LzB4MTIwDQogWyAxMTAwLjgxMjMzOV1bICAgIEMzXSAg
+dWRwX3Jjdl9zZWdtZW50KzB4NTAvMHgxMzQNCiBbIDExMDAuODEyMzQ0XVsgICAgQzNdICB1ZHBf
+cXVldWVfcmN2X3NrYisweDc0LzB4MTE0DQogWyAxMTAwLjgxMjM0OF1bICAgIEMzXSAgdWRwX3Vu
+aWNhc3RfcmN2X3NrYisweDk0LzB4YWMNCiBbIDExMDAuODEyMzUzXVsgICAgQzNdICBfX3VkcDRf
+bGliX3JjdisweDNlMC8weDgxOA0KIFsgMTEwMC44MTIzNThdWyAgICBDM10gIHVkcF9yY3YrMHgy
+MC8weDMwDQogWyAxMTAwLjgxMjM2Ml1bICAgIEMzXSAgaXBfcHJvdG9jb2xfZGVsaXZlcl9yY3Ur
+MHgxOTQvMHgzNjgNCiBbIDExMDAuODEyMzY4XVsgICAgQzNdICBpcF9sb2NhbF9kZWxpdmVyKzB4
+ZTQvMHgxODQNCiBbIDExMDAuODEyMzczXVsgICAgQzNdICBpcF9yY3YrMHg5MC8weDExOA0KIFsg
+MTEwMC44MTIzNzhdWyAgICBDM10gIF9fbmV0aWZfcmVjZWl2ZV9za2IrMHg3NC8weDEyNA0KIFsg
+MTEwMC44MTIzODNdWyAgICBDM10gIHByb2Nlc3NfYmFja2xvZysweGQ4LzB4MThjDQogWyAxMTAw
+LjgxMjM4OF1bICAgIEMzXSAgX19uYXBpX3BvbGwrMHg1Yy8weDFmYw0KIFsgMTEwMC44MTIzOTJd
+WyAgICBDM10gIG5ldF9yeF9hY3Rpb24rMHgxNTAvMHgzMzQNCiBbIDExMDAuODEyMzk3XVsgICAg
+QzNdICBfX2RvX3NvZnRpcnErMHgxMjAvMHgzZjQNCiBbIDExMDAuODEyNDAxXVsgICAgQzNdICBf
+X19fZG9fc29mdGlycSsweDEwLzB4MjANCiBbIDExMDAuODEyNDA1XVsgICAgQzNdICBjYWxsX29u
+X2lycV9zdGFjaysweDNjLzB4NzQNCiBbIDExMDAuODEyNDEwXVsgICAgQzNdICBkb19zb2Z0aXJx
+X293bl9zdGFjaysweDFjLzB4MmMNCiBbIDExMDAuODEyNDE0XVsgICAgQzNdICBfX2lycV9leGl0
+X3JjdSsweDVjLzB4ZDQNCiBbIDExMDAuODEyNDE4XVsgICAgQzNdICBpcnFfZXhpdF9yY3UrMHgx
+MC8weDFjDQogWyAxMTAwLjgxMjQyMl1bICAgIEMzXSAgZWwxX2ludGVycnVwdCsweDM4LzB4NTgN
+CiBbIDExMDAuODEyNDI4XVsgICAgQzNdICBlbDFoXzY0X2lycV9oYW5kbGVyKzB4MTgvMHgyNA0K
+IFsgMTEwMC44MTI0MzRdWyAgICBDM10gIGVsMWhfNjRfaXJxKzB4NjgvMHg2Yw0KIFsgMTEwMC44
+MTI0MzddWyAgICBDM10gIGFyY2hfbG9jYWxfaXJxX2VuYWJsZSsweDQvMHg4DQogWyAxMTAwLjgx
+MjQ0M11bICAgIEMzXSAgY3B1aWRsZV9lbnRlcisweDM4LzB4NTQNCiBbIDExMDAuODEyNDQ5XVsg
+ICAgQzNdICBkb19pZGxlKzB4MTk4LzB4Mjk0DQogWyAxMTAwLjgxMjQ1NF1bICAgIEMzXSAgY3B1
+X3N0YXJ0dXBfZW50cnkrMHgzNC8weDNjDQogWyAxMTAwLjgxMjQ1OV1bICAgIEMzXSAgc2Vjb25k
+YXJ5X3N0YXJ0X2tlcm5lbCsweDEzOC8weDE1OA0KIFsgMTEwMC44MTI0NjVdWyAgICBDM10gIF9f
+c2Vjb25kYXJ5X3N3aXRjaGVkKzB4YzAvMHhjNA0KDQo+ID4gVGhpcyBwYWNrZXQncyBmcmFnIGxp
+c3QgaXMgbnVsbCB3aGlsZSBnc29fdHlwZSBpcyBub3QgMC4gVGhlbiBpdCBpcw0KPiB0cmVhdGVk
+DQo+ID4gYXMgYSBHUk8tZWQgcGFja2V0IGFuZCBzZW50IHRvIHNlZ21lbnQgZnJhZyBsaXN0LiBG
+dW5jdGlvbiBjYWxsDQo+IHBhdGggaXMNCj4gPiB1ZHBfcmN2X3NlZ21lbnQgPT4gY29uZmlnIGZl
+YXR1cmVzIHZhbHVlDQo+ID4gICAgIF9fdWRwdjRfZ3NvX3NlZ21lbnQgID0+IHNrYl9nc29fb2sg
+cmV0dXJucyBmYWxzZS4gSGVyZSBpdA0KPiBzaG91bGQgYmUNCj4gPiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgdHJ1ZS4gDQo+IA0KPiBXaHk/IElmIEkgcmVhZCBjb3JyZWN0bHkgdGhlIGFi
+b3ZlLCB0aGlzIGlzIEdTTyBwYWNrZXQgbGFuZGluZyBpbiBhbg0KPiBVRFAgc29ja2V0IHdpdGgg
+bm8gVURQX0dSTyBzb2Nrb3B0LiBUaGUgcGFja2V0IGlzIGV4cGVjdGVkIHRvIGJlDQo+IHNlZ21l
+bnRlZCBhZ2Fpbi4NCj4gDQpZZXMsIGl0IGlzIEdTTyBwYWNrZXQsIGhvd2V2ZXIgdGhlIGZyYWdt
+ZW50IGxpc3Qgb2YgdGhpcyBHU08gcGFja2V0DQpiZWNvbWVzIE5VTEwuIEFzIHRoZSBvY2N1cnJl
+bmNlIHJhdGUgaXMgdmVyeSBsb3csIHdlIHJlYWxseSBkb27igJl0IGtub3cNCndoeSBhbmQgd2hl
+biBpdCBiZWNvbWVzIHRvIGJlIE5VTEwuIEl0IGhhcHBlbnMgYm90aCBpbiBjZWxsdWxhciBhbmQN
+CndsYW4gbmV0d29yayBhbmQgc2VlbXMgYW4gdW5rbm93biBrZXJuZWwgaXNzdWUuDQoNClRvIGF2
+b2lkIGNyYXNoIHRoZSBwYWNrZXQgc2hvdWxkIHNraXAgdG8gYmUgc2VnbWVudGVkIHdoZW4gZnJh
+Z2xpc3QgaXMNCm51bGwuDQoNCj4gPkZhaWxlZCByZWFzb24gaXMgZmVhdHVyZXMgZG9lc24ndA0K
+PiBtYXRjaA0KPiA+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICBnc29fdHlwZS4NCj4gPiAg
+ICAgICAgIF9fdWRwX2dzb19zZWdtZW50X2xpc3QNCj4gPiAgICAgICAgICAgICBza2Jfc2VnbWVu
+dF9saXN0ID0+IHBhY2tldCBpcyBsaW5lYXIgd2l0aCBza2ItPm5leHQgPQ0KPiBOVUxMDQo+ID4g
+ICAgICAgICAgICAgX191ZHB2NF9nc29fc2VnbWVudF9saXN0X2NzdW0gPT4gdXNlIHNrYi0+bmV4
+dCBkaXJlY3RseQ0KPiBhbmQNCj4gPiAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICBjcmFzaCBoYXBwZW5zDQo+ID4gDQo+ID4gSW4gcngtZ3JvLWxpc3QgR1JPLWVk
+IHBhY2tldCBpcyBzZXQgZ3NvIHR5cGUgYXMNCj4gPiBORVRJRl9GX0dTT19VRFBfTDQgfCBORVRJ
+Rl9GX0dTT19GUkFHTElTVCBpbiBuYXBpX2dyb19jb21wbGV0ZS4gSW4NCj4gZ3NvDQo+ID4gZmxv
+dyB0aGUgZmVhdHVyZXMgc2hvdWxkIGFsc28gc2V0IHRoZW0gdG8gbWF0Y2ggd2l0aCBnc29fdHlw
+ZS4gT3INCj4gZWxzZSBpdA0KPiA+IHdpbGwgYWx3YXlzIHJldHVybiBmYWxzZSBpbiBza2JfZ3Nv
+X29rLiBUaGVuIGl0IGNhbid0IGRpc2NvdmVyIHRoZQ0KPiA+IHVudHJ1c3RlZCBzb3VyY2UgcGFj
+a2V0IGFuZCByZXN1bHQgY3Jhc2ggaW4gZm9sbG93aW5nIGZ1bmN0aW9uLg0KPiANCj4gV2hhdCBp
+cyB0aGUgJ3VudHJ1c3RlZCBzb3VyY2UnIGhlcmU/IEkgcmVhZCB0aGUgYWJvdmUgYXMgdGhlIHBh
+Y2tldA0KPiBhZ2dyZWdhdGlvbiBoYXBwZW5lZCBpbiB0aGUgR1JPIGVuZ2luZT8/Pw0KPiANCj4g
+Q291bGQgeW91IHBsZWFzZSBnaXZlIGEgY29tcGxldGUgZGVzY3JpcHRpb24gb2YgdGhlIHJlbGV2
+YW50DQo+IHNjZW5hcmlvPw0KPiANCg0KQWNjb3JkaW5nIHRvIHRoZSBiYWNrdHJhY2UgaW5mbywg
+d2UgaW5mZXIgaXQgaXMgYSByeC1mcmFnX2xpc3QgR1JPDQpwYWNrZXQuIEJlZm9yZSBzZW5kaW5n
+IGludG8gdGhlIFVEUCBzb2NrZXQgd2l0aCBubyBVRFBfR1JPIHNvY2tvcHQsIGl0DQpzZWVtcyBl
+bnRlciAic2tiX2NvbmRlbnNlIiB0byB0cmltIGl0IGFuZCBsb29zZSBoaXMgZnJhZyBsaXN0LiBI
+b3dldmVyDQppdCBzdGlsbCBrZWVwcyBnc29fdHlwZSBhbmQgZ3NvX3NpemUuIFRoZW4gaXQgY29u
+dGludWVzIHRvIGRvDQpza2Jfc2VnbWVudF9saXN0Lg0KDQpGaXJzdCBjcmFzaCBoYXBwZW5zIGlu
+IHNrYl9zZWdtZW50X2xpc3QuIA0KVGhpcyBwYXRjaCByZXNvbHZlcyB0aGUgY3Jhc2ggYW5kIGxl
+dHMgdGhlIHBhY2tldCBiZWNvbWVzIGEgc2tiIHdpdGhvdXQNCnNrYi0+bmV4dDoNCmh0dHBzOi8v
+bG9yZS5rZXJuZWwub3JnL2FsbC9ZOWd0NUVVaXpLMVVJbUVQQGRlYmlhbi8NClRoZW4gY3Jhc2gg
+bW92ZXMgdG8gX191ZHBfZ3NvX3NlbWVudF9saXN0IC0+IHNrYl9zZWdtZW50X2xpc3QoZmluaXNo
+KQ0KLT4gX191ZHB2NF9nc29fc2VnbWVudF9saXN0X2NzdW0sIGl0IHVzZXMgc2tiLT5uZXh0IHdp
+dGhvdXQgY2hlY2sgdGhlbg0KY3Jhc2guDQoNCg0KV2hhdCB3ZSB3YW50IHRvIGRvIGlzIHRvIGRy
+b3AgdGhpcyBhYm5vcm1hbCBwYWNrZXQuIFNvIHdlIHNldCBmZWF0dXJlcw0KTkVUSUZfRl9HU09f
+VURQX0w0IHxORVRJRl9GX0dTT19GUkFHTElTVCB0byBtYXRjaCBmaXhlczogZjI2OTYwOTljNmM2
+DQpjb25kYXRpb24gdGhlbiBkcm9wIGl0LiANCg0KQW5vdGhlciBzb2x1dGlvbiBpcyB3ZSBjYW4g
+Y2hlY2sgdGhlIGZyYWdfbGlzdCBkaXJlY3RseSBpbg0Kc2tiX3NlZ21lbnRfbHNpdDoNCmRpZmYg
+LS1naXQgYS9uZXQvY29yZS9za2J1ZmYuYyBiL25ldC9jb3JlL3NrYnVmZi5jDQppbmRleCAwMTFk
+NjkwLi41YjA1NGYwIDEwMDY0NA0KLS0tIGEvbmV0L2NvcmUvc2tidWZmLmMNCisrKyBiL25ldC9j
+b3JlL3NrYnVmZi5jDQpAQCAtNDMzNiw2ICs0MzM2LDggQEANCiAgaW50IGxlbl9kaWZmLCBlcnI7
+DQoNCiAgc2tiX3B1c2goc2tiLCAtc2tiX25ldHdvcmtfb2Zmc2V0KHNrYikgKyBvZmZzZXQpOw0K
+KyAgICAgIGlmICghbGlzdF9za2IpDQorICAgICAgICAgICAgIGdvdG8gZXJyX2xpbmVhcml6ZTsN
+Cg0KICAvKiBFbnN1cmUgdGhlIGhlYWQgaXMgd3JpdGVhYmxlIGJlZm9yZSB0b3VjaGluZyB0aGUg
+c2hhcmVkIGluZm8gKi8NCiAgZXJyID0gc2tiX3VuY2xvbmUoc2tiLCBHRlBfQVRPTUlDKTsNCg0K
+PiA+IEZpeGVzOiBmMjY5NjA5OWM2YzYgKCJ1ZHA6IEF2b2lkIHBvc3QtR1JPIFVEUCBjaGVja3N1
+bQ0KPiByZWNhbGN1bGF0aW9uIikNCj4gPiBTaWduZWQtb2ZmLWJ5OiBTaGltaW5nIENoZW5nIDxz
+aGltaW5nLmNoZW5nQG1lZGlhdGVrLmNvbT4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBMZW5hIFdhbmcg
+PGxlbmEud2FuZ0BtZWRpYXRlay5jb20+DQo+ID4gLS0tDQo+ID4gIGluY2x1ZGUvbmV0L3VkcC5o
+IHwgMiArLQ0KPiA+ICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24o
+LSkNCj4gPiANCj4gPiBkaWZmIC0tZ2l0IGEvaW5jbHVkZS9uZXQvdWRwLmggYi9pbmNsdWRlL25l
+dC91ZHAuaA0KPiA+IGluZGV4IDQ4OGE2ZDJiYWJjYy4uYzg3YmFhMjNiOWRhIDEwMDY0NA0KPiA+
+IC0tLSBhL2luY2x1ZGUvbmV0L3VkcC5oDQo+ID4gKysrIGIvaW5jbHVkZS9uZXQvdWRwLmgNCj4g
+PiBAQCAtNDY0LDcgKzQ2NCw3IEBAIHZvaWQgdWRwdjZfZW5jYXBfZW5hYmxlKHZvaWQpOw0KPiA+
+ICBzdGF0aWMgaW5saW5lIHN0cnVjdCBza19idWZmICp1ZHBfcmN2X3NlZ21lbnQoc3RydWN0IHNv
+Y2sgKnNrLA0KPiA+ICAgICAgICBzdHJ1Y3Qgc2tfYnVmZiAqc2tiLCBib29sIGlwdjQpDQo+ID4g
+IHsNCj4gPiAtbmV0ZGV2X2ZlYXR1cmVzX3QgZmVhdHVyZXMgPSBORVRJRl9GX1NHOw0KPiA+ICtu
+ZXRkZXZfZmVhdHVyZXNfdCBmZWF0dXJlcyA9IE5FVElGX0ZfU0cgfCBORVRJRl9GX0dTT19VRFBf
+TDQgfA0KPiBORVRJRl9GX0dTT19GUkFHTElTVDsNCj4gDQo+IFRoaXMgbG9va3Mgd3Jvbmc6IHJl
+YWwgVURQX0w0IEdTTyBwYWNrZXRzIHdpbGwgbm90IHNlZ21lbnRlZCBhbnltb3JlDQo+IGFuZCBz
+aG91bGQgYmUgZHJvcHBlZCAoPyE/KQ0KPiANCj4gDQo=
 
