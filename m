@@ -1,221 +1,159 @@
-Return-Path: <netdev+bounces-80029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 058AE87C97F
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 08:55:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BB9387C983
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 09:01:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2925F1C216E9
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 07:55:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6E31B2215E
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 08:01:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED5E614280;
-	Fri, 15 Mar 2024 07:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1286314A98;
+	Fri, 15 Mar 2024 08:01:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b="mIywDInu"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="E7E+Z+Ct"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2062.outbound.protection.outlook.com [40.107.105.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0F6B1426E
-	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 07:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.62
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710489354; cv=fail; b=UHsXJWFEC78ncRQ77oHgI4TAEWt/QHVaYIHtkjrTzu+tLglAwZ1PUIfrxa/Dc6Pr6DFf9O31ZI+FZOaIIQuwBcp8WrgzEH3UrTj9+rbS84biO20/3ZOPoaflKiR5vSisRBS0zDpGmKjJJhHzLpK7iFmv3QsLd6ap+K0MJnAWl3o=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710489354; c=relaxed/simple;
-	bh=Lh7vQifcW0DOApwQF6mp0rJYf81j5xyPis6k2FrtUMA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=hsedwkIHujoWdF5pi9uaEnXwKa2GH+i5TunKy4w4wqu6NtkF5pCF31RhetBeJtbSM7AIDgCuK9CzLs7aLFV1XLEaSyvhrGfT1oJBrco6kbCMkmA/qFruQGEengiGKgyczVX70211ycOx/AFgB49Ge0VEeOb05Bmt87jHmFyOyYw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com; spf=pass smtp.mailfrom=oss.nxp.com; dkim=pass (1024-bit key) header.d=NXP1.onmicrosoft.com header.i=@NXP1.onmicrosoft.com header.b=mIywDInu; arc=fail smtp.client-ip=40.107.105.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oss.nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=b36NNhU6PS1fPadR9EsD/+wv534N9GJlyPzGOwI2Jup18u/1HwDBSQb5xPGAi19zLiPOzAyDa0V21Ml6mms0ssWdWMWj2Ri3IMljk1Lnur8XvSE6yej5vAzn3FtxY4HNYDzkKoRdn/SKjby9VOTyiipc8LVM5skAASAg1bE1GlEXEWHo/erZeBF3eOTWJ1LV3QE/iJu/IJPdQjQ+bXGSHkrFUkMi5nCmcj5Yai5too3LZ1/IQjIu6dv+PnLWzrnnPIzkQK/1dEHTpREXSiC9z+FCzQWl0RVmpO8oHVzq7iXTMQZ13yUTjRmPqAiUb1YekVNhtT+wSRtric79wEVAUA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mXcufTdUASEWYl70KqjlxBq+DIWueLuPsn4PdGFmky8=;
- b=AEcOF9CxaToT6ZqaWDyWBmGeLHegfLsftGVJvdjt92I3TyH/bHZzSvHE6rY7rQ+MvvqSZ5pisadd0B+H/LMPvffv8KnLMoPuananp3bBy35N0fO/1iljR0U+6vV+jia/VjS3Wp1Kr5HkNkSgV0Rk80QVVRJ5GC1MYMXktZGAO1fwyB8Ifl1gVGbfJvBr1QfTZwrNchsoH56Ljxb0Vz7sO8irZBCqeFqkW/uiIX4o1UibSC+PxA5O+grfQb72/w+caw0XCKAnRjcifoaM2YzCZxywAb1m82APZgEnnNULZOGM9SDAWuMnBVkAWwEzdwPHj0HTPQnqk1DWqx2RVnDIzw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
- dkim=pass header.d=oss.nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
- s=selector2-NXP1-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=mXcufTdUASEWYl70KqjlxBq+DIWueLuPsn4PdGFmky8=;
- b=mIywDInuZK8POsSvcFevWt6MEjkjV//w4AKC+EcUobU3fvC01/EMFCluV5it7cuRBnPNigAyghzdM1FQhxShQjda3md1LgmHWupXZuax0vNyFpGjliDQa6/Ax3CMpiMMCg5z3Wdo3WQR1hw5E7gS9HsbIn+SPjkZK08gte+jrZg=
-Received: from AM9PR04MB8506.eurprd04.prod.outlook.com (2603:10a6:20b:431::16)
- by VE1PR04MB7293.eurprd04.prod.outlook.com (2603:10a6:800:1a8::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.19; Fri, 15 Mar
- 2024 07:55:48 +0000
-Received: from AM9PR04MB8506.eurprd04.prod.outlook.com
- ([fe80::b6dd:f421:80e4:8436]) by AM9PR04MB8506.eurprd04.prod.outlook.com
- ([fe80::b6dd:f421:80e4:8436%7]) with mapi id 15.20.7362.031; Fri, 15 Mar 2024
- 07:55:48 +0000
-From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
-To: Andrew Lunn <andrew@lunn.ch>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
-	<linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-Subject: [PATCH net-next v2] net: phy: don't resume device not in use
-Thread-Topic: [PATCH net-next v2] net: phy: don't resume device not in use
-Thread-Index: AQHadq4xhzwXjOEGWEKleB9yW341+Q==
-Date: Fri, 15 Mar 2024 07:55:48 +0000
-Message-ID:
- <AM9PR04MB8506791F9A2A1EF4B33AAAF4E2282@AM9PR04MB8506.eurprd04.prod.outlook.com>
-References:
- <AM9PR04MB8506772CFCC05CE71C383A6AE2202@AM9PR04MB8506.eurprd04.prod.outlook.com>
- <c5238a4e-b4b1-484a-87f3-ea942b6aa04a@lunn.ch>
- <AM9PR04MB8506A1FC6679E96B34F21E94E2202@AM9PR04MB8506.eurprd04.prod.outlook.com>
-In-Reply-To:
- <AM9PR04MB8506A1FC6679E96B34F21E94E2202@AM9PR04MB8506.eurprd04.prod.outlook.com>
-Accept-Language: cs-CZ, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=oss.nxp.com;
-x-ms-exchange-messagesentrepresentingtype: 1
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM9PR04MB8506:EE_|VE1PR04MB7293:EE_
-x-ms-office365-filtering-correlation-id: ceac31fe-8ed5-4f6a-fad1-08dc44c553c9
-x-ms-exchange-sharedmailbox-routingagent-processed: True
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- klvw6d3ZdJafBGsizwmKCh/mRTm/TQo3ObkLKhM8xyetBvx62PZxL39/YC3SM0B+Q7sI2sfIxv9F35DEhJHS+zmmloaM2FDbXOM265+Dc0uzSS6tX0LrRZJwGLPOt6P1BtDDl1wq++MYwaFNZnufDeBet98Lqw0QaFpomBjaYpM+XOo85drM31b+tGguxjA4mZ6MaywO++iEn4ua1PuFQ7xb9mtMEXjetjbCdWEeLI5NrnZktdHH8lf20uh00QS3hJF9Wis1mK5F1ZWD1+Rh7+CuLbi1J3QPTR3L4h2ihgCoI+/nHZPFD28RU6ls/9tUC9/9jzNuDvU7kgnmViS/6uHWpFAChKqdBzl6FnSs5H0LwBDicC4Vh7P79IAcawirKeiCXHzqWwumbmfQYXay3sdpPQATIHwN3wbGISst5pxFz5K81BDW7bUR3aOJ5y/vhGpQJzvfzyJI4T7tESs0rGI8Xalf2a8MvtASQD0Ijax1vB3Z8ZqzOL6mBcht76qEVudfk5/51ULnti+ynFI7uv2Z8YC/Sd/qHm+Eb4JvoX6aEm4F+XPs/++44d68VpIBiHgRbvZE8tPqNL0hKd21WN84w7LOF2uT2+iqEiSzRUDc4bhw3zMOqP6ZXRfLDd7jb72YzCROT00XyuWSd5OD4acov7CNQgBQZRDOmO4dUgKVeapRE17WAg/PAIXfT5R/27dCE0WGIHYF/G4GP68Xhdbno1JQzjPikN+0VYiVgS4=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8506.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?9SWr5jfOBnjsAJHf+3Ce2be/0aJ60efGAsPDfMbz1S2SpjbAlhoYUa/ipd1E?=
- =?us-ascii?Q?80wPOWaCK5KDIa1mS/5V1nYNpJS71+V7tNhpljlB90MSEx+aVlJdXXiHyRVx?=
- =?us-ascii?Q?pQU7G/UKwCA5/3nTZ9vcO4zjB8XcxbviCdTQDoT3aV8uERL3lyvekooDxAos?=
- =?us-ascii?Q?IFuknJayDb14mN7BK8R7mx8/hIXmp+KXxrwKhaUtWv6KKzXX5Ekgo45B//WA?=
- =?us-ascii?Q?WjXZ3yZ18mPvZWnetfzc49YKWq5J372TKKjCZNyqSNonOtf82HhePnaO+gkA?=
- =?us-ascii?Q?8UmWIvEtWaFtqnPcxCQtiWpxuuwBFZmRA4/6WVONQ93dcsw4lLerS/GKVngC?=
- =?us-ascii?Q?vSMvt9rJgbVssPquDSg4pEqagmOqQxyabyDQyTQa4rDqcJ5+SgMAT/5Te89t?=
- =?us-ascii?Q?CvQR0Od7cTDdo7N1xwPV0V1aw74BpTcwMgimBzs2MxZp1tHKEM7w6MohWAux?=
- =?us-ascii?Q?iioTT4Gn1I5RB+hwWEIyfZIiA4TRKzsqZWOhcGJafbTDYXrzo9Hpa756S1dw?=
- =?us-ascii?Q?Hqx/JBWX9D3zcwrEiYkp7H5LJb7wpMdW3Xlb+SpRsIDfYf+0WNqMg1gKeK7R?=
- =?us-ascii?Q?I7RJ3l4MhgBK8qKy4lA/EKqwLfmK5B5y+D+WLd4gw0Iilk+VpkqaScx6PSMi?=
- =?us-ascii?Q?QIIJJ6tkwlUB9rtLOFvRejhv2wBYRYNGWT/fRoxVAUsz1gehVbHZmyi2ksQD?=
- =?us-ascii?Q?Qe8wGWibc+Ht/CvF61ayi/bkCzEeXSM2fFYWmwLXpWNyoBfNmJqvtdQdgYem?=
- =?us-ascii?Q?49d1mk/60GFQFrexXVCGMf5/yKjj7kbglN47lS6Anz+jihgj8sBbBQWdyuLv?=
- =?us-ascii?Q?hQm3GXCg4qbCHTcM5Ao6Pqz9CrQs85A2FZzRTDBMtFLoLhaQfGbe8oBW075K?=
- =?us-ascii?Q?1MUTsw4IdeHpy8am+RB8qoBAq+Fw9fyuNAmeWlG2+4qmQJ++gZky4sphheUn?=
- =?us-ascii?Q?SdOadq3cPoSMhljV6GFfLKjGNbBh88ggwlRUk6PvibqNjVv80C2zV7LWBjzu?=
- =?us-ascii?Q?9a7D8lCtRLZj6xDSo3IDGvhAt4+sOorI2KnpsGGPPh+II4X+ycW03MyaUlZp?=
- =?us-ascii?Q?2SMf1wQejXkclEi/PVDcHeUs/v1sbyjZLRRLkTAzoKgugY5Ar1lP1orVuX8W?=
- =?us-ascii?Q?uXGOQEZCdvEzv6FbxPhYjpY5WbX0otDHvqYmNvs35LfjfcMscldYqTwfH8/9?=
- =?us-ascii?Q?/hLJOF2SNZmWGn14WphKBS+Zx3t5bayfy9jcxZCjJJqxpfgyOHMRWGy50Ery?=
- =?us-ascii?Q?wvc/lviwyX3UCRlSXnvo91s1euyzXzzRspoq59NFaQqDUmOfE3Gh+EPrmX5n?=
- =?us-ascii?Q?Bb8zpyt2XlWR11bRycx5p2RC782spQWm776HRTkt4B7nAZd3Ib7iyrEjXCn9?=
- =?us-ascii?Q?rWQ348e2zIEbxkDwknfQ75bWqZOHEuXAV8XB9FSBQP83HeqbzAeTk3aLdAA0?=
- =?us-ascii?Q?591aV7fMSh6aVaFWeb9CeUVJcp5Y6f2EjzZ4bedmzzr5gZeo+UnBQS6FxJMQ?=
- =?us-ascii?Q?K7uC84yqkCb5p/x1yM/zhV8iVdM35oyvdoQa5d4MCU5vnP2IjPZLaNSmgGlD?=
- =?us-ascii?Q?4XFCQzG0fY2yCvMgy5ZYChQtq08ypJnYdKD9+4f8?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BBD14280
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 08:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710489669; cv=none; b=qhRDaxmVt2QjEIMf8OE4OMSEnT+RyuCLQ9lYpQyi1eWna1sQe4rTiXghjAmLhGkZ7Qz283S6wB2ghYUep4/OtWa5FRd9Kx55oMAMxQbmcdXGQD79/hlfxfZ2QTlDbG7IUj1tbItfUtILASLFhewIn6HmdmD1JFk7+efd44MdJxo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710489669; c=relaxed/simple;
+	bh=p0en/GCOfhc21UxAgSvgpjSxEaCkV+SmFKeaU1UDvXQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=p8W0fnjXDa4OC2lKa9BybSq+FiWzqnjdgSLuCfPHMUi45IrO6QeTs5LGN8LKuwMVYaegLUpzNAUlukEOtamZCWhtbHiJb2GH/VKiSFln4ydjW9W4Y31nkNRE3z3IsiOWhJYnnCWYMj5Jf1FXU0My7QqmaZ6BLJIGYrWIVesIDLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=E7E+Z+Ct; arc=none smtp.client-ip=209.85.215.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-53fbf2c42bfso1351405a12.3
+        for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 01:01:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1710489667; x=1711094467; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=p0en/GCOfhc21UxAgSvgpjSxEaCkV+SmFKeaU1UDvXQ=;
+        b=E7E+Z+CtWt8kqiIjYWVQjEQ5fj1jos1mIKKRspBALWmE5bpg83ESZX6Bn5hJBz/CmZ
+         BeKAAir5/rFWNesxtwFWK3Tnr4Z6qZlWzPhhZ+rIubFMtMI34lAx+ZgY0GQ3VNMgN/Cz
+         uUQnfNLDzXZfCF0vDa991O2bU8qGj7BgLVY2O33qRMVT4T6b4AM8SJwLVqqfXb8Y135U
+         4J//tHDM2+xPpMs3PW0OVcpu6s7/9R1Z7RKt6G+SdFeJcklUqICdg9FgGcgKCFZAEXEI
+         Tq25GM5Oyuk4eiAn2mh0YG9+mIj52I4qrzB+oPAKwBmu3R4t9GEa2Y9aKBvlNL2Idzkz
+         jvQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710489667; x=1711094467;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=p0en/GCOfhc21UxAgSvgpjSxEaCkV+SmFKeaU1UDvXQ=;
+        b=q5tKfxhhNWgEjuoYiJbEdbJUumkcAN3D/NEXDGu1LBQMdog0fayZDdgAfXf8zjplip
+         BDdhZdzEwnevAR5ne3pMUhmhRjgSY+HY0dTOVsGoWRTrsV0FbRxu15pnNjK0eA5aHmCM
+         yJN0A7v6wWP2VloL2x4CpUXCBjSHRDCLrVHncy80+4zuNvoCIY/1KBAZ5fofMmcLN1DF
+         Q71b9olIZXTtj01x7iHsQavgD2TfciOn/bAVfnkMu+X+efku+1iwTiQWkbBG7TM2CO75
+         le5Z+UnHdO1rrT67BiWDFQ5KaDYWSzM9c9gQIA58ANm77FWRbQ7HfOQxKXal7z/oa7h7
+         /eOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV4ia7nUjG6t+JTUCSy81IZ/2mWZl/R6W9bgh3ZpF9q0IvUBmm5jGnMsMbWneAE1SFSIon61Cg44QUhgKksRMjX6GXy1K1x
+X-Gm-Message-State: AOJu0YzfbULMREw7lrPrh3TSN2gtxeHwGoW/t2+IvGcuwIr19wqu0obH
+	fjLHA4ZXuZGnDINW1uVzr6ouHRNmWfReCQECy3fiT1EtZb5Y3FK/ReTZd3TbG3qrbCIfWe1ur7/
+	j6nyt24ub/emXeTfIBbvL+gl4J263ZV2OuoaTbg==
+X-Google-Smtp-Source: AGHT+IEpM9Mqa5iEhQbTXQByuieojUsSQiVC/HtuI16NWpRWnCf8v9wukRY0tmuiax6xN5WzRfxP5Mr9rKAT0G28iSY=
+X-Received: by 2002:a17:90a:dc0b:b0:29d:fe1c:79e7 with SMTP id
+ i11-20020a17090adc0b00b0029dfe1c79e7mr271232pjv.45.1710489666842; Fri, 15 Mar
+ 2024 01:01:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: oss.nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8506.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ceac31fe-8ed5-4f6a-fad1-08dc44c553c9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 15 Mar 2024 07:55:48.4737
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: JFDZa02VdQIRiXnuXdveeyClbwAUV52Oty/bzVfh8Kp6YgG998k7MRqLTDnQXzk2AmYEsJMP2pBEg5jJzpn7NA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VE1PR04MB7293
+References: <20240311093526.1010158-1-dongmenglong.8@bytedance.com>
+ <20240311093526.1010158-2-dongmenglong.8@bytedance.com> <CAADnVQKQPS5NcvEouH4JqZ2fKgQAC+LtcwhX9iXYoiEkF_M94Q@mail.gmail.com>
+ <CALz3k9i5G5wWi+rtvHPwVLOUAXVMCiU_8QUZs87TEYgR_0wpPA@mail.gmail.com>
+ <CAADnVQJ_ZCzMmT1aBsNXEBFfYNSVBdBXmLocjR0PPEWtYQrQFw@mail.gmail.com>
+ <CALz3k9icPePb0c4FE67q=u1U0hrePorN9gDpQrKTR_sXbLMfDA@mail.gmail.com>
+ <CAADnVQLwgw8bQ7OHBbqLhcPJ2QpxiGw3fkMFur+2cjZpM_78oA@mail.gmail.com>
+ <CALz3k9g9k7fEwdTZVLhrmGoXp8CE47Q+83r-AZDXrzzuR+CjVA@mail.gmail.com> <CAADnVQLHpi3J6cBJ0QBgCQ2aY6fWGnVvNGdfi3W-jmoa9d1eVQ@mail.gmail.com>
+In-Reply-To: <CAADnVQLHpi3J6cBJ0QBgCQ2aY6fWGnVvNGdfi3W-jmoa9d1eVQ@mail.gmail.com>
+From: =?UTF-8?B?5qKm6b6Z6JGj?= <dongmenglong.8@bytedance.com>
+Date: Fri, 15 Mar 2024 16:00:55 +0800
+Message-ID: <CALz3k9g-U8ih=ycJPRbyU9x_9cp00fNkU3PGQ6jP0WJ+=uKmqQ@mail.gmail.com>
+Subject: Re: [External] Re: [PATCH bpf-next v2 1/9] bpf: tracing: add support
+ to record and check the accessed args
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
+	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
+	Sven Schnelle <svens@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
+	X86 ML <x86@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Quentin Monnet <quentin@isovalent.com>, 
+	bpf <bpf@vger.kernel.org>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
+	linux-riscv <linux-riscv@lists.infradead.org>, linux-s390 <linux-s390@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, linux-trace-kernel@vger.kernel.org, 
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-In the case when an MDIO bus contains PHY device not attached to
-any netdev or is attached to the external netdev, controlled
-by another driver and the driver is disabled, the bus, when PM resume
-occurs, is trying to resume also the unattached phydev.
+On Thu, Mar 14, 2024 at 8:27=E2=80=AFAM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+>
+> On Tue, Mar 12, 2024 at 6:53=E2=80=AFPM =E6=A2=A6=E9=BE=99=E8=91=A3 <dong=
+menglong.8@bytedance.com> wrote:
+[......]
+> > What does "a hundred attachments max" means? Can't I
+> > trace thousands of kernel functions with a bpf program of
+> > tracing multi-link?
+>
+> I mean what time does it take to attach one program
+> to 100 fentry-s ?
+> What is the time for 1k and for 10k ?
+>
+> The kprobe multi test attaches to pretty much all funcs in
+> /sys/kernel/tracing/available_filter_functions
+> and it's fast enough to run in test_progs on every commit in bpf CI.
+> See get_syms() in prog_tests/kprobe_multi_test.c
+>
+> Can this new multi fentry do that?
+> and at what speed?
+> The answer will decide how applicable this api is going to be.
+> Generating different trampolines for every attach point
+> is an approach as well. Pls benchmark it too.
 
-/* Synopsys DWMAC built-in driver (stmmac) */
-gmac0: ethernet@4033c000 {
-	compatible =3D "snps,dwc-qos-ethernet", "nxp,s32cc-dwmac";
+I see. Creating plenty of trampolines does take a lot of time,
+and I'll do testing on it.
 
-	phy-handle =3D <&gmac0_mdio_c_phy4>;
-	phy-mode =3D "rgmii-id";
-
-	gmac0_mdio: mdio@0 {
-		compatible =3D "snps,dwmac-mdio";
-
-		/* AQR107 */
-		gmac0_mdio_c_phy1: ethernet-phy@1 {
-			compatible =3D "ethernet-phy-ieee802.3-c45";
-			reg =3D <1>;
-		};
-
-		/* KSZ9031RNX */
-		gmac0_mdio_c_phy4: ethernet-phy@4 {
-			reg =3D <4>;
-		};
-	};
-};
-
-/* PFE controller, loadable driver pfeng.ko */
-pfe: pfe@46000000 {
-	compatible =3D "nxp,s32g-pfe";
-
-	/* Network interface 'pfe1' */
-	pfe_netif1: ethernet@11 {
-		compatible =3D "nxp,s32g-pfe-netif";
-
-		phy-mode =3D "sgmii";
-		phy-handle =3D <&gmac0_mdio_c_phy1>;
-	};
-};
-
-Because such device didn't go through attach process, internal
-parameters like phy_dev->interface are set to default values, which
-can be incorrect for some drivers. Ie. Aquantia PHY AQR107 doesn't
-support PHY_INTERFACE_MODE_GMII and trying to use phy_init()
-in mdio_bus_phy_resume ends up with the following error caused
-by initial check of supported interfaces in aqr107_config_init():
-
-[   63.927708] Aquantia AQR113C stmmac-0:08: PM: failed to resume: error -1=
-9']
-
-The fix is intentionally assymetric to support PM suspend of the device.
-
-Signed-off-by: Jan Petrous <jan.petrous@oss.nxp.com>
----
- drivers/net/phy/phy_device.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/net/phy/phy_device.c b/drivers/net/phy/phy_device.c
-index 8297ef681bf5..507eb0570e0e 100644
---- a/drivers/net/phy/phy_device.c
-+++ b/drivers/net/phy/phy_device.c
-@@ -355,6 +355,10 @@ static __maybe_unused int mdio_bus_phy_resume(struct d=
-evice *dev)
- 	struct phy_device *phydev =3D to_phy_device(dev);
- 	int ret;
-=20
-+	/* Don't resume device which wasn't previously in use state */
-+	if (phydev->state <=3D PHY_READY)
-+		return 0;
-+
- 	if (phydev->mac_managed_pm)
- 		return 0;
-=20
---=20
-2.43.0
-
+>
+> > >
+> > > Let's step back.
+[......]
+>
+> For one trampoline to handle all attach points we might
+> need some arch support, but we can start simple.
+> Make btf_func_model with MAX_BPF_FUNC_REG_ARGS
+> by calling btf_distill_func_proto() with func=3D=3DNULL.
+> And use that to build a trampoline.
+>
+> The challenge is how to use minimal number of trampolines
+> when bpf_progA is attached for func1, func2, func3
+> and bpf_progB is attached to func3, func4, func5.
+> We'd still need 3 trampolines:
+> for func[12] to call bpf_progA,
+> for func3 to call bpf_progA and bpf_progB,
+> for func[45] to call bpf_progB.
+>
+> Jiri was trying to solve it in the past. His slides from LPC:
+> https://lpc.events/event/16/contributions/1350/attachments/1033/1983/plum=
+bers.pdf
+>
+> Pls study them and his prior patchsets to avoid stepping on the same rake=
+s.
 
