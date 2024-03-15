@@ -1,103 +1,97 @@
-Return-Path: <netdev+bounces-80059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADEBB87CC7D
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 12:40:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D048D87CC8B
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 12:41:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E7FB282F37
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 11:40:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B3C31F21D35
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 11:41:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF3881B80F;
-	Fri, 15 Mar 2024 11:39:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889CC1B940;
+	Fri, 15 Mar 2024 11:39:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="m+EyuCEe"
+	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="iz5jHFZq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59811C692;
-	Fri, 15 Mar 2024 11:39:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB4C36B15;
+	Fri, 15 Mar 2024 11:39:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710502745; cv=none; b=lhIN4Or1KuKN4RKS/+L4E2I8RzQwzLzMLYZPh1O7YjB7SJe0x+2Pg4eMxUbPdiGjzDkEracPC/u/aeAWhGxWyOhSWaYxkPfL77WDuWfMD1siKA3+zzU8NC6mn4MEZMqSMrYRJoTA2ab6WCmtAAjXYcVEO/O/waG4DJI1j7kiB08=
+	t=1710502751; cv=none; b=Qk3BeWUmizX9MdwR3KgBxrJ0gNCSTz2NT6KCxnhqC20DFb/cDOYPDkQIRUh9r+zTNFXhzjWxlJnFVRIxaSPx+DSIFi62V29ORmk3E2COZsKPa1dzzNNQ4tF+Yi6pbZGB5YxYHHvQwd3d92+n2HU6zjKBo6hlLGZjjMlQlYbFtCw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710502745; c=relaxed/simple;
-	bh=e1y/a3hAt3iIY1eG/bhFWCCip3ImzDp68z3R3ZufW3k=;
+	s=arc-20240116; t=1710502751; c=relaxed/simple;
+	bh=v58AhsmmQT/EbyS8YFz+dOXWE+1LCHneaLwzLK8avl8=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Xwzu25MZ2ZjUIli76vBHaHNkUeXa7oMbHKbxFd8ku3r0kSdrLLp+D/l3HiJ16RWg3dkrLFgYwhK4RqoXAlDWyobuhO+rf9RIuCj8WJWooAgx8PAf5BiPeoS5FxJmNS2rM1MBg/66HaZicNuPpi1moaR3AV8j1Bylf+64+M2PYEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=m+EyuCEe; arc=none smtp.client-ip=209.85.218.53
+	 MIME-Version:Content-Type; b=T3bs5N+earuqQsw3+5hXSH5Nwsss8aCIBxtKHHxqsSZr6Pq6qqaVvKt8IIoc2PGbYx59xETqvGuvt/xUE4lRPbDoMIzX04UMeE/mK5svJn9SowhuvkJLdqcy7lGZ5c9++OA0zhlTszpkgI081tnqaqnkUbREEWYF9ZsZ+AVNFks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=iz5jHFZq; arc=none smtp.client-ip=209.85.167.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a3ddc13bbb3so562203166b.0;
-        Fri, 15 Mar 2024 04:39:03 -0700 (PDT)
+Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-513da1c1f26so803715e87.3;
+        Fri, 15 Mar 2024 04:39:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20230601; t=1710502742; x=1711107542; darn=vger.kernel.org;
+        d=googlemail.com; s=20230601; t=1710502748; x=1711107548; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ajSGsc6A/F/qkby1cV3DFijz3ujuoh7yFblhBSAWTk4=;
-        b=m+EyuCEesIsDuGQ6AVn09GFl/Sc9Nd1IwniLlBRMSQlyFvpRQe/06nj77PnnEloORY
-         ZSUZVXKOoAejW0/VB00UtZf6ZSbeD7uZzmqOzZV1T/1uIM3sB/aIuDjGDvyE6YnP4Fmr
-         CBsKffMJAUEBZHNoPqPBsq+8XqN0JvTmBZrvp3biKpN+F9AxuvgpmCAIYK6+4pLBnXPH
-         gpWTMbfeiTGUUiKu/sTJij2ePn5wtuqpfISjV/bRnlHOXgMKEpJV+Yj9eWkSExR6gmr8
-         Wqu6i3pvXzzEfNsZ1cHXYDlN7u55voEv/tYewWcx49jKZgN4M7rurZB9+xf8KufXt1di
-         dkvw==
+        bh=Oep7fiSPFUB4mUGU2hN2D+vBrhzRF1VLsba4TSKYhR0=;
+        b=iz5jHFZqVQ7paGV1QpmDKiLWSD0Qr2vOihEIItoQDzGZjUoH7px4N8/n0ZpRmeopFm
+         OUfgbXaltNyWUtewR8Ec62PT0OMd7Ef+kZKkX1Db5/ylvhlB4zSjP5lxtDnIwz4kukXc
+         i2RcvbrwpzBA2pedj90ZTg03x4Y3WCmB+DtjMbA0+XEeaRIEr/9gYYGBmqiLn7ZTIeSv
+         JeTxXCh2fcPgquUBsy/Hu/HLnPR+o0XRY/yC46ALY3N265DGu/vkU1ZC4mmGa9k3nuq+
+         MemcWkJ4AXol56UOQ+NNgl8ji0gYS1PdQjUY9Uca+v2RANtu+4/qO0Po1f7zpYEfNW4c
+         37ew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710502742; x=1711107542;
+        d=1e100.net; s=20230601; t=1710502748; x=1711107548;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ajSGsc6A/F/qkby1cV3DFijz3ujuoh7yFblhBSAWTk4=;
-        b=m2i20SLJ95nNtHMNV1/ybL3sZmOpq+j7FDhPe2un2YG1+HKFT1hsqT/k2KGh1cx92t
-         FKeVy+mv3Tf/KT1bGmI2nKVZrmeXWV9mgnD+gobrHBNY8ieS1nM3Xg7f7hwakku6kuL9
-         g7gKPZOUG874dQJxz/RW0FKLmCiQffDPgphsY2upx1/0KzxiGr4qin4Y8ZNDuwIGoXCZ
-         pCYAUkAJn2YXS2OBCmWyEHG2H1DOnqF35AAGf4OJJTHDcyLMMzjaIWEiZJFoJrallF8E
-         /062jBqZ+bYLQYlg8jrWjBQS5XV1rXeT/F7a/d3UCYLzObCK9k6gN6Vc7IEh9HNzssaz
-         Gtlg==
-X-Forwarded-Encrypted: i=1; AJvYcCU/u5xN97DqJsbxo/nBXCIhGdoK1TTMq11OvhNMcT1+NhREQal9tXbhUtGsp2her+EIccgs8RFBhbeC7GtuongHLOcx5VYALuN7NUcqQLRecxRzPQDKlPQfqSfGfeFnE6x2+PlfUdhG3HwCDYZlOOwXgaCbDVGBCHqdBweNDkt6W2x6UYEh7yu9A6Np9B89NwftCbbMeQ==
-X-Gm-Message-State: AOJu0Yw30OxrMnn6dC7TIntAxALHSWajHgjtbL/snVeqf7ro73gHFDHq
-	GuNDRrxxrDXLGjw5jSxqmoqawMJu3NzGbP2jMebzidmV1w336KcmuI0DRKaVjvUlcQ==
-X-Google-Smtp-Source: AGHT+IHJJjdK95FxiFWtuKqFb5okKLCX+Xl17xr9ZeV/oMTb5MlWFKMC//tYf9kBKFRK8DaZbTEwfQ==
-X-Received: by 2002:a17:906:1501:b0:a45:d7fb:8423 with SMTP id b1-20020a170906150100b00a45d7fb8423mr7825935ejd.9.1710502741739;
-        Fri, 15 Mar 2024 04:39:01 -0700 (PDT)
+        bh=Oep7fiSPFUB4mUGU2hN2D+vBrhzRF1VLsba4TSKYhR0=;
+        b=AuixkN+UFFA71GTOPPqxV/Qs3lLjeLM+Kpg8pi2MkfSesgme4hxogXko9VlY3qkmnx
+         lx8AQV0fJWk9wSLRUZFbOnxcOcwipO6eXia332wtUYqFqfksFhodq0SOXfSmZn8ZypbB
+         yIXp8IHlZWgz06JOZMZwLAFlc4/79adY/QCfqvYHbxbs8g3GtOZbuxWZNz7BizV+tGbv
+         /yNB+JF+iurLCih5hkkXSmOzRCM2hBTUORp5RMMAVOA/wEpfzFFWoOvRx2u2r6c40qv7
+         AAW4FiOtpvoayJy2r0dLnXhU2XM8Dj8ZYOFhd1ycIKgnEKn8eLHbJfo/Q5uVOs/obdR5
+         TTvg==
+X-Forwarded-Encrypted: i=1; AJvYcCUXGOnskgvZP8AkqENjQmuBndmxCaOrtTKBOSgZVOvM3ikpzE83vma+fq9vkbxozkLwAmE+7tvFAzBZTDGWGIOtfqXixd6fd0La7gIWJeHFBkUAvI1WRdWasNEnnofVh11VE1eqwfnzxCPM+ReqjTA463sHoBXoJYWyHvoMdeIXL+l6e+IizBkx0Qs42CzyNFeWunn+6A==
+X-Gm-Message-State: AOJu0YxT3NS4yotcAiIbc0w+vYJOG1DPsZwBSRczNsOxvkKx4YytdRBB
+	twi2zScNwApSUV/hD/27n0wvUYfWZMGk3sHhi9Mo7Z7dcFwEkV8h98VEJtPLq8uG2g==
+X-Google-Smtp-Source: AGHT+IH2SgThAHXr+8wzksbodsMSKaWmVuuNHL/aCI6V/7GnUQ8/ngvOSLVSaHYnNCgiKx6GrAZoQA==
+X-Received: by 2002:a2e:a7c4:0:b0:2d4:83f9:2e21 with SMTP id x4-20020a2ea7c4000000b002d483f92e21mr1975031ljp.42.1710502747344;
+        Fri, 15 Mar 2024 04:39:07 -0700 (PDT)
 Received: from ddev.DebianHome (dynamic-095-119-217-226.95.119.pool.telefonica.de. [95.119.217.226])
-        by smtp.gmail.com with ESMTPSA id fg3-20020a056402548300b005682f47aea7sm1610024edb.94.2024.03.15.04.39.00
+        by smtp.gmail.com with ESMTPSA id fg3-20020a056402548300b005682f47aea7sm1610024edb.94.2024.03.15.04.39.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Mar 2024 04:39:01 -0700 (PDT)
+        Fri, 15 Mar 2024 04:39:06 -0700 (PDT)
 From: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
 To: linux-security-module@vger.kernel.org
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>,
-	Felix Kuehling <Felix.Kuehling@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	"Pan, Xinhui" <Xinhui.Pan@amd.com>,
-	David Airlie <airlied@gmail.com>,
-	Daniel Vetter <daniel@ffwll.ch>,
+Cc: Miquel Raynal <miquel.raynal@bootlin.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Stefan Haberland <sth@linux.ibm.com>,
-	Jan Hoeppner <hoeppner@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Mark Brown <broonie@kernel.org>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	"Jiri Slaby (SUSE)" <jirislaby@kernel.org>,
-	amd-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org,
-	linux-kernel@vger.kernel.org,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	David Ahern <dsahern@kernel.org>,
+	David Howells <dhowells@redhat.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Abel Wu <wuyun.abel@bytedance.com>,
+	Breno Leitao <leitao@debian.org>,
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Daan De Meyer <daan.j.demeyer@gmail.com>,
 	netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wpan@vger.kernel.org,
 	bpf@vger.kernel.org
-Subject: [PATCH 05/10] drivers: use new capable_any functionality
-Date: Fri, 15 Mar 2024 12:37:26 +0100
-Message-ID: <20240315113828.258005-5-cgzones@googlemail.com>
+Subject: [PATCH 08/10] net: use new capable_any functionality
+Date: Fri, 15 Mar 2024 12:37:29 +0100
+Message-ID: <20240315113828.258005-8-cgzones@googlemail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240315113828.258005-1-cgzones@googlemail.com>
 References: <20240315113828.258005-1-cgzones@googlemail.com>
@@ -113,60 +107,167 @@ Content-Transfer-Encoding: 8bit
 Use the new added capable_any function in appropriate cases, where a
 task is required to have any of two capabilities.
 
+Add sock_ns_capable_any() wrapper similar to existing sock_ns_capable()
+one.
+
 Reorder CAP_SYS_ADMIN last.
 
 Signed-off-by: Christian Göttsche <cgzones@googlemail.com>
-Acked-by: Alexander Gordeev <agordeev@linux.ibm.com> (s390 portion)
+Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com> (ieee802154 portion)
 ---
 v4:
-   Additional usage in kfd_ioctl()
+  - introduce sockopt_ns_capable_any()
 v3:
-   rename to capable_any()
+  - rename to capable_any()
+  - make use of ns_capable_any
 ---
- drivers/gpu/drm/amd/amdkfd/kfd_chardev.c | 3 +--
- drivers/net/caif/caif_serial.c           | 2 +-
- drivers/s390/block/dasd_eckd.c           | 2 +-
- 3 files changed, 3 insertions(+), 4 deletions(-)
+ include/net/sock.h       |  1 +
+ net/caif/caif_socket.c   |  2 +-
+ net/core/sock.c          | 15 +++++++++------
+ net/ieee802154/socket.c  |  6 ++----
+ net/ipv4/ip_sockglue.c   |  5 +++--
+ net/ipv6/ipv6_sockglue.c |  3 +--
+ net/unix/af_unix.c       |  2 +-
+ 7 files changed, 18 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/gpu/drm/amd/amdkfd/kfd_chardev.c b/drivers/gpu/drm/amd/amdkfd/kfd_chardev.c
-index dfa8c69532d4..8c7ebca01c17 100644
---- a/drivers/gpu/drm/amd/amdkfd/kfd_chardev.c
-+++ b/drivers/gpu/drm/amd/amdkfd/kfd_chardev.c
-@@ -3290,8 +3290,7 @@ static long kfd_ioctl(struct file *filep, unsigned int cmd, unsigned long arg)
- 	 * more priviledged access.
- 	 */
- 	if (unlikely(ioctl->flags & KFD_IOC_FLAG_CHECKPOINT_RESTORE)) {
--		if (!capable(CAP_CHECKPOINT_RESTORE) &&
--						!capable(CAP_SYS_ADMIN)) {
-+		if (!capable_any(CAP_CHECKPOINT_RESTORE, CAP_SYS_ADMIN)) {
- 			retcode = -EACCES;
- 			goto err_i1;
- 		}
-diff --git a/drivers/net/caif/caif_serial.c b/drivers/net/caif/caif_serial.c
-index ed3a589def6b..e908b9ce57dc 100644
---- a/drivers/net/caif/caif_serial.c
-+++ b/drivers/net/caif/caif_serial.c
-@@ -326,7 +326,7 @@ static int ldisc_open(struct tty_struct *tty)
- 	/* No write no play */
- 	if (tty->ops->write == NULL)
- 		return -EOPNOTSUPP;
--	if (!capable(CAP_SYS_ADMIN) && !capable(CAP_SYS_TTY_CONFIG))
-+	if (!capable_any(CAP_SYS_TTY_CONFIG, CAP_SYS_ADMIN))
+diff --git a/include/net/sock.h b/include/net/sock.h
+index b5e00702acc1..2e64a80c8fca 100644
+--- a/include/net/sock.h
++++ b/include/net/sock.h
+@@ -1736,6 +1736,7 @@ static inline void unlock_sock_fast(struct sock *sk, bool slow)
+ void sockopt_lock_sock(struct sock *sk);
+ void sockopt_release_sock(struct sock *sk);
+ bool sockopt_ns_capable(struct user_namespace *ns, int cap);
++bool sockopt_ns_capable_any(struct user_namespace *ns, int cap1, int cap2);
+ bool sockopt_capable(int cap);
+ 
+ /* Used by processes to "lock" a socket state, so that
+diff --git a/net/caif/caif_socket.c b/net/caif/caif_socket.c
+index 039dfbd367c9..2d811037e378 100644
+--- a/net/caif/caif_socket.c
++++ b/net/caif/caif_socket.c
+@@ -1026,7 +1026,7 @@ static int caif_create(struct net *net, struct socket *sock, int protocol,
+ 		.usersize = sizeof_field(struct caifsock, conn_req.param)
+ 	};
+ 
+-	if (!capable(CAP_SYS_ADMIN) && !capable(CAP_NET_ADMIN))
++	if (!capable_any(CAP_NET_ADMIN, CAP_SYS_ADMIN))
  		return -EPERM;
+ 	/*
+ 	 * The sock->type specifies the socket type to use.
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 43bf3818c19e..fa9edcc3e23d 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -1077,6 +1077,12 @@ bool sockopt_ns_capable(struct user_namespace *ns, int cap)
+ }
+ EXPORT_SYMBOL(sockopt_ns_capable);
  
- 	/* release devices to avoid name collision */
-diff --git a/drivers/s390/block/dasd_eckd.c b/drivers/s390/block/dasd_eckd.c
-index 373c1a86c33e..8f9a5136306a 100644
---- a/drivers/s390/block/dasd_eckd.c
-+++ b/drivers/s390/block/dasd_eckd.c
-@@ -5384,7 +5384,7 @@ static int dasd_symm_io(struct dasd_device *device, void __user *argp)
- 	char psf0, psf1;
- 	int rc;
++bool sockopt_ns_capable_any(struct user_namespace *ns, int cap1, int cap2)
++{
++	return has_current_bpf_ctx() || ns_capable_any(ns, cap1, cap2);
++}
++EXPORT_SYMBOL(sockopt_ns_capable_any);
++
+ bool sockopt_capable(int cap)
+ {
+ 	return has_current_bpf_ctx() || capable(cap);
+@@ -1118,8 +1124,7 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+ 	switch (optname) {
+ 	case SO_PRIORITY:
+ 		if ((val >= 0 && val <= 6) ||
+-		    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) ||
+-		    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
++		    sockopt_ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
+ 			sock_set_priority(sk, val);
+ 			return 0;
+ 		}
+@@ -1422,8 +1427,7 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
+ 		break;
  
--	if (!capable(CAP_SYS_ADMIN) && !capable(CAP_SYS_RAWIO))
-+	if (!capable_any(CAP_SYS_RAWIO, CAP_SYS_ADMIN))
- 		return -EACCES;
- 	psf0 = psf1 = 0;
+ 	case SO_MARK:
+-		if (!sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
+-		    !sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
++		if (!sockopt_ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
+ 			ret = -EPERM;
+ 			break;
+ 		}
+@@ -2813,8 +2817,7 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
+ 
+ 	switch (cmsg->cmsg_type) {
+ 	case SO_MARK:
+-		if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
+-		    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
++		if (!ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN))
+ 			return -EPERM;
+ 		if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
+ 			return -EINVAL;
+diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
+index 990a83455dcf..42b3b12eb493 100644
+--- a/net/ieee802154/socket.c
++++ b/net/ieee802154/socket.c
+@@ -902,8 +902,7 @@ static int dgram_setsockopt(struct sock *sk, int level, int optname,
+ 		ro->want_lqi = !!val;
+ 		break;
+ 	case WPAN_SECURITY:
+-		if (!ns_capable(net->user_ns, CAP_NET_ADMIN) &&
+-		    !ns_capable(net->user_ns, CAP_NET_RAW)) {
++		if (!ns_capable_any(net->user_ns, CAP_NET_ADMIN, CAP_NET_RAW)) {
+ 			err = -EPERM;
+ 			break;
+ 		}
+@@ -926,8 +925,7 @@ static int dgram_setsockopt(struct sock *sk, int level, int optname,
+ 		}
+ 		break;
+ 	case WPAN_SECURITY_LEVEL:
+-		if (!ns_capable(net->user_ns, CAP_NET_ADMIN) &&
+-		    !ns_capable(net->user_ns, CAP_NET_RAW)) {
++		if (!ns_capable_any(net->user_ns, CAP_NET_ADMIN, CAP_NET_RAW)) {
+ 			err = -EPERM;
+ 			break;
+ 		}
+diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
+index cf377377b52d..5a1e5ee20ddd 100644
+--- a/net/ipv4/ip_sockglue.c
++++ b/net/ipv4/ip_sockglue.c
+@@ -1008,8 +1008,9 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
+ 		inet_assign_bit(MC_ALL, sk, val);
+ 		return 0;
+ 	case IP_TRANSPARENT:
+-		if (!!val && !sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
+-		    !sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
++		if (!!val &&
++		    !sockopt_ns_capable_any(sock_net(sk)->user_ns,
++					    CAP_NET_RAW, CAP_NET_ADMIN))
+ 			return -EPERM;
+ 		if (optlen < 1)
+ 			return -EINVAL;
+diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
+index d4c28ec1bc51..e46b11b5d3dd 100644
+--- a/net/ipv6/ipv6_sockglue.c
++++ b/net/ipv6/ipv6_sockglue.c
+@@ -773,8 +773,7 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
+ 		break;
+ 
+ 	case IPV6_TRANSPARENT:
+-		if (valbool && !sockopt_ns_capable(net->user_ns, CAP_NET_RAW) &&
+-		    !sockopt_ns_capable(net->user_ns, CAP_NET_ADMIN)) {
++		if (valbool && !sockopt_ns_capable_any(net->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
+ 			retv = -EPERM;
+ 			break;
+ 		}
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 5b41e2321209..acc36b2d25d7 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -1783,7 +1783,7 @@ static inline bool too_many_unix_fds(struct task_struct *p)
+ 	struct user_struct *user = current_user();
+ 
+ 	if (unlikely(READ_ONCE(user->unix_inflight) > task_rlimit(p, RLIMIT_NOFILE)))
+-		return !capable(CAP_SYS_RESOURCE) && !capable(CAP_SYS_ADMIN);
++		return !capable_any(CAP_SYS_RESOURCE, CAP_SYS_ADMIN);
+ 	return false;
+ }
  
 -- 
 2.43.0
