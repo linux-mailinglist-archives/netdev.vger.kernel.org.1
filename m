@@ -1,103 +1,92 @@
-Return-Path: <netdev+bounces-80015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A96D087C77B
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 03:30:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4C2787C788
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 03:33:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAA8C1C2103D
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 02:30:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55812B211D9
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 02:32:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7AFD50F;
-	Fri, 15 Mar 2024 02:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6073B6AA0;
+	Fri, 15 Mar 2024 02:32:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KP6FE4eq"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Ih+a+xQC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72B78D2FA;
-	Fri, 15 Mar 2024 02:30:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC82C79D3;
+	Fri, 15 Mar 2024 02:32:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710469831; cv=none; b=Mh4MEwuPWtmPFLKjX+38ME0FzIf000fe3r8745CouHRPp3nWFa9YE9SIvoEsRT/JNw3uEDvvm/4O78VaANzmmisxQ1n2RzJatRBmjOGawYRs/9gpxBByluqFzpmGp10m9BwVJ+e45ouflO6/KwxSfRMJo2HrVz8TykKtV1ngcGI=
+	t=1710469974; cv=none; b=FpLbu0GdgEjIAA3YzTbb+B8421M1NhNYKtMQnW9hR0nwqKWF8K3KRZYDiyvtLu8GpzOqEnWfLh1R1RVG2DMFy2DaAxUDMM83m7qH7i4br4YC5r9j1gfxGi25rpjq16tvLccr/+qaBOdxV00g+fCPqg4EsJJsUFfQYlLijwxHxdc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710469831; c=relaxed/simple;
-	bh=/DuxcoU5eU7Jg2W0UecnZo3j6aFQsVsJnqcpKoj3iDU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mVDBStFU77eZ/LU1HaaOnd8nnpsBYTNRxmOTUPyheO72N4g9SOv8g2fG1ChRqxLKetY/647C3EcybO+MrHeiVehzInfSOEoUHekQX6N0r/V19qKPVJ9eKsqHWcu6DuMcxPkjNFvg9MXeoiSPzNHXR/v0POweoP8jdg9eXgVZOEk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KP6FE4eq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0D109C433C7;
-	Fri, 15 Mar 2024 02:30:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710469831;
-	bh=/DuxcoU5eU7Jg2W0UecnZo3j6aFQsVsJnqcpKoj3iDU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=KP6FE4eq9/myZv8B6rO85RyDC/5fy8vNg16+Nz/OmRAVWA0o5ldthsyQHF9xdmSQD
-	 3sGhNMgSv2xxV3C5rikVOXZzCyLxjUMljmmQHwVrrkUDmGrnQvOtpyCFOz0ZbHddh6
-	 meiyRECn3tp+MCoUkGwPalXjGO8yEUDPyJLjYi1k2TMOWcwI9VkkDp1EKWuhu8Waxg
-	 DHzRRIfjbJnniJwWQfZM9ckyC7Wq1VzEpcqorHyXiaMEQYz6Sk9RJECU67gJnNavX5
-	 CsyUGj74Bq5C3LTBLwmtQwd0mJbg1t/FxU1HdjS2cYKVqMT74jNfrEZZRl/+PZ1piE
-	 irzVcogN+JBCA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EFF08D84BAB;
-	Fri, 15 Mar 2024 02:30:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1710469974; c=relaxed/simple;
+	bh=9j14obn7LJhO8DocmOfVRGauUW8ZOKLXG5D4pRwAFBA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lKLdNXtVCV2VYneta2nWFxauwHXP+xjOokPsXqZ+K7ByFNDI5n/OyyghMXY6R1n8UFr3AM26+H4IQH2sRtx32pbvJPmFPrbM6dQVehSRgKufCkz4fwRzDbPhZR1LHzJ9wdv8tY0ldV4S01QleT+TaduQ3NwhtDN4yYIbgEwa73w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Ih+a+xQC; arc=none smtp.client-ip=115.124.30.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1710469963; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=uWppkp/CDYn1IU8SGxz0loaKDXyaJFyU0HWPRcBekZI=;
+	b=Ih+a+xQC/wzNtKFtMAd6uzxbbpp1KtFPmyxhsxW+QPHKrPBqRL5RZLxkWb1O7h/7jUAFdZWfoy8KGxKUzfCbR6U6XweEwIl/kmtero5oueZOr/XAV/pUoc1TS3qtMqsoZumc4TnvstwHabw7K1hk4EKl6CgERrtfaNzd9rPKI2s=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R761e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0W2UXABh_1710469953;
+Received: from 30.221.148.72(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W2UXABh_1710469953)
+          by smtp.aliyun-inc.com;
+          Fri, 15 Mar 2024 10:32:41 +0800
+Message-ID: <143ea675-97e5-42ab-b8e6-55b2675294c3@linux.alibaba.com>
+Date: Fri, 15 Mar 2024 10:32:32 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/2] net: provides dim profile fine-tuning channels
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Tal Gilboa <talgi@nvidia.com>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>,
+ Randy Dunlap <rdunlap@infradead.org>, Bjorn Helgaas <bhelgaas@google.com>,
+ Breno Leitao <leitao@debian.org>, Johannes Berg <johannes.berg@intel.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev
+References: <1710421773-61277-1-git-send-email-hengqi@linux.alibaba.com>
+ <20240314114955.71ada20c@kernel.org>
+From: Heng Qi <hengqi@linux.alibaba.com>
+In-Reply-To: <20240314114955.71ada20c@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v3 1/2] bpf: Take return from set_memory_ro() into
- account with bpf_prog_lock_ro()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171046983097.25404.15651868965957197359.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Mar 2024 02:30:30 +0000
-References: <286def78955e04382b227cb3e4b6ba272a7442e3.1709850515.git.christophe.leroy@csgroup.eu>
-In-Reply-To: <286def78955e04382b227cb3e4b6ba272a7442e3.1709850515.git.christophe.leroy@csgroup.eu>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@google.com, haoluo@google.com, jolsa@kernel.org, bpf@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- loongarch@lists.linux.dev, linux-mips@vger.kernel.org,
- linux-parisc@vger.kernel.org, linux-s390@vger.kernel.org,
- sparclinux@vger.kernel.org, netdev@vger.kernel.org,
- linux-hardening@vger.kernel.org, keescook@chromium.org
 
-Hello:
 
-This series was applied to bpf/bpf-next.git (master)
-by Alexei Starovoitov <ast@kernel.org>:
 
-On Fri,  8 Mar 2024 06:38:07 +0100 you wrote:
-> set_memory_ro() can fail, leaving memory unprotected.
-> 
-> Check its return and take it into account as an error.
-> 
-> Link: https://github.com/KSPP/linux/issues/7
-> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
-> Cc: linux-hardening@vger.kernel.org <linux-hardening@vger.kernel.org>
-> Reviewed-by: Kees Cook <keescook@chromium.org>
-> 
-> [...]
+在 2024/3/15 上午2:49, Jakub Kicinski 写道:
+> On Thu, 14 Mar 2024 21:09:31 +0800 Heng Qi wrote:
+>> The NetDIM library provides excellent acceleration for many modern
+>> network cards. However, the default profiles of DIM limits its maximum
+>> capabilities for different NICs, so providing a channel through which
+>> the NIC can be custom configured is necessary.
+> Given that DIM is currently enabled and disable via ethtool
+> why are you putting the API is sysfs and ops in ndo?
 
-Here is the summary with links:
-  - [bpf-next,v3,1/2] bpf: Take return from set_memory_ro() into account with bpf_prog_lock_ro()
-    https://git.kernel.org/bpf/bpf-next/c/7d2cc63eca0c
-  - [bpf-next,v3,2/2] bpf: Take return from set_memory_rox() into account with bpf_jit_binary_lock_ro()
-    https://git.kernel.org/bpf/bpf-next/c/e60adf513275
+Hi Jakub,
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Thank you for reaching out. We're flexible regarding configuration 
+methods and are
+open to using either sysfs or ethtool, depending on what's most 
+appropriate for the task at hand.
 
+If the ethtool is favored, I am happy to proceed with it!
+
+Best regards,
+Heng
 
 
