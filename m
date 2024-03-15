@@ -1,60 +1,54 @@
-Return-Path: <netdev+bounces-80046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80048-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4AF787CB12
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 11:02:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7E0B87CB2B
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 11:12:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E65E41C2272B
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 10:02:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 86E4E281774
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 10:12:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38BEE17C6F;
-	Fri, 15 Mar 2024 10:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69AD218C38;
+	Fri, 15 Mar 2024 10:12:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6760418B14
-	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 10:02:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BFC918AEE;
+	Fri, 15 Mar 2024 10:12:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710496932; cv=none; b=LH0YXdU56zvZY5/HDIdxBA4sjyktmLEKpyykPNMThA5VVbSV2pNsWGpZ0UIfiKPSGrWl5qSUxOSmo8tgpTCXfUzPYKg/Ma+Li8lrO3yVCCbio9IcI9LZJqXq40hWoco1EVWKqvHBjP4C3qvxfhE3llK2soa0eG3/cVkqDXpWYFo=
+	t=1710497545; cv=none; b=IzfLQSxWnLuFyVl67KwDWgniD/vWZXsJ6MutU4PBjwK0tP/us+fmjNWvm4BAAQ6h0+wqJ/hdii+hzT0v4961WRYOoPxJ8a3TXp+Gff08cOUSeN2QNcbxRuopwgCW0VYKoM9DZA7tQcY/NFcDxSJATn1TLwz0CBAHMnyUKcXeMLU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710496932; c=relaxed/simple;
-	bh=svVdf8i4uzpl1k5sx6TWTgbPeE2Du1GRD2jg8IdsSlA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hYudKJAnUGXctud7QVaskXEZgUOxAF6gfYtTHEItVkcJE1GOSJHCf6FzvH3ZmS7wsPapJOeIZygs4ynobS0hF1cDzOXuHJaIVh1c/+0XPcIH4AQoHOvItLkM1uf2Pgespb+nGaXhUCCGcqd9/Nd3aFZRkAMNfBgrGJVkmq55zrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <s.hauer@pengutronix.de>)
-	id 1rl4O0-0005Zj-Mq; Fri, 15 Mar 2024 11:02:00 +0100
-Received: from [2a0a:edc0:0:1101:1d::28] (helo=dude02.red.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <s.hauer@pengutronix.de>)
-	id 1rl4O0-006Tj8-47; Fri, 15 Mar 2024 11:02:00 +0100
-Received: from localhost ([::1] helo=dude02.red.stw.pengutronix.de)
-	by dude02.red.stw.pengutronix.de with esmtp (Exim 4.96)
-	(envelope-from <s.hauer@pengutronix.de>)
-	id 1rl4O0-00GMJ8-03;
-	Fri, 15 Mar 2024 11:02:00 +0100
-From: Sascha Hauer <s.hauer@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	io-uring@vger.kernel.org,
-	Sascha Hauer <s.hauer@pengutronix.de>
-Subject: [PATCH] net: Do not break out of sk_stream_wait_memory() with TIF_NOTIFY_SIGNAL
-Date: Fri, 15 Mar 2024 11:01:59 +0100
-Message-Id: <20240315100159.3898944-1-s.hauer@pengutronix.de>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1710497545; c=relaxed/simple;
+	bh=CbuDnbaCrp/uLDAVQ+6BHKStFdlC4iTclbuSm70T/Wo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=l2VfyJ3v7nbqomaH2tKeqBFSdCl16kAd21/cyqOhdLd0kKwuUguSo193GF6MWwWOquSQkdWhkavD06d3hFl56+fk9okQOY0U4EduFRcnsB1tQDNCh/K4XzQTqfsSI2Zxn/wUwGEV9VOLa4fWLbWsKPAWyzFv7uzdiASCPxtUt1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Tx0QW0ycHz1vwMH;
+	Fri, 15 Mar 2024 18:11:31 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 365E0180061;
+	Fri, 15 Mar 2024 18:12:15 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.2) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Fri, 15 Mar 2024 18:12:14 +0800
+From: Jijie Shao <shaojijie@huawei.com>
+To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+	<liuyonglong@huawei.com>, <shaojijie@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net 0/3] There are some bugfix for the HNS3 ethernet driver
+Date: Fri, 15 Mar 2024 18:07:45 +0800
+Message-ID: <20240315100748.2913882-1-shaojijie@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,61 +56,28 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: s.hauer@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-It can happen that a socket sends the remaining data at close() time.
-With io_uring and KTLS it can happen that sk_stream_wait_memory() bails
-out with -512 (-ERESTARTSYS) because TIF_NOTIFY_SIGNAL is set for the
-current task. This flag has been set in io_req_normal_work_add() by
-calling task_work_add().
+There are some bugfix for the HNS3 ethernet driver
 
-This patch replaces signal_pending() with task_sigpending(), thus ignoring
-the TIF_NOTIFY_SIGNAL flag.
+Jian Shen (1):
+  net: hns3: mark unexcuted loopback test result as UNEXECUTED
 
-A discussion of this issue can be found at
-https://lore.kernel.org/20231010141932.GD3114228@pengutronix.de
+Jie Wang (1):
+  net: hns3: fix index limit to support all queue stats
 
-Suggested-by: Jens Axboe <axboe@kernel.dk>
-Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
----
- net/core/stream.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+Yonglong Liu (1):
+  net: hns3: fix kernel crash when devlink reload during pf
+    initialization
 
-diff --git a/net/core/stream.c b/net/core/stream.c
-index 96fbcb9bbb30a..e9e17b48e0122 100644
---- a/net/core/stream.c
-+++ b/net/core/stream.c
-@@ -67,7 +67,7 @@ int sk_stream_wait_connect(struct sock *sk, long *timeo_p)
- 			return -EPIPE;
- 		if (!*timeo_p)
- 			return -EAGAIN;
--		if (signal_pending(tsk))
-+		if (task_sigpending(tsk))
- 			return sock_intr_errno(*timeo_p);
- 
- 		add_wait_queue(sk_sleep(sk), &wait);
-@@ -103,7 +103,7 @@ void sk_stream_wait_close(struct sock *sk, long timeout)
- 		do {
- 			if (sk_wait_event(sk, &timeout, !sk_stream_closing(sk), &wait))
- 				break;
--		} while (!signal_pending(current) && timeout);
-+		} while (!task_sigpending(current) && timeout);
- 
- 		remove_wait_queue(sk_sleep(sk), &wait);
- 	}
-@@ -134,7 +134,7 @@ int sk_stream_wait_memory(struct sock *sk, long *timeo_p)
- 			goto do_error;
- 		if (!*timeo_p)
- 			goto do_eagain;
--		if (signal_pending(current))
-+		if (task_sigpending(current))
- 			goto do_interrupted;
- 		sk_clear_bit(SOCKWQ_ASYNC_NOSPACE, sk);
- 		if (sk_stream_memory_free(sk) && !vm_wait)
+ .../hns3/hns3_common/hclge_comm_tqp_stats.c      |  2 +-
+ .../net/ethernet/hisilicon/hns3/hns3_ethtool.c   | 16 +++++++++++++++-
+ .../hisilicon/hns3/hns3pf/hclge_devlink.c        |  5 +++--
+ 3 files changed, 19 insertions(+), 4 deletions(-)
+
 -- 
-2.39.2
+2.30.0
 
 
