@@ -1,159 +1,110 @@
-Return-Path: <netdev+bounces-80030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BB9387C983
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 09:01:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4279B87C9B3
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 09:11:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6E31B2215E
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 08:01:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DC5E28305F
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 08:11:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1286314A98;
-	Fri, 15 Mar 2024 08:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3391214F65;
+	Fri, 15 Mar 2024 08:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="E7E+Z+Ct"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fYXNmJWp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f174.google.com (mail-pg1-f174.google.com [209.85.215.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BBD14280
-	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 08:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB0A14AB0;
+	Fri, 15 Mar 2024 08:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710489669; cv=none; b=qhRDaxmVt2QjEIMf8OE4OMSEnT+RyuCLQ9lYpQyi1eWna1sQe4rTiXghjAmLhGkZ7Qz283S6wB2ghYUep4/OtWa5FRd9Kx55oMAMxQbmcdXGQD79/hlfxfZ2QTlDbG7IUj1tbItfUtILASLFhewIn6HmdmD1JFk7+efd44MdJxo=
+	t=1710490261; cv=none; b=qunWe0S0Zg/4EP//ZnB5vOGVYgbdPJbEPExFNTrtZlL9HcP6K8qkqMRt2tSMEzgCFVV4/sNqfYVQZwUHuj9iSmVQq+wB8guVgRlZL2N7ShrkHxU3yzSpLCWYsO6vVobxCBHtjFIYVvZxW0zwEj5w3HAhDA5w4R5YZvybI2TSdXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710489669; c=relaxed/simple;
-	bh=p0en/GCOfhc21UxAgSvgpjSxEaCkV+SmFKeaU1UDvXQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p8W0fnjXDa4OC2lKa9BybSq+FiWzqnjdgSLuCfPHMUi45IrO6QeTs5LGN8LKuwMVYaegLUpzNAUlukEOtamZCWhtbHiJb2GH/VKiSFln4ydjW9W4Y31nkNRE3z3IsiOWhJYnnCWYMj5Jf1FXU0My7QqmaZ6BLJIGYrWIVesIDLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=E7E+Z+Ct; arc=none smtp.client-ip=209.85.215.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pg1-f174.google.com with SMTP id 41be03b00d2f7-53fbf2c42bfso1351405a12.3
-        for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 01:01:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1710489667; x=1711094467; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=p0en/GCOfhc21UxAgSvgpjSxEaCkV+SmFKeaU1UDvXQ=;
-        b=E7E+Z+CtWt8kqiIjYWVQjEQ5fj1jos1mIKKRspBALWmE5bpg83ESZX6Bn5hJBz/CmZ
-         BeKAAir5/rFWNesxtwFWK3Tnr4Z6qZlWzPhhZ+rIubFMtMI34lAx+ZgY0GQ3VNMgN/Cz
-         uUQnfNLDzXZfCF0vDa991O2bU8qGj7BgLVY2O33qRMVT4T6b4AM8SJwLVqqfXb8Y135U
-         4J//tHDM2+xPpMs3PW0OVcpu6s7/9R1Z7RKt6G+SdFeJcklUqICdg9FgGcgKCFZAEXEI
-         Tq25GM5Oyuk4eiAn2mh0YG9+mIj52I4qrzB+oPAKwBmu3R4t9GEa2Y9aKBvlNL2Idzkz
-         jvQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710489667; x=1711094467;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=p0en/GCOfhc21UxAgSvgpjSxEaCkV+SmFKeaU1UDvXQ=;
-        b=q5tKfxhhNWgEjuoYiJbEdbJUumkcAN3D/NEXDGu1LBQMdog0fayZDdgAfXf8zjplip
-         BDdhZdzEwnevAR5ne3pMUhmhRjgSY+HY0dTOVsGoWRTrsV0FbRxu15pnNjK0eA5aHmCM
-         yJN0A7v6wWP2VloL2x4CpUXCBjSHRDCLrVHncy80+4zuNvoCIY/1KBAZ5fofMmcLN1DF
-         Q71b9olIZXTtj01x7iHsQavgD2TfciOn/bAVfnkMu+X+efku+1iwTiQWkbBG7TM2CO75
-         le5Z+UnHdO1rrT67BiWDFQ5KaDYWSzM9c9gQIA58ANm77FWRbQ7HfOQxKXal7z/oa7h7
-         /eOQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV4ia7nUjG6t+JTUCSy81IZ/2mWZl/R6W9bgh3ZpF9q0IvUBmm5jGnMsMbWneAE1SFSIon61Cg44QUhgKksRMjX6GXy1K1x
-X-Gm-Message-State: AOJu0YzfbULMREw7lrPrh3TSN2gtxeHwGoW/t2+IvGcuwIr19wqu0obH
-	fjLHA4ZXuZGnDINW1uVzr6ouHRNmWfReCQECy3fiT1EtZb5Y3FK/ReTZd3TbG3qrbCIfWe1ur7/
-	j6nyt24ub/emXeTfIBbvL+gl4J263ZV2OuoaTbg==
-X-Google-Smtp-Source: AGHT+IEpM9Mqa5iEhQbTXQByuieojUsSQiVC/HtuI16NWpRWnCf8v9wukRY0tmuiax6xN5WzRfxP5Mr9rKAT0G28iSY=
-X-Received: by 2002:a17:90a:dc0b:b0:29d:fe1c:79e7 with SMTP id
- i11-20020a17090adc0b00b0029dfe1c79e7mr271232pjv.45.1710489666842; Fri, 15 Mar
- 2024 01:01:06 -0700 (PDT)
+	s=arc-20240116; t=1710490261; c=relaxed/simple;
+	bh=hf/7tzQiNSvYmFuA/yKuj1fm3A4gA/3hedPkcZLXEe8=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=s1rHiBAE+85F5eToewKL2888iklYXW8jvYRSARhFeDIfFmU24wGMyL0P5neKNSumv0+InVwNIkq9nMTBW98yn0yuWqlCLi778N2d8yaZI2K17OAOBWqOMFGDG5U/IO9tCCfrkW19pzbkWCD8ZOh9PwoCDFzIJruw6syehdi2tv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fYXNmJWp; arc=none smtp.client-ip=115.124.30.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1710490251; h=Message-ID:Subject:Date:From:To;
+	bh=hf/7tzQiNSvYmFuA/yKuj1fm3A4gA/3hedPkcZLXEe8=;
+	b=fYXNmJWplcKF5W2UnPUwG8wBfUOtbby51EA29jlCTX4AUdPfQvQZX+jYjlycW3ntVgfyX7P4eHccM7eVAkx4Wa+5sooe1KEWSKdOPOmP9Eitntb/MkNR8QfV7i0JMB/WeaUp5KhIA5YSHPaj6SWGXjEXNRINsieTWZhNxICvtKo=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W2ViqTo_1710490249;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W2ViqTo_1710490249)
+          by smtp.aliyun-inc.com;
+          Fri, 15 Mar 2024 16:10:50 +0800
+Message-ID: <1710489940.1772969-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v4 3/8] virtio_net: support device stats
+Date: Fri, 15 Mar 2024 16:05:40 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric  Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ "Michael S.  Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>,
+ Alexei  Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Stanislav Fomichev <sdf@google.com>,
+ Amritha  Nambiar <amritha.nambiar@intel.com>,
+ Larysa Zaremba <larysa.zaremba@intel.com>,
+ Sridhar Samudrala <sridhar.samudrala@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ virtualization@lists.linux.dev,
+ bpf@vger.kernel.org
+References: <20240314085459.115933-1-xuanzhuo@linux.alibaba.com>
+ <20240314085459.115933-4-xuanzhuo@linux.alibaba.com>
+ <20240314155425.74b8c601@kernel.org>
+In-Reply-To: <20240314155425.74b8c601@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240311093526.1010158-1-dongmenglong.8@bytedance.com>
- <20240311093526.1010158-2-dongmenglong.8@bytedance.com> <CAADnVQKQPS5NcvEouH4JqZ2fKgQAC+LtcwhX9iXYoiEkF_M94Q@mail.gmail.com>
- <CALz3k9i5G5wWi+rtvHPwVLOUAXVMCiU_8QUZs87TEYgR_0wpPA@mail.gmail.com>
- <CAADnVQJ_ZCzMmT1aBsNXEBFfYNSVBdBXmLocjR0PPEWtYQrQFw@mail.gmail.com>
- <CALz3k9icPePb0c4FE67q=u1U0hrePorN9gDpQrKTR_sXbLMfDA@mail.gmail.com>
- <CAADnVQLwgw8bQ7OHBbqLhcPJ2QpxiGw3fkMFur+2cjZpM_78oA@mail.gmail.com>
- <CALz3k9g9k7fEwdTZVLhrmGoXp8CE47Q+83r-AZDXrzzuR+CjVA@mail.gmail.com> <CAADnVQLHpi3J6cBJ0QBgCQ2aY6fWGnVvNGdfi3W-jmoa9d1eVQ@mail.gmail.com>
-In-Reply-To: <CAADnVQLHpi3J6cBJ0QBgCQ2aY6fWGnVvNGdfi3W-jmoa9d1eVQ@mail.gmail.com>
-From: =?UTF-8?B?5qKm6b6Z6JGj?= <dongmenglong.8@bytedance.com>
-Date: Fri, 15 Mar 2024 16:00:55 +0800
-Message-ID: <CALz3k9g-U8ih=ycJPRbyU9x_9cp00fNkU3PGQ6jP0WJ+=uKmqQ@mail.gmail.com>
-Subject: Re: [External] Re: [PATCH bpf-next v2 1/9] bpf: tracing: add support
- to record and check the accessed args
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Andrii Nakryiko <andrii@kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Martin KaFai Lau <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Alexander Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>, 
-	Sven Schnelle <svens@linux.ibm.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Dave Hansen <dave.hansen@linux.intel.com>, 
-	X86 ML <x86@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Quentin Monnet <quentin@isovalent.com>, 
-	bpf <bpf@vger.kernel.org>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, LKML <linux-kernel@vger.kernel.org>, 
-	linux-riscv <linux-riscv@lists.infradead.org>, linux-s390 <linux-s390@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, linux-trace-kernel@vger.kernel.org, 
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 14, 2024 at 8:27=E2=80=AFAM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
+On Thu, 14 Mar 2024 15:54:25 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
+> On Thu, 14 Mar 2024 16:54:54 +0800 Xuan Zhuo wrote:
+> > make virtio-net support getting the stats from the device by ethtool -S
+> > <eth0>.
+> >
+> > Due to the numerous descriptors stats, an organization method is
+> > required. For this purpose, I have introduced the "virtnet_stats_map".
+> > Utilizing this array simplifies coding tasks such as generating field
+> > names, calculating buffer sizes for requests and responses, and parsing
+> > replies from the device. By iterating over the "virtnet_stats_map,"
+> > these operations become more streamlined and efficient.
 >
-> On Tue, Mar 12, 2024 at 6:53=E2=80=AFPM =E6=A2=A6=E9=BE=99=E8=91=A3 <dong=
-menglong.8@bytedance.com> wrote:
-[......]
-> > What does "a hundred attachments max" means? Can't I
-> > trace thousands of kernel functions with a bpf program of
-> > tracing multi-link?
+> Don't duplicate the stats which get reported via the netlink API in
+> ethtool. Similar story to the rtnl stats:
 >
-> I mean what time does it take to attach one program
-> to 100 fentry-s ?
-> What is the time for 1k and for 10k ?
->
-> The kprobe multi test attaches to pretty much all funcs in
-> /sys/kernel/tracing/available_filter_functions
-> and it's fast enough to run in test_progs on every commit in bpf CI.
-> See get_syms() in prog_tests/kprobe_multi_test.c
->
-> Can this new multi fentry do that?
-> and at what speed?
-> The answer will decide how applicable this api is going to be.
-> Generating different trampolines for every attach point
-> is an approach as well. Pls benchmark it too.
+> https://docs.kernel.org/next/networking/statistics.html#notes-for-driver-authors
 
-I see. Creating plenty of trampolines does take a lot of time,
-and I'll do testing on it.
+Sorry, this patch set did not follow this.
 
->
-> > >
-> > > Let's step back.
-[......]
->
-> For one trampoline to handle all attach points we might
-> need some arch support, but we can start simple.
-> Make btf_func_model with MAX_BPF_FUNC_REG_ARGS
-> by calling btf_distill_func_proto() with func=3D=3DNULL.
-> And use that to build a trampoline.
->
-> The challenge is how to use minimal number of trampolines
-> when bpf_progA is attached for func1, func2, func3
-> and bpf_progB is attached to func3, func4, func5.
-> We'd still need 3 trampolines:
-> for func[12] to call bpf_progA,
-> for func3 to call bpf_progA and bpf_progB,
-> for func[45] to call bpf_progB.
->
-> Jiri was trying to solve it in the past. His slides from LPC:
-> https://lpc.events/event/16/contributions/1350/attachments/1033/1983/plum=
-bers.pdf
->
-> Pls study them and his prior patchsets to avoid stepping on the same rake=
-s.
+I will fix in next version.
+
+But I plan that will be done in the commit "virtio-net: support queue stat".
+This commit in next version will report all stat by ethtool -S.
+The commit "virtio-net: support queue stat" in next version
+will not report the duplicate the stats that reported via the netlink API.
+
+Do you think ok?
+
+Thanks.
+
+
+
+
+
+
+
 
