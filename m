@@ -1,109 +1,248 @@
-Return-Path: <netdev+bounces-80114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69DEF87D150
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 17:43:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1985587D186
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 17:53:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BE621F21FD0
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 16:43:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C2D31C21C6C
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 16:53:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77CCA2208A;
-	Fri, 15 Mar 2024 16:43:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C734F45C06;
+	Fri, 15 Mar 2024 16:53:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="mjcTznr0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nPSxfnA0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE85D3D579
-	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 16:43:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856A845BE1;
+	Fri, 15 Mar 2024 16:53:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710520997; cv=none; b=s97898W6GGFVPGrcCiV/n1cSuPvbd0x4JFrdKfleS0Px7oFkPj9aX8UQjNQND2a+NEUYJVCIz0kxbhGK6NpASlkH2D3/dTTXvJ7IskHsbkfB7qxvgbxANIUukNXcJR32WT7XGg7Mi+dcW3dQIZ5YfLtCtIKsuFhKgHqq4+e027c=
+	t=1710521587; cv=none; b=rzWOPMDm95IdN/0YWtrwXTK69BIm+r13hJb6anCnh+0WlqRLV+NHpVdtC0grNUo1ibPKzHUAA3S50LJJpUKjx0h6ofAoAKQ1EISMEUZCDjkggFntiLDK0khIe2e4+wZRQbvlZzAGF//OzsUZIK5ue+fYTVf6s7taIGsej0eG8eM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710520997; c=relaxed/simple;
-	bh=KL2SdFZI6xj14E9gdnKkJmRkYlKkUmM4EoGRsI93QtY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rkxshdrYDIrbR356tHnQWLGpVlmCqWbdq+yH2PRgmM20C4e4Q1whZ/2/v4Vp0rMUYJFyBgRuqb1q9GPgaq8bzlLVjhXg/gY/69mL6heFz8WgY46j8jmMwvx2byOrcetJ8TDBQqX4Wk8C1mIb0FTENRTd+ixTPY0NTc/3FeAjHSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=mjcTznr0; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3663903844bso3559445ab.1
-        for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 09:43:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710520994; x=1711125794; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NnYrkeEuyooTzIwqpfS+gG0pSUcxJ+MtV42LbV77NO8=;
-        b=mjcTznr0AnttCmWs8R630cdqUoVvTyRfA2XvIzaCYQalCB+oC+Dn4yVxntdM+c7K4o
-         ISpJMxFnoyZCUP3zbAPIeRcopPEjjbuBW3UDAZYZBMCZ8chnvewDkygBrQqMNmwhrtBf
-         voqsNaeq7k6ua5gktQiGIwWGBb1mjSj5T+Dw8+YifwOeTjJBlKczopztKOzh90LsLE+B
-         uzPDaBw1VXpUvU/QKmBhFj2T3IhdqczIL4IAFS+xsNjkP+BW2KfgdxgCCDX2CqErBIIt
-         xdfz66AcD2KrOH4JhCoLQTylykypZYxKLyuzRXpvlDql22u2LOknTwcwwGRYAPAH6Pt2
-         2seg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710520994; x=1711125794;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=NnYrkeEuyooTzIwqpfS+gG0pSUcxJ+MtV42LbV77NO8=;
-        b=rkExiv+/cF5q2gGmqrLnkipOGwP49WKm/idO83Ci3Heysj2B2CagOvtjBl/Gpod4by
-         lBdO5vcH395cZJSxCUFSYRONNYOjEVAsQrH6LxkIlQY2hbx++iAJgSvBFH3xwhdK9yxP
-         xwuRu+3Tn4TXUr1Kc7VHBWXUmBjaEbyZ4AzYeqEPtdWYn5DUgKO9SqNb/AiIotxi6x+X
-         4WVNGTgvs1JZXHPiXNPVWVxB/k4yx8HBCAbUzqN+PNBXJKIqOHEYYOmfBvEx72DjTM48
-         jxGA35GtPT7IJRP01uIkrzARBFr74G7xU0YeycRCPCIdNYCZW4AZ/OWUu6igjX5IDMyu
-         hyBg==
-X-Forwarded-Encrypted: i=1; AJvYcCX2yjZPw5zKYVrX10IrA4oJr0sGN6EdABqx9oW5AgJP6JKdJMlG8vnl89LAlWWoUEgNtGluJlg5diF9eMSEPBmbbPrfr6jC
-X-Gm-Message-State: AOJu0YyCI4otHXsRfcQc8NWWIQAdQ+Ip1brRSd4BBGYDY2qlXyz/NVsX
-	OKtYxJhLF675HTuBRp3FRHIFQfe1jHlDvnezVnZJmGgDcws81hKw8Zji8NNw8Ho=
-X-Google-Smtp-Source: AGHT+IHw1pzzO7Lbgj3rvUe5D+ef6Gi98W/ojPiEC7bSUDtyXI2fQLppD6zQr3heqjbpOrSMGqElPA==
-X-Received: by 2002:a05:6e02:1745:b0:366:7443:c9f7 with SMTP id y5-20020a056e02174500b003667443c9f7mr6765962ill.3.1710520993934;
-        Fri, 15 Mar 2024 09:43:13 -0700 (PDT)
-Received: from [192.168.1.116] ([96.43.243.2])
-        by smtp.gmail.com with ESMTPSA id a11-20020a92d34b000000b00366958eb5e8sm505837ilh.74.2024.03.15.09.43.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Mar 2024 09:43:13 -0700 (PDT)
-Message-ID: <ed44cb26-7d23-4391-89c5-0e7b59d019f6@kernel.dk>
-Date: Fri, 15 Mar 2024 10:43:12 -0600
+	s=arc-20240116; t=1710521587; c=relaxed/simple;
+	bh=qYctyXGEOoZXV6Jh8OrILzQOvS7D8Y2IuiQCeaSls9A=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ijdLTwJhKeuEbN0jO8p0zMQDLSnEUGE6RX03C4PQ5GSF58XBeUDqW+Xon0gfRiBehSjoY/jCRfmNW5LqR1DKPPkOBpeoYglC14aZjGc+6I7GtjdTYMDO6NxDLr///4zPC1qBH1M7FZrnmf9XXn8YPmnrctlhnLCB6M7cNS41IBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nPSxfnA0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07B64C433F1;
+	Fri, 15 Mar 2024 16:53:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710521587;
+	bh=qYctyXGEOoZXV6Jh8OrILzQOvS7D8Y2IuiQCeaSls9A=;
+	h=From:Subject:Date:To:Cc:From;
+	b=nPSxfnA0NHvOyANVe4L+CLdzIHMbJ6G1FEbax+MoZilCvP6jyio9LFQ9avi16uOKE
+	 45PJHVmSARkIaZE3+Zg9gYMeQ60+F7YgtEuf6RXwrSzau5+Emyf8RFM8er61XNq3CH
+	 qHRaQ1JIJhDw9H5uCJvyGoKGCyvbkLJemR/EPUiYpjAojWp/jr5KSJbke9XEFYzuo7
+	 bQvMj0M24b+c8lnJq8HujEREygx3yFdqQtvhuECka3dZrZurid7knDwEt+t3ra98TG
+	 FmkYUz9V+UTNszGaz0coC5c8HRp5V3KSqhLsMi5Gplo4zG69sWu3NGrjq65j+5EY4E
+	 Bjh3b1O3dQLdg==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH RFC 00/24] vfs, nfsd, nfs: implement directory delegations
+Date: Fri, 15 Mar 2024 12:52:51 -0400
+Message-Id: <20240315-dir-deleg-v1-0-a1d6209a3654@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: Do not break out of sk_stream_wait_memory() with
- TIF_NOTIFY_SIGNAL
-Content-Language: en-US
-To: Sascha Hauer <s.hauer@pengutronix.de>, netdev@vger.kernel.org
-Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>, io-uring@vger.kernel.org
-References: <20240315100159.3898944-1-s.hauer@pengutronix.de>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <20240315100159.3898944-1-s.hauer@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAOR89GUC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxMDI0NT3ZTMIt2U1JzUdN1UI0MjI0ODpETLFBMloPqCotS0zAqwWdFKQW7
+ OSrG1tQD7IB8JYAAAAA==
+To: Alexander Viro <viro@zeniv.linux.org.uk>, 
+ Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>, 
+ Chuck Lever <chuck.lever@oracle.com>, 
+ Alexander Aring <alex.aring@gmail.com>, 
+ Trond Myklebust <trond.myklebust@hammerspace.com>, 
+ Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>, 
+ Paulo Alcantara <pc@manguebit.com>, 
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>, 
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+ "Rafael J. Wysocki" <rafael@kernel.org>, 
+ David Howells <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>, 
+ Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, 
+ Dai Ngo <Dai.Ngo@oracle.com>, Miklos Szeredi <miklos@szeredi.hu>, 
+ Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+ Sergey Senozhatsky <senozhatsky@chromium.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, 
+ samba-technical@lists.samba.org, netfs@lists.linux.dev, 
+ ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
+ netdev@vger.kernel.org, Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=7113; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=qYctyXGEOoZXV6Jh8OrILzQOvS7D8Y2IuiQCeaSls9A=;
+ b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBl9HzsIFPO4qmRNI+ITLK0st6aVgzmSJbLcGqra
+ AThOkCTgOeJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCZfR87AAKCRAADmhBGVaC
+ FaGeEAChIS9AQaRvxbB+6LQSElzXukcCCobpzzUO21Dhx8VFbVzHqQH2W+mMjIN7UALlOxT9VEZ
+ h6VaIkDGob695Aqi/wq/Qm0BEpd+XKO2Y4IuMDP8A+8+k2J3j4mdyz6nDWJiiau0Ng5EF4pb3Sq
+ vhYUy7Bpu0culANSYWXqs930FVPqaqshNWVtRKIGHMW3/VZEpB8O0XLkFT0OW4fhHW5+FHl8rkd
+ CuYP5bWk2xk0b4+ZEwvBvDJ0Zc9mndRNQMbbFQr0G4WhwISQO3BKf4zK/21jYhCfJd3FsasqQgh
+ Lhnce75SrlI1HWO+ozACZGrm3yhF9rirXGZScKNUsFJAz+9b1J1gQ4vDVj5EDdRUzAp7V54p3Wl
+ 2EtHjlUtNot+NPK2wBzdM1zg8m70t6JV4STWgn8WKQPMy8xG/HMUnSkKIDG4NWpKmIoQO/qiQCD
+ 46ufSgaK1lFYVA9RNtHjy3+8JctkIlBOOuxV/AZgN887cSSAwI06oI7v9YzqUDhhetqMLaJFoDQ
+ ZJOqa+wMvuxhA94xB1lPPDAnQaG2g2Ebkleu4lSoAj8PPP/HP17Fj5a0935G32oPb+jcdU0cbDw
+ 7bU+U3cGLl3b962IHh3XyLos88DpoLOHtdwmX11r2usfdvcX6iGHfwv2UVDo7uDyNvsPkrjNbWE
+ z53diDtmAR7ssuA==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-On 3/15/24 4:01 AM, Sascha Hauer wrote:
-> It can happen that a socket sends the remaining data at close() time.
-> With io_uring and KTLS it can happen that sk_stream_wait_memory() bails
-> out with -512 (-ERESTARTSYS) because TIF_NOTIFY_SIGNAL is set for the
-> current task. This flag has been set in io_req_normal_work_add() by
-> calling task_work_add().
-> 
-> This patch replaces signal_pending() with task_sigpending(), thus ignoring
-> the TIF_NOTIFY_SIGNAL flag.
+NFSv4.1 adds a new GET_DIR_DELEGATION operation, to allow clients
+to request a delegation on a directory. If the client holds a directory
+delegation, then it knows that nothing will change the dentries in it
+until it has been recalled.
 
-Reviewed-by: Jens Axboe <axboe@kernel.dk>
+Last year, Rick Macklem gave a talk at the NFS Bakeathon on his
+implementation of directory delegations for FreeBSD [1], and showed that
+it can greatly improve LOOKUP-heavy workloads. There is also some
+earlier work by CITI [2] that showed similar results. The SMB protocol
+also has a similar sort of construct, and they have also seen great
+performance improvements from it.
 
-Should probably also flag this for stable, 5.10+ I think as the task
-sigpending got backported that far.
+This patchset adds minimal support for directory delegations to the VFS
+layer, and and plumbs support for GET_DIR_DELEGATION handling into nfsd.
+It also has a set of patches for the NFS client. The VFS and server-side
+bits all seem to work now and do the right thing. The client side is
+still very much a WIP since it relies more on policy and heuristics.
 
+What I've found is that without directory delegations in play, the
+client usually revalidates dentries by issuing a GETATTR for the parent.
+If it holds a delegation on the parent, it can avoid that GETATTR, which
+is a nice benefit.
+
+But...the catch is that the Linux NFS client defaults to caching
+dentries for 30-60s before revalidating them. The attrcache timeout
+quickly ends up as 60s on directories that aren't changing, so for a
+delegation to be useful, you need to be revalidating dentries in the
+same directory over a rather long span of time. Even then, at best it'll
+be optimizing away one GETATTR per inode every 60s or so.
+
+I've done a little ad-hoc testing with kernel builds, but they don't
+show much benefit from this. Testing with them both enabled and
+disabled, the kernel builds finished within 5 seconds of one another on
+a 12.5 minute build, which is insignificant.
+
+The GETATTR load seems to be reduced by about 7% with dir delegs
+enabled, which is nice, but GETATTRs are usually pretty lightweight
+anyway, and we do have the overhead of dir delegations to deal with.
+
+There is a lot of room for improvement that could make this more
+compelling:
+
+1) The client's logic for fetching a delegation is probably too
+   primitive. Maybe we need to request one only after every 3-5
+   revalidations?
+
+2) The client uses the same "REFERENCED" timeout for dir delegations
+   as it does for clients. It could probably benefit from holding them
+   longer by default. I'm not sure how best to do that.
+
+3) The protocol allows for clients and server to use asynchronous
+   notifications to avoid issuing delegation breaks when there are
+   changes to a delegated directory. That's not implemented yet,
+   but it could change the calculus here for workloads where multiple
+   clients are accessing and changing child dentries.
+
+4) A GET_DIR_DELEGATION+READDIR compound could be worthwhile. If we have
+   all of the dentries in the directory, then we could (in principle)
+   satisfy any negtive dentry lookup w/o going to the server. If they're
+   all in the correct order on d_subdirs, we could satisfy a readdir
+   via dcache_readdir without going to the server.
+
+5) The server could probably avoid handing them out if the inode changed
+   <60s in the past?
+
+For the VFS and NFSD bits, I mainly want to get some early feedback.
+Does this seem like a reasonable approach? Anyone see major problems
+with handling directory delegations in the VFS codepaths?
+
+The NFS client bits are quite a bit more rough.  Is there a better
+heuristic for when to request a dir delegation? I could use a bit of
+guidance here.
+
+[1]: https://www.youtube.com/watch?v=DdFyH3BN5pI
+[2]: https://linux-nfs.org/wiki/index.php/CITI_Experience_with_Directory_Delegations
+
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+Jeff Layton (24):
+      filelock: push the S_ISREG check down to ->setlease handlers
+      filelock: add a lm_set_conflict lease_manager callback
+      vfs: add try_break_deleg calls for parents to vfs_{link,rename,unlink}
+      vfs: allow mkdir to wait for delegation break on parent
+      vfs: allow rmdir to wait for delegation break on parent
+      vfs: break parent dir delegations in open(..., O_CREAT) codepath
+      vfs: make vfs_create break delegations on parent directory
+      vfs: make vfs_mknod break delegations on parent directory
+      filelock: lift the ban on directory leases in generic_setlease
+      nfsd: allow filecache to hold S_IFDIR files
+      nfsd: allow DELEGRETURN on directories
+      nfsd: encoders and decoders for GET_DIR_DELEGATION
+      nfsd: check for delegation conflicts vs. the same client
+      nfsd: wire up GET_DIR_DELEGATION handling
+      nfs: fix nfs_stateid_hash prototype when CONFIG_CRC32 isn't set
+      nfs: remove unused NFS_CALL macro
+      nfs: add cache_validity to the nfs_inode_event tracepoints
+      nfs: add a tracepoint to nfs_inode_detach_delegation_locked
+      nfs: new tracepoint in nfs_delegation_need_return
+      nfs: new tracepoint in match_stateid operation
+      nfs: add a GDD_GETATTR rpc operation
+      nfs: skip dentry revalidation when parent dir has a delegation
+      nfs: optionally request a delegation on GETATTR
+      nfs: add a module parameter to disable directory delegations
+
+ drivers/base/devtmpfs.c   |   6 +-
+ fs/cachefiles/namei.c     |   2 +-
+ fs/ecryptfs/inode.c       |   8 +--
+ fs/init.c                 |   4 +-
+ fs/locks.c                |  12 +++-
+ fs/namei.c                | 101 ++++++++++++++++++++++++++++------
+ fs/nfs/delegation.c       |   5 ++
+ fs/nfs/dir.c              |  20 +++++++
+ fs/nfs/internal.h         |   2 +-
+ fs/nfs/nfs4file.c         |   2 +
+ fs/nfs/nfs4proc.c         |  55 ++++++++++++++++++-
+ fs/nfs/nfs4trace.h        | 104 +++++++++++++++++++++++++++++++++++
+ fs/nfs/nfs4xdr.c          | 136 ++++++++++++++++++++++++++++++++++++++++++++++
+ fs/nfs/nfstrace.h         |   8 ++-
+ fs/nfsd/filecache.c       |  37 +++++++++++--
+ fs/nfsd/filecache.h       |   2 +
+ fs/nfsd/nfs3proc.c        |   2 +-
+ fs/nfsd/nfs4proc.c        |  49 +++++++++++++++++
+ fs/nfsd/nfs4recover.c     |   6 +-
+ fs/nfsd/nfs4state.c       | 112 +++++++++++++++++++++++++++++++++++++-
+ fs/nfsd/nfs4xdr.c         |  72 +++++++++++++++++++++++-
+ fs/nfsd/state.h           |   5 ++
+ fs/nfsd/vfs.c             |  13 +++--
+ fs/nfsd/vfs.h             |   2 +-
+ fs/nfsd/xdr4.h            |   8 +++
+ fs/open.c                 |   2 +-
+ fs/overlayfs/overlayfs.h  |   8 +--
+ fs/smb/client/cifsfs.c    |   3 +
+ fs/smb/server/vfs.c       |   8 +--
+ include/linux/filelock.h  |  10 ++++
+ include/linux/fs.h        |  11 ++--
+ include/linux/nfs4.h      |   6 ++
+ include/linux/nfs_fs.h    |   1 +
+ include/linux/nfs_fs_sb.h |   1 +
+ include/linux/nfs_xdr.h   |   9 +--
+ net/unix/af_unix.c        |   2 +-
+ 36 files changed, 754 insertions(+), 80 deletions(-)
+---
+base-commit: b80a250a20975e30ff8635dd75d6d20bf05405a1
+change-id: 20240215-dir-deleg-e212210ba9d4
+
+Best regards,
 -- 
-Jens Axboe
+Jeff Layton <jlayton@kernel.org>
 
 
