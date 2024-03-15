@@ -1,135 +1,185 @@
-Return-Path: <netdev+bounces-80147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C779787D2E3
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 18:35:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F31C87D2F6
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 18:41:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 03995B21FDF
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 17:35:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 892A0B218EA
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 17:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3D1A3BBD0;
-	Fri, 15 Mar 2024 17:35:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440E24DA19;
+	Fri, 15 Mar 2024 17:40:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mk9y5T8n"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="RyBrlIAf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D11E4D599;
-	Fri, 15 Mar 2024 17:35:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFD3F4AEC6
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 17:40:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710524134; cv=none; b=WOjMgmKfpSqxwBL/4LLAx8lm7HHb2/sYq7G3ZWaOTz/gbvVOabBpouZG2Cjm3KVDj7RRHHaTWEuVruK46FzEMjcru8D6lYMLF7hnXmugd9aVe8MKkHbdoQe+nKJqKgs+4o1BgNSiOb6CMpoZC0+ZT3g5+OVrtJ9e3cNHOdM7bx8=
+	t=1710524451; cv=none; b=o85vxWm0H4Hlf1lA9m3+Zn2XdpRg8peax9MMVa9hTdKi2ykfAIBxe3D+WAlgQc8Zjv1uqa79hVe9KY/1ANB9vkkiB1xr0c9FhPU9aaE+tvgpaErBz4z7w8AaZOX3rxpm1TjDqp0uRDLQdBgavpBCLb5rRmdVpAED6RGZ79kcDrs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710524134; c=relaxed/simple;
-	bh=Y1PEXpSEK0rsDS711/gG7hMZeM0np4zytvBVm/pTdUc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IDmUxajP741vhZEZd83ZNo+KY2/Pchm/wD59+BMURgePxJznAVlDhPkaZccmGIgBK8y7uxg9aDAirvBDcfo1dX+9dTwZIz8j3lcRzVDrN0tPUY7djH5iIzUY/mgmimzxqw8+fPrPi2yQoyqMf23digVjmHJHy07CXIKgjJZbgfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mk9y5T8n; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-413fff2aa2aso8491945e9.2;
-        Fri, 15 Mar 2024 10:35:32 -0700 (PDT)
+	s=arc-20240116; t=1710524451; c=relaxed/simple;
+	bh=5HCRl2x1viEyNkAD/Zm4AolqRu1YCoqTb4oMNH+XAkw=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=WPSQhPRewt4ItHLUxQpdVrZFt1SiWCBPkL0dtru2UXIu4ZYVYdi63JcAJvspNzEQvHnt2SmbaRCth0of+cEDFtEoHWi0f5nI0m8MY3EG33T0tYA4vTVwrw1SQtgZPjjM/mkrRwtaqL4UBk1iC3fXs3WfD+U/y9hHFtAJSEAzrno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=RyBrlIAf; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6e6a9ffaf3eso2251971b3a.3
+        for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 10:40:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710524131; x=1711128931; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cfpfNcyeYYbLF1S7F08Dgtx2zhwW7B2Wxc9KNT7IMbo=;
-        b=Mk9y5T8n1A6dx3RCTJ6waVVBUROdWpep3UgG0M/mIcG4wKIUNeMaIr282InAR5AxjL
-         QaNJ1z9bsVSb7MF5/yBrXgZgSVXjCeYCgPHFwV8CxtgFE+yrUvGbGk95mjB2t8iO3Dzz
-         zd2Y3UBIEleayNnOxhGu2rnukSeOUxKyLM384+Cn4USz0Z67bkPRB9cKl6YMq9CLgQYq
-         15zOQfNSpSZhSUFJxpawFNOdjcPl3E7jbp5CwvO+6Czzr0PEsQNVGm1RJE5jLTnsCGd0
-         nW8jN3FonBGaWlD055BxghRCxkbxtAAAJopkND/NmXLPPB77JJP1lXKjcbIsn3PAEYoL
-         /gQg==
+        d=google.com; s=20230601; t=1710524449; x=1711129249; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=48KHiiBIGucSlkCxyuE9gcyqU8jXsSRw/tV7Rve5Qs0=;
+        b=RyBrlIAfYgmhp3UcrK+Sq8lL4JrJmpKcpYHPO0SHNYZtjQ+ZZUjELT/E5/lKioLuFD
+         UVpKO90H/b7Dm+OXOXZcUxXB5S3FN4lEV06Ce7pkwogweLSteQgmsN57p8l4JrDajr/7
+         M4iPTgWMdRF5GIuiky0Stt2Kgun4tP6BAK4+2LhG65qvKI5dwhMxak0vm3m5s9BTjV1B
+         61+zgWvKumyhk9F2+iqyn1V1kV6OZLn8UVkQ02gUVs3jDV/fyXBI6KW1KNPj3rr6NtgW
+         7gvN/rCNh3bI16p5GtVlEtFfVesEDr9JfR7NQ7rBIDWfU4ndtcI2PFKz/NlEL3lotDZP
+         1JCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710524131; x=1711128931;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cfpfNcyeYYbLF1S7F08Dgtx2zhwW7B2Wxc9KNT7IMbo=;
-        b=MFhdYOAgqDNm2AN9U47hAzenq137bqj/6c2KlEO9fwm81WHNonx+74jALpcGA5NenM
-         MWz50WKkyScAT6NafTUOtBP6vPgL/9/23GNKe2F3Df6DE+VGUyDP7ViKD9juiD0/LhQP
-         F5MiVL7sUURdwjkqnuEbETBRkG7qMp+e0AonjXR/8wDJBjv+iyC2fHdDoak9keDCjLEU
-         zoaCX/Y9N71Vd9JxWgzpi7Ps5mnM+e2XUUL3LKHZhsDKIIVepzlNVoG3Mii2THl0kN2X
-         y5bx/sA+qWHdm1KJWbW7RsjQttrWJAavIMKvQI7RSauelw02xxJvHA+JBisyxEzsskkj
-         Hd3A==
-X-Forwarded-Encrypted: i=1; AJvYcCVWmKdzH1EBsM+hg8dVwrzhPOqIP3hAR4dQ1LJDf9UXrkE5N9SdIZvzlIf91j3GSFp1O+fWsbqVc1A5KUAGviOuV/2J1PB0kHvL3cuqIatiNJeN+R03E1ZtX45K83xVkmc=
-X-Gm-Message-State: AOJu0YyeGwN35bDvHBmGuuwsYQIqrJDCM8oWX9g9Wzpv2BbWhOyDPPUI
-	7PknAwPrjAUbR7qp7waFksCB/y9mCITi0aViH21ywtZaBv7eTECI
-X-Google-Smtp-Source: AGHT+IFKcYchHNiJVp2U2l5sbwFT4QFFnm1EDc9lywsF5tDhdHwYtFysvSsFYJLSb/susBVb24Lqwg==
-X-Received: by 2002:a5d:5383:0:b0:33d:1f11:33c1 with SMTP id d3-20020a5d5383000000b0033d1f1133c1mr3097424wrv.55.1710524130435;
-        Fri, 15 Mar 2024 10:35:30 -0700 (PDT)
-Received: from [192.168.8.100] ([148.252.141.58])
-        by smtp.gmail.com with ESMTPSA id bv17-20020a0560001f1100b0033dd9b050f9sm3639718wrb.14.2024.03.15.10.35.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Mar 2024 10:35:30 -0700 (PDT)
-Message-ID: <e646d731-dec9-4d2e-9e05-dbb9b1183a0b@gmail.com>
-Date: Fri, 15 Mar 2024 17:34:24 +0000
+        d=1e100.net; s=20230601; t=1710524449; x=1711129249;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=48KHiiBIGucSlkCxyuE9gcyqU8jXsSRw/tV7Rve5Qs0=;
+        b=Nkz5mtdrw+mKmEFtSM5gy0ggADwloRmFF88Z5WQWRvLelQ7aoiNcsX6yHNFv0dWac9
+         hM6Dp0um2ueJhNNeJBpOzOHqNTKK79KcDLiTbnLURUMZZUg5udMLAmHoscDTrNKgGCVN
+         VY6t4yUvVac8MOu2QJQ1YoG9iq3mw9z90Jbw+vncEhzRO3q4auU7knjMeFG0CmYj89Em
+         eXuYB6zI3/qzBWgEYmxjNiHBYufAGHeMGg4wB+9Kqt+1tcZ9GtWMfKw2rBcZMSXgRE/B
+         SyV7BrAAU4NrHm8Bv23G9ZTTQaLuTbwnSOFTbc9XiJOZWgyYZyc3bOecgVox8/LIWWAN
+         lDgg==
+X-Forwarded-Encrypted: i=1; AJvYcCVtYgmqh79PvPYj3Y+C2hDHGVte5C58MSl4MkOh8Albf+Abwky/wJ4nzxK9asqsFvzQhJRLMtBStnsZlwaQEdrgRjUG2SxT
+X-Gm-Message-State: AOJu0YxqQz80tjnbs8ZUQeqOrYqqSeTNHtKFS+IR2vrdbrQGLloPMkLN
+	X425g09vhUD0BQ0xv84DvQRTbEt5Ry9Hs8EIOEBT2KeUkXteWdUYHmx2nq3imZ7DfA==
+X-Google-Smtp-Source: AGHT+IFpe7r7WewlV5WqGwWS9beNX0I0LXtoPYI2Emv6EVTpv4fDD4jM7m/hJKkpsk32OyGQ28U4d4A=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a05:6a00:3986:b0:6e6:9ad4:6131 with SMTP id
+ fi6-20020a056a00398600b006e69ad46131mr254656pfb.4.1710524448954; Fri, 15 Mar
+ 2024 10:40:48 -0700 (PDT)
+Date: Fri, 15 Mar 2024 10:40:47 -0700
+In-Reply-To: <20240315140726.22291-4-tushar.vyavahare@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v4 13/16] io_uring: add io_recvzc request
-Content-Language: en-US
-To: Jens Axboe <axboe@kernel.dk>, David Wei <dw@davidwei.uk>,
- io-uring@vger.kernel.org, netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>
-References: <20240312214430.2923019-1-dw@davidwei.uk>
- <20240312214430.2923019-14-dw@davidwei.uk>
- <7752a08c-f55c-48d5-87f2-70f248381e48@kernel.dk>
- <4343cff7-37d9-4b78-af70-a0d7771b04bc@gmail.com>
- <c4871911-5cb6-4237-a0a3-001ecb8bd7e5@kernel.dk>
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <c4871911-5cb6-4237-a0a3-001ecb8bd7e5@kernel.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+References: <20240315140726.22291-1-tushar.vyavahare@intel.com> <20240315140726.22291-4-tushar.vyavahare@intel.com>
+Message-ID: <ZfSIH07rCk3mjjWc@google.com>
+Subject: Re: [PATCH bpf-next 3/6] selftests/xsk: implement get_hw_ring_size
+ function to retrieve current and max interface size
+From: Stanislav Fomichev <sdf@google.com>
+To: Tushar Vyavahare <tushar.vyavahare@intel.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, bjorn@kernel.org, 
+	magnus.karlsson@intel.com, maciej.fijalkowski@intel.com, 
+	jonathan.lemon@gmail.com, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net, 
+	tirthendu.sarkar@intel.com
+Content-Type: text/plain; charset="utf-8"
 
-On 3/14/24 16:14, Jens Axboe wrote:
-[...]
->>>> @@ -1053,6 +1058,85 @@ struct io_zc_rx_ifq *io_zc_verify_sock(struct io_kiocb *req,
->>>>        return ifq;
->>>>    }
->>>>    +int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->>>> +{
->>>> +    struct io_recvzc *zc = io_kiocb_to_cmd(req, struct io_recvzc);
->>>> +
->>>> +    /* non-iopoll defer_taskrun only */
->>>> +    if (!req->ctx->task_complete)
->>>> +        return -EINVAL;
->>>
->>> What's the reasoning behind this?
->>
->> CQ locking, see the comment a couple lines below
+On 03/15, Tushar Vyavahare wrote:
+> Introduce a new function called get_hw_size that retrieves both the
+> current and maximum size of the interface and stores this information in
+> the 'hw_ring' structure.
 > 
-> My question here was more towards "is this something we want to do".
-> Maybe this is just a temporary work-around and it's nothing to discuss,
-> but I'm not sure we want to have opcodes only work on certain ring
-> setups.
+> Signed-off-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
+> ---
+>  tools/testing/selftests/bpf/xskxceiver.c | 32 ++++++++++++++++++++++++
+>  tools/testing/selftests/bpf/xskxceiver.h |  8 ++++++
+>  2 files changed, 40 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
+> index eaa102c8098b..32005bfb9c9f 100644
+> --- a/tools/testing/selftests/bpf/xskxceiver.c
+> +++ b/tools/testing/selftests/bpf/xskxceiver.c
+> @@ -81,6 +81,8 @@
+>  #include <linux/mman.h>
+>  #include <linux/netdev.h>
+>  #include <linux/bitmap.h>
+> +#include <linux/sockios.h>
+> +#include <linux/ethtool.h>
+>  #include <arpa/inet.h>
+>  #include <net/if.h>
+>  #include <locale.h>
+> @@ -95,6 +97,7 @@
+>  #include <sys/socket.h>
+>  #include <sys/time.h>
+>  #include <sys/types.h>
+> +#include <sys/ioctl.h>
+>  #include <unistd.h>
+>  
+>  #include "xsk_xdp_progs.skel.h"
+> @@ -409,6 +412,35 @@ static void parse_command_line(struct ifobject *ifobj_tx, struct ifobject *ifobj
+>  	}
+>  }
+>  
+> +static int get_hw_ring_size(struct ifobject *ifobj)
+> +{
+> +	struct ethtool_ringparam ring_param = {0};
+> +	struct ifreq ifr = {0};
+> +	int sockfd;
+> +
+> +	sockfd = socket(AF_INET, SOCK_DGRAM, 0);
+> +	if (sockfd < 0)
+> +		return errno;
+> +
+> +	memcpy(ifr.ifr_name, ifobj->ifname, sizeof(ifr.ifr_name));
+> +
+> +	ring_param.cmd = ETHTOOL_GRINGPARAM;
+> +	ifr.ifr_data = (char *)&ring_param;
+> +
+> +	if (ioctl(sockfd, SIOCETHTOOL, &ifr) < 0) {
+> +		close(sockfd);
+> +		return errno;
 
-I don't think it's that unreasonable restricting it. It's hard to
-care about !DEFER_TASKRUN for net workloads, it makes CQE posting a bit
-cleaner, and who knows where the single task part would become handy.
-Thinking about ifq termination, which should better cancel and wait
-for all corresponding zc requests, it's should be easier without
-parallel threads. E.g. what if another thread is in the enter syscall
-using ifq, or running task_work and not cancellable. Then apart
-from (non-atomic) refcounting, we'd need to somehow wait for it,
-doing wake ups on the zc side, and so on.
+close(sockfd) can potentially override the errno. Also, return -errno to
+match the other cases where errors are < 0.
 
-The CQ side is easy to support though, put conditional locking
-around the posting like fill/post_cqe does with the todays
-patchset.
+> +	}
+> +
+> +	ifobj->ring.default_tx = ring_param.tx_pending;
+> +	ifobj->ring.default_rx = ring_param.rx_pending;
+> +	ifobj->ring.max_tx = ring_param.tx_max_pending;
+> +	ifobj->ring.max_rx = ring_param.rx_max_pending;
+> +
+> +	close(sockfd);
+> +	return 0;
+> +}
+> +
+>  static void __test_spec_init(struct test_spec *test, struct ifobject *ifobj_tx,
+>  			     struct ifobject *ifobj_rx)
+>  {
+> diff --git a/tools/testing/selftests/bpf/xskxceiver.h b/tools/testing/selftests/bpf/xskxceiver.h
+> index 425304e52f35..4f58b70fa781 100644
+> --- a/tools/testing/selftests/bpf/xskxceiver.h
+> +++ b/tools/testing/selftests/bpf/xskxceiver.h
+> @@ -114,6 +114,13 @@ struct pkt_stream {
+>  	bool verbatim;
+>  };
+>  
+> +struct hw_ring {
+> +	u32 default_tx;
+> +	u32 default_rx;
+> +	u32 max_tx;
+> +	u32 max_rx;
+> +};
+> +
+>  struct ifobject;
+>  struct test_spec;
+>  typedef int (*validation_func_t)(struct ifobject *ifobj);
+> @@ -130,6 +137,7 @@ struct ifobject {
+>  	struct xsk_xdp_progs *xdp_progs;
+>  	struct bpf_map *xskmap;
+>  	struct bpf_program *xdp_prog;
+> +	struct hw_ring ring;
 
--- 
-Pavel Begunkov
+Any reason not to store ethtool_ringparam directly here? No need to
+introduce new hw_ring.
 
