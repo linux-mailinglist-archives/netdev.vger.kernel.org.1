@@ -1,109 +1,162 @@
-Return-Path: <netdev+bounces-80187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB2FB87D65C
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 22:44:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF7BE87D690
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 23:28:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 664082835AF
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 21:44:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D31351C21198
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 22:28:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CC254908;
-	Fri, 15 Mar 2024 21:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E403E56B6E;
+	Fri, 15 Mar 2024 22:28:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jSwoDIdH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UW76ZLRK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8A917984
-	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 21:44:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9037154F84;
+	Fri, 15 Mar 2024 22:28:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710539070; cv=none; b=DOGH21PhDNlIpMsD5dQKwxC542p9WnHYUWI3Uf2iPfup2ejo0iEJNOC7pOnlEudVFGcnMYceSHbz7rkpFkqsrQgXzB+WsEjOXqPaGFZMn6UFClDixIGmB4PQ5cPC06J0lnBp4BGcK9IiaEXmRnLqeH8MPf5uA/0cu+/9qrEoniI=
+	t=1710541714; cv=none; b=pGhqENxicpodVh4jvW6umfYdRgxEB1g3k7PhIkFwfAtdzIMgv8QUGGaDjXh/GKNt7Og0PjaJH/A5TejH+srd8g4+Kds7moFyVTGnXxxlfaJs8fwYfCNbiRVJBDz4OhVdvxdqoehNfiQT6JqD8lgKwCvNHb+ZzNqTDztEmgQrWRA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710539070; c=relaxed/simple;
-	bh=Vc68BX9M37hBcSzBZecsWwCYOHNZgEWJfCZ8h1c56y8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZS/I6VOUTWqMaEMIYX23T57lQOOVK0T6eLLsUdzZnNDPgVR57HzVi8qrComEijnS23b5gwK+yJi7mRG5k4rr5r2Kn+XNVoKTKuU0C8ZeSYSmSXroTnaQZ0mCQKTbQpr2prEy8GUlvP4sme3RZf3N7O9Kga1wTyhBvkrPTLzuI3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jSwoDIdH; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710539066; x=1742075066;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Vc68BX9M37hBcSzBZecsWwCYOHNZgEWJfCZ8h1c56y8=;
-  b=jSwoDIdHisXQWtK8l13SzxsqAUCtEgAd8DNft7XUTL96sYKNuBbFSfD2
-   LNaKQtRoWhQf8vW9WJoaIiT7ZL2ZDpj0nfwoHuD7cTyPovqkT+6tkXw8f
-   yPt1Th5K7+X9RqZgPoCXnDCbvHMgoQ/+we23XG/29O0MjofIgwYKupsgL
-   ULgfwOreG5nRBndKNoNopyjD0qYpEVlCWlcXwk3sm1EA82lb0Q2gUWIYr
-   HUuTEGnuoolYhmzpD5Sdt5f8NMuRFz8TWw0yhYqBioGa9EVTuPpzP27nL
-   Jo7i0j/Kvxohy+oSKVvk9o2rr0ulyBzzH9i/Zr88ufLrqYjwxZ28c6MOc
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11014"; a="16077956"
-X-IronPort-AV: E=Sophos;i="6.07,129,1708416000"; 
-   d="scan'208";a="16077956"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2024 14:44:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,129,1708416000"; 
-   d="scan'208";a="35935716"
-Received: from lkp-server01.sh.intel.com (HELO b21307750695) ([10.239.97.150])
-  by fmviesa002.fm.intel.com with ESMTP; 15 Mar 2024 14:44:24 -0700
-Received: from kbuild by b21307750695 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rlFLh-000EpN-1t;
-	Fri, 15 Mar 2024 21:44:21 +0000
-Date: Sat, 16 Mar 2024 05:43:38 +0800
-From: kernel test robot <lkp@intel.com>
-To: Antoine Tenart <atenart@kernel.org>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
-Cc: oe-kbuild-all@lists.linux.dev, Antoine Tenart <atenart@kernel.org>,
-	steffen.klassert@secunet.com, netdev@vger.kernel.org
-Subject: Re: [PATCH net 1/4] udp: do not accept non-tunnel GSO skbs landing
- in a tunnel
-Message-ID: <202403160550.1TZ0mDSX-lkp@intel.com>
-References: <20240315151722.119628-2-atenart@kernel.org>
+	s=arc-20240116; t=1710541714; c=relaxed/simple;
+	bh=zsuC/t+XdTuI/DjTEsIPVcUIbRmD9P+ZPy8rJ5VJJMg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ZwedTSKHFIN4rNmpc1j3q9TCAdGf/4PwJU+FxVSNQaXKYoiH+DFy+0jsRLi+rvyooYs81hjyGQrAAWx+/Cuw639YZ5pM0XuKRSlX8geZjnJLk0fc1wRYFKe7rCJGyrMPB82SXHRn21EoPHROp4v58CgpviebhpB4so67pnISlvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UW76ZLRK; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5688eaf1165so3907151a12.1;
+        Fri, 15 Mar 2024 15:28:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710541709; x=1711146509; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=VKMrVBH/fNSeezyhVeqSE7P3QRxBY9UAa0c3DLVNqYA=;
+        b=UW76ZLRKNL7o/We0EqD4hyFsLnDpLI48gmx5e0+OpeO182dfVJo/0vkeCGFVaHZkgk
+         f63klHAGXagZ6WEUUeMJZ9zQCY7CwotQ61wr8Tn3EONRIwtdGdJrSZdywnLFhLPLCwnb
+         YxphRPfH7g/8dT0k8U4AeaCiRzrptL16N9xRKQS2Xw0GYV5EqyEGh+AukH9DoZdcBPJP
+         V7Rn/EnAv4dAJ0qd6NYJzhB8K5sS25+Adt1vePYsmjmPWUAGNxjm9wcVBEU1TgqSQ2ES
+         9Pqx9nJYsDjC+NW+PTKDKvuSt6GEssvXVVY88u+VHR8eXDugZ32gkr2hPzQ83IdKWsTr
+         Rbhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710541709; x=1711146509;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=VKMrVBH/fNSeezyhVeqSE7P3QRxBY9UAa0c3DLVNqYA=;
+        b=Pv5gPvCiDj5LeOr6w4EzUdigptXSJLr3wxmvMN9FkZUHYNFc4vJn6N4eaiofYIzqxZ
+         NmYAxILzbNrZibBKZHEI7jhIADRQPYbWFjD/wx9dA170P7pmYBG4TvOcWRcu+qKc3Cqu
+         QqfJ0z4WWDVDMrD0BeGIBsVT7f+Xy9WcZsPM6Ie4Yeeoh27KGwX2EMh/y5ZDAHQah8L9
+         aNwtOs2r6X73Ni9oKAoOdbUETx4pNeZkkiJAZFpyP+hGyLb5RhOl1Grd9DhgB2N27zMf
+         Js3z0+0FLTdDGesOtchoNpKvTFRG+Wcy82SjZFmGk0v1XXdg9vjfGm19m4V69sfHRvsX
+         KBJA==
+X-Forwarded-Encrypted: i=1; AJvYcCWWFvyQIYug/yLY/xkBv0zQ/Qkjw8QhcE6D//Utp2uSeloAXI/AaQp7Ery/MTGh7DrhInMi+EOQ8ehWjQFcbdEKLulOPQvXXoiY0p0oNAfRzZ68ypGfAHBdIAtRBiE8N6RyH8PhKKbBE1J+RFi7I/VGh7mOLYFPSN1CD1d7fmEcbCJzpIv80YA6zmLL8HsFiLfv8HMdGF0MudU1Dw==
+X-Gm-Message-State: AOJu0YytRePbdtRLH2eif01A5PkpMfov+NHKrd2Ygg+tZ5ay+Qw6jADO
+	7yy1S0QHAMWIgboxLWL0Pq9/MCjm/h+J2qmDa5B2tYh2MNlgpd/S
+X-Google-Smtp-Source: AGHT+IHMiOXqAu3IOFZbWybq/E7AHBFjYPqnN6JICZlEg0O6rLl7kC8XY7jGhpfuWwf3jwEHz5Vu5g==
+X-Received: by 2002:aa7:d792:0:b0:568:231e:31dd with SMTP id s18-20020aa7d792000000b00568231e31ddmr4054551edq.30.1710541708964;
+        Fri, 15 Mar 2024 15:28:28 -0700 (PDT)
+Received: from bhlegrsu.conti.de ([2a02:908:2525:6ea0::f845])
+        by smtp.googlemail.com with ESMTPSA id el9-20020a056402360900b005684173e413sm2039833edb.72.2024.03.15.15.28.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Mar 2024 15:28:27 -0700 (PDT)
+From: Wadim Mueller <wafgo01@gmail.com>
+To: 
+Cc: Wadim Mueller <wafgo01@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Chester Lin <chester62515@gmail.com>,
+	=?UTF-8?q?Andreas=20F=C3=A4rber?= <afaerber@suse.de>,
+	Matthias Brugger <mbrugger@suse.com>,
+	NXP S32 Linux Team <s32@nxp.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	Johannes Zink <j.zink@pengutronix.de>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Swee Leong Ching <leong.ching.swee@intel.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-clk@vger.kernel.org
+Subject: [PATCH 0/3] NXP S32G3 SoC initial bring-up
+Date: Fri, 15 Mar 2024 23:27:46 +0100
+Message-Id: <20240315222754.22366-1-wafgo01@gmail.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240315151722.119628-2-atenart@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-Hi Antoine,
+This series brings up initial support for the NXP S32G3 SoC (8 x cortex-a53), used on the S32G-VNP-RDB3 board [1].
 
-kernel test robot noticed the following build errors:
+The following features are supported in this initial port:
 
-[auto build test ERROR on net/main]
+  Devicetree for the S32G-VNP-RDB3 
+  UART (fsl-linflexuart) with earlycon support
+  SDHC: fsl-imx-esdhc (SD/eMMC)
+  Ethernet: synopsys gmac/stmac. This is based on a patch series provided by Chester Lin in [2]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Antoine-Tenart/udp-do-not-accept-non-tunnel-GSO-skbs-landing-in-a-tunnel/20240315-232048
-base:   net/main
-patch link:    https://lore.kernel.org/r/20240315151722.119628-2-atenart%40kernel.org
-patch subject: [PATCH net 1/4] udp: do not accept non-tunnel GSO skbs landing in a tunnel
-config: nios2-defconfig (https://download.01.org/0day-ci/archive/20240316/202403160550.1TZ0mDSX-lkp@intel.com/config)
-compiler: nios2-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240316/202403160550.1TZ0mDSX-lkp@intel.com/reproduce)
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202403160550.1TZ0mDSX-lkp@intel.com/
+[1] https://www.nxp.com/design/design-center/designs/s32g3-vehicle-networking-reference-design:S32G-VNP-RDB3
+[2] https://patchwork.kernel.org/project/netdevbpf/patch/20221031101052.14956-6-clin@suse.com/#25068228
 
-All errors (new ones prefixed by >>):
+Wadim Mueller (3):
+  arm64: dts: S32G3: Introduce device trees for S32G-VNP-RDB3
+  net: stmmac: Add NXP S32 SoC family support
+  dt-bindings: net: add schema for NXP S32 dwmac glue driver
 
-   nios2-linux-ld: net/ipv4/udp.o: in function `raw_atomic_read':
-   include/linux/atomic/atomic-arch-fallback.h:457:(.text+0x4b28): undefined reference to `udpv6_encap_needed_key'
->> nios2-linux-ld: include/linux/atomic/atomic-arch-fallback.h:457:(.text+0x4b2c): undefined reference to `udpv6_encap_needed_key'
+ .../bindings/net/nxp,s32-dwmac.yaml           | 130 +++++++
+ .../devicetree/bindings/net/snps,dwmac.yaml   |   5 +-
+ arch/arm64/boot/dts/freescale/Makefile        |   1 +
+ arch/arm64/boot/dts/freescale/s32g3.dtsi      | 352 ++++++++++++++++++
+ .../boot/dts/freescale/s32g399a-rdb3.dts      |  57 +++
+ drivers/net/ethernet/stmicro/stmmac/Kconfig   |  12 +
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
+ drivers/net/ethernet/stmicro/stmmac/common.h  |   3 +
+ .../net/ethernet/stmicro/stmmac/dwmac-s32.c   | 313 ++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/dwmac4_dma.c  |   9 +
+ .../net/ethernet/stmicro/stmmac/dwmac4_dma.h  |   3 +
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |   5 +
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |   7 +
+ .../dt-bindings/clock/nxp,s32-scmi-clock.h    | 158 ++++++++
+ include/linux/stmmac.h                        |   9 +
+ 15 files changed, 1063 insertions(+), 2 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
+ create mode 100644 arch/arm64/boot/dts/freescale/s32g3.dtsi
+ create mode 100644 arch/arm64/boot/dts/freescale/s32g399a-rdb3.dts
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
+ create mode 100644 include/dt-bindings/clock/nxp,s32-scmi-clock.h
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.25.1
+
 
