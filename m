@@ -1,101 +1,218 @@
-Return-Path: <netdev+bounces-80096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E266487CFDA
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 16:10:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E47387CFDF
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 16:12:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9ED8F28402B
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 15:10:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61C041C2258F
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 15:12:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D86B3CF68;
-	Fri, 15 Mar 2024 15:10:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DAD12E636;
+	Fri, 15 Mar 2024 15:12:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H8PyHkEy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nGZ/tOLV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7972A3CF63
-	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 15:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6918B3CF6B
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 15:12:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710515432; cv=none; b=RxmFRRVKNxYcy51h/wZklLdDhCa44DuOYxMOm4xROmuevF15jg9VS0S7zdLktlzsXRbgzZzfaxmGamsQJnOzZXX6efIhMmy1tMzUFbTE0p0yt7+cvqMjFW6ACBCn/2gsn/1UwEu36vbFhTw7R8bZ0qPwc+El9iqpeskdu8emwdY=
+	t=1710515567; cv=none; b=mAb8qV/EUndsM0sEJpRGB3MDrh+IS5ikcWkRt+qOW9duWr0AUDtXPpcEQVpU3NdDZSjFVStBL2hxQia9DuBjRQbMF8uARhN0/TeAJIyNRs2QRH/329HPbnHvKDBFmapTYjEOiGVRGUoiaYVwk7joyZ+JR4uVSfSach3KYSVENtc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710515432; c=relaxed/simple;
-	bh=vAh/3X05SOmBzsXFznPCYI+kgTt6Vw3IlAImncaYGxc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=AnWAJfp+qYxyObyfwZ6wtyffAPdjVRmXRh7T7akU7NMSJmTku3ni3Dr6Ee/kEeqiPh1pbYw5E5U1hqPKVKyOwccrbtn3mIPB85orqxjPAU25OVfS1GdtsB3DSaW2LqTCdH6UnxOadQiLTHT8DMARqFXTWgpSeCUuhMQTxHXH/9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H8PyHkEy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 08E15C433C7;
-	Fri, 15 Mar 2024 15:10:31 +0000 (UTC)
+	s=arc-20240116; t=1710515567; c=relaxed/simple;
+	bh=uNec6+w51dtNEBRRFtWW3+PljCIgahJliP3Dzp9Or8E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=ludH2PcKSjZB3r/CDVCuu2gdpUHCSCeg4w2U1iKNrRwwLsabTAz8tIoMJYlGpgekJC4ZTAgbjrngjaZguz1+9S0EAW/RDRkk09W5NU8gPfakMmWMh1JselUcFsPxGNjuEVFaWKyNeF2HZgh83o43y2CRcLsHAdZZktfLRjzIJOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nGZ/tOLV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2CF3C433F1;
+	Fri, 15 Mar 2024 15:12:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710515431;
-	bh=vAh/3X05SOmBzsXFznPCYI+kgTt6Vw3IlAImncaYGxc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=H8PyHkEyXcHnob3iLBBmA+ZLj/GA+G/o85BPrHmQ7En+/7Kiy9K9ppf+hWerbv8Vi
-	 DjwlOpt98QKYPhhb4UmZ+F7ZKWwSkRLnf+nBZSklOfwWan4wshNIfuXNF0I0IcRtmx
-	 Csaso/4tYbubp/kXrdElzL3pUgW3Gdx/EYqyiMv7sRpCDp4FzF/K6Po0Omdq5QLU1e
-	 AW5QVDuJMEz4i5ree1nwZaVlCPnErdCmMDqTc4DdGcCxMZ7llKVWHvyideFhiZFweV
-	 8up/UQyf2H3RTTXF5LlNEHxshE0FfIuJ7HV57o8PctTPvvWO6wfVQZBDZk6LZzFFWv
-	 PBJMnGqgOXPxA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E66AFD95053;
-	Fri, 15 Mar 2024 15:10:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1710515566;
+	bh=uNec6+w51dtNEBRRFtWW3+PljCIgahJliP3Dzp9Or8E=;
+	h=Date:Subject:To:References:Cc:From:In-Reply-To:From;
+	b=nGZ/tOLVTJ8Ch+krP9daXzMppAIgg5KiToQ+IMWSLo22YjF3lSUmNW2QnBHODY3Q+
+	 DHs8fbdTypvc80L/vuF6bxSqFIgoI8JYtdRiz7fRKuGN7D9ne4Q+5QaLqDOGI/CH6w
+	 6pBoMz1SON7ATCjPvjS7INmJ5hhO4Y8ABuzVH3cryGK12cElLpyV0omNFVx+XVC3vZ
+	 l/WfCMAfEWiS8q26eEvb+kxtGRoBt7Oyf3/OjeWgV6YgYE/Fnb5ysG9JSMu3Mx1ZMj
+	 x3DDW52PntfyJ2ue2AZ0EaJjnBtiUeFc9zCNnBUkXD0ad+acfjYJQTZ80pml8I8+vI
+	 U42pK+gZbuD0w==
+Message-ID: <9883d05e-a18b-4b41-8a0d-8b0038aeceb7@kernel.org>
+Date: Fri, 15 Mar 2024 09:12:46 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next v2 0/4] Support for nexthop group statistics
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171051543093.12293.15883216634942315992.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Mar 2024 15:10:30 +0000
-References: <cover.1710427655.git.petrm@nvidia.com>
-In-Reply-To: <cover.1710427655.git.petrm@nvidia.com>
-To: Petr Machata <petrm@nvidia.com>
-Cc: dsahern@kernel.org, stephen@networkplumber.org, netdev@vger.kernel.org,
- idosch@nvidia.com, kuba@kernel.org, mlxsw@nvidia.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2] ematch: support JSON output
+Content-Language: en-US
+To: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org
+References: <20240314002415.26518-1-stephen@networkplumber.org>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240314002415.26518-1-stephen@networkplumber.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On 3/13/24 6:24 PM, Stephen Hemminger wrote:
+> diff --git a/tc/em_canid.c b/tc/em_canid.c
+> index 228547529134..815ed8c7bce0 100644
+> --- a/tc/em_canid.c
+> +++ b/tc/em_canid.c
+> @@ -154,24 +154,29 @@ static int canid_print_eopt(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
+>  
+>  		if (pcfltr->can_id & CAN_EFF_FLAG) {
+>  			if (pcfltr->can_mask == (CAN_EFF_FLAG | CAN_EFF_MASK))
+> -				fprintf(fd, "eff 0x%"PRIX32,
+> -						pcfltr->can_id & CAN_EFF_MASK);
+> -			else
+> -				fprintf(fd, "eff 0x%"PRIX32":0x%"PRIX32,
+> -						pcfltr->can_id & CAN_EFF_MASK,
+> -						pcfltr->can_mask & CAN_EFF_MASK);
+> +				print_0xhex(PRINT_ANY, "eff", "eff 0x%"PRIX32,
+> +					    pcfltr->can_id & CAN_EFF_MASK);
+> +			else {
+> +				print_0xhex(PRINT_ANY, "eff", "eff 0x%"PRIX32,
+> +					    pcfltr->can_id & CAN_EFF_MASK);
+> +				print_0xhex(PRINT_ANY, "mask", ":0x%"PRIX32,
+> +					    pcfltr->can_mask & CAN_EFF_MASK);
+> +			}
 
-This series was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
+if the else branch has {}, the first one should as well.
 
-On Thu, 14 Mar 2024 15:52:11 +0100 you wrote:
-> Next hop group stats allow verification of balancedness of a next hop
-> group. The feature was merged in kernel commit 7cf497e5a122 ("Merge branch
-> 'nexthop-group-stats'"). This patchset adds to ip the corresponding
-> support.
-> 
-> NH group stats come in two flavors: as statistics for SW and for HW
-> datapaths. The former is shown when -s is given to "ip nexthop". The latter
-> demands more work from the kernel, and possibly driver and HW, and might
-> not be always necessary. Therefore tie it to -s -s, similarly to how ip
-> link shows more detailed stats when -s is given twice.
-> 
-> [...]
+>  		} else {
+> +			
 
-Here is the summary with links:
-  - [iproute2-next,v2,1/4] libnetlink: Add rta_getattr_uint()
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=95836fbf35d3
-  - [iproute2-next,v2,2/4] ip: ipnexthop: Support dumping next hop group stats
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=529ada74c401
-  - [iproute2-next,v2,3/4] ip: ipnexthop: Support dumping next hop group HW stats
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=a50655e730ff
-  - [iproute2-next,v2,4/4] ip: ipnexthop: Allow toggling collection of nexthop group HW statistics
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=69d1c2c4aae8
+unneeded extra newline
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>  			if (pcfltr->can_mask == (CAN_EFF_FLAG | CAN_SFF_MASK))
+> -				fprintf(fd, "sff 0x%"PRIX32,
+> -						pcfltr->can_id & CAN_SFF_MASK);
+> -			else
+> -				fprintf(fd, "sff 0x%"PRIX32":0x%"PRIX32,
+> -						pcfltr->can_id & CAN_SFF_MASK,
+> -						pcfltr->can_mask & CAN_SFF_MASK);
+> +				print_0xhex(PRINT_ANY, "sff", "sff 0x%"PRIX32,
+> +					    pcfltr->can_id & CAN_SFF_MASK);
+> +			else {
+> +				print_0xhex(PRINT_ANY, "sff", "sff 0x%"PRIX32,
+> +					    pcfltr->can_id & CAN_SFF_MASK);
+> +				print_0xhex(PRINT_ANY, "mask", ":0x%"PRIX32,
+> +					    pcfltr->can_mask & CAN_SFF_MASK);
+> +			}
+>  		}
+>  
+>  		if ((i + 1) < rules_count)
+> -			fprintf(fd, " ");
+> +			print_string(PRINT_FP, NULL, " ", NULL);
+>  	}
+>  
+>  	return 0;
+> diff --git a/tc/em_cmp.c b/tc/em_cmp.c
+> index dfd123df1e10..9e2d14077c6c 100644
+> --- a/tc/em_cmp.c
+> +++ b/tc/em_cmp.c
+> @@ -138,6 +138,8 @@ static int cmp_print_eopt(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
+>  			  int data_len)
+>  {
+>  	struct tcf_em_cmp *cmp = data;
+> +	const char *align = NULL;
+> +	const char *op = NULL;
+>  
+>  	if (data_len < sizeof(*cmp)) {
+>  		fprintf(stderr, "CMP header size mismatch\n");
+> @@ -145,28 +147,36 @@ static int cmp_print_eopt(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
+>  	}
+>  
+>  	if (cmp->align == TCF_EM_ALIGN_U8)
+> -		fprintf(fd, "u8 ");
+> +		align = "u8";
+>  	else if (cmp->align == TCF_EM_ALIGN_U16)
+> -		fprintf(fd, "u16 ");
+> +		align = "u16";
+>  	else if (cmp->align == TCF_EM_ALIGN_U32)
+> -		fprintf(fd, "u32 ");
+> +		align = "u32";
+>  
+> -	fprintf(fd, "at %d layer %d ", cmp->off, cmp->layer);
+> +	print_uint(PRINT_JSON, "align", "%u ", cmp->align);
+> +	if (align)
+> +		print_string(PRINT_FP, NULL, "%s ", align);
+> +
+> +	print_uint(PRINT_ANY, "offset", "at %u ", cmp->off);
+> +	print_uint(PRINT_ANY, "layer", "layer %u ", cmp->layer);
+>  
+>  	if (cmp->mask)
+> -		fprintf(fd, "mask 0x%x ", cmp->mask);
+> +		print_0xhex(PRINT_ANY, "mask", "mask 0x%x ", cmp->mask);
+>  
+>  	if (cmp->flags & TCF_EM_CMP_TRANS)
+> -		fprintf(fd, "trans ");
+> +		print_null(PRINT_ANY, "trans", "trans ", NULL);
+>  
+>  	if (cmp->opnd == TCF_EM_OPND_EQ)
+> -		fprintf(fd, "eq ");
+> +		op = "eq";
+>  	else if (cmp->opnd == TCF_EM_OPND_LT)
+> -		fprintf(fd, "lt ");
+> +		op = "lt";
+>  	else if (cmp->opnd == TCF_EM_OPND_GT)
+> -		fprintf(fd, "gt ");
+> +		op = "gt";
+> +
+> +	if (op)
+> +		print_string(PRINT_ANY, "opnd", "%s ", op);
 
+seems like a change in output which tends to break the tdc suite. Please
+cc Jamal on tc patches.
+
+>  
+> -	fprintf(fd, "%d", cmp->val);
+> +	print_uint(PRINT_ANY, "val", "%u", cmp->val);
+>  
+>  	return 0;
+>  }
+
+
+> @@ -436,53 +445,51 @@ static inline int print_value(FILE *fd, int type, struct rtattr *rta)
+>  	}
+>  
+>  	switch (type) {
+> -		case TCF_META_TYPE_INT:
+> -			if (RTA_PAYLOAD(rta) < sizeof(__u32)) {
+> -				fprintf(stderr, "meta int type value TLV " \
+> -				    "size mismatch.\n");
+> -				return -1;
+> -			}
+> -			fprintf(fd, "%d", rta_getattr_u32(rta));
+> -			break;
+> +	case TCF_META_TYPE_INT:
+> +		if (RTA_PAYLOAD(rta) < sizeof(__u32)) {
+> +			fprintf(stderr,
+> +				"meta int type value TLV size mismatch.\n");
+> +			return -1;
+> +		}
+> +		print_uint(PRINT_ANY, "value", "%u", rta_getattr_u32(rta));
+> +		break;
+>  
+> -		case TCF_META_TYPE_VAR:
+> -			print_binary(fd, RTA_DATA(rta), RTA_PAYLOAD(rta));
+> -			break;
+> +	case TCF_META_TYPE_VAR:
+> +		print_binary(RTA_DATA(rta), RTA_PAYLOAD(rta));
+> +		break;
+>  	}
+
+whitespace cleanup should be a separate patch.
+
+in general this is a large patch. It would be better as a series
+
+pw-bot: cr
 
 
