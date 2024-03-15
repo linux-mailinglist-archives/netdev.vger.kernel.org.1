@@ -1,162 +1,101 @@
-Return-Path: <netdev+bounces-80141-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 533A387D261
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 18:08:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C350087D25E
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 18:08:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A24BBB24920
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 17:08:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8A6CC284DC8
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 17:08:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 652EB54BF7;
-	Fri, 15 Mar 2024 17:03:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF0124CB41;
+	Fri, 15 Mar 2024 17:02:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NFfJiFsL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jYBQNYMY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 979174CB28;
-	Fri, 15 Mar 2024 17:03:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 380514CB3D
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 17:02:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710522195; cv=none; b=VIQsA7nwGEuLc/r9JffSUGIpN57wq835fuUo2R2iZBLgFNfjJH8J+cvjpUukIT/xOskqTxgx7C8/rfZN9/T+XfHwplapCsgvAMCTybw11E/2GZtL/RgJWgf4v19jCT0W3P/7FtTd3Kh8IbAwn/oBDxi9dFiTqqokFH12pxi4BL8=
+	t=1710522176; cv=none; b=mWo8Vwh+aznfGsfcF1y2FiibbiP3WdU8wXHiZ2KKoO5/+QQc7M2X9u8HG1/N808eHBx7EWVP5jwreOCLI3Sfl0e5GKC6rKLzsupnNHTQLRm7A/2R7+pxF7lwx9w/l6eT/hWbRtpjs+o59uJJFiay/9Io1/sAunNqfPhuimBJb+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710522195; c=relaxed/simple;
-	bh=VuiJ6Yk+4rO2dkDpvPyGuOChWDOminf+zuxzplbDYt8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n+1wSblftkHdpKlu7YNCWi9PQzWMU4hAHBzSWSWWonT65lm2n4ErUUv/LCvCW/Lp+AxYEze1xkqWAjV6uxLpAumwHtvum61bv9TbUaZDZK4PdJZY1tpBVtDIOvz0/WhjayB/dFca2aGRZExEpxVgMCeDU5S473cZJujUu3x+1Xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NFfJiFsL; arc=none smtp.client-ip=209.85.218.46
+	s=arc-20240116; t=1710522176; c=relaxed/simple;
+	bh=vZzetsUftfAAAXCYiQT8pzNgnbC6mGGUoLjZtsV00ZU=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=cr+91Co/fLqlW7XTeNiy/b13Dkx3pOuYR11fO4FCEV1oKj9M9hvOS+Sg4q5RGvAwDOhESmGRs+G76ZD+Hv0XF5tSTNt16r4qsGGj44OgsXQxjNYx10LYfeQJSzBHaeMfcOn9XFK1K5ZWZwYu/8BH0DUShtY8AdSD9Q2XTuvSA8U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jYBQNYMY; arc=none smtp.client-ip=209.85.128.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a46805cd977so165672966b.0;
-        Fri, 15 Mar 2024 10:03:13 -0700 (PDT)
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-41405d77c7bso704415e9.3
+        for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 10:02:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710522192; x=1711126992; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=JZ1sNJm+yT9gSzolt7Elm/obovWaZLhTaW0EpgnXEQs=;
-        b=NFfJiFsLvf49XlMBvvVwwv2Y+YjwoH5qyn5W3t34DyWtcUZSjCLqlbf+0Hae8+VbJu
-         sJgOBjlkE82SLHSoNmOUzbIS+xbxJ4Fzfvh6qmcqN8FNG8cXU/KzoEG83M7cNVyAGETE
-         PrJi5lOUyLL2kWPGdGPj9sdHWsiPS5oi/Uce4UEwTOqavsGjjBRChDEFIPLY4n3xw3+A
-         +Hu5lwlbAARlyyg25r+NpAao+hLSONZz07HyABCjHv/jMJnCpeUQN0VZRQoYMKaCEaJl
-         6RudIetddkfXvXbg3+vkubEZOWzVRDmN757bjaIzwpGWUJsmaA9InPQQXm4j59FTumIO
-         VsVw==
+        d=gmail.com; s=20230601; t=1710522173; x=1711126973; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vZzetsUftfAAAXCYiQT8pzNgnbC6mGGUoLjZtsV00ZU=;
+        b=jYBQNYMYWorIHoFH3pnUk0E9v66Qt1vBb6SXqAAg+brwtD3f3e9KqfS/SXKEJtax2J
+         Tp4KU8ikPvECRJ3QgP3HrtX/A74TNXBJLjXYVCdB1idEyfPy/dJcqxFYwz39A73cV/7A
+         r8jaIeTR+H5J/BJwsIs5tiMdB7TePgshSVMfY/w4hV4esSjFzM2dmtrIb/IlHcNSv2c0
+         4zOgmNu8jEHlBJ4LuCt/s5bfUZSemYCB0I7hvrS0c87Gs1TQkdI1E65ckuhA97PG2jht
+         PkDar+fU525BIn27zhIaYP3Cl7z3/5CUP5Wi8/lWDdcxje+vBInOJEn7c3gSiqAHwdHw
+         0JkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710522192; x=1711126992;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JZ1sNJm+yT9gSzolt7Elm/obovWaZLhTaW0EpgnXEQs=;
-        b=MFsr2QD7KbJs0z1c2uJgWarYYW0abbbw4jcUDRwGUrqca0t95kRPp0RszclYfIBTIl
-         P1nooI/XJla+7X0as5jMZOAjwILzVfJxwQn6/MPaETJZxr0slXoLNHXl+07r4N+eQ8h5
-         50oCG/SeuSGyatK7FjYb9zuyNpZ3qDYe3yCOHIckeoiw99X5RWJZdbUVwOeADoWvXT5z
-         +5euG/7rZDx1k4QRlTcWsFtDMcAtgb7I+FJsP9i6jYzUb6s4RjbjcJRcZq3+1FmHGvgq
-         ++AzTAPlDvLir0GPzqx51zcsNAwis71uOMiycNZ63uH+9xBq5NbOEVBUa/mGHscBYcxY
-         z/1A==
-X-Forwarded-Encrypted: i=1; AJvYcCWe4BpHNMwVwiaa5nX9qtgjJgVd+eHFmu7EU64FEpb+Hkh5PNtC5EtZW2djnWVyERrMwPLmfN/RHpc6D3avZsJvFDhYjrKfFypCYF83lgpIkZqaAd3G4xFmxBcRK8PrTVnpgTZXBeI4xpPXRUM7n/Pkx7F3ZFTYxtSATtvf/Ws=
-X-Gm-Message-State: AOJu0YwSu0v8eWQtT/Jy0QhvyH8KoDZNQ/xoJblZmCbBVA5gT3Z6hCh7
-	1tYkdmmJbGKrdMQ/SwtuG6ns53GT34vrkxIFn0ukFPMEi4fzTx8Z
-X-Google-Smtp-Source: AGHT+IHmXXk6e/3tQw4Vi40FAeG9esFTmR4mmLFDgLolU22mS0fcuSO+nCMA5o7zuNvSNbXzpebRwQ==
-X-Received: by 2002:a17:906:3bd1:b0:a45:fb0f:d210 with SMTP id v17-20020a1709063bd100b00a45fb0fd210mr2348722ejf.25.1710522191729;
-        Fri, 15 Mar 2024 10:03:11 -0700 (PDT)
-Received: from [192.168.8.100] ([148.252.141.58])
-        by smtp.gmail.com with ESMTPSA id e27-20020a170906375b00b00a4354b9893csm1857566ejc.74.2024.03.15.10.03.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 15 Mar 2024 10:03:11 -0700 (PDT)
-Message-ID: <7b82679f-9b69-4568-a61d-03eb1e4afc18@gmail.com>
-Date: Fri, 15 Mar 2024 17:02:05 +0000
+        d=1e100.net; s=20230601; t=1710522173; x=1711126973;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vZzetsUftfAAAXCYiQT8pzNgnbC6mGGUoLjZtsV00ZU=;
+        b=G+HNBOfSceV1hjCPnrSyBiN3f74bp3IK1bGknbXhyJI8hRlw2YJVBQMFNDKwLVP9dx
+         NZj9HOREtU9o+/cLvrZ8z0cPaGgqgRQN44DVewNhH/g777DF/KUIXB0pgRk5czRD1psy
+         qH9gAeXmZyh3EVjwA7K5oi3DWCGC4RFwBzcfhIdo90/laDMW3lbSj/eNSqKG//NWotkO
+         2KxC4eMv4Hhy3BzfCbWLe+beIa1Ou6SMMWoYyQXRsHnCmxAbBSlElV9WrTKPtYpMeQBF
+         lFaAhB8PWyS82WEOp4y6B/bzIl71KoIeTHgqIiGhs35ZxiLldiW92NLVByfo2UT3T5Cc
+         4slA==
+X-Forwarded-Encrypted: i=1; AJvYcCW6d+Efq/LMu07KSq7XX2JWAdRdnhCS+umQEJj68yzp7NcGidipSjrqtAM7jIR/LY9K5FN+WW2r8fh9/gvcUXnvZexHu0wP
+X-Gm-Message-State: AOJu0Yz7fN/4+5gikaUYA1LoDLz9eNKMNmdqo7CrtPuFgEc+TTFjIRIP
+	btK5IRm6mc3odKb4rJQh+QZvQYtIMZ1ZF4pc27qSHpKDpFwRrdxB
+X-Google-Smtp-Source: AGHT+IEp7zUgChknNCZpLB4493mzhmpbVuGL94J+aTvBzuTWiLECi1moVDmmZQDcq9xDBWTLd800zA==
+X-Received: by 2002:adf:f548:0:b0:33d:c5c7:459e with SMTP id j8-20020adff548000000b0033dc5c7459emr3996926wrp.12.1710522173274;
+        Fri, 15 Mar 2024 10:02:53 -0700 (PDT)
+Received: from imac ([2a02:8010:60a0:0:f0a8:4bb1:6f3b:c650])
+        by smtp.gmail.com with ESMTPSA id t18-20020a5d42d2000000b0033e456f6e7csm3642684wrr.1.2024.03.15.10.02.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Mar 2024 10:02:52 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
+  pabeni@redhat.com,  jiri@resnulli.us,  chuck.lever@oracle.com
+Subject: Re: [PATCH net] tools: ynl: add header guards for nlctrl
+In-Reply-To: <20240315002108.523232-1-kuba@kernel.org> (Jakub Kicinski's
+	message of "Thu, 14 Mar 2024 17:21:08 -0700")
+Date: Fri, 15 Mar 2024 17:02:24 +0000
+Message-ID: <m2a5mz2ztr.fsf@gmail.com>
+References: <20240315002108.523232-1-kuba@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: Do not break out of sk_stream_wait_memory() with
- TIF_NOTIFY_SIGNAL
-Content-Language: en-US
-To: Sascha Hauer <s.hauer@pengutronix.de>, netdev@vger.kernel.org
-Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>,
- io-uring@vger.kernel.org
-References: <20240315100159.3898944-1-s.hauer@pengutronix.de>
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <20240315100159.3898944-1-s.hauer@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 3/15/24 10:01, Sascha Hauer wrote:
-> It can happen that a socket sends the remaining data at close() time.
-> With io_uring and KTLS it can happen that sk_stream_wait_memory() bails
-> out with -512 (-ERESTARTSYS) because TIF_NOTIFY_SIGNAL is set for the
-> current task. This flag has been set in io_req_normal_work_add() by
-> calling task_work_add().
+Jakub Kicinski <kuba@kernel.org> writes:
 
-The entire idea of task_work is to interrupt syscalls and let io_uring
-do its job, otherwise it wouldn't free resources it might be holding,
-and even potentially forever block the syscall.
+> I "extracted" YNL C into a GitHub repo to make it easier
+> to use in other projects: https://github.com/linux-netdev/ynl-c
+>
+> GitHub actions use Ubuntu by default, and the kernel headers
+> there are missing f329a0ebeaba ("genetlink: correct uAPI defines").
+> Add the direct include workaround for nlctrl.
+>
+> Fixes: 768e044a5fd4 ("doc/netlink/specs: Add spec for nlctrl netlink family")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-I'm not that sure about connect / close (are they not restartable?),
-but it doesn't seem to be a good idea for sk_stream_wait_memory(),
-which is the normal TCP blocking send path. I'm thinking of some kinds
-of cases with a local TCP socket pair, the tx queue is full as well
-and the rx queue of the other end, and io_uring has to run to receive
-the data.
-
-If interruptions are not welcome you can use different io_uring flags,
-see IORING_SETUP_COOP_TASKRUN and/or IORING_SETUP_DEFER_TASKRUN.
-
-Maybe I'm missing something, why not restart your syscall?
-
-
-> This patch replaces signal_pending() with task_sigpending(), thus ignoring
-> the TIF_NOTIFY_SIGNAL flag.
-> 
-> A discussion of this issue can be found at
-> https://lore.kernel.org/20231010141932.GD3114228@pengutronix.de
-> 
-> Suggested-by: Jens Axboe <axboe@kernel.dk>
-> Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
-> ---
->   net/core/stream.c | 6 +++---
->   1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/core/stream.c b/net/core/stream.c
-> index 96fbcb9bbb30a..e9e17b48e0122 100644
-> --- a/net/core/stream.c
-> +++ b/net/core/stream.c
-> @@ -67,7 +67,7 @@ int sk_stream_wait_connect(struct sock *sk, long *timeo_p)
->   			return -EPIPE;
->   		if (!*timeo_p)
->   			return -EAGAIN;
-> -		if (signal_pending(tsk))
-> +		if (task_sigpending(tsk))
->   			return sock_intr_errno(*timeo_p);
->   
->   		add_wait_queue(sk_sleep(sk), &wait);
-> @@ -103,7 +103,7 @@ void sk_stream_wait_close(struct sock *sk, long timeout)
->   		do {
->   			if (sk_wait_event(sk, &timeout, !sk_stream_closing(sk), &wait))
->   				break;
-> -		} while (!signal_pending(current) && timeout);
-> +		} while (!task_sigpending(current) && timeout);
->   
->   		remove_wait_queue(sk_sleep(sk), &wait);
->   	}
-> @@ -134,7 +134,7 @@ int sk_stream_wait_memory(struct sock *sk, long *timeo_p)
->   			goto do_error;
->   		if (!*timeo_p)
->   			goto do_eagain;
-> -		if (signal_pending(current))
-> +		if (task_sigpending(current))
->   			goto do_interrupted;
->   		sk_clear_bit(SOCKWQ_ASYNC_NOSPACE, sk);
->   		if (sk_stream_memory_free(sk) && !vm_wait)
-
--- 
-Pavel Begunkov
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
