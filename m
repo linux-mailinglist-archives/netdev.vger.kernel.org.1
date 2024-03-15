@@ -1,187 +1,123 @@
-Return-Path: <netdev+bounces-80061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B69E87CCF0
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 12:49:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EF9687CD02
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 13:05:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EFEA1C21814
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 11:49:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 343612837E6
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 12:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0041C294;
-	Fri, 15 Mar 2024 11:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A51C1BDE0;
+	Fri, 15 Mar 2024 12:05:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XoypR1av"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LarYQq4j"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3952D1BC4D
-	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 11:48:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2C3D18EA8
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 12:05:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710503338; cv=none; b=Kj2eTpu8f2qplg82lRo1iiLI4XipwIF/qDMg1Q75MaZt5cG/yYhOaRoctu85WMO3S1Sug4AzfqxPAMejtArjfPJ+XzIn0mB4jjTTjf14vTnhRBspf2Z73SFHVhCIlycZH//6DuAVmsnkFvCP5GW8KRtGwbkumfNqJ1GyWIXnqb4=
+	t=1710504323; cv=none; b=i/VEiKq9dBSM2X7NBiilLN6DzDA5wihw934v9ivT45VsjKleCIE265eRb/1Ib2SHp4cN4tsX50yxeCJ4MUz/y8SbOjJaKpEBZbEB+PjlKDss7q953n6XfEFd7XoN1U5qzV8nCimo4spTZW4Tpn3btj/hs3MSxL+mDJ/Rjw5wyvo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710503338; c=relaxed/simple;
-	bh=xwGKfZufaUhiXCXYsJDtgBgzcdvqo9CJ7vHMJisCpaw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=l4L51BfNAeaVdeQm5+qqkWVTq3F/EAjPDCuut6aa1Vi900KmvFC+yCzG8MzZCGYBJot93weCqa9lMK0LqpbbgVDW8MBOdoIe9pJ3yknhLlks1oah3y0V8ODB2Y+kNG0KTPZAKqks4C7dBMBGcbhXWszJSvynVPM4Lulqp+EoouU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XoypR1av; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1710504323; c=relaxed/simple;
+	bh=7VXQfjdk/MbEsbbqW5N6rG0COnPGgQTmZSu0kiC+nik=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=We7ftSYKJlvpXjOI84TUKBapjaN6NuoyO4l41CLT793CWJdNJOSz/Yn7MwIogNNwaXR6PZDZiTQdMVhBPRXJqggEA/K0QtbpYYZnGqFv3ivBoCKcy6dbD2b7CKs3KqACy1TqWa/urfKM1Nau4EBdBYbrN5QVGlV1bWAfEnaoNcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LarYQq4j; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710503334;
+	s=mimecast20190719; t=1710504320;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8xwyrO4Nw6XTQrs6yfETpHuCrbfSZVrTnmqnSwO+IBo=;
-	b=XoypR1avg8kOwcHJfAqr3swqMR0IAlus5EAo821RkhxfZkStyS99WqMJynXr5Z8l7aIJB7
-	QEEshSlVwvz7OOleuOVfUsZGOs8TzQNrYoFPZofsJbw0yHwrYeTT4vWAT7JCgQvf9wb4p4
-	kY8/AC4m+Nil00ZLBHih8PKgVnFjbG8=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Kn24Hzs/NOyHJ9zT+/JeXQsL6NssdOOEzODdJVZXeKs=;
+	b=LarYQq4j4iucL48AZX7QdRB8KkqHDkE8Lh5WXjijxMqBGEyNy8U2GpMqgGTVI3upifBOKi
+	TEQ/mzBy1kIT0AFIkKE1iHXieTUiSpjbpfZQSj1Lk+FGPb7b1CULSBCX1GG08VTVu+r1Rt
+	+wpzVstFFCeO6hiAUteEkf8mtmitsBg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-460-EjYmC7XnOK2DuP1DOQp9rg-1; Fri, 15 Mar 2024 07:48:52 -0400
-X-MC-Unique: EjYmC7XnOK2DuP1DOQp9rg-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a462e4d8c44so95897066b.1
-        for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 04:48:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710503331; x=1711108131;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=8xwyrO4Nw6XTQrs6yfETpHuCrbfSZVrTnmqnSwO+IBo=;
-        b=bWhvivJWWS7r7/X/nGWkPAbNBixG25Mntsem4XIkKbX13+Akg/ytjOuDir+p7DpGWP
-         Wf8dOxoQh60niXp5hZZ/lvFUbolqJlPc/0lpEV6vyMd4KVuXOgDkaAHox/Q3KIDalJmh
-         zQxN7T+auraQout0TSPzuAqmnU+Jajdd9GFlxWWLOmqb8LEJhDhiNp/vwPsdgiP15bKw
-         Nf2KRZo7KxZ+JtQUVcSYi7tavvzYk1B6nNEKLbA5TX7EOYCTSU4gkg9cxR5x8wgTNrL0
-         6w2RJ9zrDXqtqjsBZ9dcDYPTcBpSiamZaGLcasKNG3w2kVRXLrYp9lVYKPUOd/83iWiY
-         Xsgw==
-X-Forwarded-Encrypted: i=1; AJvYcCWje6zJZDNeyfsG0YEFBaQDWm+GTHyFJ5GhfNRG6jEinH1IxfFc9pCYtyjO891+FwlMUc9odLQsXJ3YLe+M377NeFB9h4+s
-X-Gm-Message-State: AOJu0YyfWIWnNd3ngSui25SNXiJFKsXYV+P7qpn4+78T1mzMvYSUgt6G
-	kVn1B4P0iM1P0RoKMWzwgnROlGLEaV3LGkIvlU+oOV1pOSMW8oO3opYliqsb8I7o+XW/Rdsv4I3
-	E4xXNJtA/ThT87vxyt+Dka/MtQohFcbFPP8j750IN5UzmU9oGKuUL6g==
-X-Received: by 2002:a17:906:6bd4:b0:a44:1e32:a503 with SMTP id t20-20020a1709066bd400b00a441e32a503mr3190478ejs.22.1710503331518;
-        Fri, 15 Mar 2024 04:48:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG4rijzPw95HZZMGtM6WYg0TbO/IMk3iMsl8cBCJ65BDgxDM5NoP6dJg1i0hsPqej4NTsP76Q==
-X-Received: by 2002:a17:906:6bd4:b0:a44:1e32:a503 with SMTP id t20-20020a1709066bd400b00a441e32a503mr3190455ejs.22.1710503331020;
-        Fri, 15 Mar 2024 04:48:51 -0700 (PDT)
-Received: from maya.cloud.tilaa.com (maya.cloud.tilaa.com. [164.138.29.33])
-        by smtp.gmail.com with ESMTPSA id bw9-20020a170906c1c900b00a4650ec48d0sm1645765ejb.140.2024.03.15.04.48.49
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 15 Mar 2024 04:48:49 -0700 (PDT)
-Date: Fri, 15 Mar 2024 12:48:08 +0100
-From: Stefano Brivio <sbrivio@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, jiri@resnulli.us, idosch@idosch.org,
- johannes@sipsolutions.net, fw@strlen.de, pablo@netfilter.org, Martin Pitt
- <mpitt@redhat.com>, Paul Holzinger <pholzing@redhat.com>, David Gibson
- <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH net-next v2 3/3] genetlink: fit NLMSG_DONE into same
- read() as families
-Message-ID: <20240315124808.033ff58d@elisabeth>
-In-Reply-To: <20240303052408.310064-4-kuba@kernel.org>
-References: <20240303052408.310064-1-kuba@kernel.org>
-	<20240303052408.310064-4-kuba@kernel.org>
-Organization: Red Hat
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.36; x86_64-pc-linux-gnu)
+ us-mta-317-hqf2JLXlNp22xSr4D9UHYQ-1; Fri, 15 Mar 2024 08:05:16 -0400
+X-MC-Unique: hqf2JLXlNp22xSr4D9UHYQ-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 7A0E885A58B;
+	Fri, 15 Mar 2024 12:05:16 +0000 (UTC)
+Received: from thinkpad.redhat.com (unknown [10.45.225.235])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 4395E3C22;
+	Fri, 15 Mar 2024 12:05:15 +0000 (UTC)
+From: Felix Maurer <fmaurer@redhat.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	leitao@debian.org,
+	dkirjanov@suse.de
+Subject: [PATCH net v2] hsr: Handle failures in module init
+Date: Fri, 15 Mar 2024 13:04:52 +0100
+Message-ID: <3ce097c15e3f7ace98fc7fd9bcbf299f092e63d1.1710504184.git.fmaurer@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.1
 
-Hi,
+A failure during registration of the netdev notifier was not handled at
+all. A failure during netlink initialization did not unregister the netdev
+notifier.
 
-On Sat,  2 Mar 2024 21:24:08 -0800
-Jakub Kicinski <kuba@kernel.org> wrote:
+Handle failures of netdev notifier registration and netlink initialization.
+Both functions should only return negative values on failure and thereby
+lead to the hsr module not being loaded.
 
-> Make sure ctrl_fill_info() returns sensible error codes and
-> propagate them out to netlink core. Let netlink core decide
-> when to return skb->len and when to treat the exit as an
-> error. Netlink core does better job at it, if we always
-> return skb->len the core doesn't know when we're done
-> dumping and NLMSG_DONE ends up in a separate read().
+Fixes: f421436a591d ("net/hsr: Add support for the High-availability Seamless Redundancy protocol (HSRv0)")
+Signed-off-by: Felix Maurer <fmaurer@redhat.com>
+---
+ net/hsr/hsr_main.c | 15 +++++++++++----
+ 1 file changed, 11 insertions(+), 4 deletions(-)
 
-While this change is obviously correct, it breaks... well, broken
-applications that _wrongly_ rely on the fact that NLMSG_DONE is
-delivered in a separate datagram.
-
-This was the (embarrassing) case for passt(1), which I just fixed:
-  https://archives.passt.top/passt-dev/20240315112432.382212-1-sbrivio@redh=
-at.com/
-
-but the "separate" NLMSG_DONE is such an established behaviour,
-I think, that this might raise a more general concern.
-
-=46rom my perspective, I'm just happy that this change revealed the
-issue, but I wanted to report this anyway in case somebody has
-similar possible breakages in mind.
-
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: jiri@resnulli.us
-> ---
->  net/netlink/genetlink.c | 12 +++++++-----
->  1 file changed, 7 insertions(+), 5 deletions(-)
->=20
-> diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
-> index 50ec599a5cff..3b7666944b11 100644
-> --- a/net/netlink/genetlink.c
-> +++ b/net/netlink/genetlink.c
-> @@ -1232,7 +1232,7 @@ static int ctrl_fill_info(const struct genl_family =
-*family, u32 portid, u32 seq,
-> =20
->  	hdr =3D genlmsg_put(skb, portid, seq, &genl_ctrl, flags, cmd);
->  	if (hdr =3D=3D NULL)
-> -		return -1;
-> +		return -EMSGSIZE;
-> =20
->  	if (nla_put_string(skb, CTRL_ATTR_FAMILY_NAME, family->name) ||
->  	    nla_put_u16(skb, CTRL_ATTR_FAMILY_ID, family->id) ||
-> @@ -1355,6 +1355,7 @@ static int ctrl_dumpfamily(struct sk_buff *skb, str=
-uct netlink_callback *cb)
->  	struct net *net =3D sock_net(skb->sk);
->  	int fams_to_skip =3D cb->args[0];
->  	unsigned int id;
-> +	int err =3D 0;
-> =20
->  	idr_for_each_entry(&genl_fam_idr, rt, id) {
->  		if (!rt->netnsok && !net_eq(net, &init_net))
-> @@ -1363,16 +1364,17 @@ static int ctrl_dumpfamily(struct sk_buff *skb, s=
-truct netlink_callback *cb)
->  		if (n++ < fams_to_skip)
->  			continue;
-> =20
-> -		if (ctrl_fill_info(rt, NETLINK_CB(cb->skb).portid,
-> -				   cb->nlh->nlmsg_seq, NLM_F_MULTI,
-> -				   skb, CTRL_CMD_NEWFAMILY) < 0) {
-> +		err =3D ctrl_fill_info(rt, NETLINK_CB(cb->skb).portid,
-> +				     cb->nlh->nlmsg_seq, NLM_F_MULTI,
-> +				     skb, CTRL_CMD_NEWFAMILY);
-> +		if (err) {
->  			n--;
->  			break;
->  		}
->  	}
-> =20
->  	cb->args[0] =3D n;
-> -	return skb->len;
-> +	return err;
->  }
-> =20
->  static struct sk_buff *ctrl_build_family_msg(const struct genl_family *f=
-amily,
-
---=20
-Stefano
+diff --git a/net/hsr/hsr_main.c b/net/hsr/hsr_main.c
+index cb83c8feb746..9756e657bab9 100644
+--- a/net/hsr/hsr_main.c
++++ b/net/hsr/hsr_main.c
+@@ -148,14 +148,21 @@ static struct notifier_block hsr_nb = {
+ 
+ static int __init hsr_init(void)
+ {
+-	int res;
++	int err;
+ 
+ 	BUILD_BUG_ON(sizeof(struct hsr_tag) != HSR_HLEN);
+ 
+-	register_netdevice_notifier(&hsr_nb);
+-	res = hsr_netlink_init();
++	err = register_netdevice_notifier(&hsr_nb);
++	if (err)
++		return err;
++
++	err = hsr_netlink_init();
++	if (err) {
++		unregister_netdevice_notifier(&hsr_nb);
++		return err;
++	}
+ 
+-	return res;
++	return 0;
+ }
+ 
+ static void __exit hsr_exit(void)
+-- 
+2.44.0
 
 
