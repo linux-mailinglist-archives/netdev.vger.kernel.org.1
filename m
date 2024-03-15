@@ -1,110 +1,153 @@
-Return-Path: <netdev+bounces-80032-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4279B87C9B3
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 09:11:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D415287C9AA
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 09:09:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DC5E28305F
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 08:11:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 662B51C222CC
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 08:09:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3391214F65;
-	Fri, 15 Mar 2024 08:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59A0414A85;
+	Fri, 15 Mar 2024 08:07:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="fYXNmJWp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kp7RNCfS"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECB0A14AB0;
-	Fri, 15 Mar 2024 08:10:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5821AAAE;
+	Fri, 15 Mar 2024 08:07:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710490261; cv=none; b=qunWe0S0Zg/4EP//ZnB5vOGVYgbdPJbEPExFNTrtZlL9HcP6K8qkqMRt2tSMEzgCFVV4/sNqfYVQZwUHuj9iSmVQq+wB8guVgRlZL2N7ShrkHxU3yzSpLCWYsO6vVobxCBHtjFIYVvZxW0zwEj5w3HAhDA5w4R5YZvybI2TSdXA=
+	t=1710490068; cv=none; b=SjhKnNi5jE66seTzuR8l9XzRX7D0WowVYnb/lzmvyBz0qG9A1o0Z6pKbLMe4Q6qA/lmf/feijt9eSVs0i49nXBdtK05PsthhmOne7WDe6k9Pj39uTiYtJ3YhErmCaizSLMS/uAU0nkIkpQ8ypjvMk4PSxXQYMGwQZ4aSAiqz/uE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710490261; c=relaxed/simple;
-	bh=hf/7tzQiNSvYmFuA/yKuj1fm3A4gA/3hedPkcZLXEe8=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=s1rHiBAE+85F5eToewKL2888iklYXW8jvYRSARhFeDIfFmU24wGMyL0P5neKNSumv0+InVwNIkq9nMTBW98yn0yuWqlCLi778N2d8yaZI2K17OAOBWqOMFGDG5U/IO9tCCfrkW19pzbkWCD8ZOh9PwoCDFzIJruw6syehdi2tv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=fYXNmJWp; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1710490251; h=Message-ID:Subject:Date:From:To;
-	bh=hf/7tzQiNSvYmFuA/yKuj1fm3A4gA/3hedPkcZLXEe8=;
-	b=fYXNmJWplcKF5W2UnPUwG8wBfUOtbby51EA29jlCTX4AUdPfQvQZX+jYjlycW3ntVgfyX7P4eHccM7eVAkx4Wa+5sooe1KEWSKdOPOmP9Eitntb/MkNR8QfV7i0JMB/WeaUp5KhIA5YSHPaj6SWGXjEXNRINsieTWZhNxICvtKo=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W2ViqTo_1710490249;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W2ViqTo_1710490249)
-          by smtp.aliyun-inc.com;
-          Fri, 15 Mar 2024 16:10:50 +0800
-Message-ID: <1710489940.1772969-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v4 3/8] virtio_net: support device stats
-Date: Fri, 15 Mar 2024 16:05:40 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric  Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>,
- "Michael S.  Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Alexei  Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@google.com>,
- Amritha  Nambiar <amritha.nambiar@intel.com>,
- Larysa Zaremba <larysa.zaremba@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-References: <20240314085459.115933-1-xuanzhuo@linux.alibaba.com>
- <20240314085459.115933-4-xuanzhuo@linux.alibaba.com>
- <20240314155425.74b8c601@kernel.org>
-In-Reply-To: <20240314155425.74b8c601@kernel.org>
+	s=arc-20240116; t=1710490068; c=relaxed/simple;
+	bh=I9CZHjGLseY19YFTtusPH4FEw4b8ZHI1OZ1poZl29Ow=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=HPzn25tJImT9Zu4gwmKLV79NXInitESoYXjHeqpr3b0jnJ+kn1wcCGarmHxT2Ud8krEPO+mXfROJnd8HG3gq2PP4p3QjcV0z/FWSDfonmys8EZiwa5egVWVXSQ/E4KWtfVeFQp5F+MCJ8vuIT2uH08rmDQ8VmYg2bE7gRazP6bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kp7RNCfS; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-513cf9bacf1so2252868e87.0;
+        Fri, 15 Mar 2024 01:07:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710490064; x=1711094864; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2PKCiNmwzWlVeb44V5zJD+USqe8HMNhcEB2r7dumJco=;
+        b=kp7RNCfSm2t5gB/CntMxTmPupEsszDq6DPYBDofg65CaRmuZCzg6vM4zF/NXmJqHH4
+         8yQMOBnx7fSkoCDMWoPuBA5fY5ZUXJfhjGQpFr2X3HDbJGwWX5A842KJURGF8HsRc87a
+         0Abg8Ypd/19ZuMHU/zdvSAPecH4id3njuN/5bEqcqOA6Ipdn6C4kJyZhKQ4jnJPLPfQ0
+         MRpEMJA/oXdsdo9tDi3n2O7TM+ZggRAHvAiFdkm3rcJ1Ia4cBAy0kNQoi82cnt4c1i5a
+         07tz7uGYxSIaDENHm1xJzjWvUsor1qRMxBBaxKqmZJc1ftXRsIQQiCEUo50XA6Q6NtgO
+         28eA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710490064; x=1711094864;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2PKCiNmwzWlVeb44V5zJD+USqe8HMNhcEB2r7dumJco=;
+        b=NthTcEvl+96UIMngxJJ/vQkRCHRJAsKiUgSot8wuoieP4CZSrzVHo7J8pLVf6/jPfS
+         xo1oOZg9O5UMotiHyS6Lo2ibtUCEv+f4teI/70dqN0iM0qOzHJchg/Pe9bBk/hNTtc/p
+         4cE+pRvcpg3P5NQdMTMfxvVtdbmlUuyn6p29BmqB9t7pLvmiOYCHoQ5OwruFVClm6na+
+         jo2O+L9oATH4/sbKge7/dG0FtqC/CcFpxztgBC95Lv6DPP5ad2CyJd7vp5gt6aamnoGs
+         RjteFPTjmnrB0Dl7edDemBOCeYGfKk4lTCEOyKZo4MUEaIfWwfJUaNUuI1uaDyCaD+Nv
+         Hrmg==
+X-Forwarded-Encrypted: i=1; AJvYcCVpuk3BlkwWuHI9PHo0Y2gkguO3SwHRdm68sq+5zPX2yLWgauIxsLhR214B/4RixaDKkl9JNeeHh6a0biDYRfhsWdUQT6eL0OT/jxGKhkCj32DvNZkL1LyrtNlqeu63UkJsliJG
+X-Gm-Message-State: AOJu0YyDxSwoeWkyYvuENyNJVU7PmYV9YYtBEvcRu7oQ0tBAVIcfhbK1
+	uwg/NtbnJ2+Jsv95GnFSykdDc6kDVezQsfX09JNITPMf9Rcge8g=
+X-Google-Smtp-Source: AGHT+IGGFlDBe2VZdzwHilcJKmzNzqi5YhmYuqrSAunBcPK03IlR8xn2HJOQFeCLPiNH+44BvmAkNQ==
+X-Received: by 2002:a05:6512:3b96:b0:513:c227:70bd with SMTP id g22-20020a0565123b9600b00513c22770bdmr1985223lfv.60.1710490063677;
+        Fri, 15 Mar 2024 01:07:43 -0700 (PDT)
+Received: from frutis-latitude7490.lan (public-gprs367196.centertel.pl. [37.47.65.157])
+        by smtp.googlemail.com with ESMTPSA id l24-20020a19c218000000b00513d1ff9eb2sm475518lfc.208.2024.03.15.01.07.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 15 Mar 2024 01:07:42 -0700 (PDT)
+From: =?UTF-8?q?Pawe=C5=82=20Owoc?= <frut3k7@gmail.com>
+To: 
+Cc: =?UTF-8?q?Pawe=C5=82=20Owoc?= <frut3k7@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Robert Marko <robimarko@gmail.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next] net: phy: aquantia: add support for AQR114C PHY ID
+Date: Fri, 15 Mar 2024 09:06:50 +0100
+Message-ID: <20240315080657.3460084-1-frut3k7@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, 14 Mar 2024 15:54:25 -0700, Jakub Kicinski <kuba@kernel.org> wrote:
-> On Thu, 14 Mar 2024 16:54:54 +0800 Xuan Zhuo wrote:
-> > make virtio-net support getting the stats from the device by ethtool -S
-> > <eth0>.
-> >
-> > Due to the numerous descriptors stats, an organization method is
-> > required. For this purpose, I have introduced the "virtnet_stats_map".
-> > Utilizing this array simplifies coding tasks such as generating field
-> > names, calculating buffer sizes for requests and responses, and parsing
-> > replies from the device. By iterating over the "virtnet_stats_map,"
-> > these operations become more streamlined and efficient.
->
-> Don't duplicate the stats which get reported via the netlink API in
-> ethtool. Similar story to the rtnl stats:
->
-> https://docs.kernel.org/next/networking/statistics.html#notes-for-driver-authors
+Add support for AQR114C PHY ID. This PHY advertise 10G speed
+but supports only up to 5G speed.
 
-Sorry, this patch set did not follow this.
+Signed-off-by: Paweł Owoc <frut3k7@gmail.com>
+---
+ drivers/net/phy/aquantia/aquantia_main.c | 21 +++++++++++++++++++++
+ 1 file changed, 21 insertions(+)
 
-I will fix in next version.
-
-But I plan that will be done in the commit "virtio-net: support queue stat".
-This commit in next version will report all stat by ethtool -S.
-The commit "virtio-net: support queue stat" in next version
-will not report the duplicate the stats that reported via the netlink API.
-
-Do you think ok?
-
-Thanks.
-
-
-
-
-
-
+diff --git a/drivers/net/phy/aquantia/aquantia_main.c b/drivers/net/phy/aquantia/aquantia_main.c
+index 71bfddb8f453..e1fdfa537452 100644
+--- a/drivers/net/phy/aquantia/aquantia_main.c
++++ b/drivers/net/phy/aquantia/aquantia_main.c
+@@ -28,6 +28,7 @@
+ #define PHY_ID_AQR412	0x03a1b712
+ #define PHY_ID_AQR113	0x31c31c40
+ #define PHY_ID_AQR113C	0x31c31c12
++#define PHY_ID_AQR114C	0x31c31c22
+ #define PHY_ID_AQR813	0x31c31cb2
+ 
+ #define MDIO_PHYXS_VEND_IF_STATUS		0xe812
+@@ -962,6 +963,25 @@ static struct phy_driver aqr_driver[] = {
+ 	.get_stats      = aqr107_get_stats,
+ 	.link_change_notify = aqr107_link_change_notify,
+ },
++{
++	PHY_ID_MATCH_MODEL(PHY_ID_AQR114C),
++	.name		= "Aquantia AQR114C",
++	.probe		= aqr107_probe,
++	.get_rate_matching = aqr107_get_rate_matching,
++	.config_init	= aqr111_config_init,
++	.config_aneg    = aqr_config_aneg,
++	.config_intr	= aqr_config_intr,
++	.handle_interrupt = aqr_handle_interrupt,
++	.read_status	= aqr107_read_status,
++	.get_tunable    = aqr107_get_tunable,
++	.set_tunable    = aqr107_set_tunable,
++	.suspend	= aqr107_suspend,
++	.resume		= aqr107_resume,
++	.get_sset_count	= aqr107_get_sset_count,
++	.get_strings	= aqr107_get_strings,
++	.get_stats	= aqr107_get_stats,
++	.link_change_notify = aqr107_link_change_notify,
++},
+ {
+ 	PHY_ID_MATCH_MODEL(PHY_ID_AQR813),
+ 	.name		= "Aquantia AQR813",
+@@ -999,6 +1019,7 @@ static struct mdio_device_id __maybe_unused aqr_tbl[] = {
+ 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR412) },
+ 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR113) },
+ 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR113C) },
++	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR114C) },
+ 	{ PHY_ID_MATCH_MODEL(PHY_ID_AQR813) },
+ 	{ }
+ };
+-- 
+2.44.0
 
 
