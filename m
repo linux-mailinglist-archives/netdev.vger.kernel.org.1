@@ -1,47 +1,48 @@
-Return-Path: <netdev+bounces-80016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4C2787C788
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 03:33:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DBC487C790
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 03:34:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55812B211D9
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 02:32:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AD92D1C212D7
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 02:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6073B6AA0;
-	Fri, 15 Mar 2024 02:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A8A76AA0;
+	Fri, 15 Mar 2024 02:34:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Ih+a+xQC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EwQQbNF+"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC82C79D3;
-	Fri, 15 Mar 2024 02:32:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA04D79DE
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 02:34:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710469974; cv=none; b=FpLbu0GdgEjIAA3YzTbb+B8421M1NhNYKtMQnW9hR0nwqKWF8K3KRZYDiyvtLu8GpzOqEnWfLh1R1RVG2DMFy2DaAxUDMM83m7qH7i4br4YC5r9j1gfxGi25rpjq16tvLccr/+qaBOdxV00g+fCPqg4EsJJsUFfQYlLijwxHxdc=
+	t=1710470086; cv=none; b=LN0tgj3qk2MU6/mODz3aCMpJdmCXtDgZ2OX4kSz6BVI7PCw4pQrEjijupmRfwY3KYR2R/2hcoKsAlOpnFAttMKODmFwmGGnJHU0B9iJ9v4ZEDodku5qEJWmxtALU4ivc5qzVPJOZP4su/I+0sti+aZCXBJrlopEDPHeP7lnaLng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710469974; c=relaxed/simple;
-	bh=9j14obn7LJhO8DocmOfVRGauUW8ZOKLXG5D4pRwAFBA=;
+	s=arc-20240116; t=1710470086; c=relaxed/simple;
+	bh=3sN91xSQJYCCwlGVlZkCAHVvcsrlaZ+bV7z9B9hEAeQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lKLdNXtVCV2VYneta2nWFxauwHXP+xjOokPsXqZ+K7ByFNDI5n/OyyghMXY6R1n8UFr3AM26+H4IQH2sRtx32pbvJPmFPrbM6dQVehSRgKufCkz4fwRzDbPhZR1LHzJ9wdv8tY0ldV4S01QleT+TaduQ3NwhtDN4yYIbgEwa73w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Ih+a+xQC; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1710469963; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=uWppkp/CDYn1IU8SGxz0loaKDXyaJFyU0HWPRcBekZI=;
-	b=Ih+a+xQC/wzNtKFtMAd6uzxbbpp1KtFPmyxhsxW+QPHKrPBqRL5RZLxkWb1O7h/7jUAFdZWfoy8KGxKUzfCbR6U6XweEwIl/kmtero5oueZOr/XAV/pUoc1TS3qtMqsoZumc4TnvstwHabw7K1hk4EKl6CgERrtfaNzd9rPKI2s=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R761e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0W2UXABh_1710469953;
-Received: from 30.221.148.72(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W2UXABh_1710469953)
-          by smtp.aliyun-inc.com;
-          Fri, 15 Mar 2024 10:32:41 +0800
-Message-ID: <143ea675-97e5-42ab-b8e6-55b2675294c3@linux.alibaba.com>
-Date: Fri, 15 Mar 2024 10:32:32 +0800
+	 In-Reply-To:Content-Type; b=DAJV0R5Qnjqql9HW3/gOg6msZbXL9+T7FnTYq9G8r0gMOLwleHeQDC+f8Xp5gcHpHtva90fI5QwEtqZRhfI5R1vvDLYBwWbHBh7zKfUGLUUqmBycXpRA6yui0o3C9Ta96WPpJi3MQekIKcCjZUJUK7uWbLBnQvK8g8pWSKcYjxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EwQQbNF+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4E303C43390;
+	Fri, 15 Mar 2024 02:34:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710470085;
+	bh=3sN91xSQJYCCwlGVlZkCAHVvcsrlaZ+bV7z9B9hEAeQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=EwQQbNF+O5BsycE2hAAZjtFNTGdYbfc0txij5ut/w/0QX85j8mRyW/W3T61Qxw/c9
+	 udvhEN9vh5m+dA3XEpemPcX2tA68RzFdpqOuExPwOHpc4fbIQJJJmFwLUcM8PzkRKY
+	 GPF5E32gK9wPHdc84eY+dbFFgmwhMAnvl41NMqU0HNh0mzQ9aAx/hpaXZcutzrBjPQ
+	 vaXBTDCxXIT/990QSNVik0Ib5sX7EJ6vi/pSOw7DZG/GlwGRwLH3HJisUOdtEhINWG
+	 kVMfCKCmZOMBOYXlfbYOHx/a49R0yK+eomg4SIx1JqwEH4ZlS42Rg1GHqZ17538o14
+	 ZXqck/had79WA==
+Message-ID: <19699d5f-29d7-4e14-b954-d612c5035b4a@kernel.org>
+Date: Thu, 14 Mar 2024 20:34:43 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,44 +50,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/2] net: provides dim profile fine-tuning channels
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Tal Gilboa <talgi@nvidia.com>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jonathan Corbet <corbet@lwn.net>,
- Randy Dunlap <rdunlap@infradead.org>, Bjorn Helgaas <bhelgaas@google.com>,
- Breno Leitao <leitao@debian.org>, Johannes Berg <johannes.berg@intel.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev
-References: <1710421773-61277-1-git-send-email-hengqi@linux.alibaba.com>
- <20240314114955.71ada20c@kernel.org>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <20240314114955.71ada20c@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2] ifstat: handle strdup return value
+Content-Language: en-US
+To: Ratheesh Kannoth <rkannoth@marvell.com>,
+ Denis Kirjanov <kirjanov@gmail.com>
+Cc: stephen@networkplumber.org, netdev@vger.kernel.org,
+ Denis Kirjanov <dkirjanov@suse.de>
+References: <20240314122040.4644-1-dkirjanov@suse.de>
+ <20240315022329.GA1295449@maili.marvell.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240315022329.GA1295449@maili.marvell.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
+On 3/14/24 8:23 PM, Ratheesh Kannoth wrote:
+>> diff --git a/misc/ifstat.c b/misc/ifstat.c
+>> index 685e66c9..f94b11bc 100644
+>> --- a/misc/ifstat.c
+>> +++ b/misc/ifstat.c
+>> @@ -140,6 +140,11 @@ static int get_nlmsg_extended(struct nlmsghdr *m, void *arg)
+>>
+>>  	n->ifindex = ifsm->ifindex;
+>>  	n->name = strdup(ll_index_to_name(ifsm->ifindex));
+>> +	if (!n->name) {
+>> +		free(n);
+>> +		errno = ENOMEM;
+> strdup() will set the errno right ? why do you need to set it explicitly ?
 
+agreed.
 
-在 2024/3/15 上午2:49, Jakub Kicinski 写道:
-> On Thu, 14 Mar 2024 21:09:31 +0800 Heng Qi wrote:
->> The NetDIM library provides excellent acceleration for many modern
->> network cards. However, the default profiles of DIM limits its maximum
->> capabilities for different NICs, so providing a channel through which
->> the NIC can be custom configured is necessary.
-> Given that DIM is currently enabled and disable via ethtool
-> why are you putting the API is sysfs and ops in ndo?
-
-Hi Jakub,
-
-Thank you for reaching out. We're flexible regarding configuration 
-methods and are
-open to using either sysfs or ethtool, depending on what's most 
-appropriate for the task at hand.
-
-If the ethtool is favored, I am happy to proceed with it!
-
-Best regards,
-Heng
+pw-bot: cr
 
 
