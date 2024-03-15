@@ -1,192 +1,86 @@
-Return-Path: <netdev+bounces-80027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 352A487C96D
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 08:43:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE48587C97A
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 08:54:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2418281AAF
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 07:43:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BD7D1C21E92
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 07:54:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D58C14016;
-	Fri, 15 Mar 2024 07:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 101F01426E;
+	Fri, 15 Mar 2024 07:53:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a8V6EKs6"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="VzOAQfG4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98C5C8BEE;
-	Fri, 15 Mar 2024 07:43:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3971168B1;
+	Fri, 15 Mar 2024 07:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710488604; cv=none; b=a3gm1vAQP5BdN742WFBXZUgwlE76pxRrsTbG+5Z1Y+Q1c3NjCsy8HXbLyvdSnAywihHYdEc4JTXyYQFi2QKh9I0RPVkKOqKdr+4RVAKvw4jHJQmUx4vptuT9knQOSMDM90p/XtT03sDEvQFE25SbNeA4xf4SAouzhNySRgA2xMs=
+	t=1710489235; cv=none; b=Coxyq5aTXf2DCdRbJgtGXQvmeP0X316eOu3WwsyxbcPw0Y36O+Ba9mtpkaTLhBxwPZlcTRt4A7uzbg1CMDM6qaU0U2g8MevYBV2KThhfEuD/TydRetdGaj4aNzKNl01BCn9UuJmiY8Mtxcwp2YA72mGtSeM0xM6Jmgm65KaON8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710488604; c=relaxed/simple;
-	bh=Zw9S6hRNBlDHNXOavKPS6AU9Ku+D+1bxIk/tgYyDWOE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iTEW7ksPyAF4BvmQmc0yCb5wlaLkK179LzbFt/ZHbhG1PfFSohKs6jSwccyXeCbHtmKx+Rv2DiW191ebb6ZQ8fVbRkYq+IXDS2NRxLkR0GKkO4qWhLBKAURqN51SG+QQa39ugIkyKzmHUUXybbZbEcIu0FLhW9slE5m7ioQrzLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a8V6EKs6; arc=none smtp.client-ip=209.85.161.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5a14d7f0e66so780482eaf.1;
-        Fri, 15 Mar 2024 00:43:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710488601; x=1711093401; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=y+sKbEMgE5r6A8AgrakXmyb0PKCVFac2dOoteAq7k8o=;
-        b=a8V6EKs6lFykvoYwT2bHwa6SDxwUQ031xBOd9vrfwrbqtiXtEH3e9ZaY7sVgsOWe0E
-         0Y8LACcy0VHCArr2pnqZlCTJn0iAcLqEK4QWP3z1NzQ0ACP7kegCfZ8n4NBX25FpUgmQ
-         w1F70hh10s7J2uWDyTnlb2WBybJCUI1W9OQ56KTAQFy+6E3Ufnk8B1/Wj6ELjeYtgByZ
-         78PBgTZYS+l8IlmNfTTxJSzNoNa5pRFQPO+URsCso3EEe4JPpk0laGrc8bnp/u6giIbz
-         6RHzIGVeVYn5AKbWDo8dORbNfJtyn8Ex1nNUq+2Kgx4FsDbEgZ8EiB5FamkkZkpsEylu
-         bJDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710488601; x=1711093401;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y+sKbEMgE5r6A8AgrakXmyb0PKCVFac2dOoteAq7k8o=;
-        b=ldJM2bMZlzH7evl2k3O8NaVwOkn3+I/nvQ8gy2PkWZQIoZKIFtflb8sPTJo+xgnsck
-         uLrOl3LKYwzHpCFUoAZ7/poN3uBecyvywn4h4ZghTBNzcWxK0F8WYa/82AcaYgtbEWXD
-         jsp6m0QRCQ5knTaipNWZ6XTimcV25SiZJBOjH2bdCQbJE2vVkdpjz781mHwVTB4gnc96
-         hkbDCN5hJvhJPKZAEasjnCHpIi+0xT3cKK8TBFUHsJ7ZBCfPGNzoQGRlQWpTMQ6dyeEq
-         RhFpfjMiApSEHTokgFIiqdVw4RjEXWuoRDb/S3FxiSJMo/LHVILCbiyjRlU1H2rPYErg
-         KSqg==
-X-Forwarded-Encrypted: i=1; AJvYcCV1RzT84Vx3QnbmE8qVPihwC52dGUfMB4HQWRcvoN+HhDnuX9RIfPxf7urWH3DH8WS8oT0KvArhZ2VdbfQ745jy3p+ji2n9
-X-Gm-Message-State: AOJu0YwVN/1d+NJ1iLPdJynESlltQbtfSU9R9o61EWCcmgK6dPEYP6oS
-	ijVUCbbzg1nJqAUPQi2jEEtBUHWXwn5lCb8JBf9Wr7evfgoqaYxZ
-X-Google-Smtp-Source: AGHT+IGLOQadiQa1j4OnHkg6nggd2mD2/umSTkBhGKXKQ/0a+Rz3wiHLhaz65dtf7FsJ2mLWjao4Tw==
-X-Received: by 2002:a05:6870:f707:b0:221:ab60:da45 with SMTP id ej7-20020a056870f70700b00221ab60da45mr4510391oab.11.1710488601652;
-        Fri, 15 Mar 2024 00:43:21 -0700 (PDT)
-Received: from archie.me ([103.124.138.155])
-        by smtp.gmail.com with ESMTPSA id h4-20020aa786c4000000b006e6a3f52ee5sm2740197pfo.69.2024.03.15.00.43.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Mar 2024 00:43:20 -0700 (PDT)
-Received: by archie.me (Postfix, from userid 1000)
-	id B1BF0181043B9; Fri, 15 Mar 2024 14:43:18 +0700 (WIB)
-Date: Fri, 15 Mar 2024 14:43:18 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Herve Codina <herve.codina@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Stephen Rothwell <sfr@canb.auug.org.au>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>
-Subject: Re: [PATCH v2] lib/bitmap: Fix bitmap_scatter() and bitmap_gather()
- kernel doc
-Message-ID: <ZfP8FowhZ3ZtSq2T@archie.me>
-References: <20240314120006.458580-1-herve.codina@bootlin.com>
+	s=arc-20240116; t=1710489235; c=relaxed/simple;
+	bh=6FMRl6m8tBGLZaaAzsLem205PhnR/hBTd36NLkHi/Cw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YfRap1HphXMzhw1wadsALLNYDdUyWTILr15+rGf9cclpyRg9SjU0j0Ux4ajwjhsGjqf2uCgJMxVnhpeDNFzq9yHUk2JJM8eRYE/v7R7ohDD1/Kv0SaNS3kBf+DVWIhAlT1Z6JWtIWuRaCG/SGsx10ulMUFLQtp3GMBV4lpVUH0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=VzOAQfG4; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1710489229; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=taaP0Q9u2K5DH9xLuWgNdAcyQdJAZ4Px6dOvD4Tr4Bc=;
+	b=VzOAQfG4t0ynN0mr9D+RsuQLbRV1YKnO7NNvycyCEWHUN0x51I6QP6xNBf2W2znTe8TZ3tOGYV0hVvuwWmrrPNhCL+oog1dgrhUBgRPg10L01uj13W3ySlhgqDLwMHFEw+gq2pkYs0Tz3R6Le8jldCAYf+6uZNwwuOfrYP6NUTA=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=xianting.tian@linux.alibaba.com;NM=1;PH=DS;RN=6;SR=0;TI=SMTPD_---0W2VZ4oX_1710489199;
+Received: from 30.221.98.145(mailfrom:xianting.tian@linux.alibaba.com fp:SMTPD_---0W2VZ4oX_1710489199)
+          by smtp.aliyun-inc.com;
+          Fri, 15 Mar 2024 15:53:48 +0800
+Message-ID: <e004b5d6-e74c-44a8-afaa-b6f4b993817d@linux.alibaba.com>
+Date: Fri, 15 Mar 2024 15:53:18 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="Vkpw4sfr+qcOP7vO"
-Content-Disposition: inline
-In-Reply-To: <20240314120006.458580-1-herve.codina@bootlin.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] vhost: correct misleading printing information
+To: mst@redhat.com, jasowang@redhat.com
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240311082109.46773-1-xianting.tian@linux.alibaba.com>
+From: Xianting Tian <xianting.tian@linux.alibaba.com>
+In-Reply-To: <20240311082109.46773-1-xianting.tian@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
+it is a very minor fix, I think it can be applied
 
---Vkpw4sfr+qcOP7vO
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Mar 14, 2024 at 01:00:06PM +0100, Herve Codina wrote:
-> diff --git a/include/linux/bitmap.h b/include/linux/bitmap.h
-> index fb3a9c93ac86..aa4096126553 100644
-> --- a/include/linux/bitmap.h
-> +++ b/include/linux/bitmap.h
-> @@ -522,17 +522,18 @@ static inline void bitmap_replace(unsigned long *ds=
-t,
->   *
->   * (Bits 0, 1, 2, 3, 4, 5 are copied to the bits 0, 1, 4, 8, 9, 12)
->   *
-> - * A more 'visual' description of the operation:
-> - * src:  0000000001011010
-> - *                 ||||||
-> - *          +------+|||||
-> - *          |  +----+||||
-> - *          |  |+----+|||
-> - *          |  ||   +-+||
-> - *          |  ||   |  ||
-> - * mask: ...v..vv...v..vv
-> - *       ...0..11...0..10
-> - * dst:  0000001100000010
-> + * A more 'visual' description of the operation::
-> + *
-> + *	src:  0000000001011010
-> + *	                ||||||
-> + *	         +------+|||||
-> + *	         |  +----+||||
-> + *	         |  |+----+|||
-> + *	         |  ||   +-+||
-> + *	         |  ||   |  ||
-> + *	mask: ...v..vv...v..vv
-> + *	      ...0..11...0..10
-> + *	dst:  0000001100000010
->   *
->   * A relationship exists between bitmap_scatter() and bitmap_gather().
->   * bitmap_gather() can be seen as the 'reverse' bitmap_scatter() operati=
-on.
-> @@ -568,16 +569,17 @@ static inline void bitmap_scatter(unsigned long *ds=
-t, const unsigned long *src,
->   *
->   * (Bits 0, 1, 4, 8, 9, 12 are copied to the bits 0, 1, 2, 3, 4, 5)
->   *
-> - * A more 'visual' description of the operation:
-> - * mask: ...v..vv...v..vv
-> - * src:  0000001100000010
-> - *          ^  ^^   ^   0
-> - *          |  ||   |  10
-> - *          |  ||   > 010
-> - *          |  |+--> 1010
-> - *          |  +--> 11010
-> - *          +----> 011010
-> - * dst:  0000000000011010
-> + * A more 'visual' description of the operation::
-> + *
-> + *	mask: ...v..vv...v..vv
-> + *	src:  0000001100000010
-> + *	         ^  ^^   ^   0
-> + *	         |  ||   |  10
-> + *	         |  ||   > 010
-> + *	         |  |+--> 1010
-> + *	         |  +--> 11010
-> + *	         +----> 011010
-> + *	dst:  0000000000011010
->   *
->   * A relationship exists between bitmap_gather() and bitmap_scatter(). S=
-ee
->   * bitmap_scatter() for the bitmap scatter detailed operations.
-
-LGTM, thanks!
-
-Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---Vkpw4sfr+qcOP7vO
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZfP8EwAKCRD2uYlJVVFO
-owRnAP9+A9A7YmJqbQ2uV2vnT+S7PoxF2bX1VkyDqbjfObqyFAEA2VkJEBlkBFez
-dVNRdRo6w3txtpn1mAv+fYEFEEItYgY=
-=2+Hm
------END PGP SIGNATURE-----
-
---Vkpw4sfr+qcOP7vO--
+在 2024/3/11 下午4:21, Xianting Tian 写道:
+> Guest moved avail idx not used idx when we need to print log if
+> '(vq->avail_idx - last_avail_idx) > vq->num', so fix it.
+>
+> Signed-off-by: Xianting Tian <xianting.tian@linux.alibaba.com>
+> ---
+>   drivers/vhost/vhost.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 045f666b4f12..1f3604c79394 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -2515,7 +2515,7 @@ int vhost_get_vq_desc(struct vhost_virtqueue *vq,
+>   		vq->avail_idx = vhost16_to_cpu(vq, avail_idx);
+>   
+>   		if (unlikely((u16)(vq->avail_idx - last_avail_idx) > vq->num)) {
+> -			vq_err(vq, "Guest moved used index from %u to %u",
+> +			vq_err(vq, "Guest moved avail index from %u to %u",
+>   				last_avail_idx, vq->avail_idx);
+>   			return -EFAULT;
+>   		}
 
