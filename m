@@ -1,157 +1,109 @@
-Return-Path: <netdev+bounces-80113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D367387D143
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 17:37:06 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 69DEF87D150
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 17:43:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56DC01F21F15
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 16:37:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BE621F21FD0
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 16:43:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE9F344361;
-	Fri, 15 Mar 2024 16:36:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77CCA2208A;
+	Fri, 15 Mar 2024 16:43:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jQ2f//sK"
+	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="mjcTznr0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CA3312E71;
-	Fri, 15 Mar 2024 16:36:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE85D3D579
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 16:43:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710520615; cv=none; b=tXSUqnhbgrYzWaqMFCDt+RlfP1aSu0Q61iVWQXYNtBHLRAvgABnqHz6HpYvsfg6GqJZp/SY4H8vRDdslIVD+27klLS5m433mXgazZp2TGZmndfBn9uIxmQ3AlQRyK9i5empWuY2AQ3TTtHurNzBE+WJR+gaIePR+o5Cml0OVsoM=
+	t=1710520997; cv=none; b=s97898W6GGFVPGrcCiV/n1cSuPvbd0x4JFrdKfleS0Px7oFkPj9aX8UQjNQND2a+NEUYJVCIz0kxbhGK6NpASlkH2D3/dTTXvJ7IskHsbkfB7qxvgbxANIUukNXcJR32WT7XGg7Mi+dcW3dQIZ5YfLtCtIKsuFhKgHqq4+e027c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710520615; c=relaxed/simple;
-	bh=uC5VIfkv0Jum6Z0WXV3XmwmF8GY+xRPbShmLcmkydzI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ffBXqaK0kmpLIf9CAUFeU9s+KmmaM1iaIrXx1lxvQMoY3hxGUihrIaVLk1B2JDWvdX1MY/MVG8XQB1gyiqxNi0sEz/J0wT/B6v10vRjjINvubNGs/e3PdvHwjUHG0zvGjUmLes86t7R7uPmhS5aBluGErpRGrmD+4YVCVvU/LVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jQ2f//sK; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a36126ee41eso285615266b.2;
-        Fri, 15 Mar 2024 09:36:53 -0700 (PDT)
+	s=arc-20240116; t=1710520997; c=relaxed/simple;
+	bh=KL2SdFZI6xj14E9gdnKkJmRkYlKkUmM4EoGRsI93QtY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rkxshdrYDIrbR356tHnQWLGpVlmCqWbdq+yH2PRgmM20C4e4Q1whZ/2/v4Vp0rMUYJFyBgRuqb1q9GPgaq8bzlLVjhXg/gY/69mL6heFz8WgY46j8jmMwvx2byOrcetJ8TDBQqX4Wk8C1mIb0FTENRTd+ixTPY0NTc/3FeAjHSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=mjcTznr0; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3663903844bso3559445ab.1
+        for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 09:43:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710520612; x=1711125412; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3WAJd17tQUXzgE53aI6B1hdEipyJmkfxL6o6rwzYoy8=;
-        b=jQ2f//sKiyW1ELhBfa6alOtDJjXkJGJshSVQb/6GiC7t8tb2/+CIsJ0dHjzRHLxu5k
-         A7ieShZ2jFzsOFOK79bqfra0JoGKbS4IYorOUQK50dr9KvxPcWjj+AJ4VgHpTlgWbfsE
-         PQ1K+oqTZuerPnAX+ibhvAH9rVzC9hGZ16EwRU5Puy+vgM6dfhHc5D6zkOi4qY/k/Tv3
-         WsWJqqTD9UJLwLYOABOkPhba0RBDmRQb9i2Ps8bNv8BklYgPcWtdB8BPU/QjzB0netQX
-         2cVmRxcyqcywuGuAJ1By8rJ9EA5HnMI/KUA1NwsN3zb+9pr9jVeiT1E5ZW7XOMsYi4AX
-         8+Jw==
+        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710520994; x=1711125794; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NnYrkeEuyooTzIwqpfS+gG0pSUcxJ+MtV42LbV77NO8=;
+        b=mjcTznr0AnttCmWs8R630cdqUoVvTyRfA2XvIzaCYQalCB+oC+Dn4yVxntdM+c7K4o
+         ISpJMxFnoyZCUP3zbAPIeRcopPEjjbuBW3UDAZYZBMCZ8chnvewDkygBrQqMNmwhrtBf
+         voqsNaeq7k6ua5gktQiGIwWGBb1mjSj5T+Dw8+YifwOeTjJBlKczopztKOzh90LsLE+B
+         uzPDaBw1VXpUvU/QKmBhFj2T3IhdqczIL4IAFS+xsNjkP+BW2KfgdxgCCDX2CqErBIIt
+         xdfz66AcD2KrOH4JhCoLQTylykypZYxKLyuzRXpvlDql22u2LOknTwcwwGRYAPAH6Pt2
+         2seg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710520612; x=1711125412;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3WAJd17tQUXzgE53aI6B1hdEipyJmkfxL6o6rwzYoy8=;
-        b=kGPP4+SF02M4VPtgspxUMHgF0ycWLO+hd6/ZYR+ZGmN149IsHxDYutgQflCLZP1zRv
-         gThoOjKDoQutO0q2isozjDGMdpStRvrA+/XNI0sxOMKcMHG1ahLcFPR1sAkGZeKXAysj
-         ONd822iZ3V4ybvjBxj+cfTvjJWnvoN0UD74yBFm9GPyCSglTN0JY8u4im6H2tyiFH9gQ
-         yk8l/cNsjCKvPvgoa91ZTNWISU7ohlcqqmd7A+Na3Tu1iIwqlVqZHrI8GSJPX6L74K8p
-         oPbQvIkwElqIv17pnSopkBJPBvGGig1UgGpzyP3foFASIErIEQ4B5fc0Z4CBVyhfyKbc
-         UTxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXB5qrisQvWL/YPDOh4V3unlgeu1WfvH0IrxWvtTYhrlquQGit7IEopxljVpiJqXh1emFlD7jqacz/cPJAlZFCA1xEP8C4XGaksCEqiGiep1gZ7VVLOKXilA2MxT6gRBWM/hujjBTTVCU4GRPS3A6/vXQYaA49CmPSP4uT+gXa3
-X-Gm-Message-State: AOJu0YxuERVCuUDhfK4l1xGKYeYJGVSgj4EhYW1Pgs4HjzX1jwe56Dxt
-	4HSmWTg2LWD3qT2B0T66omjphHqRO4WYLD/KTBo+Ba+w1sbMyTL9
-X-Google-Smtp-Source: AGHT+IGiLRMeewXTx7ynckmJWlfGqHD8aeux8y1eXng1121L4qb9aJWb8iMJ7SCHqwDWTPkdMjj+4g==
-X-Received: by 2002:a17:906:ba84:b0:a46:74d2:a0c3 with SMTP id cu4-20020a170906ba8400b00a4674d2a0c3mr4515276ejd.4.1710520612100;
-        Fri, 15 Mar 2024 09:36:52 -0700 (PDT)
-Received: from fedora (host-95-250-206-50.retail.telecomitalia.it. [95.250.206.50])
-        by smtp.gmail.com with ESMTPSA id s11-20020a170906bc4b00b00a4671d37717sm1758044ejv.52.2024.03.15.09.36.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Mar 2024 09:36:51 -0700 (PDT)
-Date: Fri, 15 Mar 2024 17:36:49 +0100
-From: Francesco Valla <valla.francesco@gmail.com>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	fabio@redaril.me, Linux CAN <linux-can@vger.kernel.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 1/1] Documentation: networking: document CAN ISO-TP
-Message-ID: <ZfR5IXA9tVHgBTva@fedora>
-References: <20240313223445.87170-1-valla.francesco@gmail.com>
- <20240313223445.87170-2-valla.francesco@gmail.com>
- <ZfPUqOVpF8u5738S@archie.me>
+        d=1e100.net; s=20230601; t=1710520994; x=1711125794;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=NnYrkeEuyooTzIwqpfS+gG0pSUcxJ+MtV42LbV77NO8=;
+        b=rkExiv+/cF5q2gGmqrLnkipOGwP49WKm/idO83Ci3Heysj2B2CagOvtjBl/Gpod4by
+         lBdO5vcH395cZJSxCUFSYRONNYOjEVAsQrH6LxkIlQY2hbx++iAJgSvBFH3xwhdK9yxP
+         xwuRu+3Tn4TXUr1Kc7VHBWXUmBjaEbyZ4AzYeqEPtdWYn5DUgKO9SqNb/AiIotxi6x+X
+         4WVNGTgvs1JZXHPiXNPVWVxB/k4yx8HBCAbUzqN+PNBXJKIqOHEYYOmfBvEx72DjTM48
+         jxGA35GtPT7IJRP01uIkrzARBFr74G7xU0YeycRCPCIdNYCZW4AZ/OWUu6igjX5IDMyu
+         hyBg==
+X-Forwarded-Encrypted: i=1; AJvYcCX2yjZPw5zKYVrX10IrA4oJr0sGN6EdABqx9oW5AgJP6JKdJMlG8vnl89LAlWWoUEgNtGluJlg5diF9eMSEPBmbbPrfr6jC
+X-Gm-Message-State: AOJu0YyCI4otHXsRfcQc8NWWIQAdQ+Ip1brRSd4BBGYDY2qlXyz/NVsX
+	OKtYxJhLF675HTuBRp3FRHIFQfe1jHlDvnezVnZJmGgDcws81hKw8Zji8NNw8Ho=
+X-Google-Smtp-Source: AGHT+IHw1pzzO7Lbgj3rvUe5D+ef6Gi98W/ojPiEC7bSUDtyXI2fQLppD6zQr3heqjbpOrSMGqElPA==
+X-Received: by 2002:a05:6e02:1745:b0:366:7443:c9f7 with SMTP id y5-20020a056e02174500b003667443c9f7mr6765962ill.3.1710520993934;
+        Fri, 15 Mar 2024 09:43:13 -0700 (PDT)
+Received: from [192.168.1.116] ([96.43.243.2])
+        by smtp.gmail.com with ESMTPSA id a11-20020a92d34b000000b00366958eb5e8sm505837ilh.74.2024.03.15.09.43.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 15 Mar 2024 09:43:13 -0700 (PDT)
+Message-ID: <ed44cb26-7d23-4391-89c5-0e7b59d019f6@kernel.dk>
+Date: Fri, 15 Mar 2024 10:43:12 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZfPUqOVpF8u5738S@archie.me>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: Do not break out of sk_stream_wait_memory() with
+ TIF_NOTIFY_SIGNAL
+Content-Language: en-US
+To: Sascha Hauer <s.hauer@pengutronix.de>, netdev@vger.kernel.org
+Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>, io-uring@vger.kernel.org
+References: <20240315100159.3898944-1-s.hauer@pengutronix.de>
+From: Jens Axboe <axboe@kernel.dk>
+In-Reply-To: <20240315100159.3898944-1-s.hauer@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 15, 2024 at 11:55:04AM +0700, Bagas Sanjaya wrote:
+On 3/15/24 4:01 AM, Sascha Hauer wrote:
+> It can happen that a socket sends the remaining data at close() time.
+> With io_uring and KTLS it can happen that sk_stream_wait_memory() bails
+> out with -512 (-ERESTARTSYS) because TIF_NOTIFY_SIGNAL is set for the
+> current task. This flag has been set in io_req_normal_work_add() by
+> calling task_work_add().
+> 
+> This patch replaces signal_pending() with task_sigpending(), thus ignoring
+> the TIF_NOTIFY_SIGNAL flag.
 
-<snip>
-> 
-> htmldocs build reports new warnings:
-> 
-> /home/bagas/repo/linux-kernel/Documentation/networking/isotp.rst:3: WARNING: Title overline too short.
-> 
-> ====================
-> ISO-TP (ISO 15765-2) Transport Protocol
-> ====================
-> /home/bagas/repo/linux-kernel/Documentation/networking/isotp.rst:275: WARNING: Title underline too short.
-> 
-> Multi-frame transport support
-> --------------------------
-> /home/bagas/repo/linux-kernel/Documentation/networking/isotp.rst:275: WARNING: Title underline too short.
-> 
-> Multi-frame transport support
-> --------------------------
-> 
-> I have applied the fixup:
-> 
-> ---- >8 ----
-> diff --git a/Documentation/networking/isotp.rst b/Documentation/networking/isotp.rst
-> index d0c49fd1f5c976..a104322ddb6c5e 100644
-> --- a/Documentation/networking/isotp.rst
-> +++ b/Documentation/networking/isotp.rst
-> @@ -1,11 +1,11 @@
->  .. SPDX-License-Identifier: (GPL-2.0 OR BSD-3-Clause)
->  
-> -====================
-> +=======================================
->  ISO-TP (ISO 15765-2) Transport Protocol
-> -====================
-> +=======================================
->  
->  Overview
-> -=========================
-> +========
->  
->  ISO-TP, also known as ISO 15765-2 from the ISO standard it is defined in, is a
->  transport protocol specifically defined for diagnostic communication on CAN.
-> @@ -272,7 +272,7 @@ differ less than this value will be ignored:
->      ret = setsockopt(s, SOL_CAN_ISOTP, CAN_ISOTP_RX_STMIN, &stmin, sizeof(stmin));
->  
->  Multi-frame transport support
-> ---------------------------
-> +-----------------------------
->  
->  The ISO-TP stack contained inside the Linux kernel supports the multi-frame
->  transport mechanism defined by the standard, with the following contraints:
-> 
-> Thanks.
-> 
-> -- 
-> An old man doll... just what I always wanted! - Clara
+Reviewed-by: Jens Axboe <axboe@kernel.dk>
 
-Thank you! Fixes (along with some rework) will be applied to the v2.
+Should probably also flag this for stable, 5.10+ I think as the task
+sigpending got backported that far.
 
-Regards,
-Francesco
+-- 
+Jens Axboe
 
 
