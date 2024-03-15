@@ -1,94 +1,144 @@
-Return-Path: <netdev+bounces-80064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 236B987CD27
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 13:20:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E532687CD4E
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 13:33:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1E311F22891
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 12:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AC481C20F5E
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 12:33:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67A7D1C298;
-	Fri, 15 Mar 2024 12:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 733CB1AADF;
+	Fri, 15 Mar 2024 12:33:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IAIN5NIf"
+	dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b="KGhPZOUK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mail.codelabs.ch (mail.codelabs.ch [109.202.192.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D9881C280;
-	Fri, 15 Mar 2024 12:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81051A38E1
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 12:33:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.202.192.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710505229; cv=none; b=nqunSb0wAD+ZH/qHJU9klu9ziKxW7gN4g6k69pwWrUVzVvR19NgB4Q2gjZ4mFEe4OWAdsajir2sH+yKY9fYQeHAu4NmDM2Aku2SB0hOvt+pJ3r9tb27BS246RTPyDD7PrruF78+oA3M6HaQtZUFQN57OiwQYnI8JAVfbth7znjU=
+	t=1710505999; cv=none; b=dw86GyVbeGolI8q6z+JjTr1Vso+3wdjA6k+AfaYRUciCASV2JnZtSq+GMuIXsqhzkqoT9lfrYxi27xher/GFjMumVcXGvtMiGmG3+BL7EZvHV/dWpYwuRJAast3eKAUeTX/aBruPdkJebCJXoaEPtd31dIanDykOVajHk3ki5Ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710505229; c=relaxed/simple;
-	bh=71GAZqdw0qD1crd2WpK4nj51QmylewCnjCcyToSY0Ow=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=iu6BIcjrBYo3SZwWSGEVIvsEc4aW3Yyk/0lgpRjUmYDjCnYk8cJ0TUT8Q9awlSFejSJgPYPjp0h2wzYE0UeMKc9r/i7fqgByUzDvfqO5UGpng2UrSIsbzI9j/N0wK3DOT8Qf03/AYpbpWJtOn2mSGeG25fYhiliFt0WKcM1Nd8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IAIN5NIf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B45DBC43390;
-	Fri, 15 Mar 2024 12:20:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710505228;
-	bh=71GAZqdw0qD1crd2WpK4nj51QmylewCnjCcyToSY0Ow=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IAIN5NIf86XFDLNo295h/mV58FKRf+bzng+hR6J/7BV2gHu+nqFgIvGAVlgqSwXSf
-	 Nlakhs4eJCGXmWFX5DlZxJVtK7b+KPhLYNEIty0eEPaNQSxrwZrHlw8gDKyLwG4FQl
-	 Yds3zfdb3DRLDWZ2SBryMjfBUl4gw3emYbAJIz5x5mV8oCBkzjHHZg6pmIJGEd1uZs
-	 O8cp6PiyZtAPxmpyDfd2wIyu6qKEJBWi7pKcAQM76tetUtY9SQIkyOJsk44kmwajgy
-	 xeLNezYbkiuhnBV1eOhGOrCyftsT5ahcbSmF6jGpgoj7o3sNR449SmrQdqHMFArTpt
-	 0KB26vRbWJjAQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A2FF6D84BA8;
-	Fri, 15 Mar 2024 12:20:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1710505999; c=relaxed/simple;
+	bh=TeThsepKwcYMzi6vRV1ofdWBdRt+ego0RAk4qLIWwN0=;
+	h=Message-ID:Date:MIME-Version:From:To:Cc:Subject:Content-Type; b=cC4nCp4iTKvDX6DCZkAzSB2h2ANebK8H3mX77kaIf5YDRbz7djtHbhhdA3OJ3e7aNq8SsMfdGUmT6f3YL1e65oOP/SiQRpCUBdKmvOVTkod6HWwAZEzzV27eA16ud1XSnAzkuQlcnfWczAAkVLUC+h2B2g4xl6bF+L9LLUvCGvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org; spf=pass smtp.mailfrom=strongswan.org; dkim=pass (2048-bit key) header.d=strongswan.org header.i=@strongswan.org header.b=KGhPZOUK; arc=none smtp.client-ip=109.202.192.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=strongswan.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strongswan.org
+Received: from localhost (localhost [127.0.0.1])
+	by mail.codelabs.ch (Postfix) with ESMTP id F3EDB633E5;
+	Fri, 15 Mar 2024 13:25:50 +0100 (CET)
+Received: from mail.codelabs.ch ([127.0.0.1])
+ by localhost (fenrir.codelabs.ch [127.0.0.1]) (amavis, port 10024) with ESMTP
+ id ZWz9QZs-HPlc; Fri, 15 Mar 2024 13:25:48 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=strongswan.org;
+	s=default; t=1710505548;
+	bh=TeThsepKwcYMzi6vRV1ofdWBdRt+ego0RAk4qLIWwN0=;
+	h=Date:From:To:Cc:Subject:From;
+	b=KGhPZOUKGvRwOgLWn/bd4hah0kusbO8tVLmdsGB/POHKsa40gmdW4Ujpkb+iD1npZ
+	 /YTvysdW3nbhHOwmkJeouODXZkFtmYJLpj+Whgelrr8V2ElcHg4y4UmXITjsYqbrHm
+	 nw2DYjIxtdQdsImSMcqXyZFip3HrnIFaW1BtmEp3EJ5wqHAiYsCoFGtqpK7pKEW+dJ
+	 zu5TSff/N7/D/yk++pq5GC7xMzq/NrLdIjsade2LiRLOxN9kWY8eBgZWUGOVRWLD6n
+	 d85P0bjpwT9Vq0yrQb4tbpXUzz4cK1+AnrUfrK/ei2762OPrB6A+zeu+DT4wb3cDgu
+	 Q6MS0yjF3idUw==
+Received: from [IPV6:2a01:8b81:5400:f500:d47c:2824:818f:c8a] (unknown [IPv6:2a01:8b81:5400:f500:d47c:2824:818f:c8a])
+	by mail.codelabs.ch (Postfix) with ESMTPSA id 556A7633CC;
+	Fri, 15 Mar 2024 13:25:48 +0100 (CET)
+Message-ID: <4f0d0955-8bfc-486e-a44f-0e12af8a403f@strongswan.org>
+Date: Fri, 15 Mar 2024 13:25:48 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 1/1] net: stmmac: dwmac-rk: Remove unused of_gpio.h
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171050522866.5558.8897544477408916350.git-patchwork-notify@kernel.org>
-Date: Fri, 15 Mar 2024 12:20:28 +0000
-References: <20240313140057.2088667-1-andriy.shevchenko@linux.intel.com>
-In-Reply-To: <20240313140057.2088667-1-andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: sebastian.reichel@collabora.com, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com
+User-Agent: Mozilla Thunderbird
+Content-Language: en-US, de-CH-frami
+From: Tobias Brunner <tobias@strongswan.org>
+To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, Steffen Klassert <steffen.klassert@secunet.com>,
+ Herbert Xu <herbert@gondor.apana.org.au>
+Autocrypt: addr=tobias@strongswan.org; keydata=
+ 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
+ tvkh7XWO2ycrW1UlzUzM4KV3SDLIhfOU
+Subject: [PATCH net] ipv4: raw: Fix sending packets from raw sockets via IPsec
+ tunnels
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
+Since the referenced commit, the xfrm_inner_extract_output() function
+uses the skb's protocol field to determine the address family.  So not
+setting it for IPv4 raw sockets meant that such packets couldn't be
+tunneled via IPsec anymore.
 
-This patch was applied to netdev/net-next.git (main)
-by David S. Miller <davem@davemloft.net>:
+IPv6 raw sockets are not affected as they already set the protocol since
+9c9c9ad5fae7 ("ipv6: set skb->protocol on tcp, raw and ip6_append_data
+genereated skbs").
 
-On Wed, 13 Mar 2024 16:00:57 +0200 you wrote:
-> of_gpio.h is deprecated and subject to remove.
-> The driver doesn't use it, simply remove the unused header.
-> 
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-> ---
->  drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 2 --
->  1 file changed, 2 deletions(-)
+Fixes: 5f24f41e8ea6 ("xfrm: Remove inner/outer modes from input path")
+Signed-off-by: Tobias Brunner <tobias@strongswan.org>
+---
+ net/ipv4/raw.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-Here is the summary with links:
-  - [v1,1/1] net: stmmac: dwmac-rk: Remove unused of_gpio.h
-    https://git.kernel.org/netdev/net-next/c/19c5c04d3178
-
-You are awesome, thank you!
+diff --git a/net/ipv4/raw.c b/net/ipv4/raw.c
+index 42ac434cfcfa..322e389021c3 100644
+--- a/net/ipv4/raw.c
++++ b/net/ipv4/raw.c
+@@ -357,6 +357,7 @@ static int raw_send_hdrinc(struct sock *sk, struct flowi4 *fl4,
+ 		goto error;
+ 	skb_reserve(skb, hlen);
+ 
++	skb->protocol = htons(ETH_P_IP);
+ 	skb->priority = READ_ONCE(sk->sk_priority);
+ 	skb->mark = sockc->mark;
+ 	skb->tstamp = sockc->transmit_time;
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
