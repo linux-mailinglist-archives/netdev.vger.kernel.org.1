@@ -1,275 +1,187 @@
-Return-Path: <netdev+bounces-80060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D048D87CC8B
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 12:41:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B69E87CCF0
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 12:49:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4B3C31F21D35
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 11:41:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EFEA1C21814
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 11:49:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889CC1B940;
-	Fri, 15 Mar 2024 11:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA0041C294;
+	Fri, 15 Mar 2024 11:48:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b="iz5jHFZq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XoypR1av"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB4C36B15;
-	Fri, 15 Mar 2024 11:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3952D1BC4D
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 11:48:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710502751; cv=none; b=Qk3BeWUmizX9MdwR3KgBxrJ0gNCSTz2NT6KCxnhqC20DFb/cDOYPDkQIRUh9r+zTNFXhzjWxlJnFVRIxaSPx+DSIFi62V29ORmk3E2COZsKPa1dzzNNQ4tF+Yi6pbZGB5YxYHHvQwd3d92+n2HU6zjKBo6hlLGZjjMlQlYbFtCw=
+	t=1710503338; cv=none; b=Kj2eTpu8f2qplg82lRo1iiLI4XipwIF/qDMg1Q75MaZt5cG/yYhOaRoctu85WMO3S1Sug4AzfqxPAMejtArjfPJ+XzIn0mB4jjTTjf14vTnhRBspf2Z73SFHVhCIlycZH//6DuAVmsnkFvCP5GW8KRtGwbkumfNqJ1GyWIXnqb4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710502751; c=relaxed/simple;
-	bh=v58AhsmmQT/EbyS8YFz+dOXWE+1LCHneaLwzLK8avl8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T3bs5N+earuqQsw3+5hXSH5Nwsss8aCIBxtKHHxqsSZr6Pq6qqaVvKt8IIoc2PGbYx59xETqvGuvt/xUE4lRPbDoMIzX04UMeE/mK5svJn9SowhuvkJLdqcy7lGZ5c9++OA0zhlTszpkgI081tnqaqnkUbREEWYF9ZsZ+AVNFks=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com; spf=pass smtp.mailfrom=googlemail.com; dkim=pass (2048-bit key) header.d=googlemail.com header.i=@googlemail.com header.b=iz5jHFZq; arc=none smtp.client-ip=209.85.167.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=googlemail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=googlemail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-513da1c1f26so803715e87.3;
-        Fri, 15 Mar 2024 04:39:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20230601; t=1710502748; x=1711107548; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Oep7fiSPFUB4mUGU2hN2D+vBrhzRF1VLsba4TSKYhR0=;
-        b=iz5jHFZqVQ7paGV1QpmDKiLWSD0Qr2vOihEIItoQDzGZjUoH7px4N8/n0ZpRmeopFm
-         OUfgbXaltNyWUtewR8Ec62PT0OMd7Ef+kZKkX1Db5/ylvhlB4zSjP5lxtDnIwz4kukXc
-         i2RcvbrwpzBA2pedj90ZTg03x4Y3WCmB+DtjMbA0+XEeaRIEr/9gYYGBmqiLn7ZTIeSv
-         JeTxXCh2fcPgquUBsy/Hu/HLnPR+o0XRY/yC46ALY3N265DGu/vkU1ZC4mmGa9k3nuq+
-         MemcWkJ4AXol56UOQ+NNgl8ji0gYS1PdQjUY9Uca+v2RANtu+4/qO0Po1f7zpYEfNW4c
-         37ew==
+	s=arc-20240116; t=1710503338; c=relaxed/simple;
+	bh=xwGKfZufaUhiXCXYsJDtgBgzcdvqo9CJ7vHMJisCpaw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=l4L51BfNAeaVdeQm5+qqkWVTq3F/EAjPDCuut6aa1Vi900KmvFC+yCzG8MzZCGYBJot93weCqa9lMK0LqpbbgVDW8MBOdoIe9pJ3yknhLlks1oah3y0V8ODB2Y+kNG0KTPZAKqks4C7dBMBGcbhXWszJSvynVPM4Lulqp+EoouU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XoypR1av; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710503334;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8xwyrO4Nw6XTQrs6yfETpHuCrbfSZVrTnmqnSwO+IBo=;
+	b=XoypR1avg8kOwcHJfAqr3swqMR0IAlus5EAo821RkhxfZkStyS99WqMJynXr5Z8l7aIJB7
+	QEEshSlVwvz7OOleuOVfUsZGOs8TzQNrYoFPZofsJbw0yHwrYeTT4vWAT7JCgQvf9wb4p4
+	kY8/AC4m+Nil00ZLBHih8PKgVnFjbG8=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-460-EjYmC7XnOK2DuP1DOQp9rg-1; Fri, 15 Mar 2024 07:48:52 -0400
+X-MC-Unique: EjYmC7XnOK2DuP1DOQp9rg-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a462e4d8c44so95897066b.1
+        for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 04:48:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710502748; x=1711107548;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Oep7fiSPFUB4mUGU2hN2D+vBrhzRF1VLsba4TSKYhR0=;
-        b=AuixkN+UFFA71GTOPPqxV/Qs3lLjeLM+Kpg8pi2MkfSesgme4hxogXko9VlY3qkmnx
-         lx8AQV0fJWk9wSLRUZFbOnxcOcwipO6eXia332wtUYqFqfksFhodq0SOXfSmZn8ZypbB
-         yIXp8IHlZWgz06JOZMZwLAFlc4/79adY/QCfqvYHbxbs8g3GtOZbuxWZNz7BizV+tGbv
-         /yNB+JF+iurLCih5hkkXSmOzRCM2hBTUORp5RMMAVOA/wEpfzFFWoOvRx2u2r6c40qv7
-         AAW4FiOtpvoayJy2r0dLnXhU2XM8Dj8ZYOFhd1ycIKgnEKn8eLHbJfo/Q5uVOs/obdR5
-         TTvg==
-X-Forwarded-Encrypted: i=1; AJvYcCUXGOnskgvZP8AkqENjQmuBndmxCaOrtTKBOSgZVOvM3ikpzE83vma+fq9vkbxozkLwAmE+7tvFAzBZTDGWGIOtfqXixd6fd0La7gIWJeHFBkUAvI1WRdWasNEnnofVh11VE1eqwfnzxCPM+ReqjTA463sHoBXoJYWyHvoMdeIXL+l6e+IizBkx0Qs42CzyNFeWunn+6A==
-X-Gm-Message-State: AOJu0YxT3NS4yotcAiIbc0w+vYJOG1DPsZwBSRczNsOxvkKx4YytdRBB
-	twi2zScNwApSUV/hD/27n0wvUYfWZMGk3sHhi9Mo7Z7dcFwEkV8h98VEJtPLq8uG2g==
-X-Google-Smtp-Source: AGHT+IH2SgThAHXr+8wzksbodsMSKaWmVuuNHL/aCI6V/7GnUQ8/ngvOSLVSaHYnNCgiKx6GrAZoQA==
-X-Received: by 2002:a2e:a7c4:0:b0:2d4:83f9:2e21 with SMTP id x4-20020a2ea7c4000000b002d483f92e21mr1975031ljp.42.1710502747344;
-        Fri, 15 Mar 2024 04:39:07 -0700 (PDT)
-Received: from ddev.DebianHome (dynamic-095-119-217-226.95.119.pool.telefonica.de. [95.119.217.226])
-        by smtp.gmail.com with ESMTPSA id fg3-20020a056402548300b005682f47aea7sm1610024edb.94.2024.03.15.04.39.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Mar 2024 04:39:06 -0700 (PDT)
-From: =?UTF-8?q?Christian=20G=C3=B6ttsche?= <cgzones@googlemail.com>
-To: linux-security-module@vger.kernel.org
-Cc: Miquel Raynal <miquel.raynal@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	David Ahern <dsahern@kernel.org>,
-	David Howells <dhowells@redhat.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Abel Wu <wuyun.abel@bytedance.com>,
-	Breno Leitao <leitao@debian.org>,
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Daan De Meyer <daan.j.demeyer@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-wpan@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH 08/10] net: use new capable_any functionality
-Date: Fri, 15 Mar 2024 12:37:29 +0100
-Message-ID: <20240315113828.258005-8-cgzones@googlemail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240315113828.258005-1-cgzones@googlemail.com>
-References: <20240315113828.258005-1-cgzones@googlemail.com>
+        d=1e100.net; s=20230601; t=1710503331; x=1711108131;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8xwyrO4Nw6XTQrs6yfETpHuCrbfSZVrTnmqnSwO+IBo=;
+        b=bWhvivJWWS7r7/X/nGWkPAbNBixG25Mntsem4XIkKbX13+Akg/ytjOuDir+p7DpGWP
+         Wf8dOxoQh60niXp5hZZ/lvFUbolqJlPc/0lpEV6vyMd4KVuXOgDkaAHox/Q3KIDalJmh
+         zQxN7T+auraQout0TSPzuAqmnU+Jajdd9GFlxWWLOmqb8LEJhDhiNp/vwPsdgiP15bKw
+         Nf2KRZo7KxZ+JtQUVcSYi7tavvzYk1B6nNEKLbA5TX7EOYCTSU4gkg9cxR5x8wgTNrL0
+         6w2RJ9zrDXqtqjsBZ9dcDYPTcBpSiamZaGLcasKNG3w2kVRXLrYp9lVYKPUOd/83iWiY
+         Xsgw==
+X-Forwarded-Encrypted: i=1; AJvYcCWje6zJZDNeyfsG0YEFBaQDWm+GTHyFJ5GhfNRG6jEinH1IxfFc9pCYtyjO891+FwlMUc9odLQsXJ3YLe+M377NeFB9h4+s
+X-Gm-Message-State: AOJu0YyfWIWnNd3ngSui25SNXiJFKsXYV+P7qpn4+78T1mzMvYSUgt6G
+	kVn1B4P0iM1P0RoKMWzwgnROlGLEaV3LGkIvlU+oOV1pOSMW8oO3opYliqsb8I7o+XW/Rdsv4I3
+	E4xXNJtA/ThT87vxyt+Dka/MtQohFcbFPP8j750IN5UzmU9oGKuUL6g==
+X-Received: by 2002:a17:906:6bd4:b0:a44:1e32:a503 with SMTP id t20-20020a1709066bd400b00a441e32a503mr3190478ejs.22.1710503331518;
+        Fri, 15 Mar 2024 04:48:51 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IG4rijzPw95HZZMGtM6WYg0TbO/IMk3iMsl8cBCJ65BDgxDM5NoP6dJg1i0hsPqej4NTsP76Q==
+X-Received: by 2002:a17:906:6bd4:b0:a44:1e32:a503 with SMTP id t20-20020a1709066bd400b00a441e32a503mr3190455ejs.22.1710503331020;
+        Fri, 15 Mar 2024 04:48:51 -0700 (PDT)
+Received: from maya.cloud.tilaa.com (maya.cloud.tilaa.com. [164.138.29.33])
+        by smtp.gmail.com with ESMTPSA id bw9-20020a170906c1c900b00a4650ec48d0sm1645765ejb.140.2024.03.15.04.48.49
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 15 Mar 2024 04:48:49 -0700 (PDT)
+Date: Fri, 15 Mar 2024 12:48:08 +0100
+From: Stefano Brivio <sbrivio@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, jiri@resnulli.us, idosch@idosch.org,
+ johannes@sipsolutions.net, fw@strlen.de, pablo@netfilter.org, Martin Pitt
+ <mpitt@redhat.com>, Paul Holzinger <pholzing@redhat.com>, David Gibson
+ <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH net-next v2 3/3] genetlink: fit NLMSG_DONE into same
+ read() as families
+Message-ID: <20240315124808.033ff58d@elisabeth>
+In-Reply-To: <20240303052408.310064-4-kuba@kernel.org>
+References: <20240303052408.310064-1-kuba@kernel.org>
+	<20240303052408.310064-4-kuba@kernel.org>
+Organization: Red Hat
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.36; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Use the new added capable_any function in appropriate cases, where a
-task is required to have any of two capabilities.
+Hi,
 
-Add sock_ns_capable_any() wrapper similar to existing sock_ns_capable()
-one.
+On Sat,  2 Mar 2024 21:24:08 -0800
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-Reorder CAP_SYS_ADMIN last.
+> Make sure ctrl_fill_info() returns sensible error codes and
+> propagate them out to netlink core. Let netlink core decide
+> when to return skb->len and when to treat the exit as an
+> error. Netlink core does better job at it, if we always
+> return skb->len the core doesn't know when we're done
+> dumping and NLMSG_DONE ends up in a separate read().
 
-Signed-off-by: Christian Göttsche <cgzones@googlemail.com>
-Reviewed-by: Miquel Raynal <miquel.raynal@bootlin.com> (ieee802154 portion)
----
-v4:
-  - introduce sockopt_ns_capable_any()
-v3:
-  - rename to capable_any()
-  - make use of ns_capable_any
----
- include/net/sock.h       |  1 +
- net/caif/caif_socket.c   |  2 +-
- net/core/sock.c          | 15 +++++++++------
- net/ieee802154/socket.c  |  6 ++----
- net/ipv4/ip_sockglue.c   |  5 +++--
- net/ipv6/ipv6_sockglue.c |  3 +--
- net/unix/af_unix.c       |  2 +-
- 7 files changed, 18 insertions(+), 16 deletions(-)
+While this change is obviously correct, it breaks... well, broken
+applications that _wrongly_ rely on the fact that NLMSG_DONE is
+delivered in a separate datagram.
 
-diff --git a/include/net/sock.h b/include/net/sock.h
-index b5e00702acc1..2e64a80c8fca 100644
---- a/include/net/sock.h
-+++ b/include/net/sock.h
-@@ -1736,6 +1736,7 @@ static inline void unlock_sock_fast(struct sock *sk, bool slow)
- void sockopt_lock_sock(struct sock *sk);
- void sockopt_release_sock(struct sock *sk);
- bool sockopt_ns_capable(struct user_namespace *ns, int cap);
-+bool sockopt_ns_capable_any(struct user_namespace *ns, int cap1, int cap2);
- bool sockopt_capable(int cap);
- 
- /* Used by processes to "lock" a socket state, so that
-diff --git a/net/caif/caif_socket.c b/net/caif/caif_socket.c
-index 039dfbd367c9..2d811037e378 100644
---- a/net/caif/caif_socket.c
-+++ b/net/caif/caif_socket.c
-@@ -1026,7 +1026,7 @@ static int caif_create(struct net *net, struct socket *sock, int protocol,
- 		.usersize = sizeof_field(struct caifsock, conn_req.param)
- 	};
- 
--	if (!capable(CAP_SYS_ADMIN) && !capable(CAP_NET_ADMIN))
-+	if (!capable_any(CAP_NET_ADMIN, CAP_SYS_ADMIN))
- 		return -EPERM;
- 	/*
- 	 * The sock->type specifies the socket type to use.
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 43bf3818c19e..fa9edcc3e23d 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -1077,6 +1077,12 @@ bool sockopt_ns_capable(struct user_namespace *ns, int cap)
- }
- EXPORT_SYMBOL(sockopt_ns_capable);
- 
-+bool sockopt_ns_capable_any(struct user_namespace *ns, int cap1, int cap2)
-+{
-+	return has_current_bpf_ctx() || ns_capable_any(ns, cap1, cap2);
-+}
-+EXPORT_SYMBOL(sockopt_ns_capable_any);
-+
- bool sockopt_capable(int cap)
- {
- 	return has_current_bpf_ctx() || capable(cap);
-@@ -1118,8 +1124,7 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 	switch (optname) {
- 	case SO_PRIORITY:
- 		if ((val >= 0 && val <= 6) ||
--		    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) ||
--		    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
-+		    sockopt_ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
- 			sock_set_priority(sk, val);
- 			return 0;
- 		}
-@@ -1422,8 +1427,7 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
- 		break;
- 
- 	case SO_MARK:
--		if (!sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
--		    !sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
-+		if (!sockopt_ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
- 			ret = -EPERM;
- 			break;
- 		}
-@@ -2813,8 +2817,7 @@ int __sock_cmsg_send(struct sock *sk, struct cmsghdr *cmsg,
- 
- 	switch (cmsg->cmsg_type) {
- 	case SO_MARK:
--		if (!ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
--		    !ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
-+		if (!ns_capable_any(sock_net(sk)->user_ns, CAP_NET_RAW, CAP_NET_ADMIN))
- 			return -EPERM;
- 		if (cmsg->cmsg_len != CMSG_LEN(sizeof(u32)))
- 			return -EINVAL;
-diff --git a/net/ieee802154/socket.c b/net/ieee802154/socket.c
-index 990a83455dcf..42b3b12eb493 100644
---- a/net/ieee802154/socket.c
-+++ b/net/ieee802154/socket.c
-@@ -902,8 +902,7 @@ static int dgram_setsockopt(struct sock *sk, int level, int optname,
- 		ro->want_lqi = !!val;
- 		break;
- 	case WPAN_SECURITY:
--		if (!ns_capable(net->user_ns, CAP_NET_ADMIN) &&
--		    !ns_capable(net->user_ns, CAP_NET_RAW)) {
-+		if (!ns_capable_any(net->user_ns, CAP_NET_ADMIN, CAP_NET_RAW)) {
- 			err = -EPERM;
- 			break;
- 		}
-@@ -926,8 +925,7 @@ static int dgram_setsockopt(struct sock *sk, int level, int optname,
- 		}
- 		break;
- 	case WPAN_SECURITY_LEVEL:
--		if (!ns_capable(net->user_ns, CAP_NET_ADMIN) &&
--		    !ns_capable(net->user_ns, CAP_NET_RAW)) {
-+		if (!ns_capable_any(net->user_ns, CAP_NET_ADMIN, CAP_NET_RAW)) {
- 			err = -EPERM;
- 			break;
- 		}
-diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
-index cf377377b52d..5a1e5ee20ddd 100644
---- a/net/ipv4/ip_sockglue.c
-+++ b/net/ipv4/ip_sockglue.c
-@@ -1008,8 +1008,9 @@ int do_ip_setsockopt(struct sock *sk, int level, int optname,
- 		inet_assign_bit(MC_ALL, sk, val);
- 		return 0;
- 	case IP_TRANSPARENT:
--		if (!!val && !sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) &&
--		    !sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN))
-+		if (!!val &&
-+		    !sockopt_ns_capable_any(sock_net(sk)->user_ns,
-+					    CAP_NET_RAW, CAP_NET_ADMIN))
- 			return -EPERM;
- 		if (optlen < 1)
- 			return -EINVAL;
-diff --git a/net/ipv6/ipv6_sockglue.c b/net/ipv6/ipv6_sockglue.c
-index d4c28ec1bc51..e46b11b5d3dd 100644
---- a/net/ipv6/ipv6_sockglue.c
-+++ b/net/ipv6/ipv6_sockglue.c
-@@ -773,8 +773,7 @@ int do_ipv6_setsockopt(struct sock *sk, int level, int optname,
- 		break;
- 
- 	case IPV6_TRANSPARENT:
--		if (valbool && !sockopt_ns_capable(net->user_ns, CAP_NET_RAW) &&
--		    !sockopt_ns_capable(net->user_ns, CAP_NET_ADMIN)) {
-+		if (valbool && !sockopt_ns_capable_any(net->user_ns, CAP_NET_RAW, CAP_NET_ADMIN)) {
- 			retv = -EPERM;
- 			break;
- 		}
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 5b41e2321209..acc36b2d25d7 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -1783,7 +1783,7 @@ static inline bool too_many_unix_fds(struct task_struct *p)
- 	struct user_struct *user = current_user();
- 
- 	if (unlikely(READ_ONCE(user->unix_inflight) > task_rlimit(p, RLIMIT_NOFILE)))
--		return !capable(CAP_SYS_RESOURCE) && !capable(CAP_SYS_ADMIN);
-+		return !capable_any(CAP_SYS_RESOURCE, CAP_SYS_ADMIN);
- 	return false;
- }
- 
--- 
-2.43.0
+This was the (embarrassing) case for passt(1), which I just fixed:
+  https://archives.passt.top/passt-dev/20240315112432.382212-1-sbrivio@redh=
+at.com/
+
+but the "separate" NLMSG_DONE is such an established behaviour,
+I think, that this might raise a more general concern.
+
+=46rom my perspective, I'm just happy that this change revealed the
+issue, but I wanted to report this anyway in case somebody has
+similar possible breakages in mind.
+
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: jiri@resnulli.us
+> ---
+>  net/netlink/genetlink.c | 12 +++++++-----
+>  1 file changed, 7 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/net/netlink/genetlink.c b/net/netlink/genetlink.c
+> index 50ec599a5cff..3b7666944b11 100644
+> --- a/net/netlink/genetlink.c
+> +++ b/net/netlink/genetlink.c
+> @@ -1232,7 +1232,7 @@ static int ctrl_fill_info(const struct genl_family =
+*family, u32 portid, u32 seq,
+> =20
+>  	hdr =3D genlmsg_put(skb, portid, seq, &genl_ctrl, flags, cmd);
+>  	if (hdr =3D=3D NULL)
+> -		return -1;
+> +		return -EMSGSIZE;
+> =20
+>  	if (nla_put_string(skb, CTRL_ATTR_FAMILY_NAME, family->name) ||
+>  	    nla_put_u16(skb, CTRL_ATTR_FAMILY_ID, family->id) ||
+> @@ -1355,6 +1355,7 @@ static int ctrl_dumpfamily(struct sk_buff *skb, str=
+uct netlink_callback *cb)
+>  	struct net *net =3D sock_net(skb->sk);
+>  	int fams_to_skip =3D cb->args[0];
+>  	unsigned int id;
+> +	int err =3D 0;
+> =20
+>  	idr_for_each_entry(&genl_fam_idr, rt, id) {
+>  		if (!rt->netnsok && !net_eq(net, &init_net))
+> @@ -1363,16 +1364,17 @@ static int ctrl_dumpfamily(struct sk_buff *skb, s=
+truct netlink_callback *cb)
+>  		if (n++ < fams_to_skip)
+>  			continue;
+> =20
+> -		if (ctrl_fill_info(rt, NETLINK_CB(cb->skb).portid,
+> -				   cb->nlh->nlmsg_seq, NLM_F_MULTI,
+> -				   skb, CTRL_CMD_NEWFAMILY) < 0) {
+> +		err =3D ctrl_fill_info(rt, NETLINK_CB(cb->skb).portid,
+> +				     cb->nlh->nlmsg_seq, NLM_F_MULTI,
+> +				     skb, CTRL_CMD_NEWFAMILY);
+> +		if (err) {
+>  			n--;
+>  			break;
+>  		}
+>  	}
+> =20
+>  	cb->args[0] =3D n;
+> -	return skb->len;
+> +	return err;
+>  }
+> =20
+>  static struct sk_buff *ctrl_build_family_msg(const struct genl_family *f=
+amily,
+
+--=20
+Stefano
 
 
