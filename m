@@ -1,177 +1,110 @@
-Return-Path: <netdev+bounces-80155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3EE787D364
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 19:11:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3126B87D3A9
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 19:34:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00FB71C20C26
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 18:11:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAC51284A63
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 18:34:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D307F4E1C1;
-	Fri, 15 Mar 2024 18:11:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC08FC1C;
+	Fri, 15 Mar 2024 18:34:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="ucF35Ds0"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vgG9rOHu"
 X-Original-To: netdev@vger.kernel.org
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D9934D9F5;
-	Fri, 15 Mar 2024 18:11:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50E648F6D
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 18:34:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710526301; cv=none; b=SDbTg++xmng4DnVZwovCtvt4oGM3u3KMQfPe5BPv4UJjcb7ZSFeU2w1Q+AWE9FfmCw/5Pl4MLMLdGLzWxKnf8eYsIwViYTTmDZsX0kyaElwB+Gt+9JT+6ALwKn6GS54XRdf2vgbov7QlSmOYmk1WkdcEgUvys3wSZK8/1OloPXU=
+	t=1710527664; cv=none; b=dwKTFkUYojk0yC8qgEAWTBpFwOQb+7RdBIMDgj4Ze5foolnltN8OvR5DcqU+L5FDtJTFcRPRWg8gvT9hNioNUBrS/31TdBk653pTjWNc/4WkinkSxoeVrycxuUiTY9MVe0Kh81ZuF8L0MXyxsiDkJ+X6PTLa/C860ll2JleG6/k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710526301; c=relaxed/simple;
-	bh=yZAVxfJujoi4wcGgrDoEtqKa9Pt1OYmQDrNQKqMs0s4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=DjnUkxoGkzVk+ZX6ZzVDxSbopppy9wLXxkB4T7eiDJjciYd29YB3UPjr8KtsG99SbIYxzd8cJGcauMJwQACwhqlr4yF+hhkPie3qiDiOxz+bew40E2ZjzpxV3Tp5N04YSny2NSYuw5yvFk2hkqjGLs6JGVccytqPVdo3xlwPG8M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=ucF35Ds0; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1710526295;
-	bh=yZAVxfJujoi4wcGgrDoEtqKa9Pt1OYmQDrNQKqMs0s4=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=ucF35Ds0DIHLCoevee8XQOvskfRQ3rlnOnUnTs1Hvt5UDuGZML+Xfq8Pcgbu4/6hA
-	 ogYGa9fK3A0W8USkUaPtdJsAzKTFJuXP4kRKmgvmUavhB/enUmSQmQDexsagojcsTE
-	 oWZ8NEU3nCLIr/tG2puHOitgwNCO247mQLs+EaaQ=
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Fri, 15 Mar 2024 19:11:31 +0100
-Subject: [PATCH v3 2/2] sysctl: treewide: constify argument
- ctl_table_root::permissions(table)
+	s=arc-20240116; t=1710527664; c=relaxed/simple;
+	bh=f1MflJg0i2dTYFfJ/FvCXugz7LXWLRqLl9XukgJO8sE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=O2AHhdSfQTU292ydnxhtaCXrbUEFEk84YmDvkGuAGGvaFr7UcQsSL17DKHpak2W0gGwLopJxubc/piAQ01WIamhGb0OQyOWGoOnDyHFr5AQ9x5WFUNRZaaKe7n59zJcN7EOzlf4gd/+MVmghUIFKSvSaVg9vmKlkGUnenUdcdDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vgG9rOHu; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c8727ba1-0d8b-4c42-a4b1-e98bed061b22@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1710527660;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zwS8ifPQAGz1J3Hq6rVc1WHZcxma52yVomkFbeLKS2s=;
+	b=vgG9rOHuxmCKaF8xIhfHf8fAEHOjraC0qZ2aRwEMFTxOuLTarOI2hdc5rm9lRh+ThmOmS6
+	FNZGtOkmKRgPXu5ZnDn9bnfwz+JD8qeISh2MQ8eFBpNzG8z2rnmJDKpMgznz+X7mS4/CU2
+	tW+s9N6w/ziM1+D788Trt2x/egeak68=
+Date: Fri, 15 Mar 2024 11:34:06 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20240315-sysctl-const-ownership-v3-2-b86680eae02e@weissschuh.net>
-References: <20240315-sysctl-const-ownership-v3-0-b86680eae02e@weissschuh.net>
-In-Reply-To: <20240315-sysctl-const-ownership-v3-0-b86680eae02e@weissschuh.net>
-To: Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <keescook@chromium.org>, 
- Joel Granados <j.granados@samsung.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+Subject: Re: [PATCH bpf-next v3 2/2] bpf: Check return from set_memory_rox()
+Content-Language: en-US
+To: Kui-Feng Lee <sinquersw@gmail.com>
+Cc: bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ Kees Cook <keescook@chromium.org>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Zi Shen Lim <zlim.lnx@gmail.com>,
+ Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ Kui-Feng Lee <thinker.li@gmail.com>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1710526294; l=3547;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=yZAVxfJujoi4wcGgrDoEtqKa9Pt1OYmQDrNQKqMs0s4=;
- b=VkF+cll2VnMifjDikxSZHzdX0SlbUsfl03rU48ltG+5ANjQmVNJFm297JBiHElG0ojh4ptCFg
- 6g/xnUHmT8KAtlfPMwo0rC96BlF/0PaGQDX3Wd1To46bM3xgD2OeIjM
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+References: <2b9fdb119ef73cfa4516572026ba4936e86aedca.1710522112.git.christophe.leroy@csgroup.eu>
+ <4d7cc25e937403ac61ae61be06f998f27e631a65.1710522112.git.christophe.leroy@csgroup.eu>
+ <81492d37-47b2-4fca-ba2f-9528c2d41029@gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <81492d37-47b2-4fca-ba2f-9528c2d41029@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-The permissions callback is not supposed to modify the ctl_table.
-Enforce this expectation via the typesystem.
+On 3/15/24 11:11 AM, Kui-Feng Lee wrote:
+>> --- a/kernel/bpf/bpf_struct_ops.c
+>> +++ b/kernel/bpf/bpf_struct_ops.c
+>> @@ -742,8 +742,11 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map 
+>> *map, void *key,
+>>           if (err)
+>>               goto reset_unlock;
+>>       }
+>> -    for (i = 0; i < st_map->image_pages_cnt; i++)
+>> -        arch_protect_bpf_trampoline(st_map->image_pages[i], PAGE_SIZE);
+>> +    for (i = 0; i < st_map->image_pages_cnt && !err; i++)
+>> +        err = arch_protect_bpf_trampoline(st_map->image_pages[i], PAGE_SIZE);
+>> +
+>> +    if (err)
+> 
+> nit: Can it be more specific? I mean to check err < 0, so we can reason
+> that this function never returns a positive value other than 0.
 
-The patch was created with the following coccinelle script:
+I think "if (err)" is fine. It is pretty common in other places of the kernel.
 
-  @@
-  identifier func, head, ctl;
-  @@
+Checking "(err < 0)" may actually mean the return value could be positive. At 
+least it is how bpf_struct_ops.c is using "(err < 0)".
 
-  int func(
-    struct ctl_table_header *head,
-  - struct ctl_table *ctl)
-  + const struct ctl_table *ctl)
-  { ... }
+[ An unrelated side note is another (err < 0) check in bpf_struct_ops.c could 
+have been changed after the recent changes in bpf_struct_ops_prepare_trampoline 
+which no longer return +val ].
 
-(insert_entry() from fs/proc/proc_sysctl.c is a false-positive)
-
-The three changed locations were validated through manually inspection
-and compilation.
-
-In addition a search for '.permissions =' was done over the full tree to
-look for places that were missed by coccinelle.
-None were found.
-
-This change also is a step to put "struct ctl_table" into .rodata
-throughout the kernel.
-
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
----
- include/linux/sysctl.h | 2 +-
- ipc/ipc_sysctl.c       | 2 +-
- ipc/mq_sysctl.c        | 2 +-
- kernel/ucount.c        | 2 +-
- net/sysctl_net.c       | 2 +-
- 5 files changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/include/linux/sysctl.h b/include/linux/sysctl.h
-index 60333a6b9370..f9214de0490c 100644
---- a/include/linux/sysctl.h
-+++ b/include/linux/sysctl.h
-@@ -206,7 +206,7 @@ struct ctl_table_root {
- 	struct ctl_table_set *(*lookup)(struct ctl_table_root *root);
- 	void (*set_ownership)(struct ctl_table_header *head,
- 			      kuid_t *uid, kgid_t *gid);
--	int (*permissions)(struct ctl_table_header *head, struct ctl_table *table);
-+	int (*permissions)(struct ctl_table_header *head, const struct ctl_table *table);
- };
- 
- #define register_sysctl(path, table)	\
-diff --git a/ipc/ipc_sysctl.c b/ipc/ipc_sysctl.c
-index 1a5085e5b178..19b2a67aef40 100644
---- a/ipc/ipc_sysctl.c
-+++ b/ipc/ipc_sysctl.c
-@@ -204,7 +204,7 @@ static void ipc_set_ownership(struct ctl_table_header *head,
- 	*gid = gid_valid(ns_root_gid) ? ns_root_gid : GLOBAL_ROOT_GID;
- }
- 
--static int ipc_permissions(struct ctl_table_header *head, struct ctl_table *table)
-+static int ipc_permissions(struct ctl_table_header *head, const struct ctl_table *table)
- {
- 	int mode = table->mode;
- 
-diff --git a/ipc/mq_sysctl.c b/ipc/mq_sysctl.c
-index 6bb1c5397c69..43c0825da9e8 100644
---- a/ipc/mq_sysctl.c
-+++ b/ipc/mq_sysctl.c
-@@ -90,7 +90,7 @@ static void mq_set_ownership(struct ctl_table_header *head,
- 	*gid = gid_valid(ns_root_gid) ? ns_root_gid : GLOBAL_ROOT_GID;
- }
- 
--static int mq_permissions(struct ctl_table_header *head, struct ctl_table *table)
-+static int mq_permissions(struct ctl_table_header *head, const struct ctl_table *table)
- {
- 	int mode = table->mode;
- 	kuid_t ns_root_uid;
-diff --git a/kernel/ucount.c b/kernel/ucount.c
-index 4aa6166cb856..90300840256b 100644
---- a/kernel/ucount.c
-+++ b/kernel/ucount.c
-@@ -38,7 +38,7 @@ static int set_is_seen(struct ctl_table_set *set)
- }
- 
- static int set_permissions(struct ctl_table_header *head,
--				  struct ctl_table *table)
-+			   const struct ctl_table *table)
- {
- 	struct user_namespace *user_ns =
- 		container_of(head->set, struct user_namespace, set);
-diff --git a/net/sysctl_net.c b/net/sysctl_net.c
-index a0a7a79991f9..f5017012a049 100644
---- a/net/sysctl_net.c
-+++ b/net/sysctl_net.c
-@@ -40,7 +40,7 @@ static int is_seen(struct ctl_table_set *set)
- 
- /* Return standard mode bits for table entry. */
- static int net_ctl_permissions(struct ctl_table_header *head,
--			       struct ctl_table *table)
-+			       const struct ctl_table *table)
- {
- 	struct net *net = container_of(head->set, struct net, sysctls);
- 
-
--- 
-2.44.0
 
 
