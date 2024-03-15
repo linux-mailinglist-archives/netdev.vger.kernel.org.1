@@ -1,204 +1,111 @@
-Return-Path: <netdev+bounces-80098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9454587CFFF
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 16:16:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A8B487D004
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 16:17:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DEEC2830F9
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 15:16:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B8BE1C2048B
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 15:17:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 507BE3D0C0;
-	Fri, 15 Mar 2024 15:16:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E4993D0B4;
+	Fri, 15 Mar 2024 15:17:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="O43SCO9M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LKGrE9rp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010013E48E;
-	Fri, 15 Mar 2024 15:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE9FF3D542
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 15:17:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710515783; cv=none; b=LVdNaVMmFTWRY9vqY8L14M1kwqjXsDAVpb+wo/01Yq/xF0zCIMibsOkUYVvmi0TwOxIHT8pPGb9U1CYBeLQxsdq/YA22txCgLaDTQ5eXRjRCQFMUqr4mBbdGUB8pfMW8JKLS5lrYxLQE5NCXpU0zuFySlijF1VtodBnDpdi44dc=
+	t=1710515846; cv=none; b=FaMvxpIPyiRgYxvbdtVwzO9vKaA3xZvtaIR2S9dZSynizsOEr0Nay12wCtaEwOTU5cHO0UttGQbHmBtayYyWcFad0n0uxFNKKTXELJFAdr8XWXb0uxmWkLHBC+7BjQkd1n2xESHC+AOBGPVFjg/5M8k1r7e4fheGjyyf3/1daMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710515783; c=relaxed/simple;
-	bh=IHIPLZE3idlw2cVAcFI6y49qart4V2n1jZXMAHDIMxo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Lq2Qm0B/iSkhv9HW6XbGDzChrPhlJkNucuyWM7cn4xatHFEB0DeHIkyOyNw3VD7+TmPDP7NXr+7oq+kElfZFcq2ZogUMbEVD0RwWocz0EDFKiJtw+wCYyKoz/+8EhSf2SgUPsoQkun6UwNDwdevApYxo+qBbsMUBtA0iPrVudSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=O43SCO9M; arc=none smtp.client-ip=185.132.182.106
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42FEcweV009640;
-	Fri, 15 Mar 2024 16:15:47 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	message-id:date:mime-version:subject:to:cc:references:from
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	selector1; bh=mN5YOoII/OjhboOJve/4NynjPrKGyVn2gyMyB0ukmK8=; b=O4
-	3SCO9MyJtYSOKQdCylCRvSDcHHxssv5BfVPLBubd9+Szkv5WcxgLnXtQAUfWgSpU
-	I/ziY/map1ZTLqOZb8ZAnHsdyX60bH1ck19Gasjv4xwvTDWB7UoL00peD7ZiCStO
-	KeaFREhRryPVNq8JlIigO7sTODYdN74knfTf/64YaI2cECSnOQXA2TDg2oVnyhxf
-	P1Ith7hPfjfZF1sCPg9eLz3nYzbimwXYUPLzLHoxToQw0oCvidRmtD+dA3IjzbcF
-	g9O/JaNlPfLQ71HLGwZi21RHHQpgGpDVpk7byycaRUQ1xcUN6bn0PdAJMuuQbsMe
-	cbrKU5yedbA9yalQymXg==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3wv9yckf3e-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 15 Mar 2024 16:15:46 +0100 (CET)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id A126D4002D;
-	Fri, 15 Mar 2024 16:15:30 +0100 (CET)
-Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 8AEB827564A;
-	Fri, 15 Mar 2024 16:14:16 +0100 (CET)
-Received: from [10.252.28.102] (10.252.28.102) by SHFDAG1NODE2.st.com
- (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 15 Mar
- 2024 16:14:15 +0100
-Message-ID: <ac696442-0513-48cc-86b1-8647b9bd8e91@foss.st.com>
-Date: Fri, 15 Mar 2024 16:14:06 +0100
+	s=arc-20240116; t=1710515846; c=relaxed/simple;
+	bh=02mSvrIwEftRpShrclkIU6aVuENMG5q6CSeuuMn0Mdw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LIkgw4fQuQlBkDbIXxiv6TG3yKTTZoGU0dGGq2m4RqjUbJaJI7N/rhBwpJHvqDCVJhGNd7TafuyRDBa2+9KC+SUvZcOgm43U301O44aJPptt3oUMiY1O8OlX1p0FL0Y3NpNNwmy37mso680+SHwQcH8i+WaBeMgYM5LPGgDRbc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LKGrE9rp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AEABC43390;
+	Fri, 15 Mar 2024 15:17:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710515845;
+	bh=02mSvrIwEftRpShrclkIU6aVuENMG5q6CSeuuMn0Mdw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=LKGrE9rp3k1uV9g57Dv1HsmXIHm6kJjPk0LB1cMoOGRomF5yXmc3LbYqH5ds8xx4Y
+	 k4gpzI8mifFK9zC0vy9MJ2Sw8dfELZOp6Cv3FJkByFEkoTqVe3r/8ieIrPpBhZKyBO
+	 6BHZnOeKzxnnodxnPP1eKEf7bsK+umINRFowF8Le7Ilu5B7R2bbGOc3i3mCOhVXRhq
+	 7Q0NMD2AzGyUEJnqlFksnHH4WH/eXsqFzSsI2b3jAJmfb+kFmmcF2P29iO/oKm0wJo
+	 qy58dRjVKeT+/X3IfOTbOaC5ukJvn2jD4eFad2HIXmkWOfnrh0yee8HmXxZDwbC3jl
+	 ETJB3trbDJhcw==
+From: Antoine Tenart <atenart@kernel.org>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com
+Cc: Antoine Tenart <atenart@kernel.org>,
+	steffen.klassert@secunet.com,
+	netdev@vger.kernel.org
+Subject: [PATCH net 0/4] gro: various fixes related to UDP tunnels
+Date: Fri, 15 Mar 2024 16:17:16 +0100
+Message-ID: <20240315151722.119628-1-atenart@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 2/2] dt-bindings: net: add new property st,ext-phyclk
- in documentation for stm32
-To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-        "David S . Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue
-	<alexandre.torgue@foss.st.com>,
-        Richard Cochran <richardcochran@gmail.com>,
-        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
-        Mark
- Brown <broonie@kernel.org>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-References: <20240307135957.303481-1-christophe.roullier@foss.st.com>
- <20240307135957.303481-3-christophe.roullier@foss.st.com>
- <578f421c-ca06-45d4-8380-8b2b423d4d47@linaro.org>
- <50ee6122-b160-48ea-8c44-1046b5907d7c@foss.st.com>
- <e2a98098-8ccd-4b8f-9a4b-1cbc0776a9c2@linaro.org>
- <51531046-ee83-4d99-836b-af4dc5d7add9@foss.st.com>
- <cf122942-c0fd-457f-a753-366cae39d5f8@linaro.org>
-Content-Language: en-US
-From: Christophe ROULLIER <christophe.roullier@foss.st.com>
-In-Reply-To: <cf122942-c0fd-457f-a753-366cae39d5f8@linaro.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE2.st.com
- (10.75.129.70)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-15_02,2024-03-13_01,2023-05-22_02
+Content-Transfer-Encoding: 8bit
 
-Hi
+Hello,
 
-On 3/14/24 16:25, Krzysztof Kozlowski wrote:
-> On 14/03/2024 16:10, Christophe ROULLIER wrote:
->> Hi,
->>
->> On 3/13/24 14:06, Krzysztof Kozlowski wrote:
->>> On 13/03/2024 11:39, Christophe ROULLIER wrote:
->>>> On 3/8/24 09:28, Krzysztof Kozlowski wrote:
->>>>> On 07/03/2024 14:59, Christophe Roullier wrote:
->>>>>> Add property st,ext-phyclk to manage cases when PHY have no cristal/quartz
->>>>>> This property can be used with RMII phy without cristal 50Mhz and when we
->>>>>> want to select RCC clock instead of ETH_REF_CLK
->>>>>> Can be used also with RGMII phy with no cristal and we select RCC clock
->>>>>> instead of ETH_CLK125
->>>>>>
->>>>> Nothing improved here. You say you add new property (wrote it explicitly
->>>>> in the subject), but where is it? Where is the user?
->>>>>
->>>>> I think we talked about this. Rob also asked quite clear:
->>>>>
->>>>>> That is obvious from the diff. What is not obvious is why we need a new
->>>>>> property and what is the problem with the existing ones.
->>>>> How did you solve it?
->>>> Hi,
->>>>
->>>> I do not understand your questions.
->>> OK, I will clarify some questions, but are you sure that this question:
->>> "How did you solve it?"
->>> needs clarification?
->>>
->>> If so, then let me clarify:
->>> Rob pointed issue. How did you resolve Rob's comment? How did you
->>> address it? What changed in your patch, that Rob's comment should be
->>> considered as addressed/resolved/done?
->> This property was introduced in 2020 in order to simplify management of
->> all STM32 platforms without Ethernet cristal/quartz PHY.
-> I fail to see how this answers how did you resolve the comment. You now
-> described some sort of history, but I am asking: what did you change in
-> your patches, so Rob's comment is considered resolved?
+We found issues when a UDP tunnel endpoint is in a different netns than
+where UDP GRO happens. This kind of setup is actually quite diverse,
+from having one leg of the tunnel on a remove host, to having a tunnel
+between netns (eg. being bridged in another one or on the host). In our
+case that UDP tunnel was geneve.
 
-Concerning Rob's comment, in V2 I finally remove deprecated fields put 
-in V1 to keep existing properties, which have no pb and can be used.
+UDP tunnel packets should not be GROed at the UDP level. The fundamental
+issue here is such packet can't be detected in a foolproof way: we can't
+know by looking at a packet alone and the current logic of looking up
+UDP sockets is fragile (socket could be in another netns, packet could
+be modified in between, etc). Because there is no way to make the GRO
+code to correctly handle those packets in all cases, this series aims at
+two things: making the net stack to correctly behave (as in, no crash
+and no invalid packet) when such thing happens, and in some cases to
+prevent this "early GRO" from happening.
 
-And I explained the meaning to add existing property in yaml.
+First three patches fix issues when an "UDP tunneled" packet is being
+GROed too early by rx-udp-gro-forwarding or rx-gro-list.
 
->>> Now about my other question:
->>> "but where is it? Where is the user?"
->>>
->>> Your subject and commit message claim you add new property. This means
->>> such property was not existing so far in the Linux kernel. If you add
->>> new property in the binding, then I expect adding the user of that
->>> binding, thus my question: where is the user of that binding?
->>>
->> I'm preparing glue and DTS to upstream for STM32MP13 platform, this
->> platform will use with property.
->>
->> Since 2020, this property is available in the driver in kernel.org, so
->> it is also possible that someone who has not upstreamed their
-> This should be explained in commit msg (although not kernel.org, website
-> does not matter here).
-ok I will add this in V3.
->
->> code also uses it.
->>
->>>> That I would like to do, it is property "st,ext-phyclk" was introduced
->>>> in driver
->>>>
->>>> "drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c" in 2020, and YAML
->>>> was not updated at the time.
->>> Are you saying you document existing property or add a new one?
->> Yes, existing property, since 2020 in kernel.org.
-> Drop the website. We talk here about Linux kernel.
->
-> Commit msg fails to explain it in a clear way.
+Last patch is preventing locally generated UDP tunnel packets from being
+GROed. This turns out to be more complex than this patch alone as it
+relies on skb->encapsulation which is currently untrusty in some cases
+(see iptunnel_handle_offloads); but that should fix things in practice
+and is acceptable for a fix. Future work is required to improve things
+(prevent all locally generated UDP tunnel packets from being GROed),
+such as fixing the misuse of skb->encapsulation in drivers; but that
+would be net-next material.
 
-ok I will add this in V3.
+Thanks!
+Antoine
 
-Thanks
+Antoine Tenart (4):
+  udp: do not accept non-tunnel GSO skbs landing in a tunnel
+  gro: fix ownership transfer
+  udp: do not transition UDP fraglist to unnecessary checksum
+  udp: prevent local UDP tunnel packets from being GROed
 
->
->>>> Goal of this patch it is to update YAML to avoid dtbs check issue if
->>>> someone use this property :
->>>>
->>>>     dtbs check issue : views/kernel/upstream/net-next/arch/arm/boot/dts/st/stm32mp157c-dk2.dtb:
->>>> ethernet@5800a000: Unevaluated properties are not allowed
->>>> ('st,ext-phyclk' was unexpected)
->>> So DTS uses it?
->> Here it was example, if someone wants to use this property, but today
->> this property is not yet present in DTS in kernel.org
->
-> Best regards,
-> Krzysztof
->
+ include/linux/udp.h    | 14 ++++++++++++++
+ net/core/gro.c         |  3 ++-
+ net/ipv4/udp_offload.c | 23 ++++++++++++-----------
+ net/ipv6/udp_offload.c |  8 --------
+ 4 files changed, 28 insertions(+), 20 deletions(-)
+
+-- 
+2.44.0
+
 
