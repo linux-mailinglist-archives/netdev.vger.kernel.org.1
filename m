@@ -1,142 +1,96 @@
-Return-Path: <netdev+bounces-80038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80039-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6248287CA3D
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 09:49:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC9A187CA49
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 09:58:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 937021C22012
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 08:49:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CC6E6B20EF8
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 08:58:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B07391755A;
-	Fri, 15 Mar 2024 08:49:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B7FD17581;
+	Fri, 15 Mar 2024 08:58:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rgKeKk9H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="atURHY6a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DB21798A
-	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 08:49:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DDBD175AA
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 08:58:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710492550; cv=none; b=GtO/LFgnPv4vmnv30NJiX87wB5a70DqGEwZKXMw37ULx5me4T/mlNwZt4K5mud0BXqVA+HgSOfE61BcjXuftkxk3mhoNZsl4rTOwHeoroqfTG8ZApjelQU6utck86scSZOyEaNp8BxU1tUFHztL1ZOOwx6XVVpw7tP8CkH7uodA=
+	t=1710493126; cv=none; b=loLutRbSvk2OIwMsMjY40VIoxVMpDMcoOasqemBNwNXGWaCzaYFtgDfEdF8eMuDWUWWdSN42FekFz0HF5ehT9gVhUS6bPq1psVfNv18aBbO9QoR6UvISEK3+NB2iYf+fWQtbmvx+Tr00duJVcanc1PeKonriC6lTFf1kxuuy9bc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710492550; c=relaxed/simple;
-	bh=5H706Y0gmm570HBuRhjK5DaC/uQep1yAMFfTV2AK/tg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=VW2pq6HFAL655sfUWwqXbrJRdR1oJP34u4NdJydUQTQp92FPPvBcGGACIGC9gjAX8I0Yc1ok/iAgom/5C3RkBlFUcpHcR3i2KWQhT3VTnXPfZUtRGZtQAflkV2CpF/P43LuCPL1nWqPDXOo1ehgfuVsg83qjQKuGONw0IFlR9MA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rgKeKk9H; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-dc743cc50a6so2585442276.2
-        for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 01:49:08 -0700 (PDT)
+	s=arc-20240116; t=1710493126; c=relaxed/simple;
+	bh=ISjqis1qw3ArUV30cjVtubLuAtwrK92YIb6wMQbpHfM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=V5C58yaSTT9MCUSIfIONwdJJ4q5q2S1UsWFo7fUi197VOWSI3SKR2XXVf3w0D34YbxirLDmNSnGRhU/N9A5G4IYRQDab5RUJCEwrCfAlfiAmJ8LflG5mFNJCoVsgRNMvAQpf5v/Vc9YFZd+6zvbOr2HsHO/r/ZqoWhlhyUXB2Bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=atURHY6a; arc=none smtp.client-ip=209.85.218.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a461c50deccso218980266b.0
+        for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 01:58:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710492548; x=1711097348; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=+1QL6bniEd1IyAOA4550ZTezM10mQAiMjSPvG6WuKq0=;
-        b=rgKeKk9H5u2fPo/elLbUz4t83U5lJWW76CabLWtMKWxoufmv9C8YNrl11v0s6ZqzWg
-         OY1OK1mZnFQImM/hekFjXw32jTWDeQw5GUbXF/mA8xhpHikibOFytBmcPcm+ObT/CIo2
-         KUGDu9JooCfABjnWDvCJalM994fnCJpwuVVMDZ5ZoNeEJ79C8IymmMO7531gvB4204b9
-         M27k1Rgf6Kr5NXJXZ5hbV4JHrBU7lewKPtEw3Q/OnVk0ddNLdRhjat19BcAmoIHLfD40
-         RMg8bD0ZUGpk3MvUrQCtRUTybW5+lhOCxgyQhgG8iLpgBtWqyM1WiUXZEJr4j41JiAhP
-         MLKQ==
+        d=gmail.com; s=20230601; t=1710493123; x=1711097923; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ISjqis1qw3ArUV30cjVtubLuAtwrK92YIb6wMQbpHfM=;
+        b=atURHY6ajYqiMZeMD8MHNIaFjkUG8Y+I1wr/uqfvu2QKsuqiobXSccu3nuw7W42nB/
+         0KOuZsFcuRIskuKDWVpfv3wOkIIEXs39nvaWhbwh09ItnzpfwFQsByIiKoJ6Bc4BR3eU
+         rXeFhRBkBljyGhpic1nkL+6WCIQ9tDtxsRNlK/cl+sWynDOuCCiAlty0A13H/SN3WHLC
+         DZpK3j5unlh8IYWClZOBLxlywuEtQbEhw8u3Cdd6/nynHoUFf7AltgjEDGdkcenSdoRY
+         rINZCwbLKMaXooNhp9jrX6ahAnrlASQziyn/E1gNNqvPXWTZdiEhkP+x1h+4vwU995+9
+         JPJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710492548; x=1711097348;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=+1QL6bniEd1IyAOA4550ZTezM10mQAiMjSPvG6WuKq0=;
-        b=EiPBNHg/bi40wqIqcLZ4AQMyhMgAIvI3d1I3kQdCS5g4sYb5EwFuwOXLLY6yQIpAEh
-         uh0IgswfpxAwO/CuXRzDOteGEOTdeQaoQ1Xk4NFufknQdhKU5wce0PD8njIXkwc+CVAX
-         YsNRWxrN9HCQMeNyq/gBagzhZeJ/72shRprd1I2dUO3fqTtfj97DrfxxuzSiRrMtL3f3
-         Zd+1Z+ONs+FNXDrSNsifLjF2Fnpbs9NawS5L4eYDBI/ck33bJWGvvN2a6FyIczkGejaI
-         3yKfQGPOTeXKiOQG6h7pUV+wCHhvgIFkZ4BUjWdbSZnL6JBDc9F47CxkvVeA9R1e6XQf
-         arcg==
-X-Gm-Message-State: AOJu0YyBNi3ap/oiSr+3mqsUhAuYsB14dOGbIBEXuCeIxakvFotqMCw+
-	zpoE6ZwWVq6rLcvJPghLjuB8gOilOdvgjm8ZVfnR8NYlSyahIm99pHhiZzzjkk1AAlG2Wy56TAM
-	saUSTRXr/og==
-X-Google-Smtp-Source: AGHT+IHu2YDss3xWdZey1fE7LG4Nf7D0V4sIMP0zcEFXt8T4XtwCDDFfq0KcbLxLczXB/6MaVzIkSTcJYF+oLQ==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1a46:b0:dcd:2f2d:7a0f with SMTP
- id cy6-20020a0569021a4600b00dcd2f2d7a0fmr229714ybb.9.1710492548094; Fri, 15
- Mar 2024 01:49:08 -0700 (PDT)
-Date: Fri, 15 Mar 2024 08:49:06 +0000
+        d=1e100.net; s=20230601; t=1710493123; x=1711097923;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ISjqis1qw3ArUV30cjVtubLuAtwrK92YIb6wMQbpHfM=;
+        b=ZbIGXWW5UOuuPsyLKJwT29Afg7UbieKqacIYaCpK3iz0Re9V0ThWRwpxwIOEX6vkas
+         cCq4ooReWdp5Ju9WlF+bABF9hGhynTkYM/9WWE2V4UEEECOoiv0ucZ/hw6DSo5TLKVbm
+         5SKtbyLBaYBzunetWSZd0VwQRiVA43cVDM92YqluiKTAHP2h09PvIq0caq6hRyJUY+ZN
+         LIldVuYMUuJimdct5BDiwQ8iTvhIc0yJih1ZbebhkpySwCkyTmNC/hUjk3RCUmlOg7iZ
+         Y/Ajt1uDFwcX652OEM24w7mv1H+8XCqEp51jj9GFGU5EwX8A3+AJ2ykn6O0zboHzdy5K
+         v6eg==
+X-Forwarded-Encrypted: i=1; AJvYcCV115V/CJI8i9SLCPOa4fo0FVs1hd4fTWp+BiOnu76Kfp+z2oqN5M1YQhxrhmjpoLOzzdnJzU70Bzs5PANZ67Ax2Lofox6A
+X-Gm-Message-State: AOJu0Yw7DGAYMC87DAVZYSPvegO+B1373aippE7RUTQcff9205+KAGog
+	/S+nPSsUKGMrdhMfi6NXpqpmACJhrQqsROF9Vkj6Xn2Qpa+bON7Dhkle6hLphbl472e/dmY7vuX
+	XcymQA0aqXiEcchE6p+DLmD/E+hJhRr3zGaI=
+X-Google-Smtp-Source: AGHT+IGKid5izOBNUeKCoEfQXEyFmaJnsICRp+Iff0/dPAjkUyRxt5JgjJi7B0f1qIOwuwvJxT46erMmtFJfJ5WTgfo=
+X-Received: by 2002:a17:906:f118:b0:a46:5597:596a with SMTP id
+ gv24-20020a170906f11800b00a465597596amr2766122ejb.45.1710493122610; Fri, 15
+ Mar 2024 01:58:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.291.gc1ea87d7ee-goog
-Message-ID: <20240315084906.3288235-1-edumazet@google.com>
-Subject: [PATCH net] net: remove skb_free_datagram_locked()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+MIME-Version: 1.0
+References: <20240315084906.3288235-1-edumazet@google.com>
+In-Reply-To: <20240315084906.3288235-1-edumazet@google.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 15 Mar 2024 16:58:05 +0800
+Message-ID: <CAL+tcoAHoBY8ObNQic-M7t831gpBOjqybkOS5BE0gwmkSQfvQg@mail.gmail.com>
+Subject: Re: [PATCH net] net: remove skb_free_datagram_locked()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Last user of skb_free_datagram_locked() went away in 2016
-with commit 850cbaddb52d ("udp: use it's own memory
-accounting schema").
+On Fri, Mar 15, 2024 at 4:49=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> Last user of skb_free_datagram_locked() went away in 2016
+> with commit 850cbaddb52d ("udp: use it's own memory
+> accounting schema").
+>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- include/linux/skbuff.h |  6 ------
- net/core/datagram.c    | 19 -------------------
- 2 files changed, 25 deletions(-)
-
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 3023bc2be6a1c126bdbba2a0bc9b1f11d4131735..499ae20f161af6397ad3f973da42239f639fd90f 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -4053,12 +4053,6 @@ int skb_copy_datagram_from_iter(struct sk_buff *skb, int offset,
- 				 struct iov_iter *from, int len);
- int zerocopy_sg_from_iter(struct sk_buff *skb, struct iov_iter *frm);
- void skb_free_datagram(struct sock *sk, struct sk_buff *skb);
--void __skb_free_datagram_locked(struct sock *sk, struct sk_buff *skb, int len);
--static inline void skb_free_datagram_locked(struct sock *sk,
--					    struct sk_buff *skb)
--{
--	__skb_free_datagram_locked(sk, skb, 0);
--}
- int skb_kill_datagram(struct sock *sk, struct sk_buff *skb, unsigned int flags);
- int skb_copy_bits(const struct sk_buff *skb, int offset, void *to, int len);
- int skb_store_bits(struct sk_buff *skb, int offset, const void *from, int len);
-diff --git a/net/core/datagram.c b/net/core/datagram.c
-index a8b625abe242c657dca8cd0188c236553757c6b2..e614cfd8e14a50a08c764dfed30c2e0838413a93 100644
---- a/net/core/datagram.c
-+++ b/net/core/datagram.c
-@@ -324,25 +324,6 @@ void skb_free_datagram(struct sock *sk, struct sk_buff *skb)
- }
- EXPORT_SYMBOL(skb_free_datagram);
- 
--void __skb_free_datagram_locked(struct sock *sk, struct sk_buff *skb, int len)
--{
--	bool slow;
--
--	if (!skb_unref(skb)) {
--		sk_peek_offset_bwd(sk, len);
--		return;
--	}
--
--	slow = lock_sock_fast(sk);
--	sk_peek_offset_bwd(sk, len);
--	skb_orphan(skb);
--	unlock_sock_fast(sk, slow);
--
--	/* skb is now orphaned, can be freed outside of locked section */
--	__kfree_skb(skb);
--}
--EXPORT_SYMBOL(__skb_free_datagram_locked);
--
- int __sk_queue_drop_skb(struct sock *sk, struct sk_buff_head *sk_queue,
- 			struct sk_buff *skb, unsigned int flags,
- 			void (*destructor)(struct sock *sk,
--- 
-2.44.0.291.gc1ea87d7ee-goog
-
+Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
 
