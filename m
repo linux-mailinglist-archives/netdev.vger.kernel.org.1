@@ -1,135 +1,169 @@
-Return-Path: <netdev+bounces-80108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72F7987D0DB
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 17:01:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A963487D0E3
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 17:02:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99FA7B22A95
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 16:01:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1525EB233AA
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 16:02:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF0B405FF;
-	Fri, 15 Mar 2024 16:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0366140BEE;
+	Fri, 15 Mar 2024 16:02:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="D6ZaLuJt"
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="SC6rGy6w";
+	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="SC6rGy6w"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D02B93F9F4;
-	Fri, 15 Mar 2024 16:01:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FBD24086B;
+	Fri, 15 Mar 2024 16:02:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710518469; cv=none; b=bpOvg4jd/yBvuR7MFGVDpe9sL5iWeXHFOfOEe7ABL6n+AKUxYlnJLkfvI+sHXlhBm6ySPlS/exebZ14mY2GiL1jaXR0TVgIYlLoiEblbgWaLcOapTGJM/PzmrscOIPv/pcFSFWWZZz9A/iOrO4W6TGvTt2qy1CpxJb/m2qyzsKI=
+	t=1710518539; cv=none; b=iMwLz/b5c/OxhvrsAwxc66t4n9oITjtongjj3jBmQVfj+YIwrqsKheyo+HzIdiUTX5UOqVLdlkbSHFm5x1BX0riMBA30B554+XUrS+jNyGIC00SdVTLzZHA4wpFWVjv9i/LLOOjUBzPaokGDzgVh1NPmQqLa3G7QYxrHI95HPZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710518469; c=relaxed/simple;
-	bh=DY5bqcoMqBokCekqilHN7pFTOtuXZy4JlDrniyQss8k=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=TmI4AsvmcIFPRyXmB1+hpAWx+Z23+k/8OwI8Wkj6Sp063i+Wnm6PHzXYX1pdcLBFgjo9YnC0hsnlIFe4dvo/JvHD2Ud5rBkeT4EfU2rxXLsibRTGEVv5TQKevPOe48CnJ2M6rB/p4FiEeXNbD8jIM8SNN0kUnKPGM0ZkHe3sbv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=D6ZaLuJt; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=AYVnUm7ckwTfwVjLKqAldlVmSJddb6dwWNatvUe0+Kc=; b=D6ZaLuJtyhB2q4q9JVQZIHlVAB
-	kyfLf+2Z2RpPP0xZYa9PI+08sKh2zZdxd1p4gAEAoCY+ngiXBifUaLhdWosR7g1U8dzEaYQBmu5c1
-	fXHhsjgYDQUktOa+sSw08G9vtEyLhQofLLISLdbaSi0zyWd+nVUwUp+NjI3JvcquQXBnngraECpwB
-	/LZM7Q6FcDnExS32+rh+E3rKJwSgPnjMhl2ZEoPu1leQ6HnhYOYETcuHSVvvlfiKiNxstTeSUrrOH
-	+TagggIppv3BBqQUm8VETDBM7HzazugdVU425kNCmOHZSYsBQzaSPrX8aniLO35ifIoetW4fSa+Ca
-	fEuv/2Iw==;
-Received: from sslproxy04.your-server.de ([78.46.152.42])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rl9z7-000EKR-Sa; Fri, 15 Mar 2024 17:00:41 +0100
-Received: from [178.197.249.11] (helo=linux.home)
-	by sslproxy04.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rl9z6-000FYY-0L;
-	Fri, 15 Mar 2024 17:00:40 +0100
-Subject: Re: [PATCH bpf-next v2] bpf: Check return from set_memory_rox() and
- friends
-To: Christophe Leroy <christophe.leroy@csgroup.eu>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, "x86@kernel.org"
- <x86@kernel.org>, "H. Peter Anvin" <hpa@zytor.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- Kees Cook <keescook@chromium.org>
-References: <883c5a268483a89ab13ed630210328a926f16e5b.1708526584.git.christophe.leroy@csgroup.eu>
- <14b840d4-631f-2ad9-fb92-540aa150250b@iogearbox.net>
- <7848b9e8-2326-4046-8cec-bac2255c8602@csgroup.eu>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <d6159a82-284e-780d-b1b6-d583caf07fea@iogearbox.net>
-Date: Fri, 15 Mar 2024 17:00:38 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1710518539; c=relaxed/simple;
+	bh=6Ule3JN0U15LHh3rH6IkUT0Y0+A+gb7QON59wG/WH1k=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cWD1ea0VU9WwzuMvOs576FasD6SE+z611Zc6CE9yu+gDMzoS8ITcKNGlwXM7FVsnfeFGvunN6KjHaFY3OkxN6ILeOkvlIJhPcYMM1PZkoJrgVJZV23RutG/wwR+fSfLP+a4AJZC6+SDLnwjnQ/im/SArHv67ND0+f5+NkgkrREs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=SC6rGy6w; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=SC6rGy6w; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id D3EFF1FB6D;
+	Fri, 15 Mar 2024 16:02:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1710518531; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=faiaAnTe6lOY2CBUd6zMN/hZKSHWHcaRYL1tD6+DLRk=;
+	b=SC6rGy6wppVPzsUIuTEShsqR7wG141w9vLma94akKnEXqQjKdQriAhyq7O2BMymjvrDrpS
+	2BhAD3iMSJY9nukgfaShrFuXYUMhzjZRSzoEglx0RNBGmI50G0oUoPAGf40gWKybK44yRG
+	4KK5EQ7Wz+tlRN8ysUQ/9ndVDiADtOo=
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
+	t=1710518531; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=faiaAnTe6lOY2CBUd6zMN/hZKSHWHcaRYL1tD6+DLRk=;
+	b=SC6rGy6wppVPzsUIuTEShsqR7wG141w9vLma94akKnEXqQjKdQriAhyq7O2BMymjvrDrpS
+	2BhAD3iMSJY9nukgfaShrFuXYUMhzjZRSzoEglx0RNBGmI50G0oUoPAGf40gWKybK44yRG
+	4KK5EQ7Wz+tlRN8ysUQ/9ndVDiADtOo=
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C712513460;
+	Fri, 15 Mar 2024 16:02:11 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([10.150.64.162])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 5mBtMANx9GVUXgAAD6G6ig
+	(envelope-from <mkoutny@suse.com>); Fri, 15 Mar 2024 16:02:11 +0000
+From: =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	=?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>
+Subject: [PATCH] net/sched: Add module alias for sch_fq_pie
+Date: Fri, 15 Mar 2024 17:02:10 +0100
+Message-ID: <20240315160210.8379-1-mkoutny@suse.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <7848b9e8-2326-4046-8cec-bac2255c8602@csgroup.eu>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27215/Fri Mar 15 09:31:18 2024)
+X-Spam-Score: 1.10
+X-Spamd-Result: default: False [1.10 / 50.00];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 RCPT_COUNT_SEVEN(0.00)[10];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 BAYES_HAM(-0.10)[65.70%];
+	 ARC_NA(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 FREEMAIL_ENVRCPT(0.00)[gmail.com];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 TAGGED_RCPT(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 DKIM_SIGNED(0.00)[suse.com:s=susede1];
+	 MID_CONTAINS_FROM(1.00)[];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FREEMAIL_CC(0.00)[mojatatu.com,gmail.com,resnulli.us,davemloft.net,google.com,kernel.org,redhat.com,suse.com];
+	 RCVD_TLS_ALL(0.00)[];
+	 SUSPICIOUS_RECIPS(1.50)[]
+X-Spam-Level: *
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spam-Flag: NO
 
-On 3/15/24 3:55 PM, Christophe Leroy wrote:
-[...]
->>>    {
->>>        WARN_ON_ONCE(size > PAGE_SIZE);
->>> -    set_memory_rox((long)image, 1);
->>> +    return set_memory_rox((long)image, 1);
->>>    }
->>> -void __weak arch_unprotect_bpf_trampoline(void *image, unsigned int
->>> size)
->>> +int __weak arch_unprotect_bpf_trampoline(void *image, unsigned int size)
->>>    {
->>> +    int err;
->>>        WARN_ON_ONCE(size > PAGE_SIZE);
->>> -    set_memory_nx((long)image, 1);
->>> -    set_memory_rw((long)image, 1);
->>> +
->>> +    err = set_memory_nx((long)image, 1);
->>> +    if (err)
->>> +        return err;
->>> +    return set_memory_rw((long)image, 1);
->>>    }
->>
->> Do we still need this? It looks like this does not have an in-tree user
->> anymore.
-> 
-> Looks like last user went away with commit 187e2af05abe ("bpf:
-> struct_ops supports more than one page for trampolines.") but I'm having
-> hard time figuring if it's valid or not.
-> 
-> But as there is no user anymore it surely can go away. Will you drop it
-> or do you want a proper patch from me ?
+The commit 2c15a5aee2f3 ("net/sched: Load modules via their alias")
+starts loading modules via aliases and not canonical names. The new
+aliases were added in commit 241a94abcf46 ("net/sched: Add module
+aliases for cls_,sch_,act_ modules") via a Coccinele script.
 
-My understanding is that the VM_FLUSH_RESET_PERMS would take care of this
-via arch_alloc_bpf_trampoline(). Anyway, gvien there is a merge conflict
-with this patch, pls include it with a v3.
+sch_fq_pie.c is missing module.h header and thus Coccinele did not patch
+it. Add the include and module alias manually, so that autoloading works
+for sch_fq_pie too.
 
-Thanks,
-Daniel
+(Note: commit message in commit 241a94abcf46 ("net/sched: Add module
+aliases for cls_,sch_,act_ modules") was mangled due to '#'
+misinterpretation. The predicate haskernel is:
+
+| @ haskernel @
+| @@
+|
+| #include <linux/module.h>
+|
+.)
+
+Fixes: 241a94abcf46 ("net/sched: Add module aliases for cls_,sch_,act_ modules")
+Signed-off-by: Michal Koutný <mkoutny@suse.com>
+---
+ net/sched/sch_fq_pie.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/net/sched/sch_fq_pie.c b/net/sched/sch_fq_pie.c
+index 5b595773e59b..358cf304f4c9 100644
+--- a/net/sched/sch_fq_pie.c
++++ b/net/sched/sch_fq_pie.c
+@@ -10,6 +10,7 @@
+  */
+ 
+ #include <linux/jhash.h>
++#include <linux/module.h>
+ #include <linux/sizes.h>
+ #include <linux/vmalloc.h>
+ #include <net/pkt_cls.h>
+@@ -563,6 +564,7 @@ static struct Qdisc_ops fq_pie_qdisc_ops __read_mostly = {
+ 	.dump_stats	= fq_pie_dump_stats,
+ 	.owner		= THIS_MODULE,
+ };
++MODULE_ALIAS_NET_SCH("fq_pie");
+ 
+ static int __init fq_pie_module_init(void)
+ {
+
+base-commit: ea80e3ed09ab2c2b75724faf5484721753e92c31
+-- 
+2.44.0
+
 
