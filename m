@@ -1,79 +1,50 @@
-Return-Path: <netdev+bounces-80082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB4AC87CEBA
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 15:25:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E0EA87CE89
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 15:11:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 917691F228AC
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 14:25:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8D791B20ECE
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 14:11:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4A93BB33;
-	Fri, 15 Mar 2024 14:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 332613717C;
+	Fri, 15 Mar 2024 14:11:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WOO4/P6C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ez//vUQc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B293FB1B;
-	Fri, 15 Mar 2024 14:23:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BC1937164;
+	Fri, 15 Mar 2024 14:11:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710512632; cv=none; b=q6gbBWDdcqv+hG3klKRkMFgL6AUgJD3FAYgaAcJcXShiHVmW8+Wmru9MFgZkMFfSCdPoBbA9SnLLytK6dugcsh4QIytHe4mwTWDwgpiXlwdSDOOWkAhI/AW1gVagFoYYRlFfmwbbzA+Z0Nlgzu9KZnX4N/e8WvGGFkzbs/yLAUg=
+	t=1710511881; cv=none; b=dJc6Ih0pPx74U3dzbRGOjsRdFqZdSeJfV9OfA/N8AEF3ysX8BHeqOO9UiTuIBo9+MRxf9PH0wkapI2IRFYcJ4yyL6Oz6CQgxfU0L9Zbho7P3yMfqfsVRAoirK8SQcFS7fS9Whe+9SnyuZnrA+DYJRq0hiooVGo0Y20Acl3u0jls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710512632; c=relaxed/simple;
-	bh=ymtlPopoAK6IcVkhxWyn3VJniXSJJ6SOqftfCTa+nu0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LNsQwmcgWJr0ggpodRk3Tz3ZF2T2XoIr4E1qL1qiL++HkS4eErwEPPglpmmJ32zLY7/f3FwboKx0r+GJ8wxtvMa9ni9L1v53/ixbkrNbaKBekb/hTD6i/pMBxvKhpVtWlxFKyaTOkKKGfUSV9QvymJqy5UGyG2kAavOBhWqTou4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WOO4/P6C; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710512631; x=1742048631;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=ymtlPopoAK6IcVkhxWyn3VJniXSJJ6SOqftfCTa+nu0=;
-  b=WOO4/P6CIMbAWMpVXvT9ZzdV++1UIUc0TTh96jJh3KOmRMy8tyUMoHTh
-   8XVukbvGHCaqgqol6MqsEOxy7o81SoCyzEtNpzxBaaolTw+NMV+SXJ3J1
-   OjQ9pNbS+ULbTLp7QBNt6jXc2pFnTtf6hNGZC1wnyVzTCA6AnaUvZ37Ke
-   H+LnljRuUoNzWA+D7taEB81I8/sQ0Sx/QE8kVkftUgRp5CXRVojq6U+5m
-   wYrPrAJQ1dSbPHXCNQ85Xw9WoVApS7pLPdhUH7IciBicwhrEvleBDHLP1
-   ADx5oWvUpKnhJQQTGq0XZ4BDkO2rWU5gWtiAJzG/78hRDyGBm8ccqoCov
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11013"; a="5250119"
-X-IronPort-AV: E=Sophos;i="6.07,128,1708416000"; 
-   d="scan'208";a="5250119"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2024 07:23:51 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,128,1708416000"; 
-   d="scan'208";a="17140761"
-Received: from intel.iind.intel.com (HELO brc5..) ([10.190.162.156])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 15 Mar 2024 07:23:47 -0700
-From: Tushar Vyavahare <tushar.vyavahare@intel.com>
-To: bpf@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	bjorn@kernel.org,
-	magnus.karlsson@intel.com,
-	maciej.fijalkowski@intel.com,
-	jonathan.lemon@gmail.com,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	tirthendu.sarkar@intel.com,
-	tushar.vyavahare@intel.com
-Subject: [PATCH bpf-next 6/6] selftests/xsk: enhance framework with a new test case for AF_XDP under max ring sizes
-Date: Fri, 15 Mar 2024 14:07:26 +0000
-Message-Id: <20240315140726.22291-7-tushar.vyavahare@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240315140726.22291-1-tushar.vyavahare@intel.com>
-References: <20240315140726.22291-1-tushar.vyavahare@intel.com>
+	s=arc-20240116; t=1710511881; c=relaxed/simple;
+	bh=xYmAthB11ki5pMUzbtNCl+cG0dk3Pap42GLMQ8EMeTE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=Gp8O4407EaWbwT0ESGNnYwGXE09U/BypW84Q0cSHl11UwVM2EwOFG2tPaYino1cN5xZ1ri4He0exYpan2cYC6Cm3gfWLn19DvOucDXb3bYqthkUcxdgSYbox1Xs+c6dgKRylS2/EsCrrPyreY+pM0KXC70bxKinytmUZ/0iWtKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ez//vUQc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8B3E3C433C7;
+	Fri, 15 Mar 2024 14:11:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710511880;
+	bh=xYmAthB11ki5pMUzbtNCl+cG0dk3Pap42GLMQ8EMeTE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ez//vUQcHaqHkEqhM6yLs7YMZlPo6c0DDwBTf9E+yHYUIWQXuKguB38bnOad5lIhy
+	 hxU+leTls8Orl24viNxHKwj4sJ0Vo8cUvH/9be1E4/tcAoMy3MEpldRdr1cspoRJXT
+	 7admbgk48qVAZBV1NTJWZE0UFatpFnm4CxRw+dB356fhWtP6G5gH14/ZCqXQXk1Nxj
+	 Hame8Fca1TzsQaCGVw8G6pgCSls14Ktg0u8hh6HFFXdckG1jp3VSP0SkpDjskreVxb
+	 9aI4ReDcgWX0hK9KrX9JkmhKca+AqOecORaXecS/2UqM5P9mU2qw+1L4WMxbajGLQV
+	 870rV7iF79NCA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7F037D84BA8;
+	Fri, 15 Mar 2024 14:11:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,61 +52,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/2] net: mediatek: mtk_eth_soc: clear MAC_MCR_FORCE_LINK
+ only when MAC is up
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171051188051.5784.14743841618605304663.git-patchwork-notify@kernel.org>
+Date: Fri, 15 Mar 2024 14:11:20 +0000
+References: <7205ca7d3c5433214256df4672f7c1a49815a5a5.1710367570.git.daniel@makrotopia.org>
+In-Reply-To: <7205ca7d3c5433214256df4672f7c1a49815a5a5.1710367570.git.daniel@makrotopia.org>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: nbd@nbd.name, sean.wang@mediatek.com, Mark-MC.Lee@mediatek.com,
+ lorenzo@kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, matthias.bgg@gmail.com,
+ angelogioacchino.delregno@collabora.com, opensource@vdorst.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org,
+ chad.monroe@adtran.com, steven.liu@mediatek.com, john@phrozen.org
 
-Introduce a test case to evaluate AF_XDP's robustness by pushing hardware
-and software ring sizes to their limits. This test ensures AF_XDP's
-reliability amidst potential producer/consumer throttling due to maximum
-ring utilization. The testing strategy includes:
+Hello:
 
-1. Configuring rings to their maximum allowable sizes.
-2. Executing a series of tests across diverse batch sizes to assess system
-   performance under varying load conditions.
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Signed-off-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
----
- tools/testing/selftests/bpf/xskxceiver.c | 21 +++++++++++++++++++++
- 1 file changed, 21 insertions(+)
+On Wed, 13 Mar 2024 22:50:18 +0000 you wrote:
+> Clearing bit MAC_MCR_FORCE_LINK which forces the link down too early
+> can result in MAC ending up in a broken/blocked state.
+> 
+> Fix this by handling this bit in the .mac_link_up and .mac_link_down
+> calls instead of in .mac_finish.
+> 
+> Fixes: b8fc9f30821e ("net: ethernet: mediatek: Add basic PHYLINK support")
+> Suggested-by: Mason-cw Chang <Mason-cw.Chang@mediatek.com>
+> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> 
+> [...]
 
-diff --git a/tools/testing/selftests/bpf/xskxceiver.c b/tools/testing/selftests/bpf/xskxceiver.c
-index 5326ca5c458c..f545b529e404 100644
---- a/tools/testing/selftests/bpf/xskxceiver.c
-+++ b/tools/testing/selftests/bpf/xskxceiver.c
-@@ -2480,6 +2480,26 @@ static int testapp_hw_sw_min_ring_size(struct test_spec *test)
- 	return testapp_validate_traffic(test);
- }
- 
-+static int testapp_hw_sw_max_ring_size(struct test_spec *test)
-+{
-+	u32 max_descs = XSK_RING_PROD__DEFAULT_NUM_DESCS * 2;
-+	int ret;
-+
-+	test->total_steps = 2;
-+	test->ifobj_tx->ring.set_tx = test->ifobj_tx->ring.max_tx;
-+	test->ifobj_tx->ring.set_rx = test->ifobj_tx->ring.max_rx;
-+	test->ifobj_rx->umem->num_frames = max_descs;
-+	test->ifobj_rx->xsk->rxqsize = max_descs;
-+	test->ifobj_rx->xsk->batch_size = XSK_RING_PROD__DEFAULT_NUM_DESCS;
-+	ret = testapp_validate_traffic(test);
-+	if (ret)
-+		return ret;
-+
-+	/* Set batch_size to 4095 */
-+	test->ifobj_rx->xsk->batch_size = max_descs - 1;
-+	return testapp_validate_traffic(test);
-+}
-+
- static void run_pkt_test(struct test_spec *test)
- {
- 	int ret;
-@@ -2585,6 +2605,7 @@ static const struct test_spec tests[] = {
- 	{.name = "UNALIGNED_INV_DESC_MULTI_BUFF", .test_func = testapp_unaligned_inv_desc_mb},
- 	{.name = "TOO_MANY_FRAGS", .test_func = testapp_too_many_frags},
- 	{.name = "HW_SW_MIN_RING_SIZE", .test_func = testapp_hw_sw_min_ring_size},
-+	{.name = "HW_SW_MAX_RING_SIZE", .test_func = testapp_hw_sw_max_ring_size},
- };
- 
- static void print_tests(void)
+Here is the summary with links:
+  - [net,1/2] net: mediatek: mtk_eth_soc: clear MAC_MCR_FORCE_LINK only when MAC is up
+    https://git.kernel.org/netdev/net/c/f1b85ef15a99
+  - [net,2/2] net: ethernet: mtk_eth_soc: fix PPE hanging issue
+    https://git.kernel.org/netdev/net/c/ea80e3ed09ab
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
