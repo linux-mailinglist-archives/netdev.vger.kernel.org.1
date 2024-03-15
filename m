@@ -1,131 +1,102 @@
-Return-Path: <netdev+bounces-80196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB18A87D748
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 00:19:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B201187D760
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 00:44:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81B0C282E0B
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 23:19:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 452641F21ADC
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 23:44:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F1425A10C;
-	Fri, 15 Mar 2024 23:19:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A32459B6C;
+	Fri, 15 Mar 2024 23:44:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CVbH5fRe"
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="pxiLr+G9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C08359B7C;
-	Fri, 15 Mar 2024 23:19:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F361414A81
+	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 23:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710544791; cv=none; b=avMcd0IL2N2KPWV750XaP6YkkJiwg1cB6ffw4zFcVduRRJSn/Lx45JInbJ1ccMejh7i+xgw733oFLxQR2O/T6o9V3a34gm5rJnFKw/MWPOB2Obe5EUbf01A4zfPnsVbLjeH96bgn4BUwWlnrJBRDwlmchZ30g/q8F3ZkUIjHcOI=
+	t=1710546281; cv=none; b=aCfvH821iHO++qUy6Enj+BIilCbDtVh/ESXQkTy76C8YavUgDtMCF0a7kLtB4/nA+V7OJQfNWmhafV7bAZdaVP1zkHRaOJ4Ggv/KGamPtjvn/DLjolBhhkOhrIJmkvySLU0WgYsz3ALmWgNYkBPtgJAQDIVOXDpOFHK1PKIgnFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710544791; c=relaxed/simple;
-	bh=jBWgkYqvqhVvrT8m7OLF+JmN106sgWSvhxbbqyPfUDI=;
-	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
-	 Message-Id:Subject; b=e7ejf0F+DM36TGyUbuwCharOWMLtGXVJLCZF8tXcQQr28vp3tjtPw3SovVPrXF/t6t4MfrIZ+law2DT7Jdxqyys7AC08xXGCgYsAcBtBX7kzV2o5KpWrGJkx/VWeRCZZB45ZHhPJahqlSdwm0CUW+b6DuVE/eTr7j0K8j85gLt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CVbH5fRe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D366C433F1;
-	Fri, 15 Mar 2024 23:19:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710544790;
-	bh=jBWgkYqvqhVvrT8m7OLF+JmN106sgWSvhxbbqyPfUDI=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=CVbH5fRerXnTKiVloaqImqoEZu0gtZV5dhBTBtdVFe7IITRZnp3YH3Nm265Meyl6b
-	 Hq0gD6iGzKSezqxwEXCyokTEUjRxFzFba/ooq9hRIgIfvWtTa/8Zspfoubyu/6+lIr
-	 DdZZIyf0o271jpS8VO8TjXCnzIawIzZJaUPgUm0F7VlCw8hFS76TuE8OINHwPXneZf
-	 rQ79E8HCSodoBeIF8tKehqrVyX2uFbR7Y40g2I988ZMJgw9Wg1840a8Ebj1H142ZbW
-	 2l2mwlCE9t4WbaxJ8YOQ9xhlQmE9IGl0GLYWVHCFQJQ958tdnrTE4gTSQ4jTb0FYvM
-	 QJ9OwANVCIeng==
-Date: Fri, 15 Mar 2024 17:19:49 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1710546281; c=relaxed/simple;
+	bh=9W0emP71TLyVegPtfhIFli30mDZIEwfJd9QfnxEAAeI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=D09+SqnMBW3lt13Cpj5SCpIRwidLFIecwY2yuIesWI/fkBbxSQC/VxXd6T9fU58MzxqJ0v4px8h1YfoQR6XMSNm+rciR9Gznk73gEXbSP5DOA0RyvyNMXnjmTMX9VpVG51HvvsqBnehmCl080lvQRAIDuaxerlkzTacLivmhkDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=pxiLr+G9; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1710546268;
+	bh=DmvrUMNXUtpSZVzaitPWmDSNlpeFznZ95+rmUpDj/bk=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=pxiLr+G9wiG7ShCCGxO97nJBFeBRkNkYKBAmEE8oi7eDQyyASb3PwlGGzp405JCnD
+	 QOOs2fOMa+QktpaFLnFJV1dGPT+UMeapeG08ZRLGmeGrs3r/R2/7xxtVYZh6ZMA6m7
+	 PzVqUyA9ej9kCGsSTqzUcMxRCIFvVlyi9sPVUcJd7/YQ+RE7p2KADSiCi1iyj+eXxn
+	 BrUMsmuRqyKEmfAIHa8X2efgR5B9RjkDMdDPVi/ltHJHb9bpe/nnqTnbZBBqWVJ1YL
+	 nltG8fh3063WnK4ywUhQmftbcikNAktd0Lq9ABQu2vAXiv8Ehhb3LsGaMXY61BhT4D
+	 dj9tVuTv980KA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4TxLSW4Rr9z4wbr;
+	Sat, 16 Mar 2024 10:44:27 +1100 (AEDT)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: Michal =?utf-8?Q?Such=C3=A1nek?= <msuchanek@suse.de>,
+ dtsen@linux.ibm.com
+Cc: linuxppc-dev@lists.ozlabs.org, wireguard@lists.zx2c4.com, "Jason A.
+ Donenfeld" <Jason@zx2c4.com>, netdev@vger.kernel.org
+Subject: Re: Cannot load wireguard module
+In-Reply-To: <20240315122005.GG20665@kitsune.suse.cz>
+References: <20240315122005.GG20665@kitsune.suse.cz>
+Date: Sat, 16 Mar 2024 10:44:25 +1100
+Message-ID: <87jzm32h7q.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Wadim Mueller <wafgo01@gmail.com>
-Cc: =?utf-8?q?Andreas_F=C3=A4rber?= <afaerber@suse.de>, 
- Eric Dumazet <edumazet@google.com>, Conor Dooley <conor+dt@kernel.org>, 
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, 
- Shawn Guo <shawnguo@kernel.org>, Stephen Boyd <sboyd@kernel.org>, 
- linux-arm-kernel@lists.infradead.org, Rob Herring <robh+dt@kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Richard Cochran <richardcochran@gmail.com>, 
- linux-stm32@st-md-mailman.stormreply.com, 
- Shenwei Wang <shenwei.wang@nxp.com>, Matthias Brugger <mbrugger@suse.com>, 
- Pengutronix Kernel Team <kernel@pengutronix.de>, 
- "David S. Miller" <davem@davemloft.net>, linux-kernel@vger.kernel.org, 
- Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
- Simon Horman <horms@kernel.org>, devicetree@vger.kernel.org, 
- netdev@vger.kernel.org, Fabio Estevam <festevam@gmail.com>, 
- Johannes Zink <j.zink@pengutronix.de>, linux-clk@vger.kernel.org, 
- Sascha Hauer <s.hauer@pengutronix.de>, NXP Linux Team <linux-imx@nxp.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Andrew Halaney <ahalaney@redhat.com>, Jose Abreu <joabreu@synopsys.com>, 
- Swee Leong Ching <leong.ching.swee@intel.com>, 
- Chester Lin <chester62515@gmail.com>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Paolo Abeni <pabeni@redhat.com>, NXP S32 Linux Team <s32@nxp.com>, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, 
- Michael Turquette <mturquette@baylibre.com>
-In-Reply-To: <20240315222754.22366-4-wafgo01@gmail.com>
-References: <20240315222754.22366-1-wafgo01@gmail.com>
- <20240315222754.22366-4-wafgo01@gmail.com>
-Message-Id: <171054478795.2084826.7994527965167081853.robh@kernel.org>
-Subject: Re: [PATCH 3/3] dt-bindings: net: add schema for NXP S32 dwmac
- glue driver
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
+Michal Such=C3=A1nek <msuchanek@suse.de> writes:
+> Hello,
+>
+> I cannot load the wireguard module.
+>
+> Loading the module provides no diagnostic other than 'No such device'.
+>
+> Please provide maningful diagnostics for loading software-only driver,
+> clearly there is no particular device needed.
 
-On Fri, 15 Mar 2024 23:27:49 +0100, Wadim Mueller wrote:
-> Add DT binding schema documentation for the NXP S32 dwmac glue driver. This documentation is based on the patchset originally provided by Chester Lin [1]. This commit is a re-send of [2] and [3].
-> 
-> [1] https://patchwork.kernel.org/project/netdevbpf/patch/20221031101052.14956-6-clin@suse.com/#25068228
-> [2] https://lore.kernel.org/lkml/20221031101052.14956-1-clin@suse.com/T/#me96c28bd0536de276dee941469ea084d51b42244
-> [3] https://lore.kernel.org/lkml/20221031101052.14956-1-clin@suse.com/T/#m887a1b34e612f8dc0d5b718e4d6834c083f1e245
-> 
-> Signed-off-by: Wadim Mueller <wafgo01@gmail.com>
-> ---
->  .../bindings/net/nxp,s32-dwmac.yaml           | 130 ++++++++++++++++++
->  .../devicetree/bindings/net/snps,dwmac.yaml   |   5 +-
->  2 files changed, 133 insertions(+), 2 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
-> 
+Presumably it's just bubbling up an -ENODEV from somewhere.
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+Can you get a trace of it?
 
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml:5:10: [error] string value is redundantly quoted with any quotes (quoted-strings)
+Something like:
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml: 'maintainers' is a required property
-	hint: Metaschema for devicetree binding documentation
-	from schema $id: http://devicetree.org/meta-schemas/base.yaml#
+  # trace-cmd record -p function_graph -F modprobe wireguard
 
-doc reference errors (make refcheckdocs):
+That should probably show where it's bailing out.
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240315222754.22366-4-wafgo01@gmail.com
+> jostaberry-1:~ # uname -a
+> Linux jostaberry-1 6.8.0-lp155.8.g7e0e887-default #1 SMP Wed Mar 13 09:02=
+:21 UTC 2024 (7e0e887) ppc64le ppc64le ppc64le GNU/Linux
+> jostaberry-1:~ # modprobe wireguard
+> modprobe: ERROR: could not insert 'wireguard': No such device
+> jostaberry-1:~ # modprobe -v wireguard
+> insmod /lib/modules/6.8.0-lp155.8.g7e0e887-default/kernel/arch/powerpc/cr=
+ypto/chacha-p10-crypto.ko.zst=20
+> modprobe: ERROR: could not insert 'wireguard': No such device
+=20
+What machine is this? A Power10?
 
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+cheers
 
