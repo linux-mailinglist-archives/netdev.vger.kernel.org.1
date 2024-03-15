@@ -1,48 +1,65 @@
-Return-Path: <netdev+bounces-80097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E47387CFDF
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 16:12:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9454587CFFF
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 16:16:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61C041C2258F
-	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 15:12:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DEEC2830F9
+	for <lists+netdev@lfdr.de>; Fri, 15 Mar 2024 15:16:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DAD12E636;
-	Fri, 15 Mar 2024 15:12:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 507BE3D0C0;
+	Fri, 15 Mar 2024 15:16:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nGZ/tOLV"
+	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="O43SCO9M"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6918B3CF6B
-	for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 15:12:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010013E48E;
+	Fri, 15 Mar 2024 15:16:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.132.182.106
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710515567; cv=none; b=mAb8qV/EUndsM0sEJpRGB3MDrh+IS5ikcWkRt+qOW9duWr0AUDtXPpcEQVpU3NdDZSjFVStBL2hxQia9DuBjRQbMF8uARhN0/TeAJIyNRs2QRH/329HPbnHvKDBFmapTYjEOiGVRGUoiaYVwk7joyZ+JR4uVSfSach3KYSVENtc=
+	t=1710515783; cv=none; b=LVdNaVMmFTWRY9vqY8L14M1kwqjXsDAVpb+wo/01Yq/xF0zCIMibsOkUYVvmi0TwOxIHT8pPGb9U1CYBeLQxsdq/YA22txCgLaDTQ5eXRjRCQFMUqr4mBbdGUB8pfMW8JKLS5lrYxLQE5NCXpU0zuFySlijF1VtodBnDpdi44dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710515567; c=relaxed/simple;
-	bh=uNec6+w51dtNEBRRFtWW3+PljCIgahJliP3Dzp9Or8E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=ludH2PcKSjZB3r/CDVCuu2gdpUHCSCeg4w2U1iKNrRwwLsabTAz8tIoMJYlGpgekJC4ZTAgbjrngjaZguz1+9S0EAW/RDRkk09W5NU8gPfakMmWMh1JselUcFsPxGNjuEVFaWKyNeF2HZgh83o43y2CRcLsHAdZZktfLRjzIJOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nGZ/tOLV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2CF3C433F1;
-	Fri, 15 Mar 2024 15:12:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710515566;
-	bh=uNec6+w51dtNEBRRFtWW3+PljCIgahJliP3Dzp9Or8E=;
-	h=Date:Subject:To:References:Cc:From:In-Reply-To:From;
-	b=nGZ/tOLVTJ8Ch+krP9daXzMppAIgg5KiToQ+IMWSLo22YjF3lSUmNW2QnBHODY3Q+
-	 DHs8fbdTypvc80L/vuF6bxSqFIgoI8JYtdRiz7fRKuGN7D9ne4Q+5QaLqDOGI/CH6w
-	 6pBoMz1SON7ATCjPvjS7INmJ5hhO4Y8ABuzVH3cryGK12cElLpyV0omNFVx+XVC3vZ
-	 l/WfCMAfEWiS8q26eEvb+kxtGRoBt7Oyf3/OjeWgV6YgYE/Fnb5ysG9JSMu3Mx1ZMj
-	 x3DDW52PntfyJ2ue2AZ0EaJjnBtiUeFc9zCNnBUkXD0ad+acfjYJQTZ80pml8I8+vI
-	 U42pK+gZbuD0w==
-Message-ID: <9883d05e-a18b-4b41-8a0d-8b0038aeceb7@kernel.org>
-Date: Fri, 15 Mar 2024 09:12:46 -0600
+	s=arc-20240116; t=1710515783; c=relaxed/simple;
+	bh=IHIPLZE3idlw2cVAcFI6y49qart4V2n1jZXMAHDIMxo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Lq2Qm0B/iSkhv9HW6XbGDzChrPhlJkNucuyWM7cn4xatHFEB0DeHIkyOyNw3VD7+TmPDP7NXr+7oq+kElfZFcq2ZogUMbEVD0RwWocz0EDFKiJtw+wCYyKoz/+8EhSf2SgUPsoQkun6UwNDwdevApYxo+qBbsMUBtA0iPrVudSw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=O43SCO9M; arc=none smtp.client-ip=185.132.182.106
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42FEcweV009640;
+	Fri, 15 Mar 2024 16:15:47 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	selector1; bh=mN5YOoII/OjhboOJve/4NynjPrKGyVn2gyMyB0ukmK8=; b=O4
+	3SCO9MyJtYSOKQdCylCRvSDcHHxssv5BfVPLBubd9+Szkv5WcxgLnXtQAUfWgSpU
+	I/ziY/map1ZTLqOZb8ZAnHsdyX60bH1ck19Gasjv4xwvTDWB7UoL00peD7ZiCStO
+	KeaFREhRryPVNq8JlIigO7sTODYdN74knfTf/64YaI2cECSnOQXA2TDg2oVnyhxf
+	P1Ith7hPfjfZF1sCPg9eLz3nYzbimwXYUPLzLHoxToQw0oCvidRmtD+dA3IjzbcF
+	g9O/JaNlPfLQ71HLGwZi21RHHQpgGpDVpk7byycaRUQ1xcUN6bn0PdAJMuuQbsMe
+	cbrKU5yedbA9yalQymXg==
+Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3wv9yckf3e-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 15 Mar 2024 16:15:46 +0100 (CET)
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id A126D4002D;
+	Fri, 15 Mar 2024 16:15:30 +0100 (CET)
+Received: from Webmail-eu.st.com (shfdag1node2.st.com [10.75.129.70])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 8AEB827564A;
+	Fri, 15 Mar 2024 16:14:16 +0100 (CET)
+Received: from [10.252.28.102] (10.252.28.102) by SHFDAG1NODE2.st.com
+ (10.75.129.70) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 15 Mar
+ 2024 16:14:15 +0100
+Message-ID: <ac696442-0513-48cc-86b1-8647b9bd8e91@foss.st.com>
+Date: Fri, 15 Mar 2024 16:14:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,169 +67,138 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iproute2] ematch: support JSON output
+Subject: Re: [PATCH v2 2/2] dt-bindings: net: add new property st,ext-phyclk
+ in documentation for stm32
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
+        "David S . Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh+dt@kernel.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski+dt@linaro.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+        Alexandre Torgue
+	<alexandre.torgue@foss.st.com>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Jose Abreu <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+        Mark
+ Brown <broonie@kernel.org>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
+References: <20240307135957.303481-1-christophe.roullier@foss.st.com>
+ <20240307135957.303481-3-christophe.roullier@foss.st.com>
+ <578f421c-ca06-45d4-8380-8b2b423d4d47@linaro.org>
+ <50ee6122-b160-48ea-8c44-1046b5907d7c@foss.st.com>
+ <e2a98098-8ccd-4b8f-9a4b-1cbc0776a9c2@linaro.org>
+ <51531046-ee83-4d99-836b-af4dc5d7add9@foss.st.com>
+ <cf122942-c0fd-457f-a753-366cae39d5f8@linaro.org>
 Content-Language: en-US
-To: Stephen Hemminger <stephen@networkplumber.org>, netdev@vger.kernel.org
-References: <20240314002415.26518-1-stephen@networkplumber.org>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240314002415.26518-1-stephen@networkplumber.org>
-Content-Type: text/plain; charset=UTF-8
+From: Christophe ROULLIER <christophe.roullier@foss.st.com>
+In-Reply-To: <cf122942-c0fd-457f-a753-366cae39d5f8@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE2.st.com
+ (10.75.129.70)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-15_02,2024-03-13_01,2023-05-22_02
 
-On 3/13/24 6:24 PM, Stephen Hemminger wrote:
-> diff --git a/tc/em_canid.c b/tc/em_canid.c
-> index 228547529134..815ed8c7bce0 100644
-> --- a/tc/em_canid.c
-> +++ b/tc/em_canid.c
-> @@ -154,24 +154,29 @@ static int canid_print_eopt(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
->  
->  		if (pcfltr->can_id & CAN_EFF_FLAG) {
->  			if (pcfltr->can_mask == (CAN_EFF_FLAG | CAN_EFF_MASK))
-> -				fprintf(fd, "eff 0x%"PRIX32,
-> -						pcfltr->can_id & CAN_EFF_MASK);
-> -			else
-> -				fprintf(fd, "eff 0x%"PRIX32":0x%"PRIX32,
-> -						pcfltr->can_id & CAN_EFF_MASK,
-> -						pcfltr->can_mask & CAN_EFF_MASK);
-> +				print_0xhex(PRINT_ANY, "eff", "eff 0x%"PRIX32,
-> +					    pcfltr->can_id & CAN_EFF_MASK);
-> +			else {
-> +				print_0xhex(PRINT_ANY, "eff", "eff 0x%"PRIX32,
-> +					    pcfltr->can_id & CAN_EFF_MASK);
-> +				print_0xhex(PRINT_ANY, "mask", ":0x%"PRIX32,
-> +					    pcfltr->can_mask & CAN_EFF_MASK);
-> +			}
+Hi
 
-if the else branch has {}, the first one should as well.
+On 3/14/24 16:25, Krzysztof Kozlowski wrote:
+> On 14/03/2024 16:10, Christophe ROULLIER wrote:
+>> Hi,
+>>
+>> On 3/13/24 14:06, Krzysztof Kozlowski wrote:
+>>> On 13/03/2024 11:39, Christophe ROULLIER wrote:
+>>>> On 3/8/24 09:28, Krzysztof Kozlowski wrote:
+>>>>> On 07/03/2024 14:59, Christophe Roullier wrote:
+>>>>>> Add property st,ext-phyclk to manage cases when PHY have no cristal/quartz
+>>>>>> This property can be used with RMII phy without cristal 50Mhz and when we
+>>>>>> want to select RCC clock instead of ETH_REF_CLK
+>>>>>> Can be used also with RGMII phy with no cristal and we select RCC clock
+>>>>>> instead of ETH_CLK125
+>>>>>>
+>>>>> Nothing improved here. You say you add new property (wrote it explicitly
+>>>>> in the subject), but where is it? Where is the user?
+>>>>>
+>>>>> I think we talked about this. Rob also asked quite clear:
+>>>>>
+>>>>>> That is obvious from the diff. What is not obvious is why we need a new
+>>>>>> property and what is the problem with the existing ones.
+>>>>> How did you solve it?
+>>>> Hi,
+>>>>
+>>>> I do not understand your questions.
+>>> OK, I will clarify some questions, but are you sure that this question:
+>>> "How did you solve it?"
+>>> needs clarification?
+>>>
+>>> If so, then let me clarify:
+>>> Rob pointed issue. How did you resolve Rob's comment? How did you
+>>> address it? What changed in your patch, that Rob's comment should be
+>>> considered as addressed/resolved/done?
+>> This property was introduced in 2020 in order to simplify management of
+>> all STM32 platforms without Ethernet cristal/quartz PHY.
+> I fail to see how this answers how did you resolve the comment. You now
+> described some sort of history, but I am asking: what did you change in
+> your patches, so Rob's comment is considered resolved?
 
->  		} else {
-> +			
+Concerning Rob's comment, in V2 I finally remove deprecated fields put 
+in V1 to keep existing properties, which have no pb and can be used.
 
-unneeded extra newline
+And I explained the meaning to add existing property in yaml.
 
->  			if (pcfltr->can_mask == (CAN_EFF_FLAG | CAN_SFF_MASK))
-> -				fprintf(fd, "sff 0x%"PRIX32,
-> -						pcfltr->can_id & CAN_SFF_MASK);
-> -			else
-> -				fprintf(fd, "sff 0x%"PRIX32":0x%"PRIX32,
-> -						pcfltr->can_id & CAN_SFF_MASK,
-> -						pcfltr->can_mask & CAN_SFF_MASK);
-> +				print_0xhex(PRINT_ANY, "sff", "sff 0x%"PRIX32,
-> +					    pcfltr->can_id & CAN_SFF_MASK);
-> +			else {
-> +				print_0xhex(PRINT_ANY, "sff", "sff 0x%"PRIX32,
-> +					    pcfltr->can_id & CAN_SFF_MASK);
-> +				print_0xhex(PRINT_ANY, "mask", ":0x%"PRIX32,
-> +					    pcfltr->can_mask & CAN_SFF_MASK);
-> +			}
->  		}
->  
->  		if ((i + 1) < rules_count)
-> -			fprintf(fd, " ");
-> +			print_string(PRINT_FP, NULL, " ", NULL);
->  	}
->  
->  	return 0;
-> diff --git a/tc/em_cmp.c b/tc/em_cmp.c
-> index dfd123df1e10..9e2d14077c6c 100644
-> --- a/tc/em_cmp.c
-> +++ b/tc/em_cmp.c
-> @@ -138,6 +138,8 @@ static int cmp_print_eopt(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
->  			  int data_len)
->  {
->  	struct tcf_em_cmp *cmp = data;
-> +	const char *align = NULL;
-> +	const char *op = NULL;
->  
->  	if (data_len < sizeof(*cmp)) {
->  		fprintf(stderr, "CMP header size mismatch\n");
-> @@ -145,28 +147,36 @@ static int cmp_print_eopt(FILE *fd, struct tcf_ematch_hdr *hdr, void *data,
->  	}
->  
->  	if (cmp->align == TCF_EM_ALIGN_U8)
-> -		fprintf(fd, "u8 ");
-> +		align = "u8";
->  	else if (cmp->align == TCF_EM_ALIGN_U16)
-> -		fprintf(fd, "u16 ");
-> +		align = "u16";
->  	else if (cmp->align == TCF_EM_ALIGN_U32)
-> -		fprintf(fd, "u32 ");
-> +		align = "u32";
->  
-> -	fprintf(fd, "at %d layer %d ", cmp->off, cmp->layer);
-> +	print_uint(PRINT_JSON, "align", "%u ", cmp->align);
-> +	if (align)
-> +		print_string(PRINT_FP, NULL, "%s ", align);
-> +
-> +	print_uint(PRINT_ANY, "offset", "at %u ", cmp->off);
-> +	print_uint(PRINT_ANY, "layer", "layer %u ", cmp->layer);
->  
->  	if (cmp->mask)
-> -		fprintf(fd, "mask 0x%x ", cmp->mask);
-> +		print_0xhex(PRINT_ANY, "mask", "mask 0x%x ", cmp->mask);
->  
->  	if (cmp->flags & TCF_EM_CMP_TRANS)
-> -		fprintf(fd, "trans ");
-> +		print_null(PRINT_ANY, "trans", "trans ", NULL);
->  
->  	if (cmp->opnd == TCF_EM_OPND_EQ)
-> -		fprintf(fd, "eq ");
-> +		op = "eq";
->  	else if (cmp->opnd == TCF_EM_OPND_LT)
-> -		fprintf(fd, "lt ");
-> +		op = "lt";
->  	else if (cmp->opnd == TCF_EM_OPND_GT)
-> -		fprintf(fd, "gt ");
-> +		op = "gt";
-> +
-> +	if (op)
-> +		print_string(PRINT_ANY, "opnd", "%s ", op);
+>>> Now about my other question:
+>>> "but where is it? Where is the user?"
+>>>
+>>> Your subject and commit message claim you add new property. This means
+>>> such property was not existing so far in the Linux kernel. If you add
+>>> new property in the binding, then I expect adding the user of that
+>>> binding, thus my question: where is the user of that binding?
+>>>
+>> I'm preparing glue and DTS to upstream for STM32MP13 platform, this
+>> platform will use with property.
+>>
+>> Since 2020, this property is available in the driver in kernel.org, so
+>> it is also possible that someone who has not upstreamed their
+> This should be explained in commit msg (although not kernel.org, website
+> does not matter here).
+ok I will add this in V3.
+>
+>> code also uses it.
+>>
+>>>> That I would like to do, it is property "st,ext-phyclk" was introduced
+>>>> in driver
+>>>>
+>>>> "drivers/net/ethernet/stmicro/stmmac/dwmac-stm32.c" in 2020, and YAML
+>>>> was not updated at the time.
+>>> Are you saying you document existing property or add a new one?
+>> Yes, existing property, since 2020 in kernel.org.
+> Drop the website. We talk here about Linux kernel.
+>
+> Commit msg fails to explain it in a clear way.
 
-seems like a change in output which tends to break the tdc suite. Please
-cc Jamal on tc patches.
+ok I will add this in V3.
 
->  
-> -	fprintf(fd, "%d", cmp->val);
-> +	print_uint(PRINT_ANY, "val", "%u", cmp->val);
->  
->  	return 0;
->  }
+Thanks
 
-
-> @@ -436,53 +445,51 @@ static inline int print_value(FILE *fd, int type, struct rtattr *rta)
->  	}
->  
->  	switch (type) {
-> -		case TCF_META_TYPE_INT:
-> -			if (RTA_PAYLOAD(rta) < sizeof(__u32)) {
-> -				fprintf(stderr, "meta int type value TLV " \
-> -				    "size mismatch.\n");
-> -				return -1;
-> -			}
-> -			fprintf(fd, "%d", rta_getattr_u32(rta));
-> -			break;
-> +	case TCF_META_TYPE_INT:
-> +		if (RTA_PAYLOAD(rta) < sizeof(__u32)) {
-> +			fprintf(stderr,
-> +				"meta int type value TLV size mismatch.\n");
-> +			return -1;
-> +		}
-> +		print_uint(PRINT_ANY, "value", "%u", rta_getattr_u32(rta));
-> +		break;
->  
-> -		case TCF_META_TYPE_VAR:
-> -			print_binary(fd, RTA_DATA(rta), RTA_PAYLOAD(rta));
-> -			break;
-> +	case TCF_META_TYPE_VAR:
-> +		print_binary(RTA_DATA(rta), RTA_PAYLOAD(rta));
-> +		break;
->  	}
-
-whitespace cleanup should be a separate patch.
-
-in general this is a large patch. It would be better as a series
-
-pw-bot: cr
-
+>
+>>>> Goal of this patch it is to update YAML to avoid dtbs check issue if
+>>>> someone use this property :
+>>>>
+>>>>     dtbs check issue : views/kernel/upstream/net-next/arch/arm/boot/dts/st/stm32mp157c-dk2.dtb:
+>>>> ethernet@5800a000: Unevaluated properties are not allowed
+>>>> ('st,ext-phyclk' was unexpected)
+>>> So DTS uses it?
+>> Here it was example, if someone wants to use this property, but today
+>> this property is not yet present in DTS in kernel.org
+>
+> Best regards,
+> Krzysztof
+>
 
