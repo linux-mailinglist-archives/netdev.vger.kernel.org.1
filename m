@@ -1,176 +1,156 @@
-Return-Path: <netdev+bounces-80221-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D79587DA85
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 16:07:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00E6487DA88
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 16:11:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE9C41F21C59
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 15:07:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EDB52821BC
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 15:11:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E51E1182B5;
-	Sat, 16 Mar 2024 15:07:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF1BC18EA1;
+	Sat, 16 Mar 2024 15:11:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="RaQPaHig"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KnG2uS9Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80460134B6
-	for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 15:07:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6909D168BE
+	for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 15:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710601628; cv=none; b=Th0n8kQD4JiStU/CJP0nZiJJFcKToiAH4PHxGXPH3ZpPu8XNHDQDFLBm6DuyhEeFTfig/trkWCWPQjrsq/YWvVUuRoRD38uMYXScs4KxUqy5zzEa8bgzHXaUGBY1iw7U+nxiszdcu8Ol/4mWa1OxMLU4Vhx9oE/9b2cMnRaLf5A=
+	t=1710601896; cv=none; b=mF2R/p4VFW7cS6ba78fC9CTyA+FZxdX4oKb3z92C1pzC/35lGQAKQigva7s+ycd8IVg3YmVdL1fsrK0WtMM2TUKgO64cPCP6BQXPmeDZi0Py/9jKtjXYHlt7yyMf0ByeZ/7Lwh1z/WNW1JRzB/pUnLzUsFNGYE1Ju4scdZBB9Ec=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710601628; c=relaxed/simple;
-	bh=xc0wOfwHP0tnVCnF8pvuBtJ7+s62XI9CbDQZRBbuKW8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=SOlypRwPBPU4k9qSlJWnT/ZoCkFQAR8zJEJfmg04fxrBdkDBfZ7VKnstfibqXXL7ZcOzoO1jOEotl29GOLZQ7sCHpkbxfh78n7sKh4ShLAshvHI17oyzyWgqjVEe/M3FcPo2/CBIINyTuvR7YBpg/iMYaF6TRxZUnf0sfHbZyBM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=RaQPaHig; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-53fa455cd94so2345902a12.2
-        for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 08:07:06 -0700 (PDT)
+	s=arc-20240116; t=1710601896; c=relaxed/simple;
+	bh=F+I/1ynaYr1QMsBSvgL6RgQ2WXyo4LqekOL85IIoQSU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Byk6JzKJfrflkhdRIYVgryLpXaRpUtEaMIFNymMjQMUsJmAtoUcB6Wl7gjFENrUAKojITVWTwf/tt5E9zmz6od9dd9tOOQJ2K1tCXl9sEzucu7C8tIVdbjXeJ1pjw/bxxeVGv7t2MyOG71HiOwkXb3xa+ZCnOtyEkXsiFiV029M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KnG2uS9Z; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-5d3907ff128so2397080a12.3
+        for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 08:11:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1710601625; x=1711206425; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1710601894; x=1711206694; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OBI0lbmrHALdF0W6xX/fVjoMi6UU1SsjJGnSeWgjFqA=;
-        b=RaQPaHiggTZBTZStF2N2pDsg4Hr7LRxsRdYTGY0WAsfwp9Eqwbsufs1EUyWS8M8Azx
-         nV3ZtTrSmZBZTm2jyMPQOdGXaNUQKqpI6nBR0otGx1aQEdiPE+Y+KhOEklG/vzw3/qoX
-         6aHA9SELxmmjNl9go7jBTrk8I/JjTaMadoJtWkPBigfaJUOG46VU5hPXt0pdTJe2dl9c
-         bdNAiZtAOAiAiOGxI/wUTvQ1ezM5MEtYw7zzaB7qXzCH1B9BkKOmPX8TUMlks54RLAEv
-         xHUnJuu5mO4ANiSlBSSzVEh58l+c2tN5aj2BXvZK/5hhYY4gFrne+Zu4LbnskDEELUZy
-         kKbg==
+        bh=nnyrmkO2WJ1aiVJu53KHDMTRTgrmRURAaCkNIqMa+M0=;
+        b=KnG2uS9ZjptwvpMVDNOZ13DbtYz2B24GLcspru4P+iVUEPbVtbysEppda6qDUTEhCK
+         TgkKEuH33RGgA34cBfiVGk0+6bnwZQmABSis/PJwzNoTTfwCZuENjgYDmGlby6K+Fb9G
+         A26z7XuGYudjwFNitrJD9F4Zfy+7avezkskqZBgFiCxyJlD2AasCLbMiJdp0qnFOKHUY
+         bbcEKCoAbzXjx1moZqq6qWa6PzBHQneLQ3FtiSdoEaBMYzGYiueeGBD+SxVxJ9Q8P9wX
+         r3Sz554cZg70j63e+EIi6GAKCt2gyjSHDbYdepk9eueZ3hcFMU2fWQDboHKh8kpa0z+d
+         tKjg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710601625; x=1711206425;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1710601894; x=1711206694;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OBI0lbmrHALdF0W6xX/fVjoMi6UU1SsjJGnSeWgjFqA=;
-        b=SKiTANGByWFArVm894/M3Y26ELni96rvmkDql53v9uvT5nxrKN/KfcFNrkrn9SM0dB
-         ls54XzQVCOG57t7ULP2JfEvF5o+xPWjJB8Lq0adWLLx20esTeUaKsrgM0T8T9VUQlTb4
-         0PvJ898XgB523aKtl46pmqeS0Bhr9LCfWQegNJ4ZIJjJt8kJlC9HyP2iNv1jpDUr4oHa
-         0KtpV68a3//I57SCuXAsQ/Q/M2KhC4KbZuNnw974+qWlzuIWGYt5SQHeN9H/Vu5PhPMH
-         FmLM16GNa0p3lhG2J8mGsVrEijz9ANWZrOEOsIojBxMaqE5eB/dHeKgqAVCCKyiMKtZB
-         GoCA==
-X-Gm-Message-State: AOJu0Yxh45knZE676qsw+ioL99rgiscv6E/JTx8YbEGwR2Q3jinW8wHa
-	rd5Nzp0T3NqEu3JTNtshygam76oYdpXhzOxFUP1B32MYA1HF00d8kU4AFxyAfnGaw6Suy3xYS1Q
-	duIM=
-X-Google-Smtp-Source: AGHT+IFUCvm/SGlgIdOZPrtln8XJOwR7ZaHjcphPg2Qum0cMmMObal4iPGBbUI1qCZNMbvIUUNjB/g==
-X-Received: by 2002:a17:902:da86:b0:1dd:76e0:a19a with SMTP id j6-20020a170902da8600b001dd76e0a19amr9560635plx.34.1710601625502;
-        Sat, 16 Mar 2024 08:07:05 -0700 (PDT)
-Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id w3-20020a170902e88300b001db5bdd5e3asm277916plg.84.2024.03.16.08.07.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Mar 2024 08:07:04 -0700 (PDT)
-Date: Sat, 16 Mar 2024 08:07:02 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Max Gautier <mg@max.gautier.name>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2-next] arpd: create /var/lib/arpd on first use
-Message-ID: <20240316080702.4cb0ed9a@hermes.local>
-In-Reply-To: <20240316091026.11164-1-mg@max.gautier.name>
-References: <20240313093856.17fc459e@hermes.local>
-	<20240316091026.11164-1-mg@max.gautier.name>
+        bh=nnyrmkO2WJ1aiVJu53KHDMTRTgrmRURAaCkNIqMa+M0=;
+        b=rzP5M4vIRL7C9wIwkGnkGHy4NWydI8Xz3ic9nibtNsjYyUz+0E6/U/qo75y8yFsot1
+         GKABc7pHV6FrheYLJayiukOhVCCXmRBt3yj1pqq4M4E3oK6kTgIbuqXnp8gXKXRI+Iga
+         3eSxDnmjNi/j5Bmg9lMeiVKv4jr/n4/6Qs3V3oeWC1rq1lw0n1mzLRgLuVb9jNohjvmB
+         5DVk1kNmfUKjpzZfkyk0fafgnMo4Fo6kezPYjaSX3t1iIILm8IKQ4HH1vsawDY7uFgpG
+         7nc5n7oCCAuTVBTIWoa3jiEJ3OMwDppqVwE1oFjD9uTWpX2SHkiuOoG7k+tE2LwZ42TM
+         8hxA==
+X-Forwarded-Encrypted: i=1; AJvYcCUPQnZsxmGxl+w1pWEw/7aZ+K5pNcqHpZwyfMWCMFe9HxfGdyEMRGZnYjEP4g6KfS3cgnF35zw8WCdsbdjXx+bG4LUCTwVw
+X-Gm-Message-State: AOJu0Yy1ze5STbWiDiKnJucwXq8sIzvya4EcyktRBcgCuud+bNAK7Jmz
+	NXAAIAzGnz28SiBRT72kOcN6CnhdeV+tT1xJpuMLUgdCFPrfUBly9uehboeEo6ZxAddZrALYoEg
+	6NDSXi++LQgOMsmwo74p0OSj+Cg==
+X-Google-Smtp-Source: AGHT+IGZa0cQAWI4T7uRiJsAgEOiOc6mVrii1BCocHOQGeO4MemH99/Cl2XZqewqZ5gmsXyqkxyeD2OElsZsVhZ5XIc=
+X-Received: by 2002:a05:6a21:170f:b0:1a3:4979:f25e with SMTP id
+ nv15-20020a056a21170f00b001a34979f25emr7244773pzb.59.1710601894351; Sat, 16
+ Mar 2024 08:11:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <ZfOalln/myRNOkH6@cy-server> <ZfRc1eUJJSoaGSpn@smile.fi.intel.com>
+In-Reply-To: <ZfRc1eUJJSoaGSpn@smile.fi.intel.com>
+From: Chenyuan Yang <chenyuan0y@gmail.com>
+Date: Sat, 16 Mar 2024 10:11:23 -0500
+Message-ID: <CALGdzurn0q49m10=K8vPDnvWyw9UyuaPVbYDnuE71oFp0TAAeQ@mail.gmail.com>
+Subject: Re: [net/netlink] Question about potential memleak in netlink_proto_init()
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>, "fw@strlen.de" <fw@strlen.de>, kuniyu@amazon.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, horms@kernel.org, anjali.k.kulkarni@oracle.com, 
+	pctammela@mojatatu.com, dhowells@redhat.com, netdev@vger.kernel.org, 
+	zzjas98@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sat, 16 Mar 2024 10:06:44 +0100
-Max Gautier <mg@max.gautier.name> wrote:
+Thank you all for sharing your insights on this issue.
 
-> The motivation is to build distributions packages without /var to go
-> towards stateless systems, see link below (TL;DR: provisionning anything
-> outside of /usr on boot).
-> 
-> We only try do create the database directory when it's in the default
-> location, and assume its parent (/var/lib in the usual case) exists.
-> 
-> Links: https://0pointer.net/blog/projects/stateless.html
-> ---
-> Instead of modifying the default location, I opted to create it at
-> runtime, but only for the default location and assuming that /var/lib
-> exists. My thinking is that not changing defaults is somewhat better,
-> plus using /var/tmp directly might cause security concerns (I don't know
-> that it does, but at least someone could create a db file which the root
-> user would then open by default. Not sure what that could cause, so I'd
-> rather avoid it).
-> 
->  Makefile    |  2 +-
->  misc/arpd.c | 12 +++++++++++-
->  2 files changed, 12 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Makefile b/Makefile
-> index 8024d45e..2b2c3dec 100644
-> --- a/Makefile
-> +++ b/Makefile
-> @@ -42,6 +42,7 @@ DEFINES+=-DCONF_USR_DIR=\"$(CONF_USR_DIR)\" \
->           -DCONF_ETC_DIR=\"$(CONF_ETC_DIR)\" \
->           -DNETNS_RUN_DIR=\"$(NETNS_RUN_DIR)\" \
->           -DNETNS_ETC_DIR=\"$(NETNS_ETC_DIR)\" \
-> +         -DARPDDIR=\"$(ARPDDIR)\" \
->           -DCONF_COLOR=$(CONF_COLOR)
->  
->  #options for AX.25
-> @@ -104,7 +105,6 @@ config.mk:
->  install: all
->  	install -m 0755 -d $(DESTDIR)$(SBINDIR)
->  	install -m 0755 -d $(DESTDIR)$(CONF_USR_DIR)
-> -	install -m 0755 -d $(DESTDIR)$(ARPDDIR)
->  	install -m 0755 -d $(DESTDIR)$(HDRDIR)
->  	@for i in $(SUBDIRS);  do $(MAKE) -C $$i install; done
->  	install -m 0644 $(shell find etc/iproute2 -maxdepth 1 -type f) $(DESTDIR)$(CONF_USR_DIR)
-> diff --git a/misc/arpd.c b/misc/arpd.c
-> index 1ef837c6..a133226c 100644
-> --- a/misc/arpd.c
-> +++ b/misc/arpd.c
-> @@ -19,6 +19,7 @@
->  #include <fcntl.h>
->  #include <sys/uio.h>
->  #include <sys/socket.h>
-> +#include <sys/stat.h>
->  #include <sys/time.h>
->  #include <time.h>
->  #include <signal.h>
-> @@ -35,7 +36,8 @@
->  #include "rt_names.h"
->  
->  DB	*dbase;
-> -char	*dbname = "/var/lib/arpd/arpd.db";
-> +char const * const	default_dbname = ARPDDIR "/arpd.db";
+I'm pondering over the best solution: should we follow Kuniyuki's
+suggestion to "eliminate the cleanup code," or would it be better to
+adopt Florian's approach of "eschewing error handling in favor of
+immediate panic"?
 
-Make this an array.
-const char *default_dbname[] = ARPDDIR "/arpd.db";
+Best,
+Chenyuan
 
-
-> +char const	*dbname = default_dbname;
->  
->  int	ifnum;
->  int	*ifvec;
-> @@ -668,6 +670,14 @@ int main(int argc, char **argv)
->  		}
->  	}
->  
-> +	if (default_dbname == dbname
-> +			&& mkdir(ARPDDIR, 0755) != 0
-> +			&& errno != EEXIST
-> +			) {
-> +		perror("create_db_dir");
-> +		exit(-1);
-> +	}
-> +
->  	dbase = dbopen(dbname, O_CREAT|O_RDWR, 0644, DB_HASH, NULL);
->  	if (dbase == NULL) {
->  		perror("db_open");
-
-Missing signed-off-by
+On Fri, Mar 15, 2024 at 9:36=E2=80=AFAM Andy Shevchenko
+<andriy.shevchenko@linux.intel.com> wrote:
+>
+> On Thu, Mar 14, 2024 at 07:47:18PM -0500, Chenyuan Yang wrote:
+> > Dear Netlink Developers,
+> >
+> > We are curious whether the function `netlink_proto_init()` might have a
+> > memory leak.
+> >
+> > The function is
+> > https://elixir.bootlin.com/linux/v6.8/source/net/netlink/af_netlink.c#L=
+2908
+> > and the relevant code is
+> > ```
+> > static int __init netlink_proto_init(void)
+> > {
+> >       int i;
+> >   ...
+> >
+> >       for (i =3D 0; i < MAX_LINKS; i++) {
+> >               if (rhashtable_init(&nl_table[i].hash,
+> >                                   &netlink_rhashtable_params) < 0) {
+> >                       while (--i > 0)
+> >                               rhashtable_destroy(&nl_table[i].hash);
+> >                       kfree(nl_table);
+> >                       goto panic;
+> >               }
+> >       }
+> >   ...
+> > }
+> > ```
+> >
+> > In the for loop, when `rhashtable_init()` fails, the function will free=
+ the
+> > allocated memory for `nl_table[i].hash` by checking `while (--i > 0)`.
+> > However, the first element (`i=3D1`) of `nl_table` is not freed since `=
+i` is
+> > decremented before the check.
+> >
+> > Based on our understanding, a possible fix would be
+> > ```
+> > -      while (--i > 0)
+> > +      while (--i >=3D 0)
+> > ```
+>
+> The better pattern (and widely used in kernel) is
+>
+>         while (i--)
+>
+> > Please kindly correct us if we missed any key information. Looking forw=
+ard to
+> > your response!
+>
+> --
+> With Best Regards,
+> Andy Shevchenko
+>
+>
 
