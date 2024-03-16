@@ -1,180 +1,98 @@
-Return-Path: <netdev+bounces-80226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C887187DABF
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 17:19:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19F4287DACF
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 17:29:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 661301F21CD9
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 16:19:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1EDD1F21A66
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 16:29:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A508E1BC43;
-	Sat, 16 Mar 2024 16:19:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B4891BC40;
+	Sat, 16 Mar 2024 16:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MwrqswgV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCE3D1BC20
-	for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 16:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC581BDD0;
+	Sat, 16 Mar 2024 16:29:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710605966; cv=none; b=LV5kPzkP04EjNf30Ho+sljOxudB4Adds5tivUDGvd56zSem03OmgyzkP6rqoLhLsbohTscn+zDQSytjcnUJToG45cRn24r/DUtDGUoHv1CAMijT2V0QhrT9tCf4FhAlTBKeWJ0MYw2xRxc6hba8m1Nnbu+FjS8Im9tcAK/D3R4U=
+	t=1710606570; cv=none; b=gPO1wamtqrbPgBiC9G4B2ik4QRRtnHr0LffKsxTt7qmBj06jwVn+CELqotBsHiApRKK03PK5uRqF7Aui3uiu7ARPeEa3uk6eELPqOQu63t6PYNmm4Jd2358Y+B226RQsWBJojC39r/Az7/5LTU1SCGfCt02ZRI+GNmyxlQY6FLg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710605966; c=relaxed/simple;
-	bh=+FhPLa0Rk5KaNidia6MCMfaPjXpKlOVaJgiPKSVbdE0=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=AI42VOhG3DsuXZX1uQTxKPLDXsVROFMsMGMRkWIsYHSaSfpD/0nkdfX4Z0PD+QiUwrb1Hb4nBx0rm2lJgjRw92VigPPF2McOG9RP6zzOD80euQY2r/9oxyK6zzh/GVmjZ9BU/R5GgNuRKPJNKTbaM0rAXb8gQKg51hqhuLIDbeg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c8a960bd9eso252558539f.0
-        for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 09:19:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710605964; x=1711210764;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Uf6W3Zg2dvW4+JRL0J6TTi5aicDL8OJz3V+JIREMUJw=;
-        b=ipefAmTV+YVecIGwtUCqwFO04WFPJoMg9SfJYNs5EI7Whk3nSdELVzRqnbdS6SmRED
-         JkaKvwLPJOO70Y83DrRq1s4W+LSC3LIccQwVNYQNcU3Wh2prdRixhzmScvBiCBwkDeME
-         zEL2WOORIaSdexvWG7Vd+TO2+QImzlBjWeFfYCUvE75uhKNA49569koPFzKUNMy+6ivD
-         l7xHQ1iZLVd6+iToGwI7fS9TvxmDJ3NnNUNiFKiC/rBdzVeUGVnnmNoQsrT1rukxb8fa
-         wCb/6LXnf+d2c1TmoPjiHXgFx3QuMu1dYWi22W55vw7tBBWNwnQbZ9aRTmi0q3UcHwGF
-         4BLA==
-X-Forwarded-Encrypted: i=1; AJvYcCX3Fc17oWArN/91oAoAusNLBEYhtwvZfxsuQA2AMQvo5mdUbXPX4t5LrYMvb7vMmdYhLty9AXqaN9KsDjKvjjLB+wW/hiw/
-X-Gm-Message-State: AOJu0YziafZI3ICtmhY3n7UW4TWIH3u62Pm9sGkH2KSQsgxYC6R7YHN4
-	3z9iWlD8VDxUevRNH1baLFO51hccaZDeJjbnIYnQlv2EmOfJT+I9U+Zg5SqqT+L38crnJlvQwOB
-	m/QPCstg8yFgngX3SIDg75NWce01r3vHkXxysM5e9S9LhQfwdafcFFfw=
-X-Google-Smtp-Source: AGHT+IGikfW01z7K2y5JnZchZJvcVj4AYhPuOoEanssKaWL9kn3ExakVmnSjQwzwrsbu+j3WDvlTX9f5sleigmep3j/fhRfGZ0VW
+	s=arc-20240116; t=1710606570; c=relaxed/simple;
+	bh=5qE8kYJREZWCNMC1klayr2kNVh5Rg7+5qdAS3gKxcg4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IcLCE8I9nKL4YL86Cfj+fgniCB22IgwPBk6/ca0aYm+ctVklkLvBzRzpvtC6LCjs3O/Q4vVM8fZRKbOK7KGATgPlWJT5/pD5OCrJ8gwdiUjbMVXdRINJ2aX5BUPswq26BeHL15VawEyFptW5paMQNNGEtkyajdLYrOXBQT/D6Fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MwrqswgV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF03CC433F1;
+	Sat, 16 Mar 2024 16:29:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710606569;
+	bh=5qE8kYJREZWCNMC1klayr2kNVh5Rg7+5qdAS3gKxcg4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=MwrqswgVxGCPKB7gHtMKSFzUTipBn3n9+ODM2kZBJaCwPT9ZnEJMlSg6Z9RPPknIT
+	 jYRQBPiG+vRDIBz6MNr9CSY/4XJgP2aY4t0ZktSOaH9mAuvKeWrlAFii3zuz77nlxa
+	 FClu1D6NisoqLnoO00n1Ciz1zR10tujQO6hyNWRhVtXH7dAQ9GK6hlFBUmFwkO0SGz
+	 YIzQMoCu+1kRPpGUpfNNvUiEZKwKa724Jj8S6TUHJSA36255oTyItSawoO0UunWeQO
+	 PKUDgpLII9GMXU1RkdnP/N06Md1oOezUWhdhWTZQHgLMAosEWgvQ0iXl++LPz+/onn
+	 oqfQo09C9exeg==
+Message-ID: <893d73c3-e449-49ad-b297-1acef5dae38e@kernel.org>
+Date: Sat, 16 Mar 2024 10:29:27 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:62a7:b0:476:f043:d34b with SMTP id
- fh39-20020a05663862a700b00476f043d34bmr237781jab.0.1710605963997; Sat, 16 Mar
- 2024 09:19:23 -0700 (PDT)
-Date: Sat, 16 Mar 2024 09:19:23 -0700
-In-Reply-To: <00000000000067f65105edbd295d@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d5c35b0613c97c85@google.com>
-Subject: Re: [syzbot] [can?] [bpf?] KMSAN: uninit-value in bpf_prog_run_generic_xdp
-From: syzbot <syzbot+0e6ddb1ef80986bdfe64@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, ben-linux@fluff.org, bp@alien8.de, 
-	bpf@vger.kernel.org, daniel.sneddon@linux.intel.com, daniel@iogearbox.net, 
-	dave.hansen@linux.intel.com, glider@google.com, hpa@zytor.com, 
-	linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, mingo@redhat.com, 
-	mkl@pengutronix.de, netdev@vger.kernel.org, pbonzini@redhat.com, 
-	sathyanarayanan.kuppuswamy@linux.intel.com, syzkaller-bugs@googlegroups.com, 
-	tglx@linutronix.de, x86@kernel.org, xrivendell7@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] nexthop: fix uninitialized variable in
+ nla_put_nh_group_stats()
+Content-Language: en-US
+To: Dan Carpenter <dan.carpenter@linaro.org>, Ido Schimmel <idosch@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Petr Machata <petrm@nvidia.com>,
+ Kees Cook <keescook@chromium.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+References: <b2578acd-9838-45b6-a50d-96a86171b20e@moroto.mountain>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <b2578acd-9838-45b6-a50d-96a86171b20e@moroto.mountain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-syzbot has found a reproducer for the following issue on:
+On 3/16/24 3:46 AM, Dan Carpenter wrote:
+> The nh_grp_hw_stats_update() function doesn't always set "hw_stats_used"
+> so it could be used without being initialized.  Set it to false.
+> 
+> Fixes: 5072ae00aea4 ("net: nexthop: Expose nexthop group HW stats to user space")
+> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> ---
+>  net/ipv4/nexthop.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
+> index 74928a9d1aa4..c25bfdf4e25f 100644
+> --- a/net/ipv4/nexthop.c
+> +++ b/net/ipv4/nexthop.c
+> @@ -824,8 +824,8 @@ static int nla_put_nh_group_stats(struct sk_buff *skb, struct nexthop *nh,
+>  				  u32 op_flags)
+>  {
+>  	struct nh_group *nhg = rtnl_dereference(nh->nh_grp);
+> +	bool hw_stats_used = false;
+>  	struct nlattr *nest;
+> -	bool hw_stats_used;
+>  	int err;
+>  	int i;
+>  
 
-HEAD commit:    66a27abac311 Merge tag 'powerpc-6.9-1' of git://git.kernel..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=14285ac9180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=48bb382b96e7eda7
-dashboard link: https://syzkaller.appspot.com/bug?extid=0e6ddb1ef80986bdfe64
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17ab51c9180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=127d21f1180000
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/37968fa0451e/disk-66a27aba.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5b288c5c3088/vmlinux-66a27aba.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/792ddbf8146d/bzImage-66a27aba.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+0e6ddb1ef80986bdfe64@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in bpf_prog_run_generic_xdp+0x13a0/0x1ee0 net/core/dev.c:4876
- bpf_prog_run_generic_xdp+0x13a0/0x1ee0 net/core/dev.c:4876
- netif_receive_generic_xdp net/core/dev.c:4958 [inline]
- do_xdp_generic+0xb68/0x1440 net/core/dev.c:5017
- __netif_receive_skb_core+0x2533/0x6190 net/core/dev.c:5358
- __netif_receive_skb_one_core net/core/dev.c:5536 [inline]
- __netif_receive_skb+0xca/0xa00 net/core/dev.c:5652
- process_backlog+0x480/0x8b0 net/core/dev.c:5981
- __napi_poll+0xe7/0x980 net/core/dev.c:6632
- napi_poll net/core/dev.c:6701 [inline]
- net_rx_action+0x89d/0x1820 net/core/dev.c:6813
- __do_softirq+0x1c0/0x7d7 kernel/softirq.c:554
- invoke_softirq kernel/softirq.c:428 [inline]
- __irq_exit_rcu kernel/softirq.c:633 [inline]
- irq_exit_rcu+0x6a/0x130 kernel/softirq.c:645
- instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
- sysvec_apic_timer_interrupt+0x83/0x90 arch/x86/kernel/apic/apic.c:1043
- asm_sysvec_apic_timer_interrupt+0x1f/0x30 arch/x86/include/asm/idtentry.h:702
- __preempt_count_dec_and_test arch/x86/include/asm/preempt.h:94 [inline]
- __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
- _raw_spin_unlock_irqrestore+0x33/0x60 kernel/locking/spinlock.c:194
- unlock_hrtimer_base kernel/time/hrtimer.c:1021 [inline]
- hrtimer_start_range_ns+0x112c/0x11a0 kernel/time/hrtimer.c:1308
- hrtimer_start include/linux/hrtimer.h:275 [inline]
- j1939_tp_schedule_txtimer+0xc2/0x100 net/can/j1939/transport.c:702
- j1939_sk_send_loop net/can/j1939/socket.c:1164 [inline]
- j1939_sk_sendmsg+0x1a0e/0x2730 net/can/j1939/socket.c:1277
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:745
- ____sys_sendmsg+0x877/0xb60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x4a0 net/socket.c:2674
- do_syscall_64+0xd5/0x1f0
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-Uninit was stored to memory at:
- pskb_expand_head+0x30f/0x19d0 net/core/skbuff.c:2253
- netif_skb_check_for_xdp net/core/dev.c:4921 [inline]
- netif_receive_generic_xdp net/core/dev.c:4952 [inline]
- do_xdp_generic+0x931/0x1440 net/core/dev.c:5017
- __netif_receive_skb_core+0x2533/0x6190 net/core/dev.c:5358
- __netif_receive_skb_one_core net/core/dev.c:5536 [inline]
- __netif_receive_skb+0xca/0xa00 net/core/dev.c:5652
- process_backlog+0x480/0x8b0 net/core/dev.c:5981
- __napi_poll+0xe7/0x980 net/core/dev.c:6632
- napi_poll net/core/dev.c:6701 [inline]
- net_rx_action+0x89d/0x1820 net/core/dev.c:6813
- __do_softirq+0x1c0/0x7d7 kernel/softirq.c:554
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:3804 [inline]
- slab_alloc_node mm/slub.c:3845 [inline]
- kmem_cache_alloc_node+0x613/0xc50 mm/slub.c:3888
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
- __alloc_skb+0x35b/0x7a0 net/core/skbuff.c:668
- alloc_skb include/linux/skbuff.h:1318 [inline]
- alloc_skb_with_frags+0xc8/0xbf0 net/core/skbuff.c:6504
- sock_alloc_send_pskb+0xa81/0xbf0 net/core/sock.c:2795
- sock_alloc_send_skb include/net/sock.h:1835 [inline]
- j1939_sk_alloc_skb net/can/j1939/socket.c:878 [inline]
- j1939_sk_send_loop net/can/j1939/socket.c:1142 [inline]
- j1939_sk_sendmsg+0xc0a/0x2730 net/can/j1939/socket.c:1277
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg+0x30f/0x380 net/socket.c:745
- ____sys_sendmsg+0x877/0xb60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x4a0 net/socket.c:2674
- do_syscall_64+0xd5/0x1f0
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-CPU: 0 PID: 5044 Comm: syz-executor640 Not tainted 6.8.0-syzkaller-11136-g66a27abac311 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-=====================================================
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+The flag could be moved under
+	`if (op_flags & NHA_OP_FLAG_DUMP_HW_STATS ...`
+as well.
 
