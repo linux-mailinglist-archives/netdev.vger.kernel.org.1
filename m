@@ -1,182 +1,180 @@
-Return-Path: <netdev+bounces-80205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A027987D8FD
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 06:41:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CAA787D92E
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 08:36:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32E4D1F2165D
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 05:41:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 756B6282003
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 07:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2F36AB8;
-	Sat, 16 Mar 2024 05:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HjvigbZd"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12D4ADDB8;
+	Sat, 16 Mar 2024 07:35:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pegase1.c-s.fr (pegase1.c-s.fr [93.17.236.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2CFE6AA1;
-	Sat, 16 Mar 2024 05:41:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B22D1D512;
+	Sat, 16 Mar 2024 07:35:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.236.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710567661; cv=none; b=d7VkeznXW6g+GxMKiatpSUE1VzFhEW/4mwXqyIFmWi0B9+iDbgT2vRDxU4mj9it8cGQNndOqohipFD1m37YC8KydzNAFAc9ucFUH+URvOW3ETOPBRMc60N/xSELI7ifUaE+sHX0hImDs3UoITb0VJPUwpFeCfboT3zx9ufA6oDw=
+	t=1710574549; cv=none; b=tG0d4458dPQyEamx3BxkChw4MJ04q0kO9Unz42Ko2V+OgjTOdDO/2I1XGf2U28KqJovCkqnCQmiSEkKIDowwr70S1AyzJAh2tVMw1ur0/nA6ZuGns9Kv/74mpNAHpkifSPKPvM3TdFXkioful0Mr6E0dNpIyhnGJAL0ydHopXoA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710567661; c=relaxed/simple;
-	bh=zpFhiM3PAxX/JyJRkDpY9ZV+mL+lJb4usahl35U/Ujg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pIMrc6muPQz+uFFwHGfI8FC95AwtE5hjOlPQD5LMoOs1yzFuOMQsVyVt3gqiCzPzc9tk0uUEgtzXhLGFC3Z8jXFFKCj1Wvq+mnUM7oczDR2SyUIsM4yg2QSVt3uCq4B85BbVUEeA9Vdp8LKJWM8srIrHPxNsfm0jqSrRjDb5iXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HjvigbZd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08A28C433F1;
-	Sat, 16 Mar 2024 05:41:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710567660;
-	bh=zpFhiM3PAxX/JyJRkDpY9ZV+mL+lJb4usahl35U/Ujg=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=HjvigbZdMD0owzOJXTmHchrakQ4u/PHtXuAreEUfas8c7Eq4XwuMIZr3bAjk+cuEl
-	 /Lx88pQFy1UQN0KcvNDkZv6Wv3lMzOuki0GRGL060d/YDdYIdURoKvImT5K3UiIfId
-	 Ccj1dJ0p3DWvY3FPO8wh1SWvd3OiCDAGlc9jJq+FfGw1Rg6xzhreIwMnNkPW4g3pMN
-	 Jp+1+0rtoFOjMg5UQnsFTUu6z6tNdPpeZMVeKtWRkOlNSwA9ziA654tikdsFQDQUrK
-	 4nfNkjxQqo+SU3cKnfpgQN0RXAaFJBzsB8pfznYJKX6b+iQSLZSRumAvywJsGAnkWq
-	 46/voqVzs0SbQ==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 8CBF0CE0D20; Fri, 15 Mar 2024 22:40:56 -0700 (PDT)
-Date: Fri, 15 Mar 2024 22:40:56 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Yan Zhai <yan@cloudflare.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	s=arc-20240116; t=1710574549; c=relaxed/simple;
+	bh=T5bIwnC4F5+XhzcizGiodJCow49SKAvyJt/UVTT6f10=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=TgvFMfvzIE/GhxjaR7qwee76cY12OgF9kqt3yqfllGeUT6xQ5Q2NKxkuXUQPSlfJ8HvyBD3MSx8gho4aDfTHHpsRHHrsTW0IFfLAgXKs/DdyOcjZoUhvptigb8sbaOsFEFfOPwCx3IqtONFyyGOFFVUxhnnPf+s+RsghO6r+nGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.236.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [192.168.12.233])
+	by localhost (Postfix) with ESMTP id 4TxXwJ2XHBz9sgJ;
+	Sat, 16 Mar 2024 08:35:44 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase1.c-s.fr ([192.168.12.234])
+	by localhost (pegase1.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id 3Xxb4X6sR4Uy; Sat, 16 Mar 2024 08:35:44 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase1.c-s.fr (Postfix) with ESMTP id 4TxXwJ1RwDz9sfF;
+	Sat, 16 Mar 2024 08:35:44 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 27CF18B76C;
+	Sat, 16 Mar 2024 08:35:44 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id dBMYRJzyNT0I; Sat, 16 Mar 2024 08:35:44 +0100 (CET)
+Received: from PO20335.idsi0.si.c-s.fr (PO18731.IDSI0.si.c-s.fr [192.168.233.183])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id CED238B764;
+	Sat, 16 Mar 2024 08:35:42 +0100 (CET)
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+To: Alexei Starovoitov <ast@kernel.org>,
 	Daniel Borkmann <daniel@iogearbox.net>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>,
-	Alexander Duyck <alexanderduyck@fb.com>,
-	Hannes Frederic Sowa <hannes@stressinduktion.org>,
-	linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
-	bpf@vger.kernel.org, kernel-team@cloudflare.com,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
-	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Steven Rostedt <rostedt@goodmis.org>, mark.rutland@arm.com,
-	Jesper Dangaard Brouer <hawk@kernel.org>
-Subject: Re: [PATCH v4 net 1/3] rcu: add a helper to report consolidated
- flavor QS
-Message-ID: <790ce7e7-a8fd-4d28-aaf3-1b991a898be2@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <cover.1710525524.git.yan@cloudflare.com>
- <491d3af6c7d66dfb3b60b2f210f38e843dfe6ed2.1710525524.git.yan@cloudflare.com>
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Zi Shen Lim <zlim.lnx@gmail.com>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Kui-Feng Lee <thinker.li@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Christophe Leroy <christophe.leroy@csgroup.eu>,
+	bpf@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH bpf-next v4 1/2] bpf: Remove arch_unprotect_bpf_trampoline()
+Date: Sat, 16 Mar 2024 08:35:40 +0100
+Message-ID: <42c635bb54d3af91db0f9b85d724c7c290069f67.1710574353.git.christophe.leroy@csgroup.eu>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <491d3af6c7d66dfb3b60b2f210f38e843dfe6ed2.1710525524.git.yan@cloudflare.com>
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1710574540; l=3028; i=christophe.leroy@csgroup.eu; s=20211009; h=from:subject:message-id; bh=T5bIwnC4F5+XhzcizGiodJCow49SKAvyJt/UVTT6f10=; b=uzUMQgPir//Sh+yMaOXG853ZNTpLoDmrEjAMPUnFKvQzYmjW/5XfEgXO8ToeWNMzHDlUKfvzZ qmpBTuxFwLxCVXBC6mvXWExGa9rbUlQpUIzwm587U4CmPlUxU465Mli
+X-Developer-Key: i=christophe.leroy@csgroup.eu; a=ed25519; pk=HIzTzUj91asvincQGOFx6+ZF5AoUuP9GdOtQChs7Mm0=
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 15, 2024 at 12:55:03PM -0700, Yan Zhai wrote:
-> There are several scenario in network processing that can run
-> extensively under heavy traffic. In such situation, RCU synchronization
-> might not observe desired quiescent states for indefinitely long period.
-> Create a helper to safely raise the desired RCU quiescent states for
-> such scenario.
-> 
-> Currently the frequency is locked at HZ/10, i.e. 100ms, which is
-> sufficient to address existing problems around RCU tasks. It's unclear
-> yet if there is any future scenario for it to be further tuned down.
+Last user of arch_unprotect_bpf_trampoline() was removed by
+commit 187e2af05abe ("bpf: struct_ops supports more than one page for
+trampolines.")
 
-I suggest something like the following for the commit log:
+Remove arch_unprotect_bpf_trampoline()
 
-------------------------------------------------------------------------
+Reported-by: Daniel Borkmann <daniel@iogearbox.net>
+Fixes: 187e2af05abe ("bpf: struct_ops supports more than one page for trampolines.")
+Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+---
+v4: No change
+v3: New
+---
+ arch/arm64/net/bpf_jit_comp.c | 4 ----
+ arch/x86/net/bpf_jit_comp.c   | 4 ----
+ include/linux/bpf.h           | 1 -
+ kernel/bpf/trampoline.c       | 7 -------
+ 4 files changed, 16 deletions(-)
 
-When under heavy load, network processing can run CPU-bound for many tens
-of seconds.  Even in preemptible kernels, this can block RCU Tasks grace
-periods, which can cause trace-event removal to take more than a minute,
-which is unacceptably long.
+diff --git a/arch/arm64/net/bpf_jit_comp.c b/arch/arm64/net/bpf_jit_comp.c
+index c5b461dda438..132c8ffba109 100644
+--- a/arch/arm64/net/bpf_jit_comp.c
++++ b/arch/arm64/net/bpf_jit_comp.c
+@@ -2180,10 +2180,6 @@ void arch_protect_bpf_trampoline(void *image, unsigned int size)
+ {
+ }
+ 
+-void arch_unprotect_bpf_trampoline(void *image, unsigned int size)
+-{
+-}
+-
+ int arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *ro_image,
+ 				void *ro_image_end, const struct btf_func_model *m,
+ 				u32 flags, struct bpf_tramp_links *tlinks,
+diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+index a7ba8e178645..7a56d2d84512 100644
+--- a/arch/x86/net/bpf_jit_comp.c
++++ b/arch/x86/net/bpf_jit_comp.c
+@@ -3008,10 +3008,6 @@ void arch_protect_bpf_trampoline(void *image, unsigned int size)
+ {
+ }
+ 
+-void arch_unprotect_bpf_trampoline(void *image, unsigned int size)
+-{
+-}
+-
+ int arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *image, void *image_end,
+ 				const struct btf_func_model *m, u32 flags,
+ 				struct bpf_tramp_links *tlinks,
+diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+index 4f20f62f9d63..d89bdefb42e2 100644
+--- a/include/linux/bpf.h
++++ b/include/linux/bpf.h
+@@ -1117,7 +1117,6 @@ int arch_prepare_bpf_trampoline(struct bpf_tramp_image *im, void *image, void *i
+ void *arch_alloc_bpf_trampoline(unsigned int size);
+ void arch_free_bpf_trampoline(void *image, unsigned int size);
+ void arch_protect_bpf_trampoline(void *image, unsigned int size);
+-void arch_unprotect_bpf_trampoline(void *image, unsigned int size);
+ int arch_bpf_trampoline_size(const struct btf_func_model *m, u32 flags,
+ 			     struct bpf_tramp_links *tlinks, void *func_addr);
+ 
+diff --git a/kernel/bpf/trampoline.c b/kernel/bpf/trampoline.c
+index db7599c59c78..04fd1abd3661 100644
+--- a/kernel/bpf/trampoline.c
++++ b/kernel/bpf/trampoline.c
+@@ -1078,13 +1078,6 @@ void __weak arch_protect_bpf_trampoline(void *image, unsigned int size)
+ 	set_memory_rox((long)image, 1);
+ }
+ 
+-void __weak arch_unprotect_bpf_trampoline(void *image, unsigned int size)
+-{
+-	WARN_ON_ONCE(size > PAGE_SIZE);
+-	set_memory_nx((long)image, 1);
+-	set_memory_rw((long)image, 1);
+-}
+-
+ int __weak arch_bpf_trampoline_size(const struct btf_func_model *m, u32 flags,
+ 				    struct bpf_tramp_links *tlinks, void *func_addr)
+ {
+-- 
+2.43.0
 
-This commit therefore creates a new helper function that passes
-through both RCU and RCU-Tasks quiescent states every 100 milliseconds.
-This hard-coded value suffices for current workloads.
-
-------------------------------------------------------------------------
-
-> Suggested-by: Paul E. McKenney <paulmck@kernel.org>
-> Reviewed-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> Signed-off-by: Yan Zhai <yan@cloudflare.com>
-> ---
-> v3->v4: comment fixup
-> 
-> ---
->  include/linux/rcupdate.h | 24 ++++++++++++++++++++++++
->  1 file changed, 24 insertions(+)
-> 
-> diff --git a/include/linux/rcupdate.h b/include/linux/rcupdate.h
-> index 0746b1b0b663..da224706323e 100644
-> --- a/include/linux/rcupdate.h
-> +++ b/include/linux/rcupdate.h
-> @@ -247,6 +247,30 @@ do { \
->  	cond_resched(); \
->  } while (0)
->  
-> +/**
-> + * rcu_softirq_qs_periodic - Periodically report consolidated quiescent states
-> + * @old_ts: last jiffies when QS was reported. Might be modified in the macro.
-> + *
-> + * This helper is for network processing in non-RT kernels, where there could
-> + * be busy polling threads that block RCU synchronization indefinitely.  In
-> + * such context, simply calling cond_resched is insufficient, so give it a
-> + * stronger push to eliminate all potential blockage of all RCU types.
-> + *
-> + * NOTE: unless absolutely sure, this helper should in general be called
-> + * outside of bh lock section to avoid reporting a surprising QS to updaters,
-> + * who could be expecting RCU read critical section to end at local_bh_enable().
-> + */
-
-How about something like this for the kernel-doc comment?
-
-/**
- * rcu_softirq_qs_periodic - Report RCU and RCU-Tasks quiescent states
- * @old_ts: jiffies at start of processing.
- *
- * This helper is for long-running softirq handlers, such as those
- * in networking.  The caller should initialize the variable passed in
- * as @old_ts at the beginning of the softirq handler.  When invoked
- * frequently, this macro will invoke rcu_softirq_qs() every 100
- * milliseconds thereafter, which will provide both RCU and RCU-Tasks
- * quiescent states.  Note that this macro modifies its old_ts argument.
- *
- * Note that although cond_resched() provides RCU quiescent states,
- * it does not provide RCU-Tasks quiescent states.
- *
- * Because regions of code that have disabled softirq act as RCU
- * read-side critical sections, this macro should be invoked with softirq
- * (and preemption) enabled.
- *
- * This macro has no effect in CONFIG_PREEMPT_RT kernels.
- */
-
-							Thanx, Paul
-
-> +#define rcu_softirq_qs_periodic(old_ts) \
-> +do { \
-> +	if (!IS_ENABLED(CONFIG_PREEMPT_RT) && \
-> +	    time_after(jiffies, (old_ts) + HZ / 10)) { \
-> +		preempt_disable(); \
-> +		rcu_softirq_qs(); \
-> +		preempt_enable(); \
-> +		(old_ts) = jiffies; \
-> +	} \
-> +} while (0)
-> +
->  /*
->   * Infrastructure to implement the synchronize_() primitives in
->   * TREE_RCU and rcu_barrier_() primitives in TINY_RCU.
-> -- 
-> 2.30.2
-> 
-> 
 
