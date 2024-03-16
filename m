@@ -1,140 +1,176 @@
-Return-Path: <netdev+bounces-80220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C38E287DA67
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 15:05:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D79587DA85
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 16:07:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE4BEB212B0
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 14:05:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE9C41F21C59
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 15:07:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1783018E1D;
-	Sat, 16 Mar 2024 14:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E51E1182B5;
+	Sat, 16 Mar 2024 15:07:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ENUIwmla"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="RaQPaHig"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f177.google.com (mail-qt1-f177.google.com [209.85.160.177])
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6338E18EA1
-	for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 14:05:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80460134B6
+	for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 15:07:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710597938; cv=none; b=UxILPbCWboGuFCJrrRfn1KX5MZrmTLmh2Thmwtamgnuwk93AN3zXF4W6j9YggKHddrubh79LEW8WaJ0GFcGOpNVHuTMau+PQ93dAcV6XMwVA65BfSlob0slDPl64PXU1c2aDztf2gXPEAIoOi8oFoQ0XrOR2xQQjJk+KTuktkD4=
+	t=1710601628; cv=none; b=Th0n8kQD4JiStU/CJP0nZiJJFcKToiAH4PHxGXPH3ZpPu8XNHDQDFLBm6DuyhEeFTfig/trkWCWPQjrsq/YWvVUuRoRD38uMYXScs4KxUqy5zzEa8bgzHXaUGBY1iw7U+nxiszdcu8Ol/4mWa1OxMLU4Vhx9oE/9b2cMnRaLf5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710597938; c=relaxed/simple;
-	bh=/aGAD7ikSKrkpqsj+diS1JvPiiFj/VlFkOeCvZ8K/MQ=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Y12AkFrkyVJ4BYq/b/DYWt+SybreDlpGnHGk9Em4AauMKixtrkXneIznnwxin7Ll5nRLVVKEupJy6PSXC19TvmUN2i3/keGcXvB6evQ84iIIagQVTvrsJ2i5Sc7Tlk9xH+H35Dw7t47NSN9YP4hrokcqUuvBdftYQE5sRO9cwAE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ENUIwmla; arc=none smtp.client-ip=209.85.160.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f177.google.com with SMTP id d75a77b69052e-430baec7bb5so6082541cf.0
-        for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 07:05:36 -0700 (PDT)
+	s=arc-20240116; t=1710601628; c=relaxed/simple;
+	bh=xc0wOfwHP0tnVCnF8pvuBtJ7+s62XI9CbDQZRBbuKW8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SOlypRwPBPU4k9qSlJWnT/ZoCkFQAR8zJEJfmg04fxrBdkDBfZ7VKnstfibqXXL7ZcOzoO1jOEotl29GOLZQ7sCHpkbxfh78n7sKh4ShLAshvHI17oyzyWgqjVEe/M3FcPo2/CBIINyTuvR7YBpg/iMYaF6TRxZUnf0sfHbZyBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=RaQPaHig; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-53fa455cd94so2345902a12.2
+        for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 08:07:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710597935; x=1711202735; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1710601625; x=1711206425; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=v4P7olAMucucDgbtxfuItSbvDs8THVNvrbg360YPOWc=;
-        b=ENUIwmlarpdCLCas2QB79ouG5EkhaYVXy822u/xZT503fLwLwA/8xcyEZvQ/AA49J1
-         crdRZ10p5UxNH1LaJo80fSkUXi/OelIs98wzDjI/1VKfc9nfpoRDvj++ZsXhtT91xeKl
-         a5S4c6AND5gywbjXU04fQW7drKoJ/LEoOQ2osc/TNeS5e2I+lBCu1DSV0MJ0oI1GF5ct
-         ou1VBwDfKTtZTZnsq1eRQRX8rVHcoNh+aSrE9AxqIAIRkb0jxW7PToKO/BjyhHeFuF+Q
-         hbKzet0kjmxZ+/FdXGu1IvvsDU30WWRejYnsY52Ho09VI8+Jtge2y+ZeX8ECtG8sZoJD
-         wurg==
+        bh=OBI0lbmrHALdF0W6xX/fVjoMi6UU1SsjJGnSeWgjFqA=;
+        b=RaQPaHiggTZBTZStF2N2pDsg4Hr7LRxsRdYTGY0WAsfwp9Eqwbsufs1EUyWS8M8Azx
+         nV3ZtTrSmZBZTm2jyMPQOdGXaNUQKqpI6nBR0otGx1aQEdiPE+Y+KhOEklG/vzw3/qoX
+         6aHA9SELxmmjNl9go7jBTrk8I/JjTaMadoJtWkPBigfaJUOG46VU5hPXt0pdTJe2dl9c
+         bdNAiZtAOAiAiOGxI/wUTvQ1ezM5MEtYw7zzaB7qXzCH1B9BkKOmPX8TUMlks54RLAEv
+         xHUnJuu5mO4ANiSlBSSzVEh58l+c2tN5aj2BXvZK/5hhYY4gFrne+Zu4LbnskDEELUZy
+         kKbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710597935; x=1711202735;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=v4P7olAMucucDgbtxfuItSbvDs8THVNvrbg360YPOWc=;
-        b=wQhKW5GToUcDiLF1zTjxeGoSZaE6nWAuw1YEVxga3T2bFl9dKfZKSJV0/W50sGKpmL
-         p170uHGJ93T6pvfnQrut3evayIHmnqbFjxhJbbwUBMlsHUW54NRLGtd/IZn9FW/hpPIz
-         Pf6uEdk1BiyUlYESgzdtLkwY07mX9D7LrvLGqRUXY5y38saEQMuEXN37tbUJKaGpM6A8
-         oRfiSeeMKSzOW1fRf0uqtyD+ZU/pGDaAZcypT/eVJTiQU+8cd/iPxtkSQ3l23/M68TM6
-         aXtzMg8wl4DXS1o+LbrljqbcYzxDqVpDBdeb2qu7uQ/iazwoFYEChSAtkSN0yiWR0dcl
-         cqow==
-X-Forwarded-Encrypted: i=1; AJvYcCWeNz8RKbfoE5QF7wRsB/Aeyumx6yfuXe06uCdZ2m39EyRuOvSxdJSS2MhQ8qdrP3MprwKEcll8cnv/KozsrF6mspYKmhLM
-X-Gm-Message-State: AOJu0YyiyrxcUiFrkW4pNfmZ7J3DDGP5OGpsyyw3o881AGkhbJRc3XwA
-	ACi64qTUjRaea5iB6RWLOI33I2MCieMzQe6HzvgxLbSaUhmxYgBC
-X-Google-Smtp-Source: AGHT+IFbUzMY6d+M9UufUHsUJSnfi6bUz/X5r6WCCzpa5/5QR//FK4XwNmwFsncLH6nsOgymZ4g84Q==
-X-Received: by 2002:ac8:5cc5:0:b0:42f:205f:d20f with SMTP id s5-20020ac85cc5000000b0042f205fd20fmr12736604qta.23.1710597935129;
-        Sat, 16 Mar 2024 07:05:35 -0700 (PDT)
-Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
-        by smtp.gmail.com with ESMTPSA id hg1-20020a05622a610100b00430b5dcac34sm1346818qtb.8.2024.03.16.07.05.34
+        d=1e100.net; s=20230601; t=1710601625; x=1711206425;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OBI0lbmrHALdF0W6xX/fVjoMi6UU1SsjJGnSeWgjFqA=;
+        b=SKiTANGByWFArVm894/M3Y26ELni96rvmkDql53v9uvT5nxrKN/KfcFNrkrn9SM0dB
+         ls54XzQVCOG57t7ULP2JfEvF5o+xPWjJB8Lq0adWLLx20esTeUaKsrgM0T8T9VUQlTb4
+         0PvJ898XgB523aKtl46pmqeS0Bhr9LCfWQegNJ4ZIJjJt8kJlC9HyP2iNv1jpDUr4oHa
+         0KtpV68a3//I57SCuXAsQ/Q/M2KhC4KbZuNnw974+qWlzuIWGYt5SQHeN9H/Vu5PhPMH
+         FmLM16GNa0p3lhG2J8mGsVrEijz9ANWZrOEOsIojBxMaqE5eB/dHeKgqAVCCKyiMKtZB
+         GoCA==
+X-Gm-Message-State: AOJu0Yxh45knZE676qsw+ioL99rgiscv6E/JTx8YbEGwR2Q3jinW8wHa
+	rd5Nzp0T3NqEu3JTNtshygam76oYdpXhzOxFUP1B32MYA1HF00d8kU4AFxyAfnGaw6Suy3xYS1Q
+	duIM=
+X-Google-Smtp-Source: AGHT+IFUCvm/SGlgIdOZPrtln8XJOwR7ZaHjcphPg2Qum0cMmMObal4iPGBbUI1qCZNMbvIUUNjB/g==
+X-Received: by 2002:a17:902:da86:b0:1dd:76e0:a19a with SMTP id j6-20020a170902da8600b001dd76e0a19amr9560635plx.34.1710601625502;
+        Sat, 16 Mar 2024 08:07:05 -0700 (PDT)
+Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
+        by smtp.gmail.com with ESMTPSA id w3-20020a170902e88300b001db5bdd5e3asm277916plg.84.2024.03.16.08.07.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 16 Mar 2024 07:05:34 -0700 (PDT)
-Date: Sat, 16 Mar 2024 10:05:34 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Antoine Tenart <atenart@kernel.org>, 
- davem@davemloft.net, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- edumazet@google.com
-Cc: Antoine Tenart <atenart@kernel.org>, 
- steffen.klassert@secunet.com, 
- netdev@vger.kernel.org
-Message-ID: <65f5a72e62658_6ef3e294dd@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20240315151722.119628-2-atenart@kernel.org>
-References: <20240315151722.119628-1-atenart@kernel.org>
- <20240315151722.119628-2-atenart@kernel.org>
-Subject: Re: [PATCH net 1/4] udp: do not accept non-tunnel GSO skbs landing in
- a tunnel
+        Sat, 16 Mar 2024 08:07:04 -0700 (PDT)
+Date: Sat, 16 Mar 2024 08:07:02 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Max Gautier <mg@max.gautier.name>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2-next] arpd: create /var/lib/arpd on first use
+Message-ID: <20240316080702.4cb0ed9a@hermes.local>
+In-Reply-To: <20240316091026.11164-1-mg@max.gautier.name>
+References: <20240313093856.17fc459e@hermes.local>
+	<20240316091026.11164-1-mg@max.gautier.name>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Antoine Tenart wrote:
-> When rx-udp-gro-forwarding is enabled UDP packets might be GROed when
-> being forwarded. If such packets might land in a tunnel this can cause
-> various issues and udp_gro_receive makes sure this isn't the case by
-> looking for a matching socket. This is performed in
-> udp4/6_gro_lookup_skb but only in the current netns. This is an issue
-> with tunneled packets when the endpoint is in another netns. In such
-> cases the packets will be GROed at the UDP level, which leads to various
-> issues later on. The same thing can happen with rx-gro-list.
-> 
-> We saw this with geneve packets being GROed at the UDP level. In such
-> case gso_size is set; later the packet goes through the geneve rx path,
-> the geneve header is pulled, the offset are adjusted and frag_list skbs
-> are not adjusted with regard to geneve. When those skbs hit
-> skb_fragment, it will misbehave. Different outcomes are possible
-> depending on what the GROed skbs look like; from corrupted packets to
-> kernel crashes.
-> 
-> One example is a BUG_ON[1] triggered in skb_segment while processing the
-> frag_list. Because gso_size is wrong (geneve header was pulled)
-> skb_segment thinks there is "geneve header size" of data in frag_list,
-> although it's in fact the next packet. The BUG_ON itself has nothing to
-> do with the issue. This is only one of the potential issues.
-> 
-> Looking up for a matching socket in udp_gro_receive is fragile: the
-> lookup could be extended to all netns (not speaking about performances)
-> but nothing prevents those packets from being modified in between and we
-> could still not find a matching socket. It's OK to keep the current
-> logic there as it should cover most cases but we also need to make sure
-> we handle tunnel packets being GROed too early.
-> 
-> This is done by extending the checks in udp_unexpected_gso: GSO packets
-> lacking the SKB_GSO_UDP_TUNNEL/_CUSM bits and landing in a tunnel must
-> be segmented.
-> 
-> [1] kernel BUG at net/core/skbuff.c:4408!
->     RIP: 0010:skb_segment+0xd2a/0xf70
->     __udp_gso_segment+0xaa/0x560
-> 
-> Fixes: 9fd1ff5d2ac7 ("udp: Support UDP fraglist GRO/GSO.")
-> Fixes: 36707061d6ba ("udp: allow forwarding of plain (non-fraglisted) UDP GRO packets")
-> Signed-off-by: Antoine Tenart <atenart@kernel.org>
+On Sat, 16 Mar 2024 10:06:44 +0100
+Max Gautier <mg@max.gautier.name> wrote:
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+> The motivation is to build distributions packages without /var to go
+> towards stateless systems, see link below (TL;DR: provisionning anything
+> outside of /usr on boot).
+> 
+> We only try do create the database directory when it's in the default
+> location, and assume its parent (/var/lib in the usual case) exists.
+> 
+> Links: https://0pointer.net/blog/projects/stateless.html
+> ---
+> Instead of modifying the default location, I opted to create it at
+> runtime, but only for the default location and assuming that /var/lib
+> exists. My thinking is that not changing defaults is somewhat better,
+> plus using /var/tmp directly might cause security concerns (I don't know
+> that it does, but at least someone could create a db file which the root
+> user would then open by default. Not sure what that could cause, so I'd
+> rather avoid it).
+> 
+>  Makefile    |  2 +-
+>  misc/arpd.c | 12 +++++++++++-
+>  2 files changed, 12 insertions(+), 2 deletions(-)
+> 
+> diff --git a/Makefile b/Makefile
+> index 8024d45e..2b2c3dec 100644
+> --- a/Makefile
+> +++ b/Makefile
+> @@ -42,6 +42,7 @@ DEFINES+=-DCONF_USR_DIR=\"$(CONF_USR_DIR)\" \
+>           -DCONF_ETC_DIR=\"$(CONF_ETC_DIR)\" \
+>           -DNETNS_RUN_DIR=\"$(NETNS_RUN_DIR)\" \
+>           -DNETNS_ETC_DIR=\"$(NETNS_ETC_DIR)\" \
+> +         -DARPDDIR=\"$(ARPDDIR)\" \
+>           -DCONF_COLOR=$(CONF_COLOR)
+>  
+>  #options for AX.25
+> @@ -104,7 +105,6 @@ config.mk:
+>  install: all
+>  	install -m 0755 -d $(DESTDIR)$(SBINDIR)
+>  	install -m 0755 -d $(DESTDIR)$(CONF_USR_DIR)
+> -	install -m 0755 -d $(DESTDIR)$(ARPDDIR)
+>  	install -m 0755 -d $(DESTDIR)$(HDRDIR)
+>  	@for i in $(SUBDIRS);  do $(MAKE) -C $$i install; done
+>  	install -m 0644 $(shell find etc/iproute2 -maxdepth 1 -type f) $(DESTDIR)$(CONF_USR_DIR)
+> diff --git a/misc/arpd.c b/misc/arpd.c
+> index 1ef837c6..a133226c 100644
+> --- a/misc/arpd.c
+> +++ b/misc/arpd.c
+> @@ -19,6 +19,7 @@
+>  #include <fcntl.h>
+>  #include <sys/uio.h>
+>  #include <sys/socket.h>
+> +#include <sys/stat.h>
+>  #include <sys/time.h>
+>  #include <time.h>
+>  #include <signal.h>
+> @@ -35,7 +36,8 @@
+>  #include "rt_names.h"
+>  
+>  DB	*dbase;
+> -char	*dbname = "/var/lib/arpd/arpd.db";
+> +char const * const	default_dbname = ARPDDIR "/arpd.db";
+
+Make this an array.
+const char *default_dbname[] = ARPDDIR "/arpd.db";
+
+
+> +char const	*dbname = default_dbname;
+>  
+>  int	ifnum;
+>  int	*ifvec;
+> @@ -668,6 +670,14 @@ int main(int argc, char **argv)
+>  		}
+>  	}
+>  
+> +	if (default_dbname == dbname
+> +			&& mkdir(ARPDDIR, 0755) != 0
+> +			&& errno != EEXIST
+> +			) {
+> +		perror("create_db_dir");
+> +		exit(-1);
+> +	}
+> +
+>  	dbase = dbopen(dbname, O_CREAT|O_RDWR, 0644, DB_HASH, NULL);
+>  	if (dbase == NULL) {
+>  		perror("db_open");
+
+Missing signed-off-by
 
