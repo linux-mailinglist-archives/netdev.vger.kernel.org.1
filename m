@@ -1,209 +1,227 @@
-Return-Path: <netdev+bounces-80228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A85D487DAED
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 18:00:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5368687DB61
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 21:03:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2CD14B20AEC
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 17:00:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E7CAE1F21783
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 20:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B461BC26;
-	Sat, 16 Mar 2024 16:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 757D61BDD0;
+	Sat, 16 Mar 2024 20:03:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="aY5c7Chg"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="IwhdEErV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7E818C07
-	for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 16:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34BB51BDEB
+	for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 20:03:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710608397; cv=none; b=Pf7T0yeKxqFgneqg7Xxi0j+ov+LNEeUWEvY2YpiaZGTKski2lFsgDDzZW85AdzLt3vVvFu6W8QJ2yWRPehsquHj4NmIIsTT1cJ6lqgGSom1/+p7VcDpJvAvwCmJdhu4DvLW1chioICS2fx7bxFefSrKH8qk8qC7swkF8KgjkZ0c=
+	t=1710619397; cv=none; b=g2IkqPFL9VZRuPzODYXizI0BzgFuKR/idGemGVcSCi1TYBLJFLWsTkijE9IkTlf99yuBbTGYDAbnY5acm3G7YHtapzLYZeMnGFPCbf4/LY0ftTyaf6SRXriJXXc1jF5p+ShXqJy7LZQ4ZnI/n6QgmKUBUwEqfsvlN2x28+iS8fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710608397; c=relaxed/simple;
-	bh=L5E54FcKbDRqcU8ZTlQM/H5zN267yobnpBU5kmy9AIk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=WoZ03m2UoVOU+oKgd9qng/qzN+NCbK99GSKNxVMpBRR2ucrlEd6yRuvIfmV+ut0kU6mmy43SykhCBA6Kz3DjWymemLvdReZLXtrdlGTrt5bZgx5EF/bhe2z6bmxuxKMF/yvhiIwqpE6fh+TdpKbDGFPQ7jM5DJjGxECaRKWRPTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=aY5c7Chg; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6e6c18e9635so669450b3a.1
-        for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 09:59:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710608394; x=1711213194; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=y1GIdlcJxdG4YtFEAdIwGXJrrGx7Kfdq8NmdWCG1dVA=;
-        b=aY5c7ChgWzbylycGVcqOJw/YAZ+JyIRdrFCPpjqvIf0cb+1t+2TZjLbH8AgztSrwo/
-         qWUXgA5CIbpcqfkDgWdnM9c58Mdhv4K4eX5AzKzauwFASmav78sXxUDqm7Vc3mQmVa9x
-         6rbdXohEqlUHgNKMP/idh3Le/IrjD3P95FxqcGTGBwJIxbrcln/eQ1RWslnPd+IUbCJ/
-         6/d9d6dGqsIPMDwzLYPN0VZDWIZWmgILe57yd8iqZ+qKOlNnnZ+4m4uzaQqcTzIASwmO
-         yvE4Un/QSw1YsaC6IchtSY+h5sfum5Ujuhgyb75OZQjarMHtOI7qc1aHoz/q7HR12pSE
-         It9g==
+	s=arc-20240116; t=1710619397; c=relaxed/simple;
+	bh=H7Qm4sfnvXppIxlgsMHU+Yo7iYW5ygWZXqKxd3nZ7qc=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID; b=vCDw4AyNomsPHqZbpTaz6RYh4qeHiTTergFj3A5O5RauxDlhFEiQK41WXtjuvj2LBwGj9NmwBDFY4bFV7A4Kntjmbu/cUVdJ1gwv9pBs+ob0pAs+v2lktP6AA4ZYQTaxgOxgBNyWWjwoWqLRilz4I8pQCJzFkAoL8lA5ojXe9ZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=IwhdEErV; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id C15FC3F120
+	for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 19:56:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1710619000;
+	bh=TP2KNC11l4nDmaxHecYL48vE/SAz/Ax5xMdjIwUIOjM=;
+	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
+	 Content-Type:Date:Message-ID;
+	b=IwhdEErVEZblDlLNVd6O/bCFWjM0+pYAZKgkz9doQmc72SV7QTwuHmy74Q24OoOth
+	 8PpsBkHR+8lkTBL9ZeHj19RV7aUFX5sq8Es8CUp0h9wuvSyVrbr4vV0P7kn8t+NfjG
+	 g1lG0UjYEGx7DPKUx3v5mMygkccpFjp8CVcPyKr87N1XE7kwQeng1cJNvUiem8Pm+n
+	 AwvkBiPBVvkBT0Xh4aKAczWzpfgOCbvnZIWG3dmWnXYFl+QKie5s/OKkXfdsoRv8Fs
+	 7xVcZOWtubFkY9sGWlPC8Cl+yzTTNHLLUOShpsyxiEfCMUsZ5KCJ4TT/i5lM4wXSU8
+	 fY8Xsvf+MuO2w==
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-29df3d9c644so1583915a91.1
+        for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 12:56:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710608394; x=1711213194;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1710618999; x=1711223799;
+        h=message-id:date:content-transfer-encoding:content-id:mime-version
+         :comments:references:in-reply-to:subject:cc:to:from
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y1GIdlcJxdG4YtFEAdIwGXJrrGx7Kfdq8NmdWCG1dVA=;
-        b=gPMV7Up6szhn5Kr+l+nRIYLq6BvCseeQBihRdGmqYLi4W31kwSj3zEINJabolPnOiP
-         7hqmSUhajpHDdUdcTvq3fxpQSJ7hkRSq5xCbVBbZBUFJ/aXkiAzBxCsU8ukVoSmUEInz
-         O1ZQbOJTqeB6e6/hQNYk1SzagHoZ7mwA5V5dy3oxaOnbFhqy1Ft6p3zF7bm6WO3u48yE
-         5Jis6NIjheLCyqyEEA+0qa0dddPcnj/K/zdhEIlRMGcoyJFnnNxLLWBQrO1xm4MS7RcN
-         ObIW5/S5aKAfAcGXyzfOsR/Xq64RrngQlBfZLKaSet2QlJ6IXtoJ9JolO6Yylct5vdRi
-         RVeg==
-X-Forwarded-Encrypted: i=1; AJvYcCUa5b7iaHwvXO38UaxFAJzizkb0cRZyZSYdHsmMvcKBbQqikct956ZMT1mLGEQB3Ml3oG8654BV1ar2fN8cjW63gxDv3Mqb
-X-Gm-Message-State: AOJu0YxNq8wGQDioKSHcXyV4kyt9cddH4esfO3xWPrJL1oCKSB9na7uB
-	P8ffCOyLUbSpcCjQOM1VWOJ1yD9KSyE+LxpQQiqbo/sf4CumvTAcUesDDNlyKqw=
-X-Google-Smtp-Source: AGHT+IF9k7wYPR8lnQctGGvzP1ehsITWWaLQGt+1f8KHDmDYdfm2KnwCv+FAe35PlEd/t8r7i8mVhA==
-X-Received: by 2002:a05:6a21:3381:b0:1a3:5c74:62ae with SMTP id yy1-20020a056a21338100b001a35c7462aemr1232334pzb.1.1710608393978;
-        Sat, 16 Mar 2024 09:59:53 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id n29-20020a634d5d000000b005d6a0b2efb3sm4303093pgl.21.2024.03.16.09.59.52
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 16 Mar 2024 09:59:53 -0700 (PDT)
-Message-ID: <4a613551-9a29-4e41-ae78-ad38bacaa009@kernel.dk>
-Date: Sat, 16 Mar 2024 10:59:51 -0600
+        bh=TP2KNC11l4nDmaxHecYL48vE/SAz/Ax5xMdjIwUIOjM=;
+        b=Ule5OpnwUORBLIAkCvUFlVXe760gtahEaLNq/OwJDpx0QReOAL9xVM3Gqjwecb0twe
+         2JNhcRrS02HlOr3ISVPfM8DsSdzUfOBS9zMZxi3bTzmB1pPXJcxFKFjPJ+4eZcCINdtS
+         pT6CXKzRASTWh2aXIqxXUT/cFvW4RXkWVx8I985o2/zYXlf2KpeaHZz4ASxfQV2ZwrD6
+         RmCjLWZo7P3Of5YBk5UYwfcAhcqouF5C03H2pQMpFCXzMzKKxGN4kCCn4A8myxCxGgeV
+         DV/R27mtLWYJWlx/ZJWNw8luiq+9/ImzP/lIDd9I9cemkr71a58I8rSJrAT9pYNhzkLc
+         iqEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUOxhvbe0OkXSf9+myWp4YcrfkwRwHqv4LZ/Iksuaf/JgcidE9Ph7RUJK1KoiXJx4gnbOPdUkTNpto1dEbrXTuGNnquGs5p
+X-Gm-Message-State: AOJu0Yz8flILixGd2AMVayTwjSISbdJOuLfygD3yCFxs3IQjEOJQyOCR
+	lZCYmnwOadurmTXgD6rioOthfRiBRAe5zJlxJlZfQe21hExsk2ijlbPEhoXAFOhLThBqfXFmamp
+	p4v+R9Fto89NyV0RsLfYJVGmYQrFpNuNZanhKKhpy0lfhtZ65CyF1lDj82Uexng/YI6Dt/Z9QRq
+	H3WA==
+X-Received: by 2002:a17:902:ec8d:b0:1dd:8c28:8a97 with SMTP id x13-20020a170902ec8d00b001dd8c288a97mr8053476plg.6.1710618998874;
+        Sat, 16 Mar 2024 12:56:38 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHQPjSA5VWm1eWEHxYVBfoRACEU/GYpIHLZTucbloG7NzFugpdl/7gfUl05unyEyz6jY+O0jA==
+X-Received: by 2002:a17:902:ec8d:b0:1dd:8c28:8a97 with SMTP id x13-20020a170902ec8d00b001dd8c288a97mr8053456plg.6.1710618998181;
+        Sat, 16 Mar 2024 12:56:38 -0700 (PDT)
+Received: from famine.localdomain ([50.125.80.253])
+        by smtp.gmail.com with ESMTPSA id l14-20020a170903120e00b001dcfaf4db22sm6161041plh.2.2024.03.16.12.56.37
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Sat, 16 Mar 2024 12:56:37 -0700 (PDT)
+Received: by famine.localdomain (Postfix, from userid 1000)
+	id 23EFA604B6; Sat, 16 Mar 2024 12:56:37 -0700 (PDT)
+Received: from famine (localhost [127.0.0.1])
+	by famine.localdomain (Postfix) with ESMTP id 1CAA89FA74;
+	Sat, 16 Mar 2024 12:56:37 -0700 (PDT)
+From: Jay Vosburgh <jay.vosburgh@canonical.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+cc: Max Gautier <mg@max.gautier.name>, netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2-next] arpd: create /var/lib/arpd on first use
+In-reply-to: <20240316080702.4cb0ed9a@hermes.local>
+References: <20240313093856.17fc459e@hermes.local> <20240316091026.11164-1-mg@max.gautier.name> <20240316080702.4cb0ed9a@hermes.local>
+Comments: In-reply-to Stephen Hemminger <stephen@networkplumber.org>
+   message dated "Sat, 16 Mar 2024 08:07:02 -0700."
+X-Mailer: MH-E 8.6+git; nmh 1.6; Emacs 29.0.50
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v4 13/16] io_uring: add io_recvzc request
-Content-Language: en-US
-To: Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
- io-uring@vger.kernel.org, netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>
-References: <20240312214430.2923019-1-dw@davidwei.uk>
- <20240312214430.2923019-14-dw@davidwei.uk>
- <7752a08c-f55c-48d5-87f2-70f248381e48@kernel.dk>
- <4343cff7-37d9-4b78-af70-a0d7771b04bc@gmail.com>
- <c4871911-5cb6-4237-a0a3-001ecb8bd7e5@kernel.dk>
- <e646d731-dec9-4d2e-9e05-dbb9b1183a0b@gmail.com>
- <1e49ba1e-a2b0-4b11-8c36-85e7b9f95260@kernel.dk>
- <90c588ab-884e-401a-83fd-3d204a732acd@gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <90c588ab-884e-401a-83fd-3d204a732acd@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3015.1710618997.1@famine>
+Content-Transfer-Encoding: quoted-printable
+Date: Sat, 16 Mar 2024 12:56:37 -0700
+Message-ID: <3016.1710618997@famine>
 
-On 3/15/24 5:52 PM, Pavel Begunkov wrote:
-> On 3/15/24 18:38, Jens Axboe wrote:
->> On 3/15/24 11:34 AM, Pavel Begunkov wrote:
->>> On 3/14/24 16:14, Jens Axboe wrote:
->>> [...]
->>>>>>> @@ -1053,6 +1058,85 @@ struct io_zc_rx_ifq *io_zc_verify_sock(struct io_kiocb *req,
->>>>>>>         return ifq;
->>>>>>>     }
->>>>>>>     +int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->>>>>>> +{
->>>>>>> +    struct io_recvzc *zc = io_kiocb_to_cmd(req, struct io_recvzc);
->>>>>>> +
->>>>>>> +    /* non-iopoll defer_taskrun only */
->>>>>>> +    if (!req->ctx->task_complete)
->>>>>>> +        return -EINVAL;
->>>>>>
->>>>>> What's the reasoning behind this?
->>>>>
->>>>> CQ locking, see the comment a couple lines below
->>>>
->>>> My question here was more towards "is this something we want to do".
->>>> Maybe this is just a temporary work-around and it's nothing to discuss,
->>>> but I'm not sure we want to have opcodes only work on certain ring
->>>> setups.
->>>
->>> I don't think it's that unreasonable restricting it. It's hard to
->>> care about !DEFER_TASKRUN for net workloads, it makes CQE posting a bit
->>
->> I think there's a distinction between "not reasonable to support because
->> it's complicated/impossible to do so", and "we prefer not to support
->> it". I agree, as a developer it's hard to care about !DEFER_TASKRUN for
->> networking workloads, but as a user, they will just setup a default
->> queue until they wise up. And maybe this can be a good thing in that
-> 
-> They'd still need to find a supported NIC and do all the other
-> setup, comparably to that it doesn't add much trouble. And my
+Stephen Hemminger <stephen@networkplumber.org> wrote:
 
-Hopefully down the line, it'll work on more NICs, and configuration will
-be less of a nightmare than it is now.
+>On Sat, 16 Mar 2024 10:06:44 +0100
+>Max Gautier <mg@max.gautier.name> wrote:
+>
+>> The motivation is to build distributions packages without /var to go
+>> towards stateless systems, see link below (TL;DR: provisionning anythin=
+g
+>> outside of /usr on boot).
+>> =
 
-> usual argument is that io_uring is a low-level api, it's expected
-> that people interacting with it directly are experienced enough,
-> expect to spend some time to make it right and likely library
-> devs.
+>> We only try do create the database directory when it's in the default
+>> location, and assume its parent (/var/lib in the usual case) exists.
+>> =
 
-Have you seen some of the code that has gone in to libraries for
-io_uring support? I have, and I don't think that statement is true at
-all for that side.
+>> Links: https://0pointer.net/blog/projects/stateless.html
+>> ---
+>> Instead of modifying the default location, I opted to create it at
+>> runtime, but only for the default location and assuming that /var/lib
+>> exists. My thinking is that not changing defaults is somewhat better,
+>> plus using /var/tmp directly might cause security concerns (I don't kno=
+w
+>> that it does, but at least someone could create a db file which the roo=
+t
+>> user would then open by default. Not sure what that could cause, so I'd
+>> rather avoid it).
+>> =
 
-It should work out of the box even with a naive approach, while the best
-approach may require some knowledge. At least I think that's the sanest
-stance on that.
+>>  Makefile    |  2 +-
+>>  misc/arpd.c | 12 +++++++++++-
+>>  2 files changed, 12 insertions(+), 2 deletions(-)
+>> =
 
->> they'd be nudged toward DEFER_TASKRUN, but I can also see some head
->> scratching when something just returns (the worst of all error codes)
->> -EINVAL when they attempt to use it.
-> 
-> Yeah, we should try to find a better error code, and the check
-> should migrate to ifq registration.
+>> diff --git a/Makefile b/Makefile
+>> index 8024d45e..2b2c3dec 100644
+>> --- a/Makefile
+>> +++ b/Makefile
+>> @@ -42,6 +42,7 @@ DEFINES+=3D-DCONF_USR_DIR=3D\"$(CONF_USR_DIR)\" \
+>>           -DCONF_ETC_DIR=3D\"$(CONF_ETC_DIR)\" \
+>>           -DNETNS_RUN_DIR=3D\"$(NETNS_RUN_DIR)\" \
+>>           -DNETNS_ETC_DIR=3D\"$(NETNS_ETC_DIR)\" \
+>> +         -DARPDDIR=3D\"$(ARPDDIR)\" \
+>>           -DCONF_COLOR=3D$(CONF_COLOR)
+>>  =
 
-Wasn't really a jab at the code in question, just more that -EINVAL is
-the ubiqitious error code for all kinds of things and it's hard to
-diagnose in general for a user. You just have to start guessing...
+>>  #options for AX.25
+>> @@ -104,7 +105,6 @@ config.mk:
+>>  install: all
+>>  	install -m 0755 -d $(DESTDIR)$(SBINDIR)
+>>  	install -m 0755 -d $(DESTDIR)$(CONF_USR_DIR)
+>> -	install -m 0755 -d $(DESTDIR)$(ARPDDIR)
+>>  	install -m 0755 -d $(DESTDIR)$(HDRDIR)
+>>  	@for i in $(SUBDIRS);  do $(MAKE) -C $$i install; done
+>>  	install -m 0644 $(shell find etc/iproute2 -maxdepth 1 -type f) $(DEST=
+DIR)$(CONF_USR_DIR)
+>> diff --git a/misc/arpd.c b/misc/arpd.c
+>> index 1ef837c6..a133226c 100644
+>> --- a/misc/arpd.c
+>> +++ b/misc/arpd.c
+>> @@ -19,6 +19,7 @@
+>>  #include <fcntl.h>
+>>  #include <sys/uio.h>
+>>  #include <sys/socket.h>
+>> +#include <sys/stat.h>
+>>  #include <sys/time.h>
+>>  #include <time.h>
+>>  #include <signal.h>
+>> @@ -35,7 +36,8 @@
+>>  #include "rt_names.h"
+>>  =
 
->>> cleaner, and who knows where the single task part would become handy.
->>
->> But you can still take advantage of single task, since you know if
->> that's going to be true or not. It just can't be unconditional.
->>
->>> Thinking about ifq termination, which should better cancel and wait
->>> for all corresponding zc requests, it's should be easier without
->>> parallel threads. E.g. what if another thread is in the enter syscall
->>> using ifq, or running task_work and not cancellable. Then apart
->>> from (non-atomic) refcounting, we'd need to somehow wait for it,
->>> doing wake ups on the zc side, and so on.
->>
->> I don't know, not seeing a lot of strong arguments for making it
->> DEFER_TASKRUN only. My worry is that once we starting doing that, then
->> more will follow. And honestly I think that would be a shame.
->>
->> For ifq termination, surely these things are referenced, and termination
->> would need to wait for the last reference to drop? And if that isn't an
->> expected condition (it should not be), then a percpu ref would suffice.
->> Nobody cares if the teardown side is more expensive, as long as the fast
->> path is efficient.
-> 
-> You can solve any of that, it's true, the question how much crap
-> you'd need to add in hot paths and diffstat wise. Just take a look
-> at what a nice function io_recvmsg() is together with its helpers
-> like io_recvmsg_multishot().
+>>  DB	*dbase;
+>> -char	*dbname =3D "/var/lib/arpd/arpd.db";
+>> +char const * const	default_dbname =3D ARPDDIR "/arpd.db";
+>
+>Make this an array.
+>const char *default_dbname[] =3D ARPDDIR "/arpd.db";
 
-That is true, and I guess my real question is "what would it look like
-if we supported !DEFER_TASKRUN". Which I think is a valid question.
+	I suspect this should be
 
-> The biggest concern is optimisations and quirks that we can't
-> predict at the moment. DEFER_TASKRUN/SINGLE_ISSUER provide a simpler
-> model, I'd rather keep recvzc simple than having tens of conditional
-> optimisations with different execution flavours and contexts.
-> Especially, since it can be implemented later, wouldn't work the
-> other way around.
+const char default_dbname[] =3D ARPDDIR "/arpd.db";
 
-Yes me too, and I'd hate to have two variants just because of that. But
-comparing to eg io_recv() and helpers, it's really not that bad. Hence
-my question on how much would it take, and how nasty would it be, to
-support !DEFER_TASKRUN.
+	i.e., no "*" before "default_dbname", to match the type of
+dbname (below).
 
--- 
-Jens Axboe
+>> +char const	*dbname =3D default_dbname;
+>>  =
 
+>>  int	ifnum;
+>>  int	*ifvec;
+>> @@ -668,6 +670,14 @@ int main(int argc, char **argv)
+>>  		}
+>>  	}
+>>  =
+
+>> +	if (default_dbname =3D=3D dbname
+>> +			&& mkdir(ARPDDIR, 0755) !=3D 0
+>> +			&& errno !=3D EEXIST
+>> +			) {
+>> +		perror("create_db_dir");
+>> +		exit(-1);
+>> +	}
+>> +
+
+	Should this be a string comparison?  I don't think the pointer
+comparison "default_dbname =3D=3D dbname" will do what you expect if a use=
+r
+specifies "-b" with the default value of ARPDIR "/arpd.db" as its
+argument (i.e., the pointers won't match, but the actual text is the
+same).
+
+	-J
+
+>>  	dbase =3D dbopen(dbname, O_CREAT|O_RDWR, 0644, DB_HASH, NULL);
+>>  	if (dbase =3D=3D NULL) {
+>>  		perror("db_open");
+>
+>Missing signed-off-by
+>
+
+---
+	-Jay Vosburgh, jay.vosburgh@canonical.com
 
