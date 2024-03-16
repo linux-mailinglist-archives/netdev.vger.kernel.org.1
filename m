@@ -1,116 +1,182 @@
-Return-Path: <netdev+bounces-80204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3391487D8B8
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 05:11:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A027987D8FD
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 06:41:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A7ED1C20E70
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 04:11:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32E4D1F2165D
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 05:41:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BFC04C83;
-	Sat, 16 Mar 2024 04:11:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2F36AB8;
+	Sat, 16 Mar 2024 05:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Ye67B/LX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HjvigbZd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f202.google.com (mail-pf1-f202.google.com [209.85.210.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E81754C7D
-	for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 04:11:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2CFE6AA1;
+	Sat, 16 Mar 2024 05:41:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710562314; cv=none; b=InLwjFnFuEMlFO+qShbu/cyV3rCUu5ScuJaCW41B93iqssIxwm8X412f31nVgh2PTGVOjmDD089LRb7qTGa4UQQmTHwIZq44wrFd5+VK/EMPdlYGISZpJuL1V3x53QaIjIQ/QADRq6tiWdZrtbIymG4MLSZfAr+J0OcfnUjuk7M=
+	t=1710567661; cv=none; b=d7VkeznXW6g+GxMKiatpSUE1VzFhEW/4mwXqyIFmWi0B9+iDbgT2vRDxU4mj9it8cGQNndOqohipFD1m37YC8KydzNAFAc9ucFUH+URvOW3ETOPBRMc60N/xSELI7ifUaE+sHX0hImDs3UoITb0VJPUwpFeCfboT3zx9ufA6oDw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710562314; c=relaxed/simple;
-	bh=Rt6aMzr2OuQnLBliXVO6f1PBBxyeswtksvS+Yn8xdFc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=ajwOxWjo+U85X58C97pweiBXeHlJjMK8tgwkj0Dv+oLLWxQIL94zw0Q0t8fPzkK2qMk4XzUtDaHCkrqyokpMjl/1ml1v3Mpw1BT1XVBUVTpVZqFJk8NTO9fHFtZM4SmABwz1x+Aq5yCiHxgSm3OTzIQHEHO+hjfbINA/bZAFY6A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Ye67B/LX; arc=none smtp.client-ip=209.85.210.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--sdf.bounces.google.com
-Received: by mail-pf1-f202.google.com with SMTP id d2e1a72fcca58-6e6fce696dfso1074643b3a.0
-        for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 21:11:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710562312; x=1711167112; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HVgOFP2Zu1etY739TvoykPTTCP+tXV1+/X2pr3iQXWQ=;
-        b=Ye67B/LXjEBOcPjI+cY1X6t2uAQo0ZG08h3tCacTFq6Da0lVorzuBIR+IDphPWfEZM
-         8LI2Snoc844sSLp8ui1Fn74ofEW2a+aVvpM7fkpjhP6S4lfNRdHh2gW+W1lc/wSzvBRq
-         syMwhP1JNtBaGMKnRONVaB1Ec5fnrcYVLLh0EAU15Meakp436QrSPKNGHAp0grgEpM+T
-         /odNZQHTQGyhWjkdcb7NRHPI+ADiCPIzlP4DbHpVxPW84FRMEUPRP4upaOq7eV0147U5
-         LS4XTxac6WH3i7YiUgj7rDn5bMHnXIaE1gTkvmQyQHPJsmvhCK5xirh8wAntGdqup5PI
-         ROMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710562312; x=1711167112;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HVgOFP2Zu1etY739TvoykPTTCP+tXV1+/X2pr3iQXWQ=;
-        b=fyZ90DzuIweS5Vsozk89GxbX77YzOXHMRhgDin6JF+K7y97GqGNUAXPBAI/ZaroX9Y
-         wn0jCLIHEC70Nkhjx5cL5z25zhHzQQxH4EYll0Of+rzHlq18PX7tfn8U43PQO2eB3l35
-         fUzHwG/0VBv234MEqiXTgIJS84muvTROGAh/cnNzk0Tu9EuWTZgUMY9Oi+JnvdFSD8/4
-         LiOCsYkY825lMU2O+ccBXUqywHvWqM2OQXcb4LIiO17nLqKfxqmmZ53XVh2izDrKdl3a
-         iedlcYPxW+gsR4+d9qBZy5fg1Skqs8jn2L69q1+nu/ecTfD8aaz00LKAZ+KxRkFdRYdt
-         3Zog==
-X-Gm-Message-State: AOJu0YxuCUsTB0EAuexX14TyIdQLwKPaCFcrnh1HRWM3RunyVIL3gMoT
-	R2Qx9sxs/bO6QsPLVkQIvEWHGoGPkX9oES4A+KwNtByk1gaGHR8FQTFozvICwK+/pQ==
-X-Google-Smtp-Source: AGHT+IEmC++9sbMbXcpKhmbeCHyzQ0JhvYubzdbhQ5FaNMKqUIHCRxBi1dhziJJoMWG9GZVJky26JtU=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a05:6a00:234c:b0:6e6:9dae:20c6 with SMTP id
- j12-20020a056a00234c00b006e69dae20c6mr243993pfj.4.1710562312080; Fri, 15 Mar
- 2024 21:11:52 -0700 (PDT)
-Date: Fri, 15 Mar 2024 21:11:50 -0700
-In-Reply-To: <CAKq9yRgO3akVUoz=H_vKgMjoDowq=owq5snPhmKLi4c=taLTnA@mail.gmail.com>
+	s=arc-20240116; t=1710567661; c=relaxed/simple;
+	bh=zpFhiM3PAxX/JyJRkDpY9ZV+mL+lJb4usahl35U/Ujg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pIMrc6muPQz+uFFwHGfI8FC95AwtE5hjOlPQD5LMoOs1yzFuOMQsVyVt3gqiCzPzc9tk0uUEgtzXhLGFC3Z8jXFFKCj1Wvq+mnUM7oczDR2SyUIsM4yg2QSVt3uCq4B85BbVUEeA9Vdp8LKJWM8srIrHPxNsfm0jqSrRjDb5iXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HjvigbZd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08A28C433F1;
+	Sat, 16 Mar 2024 05:41:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710567660;
+	bh=zpFhiM3PAxX/JyJRkDpY9ZV+mL+lJb4usahl35U/Ujg=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=HjvigbZdMD0owzOJXTmHchrakQ4u/PHtXuAreEUfas8c7Eq4XwuMIZr3bAjk+cuEl
+	 /Lx88pQFy1UQN0KcvNDkZv6Wv3lMzOuki0GRGL060d/YDdYIdURoKvImT5K3UiIfId
+	 Ccj1dJ0p3DWvY3FPO8wh1SWvd3OiCDAGlc9jJq+FfGw1Rg6xzhreIwMnNkPW4g3pMN
+	 Jp+1+0rtoFOjMg5UQnsFTUu6z6tNdPpeZMVeKtWRkOlNSwA9ziA654tikdsFQDQUrK
+	 4nfNkjxQqo+SU3cKnfpgQN0RXAaFJBzsB8pfznYJKX6b+iQSLZSRumAvywJsGAnkWq
+	 46/voqVzs0SbQ==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 8CBF0CE0D20; Fri, 15 Mar 2024 22:40:56 -0700 (PDT)
+Date: Fri, 15 Mar 2024 22:40:56 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Yan Zhai <yan@cloudflare.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Hannes Frederic Sowa <hannes@stressinduktion.org>,
+	linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
+	bpf@vger.kernel.org, kernel-team@cloudflare.com,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>, mark.rutland@arm.com,
+	Jesper Dangaard Brouer <hawk@kernel.org>
+Subject: Re: [PATCH v4 net 1/3] rcu: add a helper to report consolidated
+ flavor QS
+Message-ID: <790ce7e7-a8fd-4d28-aaf3-1b991a898be2@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <cover.1710525524.git.yan@cloudflare.com>
+ <491d3af6c7d66dfb3b60b2f210f38e843dfe6ed2.1710525524.git.yan@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <CAKq9yRgO3akVUoz=H_vKgMjoDowq=owq5snPhmKLi4c=taLTnA@mail.gmail.com>
-Message-ID: <ZfUcBnDCepuryS3f@google.com>
-Subject: Re: [mlx5_core] kernel NULL pointer dereference when sending packets
- with AF_XDP using the hw checksum
-From: Stanislav Fomichev <sdf@google.com>
-To: Daniele Salvatore Albano <d.albano@gmail.com>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <491d3af6c7d66dfb3b60b2f210f38e843dfe6ed2.1710525524.git.yan@cloudflare.com>
 
-On 03/16, Daniele Salvatore Albano wrote:
-> Hey there,
+On Fri, Mar 15, 2024 at 12:55:03PM -0700, Yan Zhai wrote:
+> There are several scenario in network processing that can run
+> extensively under heavy traffic. In such situation, RCU synchronization
+> might not observe desired quiescent states for indefinitely long period.
+> Create a helper to safely raise the desired RCU quiescent states for
+> such scenario.
 > 
-> Hope this is the right ml, if not sorry in advance.
+> Currently the frequency is locked at HZ/10, i.e. 100ms, which is
+> sufficient to address existing problems around RCU tasks. It's unclear
+> yet if there is any future scenario for it to be further tuned down.
+
+I suggest something like the following for the commit log:
+
+------------------------------------------------------------------------
+
+When under heavy load, network processing can run CPU-bound for many tens
+of seconds.  Even in preemptible kernels, this can block RCU Tasks grace
+periods, which can cause trace-event removal to take more than a minute,
+which is unacceptably long.
+
+This commit therefore creates a new helper function that passes
+through both RCU and RCU-Tasks quiescent states every 100 milliseconds.
+This hard-coded value suffices for current workloads.
+
+------------------------------------------------------------------------
+
+> Suggested-by: Paul E. McKenney <paulmck@kernel.org>
+> Reviewed-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> Signed-off-by: Yan Zhai <yan@cloudflare.com>
+> ---
+> v3->v4: comment fixup
 > 
-> I have been facing a reproducible kernel panic with 6.8.0 and 6.8.1
-> when sending packets and enabling the HW checksum calculation with
-> AF_XDP on my mellanox connect 5.
+> ---
+>  include/linux/rcupdate.h | 24 ++++++++++++++++++++++++
+>  1 file changed, 24 insertions(+)
 > 
-> Running xskgen ( https://github.com/fomichev/xskgen ), which I saw
-> mentioned in some patches related to AF_XDP and the hw checksum
-> support. In addition to the minimum parameters to make it work, adding
-> the -m option is enough to trigger the kernel panic.
+> diff --git a/include/linux/rcupdate.h b/include/linux/rcupdate.h
+> index 0746b1b0b663..da224706323e 100644
+> --- a/include/linux/rcupdate.h
+> +++ b/include/linux/rcupdate.h
+> @@ -247,6 +247,30 @@ do { \
+>  	cond_resched(); \
+>  } while (0)
+>  
+> +/**
+> + * rcu_softirq_qs_periodic - Periodically report consolidated quiescent states
+> + * @old_ts: last jiffies when QS was reported. Might be modified in the macro.
+> + *
+> + * This helper is for network processing in non-RT kernels, where there could
+> + * be busy polling threads that block RCU synchronization indefinitely.  In
+> + * such context, simply calling cond_resched is insufficient, so give it a
+> + * stronger push to eliminate all potential blockage of all RCU types.
+> + *
+> + * NOTE: unless absolutely sure, this helper should in general be called
+> + * outside of bh lock section to avoid reporting a surprising QS to updaters,
+> + * who could be expecting RCU read critical section to end at local_bh_enable().
+> + */
 
-Now I wonder if I ever tested only -m (without passing a flag to request
-tx timestamp). Maybe you can try to confirm that `xskgen -mC` works?
+How about something like this for the kernel-doc comment?
 
-If you can test custom patches, I think the following should fix it:
+/**
+ * rcu_softirq_qs_periodic - Report RCU and RCU-Tasks quiescent states
+ * @old_ts: jiffies at start of processing.
+ *
+ * This helper is for long-running softirq handlers, such as those
+ * in networking.  The caller should initialize the variable passed in
+ * as @old_ts at the beginning of the softirq handler.  When invoked
+ * frequently, this macro will invoke rcu_softirq_qs() every 100
+ * milliseconds thereafter, which will provide both RCU and RCU-Tasks
+ * quiescent states.  Note that this macro modifies its old_ts argument.
+ *
+ * Note that although cond_resched() provides RCU quiescent states,
+ * it does not provide RCU-Tasks quiescent states.
+ *
+ * Because regions of code that have disabled softirq act as RCU
+ * read-side critical sections, this macro should be invoked with softirq
+ * (and preemption) enabled.
+ *
+ * This macro has no effect in CONFIG_PREEMPT_RT kernels.
+ */
 
-diff --git a/include/net/xdp_sock.h b/include/net/xdp_sock.h
-index 3cb4dc9bd70e..3d54de168a6d 100644
---- a/include/net/xdp_sock.h
-+++ b/include/net/xdp_sock.h
-@@ -188,6 +188,8 @@ static inline void xsk_tx_metadata_complete(struct xsk_tx_metadata_compl *compl,
- {
- 	if (!compl)
- 		return;
-+	if (!compl->tx_timestamp)
-+		return;
- 
- 	*compl->tx_timestamp = ops->tmo_fill_timestamp(priv);
- }
+							Thanx, Paul
 
-If not, I can try to get my mlx5 setup back in shape sometime next week.
+> +#define rcu_softirq_qs_periodic(old_ts) \
+> +do { \
+> +	if (!IS_ENABLED(CONFIG_PREEMPT_RT) && \
+> +	    time_after(jiffies, (old_ts) + HZ / 10)) { \
+> +		preempt_disable(); \
+> +		rcu_softirq_qs(); \
+> +		preempt_enable(); \
+> +		(old_ts) = jiffies; \
+> +	} \
+> +} while (0)
+> +
+>  /*
+>   * Infrastructure to implement the synchronize_() primitives in
+>   * TREE_RCU and rcu_barrier_() primitives in TINY_RCU.
+> -- 
+> 2.30.2
+> 
+> 
 
