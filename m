@@ -1,396 +1,311 @@
-Return-Path: <netdev+bounces-80202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23BF487D807
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 03:53:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E024287D8B2
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 04:44:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FABB282A43
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 02:53:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3B41BB20D0E
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 03:44:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F423468E;
-	Sat, 16 Mar 2024 02:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 897784C6D;
+	Sat, 16 Mar 2024 03:42:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b="OS38TBQX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JUf6ylCw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCDE31FDD
-	for <netdev@vger.kernel.org>; Sat, 16 Mar 2024 02:52:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D57D4C7C;
+	Sat, 16 Mar 2024 03:42:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710557576; cv=none; b=aCOWSRABQhyK/FuJSZtzyeIOPecefixIBn/sOD8cBk26HIC/J+Cs/lCNj316uEmflZAveQIhS0+ZHQyd3VbtHzRS+cDzOnDPmb96jASvHXmN0UGPxbN28alUn64i4tydDGoGR06uAuEqEyLgGkp/5fDblS5beaHiJPEy0Otn5qQ=
+	t=1710560566; cv=none; b=N96mCbAw/T5DI+3ORMyEUAgBN504t50ssLozFu+KWl4AdSHNazZ0JSKOFzTfezW6usdb7Cbxxi2KPphN1xb5f108eoEfhTvOWRmPWcWqaEiDfGt/8PDb3RkNK3X/hiq7+//uMyx/A2Au8R3qnvs4Liv/LZnrz1HtscufsLiTM0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710557576; c=relaxed/simple;
-	bh=ONoYL4XYOrO/6V38FWRzOpd8quw8P9OYCw818URL5SI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g03Q3KkahoP8M51VG/bK5wOdz1Bfef8AthiUcL/97jQQzBsi9e8rPqLOaBja82KLzrslM3NqlF50nwfY5rgUGCl5JOOBJGhQzM74p490AoRC1NDMYtvTfekP204qEBZbUY+xVomO+AVK8YbLC3k1/HIGmcbA8Ekbx1QTD72kZXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com; spf=pass smtp.mailfrom=fromorbit.com; dkim=pass (2048-bit key) header.d=fromorbit-com.20230601.gappssmtp.com header.i=@fromorbit-com.20230601.gappssmtp.com header.b=OS38TBQX; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=fromorbit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fromorbit.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-29c5f8bc830so1948328a91.2
-        for <netdev@vger.kernel.org>; Fri, 15 Mar 2024 19:52:53 -0700 (PDT)
+	s=arc-20240116; t=1710560566; c=relaxed/simple;
+	bh=pUF3+JmexwNFY74SyLf8EhNr3fsrFSXf8Rx7TcEMM3c=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=S4rnJAASFukT/vXgghXyXm2rWnq5zpLY0SvveYYU16u7pda/h2i9HBsiSecCxCKaw2w3soquwCfhHyZlyS0rR6lgQDj0jB2L/CawKVdsflp9DV1IQZvTJ0TXnUJWWXmiNzPI0iYKJIKV1l2NNwjsYTNluJXGDhtgupWlFGeWlmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JUf6ylCw; arc=none smtp.client-ip=209.85.167.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-513e134f73aso109979e87.2;
+        Fri, 15 Mar 2024 20:42:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fromorbit-com.20230601.gappssmtp.com; s=20230601; t=1710557573; x=1711162373; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bBoX08MQ+GnGsn3Ys1XDLWs0vSpU6QZ104y6JQ1iJRA=;
-        b=OS38TBQXdJvmCPcBqtVgseCBD92KPMKjZB5CNB1A04ssBRuxFtzhRPn1GciuiaZp/t
-         ZH5bJFCL/HpWMw666xaF9ceynO1+jhCFyauCWBZUGDOD1jkHbl+xoO/jG6Zp360GwjSj
-         i66QeBxSRG87tkQkjPc2WA1M6sUtCwvS7DgrAnPORxwYyGeQf+wuJHESEF51ACE4d88K
-         v4nAXQtE+CrgRNknVt8a/+cuKu8aypzYeDig59JPHUtRYsAH3lqkfrJopeugL+PkOFJP
-         r/+/nAs2w8rmwShkaEIQMuFTq7jUIHueDrkctHW9aB3EK7WEeQJ4EnyrT3UmzNQXv8kk
-         1a+A==
+        d=gmail.com; s=20230601; t=1710560562; x=1711165362; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Cgf8DgxHUjitbx8VzHDjQyw83nPToBtCwrDSRoMwYHc=;
+        b=JUf6ylCwnr/LRxhV4NvjP0HSZG35Tpf4chdWuHChT5YQRgRHdQcqiL2BOluRiZ3jhm
+         nR1tGj/AvFIEbaB2FY8J5FxCSHOv7RgSr1G4sFnHuMYuwd8jjACbhmmtqUSte29LNCZn
+         cawX0NWzOH7pt5g3m1OLuHGPTyrDhzF/XjwoBfWtY/xu9kqy1dGNrVIdYpYDP972SjHM
+         y1iIbDUsFWueqSqNdvLYKbCLQwbg2ICi3PgIibeB4Bib0/oLBcCXtpRnJv58Du0fyGb1
+         iARkN1RDkD44rWCS6YrztDiYEEZEtAx87tXjb23nb9ivxuMXagtoWLEBiapkzxHLIFdl
+         VJKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710557573; x=1711162373;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bBoX08MQ+GnGsn3Ys1XDLWs0vSpU6QZ104y6JQ1iJRA=;
-        b=UvnanEKh8w8Kh4NuFswTzgdSvemGMrerVhaIDy9QMkt5dIqsnyL5yDkppautp/pDZN
-         ofHQ1RiqVYbhVHRmekooyAHwDb55c8neTLznA1ra54lPEG4K06Mx6BDIqUr+oj11/7jX
-         7rkZcxCSARHCd1t1yJ2REayeyHch63pDMTQ4dsnXCWSOFT+goU95aGCexo4kXfS1pO97
-         jErueqqQNJzTqEbStGzRqOX3ZhORLp3plxkDQBeFEWdTy0ES/oZbk6kBUFKNq2CjxmjY
-         vWA6/Ap9TNw3WyIi3tTcpjcp9C5mrllPbov3xZ6jbp6tF0ncGTgbGMyJs/SZWXWkcGPw
-         5AFw==
-X-Forwarded-Encrypted: i=1; AJvYcCXSjr+1e48RnKx2BfOFqSlL946CfJlCROuAYoRZoPbkByXtGc/g6q+VJRYDCxw8rRpZ7DW+dPBtzN4J83Oezr4z30p9A/0V
-X-Gm-Message-State: AOJu0Yx03FliTmdsQ5ukFtK/877Sig2r6tv/YtJHnqupJGBXyiVpGYdG
-	f6nKy5d9BeP5cH1OAW0fhzZWz3fqh4cwbmCHAkVOGTCUpC3AtZoTR7JyrBRVTs8iIzpoDoYDw1+
-	YoUM=
-X-Google-Smtp-Source: AGHT+IF+mhHYlAObRzpfXYn3IGnPDczeVjZaH7QVUqvtIq9UdyOULCBCqzY79zAwu/GemLxZ182Fng==
-X-Received: by 2002:a17:903:2446:b0:1dd:9cb3:8f96 with SMTP id l6-20020a170903244600b001dd9cb38f96mr6055795pls.42.1710557572964;
-        Fri, 15 Mar 2024 19:52:52 -0700 (PDT)
-Received: from dread.disaster.area (pa49-180-185-123.pa.nsw.optusnet.com.au. [49.180.185.123])
-        by smtp.gmail.com with ESMTPSA id f5-20020a170902684500b001dddbb58d5esm4736209pln.109.2024.03.15.19.52.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Mar 2024 19:52:52 -0700 (PDT)
-Received: from dave by dread.disaster.area with local (Exim 4.96)
-	(envelope-from <david@fromorbit.com>)
-	id 1rlKAC-002Wnj-2F;
-	Sat, 16 Mar 2024 13:52:48 +1100
-Date: Sat, 16 Mar 2024 13:52:48 +1100
-From: Dave Chinner <david@fromorbit.com>
-To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Kees Cook <keescook@chromium.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Muchun Song <muchun.song@linux.dev>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, Simon Horman <horms@verge.net.au>,
-	Julian Anastasov <ja@ssi.bg>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Joel Granados <j.granados@samsung.com>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Gerald Schaefer <gerald.schaefer@linux.ibm.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Phillip Potter <phil@philpotter.co.uk>,
-	Theodore Ts'o <tytso@mit.edu>,
-	"Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Sudip Mukherjee <sudipm.mukherjee@gmail.com>,
-	Mark Rutland <mark.rutland@arm.com>,
-	Atish Patra <atishp@atishpatra.org>,
-	Anup Patel <anup@brainfault.org>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>, Jan Kara <jack@suse.cz>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Chandan Babu R <chandan.babu@oracle.com>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Arnaldo Carvalho de Melo <acme@kernel.org>,
-	Namhyung Kim <namhyung@kernel.org>,
-	Alexander Shishkin <alexander.shishkin@linux.intel.com>,
-	Ian Rogers <irogers@google.com>,
-	Adrian Hunter <adrian.hunter@intel.com>,
-	Balbir Singh <bsingharora@gmail.com>,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>,
-	Petr Mladek <pmladek@suse.com>,
-	John Ogness <john.ogness@linutronix.de>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Juri Lelli <juri.lelli@redhat.com>,
-	Vincent Guittot <vincent.guittot@linaro.org>,
-	Dietmar Eggemann <dietmar.eggemann@arm.com>,
-	Ben Segall <bsegall@google.com>, Mel Gorman <mgorman@suse.de>,
-	Daniel Bristot de Oliveira <bristot@redhat.com>,
-	Valentin Schneider <vschneid@redhat.com>,
-	Andy Lutomirski <luto@amacapital.net>,
-	Will Drewry <wad@chromium.org>, John Stultz <jstultz@google.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Remi Denis-Courmont <courmisch@gmail.com>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Jeff Layton <jlayton@kernel.org>, Neil Brown <neilb@suse.de>,
-	Olga Kornievskaia <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>,
-	Tom Talpey <tom@talpey.com>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Anna Schumaker <anna@kernel.org>,
-	John Johansen <john.johansen@canonical.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Alexander Popov <alex.popov@linux.com>,
-	linux-hardening@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org,
-	lvs-devel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, linux-fsdevel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-s390@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-riscv@lists.infradead.org,
-	linux-xfs@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, kexec@lists.infradead.org,
-	bridge@lists.linux.dev, linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com, linux-sctp@vger.kernel.org,
-	linux-nfs@vger.kernel.org, apparmor@lists.ubuntu.com,
-	linux-security-module@vger.kernel.org
-Subject: Re: [PATCH 11/11] sysctl: treewide: constify the ctl_table argument
- of handlers
-Message-ID: <ZfUJgML8tk6RWqOC@dread.disaster.area>
-References: <20240315-sysctl-const-handler-v1-0-1322ac7cb03d@weissschuh.net>
- <20240315-sysctl-const-handler-v1-11-1322ac7cb03d@weissschuh.net>
+        d=1e100.net; s=20230601; t=1710560562; x=1711165362;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Cgf8DgxHUjitbx8VzHDjQyw83nPToBtCwrDSRoMwYHc=;
+        b=Km8rHSbI/7G9WUQqAEGHhPFulg/2Iwu58g7eWjuI6sDVp7Z8V7rIQoQyspZh3wpOmO
+         9LcofKj0lKb9eBgWClZ/j7+jd/eYBZsHc99N2XSLoE8O/SRHTwSCHcVCRKfsaOKpq9pV
+         cTOONFS7NxuQa6fRHYsdzmmp9WFePTUigAMvfcTrbgYwvEIIuymar7JKS+jd4cRlDxg/
+         /Y907pbIj8iXopC9Fuu+jXYaxvU3CdHHeflLv28GCFqBk6z70MaOYRH30RGLs4+UOupE
+         zavG+RgmGvNsii6LbpUJAZTzEndm8XechwXbc/T7blhw/qC07wzqVqi1EwwSTgzKAvL9
+         uSkg==
+X-Forwarded-Encrypted: i=1; AJvYcCWkZZOjNCO+Jf4/l3UaxpIBg/hUf5CXdMVxl/cxGJHeuxhtaxi6chs/BHO3uWo9EdbUxQ4QNaww1G1hUpyXhr8cUqegON7qClPI7NauQneVysaR0lmKU5PzUVBZNLI5Xh0puHlX
+X-Gm-Message-State: AOJu0Yxedoe1Mzr5ur9xKxagymJ8xwqMprEsVEXSbxL8kj1SMhknFRAu
+	QBU1g2Q5yiiMUrLEAkDQ9FgVsqFisfC+HVWR+/Ub8vomCTIOj+3HNo3u6BCtXGVEnZiTA7a4kyJ
+	w99unh5es3j8dvyKrEQQKTcG84Xk=
+X-Google-Smtp-Source: AGHT+IEjTxPgog4y7kx8jtZrkI/l2TrXT6vyaTeDllwh6ScXCC88X2vifwiIzAWLkjBrBmgu2X3jxvGz4GkKK+c4MNs=
+X-Received: by 2002:ac2:464c:0:b0:513:c4d9:a0d9 with SMTP id
+ s12-20020ac2464c000000b00513c4d9a0d9mr4535557lfo.22.1710560562097; Fri, 15
+ Mar 2024 20:42:42 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240315-sysctl-const-handler-v1-11-1322ac7cb03d@weissschuh.net>
+From: cheung wall <zzqq0103.hey@gmail.com>
+Date: Sat, 16 Mar 2024 11:42:30 +0800
+Message-ID: <CAKHoSAshN6b3sCkWDLsHJ42Wqa0R_82horK_Owvy0fjBq6seuQ@mail.gmail.com>
+Subject: INFO: rcu detected stall in gc_worker
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Mar 15, 2024 at 09:48:09PM +0100, Thomas Weißschuh wrote:
-> Adapt the proc_hander function signature to make it clear that handlers
-> are not supposed to modify their ctl_table argument.
-> 
-> This is a prerequisite to moving the static ctl_table structs into
-> .rodata.
-> By migrating all handlers at once a lengthy transition can be avoided.
-> 
-> The patch was mostly generated by coccinelle with the following script:
-> 
->     @@
->     identifier func, ctl, write, buffer, lenp, ppos;
->     @@
-> 
->     int func(
->     - struct ctl_table *ctl,
->     + const struct ctl_table *ctl,
->       int write, void *buffer, size_t *lenp, loff_t *ppos)
->     { ... }
+Hello,
 
-Which seems to have screwed up the formatting of the XFS code...
 
-> diff --git a/fs/xfs/xfs_sysctl.c b/fs/xfs/xfs_sysctl.c
-> index a191f6560f98..a3ca192eca79 100644
-> --- a/fs/xfs/xfs_sysctl.c
-> +++ b/fs/xfs/xfs_sysctl.c
-> @@ -10,12 +10,11 @@ static struct ctl_table_header *xfs_table_header;
->  
->  #ifdef CONFIG_PROC_FS
->  STATIC int
-> -xfs_stats_clear_proc_handler(
-> -	struct ctl_table	*ctl,
-> -	int			write,
-> -	void			*buffer,
-> -	size_t			*lenp,
-> -	loff_t			*ppos)
-> +xfs_stats_clear_proc_handler(const struct ctl_table *ctl,
-> +			     int			write,
-> +			     void			*buffer,
-> +			     size_t			*lenp,
-> +			     loff_t			*ppos)
+when using Healer to fuzz the latest Linux Kernel, the following crash
 
-... because this doesn't match any format I've ever seen in the
-kernel. The diff for this change shold be just:
+was triggered on:
 
-@@ -10,7 +10,7 @@ static struct ctl_table_header *xfs_table_header;
- #ifdef CONFIG_PROC_FS
- STATIC int
- xfs_stats_clear_proc_handler(
--	struct ctl_table	*ctl,
-+	const struct ctl_table	*ctl,
- 	int			write,
- 	void			*buffer,
- 	size_t			*lenp,
 
->  {
->  	int		ret, *valp = ctl->data;
->  
-> @@ -30,12 +29,11 @@ xfs_stats_clear_proc_handler(
->  }
->  
->  STATIC int
-> -xfs_panic_mask_proc_handler(
-> -	struct ctl_table	*ctl,
-> -	int			write,
-> -	void			*buffer,
-> -	size_t			*lenp,
-> -	loff_t			*ppos)
-> +xfs_panic_mask_proc_handler(const struct ctl_table *ctl,
-> +			    int			write,
-> +			    void			*buffer,
-> +			    size_t			*lenp,
-> +			    loff_t			*ppos)
->  {
->  	int		ret, *valp = ctl->data;
->  
-> @@ -51,12 +49,11 @@ xfs_panic_mask_proc_handler(
->  #endif /* CONFIG_PROC_FS */
->  
->  STATIC int
-> -xfs_deprecated_dointvec_minmax(
-> -	struct ctl_table	*ctl,
-> -	int			write,
-> -	void			*buffer,
-> -	size_t			*lenp,
-> -	loff_t			*ppos)
-> +xfs_deprecated_dointvec_minmax(const struct ctl_table *ctl,
-> +			       int			write,
-> +			       void			*buffer,
-> +			       size_t			*lenp,
-> +			       loff_t			*ppos)
->  {
->  	if (write) {
->  		printk_ratelimited(KERN_WARNING
+HEAD commit: 0dd3ee31125508cd67f7e7172247f05b7fd1753a  (tag: v6.7)
 
-And these need fixing as well.
+git tree: upstream
 
-A further quick glance at the patch reveals that there are other
-similar screwed up conversions as well.
+console output: https://pastebin.com/raw/0bRkEgvF
 
-> diff --git a/kernel/delayacct.c b/kernel/delayacct.c
-> index 6f0c358e73d8..513791ef573d 100644
-> --- a/kernel/delayacct.c
-> +++ b/kernel/delayacct.c
-> @@ -44,8 +44,9 @@ void delayacct_init(void)
->  }
->  
->  #ifdef CONFIG_PROC_SYSCTL
-> -static int sysctl_delayacct(struct ctl_table *table, int write, void *buffer,
-> -		     size_t *lenp, loff_t *ppos)
-> +static int sysctl_delayacct(const struct ctl_table *table, int write,
-> +			    void *buffer,
-> +			    size_t *lenp, loff_t *ppos)
->  {
->  	int state = delayacct_on;
->  	struct ctl_table t;
+kernel config: https://pastebin.com/raw/VecrLrRN
 
-Like this.
+C reproducer: https://pastebin.com/raw/k6HDMmac
 
-> diff --git a/kernel/events/core.c b/kernel/events/core.c
-> index 724e6d7e128f..e2955e0d9f44 100644
-> --- a/kernel/events/core.c
-> +++ b/kernel/events/core.c
-> @@ -450,7 +450,8 @@ static void update_perf_cpu_limits(void)
->  
->  static bool perf_rotate_context(struct perf_cpu_pmu_context *cpc);
->  
-> -int perf_event_max_sample_rate_handler(struct ctl_table *table, int write,
-> +int perf_event_max_sample_rate_handler(const struct ctl_table *table,
-> +				       int write,
->  				       void *buffer, size_t *lenp, loff_t *ppos)
->  {
->  	int ret;
+Syzlang reproducer: https://pastebin.com/raw/uX82h1ks
 
-And this.
 
-> @@ -474,8 +475,10 @@ int perf_event_max_sample_rate_handler(struct ctl_table *table, int write,
->  
->  int sysctl_perf_cpu_time_max_percent __read_mostly = DEFAULT_CPU_TIME_MAX_PERCENT;
->  
-> -int perf_cpu_time_max_percent_handler(struct ctl_table *table, int write,
-> -		void *buffer, size_t *lenp, loff_t *ppos)
-> +int perf_cpu_time_max_percent_handler(const struct ctl_table *table,
-> +				      int write,
-> +				      void *buffer, size_t *lenp,
-> +				      loff_t *ppos)
->  {
->  	int ret = proc_dointvec_minmax(table, write, buffer, lenp, ppos);
->  
+If you fix this issue, please add the following tag to the commit:
 
-And this.
+Reported-by: Qiang Zhang <zzqq0103.hey@gmail.com>
 
-> diff --git a/kernel/hung_task.c b/kernel/hung_task.c
-> index b2fc2727d654..003f0f5cb111 100644
-> --- a/kernel/hung_task.c
-> +++ b/kernel/hung_task.c
-> @@ -239,9 +239,10 @@ static long hung_timeout_jiffies(unsigned long last_checked,
->  /*
->   * Process updating of timeout sysctl
->   */
-> -static int proc_dohung_task_timeout_secs(struct ctl_table *table, int write,
-> -				  void *buffer,
-> -				  size_t *lenp, loff_t *ppos)
-> +static int proc_dohung_task_timeout_secs(const struct ctl_table *table,
-> +					 int write,
-> +					 void *buffer,
-> +					 size_t *lenp, loff_t *ppos)
->  {
->  	int ret;
->  
+----------------------------------------------------------
 
-And this.
-
-> diff --git a/kernel/latencytop.c b/kernel/latencytop.c
-> index 781249098cb6..0a5c22b19821 100644
-> --- a/kernel/latencytop.c
-> +++ b/kernel/latencytop.c
-> @@ -65,8 +65,9 @@ static struct latency_record latency_record[MAXLR];
->  int latencytop_enabled;
->  
->  #ifdef CONFIG_SYSCTL
-> -static int sysctl_latencytop(struct ctl_table *table, int write, void *buffer,
-> -		size_t *lenp, loff_t *ppos)
-> +static int sysctl_latencytop(const struct ctl_table *table, int write,
-> +			     void *buffer,
-> +			     size_t *lenp, loff_t *ppos)
->  {
->  	int err;
->  
-
-And this.
-
-I could go on, but there are so many examples of this in the patch
-that I think that it needs to be toosed away and regenerated in a
-way that doesn't trash the existing function parameter formatting.
-
--Dave.
--- 
-Dave Chinner
-david@fromorbit.com
+rcu: INFO: rcu_preempt detected stalls on CPUs/tasks:
+systemd-journal (124) used greatest stack depth: 24160 bytes left
+systemd[1]: systemd-journald.service: Main process exited,
+code=killed, status=6/ABRT
+systemd[1]: systemd-journald.service: Failed with result 'watchdog'.
+systemd[1]: systemd-journald.service: Scheduled restart job, restart
+counter is at 1.
+rcu: 0-...0: (4 ticks this GP) idle=c6ec/1/0x4000000000000000
+softirq=1263/1265 fqs=4551
+rcu: 2-...0: (1 GPs behind) idle=4f1c/1/0x4000000000000000
+softirq=993/993 fqs=4551
+rcu: 3-....: (1 GPs behind) idle=8b4c/0/0x3 softirq=1112/1113 fqs=4551
+rcu: (detected by 5, t=355128 jiffies, g=2045, q=163 ncpus=8)
+Sending NMI from CPU 5 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 PID: 10 Comm: kworker/0:1 Not tainted 6.7.0 #2
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Workqueue: events e1000_watchdog
+RIP: 0010:e1000_update_stats+0xb6f/0x1d70
+drivers/net/ethernet/intel/e1000/e1000_main.c:3660
+Code: df 48 89 f9 48 c1 e9 03 80 3c 01 00 0f 85 d8 11 00 00 45 89 ed
+48 8b 83 80 04 00 00 4c 01 ab 40 07 00 00 44 8b a8 e4 40 00 00 <48> 8d
+bb 48 07 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 f9 48 c1
+RSP: 0018:ffff88810031fbd0 EFLAGS: 00000002
+RAX: ffffc90001040000 RBX: ffff888104964900 RCX: 1ffff1102092ca08
+RDX: ffff888100302200 RSI: 0000000000000004 RDI: ffff888104965040
+RBP: 1ffff11020063f89 R08: 0000000000000001 R09: ffffed1020063f6e
+R10: 0000000000000003 R11: dead000000000100 R12: ffff888104964b18
+R13: 0000000000000000 R14: ffff888104964000 R15: ffff888104964900
+FS:  0000000000000000(0000) GS:ffff8881f7000000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f348ff56328 CR3: 00000001b60a4002 CR4: 0000000000770ef0
+PKRU: 55555554
+Call Trace:
+ <NMI>
+ </NMI>
+ <TASK>
+ e1000_watchdog+0x2f1/0x1300 drivers/net/ethernet/intel/e1000/e1000_main.c:2499
+ process_one_work+0x583/0xda0 kernel/workqueue.c:2627
+ process_scheduled_works kernel/workqueue.c:2700 [inline]
+ worker_thread+0x981/0x11e0 kernel/workqueue.c:2781
+ kthread+0x263/0x330 kernel/kthread.c:388
+ ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1b/0x30 arch/x86/entry/entry_64.S:242
+ </TASK>
+INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 2.146 msecs
+Sending NMI from CPU 5 to CPUs 2:
+NMI backtrace for cpu 2
+CPU: 2 PID: 89 Comm: kworker/2:1H Not tainted 6.7.0 #2
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Workqueue: kblockd blk_mq_requeue_work
+RIP: 0010:bytes_is_nonzero mm/kasan/generic.c:85 [inline]
+RIP: 0010:memory_is_nonzero mm/kasan/generic.c:102 [inline]
+RIP: 0010:memory_is_poisoned_n mm/kasan/generic.c:127 [inline]
+RIP: 0010:memory_is_poisoned mm/kasan/generic.c:159 [inline]
+RIP: 0010:check_region_inline mm/kasan/generic.c:178 [inline]
+RIP: 0010:kasan_check_range+0x164/0x1c0 mm/kasan/generic.c:187
+Code: c2 48 85 c0 75 b0 48 89 da 4c 89 d8 4c 29 da e9 49 ff ff ff 48
+85 d2 74 b3 48 01 ea eb 09 48 83 c0 01 48 39 d0 74 a5 80 38 00 <74> f2
+e9 74 ff ff ff b8 01 00 00 00 e9 16 7c 85 02 48 29 c3 48 89
+RSP: 0018:ffff8881f7109df0 EFLAGS: 00000046
+RAX: fffffbfff7b84000 RBX: fffffbfff7b84001 RCX: ffffffffbcb6ec4a
+RDX: fffffbfff7b84001 RSI: 0000000000000004 RDI: ffffffffbdc20000
+RBP: fffffbfff7b84000 R08: 0000000000000000 R09: fffffbfff7b84000
+R10: ffffffffbdc20003 R11: ffff8881f7109ff8 R12: 0000000000000001
+R13: 0000000000000003 R14: fffffbfff7b84000 R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff8881f7100000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f70dae1ab40 CR3: 000000011209e003 CR4: 0000000000770ef0
+PKRU: 55555554
+Call Trace:
+ <NMI>
+ </NMI>
+ <IRQ>
+ instrument_atomic_read include/linux/instrumented.h:68 [inline]
+ atomic_read include/linux/atomic/atomic-instrumented.h:32 [inline]
+ virt_spin_lock arch/x86/include/asm/qspinlock.h:98 [inline]
+ queued_spin_lock_slowpath+0xba/0xbe0 kernel/locking/qspinlock.c:327
+ queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
+ do_raw_spin_lock include/linux/spinlock.h:187 [inline]
+ __raw_spin_lock include/linux/spinlock_api_smp.h:134 [inline]
+ _raw_spin_lock+0xe8/0xf0 kernel/locking/spinlock.c:154
+ rcu_iw_handler+0x3c/0xe0 kernel/rcu/tree_stall.h:226
+ irq_work_single+0xc8/0x160 kernel/irq_work.c:221
+ __flush_smp_call_function_queue+0x4f0/0xa00 kernel/smp.c:545
+ __sysvec_call_function_single+0x25/0x1d0 arch/x86/kernel/smp.c:267
+ sysvec_call_function_single+0x8c/0xa0 arch/x86/kernel/smp.c:262
+ </IRQ>
+ <TASK>
+ asm_sysvec_call_function_single+0x1a/0x20 arch/x86/include/asm/idtentry.h:656
+RIP: 0010:__sanitizer_cov_trace_pc+0x0/0x70 kernel/kcov.c:200
+Code: e9 c0 cf b1 02 48 89 f7 e9 8d fd ff ff 66 66 2e 0f 1f 84 00 00
+00 00 00 66 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 <f3> 0f
+1e fa 48 8b 0c 24 65 48 8b 14 25 40 6f 03 00 65 8b 05 c0 fd
+RSP: 0018:ffff888105d87810 EFLAGS: 00000293
+RAX: 0000000000000000 RBX: ffff888101785000 RCX: ffffffffbcb6d7b4
+RDX: ffff888105d61100 RSI: 0000000000000293 RDI: ffff888101785000
+RBP: 0000000000000293 R08: 0000000000000002 R09: 0000000000000475
+R10: ffffffffbf2d3787 R11: 000000000038d918 R12: 0000000000000000
+R13: ffff888104850000 R14: 0000000000000293 R15: ffff888104850010
+ __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
+ _raw_spin_unlock_irqrestore+0x4a/0x80 kernel/locking/spinlock.c:194
+ spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
+ ata_scsi_queuecmd+0x19d/0x200 drivers/ata/libata-scsi.c:4204
+ scsi_dispatch_cmd drivers/scsi/scsi_lib.c:1516 [inline]
+ scsi_queue_rq+0xb84/0x2bf0 drivers/scsi/scsi_lib.c:1758
+ blk_mq_dispatch_rq_list+0x3b6/0x1af0 block/blk-mq.c:2049
+ __blk_mq_do_dispatch_sched block/blk-mq-sched.c:170 [inline]
+ blk_mq_do_dispatch_sched block/blk-mq-sched.c:184 [inline]
+ __blk_mq_sched_dispatch_requests+0xbf4/0x13c0 block/blk-mq-sched.c:309
+ blk_mq_sched_dispatch_requests+0xeb/0x150 block/blk-mq-sched.c:333
+ blk_mq_run_hw_queue+0x44f/0x530 block/blk-mq.c:2264
+ blk_mq_run_hw_queues+0x105/0x270 block/blk-mq.c:2313
+ blk_mq_requeue_work+0x525/0x850 block/blk-mq.c:1498
+ process_one_work+0x583/0xda0 kernel/workqueue.c:2627
+ process_scheduled_works kernel/workqueue.c:2700 [inline]
+ worker_thread+0x981/0x11e0 kernel/workqueue.c:2781
+ kthread+0x263/0x330 kernel/kthread.c:388
+ ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1b/0x30 arch/x86/entry/entry_64.S:242
+ </TASK>
+INFO: NMI handler (nmi_cpu_backtrace_handler) took too long to run: 2.407 msecs
+Sending NMI from CPU 5 to CPUs 3:
+NMI backtrace for cpu 3
+CPU: 3 PID: 76 Comm: kworker/3:1 Not tainted 6.7.0 #2
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+Workqueue: events_power_efficient gc_worker
+RIP: 0010:arch_atomic_read arch/x86/include/asm/atomic.h:23 [inline]
+RIP: 0010:raw_atomic_read
+include/linux/atomic/atomic-arch-fallback.h:457 [inline]
+RIP: 0010:atomic_read include/linux/atomic/atomic-instrumented.h:33 [inline]
+RIP: 0010:virt_spin_lock arch/x86/include/asm/qspinlock.h:98 [inline]
+RIP: 0010:queued_spin_lock_slowpath+0xba/0xbe0 kernel/locking/qspinlock.c:327
+Code: c1 ee 03 41 83 e5 07 48 b8 00 00 00 00 00 fc ff df 49 01 c6 41
+83 c5 03 e8 33 85 67 fd be 04 00 00 00 48 89 ef e8 c6 e5 93 fd <41> 0f
+b6 06 41 38 c5 7c 08 84 c0 0f 85 bb 09 00 00 44 8b 65 00 45
+RSP: 0018:ffff8881035c78e8 EFLAGS: 00000046
+RAX: 0000000000000001 RBX: 1ffff110206b8f1e RCX: ffffffffbcb6ec4a
+RDX: fffffbfff7b84001 RSI: 0000000000000004 RDI: ffffffffbdc20000
+RBP: ffffffffbdc20000 R08: 0000000000000000 R09: fffffbfff7b84000
+R10: ffffffffbdc20003 R11: ffffffffbda0b9c0 R12: 0000000000000001
+R13: 0000000000000003 R14: fffffbfff7b84000 R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff8881f7180000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f7a857bcff0 CR3: 00000001121dc006 CR4: 0000000000770ef0
+PKRU: 55555554
+Call Trace:
+ <NMI>
+ </NMI>
+ <TASK>
+ queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
+ do_raw_spin_lock include/linux/spinlock.h:187 [inline]
+ __raw_spin_lock include/linux/spinlock_api_smp.h:134 [inline]
+ _raw_spin_lock+0xe8/0xf0 kernel/locking/spinlock.c:154
+ rcu_note_context_switch+0x2d0/0x1770 kernel/rcu/tree_plugin.h:326
+ __schedule+0x16b/0x2230 kernel/sched/core.c:6587
+ preempt_schedule_irq+0x59/0x90 kernel/sched/core.c:7008
+ irqentry_exit+0x21/0x50 kernel/entry/common.c:432
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:649
+RIP: 0010:__rcu_read_unlock+0x0/0x100 kernel/rcu/tree_plugin.h:419
+Code: e8 65 98 3e 00 e9 fc fe ff ff 48 89 ef e8 48 97 3e 00 e9 55 ff
+ff ff 0f 1f 00 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 <f3> 0f
+1e fa 41 54 55 65 48 8b 2c 25 40 6f 03 00 53 48 8d bd fc 03
+RSP: 0018:ffff8881035c7cb0 EFLAGS: 00000293
+RAX: 0000000000000000 RBX: dffffc0000000000 RCX: ffffffffbc220217
+RDX: ffff888101d8a200 RSI: 0000000000040000 RDI: ffff888101d8a5fc
+RBP: ffff88810610f190 R08: 0000000000000001 R09: fffffbfff7e66d44
+R10: ffffffffbf336a27 R11: ffff8881f71b8460 R12: 0000000000043c65
+R13: ffff8881f71b7100 R14: 000000000000ea60 R15: 0000000000040000
+ rcu_read_unlock include/linux/rcupdate.h:779 [inline]
+ gc_worker+0x7cc/0x1110 net/netfilter/nf_conntrack_core.c:1565
+ process_one_work+0x583/0xda0 kernel/workqueue.c:2627
+ process_scheduled_works kernel/workqueue.c:2700 [inline]
+ worker_thread+0x981/0x11e0 kernel/workqueue.c:2781
+ kthread+0x263/0x330 kernel/kthread.c:388
+ ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1b/0x30 arch/x86/entry/entry_64.S:242
+ </TASK>
+rcu: rcu_preempt kthread timer wakeup didn't happen for 334296
+jiffies! g2045 f0x0 RCU_GP_WAIT_FQS(5) ->state=0x402
+rcu: Possible timer handling issue on cpu=5 timer-softirq=7633
+systemd[1]: Stopping Flush Journal to Persistent Storage...
+systemd[1]: systemd-journal-flush.service: Stopping timed out. Terminating.
+systemd[1]: systemd-journal-flush.service: Control process exited,
+code=killed, status=15/TERM
+systemd[1]: systemd-journal-flush.service: Failed with result 'timeout'.
+systemd[1]: Stopped Flush Journal to Persistent Storage.
+systemd[1]: Stopped Journal Service.
+systemd[1]: Starting Journal Service...
+systemd-journald[289]: File
+/var/log/journal/495cb7baaf694f459d942b793c107665/system.journal
+corrupted or uncleanly shut down, renaming and replacing.
+systemd[1]: Started Journal Service.
+systemd-journald[289]: Received client request to flush runtime journal.
+cgroup: Unknown subsys name 'net'
+cgroup: Unknown subsys name 'rlimit'
+cgroup: Unknown subsys name 'memory'
+Adding 124996k swap on ./swap-file.  Priority:0 extents:1 across:124996k
+audit: type=1400 audit(1710145844.746:6): avc:  denied  { execmem }
+for  pid=353 comm="syz-executor.1"
+scontext=system_u:system_r:kernel_t:s0
+tcontext=system_u:system_r:kernel_t:s0 tclass=process permissive=1
+modprobe (652) used greatest stack depth: 24064 bytes left
 
