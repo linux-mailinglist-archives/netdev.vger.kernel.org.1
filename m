@@ -1,137 +1,92 @@
-Return-Path: <netdev+bounces-80215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B30E87D9E3
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 12:16:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B87587D9E7
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 12:18:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3C5C281E84
-	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 11:16:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AA2A1F21933
+	for <lists+netdev@lfdr.de>; Sat, 16 Mar 2024 11:18:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B42C118EA1;
-	Sat, 16 Mar 2024 11:16:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 643B012B9A;
+	Sat, 16 Mar 2024 11:18:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC499182B5;
-	Sat, 16 Mar 2024 11:16:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 822E51798C;
+	Sat, 16 Mar 2024 11:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710587767; cv=none; b=OPucvEk/uNp0NIbBWKq0AI2HGCp2X0q731x/CDP+sPpGyFmU4WeE68UjDwdOgMU9KBgFaJUdmbUCIw8GF6QtZ0YNWtrz2wti5KsQdKsMy3sTP3J23Xd66suv4/ZXP+2BqK/jbAKwxI6XHBvKQFnNkQB5YeZv0R9XToVFs4Hwy0o=
+	t=1710587881; cv=none; b=AWeUFzNGiiyAUxBCzTUfz+MXwsYu8mkOJHHKw7j1sRkeRaPpQLFp+Bo7wwz5gZGliAHrxgPazyoKQeX/qzmlw9iC76fpdpr+TdcgoBRBbmPlymN231RFqrSEUZILoFIPkDSSR8qBWQ737I4b3JZEEZ+w5tAHgjw7Peq4UrvB6Ic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710587767; c=relaxed/simple;
-	bh=HQuG/dTUKUH3xhtdG0QeihBZTQ3pbDtmf87DVi7E7MQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=idVKxkzm0K0NS1kUzDdwx2UDB0XDSB6DIknzN5c9zZr2nKGUoC7VM1dOsMItd1j9cYTjyXRTkVDwRdvFz0pSiCAt0xlXY3xfc1CIT88spyM/G3GF4EA5q4xHGtULD2BIMSs4+O4dYSHHnwCy9wcmRDc6Dp/0lu7415EjXIkh6YM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
+	s=arc-20240116; t=1710587881; c=relaxed/simple;
+	bh=iZsF+Z/oasKLf5xwtQCPgUvMR4ytrQBTDLN0o2cO25g=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=QeUOATdQqIVXXnXcSlaV2J0V1oSfefdbC3nC/ilqLotq9CBp7ebU9lY7h/loPPrrRuTOANjltJ0tNvKCApWkGsPHP5T4MciYRu8bwvz9Iy9MUwNCYRAxleuG5Fo+V5p22r2iT130sX7CV0UJREXm/CmYTVNU5rj5EUIJKXVU20o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4TxdlW5MqFz2BgMP;
-	Sat, 16 Mar 2024 19:13:27 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Txdnq2gQMz1h1v6;
+	Sat, 16 Mar 2024 19:15:27 +0800 (CST)
 Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id A4BDA140384;
-	Sat, 16 Mar 2024 19:15:57 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.2) by
+	by mail.maildlp.com (Postfix) with ESMTPS id 19BC41A0172;
+	Sat, 16 Mar 2024 19:17:57 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
  kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Sat, 16 Mar 2024 19:15:56 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <michal.kubiak@intel.com>, <shenjian15@huawei.com>,
-	<wangjie125@huawei.com>, <liuyonglong@huawei.com>, <shaojijie@huawei.com>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH V2 net 3/3] net: hns3: mark unexcuted loopback test result as UNEXECUTED
-Date: Sat, 16 Mar 2024 19:10:57 +0800
-Message-ID: <20240316111057.277591-4-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
-In-Reply-To: <20240316111057.277591-1-shaojijie@huawei.com>
-References: <20240316111057.277591-1-shaojijie@huawei.com>
+ 15.1.2507.35; Sat, 16 Mar 2024 19:17:56 +0800
+Message-ID: <5178c9fa-711a-4a91-ba1c-4b10da7592b3@huawei.com>
+Date: Sat, 16 Mar 2024 19:17:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
+	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <shenjian15@huawei.com>,
+	<wangjie125@huawei.com>, <liuyonglong@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net 3/3] net: hns3: mark unexcuted loopback test result as
+ UNEXECUTED
+To: Michal Kubiak <michal.kubiak@intel.com>
+References: <20240315100748.2913882-1-shaojijie@huawei.com>
+ <20240315100748.2913882-4-shaojijie@huawei.com>
+ <ZfSOZG5vHbIY3IFU@localhost.localdomain>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <ZfSOZG5vHbIY3IFU@localhost.localdomain>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
  kwepemm600007.china.huawei.com (7.193.23.208)
 
-From: Jian Shen <shenjian15@huawei.com>
 
-Currently, loopback test may be skipped when resetting, but the test
-result will still show as 'PASS', because the driver doesn't set
-ETH_TEST_FL_FAILED flag. Fix it by setting the flag and
-initializating the value to UNEXECUTED.
+on 2024/3/16 2:07, Michal Kubiak wrote:
+> On Fri, Mar 15, 2024 at 06:07:48PM +0800, Jijie Shao wrote:
+>> From: Jian Shen <shenjian15@huawei.com>
+>>
+>> Currently, loopback test maybe skipped when resetting, but the test
+> typo: maybe skipped -> may be skipped
+>
+>> result will still show as 'PASS', because the driver doesn't set
+>> ETH_TEST_FL_FAILED flag. Fixes it by set the flag and initialize the
+>> value to be UNEXECUTED.
+> Fix it by setting the flag and initializating the value to UNEXECUTED.
+>
+>
+>> Fixes: 4c8dab1c709c ("net: hns3: reconstruct function hns3_self_test")
+>> Signed-off-by: Jian Shen <shenjian15@huawei.com>
 
-Fixes: 4c8dab1c709c ("net: hns3: reconstruct function hns3_self_test")
-Signed-off-by: Jian Shen <shenjian15@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- .../ethernet/hisilicon/hns3/hns3_ethtool.c    | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+Thanks，
 
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-index 999a0ee162a6..941cb529d671 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-@@ -78,6 +78,9 @@ static const struct hns3_stats hns3_rxq_stats[] = {
- #define HNS3_NIC_LB_TEST_NO_MEM_ERR	1
- #define HNS3_NIC_LB_TEST_TX_CNT_ERR	2
- #define HNS3_NIC_LB_TEST_RX_CNT_ERR	3
-+#define HNS3_NIC_LB_TEST_UNEXECUTED	4
-+
-+static int hns3_get_sset_count(struct net_device *netdev, int stringset);
- 
- static int hns3_lp_setup(struct net_device *ndev, enum hnae3_loop loop, bool en)
- {
-@@ -418,18 +421,26 @@ static void hns3_do_external_lb(struct net_device *ndev,
- static void hns3_self_test(struct net_device *ndev,
- 			   struct ethtool_test *eth_test, u64 *data)
- {
-+	int cnt = hns3_get_sset_count(ndev, ETH_SS_TEST);
- 	struct hns3_nic_priv *priv = netdev_priv(ndev);
- 	struct hnae3_handle *h = priv->ae_handle;
- 	int st_param[HNAE3_LOOP_NONE][2];
- 	bool if_running = netif_running(ndev);
-+	int i;
-+
-+	/* initialize the loopback test result, avoid marking an unexcuted
-+	 * loopback test as PASS.
-+	 */
-+	for (i = 0; i < cnt; i++)
-+		data[i] = HNS3_NIC_LB_TEST_UNEXECUTED;
- 
- 	if (hns3_nic_resetting(ndev)) {
- 		netdev_err(ndev, "dev resetting!");
--		return;
-+		goto failure;
- 	}
- 
- 	if (!(eth_test->flags & ETH_TEST_FL_OFFLINE))
--		return;
-+		goto failure;
- 
- 	if (netif_msg_ifdown(h))
- 		netdev_info(ndev, "self test start\n");
-@@ -451,6 +462,10 @@ static void hns3_self_test(struct net_device *ndev,
- 
- 	if (netif_msg_ifdown(h))
- 		netdev_info(ndev, "self test end\n");
-+	return;
-+
-+failure:
-+	eth_test->flags |= ETH_TEST_FL_FAILED;
- }
- 
- static void hns3_update_limit_promisc_mode(struct net_device *netdev,
--- 
-2.30.0
+I have sent V2 to fix them.
+
+Jijie
 
 
