@@ -1,82 +1,84 @@
-Return-Path: <netdev+bounces-80264-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80265-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6093787DE04
-	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 16:39:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BA2A87DE06
+	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 16:40:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12A551C20D52
-	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 15:39:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C19E1B20C2E
+	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 15:40:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6472C1C6BE;
-	Sun, 17 Mar 2024 15:39:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 766301C6B5;
+	Sun, 17 Mar 2024 15:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="ryYEvo42"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="KV5x1///"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f50.google.com (mail-oo1-f50.google.com [209.85.161.50])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28FC31BC3E
-	for <netdev@vger.kernel.org>; Sun, 17 Mar 2024 15:39:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C89A31C2A3
+	for <netdev@vger.kernel.org>; Sun, 17 Mar 2024 15:40:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710689989; cv=none; b=kaUINhvq4eouvZQmF72Ni5K163BjJTF0BT3iO10R+6SN2tXFJ3qrmV8lJdABOgcp8LFbJg+9pXVtm4yrn8s1RbyS+N1Vs3Dqgi6uvPTeU+PHqGzxeOPkeW0Ixv6ayFLSzZ/SgObpzc0cpBLBiA4vuGacrOl66WvgwIFILXxGgDw=
+	t=1710690042; cv=none; b=h00PESMBvasHac9CCO88b3fNT0MW/QUyWBNWUOa3PlSyRj45sw6rF2yIGiof7RFsB0lYxbvRRpKBGnikEANbI+P0QhxI7UPB/jVMZtqCzICmbrs0CVSV4kUt26VxCNxMethXBX0LExZ7yFIEZlQy0F6GCfQbQgk7FYj5loWJ/mE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710689989; c=relaxed/simple;
-	bh=NqMa0AgnUprbpG2R+L+pj7S3f3o3FQhFhzOt3JIo0h8=;
+	s=arc-20240116; t=1710690042; c=relaxed/simple;
+	bh=vo2e5vUn+vFpBQO7O1M3l2GgrAAYge5VyYiA5N9oPBg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TH+tQTgCRijz/wYybbsS2EMDgUwrcQ8hHIswDv5F8A5ba7a2uzdWTTVDhowWgMigaHZcbtqWeEv/EpzhYqe+hJ5xM6WJYGEVNaYx397g56AyyyW61axBSDr39inR6pcizsacnyI/uv9rAeUMrQoeMsIrqn38Ok+O3wv1XrA3B2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=ryYEvo42; arc=none smtp.client-ip=209.85.161.50
+	 MIME-Version:Content-Type; b=TYQPRgGelFE60K04fwcJd0wmE0ALygWQy0OJouHQoz/ueAP5QC2QQdcPWEZNqoPwHW+Q4fp06DoStQelBeeUqmW1xwjqskoBKBjOF8I+tsjtrKXS409UlSsbbkvRn8jMpw7Zg6roq+4+ncOQXJqHb0TZbJ2SdnhN7dKbtOj629Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=KV5x1///; arc=none smtp.client-ip=209.85.210.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5a46b28a77dso1971553eaf.1
-        for <netdev@vger.kernel.org>; Sun, 17 Mar 2024 08:39:46 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6e6afb754fcso3359678b3a.3
+        for <netdev@vger.kernel.org>; Sun, 17 Mar 2024 08:40:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1710689986; x=1711294786; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1710690040; x=1711294840; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eLoenuTk1RoT/67ig6QWfH/Z3+Hrd5UZjwRx+S/tIcQ=;
-        b=ryYEvo42uPv6h48AatAGZhZqwCo/9jzWm95OvP7/2kpZRywtv4ACNFCRpUjMWj2Wre
-         8Ar15I+DuMOvreiUixW2iJQba1Z/dGYsRvOe+RgSepV7wd8L0sixKjkk+0sd0dNwlbT+
-         nsolNaq/TxsNvhGyfdTE5TeB2reDMY/ig0qXq0MA/ql0dXJRsp7pvbp+AUMIrrAW8xZw
-         HFGiey0xQhFm3i4Y4bxPxC4Z8mM7XaJYcjzG18ZGEQWsSNdvne6+3e7/oXreCIzd10VO
-         l9ehlafzcmYgtQVFDS0vWEL6uAYQnXK8G4D5r0bV7cCvqNARjVHh1nHstkO7VHdpUemo
-         NagQ==
+        bh=BN5rfpbSOuj0X70e90AskrGd/D348RRJczaiDg2murw=;
+        b=KV5x1///MCospXRHiHDoaiHklkfuahEJ3kobn8ANIuATZuhhCduawk5BFP0nDMgKyQ
+         IttRZ39D9BOJTOjBLw1JiaKIPRzK7QfN5D5NMEclyLaWHM+0rc03MczsC4/C1uHA5IrR
+         UzvaGiNe3n9UV2ITcqkNDH09ljtE77eaSG2CwfHF9NwKpXnSm0eiFlEHjHM4pRvgCLz6
+         O0gULcZstJLyKtMpmVLrgJoZ3lL1bVKL5EefY3l+JEX78bOVfFR2hB7k+lqDaTX1d0lF
+         gN6vYZy+L2G5bPgioiXvEc1O4pCVaaJle9nocwl/AkSVX+8Dak5mLZBFx8zbpKcN4wW8
+         amoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710689986; x=1711294786;
+        d=1e100.net; s=20230601; t=1710690040; x=1711294840;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eLoenuTk1RoT/67ig6QWfH/Z3+Hrd5UZjwRx+S/tIcQ=;
-        b=q8ikEVWZAQygQjDeuE6TSGZ/UAkfxeK6SafHJXVrNj5WO1Ls9FPfPFgwXXJB+PpUmz
-         Q1Idx+ZQgOFUuZN6T10Q055bozAu08uZZ3Je0WTsafTCZK7CfqZJ95oB0K7bZYmHTWz/
-         nWAlKCF0SeHZv1I7KIHxTacYSXJoA8FIvEFh0k8MkDuasYq71pmL26nVxJTpXOJ+1+tI
-         x8vhoNi8BUC8UsmDdn0UV5//WieWfYf6bhVQHzN0PrZ6Ckj6Ut5eKfaR7CoPKwHYgUVl
-         vs3pQ8zocU8yfbL/veXbivzy7ARTmYQHqIFlxbUhjBCVoZhS4isyKMlAF8+XDj67LQW5
-         uknA==
-X-Gm-Message-State: AOJu0YyECuOsPBJOJ2jQUpF7LTIhnJOGOTHo9UQ2UKfF2dXWXqv2ZAEd
-	KF7Kly1NzO7ByPrzKEKLpRCw6hybcRxBPgyFEOAm1d5KGt10jSULnYYTLtfOVyDB51+PtIK4tRR
-	8VbY=
-X-Google-Smtp-Source: AGHT+IGEy7wo3qXs0cjaPIQKZIHAwuvzjj0FV+TE/dXDd+Tv+hjgKi8tuA8ha4lqcqPUlP0KapXphA==
-X-Received: by 2002:a05:6358:63a6:b0:17e:bae0:fe8a with SMTP id k38-20020a05635863a600b0017ebae0fe8amr8858155rwh.2.1710689986049;
-        Sun, 17 Mar 2024 08:39:46 -0700 (PDT)
+        bh=BN5rfpbSOuj0X70e90AskrGd/D348RRJczaiDg2murw=;
+        b=AovHrpUlJEu+4YV3nxvq91OWv0VHWWg6Hy+DEGOW7Sj2YPnDU7HuL936I/Hlm1alV5
+         1F18b4CQV0K71g3c+1Y3opHxf/ygaheVRAe7gBRy7NTu80kvahpWPF58kCVDMIaJx9vw
+         jMmdw2hP3jDgw5YFPU7GCiYxiA/tGBfRk3a/d7WcTNGeqspGXYEdH2vMonSkBv5Z2b3Z
+         3VVtowJeTtVM3Qi4k9KyyMZevlDj53/TZY/sdTp8hfW9NsnMrE2kRvf/9g4yvGk+Wqp4
+         MHsO0QNG+EfArz7eBC8vVAidmdCuKWgGwB9bnM4evbLz1lqcN6kGF0XkiOkIafMPjHGR
+         agvg==
+X-Forwarded-Encrypted: i=1; AJvYcCWECorUfcDUPXJBdxLTyOaqeMjEGuabgLaXKB7uKWmQtc80A69a3ZF9NtSt8Pj8eKzMJHHBhNgSrg7IdqbSSCh8PzbMg2sr
+X-Gm-Message-State: AOJu0Yzsn/zHT8S13LGMuzN/EakY3U83IEruT4z+TCvPRCKalkF9c1cx
+	brxMX7gr5I6/6sg1GJSIA89/NclIumCL8J/dRPWzNsRL/L451AaOyOw+8jNIZQM=
+X-Google-Smtp-Source: AGHT+IG7Xk93BgxDOAwncq6Cbr79dZt/KkPrl6SVBbkXEepBnFuLP09OA7aiplz3FMObC/Wmp0dixg==
+X-Received: by 2002:a05:6a20:2588:b0:1a3:6725:4406 with SMTP id k8-20020a056a20258800b001a367254406mr383278pzd.14.1710690040021;
+        Sun, 17 Mar 2024 08:40:40 -0700 (PDT)
 Received: from hermes.local (204-195-123-141.wavecable.com. [204.195.123.141])
-        by smtp.gmail.com with ESMTPSA id 37-20020a631965000000b005cd8044c6fesm5493634pgz.23.2024.03.17.08.39.45
+        by smtp.gmail.com with ESMTPSA id le15-20020a056a004fcf00b006e71bfa5504sm1203644pfb.119.2024.03.17.08.40.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 17 Mar 2024 08:39:45 -0700 (PDT)
-Date: Sun, 17 Mar 2024 08:39:44 -0700
+        Sun, 17 Mar 2024 08:40:39 -0700 (PDT)
+Date: Sun, 17 Mar 2024 08:40:37 -0700
 From: Stephen Hemminger <stephen@networkplumber.org>
-To: Max Gautier <mg@max.gautier.name>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2-next v2] arpd: create /var/lib/arpd on first
- use
-Message-ID: <20240317083944.74c53286@hermes.local>
-In-Reply-To: <20240317090134.4219-1-mg@max.gautier.name>
-References: <20240316091026.11164-1-mg@max.gautier.name>
-	<20240317090134.4219-1-mg@max.gautier.name>
+To: Thorsten Blum <thorsten.blum@toblux.com>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ice: Remove newlines in NL_SET_ERR_MSG_MOD
+Message-ID: <20240317084037.4ae8806e@hermes.local>
+In-Reply-To: <20240317152756.1666-2-thorsten.blum@toblux.com>
+References: <20240317152756.1666-2-thorsten.blum@toblux.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,16 +88,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 17 Mar 2024 10:01:24 +0100
-Max Gautier <mg@max.gautier.name> wrote:
+On Sun, 17 Mar 2024 16:27:57 +0100
+Thorsten Blum <thorsten.blum@toblux.com> wrote:
 
-> +	if (strcmp(default_dbname, dbname) == 0
-> +			&& mkdir(ARPDDIR, 0755) != 0
-> +			&& errno != EEXIST
-> +			) {
-> +		perror("create_db_dir");
-> +		exit(-1);
-> +	}
+> Fixes Coccinelle/coccicheck warnings reported by newline_in_nl_msg.cocci.
+> 
+> Signed-off-by: Thorsten Blum <thorsten.blum@toblux.com>
 
-Please put closing paren on same line after EEXIST
+
+Acked-by: Stephen Hemminger <stephen@networkplumber.org>
 
