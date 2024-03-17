@@ -1,252 +1,156 @@
-Return-Path: <netdev+bounces-80273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A06D87E05B
-	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 22:30:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63AA387E077
+	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 22:45:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CBC6B20A41
-	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 21:30:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04082B209B6
+	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 21:45:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB676208B0;
-	Sun, 17 Mar 2024 21:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5200208B6;
+	Sun, 17 Mar 2024 21:45:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b="fcm3UVSy"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jlQgc0pK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B321E208A4
-	for <netdev@vger.kernel.org>; Sun, 17 Mar 2024 21:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D18B1DFF9
+	for <netdev@vger.kernel.org>; Sun, 17 Mar 2024 21:45:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710711015; cv=none; b=siIqKQeBqCFH/+3jvitqETbOpPV56XzU6rqPOarf6LbYieLasYQi/LFeR6lH0kRiG/wyL07DqKVVltbYGqs8xYrHG/m804shCt0hJwa0gmpNFvYror7YhN33jEBX2DgtXfZXp4SXOTQ4nDWtux+Bd5b4PQ6g6lyGN+4jE65io7E=
+	t=1710711950; cv=none; b=qLsgcvXnTpur9xO5vqj69uQG0u32FGJoUrtB7Ct/3pDVJ+H3XaA+ymWS6zxd4b7gIhpE7iZYpy+9DHYTjaMnMYULMRsCU5Ds94dNd5b9Hfe+nDTDEe7Cd/+8no7fNoYGpEVS7V0oM3zjawYK6T7vAyKoFbDCEoy+rjyIm9z+DJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710711015; c=relaxed/simple;
-	bh=EAP8WLr0E4ZJ4NmQfGAO4IQBYefspc5BJqXMxVYhUOw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JTEIV6g5dvrQupUqWlu5Yj48ryw3UGlvsXdmLQhWnoIoLwvr1bzW8dimE5KJ67VCatHivMYixCTyfIkVsNzbeqZAN0lUS315JrUBH6eYCFtjFxn2jfdp8FJPZeb83O98oU/014RvI7iRyUoohPWTln6NVrtc6g5Sfrgf8MHkoCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk; spf=pass smtp.mailfrom=kernel.dk; dkim=pass (2048-bit key) header.d=kernel-dk.20230601.gappssmtp.com header.i=@kernel-dk.20230601.gappssmtp.com header.b=fcm3UVSy; arc=none smtp.client-ip=209.85.210.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kernel.dk
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kernel.dk
-Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-6e6ca65edc9so1297397b3a.0
-        for <netdev@vger.kernel.org>; Sun, 17 Mar 2024 14:30:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kernel-dk.20230601.gappssmtp.com; s=20230601; t=1710711013; x=1711315813; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=3PxkkblZ7HCoh3ry2JVig2sKl2js1XvqsA+vMJLZU4k=;
-        b=fcm3UVSymYH/Bqv7ZkndTW84Mx4GBFwZ/FDbstPwHDUsQP3HDUzzEFJcKOeuhAYeFF
-         QA9ShZ30MH01zQm5NEoma7JEi0jmaTQD/PfwIcOdJng/J3O/+xlxLALY9qBe3FyyAkTJ
-         Bno6ZKPyLCAgyznnd9y3+HOYXQ4aaya6RoIatI+12Facxo7o+/x0F/IRDd60syVsQKkm
-         DD7HIyR3kyFd/DK/JX65XzV36coTg4EAZzl+Cg4HFsGfWw3jeNEq5fqh9zcQ9k1MyXJl
-         RgF0vW3IPF7TRj7NBrowcdMN0FFoxWKWpIX2HpF4l2qehx+b0gqhQywqFmHFGti2Fb0K
-         0xqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710711013; x=1711315813;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3PxkkblZ7HCoh3ry2JVig2sKl2js1XvqsA+vMJLZU4k=;
-        b=KGS5tcAfb8Ao2DgXaRRgOburi4Nxd/A+6MGo8qi47UDNkNw917ytt+arp17wnzOLlI
-         n9zkFcS8XHj7JGxX2RS3Yt8IWp0RV2Gh8VftlYhAv4v7x2+eTtjodZMV4OvwPeGCmjuZ
-         EkxI29lx4hEA9d113MFRi/PHBoBxAl/x/nB9aArD2rt9zyIFtLWj9srlx3w9s3IPEsQS
-         uO3cEXalPx/VcDytTOrz2itknxIqGzU4nw8gMB/w7EBoOQvIXQIyG52Izbhy7bYV19SA
-         mvDxkYfoeLQ9EL4AQ9m+0Up5qHckr64oet1AcxITFcO0WRDvGf2RJakz48NUOALIk5ki
-         m+iA==
-X-Forwarded-Encrypted: i=1; AJvYcCWkyR4faCZrOUakD0vVl//iTELcEo98ao2p3zO1j3G1bhbJIk1xsZ/QXIvAbVflBUcWNZyGr5jRpRr3RVIG0zGLUdYZLnBs
-X-Gm-Message-State: AOJu0Yw6wailTj0JwHrCIP45EVr7wucUWK1sfvDyqQtFxLoj7/TQjcs/
-	5GYUmPUuA75crL8GvTYboKkIfXcedAOrdJf5ifty2zEa4SH8qnep8cqOQ3FCbHE=
-X-Google-Smtp-Source: AGHT+IGTUPuYxpgl1rrznjp7YG/tbbIDCCqaKV4kXFCM+cE18b7FCvus9TaMBI3CwKZIzHU+zGFIYA==
-X-Received: by 2002:a62:cd4e:0:b0:6e7:256b:d47 with SMTP id o75-20020a62cd4e000000b006e7256b0d47mr1956668pfg.0.1710711012465;
-        Sun, 17 Mar 2024 14:30:12 -0700 (PDT)
-Received: from [192.168.1.150] ([198.8.77.194])
-        by smtp.gmail.com with ESMTPSA id x16-20020aa784d0000000b006e66c9bb00dsm6734232pfn.179.2024.03.17.14.30.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Mar 2024 14:30:11 -0700 (PDT)
-Message-ID: <b33184b5-3c94-4507-9fe1-bf68d93817ba@kernel.dk>
-Date: Sun, 17 Mar 2024 15:30:10 -0600
+	s=arc-20240116; t=1710711950; c=relaxed/simple;
+	bh=kCuM5P3oST0o7QGj75vD48UgRaWAZ+vnWkha8JWbwds=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mraLUvvXjPZ05yOjqEyC0nP8ZRPi7bVNBCP7e1Q3LUosHuGfRvR3vX/K7cFr4iJdWYB4BH1eUuc7KUQLEYzgxomdAL28RezqhDghAHhrTWdP6LhMLClTRQpfreaJNGcSVpqVXc878Lqsf4ebdtWS6qUrmWOZlrpbOnRyvkV/154=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jlQgc0pK; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From:From:Sender:Reply-To:Subject:Date:Message-ID:To:
+	Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=F73lDjsoFDtNnARRlXf2fQHDZzctXvRd3BawGMUqvjk=; b=jlQgc0pK6XPH2lVWZQXzW5EaaJ
+	GVUCwpadjyuiDvr0ZYDmEnSkqo1cJrMxJn+jmlt2e6B+Qi+2xD5/MMG/cQuCCqnMKXqIKOPUPhJ/+
+	UrVbsbXhSDrsERmpQAhFo5SIFLZpNuuYZf3t0LTaBN2TxsnlwiuYB1Qh0Po/V79Uz4gk=;
+Received: from c-76-156-36-110.hsd1.mn.comcast.net ([76.156.36.110] helo=thinkpad.home.lunn.ch)
+	by vps0.lunn.ch with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rlyK5-00AYv5-R1; Sun, 17 Mar 2024 22:45:42 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+Subject: [PATCH RFC 0/7] net: Add generic support for netdev LEDs
+Date: Sun, 17 Mar 2024 16:45:13 -0500
+Message-Id: <20240317-v6-8-0-net-next-mv88e6xxx-leds-v4-v1-0-80a4e6c6293e@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v4 13/16] io_uring: add io_recvzc request
-Content-Language: en-US
-To: Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>,
- io-uring@vger.kernel.org, netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>
-References: <20240312214430.2923019-1-dw@davidwei.uk>
- <20240312214430.2923019-14-dw@davidwei.uk>
- <7752a08c-f55c-48d5-87f2-70f248381e48@kernel.dk>
- <4343cff7-37d9-4b78-af70-a0d7771b04bc@gmail.com>
- <c4871911-5cb6-4237-a0a3-001ecb8bd7e5@kernel.dk>
- <e646d731-dec9-4d2e-9e05-dbb9b1183a0b@gmail.com>
- <1e49ba1e-a2b0-4b11-8c36-85e7b9f95260@kernel.dk>
- <90c588ab-884e-401a-83fd-3d204a732acd@gmail.com>
- <4a613551-9a29-4e41-ae78-ad38bacaa009@kernel.dk>
- <d5ceb9c2-2fbb-4b82-9e9b-c482109acbf8@gmail.com>
-From: Jens Axboe <axboe@kernel.dk>
-In-Reply-To: <d5ceb9c2-2fbb-4b82-9e9b-c482109acbf8@gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGlk92UC/x2NQQrCMBAAv1L27EKapknwKvgAr+IhNtu6oKkkJ
+ SyU/t3gYQ5zmdmhUGYqcO52yFS58Jqa9KcOpldICyHH5qCVNmroLVaLHhUm2hqy4ad6T1ZE8E2
+ xYDUYns5FN8RRBwOt8800s/wfd7hdL/A4jh/N4bV+eAAAAA==
+To: Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ Gregory Clement <gregory.clement@bootlin.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3165; i=andrew@lunn.ch;
+ h=from:subject:message-id; bh=kCuM5P3oST0o7QGj75vD48UgRaWAZ+vnWkha8JWbwds=;
+ b=owEBbQKS/ZANAwAKAea/DcumaUyEAcsmYgBl92R5dASAllw1P0KZmKPtRDHYQ+tVzPySjN9vT
+ qWNGLh4LXOJAjMEAAEKAB0WIQRh+xAly1MmORb54bfmvw3LpmlMhAUCZfdkeQAKCRDmvw3LpmlM
+ hMQND/wMw1mzZYtWRUvXEeB7/OeaZIJNJOX2d4rcw9aD9/eJl2/EuAx8I35GYlgS9mA3GmajgX2
+ CxV4OlwGzJkMun/tg9nLL1oLrnar5ehmvM8/zrVbLBi3Tc4biFRyImWrPKl6pXf82/5vilgK4e+
+ s7yqw+sSjArnAmMSolAknGQwcRMDdPpefnBWRLdV1Xu7aQ6NhFnH/3uXfbQFSPP+qPEcqIG+MZI
+ bbCD9qaFSnns3f0wYYxnmf0n96nQ9GBmD8yYtYp4od30AjjTLnfCSIEU4xFplgunLBngF/bpIfE
+ qr2E1HDDZYk0CUzmBvKN6d+TeXgDfyL0m92k+eBHTP/lgsR3KxKU6rahcV6i3lZ1KImEb3fFfl7
+ VAklx8e8WsEFeaNwKgUDx9QVluUGHagzGl5ibzUea4Twp+cpXgCVJFvdMjcuQMMV7MHNDmPDKpi
+ 7TqMRnibhjojNmxK6TwTtvkZn7BXnqlp5Y1Z5cKuQMEkaY9baMRqdXU5pw9xQVRTtNscWyeXB1/
+ ZL5b8BB8amqYSwCFsi3ih5sPDhwBx+XKbHppIygcBSQOzvZFxuXH7RLil0rQF4E9NGG9u8u+uU5
+ P8K8gI228fjcRVWb67k0u8GvqSFYB/RIBtdSXBCOKMn1w3jHTjqifsd720zupsmzFdKuTmHJawV
+ LntFkxatJYX3EMg==
+X-Developer-Key: i=andrew@lunn.ch; a=openpgp;
+ fpr=61FB1025CB53263916F9E1B7E6BF0DCBA6694C84
 
-On 3/17/24 3:22 PM, Pavel Begunkov wrote:
-> On 3/16/24 16:59, Jens Axboe wrote:
->> On 3/15/24 5:52 PM, Pavel Begunkov wrote:
->>> On 3/15/24 18:38, Jens Axboe wrote:
->>>> On 3/15/24 11:34 AM, Pavel Begunkov wrote:
->>>>> On 3/14/24 16:14, Jens Axboe wrote:
->>>>> [...]
->>>>>>>>> @@ -1053,6 +1058,85 @@ struct io_zc_rx_ifq *io_zc_verify_sock(struct io_kiocb *req,
->>>>>>>>>          return ifq;
->>>>>>>>>      }
->>>>>>>>>      +int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
->>>>>>>>> +{
->>>>>>>>> +    struct io_recvzc *zc = io_kiocb_to_cmd(req, struct io_recvzc);
->>>>>>>>> +
->>>>>>>>> +    /* non-iopoll defer_taskrun only */
->>>>>>>>> +    if (!req->ctx->task_complete)
->>>>>>>>> +        return -EINVAL;
->>>>>>>>
->>>>>>>> What's the reasoning behind this?
->>>>>>>
->>>>>>> CQ locking, see the comment a couple lines below
->>>>>>
->>>>>> My question here was more towards "is this something we want to do".
->>>>>> Maybe this is just a temporary work-around and it's nothing to discuss,
->>>>>> but I'm not sure we want to have opcodes only work on certain ring
->>>>>> setups.
->>>>>
->>>>> I don't think it's that unreasonable restricting it. It's hard to
->>>>> care about !DEFER_TASKRUN for net workloads, it makes CQE posting a bit
->>>>
->>>> I think there's a distinction between "not reasonable to support because
->>>> it's complicated/impossible to do so", and "we prefer not to support
->>>> it". I agree, as a developer it's hard to care about !DEFER_TASKRUN for
->>>> networking workloads, but as a user, they will just setup a default
->>>> queue until they wise up. And maybe this can be a good thing in that
->>>
->>> They'd still need to find a supported NIC and do all the other
->>> setup, comparably to that it doesn't add much trouble. And my
->>
->> Hopefully down the line, it'll work on more NICs,
-> 
-> I wouldn't hope all necessary features will be seen in consumer
-> cards
+For some devices, the MAC controls the LEDs in the RJ45 connector, not
+the PHY. This patchset provides generic support for such LEDs, and
+adds the first user, mv88e6xxx.
 
-Nah that would never be the case, but normal users aren't going to be
-interested in zerocopy rx. If they are, then it's power users, and they
-can pick an appropriate NIC rather than just rely on what's in their
-laptop or desktop PC. But hopefully on the server production front,
-there will be more NICs that support it. It's all driven by demand. If
-it's a useful feature, then customers will ask for it.
+The common code netdev_leds_setup() is passed a DT node containing the
+LEDs and a structure of operations to act on the LEDs. The core will
+then create an cdev LED for each LED found in the device tree node.
 
->> and configuration will be less of a nightmare than it is now.
-> 
-> I'm already assuming steering will be taken care by the kernel,
-> but you have to choose your nic, allocate an ifq, mmap a ring,
-> and then you're getting scattered chunks instead of
-> 
-> recv((void *)one_large_buffer);
-> 
-> My point is that it requires more involvement from user by design.
+The callbacks are passed the netdev, and the index of the LED. In
+order to make use of this within DSA, helpers are added to convert a
+netdev to a ds and port.
 
-For sure, it's more complicated than non-zerocopy, that's unavoidable.
+The mv88e6xxx has been extended to add basic support for the 6352
+LEDs. Only software control is added, but the API supports hardware
+offload which can be added to the mv88e6xxx driver later.
 
->>> usual argument is that io_uring is a low-level api, it's expected
->>> that people interacting with it directly are experienced enough,
->>> expect to spend some time to make it right and likely library
->>> devs.
->>
->> Have you seen some of the code that has gone in to libraries for
->> io_uring support? I have, and I don't think that statement is true at
->> all for that side.
-> 
-> Well, some implementations are crappy, some are ok, some are
-> learning and improving what they have.
+For testing and demonstration, the Linksys Mamba aka. wrt1900ac has
+the needed DT nodes added to describe its LEDs.
 
-Right, it wasn't a jab at them in general, it's natural to start
-somewhere simple and then improve things as they go along. I don't
-expect folks to have the level of knowledge of the internals that we do,
-nor should they need to.
+RFC:
 
->> It should work out of the box even with a naive approach, while the best
->> approach may require some knowledge. At least I think that's the sanest
->> stance on that.
->>
->>>> they'd be nudged toward DEFER_TASKRUN, but I can also see some head
->>>> scratching when something just returns (the worst of all error codes)
->>>> -EINVAL when they attempt to use it.
->>>
->>> Yeah, we should try to find a better error code, and the check
->>> should migrate to ifq registration.
->>
->> Wasn't really a jab at the code in question, just more that -EINVAL is
->> the ubiqitious error code for all kinds of things and it's hard to
->> diagnose in general for a user. You just have to start guessing...
->>
->>>>> cleaner, and who knows where the single task part would become handy.
->>>>
->>>> But you can still take advantage of single task, since you know if
->>>> that's going to be true or not. It just can't be unconditional.
->>>>
->>>>> Thinking about ifq termination, which should better cancel and wait
->>>>> for all corresponding zc requests, it's should be easier without
->>>>> parallel threads. E.g. what if another thread is in the enter syscall
->>>>> using ifq, or running task_work and not cancellable. Then apart
->>>>> from (non-atomic) refcounting, we'd need to somehow wait for it,
->>>>> doing wake ups on the zc side, and so on.
->>>>
->>>> I don't know, not seeing a lot of strong arguments for making it
->>>> DEFER_TASKRUN only. My worry is that once we starting doing that, then
->>>> more will follow. And honestly I think that would be a shame.
->>>>
->>>> For ifq termination, surely these things are referenced, and termination
->>>> would need to wait for the last reference to drop? And if that isn't an
->>>> expected condition (it should not be), then a percpu ref would suffice.
->>>> Nobody cares if the teardown side is more expensive, as long as the fast
->>>> path is efficient.
->>>
->>> You can solve any of that, it's true, the question how much crap
->>> you'd need to add in hot paths and diffstat wise. Just take a look
->>> at what a nice function io_recvmsg() is together with its helpers
->>> like io_recvmsg_multishot().
->>
->> That is true, and I guess my real question is "what would it look like
->> if we supported !DEFER_TASKRUN". Which I think is a valid question.
->>
->>> The biggest concern is optimisations and quirks that we can't
->>> predict at the moment. DEFER_TASKRUN/SINGLE_ISSUER provide a simpler
->>> model, I'd rather keep recvzc simple than having tens of conditional
->>> optimisations with different execution flavours and contexts.
->>> Especially, since it can be implemented later, wouldn't work the
->>> other way around.
->>
->> Yes me too, and I'd hate to have two variants just because of that. But
->> comparing to eg io_recv() and helpers, it's really not that bad. Hence
->> my question on how much would it take, and how nasty would it be, to
->> support !DEFER_TASKRUN.
-> 
-> It might look bearable... at first, but when it stops on that?
-> There will definitely be fixes and optimisations, whenever in my
-> mind it's something that is not even needed. I guess I'm too
-> traumatised by the amount of uapi binding features I wish I
-> could axe out and never see again.
+netdev is closed at the moment.
 
-But that's real world though, particularly for the kernel. We'd all love
-to restart things from scratch, and sometimes that'd lead to something
-better which then down the line inevitably you'd love to redo again.
+A previous version of this patchset was specific to DSA. Vladimir
+objected to that and suggested the code should be more generic. Hence
+now the shared code is moved into net/core and a struct net_device is
+used, rather than struct dsa_switch. As a result, there is a bit more
+boilerplate needed in DSA drivers.
 
+If this code is accepted, it would be good to convert the qca8k DSA
+driver to also use this framework.
+
+Given how hard it is to get kconfig connect for LEDs, i would not be
+surprised if this is also broken :-(
+
+Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+---
+Andrew Lunn (7):
+      dsa: move call to driver port_setup after creation of netdev.
+      net: Add helpers for netdev LEDs
+      net: dsa: mv88e6xxx: Add helpers for 6352 LED blink and brightness
+      net: dsa: mv88e6xxx: Tie the low level LED functions to device ops
+      net: dsa: Add helpers to convert netdev to ds or port index
+      dsa: mv88e6xxx: Create port/netdev LEDs
+      arm: boot: dts: mvebu: linksys-mamba: Add Ethernet LEDs
+
+ .../boot/dts/marvell/armada-xp-linksys-mamba.dts   |  66 +++++++
+ drivers/net/dsa/mv88e6xxx/Kconfig                  |   1 +
+ drivers/net/dsa/mv88e6xxx/chip.c                   | 125 ++++++++++++-
+ drivers/net/dsa/mv88e6xxx/chip.h                   |  19 ++
+ drivers/net/dsa/mv88e6xxx/port.c                   |  99 +++++++++++
+ drivers/net/dsa/mv88e6xxx/port.h                   |  76 +++++++-
+ include/net/dsa.h                                  |  17 ++
+ include/net/netdev_leds.h                          |  44 +++++
+ net/Kconfig                                        |  10 ++
+ net/core/Makefile                                  |   1 +
+ net/core/netdev-leds.c                             | 197 +++++++++++++++++++++
+ net/dsa/devlink.c                                  |  17 +-
+ net/dsa/dsa.c                                      |   3 +
+ net/dsa/user.c                                     |   8 +
+ net/dsa/user.h                                     |   7 -
+ 15 files changed, 665 insertions(+), 25 deletions(-)
+---
+base-commit: 237bb5f7f7f55ec5f773469a974c61a49c298625
+change-id: 20240316-v6-8-0-net-next-mv88e6xxx-leds-v4-ab77d73d52a4
+
+Best regards,
 -- 
-Jens Axboe
+Andrew Lunn <andrew@lunn.ch>
 
 
