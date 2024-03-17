@@ -1,168 +1,635 @@
-Return-Path: <netdev+bounces-80255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BAC187DD7A
-	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 15:43:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C2BA87DD8D
+	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 15:51:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7756B1C209AF
-	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 14:43:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAE31281330
+	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 14:51:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D624E179B1;
-	Sun, 17 Mar 2024 14:43:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6546EACE;
+	Sun, 17 Mar 2024 14:51:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NNFPo6F/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A5561370
-	for <netdev@vger.kernel.org>; Sun, 17 Mar 2024 14:43:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65FE81C68D
+	for <netdev@vger.kernel.org>; Sun, 17 Mar 2024 14:51:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710686603; cv=none; b=SnIOdjhNseohkwvWNQQhAtmWmYJloiAL1SfqaeP8uEh+v7hjj1bb4zpaqj344sagfimxbGK41lSXTDL9Or+ZVqR50Fv+doz47Gmyl4XYEZXb4C4ycLRs3NLS22vdPMgUhc64MXrv+E9TWsPuR2fzJAYllC+Yb39KSadfh+uWyNQ=
+	t=1710687063; cv=none; b=JES0Z8I3pNqC8JtFAktWVcvzp4ouPKilt0FiVh+Bs8m5ke5hPo+iwLJ5ejFgculSJ7/13t8QLrlHhlQEXlx8C1F7EPtKmzGqScjHGkOGO9vy/Oea0duRJYP3P9l0RntioMelHWQBt4PNqBg65ERlHPCfQet96w6dcR9GbxM5Dfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710686603; c=relaxed/simple;
-	bh=1piAQqG5obqShU/tUMwPYZPnHvv1aBkmLwwk6AvgoCY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Q23YTyZqE/fjT1EAcvZAaj3sd58RDElUB0u7BwDw4bUyYNUKRe/WLcwNikp8fQZkYrKC3Pf65c7xR5LNsXQ8QJdo8LwQA2nBiPtfKGqlIojTA4d9ECmHnuTfLHiRjEHDaK7ex0BY4r0LBO6jIMVtapy6NmFWoLKQwxtk9RZp3tw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7c7c9831579so332093839f.0
-        for <netdev@vger.kernel.org>; Sun, 17 Mar 2024 07:43:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710686601; x=1711291401;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1710687063; c=relaxed/simple;
+	bh=iaP6b8w9lrE8ipKBPTJXmKuSuzrUGzo7G9823oibSis=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pOyQqmiUiHLDfiJt5PBRzGBzNB1n8TAWs+3CXA569j5Sbrx/kAkU+liQe1OQwL3naycYc/MN+ob5nj3F9n98Qeg4BxxuKjc5ralstU0yVAYvaLUvkDQ8yGNQlvIsyjEe05VJfOjppqL+Q4zXcQLVjGhUDtjxZ8kuqfvZ38jhchs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NNFPo6F/; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a468004667aso336729166b.2
+        for <netdev@vger.kernel.org>; Sun, 17 Mar 2024 07:51:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1710687060; x=1711291860; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=EAJU0QC5hMGmQr0QLfhlk49w7WSutZvWX1XUq5wil+k=;
-        b=HCGaxm/wGZ5NFkiAic2h5TqJCLNhbvSWsVy+e3J+WFp0/UDTIYucBO+G0ciNB29ehx
-         0ekyZpQBPlfIs+/UjzA2D/aS4dmZZbB8ldfDHK9hc1ZtodJRjPCavcMbL9DpYZfHZtB5
-         /CLXMcYRiMqv9o3dxNV7P+0TWWmlRixXncUgSuxOP3wG1uQ4tEXhx25ysWkABoHFJd2R
-         RQeZlSb3Wa9Pt57iQbu0P5Kl/joZ9aYVa/3JwclDBHBXyWcadjWjqBpSHM8ddptyATnt
-         +6Sq12TpojzVQ/Jb4+zPwR0t3DLwMpNYF2MdfzSDCL3UxO9XrFsg1yTdwnJclBUrkSJz
-         Nn1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXcEKBr0OFuIWPWgL2Ei+xcLppaIP5Ddq0vFFxX8F+NXy9e+/4i8mH96C4Chs/775nTR9Hgah/XNCslogLvC2AaqdEkpBVr
-X-Gm-Message-State: AOJu0YyLaaGWTwRcu1nJyCS/u4u5P2tHn/heOi9lmL+ZZ6U684QaGVY2
-	ClTZErSchG5Wc3i/5m/uHSUkVr85FFvUXBsjORNvgSypX8dZt4mUzTOerGMcFDah4XbnYJ2sKZL
-	YhI+T8Cg3pTBSFRBUCwdd5GGgtJzXQ46CP5sJgAoBzP/SnatZL/2QqGU=
-X-Google-Smtp-Source: AGHT+IHh2M0Mtf5+8D6PFC3HYzJ3ck0RwGR4c9+KUw9MeDUm+enscKt4yf2gm2VE0XjStr8NaE5cLsnw4ObheM+8Znuyhv/c3b45
+        bh=OzkgJIRc2tYmJ3Btk0xVIO9rDn0mpVtYOI9YDc2eSB4=;
+        b=NNFPo6F/jgZQNg2aYAeEdseRfPyNRRXXhCW/IoMScMjd3yj7rYGPHkaG3QnIdw0vqi
+         3lcHXO4XfDLZVfw16hDmwbU8z3SLqkuVVkNWbtwZL3u7UsulfD0quYX4s99GHNePIj5d
+         LgT5HjnYce6Iqaj1YbBZm2uZcU6bqhpTJqocJGUgknwoIxUmVw5R78OFtnQh1ml1xrtS
+         oeos2J5pyQw5XuZd2eerkzX1qnU8LMophtHgvXAYhEOm8zu9Kzlel1+yZy/peMb9/tUd
+         tciptpoedF41ms1sKONeT5WqvqPZNhgr44gBCvQF5UNxnILOEct0cCMjwpnCIQEHvgFM
+         9zPA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710687060; x=1711291860;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OzkgJIRc2tYmJ3Btk0xVIO9rDn0mpVtYOI9YDc2eSB4=;
+        b=kVIcWuUCVCRN3DP9HTR75VxzF0qpUECiDSuKwJsDmQbnOMquahnLrXiAKdMoGt4b5K
+         Q7zw3gPqI3Hu2STSbzWj/CrJOD7yWO/dy7ATVyGuho1gDGLNe7+SEFgNdVYfUfuJG4cs
+         wA8Gn2MlAUNFj3c6Zjfh2mMND0PXIviJBrFQ8wtPAnQVTqPViutyTap15yLihkG7tQcp
+         mAqbEsajv5G7kUjQmlVbLynhb2VPaiEUo/JsYCk5F+KntB//b96ayfHq48SEBFZ6cozT
+         s9+SLJ/jpVxtSffGTfav25iMz2evrYnUIuMj9LEVJHZOAI+gMzkG4KLmCfU61XYYBgo5
+         sY3w==
+X-Forwarded-Encrypted: i=1; AJvYcCX3+YqqtMTGmts67mQSDHaPfIvD8mx56WYiI7Yco3vEPnAttR6kDVxDFjYZviZFAkTsfuPExVRdhklcBqRkPsO5qfd3NQ1B
+X-Gm-Message-State: AOJu0YyLFK3dMtHedx/F0mPkqa8UBeHoo4L3spZcWSRpxzQwp2Fapzv0
+	raerHFYSTEovERZpK1LTzi1S7V56bw85XVTDBRe2102VCY2t2h7JK9WMnq5uY7A=
+X-Google-Smtp-Source: AGHT+IEh9mfhHobJDKbSW8F2c89QW3ynMelBgP21Gj4W8BGI1tkkbQZK51shego22/azCsTJcxmG0A==
+X-Received: by 2002:a17:906:c411:b0:a46:635b:bb3e with SMTP id u17-20020a170906c41100b00a46635bbb3emr5701615ejz.52.1710687059641;
+        Sun, 17 Mar 2024 07:50:59 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.222.97])
+        by smtp.gmail.com with ESMTPSA id w13-20020a1709064a0d00b00a453b2261b4sm3797814eju.184.2024.03.17.07.50.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 17 Mar 2024 07:50:59 -0700 (PDT)
+Message-ID: <cc55daa1-0256-48d1-97a4-0f755fb4951b@linaro.org>
+Date: Sun, 17 Mar 2024 15:50:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:3709:b0:476:f2cb:8790 with SMTP id
- k9-20020a056638370900b00476f2cb8790mr535297jav.0.1710686601500; Sun, 17 Mar
- 2024 07:43:21 -0700 (PDT)
-Date: Sun, 17 Mar 2024 07:43:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000346bbd0613dc4396@google.com>
-Subject: [syzbot] [usb?] WARNING in usbnet_start_xmit/usb_submit_urb (2)
-From: syzbot <syzbot+d693c07c6f647e0388d3@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org, 
-	netdev@vger.kernel.org, oneukum@suse.com, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] arm64: dts: S32G3: Introduce device tree for
+ S32G-VNP-RDB3
+Content-Language: en-US
+To: Wadim Mueller <wafgo01@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>,
+ Chester Lin <chester62515@gmail.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?=
+ <afaerber@suse.de>, Matthias Brugger <mbrugger@suse.com>,
+ NXP S32 Linux Team <s32@nxp.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
+ Simon Horman <horms@kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Johannes Zink <j.zink@pengutronix.de>, Shenwei Wang <shenwei.wang@nxp.com>,
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Swee Leong Ching <leong.ching.swee@intel.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-clk@vger.kernel.org
+References: <20240315222754.22366-1-wafgo01@gmail.com>
+ <20240315222754.22366-2-wafgo01@gmail.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240315222754.22366-2-wafgo01@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On 15/03/2024 23:27, Wadim Mueller wrote:
+> This commit adds device tree support for the NXP S32G3-based
+> S32G-VNP-RDB3 Board (Vehicle Networking Platform - Reference Design Board) [1].
+> 
+> The S32G3 features an 8-core ARM Cortex-A53 based SoC developed by NXP.
+> 
+> The device tree files are derived from the official NXP downstream Linux tree [2].
+> 
+> This addition encompasses a limited selection of peripherals that are upstream-supported. Apart from the ARM System Modules (GIC, Generic Timer, etc.), the following IPs have been validated:
+> 
+>     UART: fsl-linflexuart
+>     SDHC: fsl-imx-esdhc
+>     Ethernet: synopsys gmac/stmac
+> 
+> Clock settings for the chip rely on ATF Firmware [3]. Pin control integration into the device tree is pending and currently relies on Firmware/U-Boot settings [4].
+> 
+> These changes were validated using the latest BSP39 Firmware/U-Boot from NXP [5].
+> 
+> The modifications enable booting the official Ubuntu 22.04 from NXP on
+> the RDB3 with default settings from the SD card and eMMC.
+> 
+> [1] https://www.nxp.com/design/design-center/designs/s32g3-vehicle-networking-reference-design:S32G-VNP-RDB3
+> [2] https://github.com/nxp-auto-linux/linux
+> [3] https://github.com/nxp-auto-linux/arm-trusted-firmware
+> [4] https://github.com/nxp-auto-linux/u-boot
+> [5] https://github.com/nxp-auto-linux/auto_yocto_bsp
+> 
+> Signed-off-by: Wadim Mueller <wafgo01@gmail.com>
+> ---
+>  arch/arm64/boot/dts/freescale/Makefile        |   1 +
+>  arch/arm64/boot/dts/freescale/s32g3.dtsi      | 352 ++++++++++++++++++
+>  .../boot/dts/freescale/s32g399a-rdb3.dts      |  57 +++
+>  .../dt-bindings/clock/nxp,s32-scmi-clock.h    | 158 ++++++++
 
-syzbot found the following issue on:
+Please run scripts/checkpatch.pl and fix reported warnings. Some
+warnings can be ignored, but the code here looks like it needs a fix.
+Feel free to get in touch if the warning is not clear.
 
-HEAD commit:    d99e42ce6b83 Merge tag 'usb-serial-6.9-rc1' of https://git..
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
-console output: https://syzkaller.appspot.com/x/log.txt?x=111aa901180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=dd8c589043bc2b49
-dashboard link: https://syzkaller.appspot.com/bug?extid=d693c07c6f647e0388d3
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1248049e180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14bbf9fa180000
+Bindings are not DTS.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/69f01028417d/disk-d99e42ce.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/b4624715c637/vmlinux-d99e42ce.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0a940dfca61e/bzImage-d99e42ce.xz
+>  4 files changed, 568 insertions(+)
+>  create mode 100644 arch/arm64/boot/dts/freescale/s32g3.dtsi
+>  create mode 100644 arch/arm64/boot/dts/freescale/s32g399a-rdb3.dts
+>  create mode 100644 include/dt-bindings/clock/nxp,s32-scmi-clock.h
+> 
+> diff --git a/arch/arm64/boot/dts/freescale/Makefile b/arch/arm64/boot/dts/freescale/Makefile
+> index 2cb0212b63c6..e701008dbc7b 100644
+> --- a/arch/arm64/boot/dts/freescale/Makefile
+> +++ b/arch/arm64/boot/dts/freescale/Makefile
+> @@ -252,3 +252,4 @@ dtb-$(CONFIG_ARCH_MXC) += imx8mp-venice-gw74xx-rpidsi.dtb
+>  dtb-$(CONFIG_ARCH_S32) += s32g274a-evb.dtb
+>  dtb-$(CONFIG_ARCH_S32) += s32g274a-rdb2.dtb
+>  dtb-$(CONFIG_ARCH_S32) += s32v234-evb.dtb
+> +dtb-$(CONFIG_ARCH_S32) += s32g399a-rdb3.dtb
+> diff --git a/arch/arm64/boot/dts/freescale/s32g3.dtsi b/arch/arm64/boot/dts/freescale/s32g3.dtsi
+> new file mode 100644
+> index 000000000000..481ddcfd3a6d
+> --- /dev/null
+> +++ b/arch/arm64/boot/dts/freescale/s32g3.dtsi
+> @@ -0,0 +1,352 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +
+> +#include <dt-bindings/interrupt-controller/arm-gic.h>
+> +#include <dt-bindings/clock/nxp,s32-scmi-clock.h>
+> +/ {
+> +	compatible = "nxp,s32g3";
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d693c07c6f647e0388d3@syzkaller.appspotmail.com
+Order your patches correctly. Bindings come before users.
 
-------------[ cut here ]------------
-usb 3-1: BOGUS urb xfer, pipe 3 != type 1
-WARNING: CPU: 1 PID: 2507 at drivers/usb/core/urb.c:503 usb_submit_urb+0xe47/0x1730 drivers/usb/core/urb.c:503
-Modules linked in:
-CPU: 1 PID: 2507 Comm: kworker/1:5 Not tainted 6.8.0-rc6-syzkaller-00189-gd99e42ce6b83 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-Workqueue: mld mld_ifc_work
-RIP: 0010:usb_submit_urb+0xe47/0x1730 drivers/usb/core/urb.c:503
-Code: 84 3c 02 00 00 e8 59 ba 43 fd 4c 89 ef e8 61 16 07 ff 45 89 e0 89 e9 4c 89 f2 48 89 c6 48 c7 c7 a0 37 f0 86 e8 0a 46 0d fd 90 <0f> 0b 90 90 e9 ed f8 ff ff e8 2b ba 43 fd 49 81 c4 b8 05 00 00 e9
-RSP: 0018:ffffc9000157f308 EFLAGS: 00010082
-RAX: 0000000000000000 RBX: ffff8881123c3000 RCX: ffffffff81177339
-RDX: ffff888115e8d700 RSI: ffffffff81177346 RDI: 0000000000000001
-RBP: 0000000000000003 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000001
-R13: ffff888120fb00a8 R14: ffff888103eeb240 R15: ffff8881123c307c
-FS:  0000000000000000(0000) GS:ffff8881f6700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f4293372238 CR3: 00000001227c5000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- usbnet_start_xmit+0x693/0x2440 drivers/net/usb/usbnet.c:1453
- __netdev_start_xmit include/linux/netdevice.h:4989 [inline]
- netdev_start_xmit include/linux/netdevice.h:5003 [inline]
- xmit_one net/core/dev.c:3547 [inline]
- dev_hard_start_xmit+0x137/0x6d0 net/core/dev.c:3563
- sch_direct_xmit+0x18e/0x830 net/sched/sch_generic.c:342
- __dev_xmit_skb net/core/dev.c:3776 [inline]
- __dev_queue_xmit+0x12b2/0x3ed0 net/core/dev.c:4317
- dev_queue_xmit include/linux/netdevice.h:3171 [inline]
- neigh_resolve_output net/core/neighbour.c:1563 [inline]
- neigh_resolve_output+0x582/0x8f0 net/core/neighbour.c:1543
- neigh_output include/net/neighbour.h:542 [inline]
- ip6_finish_output2+0xad9/0x22b0 net/ipv6/ip6_output.c:137
- __ip6_finish_output+0x3a5/0xbc0 net/ipv6/ip6_output.c:211
- ip6_finish_output net/ipv6/ip6_output.c:222 [inline]
- NF_HOOK_COND include/linux/netfilter.h:303 [inline]
- ip6_output+0x23a/0x8c0 net/ipv6/ip6_output.c:243
- dst_output include/net/dst.h:451 [inline]
- NF_HOOK.constprop.0+0xff/0x570 include/linux/netfilter.h:314
- mld_sendpack+0x6e6/0xd10 net/ipv6/mcast.c:1818
- mld_send_cr net/ipv6/mcast.c:2119 [inline]
- mld_ifc_work+0x756/0xcd0 net/ipv6/mcast.c:2650
- process_one_work+0x886/0x15d0 kernel/workqueue.c:2633
- process_scheduled_works kernel/workqueue.c:2706 [inline]
- worker_thread+0x8b9/0x1290 kernel/workqueue.c:2787
- kthread+0x2c6/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:243
- </TASK>
+> +	interrupt-parent = <&gic>;
+> +	#address-cells = <0x02>;
+> +	#size-cells = <0x02>;
+> +
+> +	cpus {
+> +		#address-cells = <1>;
+> +		#size-cells = <0>;
+> +
+> +		cpu-map {
+> +			cluster0 {
+> +				core0 {
+> +					cpu = <&cpu0>;
+> +				};
+> +
+> +				core1 {
+> +					cpu = <&cpu1>;
+> +				};
+> +
+> +				core2 {
+> +					cpu = <&cpu2>;
+> +				};
+> +
+> +				core3 {
+> +					cpu = <&cpu3>;
+> +				};
+> +			};
+> +
+> +			cluster1 {
+> +				core0 {
+> +					cpu = <&cpu4>;
+> +				};
+> +
+> +				core1 {
+> +					cpu = <&cpu5>;
+> +				};
+> +
+> +				core2 {
+> +					cpu = <&cpu6>;
+> +				};
+> +
+> +				core3 {
+> +					cpu = <&cpu7>;
+> +				};
+> +			};
+> +		};
+> +
+> +		cpu0: cpu@0 {
+> +			device_type = "cpu";
+> +			compatible = "arm,cortex-a53";
+> +			reg = <0x0>;
+> +			enable-method = "psci";
+> +			clocks = <&dfs S32_SCMI_CLK_A53>;
+> +			next-level-cache = <&cluster0_l2_cache>;
+> +			#cooling-cells = <2>;
+> +		};
+> +
+> +		cpu1: cpu@1 {
+> +			device_type = "cpu";
+> +			compatible = "arm,cortex-a53";
+> +			reg = <0x1>;
+> +			enable-method = "psci";
+> +			clocks = <&dfs S32_SCMI_CLK_A53>;
+> +			next-level-cache = <&cluster0_l2_cache>;
+> +			#cooling-cells = <2>;
+> +		};
+> +
+> +		cpu2: cpu@2 {
+> +			device_type = "cpu";
+> +			compatible = "arm,cortex-a53";
+> +			reg = <0x2>;
+> +			enable-method = "psci";
+> +			clocks = <&dfs S32_SCMI_CLK_A53>;
+> +			next-level-cache = <&cluster0_l2_cache>;
+> +			#cooling-cells = <2>;
+> +		};
+> +
+> +		cpu3: cpu@3 {
+> +			device_type = "cpu";
+> +			compatible = "arm,cortex-a53";
+> +			reg = <0x3>;
+> +			enable-method = "psci";
+> +			clocks = <&dfs S32_SCMI_CLK_A53>;
+> +			next-level-cache = <&cluster0_l2_cache>;
+> +			#cooling-cells = <2>;
+> +		};
+> +
+> +		cpu4: cpu@100 {
+> +			device_type = "cpu";
+> +			compatible = "arm,cortex-a53";
+> +			reg = <0x100>;
+> +			enable-method = "psci";
+> +			clocks = <&dfs S32_SCMI_CLK_A53>;
+> +			next-level-cache = <&cluster1_l2_cache>;
+> +			#cooling-cells = <2>;
+> +		};
+> +
+> +		cpu5: cpu@101 {
+> +			device_type = "cpu";
+> +			compatible = "arm,cortex-a53";
+> +			reg = <0x101>;
+> +			enable-method = "psci";
+> +			clocks = <&dfs S32_SCMI_CLK_A53>;
+> +			next-level-cache = <&cluster1_l2_cache>;
+> +			#cooling-cells = <2>;
+> +		};
+> +
+> +		cpu6: cpu@102 {
+> +			device_type = "cpu";
+> +			compatible = "arm,cortex-a53";
+> +			reg = <0x102>;
+> +			enable-method = "psci";
+> +			clocks = <&dfs S32_SCMI_CLK_A53>;
+> +			next-level-cache = <&cluster1_l2_cache>;
+> +			#cooling-cells = <2>;
+> +		};
+> +
+> +		cpu7: cpu@103 {
+> +			device_type = "cpu";
+> +			compatible = "arm,cortex-a53";
+> +			reg = <0x103>;
+> +			enable-method = "psci";
+> +			clocks = <&dfs S32_SCMI_CLK_A53>;
+> +			next-level-cache = <&cluster1_l2_cache>;
+> +			#cooling-cells = <2>;
+> +		};
+> +
+> +		cluster0_l2_cache: l2-cache0 {
+
+l2-cache-0
+
+> +			compatible = "cache";
+> +			status = "okay";
+
+Why do you need it? It's enabled by default.
+
+Anyway it incomplete:
+It does not look like you tested the DTS against bindings. Please run
+`make dtbs_check W=1` (see
+Documentation/devicetree/bindings/writing-schema.rst or
+https://www.linaro.org/blog/tips-and-tricks-for-validating-devicetree-sources-with-the-devicetree-schema/
+for instructions).
+
+> +		};
+> +
+> +		cluster1_l2_cache: l2-cache1 {
+
+l2-cache-1
+
+> +			compatible = "cache";
+> +			status = "okay";
+> +		};
+> +	};
+> +
+> +	pmu {
+> +		compatible = "arm,cortex-a53-pmu";
+> +		interrupts = <GIC_PPI 7 IRQ_TYPE_LEVEL_HIGH>;
+> +	};
+> +
+> +	timer {
+> +		compatible = "arm,armv8-timer";
+> +		interrupts = <GIC_PPI 13 IRQ_TYPE_LEVEL_LOW>, /* sec-phys */
+> +			     <GIC_PPI 14 IRQ_TYPE_LEVEL_LOW>, /* virt */
+> +			     <GIC_PPI 11 IRQ_TYPE_LEVEL_LOW>, /* hyp-virt */
+> +		             <GIC_PPI 10 IRQ_TYPE_LEVEL_LOW>, /* sec-phys */
+> +		             <GIC_PPI 12 IRQ_TYPE_LEVEL_LOW>; /* phys */
+> +		always-on;
+> +	};
+> +
+> +	reserved-memory  {
+> +		#address-cells = <2>;
+> +		#size-cells = <2>;
+> +		ranges;
+> +
+> +		scmi_tx_buf: shm@d0000000 {
+> +			compatible = "arm,scmi-shmem";
+> +			reg = <0x0 0xd0000000 0x0 0x80>;
+> +			no-map;
+> +		};
+> +
+> +		scmi_rx_buf: shm@d0000080 {
+> +			compatible = "arm,scmi-shmem";
+> +			reg = <0x0 0xd0000080 0x0 0x80>;
+> +			no-map;
+> +		};
+> +	};
+> +
+> +	firmware {
+> +		scmi: scmi {
+> +			compatible = "arm,scmi-smc";
+> +			mbox-names = "tx", "rx";
+> +			shmem = <&scmi_tx_buf>, <&scmi_rx_buf>;
+> +			arm,smc-id = <0xc20000fe>;
+> +			#address-cells = <1>;
+> +			#size-cells = <0>;
+> +			status = "okay";
+
+Drop or explain why is it needed.
+
+> +			interrupts = <GIC_SPI 300 IRQ_TYPE_EDGE_RISING>;
+> +			interrupt-names = "p2a_notif";
+> +
+> +			dfs: protocol@13 {
+> +				reg = <0x13>;
+> +				#clock-cells = <1>;
+> +			};
+> +
+> +			clks: protocol@14 {
+> +				reg = <0x14>;
+> +				#clock-cells = <1>;
+> +			};
+> +
+> +			reset: protocol@16 {
+> +				reg = <0x16>;
+> +				#reset-cells = <1>;
+> +			};
+> +
+> +			pinctrl_scmi: protocol@80 {
+> +				reg = <0x80>;
+> +				#pinctrl-cells = <2>;
+> +
+> +				status = "disabled";
+> +			};
+> +		};
+> +
+> +		psci: psci {
+> +			compatible = "arm,psci-1.0";
+> +			method = "smc";
+> +		};
+> +	};
+> +
+> +	soc@0 {
+> +		compatible = "simple-bus";
+> +		#address-cells = <1>;
+> +		#size-cells = <1>;
+> +		ranges = <0 0 0 0x80000000>;
+> +
+> +		uart0: serial@401c8000 {
+> +			compatible = "nxp,s32g3-linflexuart",
+> +				     "fsl,s32v234-linflexuart";
+> +			reg = <0x401c8000 0x3000>;
+> +			interrupts = <GIC_SPI 82 IRQ_TYPE_EDGE_RISING>;
+> +			status = "disabled";
+> +		};
+> +
+> +		uart1: serial@401cc000 {
+> +			compatible = "nxp,s32g3-linflexuart",
+> +				     "fsl,s32v234-linflexuart";
+> +			reg = <0x401cc000 0x3000>;
+> +			interrupts = <GIC_SPI 83 IRQ_TYPE_EDGE_RISING>;
+> +			status = "disabled";
+> +		};
+> +
+> +		uart2: serial@402bc000 {
+> +			compatible = "nxp,s32g3-linflexuart",
+> +				     "fsl,s32v234-linflexuart";
+> +			reg = <0x402bc000 0x3000>;
+> +			interrupts = <GIC_SPI 84 IRQ_TYPE_EDGE_RISING>;
+> +			status = "disabled";
+> +		};
+> +
+> +		gic: interrupt-controller@50800000 {
+> +			compatible = "arm,gic-v3";
+> +			#interrupt-cells = <3>;
+> +			interrupt-controller;
+> +			reg = <0x50800000 0x10000>,
+> +			      <0x50900000 0x200000>,
+> +			      <0x50400000 0x2000>,
+> +			      <0x50410000 0x2000>,
+> +			      <0x50420000 0x2000>;
+> +			interrupts = <GIC_PPI 9 IRQ_TYPE_LEVEL_HIGH>;
+> +			mbi-ranges = <167 16>;
+> +		};
+> +
+> +		qspi: spi@40134000 {
+
+Keep order by unit address.
+
+> +			compatible = "nxp,s32g3-qspi";
+> +			#address-cells = <1>;
+> +			#size-cells = <0>;
+> +			reg = <0x0 0x00000000 0x0 0x20000000>,
+> +				<0x0 0x40134000 0x0 0x1000>;
+> +			reg-names = "QuadSPI-memory", "QuadSPI";
+> +			interrupts = <GIC_SPI 32 IRQ_TYPE_LEVEL_HIGH>;
+> +			clock-names = "qspi_en", "qspi";
+> +			clocks = <&clks S32_SCMI_CLK_QSPI_FLASH1X>,
+> +				 <&clks S32_SCMI_CLK_QSPI_FLASH1X>;
+> +			spi-max-frequency = <200000000>;
+> +			spi-num-chipselects = <2>;
+> +			status = "disabled";
+> +		};
+> +
+> +		usdhc0: mmc@402f0000 {
+> +			compatible = "nxp,s32g3-usdhc",
+> +			             "nxp,s32g2-usdhc";
+> +			reg = <0x402f0000 0x1000>;
+> +			interrupts = <GIC_SPI 36 IRQ_TYPE_LEVEL_HIGH>;
+> +			clocks = <&clks S32_SCMI_CLK_USDHC_MODULE>,
+> +				 <&clks S32_SCMI_CLK_USDHC_AHB>,
+> +				 <&clks S32_SCMI_CLK_USDHC_CORE>;
+> +			clock-names = "ipg", "ahb", "per";
+> +			status = "disabled";
+> +		};
+> +
+> +		gmac0: ethernet@4033c000 {
+> +			status = "disabled";
+
+Random code... sorry, but status does not come first. Put it last and
+please read carefully DTS coding style.
+
+> +			compatible = "nxp,s32-dwmac";
+> +			reg = <0x4033c000 0x2000>, /* gmac IP */
+> +			      <0x4007c004 0x4>;    /* S32 CTRL_STS reg */
+> +			interrupt-parent = <&gic>;
+> +			interrupts = <GIC_SPI 57 IRQ_TYPE_LEVEL_HIGH>;
+> +			interrupt-names = "macirq";
+> +			tx-fifo-depth = <20480>;
+> +			rx-fifo-depth = <20480>;
+> +			dma-coherent;
+> +			snps,mtl-rx-config = <&mtl_rx_setup_gmac0>;
+> +			snps,mtl-tx-config = <&mtl_tx_setup_gmac0>;
+> +			clocks = <&clks S32_SCMI_CLK_GMAC0_AXI>,
+> +				 <&clks S32_SCMI_CLK_GMAC0_AXI>,
+> +				 <&clks S32_SCMI_CLK_GMAC0_TX_SGMII>,
+> +				 <&clks S32_SCMI_CLK_GMAC0_TX_RGMII>,
+> +				 <&clks S32_SCMI_CLK_GMAC0_TX_RMII>,
+> +				 <&clks S32_SCMI_CLK_GMAC0_TX_MII>,
+> +				 <&clks S32_SCMI_CLK_GMAC0_RX_SGMII>,
+> +				 <&clks S32_SCMI_CLK_GMAC0_RX_RGMII>,
+> +				 <&clks S32_SCMI_CLK_GMAC0_RX_RMII>,
+> +				 <&clks S32_SCMI_CLK_GMAC0_RX_MII>,
+> +				 <&clks S32_SCMI_CLK_GMAC0_TS>;
+> +			clock-names = "stmmaceth", "pclk",
+> +				      "tx_sgmii", "tx_rgmii",
+> +				      "tx_rmii", "tx_mii",
+> +				      "rx_sgmii", "rx_rgmii",
+> +				      "rx_rmii", "rx_mii",
+> +				      "ptp_ref";
+> +
+> +			mtl_rx_setup_gmac0: rx-queues-config {
+> +				snps,rx-queues-to-use = <5>;
+> +				#address-cells = <1>;
+> +				#size-cells = <0>;
+> +
+> +				queue@0 {};
+> +				queue@1 {};
+> +				queue@2 {};
+> +				queue@3 {};
+> +				queue@4 {};
+> +			};
+> +
+> +			mtl_tx_setup_gmac0: tx-queues-config {
+> +				snps,tx-queues-to-use = <5>;
+> +				#address-cells = <1>;
+> +				#size-cells = <0>;
+> +
+> +				queue@0 {};
+> +				queue@1 {};
+> +				queue@2 {};
+> +				queue@3 {};
+> +				queue@4 {};
+> +			};
+> +
+> +			gmac0_mdio: mdio0 {
+
+mdio?
+
+It does not look like you tested the DTS against bindings. Please run
+`make dtbs_check W=1` (see
+Documentation/devicetree/bindings/writing-schema.rst or
+https://www.linaro.org/blog/tips-and-tricks-for-validating-devicetree-sources-with-the-devicetree-schema/
+for instructions).
+
+> +				compatible = "snps,dwmac-mdio";
+> +				#address-cells = <1>;
+> +				#size-cells = <0>;
+> +			};
+> +		};
+> +
+> +	};
+> +};
+> diff --git a/arch/arm64/boot/dts/freescale/s32g399a-rdb3.dts b/arch/arm64/boot/dts/freescale/s32g399a-rdb3.dts
+> new file mode 100644
+> index 000000000000..707b503c0165
+> --- /dev/null
+> +++ b/arch/arm64/boot/dts/freescale/s32g399a-rdb3.dts
+> @@ -0,0 +1,57 @@
+> +// SPDX-License-Identifier: GPL-2.0-or-later
+> +/*
+> + * NXP S32G3 Reference Design Board 3 (S32G-VNP-RDB3)
+> + */
+> +
+> +/dts-v1/;
+> +
+> +#include "s32g3.dtsi"
+> +
+> +/ {
+> +	model = "NXP S32G3 Reference Design Board 3 (S32G-VNP-RDB3)";
+> +	compatible = "nxp,s32g399a-rdb3", "nxp,s32g3";
+
+Missing bindings.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Best regards,
+Krzysztof
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
