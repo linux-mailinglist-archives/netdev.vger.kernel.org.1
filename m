@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-80271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0457787DF55
-	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 19:47:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 050FA87E044
+	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 22:24:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 348191C2087E
-	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 18:47:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 57667B21128
+	for <lists+netdev@lfdr.de>; Sun, 17 Mar 2024 21:24:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97FAD1CFA8;
-	Sun, 17 Mar 2024 18:47:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E227208A5;
+	Sun, 17 Mar 2024 21:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="EZN0PhV3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HRCZBNV4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3F5B1D530
-	for <netdev@vger.kernel.org>; Sun, 17 Mar 2024 18:47:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70BAB208A0;
+	Sun, 17 Mar 2024 21:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710701264; cv=none; b=dP1VuSrTeW06Ena37tf0vjTLJ3lAExhscdO2Aos2gTRUx6PUGT6vVJd3JrPfc89L7aoSokCI77zhzZOZkVqvOk5DDqheG8GpNiDV9WpPjBwsvfnoLNEtrkc1qj9IKc21+QmQc2UyF5JDq0Sj/Q+4mAtXis6SBNdm9m6v1AostrU=
+	t=1710710644; cv=none; b=qO0AAAf/DUa5ZdAvtXldipAp6sSyVvoRvoTsiVw6KIm4A4RantadhphAMT+Wg94U4zQugIxch45A1R63+jYsV+vfVU8wTibkIH6JlE6qr1x11p/BpvB4lgjglqWHwj7ItPsShPqcTZmgr9t1FCoqqXJoreezaYutoDan2D/UuIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710701264; c=relaxed/simple;
-	bh=K6foNgXqrQlpy86n2/27eq3A66OjDosqj5w+ijEj7m8=;
+	s=arc-20240116; t=1710710644; c=relaxed/simple;
+	bh=JImlRwkOFe13jFffeZcKf4MJA+RzZ2nk4xGQMDWRNRk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AzpPgdx05dVhFd2EgsJYcQo1RT5MlAna8aA2PCo3+jFRoWVDBO6UPSkL0aZL/m9jfVYhCaXZBhliPOuwneBoUCV2u3PBfNY0xMPONWKTlrKBb4xRY/Ym7Whj8xTe9UDsWQeYrZWwVf+bJOqWZDG6zKuhwHoVrUgFmp3OCFvuK4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=EZN0PhV3; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d476d7972aso53001301fa.1
-        for <netdev@vger.kernel.org>; Sun, 17 Mar 2024 11:47:42 -0700 (PDT)
+	 In-Reply-To:Content-Type; b=dnENqZ78N0RN4VCKS2OmRxF/nKShl5jD8BfuqIE+4j25GMLfOslffK3vaCHXvlB0QXP2gdOa8wVwcNIDJ8as8wnySISgSSnzXGiEA04zX4644OexvvzvGwyU55o5/hA8amcMH0SD7SLpp8D/9iUBlVcNrzQRVq/VqePAViccs3g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HRCZBNV4; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a4644bde1d4so488598266b.3;
+        Sun, 17 Mar 2024 14:24:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1710701261; x=1711306061; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
+        d=gmail.com; s=20230601; t=1710710641; x=1711315441; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=VKXtvsqImemBiWCLBIvLrfhzInPoUFOQ1xHfm3l91So=;
-        b=EZN0PhV3JVPkfDXe2kgjOdntbWzZvwjSVMeeyTa6Kdv2S6jJ70nZEmYclNWAhQoh/o
-         eb/wRpQo3DJVvATfGCQlJ7+wX5qzQLmSs1sP5BhrpxAATom4jGS0KjT8K2fw9YQCZNky
-         Uz4YSSXb9MnuEWJyR4ZkXV2B9h9IntucrQ9dTX0A0Ertp8UqD9dVBaqnQ9cJGKuS+jv1
-         fXL3LhliA62VLeZ7at7pCqO5rgoEbSdJPV1Qf07kfx55LS8IaDdeVN6fooC6cJfTr5hB
-         wXVtKx5nSuKk7s4n3I35s/9jXxKmZni3ore3pukGW7VdoAXVZCoILnfSVqSZ9ZpKH81h
-         jMag==
+        bh=6RUYP0GHl7tm3Mga3DjOfW1WDbCxoCJCtfJ1ECYKcWY=;
+        b=HRCZBNV4vxN/wL/Y62vinJbYO50OQbncvXwCcUo/T+h2OEHLfI8YCk1f09tgqVmwET
+         gE9n3IpuatLExyTQ46y51wR6zFzDBj5Rmln5m69FkgIbWfuRmf73QPeavNFIxSPEnFBH
+         0a/a6M6tD5a34O4iCkp645uryFJlKGiQ4oh4aGL/0PDksDwqzxqC7Ro+6zsPM/4zO3yu
+         0/1OyzjPWaxjp/snoXjRPLRsXl2uvo6BI+n5bc5MhxnyRLI32ZH/oXYo5t/b2EV1H1jt
+         +0NtXwHhtj6qZdaSr+aZWOJOHC+0Wc4jyAHQz/a3Oz4A8CobctPCmlPrwt30c8sZBfAF
+         0c7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710701261; x=1711306061;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :to:content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1710710641; x=1711315441;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VKXtvsqImemBiWCLBIvLrfhzInPoUFOQ1xHfm3l91So=;
-        b=ZwqubDM2avWh4+APHjy6LQ5eJHmLTbz7MQI6zSzVqvHuY26ZEm1ryIGsyzIQ8hk4+f
-         Y4SzAIVwYwVda0cA7YmRC+4u0JpIejLxIllqH3f+jFaL+JkLONqCd7HOQALxYWzWKFW8
-         FB4hSqbVQokzY7K/V26Z/LSTyyzktc1N41yMH2ReqFVnr11iSdyMOpzj1COR8PvIJDwJ
-         tAvmm9rZMgqvyi+TjA9AoNRk4EBdWZe3eUdOsBYPJawPSkXPaUEUpfHPxYDWZi8OabwX
-         C8HL6Y6mO02ZMj4cim5dW+SQ8LQ3Fv5A4+6kJBYIL1wAfuVnBKrjsy9zfTr2akhqh5+P
-         YGvA==
-X-Forwarded-Encrypted: i=1; AJvYcCUpJ+GvtA0rZRh/+UjHfabFViu/H3qRYYh4g7fYiFw/JLLSbf8eJSW+brWXGBe0WvyLZYxKoeLfB8cLxrgU2L3zBhN5z00R
-X-Gm-Message-State: AOJu0Yy0TDMuvpEuF+rsS7gNVt85fuTnOaK4yUp/aj8G3UTrAMEzbcP3
-	eEkl/FI2L+txjw3gfogaULDI2n9zILJl3loK1oE7POfzh5pEQvvQ0UfcVrkajq8=
-X-Google-Smtp-Source: AGHT+IFAr2DXYl74fsplXyGANfFVV8qAO45Bw7D5ro4+K13W9zhcg2/Fy+WhYhdLgVgkdDbqjyL+6A==
-X-Received: by 2002:a2e:91d4:0:b0:2d4:5d3e:9666 with SMTP id u20-20020a2e91d4000000b002d45d3e9666mr5923485ljg.45.1710701260560;
-        Sun, 17 Mar 2024 11:47:40 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.222.97])
-        by smtp.gmail.com with ESMTPSA id p7-20020a056402500700b0056882aa15b9sm3829135eda.95.2024.03.17.11.47.35
+        bh=6RUYP0GHl7tm3Mga3DjOfW1WDbCxoCJCtfJ1ECYKcWY=;
+        b=MORaUKu5hmS9Aw+rzb78rXOowJFwthPBve1sYpSoRAYHORz5c5Ib6Rn2w5fcmcj09t
+         0yOKHmqHPpR2VLEVH3gvxZbIthS5RWqdi1uNzZIcV5rzC0TXdVuigDNNWrhxXazWx7sy
+         h6ZRhVFiXHe0i1rgQitbOnUy0gv2/J/q7eWB1zLQdZHbAuH7Dk107Ih75GCQ9hMhgfk4
+         5knnVxf3XXPAErXkrv/zfqYlWH6en6K3XkOcEXW8HSwraTtz7zFLRylg71naV6i0iU4A
+         MBM/Ueu0NguU5WxoDsaHzywlowh4ItNS9L5p2r1wqlvdwviudHAiX1BEo1ULEGcXz2H5
+         ePcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWCPdLHOKcuAJrs3AqZEQrmoYjWHm8GcI/TrWI2EBoDgOqtI+4Zu7VPW5qdBK6v5h6woZj7iKHOERBwPPfzV3HJfL7hbeuGTym8CLatOoTnG2frqoiXbUmPOU1qRUD6q4k=
+X-Gm-Message-State: AOJu0Yz8VihLye+Q//81GkgVB6on4Ym/fTJXCu+2Vwpoiqbj5pqz+5Ud
+	7ffjONDqFrSjNlMFuEt2oKSqn2Qr7qFrOZjLcxXpY3ARRfvduCOj
+X-Google-Smtp-Source: AGHT+IExWvTxZ0NIOlrml3ZfbIIeI/2UI2jo4KMSfpFxlc79HgB13KJW8ga9iG+VMGrQuZIOg9Aplw==
+X-Received: by 2002:a17:906:68db:b0:a46:1f0f:31b5 with SMTP id y27-20020a17090668db00b00a461f0f31b5mr4316582ejr.57.1710710640568;
+        Sun, 17 Mar 2024 14:24:00 -0700 (PDT)
+Received: from [192.168.8.100] ([85.255.232.181])
+        by smtp.gmail.com with ESMTPSA id bf8-20020a170907098800b00a46bcfe4f16sm515970ejc.37.2024.03.17.14.23.59
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 17 Mar 2024 11:47:40 -0700 (PDT)
-Message-ID: <3ce9cf8e-f8d0-4de5-b5b7-1060f77321eb@linaro.org>
-Date: Sun, 17 Mar 2024 19:47:34 +0100
+        Sun, 17 Mar 2024 14:24:00 -0700 (PDT)
+Message-ID: <d5ceb9c2-2fbb-4b82-9e9b-c482109acbf8@gmail.com>
+Date: Sun, 17 Mar 2024 21:22:46 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,116 +76,157 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [EXT] [PATCH 2/3] net: stmmac: Add NXP S32 SoC family support
+Subject: Re: [RFC PATCH v4 13/16] io_uring: add io_recvzc request
 Content-Language: en-US
-To: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
- Wadim Mueller <wafgo01@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
- Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
- Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, dl-linux-imx <linux-imx@nxp.com>,
- Chester Lin <chester62515@gmail.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?=
- <afaerber@suse.de>, Matthias Brugger <mbrugger@suse.com>,
- dl-S32 <S32@nxp.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
- <sboyd@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
- Andrew Halaney <ahalaney@redhat.com>, Simon Horman <horms@kernel.org>,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- Johannes Zink <j.zink@pengutronix.de>, Shenwei Wang <shenwei.wang@nxp.com>,
- "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Swee Leong Ching <leong.ching.swee@intel.com>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-stm32@st-md-mailman.stormreply.com"
- <linux-stm32@st-md-mailman.stormreply.com>,
- "linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>
-References: <20240315222754.22366-1-wafgo01@gmail.com>
- <20240315222754.22366-3-wafgo01@gmail.com>
- <AM9PR04MB8506244076FBC931101B2205E22E2@AM9PR04MB8506.eurprd04.prod.outlook.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <AM9PR04MB8506244076FBC931101B2205E22E2@AM9PR04MB8506.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8
+To: Jens Axboe <axboe@kernel.dk>, David Wei <dw@davidwei.uk>,
+ io-uring@vger.kernel.org, netdev@vger.kernel.org
+Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>
+References: <20240312214430.2923019-1-dw@davidwei.uk>
+ <20240312214430.2923019-14-dw@davidwei.uk>
+ <7752a08c-f55c-48d5-87f2-70f248381e48@kernel.dk>
+ <4343cff7-37d9-4b78-af70-a0d7771b04bc@gmail.com>
+ <c4871911-5cb6-4237-a0a3-001ecb8bd7e5@kernel.dk>
+ <e646d731-dec9-4d2e-9e05-dbb9b1183a0b@gmail.com>
+ <1e49ba1e-a2b0-4b11-8c36-85e7b9f95260@kernel.dk>
+ <90c588ab-884e-401a-83fd-3d204a732acd@gmail.com>
+ <4a613551-9a29-4e41-ae78-ad38bacaa009@kernel.dk>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <4a613551-9a29-4e41-ae78-ad38bacaa009@kernel.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-On 17/03/2024 19:26, Jan Petrous (OSS) wrote:
->> Add support for NXP S32 SoC family's GMAC to the stmmac network driver.
->> This driver implementation is based on the patchset originally contributed by
->> Chester Lin [1], which itself draws heavily from NXP's downstream
->> implementation [2]. The patchset was never merged.
+On 3/16/24 16:59, Jens Axboe wrote:
+> On 3/15/24 5:52 PM, Pavel Begunkov wrote:
+>> On 3/15/24 18:38, Jens Axboe wrote:
+>>> On 3/15/24 11:34 AM, Pavel Begunkov wrote:
+>>>> On 3/14/24 16:14, Jens Axboe wrote:
+>>>> [...]
+>>>>>>>> @@ -1053,6 +1058,85 @@ struct io_zc_rx_ifq *io_zc_verify_sock(struct io_kiocb *req,
+>>>>>>>>          return ifq;
+>>>>>>>>      }
+>>>>>>>>      +int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
+>>>>>>>> +{
+>>>>>>>> +    struct io_recvzc *zc = io_kiocb_to_cmd(req, struct io_recvzc);
+>>>>>>>> +
+>>>>>>>> +    /* non-iopoll defer_taskrun only */
+>>>>>>>> +    if (!req->ctx->task_complete)
+>>>>>>>> +        return -EINVAL;
+>>>>>>>
+>>>>>>> What's the reasoning behind this?
+>>>>>>
+>>>>>> CQ locking, see the comment a couple lines below
+>>>>>
+>>>>> My question here was more towards "is this something we want to do".
+>>>>> Maybe this is just a temporary work-around and it's nothing to discuss,
+>>>>> but I'm not sure we want to have opcodes only work on certain ring
+>>>>> setups.
+>>>>
+>>>> I don't think it's that unreasonable restricting it. It's hard to
+>>>> care about !DEFER_TASKRUN for net workloads, it makes CQE posting a bit
+>>>
+>>> I think there's a distinction between "not reasonable to support because
+>>> it's complicated/impossible to do so", and "we prefer not to support
+>>> it". I agree, as a developer it's hard to care about !DEFER_TASKRUN for
+>>> networking workloads, but as a user, they will just setup a default
+>>> queue until they wise up. And maybe this can be a good thing in that
 >>
+>> They'd still need to find a supported NIC and do all the other
+>> setup, comparably to that it doesn't add much trouble. And my
 > 
-> Hi Wadim,
+> Hopefully down the line, it'll work on more NICs,
+
+I wouldn't hope all necessary features will be seen in consumer
+cards
+
+> and configuration will be less of a nightmare than it is now.
+
+I'm already assuming steering will be taken care by the kernel,
+but you have to choose your nic, allocate an ifq, mmap a ring,
+and then you're getting scattered chunks instead of
+
+recv((void *)one_large_buffer);
+
+My point is that it requires more involvement from user by design.
+  
+>> usual argument is that io_uring is a low-level api, it's expected
+>> that people interacting with it directly are experienced enough,
+>> expect to spend some time to make it right and likely library
+>> devs.
 > 
-> Thank you for your upstreaming activities, but I would like to note that
-> the old NXP S32CC  stmmac glue was rewritten lately and will be part of next
-> NXP BSP Linux release planned for April.
+> Have you seen some of the code that has gone in to libraries for
+> io_uring support? I have, and I don't think that statement is true at
+> all for that side.
+
+Well, some implementations are crappy, some are ok, some are
+learning and improving what they have.
+
 > 
-> The rework was done mainly to allow simpler upstreaming process, so I would recommend
-> to postpone your current work.
+> It should work out of the box even with a naive approach, while the best
+> approach may require some knowledge. At least I think that's the sanest
+> stance on that.
+> 
+>>> they'd be nudged toward DEFER_TASKRUN, but I can also see some head
+>>> scratching when something just returns (the worst of all error codes)
+>>> -EINVAL when they attempt to use it.
+>>
+>> Yeah, we should try to find a better error code, and the check
+>> should migrate to ifq registration.
+> 
+> Wasn't really a jab at the code in question, just more that -EINVAL is
+> the ubiqitious error code for all kinds of things and it's hard to
+> diagnose in general for a user. You just have to start guessing...
+> 
+>>>> cleaner, and who knows where the single task part would become handy.
+>>>
+>>> But you can still take advantage of single task, since you know if
+>>> that's going to be true or not. It just can't be unconditional.
+>>>
+>>>> Thinking about ifq termination, which should better cancel and wait
+>>>> for all corresponding zc requests, it's should be easier without
+>>>> parallel threads. E.g. what if another thread is in the enter syscall
+>>>> using ifq, or running task_work and not cancellable. Then apart
+>>>> from (non-atomic) refcounting, we'd need to somehow wait for it,
+>>>> doing wake ups on the zc side, and so on.
+>>>
+>>> I don't know, not seeing a lot of strong arguments for making it
+>>> DEFER_TASKRUN only. My worry is that once we starting doing that, then
+>>> more will follow. And honestly I think that would be a shame.
+>>>
+>>> For ifq termination, surely these things are referenced, and termination
+>>> would need to wait for the last reference to drop? And if that isn't an
+>>> expected condition (it should not be), then a percpu ref would suffice.
+>>> Nobody cares if the teardown side is more expensive, as long as the fast
+>>> path is efficient.
+>>
+>> You can solve any of that, it's true, the question how much crap
+>> you'd need to add in hot paths and diffstat wise. Just take a look
+>> at what a nice function io_recvmsg() is together with its helpers
+>> like io_recvmsg_multishot().
+> 
+> That is true, and I guess my real question is "what would it look like
+> if we supported !DEFER_TASKRUN". Which I think is a valid question.
+> 
+>> The biggest concern is optimisations and quirks that we can't
+>> predict at the moment. DEFER_TASKRUN/SINGLE_ISSUER provide a simpler
+>> model, I'd rather keep recvzc simple than having tens of conditional
+>> optimisations with different execution flavours and contexts.
+>> Especially, since it can be implemented later, wouldn't work the
+>> other way around.
+> 
+> Yes me too, and I'd hate to have two variants just because of that. But
+> comparing to eg io_recv() and helpers, it's really not that bad. Hence
+> my question on how much would it take, and how nasty would it be, to
+> support !DEFER_TASKRUN.
 
-I suggest you working with upstream first instead of claiming that
-upstream contributions should align with your downstream work. To be
-clear: your downstream NXP BSP does not matter.
+It might look bearable... at first, but when it stops on that?
+There will definitely be fixes and optimisations, whenever in my
+mind it's something that is not even needed. I guess I'm too
+traumatised by the amount of uapi binding features I wish I
+could axe out and never see again.
 
-If you think this submission needs any particular changes, then please
-comment on specifics, but such broad statement that community should
-wait till NXP will be so kind to allow upstream work is just not acceptable.
-
-Best regards,
-Krzysztof
-
+-- 
+Pavel Begunkov
 
