@@ -1,121 +1,101 @@
-Return-Path: <netdev+bounces-80386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A57AE87E934
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 13:19:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2F1187E952
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 13:30:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 500111F2186B
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 12:19:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4FBF0B21E9C
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 12:30:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F2E3364A4;
-	Mon, 18 Mar 2024 12:19:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DFAD1E52C;
+	Mon, 18 Mar 2024 12:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="aaEwdND6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nGJycxgL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70CDA381B8
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 12:19:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 185E2179B1;
+	Mon, 18 Mar 2024 12:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710764371; cv=none; b=DQNrx+3+0z0pI/o221TcuksyVIGWXDrjDExyI0L3Tf/Khdg2DfY4HAZ4VmRPzcac6MMHQEmIyIFNblThxmbdIzOytaMxoHz/AllGRP3JdIX28MCvSzApWMJhv59Gjx5zCFUfD48o6jdFfLQfIqVdMp8rMNahP+43KeeTEZYOPD8=
+	t=1710765030; cv=none; b=pBVuXA3QBbHRJ0ZcYboOjta4y9VH4Nw/Q2FfTnBYAD0yk7qBXuYOxiscwixrGkuNuk6vdJIHRmfJ+uHUt8Qfe7+BFmCTYdoLuQeciDoiZv2l2sguGkHgJkh5c3B7hBwvd98J84qwffZI5MYWGrs9sEGi93Q21dYfheulrsXqYpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710764371; c=relaxed/simple;
-	bh=pOSlkUulYyw5/O4A+X0uYoH/0HZhuQNeAcLk38o/IBk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YAdQsDSm0VVPLTszzP7SGDXpOhTB0AQ31OSXUHchb2/wN88cdGb0SOSCrqm5n4WnGRsF/qUDkTOY7PQSE9kWjPsrIxTIG56hdmiDZVOjj8RUzAYn1TnaoDk+pSprBYyLvNd26aukMJsUyW7tc2uj7XShi8xInEv7qYQkU+65sBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=aaEwdND6; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5654f700705so5849220a12.1
-        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 05:19:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710764367; x=1711369167; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pOSlkUulYyw5/O4A+X0uYoH/0HZhuQNeAcLk38o/IBk=;
-        b=aaEwdND64LiE8FYe7nBzBYvjKQD99tn2uikFgpMIZQWr98se8EsGqjiE8aO8+0BLEg
-         Td+mrf2BtIDFn9LNNiRyBh3ZdW6NmnhWqBaKslesdVEzpl+PagC0Pb6DR669E4tnjad7
-         o2a9OBHRJ/hFmqXYZmCy8b/kxZcrhWjDCNj3REai7vuWjl8G883ZuYWM9iu4WYp1oGNo
-         ne3lehklZNdfGovA5oKmJfQyfnYkcly/487nl5DyD3Mu4xV0J15o/GsgcsMlBSplkS3N
-         OSaCf68K14QyFZvweJO3p6ps8DhDAHhB4OrjBsIrsU3POxEuMzaZjUMY6tiCk/o75ixT
-         WyMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710764367; x=1711369167;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pOSlkUulYyw5/O4A+X0uYoH/0HZhuQNeAcLk38o/IBk=;
-        b=rTYR4xak0rb19l6zspSQBR9QN+JdJnpaqIwAAc0Q4MMF1vvSqOoxLcqdUfX245jNtE
-         ZAgyOsVOZWXLiqgnuTgrZ4BGK8GEo1qJzI6ix9ckTe2VQP9Vzuc9PVBryedT9Bg+PS63
-         2pO2PlIiHeqHgLiw0bm3VEezkJpluMBNRn5dDM0Ygk4GkJfXEy+SplYen/7H0JFBMAB/
-         6MrOZ0P3d5ZlRhEkJA+jfLFRydAOQGEmSPn6XuCF9vsGX1U1K0rcPKhqLxAEqnaX+VJe
-         sHLSCFkgsMOEnkgJcd9xtBaU+wRDrxXIzXZ62VNE+Qt6oNU6dKL93IL18q9PHMGSLG2S
-         e6Yw==
-X-Gm-Message-State: AOJu0YzSFz6VSCJMGlNdn4D7HEb4FzaOoWWxlDrZaH5SaAfdBTjZECYm
-	ZfP0/gxiBn+9g1wW0HvBLxgr76kwPXMMWcIEyxRvmE0udfqjjqiPraoSh1dUu3s=
-X-Google-Smtp-Source: AGHT+IHF1tEj7gb/YwVHDW9BOuby74iZuApmYgSUxT3zLZ2JgfbTwLMWpYsP7y0MGCfo/Ko64/Zs/w==
-X-Received: by 2002:a05:6402:c13:b0:568:b391:4ec8 with SMTP id co19-20020a0564020c1300b00568b3914ec8mr5028130edb.12.1710764366639;
-        Mon, 18 Mar 2024 05:19:26 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id h13-20020a0564020e0d00b00568b163c4easm3421073edh.11.2024.03.18.05.19.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Mar 2024 05:19:25 -0700 (PDT)
-Date: Mon, 18 Mar 2024 13:19:22 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Stanislav Fomichev <sdf@google.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	Larysa Zaremba <larysa.zaremba@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	virtualization@lists.linux.dev, bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v5 0/9] virtio-net: support device stats
-Message-ID: <ZfgxSug4sekWGyNd@nanopsycho>
-References: <20240318110602.37166-1-xuanzhuo@linux.alibaba.com>
- <Zfgq8k2Q-olYWiuw@nanopsycho>
- <1710762818.1520293-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1710765030; c=relaxed/simple;
+	bh=Pf3JZGSV0vq0+Ep32XwBVnIFfn/v8WNnsG3rb8t8ghQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=TylQmn9GiJSRK2vRC4Ajv+1ooDd/sqSDWsvTbv8r524M03P+c58TfahOVrjSn9hfCMMHNu7rEmMgLdBr9X3Gc0WilwFKuQRMfzQkicKPdxn7emrOzEc4hHXNMtH+CMzLkVifxmLwnoJMdDfpPbUDpSegbUtc9pDfczG4S2a14sE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nGJycxgL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id AEDA4C433F1;
+	Mon, 18 Mar 2024 12:30:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710765029;
+	bh=Pf3JZGSV0vq0+Ep32XwBVnIFfn/v8WNnsG3rb8t8ghQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=nGJycxgLs+3XFpLWAHW0vsUe3BzzPE5xJRp/m8qxdtLJo8qln3kUI6WU7PK+Ubfc9
+	 UlefgKwutWEfXIyGaGscl1BC7/xIk7fdHv+KamIY3d8ETQWJadkRN45hCdsRnQwaex
+	 mxH83Du4dl8hcu9Y0GGNBJxEbpymxSSZe/86/cEkV024L+ubVMlZile6HVZYu4YRnZ
+	 TZ/KrUBiHwukN63HlT8GACqLib8vtqFNQTkD6wgDvkE1oz7AGrAClgFQOvLJSOwr9A
+	 Tbcb2c7IHU/Ci4eTfR6NaURF0GsAllXGBZnwzqUQoR+54c7NDympnR6mpPJUm1Z9ye
+	 pg+dscuOIwzFw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A00E7D95053;
+	Mon, 18 Mar 2024 12:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1710762818.1520293-1-xuanzhuo@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: dsa: mt7530: prevent possible incorrect XTAL
+ frequency selection
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171076502965.32045.18266951934755323293.git-patchwork-notify@kernel.org>
+Date: Mon, 18 Mar 2024 12:30:29 +0000
+References: <20240314-for-netnext-mt7530-better-fix-xtal-frequency-v2-1-fe30795593df@arinc9.com>
+In-Reply-To: <20240314-for-netnext-mt7530-better-fix-xtal-frequency-v2-1-fe30795593df@arinc9.com>
+To: =?utf-8?b?QXLEsW7DpyDDnE5BTCB2aWEgQjQgUmVsYXkgPGRldm51bGwrYXJpbmMudW5hbC5h?=@codeaurora.org,
+	=?utf-8?b?cmluYzkuY29tQGtlcm5lbC5vcmc+?=@codeaurora.org
+Cc: daniel@makrotopia.org, dqfext@gmail.com, sean.wang@mediatek.com,
+ andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
+ p.zabel@pengutronix.de, Landen.Chao@mediatek.com,
+ bartel.eerdekens@constell8.be, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org, justin.swartz@risingedge.co.za,
+ arinc.unal@arinc9.com
 
-Mon, Mar 18, 2024 at 12:53:38PM CET, xuanzhuo@linux.alibaba.com wrote:
->On Mon, 18 Mar 2024 12:52:18 +0100, Jiri Pirko <jiri@resnulli.us> wrote:
->> Mon, Mar 18, 2024 at 12:05:53PM CET, xuanzhuo@linux.alibaba.com wrote:
->> >As the spec:
->> >
->> >https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
->> >
->> >The virtio net supports to get device stats.
->> >
->> >Please review.
->>
->> net-next is closed. Please resubmit next week.
->
->
->For review.
+Hello:
 
-RFC, or wait.
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
->
->Thanks.
+On Thu, 14 Mar 2024 12:28:35 +0300 you wrote:
+> From: Arınç ÜNAL <arinc.unal@arinc9.com>
+> 
+> On MT7530, the HT_XTAL_FSEL field of the HWTRAP register stores a 2-bit
+> value that represents the frequency of the crystal oscillator connected to
+> the switch IC. The field is populated by the state of the ESW_P4_LED_0 and
+> ESW_P4_LED_0 pins, which is done right after reset is deasserted.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] net: dsa: mt7530: prevent possible incorrect XTAL frequency selection
+    https://git.kernel.org/netdev/net/c/f490c492e946
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
