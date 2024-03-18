@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-80399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40A7687E9D5
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 14:08:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABC9987E9E6
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 14:12:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB5AD1F214F4
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 13:08:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8B2F1C20A18
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 13:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D9E383B0;
-	Mon, 18 Mar 2024 13:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D2FA383B0;
+	Mon, 18 Mar 2024 13:11:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HlykcDMR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mI+0rc2H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8CC41DA23;
-	Mon, 18 Mar 2024 13:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBF213BBC1;
+	Mon, 18 Mar 2024 13:11:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710767305; cv=none; b=d4nh1ShB0JeDU5EDRb9RCdtVYrPV81E3O9a1x0yyST1xSOL4sk20cJh3Wbfv1ppujspJoz/WFlAzNS6LcHBM0jw85Vgu1iFUr1LvFzP0oLYeJWfDd3+8drrQn2r+wcEuYHTEW2YgOsqrIISxwbZRmsplBBNcqU0YknTqf9gCT0g=
+	t=1710767517; cv=none; b=Bdroqxj3RCUubQotzq5dWFzuRDOXSCbJB7QNJsw5xAFx2CLB0iGk9nI7iO9SoKFsUJVLie/IjeJfzUnPdxHeM5xx52HIp6iZS4Ml0Shr8R1vm/DDdN96JewfZzLtY/pIBt03Y26k0kfOvdZABnmRLIdzFG+nVHuafdR6VDYVUrk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710767305; c=relaxed/simple;
-	bh=9y8WJjFyw32pW/zJbqRdgBfGpHDDLgekVbv5GaetnbY=;
+	s=arc-20240116; t=1710767517; c=relaxed/simple;
+	bh=tyFMDuuCeBtOYLIiMFvOO0NFCs9r8yz/TGZiHuyr4CE=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=b+np8t2Mj+ZxBQVmzxkZLF5CMY3IjsA0tokAKvV3ezafh4qZ9CHqYJwZ3SMXnwg1nw7SWkwI/nCC/eRFek+O3xEfNhKKYJQ090VeSh4QbhpSxVgEWE1ZGYHzLJNghKyZW9A8i3QjtyM68vOWlGaicJ0NeSALI9HW45pJyp22MRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HlykcDMR; arc=none smtp.client-ip=209.85.167.171
+	 In-Reply-To:Content-Type; b=BdfPpcNpC+AAenwfhcG5iO+7VYA6jNuExZ30TuD5MUdgOg6NOgw1NPsunrzJQPw4jYDg6xrUzBoTexTnPkFdkgkuBGj0NAfgAry7gwEFZFERqhmlz3X2QbZ2AIF7WQRZByeywSGKE4Ajdn0pSu44+nStcMjMaBRCZdKC8r+jjrE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mI+0rc2H; arc=none smtp.client-ip=209.85.219.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3c1a2f7e302so2445909b6e.0;
-        Mon, 18 Mar 2024 06:08:23 -0700 (PDT)
+Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6962950c6bfso1919676d6.2;
+        Mon, 18 Mar 2024 06:11:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710767303; x=1711372103; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1710767515; x=1711372315; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=0b3lVbJ/u4Iyr/bGVB60L+I6TRPbyfigHd10qyDtAt8=;
-        b=HlykcDMRwV8Y3mbA9rjIDRX0GEs3DCbCc54OLQ3sD2B+AYRBn/FBTeRYXntab2Toyq
-         9uxtn53mvPyuvpZxwkZEBWTHgPqRRxjDKWUGT3Odn1W5dDr5Anfd7NERRwng3xGKUIM0
-         OLRsVSLzpso8PLJ/0zW5idIa7XxaX+fKM6sm27UHXwFz1LFuwYFbgBlwFkW39+TKnfmm
-         xCXjd92QJvoL8TzNCgyuNgq0RMx1WxNB4+7I6cfvXPusnWobo2QC9km963uyWk9F/IX8
-         Zyo57EM9D4T6l5QF0D8MC+LSb4AWcnQrKgV/87berIwGkoBaDnFhGuHQSdOxXGFFeAib
-         GA1A==
+        bh=iR1PVTYigSsX/lfBBb8BrTI0Bk6Qcqxklf6J6zVF8SI=;
+        b=mI+0rc2HsPpIX+78dHtdtFKWhdBUOa1I+yu7O7RBrtXeFhETPeZpNlWO53q/V/mJek
+         UEf7Zg2u+IxwX736X34kXB3sxaFbpNVDequw5s+r+8YTkSP1Z5PxB8ltidRJVgYafRQq
+         +uIrmVaTOkQywwsnHN8U2R3ouh1XMGt9oqiQqLhxVVNG3lcTDUHFZPlqee7vw9tYFL1H
+         ZZFIIq+GZXF60akA+h3RSNBnPMuhWxjwfTtlF45AOOVRKe6ZJe8+vk3tDRCswahHKzCm
+         zwk3kzO5ulCgkf2ybJY1YRAX2QQfjD5Bim+2YRukNAWya144Fq3PwaxungUgFUjjVoXy
+         hEAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710767303; x=1711372103;
+        d=1e100.net; s=20230601; t=1710767515; x=1711372315;
         h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
          :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=0b3lVbJ/u4Iyr/bGVB60L+I6TRPbyfigHd10qyDtAt8=;
-        b=LFZN9qTe0Jif2481Gjwytcw8fXFGMuP31h/+Z6jqdXwaJDeFYyUBVir1hfA9dFAHVn
-         mAurXMa8dBTPjSipMk9T49OXxTHERKi4HnxDdf/56ZHL9YgGYUmcb/udHS0NRNIvmrAa
-         1HeR+utGR47ioc3UAD/y1g3/BC9p/Vj55NsGXRJe9TcGpYQ1cE/3LcbjhqD6Ft0JcJBJ
-         mH+umE5ZaZcf75Az8Az0o96E1tfeMNS8zulnNBUXrnZeFmAfxwgXwK5sJiF1U50Np+YZ
-         Zs5TVQkCwjNECCoBzEy3Gne+P/RTybK6yB6827fwIxFJt52FKmpkQfDtcjC7r9fgcWfw
-         6I2A==
-X-Forwarded-Encrypted: i=1; AJvYcCWust3m/oJ1x+4DDLrDX52gFxnAbYKQGw9CU9TWrC1dW0bUQnYDWADaUlCGYlFElQH7dQGDpKWnNfewaksCtMZTfQ+pgOdhWh8HAxZd4Q8QSgJUTQeBAU/s+deqIv1qP8wVceKp
-X-Gm-Message-State: AOJu0Yw+LlrpqVTG+mSJO3mlbnfa1bacecP3Sd3SRF/ZIr8nmAnLYtiL
-	kHXzv4L6x+HDbab749DwgMhfWNQh2Ziv7ZYJPfR7fttxdHv+yMm4
-X-Google-Smtp-Source: AGHT+IFe50KHFHexAqMvJ0KnSzN5auUkz3ombF0fqCQ23161eDZZjvx9TuaLT4tbp6XDv3V6+OkWNg==
-X-Received: by 2002:a05:6808:2289:b0:3c3:82a1:e6e with SMTP id bo9-20020a056808228900b003c382a10e6emr7831238oib.53.1710767302926;
-        Mon, 18 Mar 2024 06:08:22 -0700 (PDT)
+        bh=iR1PVTYigSsX/lfBBb8BrTI0Bk6Qcqxklf6J6zVF8SI=;
+        b=w43fNc1MMJDz3lmpygymm8/6reBtBYeBzTRO9ITRTnNoW1jKgUkVX9h+dEqVh53Hua
+         dwWHj0XY7/kOy+K1Rw0lkjmIvGbKo7JzQJ+q9E75EnJC8eHJbBpdHy/U9E+gBdl00eJv
+         J6QIzFNubJudqRfTxW9MoAIp6fJP6Szx1qBFYPVgXp10+NxeBUoyuMhlsxBjYBZb8+/r
+         xnt7nla6Ys0wmnSxW4NgmmuchH2PwunLod/1X0CUk+LkHBt0sKYCGnABnHzHbTiWHaKI
+         TIwXmsP2+TcdrHb3snibYND91E/RqE6rISLD/RdBWzdxQUMIJD5OfJgNEDez0Rq2D4Mv
+         1H5Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVU6MCVti7v9y4n2Ilznf+nrOO4r5LpE0sBf4ftqXbR6F5yaGVVkIGZP7o24cKKqkUn5USKzRW2B0jnYleZKCiTM3i7blPxoupQkV8SXGqZ4w5cb55Q4hrIp4Ds6VPIN0SuI7YI
+X-Gm-Message-State: AOJu0YxgaPK90rJERAzvHVy83PbHHLDuyS45b41BknYtldGGnz/3wzrx
+	atwq+yHwmNe8y6z1zWtuuECCw5GETylnDpbeNTr0KUmtLSpUYTtg
+X-Google-Smtp-Source: AGHT+IEyZvLimIql/3umoWPezmAL/scvy5OqI+bhWQ0vzUndpy1LV31gNE1h9DgMDwYY3wJZJqyCsA==
+X-Received: by 2002:ad4:550d:0:b0:691:5c3:bdcb with SMTP id pz13-20020ad4550d000000b0069105c3bdcbmr11468009qvb.32.1710767514642;
+        Mon, 18 Mar 2024 06:11:54 -0700 (PDT)
 Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id l16-20020ac84a90000000b0042ee243ca95sm4953118qtq.50.2024.03.18.06.08.19
+        by smtp.gmail.com with ESMTPSA id 4-20020a0562140dc400b006940b9ec66fsm2381423qvt.82.2024.03.18.06.11.51
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Mar 2024 06:08:22 -0700 (PDT)
-Message-ID: <50d8a099-1274-40a7-937e-b2618bfe65be@gmail.com>
-Date: Mon, 18 Mar 2024 06:08:18 -0700
+        Mon, 18 Mar 2024 06:11:54 -0700 (PDT)
+Message-ID: <85bc49e5-a086-4484-86d2-bc2c3829de87@gmail.com>
+Date: Mon, 18 Mar 2024 06:11:51 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,8 +76,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 3/3] net: phy: mediatek-ge: do not disable EEE
- advertisement
+Subject: Re: [PATCH 1/3] net: dsa: mt7530: fix enabling EEE on MT7531 switch
+ on all boards
 Content-Language: en-US
 To: arinc.unal@arinc9.com, Daniel Golle <daniel@makrotopia.org>,
  DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
@@ -95,7 +95,7 @@ Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>,
  linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  linux-mediatek@lists.infradead.org
 References: <20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v1-0-3f17226344e8@arinc9.com>
- <65f7f17d.050a0220.c6db1.02bdSMTPIN_ADDED_BROKEN@mx.google.com>
+ <65f7f17d.050a0220.7383e.5eeeSMTPIN_ADDED_BROKEN@mx.google.com>
 From: Florian Fainelli <f.fainelli@gmail.com>
 Autocrypt: addr=f.fainelli@gmail.com; keydata=
  xsDiBEjPuBIRBACW9MxSJU9fvEOCTnRNqG/13rAGsj+vJqontvoDSNxRgmafP8d3nesnqPyR
@@ -130,7 +130,7 @@ Autocrypt: addr=f.fainelli@gmail.com; keydata=
  y5arMQorqTFWlEOgRA8OP47L9knl9i4xuR0euV6DChDrguup2aJVU8JPBBgRAgAPAhsMBQJU
  X9LxBQkeXB3fAAoJEGFXmRW1Y3YOj4UAn3nrFLPZekMeqX5aD/aq/dsbXSfyAKC45Go0YyxV
  HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <65f7f17d.050a0220.c6db1.02bdSMTPIN_ADDED_BROKEN@mx.google.com>
+In-Reply-To: <65f7f17d.050a0220.7383e.5eeeSMTPIN_ADDED_BROKEN@mx.google.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
@@ -139,19 +139,31 @@ Content-Transfer-Encoding: 8bit
 On 3/18/2024 12:46 AM, Arınç ÜNAL via B4 Relay wrote:
 > From: Arınç ÜNAL <arinc.unal@arinc9.com>
 > 
-> There's no need to disable Energy-Efficient Ethernet (EEE) advertisement on
-> the MT7530 and MT7531 switch PHYs. EEE works fine on MT7530 and MT7531
-> switch PHYs. Remove the code where EEE advertisement is disabled.
+> The commit 40b5d2f15c09 ("net: dsa: mt7530: Add support for EEE features")
+> brought EEE support but did not enable EEE on MT7531 switch MACs. EEE is
+> enabled on MT7531 switch MACs either by pulling the LAN2LED0 pin low on the
+> board (bootstrapping), or unsetting the EEE_DIS bit on the trap register.
 > 
-> This is a bugfix because there's a possible race condition where the
-> mediatek-ge driver would kick in after the MT7530 DSA subdriver which would
-> have EEE disabled until manually enabled.
+> There are existing boards that were not designed to pull the pin low.
+> Therefore, unset the EEE_DIS bit on the trap register.
 > 
-> Fixes: e40d2cca0189 ("net: phy: add MediaTek Gigabit Ethernet PHY driver")
+> Unlike MT7530, the modifiable trap register won't be populated identical to
+> the trap status register after reset. Therefore, read from the trap status
+> register, modify the bits, then write to the modifiable trap register.
+> 
+> The disable EEE bit on the trap pertains to the LAN2LED0 pin which is
+> usually used to control an LED. Once the bit is unset, the pin will be low.
+> That will make the active low LED turn on.
+> 
+> The pin is controlled by the switch PHY. It seems that the PHY controls the
+> pin in the way that it inverts the pin state. That means depending on the
+> wiring of the LED connected to LAN2LED0 on the board, the LED may be on
+> without an active link.
+> 
+> Fixes: 40b5d2f15c09 ("net: dsa: mt7530: Add support for EEE features")
 > Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
 
-Could we get Sean to chime in, maybe there was a valid reason to disable 
-EEE advertisement in the first place?
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
 Florian
 
