@@ -1,125 +1,109 @@
-Return-Path: <netdev+bounces-80326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 694BE87E5BA
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 10:27:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47A4787E5BE
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 10:27:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98A111C217B4
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:27:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 025C4281D40
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:27:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B727B2C68B;
-	Mon, 18 Mar 2024 09:26:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59E32C19C;
+	Mon, 18 Mar 2024 09:26:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tyKpNz69"
+	dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b="qEoeURrd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
+Received: from taslin.fdn.fr (taslin.fdn.fr [80.67.169.77])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0932C1A0
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 09:26:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767C92C848
+	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 09:26:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.67.169.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710753968; cv=none; b=UTK2bvdvL+uYHmzq6wbTFQH4Jk1Rm8IoDcxn8ow833Ha7y7Gdz1ZbVW/st0NLiQEK50H6JY2onqS9cTlM+l/LMjefHj0VjrcC/6jjBbdG/rtfN6LsqfPYEMxR3h/0ApB+xLVJ9tDFDXO3TasGmdpg8kjneuWiiKPlc/aN7A4XC0=
+	t=1710754001; cv=none; b=OLdXTaCIRolllswl33jygZ9HomAjt/WP0R3rz5iBJRu+O5Q22Hc0GaghvJH2ROZ1KyQDbvFd1hs0F4QkaTg+l8b2N3S4H/1EghYyXQq+JH+Ghjv9YLkYrFks0HeSJ5qh4jEzJLPtpuC9L4CV9T6ADNXl3hfK5VBSnJu4km0RfRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710753968; c=relaxed/simple;
-	bh=8y4vSdVUZCk+aPZhva5pLco3uG5l2lCYnp2HRRGYbkg=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=SPjZdz/Wj924JZIPnEJusMAFFCktB29QJA5hxMiO6wLDA4jlVACxSvBTpS87vilZHpSosnKOMTWjjI2fAnO9m+eAYBPR2bcGF4YI7HacBXcTje9O7EnNO1R3gzP3rVztNMy3dNTIDmJfCQi821aQXWkboovAU3FBHy3/sK5PuTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tyKpNz69; arc=none smtp.client-ip=209.85.221.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-4d43c633fecso876534e0c.3
-        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 02:26:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1710753965; x=1711358765; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=dr558Gtc+rRfkIYnJ72l9uUtS+S0kUdV5Cm0VXr/mqc=;
-        b=tyKpNz69GkAF/dxzi9qfLSPyLCVErblaF4Nkwhl3t+ipwJzq8rtnLlv1GqG4PJ/lpJ
-         JzcXZmvwtynAJeth3rowcHafUj+P4xEGKufFbSRqtuQ5P3Wo7Pl4sv1IhaIYW6yUtdCm
-         jqbfRkY2CJUhav0KD0h4juyF0YhmITziNU3P1abs+dbZaE5VlNkOA7mQVSObs1RD7ooh
-         V9Bd/dr/UgyQej7koeQXPdZB0uiU1TTDXgD0ewCNTfQuu4tAbu/VRkoJ6b6wA5a4XPOd
-         Ntrc+j9SAtGSCL/7TwA+q/Wjr+dzIi9oZIm+loICzM3OpNpO1cHsXWrML36lN9HaFcPr
-         49hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710753965; x=1711358765;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=dr558Gtc+rRfkIYnJ72l9uUtS+S0kUdV5Cm0VXr/mqc=;
-        b=EbOddHBx0rH36tOarfPfknWa/OmYKuumixEKiLpDGAWsLrsExmhMDw86uy/nF6kAfl
-         tfHChe1SJw6higrcUI3jAHDUMlMwO0aETHY3CTU0k/iokxmC/bPbeczPwXjcA7yzX9GQ
-         RzCUlSKRQ6Nd0lVBh8iWAa4+qXRKUIFluhuiLZ+1l3onruZY7cki6LoTcpDYSgP8hAEI
-         oZ3pPKG8PFfQnl/PBzLznS711bFk4aKZ/8DhSqJWyU94nyZ8rIklnZOqivfXfsbANgYn
-         LkqVyJvq2MWffXdk0J0QltZU0wo4Yt4xPe2pJqJdNP6tQBdPckbE/Gk7QA/3Nobeg9s6
-         W7gA==
-X-Gm-Message-State: AOJu0YxOgbfktipT+4LDyzG+rhBYI2G9X4zmSApNF53is2IUrgGNPrms
-	i9R/Bq3MD4Bd2WMCVKHEPMSt0tU8m6cPhaq8Vn4cIt22X4PxyuHbiFNt5LwkKpjI4Aty1sNNvXm
-	P4sfBOviZi85Q6HAAb4j/zQvnPf2fBYhtKAAcrgTDMU7Uy4ZhP1o=
-X-Google-Smtp-Source: AGHT+IFDDQIlK3lVhoDg3KpbK/eh3Hhxm8PIDTagoTjsDxY8wbny4dXn7KvLQWqbF5dW8Rr0jLCdFvvcFrJRC5YENVg=
-X-Received: by 2002:a1f:724c:0:b0:4ca:615e:1b61 with SMTP id
- n73-20020a1f724c000000b004ca615e1b61mr7860598vkc.10.1710753965337; Mon, 18
- Mar 2024 02:26:05 -0700 (PDT)
+	s=arc-20240116; t=1710754001; c=relaxed/simple;
+	bh=Z4a1RpMfDza/YkJd2F9IESbcl9JEVKFO0de2R1TjqAQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gHYH2PCBhJxVHRMg+b1OzoNj0QdlFQWTtijlzVYJEdXfBh6FkBsRg15IxhEkgXkr8Ao9U02dkcsLmHDHpoXK15rctn08GpNIfSHGarFB03U5/4VF7dzNsGMZZZWnx1mbkcIEaPaWhK3g6mnMR4IdrUVoA/ad4yto7XylnweC8zc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name; spf=pass smtp.mailfrom=max.gautier.name; dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b=qEoeURrd; arc=none smtp.client-ip=80.67.169.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=max.gautier.name
+Received: from localhost (unknown [IPv6:2001:910:10ee:0:fc9:9524:11d1:7aa4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by taslin.fdn.fr (Postfix) with ESMTPSA id 84404602BD;
+	Mon, 18 Mar 2024 10:26:37 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=max.gautier.name;
+	s=fdn; t=1710753997;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0wYnnBG7TuTQKoZxNuOfj1wYN5EUYoP7RjJIjY9Mohs=;
+	b=qEoeURrdGSVO65TYEQGcJ6UpTCUjMHO19Jbo3VsiwVjU/LCKOzJyWB2sJvYN+aQdY7pNt0
+	lGNEVh10kyJEvyc+zTT+AkqdJUAWGxRa30LD6rYKB6IdHPgnm8bOSUAehnfA2JUcmejcUF
+	3EXpGPS3kPB+80aAgwNxgCYZDM2VT72JOOtnzIPsLAIn1NeB57A7DAm+kSTgkCfHdyIeR7
+	ValfNQlhBPUqo5Zb+gJMayo0PeuI0EJeXHCUcjH9vmMGIavgIKHhXbMkfupAg8rUrEg9Xi
+	85Akno6Plg/loTiGKIRdiXK/FFYfsv89hsKotlHw6BXJxE/gDydSSz4m+agb5w==
+Date: Mon, 18 Mar 2024 10:26:48 +0100
+From: Max Gautier <mg@max.gautier.name>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [EXTERNAL] Re: [PATCH iproute2-next v2] arpd: create
+ /var/lib/arpd on first use
+Message-ID: <ZfgI2Aow6751-EGj@framework>
+References: <20240316091026.11164-1-mg@max.gautier.name>
+ <20240317090134.4219-1-mg@max.gautier.name>
+ <20240318025613.GA1312561@maili.marvell.com>
+ <Zff9ReznTN4h-Jrh@framework>
+ <MWHPR1801MB1918B6880C90E045C219B9ADD32D2@MWHPR1801MB1918.namprd18.prod.outlook.com>
+ <ZfgCZNjlYrj5-rJz@framework>
+ <MWHPR1801MB191828A6FF7D83103C75ED6AD32D2@MWHPR1801MB1918.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Mon, 18 Mar 2024 14:55:54 +0530
-Message-ID: <CA+G9fYs=OTKAZS6g1P1Ewadfr0qoe6LgOVSohqkXmFXotEODdg@mail.gmail.com>
-Subject: net/sunrpc/sched.c: error: result of comparison against a string
- literal is unspecified (use an explicit string comparison function instead)
-To: Netdev <netdev@vger.kernel.org>, clang-built-linux <llvm@lists.linux.dev>, 
-	open list <linux-kernel@vger.kernel.org>, lkft-triage@lists.linaro.org
-Cc: "David S. Miller" <davem@davemloft.net>, Nathan Chancellor <nathan@kernel.org>, 
-	Trond Myklebust <trond.myklebust@hammerspace.com>, Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <MWHPR1801MB191828A6FF7D83103C75ED6AD32D2@MWHPR1801MB1918.namprd18.prod.outlook.com>
 
-The following build warnings / errors noticed on x86 kselftests build with
-clang nightly  / clang-17 on Linux  next tag next-20240318.
+On Mon, Mar 18, 2024 at 09:18:59AM +0000, Ratheesh Kannoth wrote:
+> > > > > > +	if (strcmp(default_dbname, dbname) == 0
+> > > > > > +			&& mkdir(ARPDDIR, 0755) != 0
+> > > > > > +			&& errno != EEXIST
+> > > > > why do you need errno != EEXIST case ? mkdir() will return error
+> > > > > in this case
+> > > > as well.
+> > > >
+> > > > EEXIST is not an error in this case: if the default location already
+> > > > exist, all is good. mkdir would still return -1 in this case, so we
+> > > > need to exclude it manually.
+> > >
+> > > ACK. IMO, it would make a more readable code if you consider splitting the
+> > "if" loop.
+> > 
+> > Something like this ? I tend to pack conditions unless branching is necessary,
+> > but no problem if this form is preferred.
+> > 
+> > if (strcmp(default_dbname, dbname) == 0) {
+> >     if (mkdir(ARPDDIR, 0755) != 0 && errno != EEXIST) {
+> >    ...
+> >    }
+> > }
+> ACK.   
+> instead of errno != EXIST ,  you may consider stat() before mkdir() call. Just my way thinking(please ignore it, if you don't like). 
+> My thinking is --> you need to execute mkdir () only first time, second time onwards, stat() call will return 0.
 
-This build config is generated from kselftest merge configs [1].
+That's racy: we can stat and have a non existing folder, then have
+another arpd instance (or anything else, really) create the directory,
+and we would hit EEXIST anyway when we call mkdir.
+Also, that needs two syscalls instead of one.
 
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-
-Build log:
------------
-In file included from net/sunrpc/sched.c:31:
-In file included from include/trace/events/sunrpc.h:2524:
-In file included from include/trace/define_trace.h:102:
-In file included from include/trace/trace_events.h:419:
-include/trace/events/sunrpc.h:707:4: error: result of comparison
-against a string literal is unspecified (use an explicit string
-comparison function instead) [-Werror,-Wstring-compare]
-  667 |                         __assign_str(progname,
-      |                         ~~~~~~~~~~~~~~~~~~~~~~
-  668 |                                      task->tk_client->cl_program->name);
-      |                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  669 |                         __entry->version = task->tk_client->cl_vers;
-      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-  670 |                         __assign_str(procedure,
-task->tk_msg.rpc_proc->p_name);
-      |
-
-[1] steps to reproduce:
------------
-tuxmake --runtime podman --target-arch x86_64 --toolchain
-clang-nightly --kconfig
-https://storage.tuxsuite.com/public/linaro/lkft/builds/2dqIWv3Qq5qYmJfnmKfkSg9fvN0/config
-LLVM=1 LLVM_IAS=1 debugkernel cpupower headers kernel kselftest
-modules
-
-
-Links:
- - https://storage.tuxsuite.com/public/linaro/lkft/builds/2dqIWv3Qq5qYmJfnmKfkSg9fvN0/
- - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20240318/testrun/23069554/suite/build/test/clang-nightly-lkftconfig-kselftest/log
- - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20240318/testrun/23069554/suite/build/test/clang-nightly-lkftconfig-kselftest/details/
-
-
---
-Linaro LKFT
-https://lkft.linaro.org
+-- 
+Max Gautier
 
