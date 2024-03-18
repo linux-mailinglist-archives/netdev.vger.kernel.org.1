@@ -1,93 +1,84 @@
-Return-Path: <netdev+bounces-80471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67B0E87EF50
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 18:58:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3718487EF69
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 19:02:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9B06281DA0
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 17:58:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAB3E1F21F6F
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 18:02:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1906055C2B;
-	Mon, 18 Mar 2024 17:58:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C76FB55C3C;
+	Mon, 18 Mar 2024 18:01:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lynne.ee header.i=@lynne.ee header.b="JUBwSPJs"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="wd5cAvKj"
 X-Original-To: netdev@vger.kernel.org
-Received: from w4.tutanota.de (w4.tutanota.de [81.3.6.165])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E019F55C07
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 17:58:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.3.6.165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890A35579C;
+	Mon, 18 Mar 2024 18:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710784698; cv=none; b=Z9epKYFxdWAcj85cN803RQKvXXUSBhq35hQpz8hmUwCOcywPhvAZtFiTq0qElYuv9JIfA7vp6ACAoI9Goa/tDHUKGv70egbUv79FPNfvjUl2/YHr7SfuPTDsH92JNIjH43F52kTV/DYcp+oaz8UwTIj0YbW07VQEOYeXzcVE/hI=
+	t=1710784919; cv=none; b=ujVyYaQ9AUfty8NITqwFZmyplOOH4bkKiGbDVfWZebs6SG702JktYvN5OwhkUjYNqhKyVuyIukIH53qaoNk/veFGZTAfxfrIpNFoP6KhY9GBrfEHV7h+7zmS/16YFuDiWRqovjeNkhX+H0KSo9svS3OpIf+5ZMCr/D9UXOzTsvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710784698; c=relaxed/simple;
-	bh=BozJnYrBkjqHICJFMZVYfh7cFw/AHonryra8lQWiM3s=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=QOtFIwF3J7uHuQrpXzNF6fG348EA7bBe5PX0KFmwGGfo2svMYdwOUhEZi/viLJCJCXBB+wxudmKtw7FIDbMHxLXKeJG33Fe269h/HqdedJ2CPiN4JgRWIIb4q/dWmD+ZF9pQnyEM++32pjwtxOyeZrG9mULbiwBcb0e6BqV91Ao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lynne.ee; spf=pass smtp.mailfrom=lynne.ee; dkim=pass (2048-bit key) header.d=lynne.ee header.i=@lynne.ee header.b=JUBwSPJs; arc=none smtp.client-ip=81.3.6.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lynne.ee
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lynne.ee
-Received: from tutadb.w10.tutanota.de (unknown [192.168.1.10])
-	by w4.tutanota.de (Postfix) with ESMTP id C867710602E7;
-	Mon, 18 Mar 2024 17:58:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1710784690;
-	s=s1; d=lynne.ee;
-	h=From:From:To:To:Subject:Subject:Content-Description:Content-ID:Content-Type:Content-Type:Content-Transfer-Encoding:Content-Transfer-Encoding:Cc:Cc:Date:Date:In-Reply-To:In-Reply-To:MIME-Version:MIME-Version:Message-ID:Message-ID:Reply-To:References:References:Sender;
-	bh=BozJnYrBkjqHICJFMZVYfh7cFw/AHonryra8lQWiM3s=;
-	b=JUBwSPJsxT86n0OhW4NjRg3SrrDA/hu0vgZrx4TlREJukHlF9FhGICgfirvOIP8b
-	DZFNBGaR91y2qedmCLDjWw4QBhUmJsclwKlHnXLUyJAQ3hYOkFjDYQ4OrhkUSw2HE31
-	vyKKj2lDLXkND97bRXkxN1g2wNn48twHjY0p9dApzg6aJ/mYXjNz1dPNcIcdh0CuG0I
-	vFYRM6Bhpk6P2N8JxRsEVzsnjh7EJdLA7lm/tXgkGTrFRR7KFUQ52q8okEEDy1k9d1L
-	oc+3UrwFiuFGMqmHMOrNLWV3/2SM4EzrxTtw+PKWF8jpyAZDRMoHuMJtzBy5Nucuf6B
-	WmHvOMymhQ==
-Date: Mon, 18 Mar 2024 18:58:10 +0100 (CET)
-From: Lynne <dev@lynne.ee>
-To: Florian Westphal <fw@strlen.de>
-Cc: Netdev <netdev@vger.kernel.org>, Kuniyu <kuniyu@amazon.com>,
-	Willemdebruijn Kernel <willemdebruijn.kernel@gmail.com>
-Message-ID: <NtHhf_6--3-9@lynne.ee>
-In-Reply-To: <ZfhLUb_b_szay3GG@strlen.de>
-References: <Nt8pHPQ--B-9@lynne.ee> <ZfhLUb_b_szay3GG@strlen.de>
-Subject: Re: Regarding UDP-Lite deprecation and removal
+	s=arc-20240116; t=1710784919; c=relaxed/simple;
+	bh=AsJtNv/pnLcwK3yuhNmyxuo7mviUdItkUTqHK8N+CpQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IebbgLZEG8kwlPimusIdCtpyNP/tChx7tQMYpyEA3R/HhFb/+wwbTCYOT8MIOnUGeCAOqQR2kKJCvHtWYdpYu3B7tr/qt0Li/F7t/AGu2i1+pGHMWr22zL6b4Rt3P0gj0FZE9gMnov4OJJTOWq0snIvxUFjJHOpr95yFpRwz9cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=wd5cAvKj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2300C433C7;
+	Mon, 18 Mar 2024 18:01:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1710784919;
+	bh=AsJtNv/pnLcwK3yuhNmyxuo7mviUdItkUTqHK8N+CpQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=wd5cAvKjs7+lgaCUrGw2bcXhS7NFH+TKpo4w2yEqrMXiJCg2xRhMXdZHeZBiuUaoP
+	 ZKgj3eAgJWlHNSHBp/Jv0CUkUQL8QpA2oBMzeJ8B7hvq/eUqV5iHrvzt8mZy2a9MDh
+	 RDvQTm01LvqUPb7PSe/Se5zM1KYYN5M1piVKDeLY=
+Date: Mon, 18 Mar 2024 14:01:58 -0400
+From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, 
+	Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, =?utf-8?B?UmVuw6k=?= van Dorst <opensource@vdorst.com>, 
+	Russell King <linux@armlinux.org.uk>, SkyLake Huang <SkyLake.Huang@mediatek.com>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Bartel Eerdekens <bartel.eerdekens@constell8.be>, 
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH 0/3] Fix EEE support for MT7531 and MT7988 SoC switch
+Message-ID: <20240318-quizzical-raven-of-plenty-ef21f5@lemur>
+References: <65f7f17d.050a0220.3c75a.cde3SMTPIN_ADDED_BROKEN@mx.google.com>
+ <5514243b-c795-436e-8628-8f421c900bcb@gmail.com>
+ <ea889226-3649-4f74-8c38-67c459e4ea4d@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ea889226-3649-4f74-8c38-67c459e4ea4d@arinc9.com>
 
-Mar 18, 2024, 14:18 by fw@strlen.de:
+On Mon, Mar 18, 2024 at 05:03:29PM +0300, Arınç ÜNAL wrote:
+> > We've received your patch series 4 times and this was the same thing with your previous b4 submission, can you find out what happened? Thanks.
+> 
+> It looks like my branch name was too long again. b4 0.13.0 cannot handle
+> branch names that are too long. I'll keep it shorter for future
+> submissions. It'd be great if Konstantin could provide a specific limit.
 
-> Lynne <dev@lynne.ee> wrote:
->
->> UDP-Lite was scheduled to be removed in 2025 in commit
->> be28c14ac8bbe1ff due to a lack of real-world users, and
->> a long-outstanding security bug being left undiscovered.
->>
->> I would like to open a discussion to perhaps either avoid this,
->> or delay it, conditionally.
->>
->
-> Is there any evidence UDP-Lite works in practice?
->
-> I am not aware of any HW that will peek into L3/L4 payload to figure out
-> that the 'udplite' payload should be passed up even though it has bad csum.
->
-> So, AFAIU L2 FCS/CRC essentially renders entire 'partial csum' premise moot,
-> stack will never receive udplite frames that are damaged.
->
-> Did things change?
->
+It's not really b4, it's the web endpoint and the version of python it's
+running. I hope to fix it soon by applying the same workarounds as we ended up
+doing for b4 itself.
 
-I do somehow get CRC errors past the Ethernet layer on consumer rtl cards,
-by default, with no ethtool changes, so maybe things did change.
-
-I haven't sacrificed a good cable yet to get a definitive proof.
-The cargo-culted way to be sure is to enable rx-all.
+-K
 
