@@ -1,202 +1,217 @@
-Return-Path: <netdev+bounces-80341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B8FC87E62F
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 10:46:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2A6487E686
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 10:57:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A29E1C20FF6
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:46:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F27C81C2182C
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:57:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 148F72C694;
-	Mon, 18 Mar 2024 09:46:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D86BA2D022;
+	Mon, 18 Mar 2024 09:57:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="TPoq/Cp4"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="YcZ/q+oP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7D62C690
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 09:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.156.173
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710755167; cv=fail; b=T87gp25wxzcRiclcQXit2IO/0eXL/eBsQTvWKdYpqyrKHjrW3QPWww5fF5eKOkhsV4ds5rRxd/KiIIjniMhYTz7salZtIvF/m9oFU8rNbpfC7a/+xeaHvVHfqGtiPzeyoq2dks9eYmkP7b983zuKHVWV0CgxYEfzJ4eaLfQEXbk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710755167; c=relaxed/simple;
-	bh=oAdBltMrN0cMnbfDvNeKDDLkvSfIGEaf9iKy99L6tvU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=iqrwMHWg7jRTDjj4O11LgkbTBjnkcePaMam0JadK0xMFPrjGhShvbXzq/uaTzp5jc7akggEPeM9LuHm7cNES4a5TtkoZGkyZwYaT3vACb8Cf9CbNahu3T/syjW4HX6H8iSfAo8Vdo183nzaksUVSxoxgB5Ya6bvDGnntbe5rjEo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=TPoq/Cp4; arc=fail smtp.client-ip=67.231.156.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42HLdm29010148;
-	Mon, 18 Mar 2024 02:45:52 -0700
-Received: from nam10-dm6-obe.outbound.protection.outlook.com (mail-dm6nam10lp2100.outbound.protection.outlook.com [104.47.58.100])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3wwaxgc87g-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 18 Mar 2024 02:45:34 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=BGNd+HVW37ead19vSy0CoxGVG29zDBC/VlXcNqh2CxtFI9xjq7ulHLkWa0j9BaXv9PxTPnZfDjM1TCs/fukaASs27E/al4SSyrhx2sxuU2Lf6rSy3PoBfmTTr3GoQBNoxSASZPWR/kJKUGXJieVWNYZtTZHBRx8xUCSFLnwmkyp7wI9dU7+9HHkz4PTh8g9wODhOB8RXBiKZoopeuM7F+ljzdqs2lVuF1VvsWOEh83scDb4B41d9Uq3cqdmbolhgw1qQcyo2mWukdKBaB+0QKHTo6Tzn456gAHNUMrE+vO/3cK7rzGSKEgE7SfEOhqcN84gFQpw7w7kCP0DmqRrTLQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wk0+Fxb2tl+Jr5wxq0LxQIIO4wqwFbBZ66JlbwfV1jE=;
- b=Ex1xulADtjiojF22iUEfcoeunwsAPpki+TlZpaD9ASZXbqiaIctnMkuX4wBKntXLg0h8/7ARFDuPqBSy/B8G333gb1GKo9QOL6ffGnA86M/mk+4qRLxc34X+3pfRYP6o+72lvEr47HLRT2xMMFAVbI7JD1unSr0hWK4IB7UsLtZTG0t9N3la/YMCX5+4Af1KUgE+TD1PsjsO7QOATXkuubexS7R1dWluOiFLymwWCZmAZUSgs+5eIvUJGJiTo0OoaT1jYu1R1xynV2bAusuBPZj5VRnHcgPaiRQ3MeuoFJvEvkG4xXh3pPQrZU2mBfy3Eox7TTyB+vhRFPqprte4Gw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
- dkim=pass header.d=marvell.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=wk0+Fxb2tl+Jr5wxq0LxQIIO4wqwFbBZ66JlbwfV1jE=;
- b=TPoq/Cp48YuMWQY5ICmvrPFqefKt5WMU/qpjipjgfX/4qri3O/1c/kY/9awXBb0or3YF90mGpRNWvnYKBLGcg0y1+vfrkfg2HoW9laswwF8wQs/VyGVBtGWn5PUWPEh55sU7S2bqR4lIJdbLwQavzbKJbMN9FyuiJu9XCNYkTkQ=
-Received: from MWHPR1801MB1918.namprd18.prod.outlook.com
- (2603:10b6:301:68::33) by DM8PR18MB4439.namprd18.prod.outlook.com
- (2603:10b6:8:34::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.27; Mon, 18 Mar
- 2024 09:43:52 +0000
-Received: from MWHPR1801MB1918.namprd18.prod.outlook.com
- ([fe80::cfab:d22:63d2:6c72]) by MWHPR1801MB1918.namprd18.prod.outlook.com
- ([fe80::cfab:d22:63d2:6c72%4]) with mapi id 15.20.7386.025; Mon, 18 Mar 2024
- 09:43:52 +0000
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: Max Gautier <mg@max.gautier.name>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: RE: [EXTERNAL] Re: [PATCH iproute2-next v2] arpd: create
- /var/lib/arpd on first use
-Thread-Topic: [EXTERNAL] Re: [PATCH iproute2-next v2] arpd: create
- /var/lib/arpd on first use
-Thread-Index: AQHaeQ+DEXH4amMOoUe+d+9xZxG5A7E9LjQggAAEyQCAAAEwIIAABoEAgAAEkKA=
-Date: Mon, 18 Mar 2024 09:43:52 +0000
-Message-ID: 
- <MWHPR1801MB19182C5B4649293D29098689D32D2@MWHPR1801MB1918.namprd18.prod.outlook.com>
-References: <20240316091026.11164-1-mg@max.gautier.name>
- <20240317090134.4219-1-mg@max.gautier.name>
- <20240318025613.GA1312561@maili.marvell.com> <Zff9ReznTN4h-Jrh@framework>
- <MWHPR1801MB1918B6880C90E045C219B9ADD32D2@MWHPR1801MB1918.namprd18.prod.outlook.com>
- <ZfgCZNjlYrj5-rJz@framework>
- <MWHPR1801MB191828A6FF7D83103C75ED6AD32D2@MWHPR1801MB1918.namprd18.prod.outlook.com>
- <ZfgI2Aow6751-EGj@framework>
-In-Reply-To: <ZfgI2Aow6751-EGj@framework>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MWHPR1801MB1918:EE_|DM8PR18MB4439:EE_
-x-ms-office365-filtering-correlation-id: d091b41b-1bec-41b3-1d41-08dc472febae
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: 
- QMBYUlrGNJwhA/wSysXgtue7iHHR6UIwYlBIHuaxTUOAQCMjO4taoPZl/d5W615izU+SiPJoHkc0ydWJCUNllIo5Bs+2CB8SenBn3ysruEpKWQFNZ7Vk7ytMlHY8xIo+nnwySdlgMRuIxdmNryFRbmTeMqLxFdeyAKMEbDB8mI3I1vDBCg/50Yw+RIQ4fbNDRfWvnfFbTCHPMhcCT64HtIRYPjqHfYXqIDR7rIqDagLoqVYJFs5cQEoAdYgvWYCdwVtZIQj2kXyKJBb8Mas74JeKpGXfh1hevjC/hjZPs6AIduLpwN7aPXJ46mfC0yf5xbMQkwmgzpYzHtUW/LBEFxuxu9GVw7UI0dGNyyeORsti2yaDcyvfRJHeuzFtZnIs3S02m+Fla+UGbg+EpBvvFa+OxHA/konGo+CuFZZkk0k+OFHX/NnaJJSqtLW9EAko/UFycsb0KEaAbIHg+ArevzM8vjryHYm0QA7XxpzPk/Fe/6MejlHVnMUoATd7pW7oxMQoLizob7C9d3z6sF6ZmVBht/aWnyE5u+0l7XGJCIveYTLc6I4Hsq9tchiYUWQM/y/AdpsxtcUNb7kkwBAbNe9tbaD3unqonq7m1TeVl+KNEZfJQ5c85HknuTxERGBnooCZpSl6NNbDColhrbSpLUlIkgTHBANRMLhJ/NvpI+PDx3jX/UAq5NZb6Clr9P1uZiV+yl5TDk44loDbXpM56NDVY1M3o15y6Edq+JU6noY=
-x-forefront-antispam-report: 
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MWHPR1801MB1918.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: 
- =?us-ascii?Q?got7gsGTSjgNoCOlir5TMQOYNEX+T9ASMAlfogr8RnkP8wc2fgT2ZpBs+3cO?=
- =?us-ascii?Q?97EGj7oBFk23YECCrzES081ZI6oDg2qiVNEkqWI6/+ntU6i8a0zSzREgp31+?=
- =?us-ascii?Q?CFAEBZPRgUbxbtPBh88dqwOkXxwXQXWhsWpAWckDJhrnVTw5eD63HTPECSko?=
- =?us-ascii?Q?AIIFadQto2felGV1QtQz6+aO/m1VmZpAlMcNU1+14NZpqVST0dRAOQuGXkI8?=
- =?us-ascii?Q?4LwLu5OewdPTESWSxXBc7j7SCKGJpGZimKE5Y7eJljf/swEdh4fpGh0vJBgE?=
- =?us-ascii?Q?OVuRhgUv6sqrokkdYfIQ37Dp/cPxaXvnoXhosnVq5PC/Gps3te/j4VAPnicn?=
- =?us-ascii?Q?6cAezyEAjkIvAi9cVTPZi7AdQAev6YMTOsvLAu8zwEPzDt42+yIlTs5sbPax?=
- =?us-ascii?Q?l51L3wPj6PNjPnwqi6l9v+QJYRDh8MGdHRVDrTEul9Ns8UnOYcVrBbiMHfhG?=
- =?us-ascii?Q?6VsuECNxqRorcpKEOOJ5skN1m0p1PZvlbxkv6l/NhsF5x8Ji4+V8p5+1rRvT?=
- =?us-ascii?Q?Qgkp4cU3wQ95T5hlG2Ci9KeOe/YPd4tuU1InYtswCByZQErtQUtWF9ZFPxew?=
- =?us-ascii?Q?bufICMUhQz5YsMGNFLF4tAz0EaKzg0PpbSfHL0oNnR/WZ5wR0Klsu2wB3Xfd?=
- =?us-ascii?Q?SonvM7nnAH8xIQEG9tlbi9M2IWwq9lMPVDXTzTDtDIM5IDTUyAKWKkl//KUZ?=
- =?us-ascii?Q?qQB+cpT7z6YHDVwtw06WF/fj+SfcaR6B+HbK6EqSGQUp1+HHuesKHz2F3rfj?=
- =?us-ascii?Q?WD3zNKDD7ImwloA72vcU8E5iT6kot3w+hO9tyn55wLC0l+hgV2D0llIGBwCH?=
- =?us-ascii?Q?ckHQ79Z2VQXyzHLF2HLKy7gYAsgSMbKTUZvcBUAiVbJHKlSXMSEzfykyXuWO?=
- =?us-ascii?Q?I+GZtnOglzTwrWiFyiVikWlmi7Ihihp5UOvfKim1WNIrkFF2vfLl6xLyhkES?=
- =?us-ascii?Q?xTOprTdagTuOHiQGUnerbAUW0WUNBP/7FrEcfa3clGKJurxSABvEBBBS9++5?=
- =?us-ascii?Q?WPUSMLqohceq2DHVS15kn4/Hiv/pl6cPhCSBsb2pX/BRtGwvXa13EDH5HPWi?=
- =?us-ascii?Q?W0Q+jZtFJcWJNDp8EFUQgbR0TTw8Aex4QMBngpTmQsML8QmznIErxOaf8oBf?=
- =?us-ascii?Q?KNlMqeJutDK67dMvdD2syedDPdeJfkG7EEVVG7ImLnXii0ax8RtgXZFAxtkg?=
- =?us-ascii?Q?uhnAh/h0PrmE0FdrLxP6fmE7pcU3DxV1Z3RmZtfeTuubi1zCRR5TN3aN7z/9?=
- =?us-ascii?Q?/KYnwS3t5NVSfuyV8CsBL4Q6BAhjhywlve/N6j2ZBtqDbyHDdMaJkfnMUTsD?=
- =?us-ascii?Q?Zmx39G6f7VhMXOWPfGrdVIVkH3s+Oo+o3eFqaVS0a/jy+93YcJPv2q496++m?=
- =?us-ascii?Q?4aJfjbgzwBqui3bvfxUhjemegciYJmz2y3InfJpaDeaNIrLyMsUEJtBbGRxi?=
- =?us-ascii?Q?kDajgVzS9Oh6geLPwIkwph7/f4eo752mMO7R2nIxyAJQrtrRG9EwuQ+hzCOR?=
- =?us-ascii?Q?0YCYdQ2BlAYkxmnRnOMDea5NHCt9RCDqZDxCt8HP16xRa64RwKeovRmHQ5nU?=
- =?us-ascii?Q?6t8OOyKN/EGZPk4Ljxd45stnEEugFpKJFoegKrRL?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F64322EF2
+	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 09:57:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710755861; cv=none; b=hHpHlmOKjsN7khBVRxIozZ7ihCZN/vQnHiZoA4htNBK+IW9D2JUvzPh1VkGF50J2se1mnMlJ/UmyjqZGa+IKPOg/c2wMO+XYvFD6KJvC7hbvOjdVZ611wyTjbhDfPVYgTPgmHoB+6iyLsO1NoN11sw7Nmmr3E0UoXpa3J1ArazU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710755861; c=relaxed/simple;
+	bh=EVnPp56kaE4rhCkM2vBnxUsI0YSBGnAK/3WVxIVet08=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eR9aX0La+svV3WmO9KiB18tfrr4XK7krlctHD9oSCkNGpi/2ADWOANfEZtWI8+pJZBJXHUk3iAyxgt99wkTpBbkmoeomvLbIW+q4SYpPlC9gF886Ux/OYFLw9YLjUcZXDUl0TXRFKCLc+45OZGIWnv8oKNMUMKOM3cvFtxqT2Vg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=YcZ/q+oP; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a46c0b40157so76901066b.0
+        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 02:57:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1710755858; x=1711360658; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=CvwiY2px09JBaPxmeT996zlVjpkjtFKPSJgCnMAlIOw=;
+        b=YcZ/q+oPSSrvv1k2IDzBm7bAcIof735+sB/33Mo24v2E8WFCE5sGMp/qJzYQljQHlM
+         wacsAp1vGUWkZfcEKR1GsrIUMGcjReilJ3kTnmOLz6fCID3PU2hrPOfQfO2Qy8t9zo26
+         OXQ7nswjuP4udBQl8y4zmHMG5LOIr3NuU1NhdnKH68q2Zi5G5tohswxKFJEtT+layyte
+         to/13Oe3/2gj2M+T6M5jODB/9zWEjP8l483/uYeISVFYeCUykXVNrSetYCv2FCUC+rec
+         IobHiucpgE6vXl/jMQ9aKKOFXEL76+uAAl/wwrxjWVDS+jc0e4gxfHaJ4TWIhY0apSYq
+         LmgQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710755858; x=1711360658;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=CvwiY2px09JBaPxmeT996zlVjpkjtFKPSJgCnMAlIOw=;
+        b=UG0WBxZJGogit8EQYTvpWY5svDL4IcEHVsgfzddTIgmHssTzba48mW/uDFV22PZgYO
+         EDszehd/VK+cqzTBnbpnrA0suU3Eil1AI6o3vjDdTVWk9EBPy3yRrxR6IrcpqLH6jX58
+         WRmL5lDmRQDIihW/kFS+5Qq6WSi3EWvsL+hW8u3IabfhIgH+HGGGZXvddf9VKhfBdA9j
+         aezZZkZ1zsGv/eIB049KdLYBoZHztXxEKY+V5Ffb/g8OXn7igwejtuWi7gXgn0Hdnsu7
+         MxQdqt5bYfnDIeOcT8OWof8ZQiMwwu9yOFy+1A66QfUEYPVUMDH2wXl3olIGgt6M+w5d
+         Yrzw==
+X-Forwarded-Encrypted: i=1; AJvYcCVKMPlbYvGTbdq8WSSDq9ETzEshGXNEY8/8tDWg9amiGglLzLewfYpvOSZr1OQhbvZhe4NUfsx3n1nrEzEr2HTANqlnOlPJ
+X-Gm-Message-State: AOJu0YyFicDRNJ2dZrhWlUVPIUHBoDUjpGWWLNXB3mTNuv17Ld/Wr2+7
+	V8DERDeM/nCtteXKg5KeUZUvRV9OrRS/9xdw3T5iQU944wu9MNkVneyeu/uIyOo=
+X-Google-Smtp-Source: AGHT+IE4Vs4Pth77Ukq1Bp0ir9YHjxFLKSrIhmRE5Q697X+NEwv+mMFjjCPvm24dipjKUYd2nFDaww==
+X-Received: by 2002:a17:906:528d:b0:a45:b91f:2f95 with SMTP id c13-20020a170906528d00b00a45b91f2f95mr7514842ejm.72.1710755857562;
+        Mon, 18 Mar 2024 02:57:37 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.222.97])
+        by smtp.gmail.com with ESMTPSA id e14-20020a1709062c0e00b00a455d78be5bsm4637433ejh.9.2024.03.18.02.57.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Mar 2024 02:57:37 -0700 (PDT)
+Message-ID: <3bffa949-e85c-4309-9e77-9aca44039dbf@linaro.org>
+Date: Mon, 18 Mar 2024 10:57:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: marvell.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MWHPR1801MB1918.namprd18.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d091b41b-1bec-41b3-1d41-08dc472febae
-X-MS-Exchange-CrossTenant-originalarrivaltime: 18 Mar 2024 09:43:52.2643
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: upp6yJYMwsI4Fa6Jde9fhrqvXH3yQ6ArgcaFenRuoe5BCFZtYL6ZnrtW10CcKTAecIIqTcoXIE7wLHyr2l3xLA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR18MB4439
-X-Proofpoint-GUID: U9WbxcNkZkcOSUbPp2_Qd5yc1wIMAG3N
-X-Proofpoint-ORIG-GUID: U9WbxcNkZkcOSUbPp2_Qd5yc1wIMAG3N
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-17_12,2024-03-18_01,2023-05-22_02
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] arm64: dts: S32G3: Introduce device tree for
+ S32G-VNP-RDB3
+Content-Language: en-US
+To: Wadim Mueller <wafgo01@gmail.com>,
+ Ghennadi Procopciuc <ghennadi.procopciuc@oss.nxp.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, NXP Linux Team <linux-imx@nxp.com>,
+ Chester Lin <chester62515@gmail.com>, =?UTF-8?Q?Andreas_F=C3=A4rber?=
+ <afaerber@suse.de>, Matthias Brugger <mbrugger@suse.com>,
+ NXP S32 Linux Team <s32@nxp.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
+ Simon Horman <horms@kernel.org>, Andrew Halaney <ahalaney@redhat.com>,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Johannes Zink <j.zink@pengutronix.de>, Shenwei Wang <shenwei.wang@nxp.com>,
+ "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Swee Leong Ching <leong.ching.swee@intel.com>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, linux-clk@vger.kernel.org
+References: <20240315222754.22366-1-wafgo01@gmail.com>
+ <20240315222754.22366-2-wafgo01@gmail.com>
+ <4e168fbc-8a13-4666-ab80-e3032f61ef38@oss.nxp.com>
+ <20240318093418.GA20810@bhlegrsu.conti.de>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ xsFNBFVDQq4BEAC6KeLOfFsAvFMBsrCrJ2bCalhPv5+KQF2PS2+iwZI8BpRZoV+Bd5kWvN79
+ cFgcqTTuNHjAvxtUG8pQgGTHAObYs6xeYJtjUH0ZX6ndJ33FJYf5V3yXqqjcZ30FgHzJCFUu
+ JMp7PSyMPzpUXfU12yfcRYVEMQrmplNZssmYhiTeVicuOOypWugZKVLGNm0IweVCaZ/DJDIH
+ gNbpvVwjcKYrx85m9cBVEBUGaQP6AT7qlVCkrf50v8bofSIyVa2xmubbAwwFA1oxoOusjPIE
+ J3iadrwpFvsZjF5uHAKS+7wHLoW9hVzOnLbX6ajk5Hf8Pb1m+VH/E8bPBNNYKkfTtypTDUCj
+ NYcd27tjnXfG+SDs/EXNUAIRefCyvaRG7oRYF3Ec+2RgQDRnmmjCjoQNbFrJvJkFHlPeHaeS
+ BosGY+XWKydnmsfY7SSnjAzLUGAFhLd/XDVpb1Een2XucPpKvt9ORF+48gy12FA5GduRLhQU
+ vK4tU7ojoem/G23PcowM1CwPurC8sAVsQb9KmwTGh7rVz3ks3w/zfGBy3+WmLg++C2Wct6nM
+ Pd8/6CBVjEWqD06/RjI2AnjIq5fSEH/BIfXXfC68nMp9BZoy3So4ZsbOlBmtAPvMYX6U8VwD
+ TNeBxJu5Ex0Izf1NV9CzC3nNaFUYOY8KfN01X5SExAoVTr09ewARAQABzTRLcnp5c3p0b2Yg
+ S296bG93c2tpIDxrcnp5c3p0b2Yua296bG93c2tpQGxpbmFyby5vcmc+wsGUBBMBCgA+FiEE
+ m9B+DgxR+NWWd7dUG5NDfTtBYpsFAmI+BxMCGwMFCRRfreEFCwkIBwIGFQoJCAsCBBYCAwEC
+ HgECF4AACgkQG5NDfTtBYptgbhAAjAGunRoOTduBeC7V6GGOQMYIT5n3OuDSzG1oZyM4kyvO
+ XeodvvYv49/ng473E8ZFhXfrre+c1olbr1A8pnz9vKVQs9JGVa6wwr/6ddH7/yvcaCQnHRPK
+ mnXyP2BViBlyDWQ71UC3N12YCoHE2cVmfrn4JeyK/gHCvcW3hUW4i5rMd5M5WZAeiJj3rvYh
+ v8WMKDJOtZFXxwaYGbvFJNDdvdTHc2x2fGaWwmXMJn2xs1ZyFAeHQvrp49mS6PBQZzcx0XL5
+ cU9ZjhzOZDn6Apv45/C/lUJvPc3lo/pr5cmlOvPq1AsP6/xRXsEFX/SdvdxJ8w9KtGaxdJuf
+ rpzLQ8Ht+H0lY2On1duYhmro8WglOypHy+TusYrDEry2qDNlc/bApQKtd9uqyDZ+rx8bGxyY
+ qBP6bvsQx5YACI4p8R0J43tSqWwJTP/R5oPRQW2O1Ye1DEcdeyzZfifrQz58aoZrVQq+innR
+ aDwu8qDB5UgmMQ7cjDSeAQABdghq7pqrA4P8lkA7qTG+aw8Z21OoAyZdUNm8NWJoQy8m4nUP
+ gmeeQPRc0vjp5JkYPgTqwf08cluqO6vQuYL2YmwVBIbO7cE7LNGkPDA3RYMu+zPY9UUi/ln5
+ dcKuEStFZ5eqVyqVoZ9eu3RTCGIXAHe1NcfcMT9HT0DPp3+ieTxFx6RjY3kYTGLOwU0EVUNc
+ NAEQAM2StBhJERQvgPcbCzjokShn0cRA4q2SvCOvOXD+0KapXMRFE+/PZeDyfv4dEKuCqeh0
+ hihSHlaxTzg3TcqUu54w2xYskG8Fq5tg3gm4kh1Gvh1LijIXX99ABA8eHxOGmLPRIBkXHqJY
+ oHtCvPc6sYKNM9xbp6I4yF56xVLmHGJ61KaWKf5KKWYgA9kfHufbja7qR0c6H79LIsiYqf92
+ H1HNq1WlQpu/fh4/XAAaV1axHFt/dY/2kU05tLMj8GjeQDz1fHas7augL4argt4e+jum3Nwt
+ yupodQBxncKAUbzwKcDrPqUFmfRbJ7ARw8491xQHZDsP82JRj4cOJX32sBg8nO2N5OsFJOcd
+ 5IE9v6qfllkZDAh1Rb1h6DFYq9dcdPAHl4zOj9EHq99/CpyccOh7SrtWDNFFknCmLpowhct9
+ 5ZnlavBrDbOV0W47gO33WkXMFI4il4y1+Bv89979rVYn8aBohEgET41SpyQz7fMkcaZU+ok/
+ +HYjC/qfDxT7tjKXqBQEscVODaFicsUkjheOD4BfWEcVUqa+XdUEciwG/SgNyxBZepj41oVq
+ FPSVE+Ni2tNrW/e16b8mgXNngHSnbsr6pAIXZH3qFW+4TKPMGZ2rZ6zITrMip+12jgw4mGjy
+ 5y06JZvA02rZT2k9aa7i9dUUFggaanI09jNGbRA/ABEBAAHCwXwEGAEKACYCGwwWIQSb0H4O
+ DFH41ZZ3t1Qbk0N9O0FimwUCYDzvagUJFF+UtgAKCRAbk0N9O0Fim9JzD/0auoGtUu4mgnna
+ oEEpQEOjgT7l9TVuO3Qa/SeH+E0m55y5Fjpp6ZToc481za3xAcxK/BtIX5Wn1mQ6+szfrJQ6
+ 59y2io437BeuWIRjQniSxHz1kgtFECiV30yHRgOoQlzUea7FgsnuWdstgfWi6LxstswEzxLZ
+ Sj1EqpXYZE4uLjh6dW292sO+j4LEqPYr53hyV4I2LPmptPE9Rb9yCTAbSUlzgjiyyjuXhcwM
+ qf3lzsm02y7Ooq+ERVKiJzlvLd9tSe4jRx6Z6LMXhB21fa5DGs/tHAcUF35hSJrvMJzPT/+u
+ /oVmYDFZkbLlqs2XpWaVCo2jv8+iHxZZ9FL7F6AHFzqEFdqGnJQqmEApiRqH6b4jRBOgJ+cY
+ qc+rJggwMQcJL9F+oDm3wX47nr6jIsEB5ZftdybIzpMZ5V9v45lUwmdnMrSzZVgC4jRGXzsU
+ EViBQt2CopXtHtYfPAO5nAkIvKSNp3jmGxZw4aTc5xoAZBLo0OV+Ezo71pg3AYvq0a3/oGRG
+ KQ06ztUMRrj8eVtpImjsWCd0bDWRaaR4vqhCHvAG9iWXZu4qh3ipie2Y0oSJygcZT7H3UZxq
+ fyYKiqEmRuqsvv6dcbblD8ZLkz1EVZL6djImH5zc5x8qpVxlA0A0i23v5QvN00m6G9NFF0Le
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240318093418.GA20810@bhlegrsu.conti.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> From: Max Gautier <mg@max.gautier.name>
-> Sent: Monday, March 18, 2024 2:57 PM
-> To: Ratheesh Kannoth <rkannoth@marvell.com>
-> Cc: netdev@vger.kernel.org
-> Subject: Re: [EXTERNAL] Re: [PATCH iproute2-next v2] arpd: create
-> /var/lib/arpd on first use
->=20
-> On Mon, Mar 18, 2024 at 09:18:59AM +0000, Ratheesh Kannoth wrote:
-> > > > > > > +	if (strcmp(default_dbname, dbname) =3D=3D 0
-> > > > > > > +			&& mkdir(ARPDDIR, 0755) !=3D 0
-> > > > > > > +			&& errno !=3D EEXIST
-> > > > > > why do you need errno !=3D EEXIST case ? mkdir() will return
-> > > > > > error in this case
-> > > > > as well.
-> > > > >
-> > > > > EEXIST is not an error in this case: if the default location
-> > > > > already exist, all is good. mkdir would still return -1 in this
-> > > > > case, so we need to exclude it manually.
-> > > >
-> > > > ACK. IMO, it would make a more readable code if you consider
-> > > > splitting the
-> > > "if" loop.
-> > >
-> > > Something like this ? I tend to pack conditions unless branching is
-> > > necessary, but no problem if this form is preferred.
-> > >
-> > > if (strcmp(default_dbname, dbname) =3D=3D 0) {
-> > >     if (mkdir(ARPDDIR, 0755) !=3D 0 && errno !=3D EEXIST) {
-> > >    ...
-> > >    }
-> > > }
-> > ACK.
-> > instead of errno !=3D EXIST ,  you may consider stat() before mkdir() c=
-all. Just
-> my way thinking(please ignore it, if you don't like).
-> > My thinking is --> you need to execute mkdir () only first time, second=
- time
-> onwards, stat() call will return 0.
->=20
-> That's racy: we can stat and have a non existing folder, then have anothe=
-r arpd
-> instance (or anything else, really) create the directory, and we would hi=
-t EEXIST
-> anyway when we call mkdir.
-ACK.=20
+On 18/03/2024 10:34, Wadim Mueller wrote:
+> On Mon, Mar 18, 2024 at 09:32:24AM +0200, Ghennadi Procopciuc wrote:
+>> On 3/16/24 00:27, Wadim Mueller wrote:
+>>> This commit adds device tree support for the NXP S32G3-based
+>>> S32G-VNP-RDB3 Board (Vehicle Networking Platform - Reference Design Board) [1].
+>>>
+>>> The S32G3 features an 8-core ARM Cortex-A53 based SoC developed by NXP.
+>>>
+>>> The device tree files are derived from the official NXP downstream Linux tree [2].
+>>>
+>>> This addition encompasses a limited selection of peripherals that are upstream-supported. Apart from the ARM System Modules (GIC, Generic Timer, etc.), the following IPs have been validated:
+>>>
+>>>     UART: fsl-linflexuart
+>>>     SDHC: fsl-imx-esdhc
+>>>     Ethernet: synopsys gmac/stmac
+>>>
+>>> Clock settings for the chip rely on ATF Firmware [3]. Pin control integration into the device tree is pending and currently relies on Firmware/U-Boot settings [4].
+>>>
+>>> These changes were validated using the latest BSP39 Firmware/U-Boot from NXP [5].
+>>>
+>>> The modifications enable booting the official Ubuntu 22.04 from NXP on
+>>> the RDB3 with default settings from the SD card and eMMC.
+>>>
+>>> [1] https://www.nxp.com/design/design-center/designs/s32g3-vehicle-networking-reference-design:S32G-VNP-RDB3
+>>> [2] https://github.com/nxp-auto-linux/linux
+>>> [3] https://github.com/nxp-auto-linux/arm-trusted-firmware
+>>> [4] https://github.com/nxp-auto-linux/u-boot
+>>> [5] https://github.com/nxp-auto-linux/auto_yocto_bsp
+>>>
+>>> Signed-off-by: Wadim Mueller <wafgo01@gmail.com>
+>>
+>> This patch seems to be heavily based on the downstream version of the
+>> kernel. Many of the changes originate from NXP. Therefore, shouldn't the
+>> authors also be mentioned here?
+>>
+> 
+> Yes, it definitely is, I also mentionaed it in the commit message. As
+> Krzyszof mentioned, would you expect me to "git blame" the file and put
+> all contributors into the commment part? Or would it be enough to put a
+> Copyright of NXP as here [1]?
+> 
+> 
+> [1] https://github.com/nxp-auto-linux/linux/blob/cdac0506874b7e6a277f12e72e3900d2a410d909/arch/arm64/boot/dts/freescale/s32g3.dtsi#L3
 
-> Also, that needs two syscalls instead of one.
->=20
-> --
-> Max Gautier
+This has copyright from 2021, so 3 years is enough for NXP to prove they
+care and upstream it. If they don't do it within 3 years, it is proof
+NXP does not care enough, so I don't think you need to provide any
+authorship remarks. Especially that many emails might be incorrect. Your
+Cc-list here already creates 4 bounces..
+
+But keep the copyright if you indeed based on that file.
+
+Best regards,
+Krzysztof
+
 
