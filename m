@@ -1,180 +1,290 @@
-Return-Path: <netdev+bounces-80483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4819D87F148
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 21:39:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 218B787F193
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 21:51:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 053402846D3
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 20:39:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A55221F22711
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 20:51:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D289522087;
-	Mon, 18 Mar 2024 20:39:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE23535C1;
+	Mon, 18 Mar 2024 20:51:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gOeTv3G7"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JvelUiUl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2339E58AB6;
-	Mon, 18 Mar 2024 20:39:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED62752F98;
+	Mon, 18 Mar 2024 20:50:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710794368; cv=none; b=J6+7YUmOP2bVIfY1Yf/WSyCS2dnciiW47JM/EJUxGFbAu926AmEOH3LQHxcn1MsYs9AEp3ZV1k3HX/p+N+lJUba1vZW9DtG0EqBjFjAzNlpXgHjQV+wEEu79jrZeqSgteKmb4RYwrN2zUP6Ph7ouRPjjXNeEYGuNrzDn2awCyT0=
+	t=1710795061; cv=none; b=izcC2TUfxexC9sNb6b8P+MKZAguysix7oi53QyAhHjrPpnWirNYwEvc28c65T03P94BgdrVLktwts3/6XmjXUQv0Kow4kIKpezzCsbj5Dx7dlSLkziE6ByMtOPcY15F9roWJHpQxeje4hhFY81RT1fbQ61afymfQfvaYR2qg40I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710794368; c=relaxed/simple;
-	bh=2h5jo8wEAkXTw9G7gniyt7zf6JOSZSqfam+jr8qgV0c=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qs2G2rRuZAqTmcnBCKLw9S5a2rmqrkFVFG2dpvv2SVZKxe12mzQbfSLr/oB2mQiDN6MXN3Hw7DJW/6P3k7XUTD6DSICEiAXejqYhdrKev2J1UC8jSeTVFduNU9rm+bfUVngwb4VmUvpR2B4S0oVgVkkGDR+k4VLhX545gAOKo6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gOeTv3G7; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710794367; x=1742330367;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=2h5jo8wEAkXTw9G7gniyt7zf6JOSZSqfam+jr8qgV0c=;
-  b=gOeTv3G7SZwueLHzeNdOioPGWYG9jh4g76hZlsrBiC9ZofVMkDzlBvC5
-   D9vWq8jIFkMRi7d7PqpWtvuXmdZikEW0EKzQWJbGJblDoFaZBBefsx+CS
-   riNMruYeBSnh44IhllDCfljqafhu+rHKkkFd1z0CLnmDTr45onApq8LrY
-   bdyb4Oh97LZYzMOV+R5g1pnWGCtWt/RxTpugz28+hSrm0LyjNUuZUSjgV
-   3fzDMha415LloXhemuMm+MLD3KfaYl57t3t98gCTxLuwJRAVDrQl71Prx
-   R0SnfQBPhAB68Y+vjqPBDzmdICrfi8AH01KlDVUbOkmDosY9+lKanHF0b
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11017"; a="5482171"
-X-IronPort-AV: E=Sophos;i="6.07,135,1708416000"; 
-   d="scan'208";a="5482171"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2024 13:39:26 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,11017"; a="937060676"
-X-IronPort-AV: E=Sophos;i="6.07,135,1708416000"; 
-   d="scan'208";a="937060676"
-Received: from black.fi.intel.com ([10.237.72.28])
-  by fmsmga001.fm.intel.com with ESMTP; 18 Mar 2024 13:39:25 -0700
-Received: by black.fi.intel.com (Postfix, from userid 1003)
-	id 2767C241; Mon, 18 Mar 2024 22:39:24 +0200 (EET)
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: [PATCH net-next v1 1/1] nfc: st95hf: Switch to using gpiod API
-Date: Mon, 18 Mar 2024 22:39:23 +0200
-Message-ID: <20240318203923.183943-1-andriy.shevchenko@linux.intel.com>
-X-Mailer: git-send-email 2.43.0.rc1.1.gbec44491f096
+	s=arc-20240116; t=1710795061; c=relaxed/simple;
+	bh=DQyXwkGCVcqn03gGGgc5pF7UkvAlzUUsxkvBry9vhTc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=adU97unXwiV/wIFkCb6d3cU16o08/iGaDXLlyWFsdMgA4JV2TE7C20+UHzyRb4V/6L3jX1CY0hARm48CvUYQbWKm2s+4b9WtINLYw6iwFEySoIRKARFDxyr7gr40e4nkrv3ops3l0fucdPo8ZG+kChuoB/TjmTnaqe4lel69hpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JvelUiUl; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=V7hiweKCShqTkZVjRoBbzPoSakFvSACyYI9eRdobDaY=; b=JvelUiUlEPlnNSozIDXO9xVl79
+	Vs4SbJuFviGCjY4V59jwpJctAAgl/bbxuvkCTt8bNjpAbrnA/aZIbPTJEfgE0AA9FpnamA7sF7sJt
+	j4SWEbsy5Vwie22bOlRsk92UlWylNrCgyTskccbnJYgCIhiTjBaXOW7fIAbhCA3TxMgU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rmJw1-00Adr6-5R; Mon, 18 Mar 2024 21:50:17 +0100
+Date: Mon, 18 Mar 2024 21:50:17 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Wadim Mueller <wafgo01@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	NXP Linux Team <linux-imx@nxp.com>,
+	Chester Lin <chester62515@gmail.com>,
+	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>,
+	Matthias Brugger <mbrugger@suse.com>,
+	NXP S32 Linux Team <s32@nxp.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Michael Turquette <mturquette@baylibre.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Johannes Zink <j.zink@pengutronix.de>,
+	Shenwei Wang <shenwei.wang@nxp.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Swee Leong Ching <leong.ching.swee@intel.com>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-stm32@st-md-mailman.stormreply.com, linux-clk@vger.kernel.org
+Subject: Re: [PATCH 2/3] net: stmmac: Add NXP S32 SoC family support
+Message-ID: <ddf5c4e2-16c2-4399-ae34-57114b8d4d21@lunn.ch>
+References: <20240315222754.22366-1-wafgo01@gmail.com>
+ <20240315222754.22366-3-wafgo01@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240315222754.22366-3-wafgo01@gmail.com>
 
-This updates the driver to gpiod API, and removes yet another use of
-of_get_named_gpio().
+On Fri, Mar 15, 2024 at 11:27:48PM +0100, Wadim Mueller wrote:
+> Add support for NXP S32 SoC family's GMAC to the stmmac network driver. This driver implementation is based on the patchset originally contributed by Chester Lin [1], which itself draws heavily from NXP's downstream implementation [2]. The patchset was never merged.
 
-Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
----
- drivers/nfc/st95hf/core.c | 27 +++++++++++----------------
- 1 file changed, 11 insertions(+), 16 deletions(-)
+Please wrap you commit message.
 
-diff --git a/drivers/nfc/st95hf/core.c b/drivers/nfc/st95hf/core.c
-index ed704bb77226..067e0ec31d2d 100644
---- a/drivers/nfc/st95hf/core.c
-+++ b/drivers/nfc/st95hf/core.c
-@@ -7,14 +7,13 @@
-  */
  
- #include <linux/err.h>
--#include <linux/gpio.h>
-+#include <linux/gpio/consumer.h>
- #include <linux/init.h>
- #include <linux/interrupt.h>
- #include <linux/irq.h>
- #include <linux/module.h>
- #include <linux/netdevice.h>
- #include <linux/nfc.h>
--#include <linux/of_gpio.h>
- #include <linux/of.h>
- #include <linux/property.h>
- #include <linux/regulator/consumer.h>
-@@ -196,7 +195,7 @@ struct st95_digital_cmd_complete_arg {
-  *	for spi communication between st95hf and host.
-  * @ddev: nfc digital device object.
-  * @nfcdev: nfc device object.
-- * @enable_gpio: gpio used to enable st95hf transceiver.
-+ * @enable_gpiod: gpio used to enable st95hf transceiver.
-  * @complete_cb_arg: structure to store various context information
-  *	that is passed from nfc requesting thread to the threaded ISR.
-  * @st95hf_supply: regulator "consumer" for NFC device.
-@@ -219,7 +218,7 @@ struct st95hf_context {
- 	struct st95hf_spi_context spicontext;
- 	struct nfc_digital_dev *ddev;
- 	struct nfc_dev *nfcdev;
--	unsigned int enable_gpio;
-+	struct gpio_desc *enable_gpiod;
- 	struct st95_digital_cmd_complete_arg complete_cb_arg;
- 	struct regulator *st95hf_supply;
- 	unsigned char sendrcv_trflag;
-@@ -451,19 +450,19 @@ static int st95hf_select_protocol(struct st95hf_context *stcontext, int type)
- static void st95hf_send_st95enable_negativepulse(struct st95hf_context *st95con)
- {
- 	/* First make irq_in pin high */
--	gpio_set_value(st95con->enable_gpio, HIGH);
-+	gpiod_set_value(st95con->enable_gpiod, HIGH);
- 
- 	/* wait for 1 milisecond */
- 	usleep_range(1000, 2000);
- 
- 	/* Make irq_in pin low */
--	gpio_set_value(st95con->enable_gpio, LOW);
-+	gpiod_set_value(st95con->enable_gpiod, LOW);
- 
- 	/* wait for minimum interrupt pulse to make st95 active */
- 	usleep_range(1000, 2000);
- 
- 	/* At end make it high */
--	gpio_set_value(st95con->enable_gpio, HIGH);
-+	gpiod_set_value(st95con->enable_gpiod, HIGH);
- }
- 
- /*
-@@ -1063,6 +1062,7 @@ MODULE_DEVICE_TABLE(of, st95hf_spi_of_match);
- 
- static int st95hf_probe(struct spi_device *nfc_spi_dev)
- {
-+	struct device *dev = &nfc_spi_dev->dev;
- 	int ret;
- 
- 	struct st95hf_context *st95context;
-@@ -1108,19 +1108,14 @@ static int st95hf_probe(struct spi_device *nfc_spi_dev)
- 	 */
- 	dev_set_drvdata(&nfc_spi_dev->dev, spicontext);
- 
--	st95context->enable_gpio =
--		of_get_named_gpio(nfc_spi_dev->dev.of_node,
--				  "enable-gpio",
--				  0);
--	if (!gpio_is_valid(st95context->enable_gpio)) {
-+	st95context->enable_gpiod = devm_gpiod_get(dev, "enable", GPIOD_OUT_HIGH);
-+	if (IS_ERR(st95context->enable_gpiod)) {
-+		ret = PTR_ERR(st95context->enable_gpiod);
- 		dev_err(&nfc_spi_dev->dev, "No valid enable gpio\n");
--		ret = st95context->enable_gpio;
- 		goto err_disable_regulator;
- 	}
- 
--	ret = devm_gpio_request_one(&nfc_spi_dev->dev, st95context->enable_gpio,
--				    GPIOF_DIR_OUT | GPIOF_INIT_HIGH,
--				    "enable_gpio");
-+	ret = gpiod_set_consumer_name(st95context->enable_gpiod, "enable_gpio");
- 	if (ret)
- 		goto err_disable_regulator;
- 
--- 
-2.43.0.rc1.1.gbec44491f096
+> +#include <linux/device.h>
+> +#include <linux/ethtool.h>
+
+Is this one needed?
+
+> +static int s32_gmac_init(struct platform_device *pdev, void *priv)
+> +{
+> +	struct s32_priv_data *gmac = priv;
+> +	u32 intf_sel;
+> +	int ret;
+> +
+> +	if (gmac->tx_clk) {
+> +		ret = clk_prepare_enable(gmac->tx_clk);
+> +		if (ret) {
+> +			dev_err(&pdev->dev, "Can't set tx clock\n");
+> +			return ret;
+> +		}
+> +	}
+> +
+> +	if (gmac->rx_clk) {
+> +		ret = clk_prepare_enable(gmac->rx_clk);
+> +		if (ret) {
+> +			dev_err(&pdev->dev, "Can't set rx clock\n");
+> +			return ret;
+> +		}
+> +	}
+> +
+> +	/* set interface mode */
+> +	if (gmac->ctrl_sts) {
+> +		switch (gmac->intf_mode) {
+> +		default:
+> +			dev_info(
+> +				&pdev->dev,
+> +				"unsupported mode %u, set the default phy mode.\n",
+> +				gmac->intf_mode);
+> +			fallthrough;
+
+I would actually return -EINVAL. There is no backwards compatibility
+needed here, so force that the mode is always specified.
+
+> +		case PHY_INTERFACE_MODE_SGMII:
+> +			dev_info(&pdev->dev, "phy mode set to SGMII\n");
+
+Please don't spam the kernel log. dev_dbg(). 
+
+> +static void s32_fix_speed(void *priv, unsigned int speed, unsigned int mode)
+> +{
+> +	struct s32_priv_data *gmac = priv;
+> +
+> +	if (!gmac->tx_clk || !gmac->rx_clk)
+> +		return;
+> +
+> +	/* SGMII mode doesn't support the clock reconfiguration */
+> +	if (gmac->intf_mode == PHY_INTERFACE_MODE_SGMII)
+> +		return;
+> +
+> +	switch (speed) {
+> +	case SPEED_1000:
+> +		dev_info(gmac->dev, "Set TX clock to 125M\n");
+
+more dev_dbg(). A driver should generally be silent, unless something
+goes wrong. It is also questionable if dev_dbg() should be used. Once
+the driver actually works, you can throw away a lot of debug
+prints. Do you expect problems here in the future?
+
+> +static int s32_config_cache_coherency(struct platform_device *pdev,
+> +				      struct plat_stmmacenet_data *plat_dat)
+> +{
+> +	plat_dat->axi4_ace_ctrl = devm_kzalloc(
+> +		&pdev->dev, sizeof(struct stmmac_axi4_ace_ctrl), GFP_KERNEL);
+> +
+> +	if (!plat_dat->axi4_ace_ctrl)
+> +		return -ENOMEM;
+> +
+> +	plat_dat->axi4_ace_ctrl->tx_ar_reg = (ACE_CONTROL_SIGNALS << 16) |
+> +					     (ACE_CONTROL_SIGNALS << 8) |
+> +					     ACE_CONTROL_SIGNALS;
+> +
+> +	plat_dat->axi4_ace_ctrl->rx_aw_reg =
+> +		(ACE_CONTROL_SIGNALS << 24) | (ACE_CONTROL_SIGNALS << 16) |
+> +		(ACE_CONTROL_SIGNALS << 8) | ACE_CONTROL_SIGNALS;
+> +
+> +	plat_dat->axi4_ace_ctrl->txrx_awar_reg =
+> +		(ACE_PROTECTION << 20) | (ACE_PROTECTION << 16) |
+> +		(ACE_CONTROL_SIGNALS << 8) | ACE_CONTROL_SIGNALS;
+
+This looks like magic. Can the various shifts be replaced my #defines?
+Comments added? This makes changes in some of the core code. So it
+might be better to have a prerequisite patch adding cache coherency
+control, with a good commit message explaining it.
+
+> +
+> +	return 0;
+> +}
+> +
+> +static int s32_dwmac_probe(struct platform_device *pdev)
+> +{
+> +	struct plat_stmmacenet_data *plat_dat;
+> +	struct stmmac_resources stmmac_res;
+> +	struct s32_priv_data *gmac;
+> +	struct resource *res;
+> +	const char *tx_clk, *rx_clk;
+> +	int ret;
+> +
+> +	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
+> +	if (ret)
+> +		return ret;
+> +
+> +	gmac = devm_kzalloc(&pdev->dev, sizeof(*gmac), GFP_KERNEL);
+> +	if (!gmac)
+> +		return PTR_ERR(gmac);
+> +
+> +	gmac->dev = &pdev->dev;
+> +
+> +	/* S32G control reg */
+> +	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
+> +	gmac->ctrl_sts = devm_ioremap_resource(&pdev->dev, res);
+> +	if (IS_ERR_OR_NULL(gmac->ctrl_sts)) {
+> +		dev_err(&pdev->dev, "S32G config region is missing\n");
+> +		return PTR_ERR(gmac->ctrl_sts);
+> +	}
+> +
+> +	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
+> +	if (IS_ERR(plat_dat))
+> +		return PTR_ERR(plat_dat);
+> +
+> +	plat_dat->bsp_priv = gmac;
+> +
+> +	switch (plat_dat->phy_interface) {
+> +	case PHY_INTERFACE_MODE_SGMII:
+> +		tx_clk = "tx_sgmii";
+> +		rx_clk = "rx_sgmii";
+> +		break;
+> +	case PHY_INTERFACE_MODE_RGMII:
+> +	case PHY_INTERFACE_MODE_RGMII_ID:
+> +	case PHY_INTERFACE_MODE_RGMII_TXID:
+> +	case PHY_INTERFACE_MODE_RGMII_RXID:
+> +		tx_clk = "tx_rgmii";
+> +		rx_clk = "rx_rgmii";
+> +		break;
+> +	case PHY_INTERFACE_MODE_RMII:
+> +		tx_clk = "tx_rmii";
+> +		rx_clk = "rx_rmii";
+> +		break;
+> +	case PHY_INTERFACE_MODE_MII:
+> +		tx_clk = "tx_mii";
+> +		rx_clk = "rx_mii";
+> +		break;
+> +	default:
+> +		dev_err(&pdev->dev, "Not supported phy interface mode: [%s]\n",
+> +			phy_modes(plat_dat->phy_interface));
+> +		return -EINVAL;
+> +	};
+> +
+> +	gmac->intf_mode = plat_dat->phy_interface;
+> +
+> +	/* DMA cache coherency settings */
+> +	if (of_dma_is_coherent(pdev->dev.of_node)) {
+> +		ret = s32_config_cache_coherency(pdev, plat_dat);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +
+> +	/* tx clock */
+> +	gmac->tx_clk = devm_clk_get(&pdev->dev, tx_clk);
+> +	if (IS_ERR(gmac->tx_clk)) {
+> +		dev_info(&pdev->dev, "tx clock not found\n");
+> +		gmac->tx_clk = NULL;
+
+Is the clock really optional?
+
+I would also print the name of the clock which is missing.
+
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -324,6 +324,10 @@ static void stmmac_clk_csr_set(struct stmmac_priv *priv)
+>  			priv->clk_csr = STMMAC_CSR_150_250M;
+>  		else if ((clk_rate >= CSR_F_250M) && (clk_rate <= CSR_F_300M))
+>  			priv->clk_csr = STMMAC_CSR_250_300M;
+> +		else if ((clk_rate >= CSR_F_300M) && (clk_rate < CSR_F_500M))
+> +			priv->clk_csr = STMMAC_CSR_300_500M;
+> +		else if ((clk_rate >= CSR_F_500M) && (clk_rate < CSR_F_800M))
+> +			priv->clk_csr = STMMAC_CSR_500_800M;
+
+Also seems like something which could be a patch of its own. Ideally
+you want lots of small patches which are obviously correct. Part of
+being obviously correct is the commit message, which is easier to
+write when the patch is small and only does one thing.
+
+      Andrew
 
 
