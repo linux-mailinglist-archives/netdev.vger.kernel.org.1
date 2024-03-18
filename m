@@ -1,150 +1,164 @@
-Return-Path: <netdev+bounces-80384-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80385-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F7A587E924
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 13:10:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BA4687E92A
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 13:13:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E6871C2111E
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 12:10:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10D7CB21443
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 12:13:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CE6337707;
-	Mon, 18 Mar 2024 12:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E53D737714;
+	Mon, 18 Mar 2024 12:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="omFYthG0"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A585638382
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 12:10:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1E738382;
+	Mon, 18 Mar 2024 12:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710763837; cv=none; b=CGbwAfzh5p4zLNBDK3aPrhwF9Pr/vCDzrvUTa7okEVrkE3yr18E0TDmgrch0gX1XDuWJDDWvEzj55rUg3xJY4Uq2Ofs6jEIwo1OImGEDkQKgkL2d02idSdBpGF7IudPoPq0kaPFLiL6D84Uq5ZdJYTEQxloAYWmI0I9MA1z+GzQ=
+	t=1710763978; cv=none; b=JrgFyI9nSkWVTf7qdtGulohwnx0FBG65x0b4fD6+2RqgGDzCOeQmVpsO9+N7cQTODB78xkJAIIW3VfHxErcK39mLhn91Y2/qVKUdwv86D85oWXThEYjpvZtpS5Aj2A/bUeNYgRIwQ/OQMfkXMXP3hoW0cugmuR7J4Al7JFQA/yI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710763837; c=relaxed/simple;
-	bh=9DO4H0yr1RtI4SR37swjRNKXlu0sNnwuEFpmHB3V3Rw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B3ipubxyOtt4EPdQYHqiBdQyHCXtcKdOcFlsxGNiJ1X48m1xv30Fcdqkd6onwP0orG5TmRg6QZpeTeiDyBjnfTSeqP4SF0Z3L4cHjJcwL3v0FzAe3O4+H03gcIrJWUn/HfqK45cgC2zUHJJqnr3A0rt7WPtYYybefcN33+ziD4I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <sha@pengutronix.de>)
-	id 1rmBp1-0004re-F6; Mon, 18 Mar 2024 13:10:31 +0100
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <sha@pengutronix.de>)
-	id 1rmBp1-0074Ij-15; Mon, 18 Mar 2024 13:10:31 +0100
-Received: from sha by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <sha@pengutronix.de>)
-	id 1rmBp0-005Uua-33;
-	Mon, 18 Mar 2024 13:10:30 +0100
-Date: Mon, 18 Mar 2024 13:10:30 +0100
-From: Sascha Hauer <s.hauer@pengutronix.de>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
-Subject: Re: [PATCH] net: Do not break out of sk_stream_wait_memory() with
- TIF_NOTIFY_SIGNAL
-Message-ID: <ZfgvNjWP8OYMIa3Y@pengutronix.de>
-References: <20240315100159.3898944-1-s.hauer@pengutronix.de>
- <7b82679f-9b69-4568-a61d-03eb1e4afc18@gmail.com>
+	s=arc-20240116; t=1710763978; c=relaxed/simple;
+	bh=HLuck12upJDUcz1Z3oOsil9KA5H2QT2T3rExgKJluOU=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=IPJEbsQdv61YfavkuVuRqtXJg7fOgHiOOKMoyEhtCeU6Fl9+dApjZDYNEGLNZC8D0j31CloPhv1iZsXrJcH3npzej9dd8Ik+Oam7363+VdetheK8KMZR2t8EYUvIMscl+XlXG+OlUbTt+WIevVO/UIid/ha0lPEZ7JRVpU3IW8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=omFYthG0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C97F9C433F1;
+	Mon, 18 Mar 2024 12:12:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710763978;
+	bh=HLuck12upJDUcz1Z3oOsil9KA5H2QT2T3rExgKJluOU=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=omFYthG0kHVa39d/Ee5/nLEfNOYh2nN3O+5zT/flV4LFoqCIZ96TG7rLZ/dH2U7O9
+	 DuRgTdVu/38c0vgMHvX4Ak0hU7WOwF0OmEReUnHrjbXPOEJn5tUUrfJdI4lp/lCM12
+	 KHO88QV4UqM5Cs3mwbKXmLwCh+Tsuq2R946r3ZD6Zn+dq45gGwd0oD1FCGizdKLnrk
+	 CYeG+pf7sNEYfr6oURdU5v3loaMKErxXYoj+EPmnWVJ4rIFZV4H43N7eWN4RgI+KHX
+	 4cel6OknNSwONw2iZHKCIEq94HGZGlnu9xeMDEH34eBj8wE9Fv78vJQeZbKwlgYZE8
+	 We3sPRcfYNb7A==
+Message-ID: <447caa0d-10d6-42f9-958b-5d6d7c472792@kernel.org>
+Date: Mon, 18 Mar 2024 13:12:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7b82679f-9b69-4568-a61d-03eb1e4afc18@gmail.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: sha@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next] bpf/lpm_trie: inline longest_prefix_match for
+ fastpath
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <borkmann@iogearbox.net>, martin.lau@kernel.org,
+ netdev@vger.kernel.org, kernel-team@cloudflare.com
+References: <171025648415.2098287.4441181253947701605.stgit@firesoul>
+ <2c2d1b85-9c4a-5122-c471-e4a729b4df03@iogearbox.net>
+ <860f02ae-a8a8-4bcd-86d8-7a6da3f2056d@kernel.org>
+In-Reply-To: <860f02ae-a8a8-4bcd-86d8-7a6da3f2056d@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 15, 2024 at 05:02:05PM +0000, Pavel Begunkov wrote:
-> On 3/15/24 10:01, Sascha Hauer wrote:
-> > It can happen that a socket sends the remaining data at close() time.
-> > With io_uring and KTLS it can happen that sk_stream_wait_memory() bails
-> > out with -512 (-ERESTARTSYS) because TIF_NOTIFY_SIGNAL is set for the
-> > current task. This flag has been set in io_req_normal_work_add() by
-> > calling task_work_add().
+
+
+On 15/03/2024 18.08, Jesper Dangaard Brouer wrote:
 > 
-> The entire idea of task_work is to interrupt syscalls and let io_uring
-> do its job, otherwise it wouldn't free resources it might be holding,
-> and even potentially forever block the syscall.
 > 
-> I'm not that sure about connect / close (are they not restartable?),
-> but it doesn't seem to be a good idea for sk_stream_wait_memory(),
-> which is the normal TCP blocking send path. I'm thinking of some kinds
-> of cases with a local TCP socket pair, the tx queue is full as well
-> and the rx queue of the other end, and io_uring has to run to receive
-> the data.
+> On 15/03/2024 16.03, Daniel Borkmann wrote:
+>> On 3/12/24 4:17 PM, Jesper Dangaard Brouer wrote:
+>>> The BPF map type LPM (Longest Prefix Match) is used heavily
+>>> in production by multiple products that have BPF components.
+>>> Perf data shows trie_lookup_elem() and longest_prefix_match()
+>>> being part of kernels perf top.
+>>
+>> You mention these are heavy hitters in prod ...
+>>
+>>> For every level in the LPM tree trie_lookup_elem() calls out
+>>> to longest_prefix_match().  The compiler is free to inline this
+>>> call, but chooses not to inline, because other slowpath callers
+>>> (that can be invoked via syscall) exists like trie_update_elem(),
+>>> trie_delete_elem() or trie_get_next_key().
+>>>
+>>>   bcc/tools/funccount -Ti 1 
+>>> 'trie_lookup_elem|longest_prefix_match.isra.0'
+>>>   FUNC                                    COUNT
+>>>   trie_lookup_elem                       664945
+>>>   longest_prefix_match.isra.0           8101507
+>>>
+>>> Observation on a single random metal shows a factor 12 between
+>>> the two functions. Given an average of 12 levels in the trie being
+>>> searched.
+>>>
+>>> This patch force inlining longest_prefix_match(), but only for
+>>> the lookup fastpath to balance object instruction size.
+>>>
+>>>   $ bloat-o-meter kernel/bpf/lpm_trie.o.orig-noinline 
+>>> kernel/bpf/lpm_trie.o
+>>>   add/remove: 1/1 grow/shrink: 1/0 up/down: 335/-4 (331)
+>>>   Function                                     old     new   delta
+>>>   trie_lookup_elem                             179     510    +331
+>>>   __BTF_ID__struct__lpm_trie__706741             -       4      +4
+>>>   __BTF_ID__struct__lpm_trie__706733             4       -      -4
+>>>   Total: Before=3056, After=3387, chg +10.83%
+>>
+>> ... and here you quote bloat-o-meter instead. But do you also see an
+>> observable perf gain in prod after this change? (No objection from my
+>> side but might be good to mention here.. given if not then why do the
+>> change?)
+>>
 > 
-> If interruptions are not welcome you can use different io_uring flags,
-> see IORING_SETUP_COOP_TASKRUN and/or IORING_SETUP_DEFER_TASKRUN.
+> I'm still waiting for more production servers to reboot into patched
+> kernels.  I do have some "low-level" numbers from previous generation
+> AMD servers, running kernel 6.1, which should be less affected by the
+> SRSO (than our 6.6 kernels). Waiting for newer generation to get kernel
+> updates, and especially 6.6 will be interesting.
 
-I tried with different combinations of these flags. For example
-IORING_SETUP_TASKRUN_FLAG | IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN
-makes the issue less likely, but nevertheless it still happens.
+There were no larger performance benefit on 6.6 it is basically the same.
 
-However, reading the documentation of these flags, they shall provide
-hints to the kernel for optimizations, but it should work without these
-flags, right?
+Newer generation (11G) hardware latency overhead of trie_lookup_elem
+  - avg 1181 nsecs for patched kernel
+  - avg 1269 nsecs for non patched kernel
+  - around 7% improvement or 88 ns
 
 > 
-> Maybe I'm missing something, why not restart your syscall?
+>  From production measurements the latency overhead of trie_lookup_elem:
+>   - avg 1220 nsecs for patched kernel
+>   - avg 1329 nsecs for non patched kernel
+>   - around 8% improvement or 109 nanosec
+>   - given approx 12 calls "saved" this is 9 ns per function call
+>   - for reference on Intel I measured func call to cost 1.3ns
+>   - this extra overhead is caused by __x86_return_thunk().
+> 
 
-The problem comes with TLS. Normally with synchronous encryption all
-data on a socket is written during write(). When asynchronous
-encryption comes into play, then not all data is written during write(),
-but instead the remaining data is written at close() time.
+> I also see slight improvement in the graphs, but given how much
+> production varies I don't want to draw conclusions yet.
+> 
 
-Here is my call stack when things go awry:
+Still inconclusive due to variations in traffic distribution due to
+load-balancing isn't perfect.
 
-[  325.560946] tls_push_sg: tcp_sendmsg_locked returned -512
-[  325.566371] CPU: 1 PID: 305 Comm: webserver_libur Not tainted 6.8.0-rc6-00022-g932acd9c444b-dirty #248
-[  325.575684] Hardware name: NXP i.MX8MPlus EVK board (DT)
-[  325.580997] Call trace:
-[  325.583444]  dump_backtrace+0x90/0xe8
-[  325.587122]  show_stack+0x18/0x24
-[  325.590444]  dump_stack_lvl+0x48/0x60
-[  325.594114]  dump_stack+0x18/0x24
-[  325.597432]  tls_push_sg+0xfc/0x22c
-[  325.600930]  tls_tx_records+0x114/0x1cc
-[  325.604772]  tls_sw_release_resources_tx+0x3c/0x140
-[  325.609658]  tls_sk_proto_close+0x2b0/0x3ac
-[  325.613846]  inet_release+0x4c/0x9c
-[  325.617341]  __sock_release+0x40/0xb4
-[  325.621007]  sock_close+0x18/0x28
-[  325.624328]  __fput+0x70/0x2bc
-[  325.627386]  ____fput+0x10/0x1c
-[  325.630531]  task_work_run+0x74/0xcc
-[  325.634113]  do_notify_resume+0x22c/0x1310
-[  325.638220]  el0_svc+0xa4/0xb4
-[  325.641279]  el0t_64_sync_handler+0x120/0x12c
-[  325.645643]  el0t_64_sync+0x190/0x194
+> 
+>>> Details: Due to AMD mitigation for SRSO (Speculative Return Stack Overflow)
+>>> these function calls have additional overhead. On newer kernels this shows
+>>> up under srso_safe_ret() + srso_return_thunk(), and on older kernels (6.1)
+>>> under __x86_return_thunk(). Thus, for production workloads the biggest gain
+>>> comes from avoiding this mitigation overhead.
+>>>
+>>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
-As said, TLS is sending remaining data at close() time in tls_push_sg().
-Here sk_stream_wait_memory() gets interrupted and returns -ERESTARTSYS.
-There's no way to restart this operation, the socket is about to be
-closed and won't accept data anymore.
+I'm going to send a V2, because kernel doc processing found an issue:
+  - https://netdev.bots.linux.dev/static/nipa/834681/13590144/kdoc/stderr
 
-Sascha
+I'll try to incorporate the production improvements we are seeing, but
+it feels wrong to write about kernel 6.1 and 6.6 improvements, but I
+(currently) cannot deploy a bpf-next kernel in production (but I do test
+latest kernels in my local testlab).
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+--Jesper
 
