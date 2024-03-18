@@ -1,253 +1,164 @@
-Return-Path: <netdev+bounces-80449-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCFE087ECEF
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 17:03:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45AA087ECFB
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 17:08:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDD541C20C85
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 16:03:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF6861F21C42
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 16:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4BF852F8E;
-	Mon, 18 Mar 2024 16:03:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1468E52F8C;
+	Mon, 18 Mar 2024 16:08:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="oJTRsKNq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25DD852F8C
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 16:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24ABA52F79
+	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 16:08:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710777803; cv=none; b=DXLoaS9ySP4W8JuXCrzLquRlJzbBG/pP315ewij6LPo+y7oSSjdmeRB+7sZVv8BiQaFl+GBchsnlRVx1Hi3JS9cJEoh5v/nzgG+3uaAOu1YIoOJSv0QjI/HHnLdQZJJa7mNMrmWdoVOiTEUGUPBDi8ZRpVX9g0kbx8ypmshb4l8=
+	t=1710778084; cv=none; b=o9BoiAWUxyZPGDSrNxkDd+Tt1L9R/qt6tSgqGWEhbCcjuJMChniRHVxlgHGF7rTzMe7fcjomIOVSyxUy0XQbJyc2Pe1ogo309+U0UHdOA5byOVyoNzhjDvX6V74ABOg7f384RjBmWGNi5MH8kQRsLXVZaQdtFLc9V70KGo2b/po=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710777803; c=relaxed/simple;
-	bh=LgBEE954d8HVX+jPEO5HwArTJ/CRNUYZQnnIo5eukSA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=FBCF5CIWwQhK2HkS9/Wmpybe4aWcwoWZLhsADuqXl3DzON6i10AEy2ixLR2/6U7YiQJkFg2hJqmH0tomhkiOFZFtozVRccv4OnB7d4Q35wXoWw5nf1Xd4UFL+s9OjPozCQcWw6KUQ1JRkR37pjgPF8YBmcxlosOCvCP8qWREJk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-366c3152af9so11353395ab.3
-        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 09:03:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710777801; x=1711382601;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sHtJnWtd6RoBK4zDgnmMUaefunHW0MPhVgb1LJRs0Ho=;
-        b=g6Jve6DceZyIOeRserYUr0q/pMX0PLHWV+lIQ9+o4jtlmG5dt7uNCy42K2Jqf2AG/e
-         1+6nwCFAuKxiYur3wKSpXl7bRPoX6j4AQEVt7x/a2gdYuhvQL3PcW9Z61DZeRlzuJBL7
-         ukdMdPcqPtkALmo1O03zst3f192tnJoZlgs0D3Ro9AzcVNLCyrwHo6DevI6qSMHkuNrJ
-         Rp2ImDsORWnoidWIRw918zFtsmAUleS2dV8gfUchLvFkWYrv2VI1e5RhnH68uH8C/bm8
-         j2DTs78spRbThqHB0/sVVu2+PDjcpCOmqI+dY20DSOXokFkSEGNn7VlHik96wjFCQ/q4
-         Pppw==
-X-Forwarded-Encrypted: i=1; AJvYcCWoGCrsuSxqxySgAfH+xEaHbpIZxf7c8ok8tQPGeit3H6kAcN5VUVNDj+Iuofdg1TfRwwqXBSKbaGG1nq4XzWa3qPqrP6/7
-X-Gm-Message-State: AOJu0YzspKVw9XwBBW2x2uQ5Awfr1hGShvkG6LCl2aqpnhEpdvaduOAW
-	Ca+8ABxCmhwtNft5EGd/EwaNylLIw3HmvcyQ584XdY36kMZqjQVKn3XlUYvTN8Il5nbbdOzpnbi
-	1aF10Ur8OSpj4XJ1VtUv91PX4cWq+h6seTi8h4Uc3ZQdzSwCUXLfEFm8=
-X-Google-Smtp-Source: AGHT+IGSXI/yUv0rjc6ACiv2rSTuMOE8k/ioRKFxv2MbmD/8bBqwkbvYJyL/xasU2ihb3RJQXuVzjhsYCfkwkJB4udCrn+FAazXS
+	s=arc-20240116; t=1710778084; c=relaxed/simple;
+	bh=XftcC/cufe2hINAjtjXcT+EDnMGkcOcgTjiPHmt1bdU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iakNv7LBsuv25Ks6mIZwniojSoXou/VBzimwExFfDFNcA+IfgYtY3tqosZBQ6lfKUM4el3bQdKNaDZehJ0DYCaE3iNlvbmhxciqVTUGTcGGOnXqCJhD21CLsZF1tFfoBukKB0WjKIdFQ/P7EV7OET1oSbeyUHwHZLJ0jgBJd2K8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=oJTRsKNq; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b849aa68-0f7e-455f-ba09-ff1c811db771@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1710778080;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fwQPOjQn9KdVqbATUorSxLxTcDNlvestQijqzOe8SZs=;
+	b=oJTRsKNqqrV1j8KZgt32XH+1pFyT52699CiQPGgQObTaFqP2snDQkONaqHQowRki3F02UT
+	Ot7SfvR0evdgnzE9g6SieZbM/2LB+WWHiDQHEYMQB6c/0rjMAEDcjN345VbRKCPLUWkAZm
+	SSoTLg4fBa37DH+apsl7WP7A/2CObTM=
+Date: Mon, 18 Mar 2024 09:07:54 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:17c7:b0:366:94e2:f17b with SMTP id
- z7-20020a056e0217c700b0036694e2f17bmr802591ilu.0.1710777801319; Mon, 18 Mar
- 2024 09:03:21 -0700 (PDT)
-Date: Mon, 18 Mar 2024 09:03:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000233ab00613f17f99@google.com>
-Subject: [syzbot] [bpf?] [net?] possible deadlock in sock_map_delete_elem
-From: syzbot <syzbot+4ac2fe2b496abca8fa4b@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
-	jakub@cloudflare.com, john.fastabend@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    aae08491b943 MAINTAINERS: Update email address for Quentin..
-git tree:       bpf
-console output: https://syzkaller.appspot.com/x/log.txt?x=1638d769180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
-dashboard link: https://syzkaller.appspot.com/bug?extid=4ac2fe2b496abca8fa4b
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/95cdb255229a/disk-aae08491.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/dc336e48f648/vmlinux-aae08491.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/1abbb4a4ac37/bzImage-aae08491.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+4ac2fe2b496abca8fa4b@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.8.0-syzkaller-05221-gaae08491b943 #0 Not tainted
-------------------------------------------------------
-syz-executor.4/12756 is trying to acquire lock:
-ffff888054905a00 (&stab->lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-ffff888054905a00 (&stab->lock){+.-.}-{2:2}, at: __sock_map_delete net/core/sock_map.c:414 [inline]
-ffff888054905a00 (&stab->lock){+.-.}-{2:2}, at: sock_map_delete_elem+0x97/0x140 net/core/sock_map.c:446
-
-but task is already holding lock:
-ffff888045774290 (&psock->link_lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-ffff888045774290 (&psock->link_lock){+...}-{2:2}, at: sock_map_del_link net/core/sock_map.c:145 [inline]
-ffff888045774290 (&psock->link_lock){+...}-{2:2}, at: sock_map_unref+0xcc/0x5e0 net/core/sock_map.c:180
-
-which lock already depends on the new lock.
+Subject: Re: [PATCH bpf-next V2] bpf/lpm_trie: inline longest_prefix_match for
+ fastpath
+Content-Language: en-GB
+To: Jesper Dangaard Brouer <hawk@kernel.org>, bpf@vger.kernel.org,
+ Daniel Borkmann <borkmann@iogearbox.net>
+Cc: Alexei Starovoitov <ast@kernel.org>, martin.lau@kernel.org,
+ netdev@vger.kernel.org, bp@alien8.de, kernel-team@cloudflare.com
+References: <171076828575.2141737.18370644069389889027.stgit@firesoul>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <171076828575.2141737.18370644069389889027.stgit@firesoul>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
 
-the existing dependency chain (in reverse order) is:
+On 3/18/24 6:25 AM, Jesper Dangaard Brouer wrote:
+> The BPF map type LPM (Longest Prefix Match) is used heavily
+> in production by multiple products that have BPF components.
+> Perf data shows trie_lookup_elem() and longest_prefix_match()
+> being part of kernels perf top.
+>
+> For every level in the LPM tree trie_lookup_elem() calls out
+> to longest_prefix_match().  The compiler is free to inline this
+> call, but chooses not to inline, because other slowpath callers
+> (that can be invoked via syscall) exists like trie_update_elem(),
+> trie_delete_elem() or trie_get_next_key().
+>
+>   bcc/tools/funccount -Ti 1 'trie_lookup_elem|longest_prefix_match.isra.0'
+>   FUNC                                    COUNT
+>   trie_lookup_elem                       664945
+>   longest_prefix_match.isra.0           8101507
+>
+> Observation on a single random machine shows a factor 12 between
+> the two functions. Given an average of 12 levels in the trie being
+> searched.
+>
+> This patch force inlining longest_prefix_match(), but only for
+> the lookup fastpath to balance object instruction size.
+>
+> In production with AMD CPUs, measuring the function latency of
+> 'trie_lookup_elem' (bcc/tools/funclatency) we are seeing an improvement
+> function latency reduction 7-8% with this patch applied (to production
+> kernels 6.6 and 6.1). Analyzing perf data, we can explain this rather
+> large improvement due to reducing the overhead for AMD side-channel
+> mitigation SRSO (Speculative Return Stack Overflow).
+>
+> Fixes: fb3bd914b3ec ("x86/srso: Add a Speculative RAS Overflow mitigation")
+> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
--> #1 (&psock->link_lock){+...}-{2:2}:
-       lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-       _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-       spin_lock_bh include/linux/spinlock.h:356 [inline]
-       sock_map_add_link net/core/sock_map.c:134 [inline]
-       sock_map_update_common+0x31c/0x5b0 net/core/sock_map.c:500
-       sock_map_update_elem_sys+0x55f/0x910 net/core/sock_map.c:579
-       map_update_elem+0x53a/0x6f0 kernel/bpf/syscall.c:1641
-       __sys_bpf+0x76f/0x810 kernel/bpf/syscall.c:5619
-       __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
-       __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
-       __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
-       do_syscall_64+0xfb/0x240
-       entry_SYSCALL_64_after_hwframe+0x6d/0x75
+I checked out internal PGO (Profile-Guided Optimization) kernel and
+it did exactly like the above described: longest_prefix_match() is inlined
+to trie_lookup_elem(), but not others.
 
--> #0 (&stab->lock){+.-.}-{2:2}:
-       check_prev_add kernel/locking/lockdep.c:3134 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3253 [inline]
-       validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
-       __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
-       lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-       _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-       spin_lock_bh include/linux/spinlock.h:356 [inline]
-       __sock_map_delete net/core/sock_map.c:414 [inline]
-       sock_map_delete_elem+0x97/0x140 net/core/sock_map.c:446
-       bpf_prog_174084c74af853ee+0x42/0x67
-       bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
-       __bpf_prog_run include/linux/filter.h:657 [inline]
-       bpf_prog_run include/linux/filter.h:664 [inline]
-       __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
-       bpf_trace_run2+0x204/0x420 kernel/trace/bpf_trace.c:2420
-       trace_kfree include/trace/events/kmem.h:94 [inline]
-       kfree+0x291/0x380 mm/slub.c:4396
-       sk_psock_free_link include/linux/skmsg.h:421 [inline]
-       sock_map_del_link net/core/sock_map.c:158 [inline]
-       sock_map_unref+0x3ac/0x5e0 net/core/sock_map.c:180
-       sock_hash_delete_elem+0x27e/0x300 net/core/sock_map.c:943
-       map_delete_elem+0x464/0x5e0 kernel/bpf/syscall.c:1696
-       __sys_bpf+0x598/0x810 kernel/bpf/syscall.c:5622
-       __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
-       __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
-       __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
-       do_syscall_64+0xfb/0x240
-       entry_SYSCALL_64_after_hwframe+0x6d/0x75
+Acked-by: Yonghong Song <yonghong.song@linux.dev>
 
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&psock->link_lock);
-                               lock(&stab->lock);
-                               lock(&psock->link_lock);
-  lock(&stab->lock);
-
- *** DEADLOCK ***
-
-4 locks held by syz-executor.4/12756:
- #0: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #0: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
- #0: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: map_delete_elem+0x388/0x5e0 kernel/bpf/syscall.c:1695
- #1: ffff88802b169b68 (&htab->buckets[i].lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
- #1: ffff88802b169b68 (&htab->buckets[i].lock){+...}-{2:2}, at: sock_hash_delete_elem+0xb0/0x300 net/core/sock_map.c:939
- #2: ffff888045774290 (&psock->link_lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
- #2: ffff888045774290 (&psock->link_lock){+...}-{2:2}, at: sock_map_del_link net/core/sock_map.c:145 [inline]
- #2: ffff888045774290 (&psock->link_lock){+...}-{2:2}, at: sock_map_unref+0xcc/0x5e0 net/core/sock_map.c:180
- #3: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #3: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
- #3: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2380 [inline]
- #3: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run2+0x114/0x420 kernel/trace/bpf_trace.c:2420
-
-stack backtrace:
-CPU: 1 PID: 12756 Comm: syz-executor.4 Not tainted 6.8.0-syzkaller-05221-gaae08491b943 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2187
- check_prev_add kernel/locking/lockdep.c:3134 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain+0x18cb/0x58e0 kernel/locking/lockdep.c:3869
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
- _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- __sock_map_delete net/core/sock_map.c:414 [inline]
- sock_map_delete_elem+0x97/0x140 net/core/sock_map.c:446
- bpf_prog_174084c74af853ee+0x42/0x67
- bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
- __bpf_prog_run include/linux/filter.h:657 [inline]
- bpf_prog_run include/linux/filter.h:664 [inline]
- __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
- bpf_trace_run2+0x204/0x420 kernel/trace/bpf_trace.c:2420
- trace_kfree include/trace/events/kmem.h:94 [inline]
- kfree+0x291/0x380 mm/slub.c:4396
- sk_psock_free_link include/linux/skmsg.h:421 [inline]
- sock_map_del_link net/core/sock_map.c:158 [inline]
- sock_map_unref+0x3ac/0x5e0 net/core/sock_map.c:180
- sock_hash_delete_elem+0x27e/0x300 net/core/sock_map.c:943
- map_delete_elem+0x464/0x5e0 kernel/bpf/syscall.c:1696
- __sys_bpf+0x598/0x810 kernel/bpf/syscall.c:5622
- __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
- do_syscall_64+0xfb/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-RIP: 0033:0x7f94ec87dda9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f94ed5410c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007f94ec9abf80 RCX: 00007f94ec87dda9
-RDX: 0000000000000020 RSI: 0000000020000080 RDI: 0000000000000003
-RBP: 00007f94ec8ca47a R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 000000000000000b R14: 00007f94ec9abf80 R15: 00007ffd0775a478
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+> ---
+>   kernel/bpf/lpm_trie.c |   18 +++++++++++++-----
+>   1 file changed, 13 insertions(+), 5 deletions(-)
+>
+> diff --git a/kernel/bpf/lpm_trie.c b/kernel/bpf/lpm_trie.c
+> index 050fe1ebf0f7..939620b91c0e 100644
+> --- a/kernel/bpf/lpm_trie.c
+> +++ b/kernel/bpf/lpm_trie.c
+> @@ -155,16 +155,17 @@ static inline int extract_bit(const u8 *data, size_t index)
+>   }
+>   
+>   /**
+> - * longest_prefix_match() - determine the longest prefix
+> + * __longest_prefix_match() - determine the longest prefix
+>    * @trie:	The trie to get internal sizes from
+>    * @node:	The node to operate on
+>    * @key:	The key to compare to @node
+>    *
+>    * Determine the longest prefix of @node that matches the bits in @key.
+>    */
+> -static size_t longest_prefix_match(const struct lpm_trie *trie,
+> -				   const struct lpm_trie_node *node,
+> -				   const struct bpf_lpm_trie_key_u8 *key)
+> +static __always_inline
+> +size_t __longest_prefix_match(const struct lpm_trie *trie,
+> +			      const struct lpm_trie_node *node,
+> +			      const struct bpf_lpm_trie_key_u8 *key)
+>   {
+>   	u32 limit = min(node->prefixlen, key->prefixlen);
+>   	u32 prefixlen = 0, i = 0;
+> @@ -224,6 +225,13 @@ static size_t longest_prefix_match(const struct lpm_trie *trie,
+>   	return prefixlen;
+>   }
+>   
+> +static size_t longest_prefix_match(const struct lpm_trie *trie,
+> +				   const struct lpm_trie_node *node,
+> +				   const struct bpf_lpm_trie_key_u8 *key)
+> +{
+> +	return __longest_prefix_match(trie, node, key);
+> +}
+> +
+>   /* Called from syscall or from eBPF program */
+>   static void *trie_lookup_elem(struct bpf_map *map, void *_key)
+>   {
+> @@ -245,7 +253,7 @@ static void *trie_lookup_elem(struct bpf_map *map, void *_key)
+>   		 * If it's the maximum possible prefix for this trie, we have
+>   		 * an exact match and can return it directly.
+>   		 */
+> -		matchlen = longest_prefix_match(trie, node, key);
+> +		matchlen = __longest_prefix_match(trie, node, key);
+>   		if (matchlen == trie->max_prefixlen) {
+>   			found = node;
+>   			break;
+>
+>
+>
 
