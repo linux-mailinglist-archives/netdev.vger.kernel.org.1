@@ -1,137 +1,117 @@
-Return-Path: <netdev+bounces-80476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A618387F06D
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 20:29:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77B1787F070
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 20:31:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 46E17B21019
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 19:29:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 121C1282810
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 19:31:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A5B56767;
-	Mon, 18 Mar 2024 19:29:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EE7056767;
+	Mon, 18 Mar 2024 19:31:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SRVv8+Js"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MAqm5HDx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF43456755
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 19:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0901A56755
+	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 19:31:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710790159; cv=none; b=uWK05hENp9QALNV5XIJ2XD5zhPL9GT/oAbeUk9Gn8fJqZJhIQvo/AIva1lSJ12PLTym6jW/Ruiu+D8LRzoJTEN97AW4F+kQb87mZz+8LXeW37t5FreUI7zerDyTNOuk5gQ0pZTfmeicjqzfHzAs+FEmRccFe+Rgsgkad2/qqzNY=
+	t=1710790287; cv=none; b=oeZK5fTLYLShtgYbHByXpTFY4XynsJ/RtAbzMEqY8yo3FSR2dJmOQyX+X9tCqkmXvAt5RFsp0zV62hT4E6Q54TMaqlVYduf8Ea1X+Kk/rAR/tF69DUP1K88AAs7oV0MnxFDyBuNJ+i739TUMba03XVKCATgF/mlIzRry5QSiPTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710790159; c=relaxed/simple;
-	bh=9B5+PbH/lzud3TnNw/UNcvw9W2yFSkK2v1DvNMKypCk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VpK9GqySZBUn4EH9tuY1tDAeyeAcdoKxYaBgL6BzNLaFTkyvMMHSW9epN8mlsHQenOVaFx3FHGHJuj6RpABqzhTZPnTRdzOM7X1CCklfw/omaZXcFQm5qi4oZXC/d2b5r6pcJUilE2x0gnJJfvx2B9QzuzOB3v0uq7fBrOn/nnI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SRVv8+Js; arc=none smtp.client-ip=209.85.215.182
+	s=arc-20240116; t=1710790287; c=relaxed/simple;
+	bh=9ED1UA2aTtgsP9lqYvHliAsugiOz+ZDOcdsAbNgRAg4=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=F8sKAXwUf5Fw2zSITX2Sm13Ibu5d1dAKN50Srzn1Tj3Ly5khIfYz38vQCNMpKWH2ZwmHS/X+MOf8M50VsKszP+x3iYNeyNXZn4RQIgJnvPObi93BtejJoj13sZZBsgIAqoTYXR0RtNVsSMNLlwoO/cL4XibbYNowjYJ+Srz3lDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MAqm5HDx; arc=none smtp.client-ip=209.85.222.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-5dc949f998fso3547122a12.3
-        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 12:29:17 -0700 (PDT)
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-78850c6609bso197443985a.0
+        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 12:31:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710790157; x=1711394957; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KN09v//x59Hz3OYqOq86iV40wL9tkGH0gDwo/zxn29E=;
-        b=SRVv8+Js3eersDzI90JVHxO5mZO+DnrjT4bg7QUUi8qXXH+C6MxKbWhlhr4DXAWNge
-         5Rp4VwmmKPNbNwy4Yade6tEaE7UL9N/LCwEMXWhUIGO88OB9SjO27HyquT8EMvO3fkor
-         EFeNN0z3F5mvD9nUPjWH1HrmCqIfSAXN7PJTssM1Rzrtkrztlg+l8XskfpAe9IpmXO3q
-         /UgUTV82AW6LDHvoSB/Y4QkZ2O+wlhsjm6eoC351hBUh+2UAMojBB5I8/H15vIcfCTdK
-         sR60Ucx3EbwCgGXuPMnYdWiFRr0/I+iGYmCiVxNMRp/YdiK5i4BwlVCTIoKqUALIgzEv
-         j7UQ==
+        d=gmail.com; s=20230601; t=1710790285; x=1711395085; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3HCtE5FSo/r9cX0PreD1CPVvUUAArzDA00BY23dMYLM=;
+        b=MAqm5HDxyDaC/xSi3enHc5AbP+TCqid5nO5pMmm5NSyGzJ5OLwevywgCTDdw1c9QAH
+         wKpsa3+AQqLn0PWM79zrtclQwskmo44TI119mZs+MlYX0CVi6OKqhsX9WYXdLkYXEiGJ
+         b+qXNcAunzQGgPo3fzIuEv2sEiEn4xW2AEDPyrv6umwyrGrMbweyD04VIQVK8Rw3c2Pj
+         3gg8HMlO65TILrfKDqoabqs9E4pJnhXmmZLIhf1HMmizASbcprztEAj+Chb66UsyDkks
+         LaQPuqhqQ4b3GdtMOJcF9JMrVpYFBOZUtdzdUosb6Z9bTHAcrfJ4TVUK2erPJxz9L6gK
+         8Ydg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710790157; x=1711394957;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KN09v//x59Hz3OYqOq86iV40wL9tkGH0gDwo/zxn29E=;
-        b=C2MKjaKKywVMzpL2zVgWAs4D2U3GG+SAvbfFzErIKS6I+iKti3ec9Nxjl7kYk2bJdH
-         XSLNlAgxHkza+JVrGi3CDp+8+vLLNJt9vu3GCFWHy3HhJGCep+ebw8UU+Q1SNyYWMoF1
-         3UCW77JJ+F+ki3FEkfMMGXPJiNLH/nA5BW99dS53pueqMz2n/JDWZq3AkGTxNrxLkcUZ
-         CdbfGfGBqevE+STIs17iIgycMWtGKUw6aLPHbHhHYjs9LCg8ArzHyyDxGoRcGTgwqnLa
-         ukBZ/5SNM3e4IuD+TYCbL6eP++mbyhbyRLag1b3ChYeAQNK2jBMbwjWm6wyLrJB1SWxf
-         mEBg==
-X-Forwarded-Encrypted: i=1; AJvYcCWr/UYV5c86YB2mnJWgFgv66e3sCzknA9WJD7h0Si8UBDxKKp1E++AeZ+f/9OwMLskAnIcuuenQKVCtalZaIRyCiKRHBa+k
-X-Gm-Message-State: AOJu0YyOBuNU5d57rRVCyWYv3wsctgR3HdQIxXR/8G/3yXcPtSvJ8j5c
-	8Bc8qJDxpjxmiWQIXGCDIDH0p+gaAiDfMQjUh8qsEPVBRsBy38zf3rl2Knj+WZvVLCCZShi1toX
-	oooCy7yL6wZXx+26wsLv4SrOcWw==
-X-Google-Smtp-Source: AGHT+IGvZfnZ+Rky0Oh/Gsn5g6WhTcakpBOS3Ktw8XVis6xgJg1tYb8wfhJIJC8i856kKwwm3a8vqxrEPp9TbQ2uiN0=
-X-Received: by 2002:a17:90a:c592:b0:29b:a509:30aa with SMTP id
- l18-20020a17090ac59200b0029ba50930aamr660387pjt.14.1710790157090; Mon, 18 Mar
- 2024 12:29:17 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710790285; x=1711395085;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3HCtE5FSo/r9cX0PreD1CPVvUUAArzDA00BY23dMYLM=;
+        b=l5JhylL4kOFH+Dw+3Tixz7aut9aR02iNGU7TbVwEEUHOyrM3ZexD+owyF0niYJH8+I
+         gm0KMRDA4yJvrduecdHTpLzrY6+sTWbvMMUDafblQjAMZSbRsWA9eQLUeuH2IL3v50ey
+         8edsy7pxDBe3BSXm59Y5zGihb0lm772A9BXkOOyDfci8LD7+82D+g0oRcw/1n8m6fVsC
+         VeMteX7JlIoGBy/Brh42c/7KJDpafFF2FxGPp4Kb3DGOoUUnK9LEIsInVcveYcDjc/rX
+         IbgimPoIzlo20j2BxgvlIRWLgv/H4X3zwX6vwEGPY4TXWQlfrBcbIQCmh+4jDIurG8cQ
+         +bRw==
+X-Forwarded-Encrypted: i=1; AJvYcCWYNxYzLfiRidZlVJ4qGPH3XO9jt2eWd+UNyB//OxK2cOqKJ+9AAjHIDiH20ogTvpXgbtxUDi//Ch7HO9KfPbAb+DSQW+pg
+X-Gm-Message-State: AOJu0YymuvvwDUmLd2GD6Ftsk7ELntRJpoihYmcTY0EbuEjg3elnfcxa
+	nkbgSJdE006ughQQ3yRdVSdcLcjwCQe+3nR4jTKzBeYuNXhDnDo=
+X-Google-Smtp-Source: AGHT+IEM2/UAdpOwySD5GxnJlR8xpYe4iTsQU8iP+0qN60W7JwatwDYP328gheEyeu4bDeRJz4VZIA==
+X-Received: by 2002:a05:620a:3883:b0:789:e902:a608 with SMTP id qp3-20020a05620a388300b00789e902a608mr8513379qkn.54.1710790284937;
+        Mon, 18 Mar 2024 12:31:24 -0700 (PDT)
+Received: from cy-server ([2620:0:e00:550a:f223:a573:b90d:c1bf])
+        by smtp.gmail.com with ESMTPSA id h15-20020ae9ec0f000000b00787930320b6sm4820387qkg.70.2024.03.18.12.31.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Mar 2024 12:31:24 -0700 (PDT)
+Date: Mon, 18 Mar 2024 14:31:24 -0500
+From: Chenyuan Yang <chenyuan0y@gmail.com>
+To: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org, zzjas98@gmail.com
+Subject: [net/sched] Question about possible misuse checksum in
+ tcf_csum_ipv6_icmp()
+Message-ID: <ZfiWjOWDs2osFAnX@cy-server>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <ZfZcDxGV3tSy4qsV@cy-server> <ZfgHkApgxX7DybHx@nanopsycho>
-In-Reply-To: <ZfgHkApgxX7DybHx@nanopsycho>
-From: Chenyuan Yang <chenyuan0y@gmail.com>
-Date: Mon, 18 Mar 2024 14:29:06 -0500
-Message-ID: <CALGdzurhU95jn7q71fb5Dq0QZ2dB1hHLNbX2zR=32gB6nRHjmA@mail.gmail.com>
-Subject: Re: [net/devlink] Question about possible CMD misuse in devlink_nl_port_new_doit()
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, zzjas98@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Thank you so much for your prompt reply and fix!
+Dear TC subsystem maintainers,
+
+We are curious whether the function `tcf_csum_ipv6_icmp()` would have a misuse of `csum_partial()` leading to an out-of-bounds access.
+
+The function `tcf_csum_ipv6_icmp` is https://elixir.bootlin.com/linux/v6.8/source/net/sched/act_csum.c#L183 and the relevant code is
+```
+static int tcf_csum_ipv6_icmp(struct sk_buff *skb, unsigned int ihl,
+			      unsigned int ipl)
+{
+  ...
+	ip6h = ipv6_hdr(skb);
+	icmp6h->icmp6_cksum = 0;
+	skb->csum = csum_partial(icmp6h, ipl - ihl, 0);
+	icmp6h->icmp6_cksum = csum_ipv6_magic(&ip6h->saddr, &ip6h->daddr,
+					      ipl - ihl, IPPROTO_ICMPV6,
+					      skb->csum);
+  ...
+}
+```
+
+Based on this patch: https://lore.kernel.org/netdev/20240201083817.12774-1-atenart@kernel.org/T/, it seems that the `skb` here for ICMPv6 could be non-linear, and `csum_partial` is not suitable for non-linear SKBs, which could lead to an out-of-bound access. The correct approach is to use `skb_checksum` which properly handles non-linear SKBs.
+
+Based on the above information, a possible fix would be
+```
+-	skb->csum = csum_partial(icmp6h, ipl - ihl, 0);
++	skb->csum = skb_checksum(skb, skb_transport_offset(skb), ipl - ihl, 0);
+``` 
+
+Please kindly correct us if we missed any key information. Looking forward to your response!
 
 Best,
 Chenyuan
-
-On Mon, Mar 18, 2024 at 4:21=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrote=
-:
->
-> Sun, Mar 17, 2024 at 03:57:19AM CET, chenyuan0y@gmail.com wrote:
-> >Dear Devlink Developers,
-> >
-> >We are curious whether the function `devlink_nl_port_new_doit()` might h=
-ave a incorrect command value `DEVLINK_CMD_NEW`, which should be `DEVLINK_C=
-MD_PORT_NEW`.
-> >
-> >The function is https://elixir.bootlin.com/linux/v6.8/source/net/devlink=
-/port.c#L844
-> >and the relevant code is
-> >```
-> >int devlink_nl_port_new_doit(struct sk_buff *skb, struct genl_info *info=
-)
-> >{
-> >       ...
-> >       err =3D devlink_nl_port_fill(msg, devlink_port, DEVLINK_CMD_NEW,
-> >                                  info->snd_portid, info->snd_seq, 0, NU=
-LL);
-> >       if (WARN_ON_ONCE(err))
-> >               goto err_out_msg_free;
-> >       ...
-> >}
-> >```
-> >
-> >In `devlink_nl_port_fill`, all other places use `DEVLINK_CMD_PORT_NEW` a=
-s the command value. However, in `devlink_nl_port_new_doit`, it uses `DEVLI=
-NK_CMD_NEW`. This might be a misuse, also according to https://lore.kernel.=
-org/netdev/20240216113147.50797-1-jiri@resnulli.us/T/.
-> >
-> >Based on our understanding, a possible fix would be
-> >```
-> >-  err =3D devlink_nl_port_fill(msg, devlink_port, DEVLINK_CMD_NEW,
-> >+  err =3D devlink_nl_port_fill(msg, devlink_port, DEVLINK_CMD_PORT_NEW,
-> >```
-> >
-> >Please kindly correct us if we missed any key information. Looking forwa=
-rd to your response!
->
-> You are correct, this is a bug. Thanks for report!
-> Here's the fix:
-> https://lore.kernel.org/netdev/20240318091908.2736542-1-jiri@resnulli.us/
->
->
 
