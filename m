@@ -1,164 +1,121 @@
-Return-Path: <netdev+bounces-80385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BA4687E92A
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 13:13:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A57AE87E934
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 13:19:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10D7CB21443
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 12:13:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 500111F2186B
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 12:19:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E53D737714;
-	Mon, 18 Mar 2024 12:12:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F2E3364A4;
+	Mon, 18 Mar 2024 12:19:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="omFYthG0"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="aaEwdND6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB1E738382;
-	Mon, 18 Mar 2024 12:12:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70CDA381B8
+	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 12:19:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710763978; cv=none; b=JrgFyI9nSkWVTf7qdtGulohwnx0FBG65x0b4fD6+2RqgGDzCOeQmVpsO9+N7cQTODB78xkJAIIW3VfHxErcK39mLhn91Y2/qVKUdwv86D85oWXThEYjpvZtpS5Aj2A/bUeNYgRIwQ/OQMfkXMXP3hoW0cugmuR7J4Al7JFQA/yI=
+	t=1710764371; cv=none; b=DQNrx+3+0z0pI/o221TcuksyVIGWXDrjDExyI0L3Tf/Khdg2DfY4HAZ4VmRPzcac6MMHQEmIyIFNblThxmbdIzOytaMxoHz/AllGRP3JdIX28MCvSzApWMJhv59Gjx5zCFUfD48o6jdFfLQfIqVdMp8rMNahP+43KeeTEZYOPD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710763978; c=relaxed/simple;
-	bh=HLuck12upJDUcz1Z3oOsil9KA5H2QT2T3rExgKJluOU=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=IPJEbsQdv61YfavkuVuRqtXJg7fOgHiOOKMoyEhtCeU6Fl9+dApjZDYNEGLNZC8D0j31CloPhv1iZsXrJcH3npzej9dd8Ik+Oam7363+VdetheK8KMZR2t8EYUvIMscl+XlXG+OlUbTt+WIevVO/UIid/ha0lPEZ7JRVpU3IW8c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=omFYthG0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C97F9C433F1;
-	Mon, 18 Mar 2024 12:12:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710763978;
-	bh=HLuck12upJDUcz1Z3oOsil9KA5H2QT2T3rExgKJluOU=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=omFYthG0kHVa39d/Ee5/nLEfNOYh2nN3O+5zT/flV4LFoqCIZ96TG7rLZ/dH2U7O9
-	 DuRgTdVu/38c0vgMHvX4Ak0hU7WOwF0OmEReUnHrjbXPOEJn5tUUrfJdI4lp/lCM12
-	 KHO88QV4UqM5Cs3mwbKXmLwCh+Tsuq2R946r3ZD6Zn+dq45gGwd0oD1FCGizdKLnrk
-	 CYeG+pf7sNEYfr6oURdU5v3loaMKErxXYoj+EPmnWVJ4rIFZV4H43N7eWN4RgI+KHX
-	 4cel6OknNSwONw2iZHKCIEq94HGZGlnu9xeMDEH34eBj8wE9Fv78vJQeZbKwlgYZE8
-	 We3sPRcfYNb7A==
-Message-ID: <447caa0d-10d6-42f9-958b-5d6d7c472792@kernel.org>
-Date: Mon, 18 Mar 2024 13:12:55 +0100
+	s=arc-20240116; t=1710764371; c=relaxed/simple;
+	bh=pOSlkUulYyw5/O4A+X0uYoH/0HZhuQNeAcLk38o/IBk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=YAdQsDSm0VVPLTszzP7SGDXpOhTB0AQ31OSXUHchb2/wN88cdGb0SOSCrqm5n4WnGRsF/qUDkTOY7PQSE9kWjPsrIxTIG56hdmiDZVOjj8RUzAYn1TnaoDk+pSprBYyLvNd26aukMJsUyW7tc2uj7XShi8xInEv7qYQkU+65sBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=aaEwdND6; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5654f700705so5849220a12.1
+        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 05:19:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710764367; x=1711369167; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=pOSlkUulYyw5/O4A+X0uYoH/0HZhuQNeAcLk38o/IBk=;
+        b=aaEwdND64LiE8FYe7nBzBYvjKQD99tn2uikFgpMIZQWr98se8EsGqjiE8aO8+0BLEg
+         Td+mrf2BtIDFn9LNNiRyBh3ZdW6NmnhWqBaKslesdVEzpl+PagC0Pb6DR669E4tnjad7
+         o2a9OBHRJ/hFmqXYZmCy8b/kxZcrhWjDCNj3REai7vuWjl8G883ZuYWM9iu4WYp1oGNo
+         ne3lehklZNdfGovA5oKmJfQyfnYkcly/487nl5DyD3Mu4xV0J15o/GsgcsMlBSplkS3N
+         OSaCf68K14QyFZvweJO3p6ps8DhDAHhB4OrjBsIrsU3POxEuMzaZjUMY6tiCk/o75ixT
+         WyMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710764367; x=1711369167;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pOSlkUulYyw5/O4A+X0uYoH/0HZhuQNeAcLk38o/IBk=;
+        b=rTYR4xak0rb19l6zspSQBR9QN+JdJnpaqIwAAc0Q4MMF1vvSqOoxLcqdUfX245jNtE
+         ZAgyOsVOZWXLiqgnuTgrZ4BGK8GEo1qJzI6ix9ckTe2VQP9Vzuc9PVBryedT9Bg+PS63
+         2pO2PlIiHeqHgLiw0bm3VEezkJpluMBNRn5dDM0Ygk4GkJfXEy+SplYen/7H0JFBMAB/
+         6MrOZ0P3d5ZlRhEkJA+jfLFRydAOQGEmSPn6XuCF9vsGX1U1K0rcPKhqLxAEqnaX+VJe
+         sHLSCFkgsMOEnkgJcd9xtBaU+wRDrxXIzXZ62VNE+Qt6oNU6dKL93IL18q9PHMGSLG2S
+         e6Yw==
+X-Gm-Message-State: AOJu0YzSFz6VSCJMGlNdn4D7HEb4FzaOoWWxlDrZaH5SaAfdBTjZECYm
+	ZfP0/gxiBn+9g1wW0HvBLxgr76kwPXMMWcIEyxRvmE0udfqjjqiPraoSh1dUu3s=
+X-Google-Smtp-Source: AGHT+IHF1tEj7gb/YwVHDW9BOuby74iZuApmYgSUxT3zLZ2JgfbTwLMWpYsP7y0MGCfo/Ko64/Zs/w==
+X-Received: by 2002:a05:6402:c13:b0:568:b391:4ec8 with SMTP id co19-20020a0564020c1300b00568b3914ec8mr5028130edb.12.1710764366639;
+        Mon, 18 Mar 2024 05:19:26 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id h13-20020a0564020e0d00b00568b163c4easm3421073edh.11.2024.03.18.05.19.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Mar 2024 05:19:25 -0700 (PDT)
+Date: Mon, 18 Mar 2024 13:19:22 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@google.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	virtualization@lists.linux.dev, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v5 0/9] virtio-net: support device stats
+Message-ID: <ZfgxSug4sekWGyNd@nanopsycho>
+References: <20240318110602.37166-1-xuanzhuo@linux.alibaba.com>
+ <Zfgq8k2Q-olYWiuw@nanopsycho>
+ <1710762818.1520293-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next] bpf/lpm_trie: inline longest_prefix_match for
- fastpath
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>, bpf@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <borkmann@iogearbox.net>, martin.lau@kernel.org,
- netdev@vger.kernel.org, kernel-team@cloudflare.com
-References: <171025648415.2098287.4441181253947701605.stgit@firesoul>
- <2c2d1b85-9c4a-5122-c471-e4a729b4df03@iogearbox.net>
- <860f02ae-a8a8-4bcd-86d8-7a6da3f2056d@kernel.org>
-In-Reply-To: <860f02ae-a8a8-4bcd-86d8-7a6da3f2056d@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1710762818.1520293-1-xuanzhuo@linux.alibaba.com>
 
-
-
-On 15/03/2024 18.08, Jesper Dangaard Brouer wrote:
-> 
-> 
-> On 15/03/2024 16.03, Daniel Borkmann wrote:
->> On 3/12/24 4:17 PM, Jesper Dangaard Brouer wrote:
->>> The BPF map type LPM (Longest Prefix Match) is used heavily
->>> in production by multiple products that have BPF components.
->>> Perf data shows trie_lookup_elem() and longest_prefix_match()
->>> being part of kernels perf top.
+Mon, Mar 18, 2024 at 12:53:38PM CET, xuanzhuo@linux.alibaba.com wrote:
+>On Mon, 18 Mar 2024 12:52:18 +0100, Jiri Pirko <jiri@resnulli.us> wrote:
+>> Mon, Mar 18, 2024 at 12:05:53PM CET, xuanzhuo@linux.alibaba.com wrote:
+>> >As the spec:
+>> >
+>> >https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
+>> >
+>> >The virtio net supports to get device stats.
+>> >
+>> >Please review.
 >>
->> You mention these are heavy hitters in prod ...
->>
->>> For every level in the LPM tree trie_lookup_elem() calls out
->>> to longest_prefix_match().  The compiler is free to inline this
->>> call, but chooses not to inline, because other slowpath callers
->>> (that can be invoked via syscall) exists like trie_update_elem(),
->>> trie_delete_elem() or trie_get_next_key().
->>>
->>>   bcc/tools/funccount -Ti 1 
->>> 'trie_lookup_elem|longest_prefix_match.isra.0'
->>>   FUNC                                    COUNT
->>>   trie_lookup_elem                       664945
->>>   longest_prefix_match.isra.0           8101507
->>>
->>> Observation on a single random metal shows a factor 12 between
->>> the two functions. Given an average of 12 levels in the trie being
->>> searched.
->>>
->>> This patch force inlining longest_prefix_match(), but only for
->>> the lookup fastpath to balance object instruction size.
->>>
->>>   $ bloat-o-meter kernel/bpf/lpm_trie.o.orig-noinline 
->>> kernel/bpf/lpm_trie.o
->>>   add/remove: 1/1 grow/shrink: 1/0 up/down: 335/-4 (331)
->>>   Function                                     old     new   delta
->>>   trie_lookup_elem                             179     510    +331
->>>   __BTF_ID__struct__lpm_trie__706741             -       4      +4
->>>   __BTF_ID__struct__lpm_trie__706733             4       -      -4
->>>   Total: Before=3056, After=3387, chg +10.83%
->>
->> ... and here you quote bloat-o-meter instead. But do you also see an
->> observable perf gain in prod after this change? (No objection from my
->> side but might be good to mention here.. given if not then why do the
->> change?)
->>
-> 
-> I'm still waiting for more production servers to reboot into patched
-> kernels.  I do have some "low-level" numbers from previous generation
-> AMD servers, running kernel 6.1, which should be less affected by the
-> SRSO (than our 6.6 kernels). Waiting for newer generation to get kernel
-> updates, and especially 6.6 will be interesting.
+>> net-next is closed. Please resubmit next week.
+>
+>
+>For review.
 
-There were no larger performance benefit on 6.6 it is basically the same.
+RFC, or wait.
 
-Newer generation (11G) hardware latency overhead of trie_lookup_elem
-  - avg 1181 nsecs for patched kernel
-  - avg 1269 nsecs for non patched kernel
-  - around 7% improvement or 88 ns
-
-> 
->  From production measurements the latency overhead of trie_lookup_elem:
->   - avg 1220 nsecs for patched kernel
->   - avg 1329 nsecs for non patched kernel
->   - around 8% improvement or 109 nanosec
->   - given approx 12 calls "saved" this is 9 ns per function call
->   - for reference on Intel I measured func call to cost 1.3ns
->   - this extra overhead is caused by __x86_return_thunk().
-> 
-
-> I also see slight improvement in the graphs, but given how much
-> production varies I don't want to draw conclusions yet.
-> 
-
-Still inconclusive due to variations in traffic distribution due to
-load-balancing isn't perfect.
-
-> 
->>> Details: Due to AMD mitigation for SRSO (Speculative Return Stack Overflow)
->>> these function calls have additional overhead. On newer kernels this shows
->>> up under srso_safe_ret() + srso_return_thunk(), and on older kernels (6.1)
->>> under __x86_return_thunk(). Thus, for production workloads the biggest gain
->>> comes from avoiding this mitigation overhead.
->>>
->>> Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
-
-I'm going to send a V2, because kernel doc processing found an issue:
-  - https://netdev.bots.linux.dev/static/nipa/834681/13590144/kdoc/stderr
-
-I'll try to incorporate the production improvements we are seeing, but
-it feels wrong to write about kernel 6.1 and 6.6 improvements, but I
-(currently) cannot deploy a bpf-next kernel in production (but I do test
-latest kernels in my local testlab).
-
---Jesper
+>
+>Thanks.
 
