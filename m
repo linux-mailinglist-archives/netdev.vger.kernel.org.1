@@ -1,141 +1,146 @@
-Return-Path: <netdev+bounces-80375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40E5B87E8DF
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 12:46:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC0A787E8E2
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 12:48:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF3171F23886
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 11:46:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 673C928250C
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 11:48:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE00D37159;
-	Mon, 18 Mar 2024 11:46:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9367037162;
+	Mon, 18 Mar 2024 11:48:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="PH2LIwZ0"
+	dkim=pass (2048-bit key) header.d=yotsuba.nl header.i=@yotsuba.nl header.b="CDkWvBqy";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="asTqP3/k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wfhigh2-smtp.messagingengine.com (wfhigh2-smtp.messagingengine.com [64.147.123.153])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9EC364C6
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 11:46:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11E5428E0B;
+	Mon, 18 Mar 2024 11:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.153
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710762403; cv=none; b=mdw6rq/ozpSS609GFtrA5GDu7VPNPgRrCoTFIbPs4PXDhAfWxTYJ9fV/u/TPNHUZqHC1un2ixxSIHqS5X+aFNw0ZeokyFJWCATcXCkUSoWmEY32Dogz24J3RM93kzR1RvBSWbSkcVefj0ITigXcPaT/CrZaLcXn21KJQDyyTxxI=
+	t=1710762485; cv=none; b=J141NtpDdpkn1qawWgksIxJknxOq8VesyZo7B7c8gOdC0YxVlOOtUbXh503zJ57vaFC7sgyZbo72mdQR7W9Dys0Mkh6TedFLdL/Q1sf9a2sMPXM2Jet7WWSvPVcLR3U+LPk+kX68i+2JMrvlD6peD4sG7+DjmAa676uomNx7STk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710762403; c=relaxed/simple;
-	bh=R7ovyQCXq4JqE74DA5qi0Whd11d4dcJZI4jtH31aC14=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=od/ZWdtvYpzRRNUbVzpfEEfXVuXD8VNO/6YLKbVxhYrjbVJX5UBBoWqG+eXukxeB6F6TwDTJTkXrwHtyfZK2t85OYE9UCXioUNDitMiYxlYUCp4FKUjmTTJ/Kzx9TGaDdszhktmjl7X208dBRMN9KeuIQMwn3D40vieraORmOxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=PH2LIwZ0; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33ec7e38b84so2512986f8f.1
-        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 04:46:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710762400; x=1711367200; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=B8A409aN+fBcQklFPlBADZ9jKHPDQaUy+bgX3gYOHe0=;
-        b=PH2LIwZ0ZBSpySb9r+xmN3bRjaTA3cEVg2tHbWJrj7TWRXOxp446NgUSzsnmfNHcUl
-         oDZCoEBC94XcQ/Lc5TvuKHuF6TPenQ5W6/YBJg0WQEX6VDla7GzjxugujQ9T8VUdoxth
-         D+RdgKoFCnuoz6VI2eHU5P9bzTNP8USV1VrGD/FoHdThUdwZEbkyeEoQjFoIsc7vw9kF
-         qr/icSxbfzxe/gAks71xecwjqwtQNMxY+eZoLJawdxvvCNnqXFl6C3HbPI3MhkFBLRex
-         ta+vQRJalbMm8zL68edHyJlm0K9JoU0i0T7IKzM9ESEwW/sxwnBh2BSXBz2UfTFqkoL3
-         RPKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710762400; x=1711367200;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B8A409aN+fBcQklFPlBADZ9jKHPDQaUy+bgX3gYOHe0=;
-        b=OsRJat6NjMqnr0yuzcIt/4l40lGJcp7CPrT7My4TDvagLIZffU51G09JiD2YaAlbkF
-         /ONeNECTTOs6g60L0c5tdKTV9FZjuFL4tUF1koqVt6xrSYs6kHFp5bl3YYCPofcyoq+i
-         NsrsFF6yz/hvxGRf21EEUBXfPgcKAujewBFl1SIpOLzAXYM5TbOP0Rw63DlGD/5tDTLt
-         yLHU6WkrVAWMVP8afNPTZQuz6j/RZDuaFtgFx0XStHK32iDKhpeQrFl+3pdQiSoWk4Cg
-         u8pznkEHEN4P26pTMywNRdAa0+vCJwJlUmN2CkU9lGhMgJiJNdkd47IqrFxqR/q0kkfN
-         5Hvw==
-X-Forwarded-Encrypted: i=1; AJvYcCUfm0xnVBdJS9NKy08cKstBh3mUdAUpltxzd/lB15DsE4o3NObpGoWc5TrXcLmNVP13Lbf1IRhhlZ7UFM+PgZ+B6do3oXCF
-X-Gm-Message-State: AOJu0YyXIhL5i6QIX2qIX0K7lhKZNLhlZ4dtQOBENGgKVZ69A5XaQ77W
-	QKQlb2/oPFI5q2PNMCOCIQeINByoXdgomUrOnq/oXp2KJ5WuGYs5ayWcXhGR7y4=
-X-Google-Smtp-Source: AGHT+IFudxVTqDsTL3NiAJF7PgeYJ6xPOb5BxUJ2VTjXU0sS/60+Zkk4r7qaMCwKc3/zN+yqXWZBVw==
-X-Received: by 2002:a05:6000:246:b0:33e:78c1:acfa with SMTP id m6-20020a056000024600b0033e78c1acfamr8007701wrz.1.1710762399966;
-        Mon, 18 Mar 2024 04:46:39 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ck19-20020a5d5e93000000b0033ec81ec4aesm3338938wrb.78.2024.03.18.04.46.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Mar 2024 04:46:39 -0700 (PDT)
-Date: Mon, 18 Mar 2024 12:46:36 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Thinh Tran <thinhtr@linux.ibm.com>
-Cc: jacob.e.keller@intel.com, kuba@kernel.org, netdev@vger.kernel.org,
-	VENKATA.SAI.DUGGI@ibm.com, abdhalee@in.ibm.com, aelior@marvell.com,
-	davem@davemloft.net, drc@linux.vnet.ibm.com, edumazet@google.com,
-	manishc@marvell.com, pabeni@redhat.com, simon.horman@corigine.com,
-	skalluru@marvell.com
-Subject: Re: [PATCH v11] net/bnx2x: Prevent access to a freed page in
- page_pool
-Message-ID: <ZfgpnMtB0nDbMVJa@nanopsycho>
-References: <20240315205535.1321-1-thinhtr@linux.ibm.com>
+	s=arc-20240116; t=1710762485; c=relaxed/simple;
+	bh=5IPsSEdz/fp9vQJpZ1KEpT33IKLJun6HJeoTvxotXNE=;
+	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
+	 Message-Id:References:To; b=prpUT8EiVIewLji++pjuLrNcg4w8hA+S47Loe3OVDIxGDez/9wUcwf4Gv1kj6SiiBnRpbCw6cC4NGG0T1v/lF8Uv0es4aBbndfVsvk/jXXGsL+9hNTEckfmE7hbFQHy9zdpQmHJ7BfxagcpOesksU2hSzwH5JGSywbotziOHtX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yotsuba.nl; spf=pass smtp.mailfrom=yotsuba.nl; dkim=pass (2048-bit key) header.d=yotsuba.nl header.i=@yotsuba.nl header.b=CDkWvBqy; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=asTqP3/k; arc=none smtp.client-ip=64.147.123.153
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yotsuba.nl
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yotsuba.nl
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailfhigh.west.internal (Postfix) with ESMTP id 73DCD18000AB;
+	Mon, 18 Mar 2024 07:48:01 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute6.internal (MEProxy); Mon, 18 Mar 2024 07:48:02 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yotsuba.nl; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1710762480;
+	 x=1710848880; bh=5IPsSEdz/fp9vQJpZ1KEpT33IKLJun6HJeoTvxotXNE=; b=
+	CDkWvBqyo1bkd5bcJgZ3nEhjGMO526PRFyNSgfBXdAfyUjLg2+zH87KjBV67SiOS
+	6aN+gWQ1JwFK5fMvPGVvdX7sB1YX2oz8aY1Eq1ydqXAfwWnq0QQ6gThsMxF8/vza
+	RMRuN/pQak27I0cksCMCFPpdEqdi/bOfyLxfffUS8WU6AKFPwWg2OF47a9RYNF9W
+	uNvN1sY4Vy3P7RPfysl8SXA+09s/qF4SxapeVh3Lt9+QtqZm7OXyMXkb7oqhHfF6
+	OPtUoXBUIPt8FBcINlYB+vBGyldOngliDVVE1Ug8JSXq7Qi2GNl1Km5ha3sGIqZv
+	LNb2INp3dt77tYconsgyEQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1710762480; x=
+	1710848880; bh=5IPsSEdz/fp9vQJpZ1KEpT33IKLJun6HJeoTvxotXNE=; b=a
+	sTqP3/kcyn2kaNJ7ypH9+rX13SFIcxyyT2fmvKGNI4WRNAz/q6jY07Guv9HI0Kdy
+	QqfkaChkJ6UsE0do5geeh143yJkvv4ojwzPtCK/tBwVV30Dcyc++XSx49Ft2IvJ+
+	FPN/51c6G1CAUyCfkGLuPB6ECHypOSnTMilVf/dp9qDGxYeZJaFDU0I3QqtU6D0Z
+	p2erDccHRA74dkZR7Pw6IPVC922zIARxEIF1dATJya5LpRcSU75VXS4Px0Qmnf6Q
+	l0JjYJk75Rku6/WE8eLhhKfSKOORjGeFkMi+FbFrXfQWbAkySj8I3iLibwcgH2bV
+	1k4mbYF3MqOzcHhAizyzQ==
+X-ME-Sender: <xms:8Cn4Zec2p6jS7XYYv9pjw5Sb7qXREBjCn0Kb8YiqTxYEn3iL8H-YuA>
+    <xme:8Cn4ZYMGcEG5TlMPGCxGXX1HEAtrJ1LGjnFs7-90z8RIhqVNdp4oggq2KR1hlub15
+    e7VgmUtmwm4GbLb0Ak>
+X-ME-Received: <xmr:8Cn4ZfjPsBSEQUd4A8daFXKwTEaNKKWa8af7T9TviSuOO8E58NtNyUeBm-F99tJiGO48F_R5oSLA0uN0KcgL-OHIY4BQaKSH4ca9Ukc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrkeejgdefvdcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
+    fjughrpegtggfuhfgjffevgffkfhfvofesthhqmhdthhdtvdenucfhrhhomhepofgrrhhk
+    uceomhgrrhhkseihohhtshhusggrrdhnlheqnecuggftrfgrthhtvghrnhepueeifeffue
+    ekudekieejhedujedtteeggfdtheeuudegvdegueeiudfgueeltedtnecuvehluhhsthgv
+    rhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmhgrrhhkseihohhtshhusg
+    grrdhnlh
+X-ME-Proxy: <xmx:8Cn4Zb_IpLdAIle_e6Kx8tuNHx3XdRDjP9l2i2NmLzHGDYDHGhOmhw>
+    <xmx:8Cn4ZavX3CvteEZVRZIfQCVo75CPM6QMBIg8GMknbH7_p4V_mSgIiA>
+    <xmx:8Cn4ZSESVrNJ2fdYSA3bJKjD75r-H3K8jk2HhlW3TInOT9gzWmqT2Q>
+    <xmx:8Cn4ZZPv-HZj94k6JTR8kx1Tfuq4E_T1frLsA6r3ZAfTGcrgd_Cf7Q>
+    <xmx:8Cn4ZbmqpEZ1ljHUjeGXdY-kZRFet77Gu0mBWLhZBTwFnbuAoDokdkNIOa4>
+Feedback-ID: i85e1472c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 18 Mar 2024 07:47:59 -0400 (EDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240315205535.1321-1-thinhtr@linux.ibm.com>
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.300.61.1.2\))
+Subject: Re: [PATCH] netpoll: support sending over raw IP interfaces
+From: Mark <mark@yotsuba.nl>
+In-Reply-To: <20240314113455.152cebc9@kernel.org>
+Date: Mon, 18 Mar 2024 12:47:46 +0100
+Cc: netdev@vger.kernel.org,
+ Hans de Goede <hdegoede@redhat.com>,
+ Eric Dumazet <edumazet@google.com>,
+ Breno Leitao <leitao@debian.org>,
+ Ingo Molnar <mingo@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <93E237FA-9F0B-48E4-8A89-B9C2619B90A5@yotsuba.nl>
+References: <20240313124613.51399-1-mark@yotsuba.nl>
+ <20240314113455.152cebc9@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+X-Mailer: Apple Mail (2.3774.300.61.1.2)
 
-Fri, Mar 15, 2024 at 09:55:35PM CET, thinhtr@linux.ibm.com wrote:
->Fix race condition leading to system crash during EEH error handling
->
->During EEH error recovery, the bnx2x driver's transmit timeout logic
->could cause a race condition when handling reset tasks. The
->bnx2x_tx_timeout() schedules reset tasks via bnx2x_sp_rtnl_task(),
->which ultimately leads to bnx2x_nic_unload(). In bnx2x_nic_unload()
->SGEs are freed using bnx2x_free_rx_sge_range(). However, this could
->overlap with the EEH driver's attempt to reset the device using
->bnx2x_io_slot_reset(), which also tries to free SGEs. This race 
->condition can result in system crashes due to accessing freed memory
->locations in bnx2x_free_rx_sge()
->
->799  static inline void bnx2x_free_rx_sge(struct bnx2x *bp,
->800				struct bnx2x_fastpath *fp, u16 index)
->801  {
->802	struct sw_rx_page *sw_buf = &fp->rx_page_ring[index];
->803     struct page *page = sw_buf->page;
->....
->where sw_buf was set to NULL after the call to dma_unmap_page() 
->by the preceding thread.
->
->
->[  793.003930] EEH: Beginning: 'slot_reset'
->[  793.003937] PCI 0011:01:00.0#10000: EEH: Invoking bnx2x->slot_reset()
->[  793.003939] bnx2x: [bnx2x_io_slot_reset:14228(eth1)]IO slot reset initializing...
->[  793.004037] bnx2x 0011:01:00.0: enabling device (0140 -> 0142)
->[  793.008839] bnx2x: [bnx2x_io_slot_reset:14244(eth1)]IO slot reset --> driver unload
->[  793.122134] Kernel attempted to read user page (0) - exploit attempt? (uid: 0)
->[  793.122143] BUG: Kernel NULL pointer dereference on read at 0x00000000
->[  793.122147] Faulting instruction address: 0xc0080000025065fc
->[  793.122152] Oops: Kernel access of bad area, sig: 11 [#1]
->.....
->[  793.122315] Call Trace:
->[  793.122318] [c000000003c67a20] [c00800000250658c] bnx2x_io_slot_reset+0x204/0x610 [bnx2x] (unreliable)
->[  793.122331] [c000000003c67af0] [c0000000000518a8] eeh_report_reset+0xb8/0xf0
->[  793.122338] [c000000003c67b60] [c000000000052130] eeh_pe_report+0x180/0x550
->[  793.122342] [c000000003c67c70] [c00000000005318c] eeh_handle_normal_event+0x84c/0xa60
->[  793.122347] [c000000003c67d50] [c000000000053a84] eeh_event_handler+0xf4/0x170
->[  793.122352] [c000000003c67da0] [c000000000194c58] kthread+0x1c8/0x1d0
->[  793.122356] [c000000003c67e10] [c00000000000cf64] ret_from_kernel_thread+0x5c/0x64
->
->To solve this issue, we need to verify page pool allocations before
->freeing.
->
->Fixes: 4cace675d687 ("bnx2x: Alloc 4k fragment for each rx ring buffer element")
->
->Signed-off-by: Thinh Tran <thinhtr@linux.ibm.com>
+Hi Jakub,
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+> Op 14 mrt 6 Reiwa, om 19:34 heeft Jakub Kicinski <kuba@kernel.org> het =
+volgende geschreven:
+>=20
+> On Wed, 13 Mar 2024 13:46:13 +0100 Mark Cilissen wrote:
+>> Currently, netpoll only supports interfaces with an =
+ethernet-compatible
+>> link layer. Certain interfaces like SLIP do not have a link layer
+>> on the network interface level at all and expect raw IP packets,
+>> and could benefit from being supported by netpoll.
+>>=20
+>> This commit adds support for such interfaces by using the network =
+device's
+>> `hard_header_len` field as an indication that no link layer is =
+present.
+>> If that is the case we simply skip adding the ethernet header, =
+causing
+>> a raw IP packet to be sent over the interface. This has been =
+confirmed
+>> to add netconsole support to at least SLIP and WireGuard interfaces.
+>=20
+> Would be great if this could come with a simple selftest under
+> tools/testing/selftests/net. Preferably using some simple tunnel
+> device, rather than wg to limit tooling dependencies ;)
+
+Yes, that makes a lot of sense. I wrote a selftest that tests netconsole
+using IPIP and GRE tunnels, and they too seem to work correctly and pass =
+(and
+more importantly, fail without the patch ;-). Would you prefer me to =
+submit
+a v2 with that test now, or when net-next reopens in a week?
+
+Thanks and regards,
+Mark=
 
