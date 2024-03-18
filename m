@@ -1,129 +1,155 @@
-Return-Path: <netdev+bounces-80312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D70AD87E4EC
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:25:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B2B687E50B
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:37:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 100BF1C2156B
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 08:25:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BEA16B207F4
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 08:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 610292577D;
-	Mon, 18 Mar 2024 08:25:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7D11E511;
+	Mon, 18 Mar 2024 08:37:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="oBxflvDV"
+	dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b="R/khW/jc"
 X-Original-To: netdev@vger.kernel.org
-Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from taslin.fdn.fr (taslin.fdn.fr [80.67.169.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29D925760;
-	Mon, 18 Mar 2024 08:25:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B074028DA5
+	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 08:37:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.67.169.77
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710750344; cv=none; b=pVuEy+nVCHTxV2hqx0cSGWNJw4ZIId4njG97lxi7iuIGmtL8J9RS1Gppsmak/TS9Ge+/SDwf2RV7xd3hJ82LwozPXicwX4ZZq7PlUGoF3yahtP7BewJqEpPVcPq1WEJhZUMdYBHP3L1BDn4jK+Nsr1b4Cae3p8cuo5dU64d3P2s=
+	t=1710751050; cv=none; b=hrZGjLr4jH5/NUmp0h5sbecxmaETHl0uydBK28vycWawl7j3BI8o6Hwhev6zuUhAfpv/a8BZbZ/FWcfqGFsLZBHAoFg1LWgiPCuzhkIMpKG9qiZu36645IwV5/0xfHlyFpjZMHoPyjLEpWgls7RZnHX3TYD+H71WmLbiUqsl+P8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710750344; c=relaxed/simple;
-	bh=9Gox6nr4Yw3nX20mUWVTq/8pONnShOOhZz4ItxTrQSo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nU2I0CP+Vw6piFu/LKIQ44ucgSkTGAuFqIN7kLnnmvQCWH9ufk23SIxDF5Qn9eKu6znzkb5KDMT1VpBL8jUrHT7dR9ZG6vTwkNA0QvaOVV4Kahw/DQVmTzfmR87Fj3pEF9Ha5tlEzMyK0J47tRARdx4MFV6+cKv4FyYr4J6Zgzo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=oBxflvDV; arc=none smtp.client-ip=144.76.82.148
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
-	s=42; h=From:Cc:To:Date:Message-ID;
-	bh=5lYBvG/HYr+nZZA7Ycz+u5VrES4YL7MUIS//0G2Ymss=; b=oBxflvDVpm9F7x3AVIgIprIZjM
-	D7jw1p3vzgwchZMSbqw7iBA0n6s8OElUrgZUo4gO6ntkWIBjwIYrPglb5noNTeb6Wsvuqjl0vZjkt
-	sgAAKesQmGWPo8wkagDWUYzif6v+Fd5WQmvqKLiYqrx6lJHaUosRUyTMPqGkHpqmyv/9M73in9eXl
-	5ZJB98fh7FOB83SGxT1f1UL1LeuUDdL1KAzt+tC5BwQhwIw/Kfv2FJiERCmCer4K/tg2qzn2LxuD6
-	FCU3HoaFyb6aBISmUu/LRWDmOZydZ8FfpH276W4qvrsA2jBgvSnu/VT/EzntvUv0wOCLiHwHk+V9Y
-	uDmBmiBiMH84b8hrhizZflbIgoW1BxiVI6HSOZxp+FMi0sQqD+DttRTiN6RMZzkTL7Z9qdCtaFqy6
-	o2SUNzb7Go93OB1GHrEl+TH4kL9pL5EcMT1eWLCFrfODM7EJRORXDGUSvKJgprDBtdpGnTFdBDigA
-	ESG8nh0AYk6H7STsYJQKmXyS;
-Received: from [127.0.0.2] (localhost [127.0.0.1])
-	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
-	(Exim)
-	id 1rm8JD-001XmP-1R;
-	Mon, 18 Mar 2024 08:25:27 +0000
-Message-ID: <0583f4be-4c34-44de-99f2-891d673b53a9@samba.org>
-Date: Mon, 18 Mar 2024 09:25:25 +0100
+	s=arc-20240116; t=1710751050; c=relaxed/simple;
+	bh=K4WhvKO59CcL3GuCM+MANtqV6Pdk63mSqlKJ4RB04uc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JQaCX9B0Pjnn2Fa5tKoWLBjCvwCEaBY6VZ0+HIDcQA/BdMJOLzg0NgLNF2Kz2yMkuQbThJC6Md+jWoVV2fb5P3BVN2ugzhxzz8eMktuwvlzp1J7OgFKlZ4ZJSOfg/mdUVKdoMIaHqH2NWb4cB20U2NfWOFv0dUJAWngCVgFX0p4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name; spf=pass smtp.mailfrom=max.gautier.name; dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b=R/khW/jc; arc=none smtp.client-ip=80.67.169.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=max.gautier.name
+Received: from localhost (unknown [IPv6:2001:910:10ee:0:fc9:9524:11d1:7aa4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by taslin.fdn.fr (Postfix) with ESMTPSA id 9E991602BD;
+	Mon, 18 Mar 2024 09:37:14 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=max.gautier.name;
+	s=fdn; t=1710751036;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hU3XBlqD6rKxG/7AY3EPY7SirDlljNgW7LcoyoKnFws=;
+	b=R/khW/jckgzRX2MTQzv7FsZ+UtmnILg9ZoNTaJRS6yWDjIMF6iuEZO30yS9CwdypX/EfN4
+	l9nPit627y+QPpZjgPXprENzwCEWwB5msdCA0905jNhiK2gdPHNSsUN9fN3mbzksr50DWd
+	KejLM2kJXgp7oi+M+VcV2YIXaLAYZ5wu/U7/unVYUk/YHPzyq8MaynDzPVNiDB3SP/vY5s
+	lEe482Nvzk1NEXYDlrYN6wh9+XOtV8bVEGjcm6DOj1pWlok3saIq17tgrkULT52L/YL5rP
+	yZ4pKw5oiG03y9G4am063opb0hulhzx0eAjmpNaURH3E/rpLeeySk++pfsPsOg==
+Date: Mon, 18 Mar 2024 09:37:25 +0100
+From: Max Gautier <mg@max.gautier.name>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH iproute2-next v2] arpd: create /var/lib/arpd on first use
+Message-ID: <Zff9ReznTN4h-Jrh@framework>
+References: <20240316091026.11164-1-mg@max.gautier.name>
+ <20240317090134.4219-1-mg@max.gautier.name>
+ <20240318025613.GA1312561@maili.marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC 06/24] vfs: break parent dir delegations in open(...,
- O_CREAT) codepath
-To: Jeff Layton <jlayton@kernel.org>, Alexander Viro
- <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
- Jan Kara <jack@suse.cz>, Chuck Lever <chuck.lever@oracle.com>,
- Alexander Aring <alex.aring@gmail.com>,
- Trond Myklebust <trond.myklebust@hammerspace.com>,
- Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>,
- Paulo Alcantara <pc@manguebit.com>,
- Ronnie Sahlberg <ronniesahlberg@gmail.com>,
- Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- "Rafael J. Wysocki" <rafael@kernel.org>, David Howells
- <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>,
- Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>,
- Dai Ngo <Dai.Ngo@oracle.com>, Miklos Szeredi <miklos@szeredi.hu>,
- Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
- Sergey Senozhatsky <senozhatsky@chromium.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, netfs@lists.linux.dev,
- ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240315-dir-deleg-v1-0-a1d6209a3654@kernel.org>
- <20240315-dir-deleg-v1-6-a1d6209a3654@kernel.org>
-Content-Language: en-US
-From: Stefan Metzmacher <metze@samba.org>
-In-Reply-To: <20240315-dir-deleg-v1-6-a1d6209a3654@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240318025613.GA1312561@maili.marvell.com>
 
-Hi Jeff,
+On Mon, Mar 18, 2024 at 08:26:13AM +0530, Ratheesh Kannoth wrote:
+> On 2024-03-17 at 14:31:24, Max Gautier (mg@max.gautier.name) wrote:
+> > The motivation is to build distributions packages without /var to go
+> > towards stateless systems, see link below (TL;DR: provisionning anything
+> > outside of /usr on boot).
+> >
+> > We only try do create the database directory when it's in the default
+> > location, and assume its parent (/var/lib in the usual case) exists.
+> >
+> > Links: https://0pointer.net/blog/projects/stateless.html
+> > Signed-off-by: Max Gautier <mg@max.gautier.name>
+> > ---
+> >  Makefile    |  2 +-
+> >  misc/arpd.c | 12 +++++++++++-
+> >  2 files changed, 12 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/Makefile b/Makefile
+> > index 8024d45e..2b2c3dec 100644
+> > --- a/Makefile
+> > +++ b/Makefile
+> > @@ -42,6 +42,7 @@ DEFINES+=-DCONF_USR_DIR=\"$(CONF_USR_DIR)\" \
+> >           -DCONF_ETC_DIR=\"$(CONF_ETC_DIR)\" \
+> >           -DNETNS_RUN_DIR=\"$(NETNS_RUN_DIR)\" \
+> >           -DNETNS_ETC_DIR=\"$(NETNS_ETC_DIR)\" \
+> > +         -DARPDDIR=\"$(ARPDDIR)\" \
+> >           -DCONF_COLOR=$(CONF_COLOR)
+> >
+> >  #options for AX.25
+> > @@ -104,7 +105,6 @@ config.mk:
+> >  install: all
+> >  	install -m 0755 -d $(DESTDIR)$(SBINDIR)
+> >  	install -m 0755 -d $(DESTDIR)$(CONF_USR_DIR)
+> > -	install -m 0755 -d $(DESTDIR)$(ARPDDIR)
+> >  	install -m 0755 -d $(DESTDIR)$(HDRDIR)
+> >  	@for i in $(SUBDIRS);  do $(MAKE) -C $$i install; done
+> >  	install -m 0644 $(shell find etc/iproute2 -maxdepth 1 -type f) $(DESTDIR)$(CONF_USR_DIR)
+> > diff --git a/misc/arpd.c b/misc/arpd.c
+> > index 1ef837c6..a64888aa 100644
+> > --- a/misc/arpd.c
+> > +++ b/misc/arpd.c
+> > @@ -19,6 +19,7 @@
+> >  #include <fcntl.h>
+> >  #include <sys/uio.h>
+> >  #include <sys/socket.h>
+> > +#include <sys/stat.h>
+> >  #include <sys/time.h>
+> >  #include <time.h>
+> >  #include <signal.h>
+> > @@ -35,7 +36,8 @@
+> >  #include "rt_names.h"
+> >
+> >  DB	*dbase;
+> > -char	*dbname = "/var/lib/arpd/arpd.db";
+> > +char const	default_dbname[] = ARPDDIR "/arpd.db";
+> > +char const	*dbname = default_dbname;
+> >
+> >  int	ifnum;
+> >  int	*ifvec;
+> > @@ -668,6 +670,14 @@ int main(int argc, char **argv)
+> >  		}
+> >  	}
+> >
+> > +	if (strcmp(default_dbname, dbname) == 0
+> > +			&& mkdir(ARPDDIR, 0755) != 0
+> > +			&& errno != EEXIST
+> why do you need errno != EEXIST case ? mkdir() will return error in this case as well.
 
-> In order to add directory delegation support, we need to break
-> delegations on the parent whenever there is going to be a change in the
-> directory.
-> 
-> Add a delegated_inode parameter to lookup_open and have it break the
-> delegation. Then, open_last_lookups can wait for the delegation break
-> and retry the call to lookup_open once it's done.
-> 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->   fs/namei.c | 22 ++++++++++++++++++----
->   1 file changed, 18 insertions(+), 4 deletions(-)
-> 
-> diff --git a/fs/namei.c b/fs/namei.c
-> index f00d8d708001..88598a62ec64 100644
-> --- a/fs/namei.c
-> +++ b/fs/namei.c
-> @@ -3404,7 +3404,7 @@ static struct dentry *atomic_open(struct nameidata *nd, struct dentry *dentry,
->    */
->   static struct dentry *lookup_open(struct nameidata *nd, struct file *file,
->   				  const struct open_flags *op,
-> -				  bool got_write)
-> +				  bool got_write, struct inode **delegated_inode)
+EEXIST is not an error in this case: if the default location already
+exist, all is good. mkdir would still return -1 in this case, so we need
+to exclude it manually.
 
-Does NFS has a concept of lease keys and parent lease keys?
+> > +			) {
+> > +		perror("create_db_dir");
+> > +		exit(-1);
+> > +	}
+> > +
+> >  	dbase = dbopen(dbname, O_CREAT|O_RDWR, 0644, DB_HASH, NULL);
+> >  	if (dbase == NULL) {
+> >  		perror("db_open");
+> > --
+> > 2.44.0
+> >
 
-In SMB it's possible that the client passes a lease key (16 client chosen bytes) to a directory open,
-when asking for a directory lease.
-
-Then operations on files within that directory, take that lease key from the directory as
-'parent lease keys' in addition to a unique lease key for the file.
-
-That way a client can avoid breaking its own directory leases when creating/move/delete... files
-in the directory.
-
-metze
+-- 
+Max Gautier
 
