@@ -1,60 +1,79 @@
-Return-Path: <netdev+bounces-80468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 391A687EF24
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 18:45:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D753787EF2B
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 18:49:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DECF51F22237
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 17:45:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60A2C286974
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 17:49:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A43F55C18;
-	Mon, 18 Mar 2024 17:45:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D173F55C2B;
+	Mon, 18 Mar 2024 17:49:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WWaNDbWT"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="bjRLZC5A"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2270D55C14;
-	Mon, 18 Mar 2024 17:45:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6240055C18
+	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 17:49:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710783909; cv=none; b=PXAUB3C5X5uxHSdK7qWU8uaIsLu2ZZjrsih98upGw21BPAzfDngPsgtYSvdjWmSNva43tfvExIfMTWv/m6uV4ilTt/SejXQJznWYIar+WWhYXaQfsYu1u9f6eBjPNmbaDhV1w5w3/hp/FmFB4YlrZ1q96PeJuZHWTX63WQvzsU8=
+	t=1710784169; cv=none; b=crAoANe2TO1GU4RPBOa4BVzHEnzIycc7ooXcseWN/uQtT3fStFLQ9fq3iN/OBSgOIIvA9NHMQxji/gr4plV5TAOM1t/SAL6NgXRi81kD2yqaSEPQHFU5vpzbj63fK0I5zgSSR8TxkJ+ljAFxM9V0WphY6VDbP+kP/+J/tkzJHFE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710783909; c=relaxed/simple;
-	bh=Rv/2CA5wPLokC7VCqSey3DSFL6DXzXxuAMNj1og1Kh8=;
+	s=arc-20240116; t=1710784169; c=relaxed/simple;
+	bh=AYMfYRY6klCQYJM0bVnZCDDZuEIucFRaAGMVi5tuFig=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=htG0RGqTwPjeT1VPB8uWvApYDKrkj47FD134YOuHyH/6DJAQ9PJwhKITacf/ZVXI6VHKIlw4NupePjbPVFPNcLKucN5Z90xx0Pbp4UEE30uK3lTrLIHpgl9smWNVXxDf4m+tiTyodHZsLnswJ9pXfcfMKmKHpZuMCfrpS9nsJjY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WWaNDbWT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5570FC433C7;
-	Mon, 18 Mar 2024 17:45:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710783908;
-	bh=Rv/2CA5wPLokC7VCqSey3DSFL6DXzXxuAMNj1og1Kh8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WWaNDbWTEAAmKf9IeOXu65Mq96lSZxdoIzl57Yufwp7sGduxsN9HEXIrYzX7xVFRB
-	 Hy1mtA1Are4jKEG2IACOEirgKrPxv9Zs1dp7fdnMC0bfOtcyEQQneb+Sq2IR+LNeuJ
-	 Qm4PaSYyJSYzEW1PyUQ3GA1oW4uCUo9cP2Kl9ZFUVbePgoZjMoBtm4yIL6lG3iI5Y6
-	 Ap2yMBGMzoB+Ep1+VDrr0mYHjUf9hszzwqUb9eC2syA33HpPQrMK2u0+nfb9oVk6BT
-	 M0dwO4pTylvIrS88SdlZVkZ9B3ZjCplzmiIWt/w24KRM8YTMndNRvb32gsfsIG37Lt
-	 rRb95s82iaBfg==
-Date: Mon, 18 Mar 2024 17:45:03 +0000
-From: Simon Horman <horms@kernel.org>
-To: Erwan Velu <erwanaliasr1@gmail.com>
-Cc: Erwan Velu <e.velu@criteo.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 iwl-net] i40e: Prevent setting MTU if greater than MFS
-Message-ID: <20240318174503.GE1623@kernel.org>
-References: <20240313090719.33627-2-e.velu@criteo.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HyCjKaayu8Q6K7e6jbLbjOdZ1XeXlZy8MsWLqNCysfw6RbzQkQEaq0FuwIJAMJ/xR08x1xtIvwvcr6CNV6B2I5v0gZWFbIcCjhtitvsp80ZUSIyoz+S9J30JRWDgYCM+xStoxmj3YNaoFONQhNU7dnqmMbmIpj3yjEu7u48vBGc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=bjRLZC5A; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-1df01161b39so20869715ad.3
+        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 10:49:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1710784168; x=1711388968; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=/hzHXHAYAO5IILy822dDVSoGujLH1eorSOetYUN+2mo=;
+        b=bjRLZC5A/VZvwMZxMp6m++hqN3+TDHrVFJOL8i9Y4qYNXCFVHT/w5eFPJ3MlhWgwC2
+         AxObZ2dTh+6MTahoIj8Q++Z7GMoNnS5VDOJtEsriJGwuU3qhDaTnw9iBCX7+heF84yMO
+         A7rJK6NzInsVUiegfehtPIsvpPSfzL/zy80Hk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710784168; x=1711388968;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/hzHXHAYAO5IILy822dDVSoGujLH1eorSOetYUN+2mo=;
+        b=oz7kuWCddJwfjPBnqpofx7S9hXovpUT9WwqIeWmquECE+h2GAWfLYWiQjtJH56AZ1I
+         2+3j1MVjB6VTfBcy5I2HGrK/EuhvNkRxGl+gkmB7gsiPXFxKWvq/3pzXtc/U7Q0Pq9vr
+         CQcaUAIdCCx/+J/eDMsXMkM5Tb+s/C+rvG0/37RqRmkQbVVLw14uFqqN2JVArNm0+pnw
+         lyra4pONeyBOb3jhT2dlUTVNJPSB7SbCpb5bJMnd6r0Fr1l4ei3JBkfj496psZvquWdA
+         ztOCYVRlCB6j7PzjQXQwUvlvC7aNx5bJVCAgWTSQOFxuyeC0mFUQF1yXG06LbqPxmjcQ
+         dkeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUaCnVBhyoUybYUYlFQr1oa4tPdyV4/xK8B5BdA7im90MeEqTsSIze4X+BAsnFW+yaAulFbxW06Jf5zArESTtnL3KRB+xrz
+X-Gm-Message-State: AOJu0Yx1oHxFb65WKtK0/nSuY215bsRaViK42fOKE8TCGMko7/ruvq7h
+	A/QHATr1f3tS8oV6TuKmc4uOYCSR/qdNmWNb5lWOyphBTBpQVhEZSZ9jBwMNZA==
+X-Google-Smtp-Source: AGHT+IHwULWpwHgXCxheCai0yUoIM9O7hU0pUI6uaypY1BpY+L2E5BH3oRPzmgUhLmFFsNz/L9wHkw==
+X-Received: by 2002:a17:902:da8c:b0:1df:f9fc:e572 with SMTP id j12-20020a170902da8c00b001dff9fce572mr9150174plx.22.1710784167690;
+        Mon, 18 Mar 2024 10:49:27 -0700 (PDT)
+Received: from www.outflux.net ([198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id y14-20020a17090322ce00b001dcc8ea6247sm9547206plg.15.2024.03.18.10.49.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Mar 2024 10:49:26 -0700 (PDT)
+Date: Mon, 18 Mar 2024 10:49:25 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: linux-hardening@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Marco Elver <elver@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC kspp-next 0/3] compiler_types: add
+ Endianness-dependent __counted_by_{le,be}
+Message-ID: <202403181038.EC9DF8CE3C@keescook>
+References: <20240318130354.2713265-1-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,95 +82,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240313090719.33627-2-e.velu@criteo.com>
+In-Reply-To: <20240318130354.2713265-1-aleksander.lobakin@intel.com>
 
-On Wed, Mar 13, 2024 at 10:07:16AM +0100, Erwan Velu wrote:
-> Commit 6871a7de705 ("[intelxl] Use admin queue to set port MAC address
-> and maximum frame size") from iPXE project set the MFS to 0x600 = 1536.
-> See https://github.com/ipxe/ipxe/commit/6871a7de705
-> 
-> At boot time the i40e driver complains about it with
-> the following message but continues.
-> 
-> 	MFS for port 1 has been set below the default: 600
-> 
-> If the MTU size is increased, the driver accepts it but large packets will
-> not be processed by the firmware generating tx_errors. The issue is pretty
-> silent for users. i.e doing TCP in such context will generates lots of
-> retransmissions until the proper window size (below 1500) will be used.
-> 
-> To fix this case, it would have been ideal to increase the MFS,
-> via i40e_aqc_opc_set_mac_config, incoming patch will take care of it.
-> 
-> At least, commit prevents setting up an MTU greater than the current MFS.
-> It will avoid being in the position of having an MTU set to 9000 on the
-> netdev with a firmware refusing packets larger than 1536.
-> 
-> A typical trace looks like:
-> [  377.548696] i40e 0000:5d:00.0 eno5: Error changing mtu to 9000, Max is 1500. MFS is too small.
-> 
+On Mon, Mar 18, 2024 at 02:03:51PM +0100, Alexander Lobakin wrote:
+>  include/linux/compiler_types.h              | 11 ++++++++++
+>  drivers/net/ethernet/intel/idpf/virtchnl2.h | 24 ++++++++++-----------
+>  2 files changed, 23 insertions(+), 12 deletions(-)
 
-Hi Erwan, all,
+Oh, I see the Subject says "kspp-next" -- normally I'd expect things
+touch net to go through netdev. I'm fine with this going through either
+tree. Perhaps better through netdev since that subsystem has the most
+users and may gain more using the new macros?
 
-As a fix, I think this patch warrants a fixes tag.
-Perhaps this one is appropriate?
+-Kees
 
-Fixes: 41c445ff0f48 ("i40e: main driver core")
-
-> Signed-off-by: Erwan Velu <e.velu@criteo.com>
-> ---
->  drivers/net/ethernet/intel/i40e/i40e_main.c | 10 +++++++++-
->  1 file changed, 9 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> index f86578857e8a..85ecf2f3de18 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
-> @@ -2946,7 +2946,7 @@ static int i40e_change_mtu(struct net_device *netdev, int new_mtu)
->  	struct i40e_netdev_priv *np = netdev_priv(netdev);
->  	struct i40e_vsi *vsi = np->vsi;
->  	struct i40e_pf *pf = vsi->back;
-> -	int frame_size;
-> +	int frame_size, mfs, max_mtu;
->  
->  	frame_size = i40e_max_vsi_frame_size(vsi, vsi->xdp_prog);
->  	if (new_mtu > frame_size - I40E_PACKET_HDR_PAD) {
-
-I am fine with this patch, so please take what follows as a suggestion
-for improvement, possibly as a follow-up. Not as a hard requirement from
-my side.
-
-The part of this function between the two hunks of this patch is:
-
-		netdev_err(netdev, "Error changing mtu to %d, Max is %d\n",
-			   new_mtu, frame_size - I40E_PACKET_HDR_PAD);
-
-My reading is that with this patch two different limits are
-checked wrt maximum MTU size:
-
-1. A VSI level limit, which relates to RX buffer size
-2. A PHY level limit that relates to the MFS
-
-That seems fine to me. But the log message for 1 (above) does
-not seem particularly informative wrt which limit has been exceeded.
-
-> @@ -2955,6 +2955,14 @@ static int i40e_change_mtu(struct net_device *netdev, int new_mtu)
->  		return -EINVAL;
->  	}
->  
-> +	mfs = pf->hw.phy.link_info.max_frame_size;
-> +	max_mtu = mfs - I40E_PACKET_HDR_PAD;
-> +	if (new_mtu > max_mtu) {
-> +		netdev_err(netdev, "Error changing mtu to %d, Max is %d. MFS is too small.\n",
-> +			   new_mtu, max_mtu);
-> +		return -EINVAL;
-> +	}
-> +
->  	netdev_dbg(netdev, "changing MTU from %d to %d\n",
->  		   netdev->mtu, new_mtu);
->  	netdev->mtu = new_mtu;
-> -- 
-> 2.44.0
-> 
-> 
+-- 
+Kees Cook
 
