@@ -1,165 +1,141 @@
-Return-Path: <netdev+bounces-80374-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF3FF87E8CA
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 12:43:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40E5B87E8DF
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 12:46:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 588C02821D7
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 11:43:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF3171F23886
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 11:46:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABD2C36B1C;
-	Mon, 18 Mar 2024 11:43:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE00D37159;
+	Mon, 18 Mar 2024 11:46:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yotsuba.nl header.i=@yotsuba.nl header.b="gmSdw2Qc";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RHeeDNMH"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="PH2LIwZ0"
 X-Original-To: netdev@vger.kernel.org
-Received: from wfout2-smtp.messagingengine.com (wfout2-smtp.messagingengine.com [64.147.123.145])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B66381A1;
-	Mon, 18 Mar 2024 11:43:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.145
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9EC364C6
+	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 11:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710762217; cv=none; b=ok+bK4AxMOgJHEdvepg6cKtwNbeTbO51qQzabbqHZJPJEOXywkgzm1Ta+9YPaXgaxXksnLY7791FHOfILfH3kqsBKSShIzoVvotjt8QlqR7iQSUM27Xf1RO8BXoCjchmxSR9z7Do6ECAw30nMV5RrtUv/GjCW10MyFIMjoE9mGY=
+	t=1710762403; cv=none; b=mdw6rq/ozpSS609GFtrA5GDu7VPNPgRrCoTFIbPs4PXDhAfWxTYJ9fV/u/TPNHUZqHC1un2ixxSIHqS5X+aFNw0ZeokyFJWCATcXCkUSoWmEY32Dogz24J3RM93kzR1RvBSWbSkcVefj0ITigXcPaT/CrZaLcXn21KJQDyyTxxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710762217; c=relaxed/simple;
-	bh=H+Ct9EJKuBXxy6FkALq1UJAazffMwumuGhqyxaMkEnc=;
-	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=sbcXms/OVZjvM+WmvvDd7CzNWvA4TSwG8HclTsbsTRzzavWc8cl1sa3BWMyae+LtTVShkI+3ad2lEgnwTekB7q4xgW3uJRqi85gyx9f38A4RhNXVcqXh2CTpyJb64RMSBzLiLIc3cXg76TbvKuqa4aY+UhovbIkOfSmU+TPSxfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yotsuba.nl; spf=pass smtp.mailfrom=yotsuba.nl; dkim=pass (2048-bit key) header.d=yotsuba.nl header.i=@yotsuba.nl header.b=gmSdw2Qc; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RHeeDNMH; arc=none smtp.client-ip=64.147.123.145
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=yotsuba.nl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yotsuba.nl
-Received: from compute7.internal (compute7.nyi.internal [10.202.2.48])
-	by mailfout.west.internal (Postfix) with ESMTP id 0B8D21C0008E;
-	Mon, 18 Mar 2024 07:43:30 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute7.internal (MEProxy); Mon, 18 Mar 2024 07:43:31 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yotsuba.nl; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm1; t=1710762210;
-	 x=1710848610; bh=y0d2j2d3CaGP3R5RQDy+IW3nY2J08YoFoA0R013PCZg=; b=
-	gmSdw2Qc0P1+y5n1u0JhsFQB44HWZw/LHaygvm4OYbvklZdbAkUZuY78kZ+sWcVY
-	ppEigYL+7T3F8EGLzYlB1gaSBnq3f+/n1MSeagDEn54O5ogJ8Cpe2J1dnqakKNSH
-	QJY31Q+vIQ6l+DP2eYR8V6XgmcyDqFe9ck+yh3OV069ET7MSem1RLTg3QQuj2bTn
-	A3ggCFVEin+Z7c4CPMUbwhcOO/ufl9BEi7H2gekQbnKS3GwSIJLIxNt9ThwnVsOG
-	9zfKg7O4D6hKDROKVTSyCZRsek8nXaNuVOvz2VKg0ON7vGI6heGIdmxzPUghpCz+
-	3r5piqwps98FCNShExLuLQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1710762210; x=
-	1710848610; bh=y0d2j2d3CaGP3R5RQDy+IW3nY2J08YoFoA0R013PCZg=; b=R
-	HeeDNMHB10EZrhF3zKDg/HNv2i32WbYy+XI7M65UPMXM9T0X9kp0eZVao5rV7BmE
-	7WyGltbmoEzXSWfqmFvuJK/AruUMv8AoY6/ajlq2GYeeqErjLtEAPkuVSHfQCCzD
-	ndT1STwguWC4+CEc49dSQEJzehmCtduFpTjCp6ps99zdjX8uKe74scS748uCagO+
-	/QnOceh7nqkSiprnZ9qZK2T9XBzEtbTCseEF26ytiR59PpKLDkOxztKSOhJPZRdU
-	EXLVRQElXDr9cNrvngY+ZtfI28e6dB5NgiYCR6dGDzBCYhx/u50KfN98TufduxjC
-	HTPX/+2nCsIHClSdk6nbQ==
-X-ME-Sender: <xms:4ij4ZTtHlSnu59FXsiWdPqPuFIRkXttNvGSypPn-HQuPloDEISMVgw>
-    <xme:4ij4ZUdy6O52kGCD4zoLENVKJEr0hW553pd3mtHNXAG-rZV2pQFBgv8lDjC8c0jMI
-    R_RDkeHfMIiLgGTuZ0>
-X-ME-Received: <xmr:4ij4ZWzKeHK8XSDYzkYXczKmsZmTT6ZoxgdCIIst2muYpFZc62goRJ6wHVoo0wtrLC3xBxgxO4SBy26RTYRCrCR9VAP9pEl129VrxNY>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrkeejgdefudcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpegtggfuhfgjffevgffkfhfvofesthhqmhdthhdtjeenucfhrhhomhepofgrrhhk
-    uceomhgrrhhkseihohhtshhusggrrdhnlheqnecuggftrfgrthhtvghrnhephfffjeefje
-    eutedvjeekleduteettdehkeeugefgjedvgfevteffffeukefggedtnecuvehluhhsthgv
-    rhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepmhgrrhhkseihohhtshhusg
-    grrdhnlh
-X-ME-Proxy: <xmx:4ij4ZSOkvsthEABwsScDi3GFdQ35moLvqt5RDQUi3xpxtt06ctA44w>
-    <xmx:4ij4ZT8ZK-4RQp00QFWPHRAi_RH9YkbZsc22LE1KQKrwdEAJtPWVmw>
-    <xmx:4ij4ZSX2AooPT3wAOUhbpGNKkFZFxYRV8U8yEWIlGCcYSLanOb1ZqA>
-    <xmx:4ij4ZUedId-KYmwF1PdJBqKHJW8b68zfqiTZ9eu6qjGKyh7T3kBOqw>
-    <xmx:4ij4ZSXcBrhDy8el12TQojAegjLRYBhsfwgMd6FAemltp6Il9YeGPLY3j1o>
-Feedback-ID: i85e1472c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 18 Mar 2024 07:43:28 -0400 (EDT)
-Content-Type: text/plain;
-	charset=utf-8
+	s=arc-20240116; t=1710762403; c=relaxed/simple;
+	bh=R7ovyQCXq4JqE74DA5qi0Whd11d4dcJZI4jtH31aC14=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=od/ZWdtvYpzRRNUbVzpfEEfXVuXD8VNO/6YLKbVxhYrjbVJX5UBBoWqG+eXukxeB6F6TwDTJTkXrwHtyfZK2t85OYE9UCXioUNDitMiYxlYUCp4FKUjmTTJ/Kzx9TGaDdszhktmjl7X208dBRMN9KeuIQMwn3D40vieraORmOxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=PH2LIwZ0; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33ec7e38b84so2512986f8f.1
+        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 04:46:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710762400; x=1711367200; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=B8A409aN+fBcQklFPlBADZ9jKHPDQaUy+bgX3gYOHe0=;
+        b=PH2LIwZ0ZBSpySb9r+xmN3bRjaTA3cEVg2tHbWJrj7TWRXOxp446NgUSzsnmfNHcUl
+         oDZCoEBC94XcQ/Lc5TvuKHuF6TPenQ5W6/YBJg0WQEX6VDla7GzjxugujQ9T8VUdoxth
+         D+RdgKoFCnuoz6VI2eHU5P9bzTNP8USV1VrGD/FoHdThUdwZEbkyeEoQjFoIsc7vw9kF
+         qr/icSxbfzxe/gAks71xecwjqwtQNMxY+eZoLJawdxvvCNnqXFl6C3HbPI3MhkFBLRex
+         ta+vQRJalbMm8zL68edHyJlm0K9JoU0i0T7IKzM9ESEwW/sxwnBh2BSXBz2UfTFqkoL3
+         RPKQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710762400; x=1711367200;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B8A409aN+fBcQklFPlBADZ9jKHPDQaUy+bgX3gYOHe0=;
+        b=OsRJat6NjMqnr0yuzcIt/4l40lGJcp7CPrT7My4TDvagLIZffU51G09JiD2YaAlbkF
+         /ONeNECTTOs6g60L0c5tdKTV9FZjuFL4tUF1koqVt6xrSYs6kHFp5bl3YYCPofcyoq+i
+         NsrsFF6yz/hvxGRf21EEUBXfPgcKAujewBFl1SIpOLzAXYM5TbOP0Rw63DlGD/5tDTLt
+         yLHU6WkrVAWMVP8afNPTZQuz6j/RZDuaFtgFx0XStHK32iDKhpeQrFl+3pdQiSoWk4Cg
+         u8pznkEHEN4P26pTMywNRdAa0+vCJwJlUmN2CkU9lGhMgJiJNdkd47IqrFxqR/q0kkfN
+         5Hvw==
+X-Forwarded-Encrypted: i=1; AJvYcCUfm0xnVBdJS9NKy08cKstBh3mUdAUpltxzd/lB15DsE4o3NObpGoWc5TrXcLmNVP13Lbf1IRhhlZ7UFM+PgZ+B6do3oXCF
+X-Gm-Message-State: AOJu0YyXIhL5i6QIX2qIX0K7lhKZNLhlZ4dtQOBENGgKVZ69A5XaQ77W
+	QKQlb2/oPFI5q2PNMCOCIQeINByoXdgomUrOnq/oXp2KJ5WuGYs5ayWcXhGR7y4=
+X-Google-Smtp-Source: AGHT+IFudxVTqDsTL3NiAJF7PgeYJ6xPOb5BxUJ2VTjXU0sS/60+Zkk4r7qaMCwKc3/zN+yqXWZBVw==
+X-Received: by 2002:a05:6000:246:b0:33e:78c1:acfa with SMTP id m6-20020a056000024600b0033e78c1acfamr8007701wrz.1.1710762399966;
+        Mon, 18 Mar 2024 04:46:39 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ck19-20020a5d5e93000000b0033ec81ec4aesm3338938wrb.78.2024.03.18.04.46.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Mar 2024 04:46:39 -0700 (PDT)
+Date: Mon, 18 Mar 2024 12:46:36 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Thinh Tran <thinhtr@linux.ibm.com>
+Cc: jacob.e.keller@intel.com, kuba@kernel.org, netdev@vger.kernel.org,
+	VENKATA.SAI.DUGGI@ibm.com, abdhalee@in.ibm.com, aelior@marvell.com,
+	davem@davemloft.net, drc@linux.vnet.ibm.com, edumazet@google.com,
+	manishc@marvell.com, pabeni@redhat.com, simon.horman@corigine.com,
+	skalluru@marvell.com
+Subject: Re: [PATCH v11] net/bnx2x: Prevent access to a freed page in
+ page_pool
+Message-ID: <ZfgpnMtB0nDbMVJa@nanopsycho>
+References: <20240315205535.1321-1-thinhtr@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3774.300.61.1.2\))
-Subject: Re: [EXTERNAL] [PATCH] netpoll: support sending over raw IP
- interfaces
-From: Mark <mark@yotsuba.nl>
-In-Reply-To: <MWHPR1801MB1918F15413BA4766F29A8581D3292@MWHPR1801MB1918.namprd18.prod.outlook.com>
-Date: Mon, 18 Mar 2024 12:43:16 +0100
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Hans de Goede <hdegoede@redhat.com>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Breno Leitao <leitao@debian.org>,
- Ingo Molnar <mingo@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <57AE2A31-257C-4702-A571-C590A5DD234A@yotsuba.nl>
-References: <20240313124613.51399-1-mark@yotsuba.nl>
- <20240313133602.GA1263314@maili.marvell.com>
- <7C42FC4B-D803-4194-8FBB-19A432D37124@yotsuba.nl>
- <MWHPR1801MB1918F15413BA4766F29A8581D3292@MWHPR1801MB1918.namprd18.prod.outlook.com>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-X-Mailer: Apple Mail (2.3774.300.61.1.2)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240315205535.1321-1-thinhtr@linux.ibm.com>
 
+Fri, Mar 15, 2024 at 09:55:35PM CET, thinhtr@linux.ibm.com wrote:
+>Fix race condition leading to system crash during EEH error handling
+>
+>During EEH error recovery, the bnx2x driver's transmit timeout logic
+>could cause a race condition when handling reset tasks. The
+>bnx2x_tx_timeout() schedules reset tasks via bnx2x_sp_rtnl_task(),
+>which ultimately leads to bnx2x_nic_unload(). In bnx2x_nic_unload()
+>SGEs are freed using bnx2x_free_rx_sge_range(). However, this could
+>overlap with the EEH driver's attempt to reset the device using
+>bnx2x_io_slot_reset(), which also tries to free SGEs. This race 
+>condition can result in system crashes due to accessing freed memory
+>locations in bnx2x_free_rx_sge()
+>
+>799  static inline void bnx2x_free_rx_sge(struct bnx2x *bp,
+>800				struct bnx2x_fastpath *fp, u16 index)
+>801  {
+>802	struct sw_rx_page *sw_buf = &fp->rx_page_ring[index];
+>803     struct page *page = sw_buf->page;
+>....
+>where sw_buf was set to NULL after the call to dma_unmap_page() 
+>by the preceding thread.
+>
+>
+>[  793.003930] EEH: Beginning: 'slot_reset'
+>[  793.003937] PCI 0011:01:00.0#10000: EEH: Invoking bnx2x->slot_reset()
+>[  793.003939] bnx2x: [bnx2x_io_slot_reset:14228(eth1)]IO slot reset initializing...
+>[  793.004037] bnx2x 0011:01:00.0: enabling device (0140 -> 0142)
+>[  793.008839] bnx2x: [bnx2x_io_slot_reset:14244(eth1)]IO slot reset --> driver unload
+>[  793.122134] Kernel attempted to read user page (0) - exploit attempt? (uid: 0)
+>[  793.122143] BUG: Kernel NULL pointer dereference on read at 0x00000000
+>[  793.122147] Faulting instruction address: 0xc0080000025065fc
+>[  793.122152] Oops: Kernel access of bad area, sig: 11 [#1]
+>.....
+>[  793.122315] Call Trace:
+>[  793.122318] [c000000003c67a20] [c00800000250658c] bnx2x_io_slot_reset+0x204/0x610 [bnx2x] (unreliable)
+>[  793.122331] [c000000003c67af0] [c0000000000518a8] eeh_report_reset+0xb8/0xf0
+>[  793.122338] [c000000003c67b60] [c000000000052130] eeh_pe_report+0x180/0x550
+>[  793.122342] [c000000003c67c70] [c00000000005318c] eeh_handle_normal_event+0x84c/0xa60
+>[  793.122347] [c000000003c67d50] [c000000000053a84] eeh_event_handler+0xf4/0x170
+>[  793.122352] [c000000003c67da0] [c000000000194c58] kthread+0x1c8/0x1d0
+>[  793.122356] [c000000003c67e10] [c00000000000cf64] ret_from_kernel_thread+0x5c/0x64
+>
+>To solve this issue, we need to verify page pool allocations before
+>freeing.
+>
+>Fixes: 4cace675d687 ("bnx2x: Alloc 4k fragment for each rx ring buffer element")
+>
+>Signed-off-by: Thinh Tran <thinhtr@linux.ibm.com>
 
-Hi Ratheesh,
-
-> Op 14 mrt 6 Reiwa, om 03:46 heeft Ratheesh Kannoth =
-<rkannoth@marvell.com> het volgende geschreven:
->=20
->> From: Mark <mark@yotsuba.nl>
->> [=E2=80=A6]
->=20
-> Hmm.  That is not my question.   Let me explain it in detail. =
-Netconsole is using netpoll_send_udp() to encapsulate the msg over=20
-> UDP/IP/ MAC headers. Job well done. Now it calls =
-netdev->ops->ndo_start_xmit(skb, dev).  If your driver is well aware =
-that you can
-> Transmit only from network header, why don=E2=80=99t you dma map from =
-network header ? =20
-
-The rest of the network subsystem seems to not add a header to skbs =
-submitted
-to netdev->ops->ndo_start_xmit() at all, which makes sense considering
-netdev->header_ops is either NULL or no-op for these devices.
-
-Following this line of reasoning, from API perspective it made more =
-sense
-to me for netpoll to not submit =E2=80=98bogus=E2=80=99 skbs that are =
-out-of-line with what
-the rest of the network subsystem does to ndo_start_xmit() to begin =
-with.
-It really depends on the API guarantees we want to have for netdev,
-but personally I'm wary of introducing an allowance for bogus headers.
-
-Additionally from a practical perspective, this would require changing =
-almost
-every, if not every, IP interface driver. I took a look at the WireGuard
-driver to see what it would entail, and from my limited experience with =
-the
-networking code it seems like there's some quite annoying interactions =
-with
-e.g. GSO which would make driver-side handling of such packets quite a =
-bit
-more complex.
-
-So from my perspective, fixing this in netpoll is both the more =
-API-correct
-change and introduces the least amount of additional complexity.
-
-> [=E2=80=A6]
-
-Thanks and regards,
-Mark=
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
