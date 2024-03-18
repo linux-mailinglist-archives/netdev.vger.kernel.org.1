@@ -1,180 +1,149 @@
-Return-Path: <netdev+bounces-80403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 151DC87E9FC
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 14:21:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D081187EA0C
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 14:25:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62C53B226C5
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 13:21:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C5951C20FFC
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 13:25:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 759B445BFA;
-	Mon, 18 Mar 2024 13:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B66264645B;
+	Mon, 18 Mar 2024 13:25:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PlQ+c4bl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GYhEnCDy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15674438F;
-	Mon, 18 Mar 2024 13:20:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF1647F4B;
+	Mon, 18 Mar 2024 13:25:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710768058; cv=none; b=RRMjfuCpzA874WAZHompfdX4dNKqOwstOa+OnqJd5ELnjc2hbg35I7ZUpHdhK0gtwQwPJkFPCpeMKHwdgVGnBjxD0cthuM/uONn3kn9fHT4Em2MynzAGzP5KsBsWxpDY+QFbuY4JbwvTGEzeT0VzaOyerPr0c6zsS4DwoQH5OfQ=
+	t=1710768331; cv=none; b=mBoAEwrTT5G2tE+437yrrj2lsOBrwyWAyODdJeJ69iJqmjIg/a/ngBzn9C8/tElCYtiloSfvuXInIM3+cu5Yr8eXQ91WbTt8WraMdIsfs8lDLa7o4E4X3n10L2zFeM/A1Iqt8jwmgT3wrpaWOPvE5PDmgWEB9fyoT6keJhEEmow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710768058; c=relaxed/simple;
-	bh=Ro9DhNywcl6K5qDRLecjZIB/mP5nv+WPca/RqnMk09M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HZIOWwun8+lN98l85XYRMmVYQYYAR7Xj0TYWftt5WYkF7WR1GtwHoLWH+WsmxgcGhXwm45w39uIDQKHhH7yTboZ7M7Grz07BvR+MVm5Dqet2wfu5S1mEow8YgppGcDVahnNo/hdyYhBmRnrvJTwDHA/XbF4M3VXb8MfahNDPv7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PlQ+c4bl; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d41d1bedc9so73982051fa.3;
-        Mon, 18 Mar 2024 06:20:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710768055; x=1711372855; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=B6f1uddVmun0jJOTXaZCQpPLYe/6XOnd9oX08SFGjC0=;
-        b=PlQ+c4bl91Dpmes14fBswcC6BcIbol49w+sQwMRe/TAeUvvaM3ac2D3bcjkLQiab3e
-         kxvAeD1ESF4SceQgKmgzJ2UA0gDA+vS5cLHgahaKEv6qs03SWOck70/XdJDI5IWog36G
-         Cc+kEbTy24WU4yCgCy+Y4HAA703c6iV7BjFvAktvlPwl0C1VqO2zid2eAmG9iHyWh/iv
-         SsvqDm1zzIKjeBUAg0lAfUvfOYrrUEsLEVsmRit3cs4k1W6IIhUbQ4Bye+krtc3Z550S
-         KEnewm6A/DwcFKXC2Vr8QdYGhMrYWiiV9BZu4obD1LP6Duww0X5bGdkL4fyHMV45JBNs
-         d6mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710768055; x=1711372855;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B6f1uddVmun0jJOTXaZCQpPLYe/6XOnd9oX08SFGjC0=;
-        b=k2jtj/y/Nc2CXNuqtZIKCbwLJ7H5zs20+up0seADMaJvYxQ8rbYg3MKRxgUUTIcfUV
-         nRupgC/BSSsU5lYl3IbCYS1pSr5g3e9ETkcQLWJ4OFdUE4XCRPQJbPS+SH+aDMypfDgs
-         xXzYP3sD0si/gFik5en7IqniCUyJN0sil25IYyFki5gLBa5mTf1HeZVbodjLo1p+FNaj
-         J0n31HArjK7r86gfTSN+H5ghZXrj+6MsMJnqF3qFwhCgCn5YIlAedi6Z9UZ8JDWXJJnl
-         4y1lW5kvmqAQK7siIrtnQAhMHsEonIrR0GRpZnzTzCdxso5uuFd/nx8tO2P6JRtT7SAI
-         HoIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCV+b8K65aybDDKyYXTuzO2rocOP3kcjpoyZgHHfUjkndoHF6J7zufyGTXC8F+0UM+9GsCzAyoNkWbVxz0+h9MUI/ElQHi3XdJdeqq+LErZg2ZiaduZlcN2cAlQrCN4jso248XCWhXY=
-X-Gm-Message-State: AOJu0YxDp+zm9pBLMxoc/K1SzjM4becevr4L6qgx4qcQS/V8SVg36l4B
-	LfuC9/G4otewzdSgH8auYTA1MwjV2l6sc499NO8S1papeFhZ408Z
-X-Google-Smtp-Source: AGHT+IGo7h2AxBg2UxkUko/nh1IfJYKCRKIBQwNwYP8I35nwUeXbiEw4QWW6hWgGVAaLpuqdbDqs6Q==
-X-Received: by 2002:a2e:9bcd:0:b0:2d4:5c03:5ccb with SMTP id w13-20020a2e9bcd000000b002d45c035ccbmr5121261ljj.10.1710768054395;
-        Mon, 18 Mar 2024 06:20:54 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:310::2181? ([2620:10d:c092:600::1:429a])
-        by smtp.gmail.com with ESMTPSA id wk18-20020a170907055200b00a46c7ecb464sm709545ejb.27.2024.03.18.06.20.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Mar 2024 06:20:54 -0700 (PDT)
-Message-ID: <0a556650-9627-48ee-9707-05d7cab33f0f@gmail.com>
-Date: Mon, 18 Mar 2024 13:19:19 +0000
+	s=arc-20240116; t=1710768331; c=relaxed/simple;
+	bh=Vf12dd/Egl8nCL4fAZyQY6z00cZn1KGW7EOXwQXKS2U=;
+	h=Subject:From:To:Cc:Date:Message-ID:MIME-Version:Content-Type; b=jYDRk23uCmrKRNVxbz6WkyQE/UzSkCWPfjW3TWC8HafOJrLRTg+rTrrJOsebflaef9SuxrNb5ki9r1RqyDdCssNCBtqvaPUjdFQTP5SFJh3hiE3pwiZuBzuK088yL+2UaEU4bTF/zaCL/fMwEgOoeXtcBIgq6SAZalj2Zht6HeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GYhEnCDy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D813C433F1;
+	Mon, 18 Mar 2024 13:25:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710768331;
+	bh=Vf12dd/Egl8nCL4fAZyQY6z00cZn1KGW7EOXwQXKS2U=;
+	h=Subject:From:To:Cc:Date:From;
+	b=GYhEnCDyMs3UBDxenTSxg/j7DlqzZZigVWDEAdzKdsoknZd1yF0TQ6zmbbp+7u9Gl
+	 /BaCU6v7ke+D/B8cEFv7C3jthtvuWjrFAhWsq9eBCwasJu5TRcv4sdvrbmST7qz95T
+	 8Tjfdb5pJcuhstJ9XMQDSv/2gDY03HKQcD141p5xrtHfqiL3ug76gAwBKg88li66nn
+	 C3mOE0qz4EawfX8nuqngaeLicL6gUoLfksRHeb4KU2vthZa/JQMpW56HuC1OMU0T6Z
+	 94Dt+n9Of2bzWd2zolh1lBpjoIJKgD4cvqPCFg9+l/ZvgFOHtAizuKaSjex6MSm66f
+	 YKBXntQY336NQ==
+Subject: [PATCH bpf-next V2] bpf/lpm_trie: inline longest_prefix_match for
+ fastpath
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+To: bpf@vger.kernel.org, Daniel Borkmann <borkmann@iogearbox.net>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, martin.lau@kernel.org,
+ netdev@vger.kernel.org, bp@alien8.de, kernel-team@cloudflare.com
+Date: Mon, 18 Mar 2024 14:25:26 +0100
+Message-ID: <171076828575.2141737.18370644069389889027.stgit@firesoul>
+User-Agent: StGit/1.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: Do not break out of sk_stream_wait_memory() with
- TIF_NOTIFY_SIGNAL
-Content-Language: en-US
-To: Sascha Hauer <s.hauer@pengutronix.de>
-Cc: netdev@vger.kernel.org, kernel@pengutronix.de,
- linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
- Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
-References: <20240315100159.3898944-1-s.hauer@pengutronix.de>
- <7b82679f-9b69-4568-a61d-03eb1e4afc18@gmail.com>
- <ZfgvNjWP8OYMIa3Y@pengutronix.de>
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <ZfgvNjWP8OYMIa3Y@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
 
-On 3/18/24 12:10, Sascha Hauer wrote:
-> On Fri, Mar 15, 2024 at 05:02:05PM +0000, Pavel Begunkov wrote:
->> On 3/15/24 10:01, Sascha Hauer wrote:
->>> It can happen that a socket sends the remaining data at close() time.
->>> With io_uring and KTLS it can happen that sk_stream_wait_memory() bails
->>> out with -512 (-ERESTARTSYS) because TIF_NOTIFY_SIGNAL is set for the
->>> current task. This flag has been set in io_req_normal_work_add() by
->>> calling task_work_add().
->>
->> The entire idea of task_work is to interrupt syscalls and let io_uring
->> do its job, otherwise it wouldn't free resources it might be holding,
->> and even potentially forever block the syscall.
->>
->> I'm not that sure about connect / close (are they not restartable?),
->> but it doesn't seem to be a good idea for sk_stream_wait_memory(),
->> which is the normal TCP blocking send path. I'm thinking of some kinds
->> of cases with a local TCP socket pair, the tx queue is full as well
->> and the rx queue of the other end, and io_uring has to run to receive
->> the data.
+The BPF map type LPM (Longest Prefix Match) is used heavily
+in production by multiple products that have BPF components.
+Perf data shows trie_lookup_elem() and longest_prefix_match()
+being part of kernels perf top.
 
-There is another case, let's say the IO is done via io-wq
-(io_uring's worker thread pool) and hits the waiting. Now the
-request can't get cancelled, which is done by interrupting the
-task with TIF_NOTIFY_SIGNAL. User requested request cancellations
-is one thing, but we'd need to check if io_uring can ever be closed
-in this case.
+For every level in the LPM tree trie_lookup_elem() calls out
+to longest_prefix_match().  The compiler is free to inline this
+call, but chooses not to inline, because other slowpath callers
+(that can be invoked via syscall) exists like trie_update_elem(),
+trie_delete_elem() or trie_get_next_key().
+
+ bcc/tools/funccount -Ti 1 'trie_lookup_elem|longest_prefix_match.isra.0'
+ FUNC                                    COUNT
+ trie_lookup_elem                       664945
+ longest_prefix_match.isra.0           8101507
+
+Observation on a single random machine shows a factor 12 between
+the two functions. Given an average of 12 levels in the trie being
+searched.
+
+This patch force inlining longest_prefix_match(), but only for
+the lookup fastpath to balance object instruction size.
+
+In production with AMD CPUs, measuring the function latency of
+'trie_lookup_elem' (bcc/tools/funclatency) we are seeing an improvement
+function latency reduction 7-8% with this patch applied (to production
+kernels 6.6 and 6.1). Analyzing perf data, we can explain this rather
+large improvement due to reducing the overhead for AMD side-channel
+mitigation SRSO (Speculative Return Stack Overflow).
+
+Fixes: fb3bd914b3ec ("x86/srso: Add a Speculative RAS Overflow mitigation")
+Signed-off-by: Jesper Dangaard Brouer <hawk@kernel.org>
+---
+ kernel/bpf/lpm_trie.c |   18 +++++++++++++-----
+ 1 file changed, 13 insertions(+), 5 deletions(-)
+
+diff --git a/kernel/bpf/lpm_trie.c b/kernel/bpf/lpm_trie.c
+index 050fe1ebf0f7..939620b91c0e 100644
+--- a/kernel/bpf/lpm_trie.c
++++ b/kernel/bpf/lpm_trie.c
+@@ -155,16 +155,17 @@ static inline int extract_bit(const u8 *data, size_t index)
+ }
+ 
+ /**
+- * longest_prefix_match() - determine the longest prefix
++ * __longest_prefix_match() - determine the longest prefix
+  * @trie:	The trie to get internal sizes from
+  * @node:	The node to operate on
+  * @key:	The key to compare to @node
+  *
+  * Determine the longest prefix of @node that matches the bits in @key.
+  */
+-static size_t longest_prefix_match(const struct lpm_trie *trie,
+-				   const struct lpm_trie_node *node,
+-				   const struct bpf_lpm_trie_key_u8 *key)
++static __always_inline
++size_t __longest_prefix_match(const struct lpm_trie *trie,
++			      const struct lpm_trie_node *node,
++			      const struct bpf_lpm_trie_key_u8 *key)
+ {
+ 	u32 limit = min(node->prefixlen, key->prefixlen);
+ 	u32 prefixlen = 0, i = 0;
+@@ -224,6 +225,13 @@ static size_t longest_prefix_match(const struct lpm_trie *trie,
+ 	return prefixlen;
+ }
+ 
++static size_t longest_prefix_match(const struct lpm_trie *trie,
++				   const struct lpm_trie_node *node,
++				   const struct bpf_lpm_trie_key_u8 *key)
++{
++	return __longest_prefix_match(trie, node, key);
++}
++
+ /* Called from syscall or from eBPF program */
+ static void *trie_lookup_elem(struct bpf_map *map, void *_key)
+ {
+@@ -245,7 +253,7 @@ static void *trie_lookup_elem(struct bpf_map *map, void *_key)
+ 		 * If it's the maximum possible prefix for this trie, we have
+ 		 * an exact match and can return it directly.
+ 		 */
+-		matchlen = longest_prefix_match(trie, node, key);
++		matchlen = __longest_prefix_match(trie, node, key);
+ 		if (matchlen == trie->max_prefixlen) {
+ 			found = node;
+ 			break;
 
 
->> If interruptions are not welcome you can use different io_uring flags,
->> see IORING_SETUP_COOP_TASKRUN and/or IORING_SETUP_DEFER_TASKRUN.
-> 
-> I tried with different combinations of these flags. For example
-> IORING_SETUP_TASKRUN_FLAG | IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN
-> makes the issue less likely, but nevertheless it still happens.
-> 
-> However, reading the documentation of these flags, they shall provide
-> hints to the kernel for optimizations, but it should work without these
-> flags, right?
-
-That's true, and I guess there are other cases as well, like
-io-wq and perhaps even a stray fput.
-
-
->> Maybe I'm missing something, why not restart your syscall?
-> 
-> The problem comes with TLS. Normally with synchronous encryption all
-> data on a socket is written during write(). When asynchronous
-> encryption comes into play, then not all data is written during write(),
-> but instead the remaining data is written at close() time.
-
-Was it considered to do the final cleanup in workqueue
-and only then finalising the release?
-
-
-> Here is my call stack when things go awry:
-> 
-> [  325.560946] tls_push_sg: tcp_sendmsg_locked returned -512
-> [  325.566371] CPU: 1 PID: 305 Comm: webserver_libur Not tainted 6.8.0-rc6-00022-g932acd9c444b-dirty #248
-> [  325.575684] Hardware name: NXP i.MX8MPlus EVK board (DT)
-> [  325.580997] Call trace:
-> [  325.583444]  dump_backtrace+0x90/0xe8
-> [  325.587122]  show_stack+0x18/0x24
-> [  325.590444]  dump_stack_lvl+0x48/0x60
-> [  325.594114]  dump_stack+0x18/0x24
-> [  325.597432]  tls_push_sg+0xfc/0x22c
-> [  325.600930]  tls_tx_records+0x114/0x1cc
-> [  325.604772]  tls_sw_release_resources_tx+0x3c/0x140
-> [  325.609658]  tls_sk_proto_close+0x2b0/0x3ac
-> [  325.613846]  inet_release+0x4c/0x9c
-> [  325.617341]  __sock_release+0x40/0xb4
-> [  325.621007]  sock_close+0x18/0x28
-> [  325.624328]  __fput+0x70/0x2bc
-> [  325.627386]  ____fput+0x10/0x1c
-> [  325.630531]  task_work_run+0x74/0xcc
-> [  325.634113]  do_notify_resume+0x22c/0x1310
-> [  325.638220]  el0_svc+0xa4/0xb4
-> [  325.641279]  el0t_64_sync_handler+0x120/0x12c
-> [  325.645643]  el0t_64_sync+0x190/0x194
-> 
-> As said, TLS is sending remaining data at close() time in tls_push_sg().
-> Here sk_stream_wait_memory() gets interrupted and returns -ERESTARTSYS.
-> There's no way to restart this operation, the socket is about to be
-> closed and won't accept data anymore.
-
--- 
-Pavel Begunkov
 
