@@ -1,186 +1,165 @@
-Return-Path: <netdev+bounces-80456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0C1987EE39
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 17:58:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D184087EE74
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 18:09:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E27C21C2134C
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 16:58:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EB581F2471F
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 17:09:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E6C55775;
-	Mon, 18 Mar 2024 16:58:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B4454F96;
+	Mon, 18 Mar 2024 17:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vml4KMbB";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="lK6sLjjW";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LHH73Z5l";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/tYtToBm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA2654BE3
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 16:58:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B387555C34
+	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 17:08:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710781102; cv=none; b=HyPJBhAA+bLWhREBzVecLHc/RrK6M550MX3FTSVRkPnfwsWLL8DHB3+oHKf2Lm0wncD6m32VYlBLAx6Kaf/YJ4a7e+yrvXdAQlIFJ29foCZK5achEEBNcb6XzqUaU4qhdn+pdDfth3zaTp8C8aXLRBgN7jSG6/YDtuMgeVyUKoM=
+	t=1710781740; cv=none; b=JDq8GE1QUZw1Iz2HdUo2QlFA+yD3bV0zuTHvXGa9Tysqvr1Q6g6zDqs7Tz5xy7ppcaFEa8L1269nu4R3LE9YXVIu+KzBwUKhWu2xlqRHskFLD6nTCEFXShZ90t7SFeZmanO5WsA34+hhQyDMk3Gz7eNyvF4Mb5RJzizRrIvlsio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710781102; c=relaxed/simple;
-	bh=yQvL+Ij2soSkg+12ZYM8o5fSUJad3PfIe0NIll+8grw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ukz5aXzDAp8F32BKAshHldJgDrjEGR/gxZFPtre3SppDbllmky3q9C4y2MTJBa+KXK0oZH8cFba6YS06YNcJL9pHfQ8pC6TIM/IhQXtt7sDOXC/Ut0lJ5mUGnkH1xXlkKBEzeDC0b6/hU0+qUMtvev9irYYNeJI6YeBOC94cwiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-7cc70b85c48so89731439f.3
-        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 09:58:20 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710781099; x=1711385899;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wcG2b2YpOfaC4aVgOXmHR6nmRANw2mgN0+tkaaaKusU=;
-        b=X5Nb1WrKNNCQLx43sfd/Abed0MCCvpjNkk5yb6S5YKgxwFnEBe3GkYinz51XyHvMC7
-         ROQXfRHhNAmeEtqSgRJkezBGHVSXF+rhEEZacumqkr1Dg/HxP2/yL7+Troy5JfgGwHtR
-         PXsCKQ0AVOKafwSJSaiPZvi8NPvnNUuZ5SrXf+ellYu8Jb9F2ff7aNHb5gJ/BH4GyWSN
-         upRm1HZSSx0edvPOUxrSsVUcPWkonJmRA0dIJiDP/hW7xcWkOSfWFAv9q6OB6PLUneBa
-         MBG/lcgNMx3SWJj2jhQZD5u2YzV86ldFPifiRKl792rnX5oEo4wBij5+DI1RA4sQKj7Y
-         U+xQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUHKchAZKqqjq4NLZ1Oigjv08r8Ix8gjaj2ZV4+vq9rc8ReR4DEcBYPTVx2EtyKxrsviOrI+DuypCkPgmcBDHPONG5QpbUm
-X-Gm-Message-State: AOJu0YzJokyzaA1glXDabmC9VmgZco4OzJoDFIKo8HjWcncDPBm7vkWv
-	4J/JmdM/6FbQTWj1ka0RrvrerDRgj/dMAZwz9g7Hk9d251yTwLBFFSTCygKcJQ55tBLFTi1EFlA
-	ZBpkJJX1hzJqHV5qzy9aphOVwamO79tCdEjlxisV1ACQ5n9fjwzmI5ik=
-X-Google-Smtp-Source: AGHT+IHGea0GcYgHwTyfns+Gbjc96VCytK/MlWJ6eLnRI7wXhhsqJvpZXOqWU9t9P5ymLf199jCDblFoDPX/dn5t31kjaAPaAOx5
+	s=arc-20240116; t=1710781740; c=relaxed/simple;
+	bh=2Jh06q2N+PaoyTfx/05eU5SdyF4sKmU3zCLX/+7z2fA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UVlEvWqcJL0e8ttcs+j4HiKVQD+ZGNw18kv6efqwDy35Vun0WrHKDAHJV2JZpMONHnQ6xUbvTHEyXkPhTdIxgmQNBtg6v9Bz5mxwp2Hhi4DlaQXCygMr4a/ndU1UifvmhaVa/hAKunmMmvx9H2qu+LuiXOArpStnDIxXsgpkIsY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vml4KMbB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=lK6sLjjW; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LHH73Z5l; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/tYtToBm; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from kitsune.suse.cz (unknown [10.100.12.127])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id CD9CE5C7BD;
+	Mon, 18 Mar 2024 17:08:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1710781737; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ftgY+bLb8XwfHyNervbdasFc4FlYUFBR74M9K0wXRRU=;
+	b=vml4KMbBoSdX7TzpANJILNLPkosIvB3jQMDK7SgDm7qYh8gl6hJOWSw/xKZ+hlZiaAWCYy
+	CjLkv/5dbuaYtU8e6lyt7riKmOqvDyA8n+1Rm2rIf0GUFkWRYWXtgjW5L4oziM67qGErfD
+	YSyLhWqrJrJtVmeVA0avYeTKKqPuCdw=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1710781737;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ftgY+bLb8XwfHyNervbdasFc4FlYUFBR74M9K0wXRRU=;
+	b=lK6sLjjW+BWes869Ev3Zwkmn1q7aHB7iPhWXEkxRA9HjXyT25KTEOtAeBEaBX5XPyOpfvL
+	MFBGyIFb7+B+mjDg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1710781736; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ftgY+bLb8XwfHyNervbdasFc4FlYUFBR74M9K0wXRRU=;
+	b=LHH73Z5lUD01YkOLQIME/DpDwb0eYMJluswQqcNLUQ8Mzuo+H1dklZ4H/OleGN5iSOQ6V2
+	3OrCNjJnoKFy7fUMMNHmNXIIxh+1dbSMJpBB1fenuE4P1AxVjIhIh/0egPzFeiJOn8Do6t
+	zg2YGnIkI2TB6zbE1R0iHdU3DVir2GI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1710781736;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ftgY+bLb8XwfHyNervbdasFc4FlYUFBR74M9K0wXRRU=;
+	b=/tYtToBmjXBuFy/sx0vDRx1IPjdDVL+OpO3t5nHLhGdXKyCMvBIewH3pHuipRdyH3IYYw+
+	jf/PbZfKrR6BRUCw==
+Date: Mon, 18 Mar 2024 18:08:55 +0100
+From: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
+To: Michael Ellerman <mpe@ellerman.id.au>
+Cc: dtsen@linux.ibm.com, linuxppc-dev@lists.ozlabs.org,
+	wireguard@lists.zx2c4.com, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	netdev@vger.kernel.org
+Subject: Re: Cannot load wireguard module
+Message-ID: <20240318170855.GK20665@kitsune.suse.cz>
+References: <20240315122005.GG20665@kitsune.suse.cz>
+ <87jzm32h7q.fsf@mail.lhotse>
+ <87r0g7zrl2.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:2045:b0:476:f1d6:93f4 with SMTP id
- t5-20020a056638204500b00476f1d693f4mr902259jaj.1.1710781099390; Mon, 18 Mar
- 2024 09:58:19 -0700 (PDT)
-Date: Mon, 18 Mar 2024 09:58:19 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b7c77e0613f2431f@google.com>
-Subject: [syzbot] [bpf?] [net?] WARNING in sock_hash_delete_elem
-From: syzbot <syzbot+1c04a1e4ae355870dc7a@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bp@alien8.de, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, hpa@zytor.com, 
-	jakub@cloudflare.com, jmattson@google.com, john.fastabend@gmail.com, 
-	joro@8bytes.org, kuba@kernel.org, kvm@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mark.rutland@arm.com, mingo@redhat.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, pbonzini@redhat.com, 
-	peterz@infradead.org, seanjc@google.com, syzkaller-bugs@googlegroups.com, 
-	tglx@linutronix.de, vkuznets@redhat.com, wanpengli@tencent.com, 
-	will@kernel.org, x86@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87r0g7zrl2.fsf@mail.lhotse>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+Authentication-Results: smtp-out2.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -1.52
+X-Spamd-Result: default: False [-1.52 / 50.00];
+	 TO_DN_SOME(0.00)[];
+	 REPLY(-4.00)[];
+	 RCPT_COUNT_FIVE(0.00)[6];
+	 RCVD_COUNT_ZERO(0.00)[0];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 R_MIXED_CHARSET(0.71)[subject];
+	 BAYES_HAM(-0.04)[58.07%];
+	 ARC_NA(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_SPAM_SHORT(2.91)[0.968];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email];
+	 FUZZY_BLOCKED(0.00)[rspamd.com]
+X-Spam-Flag: NO
 
-Hello,
+On Mon, Mar 18, 2024 at 10:50:49PM +1100, Michael Ellerman wrote:
+> Michael Ellerman <mpe@ellerman.id.au> writes:
+> > Michal Suchánek <msuchanek@suse.de> writes:
+> >> Hello,
+> >>
+> >> I cannot load the wireguard module.
+> >>
+> >> Loading the module provides no diagnostic other than 'No such device'.
+> >>
+> >> Please provide maningful diagnostics for loading software-only driver,
+> >> clearly there is no particular device needed.
+> >
+> > Presumably it's just bubbling up an -ENODEV from somewhere.
+> >
+> > Can you get a trace of it?
+> >
+> > Something like:
+> >
+> >   # trace-cmd record -p function_graph -F modprobe wireguard
+> >
+> > That should probably show where it's bailing out.
+> >
+> >> jostaberry-1:~ # uname -a
+> >> Linux jostaberry-1 6.8.0-lp155.8.g7e0e887-default #1 SMP Wed Mar 13 09:02:21 UTC 2024 (7e0e887) ppc64le ppc64le ppc64le GNU/Linux
+> >> jostaberry-1:~ # modprobe wireguard
+> >> modprobe: ERROR: could not insert 'wireguard': No such device
+> >> jostaberry-1:~ # modprobe -v wireguard
+> >> insmod /lib/modules/6.8.0-lp155.8.g7e0e887-default/kernel/arch/powerpc/crypto/chacha-p10-crypto.ko.zst 
+> >> modprobe: ERROR: could not insert 'wireguard': No such device
+> >  
+> > What machine is this? A Power10?
+> 
+> I am able to load the module successfully on a P10 running v6.8.0.
 
-syzbot found the following issue on:
+Of course, it's not a Power10. Otherwise the Power10-specific chacha
+implementation would load.
 
-HEAD commit:    fe46a7dd189e Merge tag 'sound-6.9-rc1' of git://git.kernel..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17934ffa180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=fe78468a74fdc3b7
-dashboard link: https://syzkaller.appspot.com/bug?extid=1c04a1e4ae355870dc7a
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=111b2e86180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13e86649180000
+Thanks
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/0f7abe4afac7/disk-fe46a7dd.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/82598d09246c/vmlinux-fe46a7dd.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/efa23788c875/bzImage-fe46a7dd.xz
-
-The issue was bisected to:
-
-commit 997acaf6b4b59c6a9c259740312a69ea549cc684
-Author: Mark Rutland <mark.rutland@arm.com>
-Date:   Mon Jan 11 15:37:07 2021 +0000
-
-    lockdep: report broken irq restoration
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=133d8711180000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=10bd8711180000
-console output: https://syzkaller.appspot.com/x/log.txt?x=173d8711180000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+1c04a1e4ae355870dc7a@syzkaller.appspotmail.com
-Fixes: 997acaf6b4b5 ("lockdep: report broken irq restoration")
-
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5069 at kernel/softirq.c:362 __local_bh_enable_ip+0x1be/0x200 kernel/softirq.c:362
-Modules linked in:
-CPU: 0 PID: 5069 Comm: syz-executor295 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-RIP: 0010:__local_bh_enable_ip+0x1be/0x200 kernel/softirq.c:362
-Code: 3b 44 24 60 75 52 48 8d 65 d8 5b 41 5c 41 5d 41 5e 41 5f 5d e9 b3 da 25 0a 90 0f 0b 90 e9 ca fe ff ff e8 55 00 00 00 eb 9c 90 <0f> 0b 90 e9 fa fe ff ff 48 c7 c1 9c 6d 87 8f 80 e1 07 80 c1 03 38
-RSP: 0018:ffffc9000415f5a0 EFLAGS: 00010046
-RAX: 0000000000000000 RBX: 1ffff9200082beb8 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: 0000000000000201 RDI: ffffffff89642276
-RBP: ffffc9000415f660 R08: ffff88807869900b R09: 1ffff1100f0d3201
-R10: dffffc0000000000 R11: ffffed100f0d3202 R12: dffffc0000000000
-R13: 0000000000000004 R14: ffffc9000415f5e0 R15: 0000000000000201
-FS:  000055556fdeb3c0(0000) GS:ffff8880b9400000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f2728b8a9f0 CR3: 000000002d9ee000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
- spin_unlock_bh include/linux/spinlock.h:396 [inline]
- sock_hash_delete_elem+0x1a6/0x300 net/core/sock_map.c:947
- bpf_prog_2c29ac5cdc6b1842+0x42/0x4a
- bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
- __bpf_prog_run include/linux/filter.h:657 [inline]
- bpf_prog_run include/linux/filter.h:664 [inline]
- __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
- bpf_trace_run2+0x206/0x420 kernel/trace/bpf_trace.c:2420
- __traceiter_kfree+0x2d/0x50 include/trace/events/kmem.h:94
- trace_kfree include/trace/events/kmem.h:94 [inline]
- kfree+0x291/0x380 mm/slub.c:4377
- put_css_set_locked+0x6e4/0x940 kernel/cgroup/cgroup.c:951
- cgroup_migrate_finish+0x1bb/0x380 kernel/cgroup/cgroup.c:2691
- cgroup_attach_task+0x7ef/0xac0 kernel/cgroup/cgroup.c:2890
- __cgroup1_procs_write+0x2e4/0x430 kernel/cgroup/cgroup-v1.c:522
- cgroup_file_write+0x2d0/0x6d0 kernel/cgroup/cgroup.c:4092
- kernfs_fop_write_iter+0x3a6/0x500 fs/kernfs/file.c:334
- call_write_iter include/linux/fs.h:2108 [inline]
- new_sync_write fs/read_write.c:497 [inline]
- vfs_write+0xa86/0xcb0 fs/read_write.c:590
- ksys_write+0x1a0/0x2c0 fs/read_write.c:643
- do_syscall_64+0xfd/0x240
- entry_SYSCALL_64_after_hwframe+0x6d/0x75
-RIP: 0033:0x7f2728bca840
-Code: 40 00 48 c7 c2 b0 ff ff ff f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 80 3d 61 a8 08 00 00 74 17 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 58 c3 0f 1f 80 00 00 00 00 48 83 ec 28 48 89
-RSP: 002b:00007ffeba5eea08 EFLAGS: 00000202 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f2728bca840
-RDX: 0000000000000001 RSI: 00007ffeba5eea30 RDI: 0000000000000003
-RBP: 0000000000000001 R08: 0000000000000001 R09: 00007ffeba5ee837
-R10: 0000000000000000 R11: 0000000000000202 R12: 00007ffeba5eea30
-R13: 00007ffeba5eef70 R14: 0000000000000001 R15: 00007ffeba5eefb0
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Michal
 
