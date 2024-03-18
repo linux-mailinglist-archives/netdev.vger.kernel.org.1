@@ -1,104 +1,119 @@
-Return-Path: <netdev+bounces-80486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FF8E87F228
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 22:30:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CB6E87F27D
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 22:47:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C965282A29
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 21:30:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CFE51C21266
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 21:47:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE67458ABE;
-	Mon, 18 Mar 2024 21:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9BBC59B4C;
+	Mon, 18 Mar 2024 21:47:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HZ6UiNf0"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="BtT6BSCA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp.smtpout.orange.fr (smtp-16.smtpout.orange.fr [80.12.242.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B2958233;
-	Mon, 18 Mar 2024 21:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD1DC5A4C4;
+	Mon, 18 Mar 2024 21:47:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710797428; cv=none; b=nHEviqa6ptqRQ0zGd1gwXoeNTfB84VsE0HUPWU+ejt80kkVCA0c0u0uTZ8r2D/QDcAJr0CDYjnw3eYdaGLKsbjYbCO7vPXVpP+o2b9nKFIt/7ADPEWnhN43NhA6NugMzzOdiBdiFCWW+X8BHD7BuMU3FydtBh7nPKVqSmxeN03g=
+	t=1710798452; cv=none; b=uRRd8JiSfGnjlu/64PfQluj1/wHCZQMfau7DQ9XFiBzsgqal28ZxhcXbMgXxyB2a0mM83NaOK3omHXb8CajKtBtteQ+0rYrxKPLaWmrnI8OTLaCB2LIIHPaFxo+MCJrYlDorhdufNY9+xPWyAY3qX6lfXmuCZ9lwQsUCYMzSNj0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710797428; c=relaxed/simple;
-	bh=IQfDhlfXgR0M/YJ+genNdqvBkoyI4XQyUz4tYdGuLbQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qJ8+Xf64DWcnuehXQelc2/84hHW9sWQHWEroJDU404qkTshHqfJ8WGpmJgI5keBui6wmUuzLokbdsLOOCYuBmKxMZGzo5x/Clbm0ykUJuK1v5O0NW+mwcCfrJLF+6d7/m5I5xGwVtAzFJLJ6xSobN3uoCA8Aa0QtnSCMF2NHDxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HZ6UiNf0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D717C433C7;
-	Mon, 18 Mar 2024 21:30:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710797428;
-	bh=IQfDhlfXgR0M/YJ+genNdqvBkoyI4XQyUz4tYdGuLbQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HZ6UiNf06eWxfyjbW/dbD0mCoYbrtc8CEQdqotsIZg1rPamGZEWJSgiUY8iDg8Ipc
-	 iOQp9jsSIvSKfHN3aSLZVfayfXkcXrVqDucLu1dkf5yeCs1eCnW+yexKCgNJQNrDdf
-	 I/v5CgFITSDH4k87C/+tTf4T7jzXbk+NNGwV1ZqttnRRwxvlRo49/sA8HIfIO/TKA7
-	 uUm72egu10qBnR6w5pehRMfQDYMAkMclvM7u89pSqVCjxS+SArR38rQ4dQKMxpVWEZ
-	 5l+68AAuJSHscbhVFoGW86pz8UV+QxWK1nHDKD22Y/2STmvpTFTPor97i7NESPSTnS
-	 g5PUKrRqniR6g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 189021466CEB;
-	Mon, 18 Mar 2024 21:30:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1710798452; c=relaxed/simple;
+	bh=0KHLOX989patS77pGpcRZFTzkTlt4FFLOAPNDbE1sso=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=T4HIZpse48Yf171OUKy/XABQ6+qPLPDQrOrnYsAOc/wPcWdY4CLaXT0g/3iCKndwD0pZjxoEwLx+uzD3Vv66vrRGsq4frQV5xmzflavJa9C8g7NZCO6oo13fct5QbF7sdTnh2tad5X5EHOIpNZ3UIZ5WLAWSKGeVWd8kpqNMkxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=BtT6BSCA; arc=none smtp.client-ip=80.12.242.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [192.168.1.18] ([92.140.202.140])
+	by smtp.orange.fr with ESMTPA
+	id mKpDrVX3HykpTmKpDrlHk1; Mon, 18 Mar 2024 22:47:21 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1710798441;
+	bh=Ki8LFuEpDeR2mCHJn1d/kGG14vmkqd8OY5uyzfzg9Qc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=BtT6BSCAllOalo4Torsvp9ebPARr532K3yfpGu5YkFPtWUGFT/8yFUxQl8rrSGqk7
+	 LJLXIPCFJcnIXv/hS+TrJeQ+0QxMKSYFHguTyrBjz6Ehsdwiksg6I1E98NAGRl7prY
+	 Evnf6p4hrYbW/oUufarHq975ylA3gkz5NhoX3OoPsn61LVFZcduJloyvN/M4PPJ4Tl
+	 1txPov/jEW1BdfZURM0okyyOYrpClTiF83clIDbJlhbk9qjz4GdTQAbAtvnb9sW0Hk
+	 t1zLN7ddTI/g/5wsMKOq+ZpfA/pKA2wiAv92ysOtbLcmtU59/u3dDho5g+wAGTfwkl
+	 OMpS+aL8j3UwQ==
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Mon, 18 Mar 2024 22:47:21 +0100
+X-ME-IP: 92.140.202.140
+Message-ID: <c4236382-d3c8-4560-9a95-f90effcf6d88@wanadoo.fr>
+Date: Mon, 18 Mar 2024 22:47:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] caif: Use UTILITY_NAME_LENGTH instead of hard-coding 16
+Content-Language: en-MW
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, netdev@vger.kernel.org
+References: <af10f5a3236d47fd183487c9dcba3b3b3c66b595.1710584144.git.christophe.jaillet@wanadoo.fr>
+ <20240318032133.GA1312783@maili.marvell.com>
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20240318032133.GA1312783@maili.marvell.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf-next v4 1/2] bpf: Remove arch_unprotect_bpf_trampoline()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171079742809.5361.11333101875277498978.git-patchwork-notify@kernel.org>
-Date: Mon, 18 Mar 2024 21:30:28 +0000
-References: <42c635bb54d3af91db0f9b85d724c7c290069f67.1710574353.git.christophe.leroy@csgroup.eu>
-In-Reply-To: <42c635bb54d3af91db0f9b85d724c7c290069f67.1710574353.git.christophe.leroy@csgroup.eu>
-To: Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@google.com, haoluo@google.com, jolsa@kernel.org, zlim.lnx@gmail.com,
- catalin.marinas@arm.com, will@kernel.org, davem@davemloft.net,
- dsahern@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
- dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- thinker.li@gmail.com, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 
-Hello:
+Le 18/03/2024 à 04:21, Ratheesh Kannoth a écrit :
+> On 2024-03-16 at 15:46:10, Christophe JAILLET (christophe.jaillet@wanadoo.fr) wrote:
+>> UTILITY_NAME_LENGTH is 16. So better use the former when defining the
+>> 'utility_name' array. This makes the intent clearer when it is used around
+>> line 260.
+>>
+>> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+>> ---
+>>   net/caif/cfctrl.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/caif/cfctrl.c b/net/caif/cfctrl.c
+>> index 8480684f2762..b6d9462f92b9 100644
+>> --- a/net/caif/cfctrl.c
+>> +++ b/net/caif/cfctrl.c
+>> @@ -206,7 +206,7 @@ int cfctrl_linkup_request(struct cflayer *layer,
+>>   	u8 tmp8;
+>>   	struct cfctrl_request_info *req;
+>>   	int ret;
+>> -	char utility_name[16];
+>> +	char utility_name[UTILITY_NAME_LENGTH];
+> Reverse xmas tree.
 
-This series was applied to bpf/bpf-next.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
+Hi,
 
-On Sat, 16 Mar 2024 08:35:40 +0100 you wrote:
-> Last user of arch_unprotect_bpf_trampoline() was removed by
-> commit 187e2af05abe ("bpf: struct_ops supports more than one page for
-> trampolines.")
+I'll update and repost when net-next is reopened, but honestly, looking 
+at this file, changing this to reverse xmas style won't change that much 
+for the overall coding style!
+
+Moreover, as said by Dan, it is not really easy to understand the wishes 
+of different maintainers. Should I have updated the lay-out, someone 
+could have argued that patches should be 1 thing at a time.
+
+CJ
+
 > 
-> Remove arch_unprotect_bpf_trampoline()
+>>   	struct cfpkt *pkt;
+>>   	struct cflayer *dn = cfctrl->serv.layer.dn;
+>>
+>> --
+>> 2.44.0
+>>
 > 
-> Reported-by: Daniel Borkmann <daniel@iogearbox.net>
-> Fixes: 187e2af05abe ("bpf: struct_ops supports more than one page for trampolines.")
-> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
 > 
-> [...]
-
-Here is the summary with links:
-  - [bpf-next,v4,1/2] bpf: Remove arch_unprotect_bpf_trampoline()
-    https://git.kernel.org/bpf/bpf-next/c/e3362acd7967
-  - [bpf-next,v4,2/2] bpf: Check return from set_memory_rox()
-    https://git.kernel.org/bpf/bpf-next/c/c733239f8f53
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
 
 
