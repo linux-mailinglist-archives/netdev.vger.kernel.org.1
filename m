@@ -1,84 +1,87 @@
-Return-Path: <netdev+bounces-80309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 928A787E4B5
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:06:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BA7B87E4CD
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:11:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 497652828C3
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 08:06:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA3161C2026E
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 08:11:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD76249F7;
-	Mon, 18 Mar 2024 08:05:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 531022576B;
+	Mon, 18 Mar 2024 08:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="lcBOLlQs"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="j/QuOR6w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F3F62576F
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 08:05:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A64B724B26
+	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 08:10:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710749153; cv=none; b=TfYpUpGEh6Th8BYfROYig4kG9bBJ8vpz7FB32OVI1oIeaWTcs+vF/EJpTUw7LHnkuwXTyF/aF2N1yJT6WyQAaSaQbYK26q7Dp6W/9Hd8rYO2GQB+guDgCXY+iS51Mp5e67c1I+DsFYXdi5EjSQbhaRtiC6snSWrDDDRyaIneO+8=
+	t=1710749460; cv=none; b=O8TQQBYQCTO97b6wqWxjY22uTjGqgxcDAFlq32XDRf/SImUV2XLB7rqoqhJN9yHirvUKAC28MZWoFGJOxg3zFUZtaECJDQFbzjdNPZrjGiQutO7EFdA2XjYYVy/p21Et253y3stVbxGxzZNPRDpzDS5Oa7TvJt7WfnjqPLtfUos=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710749153; c=relaxed/simple;
-	bh=xi5wwcua6lSYpDyXXRxYzCJScSbcdjnZzat3Av4lAFY=;
+	s=arc-20240116; t=1710749460; c=relaxed/simple;
+	bh=opmeh9JyNTU62HaqhKhjZQzYJINRflOWclmPToSuOvY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KDGCuXiVh+q8U8ULkvllIBEfUWIUFo3ST211tFoExKxzAjqK4+pALCrRimO6iKoT6nnAb5wPwlh2CxKJgao2G0fwTg1UgJ1tbGcb3rXt9W3bLURg53zNmlEE2y/9shHF4RknUyQAuIWKXdxdLxvBeicHTdvZupc1jcOn4An3V3A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=lcBOLlQs; arc=none smtp.client-ip=209.85.208.44
+	 Content-Type:Content-Disposition:In-Reply-To; b=eIDpxOzqp/5FfRiWfIL/CYUps1D8h/9hi+9FzM82AhVLTB59DKy95C2+N8loO42VCqndhEOAznDrvX2yF2691R/INxgFGGZPYwAhS1tXyw5CNW6FGORucOZymj6vpEOhFw2UzaWYtdp0yw4DAOLqInJ6zehyRVlUnQ1bjEtYbYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=j/QuOR6w; arc=none smtp.client-ip=209.85.208.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-568a53d2ce0so4576923a12.0
-        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 01:05:51 -0700 (PDT)
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-563c403719cso4938821a12.2
+        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 01:10:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1710749150; x=1711353950; darn=vger.kernel.org;
+        d=linaro.org; s=google; t=1710749456; x=1711354256; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ItwEhW+Elih6WOdZ654FWHRBfnNI2hxeOn7Y1OcJxDk=;
-        b=lcBOLlQsJJHhrlOR8jwNpiV9pjv+mgPTwIkKuLlGvqugNHYh+I2uPNrItMz1CRZyOz
-         xfyIRZM3063F+mh6QHX5uwI93yrkrvEroBqtX/w/zTJrhtFszLcZN48lNLujaLy5+/mi
-         lfxm2z3DxAT0KH0LX3Rlewr6VNWYr5M7nsEV3RapNwJudHX86F5KZ5HUJmlGwAMWtaDD
-         Xx2O8QOuWmIE8IEFWUr+DRWKijuIiFuTNFv+hecLxtQbpe0zwt6vfAEWhQ6ncrGCiPJg
-         cg06XHoQctWVUNKbo8LONaZw2njAIDU6/01J5YjwVxGXjXrXLhQ2AMxKwq9JcX8y++5o
-         9ihQ==
+        bh=E4DNi1tThxPrAjwj3MNLTkspc0oafwDCMGAENKTid3c=;
+        b=j/QuOR6w9TSdjgU1TlaZerDTlRnKi4MwLIK6OD5Z6wf5Bi6Lc23Uy2w4CBDNoheNoi
+         xNliQLXJJTvrCjWG3Mz9BEKmHl9awVjwFYCU7pRVoj/uwifDQ9252CK35c9D8BDyuClr
+         XiM1/j/Dcx/tfo8bR62SWXBq4/tJyOVN6cAwJC1Evut9WeJaDFY7a0SfQ8pP8oAbC1Zk
+         Y5xlS7pDOFqnFej6ulWXp7ncnwgzFHdGEFV7vB4jbTVD+aHD6E0cUX3iNOeLMiVW9Hy+
+         hlmZmLlOQnbfsZGqcrctcKfl7ejBP67mUFItk39yw5XTnNIMxK53mIg1/YLWTbdorixk
+         qqnQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710749150; x=1711353950;
+        d=1e100.net; s=20230601; t=1710749456; x=1711354256;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ItwEhW+Elih6WOdZ654FWHRBfnNI2hxeOn7Y1OcJxDk=;
-        b=KUBf+ULBngEqtd1CuRcjWYWjC1W4jrlhNFvyB6qmXVjj9Xr9gHQv7qNJPa/5xLp6Bv
-         m8+HPgvKQ4GAcc6WwaNHiaecfJlgDzE4IJo4ipk+QIu7iGjLdEH0P+V1heqwVT3BrD6h
-         ltBKX9cDB2+fxihZC98vyZZ0QT1K9+24+G+RtU+e+hJd9DoWRU62XgYCMNjR7/NDi9xA
-         APlECF2L13v0V1al+LPPyQ7oMc9b1tQsr9/+PVaX06JuR3D7SMSiyNdORqdxik5U82mU
-         7JX5BFMgq2TrDO2ntYmraQoYuIvbnM5/hGGo2dFgXxItorSD3BnznXX+XKLHRO9bdRzf
-         gHyg==
-X-Forwarded-Encrypted: i=1; AJvYcCUo6f7W4GlNAz+0RkXRT8svyxOMYTfYAotOorNMZf3CVRa+5/K8uvwbW5Znzv7cw6PotpSc7FQxU4O2/uX19aV++ZLOTpNT
-X-Gm-Message-State: AOJu0YzGrfOyPpAW7UPdQubpiAkypW7tSUZS9mYBiIRUAjFCUBTObpsX
-	r+JVxvoUNDeSG8XV8WP0p8+xZaLtTnUC2a0O2iffltDH+P7dHngv9jmznV7Hyx4=
-X-Google-Smtp-Source: AGHT+IHKtcrmJOgM+mlLfZ7Vs05DyRjA6NQDYRTKLkIuZFdj2gc0SGhwQECvBIW2kaQ3t2ReK5LFKw==
-X-Received: by 2002:a17:906:5fd5:b0:a44:e371:a31b with SMTP id k21-20020a1709065fd500b00a44e371a31bmr6557533ejv.10.1710749149848;
-        Mon, 18 Mar 2024 01:05:49 -0700 (PDT)
+        bh=E4DNi1tThxPrAjwj3MNLTkspc0oafwDCMGAENKTid3c=;
+        b=TJaBzLkuirlq1/ah/y4MNDmpd34Ytwp3MIh3SRP3sf8R3WiOgzp3QwTy1gca60czhv
+         8VV8CcC+r2nuWc/UJF9vE5BOV76CK0U5/mW3nlMdt+Ggl7W43U3QgsueAVPbThvBN8fV
+         EY9TSS9Q/+cMAse94IgoZzfgg/N9xl+w3r3OxXybU5KGuA9KWUtjKm+TZT+SKlSKE/AL
+         hOo8YFFDI/9pqrNAeZOSQMeXT3vTwk3haQ7FNxG/hOdnzYNOYeDC/DId5cZR51ga8Rjj
+         qpcq9cC/EisWcZtWFPMBSU/Rxy1DOZrz4md5dWLRfvaEIx0w4/CkhFOx3c4VmG4sTQ/+
+         k3ew==
+X-Forwarded-Encrypted: i=1; AJvYcCVY3MxP5fycExt3GyFCGclFyevGxab+BAVuSU57BWx9mObM7UkKtEjXJnD60l6NtdB1mehZSVIEaw7rc1yH8aO8pT+PVZq4
+X-Gm-Message-State: AOJu0Yx6aBEIK5bjGRbazWfCoVS9vl6MGiSA94WL6at7XKSPyK0MXbNy
+	cwLkpyMQboezXD6L6RkEhRLQ7ybPhEGn9Iw9a2dIEtZuFj4nl07ygaYevKWF8a0=
+X-Google-Smtp-Source: AGHT+IF7QDTquWD+I+K+G6iw+g4y541SJ1nIcz4EIs4ACVb80u6p6Zv/G7HRDxnFSFtqQ8VONOtvKQ==
+X-Received: by 2002:a17:906:ca17:b0:a46:cef3:4aba with SMTP id jt23-20020a170906ca1700b00a46cef34abamr125127ejb.75.1710749455840;
+        Mon, 18 Mar 2024 01:10:55 -0700 (PDT)
 Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id ht17-20020a170907609100b00a461b1e814asm4517581ejc.130.2024.03.18.01.05.48
+        by smtp.gmail.com with ESMTPSA id dv22-20020a170906b81600b00a4658d3e405sm4531600ejb.196.2024.03.18.01.10.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Mar 2024 01:05:49 -0700 (PDT)
-Date: Mon, 18 Mar 2024 11:05:45 +0300
+        Mon, 18 Mar 2024 01:10:55 -0700 (PDT)
+Date: Mon, 18 Mar 2024 11:10:51 +0300
 From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: Christophe JAILLET <christophe.jaillet@wanadoo.fr>,
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] caif: Use UTILITY_NAME_LENGTH instead of hard-coding 16
-Message-ID: <148f58b6-fe56-4fd2-b430-d6aa40037bb5@moroto.mountain>
-References: <af10f5a3236d47fd183487c9dcba3b3b3c66b595.1710584144.git.christophe.jaillet@wanadoo.fr>
- <20240318032133.GA1312783@maili.marvell.com>
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] ice: Fix freeing uninitialized pointers
+Message-ID: <a315177e-a9b1-4110-a176-8a909335c56f@moroto.mountain>
+References: <77145930-e3df-4e77-a22d-04851cf3a426@moroto.mountain>
+ <Zff0IO6nqpMiGXl5@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,35 +90,49 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240318032133.GA1312783@maili.marvell.com>
+In-Reply-To: <Zff0IO6nqpMiGXl5@nanopsycho>
 
-On Mon, Mar 18, 2024 at 08:51:33AM +0530, Ratheesh Kannoth wrote:
-> On 2024-03-16 at 15:46:10, Christophe JAILLET (christophe.jaillet@wanadoo.fr) wrote:
-> > UTILITY_NAME_LENGTH is 16. So better use the former when defining the
-> > 'utility_name' array. This makes the intent clearer when it is used around
-> > line 260.
+On Mon, Mar 18, 2024 at 08:58:24AM +0100, Jiri Pirko wrote:
+> Sat, Mar 16, 2024 at 10:44:40AM CET, dan.carpenter@linaro.org wrote:
+> >Automatically cleaned up pointers need to be initialized before exiting
+> >their scope.  In this case, they need to be initialized to NULL before
+> >any return statement.
 > >
-> > Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> > ---
-> >  net/caif/cfctrl.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> >Fixes: 90f821d72e11 ("ice: avoid unnecessary devm_ usage")
+> >Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+> >---
+> > drivers/net/ethernet/intel/ice/ice_common.c  | 4 ++--
+> > drivers/net/ethernet/intel/ice/ice_ethtool.c | 2 +-
+> > 2 files changed, 3 insertions(+), 3 deletions(-)
 > >
-> > diff --git a/net/caif/cfctrl.c b/net/caif/cfctrl.c
-> > index 8480684f2762..b6d9462f92b9 100644
-> > --- a/net/caif/cfctrl.c
-> > +++ b/net/caif/cfctrl.c
-> > @@ -206,7 +206,7 @@ int cfctrl_linkup_request(struct cflayer *layer,
-> >  	u8 tmp8;
-> >  	struct cfctrl_request_info *req;
-> >  	int ret;
-> > -	char utility_name[16];
-> > +	char utility_name[UTILITY_NAME_LENGTH];
-> Reverse xmas tree.
+> >diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+> >index 4d8111aeb0ff..4b27d2bc2912 100644
+> >--- a/drivers/net/ethernet/intel/ice/ice_common.c
+> >+++ b/drivers/net/ethernet/intel/ice/ice_common.c
+> >@@ -1002,8 +1002,8 @@ static void ice_get_itr_intrl_gran(struct ice_hw *hw)
+> >  */
+> > int ice_init_hw(struct ice_hw *hw)
+> > {
+> >-	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree);
+> >-	void *mac_buf __free(kfree);
+> >+	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) = NULL;
+> >+	void *mac_buf __free(kfree) = NULL;
+> > 	u16 mac_buf_len;
+> > 	int status;
+> > 
 > 
+> How about similar issues in:
+> ice_set_fc()
+> ice_cfg_phy_fec()
+> ?
 
-It's always hard to know what to do when the original code isn't in the
-correct format.  Someone sent a patch last week which fixed a bug and
-partially converted a declaration block into reverse Christmas tree...
+Yeah.  Sorry, I'll resend.  Smatch didn't warn about those bugs because
+the sanity checks are the begining of the functions:
+
+	if (!pi || !aq_failures)
+		return -EINVAL;
+
+are never true...  It's the first time I've run into this as an issue.
 
 regards,
 dan carpenter
