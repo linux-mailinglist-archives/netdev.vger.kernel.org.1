@@ -1,109 +1,180 @@
-Return-Path: <netdev+bounces-80401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80403-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08F6D87E9F2
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 14:17:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 151DC87E9FC
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 14:21:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D2B11F21A42
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 13:17:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 62C53B226C5
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 13:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FC1C38DF9;
-	Mon, 18 Mar 2024 13:17:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 759B445BFA;
+	Mon, 18 Mar 2024 13:20:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jfn6yFY5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PlQ+c4bl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F174D383B0;
-	Mon, 18 Mar 2024 13:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A15674438F;
+	Mon, 18 Mar 2024 13:20:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710767863; cv=none; b=XA3q2EpYx9oPr0tl/EbGJ06pywOjyh8MJ4ouFFGNcl9PEfmq60SwCeg6pF+8sIpcma2L4PVJOySigIctoNhL5aoKuOQXP6LVkZ5U9DMw2NPSCx13RrR/NzqjaQH7ylZx/UMblLovwLl7XC2W69mE3SsTm4DXPbCZborhf8JMcWA=
+	t=1710768058; cv=none; b=RRMjfuCpzA874WAZHompfdX4dNKqOwstOa+OnqJd5ELnjc2hbg35I7ZUpHdhK0gtwQwPJkFPCpeMKHwdgVGnBjxD0cthuM/uONn3kn9fHT4Em2MynzAGzP5KsBsWxpDY+QFbuY4JbwvTGEzeT0VzaOyerPr0c6zsS4DwoQH5OfQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710767863; c=relaxed/simple;
-	bh=TBxlNbJ1kz+1mgc5LCV7B1yVqyid6pknsBQioHE+wvk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TCYke6JmP4QUlVkMsyJ9r4S0CTsDxryJJ0kP1u8xf6hau/7lBm4AyBHhi6/mQTJN750RnxCqu9EYec5EJjyfE+9yFz4BovuYla+LLBlAHaUaAXReTBajKX3p1qtZB9RiA3rgRstm5X6GSI4jbUv6yKjVd2cQPDFphM4sGRS9bSs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jfn6yFY5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65B23C433C7;
-	Mon, 18 Mar 2024 13:17:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710767862;
-	bh=TBxlNbJ1kz+1mgc5LCV7B1yVqyid6pknsBQioHE+wvk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Jfn6yFY5x4ioM/28bhoexwqqED+kx78C7906yUeW8Z/8QSUgq6RolopQ5eyEINwNM
-	 xzj5LQtBaqipMQ59yVEF6WL6G3XDksaViLZglkF4ECw2itY4cy0T6MRo+1sK4in3ON
-	 d2ucQ4ZTUuSaZgx67vgbUhTVE0nnKtqGDPPhzZsFCXFFZ1dO3AK/e/vcpHia0wMHJo
-	 RmzPD/XdSIDdvNQ8ra7bF3Wo03gdf+YltOu840+d3/180ohoqCDb6hDEKgDH8BELTv
-	 7tvOEnAsZ36LpQVzqhCLUiFIsC8gGyJnvpnKi0iLica0joad0fiwH76tgOYGpz+4h+
-	 hCP/rvpR1PB/w==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1rmCs7-000000000L7-46cK;
-	Mon, 18 Mar 2024 14:17:48 +0100
-Date: Mon, 18 Mar 2024 14:17:47 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: Johan Hovold <johan+linaro@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Matthias Kaehlcke <mka@chromium.org>,
-	Doug Anderson <dianders@google.com>,
-	Bjorn Andersson <quic_bjorande@quicinc.com>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 1/4] dt-bindings: bluetooth: add new wcn3991
- compatible to fix bd_addr
-Message-ID: <Zfg--2_NMPSPTxK-@hovoldconsulting.com>
-References: <20240318110855.31954-1-johan+linaro@kernel.org>
- <20240318110855.31954-2-johan+linaro@kernel.org>
- <CAA8EJprywWbdoyfAbys=0WzEdAkp0UK1fzzCPzxKRjyk9DrC6Q@mail.gmail.com>
+	s=arc-20240116; t=1710768058; c=relaxed/simple;
+	bh=Ro9DhNywcl6K5qDRLecjZIB/mP5nv+WPca/RqnMk09M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HZIOWwun8+lN98l85XYRMmVYQYYAR7Xj0TYWftt5WYkF7WR1GtwHoLWH+WsmxgcGhXwm45w39uIDQKHhH7yTboZ7M7Grz07BvR+MVm5Dqet2wfu5S1mEow8YgppGcDVahnNo/hdyYhBmRnrvJTwDHA/XbF4M3VXb8MfahNDPv7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PlQ+c4bl; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2d41d1bedc9so73982051fa.3;
+        Mon, 18 Mar 2024 06:20:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710768055; x=1711372855; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=B6f1uddVmun0jJOTXaZCQpPLYe/6XOnd9oX08SFGjC0=;
+        b=PlQ+c4bl91Dpmes14fBswcC6BcIbol49w+sQwMRe/TAeUvvaM3ac2D3bcjkLQiab3e
+         kxvAeD1ESF4SceQgKmgzJ2UA0gDA+vS5cLHgahaKEv6qs03SWOck70/XdJDI5IWog36G
+         Cc+kEbTy24WU4yCgCy+Y4HAA703c6iV7BjFvAktvlPwl0C1VqO2zid2eAmG9iHyWh/iv
+         SsvqDm1zzIKjeBUAg0lAfUvfOYrrUEsLEVsmRit3cs4k1W6IIhUbQ4Bye+krtc3Z550S
+         KEnewm6A/DwcFKXC2Vr8QdYGhMrYWiiV9BZu4obD1LP6Duww0X5bGdkL4fyHMV45JBNs
+         d6mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710768055; x=1711372855;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=B6f1uddVmun0jJOTXaZCQpPLYe/6XOnd9oX08SFGjC0=;
+        b=k2jtj/y/Nc2CXNuqtZIKCbwLJ7H5zs20+up0seADMaJvYxQ8rbYg3MKRxgUUTIcfUV
+         nRupgC/BSSsU5lYl3IbCYS1pSr5g3e9ETkcQLWJ4OFdUE4XCRPQJbPS+SH+aDMypfDgs
+         xXzYP3sD0si/gFik5en7IqniCUyJN0sil25IYyFki5gLBa5mTf1HeZVbodjLo1p+FNaj
+         J0n31HArjK7r86gfTSN+H5ghZXrj+6MsMJnqF3qFwhCgCn5YIlAedi6Z9UZ8JDWXJJnl
+         4y1lW5kvmqAQK7siIrtnQAhMHsEonIrR0GRpZnzTzCdxso5uuFd/nx8tO2P6JRtT7SAI
+         HoIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV+b8K65aybDDKyYXTuzO2rocOP3kcjpoyZgHHfUjkndoHF6J7zufyGTXC8F+0UM+9GsCzAyoNkWbVxz0+h9MUI/ElQHi3XdJdeqq+LErZg2ZiaduZlcN2cAlQrCN4jso248XCWhXY=
+X-Gm-Message-State: AOJu0YxDp+zm9pBLMxoc/K1SzjM4becevr4L6qgx4qcQS/V8SVg36l4B
+	LfuC9/G4otewzdSgH8auYTA1MwjV2l6sc499NO8S1papeFhZ408Z
+X-Google-Smtp-Source: AGHT+IGo7h2AxBg2UxkUko/nh1IfJYKCRKIBQwNwYP8I35nwUeXbiEw4QWW6hWgGVAaLpuqdbDqs6Q==
+X-Received: by 2002:a2e:9bcd:0:b0:2d4:5c03:5ccb with SMTP id w13-20020a2e9bcd000000b002d45c035ccbmr5121261ljj.10.1710768054395;
+        Mon, 18 Mar 2024 06:20:54 -0700 (PDT)
+Received: from ?IPV6:2620:10d:c096:310::2181? ([2620:10d:c092:600::1:429a])
+        by smtp.gmail.com with ESMTPSA id wk18-20020a170907055200b00a46c7ecb464sm709545ejb.27.2024.03.18.06.20.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 18 Mar 2024 06:20:54 -0700 (PDT)
+Message-ID: <0a556650-9627-48ee-9707-05d7cab33f0f@gmail.com>
+Date: Mon, 18 Mar 2024 13:19:19 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAA8EJprywWbdoyfAbys=0WzEdAkp0UK1fzzCPzxKRjyk9DrC6Q@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: Do not break out of sk_stream_wait_memory() with
+ TIF_NOTIFY_SIGNAL
+Content-Language: en-US
+To: Sascha Hauer <s.hauer@pengutronix.de>
+Cc: netdev@vger.kernel.org, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
+References: <20240315100159.3898944-1-s.hauer@pengutronix.de>
+ <7b82679f-9b69-4568-a61d-03eb1e4afc18@gmail.com>
+ <ZfgvNjWP8OYMIa3Y@pengutronix.de>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <ZfgvNjWP8OYMIa3Y@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 18, 2024 at 03:00:40PM +0200, Dmitry Baryshkov wrote:
-> On Mon, 18 Mar 2024 at 13:09, Johan Hovold <johan+linaro@kernel.org> wrote:
-> >
-> > Several Qualcomm Bluetooth controllers lack persistent storage for the
-> > device address and instead one can be provided by the boot firmware
-> > using the 'local-bd-address' devicetree property.
-> >
-> > The Bluetooth bindings clearly says that the address should be specified
-> > in little-endian order, but due to a long-standing bug in the Qualcomm
-> > driver which reversed the address some bootloaders have been providing
-> > the address in big-endian order instead.
-> >
-> > The only device out there that should be affected by this is the WCN3991
-> > used in some Chromebooks. To maintain backwards compatibility, mark the
-> > current compatible string as deprecated and add a new
-> > 'qcom,wcn3991-bt-bdaddr-le' for firmware which conforms with the
-> > binding.
+On 3/18/24 12:10, Sascha Hauer wrote:
+> On Fri, Mar 15, 2024 at 05:02:05PM +0000, Pavel Begunkov wrote:
+>> On 3/15/24 10:01, Sascha Hauer wrote:
+>>> It can happen that a socket sends the remaining data at close() time.
+>>> With io_uring and KTLS it can happen that sk_stream_wait_memory() bails
+>>> out with -512 (-ERESTARTSYS) because TIF_NOTIFY_SIGNAL is set for the
+>>> current task. This flag has been set in io_req_normal_work_add() by
+>>> calling task_work_add().
+>>
+>> The entire idea of task_work is to interrupt syscalls and let io_uring
+>> do its job, otherwise it wouldn't free resources it might be holding,
+>> and even potentially forever block the syscall.
+>>
+>> I'm not that sure about connect / close (are they not restartable?),
+>> but it doesn't seem to be a good idea for sk_stream_wait_memory(),
+>> which is the normal TCP blocking send path. I'm thinking of some kinds
+>> of cases with a local TCP socket pair, the tx queue is full as well
+>> and the rx queue of the other end, and io_uring has to run to receive
+>> the data.
 
-> This compatible doesn't describe new hardware kind. As such, I think,
-> the better way would be to continue using qcom,wcn3991-bt compatible
-> string + add some kind of qcom,bt-addr-le property.
+There is another case, let's say the IO is done via io-wq
+(io_uring's worker thread pool) and hits the waiting. Now the
+request can't get cancelled, which is done by interrupting the
+task with TIF_NOTIFY_SIGNAL. User requested request cancellations
+is one thing, but we'd need to check if io_uring can ever be closed
+in this case.
 
-No, you can't handle backwards compatibility by *adding* a property.
 
-I wanted to avoid doing this, but if we have to support Google's broken
-boot firmware for these devices, then this is how it needs to be done.
+>> If interruptions are not welcome you can use different io_uring flags,
+>> see IORING_SETUP_COOP_TASKRUN and/or IORING_SETUP_DEFER_TASKRUN.
+> 
+> I tried with different combinations of these flags. For example
+> IORING_SETUP_TASKRUN_FLAG | IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN
+> makes the issue less likely, but nevertheless it still happens.
+> 
+> However, reading the documentation of these flags, they shall provide
+> hints to the kernel for optimizations, but it should work without these
+> flags, right?
 
-Johan
+That's true, and I guess there are other cases as well, like
+io-wq and perhaps even a stray fput.
+
+
+>> Maybe I'm missing something, why not restart your syscall?
+> 
+> The problem comes with TLS. Normally with synchronous encryption all
+> data on a socket is written during write(). When asynchronous
+> encryption comes into play, then not all data is written during write(),
+> but instead the remaining data is written at close() time.
+
+Was it considered to do the final cleanup in workqueue
+and only then finalising the release?
+
+
+> Here is my call stack when things go awry:
+> 
+> [  325.560946] tls_push_sg: tcp_sendmsg_locked returned -512
+> [  325.566371] CPU: 1 PID: 305 Comm: webserver_libur Not tainted 6.8.0-rc6-00022-g932acd9c444b-dirty #248
+> [  325.575684] Hardware name: NXP i.MX8MPlus EVK board (DT)
+> [  325.580997] Call trace:
+> [  325.583444]  dump_backtrace+0x90/0xe8
+> [  325.587122]  show_stack+0x18/0x24
+> [  325.590444]  dump_stack_lvl+0x48/0x60
+> [  325.594114]  dump_stack+0x18/0x24
+> [  325.597432]  tls_push_sg+0xfc/0x22c
+> [  325.600930]  tls_tx_records+0x114/0x1cc
+> [  325.604772]  tls_sw_release_resources_tx+0x3c/0x140
+> [  325.609658]  tls_sk_proto_close+0x2b0/0x3ac
+> [  325.613846]  inet_release+0x4c/0x9c
+> [  325.617341]  __sock_release+0x40/0xb4
+> [  325.621007]  sock_close+0x18/0x28
+> [  325.624328]  __fput+0x70/0x2bc
+> [  325.627386]  ____fput+0x10/0x1c
+> [  325.630531]  task_work_run+0x74/0xcc
+> [  325.634113]  do_notify_resume+0x22c/0x1310
+> [  325.638220]  el0_svc+0xa4/0xb4
+> [  325.641279]  el0t_64_sync_handler+0x120/0x12c
+> [  325.645643]  el0t_64_sync+0x190/0x194
+> 
+> As said, TLS is sending remaining data at close() time in tls_push_sg().
+> Here sk_stream_wait_memory() gets interrupted and returns -ERESTARTSYS.
+> There's no way to restart this operation, the socket is about to be
+> closed and won't accept data anymore.
+
+-- 
+Pavel Begunkov
 
