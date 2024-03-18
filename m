@@ -1,106 +1,108 @@
-Return-Path: <netdev+bounces-80433-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80434-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF22087EB38
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 15:42:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0234587EB56
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 15:45:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9943C282CB2
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 14:42:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C2EA1F2439E
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 14:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD7B4E1A0;
-	Mon, 18 Mar 2024 14:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 339124E1D1;
+	Mon, 18 Mar 2024 14:45:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V1pi4l/t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kqwSd1uF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D21C64DA0D;
-	Mon, 18 Mar 2024 14:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5A184E1C5;
+	Mon, 18 Mar 2024 14:45:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710772971; cv=none; b=qUbHLMk22IZx+asU/Twf6priq7WTMd1BYA7lHGJPybRs5jbI099+IVjk8ZgFIfi6LZXveaftK1qkUTAQjp8iQb1nqZFUberBU0V84rtuNDKrEGZF1F5lx20m/j42rGLyHIBIqOkNvOw2k0oeVCtMF8P7nMH8vSCqWuIZVtcF3yo=
+	t=1710773140; cv=none; b=pHkQs+xKCOdEFJW/t55lKwJQXnHN39D/IdylIfwP5HGxsvunJJ0r9T8XoXehMggrObip3WoBcb4KKXZX5T1tGQ6x4KYdj+fZt2CDARi1l2jl6fON8+E1jzh1NmRJiJvtbzIp66G9uoJI7aOFok+P1zawdc0aJmluxHvjGP6pA/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710772971; c=relaxed/simple;
-	bh=6jZUOrSarj0xwQwHkR92kQfr7ZCM72vokHH8mZ8RfRg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=esnuGyPJU1p+ooLAxIpONxIk5otoesdW37xpWgqdw20ugEOaO9Q8tOu7fn4VklmYkqSKSm+yErw0ATJMy9Jen5qAPsgBFA/SzxU46nlM9sE7pc/6n3bG8SwVU3G1JLw3ui76WxrkAsxziWsM4mRBf5TX9TUc5YMXgXamGvTDW20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V1pi4l/t; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-7beda6a274bso135324639f.2;
-        Mon, 18 Mar 2024 07:42:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710772969; x=1711377769; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6jZUOrSarj0xwQwHkR92kQfr7ZCM72vokHH8mZ8RfRg=;
-        b=V1pi4l/tp5H4dFLW+XuvtwUlL6BfL6SKI2u+QPwx82Zeq1EQjmeyzA1xZUbAvPHfTk
-         vwzW1YGpRfRo9CBIFihM+McDJwyO3k5s8DDKi1Q7EO0EruswZGvpgFlDHk74qVCt5lpm
-         xQS8fhYJyw8vYjHH7mZwnvKIZL9y66UlAS1LtKoZmA+CKzotUchM1F8DTfd/+VN2EnxS
-         Mod0JKwYwg8o7Zgm2ZabTUUGJQIE3D4t4DSAKsTIr8MA5+YL9q2r5O9aO364KtHbJVGC
-         DlVAXXJbl1a6XAz/aC5ycqsKp/pnF15YCxRGsJqljE45R1jlMoV0a0vxAjemeuUjzFqD
-         q7MA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710772969; x=1711377769;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6jZUOrSarj0xwQwHkR92kQfr7ZCM72vokHH8mZ8RfRg=;
-        b=iJw5O9rY+cBPqFpGtYWm1GqR3euA/MPsa9YhqeCIRTmWwX3cVk7wm5I3i6OqJA1Czf
-         Y/pii5eyZEEXwhfJMHoZVX8p6IROxJHw02b3IlKleZZXp+96vp6pTnaynKocLVOqNwOW
-         fm0fih9uF/6jdoDiOK4wcOp8FMkurcmlYUlwQnbqaCLOBUMnyFzr7FkbEEbDLePWmtbW
-         nn7+ZQ3wMchmbPRSKUPO4S4zOI4h1pqFu7uCaJWSswg7jEdQtt9CdVXhkzstf3/1o1v/
-         PK67O8P8Li29ezT6kkv9Cc11Ql1E+gcIb113ljGpYZab3R8F8jIQtdOpSE0dIefyDGpD
-         HgPw==
-X-Forwarded-Encrypted: i=1; AJvYcCVCUJ3714lfg6Jz7NmIkuUC/G/5/aWOUfsxVoGkqbMUX/aa+alb3utaqM1HkuiUjxUH0Y4ZwIqEY5T9SUnszS6Z4WfLl9L2WW7KnpN2bMun12n48nAJt4+RDi+v0KLIglp1FSnNh+Xqcy/XGw4g
-X-Gm-Message-State: AOJu0YzwtN0S10wyeDKJHrMvnxzWmFFknE+RM+Zf2qQtV2RBmYU3H5Fa
-	uk3rPKRXoRJH+i6Hr77/6/tnN7VboxZ+e1InCi9CZXwcC7LRPOAb
-X-Google-Smtp-Source: AGHT+IF0uNwYEaBz8AnexP5ENUY+lLOK4IZZdV2iGj2PTo9PbF1OMggRiBoWCrlFZUCVvWkeE+p3nQ==
-X-Received: by 2002:a05:6e02:d41:b0:364:279c:4a08 with SMTP id h1-20020a056e020d4100b00364279c4a08mr10977168ilj.23.1710772968895;
-        Mon, 18 Mar 2024 07:42:48 -0700 (PDT)
-Received: from ?IPV6:2601:284:8200:b700:a4f8:d880:24:bcbe? ([2601:284:8200:b700:a4f8:d880:24:bcbe])
-        by smtp.googlemail.com with ESMTPSA id y14-20020a92c98e000000b00366776dcc88sm2363725iln.79.2024.03.18.07.42.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 18 Mar 2024 07:42:48 -0700 (PDT)
-Message-ID: <2b5e831b-baf1-4681-b3b1-b223df07ab83@gmail.com>
-Date: Mon, 18 Mar 2024 08:42:46 -0600
+	s=arc-20240116; t=1710773140; c=relaxed/simple;
+	bh=mNFwIbUpYbC6mIe+Ons8M/fmdCsJd0AHKosKXozTHfs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uKyLW1z1NmEK52DwAiloLSV8e0IwvDXEv6nFzKjMe5mpxtNY14MY0F658jNCU20TblMCpy2GUzu9gjD/cR+O9qomP8LD4JX2/VZYFz0e3h7b/G6xMjSrM5gQKTPoK+Vv5PmTdfx0mI75aMGyzFLcyVcZaoELWffS8yw3Wvvwkho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kqwSd1uF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EBC3C433F1;
+	Mon, 18 Mar 2024 14:45:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710773139;
+	bh=mNFwIbUpYbC6mIe+Ons8M/fmdCsJd0AHKosKXozTHfs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kqwSd1uFjWxPfNUE0/idanxGBUrdyMwC9MFJVRWvUhOVxbEuBrHkpxTBXNRmucbIu
+	 drSTjRLLKhPKf9SVWv9E+6//cUMjLhj3ixKZNa9kwq7Sg9J6HwjpnNCXOJRGqVlVvY
+	 WaE/9HaIvEnL2lNf5PtSKn8lAgqT2do3hOuJftC+fjuKUBNgw9k1Lt585dSw8zKB0G
+	 QwH08EjqmxoUE1iHv7degGtOJ31pY+vyQ/H9ic+QHHYu+xWvGSAGvyF4cNXbnxs6gw
+	 uoORzwsDvWQLi38VzylOrPel1jI0dYMYupn/imr0gT1NJzPD1PfU5Vofc0tusOr9Fr
+	 itZfsI5QGKC/w==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1rmEFF-00000000310-1VgJ;
+	Mon, 18 Mar 2024 15:45:45 +0100
+Date: Mon, 18 Mar 2024 15:45:45 +0100
+From: Johan Hovold <johan@kernel.org>
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Cc: Johan Hovold <johan+linaro@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Matthias Kaehlcke <mka@chromium.org>,
+	Doug Anderson <dianders@google.com>,
+	Bjorn Andersson <quic_bjorande@quicinc.com>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/4] dt-bindings: bluetooth: add new wcn3991
+ compatible to fix bd_addr
+Message-ID: <ZfhTmQ6mOLR8eXA5@hovoldconsulting.com>
+References: <20240318110855.31954-1-johan+linaro@kernel.org>
+ <20240318110855.31954-2-johan+linaro@kernel.org>
+ <CAA8EJprywWbdoyfAbys=0WzEdAkp0UK1fzzCPzxKRjyk9DrC6Q@mail.gmail.com>
+ <Zfg--2_NMPSPTxK-@hovoldconsulting.com>
+ <CAA8EJpoxq6__DMcsuAEsnxBfPrrQBuu4ZgfULkok4KWSYVxuHQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG] selftests/net: icmp_redirect.sh: 12 out of 40 test result
- with [FAIL]
-Content-Language: en-US
-To: Hangbin Liu <liuhangbin@gmail.com>,
- Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- Po-Hsu Lin <po-hsu.lin@canonical.com>
-References: <dfb4b2fa-1728-43f2-ad73-f06145399fc9@alu.unizg.hr>
- <ZfepK3xItcv3ARVV@Laptop-X1>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <ZfepK3xItcv3ARVV@Laptop-X1>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAA8EJpoxq6__DMcsuAEsnxBfPrrQBuu4ZgfULkok4KWSYVxuHQ@mail.gmail.com>
 
-On 3/17/24 8:38 PM, Hangbin Liu wrote:
-> Wild guess, the last change of icmp_redirect is my netns update. Maybe
-> there are something default sysctl settings in netns cause the error?
+On Mon, Mar 18, 2024 at 04:17:24PM +0200, Dmitry Baryshkov wrote:
+> On Mon, 18 Mar 2024 at 15:17, Johan Hovold <johan@kernel.org> wrote:
+> > On Mon, Mar 18, 2024 at 03:00:40PM +0200, Dmitry Baryshkov wrote:
+> > > On Mon, 18 Mar 2024 at 13:09, Johan Hovold <johan+linaro@kernel.org> wrote:
+> > > > The only device out there that should be affected by this is the WCN3991
+> > > > used in some Chromebooks. To maintain backwards compatibility, mark the
+> > > > current compatible string as deprecated and add a new
+> > > > 'qcom,wcn3991-bt-bdaddr-le' for firmware which conforms with the
+> > > > binding.
+> >
+> > > This compatible doesn't describe new hardware kind. As such, I think,
+> > > the better way would be to continue using qcom,wcn3991-bt compatible
+> > > string + add some kind of qcom,bt-addr-le property.
+> >
+> > No, you can't handle backwards compatibility by *adding* a property.
+> >
+> > I wanted to avoid doing this, but if we have to support Google's broken
+> > boot firmware for these devices, then this is how it needs to be done.
+> 
+> One hardware compat string per hardware type.
 
-It is most likely sysctl settings. It would be good to chase those down
-and make sure we have the script setting them.
+Again, no. Not when there is an incompatible change in the binding. Then
+we add a new compatible string and deprecate the old binding.
 
-Mirsad: What OS are you testing with? That script has a verbose option
-(-v) to get more output like the commands run and pause-on-fail (-p) to
-manually debug at that point.
+Johan
 
