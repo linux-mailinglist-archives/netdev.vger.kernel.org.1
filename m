@@ -1,290 +1,110 @@
-Return-Path: <netdev+bounces-80484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 218B787F193
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 21:51:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8462D87F1DE
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 22:14:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A55221F22711
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 20:51:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A9B01F223C6
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 21:14:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CE23535C1;
-	Mon, 18 Mar 2024 20:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030B358AC3;
+	Mon, 18 Mar 2024 21:14:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JvelUiUl"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="c7KQe2Yv"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED62752F98;
-	Mon, 18 Mar 2024 20:50:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94EA226AC7;
+	Mon, 18 Mar 2024 21:14:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710795061; cv=none; b=izcC2TUfxexC9sNb6b8P+MKZAguysix7oi53QyAhHjrPpnWirNYwEvc28c65T03P94BgdrVLktwts3/6XmjXUQv0Kow4kIKpezzCsbj5Dx7dlSLkziE6ByMtOPcY15F9roWJHpQxeje4hhFY81RT1fbQ61afymfQfvaYR2qg40I=
+	t=1710796463; cv=none; b=XSnS9NFuo0AFwhAeBwa68iV3Rim/2GsfJeBt9zvJ/HXvCJcRZdcjW+J6q1LABrRgFIQGnqtgjSSr+8GEl2llmcP78fsO/ZZev62PhZ9oJBI8SqRcDQ20AT6ZaS+I9PMRAUvaU+w4RoFs5UdWCuYDViBMZt3YxVg2FkraG88AoUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710795061; c=relaxed/simple;
-	bh=DQyXwkGCVcqn03gGGgc5pF7UkvAlzUUsxkvBry9vhTc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=adU97unXwiV/wIFkCb6d3cU16o08/iGaDXLlyWFsdMgA4JV2TE7C20+UHzyRb4V/6L3jX1CY0hARm48CvUYQbWKm2s+4b9WtINLYw6iwFEySoIRKARFDxyr7gr40e4nkrv3ops3l0fucdPo8ZG+kChuoB/TjmTnaqe4lel69hpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JvelUiUl; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=V7hiweKCShqTkZVjRoBbzPoSakFvSACyYI9eRdobDaY=; b=JvelUiUlEPlnNSozIDXO9xVl79
-	Vs4SbJuFviGCjY4V59jwpJctAAgl/bbxuvkCTt8bNjpAbrnA/aZIbPTJEfgE0AA9FpnamA7sF7sJt
-	j4SWEbsy5Vwie22bOlRsk92UlWylNrCgyTskccbnJYgCIhiTjBaXOW7fIAbhCA3TxMgU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rmJw1-00Adr6-5R; Mon, 18 Mar 2024 21:50:17 +0100
-Date: Mon, 18 Mar 2024 21:50:17 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Wadim Mueller <wafgo01@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>, Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	Chester Lin <chester62515@gmail.com>,
-	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>,
-	Matthias Brugger <mbrugger@suse.com>,
-	NXP S32 Linux Team <s32@nxp.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
-	Johannes Zink <j.zink@pengutronix.de>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Swee Leong Ching <leong.ching.swee@intel.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, linux-clk@vger.kernel.org
-Subject: Re: [PATCH 2/3] net: stmmac: Add NXP S32 SoC family support
-Message-ID: <ddf5c4e2-16c2-4399-ae34-57114b8d4d21@lunn.ch>
-References: <20240315222754.22366-1-wafgo01@gmail.com>
- <20240315222754.22366-3-wafgo01@gmail.com>
+	s=arc-20240116; t=1710796463; c=relaxed/simple;
+	bh=aJ6CjiZF2hyXHtQozMRnoONYsxKu8VHkBvwiL9mDz1k=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=o6gvSVJlWce0gpjTnV+wtgqaajpRjtO1UFLg0cGsh/M79aMvEabOBfnXZR1/koi1/TujBTi5JIUdxusoVuyZTOorXWU16fDADdzkdsGp5NrYwJfjWhLDSUKCDNPNpFYtvl80lTNgviI74Ji6jU/o54fhLrPbJskrK4rxFFsiR5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=c7KQe2Yv; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1710796455;
+	bh=deHKErowfgRjzg+BZICm3hY4w6A10J4cfRkkakLoAPA=;
+	h=Date:From:To:Cc:Subject:From;
+	b=c7KQe2YvEOCL6E9r6+p+Qn2T77an8mLLJkDSt4dX1LB/NuAD4ET5zN0/6MpOwhN5j
+	 AbNU2UCZKgqzlEtZquF00rww6miOJdmokjTQ+HlXZJ57RBj+lO21d72JB+ikkomX4n
+	 Ofhg9FeUh9iMivPCqdXBYE8Ts/QhLXBSWZ1hN/Sbz6/srY4Ttf0x0yD3u761y8PvuG
+	 PJnIke4Js7xCN8C0fBeJz/ExbKI56voBP2yi5WZFWoU79EsqjXjMXfyLeCauhaf4lC
+	 3TC811ZLdX7gJJrNiLzAoBHmHnUZxHtgURqXQ/vp5pAXOxsYWCHn6sjM3zXxzkeD4U
+	 wMLbR28iv/zYA==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Tz6zp5FTHz4wb0;
+	Tue, 19 Mar 2024 08:14:14 +1100 (AEDT)
+Date: Tue, 19 Mar 2024 08:14:12 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>
+Cc: Herve Codina <herve.codina@bootlin.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: linux-next: Fixes tag needs some work in the net tree
+Message-ID: <20240319081412.750b896d@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240315222754.22366-3-wafgo01@gmail.com>
+Content-Type: multipart/signed; boundary="Sig_/gt63zEmlVLcvl=VnbfYvrc9";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Fri, Mar 15, 2024 at 11:27:48PM +0100, Wadim Mueller wrote:
-> Add support for NXP S32 SoC family's GMAC to the stmmac network driver. This driver implementation is based on the patchset originally contributed by Chester Lin [1], which itself draws heavily from NXP's downstream implementation [2]. The patchset was never merged.
+--Sig_/gt63zEmlVLcvl=VnbfYvrc9
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Please wrap you commit message.
+Hi all,
 
- 
-> +#include <linux/device.h>
-> +#include <linux/ethtool.h>
+In commit
 
-Is this one needed?
+  badc9e33c795 ("net: wan: fsl_qmc_hdlc: Fix module compilation")
 
-> +static int s32_gmac_init(struct platform_device *pdev, void *priv)
-> +{
-> +	struct s32_priv_data *gmac = priv;
-> +	u32 intf_sel;
-> +	int ret;
-> +
-> +	if (gmac->tx_clk) {
-> +		ret = clk_prepare_enable(gmac->tx_clk);
-> +		if (ret) {
-> +			dev_err(&pdev->dev, "Can't set tx clock\n");
-> +			return ret;
-> +		}
-> +	}
-> +
-> +	if (gmac->rx_clk) {
-> +		ret = clk_prepare_enable(gmac->rx_clk);
-> +		if (ret) {
-> +			dev_err(&pdev->dev, "Can't set rx clock\n");
-> +			return ret;
-> +		}
-> +	}
-> +
-> +	/* set interface mode */
-> +	if (gmac->ctrl_sts) {
-> +		switch (gmac->intf_mode) {
-> +		default:
-> +			dev_info(
-> +				&pdev->dev,
-> +				"unsupported mode %u, set the default phy mode.\n",
-> +				gmac->intf_mode);
-> +			fallthrough;
+Fixes tag
 
-I would actually return -EINVAL. There is no backwards compatibility
-needed here, so force that the mode is always specified.
+  Fixes: b40f00ecd463 ("net: wan: Add support for QMC HDLC")
 
-> +		case PHY_INTERFACE_MODE_SGMII:
-> +			dev_info(&pdev->dev, "phy mode set to SGMII\n");
+has these problem(s):
 
-Please don't spam the kernel log. dev_dbg(). 
+  - Target SHA1 does not exist
 
-> +static void s32_fix_speed(void *priv, unsigned int speed, unsigned int mode)
-> +{
-> +	struct s32_priv_data *gmac = priv;
-> +
-> +	if (!gmac->tx_clk || !gmac->rx_clk)
-> +		return;
-> +
-> +	/* SGMII mode doesn't support the clock reconfiguration */
-> +	if (gmac->intf_mode == PHY_INTERFACE_MODE_SGMII)
-> +		return;
-> +
-> +	switch (speed) {
-> +	case SPEED_1000:
-> +		dev_info(gmac->dev, "Set TX clock to 125M\n");
+Maybe you meant
 
-more dev_dbg(). A driver should generally be silent, unless something
-goes wrong. It is also questionable if dev_dbg() should be used. Once
-the driver actually works, you can throw away a lot of debug
-prints. Do you expect problems here in the future?
+Fixes: d0f2258e79fd ("net: wan: Add support for QMC HDLC")
 
-> +static int s32_config_cache_coherency(struct platform_device *pdev,
-> +				      struct plat_stmmacenet_data *plat_dat)
-> +{
-> +	plat_dat->axi4_ace_ctrl = devm_kzalloc(
-> +		&pdev->dev, sizeof(struct stmmac_axi4_ace_ctrl), GFP_KERNEL);
-> +
-> +	if (!plat_dat->axi4_ace_ctrl)
-> +		return -ENOMEM;
-> +
-> +	plat_dat->axi4_ace_ctrl->tx_ar_reg = (ACE_CONTROL_SIGNALS << 16) |
-> +					     (ACE_CONTROL_SIGNALS << 8) |
-> +					     ACE_CONTROL_SIGNALS;
-> +
-> +	plat_dat->axi4_ace_ctrl->rx_aw_reg =
-> +		(ACE_CONTROL_SIGNALS << 24) | (ACE_CONTROL_SIGNALS << 16) |
-> +		(ACE_CONTROL_SIGNALS << 8) | ACE_CONTROL_SIGNALS;
-> +
-> +	plat_dat->axi4_ace_ctrl->txrx_awar_reg =
-> +		(ACE_PROTECTION << 20) | (ACE_PROTECTION << 16) |
-> +		(ACE_CONTROL_SIGNALS << 8) | ACE_CONTROL_SIGNALS;
+--=20
+Cheers,
+Stephen Rothwell
 
-This looks like magic. Can the various shifts be replaced my #defines?
-Comments added? This makes changes in some of the core code. So it
-might be better to have a prerequisite patch adding cache coherency
-control, with a good commit message explaining it.
+--Sig_/gt63zEmlVLcvl=VnbfYvrc9
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
 
-> +
-> +	return 0;
-> +}
-> +
-> +static int s32_dwmac_probe(struct platform_device *pdev)
-> +{
-> +	struct plat_stmmacenet_data *plat_dat;
-> +	struct stmmac_resources stmmac_res;
-> +	struct s32_priv_data *gmac;
-> +	struct resource *res;
-> +	const char *tx_clk, *rx_clk;
-> +	int ret;
-> +
-> +	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-> +	if (ret)
-> +		return ret;
-> +
-> +	gmac = devm_kzalloc(&pdev->dev, sizeof(*gmac), GFP_KERNEL);
-> +	if (!gmac)
-> +		return PTR_ERR(gmac);
-> +
-> +	gmac->dev = &pdev->dev;
-> +
-> +	/* S32G control reg */
-> +	res = platform_get_resource(pdev, IORESOURCE_MEM, 1);
-> +	gmac->ctrl_sts = devm_ioremap_resource(&pdev->dev, res);
-> +	if (IS_ERR_OR_NULL(gmac->ctrl_sts)) {
-> +		dev_err(&pdev->dev, "S32G config region is missing\n");
-> +		return PTR_ERR(gmac->ctrl_sts);
-> +	}
-> +
-> +	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
-> +	if (IS_ERR(plat_dat))
-> +		return PTR_ERR(plat_dat);
-> +
-> +	plat_dat->bsp_priv = gmac;
-> +
-> +	switch (plat_dat->phy_interface) {
-> +	case PHY_INTERFACE_MODE_SGMII:
-> +		tx_clk = "tx_sgmii";
-> +		rx_clk = "rx_sgmii";
-> +		break;
-> +	case PHY_INTERFACE_MODE_RGMII:
-> +	case PHY_INTERFACE_MODE_RGMII_ID:
-> +	case PHY_INTERFACE_MODE_RGMII_TXID:
-> +	case PHY_INTERFACE_MODE_RGMII_RXID:
-> +		tx_clk = "tx_rgmii";
-> +		rx_clk = "rx_rgmii";
-> +		break;
-> +	case PHY_INTERFACE_MODE_RMII:
-> +		tx_clk = "tx_rmii";
-> +		rx_clk = "rx_rmii";
-> +		break;
-> +	case PHY_INTERFACE_MODE_MII:
-> +		tx_clk = "tx_mii";
-> +		rx_clk = "rx_mii";
-> +		break;
-> +	default:
-> +		dev_err(&pdev->dev, "Not supported phy interface mode: [%s]\n",
-> +			phy_modes(plat_dat->phy_interface));
-> +		return -EINVAL;
-> +	};
-> +
-> +	gmac->intf_mode = plat_dat->phy_interface;
-> +
-> +	/* DMA cache coherency settings */
-> +	if (of_dma_is_coherent(pdev->dev.of_node)) {
-> +		ret = s32_config_cache_coherency(pdev, plat_dat);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	/* tx clock */
-> +	gmac->tx_clk = devm_clk_get(&pdev->dev, tx_clk);
-> +	if (IS_ERR(gmac->tx_clk)) {
-> +		dev_info(&pdev->dev, "tx clock not found\n");
-> +		gmac->tx_clk = NULL;
+-----BEGIN PGP SIGNATURE-----
 
-Is the clock really optional?
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmX4rqQACgkQAVBC80lX
+0GzSHwf/Xua2r0nzT62DVFbLZHPIkQKpZ7Y2+HoQGVv2y6FlW9gEK4VwVF1QuhxL
+ZAjWqcMW4pIUc6t1jdiCEhn8r/l3kkpL9Ps4GebHcGeKCGhl6uQ9B5DzkKZteRnv
+0akJDOvIWkJqd8IwW14oIjXdl6bXyDNVW5pP81dkcLgn0kzEAsTxlX6DqUpLfAGT
+wV3d6p/0nKumOorY5uPz2vmXo/sLjJT3vh8zYo4Zx1onkCnIXLKjTNQRL8ozrEI2
+kdf9vSfu5UZMrQVRKFtDMxMsIpQBqv6QbMJFeD5CytH2MnZLwErXPOGc4XZTKD3z
+ok4FUDb5H2vqbILVYtemxfoQ7WuPPw==
+=6KH0
+-----END PGP SIGNATURE-----
 
-I would also print the name of the clock which is missing.
-
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -324,6 +324,10 @@ static void stmmac_clk_csr_set(struct stmmac_priv *priv)
->  			priv->clk_csr = STMMAC_CSR_150_250M;
->  		else if ((clk_rate >= CSR_F_250M) && (clk_rate <= CSR_F_300M))
->  			priv->clk_csr = STMMAC_CSR_250_300M;
-> +		else if ((clk_rate >= CSR_F_300M) && (clk_rate < CSR_F_500M))
-> +			priv->clk_csr = STMMAC_CSR_300_500M;
-> +		else if ((clk_rate >= CSR_F_500M) && (clk_rate < CSR_F_800M))
-> +			priv->clk_csr = STMMAC_CSR_500_800M;
-
-Also seems like something which could be a patch of its own. Ideally
-you want lots of small patches which are obviously correct. Part of
-being obviously correct is the commit message, which is easier to
-write when the patch is small and only does one thing.
-
-      Andrew
-
+--Sig_/gt63zEmlVLcvl=VnbfYvrc9--
 
