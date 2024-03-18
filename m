@@ -1,88 +1,157 @@
-Return-Path: <netdev+bounces-80469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11F9587EF27
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 18:45:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 391A687EF24
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 18:45:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB3021F237EE
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 17:45:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DECF51F22237
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 17:45:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C5155C04;
-	Mon, 18 Mar 2024 17:45:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A43F55C18;
+	Mon, 18 Mar 2024 17:45:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QUJ60qAn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WWaNDbWT"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C06655C27
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 17:45:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2270D55C14;
+	Mon, 18 Mar 2024 17:45:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710783916; cv=none; b=JczUyh6pJ5pj2GtKzBh8u5NLuGP3v9DsgZ8ILmCIg1ppOO4mnoZOWRc4gNlLJWlPN7u1RAShDs5kFd+a+1Xr4HwgBin50mtg/Oo8jzx7fKUrBIBTomjf4Wu+4xemBRNQvvAPRISdVBv64wKOcmgx506wGY5aIoweeMwTMPjCMg0=
+	t=1710783909; cv=none; b=PXAUB3C5X5uxHSdK7qWU8uaIsLu2ZZjrsih98upGw21BPAzfDngPsgtYSvdjWmSNva43tfvExIfMTWv/m6uV4ilTt/SejXQJznWYIar+WWhYXaQfsYu1u9f6eBjPNmbaDhV1w5w3/hp/FmFB4YlrZ1q96PeJuZHWTX63WQvzsU8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710783916; c=relaxed/simple;
-	bh=Yaw8P7cIcZWvI09FWQm7OlGmpHB1wZjneZPbzfUnh5E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=eQnwaxtSfsxmdSIfu37de4IA5jyPX3vYYG0btPLhoneuFl9cUnny73mEFV1RW6aMkf5d38GY6kL8YdhUjnKlhJ5fHhtMq3RRVk2nsccb1iMhJFWzDBDllUuNweZGG4LaZC0UALiXzf4frkvoVS8p1ac1XukuOTuEkFkSK/9TqAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QUJ60qAn; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8aa1b70e-deb9-4e49-9a6c-059330995384@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1710783912;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xtbqcg2qKelrwJqvKUS60CjZNtxch3FLesIB/MCryZs=;
-	b=QUJ60qAnL+kQMfjbv6vF+Z1I0zs3ZxOhTJsIg7qrwGMSLQy1Zl2Bkw45Nn4v3KYFesOAYb
-	O+H7vHWN+GoHGI4n+00rk6nqhj4+asehHLRwhN1fjQJuUnl88t3U4COu5u4jBpgT+RRIZa
-	DhmSXtsDTXsTy2DMu6SrmxeBk/rRwUE=
-Date: Mon, 18 Mar 2024 10:45:01 -0700
+	s=arc-20240116; t=1710783909; c=relaxed/simple;
+	bh=Rv/2CA5wPLokC7VCqSey3DSFL6DXzXxuAMNj1og1Kh8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=htG0RGqTwPjeT1VPB8uWvApYDKrkj47FD134YOuHyH/6DJAQ9PJwhKITacf/ZVXI6VHKIlw4NupePjbPVFPNcLKucN5Z90xx0Pbp4UEE30uK3lTrLIHpgl9smWNVXxDf4m+tiTyodHZsLnswJ9pXfcfMKmKHpZuMCfrpS9nsJjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WWaNDbWT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5570FC433C7;
+	Mon, 18 Mar 2024 17:45:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710783908;
+	bh=Rv/2CA5wPLokC7VCqSey3DSFL6DXzXxuAMNj1og1Kh8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=WWaNDbWTEAAmKf9IeOXu65Mq96lSZxdoIzl57Yufwp7sGduxsN9HEXIrYzX7xVFRB
+	 Hy1mtA1Are4jKEG2IACOEirgKrPxv9Zs1dp7fdnMC0bfOtcyEQQneb+Sq2IR+LNeuJ
+	 Qm4PaSYyJSYzEW1PyUQ3GA1oW4uCUo9cP2Kl9ZFUVbePgoZjMoBtm4yIL6lG3iI5Y6
+	 Ap2yMBGMzoB+Ep1+VDrr0mYHjUf9hszzwqUb9eC2syA33HpPQrMK2u0+nfb9oVk6BT
+	 M0dwO4pTylvIrS88SdlZVkZ9B3ZjCplzmiIWt/w24KRM8YTMndNRvb32gsfsIG37Lt
+	 rRb95s82iaBfg==
+Date: Mon, 18 Mar 2024 17:45:03 +0000
+From: Simon Horman <horms@kernel.org>
+To: Erwan Velu <erwanaliasr1@gmail.com>
+Cc: Erwan Velu <e.velu@criteo.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 iwl-net] i40e: Prevent setting MTU if greater than MFS
+Message-ID: <20240318174503.GE1623@kernel.org>
+References: <20240313090719.33627-2-e.velu@criteo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v1 net] tcp: Clear req->syncookie in reqsk_alloc().
-Content-Language: en-US
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Martin KaFai Lau <martin.lau@kernel.org>,
- Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
- syzkaller <syzkaller@googlegroups.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20240315224710.55209-1-kuniyu@amazon.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20240315224710.55209-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240313090719.33627-2-e.velu@criteo.com>
 
-On 3/15/24 3:47 PM, Kuniyuki Iwashima wrote:
-> syzkaller reported a read of uninit req->syncookie. [0]
+On Wed, Mar 13, 2024 at 10:07:16AM +0100, Erwan Velu wrote:
+> Commit 6871a7de705 ("[intelxl] Use admin queue to set port MAC address
+> and maximum frame size") from iPXE project set the MFS to 0x600 = 1536.
+> See https://github.com/ipxe/ipxe/commit/6871a7de705
 > 
-> Originally, req->syncookie was used only in tcp_conn_request()
-> to indicate if we need to encode SYN cookie in SYN+ACK, so the
-> field remains uninitialised in other places.
+> At boot time the i40e driver complains about it with
+> the following message but continues.
 > 
-> The commit 695751e31a63 ("bpf: tcp: Handle BPF SYN Cookie in
-> cookie_v[46]_check().") added another meaning in ACK path;
-> req->syncookie is set true if SYN cookie is validated by BPF
-> kfunc.
+> 	MFS for port 1 has been set below the default: 600
 > 
-> After the change, cookie_v[46]_check() always read req->syncookie,
-> but it is not initialised in the normal SYN cookie case as reported
-> by KMSAN.
+> If the MTU size is increased, the driver accepts it but large packets will
+> not be processed by the firmware generating tx_errors. The issue is pretty
+> silent for users. i.e doing TCP in such context will generates lots of
+> retransmissions until the proper window size (below 1500) will be used.
 > 
-> Let's make sure we always initialise req->syncookie in reqsk_alloc().
+> To fix this case, it would have been ideal to increase the MFS,
+> via i40e_aqc_opc_set_mac_config, incoming patch will take care of it.
+> 
+> At least, commit prevents setting up an MTU greater than the current MFS.
+> It will avoid being in the position of having an MTU set to 9000 on the
+> netdev with a firmware refusing packets larger than 1536.
+> 
+> A typical trace looks like:
+> [  377.548696] i40e 0000:5d:00.0 eno5: Error changing mtu to 9000, Max is 1500. MFS is too small.
+> 
 
-Acked-by: Martin KaFai Lau <martin.lau@kernel.org>
+Hi Erwan, all,
 
+As a fix, I think this patch warrants a fixes tag.
+Perhaps this one is appropriate?
+
+Fixes: 41c445ff0f48 ("i40e: main driver core")
+
+> Signed-off-by: Erwan Velu <e.velu@criteo.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e_main.c | 10 +++++++++-
+>  1 file changed, 9 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> index f86578857e8a..85ecf2f3de18 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -2946,7 +2946,7 @@ static int i40e_change_mtu(struct net_device *netdev, int new_mtu)
+>  	struct i40e_netdev_priv *np = netdev_priv(netdev);
+>  	struct i40e_vsi *vsi = np->vsi;
+>  	struct i40e_pf *pf = vsi->back;
+> -	int frame_size;
+> +	int frame_size, mfs, max_mtu;
+>  
+>  	frame_size = i40e_max_vsi_frame_size(vsi, vsi->xdp_prog);
+>  	if (new_mtu > frame_size - I40E_PACKET_HDR_PAD) {
+
+I am fine with this patch, so please take what follows as a suggestion
+for improvement, possibly as a follow-up. Not as a hard requirement from
+my side.
+
+The part of this function between the two hunks of this patch is:
+
+		netdev_err(netdev, "Error changing mtu to %d, Max is %d\n",
+			   new_mtu, frame_size - I40E_PACKET_HDR_PAD);
+
+My reading is that with this patch two different limits are
+checked wrt maximum MTU size:
+
+1. A VSI level limit, which relates to RX buffer size
+2. A PHY level limit that relates to the MFS
+
+That seems fine to me. But the log message for 1 (above) does
+not seem particularly informative wrt which limit has been exceeded.
+
+> @@ -2955,6 +2955,14 @@ static int i40e_change_mtu(struct net_device *netdev, int new_mtu)
+>  		return -EINVAL;
+>  	}
+>  
+> +	mfs = pf->hw.phy.link_info.max_frame_size;
+> +	max_mtu = mfs - I40E_PACKET_HDR_PAD;
+> +	if (new_mtu > max_mtu) {
+> +		netdev_err(netdev, "Error changing mtu to %d, Max is %d. MFS is too small.\n",
+> +			   new_mtu, max_mtu);
+> +		return -EINVAL;
+> +	}
+> +
+>  	netdev_dbg(netdev, "changing MTU from %d to %d\n",
+>  		   netdev->mtu, new_mtu);
+>  	netdev->mtu = new_mtu;
+> -- 
+> 2.44.0
+> 
+> 
 
