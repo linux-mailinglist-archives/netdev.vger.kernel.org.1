@@ -1,102 +1,125 @@
-Return-Path: <netdev+bounces-80325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 221FC87E5B7
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 10:26:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 694BE87E5BA
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 10:27:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D32EB2827A8
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:26:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98A111C217B4
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EE422D627;
-	Mon, 18 Mar 2024 09:25:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B727B2C68B;
+	Mon, 18 Mar 2024 09:26:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="aT6znPyw"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="tyKpNz69"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
+Received: from mail-vk1-f171.google.com (mail-vk1-f171.google.com [209.85.221.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16CBE2D044
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 09:25:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0932C1A0
+	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 09:26:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710753957; cv=none; b=tjJeGTwoHSXw7/vjQu+Or+hFuoM2dh8rqx52QT5tDZ9kO7Y4tQjxcxCqBlgJ5gzbA0xGhSbGUIW4A/C7pqW3VrPpZWA4pUTTlfpVmiDFVfivIfQb1DFcmg6ag+h3IWRHopEESpVToDhEjDceVg/w9MgMk/PNXo8s7vFhv5b5n/E=
+	t=1710753968; cv=none; b=UTK2bvdvL+uYHmzq6wbTFQH4Jk1Rm8IoDcxn8ow833Ha7y7Gdz1ZbVW/st0NLiQEK50H6JY2onqS9cTlM+l/LMjefHj0VjrcC/6jjBbdG/rtfN6LsqfPYEMxR3h/0ApB+xLVJ9tDFDXO3TasGmdpg8kjneuWiiKPlc/aN7A4XC0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710753957; c=relaxed/simple;
-	bh=zEOm0EiFBqFYUj8BdCzuvUG8K0L0U3LAU+dVKRjw4k8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E3UvtjBGqw6GeXvDZbMeGtQyq67U8au4nPdpyTMnBe/CfszotIvJPLmKaoBhJ3sl1vuaTIJsNvFtE9C2qFt+DweXX7orDZ9Ux8KacaHNqW8CdE5jvJyiI4gY4kq5JEnoBKCQXPLWa1i7/dxJdqxuZWSTT9dFDhm6RHdq12Ujh3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=aT6znPyw; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-33ec7e1d542so2201879f8f.1
-        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 02:25:54 -0700 (PDT)
+	s=arc-20240116; t=1710753968; c=relaxed/simple;
+	bh=8y4vSdVUZCk+aPZhva5pLco3uG5l2lCYnp2HRRGYbkg=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=SPjZdz/Wj924JZIPnEJusMAFFCktB29QJA5hxMiO6wLDA4jlVACxSvBTpS87vilZHpSosnKOMTWjjI2fAnO9m+eAYBPR2bcGF4YI7HacBXcTje9O7EnNO1R3gzP3rVztNMy3dNTIDmJfCQi821aQXWkboovAU3FBHy3/sK5PuTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=tyKpNz69; arc=none smtp.client-ip=209.85.221.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-vk1-f171.google.com with SMTP id 71dfb90a1353d-4d43c633fecso876534e0c.3
+        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 02:26:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710753953; x=1711358753; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zEOm0EiFBqFYUj8BdCzuvUG8K0L0U3LAU+dVKRjw4k8=;
-        b=aT6znPywi018D1glJqK/30q2e2xOFfu9dA5wrsZMju/zuzKH5FedzamUWzusnHwRW6
-         5zH+99mA1GPtTbVjWVkHOR8Jlrg7v54X/JYa1krfWOJQg0USN7seE1thB8nUChXwt3EQ
-         9YJCJwZhrZ084CYttNpyJq4FQoIlz34SA0DXKkU1gTfHEgZxV6gS0wOdzVeKiZWFZBzq
-         VsoYDd56uvFr/WRMcD7gMB6syhNo79XBBRgfLTv5jGqt5WE4JZ2GPsBHG0iu+sBEjXCK
-         xgQ/MJFAC5H1O3hIFzANo81s+rOGn4COGwal5GnNeWG0lizhPd38rARo6wn2rInTacLD
-         powg==
+        d=linaro.org; s=google; t=1710753965; x=1711358765; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dr558Gtc+rRfkIYnJ72l9uUtS+S0kUdV5Cm0VXr/mqc=;
+        b=tyKpNz69GkAF/dxzi9qfLSPyLCVErblaF4Nkwhl3t+ipwJzq8rtnLlv1GqG4PJ/lpJ
+         JzcXZmvwtynAJeth3rowcHafUj+P4xEGKufFbSRqtuQ5P3Wo7Pl4sv1IhaIYW6yUtdCm
+         jqbfRkY2CJUhav0KD0h4juyF0YhmITziNU3P1abs+dbZaE5VlNkOA7mQVSObs1RD7ooh
+         V9Bd/dr/UgyQej7koeQXPdZB0uiU1TTDXgD0ewCNTfQuu4tAbu/VRkoJ6b6wA5a4XPOd
+         Ntrc+j9SAtGSCL/7TwA+q/Wjr+dzIi9oZIm+loICzM3OpNpO1cHsXWrML36lN9HaFcPr
+         49hg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710753953; x=1711358753;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zEOm0EiFBqFYUj8BdCzuvUG8K0L0U3LAU+dVKRjw4k8=;
-        b=DVDfiBTNZhiCK5S6Yi5Vw0d+Bnh21RAq0BvrIVu9nuPNVdycIW0UdjR6zRFDbJGUEG
-         1W6JVAxeH9IBW+bdcCV2iUmPlJaQ9dGvomdGQoXY/ixGk7c7z5US3zD16LK/Sksl7F9F
-         1HAZ7zLG7AQJH9FY2okqtFmA7NdBJP4+tc+aMgWOwV78Ve7wdh/N6lACANsylHB7LWfc
-         wvcnCYkoE+SdOKAO0lJtV9zF/ayXeDmMmOg6/FTx+JNPGBfY6c3cdFeUaYXdb4RoeouP
-         sVTSBlPKRdTgwn5/XUQxgE1Md7BWnuU8xZZgxka4nenCtykwYON3bUaYM18zWgIAH1vl
-         98bA==
-X-Forwarded-Encrypted: i=1; AJvYcCWc8sImF1AcCt9exTk80rUA1o3NfbxD7hYu+EF7CBx9x2qLJKb2RdBrhMAHpPZ+YsqSqoKJ8aK+Dm4xz4MEBtw+OukvK90x
-X-Gm-Message-State: AOJu0YyopR3C2/ftsexdu/JsbRfYjp10ImeWK1WTj+cuP+ix5xARDgYd
-	jmP2JvZ4BS00/M9quDz0v4neeYjJoS7B+eEPJE56MCYjwpJILvxh3ohJO8xw0mQ=
-X-Google-Smtp-Source: AGHT+IH4VruI12d01sMu0QUhvz+bFlGKzrMX1TpGt3UETCdTqTB1BJVof+0IldCD67i/nPgANjkeRw==
-X-Received: by 2002:adf:e582:0:b0:33e:c2a5:15c3 with SMTP id l2-20020adfe582000000b0033ec2a515c3mr8423129wrm.41.1710753953291;
-        Mon, 18 Mar 2024 02:25:53 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id f10-20020adffcca000000b0033d640c8942sm9355029wrs.10.2024.03.18.02.25.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Mar 2024 02:25:52 -0700 (PDT)
-Date: Mon, 18 Mar 2024 10:25:49 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] caif: Use UTILITY_NAME_LENGTH instead of hard-coding 16
-Message-ID: <ZfgIneq04KwBPWqV@nanopsycho>
-References: <af10f5a3236d47fd183487c9dcba3b3b3c66b595.1710584144.git.christophe.jaillet@wanadoo.fr>
+        d=1e100.net; s=20230601; t=1710753965; x=1711358765;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dr558Gtc+rRfkIYnJ72l9uUtS+S0kUdV5Cm0VXr/mqc=;
+        b=EbOddHBx0rH36tOarfPfknWa/OmYKuumixEKiLpDGAWsLrsExmhMDw86uy/nF6kAfl
+         tfHChe1SJw6higrcUI3jAHDUMlMwO0aETHY3CTU0k/iokxmC/bPbeczPwXjcA7yzX9GQ
+         RzCUlSKRQ6Nd0lVBh8iWAa4+qXRKUIFluhuiLZ+1l3onruZY7cki6LoTcpDYSgP8hAEI
+         oZ3pPKG8PFfQnl/PBzLznS711bFk4aKZ/8DhSqJWyU94nyZ8rIklnZOqivfXfsbANgYn
+         LkqVyJvq2MWffXdk0J0QltZU0wo4Yt4xPe2pJqJdNP6tQBdPckbE/Gk7QA/3Nobeg9s6
+         W7gA==
+X-Gm-Message-State: AOJu0YxOgbfktipT+4LDyzG+rhBYI2G9X4zmSApNF53is2IUrgGNPrms
+	i9R/Bq3MD4Bd2WMCVKHEPMSt0tU8m6cPhaq8Vn4cIt22X4PxyuHbiFNt5LwkKpjI4Aty1sNNvXm
+	P4sfBOviZi85Q6HAAb4j/zQvnPf2fBYhtKAAcrgTDMU7Uy4ZhP1o=
+X-Google-Smtp-Source: AGHT+IFDDQIlK3lVhoDg3KpbK/eh3Hhxm8PIDTagoTjsDxY8wbny4dXn7KvLQWqbF5dW8Rr0jLCdFvvcFrJRC5YENVg=
+X-Received: by 2002:a1f:724c:0:b0:4ca:615e:1b61 with SMTP id
+ n73-20020a1f724c000000b004ca615e1b61mr7860598vkc.10.1710753965337; Mon, 18
+ Mar 2024 02:26:05 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <af10f5a3236d47fd183487c9dcba3b3b3c66b595.1710584144.git.christophe.jaillet@wanadoo.fr>
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Mon, 18 Mar 2024 14:55:54 +0530
+Message-ID: <CA+G9fYs=OTKAZS6g1P1Ewadfr0qoe6LgOVSohqkXmFXotEODdg@mail.gmail.com>
+Subject: net/sunrpc/sched.c: error: result of comparison against a string
+ literal is unspecified (use an explicit string comparison function instead)
+To: Netdev <netdev@vger.kernel.org>, clang-built-linux <llvm@lists.linux.dev>, 
+	open list <linux-kernel@vger.kernel.org>, lkft-triage@lists.linaro.org
+Cc: "David S. Miller" <davem@davemloft.net>, Nathan Chancellor <nathan@kernel.org>, 
+	Trond Myklebust <trond.myklebust@hammerspace.com>, Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Sat, Mar 16, 2024 at 11:16:10AM CET, christophe.jaillet@wanadoo.fr wrote:
->UTILITY_NAME_LENGTH is 16. So better use the former when defining the
->'utility_name' array. This makes the intent clearer when it is used around
->line 260.
->
->Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+The following build warnings / errors noticed on x86 kselftests build with
+clang nightly  / clang-17 on Linux  next tag next-20240318.
 
-This is net-next material, yet net-next is closed.
+This build config is generated from kselftest merge configs [1].
 
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 
-pw-bot: defer
+Build log:
+-----------
+In file included from net/sunrpc/sched.c:31:
+In file included from include/trace/events/sunrpc.h:2524:
+In file included from include/trace/define_trace.h:102:
+In file included from include/trace/trace_events.h:419:
+include/trace/events/sunrpc.h:707:4: error: result of comparison
+against a string literal is unspecified (use an explicit string
+comparison function instead) [-Werror,-Wstring-compare]
+  667 |                         __assign_str(progname,
+      |                         ~~~~~~~~~~~~~~~~~~~~~~
+  668 |                                      task->tk_client->cl_program->name);
+      |                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  669 |                         __entry->version = task->tk_client->cl_vers;
+      |                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+  670 |                         __assign_str(procedure,
+task->tk_msg.rpc_proc->p_name);
+      |
+
+[1] steps to reproduce:
+-----------
+tuxmake --runtime podman --target-arch x86_64 --toolchain
+clang-nightly --kconfig
+https://storage.tuxsuite.com/public/linaro/lkft/builds/2dqIWv3Qq5qYmJfnmKfkSg9fvN0/config
+LLVM=1 LLVM_IAS=1 debugkernel cpupower headers kernel kselftest
+modules
+
+
+Links:
+ - https://storage.tuxsuite.com/public/linaro/lkft/builds/2dqIWv3Qq5qYmJfnmKfkSg9fvN0/
+ - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20240318/testrun/23069554/suite/build/test/clang-nightly-lkftconfig-kselftest/log
+ - https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20240318/testrun/23069554/suite/build/test/clang-nightly-lkftconfig-kselftest/details/
+
+
+--
+Linaro LKFT
+https://lkft.linaro.org
 
