@@ -1,155 +1,153 @@
-Return-Path: <netdev+bounces-80313-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B2B687E50B
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:37:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0A9287E516
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:40:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BEA16B207F4
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 08:37:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34FF21C212E7
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 08:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7D11E511;
-	Mon, 18 Mar 2024 08:37:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55FB322086;
+	Mon, 18 Mar 2024 08:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b="R/khW/jc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="im9Z2UT/"
 X-Original-To: netdev@vger.kernel.org
-Received: from taslin.fdn.fr (taslin.fdn.fr [80.67.169.77])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B074028DA5
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 08:37:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.67.169.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C74DF2D605;
+	Mon, 18 Mar 2024 08:39:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710751050; cv=none; b=hrZGjLr4jH5/NUmp0h5sbecxmaETHl0uydBK28vycWawl7j3BI8o6Hwhev6zuUhAfpv/a8BZbZ/FWcfqGFsLZBHAoFg1LWgiPCuzhkIMpKG9qiZu36645IwV5/0xfHlyFpjZMHoPyjLEpWgls7RZnHX3TYD+H71WmLbiUqsl+P8=
+	t=1710751177; cv=none; b=Dap25xApVGzXY792ClCjUvGdHO/Vpj971UCGg2SSXfeoDaWKyfkv2bP5OdTGh+5TjgkAl3wILxS9ddNFCcxW0FBT4HdpsIZrqp7a4sbHuSaQyC4PqOU6cFj2RFF17hzuA6StPwGINrG7Bzp9FezwoG1Fm05TO0sq9wtZIy00hO0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710751050; c=relaxed/simple;
-	bh=K4WhvKO59CcL3GuCM+MANtqV6Pdk63mSqlKJ4RB04uc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JQaCX9B0Pjnn2Fa5tKoWLBjCvwCEaBY6VZ0+HIDcQA/BdMJOLzg0NgLNF2Kz2yMkuQbThJC6Md+jWoVV2fb5P3BVN2ugzhxzz8eMktuwvlzp1J7OgFKlZ4ZJSOfg/mdUVKdoMIaHqH2NWb4cB20U2NfWOFv0dUJAWngCVgFX0p4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name; spf=pass smtp.mailfrom=max.gautier.name; dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b=R/khW/jc; arc=none smtp.client-ip=80.67.169.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=max.gautier.name
-Received: from localhost (unknown [IPv6:2001:910:10ee:0:fc9:9524:11d1:7aa4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by taslin.fdn.fr (Postfix) with ESMTPSA id 9E991602BD;
-	Mon, 18 Mar 2024 09:37:14 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=max.gautier.name;
-	s=fdn; t=1710751036;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hU3XBlqD6rKxG/7AY3EPY7SirDlljNgW7LcoyoKnFws=;
-	b=R/khW/jckgzRX2MTQzv7FsZ+UtmnILg9ZoNTaJRS6yWDjIMF6iuEZO30yS9CwdypX/EfN4
-	l9nPit627y+QPpZjgPXprENzwCEWwB5msdCA0905jNhiK2gdPHNSsUN9fN3mbzksr50DWd
-	KejLM2kJXgp7oi+M+VcV2YIXaLAYZ5wu/U7/unVYUk/YHPzyq8MaynDzPVNiDB3SP/vY5s
-	lEe482Nvzk1NEXYDlrYN6wh9+XOtV8bVEGjcm6DOj1pWlok3saIq17tgrkULT52L/YL5rP
-	yZ4pKw5oiG03y9G4am063opb0hulhzx0eAjmpNaURH3E/rpLeeySk++pfsPsOg==
-Date: Mon, 18 Mar 2024 09:37:25 +0100
-From: Max Gautier <mg@max.gautier.name>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH iproute2-next v2] arpd: create /var/lib/arpd on first use
-Message-ID: <Zff9ReznTN4h-Jrh@framework>
-References: <20240316091026.11164-1-mg@max.gautier.name>
- <20240317090134.4219-1-mg@max.gautier.name>
- <20240318025613.GA1312561@maili.marvell.com>
+	s=arc-20240116; t=1710751177; c=relaxed/simple;
+	bh=vVRNDFTWoPtwzQ3IZjFY5VjQCSazSJ7M7SEttHV0hKQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KzXPmlhGLGGLHR9ijFYixVFaxFxHUvsgL848Ev+OGNusoCOD1Uu6Jjn3wIdQgLB5mo0ZcA3R9wEJGRiDKtGRex9pDUrXnSvGlK2GlV007uelTAn1GlbyT6MNv+h5UbGqaZW34OBW6LlnIYCANu4OGK6NpsL1ZC36lS7g4YCSUaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=im9Z2UT/; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-5cfcf509fbdso521195a12.1;
+        Mon, 18 Mar 2024 01:39:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710751175; x=1711355975; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IhqD0/DPJNiiogh7PLeACfknOmZrcyXgxXzcRpXuP6A=;
+        b=im9Z2UT/8UIg4//cOSR96Q/CTa+q2pNj9po6mbIGTqflAVyePSOnYEaCm/0FIu+ZoX
+         7iHJxV93hTy1CggPybLreA6yJjYtP0ZZzMCIFNL+dCJuSbGPVrFKJPHZKyxMju+BVm37
+         gIIsSpMUXsNZnJZpcIEA8Fr4Dg+3CJtd+Lgb7DxwTG8ws5vdHC4SPFJbNrasEnMUnjSa
+         yI87poqaS+369XIW7OzzJBlMfzizQeZ2eEqVIZ+VKkSoPpczJ42cudHcyJUcm2Wn0xfW
+         YWGbxAx+Qm5qoBMqB+M2P3+LejdFpvyCffbwXg6WinMnmA1bBEHyF00Lx2mXg3cHwond
+         BPtA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710751175; x=1711355975;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IhqD0/DPJNiiogh7PLeACfknOmZrcyXgxXzcRpXuP6A=;
+        b=M82OOvXC1sPFjniVNO+gleJJw9tpBcL3SsEY62Bxn7VKgrdQWXgtENlBcr4tohQgyG
+         XAXccfE5YBKk5m24RO+T1JSMlWxNrJHKFLO2jOiQm8bGfrZVQIF4YQHjMKYakYY7+3UG
+         R/MduJgepus7sHdty/P4bwmasDoCBKXIsBrTwRYcrXEKsM6+MImm4seulYpUGCbBHotn
+         HrAquYNOJacd9XGsgYuXOe/N9WtoVTyZS8kJHVk+MUn7p9aigRxVbS0MF54fgZtE7QkN
+         HC/GEfF/Z1B1mxRsSiihFBuUGGIg6s5tM/B7yRNbqa6kO7aPvTCRY6kIgBGxe5s1XUI9
+         PG5w==
+X-Forwarded-Encrypted: i=1; AJvYcCWNMbr0Fhb/9yZXu2c2nBWtZ8ApRAIK+Oi3bSP8L0jSHYFLkFC8dXMsOWukyIz3psbmovy/TTh8CCj3Z7AauuPSf6kfBj0o
+X-Gm-Message-State: AOJu0Yzw2ujU0PtPGV1Dt5yneuzg56ereopbAInMd5xlHaym5a9z/Rla
+	KJIn74E9mfEFTGAJGKLPrYqMZySi1EUufJQ27LtImxmA+zAw+lxp9Heapp9bWruY5EsGhwE0b8k
+	8Z8y+P+STaAbeV+pmsXGl2fSrNhY=
+X-Google-Smtp-Source: AGHT+IE4i31LAUwvRUHVTCId5zVUOwoXPTGvQMFDx7yawo6GGCMp1hz0y9+TOB5qkAipp9NHqfdsziyK9xpfVGSrRG0=
+X-Received: by 2002:a17:90a:ba81:b0:29c:7614:1cb4 with SMTP id
+ t1-20020a17090aba8100b0029c76141cb4mr9794036pjr.0.1710751175017; Mon, 18 Mar
+ 2024 01:39:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240318025613.GA1312561@maili.marvell.com>
+References: <20240311122401.6549-1-lizheng043@gmail.com> <20240311135117.GA1244788@maili.marvell.com>
+In-Reply-To: <20240311135117.GA1244788@maili.marvell.com>
+From: James Lee <lizheng043@gmail.com>
+Date: Mon, 18 Mar 2024 16:39:21 +0800
+Message-ID: <CAPCnf4zS=FN0MHM2tQV0b468zN0yqRHbaNMsk3cDQ7Vu8wiHKA@mail.gmail.com>
+Subject: Re: [PATCH] neighbour: guarantee the localhost connections be
+ established successfully even the ARP table is full
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	nhorman@tuxdriver.com, davem@davemloft.net, jmorris@namei.org, 
+	James.Z.Li@dell.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 18, 2024 at 08:26:13AM +0530, Ratheesh Kannoth wrote:
-> On 2024-03-17 at 14:31:24, Max Gautier (mg@max.gautier.name) wrote:
-> > The motivation is to build distributions packages without /var to go
-> > towards stateless systems, see link below (TL;DR: provisionning anything
-> > outside of /usr on boot).
+loopback neigh is a special device in the neighbour system which is
+used by all local communications and state is NUD_NOARP.
+Any setting value of gc_thresh3 might encounter arp table be full,
+manually increasing gc_thresh3 can resolve this issue for every time,
+but we hope this issue automatically be resolved in Linux kernel for
+all local communications whenever ARP table is full, rather than
+manually operation as a workaround.
+
+
+Ratheesh Kannoth <rkannoth@marvell.com> =E4=BA=8E2024=E5=B9=B43=E6=9C=8811=
+=E6=97=A5=E5=91=A8=E4=B8=80 21:51=E5=86=99=E9=81=93=EF=BC=9A
+>
+> On 2024-03-11 at 17:54:01, Zheng Li (lizheng043@gmail.com) wrote:
 > >
-> > We only try do create the database directory when it's in the default
-> > location, and assume its parent (/var/lib in the usual case) exists.
+> > Inter-process communication on localhost should be established successf=
+ully even the ARP table is full,
+> > many processes on server machine use the localhost to communicate such =
+as command-line interface (CLI),
+> > servers hope all CLI commands can be executed successfully even the arp=
+ table is full.
+> > Right now CLI commands got timeout when the arp table is full.
+> > Set the parameter of exempt_from_gc to be true for LOOPBACK net device =
+to
+> > keep localhost neigh in arp table, not removed by gc.
 > >
-> > Links: https://0pointer.net/blog/projects/stateless.html
-> > Signed-off-by: Max Gautier <mg@max.gautier.name>
+> > the steps of reproduced:
+> > server with "gc_thresh3 =3D 1024" setting, ping server from more than 1=
+024 IPv4 addresses,
+> > run "ssh localhost" on console interface, then the command will get tim=
+eout.
+> it does not look correct to me. why gc has to behave differently for loop=
+back devices.
+> why can't a higher gc_thresh3 value (fine tuned to your use case) wont so=
+lve the issue ?
+> can't you add localhost arp entry statically and get rid of gc issue ?
+>
+> >
+> > Signed-off-by: Zheng Li <James.Z.Li@Dell.com>
 > > ---
-> >  Makefile    |  2 +-
-> >  misc/arpd.c | 12 +++++++++++-
-> >  2 files changed, 12 insertions(+), 2 deletions(-)
+> >  net/core/neighbour.c | 5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-)
 > >
-> > diff --git a/Makefile b/Makefile
-> > index 8024d45e..2b2c3dec 100644
-> > --- a/Makefile
-> > +++ b/Makefile
-> > @@ -42,6 +42,7 @@ DEFINES+=-DCONF_USR_DIR=\"$(CONF_USR_DIR)\" \
-> >           -DCONF_ETC_DIR=\"$(CONF_ETC_DIR)\" \
-> >           -DNETNS_RUN_DIR=\"$(NETNS_RUN_DIR)\" \
-> >           -DNETNS_ETC_DIR=\"$(NETNS_ETC_DIR)\" \
-> > +         -DARPDDIR=\"$(ARPDDIR)\" \
-> >           -DCONF_COLOR=$(CONF_COLOR)
+> > diff --git a/net/core/neighbour.c b/net/core/neighbour.c
+> > index 552719c3bbc3..d96dee3d4af6 100644
+> > --- a/net/core/neighbour.c
+> > +++ b/net/core/neighbour.c
+> > @@ -734,7 +734,10 @@ ___neigh_create(struct neigh_table *tbl, const voi=
+d *pkey,
+> >  struct neighbour *__neigh_create(struct neigh_table *tbl, const void *=
+pkey,
+> >                                struct net_device *dev, bool want_ref)
+> >  {
+> > -     return ___neigh_create(tbl, pkey, dev, 0, false, want_ref);
+> > +     if (dev->flags & IFF_LOOPBACK)
+> > +             return ___neigh_create(tbl, pkey, dev, 0, true, want_ref)=
+;
+> > +     else
+> > +             return ___neigh_create(tbl, pkey, dev, 0, false, want_ref=
+);
+> >  }
+> >  EXPORT_SYMBOL(__neigh_create);
 > >
-> >  #options for AX.25
-> > @@ -104,7 +105,6 @@ config.mk:
-> >  install: all
-> >  	install -m 0755 -d $(DESTDIR)$(SBINDIR)
-> >  	install -m 0755 -d $(DESTDIR)$(CONF_USR_DIR)
-> > -	install -m 0755 -d $(DESTDIR)$(ARPDDIR)
-> >  	install -m 0755 -d $(DESTDIR)$(HDRDIR)
-> >  	@for i in $(SUBDIRS);  do $(MAKE) -C $$i install; done
-> >  	install -m 0644 $(shell find etc/iproute2 -maxdepth 1 -type f) $(DESTDIR)$(CONF_USR_DIR)
-> > diff --git a/misc/arpd.c b/misc/arpd.c
-> > index 1ef837c6..a64888aa 100644
-> > --- a/misc/arpd.c
-> > +++ b/misc/arpd.c
-> > @@ -19,6 +19,7 @@
-> >  #include <fcntl.h>
-> >  #include <sys/uio.h>
-> >  #include <sys/socket.h>
-> > +#include <sys/stat.h>
-> >  #include <sys/time.h>
-> >  #include <time.h>
-> >  #include <signal.h>
-> > @@ -35,7 +36,8 @@
-> >  #include "rt_names.h"
-> >
-> >  DB	*dbase;
-> > -char	*dbname = "/var/lib/arpd/arpd.db";
-> > +char const	default_dbname[] = ARPDDIR "/arpd.db";
-> > +char const	*dbname = default_dbname;
-> >
-> >  int	ifnum;
-> >  int	*ifvec;
-> > @@ -668,6 +670,14 @@ int main(int argc, char **argv)
-> >  		}
-> >  	}
-> >
-> > +	if (strcmp(default_dbname, dbname) == 0
-> > +			&& mkdir(ARPDDIR, 0755) != 0
-> > +			&& errno != EEXIST
-> why do you need errno != EEXIST case ? mkdir() will return error in this case as well.
-
-EEXIST is not an error in this case: if the default location already
-exist, all is good. mkdir would still return -1 in this case, so we need
-to exclude it manually.
-
-> > +			) {
-> > +		perror("create_db_dir");
-> > +		exit(-1);
-> > +	}
-> > +
-> >  	dbase = dbopen(dbname, O_CREAT|O_RDWR, 0644, DB_HASH, NULL);
-> >  	if (dbase == NULL) {
-> >  		perror("db_open");
 > > --
-> > 2.44.0
+> > 2.17.1
 > >
-
--- 
-Max Gautier
 
