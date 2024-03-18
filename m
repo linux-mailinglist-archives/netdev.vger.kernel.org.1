@@ -1,109 +1,147 @@
-Return-Path: <netdev+bounces-80327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47A4787E5BE
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 10:27:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CC6B87E5C1
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 10:30:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 025C4281D40
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:27:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17201282C10
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:30:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D59E32C19C;
-	Mon, 18 Mar 2024 09:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C762C1A4;
+	Mon, 18 Mar 2024 09:30:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b="qEoeURrd"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="VEZkKPE2"
 X-Original-To: netdev@vger.kernel.org
-Received: from taslin.fdn.fr (taslin.fdn.fr [80.67.169.77])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 767C92C848
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 09:26:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.67.169.77
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3E0624205;
+	Mon, 18 Mar 2024 09:30:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710754001; cv=none; b=OLdXTaCIRolllswl33jygZ9HomAjt/WP0R3rz5iBJRu+O5Q22Hc0GaghvJH2ROZ1KyQDbvFd1hs0F4QkaTg+l8b2N3S4H/1EghYyXQq+JH+Ghjv9YLkYrFks0HeSJ5qh4jEzJLPtpuC9L4CV9T6ADNXl3hfK5VBSnJu4km0RfRw=
+	t=1710754217; cv=none; b=cGLMkkY0c3ou2qiIrQi/7pPapCrAAxZoJNeBPdYzmpk2ezitEI4YryHxtSoAtAPKW8bAY8wXnpdq5elUZDszNZnrEdEeboacyqXosP0q828+9rDs1wHQ6eJNZQ5s+UQQ3RmNxwyqRvG/bXQ1XIcdZ2qyvuVO7OaRbsgla1TwTxw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710754001; c=relaxed/simple;
-	bh=Z4a1RpMfDza/YkJd2F9IESbcl9JEVKFO0de2R1TjqAQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gHYH2PCBhJxVHRMg+b1OzoNj0QdlFQWTtijlzVYJEdXfBh6FkBsRg15IxhEkgXkr8Ao9U02dkcsLmHDHpoXK15rctn08GpNIfSHGarFB03U5/4VF7dzNsGMZZZWnx1mbkcIEaPaWhK3g6mnMR4IdrUVoA/ad4yto7XylnweC8zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name; spf=pass smtp.mailfrom=max.gautier.name; dkim=pass (2048-bit key) header.d=max.gautier.name header.i=@max.gautier.name header.b=qEoeURrd; arc=none smtp.client-ip=80.67.169.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=max.gautier.name
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=max.gautier.name
-Received: from localhost (unknown [IPv6:2001:910:10ee:0:fc9:9524:11d1:7aa4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by taslin.fdn.fr (Postfix) with ESMTPSA id 84404602BD;
-	Mon, 18 Mar 2024 10:26:37 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=max.gautier.name;
-	s=fdn; t=1710753997;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0wYnnBG7TuTQKoZxNuOfj1wYN5EUYoP7RjJIjY9Mohs=;
-	b=qEoeURrdGSVO65TYEQGcJ6UpTCUjMHO19Jbo3VsiwVjU/LCKOzJyWB2sJvYN+aQdY7pNt0
-	lGNEVh10kyJEvyc+zTT+AkqdJUAWGxRa30LD6rYKB6IdHPgnm8bOSUAehnfA2JUcmejcUF
-	3EXpGPS3kPB+80aAgwNxgCYZDM2VT72JOOtnzIPsLAIn1NeB57A7DAm+kSTgkCfHdyIeR7
-	ValfNQlhBPUqo5Zb+gJMayo0PeuI0EJeXHCUcjH9vmMGIavgIKHhXbMkfupAg8rUrEg9Xi
-	85Akno6Plg/loTiGKIRdiXK/FFYfsv89hsKotlHw6BXJxE/gDydSSz4m+agb5w==
-Date: Mon, 18 Mar 2024 10:26:48 +0100
-From: Max Gautier <mg@max.gautier.name>
-To: Ratheesh Kannoth <rkannoth@marvell.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: [EXTERNAL] Re: [PATCH iproute2-next v2] arpd: create
- /var/lib/arpd on first use
-Message-ID: <ZfgI2Aow6751-EGj@framework>
-References: <20240316091026.11164-1-mg@max.gautier.name>
- <20240317090134.4219-1-mg@max.gautier.name>
- <20240318025613.GA1312561@maili.marvell.com>
- <Zff9ReznTN4h-Jrh@framework>
- <MWHPR1801MB1918B6880C90E045C219B9ADD32D2@MWHPR1801MB1918.namprd18.prod.outlook.com>
- <ZfgCZNjlYrj5-rJz@framework>
- <MWHPR1801MB191828A6FF7D83103C75ED6AD32D2@MWHPR1801MB1918.namprd18.prod.outlook.com>
+	s=arc-20240116; t=1710754217; c=relaxed/simple;
+	bh=BPXDf7rV3OrXPaxIf58C0rfEhbVnaKvDjZ564s1bO1I=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jJ+cDntPeB1YTTX0ntaWf3Lt+ol39Aw73+HgRHCsjZJEC+ikXfXTkL8US5Ft16QCd5hUlLIcKVoxZ1KRvqrNk9WScT/GC/RcHH5AKa/KEEV1fB4EQnCHf2iFmYbhijAlxztsGQPrpbd6RmAd9NpmUDY6AD1lK2H8girWW9UVlFk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=VEZkKPE2; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42HMwH16011594;
+	Mon, 18 Mar 2024 02:30:06 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type; s=
+	pfpt0220; bh=cd0oB67DNWqAGSh/WIoCmb/Fvb1TO1x0tgEB6/3bgas=; b=VEZ
+	kKPE2/uAR1qq/67DJ2HEWJir6SjbF012pCqA6f+Nv9w1wOt1n9J1DP8JjoA8KG1G
+	sugvVOj5dx8jcfoS1rQTwTdQ2GQBtNkwgp4kGIqhyiAoq/Iz0QVhdHceT/TS8WgH
+	phcI/w3fY6aoQn2V44kvpHj6ylJ8Fbxv8PSss/Ii3zDM0lyhHClGlsBNB+PEgl2b
+	6ztKxLdiVkVLmbHiXVAfF5MajPKCB2KUUS+E+XH4mdDXCYAmQwygDZeEuXJbAuwn
+	ivJLc4V6Q/20uUP1VigJDGWleIzXsjm5WjXMS/omVe+k0JGz9YNGmWI+gPTPp6+Y
+	nwK1FYxMHwETNKQkCnA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3wwaxgc6qc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 18 Mar 2024 02:30:06 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Mon, 18 Mar 2024 02:30:05 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
+ Transport; Mon, 18 Mar 2024 02:30:05 -0700
+Received: from hyd1358.marvell.com (unknown [10.29.37.11])
+	by maili.marvell.com (Postfix) with ESMTP id 940D63F708D;
+	Mon, 18 Mar 2024 02:30:01 -0700 (PDT)
+From: Subbaraya Sundeep <sbhatta@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
+        <gakula@marvell.com>, <hkelam@marvell.com>, <naveenm@marvell.com>,
+        <horms@kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>
+Subject: [v2 net PATCH 0/5] octeontx2-pf: RVU Mailbox fixes
+Date: Mon, 18 Mar 2024 14:59:53 +0530
+Message-ID: <1710754198-18632-1-git-send-email-sbhatta@marvell.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <MWHPR1801MB191828A6FF7D83103C75ED6AD32D2@MWHPR1801MB1918.namprd18.prod.outlook.com>
+Content-Type: text/plain
+X-Proofpoint-GUID: DSxtPiF5kYFHQBgK3jgQ4bVmtJiMChWk
+X-Proofpoint-ORIG-GUID: DSxtPiF5kYFHQBgK3jgQ4bVmtJiMChWk
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-17_12,2024-03-18_01,2023-05-22_02
 
-On Mon, Mar 18, 2024 at 09:18:59AM +0000, Ratheesh Kannoth wrote:
-> > > > > > +	if (strcmp(default_dbname, dbname) == 0
-> > > > > > +			&& mkdir(ARPDDIR, 0755) != 0
-> > > > > > +			&& errno != EEXIST
-> > > > > why do you need errno != EEXIST case ? mkdir() will return error
-> > > > > in this case
-> > > > as well.
-> > > >
-> > > > EEXIST is not an error in this case: if the default location already
-> > > > exist, all is good. mkdir would still return -1 in this case, so we
-> > > > need to exclude it manually.
-> > >
-> > > ACK. IMO, it would make a more readable code if you consider splitting the
-> > "if" loop.
-> > 
-> > Something like this ? I tend to pack conditions unless branching is necessary,
-> > but no problem if this form is preferred.
-> > 
-> > if (strcmp(default_dbname, dbname) == 0) {
-> >     if (mkdir(ARPDDIR, 0755) != 0 && errno != EEXIST) {
-> >    ...
-> >    }
-> > }
-> ACK.   
-> instead of errno != EXIST ,  you may consider stat() before mkdir() call. Just my way thinking(please ignore it, if you don't like). 
-> My thinking is --> you need to execute mkdir () only first time, second time onwards, stat() call will return 0.
+This patchset fixes the problems related to RVU mailbox.
+During long run tests some times VF commands like setting
+MTU or toggling interface fails because VF mailbox is timedout
+waiting for response from PF.
 
-That's racy: we can stat and have a non existing folder, then have
-another arpd instance (or anything else, really) create the directory,
-and we would hit EEXIST anyway when we call mkdir.
-Also, that needs two syscalls instead of one.
+Below are the fixes
+Patch 1: There are two types of messages in RVU mailbox namely up and down
+messages. Down messages are synchronous messages where a PF/VF sends
+a message to AF and AF replies back with response. UP messages are
+notifications and are asynchronous like AF sending link events to
+PF. When VF sends a down message to PF, PF forwards to AF and sends
+the response from AF back to VF. PF has to forward VF messages since
+there is no path in hardware for VF to send directly to AF.
+There is one mailbox interrupt from AF to PF when raised could mean
+two scenarios one is where AF sending reply to PF for a down message
+sent by PF and another one is AF sending up message asynchronously
+when link changed for that PF. Receiving the up message interrupt while
+PF is in middle of forwarding down message causes mailbox errors.
+Fix this by receiver detecting the type of message from the mbox data register
+set by sender.
+
+Patch 2:
+During VF driver remove, VF has to wait until last message is
+completed and then turn off mailbox interrupts from PF.
+
+Patch 3:
+Do not use ordered workqueue for message processing since multiple works are
+queued simultaneously by all the VFs and PF link UP messages.
+
+Patch 4:
+When sending link event to VF by PF check whether VF is really up to
+receive this message.
+
+Patch 5:
+In AF driver, use separate interrupt handlers for the AF-VF interrupt and
+AF-PF interrupt. Sometimes both interrupts are raised to two CPUs at same
+time and both CPUs execute same function at same time corrupting the data.
+
+v2 changes:
+	Added missing mutex unlock in error path in patch 1
+	Refactored if else logic in patch 1 as suggested by Paolo Abeni
+
+
+Subbaraya Sundeep (5):
+  octeontx2: Detect the mbox up or down message via register
+  octeontx2-pf: Wait till detach_resources msg is complete
+  octeontx2-pf: Use default max_active works instead of one
+  octeontx2-pf: Send UP messages to VF only when VF is up.
+  octeontx2-af: Use separate handlers for interrupts
+
+ drivers/net/ethernet/marvell/octeontx2/af/mbox.c   |  43 +++++++-
+ drivers/net/ethernet/marvell/octeontx2/af/mbox.h   |   6 ++
+ .../net/ethernet/marvell/octeontx2/af/mcs_rvu_if.c |  17 +--
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.c    |  31 ++++--
+ drivers/net/ethernet/marvell/octeontx2/af/rvu.h    |   2 +
+ .../net/ethernet/marvell/octeontx2/af/rvu_cgx.c    |  20 ++--
+ .../ethernet/marvell/octeontx2/nic/otx2_common.c   |   2 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_common.h   |   2 +-
+ .../net/ethernet/marvell/octeontx2/nic/otx2_pf.c   | 119 ++++++++++++++-------
+ .../net/ethernet/marvell/octeontx2/nic/otx2_vf.c   |  71 +++++++-----
+ 10 files changed, 225 insertions(+), 88 deletions(-)
 
 -- 
-Max Gautier
+2.7.4
+
 
