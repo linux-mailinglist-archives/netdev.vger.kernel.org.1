@@ -1,112 +1,125 @@
-Return-Path: <netdev+bounces-80491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD9A787F3DA
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 00:13:46 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F19D687F3F2
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 00:22:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7370B1F22027
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 23:13:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90C1D1F227B5
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 23:22:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88DFB5D742;
-	Mon, 18 Mar 2024 23:13:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6719B5EE61;
+	Mon, 18 Mar 2024 23:22:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="w2L6EO3p"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="U6+y+pDz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06E315D727
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 23:13:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAE45D8F7;
+	Mon, 18 Mar 2024 23:22:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710803620; cv=none; b=hOFO8E21Wb4bWpiAOaVFguetOZl2M2I2Zs8dBiMszOrebBIX2XuwadU81pPqXljq8D0Kn/FJe8PrVkHtLnu6fRl92FLfkxWdWdQxCgMcqJoKBrW/memHguwe+J1ugtkfR0+4fIcJ2F05Z+/2P09Zk4EEW+0Q2gMEn3cDXZvYcuE=
+	t=1710804139; cv=none; b=GJ+chdCpVJXfrmun+RkGBAP1Bk0mGiV1Ld4/l/HRHM3d0nahz7CioHd9s0ZD0JMhVr8rqv5O1xSdvZnm+qyWYnlpTq+CtVSksudUIWOY0cvcPT0xC+KFk3C+VurytszSGIkLbYXMSLLgY+a6CmJWHDujWt5T4DnOx04ahZCpn3Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710803620; c=relaxed/simple;
-	bh=FXc+M9klWY/q41q/XRbx56uqjqf8s6lw3gQrf3s5Zb8=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Ki8AeIs69fERZVoW3E8T0svi5yH3AM11U0vI9IArr1QMUPzMLAjvVA2jOC786AbGZ+hXWkRwDItyco4ChDTMVI8Wlhl/33S8WyGVjyd6PtnxbHxo24gIpkHA03ig9WxN+3Z16drhC5EjJkrwOnSuTdsLTh9OFpigY/t9gUag+s0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--wangfe.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=w2L6EO3p; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--wangfe.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-60a0815e3f9so72835027b3.2
-        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 16:13:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710803618; x=1711408418; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uPyhBA1D7i8/h337R7x4G8QOXyXKXYyy/cHk2PX484A=;
-        b=w2L6EO3pBh44E1PCIxCUsZAiASccAW0opjRg83N1nwRIQYLBnux8ciPj9pMI4WyYQh
-         Kj4znRvqbFrLM7CFdmcLYtu3Fh2LitthvnTC7lHGbYB0txf432eePArN8ZLU+Y9kpmyJ
-         u53hONEQin8XkCywEC8ciJum1+Dpkj7nsDWQ2hIH4+ffvqeAWQSpjv0iMRdjAZGaH4EK
-         dFTuZ7ivHdmUtzhvDRKANi4KLweterDSJZFLKh7+CprRsrQSpYPkKtVrurkEmHZX76KL
-         Ox2knA4Mii91iiaf+LyHJz1ezWni7Jp79Up77H3CPbIq/qrd49zEZE+p9VQUTOVgXCG7
-         Lfww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710803618; x=1711408418;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uPyhBA1D7i8/h337R7x4G8QOXyXKXYyy/cHk2PX484A=;
-        b=I6lEFt9mt8YU7X8UgfADug9VBeHj0tkx33urSR8P8tfwEeGssaqoJn6BCNaF2TNR+E
-         /SqOWIgf6N5T7HgtBZk6itlp/96n9GRHhVjIy6P0KS1WvV4xlNlZEaeN93afTFlGCLkG
-         dIjs0RDUrgfB0cd2R/We8vfstZ1hukSxtD7pQUUsSpwLBye17qnLdBlbxsF3PtG3U8OI
-         AmM0vZpjj3ioSX3PjlNP7PczKtPT0lt4RZRu0E66qpVv3jsMegpje2QREd3rkX/Z24RQ
-         tPxW/uYUkkuSZ7IUugfLgojSQRq9czjAyVfmawN0Po+VEvvBbubSU5YRZQ87s2uanuVC
-         T+yQ==
-X-Gm-Message-State: AOJu0YzWckEFut4SvhuEEYk5+T54uCN94FYrLlePKf8wi+zV3hsXUzJN
-	P+tio8C08O7lif1bR+It9VCsP9OBnFtmxHT6KIeUXwYMRScZ8d5AmPU/WouYyWkNqwX3zzATQXZ
-	GiKOeIDGtMdZKC+dQ7Ke9lSNDJSOvsiuThIMbfoyDL0V0w2dYR+p5tLKvGgNulo2XUd32uYp0Nz
-	H/y6NwL8TjbVQTOG8NXG39H0OfUjnuF7gR
-X-Google-Smtp-Source: AGHT+IEKMTRV2+l3OGfooRdcyx4P3eN+T5sEWHzBJRF7gQIRQRj4wk0Mg3ruWCJyEPXNsuO7tynIH8IacbI=
-X-Received: from wangfe.mtv.corp.google.com ([2620:0:1000:5a11:a50c:9ab4:6067:8eb5])
- (user=wangfe job=sendgmr) by 2002:a05:6902:2484:b0:dd9:2d94:cd8a with SMTP id
- ds4-20020a056902248400b00dd92d94cd8amr171543ybb.9.1710803617932; Mon, 18 Mar
- 2024 16:13:37 -0700 (PDT)
-Date: Mon, 18 Mar 2024 16:13:28 -0700
+	s=arc-20240116; t=1710804139; c=relaxed/simple;
+	bh=OotrFEDPSRJwIaQ3u4I4spUR/2JA32XkaDt3CDv0uYI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NJL9goQph5P3RkehC1N4hNVHRhCzi+/T7bb4PCOgIXzEUjaKs6QCmz/8iEeyyRjaeD+QUVyyl8mtsdLTytQ+ki0PCbqVwMGdTenJtXDmeCliXCNf8nNmQ5ChmhqVLNVIAYO+WeUVdLBmoYux5TzUoAZ76dqWTN5xgwmr6A5fm20=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=U6+y+pDz; arc=none smtp.client-ip=198.137.202.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
+	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=uDe90oU4m7kN4U29sr7WiiZQguijp+pDgJnuhirb2IY=; b=U6+y+pDzUahdjxZCjK02oc3MY0
+	jhjQNaWdPtpOUHeAQn3kyAp1Po1UThO3kSBTS0teWqL0zaNN0wzcr72e45m1tQR/NW4bsv7t93qOT
+	GIR1OlIoM597ZA5zMZBj2SWx3tJ185eBo4+ML7+NeW/6K1AgDTfPrXGaUtrA+ZdHvzJmEb1PwQTzO
+	KULWQZwts+KWeJGFjz2q2fzDEgcxB2JtvZ0qOih3gfF3HP/3w1vzhGrKf/74FyIryuVzfnUgk7UUi
+	nQfEygnz+caLPMXacklKQz5u9pHLYoW2cHy2stoESVq/FTDny7iHJSIKT1RY9D4ew/odWIo0+n6Ce
+	6xUA3AMg==;
+Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
+	id 1rmMJ0-0000000AWy1-0ZBd;
+	Mon, 18 Mar 2024 23:22:10 +0000
+Date: Mon, 18 Mar 2024 16:22:10 -0700
+From: Christoph Hellwig <hch@infradead.org>
+To: David Wei <dw@davidwei.uk>
+Cc: Christoph Hellwig <hch@infradead.org>,
+	Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
+	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
+	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Richard Henderson <richard.henderson@linaro.org>,
+	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+	Matt Turner <mattst88@gmail.com>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Sumit Semwal <sumit.semwal@linaro.org>,
+	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Shailend Chand <shailend@google.com>,
+	Harshitha Ramamurthy <hramamurthy@google.com>,
+	Jeroen de Borst <jeroendb@google.com>,
+	Praveen Kaligineedi <pkaligineedi@google.com>
+Subject: Re: [RFC PATCH net-next v6 02/15] net: page_pool: create hooks for
+ custom page providers
+Message-ID: <ZfjMopBl27-7asBc@infradead.org>
+References: <20240305020153.2787423-1-almasrymina@google.com>
+ <20240305020153.2787423-3-almasrymina@google.com>
+ <ZfegzB341oNc_Ocz@infradead.org>
+ <b938514c-61cc-41e6-b592-1003b8deccae@davidwei.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.291.gc1ea87d7ee-goog
-Message-ID: <20240318231328.2086239-1-wangfe@google.com>
-Subject: [PATCH] [PATCH ipsec] xfrm: Store ipsec interface index
-From: Feng Wang <wangfe@google.com>
-To: netdev@vger.kernel.org, steffen.klassert@secunet.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net
-Cc: wangfe@google.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b938514c-61cc-41e6-b592-1003b8deccae@davidwei.uk>
+X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
 
-From: wangfe <wangfe@google.com>
+On Sun, Mar 17, 2024 at 07:49:43PM -0700, David Wei wrote:
+> I'm working on a similar proposal for zero copy Rx but to host memory
+> and depend on this memory provider API.
 
-When there are multiple ipsec sessions, packet offload driver
-can use the index to distinguish the packets from the different
-sessions even though xfrm_selector are same. Thus each packet is
-handled corresponding to its session parameter.
+How do you need a different provider for that vs just udmabuf?
 
-Signed-off-by: wangfe <wangfe@google.com>
----
- net/xfrm/xfrm_interface_core.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+> Jakub also designed this API for hugepages too IIRC. Basically there's
+> going to be at least three fancy ways of providing pages (one of which
+> isn't actually pages, hence the merged netmem_t series) to drivers.
 
-diff --git a/net/xfrm/xfrm_interface_core.c b/net/xfrm/xfrm_interface_core.c
-index 21d50d75c260..996571af53e5 100644
---- a/net/xfrm/xfrm_interface_core.c
-+++ b/net/xfrm/xfrm_interface_core.c
-@@ -506,7 +506,9 @@ xfrmi_xmit2(struct sk_buff *skb, struct net_device *dev, struct flowi *fl)
- 	xfrmi_scrub_packet(skb, !net_eq(xi->net, dev_net(dev)));
- 	skb_dst_set(skb, dst);
- 	skb->dev = tdev;
--
-+#ifdef CONFIG_XFRM_OFFLOAD
-+	skb->skb_iif = if_id;
-+#endif
- 	err = dst_output(xi->net, skb->sk, skb);
- 	if (net_xmit_eval(err) == 0) {
- 		dev_sw_netstats_tx_add(dev, 1, length);
--- 
-2.44.0.291.gc1ea87d7ee-goog
+How do hugepages different from a normal page allocation?  They should
+just a different ordered passed to the page allocator.
 
 
