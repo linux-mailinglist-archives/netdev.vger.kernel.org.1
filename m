@@ -1,131 +1,129 @@
-Return-Path: <netdev+bounces-80311-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80312-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74D1887E4CE
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:11:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D70AD87E4EC
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 09:25:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4CE31C212CB
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 08:11:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 100BF1C2156B
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 08:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 710C624B29;
-	Mon, 18 Mar 2024 08:11:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 610292577D;
+	Mon, 18 Mar 2024 08:25:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="elJf6qzf"
+	dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b="oBxflvDV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from hr2.samba.org (hr2.samba.org [144.76.82.148])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C7224B26
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 08:11:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29D925760;
+	Mon, 18 Mar 2024 08:25:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.76.82.148
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710749498; cv=none; b=IXG5GWJFuYTIsqg9/dR604Epa5nGjcOqkrkVPf5ui9jJbTtF/6I0dKKRsOHb8UZWfI7IunUD1uWGSxhmg/Rs87Z6DcEh4HlnFUWeCR0hgZQRIXb2UqLP3sx+idr/rAfT4At3hIDRBXktTkQAMne7+W4gHsxqj/50tvkUOVDY9Ac=
+	t=1710750344; cv=none; b=pVuEy+nVCHTxV2hqx0cSGWNJw4ZIId4njG97lxi7iuIGmtL8J9RS1Gppsmak/TS9Ge+/SDwf2RV7xd3hJ82LwozPXicwX4ZZq7PlUGoF3yahtP7BewJqEpPVcPq1WEJhZUMdYBHP3L1BDn4jK+Nsr1b4Cae3p8cuo5dU64d3P2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710749498; c=relaxed/simple;
-	bh=V6znXjGGU3aPA57dEwTHJMwuGwRXM9LRRb2ZgBPhwS0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TKuErq9fuDNbKFNz53N80pge5WYRZke4wIFkgnZ2oanL2Wzz0iMLxpyql0uIuhf2PYppW4dtz6RYcXGjnp8Pky8EHVw3fI1K33NCp+GZgqUy83AQKa3FvZLXDDN34gzET/YLHFVm3GBFtRkTSV/9Q/tlAOrVj38LTxZk8/2nhg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=elJf6qzf; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5687e7662a5so5451478a12.0
-        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 01:11:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1710749495; x=1711354295; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EgbdSr9trKys7K2fBJUdtpCVbBrhRbc/oyBwbkqocGU=;
-        b=elJf6qzf49ZTc9Fft4MO6UfLcFsdwJBB7VUlD4bXUsbTkqMYJv7OyRK1HUQaYWhMhy
-         odcqZK6X1ynIu4dfXYBvh1EVzs6HzWIvCF1jZ40t94sMQaN1EbOAPTmBLB4rCkGyH6t7
-         jdDhrSzTwcWApEQ2WNWTwgVdgXP+LrytuY5J1jzttZznFj+o5OQj8Yc5P4tgSTd/x3qW
-         f6vWDQdSxqgxpEYZPO1WuO/s7AmXyP5ScPItqMWeM7mC+JD5yKaPcSNEvnsEPJ+mRC5j
-         uCJO7ys08wwBvnXkJRJp3zsc5Spkc1asbO2hgay9GzdmVwHokJK7SEb326Ca8X6bGC+p
-         1pVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710749495; x=1711354295;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EgbdSr9trKys7K2fBJUdtpCVbBrhRbc/oyBwbkqocGU=;
-        b=FIrp5GBWcA/EKB6kQ1y0BN01WPhQ5WFqctTxz9JCkr6B/k5uAO74yoJiTdzXv+y6cw
-         n0zM40X3ndME4+qOAuD8m0YPeF6t05bhCYSAZ7k8kWhH3rCVDvzh36z7EpVjfvneB5ti
-         /ydfsHg657UvSJYhFIPqJt9ES4/k2CZiE6WF9JBu3+h/o6UjGz50OKOkDPHogQGFY9uT
-         69AK82ADwOi8RGLhD+3U62JNqzEI8BRM/kc3GWP4QJqMQ+qnly8436xYlQriMyCKfya2
-         AmUa5x6DKnH5zF9al9ffw2JGbWY5AOl5RrsEVXUFzQm3qjhiUtNuXJzgusQ91NfG8CP3
-         GaDg==
-X-Forwarded-Encrypted: i=1; AJvYcCX7OfMmUBoiSMBQyae34Y3s0ErL4O6eRP4Y0u/CSz7+/GOMOuV9N6QvCr6499NPC0CX2ATycd1NdLxBpbGBRH/7HFK37sxx
-X-Gm-Message-State: AOJu0YzeXmIej4MzzOeAEfwSe6w4lAR8aH3fy8yt1HlFaOQ8VuXAHU4J
-	WeMsauTrGuJsALbodXQLjIKZP1zY8fWfJRsUGCmkMYaoGd0Diyf1DR3IkDxSCHw=
-X-Google-Smtp-Source: AGHT+IGuDGy4t5OiJnBrpwrYM4srMjBbY92AEY8Y70IH4ld6vGw0bs5SmOoET7R+xihO3L1Kpj90ug==
-X-Received: by 2002:a05:6402:2486:b0:566:4dc1:522c with SMTP id q6-20020a056402248600b005664dc1522cmr8574512eda.15.1710749494896;
-        Mon, 18 Mar 2024 01:11:34 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id i33-20020a0564020f2100b005687bb9816csm4370279eda.69.2024.03.18.01.11.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 18 Mar 2024 01:11:34 -0700 (PDT)
-Date: Mon, 18 Mar 2024 11:11:31 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Ido Schimmel <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Petr Machata <petrm@nvidia.com>, Kees Cook <keescook@chromium.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net] nexthop: fix uninitialized variable in
- nla_put_nh_group_stats()
-Message-ID: <1e3c6bcb-a0af-4800-92e2-1cab10545572@moroto.mountain>
-References: <b2578acd-9838-45b6-a50d-96a86171b20e@moroto.mountain>
- <Zff1Liloe7DwW7Fh@nanopsycho>
+	s=arc-20240116; t=1710750344; c=relaxed/simple;
+	bh=9Gox6nr4Yw3nX20mUWVTq/8pONnShOOhZz4ItxTrQSo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nU2I0CP+Vw6piFu/LKIQ44ucgSkTGAuFqIN7kLnnmvQCWH9ufk23SIxDF5Qn9eKu6znzkb5KDMT1VpBL8jUrHT7dR9ZG6vTwkNA0QvaOVV4Kahw/DQVmTzfmR87Fj3pEF9Ha5tlEzMyK0J47tRARdx4MFV6+cKv4FyYr4J6Zgzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org; spf=pass smtp.mailfrom=samba.org; dkim=pass (3072-bit key) header.d=samba.org header.i=@samba.org header.b=oBxflvDV; arc=none smtp.client-ip=144.76.82.148
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=samba.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samba.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=samba.org;
+	s=42; h=From:Cc:To:Date:Message-ID;
+	bh=5lYBvG/HYr+nZZA7Ycz+u5VrES4YL7MUIS//0G2Ymss=; b=oBxflvDVpm9F7x3AVIgIprIZjM
+	D7jw1p3vzgwchZMSbqw7iBA0n6s8OElUrgZUo4gO6ntkWIBjwIYrPglb5noNTeb6Wsvuqjl0vZjkt
+	sgAAKesQmGWPo8wkagDWUYzif6v+Fd5WQmvqKLiYqrx6lJHaUosRUyTMPqGkHpqmyv/9M73in9eXl
+	5ZJB98fh7FOB83SGxT1f1UL1LeuUDdL1KAzt+tC5BwQhwIw/Kfv2FJiERCmCer4K/tg2qzn2LxuD6
+	FCU3HoaFyb6aBISmUu/LRWDmOZydZ8FfpH276W4qvrsA2jBgvSnu/VT/EzntvUv0wOCLiHwHk+V9Y
+	uDmBmiBiMH84b8hrhizZflbIgoW1BxiVI6HSOZxp+FMi0sQqD+DttRTiN6RMZzkTL7Z9qdCtaFqy6
+	o2SUNzb7Go93OB1GHrEl+TH4kL9pL5EcMT1eWLCFrfODM7EJRORXDGUSvKJgprDBtdpGnTFdBDigA
+	ESG8nh0AYk6H7STsYJQKmXyS;
+Received: from [127.0.0.2] (localhost [127.0.0.1])
+	by hr2.samba.org with esmtpsa (TLS1.3:ECDHE_SECP256R1__ECDSA_SECP256R1_SHA256__CHACHA20_POLY1305:256)
+	(Exim)
+	id 1rm8JD-001XmP-1R;
+	Mon, 18 Mar 2024 08:25:27 +0000
+Message-ID: <0583f4be-4c34-44de-99f2-891d673b53a9@samba.org>
+Date: Mon, 18 Mar 2024 09:25:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zff1Liloe7DwW7Fh@nanopsycho>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 06/24] vfs: break parent dir delegations in open(...,
+ O_CREAT) codepath
+To: Jeff Layton <jlayton@kernel.org>, Alexander Viro
+ <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>,
+ Jan Kara <jack@suse.cz>, Chuck Lever <chuck.lever@oracle.com>,
+ Alexander Aring <alex.aring@gmail.com>,
+ Trond Myklebust <trond.myklebust@hammerspace.com>,
+ Anna Schumaker <anna@kernel.org>, Steve French <sfrench@samba.org>,
+ Paulo Alcantara <pc@manguebit.com>,
+ Ronnie Sahlberg <ronniesahlberg@gmail.com>,
+ Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, David Howells
+ <dhowells@redhat.com>, Tyler Hicks <code@tyhicks.com>,
+ Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>,
+ Dai Ngo <Dai.Ngo@oracle.com>, Miklos Szeredi <miklos@szeredi.hu>,
+ Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>,
+ Sergey Senozhatsky <senozhatsky@chromium.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org,
+ samba-technical@lists.samba.org, netfs@lists.linux.dev,
+ ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240315-dir-deleg-v1-0-a1d6209a3654@kernel.org>
+ <20240315-dir-deleg-v1-6-a1d6209a3654@kernel.org>
+Content-Language: en-US
+From: Stefan Metzmacher <metze@samba.org>
+In-Reply-To: <20240315-dir-deleg-v1-6-a1d6209a3654@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 18, 2024 at 09:02:54AM +0100, Jiri Pirko wrote:
-> Sat, Mar 16, 2024 at 10:46:03AM CET, dan.carpenter@linaro.org wrote:
-> >The nh_grp_hw_stats_update() function doesn't always set "hw_stats_used"
-> >so it could be used without being initialized.  Set it to false.
-> >
-> >Fixes: 5072ae00aea4 ("net: nexthop: Expose nexthop group HW stats to user space")
-> >Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> >---
-> > net/ipv4/nexthop.c | 2 +-
-> > 1 file changed, 1 insertion(+), 1 deletion(-)
-> >
-> >diff --git a/net/ipv4/nexthop.c b/net/ipv4/nexthop.c
-> >index 74928a9d1aa4..c25bfdf4e25f 100644
-> >--- a/net/ipv4/nexthop.c
-> >+++ b/net/ipv4/nexthop.c
-> >@@ -824,8 +824,8 @@ static int nla_put_nh_group_stats(struct sk_buff *skb, struct nexthop *nh,
-> > 				  u32 op_flags)
-> > {
-> > 	struct nh_group *nhg = rtnl_dereference(nh->nh_grp);
-> >+	bool hw_stats_used = false;
-> > 	struct nlattr *nest;
-> >-	bool hw_stats_used;
+Hi Jeff,
+
+> In order to add directory delegation support, we need to break
+> delegations on the parent whenever there is going to be a change in the
+> directory.
 > 
+> Add a delegated_inode parameter to lookup_open and have it break the
+> delegation. Then, open_last_lookups can wait for the delegation break
+> and retry the call to lookup_open once it's done.
 > 
-> Probably better to set this in one place and have:
->        if (nexthop_notifiers_is_empty(net)) {
-> 	       *hw_stats_used = false;
->                return 0;
->        }
-> in nh_grp_hw_stats_update().
+> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> ---
+>   fs/namei.c | 22 ++++++++++++++++++----
+>   1 file changed, 18 insertions(+), 4 deletions(-)
 > 
+> diff --git a/fs/namei.c b/fs/namei.c
+> index f00d8d708001..88598a62ec64 100644
+> --- a/fs/namei.c
+> +++ b/fs/namei.c
+> @@ -3404,7 +3404,7 @@ static struct dentry *atomic_open(struct nameidata *nd, struct dentry *dentry,
+>    */
+>   static struct dentry *lookup_open(struct nameidata *nd, struct file *file,
+>   				  const struct open_flags *op,
+> -				  bool got_write)
+> +				  bool got_write, struct inode **delegated_inode)
 
-Sure.  Will do.
+Does NFS has a concept of lease keys and parent lease keys?
 
-regards,
-dan carpenter
+In SMB it's possible that the client passes a lease key (16 client chosen bytes) to a directory open,
+when asking for a directory lease.
 
+Then operations on files within that directory, take that lease key from the directory as
+'parent lease keys' in addition to a unique lease key for the file.
+
+That way a client can avoid breaking its own directory leases when creating/move/delete... files
+in the directory.
+
+metze
 
