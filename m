@@ -1,200 +1,220 @@
-Return-Path: <netdev+bounces-80420-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80421-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96D8D87EAEC
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 15:27:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8284287EAEE
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 15:27:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4D2401F21675
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 14:27:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A28AD1C20D6E
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 14:27:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58D5F4C3D0;
-	Mon, 18 Mar 2024 14:27:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90A544BA94;
+	Mon, 18 Mar 2024 14:27:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="idyaFRuf"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="QYt03oPN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8416D4E1B5;
-	Mon, 18 Mar 2024 14:27:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710772033; cv=fail; b=QYLGJiIMRxJdT4T8C+sfmGYXOqIcBwlpCBc3XNEW6HuU4zH2wr0tMvB3HBo+6D06V1PDWFziWTCHLDUkMoq7P3dtwX4UeSUYBKA5mmZ4t4m8N2qLQ5eNDb842O/nIj5dlBe6MsVP1zDRUcxV/FSD/jx4t1icly+gcX6blk/YH1E=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710772033; c=relaxed/simple;
-	bh=Xpa5upDwARzKIskLCcrGwYsvaUE5BcbdVGary5ZjNuk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=RYQsO9KvogeROXlYrnR2IDxf7bDPCSi3LypV7zSVz5pcX75RN7oAsbLYQkY5BdTViy2+2sk66skYZvgw4k2ZCLtoelH5YN5JliGZHPPcG+9qzStK0DEF3sMjksOYO7Fy9RoJX0LMKHxpQ+znxskAN5yhN3/KMYSf/KvajQeSvCg=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=idyaFRuf; arc=fail smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710772031; x=1742308031;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=Xpa5upDwARzKIskLCcrGwYsvaUE5BcbdVGary5ZjNuk=;
-  b=idyaFRufO9Vu3K5JkMoGyU3pvIfM0yiYHfUDFwcPeWvhnNmTMhJ4Mszk
-   DtLLGekEQGw1eFncclHny7aZkm9KXpRebgJx+tE2MymicSSTovpD8QtCI
-   WYHB/Mq81OAIphPYAVVa7vIZxG9aK7P2VvH9cgLkXEWEPn8SUv5AywdYH
-   /DXHLVmI0uyPN1tHQhz96vc4dIMyJWzqfRi5CMzx6wkal5zSTPdXx/vlU
-   +MzzHmcekB9fuKm+QGBQL5mLbqgu+pFisx9tRks++LNLgspl1BbOJgDOV
-   7Tn5hpIgog7rvyJhw3c2VoGkkNtIFJGH+b9efDeqbRP6BUcArp9Y8DPn+
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11016"; a="5420683"
-X-IronPort-AV: E=Sophos;i="6.07,134,1708416000"; 
-   d="scan'208";a="5420683"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 Mar 2024 07:27:10 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,134,1708416000"; 
-   d="scan'208";a="13435363"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 18 Mar 2024 07:27:09 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 18 Mar 2024 07:27:09 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 18 Mar 2024 07:27:08 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Mon, 18 Mar 2024 07:27:08 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 18 Mar 2024 07:27:08 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=XCiSXEgPLWP73t2M+JOKOGtJAcNGADQzPmiCC1Ll58mmE4P7GYajjahIkKvxzLmDVqY3Hhee3ZSkUfL7KHrP5go3xuvM9J6QHwJ1Fb/Z5Qc/0NwMMoV6gn8xJ6Qjcgimrap0i04Sa9fgwZ6BEaL9xfNRhEggEPhHCFVkJU+ZNDU2kIlvID1Rdu4tSuXsF66THgP1jdwn+0lZ0YgPau+eTg1Og71yuuroWt5eJkGfr06slaSA16pKb4UBlfHKtVy4oiwqM9MklGTcWY9LlzGMjBGOhGj1omT/XQ9agmyeW0hzNeP9EuS5h5Io9DCp4iqs5bmqTNhmCzhhAH+dyviVDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=XLyxj7UtevsTeD5sXrzQT2YYz7us3j+M36lvPyb806k=;
- b=Gwh7rom2tzdXEk1pVtpHWnXlZ3tQmVqBv83aDUnPR3cMSuaVnn2X6D6H3XzbFIMeAiYsbmEmcI6qxDvEjIWpr7JCKih2v7idtwEKAcGrlXwUbWYtsAy8KP50YveZ8pREktE3tomTbdZNKZghIY3yu7CzL9MSEB1xoyp6ma2aEuTP/tm2odPGKQ5J8q0oSFSohTH9dNU7CFZ2Ps+Hr3H8kEE8nMeWjbt4igjYHTt1JEWWc7QQCempwun1h8iQ2KPgEnjF2nsLuvVCC9EjwfKXLNLKEKTBRyFVNLTtTLGq9+8oqkGH1hO0QyMb+aBjVQSZMBfHtlsdBJPFF7hMaod2og==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH0PR11MB5782.namprd11.prod.outlook.com (2603:10b6:510:147::11)
- by CH3PR11MB8381.namprd11.prod.outlook.com (2603:10b6:610:17b::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.9; Mon, 18 Mar
- 2024 14:27:01 +0000
-Received: from PH0PR11MB5782.namprd11.prod.outlook.com
- ([fe80::d48a:df79:97ac:9630]) by PH0PR11MB5782.namprd11.prod.outlook.com
- ([fe80::d48a:df79:97ac:9630%4]) with mapi id 15.20.7409.010; Mon, 18 Mar 2024
- 14:27:01 +0000
-Date: Mon, 18 Mar 2024 15:26:55 +0100
-From: Michal Kubiak <michal.kubiak@intel.com>
-To: Jijie Shao <shaojijie@huawei.com>
-CC: <yisen.zhuang@huawei.com>, <salil.mehta@huawei.com>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <rkannoth@marvell.com>, <shenjian15@huawei.com>,
-	<wangjie125@huawei.com>, <liuyonglong@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V3 net 1/3] net: hns3: fix index limit to support all
- queue stats
-Message-ID: <ZfhPLzmM+1r1duo1@localhost.localdomain>
-References: <20240318132948.3624333-1-shaojijie@huawei.com>
- <20240318132948.3624333-2-shaojijie@huawei.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20240318132948.3624333-2-shaojijie@huawei.com>
-X-ClientProxiedBy: MI0P293CA0010.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:44::12) To PH0PR11MB5782.namprd11.prod.outlook.com
- (2603:10b6:510:147::11)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34B0E25740
+	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 14:27:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710772051; cv=none; b=O4Bo7LTC0eby6FqoXQWJSX0bEvKpWZUxESIV2DJeaoiyB53o/tW6X14E8ynsQ7eolhYUUuZjNfL76homYToDJdnpje8yghwPdySNTu914DQK1YCby5jvMO5jWj9FVRJa4eT9b/hYdHODsu5OprGZb12cb6hsV2KH8ya1ECEvkNc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710772051; c=relaxed/simple;
+	bh=vMjangHmhIsFcqbY2zMb+hekHvoejiMsc8ElxL6lI/I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KqJkK1XkST8mdaSRLi2qqNhd+WturFa35uBfaYdBfZGUTPyKc/rijF8zpy0/cWPnVSy2zukWEjvNFtG8TOthmAJiIGZZuSjgg3dvLhAcIMxFkNSDXJbYFJ8jIWeVX/5cuKHlcikVsGVhTbL8so4qJ8zMQxbphSeVcbuaXJqsMMc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=QYt03oPN; arc=none smtp.client-ip=209.85.128.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-6098a20ab22so39947067b3.2
+        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 07:27:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1710772048; x=1711376848; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i86Y1C8ACu60ezBiV3Hsao6Bo4yhfhnLYWm/UnhLOKw=;
+        b=QYt03oPNngX4/DPuEWWX3JZTdIf/QvutQh1stttoDvBW/+E10Y16tjIcqLoNP0CL0A
+         Ur24wTPdrkZOkXM13DjRhuU6SLNV6THwA/Zlh5xkf6W9MGjzqo1CAz+W4uz5mo2ED6Xf
+         nAzipasaY4gEAhEzMeFwI/G4cuQwPAs2JmRFZdLn52DlIrm2iI15c3bk8TAclTJgLQMl
+         YexgXjc8kUkTu1tZYbNWRjf20oo101w1sSFLtWPkMowMGs8thC190+OYoI4FxE//0up3
+         Vc7n678potnVxjhRZW5/KkEltIRBtZXL/Mg+sPr1pRx7hL1re2TWsVJCa6QZ0UQTtkRo
+         K5ZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710772048; x=1711376848;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i86Y1C8ACu60ezBiV3Hsao6Bo4yhfhnLYWm/UnhLOKw=;
+        b=ej76eTDSZ+0YM4l5Z2Wmf/MaepTiMxJClvx5UGijfL2mEkiTx3UNT1Dy9AWrPiDxtn
+         iPOPwjZcnFEQGS4MXd9hfvwggKOGoSFlFmu+gHwDovrKl2OE42w7K9u7hTVk3/2VaZdW
+         8XEv2KHtrj4aeuALYuzHzGsRmL9OT2Ukfvc/W4iV9KwH4K9BaS2FVzWFgMnYGMj+oYul
+         zVTMfZIWNnj9ZsLPTGggrO+KxpIywUWlFrH/S+qQIQm3vdFyrsCDGQpONNx8dWn5bOXz
+         d0UXJLM98yHCzJNM3Fj8KRJNTbbh8MyWGkK3GwWiF1FETEe7AhxlzQBty8WzuJCaMhVw
+         VREA==
+X-Forwarded-Encrypted: i=1; AJvYcCU6WA8CvnIFd7HL7f71hsV5nILpF0oNc5ZVDoAQWMqrQaX2z0szrEkRdzBPE9xpbOqBIn4I9ZhhVeFmc9aTqsLTH76MkRQk
+X-Gm-Message-State: AOJu0YxfATplGn/hATDYC0df63tuwPTT7i/V/onMjB4s41SI/qvO8uNN
+	9iT7e0WXAGBk1RseVP72tPDScN6vsCkPvsQZcdEbbk4E4NrBb5v7tLfpniLYzWXoJVNqF17/IUL
+	fTYHWLRSDwq9mECoMsoCmqFH2vrCBd09rnzh4
+X-Google-Smtp-Source: AGHT+IHzsQeZ771cVahOzmno2qV84ihQZouTr8tAzi3W6m8rXATVPHf2e2gpNQRWDd1fG9/LpTjLBrsBgxYY3kJa5+E=
+X-Received: by 2002:a0d:c343:0:b0:610:ccbe:159a with SMTP id
+ f64-20020a0dc343000000b00610ccbe159amr2967483ywd.18.1710772047859; Mon, 18
+ Mar 2024 07:27:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR11MB5782:EE_|CH3PR11MB8381:EE_
-X-MS-Office365-Filtering-Correlation-Id: a5148dbd-4c40-416f-1ec9-08dc475779cc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: j5gCM/T/U0MpTAAnfYovleSRWlTxddGXHVTh6qvbOLYXcpUr3kYCvxc5cgZR2q9+d/29v6e9PoMP3SMFN+2fvK/lxvGU0zHnke9Xro7EmF2sXmVkEYBNusVVdU08moUiB0XlqrC13bdM3pUcdAIszd99KYQTy2A2JCqES5MnVy6TYDhoS9rtbFenI/8d5BbKfSC8xGusU+KnidpZzm3ThBgnUVNmwNRqLCVDxyp9Xshb+bQRtBhYcmvisMI211Gp+/dulKu/JVfpoSMszGOcwxoRFOgJBB2YL+OZgaRZytTBGZh2X7JCA56FwweDVFwYvDwWgT6yitJvc8g9QPCcozLU0QEkISQZKvltiGRjD4wwSrsOCzE+VwRgW6ymAkal1nSdYOUPnDYtFAS/Ty16Y/MK+KOFVquHfWqfghOIxGHbBBAqUXSxphMttnfKOntRJTBFR3V7NscfkzvsEUFNCaEJdICwWVhZTFH6Z+zm73AB+y0kqHzJJn+uj1mW8TZ9oau0HH+8cX8DjlS5Wlf3j7lrjBh72xYAlOgEpQPDYE4TnA6L4b68u4QXCJGjCt0p9lFETPJOYqiZk/xsmnUmBKnM69FPs6kl9X2aosSTdwT+JGl6AboXDPGWTVVPLxNLaQ+EkFlaz5QPn/xh9ErgTwMl54T/wQoxY5/C9j5hZ1A=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5782.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(7416005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?NR8AKvwkLWUvqIZI+Xe4puVYDibE51q95ZHjnZZByIzU3FBjbM2oaE2YJwck?=
- =?us-ascii?Q?KIbrBbf4oELIR9ozn9Yct1iFXxcq8ZbTc98QoGaJoTw4MDgj/2lvgOW7iPmg?=
- =?us-ascii?Q?2Voosla1xpD2QjX4E7g8RlCAxsZkXrBFjMbypgHdHifqJL6KlxVRqOu0O34G?=
- =?us-ascii?Q?d8opEVAjKAJ08x4uQA3OiUHJ3afOuEvSjKYSvqDynVT9LRbl+D7ZWnR8XsM+?=
- =?us-ascii?Q?adDzx7+eW6P0a0PHuIG8REVq052fzsoVQrvwfFJeZY8CXeh67pjyxYO1MF/3?=
- =?us-ascii?Q?K5GkTQHoKVHV1HrVwFuTs6YQ9+HBCPAESYNVkzxvWQ7FW79/Jw+S5wrHYTlz?=
- =?us-ascii?Q?62S8ORVO908gmFBpWTzJQIoSSEXX/WRHk2Dwr9bskm0zxKLecA/z3JF5AGbd?=
- =?us-ascii?Q?gytdJM9sS+I4ABNI4GBe7KGcUWOgqYyOlUhYl/FyLG9K7xM+CN/lv1h0WpwQ?=
- =?us-ascii?Q?XCFo4keJBugS0qFmD4yDpIUsku2E7wpD+T5TSvQjIGap5ywNjBJWpJL9wiHQ?=
- =?us-ascii?Q?ZiNQZo1+CZZwe9ns5TH3irZ9jzklc83w+An6niuSJvXZMT6eYwI+wSRyyEv+?=
- =?us-ascii?Q?g4egPuxDzUeIyH/Hgz0BxYFfAaMbeWv8xs/zJNdqBKnb2DeJL9HbYETZSlv0?=
- =?us-ascii?Q?Wype478NlBFxvNwO5m4HOuCsSPfoaZ8TOl8rRmNPRHfO4+g1tvowgUTPEM9r?=
- =?us-ascii?Q?oazk24ariRniDQgtpL1qeMi+jJQlfgwgJwZC0zZrprTl9t6ov6KFPENvctBQ?=
- =?us-ascii?Q?3gnqNPhqorqUUB/cQR4YT4b4r0seADODl9AGSO+5HVfxaxCDtsibvOQaM4i0?=
- =?us-ascii?Q?FH0qNUQt+IRjCir/Vo3loHx5IgWzYPvrRObAH5GXlGl+oFWC1dDFEgQaSrvw?=
- =?us-ascii?Q?AuxLbC36uTHfY3YSijBP9BQVBS+vA+FWet7HWRslfNr7xgSS+E203Mrgg8Vp?=
- =?us-ascii?Q?e/vhhDKg7o5LJqIgiH3dKtQHoyQyVanVmwh9JdPvE+VULDlBPWiaEgz2SryP?=
- =?us-ascii?Q?bPnKV3eFgMRB0gdc1GuDGJhTTKAzRwcs7TD2eYCjIzv3ZW1fl0K+bL5ZsvA0?=
- =?us-ascii?Q?S7yc+V/sjXNW53FpadCCMLB1X7aeP9UENL883u3cWimmgoJbpQL8b6GETx+o?=
- =?us-ascii?Q?stxAPxwggNumNfHhdH5+CKTf0bN31AQGM63MQ05d0bUURt8bctDqeHtLwtWq?=
- =?us-ascii?Q?P2iKjtbptmeiUVfEd6EG6j/+FAiHOfuQYO+ajhOrPLzsb43pKOvX5+U8CsOg?=
- =?us-ascii?Q?ZQxDlHxAzGwgZk23bL42sAcR24/KZG9KlrEmwGh6zbB4lcSnHvbUGpLhLQlT?=
- =?us-ascii?Q?fPmlJ56HUxjp/F0cLaQcstsbzjle4RNq+Hheb8677Q+p9U3CpndzAgA3/7by?=
- =?us-ascii?Q?/AjyANhGK4rTeOzER9BVCzbHVLn+ddeRo4WIvTj3Goknw09q0GghwwIYWC6y?=
- =?us-ascii?Q?2cRUnds/P/gklTt3Ew3rglIUzb6OFoHfVMqDLUmQeCnQeaqVp5OPol587wBB?=
- =?us-ascii?Q?rhtEvVHIL3iQ2XlXSzt0Z6GVuA+SVRm2MX7Z9WaoyzfCshTT4pTDqF4L9n2t?=
- =?us-ascii?Q?bTmJVxPRfKRKE/k2SK9mXYP5i6Mhj8ylKZMDbpU5gMH2NiqYTX2SHaQUX0ql?=
- =?us-ascii?Q?kA=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a5148dbd-4c40-416f-1ec9-08dc475779cc
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5782.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Mar 2024 14:27:01.3500
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 5ZFYaGpTZC2jLF5AY293+Me3G5l//kDNcz9Jc+5Ik7SdRO0GdHcgMyfLr/U3zLtcGXvybaNd5QRTffjOJVpM7Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8381
-X-OriginatorOrg: intel.com
+References: <20240314111713.5979-1-renmingshuai@huawei.com>
+ <CAM0EoMmqVHGC4_YVHj=rUPj+XBS_N99rCKk1S7wCi1wJ8__Pyw@mail.gmail.com> <CAM0EoMkZKvvPVaCGFVTE_P1YCyS-r2b3gq3QRhDuEF=Cm-sY4g@mail.gmail.com>
+In-Reply-To: <CAM0EoMkZKvvPVaCGFVTE_P1YCyS-r2b3gq3QRhDuEF=Cm-sY4g@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 18 Mar 2024 10:27:16 -0400
+Message-ID: <CAM0EoMm+W3X7TG8qjb8LWsBbAQ8_rntr7kwhSTy7Sxk=Yj=R2g@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: Forbid assigning mirred action to a filter
+ attached to the egress
+To: renmingshuai <renmingshuai@huawei.com>
+Cc: xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net, 
+	vladbu@nvidia.com, netdev@vger.kernel.org, yanan@huawei.com, 
+	liaichun@huawei.com, caowangbao@huawei.com, 
+	Eric Dumazet <edumazet@google.com>, Eric Dumazet <eric.dumazet@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 18, 2024 at 09:29:46PM +0800, Jijie Shao wrote:
-> From: Jie Wang <wangjie125@huawei.com>
-> 
-> Currently, hns hardware supports more than 512 queues and the index limit
-> in hclge_comm_tqps_update_stats is wrong. So this patch removes it.
-> 
-> Fixes: 287db5c40d15 ("net: hns3: create new set of common tqp stats APIs for PF and VF reuse")
-> Signed-off-by: Jie Wang <wangjie125@huawei.com>
-> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
-> ---
->  .../ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.c  | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.c b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.c
-> index f3c9395d8351..618f66d9586b 100644
-> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.c
-> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.c
-> @@ -85,7 +85,7 @@ int hclge_comm_tqps_update_stats(struct hnae3_handle *handle,
->  		hclge_comm_cmd_setup_basic_desc(&desc, HCLGE_OPC_QUERY_TX_STATS,
->  						true);
->  
-> -		desc.data[0] = cpu_to_le32(tqp->index & 0x1ff);
-> +		desc.data[0] = cpu_to_le32(tqp->index);
->  		ret = hclge_comm_cmd_send(hw, &desc, 1);
->  		if (ret) {
->  			dev_err(&hw->cmq.csq.pdev->dev,
-> -- 
-> 2.30.0
-> 
+On Sun, Mar 17, 2024 at 12:10=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com=
+> wrote:
+>
+> On Thu, Mar 14, 2024 at 1:14=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.co=
+m> wrote:
+> >
+> > On Thu, Mar 14, 2024 at 7:18=E2=80=AFAM renmingshuai <renmingshuai@huaw=
+ei.com> wrote:
+> > >
+> > > As we all know the mirred action is used to mirroring or redirecting =
+the
+> > > packet it receives. Howerver, add mirred action to a filter attached =
+to
+> > > a egress qdisc might cause a deadlock. To reproduce the problem, perf=
+orm
+> > > the following steps:
+> > > (1)tc qdisc add dev eth0 root handle 1: htb default 30 \n
+> > > (2)tc filter add dev eth2 protocol ip prio 2 flower verbose \
+> > >      action police rate 100mbit burst 12m conform-exceed jump 1 \
+> > >      / pipe mirred egress redirect dev eth2 action drop
+> > >
+> >
+> > I think you meant both to be the same device eth0 or eth2?
+> >
+> > > The stack is show as below:
+> > > [28848.883915]  _raw_spin_lock+0x1e/0x30
+> > > [28848.884367]  __dev_queue_xmit+0x160/0x850
+> > > [28848.884851]  ? 0xffffffffc031906a
+> > > [28848.885279]  tcf_mirred_act+0x3ab/0x596 [act_mirred]
+> > > [28848.885863]  tcf_action_exec.part.0+0x88/0x130
+> > > [28848.886401]  fl_classify+0x1ca/0x1e0 [cls_flower]
+> > > [28848.886970]  ? dequeue_entity+0x145/0x9e0
+> > > [28848.887464]  ? newidle_balance+0x23f/0x2f0
+> > > [28848.887973]  ? nft_lookup_eval+0x57/0x170 [nf_tables]
+> > > [28848.888566]  ? nft_do_chain+0xef/0x430 [nf_tables]
+> > > [28848.889137]  ? __flush_work.isra.0+0x35/0x80
+> > > [28848.889657]  ? nf_ct_get_tuple+0x1cf/0x210 [nf_conntrack]
+> > > [28848.890293]  ? do_select+0x637/0x870
+> > > [28848.890735]  tcf_classify+0x52/0xf0
+> > > [28848.891177]  htb_classify+0x9d/0x1c0 [sch_htb]
+> > > [28848.891722]  htb_enqueue+0x3a/0x1c0 [sch_htb]
+> > > [28848.892251]  __dev_queue_xmit+0x2d8/0x850
+> > > [28848.892738]  ? nf_hook_slow+0x3c/0xb0
+> > > [28848.893198]  ip_finish_output2+0x272/0x580
+> > > [28848.893692]  __ip_queue_xmit+0x193/0x420
+> > > [28848.894179]  __tcp_transmit_skb+0x8cc/0x970
+> > >
+> > > In this case, the process has hold the qdisc spin lock in __dev_queue=
+_xmit
+> > > before the egress packets are mirred, and it will attempt to obtain t=
+he
+> > > spin lock again after packets are mirred, which cause a deadlock.
+> > >
+> > > Fix the issue by forbidding assigning mirred action to a filter attac=
+hed
+> > > to the egress.
+> > >
+> > > Signed-off-by: Mingshuai Ren <renmingshuai@huawei.com>
+> > > ---
+> > >  net/sched/act_mirred.c                        |  4 +++
+> > >  .../tc-testing/tc-tests/actions/mirred.json   | 32 +++++++++++++++++=
+++
+> > >  2 files changed, 36 insertions(+)
+> > >
+> > > diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+> > > index 5b3814365924..fc96705285fb 100644
+> > > --- a/net/sched/act_mirred.c
+> > > +++ b/net/sched/act_mirred.c
+> > > @@ -120,6 +120,10 @@ static int tcf_mirred_init(struct net *net, stru=
+ct nlattr *nla,
+> > >                 NL_SET_ERR_MSG_MOD(extack, "Mirred requires attribute=
+s to be passed");
+> > >                 return -EINVAL;
+> > >         }
+> > > +       if (tp->chain->block->q->parent !=3D TC_H_INGRESS) {
+> > > +               NL_SET_ERR_MSG_MOD(extack, "Mirred can only be assign=
+ed to the filter attached to ingress");
+> > > +               return -EINVAL;
+> > > +       }
+> >
+> > Sorry, this is too restrictive as Jiri said. We'll try to reproduce. I
+> > am almost certain this used to work in the old days.
+>
+> Ok, i looked at old notes - it did work at "some point" pre-tdc.
+> Conclusion is things broke around this time frame:
+> https://lore.kernel.org/netdev/1431679850-31896-1-git-send-email-fw@strle=
+n.de/
+> https://lore.kernel.org/netdev/1465095748.2968.45.camel@edumazet-glaptop3=
+.roam.corp.google.com/
+>
+> Looking further into it.
 
-Thanks,
-Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
+This is what we came up with. Eric, please take a look...
+
+cheers,
+jamal
+
+
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -3789,7 +3789,14 @@ static inline int __dev_xmit_skb(struct sk_buff
+*skb, struct Qdisc *q,
+        if (unlikely(contended))
+                spin_lock(&q->busylock);
+
++       if (dev_recursion_level()) {
++               rc =3D NET_XMIT_DROP;
++               __qdisc_drop(skb, &to_free);
++               goto free;
++       }
++
+        spin_lock(root_lock);
++       dev_xmit_recursion_inc();
+        if (unlikely(test_bit(__QDISC_STATE_DEACTIVATED, &q->state))) {
+                __qdisc_drop(skb, &to_free);
+                rc =3D NET_XMIT_DROP;
+@@ -3824,8 +3831,10 @@ static inline int __dev_xmit_skb(struct sk_buff
+*skb, struct Qdisc *q,
+                        qdisc_run_end(q);
+                }
+        }
++       dev_xmit_recursion_dec();
+        spin_unlock(root_lock);
+        if (unlikely(to_free))
++free:
+                kfree_skb_list_reason(to_free,
+                                      tcf_get_drop_reason(to_free));
+        if (unlikely(contended))
 
