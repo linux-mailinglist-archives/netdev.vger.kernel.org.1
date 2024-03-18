@@ -1,125 +1,113 @@
-Return-Path: <netdev+bounces-80492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F19D687F3F2
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 00:22:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5776987F3FA
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 00:27:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90C1D1F227B5
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 23:22:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8200A1C216A5
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 23:27:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6719B5EE61;
-	Mon, 18 Mar 2024 23:22:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2DE25F543;
+	Mon, 18 Mar 2024 23:27:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="U6+y+pDz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sZ9De5F4"
 X-Original-To: netdev@vger.kernel.org
-Received: from bombadil.infradead.org (bombadil.infradead.org [198.137.202.133])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAE45D8F7;
-	Mon, 18 Mar 2024 23:22:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.137.202.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B24755EE8D;
+	Mon, 18 Mar 2024 23:27:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710804139; cv=none; b=GJ+chdCpVJXfrmun+RkGBAP1Bk0mGiV1Ld4/l/HRHM3d0nahz7CioHd9s0ZD0JMhVr8rqv5O1xSdvZnm+qyWYnlpTq+CtVSksudUIWOY0cvcPT0xC+KFk3C+VurytszSGIkLbYXMSLLgY+a6CmJWHDujWt5T4DnOx04ahZCpn3Q=
+	t=1710804468; cv=none; b=gngeMNvp/MNcy7RWXZnlPO+hM7mbtjg4+AIAprnoyxWAtOSnlV+8ujBEjWgUUBwdOqb5aqyEBONNhgC1tHiaxBJ+DfC3gsy5TKKYyN93zK4twzLuMaMA6pFuqvaSCZqDzv1nA5grXQIAgTZelw7D4Jz/KP0Zqci55cu8cY21m2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710804139; c=relaxed/simple;
-	bh=OotrFEDPSRJwIaQ3u4I4spUR/2JA32XkaDt3CDv0uYI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NJL9goQph5P3RkehC1N4hNVHRhCzi+/T7bb4PCOgIXzEUjaKs6QCmz/8iEeyyRjaeD+QUVyyl8mtsdLTytQ+ki0PCbqVwMGdTenJtXDmeCliXCNf8nNmQ5ChmhqVLNVIAYO+WeUVdLBmoYux5TzUoAZ76dqWTN5xgwmr6A5fm20=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=U6+y+pDz; arc=none smtp.client-ip=198.137.202.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bombadil.srs.infradead.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=In-Reply-To:Content-Type:MIME-Version
-	:References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=uDe90oU4m7kN4U29sr7WiiZQguijp+pDgJnuhirb2IY=; b=U6+y+pDzUahdjxZCjK02oc3MY0
-	jhjQNaWdPtpOUHeAQn3kyAp1Po1UThO3kSBTS0teWqL0zaNN0wzcr72e45m1tQR/NW4bsv7t93qOT
-	GIR1OlIoM597ZA5zMZBj2SWx3tJ185eBo4+ML7+NeW/6K1AgDTfPrXGaUtrA+ZdHvzJmEb1PwQTzO
-	KULWQZwts+KWeJGFjz2q2fzDEgcxB2JtvZ0qOih3gfF3HP/3w1vzhGrKf/74FyIryuVzfnUgk7UUi
-	nQfEygnz+caLPMXacklKQz5u9pHLYoW2cHy2stoESVq/FTDny7iHJSIKT1RY9D4ew/odWIo0+n6Ce
-	6xUA3AMg==;
-Received: from hch by bombadil.infradead.org with local (Exim 4.97.1 #2 (Red Hat Linux))
-	id 1rmMJ0-0000000AWy1-0ZBd;
-	Mon, 18 Mar 2024 23:22:10 +0000
-Date: Mon, 18 Mar 2024 16:22:10 -0700
-From: Christoph Hellwig <hch@infradead.org>
-To: David Wei <dw@davidwei.uk>
-Cc: Christoph Hellwig <hch@infradead.org>,
-	Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
-	linux-alpha@vger.kernel.org, linux-mips@vger.kernel.org,
-	linux-parisc@vger.kernel.org, sparclinux@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-arch@vger.kernel.org,
-	bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Richard Henderson <richard.henderson@linaro.org>,
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
-	Matt Turner <mattst88@gmail.com>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Sumit Semwal <sumit.semwal@linaro.org>,
-	Christian =?iso-8859-1?Q?K=F6nig?= <christian.koenig@amd.com>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Yunsheng Lin <linyunsheng@huawei.com>,
-	Shailend Chand <shailend@google.com>,
-	Harshitha Ramamurthy <hramamurthy@google.com>,
-	Jeroen de Borst <jeroendb@google.com>,
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Subject: Re: [RFC PATCH net-next v6 02/15] net: page_pool: create hooks for
- custom page providers
-Message-ID: <ZfjMopBl27-7asBc@infradead.org>
-References: <20240305020153.2787423-1-almasrymina@google.com>
- <20240305020153.2787423-3-almasrymina@google.com>
- <ZfegzB341oNc_Ocz@infradead.org>
- <b938514c-61cc-41e6-b592-1003b8deccae@davidwei.uk>
+	s=arc-20240116; t=1710804468; c=relaxed/simple;
+	bh=0S9Y9rj/bpBXjc+MXn4SjJDwIYcQoHrs8PTRftXmKbg=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:Cc:
+	 References:In-Reply-To; b=V2Y/KHeTLFzPKE2S6FWtLfJLE4H2258bRkqD2SvE87WkEH7kahyIp/ARats6j5vFT4lWSJ+7TDD8Dgd3o4qLC796DatVMESZlYFVzUTgVRsWrhnvVbWy9SxQluBUDjnqdhMUpQ9usi4jcGYImqNLYFMBlzaFlFjQ4zK9uLOyuPs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sZ9De5F4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E89F4C433C7;
+	Mon, 18 Mar 2024 23:27:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710804468;
+	bh=0S9Y9rj/bpBXjc+MXn4SjJDwIYcQoHrs8PTRftXmKbg=;
+	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
+	b=sZ9De5F4jx9EWCCKHHN68q69J893Wu0LXedrHo0Pd7sshJ4F0LaIa1U2P1QAKLPou
+	 fnz7dOYTgXxkorf/6bxIhpwstJRGMjqRkJYndfWtOmPOR5zPr6hRSAPB7XExg+vL01
+	 /yS9SZWixBhulgLuF2um2WOovtaOAMINgbfuOzO8PQwYBnJvk1ixED+ZR7gA+5m8nu
+	 ESkRmitczgmM8K9NgH5/qK+SKrcIBHJd8ELdV1GHURKz7VGQTpAeLQ7poja+1txgOz
+	 x7jw+0f+PlxJoAqj7cfi7iFbZ9aCJ5/Dd4U9A/lyBcWxrDS21sRV0cNX8bKOKOPkC6
+	 AGS6ByrRim3SA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <b938514c-61cc-41e6-b592-1003b8deccae@davidwei.uk>
-X-SRS-Rewrite: SMTP reverse-path rewritten from <hch@infradead.org> by bombadil.infradead.org. See http://www.infradead.org/rpr.html
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Tue, 19 Mar 2024 01:27:45 +0200
+Message-Id: <CZX9KHAO8163.2IASOXWIT4OZ5@kernel.org>
+Subject: Re: [PATCH] keys: Fix overwrite of key expiration on instantiation
+From: "Jarkko Sakkinen" <jarkko@kernel.org>
+To: "Silvio Gissi" <sifonsec@amazon.com>, "David Howells"
+ <dhowells@redhat.com>
+Cc: "Hazem Mohamed Abuelfotoh" <abuehaze@amazon.com>,
+ <linux-afs@lists.infradead.org>, <linux-cifs@vger.kernel.org>,
+ <keyrings@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <stable@vger.kernel.org>
+X-Mailer: aerc 0.15.2
+References: <20240315190539.1976-1-sifonsec@amazon.com>
+In-Reply-To: <20240315190539.1976-1-sifonsec@amazon.com>
 
-On Sun, Mar 17, 2024 at 07:49:43PM -0700, David Wei wrote:
-> I'm working on a similar proposal for zero copy Rx but to host memory
-> and depend on this memory provider API.
+On Fri Mar 15, 2024 at 9:05 PM EET, Silvio Gissi wrote:
+> The expiry time of a key is unconditionally overwritten during
+> instantiation, defaulting to turn it permanent. This causes a problem
+> for DNS resolution as the expiration set by user-space is overwritten to
+> TIME64_MAX, disabling further DNS updates. Fix this by restoring the
+> condition that key_set_expiry is only called when the pre-parser sets a
+> specific expiry.
+>
+> Fixes: 39299bdd2546 ("keys, dns: Allow key types (eg. DNS) to be reclaime=
+d immediately on expiry")
+> Signed-off-by: Silvio Gissi <sifonsec@amazon.com>
+> cc: David Howells <dhowells@redhat.com>
+> cc: Hazem Mohamed Abuelfotoh <abuehaze@amazon.com>
+> cc: linux-afs@lists.infradead.org
+> cc: linux-cifs@vger.kernel.org
+> cc: keyrings@vger.kernel.org
+> cc: netdev@vger.kernel.org
+> cc: stable@vger.kernel.org
+> ---
+>  security/keys/key.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
+>
+> diff --git a/security/keys/key.c b/security/keys/key.c
+> index 560790038329..0aa5f01d16ff 100644
+> --- a/security/keys/key.c
+> +++ b/security/keys/key.c
+> @@ -463,7 +463,8 @@ static int __key_instantiate_and_link(struct key *key=
+,
+>  			if (authkey)
+>  				key_invalidate(authkey);
+> =20
+> -			key_set_expiry(key, prep->expiry);
+> +			if (prep->expiry !=3D TIME64_MAX)
+> +				key_set_expiry(key, prep->expiry);
+>  		}
+>  	}
+> =20
 
-How do you need a different provider for that vs just udmabuf?
+I checked the original commit and reflected to the fix:
 
-> Jakub also designed this API for hugepages too IIRC. Basically there's
-> going to be at least three fancy ways of providing pages (one of which
-> isn't actually pages, hence the merged netmem_t series) to drivers.
+Reviewed-by: Jarkko Sakkinen <jarkko@kernel.org>
 
-How do hugepages different from a normal page allocation?  They should
-just a different ordered passed to the page allocator.
+David, I can pick this one too as I'm anyway sending PR for rc2?
 
+[1] https://lore.kernel.org/keyrings/CZX77XLG67HZ.UAU4NUQO27JP@kernel.org/
+
+BR, Jarkko
 
