@@ -1,431 +1,284 @@
-Return-Path: <netdev+bounces-80487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5412287F279
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 22:47:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CFFD87F2EB
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 23:05:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09FB1282187
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 21:47:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFD35280EA7
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 22:05:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C848559B42;
-	Mon, 18 Mar 2024 21:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5070C59B68;
+	Mon, 18 Mar 2024 22:05:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="aT9Xj+u4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FBC58230
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 21:47:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13E0659B60
+	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 22:05:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710798445; cv=none; b=B5dEOVcz5Ejxpe8hz4C48+Ip58PeBKPdbZUpCXj/vLOwZjtKz53YTStFGqR/DSe3dMw1YxlvfBgNcjv9dvKTvWXu15ZzH0giRVCZRShclBzGIoYZAOddCH4orHFe28IBPa+M8R5ABFu5+Dl2BkkfCCmMaZvkUKH5YgiiHJkOGSU=
+	t=1710799541; cv=none; b=MEQl8+VMK3zpLOKNuJqm//iuOI6uXResgYQWBl3/tUQBl04GtJy7b8E2Rob4Ik5cfYQbFfhLZQ59eBLSMOgr6po8WtQv0k801lj3QOnQXy9fweCOXp60IGeS8p1RduxXzyFi6rHfKAFfUB0KNBpnvg6sn0G8xaUGCSit14gjwLE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710798445; c=relaxed/simple;
-	bh=fq72GpsGVd/cPNeO7E1jPHHw7V1Lucl4sTZtKbidRsM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Xv0Pzcp0POiSEwfLEtq06M2CID4lb6ZAjCw6qxSfIiQDM8NmoIK7Fz922Qx2Jz2izPLVzW5GtwCiZGLi+Cjw4uzd/PlhqyW/QiE1lhyayrFXYM1CqvxZFjjJyzO2F1uxSV5bBjkhcm5GE8+kTjLzQU6HyvmeVa2Ca2gXoP20IvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7c874fb29a3so346777839f.1
-        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 14:47:23 -0700 (PDT)
+	s=arc-20240116; t=1710799541; c=relaxed/simple;
+	bh=ImxnwmPVH4hKEKAyrKCxvMl+7+5fJEuF8Z51+rw4I04=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XHZHIz8TdLTcDeJh0elJ0YcDtJm0ZuKHjsjMmC45PmlA3RdlBRGr/EwshzYIah9Qa4hL4XVG5UCkaPVDuwvmA+oOrg4M5gQIdrO5jfpC0V5l3gCuzf5wjrMSLyhrQvh5vRuukIGTSjjVkEleLHYn/k1IlcZg8WXG5IOGHrUCiDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=aT9Xj+u4; arc=none smtp.client-ip=209.85.219.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-dc6d9a8815fso4601932276.3
+        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 15:05:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1710799538; x=1711404338; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6JgsfA8A/SfQBB0wg/L10qRsSBa4VkEUGFliTXRJJ0M=;
+        b=aT9Xj+u4OHObd+A/cz7MfBmSCeBlfhuGtjoRUIU4+i+JkNkQf24qpa+KopCI3QysnY
+         6tgtg35pF9yv+hVHir8DfATQVSNgVxJvgSRZc9rLTOPKPKmcOqtYcmgIPbUK0lOqn3y8
+         bBpgEo4fYBVecRD1wupu7prOIMoiyhZ5EMzWU/xEQ7OyHIvZXlJoB95sOT2JjuqWx177
+         BvR6xhQj6n52zNPEIykALSBPQ4YQjrM68IL3CVTtsQFBGRhF8PsK9wgKpdU0Er1w5dUA
+         Rdb5Dkt2z7SIltb80Y+Z2cA9rgePiduoDQOKRBLIrQ/xgf+5qRZbcKLRVdVZMlMuFhH7
+         CODQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710798443; x=1711403243;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZNMEo2lyrGaQy5jomwIpKYATg5r7BMbeiFtEYg5txL8=;
-        b=mqaGx6xna7W+geV/XdITEyARwMqXhBhxi/i3VRaHNUajO5okmpoJNKbTMpOt803kv3
-         o0qR7fnfrGkClSMD1v/j1a2PoR0gtihQS3nEAQGTdJ2u84IcVuGX2wfj+FVaeVMShTXd
-         7tZu3oVlgQ81yGXGrY5sBkB6TmBASLciRCB8NAFKSozY6kW2/o6/cW3dhk4heufJEFvo
-         n8wq/fv+oI5MYrYhmuO2ojSZN97BzW90FpaNDwIrOv+ufjCZnry9IkwMA92bjF+oCLEV
-         43BQAEMj9i0qAQLcI8G0rgGE5NGbiSO3vxQk8bvjSHvl5rVo3k2B/oobjT22Mti7AM2v
-         Ae+Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUYXuFdE70lmQmnNEhrWllfKXJ7lPzHLvj17sExHmNPOmy4PJQ8nNa8ONEdkkWwk9v7ri/vchdkXXtWpWXX4fIyJLYdV43L
-X-Gm-Message-State: AOJu0YwYkXLCJOs2GeKjD4xvKWrSfGVfAMEoRnaPBgefMqS13n9wCnK4
-	kUNEoAGv/aghhnSgn+mdqSDU9qJNe+mllZ+PLvwlKfz/bbFebr8uEKx4q1mIiUsYKhDmXlRXOPd
-	cbR/Gyk6/IPfpijhreDOLI4lrkIeINYMEZ1+fjlQUSgRb6l28ml7mFDA=
-X-Google-Smtp-Source: AGHT+IFKaIzkj69jDzRILH8PNDNLmJX66MRx7KB/h7/xEszxioOrufWqbH7cQs02n629b8e88SRfDUHHZ1KIkUIMgMdgQhoQ6My0
+        d=1e100.net; s=20230601; t=1710799538; x=1711404338;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6JgsfA8A/SfQBB0wg/L10qRsSBa4VkEUGFliTXRJJ0M=;
+        b=u6k2PT/x4PCFws3bTjJtWiDnpeCq4P1jpbCBpzGqj7LiGx7CsBON5WBrz0BLDyHsLp
+         VludHQLTQl0kNxaQO/vTje23AJwb+40H23uvH4hPaknBaTGfBGnnffaJxP5oUpejhSVE
+         k89GEZFt45PnGoktMzK43tyjAMvGlsWTB4PU9KmfDLYXumL52c1JHcqoA8GiEwwfN16B
+         79/6niyqZGKRdM3PimZnuBs/fByxffkTkf9cw/lextDjmMJ6dmS+9svgWWyZgfRbU/lX
+         YEqQsq+eJjx2gM/0dALXNwyuMgzCw6eP2y5oXAOK1t2AOKm5lX3JkRegCIbmVCtc/8iG
+         G1Ig==
+X-Forwarded-Encrypted: i=1; AJvYcCWtzpersMXcEp8YHmvLzmS1fNOTYQLkVsqC16V3c+uS09y3iUqzS74q30NO5n8ABQchlBVZW09jUzYZWtrT6jsjkt+9vQZa
+X-Gm-Message-State: AOJu0YznSdcEM1BODScvtQocQ8E/5bNeWAlDBEwmkMMlTiat6rVYC+lM
+	vq/l75U++6HkxBVuEj04iHjbPeaS08FYnIYoEXwCoK1m+PuTLMie8tz1FviWK0shT8OQmLEFrNT
+	73ZaShFPURX2qSmzW5XXUtG9sv+RW5H0bMDkU
+X-Google-Smtp-Source: AGHT+IGhRx0PyAP7lfxuEZj7NDj8u3iE4675Ym7tx+6drValTpleq+0Db08rtMQ2HwdjtAlmOeMzmmpLZjTVVaOWdxc=
+X-Received: by 2002:a05:6902:2202:b0:dcd:990a:c02a with SMTP id
+ dm2-20020a056902220200b00dcd990ac02amr333070ybb.63.1710799537930; Mon, 18 Mar
+ 2024 15:05:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:271e:b0:477:3027:ed75 with SMTP id
- m30-20020a056638271e00b004773027ed75mr836224jav.1.1710798443056; Mon, 18 Mar
- 2024 14:47:23 -0700 (PDT)
-Date: Mon, 18 Mar 2024 14:47:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000007b33c00613f64d03@google.com>
-Subject: [syzbot] [net?] [bpf?] possible deadlock in __lock_task_sighand (2)
-From: syzbot <syzbot+34267210261c2cbba2da@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
-	jakub@cloudflare.com, john.fastabend@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
+References: <20240314111713.5979-1-renmingshuai@huawei.com>
+ <CAM0EoMmqVHGC4_YVHj=rUPj+XBS_N99rCKk1S7wCi1wJ8__Pyw@mail.gmail.com>
+ <CAM0EoMkZKvvPVaCGFVTE_P1YCyS-r2b3gq3QRhDuEF=Cm-sY4g@mail.gmail.com>
+ <CAM0EoMm+W3X7TG8qjb8LWsBbAQ8_rntr7kwhSTy7Sxk=Yj=R2g@mail.gmail.com>
+ <CANn89iL_hfoWTqr+KaKZoO8fKoZdd-xcY040NeSb-WL7pHMLGQ@mail.gmail.com>
+ <CAM0EoMkqhmDtpg09ktnkxjAtddvXzwQo4Qh2-LX2r8iqrECogw@mail.gmail.com> <CANn89iK2e4csrApZjY+kpR9TwaFpN9rcbRSPtyQnw5P_qkyYfA@mail.gmail.com>
+In-Reply-To: <CANn89iK2e4csrApZjY+kpR9TwaFpN9rcbRSPtyQnw5P_qkyYfA@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Mon, 18 Mar 2024 18:05:26 -0400
+Message-ID: <CAM0EoMkDexWQ_Rj_=gKMhWzSgQqtbAdyDv8DXgY+nk_2Rp3drg@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: Forbid assigning mirred action to a filter
+ attached to the egress
+To: Eric Dumazet <edumazet@google.com>
+Cc: renmingshuai <renmingshuai@huawei.com>, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	davem@davemloft.net, vladbu@nvidia.com, netdev@vger.kernel.org, 
+	yanan@huawei.com, liaichun@huawei.com, caowangbao@huawei.com, 
+	Eric Dumazet <eric.dumazet@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Davide Caratti <dcaratti@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Mon, Mar 18, 2024 at 3:11=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Mon, Mar 18, 2024 at 6:36=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.co=
+m> wrote:
+> >
+> > On Mon, Mar 18, 2024 at 11:46=E2=80=AFAM Eric Dumazet <edumazet@google.=
+com> wrote:
+> > >
+> > > On Mon, Mar 18, 2024 at 3:27=E2=80=AFPM Jamal Hadi Salim <jhs@mojatat=
+u.com> wrote:
+> > > >
+> > > > On Sun, Mar 17, 2024 at 12:10=E2=80=AFPM Jamal Hadi Salim <jhs@moja=
+tatu.com> wrote:
+> > > > >
+> > > > > On Thu, Mar 14, 2024 at 1:14=E2=80=AFPM Jamal Hadi Salim <jhs@moj=
+atatu.com> wrote:
+> > > > > >
+> > > > > > On Thu, Mar 14, 2024 at 7:18=E2=80=AFAM renmingshuai <renmingsh=
+uai@huawei.com> wrote:
+> > > > > > >
+> > > > > > > As we all know the mirred action is used to mirroring or redi=
+recting the
+> > > > > > > packet it receives. Howerver, add mirred action to a filter a=
+ttached to
+> > > > > > > a egress qdisc might cause a deadlock. To reproduce the probl=
+em, perform
+> > > > > > > the following steps:
+> > > > > > > (1)tc qdisc add dev eth0 root handle 1: htb default 30 \n
+> > > > > > > (2)tc filter add dev eth2 protocol ip prio 2 flower verbose \
+> > > > > > >      action police rate 100mbit burst 12m conform-exceed jump=
+ 1 \
+> > > > > > >      / pipe mirred egress redirect dev eth2 action drop
+> > > > > > >
+> > > > > >
+> > > > > > I think you meant both to be the same device eth0 or eth2?
+> > > > > >
+> > > > > > > The stack is show as below:
+> > > > > > > [28848.883915]  _raw_spin_lock+0x1e/0x30
+> > > > > > > [28848.884367]  __dev_queue_xmit+0x160/0x850
+> > > > > > > [28848.884851]  ? 0xffffffffc031906a
+> > > > > > > [28848.885279]  tcf_mirred_act+0x3ab/0x596 [act_mirred]
+> > > > > > > [28848.885863]  tcf_action_exec.part.0+0x88/0x130
+> > > > > > > [28848.886401]  fl_classify+0x1ca/0x1e0 [cls_flower]
+> > > > > > > [28848.886970]  ? dequeue_entity+0x145/0x9e0
+> > > > > > > [28848.887464]  ? newidle_balance+0x23f/0x2f0
+> > > > > > > [28848.887973]  ? nft_lookup_eval+0x57/0x170 [nf_tables]
+> > > > > > > [28848.888566]  ? nft_do_chain+0xef/0x430 [nf_tables]
+> > > > > > > [28848.889137]  ? __flush_work.isra.0+0x35/0x80
+> > > > > > > [28848.889657]  ? nf_ct_get_tuple+0x1cf/0x210 [nf_conntrack]
+> > > > > > > [28848.890293]  ? do_select+0x637/0x870
+> > > > > > > [28848.890735]  tcf_classify+0x52/0xf0
+> > > > > > > [28848.891177]  htb_classify+0x9d/0x1c0 [sch_htb]
+> > > > > > > [28848.891722]  htb_enqueue+0x3a/0x1c0 [sch_htb]
+> > > > > > > [28848.892251]  __dev_queue_xmit+0x2d8/0x850
+> > > > > > > [28848.892738]  ? nf_hook_slow+0x3c/0xb0
+> > > > > > > [28848.893198]  ip_finish_output2+0x272/0x580
+> > > > > > > [28848.893692]  __ip_queue_xmit+0x193/0x420
+> > > > > > > [28848.894179]  __tcp_transmit_skb+0x8cc/0x970
+> > > > > > >
+> > > > > > > In this case, the process has hold the qdisc spin lock in __d=
+ev_queue_xmit
+> > > > > > > before the egress packets are mirred, and it will attempt to =
+obtain the
+> > > > > > > spin lock again after packets are mirred, which cause a deadl=
+ock.
+> > > > > > >
+> > > > > > > Fix the issue by forbidding assigning mirred action to a filt=
+er attached
+> > > > > > > to the egress.
+> > > > > > >
+> > > > > > > Signed-off-by: Mingshuai Ren <renmingshuai@huawei.com>
+> > > > > > > ---
+> > > > > > >  net/sched/act_mirred.c                        |  4 +++
+> > > > > > >  .../tc-testing/tc-tests/actions/mirred.json   | 32 +++++++++=
+++++++++++
+> > > > > > >  2 files changed, 36 insertions(+)
+> > > > > > >
+> > > > > > > diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+> > > > > > > index 5b3814365924..fc96705285fb 100644
+> > > > > > > --- a/net/sched/act_mirred.c
+> > > > > > > +++ b/net/sched/act_mirred.c
+> > > > > > > @@ -120,6 +120,10 @@ static int tcf_mirred_init(struct net *n=
+et, struct nlattr *nla,
+> > > > > > >                 NL_SET_ERR_MSG_MOD(extack, "Mirred requires a=
+ttributes to be passed");
+> > > > > > >                 return -EINVAL;
+> > > > > > >         }
+> > > > > > > +       if (tp->chain->block->q->parent !=3D TC_H_INGRESS) {
+> > > > > > > +               NL_SET_ERR_MSG_MOD(extack, "Mirred can only b=
+e assigned to the filter attached to ingress");
+> > > > > > > +               return -EINVAL;
+> > > > > > > +       }
+> > > > > >
+> > > > > > Sorry, this is too restrictive as Jiri said. We'll try to repro=
+duce. I
+> > > > > > am almost certain this used to work in the old days.
+> > > > >
+> > > > > Ok, i looked at old notes - it did work at "some point" pre-tdc.
+> > > > > Conclusion is things broke around this time frame:
+> > > > > https://lore.kernel.org/netdev/1431679850-31896-1-git-send-email-=
+fw@strlen.de/
+> > > > > https://lore.kernel.org/netdev/1465095748.2968.45.camel@edumazet-=
+glaptop3.roam.corp.google.com/
+> > > > >
+> > > > > Looking further into it.
+> > > >
+> > > > This is what we came up with. Eric, please take a look...
+> > > >
+> > > > cheers,
+> > > > jamal
+> > > >
+> > > >
+> > > > --- a/net/core/dev.c
+> > > > +++ b/net/core/dev.c
+> > > > @@ -3789,7 +3789,14 @@ static inline int __dev_xmit_skb(struct sk_b=
+uff
+> > > > *skb, struct Qdisc *q,
+> > > >         if (unlikely(contended))
+> > > >                 spin_lock(&q->busylock);
+> > > >
+> > > > +       if (dev_recursion_level()) {
+> > >
+> > > I am not sure what your intent is, but this seems wrong to me.
+> > >
+> >
+> > There is a deadlock if you reenter the same device which has a qdisc
+> > attached to it more than once.
+> > Essentially entering __dev_xmit_skb() we grab the root qdisc lock then
+> > run some action which requires it to grab the root qdisc lock (again).
+> > This is easy to show with mirred (although i am wondering if syzkaller
+> > may have produced this at some point)..
+> > $TC qdisc add dev $DEV root handle 1: htb default 1
+> > $TC filter add dev $DEV protocol ip u32 match ip protocol 1 0xff
+> > action mirred egress mirror dev $DEV
+> >
+> > Above example is essentially egress $DEV-> egress $DEV in both cases
+> > "egress $DEV" grabs the root qdisc lock. You could also create another
+> > example with egress($DEV1->$DEV2->back to $DEV1).
+> >
+> > > Some valid setup use :
+> > >
+> > > A bonding device, with HTB qdisc (or other qdisc)
+> > >   (This also could be a tunnel device with a qdisc)
+> > >
+> > > -> one or multiple physical NIC, wth FQ or other qdisc.
+> > >
+> > > Packets would be dropped here when we try to reach the physical devic=
+e.
+> > >
+> >
+> > If you have an example handy please send it. I am trying to imagine
+> > how those would have worked if they have to reenter the root qdisc of
+> > the same dev multiple times..
+>
+> Any virtual device like a GRE/SIT/IPIP/... tunnel, add a qdisc on it ?
+>
+> dev_xmit_recursion_inc() is global (per-cpu), it is not per-device.
+>
+> A stack of devices A -> B -> C  would elevate the recursion level to
+> three just fine.
+>
+> After your patch, a stack of devices would no longer work.
+>
+> It seems mirred correctly injects packets to the top of the stack for
+> ingress (via netif_rx() / netif_receive_skb()),
+> but thinks it is okay to call dev_queue_xmit(), regardless of the context=
+ ?
+>
+> Perhaps safe-guard mirred, instead of adding more code to fast path.
 
-syzbot found the following issue on:
+I agree not to penalize everybody for a "bad config" like this
+(surprising syzkaller hasnt caught this). But i dont see how doing the
+checking within mirred will catch this (we cant detect the A->B->A
+case).
+I think you are suggesting a backlog-like queue for mirred? Not far
+off from that is how it used to work before
+(https://lore.kernel.org/netdev/1465095748.2968.45.camel@edumazet-glaptop3.=
+roam.corp.google.com/)
+- i.e we had a trylock for the qdisc lock and if it failed we tagged
+the rx softirq for a reschedule. That in itself is insufficient, we
+would need a loop check which is per-skb (which we had before
+https://lore.kernel.org/netdev/1431679850-31896-1-git-send-email-fw@strlen.=
+de/).
+There are other gotchas there, potentially packet reordering.
 
-HEAD commit:    fe46a7dd189e Merge tag 'sound-6.9-rc1' of git://git.kernel..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11725ac9180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4d90a36f0cab495a
-dashboard link: https://syzkaller.appspot.com/bug?extid=34267210261c2cbba2da
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f6c04726a2ae/disk-fe46a7dd.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/09c26ce901ea/vmlinux-fe46a7dd.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/134acf7f5322/bzImage-fe46a7dd.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+34267210261c2cbba2da@syzkaller.appspotmail.com
-
-=====================================================
-WARNING: HARDIRQ-safe -> HARDIRQ-unsafe lock order detected
-6.8.0-syzkaller-08951-gfe46a7dd189e #0 Not tainted
------------------------------------------------------
-syz-fuzzer/5356 [HC0[0]:SC0[2]:HE0:SE0] is trying to acquire:
-ffff888092ee3020 (&htab->buckets[i].lock){+.-.}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-ffff888092ee3020 (&htab->buckets[i].lock){+.-.}-{2:2}, at: sock_hash_delete_elem+0xb0/0x300 net/core/sock_map.c:939
-
-and this task is already holding:
-ffff888015f2d358 (&sighand->siglock){-.-.}-{2:2}, at: spin_lock_irq include/linux/spinlock.h:376 [inline]
-ffff888015f2d358 (&sighand->siglock){-.-.}-{2:2}, at: get_signal+0x247/0x1850 kernel/signal.c:2699
-which would create a new lock dependency:
- (&sighand->siglock){-.-.}-{2:2} -> (&htab->buckets[i].lock){+.-.}-{2:2}
-
-but this new dependency connects a HARDIRQ-irq-safe lock:
- (&sighand->siglock){-.-.}-{2:2}
-
-... which became HARDIRQ-irq-safe at:
-  lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-  __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-  _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
-  __lock_task_sighand+0x149/0x2e0 kernel/signal.c:1414
-  lock_task_sighand include/linux/sched/signal.h:746 [inline]
-  send_sigqueue+0x25d/0x760 kernel/signal.c:1997
-  posix_timer_event kernel/time/posix-timers.c:298 [inline]
-  posix_timer_fn+0x18a/0x3a0 kernel/time/posix-timers.c:324
-  __run_hrtimer kernel/time/hrtimer.c:1692 [inline]
-  __hrtimer_run_queues+0x595/0xd00 kernel/time/hrtimer.c:1756
-  hrtimer_interrupt+0x396/0x990 kernel/time/hrtimer.c:1818
-  local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
-  __sysvec_apic_timer_interrupt+0x107/0x3a0 arch/x86/kernel/apic/apic.c:1049
-  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
-  sysvec_apic_timer_interrupt+0xa1/0xc0 arch/x86/kernel/apic/apic.c:1043
-  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-  __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
-  _raw_spin_unlock_irqrestore+0xd8/0x140 kernel/locking/spinlock.c:194
-  spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
-  unlock_timer kernel/time/posix-timers.c:128 [inline]
-  do_timer_settime+0x2db/0x340 kernel/time/posix-timers.c:934
-  __do_sys_timer_settime kernel/time/posix-timers.c:954 [inline]
-  __se_sys_timer_settime kernel/time/posix-timers.c:940 [inline]
-  __x64_sys_timer_settime+0x19e/0x240 kernel/time/posix-timers.c:940
-  do_syscall_64+0xfb/0x240
-  entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-to a HARDIRQ-irq-unsafe lock:
- (&htab->buckets[i].lock){+.-.}-{2:2}
-
-... which became HARDIRQ-irq-unsafe at:
-...
-  lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-  __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-  _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-  spin_lock_bh include/linux/spinlock.h:356 [inline]
-  sock_hash_update_common+0x20c/0xa30 net/core/sock_map.c:1007
-  sock_map_update_elem_sys+0x5a4/0x910 net/core/sock_map.c:581
-  map_update_elem+0x53a/0x6f0 kernel/bpf/syscall.c:1641
-  __sys_bpf+0x76f/0x810 kernel/bpf/syscall.c:5619
-  __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
-  __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
-  __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
-  do_syscall_64+0xfb/0x240
-  entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-other info that might help us debug this:
-
- Possible interrupt unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&htab->buckets[i].lock);
-                               local_irq_disable();
-                               lock(&sighand->siglock);
-                               lock(&htab->buckets[i].lock);
-  <Interrupt>
-    lock(&sighand->siglock);
-
- *** DEADLOCK ***
-
-2 locks held by syz-fuzzer/5356:
- #0: ffff888015f2d358 (&sighand->siglock){-.-.}-{2:2}, at: spin_lock_irq include/linux/spinlock.h:376 [inline]
- #0: ffff888015f2d358 (&sighand->siglock){-.-.}-{2:2}, at: get_signal+0x247/0x1850 kernel/signal.c:2699
- #1: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #1: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
- #1: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2380 [inline]
- #1: ffffffff8e132020 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run3+0x14a/0x460 kernel/trace/bpf_trace.c:2421
-
-the dependencies between HARDIRQ-irq-safe lock and the holding lock:
--> (&sighand->siglock){-.-.}-{2:2} {
-   IN-HARDIRQ-W at:
-                    lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-                    __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-                    _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
-                    __lock_task_sighand+0x149/0x2e0 kernel/signal.c:1414
-                    lock_task_sighand include/linux/sched/signal.h:746 [inline]
-                    send_sigqueue+0x25d/0x760 kernel/signal.c:1997
-                    posix_timer_event kernel/time/posix-timers.c:298 [inline]
-                    posix_timer_fn+0x18a/0x3a0 kernel/time/posix-timers.c:324
-                    __run_hrtimer kernel/time/hrtimer.c:1692 [inline]
-                    __hrtimer_run_queues+0x595/0xd00 kernel/time/hrtimer.c:1756
-                    hrtimer_interrupt+0x396/0x990 kernel/time/hrtimer.c:1818
-                    local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
-                    __sysvec_apic_timer_interrupt+0x107/0x3a0 arch/x86/kernel/apic/apic.c:1049
-                    instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
-                    sysvec_apic_timer_interrupt+0xa1/0xc0 arch/x86/kernel/apic/apic.c:1043
-                    asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-                    __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:152 [inline]
-                    _raw_spin_unlock_irqrestore+0xd8/0x140 kernel/locking/spinlock.c:194
-                    spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
-                    unlock_timer kernel/time/posix-timers.c:128 [inline]
-                    do_timer_settime+0x2db/0x340 kernel/time/posix-timers.c:934
-                    __do_sys_timer_settime kernel/time/posix-timers.c:954 [inline]
-                    __se_sys_timer_settime kernel/time/posix-timers.c:940 [inline]
-                    __x64_sys_timer_settime+0x19e/0x240 kernel/time/posix-timers.c:940
-                    do_syscall_64+0xfb/0x240
-                    entry_SYSCALL_64_after_hwframe+0x6d/0x75
-   IN-SOFTIRQ-W at:
-                    lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-                    __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-                    _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
-                    __lock_task_sighand+0x149/0x2e0 kernel/signal.c:1414
-                    lock_task_sighand include/linux/sched/signal.h:746 [inline]
-                    send_sigqueue+0x25d/0x760 kernel/signal.c:1997
-                    posix_timer_event kernel/time/posix-timers.c:298 [inline]
-                    posix_timer_fn+0x18a/0x3a0 kernel/time/posix-timers.c:324
-                    __run_hrtimer kernel/time/hrtimer.c:1692 [inline]
-                    __hrtimer_run_queues+0x595/0xd00 kernel/time/hrtimer.c:1756
-                    hrtimer_interrupt+0x396/0x990 kernel/time/hrtimer.c:1818
-                    local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
-                    __sysvec_apic_timer_interrupt+0x107/0x3a0 arch/x86/kernel/apic/apic.c:1049
-                    instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
-                    sysvec_apic_timer_interrupt+0x52/0xc0 arch/x86/kernel/apic/apic.c:1043
-                    asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-                    check_kcov_mode kernel/kcov.c:173 [inline]
-                    __sanitizer_cov_trace_pc+0x2f/0x70 kernel/kcov.c:207
-                    stack_access_ok arch/x86/kernel/unwind_orc.c:393 [inline]
-                    deref_stack_reg+0xd5/0x260 arch/x86/kernel/unwind_orc.c:403
-                    unwind_next_frame+0x1ab8/0x2a00 arch/x86/kernel/unwind_orc.c:648
-                    arch_stack_walk+0x151/0x1b0 arch/x86/kernel/stacktrace.c:25
-                    stack_trace_save+0x118/0x1d0 kernel/stacktrace.c:122
-                    kasan_save_stack mm/kasan/common.c:47 [inline]
-                    kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
-                    unpoison_slab_object mm/kasan/common.c:312 [inline]
-                    __kasan_slab_alloc+0x66/0x80 mm/kasan/common.c:338
-                    kasan_slab_alloc include/linux/kasan.h:201 [inline]
-                    slab_post_alloc_hook mm/slub.c:3798 [inline]
-                    slab_alloc_node mm/slub.c:3845 [inline]
-                    kmem_cache_alloc_node+0x194/0x380 mm/slub.c:3888
-                    __alloc_skb+0x1c3/0x440 net/core/skbuff.c:658
-                    __netdev_alloc_skb+0x105/0x560 net/core/skbuff.c:732
-                    netdev_alloc_skb include/linux/skbuff.h:3306 [inline]
-                    dev_alloc_skb include/linux/skbuff.h:3319 [inline]
-                    __ieee80211_beacon_get+0x998/0x15c0 net/mac80211/tx.c:5466
-                    ieee80211_beacon_get_tim+0xb4/0x320 net/mac80211/tx.c:5588
-                    ieee80211_beacon_get include/net/mac80211.h:5552 [inline]
-                    mac80211_hwsim_beacon_tx+0x398/0x7e0 drivers/net/wireless/virtual/mac80211_hwsim.c:2296
-                    __iterate_interfaces+0x223/0x4c0 net/mac80211/util.c:772
-                    ieee80211_iterate_active_interfaces_atomic+0xd8/0x170 net/mac80211/util.c:808
-                    mac80211_hwsim_beacon+0xd4/0x1f0 drivers/net/wireless/virtual/mac80211_hwsim.c:2326
-                    __run_hrtimer kernel/time/hrtimer.c:1692 [inline]
-                    __hrtimer_run_queues+0x595/0xd00 kernel/time/hrtimer.c:1756
-                    hrtimer_run_softirq+0x19a/0x2c0 kernel/time/hrtimer.c:1773
-                    __do_softirq+0x2bc/0x943 kernel/softirq.c:554
-                    invoke_softirq kernel/softirq.c:428 [inline]
-                    __irq_exit_rcu+0xf2/0x1c0 kernel/softirq.c:633
-                    irq_exit_rcu+0x9/0x30 kernel/softirq.c:645
-                    instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
-                    sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1043
-                    asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-                    lock_acquire+0x25b/0x530 kernel/locking/lockdep.c:5758
-                    rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
-                    rcu_read_lock include/linux/rcupdate.h:750 [inline]
-                    batadv_nc_purge_orig_hash net/batman-adv/network-coding.c:408 [inline]
-                    batadv_nc_worker+0xec/0x610 net/batman-adv/network-coding.c:719
-                    process_one_work kernel/workqueue.c:3254 [inline]
-                    process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
-                    worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
-                    kthread+0x2f0/0x390 kernel/kthread.c:388
-                    ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-                    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-   INITIAL USE at:
-                   lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-                   __raw_spin_lock_irq include/linux/spinlock_api_smp.h:119 [inline]
-                   _raw_spin_lock_irq+0xd3/0x120 kernel/locking/spinlock.c:170
-                   spin_lock_irq include/linux/spinlock.h:376 [inline]
-                   calculate_sigpending+0x4f/0x90 kernel/signal.c:188
-                   ret_from_fork+0x24/0x80 arch/x86/kernel/process.c:143
-                   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
- }
- ... key      at: [<ffffffff926a68c0>] sighand_ctor.__key+0x0/0x20
-
-the dependencies between the lock to be acquired
- and HARDIRQ-irq-unsafe lock:
--> (&htab->buckets[i].lock){+.-.}-{2:2} {
-   HARDIRQ-ON-W at:
-                    lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-                    __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-                    _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-                    spin_lock_bh include/linux/spinlock.h:356 [inline]
-                    sock_hash_update_common+0x20c/0xa30 net/core/sock_map.c:1007
-                    sock_map_update_elem_sys+0x5a4/0x910 net/core/sock_map.c:581
-                    map_update_elem+0x53a/0x6f0 kernel/bpf/syscall.c:1641
-                    __sys_bpf+0x76f/0x810 kernel/bpf/syscall.c:5619
-                    __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
-                    __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
-                    __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
-                    do_syscall_64+0xfb/0x240
-                    entry_SYSCALL_64_after_hwframe+0x6d/0x75
-   IN-SOFTIRQ-W at:
-                    lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-                    __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-                    _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-                    spin_lock_bh include/linux/spinlock.h:356 [inline]
-                    sock_hash_delete_elem+0xb0/0x300 net/core/sock_map.c:939
-                    bpf_prog_2c29ac5cdc6b1842+0x42/0x46
-                    bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
-                    __bpf_prog_run include/linux/filter.h:657 [inline]
-                    bpf_prog_run include/linux/filter.h:664 [inline]
-                    __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
-                    bpf_trace_run3+0x238/0x460 kernel/trace/bpf_trace.c:2421
-                    trace_kmem_cache_free include/trace/events/kmem.h:114 [inline]
-                    kmem_cache_free+0x23c/0x2b0 mm/slub.c:4343
-                    rcu_do_batch kernel/rcu/tree.c:2196 [inline]
-                    rcu_core+0xafd/0x1830 kernel/rcu/tree.c:2471
-                    __do_softirq+0x2bc/0x943 kernel/softirq.c:554
-                    run_ksoftirqd+0xc5/0x130 kernel/softirq.c:924
-                    smpboot_thread_fn+0x544/0xa30 kernel/smpboot.c:164
-                    kthread+0x2f0/0x390 kernel/kthread.c:388
-                    ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-                    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-   INITIAL USE at:
-                   lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-                   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-                   _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-                   spin_lock_bh include/linux/spinlock.h:356 [inline]
-                   sock_hash_update_common+0x20c/0xa30 net/core/sock_map.c:1007
-                   sock_map_update_elem_sys+0x5a4/0x910 net/core/sock_map.c:581
-                   map_update_elem+0x53a/0x6f0 kernel/bpf/syscall.c:1641
-                   __sys_bpf+0x76f/0x810 kernel/bpf/syscall.c:5619
-                   __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
-                   __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
-                   __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
-                   do_syscall_64+0xfb/0x240
-                   entry_SYSCALL_64_after_hwframe+0x6d/0x75
- }
- ... key      at: [<ffffffff94869300>] sock_hash_alloc.__key+0x0/0x20
- ... acquired at:
-   lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-   _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-   spin_lock_bh include/linux/spinlock.h:356 [inline]
-   sock_hash_delete_elem+0xb0/0x300 net/core/sock_map.c:939
-   bpf_prog_2c29ac5cdc6b1842+0x42/0x46
-   bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
-   __bpf_prog_run include/linux/filter.h:657 [inline]
-   bpf_prog_run include/linux/filter.h:664 [inline]
-   __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
-   bpf_trace_run3+0x238/0x460 kernel/trace/bpf_trace.c:2421
-   trace_kmem_cache_free include/trace/events/kmem.h:114 [inline]
-   kmem_cache_free+0x23c/0x2b0 mm/slub.c:4343
-   __sigqueue_free kernel/signal.c:451 [inline]
-   collect_signal kernel/signal.c:594 [inline]
-   __dequeue_signal+0x4ac/0x5c0 kernel/signal.c:616
-   dequeue_signal+0xd8/0x5a0 kernel/signal.c:636
-   get_signal+0x5f7/0x1850 kernel/signal.c:2787
-   arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:310
-   exit_to_user_mode_loop kernel/entry/common.c:105 [inline]
-   exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
-   irqentry_exit_to_user_mode+0x79/0x270 kernel/entry/common.c:225
-   asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-
-
-stack backtrace:
-CPU: 1 PID: 5356 Comm: syz-fuzzer Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:114
- print_bad_irq_dependency kernel/locking/lockdep.c:2626 [inline]
- check_irq_usage kernel/locking/lockdep.c:2865 [inline]
- check_prev_add kernel/locking/lockdep.c:3138 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain+0x4dc7/0x58e0 kernel/locking/lockdep.c:3869
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
- _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- sock_hash_delete_elem+0xb0/0x300 net/core/sock_map.c:939
- bpf_prog_2c29ac5cdc6b1842+0x42/0x46
- bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
- __bpf_prog_run include/linux/filter.h:657 [inline]
- bpf_prog_run include/linux/filter.h:664 [inline]
- __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
- bpf_trace_run3+0x238/0x460 kernel/trace/bpf_trace.c:2421
- trace_kmem_cache_free include/trace/events/kmem.h:114 [inline]
- kmem_cache_free+0x23c/0x2b0 mm/slub.c:4343
- __sigqueue_free kernel/signal.c:451 [inline]
- collect_signal kernel/signal.c:594 [inline]
- __dequeue_signal+0x4ac/0x5c0 kernel/signal.c:616
- dequeue_signal+0xd8/0x5a0 kernel/signal.c:636
- get_signal+0x5f7/0x1850 kernel/signal.c:2787
- arch_do_signal_or_restart+0x96/0x860 arch/x86/kernel/signal.c:310
- exit_to_user_mode_loop kernel/entry/common.c:105 [inline]
- exit_to_user_mode_prepare include/linux/entry-common.h:328 [inline]
- irqentry_exit_to_user_mode+0x79/0x270 kernel/entry/common.c:225
- asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-RIP: 0033:0x50f320
-Code: c4 18 5d c3 48 8b 4c 24 28 48 8b 11 48 8b 41 08 48 8b 52 18 90 ff d2 48 c1 f8 20 8b 4c 24 14 39 c8 7f e1 8b 4c 24 30 99 f7 f9 <89> d0 48 83 c4 18 5d c3 48 8d 05 d1 0e 56 00 48 8d 1d da 4a 94 00
-RSP: 002b:000000c016b891a0 EFLAGS: 00000297
-RAX: 0000000000009943 RBX: 0000000000000236 RCX: 000000000000c042
-RDX: 0000000000009250 RSI: 731a5596983e0cd1 RDI: 000000000000c040
-RBP: 000000c016b891b8 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 00007f71e59ceac8 R12: 0000000000470621
-R13: 0000000000470621 R14: 000000c00ce076c0 R15: 0000000000000003
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+cheers,
+jamal
 
