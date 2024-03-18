@@ -1,158 +1,153 @@
-Return-Path: <netdev+bounces-80289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47C4187E239
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 03:44:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5187287E24D
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 03:49:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFFFF1F21394
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 02:44:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DC101C208DE
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 02:49:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC1431BF3F;
-	Mon, 18 Mar 2024 02:44:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A9801DDF1;
+	Mon, 18 Mar 2024 02:49:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e9Y0sbQT"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="iV4pzRO6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+Received: from mail-oi1-f174.google.com (mail-oi1-f174.google.com [209.85.167.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 311B31DDE9
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 02:44:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDFFC1EB39
+	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 02:49:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710729885; cv=none; b=SXNhtNysJn3cnBlDaMIoFFHqoZXljVOdefEJFxI2sMMwG3KDuhFZIlfzBKVNJJ94JkuzYh0mrs8WYu7wdEsybSq19xz/bMXVsvW+3dWXWEnORl/o1w9c0ZBmjyGmFv5hp3dARyC2tFFqD0fLNbAZ6U1DwPAKIg2k1fEVwGdkLLg=
+	t=1710730189; cv=none; b=MWN2nnAc6jQSkDOr7RmbBqODUDmbpzIiPX5lScPitkS4qSQYIcNN/Vx9RQQdWnZo3pCvZ5lP+GpDJTOFZLQlKsgqgbw7INrC4Gw7SbUVUUn5pdGVPvJHxp2Ru4ESISuqVnN7fUXVCagKPbUhbL9KwDbQ6Tk8/iGR2c2BFAHQh58=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710729885; c=relaxed/simple;
-	bh=5YrXE2MJsa7bNqse65FNAL1chmFW+14NdHbJj14inso=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZHfg5+RR25QnukuqrwHQNp5fxhKkFnGXb8Y8LhbjbqAQklsk5aFGrICKjv93N4MbhspEbDMRYthwZqaUMWhnNCERTa5td57HipZfKY55pf3zKB75afMOjyHlQO8BjwJscrLJtmJWOMIqCasU4ZbYnbO3RtnaHxSBMfWYKLWKgik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e9Y0sbQT; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a3ddc13bbb3so895770766b.0
-        for <netdev@vger.kernel.org>; Sun, 17 Mar 2024 19:44:43 -0700 (PDT)
+	s=arc-20240116; t=1710730189; c=relaxed/simple;
+	bh=ybVBqVNCXzGJGuz6lwF+tzdhl5wD9gmQp2PXPNadGZI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NmIgxwUeVZmC6sGF9z+y9S1y2lt2hyT6+66zVwVbk4YSAVyZ11twCz5uVkq8ivGJsbjOailot140811PVO2FZqOjMDXoZ8LkRI16QyVoR4xF7LN+Oqkq4WPmhGzkQIVigodjh16xmDLj83vNYJqv4wbEqskgGdKp39H14yN7Olo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=iV4pzRO6; arc=none smtp.client-ip=209.85.167.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
+Received: by mail-oi1-f174.google.com with SMTP id 5614622812f47-3c38bac4c50so10568b6e.1
+        for <netdev@vger.kernel.org>; Sun, 17 Mar 2024 19:49:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710729882; x=1711334682; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T2SESJlqbGOYBDnocAiOAdQciPn95Lh/Wfj9+V2UOuU=;
-        b=e9Y0sbQTn43StS0T680n87R8KQnX+WxVHiqLFJjZacuARUYq3jn+Gvnc3aPmrIoEs2
-         EZL7/zZvJZouZk7RwCk3pN6zqTe7hGqT7bu3cKGuYV9HZJXyAPxRF04HNBm3oXxDJsPi
-         QrBqPcCFHsvcLMKF+8/AFCGHgbxtaDqPo2Y+2aRnuGjhJF8u6mNH9BUms9X4joNiA+9j
-         Z1skFr1820x9pZRkhbdLsOkxsyY5Zs66F8Comt88YgVeBFV6Cz6HNtW6rt5kVFnkrUqG
-         FgnsJ6P69GYjVNjWDmbaByJ7E6Yg60/JfuFnLnEa2pnPhfoMf6yQjRFFSpB7HKJtcfof
-         uMiw==
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1710730186; x=1711334986; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QE0CXFBu76tpBM6gpoJrOe0mC6QUf5XbAI8puJxCLjs=;
+        b=iV4pzRO6P3GXwlCKnBLXNP1M23gu1zQrspv6JPJ8fStuXR6pQ39ApKrDntPI5tx/uE
+         /MnuWm41o/lbyJAypmV8amaK7R/DY9hx5GRXs/0r9iXayTGjDZNX/3a3xzI+TRbmrgc5
+         CKaIjiPutwDoASk/sLDAWwavRiaWn0pBM9030+PUUupT3yeK7y4jPmhcyEMY7r4Hl52y
+         XWNfIYJJTMt5wTngWdOXFC2+N/RSAkoF1vsgGy7/X1ZW8EIw0zE/PfsaGzUF6O4qnNcM
+         v/ZuzSbzmtn0escS9ERzZ4uMFZQ9IggD068oFEU9q2JSyZaFtYe56f0HASQWjPvNI5se
+         3jpg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710729882; x=1711334682;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T2SESJlqbGOYBDnocAiOAdQciPn95Lh/Wfj9+V2UOuU=;
-        b=cTNttzcMdD+lzojmo/a6HobUP0cRF07ya7NryJ3vgwHlf3BCG4+EclhxbqaqG3VkCz
-         JwphJ/aTQ9KY62GIlZ1MvwT1bYL9Oi+TIT2wyk8r+VWEkuJqbtc1eYMn0NqUGTtSBwSn
-         th9ext+RU0TBW2kh7SIi6GGn2rhDLy58VSrrpQs9owmEx9DaENqbKBdKdcQsHtKBpTmj
-         DQTxkZlbetyrXEZCBP6wasEMK7elPuswXeBgJMD4rNeX1t75FNH0vg0VG22E3Rbv6pL9
-         i275RW75yYikaJwm4QWbHRT6ykc/KL57dbaZK4V/IFOPCdbecnZ2kAMDjyGFwEERnRuT
-         MfgA==
-X-Gm-Message-State: AOJu0YzWlvFrI0bjpyl0djTBmwDPMmv8cmBlw1L+aI3UW6ZimbAqQc+E
-	Ql57yHt0nRmIIQc1j3jwx82brZpS6Fcv1R+/HJRvhmVa+gI3mXVMr8a3IHPHaKphkYlGMtjy1sO
-	8UwsKm6jkl6dUidIppMAqrhLQta8=
-X-Google-Smtp-Source: AGHT+IGIRXdL7SdCKJJUIWoIyF8WTsr4kI75/0TvH7deaHuX2bI3kehMJoReKtgLUZfcbJnuFjVMBs/Z+BfYlPeicQM=
-X-Received: by 2002:a17:906:3c59:b0:a46:83f0:6ca6 with SMTP id
- i25-20020a1709063c5900b00a4683f06ca6mr6777823ejg.33.1710729882337; Sun, 17
- Mar 2024 19:44:42 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710730186; x=1711334986;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QE0CXFBu76tpBM6gpoJrOe0mC6QUf5XbAI8puJxCLjs=;
+        b=I/0xuHzcCS3US9UQYn1UXXRciq1Dg59AJnxN+y/aEHr7M6pxRLBGVuKlgrklT5V5wf
+         MGZ0w7jU7jhRB7EgsAgf/S+vkkujjkXvYCBnAwK7ndrh8t+ilFwJpJHC8kTtP5tTth0l
+         RxpApQNbHuZkehFbE3ezkMv0N8qb4Vd+AnQAvWdRxmFl2GmJBEASatshpT1GvTNcN4kq
+         kozd3HwsWtTlyruAt6fOqFkDLIsv61iWaILPyM51r+BTya00vZKml9eCslq0B+y25CuJ
+         XSOScX4hNRUgCHCanxXvu//1O3eB2pSADGP6rriuiV+ZbgvRjYksRA3BEnE1ynq9rgXQ
+         aXtQ==
+X-Gm-Message-State: AOJu0YxjzN3BEbo/XWIUX/tqjBzOZGHwNhr5tuzIPFKDxGHYet5/5Z/W
+	2Zlo8zy98Hp/MWrewxYSgzCXAa7hpZdeGZz5RjsLhLkKsdWPWEmfQrMMbx4kQHk=
+X-Google-Smtp-Source: AGHT+IENq8waTwhUkJrEOrb8DEHjfl4QDem6FZJYYGTlmjRRGItMoHQ4P2wTQfIoEZJr502KAVnEEA==
+X-Received: by 2002:a05:6870:8e05:b0:222:d6a:9ae8 with SMTP id lw5-20020a0568708e0500b002220d6a9ae8mr10284561oab.35.1710730185882;
+        Sun, 17 Mar 2024 19:49:45 -0700 (PDT)
+Received: from [192.168.1.24] (71-212-18-124.tukw.qwest.net. [71.212.18.124])
+        by smtp.gmail.com with ESMTPSA id i189-20020a62c1c6000000b006e66a76d877sm7120229pfg.153.2024.03.17.19.49.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 17 Mar 2024 19:49:45 -0700 (PDT)
+Message-ID: <b938514c-61cc-41e6-b592-1003b8deccae@davidwei.uk>
+Date: Sun, 17 Mar 2024 19:49:43 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1a4e901d6ecb9b091888c4d92256fa4a56cb83a4.1710715791.git.asml.silence@gmail.com>
-In-Reply-To: <1a4e901d6ecb9b091888c4d92256fa4a56cb83a4.1710715791.git.asml.silence@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 18 Mar 2024 10:44:05 +0800
-Message-ID: <CAL+tcoA=3KNFGNv4DSqnWcUu4LTY3Pz5ex+fRr4LkyS8ZNNKwQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] net: cache for same cpu skb_attempt_defer_free
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, davem@davemloft.net, 
-	dsahern@kernel.org, pabeni@redhat.com, kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net-next v6 02/15] net: page_pool: create hooks for
+ custom page providers
+Content-Language: en-GB
+To: Christoph Hellwig <hch@infradead.org>,
+ Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org,
+ linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org,
+ sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ linux-arch@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org,
+ dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+ Richard Henderson <richard.henderson@linaro.org>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner
+ <mattst88@gmail.com>, Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ "James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+ Helge Deller <deller@gmx.de>, Andreas Larsson <andreas@gaisler.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ Pavel Begunkov <asml.silence@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>,
+ Harshitha Ramamurthy <hramamurthy@google.com>,
+ Jeroen de Borst <jeroendb@google.com>,
+ Praveen Kaligineedi <pkaligineedi@google.com>
+References: <20240305020153.2787423-1-almasrymina@google.com>
+ <20240305020153.2787423-3-almasrymina@google.com>
+ <ZfegzB341oNc_Ocz@infradead.org>
+From: David Wei <dw@davidwei.uk>
+In-Reply-To: <ZfegzB341oNc_Ocz@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Mar 18, 2024 at 8:46=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
->
-> Optimise skb_attempt_defer_free() when run by the same CPU the skb was
-> allocated on. Instead of __kfree_skb() -> kmem_cache_free() we can
-> disable softirqs and put the buffer into cpu local caches.
->
-> CPU bound TCP ping pong style benchmarking (i.e. netbench) showed a 1%
-> throughput increase (392.2 -> 396.4 Krps). Cross checking with profiles,
-> the total CPU share of skb_attempt_defer_free() dropped by 0.6%. Note,
+On 2024-03-17 19:02, Christoph Hellwig wrote:
+> On Mon, Mar 04, 2024 at 06:01:37PM -0800, Mina Almasry wrote:
+>> From: Jakub Kicinski <kuba@kernel.org>
+>>
+>> The page providers which try to reuse the same pages will
+>> need to hold onto the ref, even if page gets released from
+>> the pool - as in releasing the page from the pp just transfers
+>> the "ownership" reference from pp to the provider, and provider
+>> will wait for other references to be gone before feeding this
+>> page back into the pool.
+> 
+> The word hook always rings a giant warning bell for me, and looking into
+> this series I am concerned indeed.
+> 
+> The only provider provided here is the dma-buf one, and that basically
+> is the only sensible one for the documented design.  So instead of
+> adding hooks that random proprietary crap can hook into, why not hard
+> code the dma buf provide and just use a flag?  That'll also avoid
+> expensive indirect calls.
 
-I suspect that we can stably gain this improvement. The reason why I
-ask is because it might be caused by some factor of chance.
+I'm working on a similar proposal for zero copy Rx but to host memory
+and depend on this memory provider API.
 
-> I'd expect the win doubled with rx only benchmarks, as the optimisation
-> is for the receive path, but the test spends >55% of CPU doing writes.
+Jakub also designed this API for hugepages too IIRC. Basically there's
+going to be at least three fancy ways of providing pages (one of which
+isn't actually pages, hence the merged netmem_t series) to drivers.
 
-I wonder how you did this test? Could you tell us more, please.
-
->
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> ---
->
-> v2: pass @napi_safe=3Dtrue by using __napi_kfree_skb()
->
->  net/core/skbuff.c | 15 ++++++++++++++-
->  1 file changed, 14 insertions(+), 1 deletion(-)
->
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index b99127712e67..35d37ae70a3d 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -6995,6 +6995,19 @@ void __skb_ext_put(struct skb_ext *ext)
->  EXPORT_SYMBOL(__skb_ext_put);
->  #endif /* CONFIG_SKB_EXTENSIONS */
->
-> +static void kfree_skb_napi_cache(struct sk_buff *skb)
-> +{
-> +       /* if SKB is a clone, don't handle this case */
-> +       if (skb->fclone !=3D SKB_FCLONE_UNAVAILABLE) {
-> +               __kfree_skb(skb);
-> +               return;
-> +       }
-> +
-> +       local_bh_disable();
-> +       __napi_kfree_skb(skb, SKB_DROP_REASON_NOT_SPECIFIED);
-
-__napi_kfree_skb() doesn't care much about why we drop in the rx path,
-I think. How about replacing it with SKB_CONSUMED like
-napi_skb_finish() does?
-
-Thanks,
-Jason
-
-> +       local_bh_enable();
-> +}
-> +
->  /**
->   * skb_attempt_defer_free - queue skb for remote freeing
->   * @skb: buffer
-> @@ -7013,7 +7026,7 @@ void skb_attempt_defer_free(struct sk_buff *skb)
->         if (WARN_ON_ONCE(cpu >=3D nr_cpu_ids) ||
->             !cpu_online(cpu) ||
->             cpu =3D=3D raw_smp_processor_id()) {
-> -nodefer:       __kfree_skb(skb);
-> +nodefer:       kfree_skb_napi_cache(skb);
->                 return;
->         }
->
-> --
-> 2.44.0
->
->
+> 
 
