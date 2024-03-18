@@ -1,136 +1,201 @@
-Return-Path: <netdev+bounces-80366-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99B5F87E832
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 12:09:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E41E87E853
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 12:13:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C96B31C21532
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 11:09:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D11C8283DF1
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 11:13:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01431376EE;
-	Mon, 18 Mar 2024 11:08:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E0A83611B;
+	Mon, 18 Mar 2024 11:12:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cR/ElfzX"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="vCvUgQ0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2026364BF;
-	Mon, 18 Mar 2024 11:08:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3304B381AC;
+	Mon, 18 Mar 2024 11:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710760139; cv=none; b=nlSiremQ48t3lxbKb1+lkEB/V+hWuE9iLIMInBiQP4CPtCx4CrE76OxFf+aJy1kSKNtIx8fHCTepNMzyPSGrxWoeu23wHww/obCtWZV0qKOyd1JaSWC7ogr2qfm+e37ZuuF0TXAwkyLnPwmfVJCmdZ/rQmHvnfUoRfbiYdoALsc=
+	t=1710760372; cv=none; b=Al3o44r6zi19/HTYoGz3y0yPsH0W5hFQxT4OOsjbsL33W69/yufOnaiKfZgcmJpY5zJ6s8E5oXi5PRknpqs1gzJOc3oAUtjo3OEIS7fns8L0c283f6iMiVHSzREasxI0TMKysDTzCsws/FVyLpf/r15uPfvsLe+5GlGwKhmSXnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710760139; c=relaxed/simple;
-	bh=vFYxI/evLVZ5xnjJcv/HxjQrEpYkbG+SjslgqJGSw9Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XmMfZGRdFYBrGaUndz0SUDzQCfOj2wjqlsl/VMFVEkPWemKAiHZ3BUwaa4tWgyZHeyb4loJ3ZjWhsnedLGD06wARgO/e0JZtMp/+c6W+Crpu3wSd93fdTTzq0oAENMe1DKu0WmRi/bm0msK6c99sT/ANhLs7T9f/SmxOQF/Ln/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cR/ElfzX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D12BC433B1;
-	Mon, 18 Mar 2024 11:08:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710760139;
-	bh=vFYxI/evLVZ5xnjJcv/HxjQrEpYkbG+SjslgqJGSw9Q=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cR/ElfzXeQ5RfhRBRufwn/QdOag6NRNsRSMmdvp4OsBMEkQg194NAMaR2m0mPHUDs
-	 wJkU0TxY95DRJ+IY7QKwzqchYsoXp5vVatMtvmOJfXw4VH7nB7V0z9RQv1RPPTmrQO
-	 ftPgFbYGUIqzOVD6oIO0E8d4wdB0eyc59HM4pnhU5dqlfk9ZXpJ8Mw0luUmOHTJhLa
-	 51ht3JXKgZXCEbsNTmtwBpR6Bq/eOILukrNVKEZe154dBlA5YwxpLHyzIhICsoHFq+
-	 G0cPna4EHmvl6BcJbCn7fZUUzdzNdlMuIdJvgMrjDldD4BCb41QICj9y2yO2jhEuWc
-	 fRqVfXQYGD68w==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan+linaro@kernel.org>)
-	id 1rmArY-000000008Jr-45VI;
-	Mon, 18 Mar 2024 12:09:05 +0100
-From: Johan Hovold <johan+linaro@kernel.org>
-To: Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Matthias Kaehlcke <mka@chromium.org>,
-	Doug Anderson <dianders@google.com>,
-	Bjorn Andersson <quic_bjorande@quicinc.com>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	linux-bluetooth@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Johan Hovold <johan+linaro@kernel.org>,
-	stable@vger.kernel.org,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
-Subject: [PATCH v2 4/4] Bluetooth: qca: fix wcn3991 'local-bd-address' endianness
-Date: Mon, 18 Mar 2024 12:08:55 +0100
-Message-ID: <20240318110855.31954-5-johan+linaro@kernel.org>
-X-Mailer: git-send-email 2.43.2
-In-Reply-To: <20240318110855.31954-1-johan+linaro@kernel.org>
-References: <20240318110855.31954-1-johan+linaro@kernel.org>
+	s=arc-20240116; t=1710760372; c=relaxed/simple;
+	bh=DnVZF8SGVwGKINb0idkVhUywVWKD3UaEQ9II6Y0tp+o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=cHCXk92C+Jrw4fOyoIDQAT/Zj/yak2hm+B1T0Mn7V9taRwxL0XdDf0AliwhKn3N7ZJ25aOd6Bi14BlPtj7QEMJkwKkScFhgJBjCH8ceXTboekeq97gQVKchtMCzfIQ+TD3o83KE+hlXXnVi/jjFWDw5bvH6XRA0piHtUodiRz70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=vCvUgQ0n; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 42IBCUfc088930;
+	Mon, 18 Mar 2024 06:12:30 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1710760350;
+	bh=DV4xGfeZV0MHV7EUiL5CPLZLpyUrr+cQbMmhRNUiEbU=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=vCvUgQ0no+l0m+XxSAIntTEFS5NRdg6Qg9ZfIyoCdnhCn7Epf1UxV01TV4MKOozmC
+	 6gjGxyUGmnEz1t06ZqbIvoSc3s5hOGFtXDlrkOv0Shdr4gPnhECKcg1j9deVSiwxF2
+	 MzwoiqsMCd1Z9UI9VF0/C44dE90V0uow2ekWqIbU=
+Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 42IBCUfW029670
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Mon, 18 Mar 2024 06:12:30 -0500
+Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE103.ent.ti.com
+ (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 18
+ Mar 2024 06:12:30 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE114.ent.ti.com
+ (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 18 Mar 2024 06:12:30 -0500
+Received: from [172.24.227.220] (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.227.220])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 42IBCQSs091840;
+	Mon, 18 Mar 2024 06:12:26 -0500
+Message-ID: <47f8db23-52b8-4a37-89b9-70e5ed4c8d83@ti.com>
+Date: Mon, 18 Mar 2024 16:42:25 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 1/3] net: ethernet: ti: am65-cpts: Enable PTP RX HW
+ timestamp using CPTS FIFO
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>, Dan Carpenter <dan.carpenter@linaro.org>,
+        Siddharth Vadapalli <s-vadapalli@ti.com>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>,
+        Vladimir Oltean <vladimir.oltean@nxp.com>,
+        "Grygorii
+ Strashko" <grygorii.strashko@ti.com>,
+        Andrew Lunn <andrew@lunn.ch>, "Roger
+ Quadros" <rogerq@kernel.org>,
+        Richard Cochran <richardcochran@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David
+ S. Miller" <davem@davemloft.net>
+CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>
+References: <20240312100233.941763-1-c-vankar@ti.com>
+ <dc45f4f104a0d0691715398d2f7efa6a0a3447b8.camel@redhat.com>
+From: Chintan Vankar <c-vankar@ti.com>
+In-Reply-To: <dc45f4f104a0d0691715398d2f7efa6a0a3447b8.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Due to a long-standing bug in the Qualcomm Bluetooth driver, the device
-address has so far been reversed when configuring the controller.
 
-This has led to one vendor reversing the address provided by the
-boot firmware using the 'local-bd-address' devicetree property.
 
-The only device affected by this should be the WCN3991 used in some
-Chromebooks. The corresponding compatible string has now been deprecated
-so that the underlying driver bug can be fixed without breaking
-backwards compatibility.
+On 12/03/24 16:20, Paolo Abeni wrote:
+> On Tue, 2024-03-12 at 15:32 +0530, Chintan Vankar wrote:
+>> diff --git a/drivers/net/ethernet/ti/am65-cpts.c b/drivers/net/ethernet/ti/am65-cpts.c
+>> index c66618d91c28..6c1d571c5e0b 100644
+>> --- a/drivers/net/ethernet/ti/am65-cpts.c
+>> +++ b/drivers/net/ethernet/ti/am65-cpts.c
+>> @@ -859,29 +859,6 @@ static long am65_cpts_ts_work(struct ptp_clock_info *ptp)
+>>   	return delay;
+>>   }
+>>   
+>> -/**
+>> - * am65_cpts_rx_enable - enable rx timestamping
+>> - * @cpts: cpts handle
+>> - * @en: enable
+>> - *
+>> - * This functions enables rx packets timestamping. The CPTS can timestamp all
+>> - * rx packets.
+>> - */
+>> -void am65_cpts_rx_enable(struct am65_cpts *cpts, bool en)
+>> -{
+>> -	u32 val;
+>> -
+>> -	mutex_lock(&cpts->ptp_clk_lock);
+>> -	val = am65_cpts_read32(cpts, control);
+>> -	if (en)
+>> -		val |= AM65_CPTS_CONTROL_TSTAMP_EN;
+>> -	else
+>> -		val &= ~AM65_CPTS_CONTROL_TSTAMP_EN;
+>> -	am65_cpts_write32(cpts, val, control);
+>> -	mutex_unlock(&cpts->ptp_clk_lock);
+>> -}
+>> -EXPORT_SYMBOL_GPL(am65_cpts_rx_enable);
+> 
+> It looks like the above chunk will cause a transient build break, as
+> the function is still in use and the caller will be removed by the next
+> patch. I guess you should move this chunk there.
 
-Set the HCI_QUIRK_BDADDR_PROPERTY_BROKEN quirk for the deprecated
-compatible string and add the new 'qcom,wcn3991-bt-bdaddr-le' string to
-the match table for boot firmware that conforms with the binding.
+Thank you for your suggestion. I will update the patch with this
+change in the next version.
 
-Fixes: 7d250a062f75 ("Bluetooth: hci_qca: Add support for Qualcomm Bluetooth SoC WCN3991")
-Cc: stable@vger.kernel.org      # 5.10
-Cc: Balakrishna Godavarthi <quic_bgodavar@quicinc.com>
-Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
----
- drivers/bluetooth/hci_qca.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+> 
+>> -
+>>   static int am65_skb_get_mtype_seqid(struct sk_buff *skb, u32 *mtype_seqid)
+>>   {
+>>   	unsigned int ptp_class = ptp_classify_raw(skb);
+>> @@ -906,6 +883,72 @@ static int am65_skb_get_mtype_seqid(struct sk_buff *skb, u32 *mtype_seqid)
+>>   	return 1;
+>>   }
+>>   
+>> +static u64 am65_cpts_find_rx_ts(struct am65_cpts *cpts, struct sk_buff *skb,
+>> +				int ev_type, u32 skb_mtype_seqid)
+>> +{
+>> +	struct list_head *this, *next;
+>> +	struct am65_cpts_event *event;
+>> +	unsigned long flags;
+>> +	u32 mtype_seqid;
+>> +	u64 ns = 0;
+>> +
+>> +	am65_cpts_fifo_read(cpts);
+>> +	spin_lock_irqsave(&cpts->lock, flags);
+>> +	list_for_each_safe(this, next, &cpts->events) {
+>> +		event = list_entry(this, struct am65_cpts_event, list);
+>> +		if (time_after(jiffies, event->tmo)) {
+>> +			list_del_init(&event->list);
+>> +			list_add(&event->list, &cpts->pool);
+>> +			continue;
+>> +		}
+>> +
+>> +		mtype_seqid = event->event1 &
+>> +			      (AM65_CPTS_EVENT_1_MESSAGE_TYPE_MASK |
+>> +			       AM65_CPTS_EVENT_1_SEQUENCE_ID_MASK |
+>> +			       AM65_CPTS_EVENT_1_EVENT_TYPE_MASK);
+>> +
+>> +		if (mtype_seqid == skb_mtype_seqid) {
+>> +			ns = event->timestamp;
+>> +			list_del_init(&event->list);
+>> +			list_add(&event->list, &cpts->pool);
+>> +			break;
+>> +		}
+>> +	}
+>> +	spin_unlock_irqrestore(&cpts->lock, flags);
+> 
+> Ouch, you have to acquire an additional lock per packet and a lot of
+> cacheline dithering.
+> 
+> Not strictly necessary for this series, but I suggest to invest some
+> time reconsidering this schema, it looks bad from performance pov.
+> 
+> Possibly protecting the list with RCU and leaving the recycle to the
+> producer could help.
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index f989c05f8177..346274fe66d8 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -1904,6 +1904,16 @@ static int qca_setup(struct hci_uart *hu)
- 	case QCA_WCN6855:
- 	case QCA_WCN7850:
- 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
-+
-+		if (soc_type == QCA_WCN3991) {
-+			struct device *dev = GET_HCIDEV_DEV(hdev);
-+
-+			if (device_is_compatible(dev, "qcom,wcn3991-bt")) {
-+				set_bit(HCI_QUIRK_BDADDR_PROPERTY_BROKEN,
-+						&hdev->quirks);
-+			}
-+		}
-+
- 		hci_set_aosp_capable(hdev);
- 
- 		ret = qca_read_soc_version(hdev, &ver, soc_type);
-@@ -2597,6 +2607,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
- 	{ .compatible = "qcom,wcn3988-bt", .data = &qca_soc_data_wcn3988},
- 	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data_wcn3990},
- 	{ .compatible = "qcom,wcn3991-bt", .data = &qca_soc_data_wcn3991},
-+	{ .compatible = "qcom,wcn3991-bt-bdaddr-le", .data = &qca_soc_data_wcn3991},
- 	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
- 	{ .compatible = "qcom,wcn6750-bt", .data = &qca_soc_data_wcn6750},
- 	{ .compatible = "qcom,wcn6855-bt", .data = &qca_soc_data_wcn6855},
--- 
-2.43.2
+Thank you for pointing out this. I will consider your point and spend
+some time on it.
 
+> 
+> Additionally net-next is currently closed for the merge window, please
+> post the new revision (including the target tree in the subj prefix)
+> when net-next will re-open in ~2weeks.
+> 
+Thank you for information. I will update the patch and post its next
+version with above mentioned changes.
+
+> Cheers,
+> 
+> Paolo
+> 
 
