@@ -1,165 +1,149 @@
-Return-Path: <netdev+bounces-80458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D184087EE74
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 18:09:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 768A287EECD
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 18:29:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EB581F2471F
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 17:09:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9F36B2247F
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 17:29:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B4454F96;
-	Mon, 18 Mar 2024 17:09:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C62BD55766;
+	Mon, 18 Mar 2024 17:29:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vml4KMbB";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="lK6sLjjW";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="LHH73Z5l";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="/tYtToBm"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="d0e2JRYl"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2064.outbound.protection.outlook.com [40.107.243.64])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B387555C34
-	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 17:08:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710781740; cv=none; b=JDq8GE1QUZw1Iz2HdUo2QlFA+yD3bV0zuTHvXGa9Tysqvr1Q6g6zDqs7Tz5xy7ppcaFEa8L1269nu4R3LE9YXVIu+KzBwUKhWu2xlqRHskFLD6nTCEFXShZ90t7SFeZmanO5WsA34+hhQyDMk3Gz7eNyvF4Mb5RJzizRrIvlsio=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710781740; c=relaxed/simple;
-	bh=2Jh06q2N+PaoyTfx/05eU5SdyF4sKmU3zCLX/+7z2fA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UVlEvWqcJL0e8ttcs+j4HiKVQD+ZGNw18kv6efqwDy35Vun0WrHKDAHJV2JZpMONHnQ6xUbvTHEyXkPhTdIxgmQNBtg6v9Bz5mxwp2Hhi4DlaQXCygMr4a/ndU1UifvmhaVa/hAKunmMmvx9H2qu+LuiXOArpStnDIxXsgpkIsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vml4KMbB; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=lK6sLjjW; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=LHH73Z5l; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=/tYtToBm; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from kitsune.suse.cz (unknown [10.100.12.127])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id CD9CE5C7BD;
-	Mon, 18 Mar 2024 17:08:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1710781737; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ftgY+bLb8XwfHyNervbdasFc4FlYUFBR74M9K0wXRRU=;
-	b=vml4KMbBoSdX7TzpANJILNLPkosIvB3jQMDK7SgDm7qYh8gl6hJOWSw/xKZ+hlZiaAWCYy
-	CjLkv/5dbuaYtU8e6lyt7riKmOqvDyA8n+1Rm2rIf0GUFkWRYWXtgjW5L4oziM67qGErfD
-	YSyLhWqrJrJtVmeVA0avYeTKKqPuCdw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1710781737;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ftgY+bLb8XwfHyNervbdasFc4FlYUFBR74M9K0wXRRU=;
-	b=lK6sLjjW+BWes869Ev3Zwkmn1q7aHB7iPhWXEkxRA9HjXyT25KTEOtAeBEaBX5XPyOpfvL
-	MFBGyIFb7+B+mjDg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1710781736; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ftgY+bLb8XwfHyNervbdasFc4FlYUFBR74M9K0wXRRU=;
-	b=LHH73Z5lUD01YkOLQIME/DpDwb0eYMJluswQqcNLUQ8Mzuo+H1dklZ4H/OleGN5iSOQ6V2
-	3OrCNjJnoKFy7fUMMNHmNXIIxh+1dbSMJpBB1fenuE4P1AxVjIhIh/0egPzFeiJOn8Do6t
-	zg2YGnIkI2TB6zbE1R0iHdU3DVir2GI=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1710781736;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ftgY+bLb8XwfHyNervbdasFc4FlYUFBR74M9K0wXRRU=;
-	b=/tYtToBmjXBuFy/sx0vDRx1IPjdDVL+OpO3t5nHLhGdXKyCMvBIewH3pHuipRdyH3IYYw+
-	jf/PbZfKrR6BRUCw==
-Date: Mon, 18 Mar 2024 18:08:55 +0100
-From: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
-To: Michael Ellerman <mpe@ellerman.id.au>
-Cc: dtsen@linux.ibm.com, linuxppc-dev@lists.ozlabs.org,
-	wireguard@lists.zx2c4.com, "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	netdev@vger.kernel.org
-Subject: Re: Cannot load wireguard module
-Message-ID: <20240318170855.GK20665@kitsune.suse.cz>
-References: <20240315122005.GG20665@kitsune.suse.cz>
- <87jzm32h7q.fsf@mail.lhotse>
- <87r0g7zrl2.fsf@mail.lhotse>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FA4655C04;
+	Mon, 18 Mar 2024 17:29:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.64
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710782981; cv=fail; b=AZyi7BHiI9smtvrj8xyhUXsO970KrxWmeUbZiUEiTqtV/hM0UP4wsqWEwlIzqSqAMUsTISWW2BADQHQVCH5y05HrqBWevAAlurdDlwUPRdivgOaugyt4WDBzDpOZRUxLPfrepZO7wRnvfe/FEEu0twF6y6UU5kB+a01rsaWyujI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710782981; c=relaxed/simple;
+	bh=mioly1x9sHuXmvdRFDJIcqAOth1XCNAf7hJ7oDQugbk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=TOaYOjh16K92vV9hzRcImF3P7FNKWtmcZ/bE2FIZByB5xYitTliv/xWUIDw0MdDfK3ui0A/mnrKRQOkpYM+pFKSZqiv+30xdalo+qg8ElktVjoGCbvkztAsQyrGpYNoFV04S1efv1+mIbiAPZM/fp1mpmdojTfQqyuYskKXqM2o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=d0e2JRYl; arc=fail smtp.client-ip=40.107.243.64
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=dadp5JAQoIRwzIN6Qb71l1jAodiPtIqhjfykcXqURULsdp/XHVTyjnCV/wQJOjCrrE+ocgDVQ+RK7ylIIKdPu5Dc3W1vq+lXxaX7+gZpkrTZFwwF/pmi99XVhomoCNh04UCY9mHVD89MSCxJ+++Fdqg/Z82yDVm+G6PC9Wz0gaIzlQRk069secxzW1d08KYHeYcIGNUTCYybFmQCBZn/ke3BU2NNcBmfT8IUx0m93PYWjykdH5w953T+vZh5kZOafZhwiX1wUVF/B7mw/MGGGR3sGauqFNKFq8suU9217YloKDBrzglsCL8Bhpo9GbLFHhrLvFq6rDqxyfgX+Rjb+A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QNs3dCWBTwvbY0N2zixejYIHPcof5M/naR2K5df02Ps=;
+ b=dfQgSvAudZvyckvWj8kwcokkAcwVquNY+iyegFtzJaRo5e27QvrafmGHu6l2ja8gzekK12z6SUTQNanbHId6AGeco/lBhMgjPTC8LsUMvXYnid+CV4jre79OFqF3QSuO9bjYb5q942saav9svcZYuPIoPfwXnxylsWA4dlcUk6Y/raly9OkTDVzK927m0uWB44zKYDMobXdhlnUV1+SlBPWIWPeUX1CvMxossYz7tYKh9g8n5Dhvum/sQMKdKg28TGj5PHst6we3uWQdtwCuEbo5ZKaRtRzTVO+CfpTEQ5KvXFwUAPDOQmFl3MwfDhDA2EKgv7RoIadAEVhx8KKiIA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QNs3dCWBTwvbY0N2zixejYIHPcof5M/naR2K5df02Ps=;
+ b=d0e2JRYlb2lrn2hxvj+y4cj80ksWYk4XYaQRRSnBnTRobU48pY5LBU1XXzR2ObTdQleFpuwXSPi3Xo4Wlt1OfqUrDCwtdYFgt2wHulSa5SCdMTp8W+o0SlZhA4rRunwjW3kMmaloz+6/h7f8TF2zW21wTUVdiWV6MUeQWD+oTW0wlLIYIc/1pWxr246GVdcTb2i1ihlEivPOhOOj3lJ9G5ZnDqAWP7NJERKyfLkZhNsAOT9vEGqc18gd7La73KjNYxdpthiXDgd2GG+Mu9T9+ADz1GupV9KNm0pJVkyzKOuK5EVmu1cbOaRJtpDA1OlHIFpIGKVQvJe8LJBnBpx01w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
+ by SN7PR12MB7322.namprd12.prod.outlook.com (2603:10b6:806:299::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.27; Mon, 18 Mar
+ 2024 17:29:37 +0000
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::b93d:10a3:632:c543]) by CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::b93d:10a3:632:c543%4]) with mapi id 15.20.7386.025; Mon, 18 Mar 2024
+ 17:29:36 +0000
+Date: Mon, 18 Mar 2024 19:29:32 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: kuba@kernel.org, Duanqiang Wen <duanqiangwen@net-swift.com>,
+	netdev@vger.kernel.org, mengyuanlou@net-swift.com,
+	davem@davemloft.net, edumazet@google.com,
+	maciej.fijalkowski@intel.com, andrew@lunn.ch,
+	wangxiongfeng2@huawei.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: txgbe: fix clk_name exceed MAX_DEV_ID limits
+Message-ID: <Zfh5_CpMJC8KU_yG@shredder>
+References: <20240313080634.459523-1-duanqiangwen@net-swift.com>
+ <24a7051fdcd1f156c3704bca39e4b3c41dfc7c4b.camel@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <24a7051fdcd1f156c3704bca39e4b3c41dfc7c4b.camel@redhat.com>
+X-ClientProxiedBy: LO4P123CA0078.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:190::11) To CY5PR12MB6179.namprd12.prod.outlook.com
+ (2603:10b6:930:24::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87r0g7zrl2.fsf@mail.lhotse>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -1.52
-X-Spamd-Result: default: False [-1.52 / 50.00];
-	 TO_DN_SOME(0.00)[];
-	 REPLY(-4.00)[];
-	 RCPT_COUNT_FIVE(0.00)[6];
-	 RCVD_COUNT_ZERO(0.00)[0];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 R_MIXED_CHARSET(0.71)[subject];
-	 BAYES_HAM(-0.04)[58.07%];
-	 ARC_NA(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 MIME_GOOD(-0.10)[text/plain];
-	 NEURAL_SPAM_SHORT(2.91)[0.968];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com]
-X-Spam-Flag: NO
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|SN7PR12MB7322:EE_
+X-MS-Office365-Filtering-Correlation-Id: 110d0716-6364-42f4-0141-08dc4770fb99
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	iGUOVQAdEy3OvV4ldTvVIRhPNP3WdSltuaocS4vBo5NKhnGeOpOL0Dn1+rKlVkcGW11k/h4FGtfHNNK7CiGLACAT8vYEZqA7xamQxI0W6qiwK9QSW8/rjvtcFRnGsU5onIVotaV7be5fqeKI1sf0Tmm0jTm1R9YBPv5FlMXXwsf8C0kEME9GbVpZZY3uxyfmBXvb2Xopjl2aN4PGa3H1mkyUCTc2g7dI/oxKBZiFL8/SwE7ClaBuXvHNduKJWliOR4zUzFymUACbJeyAUfFC4YmD60rtVZVJqwWY2StISeBXSoDqBaFT/69wRh/WX5zDy7VZeNH8PyMYVMJ64MsffuIOPaWHjlwTcUDXkXKXPgYIL5Uc5+IXUA8XyseNfgPK0y7SjwKm7lNz1JNkA4ZHAEvAs9WN7UUK4QfejFJm2RuUrxss3PXuya9fyPOhiFsCF5JC5uCRe/UmOqKmn/6Mt9m1ozZ4jvYdRtGylkkL3F9BGSXYLwYJeGB0K624Uy3bi8bx/7CKNranAHQz0aH/SDSxOMTcqrzISbv9vWINSBaOzEKB0Mxb++KdpMI0b9x3aRofOleH/xZ5J1XBdqZl1Js0FUMSbxTEUmw/u9UeWep32vb4ynpf/aU3cSPtMLa7A+CMgaPFRfDhaQG+6MZ1hK38LZGwG63iBV8U/CAStjs=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(7416005)(376005)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?YdWGtmOmb35+5tlobl/1mhsYtwYaJ0JA6u0A8071QUTQBKRpwOfG3ebIAMrr?=
+ =?us-ascii?Q?V2tzs4qmDcfWCWE0R6IbiIBMSu5kBRKYjA23jCpJmiYGmtOyvxYl9ZFFTrxv?=
+ =?us-ascii?Q?e3VhlzSA5tVGspvCtfl7ZTr3Ak8YCnZnBqK1GCRfoQXb5bmCWAuoTUg0/RJ0?=
+ =?us-ascii?Q?1tOV4zKHnlRSP2o8SyAZH/ltm5tNJ5Jeu1IyOOrXkXT0OiLyKD4qmN9WRGAL?=
+ =?us-ascii?Q?DDG+pVw2eBBgoaeZKSgjnc8jdwDxU1Gd5WfZmeeVHPaNK2y88/XxAfPGpOn5?=
+ =?us-ascii?Q?mV3STvYZ1KlbdgM9/mzMu0gOCIrfpLamg34CqgHDXw0kV4PV79xxjRTCyQRW?=
+ =?us-ascii?Q?vYEvjbtrul7EuJRbXl9SgTn6O6/DhlO5TNvo4Q8lUskT41fDlS/gVfcd9V0+?=
+ =?us-ascii?Q?YDUI4gTsNsSq+uEw6vHKIv7vcjFEhxpmt2Vv1v1LgDDw3SNjxBpeots8TjoK?=
+ =?us-ascii?Q?zsjA/ib2gJbAWVJDwxuObTzU4JMuDiiwM/UELmx0IftgDP0+SPuMfrKCVMKG?=
+ =?us-ascii?Q?BGO4a8xxGslWSMdmj4tu8qw1f3o3MlkP31YQn3gGm565kQnV5fPa8BdIwLsJ?=
+ =?us-ascii?Q?3Mj0AM6j+fXTuDUOVQjHYWRpZNC9idn1JRYjNv/kTlLUluL9U3S8kVUWlK+Z?=
+ =?us-ascii?Q?B7UkdAHo9FXimFZfVTP7N7yVSE6eeznf8iI23/Yt1wbzp1H5BIWg1e3q/X7D?=
+ =?us-ascii?Q?8nu5Jai1hReg5/4SX8mzAOsEgJKitma+BLaYfxy5RpWYDerMeM60t2LGObFU?=
+ =?us-ascii?Q?2to+1JY4XVKgvRCiAmzqa3FfVAxJOhfQXSDh2Gmyefq3FuRXmsGW+Jj665W0?=
+ =?us-ascii?Q?BeCdSGblBj/lMP0Jw3Txbk2QEg2iGBVQhcZEhn8IkD1P592X9i7Pj+nUMzQL?=
+ =?us-ascii?Q?oaNYahDfoe4U5W986oGewgjwX0+4HhD8BXnzjv8goLNyIIS5byPlI/NQ6Xno?=
+ =?us-ascii?Q?VRjZbcniAuqVI7NbTjQ+VRSw1vRhapwjpQthVVxWVzmyzYFs3RnRw/nmATDr?=
+ =?us-ascii?Q?Egq2yw8U1K1hQ/98+PtjaBLJiKVgETAN9dey9+BvEz1doLq/3cVhTVg4x/z0?=
+ =?us-ascii?Q?89OaerU5E5V1Yfyqsu0xauO+4Gqni4j3A4GDTuEXebBJcBuswAqIvob/hvYq?=
+ =?us-ascii?Q?FLPCd8qMuNdlFaR+qB3GmITTVLuv44aBUePR5ct82f9TXM72TNEhSrh98h02?=
+ =?us-ascii?Q?DjiAq5yt0bs69ey8CIKUKl5xYf3YkJ98VrCtWmGc5Ra0fLNcUnH9s69JdQ3D?=
+ =?us-ascii?Q?PDWtoD6xyxv3JbbWfdRyQT/2Gp8tMq137WV+5sqgrF3YowoT6JLeecZ8rUU5?=
+ =?us-ascii?Q?53cdpItLRch9RBYqbM3l8zROgmwKSvNJQqOlvT0vVWLj+3WQCImK6Q3rlSAD?=
+ =?us-ascii?Q?tYiSL1HFYbKe3YNcSTqJWE6NFAHkeUw/WKbC6xNG2peldJp4H6HSRHfkL9C4?=
+ =?us-ascii?Q?mMHJJnJIC3ovR5aaG1Vu+6AegzSz9povZ2t9jZJIe+OdgSZckzsDbPuwdggJ?=
+ =?us-ascii?Q?G+CTYxMm9ITHdMAk0Z6KVRzWlWlsUnYOUMb1iEC91EUBqErTNx/lBawiV9uV?=
+ =?us-ascii?Q?Aq/cjSQlKqOozV34UvCN1bLrBBhXYjouUglJ6aWO?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 110d0716-6364-42f4-0141-08dc4770fb99
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 18 Mar 2024 17:29:36.3864
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Xx6ohrrwf/ctCasQ18zUIZM3YqeHJGDKDWRWVCcDCKQtgfeZOh+Q9iBXI6TJAWHkLEYziH0L9aulxla3e5kF9g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7322
 
-On Mon, Mar 18, 2024 at 10:50:49PM +1100, Michael Ellerman wrote:
-> Michael Ellerman <mpe@ellerman.id.au> writes:
-> > Michal Suchánek <msuchanek@suse.de> writes:
-> >> Hello,
-> >>
-> >> I cannot load the wireguard module.
-> >>
-> >> Loading the module provides no diagnostic other than 'No such device'.
-> >>
-> >> Please provide maningful diagnostics for loading software-only driver,
-> >> clearly there is no particular device needed.
-> >
-> > Presumably it's just bubbling up an -ENODEV from somewhere.
-> >
-> > Can you get a trace of it?
-> >
-> > Something like:
-> >
-> >   # trace-cmd record -p function_graph -F modprobe wireguard
-> >
-> > That should probably show where it's bailing out.
-> >
-> >> jostaberry-1:~ # uname -a
-> >> Linux jostaberry-1 6.8.0-lp155.8.g7e0e887-default #1 SMP Wed Mar 13 09:02:21 UTC 2024 (7e0e887) ppc64le ppc64le ppc64le GNU/Linux
-> >> jostaberry-1:~ # modprobe wireguard
-> >> modprobe: ERROR: could not insert 'wireguard': No such device
-> >> jostaberry-1:~ # modprobe -v wireguard
-> >> insmod /lib/modules/6.8.0-lp155.8.g7e0e887-default/kernel/arch/powerpc/crypto/chacha-p10-crypto.ko.zst 
-> >> modprobe: ERROR: could not insert 'wireguard': No such device
-> >  
-> > What machine is this? A Power10?
+On Thu, Mar 14, 2024 at 01:46:01PM +0100, Paolo Abeni wrote:
+> Unrelated to this patch, but more related to the self-test burst this
+> patch landed into: it looks like that since roughly the net-next PR was
+> merged back forwarding debug variant of the vxlan-bridge-1q-ipv6-sh and
+> vxlan-bridge-1d-port-8472-ipv6-sh tests become less stable.
 > 
-> I am able to load the module successfully on a P10 running v6.8.0.
+> IDK if that was due to some glitch in the AWS hosts or what else. Just
+> an head-up.
 
-Of course, it's not a Power10. Otherwise the Power10-specific chacha
-implementation would load.
-
-Thanks
-
-Michal
+Looked into it. The test is sending 100 pings with an interval of 0.1
+seconds and using a timeout of 11 seconds which is borderline,
+especially with a debug kernel. Will bump it to 20 seconds for good
+measures. It won't prolong the test unless something is actually wrong,
+in which case the test will rightfully fail.
 
