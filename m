@@ -1,171 +1,456 @@
-Return-Path: <netdev+bounces-80369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A74687E87A
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 12:22:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8750687E88F
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 12:26:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D0761F22DFF
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 11:22:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6CC61C219BD
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 11:26:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBDEF364BA;
-	Mon, 18 Mar 2024 11:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qY4r/LVk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B097D2EAE0;
+	Mon, 18 Mar 2024 11:26:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90ADB2C85D;
-	Mon, 18 Mar 2024 11:22:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60B06376F4
+	for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 11:26:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710760928; cv=none; b=NKeFCVlmm6Z+DwB7k9Q6AfzW9oCxy0XhNw0T7LDqUpuThuMNAjcgtjPpZM5CKwOEN4HpnZTqmy/g9jORofrzbxULU9jleivYiWt7ibBRGxgvsv5oMsBs69JNJkt7W3w3k+IOBa4LUFEZU2V8b0jddV01mOjSDPjptP+JQAT8YJc=
+	t=1710761185; cv=none; b=RnDNv+IzVrkEkXlzu8Xoj9/3o4JOscgwMDwjWlRq0RzLQMYrC6upnrnlGD+/fUGI5/I87nxpppqOjTe7Wo5dbDusXWgup3Ah92QWxM1F4ipNGU63KpNhZ54a5T3bVP03VUmZGiSTHF1na4G8vCIcv0wsMkaW0ZMknATIaz2Favw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710760928; c=relaxed/simple;
-	bh=0xOr6SIupIgFP91LGldL2VaJn7VG0m94uoYWdc60Zbc=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=fmhZjeI/6Uqgy+4KIDMvSbtq69qEuosUL5w1HMKsi+auF1MKnc1nqMcmfRjBbmhz2GodRQe1csrqOrhckDtPqSO92xweNO23bRrb8zn843PV+ziGb4HZwh63buii2MZVegw9BNOOdt0bf1fVN8/9GTbNno5K4l3ibPBwfHqGWGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qY4r/LVk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3330CC433C7;
-	Mon, 18 Mar 2024 11:22:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710760928;
-	bh=0xOr6SIupIgFP91LGldL2VaJn7VG0m94uoYWdc60Zbc=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=qY4r/LVkNbaubL7kQdZSigdtImRj8XV7gdVH9zytMDfp1G2AiNEsyPFUbcrIq4QxK
-	 PkLeBI3iCml6AstODLC+MCV4ppult4Tf8PxVedJWNjtFFvfTJgPbUS1Ol7XmDeREEU
-	 LTMCLKiajHPHdCHzfRBIEdDx7hzyQRjUjZ/l9Az2dvvNUuy42pMRfhU1nMLv8gdzPH
-	 BQsHP8HdP2xM4ZhWHX8b2dBg+5xHc681xeQ+/HlOLO2ykFQzwK5bdYbffB78SVP/jf
-	 +N7+IWqeRHl8kRQYEd+7Q0EGZypLNUgEKPdQFajjYDvzFHpSwqCqFrlQXJes6BqaSn
-	 pG0RokFnVGEug==
-Message-ID: <5d6688d419f19512a8170ca915ec5825df8f489a.camel@kernel.org>
-Subject: Re: [PATCH RFC 11/24] nfsd: allow DELEGRETURN on directories
-From: Jeff Layton <jlayton@kernel.org>
-To: Trond Myklebust <trondmy@hammerspace.com>, "chuck.lever@oracle.com"
-	 <chuck.lever@oracle.com>
-Cc: "senozhatsky@chromium.org" <senozhatsky@chromium.org>, 
- "sfrench@samba.org" <sfrench@samba.org>, "ecryptfs@vger.kernel.org"
- <ecryptfs@vger.kernel.org>,  "linux-unionfs@vger.kernel.org"
- <linux-unionfs@vger.kernel.org>, "davem@davemloft.net"
- <davem@davemloft.net>,  "viro@zeniv.linux.org.uk"
- <viro@zeniv.linux.org.uk>, "anna@kernel.org" <anna@kernel.org>,
- "jack@suse.cz" <jack@suse.cz>, "tom@talpey.com" <tom@talpey.com>,
- "pabeni@redhat.com" <pabeni@redhat.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>,  "linux-fsdevel@vger.kernel.org"
- <linux-fsdevel@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "ronniesahlberg@gmail.com"
- <ronniesahlberg@gmail.com>, "samba-technical@lists.samba.org"
- <samba-technical@lists.samba.org>, "dhowells@redhat.com"
- <dhowells@redhat.com>,  "Dai.Ngo@oracle.com" <Dai.Ngo@oracle.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "rafael@kernel.org"
- <rafael@kernel.org>, "alex.aring@gmail.com" <alex.aring@gmail.com>, 
- "pc@manguebit.com" <pc@manguebit.com>, "amir73il@gmail.com"
- <amir73il@gmail.com>,  "kolga@netapp.com" <kolga@netapp.com>,
- "sprasad@microsoft.com" <sprasad@microsoft.com>,  "code@tyhicks.com"
- <code@tyhicks.com>, "brauner@kernel.org" <brauner@kernel.org>, 
- "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
- "edumazet@google.com" <edumazet@google.com>,  "linux-cifs@vger.kernel.org"
- <linux-cifs@vger.kernel.org>, "linkinjeon@kernel.org"
- <linkinjeon@kernel.org>,  "neilb@suse.de" <neilb@suse.de>,
- "linux-nfs@vger.kernel.org" <linux-nfs@vger.kernel.org>, 
- "netfs@lists.linux.dev" <netfs@lists.linux.dev>, "miklos@szeredi.hu"
- <miklos@szeredi.hu>
-Date: Mon, 18 Mar 2024 07:22:04 -0400
-In-Reply-To: <d3d8483b1248e4bccadb8591019dbe7c4aeb3d1c.camel@hammerspace.com>
-References: <20240315-dir-deleg-v1-0-a1d6209a3654@kernel.org>
-	 <20240315-dir-deleg-v1-11-a1d6209a3654@kernel.org>
-	 <ZfcHvSEkwIS8-Ytj@manet.1015granger.net>
-	 <d3d8483b1248e4bccadb8591019dbe7c4aeb3d1c.camel@hammerspace.com>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
-	kZWuOsJdJQdmwlWC5L5ln9xgfr/4mOY38B0U=
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1710761185; c=relaxed/simple;
+	bh=u0TxxE57sl9zpLukoJnc8xxdjk77Kx9B137X/yCTzfE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ftLZoFukKCyd1PEmFYwbKyDVd03JePZT9dWVt+gUQujtuL2j7OmmeUH4xWNCWXIRI4+I3YM9rgta8GSo/AtW7hkID73OYw5lIUM23ToAVau6KiE8C/5j0afefxImNKfJ4clfvDdSW/xfexq5wx8DCIKYx5HO0h9HAWzCilHP3T4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7cbf0ebfda8so303977139f.0
+        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 04:26:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710761182; x=1711365982;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=njZzGr49I8wSygjXsyN6z7oUcORyjZVXAR1ZLEn7R4I=;
+        b=Si8xgdACRJgNHpvYPRwQYGOJ8uAWZqtpGXYcIz9knn/nZTPjeg4XYMIjtriXI3wmB8
+         rgMYMG9l4KiLOjbyAAlltjHzSQS6vmCvXm0u1L1+ieVZhj4VyXsnju9HBxOeVmCEoaoH
+         BakIrjwGQO1tYGV35CyZ/1+WMQZaZaCI3diJGm2136+tGLH0gFrXkMdhHsGvZZpSS8iV
+         nWi/Mbfxz1no0lCF3PSMjV3bys8Cx/VnGKmnOOnYgBeGW4rjeur6NifqlQALibK9VCUn
+         0IhDQkZZebeAorgO/ehrCYbcgYNeVJP3DvyfUv2GdZ/FOOa+eUVoSaqP8z3g7MwOke+Z
+         H4OQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVj2CKcGO2ZDFsFI9L0/CJZinuG5FY+YSGzc7uWUu0GsxZlAMp7nBMSFyBOZIOBeb7T/J1ltrGhHuZRG6H96Na89PCJHSs0
+X-Gm-Message-State: AOJu0YzCs3S/1zAJqUwi/rRKpxLzJ2l06J9Qgmf/wh42pv4Ml7AYI8LU
+	YV240PzYFHuZ5+UmqojoNqpRGNo4jZTjs8X2MpiH9t650aahXsd2gbU1yI9e7pdthcC6y5UOmEU
+	QfFUZTECrhUFJ2RHm9EZoeBoKaplmpI+x0QQvvjQt2B59b8608NmV3JM=
+X-Google-Smtp-Source: AGHT+IF0hvkzCMV6XagO3cNBasVSK9AM2PUCs5HCW/MJJ88g26RNpUYmIPVh9UA10bN/G7onduDgvPeDarq5WsaQpus2q45/6m4G
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Received: by 2002:a05:6638:168e:b0:476:7265:9bfc with SMTP id
+ f14-20020a056638168e00b0047672659bfcmr599126jat.6.1710761182525; Mon, 18 Mar
+ 2024 04:26:22 -0700 (PDT)
+Date: Mon, 18 Mar 2024 04:26:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000009485160613eda067@google.com>
+Subject: [syzbot] [net?] INFO: task hung in register_nexthop_notifier (3)
+From: syzbot <syzbot+99b8125966713aa4b0c3@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sun, 2024-03-17 at 16:03 +0000, Trond Myklebust wrote:
-> On Sun, 2024-03-17 at 11:09 -0400, Chuck Lever wrote:
-> > On Fri, Mar 15, 2024 at 12:53:02PM -0400, Jeff Layton wrote:
-> > > fh_verify only allows you to filter on a single type of inode, so
-> > > have
-> > > nfsd4_delegreturn not filter by type. Once fh_verify returns, do
-> > > the
-> > > appropriate check of the type and return an error if it's not a
-> > > regular
-> > > file or directory.
-> > >=20
-> > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> > > ---
-> > > =A0fs/nfsd/nfs4state.c | 14 +++++++++++++-
-> > > =A01 file changed, 13 insertions(+), 1 deletion(-)
-> > >=20
-> > > diff --git a/fs/nfsd/nfs4state.c b/fs/nfsd/nfs4state.c
-> > > index 17d09d72632b..c52e807f9672 100644
-> > > --- a/fs/nfsd/nfs4state.c
-> > > +++ b/fs/nfsd/nfs4state.c
-> > > @@ -7425,12 +7425,24 @@ nfsd4_delegreturn(struct svc_rqst *rqstp,
-> > > struct nfsd4_compound_state *cstate,
-> > > =A0	struct nfs4_delegation *dp;
-> > > =A0	stateid_t *stateid =3D &dr->dr_stateid;
-> > > =A0	struct nfs4_stid *s;
-> > > +	umode_t mode;
-> > > =A0	__be32 status;
-> > > =A0	struct nfsd_net *nn =3D net_generic(SVC_NET(rqstp),
-> > > nfsd_net_id);
-> > > =A0
-> > > -	if ((status =3D fh_verify(rqstp, &cstate->current_fh,
-> > > S_IFREG, 0)))
-> > > +	if ((status =3D fh_verify(rqstp, &cstate->current_fh, 0,
-> > > 0)))
-> > > =A0		return status;
-> > > =A0
-> > > +	mode =3D d_inode(cstate->current_fh.fh_dentry)->i_mode &
-> > > S_IFMT;
-> > > +	switch(mode) {
-> > > +	case S_IFREG:
-> > > +	case S_IFDIR:
-> > > +		break;
-> > > +	case S_IFLNK:
-> > > +		return nfserr_symlink;
-> > > +	default:
-> > > +		return nfserr_inval;
-> > > +	}
-> > > +
-> >=20
-> > RFC 8881 Section 15.2 does not list NFS4ERR_SYMLINK among the
-> > valid status codes for the DELEGRETURN operation. Maybe the naked
-> > fh_verify() call has gotten it wrong all these years...?
->=20
-> The WANT_DELEGATION operation allows the server to hand out delegations
-> for aggressive caching of symlinks. It is not an error to return that
-> delegation using DELEGRETURN.
->=20
-> Furthermore, provided that the presented stateid is actually valid, it
-> is also sufficient to uniquely identify the file to which it is
-> associated (see RFC8881 Section 8.2.4), so the filehandle should be
-> considered mostly irrelevant for operations like DELEGRETURN.
->=20
+Hello,
 
-Ok. I think we can probably just drop the switch altogether. We already
-don't validate that the stateid is associated with current_fh, AFAICT.
-It looks possible to send a valid stateid alongside an FH that refers to
-a completely different file, and we'll just accept it.
+syzbot found the following issue on:
 
---=20
-Jeff Layton <jlayton@kernel.org>
+HEAD commit:    76839e2f1fde net/packet: Add getsockopt support for PACKET..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=10c38e3e180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=63afafeedf00ef8f
+dashboard link: https://syzkaller.appspot.com/bug?extid=99b8125966713aa4b0c3
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/1fdcc43b8d91/disk-76839e2f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/7710da23cc3a/vmlinux-76839e2f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2b8715f33de4/bzImage-76839e2f.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+99b8125966713aa4b0c3@syzkaller.appspotmail.com
+
+INFO: task syz-executor.3:6975 blocked for more than 143 seconds.
+      Not tainted 6.8.0-rc7-syzkaller-02500-g76839e2f1fde #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.3  state:D stack:20920 pid:6975  tgid:6975  ppid:1      flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5400 [inline]
+ __schedule+0x17d1/0x49f0 kernel/sched/core.c:6727
+ __schedule_loop kernel/sched/core.c:6802 [inline]
+ schedule+0x149/0x260 kernel/sched/core.c:6817
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6874
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a3/0xd70 kernel/locking/mutex.c:752
+ register_nexthop_notifier+0x84/0x290 net/ipv4/nexthop.c:3863
+ nsim_fib_create+0x8a6/0xa70 drivers/net/netdevsim/fib.c:1587
+ nsim_drv_probe+0x747/0xb80 drivers/net/netdevsim/dev.c:1582
+ really_probe+0x29e/0xc50 drivers/base/dd.c:658
+ __driver_probe_device+0x1a2/0x3e0 drivers/base/dd.c:800
+ driver_probe_device+0x50/0x430 drivers/base/dd.c:830
+ __device_attach_driver+0x2d6/0x530 drivers/base/dd.c:958
+ bus_for_each_drv+0x24e/0x2e0 drivers/base/bus.c:457
+ __device_attach+0x333/0x520 drivers/base/dd.c:1030
+ bus_probe_device+0x189/0x260 drivers/base/bus.c:532
+ device_add+0x8ff/0xca0 drivers/base/core.c:3639
+ nsim_bus_dev_new drivers/net/netdevsim/bus.c:442 [inline]
+ new_device_store+0x3f2/0x890 drivers/net/netdevsim/bus.c:173
+ kernfs_fop_write_iter+0x3a4/0x500 fs/kernfs/file.c:334
+ call_write_iter include/linux/fs.h:2087 [inline]
+ new_sync_write fs/read_write.c:497 [inline]
+ vfs_write+0xa81/0xcb0 fs/read_write.c:590
+ ksys_write+0x1a0/0x2c0 fs/read_write.c:643
+ do_syscall_64+0xf9/0x240
+ entry_SYSCALL_64_after_hwframe+0x6f/0x77
+RIP: 0033:0x7f12ecc7caef
+RSP: 002b:00007ffd6d32df00 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007f12ecc7caef
+RDX: 0000000000000003 RSI: 00007ffd6d32df50 RDI: 0000000000000005
+RBP: 00007f12eccca045 R08: 0000000000000000 R09: 00007ffd6d32dd57
+R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000003
+R13: 00007ffd6d32df50 R14: 00007f12ed8d4620 R15: 0000000000000003
+ </TASK>
+INFO: task syz-executor.2:7486 blocked for more than 143 seconds.
+      Not tainted 6.8.0-rc7-syzkaller-02500-g76839e2f1fde #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.2  state:D stack:26768 pid:7486  tgid:7483  ppid:5094   flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5400 [inline]
+ __schedule+0x17d1/0x49f0 kernel/sched/core.c:6727
+ __schedule_loop kernel/sched/core.c:6802 [inline]
+ schedule+0x149/0x260 kernel/sched/core.c:6817
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6874
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a3/0xd70 kernel/locking/mutex.c:752
+ rtnl_lock net/core/rtnetlink.c:79 [inline]
+ rtnetlink_rcv_msg+0x842/0x10d0 net/core/rtnetlink.c:6592
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x8e0/0xcb0 net/netlink/af_netlink.c:1905
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+ do_syscall_64+0xf9/0x240
+ entry_SYSCALL_64_after_hwframe+0x6f/0x77
+RIP: 0033:0x7f406d87dda9
+RSP: 002b:00007f406e5dd0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f406d9abf80 RCX: 00007f406d87dda9
+RDX: 0000000000000000 RSI: 0000000020000140 RDI: 0000000000000003
+RBP: 00007f406d8ca47a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f406d9abf80 R15: 00007ffe1ff0e4a8
+ </TASK>
+INFO: task syz-executor.0:7485 blocked for more than 144 seconds.
+      Not tainted 6.8.0-rc7-syzkaller-02500-g76839e2f1fde #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.0  state:D stack:26768 pid:7485  tgid:7484  ppid:5093   flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5400 [inline]
+ __schedule+0x17d1/0x49f0 kernel/sched/core.c:6727
+ __schedule_loop kernel/sched/core.c:6802 [inline]
+ schedule+0x149/0x260 kernel/sched/core.c:6817
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6874
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a3/0xd70 kernel/locking/mutex.c:752
+ rtnl_lock net/core/rtnetlink.c:79 [inline]
+ rtnetlink_rcv_msg+0x842/0x10d0 net/core/rtnetlink.c:6592
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x8e0/0xcb0 net/netlink/af_netlink.c:1905
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+ do_syscall_64+0xf9/0x240
+ entry_SYSCALL_64_after_hwframe+0x6f/0x77
+RIP: 0033:0x7f7143c7dda9
+RSP: 002b:00007f714491f0c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f7143dabf80 RCX: 00007f7143c7dda9
+RDX: 0000000000000000 RSI: 0000000020000140 RDI: 0000000000000003
+RBP: 00007f7143cca47a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007f7143dabf80 R15: 00007ffe6918ff78
+ </TASK>
+INFO: task syz-executor.4:7489 blocked for more than 144 seconds.
+      Not tainted 6.8.0-rc7-syzkaller-02500-g76839e2f1fde #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.4  state:D stack:25520 pid:7489  tgid:7488  ppid:5107   flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5400 [inline]
+ __schedule+0x17d1/0x49f0 kernel/sched/core.c:6727
+ __schedule_loop kernel/sched/core.c:6802 [inline]
+ schedule+0x149/0x260 kernel/sched/core.c:6817
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6874
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a3/0xd70 kernel/locking/mutex.c:752
+ ieee802154_nl_fill_phy+0xf2/0x790 net/ieee802154/nl-phy.c:45
+ ieee802154_dump_phy_iter+0x110/0x200 net/ieee802154/nl-phy.c:129
+ class_for_each_device+0x262/0x380 drivers/base/class.c:404
+ wpan_phy_for_each+0xbf/0x100 net/ieee802154/core.c:62
+ ieee802154_dump_phy+0x160/0x290 net/ieee802154/nl-phy.c:154
+ genl_dumpit+0x107/0x1a0 net/netlink/genetlink.c:1025
+ netlink_dump+0x6ff/0xe50 net/netlink/af_netlink.c:2269
+ __netlink_dump_start+0x59d/0x780 net/netlink/af_netlink.c:2386
+ genl_family_rcv_msg_dumpit net/netlink/genetlink.c:1074 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1190 [inline]
+ genl_rcv_msg+0x88c/0xec0 net/netlink/genetlink.c:1208
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x8e0/0xcb0 net/netlink/af_netlink.c:1905
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ ____sys_sendmsg+0x525/0x7d0 net/socket.c:2584
+ ___sys_sendmsg net/socket.c:2638 [inline]
+ __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2667
+ do_syscall_64+0xf9/0x240
+ entry_SYSCALL_64_after_hwframe+0x6f/0x77
+RIP: 0033:0x7fdbb3e7dda9
+RSP: 002b:00007fdbb4b300c8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007fdbb3fabf80 RCX: 00007fdbb3e7dda9
+RDX: 0000000000000000 RSI: 00000000200001c0 RDI: 0000000000000004
+RBP: 00007fdbb3eca47a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007fdbb3fabf80 R15: 00007ffc0809fb68
+ </TASK>
+INFO: task syz-executor.1:7491 blocked for more than 145 seconds.
+      Not tainted 6.8.0-rc7-syzkaller-02500-g76839e2f1fde #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.1  state:D stack:27536 pid:7491  tgid:7490  ppid:6204   flags:0x00004006
+Call Trace:
+ <TASK>
+ context_switch kernel/sched/core.c:5400 [inline]
+ __schedule+0x17d1/0x49f0 kernel/sched/core.c:6727
+ __schedule_loop kernel/sched/core.c:6802 [inline]
+ schedule+0x149/0x260 kernel/sched/core.c:6817
+ schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6874
+ __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+ __mutex_lock+0x6a3/0xd70 kernel/locking/mutex.c:752
+ genl_lock net/netlink/genetlink.c:33 [inline]
+ genl_op_lock net/netlink/genetlink.c:58 [inline]
+ genl_rcv_msg+0x121/0xec0 net/netlink/genetlink.c:1207
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2559
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1217
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0x7ea/0x980 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x8e0/0xcb0 net/netlink/af_netlink.c:1905
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:745
+ __sys_sendto+0x3a4/0x4f0 net/socket.c:2191
+ __do_sys_sendto net/socket.c:2203 [inline]
+ __se_sys_sendto net/socket.c:2199 [inline]
+ __x64_sys_sendto+0xde/0x100 net/socket.c:2199
+ do_syscall_64+0xf9/0x240
+ entry_SYSCALL_64_after_hwframe+0x6f/0x77
+RIP: 0033:0x7f13f947fa9c
+RSP: 002b:00007f13fa1eef60 EFLAGS: 00000293 ORIG_RAX: 000000000000002c
+RAX: ffffffffffffffda RBX: 00007f13fa1ef050 RCX: 00007f13f947fa9c
+RDX: 0000000000000020 RSI: 00007f13fa1ef0a0 RDI: 0000000000000004
+RBP: 0000000000000000 R08: 00007f13fa1eefb4 R09: 000000000000000c
+R10: 0000000000000000 R11: 0000000000000293 R12: 0000000000000004
+R13: 00007f13fa1ef008 R14: 00007f13fa1ef0a0 R15: 0000000000000000
+ </TASK>
+
+Showing all locks held in the system:
+2 locks held by kworker/u4:1/12:
+1 lock held by khungtaskd/29:
+ #0: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #0: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+ #0: ffffffff8e130be0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x55/0x2a0 kernel/locking/lockdep.c:6614
+2 locks held by getty/4820:
+ #0: ffff888029f0d0a0 (&tty->ldisc_sem){++++}-{0:0}, at: tty_ldisc_ref_wait+0x25/0x70 drivers/tty/tty_ldisc.c:243
+ #1: ffffc90002f062f0 (&ldata->atomic_read_lock){+.+.}-{3:3}, at: n_tty_read+0x6b4/0x1e10 drivers/tty/n_tty.c:2201
+5 locks held by kworker/u4:7/23559:
+ #0: ffff888015ea4938 ((wq_completion)netns){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2608 [inline]
+ #0: ffff888015ea4938 ((wq_completion)netns){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2706
+ #1: ffffc90012b8fd20 (net_cleanup_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2608 [inline]
+ #1: ffffc90012b8fd20 (net_cleanup_work){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2706
+ #2: ffffffff8f36d250 (pernet_ops_rwsem){++++}-{3:3}, at: cleanup_net+0x16a/0xcc0 net/core/net_namespace.c:591
+ #3: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: cleanup_net+0x6af/0xcc0 net/core/net_namespace.c:627
+ #4: ffffffff8e136440 (rcu_state.barrier_mutex){+.+.}-{3:3}, at: rcu_barrier+0x4c/0x550 kernel/rcu/tree.c:4064
+1 lock held by syz-executor.3/895:
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers/net/tun.c:698 [inline]
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3e/0x1b0 drivers/net/tun.c:3498
+1 lock held by syz-executor.3/2766:
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers/net/tun.c:698 [inline]
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3e/0x1b0 drivers/net/tun.c:3498
+1 lock held by syz-executor.3/4747:
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: tun_detach drivers/net/tun.c:698 [inline]
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: tun_chr_close+0x3e/0x1b0 drivers/net/tun.c:3498
+7 locks held by syz-executor.3/6975:
+ #0: ffff888029d6a420 (sb_writers#8){.+.+}-{0:0}, at: file_start_write include/linux/fs.h:2794 [inline]
+ #0: ffff888029d6a420 (sb_writers#8){.+.+}-{0:0}, at: vfs_write+0x233/0xcb0 fs/read_write.c:586
+ #1: ffff88809c7ab888 (&of->mutex){+.+.}-{3:3}, at: kernfs_fop_write_iter+0x1eb/0x500 fs/kernfs/file.c:325
+ #2: ffff888021caba00 (kn->active#51){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x20f/0x500 fs/kernfs/file.c:326
+ #3: ffffffff8ecb8508 (nsim_bus_dev_list_lock){+.+.}-{3:3}, at: new_device_store+0x1b4/0x890 drivers/net/netdevsim/bus.c:166
+ #4: ffff88809acf50e8 (&dev->mutex){....}-{3:3}, at: device_lock include/linux/device.h:990 [inline]
+ #4: ffff88809acf50e8 (&dev->mutex){....}-{3:3}, at: __device_attach+0x8e/0x520 drivers/base/dd.c:1005
+ #5: ffff88809acf0250 (&devlink->lock_key#7){+.+.}-{3:3}, at: nsim_drv_probe+0xcb/0xb80 drivers/net/netdevsim/dev.c:1534
+ #6: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: register_nexthop_notifier+0x84/0x290 net/ipv4/nexthop.c:3863
+1 lock held by syz-executor.2/7486:
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x842/0x10d0 net/core/rtnetlink.c:6592
+1 lock held by syz-executor.0/7485:
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x842/0x10d0 net/core/rtnetlink.c:6592
+4 locks held by syz-executor.4/7489:
+ #0: ffffffff8f3de3b0 (cb_lock){++++}-{3:3}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1216
+ #1: ffff88808f3dd678 (nlk_cb_mutex-GENERIC){+.+.}-{3:3}, at: __netlink_dump_start+0x119/0x780 net/netlink/af_netlink.c:2350
+ #2: ffffffff8f3de268 (genl_mutex){+.+.}-{3:3}, at: genl_lock net/netlink/genetlink.c:33 [inline]
+ #2: ffffffff8f3de268 (genl_mutex){+.+.}-{3:3}, at: genl_op_lock net/netlink/genetlink.c:58 [inline]
+ #2: ffffffff8f3de268 (genl_mutex){+.+.}-{3:3}, at: genl_dumpit+0xd6/0x1a0 net/netlink/genetlink.c:1024
+ #3: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: ieee802154_nl_fill_phy+0xf2/0x790 net/ieee802154/nl-phy.c:45
+2 locks held by syz-executor.1/7491:
+ #0: ffffffff8f3de3b0 (cb_lock){++++}-{3:3}, at: genl_rcv+0x19/0x40 net/netlink/genetlink.c:1216
+ #1: ffffffff8f3de268 (genl_mutex){+.+.}-{3:3}, at: genl_lock net/netlink/genetlink.c:33 [inline]
+ #1: ffffffff8f3de268 (genl_mutex){+.+.}-{3:3}, at: genl_op_lock net/netlink/genetlink.c:58 [inline]
+ #1: ffffffff8f3de268 (genl_mutex){+.+.}-{3:3}, at: genl_rcv_msg+0x121/0xec0 net/netlink/genetlink.c:1207
+3 locks held by kworker/u4:0/7496:
+ #0: ffff88802998bd38 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2608 [inline]
+ #0: ffff88802998bd38 ((wq_completion)ipv6_addrconf){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2706
+ #1: ffffc9000314fd20 ((work_completion)(&(&net->ipv6.addr_chk_work)->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2608 [inline]
+ #1: ffffc9000314fd20 ((work_completion)(&(&net->ipv6.addr_chk_work)->work)){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2706
+ #2: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: addrconf_verify_work+0x19/0x30 net/ipv6/addrconf.c:4731
+1 lock held by syz-executor.0/7498:
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x842/0x10d0 net/core/rtnetlink.c:6592
+1 lock held by syz-executor.4/7505:
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x842/0x10d0 net/core/rtnetlink.c:6592
+1 lock held by syz-executor.1/7506:
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x842/0x10d0 net/core/rtnetlink.c:6592
+1 lock held by syz-executor.2/7509:
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x842/0x10d0 net/core/rtnetlink.c:6592
+1 lock held by syz-executor.3/7516:
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x842/0x10d0 net/core/rtnetlink.c:6592
+1 lock held by syz-executor.0/7528:
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x842/0x10d0 net/core/rtnetlink.c:6592
+1 lock held by syz-executor.4/7533:
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x842/0x10d0 net/core/rtnetlink.c:6592
+1 lock held by syz-executor.1/7537:
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x842/0x10d0 net/core/rtnetlink.c:6592
+1 lock held by syz-executor.2/7539:
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x842/0x10d0 net/core/rtnetlink.c:6592
+1 lock held by syz-executor.3/7543:
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
+ #0: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x842/0x10d0 net/core/rtnetlink.c:6592
+
+=============================================
+
+NMI backtrace for cpu 0
+CPU: 0 PID: 29 Comm: khungtaskd Not tainted 6.8.0-rc7-syzkaller-02500-g76839e2f1fde #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
+ nmi_cpu_backtrace+0x49c/0x4d0 lib/nmi_backtrace.c:113
+ nmi_trigger_cpumask_backtrace+0x198/0x320 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:160 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:222 [inline]
+ watchdog+0xfaf/0xff0 kernel/hung_task.c:379
+ kthread+0x2ef/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1b/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
+Sending NMI from CPU 0 to CPUs 1:
+NMI backtrace for cpu 1
+CPU: 1 PID: 12 Comm: kworker/u4:1 Not tainted 6.8.0-rc7-syzkaller-02500-g76839e2f1fde #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+Workqueue: bat_events batadv_nc_worker
+RIP: 0010:bytes_is_nonzero mm/kasan/generic.c:89 [inline]
+RIP: 0010:memory_is_nonzero mm/kasan/generic.c:104 [inline]
+RIP: 0010:memory_is_poisoned_n mm/kasan/generic.c:129 [inline]
+RIP: 0010:memory_is_poisoned mm/kasan/generic.c:161 [inline]
+RIP: 0010:check_region_inline mm/kasan/generic.c:180 [inline]
+RIP: 0010:kasan_check_range+0x8c/0x290 mm/kasan/generic.c:189
+Code: 3c 31 4c 89 fd 4c 29 dd 48 83 fd 10 7f 29 48 85 ed 0f 84 3e 01 00 00 4c 89 cd 48 f7 d5 48 01 dd 41 80 3b 00 0f 85 c9 01 00 00 <49> ff c3 48 ff c5 75 ee e9 1e 01 00 00 45 89 dc 41 83 e4 07 0f 84
+RSP: 0018:ffffc90000117860 EFLAGS: 00000046
+RAX: 0000000000000001 RBX: 1ffffffff259469f RCX: ffffffff81713084
+RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffffffff92ca34f8
+RBP: ffffffffffffffff R08: ffffffff92ca34ff R09: 1ffffffff259469f
+R10: dffffc0000000000 R11: fffffbfff259469f R12: ffff888016ead940
+R13: ffff888016ead940 R14: dffffc0000000001 R15: fffffbfff25946a0
+FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000c00b564de0 CR3: 000000000df32000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <NMI>
+ </NMI>
+ <TASK>
+ instrument_atomic_read include/linux/instrumented.h:68 [inline]
+ _test_bit include/asm-generic/bitops/instrumented-non-atomic.h:141 [inline]
+ hlock_class kernel/locking/lockdep.c:228 [inline]
+ __lock_acquire+0x1264/0x1fd0 kernel/locking/lockdep.c:5134
+ lock_acquire+0x1e3/0x530 kernel/locking/lockdep.c:5754
+ __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+ _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
+ spin_lock_bh include/linux/spinlock.h:356 [inline]
+ batadv_nc_purge_paths+0xe8/0x3b0 net/batman-adv/network-coding.c:442
+ batadv_nc_worker+0x365/0x610 net/batman-adv/network-coding.c:722
+ process_one_work kernel/workqueue.c:2633 [inline]
+ process_scheduled_works+0x913/0x1420 kernel/workqueue.c:2706
+ worker_thread+0xa5f/0x1000 kernel/workqueue.c:2787
+ kthread+0x2ef/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1b/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
