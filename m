@@ -1,110 +1,104 @@
-Return-Path: <netdev+bounces-80485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8462D87F1DE
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 22:14:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FF8E87F228
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 22:30:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A9B01F223C6
-	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 21:14:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C965282A29
+	for <lists+netdev@lfdr.de>; Mon, 18 Mar 2024 21:30:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030B358AC3;
-	Mon, 18 Mar 2024 21:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE67458ABE;
+	Mon, 18 Mar 2024 21:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="c7KQe2Yv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HZ6UiNf0"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94EA226AC7;
-	Mon, 18 Mar 2024 21:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2B2958233;
+	Mon, 18 Mar 2024 21:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710796463; cv=none; b=XSnS9NFuo0AFwhAeBwa68iV3Rim/2GsfJeBt9zvJ/HXvCJcRZdcjW+J6q1LABrRgFIQGnqtgjSSr+8GEl2llmcP78fsO/ZZev62PhZ9oJBI8SqRcDQ20AT6ZaS+I9PMRAUvaU+w4RoFs5UdWCuYDViBMZt3YxVg2FkraG88AoUg=
+	t=1710797428; cv=none; b=nHEviqa6ptqRQ0zGd1gwXoeNTfB84VsE0HUPWU+ejt80kkVCA0c0u0uTZ8r2D/QDcAJr0CDYjnw3eYdaGLKsbjYbCO7vPXVpP+o2b9nKFIt/7ADPEWnhN43NhA6NugMzzOdiBdiFCWW+X8BHD7BuMU3FydtBh7nPKVqSmxeN03g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710796463; c=relaxed/simple;
-	bh=aJ6CjiZF2hyXHtQozMRnoONYsxKu8VHkBvwiL9mDz1k=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=o6gvSVJlWce0gpjTnV+wtgqaajpRjtO1UFLg0cGsh/M79aMvEabOBfnXZR1/koi1/TujBTi5JIUdxusoVuyZTOorXWU16fDADdzkdsGp5NrYwJfjWhLDSUKCDNPNpFYtvl80lTNgviI74Ji6jU/o54fhLrPbJskrK4rxFFsiR5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=c7KQe2Yv; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1710796455;
-	bh=deHKErowfgRjzg+BZICm3hY4w6A10J4cfRkkakLoAPA=;
-	h=Date:From:To:Cc:Subject:From;
-	b=c7KQe2YvEOCL6E9r6+p+Qn2T77an8mLLJkDSt4dX1LB/NuAD4ET5zN0/6MpOwhN5j
-	 AbNU2UCZKgqzlEtZquF00rww6miOJdmokjTQ+HlXZJ57RBj+lO21d72JB+ikkomX4n
-	 Ofhg9FeUh9iMivPCqdXBYE8Ts/QhLXBSWZ1hN/Sbz6/srY4Ttf0x0yD3u761y8PvuG
-	 PJnIke4Js7xCN8C0fBeJz/ExbKI56voBP2yi5WZFWoU79EsqjXjMXfyLeCauhaf4lC
-	 3TC811ZLdX7gJJrNiLzAoBHmHnUZxHtgURqXQ/vp5pAXOxsYWCHn6sjM3zXxzkeD4U
-	 wMLbR28iv/zYA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Tz6zp5FTHz4wb0;
-	Tue, 19 Mar 2024 08:14:14 +1100 (AEDT)
-Date: Tue, 19 Mar 2024 08:14:12 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Networking <netdev@vger.kernel.org>
-Cc: Herve Codina <herve.codina@bootlin.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: Fixes tag needs some work in the net tree
-Message-ID: <20240319081412.750b896d@canb.auug.org.au>
+	s=arc-20240116; t=1710797428; c=relaxed/simple;
+	bh=IQfDhlfXgR0M/YJ+genNdqvBkoyI4XQyUz4tYdGuLbQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qJ8+Xf64DWcnuehXQelc2/84hHW9sWQHWEroJDU404qkTshHqfJ8WGpmJgI5keBui6wmUuzLokbdsLOOCYuBmKxMZGzo5x/Clbm0ykUJuK1v5O0NW+mwcCfrJLF+6d7/m5I5xGwVtAzFJLJ6xSobN3uoCA8Aa0QtnSCMF2NHDxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HZ6UiNf0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2D717C433C7;
+	Mon, 18 Mar 2024 21:30:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710797428;
+	bh=IQfDhlfXgR0M/YJ+genNdqvBkoyI4XQyUz4tYdGuLbQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=HZ6UiNf06eWxfyjbW/dbD0mCoYbrtc8CEQdqotsIZg1rPamGZEWJSgiUY8iDg8Ipc
+	 iOQp9jsSIvSKfHN3aSLZVfayfXkcXrVqDucLu1dkf5yeCs1eCnW+yexKCgNJQNrDdf
+	 I/v5CgFITSDH4k87C/+tTf4T7jzXbk+NNGwV1ZqttnRRwxvlRo49/sA8HIfIO/TKA7
+	 uUm72egu10qBnR6w5pehRMfQDYMAkMclvM7u89pSqVCjxS+SArR38rQ4dQKMxpVWEZ
+	 5l+68AAuJSHscbhVFoGW86pz8UV+QxWK1nHDKD22Y/2STmvpTFTPor97i7NESPSTnS
+	 g5PUKrRqniR6g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 189021466CEB;
+	Mon, 18 Mar 2024 21:30:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/gt63zEmlVLcvl=VnbfYvrc9";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next v4 1/2] bpf: Remove arch_unprotect_bpf_trampoline()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171079742809.5361.11333101875277498978.git-patchwork-notify@kernel.org>
+Date: Mon, 18 Mar 2024 21:30:28 +0000
+References: <42c635bb54d3af91db0f9b85d724c7c290069f67.1710574353.git.christophe.leroy@csgroup.eu>
+In-Reply-To: <42c635bb54d3af91db0f9b85d724c7c290069f67.1710574353.git.christophe.leroy@csgroup.eu>
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@google.com, haoluo@google.com, jolsa@kernel.org, zlim.lnx@gmail.com,
+ catalin.marinas@arm.com, will@kernel.org, davem@davemloft.net,
+ dsahern@kernel.org, tglx@linutronix.de, mingo@redhat.com, bp@alien8.de,
+ dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
+ thinker.li@gmail.com, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 
---Sig_/gt63zEmlVLcvl=VnbfYvrc9
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hello:
 
-Hi all,
+This series was applied to bpf/bpf-next.git (master)
+by Martin KaFai Lau <martin.lau@kernel.org>:
 
-In commit
+On Sat, 16 Mar 2024 08:35:40 +0100 you wrote:
+> Last user of arch_unprotect_bpf_trampoline() was removed by
+> commit 187e2af05abe ("bpf: struct_ops supports more than one page for
+> trampolines.")
+> 
+> Remove arch_unprotect_bpf_trampoline()
+> 
+> Reported-by: Daniel Borkmann <daniel@iogearbox.net>
+> Fixes: 187e2af05abe ("bpf: struct_ops supports more than one page for trampolines.")
+> Signed-off-by: Christophe Leroy <christophe.leroy@csgroup.eu>
+> 
+> [...]
 
-  badc9e33c795 ("net: wan: fsl_qmc_hdlc: Fix module compilation")
+Here is the summary with links:
+  - [bpf-next,v4,1/2] bpf: Remove arch_unprotect_bpf_trampoline()
+    https://git.kernel.org/bpf/bpf-next/c/e3362acd7967
+  - [bpf-next,v4,2/2] bpf: Check return from set_memory_rox()
+    https://git.kernel.org/bpf/bpf-next/c/c733239f8f53
 
-Fixes tag
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  Fixes: b40f00ecd463 ("net: wan: Add support for QMC HDLC")
 
-has these problem(s):
-
-  - Target SHA1 does not exist
-
-Maybe you meant
-
-Fixes: d0f2258e79fd ("net: wan: Add support for QMC HDLC")
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/gt63zEmlVLcvl=VnbfYvrc9
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmX4rqQACgkQAVBC80lX
-0GzSHwf/Xua2r0nzT62DVFbLZHPIkQKpZ7Y2+HoQGVv2y6FlW9gEK4VwVF1QuhxL
-ZAjWqcMW4pIUc6t1jdiCEhn8r/l3kkpL9Ps4GebHcGeKCGhl6uQ9B5DzkKZteRnv
-0akJDOvIWkJqd8IwW14oIjXdl6bXyDNVW5pP81dkcLgn0kzEAsTxlX6DqUpLfAGT
-wV3d6p/0nKumOorY5uPz2vmXo/sLjJT3vh8zYo4Zx1onkCnIXLKjTNQRL8ozrEI2
-kdf9vSfu5UZMrQVRKFtDMxMsIpQBqv6QbMJFeD5CytH2MnZLwErXPOGc4XZTKD3z
-ok4FUDb5H2vqbILVYtemxfoQ7WuPPw==
-=6KH0
------END PGP SIGNATURE-----
-
---Sig_/gt63zEmlVLcvl=VnbfYvrc9--
 
