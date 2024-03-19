@@ -1,103 +1,76 @@
-Return-Path: <netdev+bounces-80570-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8266887FD56
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:06:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 76E3E87FCC2
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:25:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B51771C21DE1
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:06:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A83B41C22636
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 11:25:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072A57F487;
-	Tue, 19 Mar 2024 12:06:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OhbfgXul"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A39F77E792;
+	Tue, 19 Mar 2024 11:25:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC49F7CF03;
-	Tue, 19 Mar 2024 12:06:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54BF17CF03;
+	Tue, 19 Mar 2024 11:25:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710849990; cv=none; b=ZPTSNKGSJAdsw81kq8yQrvnVOzn3/cF9FTx/fNh9yt53syq4qX5ydIqJykAgiBOpInHhuz7J10MSRq8QJCFyOJZ8XbpsYtSQ8feE6uS/XEVZK4UkiOPCRAnRKaOeknsa4He/WK0PY6nEIIF9Eu8A/7MY7TcdWzf+3xQtLvslgqA=
+	t=1710847526; cv=none; b=sTG1Qk0ag1SqgS/8HbawA8UIip650P6CKD0/G6c0JYzxrw8ClzRwp+CagjURt+jmg6SOGaKhszPnqxgCq52cYslDXXaLeqV8ukyTBCeEuYEDoqohGALkJF23RC/BTMvLVgEBdYtfDVeJ5QZBjogMIU2HZVzprex6vipOeVJUHjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710849990; c=relaxed/simple;
-	bh=bKAtYoJBSuOHQQgagWmINKfaNalyupmW9O/fQEj1bpU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=udAZpKio6v/Sg9sCqMCkqaUSpa1fcqIp8IBjB7uZkNq9YTog5gKckdkMyvqVWrijUfut2R9VvBmVE/G9nn0AqFjaLqavhKF+2JeOseUmzIQotouIG2gTOP/i0Nolui4j46UyxypVZJfzUOzj8L9EXMj/eTqGVQm3ihTCMb6g1T8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OhbfgXul; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C8EEC433C7;
-	Tue, 19 Mar 2024 12:06:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710849990;
-	bh=bKAtYoJBSuOHQQgagWmINKfaNalyupmW9O/fQEj1bpU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=OhbfgXulU9Vp/bUvWbaxfDXAhUEcinY86e4TwFGgQJ6blxtPoaurjvKQ0SnYRRWtQ
-	 kuR11qwDUoedyVx8C+mpDPig/xhGx3aoImViOGVVeceWhsF3+KG/UL6CwLnAIcTu0B
-	 ZtAJEn4LqNwQdJ5ENR7imp+3TVYEX+QLH//T3fI0jjsaTzjCS9DLN7DvtNUZ0KS8MU
-	 gftWI4E4vRvavKX+lvaoXMnNrDWi+mtNooOjDTawtwgfzBrsg8qREx+DSuyG7929S8
-	 R7zRfxQoFDPq8kHRtPGsAq4g64oYJRyMvB7PpfmrHX7KBEt2NArekMXI3WgMOCVGBx
-	 8LpY1IZfFpsXA==
-Date: Tue, 19 Mar 2024 12:06:25 +0000
-From: Simon Horman <horms@kernel.org>
-To: Francesco Valla <valla.francesco@gmail.com>
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	fabio@redaril.me, linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] Documentation: networking: document CAN ISO-TP
-Message-ID: <20240319120625.GI185808@kernel.org>
-References: <20240313223445.87170-1-valla.francesco@gmail.com>
- <20240313223445.87170-2-valla.francesco@gmail.com>
+	s=arc-20240116; t=1710847526; c=relaxed/simple;
+	bh=8ulJ8+weqBSerN9tC3VoDoHcMsRlBraSpYHrb1Vcvwg=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IEKnjQvJqU1Yaa+XsNmO947181cL7dysgnc25zy0jbqoQkcwm34C78OFD0+PraoapNGaZNzQV+fnVkDACsDVJnNFhQVl4CnTqeiODgYWm3YzSBZvqFyjACzubokDcMZiywl6L5D/KVrMgFNCMpGvfXgEs5thCNkQuGchJs8Zd0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@breakpoint.cc>)
+	id 1rmXas-0005GJ-8Z; Tue, 19 Mar 2024 12:25:22 +0100
+From: Florian Westphal <fw@strlen.de>
+To: <netdev@vger.kernel.org>
+Cc: <netfilter-devel@vger.kernel.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Florian Westphal <fw@strlen.de>
+Subject: [PATCH net] MAINTAINERS: step down as netfilter maintainer
+Date: Tue, 19 Mar 2024 13:11:54 +0100
+Message-ID: <20240319121223.24474-1-fw@strlen.de>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240313223445.87170-2-valla.francesco@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Mar 13, 2024 at 11:34:31PM +0100, Francesco Valla wrote:
-> Document basic concepts, APIs and behaviour of the CAN ISO-TP (ISO
-> 15765-2) stack.
-> 
-> Signed-off-by: Francesco Valla <valla.francesco@gmail.com>
+I do not feel that I'm up to the task anymore.
 
-Hi Francesco,
+I hope this to be a temporary emergeny measure, but for now I'm sure this
+is the best course of action for me.
 
-As it looks like there will be a v2 of this patchset
-please consider running checkpatch.pl --codespell
-and addressing the warnings it reports.
+Signed-off-by: Florian Westphal <fw@strlen.de>
+---
+ MAINTAINERS | 1 -
+ 1 file changed, 1 deletion(-)
 
-...
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 54775eaaf7b3..24b4f59d3ceb 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -15164,7 +15164,6 @@ F:	drivers/net/ethernet/neterion/
+ NETFILTER
+ M:	Pablo Neira Ayuso <pablo@netfilter.org>
+ M:	Jozsef Kadlecsik <kadlec@netfilter.org>
+-M:	Florian Westphal <fw@strlen.de>
+ L:	netfilter-devel@vger.kernel.org
+ L:	coreteam@netfilter.org
+ S:	Maintained
+-- 
+2.43.2
 
-> +Transport protocol and associated frame types
-> +---------------------------------------------
-> +
-> +When transmitting data using the ISO-TP protocol, the payload can either fit
-> +inside one single CAN message or not, also considering the overhead the protocol
-> +is generating and the optional extended addressing. In the first case, the data
-> +is transmitted at once using a so-called Single Frame (SF). In the second case,
-> +ISO-TP defines a multi-frame protocol, in which the sender asks (through a First
-> +Frame - FF) to the receiver the maximum supported size of a macro data block
-> +(``blocksize``) and the minimum time time between the single CAN messages
-> +composing such block (``stmin``). Once these informations have been received,
-
-nit: Once this information has
-
-> +the sender starts to send frames containing fragments of the data payload
-> +(called Consecutive Frames - CF), stopping after every ``blocksize``-sized block
-> +to wait confirmation from the receiver (which should then send a Flow Control
-> +frame - FC - to inform the sender about its availability to receive more data).
-> +
-
-...
 
