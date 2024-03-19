@@ -1,123 +1,103 @@
-Return-Path: <netdev+bounces-80683-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6814C8805C1
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 21:00:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BD438805A0
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 20:46:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9985B1C221A8
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 20:00:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF6321F2328A
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 19:46:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EC1F39FFB;
-	Tue, 19 Mar 2024 20:00:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BADDF3A1AA;
+	Tue, 19 Mar 2024 19:46:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=terma.com header.i=@terma.com header.b="ba/Q5BZ2"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="uSjosQNn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out6.electric.net (smtp-out6.electric.net [192.162.217.184])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 473FE59B77
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 20:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.162.217.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 066F53B29D
+	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 19:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710878412; cv=none; b=FsTsPQfUP4Sc2lIBc1K6+QXDtLHCNGpISYVE/1t3PyTD++cyzjjG+QNjonrLjKTQDIi9opJ8nMvUbv7G5efmKwkufpdxnYVBsAsl3r04ucWg1ScjXrAKmtq99bIlM75FCOuDknWZxAMPhGEmWpAZA3KFjcw7bJHmt0KPafSQ0fg=
+	t=1710877598; cv=none; b=DyE6HocOQqZBLpLbdzEv6mAoQAxodjC0vKY7nwjC1qfhU8T7QKYwmB4Q8dxodboSwspOQ/3fOgQ0Z02Rv+cJtkyHkJyz5XMa3GxXWbdESdPi6KVNrp8JRZwmpHTi0R2y5AF73ed5A53oTunES8v52gRoOfM8XaNRTNA8GmpE+hw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710878412; c=relaxed/simple;
-	bh=C1uWuJz8EAcKg/XdvZRyMPLOQNuunVsQDACOstE+4hE=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=EU+N6afxcWvE6vD6cAAtNDRVUDW95Enq5F8Nz6D8xHrQdauixfOg1/QuCe17KmGnvfUAgCLjpr0LNljEdLxRd79+HC3vkHCCUmPDQgwRWdbt2XRUu0rq8UyEv8Zbc51SvSd5LWMEIiC6dFfZJ7acXVS5ngS912wTxkRijbw1t3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=terma.com; spf=pass smtp.mailfrom=terma.com; dkim=pass (2048-bit key) header.d=terma.com header.i=@terma.com header.b=ba/Q5BZ2; arc=none smtp.client-ip=192.162.217.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=terma.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=terma.com
-Received: from 1rmfOp-0000m0-Vz by out6b.electric.net with emc1-ok (Exim 4.96.1)
-	(envelope-from <chr@terma.com>)
-	id 1rmfOr-0000oY-Tx;
-	Tue, 19 Mar 2024 12:45:29 -0700
-Received: by emcmailer; Tue, 19 Mar 2024 12:45:29 -0700
-Received: from [193.163.1.101] (helo=EXCH09.terma.com)
-	by out6b.electric.net with esmtpsa  (TLS1.2) tls TLS_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96.1)
-	(envelope-from <chr@terma.com>)
-	id 1rmfOp-0000m0-Vz;
-	Tue, 19 Mar 2024 12:45:27 -0700
-Received: from EXCH09.terma.com (10.12.2.69) by EXCH09.terma.com (10.12.2.69)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Tue, 19 Mar
- 2024 20:45:26 +0100
-Received: from EXCH09.terma.com ([fe80::d8f4:f3a1:6899:e2da]) by
- EXCH09.terma.com ([fe80::d8f4:f3a1:6899:e2da%17]) with mapi id
- 15.01.2507.034; Tue, 19 Mar 2024 20:45:26 +0100
-From: Claus Hansen Ries <chr@terma.com>
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "davem@davemloft.net"
-	<davem@davemloft.net>
-Subject: [PATCH] net: ll_temac: platform_get_resource replaced by wrong
- function
-Thread-Topic: [PATCH] net: ll_temac: platform_get_resource replaced by wrong
- function
-Thread-Index: Adp6NO47DhzC33LDRRqZX1YF4VLPmA==
-Date: Tue, 19 Mar 2024 19:45:26 +0000
-Message-ID: <41c3ea1df1af4f03b2c66728af6812fb@terma.com>
-Accept-Language: en-150, en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1710877598; c=relaxed/simple;
+	bh=kXd2i+AOWYw8mNhkzMSPRsJ1BAfSMk5UbmtyY1hKQ4g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OF/EEnOFQTKXuTekibTE631Upz3emmzmNobS6VPaEaXM7+ArFnDtMtBOxa/3oxQ7qGpVO9ZMxoPuO5GZxNMXHahWXJj04iw2sbmurTiW8RZtKVKOBr8lJkZL0OfLWTMaS9jWQatTlq1F21rOCblFKFGBDMeiyXeuw+RI9wvuUvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=uSjosQNn; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <5b1d5758-3510-47c5-97e9-2edc5112d046@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1710877595;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+GT3KW1575UJ01KouvR9HZva7hTJApu0idB1GvqPOVU=;
+	b=uSjosQNnzCRjKn06REIRfbqr6tgrO2Qo7zhAniZ0awIiRTtfyEWuK2Hyi3ndgcrNlR3s+w
+	ZZLB/PTPqMx6mhyh1DRVV0unlZHqRqMg2r379g286Z/TbO9uUPvq8ttVj2HDOUzKivnUYi
+	XHBwD6NqJEhyHn5e/0kAGO1a08uXSn8=
+Date: Tue, 19 Mar 2024 12:46:26 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Authenticated: smtp.out@terma.com
-X-Outbound-IP: 193.163.1.101
-X-Env-From: chr@terma.com
-X-Proto: esmtpsa
-X-Revdns: r2d2.lystrup.terma.com
-X-HELO: EXCH09.terma.com
-X-TLS: TLS1.2:AES256-GCM-SHA384:256
-X-Authenticated_ID: smtp.out@terma.com
-X-VIPRE-Scanners:virus_bd;virus_clamav;
-X-PolicySMART: 6001202, 19049467
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=terma.com; s=mailanyone20180424;h=MIME-Version:Message-ID:Date:To:From; bh=kZa7KLA5YNfgR4Nf3z2GDy99fgmLIZF1RGuBT77pG1Y=;b=ba/Q5BZ2MC4W0ZIwif+jGNcheSmi43Qo7M697sy7tqznEWqWTw1DSZboHftJQIQbkSGRioAToK32aNP7BkNKCfZXUMpHeduk7PZNOVBRGdrdsDvojwec0q2ALOqrzafnZtaSGK/R9CeqSiBmw4QOx1ZneuAP8+/MGvCQ3D+Fht6//BJDvh6gxTnomhvJeShrwC2zBJ0hy+EalqfQQz/aaZ/TnrAoEFu3f9JRMURy6TyrG8QQcFGoV4sV4n6zeRdpwS24mUSuavfzTvRZy4Cx4E1pq2ryWqxaXKe0GJ3m4ffnmDK+j6OnUdza2c96JIN/tOvWVQdNoOcCBfCE7FeIDQ==;
-X-PolicySMART: 6001202, 19049467
+Subject: Re: [PATCH net-next v4] net: Re-use and set mono_delivery_time bit
+ for userspace tstamp packets
+Content-Language: en-US
+To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, kernel@quicinc.com,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Andrew Halaney <ahalaney@redhat.com>,
+ Martin KaFai Lau <martin.lau@kernel.org>, bpf <bpf@vger.kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>
+References: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
+ <2a4cb416-5d95-459d-8c1c-3fb225240363@linux.dev>
+ <65f16946cd33e_344ff1294fc@willemb.c.googlers.com.notmuch>
+ <28282905-065a-4233-a0a2-53aa9b85f381@linux.dev>
+ <65f2004e65802_3d1e792943e@willemb.c.googlers.com.notmuch>
+ <0dff8f05-e18d-47c8-9f19-351c44ea8624@linux.dev>
+ <e5da91bc-5827-4347-ab38-36c92ae2dfa2@quicinc.com>
+ <65f21d65820fc_3d934129463@willemb.c.googlers.com.notmuch>
+ <bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev>
+ <65f2c81fc7988_3ee61729465@willemb.c.googlers.com.notmuch>
+ <5692ddb3-9558-4440-a7bf-47fcc47401ed@linux.dev>
+ <65f35e00a83c0_2132294f5@willemb.c.googlers.com.notmuch>
+ <e270b646-dae0-41cf-9ef8-e991738b9c57@quicinc.com>
+ <8d245f5a-0c75-4634-9513-3d420eb2c88f@linux.dev>
+ <d10254cc-a908-4d81-98d2-2eed715e521f@quicinc.com>
+ <66ad9e5b-0126-476e-bf0f-6a33f446c976@quicinc.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <66ad9e5b-0126-476e-bf0f-6a33f446c976@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-From: Claus Hansen ries <chr@terma.com>
+On 3/18/24 12:02 PM, Abhishek Chauhan (ABC) wrote:
+>>>>>> I think the "struct inet_frag_queue" also needs a new "user_delivery_time"
+>>>>>> field. "mono_delivery_time" is already in there.
+>>> [ ... ]
+>>>
+> Martin, Do we really need to add user_delivery_time as part of inet_frag_queue struct? I was wondering why is this required since we are using tstamp_type:2 to
+> distinguish between timestamp anyway .
 
-devm_platform_ioremap_resource_byname is called using 0 as name, which even=
-tually=20
-ends up in platform_get_resource_byname, where it causes a null pointer in =
-strcmp.
 
-                if (type =3D=3D resource_type(r) && !strcmp(r->name, name))
-
-The correct function is devm_platform_ioremap_resource.
-
-Fixes: bd69058 ("net: ll_temac: Use devm_platform_ioremap_resource_byname()=
-")
-Signed-off-by: Claus H. Ries <chr@terma.com>
-Cc: stable@vger.kernel.org
----
- drivers/net/ethernet/xilinx/ll_temac_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/xilinx/ll_temac_main.c b/drivers/net/ethe=
-rnet/xilinx/ll_temac_main.c
-index 9df39cf8b097..1072e2210aed 100644
---- a/drivers/net/ethernet/xilinx/ll_temac_main.c
-+++ b/drivers/net/ethernet/xilinx/ll_temac_main.c
-@@ -1443,7 +1443,7 @@ static int temac_probe(struct platform_device *pdev)
-        }
-          /* map device registers */
--       lp->regs =3D devm_platform_ioremap_resource_byname(pdev, 0);
-+       lp->regs =3D devm_platform_ioremap_resource(pdev, 0);
-        if (IS_ERR(lp->regs)) {
-                dev_err(&pdev->dev, "could not map TEMAC registers\n");
-                return -ENOMEM;
-
-base-commit: d95fcdf4961d27a3d17e5c7728367197adc89b8d
---  2.39.3 (Apple Git-146)
+The context for this was before combining mono_delivery_time:1 and 
+user_delivery_time:1 into tstamp_type:2. No need to add user_delivery_time to 
+inet_frag_queue because it is combined into tstamp_type:2. If 
+mono_delivery_time:1 is replaced with tstamp_type:2 in sk_buff, the same should 
+be done in inet_frag_queue.
 
 
 
