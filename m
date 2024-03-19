@@ -1,222 +1,291 @@
-Return-Path: <netdev+bounces-80610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2832C87FEF9
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 14:41:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE4DF87FF02
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 14:43:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D3281F25D28
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:41:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8103A283273
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:43:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A0BF8060C;
-	Tue, 19 Mar 2024 13:41:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DED380BE1;
+	Tue, 19 Mar 2024 13:43:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hL+LykcB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aEQvHPvM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9DCB2B9A3;
-	Tue, 19 Mar 2024 13:41:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 339E48004F
+	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 13:43:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710855664; cv=none; b=erXJiyxoKKVfb7XRCVeRqkfbxoKuEWM/A7kWIGNznQei2+ZDZV60E+wk/MxVFSphDNLmD8x0dj5tUC3+/FNF1fdIMaT/0/bTgTRGskpGQUryraML+WIHYSbta3O6vZb/Vz2Eam4WsHKcxVmXUvqwcB48NARb6Jk6X51aLOh6NBs=
+	t=1710855815; cv=none; b=XCVcCDtOKu4nO+McQGPQY/j5u9M4vZYxdrxop0qFKTuho5tUMxcMl0uuGTHokH/i+QCaYNLIqh/lHvqsiaV0FjzXSRuAXVJPhO5ZV1/yMWi6JIywlwVnjm/Si3SmfQIHXxX+rdES4wuC9bgNpluNxiPlUdBvXnQmVBJU6BC8Evw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710855664; c=relaxed/simple;
-	bh=Q1XpBD3D1Jad9jOW0GmlYCOj7oP3jP/DT7Prrxxmgx4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=BnWnsmY/zDVybk/+z4YPWb+VQCpgSK0aihGIkEN+qhRT4324SqWpcf08HtJEPZUHH0e7d/UAl+07UMaCo9+VUEM2wBs5KqgTRHJFgiSbL0bLGnqPHMMNlWhCY/Qka5yp7uAn1vwmZo9HYTVnjIObhlx3oHNwWcALbGyzzjcpNOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hL+LykcB; arc=none smtp.client-ip=209.85.160.172
+	s=arc-20240116; t=1710855815; c=relaxed/simple;
+	bh=2PfxOJPzBJoBVYuYJxIGCBuZ9DLtA3uUJQ7S0DnG/kc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ABhBXMG//0NAGtcGlIIn9M2Jup4wKDfJbMBhkAqtuqYHEWTpgf5cKAtMACV8TKefZO+YOF0QH9gTMXDr6oyyoCheO3HG5ybX8ZC83fVQdjyIaH84THGbeto3CoQRwvnxBliIMrkoqTG+LuRJWzyBWyHgd/biFgUCqRb58l0ewCA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aEQvHPvM; arc=none smtp.client-ip=209.85.167.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-430c4d0408eso15533641cf.3;
-        Tue, 19 Mar 2024 06:41:01 -0700 (PDT)
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-513d3e57518so6001259e87.3
+        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 06:43:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710855661; x=1711460461; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QbcBnDm8ZRm6YnoxkvmlEycMh7Xj3p+WQ/ZP4BNyxIg=;
-        b=hL+LykcB//JmdDnoZIlsy/laZJ97SVmOb1Eb6169gbb9B0P4BRoa44i803nuPWIcUo
-         BUtbsMuwhGc5F+tU0PAsrykK7kGkjDJvlulR6+qHomq/nBBxtWfpniShkZaVosTHmsLK
-         QPjwoJ2f4Ta3URVoSHFWBh4CJAApXvFSDJQ31gf0Ib6gsXI91ecKgWZEppNvKD3HdUg9
-         l3yREzWI1sGmEtRQoYMCaLncT4AcvxCFL2xhEQXXJK43dz+pGoDBylOFXSG9rLcySUuG
-         ZydG0osvVSrArnodM1KMuOeShPWqi26pv5cqAfT+M0oYlKQWvZWaZULtRMuAsn5jneAH
-         jaCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710855661; x=1711460461;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+        d=gmail.com; s=20230601; t=1710855811; x=1711460611; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=QbcBnDm8ZRm6YnoxkvmlEycMh7Xj3p+WQ/ZP4BNyxIg=;
-        b=pdPSVzbqjnCmb5ZZauv4R/VzwTVuq0mJiwWiqfoZ2blYlWAaqZlQk72BrchAIWCl+8
-         AwLE3b/a3jOPxpvcqr7U+SLjXYwJAY/4IO7aAJM7Klvb0grC4IhFsE2BrMYc0va/eHyH
-         Ki6kwSc+H4Tj85Pu0+qH0uWjtLfYMAnk/5t9RnPTUi7dFfM+JBvCQcanZEdvgGRPn20b
-         PdFS37vBwLPqObkZsbcAbBWy/UhbD5rud1Hn8t8cofwuqph/aP9i2ku9454cDEU1w7sT
-         Au4BryjAU+PMh3uHNNzqB4qHQPU0xVswY8llvpidGr3sZ+mIJUY23bHzpRghQs4zwSoq
-         HgBw==
-X-Forwarded-Encrypted: i=1; AJvYcCWiouJ9fSInvWDkKc/sb8pqaEtiZKw1OQktmnmA5Qf3uxRiQT55F8XNR0cuIonVpcgVxEkgMv4f8JSg42udmozx2pNnPqfT
-X-Gm-Message-State: AOJu0YxQLHf6MeeYFZTvwLG92M5hJ40msJJVbRDds4mLPaxCcJ3MKc3g
-	LT4Ks8zmod4Bdosxqv3wHmdwGhXiX6sRAwjB8NQkIT8oSPPLRc/v
-X-Google-Smtp-Source: AGHT+IGi3U6WNo1j5ecpIsH904oBsScvxORHbm3VLJVUIZP3ULrWkZeT4ZMr/qlGUPjIiWw7NSAtbQ==
-X-Received: by 2002:a0c:8ecc:0:b0:690:6ce7:42b2 with SMTP id y12-20020a0c8ecc000000b006906ce742b2mr2405139qvb.42.1710855660818;
-        Tue, 19 Mar 2024 06:41:00 -0700 (PDT)
-Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
-        by smtp.gmail.com with ESMTPSA id jp9-20020ad45f89000000b0069124fff14esm6431990qvb.138.2024.03.19.06.41.00
+        bh=mv68+UnH8CH2r80ZN2HzyhfceCayNcJkw+9sGUzZqdY=;
+        b=aEQvHPvMLCsvO8rKwlzQv2ydd67c+9tmCrYVFFUuieBZTNT3yuDSAoA57ttBdm8dqZ
+         +iVpVNTw2RVGJpI/AKrwqv8+HRSuZNPla9kQd67ce4y8U3OodF8CTokUsm/8kQn0isiy
+         BDfMVgHcdC8TfWItWubgKh6uRTTh2mNEvVMKonSvPZi1YMoePgWXkPcq76FENYHbiWBF
+         Y/sbMmlVvF/YaOYuKLNpRVlGPqdPXrea7/DEqKbMLy+wj0g98BchmnWu486kdPqp8/pq
+         5T+FOrSYclYo+nqmL8tAuUuHgOlmBee2kkFSeXrKYPQ0m6yNsgxnfp+p7WXCnXeJjdB3
+         +k4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710855811; x=1711460611;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mv68+UnH8CH2r80ZN2HzyhfceCayNcJkw+9sGUzZqdY=;
+        b=EpC4xSL2nmpCGNVbzLt8c9uc4NfhYCipJ7KlRB8OqmQ1CRrL1W4qNZjzFwMphPDkkm
+         Zpw+oA/R2eHD9b9eKSzDmTn5XGart6jGAV3VISvdHZahdFIr0Cta513Dxf1ftjZhSKx1
+         EeU+S627uwZIESg4gbVr2ZzDPu73IOoX0c3PVx523+43Up/TEy0vY+f7vbECqq+nInDE
+         o08fOmDC2DVDTJaBrQOKUOFWKUHFEoRhcEDpdeOSMtEn/H8L9TZ8yeEIO0DGIqrPdkav
+         7342bRANmD6ew6Gqf8NO9YmJe9xyZoMOzrFxOS2qsMkKyTLascEiih8w/ccQdxi9TuWR
+         OBzg==
+X-Forwarded-Encrypted: i=1; AJvYcCX4oKlMRG4J20XaHtAU38nCYqcMhqJyqMb6HkL8+qYL2MkA7Vrfyo39r1JcMwkYGHLJjzk6NFOGnMdLj5u8f0j720wzRXpL
+X-Gm-Message-State: AOJu0YyN4DvZnZtomxXpRRLFy+J2KQLk/rjNiT0viTFEwuFybij+9DqM
+	NuSwV5V2J8h1d0BaWYYR3foUWBBJf368eU3lOJ9jRYS0hUpf7ApZ
+X-Google-Smtp-Source: AGHT+IEGPjTaeH1Pj8jbaC7Kx+2btnxOT5Xbi9AfG25pe+jqYC+T+qk60t/zgxCdgYb2eh+ATyCpNw==
+X-Received: by 2002:a05:6512:3294:b0:513:5951:61a4 with SMTP id p20-20020a056512329400b00513595161a4mr10541445lfe.6.1710855811083;
+        Tue, 19 Mar 2024 06:43:31 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id b5-20020a196445000000b00513d13ede82sm1946950lfj.147.2024.03.19.06.43.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Mar 2024 06:41:00 -0700 (PDT)
-Date: Tue, 19 Mar 2024 09:41:00 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Igor Raits <igor@gooddata.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: kvm@vger.kernel.org, 
- virtualization@lists.linux.dev, 
- netdev@vger.kernel.org, 
- Stefano Garzarella <sgarzare@redhat.com>, 
- Stefan Hajnoczi <stefanha@redhat.com>, 
- Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Message-ID: <65f995ec3cd43_118bb1294f3@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CA+9S74gRyDn3_=aAm7XkGKEzTg7KF=pPEHFsvENYpv80kczqZg@mail.gmail.com>
-References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
- <65f98e5b99604_11543d29415@willemb.c.googlers.com.notmuch>
- <CA+9S74gRyDn3_=aAm7XkGKEzTg7KF=pPEHFsvENYpv80kczqZg@mail.gmail.com>
-Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
+        Tue, 19 Mar 2024 06:43:30 -0700 (PDT)
+Date: Tue, 19 Mar 2024 16:43:27 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH net-next v8 04/11] net: stmmac: dwmac-loongson: Move irq
+ config to loongson_gmac_config
+Message-ID: <6x5fg66cr2vwwcgr6yi45ipov5ejkst5fggcxd4y2mxkq7m6po@nkghfpdeduyj>
+References: <cover.1706601050.git.siyanteng@loongson.cn>
+ <776bfe84003b203ebe320dc7bf6b98707a667fa9.1706601050.git.siyanteng@loongson.cn>
+ <xjfd4effff6572fohxsgannqjr2w44qm4tru4aan2agojs77dl@tneltus7zqo6>
+ <6e7e2765-5074-4252-820f-e9b34960e8b3@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <6e7e2765-5074-4252-820f-e9b34960e8b3@loongson.cn>
 
-Igor Raits wrote:
-> Hello Willem,
-> =
+On Wed, Mar 13, 2024 at 04:14:28PM +0800, Yanteng Si wrote:
+> 
+> 在 2024/2/6 01:01, Serge Semin 写道:
+> > On Tue, Jan 30, 2024 at 04:43:24PM +0800, Yanteng Si wrote:
+> > > Add loongson_dwmac_config and moving irq config related
+> > > code to loongson_dwmac_config.
+> > > 
+> > > Removing MSI to prepare for adding loongson multi-channel
+> > > support later.
+> > Please detach this change into a separate patch and thoroughly explain
+> > why it was necessary.
+> OK.
+> > 
+> > > Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+> > > Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+> > > Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+> > > ---
+> > >   .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 85 ++++++++++++-------
+> > >   1 file changed, 55 insertions(+), 30 deletions(-)
+> > > 
+> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > > index 979c9b6dab3f..e7ce027cc14e 100644
+> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+> > > @@ -11,8 +11,46 @@
+> > >   struct stmmac_pci_info {
+> > >   	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
+> > > +	int (*config)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat,
+> > > +		      struct stmmac_resources *res, struct device_node *np);
+> > >   };
+> > > +static int loongson_dwmac_config_legacy(struct pci_dev *pdev,
+> > > +					struct plat_stmmacenet_data *plat,
+> > > +					struct stmmac_resources *res,
+> > > +					struct device_node *np)
+> > > +{
+> > > +	if (np) {
+> > > +		res->irq = of_irq_get_byname(np, "macirq");
+> > > +		if (res->irq < 0) {
+> > > +			dev_err(&pdev->dev, "IRQ macirq not found\n");
+> > > +			return -ENODEV;
+> > > +		}
+> > > +
+> > > +		res->wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+> > > +		if (res->wol_irq < 0) {
+> > > +			dev_info(&pdev->dev,
+> > > +				 "IRQ eth_wake_irq not found, using macirq\n");
+> > > +			res->wol_irq = res->irq;
+> > > +		}
+> > > +
+> > > +		res->lpi_irq = of_irq_get_byname(np, "eth_lpi");
+> > > +		if (res->lpi_irq < 0) {
+> > > +			dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+> > > +			return -ENODEV;
+> > > +		}
+> > > +	} else {
+> > > +		res->irq = pdev->irq;
+> > > +		res->wol_irq = res->irq;
+> > > +	}
+> > > +
+> > > +	plat->flags &= ~STMMAC_FLAG_MULTI_MSI_EN;
+> > > +	dev_info(&pdev->dev, "%s: Single IRQ enablement successful\n",
+> > > +		 __func__);
+> > Why is this here all of the sudden? I don't see this in the original
+> > code. Please move it to the patch which requires the flag
+> > setup/cleanup or drop if it isn't necessary.
+> 
 
-> On Tue, Mar 19, 2024 at 2:08=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Igor Raits wrote:
-> > > Hello,
-> > >
-> > > We have started to observe kernel crashes on 6.7.y kernels (atm we
-> > > have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6.9 where we
-> > > have nodes of cluster it looks stable. Please see stacktrace below.=
- If
-> > > you need more information please let me know.
-> > >
-> > > We do not have a consistent reproducer but when we put some bigger
-> > > network load on a VM, the hypervisor's kernel crashes.
-> > >
-> > > Help is much appreciated! We are happy to test any patches.
-> > >
-> > > [62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOPTI
-> >
-> > Did you miss the first part of the Oops?
-> =
+> +	plat->flags &= ~STMMAC_FLAG_MULTI_MSI_EN;
+> This cannot be removed because it appeared in a rebase(v4 -> v5). See
+> <https://lore.kernel.org/all/20230710090001.303225-9-brgl@bgdev.pl/>
 
-> Actually I copied it as-is from our log system. As it is a physical
-> server, such logs are sent via netconsole to another server. This is
-> the first line I see in the log in the time segment.
-> =
+AFAICS it _can_ be removed. The patch you referred to is a formal
+conversion of
+-	plat->multi_msi_en = 0;
+to
++	plat->flags &= ~STMMAC_FLAG_MULTI_MSI_EN;
+First of all the "multi_msi_en" field clearance had been
+redundant there since the code setting the flag was executed after the
+code which may cause the field clearance performed. Second AFAICS the
+"multi_msi_en" field clearance was originally added to emphasize the
+functions semantics:
+intel_eth_config_multi_msi() - config multi IRQ device,
+intel_eth_config_single_msi() - config single IRQ device.
 
-> >
-> > > [62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Tainted: G
-> > >    E      6.7.10-1.gdc.el9.x86_64 #1
-> > > [62254.183743] Hardware name: Dell Inc. PowerEdge R7525/0H3K7P, BIO=
-S
-> > > 2.14.1 12/17/2023
-> > > [62254.192083] RIP: 0010:skb_release_data+0xb8/0x1e0
-> > > [62254.197357] Code: 48 83 c3 01 39 d8 7e 54 48 89 d8 48 c1 e0 04 4=
-1
-> > > 80 7d 7e 00 49 8b 6c 04 30 79 0f 44 89 f6 48 89 ef e8 4c e4 ff ff 8=
-4
-> > > c0 75 d0 <48> 8b 45 08 a8 01 0f 85 09 01 00 00 e9 d9 00 00 00 0f 1f=
- 44
-> > > 00 00
-> > > [62254.217013] RSP: 0018:ffffa975a0247ba8 EFLAGS: 00010206
-> > > [62254.222692] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 000=
-0000000000785
-> > > [62254.230263] RDX: 0000000000000016 RSI: 0000000000000002 RDI: fff=
-f989862b32b00
-> > > [62254.237878] RBP: 4f2b318c69a8b0f9 R08: 000000000001fe4d R09: 000=
-000000000003a
-> > > [62254.245417] R10: 0000000000000000 R11: 0000000000001736 R12: fff=
-f9880b819aec0
-> > > [62254.252963] R13: ffff989862b32b00 R14: 0000000000000000 R15: 000=
-0000000000002
-> > > [62254.260591] FS:  00007f6cf388bf80(0000) GS:ffff98b85fbc0000(0000=
-)
-> > > knlGS:0000000000000000
-> > > [62254.269061] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > [62254.275170] CR2: 000000c002236020 CR3: 000000387d37a002 CR4: 000=
-0000000770ef0
-> > > [62254.282733] PKRU: 55555554
-> > > [62254.285911] Call Trace:
-> > > [62254.288884]  <TASK>
-> > > [62254.291549]  ? die+0x33/0x90
-> > > [62254.294769]  ? do_trap+0xe0/0x110
-> > > [62254.298405]  ? do_error_trap+0x65/0x80
-> > > [62254.302471]  ? exc_stack_segment+0x35/0x50
-> > > [62254.306884]  ? asm_exc_stack_segment+0x22/0x30
-> > > [62254.311637]  ? skb_release_data+0xb8/0x1e0
-> > > [62254.316047]  kfree_skb_list_reason+0x6d/0x210
-> > > [62254.320697]  ? free_unref_page_commit+0x80/0x2f0
-> > > [62254.325700]  ? free_unref_page+0xe9/0x130
-> > > [62254.330013]  skb_release_data+0xfc/0x1e0
-> > > [62254.334261]  consume_skb+0x45/0xd0
-> > > [62254.338077]  tun_do_read+0x68/0x1f0 [tun]
-> > > [62254.342414]  tun_recvmsg+0x7e/0x160 [tun]
-> > > [62254.346696]  handle_rx+0x3ab/0x750 [vhost_net]
-> > > [62254.351488]  vhost_worker+0x42/0x70 [vhost]
-> > > [62254.355934]  vhost_task_fn+0x4b/0xb0
-> >
-> > Neither tun nor vhost_net saw significant changes between the two
-> > reported kernels.
-> >
-> >     $ git log --oneline v6.6..v6.7 -- drivers/net/tun.c drivers/vhost=
-/net.c | wc -l
-> >     0
-> >
-> >     $ git log --oneline linux/v6.6.9..linux/v6.7.5 -- drivers/net/tun=
-.c drivers/vhost/net.c
-> >     6438382dd9f8 tun: add missing rx stats accounting in tun_xdp_act
-> >     4efd09da0d49 tun: fix missing dropped counter in tun_xdp_act
-> >
-> > So the cause is likely in the code that generated the skb or somethin=
-g
-> > that modified it along the way.
-> >
-> > It could be helpful if it is possible to bisect further. Though odds
-> > are that the issue is between v6.6 and v6.7, not introduced in the
-> > stable backports after that. So it is a large target.
-> =
+So in your case there is no any reason of clearing the
+STMMAC_FLAG_MULTI_MSI_EN flag. Please, either drop it or move the
+change into a separate patch.
 
-> Yeah, as I replied later to my original message - we actually also see
-> the issue on 6.6.9 as well but it looks slightly different.
-> =
+-Serge(y)
 
-> Actually while writing reply got 6.6.9 crashed too:
-> =
-
-> [13330.391004] tun: unexpected GSO type: 0x4ec1c942, gso_size 20948,
-> hdr_len 3072
-
-This looks like memory corruption
-
-> > Getting the exact line in skb_release_data that causes the Oops
-> > would be helpful too, e.g.,
-> >
-> > gdb vmlinux
-> > list *(skb_release_data+0xb8)
-> =
-
-> Unfortunately we do not collect kdumps so this is not going to be easy
-> :( We will investigate the possibility of getting the dump though.
-
-No need for a kdump. As long as you have the vmlinux of the kernel.
+> +	dev_info(&pdev->dev, "%s: Single IRQ enablement successful\n",
+> +		 __func__);
+> 
+> OK, drop it.
+> 
+> > 
+> > > +
+> > > +	return 0;
+> > > +}
+> > > +
+> > >   static void loongson_default_data(struct pci_dev *pdev,
+> > >   				  struct plat_stmmacenet_data *plat)
+> > >   {
+> > > @@ -66,8 +104,21 @@ static int loongson_gmac_data(struct pci_dev *pdev,
+> > >   	return 0;
+> > >   }
+> > > +static int loongson_gmac_config(struct pci_dev *pdev,
+> > > +				struct plat_stmmacenet_data *plat,
+> > > +				struct stmmac_resources *res,
+> > > +				struct device_node *np)
+> > > +{
+> > > +	int ret;
+> > > +
+> > > +	ret = loongson_dwmac_config_legacy(pdev, plat, res, np);
+> > > +
+> > > +	return ret;
+> > > +}
+> > > +
+> > You introduce the config callback here and convert to a dummy method
+> > in
+> > [PATCH 07/11] net: stmmac: dwmac-loongson: Add multi-channel supports for loongson
+> > It's just pointless. What about introducing the
+> > loongson_dwmac_config_legacy() method and call it directly?
+> OK, I will try.
+> > 
+> > >   static struct stmmac_pci_info loongson_gmac_pci_info = {
+> > >   	.setup = loongson_gmac_data,
+> > > +	.config = loongson_gmac_config,
+> > >   };
+> > >   static int loongson_dwmac_probe(struct pci_dev *pdev,
+> > > @@ -139,44 +190,19 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
+> > >   		plat->phy_interface = phy_mode;
+> > >   	}
+> > > -	pci_enable_msi(pdev);
+> > See my first note in this message.
+> 
+> OK.
+> 
+> 
+> Thanks,
+> 
+> Yanteng
+> 
+> > 
+> > -Serge(y)
+> > 
+> > >   	memset(&res, 0, sizeof(res));
+> > >   	res.addr = pcim_iomap_table(pdev)[0];
+> > > -	if (np) {
+> > > -		res.irq = of_irq_get_byname(np, "macirq");
+> > > -		if (res.irq < 0) {
+> > > -			dev_err(&pdev->dev, "IRQ macirq not found\n");
+> > > -			ret = -ENODEV;
+> > > -			goto err_disable_msi;
+> > > -		}
+> > > -
+> > > -		res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+> > > -		if (res.wol_irq < 0) {
+> > > -			dev_info(&pdev->dev,
+> > > -				 "IRQ eth_wake_irq not found, using macirq\n");
+> > > -			res.wol_irq = res.irq;
+> > > -		}
+> > > -
+> > > -		res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
+> > > -		if (res.lpi_irq < 0) {
+> > > -			dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+> > > -			ret = -ENODEV;
+> > > -			goto err_disable_msi;
+> > > -		}
+> > > -	} else {
+> > > -		res.irq = pdev->irq;
+> > > -		res.wol_irq = pdev->irq;
+> > > -	}
+> > > +	ret = info->config(pdev, plat, &res, np);
+> > > +	if (ret)
+> > > +		goto err_disable_device;
+> > >   	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+> > >   	if (ret)
+> > > -		goto err_disable_msi;
+> > > +		goto err_disable_device;
+> > >   	return ret;
+> > > -err_disable_msi:
+> > > -	pci_disable_msi(pdev);
+> > >   err_disable_device:
+> > >   	pci_disable_device(pdev);
+> > >   err_put_node:
+> > > @@ -200,7 +226,6 @@ static void loongson_dwmac_remove(struct pci_dev *pdev)
+> > >   		break;
+> > >   	}
+> > > -	pci_disable_msi(pdev);
+> > >   	pci_disable_device(pdev);
+> > >   }
+> > > -- 
+> > > 2.31.4
+> > > 
+> 
 
