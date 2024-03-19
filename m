@@ -1,125 +1,93 @@
-Return-Path: <netdev+bounces-80668-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 825EE88046A
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 19:11:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7F92D88045B
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 19:07:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A6061C23147
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 18:11:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C257282359
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 18:07:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77BDC2BAE7;
-	Tue, 19 Mar 2024 18:11:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45F562B9C1;
+	Tue, 19 Mar 2024 18:07:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="aRkqSSzE"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="CY1lyTcE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780C72B9D7
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 18:11:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D9528383;
+	Tue, 19 Mar 2024 18:07:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710871874; cv=none; b=pV3PES+bezj2uj9dOe44rACD1GBMct+1WgEZk49r1eUDOvggjH7a+yLq5y2g39d4aDY5KtktIDNlly6f6yJfQSyE+Z4/p8QJt4XGV3BiovK89xtIR7ryBjjGj4yn2xIBQhCuZP9grXdMoEL/fCn26YJ3vGkqJc309Az1QCayNNg=
+	t=1710871669; cv=none; b=Il6bndQBGEQB/TPfP4SvsAkVqFT23/4fw/cFP6g7x9VsH+8zKAOhexfsNMkMBgM07goLG+Q7FC5vA7KaAL6PBI8wfDgzAkFwaI6PCiBCLYpAzyo6VPcExdRLdzl8yyM5cbr6lLItk0OPMoOUUBp/80JwhebhNmO3zTeBTFfMHOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710871874; c=relaxed/simple;
-	bh=DFh9J+u2qXCj6UQ58/J1xPY8J+BLfhUgqiTlzbpfEoo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oVz4oj17IPIPrwrKUg7KzA5+zpZEWkZFOQtujjYsYwaG0+3ZcQFeSG9Yb7bzokLojctLf9DuYIWZJ2zr3m3opclLJguI+8AmYtCVw+p/dI6C3fUOGPMRpL9F5aO/TA9zBo5ZrLpylHaYaOJv9jjj6P3gOUYTKSDjKpmn8hmODek=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=aRkqSSzE; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-foundation.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-56b93b45779so1455675a12.1
-        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 11:11:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1710871870; x=1711476670; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=EQCbsWamaqb8otc0jtHP79rNp7jzLPKKgSbrJldR67k=;
-        b=aRkqSSzEd/D8B3NSJRMytqok9IArEUFrIAKwE29WUZ2OWSsYB33wGbx0HrUGbtAESU
-         UiMgdM0wb9p49daN2gAPp65/qtvM9cHw4WE09rBxEIBuVckh+EFMZvpPi+Dn9MXOlrpF
-         y8CMjCCs1p4cdTMSLUL7S4VPw8r5XYqeNqMrQ=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710871870; x=1711476670;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=EQCbsWamaqb8otc0jtHP79rNp7jzLPKKgSbrJldR67k=;
-        b=QK/7ntIvJcHWnHV71NI5T74rUSY7XbD6fuIqGLacydTVE6QxmzMj067QZ1OQK2R7wU
-         EhW4bcm1FXt6uzlsYG1rj7hBDWO85nu0iNPaZUB3OvpwCtFbLkUN6shu6il7PCgiEwIm
-         LDEEmSigdeI+WNay6yIzVdXZUYMknaMYDDWWAgZzpIs60wA0kRONXYozfeYOrY/SY4+1
-         1NlN68H12wGNMQQ/c7umIL1FDNeYg6SAy+iprnzQzSc96Jg+2L256ORJjDZpF9jvDnQE
-         A+E2H42gp+T8dhW2PJOCO+ze/BHtZSbpBXtE2VIMlzcYeBQ/G1Cdoh0Cm/D+bMgpz3Gr
-         RF/A==
-X-Forwarded-Encrypted: i=1; AJvYcCXeLk/YonDATUdW8D5vHsAEMD4rOYqC3O28IhEEXL9kLpfU7vwST13ruoat1ZT95rBNc8GtT1rjuHVuREMZ8pll2uNHwb3T
-X-Gm-Message-State: AOJu0YzfF0Elxd2VDzxJHAPMFiA1FgY+DrHLhW01XjKWpOThCePf2saM
-	zjULx50EAAGzEljxgLUePnvYD+mqE9sKPth4UeNijn3cw/FxVWK4Eo66T2cSLdgcLzEoWPu5Kc2
-	gCZ/0PA==
-X-Google-Smtp-Source: AGHT+IGltAIFc57KcHVxiZ1BX93leLe9xfS8JOm+sPkJ2zBjBF6ffPM7FIgkjaaBL0utzTDbb01jbw==
-X-Received: by 2002:a17:906:cb92:b0:a46:24fd:4a75 with SMTP id mf18-20020a170906cb9200b00a4624fd4a75mr10475567ejb.29.1710871870539;
-        Tue, 19 Mar 2024 11:11:10 -0700 (PDT)
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com. [209.85.218.52])
-        by smtp.gmail.com with ESMTPSA id gf8-20020a170906e20800b00a46d9966ff8sm1266073ejb.147.2024.03.19.11.11.10
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 19 Mar 2024 11:11:10 -0700 (PDT)
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a46ba938de0so378847066b.3
-        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 11:11:10 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUUC4ZNlYM7JMqANJ2Y615uMBO707+XOjL1xNQ63yn9EE2uZPqiMSLMmEqzoWV2/44H9nlr4uQG1plelxKpImMeDeTbS0eY
-X-Received: by 2002:a17:906:1352:b0:a46:7ee2:f834 with SMTP id
- x18-20020a170906135200b00a467ee2f834mr9239613ejb.11.1710871440743; Tue, 19
- Mar 2024 11:04:00 -0700 (PDT)
+	s=arc-20240116; t=1710871669; c=relaxed/simple;
+	bh=9+OK1+c/8JOBYR1YQueWcR3S1IUR3nOrsBdURiXOeQk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OH3+3vIUffQjFmf71FhHsxNCTgFMLKC2O94gD/7DkyQyeyY2SC4dkzy+KuEZUA1Z6d1ptLZPPD8Rpw5G3oO03/StNDrKYH80nWB1rJFXzkadxMcAkNmo3NJqwBMlUqGiutqNHrnaerk2A4ERBTm/nJy2QcVg0TvA5vvp7sQKMww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=CY1lyTcE; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 23B77879E8;
+	Tue, 19 Mar 2024 19:07:43 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1710871664;
+	bh=BAVXIaMxVuPkFRS9oEYN4x4tDrjCx4Yiuoc6W+g6TAs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CY1lyTcEI+HjM0Eqxn5Gxkcpaw8eQBNFRH6gH+MF2MWgQfiSwac1kLdSpOERiHDMg
+	 w4ZUew46ru2XterW2I7S8rF39bdziqfyiOuW1++RIXCD2eJ2OKP9OAUsSmGV41vfPh
+	 86MB4Iw0Z2QHfsMYdyj2+0f63eKxAo+a7qbnEoOsF3bQryYYDO89OBVlaQv9oM4a5l
+	 Ur5Wl0q2dcWyp5N0+dv8eIz8Y24nur2e/isXYAJSEYx8M77p1CebJxZFSUQUEsWzqk
+	 5dguYlDdrpYH4mjt20ngkVMnbcQlRdlTB6UiTTJkgHthwmycGFyd+hdABMEAl87MYP
+	 xqcz5tBrm8w0A==
+Message-ID: <878e72e6-8a75-4593-8080-e3d9b3f7f523@denx.de>
+Date: Tue, 19 Mar 2024 19:07:42 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240319034143-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20240319034143-mutt-send-email-mst@kernel.org>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Tue, 19 Mar 2024 11:03:44 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wi363CLXBm=jB=eAtJQ18E-h4Vwrgmd6_7Q=DN+9u8z6w@mail.gmail.com>
-Message-ID: <CAHk-=wi363CLXBm=jB=eAtJQ18E-h4Vwrgmd6_7Q=DN+9u8z6w@mail.gmail.com>
-Subject: Re: [GIT PULL] virtio: features, fixes
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	alex.williamson@redhat.com, andrew@daynix.com, david@redhat.com, 
-	dtatulea@nvidia.com, eperezma@redhat.com, feliu@nvidia.com, 
-	gregkh@linuxfoundation.org, jasowang@redhat.com, jean-philippe@linaro.org, 
-	jonah.palmer@oracle.com, leiyang@redhat.com, lingshan.zhu@intel.com, 
-	maxime.coquelin@redhat.com, ricardo@marliere.net, shannon.nelson@amd.com, 
-	stable@kernel.org, steven.sistare@oracle.com, suzuki.poulose@arm.com, 
-	xuanzhuo@linux.alibaba.com, yishaih@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] dt-bindings: net: broadcom-bluetooth: Add CYW43439 DT
+ binding
+Content-Language: en-US
+To: Conor Dooley <conor@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Conor Dooley <conor+dt@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Linus Walleij <linus.walleij@linaro.org>,
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Marcel Holtmann <marcel@holtmann.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, devicetree@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20240309031609.270308-1-marex@denx.de>
+ <20240317-spotter-imminent-1a29a152648b@spud>
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <20240317-spotter-imminent-1a29a152648b@spud>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-On Tue, 19 Mar 2024 at 00:41, Michael S. Tsirkin <mst@redhat.com> wrote:
->
-> virtio: features, fixes
->
-> Per vq sizes in vdpa.
-> Info query for block devices support in vdpa.
-> DMA sync callbacks in vduse.
->
-> Fixes, cleanups.
+On 3/17/24 4:03 PM, Conor Dooley wrote:
+> On Sat, Mar 09, 2024 at 04:15:12AM +0100, Marek Vasut wrote:
+>> CYW43439 is a Wi-Fi + Bluetooth combo device from Infineon.
+>> The Bluetooth part is capable of Bluetooth 5.2 BR/EDR/LE .
+>> This chip is present e.g. on muRata 1YN module. Extend the
+>> binding with its DT compatible.
+> 
+> How come there's no fallback here? Looking at the binding patch there's
+> no device-specific handling done, what's incompatibly different between
+> this device and some of the other ones supported by the hci_bcm driver?
 
-Grr. I thought the merge message was a bit too terse, but I let it slide.
-
-But only after pushing it out do I notice that not only was the pull
-request message overly terse, you had also rebased this all just
-moments before sending the pull request and didn't even give a hit of
-a reason for that.
-
-So I missed that, and the merge is out now, but this was NOT OK.
-
-Yes, rebasing happens. But last-minute rebasing needs to be explained,
-not some kind of nasty surprise after-the-fact.
-
-And that pull request explanation was really borderline even *without*
-that issue.
-
-                Linus
+For posterity, should be addressed in V2.
 
