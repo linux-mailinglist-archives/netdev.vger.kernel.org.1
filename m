@@ -1,96 +1,142 @@
-Return-Path: <netdev+bounces-80658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A16788033A
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 18:15:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94C5D880343
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 18:18:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BD0A1C2295D
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 17:15:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49F091F23429
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 17:18:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74CD317BA4;
-	Tue, 19 Mar 2024 17:15:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B2F8171A1;
+	Tue, 19 Mar 2024 17:18:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BU6FWS3O"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NoUVK/p+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B4B8179A6;
-	Tue, 19 Mar 2024 17:15:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9DA12031D
+	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 17:18:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710868528; cv=none; b=AFxwRfUM4bMBKHM+wabOX/DdezkafF3NXpuuBTEpV2QerFDMo05MjYCcoz2fapO2Jx88ufZgvcbSKsECsl5TKLNNf25cMn1eqxt+fnt+zext/L0RF5OzRQvtvR/ErputLzzipcjMWSraQXz4LssMQln6T+DtVbFBjj1tPDAQNhc=
+	t=1710868683; cv=none; b=mPdGvn3IixpHMld1kxmolh7H4Y+ydXodcCm0Y7gJhzKNSyAwTcvovBOTJ+6X2GiwvtJFY3P5N0kxNfaXjPcARLrN6QIYHbO1ZLVI7NcNOFwI65aGYEIRYmDQs0uR8xsr4AmQGP5i4K7vBRkmR+noLmAuy4z4N4s7gu4SO7JYbzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710868528; c=relaxed/simple;
-	bh=cBcB6d6+i4J0E25xFREZKFr8Gi0/HhGKqA6mI9d7Dr8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ozbo94a+rVUuvUbrT3HlHdAgMEZmHd2K9Qz5JrAfMVuGFOCJRxNmI8Lz7czLgOQhjRy+G9GUfCGfUhNSGbNtOf0SwAaUUxvXRsT2gGP9nbp0VsF2wpDXlNxUgeSMaE4qp1gOSdXP28MUbWR4+nr/nm728mQh/fc2hHuFgx0T1Nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BU6FWS3O; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08106C433C7;
-	Tue, 19 Mar 2024 17:15:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710868527;
-	bh=cBcB6d6+i4J0E25xFREZKFr8Gi0/HhGKqA6mI9d7Dr8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BU6FWS3Osa9+Dn2am7oAuehEHNRiGwNK1VcKrsKgxxE3jql0jA8XWvsifl5qx/jY5
-	 vy1SOnjA+ZAdBlMn1+BL8mLaFf0qbLyutGv10lYwBXpqUE50ByUhgpLXy3b/UilXlm
-	 Hj4Pja6Bz3fDVNSit3eyirF4oDSjwzR4XECH2lVPKCuLfmKlT+HbXaZnYAUQpO/UgA
-	 OMJEioTmjlsEkUDvTgf6gWeiSu9w1mvER2/PIsU39YhbBvDSLsQIDn7i7r1XHgKHkO
-	 Xg0D+XmimCZNMT/ULptRsVY5ZtS2F+x+rn4A+z7PQJna4KIlQ+eEYmAt/nIpCKQcuo
-	 vqaidrcNkgMyw==
-Date: Tue, 19 Mar 2024 10:15:25 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric 
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Michael S.
-  Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alexei 
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@google.com>, Amritha 
- Nambiar <amritha.nambiar@intel.com>, Larysa Zaremba
- <larysa.zaremba@intel.com>, Sridhar Samudrala
- <sridhar.samudrala@intel.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>, virtualization@lists.linux.dev,
- bpf@vger.kernel.org
-Subject: Re: [PATCH net-next v4 3/8] virtio_net: support device stats
-Message-ID: <20240319101525.2452065d@kernel.org>
-In-Reply-To: <1710489940.1772969-1-xuanzhuo@linux.alibaba.com>
-References: <20240314085459.115933-1-xuanzhuo@linux.alibaba.com>
-	<20240314085459.115933-4-xuanzhuo@linux.alibaba.com>
-	<20240314155425.74b8c601@kernel.org>
-	<1710489940.1772969-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1710868683; c=relaxed/simple;
+	bh=W83zl3ZLS+HsPMQS5LRUk7fpZ5MkYeiNO326nwQR+TU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=h3OPRFGif5rHKQSCSThNoh77Jx/LXy807FKEF2quA4bAmyx8aURKMNAi05BY8rVCqQbiuKupdDhTwJSawl9lfF2pAadwsB0pT7EE5tRyMQrT0tUD2bOgp/YRH5uJlbSfvdoV0oVCrxAxaaoEfXXiyla2IXPzLpT2Fcvr15KpuK4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NoUVK/p+; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-56b9dac4e6cso794a12.1
+        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 10:18:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710868680; x=1711473480; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dr7fBtM1LEiJ2CrIx0DhLAiCaLMDkZLjkCt42+n7qho=;
+        b=NoUVK/p+Pda5yCds4rgDV21A7eXyEAOqZRmpFimbSvTubHER0ebnODWYLBn+lAMa3k
+         Vnv2Rbd+92UDaCsL5yRlnVWQXsJyAV4IBMftahQ6SzQkES96h8ZqKPE6FYvCZlKOWaRQ
+         oIIOuSg7YttfCQ8mP8o/QcZBgakZXtJwL4F9KirW198EzlQ7XenO3r31PROSjVCWRd1v
+         yQQ8cePHaOMnBdNXTXwtC8lHbTac5pF6q+WfUuicgtoLxn2YTfnWzQqnNtuh5jf6HIrC
+         /DmKZG5zmfJ4qELpBUF8L3Vn0C05eLzT2seubvYcV/Rc2TY6X/VYJVCbwpMcfnOmG7F0
+         tByg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710868680; x=1711473480;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dr7fBtM1LEiJ2CrIx0DhLAiCaLMDkZLjkCt42+n7qho=;
+        b=S+jDYpSiEE5FSUtffTFDgBDHPZ6tVpN/psstmHccgsxN/3DVhW+z2z5r2aIBR2f5uL
+         DPIcblm8zieNVfJE2t42BZDw9B1Y/quGQA6AIM85MKYd8C6kwl32m8muB44HmQIriJZq
+         cCMoIVhoWIoVQS6i6cGhBcZZQRfMnA0DpKC0Tpsr9fXTYznjRKs3WZ3GSTyUvls/+Rep
+         EZs3VEPM+t0KJbnqc7akQ7CQmGu6yzdzBcGJGQhapo8Pb7anDdgC9/tRS11SQXmo0QJE
+         4O2vYsNK60QzSDAcpW6MqH2608pwuMhJeogIY6bJZY611SbTrT2whOtScoGINgaE5lVf
+         h4Ag==
+X-Forwarded-Encrypted: i=1; AJvYcCV4M1G6q784YPXQthH7PpeI3Nhewa4gMLwQlMNSl34Ppye/YS/0yrFiHUkQb6sTUtnt5qCabBqT9m67FB3mu5k9zZ+tkGeQ
+X-Gm-Message-State: AOJu0YzL1+kqeuYFs6386Uo/Q8X4tbmEnaZuIaPvvFRbags1Oep7qtIo
+	1DH5GRWKrpaD/i7N7UtFoO+5v9u+vIf60l2d0TeG/mvNgPFS98sbe2gfx5J0nzwBzqQTBI77yr/
+	DOkooLEaJOR3j38wlh6+vtH0lyLC/nOkcOBYn
+X-Google-Smtp-Source: AGHT+IF0twPJdIbDYmQIt9YeIlCGcp/gll7JcM72FFU1CPR/ot3fi3BO5PjM35ZbOWi/A2yW3jIEYlBgBMTxtQrCblM=
+X-Received: by 2002:a05:6402:8c7:b0:56a:4f23:f644 with SMTP id
+ d7-20020a05640208c700b0056a4f23f644mr13054edz.0.1710868679798; Tue, 19 Mar
+ 2024 10:17:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20240303052408.310064-1-kuba@kernel.org> <20240303052408.310064-4-kuba@kernel.org>
+ <20240315124808.033ff58d@elisabeth> <20240319085545.76445a1e@kernel.org>
+In-Reply-To: <20240319085545.76445a1e@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 19 Mar 2024 18:17:47 +0100
+Message-ID: <CANn89i+afBvqP564v6TuL3OGeRxfDNMuwe=EdH_3N4UuHsvfuA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 3/3] genetlink: fit NLMSG_DONE into same
+ read() as families
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Stefano Brivio <sbrivio@redhat.com>, davem@davemloft.net, netdev@vger.kernel.org, 
+	pabeni@redhat.com, jiri@resnulli.us, idosch@idosch.org, 
+	johannes@sipsolutions.net, fw@strlen.de, pablo@netfilter.org, 
+	Martin Pitt <mpitt@redhat.com>, Paul Holzinger <pholzing@redhat.com>, 
+	David Gibson <david@gibson.dropbear.id.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 15 Mar 2024 16:05:40 +0800 Xuan Zhuo wrote:
-> > Don't duplicate the stats which get reported via the netlink API in
-> > ethtool. Similar story to the rtnl stats:
+On Tue, Mar 19, 2024 at 4:55=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Fri, 15 Mar 2024 12:48:08 +0100 Stefano Brivio wrote:
+> > > Make sure ctrl_fill_info() returns sensible error codes and
+> > > propagate them out to netlink core. Let netlink core decide
+> > > when to return skb->len and when to treat the exit as an
+> > > error. Netlink core does better job at it, if we always
+> > > return skb->len the core doesn't know when we're done
+> > > dumping and NLMSG_DONE ends up in a separate read().
 > >
-> > https://docs.kernel.org/next/networking/statistics.html#notes-for-driver-authors  
-> 
-> Sorry, this patch set did not follow this.
-> 
-> I will fix in next version.
-> 
-> But I plan that will be done in the commit "virtio-net: support queue stat".
-> This commit in next version will report all stat by ethtool -S.
-> The commit "virtio-net: support queue stat" in next version
-> will not report the duplicate the stats that reported via the netlink API.
-> 
-> Do you think ok?
+> > While this change is obviously correct, it breaks... well, broken
+> > applications that _wrongly_ rely on the fact that NLMSG_DONE is
+> > delivered in a separate datagram.
+> >
+> > This was the (embarrassing) case for passt(1), which I just fixed:
+> >   https://archives.passt.top/passt-dev/20240315112432.382212-1-sbrivio@=
+redhat.com/
+> >
+> > but the "separate" NLMSG_DONE is such an established behaviour,
+> > I think, that this might raise a more general concern.
+> >
+> > From my perspective, I'm just happy that this change revealed the
+> > issue, but I wanted to report this anyway in case somebody has
+> > similar possible breakages in mind.
+>
+> Hi Stefano! I was worried this may happen :( I think we should revert
+> offending commits, but I'd like to take it on case by case basis.
+> I'd imagine majority of netlink is only exercised by iproute2 and
+> libmnl-based tools. Does passt hang specifically on genetlink family
+> dump? Your commit also mentions RTM_GETROUTE. This is not the only
+> commit which removed DONE:
+>
+> $ git log --since=3D'1 month ago' --grep=3DNLMSG_DONE --no-merges  --onel=
+ine
+>
+> 9cc4cc329d30 ipv6: use xa_array iterator to implement inet6_dump_addr()
+> 87d381973e49 genetlink: fit NLMSG_DONE into same read() as families
+> 4ce5dc9316de inet: switch inet_dump_fib() to RCU protection
+> 6647b338fc5c netlink: fix netlink_diag_dump() return value
 
-I guess that could save time refactoring the code, but we generally
-push authors to go the extra mile and make reviewers life easier.
-Also, in a way, making the evolution of the code base look more
-logical. So I'd prefer if the series was reorganized to never
-expose the standard stats via -S.
+Lets not bring back more RTNL locking please for the handlers that
+still require it.
+
+The core can generate an NLMSG_DONE by itself, if we decide this needs
+to be done.
+
+I find this discussion a bit strange, because NLMSG_DONE being
+piggybacked has been a long established behavior.
+
+Jason patch was from 2017
 
