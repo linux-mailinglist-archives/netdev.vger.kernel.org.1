@@ -1,175 +1,96 @@
-Return-Path: <netdev+bounces-80626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00D4B88003C
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 16:09:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4F69880072
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 16:20:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84D46B20EB0
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 15:09:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22EED1C21EB6
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 15:20:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F67F651AC;
-	Tue, 19 Mar 2024 15:08:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EE3E651B1;
+	Tue, 19 Mar 2024 15:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jg9pCQWt"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33252D05E
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 15:08:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476F462818;
+	Tue, 19 Mar 2024 15:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710860938; cv=none; b=MXsQ5Ir6iSENGh/r2ovrnMSITv5zjYa6WP46wOSMF6RvHCsS5/qUxg6GOWiwF1cexn5x8M8frtCf1hbAXsT7Hnvv75zQ9geiDrWoWtg3xCJPIHKmc6YE1igOTb6SIlx6ZJztBtH6IPs9IqQVuBAe6LgiCl2F9l6KytUq5YXACVc=
+	t=1710861628; cv=none; b=DehY8O5f5Iph0JJM6RL+THZo2V9qfrZcHgu5P+0wWVxZ5M1uZVRC+6SSIOUfCz4PSdToFTz8L+ppZNfJdD4Ic0k015xfdvVNnff62cz43magN3jN3hRGyAN2mS5rLwBAthih2nJrvp4oSA/mazZCCruLlsoEgDAyeSQyPXbhhnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710860938; c=relaxed/simple;
-	bh=pWmA2TjVOlEO2nDeuR5LcVwVNFWlctcOHf43FvjyzdM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JHvmt++huVYcjZA5fEIGvbLHplS11wH6mGX5u5JfR+JgPCwCvkh6jNstDfori8yrYpiu7TxDluUoHKiq5T68+9SbHyTzPyLqttoMBbodfIn7KfdKEPaEoRin+Z4v2VZ9VloTTtlTc++flRgkgWX1gVddLg9NtCY8lToAN3wYQCY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <sha@pengutronix.de>)
-	id 1rmb59-0000Nj-9F; Tue, 19 Mar 2024 16:08:51 +0100
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <sha@pengutronix.de>)
-	id 1rmb58-007Ifk-GO; Tue, 19 Mar 2024 16:08:50 +0100
-Received: from sha by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <sha@pengutronix.de>)
-	id 1rmb58-0074Jh-1M;
-	Tue, 19 Mar 2024 16:08:50 +0100
-Date: Tue, 19 Mar 2024 16:08:50 +0100
-From: Sascha Hauer <s.hauer@pengutronix.de>
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
-Subject: Re: [PATCH] net: Do not break out of sk_stream_wait_memory() with
- TIF_NOTIFY_SIGNAL
-Message-ID: <ZfmqgvKqBtKr54Li@pengutronix.de>
-References: <20240315100159.3898944-1-s.hauer@pengutronix.de>
- <7b82679f-9b69-4568-a61d-03eb1e4afc18@gmail.com>
- <ZfgvNjWP8OYMIa3Y@pengutronix.de>
- <0a556650-9627-48ee-9707-05d7cab33f0f@gmail.com>
- <Zflt3EVf744LOA6i@pengutronix.de>
- <bfc6afa9-501f-40b6-929a-3aa8c0298265@gmail.com>
+	s=arc-20240116; t=1710861628; c=relaxed/simple;
+	bh=nNmQMr4qsJJT45KeaczDshMR3IsjHUY1Z8kaEgKlOGE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qKCoONy5eYLfp7eSWLpdB6o/N0v6aRNz04r2fWGMbMsLALTiXYBzF7WxnZZE6BjUdFG1iPlkhANOAwfRn+pZ+eSYscwLl1y4RDyNIVEPSJzYifOXZdAUv5LbjcXLQgJdAsLgPeF5xL/zMSpvgvXA7/Cwbhnka1OeUdM8Tj2Qa0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jg9pCQWt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 1D232C433F1;
+	Tue, 19 Mar 2024 15:20:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710861628;
+	bh=nNmQMr4qsJJT45KeaczDshMR3IsjHUY1Z8kaEgKlOGE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Jg9pCQWtVVM3NDofDz8skdPZLZ5oaNmO8n1Pr67BbeqKVjfuD50HS0VC9099bCYhi
+	 n3BFOps6wT55TCy0wSChdmlgPzsEG64I2iVGHCtfpULVi1Z234Z90oY41zFW0iSnxQ
+	 l/iHv5bT0+tkUrZEEsnekjId0fGdbHIXlqyjyGPnUpyR8cYuv5LJ872tzs8ZnHpJ7v
+	 vuqEz6LpUDqUCO4OlgbpRHf5eDKvF3bLZ6YfrEnVEFo3hwTBF/mnnUeExPUtHJVNfW
+	 FAuWEKVfWUVQD8u1oF0NNaiBWyeGTn6oCHxwefWEeRmT46RNu0RDmrCXKQs2K2buby
+	 oa/ZIvBywYYbg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 057AFD84BB3;
+	Tue, 19 Mar 2024 15:20:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bfc6afa9-501f-40b6-929a-3aa8c0298265@gmail.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: sha@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: phy: fix phy_read_poll_timeout argument type in
+ genphy_loopback
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171086162801.23936.5209926422558321847.git-patchwork-notify@kernel.org>
+Date: Tue, 19 Mar 2024 15:20:28 +0000
+References: <20240315175052.8049-1-kiryushin@ancud.ru>
+In-Reply-To: <20240315175052.8049-1-kiryushin@ancud.ru>
+To: Nikita Kiryushin <kiryushin@ancud.ru>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ o.rempel@pengutronix.de, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
 
-On Tue, Mar 19, 2024 at 01:55:21PM +0000, Pavel Begunkov wrote:
-> On 3/19/24 10:50, Sascha Hauer wrote:
-> > On Mon, Mar 18, 2024 at 01:19:19PM +0000, Pavel Begunkov wrote:
-> > > On 3/18/24 12:10, Sascha Hauer wrote:
-> > > > On Fri, Mar 15, 2024 at 05:02:05PM +0000, Pavel Begunkov wrote:
-> > > > > On 3/15/24 10:01, Sascha Hauer wrote:
-> > > > > > It can happen that a socket sends the remaining data at close() time.
-> > > > > > With io_uring and KTLS it can happen that sk_stream_wait_memory() bails
-> > > > > > out with -512 (-ERESTARTSYS) because TIF_NOTIFY_SIGNAL is set for the
-> > > > > > current task. This flag has been set in io_req_normal_work_add() by
-> > > > > > calling task_work_add().
-> > > > > 
-> > > > > The entire idea of task_work is to interrupt syscalls and let io_uring
-> > > > > do its job, otherwise it wouldn't free resources it might be holding,
-> > > > > and even potentially forever block the syscall.
-> > > > > 
-> > > > > I'm not that sure about connect / close (are they not restartable?),
-> > > > > but it doesn't seem to be a good idea for sk_stream_wait_memory(),
-> > > > > which is the normal TCP blocking send path. I'm thinking of some kinds
-> > > > > of cases with a local TCP socket pair, the tx queue is full as well
-> > > > > and the rx queue of the other end, and io_uring has to run to receive
-> > > > > the data.
-> > > 
-> > > There is another case, let's say the IO is done via io-wq
-> > > (io_uring's worker thread pool) and hits the waiting. Now the
-> > > request can't get cancelled, which is done by interrupting the
-> > > task with TIF_NOTIFY_SIGNAL. User requested request cancellations
-> > > is one thing, but we'd need to check if io_uring can ever be closed
-> > > in this case.
-> > > 
-> > > 
-> > > > > If interruptions are not welcome you can use different io_uring flags,
-> > > > > see IORING_SETUP_COOP_TASKRUN and/or IORING_SETUP_DEFER_TASKRUN.
-> > > > 
-> > > > I tried with different combinations of these flags. For example
-> > > > IORING_SETUP_TASKRUN_FLAG | IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN
-> > > > makes the issue less likely, but nevertheless it still happens.
-> > > > 
-> > > > However, reading the documentation of these flags, they shall provide
-> > > > hints to the kernel for optimizations, but it should work without these
-> > > > flags, right?
-> > > 
-> > > That's true, and I guess there are other cases as well, like
-> > > io-wq and perhaps even a stray fput.
-> > > 
-> > > 
-> > > > > Maybe I'm missing something, why not restart your syscall?
-> > > > 
-> > > > The problem comes with TLS. Normally with synchronous encryption all
-> > > > data on a socket is written during write(). When asynchronous
-> > > > encryption comes into play, then not all data is written during write(),
-> > > > but instead the remaining data is written at close() time.
-> > > 
-> > > Was it considered to do the final cleanup in workqueue
-> > > and only then finalising the release?
-> > 
-> > No, but I don't really understand what you mean here. Could you
-> > elaborate?
-> 
-> The suggestion is instead of executing the release and that final
-> flush off of the context you're in, namely userspace task,
-> you can spin up a kernel task (they're not getting any signals)
-> and execute it from there.
-> 
-> void deferred_release_fn(struct work_struct *work)
-> {
-> 	do_release();
-> 	...
-> }
-> 
-> struct work_struct work;
-> INIT_WORK(&work, deferred_release_fn);
-> queue_work(system_unbound_wq, &work);
-> 
-> 
-> There is a catch. Even though close() is not obliged to close
-> the file / socket immediately, but it still not nice when you
-> drop the final ref but port and other bits are not released
-> until some time after. So, you might want to wait for that
-> deferred release to complete before returning to the
-> userspace.
-> 
-> I'm assuming it's fine to run it by a kernel task since
-> IIRC fput might delay release to it anyway, but it's better
-> to ask net maintainers. In theory it shouldn't need
-> mm,fs,etc that user task would hold.
+Hello:
 
-Ok, I'll have a look into it. Thanks for your input.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Sascha
+On Fri, 15 Mar 2024 20:50:52 +0300 you wrote:
+> read_poll_timeout inside phy_read_poll_timeout can set val negative
+> in some cases (for example, __mdiobus_read inside phy_read can return
+> -EOPNOTSUPP).
+> 
+> Supposedly, commit 4ec732951702 ("net: phylib: fix phy_read*_poll_timeout()")
+> should fix problems with wrong-signed vals, but I do not see how
+> as val is sent to phy_read as is and __val = phy_read (not val)
+> is checked for sign.
+> 
+> [...]
 
+Here is the summary with links:
+  - [net] net: phy: fix phy_read_poll_timeout argument type in genphy_loopback
+    https://git.kernel.org/netdev/net/c/32fa4366cc4d
+
+You are awesome, thank you!
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
