@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-80528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED82287FAC0
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 10:32:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE78387FAC1
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 10:32:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87F771F21D59
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 09:32:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9EFD282909
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 09:32:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A877D416;
-	Tue, 19 Mar 2024 09:31:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D4A7CF30;
+	Tue, 19 Mar 2024 09:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kT215DZ+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kX22+hmM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E5B17CF07
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 09:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CCBC7CF07
+	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 09:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710840710; cv=none; b=bWhWPjSvbPGiPSGkUhk04KKEYOZSIckrbEokJZpUpDVsyebvKMfGVQBGBYHjfuNiCkWi/RwKh/Mou1mazZSbAKXAK5NfSaEn16mnCwiZZI4oaN2Lq5cgwu/+oH86Ierk+5gJan9QRZik5zCY/bQ3v2xlKHd4w9NZ4zQD+n+hOmQ=
+	t=1710840712; cv=none; b=iQCRaJUOB8UJC3mgxNMgIwU7vAgVmc2GBL8Vj7QbEQeUrGGgrEqlU2EdlVCipoqShRqiDHcphxBVMsEeUqfS+hGVLGKnlGUFUdfGpR7bfNyXYNX0Uqp99r3KsnZKi5bMRqSzpWXN6xswycrdmKW+oULAgnIJUYBtGkx8o1jCq+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710840710; c=relaxed/simple;
-	bh=GQuzUSMgJFKGY+VSFwAV8bBLm4VyTtVUj9T4/0i49fI=;
+	s=arc-20240116; t=1710840712; c=relaxed/simple;
+	bh=o35t/04LWDC93+XbKVJyrV9DTCIG9cG4uP9jHW9xk0k=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eq8O2kXAfYA3XBTudHT+oPyUo8opxi2NUhqgrdkgAT3aRiOPm1aVS8aDzzRVbBhWYWcOSc5uced2KexAuCCKwXGQrLZpkPCMH+HLoNbWEFro8x1eeAMzmYACsYZ2R1vKhhpyBxL0+VVu5gRrDMHyynd2Y6ZcMge1pTcp66oljM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kT215DZ+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3A704C433F1;
-	Tue, 19 Mar 2024 09:31:49 +0000 (UTC)
+	 MIME-Version; b=C3cz6kPxSho28rwKV5166mfxzdk1zlzLC/pT9wure00aQ72TDetcW7dXiKY/hbV4KitM5aW07PgemxIK9JFvQeL6A1dd27S2YKZ3apAdTflxRIgBn22s1wd137GGbJu4fc3YcjbDs1u3Uiq3ysS+qGN3PhN7m38uQrx6A/Jk8dI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kX22+hmM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F26A8C433C7;
+	Tue, 19 Mar 2024 09:31:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710840709;
-	bh=GQuzUSMgJFKGY+VSFwAV8bBLm4VyTtVUj9T4/0i49fI=;
+	s=k20201202; t=1710840712;
+	bh=o35t/04LWDC93+XbKVJyrV9DTCIG9cG4uP9jHW9xk0k=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kT215DZ+ibTbgX26wmy4UfARDKGFDetYOpZ2ozFOvkF8kV3yO973VwLo4kPpMVwcD
-	 0nIk5iF9l40mlkVR52QAhvZX3gxPbS+E0jvRipcrU0ct3qooAfkpKjxImW1vpCt+Ae
-	 pGq5mia5Z4mUClpYFuWk1FDtVwnewcrOMhcpNjpPeS3AvzYAki4zE2f4jjTePlIS93
-	 FxvzvjIBG/zdSRJ5EyJZkuDP+2BqV4GEOUKC50QwBuPZS5ExRctjEboKS1mkqnLmtJ
-	 AewKuVyB/fnu81A3u6UM3z0AaWDasS+8Ux4cNfp7m8pjb6Dn6R9IL/AdoNFkEegEWZ
-	 lucKMmOoBbggA==
+	b=kX22+hmM5hDYkZrvQ0Ns2Elerj75aAXXf3WV1/t3CNZ+Ox89RC5RQJ4hT27bVrB3b
+	 +DsrLWO3EjMa8UuAGVc0FT/f4qDgN/PmIolgZaubbKZYB0CwyOjXINyax917JiQbzn
+	 J7EBqXhIkzUyXqDc6jRdqjAUncmesrPFxyD/5rZHWKoCIusA2HoIMkcAby9Yxkrbxs
+	 kcmtqPF5Qx7CvLM7UvTOEhTP+Kscu8Kj4+eAmwfiT78t6v2In0v8N84blZ+76UP+Wf
+	 OoE2bVvOe4GVRfnykPRSISns6phT6uX17+S8rGdu/tFlSl5xa4TkT96QWpT1ERHzpx
+	 D41j5IDAOQoVg==
 From: Antoine Tenart <atenart@kernel.org>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -50,9 +50,9 @@ Cc: Antoine Tenart <atenart@kernel.org>,
 	steffen.klassert@secunet.com,
 	willemdebruijn.kernel@gmail.com,
 	netdev@vger.kernel.org
-Subject: [PATCH net v2 2/4] gro: fix ownership transfer
-Date: Tue, 19 Mar 2024 10:31:37 +0100
-Message-ID: <20240319093140.499123-3-atenart@kernel.org>
+Subject: [PATCH net v2 3/4] udp: do not transition UDP fraglist to unnecessary checksum
+Date: Tue, 19 Mar 2024 10:31:38 +0100
+Message-ID: <20240319093140.499123-4-atenart@kernel.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240319093140.499123-1-atenart@kernel.org>
 References: <20240319093140.499123-1-atenart@kernel.org>
@@ -64,67 +64,66 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-If packets are GROed with fraglist they might be segmented later on and
-continue their journey in the stack. In skb_segment_list those skbs can
-be reused as-is. This is an issue as their destructor was removed in
-skb_gro_receive_list but not the reference to their socket, and then
-they can't be orphaned. Fix this by also removing the reference to the
-socket.
+udp4/6_gro_complete transition fraglist packets to CHECKSUM_UNNECESSARY
+and sets their checksum level based on if the packet is recognized to be
+a tunneled one. However there is no safe way to detect a packet is a
+tunneled one and in case such packet is GROed at the UDP level, setting
+a wrong checksum level will lead to later errors. For example if those
+packets are forwarded to the Tx path they could produce the following
+dump:
 
-For example this could be observed,
+  gen01: hw csum failure
+  skb len=3008 headroom=160 headlen=1376 tailroom=0
+  mac=(106,14) net=(120,40) trans=160
+  shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
+  csum(0xffff232e ip_summed=2 complete_sw=0 valid=0 level=0)
+  hash(0x77e3d716 sw=1 l4=1) proto=0x86dd pkttype=0 iif=12
+  ...
 
-  kernel BUG at include/linux/skbuff.h:3131!  (skb_orphan)
-  RIP: 0010:ip6_rcv_core+0x11bc/0x19a0
-  Call Trace:
-   ipv6_list_rcv+0x250/0x3f0
-   __netif_receive_skb_list_core+0x49d/0x8f0
-   netif_receive_skb_list_internal+0x634/0xd40
-   napi_complete_done+0x1d2/0x7d0
-   gro_cell_poll+0x118/0x1f0
-
-A similar construction is found in skb_gro_receive, apply the same
-change there.
-
-Fixes: 5e10da5385d2 ("skbuff: allow 'slow_gro' for skb carring sock reference")
+Fixes: 9fd1ff5d2ac7 ("udp: Support UDP fraglist GRO/GSO.")
 Signed-off-by: Antoine Tenart <atenart@kernel.org>
 ---
+ net/ipv4/udp_offload.c | 8 --------
+ net/ipv6/udp_offload.c | 8 --------
+ 2 files changed, 16 deletions(-)
 
-Since v1:
-  - Reworded beginning of the commit msg.
-
- net/core/gro.c         | 3 ++-
- net/ipv4/udp_offload.c | 3 ++-
- 2 files changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/net/core/gro.c b/net/core/gro.c
-index ee30d4f0c038..83f35d99a682 100644
---- a/net/core/gro.c
-+++ b/net/core/gro.c
-@@ -192,8 +192,9 @@ int skb_gro_receive(struct sk_buff *p, struct sk_buff *skb)
- 	}
- 
- merge:
--	/* sk owenrship - if any - completely transferred to the aggregated packet */
-+	/* sk ownership - if any - completely transferred to the aggregated packet */
- 	skb->destructor = NULL;
-+	skb->sk = NULL;
- 	delta_truesize = skb->truesize;
- 	if (offset > headlen) {
- 		unsigned int eat = offset - headlen;
 diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index e9719afe91cf..3bb69464930b 100644
+index 3bb69464930b..3263ebcaa3f4 100644
 --- a/net/ipv4/udp_offload.c
 +++ b/net/ipv4/udp_offload.c
-@@ -449,8 +449,9 @@ static int skb_gro_receive_list(struct sk_buff *p, struct sk_buff *skb)
- 	NAPI_GRO_CB(p)->count++;
- 	p->data_len += skb->len;
+@@ -722,14 +722,6 @@ INDIRECT_CALLABLE_SCOPE int udp4_gro_complete(struct sk_buff *skb, int nhoff)
+ 		skb_shinfo(skb)->gso_type |= (SKB_GSO_FRAGLIST|SKB_GSO_UDP_L4);
+ 		skb_shinfo(skb)->gso_segs = NAPI_GRO_CB(skb)->count;
  
--	/* sk owenrship - if any - completely transferred to the aggregated packet */
-+	/* sk ownership - if any - completely transferred to the aggregated packet */
- 	skb->destructor = NULL;
-+	skb->sk = NULL;
- 	p->truesize += skb->truesize;
- 	p->len += skb->len;
+-		if (skb->ip_summed == CHECKSUM_UNNECESSARY) {
+-			if (skb->csum_level < SKB_MAX_CSUM_LEVEL)
+-				skb->csum_level++;
+-		} else {
+-			skb->ip_summed = CHECKSUM_UNNECESSARY;
+-			skb->csum_level = 0;
+-		}
+-
+ 		return 0;
+ 	}
+ 
+diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
+index 312bcaeea96f..9289384cb7d0 100644
+--- a/net/ipv6/udp_offload.c
++++ b/net/ipv6/udp_offload.c
+@@ -174,14 +174,6 @@ INDIRECT_CALLABLE_SCOPE int udp6_gro_complete(struct sk_buff *skb, int nhoff)
+ 		skb_shinfo(skb)->gso_type |= (SKB_GSO_FRAGLIST|SKB_GSO_UDP_L4);
+ 		skb_shinfo(skb)->gso_segs = NAPI_GRO_CB(skb)->count;
+ 
+-		if (skb->ip_summed == CHECKSUM_UNNECESSARY) {
+-			if (skb->csum_level < SKB_MAX_CSUM_LEVEL)
+-				skb->csum_level++;
+-		} else {
+-			skb->ip_summed = CHECKSUM_UNNECESSARY;
+-			skb->csum_level = 0;
+-		}
+-
+ 		return 0;
+ 	}
  
 -- 
 2.44.0
