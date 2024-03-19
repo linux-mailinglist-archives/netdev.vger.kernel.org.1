@@ -1,165 +1,122 @@
-Return-Path: <netdev+bounces-80705-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80707-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6394288074C
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 23:30:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 308F8880762
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 23:50:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AE5C283E92
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 22:30:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E40E91F2351B
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 22:50:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D02D45FB89;
-	Tue, 19 Mar 2024 22:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ofVfAAXS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B34D740BF2;
+	Tue, 19 Mar 2024 22:50:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 046AE3C6AC
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 22:30:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6F1364D4;
+	Tue, 19 Mar 2024 22:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710887408; cv=none; b=pUKWjgH5Q3f/UoPfPQuUYKZG6chYXSI9Y824L601KBIZ0gAj32TvslSGC50YzK1Z7ugCifQe8i99fw1/mBiVYU68TDMWSHBuN28DkOkp4fVAJzfMZR6xKZk7TekEckZstgFGRDUBdIMmaxn9eO8EU9g2KhR7spSSeqVuY2j4pF4=
+	t=1710888610; cv=none; b=YNMT5KYt42HYVXqNHecc+KxCuwtVRFmM8gfpTtcyt4XHaGl0P9pARY6BkHQOJjzxf8N9qTfu2g48q2saOVcdvvP8x6ZvjA5/aDen88yNaEsKhINxBr7Exi0nnzrltWZdF1mQOpUPNfkXSHqq5cI2b74qBXm6tSReBT136/3Fg8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710887408; c=relaxed/simple;
-	bh=wtbRGprG246JSinZ1zeJ0g2NwwsbkPDYzZmmC7vbRTg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YI6uy8QNFOR9IdF8CsP6G96OGCBiGg8zv8RaGzx/XGO84YFN6pp/3RChi9pETY6yRDfBkw95xgwUgR173HdK//vV6Anx03t8vfZv78CeIx0OKG6zMIssb7uOh7f/R6TcnJXpBFdfB6xrZOpMx4UJg1dW0yADFlpd8SlcgvUSpQs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ofVfAAXS; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-41467b42b98so14325e9.1
-        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 15:30:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710887404; x=1711492204; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t8EtD8zegIhUQWzA/oDS70j+Z9o9c4kykZ4EUai9up0=;
-        b=ofVfAAXSVDz8umrvv14pK2V/4/3P3kzsOjuxfKAom8Ki59bDmUAF1ZZeWjIBSUQbKQ
-         OfXIJR+vPGDajLBH9qCmNiEbA/7RtRlba9C8M12whYQ7Q67DVEqA9GaoZs0lhuWOpVsn
-         inK1zngi7gQ3VUaCl+YdO3Br3OP9NWCD/Hr3L3Y7i6AeaQYmq5ZHTl/gBOsxC5D8xsrA
-         UjLIBbcUUEjz+IYZaereQMCv89gJ6b4wMcPFly4nwrKNvTVIH/+kesT7ruQbm4BCG0ON
-         Ho93su6n6Xp9Bt+rc1w4GoRvH5It59jwEoy0Cxl4snlxWSL2R+YpWUfjti9Mx8VlOOe1
-         WgQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710887404; x=1711492204;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t8EtD8zegIhUQWzA/oDS70j+Z9o9c4kykZ4EUai9up0=;
-        b=i6PlIN/vekrPe6ZkvdgnPovTloesuRTQvhOjhFTNgSzW74PQLmrELCWSxmU+q7SSdA
-         bG2lS4I56hoCjzKjUz+UrzimX9rMc6+jMl1614EqpB3+fXqthGolnOzhFj3lsNk5EJI1
-         Po6MyC1EHuDFwNTK9lBMlWfe8QqtISaExaYF229zWxjCb5G28cTz0b9tkXvf6t61S0DW
-         by2wyxLl54BHseP7704GUMZXJDdwmhyTjGnN0Y07yKN5Snz0NSzp/4F2HQq7LgThdz85
-         2xG6m3KbYLtdLLE42lbC361sPKJlJez1gb+78EHQi2SJLhWK45UrwpffmP9gPJ9Wl+rh
-         keMw==
-X-Forwarded-Encrypted: i=1; AJvYcCWaoAzS1ImeilpJH3eh0p/+WHvNGHGLt1dxSxS/YM4LBHgGOtGSTA9/Wgz+LOBgEhuGyi1j6mNJAPrjcEvQmZOHGpkHnOAs
-X-Gm-Message-State: AOJu0YxEtCmIIIsBM0C7sBvGk1QJwQ49ZfpjCbh2u047VE7ES6iEuAjo
-	N+rpoLduT1iAIycL5Ea+AX2Xt7rPlxmhw6UxGbROJohnSJTYHlr/vdXpxuaQkF51x4H9WHcdVRb
-	QiPBHnMFwCH8zxEE4WhtzA7L07MfJdSIO8bU=
-X-Google-Smtp-Source: AGHT+IFnGQzm4jMjcrzDlbzN56akGGgkj3uAyRKTIsnW0UhcIBF+MbiMv0KxT6M+rBMt9Ny+pOt1FU4BU9vpN+72B78=
-X-Received: by 2002:a05:600c:3051:b0:414:1ee:f399 with SMTP id
- n17-20020a05600c305100b0041401eef399mr89401wmh.2.1710887404353; Tue, 19 Mar
- 2024 15:30:04 -0700 (PDT)
+	s=arc-20240116; t=1710888610; c=relaxed/simple;
+	bh=1flOJ3RWi62qhATNMgJWjfQ18bBCP95T4oDhosHEGzc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RzQg7/NzgjJV+ndoPiy7alIajDg1azAZlN2Uyykfq0OntUur6lth8VJSbAkK3HRUpFbUxR4E+g4o6sztB7KYXjfDJuuTUsgukD5jbPWe6WkGz6ggUibznUO8CwRCMYHBgWAZfGl6oyhVDlMHgtcSNeZ3n92+3dmr2r3l17gmNP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
+Received: from [192.168.178.112] (p57b378ee.dip0.t-ipconnect.de [87.179.120.238])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: pmenzel)
+	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 152AC61E5FE3D;
+	Tue, 19 Mar 2024 23:48:19 +0100 (CET)
+Message-ID: <cd42aca9-ac6c-4579-96d5-121a38ebded5@molgen.mpg.de>
+Date: Tue, 19 Mar 2024 23:48:17 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240319130547.4195-1-lakshmi.sowjanya.d@intel.com> <20240319130547.4195-3-lakshmi.sowjanya.d@intel.com>
-In-Reply-To: <20240319130547.4195-3-lakshmi.sowjanya.d@intel.com>
-From: John Stultz <jstultz@google.com>
-Date: Tue, 19 Mar 2024 15:29:51 -0700
-Message-ID: <CANDhNCpP6Nd_iYtdgW+RyH1g7c-eyHR+j-LV4gv8rKWu9QkzhQ@mail.gmail.com>
-Subject: Re: [PATCH v5 02/11] timekeeping: Add function to convert realtime to
- base clock
-To: lakshmi.sowjanya.d@intel.com
-Cc: tglx@linutronix.de, giometti@enneenne.com, corbet@lwn.net, 
-	linux-kernel@vger.kernel.org, x86@kernel.org, netdev@vger.kernel.org, 
-	linux-doc@vger.kernel.org, intel-wired-lan@lists.osuosl.org, 
-	andriy.shevchenko@linux.intel.com, eddie.dong@intel.com, 
-	christopher.s.hall@intel.com, jesse.brandeburg@intel.com, davem@davemloft.net, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, mcoquelin.stm32@gmail.com, 
-	perex@perex.cz, linux-sound@vger.kernel.org, anthony.l.nguyen@intel.com, 
-	peter.hilber@opensynergy.com, pandith.n@intel.com, 
-	mallikarjunappa.sangannavar@intel.com, subramanian.mohan@intel.com, 
-	basavaraj.goudar@intel.com, thejesh.reddy.t.r@intel.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH v5 00/11] Add support for Intel PPS
+ Generator
+Content-Language: en-US
+To: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
+Cc: tglx@linutronix.de, jstultz@google.com, giometti@enneenne.com,
+ corbet@lwn.net, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ mallikarjunappa.sangannavar@intel.com, alexandre.torgue@foss.st.com,
+ perex@perex.cz, basavaraj.goudar@intel.com, thejesh.reddy.t.r@intel.com,
+ christopher.s.hall@intel.com, x86@kernel.org, joabreu@synopsys.com,
+ peter.hilber@opensynergy.com, intel-wired-lan@lists.osuosl.org,
+ subramanian.mohan@intel.com, linux-sound@vger.kernel.org,
+ andriy.shevchenko@linux.intel.com, netdev@vger.kernel.org,
+ pandith.n@intel.com, eddie.dong@intel.com, mcoquelin.stm32@gmail.com,
+ anthony.l.nguyen@intel.com, davem@davemloft.net
+References: <20240319130547.4195-1-lakshmi.sowjanya.d@intel.com>
+From: Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20240319130547.4195-1-lakshmi.sowjanya.d@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 19, 2024 at 6:06=E2=80=AFAM <lakshmi.sowjanya.d@intel.com> wrot=
-e:
->
+Dear Lakshmi,
+
+
+Thank you for your patch series.
+
+Am 19.03.24 um 14:05 schrieb lakshmi.sowjanya.d@intel.com:
 > From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
->
-> PPS(Pulse Per Second) generates signals in realtime, but Timed IO
-> hardware understands time in base clock reference. Add an interface,
-> ktime_real_to_base_clock() to convert realtime to base clock.
->
-> Convert the base clock to the system clock using convert_base_to_cs() in
-> get_device_system_crosststamp().
->
-> Add the helper function timekeeping_clocksource_has_base(), to check
-> whether the current clocksource has the same base clock. This will be
-> used by Timed IO device to check if the base clock is X86_ART(Always
-> Running Timer).
->
-> Co-developed-by: Thomas Gleixner <tglx@linutronix.de>
-> Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
-> Co-developed-by: Christopher S. Hall <christopher.s.hall@intel.com>
-> Signed-off-by: Christopher S. Hall <christopher.s.hall@intel.com>
-> Signed-off-by: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
-> ---
->  include/linux/timekeeping.h |   6 +++
->  kernel/time/timekeeping.c   | 105 +++++++++++++++++++++++++++++++++++-
->  2 files changed, 109 insertions(+), 2 deletions(-)
->
-> diff --git a/include/linux/timekeeping.h b/include/linux/timekeeping.h
-> index 7e50cbd97f86..1b2a4a37bf93 100644
-> --- a/include/linux/timekeeping.h
-> +++ b/include/linux/timekeeping.h
-> @@ -275,12 +275,18 @@ struct system_device_crosststamp {
->   *             timekeeping code to verify comparability of two cycle val=
-ues.
->   *             The default ID, CSID_GENERIC, does not identify a specifi=
-c
->   *             clocksource.
-> + * @nsecs:     @cycles is in nanoseconds.
->   */
->  struct system_counterval_t {
->         u64                     cycles;
->         enum clocksource_ids    cs_id;
-> +       bool                    nsecs;
+> 
+> The goal of the PPS(Pulse Per Second) hardware/software is to generate a
 
-Apologies, this is a bit of an annoying bikeshed request, but maybe
-use_nsecs here?
-There are plenty of places where nsecs fields hold actual nanoseconds,
-so what you have might be easy to misread in the future.
+Please add a space before (.
 
-Also, at least in this series, I'm not sure I see where this nsecs
-value gets set? Maybe something to split out and add in a separate
-patch, where its use is more clear?
+> signal from the system on a wire so that some third-party hardware can
+> observe that signal and judge how close the system's time is to another
+> system or piece of hardware.
+> 
+> Existing methods (like parallel ports) require software to flip a bit at
+> just the right time to create a PPS signal. Many things can prevent
+> software from doing this precisely. This (Timed I/O) method is better
+> because software only "arms" the hardware in advance and then depends on
+> the hardware to "fire" and flip the signal at just the right time.
+> 
+> To generate a PPS signal with this new hardware, the kernel wakes up
+> twice a second, once for 1->0 edge and other for the 0->1 edge. It does
+> this shortly (~10ms) before the actual change in the signal needs to be
+> made. It computes the TSC value at which edge will happen, convert to a
+> value hardware understands and program this value to Timed I/O hardware.
+> The actual edge transition happens without any further action from the
+> kernel.
+> 
+> The result here is a signal coming out of the system that is roughly
+> 1,000 times more accurate than the old methods. If the system is heavily
+> loaded, the difference in accuracy is larger in old methods.
+> 
+> Application Interface:
+> The API to use Timed I/O is very simple. It is enabled and disabled by
+> writing a '1' or '0' value to the sysfs enable attribute associated with
+> the Timed I/O PPS device. Each Timed I/O pin is represented by a PPS
+> device. When enabled, a pulse-per-second(PPS) synchronized with the
 
-> +bool timekeeping_clocksource_has_base(enum clocksource_ids id)
-> +{
-> +       unsigned int seq;
-> +       bool ret;
-> +
-> +       do {
-> +               seq =3D read_seqcount_begin(&tk_core.seq);
-> +               ret =3D tk_core.timekeeper.tkr_mono.clock->base ?
-> +               tk_core.timekeeper.tkr_mono.clock->base->id =3D=3D id : f=
-alse;
+Please add a space before (.
 
-Again, bikeshed nit: I know folks like ternaries for conciseness, but
-once you've crossed a single line, I'd often prefer to read an if
-statement.
+> system clock is continuously produced on the Timed I/O pin, otherwise it
+> is pulled low.
+> 
+> The Timed I/O signal on the motherboard is enabled in the BIOS setup.
 
-thanks
--john
+It’d be great if you documented your test setup including the name of 
+the system firmware option.
+
+
+Kind regards,
+
+Paul
 
