@@ -1,107 +1,206 @@
-Return-Path: <netdev+bounces-80517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E488187F829
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 08:08:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 322D187F887
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 08:42:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 215F31C21620
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 07:08:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55A301C21988
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 07:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0363050A97;
-	Tue, 19 Mar 2024 07:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBF5B537E0;
+	Tue, 19 Mar 2024 07:41:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="OAbakMZp"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gUpEDfKx"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE42A50A67
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 07:08:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1A45380F
+	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 07:41:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710832134; cv=none; b=HWyEqqwABpNmiruQDYqmQiEFcFvkVE+C4kmiLHm+ngg271y8+pGSbc51DW2Qr8D1/Xq75n7aQuDcAsDXxtsoGL3e+P3JoVOt3mHCAbHqpLnBkllOeZ+K8lf7egLQb55XJMRdNfoNi51NubxPYuNQcTdJQh5/FNxG72R4xZ2PEMs=
+	t=1710834113; cv=none; b=uLnE/XY5/oL46X501ztJlrp8+KS9MKLMPM9r4+egQ2pf33LoswDwpvkvrNZAwln5+UovzDTX+mtmcGLexb8gf9s6+M1TzHR1DrtHpSyUM4CItjB+ksjdNoH7bRV2huWWZfyPFoLJXRtg38yUvSCNdLajvk5vaiobcZd1boxo1EM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710832134; c=relaxed/simple;
-	bh=fthjRPSqTEWBwPv7kDg5JrBIyH5g+VbT/s4BhWGikas=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JJeNgKEWsY2fPkm0F6hYUriB/kzJPldqMPnCMY3IQtSv2CSbVcBaq+uAir8MhqlNz/K3W+uBbWfCFUgpmjUmNJIqkb/GYYAj8zNB0z5wT2y9gtXxi5bKSHYpGUJ+Aml7HImFYfv78ww0W1PKKwNOn38+qBOfqgPzvTdLU6PJ6bE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=OAbakMZp; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 24976205ED;
-	Tue, 19 Mar 2024 08:08:51 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id HXmCws4hcuTF; Tue, 19 Mar 2024 08:08:50 +0100 (CET)
-Received: from mailout2.secunet.com (mailout2.secunet.com [62.96.220.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 5E0DB2058E;
-	Tue, 19 Mar 2024 08:08:50 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 5E0DB2058E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1710832130;
-	bh=Mpq/gVrFRNjZk6Yfuc2U3PYiCIayy5FdEeXQoWJgMDo=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=OAbakMZpFnw7HcrpOB2oWJ5Q0zy2+oipFoTjy5WfFeQRD2lWsoB032JODX1s4dRr4
-	 vIhCav3DR8SXNxDRFJDEI8qR0BPZgWg9Phhmmbq/yRt6slZo29iodZ0jnbIBIlbriT
-	 xmihnvv5aNi1dg9pDVUyJ039VURPksKA31bdl5R5OiA3EUrSlp949w3txsjzGNlPEz
-	 6cCt2Bb33ASPMAjJuB6tuRSEZxhkLuSydvN6kA2oZNtx6qiTXpINeOr3VlwpQR8T3Q
-	 lEF/Lh8ELiDcAPAdJCsZ1DFS1ZhBAuitIguIonYpv/EChi18BOy5i9oE5bsHk528Vv
-	 YU8homfoV/m3w==
-Received: from cas-essen-01.secunet.de (unknown [10.53.40.201])
-	by mailout2.secunet.com (Postfix) with ESMTP id 5135080004A;
-	Tue, 19 Mar 2024 08:08:50 +0100 (CET)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-01.secunet.de (10.53.40.201) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 19 Mar 2024 08:08:50 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Tue, 19 Mar
- 2024 08:08:49 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 8A14F31844CD; Tue, 19 Mar 2024 08:08:49 +0100 (CET)
-Date: Tue, 19 Mar 2024 08:08:49 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Leon Romanovsky <leonro@nvidia.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Herbert Xu
-	<herbert@gondor.apana.org.au>, Jakub Kicinski <kuba@kernel.org>,
-	<netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH xfrm] xfrm: Allow UDP encapsulation only in offload modes
-Message-ID: <Zfk6AcOGMDxOJCd+@gauss3.secunet.de>
-References: <3d3a34ffce4f66b8242791d1e6b3091aec8a2c25.1710244420.git.leonro@nvidia.com>
+	s=arc-20240116; t=1710834113; c=relaxed/simple;
+	bh=2crLoEVLnwiq99cE6HQUHEb+ylseepzZNYcoRSHN6zw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=H88r/mfAnHdwKXSpWB4+bNzn4JGbswsumQ4lgLhpGpNYSQswXA5TGXYa6IpalqpfWrywbawzUdXYebx6FbuQnTksbBLvqXTTo9DCVkVsyVNko70E5D2T6AEVI8lS6d/YsMyLA0PbSnNCy/vAoTJIYE5CgLJltvFPTngQ3khVZYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gUpEDfKx; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710834111;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=sTsSPri+D6Wdelir2mIVSESP1KmjuvB/LjDkRovj8pE=;
+	b=gUpEDfKx2cA7200XkIVh3Xb/TR6xcVWTaNRi7kAaxtu1VM8XxKqfaQ4ozngpKQnjAdk8pQ
+	Wvxfi/e4XwyB0eXHByS9Wj7P5BGumz7Kn9dGpKA1x6xSQC7U9KHJJ5kY7pyKo++USiijXY
+	QH7M5PF2iBcuHEsWbMri2D8SWMju5ao=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-139-spoacZ1eNrml_vk8OiVDMA-1; Tue, 19 Mar 2024 03:41:49 -0400
+X-MC-Unique: spoacZ1eNrml_vk8OiVDMA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33ec604d3b3so3586700f8f.1
+        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 00:41:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710834109; x=1711438909;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sTsSPri+D6Wdelir2mIVSESP1KmjuvB/LjDkRovj8pE=;
+        b=v+j0+LGjyD7kkKp3Ej5FPdswRqgBoUcn6VDXAqfUZMPDfm+gfobHEPOXtaTJMgXAaK
+         YH54CKzc9PTj3Ma/zxSie+BKJE36MEZxe+ZX61v7xDsXUq9yvqamupEbBhhSyhGN/mZG
+         gAY+oYKSiSrQlOI5mxei73JQIn4vhWl5YpVlwFkIP4MIi0w51oGEHxeyj9HRjsSk/NgV
+         q8qroqrdfT7oMZuwG0OPRUVTuWTHEpsqEEvvPDZVolS6skvpnUE3MY+IAUboKqbz571s
+         UW+vG+T5qBCiuxga+VMp/jcLlCmoS6l+8blqIp1gI5rePfV7muQMjK54dFzJhy5Orq+P
+         lqjg==
+X-Forwarded-Encrypted: i=1; AJvYcCXnyYSWmob37fXNQ9lyT4gDIG/wqhHZG86K9vK2X7hV7TKxG4oy1caQKlcJgu8n0TvnI4Ldxi6ClZNMYqNWVwZ8aim9TvvJ
+X-Gm-Message-State: AOJu0Yw07dFBTJBcaeyoLuwi2S/EwfRqOcebS/uTjZ8En86k1h2kpdNs
+	AZ1oLApo8DxRsJ9e7vFjjMIUi1yrMs0P8Vqr4gjM/rjkYHTSK+cSZgRojlC7QEuAn9fOtOSJV2b
+	jqjffM6pKTMcJDWxDHHtxJsJ6WKyvN54J4oGDZ1l+6Q63u4DtMvpPng==
+X-Received: by 2002:a5d:4e11:0:b0:33e:7adc:516c with SMTP id p17-20020a5d4e11000000b0033e7adc516cmr10534541wrt.57.1710834108693;
+        Tue, 19 Mar 2024 00:41:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFAK2WGJat4vmdPSy7ECLAOOCSKt1cm0uCh7BMlmPoT49BMQqI0q9+XAAprgAMQmNyXP8ysuQ==
+X-Received: by 2002:a5d:4e11:0:b0:33e:7adc:516c with SMTP id p17-20020a5d4e11000000b0033e7adc516cmr10534503wrt.57.1710834108096;
+        Tue, 19 Mar 2024 00:41:48 -0700 (PDT)
+Received: from redhat.com ([2.52.6.254])
+        by smtp.gmail.com with ESMTPSA id t18-20020a5d42d2000000b0033e456f6e7csm11781382wrr.1.2024.03.19.00.41.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Mar 2024 00:41:47 -0700 (PDT)
+Date: Tue, 19 Mar 2024 03:41:43 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	alex.williamson@redhat.com, andrew@daynix.com, david@redhat.com,
+	dtatulea@nvidia.com, eperezma@redhat.com, feliu@nvidia.com,
+	gregkh@linuxfoundation.org, jasowang@redhat.com,
+	jean-philippe@linaro.org, jonah.palmer@oracle.com,
+	leiyang@redhat.com, lingshan.zhu@intel.com,
+	maxime.coquelin@redhat.com, mst@redhat.com, ricardo@marliere.net,
+	shannon.nelson@amd.com, stable@kernel.org,
+	steven.sistare@oracle.com, suzuki.poulose@arm.com,
+	xuanzhuo@linux.alibaba.com, yishaih@nvidia.com
+Subject: [GIT PULL] virtio: features, fixes
+Message-ID: <20240319034143-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <3d3a34ffce4f66b8242791d1e6b3091aec8a2c25.1710244420.git.leonro@nvidia.com>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+X-Mutt-Fcc: =sent
 
-On Tue, Mar 12, 2024 at 01:55:22PM +0200, Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> The missing check of x->encap caused to the situation where GSO packets
-> were created with UDP encapsulation.
-> 
-> As a solution return the encap check for non-offloaded SA.
-> 
-> Fixes: 9f2b55961a80 ("xfrm: Pass UDP encapsulation in TX packet offload")
-> Closes: https://lore.kernel.org/all/a650221ae500f0c7cf496c61c96c1b103dcb6f67.camel@redhat.com
-> Reported-by: Paolo Abeni <pabeni@redhat.com>
-> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+The following changes since commit e8f897f4afef0031fe618a8e94127a0934896aba:
 
-Applied, thanks Leon!
+  Linux 6.8 (2024-03-10 13:38:09 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+
+for you to fetch changes up to 5da7137de79ca6ffae3ace77050588cdf5263d33:
+
+  virtio_net: rename free_old_xmit_skbs to free_old_xmit (2024-03-19 03:19:22 -0400)
+
+----------------------------------------------------------------
+virtio: features, fixes
+
+Per vq sizes in vdpa.
+Info query for block devices support in vdpa.
+DMA sync callbacks in vduse.
+
+Fixes, cleanups.
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Andrew Melnychenko (1):
+      vhost: Added pad cleanup if vnet_hdr is not present.
+
+David Hildenbrand (1):
+      virtio: reenable config if freezing device failed
+
+Jason Wang (2):
+      virtio-net: convert rx mode setting to use workqueue
+      virtio-net: add cond_resched() to the command waiting loop
+
+Jonah Palmer (1):
+      vdpa/mlx5: Allow CVQ size changes
+
+Maxime Coquelin (1):
+      vduse: implement DMA sync callbacks
+
+Ricardo B. Marliere (2):
+      vdpa: make vdpa_bus const
+      virtio: make virtio_bus const
+
+Shannon Nelson (1):
+      vdpa/pds: fixes for VF vdpa flr-aer handling
+
+Steve Sistare (2):
+      vdpa_sim: reset must not run
+      vdpa: skip suspend/resume ops if not DRIVER_OK
+
+Suzuki K Poulose (1):
+      virtio: uapi: Drop __packed attribute in linux/virtio_pci.h
+
+Xuan Zhuo (3):
+      virtio: packed: fix unmap leak for indirect desc table
+      virtio_net: unify the code for recycling the xmit ptr
+      virtio_net: rename free_old_xmit_skbs to free_old_xmit
+
+Zhu Lingshan (20):
+      vhost-vdpa: uapi to support reporting per vq size
+      vDPA: introduce get_vq_size to vdpa_config_ops
+      vDPA/ifcvf: implement vdpa_config_ops.get_vq_size
+      vp_vdpa: implement vdpa_config_ops.get_vq_size
+      eni_vdpa: implement vdpa_config_ops.get_vq_size
+      vdpa_sim: implement vdpa_config_ops.get_vq_size for vDPA simulator
+      vduse: implement vdpa_config_ops.get_vq_size for vduse
+      virtio_vdpa: create vqs with the actual size
+      vDPA/ifcvf: get_max_vq_size to return max size
+      vDPA/ifcvf: implement vdpa_config_ops.get_vq_num_min
+      vDPA: report virtio-block capacity to user space
+      vDPA: report virtio-block max segment size to user space
+      vDPA: report virtio-block block-size to user space
+      vDPA: report virtio-block max segments in a request to user space
+      vDPA: report virtio-block MQ info to user space
+      vDPA: report virtio-block topology info to user space
+      vDPA: report virtio-block discarding configuration to user space
+      vDPA: report virtio-block write zeroes configuration to user space
+      vDPA: report virtio-block read-only info to user space
+      vDPA: report virtio-blk flush info to user space
+
+ drivers/net/virtio_net.c             | 151 +++++++++++++++---------
+ drivers/vdpa/alibaba/eni_vdpa.c      |   8 ++
+ drivers/vdpa/ifcvf/ifcvf_base.c      |  11 +-
+ drivers/vdpa/ifcvf/ifcvf_base.h      |   2 +
+ drivers/vdpa/ifcvf/ifcvf_main.c      |  15 +++
+ drivers/vdpa/mlx5/net/mlx5_vnet.c    |  13 ++-
+ drivers/vdpa/pds/aux_drv.c           |   2 +-
+ drivers/vdpa/pds/vdpa_dev.c          |  20 +++-
+ drivers/vdpa/pds/vdpa_dev.h          |   1 +
+ drivers/vdpa/vdpa.c                  | 214 ++++++++++++++++++++++++++++++++++-
+ drivers/vdpa/vdpa_sim/vdpa_sim.c     |  15 ++-
+ drivers/vdpa/vdpa_user/iova_domain.c |  27 ++++-
+ drivers/vdpa/vdpa_user/iova_domain.h |   8 ++
+ drivers/vdpa/vdpa_user/vduse_dev.c   |  34 ++++++
+ drivers/vdpa/virtio_pci/vp_vdpa.c    |   8 ++
+ drivers/vhost/net.c                  |   3 +
+ drivers/vhost/vdpa.c                 |  14 +++
+ drivers/virtio/virtio.c              |   6 +-
+ drivers/virtio/virtio_ring.c         |   6 +-
+ drivers/virtio/virtio_vdpa.c         |   5 +-
+ include/linux/vdpa.h                 |   6 +
+ include/uapi/linux/vdpa.h            |  17 +++
+ include/uapi/linux/vhost.h           |   7 ++
+ include/uapi/linux/virtio_pci.h      |  10 +-
+ 24 files changed, 521 insertions(+), 82 deletions(-)
+
 
