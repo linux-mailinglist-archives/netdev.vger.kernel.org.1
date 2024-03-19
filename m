@@ -1,290 +1,175 @@
-Return-Path: <netdev+bounces-80625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B40E880032
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 16:03:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00D4B88003C
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 16:09:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FAC0283159
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 15:03:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84D46B20EB0
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 15:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34FBB657A7;
-	Tue, 19 Mar 2024 15:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NvuJUwcs"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F67F651AC;
+	Tue, 19 Mar 2024 15:08:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5C2651AF
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 15:03:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F33252D05E
+	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 15:08:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710860605; cv=none; b=e9hCuo2jomSRxJXs4k7b9j+GITTFooD+57aqpI6EjPuHhltxWXKWIR62SMhX2AKPJZ8CKANWeIt6Pp/6MJlCOn+I8RJfFwkD7DfXQxK2SRoqF7AsmRQQAeLqnS3ZUoa5bv1cdYEcNcohB1MiBm+hbPEaG74Vzw6S4yd8Lb7qwHQ=
+	t=1710860938; cv=none; b=MXsQ5Ir6iSENGh/r2ovrnMSITv5zjYa6WP46wOSMF6RvHCsS5/qUxg6GOWiwF1cexn5x8M8frtCf1hbAXsT7Hnvv75zQ9geiDrWoWtg3xCJPIHKmc6YE1igOTb6SIlx6ZJztBtH6IPs9IqQVuBAe6LgiCl2F9l6KytUq5YXACVc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710860605; c=relaxed/simple;
-	bh=XBOyyFD0waHOnE9MvYLW/Rtuvn3b0+DQAmryQEfNsQQ=;
+	s=arc-20240116; t=1710860938; c=relaxed/simple;
+	bh=pWmA2TjVOlEO2nDeuR5LcVwVNFWlctcOHf43FvjyzdM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VHWUM6R/3XN5JYk5ZhcHbKd6UJaaFrO6/3ReiO/D3wUmAO42a5e1wXeAu+kYgBGttj8PZ6Ybtl7YDEsLfenzw8R960CoCt+rC2zxzAOX3zsH2B+Alxu0mhbtYjsQrraBZ5yCPSFN9SPJKMeabgxsJz/qB0T5jrgiYbBTGnOgwCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NvuJUwcs; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-512f892500cso6306962e87.3
-        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 08:03:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710860601; x=1711465401; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=HEtR1acEM0RSmUjC2yZzc1k5568OryBNcjVwrPXZP6E=;
-        b=NvuJUwcspgbseG6jqd8kfz/AWtqylBAaCWwkBOIvy2rh5UIgcJpb+m9Vs7bDd2uX02
-         frDA6Sur6OjsF2H4J/zrqQ3fxPHbVhBkVbthvwGzI4VaoQZN3SKPl2PrdgATEhrCesvk
-         kdoxkEhWbqKwmX8XPX4ZNUFP4In+8Qt4wxQbr3EddCcrjOgwK0VH+4/NRrwAJUGd+5IJ
-         eIRAyCG4ziP92wRqsdphDHtc0gMi+80pn9Yl0YMWX73H5fonwJOFCt9rjRD3DJhA7gmk
-         hKCEqLGfWDDZwjCK4JqkEmfO8ud/4nwXoIzLQS4xacvBu6sv3pObC0IBd2zRnunCo7tQ
-         ZZng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710860601; x=1711465401;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HEtR1acEM0RSmUjC2yZzc1k5568OryBNcjVwrPXZP6E=;
-        b=OJS/fopYMjVIwncHswk5ZuuVcuNT6yOX22hH+nzYqtK2gsbicU0d5UIXdN2a9GLncd
-         HX2JdBBgYeN5MH0HujLofj5EPOB+1eaCx3o7Nly1YP5foQ/u0PacVazsWsQjXK9E84ys
-         PrqTXfnFip9gebO9ucsk3mCnMfWJR7hwVcrviju6EU+ZrdKRhD0FcD1YjGjkXM+Wpfax
-         Ldc9ulqH+PD3sKXfRCv6W0YCEjM+Ly5oQYhra6xMnDB4RG92iT7IrOvVS29CBKV89cIF
-         0P8L56dmnuawwRo85ZVDDMlvKI13ZPsrKxUh/topp1xih3pWrq/u/ZG2s3+bMHeDO7he
-         tRHw==
-X-Forwarded-Encrypted: i=1; AJvYcCXihLzX4yUrmyJb65SuTrOvDbhVGAWUYTEVQm4aKqq69wkoodQRcuje+DkngIBOYtvnjTzUIRb4qHaj20V2MVPehxAc5mjk
-X-Gm-Message-State: AOJu0YyBixz9tuvD/rQ6cVk+rvVZqnotH5oMBUqO9V7OXE3Bx5eYRdR/
-	00o/9AslWVal3tKYygyORblbSSPvM2ZU6Yo99J/PcEATOmWgSg31
-X-Google-Smtp-Source: AGHT+IG1gdW/LfPERXZXcdA6jxsfkWXPR8JG4STmOvylbJwjIF4fsqP/3/AUWSiltUu6VttBYBNbdw==
-X-Received: by 2002:a19:8c17:0:b0:512:e02f:9fa7 with SMTP id o23-20020a198c17000000b00512e02f9fa7mr8031170lfd.1.1710860600895;
-        Tue, 19 Mar 2024 08:03:20 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id p20-20020a056512313400b0051315216363sm1967531lfd.238.2024.03.19.08.03.19
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Mar 2024 08:03:20 -0700 (PDT)
-Date: Tue, 19 Mar 2024 18:03:17 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: Yanteng Si <siyanteng@loongson.cn>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
-	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
-	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH net-next v8 06/11] net: stmmac: dwmac-loongson: Add GNET
- support
-Message-ID: <x6wwfvuzqpzfzstb3l5adp354z2buevo35advv7q347gnmo3zn@vfzwca5fafd3>
-References: <cover.1706601050.git.siyanteng@loongson.cn>
- <027b4ee29d4d7c8a22d2f5c551f5c21ced3fb046.1706601050.git.siyanteng@loongson.cn>
- <ftqxjh67a7s4iprpiuw5xxmncj3bveezf5vust7cej3kowwcvj@m7nqrxq7oe2f>
- <d0e56c9b-9549-4061-8e44-2504b6b96897@loongson.cn>
- <466f138d-0baa-4a86-88af-c690105e650e@loongson.cn>
+	 Content-Type:Content-Disposition:In-Reply-To; b=JHvmt++huVYcjZA5fEIGvbLHplS11wH6mGX5u5JfR+JgPCwCvkh6jNstDfori8yrYpiu7TxDluUoHKiq5T68+9SbHyTzPyLqttoMBbodfIn7KfdKEPaEoRin+Z4v2VZ9VloTTtlTc++flRgkgWX1gVddLg9NtCY8lToAN3wYQCY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <sha@pengutronix.de>)
+	id 1rmb59-0000Nj-9F; Tue, 19 Mar 2024 16:08:51 +0100
+Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <sha@pengutronix.de>)
+	id 1rmb58-007Ifk-GO; Tue, 19 Mar 2024 16:08:50 +0100
+Received: from sha by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <sha@pengutronix.de>)
+	id 1rmb58-0074Jh-1M;
+	Tue, 19 Mar 2024 16:08:50 +0100
+Date: Tue, 19 Mar 2024 16:08:50 +0100
+From: Sascha Hauer <s.hauer@pengutronix.de>
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: netdev@vger.kernel.org, kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+	Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
+Subject: Re: [PATCH] net: Do not break out of sk_stream_wait_memory() with
+ TIF_NOTIFY_SIGNAL
+Message-ID: <ZfmqgvKqBtKr54Li@pengutronix.de>
+References: <20240315100159.3898944-1-s.hauer@pengutronix.de>
+ <7b82679f-9b69-4568-a61d-03eb1e4afc18@gmail.com>
+ <ZfgvNjWP8OYMIa3Y@pengutronix.de>
+ <0a556650-9627-48ee-9707-05d7cab33f0f@gmail.com>
+ <Zflt3EVf744LOA6i@pengutronix.de>
+ <bfc6afa9-501f-40b6-929a-3aa8c0298265@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <466f138d-0baa-4a86-88af-c690105e650e@loongson.cn>
+In-Reply-To: <bfc6afa9-501f-40b6-929a-3aa8c0298265@gmail.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: sha@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, Mar 14, 2024 at 09:12:49PM +0800, Yanteng Si wrote:
+On Tue, Mar 19, 2024 at 01:55:21PM +0000, Pavel Begunkov wrote:
+> On 3/19/24 10:50, Sascha Hauer wrote:
+> > On Mon, Mar 18, 2024 at 01:19:19PM +0000, Pavel Begunkov wrote:
+> > > On 3/18/24 12:10, Sascha Hauer wrote:
+> > > > On Fri, Mar 15, 2024 at 05:02:05PM +0000, Pavel Begunkov wrote:
+> > > > > On 3/15/24 10:01, Sascha Hauer wrote:
+> > > > > > It can happen that a socket sends the remaining data at close() time.
+> > > > > > With io_uring and KTLS it can happen that sk_stream_wait_memory() bails
+> > > > > > out with -512 (-ERESTARTSYS) because TIF_NOTIFY_SIGNAL is set for the
+> > > > > > current task. This flag has been set in io_req_normal_work_add() by
+> > > > > > calling task_work_add().
+> > > > > 
+> > > > > The entire idea of task_work is to interrupt syscalls and let io_uring
+> > > > > do its job, otherwise it wouldn't free resources it might be holding,
+> > > > > and even potentially forever block the syscall.
+> > > > > 
+> > > > > I'm not that sure about connect / close (are they not restartable?),
+> > > > > but it doesn't seem to be a good idea for sk_stream_wait_memory(),
+> > > > > which is the normal TCP blocking send path. I'm thinking of some kinds
+> > > > > of cases with a local TCP socket pair, the tx queue is full as well
+> > > > > and the rx queue of the other end, and io_uring has to run to receive
+> > > > > the data.
+> > > 
+> > > There is another case, let's say the IO is done via io-wq
+> > > (io_uring's worker thread pool) and hits the waiting. Now the
+> > > request can't get cancelled, which is done by interrupting the
+> > > task with TIF_NOTIFY_SIGNAL. User requested request cancellations
+> > > is one thing, but we'd need to check if io_uring can ever be closed
+> > > in this case.
+> > > 
+> > > 
+> > > > > If interruptions are not welcome you can use different io_uring flags,
+> > > > > see IORING_SETUP_COOP_TASKRUN and/or IORING_SETUP_DEFER_TASKRUN.
+> > > > 
+> > > > I tried with different combinations of these flags. For example
+> > > > IORING_SETUP_TASKRUN_FLAG | IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN
+> > > > makes the issue less likely, but nevertheless it still happens.
+> > > > 
+> > > > However, reading the documentation of these flags, they shall provide
+> > > > hints to the kernel for optimizations, but it should work without these
+> > > > flags, right?
+> > > 
+> > > That's true, and I guess there are other cases as well, like
+> > > io-wq and perhaps even a stray fput.
+> > > 
+> > > 
+> > > > > Maybe I'm missing something, why not restart your syscall?
+> > > > 
+> > > > The problem comes with TLS. Normally with synchronous encryption all
+> > > > data on a socket is written during write(). When asynchronous
+> > > > encryption comes into play, then not all data is written during write(),
+> > > > but instead the remaining data is written at close() time.
+> > > 
+> > > Was it considered to do the final cleanup in workqueue
+> > > and only then finalising the release?
+> > 
+> > No, but I don't really understand what you mean here. Could you
+> > elaborate?
 > 
-> 在 2024/3/14 16:27, Yanteng Si 写道:
-> > 在 2024/2/6 04:58, Serge Semin 写道:
-> > > On Tue, Jan 30, 2024 at 04:48:18PM +0800, Yanteng Si wrote:
-> > >> Add Loongson GNET (GMAC with PHY) support, override
-> > >> stmmac_priv.synopsys_id with 0x37.
-> > > Please add more details of all the device capabilities: supported
-> > > speeds, duplexness, IP-core version, DMA-descriptors type
-> > > (normal/enhanced), MTL Tx/Rx FIFO size, Perfect and Hash-based MAC
-> > > Filter tables size, L3/L4 filters availability, VLAN hash table
-> > > filter, PHY-interface (GMII, RGMII, etc), EEE support,
-> > > AV-feature/Multi-channels support, IEEE 1588 Timestamp support, Magic
-> > > Frame support, Remote Wake-up support, IP Checksum, Tx/Rx TCP/IP
-> > > Checksum, Mac Management Counters (MMC), SMA/MDIO interface,
-
-> > The gnet (2k2000) of 0x10 supports full-duplex and half-duplex at 1000/100/10M.
-> > The gnet of 0x37 (i.e. the gnet of 7a2000) supports 1000/100/10M full duplex.
-> > 
-> > The gnet with 0x10 has 8 DMA channels, except for channel 0, which does not
-> > support sending hardware checksums.
-> > 
-> > Supported AV features are Qav, Qat, and Qas, and other features should be
-> > consistent with the 3.73 IP.
-
-Just list all of these features in the commit message referring to the
-respective controller. Like this:
-"There are two types of them Loongson GNET controllers:
-Loongson 2k2000 GNET and the rest of the Loongson GNETs (like
-presented on the 7a2000 SoC). All of them of the DW GMAC 3.73a
-IP-core with the next features:
-Speeds, DMA-descriptors type (normal/enhanced), MTL Tx/Rx FIFO size,
-Perfect and Hash-based MAC Filter tables size, L3/L4 filters availability,
-VLAN hash table filter, PHY-interface (GMII, RGMII, etc), EEE support,
-IEEE 1588 Timestamp support, Magic Frame support, Remote Wake-up support,
-IP Checksum, Tx/Rx TCP/IP Checksum, Mac Management Counters (MMC),
-SMA/MDIO interface. 
-
-The difference is that the Loongson 2k2000 GNET controller supports 8
-DMA-channels, AV features (Qav, Qat, and Qas) and half-duplex link,
-meanwhile the rest of the GNETs don't have these capabilities
-available."
-
-> > 
-> > >
-> > >> Signed-off-by: Yanteng Si<siyanteng@loongson.cn>
-> > >> Signed-off-by: Feiyang Chen<chenfeiyang@loongson.cn>
-> > >> Signed-off-by: Yinggang Gu<guyinggang@loongson.cn>
-> > >> ---
-> > >>   .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 44 +++++++++++++++++++
-> > >>   1 file changed, 44 insertions(+)
-> > >>
-> > >> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > >> index 3b3578318cc1..584f7322bd3e 100644
-> > >> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > >> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > >> @@ -318,6 +318,8 @@ static struct mac_device_info *loongson_setup(void *apriv)
-> > >>   	if (!mac)
-> > >>   		return NULL;
-> > >>   >> +	priv->synopsys_id = 0x37;	/*Overwrite custom IP*/
-> > >> +
-> > > Please add a more descriptive comment _above_ the subjected line. In
-> > > particular note why the override is needed, what is the real DW GMAC
-> > > IP-core version and what is the original value the statement above
-> > > overrides.
-> > 
-
-> > The IP-core version of the gnet device on the loongson 2k2000 is 0x10, which is
-> > a custom IP.
-> > 
-> > Compared to 0x37, we have split some of the dma registers into two (tx and rx).
-> > After overwriting stmmac_dma_ops.dma_interrupt() and stmmac_dma_ops.init_chan(),
-> > the logic is consistent with 0x37,
-> > 
-> > so we overwrite synopsys_id to 0x37.
-
-Yeah, something like that:
-	/* The original IP-core version is 0x37 in all Loongson GNET
-	 * (2k2000 and 7a2000), but the GNET HW designers have changed the
-	 * GMAC_VERSION.SNPSVER field to the custom 0x10 value on the Loongson
-	 * 2k2000 MAC to emphasize the differences: multiple DMA-channels, AV
-	 * feature and GMAC_INT_STATUS CSR flags layout. Get back the
-	 * original value so the correct HW-interface would be
-	 * selected.
-	 */
-
-> > 
-> > >>   	ld = priv->plat->bsp_priv;
-> > >>   	mac->dma = &ld->dwlgmac_dma_ops;
-> > >>   >> @@ -350,6 +352,46 @@ static struct mac_device_info
-> > *loongson_setup(void *apriv)
-> > >>   	return mac;
-> > >>   }
-> > >>   >> +static int loongson_gnet_data(struct pci_dev *pdev,
-> > >> +			      struct plat_stmmacenet_data *plat)
-> > >> +{
-> > >> +	loongson_default_data(pdev, plat);
-> > >> +
-> > >> +	plat->multicast_filter_bins = 256;
-> > >> +
-> > >> +	plat->mdio_bus_data->phy_mask =  ~(u32)BIT(2);
-> > >> +
-> > >> +	plat->phy_addr = 2;
-> > >> +	plat->phy_interface = PHY_INTERFACE_MODE_INTERNAL;
-> > > Are you sure PHY-interface is supposed to be defined as "internal"?
-> > 
-
-> > Yes, because the gnet hardware has a integrated PHY, so we set it to internal，
-> > 
-
-Why do you need the phy_addr set to 2 then? Is PHY still discoverable
-on the subordinate MDIO-bus?
-
-kdoc in "include/linux/phy.h" defines the PHY_INTERFACE_MODE_INTERNAL
-mode as for a case of the MAC and PHY being combined. IIUC it's
-reserved for a case when you can't determine actual interface between
-the MAC and PHY. Is it your case? Are you sure the interface between
-MAC and PHY isn't something like GMII/RGMII/etc?
-
--Serge(y)
-
-> > Correspondingly, our gmac hardware PHY is external.
-> > 
-> > >> +
-> > >> +	plat->bsp_priv = &pdev->dev;
-> > >> +
-> > >> +	plat->dma_cfg->pbl = 32;
-> > >> +	plat->dma_cfg->pblx8 = true;
-> > >> +
-> > >> +	plat->clk_ref_rate = 125000000;
-> > >> +	plat->clk_ptp_rate = 125000000;
-> > >> +
-> > >> +	return 0;
-> > >> +}
-> > >> +
-> > >> +static int loongson_gnet_config(struct pci_dev *pdev,
-> > >> +				struct plat_stmmacenet_data *plat,
-> > >> +				struct stmmac_resources *res,
-> > >> +				struct device_node *np)
-> > >> +{
-> > >> +	int ret;
-> > >> +
-> > >> +	ret = loongson_dwmac_config_legacy(pdev, plat, res, np);
-> > > Again. This will be moved to the probe() method in one of the next
-> > > patches leaving loongson_gnet_config() empty. What was the problem
-> > > with doing that right away with no intermediate change?
-> > 
-> > No problem. My original intention is to break the patches down into smaller pieces.
-> > 
-> > In the next version, I will try to re-break them based on your comments.
-> > 
-> > >
-> > >> +
-> > >> +	return ret;
-> > >> +}
-> > >> +
-> > >> +static struct stmmac_pci_info loongson_gnet_pci_info = {
-> > >> +	.setup = loongson_gnet_data,
-> > >> +	.config = loongson_gnet_config,
-> > >> +};
-> > >> +
-> > >>   static int loongson_dwmac_probe(struct pci_dev *pdev,
-> > >>   				const struct pci_device_id *id)
-> > >>   {
-> > >> @@ -516,9 +558,11 @@ static SIMPLE_DEV_PM_OPS(loongson_dwmac_pm_ops, loongson_dwmac_suspend,
-> > >>   			 loongson_dwmac_resume);
-> > >>   >>   #define PCI_DEVICE_ID_LOONGSON_GMAC	0x7a03
-> > >> +#define PCI_DEVICE_ID_LOONGSON_GNET	0x7a13
-> > >>   >>   static const struct pci_device_id loongson_dwmac_id_table[] =
-> > {
-> > >>   	{ PCI_DEVICE_DATA(LOONGSON, GMAC, &loongson_gmac_pci_info) },
-> > >> +	{ PCI_DEVICE_DATA(LOONGSON, GNET, &loongson_gnet_pci_info) },
-> > > After this the driver is supposed to correctly handle the Loongson
-> > > GNET devices. Based on the patches introduced further it isn't.
-> > > Please consider re-arranging the changes (see my comments in the
-> > > further patches).
-> > 
-> > OK.
-> > 
-> > 
-> > Thanks,
-> > 
-> > Yanteng
-> > 
-> > 
-> > >
-> > > -Serge(y)
-> > >
-> > >>   	{}
-> > >>   };
-> > >>   MODULE_DEVICE_TABLE(pci, loongson_dwmac_id_table);
-> > >> -- >> 2.31.4
-> > >>
+> The suggestion is instead of executing the release and that final
+> flush off of the context you're in, namely userspace task,
+> you can spin up a kernel task (they're not getting any signals)
+> and execute it from there.
 > 
+> void deferred_release_fn(struct work_struct *work)
+> {
+> 	do_release();
+> 	...
+> }
+> 
+> struct work_struct work;
+> INIT_WORK(&work, deferred_release_fn);
+> queue_work(system_unbound_wq, &work);
+> 
+> 
+> There is a catch. Even though close() is not obliged to close
+> the file / socket immediately, but it still not nice when you
+> drop the final ref but port and other bits are not released
+> until some time after. So, you might want to wait for that
+> deferred release to complete before returning to the
+> userspace.
+> 
+> I'm assuming it's fine to run it by a kernel task since
+> IIRC fput might delay release to it anyway, but it's better
+> to ask net maintainers. In theory it shouldn't need
+> mm,fs,etc that user task would hold.
+
+Ok, I'll have a look into it. Thanks for your input.
+
+Sascha
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
