@@ -1,361 +1,275 @@
-Return-Path: <netdev+bounces-80564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECD9687FCFA
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:36:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F19787FD8B
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:29:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 142571C22402
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 11:36:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB4A51F22FA3
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:29:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A9154FAB;
-	Tue, 19 Mar 2024 11:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B9A47F7CD;
+	Tue, 19 Mar 2024 12:29:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="b2JW1wDa"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875167EEF0;
-	Tue, 19 Mar 2024 11:36:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776707F498
+	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 12:29:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710848188; cv=none; b=LdS5HGRKb3wFWY0VPNBsXLvxznoIVtl/iW39HErwhhPQw2I5dTosUrfzTro0WdYq1/tnuSTD6Gye2/XOirvCuTHouZFhbk+ZhVRQDE0mBoDeQEMyENXzVzwHMuUzGIy4nHzocOAA9pj8d2ff6WmQ2uAPFb4kzRMBEFwxIKdvRmI=
+	t=1710851377; cv=none; b=cpRqwGZ8qeMdLQ8/8c4OaHvUIBx6jJ8xB+B6Ft2xPHXo9LwEu24Kg13EREJRl6WdfSl2uXkeH+Me/k1WRUXyYS66jVXgZ3Da3LdliDKLKa/nxNFc0R2KyhJVjFiq8pbyqMRNqOHNk/N/euOre3FmP3wVmEugGr++cJFNeL33dag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710848188; c=relaxed/simple;
-	bh=Fb2jaj32aBD3eR5YsLufEqtzg72Zjr+aUw2F2pK3obE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Ze2ZJwVWADgdHWiSegUuUwhzhtnVKoS2iNsLrbTTZkCMxQOGhjhX+evKXvHo90EMIwAW0fe7C3Apb6s3ZnyeGjX7UFN2CqQYcCx/flemNMFMyaXkpMFjo+lAccclh+a6359LZ3yrJK2QXPCCNMQCVTo3t8QLxDmX2EOyheUfTJc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1rmXlV-0005KL-0e; Tue, 19 Mar 2024 12:36:21 +0100
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	<netfilter-devel@vger.kernel.org>,
-	Florian Westphal <fw@strlen.de>,
-	Eric Dumazet <edumazet@google.com>,
-	xingwei lee <xrivendell7@gmail.com>,
-	yue sun <samsun1006219@gmail.com>,
-	syzbot+e5167d7144a62715044c@syzkaller.appspotmail.com
-Subject: [PATCH net] inet: inet_defrag: prevent sk release while still in use
-Date: Tue, 19 Mar 2024 13:23:07 +0100
-Message-ID: <20240319122310.27474-1-fw@strlen.de>
-X-Mailer: git-send-email 2.43.2
+	s=arc-20240116; t=1710851377; c=relaxed/simple;
+	bh=r7LQvPSbTVcUADe+MFtzy5TaJbb3VOdeiXAzNHTbuxk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=q/aHMgYEJyuqOcWM/jppGxK52TeCxKl8p5tZ4cY1He9CVhv719Fbzsllmc7TwRDDd15uqa9NmLkYydiF2sIGOiGMO4SFrpG3BaeCHnQYsCbvsoZG9+bKyW2AXPMgcsHTA406PzwRWIMw3Bw1eEg17qT2gDn9YrhlLrnRFesiD00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=b2JW1wDa; arc=none smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d46dd8b0b8so72864401fa.2
+        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 05:29:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gooddata.com; s=google; t=1710851374; x=1711456174; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S9hKCYDSzXyqAgTbSXm0uyTkE4NDjKRN02YkqXSTPPE=;
+        b=b2JW1wDayxMikZ/qJszM18V5cui/tecfzu11lbhy2SBXYjzDnbufv/LxdpWbYBoVDz
+         r/2EBETBwnJqrSD3iI70xRV3ZPSlqOS673A/PL2BjJgh0SPu5zHjszmEgJQdTo8zZ0y0
+         hvUXraNF+pcXf4pPtragmojrfPNU4q6A7ubu4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710851374; x=1711456174;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=S9hKCYDSzXyqAgTbSXm0uyTkE4NDjKRN02YkqXSTPPE=;
+        b=s58pCU+ArPLVtihSA/hniD1R4QNaV7kfpTXUlGiIXW++AxCcE9RhiGCDXtT557f+fS
+         fndIFuAjuP6gvpF2LG5IK8T8aMUXLBkPcyc196UIhbTIQsVXKoKTmPoopRJ/fKdfS7mt
+         kv4ZzEmA7g9EsXqzZhiV0Fn9caOtL/cQRTzELi0R0kZ+BrEmDxNferRR0re1bLOOgpcg
+         opzsbV1SqwYupfODEse7JbNOok3EGtjW8qBFre30hsblMsKI+rHpFO6k6t6CyUSHty/Y
+         6xsn33TIJVXM0mpdXCqspyzoIlzXSfjBsRHNR5AKe7S4Xdpdqgg2RceCyksfGMcNp3Ve
+         oPMw==
+X-Forwarded-Encrypted: i=1; AJvYcCUdx20b+3H1hIg+3uYVNTTVGX7hpI/NOlOOOLFWzVb3T8LLsH2Nzyccw+fTezFvY9gfNQa05T7FpxZejZ5bmzZdiJa3B83p
+X-Gm-Message-State: AOJu0YyXPMUeeiYMcWJGQsc22ZQs78ERIMBL/21VIaW8pI4mr+wM8Q1L
+	D8KLzT03ru0SqEhqdgAjuQdl9+FDtRHyPE5b6QVcvZjG06aZ7aMXW3h25gAXWwBW2QGtxlHk6Iq
+	/paErMC2qDnl2H8MamKfjY+URp5oZgZW2q9bp
+X-Google-Smtp-Source: AGHT+IF94iynmBXpU9wTklLZ6UhQkCL1JEqJVFqbFF4TC/0qk21TwJn2uH3hjeOoLJo5WVgYH1M+zF4elaEuDFVnywc=
+X-Received: by 2002:a2e:a68d:0:b0:2d4:57c5:886c with SMTP id
+ q13-20020a2ea68d000000b002d457c5886cmr8268471lje.13.1710851373851; Tue, 19
+ Mar 2024 05:29:33 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
+In-Reply-To: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
+From: Igor Raits <igor@gooddata.com>
+Date: Tue, 19 Mar 2024 13:29:22 +0100
+Message-ID: <CA+9S74izRjDRb1DLOcpeju4kS=6O9zm6bbCksKABtwfu68PPYw@mail.gmail.com>
+Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
+To: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org
+Cc: Stefano Garzarella <sgarzare@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
+	Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-ip_local_out() and other functions can pass skb->sk as function argument.
+Hello again,
 
-If the skb is a fragment and reassembly happens before such function call
-returns, the sk must not be released.
+On Tue, Mar 19, 2024 at 10:00=E2=80=AFAM Igor Raits <igor@gooddata.com> wro=
+te:
+>
+> Hello,
+>
+> We have started to observe kernel crashes on 6.7.y kernels (atm we
+> have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6.9 where we
+> have nodes of cluster it looks stable. Please see stacktrace below. If
+> you need more information please let me know.
 
-This affects skb fragments reassembled via netfilter or similar
-modules, e.g. openvswitch or ct_act.c, when run as part of tx pipeline.
+We have tried to downgrade to 6.6.y (6.6.9 in this case) and it looks
+like we get a slightly different crash but maybe in a similar
+direction.
 
-Eric Dumazet made an initial analysis of this bug.  Quoting Eric:
-  Calling ip_defrag() in output path is also implying skb_orphan(),
-  which is buggy because output path relies on sk not disappearing.
+[  906.338157] usercopy: Kernel memory exposure attempt detected from
+SLUB object 'skbuff_head_cache' (offset 2, size 3006)!
+[  906.349149] ------------[ cut here ]------------
+[  906.353785] kernel BUG at mm/usercopy.c:102!
+[  906.358081] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
+[  906.363314] CPU: 62 PID: 9143 Comm: vhost-9119 Tainted: G
+ E      6.6.9-2.gdc.el9.x86_64 #1
+[  906.372541] Hardware name: Dell Inc. PowerEdge R7525/0H3K7P, BIOS
+2.14.1 12/17/2023
+[  906.380209] RIP: 0010:usercopy_abort+0x6a/0x80
+[  906.384665] Code: 61 78 af 50 48 c7 c2 62 61 78 af 57 48 c7 c7 28
+df 79 af 48 0f 44 d6 48 c7 c6 88 df 79 af 4c 89 d1 49 0f 44 f3 e8 f6
+f1 d5 ff <0f> 0b 49 c7 c1 d0 40 7b af 4c 89 cf 4d 89 c8 eb a9 0f 1f 44
+00 00
+[  906.403419] RSP: 0018:ffffc9000fdb3b58 EFLAGS: 00010246
+[  906.408662] RAX: 000000000000006d RBX: 0000000000000002 RCX: 00000000000=
+00000
+[  906.415802] RDX: 0000000000000000 RSI: ffff88c05fb9f700 RDI: ffff88c05fb=
+9f700
+[  906.422941] RBP: 0000000000000bbe R08: 0000000000000000 R09: 00000000fff=
+f7fff
+[  906.430077] R10: ffffc9000fdb3a10 R11: ffffffffb01e26a8 R12: ffff889881b=
+6bd40
+[  906.437214] R13: 0000000000000001 R14: 0000000000000002 R15: ffff889069f=
+adee0
+[  906.444348] FS:  00007f4552ca3f80(0000) GS:ffff88c05fb80000(0000)
+knlGS:0000000000000000
+[  906.452523] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  906.458276] CR2: 00007f7bc42f3000 CR3: 0000003878eb6006 CR4: 00000000007=
+70ee0
+[  906.465408] PKRU: 55555554
+[  906.468118] Call Trace:
+[  906.470570]  <TASK>
+[  906.472680]  ? die+0x33/0x90
+[  906.475572]  ? do_trap+0xe0/0x110
+[  906.478892]  ? usercopy_abort+0x6a/0x80
+[  906.482733]  ? do_error_trap+0x65/0x80
+[  906.486484]  ? usercopy_abort+0x6a/0x80
+[  906.490323]  ? exc_invalid_op+0x4e/0x70
+[  906.494163]  ? usercopy_abort+0x6a/0x80
+[  906.498003]  ? asm_exc_invalid_op+0x16/0x20
+[  906.502188]  ? usercopy_abort+0x6a/0x80
+[  906.506026]  ? usercopy_abort+0x6a/0x80
+[  906.509866]  __check_heap_object+0xd5/0x110
+[  906.514056]  __check_object_size.part.0+0x5e/0x140
+[  906.518853]  simple_copy_to_iter+0x26/0x50
+[  906.522958]  __skb_datagram_iter+0x199/0x2e0
+[  906.527235]  ? __pfx_simple_copy_to_iter+0x10/0x10
+[  906.532028]  skb_copy_datagram_iter+0x33/0x90
+[  906.536389]  tun_put_user.constprop.0+0x16b/0x370 [tun]
+[  906.541624]  tun_do_read+0x54/0x1f0 [tun]
+[  906.545646]  tun_recvmsg+0x7e/0x160 [tun]
+[  906.549667]  handle_rx+0x3ab/0x750 [vhost_net]
+[  906.554123]  vhost_worker+0x42/0x70 [vhost]
+[  906.558314]  vhost_task_fn+0x4b/0xb0
+[  906.561903]  ? finish_task_switch.isra.0+0x8f/0x2a0
+[  906.566788]  ? __pfx_vhost_task_fn+0x10/0x10
+[  906.571073]  ? __pfx_vhost_task_fn+0x10/0x10
+[  906.575351]  ret_from_fork+0x2d/0x50
+[  906.578937]  ? __pfx_vhost_task_fn+0x10/0x10
+[  906.583219]  ret_from_fork_asm+0x1b/0x30
+[  906.587152]  </TASK>
+[  906.589340] Modules linked in: nf_conntrack_netlink(E) vhost_net(E)
+vhost(E) vhost_iotlb(E) tap(E) tun(E) rpcsec_gss_krb5(E)
+auth_rpcgss(E) nfsv4(E) dns_resolver(E) nfs(E) lockd(E) grace(E)
+fscache(E) netfs(E) netconsole(E) ib_core(E) scsi_transport_iscsi(E)
+sch_ingress(E) target_core_user(E) uio(E) target_core_pscsi(E)
+target_core_file(E) target_core_iblock(E) iscsi_target_mod(E)
+target_core_mod(E) 8021q(E) garp(E) mrp(E) bonding(E) tls(E)
+nfnetlink_cttimeout(E) nfnetlink(E) openvswitch(E) nf_conncount(E)
+nf_nat(E) binfmt_misc(E) dell_rbu(E) sunrpc(E) vfat(E) fat(E)
+dm_service_time(E) dm_multipath(E) btrfs(E) intel_rapl_msr(E)
+intel_rapl_common(E) xor(E) zstd_compress(E) ipmi_ssif(E) raid6_pq(E)
+amd64_edac(E) edac_mce_amd(E) kvm_amd(E) kvm(E) dell_smbios(E)
+irqbypass(E) acpi_ipmi(E) dcdbas(E) dell_wmi_descriptor(E) wmi_bmof(E)
+ipmi_si(E) acpi_cpufreq(E) rapl(E) ipmi_devintf(E) ptdma(E) wmi(E)
+i2c_piix4(E) k10temp(E) ipmi_msghandler(E) acpi_power_meter(E) fuse(E)
+drm(E) zram(E) ext4(E) mbcache(E) jbd2(E) dm_crypt(E)
+[  906.589385]  sd_mod(E) t10_pi(E) sg(E) crct10dif_pclmul(E)
+crc32_pclmul(E) polyval_clmulni(E) ahci(E) polyval_generic(E)
+ghash_clmulni_intel(E) libahci(E) ice(E) sha512_ssse3(E) libata(E)
+ccp(E) megaraid_sas(E) gnss(E) sp5100_tco(E) dm_mirror(E)
+dm_region_hash(E) dm_log(E) dm_mod(E) nf_conntrack(E) libcrc32c(E)
+crc32c_intel(E) nf_defrag_ipv6(E) nf_defrag_ipv4(E) br_netfilter(E)
+bridge(E) stp(E) llc(E)
+[  906.679233] Unloaded tainted modules: fjes(E):2
+[  906.719287] ---[ end trace 0000000000000000 ]---
 
-  A relevant old patch about the issue was :
-  8282f27449bf ("inet: frag: Always orphan skbs inside ip_defrag()")
-
-  [..]
-
-  net/ipv4/ip_output.c depends on skb->sk being set, and probably to an
-  inet socket, not an arbitrary one.
-
-  If we orphan the packet in ipvlan, then downstream things like FQ
-  packet scheduler will not work properly.
-
-  We need to change ip_defrag() to only use skb_orphan() when really
-  needed, ie whenever frag_list is going to be used.
-
-Eric suggested to stash sk in fragment queue and made an initial patch.
-However there is a problem with this:
-
-If skb is refragmented again right after, ip_do_fragment() will copy
-head->sk to the new fragments, and sets up destructor to sock_wfree.
-IOW, we have no choice but to fix up sk_wmem accouting to reflect the
-fully reassembled skb, else wmem will underflow.
-
-This change moves the orphan down into the core, to last possible moment.
-As ip_defrag_offset is aliased with sk_buff->sk member, we must move the
-offset into the FRAG_CB, else skb->sk gets clobbered.
-
-This allows to delay the orphaning long enough to learn if the skb has
-to be queued or if the skb is completing the reasm queue.
-
-In the former case, things work as before, skb is orphaned.  This is
-safe because skb gets queued/stolen and won't continue past reasm engine.
-
-In the latter case, we will steal the skb->sk reference, reattach it to
-the head skb, and fix up wmem accouting when inet_frag inflates truesize.
-
-Diagnosed-by: Eric Dumazet <edumazet@google.com>
-Reported-by: xingwei lee <xrivendell7@gmail.com>
-Reported-by: yue sun <samsun1006219@gmail.com>
-Reported-by: syzbot+e5167d7144a62715044c@syzkaller.appspotmail.com
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- include/linux/skbuff.h                  |  7 +--
- net/ipv4/inet_fragment.c                | 71 ++++++++++++++++++++-----
- net/ipv4/ip_fragment.c                  |  2 +-
- net/ipv6/netfilter/nf_conntrack_reasm.c |  2 +-
- 4 files changed, 61 insertions(+), 21 deletions(-)
-
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 7d56ce195120..6d08ff8a9357 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -753,8 +753,6 @@ typedef unsigned char *sk_buff_data_t;
-  *	@list: queue head
-  *	@ll_node: anchor in an llist (eg socket defer_list)
-  *	@sk: Socket we are owned by
-- *	@ip_defrag_offset: (aka @sk) alternate use of @sk, used in
-- *		fragmentation management
-  *	@dev: Device we arrived on/are leaving by
-  *	@dev_scratch: (aka @dev) alternate use of @dev when @dev would be %NULL
-  *	@cb: Control buffer. Free for use by every layer. Put private vars here
-@@ -875,10 +873,7 @@ struct sk_buff {
- 		struct llist_node	ll_node;
- 	};
- 
--	union {
--		struct sock		*sk;
--		int			ip_defrag_offset;
--	};
-+	struct sock		*sk;
- 
- 	union {
- 		ktime_t		tstamp;
-diff --git a/net/ipv4/inet_fragment.c b/net/ipv4/inet_fragment.c
-index 7072fc0783ef..7254b640ba06 100644
---- a/net/ipv4/inet_fragment.c
-+++ b/net/ipv4/inet_fragment.c
-@@ -24,6 +24,8 @@
- #include <net/ip.h>
- #include <net/ipv6.h>
- 
-+#include "../core/sock_destructor.h"
-+
- /* Use skb->cb to track consecutive/adjacent fragments coming at
-  * the end of the queue. Nodes in the rb-tree queue will
-  * contain "runs" of one or more adjacent fragments.
-@@ -39,6 +41,7 @@ struct ipfrag_skb_cb {
- 	};
- 	struct sk_buff		*next_frag;
- 	int			frag_run_len;
-+	int			ip_defrag_offset;
- };
- 
- #define FRAG_CB(skb)		((struct ipfrag_skb_cb *)((skb)->cb))
-@@ -396,12 +399,12 @@ int inet_frag_queue_insert(struct inet_frag_queue *q, struct sk_buff *skb,
- 	 */
- 	if (!last)
- 		fragrun_create(q, skb);  /* First fragment. */
--	else if (last->ip_defrag_offset + last->len < end) {
-+	else if (FRAG_CB(last)->ip_defrag_offset + last->len < end) {
- 		/* This is the common case: skb goes to the end. */
- 		/* Detect and discard overlaps. */
--		if (offset < last->ip_defrag_offset + last->len)
-+		if (offset < FRAG_CB(last)->ip_defrag_offset + last->len)
- 			return IPFRAG_OVERLAP;
--		if (offset == last->ip_defrag_offset + last->len)
-+		if (offset == FRAG_CB(last)->ip_defrag_offset + last->len)
- 			fragrun_append_to_last(q, skb);
- 		else
- 			fragrun_create(q, skb);
-@@ -418,13 +421,13 @@ int inet_frag_queue_insert(struct inet_frag_queue *q, struct sk_buff *skb,
- 
- 			parent = *rbn;
- 			curr = rb_to_skb(parent);
--			curr_run_end = curr->ip_defrag_offset +
-+			curr_run_end = FRAG_CB(curr)->ip_defrag_offset +
- 					FRAG_CB(curr)->frag_run_len;
--			if (end <= curr->ip_defrag_offset)
-+			if (end <= FRAG_CB(curr)->ip_defrag_offset)
- 				rbn = &parent->rb_left;
- 			else if (offset >= curr_run_end)
- 				rbn = &parent->rb_right;
--			else if (offset >= curr->ip_defrag_offset &&
-+			else if (offset >= FRAG_CB(curr)->ip_defrag_offset &&
- 				 end <= curr_run_end)
- 				return IPFRAG_DUP;
- 			else
-@@ -438,23 +441,39 @@ int inet_frag_queue_insert(struct inet_frag_queue *q, struct sk_buff *skb,
- 		rb_insert_color(&skb->rbnode, &q->rb_fragments);
- 	}
- 
--	skb->ip_defrag_offset = offset;
-+	FRAG_CB(skb)->ip_defrag_offset = offset;
- 
- 	return IPFRAG_OK;
- }
- EXPORT_SYMBOL(inet_frag_queue_insert);
- 
-+void tcp_wfree(struct sk_buff *skb);
- void *inet_frag_reasm_prepare(struct inet_frag_queue *q, struct sk_buff *skb,
- 			      struct sk_buff *parent)
- {
- 	struct sk_buff *fp, *head = skb_rb_first(&q->rb_fragments);
--	struct sk_buff **nextp;
-+	void (*destructor)(struct sk_buff *);
-+	unsigned int orig_truesize = 0;
-+	struct sk_buff **nextp = NULL;
-+	struct sock *sk = skb->sk;
- 	int delta;
- 
-+	if (sk && is_skb_wmem(skb)) {
-+		/* TX: skb->sk might have been passed as argument to
-+		 * dst->output and must remain valid until tx completes.
-+		 *
-+		 * Move sk to reassembled skb and fix up wmem accounting.
-+		 */
-+		orig_truesize = skb->truesize;
-+		destructor = skb->destructor;
-+	}
-+
- 	if (head != skb) {
- 		fp = skb_clone(skb, GFP_ATOMIC);
--		if (!fp)
--			return NULL;
-+		if (!fp) {
-+			head = skb;
-+			goto out_restore_sk;
-+		}
- 		FRAG_CB(fp)->next_frag = FRAG_CB(skb)->next_frag;
- 		if (RB_EMPTY_NODE(&skb->rbnode))
- 			FRAG_CB(parent)->next_frag = fp;
-@@ -463,6 +482,12 @@ void *inet_frag_reasm_prepare(struct inet_frag_queue *q, struct sk_buff *skb,
- 					&q->rb_fragments);
- 		if (q->fragments_tail == skb)
- 			q->fragments_tail = fp;
-+
-+		if (orig_truesize) {
-+			/* prevent skb_morph from releasing sk */
-+			skb->sk = NULL;
-+			skb->destructor = NULL;
-+		}
- 		skb_morph(skb, head);
- 		FRAG_CB(skb)->next_frag = FRAG_CB(head)->next_frag;
- 		rb_replace_node(&head->rbnode, &skb->rbnode,
-@@ -470,13 +495,13 @@ void *inet_frag_reasm_prepare(struct inet_frag_queue *q, struct sk_buff *skb,
- 		consume_skb(head);
- 		head = skb;
- 	}
--	WARN_ON(head->ip_defrag_offset != 0);
-+	WARN_ON(FRAG_CB(head)->ip_defrag_offset != 0);
- 
- 	delta = -head->truesize;
- 
- 	/* Head of list must not be cloned. */
- 	if (skb_unclone(head, GFP_ATOMIC))
--		return NULL;
-+		goto out_restore_sk;
- 
- 	delta += head->truesize;
- 	if (delta)
-@@ -492,7 +517,7 @@ void *inet_frag_reasm_prepare(struct inet_frag_queue *q, struct sk_buff *skb,
- 
- 		clone = alloc_skb(0, GFP_ATOMIC);
- 		if (!clone)
--			return NULL;
-+			goto out_restore_sk;
- 		skb_shinfo(clone)->frag_list = skb_shinfo(head)->frag_list;
- 		skb_frag_list_init(head);
- 		for (i = 0; i < skb_shinfo(head)->nr_frags; i++)
-@@ -509,6 +534,21 @@ void *inet_frag_reasm_prepare(struct inet_frag_queue *q, struct sk_buff *skb,
- 		nextp = &skb_shinfo(head)->frag_list;
- 	}
- 
-+out_restore_sk:
-+	if (orig_truesize) {
-+		int ts_delta = head->truesize - orig_truesize;
-+
-+		/* if this reassembled skb is fragmented later,
-+		 * fraglist skbs will get skb->sk assigned from head->sk,
-+		 * and each frag skb will be released via sock_wfree.
-+		 *
-+		 * Update sk_wmem_alloc.
-+		 */
-+		head->sk = sk;
-+		head->destructor = destructor;
-+		refcount_add(ts_delta, &sk->sk_wmem_alloc);
-+	}
-+
- 	return nextp;
- }
- EXPORT_SYMBOL(inet_frag_reasm_prepare);
-@@ -516,6 +556,8 @@ EXPORT_SYMBOL(inet_frag_reasm_prepare);
- void inet_frag_reasm_finish(struct inet_frag_queue *q, struct sk_buff *head,
- 			    void *reasm_data, bool try_coalesce)
- {
-+	struct sock *sk = is_skb_wmem(head) ? head->sk : NULL;
-+	const unsigned int head_truesize = head->truesize;
- 	struct sk_buff **nextp = reasm_data;
- 	struct rb_node *rbn;
- 	struct sk_buff *fp;
-@@ -579,6 +621,9 @@ void inet_frag_reasm_finish(struct inet_frag_queue *q, struct sk_buff *head,
- 	head->prev = NULL;
- 	head->tstamp = q->stamp;
- 	head->mono_delivery_time = q->mono_delivery_time;
-+
-+	if (sk)
-+		refcount_add(sum_truesize - head_truesize, &sk->sk_wmem_alloc);
- }
- EXPORT_SYMBOL(inet_frag_reasm_finish);
- 
-diff --git a/net/ipv4/ip_fragment.c b/net/ipv4/ip_fragment.c
-index a4941f53b523..fb947d1613fe 100644
---- a/net/ipv4/ip_fragment.c
-+++ b/net/ipv4/ip_fragment.c
-@@ -384,6 +384,7 @@ static int ip_frag_queue(struct ipq *qp, struct sk_buff *skb)
- 	}
- 
- 	skb_dst_drop(skb);
-+	skb_orphan(skb);
- 	return -EINPROGRESS;
- 
- insert_error:
-@@ -487,7 +488,6 @@ int ip_defrag(struct net *net, struct sk_buff *skb, u32 user)
- 	struct ipq *qp;
- 
- 	__IP_INC_STATS(net, IPSTATS_MIB_REASMREQDS);
--	skb_orphan(skb);
- 
- 	/* Lookup (or create) queue header */
- 	qp = ip_find(net, ip_hdr(skb), user, vif);
-diff --git a/net/ipv6/netfilter/nf_conntrack_reasm.c b/net/ipv6/netfilter/nf_conntrack_reasm.c
-index 1a51a44571c3..d0dcbaca1994 100644
---- a/net/ipv6/netfilter/nf_conntrack_reasm.c
-+++ b/net/ipv6/netfilter/nf_conntrack_reasm.c
-@@ -294,6 +294,7 @@ static int nf_ct_frag6_queue(struct frag_queue *fq, struct sk_buff *skb,
- 	}
- 
- 	skb_dst_drop(skb);
-+	skb_orphan(skb);
- 	return -EINPROGRESS;
- 
- insert_error:
-@@ -469,7 +470,6 @@ int nf_ct_frag6_gather(struct net *net, struct sk_buff *skb, u32 user)
- 	hdr = ipv6_hdr(skb);
- 	fhdr = (struct frag_hdr *)skb_transport_header(skb);
- 
--	skb_orphan(skb);
- 	fq = fq_find(net, fhdr->identification, user, hdr,
- 		     skb->dev ? skb->dev->ifindex : 0);
- 	if (fq == NULL) {
--- 
-2.43.2
-
+> We do not have a consistent reproducer but when we put some bigger
+> network load on a VM, the hypervisor's kernel crashes.
+>
+> Help is much appreciated! We are happy to test any patches.
+>
+> [62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOPTI
+> [62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Tainted: G
+>    E      6.7.10-1.gdc.el9.x86_64 #1
+> [62254.183743] Hardware name: Dell Inc. PowerEdge R7525/0H3K7P, BIOS
+> 2.14.1 12/17/2023
+> [62254.192083] RIP: 0010:skb_release_data+0xb8/0x1e0
+> [62254.197357] Code: 48 83 c3 01 39 d8 7e 54 48 89 d8 48 c1 e0 04 41
+> 80 7d 7e 00 49 8b 6c 04 30 79 0f 44 89 f6 48 89 ef e8 4c e4 ff ff 84
+> c0 75 d0 <48> 8b 45 08 a8 01 0f 85 09 01 00 00 e9 d9 00 00 00 0f 1f 44
+> 00 00
+> [62254.217013] RSP: 0018:ffffa975a0247ba8 EFLAGS: 00010206
+> [62254.222692] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 000000000=
+0000785
+> [62254.230263] RDX: 0000000000000016 RSI: 0000000000000002 RDI: ffff98986=
+2b32b00
+> [62254.237878] RBP: 4f2b318c69a8b0f9 R08: 000000000001fe4d R09: 000000000=
+000003a
+> [62254.245417] R10: 0000000000000000 R11: 0000000000001736 R12: ffff9880b=
+819aec0
+> [62254.252963] R13: ffff989862b32b00 R14: 0000000000000000 R15: 000000000=
+0000002
+> [62254.260591] FS:  00007f6cf388bf80(0000) GS:ffff98b85fbc0000(0000)
+> knlGS:0000000000000000
+> [62254.269061] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [62254.275170] CR2: 000000c002236020 CR3: 000000387d37a002 CR4: 000000000=
+0770ef0
+> [62254.282733] PKRU: 55555554
+> [62254.285911] Call Trace:
+> [62254.288884]  <TASK>
+> [62254.291549]  ? die+0x33/0x90
+> [62254.294769]  ? do_trap+0xe0/0x110
+> [62254.298405]  ? do_error_trap+0x65/0x80
+> [62254.302471]  ? exc_stack_segment+0x35/0x50
+> [62254.306884]  ? asm_exc_stack_segment+0x22/0x30
+> [62254.311637]  ? skb_release_data+0xb8/0x1e0
+> [62254.316047]  kfree_skb_list_reason+0x6d/0x210
+> [62254.320697]  ? free_unref_page_commit+0x80/0x2f0
+> [62254.325700]  ? free_unref_page+0xe9/0x130
+> [62254.330013]  skb_release_data+0xfc/0x1e0
+> [62254.334261]  consume_skb+0x45/0xd0
+> [62254.338077]  tun_do_read+0x68/0x1f0 [tun]
+> [62254.342414]  tun_recvmsg+0x7e/0x160 [tun]
+> [62254.346696]  handle_rx+0x3ab/0x750 [vhost_net]
+> [62254.351488]  vhost_worker+0x42/0x70 [vhost]
+> [62254.355934]  vhost_task_fn+0x4b/0xb0
+> [62254.359758]  ? finish_task_switch.isra.0+0x8f/0x2a0
+> [62254.364882]  ? __pfx_vhost_task_fn+0x10/0x10
+> [62254.369390]  ? __pfx_vhost_task_fn+0x10/0x10
+> [62254.373888]  ret_from_fork+0x2d/0x50
+> [62254.377687]  ? __pfx_vhost_task_fn+0x10/0x10
+> [62254.382169]  ret_from_fork_asm+0x1b/0x30
+> [62254.386310]  </TASK>
+> [62254.388705] Modules linked in: nf_tables(E) nf_conntrack_netlink(E)
+> vhost_net(E) vhost(E) vhost_iotlb(E) tap(E) tun(E) mptcp_diag(E)
+> xsk_diag(E) udp_diag(E) raw_diag(E) unix_diag(E) af_packet_diag(E)
+> netlink_diag(E) tcp_diag(E) inet_diag(E) rpcsec_gss_krb5(E)
+> auth_rpcgss(E) nfsv4(E) dns_resolver(E) nfs(E) lockd(E) grace(E)
+> fscache(E) netfs(E) netconsole(E) ib_core(E) scsi_transport_iscsi(E)
+> sch_ingress(E) target_core_user(E) uio(E) target_core_pscsi(E)
+> target_core_file(E) target_core_iblock(E) iscsi_target_mod(E)
+> target_core_mod(E) 8021q(E) garp(E) mrp(E) bonding(E) tls(E)
+> nfnetlink_cttimeout(E) nfnetlink(E) openvswitch(E) nf_conncount(E)
+> nf_nat(E) binfmt_misc(E) dell_rbu(E) sunrpc(E) vfat(E) fat(E)
+> dm_service_time(E) dm_multipath(E) btrfs(E) xor(E) zstd_compress(E)
+> raid6_pq(E) ipmi_ssif(E) intel_rapl_msr(E) intel_rapl_common(E)
+> amd64_edac(E) edac_mce_amd(E) kvm_amd(E) kvm(E) irqbypass(E)
+> dell_smbios(E) acpi_ipmi(E) dcdbas(E) dell_wmi_descriptor(E)
+> wmi_bmof(E) rapl(E) ipmi_si(E) acp
+> Mar 19 09:40:16 10.12.17.70 i_cpufreq(E) ipmi_devintf(E)
+> [62254.388751]  mgag200(E) i2c_algo_bit(E) ptdma(E) wmi(E)
+> i2c_piix4(E) k10temp(E) ipmi_msghandler(E) acpi_power_meter(E) fuse(E)
+> zram(E) ext4(E) mbcache(E) jbd2(E) dm_crypt(E) sd_mod(E) t10_pi(E)
+> sg(E) ice(E) crct10dif_pclmul(E) crc32_pclmul(E) polyval_clmulni(E)
+> polyval_generic(E) ahci(E) libahci(E) ghash_clmulni_intel(E)
+> sha512_ssse3(E) libata(E) megaraid_sas(E) ccp(E) gnss(E) sp5100_tco(E)
+> dm_mirror(E) dm_region_hash(E) dm_log(E) dm_mod(E) nf_conntrack(E)
+> libcrc32c(E) crc32c_intel(E) nf_defrag_ipv6(E) nf_defrag_ipv4(E)
+> br_netfilter(E) bridge(E) stp(E) llc(E)
+> [62254.480070] Unloaded tainted modules: fjes(E):2 padlock_aes(E):3
+> [62254.537711] ---[ end trace 0000000000000000 ]---
+>
+> Thanks in advance!
 
