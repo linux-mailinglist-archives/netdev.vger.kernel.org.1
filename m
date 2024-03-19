@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-80505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07F8E87F6F8
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 06:57:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55A1D87F6FB
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 06:57:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B631A2827F1
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 05:57:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8779F1C219AF
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 05:57:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D995A0E4;
-	Tue, 19 Mar 2024 05:53:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C887C6CA;
+	Tue, 19 Mar 2024 05:53:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="TggZ/YoG"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="j2Q3ISZN"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED28B53378;
-	Tue, 19 Mar 2024 05:53:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9284E53378;
+	Tue, 19 Mar 2024 05:53:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710827618; cv=none; b=V1myMbRfoO3BSRJyNC9QNlecH1a8WpTGpQ9NmuTRn604q7EeM0S+tcDqxdlATPwLp4BLGcF/GoQl8Lc77d/FKy6QtcsvRUmHIdWn2KbhMU1jxN/0DjvWXWqgOpsCqbau8mdr/ZJB3vyKkCV6v54iT1RRJ5W+fYZA89DBQ7y2iTA=
+	t=1710827627; cv=none; b=vCuK3hAg7AE5Y7jKS4ZOGT8ZJCd6AQK7VchWnBXQ4shzTP29FGRwjgP8UuxeIQp3o5Av5rSXKxJcD3jLskltJN1RzxxWYNY4aiOte0Rdjqkop7HuItsd8D7UBCqZDHc9BzrX1ab4s1fxv57UO2Cm5WA1yRMv1nHzXukOiXyD+RY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710827618; c=relaxed/simple;
-	bh=yq3YHlVRsX6PSIYdrYleyCHEmEQa/f5R2iEiEZJ60eM=;
+	s=arc-20240116; t=1710827627; c=relaxed/simple;
+	bh=C1KTS43iNb7xCJMeLZHV/iIX5f8wXoKRqUfcQWPIpVg=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=c85s6et/7/mFTicKggdTQwwAcUF0HSva2wJkuapfCuIzn5NLZfNTe2sslaV+Hif9T3kiiz2nYPaV/DJtbM6i7NqN8D/U2dJ++6JAdTm+G089w974q5U68Srw5l1Sxp4yKYHDOZbkpvtNQuUWoV/QxNGRkTfwU9KNjApAdPMtQCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=TggZ/YoG; arc=none smtp.client-ip=68.232.154.123
+	 MIME-Version:Content-Type; b=GtqUKkL3emuYKJBLtcoG84nUXjmGK1FouJbZ49k/1bfxmyTdWhRBfSmbx4IQWMKk5DU2Vjb3S2FCXPUOhG60jTeNR7Iw0Kp8rGNRO6aBP+5ITlwQO8qqAMRSsF+xjVFtUPP8D7nyfG01xNAQYhgg/v/W3pe01W3HS6ClqONVvpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=j2Q3ISZN; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1710827616; x=1742363616;
+  t=1710827625; x=1742363625;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=yq3YHlVRsX6PSIYdrYleyCHEmEQa/f5R2iEiEZJ60eM=;
-  b=TggZ/YoGGb42T7iXxyHD7BIfs2JpmOxIumYa6FQPltlKsWLvjme/bwwU
-   J8YY3E6T6jmh2AaFp3SGG6Q7GLAhav5JXT+TbBxj55SI9v3FpYMZ9Itlj
-   xm3Ni4244xISKeVPpiYh2x3UVRNRgSr67XRLtQeP8Oh6xD7inGHLU09wA
-   PwWqPCE/Mw/0hXgtCirLWisXYlQ6qhlTV3XHTO8pSlHaTkmjfE/uxe5cI
-   d3XMMHHZsx50l8K46/9/JyQBkVliaeYzBeh4pDdWIgW4FvJIJDSh9McOT
-   nHbEIJEFK376NGItSkW7e+yr3zy5d+92Hq6ch4p/frTaJSXqb+d18YUs6
-   A==;
-X-CSE-ConnectionGUID: hjRUxpXDSNCUSMjqPC7odw==
-X-CSE-MsgGUID: JpNjhAroQUCBuPV3pb66dQ==
+  bh=C1KTS43iNb7xCJMeLZHV/iIX5f8wXoKRqUfcQWPIpVg=;
+  b=j2Q3ISZN6LpZxcIfejtGpep1Kx5/XtD2AEu5PpJB296KS8+04SwIVhaX
+   PDS88IxUnslPrgm50d0rEsuCFfVwYrTJwvDHna3F0p7ZI6BtIx0ib08P8
+   UEmSezsWI0kRANsx7lptr3OEzFH4a1B3n48nsgL4hOkljVmrSQwk0Ie/E
+   2R3Q83F+Cjmmc29Re3/OSQP1IR6hunHWWbFWPvpsrjckMjZJADKkBvMg5
+   e8Jp+XbxfTrWaagfskjANY/YFzNGrxQsGT1rDx17mCIzL1AYz8DjjVW5z
+   P2W9lm4b8b5nFGLK8ibIXjA6qBfS3i9Y26FwOS/mgkkgUSZxaJo9e5TGC
+   Q==;
+X-CSE-ConnectionGUID: VmcjLmElSdeXl3on+0k91w==
+X-CSE-MsgGUID: XBVubKrHSiG17DUa7pipdQ==
 X-IronPort-AV: E=Sophos;i="6.07,136,1708412400"; 
-   d="scan'208";a="18356697"
+   d="scan'208";a="19565327"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Mar 2024 22:53:29 -0700
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 18 Mar 2024 22:53:43 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
  chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Mon, 18 Mar 2024 22:53:28 -0700
+ 15.1.2507.35; Mon, 18 Mar 2024 22:53:31 -0700
 Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Mon, 18 Mar 2024 22:53:25 -0700
+ 15.1.2507.35 via Frontend Transport; Mon, 18 Mar 2024 22:53:28 -0700
 From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 To: <netdev@vger.kernel.org>
 CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
 	<edumazet@google.com>, <linux-kernel@vger.kernel.org>,
 	<bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>
-Subject: [PATCH net V1 1/2] net: lan743x: disable WOL upon resume to restore full data path operation
-Date: Tue, 19 Mar 2024 11:21:08 +0530
-Message-ID: <20240319055110.764002-2-Raju.Lakkaraju@microchip.com>
+Subject: [PATCH net V1 2/2] net: lan743x: support WOL in MAC even when PHY does not
+Date: Tue, 19 Mar 2024 11:21:09 +0530
+Message-ID: <20240319055110.764002-3-Raju.Lakkaraju@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240319055110.764002-1-Raju.Lakkaraju@microchip.com>
 References: <20240319055110.764002-1-Raju.Lakkaraju@microchip.com>
@@ -78,126 +78,51 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 
-In order for datapath to be restored to normal functionality after resume
-we disable all wakeup events. Additionally we clear all W1C status bits by
-writing 1's to them.
+Allow WOL support if MAC supports it, even if the PHY does not support it
 
-Fixes: 4d94282afd95 ("lan743x: Add power management support")
+Fixes: e9e13b6adc338 ("lan743x: fix for potential NULL pointer dereference with bare card")
 Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
 ---
 Change List:
 ------------
-V0 -> V1:
-  - Variable "data" change from "int" to "unsigned int"
+  - Change the "phy does not support WOL" print from netif_info() to
+    netif_dbg()
 
- drivers/net/ethernet/microchip/lan743x_main.c | 24 ++++++++++++++++++-
- drivers/net/ethernet/microchip/lan743x_main.h | 24 +++++++++++++++++++
- 2 files changed, 47 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/microchip/lan743x_ethtool.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-index bd8aa83b47e5..385e9dcd8cd9 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.c
-+++ b/drivers/net/ethernet/microchip/lan743x_main.c
-@@ -3550,7 +3550,7 @@ static void lan743x_pm_set_wol(struct lan743x_adapter *adapter)
- 
- 	/* clear wake settings */
- 	pmtctl = lan743x_csr_read(adapter, PMT_CTL);
--	pmtctl |= PMT_CTL_WUPS_MASK_;
-+	pmtctl |= PMT_CTL_WUPS_MASK_ | PMT_CTL_RES_CLR_WKP_MASK_;
- 	pmtctl &= ~(PMT_CTL_GPIO_WAKEUP_EN_ | PMT_CTL_EEE_WAKEUP_EN_ |
- 		PMT_CTL_WOL_EN_ | PMT_CTL_MAC_D3_RX_CLK_OVR_ |
- 		PMT_CTL_RX_FCT_RFE_D3_CLK_OVR_ | PMT_CTL_ETH_PHY_WAKE_EN_);
-@@ -3685,6 +3685,7 @@ static int lan743x_pm_resume(struct device *dev)
- 	struct pci_dev *pdev = to_pci_dev(dev);
- 	struct net_device *netdev = pci_get_drvdata(pdev);
+diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+index 8a6ae171e375..7509a19269c3 100644
+--- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
++++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
+@@ -1163,6 +1163,17 @@ static int lan743x_ethtool_set_wol(struct net_device *netdev,
+ 				   struct ethtool_wolinfo *wol)
+ {
  	struct lan743x_adapter *adapter = netdev_priv(netdev);
-+	u32 data;
- 	int ret;
++	int ret;
++
++	if (netdev->phydev) {
++		ret = phy_ethtool_set_wol(netdev->phydev, wol);
++		if (ret != -EOPNOTSUPP && ret != 0)
++			return ret;
++
++		if (ret == -EOPNOTSUPP)
++			netif_dbg(adapter, drv, adapter->netdev,
++				  "phy does not support WOL\n");
++	}
  
- 	pci_set_power_state(pdev, PCI_D0);
-@@ -3715,6 +3716,27 @@ static int lan743x_pm_resume(struct device *dev)
- 	netif_info(adapter, drv, adapter->netdev,
- 		   "Wakeup source : 0x%08X\n", ret);
+ 	adapter->wolopts = 0;
+ 	if (wol->wolopts & WAKE_UCAST)
+@@ -1187,8 +1198,7 @@ static int lan743x_ethtool_set_wol(struct net_device *netdev,
  
-+	/* Clear the wol configuration and status bits when system
-+	 * events occurs.
-+	 * The status bits are "Write One to Clear (W1C)"
-+	 */
-+	data = MAC_WUCSR_EEE_TX_WAKE_ | MAC_WUCSR_EEE_RX_WAKE_ |
-+	       MAC_WUCSR_RFE_WAKE_FR_ | MAC_WUCSR_PFDA_FR_ | MAC_WUCSR_WUFR_ |
-+	       MAC_WUCSR_MPR_ | MAC_WUCSR_BCAST_FR_;
-+	lan743x_csr_write(adapter, MAC_WUCSR, data);
-+
-+	data = MAC_WUCSR2_NS_RCD_ | MAC_WUCSR2_ARP_RCD_ |
-+	       MAC_WUCSR2_IPV6_TCPSYN_RCD_ | MAC_WUCSR2_IPV4_TCPSYN_RCD_;
-+	lan743x_csr_write(adapter, MAC_WUCSR2, data);
-+
-+	data = MAC_WK_SRC_ETH_PHY_WK_ | MAC_WK_SRC_IPV6_TCPSYN_RCD_WK_ |
-+	       MAC_WK_SRC_IPV4_TCPSYN_RCD_WK_ | MAC_WK_SRC_EEE_TX_WK_ |
-+	       MAC_WK_SRC_EEE_RX_WK_ | MAC_WK_SRC_RFE_FR_WK_ |
-+	       MAC_WK_SRC_PFDA_FR_WK_ | MAC_WK_SRC_MP_FR_WK_ |
-+	       MAC_WK_SRC_BCAST_FR_WK_ | MAC_WK_SRC_WU_FR_WK_ |
-+	       MAC_WK_SRC_WK_FR_SAVED_;
-+	lan743x_csr_write(adapter, MAC_WK_SRC, data);
-+
- 	return 0;
+ 	device_set_wakeup_enable(&adapter->pdev->dev, (bool)wol->wolopts);
+ 
+-	return netdev->phydev ? phy_ethtool_set_wol(netdev->phydev, wol)
+-			: -ENETDOWN;
++	return 0;
  }
+ #endif /* CONFIG_PM */
  
-diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
-index be79cb0ae5af..77fc3abc1428 100644
---- a/drivers/net/ethernet/microchip/lan743x_main.h
-+++ b/drivers/net/ethernet/microchip/lan743x_main.h
-@@ -60,6 +60,7 @@
- #define PMT_CTL_RX_FCT_RFE_D3_CLK_OVR_		BIT(18)
- #define PMT_CTL_GPIO_WAKEUP_EN_			BIT(15)
- #define PMT_CTL_EEE_WAKEUP_EN_			BIT(13)
-+#define PMT_CTL_RES_CLR_WKP_MASK_		GENMASK(9, 8)
- #define PMT_CTL_READY_				BIT(7)
- #define PMT_CTL_ETH_PHY_RST_			BIT(4)
- #define PMT_CTL_WOL_EN_				BIT(3)
-@@ -226,12 +227,31 @@
- #define MAC_WUCSR				(0x140)
- #define MAC_MP_SO_EN_				BIT(21)
- #define MAC_WUCSR_RFE_WAKE_EN_			BIT(14)
-+#define MAC_WUCSR_EEE_TX_WAKE_			BIT(13)
-+#define MAC_WUCSR_EEE_RX_WAKE_			BIT(11)
-+#define MAC_WUCSR_RFE_WAKE_FR_			BIT(9)
-+#define MAC_WUCSR_PFDA_FR_			BIT(7)
-+#define MAC_WUCSR_WUFR_				BIT(6)
-+#define MAC_WUCSR_MPR_				BIT(5)
-+#define MAC_WUCSR_BCAST_FR_			BIT(4)
- #define MAC_WUCSR_PFDA_EN_			BIT(3)
- #define MAC_WUCSR_WAKE_EN_			BIT(2)
- #define MAC_WUCSR_MPEN_				BIT(1)
- #define MAC_WUCSR_BCST_EN_			BIT(0)
- 
- #define MAC_WK_SRC				(0x144)
-+#define MAC_WK_SRC_ETH_PHY_WK_			BIT(17)
-+#define MAC_WK_SRC_IPV6_TCPSYN_RCD_WK_		BIT(16)
-+#define MAC_WK_SRC_IPV4_TCPSYN_RCD_WK_		BIT(15)
-+#define MAC_WK_SRC_EEE_TX_WK_			BIT(14)
-+#define MAC_WK_SRC_EEE_RX_WK_			BIT(13)
-+#define MAC_WK_SRC_RFE_FR_WK_			BIT(12)
-+#define MAC_WK_SRC_PFDA_FR_WK_			BIT(11)
-+#define MAC_WK_SRC_MP_FR_WK_			BIT(10)
-+#define MAC_WK_SRC_BCAST_FR_WK_			BIT(9)
-+#define MAC_WK_SRC_WU_FR_WK_			BIT(8)
-+#define MAC_WK_SRC_WK_FR_SAVED_			BIT(7)
-+
- #define MAC_MP_SO_HI				(0x148)
- #define MAC_MP_SO_LO				(0x14C)
- 
-@@ -294,6 +314,10 @@
- #define RFE_INDX(index)			(0x580 + (index << 2))
- 
- #define MAC_WUCSR2			(0x600)
-+#define MAC_WUCSR2_NS_RCD_		BIT(7)
-+#define MAC_WUCSR2_ARP_RCD_		BIT(6)
-+#define MAC_WUCSR2_IPV6_TCPSYN_RCD_	BIT(5)
-+#define MAC_WUCSR2_IPV4_TCPSYN_RCD_	BIT(4)
- 
- #define SGMII_ACC			(0x720)
- #define SGMII_ACC_SGMII_BZY_		BIT(31)
 -- 
 2.34.1
 
