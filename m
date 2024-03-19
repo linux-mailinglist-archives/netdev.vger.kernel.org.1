@@ -1,52 +1,63 @@
-Return-Path: <netdev+bounces-80685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D42B98805D2
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 21:05:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D17DC8805E5
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 21:13:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D467283AE8
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 20:05:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D5171C22967
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 20:13:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B708154665;
-	Tue, 19 Mar 2024 20:05:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89AA154BEA;
+	Tue, 19 Mar 2024 20:13:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="HO3WkU4p"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="V7i4Sz+K"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02AB61CAB2;
-	Tue, 19 Mar 2024 20:05:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4DC45F860;
+	Tue, 19 Mar 2024 20:13:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710878729; cv=none; b=YGbB9Lx8LZL2ik+SbdxkmT8aM5tjSxCLUi0ZFTvAC1ZCKctDjvyEe17b64boaldTMV6cZactTwiu6XNb7lQ25V0FkL4xSVthmpWoClrKpF6jR3ZQD5J6cuq+4jlCGiETJD/BeI2w1lWTSJTv/7xlkjMcTdv/ByN22IXH50CLf00=
+	t=1710879190; cv=none; b=ldtPOyH0RralXh0Z8+vbs2JY2kVWx+NMOJepFNqM2wFULBvQ7+buOLkfqdc6ETfOKh16AsYFeiHyDmjxDBgjZPC3l7RT6IXxFjmoO+1aTDVBitnKVkKlxYRrz9iXNJmiTZKmolnPvwmtvwGhXB++I05cJ3fVgIC9CyrDq+SWKZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710878729; c=relaxed/simple;
-	bh=8Ru+r5tmczOVlu4ej5UKX3wbZzLXCVtCcMTcY6qI3hA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TBFj0ipybEj7TzMlBim+hTWRz4EYkfp62VuiTUosP4X8/PoIuuKOO3BYqcA1XAlGpJloYgK5O0NhmW1lUO9aw5dU1IeyXINmKp3AxVzpIiIJ7UkbkL0mDH8GuaoB7z1SYDvmCHAIxwWKZUIwkLeWUEyNsnH0U+ondwR6c/14yvY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=HO3WkU4p; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 24838240002;
-	Tue, 19 Mar 2024 20:05:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1710878718;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=J6j8gsk/0efjiGaA6j1k1JY0wgpOfZpJCDP88uiiOZI=;
-	b=HO3WkU4phWfOw6nkmEI15k1bdiHhhOOUzsS9cl0etLXk2S8wBLrnSkHn8XjXMyv6EN1XR3
-	C7oyOImPYZ4kTV+5TlOp4wtW+fKVn19gGbTMyXoVkyI5jtbUepfm7keb6Yr7E33wAxdusK
-	/piuAZB0JR+Y7dD5ylWGnMvLHziaYf9FbTDmRx2aa/SrRg0gQAar/eFToEdKrPH5v61Ard
-	cvv4gjBNqakKYYlDwXJaLeNUsLDghUcLHxd+Fo8QpkyAS9FdiBw7w66w1gkyuxhD3C5zBQ
-	jRaCKZsWSpnwb/AVIbB6HXDK4F8aVoOIGj4LjVZohotEK1TSubPdq9lVCRD6rg==
-Message-ID: <7feb4cbc-15f3-47e1-874e-382ebee109de@arinc9.com>
-Date: Tue, 19 Mar 2024 23:04:53 +0300
+	s=arc-20240116; t=1710879190; c=relaxed/simple;
+	bh=XSo6Qp5+TTIpAtv1z79spgUBfLtasygSqClrv/83aWw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=WOig6C3vMD0XD7gGs0jtR1ZMItN84oMSUQ99/FR2eBJcwjdk3aldPF8w/GYNgX1BJ1wpnBhKC+jmo+nzvxCNIvIWJ3LjnHWFUHnh5FrMX7yZeujVtbrQdB9Y2YwJr455NhQ7G93boE4nYHhccRPGFHhxAyAS9bV6hrwsm/Bt6us=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=V7i4Sz+K; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42JJh5Vx008725;
+	Tue, 19 Mar 2024 20:12:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:to:cc:references:from
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=fmu5THVSphdCzmExKKVkeaiKTgxaANSNFePOX3S7iuw=; b=V7
+	i4Sz+KcchDCEHBZspLgAEOXU+KnHuiJZT0xDDlGpF9brzF27UbCuFY+4c0KauPS1
+	yYpJtkm5x0+k0/mqNQ2SxJ5yjcMakV8wiM+NLOfngWv9B1SZ7aNfaddrWjJVXSyn
+	gylXSXfmPKewOFBRBMI+9wLFdxOKTqHZXn5v06Bz8wVLmb3ijAi/qpqd/J7eNcWT
+	cEYE/0oBdBzrVV5FnM6LV70W/NX1zhtOffQ27ENuus3XpVOkQJSaZSBA9y4l8/4p
+	UOcKZ7ZRb5CSoxPuhXr68dAA38sRYjysjWvGK8kieX8+J+UWVhknfNAqQrRRVmSm
+	+nVY7m1ud48wjQBugRJA==
+Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wye5n8jsn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Mar 2024 20:12:40 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42JKCexf025944
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 19 Mar 2024 20:12:40 GMT
+Received: from [10.110.98.255] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Tue, 19 Mar
+ 2024 13:12:36 -0700
+Message-ID: <e008b2aa-8a36-44af-ad57-f5cd9658bb4f@quicinc.com>
+Date: Tue, 19 Mar 2024 13:12:35 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,52 +65,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] Fix EEE support for MT7531 and MT7988 SoC switch
+Subject: Re: [PATCH net-next v4] net: Re-use and set mono_delivery_time bit
+ for userspace tstamp packets
 Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
- Sean Wang <sean.wang@mediatek.com>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- =?UTF-8?Q?Ren=C3=A9_van_Dorst?= <opensource@vdorst.com>,
- Russell King <linux@armlinux.org.uk>,
- SkyLake Huang <SkyLake.Huang@mediatek.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v>
- <ZfnYkuzuvwLepIfC@makrotopia.org>
- <00ec9779-19ce-4005-83f0-f4abf37350fc@arinc9.com>
- <6cb585f6-6da8-45a2-a28b-2fb556f95672@lunn.ch>
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <6cb585f6-6da8-45a2-a28b-2fb556f95672@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: yes
-X-Spam-Level: **************************
-X-GND-Spam-Score: 400
-X-GND-Status: SPAM
-X-GND-Sasl: arinc.unal@arinc9.com
+To: Martin KaFai Lau <martin.lau@linux.dev>
+CC: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, <kernel@quicinc.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Andrew Halaney
+	<ahalaney@redhat.com>,
+        Martin KaFai Lau <martin.lau@kernel.org>, bpf
+	<bpf@vger.kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        "Alexei
+ Starovoitov" <ast@kernel.org>,
+        Andrii Nakryiko <andrii@kernel.org>
+References: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
+ <2a4cb416-5d95-459d-8c1c-3fb225240363@linux.dev>
+ <65f16946cd33e_344ff1294fc@willemb.c.googlers.com.notmuch>
+ <28282905-065a-4233-a0a2-53aa9b85f381@linux.dev>
+ <65f2004e65802_3d1e792943e@willemb.c.googlers.com.notmuch>
+ <0dff8f05-e18d-47c8-9f19-351c44ea8624@linux.dev>
+ <e5da91bc-5827-4347-ab38-36c92ae2dfa2@quicinc.com>
+ <65f21d65820fc_3d934129463@willemb.c.googlers.com.notmuch>
+ <bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev>
+ <65f2c81fc7988_3ee61729465@willemb.c.googlers.com.notmuch>
+ <5692ddb3-9558-4440-a7bf-47fcc47401ed@linux.dev>
+ <65f35e00a83c0_2132294f5@willemb.c.googlers.com.notmuch>
+ <e270b646-dae0-41cf-9ef8-e991738b9c57@quicinc.com>
+ <8d245f5a-0c75-4634-9513-3d420eb2c88f@linux.dev>
+ <d10254cc-a908-4d81-98d2-2eed715e521f@quicinc.com>
+ <66ad9e5b-0126-476e-bf0f-6a33f446c976@quicinc.com>
+ <5b1d5758-3510-47c5-97e9-2edc5112d046@linux.dev>
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+In-Reply-To: <5b1d5758-3510-47c5-97e9-2edc5112d046@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: VMrYGObpInr61SalXL7s6H01AGPAuPip
+X-Proofpoint-ORIG-GUID: VMrYGObpInr61SalXL7s6H01AGPAuPip
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-19_08,2024-03-18_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ spamscore=0 priorityscore=1501 bulkscore=0 lowpriorityscore=0
+ malwarescore=0 clxscore=1015 mlxlogscore=876 mlxscore=0 suspectscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2403140001 definitions=main-2403190155
 
-On 19.03.2024 22:38, Andrew Lunn wrote:
->> I would argue that EEE advertisement on the PHY should be enabled by
->> default.
+
+
+On 3/19/2024 12:46 PM, Martin KaFai Lau wrote:
+> On 3/18/24 12:02 PM, Abhishek Chauhan (ABC) wrote:
+>>>>>>> I think the "struct inet_frag_queue" also needs a new "user_delivery_time"
+>>>>>>> field. "mono_delivery_time" is already in there.
+>>>> [ ... ]
+>>>>
+>> Martin, Do we really need to add user_delivery_time as part of inet_frag_queue struct? I was wondering why is this required since we are using tstamp_type:2 to
+>> distinguish between timestamp anyway .
 > 
-> That is an open question at the moment. For some use cases, it can add
-> extra delay and jitter which can cause problems. I've heard people
-> doing PTP don't like EEE for example.
 > 
-> The current phylib core code leaves the PHY advertisement whatever its
-> reset default is. So we leave it to the manufacture to decide if it
-> should be enabled or disabled by default. It is policy, so it should
-> really be down to user space to configure EEE how it wants it.
-
-That's fine by me. Then my patch series is okay as it is.
-
-Arınç
+> The context for this was before combining mono_delivery_time:1 and user_delivery_time:1 into tstamp_type:2. No need to add user_delivery_time to inet_frag_queue because it is combined into tstamp_type:2. If mono_delivery_time:1 is replaced with tstamp_type:2 in sk_buff, the same should be done in inet_frag_queue.
+> 
+Thats what i was planning to do. This is more or like the patch 3 - when brings in the changes of two bits. 
+Thanks Martin for clarification. 
+> 
 
