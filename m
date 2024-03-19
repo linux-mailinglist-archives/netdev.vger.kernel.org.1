@@ -1,100 +1,120 @@
-Return-Path: <netdev+bounces-80496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A96187F4FD
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 02:35:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5703D87F536
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 03:00:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 68B1FB217EF
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 01:35:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12C40282728
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 02:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0828626DB;
-	Tue, 19 Mar 2024 01:35:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 141A064CE6;
+	Tue, 19 Mar 2024 02:00:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AvbdDp5I"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1408D612F6;
-	Tue, 19 Mar 2024 01:35:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E1C564CC9;
+	Tue, 19 Mar 2024 02:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710812117; cv=none; b=LTyq0hoCXRfMe5LdPPhgm5EgyoAqtGWmuqL3jxTxy/jwdu7qPdVK5+nQPzFT8bidn64oX5dyO9r+hgswsPGs774ErJNoZxDh8aIijXrACoNVrWzYu0wADbbKlOl9Vn3EwPldUvsBVAu2COkxPGkxx37KNF7b+72Lh0/1x7Ivwf8=
+	t=1710813608; cv=none; b=j0jpAvrGCaBZgADsleYK7UEv4fgM1naH61Qjj+rJvSnGUgHyHTOT6sOHzu3rDKSJMnKgG/HeZdZuY0wximq/p9A5K1i50V+I+kV0H69pZBQSsgrWVi6qTtSACqvNYFA4da8QXIeLaa4nzQa3ZJ2brB0CXkwewTl7nALtFr531UU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710812117; c=relaxed/simple;
-	bh=Sd8bclQ/7iS9zW3jBrxs2+6SaQEBr8bQ3OMru9SXT94=;
-	h=Subject:To:CC:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=Vo5YK+j8bylyvmD/5JOXSPSCpuPRb15gXaMRWpTYGa9haxO6sw0gxpiHpDDmWnaJhI3Qn/F4khlpT2ZV5bPl2g72UYo/BFdXrAGTw+Kt5OnFNm6D4rWhZNy7UQiOO2bUjXTvUabsStK5Db6f8VbobB4NsT0L44FCO4YKSCwtWRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4TzDkC3xRJz1Q9nH;
-	Tue, 19 Mar 2024 09:32:51 +0800 (CST)
-Received: from kwepemm600013.china.huawei.com (unknown [7.193.23.68])
-	by mail.maildlp.com (Postfix) with ESMTPS id C14991400F4;
-	Tue, 19 Mar 2024 09:35:05 +0800 (CST)
-Received: from [10.174.178.46] (10.174.178.46) by
- kwepemm600013.china.huawei.com (7.193.23.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Tue, 19 Mar 2024 09:35:04 +0800
-Subject: Re: [linux-next:master] BUILD REGRESSION
- 2e93f143ca010a5013528e1cfdc895f024fe8c21
-To: kernel test robot <lkp@intel.com>, Andrew Morton
-	<akpm@linux-foundation.org>
-CC: Linux Memory Management List <linux-mm@kvack.org>,
-	<amd-gfx@lists.freedesktop.org>, <bpf@vger.kernel.org>,
-	<linux-fsdevel@vger.kernel.org>, <linux-gpio@vger.kernel.org>,
-	<linux-mtd@lists.infradead.org>, <linux-omap@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-References: <202403182219.XrvfZx4s-lkp@intel.com>
-From: Zhihao Cheng <chengzhihao1@huawei.com>
-Message-ID: <e7ca3f69-7052-616b-68db-f29a66b42edc@huawei.com>
-Date: Tue, 19 Mar 2024 09:35:04 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:68.0) Gecko/20100101
- Thunderbird/68.5.0
+	s=arc-20240116; t=1710813608; c=relaxed/simple;
+	bh=ut8hDUkgxvNhNW661J8IdgqhNl1h0iYMv1pVArL5g6U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aza3QqQNrReNLhMImQcsl34Ptvug2A6EG8f7iVAysAFSSTTzfbsmD9SA1YbvgIJxQ99yK6WU0s7Uv8uRkCZgg6UFb5QWsxyfybw5SukSqoyJDwoMlQ7+A0//KKUB/X3yhYdlieuBN7QlaENjT7Sn91pVJJNgtKQsONv6j+z2meY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AvbdDp5I; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-1dc29f1956cso29616815ad.0;
+        Mon, 18 Mar 2024 19:00:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710813606; x=1711418406; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZLi9VGflMy5URAtqCMgtdK8z2MbS+1xX/KzoZuLs/PY=;
+        b=AvbdDp5I0/3MEqJMKwvoE/Vwq1CszxH0+eHL/FcwGpwHrX5RV2U2x0b5+fPlBGjnWX
+         Jd1OZa46VCaCYgy4Hd10omOqwjR7MnJqtBY92P06zmFwWNnp7dNXHl702zRMRsUNWNb0
+         ls/zHfthtGXiW70C+zC8tX9WTRjRztEWeyvtXiBdNHaNAwHCq5iY4RPlMHRqdcyDXOeq
+         NdsT5McFHyh6g0ntY6bh7Naw2UijZMD/bCNAtqdCaBzqFNKGXC1/YiucaEP2G+pU2a6P
+         w0Djrfl2IcjOsN0EA8YGdGzPA6OatmwkBHUhDw45/kzARiL+boAsfc0NiGu1KqfkvdL4
+         mTiA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710813606; x=1711418406;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZLi9VGflMy5URAtqCMgtdK8z2MbS+1xX/KzoZuLs/PY=;
+        b=FSH+Up0/Wu5R/jzm0ZjjY3CZZUkhP4dtpvy6/bTQaqHgkZC4Xqy87sVbEYsT6uNaoU
+         2VS1VKwCqZeKRIapH+POJvTDyywLyjvKi2x3CZEQwrTkGb0xVcSoCrvATwA13m5J6EbV
+         KOVMK5HrJenw4ELH2svJbCFySB8WE6PZZLJdxcHNu9OopGuqexJ5AkKbZnZ0bBOGwHC7
+         +L8QCQk80gjFOPp3xeRCjsTm4X69ZtMoAazPBsubq5EnhkUNk4MFmbhUA2s5ZTm7Fste
+         NPmCgySJEavSnScRUue/1jTJfqc4SVqfMsz3yFu683a90BXl2Quwx1cpHvjGHwZZ2BVk
+         BN8w==
+X-Forwarded-Encrypted: i=1; AJvYcCU4yYLDHMEOpfS4prd2rBALasMUA6h8MdqaXcCHeA3zNLwYfgkJAQVG5HgY1JbYX74jtzjcEW5creaSHlSGdkq+xz1qG0oT
+X-Gm-Message-State: AOJu0Yx30wcp2eMFQXhGDk2qy61OrMQDb/5+kOphTmWPcxmy+yqSjB3g
+	hgsZ4eYHI7jxO7UjOkKJKgKN8J/iYNLf/6oR/gPY0eHBpyO+B1Aj
+X-Google-Smtp-Source: AGHT+IFBWSKuC6nFXJdQcPu63+uwETUQA3Dg84vzszNjUUBIkjs0gG36ZTfUHohf+qWS1LKC1fZfSg==
+X-Received: by 2002:a17:902:ce86:b0:1dc:90a7:660b with SMTP id f6-20020a170902ce8600b001dc90a7660bmr15220504plg.9.1710813603960;
+        Mon, 18 Mar 2024 19:00:03 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id t20-20020a170902dcd400b001dc9893b03bsm10023762pll.272.2024.03.18.19.00.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Mar 2024 19:00:03 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id E21E71846B4A8; Tue, 19 Mar 2024 08:59:59 +0700 (WIB)
+Date: Tue, 19 Mar 2024 08:59:59 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Shannon Nelson <shannon.nelson@amd.com>, netdev@vger.kernel.org,
+	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+	pabeni@redhat.com, corbet@lwn.net
+Cc: linux-doc@vger.kernel.org, brett.creeley@amd.com, drivers@pensando.io
+Subject: Re: [PATCH net] ionic: update documentation for XDP support
+Message-ID: <Zfjxn3tLlHGRHXMV@archie.me>
+References: <20240318235331.71161-1-shannon.nelson@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <202403182219.XrvfZx4s-lkp@intel.com>
-Content-Type: text/plain; charset="gbk"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemm600013.china.huawei.com (7.193.23.68)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="52lFMQkhUyWJFnWC"
+Content-Disposition: inline
+In-Reply-To: <20240318235331.71161-1-shannon.nelson@amd.com>
 
-ÔÚ 2024/3/18 22:33, kernel test robot Ð´µÀ:
-> tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-> branch HEAD: 2e93f143ca010a5013528e1cfdc895f024fe8c21  Add linux-next specific files for 20240318
-> 
-> Error/Warning ids grouped by kconfigs:
-> 
-> gcc_recent_errors
-> |-- arc-allmodconfig
-> |   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-> |-- arc-allyesconfig
-> |   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-> |-- arm-allmodconfig
-> |   |-- arch-arm-mach-omap2-prm33xx.c:warning:expecting-prototype-for-am33xx_prm_global_warm_sw_reset().-Prototype-was-for-am33xx_prm_global_sw_reset()-instead
-> |   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_vcn.c:warning:.bin-directive-output-may-be-truncated-writing-bytes-into-a-region-of-size-between-and
-> |   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-> |-- arm-allyesconfig
-> |   |-- arch-arm-mach-omap2-prm33xx.c:warning:expecting-prototype-for-am33xx_prm_global_warm_sw_reset().-Prototype-was-for-am33xx_prm_global_sw_reset()-instead
-> |   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_vcn.c:warning:.bin-directive-output-may-be-truncated-writing-bytes-into-a-region-of-size-between-and
-> |   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-> |-- arm64-defconfig
-> |   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-> |-- csky-allmodconfig
-> |   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_vcn.c:warning:.bin-directive-output-may-be-truncated-writing-bytes-into-a-region-of-size-between-and
-> |   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-> |-- csky-allyesconfig
-> |   |-- drivers-gpu-drm-amd-amdgpu-amdgpu_vcn.c:warning:.bin-directive-output-may-be-truncated-writing-bytes-into-a-region-of-size-between-and
-> |   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
 
-Hi, Richard,
-I sent out the warning fix patch in 
-https://patchwork.ozlabs.org/project/linux-mtd/patch/20240227024204.1080739-1-chengzhihao1@huawei.com/
+--52lFMQkhUyWJFnWC
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Mon, Mar 18, 2024 at 04:53:31PM -0700, Shannon Nelson wrote:
+> +XDP
+> +---
+> +
+> +Support for XDP includes the basics, plus Jumbo frames, Redirect
+> +and ndo_xmit.  There is no current for zero-copy sockets or HW offload.
+"... no current support ..."
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--52lFMQkhUyWJFnWC
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZfjxmwAKCRD2uYlJVVFO
+o4PqAQDoEhjydO6itzJXPw90XloyNeSOtC7SlnXdD6ptNYAl8wEAmq/lE9855UWZ
+pahDt72ESMph6ZnVelSJ0Y61F/uZ6A0=
+=omcS
+-----END PGP SIGNATURE-----
+
+--52lFMQkhUyWJFnWC--
 
