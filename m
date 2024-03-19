@@ -1,43 +1,73 @@
-Return-Path: <netdev+bounces-80707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80706-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 308F8880762
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 23:50:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0ED088075E
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 23:49:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E40E91F2351B
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 22:50:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EFBF1C21F6E
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 22:49:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B34D740BF2;
-	Tue, 19 Mar 2024 22:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC55239FC1;
+	Tue, 19 Mar 2024 22:49:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FJ0FEE3w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6F1364D4;
-	Tue, 19 Mar 2024 22:50:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63E7C364D4;
+	Tue, 19 Mar 2024 22:49:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710888610; cv=none; b=YNMT5KYt42HYVXqNHecc+KxCuwtVRFmM8gfpTtcyt4XHaGl0P9pARY6BkHQOJjzxf8N9qTfu2g48q2saOVcdvvP8x6ZvjA5/aDen88yNaEsKhINxBr7Exi0nnzrltWZdF1mQOpUPNfkXSHqq5cI2b74qBXm6tSReBT136/3Fg8A=
+	t=1710888562; cv=none; b=V7zhFErlFWYOo4Wx//Polle13xWgHYhQ0Sx/qN8myYIx3aBeHx+Yk/1MS/kIMDJBYuov/pucPbak2nzSoNnD9iUYEPuax8lta6fWaIu3rsRDQ1ivlbyYouVH/iSe5NjBGpJ60bS7boZZncxFM9dQvCFHrOGR1S/9WguK9DEa1kQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710888610; c=relaxed/simple;
-	bh=1flOJ3RWi62qhATNMgJWjfQ18bBCP95T4oDhosHEGzc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RzQg7/NzgjJV+ndoPiy7alIajDg1azAZlN2Uyykfq0OntUur6lth8VJSbAkK3HRUpFbUxR4E+g4o6sztB7KYXjfDJuuTUsgukD5jbPWe6WkGz6ggUibznUO8CwRCMYHBgWAZfGl6oyhVDlMHgtcSNeZ3n92+3dmr2r3l17gmNP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.178.112] (p57b378ee.dip0.t-ipconnect.de [87.179.120.238])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 152AC61E5FE3D;
-	Tue, 19 Mar 2024 23:48:19 +0100 (CET)
-Message-ID: <cd42aca9-ac6c-4579-96d5-121a38ebded5@molgen.mpg.de>
-Date: Tue, 19 Mar 2024 23:48:17 +0100
+	s=arc-20240116; t=1710888562; c=relaxed/simple;
+	bh=hY7Qrm6Z+Ri/tqAFiaNgt/KD2fehu+eG9GkAkB/P1nE=;
+	h=Message-ID:Date:MIME-Version:To:From:Subject:Cc:Content-Type; b=WjzwcPAjBZkQWg/9y8e3kfOPqP4MA2MHec6AfHIXWDnIc055K80fLl/AsaIfpkLYaKzpHxwdMTx76JdT1OSs8wvNKBADcki4pZafSCDRpCe0MuIXOzivSA/RJfr3BsYUOILZbh2e8TvSh4TxGG5FyUEw8L8pVxCTO1fUyb1cFPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FJ0FEE3w; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-789db18e169so455555785a.1;
+        Tue, 19 Mar 2024 15:49:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710888560; x=1711493360; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V+3XOLRqQvOEeLiRjJAh8LJnrrAM0/tDEQfJD1xUeSg=;
+        b=FJ0FEE3w9+OfCwpxGTuOVDMOsefU55Tm/qO7JCVuA7oCB01ddEoi/s9rCPtA6bnpTH
+         O38Wn+Np53Xy0B01kEAHS1bs+cWZJygylsNYMkNZWwhtuxSPgLbT8/AVF6AO+9tE7Nav
+         eCKk309WmskDRnjCl8EyBk6bB4K7T27hEOBC6i9D58R6EMG4HeVN1t0O2nBDelU4WCOr
+         RiRAJRAE27dgR1Me5513BW74WYQvjR4Eo2qN01/aV2sdmNKqI7axCWuFoAb1a+/GX1Le
+         uAHYowrwyZ2PtY6ut+kMZUqb843J+QEqzuPuJf8mZpRZqLtk9nfqcBfwR+EnoH/R0ajv
+         /Frg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710888560; x=1711493360;
+        h=content-transfer-encoding:cc:subject:from:to:content-language
+         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=V+3XOLRqQvOEeLiRjJAh8LJnrrAM0/tDEQfJD1xUeSg=;
+        b=R+0K6OnUtzhQY0+Bipdpu4yQcmpONAGcg0elAYSj8dd0Ra8oBR4hmNxCHtOkS9fNU7
+         rgxDMqOt4m/mYMLcGDl//85xCI9u1mJrjFlQjCC15EDHpGOKHN3MAREEYx51Q2tKvSt0
+         OkO5tx8Hyhhl/5cKhTniBUkk4snFgPE45WbDqCMj3GLSGWxzJ3jExBZVQyIC6Bw05KJo
+         YVuO6FoXhUv9YKKO5apdKe3kzCwWEBBqBOKwuB/KiLbrAhfdIvq+ZE7trv3wItFRhyAs
+         crqtmtG0Y6vMl1mKSy/ClSj+VxkHNeZ6xIjFSKfwGi51so5hI+BNo7xwfYs4q58D9x2W
+         B/sw==
+X-Forwarded-Encrypted: i=1; AJvYcCWQ/JvFS5cwS4mXNGCnFikL7dgpLzWVNI6jKjB2LZrgpuALJcT+/+6xOL8s+ZKdJWRFwwflQc0Gg2o/MKMAvUh/wyjGJEkd/I44
+X-Gm-Message-State: AOJu0YxcGs1CrRhf763nrgQ1fNVYp7upeDjMszqjvwF00tQuMvr34PBV
+	8gV5wJHcZsrdSfuPIoc9IA/b1d3m6xPpKGSwkLSzr5cFyAm2ugcV
+X-Google-Smtp-Source: AGHT+IEZ1OX3N9DDyixmV/0csvF1zpWYjHyudqQsgx6Rc2jOzZNMl0GVEne1FKKFl6Dzr+ARXQ+XoA==
+X-Received: by 2002:ae9:e518:0:b0:788:663d:f38e with SMTP id w24-20020ae9e518000000b00788663df38emr18559933qkf.11.1710888560204;
+        Tue, 19 Mar 2024 15:49:20 -0700 (PDT)
+Received: from [10.193.190.170] (mobile-130-126-255-72.near.illinois.edu. [130.126.255.72])
+        by smtp.gmail.com with ESMTPSA id g17-20020a05620a109100b00789e90a851asm4084589qkk.56.2024.03.19.15.49.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Mar 2024 15:49:20 -0700 (PDT)
+Message-ID: <5fde8ace-a0ac-4870-a7fe-ec2a24697112@gmail.com>
+Date: Tue, 19 Mar 2024 17:49:19 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -45,78 +75,47 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH v5 00/11] Add support for Intel PPS
- Generator
 Content-Language: en-US
-To: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
-Cc: tglx@linutronix.de, jstultz@google.com, giometti@enneenne.com,
- corbet@lwn.net, linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- mallikarjunappa.sangannavar@intel.com, alexandre.torgue@foss.st.com,
- perex@perex.cz, basavaraj.goudar@intel.com, thejesh.reddy.t.r@intel.com,
- christopher.s.hall@intel.com, x86@kernel.org, joabreu@synopsys.com,
- peter.hilber@opensynergy.com, intel-wired-lan@lists.osuosl.org,
- subramanian.mohan@intel.com, linux-sound@vger.kernel.org,
- andriy.shevchenko@linux.intel.com, netdev@vger.kernel.org,
- pandith.n@intel.com, eddie.dong@intel.com, mcoquelin.stm32@gmail.com,
- anthony.l.nguyen@intel.com, davem@davemloft.net
-References: <20240319130547.4195-1-lakshmi.sowjanya.d@intel.com>
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20240319130547.4195-1-lakshmi.sowjanya.d@intel.com>
+To: horms@verge.net.au, ja@ssi.bg, davem@davemloft.net, dsahern@kernel.org,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+From: Zijie Zhao <zzjas98@gmail.com>
+Subject: [net] Question about ipvs->sysctl_sync_threshold and READ_ONCE
+Cc: netdev@vger.kernel.org, lvs-devel@vger.kernel.org, chenyuan0y@gmail.com
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-Dear Lakshmi,
+Dear IPVS maintainers,
 
-
-Thank you for your patch series.
-
-Am 19.03.24 um 14:05 schrieb lakshmi.sowjanya.d@intel.com:
-> From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
-> 
-> The goal of the PPS(Pulse Per Second) hardware/software is to generate a
-
-Please add a space before (.
-
-> signal from the system on a wire so that some third-party hardware can
-> observe that signal and judge how close the system's time is to another
-> system or piece of hardware.
-> 
-> Existing methods (like parallel ports) require software to flip a bit at
-> just the right time to create a PPS signal. Many things can prevent
-> software from doing this precisely. This (Timed I/O) method is better
-> because software only "arms" the hardware in advance and then depends on
-> the hardware to "fire" and flip the signal at just the right time.
-> 
-> To generate a PPS signal with this new hardware, the kernel wakes up
-> twice a second, once for 1->0 edge and other for the 0->1 edge. It does
-> this shortly (~10ms) before the actual change in the signal needs to be
-> made. It computes the TSC value at which edge will happen, convert to a
-> value hardware understands and program this value to Timed I/O hardware.
-> The actual edge transition happens without any further action from the
-> kernel.
-> 
-> The result here is a signal coming out of the system that is roughly
-> 1,000 times more accurate than the old methods. If the system is heavily
-> loaded, the difference in accuracy is larger in old methods.
-> 
-> Application Interface:
-> The API to use Timed I/O is very simple. It is enabled and disabled by
-> writing a '1' or '0' value to the sysfs enable attribute associated with
-> the Timed I/O PPS device. Each Timed I/O pin is represented by a PPS
-> device. When enabled, a pulse-per-second(PPS) synchronized with the
-
-Please add a space before (.
-
-> system clock is continuously produced on the Timed I/O pin, otherwise it
-> is pulled low.
-> 
-> The Timed I/O signal on the motherboard is enabled in the BIOS setup.
-
-It’d be great if you documented your test setup including the name of 
-the system firmware option.
+We encountered an unusual usage of sysctl parameter while analyzing 
+kernel source code.
 
 
-Kind regards,
+In include/net/ip_vs.h, line 1062 - 1070:
 
-Paul
+```
+static inline int sysctl_sync_threshold(struct netns_ipvs *ipvs)
+{
+	return ipvs->sysctl_sync_threshold[0];
+}
+
+static inline int sysctl_sync_period(struct netns_ipvs *ipvs)
+{
+	return READ_ONCE(ipvs->sysctl_sync_threshold[1]);
+}
+```
+
+Here, sysctl_sync_threshold[1] is accessed behind `READ_ONCE`, but 
+sysctl_sync_threshold[0] is not. Should sysctl_sync_threshold[0] also be 
+guarded by `READ_ONCE`?
+
+Please kindly let us know if we missed any key information and this is 
+actually intended. We appreciate your information and time! Thanks!
+
+
+Links to the code:
+https://elixir.bootlin.com/linux/v6.8.1/source/include/net/ip_vs.h#L1064
+https://elixir.bootlin.com/linux/v6.8.1/source/include/net/ip_vs.h#L1069
+
+Best,
+Zijie
 
