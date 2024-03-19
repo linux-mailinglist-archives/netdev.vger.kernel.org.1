@@ -1,155 +1,110 @@
-Return-Path: <netdev+bounces-80643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5634C880225
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 17:26:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B8D3880233
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 17:27:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0D11283399
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 16:26:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1240B25607
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 16:27:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CBCB84FD2;
-	Tue, 19 Mar 2024 16:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344C382871;
+	Tue, 19 Mar 2024 16:22:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="mQvpT4KW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MYx6JdOS"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCF9F84FD4;
-	Tue, 19 Mar 2024 16:18:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.40
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710865103; cv=fail; b=a0oiR7j3BpYUBwpQJ/tVA78JNHrOaRO6hOz4zbwQd6etHFv9J7grMivYyf3v746fMMwmhf2P/zLRyjTW+0bKn5Hqa9ANDgCgGfavZx4Fl62ZLXxNivhIEKEZ4SfF747LnO7R4jo8F/SW6y+VIZxybcQWJ0BB6H+pOmBULbi6rBs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710865103; c=relaxed/simple;
-	bh=PtEYQ8QVWWt6vx0o0S4sndWqJcsDsp4bIVhZMF2/dXU=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=qj8OEaTEM0N2KdESjljpBZLY9QMa8sf6LHUM30HFr2/KYDDSzx7ampK9dv2EWhw1aoqWrFkgPY4zdPKhHjftI9CmGx8G9pna6PXRGWtPRy51pV6v7QijC45odIPziRiTcTZJs0zKqVob8yCV2gdZAWvSul7hzjXq9yDMZx0bj10=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=mQvpT4KW; arc=fail smtp.client-ip=40.107.236.40
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HGkoBavhJ8+BNbHTFUqOC/PYn2QaUnF4zHz5G9bZndIkdvKoCmz7+SfVVFwE/6+gncXj12Pv3Y7UwgMBCC9VvYm7mLnRZFLnDBCEq9bYrJQH7DQv6XFdwoxs3t5X/relDg1rJ1hRzm7OB8ee+qnVuGqz0jxTUjqTXapDzF5UJjGsIJtenUigwqjA0s32xnpFGp22vJE/7qJcm+xsWrD68XJPy63MC3H+up9371A5c0ZaCGFfE0sFU5LtX3K65jlSgSoDQ7p6oNL+BlS8+yGnWhH4npZgCXc7+O1tJFcw7a2AA+qb1zot9OyYFvKUCGeW5eTYJYHKEtLOpk5cqfaKOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zSlt1OGYyoCdbfyBACOzrGe8khtkkybqSyqKxecekJc=;
- b=EaTv6RgPBWg+ZaSutHonjNLUmt+JFSYFJgavFoXFXfJlRRK3I/XXxITc30dStvjOqUJLzSmV4QrP2xpiReA4Ym7pMn3mm/oOov+XvWj1+qRJFInBOkJvHy8Qd6wN9QJKNR4A5yfchHu7mnWrB3t7m8lNQmTjx7/uDFXkrmhyjobPg8MlZ0xWLXBsGeu2KVeuyR/hMuW0rr42mcFCKz7vcOFOHT3C6Lry4yZt9bPKizUJak4sbajBrH1WhHOcb56FCTxyhLvPmGmHxMOUC4oQQNQV02ux/m5cEB8NNKQ6IjtpmyDFNaYXGKuFruH7iptpVsNjrlMGljJIcl4w15rEZg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zSlt1OGYyoCdbfyBACOzrGe8khtkkybqSyqKxecekJc=;
- b=mQvpT4KWz5kc/xuqN1tOg0YE7BeWKJN3EoIGiMYUh3y1WymACkhEsjW7qFUf1hvU0sqIsPVsEKsW3QzA8HWdGBkKwDzqA5HFHXnC/tSHlb59fWEMPHqgXn4ixlFaNrlvwoIOupleElT1JfDbvZ5Iz1drN+Aa7vXvtGTyf4yaI3k=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12) by
- MW4PR12MB7120.namprd12.prod.outlook.com (2603:10b6:303:222::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.23; Tue, 19 Mar
- 2024 16:18:17 +0000
-Received: from DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::11ac:76e:24ce:4cb1]) by DS0PR12MB6583.namprd12.prod.outlook.com
- ([fe80::11ac:76e:24ce:4cb1%4]) with mapi id 15.20.7386.025; Tue, 19 Mar 2024
- 16:18:17 +0000
-Message-ID: <c68a0c77-6d92-4cd2-b747-0588e6586aa9@amd.com>
-Date: Tue, 19 Mar 2024 09:18:14 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ionic: update documentation for XDP support
-To: Bagas Sanjaya <bagasdotme@gmail.com>, netdev@vger.kernel.org,
- davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, corbet@lwn.net
-Cc: linux-doc@vger.kernel.org, brett.creeley@amd.com, drivers@pensando.io
-References: <20240318235331.71161-1-shannon.nelson@amd.com>
- <Zfjxn3tLlHGRHXMV@archie.me>
-Content-Language: en-US
-From: "Nelson, Shannon" <shannon.nelson@amd.com>
-In-Reply-To: <Zfjxn3tLlHGRHXMV@archie.me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR01CA0033.prod.exchangelabs.com (2603:10b6:a02:80::46)
- To DS0PR12MB6583.namprd12.prod.outlook.com (2603:10b6:8:d1::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B0E82864;
+	Tue, 19 Mar 2024 16:22:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710865353; cv=none; b=UwBjKh+hSXNQX4Wsyaj1OaOQmyyguMj4tN5MOw/u2Kn9lF14ECF52d+D5KH2RdXic/7hmuGQgQN3Y3hABEHkVKYSiNiM/CbA4Z0cnA6yN7zt69FcZhj4/HwNExV/Kd74qg0YvODHisRbSH6Y9aMmbc88b1BeQcs84niy4C0is8M=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710865353; c=relaxed/simple;
+	bh=acH73uxgSHv/9BCCRDyYgpImYhoviLo4KGKdazenxjg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=L2BxXohy9GHKnlGNZl1UQOPNRBvJCeWS1GYR9kmkgafOzwZZFZlTlw/v8XIEdGluZalGucLH2RGPv8dXFsKQqb9bJq+yOcqBedCrE4MYvUU8KEHO+qg5v5AQ0TEKmg89CtGHeebO84P4BMtQr+RlSuxKbeQZe+oxSpMjcAfLHeE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MYx6JdOS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 66617C433F1;
+	Tue, 19 Mar 2024 16:22:32 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710865352;
+	bh=acH73uxgSHv/9BCCRDyYgpImYhoviLo4KGKdazenxjg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MYx6JdOS12ng1Hk7K5AcUmYuLhE4Q9WdE75c85+hNVQvIIPHwNf268g6VyXMp7EFe
+	 gmcTs/Xv9e41VpLXQaEkkDrbr7OhdCnrib7jyGw+Eh9C11F1M9BliuVjPOdCXYXxUl
+	 y5IFpsnROz0UEpTCbmrxWxsO/CVNyKRlOf0x152+5aFcAx5YUbM2jrkeyM09G9grOM
+	 W0L9zk+jVK3trLI2EFEoN/NkHVN0kOeeaFqJZqHnO6hCPbEqz2diK8dOVkcKj7I8PS
+	 9b4XwhUfADfYGyYGWVb2PlsmuXOVnnHIwic830u/Zq8XxZAXDIHvaRODtxTSwDJdvB
+	 bFx4ftos+fZzQ==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1rmcEY-000000000rS-2PTg;
+	Tue, 19 Mar 2024 17:22:39 +0100
+Date: Tue, 19 Mar 2024 17:22:38 +0100
+From: Johan Hovold <johan@kernel.org>
+To: Doug Anderson <dianders@chromium.org>
+Cc: Johan Hovold <johan+linaro@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	cros-qcom-dts-watchers@chromium.org,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Matthias Kaehlcke <mka@chromium.org>,
+	Rocky Liao <quic_rjliao@quicinc.com>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/5] dt-bindings: bluetooth: add
+ 'qcom,local-bd-address-broken'
+Message-ID: <Zfm7zjD-aicgvr-t@hovoldconsulting.com>
+References: <20240319152926.1288-1-johan+linaro@kernel.org>
+ <20240319152926.1288-2-johan+linaro@kernel.org>
+ <CAD=FV=XJ+yAvDn5NyfCSJdg+DujPrWO+DZu=BmcqbJS-ugEGMg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR12MB6583:EE_|MW4PR12MB7120:EE_
-X-MS-Office365-Filtering-Correlation-Id: b677939d-155b-44ab-c6bb-08dc48302f55
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	DlAs+40R3HWwG9+Lk9l6Wx6nDKBQAf9C3bFwPAB+tipBJQu8ij/cp2kxYJAUuvdBjvG0gPWIvW8XvBeF17z9zsZikcJ5uBgigUhAm7YRDTOfJEilLt72hOBOuEEcExm8fysH9+U20FN/tVWON71Zn/aGoTp8MvEFHJwuKAx8YbZzo6/rZx1IMK5Uy/h+2Vrmr74p1LGNbHhahXCV9eDz/fjZ1qjoLN5LEc4lwkXRvT84/M0u3Y5jDSWsJFzrbFgw8Lqd1d3y4dsVM8fnrDisCSfYPS5ahL3nb5I7jsb/gHqfg+afkzKIOTdItcaHTBwpBpYvdE1zfDd/RyqkdcOVHF/Qcxk3ScIsSaerHmfKtq5CNemXL4gbxPqLiG3opnWFU83FPQGZd4pn+986Y8ivKBS3zzRg/5pmWJusk4+detBSgXHzcyFBBleXudjP/Y1SdR9LFjVQ7OZUSRobt/1aGC1deKic/m/vWjKTHe1gosRGI4hyD64kwCzccIu6NtRR5/pG5MJ8TL9z5r2m9ZmURaRMAnHk0jDfLfbtp1Ov9+jzH5wnl3OZKI7bE4lwwsapDKXkMWDI8RDqhZYa1ZJveUGdsoIAX1m/GeSH2QUq+a1e3kOIu318xPkEcrhI6N0QMEyggCJcsT4qXwCa9Zds1KXvRxzKo5iQql8OqDory74=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB6583.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(1800799015)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?RGg4d0dQRmpSdndMQlgwRnVzK05kREhweU54dVhENTBkaCtubWlBVENKOGcr?=
- =?utf-8?B?aUpWZXlmOTZPZUVVcVg0SVI5RUpMd3pQeURMR3JtbTRPc3hPcFRvNkpmaGZm?=
- =?utf-8?B?cHZSR2ZwZlVNeTFMMzNMREdOUVN6ZzZTbTVIMjYvVVhFSXdjd2trQzdOUTd2?=
- =?utf-8?B?UEdJcEI0MCtTV1dMbUlkYk9LbnplOWFqMEJ4UFM4NnJlbWRDWVU2LytaV1M5?=
- =?utf-8?B?Y3g2L0Jld2VicEh1UUtOOFczUHg0ZXdRb2I2UWZ6eVhZeFJMR2ZOSGFXZXpJ?=
- =?utf-8?B?bFBJNUNNeWoxOFMwcTFOMS9GZi9hYmtJTkNXVWRWK0svckoxU3pFYlhDcDV2?=
- =?utf-8?B?WENGU2hkYlJtSWcrR2xUV0p2MFdpMks1TDNMb1dGbE1jbTd6V2MwbkFKNG5x?=
- =?utf-8?B?VENVSXF3U2s0NzFORVNWYk84dFFWT0l4dmF0M21uclFBQks1NlZ2ZjV6OWc5?=
- =?utf-8?B?bWRyRkJhdk04N3k5K0xueGNUaHdHNXREZ1lVQzRFYVlERXJBR3pTdk9sQ3Rq?=
- =?utf-8?B?djMwWDR0V2xzU3Ava3MySmYzdVBWbFF3Z0FaUEVySS9vd09udkh3V0pVRGFB?=
- =?utf-8?B?TWhIRkNjcWV2MXFGaDdoT2JDTDZBOVVhbEViTktBb1RiSFpIV0JqRDVFZTVS?=
- =?utf-8?B?TG1xdVFLM0FpelhONG1rU0NEZ3VCanp0QzZtK3QrQ2MwM0xvU0lIRDErdGNq?=
- =?utf-8?B?YWdnVzJzeFZhQmp1Uy9yMDlScVBkdWdvRXNOZVBzdkpHZ2oxTmkxV2V0dFJu?=
- =?utf-8?B?SDdEVEZNUkJHeklwL1B1eU5VNnhCS2VDSmVPOHBZbVdNdDkxSWVzaTVacDFo?=
- =?utf-8?B?bXo0WlNnM2d2c1p1OHk2eWd6cmNqUHNNbzYrUVdyRFZHdllkVnR4WlVSaVRN?=
- =?utf-8?B?MXp0OEl2dXdMTjJKUU8zSEsvQXczcTkvSFZmODhzMWlkbTJJWkgwRFB1R3gv?=
- =?utf-8?B?UXlFM3Q2M2NtR0tQQ0lrR0hZQWE3NGdudGJOZWJCbXVQbmFhdmMyWU9ENTVX?=
- =?utf-8?B?SEZMY1RhV08xUUxrRHNWVUVqZFROM3RCOWI3NXZEcm9vMUNwWkgxZzYxL2cz?=
- =?utf-8?B?bnpQSFo0RklxWUxOUXlIM0ZtVDdWbVlkUzcyUGV5VzBON1dwMkUrbi9wUm8x?=
- =?utf-8?B?MXNQV1NyLzkzanZUc3FkMWlPditOcFc2QTd1Vkdtb3lhWHMxOWxUU0JPU21D?=
- =?utf-8?B?VnNYaVREWWs5S3FrL283OGZ4VnpMVXcyb1V1RFM1MmpERGt1QkVLSXdjMEVX?=
- =?utf-8?B?WlQ0Vmo1ZHlqOWZuZVlrQTRpQmtzQVBjcVhWNUNENEdLWE82YUtUUDljTitt?=
- =?utf-8?B?LzRyeGliQVkxZGRkNG1yV2llWDRBTzJiUjZaa2kzKzZORzlaS0xnZzFzVU9s?=
- =?utf-8?B?Y1FNWlVKajFYY0krWkpLdC9hNGxOT0dPb3VmMDBHMXBibVRWRytUVFd4SHhn?=
- =?utf-8?B?a3pub2Y4WnBGV09uZnZULzRKYTNpaXFBVlhlRGo3dkl2d1lJQm9YV3lqdHJ2?=
- =?utf-8?B?d1VjS2NSK2o4M3U2T293RDB3ZUVhSDkrR2dJWjB0YWRHMHFOTllTMXV3RjV6?=
- =?utf-8?B?bnNVaFQzcUFlS1VMU0FCRWpuY1QxMTdPdlhWVkthK25oUmorRmpoZGQxRzJK?=
- =?utf-8?B?bHYxSUhGZWNCbXN2UFNscWRhbGZXSTBjTms4MnBWQmlHbXgzUSt6NzlIcHdD?=
- =?utf-8?B?VDFZeGhvSlZvTXRZZGdFTnB5SjVFbzJNU0pzSWxDY05wdHVjYXpYcjM4Tmsr?=
- =?utf-8?B?eitQUVJSeFk3emtWYVlnQmpUNTRRUjJvMGR3RGdGV1BQZXU0NnV0ZlJ4UzVu?=
- =?utf-8?B?TFdBWnJ3ZTFTdUQvZzRwZTFwSkRZcjM2d0l1VW5GR1g4T01LVmh6YmdDbUY2?=
- =?utf-8?B?RDhES2ZWYUp6Rzg3ZmpGVXNoY3FiVlpKdmR2WVZ2RWo3SlVDaDMwVFJkNGxJ?=
- =?utf-8?B?QXVZMy9TTEdraWpCT1hNcmIyNzIyeGtzaGxUYkNsVm5tYVA2bHQyQTFIbmpq?=
- =?utf-8?B?bVFUemFtZ21yK0ZNZmV2dU82YU1SMXV1a3BVQ1p6VnM5c3FxUzdubGpycCtr?=
- =?utf-8?B?L3hCWmFIamZyVGUwak85VWVXTjZKbVNBZEsxME5qUlV2ZjhobTMrQmw0MlI5?=
- =?utf-8?Q?MeIvbBk/WBPYzyKpagv8aXKjq?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b677939d-155b-44ab-c6bb-08dc48302f55
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR12MB6583.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2024 16:18:17.1411
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fvl1pUvEmXLyp6zDtLzDVLs7nqOIHL27gPMb/yeCpZGcIHmptmM0tIyY3V5qxQ9ttLxuVIIEKI4AsFB1Ya2rtg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB7120
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAD=FV=XJ+yAvDn5NyfCSJdg+DujPrWO+DZu=BmcqbJS-ugEGMg@mail.gmail.com>
 
-On 3/18/2024 6:59 PM, Bagas Sanjaya wrote:
-> On Mon, Mar 18, 2024 at 04:53:31PM -0700, Shannon Nelson wrote:
->> +XDP
->> +---
->> +
->> +Support for XDP includes the basics, plus Jumbo frames, Redirect
->> +and ndo_xmit.  There is no current for zero-copy sockets or HW offload.
-> "... no current support ..."
+On Tue, Mar 19, 2024 at 09:10:08AM -0700, Doug Anderson wrote:
+> On Tue, Mar 19, 2024 at 8:29 AM Johan Hovold <johan+linaro@kernel.org> wrote:
+
+> > +  qcom,local-bd-address-broken: true
+> > +    description: >
+> > +      boot firmware is incorrectly passing the address in big-endian order
 > 
+> Personally, I feel like "qcom,local-bd-address-backwards" or
+> "qcom,local-bd-address-swapped" would be more documenting but I don't
+> feel super strongly about it. I guess "broken" makes it more obvious
+> that this is not just a normal variant that someone should use.
 
-Right, I'll fix that up.
-Thanks,
-sln
+Yeah, that is precisely why I chose that name, to avoid having people
+think this is something they can just pick and choose for their driver.
+
+As is repeatedly made clear, this needs to be obvious from the name, as
+apparently not many people bother to look up the documentation.
+
+> If DT binding folks are happy, I'm happy enough with this solution.
+
+> Reviewed-by: Douglas Anderson <dianders@chromium.org>
+
+Thanks for reviewing.
+
+Johan
 
