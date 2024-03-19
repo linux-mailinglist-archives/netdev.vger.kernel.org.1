@@ -1,275 +1,178 @@
-Return-Path: <netdev+bounces-80573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F19787FD8B
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:29:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 286FE87FD8F
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:30:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB4A51F22FA3
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:29:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 942151F23663
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B9A47F7CD;
-	Tue, 19 Mar 2024 12:29:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA43133981;
+	Tue, 19 Mar 2024 12:30:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="b2JW1wDa"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YGIbOdcC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776707F498
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 12:29:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2731E1E4BF
+	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 12:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710851377; cv=none; b=cpRqwGZ8qeMdLQ8/8c4OaHvUIBx6jJ8xB+B6Ft2xPHXo9LwEu24Kg13EREJRl6WdfSl2uXkeH+Me/k1WRUXyYS66jVXgZ3Da3LdliDKLKa/nxNFc0R2KyhJVjFiq8pbyqMRNqOHNk/N/euOre3FmP3wVmEugGr++cJFNeL33dag=
+	t=1710851436; cv=none; b=I4rAZCzUulZytBrjhXtf+GTYV8ODxvTmgopSibb3lf+vauvezvJ0idITUUikE0WZYCEKo0gGVC6OC6HFKYbdgutQUDWzTUa2dEIzIWogp6dnGRikicWBqe23SD0tA1Fxueci2k0IbkfVC5RB2IFzWfuZr//LLTNKKIdfA/EQkBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710851377; c=relaxed/simple;
-	bh=r7LQvPSbTVcUADe+MFtzy5TaJbb3VOdeiXAzNHTbuxk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q/aHMgYEJyuqOcWM/jppGxK52TeCxKl8p5tZ4cY1He9CVhv719Fbzsllmc7TwRDDd15uqa9NmLkYydiF2sIGOiGMO4SFrpG3BaeCHnQYsCbvsoZG9+bKyW2AXPMgcsHTA406PzwRWIMw3Bw1eEg17qT2gDn9YrhlLrnRFesiD00=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=b2JW1wDa; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d46dd8b0b8so72864401fa.2
-        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 05:29:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gooddata.com; s=google; t=1710851374; x=1711456174; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S9hKCYDSzXyqAgTbSXm0uyTkE4NDjKRN02YkqXSTPPE=;
-        b=b2JW1wDayxMikZ/qJszM18V5cui/tecfzu11lbhy2SBXYjzDnbufv/LxdpWbYBoVDz
-         r/2EBETBwnJqrSD3iI70xRV3ZPSlqOS673A/PL2BjJgh0SPu5zHjszmEgJQdTo8zZ0y0
-         hvUXraNF+pcXf4pPtragmojrfPNU4q6A7ubu4=
+	s=arc-20240116; t=1710851436; c=relaxed/simple;
+	bh=NuYxhdluYleWL4hPUjiEYWiMglYwHi6VwlRckDkov7o=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ThFXLFrqEN1lqiLOxSF+Csr5VEXwrOBR73nwH9JCg4IcJ98je9FBJgaCe/EWLpOli305vpuW9hVRlKV2ULieO6KnKb5mLpzusiaUKQqHRGjMMtCZoZVOPgq63aOK6xyLwIfc1vpuknXtlwyZCizpaK7oDXvoAmtmPkfBYXtsvZU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YGIbOdcC; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710851434;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=hk6fXodssFp8pxdmo3yTVAFcI2aHv/hJ/chEAC3UfVc=;
+	b=YGIbOdcCdGNOykT7rWfHsUuOFwULsjSGK0u3GbZ/RLo6iQDRTc55j2sT8X5adMKo4eN3K8
+	VPAmmLaQzrvTZS46vFK2n+OapqF+xeFqmalJbL6koxT4l8VcbbFFL9gTQCaaoHXqEAnIYM
+	Xrx1d+P8GNofopFTovotUlQ9yyr6Lus=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-569-9fG8Z4AtMNKdhwxKA9R0tQ-1; Tue, 19 Mar 2024 08:30:30 -0400
+X-MC-Unique: 9fG8Z4AtMNKdhwxKA9R0tQ-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-78356ddf3cfso89682285a.1
+        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 05:30:30 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710851374; x=1711456174;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=S9hKCYDSzXyqAgTbSXm0uyTkE4NDjKRN02YkqXSTPPE=;
-        b=s58pCU+ArPLVtihSA/hniD1R4QNaV7kfpTXUlGiIXW++AxCcE9RhiGCDXtT557f+fS
-         fndIFuAjuP6gvpF2LG5IK8T8aMUXLBkPcyc196UIhbTIQsVXKoKTmPoopRJ/fKdfS7mt
-         kv4ZzEmA7g9EsXqzZhiV0Fn9caOtL/cQRTzELi0R0kZ+BrEmDxNferRR0re1bLOOgpcg
-         opzsbV1SqwYupfODEse7JbNOok3EGtjW8qBFre30hsblMsKI+rHpFO6k6t6CyUSHty/Y
-         6xsn33TIJVXM0mpdXCqspyzoIlzXSfjBsRHNR5AKe7S4Xdpdqgg2RceCyksfGMcNp3Ve
-         oPMw==
-X-Forwarded-Encrypted: i=1; AJvYcCUdx20b+3H1hIg+3uYVNTTVGX7hpI/NOlOOOLFWzVb3T8LLsH2Nzyccw+fTezFvY9gfNQa05T7FpxZejZ5bmzZdiJa3B83p
-X-Gm-Message-State: AOJu0YyXPMUeeiYMcWJGQsc22ZQs78ERIMBL/21VIaW8pI4mr+wM8Q1L
-	D8KLzT03ru0SqEhqdgAjuQdl9+FDtRHyPE5b6QVcvZjG06aZ7aMXW3h25gAXWwBW2QGtxlHk6Iq
-	/paErMC2qDnl2H8MamKfjY+URp5oZgZW2q9bp
-X-Google-Smtp-Source: AGHT+IF94iynmBXpU9wTklLZ6UhQkCL1JEqJVFqbFF4TC/0qk21TwJn2uH3hjeOoLJo5WVgYH1M+zF4elaEuDFVnywc=
-X-Received: by 2002:a2e:a68d:0:b0:2d4:57c5:886c with SMTP id
- q13-20020a2ea68d000000b002d457c5886cmr8268471lje.13.1710851373851; Tue, 19
- Mar 2024 05:29:33 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710851430; x=1711456230;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hk6fXodssFp8pxdmo3yTVAFcI2aHv/hJ/chEAC3UfVc=;
+        b=QlIFVdYfDtNbFifq4hhO6CeDd30LV7NVkG4Fmnm8qv+6DvueYadkVZ83h256EqOoSb
+         Qp7tgfAVt8MIomYVLpoqgBQHG3OvPCoocomytzombexcvIKEg7PcwNXadNBCszB90sUD
+         iUSC8pqZzHOFnrIm1LgCcarzVRklxNDInrM4yRBKrBGXjjP3Prb1RfMB8tLAhLaoZ8z5
+         qsiKotfoEuNNBsi8McPs2PWNw6i4PTpY90UuPJpLd4EhwHHP3ShEXil6jWM3TsQ5r3Ge
+         RBKL+dgTEpbhlLym11qzmH10DEvLCbmCMvFuLuXr12jwOjoSYg3hzs6kfd2a+2gNVxOO
+         bPgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW0oP42jgff/T0LEGYyKIZI9/34t7D26C6HRg8lA4lpCq/aBiHzII04Y2Nd0Rt2qYsC0g39KwFe53r964GPTWc3b+oS4LmG
+X-Gm-Message-State: AOJu0YzwRTkFPocffmSEoKkJv1vlOjBzs2n8keC1TnqKAf0knNwAbXIQ
+	LLD13z+vevuSvQtOVtqBGQlFnLq2dibmNoaBmia2a6K1JTnEJbAPnBNcp4bMxET6lup6YGGfCis
+	2snAFH//FLaaPrmcpQ/H4YtB4LCMxohWjmL/xRH/rgRK7W4iTw86RXw==
+X-Received: by 2002:a05:620a:198c:b0:788:3a16:d8b5 with SMTP id bm12-20020a05620a198c00b007883a16d8b5mr14337958qkb.4.1710851430143;
+        Tue, 19 Mar 2024 05:30:30 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHd9RalBe1bNJtEB8MezogsCo3Vhxoc3LhemnSbnzLQ6LMNhvFa5LLiu3OB+VRxEYhPu6tgxA==
+X-Received: by 2002:a05:620a:198c:b0:788:3a16:d8b5 with SMTP id bm12-20020a05620a198c00b007883a16d8b5mr14337925qkb.4.1710851429706;
+        Tue, 19 Mar 2024 05:30:29 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-224-202.dyn.eolo.it. [146.241.224.202])
+        by smtp.gmail.com with ESMTPSA id y1-20020ae9f401000000b00789ed16d039sm3045072qkl.54.2024.03.19.05.30.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Mar 2024 05:30:29 -0700 (PDT)
+Message-ID: <9c63cf0c31792270026fc673334aa76f855eae35.camel@redhat.com>
+Subject: Re: [PATCH] net: Do not break out of sk_stream_wait_memory() with
+ TIF_NOTIFY_SIGNAL
+From: Paolo Abeni <pabeni@redhat.com>
+To: Sascha Hauer <s.hauer@pengutronix.de>, netdev@vger.kernel.org
+Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org, Jens Axboe
+	 <axboe@kernel.dk>, io-uring@vger.kernel.org
+Date: Tue, 19 Mar 2024 13:30:26 +0100
+In-Reply-To: <ZfgtgwEM69VPJGs7@pengutronix.de>
+References: <20240315100159.3898944-1-s.hauer@pengutronix.de>
+	 <ZfgtgwEM69VPJGs7@pengutronix.de>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
-In-Reply-To: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
-From: Igor Raits <igor@gooddata.com>
-Date: Tue, 19 Mar 2024 13:29:22 +0100
-Message-ID: <CA+9S74izRjDRb1DLOcpeju4kS=6O9zm6bbCksKABtwfu68PPYw@mail.gmail.com>
-Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
-To: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org
-Cc: Stefano Garzarella <sgarzare@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hello again,
+On Mon, 2024-03-18 at 13:03 +0100, Sascha Hauer wrote:
+> Apologies, I have sent the wrong mail. Here is the mail I really wanted
+> to send, with answers to some of the questions Paolo raised the last
+> time I sent it.
+>=20
+> -----------------------------------8<------------------------------
+>=20
+> > From 566bb198546423c024cdebc50d0aade7ed638a40 Mon Sep 17 00:00:00 2001
+> From: Sascha Hauer <s.hauer@pengutronix.de>
+> Date: Mon, 23 Oct 2023 14:13:46 +0200
+> Subject: [PATCH v2] net: Do not break out of sk_stream_wait_memory() with=
+ TIF_NOTIFY_SIGNAL
+>=20
+> It can happen that a socket sends the remaining data at close() time.
+> With io_uring and KTLS it can happen that sk_stream_wait_memory() bails
+> out with -512 (-ERESTARTSYS) because TIF_NOTIFY_SIGNAL is set for the
+> current task. This flag has been set in io_req_normal_work_add() by
+> calling task_work_add().
+>=20
+> It seems signal_pending() is too broad, so this patch replaces it with
+> task_sigpending(), thus ignoring the TIF_NOTIFY_SIGNAL flag.
+>=20
+> A discussion of this issue can be found at
+> https://lore.kernel.org/20231010141932.GD3114228@pengutronix.de
+>=20
+> Suggested-by: Jens Axboe <axboe@kernel.dk>
+> Fixes: 12db8b690010c ("entry: Add support for TIF_NOTIFY_SIGNAL")
+> Link: https://lore.kernel.org/r/20231023121346.4098160-1-s.hauer@pengutro=
+nix.de
+> Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
+> ---
+>=20
+> Changes since v1:
+> - only replace signal_pending() with task_sigpending() where we need it,
+>   in sk_stream_wait_memory()
+>=20
+> I'd like to pick up the discussion on this patch as it is still needed fo=
+r our
+> usecase. Paolo Abeni raised some concerns about this patch for which I di=
+dn't have
+> good answers. I am referencing them here again with an attempts to answer=
+ them.
+> Jens, maybe you also have a few words here.
+>=20
+> Paolo raised some concerns in
+> https://lore.kernel.org/all/e1e15554bfa5cfc8048d6074eedbc83c4d912c98.came=
+l@redhat.com/:
+>=20
+> > To be more explicit: why this will not cause user-space driven
+> > connect() from missing relevant events?
+>=20
+> Note I dropped the hunk in sk_stream_wait_connect() and
+> sk_stream_wait_close() in this version.
+> Userspace driven signals are still catched with task_sigpending() which
+> tests for TIF_SIGPENDING. signal_pending() will additionally check for
+> TIF_NOTIFY_SIGNAL which is exclusively used by task_work_add() to add
+> work to a task.
 
-On Tue, Mar 19, 2024 at 10:00=E2=80=AFAM Igor Raits <igor@gooddata.com> wro=
-te:
->
-> Hello,
->
-> We have started to observe kernel crashes on 6.7.y kernels (atm we
-> have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6.9 where we
-> have nodes of cluster it looks stable. Please see stacktrace below. If
-> you need more information please let me know.
+It looks like even e.g. livepatch would set TIF_NOTIFY_SIGNAL, and
+ignoring it could break livepatch for any code waiting e.g. in
+tcp_sendmsg()?!?
 
-We have tried to downgrade to 6.6.y (6.6.9 in this case) and it looks
-like we get a slightly different crash but maybe in a similar
-direction.
+This change looks scary to me.
 
-[  906.338157] usercopy: Kernel memory exposure attempt detected from
-SLUB object 'skbuff_head_cache' (offset 2, size 3006)!
-[  906.349149] ------------[ cut here ]------------
-[  906.353785] kernel BUG at mm/usercopy.c:102!
-[  906.358081] invalid opcode: 0000 [#1] PREEMPT SMP NOPTI
-[  906.363314] CPU: 62 PID: 9143 Comm: vhost-9119 Tainted: G
- E      6.6.9-2.gdc.el9.x86_64 #1
-[  906.372541] Hardware name: Dell Inc. PowerEdge R7525/0H3K7P, BIOS
-2.14.1 12/17/2023
-[  906.380209] RIP: 0010:usercopy_abort+0x6a/0x80
-[  906.384665] Code: 61 78 af 50 48 c7 c2 62 61 78 af 57 48 c7 c7 28
-df 79 af 48 0f 44 d6 48 c7 c6 88 df 79 af 4c 89 d1 49 0f 44 f3 e8 f6
-f1 d5 ff <0f> 0b 49 c7 c1 d0 40 7b af 4c 89 cf 4d 89 c8 eb a9 0f 1f 44
-00 00
-[  906.403419] RSP: 0018:ffffc9000fdb3b58 EFLAGS: 00010246
-[  906.408662] RAX: 000000000000006d RBX: 0000000000000002 RCX: 00000000000=
-00000
-[  906.415802] RDX: 0000000000000000 RSI: ffff88c05fb9f700 RDI: ffff88c05fb=
-9f700
-[  906.422941] RBP: 0000000000000bbe R08: 0000000000000000 R09: 00000000fff=
-f7fff
-[  906.430077] R10: ffffc9000fdb3a10 R11: ffffffffb01e26a8 R12: ffff889881b=
-6bd40
-[  906.437214] R13: 0000000000000001 R14: 0000000000000002 R15: ffff889069f=
-adee0
-[  906.444348] FS:  00007f4552ca3f80(0000) GS:ffff88c05fb80000(0000)
-knlGS:0000000000000000
-[  906.452523] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[  906.458276] CR2: 00007f7bc42f3000 CR3: 0000003878eb6006 CR4: 00000000007=
-70ee0
-[  906.465408] PKRU: 55555554
-[  906.468118] Call Trace:
-[  906.470570]  <TASK>
-[  906.472680]  ? die+0x33/0x90
-[  906.475572]  ? do_trap+0xe0/0x110
-[  906.478892]  ? usercopy_abort+0x6a/0x80
-[  906.482733]  ? do_error_trap+0x65/0x80
-[  906.486484]  ? usercopy_abort+0x6a/0x80
-[  906.490323]  ? exc_invalid_op+0x4e/0x70
-[  906.494163]  ? usercopy_abort+0x6a/0x80
-[  906.498003]  ? asm_exc_invalid_op+0x16/0x20
-[  906.502188]  ? usercopy_abort+0x6a/0x80
-[  906.506026]  ? usercopy_abort+0x6a/0x80
-[  906.509866]  __check_heap_object+0xd5/0x110
-[  906.514056]  __check_object_size.part.0+0x5e/0x140
-[  906.518853]  simple_copy_to_iter+0x26/0x50
-[  906.522958]  __skb_datagram_iter+0x199/0x2e0
-[  906.527235]  ? __pfx_simple_copy_to_iter+0x10/0x10
-[  906.532028]  skb_copy_datagram_iter+0x33/0x90
-[  906.536389]  tun_put_user.constprop.0+0x16b/0x370 [tun]
-[  906.541624]  tun_do_read+0x54/0x1f0 [tun]
-[  906.545646]  tun_recvmsg+0x7e/0x160 [tun]
-[  906.549667]  handle_rx+0x3ab/0x750 [vhost_net]
-[  906.554123]  vhost_worker+0x42/0x70 [vhost]
-[  906.558314]  vhost_task_fn+0x4b/0xb0
-[  906.561903]  ? finish_task_switch.isra.0+0x8f/0x2a0
-[  906.566788]  ? __pfx_vhost_task_fn+0x10/0x10
-[  906.571073]  ? __pfx_vhost_task_fn+0x10/0x10
-[  906.575351]  ret_from_fork+0x2d/0x50
-[  906.578937]  ? __pfx_vhost_task_fn+0x10/0x10
-[  906.583219]  ret_from_fork_asm+0x1b/0x30
-[  906.587152]  </TASK>
-[  906.589340] Modules linked in: nf_conntrack_netlink(E) vhost_net(E)
-vhost(E) vhost_iotlb(E) tap(E) tun(E) rpcsec_gss_krb5(E)
-auth_rpcgss(E) nfsv4(E) dns_resolver(E) nfs(E) lockd(E) grace(E)
-fscache(E) netfs(E) netconsole(E) ib_core(E) scsi_transport_iscsi(E)
-sch_ingress(E) target_core_user(E) uio(E) target_core_pscsi(E)
-target_core_file(E) target_core_iblock(E) iscsi_target_mod(E)
-target_core_mod(E) 8021q(E) garp(E) mrp(E) bonding(E) tls(E)
-nfnetlink_cttimeout(E) nfnetlink(E) openvswitch(E) nf_conncount(E)
-nf_nat(E) binfmt_misc(E) dell_rbu(E) sunrpc(E) vfat(E) fat(E)
-dm_service_time(E) dm_multipath(E) btrfs(E) intel_rapl_msr(E)
-intel_rapl_common(E) xor(E) zstd_compress(E) ipmi_ssif(E) raid6_pq(E)
-amd64_edac(E) edac_mce_amd(E) kvm_amd(E) kvm(E) dell_smbios(E)
-irqbypass(E) acpi_ipmi(E) dcdbas(E) dell_wmi_descriptor(E) wmi_bmof(E)
-ipmi_si(E) acpi_cpufreq(E) rapl(E) ipmi_devintf(E) ptdma(E) wmi(E)
-i2c_piix4(E) k10temp(E) ipmi_msghandler(E) acpi_power_meter(E) fuse(E)
-drm(E) zram(E) ext4(E) mbcache(E) jbd2(E) dm_crypt(E)
-[  906.589385]  sd_mod(E) t10_pi(E) sg(E) crct10dif_pclmul(E)
-crc32_pclmul(E) polyval_clmulni(E) ahci(E) polyval_generic(E)
-ghash_clmulni_intel(E) libahci(E) ice(E) sha512_ssse3(E) libata(E)
-ccp(E) megaraid_sas(E) gnss(E) sp5100_tco(E) dm_mirror(E)
-dm_region_hash(E) dm_log(E) dm_mod(E) nf_conntrack(E) libcrc32c(E)
-crc32c_intel(E) nf_defrag_ipv6(E) nf_defrag_ipv4(E) br_netfilter(E)
-bridge(E) stp(E) llc(E)
-[  906.679233] Unloaded tainted modules: fjes(E):2
-[  906.719287] ---[ end trace 0000000000000000 ]---
+I think what Pavel is suggesting is to refactor the KTLS code to ensure
+all the writes are completed before releasing the last socket
+reference.
 
-> We do not have a consistent reproducer but when we put some bigger
-> network load on a VM, the hypervisor's kernel crashes.
->
-> Help is much appreciated! We are happy to test any patches.
->
-> [62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOPTI
-> [62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Tainted: G
->    E      6.7.10-1.gdc.el9.x86_64 #1
-> [62254.183743] Hardware name: Dell Inc. PowerEdge R7525/0H3K7P, BIOS
-> 2.14.1 12/17/2023
-> [62254.192083] RIP: 0010:skb_release_data+0xb8/0x1e0
-> [62254.197357] Code: 48 83 c3 01 39 d8 7e 54 48 89 d8 48 c1 e0 04 41
-> 80 7d 7e 00 49 8b 6c 04 30 79 0f 44 89 f6 48 89 ef e8 4c e4 ff ff 84
-> c0 75 d0 <48> 8b 45 08 a8 01 0f 85 09 01 00 00 e9 d9 00 00 00 0f 1f 44
-> 00 00
-> [62254.217013] RSP: 0018:ffffa975a0247ba8 EFLAGS: 00010206
-> [62254.222692] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 000000000=
-0000785
-> [62254.230263] RDX: 0000000000000016 RSI: 0000000000000002 RDI: ffff98986=
-2b32b00
-> [62254.237878] RBP: 4f2b318c69a8b0f9 R08: 000000000001fe4d R09: 000000000=
-000003a
-> [62254.245417] R10: 0000000000000000 R11: 0000000000001736 R12: ffff9880b=
-819aec0
-> [62254.252963] R13: ffff989862b32b00 R14: 0000000000000000 R15: 000000000=
-0000002
-> [62254.260591] FS:  00007f6cf388bf80(0000) GS:ffff98b85fbc0000(0000)
-> knlGS:0000000000000000
-> [62254.269061] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [62254.275170] CR2: 000000c002236020 CR3: 000000387d37a002 CR4: 000000000=
-0770ef0
-> [62254.282733] PKRU: 55555554
-> [62254.285911] Call Trace:
-> [62254.288884]  <TASK>
-> [62254.291549]  ? die+0x33/0x90
-> [62254.294769]  ? do_trap+0xe0/0x110
-> [62254.298405]  ? do_error_trap+0x65/0x80
-> [62254.302471]  ? exc_stack_segment+0x35/0x50
-> [62254.306884]  ? asm_exc_stack_segment+0x22/0x30
-> [62254.311637]  ? skb_release_data+0xb8/0x1e0
-> [62254.316047]  kfree_skb_list_reason+0x6d/0x210
-> [62254.320697]  ? free_unref_page_commit+0x80/0x2f0
-> [62254.325700]  ? free_unref_page+0xe9/0x130
-> [62254.330013]  skb_release_data+0xfc/0x1e0
-> [62254.334261]  consume_skb+0x45/0xd0
-> [62254.338077]  tun_do_read+0x68/0x1f0 [tun]
-> [62254.342414]  tun_recvmsg+0x7e/0x160 [tun]
-> [62254.346696]  handle_rx+0x3ab/0x750 [vhost_net]
-> [62254.351488]  vhost_worker+0x42/0x70 [vhost]
-> [62254.355934]  vhost_task_fn+0x4b/0xb0
-> [62254.359758]  ? finish_task_switch.isra.0+0x8f/0x2a0
-> [62254.364882]  ? __pfx_vhost_task_fn+0x10/0x10
-> [62254.369390]  ? __pfx_vhost_task_fn+0x10/0x10
-> [62254.373888]  ret_from_fork+0x2d/0x50
-> [62254.377687]  ? __pfx_vhost_task_fn+0x10/0x10
-> [62254.382169]  ret_from_fork_asm+0x1b/0x30
-> [62254.386310]  </TASK>
-> [62254.388705] Modules linked in: nf_tables(E) nf_conntrack_netlink(E)
-> vhost_net(E) vhost(E) vhost_iotlb(E) tap(E) tun(E) mptcp_diag(E)
-> xsk_diag(E) udp_diag(E) raw_diag(E) unix_diag(E) af_packet_diag(E)
-> netlink_diag(E) tcp_diag(E) inet_diag(E) rpcsec_gss_krb5(E)
-> auth_rpcgss(E) nfsv4(E) dns_resolver(E) nfs(E) lockd(E) grace(E)
-> fscache(E) netfs(E) netconsole(E) ib_core(E) scsi_transport_iscsi(E)
-> sch_ingress(E) target_core_user(E) uio(E) target_core_pscsi(E)
-> target_core_file(E) target_core_iblock(E) iscsi_target_mod(E)
-> target_core_mod(E) 8021q(E) garp(E) mrp(E) bonding(E) tls(E)
-> nfnetlink_cttimeout(E) nfnetlink(E) openvswitch(E) nf_conncount(E)
-> nf_nat(E) binfmt_misc(E) dell_rbu(E) sunrpc(E) vfat(E) fat(E)
-> dm_service_time(E) dm_multipath(E) btrfs(E) xor(E) zstd_compress(E)
-> raid6_pq(E) ipmi_ssif(E) intel_rapl_msr(E) intel_rapl_common(E)
-> amd64_edac(E) edac_mce_amd(E) kvm_amd(E) kvm(E) irqbypass(E)
-> dell_smbios(E) acpi_ipmi(E) dcdbas(E) dell_wmi_descriptor(E)
-> wmi_bmof(E) rapl(E) ipmi_si(E) acp
-> Mar 19 09:40:16 10.12.17.70 i_cpufreq(E) ipmi_devintf(E)
-> [62254.388751]  mgag200(E) i2c_algo_bit(E) ptdma(E) wmi(E)
-> i2c_piix4(E) k10temp(E) ipmi_msghandler(E) acpi_power_meter(E) fuse(E)
-> zram(E) ext4(E) mbcache(E) jbd2(E) dm_crypt(E) sd_mod(E) t10_pi(E)
-> sg(E) ice(E) crct10dif_pclmul(E) crc32_pclmul(E) polyval_clmulni(E)
-> polyval_generic(E) ahci(E) libahci(E) ghash_clmulni_intel(E)
-> sha512_ssse3(E) libata(E) megaraid_sas(E) ccp(E) gnss(E) sp5100_tco(E)
-> dm_mirror(E) dm_region_hash(E) dm_log(E) dm_mod(E) nf_conntrack(E)
-> libcrc32c(E) crc32c_intel(E) nf_defrag_ipv6(E) nf_defrag_ipv4(E)
-> br_netfilter(E) bridge(E) stp(E) llc(E)
-> [62254.480070] Unloaded tainted modules: fjes(E):2 padlock_aes(E):3
-> [62254.537711] ---[ end trace 0000000000000000 ]---
->
-> Thanks in advance!
+I would second such suggestion.
+
+If really nothing else works, and this change is the only option, try
+to obtain an ack from kernel/signal.c maintainers.
+
+Thanks,
+
+Paolo
+
 
