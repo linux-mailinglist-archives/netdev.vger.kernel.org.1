@@ -1,103 +1,116 @@
-Return-Path: <netdev+bounces-80635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F01288013C
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 16:55:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97F22880151
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 17:01:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D71DC285642
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 15:55:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 531E62869B0
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 16:01:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEB39657BE;
-	Tue, 19 Mar 2024 15:55:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 553CE65BAA;
+	Tue, 19 Mar 2024 16:01:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="if2Ch+0c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jmWpX5tY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB0DF651BE
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 15:55:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3167D657AD
+	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 16:01:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710863747; cv=none; b=iEnJ2lAGLnz1Vo/lF5+ag10MTIk+ZASGXaKjLQw/WHc6L6TlASD4p5H3IHo9uD2ztWRk/y9p1dPGuL4HRg7ZUzvXur6y7iiUMZlusoCkw6FRora4AXcj4DgfIzJNVhw85c/VwebZfq5BCjdcQw7VDRIfwvJSVipF5Q2K0fpm8Go=
+	t=1710864100; cv=none; b=M/2cwILrLi9e34uxJOP1zYgZI0hOuZ+cMnUbJIeWl6KqBrJ4uv3qJcin+yLTuaQvn7hgjoLZcf++XhqXz4hhb6WE/t2WmYmgGyoQQBqF6eJAtgAdadqDEM1JpBYmA6PCaWUmDKoVosQ1kJokjoZFc1Gj6Bt3Rh4D0DSEHDzzhnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710863747; c=relaxed/simple;
-	bh=uMB3lhmyFKcRGLM8S4JY1edMakQmNeLEU/M7AoWa24A=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fJkU/IvyIhKLPmnxHaZZaOPK6jQcRZW9YLr42L5LMv6ty9dizE7ffi0Zy65DUHBIs8Y1vvwlAHIpWkV+10F9eagRP9yGkMMVLN8Y1RfzNDyGcuTuF3jpfeL2eAuB1Vma2bIt4mvtb/vRMJki6FBFJHKeiSzZXs71SbVzko/2xZw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=if2Ch+0c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF419C433C7;
-	Tue, 19 Mar 2024 15:55:46 +0000 (UTC)
+	s=arc-20240116; t=1710864100; c=relaxed/simple;
+	bh=ds9DRWtBxdMjHdK+2ASeYlpNgvl7efka+lXHRJw8ArQ=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=d1wLXfGGvOxhx647URI2kiIK5ZRb5mfX7xVsizJ3bJ5MKSWdux48Pj0svZ09ejqF8sIZrNLxXyttOc8oJawxqDTE0N0kVAWJB+1AuIxVOm8QeY+n4Wa2+pbC7fzRk07TUMeTvqiniRRTrSfGgGutv0Rfd2amjtVG3XI9c4Oxcbg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jmWpX5tY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37E18C433C7;
+	Tue, 19 Mar 2024 16:01:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710863747;
-	bh=uMB3lhmyFKcRGLM8S4JY1edMakQmNeLEU/M7AoWa24A=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=if2Ch+0cjJwj+b8ebjxNbRXLzcs4YWHOZFwgdcobsqVB7RY5Ce3yVOV2E2wFrzcCq
-	 MuTqtRbqRxwdUwnC3fT4Ui4w91wn7wptex+YAbzfDJOXyMZhnDTLVONN+OR6aY9dvw
-	 fAHlMQr7cs63AuHZh/+Ok8/nmkTHa+SdrEG7iPjFE+jJGiLINTeI1jl3xaZG345mTt
-	 poFIaZ/sdSrBiPX7r/Wf8SnGWDnUHzuslZORcMJbRK1B9iFG7FwM0QBzwOOrLsJkTd
-	 t4BFT+MT2XxKU2mmKdmMIMX/LncWjgAfxOwTyj+xoxrIramE7dbsEVGzNWMtvMd+3a
-	 BJVlJxKg5bJvQ==
-Date: Tue, 19 Mar 2024 08:55:45 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stefano Brivio <sbrivio@redhat.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, jiri@resnulli.us, idosch@idosch.org,
- johannes@sipsolutions.net, fw@strlen.de, pablo@netfilter.org, Martin Pitt
- <mpitt@redhat.com>, Paul Holzinger <pholzing@redhat.com>, David Gibson
- <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH net-next v2 3/3] genetlink: fit NLMSG_DONE into same
- read() as families
-Message-ID: <20240319085545.76445a1e@kernel.org>
-In-Reply-To: <20240315124808.033ff58d@elisabeth>
-References: <20240303052408.310064-1-kuba@kernel.org>
-	<20240303052408.310064-4-kuba@kernel.org>
-	<20240315124808.033ff58d@elisabeth>
+	s=k20201202; t=1710864099;
+	bh=ds9DRWtBxdMjHdK+2ASeYlpNgvl7efka+lXHRJw8ArQ=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=jmWpX5tYR4eyKl3PL/+6Qdk+Ukf6r34wNTIfnAv9z0sZf+tYra7tD9r+cpz/oTkNq
+	 /zYkIxhy9n/FWplm0jX8E/l4k4aMYxoUmqon/sWT8etdhBF7GLLJpABQ09S8kJodfs
+	 AyEP2vskMpnrkJT7WNrUjCxFS8KJu9SJtr+tZrNsRl5H7X82D8FNAfgKT3qeELsy78
+	 ZDL8ybNc++3xUZfN+s3/JO9yOKkcGH0d0h8yyfx3hyVNLPgO33F2nSUAg9sWjhB0+q
+	 yp4dZe8JF3xXYK5zlMAeZIcjWGP8B42fa5Dx6puRCkUu9ShXdCUoUz6FP6OtsgyoxS
+	 QrSCo8/dBrkbQ==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <65f9954c70e28_11543d294f3@willemb.c.googlers.com.notmuch>
+References: <20240319093140.499123-1-atenart@kernel.org> <20240319093140.499123-4-atenart@kernel.org> <65f9954c70e28_11543d294f3@willemb.c.googlers.com.notmuch>
+Subject: Re: [PATCH net v2 3/4] udp: do not transition UDP fraglist to unnecessary checksum
+From: Antoine Tenart <atenart@kernel.org>
+Cc: steffen.klassert@secunet.com, willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Date: Tue, 19 Mar 2024 17:01:36 +0100
+Message-ID: <171086409633.4835.11427072260403202761@kwain>
 
-On Fri, 15 Mar 2024 12:48:08 +0100 Stefano Brivio wrote:
-> > Make sure ctrl_fill_info() returns sensible error codes and
-> > propagate them out to netlink core. Let netlink core decide
-> > when to return skb->len and when to treat the exit as an
-> > error. Netlink core does better job at it, if we always
-> > return skb->len the core doesn't know when we're done
-> > dumping and NLMSG_DONE ends up in a separate read().  
-> 
-> While this change is obviously correct, it breaks... well, broken
-> applications that _wrongly_ rely on the fact that NLMSG_DONE is
-> delivered in a separate datagram.
-> 
-> This was the (embarrassing) case for passt(1), which I just fixed:
->   https://archives.passt.top/passt-dev/20240315112432.382212-1-sbrivio@redhat.com/
-> 
-> but the "separate" NLMSG_DONE is such an established behaviour,
-> I think, that this might raise a more general concern.
-> 
-> From my perspective, I'm just happy that this change revealed the
-> issue, but I wanted to report this anyway in case somebody has
-> similar possible breakages in mind.
+Quoting Willem de Bruijn (2024-03-19 14:38:20)
+> Antoine Tenart wrote:
+> > udp4/6_gro_complete transition fraglist packets to CHECKSUM_UNNECESSARY
+> > and sets their checksum level based on if the packet is recognized to be
+> > a tunneled one. However there is no safe way to detect a packet is a
+> > tunneled one and in case such packet is GROed at the UDP level, setting
+> > a wrong checksum level will lead to later errors. For example if those
+> > packets are forwarded to the Tx path they could produce the following
+> > dump:
+> >=20
+> >   gen01: hw csum failure
+> >   skb len=3D3008 headroom=3D160 headlen=3D1376 tailroom=3D0
+> >   mac=3D(106,14) net=3D(120,40) trans=3D160
+> >   shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D0 type=3D0 segs=3D0))
+> >   csum(0xffff232e ip_summed=3D2 complete_sw=3D0 valid=3D0 level=3D0)
+> >   hash(0x77e3d716 sw=3D1 l4=3D1) proto=3D0x86dd pkttype=3D0 iif=3D12
+> >   ...
+> >=20
+> > Fixes: 9fd1ff5d2ac7 ("udp: Support UDP fraglist GRO/GSO.")
+> > Signed-off-by: Antoine Tenart <atenart@kernel.org>
+>=20
+> The original patch converted to CHECKSUM_UNNECESSARY for a reason.
+> The skb->csum of the main gso_skb is not valid?
+>=20
+> Should instead only the csum_level be adjusted, to always keep
+> csum_level =3D=3D 0?
 
-Hi Stefano! I was worried this may happen :( I think we should revert
-offending commits, but I'd like to take it on case by case basis. 
-I'd imagine majority of netlink is only exercised by iproute2 and
-libmnl-based tools. Does passt hang specifically on genetlink family
-dump? Your commit also mentions RTM_GETROUTE. This is not the only
-commit which removed DONE:
+The above trace is an ICMPv6 packet being tunneled and GROed at the UDP
+level, thus we have:
+  UDP(CHECKSUM_PARTIAL)/Geneve/ICMPv6(was CHECKSUM_NONE)
+csum_level would need to be 1 here; but we can't know that.
 
-$ git log --since='1 month ago' --grep=NLMSG_DONE --no-merges  --oneline 
+There is another issue (no kernel trace): if a packet has partial csum
+and is being GROed that information is lost and the packet ends up with
+an invalid csum.
 
-9cc4cc329d30 ipv6: use xa_array iterator to implement inet6_dump_addr()
-87d381973e49 genetlink: fit NLMSG_DONE into same read() as families
-4ce5dc9316de inet: switch inet_dump_fib() to RCU protection
-6647b338fc5c netlink: fix netlink_diag_dump() return value
+Packets with CHECKSUM_UNNECESSARY should end up with the same info. My
+impression is this checksum conversion is at best setting the same info
+and otherwise is overriding valuable csum information.
+
+Or would packets with CSUM_NONE being GROed would benefit from the
+CHECKSUM_UNNECESSARY conversion?
+
+For reference, original commit says:
+"""
+After validating the csum,  we mark ip_summed as
+CHECKSUM_UNNECESSARY for fraglist GRO packets to
+make sure that the csum is not touched.
+"""
+
+But I'm failing to see where that would happen and how the none to
+unnecessary conversion would help. WDYT?
+
+Thanks,
+Antoine
 
