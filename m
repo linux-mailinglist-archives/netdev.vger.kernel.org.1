@@ -1,105 +1,79 @@
-Return-Path: <netdev+bounces-80645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF97A880241
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 17:28:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CC93880259
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 17:32:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B97D285552
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 16:28:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9876D1C22FD6
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 16:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD44C823A6;
-	Tue, 19 Mar 2024 16:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EDC73D8E;
+	Tue, 19 Mar 2024 16:32:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EDacBSHb"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KqafG1FO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2CD31E4A9;
-	Tue, 19 Mar 2024 16:26:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 331EA111B1;
+	Tue, 19 Mar 2024 16:32:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710865560; cv=none; b=tQf3ySc8MKEErjj7sbTGZlsC3Lx5w3y/O1dv7jmea/c6FuKKQ2VIQc/sXJTQ2RX65a0NjkSba9/SlE8kteVtiYiSJYQbdBzWzOKqPag+YNk+Wdf0Nn8jTqXVsEoWq+tCQ277i3vs2Zjgx4ViaBPyuCtvh9TMM2+tzVL20/z6qhI=
+	t=1710865935; cv=none; b=gY6CXYlJWaxKdAtOcm/PkzRW7jgJPR5fpZvn4pLhRd9N06ugPMDjCBnnpH6IN1NtkTPacPxr3pmgwlymulI/ft18Iw3nlL75WT7zr74S93nzBsvPioae9PPEvnSzf+1PaHGz82bEZNegv3TlRzLq2ouKRsUnY0dMTAdlAdAPFp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710865560; c=relaxed/simple;
-	bh=+wx6pm84h4SSZqN7LgwX7nuza5CpaVwm5ikzrYbkklk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=boV1zwR71BUH79giYDsA43+NRKuf4+xqoW2i7Hn4CZfmMMEa++SqqFP27GnimTharEHDITgHCZtAuxWIeZO7YgkBZgWmfGXtljxc/OQ0MKgu1vaMSI1VcGDbr5dMLEwc43rDq1z9u6EW9OjOaeT8DxyqhzRrmuw9pkDg3aKJv0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EDacBSHb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10679C433F1;
-	Tue, 19 Mar 2024 16:26:00 +0000 (UTC)
+	s=arc-20240116; t=1710865935; c=relaxed/simple;
+	bh=dlwS+ClYwtdCIhyRMHsdbtRf3zIzcBodhDuKwd+a6r4=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=r7IxgF+Dkjbt773U4ZKBYABdLFEvZSX3mG7IUULFXhJaoGg9/Mejg00g8H7uR6HLMUhdrEMynLMOa4DaXoyBM92elM+k7zUbGUf9z5JAooqQJ8zdzrqrHzPfuGkbcnAFa0RCVnCK+tqJY/lJ9YqfiQZdSCT5Ys/YnSk479oM9VM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KqafG1FO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 07641C433C7;
+	Tue, 19 Mar 2024 16:32:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710865560;
-	bh=+wx6pm84h4SSZqN7LgwX7nuza5CpaVwm5ikzrYbkklk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=EDacBSHbddGGkBkjEvMDDec/065XpdXqytnKL4IiuFBQn6bJQqM2BM3iYDROEXxDp
-	 Km/QA7SXjxgSKyx+h0CxnIqPzDye5DToSDv7SMX737+StXoMB0yOhcGJsEGmn4Hbv+
-	 ykNJFOhDZ0No+Sph2HQYihKOx6y8+Sb2Euf/uoTPk/MI+aizrVKh1E/jgikx03NzFV
-	 rvbnvQkWXKhSDGUXhpIMg2dwW2+Q/BvmM7J6RdzWdlK/3n54mwx1ibUKDl/u8uMbRf
-	 QbpPpCww1mqacFKfGIfPnYKg2jI9yc98w9elBpUaOvH8Ar2ZSWczvTlp/qHfBak43C
-	 ocspy0Tj07VzQ==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1rmcHu-000000000s5-45bY;
-	Tue, 19 Mar 2024 17:26:07 +0100
-Date: Tue, 19 Mar 2024 17:26:06 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Doug Anderson <dianders@chromium.org>
-Cc: Johan Hovold <johan+linaro@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	cros-qcom-dts-watchers@chromium.org,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Matthias Kaehlcke <mka@chromium.org>,
-	Rocky Liao <quic_rjliao@quicinc.com>,
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v3 2/5] Bluetooth: add quirk for broken address properties
-Message-ID: <Zfm8nifvqb3xO5HG@hovoldconsulting.com>
-References: <20240319152926.1288-1-johan+linaro@kernel.org>
- <20240319152926.1288-3-johan+linaro@kernel.org>
- <CAD=FV=VUFodCAXEJgfpSqZZdtQaw5-8n_-sX_2p6LuQ2ixLRpQ@mail.gmail.com>
+	s=k20201202; t=1710865935;
+	bh=dlwS+ClYwtdCIhyRMHsdbtRf3zIzcBodhDuKwd+a6r4=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=KqafG1FOkpQ1tdSHmOM60N3qo+kOfsYOfMeSna55txX+1i+AeJRYBB0RLCBBwOJdA
+	 P8Zl+dfevApg/fTIQzEwgyrWb/g2LivLHaHjVjnZFHXDxLpRR2hihs7OGrSZFFdDZu
+	 e5szhg4Z+P6J0PAnAVAfHnj08LTiNzpKMxgC3V17cKU2TMawKIrDohePcxHoPclan9
+	 sWVA46+AnWm6O7WR0Mlcw01n+EU7qeyguE34jiW1OrK+VUxpCQkbTmaph2xrv0bs8s
+	 Y6KXl7cKjswa3L4uxlA+jknT5YRY0Woznmtz8Ldre8Uh75/h0QYeGzPWtD9aVospJA
+	 P6DpI9lV8tBtA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F1E92D84BB3;
+	Tue, 19 Mar 2024 16:32:14 +0000 (UTC)
+Subject: Re: [GIT PULL] virtio: features, fixes
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240319034143-mutt-send-email-mst@kernel.org>
+References: <20240319034143-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-List-Id: <kvm.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240319034143-mutt-send-email-mst@kernel.org>
+X-PR-Tracked-Remote: https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+X-PR-Tracked-Commit-Id: 5da7137de79ca6ffae3ace77050588cdf5263d33
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: d95fcdf4961d27a3d17e5c7728367197adc89b8d
+Message-Id: <171086593498.7768.14462757833782378841.pr-tracker-bot@kernel.org>
+Date: Tue, 19 Mar 2024 16:32:14 +0000
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, alex.williamson@redhat.com, andrew@daynix.com, david@redhat.com, dtatulea@nvidia.com, eperezma@redhat.com, feliu@nvidia.com, gregkh@linuxfoundation.org, jasowang@redhat.com, jean-philippe@linaro.org, jonah.palmer@oracle.com, leiyang@redhat.com, lingshan.zhu@intel.com, maxime.coquelin@redhat.com, mst@redhat.com, ricardo@marliere.net, shannon.nelson@amd.com, stable@kernel.org, steven.sistare@oracle.com, suzuki.poulose@arm.com, xuanzhuo@linux.alibaba.com, yishaih@nvidia.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAD=FV=VUFodCAXEJgfpSqZZdtQaw5-8n_-sX_2p6LuQ2ixLRpQ@mail.gmail.com>
 
-On Tue, Mar 19, 2024 at 09:10:23AM -0700, Doug Anderson wrote:
-> On Tue, Mar 19, 2024 at 8:29 AM Johan Hovold <johan+linaro@kernel.org> wrote:
+The pull request you sent on Tue, 19 Mar 2024 03:41:43 -0400:
 
-> > +       /* When this quirk is set, the Bluetooth Device Address provided by
-> > +        * the 'local-bd-address' fwnode property is incorrectly specified in
-> > +        * big-endian order.
-> > +        *
-> > +        * This quirk can be set before hci_register_dev is called or
-> > +        * during the hdev->setup vendor callback.
-> > +        */
-> > +       HCI_QUIRK_BDADDR_PROPERTY_BROKEN,
-> 
-> Like with the binding, I feel like
-> "HCI_QUIRK_BDADDR_PROPERTY_BACKWARDS" or
-> "HCI_QUIRK_BDADDR_PROPERTY_SWAPPED" would be more documenting but I
-> don't feel strongly.
+> https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-So, same reasoning here, this it not some quirk that people should go
-around setting without first considering to fix their boot firmware.
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/d95fcdf4961d27a3d17e5c7728367197adc89b8d
 
-Johan
+Thank you!
+
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
