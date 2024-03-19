@@ -1,135 +1,105 @@
-Return-Path: <netdev+bounces-80684-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80685-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBF7A8805C4
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 21:02:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D42B98805D2
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 21:05:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 096A31C22A1C
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 20:02:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D467283AE8
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 20:05:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36840535B3;
-	Tue, 19 Mar 2024 20:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B708154665;
+	Tue, 19 Mar 2024 20:05:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pJnDqtCz"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="HO3WkU4p"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31012C6B8;
-	Tue, 19 Mar 2024 20:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02AB61CAB2;
+	Tue, 19 Mar 2024 20:05:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710878530; cv=none; b=gSSfiKvcScbgnqQNWsbQlN4E4FXrHl+PCQs2t7DB5q2ZD7HVM8DgDPvw/ZqGRGSYdrN3QQzm997oLaumtmQpigR20fSlyGXBY6K9t7NGhYPWcf+gxp0oZKaq7RU0yrSwwPzzGrvNq4gVDW3Uh1Hx0ySTCPVqlBYCf+MTYa+cqGs=
+	t=1710878729; cv=none; b=YGbB9Lx8LZL2ik+SbdxkmT8aM5tjSxCLUi0ZFTvAC1ZCKctDjvyEe17b64boaldTMV6cZactTwiu6XNb7lQ25V0FkL4xSVthmpWoClrKpF6jR3ZQD5J6cuq+4jlCGiETJD/BeI2w1lWTSJTv/7xlkjMcTdv/ByN22IXH50CLf00=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710878530; c=relaxed/simple;
-	bh=BfzfXnXoSemadhBtWj3WTtx3o15kRsVsxyeo0pRpIbA=;
-	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
-	 Message-Id:Subject; b=pgN9pf30Ym5VusHhsu7L5PJ6zfVMHX2nyr7QTIbt2xBwCj6xjofg6EeaAjOWvQ0lyuAojOLKan/Qm0XaAy2SY/Rg7YeGyWnw4XWQ494143EsF/xkU9Fey0jm14kD1GS76mL746cR0iHeW+iyO7iHOFaouD0taO0JidHSHAPfINs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pJnDqtCz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2D5E5C433C7;
-	Tue, 19 Mar 2024 20:02:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710878529;
-	bh=BfzfXnXoSemadhBtWj3WTtx3o15kRsVsxyeo0pRpIbA=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=pJnDqtCzYhzzXWlnC9ojvuZnXmWsdooKOdDBCKUA3VpLuUkNv6/QqSCz2Iq1NYCId
-	 QWeNNDoQHySk/Co56XBb0CoTAo7F2JYQFkTgR0nl1QOBP6T3/rPjEOLNk8FXDzvayn
-	 nUFdCRXbp3yMYYgotTwKXP6wL73w3M6y4gBC8Y5o7FiQQc9DBmnlTRso4emUlHJh44
-	 a31RC8yKuy3KD6RpVfvKIgkpMxdYysdBrtkl81Nq78Lg4zYn7b3Ek6arb2H8qNye61
-	 w5tUz5gfardmH9IAmTMfdkPDHZzDyWYDLsHFBaeD+8NDkIuQOpjI8sYwNGz4h6zFdu
-	 dOAfSntfba3Ag==
-Date: Tue, 19 Mar 2024 15:02:08 -0500
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1710878729; c=relaxed/simple;
+	bh=8Ru+r5tmczOVlu4ej5UKX3wbZzLXCVtCcMTcY6qI3hA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TBFj0ipybEj7TzMlBim+hTWRz4EYkfp62VuiTUosP4X8/PoIuuKOO3BYqcA1XAlGpJloYgK5O0NhmW1lUO9aw5dU1IeyXINmKp3AxVzpIiIJ7UkbkL0mDH8GuaoB7z1SYDvmCHAIxwWKZUIwkLeWUEyNsnH0U+ondwR6c/14yvY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=HO3WkU4p; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 24838240002;
+	Tue, 19 Mar 2024 20:05:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1710878718;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=J6j8gsk/0efjiGaA6j1k1JY0wgpOfZpJCDP88uiiOZI=;
+	b=HO3WkU4phWfOw6nkmEI15k1bdiHhhOOUzsS9cl0etLXk2S8wBLrnSkHn8XjXMyv6EN1XR3
+	C7oyOImPYZ4kTV+5TlOp4wtW+fKVn19gGbTMyXoVkyI5jtbUepfm7keb6Yr7E33wAxdusK
+	/piuAZB0JR+Y7dD5ylWGnMvLHziaYf9FbTDmRx2aa/SrRg0gQAar/eFToEdKrPH5v61Ard
+	cvv4gjBNqakKYYlDwXJaLeNUsLDghUcLHxd+Fo8QpkyAS9FdiBw7w66w1gkyuxhD3C5zBQ
+	jRaCKZsWSpnwb/AVIbB6HXDK4F8aVoOIGj4LjVZohotEK1TSubPdq9lVCRD6rg==
+Message-ID: <7feb4cbc-15f3-47e1-874e-382ebee109de@arinc9.com>
+Date: Tue, 19 Mar 2024 23:04:53 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Johan Hovold <johan+linaro@kernel.org>
-Cc: Balakrishna Godavarthi <quic_bgodavar@quicinc.com>, 
- Matthias Kaehlcke <mka@chromium.org>, devicetree@vger.kernel.org, 
- netdev@vger.kernel.org, Konrad Dybcio <konrad.dybcio@linaro.org>, 
- Rob Herring <robh+dt@kernel.org>, Rocky Liao <quic_rjliao@quicinc.com>, 
- linux-bluetooth@vger.kernel.org, Douglas Anderson <dianders@chromium.org>, 
- Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
- Johan Hedberg <johan.hedberg@gmail.com>, 
- Marcel Holtmann <marcel@holtmann.org>, cros-qcom-dts-watchers@chromium.org, 
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, 
- Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, 
- Bjorn Andersson <andersson@kernel.org>, linux-kernel@vger.kernel.org, 
- Conor Dooley <conor+dt@kernel.org>, linux-arm-msm@vger.kernel.org
-In-Reply-To: <20240319152926.1288-2-johan+linaro@kernel.org>
-References: <20240319152926.1288-1-johan+linaro@kernel.org>
- <20240319152926.1288-2-johan+linaro@kernel.org>
-Message-Id: <171087317847.5394.2197018705200988833.robh@kernel.org>
-Subject: Re: [PATCH v3 1/5] dt-bindings: bluetooth: add
- 'qcom,local-bd-address-broken'
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] Fix EEE support for MT7531 and MT7988 SoC switch
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ =?UTF-8?Q?Ren=C3=A9_van_Dorst?= <opensource@vdorst.com>,
+ Russell King <linux@armlinux.org.uk>,
+ SkyLake Huang <SkyLake.Huang@mediatek.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v>
+ <ZfnYkuzuvwLepIfC@makrotopia.org>
+ <00ec9779-19ce-4005-83f0-f4abf37350fc@arinc9.com>
+ <6cb585f6-6da8-45a2-a28b-2fb556f95672@lunn.ch>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <6cb585f6-6da8-45a2-a28b-2fb556f95672@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: yes
+X-Spam-Level: **************************
+X-GND-Spam-Score: 400
+X-GND-Status: SPAM
+X-GND-Sasl: arinc.unal@arinc9.com
 
-
-On Tue, 19 Mar 2024 16:29:22 +0100, Johan Hovold wrote:
-> Several Qualcomm Bluetooth controllers lack persistent storage for the
-> device address and instead one can be provided by the boot firmware
-> using the 'local-bd-address' devicetree property.
+On 19.03.2024 22:38, Andrew Lunn wrote:
+>> I would argue that EEE advertisement on the PHY should be enabled by
+>> default.
 > 
-> The Bluetooth bindings clearly states that the address should be
-> specified in little-endian order, but due to a long-standing bug in the
-> Qualcomm driver which reversed the address some boot firmware has been
-> providing the address in big-endian order instead.
+> That is an open question at the moment. For some use cases, it can add
+> extra delay and jitter which can cause problems. I've heard people
+> doing PTP don't like EEE for example.
 > 
-> The only device out there that should be affected by this is the WCN3991
-> used in some Chromebooks.
-> 
-> Add a 'qcom,local-bd-address-broken' property which can be set on these
-> platforms to indicate that the boot firmware is using the wrong byte
-> order.
-> 
-> Note that ChromeOS always updates the kernel and devicetree in lockstep
-> so that there is no need to handle backwards compatibility with older
-> devicetrees.
-> 
-> Signed-off-by: Johan Hovold <johan+linaro@kernel.org>
-> ---
->  .../devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml  | 3 +++
->  1 file changed, 3 insertions(+)
-> 
+> The current phylib core code leaves the PHY advertisement whatever its
+> reset default is. So we leave it to the manufacture to decide if it
+> should be enabled or disabled by default. It is policy, so it should
+> really be down to user space to configure EEE how it wants it.
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+That's fine by me. Then my patch series is okay as it is.
 
-yamllint warnings/errors:
-./Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml:98:16: [error] syntax error: mapping values are not allowed here (syntax)
-
-dtschema/dtc warnings/errors:
-make[2]: *** Deleting file 'Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.example.dts'
-Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml:98:16: mapping values are not allowed in this context
-make[2]: *** [Documentation/devicetree/bindings/Makefile:26: Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.example.dts] Error 1
-make[2]: *** Waiting for unfinished jobs....
-./Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml:98:16: mapping values are not allowed in this context
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml: ignoring, error parsing file
-make[1]: *** [/builds/robherring/dt-review-ci/linux/Makefile:1428: dt_binding_check] Error 2
-make: *** [Makefile:240: __sub-make] Error 2
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20240319152926.1288-2-johan+linaro@kernel.org
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+Arınç
 
