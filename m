@@ -1,218 +1,173 @@
-Return-Path: <netdev+bounces-80597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBA4287FE37
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 14:11:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB12587FE39
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 14:11:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E170B22F74
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:11:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 290C31C21DC2
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:11:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CB7980BFC;
-	Tue, 19 Mar 2024 13:07:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A5A57FBD5;
+	Tue, 19 Mar 2024 13:08:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="hanU3ha/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rz9sul6J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 871077E591;
-	Tue, 19 Mar 2024 13:07:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71FB43FBB9;
+	Tue, 19 Mar 2024 13:08:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710853651; cv=none; b=WV5FE768q5vUil0aWtbqAJChZhoxapXUR1QvdlbSRILv4yZxRbaQp9ytmCDdpoFBphfT4uU/U7lNCA4N1OvTYx/ylV21JgrSJP7QekkZ/p8RKreoyg1U0KniZdSTr8Al/5B9koAPSwZbhxQaJPC1+gDSRxZJhMBs/tX4mCt1u0U=
+	t=1710853727; cv=none; b=k4i1/O0htQHHv06vMDCdpLHsDPik1ZkxdCtq5k8+2umdXh2Q41i71ixN1dm6lStRwy8Q1heEKpF/MMAHXajldJ7MqJFWpCldD31xAIB3rZ9KQfVxZ52AGyso6kv8wqtnP+246cNZ1R38FBPPsKPp4krChpAFk6j6Brob8+gskIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710853651; c=relaxed/simple;
-	bh=reP5kh3mZu6dGLQ86ohHrExp+d46385Mi5nBuzrM8yk=;
-	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To:References; b=qVxoqKyixOTyYKwp/t1J4iJNRphgR0h6FTxkrPPDcyFhEe08AaDPBwdskqNIZsKr1/c6fO2TyXnTToBj+v56TCR0yTCHuqpnlQVIhiBYgHUYjFU7uqJpnYSz8Y7D1g9DuF813Bk8M4Y1KEsXtsbLHZLHiC0ecXdaatsGGmXxBWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=hanU3ha/; arc=none smtp.client-ip=210.118.77.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
-Received: from eucas1p2.samsung.com (unknown [182.198.249.207])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20240319130719euoutp02dcae367966dafafb220c6c40c89f7d4b~_LFItX-Cw2646526465euoutp02E;
-	Tue, 19 Mar 2024 13:07:19 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20240319130719euoutp02dcae367966dafafb220c6c40c89f7d4b~_LFItX-Cw2646526465euoutp02E
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1710853639;
-	bh=rwCSpmbvgmVIa+CtjhH+6gVJz6mA1KgfwUGVJRhP+1c=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=hanU3ha/SNYbSw9HkWTIZGrJogxKhpgAyBarZoeLxqP4X290WOucBz0qWueq2dkSG
-	 nMsFf92WTWSWy3FDyS3wsTcd4ChSfC9rFfuYKvWQ4R+wVdiAW8WAiEllZVl8Vcc8TP
-	 Dk/QXqId2UnExKtc48lT8O2QmtOffy3Qy0kOe/5U=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
-	20240319130719eucas1p192eafb04b220da84388078e006588b7e~_LFIT5mrM0336803368eucas1p1-;
-	Tue, 19 Mar 2024 13:07:19 +0000 (GMT)
-Received: from eucas1p2.samsung.com ( [182.198.249.207]) by
-	eusmges1new.samsung.com (EUCPMTA) with SMTP id 99.AB.09539.70E89F56; Tue, 19
-	Mar 2024 13:07:19 +0000 (GMT)
-Received: from eusmtrp2.samsung.com (unknown [182.198.249.139]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20240319130719eucas1p15bdc63ff5fdd5c9e948ce84e1505352a~_LFH3y31M0336803368eucas1p1_;
-	Tue, 19 Mar 2024 13:07:19 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-	eusmtrp2.samsung.com (KnoxPortal) with ESMTP id
-	20240319130718eusmtrp2b2a1469d4ebfa20b01fc0a8139a96895~_LFHz_Llp1402714027eusmtrp2F;
-	Tue, 19 Mar 2024 13:07:18 +0000 (GMT)
-X-AuditID: cbfec7f2-515ff70000002543-ce-65f98e070b25
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms2.samsung.com (EUCPMTA) with SMTP id F6.F3.10702.60E89F56; Tue, 19
-	Mar 2024 13:07:18 +0000 (GMT)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20240319130718eusmtip27bba48620de2046dae7c71d24286f732~_LFHpvDcT2764927649eusmtip28;
-	Tue, 19 Mar 2024 13:07:18 +0000 (GMT)
-Received: from localhost (106.210.248.248) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Tue, 19 Mar 2024 13:07:18 +0000
-Date: Tue, 19 Mar 2024 14:07:16 +0100
-From: Joel Granados <j.granados@samsung.com>
-To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Dmitry Torokhov <dmitry.torokhov@gmail.com>, "Eric W.
- Biederman" <ebiederm@xmission.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Luis Chamberlain <mcgrof@kernel.org>
-Subject: Re: [PATCH] net: always initialize sysctl ownership
-Message-ID: <20240319130716.vne4nhb3mbwtabfb@joelS2.panther.com>
+	s=arc-20240116; t=1710853727; c=relaxed/simple;
+	bh=AMeQHVzmFzEQ5pOEjitrQsM9EdvdtRNgGa+vzpIPHQk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=CcpncsLDs+hkdsVJT1GCCe12yTh8XMjl7pPHLuJ9fgTxXJ4tWvCcjJktOHKi+KRMXABGLaGotuP8XMR9UE8Zb5JjDoY/N7ildAp2crg1MAGlOHEEU6ZsExgQQWELl+woq7ffl2JXxQNqzaJqHaNVWvdyshgU3dGtUJcd+C5ptw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rz9sul6J; arc=none smtp.client-ip=209.85.222.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-78a13117a3dso40620285a.1;
+        Tue, 19 Mar 2024 06:08:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710853724; x=1711458524; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mdVAHfQQIN7iu87LjaYltiBjtIWrfsmEChPPCLn2oS8=;
+        b=Rz9sul6JXLhMFimZXlAADoG+fyycFw9iROAYoi0YNdFNiZ2TdZ/UhciHjYOEHRliJO
+         sg9ModoDxtjSs/trmYVhvSZNZ4KrgzKo77JTorsvOFMUH2hA5+iqPyk7jDZAwaNVvzcw
+         PFukKnnvbxEm+FEicKDGnOzP94zJ+kDGblJia2qblPskkrEQa/nShJZIZ8xKK7lgZHLo
+         Z8STSL/p/5ofzoOmTKyRuKSTe2zuB71y2Wqk8TjuL096tE3Mc/1ozON9b07Usn+PhjsT
+         bdvxzgS2KQDf35pUyuKXu6Rt77+SirkIZNv6yRfRBH00aWObWAE4Xr5u2zdUJ740q18W
+         gNSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710853724; x=1711458524;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=mdVAHfQQIN7iu87LjaYltiBjtIWrfsmEChPPCLn2oS8=;
+        b=jwmcHIuhplazPLz7Qcz0/eYHPTHMb3XeAHL/PzaBcS6FVyFK8+I3n4LbrFwtFVWjft
+         9S3tmJSzapipIaTIEWs/l/gVsMkjcwo1wb2sjGcQVChCB1OdgteCZzLrNH0996TuNVjc
+         amta9L2025l8CmzZ9YUfFDcvK9UD5UeBdM2BSBE5m7hTzIGWt55MrcoECHC5/2geug2S
+         kq4ZhjvLPUP/ZLqXmrOXicnrZShkInTxqkRlovrFDhrmz/DbRPPhciu3d4wBHsb4YkUY
+         /4NEU4ovbTOHnylM8mDWZddZzHFhkfCgEH8guh54E3zTOyFA60j+zj8pGDHxPghZwx65
+         vzjw==
+X-Forwarded-Encrypted: i=1; AJvYcCVmv6ajVpZ3PMbf5V3Y7qyM5wCJJXgCsa9ib39WMxR9ScQq3e7ZK2xqQ+GLs+zdZo+659CulG7BYtQhLORm+uH5Cd7bD2K4JTq9s2a2ipJB7QiapZPTr5cOt8r8
+X-Gm-Message-State: AOJu0YzJGta97dtSO9DTMwyfvq//kWeoT4ixPpMqNTvDYEsvQeWrSTVE
+	ZIsW9iinB3oxFwCcJOEyGHcEYIUDirze/xYbfe1xeZcAIcnBzZsE
+X-Google-Smtp-Source: AGHT+IHD63cSeMzwYqMGgdunUUCq9Upn1sjL1uQ8FO8DsysTbFsd/9s/VppJIlt14DsXMYq42Vgszg==
+X-Received: by 2002:a05:620a:248a:b0:789:e89d:6829 with SMTP id i10-20020a05620a248a00b00789e89d6829mr4402907qkn.35.1710853724349;
+        Tue, 19 Mar 2024 06:08:44 -0700 (PDT)
+Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
+        by smtp.gmail.com with ESMTPSA id y22-20020a37e316000000b00789f55e1ca3sm2548842qki.8.2024.03.19.06.08.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Mar 2024 06:08:43 -0700 (PDT)
+Date: Tue, 19 Mar 2024 09:08:43 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Igor Raits <igor@gooddata.com>, 
+ kvm@vger.kernel.org, 
+ virtualization@lists.linux.dev, 
+ netdev@vger.kernel.org
+Cc: Stefano Garzarella <sgarzare@redhat.com>, 
+ Stefan Hajnoczi <stefanha@redhat.com>, 
+ Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
+Message-ID: <65f98e5b99604_11543d29415@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
+References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
+Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="77xvdswkctbb3d3j"
-Content-Disposition: inline
-In-Reply-To: <20240315-sysctl-net-ownership-v1-1-2b465555a292@weissschuh.net>
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrFKsWRmVeSWpSXmKPExsWy7djP87rsfT9TDT7vkbSYc76FxeLwoheM
-	Fv+3tbBbPD32iN3iwrY+VovLu+awWfz+8YzJ4saEp4wWxxaIWXw7/YbRgctjy8qbTB47Z91l
-	91iwqdRj06pONo/3+66yeXzeJOfR332M3WPKoXaWAI4oLpuU1JzMstQifbsErowL3zewFOwW
-	r5hzKaCBsVOki5GTQ0LARGLCxYWsXYxcHEICKxglfn96xQjhfGGU+HfgOZTzmVHi0ua/rDAt
-	fy69Z4JILGeUWPL6NlgCrGryVSOIxFZGiek3rzKDJFgEVCW6nvaDFbEJ6Eicf3MHLC4iYCOx
-	8ttndpAGZoErTBJ/pn9mAUkIAyVmzz3PCGLzCjhILN38jhXCFpQ4OfMJWA2zQIXEznkHgc7g
-	ALKlJZb/4wAJcwr4Sqyav5IZ4lJliev7FrNB2LUSp7bcArtaQmA/p8TkR5fZIRIuEj9brrJA
-	2MISr45vgYrLSPzfOR+qYTKjxP5/H9ghnNWMEssavzJBVFlLtFx5AtXhKDHpxkZ2kIskBPgk
-	brwVhDiUT2LStunMEGFeiY42IYhqNYnV996wTGBUnoXktVlIXpuF8BpEWE/ixtQpbBjC2hLL
-	Fr5mhrBtJdate8+ygJF9FaN4amlxbnpqsWFearlecWJucWleul5yfu4mRmASPP3v+KcdjHNf
-	fdQ7xMjEwXiIUQWo+dGG1RcYpVjy8vNSlUR42bl/pgrxpiRWVqUW5ccXleakFh9ilOZgURLn
-	VU2RTxUSSE8sSc1OTS1ILYLJMnFwSjUwBfU/L649M/t0UKx/Y87VgxE2++Zt0V3zx9MvkXHD
-	cc5fgkERk9xT52pePv/StnmK/roLud2lTx6WmwlKVDDV21naJ3jt+tr06rFG2eKF6jfTev/w
-	vJmR1X9nWqD36RrrlD1XdR982OQmfHnLVq9LIf93xzgul5a38/HIm2G6ns2m0l+u75hhXnE5
-	j+lkxQ2nhK4kngqaLqXI17cxf5VtveWftwUZ7z+vV2z3NePknq0sX2zxcfvFGz8ddmivPffh
-	CONNv1NbEpZrHYjuW94joLNo66NZz/wni00oKe531duquP9TUVKaUdnEfZNPrqm6XFfD7NH6
-	YNrjfb7VzQ+unA1Re/6xou86R/jNK9eWKbEUZyQaajEXFScCAE8K7o39AwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpjleLIzCtJLcpLzFFi42I5/e/4PV22vp+pBhPfm1rMOd/CYnF40QtG
-	i//bWtgtnh57xG5xYVsfq8XlXXPYLH7/eMZkcWPCU0aLYwvELL6dfsPowOWxZeVNJo+ds+6y
-	eyzYVOqxaVUnm8f7fVfZPD5vkvPo7z7G7jHlUDtLAEeUnk1RfmlJqkJGfnGJrVK0oYWRnqGl
-	hZ6RiaWeobF5rJWRqZK+nU1Kak5mWWqRvl2CXsbPfd2MBTvFKz71bGRrYGwX6WLk5JAQMJH4
-	c+k9UxcjF4eQwFJGiQ0tv1kgEjISG79cZYWwhSX+XOtiA7GFBD4ySkxdywnRsJVR4viM32BF
-	LAKqEl1P+8FsNgEdifNv7jCD2CICNhIrv31mB2lgFrjCJPFn+mewDcJAidlzzzOC2LwCDhJL
-	N79jhdiwgFGifY4ERFxQ4uTMJ2D1zAJlEmderQAaxAFkS0ss/8cBEuYU8JVYNX8lM8ShyhLX
-	9y1mg7BrJT7/fcY4gVF4FpJJs5BMmoUwCSKsI7Fz6x02DGFtiWULXzND2LYS69a9Z1nAyL6K
-	USS1tDg3PbfYSK84Mbe4NC9dLzk/dxMjMBFsO/Zzyw7Gla8+6h1iZOJgPMSoAtT5aMPqC4xS
-	LHn5ealKIrzs3D9ThXhTEiurUovy44tKc1KLDzGaAkNxIrOUaHI+MEXllcQbmhmYGpqYWRqY
-	WpoZK4nzehZ0JAoJpCeWpGanphakFsH0MXFwSjUw5Tw9c0wsPft8wG276DbfkvNMXcsnOspe
-	3hRsFfmieMKspfH/5MOm7Du6LLT68AeXeKbzDXvOfXvFsldgitDJGpvZG5/f2nGB6eaGEztF
-	2p8UzX9odL43N35Z97xrXwO3hFhyHOyb5Ny9IDJug1SBxUztA/7XNH8U6LEwmekxOgUaurBG
-	/Xjhn5Tv+fNkvOUpp+VLlrxZVv7i+LwAv1MW3peFNGZKacz+yPjg9OkdbzNZcviuT+jgNqzb
-	Y8FSxiN2ZE76oc21aRsX5+69sk0/Jvmk7fTtRW0bFJ84MzbPb7ELPfNhbVr46zhh7aXS9bPv
-	cCt439JxP//dRPpOgsp6nuh+DR1PKWnfbRkB95cwK7EUZyQaajEXFScCAFh/ZZaZAwAA
-X-CMS-MailID: 20240319130719eucas1p15bdc63ff5fdd5c9e948ce84e1505352a
-X-Msg-Generator: CA
-X-RootMTR: 20240315162041eucas1p1b9254ef7e70f21b24b88d0999c34e9bd
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20240315162041eucas1p1b9254ef7e70f21b24b88d0999c34e9bd
-References: <CGME20240315162041eucas1p1b9254ef7e70f21b24b88d0999c34e9bd@eucas1p1.samsung.com>
-	<20240315-sysctl-net-ownership-v1-1-2b465555a292@weissschuh.net>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
---77xvdswkctbb3d3j
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Igor Raits wrote:
+> Hello,
+> 
+> We have started to observe kernel crashes on 6.7.y kernels (atm we
+> have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6.9 where we
+> have nodes of cluster it looks stable. Please see stacktrace below. If
+> you need more information please let me know.
+> 
+> We do not have a consistent reproducer but when we put some bigger
+> network load on a VM, the hypervisor's kernel crashes.
+> 
+> Help is much appreciated! We are happy to test any patches.
+> 
+> [62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOPTI
 
-On Fri, Mar 15, 2024 at 05:20:31PM +0100, Thomas Wei=DFschuh wrote:
-> The sysctl core does not initialize these fields when the set_ownership
-> callback is present.
-This is a bit ambiguous as these values get set in the new_inode(sb)
-call. What is really happening is that the GLOBAL_ROOT_[U|G]ID is not
-getting the correct default.
+Did you miss the first part of the Oops?
 
-> So always do it in the callback.
->=20
-> Fixes: e79c6a4fc923 ("net: make net namespace sysctls belong to container=
-'s owner")
-I think this is incorrect and here is why:
-1. At the point of committing this code, the default behavior was
-   dictated by the new_inode call. Which calculated the value from
-   super_block *sb. This was Aug 10 2016 (approx).
-2. The issue comes when a new default behavior is added by setting
-   GLOBAL_ROOT_[U|G]ID in 5ec27ec735ba0 ("fs/proc/proc_sysctl.c: fix the
-   default values of i_uid/i_gid on /proc/sys inodes"). This commit was
-   in 2019 and missed adjusting net_ctl_set_ownership.
+> [62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Tainted: G
+>    E      6.7.10-1.gdc.el9.x86_64 #1
+> [62254.183743] Hardware name: Dell Inc. PowerEdge R7525/0H3K7P, BIOS
+> 2.14.1 12/17/2023
+> [62254.192083] RIP: 0010:skb_release_data+0xb8/0x1e0
+> [62254.197357] Code: 48 83 c3 01 39 d8 7e 54 48 89 d8 48 c1 e0 04 41
+> 80 7d 7e 00 49 8b 6c 04 30 79 0f 44 89 f6 48 89 ef e8 4c e4 ff ff 84
+> c0 75 d0 <48> 8b 45 08 a8 01 0f 85 09 01 00 00 e9 d9 00 00 00 0f 1f 44
+> 00 00
+> [62254.217013] RSP: 0018:ffffa975a0247ba8 EFLAGS: 00010206
+> [62254.222692] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000785
+> [62254.230263] RDX: 0000000000000016 RSI: 0000000000000002 RDI: ffff989862b32b00
+> [62254.237878] RBP: 4f2b318c69a8b0f9 R08: 000000000001fe4d R09: 000000000000003a
+> [62254.245417] R10: 0000000000000000 R11: 0000000000001736 R12: ffff9880b819aec0
+> [62254.252963] R13: ffff989862b32b00 R14: 0000000000000000 R15: 0000000000000002
+> [62254.260591] FS:  00007f6cf388bf80(0000) GS:ffff98b85fbc0000(0000)
+> knlGS:0000000000000000
+> [62254.269061] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [62254.275170] CR2: 000000c002236020 CR3: 000000387d37a002 CR4: 0000000000770ef0
+> [62254.282733] PKRU: 55555554
+> [62254.285911] Call Trace:
+> [62254.288884]  <TASK>
+> [62254.291549]  ? die+0x33/0x90
+> [62254.294769]  ? do_trap+0xe0/0x110
+> [62254.298405]  ? do_error_trap+0x65/0x80
+> [62254.302471]  ? exc_stack_segment+0x35/0x50
+> [62254.306884]  ? asm_exc_stack_segment+0x22/0x30
+> [62254.311637]  ? skb_release_data+0xb8/0x1e0
+> [62254.316047]  kfree_skb_list_reason+0x6d/0x210
+> [62254.320697]  ? free_unref_page_commit+0x80/0x2f0
+> [62254.325700]  ? free_unref_page+0xe9/0x130
+> [62254.330013]  skb_release_data+0xfc/0x1e0
+> [62254.334261]  consume_skb+0x45/0xd0
+> [62254.338077]  tun_do_read+0x68/0x1f0 [tun]
+> [62254.342414]  tun_recvmsg+0x7e/0x160 [tun]
+> [62254.346696]  handle_rx+0x3ab/0x750 [vhost_net]
+> [62254.351488]  vhost_worker+0x42/0x70 [vhost]
+> [62254.355934]  vhost_task_fn+0x4b/0xb0
 
-> Signed-off-by: Thomas Wei=DFschuh <linux@weissschuh.net>
-> ---
->  net/sysctl_net.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
->=20
-> diff --git a/net/sysctl_net.c b/net/sysctl_net.c
-> index 051ed5f6fc93..03e320ddacc9 100644
-> --- a/net/sysctl_net.c
-> +++ b/net/sysctl_net.c
-> @@ -62,12 +62,10 @@ static void net_ctl_set_ownership(struct ctl_table_he=
-ader *head,
->  	kgid_t ns_root_gid;
-> =20
->  	ns_root_uid =3D make_kuid(net->user_ns, 0);
-> -	if (uid_valid(ns_root_uid))
-> -		*uid =3D ns_root_uid;
-> +	*uid =3D uid_valid(ns_root_uid) ? ns_root_uid : GLOBAL_ROOT_UID;
-> =20
->  	ns_root_gid =3D make_kgid(net->user_ns, 0);
-> -	if (gid_valid(ns_root_gid))
-> -		*gid =3D ns_root_gid;
-> +	*gid =3D gid_valid(ns_root_gid) ? ns_root_gid : GLOBAL_ROOT_GID;
->  }
-> =20
->  static struct ctl_table_root net_sysctl_root =3D {
->=20
-> ---
-> base-commit: e5eb28f6d1afebed4bb7d740a797d0390bd3a357
-> change-id: 20240315-sysctl-net-ownership-bc4e17eaeea6
->=20
-> Best regards,
-> --=20
-> Thomas Wei=DFschuh <linux@weissschuh.net>
->=20
+Neither tun nor vhost_net saw significant changes between the two
+reported kernels.
 
---=20
+    $ git log --oneline v6.6..v6.7 -- drivers/net/tun.c drivers/vhost/net.c | wc -l 
+    0
 
-Joel Granados
+    $ git log --oneline linux/v6.6.9..linux/v6.7.5 -- drivers/net/tun.c drivers/vhost/net.c
+    6438382dd9f8 tun: add missing rx stats accounting in tun_xdp_act
+    4efd09da0d49 tun: fix missing dropped counter in tun_xdp_act
 
---77xvdswkctbb3d3j
-Content-Type: application/pgp-signature; name="signature.asc"
+So the cause is likely in the code that generated the skb or something
+that modified it along the way.
 
------BEGIN PGP SIGNATURE-----
+It could be helpful if it is possible to bisect further. Though odds
+are that the issue is between v6.6 and v6.7, not introduced in the
+stable backports after that. So it is a large target.
 
-iQGyBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmX5jgIACgkQupfNUreW
-QU9aBQv4y/kPkCfk3e1MiGhyEft349vB7oaq5TDecvH3jR+qdMK7I45JAJYT8FIh
-nfuQEbUynAleV37MLpjGyMYfRCLeIZz/Lq3U35qqdbR/1qDCzaKLRXZy6LteIn6D
-kjQ2A8F/HFNELD1zouCdYEBGkSgjXXuUWxQW78/JPuKQzQd4GcezlJAnn9J0nvJL
-heG00PUNuEskrEPPQhxN2mxbQ0hs2RHZx5XVquBstCGMhOVNgWnpiR5267JpH8sN
-khRQSr0XsSF8bn5rGteOm1WFiPt5cUJVZFj/XbJfEi/Qw+gPGtqNCXhl5gYvKhl6
-f3fuAR1K5EM1nAFXd114hVIE6O8xMYCSnOwK7rUCZ9qQ2P6m8KrA8X47YygqT3GG
-m8E5unPdQTp7oUNCAU+3AkJ3tXToxhD7xPS4QmwRrZH2BFCoHCMUhsNcX2myYfd8
-5A5V1ypil7iBoCuAK0qWzrL3YDhO+rvv9T2Gtce5HJ5g+RqEaGnwTxnc2FYbsxzC
-CGJcQIA=
-=jgTh
------END PGP SIGNATURE-----
+Getting the exact line in skb_release_data that causes the Oops
+would be helpful too, e.g.,
 
---77xvdswkctbb3d3j--
+gdb vmlinux
+list *(skb_release_data+0xb8)
+
+
 
