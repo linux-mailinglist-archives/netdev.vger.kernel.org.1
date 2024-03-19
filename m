@@ -1,136 +1,139 @@
-Return-Path: <netdev+bounces-80537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D640487FB54
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 10:58:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E31BD87FB93
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 11:13:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4FA981F227B9
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 09:58:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A8AF1F210B7
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 10:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E06A7E785;
-	Tue, 19 Mar 2024 09:54:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 149F67E0E5;
+	Tue, 19 Mar 2024 10:12:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QVpg6SZ+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IdOvO8lf"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9C2F7E0F3
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 09:54:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75CE37D40B
+	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 10:12:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710842078; cv=none; b=eOsfZ6nQPT4K6aQ2d5dh3ZIma/3lWwZmJ508tokJhOq57ehx8WatoqFvuYGUCOYfDo6l/x1fz9FyvGj5h3EPQSQAKuILVse8slrcjrXmvtzyegkWbH08qXf/McMS4EaCMhbh0lZZnRAadesmuJpTKKAMx1S4R+3bE0LSbH8Eg+E=
+	t=1710843152; cv=none; b=T5ss4TV06u+yQjrwVIaYWRzCgoDFCSL6nDuWo/kjmOu1d/eL800h4HqxDjZU+xf1wkkmDQi/mTdx/h0caZNGEmJp8oEVCL7JFtJmz2VQZS1ydEKg2cDPWIWbOY7WBpt6dy+2Wuq7VRRWbF0oi7wauytDpP6SvaeRr1WKFGrCsBo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710842078; c=relaxed/simple;
-	bh=uNDPpDP7QY+YDybRpdn+O7fkHlUVRWgPRu7fk5G//RY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SVTTQleoWDbGKixateDQlBOiNGU3K26kEuqsQvrJvOCL0ry36qomgt1TzNYMnX/nNSFjuEbxdXxO3NNLraEDylEZkTFhZWquiagzTSdh5H1XALx5p8ZY/OuVdpTXyAHTw4y16epgbuEhiMk3sf4ehaJRLdO3JKGCIxlz6/6YaUA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QVpg6SZ+; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1710843152; c=relaxed/simple;
+	bh=xnsp3gfIoBuqkf9WzUWArWK2Eue0B2a4uf2f2qgcP1s=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=UYS58bTsxbiA2R7d/Kc9PTpygg2OdFrb3zxjQ1p79zx8LWWcsBz4zLHfcIYRhlQSKrJ9vWBUTWTBomSfO6U/Iv+lg2madt4/lcxzG6JU1HxkHS7suBnaAknc1gBPwkgQOgVcoCLvrHY4FjMu9LIV/Oq03M3moaPMtKxh7g6yKZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IdOvO8lf; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710842075;
+	s=mimecast20190719; t=1710843149;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Hib0zDgjX0wwE4G3s6Q4ROR6T+E9FLihqyZ1EtpwmMY=;
-	b=QVpg6SZ+HrL4CHeg0VnD09S8JWbqPp0P9jpc9NHerFJV72l2xJhqUkW+oHhh0aaX4wUQnD
-	tmOCXv0cZLmb5eIlwPEvWgtAq9Vd+lLzYZNGiex10MtAyTC856iqChOg5MT0XAGhYDEH83
-	W1CYiQDLzaddFDXRLk30kKhx2+ta9Bw=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=xnsp3gfIoBuqkf9WzUWArWK2Eue0B2a4uf2f2qgcP1s=;
+	b=IdOvO8lf+aV5pucZUbL+W7n9ktFJrwBP3YPPF8DFf4f/w7Mc7L+LLhlh6t0NtKgynHOh7L
+	//VcgJ+1gZ/Bc5Hdyziud6rvvxm21BmRG3w1EgqayZ0YuMDsapo0eqMtccHwMZjOCR5TMl
+	As/1Z4KYGvi/UQCHhTR+SGNZ7M/BvQs=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-593-jCLIOTEgOgKlIDPhtmP2Ew-1; Tue, 19 Mar 2024 05:54:34 -0400
-X-MC-Unique: jCLIOTEgOgKlIDPhtmP2Ew-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a450265c7b6so294732066b.0
-        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 02:54:33 -0700 (PDT)
+ us-mta-683-vUkveNTEOlme8xGHXieaCA-1; Tue, 19 Mar 2024 06:12:28 -0400
+X-MC-Unique: vUkveNTEOlme8xGHXieaCA-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-33ed3e8cf50so632184f8f.1
+        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 03:12:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710842073; x=1711446873;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Hib0zDgjX0wwE4G3s6Q4ROR6T+E9FLihqyZ1EtpwmMY=;
-        b=j/2j+nbb0g+0BN6Fw4sU/uUUQl9750ElDig28CbTwKs4Ze2hcEjAHoYLxcu4OpfjgH
-         F++oAeoZmwjrSvvrlECUvEx1FMq5m3RmisSuxqcpAIjlXllgU975QoQUNxK9DYF0HcXD
-         eNVUo8IQEdHEQf+tnQrAAsj+jQb6NzAN/eK3yH24Gghvu9nVTTCp/mt3wiq4fyBjy9WI
-         V2IZ2+c/Gkt4+F8qfmP/8MSquVwz7UF1zZTRKUiNrWlJfitKQd7AMH8L6xZQc+ZarFQF
-         dMWqRhrT+F//b5Hi+f5UTsIFhV+yDvpK7u73AAg3hFMhFyUa+5CsuFN/Orie2j4Lj4DB
-         YoVg==
-X-Forwarded-Encrypted: i=1; AJvYcCUZrgZnXs8FjIxVx7qv2w9YdOQoxa5A2wbm1+xJ5/Ev22kGrrrUD8qHiG4Ohe4YdAo1dB85fLSztKQbjLa/CqJPOsZ+1z9e
-X-Gm-Message-State: AOJu0YwKFP011y5h9am2w/JwEbmCZHfpIsqIsf/IufufZlWne4st1jap
-	29c/nr6PRoUmeZpjOzBURvsBMYmxuWCGShlVQxCf1WvcJAhP8xoBsMvFsE40oYrfQ9ZCWoBqqv3
-	N1xByMd4T0TT82V6u9PcfweiOsuD6nYjsy/UhPVA11xvzVg24EaFPYzVy2vhVmvUq2GyRVVTAmr
-	ByUKDSAZzoNhbozCLCdOwoYOAAJAZN
-X-Received: by 2002:a17:906:2310:b0:a46:7e08:37e8 with SMTP id l16-20020a170906231000b00a467e0837e8mr1225450eja.53.1710842072907;
-        Tue, 19 Mar 2024 02:54:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG6BjyEnKy2Dpuf1Q6n6FNGZtdfuIfYcEAZFAZvpsZOgYjjHe0uXoAnkUBurhDlGn2w1OypmrxEZKsO7bB1uBs=
-X-Received: by 2002:a17:906:2310:b0:a46:7e08:37e8 with SMTP id
- l16-20020a170906231000b00a467e0837e8mr1225428eja.53.1710842072689; Tue, 19
- Mar 2024 02:54:32 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710843147; x=1711447947;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xnsp3gfIoBuqkf9WzUWArWK2Eue0B2a4uf2f2qgcP1s=;
+        b=SLYeFeSbkldgETmbbPmrW9ovWljAiqkC9Gpjgu8ArF5fdiizWwk+frAZrBis8VfhG8
+         YR+ubRcrZIawRVZniTON0cY5D6DX/osavAnoYNtuSPSdHFr0jmXlXk9TbvyOerQj8ilv
+         XY55smPmO4dw3B8uP51D6qJ5g817VgCXkUURKc2sjy5VUUX9tMO3Oj/qaxV50mJ40aiL
+         c82G9y+nDYKy0/Chp97jc3nIPd72xdCBKmlVpqp5f3JoJ97Y7gOnb2J+Og5D4bj3OKFJ
+         tE0ZEa2TXkNS+LijhrHuTGnvhUcob6YuH2sBof1vHrIJdiKCjR5n0RmOaHuIADfxvtBm
+         c0AQ==
+X-Gm-Message-State: AOJu0YzoJUy8dlxU7O69guVw2c0MkVq68BqmPE5n+HeJctbI3WLs3ME4
+	P4VgY1HMw2ix7/Ct7oou6UT6/9gcwiYIRtPfSUfP+YZAZ82aueWAAgjihQRNMlhXM5wcbXXbqsX
+	UmKcqbH5jEopjpxYjAr0+50//UXqtV1alh+Cy3GwJ2TH0YHFPxz/dOA==
+X-Received: by 2002:adf:e4ca:0:b0:33e:c361:7cdf with SMTP id v10-20020adfe4ca000000b0033ec3617cdfmr1245402wrm.0.1710843146932;
+        Tue, 19 Mar 2024 03:12:26 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IF6l9P4AKCtN8uc1X/vjfDKtqMSUpnkdXstRYGAYxc8xRddl7mvdvVQRdQAxQyD/C1foBNwvg==
+X-Received: by 2002:adf:e4ca:0:b0:33e:c361:7cdf with SMTP id v10-20020adfe4ca000000b0033ec3617cdfmr1245378wrm.0.1710843146515;
+        Tue, 19 Mar 2024 03:12:26 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-224-202.dyn.eolo.it. [146.241.224.202])
+        by smtp.gmail.com with ESMTPSA id o14-20020adfe80e000000b0033e8c50fc3fsm11963607wrm.90.2024.03.19.03.12.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Mar 2024 03:12:25 -0700 (PDT)
+Message-ID: <316ea06417279a45d2d54bf4cc4afd2d775b419a.camel@redhat.com>
+Subject: Re: [PATCH net-next v5 0/9] virtio-net: support device stats
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jiri Pirko <jiri@resnulli.us>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Michael
+ S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@google.com>, Amritha
+ Nambiar <amritha.nambiar@intel.com>, Larysa Zaremba
+ <larysa.zaremba@intel.com>, Sridhar Samudrala
+ <sridhar.samudrala@intel.com>,  Maciej Fijalkowski
+ <maciej.fijalkowski@intel.com>, virtualization@lists.linux.dev,
+ bpf@vger.kernel.org
+Date: Tue, 19 Mar 2024 11:12:23 +0100
+In-Reply-To: <ZfgxSug4sekWGyNd@nanopsycho>
+References: <20240318110602.37166-1-xuanzhuo@linux.alibaba.com>
+	 <Zfgq8k2Q-olYWiuw@nanopsycho>
+	 <1710762818.1520293-1-xuanzhuo@linux.alibaba.com>
+	 <ZfgxSug4sekWGyNd@nanopsycho>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240318143058.287014-1-ivecera@redhat.com>
-In-Reply-To: <20240318143058.287014-1-ivecera@redhat.com>
-From: Michal Schmidt <mschmidt@redhat.com>
-Date: Tue, 19 Mar 2024 10:54:21 +0100
-Message-ID: <CADEbmW02H_6h6cdXher4Ua_ZzTduF_gF-b8ADRSamOms--HZbQ@mail.gmail.com>
-Subject: Re: [PATCH iwl-next 0/7] i40e: cleanups & refactors
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: intel-wired-lan@lists.osuosl.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesse Brandeburg <jesse.brandeburg@intel.com>, open list <linux-kernel@vger.kernel.org>, 
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Tony Nguyen <anthony.l.nguyen@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 18, 2024 at 3:31=E2=80=AFPM Ivan Vecera <ivecera@redhat.com> wr=
-ote:
->
-> This series do following:
-> Patch 1 - Removes write-only flags field from i40e_veb structure and
->           from i40e_veb_setup() parameters
-> Patch 2 - Changes parameter of i40e_notify_client_of_l2_param_changes()
->           and i40e_notify_client_of_netdev_close()
-> Patch 3 - Changes parameter of i40e_detect_recover_hung()
-> Patch 4 - Adds helper i40e_pf_get_main_vsi() to get main VSI and uses it
->           in existing code
-> Patch 5 - Consolidates checks whether given VSI is the main one
-> Patch 6 - Adds helper i40e_pf_get_main_veb() to get main VEB and uses it
->           in existing code
-> Patch 7 - Adds helper i40e_vsi_reconfig_tc() to reconfigure TC for
->           particular and uses it to replace existing open-coded pieces
->
-> Ivan Vecera (7):
->   i40e: Remove flags field from i40e_veb
->   i40e: Change argument of several client notification functions
->   i40e: Change argument of i40e_detect_recover_hung()
->   i40e: Add helper to access main VSI
->   i40e: Consolidate checks whether given VSI is main
->   i40e: Add helper to access main VEB
->   i40e: Add and use helper to reconfigure TC for given VSI
->
->  drivers/net/ethernet/intel/i40e/i40e.h        |  29 ++-
->  drivers/net/ethernet/intel/i40e/i40e_client.c |  28 +--
->  drivers/net/ethernet/intel/i40e/i40e_ddp.c    |   3 +-
->  .../net/ethernet/intel/i40e/i40e_debugfs.c    |  36 ++--
->  .../net/ethernet/intel/i40e/i40e_ethtool.c    |  29 ++-
->  drivers/net/ethernet/intel/i40e/i40e_main.c   | 199 ++++++++++--------
->  drivers/net/ethernet/intel/i40e/i40e_ptp.c    |   6 +-
->  drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  16 +-
->  drivers/net/ethernet/intel/i40e/i40e_txrx.h   |   2 +-
->  .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |  14 +-
->  10 files changed, 210 insertions(+), 152 deletions(-)
+On Mon, 2024-03-18 at 13:19 +0100, Jiri Pirko wrote:
+> Mon, Mar 18, 2024 at 12:53:38PM CET, xuanzhuo@linux.alibaba.com wrote:
+> > On Mon, 18 Mar 2024 12:52:18 +0100, Jiri Pirko <jiri@resnulli.us> wrote=
+:
+> > > Mon, Mar 18, 2024 at 12:05:53PM CET, xuanzhuo@linux.alibaba.com wrote=
+:
+> > > > As the spec:
+> > > >=20
+> > > > https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f=
+95bbbd243291ab0064f82
+> > > >=20
+> > > > The virtio net supports to get device stats.
+> > > >=20
+> > > > Please review.
+> > >=20
+> > > net-next is closed. Please resubmit next week.
+> >=20
+> >=20
+> > For review.
+>=20
+> RFC, or wait.
 
-Series looks OK to me.
-Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
+@Xuan, please note that you received exactly the same feedback on your
+previous submission, a few days ago. While I do understand the legit
+interest in reviews, ignoring explicit feedback tend to bring no
+feedback at all.
+
+Paolo
 
 
