@@ -1,102 +1,97 @@
-Return-Path: <netdev+bounces-80578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80580-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F23DA87FDCE
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:50:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20B6987FDD0
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:50:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80079B22C13
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:50:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA0171F2289D
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:50:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD36F3BBC1;
-	Tue, 19 Mar 2024 12:50:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45FED3F9EC;
+	Tue, 19 Mar 2024 12:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nlhYNhdk"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6A603CF5E
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 12:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14C5D3C06B;
+	Tue, 19 Mar 2024 12:50:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710852617; cv=none; b=NHCVrB2ZUJL4YhRqKn6qyrRM5hfYYlqdED90XaBu+fMG9a8kfsQLus9yps9O1vyqwc7Ivbok4gk7Gd/yknBpOCxuk/pBeWgftQASCP4ZpSSdie7L5AEElV224UTPbfGH2PubMM5gfd3Cg78iXK0Vg9QWvQIx2TLMD//9guYrSNk=
+	t=1710852629; cv=none; b=E5CDB2JXg/r8cCs51D92brhSjz3WVL52iR37aWjSbS6GGdPse3xqW2+5QS3R15brR7vrDhhBcqG6ATkZdwvLyRNdLUIjlmJi/QAtNUu+AxYtZzkbItEji4jq+VjD0xkvdDl/7Yw2F/SlTgNkDR/53SkTbhokzt2XJaeZSZQBJVE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710852617; c=relaxed/simple;
-	bh=gYDrkvK3DAgGY8Y5tTKj3kUwRxwnGyuteKZd7IZfdYg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=ksFJYxckBbUKwLQKmxeLiatwUusb8Gmh+wgVa8FRFZUXQptebT6cCqMAZE48j//yuRbnygfLDu4Y12h6A96sitRtIwVPE4RnhYAxrcrFUlN45hdOQJ/MqR7bUK4mfdle9VoDcJEoDw5d4+RVT1ZcSaG6+NF6Cb2jQxcBSE+AHgA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rmYun-0001oK-Os; Tue, 19 Mar 2024 13:50:01 +0100
-Received: from [2a0a:edc0:2:b01:1d::c5] (helo=pty.whiteo.stw.pengutronix.de)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rmYum-007HHn-Nh; Tue, 19 Mar 2024 13:50:00 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1rmYum-0072VC-25;
-	Tue, 19 Mar 2024 13:50:00 +0100
-Date: Tue, 19 Mar 2024 13:50:00 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Vladimir Oltean <olteanv@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
-	netdev@vger.kernel.org
-Subject: DSCP support for KSZ switches
-Message-ID: <ZfmJ-O8XMT8oO-TS@pengutronix.de>
+	s=arc-20240116; t=1710852629; c=relaxed/simple;
+	bh=PnKMo3jI0/DL80nOxjATy+elReu2G63BZ+c1UWaPKdc=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QFWSkmeHxXlOJRf5a2odP6ZmJhQvfu+ot9v+9Nos4SfiDxpziSmxP9VHZ4z2xaivy2vhV1TdUl0moDDg17sHtpobvTpA/iI5BG9K7YtAYtXsNejt4+pvz6dl3nqYE9Fn9IJBllyhjv+rQY6VVbCPurWlTCsxlOoh5vCnnB9aaH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nlhYNhdk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A2173C43609;
+	Tue, 19 Mar 2024 12:50:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710852628;
+	bh=PnKMo3jI0/DL80nOxjATy+elReu2G63BZ+c1UWaPKdc=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=nlhYNhdkA3O0DBGhgQXPEbQkIk8cOnQG4g8fB4jGAU8fauYVNRB8fTpN4RNzaKgV1
+	 yss4TLsDEAu99TvzGFJ4b1OCPWKyi3bu6XU/AlD4yIjFg7QLlXx9mIc5PMy1Ivq5Vr
+	 qTFMJAkKXBq2zCA+dL6y7IP1eWXOXJxJ8QCK+XMyjdu5xuy1C0NURILDp64/xNdLqO
+	 uo6nD/OsJ3J+ehvkNwV6x2wML3a3exICM9TAYWMqTqdrccRZaUMcu2oY+tfUWe1LKa
+	 buNNpzaC4XwQxYNwoS33JruU2aCvSnjuezxU88VNGhX9i1A+Iqyiqv0tmmbjicj/DY
+	 Vm7LF4KBFddQA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 987F8D982E0;
+	Tue, 19 Mar 2024 12:50:28 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next V2] bpf/lpm_trie: inline longest_prefix_match for
+ fastpath
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171085262862.28386.4132852347769986084.git-patchwork-notify@kernel.org>
+Date: Tue, 19 Mar 2024 12:50:28 +0000
+References: <171076828575.2141737.18370644069389889027.stgit@firesoul>
+In-Reply-To: <171076828575.2141737.18370644069389889027.stgit@firesoul>
+To: Jesper Dangaard Brouer <hawk@kernel.org>
+Cc: bpf@vger.kernel.org, borkmann@iogearbox.net, ast@kernel.org,
+ martin.lau@kernel.org, netdev@vger.kernel.org, bp@alien8.de,
+ kernel-team@cloudflare.com
 
-Hello all,
+Hello:
 
-I'm currently working on implementing DSCP support for the KSZ switch series.
-My efforts have led to the successful implementation of several callbacks,
-including:
+This patch was applied to bpf/bpf-next.git (master)
+by Daniel Borkmann <daniel@iogearbox.net>:
 
-port_get_default_prio()
-port_set_default_prio()
-port_get_dscp_prio()
+On Mon, 18 Mar 2024 14:25:26 +0100 you wrote:
+> The BPF map type LPM (Longest Prefix Match) is used heavily
+> in production by multiple products that have BPF components.
+> Perf data shows trie_lookup_elem() and longest_prefix_match()
+> being part of kernels perf top.
+> 
+> For every level in the LPM tree trie_lookup_elem() calls out
+> to longest_prefix_match().  The compiler is free to inline this
+> call, but chooses not to inline, because other slowpath callers
+> (that can be invoked via syscall) exists like trie_update_elem(),
+> trie_delete_elem() or trie_get_next_key().
+> 
+> [...]
 
-However, I am facing challenges with port_add_dscp_prio() and
-port_del_dscp_prio() due to the KSZ switches' limitations on per-port DSCP
-configuration. Specifically, the KSZ hardware allows only enabling or disabling
-DSCP as the source of internal priority on a per-port basis. Additionally, it
-supports either global DSCP remapping or using a default mapping, where the
-internal priority is derived from bits 5:3 of the DSCP field.
+Here is the summary with links:
+  - [bpf-next,V2] bpf/lpm_trie: inline longest_prefix_match for fastpath
+    https://git.kernel.org/bpf/bpf-next/c/1a4a0cb7985f
 
-Given these constraints, my question revolves around the appropriate tools or
-interfaces for managing DSCP settings on these devices. Should the
-enabling/disabling of DSCP per port be managed through dcb or ethtool?
-Furthermore, concerning the global DSCP mapping, would devlink be the suitable
-choice for this task?
-
-Best regards,
-Oleksij
+You are awesome, thank you!
 -- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
