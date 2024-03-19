@@ -1,116 +1,221 @@
-Return-Path: <netdev+bounces-80619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5D4087FF85
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 15:25:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABFE587FF79
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 15:23:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FE692846C7
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 14:25:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 553781F21C0E
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 14:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F41D88173D;
-	Tue, 19 Mar 2024 14:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8281981754;
+	Tue, 19 Mar 2024 14:23:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A46F781AC2
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 14:25:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6323781721;
+	Tue, 19 Mar 2024 14:23:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710858348; cv=none; b=aF1NweIVW+VBqjz5Ia+ybWmHrSsZN/+GKkgR2/voKBmA9wlHWmVGDmRULB+jlh1N9gswn/Nx8853u7y375nTvNMMtwWRqJAZQ/o0tof/ITW14so6ziAfEm8g7MWxqwtKuaog+AD2/+R2gGjjiNMDmyaOVQ3MNwsh06WSGQW0OMI=
+	t=1710858209; cv=none; b=LvcdfSr1RAkE+AIAQUYt9AlFe0XgZ8/vZljYLkjYlYVEBIErjcYd74bX+QDB9fldcKTNrsyYwfg+8U5gC6Wtan0ZuiWOO6Grc27uIJVcCpFJeOQNrDDaF7GN4pZmALrd5oFLA0X0Yo7aD8T3doiGH5H9cpuNpBVudikIOidCI4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710858348; c=relaxed/simple;
-	bh=eGwfpMd0oNEabAjNEboBF9e49KppvUpp7hnrvMiBFTg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VBK9PMaQuQMvgNRLAFpFZ7+jwwSwgsPXmg5f95DlIkq8lqZ0wCe89lxGlcnEyhOtQ7J9T9YgvtX39Mr8xzkCLMqKtOj77ZuJTxEt39+791hm/Ihv8MklE6k47vAaQjOTsP+ps0PrBvzk88aMICLXIwFfifqHrlEYz0RFppEWhSg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rmaP8-0005J6-K9; Tue, 19 Mar 2024 15:25:26 +0100
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rmaP6-007IDU-OJ; Tue, 19 Mar 2024 15:25:24 +0100
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 5F8B22A7ABA;
-	Tue, 19 Mar 2024 14:25:24 +0000 (UTC)
-Date: Tue, 19 Mar 2024 15:25:24 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Wolfgang Grandegger <wg@grandegger.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v1 1/1] can: mcp251x: Fix up includes
-Message-ID: <20240319-chewing-aptitude-db56f0a3fc32-mkl@pengutronix.de>
-References: <20240318193410.178163-1-andriy.shevchenko@linux.intel.com>
+	s=arc-20240116; t=1710858209; c=relaxed/simple;
+	bh=Xmo2x6S5V7/NQhmCgDANew9z2mao2c7yl6NKCnwOGZQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=t/uNy1GdFLg3+OtSXbWFjS9cKGADb9IGFbuaygI17fte583yxAPgi09+wYdf5xWApbnXIoxerKxZ67oTEcGGGjofVULyLe1CoxX6wDmcpABmQf9Ves1dI3AshOsmXrAg+74JtejgENMqfIZTB2wASVZ0zgcZqtUxmdbtn4ApY2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7976FC433F1;
+	Tue, 19 Mar 2024 14:23:27 +0000 (UTC)
+Date: Tue, 19 Mar 2024 10:25:49 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: <xu.xin16@zte.com.cn>
+Cc: <edumazet@google.com>, <davem@davemloft.net>, <mhiramat@kernel.org>,
+ <dsahern@kernel.org>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+ <linux-trace-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <yang.yang29@zte.com.cn>, <he.peilin@zte.com.cn>, <liu.chun2@zte.com.cn>,
+ <jiang.xuexin@zte.com.cn>, <zhang.yunkai@zte.com.cn>
+Subject: Re: [PATCH v2] net/ipv4: add tracepoint for icmp_send
+Message-ID: <20240319102549.7f7f6f53@gandalf.local.home>
+In-Reply-To: <202403192013525995034@zte.com.cn>
+References: <202403192013525995034@zte.com.cn>
+X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="k3ivyy72aisdcy5u"
-Content-Disposition: inline
-In-Reply-To: <20240318193410.178163-1-andriy.shevchenko@linux.intel.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+
+On Tue, 19 Mar 2024 20:13:52 +0800 (CST)
+<xu.xin16@zte.com.cn> wrote:
+
+> From: Peilin He<he.peilin@zte.com.cn>
+> 
+> Introduce a tracepoint for icmp_send, which can help users to get more
+> detail information conveniently when icmp abnormal events happen.
+> 
+> 1. Giving an usecase example:
+> =============================
+> When an application experiences packet loss due to an unreachable UDP
+> destination port, the kernel will send an exception message through the
+> icmp_send function. By adding a trace point for icmp_send, developers or
+> system administrators can obtain detailed information about the UDP
+> packet loss, including the type, code, source address, destination address,
+> source port, and destination port. This facilitates the trouble-shooting
+> of UDP packet loss issues especially for those network-service
+> applications.
+> 
+> 2. Operation Instructions:
+> ==========================
+> Switch to the tracing directory.
+>         cd /sys/kernel/debug/tracing
+
+FYI, that directory is obsolete. Please always reference /sys/kernel/tracing.
+
+> Filter for destination port unreachable.
+>         echo "type==3 && code==3" > events/icmp/icmp_send/filter
+> Enable trace event.
+>         echo 1 > events/icmp/icmp_send/enable
+> 
+> 3. Result View:
+> ================
+>  udp_client_erro-11370   [002] ...s.12   124.728002:
+>  icmp_send: icmp_send: type=3, code=3.
+>  From 127.0.0.1:41895 to 127.0.0.1:6666 ulen=23
+>  skbaddr=00000000589b167a
+> 
+> v1->v2:
+> Some fixes according to
+> https://lore.kernel.org/all/CANn89iL-y9e_VFpdw=sZtRnKRu_tnUwqHuFQTJvJsv-nz1xPDw@mail.gmail.com/
+> 	1. adjust the trace_icmp_send() to more protocols than UDP.
+> 	2. move the calling of trace_icmp_send after sanity checks
+> 	   in __icmp_send().
+> 
+> Signed-off-by: Peilin He<he.peilin@zte.com.cn>
+> Reviewed-by: xu xin <xu.xin16@zte.com.cn>
+> Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
+> Cc: Yang Yang <yang.yang29@zte.com.cn>
+> Cc: Liu Chun <liu.chun2@zte.com.cn>
+> Cc: Xuexin Jiang <jiang.xuexin@zte.com.cn>
+> ---
+>  include/trace/events/icmp.h | 64 +++++++++++++++++++++++++++++++++++++++++++++
+>  net/ipv4/icmp.c             |  4 +++
+>  2 files changed, 68 insertions(+)
+>  create mode 100644 include/trace/events/icmp.h
+> 
+> diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
+> new file mode 100644
+> index 000000000000..c3dc337be7bc
+> --- /dev/null
+> +++ b/include/trace/events/icmp.h
+> @@ -0,0 +1,64 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +#undef TRACE_SYSTEM
+> +#define TRACE_SYSTEM icmp
+> +
+> +#if !defined(_TRACE_ICMP_H) || defined(TRACE_HEADER_MULTI_READ)
+> +#define _TRACE_ICMP_H
+> +
+> +#include <linux/icmp.h>
+> +#include <linux/tracepoint.h>
+> +
+> +TRACE_EVENT(icmp_send,
+> +
+> +		TP_PROTO(const struct sk_buff *skb, int type, int code),
+> +
+> +		TP_ARGS(skb, type, code),
+> +
+> +		TP_STRUCT__entry(
+> +			__field(__u16, sport)
+> +			__field(__u16, dport)
+> +			__field(int, type)
+> +			__field(int, code)
+> +			__array(__u8, saddr, 4)
+> +			__array(__u8, daddr, 4)
+> +                	__field(const void *, skbaddr)
+> +			__field(unsigned short, ulen)
+
+Note, to prevent holes, I usually suggest pointers and longs go first,
+followed by ints, and then end with char.
+
+                	__field(const void *, skbaddr)
+			__field(int, type)
+			__field(int, code)
+			__array(__u8, saddr, 4)
+			__array(__u8, daddr, 4)
+			__field(__u16, sport)
+			__field(__u16, dport)
+			__field(unsigned short, ulen)
+
+-- Steve
 
 
---k3ivyy72aisdcy5u
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> +		),
+> +
+> +		TP_fast_assign(
+> +			struct iphdr *iph = ip_hdr(skb);
+> +			int proto_4 = iph->protocol;
+> +			__be32 *p32;
+> +
+> +			__entry->skbaddr = skb;
+> +			__entry->type = type;
+> +			__entry->code = code;
+> +
+> +			if (proto_4 == IPPROTO_UDP) {
+> +				struct udphdr *uh = udp_hdr(skb);
+> +				__entry->sport = ntohs(uh->source);
+> +				__entry->dport = ntohs(uh->dest);
+> +				__entry->ulen = ntohs(uh->len);
+> +			} else {
+> +				__entry->sport = 0;
+> +				__entry->dport = 0;
+> +				__entry->ulen = 0;
+> +			}
+> +
+> +			p32 = (__be32 *) __entry->saddr;
+> +			*p32 = iph->saddr;
+> +
+> +			p32 = (__be32 *) __entry->daddr;
+> +			*p32 = iph->daddr;
+> +		),
+> +
+> +		TP_printk("icmp_send: type=%d, code=%d. From %pI4:%u to %pI4:%u ulen=%d skbaddr=%p",
+> +			__entry->type, __entry->code,
+> +			__entry->saddr, __entry->sport, __entry->daddr,
+> +			__entry->dport, __entry->ulen, __entry->skbaddr)
+> +);
+> +
+> +#endif /* _TRACE_ICMP_H */
+> +
+> +/* This part must be outside protection */
+> +#include <trace/define_trace.h>
+> \ No newline at end of file
+> diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+> index e63a3bf99617..21fb41257fe9 100644
+> --- a/net/ipv4/icmp.c
+> +++ b/net/ipv4/icmp.c
+> @@ -92,6 +92,8 @@
+>  #include <net/inet_common.h>
+>  #include <net/ip_fib.h>
+>  #include <net/l3mdev.h>
+> +#define CREATE_TRACE_POINTS
+> +#include <trace/events/icmp.h>
+> 
+>  /*
+>   *	Build xmit assembly blocks
+> @@ -672,6 +674,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
+>  		}
+>  	}
+> 
+> +	trace_icmp_send(skb_in, type, code);
+> +
+>  	/* Needed by both icmp_global_allow and icmp_xmit_lock */
+>  	local_bh_disable();
+> 
 
-On 18.03.2024 21:34:10, Andy Shevchenko wrote:
-> This driver is including the legacy GPIO header <linux/gpio.h>
-> but the only thing it is using from that header is the wrong
-> define for GPIOF_DIR_OUT.
->=20
-> Fix it up by using GPIO_LINE_DIRECTION_* macros respectively.
->=20
-> Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-
-No need to resend, added to linux-can-next.
-
-Thanks,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---k3ivyy72aisdcy5u
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmX5oFAACgkQKDiiPnot
-vG+OeQgAiQRhzAhHeegYdxVcGWd+6wrHYIv3QSMgYZRbA7op7g6PHEuVb7u/eefb
-5E4hOPrkpJdjtvsPw4STB1UvC9lqbySKFRUBoijiLQBlF0c6JPhiUaBTVDbPl6Wq
-hZMvhQZGctyGXeYK/MZPaij5YOA7Srcg2ohus74B8qJYq2nWSeKmHUNsAikSTr4k
-6pK0rZxcICr8CmTaGnCLt1yJwOlZW0A2gK021XFSkgLd7wJ2PnDO4avoL6UjWDd3
-VkpL78Y3JHbrO7JiSngQUY5ESqdS7piQArHRyzvgRsYTA2dcpddOK1nhH24vCrCa
-7kUv96lZJC3+bhbkXKlT8fh7TZUErQ==
-=d6sj
------END PGP SIGNATURE-----
-
---k3ivyy72aisdcy5u--
 
