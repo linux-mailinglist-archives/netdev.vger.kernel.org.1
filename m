@@ -1,161 +1,157 @@
-Return-Path: <netdev+bounces-80500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 507EB87F5E4
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 03:56:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 34E6887F656
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 05:21:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D556DB219FE
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 02:55:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CAA44B221F1
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 04:21:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89767BAE1;
-	Tue, 19 Mar 2024 02:53:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D7B15B1E3;
+	Tue, 19 Mar 2024 04:21:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CidIsDrD"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="wsCyFyhd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A397BAF5;
-	Tue, 19 Mar 2024 02:53:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2137C1EB4A;
+	Tue, 19 Mar 2024 04:21:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710816804; cv=none; b=PCQa1SbALWbxgOJ5AeAIuXbtVPneJxVdWXzRAB6IGL3X7P+qA4AZPfoKZBUVutMxHLcx2Il0XHkCA4gUsMvDyXd5OPFgQcM/cLJHSQ1lLZb7WdLLATolJqOEmNv2yquHjS7nMNnPKFDlFCCys12ynyH4JWFGbPlYGSrvaD2Xzyw=
+	t=1710822076; cv=none; b=KYaep8b/JdOjrwS7YcSfZelWr+oUMlZ2Ifn37WzKhcfR6g2cTxM+86WMj7UCb6ycMgNdiVnoY5AgN+lwlACKucdfmTz9Go5pDQEKIpA0NmMUdJqC2AKmsqI01eMHugcthtjXlRkNZaMQ8YJWvfHK1W/GdwSYSJ67/4d1DEWwk70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710816804; c=relaxed/simple;
-	bh=Zxyts5lPZvaP44xiWGztqFVT+KpEO0dnNEyK7IoDbV4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jSvFwbmncKHsvwLnM9l0vzJiqI+0U80e29+JEFof71/rTCvJFn3a5cZQme8gPdDz3YAhyZK3Uh5IQqBRV/XzuGndfvaPU0F4XHfb9IAqMIWDCwUYh56WyhM9gjCrSfY2+R9qg2ZhlliKYWS4TjVKCTbcfKL6AD9S8jipKQx5sVg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CidIsDrD; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a46db55e64fso26077566b.1;
-        Mon, 18 Mar 2024 19:53:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710816801; x=1711421601; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=R9gD6BrNu7wEli3QCno5011uW/xmhOWQhod+0lHWEwc=;
-        b=CidIsDrD6hJ6Pxj5OW6sw/FGViw16r2xJxvsNCk8qIP1bxEdg1HZUWjfQfHNIrdEiu
-         JCyGIfkf7eZeMadxULO9o5W7r9SqOql9jyFtJYHVQVJBfiR3L9+vrxnOaVYZ50LzFaKO
-         11TAzVBDobzcaW66PSQj6YKjZf7QUWD0Nhn0I19d3Yahvq0H00PIS2e6FHz556Zd4FPK
-         AglAlHyi/V/1/f2YptJ+VYCcgx9C27cMj3j0wTC0kCTWsSOVqYYFKg1A5ciE8BtrKTBu
-         7zcfPJIbDL4eB4PapcwAut51sOyKgRu3NvMK68Icj1Vlr8nAhsdcIzbzcv82HSPiLWyi
-         2Urw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710816801; x=1711421601;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=R9gD6BrNu7wEli3QCno5011uW/xmhOWQhod+0lHWEwc=;
-        b=W5q29p6DCIPjbovRIIcjUkxF/uZ2X43KO9qcCnDwl7J3y5B+Yp8F5iG176HWGixVOK
-         +RLvhBoo5hFlTzTZ34w2F39GSXMRPaLgVnVfGo3yAev9WOWetKEOP+NPDkffz/7FFd1v
-         a6PXnGejtsJ2gGMLY9Ke6euFskDSrK1RyqfzgIpKsgSzx56ntb/yl1b5DCLsW/fj3Y3q
-         H1U3zGiSuuW0dahOd8nIU34YXgPAeH0p5/fOVpP6ImUJcFUXbbSziUKvW59v1g7a8rLU
-         sbiNc45KlsT5BeJcqgK1QyCQJ+AYqd33jNIZowTVPqzZ0KSLasMZvGIc8IrsNFIzBjdc
-         S2Sw==
-X-Forwarded-Encrypted: i=1; AJvYcCUP+O5IgMWKJfQuoTeU70bmV3BywEUuA3cl0c4P98S0sl4tSzD/k5WRxXj47MZnOVhQPGOLHZkY1W+cr2CcOhJ92bOsTBZggnBjiwWIPW7toIWQlFDPizGJCpeWd8FYfTuO8WFYR0Ip
-X-Gm-Message-State: AOJu0Yx23A4v9QWrZUqLHc2v9Zgb83u9JPNE/uOp4Ii89GjBJO2W8usI
-	9WTJ7ZU4xa6lIDoCH4IZRLuq5O1G1ICzUmmAY42kEubpul1FuceirV4oZGphKMG/6JuzQ8RIMtx
-	L30brGRX2AeKmbaFOgBDARF43RDI=
-X-Google-Smtp-Source: AGHT+IHssxyvNdr3L63+NZHNAhghqNLhvpUa2mxbkYkJJG5PKll9ckbnTkur9sYto5is8knHGuxl+1hhHlNiTTniOBU=
-X-Received: by 2002:a17:907:6d0d:b0:a46:a927:115e with SMTP id
- sa13-20020a1709076d0d00b00a46a927115emr6713763ejc.39.1710816801073; Mon, 18
- Mar 2024 19:53:21 -0700 (PDT)
+	s=arc-20240116; t=1710822076; c=relaxed/simple;
+	bh=uHYyRQ2mhUExRd5wmElp9/X/N4+vsxARJCSyVxITKpQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lqWceKpCqKgMQ4TGjpxra/yg9YxcMHS34ad1+Y5Xc2yTrAzhh1xQFkREiPXyooG9G00uj59G0jde0Zq5RPSrLllMrRNacODYEvDh2y96Eg64s9xXIYuZi+n29Vdo9wT0XDNoK29ernVUdZT7uepcHe3N+9DYauhXis04X+VYMDA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=wsCyFyhd; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from tr.lan (ip-86-49-120-218.bb.vodafone.cz [86.49.120.218])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id 8B14D87666;
+	Tue, 19 Mar 2024 05:21:11 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1710822072;
+	bh=oRy+2PBzu8Mn0QXSPx0fnRejhAqRzKthrztDSHhFpx4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=wsCyFyhdJbZ+sc+aLTm8B9CPeBxMbP230tjQ2ptH2nvkmEOpGrg1dn56+bGsn3SY/
+	 rNVLUy8cCedYaCYffojFZuJzIsD4B6MbsBeKZMYvz2zJc6Bh9MhFHOQ1JgJZTkHXTS
+	 OvyVyMpnII6V4kjf2QpCeikSVUeZFk/xBfErOiW1HO5yNlGSfJOEDauTDvP8JxXx0D
+	 hpSd5Mh0/MMJfvRaoJkPE/TE6i8oJ75VvP6ZRvqU42eCjmwSIJTvFKRXRJhPYHiJem
+	 /dNv6pwWRszSK0CPXLAb6Wjzmxjwoo8Xi6jyWBv9hTODwuwyB1rUdyyPwu3IyvOr1I
+	 Qlt5BzNmHEZBw==
+From: Marek Vasut <marex@denx.de>
+To: linux-bluetooth@vger.kernel.org
+Cc: Marek Vasut <marex@denx.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Linus Walleij <linus.walleij@linaro.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	devicetree@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH v2] dt-bindings: net: broadcom-bluetooth: Add CYW43439 DT binding
+Date: Tue, 19 Mar 2024 05:20:35 +0100
+Message-ID: <20240319042058.133885-1-marex@denx.de>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240311070550.7438-1-kerneljasonxing@gmail.com> <20240318201608.GC185808@kernel.org>
-In-Reply-To: <20240318201608.GC185808@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 19 Mar 2024 10:52:44 +0800
-Message-ID: <CAL+tcoCDs+0OJ3VE59KSyvvyzOxqf0SW-hojDeccwdB=PazwqA@mail.gmail.com>
-Subject: Re: [PATCH nf-next v2] netfilter: conntrack: avoid sending RST to
- reply out-of-window skb
-To: Simon Horman <horms@kernel.org>
-Cc: edumazet@google.com, pablo@netfilter.org, kadlec@netfilter.org, 
-	fw@strlen.de, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-Hello Simon,
+CYW43439 is a Wi-Fi + Bluetooth combo device from Infineon.
+The Bluetooth part is capable of Bluetooth 5.2 BR/EDR/LE .
+This chip is present e.g. on muRata 1YN module.
 
-On Tue, Mar 19, 2024 at 4:16=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
-te:
->
-> On Mon, Mar 11, 2024 at 03:05:50PM +0800, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Supposing we set DNAT policy converting a_port to b_port on the
-> > server at the beginning, the socket is set up by using 4-tuple:
-> >
-> > client_ip:client_port <--> server_ip:b_port
-> >
-> > Then, some strange skbs from client or gateway, say, out-of-window
-> > skbs are eventually sent to the server_ip:a_port (not b_port)
-> > in TCP layer due to netfilter clearing skb->_nfct value in
-> > nf_conntrack_in() function. Why? Because the tcp_in_window()
-> > considers the incoming skb as an invalid skb by returning
-> > NFCT_TCP_INVALID.
-> >
-> > At last, the TCP layer process the out-of-window
-> > skb (client_ip,client_port,server_ip,a_port) and try to look up
-> > such an socket in tcp_v4_rcv(), as we can see, it will fail for sure
-> > because the port is a_port not our expected b_port and then send
-> > back an RST to the client.
-> >
-> > The detailed call graphs go like this:
-> > 1)
-> > nf_conntrack_in()
-> >   -> nf_conntrack_handle_packet()
-> >     -> nf_conntrack_tcp_packet()
-> >       -> tcp_in_window() // tests if the skb is out-of-window
-> >       -> return -NF_ACCEPT;
-> >   -> skb->_nfct =3D 0; // if the above line returns a negative value
-> > 2)
-> > tcp_v4_rcv()
-> >   -> __inet_lookup_skb() // fails, then jump to no_tcp_socket
-> >   -> tcp_v4_send_reset()
-> >
-> > The moment the client receives the RST, it will drop. So the RST
-> > skb doesn't hurt the client (maybe hurt some gateway which cancels
-> > the session when filtering the RST without validating
-> > the sequence because of performance reason). Well, it doesn't
-> > matter. However, we can see many strange RST in flight.
-> >
-> > The key reason why I wrote this patch is that I don't think
-> > the behaviour is expected because the RFC 793 defines this
-> > case:
-> >
-> > "If the connection is in a synchronized state (ESTABLISHED,
-> >  FIN-WAIT-1, FIN-WAIT-2, CLOSE-WAIT, CLOSING, LAST-ACK, TIME-WAIT),
-> >  any unacceptable segment (out of window sequence number or
-> >  unacceptible acknowledgment number) must elicit only an empty
->
-> Not for those following along, it appears that RFC 793 does misspell
-> unacceptable as above. Perhaps spelling was different in 1981 :)
+Extend the binding with its DT compatible using fallback
+compatible string to "brcm,bcm4329-bt" which seems to be
+the oldest compatible device. This should also prevent the
+growth of compatible string tables in drivers. The existing
+block of compatible strings is retained.
 
-Thanks for the check. Yes, it did misspell that word. Should I correct
-that word in my quotation?
+Signed-off-by: Marek Vasut <marex@denx.de>
+---
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Conor Dooley <conor+dt@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+Cc: Linus Walleij <linus.walleij@linaro.org>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Rob Herring <robh@kernel.org>
+Cc: devicetree@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org
+Cc: netdev@vger.kernel.org
+---
+V2: - Introduce fallback compatible string
+    - Reword the second half of commit message to reflect that
+---
+ .../bindings/net/broadcom-bluetooth.yaml      | 33 +++++++++++--------
+ 1 file changed, 19 insertions(+), 14 deletions(-)
 
->
-> >  acknowledgment segment containing the current send-sequence number
-> >  and an acknowledgment..."
-> >
-> > I think, even we have set DNAT policy, it would be better if the
-> > whole process/behaviour adheres to the original TCP behaviour as
-> > default.
-> >
-> > Suggested-by: Florian Westphal <fw@strlen.de>
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
->
-> ...
+diff --git a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+index cc70b00c6ce57..4a1bfc2b35849 100644
+--- a/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
++++ b/Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+@@ -14,20 +14,25 @@ description:
+ 
+ properties:
+   compatible:
+-    enum:
+-      - brcm,bcm20702a1
+-      - brcm,bcm4329-bt
+-      - brcm,bcm4330-bt
+-      - brcm,bcm4334-bt
+-      - brcm,bcm43430a0-bt
+-      - brcm,bcm43430a1-bt
+-      - brcm,bcm43438-bt
+-      - brcm,bcm4345c5
+-      - brcm,bcm43540-bt
+-      - brcm,bcm4335a0
+-      - brcm,bcm4349-bt
+-      - cypress,cyw4373a0-bt
+-      - infineon,cyw55572-bt
++    oneOf:
++      - items:
++          - enum:
++              - infineon,cyw43439-bt
++          - const: brcm,bcm4329-bt
++      - enum:
++          - brcm,bcm20702a1
++          - brcm,bcm4329-bt
++          - brcm,bcm4330-bt
++          - brcm,bcm4334-bt
++          - brcm,bcm43430a0-bt
++          - brcm,bcm43430a1-bt
++          - brcm,bcm43438-bt
++          - brcm,bcm4345c5
++          - brcm,bcm43540-bt
++          - brcm,bcm4335a0
++          - brcm,bcm4349-bt
++          - cypress,cyw4373a0-bt
++          - infineon,cyw55572-bt
+ 
+   shutdown-gpios:
+     maxItems: 1
+-- 
+2.43.0
+
 
