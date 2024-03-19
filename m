@@ -1,178 +1,148 @@
-Return-Path: <netdev+bounces-80574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 286FE87FD8F
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:30:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 901FA87FD9C
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:32:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 942151F23663
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:30:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B42BB1C22333
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:32:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA43133981;
-	Tue, 19 Mar 2024 12:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DFD45474B;
+	Tue, 19 Mar 2024 12:31:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YGIbOdcC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KYbBmJma"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2731E1E4BF
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 12:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E188C38398
+	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 12:31:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710851436; cv=none; b=I4rAZCzUulZytBrjhXtf+GTYV8ODxvTmgopSibb3lf+vauvezvJ0idITUUikE0WZYCEKo0gGVC6OC6HFKYbdgutQUDWzTUa2dEIzIWogp6dnGRikicWBqe23SD0tA1Fxueci2k0IbkfVC5RB2IFzWfuZr//LLTNKKIdfA/EQkBE=
+	t=1710851512; cv=none; b=FtN6YKvJYZvck08i55gDLwnOJjNSqiRRZzrmOK+lHrXpIWjUhI2xryLi1wUq4+1TJ8P5eg0lWkIvAKfkFdwLGNlla4Ok9Rgivikh8HPeeD4JpoWQOp4RnrInQzANKzOSgkzYXL+WJtF8DiMkkHnyZjDBMaZMGiSXcz/8QJ0YSeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710851436; c=relaxed/simple;
-	bh=NuYxhdluYleWL4hPUjiEYWiMglYwHi6VwlRckDkov7o=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ThFXLFrqEN1lqiLOxSF+Csr5VEXwrOBR73nwH9JCg4IcJ98je9FBJgaCe/EWLpOli305vpuW9hVRlKV2ULieO6KnKb5mLpzusiaUKQqHRGjMMtCZoZVOPgq63aOK6xyLwIfc1vpuknXtlwyZCizpaK7oDXvoAmtmPkfBYXtsvZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YGIbOdcC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710851434;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=hk6fXodssFp8pxdmo3yTVAFcI2aHv/hJ/chEAC3UfVc=;
-	b=YGIbOdcCdGNOykT7rWfHsUuOFwULsjSGK0u3GbZ/RLo6iQDRTc55j2sT8X5adMKo4eN3K8
-	VPAmmLaQzrvTZS46vFK2n+OapqF+xeFqmalJbL6koxT4l8VcbbFFL9gTQCaaoHXqEAnIYM
-	Xrx1d+P8GNofopFTovotUlQ9yyr6Lus=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-569-9fG8Z4AtMNKdhwxKA9R0tQ-1; Tue, 19 Mar 2024 08:30:30 -0400
-X-MC-Unique: 9fG8Z4AtMNKdhwxKA9R0tQ-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-78356ddf3cfso89682285a.1
-        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 05:30:30 -0700 (PDT)
+	s=arc-20240116; t=1710851512; c=relaxed/simple;
+	bh=aUx48zrKCU0t82c5nuqGikm2QyAaCGYwVpEQjOvkHwA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cLDsHr4dDeyVxlTyEvY+sR8F046j4IEKC+k9SF4IVGfieCH7gH1d71iQyQKjTgsyyc4hmEcNgBitXyK+eeSHNxoUZEzTPfneGUasWom5A2btf0p/a3BpnRIscaJRK2d7P9sWjqDWPBQzz80DxIF65gSgoTP7/qX5PkXD5ERgbXU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KYbBmJma; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1dca3951ad9so35835235ad.3
+        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 05:31:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710851510; x=1711456310; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QxN5l6ceE50Lgv4vm7uUVT+0yFV3t20huG/NVIeOXAo=;
+        b=KYbBmJma0o0ZFXA1/VlvMs+Kv00983jclD6aq3FklEQcA7XAh9znnxSKOGh0cyd8G0
+         retRWAcgZSjWT/stuGC2P9RTXPsWK9P1sMhJ9sRX4MWr5O2rbS2+YnAtY+pt3dfqJv/T
+         jhyWKyWrrba6K+w93JAUFIIsXHK7AMd0mvYulKGGBS4v33gvb76m3osqTbd2kQqWZSug
+         w8mDYWhBgZo313sT89ctWk6VNpXM3wzG9SdlBMsSmXO/pR599wp3IkyLLyaw2KGNe+Ni
+         p8zNF+ioE5wdcTYRvXufk9kW7wlQ++CrXm3mcPNG7gQNDu2I1q5igTc0QKaXdMGbmW0b
+         SZow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710851430; x=1711456230;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
+        d=1e100.net; s=20230601; t=1710851510; x=1711456310;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
+         :to:content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hk6fXodssFp8pxdmo3yTVAFcI2aHv/hJ/chEAC3UfVc=;
-        b=QlIFVdYfDtNbFifq4hhO6CeDd30LV7NVkG4Fmnm8qv+6DvueYadkVZ83h256EqOoSb
-         Qp7tgfAVt8MIomYVLpoqgBQHG3OvPCoocomytzombexcvIKEg7PcwNXadNBCszB90sUD
-         iUSC8pqZzHOFnrIm1LgCcarzVRklxNDInrM4yRBKrBGXjjP3Prb1RfMB8tLAhLaoZ8z5
-         qsiKotfoEuNNBsi8McPs2PWNw6i4PTpY90UuPJpLd4EhwHHP3ShEXil6jWM3TsQ5r3Ge
-         RBKL+dgTEpbhlLym11qzmH10DEvLCbmCMvFuLuXr12jwOjoSYg3hzs6kfd2a+2gNVxOO
-         bPgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW0oP42jgff/T0LEGYyKIZI9/34t7D26C6HRg8lA4lpCq/aBiHzII04Y2Nd0Rt2qYsC0g39KwFe53r964GPTWc3b+oS4LmG
-X-Gm-Message-State: AOJu0YzwRTkFPocffmSEoKkJv1vlOjBzs2n8keC1TnqKAf0knNwAbXIQ
-	LLD13z+vevuSvQtOVtqBGQlFnLq2dibmNoaBmia2a6K1JTnEJbAPnBNcp4bMxET6lup6YGGfCis
-	2snAFH//FLaaPrmcpQ/H4YtB4LCMxohWjmL/xRH/rgRK7W4iTw86RXw==
-X-Received: by 2002:a05:620a:198c:b0:788:3a16:d8b5 with SMTP id bm12-20020a05620a198c00b007883a16d8b5mr14337958qkb.4.1710851430143;
-        Tue, 19 Mar 2024 05:30:30 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHd9RalBe1bNJtEB8MezogsCo3Vhxoc3LhemnSbnzLQ6LMNhvFa5LLiu3OB+VRxEYhPu6tgxA==
-X-Received: by 2002:a05:620a:198c:b0:788:3a16:d8b5 with SMTP id bm12-20020a05620a198c00b007883a16d8b5mr14337925qkb.4.1710851429706;
-        Tue, 19 Mar 2024 05:30:29 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-224-202.dyn.eolo.it. [146.241.224.202])
-        by smtp.gmail.com with ESMTPSA id y1-20020ae9f401000000b00789ed16d039sm3045072qkl.54.2024.03.19.05.30.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Mar 2024 05:30:29 -0700 (PDT)
-Message-ID: <9c63cf0c31792270026fc673334aa76f855eae35.camel@redhat.com>
-Subject: Re: [PATCH] net: Do not break out of sk_stream_wait_memory() with
- TIF_NOTIFY_SIGNAL
-From: Paolo Abeni <pabeni@redhat.com>
-To: Sascha Hauer <s.hauer@pengutronix.de>, netdev@vger.kernel.org
-Cc: kernel@pengutronix.de, linux-kernel@vger.kernel.org, Jens Axboe
-	 <axboe@kernel.dk>, io-uring@vger.kernel.org
-Date: Tue, 19 Mar 2024 13:30:26 +0100
-In-Reply-To: <ZfgtgwEM69VPJGs7@pengutronix.de>
-References: <20240315100159.3898944-1-s.hauer@pengutronix.de>
-	 <ZfgtgwEM69VPJGs7@pengutronix.de>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        bh=QxN5l6ceE50Lgv4vm7uUVT+0yFV3t20huG/NVIeOXAo=;
+        b=YBuzEAnSYoUUxtq2V2LDZPngR9r140oRPq7IOI5w6w1j1v/yqDLvNg26O4KGLV3K7T
+         dl5IgcFeuxCiM3R/s6d2CkJ1HddClbgSae8bHIQAL0wDF+YMUhWY1rY8UNb+oVlKir+S
+         zeMAurnpfnKWkxvC9UNLsoApenNymeEqAx6VgivqDa3/hm27skmH7owiBZAC7iHX1uWU
+         FbahhoVyvv+gxgoa7VQ1usA2z9HR2jOz/y7DhklcRBTWK7PjRcdatgluVVEIfuQEwMF5
+         JcbSRw3ro00XeSRuPn8/FU7lKSggv2nLQIAaWNJhVnstkuRTHpxb2hzjfc0474vUNW2R
+         j/Ng==
+X-Forwarded-Encrypted: i=1; AJvYcCXSjbSoHjDDFGnjgqfLSdvEkg6geDMUFdHxA3awhVVD+BK9lrmQreMnKmGzg9Li3V4bJm49En/Znm9YfzHUDVlPni953HRq
+X-Gm-Message-State: AOJu0Yy3RsiEm64ocHwWSAkkcjOQB8jCGoydkxS83B6pWmRgwO2d5MGR
+	WVrdceReQkaeDeu+ZguBGDlEM4R7Dtfp82Z9bE8DvpFnmpTZw/r2
+X-Google-Smtp-Source: AGHT+IGfkIptzNxGpOQkMF608I3+fhF5sC+G45TeMxLU2AwYPTmhDb/qpo61hXmN/MQE062uHfy7oA==
+X-Received: by 2002:a17:902:e94f:b0:1dc:7bc:d025 with SMTP id b15-20020a170902e94f00b001dc07bcd025mr3275088pll.4.1710851510014;
+        Tue, 19 Mar 2024 05:31:50 -0700 (PDT)
+Received: from [10.230.29.214] ([192.19.223.252])
+        by smtp.gmail.com with ESMTPSA id h20-20020a170902f7d400b001e0410bfcd5sm1701998plw.192.2024.03.19.05.31.47
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Mar 2024 05:31:49 -0700 (PDT)
+Message-ID: <522c63b5-1db0-4e18-9cf3-83bfeadf8c36@gmail.com>
+Date: Tue, 19 Mar 2024 05:31:46 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net: phy: don't resume device not in use
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>, Paolo Abeni <pabeni@redhat.com>
+Cc: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+References: <AM9PR04MB8506772CFCC05CE71C383A6AE2202@AM9PR04MB8506.eurprd04.prod.outlook.com>
+ <c5238a4e-b4b1-484a-87f3-ea942b6aa04a@lunn.ch>
+ <AM9PR04MB8506A1FC6679E96B34F21E94E2202@AM9PR04MB8506.eurprd04.prod.outlook.com>
+ <AM9PR04MB8506791F9A2A1EF4B33AAAF4E2282@AM9PR04MB8506.eurprd04.prod.outlook.com>
+ <5a27414c77ae0b0fc94981354fa6931031b3d6fc.camel@redhat.com>
+ <f6f62bef-5766-4fe1-a6f1-6f18d627737e@lunn.ch>
+From: Florian Fainelli <f.fainelli@gmail.com>
+Autocrypt: addr=f.fainelli@gmail.com; keydata=
+ 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
+ HGuUuzv+GKZ6nsysJw==
+In-Reply-To: <f6f62bef-5766-4fe1-a6f1-6f18d627737e@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, 2024-03-18 at 13:03 +0100, Sascha Hauer wrote:
-> Apologies, I have sent the wrong mail. Here is the mail I really wanted
-> to send, with answers to some of the questions Paolo raised the last
-> time I sent it.
->=20
-> -----------------------------------8<------------------------------
->=20
-> > From 566bb198546423c024cdebc50d0aade7ed638a40 Mon Sep 17 00:00:00 2001
-> From: Sascha Hauer <s.hauer@pengutronix.de>
-> Date: Mon, 23 Oct 2023 14:13:46 +0200
-> Subject: [PATCH v2] net: Do not break out of sk_stream_wait_memory() with=
- TIF_NOTIFY_SIGNAL
->=20
-> It can happen that a socket sends the remaining data at close() time.
-> With io_uring and KTLS it can happen that sk_stream_wait_memory() bails
-> out with -512 (-ERESTARTSYS) because TIF_NOTIFY_SIGNAL is set for the
-> current task. This flag has been set in io_req_normal_work_add() by
-> calling task_work_add().
->=20
-> It seems signal_pending() is too broad, so this patch replaces it with
-> task_sigpending(), thus ignoring the TIF_NOTIFY_SIGNAL flag.
->=20
-> A discussion of this issue can be found at
-> https://lore.kernel.org/20231010141932.GD3114228@pengutronix.de
->=20
-> Suggested-by: Jens Axboe <axboe@kernel.dk>
-> Fixes: 12db8b690010c ("entry: Add support for TIF_NOTIFY_SIGNAL")
-> Link: https://lore.kernel.org/r/20231023121346.4098160-1-s.hauer@pengutro=
-nix.de
-> Signed-off-by: Sascha Hauer <s.hauer@pengutronix.de>
-> ---
->=20
-> Changes since v1:
-> - only replace signal_pending() with task_sigpending() where we need it,
->   in sk_stream_wait_memory()
->=20
-> I'd like to pick up the discussion on this patch as it is still needed fo=
-r our
-> usecase. Paolo Abeni raised some concerns about this patch for which I di=
-dn't have
-> good answers. I am referencing them here again with an attempts to answer=
- them.
-> Jens, maybe you also have a few words here.
->=20
-> Paolo raised some concerns in
-> https://lore.kernel.org/all/e1e15554bfa5cfc8048d6074eedbc83c4d912c98.came=
-l@redhat.com/:
->=20
-> > To be more explicit: why this will not cause user-space driven
-> > connect() from missing relevant events?
->=20
-> Note I dropped the hunk in sk_stream_wait_connect() and
-> sk_stream_wait_close() in this version.
-> Userspace driven signals are still catched with task_sigpending() which
-> tests for TIF_SIGPENDING. signal_pending() will additionally check for
-> TIF_NOTIFY_SIGNAL which is exclusively used by task_work_add() to add
-> work to a task.
 
-It looks like even e.g. livepatch would set TIF_NOTIFY_SIGNAL, and
-ignoring it could break livepatch for any code waiting e.g. in
-tcp_sendmsg()?!?
 
-This change looks scary to me.
+On 3/19/2024 5:05 AM, Andrew Lunn wrote:
+>> Please note that the 'net-next' tree is closed for the merge window.
+>> You will have to repost in when the tree will re-open in a week or so.
+>>
+>> However this change could be suitable for the 'net' tree, if Andrew
+>> agrees. If, please re-sent targeting such tree and including a
+>> reasonable 'Fixes' tag.
+> 
+> This is the sort of change that i think it should only be in net-next.
+> Suspend/resume is complex and not tested too well. There is a chance
+> of regression with this change. So we should introduce it slowly.
 
-I think what Pavel is suggesting is to refactor the KTLS code to ensure
-all the writes are completed before releasing the last socket
-reference.
-
-I would second such suggestion.
-
-If really nothing else works, and this change is the only option, try
-to obtain an ack from kernel/signal.c maintainers.
-
-Thanks,
-
-Paolo
-
+Totally agree.
+-- 
+Florian
 
