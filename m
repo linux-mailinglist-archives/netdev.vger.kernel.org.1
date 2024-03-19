@@ -1,221 +1,178 @@
-Return-Path: <netdev+bounces-80618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABFE587FF79
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 15:23:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C862687FF87
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 15:26:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 553781F21C0E
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 14:23:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F2451C22AE3
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 14:26:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8281981754;
-	Tue, 19 Mar 2024 14:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 383F681AA3;
+	Tue, 19 Mar 2024 14:26:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pYBWP/LO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2133.outbound.protection.outlook.com [40.107.243.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6323781721;
-	Tue, 19 Mar 2024 14:23:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710858209; cv=none; b=LvcdfSr1RAkE+AIAQUYt9AlFe0XgZ8/vZljYLkjYlYVEBIErjcYd74bX+QDB9fldcKTNrsyYwfg+8U5gC6Wtan0ZuiWOO6Grc27uIJVcCpFJeOQNrDDaF7GN4pZmALrd5oFLA0X0Yo7aD8T3doiGH5H9cpuNpBVudikIOidCI4M=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710858209; c=relaxed/simple;
-	bh=Xmo2x6S5V7/NQhmCgDANew9z2mao2c7yl6NKCnwOGZQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t/uNy1GdFLg3+OtSXbWFjS9cKGADb9IGFbuaygI17fte583yxAPgi09+wYdf5xWApbnXIoxerKxZ67oTEcGGGjofVULyLe1CoxX6wDmcpABmQf9Ves1dI3AshOsmXrAg+74JtejgENMqfIZTB2wASVZ0zgcZqtUxmdbtn4ApY2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7976FC433F1;
-	Tue, 19 Mar 2024 14:23:27 +0000 (UTC)
-Date: Tue, 19 Mar 2024 10:25:49 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: <xu.xin16@zte.com.cn>
-Cc: <edumazet@google.com>, <davem@davemloft.net>, <mhiramat@kernel.org>,
- <dsahern@kernel.org>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
- <linux-trace-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
- <yang.yang29@zte.com.cn>, <he.peilin@zte.com.cn>, <liu.chun2@zte.com.cn>,
- <jiang.xuexin@zte.com.cn>, <zhang.yunkai@zte.com.cn>
-Subject: Re: [PATCH v2] net/ipv4: add tracepoint for icmp_send
-Message-ID: <20240319102549.7f7f6f53@gandalf.local.home>
-In-Reply-To: <202403192013525995034@zte.com.cn>
-References: <202403192013525995034@zte.com.cn>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19F963BBD4;
+	Tue, 19 Mar 2024 14:26:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.133
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710858368; cv=fail; b=swtwbFeq6gXP9X988X1ioAvLdwLz5mSpvyEQ5TxUIOboFTW/RkMpCAlsCT77UAsXCutM6NJyQup+yZNxXpOqKYVVK2F/ZXcoEBytQT51xYVxuF34nVDOG5an1m/DyWCUhgBg4vouGm8WCXpYUn3TTA8e7b43wv+FzC38w9sAekA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710858368; c=relaxed/simple;
+	bh=c1yHo/rslxZ4a7VM2c7tYsMh7HDymuoBYwYmdoTt96A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=DnGM3M2d8eSuFaPg/kFyRrRWvPqWOQdD0wQCHtI5hRb9L2RZJ9NQxBYqE72yHMLPvSo0V0SY0xHzmFQCoLTJHndCQSTXMBndFlTq+VlGt46DCb/s3j1L8ObpDuGcaX2JS6wqWY9JMc7k8Nx8VCOmOD9aATVmlpfrQhfOK7yNOy0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pYBWP/LO; arc=fail smtp.client-ip=40.107.243.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=D6Mnws2FRQbV35ljQbJS1DvzVhmAbxkGt9swco6p30H8xeeOsKGjJ8lPcqIyI6k3hVWhRHRQWcrn/ywIDjPR/jfz9wakjUT3jR8YOPuAOwnLDoWAWtDjkYa3upjqLCvW+dkQ4RgeVdFFOW+GcKu6V/hJqT7ErOfXt3Bn1ykKsI3VEGFe7R+J6qEVw35u4eHKoKJ0JhM5BO/uIxqLQ31+kXzQSAyVpBZcYVUTmGXx2mzSX6X9foHFV2RuYJM9QGhjJH4kzPDacHKqXda0YFIOSQ1dSKkS7Z6Hc7xGCoZsn1DGAKKgRaBdwHe1SQ18HOuJUmoABIMpILNK0rY7xxP6Dg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1Qn19pTdajoaYoKQKKj6XWFsvxA90ru+ajjkRxTc5Ys=;
+ b=BCzJqCxyTe3pt3wijK8Xh4NbjdVGBz17lDYiWSdMhf6/t2nDnVMzmUO3qsorXkFm+P/Oth9DitIDXCYF8vcUiEr+2FzTkrGMK68zydLCo6TKZ3NGqDiXRJRrOv+JePY2tf2EKjPVhpFgARYLVkwRx0WKgpetL5oZnzmWtmQvjgO/buZTRUxKjgGBXG9PZSB0Y4ACq6DtKqtmuTgulWXtgDVUtj2DcR2vduIfMx6wyXenHW5beJEf9v/GCYV66Sv7+UykkaaD70Y62aci6FNkB8WdjHYrEdOwY2yjJ5HV8bAdruN5E5v8K8F9XYESRum8NRiBd/tLC9Hxyh9UWcvcag==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1Qn19pTdajoaYoKQKKj6XWFsvxA90ru+ajjkRxTc5Ys=;
+ b=pYBWP/LOdf66LQxzii/SmTi1CS/7w86T++nNP0C52pdTv3sN9bYaTkcoDDuQ4eG3uP/xdzIgpPHBNJVeHIlvN/kiyJlOAnRPMy4vHeXoj/3Kn0vVsxngeswoLPBoUmSXb7uk3K0mni7OVbapN0eaG4SHYmwE3LTpLjwrakbvVWkeEh1UIUT3SMSbDkqyJPqR7lm5ekASUFEtKbO6Pu5a4W5OPaesfdMcMOOGPDwEtrgRfLwKOckSGg8bzp9CQ/aIUGFWq0rHu2NoJgP3/gY/urWCCS/quE6wtCjbjuz5smSuzDcZgSv1XjMt5+7Arbh9iUB6HrHnwLD5RIyEVphKzA==
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
+ by SA1PR12MB5640.namprd12.prod.outlook.com (2603:10b6:806:23e::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7362.36; Tue, 19 Mar
+ 2024 14:26:02 +0000
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::b93d:10a3:632:c543]) by CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::b93d:10a3:632:c543%4]) with mapi id 15.20.7386.025; Tue, 19 Mar 2024
+ 14:26:02 +0000
+Date: Tue, 19 Mar 2024 16:25:57 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [BUG] selftests/net: test_vxlan_mdb.sh: 84 out of 642 tests
+ [FAIL]
+Message-ID: <ZfmgdVUmy-DgNklu@shredder>
+References: <5bb50349-196d-4892-8ed2-f37543aa863f@alu.unizg.hr>
+ <Zfe2cGv_EWFAZXAJ@Laptop-X1>
+ <f005453c-c7cf-4e1d-b266-ffe1cf8fc79e@alu.unizg.hr>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f005453c-c7cf-4e1d-b266-ffe1cf8fc79e@alu.unizg.hr>
+X-ClientProxiedBy: LO4P123CA0532.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:2c5::14) To CY5PR12MB6179.namprd12.prod.outlook.com
+ (2603:10b6:930:24::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|SA1PR12MB5640:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	pSiVh5gLOpVhVGgd8IOft1GDfaEqZYLvjbGz2ZKMYKuFnbrbe2vxuzMjCcCG3ZVTuBtENGTawYYizFnaq+DLlF0DZosJg2b/loQZFQnTKW9y1X/ZaK8gbbUP2kV78y0aV6EcIg+TXyzB8LvJ8SSdf5VGAKKFoNitokIUgMhkhWQbyUfC9EDmMBvxZFnbhcidPr1e5Kidf52WTx1Dhthl3h2jftVDKbJOP4OEE947/5Fla7jJaQUug9fQwz6TBQmeTIhINNYX4UHwaKSjDw+/e5nRBE71Z/NxUvx4WI4kbCirMIW0XerXdcfH8oBxIaKGXQ4Slm/d/rF/udUjNvWXKCO/cKs4k7+kJy1qVocrNYCvcw3LDdtQU1ZePC/GMuZyaCrNKr6J75p3ClTGwKO8/BG5peo6wY1E/XrfRwD7G/IzT6mjDniAOWevebIjvCmPuw3xgAfDaBjeQ9eavwz0F9HN2ip6Sebzt1uMYSBSc5ByisreCgX6x3iCy2hIUzmzOwoEZwYKNwo9tl0YLjJI2xgr5SbJmbcBeLWIC5SgbuTyE4jEjZQFAdAvfjYSKnQrASuFpaflTmDJPUzvILQmN1IzybwtafXfay+cPB2aejnyqkT32taG7uUUFEqnTMhBQTId9ZlvN/m09HbnP11VFb3Mex/oIo5bNQfmnKQV1vc=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(7416005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?LMCppPAfgH8RQ0aBP9WZTas0SURrJ5As0osHByNW3XVHNrxZYO1SdzrQzCY0?=
+ =?us-ascii?Q?kMT71djVRc0YJbJY6JipXjgydWa/DGWgFsUv1F6ZwSxUSSIBuUPtHY8vl00t?=
+ =?us-ascii?Q?wYhvHQFYuI+2Vd9vCc0ODqlH9pSu03ta2RU+IVdABKo3JyGjUjiSZt5RImiW?=
+ =?us-ascii?Q?XAPp+/SByaWdCVl0KI1rLKHtyxrAoD3O7qorT7Dgh0EFfBwkYXGraBRsOnAF?=
+ =?us-ascii?Q?dArvcT1zxuyn/GDvFMNpTynMoHu2WyAGvo42Pmus+WmRMXLmvGAL/owtbvlQ?=
+ =?us-ascii?Q?4SNgVGzn7LqvrDay7RmKclYP9OdYv52NlypOTYoYr9nnazdGPIX4qnFhYVL3?=
+ =?us-ascii?Q?PY2gRIjlRhfPt6HmdlG8QMb08rQNf+BnzukbpBQx8sKxSahd/gKx+Y1udeCR?=
+ =?us-ascii?Q?vhv8bqb3JXTd1O3NawFyNU1V4iqeQQgMGecxW6PzhFSSorW1Iot5I6S/nUcG?=
+ =?us-ascii?Q?nkmT4JV1dH5RI7YuR1AiNB1FntvNou7zlazNsgv+fVakGK9sQ8eb0FDBP4oP?=
+ =?us-ascii?Q?tcmGOgScE5yV5apdNpYZwI1Wkz2ZliW9syj5uLD5evp42uxqqU359gyjxjeU?=
+ =?us-ascii?Q?6ep6qUeR8ptejh3lSGknSdD5G1wjSnLEE1pAhvBnqaHqztPGczbPrmxBkWIS?=
+ =?us-ascii?Q?WHrf5sT06eRXaaxEY01/00ACX2f+zlUaMnGp09/g2ZHf8/insl91aAyyTmV/?=
+ =?us-ascii?Q?KFeHZrb6SGTwRL2K+4NEFsaRP22bd6yn/aqBYLAXlucGLgA7xlNsRWNGl7hw?=
+ =?us-ascii?Q?nFRjVOJ00dvt+rW+1TaysNybExgth5dm9HLzPU1ZXyKBfbGVWXmv5oOnkbzv?=
+ =?us-ascii?Q?JqAS/7SQNce8Wjw36E0XtlvlXvBV/heTx2ScmlIKGO9fTyqJpmINgfeDu2JR?=
+ =?us-ascii?Q?GTcAf/o6oWv3ii6pDln5eI69IYBkFH8JHOAoV/axZXEBjQIqsTALEhZzN++p?=
+ =?us-ascii?Q?ytXxFGYuxwsU/s0Gh/jLDyW0o2z1noMxFolDLaMGNT5wqY9THRWqWoQMnR/c?=
+ =?us-ascii?Q?wQxxzsiVMzk/dRmjCu3ej4tExQ63c8OiSqtMRiRzJRjRwsNoXfzXRHKBWOk+?=
+ =?us-ascii?Q?+EMtFplkPEmCNySm7M/uaI2vlWwJZ9BWhfzb/lcrrf7Hpfszc5PWxev0neWA?=
+ =?us-ascii?Q?TkS4BCq64OLDqrgq/bDKkFrtM1FVGSp0iqQzaHUCLU/dIgOVTB8w1Y6+AABW?=
+ =?us-ascii?Q?QPnXzgwayM7RV7/5WWlTKTmUgYLi9pEtibhz3ATFMFhegS2Ouc9huJpX16dO?=
+ =?us-ascii?Q?vpoviNAixC91NNxys7KUevM5aqPYnDD/qMsz1Vf6rlrtaHH1zVgPKicOXY9K?=
+ =?us-ascii?Q?DUyngiL+QfVamc3gWyWx22B3wA9MnHzWChFPfnH33VUsyVs6gUxU3X+o56rl?=
+ =?us-ascii?Q?V5TnBCcI+LFVfSYuSKSZejFTSlvtqm3d4utNHJT1SFmnN13+DY+2U0pLKKwv?=
+ =?us-ascii?Q?4q0hfyYymdqYVpK1Bnc7DQGLd5IJFUEzNEfmDc1coGTfmdKv2J/7k9yBFVeX?=
+ =?us-ascii?Q?joqU/7S05badADdZPGV1o4/thvWlOm8+zRuDxkG+B91wAnjj6IoldP/sz87N?=
+ =?us-ascii?Q?48ExkKmcyME8nxlOnYcZuCM19XAOnjd1sXA0cjbg?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 75b2571d-eb41-40b4-8331-08dc482080d6
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2024 14:26:01.9064
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Xuirl9XAOkvlnvLmPAEN9RTb+WU0434hEPC52kNjAJ3BFvyBIL6rDX1hI4yd9NMvCvE4kD0NInjq0xfwgiZZpQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB5640
 
-On Tue, 19 Mar 2024 20:13:52 +0800 (CST)
-<xu.xin16@zte.com.cn> wrote:
+On Tue, Mar 19, 2024 at 06:05:16AM +0100, Mirsad Todorovac wrote:
+> On 3/18/24 04:35, Hangbin Liu wrote:
+> > On Sun, Mar 17, 2024 at 12:19:12AM +0100, Mirsad Todorovac wrote:
+> > > Hi,
+> > > 
+> > > While running kselftest on vanilla torvalds tree kernel commit v6.8-11167-g4438a810f396,
+> > > the test suite reported a number of errors.
+> > > 
+> > > I was using the latest iproute2-next suite on an Ubuntu 22.04 LTS box.
+> > > 
+> > > # Tests passed: 558
+> > > # Tests failed:  84
+> > > not ok 90 selftests: net: test_vxlan_mdb.sh # exit=1
+> > 
+> > FYI, I tested with 6.8 kernel with net tree. All passed.
+> > 
+> > Data path: MDB torture test - IPv6 overlay / IPv6 underlay
+> > ----------------------------------------------------------
+> > TEST: Torture test                                                  [ OK ]
+> > 
+> > Tests passed: 642
+> > Tests failed:   0
+> > 
+> > # uname -r
+> > 6.8.0-virtme
+> > 
+> > Thanks
+> > Hangbin
+> 
+> Hi, Hangbin,
+> 
+> I am running an Ubuntu 22.04 LTS configuration.
 
-> From: Peilin He<he.peilin@zte.com.cn>
-> 
-> Introduce a tracepoint for icmp_send, which can help users to get more
-> detail information conveniently when icmp abnormal events happen.
-> 
-> 1. Giving an usecase example:
-> =============================
-> When an application experiences packet loss due to an unreachable UDP
-> destination port, the kernel will send an exception message through the
-> icmp_send function. By adding a trace point for icmp_send, developers or
-> system administrators can obtain detailed information about the UDP
-> packet loss, including the type, code, source address, destination address,
-> source port, and destination port. This facilitates the trouble-shooting
-> of UDP packet loss issues especially for those network-service
-> applications.
-> 
-> 2. Operation Instructions:
-> ==========================
-> Switch to the tracing directory.
->         cd /sys/kernel/debug/tracing
+Didn't get your first mail for some reason. Anyway, it might be related
+to the fact that Ubuntu is using an old version of libnet:
 
-FYI, that directory is obsolete. Please always reference /sys/kernel/tracing.
+https://launchpad.net/ubuntu/+source/libnet
 
-> Filter for destination port unreachable.
->         echo "type==3 && code==3" > events/icmp/icmp_send/filter
-> Enable trace event.
->         echo 1 > events/icmp/icmp_send/enable
-> 
-> 3. Result View:
-> ================
->  udp_client_erro-11370   [002] ...s.12   124.728002:
->  icmp_send: icmp_send: type=3, code=3.
->  From 127.0.0.1:41895 to 127.0.0.1:6666 ulen=23
->  skbaddr=00000000589b167a
-> 
-> v1->v2:
-> Some fixes according to
-> https://lore.kernel.org/all/CANn89iL-y9e_VFpdw=sZtRnKRu_tnUwqHuFQTJvJsv-nz1xPDw@mail.gmail.com/
-> 	1. adjust the trace_icmp_send() to more protocols than UDP.
-> 	2. move the calling of trace_icmp_send after sanity checks
-> 	   in __icmp_send().
-> 
-> Signed-off-by: Peilin He<he.peilin@zte.com.cn>
-> Reviewed-by: xu xin <xu.xin16@zte.com.cn>
-> Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
-> Cc: Yang Yang <yang.yang29@zte.com.cn>
-> Cc: Liu Chun <liu.chun2@zte.com.cn>
-> Cc: Xuexin Jiang <jiang.xuexin@zte.com.cn>
-> ---
->  include/trace/events/icmp.h | 64 +++++++++++++++++++++++++++++++++++++++++++++
->  net/ipv4/icmp.c             |  4 +++
->  2 files changed, 68 insertions(+)
->  create mode 100644 include/trace/events/icmp.h
-> 
-> diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
-> new file mode 100644
-> index 000000000000..c3dc337be7bc
-> --- /dev/null
-> +++ b/include/trace/events/icmp.h
-> @@ -0,0 +1,64 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#undef TRACE_SYSTEM
-> +#define TRACE_SYSTEM icmp
-> +
-> +#if !defined(_TRACE_ICMP_H) || defined(TRACE_HEADER_MULTI_READ)
-> +#define _TRACE_ICMP_H
-> +
-> +#include <linux/icmp.h>
-> +#include <linux/tracepoint.h>
-> +
-> +TRACE_EVENT(icmp_send,
-> +
-> +		TP_PROTO(const struct sk_buff *skb, int type, int code),
-> +
-> +		TP_ARGS(skb, type, code),
-> +
-> +		TP_STRUCT__entry(
-> +			__field(__u16, sport)
-> +			__field(__u16, dport)
-> +			__field(int, type)
-> +			__field(int, code)
-> +			__array(__u8, saddr, 4)
-> +			__array(__u8, daddr, 4)
-> +                	__field(const void *, skbaddr)
-> +			__field(unsigned short, ulen)
+I remember fixing similar issues in the past:
 
-Note, to prevent holes, I usually suggest pointers and longs go first,
-followed by ints, and then end with char.
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=cb034948ac292da82cc0e6bc1340f81be36e117d
 
-                	__field(const void *, skbaddr)
-			__field(int, type)
-			__field(int, code)
-			__array(__u8, saddr, 4)
-			__array(__u8, daddr, 4)
-			__field(__u16, sport)
-			__field(__u16, dport)
-			__field(unsigned short, ulen)
-
--- Steve
-
-
-> +		),
-> +
-> +		TP_fast_assign(
-> +			struct iphdr *iph = ip_hdr(skb);
-> +			int proto_4 = iph->protocol;
-> +			__be32 *p32;
-> +
-> +			__entry->skbaddr = skb;
-> +			__entry->type = type;
-> +			__entry->code = code;
-> +
-> +			if (proto_4 == IPPROTO_UDP) {
-> +				struct udphdr *uh = udp_hdr(skb);
-> +				__entry->sport = ntohs(uh->source);
-> +				__entry->dport = ntohs(uh->dest);
-> +				__entry->ulen = ntohs(uh->len);
-> +			} else {
-> +				__entry->sport = 0;
-> +				__entry->dport = 0;
-> +				__entry->ulen = 0;
-> +			}
-> +
-> +			p32 = (__be32 *) __entry->saddr;
-> +			*p32 = iph->saddr;
-> +
-> +			p32 = (__be32 *) __entry->daddr;
-> +			*p32 = iph->daddr;
-> +		),
-> +
-> +		TP_printk("icmp_send: type=%d, code=%d. From %pI4:%u to %pI4:%u ulen=%d skbaddr=%p",
-> +			__entry->type, __entry->code,
-> +			__entry->saddr, __entry->sport, __entry->daddr,
-> +			__entry->dport, __entry->ulen, __entry->skbaddr)
-> +);
-> +
-> +#endif /* _TRACE_ICMP_H */
-> +
-> +/* This part must be outside protection */
-> +#include <trace/define_trace.h>
-> \ No newline at end of file
-> diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-> index e63a3bf99617..21fb41257fe9 100644
-> --- a/net/ipv4/icmp.c
-> +++ b/net/ipv4/icmp.c
-> @@ -92,6 +92,8 @@
->  #include <net/inet_common.h>
->  #include <net/ip_fib.h>
->  #include <net/l3mdev.h>
-> +#define CREATE_TRACE_POINTS
-> +#include <trace/events/icmp.h>
-> 
->  /*
->   *	Build xmit assembly blocks
-> @@ -672,6 +674,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
->  		}
->  	}
-> 
-> +	trace_icmp_send(skb_in, type, code);
-> +
->  	/* Needed by both icmp_global_allow and icmp_xmit_lock */
->  	local_bh_disable();
-> 
-
+Will look into it today or later this week.
 
