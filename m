@@ -1,143 +1,96 @@
-Return-Path: <netdev+bounces-80676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F998880512
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 19:47:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AB8988052D
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 19:57:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 105771F235F6
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 18:47:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0BA20B219D2
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 18:57:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E87139AC9;
-	Tue, 19 Mar 2024 18:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6911539AF9;
+	Tue, 19 Mar 2024 18:57:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uzgQA/Oh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="htL7sS/v"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3721038DC3;
-	Tue, 19 Mar 2024 18:46:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344A13A1A0;
+	Tue, 19 Mar 2024 18:57:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710874016; cv=none; b=PSML0mJrCO7D+jt4RgT7HAKLLsj4x9Nw2uXCkvDgvso1zhVtpq9ZCqKGOz3PVuSc0WtAOWcGDrc89HTlq2wxDwrUsH4zeuv3GgzH2llvvUG7K+oepL6ZTZngmQSqbqtXdMWULuqwDUXtUOlGDXJ/1eTrolVld6VUZKnQGIHFNFo=
+	t=1710874643; cv=none; b=eJxkz4/a8GgqqUJ193G8kOl4h1UxzbMm9ywhnGUtJN1ne8QZ/4PzpG2TrXD2IARpPvaww458hud2GrVKWElOeqhQoTQVMGB15rRro/xQrQUbp2j3ri1uS9QSxz2pCuJmne4AYCct0TTCXiCvEh3oLCC5qEYxNrjoOa0kaMWjORg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710874016; c=relaxed/simple;
-	bh=kCLTyFRMVvPPK2LGlEL+DICGBEMoPRX0K0T4yslSmFU=;
+	s=arc-20240116; t=1710874643; c=relaxed/simple;
+	bh=DohZWk5SdjMZAo5MvMKcWFKm/CihtRTRKj5i8fvpu/A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fCe2hxvk7+GdgiYfhvGD6uSe/G8h8YWisdLQQro2aOei4CuQNcrKiGeZMbMuGc/+gjJaJAIm2Pn1oYtJvnKGEJ3mPAvWCVf7XxP89Lw5YEj72lurUZEdP4jYP0Dzxf+UjHj3hm/XdbEqmYhKexMpSrczFIkuxoAl4EUnDPuJMD4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uzgQA/Oh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48F19C433F1;
-	Tue, 19 Mar 2024 18:46:53 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=m6faNXSyfiVl0ehLxzTWhxbkUSI1tQeq6LX6YJtBolyLcim8+Mb2/AEbgU5mvTvwueDEeorKjAFLgrCSOanqty4CWZIK5CHt4KPz7sEHke8Qooc+ixLfb/lmDxnnC/iLXYYA1dD2/Ym8FZDKrWlnWZbeGyDpiDXthDGz8OOFH30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=htL7sS/v; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11D0FC433C7;
+	Tue, 19 Mar 2024 18:57:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710874015;
-	bh=kCLTyFRMVvPPK2LGlEL+DICGBEMoPRX0K0T4yslSmFU=;
+	s=k20201202; t=1710874642;
+	bh=DohZWk5SdjMZAo5MvMKcWFKm/CihtRTRKj5i8fvpu/A=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=uzgQA/Ohe8DfGULywXncgYLnTQHHI8lJqBwvNml5ByyOvPVpql3nIukCH9KegK5IP
-	 rKN4Ar60nHD1vVG6QVnjljHv/+ZxcUYZLkXmnACl65MnOU1DVkpCSrSjrAJrJSzy3v
-	 S6LZxPPGCWJxgWphatS3XcjSxbX6bKT6QOCJ98HH0WYot+IPNwTRMYFaHvlHtZcTC6
-	 mVUPVmS/gEE2RxihTEjqMTg4AnkNK4CDcpSExd6Q5JaBW2K4BseRivZc/NZzxto8pd
-	 OLw/1pAMcCxdu2gyaxCI5/WFAPWaiefS+fCCpcVndG6zcpt3Ma3zjujtlkNC9P5reV
-	 AYbTSlQ9OL1hQ==
-Date: Tue, 19 Mar 2024 18:46:51 +0000
+	b=htL7sS/vHj8iZVyw0dlzwOo2Jwwqt0Vh1gs3NX6alrD/V7o9xavNBnsuqISHfJ4IO
+	 VY/dAJVm9DRVsYjRY+7pup1mnlrhHUIHAqAKNIU4tYb3MKgTP/V67X7Xacm3jqfdRw
+	 H4WColn29j5lMBALyUbviVFk9ZCtDnDnfBUfwmzLP6Bh5xqtuiA6Y0vL8MqCYnkNFV
+	 c6FxrJLK5+vLde9OoHV9x4QKmEwDdqMmEVxrrv6SKmc9pfxHD00qqIaGThhNNdTFjQ
+	 +Rc3fL6Q0LSCIotbuvDIvkbXpHfguqqc+zLWR/VzJur2xd3eGrL0dTCWWnSDbOuEFV
+	 nKJqbeuM34l9A==
+Date: Tue, 19 Mar 2024 18:57:18 +0000
 From: Simon Horman <horms@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: edumazet@google.com, pablo@netfilter.org, kadlec@netfilter.org,
-	fw@strlen.de, kuba@kernel.org, pabeni@redhat.com,
-	davem@davemloft.net, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH nf-next v2] netfilter: conntrack: avoid sending RST to
- reply out-of-window skb
-Message-ID: <20240319184651.GN185808@kernel.org>
-References: <20240311070550.7438-1-kerneljasonxing@gmail.com>
- <20240318201608.GC185808@kernel.org>
- <CAL+tcoCDs+0OJ3VE59KSyvvyzOxqf0SW-hojDeccwdB=PazwqA@mail.gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: linux-hardening@vger.kernel.org, Kees Cook <keescook@chromium.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Marco Elver <elver@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC kspp-next 3/3] idpf: sprinkle __counted_by{,_le}() in
+ the virtchnl2 header
+Message-ID: <20240319185718.GO185808@kernel.org>
+References: <20240318130354.2713265-1-aleksander.lobakin@intel.com>
+ <20240318130354.2713265-4-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAL+tcoCDs+0OJ3VE59KSyvvyzOxqf0SW-hojDeccwdB=PazwqA@mail.gmail.com>
+In-Reply-To: <20240318130354.2713265-4-aleksander.lobakin@intel.com>
 
-On Tue, Mar 19, 2024 at 10:52:44AM +0800, Jason Xing wrote:
-> Hello Simon,
+On Mon, Mar 18, 2024 at 02:03:54PM +0100, Alexander Lobakin wrote:
+> Both virtchnl2.h and its consumer idpf_virtchnl.c are very error-prone.
+> There are 10 structures with flexible arrays at the end, but 9 of them
+> has flex member counter in Little Endian.
+> Make the code a bit more robust by applying __counted_by_le() to those
+> 9. LE platforms is the main target for this driver, so they would
+> receive additional protection.
+> While we're here, add __counted_by() to virtchnl2_ptype::proto_id, as
+> its counter is `u8` regardless of the Endianness.
+> Compile test on x86_64 (LE) didn't reveal any new issues after applying
+> the attributes.
 > 
-> On Tue, Mar 19, 2024 at 4:16 AM Simon Horman <horms@kernel.org> wrote:
-> >
-> > On Mon, Mar 11, 2024 at 03:05:50PM +0800, Jason Xing wrote:
-> > > From: Jason Xing <kernelxing@tencent.com>
-> > >
-> > > Supposing we set DNAT policy converting a_port to b_port on the
-> > > server at the beginning, the socket is set up by using 4-tuple:
-> > >
-> > > client_ip:client_port <--> server_ip:b_port
-> > >
-> > > Then, some strange skbs from client or gateway, say, out-of-window
-> > > skbs are eventually sent to the server_ip:a_port (not b_port)
-> > > in TCP layer due to netfilter clearing skb->_nfct value in
-> > > nf_conntrack_in() function. Why? Because the tcp_in_window()
-> > > considers the incoming skb as an invalid skb by returning
-> > > NFCT_TCP_INVALID.
-> > >
-> > > At last, the TCP layer process the out-of-window
-> > > skb (client_ip,client_port,server_ip,a_port) and try to look up
-> > > such an socket in tcp_v4_rcv(), as we can see, it will fail for sure
-> > > because the port is a_port not our expected b_port and then send
-> > > back an RST to the client.
-> > >
-> > > The detailed call graphs go like this:
-> > > 1)
-> > > nf_conntrack_in()
-> > >   -> nf_conntrack_handle_packet()
-> > >     -> nf_conntrack_tcp_packet()
-> > >       -> tcp_in_window() // tests if the skb is out-of-window
-> > >       -> return -NF_ACCEPT;
-> > >   -> skb->_nfct = 0; // if the above line returns a negative value
-> > > 2)
-> > > tcp_v4_rcv()
-> > >   -> __inet_lookup_skb() // fails, then jump to no_tcp_socket
-> > >   -> tcp_v4_send_reset()
-> > >
-> > > The moment the client receives the RST, it will drop. So the RST
-> > > skb doesn't hurt the client (maybe hurt some gateway which cancels
-> > > the session when filtering the RST without validating
-> > > the sequence because of performance reason). Well, it doesn't
-> > > matter. However, we can see many strange RST in flight.
-> > >
-> > > The key reason why I wrote this patch is that I don't think
-> > > the behaviour is expected because the RFC 793 defines this
-> > > case:
-> > >
-> > > "If the connection is in a synchronized state (ESTABLISHED,
-> > >  FIN-WAIT-1, FIN-WAIT-2, CLOSE-WAIT, CLOSING, LAST-ACK, TIME-WAIT),
-> > >  any unacceptable segment (out of window sequence number or
-> > >  unacceptible acknowledgment number) must elicit only an empty
-> >
-> > Not for those following along, it appears that RFC 793 does misspell
-> > unacceptable as above. Perhaps spelling was different in 1981 :)
-> 
-> Thanks for the check. Yes, it did misspell that word. Should I correct
-> that word in my quotation?
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-No, I think you should keep the quote the same as the original text.
+Hi Alexander,
 
-> > >  acknowledgment segment containing the current send-sequence number
-> > >  and an acknowledgment..."
-> > >
-> > > I think, even we have set DNAT policy, it would be better if the
-> > > whole process/behaviour adheres to the original TCP behaviour as
-> > > default.
-> > >
-> > > Suggested-by: Florian Westphal <fw@strlen.de>
-> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> >
-> > ...
-> 
+with this patch applied ./scripts/kernel-doc -none reports the following.
+I think that this means that the kernel-doc needs to be taught
+about __counted_by_le (and __counted_by_be).
+
+.../virtchnl2.h:559: warning: Excess struct member 'chunks' description in 'virtchnl2_queue_reg_chunks'
+.../virtchnl2.h:707: warning: Excess struct member 'qinfo' description in 'virtchnl2_config_tx_queues'
+.../virtchnl2.h:786: warning: Excess struct member 'qinfo' description in 'virtchnl2_config_rx_queues'
+.../virtchnl2.h:872: warning: Excess struct member 'vchunks' description in 'virtchnl2_vector_chunks'
+.../virtchnl2.h:916: warning: Excess struct member 'lut' description in 'virtchnl2_rss_lut'
+.../virtchnl2.h:1108: warning: Excess struct member 'key_flex' description in 'virtchnl2_rss_key'
+.../virtchnl2.h:1199: warning: Excess struct member 'qv_maps' description in 'virtchnl2_queue_vector_maps'
+.../virtchnl2.h:1251: warning: Excess struct member 'mac_addr_list' description in 'virtchnl2_mac_addr_list'
+
+...
 
