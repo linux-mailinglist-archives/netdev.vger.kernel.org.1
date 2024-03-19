@@ -1,94 +1,134 @@
-Return-Path: <netdev+bounces-80622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90F0B87FFC8
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 15:40:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6624287FFE5
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 15:48:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ABADCB23418
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 14:40:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A2001C22A90
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 14:48:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 451C154273;
-	Tue, 19 Mar 2024 14:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFA01651BE;
+	Tue, 19 Mar 2024 14:48:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LCz5r99L"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XnyHI78T"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9D141A88;
-	Tue, 19 Mar 2024 14:40:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85574208B0
+	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 14:48:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710859228; cv=none; b=CoM6bPBK31h4GUddEJREt57NAj7RP7R9d7np5D+X9Hh3dy0Ft8aLnQt0fXAbbkEb3ns/ZndDPkmo7zvIsbGfi3sfz4q2mEGaSli83dscKkYsQt4p+NFtWSblt4SRILHlZDx8mbEZWUnZAnMBkE3h9vjbFQM/VMQ7MGJHvDhy9xg=
+	t=1710859688; cv=none; b=MIq2shl4guv1yqHfAeyfOBZcaqu2fMI6qt8HibMR1DU96ckDMmvE9KkP3eo13jYEVoM1yAEsEvSt1rNLurW3FKKpzleQW1hJxnpaoWFF+wfkMvTBle8+TiIH9VpC1hpuYC5Fda9PrnT4AunxsTty43vPUGZIc1dbq7w0XcE4erM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710859228; c=relaxed/simple;
-	bh=K687nVUSd4Nj8R+S1D9Gsc2gc3IuAiT6sst5UD96T8A=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=D0qXLZf9t9CmOs6vZbHc+2zR6e0DJ1UbEoSEg02OV3wvvcFqY9SB270F+Z9cAuI0eDbX9feK85Nz2x7x/iJ+Nsu6HIOjC5uH24Nu3UthPGVkQluaExKAr1/AwuZKH8gg4C6NRtQTv4r1cHBeSyd/Wr+D41IzT2WHg/C9D4zvewc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LCz5r99L; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8B2ACC43390;
-	Tue, 19 Mar 2024 14:40:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710859227;
-	bh=K687nVUSd4Nj8R+S1D9Gsc2gc3IuAiT6sst5UD96T8A=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LCz5r99LwElEuaoFYodizITyW3M8AfIvkGshmmxuEtjYml9viHUZiTVEMkD4I8e9y
-	 5J5owQKyhc1SIRthGI1jhxbu8axuf3ik0tYZX/J8T3amLZRNwTQ4Ngpk5fRUcBmqWo
-	 1GTdei2fVKg4MkyTcALr/L3C8Bkfvu83NaBA+gdshbyFbV37i++lIF7XNbUuXBHQ/D
-	 B2ZbOXDqyON+gmC+j++gZsRt/izjLQqGvRStltrtM1WtRQEKsRi4JrQAOwvYgG36EE
-	 SFp7k2qH0cJUmeYpfWLjglq3KdAaieLs1mutsB7TaPmO7CmYBboa76WsmvxR0BbN2G
-	 BfoPzJFvFSllg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 787ECD84BA6;
-	Tue, 19 Mar 2024 14:40:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1710859688; c=relaxed/simple;
+	bh=RlgzlVLtithqwcsBUwyF4k8tcSmUYR/TNIpOdEw5rIE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ZDvWgaN2/LZiXFSCE11XaKPxTpiO1rAOWdwFqfACqYY9lq5Hl5SbJeeWohN3NpiZ0k5MmhYjExUo/UBbFEfCtIzOdUsCHnuciAbYbFre1QlxACbhfFH9W1d/Rm9cmupntb4dDUJgyfesuojvjYPHGwp2N11AfM7fHesS5cp36Jk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XnyHI78T; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710859685;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=KXPueMTAfrzqtSn8q0w7M4HgneSXU9ihcQnMvmzCGDA=;
+	b=XnyHI78Tb7J3wCI3q0N9vONZQX+ZGAlbTFXHP/ELPieHXB/i/powbdQ+GTpgU7Wl0UFsUm
+	aIsGlinspnwUrKJr9Sj+TdBCd0ax+km86UAo4eMO37dWBo+/aR3O46MPy2IKYdrllNKPSh
+	wipLTiSz4doAAou734t7fJXpXHOcf+g=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-144-vyUOohz5Mzyb_AxcIYbxsw-1; Tue, 19 Mar 2024 10:48:03 -0400
+X-MC-Unique: vyUOohz5Mzyb_AxcIYbxsw-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33ec9bdcaa7so1125133f8f.0
+        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 07:48:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710859682; x=1711464482;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KXPueMTAfrzqtSn8q0w7M4HgneSXU9ihcQnMvmzCGDA=;
+        b=KBc0qVUm8TW6g9jb2HgHN5FkY/f8fAFXISBrz9ueMwtUUv2V9U+KxZM4eR8myBbP6q
+         ctLdNm/A4KpqNvsZBoiePzHURsuNb6IYDmHFGKD2prNFGhzyru3C9w7ItmBIAI+TKVi/
+         gRyB79H2cYmmyXmvDYLeZGNTmdImno+A8MTQ9iyzYdi1ZytNP/xlc7TAyR37/NTIirsN
+         5qHE5oeD5EBZ1oY7tjAokLu3Xv08hTqlGbc5ZmiClDdDBpJbIWHaPGYCpkDR/+j7A67S
+         nb5AqyHVbASLfCzbYf+QijFMum5DVBaB3ny2Wg+CoBYeiBSv49KTadnsc4jljY8s8Nz5
+         sGeg==
+X-Forwarded-Encrypted: i=1; AJvYcCXtIgf2YKJiHzvtOR/ABCd6+7+roPNs3/EKNBx44iYIGLEQ6kYoPD3td+XXc7kDx2NVoFJiaxbzyC2D4HR8DxAaCT0srNJt
+X-Gm-Message-State: AOJu0Yz+Y9iOi21TQ0JHsJbHjdXGNuVFDse1ty0B9vBjasoQHrD9xtBS
+	xy/4vCVA9ByayRcljBCxjgvvhQ7BecTf9NcrUDpgv6Pk1D8n9hcNyO8F5sHN4A17PmJR+gueNoB
+	LT9kmzKHqtVsAF9jT0WgG2PoUoGMtGCCK0zyf1+D4mBSW3oPddgq8QA==
+X-Received: by 2002:a05:6000:e46:b0:33e:1eea:33b1 with SMTP id dy6-20020a0560000e4600b0033e1eea33b1mr2145168wrb.4.1710859681840;
+        Tue, 19 Mar 2024 07:48:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHz2dLu6HF+ySitErEIQT0qJwRS1DuKvf2sqJYNB0vl9GeXVKc6QbNcabXWDj4lK/jLNv4pHA==
+X-Received: by 2002:a05:6000:e46:b0:33e:1eea:33b1 with SMTP id dy6-20020a0560000e4600b0033e1eea33b1mr2145156wrb.4.1710859681487;
+        Tue, 19 Mar 2024 07:48:01 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-224-202.dyn.eolo.it. [146.241.224.202])
+        by smtp.gmail.com with ESMTPSA id bo6-20020a056000068600b003418016b04csm3689253wrb.76.2024.03.19.07.47.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Mar 2024 07:48:00 -0700 (PDT)
+Message-ID: <5a1e45fd0bb89faa906866b7525210f4aaecab2e.camel@redhat.com>
+Subject: Re: [PATCH] net: always initialize sysctl ownership
+From: Paolo Abeni <pabeni@redhat.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>, linux@weissschuh.net
+Cc: davem@davemloft.net, dmitry.torokhov@gmail.com, ebiederm@xmission.com, 
+	edumazet@google.com, j.granados@samsung.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, mcgrof@kernel.org, netdev@vger.kernel.org
+Date: Tue, 19 Mar 2024 15:47:59 +0100
+In-Reply-To: <20240316003958.65385-1-kuniyu@amazon.com>
+References: <20240315-sysctl-net-ownership-v1-1-2b465555a292@weissschuh.net>
+	 <20240316003958.65385-1-kuniyu@amazon.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net/sched: Add module alias for sch_fq_pie
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171085922748.31413.797932865821608705.git-patchwork-notify@kernel.org>
-Date: Tue, 19 Mar 2024 14:40:27 +0000
-References: <20240315160210.8379-1-mkoutny@suse.com>
-In-Reply-To: <20240315160210.8379-1-mkoutny@suse.com>
-To: =?utf-8?b?TWljaGFsIEtvdXRuw70gPG1rb3V0bnlAc3VzZS5jb20+?=@codeaurora.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, jhs@mojatatu.com,
- xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 
-Hello:
+On Fri, 2024-03-15 at 17:39 -0700, Kuniyuki Iwashima wrote:
+> on Fri, 15 Mar 2024 17:20:31 +0100 Thomas Wei=C3=9Fschuh <linux@weissschu=
+h.net wrote:
+>=20
+> > diff --git a/net/sysctl_net.c b/net/sysctl_net.c
+> > index 051ed5f6fc93..03e320ddacc9 100644
+> > --- a/net/sysctl_net.c
+> > +++ b/net/sysctl_net.c
+> > @@ -62,12 +62,10 @@ static void net_ctl_set_ownership(struct ctl_table_=
+header *head,
+> >  	kgid_t ns_root_gid;
+> > =20
+> >  	ns_root_uid =3D make_kuid(net->user_ns, 0);
+> > -	if (uid_valid(ns_root_uid))
+> > -		*uid =3D ns_root_uid;
+> > +	*uid =3D uid_valid(ns_root_uid) ? ns_root_uid : GLOBAL_ROOT_UID;
+> > =20
+> >  	ns_root_gid =3D make_kgid(net->user_ns, 0);
+> > -	if (gid_valid(ns_root_gid))
+> > -		*gid =3D ns_root_gid;
+> > +	*gid =3D gid_valid(ns_root_gid) ? ns_root_gid : GLOBAL_ROOT_GID;
+> >  }
+>=20
+> How about setting the default in proc_sys_make_inode() instead ?
+> because the default value configured by new_inode() is not
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+I also think that could be a better option, as the caller is already
+providing default values in some cases.
 
-On Fri, 15 Mar 2024 17:02:10 +0100 you wrote:
-> The commit 2c15a5aee2f3 ("net/sched: Load modules via their alias")
-> starts loading modules via aliases and not canonical names. The new
-> aliases were added in commit 241a94abcf46 ("net/sched: Add module
-> aliases for cls_,sch_,act_ modules") via a Coccinele script.
-> 
-> sch_fq_pie.c is missing module.h header and thus Coccinele did not patch
-> it. Add the include and module alias manually, so that autoloading works
-> for sch_fq_pie too.
-> 
-> [...]
+Cheers,
 
-Here is the summary with links:
-  - net/sched: Add module alias for sch_fq_pie
-    https://git.kernel.org/netdev/net/c/9474c62ab65f
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Paolo
 
 
