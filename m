@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-80581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C67287FDD2
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:50:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC9B187FDD4
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:50:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E0EB1C22036
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:50:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9864A282699
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:50:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8F873FBA9;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2CC97FBCF;
 	Tue, 19 Mar 2024 12:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AXnRuOkA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rkn8Ybcu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A53ED7F7FE
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF8907FBB9
 	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 12:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710852629; cv=none; b=F0Np5gWS85vEaId9ryN2w8ISHN1zjkp6bilALOg1N7zsCqR3GXp8ceeGEcmdw2I3kUNt9vHubRrcw1yNw34VpbQBQwF8qCFVaKZB7GXD0HH96H3qqv51u8CjzHdZiCIEqywwimpxQ3fqekx/r/LPPjrgcf54PvDvI5/t8EzyrX0=
+	t=1710852629; cv=none; b=rEP6o2jy+KniXYqR5ZtMhb9fVCW7F+4gxCxuYcY6EnWcAPR5ecin/wGARYKNibU7mKxAfI1/VQyKjo/vZ2qPg3K2C996j68sfTWFWafhau6fPD6isvXNfp6ulhZjx2YYhh1slHqwMCBaAaImGEbvFWlUI4JGilCN1cPjf8pae0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1710852629; c=relaxed/simple;
-	bh=kt15eg20jl0wzbsU2OS3aToYEk7iBlPcGoN9BpUnc+U=;
+	bh=W5SOc2P/C0uZpermhfs+gHNpR+HxTClcTSQYz3W21To=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Oa7tr4CrbMtRmnKD5O1di4IzJPZnTQeAM8E6DXsumy0ovhwSpBqrSFpRV1KEAIOXHO1/OLxZffUDsvCwKt/m15dw+e0npyYBrUlD2s8+pGDK60W2ss4DTVS7JGqItxZ2mNtnhOh9fM3Nb2d/oyRdkBpy0bm2EDmdviqqBsHUYe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AXnRuOkA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 294CEC433F1;
+	 In-Reply-To:To:Cc; b=sITj9DB0Vz30efaTSii9MC881zi5GethKKbc/AOXZy/Ugsz0/VOt3ccjCCsvpUvlJyh6y1L3F8GEOK5cb+irqfFnY+JYJtNnhcNyyAAZ8jGVmWJKo6rHggiVbqXdaarvIzLNyVVrAnKYXwP/TCPVKxI05CZbFwUi/lvamUo5RKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rkn8Ybcu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 37B88C433B1;
 	Tue, 19 Mar 2024 12:50:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1710852629;
-	bh=kt15eg20jl0wzbsU2OS3aToYEk7iBlPcGoN9BpUnc+U=;
+	bh=W5SOc2P/C0uZpermhfs+gHNpR+HxTClcTSQYz3W21To=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=AXnRuOkAKZ14nHbArUPwAv5FppSm+BbjfGJ2hfBm7ali8K1wayTGjDTQSbr49R7i6
-	 tUBtl6qNqhJTSkS0qQXorz0o1gAr9rCdngsbO9z2VqNFpDTuzsmRGovPt1Lnbo15jK
-	 4ySQ9bg9oKF70t1busx4f1RK/SO03K0lk2HwKvR4z4rYtZNsZ5Q9VdxuV2q5xk2a5c
-	 KLItM6OFrXqVecVGaXjFI2c6xfaz7mEq+jpANRhdWV9xV2Gw4wtxuOrlrJkklMGtH0
-	 6wpyW40oDxspecYUzL+K4k61RwwqZRm20YrrYyxIHH+R9qTI3UrDUsNfcxlydu44o5
-	 Ew2pOoeb6pezg==
+	b=Rkn8YbcuAgIDIxAz2QObK53q9ZLK+IEHp71nmmyiBLFWR9xyj6n/yAWb8s+waN3Fy
+	 KRX1QSqyyoO26mukyt2B12M5EYv4ui9b5aRIsISpNFkEFXwq75LvBFuM3gMlgQIQLR
+	 GGCoyI1JmxBzN7L7U5XttCp9X8HJSDPXzfi4p+OkX1rnj6PKxUviCIz5JvKI5iJcIB
+	 aNQEtyh+pOfDFpzsz84QK46L8BgEp6FKdgQBsuNbTudQ5jTZVRtrXSdgXGiZZYFnz+
+	 tqYFuczfL+ktdnE+tZeURzsAl6sU2M0Q7ZrNSn7lmhuv45wdv1qEUWsnq8TTpVtIeM
+	 j22iUh7+0LyJA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1F678D982E0;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 29965D84BA6;
 	Tue, 19 Mar 2024 12:50:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,38 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] ipv4: raw: Fix sending packets from raw sockets via
- IPsec tunnels
+Subject: Re: [PATCH net v2] hsr: Handle failures in module init
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171085262912.28386.6970587324786695855.git-patchwork-notify@kernel.org>
+ <171085262916.28386.6365910600633708829.git-patchwork-notify@kernel.org>
 Date: Tue, 19 Mar 2024 12:50:29 +0000
-References: <c5d9a947-eb19-4164-ac99-468ea814ce20@strongswan.org>
-In-Reply-To: <c5d9a947-eb19-4164-ac99-468ea814ce20@strongswan.org>
-To: Tobias Brunner <tobias@strongswan.org>
-Cc: davem@davemloft.net, dsahern@kernel.org, netdev@vger.kernel.org,
- steffen.klassert@secunet.com, herbert@gondor.apana.org.au
+References: <3ce097c15e3f7ace98fc7fd9bcbf299f092e63d1.1710504184.git.fmaurer@redhat.com>
+In-Reply-To: <3ce097c15e3f7ace98fc7fd9bcbf299f092e63d1.1710504184.git.fmaurer@redhat.com>
+To: Felix Maurer <fmaurer@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, leitao@debian.org, dkirjanov@suse.de
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Fri, 15 Mar 2024 15:35:40 +0100 you wrote:
-> Since the referenced commit, the xfrm_inner_extract_output() function
-> uses the protocol field to determine the address family.  So not setting
-> it for IPv4 raw sockets meant that such packets couldn't be tunneled via
-> IPsec anymore.
+On Fri, 15 Mar 2024 13:04:52 +0100 you wrote:
+> A failure during registration of the netdev notifier was not handled at
+> all. A failure during netlink initialization did not unregister the netdev
+> notifier.
 > 
-> IPv6 raw sockets are not affected as they already set the protocol since
-> 9c9c9ad5fae7 ("ipv6: set skb->protocol on tcp, raw and ip6_append_data
-> genereated skbs").
+> Handle failures of netdev notifier registration and netlink initialization.
+> Both functions should only return negative values on failure and thereby
+> lead to the hsr module not being loaded.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] ipv4: raw: Fix sending packets from raw sockets via IPsec tunnels
-    https://git.kernel.org/netdev/net/c/c9b3b81716c5
+  - [net,v2] hsr: Handle failures in module init
+    https://git.kernel.org/netdev/net/c/3cf28cd49230
 
 You are awesome, thank you!
 -- 
