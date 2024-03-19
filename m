@@ -1,225 +1,126 @@
-Return-Path: <netdev+bounces-80572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80571-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D87A387FD7A
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:23:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B9B487FD72
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:20:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 517A71F22C36
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:23:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0250A1F22729
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E21C7F498;
-	Tue, 19 Mar 2024 12:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707007F48D;
+	Tue, 19 Mar 2024 12:20:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SbHqefuw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mxct.zte.com.cn (mxct.zte.com.cn [58.251.27.85])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E5907CF03;
-	Tue, 19 Mar 2024 12:22:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=58.251.27.85
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE037F469;
+	Tue, 19 Mar 2024 12:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710850981; cv=none; b=EADDZehyqJvo0tDoRi9px65FHMIufOHi92DCl53iJyI4KMVVWAKHmmu+5uPKl1oV/Upk4wsU9++spMbEJMHcJXwQIKRDQZ7jEg15kvlWaT3FZtxP8xk2COP+hnwkx0GqS0IV3u3B6N+Q2UjByd7AitsinmL59WsNWDM5Oif0zSE=
+	t=1710850829; cv=none; b=SJg46Jq2QP1sJ2QfiTBhnXOoz+9v79bJnprKApU5qRhPNRbRDdKvw0s5G459JwhbJXGeYBUXkjXOKmM3q3vbEDXLoHH+77jKCkO99VihpiHi4AE4yl1/ZWaLrvUSPAD75+nOdSTe0DxvfCkG7ngOiz63TKOAJU8fLeMfsmN7oCo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710850981; c=relaxed/simple;
-	bh=uCjFt+EN7lwVjnDEYYdMMqzK2Ho+1l7zaLyTOIID/uw=;
-	h=Date:Message-ID:Mime-Version:From:To:Cc:Subject:Content-Type; b=Mrw5YjkwP0hY1PIJ9IKjxJSydWalyOZ6UpZmVRjHksykOkSVkJPmvsVU5lSs5Ph40ptrk/yNZjYAfhC6OjE4WPDTkm8NryOW8Dq+Q6JF9PV0OgkRMp3ET97rIVb8oAtPBHDTf96V4HlhTFk71dNqOdp3shwZHiNkREDyA28jk9A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn; spf=pass smtp.mailfrom=zte.com.cn; arc=none smtp.client-ip=58.251.27.85
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=zte.com.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zte.com.cn
-Received: from mxde.zte.com.cn (unknown [10.35.20.121])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mxct.zte.com.cn (FangMail) with ESMTPS id 4TzVy92HcgzW8Z;
-	Tue, 19 Mar 2024 20:14:09 +0800 (CST)
-Received: from mxhk.zte.com.cn (unknown [192.168.250.138])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mxde.zte.com.cn (FangMail) with ESMTPS id 4TzVy41cP4zCPs3L;
-	Tue, 19 Mar 2024 20:14:04 +0800 (CST)
-Received: from mse-fl1.zte.com.cn (unknown [10.5.228.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mxhk.zte.com.cn (FangMail) with ESMTPS id 4TzVxv0qMxz4xPGL;
-	Tue, 19 Mar 2024 20:13:55 +0800 (CST)
-Received: from xaxapp03.zte.com.cn ([10.88.97.17])
-	by mse-fl1.zte.com.cn with SMTP id 42JCDnnN063621;
-	Tue, 19 Mar 2024 20:13:49 +0800 (+08)
-	(envelope-from xu.xin16@zte.com.cn)
-Received: from mapi (xaxapp03[null])
-	by mapi (Zmail) with MAPI id mid32;
-	Tue, 19 Mar 2024 20:13:52 +0800 (CST)
-Date: Tue, 19 Mar 2024 20:13:52 +0800 (CST)
-X-Zmail-TransId: 2afb65f98180ffffffffd4a-d0cf2
-X-Mailer: Zmail v1.0
-Message-ID: <202403192013525995034@zte.com.cn>
+	s=arc-20240116; t=1710850829; c=relaxed/simple;
+	bh=tNjc7nnylbSais8DsBZzrd94/93ipPvqn/Y1zZVH5cY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TeCIRmvRxJ+lMV/bhShrDULYigrKKVeOWUL15Hj7uE1hKK6b069oJNP3oMYVMWs4UKLz44C236euh930KF2HJXHN7+7ugK58yiK4QISzMYOlZYHe6G5yoU1WnP2frp0OoTEBSJHOP2c3TFgv39/usIzcTfCF6ZmNGsntGd7M+lA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SbHqefuw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83730C433F1;
+	Tue, 19 Mar 2024 12:20:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710850828;
+	bh=tNjc7nnylbSais8DsBZzrd94/93ipPvqn/Y1zZVH5cY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SbHqefuwZCTg0JhEXhmcav1tqE1RvW1qxgfFL3NcJMxJPjvFqXymUJMuM5zHZPQyH
+	 RpqEg6luMeCCical3TSfiYCfH13sfAD8yFcNsk51GavJpxfWumLcUBMKrf6sq6Eldf
+	 /9bX5L3dLu0QFgZ2565+JYS1Xjeo1f7GHysCEYqFj32ovCjs0jMxBVXrvJDPJVLvB8
+	 kP+xLED7mQkRw9KWRzyRfiu50/5WMhqSLooGP2y9osfNbxjUg/zA6/4X6uaKfQ+6cB
+	 skse6WaHo5ZIvL8Q5I3wNfbuaOpBOLOiV2SJuvn69xr90FmtJ15sohFbmZQPc/D9SP
+	 L+GFTTTCp1SwA==
+Date: Tue, 19 Mar 2024 12:20:24 +0000
+From: Simon Horman <horms@kernel.org>
+To: Erwan Velu <e.velu@criteo.com>
+Cc: Erwan Velu <erwanaliasr1@gmail.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 iwl-net] i40e: Prevent setting MTU if greater than MFS
+Message-ID: <20240319122024.GJ185808@kernel.org>
+References: <20240313090719.33627-2-e.velu@criteo.com>
+ <20240318174503.GE1623@kernel.org>
+ <d33b98de-dfc0-445e-bdd7-0ae76d050ed4@criteo.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-From: <xu.xin16@zte.com.cn>
-To: <edumazet@google.com>, <davem@davemloft.net>
-Cc: <rostedt@goodmis.org>, <mhiramat@kernel.org>, <dsahern@kernel.org>,
-        <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-trace-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <yang.yang29@zte.com.cn>, <xu.xin16@zte.com.cn>,
-        <he.peilin@zte.com.cn>, <liu.chun2@zte.com.cn>,
-        <jiang.xuexin@zte.com.cn>, <zhang.yunkai@zte.com.cn>
-Subject: =?UTF-8?B?W1BBVENIIHYyXSBuZXQvaXB2NDogYWRkIHRyYWNlcG9pbnQgZm9yIGljbXBfc2VuZA==?=
-Content-Type: text/plain;
-	charset="UTF-8"
-X-MAIL:mse-fl1.zte.com.cn 42JCDnnN063621
-X-Fangmail-Gw-Spam-Type: 0
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 65F98190.000/4TzVy92HcgzW8Z
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <d33b98de-dfc0-445e-bdd7-0ae76d050ed4@criteo.com>
 
-From: Peilin He<he.peilin@zte.com.cn>
+On Tue, Mar 19, 2024 at 12:38:03PM +0100, Erwan Velu wrote:
+> 
+> Le 18/03/2024 à 18:45, Simon Horman a écrit :
+> > [...]
+> > Hi Erwan, all,
+> > 
+> > As a fix, I think this patch warrants a fixes tag.
+> > Perhaps this one is appropriate?
+> > 
+> > Fixes: 41c445ff0f48 ("i40e: main driver core")
+> 
+> Simon
+> 
+> Isn't that a bit too generic ?
 
-Introduce a tracepoint for icmp_send, which can help users to get more
-detail information conveniently when icmp abnormal events happen.
+Yes, maybe it is.
+What we would be after is the first commit where the
+user can hit the problem the patch addresses.
 
-1. Giving an usecase example:
-=============================
-When an application experiences packet loss due to an unreachable UDP
-destination port, the kernel will send an exception message through the
-icmp_send function. By adding a trace point for icmp_send, developers or
-system administrators can obtain detailed information about the UDP
-packet loss, including the type, code, source address, destination address,
-source port, and destination port. This facilitates the trouble-shooting
-of UDP packet loss issues especially for those network-service
-applications.
+> [..]
+> 
+> > I am fine with this patch, so please take what follows as a suggestion
+> > for improvement, possibly as a follow-up. Not as a hard requirement from
+> > my side.
+> > 
+> > The part of this function between the two hunks of this patch is:
+> > 
+> >                  netdev_err(netdev, "Error changing mtu to %d, Max is %d\n",
+> >                             new_mtu, frame_size - I40E_PACKET_HDR_PAD);
+> > 
+> > My reading is that with this patch two different limits are
+> > checked wrt maximum MTU size:
+> > 
+> > 1. A VSI level limit, which relates to RX buffer size
+> > 2. A PHY level limit that relates to the MFS
+> > 
+> > That seems fine to me. But the log message for 1 (above) does
+> > not seem particularly informative wrt which limit has been exceeded.
+> 
+> I got some comments around this.
+> 
+> I wanted to keep my patch being focused on the mfs issue, but I can offer a
+> patch to get a similar output for this. What WRT stands for ?
+> 
+> 
+> I wanted also to make another patch for this :
+> 
+> dev_warn(&pdev->dev, "MFS for port %x has been set below the default:
+> %x\n",pf->hw.port, val);
+> 
+> The MFS reported as hex without a "0x" prefix is very misleading, I can
+> offer a patch for this too.
 
-2. Operation Instructions:
-==========================
-Switch to the tracing directory.
-        cd /sys/kernel/debug/tracing
-Filter for destination port unreachable.
-        echo "type==3 && code==3" > events/icmp/icmp_send/filter
-Enable trace event.
-        echo 1 > events/icmp/icmp_send/enable
+FWIIW, I think handling these questions in follow-up patches is fine.
 
-3. Result View:
-================
- udp_client_erro-11370   [002] ...s.12   124.728002:
- icmp_send: icmp_send: type=3, code=3.
- From 127.0.0.1:41895 to 127.0.0.1:6666 ulen=23
- skbaddr=00000000589b167a
-
-v1->v2:
-Some fixes according to
-https://lore.kernel.org/all/CANn89iL-y9e_VFpdw=sZtRnKRu_tnUwqHuFQTJvJsv-nz1xPDw@mail.gmail.com/
-	1. adjust the trace_icmp_send() to more protocols than UDP.
-	2. move the calling of trace_icmp_send after sanity checks
-	   in __icmp_send().
-
-Signed-off-by: Peilin He<he.peilin@zte.com.cn>
-Reviewed-by: xu xin <xu.xin16@zte.com.cn>
-Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
-Cc: Yang Yang <yang.yang29@zte.com.cn>
-Cc: Liu Chun <liu.chun2@zte.com.cn>
-Cc: Xuexin Jiang <jiang.xuexin@zte.com.cn>
----
- include/trace/events/icmp.h | 64 +++++++++++++++++++++++++++++++++++++++++++++
- net/ipv4/icmp.c             |  4 +++
- 2 files changed, 68 insertions(+)
- create mode 100644 include/trace/events/icmp.h
-
-diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
-new file mode 100644
-index 000000000000..c3dc337be7bc
---- /dev/null
-+++ b/include/trace/events/icmp.h
-@@ -0,0 +1,64 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM icmp
-+
-+#if !defined(_TRACE_ICMP_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_ICMP_H
-+
-+#include <linux/icmp.h>
-+#include <linux/tracepoint.h>
-+
-+TRACE_EVENT(icmp_send,
-+
-+		TP_PROTO(const struct sk_buff *skb, int type, int code),
-+
-+		TP_ARGS(skb, type, code),
-+
-+		TP_STRUCT__entry(
-+			__field(__u16, sport)
-+			__field(__u16, dport)
-+			__field(int, type)
-+			__field(int, code)
-+			__array(__u8, saddr, 4)
-+			__array(__u8, daddr, 4)
-+                	__field(const void *, skbaddr)
-+			__field(unsigned short, ulen)
-+		),
-+
-+		TP_fast_assign(
-+			struct iphdr *iph = ip_hdr(skb);
-+			int proto_4 = iph->protocol;
-+			__be32 *p32;
-+
-+			__entry->skbaddr = skb;
-+			__entry->type = type;
-+			__entry->code = code;
-+
-+			if (proto_4 == IPPROTO_UDP) {
-+				struct udphdr *uh = udp_hdr(skb);
-+				__entry->sport = ntohs(uh->source);
-+				__entry->dport = ntohs(uh->dest);
-+				__entry->ulen = ntohs(uh->len);
-+			} else {
-+				__entry->sport = 0;
-+				__entry->dport = 0;
-+				__entry->ulen = 0;
-+			}
-+
-+			p32 = (__be32 *) __entry->saddr;
-+			*p32 = iph->saddr;
-+
-+			p32 = (__be32 *) __entry->daddr;
-+			*p32 = iph->daddr;
-+		),
-+
-+		TP_printk("icmp_send: type=%d, code=%d. From %pI4:%u to %pI4:%u ulen=%d skbaddr=%p",
-+			__entry->type, __entry->code,
-+			__entry->saddr, __entry->sport, __entry->daddr,
-+			__entry->dport, __entry->ulen, __entry->skbaddr)
-+);
-+
-+#endif /* _TRACE_ICMP_H */
-+
-+/* This part must be outside protection */
-+#include <trace/define_trace.h>
-\ No newline at end of file
-diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
-index e63a3bf99617..21fb41257fe9 100644
---- a/net/ipv4/icmp.c
-+++ b/net/ipv4/icmp.c
-@@ -92,6 +92,8 @@
- #include <net/inet_common.h>
- #include <net/ip_fib.h>
- #include <net/l3mdev.h>
-+#define CREATE_TRACE_POINTS
-+#include <trace/events/icmp.h>
-
- /*
-  *	Build xmit assembly blocks
-@@ -672,6 +674,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
- 		}
- 	}
-
-+	trace_icmp_send(skb_in, type, code);
-+
- 	/* Needed by both icmp_global_allow and icmp_xmit_lock */
- 	local_bh_disable();
-
--- 
-2.15.2
 
