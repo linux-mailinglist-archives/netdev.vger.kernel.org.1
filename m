@@ -1,87 +1,192 @@
-Return-Path: <netdev+bounces-80566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B03987FCFE
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:36:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DB7787FD11
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:42:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3B321F22C71
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 11:36:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C115B1C21B0C
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 11:42:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 647337EEF0;
-	Tue, 19 Mar 2024 11:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 670A87EF12;
+	Tue, 19 Mar 2024 11:42:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lzIHfCf/"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HJ1i+JWp"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F4453E09
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 11:36:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710848213; cv=none; b=ECUgNFlQC0xRfGcAMw88+afSUmocjH4Hg9TYavz+LxqNsoCViUEuUauC7xGDjHrF4kN4x1Y01zJOnI2uCMbuaXG73mSW54IEZpZ0i2lxffta6D8SowZNmMuXbBroNtMQdM0e3LXhQWTxTsbb7Vho7Yebp5rpNs7gQoMSr5GpxQg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710848213; c=relaxed/simple;
-	bh=6+wCK+ovT17KkvKndAS+QtxFK5cQkQusDV9tIeTnBSc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K+yD2l2r7zt1QA2fwMgc6q8/+qg+MtUdYLaRt1rA28+ox7yNE5DuH/H64rY3GB3Mfo7Uk9Lt2JoSL+A52+Z9T5EsBZ9XK19qVYOvoEPSLGK2e6+3riPpuQCyH+mzYFjG2utWOdYszhVoM9OnFHlHVeBqHC+BvI0f8jRf+cGEPTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lzIHfCf/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 922E8C433C7;
-	Tue, 19 Mar 2024 11:36:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710848212;
-	bh=6+wCK+ovT17KkvKndAS+QtxFK5cQkQusDV9tIeTnBSc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lzIHfCf/Y3AubpqAhxj3EHKJa3//OTapYMMAZ+DnxzxEay52ewrs0WKIX/yQMtHCS
-	 aUZES6NoSJtAn1yVLTp4/YrM53WHuu0nNZ0XN7wabzDT5ykxJP+nfodBv5sPEhsMrF
-	 8fIQCgFKiKDPrCgm7CjOWkyfK3/5Lhc/yPhwaIx16yao3q3ut4i5vRZcaETjMhmaLH
-	 aT971ZzOccqZ7NnYSE6iv8wblsOet6kR25KyfnIoiWlFieh7LlPysf3yc2/DOxo5O+
-	 8hqddHe7qYmoHj1aol10mvA/64TY37Ohw2qfUTcgvcu6Pst1krbJtFMXy3IXOdnFTx
-	 pWTWLuA9qL3+Q==
-Date: Tue, 19 Mar 2024 11:36:49 +0000
-From: Simon Horman <horms@kernel.org>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>
-Subject: Re: [iwl-net v1 1/2] ice: tc: check src_vsi in case of traffic from
- VF
-Message-ID: <20240319113649.GG185808@kernel.org>
-References: <20240315110821.511321-1-michal.swiatkowski@linux.intel.com>
- <20240315110821.511321-2-michal.swiatkowski@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F047A1CD13
+	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 11:42:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710848528; cv=fail; b=eETyxZRshLf7GXlcgxm3OJpjCvXMX3992kpdjAIoSPV0sSR0CGJNVqQiekZ3aCoMftMIkWbfGq4yHB5h9hArmVy+aj0oMfP3kJLFGhjfPjAfHe4U5LYKkWCTwTCN3naWMVb0FK5blrICi9I3f+uMZFjaS0E+TyVDYtFwRQbiIWM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710848528; c=relaxed/simple;
+	bh=WmFApWByayeSIWVqoBt9rbBIRMHks55EEWOAK98Os2Q=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=df/+p6/vJnmjrDNPmJ5V/wwzKwN5NP5yfP1098rtiWIom1C1u8lU3zdNVgAML1ZZHx8XsGg+cfGqMivkbJSUr1eaX1SDIc+LOTD+xrIKpZ6fnEe6YgloY+0jso03nu7Flyw6gocfyQlAX+ogWklWAy+UVcMsoFnsIkMdiWwCNwY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HJ1i+JWp; arc=fail smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710848526; x=1742384526;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=WmFApWByayeSIWVqoBt9rbBIRMHks55EEWOAK98Os2Q=;
+  b=HJ1i+JWp6tJqU7ATvMJ390PlBopnHx8Q1FXygQnpneFPORPr0ULz1uKN
+   p8IOxppBglNry7KFwLRafe6u7lMx4ZqM26drkxKBa1YFcIXoDmCYJ90q/
+   uV2Yq91qRVQ30H9yDPLvya9MB2QU61jjJN1h69moh6qEnvMgYfbwsG3HD
+   +yS57nYDxPgJmZG6mDoxa1c+HADLhPtgOrVJVbc+ISS5bXiQZa7GHQr2r
+   cFtsLTUz4WdMFmN7Sy/70+dGC0xUNPhV4BxVMopvDXtvynfZY3Flr3K9U
+   lOETLKpa9gGIaGxM1UcRvmY94TOtcLQabINme31ECcmgXDq2PuXlcNKqC
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11017"; a="5923067"
+X-IronPort-AV: E=Sophos;i="6.07,136,1708416000"; 
+   d="scan'208";a="5923067"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2024 04:42:05 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,136,1708416000"; 
+   d="scan'208";a="14236814"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 19 Mar 2024 04:42:04 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 19 Mar 2024 04:42:03 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 19 Mar 2024 04:42:03 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.168)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 19 Mar 2024 04:42:03 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=DoglZf8mhzlpJD8DxB9TRXYiKIFaRq9Xbzt04O8yW2Q9W+M5fG+JJcMBLj0xZe7Y+CBoDATpy0wFtvXp1f1TFuEYXYBe1Ep51YbJBMeVAIp95tx0JDXhxqSj+xsAAbfyR+uqxLImvHmEulSO4dVgrrH95A4ynr8RGD70yLaGpqLMyUz58ai6wGZPw8buaz5Dqikzj9PohrXKhbUL57q9j6+Q6Ldqe2uqrqa04bFxAe5mgkbo71ENfpD2dEvv5aCFqXF5AIlHWm6VN3MPFDfYRr3U7SUfoQo2Zb3xaLeUJzBbIeOpKxlfldwuoUhcmbRGS7JtU272WuJJOE5uCAd/6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TZK2PbzHtpJ6hs6SdrzTBRquvrhx/3Ux2muvrL+KBGA=;
+ b=d/ax9X+QRviAlEmrrqsBhV5PvK1Zk4zksbOqXx3w/oQf56o3bcJynPy4NvXFCriBSrRQp5TwwRGNSkfy/Q0coq3MluL3vSkmm3xqcsZ6Wrg7CL8UJJ3HHflG1fXWklugQSDG3RtoRXh0jP/H8njjhiYMFYBCq8HBCsluCL0WEVOOBoWPWF2YgOdB9//xe5yweO0Fh0Ar1jCqUsQrdXFBK+lTtcRBlYdfF8KWdlJKWMwSW0ECXw8/47J+Oief7KJJqpTcSwZ+lsKvhjn0ybmfONM6XmLi3y/JDvr1M8mRqOYMX3Bjl2VRBB3hlZYUZHmJMFebPyHyHSJTlY69nHJU9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BL1PR11MB5399.namprd11.prod.outlook.com (2603:10b6:208:318::12)
+ by MW4PR11MB5935.namprd11.prod.outlook.com (2603:10b6:303:18a::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.10; Tue, 19 Mar
+ 2024 11:42:01 +0000
+Received: from BL1PR11MB5399.namprd11.prod.outlook.com
+ ([fe80::b3ae:22db:87f1:2b57]) by BL1PR11MB5399.namprd11.prod.outlook.com
+ ([fe80::b3ae:22db:87f1:2b57%6]) with mapi id 15.20.7409.008; Tue, 19 Mar 2024
+ 11:42:01 +0000
+Message-ID: <e5d306a9-d44e-442e-bd9c-34cc272b78cd@intel.com>
+Date: Tue, 19 Mar 2024 12:41:57 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-next v7 1/6] devlink: extend
+ devlink_param *set pointer
+To: Simon Horman <horms@kernel.org>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<anthony.l.nguyen@intel.com>, <kuba@kernel.org>, <jiri@resnulli.us>,
+	<przemyslaw.kitszel@intel.com>, <andrew@lunn.ch>, <victor.raj@intel.com>,
+	<michal.wilczynski@intel.com>, <lukasz.czapnik@intel.com>, Jiri Pirko
+	<jiri@nvidia.com>
+References: <20240308113919.11787-1-mateusz.polchlopek@intel.com>
+ <20240308113919.11787-2-mateusz.polchlopek@intel.com>
+ <20240318200218.GB185808@kernel.org>
+Content-Language: pl
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Organization: Intel
+In-Reply-To: <20240318200218.GB185808@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA2P291CA0025.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1f::6) To BL1PR11MB5399.namprd11.prod.outlook.com
+ (2603:10b6:208:318::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240315110821.511321-2-michal.swiatkowski@linux.intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR11MB5399:EE_|MW4PR11MB5935:EE_
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: jPPT+1sfaTQ3t2G9JZcRI2yMhyvhQsfnivyHx7707Q7NFBZcxZ2EI+UWks8GxwgY+ukq157YSe8nOntIF74r4OSV0rXeXj1KEsVsfPeCwDW3g7VmcdH+sQZtFF4IA51RjtuHK9rztxSjiSbaHdeMMg7YXRFSzgtwk7ZHBKxeDr+4mHconNnczZ038bVEuK7oEzVbjX0Xo/KDzOE+NfbqwBiAugLkonVoBVjB7TDBtiMjpLksD16ONKZxkpLMS2GsEBHtToOLR77JajNkw9jkW0RuxMFA43ttWIsSh2w96rm+dMR9zsUVot6SUSKyZTlE3tu/HmlQGPrieQpwO3Y/UCGriizNETd1LCUz88wgOrtSZFuxw6kDXbL09JanXolgd/sp10H05nmKgyC6SwdWUvzsJobNyJclhWiloAyKGjP2vqmbFJhuf6mjYJYzi4gKGEK0OsptBkmO4o1NmiXelIdJL2rOqaTXQrHY8vyXqyghUDKILchzDj7eo7GvXri6t5ZIEKW7sNnNSch7cokcelWwTV/lY5zke0IlTeRAIZXZ3aFCRJFE7CY2/+DUJCxSen9bOYD0kCEV2zLr0veeQ0cl0/z0CbuqtedEARzmhQNFNgAPHzvRA91Bnj0pKKSofDGR/1pxKHNsxmTpcVMbRdBvnJ0XhZXnHsHugNJQRJA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5399.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?RURxREVPYTh5MU1oZHF5RXhiaHd1YjFqQ3o4LzVpdG5NU0JzWUVOY25Jb25o?=
+ =?utf-8?B?NDlCbkFxNUJ5QVRPN3V3TDF5Q0Jla1oxZm1JTGNDaU14MTNveDBaeERIN2J5?=
+ =?utf-8?B?RGhtUFRWSkF4bkhYUEhkbG5aL25BSTI1QTZTN1I3RDd2SFhINkJhQndpNVV0?=
+ =?utf-8?B?WTNhU2gzcmdtVG5VT3p6UGhveHU4NmxYUDJDMGZnRFdQWHl5eUZjU21pU25D?=
+ =?utf-8?B?dG1tcWVSZ0QxeGlGUVdwQnl6aGYyNm1kVTdCbTZlSnZaTTZxSEJ0R1VjSS9x?=
+ =?utf-8?B?OTloQUNoeXNTNWZiV2o1eXBxVmNsUkJSa0xYZi93MFhqOGJTMjcwbjNVSGdT?=
+ =?utf-8?B?cjZnWEg1UVBqWkZUeElJc2FEUzA4eWhhZytUS2lYMk9yMm9WR251TnhrMXMx?=
+ =?utf-8?B?K0ZrZFUzS20rSFJwRDFtaVVVOExId0wza0pPajJPYnFRQ2VzVlYzSUN2VzBa?=
+ =?utf-8?B?R0crNlRtUnI1VUdLYXRTTnpuaUM5VzdWZ1BkMkJONVlHRm1zRzkxMmJjaDRS?=
+ =?utf-8?B?cEowNnQ0UUx6Q1FFTUt2VjVRa3UrV2x5L013TFhJZ3ZXNGIzVnZJUXRiYTNx?=
+ =?utf-8?B?RWIrYUpua2FtMHI1Yk8ydXJZUldwZVE5UktoK3ZJMHFYb1FtNEcrM2ZYMmRC?=
+ =?utf-8?B?aFpmRzRoVzRVUTcvQjYyaUh5NXpEYnFoZWRqeUFIVG5mVDNvT0NXeTZqalVJ?=
+ =?utf-8?B?aHNydzJLeUwwNStLQzBoOGpPc0l0R2doS0kxLzZQWEg2RUcvTGxucC9HWVl5?=
+ =?utf-8?B?RlVMRXZ2YmZGNSs5aTd6QWdEUExpS3lvUGFKdUNYQWVBKytpa1A2eXR0d1pF?=
+ =?utf-8?B?RXNqUE1hY3l4b2ZsRTZlSnc2QkVUZXF3L1lZczBqV2MzaVZYR0swT0UyaXdT?=
+ =?utf-8?B?VlFrUmtWTjNHRzEvUlR0SVdPQ2ZhQTdkTXZEK3kyNDlWcU8yczBBNVloemNS?=
+ =?utf-8?B?TTljOGloUXVVZWdqK0NiL1cza29vcG9Hd0NzTGEzVWY2UEZtTmxYdEM4Qytv?=
+ =?utf-8?B?TjVTY2QwOUdqT3VoNXEyT3Y5N3lxVUdhOXc2V3Nmc1lFNmJzMEJqQ1Rld1g5?=
+ =?utf-8?B?c21ZRzRCT2oxT3JWT0JhZ2prYmRsRm5tMGlnR3FBQ1JLSTZlS2l6WUVLNldT?=
+ =?utf-8?B?WmZQUFVUK01JdWgyOUZKY01TRXJuRUNieEM3U01kTXJCdFpZWFpaOFJDQUxl?=
+ =?utf-8?B?enN4T0JmY1BBQmJCWmJnTkh2WjJQa3I1dXJ6ZEYzTFh3WWlGTWlWTUhrYTQy?=
+ =?utf-8?B?YlA5aEJxancvVXU5WC9sbFJDUThlYU1LVFdZSlhzdzdHekdNV3hqOHVxZjc0?=
+ =?utf-8?B?ZXBLRU9DZGJFYmNCUzJYWEI1NTljVjV0ZTk5TUFxL3dvOUh4WFR5SEs2ZnBQ?=
+ =?utf-8?B?YUJVU0dNQWl6QlYwUHM4U0tVNW42b1BaWEdic1ZwaUQ0MFZKVWs5Q0VFVnNr?=
+ =?utf-8?B?SCsxbDVyL2ZicjJWTjlrbDdGckZIRm1OMjVTdHhGRmZhVTV2ZTd4aTRVaDZN?=
+ =?utf-8?B?azV6blFucE9ZZ0NhWkxRUFk0WWZRbUE0UUVEZUlDU3BsUmZkNDR6aFVtb3hx?=
+ =?utf-8?B?a0lGUitxR0xkNzBneGUxRmRGTElHcDhreXBIL2pNKzBqaVZOc3FQbmlqVVo3?=
+ =?utf-8?B?QUZBcWJrc0t1dGZ6Z2VZOUxQZUdoVWRuYWFkc01LSDd6VEt2ZlhQVDVFUEJp?=
+ =?utf-8?B?VWg2QmFZK0JtZGp5Uk0yM1RwenoxbmFjemtRSmc5TkJPZ0RoS0UyeUFzdnY2?=
+ =?utf-8?B?NWVEYVZlVnNLQU96N0VFNjV1elJqWGNlN05EdnJRUlJnVnZPbnlRN1E5Nklm?=
+ =?utf-8?B?ZDM0NVBGd0lPcUlUbExMN2RVRis5NHVRRWF0djJCcTYxWUxSeEtjSFY5cC9S?=
+ =?utf-8?B?bUpGWkhZa29Ham1HOFNQVFBUSngrWnNicUxkckEwSzBPVXI0bkIzUXE5Sjhj?=
+ =?utf-8?B?dXRDTHVBSDdTeEZUdFdMRUJnbVJJOG84MjNJSlMyZ2dER1pGZmFPUS9SbWt6?=
+ =?utf-8?B?dkdyTW9IWis5M0ZpNEU4OVV5VHdWbDl2S3RRL0pkRklwRlhXZ1ZGZTBMZjUw?=
+ =?utf-8?B?VDJsSk0vK0wrVzlDeXFhYytjb3pnM0d4aUdGRVd6cVExT1NsUDVWUW9HcHNs?=
+ =?utf-8?B?Uy9iVWJtT29yb3N4WExRUFU5aGZtZ0lEV2VVRmpaM0RFUTkyN2ZvSmd6N1Y0?=
+ =?utf-8?B?REE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 749c9c8f-0c87-40c4-93cf-08dc4809978d
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5399.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 19 Mar 2024 11:42:01.6384
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: crT4W+oimwRfYesvUxS1PnY9QL6u13Ecm6SsqpQb3J4W2zgMLz2M8lyGJXA9BiGXQ208zAaBXNc6wkgvUdy0VXBcfyISY53eb8pq8eUfd+c=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB5935
+X-OriginatorOrg: intel.com
 
-On Fri, Mar 15, 2024 at 12:08:20PM +0100, Michal Swiatkowski wrote:
-> In case of traffic going from the VF (so ingress for port representor)
-> source VSI should be consider during packet classification. It is
-> needed for hardware to not match packets from different ports with
-> filters added on other port.
+On 3/18/2024 9:02 PM, Simon Horman wrote:
+> On Fri, Mar 08, 2024 at 06:39:14AM -0500, Mateusz Polchlopek wrote:
+>> Extend devlink_param *set function pointer to take extack as a param.
+>> Sometimes it is needed to pass information to the end user from set
+>> function. It is more proper to use for that netlink instead of passing
+>> message to dmesg.
+>>
+>> Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+>> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 > 
-> It is only for "from VF" traffic, because other traffic direction
-> doesn't have source VSI.
-> 
-> Set correct ::src_vsi in rule_info to pass it to the hardware filter.
-> 
-> For example this rule should drop only ipv4 packets from eth10, not from
-> the others VF PRs. It is needed to check source VSI in this case.
-> $tc filter add dev eth10 ingress protocol ip flower skip_sw action drop
-> 
-> Fixes: 0d08a441fb1a ("ice: ndo_setup_tc implementation for PF")
-> Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Hi Mateusz,
+>  > FWIIW, I think there are several (new?) users of this callback
+> present in net-next now which will also need to be updated.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Hi Simon
 
+Yes, You are right, I am aware of that and this will be fixed in the
+next version of this patch, thanks.
 
