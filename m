@@ -1,222 +1,184 @@
-Return-Path: <netdev+bounces-80613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E614887FF17
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 14:52:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65D8F87FF2D
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 14:58:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E44A1F23467
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:52:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C030DB259A7
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:58:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBE728121F;
-	Tue, 19 Mar 2024 13:52:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3815981725;
+	Tue, 19 Mar 2024 13:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="CgQCONdW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gA9LlWVZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f175.google.com (mail-lj1-f175.google.com [209.85.208.175])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD07C5A4CF
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 13:52:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6887280612;
+	Tue, 19 Mar 2024 13:58:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710856370; cv=none; b=ZbwN4C/EdY3U7AnfOVgU08yCalzkttDy8d2MlDxCkBHxPakG5BkV70BTfla7N8jQKACfW87rKYEtq/ep9E9659qcfPNnKKA2xQM9qddle8mNaIRjWiYSzl7hL18WtfLR7e4eul410UgBCl2Yg8mY//MEMW003AodOkRaKu6jINI=
+	t=1710856705; cv=none; b=aTdhVn7cqtXGrln29sgunxufHn4geWTq1A9y58v44HBM+NTEh8RKRcaAQiw6KcJOuriBFrpTfqoDgGaMprxFrk2upa6OE+DMVAwXL4XpQ5RnU7nR2PPzq305888aw0BHmCBby2KgbXyTLqrSrDj8tFs/3HuxTRW1v+Mzq0urTdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710856370; c=relaxed/simple;
-	bh=PcG3jFbqv0ADhPWyUGZnOImkMAkNB3NPh4hM6Mbrikg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CFyZXizHwLa+/e59yXwl8W7Msp0Bg6WoIbAxIMx8Xfjs/S5SlgiAQLylePmN8f3B/9fQ/CHqTZiqvTu15903GxX5AZlqwp+LdGPRB9SHzVH7AOACpHiibDuRoPmFk9A9oV+KBovCzB6XHYndL07BRhGy5DSSnRmwZq/0gNkoQUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=CgQCONdW; arc=none smtp.client-ip=209.85.208.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
-Received: by mail-lj1-f175.google.com with SMTP id 38308e7fff4ca-2d24a727f78so65081501fa.0
-        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 06:52:48 -0700 (PDT)
+	s=arc-20240116; t=1710856705; c=relaxed/simple;
+	bh=OVjzTOVyPNf+wcJag2OMOZeywBVyZAixmPWNMf44ywE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BvMBvmFlW4ghtLWSdv+tgMIOG0Y3WPe5wSGYknWs1xMdTmx3GpDwVisj5A+DRapqop9wkTdO6eAre/4hMzBkOEEP0Wjn18+cdr0a1V57/bk025Lm3YTnvwzyzMNdCixNnsqfB/ba/poVLqJQT5ooDIqXCSSe0fKvkk7tYi1d42M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gA9LlWVZ; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a46ba938de0so334499966b.3;
+        Tue, 19 Mar 2024 06:58:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gooddata.com; s=google; t=1710856367; x=1711461167; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ut2L92w+ObuYD4zPtPTxf87RPDeymugk8HmMDNtUuFg=;
-        b=CgQCONdWAchmHt8jPmBMcNksquEauyQbI16PwNwXTIPufqI6paZRHtkZr1BhxNkVcf
-         kIXUpjaQzHsWlp+/xxERS3UkP3Idb0F6cRIcx9kM+pmvL6Hpk4cQZCkm0vK/OpjNSr/8
-         u3ZtrucKaCPDbGdNjEAGa/etP5exyk8+NKuCk=
+        d=gmail.com; s=20230601; t=1710856702; x=1711461502; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hT6iTN2em5tEDaXXNgOGojNNtDEqq+qxwwOncA5QWiE=;
+        b=gA9LlWVZyGCsmS+uJIkcDWbQY2I8R+n5/zso4RHlxOFXsurfeD2zi/q2abdAgxeSrt
+         WxLddZcyFnBOnBNgnK0/sBLbgLmwriTE/1k+d0X36ErZyGcSE0R8S9HdzxG9IjGKz9Ly
+         51gaUOVqc6FZlSDoURTpJjHSsoFrXcvbJhmZlkjT0Qgi/gpwSGWfKMY5bzA4vUmIVtHe
+         8k4IWfhD3UvYjp1FQQMru1M/gLRzCkCyCJXxX/GJPFsxzt9nHZcsWAOocChym8Pvqd20
+         TtQONv+Udhfcc9nx7+1nhrqPlMrrN7tav/wbqcjsi9ZL2mqEJMcxQQ0w+E22kBzhM8ng
+         XgtQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710856367; x=1711461167;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ut2L92w+ObuYD4zPtPTxf87RPDeymugk8HmMDNtUuFg=;
-        b=H/xvw1PEwDs25GOh8PKjOnVdepuhX12vUTUKXaeM2onHzXoWSuThSQbTIACkJyNnQb
-         leeHF8jUeaI/zJBgF151IA0ZsPg4W4A+bqAG/sqi8yPyN15NkVK/JXq+rQ5XttBJXst6
-         HsQy2OvAbAb/NSck2yNFKD9tkqLD9Y6gY3K/IiaT7mKKtcTNqmPcoRQzVMOGUdqRSCef
-         JIcdw9xI3xdHyma4316MS910FjtZQD7PksSgwB5W3uBQqFLygcCU0XP7cG5AzRzIwz3K
-         GfMyybovpM3EZJgv1i3QGDkN3ZVvgV0Mfjd7dX5fSsz+QJVyqiBl7LQ9iECp6bJrIwYO
-         7HLA==
-X-Forwarded-Encrypted: i=1; AJvYcCV1pZPY4kCHApd9OHi2brZ6e2CrYWzIr4qLaWc8SJrPC+4LWYcDJrYJ45LPwlrhq4sZmj3JHoP7Wcp39mlx6PxRgH5Ka0IS
-X-Gm-Message-State: AOJu0Yzg4Kmit1NrdN91g4jWJ60+WGCTkJ/rNIykosi0ROTjKyG/2jIY
-	wUlJJnxYx04e0//3SOVmqF1+dbRpXB2K0EDRUrL2tgh8f1j7SicCrXfLQVJbFqVE7XP1hIqVpO2
-	rqIUPUwQVYtYXB9EoexAzerVLUgtEKtOArZO6
-X-Google-Smtp-Source: AGHT+IFXHxgD3fXqutUxcbGPNF7lCHHbHvdpYnRAQbeX/Dh/4OYt1xBfYn2yNdQj0qSxPddGgEipTsmHaV3Vw2ydS2Q=
-X-Received: by 2002:a2e:9396:0:b0:2d4:6c1a:ee6f with SMTP id
- g22-20020a2e9396000000b002d46c1aee6fmr11047346ljh.35.1710856366998; Tue, 19
- Mar 2024 06:52:46 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710856702; x=1711461502;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hT6iTN2em5tEDaXXNgOGojNNtDEqq+qxwwOncA5QWiE=;
+        b=uNCJSonoXBFcLCCtqJERC08tEhzOlWbksyTws552eP/45uA+e8F0iXI5qHRWhjvjuM
+         biuNYr/ZrXr73yerNjiJJ3GoXdtyrrU6AM1gWSwspq+dwqh4iHrCuCIzRua3faPsoLTH
+         XtXWg2aO/r/Q8rXonU/kHDAAi8uFd4mRq7MLVL8VazgDl9ZtL1jhDQLynhsP4ybrmIf1
+         QTRtCiayxPeBIynB+yDf7gVg0SMFKuMpSQ5Gghp72LFxSSUs4ZPuCPjLvLlMWkEDO9yI
+         VgT+dUNZXrSizKwDIPX3LzF0SBpVl0C8Z2Vq1IfBMyOzB5gGp/sqn/ecEWqbqcTQHukD
+         4vyA==
+X-Forwarded-Encrypted: i=1; AJvYcCXCAMCVm6p8I3ZD4nAr5vVIHlTzz/hLHWXEB7ZEqVdLFnNasdu1AvV1DNC8xv7vuRQlinVfymN4gX1H07CvLXlWtAZsDEupXYRXTYwVDPm20r1d9qt5BZWpbZPUIm0Nz2UGYFw0VRc=
+X-Gm-Message-State: AOJu0YwNH/2OpZNc39LVQ+FIIogx7b3VPdjJpqKMrSgy0yV97q9w7jUV
+	Oa4UyEt8wMS6jzY9SH25fWSc7HsF7d3pu+uFQuJUvWA1KLamyA8D
+X-Google-Smtp-Source: AGHT+IE/NwSPtsSi0jKx8EbIMiFVN10KYe5MqHlLvrRVHJsjGi/XcSI8TG9Jtyecsw/wz4C82ew/BQ==
+X-Received: by 2002:a17:906:d8c:b0:a46:181f:c1c3 with SMTP id m12-20020a1709060d8c00b00a46181fc1c3mr9487236eji.70.1710856701481;
+        Tue, 19 Mar 2024 06:58:21 -0700 (PDT)
+Received: from [192.168.8.100] ([148.252.146.160])
+        by smtp.gmail.com with ESMTPSA id mb1-20020a170906eb0100b00a46d6e51a6asm1130574ejb.40.2024.03.19.06.58.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 19 Mar 2024 06:58:21 -0700 (PDT)
+Message-ID: <bfc6afa9-501f-40b6-929a-3aa8c0298265@gmail.com>
+Date: Tue, 19 Mar 2024 13:55:21 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
- <65f98e5b99604_11543d29415@willemb.c.googlers.com.notmuch>
- <CA+9S74gRyDn3_=aAm7XkGKEzTg7KF=pPEHFsvENYpv80kczqZg@mail.gmail.com> <65f995ec3cd43_118bb1294f3@willemb.c.googlers.com.notmuch>
-In-Reply-To: <65f995ec3cd43_118bb1294f3@willemb.c.googlers.com.notmuch>
-From: Igor Raits <igor@gooddata.com>
-Date: Tue, 19 Mar 2024 14:52:35 +0100
-Message-ID: <CA+9S74heujyHmUJ6-+9xWNN+nFvtTO8mX2N5pWyhO-4hu9dFQQ@mail.gmail.com>
-Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, Stefano Garzarella <sgarzare@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: Do not break out of sk_stream_wait_memory() with
+ TIF_NOTIFY_SIGNAL
+To: Sascha Hauer <s.hauer@pengutronix.de>
+Cc: netdev@vger.kernel.org, kernel@pengutronix.de,
+ linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Jens Axboe <axboe@kernel.dk>, io-uring@vger.kernel.org
+References: <20240315100159.3898944-1-s.hauer@pengutronix.de>
+ <7b82679f-9b69-4568-a61d-03eb1e4afc18@gmail.com>
+ <ZfgvNjWP8OYMIa3Y@pengutronix.de>
+ <0a556650-9627-48ee-9707-05d7cab33f0f@gmail.com>
+ <Zflt3EVf744LOA6i@pengutronix.de>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <Zflt3EVf744LOA6i@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 19, 2024 at 2:41=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Igor Raits wrote:
-> > Hello Willem,
-> >
-> > On Tue, Mar 19, 2024 at 2:08=E2=80=AFPM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Igor Raits wrote:
-> > > > Hello,
-> > > >
-> > > > We have started to observe kernel crashes on 6.7.y kernels (atm we
-> > > > have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6.9 where we
-> > > > have nodes of cluster it looks stable. Please see stacktrace below.=
- If
-> > > > you need more information please let me know.
-> > > >
-> > > > We do not have a consistent reproducer but when we put some bigger
-> > > > network load on a VM, the hypervisor's kernel crashes.
-> > > >
-> > > > Help is much appreciated! We are happy to test any patches.
-> > > >
-> > > > [62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOPTI
-> > >
-> > > Did you miss the first part of the Oops?
-> >
-> > Actually I copied it as-is from our log system. As it is a physical
-> > server, such logs are sent via netconsole to another server. This is
-> > the first line I see in the log in the time segment.
-> >
-> > >
-> > > > [62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Tainted: G
-> > > >    E      6.7.10-1.gdc.el9.x86_64 #1
-> > > > [62254.183743] Hardware name: Dell Inc. PowerEdge R7525/0H3K7P, BIO=
-S
-> > > > 2.14.1 12/17/2023
-> > > > [62254.192083] RIP: 0010:skb_release_data+0xb8/0x1e0
-> > > > [62254.197357] Code: 48 83 c3 01 39 d8 7e 54 48 89 d8 48 c1 e0 04 4=
-1
-> > > > 80 7d 7e 00 49 8b 6c 04 30 79 0f 44 89 f6 48 89 ef e8 4c e4 ff ff 8=
-4
-> > > > c0 75 d0 <48> 8b 45 08 a8 01 0f 85 09 01 00 00 e9 d9 00 00 00 0f 1f=
- 44
-> > > > 00 00
-> > > > [62254.217013] RSP: 0018:ffffa975a0247ba8 EFLAGS: 00010206
-> > > > [62254.222692] RAX: 0000000000000000 RBX: 0000000000000000 RCX: 000=
-0000000000785
-> > > > [62254.230263] RDX: 0000000000000016 RSI: 0000000000000002 RDI: fff=
-f989862b32b00
-> > > > [62254.237878] RBP: 4f2b318c69a8b0f9 R08: 000000000001fe4d R09: 000=
-000000000003a
-> > > > [62254.245417] R10: 0000000000000000 R11: 0000000000001736 R12: fff=
-f9880b819aec0
-> > > > [62254.252963] R13: ffff989862b32b00 R14: 0000000000000000 R15: 000=
-0000000000002
-> > > > [62254.260591] FS:  00007f6cf388bf80(0000) GS:ffff98b85fbc0000(0000=
-)
-> > > > knlGS:0000000000000000
-> > > > [62254.269061] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > > [62254.275170] CR2: 000000c002236020 CR3: 000000387d37a002 CR4: 000=
-0000000770ef0
-> > > > [62254.282733] PKRU: 55555554
-> > > > [62254.285911] Call Trace:
-> > > > [62254.288884]  <TASK>
-> > > > [62254.291549]  ? die+0x33/0x90
-> > > > [62254.294769]  ? do_trap+0xe0/0x110
-> > > > [62254.298405]  ? do_error_trap+0x65/0x80
-> > > > [62254.302471]  ? exc_stack_segment+0x35/0x50
-> > > > [62254.306884]  ? asm_exc_stack_segment+0x22/0x30
-> > > > [62254.311637]  ? skb_release_data+0xb8/0x1e0
-> > > > [62254.316047]  kfree_skb_list_reason+0x6d/0x210
-> > > > [62254.320697]  ? free_unref_page_commit+0x80/0x2f0
-> > > > [62254.325700]  ? free_unref_page+0xe9/0x130
-> > > > [62254.330013]  skb_release_data+0xfc/0x1e0
-> > > > [62254.334261]  consume_skb+0x45/0xd0
-> > > > [62254.338077]  tun_do_read+0x68/0x1f0 [tun]
-> > > > [62254.342414]  tun_recvmsg+0x7e/0x160 [tun]
-> > > > [62254.346696]  handle_rx+0x3ab/0x750 [vhost_net]
-> > > > [62254.351488]  vhost_worker+0x42/0x70 [vhost]
-> > > > [62254.355934]  vhost_task_fn+0x4b/0xb0
-> > >
-> > > Neither tun nor vhost_net saw significant changes between the two
-> > > reported kernels.
-> > >
-> > >     $ git log --oneline v6.6..v6.7 -- drivers/net/tun.c drivers/vhost=
-/net.c | wc -l
-> > >     0
-> > >
-> > >     $ git log --oneline linux/v6.6.9..linux/v6.7.5 -- drivers/net/tun=
-.c drivers/vhost/net.c
-> > >     6438382dd9f8 tun: add missing rx stats accounting in tun_xdp_act
-> > >     4efd09da0d49 tun: fix missing dropped counter in tun_xdp_act
-> > >
-> > > So the cause is likely in the code that generated the skb or somethin=
-g
-> > > that modified it along the way.
-> > >
-> > > It could be helpful if it is possible to bisect further. Though odds
-> > > are that the issue is between v6.6 and v6.7, not introduced in the
-> > > stable backports after that. So it is a large target.
-> >
-> > Yeah, as I replied later to my original message - we actually also see
-> > the issue on 6.6.9 as well but it looks slightly different.
-> >
-> > Actually while writing reply got 6.6.9 crashed too:
-> >
-> > [13330.391004] tun: unexpected GSO type: 0x4ec1c942, gso_size 20948,
-> > hdr_len 3072
->
-> This looks like memory corruption
->
-> > > Getting the exact line in skb_release_data that causes the Oops
-> > > would be helpful too, e.g.,
-> > >
-> > > gdb vmlinux
-> > > list *(skb_release_data+0xb8)
-> >
-> > Unfortunately we do not collect kdumps so this is not going to be easy
-> > :( We will investigate the possibility of getting the dump though.
->
-> No need for a kdump. As long as you have the vmlinux of the kernel.
+On 3/19/24 10:50, Sascha Hauer wrote:
+> On Mon, Mar 18, 2024 at 01:19:19PM +0000, Pavel Begunkov wrote:
+>> On 3/18/24 12:10, Sascha Hauer wrote:
+>>> On Fri, Mar 15, 2024 at 05:02:05PM +0000, Pavel Begunkov wrote:
+>>>> On 3/15/24 10:01, Sascha Hauer wrote:
+>>>>> It can happen that a socket sends the remaining data at close() time.
+>>>>> With io_uring and KTLS it can happen that sk_stream_wait_memory() bails
+>>>>> out with -512 (-ERESTARTSYS) because TIF_NOTIFY_SIGNAL is set for the
+>>>>> current task. This flag has been set in io_req_normal_work_add() by
+>>>>> calling task_work_add().
+>>>>
+>>>> The entire idea of task_work is to interrupt syscalls and let io_uring
+>>>> do its job, otherwise it wouldn't free resources it might be holding,
+>>>> and even potentially forever block the syscall.
+>>>>
+>>>> I'm not that sure about connect / close (are they not restartable?),
+>>>> but it doesn't seem to be a good idea for sk_stream_wait_memory(),
+>>>> which is the normal TCP blocking send path. I'm thinking of some kinds
+>>>> of cases with a local TCP socket pair, the tx queue is full as well
+>>>> and the rx queue of the other end, and io_uring has to run to receive
+>>>> the data.
+>>
+>> There is another case, let's say the IO is done via io-wq
+>> (io_uring's worker thread pool) and hits the waiting. Now the
+>> request can't get cancelled, which is done by interrupting the
+>> task with TIF_NOTIFY_SIGNAL. User requested request cancellations
+>> is one thing, but we'd need to check if io_uring can ever be closed
+>> in this case.
+>>
+>>
+>>>> If interruptions are not welcome you can use different io_uring flags,
+>>>> see IORING_SETUP_COOP_TASKRUN and/or IORING_SETUP_DEFER_TASKRUN.
+>>>
+>>> I tried with different combinations of these flags. For example
+>>> IORING_SETUP_TASKRUN_FLAG | IORING_SETUP_SINGLE_ISSUER | IORING_SETUP_DEFER_TASKRUN
+>>> makes the issue less likely, but nevertheless it still happens.
+>>>
+>>> However, reading the documentation of these flags, they shall provide
+>>> hints to the kernel for optimizations, but it should work without these
+>>> flags, right?
+>>
+>> That's true, and I guess there are other cases as well, like
+>> io-wq and perhaps even a stray fput.
+>>
+>>
+>>>> Maybe I'm missing something, why not restart your syscall?
+>>>
+>>> The problem comes with TLS. Normally with synchronous encryption all
+>>> data on a socket is written during write(). When asynchronous
+>>> encryption comes into play, then not all data is written during write(),
+>>> but instead the remaining data is written at close() time.
+>>
+>> Was it considered to do the final cleanup in workqueue
+>> and only then finalising the release?
+> 
+> No, but I don't really understand what you mean here. Could you
+> elaborate?
 
-(gdb) list *(skb_release_data+0xb8)
-0xffffffff81a36088 is in skb_release_data (./include/linux/page-flags.h:247=
-).
-242 return page_fixed_fake_head(page) !=3D page;
-243 }
-244
-245 static inline unsigned long _compound_head(const struct page *page)
-246 {
-247 unsigned long head =3D READ_ONCE(page->compound_head);
-248
-249 if (unlikely(head & 1))
-250 return head - 1;
-251 return (unsigned long)page_fixed_fake_head(page);
+The suggestion is instead of executing the release and that final
+flush off of the context you're in, namely userspace task,
+you can spin up a kernel task (they're not getting any signals)
+and execute it from there.
+
+void deferred_release_fn(struct work_struct *work)
+{
+	do_release();
+	...
+}
+
+struct work_struct work;
+INIT_WORK(&work, deferred_release_fn);
+queue_work(system_unbound_wq, &work);
+
+
+There is a catch. Even though close() is not obliged to close
+the file / socket immediately, but it still not nice when you
+drop the final ref but port and other bits are not released
+until some time after. So, you might want to wait for that
+deferred release to complete before returning to the
+userspace.
+
+I'm assuming it's fine to run it by a kernel task since
+IIRC fput might delay release to it anyway, but it's better
+to ask net maintainers. In theory it shouldn't need
+mm,fs,etc that user task would hold.
+
+-- 
+Pavel Begunkov
 
