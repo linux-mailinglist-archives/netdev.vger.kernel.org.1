@@ -1,64 +1,60 @@
-Return-Path: <netdev+bounces-80569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E014A87FD53
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:05:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8266887FD56
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 13:06:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E80C1C21D6A
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:05:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B51771C21DE1
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 12:06:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 871627F480;
-	Tue, 19 Mar 2024 12:05:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072A57F487;
+	Tue, 19 Mar 2024 12:06:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="RFwFIzle"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OhbfgXul"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45697EEEA
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 12:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC49F7CF03;
+	Tue, 19 Mar 2024 12:06:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710849949; cv=none; b=YswTpkaBzpuQuQXJ6TO39N4sANNHlG7TA9Jus2KFTkV5WOTFJcPH5V1n8icp1iDR0AcodjfMSpDm8LNNBc3iO0R/VojF8JmEb1iz7vMefPWH/OJzb4oWuD0Dd5mSd1bRRCJ/fhcbR8SllM8iHh4Oes7cTrW0LAmYHTyCOulX9BA=
+	t=1710849990; cv=none; b=ZPTSNKGSJAdsw81kq8yQrvnVOzn3/cF9FTx/fNh9yt53syq4qX5ydIqJykAgiBOpInHhuz7J10MSRq8QJCFyOJZ8XbpsYtSQ8feE6uS/XEVZK4UkiOPCRAnRKaOeknsa4He/WK0PY6nEIIF9Eu8A/7MY7TcdWzf+3xQtLvslgqA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710849949; c=relaxed/simple;
-	bh=gyKAZWI5VLvKLDSsM08uC/wPkhGWbQB/9wp2kdBAl28=;
+	s=arc-20240116; t=1710849990; c=relaxed/simple;
+	bh=bKAtYoJBSuOHQQgagWmINKfaNalyupmW9O/fQEj1bpU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k0AeFVAWiKT854NvG/YFaAj0VID2knYLAbFZz30i3X9sPMhKPY9040qwDms3nCsx2TqIaI2mPKLIQ+FtYzxIVxkPbHs6cCbtB10hzkQW8At7NeEjEqRN7H91HgjxtCcGKTn+3HM0iFtqC2tOlkNRbE0kMMwqschHB5ZxFYNJIIs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=RFwFIzle; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=4jfICV3XzhXGR2pafhFT7jEM67I8yt+gpnJLlD9GXkA=; b=RFwFIzleQ45OjIofpfc3MFZiKV
-	+e8GWi8oFrCVJ51bnxHyzav22QfxcBBeWZRu587VLxN3SaI9RtxuKxYVg9lPBu5NpPjjocfatQ+sp
-	JXe5W3z8gn+xS8XqBaBJ0pa9F0+KUQb9p+J+rGFKuJ4iHEy3VJbLnlsH4LPwJuTD95ns=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rmYDv-00Ah8s-Kq; Tue, 19 Mar 2024 13:05:43 +0100
-Date: Tue, 19 Mar 2024 13:05:43 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=udAZpKio6v/Sg9sCqMCkqaUSpa1fcqIp8IBjB7uZkNq9YTog5gKckdkMyvqVWrijUfut2R9VvBmVE/G9nn0AqFjaLqavhKF+2JeOseUmzIQotouIG2gTOP/i0Nolui4j46UyxypVZJfzUOzj8L9EXMj/eTqGVQm3ihTCMb6g1T8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OhbfgXul; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1C8EEC433C7;
+	Tue, 19 Mar 2024 12:06:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710849990;
+	bh=bKAtYoJBSuOHQQgagWmINKfaNalyupmW9O/fQEj1bpU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OhbfgXulU9Vp/bUvWbaxfDXAhUEcinY86e4TwFGgQJ6blxtPoaurjvKQ0SnYRRWtQ
+	 kuR11qwDUoedyVx8C+mpDPig/xhGx3aoImViOGVVeceWhsF3+KG/UL6CwLnAIcTu0B
+	 ZtAJEn4LqNwQdJ5ENR7imp+3TVYEX+QLH//T3fI0jjsaTzjCS9DLN7DvtNUZ0KS8MU
+	 gftWI4E4vRvavKX+lvaoXMnNrDWi+mtNooOjDTawtwgfzBrsg8qREx+DSuyG7929S8
+	 R7zRfxQoFDPq8kHRtPGsAq4g64oYJRyMvB7PpfmrHX7KBEt2NArekMXI3WgMOCVGBx
+	 8LpY1IZfFpsXA==
+Date: Tue, 19 Mar 2024 12:06:25 +0000
+From: Simon Horman <horms@kernel.org>
+To: Francesco Valla <valla.francesco@gmail.com>
+Cc: Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: Re: [PATCH net-next v2] net: phy: don't resume device not in use
-Message-ID: <f6f62bef-5766-4fe1-a6f1-6f18d627737e@lunn.ch>
-References: <AM9PR04MB8506772CFCC05CE71C383A6AE2202@AM9PR04MB8506.eurprd04.prod.outlook.com>
- <c5238a4e-b4b1-484a-87f3-ea942b6aa04a@lunn.ch>
- <AM9PR04MB8506A1FC6679E96B34F21E94E2202@AM9PR04MB8506.eurprd04.prod.outlook.com>
- <AM9PR04MB8506791F9A2A1EF4B33AAAF4E2282@AM9PR04MB8506.eurprd04.prod.outlook.com>
- <5a27414c77ae0b0fc94981354fa6931031b3d6fc.camel@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	fabio@redaril.me, linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/1] Documentation: networking: document CAN ISO-TP
+Message-ID: <20240319120625.GI185808@kernel.org>
+References: <20240313223445.87170-1-valla.francesco@gmail.com>
+ <20240313223445.87170-2-valla.francesco@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,18 +63,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <5a27414c77ae0b0fc94981354fa6931031b3d6fc.camel@redhat.com>
+In-Reply-To: <20240313223445.87170-2-valla.francesco@gmail.com>
 
-> Please note that the 'net-next' tree is closed for the merge window.
-> You will have to repost in when the tree will re-open in a week or so.
+On Wed, Mar 13, 2024 at 11:34:31PM +0100, Francesco Valla wrote:
+> Document basic concepts, APIs and behaviour of the CAN ISO-TP (ISO
+> 15765-2) stack.
 > 
-> However this change could be suitable for the 'net' tree, if Andrew
-> agrees. If, please re-sent targeting such tree and including a
-> reasonable 'Fixes' tag.
+> Signed-off-by: Francesco Valla <valla.francesco@gmail.com>
 
-This is the sort of change that i think it should only be in net-next.
-Suspend/resume is complex and not tested too well. There is a chance
-of regression with this change. So we should introduce it slowly.
+Hi Francesco,
 
-	Andrew
+As it looks like there will be a v2 of this patchset
+please consider running checkpatch.pl --codespell
+and addressing the warnings it reports.
+
+...
+
+> +Transport protocol and associated frame types
+> +---------------------------------------------
+> +
+> +When transmitting data using the ISO-TP protocol, the payload can either fit
+> +inside one single CAN message or not, also considering the overhead the protocol
+> +is generating and the optional extended addressing. In the first case, the data
+> +is transmitted at once using a so-called Single Frame (SF). In the second case,
+> +ISO-TP defines a multi-frame protocol, in which the sender asks (through a First
+> +Frame - FF) to the receiver the maximum supported size of a macro data block
+> +(``blocksize``) and the minimum time time between the single CAN messages
+> +composing such block (``stmin``). Once these informations have been received,
+
+nit: Once this information has
+
+> +the sender starts to send frames containing fragments of the data payload
+> +(called Consecutive Frames - CF), stopping after every ``blocksize``-sized block
+> +to wait confirmation from the receiver (which should then send a Flow Control
+> +frame - FC - to inform the sender about its availability to receive more data).
+> +
+
+...
 
