@@ -1,128 +1,103 @@
-Return-Path: <netdev+bounces-80664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B37788039A
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 18:38:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 077CD8803C1
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 18:43:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 040F7B213F8
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 17:38:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 38FEE1C21C38
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 17:43:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEB541E4B1;
-	Tue, 19 Mar 2024 17:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9ECB2943C;
+	Tue, 19 Mar 2024 17:40:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FhpGq69C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ifEjnRyh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73BFD19BDC;
-	Tue, 19 Mar 2024 17:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961EE28DDF
+	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 17:40:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710869916; cv=none; b=e7yO4h/L8fmWDxroIUM0qmid17v+XCPqlo1PQZvEAxCIg1+i2VTClznjEs7xFkY4XLICDkqYSmjW6szf6igixwLTJORGep/LecaOTWvzT6KqzjYtzB+h78yF+T8POcpp5ygOrblAsJ7kmW0TEXYCWKtFtABVU0rMDXiAM1OZbW8=
+	t=1710870048; cv=none; b=q5rNSYPhq3sztCYfFct0HrucOS6nb3Vt4osW5mtVz0XH9qogFwV8XVlefN5qu8SBhZ9Pk6Bb6c1iR5K+NAlNUfLVfEJKPNIj/A6mgGc8F2oRCWSObmoR5R3C7S9lHwTrTHPosTNvoDedI0CcVy2nvEXYJQ7FoVFSALSweBjinoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710869916; c=relaxed/simple;
-	bh=4vuAWBj1evs6v+OZMqxOpqf/OaE6RssOo2tlPJIKe2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FBbHb3nfeM5Y/ZwZNvNJO52MK5dNvVsdAY6wmuHFZLsFg7Ua36MpynaYReQNJTxu6/85yVS07Ifwxh4IvH+MK5mQzUbSWyiF5CUkFl7DAEnN1EBJaBMLg8EqXJ+bI3KmJyFIfb5fLbLD5TMlLn95UnSjEaukTu0MgHKwBeKpv6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FhpGq69C; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00477C433F1;
-	Tue, 19 Mar 2024 17:38:36 +0000 (UTC)
+	s=arc-20240116; t=1710870048; c=relaxed/simple;
+	bh=1KIGc50CRo2UOE6kHOlDJqfxBJCFu+2DWv7i+/tkRg0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gNzLKkCxmU90Bq2UgskHbGEGLIzgA0HAYg4FNhNHYJWQvqfzYrUdZbkzh7oSQuLN8vf4cHyou/4oZUpb2KA7wnnLyf9zsxZlUi05HTlAcIlfeBlYU/5M+BlKFS7ZzTrhv1aKP35ClcZViSZYIHqhgZLcc4cIbdaLtwhBkeaMRis=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ifEjnRyh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81F68C433C7;
+	Tue, 19 Mar 2024 17:40:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710869916;
-	bh=4vuAWBj1evs6v+OZMqxOpqf/OaE6RssOo2tlPJIKe2o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FhpGq69CjbpLw7gdlpfimviyUI9rG1eiCMCeg4oRTfRHYiaEvNeWnvg8fB629aLZW
-	 AZ81lwqhxnWfbJDM9iuNZ5Kl5VgSgWoIfbkIO/0TdZPrxNElSmJNv1D4NHBr1x3QQd
-	 d98gs93XJgtAocflD6uznvPw2sPCqqyu19aSUi6BLS8vDa9pSw7V22D7C0mag/CeXa
-	 J+Bwkwx3Dn4Rg02ptndnzDRowRBiznOdoFMON7/tYTQ3gGghhJIQFnLmaFVdaWM7K0
-	 tRNrfqA5FYAFZjs861/KJiC57kUwu+d4A5Q5wuYc3cLP7a6wjL6pOW4W69YHBVCwGG
-	 HvG5QSe0kw+nQ==
-Received: from johan by xi.lan with local (Exim 4.97.1)
-	(envelope-from <johan@kernel.org>)
-	id 1rmdQA-0000000016b-11LA;
-	Tue, 19 Mar 2024 18:38:42 +0100
-Date: Tue, 19 Mar 2024 18:38:42 +0100
-From: Johan Hovold <johan@kernel.org>
-To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc: Doug Anderson <dianders@chromium.org>,
-	Johan Hovold <johan+linaro@kernel.org>,
-	Marcel Holtmann <marcel@holtmann.org>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	cros-qcom-dts-watchers@chromium.org,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Johan Hedberg <johan.hedberg@gmail.com>,
-	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
-	Matthias Kaehlcke <mka@chromium.org>,
-	Rocky Liao <quic_rjliao@quicinc.com>,
-	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Subject: Re: [PATCH v3 2/5] Bluetooth: add quirk for broken address properties
-Message-ID: <ZfnNoi4ahVlzHvvo@hovoldconsulting.com>
-References: <20240319152926.1288-1-johan+linaro@kernel.org>
- <20240319152926.1288-3-johan+linaro@kernel.org>
- <CAD=FV=VUFodCAXEJgfpSqZZdtQaw5-8n_-sX_2p6LuQ2ixLRpQ@mail.gmail.com>
- <Zfm8nifvqb3xO5HG@hovoldconsulting.com>
- <CAA8EJprp89VgFMjHv=EynROUs632CfQPbEka0GAcEAy743EMaA@mail.gmail.com>
+	s=k20201202; t=1710870048;
+	bh=1KIGc50CRo2UOE6kHOlDJqfxBJCFu+2DWv7i+/tkRg0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ifEjnRyhhuDUlLgWpMBCWkFeP1ZnWNBabzyOxVaQMij4HXbwvOuSYKbCmkzRRSnsH
+	 BJbZyJSUZaXLpdeAqWkoCNMF+Kh4MFf8wf+E/oqNSner7clPv5BmOwDDMk3xKt6aky
+	 73QudJwN/1Zw908IzpnCX0v5QX0BSZUmxo+43jcsfejQw5ff0KriZSDYqGTSN8jlQz
+	 cjmKcnHOttWWeaPQ5G4t8Z7qXz6SAEJ/zWE59Xjrx2YokdOJyhb3h21dwD7NUZv4w2
+	 /TldMAtEiji52n6TlWwllB64YR0oOCQnwqWEBX7RWHZaeOdntBsczAHKnvlkq3txj6
+	 5k19CE8rzSCiA==
+Date: Tue, 19 Mar 2024 10:40:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Stefano Brivio <sbrivio@redhat.com>, davem@davemloft.net,
+ netdev@vger.kernel.org, pabeni@redhat.com, jiri@resnulli.us,
+ idosch@idosch.org, johannes@sipsolutions.net, fw@strlen.de,
+ pablo@netfilter.org, Martin Pitt <mpitt@redhat.com>, Paul Holzinger
+ <pholzing@redhat.com>, David Gibson <david@gibson.dropbear.id.au>
+Subject: Re: [PATCH net-next v2 3/3] genetlink: fit NLMSG_DONE into same
+ read() as families
+Message-ID: <20240319104046.203df045@kernel.org>
+In-Reply-To: <CANn89i+afBvqP564v6TuL3OGeRxfDNMuwe=EdH_3N4UuHsvfuA@mail.gmail.com>
+References: <20240303052408.310064-1-kuba@kernel.org>
+	<20240303052408.310064-4-kuba@kernel.org>
+	<20240315124808.033ff58d@elisabeth>
+	<20240319085545.76445a1e@kernel.org>
+	<CANn89i+afBvqP564v6TuL3OGeRxfDNMuwe=EdH_3N4UuHsvfuA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAA8EJprp89VgFMjHv=EynROUs632CfQPbEka0GAcEAy743EMaA@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 19, 2024 at 07:01:57PM +0200, Dmitry Baryshkov wrote:
-> On Tue, 19 Mar 2024 at 18:26, Johan Hovold <johan@kernel.org> wrote:
+On Tue, 19 Mar 2024 18:17:47 +0100 Eric Dumazet wrote:
+> > Hi Stefano! I was worried this may happen :( I think we should revert
+> > offending commits, but I'd like to take it on case by case basis.
+> > I'd imagine majority of netlink is only exercised by iproute2 and
+> > libmnl-based tools. Does passt hang specifically on genetlink family
+> > dump? Your commit also mentions RTM_GETROUTE. This is not the only
+> > commit which removed DONE:
 > >
-> > On Tue, Mar 19, 2024 at 09:10:23AM -0700, Doug Anderson wrote:
-> > > On Tue, Mar 19, 2024 at 8:29 AM Johan Hovold <johan+linaro@kernel.org> wrote:
+> > $ git log --since='1 month ago' --grep=NLMSG_DONE --no-merges  --oneline
 > >
-> > > > +       /* When this quirk is set, the Bluetooth Device Address provided by
-> > > > +        * the 'local-bd-address' fwnode property is incorrectly specified in
-> > > > +        * big-endian order.
-> > > > +        *
-> > > > +        * This quirk can be set before hci_register_dev is called or
-> > > > +        * during the hdev->setup vendor callback.
-> > > > +        */
-> > > > +       HCI_QUIRK_BDADDR_PROPERTY_BROKEN,
-> > >
-> > > Like with the binding, I feel like
-> > > "HCI_QUIRK_BDADDR_PROPERTY_BACKWARDS" or
-> > > "HCI_QUIRK_BDADDR_PROPERTY_SWAPPED" would be more documenting but I
-> > > don't feel strongly.
-> >
-> > So, same reasoning here, this it not some quirk that people should go
-> > around setting without first considering to fix their boot firmware.
+> > 9cc4cc329d30 ipv6: use xa_array iterator to implement inet6_dump_addr()
+> > 87d381973e49 genetlink: fit NLMSG_DONE into same read() as families
+> > 4ce5dc9316de inet: switch inet_dump_fib() to RCU protection
+> > 6647b338fc5c netlink: fix netlink_diag_dump() return value  
 > 
-> The address can be considered broken in many different ways. The name
-> should still be descriptive enough. If you want to specify that it is
-> a broken behaviour, please consider something like BROKEN_BE.
+> Lets not bring back more RTNL locking please for the handlers that
+> still require it.
 
-I doubt that Qualcomm will be able come up with another way to break the
-address property. They'd have to try real hard.
+Definitely. My git log copy/paste is pretty inaccurate, these two are
+better examples:
 
-And this is an internal define which can be changed at any time. There's
-also some worth in keeping it aligned with the DT property, which I'm
-more open to renaming (e.g. if the DT maintainers thinks dropping the
-vendor prefix makes sense).
+5d9b7cb383bb nexthop: Simplify dump error handling
+02e24903e5a4 netlink: let core handle error cases in dump operations
 
-The alternative I considered but rejected was something like
-"local-bd-address-be" as that would be too neutral.
+I was trying to point out that we merged a handful of DONE "coalescing"
+patches, and if we need to revert - let's only do that for the exact
+commands needed. The comment was raised on my genetlink patch while
+the discussion in the link points to RTM_GETROUTE.
 
-Perhaps "local-bd-address-reversed" would at least signal that something
-is backwards, but I still fear that that may be too subtle.
+> The core can generate an NLMSG_DONE by itself, if we decide this needs
+> to be done.
 
-Johan
+Exactly.
 
