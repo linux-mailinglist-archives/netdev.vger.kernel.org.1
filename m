@@ -1,272 +1,161 @@
-Return-Path: <netdev+bounces-80499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80500-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C99E487F57F
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 03:40:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 507EB87F5E4
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 03:56:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC361282BF0
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 02:39:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D556DB219FE
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 02:55:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB8017B3FA;
-	Tue, 19 Mar 2024 02:39:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D89767BAE1;
+	Tue, 19 Mar 2024 02:53:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="O9PcIsVU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CidIsDrD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 904CA33FE
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 02:39:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A397BAF5;
+	Tue, 19 Mar 2024 02:53:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710815996; cv=none; b=kJ2p9tSIhqAiSSBQccI0Fy+HcevAesmN6jfwsz1U1qkDo/S907pbkOdTw3dFoYr4RQs+DHS6fMgsbU9Sbq+lZ8QSI8HE6Yvaxid4SF0/FBlpnO78jLWiUN7EYRIMlVFaYmnMorU6Sohxr2SSHrqsEpAiE5DRqNKv3CplhuoUpDc=
+	t=1710816804; cv=none; b=PCQa1SbALWbxgOJ5AeAIuXbtVPneJxVdWXzRAB6IGL3X7P+qA4AZPfoKZBUVutMxHLcx2Il0XHkCA4gUsMvDyXd5OPFgQcM/cLJHSQ1lLZb7WdLLATolJqOEmNv2yquHjS7nMNnPKFDlFCCys12ynyH4JWFGbPlYGSrvaD2Xzyw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710815996; c=relaxed/simple;
-	bh=8QoXSEm31MtGdn+MSEJmwxksvUcR3ZoTjZ8J0ChYpB0=;
+	s=arc-20240116; t=1710816804; c=relaxed/simple;
+	bh=Zxyts5lPZvaP44xiWGztqFVT+KpEO0dnNEyK7IoDbV4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=HwVmi/3p0TDxwGcqutmrRODqskLZqwk07ol73XNQTA+jqC4PkJWSkbLfocq2w30B9c8OJ91Z3fiu2skMSWJ3Htap/T+pyydJ3Ev1cpu4dNQMbgnyAfzjyZMdNgrYupmjUs0NXDgbKWW00bRRqRkpFqAkLe3RqTpPqF/LfkMBDRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=O9PcIsVU; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a46dec5d00cso17600166b.0
-        for <netdev@vger.kernel.org>; Mon, 18 Mar 2024 19:39:54 -0700 (PDT)
+	 To:Cc:Content-Type; b=jSvFwbmncKHsvwLnM9l0vzJiqI+0U80e29+JEFof71/rTCvJFn3a5cZQme8gPdDz3YAhyZK3Uh5IQqBRV/XzuGndfvaPU0F4XHfb9IAqMIWDCwUYh56WyhM9gjCrSfY2+R9qg2ZhlliKYWS4TjVKCTbcfKL6AD9S8jipKQx5sVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CidIsDrD; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a46db55e64fso26077566b.1;
+        Mon, 18 Mar 2024 19:53:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1710815993; x=1711420793; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1710816801; x=1711421601; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XeX+LTwD9WxbRtGgUoz+Zy2vkpmlwUIv1l9IuZGj3fY=;
-        b=O9PcIsVU2FLQ0f0+jP95syE1l8lMZifYXSM5jYJpT6/8borPSCutpk/SolXPGI42G/
-         l/E0wqzQ/I4ozLu/U85ElHyL9NVcOhCBpFTkb0GPhLMv5f6buyQbbAgRDeApbo9di7nJ
-         HCaQvBcLN2851/CcVIAflKpAFJvTYk46YMvnA4f8qaOTocTFk45yulPi6k64SwLxYVAp
-         2WuBJ0ktfDI9ZfN8c0s9JT8DqpcDXdYG4TEgUq9HZPmQkUd1FgHsDhv7UTgpUy+a+6lP
-         8jBpIyVELJa2anr7q3SRQeJklyVMmIavtsSAYB5ywse3vMO5bMpfHQkYhfHVWFOBFdrk
-         IWqg==
+        bh=R9gD6BrNu7wEli3QCno5011uW/xmhOWQhod+0lHWEwc=;
+        b=CidIsDrD6hJ6Pxj5OW6sw/FGViw16r2xJxvsNCk8qIP1bxEdg1HZUWjfQfHNIrdEiu
+         JCyGIfkf7eZeMadxULO9o5W7r9SqOql9jyFtJYHVQVJBfiR3L9+vrxnOaVYZ50LzFaKO
+         11TAzVBDobzcaW66PSQj6YKjZf7QUWD0Nhn0I19d3Yahvq0H00PIS2e6FHz556Zd4FPK
+         AglAlHyi/V/1/f2YptJ+VYCcgx9C27cMj3j0wTC0kCTWsSOVqYYFKg1A5ciE8BtrKTBu
+         7zcfPJIbDL4eB4PapcwAut51sOyKgRu3NvMK68Icj1Vlr8nAhsdcIzbzcv82HSPiLWyi
+         2Urw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710815993; x=1711420793;
+        d=1e100.net; s=20230601; t=1710816801; x=1711421601;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=XeX+LTwD9WxbRtGgUoz+Zy2vkpmlwUIv1l9IuZGj3fY=;
-        b=A5Oe1CddUa00Z+/Y+9GJ9TR/9dCOkF5813y6MAQ+TtIjFA9xF5m7lIyZS1zdYBISrH
-         xhGyeXAUsTdmotYippCOZ1Ub4OKZhvW4CHbtyRvSVnEDiiF+X+A1XvbERaK6ebJkmykc
-         ThIju7Mos3YVLH7hYpI2WyvpwSUnfX0MjOaewqNG3a6fSWzYH3NLUC60aGcItDg09598
-         zIYcNuajRD+F7afMSu/7OMd/WsVyXMIuts9KERtLd8byLVvaG9+9/6aW+zgXZ7ljDM8r
-         DqAK7U8y/fXxe2xPBZTTh/iOZJLysEbUaR2SSFlV3jfQPzyGOLQ1wskE0ipWzWcD00Sv
-         wGzQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUIiFheImK2YHUhexSI8/kIv18dvAWx2IM08+zD619ZZG0GAHzMGBbsRzYAeBOS2AJJAbVTOnPF8BuX62RT9d1EaWRG/7Nq
-X-Gm-Message-State: AOJu0YwbiO5aY+67V0p3aQQmZ2QiUoRS/t4+YlnjdQs0TImFxA6utqMr
-	Vha4JjieUyhZ47D4+evdJICpoW5qGGT4Q7SXH1sXMVi9Yt5qJurufnSPIFtcM9jEtr96orWNMzT
-	lzvyLng0dYBaRc9w433lgbFsB7c38GU3sjx0ucQ==
-X-Google-Smtp-Source: AGHT+IEarWSrU9kPysuNRWZYBqj2CweoN+Wd66G3E6MHg2KIDu//l5cc1cXWz6AW7X2NByfYc5k7tCSv9TaDlE4EOF8=
-X-Received: by 2002:a17:907:8e9a:b0:a46:5f6c:e04b with SMTP id
- tx26-20020a1709078e9a00b00a465f6ce04bmr11272764ejc.52.1710815993004; Mon, 18
- Mar 2024 19:39:53 -0700 (PDT)
+        bh=R9gD6BrNu7wEli3QCno5011uW/xmhOWQhod+0lHWEwc=;
+        b=W5q29p6DCIPjbovRIIcjUkxF/uZ2X43KO9qcCnDwl7J3y5B+Yp8F5iG176HWGixVOK
+         +RLvhBoo5hFlTzTZ34w2F39GSXMRPaLgVnVfGo3yAev9WOWetKEOP+NPDkffz/7FFd1v
+         a6PXnGejtsJ2gGMLY9Ke6euFskDSrK1RyqfzgIpKsgSzx56ntb/yl1b5DCLsW/fj3Y3q
+         H1U3zGiSuuW0dahOd8nIU34YXgPAeH0p5/fOVpP6ImUJcFUXbbSziUKvW59v1g7a8rLU
+         sbiNc45KlsT5BeJcqgK1QyCQJ+AYqd33jNIZowTVPqzZ0KSLasMZvGIc8IrsNFIzBjdc
+         S2Sw==
+X-Forwarded-Encrypted: i=1; AJvYcCUP+O5IgMWKJfQuoTeU70bmV3BywEUuA3cl0c4P98S0sl4tSzD/k5WRxXj47MZnOVhQPGOLHZkY1W+cr2CcOhJ92bOsTBZggnBjiwWIPW7toIWQlFDPizGJCpeWd8FYfTuO8WFYR0Ip
+X-Gm-Message-State: AOJu0Yx23A4v9QWrZUqLHc2v9Zgb83u9JPNE/uOp4Ii89GjBJO2W8usI
+	9WTJ7ZU4xa6lIDoCH4IZRLuq5O1G1ICzUmmAY42kEubpul1FuceirV4oZGphKMG/6JuzQ8RIMtx
+	L30brGRX2AeKmbaFOgBDARF43RDI=
+X-Google-Smtp-Source: AGHT+IHssxyvNdr3L63+NZHNAhghqNLhvpUa2mxbkYkJJG5PKll9ckbnTkur9sYto5is8knHGuxl+1hhHlNiTTniOBU=
+X-Received: by 2002:a17:907:6d0d:b0:a46:a927:115e with SMTP id
+ sa13-20020a1709076d0d00b00a46a927115emr6713763ejc.39.1710816801073; Mon, 18
+ Mar 2024 19:53:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1710525524.git.yan@cloudflare.com> <491d3af6c7d66dfb3b60b2f210f38e843dfe6ed2.1710525524.git.yan@cloudflare.com>
- <790ce7e7-a8fd-4d28-aaf3-1b991a898be2@paulmck-laptop> <ZfgecVqd6p-ACSZ5@FVFF77S0Q05N>
- <CAO3-Pbp6fCayWeJ11U6JtqHn-Rs3OFXoZ9uMohUefSYUvSGUKA@mail.gmail.com>
-In-Reply-To: <CAO3-Pbp6fCayWeJ11U6JtqHn-Rs3OFXoZ9uMohUefSYUvSGUKA@mail.gmail.com>
-From: Yan Zhai <yan@cloudflare.com>
-Date: Mon, 18 Mar 2024 21:39:42 -0500
-Message-ID: <CAO3-PbrssUurD5dpMjxNduYhUj8dAikuwOHgZDn78o+Jqv_dBA@mail.gmail.com>
-Subject: Re: [PATCH v4 net 1/3] rcu: add a helper to report consolidated
- flavor QS
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: "Paul E. McKenney" <paulmck@kernel.org>, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>, 
-	Alexander Duyck <alexanderduyck@fb.com>, Hannes Frederic Sowa <hannes@stressinduktion.org>, 
-	linux-kernel@vger.kernel.org, rcu@vger.kernel.org, bpf@vger.kernel.org, 
-	kernel-team@cloudflare.com, Joel Fernandes <joel@joelfernandes.org>, 
-	Toke Hoiland-Jorgensen <toke@redhat.com>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
-	Steven Rostedt <rostedt@goodmis.org>, Jesper Dangaard Brouer <hawk@kernel.org>
+References: <20240311070550.7438-1-kerneljasonxing@gmail.com> <20240318201608.GC185808@kernel.org>
+In-Reply-To: <20240318201608.GC185808@kernel.org>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 19 Mar 2024 10:52:44 +0800
+Message-ID: <CAL+tcoCDs+0OJ3VE59KSyvvyzOxqf0SW-hojDeccwdB=PazwqA@mail.gmail.com>
+Subject: Re: [PATCH nf-next v2] netfilter: conntrack: avoid sending RST to
+ reply out-of-window skb
+To: Simon Horman <horms@kernel.org>
+Cc: edumazet@google.com, pablo@netfilter.org, kadlec@netfilter.org, 
+	fw@strlen.de, kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net, 
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Mar 18, 2024 at 9:32=E2=80=AFPM Yan Zhai <yan@cloudflare.com> wrote=
-:
->
-> On Mon, Mar 18, 2024 at 5:59=E2=80=AFAM Mark Rutland <mark.rutland@arm.co=
-m> wrote:
-> >
-> > On Fri, Mar 15, 2024 at 10:40:56PM -0700, Paul E. McKenney wrote:
-> > > On Fri, Mar 15, 2024 at 12:55:03PM -0700, Yan Zhai wrote:
-> > > > There are several scenario in network processing that can run
-> > > > extensively under heavy traffic. In such situation, RCU synchroniza=
-tion
-> > > > might not observe desired quiescent states for indefinitely long pe=
-riod.
-> > > > Create a helper to safely raise the desired RCU quiescent states fo=
-r
-> > > > such scenario.
-> > > >
-> > > > Currently the frequency is locked at HZ/10, i.e. 100ms, which is
-> > > > sufficient to address existing problems around RCU tasks. It's uncl=
-ear
-> > > > yet if there is any future scenario for it to be further tuned down=
-.
-> > >
-> > > I suggest something like the following for the commit log:
-> > >
-> > > ---------------------------------------------------------------------=
----
-> > >
-> > > When under heavy load, network processing can run CPU-bound for many =
-tens
-> > > of seconds.  Even in preemptible kernels, this can block RCU Tasks gr=
-ace
-> > > periods, which can cause trace-event removal to take more than a minu=
-te,
-> > > which is unacceptably long.
-> > >
-> > > This commit therefore creates a new helper function that passes
-> > > through both RCU and RCU-Tasks quiescent states every 100 millisecond=
-s.
-> > > This hard-coded value suffices for current workloads.
-> >
-> > FWIW, this sounds good to me.
-> >
-> > >
-> > > ---------------------------------------------------------------------=
----
-> > >
-> > > > Suggested-by: Paul E. McKenney <paulmck@kernel.org>
-> > > > Reviewed-by: Jesper Dangaard Brouer <hawk@kernel.org>
-> > > > Signed-off-by: Yan Zhai <yan@cloudflare.com>
-> > > > ---
-> > > > v3->v4: comment fixup
-> > > >
-> > > > ---
-> > > >  include/linux/rcupdate.h | 24 ++++++++++++++++++++++++
-> > > >  1 file changed, 24 insertions(+)
-> > > >
-> > > > diff --git a/include/linux/rcupdate.h b/include/linux/rcupdate.h
-> > > > index 0746b1b0b663..da224706323e 100644
-> > > > --- a/include/linux/rcupdate.h
-> > > > +++ b/include/linux/rcupdate.h
-> > > > @@ -247,6 +247,30 @@ do { \
-> > > >     cond_resched(); \
-> > > >  } while (0)
-> > > >
-> > > > +/**
-> > > > + * rcu_softirq_qs_periodic - Periodically report consolidated quie=
-scent states
-> > > > + * @old_ts: last jiffies when QS was reported. Might be modified i=
-n the macro.
-> > > > + *
-> > > > + * This helper is for network processing in non-RT kernels, where =
-there could
-> > > > + * be busy polling threads that block RCU synchronization indefini=
-tely.  In
-> > > > + * such context, simply calling cond_resched is insufficient, so g=
-ive it a
-> > > > + * stronger push to eliminate all potential blockage of all RCU ty=
-pes.
-> > > > + *
-> > > > + * NOTE: unless absolutely sure, this helper should in general be =
-called
-> > > > + * outside of bh lock section to avoid reporting a surprising QS t=
-o updaters,
-> > > > + * who could be expecting RCU read critical section to end at loca=
-l_bh_enable().
-> > > > + */
-> > >
-> > > How about something like this for the kernel-doc comment?
-> > >
-> > > /**
-> > >  * rcu_softirq_qs_periodic - Report RCU and RCU-Tasks quiescent state=
-s
-> > >  * @old_ts: jiffies at start of processing.
-> > >  *
-> > >  * This helper is for long-running softirq handlers, such as those
-> > >  * in networking.  The caller should initialize the variable passed i=
-n
-> > >  * as @old_ts at the beginning of the softirq handler.  When invoked
-> > >  * frequently, this macro will invoke rcu_softirq_qs() every 100
-> > >  * milliseconds thereafter, which will provide both RCU and RCU-Tasks
-> > >  * quiescent states.  Note that this macro modifies its old_ts argume=
-nt.
-> > >  *
-> > >  * Note that although cond_resched() provides RCU quiescent states,
-> > >  * it does not provide RCU-Tasks quiescent states.
-> > >  *
-> > >  * Because regions of code that have disabled softirq act as RCU
-> > >  * read-side critical sections, this macro should be invoked with sof=
-tirq
-> > >  * (and preemption) enabled.
-> > >  *
-> > >  * This macro has no effect in CONFIG_PREEMPT_RT kernels.
-> > >  */
-> >
-> > Considering the note about cond_resched(), does does cond_resched() act=
-ually
-> > provide an RCU quiescent state for fully-preemptible kernels? IIUC for =
-those
-> > cond_resched() expands to:
-> >
-> >         __might_resched();
-> >         klp_sched_try_switch()
-> >
-> > ... and AFAICT neither reports an RCU quiescent state.
-> >
-> > So maybe it's worth dropping the note?
-> >
-> > Seperately, what's the rationale for not doing this on PREEMPT_RT? Does=
- that
-> > avoid the problem through other means, or are people just not running e=
-ffected
-> > workloads on that?
-> >
-> It's a bit anti-intuition but yes the RT kernel avoids the problem.
-> This is because "schedule()" reports task RCU QS actually, and on RT
-> kernel cond_resched() call won't call "__cond_resched()" or
-> "__schedule(PREEMPT)" as you already pointed out, which would clear
-> need-resched flag. This then allows "schedule()" to be called on hard
-> IRQ exit time by time.
->
+Hello Simon,
 
-And these are excellent questions that I should originally include in
-the comment. Thanks for bringing it up.
-Let me send another version tomorrow, allowing more thoughts on this if any=
-.
-
-thanks
-Yan
-
-> Yan
+On Tue, Mar 19, 2024 at 4:16=E2=80=AFAM Simon Horman <horms@kernel.org> wro=
+te:
 >
-> > Mark.
+> On Mon, Mar 11, 2024 at 03:05:50PM +0800, Jason Xing wrote:
+> > From: Jason Xing <kernelxing@tencent.com>
 > >
-> > >
-> > >                                                       Thanx, Paul
-> > >
-> > > > +#define rcu_softirq_qs_periodic(old_ts) \
-> > > > +do { \
-> > > > +   if (!IS_ENABLED(CONFIG_PREEMPT_RT) && \
-> > > > +       time_after(jiffies, (old_ts) + HZ / 10)) { \
-> > > > +           preempt_disable(); \
-> > > > +           rcu_softirq_qs(); \
-> > > > +           preempt_enable(); \
-> > > > +           (old_ts) =3D jiffies; \
-> > > > +   } \
-> > > > +} while (0)
-> > > > +
-> > > >  /*
-> > > >   * Infrastructure to implement the synchronize_() primitives in
-> > > >   * TREE_RCU and rcu_barrier_() primitives in TINY_RCU.
-> > > > --
-> > > > 2.30.2
-> > > >
-> > > >
+> > Supposing we set DNAT policy converting a_port to b_port on the
+> > server at the beginning, the socket is set up by using 4-tuple:
+> >
+> > client_ip:client_port <--> server_ip:b_port
+> >
+> > Then, some strange skbs from client or gateway, say, out-of-window
+> > skbs are eventually sent to the server_ip:a_port (not b_port)
+> > in TCP layer due to netfilter clearing skb->_nfct value in
+> > nf_conntrack_in() function. Why? Because the tcp_in_window()
+> > considers the incoming skb as an invalid skb by returning
+> > NFCT_TCP_INVALID.
+> >
+> > At last, the TCP layer process the out-of-window
+> > skb (client_ip,client_port,server_ip,a_port) and try to look up
+> > such an socket in tcp_v4_rcv(), as we can see, it will fail for sure
+> > because the port is a_port not our expected b_port and then send
+> > back an RST to the client.
+> >
+> > The detailed call graphs go like this:
+> > 1)
+> > nf_conntrack_in()
+> >   -> nf_conntrack_handle_packet()
+> >     -> nf_conntrack_tcp_packet()
+> >       -> tcp_in_window() // tests if the skb is out-of-window
+> >       -> return -NF_ACCEPT;
+> >   -> skb->_nfct =3D 0; // if the above line returns a negative value
+> > 2)
+> > tcp_v4_rcv()
+> >   -> __inet_lookup_skb() // fails, then jump to no_tcp_socket
+> >   -> tcp_v4_send_reset()
+> >
+> > The moment the client receives the RST, it will drop. So the RST
+> > skb doesn't hurt the client (maybe hurt some gateway which cancels
+> > the session when filtering the RST without validating
+> > the sequence because of performance reason). Well, it doesn't
+> > matter. However, we can see many strange RST in flight.
+> >
+> > The key reason why I wrote this patch is that I don't think
+> > the behaviour is expected because the RFC 793 defines this
+> > case:
+> >
+> > "If the connection is in a synchronized state (ESTABLISHED,
+> >  FIN-WAIT-1, FIN-WAIT-2, CLOSE-WAIT, CLOSING, LAST-ACK, TIME-WAIT),
+> >  any unacceptable segment (out of window sequence number or
+> >  unacceptible acknowledgment number) must elicit only an empty
+>
+> Not for those following along, it appears that RFC 793 does misspell
+> unacceptable as above. Perhaps spelling was different in 1981 :)
+
+Thanks for the check. Yes, it did misspell that word. Should I correct
+that word in my quotation?
+
+>
+> >  acknowledgment segment containing the current send-sequence number
+> >  and an acknowledgment..."
+> >
+> > I think, even we have set DNAT policy, it would be better if the
+> > whole process/behaviour adheres to the original TCP behaviour as
+> > default.
+> >
+> > Suggested-by: Florian Westphal <fw@strlen.de>
+> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+>
+> ...
 
