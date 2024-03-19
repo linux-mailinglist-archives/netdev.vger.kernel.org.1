@@ -1,72 +1,132 @@
-Return-Path: <netdev+bounces-80661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB87A880369
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 18:27:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC070880373
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 18:28:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 749B8284B26
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 17:27:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82C0F2823AE
+	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 17:28:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 288501E4B1;
-	Tue, 19 Mar 2024 17:26:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FFF120DC8;
+	Tue, 19 Mar 2024 17:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d4pLN1bP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NtdOUzi1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED936374F2;
-	Tue, 19 Mar 2024 17:26:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB60208C4;
+	Tue, 19 Mar 2024 17:28:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710869203; cv=none; b=EmYHyQ17F/aBFmo3YMNVrG4mir+aO2XWtlPY3rB2PrVgVJFVlKPzDKnqME5/ipbmqBcziUrvVSwnVS/Aik08BFoGmbNLnLyvtH/UUGEpCAYYdw7tcubdHzXSS4U47/dUotCjWsBQtvU6ms6Hz5dvRzZQurfPHSPDoBKwUlFY2+4=
+	t=1710869282; cv=none; b=Q07Lhov5i9olEIUKNdMlpyZMXUv92oDLjHYF1f6C+k7SsECuaemQV1hjl0GUamA8e/S1glxsfLUQ+7bOmY/k9oa2TLlJS7o+gQ5XeZagP0BSN9v4W3Awa7c90A0gvAUl1o6Tu2t9xXIhvHQbfFZtWiWdRaZaJWb3aMUaeJLMMXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710869203; c=relaxed/simple;
-	bh=q0mQXYnw7vmq+3ChIG1+fp/A8xtsC227i6BGq5i2jgU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WSmoJWYWCIj7JYww8g1QO8MgEPPlwfNJsOBrchgwuUNoUTXgdvZcAO3bbmGXixvHAFiN5qsKSJHLKf5NYozNhqXCMJ20z0sDkIiNr42B/yTp3om2b5ei+lP68f8Bu80OExhEjxa05Eg7qRJKqanGQTUs/kKuY7ZCwgKaD9Tgb4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d4pLN1bP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 22574C433C7;
-	Tue, 19 Mar 2024 17:26:42 +0000 (UTC)
+	s=arc-20240116; t=1710869282; c=relaxed/simple;
+	bh=BmjDLFOVVf87fF20Q7iFvAzUVKO78z0OH3SPBHvtlbk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fX3+dN739BAodExrGZk+DiRLMCSwloy4uohZlOxAPNhue//wOuTYq0O5kd173IQmsIqirk6k1TB1ifBV6oxcvY5Yf3Omd04MUeVP7asKD3Es2eJFMZb/nflsJu2gcT9uZfpNlqnwvvK6CtUl2XneDFPE7TPCrjoDPISrcnh1Ka0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NtdOUzi1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBC59C433C7;
+	Tue, 19 Mar 2024 17:28:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710869202;
-	bh=q0mQXYnw7vmq+3ChIG1+fp/A8xtsC227i6BGq5i2jgU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=d4pLN1bPbg4B7W+yT0162XeCnqfd5s42ut/P2h5xEZoHQpneCel60Os5FYHMM4K1h
-	 fIitQlVqxC8BVWvAyrXiQ9jLmAT61kaj+UKSaEUd+6RA9fpE5zln/55v07PvXWpXHd
-	 g4xoI64ljAP1amp55Uxv3hh4NS2eqdU/ynjRlTsul86osiPajs64cAF1sFymSyiJdO
-	 BK5fFlpuCgp/2nXi8DQjaxcHr/I7LJVKVkqcKs/wAYeg5YkQheRS8cGvD2bSNt+A0v
-	 YUH6PPwHwPskxLmT92qx13oLAJxccrx8KJfROrYDp10kohpjmkPOkL4u+ER392oT1y
-	 3e9vRJZ5zwO0w==
-Date: Tue, 19 Mar 2024 10:26:41 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: <Raju.Lakkaraju@microchip.com>
-Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
- <edumazet@google.com>, <linux-kernel@vger.kernel.org>,
- <Bryan.Whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH net V1 3/3] net: lan743x: Address problems with wake
- option flags configuration sequences
-Message-ID: <20240319102641.3f135b2f@kernel.org>
-In-Reply-To: <LV8PR11MB87002847609196ABF0D0568F9F2C2@LV8PR11MB8700.namprd11.prod.outlook.com>
-References: <20240319055110.764002-1-Raju.Lakkaraju@microchip.com>
-	<20240319055110.764002-4-Raju.Lakkaraju@microchip.com>
-	<LV8PR11MB87002847609196ABF0D0568F9F2C2@LV8PR11MB8700.namprd11.prod.outlook.com>
+	s=k20201202; t=1710869281;
+	bh=BmjDLFOVVf87fF20Q7iFvAzUVKO78z0OH3SPBHvtlbk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NtdOUzi1Q7UTk4HP/QwEE2ZYOe/YCr2YpzkB4PTRdc+9wk2nMfXs4QD8zMx7LwB/A
+	 IhyFX8fahAwF7tColwxJw8emGbkDZkS37rdht4o5D+n9NpWjbMN0NIVUUnueEbhanc
+	 RV+kHQ2H1sv0UpkQamqsXRwglPqYp7I+iWijNzlHW4nqyzOVzhsjnyrvhtF+lgce69
+	 toxyg2DnmNRTIS0wo1jNWg63A/UJd/oYO0GcJRANUHhIzK+9czpyGCFbY6wcn1ZEbX
+	 x1TAEgRfQspZTLRkhAKJnMbf3lmK6QyEUWiveiuA7mW8QNJywOZG/MoL4TFjpXrR4k
+	 XqQQjOZ5FFDVg==
+Received: from johan by xi.lan with local (Exim 4.97.1)
+	(envelope-from <johan@kernel.org>)
+	id 1rmdFw-0000000014I-093X;
+	Tue, 19 Mar 2024 18:28:08 +0100
+Date: Tue, 19 Mar 2024 18:28:08 +0100
+From: Johan Hovold <johan@kernel.org>
+To: Doug Anderson <dianders@chromium.org>
+Cc: Johan Hovold <johan+linaro@kernel.org>,
+	Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	cros-qcom-dts-watchers@chromium.org,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Balakrishna Godavarthi <quic_bgodavar@quicinc.com>,
+	Matthias Kaehlcke <mka@chromium.org>,
+	Rocky Liao <quic_rjliao@quicinc.com>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+	linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
+	Nikita Travkin <nikita@trvn.ru>
+Subject: Re: [PATCH v3 3/5] Bluetooth: qca: fix device-address endianness
+Message-ID: <ZfnLKC7B9o2reC8x@hovoldconsulting.com>
+References: <20240319152926.1288-1-johan+linaro@kernel.org>
+ <20240319152926.1288-4-johan+linaro@kernel.org>
+ <CAD=FV=WqwY07fMV-TuO8QMRnk555BJYEysv4urcugsELufHr4A@mail.gmail.com>
+ <Zfm_oFLNgPHqJKtG@hovoldconsulting.com>
+ <CAD=FV=UgCNmeWJiwWAGj_jm78eeTNoo-_bx7QrqLfyDMJwRNKA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAD=FV=UgCNmeWJiwWAGj_jm78eeTNoo-_bx7QrqLfyDMJwRNKA@mail.gmail.com>
 
-On Tue, 19 Mar 2024 06:00:15 +0000 Raju.Lakkaraju@microchip.com wrote:
-> Sorry for inconvenience. Please ignore this mail only. 
-> By mistake it was not out.
+On Tue, Mar 19, 2024 at 10:12:25AM -0700, Doug Anderson wrote:
+> On Tue, Mar 19, 2024 at 9:38 AM Johan Hovold <johan@kernel.org> wrote:
+> > On Tue, Mar 19, 2024 at 09:10:38AM -0700, Doug Anderson wrote:
 
-Unfortunately patchwork decided to include it in the series,
-please repost.
+> > > Personally, I'd prefer it if you didn't break bisectability with your
+> > > series. As it is, if someone applies just the first 3 patches they'll
+> > > end up with broken Bluetooth.
+> >
+> > It doesn't break the build, but yes, the device address would be
+> > reversed for Trogdor machines for two commits and possible break any
+> > previous pairings. That's hardly something to worry about.
+> >
+> > So I consider this to be acceptable for sake of clarity, and especially
+> > since these patches will be coming in from separate trees anyway.
+> 
+> I guess I have a different opinion on the matter. I often end up
+> cherry-picking stuff to older branches and I generally assume that
+> it's relatively safe to pick the beginning of a series without picking
+> later patches because I assume everyone has a goal of bisectability.
+> This breaks that assumption. IMO splitting up the Qualcomm Bluetooth
+> patch into two patches doesn't help enough with clarity to justify.
+
+I did that in v2 because then the two patches had to be split to
+facilitate backporting as wcn3991 support was added later.
+
+But the big issue here is taking the patches through different trees. If
+Bjorn could ack the DT patch so that everything goes through the
+Bluetooth tree, then I guess I can reorder the DT patch and squash the
+two driver patches.
+
+But waiting several weeks just to make sure that the DT patch hits
+mainline (and the binding patch before that?) before the driver fixes
+can go in just does not seem worth it to me.
+
+> > I don't think it's worth spending more time and effort on this issue
+> > (which should have been caught and fixed years ago) for this.
+> 
+> Sure, that's your opinion and if the BT folks agree with you then they
+> are free to land the patches without my Reviewed-by on them. ;-) Mine
+> is not a strong Nak but I feel strongly enough that I'd prefer not to
+> have my Reviewed-by added without the re-organization.
+
+Of course, understood.
+
+Johan
 
