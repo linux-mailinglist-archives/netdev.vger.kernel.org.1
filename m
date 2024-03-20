@@ -1,96 +1,138 @@
-Return-Path: <netdev+bounces-80763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83A24880FD1
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:31:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7463880FF0
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:33:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22C26285205
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 10:31:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 756C71F217CF
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 10:33:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7141E3FB82;
-	Wed, 20 Mar 2024 10:27:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE65D2D057;
+	Wed, 20 Mar 2024 10:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YeKZ41OI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ol7/ItQM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C64413FB2E;
-	Wed, 20 Mar 2024 10:27:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AFC51E48E;
+	Wed, 20 Mar 2024 10:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710930463; cv=none; b=Fv8mYvXFygM3+x0VINS2LcxIDjQ5GWcphmqVI004NUKn04PBc3/6Wy3xomNsdZt190Ib9WVe5e94bAKPBO1uXHK54eZ9crH71/dtOxvFxr+BvfsIixsMkhSkDWUfGmU1CQ6enQnWTOeaLa3CbJGYSmlLUdh4VPUdOv5GQ/6c5P0=
+	t=1710930628; cv=none; b=XRdzK1Ei13NYG3HaqFu5uw//kb/v2mlAoP5VoXmeZd6K1d2JSJSytqhnjssS9oAerYNK9ynqHpiYl7iP/BTmQKFz0b5jApfHBsk7KcFwCu2sS/SoPdV+nT1U25nBSYmPuc2LzqcMS/ZuxqVi22DQGaUKgOFVa6sr1gVwbMwfHMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710930463; c=relaxed/simple;
-	bh=xhXeyDGOb3pQKxcGo7mj/IRBOHnIFDLmPNQP6tybMTI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dkLF41Tt0/9+AZ66pxbgKSs7leTU1+oBgBUSTnRzJac5W/74ctrjKf13js4ISDcT+4UJSHE7CYTx6hw0Q5KFWcnzeJ0ZfYaaELLhoJLq1Lx9ujynpfPbt3IQpi892LFDhotXxz6llu3BrkPKR3ftc9QZq9nzFu7GUzVkcvXZZvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YeKZ41OI; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710930461; x=1742466461;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xhXeyDGOb3pQKxcGo7mj/IRBOHnIFDLmPNQP6tybMTI=;
-  b=YeKZ41OIzTaRKQwyy82xVGHjKE85+XePXJi/3y8RY1FOwq00sOYOkvco
-   9AmJvO+JH8s9MwNakTdBAsBK6MIYMpWvtbDKAU4afNXo2qlhctoZRsfug
-   EPUjpP//BxG/lonthac1aCXUIUQjMgpDx8GQxuqPDfOhBGcd7B5w5hcZz
-   DZRU2uDbRkHTmDjIInWiDMWnAOZuoP3F7+e64LE/vm6sQ1gNVcciT5CB3
-   h98KKh3ZuimcSLXxoyXsO63u4Q1YatS2Vm0SQXM0dJTR9bnRST8qcfA3x
-   7R1vtrgQdKhnY1MITVHIkgJq5hYPoLDtAWW+7UFySyX3R1rPRg8TdotyA
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11018"; a="23303725"
-X-IronPort-AV: E=Sophos;i="6.07,139,1708416000"; 
-   d="scan'208";a="23303725"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2024 03:27:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,11018"; a="914662024"
-X-IronPort-AV: E=Sophos;i="6.07,139,1708416000"; 
-   d="scan'208";a="914662024"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2024 03:27:40 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.97)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1rmtAX-0000000EXXG-3Kem;
-	Wed, 20 Mar 2024 12:27:37 +0200
-Date: Wed, 20 Mar 2024 12:27:37 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: Re: [PATCH net-next v1 1/1] nfc: st95hf: Switch to using gpiod API
-Message-ID: <Zfq6GYnPAn000my0@smile.fi.intel.com>
-References: <20240318203923.183943-1-andriy.shevchenko@linux.intel.com>
- <ZfloHvWaTOQErWfU@nanopsycho>
+	s=arc-20240116; t=1710930628; c=relaxed/simple;
+	bh=Ng5N4KT0SCm8Zb4mwGaTwyWKHKjaLEy2Wm0KyGEcEto=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aykgGPaDT4JDYFTpikBAJurw3JalHSw43vsltg4eG46i4KpPnVFG5UP3yIGOe5MCWOa0Gsc0AGVfPNyzGEapA4xlbhjOPyHHf/5UKULFWTiYZFObyjs7wyF+3xKXVW7iY4Iw97YacsutKWL0o1TXwj07gIXd34nbjBXZ0x3azW0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ol7/ItQM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 920B6C433C7;
+	Wed, 20 Mar 2024 10:30:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710930628;
+	bh=Ng5N4KT0SCm8Zb4mwGaTwyWKHKjaLEy2Wm0KyGEcEto=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Ol7/ItQM72RsqGXTgcikxJy4dTlaUDho4Kqr5tT+d6X3xM8PArvo61vgr5a1KFSSu
+	 QCjmG1YljRplfNm4JTZdB2xsYsks86a1/z/hL8c7Lsw/X3x6RuLLJ/6VQ25cWsSznv
+	 HyRsrTEIQPmSvit7T+Fj7A3tTy8+9TLd6vrU0J87HGRbeD+XJrEQVod323EJiUUzk+
+	 JIbajnxGaDABod60v59IdWD0zGBcjeSZxM0uVoDsL7UOVz6U2AD8X4NDTAtghd5esM
+	 sgVmRO2DateKvrWQrhbbjte8mLladypCMuXXtDYl39pSNLHVqzjS4Z1/41fOyjRmyA
+	 Fx6LA7Zqb842g==
+Message-ID: <4e251463-8cfb-4cc6-b9b6-ce1dcd7c7052@kernel.org>
+Date: Wed, 20 Mar 2024 11:30:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZfloHvWaTOQErWfU@nanopsycho>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 net 0/3] Report RCU QS for busy network kthreads
+To: Yan Zhai <yan@cloudflare.com>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
+ Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Coco Li <lixiaoyan@google.com>,
+ Wei Wang <weiwan@google.com>, Alexander Duyck <alexanderduyck@fb.com>,
+ linux-kernel@vger.kernel.org, rcu@vger.kernel.org, bpf@vger.kernel.org,
+ kernel-team@cloudflare.com, Joel Fernandes <joel@joelfernandes.org>,
+ "Paul E. McKenney" <paulmck@kernel.org>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+ Steven Rostedt <rostedt@goodmis.org>, mark.rutland@arm.com,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+References: <cover.1710877680.git.yan@cloudflare.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <cover.1710877680.git.yan@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 19, 2024 at 11:25:34AM +0100, Jiri Pirko wrote:
-> Mon, Mar 18, 2024 at 09:39:23PM CET, andriy.shevchenko@linux.intel.com wrote:
-> >This updates the driver to gpiod API, and removes yet another use of
-> >of_get_named_gpio().
-> >
-> net-next is closed, send again next week.
 
-Same Q: Why to resend? Can't you utilise lore.kernel.org?
+On 19/03/2024 21.44, Yan Zhai wrote:
+> This changeset fixes a common problem for busy networking kthreads.
+> These threads, e.g. NAPI threads, typically will do:
+> 
+> * polling a batch of packets
+> * if there are more work, call cond_resched() to allow scheduling
+> * continue to poll more packets when rx queue is not empty
+> 
+> We observed this being a problem in production, since it can block RCU
+> tasks from making progress under heavy load. Investigation indicates
+> that just calling cond_resched() is insufficient for RCU tasks to reach
+> quiescent states. This also has the side effect of frequently clearing
+> the TIF_NEED_RESCHED flag on voluntary preempt kernels. As a result,
+> schedule() will not be called in these circumstances, despite schedule()
+> in fact provides required quiescent states. This at least affects NAPI
+> threads, napi_busy_loop, and also cpumap kthread.
+> 
+> By reporting RCU QSes in these kthreads periodically before cond_resched, the
+> blocked RCU waiters can correctly progress. Instead of just reporting QS for
+> RCU tasks, these code share the same concern as noted in the commit
+> d28139c4e967 ("rcu: Apply RCU-bh QSes to RCU-sched and RCU-preempt when safe").
+> So report a consolidated QS for safety.
+> 
+> It is worth noting that, although this problem is reproducible in
+> napi_busy_loop, it only shows up when setting the polling interval to as high
+> as 2ms, which is far larger than recommended 50us-100us in the documentation.
+> So napi_busy_loop is left untouched.
+> 
+> Lastly, this does not affect RT kernels, which does not enter the scheduler
+> through cond_resched(). Without the mentioned side effect, schedule() will
+> be called time by time, and clear the RCU task holdouts.
+> 
+> V4: https://lore.kernel.org/bpf/cover.1710525524.git.yan@cloudflare.com/
+> V3: https://lore.kernel.org/lkml/20240314145459.7b3aedf1@kernel.org/t/
+> V2: https://lore.kernel.org/bpf/ZeFPz4D121TgvCje@debian.debian/
+> V1: https://lore.kernel.org/lkml/Zd4DXTyCf17lcTfq@debian.debian/#t
+> 
+> changes since v4:
+>   * polished comments and docs for the RCU helper as Paul McKenney suggested
+> 
+> changes since v3:
+>   * fixed kernel-doc errors
+> 
+> changes since v2:
+>   * created a helper in rcu header to abstract the behavior
+>   * fixed cpumap kthread in addition
+> 
+> changes since v1:
+>   * disable preemption first as Paul McKenney suggested
+> 
+> Yan Zhai (3):
+>    rcu: add a helper to report consolidated flavor QS
+>    net: report RCU QS on threaded NAPI repolling
+>    bpf: report RCU QS in cpumap kthread
+> 
+>   include/linux/rcupdate.h | 31 +++++++++++++++++++++++++++++++
+>   kernel/bpf/cpumap.c      |  3 +++
+>   net/core/dev.c           |  3 +++
+>   3 files changed, 37 insertions(+)
+> 
 
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
 
