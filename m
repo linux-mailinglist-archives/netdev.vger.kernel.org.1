@@ -1,544 +1,239 @@
-Return-Path: <netdev+bounces-80827-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80828-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B5BF881344
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 15:25:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2036588135E
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 15:33:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81F16B21030
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 14:25:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A58BB2260E
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 14:33:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E0744C9B;
-	Wed, 20 Mar 2024 14:25:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B6584436E;
+	Wed, 20 Mar 2024 14:33:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=solidrn.onmicrosoft.com header.i=@solidrn.onmicrosoft.com header.b="bcHeZ3YE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2139.outbound.protection.outlook.com [40.107.21.139])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFBE44436E
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 14:25:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710944738; cv=none; b=qGR2qewpj2AnvwylNxYjIXCyHKHLllre0RY7ddLlr6AzxaASb6nbf1SEfkoRBs8RaLhM2m0FIzKWWIKfqe02QEPY63UXcNO3H18a08HZyVJeuKQucc0rWsgz7dtvqnZhMLJK7jXfuj0yyQvoDC+onEmf0KA8AqEvglsaTKJ/KZ8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710944738; c=relaxed/simple;
-	bh=C9/4jKu11xvKKA0n9nxyGhW+lmUn3NFOieYK+NWTmG4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=kNaXu1xFtuaXQ2JjLWdm2Dacs1hrVkKAC4k6Gi41BgO+BdI4MyTvsJQxRJUi5FA6PWnPfg6LQi2ZzvPt1V7avY2fWykPyv97goCYIk5ZZqpq0MRtouMXlmUM0dlbb4P6W7wMxUVmpFwY2EVJAUIsNAji9/IVQ/EYeWO3iegDGs0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-366c3152af9so29527245ab.3
-        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 07:25:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710944735; x=1711549535;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tjvFyWv7zoljp+KEyQKKbubYXcjMu3wJsjfzaeYSSnQ=;
-        b=l7TErq85+iawD7GTQN3uUnMDCOHmzSY21fo5VMdcie0S1/njYnHIpM55x+K7ApeOb9
-         sfPb77SBiY+tPUCjBgkQS5nxwzNnTsKRfeKGvSADKSpH4DXsDWHfD3z+aw1UqeRDEZBX
-         bj0pa/aRACDpXb/VC4DnjBZwJhp2+aeCaa+/VbyedI/rYofCE1rXngXQig/11ZKOCHR+
-         0bwtVVxaDl3FYoZTTkZNEuKc6f78vjwuENIhzi+DI5CakGTcycabadi+KZdO93XtfHtB
-         bOMlXoXVRwTkLl5gb8o+EW6XRBUNw7++IhN3TOtvsJs62Qhv6EnuiZ/za5X4cUyH7PY2
-         ap6A==
-X-Forwarded-Encrypted: i=1; AJvYcCWJxFDF8mU4BJpWQV76P9mzKxAZ6YW+VdCvnmkNb9S3QA1PakXXBgfEgoDbGUw6vBxTqb/j3T8H+ZGRvgIZdoQESbKhIqkN
-X-Gm-Message-State: AOJu0Yw6qP7LOvW++UpFzjJPtcs8CuWyhMMRzfOH1/KCX3jJ3cDQEziy
-	HDAyzZbid21PSrseA5N32mc6T+XWxbd1eGCCI6+YD1dK9KT97JZ+Sdj88qk4v98pR89Di2+tbTB
-	yuYahaXS8m7RnfArkljY1snjZbdtpjl7htVwRF6AqjkIzlWh/8HbqCmI=
-X-Google-Smtp-Source: AGHT+IGKAdj7aHk8VYV3JYgsBVhq748EhRN1HMGOFVRnDWBagF5qjhe1q3762IHoSqLNfzqeemWBhrviNcGmqv404wIqoNxVyb4T
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B0723FB97;
+	Wed, 20 Mar 2024 14:33:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.139
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710945217; cv=fail; b=kh1TEiniT8xME3FSHeXjPNE8qmll1kD9H67qIy+rBTXv5tZLZLHbcrtc+o6yMQbTBZ+fzjQrzWBjl7VFj/V896PBWjT01yRIv6xtvbhQh7StBfkKbBsOnHz1CmMKtgNsUKdUifQv9ItS3LoEXg7IDqp1sf/dePPsRx4OnF5CDB8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710945217; c=relaxed/simple;
+	bh=iEkkRR1Ggnu0U4KksbiHEKS21yVgdlrmK1IpxqWM+20=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=NLWV9BwTjqUqMR2sKfdW2rTLf5RuJBbyG3eW3S7dztmiMdqU4m+vivF0Qo+7Cb+Q/EWkGR0m7P2aaQJmyFw6lk+jZKC1h8vwLxDgHkMvuCzujNEdWK7enpgV13UnpJPswXlggCMDaZzFZFGhHxMmxBzHBHb7C/abcV3I5eAbOIU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=solid-run.com; spf=pass smtp.mailfrom=solid-run.com; dkim=pass (1024-bit key) header.d=solidrn.onmicrosoft.com header.i=@solidrn.onmicrosoft.com header.b=bcHeZ3YE; arc=fail smtp.client-ip=40.107.21.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=solid-run.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=solid-run.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=E2/skxd5PC4yGaIMiZMtHYeJSRm0giVhrq3W30IncR/ainCZcS0COOqFguxjV8Fs0gVQ5zjRI9ZiaXwy8uE1LCtagNDH97CC7eOyDOPiqdUwNJJeoX63Ww9I/DOY1PED0wE83syCOSHeO1deZa4nN0D6zvanHDGT0AvlI6iBTAaYWSsq78bBNvlDXrvIFVirrkWV/JlFGhTPQgy6cu/aNsAnR0IiFEvOlGKW+EV+97FDs8ZXHwnUdKCgZdGXyWC5KNtCwpTL5HQBlaPdLUNl/6E3LfW7mNePPRIR1QCPdblyGSx2Bj3GeOO81dCdi982pLMNd5xI0BKXrSEo1CLQAQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iEkkRR1Ggnu0U4KksbiHEKS21yVgdlrmK1IpxqWM+20=;
+ b=jQHUeXCPDxMNPqrZqvgQALuCxz7jucJADk8XW2gNJMFBhlXv3PMtUrkhYjFPF+uYCG3AvGI5xgMvQ/dyQu67Q+kD21al6cpmG4l9sjv4YeK6E9uPyWAGoVbCEB9r4VJnIthij2xrtvmdhzXf596v/+PiRkPN4r8dgH0yZh4PVgzcgWXiyOoLmk/p6URuSN5xmtxK5Y0fztuxCLmDs8O93OeIg6N9x/M5yCmjFSk2jlLjNzirqG10+/RlR1A8Kp4ukdBKbseulN1drYfCwmyLcfdZzRCJjw/DWSS1eHy/lGGJcdcS60pH6SEDwwox0+dLA41iEVMzvRL7KpY7NJyyYg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=solid-run.com; dmarc=pass action=none
+ header.from=solid-run.com; dkim=pass header.d=solid-run.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=solidrn.onmicrosoft.com; s=selector1-solidrn-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=iEkkRR1Ggnu0U4KksbiHEKS21yVgdlrmK1IpxqWM+20=;
+ b=bcHeZ3YEJoReg3WKrU+yyALSXh4gX5ibm6tgWh7V62ZztY93itc5UTlbs8ZclNBKA87SU8wsBetJ8nDEeNLDxKwgoF2EA1y5dde+fB8BkP14R06kjC66gVRyruzzlQUuTWUMCUXehEFn5vpcw8gc3Va0foJ777hDpsM1dFz7q2s=
+Received: from AM9PR04MB7586.eurprd04.prod.outlook.com (2603:10a6:20b:2d5::17)
+ by AS8PR04MB8819.eurprd04.prod.outlook.com (2603:10a6:20b:42e::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.25; Wed, 20 Mar
+ 2024 14:33:27 +0000
+Received: from AM9PR04MB7586.eurprd04.prod.outlook.com
+ ([fe80::57e1:e1cb:74e2:2e9d]) by AM9PR04MB7586.eurprd04.prod.outlook.com
+ ([fe80::57e1:e1cb:74e2:2e9d%5]) with mapi id 15.20.7386.031; Wed, 20 Mar 2024
+ 14:33:24 +0000
+From: Josua Mayer <josua@solid-run.com>
+To: Jiri Pirko <jiri@resnulli.us>
+CC: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] net: dsa: mv88e6xxx: add warning for truncated mdio bus
+ id
+Thread-Topic: [PATCH] net: dsa: mv88e6xxx: add warning for truncated mdio bus
+ id
+Thread-Index: AQHaes1eqLrk3YtcdE6GnHKqfgAD+rFAqraAgAAG0AA=
+Date: Wed, 20 Mar 2024 14:33:24 +0000
+Message-ID: <c76c95af-71cb-4eb6-b3af-846ae318d18d@solid-run.com>
+References:
+ <20240320-mv88e6xxx-truncate-busid-v1-1-cface50b2efb@solid-run.com>
+ <Zfrt_dlYvBzlxull@nanopsycho>
+In-Reply-To: <Zfrt_dlYvBzlxull@nanopsycho>
+Accept-Language: de-DE, en-US
+Content-Language: de-DE
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=solid-run.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: AM9PR04MB7586:EE_|AS8PR04MB8819:EE_
+x-ms-office365-filtering-correlation-id: 09d31143-f9b1-4fb4-7053-08dc48eab315
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ XcMF+5hRaVpGsU+wy/3CPO6uzaK02V3i8M7304GrLjGHoJ7wDglP2ukkRLJZP8ve5AD4oA54RTMmN5lLB9q3oW3gXIO1HnUvMQMiD8a28L4tr3JWfzzby+swZjk3ORScthqfb8CS3hl+yLba4O80f0qbjo76aiFVDLuJqGTLfW5Red+y4tyeMJfOQmEwTAgVxGHqb8JOmqTCvMV4hvXfXefTbuVHUcVFnfV19iZSYcBR3K26kAXQlGbb85MmwG5Vs4h5sH2z723U0Br9/fq8gqWTMYOHeJfkLrxrxWiyCF2PO+DSFp5p8ngwIE17+hAyz8Ym22UvMonD8BaPqwzqAap+/2oHLZuCyBQP+IscCAHNYaxsvebFA56s+5goZZ8MBog/nHBUkf1n5VD+1WgbmEaXoHiLHrkVPNte8dv8nrzjRdw3OSkAeqT1Ue1h5jTFhz1OXF/dxBYzwlkMkLAizZpAaCVPvEAtexT7WVE6cfcMXcW58XMD3pdP/VGHTukIoSC9pmIsMYMrqEvqTuwru3FgMUFoTR7MGBBG3jXY4eYiasCURh5E0gpqX1vfjflV9LLXbkoHcRoNHbecLajamalV3L6AxyMnv0TS29SRtHQw8bdjtUoPBh1L1X4jGG++fzwnUZ11+k67P2cQccYvlsJEhC4E/aNwAuqpfG3UOOdwxLOJEjDxw3tLdjEeGMeJgaw2CoWbLdC0v2x0CvaLzlSh+jNbMGl2ol2a5syeDBE=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB7586.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(366007)(1800799015)(376005)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?U2VOTEE3OFNyeUgyWGY3NXdSL21ieGl5MmNxL1E0Nkg0Q0xyZVpYTlBONDc5?=
+ =?utf-8?B?WnRLMXFNL0l0YklkbFdlNWM5R0tMNENQVVoxOGN6T3lzZWwvNzg2cGhKN2Nn?=
+ =?utf-8?B?OHFIT1NUdVY0Zm9BdG5sN2ZGcXpEa25qY2N6d2lPblZvWk5nSGV0aVhZM2Vr?=
+ =?utf-8?B?Q2xNM1JXOXJNbnFUN0hEd1FkamNJaVpkeE9pYk83Z3hCMCsrM1VPZ2Fab3FW?=
+ =?utf-8?B?bHpkQUZIb3YxYTVub3o2S3FZVmFHNHdkQzM1ZC9yWXB2VkZOZVRaR2I2QUhZ?=
+ =?utf-8?B?ZDNpaU9Lc2E1eCs3NmQ5MWJzMWlCUFVHMTJ5K2loYjdicXdjdjdhOHdTbk5V?=
+ =?utf-8?B?dzZTSDVPcUtOSFFoblFDZXJRbGh0MVlyTmdoTE9iQWQvL2YrT3FjN3A1ZzB6?=
+ =?utf-8?B?Sk9lcHB0NFZZb1lnaG9qUm5DQnAyZVJuSGd3bS8yL0M5UnhqTk5FODR4UGc3?=
+ =?utf-8?B?SkRqMXRnUFhxeHZ2OXRHL0RSZlI0dFFCZ2VZRzc5RWhkODFkdnN3dGpiQTNw?=
+ =?utf-8?B?RjJzSS94TFdaNThuK0ltTzR1TlA4aDRJc2psdEgvTU12UWUyMnk1T1Q1cjJn?=
+ =?utf-8?B?VUNsazFRaVhUWGppTm45Q21wZlI1ZjRqWmVIMjArMm91YlYxWmVRSzF3KzF3?=
+ =?utf-8?B?bWd6ckFpUUVRMTRMY05zWk1oWTZSbFpRWEdMUGNGcy9YUW1CTU1rUFlhN21M?=
+ =?utf-8?B?eGE4ZWdIUDZQZkNxRTM0SDE1WTVWWjI1ZVcyS3UwZkpiZlZxbkhuMGNMNnpQ?=
+ =?utf-8?B?RXgxZG5GcXdPK2dEY2REY2pKOEczNDZ6YVlpNDFFc1VkQ1NON3gxb0dLWFRD?=
+ =?utf-8?B?bmFMZzdIa2tRZGNQM2Z1aldDYXZ3MXFpdWplZWExZU9DRGNPUUhKcnQ1MHpu?=
+ =?utf-8?B?MGpiVFNpdjRiN2VuUmdnRmdKNGt5QkRob1BzanRTcmdEbXVVWHovclUzS0NL?=
+ =?utf-8?B?SGdmc3dDSllvTWgxOFE5dStydkJUb1FUWlBpYzl5R254NjhHOEd0bkhmRTFk?=
+ =?utf-8?B?dkdYd3F3N0pnU3ExQjhHUisrVjZuNWVYaTY1dXhHT3pROWk5RGM0ZkgwN0tY?=
+ =?utf-8?B?OTZwRWlKR1FuZk9uTDVnV1ZaQzRURXY5enJjRUJyT2Y2L3lFNkdNd3Z2Y1Yw?=
+ =?utf-8?B?ZVcrZU5PTWorVHhILzA3WHNzb3pYOS9MYWFMc1R2bzRINWROTEpWNHBXaUZa?=
+ =?utf-8?B?QlFmSFBpRHFWRmJaWVhsdGpVb1ZYa3AyU0VIdWRHcjVnaHdRbnA1cHIvejhi?=
+ =?utf-8?B?M2tseENsWXFLRFJFSy9tbHFNQnR0REk5Q2ZMMnNRQy9kM3pnSVpCZHRRTk5H?=
+ =?utf-8?B?MDdjUTltZ3RuZUcxVW1yK1RsdmJVSE1jQXg4VHM2czhHOFEyV1JCMEpWbElx?=
+ =?utf-8?B?bFF1SlRxeWRkZSttdFdOQ3VKMStuV3pKeXBLR1NwdkhMaFRsU1ptbkVlc2FT?=
+ =?utf-8?B?TitJaWhpSHVYa01rT2cwWUN6RENFMGZCVVhwRStxMDFhS25xc2VlZjJaazZS?=
+ =?utf-8?B?TXA5dG91ckluZk03bHhSbjloaVlZVmR0UFhHZEN4NU9leWN2KzZuWWZnUzBP?=
+ =?utf-8?B?b2wxbUVHdHFHR2ZhS2R0UHJWRFRPUXBlU005Z3pPdHc1WHpWdFN4R0F2SE1h?=
+ =?utf-8?B?SnplUnQzQVhFTVErV1lSaUJEeGdmNUowVi9oT2xiZzlZSnYxZEhTdUZjS0lX?=
+ =?utf-8?B?dnVyRXozcWJCa1JkRW1nTmlyWEJrREQ2RUE5UVF5Z0JXUFV1cmgzZ2o0cVR4?=
+ =?utf-8?B?T0pKSitPOUtGWW9LOVNMK2o5R0pVMVR2SExDajhFaTVTQjZGTW9wbHFuRUht?=
+ =?utf-8?B?M2Nmbk12ck05dHF1RTJ4MmhrRzFGbVhSa0pFeHp3S1lmNWVFWEpUYW5vUVBE?=
+ =?utf-8?B?MERMQk92RG45ZUovdE4yKzIveE4vQ3ZFMjUxM0YzNXZmbUZkN3lMdWZUanFI?=
+ =?utf-8?B?UW54eEw2aE1SdHAzZ2ZwOFRKM2x3bGtrbVliWndlYXhzSzlCK295WFZVYXpN?=
+ =?utf-8?B?T2RhU3E2bEhhUndaUzRxVkxVdHpha2xEb2pxSTRRS2NDdWZzd09pMW0xSWth?=
+ =?utf-8?B?OWd5QWNYV2wwdGZySlRlbTE5NFRLVCtsbmZFczhKTC9MTnhSMVRXRGVXWEQx?=
+ =?utf-8?Q?acCc=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <B17FF685FE8C0246B08E03954D0E63CA@eurprd04.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:b74d:0:b0:366:c200:a9e5 with SMTP id
- c13-20020a92b74d000000b00366c200a9e5mr137751ilm.3.1710944735177; Wed, 20 Mar
- 2024 07:25:35 -0700 (PDT)
-Date: Wed, 20 Mar 2024 07:25:35 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000002bc06d0614185d4a@google.com>
-Subject: [syzbot] [bpf?] [net?] possible deadlock in drm_handle_vblank
-From: syzbot <syzbot+bc922f476bd65abbd466@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
-	jakub@cloudflare.com, john.fastabend@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-OriginatorOrg: solid-run.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB7586.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 09d31143-f9b1-4fb4-7053-08dc48eab315
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Mar 2024 14:33:24.3646
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a4a8aaf3-fd27-4e27-add2-604707ce5b82
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: vEt/0/LHzt9+EN/XqW03xmr0nWQMaIXr/3hWsstY14OppFbXx4ugewWk0ylH+2hvPidbVLsYxFuK2ujiLoBdYg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8819
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    a4145ce1e7bc Merge tag 'bcachefs-2024-03-19' of https://ev..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=17003231180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9f47e8dfa53b0b11
-dashboard link: https://syzkaller.appspot.com/bug?extid=bc922f476bd65abbd466
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7bc7510fe41f/non_bootable_disk-a4145ce1.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/54687bafa334/vmlinux-a4145ce1.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/5b6c2afe4886/bzImage-a4145ce1.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+bc922f476bd65abbd466@syzkaller.appspotmail.com
-
-=====================================================
-WARNING: HARDIRQ-safe -> HARDIRQ-unsafe lock order detected
-6.8.0-syzkaller-11743-ga4145ce1e7bc #0 Not tainted
------------------------------------------------------
-kworker/3:3/827 [HC0[0]:SC0[2]:HE0:SE0] is trying to acquire:
-ffff8880001bea00 (&stab->lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-ffff8880001bea00 (&stab->lock){+...}-{2:2}, at: __sock_map_delete net/core/sock_map.c:414 [inline]
-ffff8880001bea00 (&stab->lock){+...}-{2:2}, at: sock_map_delete_elem+0xc8/0x150 net/core/sock_map.c:446
-
-and this task is already holding:
-ffff88801f5d83f0 (&dev->event_lock){-.-.}-{2:2}, at: drm_atomic_helper_fake_vblank+0x168/0x2e0 drivers/gpu/drm/drm_atomic_helper.c:2465
-which would create a new lock dependency:
- (&dev->event_lock){-.-.}-{2:2} -> (&stab->lock){+...}-{2:2}
-
-but this new dependency connects a HARDIRQ-irq-safe lock:
- (&dev->event_lock){-.-.}-{2:2}
-
-... which became HARDIRQ-irq-safe at:
-  lock_acquire kernel/locking/lockdep.c:5754 [inline]
-  lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
-  __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-  _raw_spin_lock_irqsave+0x3a/0x60 kernel/locking/spinlock.c:162
-  drm_handle_vblank+0x125/0xbf0 drivers/gpu/drm/drm_vblank.c:1885
-  vkms_vblank_simulate+0xed/0x3e0 drivers/gpu/drm/vkms/vkms_crtc.c:29
-  __run_hrtimer kernel/time/hrtimer.c:1692 [inline]
-  __hrtimer_run_queues+0x20c/0xcc0 kernel/time/hrtimer.c:1756
-  hrtimer_interrupt+0x31b/0x800 kernel/time/hrtimer.c:1818
-  local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
-  __sysvec_apic_timer_interrupt+0x10f/0x450 arch/x86/kernel/apic/apic.c:1049
-  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
-  sysvec_apic_timer_interrupt+0x90/0xb0 arch/x86/kernel/apic/apic.c:1043
-  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-  native_safe_halt arch/x86/include/asm/irqflags.h:48 [inline]
-  arch_safe_halt arch/x86/include/asm/irqflags.h:86 [inline]
-  default_idle+0xf/0x20 arch/x86/kernel/process.c:742
-  default_idle_call+0x6d/0xb0 kernel/sched/idle.c:117
-  cpuidle_idle_call kernel/sched/idle.c:191 [inline]
-  do_idle+0x32c/0x3f0 kernel/sched/idle.c:332
-  cpu_startup_entry+0x4f/0x60 kernel/sched/idle.c:430
-  rest_init+0x16b/0x2b0 init/main.c:732
-  start_kernel+0x3a3/0x490 init/main.c:1074
-  x86_64_start_reservations+0x18/0x30 arch/x86/kernel/head64.c:509
-  x86_64_start_kernel+0xb2/0xc0 arch/x86/kernel/head64.c:490
-  common_startup_64+0x13e/0x148
-
-to a HARDIRQ-irq-unsafe lock:
- (&stab->lock){+...}-{2:2}
-
-... which became HARDIRQ-irq-unsafe at:
-...
-  lock_acquire kernel/locking/lockdep.c:5754 [inline]
-  lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
-  __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-  _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
-  spin_lock_bh include/linux/spinlock.h:356 [inline]
-  __sock_map_delete net/core/sock_map.c:414 [inline]
-  sock_map_delete_elem+0xc8/0x150 net/core/sock_map.c:446
-  ___bpf_prog_run+0x3e51/0xae80 kernel/bpf/core.c:1997
-  __bpf_prog_run32+0xc1/0x100 kernel/bpf/core.c:2236
-  bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
-  __bpf_prog_run include/linux/filter.h:657 [inline]
-  bpf_prog_run include/linux/filter.h:664 [inline]
-  __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
-  bpf_trace_run2+0x151/0x420 kernel/trace/bpf_trace.c:2420
-  trace_kfree include/trace/events/kmem.h:94 [inline]
-  kfree+0x225/0x390 mm/slub.c:4377
-  tomoyo_realpath_from_path+0x1ad/0x720 security/tomoyo/realpath.c:286
-  tomoyo_get_realpath security/tomoyo/file.c:151 [inline]
-  tomoyo_path_number_perm+0x245/0x590 security/tomoyo/file.c:723
-  tomoyo_path_mknod+0x10d/0x190 security/tomoyo/tomoyo.c:252
-  security_path_mknod+0x121/0x190 security/security.c:1791
-  may_o_create fs/namei.c:3319 [inline]
-  lookup_open.isra.0+0x53e/0x13c0 fs/namei.c:3460
-  open_last_lookups fs/namei.c:3566 [inline]
-  path_openat+0x92f/0x2990 fs/namei.c:3796
-  do_filp_open+0x1dc/0x430 fs/namei.c:3826
-  do_sys_openat2+0x17a/0x1e0 fs/open.c:1406
-  do_sys_open fs/open.c:1421 [inline]
-  __do_sys_openat fs/open.c:1437 [inline]
-  __se_sys_openat fs/open.c:1432 [inline]
-  __x64_sys_openat+0x175/0x210 fs/open.c:1432
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xd2/0x260 arch/x86/entry/common.c:83
-  entry_SYSCALL_64_after_hwframe+0x6d/0x75
-
-other info that might help us debug this:
-
- Possible interrupt unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&stab->lock);
-                               local_irq_disable();
-                               lock(&dev->event_lock);
-                               lock(&stab->lock);
-  <Interrupt>
-    lock(&dev->event_lock);
-
- *** DEADLOCK ***
-
-6 locks held by kworker/3:3/827:
- #0: ffff888015088948 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work+0x1296/0x1ac0 kernel/workqueue.c:3229
- #1: ffffc900037afd80 ((work_completion)(&helper->damage_work)){+.+.}-{0:0}, at: process_one_work+0x906/0x1ac0 kernel/workqueue.c:3230
- #2: ffffc900037afa18 (crtc_ww_class_acquire){+.+.}-{0:0}, at: drm_atomic_helper_dirtyfb+0xb5/0x7b0 drivers/gpu/drm/drm_damage_helper.c:123
- #3: ffff88801f5e30b0 (crtc_ww_class_mutex){+.+.}-{3:3}, at: modeset_lock+0x488/0x6c0 drivers/gpu/drm/drm_modeset_lock.c:314
- #4: ffff88801f5d83f0 (&dev->event_lock){-.-.}-{2:2}, at: drm_atomic_helper_fake_vblank+0x168/0x2e0 drivers/gpu/drm/drm_atomic_helper.c:2465
- #5: ffffffff8d9b1460 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #5: ffffffff8d9b1460 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
- #5: ffffffff8d9b1460 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2380 [inline]
- #5: ffffffff8d9b1460 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run2+0xe4/0x420 kernel/trace/bpf_trace.c:2420
-
-the dependencies between HARDIRQ-irq-safe lock and the holding lock:
--> (&dev->event_lock){-.-.}-{2:2} {
-   IN-HARDIRQ-W at:
-                    lock_acquire kernel/locking/lockdep.c:5754 [inline]
-                    lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
-                    __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-                    _raw_spin_lock_irqsave+0x3a/0x60 kernel/locking/spinlock.c:162
-                    drm_handle_vblank+0x125/0xbf0 drivers/gpu/drm/drm_vblank.c:1885
-                    vkms_vblank_simulate+0xed/0x3e0 drivers/gpu/drm/vkms/vkms_crtc.c:29
-                    __run_hrtimer kernel/time/hrtimer.c:1692 [inline]
-                    __hrtimer_run_queues+0x20c/0xcc0 kernel/time/hrtimer.c:1756
-                    hrtimer_interrupt+0x31b/0x800 kernel/time/hrtimer.c:1818
-                    local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
-                    __sysvec_apic_timer_interrupt+0x10f/0x450 arch/x86/kernel/apic/apic.c:1049
-                    instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
-                    sysvec_apic_timer_interrupt+0x90/0xb0 arch/x86/kernel/apic/apic.c:1043
-                    asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-                    native_safe_halt arch/x86/include/asm/irqflags.h:48 [inline]
-                    arch_safe_halt arch/x86/include/asm/irqflags.h:86 [inline]
-                    default_idle+0xf/0x20 arch/x86/kernel/process.c:742
-                    default_idle_call+0x6d/0xb0 kernel/sched/idle.c:117
-                    cpuidle_idle_call kernel/sched/idle.c:191 [inline]
-                    do_idle+0x32c/0x3f0 kernel/sched/idle.c:332
-                    cpu_startup_entry+0x4f/0x60 kernel/sched/idle.c:430
-                    rest_init+0x16b/0x2b0 init/main.c:732
-                    start_kernel+0x3a3/0x490 init/main.c:1074
-                    x86_64_start_reservations+0x18/0x30 arch/x86/kernel/head64.c:509
-                    x86_64_start_kernel+0xb2/0xc0 arch/x86/kernel/head64.c:490
-                    common_startup_64+0x13e/0x148
-   IN-SOFTIRQ-W at:
-                    lock_acquire kernel/locking/lockdep.c:5754 [inline]
-                    lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
-                    __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-                    _raw_spin_lock_irqsave+0x3a/0x60 kernel/locking/spinlock.c:162
-                    drm_handle_vblank+0x125/0xbf0 drivers/gpu/drm/drm_vblank.c:1885
-                    vkms_vblank_simulate+0xed/0x3e0 drivers/gpu/drm/vkms/vkms_crtc.c:29
-                    __run_hrtimer kernel/time/hrtimer.c:1692 [inline]
-                    __hrtimer_run_queues+0x20c/0xcc0 kernel/time/hrtimer.c:1756
-                    hrtimer_interrupt+0x31b/0x800 kernel/time/hrtimer.c:1818
-                    local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
-                    __sysvec_apic_timer_interrupt+0x10f/0x450 arch/x86/kernel/apic/apic.c:1049
-                    instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
-                    sysvec_apic_timer_interrupt+0x43/0xb0 arch/x86/kernel/apic/apic.c:1043
-                    asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-                    variable_ffs arch/x86/include/asm/bitops.h:321 [inline]
-                    __do_softirq+0x1dc/0x922 kernel/softirq.c:542
-                    invoke_softirq kernel/softirq.c:428 [inline]
-                    __irq_exit_rcu kernel/softirq.c:633 [inline]
-                    irq_exit_rcu+0xb9/0x120 kernel/softirq.c:645
-                    common_interrupt+0xb0/0xd0 arch/x86/kernel/irq.c:247
-                    asm_common_interrupt+0x26/0x40 arch/x86/include/asm/idtentry.h:693
-                    __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
-                    _raw_spin_unlock_irqrestore+0x31/0x80 kernel/locking/spinlock.c:194
-                    spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
-                    submit_async drivers/usb/host/ehci-q.c:1151 [inline]
-                    ehci_urb_enqueue+0x2e3/0x4ed0 drivers/usb/host/ehci-hcd.c:904
-                    usb_hcd_submit_urb+0x2d1/0x2090 drivers/usb/core/hcd.c:1535
-                    usb_submit_urb+0x87c/0x1730 drivers/usb/core/urb.c:581
-                    usb_start_wait_urb+0x103/0x4c0 drivers/usb/core/message.c:59
-                    usb_internal_control_msg drivers/usb/core/message.c:103 [inline]
-                    usb_control_msg+0x327/0x4b0 drivers/usb/core/message.c:154
-                    get_bMaxPacketSize0.constprop.0+0xa5/0x1c0 drivers/usb/core/hub.c:4768
-                    hub_port_init+0x693/0x3a00 drivers/usb/core/hub.c:4964
-                    hub_port_connect drivers/usb/core/hub.c:5412 [inline]
-                    hub_port_connect_change drivers/usb/core/hub.c:5623 [inline]
-                    port_event drivers/usb/core/hub.c:5783 [inline]
-                    hub_event+0x2b65/0x4e20 drivers/usb/core/hub.c:5865
-                    process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3254
-                    process_scheduled_works kernel/workqueue.c:3335 [inline]
-                    worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
-                    kthread+0x2c1/0x3a0 kernel/kthread.c:388
-                    ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
-                    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-   INITIAL USE at:
-                   lock_acquire kernel/locking/lockdep.c:5754 [inline]
-                   lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
-                   __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-                   _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
-                   spin_lock include/linux/spinlock.h:351 [inline]
-                   vkms_crtc_atomic_flush+0x98/0x2b0 drivers/gpu/drm/vkms/vkms_crtc.c:253
-                   drm_atomic_helper_commit_planes+0x61c/0x1000 drivers/gpu/drm/drm_atomic_helper.c:2820
-                   vkms_atomic_commit_tail+0x5e/0x240 drivers/gpu/drm/vkms/vkms_drv.c:73
-                   commit_tail+0x284/0x410 drivers/gpu/drm/drm_atomic_helper.c:1832
-                   drm_atomic_helper_commit+0x2fd/0x380 drivers/gpu/drm/drm_atomic_helper.c:2072
-                   drm_atomic_commit+0x227/0x300 drivers/gpu/drm/drm_atomic.c:1514
-                   drm_client_modeset_commit_atomic+0x6c6/0x810 drivers/gpu/drm/drm_client_modeset.c:1051
-                   drm_client_modeset_commit_locked+0x14d/0x580 drivers/gpu/drm/drm_client_modeset.c:1154
-                   drm_client_modeset_commit+0x4f/0x80 drivers/gpu/drm/drm_client_modeset.c:1180
-                   __drm_fb_helper_restore_fbdev_mode_unlocked drivers/gpu/drm/drm_fb_helper.c:251 [inline]
-                   __drm_fb_helper_restore_fbdev_mode_unlocked+0x130/0x180 drivers/gpu/drm/drm_fb_helper.c:230
-                   drm_fb_helper_set_par+0xd8/0x120 drivers/gpu/drm/drm_fb_helper.c:1344
-                   fbcon_init+0x884/0x1910 drivers/video/fbdev/core/fbcon.c:1094
-                   visual_init+0x328/0x630 drivers/tty/vt/vt.c:1023
-                   do_bind_con_driver.isra.0+0x57a/0xbf0 drivers/tty/vt/vt.c:3643
-                   do_take_over_console+0x4f4/0x650 drivers/tty/vt/vt.c:4222
-                   do_fbcon_takeover+0xe8/0x210 drivers/video/fbdev/core/fbcon.c:532
-                   do_fb_registered drivers/video/fbdev/core/fbcon.c:3000 [inline]
-                   fbcon_fb_registered+0x375/0x670 drivers/video/fbdev/core/fbcon.c:3020
-                   do_register_framebuffer drivers/video/fbdev/core/fbmem.c:449 [inline]
-                   register_framebuffer+0x4b2/0x860 drivers/video/fbdev/core/fbmem.c:515
-                   __drm_fb_helper_initial_config_and_unlock+0xd82/0x1650 drivers/gpu/drm/drm_fb_helper.c:1871
-                   drm_fb_helper_initial_config drivers/gpu/drm/drm_fb_helper.c:1936 [inline]
-                   drm_fb_helper_initial_config+0x44/0x60 drivers/gpu/drm/drm_fb_helper.c:1928
-                   drm_fbdev_generic_client_hotplug+0x1a6/0x280 drivers/gpu/drm/drm_fbdev_generic.c:279
-                   drm_client_register+0x195/0x280 drivers/gpu/drm/drm_client.c:141
-                   drm_fbdev_generic_setup+0x184/0x340 drivers/gpu/drm/drm_fbdev_generic.c:341
-                   vkms_create drivers/gpu/drm/vkms/vkms_drv.c:226 [inline]
-                   vkms_init+0x62d/0x760 drivers/gpu/drm/vkms/vkms_drv.c:252
-                   do_one_initcall+0x128/0x700 init/main.c:1238
-                   do_initcall_level init/main.c:1300 [inline]
-                   do_initcalls init/main.c:1316 [inline]
-                   do_basic_setup init/main.c:1335 [inline]
-                   kernel_init_freeable+0x69d/0xca0 init/main.c:1548
-                   kernel_init+0x1c/0x2b0 init/main.c:1437
-                   ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
-                   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
- }
- ... key      at: [<ffffffff94b79480>] __key.5+0x0/0x40
-
-the dependencies between the lock to be acquired
- and HARDIRQ-irq-unsafe lock:
--> (&stab->lock){+...}-{2:2} {
-   HARDIRQ-ON-W at:
-                    lock_acquire kernel/locking/lockdep.c:5754 [inline]
-                    lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
-                    __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-                    _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
-                    spin_lock_bh include/linux/spinlock.h:356 [inline]
-                    __sock_map_delete net/core/sock_map.c:414 [inline]
-                    sock_map_delete_elem+0xc8/0x150 net/core/sock_map.c:446
-                    ___bpf_prog_run+0x3e51/0xae80 kernel/bpf/core.c:1997
-                    __bpf_prog_run32+0xc1/0x100 kernel/bpf/core.c:2236
-                    bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
-                    __bpf_prog_run include/linux/filter.h:657 [inline]
-                    bpf_prog_run include/linux/filter.h:664 [inline]
-                    __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
-                    bpf_trace_run2+0x151/0x420 kernel/trace/bpf_trace.c:2420
-                    trace_kfree include/trace/events/kmem.h:94 [inline]
-                    kfree+0x225/0x390 mm/slub.c:4377
-                    tomoyo_realpath_from_path+0x1ad/0x720 security/tomoyo/realpath.c:286
-                    tomoyo_get_realpath security/tomoyo/file.c:151 [inline]
-                    tomoyo_path_number_perm+0x245/0x590 security/tomoyo/file.c:723
-                    tomoyo_path_mknod+0x10d/0x190 security/tomoyo/tomoyo.c:252
-                    security_path_mknod+0x121/0x190 security/security.c:1791
-                    may_o_create fs/namei.c:3319 [inline]
-                    lookup_open.isra.0+0x53e/0x13c0 fs/namei.c:3460
-                    open_last_lookups fs/namei.c:3566 [inline]
-                    path_openat+0x92f/0x2990 fs/namei.c:3796
-                    do_filp_open+0x1dc/0x430 fs/namei.c:3826
-                    do_sys_openat2+0x17a/0x1e0 fs/open.c:1406
-                    do_sys_open fs/open.c:1421 [inline]
-                    __do_sys_openat fs/open.c:1437 [inline]
-                    __se_sys_openat fs/open.c:1432 [inline]
-                    __x64_sys_openat+0x175/0x210 fs/open.c:1432
-                    do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-                    do_syscall_64+0xd2/0x260 arch/x86/entry/common.c:83
-                    entry_SYSCALL_64_after_hwframe+0x6d/0x75
-   INITIAL USE at:
-                   lock_acquire kernel/locking/lockdep.c:5754 [inline]
-                   lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
-                   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-                   _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
-                   spin_lock_bh include/linux/spinlock.h:356 [inline]
-                   __sock_map_delete net/core/sock_map.c:414 [inline]
-                   sock_map_delete_elem+0xc8/0x150 net/core/sock_map.c:446
-                   ___bpf_prog_run+0x3e51/0xae80 kernel/bpf/core.c:1997
-                   __bpf_prog_run32+0xc1/0x100 kernel/bpf/core.c:2236
-                   bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
-                   __bpf_prog_run include/linux/filter.h:657 [inline]
-                   bpf_prog_run include/linux/filter.h:664 [inline]
-                   __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
-                   bpf_trace_run2+0x151/0x420 kernel/trace/bpf_trace.c:2420
-                   trace_kfree include/trace/events/kmem.h:94 [inline]
-                   kfree+0x225/0x390 mm/slub.c:4377
-                   tomoyo_realpath_from_path+0x1ad/0x720 security/tomoyo/realpath.c:286
-                   tomoyo_get_realpath security/tomoyo/file.c:151 [inline]
-                   tomoyo_path_number_perm+0x245/0x590 security/tomoyo/file.c:723
-                   tomoyo_path_mknod+0x10d/0x190 security/tomoyo/tomoyo.c:252
-                   security_path_mknod+0x121/0x190 security/security.c:1791
-                   may_o_create fs/namei.c:3319 [inline]
-                   lookup_open.isra.0+0x53e/0x13c0 fs/namei.c:3460
-                   open_last_lookups fs/namei.c:3566 [inline]
-                   path_openat+0x92f/0x2990 fs/namei.c:3796
-                   do_filp_open+0x1dc/0x430 fs/namei.c:3826
-                   do_sys_openat2+0x17a/0x1e0 fs/open.c:1406
-                   do_sys_open fs/open.c:1421 [inline]
-                   __do_sys_openat fs/open.c:1437 [inline]
-                   __se_sys_openat fs/open.c:1432 [inline]
-                   __x64_sys_openat+0x175/0x210 fs/open.c:1432
-                   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-                   do_syscall_64+0xd2/0x260 arch/x86/entry/common.c:83
-                   entry_SYSCALL_64_after_hwframe+0x6d/0x75
- }
- ... key      at: [<ffffffff94c1e500>] __key.1+0x0/0x40
- ... acquired at:
-   lock_acquire kernel/locking/lockdep.c:5754 [inline]
-   lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
-   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-   _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
-   spin_lock_bh include/linux/spinlock.h:356 [inline]
-   __sock_map_delete net/core/sock_map.c:414 [inline]
-   sock_map_delete_elem+0xc8/0x150 net/core/sock_map.c:446
-   ___bpf_prog_run+0x3e51/0xae80 kernel/bpf/core.c:1997
-   __bpf_prog_run32+0xc1/0x100 kernel/bpf/core.c:2236
-   bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
-   __bpf_prog_run include/linux/filter.h:657 [inline]
-   bpf_prog_run include/linux/filter.h:664 [inline]
-   __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
-   bpf_trace_run2+0x151/0x420 kernel/trace/bpf_trace.c:2420
-   trace_kfree include/trace/events/kmem.h:94 [inline]
-   kfree+0x225/0x390 mm/slub.c:4377
-   drm_send_event_helper+0x4c1/0x5f0 drivers/gpu/drm/drm_file.c:770
-   drm_crtc_send_vblank_event+0x14e/0x1d0 drivers/gpu/drm/drm_vblank.c:1129
-   drm_atomic_helper_fake_vblank+0x1ab/0x2e0 drivers/gpu/drm/drm_atomic_helper.c:2467
-   drm_atomic_helper_commit_tail+0x7c/0xf0 drivers/gpu/drm/drm_atomic_helper.c:1753
-   commit_tail+0x356/0x410 drivers/gpu/drm/drm_atomic_helper.c:1834
-   drm_atomic_helper_commit+0x2fd/0x380 drivers/gpu/drm/drm_atomic_helper.c:2072
-   drm_atomic_commit+0x227/0x300 drivers/gpu/drm/drm_atomic.c:1514
-   drm_atomic_helper_dirtyfb+0x615/0x7b0 drivers/gpu/drm/drm_damage_helper.c:181
-   drm_fbdev_generic_helper_fb_dirty+0x7ad/0xbd0 drivers/gpu/drm/drm_fbdev_generic.c:230
-   drm_fb_helper_fb_dirty drivers/gpu/drm/drm_fb_helper.c:390 [inline]
-   drm_fb_helper_damage_work+0x285/0x5e0 drivers/gpu/drm/drm_fb_helper.c:413
-   process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3254
-   process_scheduled_works kernel/workqueue.c:3335 [inline]
-   worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
-   kthread+0x2c1/0x3a0 kernel/kthread.c:388
-   ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
-   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-
-
-stack backtrace:
-CPU: 3 PID: 827 Comm: kworker/3:3 Not tainted 6.8.0-syzkaller-11743-ga4145ce1e7bc #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Workqueue: events drm_fb_helper_damage_work
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:114
- print_bad_irq_dependency kernel/locking/lockdep.c:2626 [inline]
- check_irq_usage+0xe3c/0x1490 kernel/locking/lockdep.c:2865
- check_prev_add kernel/locking/lockdep.c:3138 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain kernel/locking/lockdep.c:3869 [inline]
- __lock_acquire+0x248e/0x3b30 kernel/locking/lockdep.c:5137
- lock_acquire kernel/locking/lockdep.c:5754 [inline]
- lock_acquire+0x1b1/0x560 kernel/locking/lockdep.c:5719
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
- _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- __sock_map_delete net/core/sock_map.c:414 [inline]
- sock_map_delete_elem+0xc8/0x150 net/core/sock_map.c:446
- ___bpf_prog_run+0x3e51/0xae80 kernel/bpf/core.c:1997
- __bpf_prog_run32+0xc1/0x100 kernel/bpf/core.c:2236
- bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
- __bpf_prog_run include/linux/filter.h:657 [inline]
- bpf_prog_run include/linux/filter.h:664 [inline]
- __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
- bpf_trace_run2+0x151/0x420 kernel/trace/bpf_trace.c:2420
- trace_kfree include/trace/events/kmem.h:94 [inline]
- kfree+0x225/0x390 mm/slub.c:4377
- drm_send_event_helper+0x4c1/0x5f0 drivers/gpu/drm/drm_file.c:770
- drm_crtc_send_vblank_event+0x14e/0x1d0 drivers/gpu/drm/drm_vblank.c:1129
- drm_atomic_helper_fake_vblank+0x1ab/0x2e0 drivers/gpu/drm/drm_atomic_helper.c:2467
- drm_atomic_helper_commit_tail+0x7c/0xf0 drivers/gpu/drm/drm_atomic_helper.c:1753
- commit_tail+0x356/0x410 drivers/gpu/drm/drm_atomic_helper.c:1834
- drm_atomic_helper_commit+0x2fd/0x380 drivers/gpu/drm/drm_atomic_helper.c:2072
- drm_atomic_commit+0x227/0x300 drivers/gpu/drm/drm_atomic.c:1514
- drm_atomic_helper_dirtyfb+0x615/0x7b0 drivers/gpu/drm/drm_damage_helper.c:181
- drm_fbdev_generic_helper_fb_dirty+0x7ad/0xbd0 drivers/gpu/drm/drm_fbdev_generic.c:230
- drm_fb_helper_fb_dirty drivers/gpu/drm/drm_fb_helper.c:390 [inline]
- drm_fb_helper_damage_work+0x285/0x5e0 drivers/gpu/drm/drm_fb_helper.c:413
- process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3254
- process_scheduled_works kernel/workqueue.c:3335 [inline]
- worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
- kthread+0x2c1/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
- </TASK>
-------------[ cut here ]------------
-raw_local_irq_restore() called with IRQs enabled
-WARNING: CPU: 3 PID: 827 at kernel/locking/irqflag-debug.c:10 warn_bogus_irq_restore+0x29/0x30 kernel/locking/irqflag-debug.c:10
-Modules linked in:
-CPU: 3 PID: 827 Comm: kworker/3:3 Not tainted 6.8.0-syzkaller-11743-ga4145ce1e7bc #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.2-debian-1.16.2-1 04/01/2014
-Workqueue: events drm_fb_helper_damage_work
-RIP: 0010:warn_bogus_irq_restore+0x29/0x30 kernel/locking/irqflag-debug.c:10
-Code: 90 f3 0f 1e fa 90 80 3d 67 ec cd 04 00 74 06 90 c3 cc cc cc cc c6 05 58 ec cd 04 01 90 48 c7 c7 80 c1 2c 8b e8 a8 9c 73 f6 90 <0f> 0b 90 90 eb df 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90 90
-RSP: 0018:ffffc900037af760 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: ffff88801f5d83d8 RCX: ffffffff814fe149
-RDX: ffff88801fa48000 RSI: ffffffff814fe156 RDI: 0000000000000001
-RBP: 0000000000000293 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: ffffffff8161b5c0 R12: 0000000000000293
-R13: ffff8880206b7900 R14: ffff88801fa20040 R15: ffff888118b9e000
-FS:  0000000000000000(0000) GS:ffff88806b500000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fa98b9ac018 CR3: 000000010ef16000 CR4: 0000000000350ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __raw_spin_unlock_irqrestore include/linux/spinlock_api_smp.h:151 [inline]
- _raw_spin_unlock_irqrestore+0x74/0x80 kernel/locking/spinlock.c:194
- spin_unlock_irqrestore include/linux/spinlock.h:406 [inline]
- drm_atomic_helper_fake_vblank+0x1f1/0x2e0 drivers/gpu/drm/drm_atomic_helper.c:2471
- drm_atomic_helper_commit_tail+0x7c/0xf0 drivers/gpu/drm/drm_atomic_helper.c:1753
- commit_tail+0x356/0x410 drivers/gpu/drm/drm_atomic_helper.c:1834
- drm_atomic_helper_commit+0x2fd/0x380 drivers/gpu/drm/drm_atomic_helper.c:2072
- drm_atomic_commit+0x227/0x300 drivers/gpu/drm/drm_atomic.c:1514
- drm_atomic_helper_dirtyfb+0x615/0x7b0 drivers/gpu/drm/drm_damage_helper.c:181
- drm_fbdev_generic_helper_fb_dirty+0x7ad/0xbd0 drivers/gpu/drm/drm_fbdev_generic.c:230
- drm_fb_helper_fb_dirty drivers/gpu/drm/drm_fb_helper.c:390 [inline]
- drm_fb_helper_damage_work+0x285/0x5e0 drivers/gpu/drm/drm_fb_helper.c:413
- process_one_work+0x9a9/0x1ac0 kernel/workqueue.c:3254
- process_scheduled_works kernel/workqueue.c:3335 [inline]
- worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
- kthread+0x2c1/0x3a0 kernel/kthread.c:388
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+QW0gMjAuMDMuMjQgdW0gMTU6MDkgc2NocmllYiBKaXJpIFBpcmtvOg0KPiBXZWQsIE1hciAyMCwg
+MjAyNCBhdCAwMjo0ODo1NVBNIENFVCwgam9zdWFAc29saWQtcnVuLmNvbSB3cm90ZToNCj4+IG12
+ODhlNnh4eCBzdXBwb3J0cyBtdWx0aXBsZSBtZGlvIGJ1c2VzIGFzIGNoaWxkcmVuLCBlLmcuIHRv
+IG1vZGVsIGJvdGgNCj4+IGludGVybmFsIGFuZCBleHRlcm5hbCBwaHlzLiBJZiB0aGUgY2hpbGQg
+YnVzZXMgbWRpbyBpZHMgYXJlIHRydW5jYXRlZCwNCj4+IHRoZXkgbWlnaHQgY29sbGlkZSB3aGlj
+aCBlYWNoIG90aGVyIGxlYWRpbmcgdG8gYW4gb2JzY3VyZSBlcnJvciBmcm9tDQo+PiBrb2JqZWN0
+X2FkZC4NCj4+DQo+PiBUaGUgbWF4aW11bSBsZW5ndGggb2YgYnVzIGlkIGlzIGN1cnJlbnRseSBk
+ZWZpbmVkIGFzIDYxDQo+PiAoTUlJX0JVU19JRF9TSVpFKS4gVHJ1bmNhdGlvbiBjYW4gb2NjdXIg
+b24gcGxhdGZvcm1zIHdpdGggbG9uZyBub2RlDQo+PiBuYW1lcyBhbmQgbXVsdGlwbGUgbGV2ZWxz
+IGJlZm9yZSB0aGUgcGFyZW50IGJ1cyBvbiB3aGlpY2ggdGhlIGRzYSBzd2l0Y2gNCj4gcy93aGlp
+Y2gvd2hpY2gvDQo+DQo+DQo+PiBzaXRzIHN1Y2ggYXMgb24gQ045MTMwIFsxXS4NCj4+DQo+PiBU
+ZXN0IHdoZXRoZXIgdGhlIHJldHVybiB2YWx1ZSBvZiBzbnByaW50ZiBleGNlZWRzIHRoZSBtYXhp
+bXVtIGJ1cyBpZA0KPj4gbGVuZ3RoIGFuZCBwcmludCBhIHdhcm5pbmcuDQo+Pg0KPj4gWzFdDQo+
+PiBbICAgIDguMzI0NjMxXSBtdjg4ZTYwODUgZjIxMmEyMDAubWRpby1taWk6MDQ6IHN3aXRjaCAw
+eDE3NjAgZGV0ZWN0ZWQ6IE1hcnZlbGwgODhFNjE3NiwgcmV2aXNpb24gMQ0KPj4gWyAgICA4LjM4
+OTUxNl0gbXY4OGU2MDg1IGYyMTJhMjAwLm1kaW8tbWlpOjA0OiBUcnVuY2F0ZWQgYnVzLWlkIG1h
+eSBjb2xsaWRlLg0KPj4gWyAgICA4LjU5MjM2N10gbXY4OGU2MDg1IGYyMTJhMjAwLm1kaW8tbWlp
+OjA0OiBUcnVuY2F0ZWQgYnVzLWlkIG1heSBjb2xsaWRlLg0KPj4gWyAgICA4LjYyMzU5M10gc3lz
+ZnM6IGNhbm5vdCBjcmVhdGUgZHVwbGljYXRlIGZpbGVuYW1lICcvZGV2aWNlcy9wbGF0Zm9ybS9j
+cDAvY3AwOmNvbmZpZy1zcGFjZUBmMjAwMDAwMC9mMjEyYTIwMC5tZGlvL21kaW9fYnVzL2YyMTJh
+MjAwLm1kaW8tbWlpL2YyMTJhMjAwLm1kaW8tbWlpOjA0L21kaW9fYnVzLyFjcDAhY29uZmlnLXNw
+YWNlQGYyMDAwMDAwIW1kaW9AMTJhMjAwIWV0aGVybmV0LXN3aXRjaEA0IW1kaScNCj4+IFsgICAg
+OC43ODU0ODBdIGtvYmplY3Q6IGtvYmplY3RfYWRkX2ludGVybmFsIGZhaWxlZCBmb3IgIWNwMCFj
+b25maWctc3BhY2VAZjIwMDAwMDAhbWRpb0AxMmEyMDAhZXRoZXJuZXQtc3dpdGNoQDQhbWRpIHdp
+dGggLUVFWElTVCwgZG9uJ3QgdHJ5IHRvIHJlZ2lzdGVyIHRoaW5ncyB3aXRoIHRoZSBzYW1lIG5h
+bWUgaW4gdGhlIHNhbWUgZGlyZWN0b3J5Lg0KPj4gWyAgICA4LjkzNjUxNF0gbGlicGh5OiBtaWlf
+YnVzIC9jcDAvY29uZmlnLXNwYWNlQGYyMDAwMDAwL21kaW9AMTJhMjAwL2V0aGVybmV0LXN3aXRj
+aEA0L21kaSBmYWlsZWQgdG8gcmVnaXN0ZXINCj4+IFsgICAgOC45NDYzMDBdIG1kaW9fYnVzICFj
+cDAhY29uZmlnLXNwYWNlQGYyMDAwMDAwIW1kaW9AMTJhMjAwIWV0aGVybmV0LXN3aXRjaEA0IW1k
+aTogX19tZGlvYnVzX3JlZ2lzdGVyOiAtMjINCj4+IFsgICAgOC45NTYwMDNdIG12ODhlNjA4NSBm
+MjEyYTIwMC5tZGlvLW1paTowNDogQ2Fubm90IHJlZ2lzdGVyIE1ESU8gYnVzICgtMjIpDQo+PiBb
+ICAgIDguOTY1MzI5XSBtdjg4ZTYwODU6IHByb2JlIG9mIGYyMTJhMjAwLm1kaW8tbWlpOjA0IGZh
+aWxlZCB3aXRoIGVycm9yIC0yMg0KPj4NCj4+IFNpZ25lZC1vZmYtYnk6IEpvc3VhIE1heWVyIDxq
+b3N1YUBzb2xpZC1ydW4uY29tPg0KPiBUaGlzIGlzIG5vdCBidWcgZml4LCBhc3N1bWUgeW91IHRh
+cmdldCBuZXQtbmV4dC4gUGxlYXNlOg0KPiAxKSBOZXh0IHRpbWUsIGluZGljYXRlIHRoYXQgaW4g
+dGhlIHBhdGNoIHN1YmplY3QgbGlrZSB0aGlzOg0KPiAgICBbcGF0Y2ggbmV0LW5leHRdIHh4eA0K
+PiAyKSBuZXQtbmV4dCBpcyBjdXJyZW50bHkgY2xvc2VkLCByZXBvc3QgbmV4dCB3ZWVrLg0KQ29y
+cmVjdCwgdGhhbmtzIC0gd2lsbCBkby4NCkp1c3QgZm9yIGZ1dHVyZSByZWZlcmVuY2UgZm9yIHRo
+b3NlIG9jY2FzaW9uYWwgY29udHJpYnV0b3JzIC0NCmlzIHRoZXJlIHN1Y2ggYSB0aGluZyBhcyBh
+biBsa21sIGNhbGVuZGFyPw0KPg0KPj4gLS0tDQo+PiBkcml2ZXJzL25ldC9kc2EvbXY4OGU2eHh4
+L2NoaXAuYyB8IDYgKysrKy0tDQo+PiAxIGZpbGUgY2hhbmdlZCwgNCBpbnNlcnRpb25zKCspLCAy
+IGRlbGV0aW9ucygtKQ0KPj4NCj4+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9kc2EvbXY4OGU2
+eHh4L2NoaXAuYyBiL2RyaXZlcnMvbmV0L2RzYS9tdjg4ZTZ4eHgvY2hpcC5jDQo+PiBpbmRleCA2
+MTRjYWJiNWMxYjAuLjFjNDBmNzYzMWFiMSAxMDA2NDQNCj4+IC0tLSBhL2RyaXZlcnMvbmV0L2Rz
+YS9tdjg4ZTZ4eHgvY2hpcC5jDQo+PiArKysgYi9kcml2ZXJzL25ldC9kc2EvbXY4OGU2eHh4L2No
+aXAuYw0KPj4gQEAgLTM3MzEsMTAgKzM3MzEsMTIgQEAgc3RhdGljIGludCBtdjg4ZTZ4eHhfbWRp
+b19yZWdpc3RlcihzdHJ1Y3QgbXY4OGU2eHh4X2NoaXAgKmNoaXAsDQo+Pg0KPj4gCWlmIChucCkg
+ew0KPj4gCQlidXMtPm5hbWUgPSBucC0+ZnVsbF9uYW1lOw0KPj4gLQkJc25wcmludGYoYnVzLT5p
+ZCwgTUlJX0JVU19JRF9TSVpFLCAiJXBPRiIsIG5wKTsNCj4+ICsJCWlmIChzbnByaW50ZihidXMt
+PmlkLCBNSUlfQlVTX0lEX1NJWkUsICIlcE9GIiwgbnApID49IE1JSV9CVVNfSURfU0laRSkNCj4+
+ICsJCQlkZXZfd2FybihjaGlwLT5kZXYsICJUcnVuY2F0ZWQgYnVzLWlkIG1heSBjb2xsaWRlLlxu
+Iik7DQo+IEhvdyBhYm91dCBpbnN0ZWFkIG9mIHdhcm4mZmFpbCBmYWxsYmFjayB0byBzb21lIGRp
+ZmZlcmVudCBuYW1lIGluIHRoaXMNCj4gY2FzZT8NCkR1cGxpY2F0ZSBjb3VsZCBiZSBhdm9pZGVk
+IGJ5IHRydW5jYXRpbmcgZnJvbSB0aGUgc3RhcnQsDQpob3dldmVyIEkgZG9uJ3Qga25vdyBpZiB0
+aGF0IGlzIGEgZ29vZCBpZGVhLg0KSXQgYWZmZWN0cyBuYW1pbmcgb2YgcGF0aHMgaW4gc3lzZnMs
+IGFuZCB0aGUgcm9vdCBjYXVzZSBpcw0KZGlmZmljdWx0IHRvIHNwb3QuDQo+PiAJfSBlbHNlIHsN
+Cj4+IAkJYnVzLT5uYW1lID0gIm12ODhlNnh4eCBTTUkiOw0KPj4gLQkJc25wcmludGYoYnVzLT5p
+ZCwgTUlJX0JVU19JRF9TSVpFLCAibXY4OGU2eHh4LSVkIiwgaW5kZXgrKyk7DQo+PiArCQlpZiAo
+c25wcmludGYoYnVzLT5pZCwgTUlJX0JVU19JRF9TSVpFLCAibXY4OGU2eHh4LSVkIiwgaW5kZXgr
+KykgPj0gTUlJX0JVU19JRF9TSVpFKQ0KPiBIb3cgZXhhY3RseSB0aGlzIG1heSBoYXBwZW4/DQpJ
+dCBjYW4gaGFwcGVuIG9uIHN3aXRjaCBub2RlcyBhdCBkZWVwIGxldmVscyBpbiB0aGUgZGV2aWNl
+LXRyZWUsDQp3aGlsZSBkZXNjcmliaW5nIGJvdGggaW50ZXJuYWwgYW5kIGV4dGVybmFsIG1kaW8g
+YnVzZXMgb2YgYSBzd2l0Y2guDQpFLmcuIERvY3VtZW50YXRpb24vZGV2aWNldHJlZS9iaW5kaW5n
+cy9uZXQvZHNhL21hcnZlbGwsbXY4OGU2eHh4LnlhbWwNCg0KT24gQ045MTMwIHBsYXRmb3JtIGRl
+dmljZS10cmVlIGxvb2tzIGxpa2UgdGhpczoNCg0KLyB7DQrCoMKgIMKgY3AwIHsNCsKgwqAgwqDC
+oMKgwqAgY29uZmlnLXNwYWNlQGYyMDAwMDAwIHsNCsKgwqAgwqDCoMKgwqAgwqDCoMKgIG1kaW9A
+MTJhMjAwIHsNCsKgwqAgwqDCoMKgwqAgwqDCoMKgIMKgwqDCoCBldGhlcm5ldC1zd2l0Y2hANCB7
+DQrCoMKgIMKgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIG1kaW8geyAuLi4gfTsNCsKgwqAg
+wqDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgbWRpby1leHRlcm5hbCB7IC4uLiB9Ow0KwqDC
+oCDCoMKgwqDCoCDCoMKgwqAgwqDCoMKgIH07DQrCoMKgIMKgwqDCoMKgIMKgwqDCoCB9Ow0KwqDC
+oCDCoMKgwqDCoCB9Ow0KwqDCoCDCoH07DQp9Ow0KDQpGb3IgbWRpby1leHRlcm5hbCBjaGlsZCBh
+bGwgdGhlIG5hbWVzIGFsb25lLCB3aXRob3V0IHNlcGFyYXRvcnMsDQptYWtlIHVwIDY2IGNoYXJh
+Y3RlcnMsIGV4Y2VlZGluZzogTUlJX0JVU19JRF9TSVpFOg0KY3AwY29uZmlnLXNwYWNlQGYyMDAw
+MDAwbWRpb0AxMmEyMDBldGhlcm5ldC1zd2l0Y2hANG1kaW8tZXh0ZXJuYWwNCg0KV2l0aCBzZXBh
+cmF0b3JzICgnIScpIHdlIGhhdmU6DQpjcDAhY29uZmlnLXNwYWNlQGYyMDAwMDAwIW1kaW9AMTJh
+MjAwIWV0aGVybmV0LXN3aXRjaEA0IW1kaW8NCmNwMCFjb25maWctc3BhY2VAZjIwMDAwMDAhbWRp
+b0AxMmEyMDAhZXRoZXJuZXQtc3dpdGNoQDQhbWRpby1leHRlcm5hbA0KVHJ1bmNhdGVkIHRvIE1J
+SV9CVVNfSURfU0laRToNCmNwMCFjb25maWctc3BhY2VAZjIwMDAwMDAhbWRpb0AxMmEyMDAhZXRo
+ZXJuZXQtc3dpdGNoQDQhbWRpDQpjcDAhY29uZmlnLXNwYWNlQGYyMDAwMDAwIW1kaW9AMTJhMjAw
+IWV0aGVybmV0LXN3aXRjaEA0IW1kaQ0KVGhleSBiZWNvbWUgZHVwbGljYXRlcy4NCg0KPj4gKwkJ
+CWRldl93YXJuKGNoaXAtPmRldiwgIlRydW5jYXRlZCBidXMtaWQgbWF5IGNvbGxpZGUuXG4iKTsN
+CkFub3RoZXIgb3B0aW9uIChpbW8pIGlzIHRvIGZvcmNlIHRoZSBpc3N1ZSBhbmQgcmV0dXJuIGVy
+cm9yIGNvZGUuDQpUaGVuIHRoZSBvbmx5IHdheSBvdXQgd291bGQgYmUgaW5jcmVhc2Ugb2YgTUlJ
+X0JVU19JRF9TSVpFLg0KPj4gCX0NCj4+DQo+PiAJYnVzLT5yZWFkID0gbXY4OGU2eHh4X21kaW9f
+cmVhZDsNCj4+DQo+PiAtLS0NCj4+IGJhc2UtY29tbWl0OiBlOGY4OTdmNGFmZWYwMDMxZmU2MThh
+OGU5NDEyN2EwOTM0ODk2YWJhDQo+PiBjaGFuZ2UtaWQ6IDIwMjQwMzIwLW12ODhlNnh4eC10cnVu
+Y2F0ZS1idXNpZC0zNGExZDI3NjliYmYNCj4+DQo+PiBTaW5jZXJlbHksDQo+PiAtLSANCj4+IEpv
+c3VhIE1heWVyIDxqb3N1YUBzb2xpZC1ydW4uY29tPg0KPj4NCj4+DQo=
 
