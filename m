@@ -1,205 +1,132 @@
-Return-Path: <netdev+bounces-80879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D42F388169B
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 18:33:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C22DC88166D
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 18:20:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F673284CB9
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 17:33:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D867E1C20F20
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 17:20:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06A906A326;
-	Wed, 20 Mar 2024 17:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F40A6A33C;
+	Wed, 20 Mar 2024 17:20:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="TLkdxO9Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.131])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C3496A02D;
-	Wed, 20 Mar 2024 17:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47CD6A02D;
+	Wed, 20 Mar 2024 17:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710956009; cv=none; b=Re5ooIzDdapeiOPrkmoQF7As7er5ftGRKCRkgljZCwQSVjsBXwnPaWGejjqTlmWFSkqZ1iALambOpkFcCsX4e/U+bx1vK5D6BuzgBUj3jDiPqF8dDVCa8224IASR1jPLzBUI2WMq3ypHlU3KvpWiO6mrIw4s7NU+HR4mRK9qmhM=
+	t=1710955245; cv=none; b=sMO+MstoXMj+S0cgV+MOr+XSICNHDOT3iEdYH8jgm0Jlbx+PQJ2A7dMSZgS4OAOvsLb/khPkGHZWVwl/5E91SMiLC+6VBdMfF6RCCfQi37mgQ6pX9nv8YFdv3BI8GCJFZD8Fsgi05Q7xG3weg0hidclsnpPnt0NKRk2F1cP90b8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710956009; c=relaxed/simple;
-	bh=EUOYGNXttkzKdXjPhe48wrwkyokl0sot/Y+oaH9w5nA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G3DaLaES2FWi/Xbj33t3DsNKD5PcE35158dpZkv1k/KRZzkA1dvOf9FI7ZpRTMlRQkN6RKNNteaRHyRPEviUn+iwKhq4m8GGGjropqct1AipcymISewg6sZIJDRJHAi2Uv/wUuELL430DSTXE9Ddtt0d5Pg2d85mwMbEvHaYMxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=green-communications.fr; spf=pass smtp.mailfrom=green-communications.fr; arc=none smtp.client-ip=212.227.126.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=green-communications.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=green-communications.fr
-Received: from evilbit.green-communications.fr ([85.168.41.102]) by
- mrelayeu.kundenserver.de (mreue012 [213.165.67.103]) with ESMTPSA (Nemesis)
- id 1MdNwm-1rDvpV1dC4-00ZNo3; Wed, 20 Mar 2024 18:19:33 +0100
-From: Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
-To: "David S. Miller" <davem@davemloft.net>,
-	David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ipv6: delay procfs initialization after the ipv6 structs are ready
-Date: Wed, 20 Mar 2024 18:17:36 +0100
-Message-ID: <20240320171858.2671-1-nicolas.cavallari@green-communications.fr>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1710955245; c=relaxed/simple;
+	bh=PXbY0Ox61cikah9PXRtM5Cq8s8wbozFkrP2zNiAE6Ag=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JF9Jk7/u+7w+x3RxVg75JcEiZOUj72U11/qtXeQbBd7q8PUjsI0JxxgzAOXQSgBRsHaVtnqgAJ/Qh6EdnBwN2W0Bvpr8rhAfc2scM9mNqr8dhXdgWknKtn8kTyN0tyKYLaAhbUQ7tyXfTzKKjLXAoTTy8Ihz+qGWPyJJVPfzY14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=none smtp.helo=mx0b-0016f401.pphosted.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=TLkdxO9Q; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.helo=mx0b-0016f401.pphosted.com
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42KFIWm8003494;
+	Wed, 20 Mar 2024 10:20:16 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	from:to:cc:subject:date:message-id:mime-version:content-type
+	:content-transfer-encoding; s=pfpt0220; bh=gi7oWzeF3IUKlp7PFSXRd
+	A2MzG072PNShX+grViVOt8=; b=TLkdxO9Qg9o2wSxvCsvs/dxsAJHcjQpTF6R5/
+	hYhYcEYKd5RpJF0qEVGN8nFvGI79i1FKdMCZ1DKNnBwAvzoAjXUUxPbcfI3EGD4w
+	S4j1bfG3rwTSplIFQuJ1BCpQJWYmF4qflHVYUiTfbv+ab1u6lbktla3pp7fvilD8
+	jgkMiIB62WlAaY0CED9mf0GJOcOPgrpgNZ1mpIP5NovWg66e8KA2GmKuodOR9by6
+	+TJbs//Kz9s3yFWq5zYXstJPf/sh6am4i0VEjvYe2xdiHeX19uMydqpoiRAea5TM
+	i6s6WxzGjsy7C2LQNxskjyeDlOKpI8UsGyUjik+Br2JXDrSZA==
+Received: from dc5-exch05.marvell.com ([199.233.59.128])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3wxka52e2y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Mar 2024 10:20:16 -0700 (PDT)
+Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
+ DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.32; Wed, 20 Mar 2024 10:20:14 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
+ (10.69.176.209) with Microsoft SMTP Server id 15.2.1258.32 via Frontend
+ Transport; Wed, 20 Mar 2024 10:20:14 -0700
+Received: from dc3lp-swdev041.marvell.com (dc3lp-swdev041.marvell.com [10.6.60.191])
+	by maili.marvell.com (Postfix) with ESMTP id 807B83F7051;
+	Wed, 20 Mar 2024 10:20:11 -0700 (PDT)
+From: Elad Nachman <enachman@marvell.com>
+To: <taras.chornyi@plvision.eu>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <andrew@lunn.ch>,
+        <kory.maincent@bootlin.com>, <thomas.petazzoni@bootlin.com>,
+        <miquel.raynal@bootlin.com>, <przemyslaw.kitszel@intel.com>,
+        <dkirjanov@suse.de>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: <enachman@marvell.com>
+Subject: [PATCH v2 0/5] Fix prestera driver fail to probe twice
+Date: Wed, 20 Mar 2024 19:20:03 +0200
+Message-ID: <20240320172008.2989693-1-enachman@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-Provags-ID: V03:K1:W7bGElgtY1racbZYK0A81P9SmHNbbxTmpzpVf+L792+wus9po92
- ndmns0ZoGBaH3CSFs6v2SIhJebA21FIwfej1y/UxEnUmNKmA336stmKZZYIhjBK7/d39S1G
- kZK2cNd0HeFWPgRttNQvAEkeh0HAKFa5H2FvtZ/23g/su1uiKmrD9cy2RpzJ5+Q7RDhuqAP
- BYOYcao0uicIdBbTC8N2g==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:l9SIw4i0dFo=;KcNnrIyPfojTsQpKr4XR27UL3GX
- ocnCMD2gKzAw5r9jZ9ksrzToBPlX413sRZnORfThi7OQirW9Z86nvO2yBLXH/u9gsb486xddB
- xRcP+3i40IM5DrpCkTAn59tQei4yJVYwCzuRZhG/OZi5OMQq82xpSHh7yhBM0uk0I/JcWbTLQ
- dzEJCWKIQ93er4Lbpi/Q/VNT4dIYiasoL1FRNJNERDq7HqbxcAk0vTEmBlVWItzmVJytArAJi
- Ph8NZsraUWvvWWBnzo9bFu00rKgeSErQ8pTdFKEo7x9NH6G6K/qb6ydxG7NfepjBi1BqX5Pp2
- CWjAQN4uFY1kucr6JdYlGBjhlrgoSSYhryX73glqZho4+mwfhpY7uOo7yD+EjaAEjl6pJGT8u
- r5+hoRFylJwSr9bMS79kCXXE9b3ldZBqFhmvkSMvpiJ2Qq+Zf7RD9TFH/ezcGdHsAP6+4qWSN
- zhFvPlItddRGgCiclKq/smt67sX4fJJ1ThthGmE99uRol/CrhXvGh1Yf5kZt1I5zvNO3HCO38
- LDKH3yeSeneLKzk6HArMYDrZuWBKf2WLNLaf7oAy+GfavBvcFIyFwOgX8rXcxsOhXdGBgFgok
- hyUv2p2UuxJMSul/j3RVclCUSIZfKUmXMyFxZpxxSVHGLT1GLuWAFk+yPVpVdtKTsHPJYOEoN
- c4+6DDZMHgR/2YJzGgTntDdLyxBD3prjfArKBdM2R+cOGW259Jd50r2/X1pPK/i5HkGki1HBE
- YBc4er7bhIn2ooVy9XpneJSLEyjc+c5T5DXIJ2Ldvvvdv9Db7aM7qU=
+X-Proofpoint-GUID: gXYJgsAoS-P74PUf3eptC7CpdzJKvQCG
+X-Proofpoint-ORIG-GUID: gXYJgsAoS-P74PUf3eptC7CpdzJKvQCG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-20_10,2024-03-18_03,2023-05-22_02
 
-procfs files are created before the structure they reference are
-initialized.  For example, if6_proc_init() creates procfs files that
-access structures initialized by addrconf_init().
+From: Elad Nachman <enachman@marvell.com>
 
-If ipv6 is compiled as a module and a program manages to open an ipv6
-procfs file during the loading of the module, it can oops the kernel.
+Fix issues resulting from insmod, rmmod and insmod of the
+prestera driver:
 
-It appears that we were unlucky enough to reproduce this problem
-multiple times already, out of maybe 100 boots:
+1. Call of firmware switch HW reset was missing, and is required
+   in order to make the firmware loader shift to the correct state
+   needed for loading the next firmware.
+2. Time-out for waiting for firmware loader to be ready was too small.
+3. memory referencing after freeing
+4. MAC addresses wrapping
+5. Missing SFP unbind (phylink release) of a port during the port release.
 
-NET: Registered PF_INET6 protocol family
-8<--- cut here ---
-pwm-backlight backlight: supply power not found, using dummy regulator
-Segment Routing with IPv6
-In-situ OAM (IOAM) with IPv6
-Unable to handle kernel NULL pointer dereference at virtual address
- 00000000
-mt7915e 0000:03:00.0 wlp3s0: renamed from wlan0
-[00000000] *pgd=00000000
-Internal error: Oops: 5 [#1] SMP ARM
-Modules linked in: ipv6 mt7915e mt76_connac_lib mt76 dw_hdmi_imx
- mac80211 dw_hdmi drm_display_helper imxdrm drm_dma_helper
- drm_kms_helper snd_soc_imx_sgtl5000 syscopyarea sysfillrect sysimgblt
- fb_sys_fops imx_ipu_v3 snd_soc_fsl_asoc_card cfg80211 snd_soc_sgtl5000
- drm libarc4 snd_soc_fsl_ssi snd_soc_simple_card_utils imx_pcm_dma
- snd_soc_core rfkill snd_pcm_dmaengine snd_pcm
- drm_panel_orientation_quirks cfbfillrect cfbimgblt cfbcopyarea
- snd_timer snd egalax_ts snd_soc_imx_audmux soundcore flexcan mux_mmio
- imx2_wdt mux_core can_dev pwm_bl
-CPU: 2 PID: 850 Comm: snmpd Not tainted 6.1.14 #1
-Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
-PC is at if6_seq_start+0x2c/0x98 [ipv6]
-LR is at init_net+0x0/0xc00
-[...]
- if6_seq_start [ipv6] from seq_read_iter+0xb4/0x510
- seq_read_iter from seq_read+0x80/0xac
- seq_read from proc_reg_read+0xac/0x100
- proc_reg_read from vfs_read+0xb0/0x284
- vfs_read from ksys_read+0x64/0xec
- ksys_read from ret_fast_syscall+0x0/0x54
-Exception stack(0xf0e31fa8 to 0xf0e31ff0)
-1fa0:                   b67fd0b0 be8a666b 0000000a b67fd148 00000400
- 00000000
-1fc0: b67fd0b0 be8a666b 00000001 00000003 be8a67ec 00000000 b6d7e000
- b6c9954a
-1fe0: b6d7eb30 be8a6638 b6ef11b4 b6ef0ddc
-Code: e5931004 e35100ff ca000014 e59e25dc (e7920101)
----[ end trace 0000000000000000 ]---
+v2:
+  1) Split first patch to firmware call for switch HW reset and to
+     increasing of firmware loader wait to be ready timeout
+  2) Explain why is switch HW reset call to the firmware required
+     before shutdown in commit message, and fix wording
+  3) Use a simpler bitwise-and on the last byte of the base MAC address
+     instead of randomizing again the entire MAC address.
+     reflect that change in the commit message, and explain why it is
+     needed (switch HW implementation requirement).
+  4) Add Fixes Tags to all commits.
+  5) For timeout enlargement commit, fix wording in comment and move
+     timeout units to milliseconds.
+  6) Add Tested-By tags.
+  7) Add patch to call prestera_port_sfp_unbind() from
+     prestera_destroy_ports() in order to release phylink.
 
-Signed-off-by: Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
----
- net/ipv6/af_inet6.c | 45 +++++++++++++++++++++++----------------------
- 1 file changed, 23 insertions(+), 22 deletions(-)
+Elad Nachman (5):
+  net: marvell: prestera: fix driver reload
+  net: marvell: prestera: enlarge fw restart time
+  net: marvell: prestera: fix memory use after free
+  net: marvell: prestera: force good base mac
+  net: marvell: prestera: unbind sfp port on exit
 
-diff --git a/net/ipv6/af_inet6.c b/net/ipv6/af_inet6.c
-index 8041dc181bd4..d12d690a4867 100644
---- a/net/ipv6/af_inet6.c
-+++ b/net/ipv6/af_inet6.c
-@@ -1148,18 +1148,6 @@ static int __init inet6_init(void)
- 	err = ipv6_netfilter_init();
- 	if (err)
- 		goto netfilter_fail;
--	/* Create /proc/foo6 entries. */
--#ifdef CONFIG_PROC_FS
--	err = -ENOMEM;
--	if (raw6_proc_init())
--		goto proc_raw6_fail;
--	if (udplite6_proc_init())
--		goto proc_udplite6_fail;
--	if (ipv6_misc_proc_init())
--		goto proc_misc6_fail;
--	if (if6_proc_init())
--		goto proc_if6_fail;
--#endif
- 	err = ip6_route_init();
- 	if (err)
- 		goto ip6_route_fail;
-@@ -1226,6 +1214,19 @@ static int __init inet6_init(void)
- 	if (err)
- 		goto ioam6_fail;
- 
-+	/* Create /proc/foo6 entries only after ipv6 structs are ready. */
-+#ifdef CONFIG_PROC_FS
-+	err = -ENOMEM;
-+	if (raw6_proc_init())
-+		goto proc_raw6_fail;
-+	if (udplite6_proc_init())
-+		goto proc_udplite6_fail;
-+	if (ipv6_misc_proc_init())
-+		goto proc_misc6_fail;
-+	if (if6_proc_init())
-+		goto proc_if6_fail;
-+#endif
-+
- 	err = igmp6_late_init();
- 	if (err)
- 		goto igmp6_late_err;
-@@ -1248,6 +1249,16 @@ static int __init inet6_init(void)
- 	igmp6_late_cleanup();
- #endif
- igmp6_late_err:
-+#ifdef CONFIG_PROC_FS
-+	if6_proc_exit();
-+proc_if6_fail:
-+	ipv6_misc_proc_exit();
-+proc_misc6_fail:
-+	udplite6_proc_exit();
-+proc_udplite6_fail:
-+	raw6_proc_exit();
-+proc_raw6_fail:
-+#endif
- 	ioam6_exit();
- ioam6_fail:
- 	rpl_exit();
-@@ -1282,16 +1293,6 @@ static int __init inet6_init(void)
- ndisc_late_fail:
- 	ip6_route_cleanup();
- ip6_route_fail:
--#ifdef CONFIG_PROC_FS
--	if6_proc_exit();
--proc_if6_fail:
--	ipv6_misc_proc_exit();
--proc_misc6_fail:
--	udplite6_proc_exit();
--proc_udplite6_fail:
--	raw6_proc_exit();
--proc_raw6_fail:
--#endif
- 	ipv6_netfilter_fini();
- netfilter_fail:
- 	igmp6_cleanup();
+ drivers/net/ethernet/marvell/prestera/prestera_hw.c       | 8 ++++++++
+ drivers/net/ethernet/marvell/prestera/prestera_hw.h       | 1 +
+ drivers/net/ethernet/marvell/prestera/prestera_main.c     | 5 ++++-
+ drivers/net/ethernet/marvell/prestera/prestera_pci.c      | 7 ++++++-
+ drivers/net/ethernet/marvell/prestera/prestera_router.c   | 1 -
+ .../net/ethernet/marvell/prestera/prestera_router_hw.c    | 1 -
+ 6 files changed, 19 insertions(+), 4 deletions(-)
+
 -- 
-2.43.0
+2.25.1
 
 
