@@ -1,118 +1,115 @@
-Return-Path: <netdev+bounces-80782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A92E8810D0
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 12:22:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99421881042
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:50:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF6191F24843
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:22:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10D99B230F2
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 10:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABDA33C485;
-	Wed, 20 Mar 2024 11:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0555B38F96;
+	Wed, 20 Mar 2024 10:50:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G0DN0sPi"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B629A3C471
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 11:21:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D3129CEB;
+	Wed, 20 Mar 2024 10:50:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710933712; cv=none; b=YHOGoyBydJp2/i1NxhOhPUViz4WTiw9ubc/7Uy7z8rusH1XdHO2A/fmvBTwrPnROgIk0GeI13zCG01E+3L6bbDCCsgwpkScBe3XKcUois3c2XyWQ4gG6OFNzcJcTZVi5j8raKQYXFwpkFYt/Q5pjDsze3Vsnz2g+tHqi1yWn+4g=
+	t=1710931829; cv=none; b=mYdYday9QIx9bxukESpFycLFHgCmr5iDzhAzxx0uc7HOvY39yN3bQ5r/wY15BUrQOVp2gCGYTNfOK03FstmTudgoM+0c5/MmNJ/VCy1k1XQy5XcOs73IIEHNX9Ly6ifXb8pIYypKT9zlz2+W7eo8SCRlGhOHb3B62/oVmmpGbQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710933712; c=relaxed/simple;
-	bh=sH5QCp/CT76MJiPwxEwgetpBKYN8GHSUPg2m6mYsgWw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=MwEgvpkw7LsaXc8YPUPxxJAkEdi/y7jkb4Aose+s6PUP1243q9HmXCeHlTvA+PAcSqZTxdryLv+Cm4vQiOHl1zdWQ8Ylf8OFJDja50eBruv1rUq1KVqYot9S6rphvwHp7yy/fWw3g0e5vXjmHi+acFu0zuKDBd5EKmv1PPIbuRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rmu0y-0007nI-T1
-	for netdev@vger.kernel.org; Wed, 20 Mar 2024 12:21:48 +0100
-Received: from [2a0a:edc0:0:b01:1d::7b] (helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1rmu0y-007SJV-GJ
-	for netdev@vger.kernel.org; Wed, 20 Mar 2024 12:21:48 +0100
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 2E5742A824C
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 11:21:48 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 7BC0D2A8240;
-	Wed, 20 Mar 2024 11:21:46 +0000 (UTC)
-Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 5a515acc;
-	Wed, 20 Mar 2024 11:21:46 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	=?UTF-8?q?Martin=20Joci=C4=87?= <martin.jocic@kvaser.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net] can: kvaser_pciefd: Add additional Xilinx interrupts
-Date: Wed, 20 Mar 2024 11:50:26 +0100
-Message-ID: <20240320112144.582741-2-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240320112144.582741-1-mkl@pengutronix.de>
-References: <20240320112144.582741-1-mkl@pengutronix.de>
+	s=arc-20240116; t=1710931829; c=relaxed/simple;
+	bh=33eYdkLv+vFOfzW7fW+bW6YTvn0TxW/yQv61af3+pCw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=SdlUv5HWw5OpE73JoLwlGBXQ0dq5lXZwnCXQpSwbmUcTvfUzXgoNSbCnj72ow4X3YaLOLJBlpcxVpn6Ei6IGCIU2ttK7JGiH2MBY6K9XMQ4JSksO0dE7mMDBp45QgWDqktrPMdpD98af8qM+/lud6i8Qo/j7jSpI3jYaFG1IRBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G0DN0sPi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 56951C433C7;
+	Wed, 20 Mar 2024 10:50:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710931829;
+	bh=33eYdkLv+vFOfzW7fW+bW6YTvn0TxW/yQv61af3+pCw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=G0DN0sPidV9DZaSKasMn2t9y3aA7tTejW/wV3BwaYb9BrHSudtxiWh94qn4zC/0oy
+	 QwCF5y7d0t+j8mxolVgaBrtn2z2yrvOvR4LNRmnyjFOJdlqZ6cQHVNnSRoViVO12wg
+	 xbgKQ2mEl+BT/Z+KaxgpkRuLCTGmfIfegZgcQipyl1jZ7o/OadfScNl/OL7b7N3gsZ
+	 Gb8QrZ3afXE0yjcmphzsy+ZjeqvRjysEHEq2LmbFRCB5WfXXn2saOzm/xA4eqaIOB0
+	 kcKDoKhRkXAZWnDogvSmwHV9K0pTZMW32nTq20E20xIq71vYmDP5inTBbiKFAwB2Xx
+	 Lt0rYsO6esHkw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 45E89D95060;
+	Wed, 20 Mar 2024 10:50:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Subject: Re: [v2 net PATCH 0/5] octeontx2-pf: RVU Mailbox fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171093182928.6411.11540341489392829464.git-patchwork-notify@kernel.org>
+Date: Wed, 20 Mar 2024 10:50:29 +0000
+References: <1710754198-18632-1-git-send-email-sbhatta@marvell.com>
+In-Reply-To: <1710754198-18632-1-git-send-email-sbhatta@marvell.com>
+To: Subbaraya Sundeep <sbhatta@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
+ hkelam@marvell.com, naveenm@marvell.com, horms@kernel.org
 
-From: Martin Jocić <martin.jocic@kvaser.com>
+Hello:
 
-Since Xilinx-based adapters now support up to eight CAN channels, the
-TX interrupt mask array must have eight elements.
+This series was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
 
-Signed-off-by: Martin Jocic <martin.jocic@kvaser.com>
-Link: https://lore.kernel.org/all/2ab3c0585c3baba272ede0487182a423a420134b.camel@kvaser.com
-Fixes: 9b221ba452aa ("can: kvaser_pciefd: Add support for Kvaser PCIe 8xCAN")
-[mkl: replace Link by Fixes tag]
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/kvaser_pciefd.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On Mon, 18 Mar 2024 14:59:53 +0530 you wrote:
+> This patchset fixes the problems related to RVU mailbox.
+> During long run tests some times VF commands like setting
+> MTU or toggling interface fails because VF mailbox is timedout
+> waiting for response from PF.
+> 
+> Below are the fixes
+> Patch 1: There are two types of messages in RVU mailbox namely up and down
+> messages. Down messages are synchronous messages where a PF/VF sends
+> a message to AF and AF replies back with response. UP messages are
+> notifications and are asynchronous like AF sending link events to
+> PF. When VF sends a down message to PF, PF forwards to AF and sends
+> the response from AF back to VF. PF has to forward VF messages since
+> there is no path in hardware for VF to send directly to AF.
+> There is one mailbox interrupt from AF to PF when raised could mean
+> two scenarios one is where AF sending reply to PF for a down message
+> sent by PF and another one is AF sending up message asynchronously
+> when link changed for that PF. Receiving the up message interrupt while
+> PF is in middle of forwarding down message causes mailbox errors.
+> Fix this by receiver detecting the type of message from the mbox data register
+> set by sender.
+> 
+> [...]
 
-diff --git a/drivers/net/can/kvaser_pciefd.c b/drivers/net/can/kvaser_pciefd.c
-index f81b598147b3..7b5028b67cd5 100644
---- a/drivers/net/can/kvaser_pciefd.c
-+++ b/drivers/net/can/kvaser_pciefd.c
-@@ -370,8 +370,8 @@ static const struct kvaser_pciefd_irq_mask kvaser_pciefd_sf2_irq_mask = {
- 
- static const struct kvaser_pciefd_irq_mask kvaser_pciefd_xilinx_irq_mask = {
- 	.kcan_rx0 = BIT(4),
--	.kcan_tx = { BIT(16), BIT(17), BIT(18), BIT(19) },
--	.all = GENMASK(19, 16) | BIT(4),
-+	.kcan_tx = { BIT(16), BIT(17), BIT(18), BIT(19), BIT(20), BIT(21), BIT(22), BIT(23) },
-+	.all = GENMASK(23, 16) | BIT(4),
- };
- 
- static const struct kvaser_pciefd_dev_ops kvaser_pciefd_altera_dev_ops = {
+Here is the summary with links:
+  - [v2,net,1/5] octeontx2: Detect the mbox up or down message via register
+    https://git.kernel.org/netdev/net/c/a88e0f936ba9
+  - [v2,net,2/5] octeontx2-pf: Wait till detach_resources msg is complete
+    https://git.kernel.org/netdev/net/c/cbf2f24939a5
+  - [v2,net,3/5] octeontx2-pf: Use default max_active works instead of one
+    https://git.kernel.org/netdev/net/c/7558ce0d974c
+  - [v2,net,4/5] octeontx2-pf: Send UP messages to VF only when VF is up.
+    https://git.kernel.org/netdev/net/c/dfcf6355f53b
+  - [v2,net,5/5] octeontx2-af: Use separate handlers for interrupts
+    https://git.kernel.org/netdev/net/c/50e60de381c3
 
-base-commit: e54e09c05c00120cbe817bdb037088035be4bd79
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
