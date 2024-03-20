@@ -1,125 +1,138 @@
-Return-Path: <netdev+bounces-80791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38293881112
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 12:35:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2FE088115D
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 12:54:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E08EC1F2178F
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:34:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4B408B21F5B
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:54:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 998203DB89;
-	Wed, 20 Mar 2024 11:34:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E574D3B19D;
+	Wed, 20 Mar 2024 11:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SH871Gt8"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29BAB3D984;
-	Wed, 20 Mar 2024 11:34:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21052628D
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 11:54:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710934494; cv=none; b=UcEsjR0Qd6uxDh8kldtMDh4asbTazAwXDkBKiUYzyBZJywHuTTXAHSpD3OiqDQlc3lJR1t3idQE0JHaSSyFH2lF4T7aTyvvNu6LOvr11++F/kSjsXBXVXU4Yk1zpaxWrhG9zC3s7pMKbzZbW4SkCAW0/7jAUZTJtBU1blK6V5cc=
+	t=1710935678; cv=none; b=E1hBpukoTx63kcS+RptwzB5pSNThFoIenqpiBpTl5ov+3lVroPeCx/dY3FDjQw3s3mA4IRp6/gLUxvDfF+KlrMNYObJStB9g3FbbX61OJneL9WTYfcZvj86HXte6U0yP32kitIQbiPR8aLIJhpoQg50eg0LwHYygFa1KZLNBmlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710934494; c=relaxed/simple;
-	bh=3WaKxkbQWcDCF2kXtI2Am05e+yUdzZw2ITQ8GoPRoSk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Rp56XkgJ4EQVOks4Ul9jdvN+mvxQ0PterGaHzowWqWpzFTOpVZcyOny/XRV0vwI8inNTTZaczUbIpjkUjoEl6Km1peZV6DFQQXPWl3qbmOVAOcJNQQrvKlLS5EldPAHoKyzPu8fC56zooQXd8eBd99GBAclk3v+vOen5tdYuc7w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4V062D0XMZz4f3l89;
-	Wed, 20 Mar 2024 19:34:44 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id E87C31A0AAE;
-	Wed, 20 Mar 2024 19:34:47 +0800 (CST)
-Received: from [10.67.111.192] (unknown [10.67.111.192])
-	by APP4 (Coremail) with SMTP id gCh0CgCX6GrWyfplm5SjHg--.34463S2;
-	Wed, 20 Mar 2024 19:34:47 +0800 (CST)
-Message-ID: <ab5e6307-8d80-4751-940f-4faa5bc41d82@huaweicloud.com>
-Date: Wed, 20 Mar 2024 19:34:46 +0800
+	s=arc-20240116; t=1710935678; c=relaxed/simple;
+	bh=ENg/EnELawJjM6QXBATTqI6UYj2sEaNTlXVLqVI/rUs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n79RDTSrqEXy8f/iq7PNnAQI3NI4snbKutJnUZNE0CXVPW4wV44UhZ94HSXY+LQEdbzZoXZF21I7E0FT5/h4g5hUL7Q6leZi+ZyXHP25qi9aSyil/ObgDFJkIyvKtrn+XsIITSQnoQR+aw6mjPjCn7Vcj1vN/3UpngNHC83yUCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SH871Gt8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AA9CAC433C7;
+	Wed, 20 Mar 2024 11:54:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710935678;
+	bh=ENg/EnELawJjM6QXBATTqI6UYj2sEaNTlXVLqVI/rUs=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SH871Gt8P6P/HWXlEBbuGDUdj4DXAjRLBwO6dhqh1PfvUH2UtamejGwTddLNAuVs2
+	 X57UxvJvOAYFq06G8XRlmYYfafWwWiSNr8kjTyhy86htJnPqSENP1AE+fD/GXD5r5M
+	 LtafNtO21uNZZZr4URRQKoypODztJPnrZtDW9XnWJa4Uicsv+cdMPZIjgVn0xgscQt
+	 Iz8igp611OU4HA5TF/tMzu/zY6xFvr1QEtWYCxWMU+XEgihXaGdCRT2Vi6ZfuxRQBc
+	 Ur6Co43vjGhLmdsF1WbX0BthkWVmjytsCeib7W57Qld1RKRbKP83CWmp2CQ4zUDGYA
+	 0kESm4GmOjfYg==
+Date: Wed, 20 Mar 2024 11:54:33 +0000
+From: Simon Horman <horms@kernel.org>
+To: Claus Hansen Ries <chr@terma.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Michal Simek <michal.simek@amd.com>, Alex Elder <elder@linaro.org>,
+	Wei Fang <wei.fang@nxp.com>,
+	Uwe =?utf-8?Q?Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Rob Herring <robh@kernel.org>, Wang Hai <wanghai38@huawei.com>
+Subject: Re: [PATCH] net: ll_temac: platform_get_resource replaced by wrong
+ function
+Message-ID: <20240320115433.GT185808@kernel.org>
+References: <41c3ea1df1af4f03b2c66728af6812fb@terma.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next] arm64: bpf: zero upper bits after rev32
-Content-Language: en-US
-To: Artem Savkov <asavkov@redhat.com>, Xi Wang <xi.wang@gmail.com>,
- Catalin Marinas <catalin.marinas@arm.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20240313140205.3191564-1-asavkov@redhat.com>
-From: Xu Kuohai <xukuohai@huaweicloud.com>
-In-Reply-To: <20240313140205.3191564-1-asavkov@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CM-TRANSID:gCh0CgCX6GrWyfplm5SjHg--.34463S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7AFyxZF1kur1UJFykAw4Dtwb_yoW8try8pr
-	4ayrZakr4UWr17Aa4FganrJr1vkay2y3yUtryDWrWSka9Yv34kXryfKrW2939IvrW0vw4Y
-	9FyjyF93X3s2v3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUgmb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_
-	Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1V
-	AY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAI
-	cVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMI
-	IF0xvEx4A2jsIE14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Jr0_GrUvcSsGvfC2
-	KfnxnUUI43ZEXa7IU1zuWJUUUUU==
-X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <41c3ea1df1af4f03b2c66728af6812fb@terma.com>
 
-On 3/13/2024 10:02 PM, Artem Savkov wrote:
-> Commit d63903bbc30c7 ("arm64: bpf: fix endianness conversion bugs")
-> added upper bits zeroing to byteswap operations, but it assumes they
-> will be already zeroed after rev32, which is not the case on some
-> systems at least:
++ Eric Dumazet, Jakub Kicinski, Paolo Abeni, Michal Simek, Alex Elder
+  Wei Fang, Uwe Kleine-König, Dan Carpenter, Rob Herring, Wang Hai
+
+On Tue, Mar 19, 2024 at 07:45:26PM +0000, Claus Hansen Ries wrote:
+> From: Claus Hansen ries <chr@terma.com>
 > 
-> [ 9757.262607] test_bpf: #312 BSWAP 16: 0x0123456789abcdef -> 0xefcd jited:1 8 PASS
-> [ 9757.264435] test_bpf: #313 BSWAP 32: 0x0123456789abcdef -> 0xefcdab89 jited:1 ret 1460850314 != -271733879 (0x5712ce8a != 0xefcdab89)FAIL (1 times)
-> [ 9757.266260] test_bpf: #314 BSWAP 64: 0x0123456789abcdef -> 0x67452301 jited:1 8 PASS
-> [ 9757.268000] test_bpf: #315 BSWAP 64: 0x0123456789abcdef >> 32 -> 0xefcdab89 jited:1 8 PASS
-> [ 9757.269686] test_bpf: #316 BSWAP 16: 0xfedcba9876543210 -> 0x1032 jited:1 8 PASS
-> [ 9757.271380] test_bpf: #317 BSWAP 32: 0xfedcba9876543210 -> 0x10325476 jited:1 ret -1460850316 != 271733878 (0xa8ed3174 != 0x10325476)FAIL (1 times)
-> [ 9757.273022] test_bpf: #318 BSWAP 64: 0xfedcba9876543210 -> 0x98badcfe jited:1 7 PASS
-> [ 9757.274721] test_bpf: #319 BSWAP 64: 0xfedcba9876543210 >> 32 -> 0x10325476 jited:1 9 PASS
+> devm_platform_ioremap_resource_byname is called using 0 as name, which eventually 
+> ends up in platform_get_resource_byname, where it causes a null pointer in strcmp.
 > 
-> Fixes: d63903bbc30c7 ("arm64: bpf: fix endianness conversion bugs")
-> Signed-off-by: Artem Savkov <asavkov@redhat.com>
+>                 if (type == resource_type(r) && !strcmp(r->name, name))
+> 
+> The correct function is devm_platform_ioremap_resource.
+
+Hi Claus,
+
+It is curious that this wasn't noticed earlier - does the driver
+function in some circumstances without this change?
+
+> 
+> Fixes: bd69058 ("net: ll_temac: Use devm_platform_ioremap_resource_byname()")
+
+nit: Fixes tags should use 12 or more characters for the hash.
+
+Fixes: bd69058f50d5 ("net: ll_temac: Use devm_platform_ioremap_resource_byname()")
+
+> Signed-off-by: Claus H. Ries <chr@terma.com>
+> Cc: stable@vger.kernel.org
+
+Unfortunately the patch does not apply - it seems that tabs have been
+replaced by spaces somewhere along the way. It would be best to repost
+with that addressed. Using git send-email usually works.
+
+Also, as this is a fix, please target it at the net tree.
+That means it should be based on that tree (that part is fine :)
+and designated as being for net in the subject.
+
+	Subject: [PATCH net] ...
+
+Lastly, please run get_maintainer.pl on your patch to provide the list
+of parties to CC.
+
+https://docs.kernel.org/process/maintainer-netdev.html
+
 > ---
->   arch/arm64/net/bpf_jit_comp.c | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
+>  drivers/net/ethernet/xilinx/ll_temac_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/arch/arm64/net/bpf_jit_comp.c b/arch/arm64/net/bpf_jit_comp.c
-> index c5b461dda4385..e86e5ba74dca2 100644
-> --- a/arch/arm64/net/bpf_jit_comp.c
-> +++ b/arch/arm64/net/bpf_jit_comp.c
-> @@ -944,7 +944,8 @@ static int build_insn(const struct bpf_insn *insn, struct jit_ctx *ctx,
->   			break;
->   		case 32:
->   			emit(A64_REV32(is64, dst, dst), ctx);
-> -			/* upper 32 bits already cleared */
-> +			/* zero-extend 32 bits into 64 bits */
-> +			emit(A64_UXTW(is64, dst, dst), ctx);
+> diff --git a/drivers/net/ethernet/xilinx/ll_temac_main.c b/drivers/net/ethernet/xilinx/ll_temac_main.c
+> index 9df39cf8b097..1072e2210aed 100644
+> --- a/drivers/net/ethernet/xilinx/ll_temac_main.c
+> +++ b/drivers/net/ethernet/xilinx/ll_temac_main.c
+> @@ -1443,7 +1443,7 @@ static int temac_probe(struct platform_device *pdev)
+>         }
+>           /* map device registers */
+> -       lp->regs = devm_platform_ioremap_resource_byname(pdev, 0);
+> +       lp->regs = devm_platform_ioremap_resource(pdev, 0);
+>         if (IS_ERR(lp->regs)) {
+>                 dev_err(&pdev->dev, "could not map TEMAC registers\n");
+>                 return -ENOMEM;
+> 
+> base-commit: d95fcdf4961d27a3d17e5c7728367197adc89b8d
+> --  2.39.3 (Apple Git-146)
+> 
+> 
+> 
 
-I think the problem only occurs when is64 == 1. In this case, the generated rev32
-insn reverses byte order in both high and low 32-bit word. To fix it, we could just
-set the first arg to 0 for A64_REV32:
-
-emit(A64_REV32(0, dst, dst), ctx);
-
-No need to add an extra uxtw isnn.
-
->   			break;
->   		case 64:
->   			emit(A64_REV64(dst, dst), ctx);
-
+-- 
+pw-bot: changes-requested
 
