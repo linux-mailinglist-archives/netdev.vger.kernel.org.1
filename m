@@ -1,254 +1,145 @@
-Return-Path: <netdev+bounces-80823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88120881322
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 15:15:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11901881336
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 15:20:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3DBAC289D50
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 14:15:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FABB286FE6
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 14:20:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96E7E45943;
-	Wed, 20 Mar 2024 14:14:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2B774436E;
+	Wed, 20 Mar 2024 14:20:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Z8Id/Iy6"
+	dkim=pass (2048-bit key) header.d=terma.com header.i=@terma.com header.b="RgM6z9Zw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-out6.electric.net (smtp-out6.electric.net [192.162.217.183])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98AAA40863
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 14:14:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012B13FE48;
+	Wed, 20 Mar 2024 14:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.162.217.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710944097; cv=none; b=TZt4893LoTYf43obQ0BdfuNsTogtsT9ssyl7XM9YJkx5ABUiS8p+wVJcf8N5xH4gCpas9bMHIknolUPGRp8zCFo1F/sFZ52bg7WipCPKIcD+rP6pdZkGesDkxa23vRl1sadXX6sSucZzNWXzg+OgU91JAsGkq11JGZcbxxPveps=
+	t=1710944405; cv=none; b=gbFbZM8Bm4zsR0bhGJFTB3aJQIIn0PW9ts/CVYqjOQ2Nsalpeby/U+bZbTFuZ0Q8wKao7pxRKHqHN65iyFNniFIfGKFTn5mTiU56EKbEkwRM2szbPJ0NRTOjNPu1Yak6DXNJGmaR/q7JGDBMiPranG80cnIIbTJNKDC8CwuVZfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710944097; c=relaxed/simple;
-	bh=XRapKtc108/pbXuzQ1RvASghSkGRFTXgTzWiVgsKsbU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RhiepNvOGLT9YSSi9w919l5V1LxvjI+6VwL0TxcjEc0jYSDnA8NRJ/Nkh4b9c4vAt0IHOUL2Y/fUuHLPshtaE7yGgedvLZLljIc5sPoDxqZdX74YunVVYHJ9v7RUIpm0KqFcERxPlaGYwwF/dJ9z2rqsm3gUlb4vALBDQ1ZOx74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Z8Id/Iy6; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-568c3888ad7so14926a12.0
-        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 07:14:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1710944094; x=1711548894; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZE0o19ZPW4Q/J+OTjU7JW8PmpitVelX4zaEFtGnHi3c=;
-        b=Z8Id/Iy60LZs44BCxYP3Zt5qv8IhLV2OntSsV3wY0NG3wQ2DK6YBeO3RcCu1rZ5Rmd
-         MdXhBKtxcyxPHY8mX91+p3JmvD3z+GCI/KlDwTyDq22IUFAmQDeeK7QhnMyRORNavKDo
-         PT9pm4ZShS7i5swjNwc/yq/21K31w0uDjk2zWic/4XElikejHUYer1GApPKrDOCGqAJg
-         RWB+XVJxC803r6SColRcecYIMCvJ2uRBiAPXuEYOOk1q/K7Wy268mC2oOT/W/wHInw/T
-         2AkWPN27wc3dBzV5EpY3vbKoBXdeb/UK71NhzUYX8QKiS9Ac0llZWJfpFRsIu1UYf8fg
-         9OIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710944094; x=1711548894;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZE0o19ZPW4Q/J+OTjU7JW8PmpitVelX4zaEFtGnHi3c=;
-        b=eSOVrd+VQvOaYvI5ez6OyYIYJjjhir6VqQrxLSRmWlmOBalU5DWmmZMIIgUy6i99b7
-         Eap3JKYFs2+NoXlVai4kegj3bYBz0Cop3zweeBKuS23k3blrOhM3KgkJXIc5DiyaSShE
-         2nF0/c5y+v78KhTUABTWrAuw7GJVplom+irGBHu9Y6zVfN86o+DZH3RbgewaD6ljiOHT
-         4l9p20sTiTaX62j3vnq7t6qb94plaDvoQbjhB1JRVLaa74TZ5SrO7F7Ga0B8FRTSqmpg
-         kEyWuJMQp57xFUyXurVoakXSfn6cDUPMLlyiaR0fyMc0aC/V5q1RDi9eY0VRFiZnUJQs
-         ipQQ==
-X-Gm-Message-State: AOJu0Yzm5lpj1u1YG5JxKoFQlQlzlQ1a13vo6v1miluuxI/KrqGOdGB9
-	4hZjuPsw97XtPX54X91WRt+veWGVzE80ur+/eeWq1ZcEVxMCwFoUr9EVXVZshjfHGVzlIrLBe5Y
-	QOoDtaaCAG8UTVG9keX16KFUBN3mPimCg+g7s
-X-Google-Smtp-Source: AGHT+IGf0RnNraDVYsG4wNxD4IMSs+QTaVw1IHmThYiPMNDH/bOviRgGHyFdKUlbI8k0p/2JQiZKnkIA61ighrrHDQw=
-X-Received: by 2002:aa7:d4cf:0:b0:56b:b856:7eb6 with SMTP id
- t15-20020aa7d4cf000000b0056bb8567eb6mr58115edr.6.1710944093653; Wed, 20 Mar
- 2024 07:14:53 -0700 (PDT)
+	s=arc-20240116; t=1710944405; c=relaxed/simple;
+	bh=AYCj9L452RECc5zbYdcDVE8dBmojGYWNPpDLbiPVRpc=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=sUifSI2s7hHVwgJcC/rd6TISLwmxG1p3m75/K9ej/Qhma80QRqMjpwet6n9UMZew4aFcUz5GPid3voXXfsLSkhkqpv2zSqSySI695vYJAJwFWKdlmw75uOzGtw7xYKfGRq+3rTxv8btvD4Tt2hNaOcETIPTAJRPwgh5X1d0qjG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=terma.com; spf=pass smtp.mailfrom=terma.com; dkim=pass (2048-bit key) header.d=terma.com header.i=@terma.com header.b=RgM6z9Zw; arc=none smtp.client-ip=192.162.217.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=terma.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=terma.com
+Received: from 1rmwmk-0008Zs-VN by out6f.electric.net with emc1-ok (Exim 4.96.1)
+	(envelope-from <chr@terma.com>)
+	id 1rmwmn-0008pI-Vx;
+	Wed, 20 Mar 2024 07:19:21 -0700
+Received: by emcmailer; Wed, 20 Mar 2024 07:19:21 -0700
+Received: from [193.163.1.101] (helo=Exch06.terma.com)
+	by out6f.electric.net with esmtpsa  (TLS1.2) tls TLS_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96.1)
+	(envelope-from <chr@terma.com>)
+	id 1rmwmk-0008Zs-VN;
+	Wed, 20 Mar 2024 07:19:18 -0700
+Received: from EXCH09.terma.com (10.12.2.69) by Exch06.terma.com (10.12.2.66)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Wed, 20 Mar
+ 2024 15:19:15 +0100
+Received: from EXCH09.terma.com ([fe80::d8f4:f3a1:6899:e2da]) by
+ EXCH09.terma.com ([fe80::d8f4:f3a1:6899:e2da%17]) with mapi id
+ 15.01.2507.034; Wed, 20 Mar 2024 15:19:15 +0100
+From: Claus Hansen Ries <chr@terma.com>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, Simon Horman
+	<horms@kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "michal.simek@amd.com"
+	<michal.simek@amd.com>, "wei.fang@nxp.com" <wei.fang@nxp.com>,
+	"yangyingliang@huawei.com" <yangyingliang@huawei.com>, "robh@kernel.org"
+	<robh@kernel.org>, "harini.katakam@amd.com" <harini.katakam@amd.com>,
+	"dan.carpenter@linaro.org" <dan.carpenter@linaro.org>,
+	"u.kleine-koenig@pengutronix.de" <u.kleine-koenig@pengutronix.de>,
+	"wanghai38@huawei.com" <wanghai38@huawei.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+Subject: [PATCH net v2] net: ll_temac: platform_get_resource replaced by wrong
+ function
+Thread-Topic: [PATCH net v2] net: ll_temac: platform_get_resource replaced by
+ wrong function
+Thread-Index: Adp6z2UIQyAdxhAwQjqZ9B4o1njNZw==
+Date: Wed, 20 Mar 2024 14:19:15 +0000
+Message-ID: <f512ff25a2cd484791757c18facb526c@terma.com>
+Accept-Language: en-150, en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240319122310.27474-1-fw@strlen.de>
-In-Reply-To: <20240319122310.27474-1-fw@strlen.de>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 20 Mar 2024 15:14:40 +0100
-Message-ID: <CANn89i+S0EYPM4N-3RsN5-QDQts5wobJjBikF7=feMo6hHY3Lw@mail.gmail.com>
-Subject: Re: [PATCH net] inet: inet_defrag: prevent sk release while still in use
-To: Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, dsahern@kernel.org, kuba@kernel.org, 
-	pabeni@redhat.com, netfilter-devel@vger.kernel.org, 
-	xingwei lee <xrivendell7@gmail.com>, yue sun <samsun1006219@gmail.com>, 
-	syzbot+e5167d7144a62715044c@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-Authenticated: smtp.out@terma.com
+X-Outbound-IP: 193.163.1.101
+X-Env-From: chr@terma.com
+X-Proto: esmtpsa
+X-Revdns: r2d2.lystrup.terma.com
+X-HELO: Exch06.terma.com
+X-TLS: TLS1.2:AES256-GCM-SHA384:256
+X-Authenticated_ID: smtp.out@terma.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=terma.com; s=mailanyone20180424;h=MIME-Version:Message-ID:Date:To:From; bh=axJONggkune0GLy0Xa7qw6QXAfBuSv4UIuRZXQYeZTY=;b=RgM6z9ZwHL6EoyJmXYUhqzVIZoQrE/Ylrr13BNreeRvDMh5LQYjMJRKiujljEqZisTmeJu1ManDsp7uC6Ywc+lARERjo8ssgQKt3YEbspA+7EXXU6/q4UozyEsrH5Sw2DDjBC9icfx6t2tMuicPkBmobVkTV4wVkdiCZXWrMNXOiKWBUgcczXSr2LCS45rfGog//P8iDhG37t8f4vHKjbg9NIGmjp8ZYgtEjVTVihYysRZpvzdWQcMVBgBjVCuAtEKV2rg5PauLi50hHZTjUnO0NMFNI0wldoqhwCt/yArLSwlzYei+xdkQ2IFFuywEUTVzbOL7MiP1j2fJLkdP2mQ==;
+X-PolicySMART: 6001202, 19049467
+X-VIPRE-Scanners:virus_bd;virus_clamav;
 
-On Tue, Mar 19, 2024 at 12:36=E2=80=AFPM Florian Westphal <fw@strlen.de> wr=
-ote:
->
-> ip_local_out() and other functions can pass skb->sk as function argument.
->
-> If the skb is a fragment and reassembly happens before such function call
-> returns, the sk must not be released.
->
-> This affects skb fragments reassembled via netfilter or similar
-> modules, e.g. openvswitch or ct_act.c, when run as part of tx pipeline.
->
-> Eric Dumazet made an initial analysis of this bug.  Quoting Eric:
->   Calling ip_defrag() in output path is also implying skb_orphan(),
->   which is buggy because output path relies on sk not disappearing.
->
->   A relevant old patch about the issue was :
->   8282f27449bf ("inet: frag: Always orphan skbs inside ip_defrag()")
->
->   [..]
->
->   net/ipv4/ip_output.c depends on skb->sk being set, and probably to an
->   inet socket, not an arbitrary one.
->
->   If we orphan the packet in ipvlan, then downstream things like FQ
->   packet scheduler will not work properly.
->
->   We need to change ip_defrag() to only use skb_orphan() when really
->   needed, ie whenever frag_list is going to be used.
->
-> Eric suggested to stash sk in fragment queue and made an initial patch.
-> However there is a problem with this:
->
-> If skb is refragmented again right after, ip_do_fragment() will copy
-> head->sk to the new fragments, and sets up destructor to sock_wfree.
-> IOW, we have no choice but to fix up sk_wmem accouting to reflect the
-> fully reassembled skb, else wmem will underflow.
->
-> This change moves the orphan down into the core, to last possible moment.
-> As ip_defrag_offset is aliased with sk_buff->sk member, we must move the
-> offset into the FRAG_CB, else skb->sk gets clobbered.
->
-> This allows to delay the orphaning long enough to learn if the skb has
-> to be queued or if the skb is completing the reasm queue.
->
-> In the former case, things work as before, skb is orphaned.  This is
-> safe because skb gets queued/stolen and won't continue past reasm engine.
->
-> In the latter case, we will steal the skb->sk reference, reattach it to
-> the head skb, and fix up wmem accouting when inet_frag inflates truesize.
->
-> Diagnosed-by: Eric Dumazet <edumazet@google.com>
-> Reported-by: xingwei lee <xrivendell7@gmail.com>
-> Reported-by: yue sun <samsun1006219@gmail.com>
-> Reported-by: syzbot+e5167d7144a62715044c@syzkaller.appspotmail.com
-> Signed-off-by: Florian Westphal <fw@strlen.de>
-> ---
->  include/linux/skbuff.h                  |  7 +--
->  net/ipv4/inet_fragment.c                | 71 ++++++++++++++++++++-----
->  net/ipv4/ip_fragment.c                  |  2 +-
->  net/ipv6/netfilter/nf_conntrack_reasm.c |  2 +-
->  4 files changed, 61 insertions(+), 21 deletions(-)
->
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 7d56ce195120..6d08ff8a9357 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -753,8 +753,6 @@ typedef unsigned char *sk_buff_data_t;
->   *     @list: queue head
->   *     @ll_node: anchor in an llist (eg socket defer_list)
->   *     @sk: Socket we are owned by
-> - *     @ip_defrag_offset: (aka @sk) alternate use of @sk, used in
-> - *             fragmentation management
->   *     @dev: Device we arrived on/are leaving by
->   *     @dev_scratch: (aka @dev) alternate use of @dev when @dev would be=
- %NULL
->   *     @cb: Control buffer. Free for use by every layer. Put private var=
-s here
-> @@ -875,10 +873,7 @@ struct sk_buff {
->                 struct llist_node       ll_node;
->         };
->
-> -       union {
-> -               struct sock             *sk;
-> -               int                     ip_defrag_offset;
-> -       };
-> +       struct sock             *sk;
->
->         union {
->                 ktime_t         tstamp;
-> diff --git a/net/ipv4/inet_fragment.c b/net/ipv4/inet_fragment.c
-> index 7072fc0783ef..7254b640ba06 100644
-> --- a/net/ipv4/inet_fragment.c
-> +++ b/net/ipv4/inet_fragment.c
-> @@ -24,6 +24,8 @@
->  #include <net/ip.h>
->  #include <net/ipv6.h>
->
-> +#include "../core/sock_destructor.h"
-> +
->  /* Use skb->cb to track consecutive/adjacent fragments coming at
->   * the end of the queue. Nodes in the rb-tree queue will
->   * contain "runs" of one or more adjacent fragments.
-> @@ -39,6 +41,7 @@ struct ipfrag_skb_cb {
->         };
->         struct sk_buff          *next_frag;
->         int                     frag_run_len;
-> +       int                     ip_defrag_offset;
->  };
->
->  #define FRAG_CB(skb)           ((struct ipfrag_skb_cb *)((skb)->cb))
-> @@ -396,12 +399,12 @@ int inet_frag_queue_insert(struct inet_frag_queue *=
-q, struct sk_buff *skb,
->          */
->         if (!last)
->                 fragrun_create(q, skb);  /* First fragment. */
-> -       else if (last->ip_defrag_offset + last->len < end) {
-> +       else if (FRAG_CB(last)->ip_defrag_offset + last->len < end) {
->                 /* This is the common case: skb goes to the end. */
->                 /* Detect and discard overlaps. */
-> -               if (offset < last->ip_defrag_offset + last->len)
-> +               if (offset < FRAG_CB(last)->ip_defrag_offset + last->len)
->                         return IPFRAG_OVERLAP;
-> -               if (offset =3D=3D last->ip_defrag_offset + last->len)
-> +               if (offset =3D=3D FRAG_CB(last)->ip_defrag_offset + last-=
->len)
->                         fragrun_append_to_last(q, skb);
->                 else
->                         fragrun_create(q, skb);
-> @@ -418,13 +421,13 @@ int inet_frag_queue_insert(struct inet_frag_queue *=
-q, struct sk_buff *skb,
->
->                         parent =3D *rbn;
->                         curr =3D rb_to_skb(parent);
-> -                       curr_run_end =3D curr->ip_defrag_offset +
-> +                       curr_run_end =3D FRAG_CB(curr)->ip_defrag_offset =
-+
->                                         FRAG_CB(curr)->frag_run_len;
-> -                       if (end <=3D curr->ip_defrag_offset)
-> +                       if (end <=3D FRAG_CB(curr)->ip_defrag_offset)
->                                 rbn =3D &parent->rb_left;
->                         else if (offset >=3D curr_run_end)
->                                 rbn =3D &parent->rb_right;
-> -                       else if (offset >=3D curr->ip_defrag_offset &&
-> +                       else if (offset >=3D FRAG_CB(curr)->ip_defrag_off=
-set &&
->                                  end <=3D curr_run_end)
->                                 return IPFRAG_DUP;
->                         else
-> @@ -438,23 +441,39 @@ int inet_frag_queue_insert(struct inet_frag_queue *=
-q, struct sk_buff *skb,
->                 rb_insert_color(&skb->rbnode, &q->rb_fragments);
->         }
->
-> -       skb->ip_defrag_offset =3D offset;
-> +       FRAG_CB(skb)->ip_defrag_offset =3D offset;
->
->         return IPFRAG_OK;
->  }
->  EXPORT_SYMBOL(inet_frag_queue_insert);
->
-> +void tcp_wfree(struct sk_buff *skb);
+From: Claus Hansen Ries <chr@terma.com>
 
-Thanks a lot Florian for looking at this !
+Hope I am resubmitting this correctly, I've fixed the issues in=20
+the original submission.
 
-Since you had : #include "../core/sock_destructor.h", perhaps the line
-can be removed,
-because it includes <net/tcp.h>
+platform_get_resource was replaced with devm_platform_ioremap_resource_byna=
+me=20
+and is called using 0 as name. This eventually ends up in platform_get_reso=
+urce_byname
+in the call stack, where it causes a null pointer in strcmp.
+
+	if (type =3D=3D resource_type(r) && !strcmp(r->name, name))
+
+It should have been replaced with devm_platform_ioremap_resource.
+
+Fixes: bd69058f50d5 ("net: ll_temac: Use devm_platform_ioremap_resource_byn=
+ame()")
+Signed-off-by: Claus Hansen Ries <chr@terma.com>
+Cc: stable@vger.kernel.org
+---
+v2:
+  - fix accidently converting tabs to spaces and wording in commit message
+v1: https://marc.info/?l=3Dlinux-netdev&m=3D171087828129633&w=3D2
+
+ drivers/net/ethernet/xilinx/ll_temac_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/xilinx/ll_temac_main.c b/drivers/net/ethe=
+rnet/xilinx/ll_temac_main.c
+index 9df39cf8b097..1072e2210aed 100644
+--- a/drivers/net/ethernet/xilinx/ll_temac_main.c
++++ b/drivers/net/ethernet/xilinx/ll_temac_main.c
+@@ -1443,7 +1443,7 @@ static int temac_probe(struct platform_device *pdev)
+ 	}
+=20
+ 	/* map device registers */
+-	lp->regs =3D devm_platform_ioremap_resource_byname(pdev, 0);
++	lp->regs =3D devm_platform_ioremap_resource(pdev, 0);
+ 	if (IS_ERR(lp->regs)) {
+ 		dev_err(&pdev->dev, "could not map TEMAC registers\n");
+ 		return -ENOMEM;
+
+base-commit: d95fcdf4961d27a3d17e5c7728367197adc89b8d
+--=20
+2.39.3 (Apple Git-146)
+
+
+
 
