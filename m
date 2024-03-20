@@ -1,248 +1,139 @@
-Return-Path: <netdev+bounces-80854-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D651188152A
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 17:04:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1C35881534
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 17:06:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5E18FB22F38
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:04:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0ACD21C22442
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:06:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBBE254661;
-	Wed, 20 Mar 2024 16:04:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9730A5466C;
+	Wed, 20 Mar 2024 16:06:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="ZM1IHRuJ";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="lfgEkScD";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="Xi6MSutC";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="AoEpC++p"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="XHgD0N30"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B4F53E1B
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 16:04:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA9A936137
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 16:06:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710950674; cv=none; b=S1rdzJvca84WWdugOOiJaRwcQtIy7vRA5X7gtIiIuxwi96lMozVFUx+DRm9+0zTlxb6XB9tTAmRLvAzAGTeRjylUceGlRGx+tYq41JYeHkbxTgMwvDorqoDa5GbAAVAhJVa1+X6q/vQktAtZkBzB/cYDmGmrobr8Qe9GUgMOOpY=
+	t=1710950781; cv=none; b=JSI7XS8dRBRVLwPqY3SbYoc0aqsjgXRSLw0jWJq/QXrZOSikwq1uE/Lw8PIkQbEfZRVzusm5nzJ0n38McCn3Zi3ZLT4EtRkSFYcshvd52PP4eRqxniy/YRbZrvYTLioGXQcldVosc08vE7+ShBuD/nTYRlaLU4Fn0nnSebcIjGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710950674; c=relaxed/simple;
-	bh=W+EY++8gJz6A80dzzLCLhXh98dB4o5XVv4gM5/Bf13U=;
+	s=arc-20240116; t=1710950781; c=relaxed/simple;
+	bh=s6NQedUXfZwfZWCI8U68XDjk31dsNA/Vfqft+OrXjBY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rCQVmicpw8hLocFlhguhgqNzbHcAL2i4Mgyy6WRpZydb4aLE8iYvQtgp8fgCer9iowaCCZqZkw7lh78xE9UBTsRLRocm/V3yB5bEoexMtKzXRdylLgwLR6CSvN0PV4FKJR2fQ3b9v7G1y78UsaUPF4etb8EPAur/vJomAkuMLu8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=ZM1IHRuJ; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=lfgEkScD; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=Xi6MSutC; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=AoEpC++p; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from kitsune.suse.cz (unknown [10.100.12.127])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id CC70734774;
-	Wed, 20 Mar 2024 16:04:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1710950670; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QjX69h01GVJIX3aWH8s2p5XVScnEQmomDafkyDxLNA0=;
-	b=ZM1IHRuJywSxvY8A+4nEfPdAHQLhQX9C8iD67BDfskczwGODJvUjL0/NWVXtfcflvsU6Xk
-	bmLgY4vKUFvWA4EIoXA6nHan3DOqoUyXiuQOS07XWugAGH8uoYUNgRDENUzJYa7DwWYcBH
-	H0ZNex80ESA6hsqs9yN3NYtk+sutzFw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1710950670;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QjX69h01GVJIX3aWH8s2p5XVScnEQmomDafkyDxLNA0=;
-	b=lfgEkScD99ZVyS2EFPayeinSdqUVXY8mobLEvk1s6AB/OwUaRBuJaWXW/xQg8tHni1VA2V
-	rZsMybeRo+yFy0DA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1710950669; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QjX69h01GVJIX3aWH8s2p5XVScnEQmomDafkyDxLNA0=;
-	b=Xi6MSutCQfz591Wl1UJwUi0ajdVP6Mwbm+63KHXpmMBPmdImS6M3cKMXe2E6y37gAYPDgN
-	5ZL8DzPKyXHozyH9xcX9kYWug2AjmGBCjxgEWUfftUP1o90zjgWvCQ9dQKSk2pU873w2dH
-	zs4Ct5kATobPicpB3CjFjQXxgIHwM7I=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1710950669;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=QjX69h01GVJIX3aWH8s2p5XVScnEQmomDafkyDxLNA0=;
-	b=AoEpC++pSxac76w/vY/ydJS6TK/GV/j2smtUlKSZse5XoRiuNW96Rg32n6ZfQ65hR0e70u
-	cvHHS2eDDWI4IDAQ==
-Date: Wed, 20 Mar 2024 17:04:28 +0100
-From: Michal =?iso-8859-1?Q?Such=E1nek?= <msuchanek@suse.de>
-To: Michael Ellerman <mpe@ellerman.id.au>
-Cc: netdev@vger.kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	linuxppc-dev@lists.ozlabs.org, wireguard@lists.zx2c4.com,
-	dtsen@linux.ibm.com, Herbert Xu <herbert@gondor.apana.org.au>
-Subject: Re: Cannot load wireguard module
-Message-ID: <20240320160428.GQ20665@kitsune.suse.cz>
-References: <20240315122005.GG20665@kitsune.suse.cz>
- <87jzm32h7q.fsf@mail.lhotse>
- <87r0g7zrl2.fsf@mail.lhotse>
- <20240318170855.GK20665@kitsune.suse.cz>
- <20240319124742.GM20665@kitsune.suse.cz>
- <87le6dyt1f.fsf@mail.lhotse>
+	 Content-Type:Content-Disposition:In-Reply-To; b=COReb05UzXDEk6IigptXXNBNNYb4Q9lr7+WoSwcm1hFz5MC1KhOov5IjSESgl2MvfHx/ITazh/sXz+7wRIn1LWm5GjEGfj6zgdZQDy6rk5xu13LIY4YIh7dDq5Svunx9oG54pbfJplcJjfi9iqAVAT+cposw9sSAjEV8h+yx1IM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=XHgD0N30; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-3417a3151c4so2491933f8f.3
+        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 09:06:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710950778; x=1711555578; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=v8jmgWz3VAY8ZzreiulUbSiKLh7pUnFJyujK1sVIPS0=;
+        b=XHgD0N30+56AvxO3Koh50UrU+fvuMVJzH5XHI66m5HQeHUc5XywJAHgdhcV/wQS2Qn
+         48v6f+1G1pNAzO69QBv05Q1QDu3Nugs9TjZJxUB+v+MKYXdVUAJGmsF7Z1RS6AmWvdo1
+         T8zq6vi/RXNdsyhG1ANCzCAPweApB2YA9rAOD0BBIdMyncuuff72vRp1QV06UMnRTAUT
+         cRgMbeIXZWRUHAIpcNinepaiSUKbiXdxCD3gR/4CQIg8AayqHRarH7qCRAEPy6ZVusoc
+         d0dMAeUpiaOFOr+srddJZRLpSMDdikuvjsz6fWfU8U2YymLz+dOxz0IO/lAAz8+Tq9Lo
+         lWAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710950778; x=1711555578;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v8jmgWz3VAY8ZzreiulUbSiKLh7pUnFJyujK1sVIPS0=;
+        b=CLuR08z1WPRV3RDGW/PrfeJGrS4nqZky/R0CoUIMQwRBaUCVKbVhbwGAbxZs/r40b6
+         Yb1MnXGiMWMSW9rhbP24jR0ZBPykNfDyb6TQP2ROaUQZPx+asCQ07VwXlqfeC1/mvueu
+         rdbjSlrJmZ2QTV4GYKpnpzSfT5SjTPx+cVJq5zYD9zLet1kgczE3ZI8XCR5J7ftYrjMY
+         i5BW6Q5mbNqMlkX2ZCjzA0/GBYRnEvReg9xrUUWD8w0NqQD6FqxVCTx9LNFJoJkGo7EH
+         OHaR4o1ZqwPKvKgD4asyPsTmvqKo40GRdL5bX7+3mkaVivEoKz0Y96/q0lszK11hMPrs
+         0fZg==
+X-Forwarded-Encrypted: i=1; AJvYcCWJQaSyO5FWwfQOm6vjLMU2KVNjpYp3/iL6lh/mU03eCMDTQcX4mmNIataQcY5rBPEeuUGVGuDlUpck5gFEF59vQNzl5VEA
+X-Gm-Message-State: AOJu0YwFeO0Ebu9afQJsrJLwC5dzBOYspWHRgvq+ZBhZB1q7scucLNOK
+	hz4MlRbLT/8zpBJrjetZrbPbyzLyDTOr2kY+18UMj9zXECnFeSmoAIuMd9bBGDQ=
+X-Google-Smtp-Source: AGHT+IETNVMK8m1jhOjqYEXAI9aTcnCW2E/0idMKApIbeQQjKSCih1HznLYl7yI8UjVpUVh5TwQcZQ==
+X-Received: by 2002:a05:6000:ad2:b0:33e:c7e2:2b64 with SMTP id di18-20020a0560000ad200b0033ec7e22b64mr11376760wrb.42.1710950778011;
+        Wed, 20 Mar 2024 09:06:18 -0700 (PDT)
+Received: from localhost (mail.chocen-mesto.cz. [85.163.43.2])
+        by smtp.gmail.com with ESMTPSA id o9-20020adfe809000000b0033ec6ebf878sm14939300wrm.93.2024.03.20.09.06.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Mar 2024 09:06:17 -0700 (PDT)
+Date: Wed, 20 Mar 2024 17:06:16 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Simon Horman <horms@kernel.org>
+Cc: Claus Hansen Ries <chr@terma.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"michal.simek@amd.com" <michal.simek@amd.com>,
+	"wei.fang@nxp.com" <wei.fang@nxp.com>,
+	"yangyingliang@huawei.com" <yangyingliang@huawei.com>,
+	"robh@kernel.org" <robh@kernel.org>,
+	"harini.katakam@amd.com" <harini.katakam@amd.com>,
+	"dan.carpenter@linaro.org" <dan.carpenter@linaro.org>,
+	"u.kleine-koenig@pengutronix.de" <u.kleine-koenig@pengutronix.de>,
+	"wanghai38@huawei.com" <wanghai38@huawei.com>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v2] net: ll_temac: platform_get_resource replaced by
+ wrong function
+Message-ID: <ZfsJeGf0uRgKxj-W@nanopsycho>
+References: <f512ff25a2cd484791757c18facb526c@terma.com>
+ <20240320152246.GU185808@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <87le6dyt1f.fsf@mail.lhotse>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Authentication-Results: smtp-out1.suse.de;
-	none
-X-Spam-Level: 
-X-Spam-Score: -7.54
-X-Spamd-Result: default: False [-7.54 / 50.00];
-	 ARC_NA(0.00)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 MIME_GOOD(-0.10)[text/plain];
-	 REPLY(-4.00)[];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 NEURAL_HAM_SHORT(-0.15)[-0.760];
-	 RCPT_COUNT_SEVEN(0.00)[7];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:email,wireguard.com:url,ellerman.id.au:email,zx2c4.com:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 RCVD_COUNT_ZERO(0.00)[0];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 R_MIXED_CHARSET(0.71)[subject];
-	 BAYES_HAM(-3.00)[100.00%]
-X-Spam-Flag: NO
+In-Reply-To: <20240320152246.GU185808@kernel.org>
 
-On Wed, Mar 20, 2024 at 11:41:32PM +1100, Michael Ellerman wrote:
-> Michal Suchánek <msuchanek@suse.de> writes:
-> > On Mon, Mar 18, 2024 at 06:08:55PM +0100, Michal Suchánek wrote:
-> >> On Mon, Mar 18, 2024 at 10:50:49PM +1100, Michael Ellerman wrote:
-> >> > Michael Ellerman <mpe@ellerman.id.au> writes:
-> >> > > Michal Suchánek <msuchanek@suse.de> writes:
-> >> > >> Hello,
-> >> > >>
-> >> > >> I cannot load the wireguard module.
-> >> > >>
-> >> > >> Loading the module provides no diagnostic other than 'No such device'.
-> >> > >>
-> >> > >> Please provide maningful diagnostics for loading software-only driver,
-> >> > >> clearly there is no particular device needed.
-> >> > >
-> >> > > Presumably it's just bubbling up an -ENODEV from somewhere.
-> >> > >
-> >> > > Can you get a trace of it?
-> >> > >
-> >> > > Something like:
-> >> > >
-> >> > >   # trace-cmd record -p function_graph -F modprobe wireguard
-> >
-> > Attached.
-> 
-> Sorry :/, you need to also trace children of modprobe, with -c.
-> 
-> But, I was able to reproduce the same issue here.
-> 
-> On a P9, a kernel with CONFIG_CRYPTO_CHACHA20_P10=n everything works:
-> 
->   $ modprobe -v wireguard
->   insmod /lib/modules/6.8.0/kernel/net/ipv4/udp_tunnel.ko
->   insmod /lib/modules/6.8.0/kernel/net/ipv6/ip6_udp_tunnel.ko
->   insmod /lib/modules/6.8.0/kernel/lib/crypto/libchacha.ko
->   insmod /lib/modules/6.8.0/kernel/lib/crypto/libchacha20poly1305.ko
->   insmod /lib/modules/6.8.0/kernel/drivers/net/wireguard/wireguard.ko
->   [   19.180564][  T692] wireguard: allowedips self-tests: pass
->   [   19.185080][  T692] wireguard: nonce counter self-tests: pass
->   [   19.310438][  T692] wireguard: ratelimiter self-tests: pass
->   [   19.310639][  T692] wireguard: WireGuard 1.0.0 loaded. See www.wireguard.com for information.
->   [   19.310746][  T692] wireguard: Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
-> 
-> 
-> If I build CONFIG_CRYPTO_CHACHA20_P10 as a module then it breaks:
-> 
->   $ modprobe -v wireguard
->   insmod /lib/modules/6.8.0/kernel/net/ipv4/udp_tunnel.ko
->   insmod /lib/modules/6.8.0/kernel/net/ipv6/ip6_udp_tunnel.ko
->   insmod /lib/modules/6.8.0/kernel/lib/crypto/libchacha.ko
->   insmod /lib/modules/6.8.0/kernel/arch/powerpc/crypto/chacha-p10-crypto.ko
->   modprobe: ERROR: could not insert 'wireguard': No such device
-> 
-> 
-> The ENODEV is coming from module_cpu_feature_match(), which blocks the
-> driver from loading on non-p10.
-> 
-> Looking at other arches (arm64 at least) it seems like the driver should
-> instead be loading but disabling the p10 path. Which then allows
-> chacha_crypt_arch() to exist, and it has a fallback to use
-> chacha_crypt_generic().
-> 
-> I don't see how module_cpu_feature_match() can co-exist with the driver
-> also providing a fallback. Hopefully someone who knows crypto better
-> than me can explain it.
+Wed, Mar 20, 2024 at 04:22:46PM CET, horms@kernel.org wrote:
+>On Wed, Mar 20, 2024 at 02:19:15PM +0000, Claus Hansen Ries wrote:
+>> From: Claus Hansen Ries <chr@terma.com>
+>> 
+>> Hope I am resubmitting this correctly, I've fixed the issues in 
+>> the original submission.
+>
+>For future reference, the text above probably belongs
+>below the scissors ("---"). But I don't think there
+>is a need to resubmit just because of that.
 
-Maybe it doesn't. ppc64le is the only platform that needs the fallback,
-on other platforms that have hardware-specific chacha implementation it
-seems to be using pretty common feature so the fallback is rarely if
-ever needed in practice.
+Well, otherwise this will be in the git history forever :)
 
-Thanks
 
-Michal
-
-> 
-> This diff fixes it for me:
-> 
-> diff --git a/arch/powerpc/crypto/chacha-p10-glue.c b/arch/powerpc/crypto/chacha-p10-glue.c
-> index 74fb86b0d209..9d2c30b0904c 100644
-> --- a/arch/powerpc/crypto/chacha-p10-glue.c
-> +++ b/arch/powerpc/crypto/chacha-p10-glue.c
-> @@ -197,6 +197,9 @@ static struct skcipher_alg algs[] = {
->  
->  static int __init chacha_p10_init(void)
->  {
-> +	if (!cpu_has_feature(PPC_FEATURE2_ARCH_3_1))
-> +		return 0;
-> +
->  	static_branch_enable(&have_p10);
->  
->  	return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
-> @@ -207,7 +210,7 @@ static void __exit chacha_p10_exit(void)
->  	crypto_unregister_skciphers(algs, ARRAY_SIZE(algs));
->  }
->  
-> -module_cpu_feature_match(PPC_MODULE_FEATURE_P10, chacha_p10_init);
-> +module_init(chacha_p10_init);
->  module_exit(chacha_p10_exit);
->  
->  MODULE_DESCRIPTION("ChaCha and XChaCha stream ciphers (P10 accelerated)");
-> 
-> 
-> Giving me:
-> 
->   $ modprobe -v wireguard
->   insmod /lib/modules/6.8.0-dirty/kernel/net/ipv4/udp_tunnel.ko
->   insmod /lib/modules/6.8.0-dirty/kernel/net/ipv6/ip6_udp_tunnel.ko
->   insmod /lib/modules/6.8.0-dirty/kernel/lib/crypto/libchacha.ko
->   insmod /lib/modules/6.8.0-dirty/kernel/arch/powerpc/crypto/chacha-p10-crypto.ko
->   insmod /lib/modules/6.8.0-dirty/kernel/lib/crypto/libchacha20poly1305.ko
->   insmod /lib/modules/6.8.0-dirty/kernel/drivers/net/wireguard/wireguard.ko
->   [   19.657941][  T718] wireguard: allowedips self-tests: pass
->   [   19.662501][  T718] wireguard: nonce counter self-tests: pass
->   [   19.782933][  T718] wireguard: ratelimiter self-tests: pass
->   [   19.783114][  T718] wireguard: WireGuard 1.0.0 loaded. See www.wireguard.com for information.
->   [   19.783223][  T718] wireguard: Copyright (C) 2015-2019 Jason A. Donenfeld <Jason@zx2c4.com>. All Rights Reserved.
->   
-> 
-> cheers
+>
+>> 
+>> platform_get_resource was replaced with devm_platform_ioremap_resource_byname 
+>> and is called using 0 as name. This eventually ends up in platform_get_resource_byname
+>> in the call stack, where it causes a null pointer in strcmp.
+>> 
+>> 	if (type == resource_type(r) && !strcmp(r->name, name))
+>> 
+>> It should have been replaced with devm_platform_ioremap_resource.
+>> 
+>> Fixes: bd69058f50d5 ("net: ll_temac: Use devm_platform_ioremap_resource_byname()")
+>> Signed-off-by: Claus Hansen Ries <chr@terma.com>
+>> Cc: stable@vger.kernel.org
+>> ---
+>> v2:
+>>   - fix accidently converting tabs to spaces and wording in commit message
+>> v1: https://marc.info/?l=linux-netdev&m=171087828129633&w=2
+>
+>Thanks,
+>
+>Reviewed-by: Simon Horman <horms@kernel.org>
+>
 
