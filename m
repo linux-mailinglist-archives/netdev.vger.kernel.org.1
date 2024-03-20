@@ -1,165 +1,213 @@
-Return-Path: <netdev+bounces-80852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B9738814D4
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:46:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4E79881523
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 17:04:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49915B22680
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 15:46:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6ED541F22B5A
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:04:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED7C452F78;
-	Wed, 20 Mar 2024 15:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0866153E1B;
+	Wed, 20 Mar 2024 16:03:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ig4aatuc"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="i4dFCifV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8321A291;
-	Wed, 20 Mar 2024 15:46:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9EFC52F65
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 16:03:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710949598; cv=none; b=tB7ikERN95RqdKTbK4y0Gxi4ptOvVNbrKsdDCw8YFvDVDBily5pk598mvdnVPXmo+lTSznGV8bJq/yVStEgFvjwF7NVN9dVaElJnUxQO8/Yg0WH5rEMC1akHXg/hWGxICaVqQcuWyGf7QKbtN6ECIBxOQAD02X3kMVnLibr2pZQ=
+	t=1710950638; cv=none; b=AQmxzzIyeVNEGgHSfmJAKIAI5OAIQPIN0obcwnXLGM+k7uy/SYnSJS4uehp716gwpoW/iaFK4lWiIqHUoTi03bl/7PJZz5yFyWpe7Iqe5xld/DiDrVUJjInN3q25ZYkV/gFEnAIqe1QbyFPSrUG8VRIbaMBhpXRe9H0mZAudDFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710949598; c=relaxed/simple;
-	bh=ViYPNM62rKHftFHn8EtCwM10ykuEE7S2GB4Mq6QRH9I=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=F0ONlRtgybO8Kb3wUKFcbr6y8FFbhMF0mpi8dDJxK/TqCnhwCto/fpYjAltnaLN+ox/tfi4ewul0A4TIgFdwsT4sAI+68sp18jc7EgyJV7eijo3NfefFP8odJWlErQGSCeQCZc6E0S+9p47wwPp7FEuhPWHsqXmqFRs5Eqr/2/A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ig4aatuc; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d29aad15a5so84561831fa.3;
-        Wed, 20 Mar 2024 08:46:36 -0700 (PDT)
+	s=arc-20240116; t=1710950638; c=relaxed/simple;
+	bh=BRq0vD38Q8/NqcZsoLjZKmB/M4TbYXvbHK9ZHfQGKzA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=p1UaucHI8zToZMhcapKsv9MTxAd3N4EfNzWttI3nYzFwZkAhFCJK5lo+IIt0OCShumBn5VOL0kUVj7JPa+j1SUHcAmXhUbZe66SdDlLEWC6yrhCGr6pUs4BaQyQNuppAY5Hz9doevKnvZr4OwcMfFRxwFMMgAJN4z/Cg/5y3t64=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=i4dFCifV; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-41467d697a2so12217425e9.1
+        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 09:03:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710949595; x=1711554395; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=oaXJM9ZvZn/4LaQiASqOr/xxq5nAZPZqRyNDIlEESuA=;
-        b=Ig4aatucE/O8jMGTpjBdR8oyefLUCu7vccGd365GHV/VBgF63OFYkk6ZeV2N1LFWHq
-         IuoIlWmDJuihpCpYTKFc8MgxBHPK6L+VIuc6IylwHHle984vgLwns+G8LocgRASd/3ID
-         Sp3y4JzZIj6eZ0Qtu9yfueb1vdUiyUTWzLbaXlKFp24Tm9xBTf9ng/rANZrDfDlFRbgA
-         epgDGMWZUJEX9gBc0UN3zAkJiKBZGMJFsG3AdD14H6POawlyodDjhzUVy0plN1AcFA6/
-         p20qBJ/doQHvZ/DfTpGALec65LPX4STBGcVE+LWHRiSRm9NkNfajAYOky7/wElgJgtM1
-         Z04A==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710950634; x=1711555434; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+bY7A1wk7zs5QU73cPdyC/1c/eIVosZrGHL12QRvkwE=;
+        b=i4dFCifVTQ+W2fDA/oqHJh9rjpkN3iP1PIbJYPsqyIrs0zw3+t1N69IhR7+tzHxNWK
+         6FMUhuicwpSYUzLxx1kmvBvpaWiLgs6IeL80z/qcj+kWzzTitoE4v9p1ZaBoyhSu8oNM
+         Sl3E2Bg+eIJbsKoq54O5XJqRZxJ72yEQmIWBp2OnrmIRgyNe0YrA8qZVRvD/JF9Ldu+w
+         UdOflBQHs7oE+osUAfps4TzI97vrZ0D3g2j+1pWc2kmvZqjWcephyBp8tg5ATZ8u970X
+         bsJJZNFFZdqG4Qiy9brEuyxJqIaBteOSRpCZk6PdHoeaSEpbrSz0spVCvBCgyQRHQxWL
+         ZtUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710949595; x=1711554395;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oaXJM9ZvZn/4LaQiASqOr/xxq5nAZPZqRyNDIlEESuA=;
-        b=tEZJZlNBD1oPQznBtPheIM7dNSykzJrTV3jEjxDqUOF9z+NV/54euhcT3om8TlR7Nt
-         sR13yEb69e2Gn7QRBY8tN2lGSxrHbpReXn/sAfYv1v3oqoZZMulKV2N75MukJ+UKeOzu
-         +4Sm+el30Rmh6K0XJ9woYBn9Zggk2zjTGWLc6JfPYi3XxVIZEFqYXnTNDrcEeriUaabF
-         6ghlnjLB1AmWQM3hT+GfV4jKn7/HobHVLp+soD7p66V2RoRR/Wp6K3vNn3gwJsFiLq0v
-         c0o7bom9hBNdGsJQq7Mfst1dkjxHFoWyedyzMu53EmnKiQtACEBYpiix8/YJpzHZap9D
-         aGoA==
-X-Forwarded-Encrypted: i=1; AJvYcCVShIIl/ibxz69Hkrg1HHQfbonKr2aeFoRCnUgflnCf4veBV6JjKSlg290AjrxI8/TCvL7hELVuzRmoeFpMBw4EUIURA3ICUeUFmjwNXnhismJ6S2BL8X+cFQFDQIPp5sVr1WznhitffnQ5npsYYCI5yTokT+Ah5yQL
-X-Gm-Message-State: AOJu0YyccXI9qH2XiZfTyejerWnJGzrKpplnZ59sH+JAWt4im7TEEZg7
-	x5CWJfYOMLlP+Kc8H2fx9dbWBd/REUXBbGqCkp6SCwsOAmpaq5cx
-X-Google-Smtp-Source: AGHT+IHtAQBGTDzEKsd2vJSQqMdsoYc7Xoc9c6idIuX7GW2nJu0OCfI8MTqhgP4XquycBw3saVi47w==
-X-Received: by 2002:a2e:22c3:0:b0:2d4:764f:8256 with SMTP id i186-20020a2e22c3000000b002d4764f8256mr10808698lji.53.1710949594945;
-        Wed, 20 Mar 2024 08:46:34 -0700 (PDT)
-Received: from localhost (54-240-197-239.amazon.com. [54.240.197.239])
-        by smtp.gmail.com with ESMTPSA id n39-20020a05600c3ba700b0041409cabb39sm2607210wms.18.2024.03.20.08.46.34
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 20 Mar 2024 08:46:34 -0700 (PDT)
-From: Puranjay Mohan <puranjay12@gmail.com>
-To: Artem Savkov <asavkov@redhat.com>, Xu Kuohai <xukuohai@huaweicloud.com>
-Cc: Xi Wang <xi.wang@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next] arm64: bpf: zero upper bits after rev32
-In-Reply-To: <20240320133849.GA142600@alecto.usersys.redhat.com>
-References: <20240313140205.3191564-1-asavkov@redhat.com>
- <ab5e6307-8d80-4751-940f-4faa5bc41d82@huaweicloud.com>
- <20240320133849.GA142600@alecto.usersys.redhat.com>
-Date: Wed, 20 Mar 2024 15:46:31 +0000
-Message-ID: <mb61pbk78x5wo.fsf@gmail.com>
+        d=1e100.net; s=20230601; t=1710950634; x=1711555434;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+bY7A1wk7zs5QU73cPdyC/1c/eIVosZrGHL12QRvkwE=;
+        b=pNNt1DWSmC784CAr8Ll9O5iDmIH5YQ5uZiQoFrl1vV4vZPUkoSCBusAYQyVuZytbMV
+         AkufCNbUtv/QVqqHBSJHS4AR/+sIcaahhQ6HtoEESFFcRe3s/KeBnu0ImCr9G2euuR2O
+         28+JcWqJB3/A929Ob9idRxodMsstBTg0hCYvIgGLUy16UlgaRo3Ls0n5YG3/aHzwIxtK
+         sWwYZvW8z+q8ON7cZ+dVKAzBdQ5V3+xn6oxqlM1N6RiornO/tuOhdRpn/9BYDuJshxKl
+         StTmpYyXUHQjV3iuPtDZypjmlBY4U3ekLV6Qr2fmdkrLvLdV0w4WOf9zxkRaOv+ZQ9ok
+         L0XQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWBc+FTIn2bml7UruCnyGuH1+fFmCeajc0XvHbuPgQuFcVAewDtFFrn9Tf5ofgLsNsiA+iIxNrnRmH/++4CLeogOtYUbW3Q
+X-Gm-Message-State: AOJu0Yxsqkc97n5roQd+ly3dYaRnhKswZOar5GEb3w82+GP7p65Z5p5c
+	sk+rcTAeSsGo+usC+hVHy7P/LhwKo3u2dGWHqCHHRdbW9EkSZsm8XKe/dnnYlzk=
+X-Google-Smtp-Source: AGHT+IHVLCW9hEgC4AANx8BDyvyzUp/cFivCz3and6RGVbJjntidh2kLf/mQ/yH/roDT762MISxzxw==
+X-Received: by 2002:a05:600c:5494:b0:414:6909:f65f with SMTP id iv20-20020a05600c549400b004146909f65fmr2940495wmb.6.1710950633810;
+        Wed, 20 Mar 2024 09:03:53 -0700 (PDT)
+Received: from localhost (mail.chocen-mesto.cz. [85.163.43.2])
+        by smtp.gmail.com with ESMTPSA id iv20-20020a05600c549400b004146bce65f4sm2551509wmb.13.2024.03.20.09.03.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Mar 2024 09:03:53 -0700 (PDT)
+Date: Wed, 20 Mar 2024 17:03:51 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Josua Mayer <josua@solid-run.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] net: dsa: mv88e6xxx: add warning for truncated mdio bus
+ id
+Message-ID: <ZfsI57371KtaRV4a@nanopsycho>
+References: <20240320-mv88e6xxx-truncate-busid-v1-1-cface50b2efb@solid-run.com>
+ <Zfrt_dlYvBzlxull@nanopsycho>
+ <c76c95af-71cb-4eb6-b3af-846ae318d18d@solid-run.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <c76c95af-71cb-4eb6-b3af-846ae318d18d@solid-run.com>
 
-Artem Savkov <asavkov@redhat.com> writes:
+Wed, Mar 20, 2024 at 03:33:24PM CET, josua@solid-run.com wrote:
+>Am 20.03.24 um 15:09 schrieb Jiri Pirko:
+>> Wed, Mar 20, 2024 at 02:48:55PM CET, josua@solid-run.com wrote:
+>>> mv88e6xxx supports multiple mdio buses as children, e.g. to model both
+>>> internal and external phys. If the child buses mdio ids are truncated,
+>>> they might collide which each other leading to an obscure error from
+>>> kobject_add.
+>>>
+>>> The maximum length of bus id is currently defined as 61
+>>> (MII_BUS_ID_SIZE). Truncation can occur on platforms with long node
+>>> names and multiple levels before the parent bus on whiich the dsa switch
+>> s/whiich/which/
+>>
+>>
+>>> sits such as on CN9130 [1].
+>>>
+>>> Test whether the return value of snprintf exceeds the maximum bus id
+>>> length and print a warning.
+>>>
+>>> [1]
+>>> [    8.324631] mv88e6085 f212a200.mdio-mii:04: switch 0x1760 detected: Marvell 88E6176, revision 1
+>>> [    8.389516] mv88e6085 f212a200.mdio-mii:04: Truncated bus-id may collide.
+>>> [    8.592367] mv88e6085 f212a200.mdio-mii:04: Truncated bus-id may collide.
+>>> [    8.623593] sysfs: cannot create duplicate filename '/devices/platform/cp0/cp0:config-space@f2000000/f212a200.mdio/mdio_bus/f212a200.mdio-mii/f212a200.mdio-mii:04/mdio_bus/!cp0!config-space@f2000000!mdio@12a200!ethernet-switch@4!mdi'
+>>> [    8.785480] kobject: kobject_add_internal failed for !cp0!config-space@f2000000!mdio@12a200!ethernet-switch@4!mdi with -EEXIST, don't try to register things with the same name in the same directory.
+>>> [    8.936514] libphy: mii_bus /cp0/config-space@f2000000/mdio@12a200/ethernet-switch@4/mdi failed to register
+>>> [    8.946300] mdio_bus !cp0!config-space@f2000000!mdio@12a200!ethernet-switch@4!mdi: __mdiobus_register: -22
+>>> [    8.956003] mv88e6085 f212a200.mdio-mii:04: Cannot register MDIO bus (-22)
+>>> [    8.965329] mv88e6085: probe of f212a200.mdio-mii:04 failed with error -22
+>>>
+>>> Signed-off-by: Josua Mayer <josua@solid-run.com>
+>> This is not bug fix, assume you target net-next. Please:
+>> 1) Next time, indicate that in the patch subject like this:
+>>    [patch net-next] xxx
+>> 2) net-next is currently closed, repost next week.
+>Correct, thanks - will do.
+>Just for future reference for those occasional contributors -
+>is there such a thing as an lkml calendar?
+>>
+>>> ---
+>>> drivers/net/dsa/mv88e6xxx/chip.c | 6 ++++--
+>>> 1 file changed, 4 insertions(+), 2 deletions(-)
+>>>
+>>> diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+>>> index 614cabb5c1b0..1c40f7631ab1 100644
+>>> --- a/drivers/net/dsa/mv88e6xxx/chip.c
+>>> +++ b/drivers/net/dsa/mv88e6xxx/chip.c
+>>> @@ -3731,10 +3731,12 @@ static int mv88e6xxx_mdio_register(struct mv88e6xxx_chip *chip,
+>>>
+>>> 	if (np) {
+>>> 		bus->name = np->full_name;
+>>> -		snprintf(bus->id, MII_BUS_ID_SIZE, "%pOF", np);
+>>> +		if (snprintf(bus->id, MII_BUS_ID_SIZE, "%pOF", np) >= MII_BUS_ID_SIZE)
+>>> +			dev_warn(chip->dev, "Truncated bus-id may collide.\n");
+>> How about instead of warn&fail fallback to some different name in this
+>> case?
+>Duplicate could be avoided by truncating from the start,
+>however I don't know if that is a good idea.
+>It affects naming of paths in sysfs, and the root cause is
+>difficult to spot.
+>>> 	} else {
+>>> 		bus->name = "mv88e6xxx SMI";
+>>> -		snprintf(bus->id, MII_BUS_ID_SIZE, "mv88e6xxx-%d", index++);
+>>> +		if (snprintf(bus->id, MII_BUS_ID_SIZE, "mv88e6xxx-%d", index++) >= MII_BUS_ID_SIZE)
+>> How exactly this may happen?
+>It can happen on switch nodes at deep levels in the device-tree,
 
-> On Wed, Mar 20, 2024 at 07:34:46PM +0800, Xu Kuohai wrote:
->> On 3/13/2024 10:02 PM, Artem Savkov wrote:
->> > Commit d63903bbc30c7 ("arm64: bpf: fix endianness conversion bugs")
->> > added upper bits zeroing to byteswap operations, but it assumes they
->> > will be already zeroed after rev32, which is not the case on some
->> > systems at least:
->> > 
->> > [ 9757.262607] test_bpf: #312 BSWAP 16: 0x0123456789abcdef -> 0xefcd jited:1 8 PASS
->> > [ 9757.264435] test_bpf: #313 BSWAP 32: 0x0123456789abcdef -> 0xefcdab89 jited:1 ret 1460850314 != -271733879 (0x5712ce8a != 0xefcdab89)FAIL (1 times)
->> > [ 9757.266260] test_bpf: #314 BSWAP 64: 0x0123456789abcdef -> 0x67452301 jited:1 8 PASS
->> > [ 9757.268000] test_bpf: #315 BSWAP 64: 0x0123456789abcdef >> 32 -> 0xefcdab89 jited:1 8 PASS
->> > [ 9757.269686] test_bpf: #316 BSWAP 16: 0xfedcba9876543210 -> 0x1032 jited:1 8 PASS
->> > [ 9757.271380] test_bpf: #317 BSWAP 32: 0xfedcba9876543210 -> 0x10325476 jited:1 ret -1460850316 != 271733878 (0xa8ed3174 != 0x10325476)FAIL (1 times)
->> > [ 9757.273022] test_bpf: #318 BSWAP 64: 0xfedcba9876543210 -> 0x98badcfe jited:1 7 PASS
->> > [ 9757.274721] test_bpf: #319 BSWAP 64: 0xfedcba9876543210 >> 32 -> 0x10325476 jited:1 9 PASS
->> > 
->> > Fixes: d63903bbc30c7 ("arm64: bpf: fix endianness conversion bugs")
->> > Signed-off-by: Artem Savkov <asavkov@redhat.com>
->> > ---
->> >   arch/arm64/net/bpf_jit_comp.c | 3 ++-
->> >   1 file changed, 2 insertions(+), 1 deletion(-)
->> > 
->> > diff --git a/arch/arm64/net/bpf_jit_comp.c b/arch/arm64/net/bpf_jit_comp.c
->> > index c5b461dda4385..e86e5ba74dca2 100644
->> > --- a/arch/arm64/net/bpf_jit_comp.c
->> > +++ b/arch/arm64/net/bpf_jit_comp.c
->> > @@ -944,7 +944,8 @@ static int build_insn(const struct bpf_insn *insn, struct jit_ctx *ctx,
->> >   			break;
->> >   		case 32:
->> >   			emit(A64_REV32(is64, dst, dst), ctx);
->> > -			/* upper 32 bits already cleared */
->> > +			/* zero-extend 32 bits into 64 bits */
->> > +			emit(A64_UXTW(is64, dst, dst), ctx);
->> 
->> I think the problem only occurs when is64 == 1. In this case, the generated rev32
->> insn reverses byte order in both high and low 32-bit word. To fix it, we could just
->> set the first arg to 0 for A64_REV32:
->> 
->> emit(A64_REV32(0, dst, dst), ctx);
->> 
->> No need to add an extra uxtw isnn.
+Read again, my question is about the else branch.
+
+
+>while describing both internal and external mdio buses of a switch.
+>E.g. Documentation/devicetree/bindings/net/dsa/marvell,mv88e6xxx.yaml
 >
-> I can confirm this approach fixes the test issue as well.
-
-Yes, the following diff fixes the issue:
-
-diff --git a/arch/arm64/net/bpf_jit_comp.c b/arch/arm64/net/bpf_jit_comp.c
-index bc16eb694..64deff221 100644
---- a/arch/arm64/net/bpf_jit_comp.c
-+++ b/arch/arm64/net/bpf_jit_comp.c
-@@ -943,7 +943,7 @@ static int build_insn(const struct bpf_insn *insn, struct jit_ctx *ctx,
-                        emit(A64_UXTH(is64, dst, dst), ctx);
-                        break;
-                case 32:
--                       emit(A64_REV32(is64, dst, dst), ctx);
-+                       emit(A64_REV32(0, dst, dst), ctx);
-                        /* upper 32 bits already cleared */
-                        break;
-                case 64:
-
-All tests pass with this change:
-
-test_bpf: Summary: 1049 PASSED, 0 FAILED, [1037/1037 JIT'ed]
-test_bpf: test_tail_calls: Summary: 10 PASSED, 0 FAILED, [10/10 JIT'ed]
-test_bpf: test_skb_segment: Summary: 2 PASSED, 0 FAILED
-
-When you send a patch please add:
-
-Tested-by: Puranjay Mohan <puranjay12@gmail.com>
-Acked-by: Puranjay Mohan <puranjay12@gmail.com>
-
-
-Thanks,
-Puranjay
+>On CN9130 platform device-tree looks like this:
+>
+>/ {
+>    cp0 {
+>        config-space@f2000000 {
+>            mdio@12a200 {
+>                ethernet-switch@4 {
+>                    mdio { ... };
+>                    mdio-external { ... };
+>                };
+>            };
+>        };
+>    };
+>};
+>
+>For mdio-external child all the names alone, without separators,
+>make up 66 characters, exceeding: MII_BUS_ID_SIZE:
+>cp0config-space@f2000000mdio@12a200ethernet-switch@4mdio-external
+>
+>With separators ('!') we have:
+>cp0!config-space@f2000000!mdio@12a200!ethernet-switch@4!mdio
+>cp0!config-space@f2000000!mdio@12a200!ethernet-switch@4!mdio-external
+>Truncated to MII_BUS_ID_SIZE:
+>cp0!config-space@f2000000!mdio@12a200!ethernet-switch@4!mdi
+>cp0!config-space@f2000000!mdio@12a200!ethernet-switch@4!mdi
+>They become duplicates.
+>
+>>> +			dev_warn(chip->dev, "Truncated bus-id may collide.\n");
+>Another option (imo) is to force the issue and return error code.
+>Then the only way out would be increase of MII_BUS_ID_SIZE.
+>>> 	}
+>>>
+>>> 	bus->read = mv88e6xxx_mdio_read;
+>>>
+>>> ---
+>>> base-commit: e8f897f4afef0031fe618a8e94127a0934896aba
+>>> change-id: 20240320-mv88e6xxx-truncate-busid-34a1d2769bbf
+>>>
+>>> Sincerely,
+>>> -- 
+>>> Josua Mayer <josua@solid-run.com>
+>>>
+>>>
 
