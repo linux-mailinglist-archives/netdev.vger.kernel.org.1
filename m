@@ -1,153 +1,152 @@
-Return-Path: <netdev+bounces-80709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81903880836
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 00:36:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 287CA8808AF
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 01:48:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16FE5283E9F
-	for <lists+netdev@lfdr.de>; Tue, 19 Mar 2024 23:36:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84D4028374B
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 00:48:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A5835F87F;
-	Tue, 19 Mar 2024 23:36:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D235F80C;
+	Wed, 20 Mar 2024 00:48:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b="nKCG2oyC"
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="NIrztfyK";
+	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="oNEk2Nt0"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA7E2DF9F
-	for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 23:36:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39034629;
+	Wed, 20 Mar 2024 00:47:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=161.53.235.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710891404; cv=none; b=RaBkfoVr5Q5Tds5UBw0CGeh6ZrO/xS53O0WnzzNgQA43qexhdzIxVXbOym+jSqNaErn6/AG7CPCpbPbFx36Kk6LGniiVkfYbkDZHHqZIuWp7U6ZV4f2Q401+0GzMUSFS+H+6T3ozdDce6svLFhvC58qx+CTZwBFBmjnLUdfvs1A=
+	t=1710895680; cv=none; b=CR8T/J9OYcp9n4JgM8HYNelWG6M75dFeA6cdufvT3iOtsKqrKkdqJoMZ5MC9tFFCy/h4g9fW4TzjXWQN0PwSResBC2zJ/Qv+iiSfgCFjE6PiBS7CinkWCF9OsZMVcAEKhChMgGVaTDlEqUjauBPOHmP0/PP/GpsiVoJymNvXu6g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710891404; c=relaxed/simple;
-	bh=74gV/9jSsE0Ovt7RAtv6FJPQwQxo5hKFzYkK3xh223g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FvVsxiG9PpwkZYbnBT42knTOPdGDb70Z22NYEbs433J/DPm/3dmrW8WoQkKXQVZ2c3WRfUkHrr9x/Rie7phA7YM4RgYyeuCFgJ/ipnzb18VXRCyJAxs4sk4+/rMsdbtm9a2wWQlbQAzOidJLl2eBvAZ4H+ElsO4DuznkZmQwIvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au; spf=pass smtp.mailfrom=gandalf.ozlabs.org; dkim=pass (2048-bit key) header.d=gibson.dropbear.id.au header.i=@gibson.dropbear.id.au header.b=nKCG2oyC; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=gibson.dropbear.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gandalf.ozlabs.org
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=gibson.dropbear.id.au; s=202312; t=1710891397;
-	bh=5RC1KC8OZQMcmcnRWXB8DN7qF8RbGLBvgAOX1y4YO7A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nKCG2oyCh8dQdEfYKeld/8R9gSRhOdX2cJdgMB4jf+Ty5zOmIvFM4kTCejNgVbuoZ
-	 iNoywgz6atVrN5zt1BaPqMklyi95B8glY0v+MenfCTeGE4jaukWrBsI015RD2rnMUc
-	 sjiYslyzq8gsBN3PfL9RAbMO5wP/a+evm0lUSsIIU6niMm9acYKorlU9Z5SEJ35DeW
-	 i3IWiMhA6FEyiM5iAZJxkgNBVSxhqDaQgZw+Fyiv4Fp3yh6SNwfrlcqL+8g1svfWCV
-	 UAQq81drvcA+ztsuneR9WZz0TiMA4ID1p/02P94tieXGtJnH4fq5HvicbtTiY/OHuR
-	 c+AceGxgEUtCg==
-Received: by gandalf.ozlabs.org (Postfix, from userid 1007)
-	id 4Tzp5d2VKyz4wnv; Wed, 20 Mar 2024 10:36:37 +1100 (AEDT)
-Date: Wed, 20 Mar 2024 10:36:21 +1100
-From: David Gibson <david@gibson.dropbear.id.au>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Stefano Brivio <sbrivio@redhat.com>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	jiri@resnulli.us, idosch@idosch.org, johannes@sipsolutions.net,
-	fw@strlen.de, pablo@netfilter.org, Martin Pitt <mpitt@redhat.com>,
-	Paul Holzinger <pholzing@redhat.com>
-Subject: Re: [PATCH net-next v2 3/3] genetlink: fit NLMSG_DONE into same
- read() as families
-Message-ID: <ZfohdcQvfdqvkoWT@zatzit>
-References: <20240303052408.310064-1-kuba@kernel.org>
- <20240303052408.310064-4-kuba@kernel.org>
- <20240315124808.033ff58d@elisabeth>
- <20240319085545.76445a1e@kernel.org>
+	s=arc-20240116; t=1710895680; c=relaxed/simple;
+	bh=GNUn5F0m1NSdDdpA3rmiVn684OoVB6CLL1oKo3QkbTk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Vgm5tayLEvH/9HTPOz2DtBBXjWxDyjbIlFugiKeU8QGK1I17GvBGCLopv+WCgjm5NpVTNrYkdceEgVdD2nTooX2PzyUPG11FAhbtC8D3z7sp9J4oVoOiDtiRSiLfqbzpIlXwSYIjjhcfheuUimr7TDDDVw9FQ0NtbYaXtPQxumk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alu.unizg.hr; spf=pass smtp.mailfrom=alu.unizg.hr; dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b=NIrztfyK; dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b=oNEk2Nt0; arc=none smtp.client-ip=161.53.235.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alu.unizg.hr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alu.unizg.hr
+Received: from localhost (localhost [127.0.0.1])
+	by domac.alu.hr (Postfix) with ESMTP id 449FA6019C;
+	Wed, 20 Mar 2024 01:47:45 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1710895665; bh=GNUn5F0m1NSdDdpA3rmiVn684OoVB6CLL1oKo3QkbTk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=NIrztfyKOT4mzU46ujiHR9eJFjXWQTIgS+urz7lwdT2aNmR7KS/F9AqMcRNAS6qDM
+	 gdPw9+yBPd815nptOdQilTZ8GQ7ggmJMo9+i0mqlgteNh1J1oVk+tXQJAy/mwTKc3x
+	 AfQ50JInr/sZst1fkVDnH09fgRfQzpnnf99pf63zisY4Arr7WleFIXcRCguP8oXXlI
+	 dEDhBsppTEDGajNKq4CuNNcRcEQ8gWuvsABWE2Idgm1qTtNVjx4Xu1zVtr2ImAITdy
+	 kWU+lkaHqn9Ov5Mjkz99FsqB1178LUctz8et+UXuEr5VSori7h0L41HolvhWQsIxFs
+	 r/8qwHpdq3b0A==
+X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
+Received: from domac.alu.hr ([127.0.0.1])
+	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id dlJEwr47upLE; Wed, 20 Mar 2024 01:47:41 +0100 (CET)
+Received: from [192.168.178.20] (dh207-42-61.xnet.hr [88.207.42.61])
+	by domac.alu.hr (Postfix) with ESMTPSA id 3487B60195;
+	Wed, 20 Mar 2024 01:47:41 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
+	t=1710895661; bh=GNUn5F0m1NSdDdpA3rmiVn684OoVB6CLL1oKo3QkbTk=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=oNEk2Nt0ojxj/eBtWTaMp8l3lFVXFncUWanhLNgX56G41nTGy4vsbZTd2PFeUzUxt
+	 P0TNu8f5E4M2f59C52Pzww+fQyiIDahH1ccX4BW0H5vY3FaQVArlV9P7DZfIePtQVQ
+	 EEu4LqafflIZbmV8wIISZkoZ4oQgNRhtAeKdcGZcSaZ1OtdtFr+6yyAPux6rR28R5n
+	 G9teB0kt0dVE7FOstVQT59FASfDdzgjwk3zxW5OH+D5rwnLQJsG0WovEtOKDnMeckO
+	 7egvjemijLTVW4OYa3mH8qZJK/iwmoVESikoD9mE3s3pOJd9UDHL7GmkRNqCtb4liZ
+	 ymR6N/34ndPyA==
+Message-ID: <87634afb-d14b-42ce-be25-1000591ee57c@alu.unizg.hr>
+Date: Wed, 20 Mar 2024 01:47:36 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="Rc7AiQ8Xv5Ul3/ih"
-Content-Disposition: inline
-In-Reply-To: <20240319085545.76445a1e@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [BUG] selftests/net: test_vxlan_mdb.sh: 84 out of 642 tests
+ [FAIL]
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <5bb50349-196d-4892-8ed2-f37543aa863f@alu.unizg.hr>
+ <Zfe2cGv_EWFAZXAJ@Laptop-X1>
+ <f005453c-c7cf-4e1d-b266-ffe1cf8fc79e@alu.unizg.hr>
+ <ZfmgdVUmy-DgNklu@shredder>
+Content-Language: en-US
+From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
+In-Reply-To: <ZfmgdVUmy-DgNklu@shredder>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
---Rc7AiQ8Xv5Ul3/ih
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 19, 2024 at 08:55:45AM -0700, Jakub Kicinski wrote:
-> On Fri, 15 Mar 2024 12:48:08 +0100 Stefano Brivio wrote:
-> > > Make sure ctrl_fill_info() returns sensible error codes and
-> > > propagate them out to netlink core. Let netlink core decide
-> > > when to return skb->len and when to treat the exit as an
-> > > error. Netlink core does better job at it, if we always
-> > > return skb->len the core doesn't know when we're done
-> > > dumping and NLMSG_DONE ends up in a separate read(). =20
-> >=20
-> > While this change is obviously correct, it breaks... well, broken
-> > applications that _wrongly_ rely on the fact that NLMSG_DONE is
-> > delivered in a separate datagram.
-> >=20
-> > This was the (embarrassing) case for passt(1), which I just fixed:
-> >   https://archives.passt.top/passt-dev/20240315112432.382212-1-sbrivio@=
-redhat.com/
-> >=20
-> > but the "separate" NLMSG_DONE is such an established behaviour,
-> > I think, that this might raise a more general concern.
-> >=20
-> > From my perspective, I'm just happy that this change revealed the
-> > issue, but I wanted to report this anyway in case somebody has
-> > similar possible breakages in mind.
->=20
-> Hi Stefano! I was worried this may happen :( I think we should revert
-> offending commits, but I'd like to take it on case by case basis.=20
-> I'd imagine majority of netlink is only exercised by iproute2 and
-> libmnl-based tools. Does passt hang specifically on genetlink family
-> dump? Your commit also mentions RTM_GETROUTE. This is not the only
-> commit which removed DONE:
+On 3/19/24 15:25, Ido Schimmel wrote:
+> On Tue, Mar 19, 2024 at 06:05:16AM +0100, Mirsad Todorovac wrote:
+>> On 3/18/24 04:35, Hangbin Liu wrote:
+>>> On Sun, Mar 17, 2024 at 12:19:12AM +0100, Mirsad Todorovac wrote:
+>>>> Hi,
+>>>>
+>>>> While running kselftest on vanilla torvalds tree kernel commit v6.8-11167-g4438a810f396,
+>>>> the test suite reported a number of errors.
+>>>>
+>>>> I was using the latest iproute2-next suite on an Ubuntu 22.04 LTS box.
+>>>>
+>>>> # Tests passed: 558
+>>>> # Tests failed:  84
+>>>> not ok 90 selftests: net: test_vxlan_mdb.sh # exit=1
+>>>
+>>> FYI, I tested with 6.8 kernel with net tree. All passed.
+>>>
+>>> Data path: MDB torture test - IPv6 overlay / IPv6 underlay
+>>> ----------------------------------------------------------
+>>> TEST: Torture test                                                  [ OK ]
+>>>
+>>> Tests passed: 642
+>>> Tests failed:   0
+>>>
+>>> # uname -r
+>>> 6.8.0-virtme
+>>>
+>>> Thanks
+>>> Hangbin
+>>
+>> Hi, Hangbin,
+>>
+>> I am running an Ubuntu 22.04 LTS configuration.
+> 
+> Didn't get your first mail for some reason.
 
-I don't think there's anything specirfic to RTM_GETROUTE here from the
-kernel side.  We've looked at the problem in passt more closely now,
-and it turns out we handled a merged NLMSG_DONE correctly in most
-cases.  For various reasons internal to passt, our handling of
-RTM_GETROUTE on one path is more complex, and we had a subtle error
-there which broke the handling of a merged NLMSG_DONE.
+Your organisation's Office 365 is configured against compressed attachments:
 
->=20
-> $ git log --since=3D'1 month ago' --grep=3DNLMSG_DONE --no-merges  --onel=
-ine=20
->=20
-> 9cc4cc329d30 ipv6: use xa_array iterator to implement inet6_dump_addr()
-> 87d381973e49 genetlink: fit NLMSG_DONE into same read() as families
-> 4ce5dc9316de inet: switch inet_dump_fib() to RCU protection
-> 6647b338fc5c netlink: fix netlink_diag_dump() return value
->=20
+Diagnostic-Code: smtp;550 5.0.350 One or more of the attachments in your email is of a file type
+that is NOT allowed by the recipient's organization.
 
---=20
-David Gibson			| I'll have my music baroque, and my code
-david AT gibson.dropbear.id.au	| minimalist, thank you.  NOT _the_ _other_
-				| _way_ _around_!
-http://www.ozlabs.org/~dgibson
+I will try to remember this.
 
---Rc7AiQ8Xv5Ul3/ih
-Content-Type: application/pgp-signature; name="signature.asc"
+> Anyway, it might be related
+> to the fact that Ubuntu is using an old version of libnet:
+> 
+> https://launchpad.net/ubuntu/+source/libnet
+> 
+> I remember fixing similar issues in the past:
+> 
+> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=cb034948ac292da82cc0e6bc1340f81be36e117d
 
------BEGIN PGP SIGNATURE-----
+I recall that last August.
 
-iQIzBAEBCAAdFiEEO+dNsU4E3yXUXRK2zQJF27ox2GcFAmX6IXAACgkQzQJF27ox
-2GcsBA//fZxoI0ikttxcucGdrOiiWmRIVJpnt3ADpbgc8vi146uP16rpRgJDHAHc
-E6z+Hx72LdE7xpZKXkFHbsn7yhBdkLjy5rryS8Nza+eL6X/+dfrvFRRn8Zg1ZvT3
-nnN5474/laNrHoHqhpqGsY2tfQLep8R8vCjnEPJtrMZFFD0evlABNvhYfgoo7OOq
-vlVKwYmnW0ooHJXY8bGFFwEiSFKsOG61yEm6LIRFtV4rv+tot5SEbj8E4L+hx2VF
-IL3wLOLBDBmxwlj/HvZVu+IEflrK1k6EJTjBbwV/wiSSYq+yDK8btZkAgPJqZfzJ
-bTNa8tTzB4rB0KQb9MkOXLRCfB2ADJ4K4BxqR04616YDOABNMqVFlPdbfzeEwX+h
-4O806bK+3h3g4r1IzCFP3c9ULFBv5VTZi9oTy2sHXVqSe05rWLgaRX1mfQ1EAoog
-lDkwlgon5sNCepBpSTRuNk3I3DBpjtMTBR1/sU303Z5kldYI2ClMC0wYSeEpVg+K
-28oPqSPIt1GySIunckMTPBqVugwgr1v+FmcGafa+Pp68chZ/NSULPjROSPTgXZgK
-suLMQn0S9Cu/Kbt8vwGFk4G7y2DdtjmZYUM8fi1LfJGTV7RczJq2LS/YuOXMHjdw
-O/kxga9iNK3zusOOoG73qGR+LlYiKdTz33II7OjwlO8uI+GBcDQ=
-=oco4
------END PGP SIGNATURE-----
+> Will look into it today or later this week.
 
---Rc7AiQ8Xv5Ul3/ih--
+Thank you for considering this.
+
+Best regards,
+Mirsad Todorovac
 
