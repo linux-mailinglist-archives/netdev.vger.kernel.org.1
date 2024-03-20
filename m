@@ -1,239 +1,192 @@
-Return-Path: <netdev+bounces-80730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B590880B29
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 07:23:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0197880B93
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 07:59:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0477282F0E
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 06:23:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C066D1C22702
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 06:59:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35B6B1802E;
-	Wed, 20 Mar 2024 06:23:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E30A21E519;
+	Wed, 20 Mar 2024 06:58:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="lQdBdNWD"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="RhS6op1l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F49E1DDDB;
-	Wed, 20 Mar 2024 06:23:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710915796; cv=none; b=cdwLC0f3of4uFasdUDeFHzTefPm6k8Nn1lLBFC+WFv81AJRPuwLtMiBqm808rQz2mgDgS0T3Q81FMT8DbuRhkOxIE4sr4mIX//fT5RqxonNzJUk/RokEIX+tgrOGLEvPPySye+6Uaf07zDw7Nmlp+MkLzZg35g+TISFDEG03KGI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710915796; c=relaxed/simple;
-	bh=JepxoVn/y92Zm8LSWzg0iAPKkXS0xVOaDszLYrBRltk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
-	 In-Reply-To:Content-Type; b=ewHl250FmRDJHEKMvyJ14yprOwamHynkoVW1GpqbApxFyXSiAKuLkEmjNFLZ6C6W24BcCgNmKo17cbVobcVY0A8LdjuODu6s9bqWujrO9+gaNdafIGtHq5SzzMPu89P3cnR4q2OfZLsailLJSBGvFe4D3/TVOP5r6KRajO6kdNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=lQdBdNWD; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42K585e5025111;
-	Wed, 20 Mar 2024 06:22:47 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	message-id:date:mime-version:subject:from:to:cc:references
-	:in-reply-to:content-type:content-transfer-encoding; s=
-	qcppdkim1; bh=OMPXI3u8TkCfqqrW7UKeDyKVc2JyB9/Mz90//A5Weeo=; b=lQ
-	dBdNWDRiSduSQ8MKPf7UDbwEaZYbYRAF0DNdVpRFqQVfIEjei3V8ZujgI+bs4Wlr
-	nmqRVmwXlQZ/MCNdJfjyfE6zvUgJPxlQWmD8LDzR41JRN0QAQLbi1jrfu77hrQ/n
-	WAVP9mh9vNwQSdXeZYOZwbzRZOjCp63SaZtC+4A+pI8lyTtrCLWSAvKf2ndDcoSL
-	ezCLeiptKcsdOlss97JnfKBGsyTheNO8ojw6FllFwjw2hbb9+zS+gyC/5VEArD6i
-	PjveUx34Y2cZu8cmrkQYcbkK+4Pxt95zTLkMvqYscsLW0ntMET2HUUuRQNeJ/2IU
-	65VpnWwdIIme1a8X2sgg==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wyqpe09ds-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Mar 2024 06:22:47 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42K6MkqO030140
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Mar 2024 06:22:46 GMT
-Received: from [10.110.44.107] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Tue, 19 Mar
- 2024 23:22:42 -0700
-Message-ID: <ac03f67c-604a-4fb8-a0ca-c187e27855be@quicinc.com>
-Date: Tue, 19 Mar 2024 23:22:41 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D168529D05
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 06:58:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710917932; cv=fail; b=p/+8PkdFALACAb7f+qGO+kNjGsRap5Wl01hPabxjV5BVKBhAmFWWeE6SGFpOiRmLNuzmLJypk4wQSR/Gi25Sqz9Th8YI6r43DSZIYAi+W0oYeaV28fcFN9/xVO15QNRWH3mTXjYhX0SjusUz7MkUla6hrs/KuQq8Izj5BErJffs=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710917932; c=relaxed/simple;
+	bh=09L1DZyAnNRlDOOeCUeoiQzUaRjXkDMNUR4H1RDHFN0=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=tfq0C5FY9JbwevIypJEZKOSU97YBhVviroK7hrKUlrib0uXatzVQ4siSLLUb2eup5VfPvJjd4COQViOnaIDkEme02dmt9t68rC+eJxa9iO/2c1vDb3iDdDEpz5CXhvOVW0z5VcU8iR1UV1ab4p+bCYx9ppYKbozaesXweSTLUno=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=RhS6op1l; arc=fail smtp.client-ip=40.107.236.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cVhZ3lsuEvd5/jhZoGFIGUfJooXzoPHhPBcuhvd23M4IC/cY43JWprZBYBNoNItvVyQK8pLZiCOnSyOqMv1cv9Q1rEldIeDrR86Nae5eEJ//2DHIUXAaROJhqN+ihCBkpZAfEg6+RDkEMy4Yqr6lv5YKBnVFtT7Il1gEdgQsaXzd26RyBOqC9zYLWm2B14kAHrvavH597yeBzvPJiAUab9olPNlCLUzyi721HeRGLBuJsI1K+TZRkZREcus2O0jzXTJjW35FzsjWD3XyJ+FnG56aTYCheH5NQacCbagM8AoYzsrL2TUm+MaC5vsCQEQCQHvN/IAInsPVOHCaGf8uAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=LwthvZgqqgImhVruKfytOB8Lys7veEW/Lv8IErbP8dc=;
+ b=e9QcMjriBXrGNCUJ024XK5ZkPCKnTmc2EAC4j5PezwM2V7iEl1D4cTuHxr58NXF6cmnBi7zEg90BQva3tgCSBLpV/PuwOzHbW1Jt87VPapFjGML29pSLjqz25FOcs9g2ICh0OnklTmmY556XsWJL4n/mAr2lo9fDO3cgwYOJFH+SMZYiCvJ5+08CNwm0rWQDUruc8kaKqYmkKwVPvsj7eAjAz3GUJGHn0+0e8LmpUf83Ee2mrLjmcr+WHyfPujYIDdnhxSr0LuLYcshtoI1b/V0ZEAroZlTdjXJDAYtPdnQJto1gVs9cK8vUNr7ocSTiwp+Y3C+9RJopV2SsAot8sw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=LwthvZgqqgImhVruKfytOB8Lys7veEW/Lv8IErbP8dc=;
+ b=RhS6op1lC7RtEI+U5bnl1Yt1WQa1AEd1sbX7V2kxRCVlj4VXDbcL7orYUV0evHC65bX9dAAMM2HQXeVaXI/gl+E7uVf3uaYNTJiU+sVWb6hh8uXZYhc3Y7AQX6Ls7rlR/9JPPF4luGWn17PoVKShUBwkSQX34xG31Ae1usLak/a5MNmFWPT48Xow72YtDtV7e/oqzWYN8Z8Vt7o/SoqOIXumAzB5bs7kwtogP6MRN3NojmmxHZ3j97gtNkLnghvtKUIGITmsODghZG28QKLE3aIUxwPIb5+CavITnGza1Iz/E2eitk2f7wQ0xygAR9FH1noc1PzHBe2ewr4rK+o2nQ==
+Received: from BN1PR10CA0001.namprd10.prod.outlook.com (2603:10b6:408:e0::6)
+ by PH7PR12MB7939.namprd12.prod.outlook.com (2603:10b6:510:278::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.27; Wed, 20 Mar
+ 2024 06:58:47 +0000
+Received: from BN1PEPF0000467F.namprd03.prod.outlook.com
+ (2603:10b6:408:e0:cafe::6b) by BN1PR10CA0001.outlook.office365.com
+ (2603:10b6:408:e0::6) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.27 via Frontend
+ Transport; Wed, 20 Mar 2024 06:58:47 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ BN1PEPF0000467F.mail.protection.outlook.com (10.167.243.84) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7409.10 via Frontend Transport; Wed, 20 Mar 2024 06:58:47 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Tue, 19 Mar
+ 2024 23:58:38 -0700
+Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
+ rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.12; Tue, 19 Mar 2024 23:58:36 -0700
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <amcohen@nvidia.com>, <petrm@nvidia.com>, Ido Schimmel
+	<idosch@nvidia.com>
+Subject: [PATCH net] selftests: forwarding: Fix ping failure due to short timeout
+Date: Wed, 20 Mar 2024 08:57:17 +0200
+Message-ID: <20240320065717.4145325-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4] net: Re-use and set mono_delivery_time bit
- for userspace tstamp packets
-Content-Language: en-US
-From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-CC: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, <kernel@quicinc.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Andrew Halaney
-	<ahalaney@redhat.com>,
-        Martin KaFai Lau <martin.lau@kernel.org>, bpf
-	<bpf@vger.kernel.org>,
-        Daniel Borkmann <daniel@iogearbox.net>,
-        "Alexei
- Starovoitov" <ast@kernel.org>,
-        Andrii Nakryiko <andrii@kernel.org>
-References: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
- <2a4cb416-5d95-459d-8c1c-3fb225240363@linux.dev>
- <65f16946cd33e_344ff1294fc@willemb.c.googlers.com.notmuch>
- <28282905-065a-4233-a0a2-53aa9b85f381@linux.dev>
- <65f2004e65802_3d1e792943e@willemb.c.googlers.com.notmuch>
- <0dff8f05-e18d-47c8-9f19-351c44ea8624@linux.dev>
- <e5da91bc-5827-4347-ab38-36c92ae2dfa2@quicinc.com>
- <65f21d65820fc_3d934129463@willemb.c.googlers.com.notmuch>
- <bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev>
- <65f2c81fc7988_3ee61729465@willemb.c.googlers.com.notmuch>
- <5692ddb3-9558-4440-a7bf-47fcc47401ed@linux.dev>
- <65f35e00a83c0_2132294f5@willemb.c.googlers.com.notmuch>
- <e270b646-dae0-41cf-9ef8-e991738b9c57@quicinc.com>
- <8d245f5a-0c75-4634-9513-3d420eb2c88f@linux.dev>
- <d10254cc-a908-4d81-98d2-2eed715e521f@quicinc.com>
- <66ad9e5b-0126-476e-bf0f-6a33f446c976@quicinc.com>
-In-Reply-To: <66ad9e5b-0126-476e-bf0f-6a33f446c976@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: spoDDDnBw54sPQ9lWY3jvni3HkwhnNgA
-X-Proofpoint-ORIG-GUID: spoDDDnBw54sPQ9lWY3jvni3HkwhnNgA
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-20_03,2024-03-18_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
- adultscore=0 clxscore=1015 malwarescore=0 lowpriorityscore=0
- impostorscore=0 spamscore=0 phishscore=0 mlxlogscore=999
- priorityscore=1501 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2403140001 definitions=main-2403200048
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BN1PEPF0000467F:EE_|PH7PR12MB7939:EE_
+X-MS-Office365-Filtering-Correlation-Id: d5b62621-0729-447e-1d08-08dc48ab30b7
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	LJiyv3P5ltE/oxyiSd9mV8PWs5/NgfzFG5MnN6ByJ17HPMGI8CY3NJ51sarOuKhOo9yRAwJx1BhcvaWYv2udIEm+d75ir2EgCt0ihz2XlrY+T/7B8Any6mD/YipUFu8Fio/unsXwjkO5J1t8srgJlcxd0Ty7rMMUHdY7+Cld8brQkDZF0VBk+jWXJYIO4XuaJZXpK0KrYFQ+WSdRbz8dlxsbK6yIIIFTM3HRQIkQQQQwYEuX9ZKyNfBbMQJibUXEOcW1zcV0yKZ0Ja64di6hWVz+UzThu/d4Kjb6C+j1aXP9oiRrQU46BCTtgKav6Gi6iWuCryYiZc5jdmoW9SJ+4gGiAxYu04bqbeXddZOExDv7a7fQ6y3qkStM1hcE4HakiZibpXj466/auDFDIAEBnQtnpRT9odIoYWXOPmhYcrTZ2BiTN4UiZagL0uSZu4didlBV7utzgYKdT3Cfaj7a4c9wycoC3v2jwJADvoq08ZmJGhiCWEYAnfxXxCqeH3bFB7v+ejgWEFVT4DV7Lj9mOpGrIU8fl6GFIeb1crIU1A0UQPnHHAKf5ncFVIAi0XFtZzVFY0pRaf91jA5B3t0zELpNTiSPdLWA+2G19FOv857slaiy1Pa8ORJ+OygzHgEKSo9ResZ7c89HHnuMEQovdxljYh9teyeF/K474JY0tyJMEYotSu/IxxvwBdSZx72VVcsVwF355foEipmQ3b3rn6zP/gEfOO25Ey9lF+Hfy6h95ob8KhWhP82EMazzLDIL
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230031)(1800799015)(36860700004)(82310400014)(376005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2024 06:58:47.1807
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: d5b62621-0729-447e-1d08-08dc48ab30b7
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	BN1PEPF0000467F.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB7939
 
+The tests send 100 pings in 0.1 second intervals and force a timeout of
+11 seconds, which is borderline (especially on debug kernels), resulting
+in random failures in netdev CI [1].
 
+Fix by increasing the timeout to 20 seconds. It should not prolong the
+test unless something is wrong, in which case the test will rightfully
+fail.
 
-On 3/18/2024 12:02 PM, Abhishek Chauhan (ABC) wrote:
-> 
-> 
-> On 3/14/2024 3:29 PM, Abhishek Chauhan (ABC) wrote:
->>
->>
->> On 3/14/2024 2:48 PM, Martin KaFai Lau wrote:
->>> On 3/14/24 1:53 PM, Abhishek Chauhan (ABC) wrote:
->>>>>> The bpf_convert_tstamp_{read,write} and the helper bpf_skb_set_tstamp need to be
->>>>>> changed to handle the new "user_delivery_time" bit anyway, e.g.
->>>>>> bpf_skb_set_tstamp(BPF_SKB_TSTAMP_DELIVERY_MONO) needs to clear the
->>>>>> "user_delivery_time" bit.
->>>>>>
->>>>>> I think the "struct inet_frag_queue" also needs a new "user_delivery_time"
->>>>>> field. "mono_delivery_time" is already in there.
->>>
->>> [ ... ]
->>>
-> 
-> Martin, Do we really need to add user_delivery_time as part of inet_frag_queue struct? I was wondering why is this required since we are using tstamp_type:2 to 
-> distinguish between timestamp anyway .
-> 
-> Let me know what you think ? 
-> 
->>> I would think the first step is to revert this patch. I don't think much of the current patch can be reused.
->>>
->>>> 1. I will raise one patch to introduce rename mono_delivery_time to
->>>> tstamp_type
->>>
->>> Right, I expect something like this:
->>>
->>> struct sk_buff {
->>>         /* ... */
->>> -            __u8                    mono_delivery_time:1;
->>> +        __u8            tstamp_type:1;
->>>         /* ... */
->>> };
->>>
->>
->> Okay ,This should be straight-forward. 
->>
->>>> 2. I will introduce setting of userspace timestamp type as the second bit
->>>> whem transmit_time is set.
->>>
->>> I expect the second patch should be introducing the enum first
->>>
->>> enum skb_tstamp_type {
->>>     SKB_TSTAMP_TYPE_RX_REAL = 0, /* A RX (receive) time in real */
->>>     SKB_TSTAMP_TYPE_TX_MONO = 1, /* A TX (delivery) time in mono */
->>> };
->>>
->>> and start doing "skb->tstamp_type = SKB_TSTAMP_TYPE_TX_MONO;" instead of
->>> "skb->tstamp_type = 1;"
->>>
->>> and the same for "skb->tstamp_type = SKB_TSTAMP_TYPE_RX_REAL;" instead of
->>> "skb->tstamp_type = 0;"
->>>
->>>
->>> This one I am not sure but probably need to change the skb_set_delivery_time() function signature also:
->>>
->>> static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
->>> -                                        bool mono)
->>> +                     enum skb_tstamp_type tstamp_type)
->>>
->> This should be straight-forward as well 
->>
->>> The third patch is to change tstamp_type from 1 bit to 2 bits and add SKB_TSTAMP_TYPE_TX_USER.
->>>
->>> struct sk_buff {
->>>         /* ... */
->>> -        __u8            tstamp_type:1;
->>> +        __u8            tstamp_type:2;
->>>         /* ... */
->>> };
->>>
->>> enum skb_tstamp_type {
->>>     SKB_TSTAMP_TYPE_RX_REAL = 0,    /* A RX (receive) time in real */
->>>     SKB_TSTAMP_TYPE_TX_MONO = 1,    /* A TX (delivery) time in mono */
->>> +    SKB_TSTAMP_TYPE_TX_USER = 2,    /* A TX (delivery) time and its clock
->>>                      * is in skb->sk->sk_clockid.
->>>                      */
->>>                
->>> };
->>>
->>> This will shift a bit out of the byte where tstamp_type lives. It should be the "inner_protocol_type" bit by my hand count. Please check if it is directly used in bpf instruction (filter.c). As far as I look, it is not, so should be fine. Some details about bpf instruction accessible skb bit field here: https://lore.kernel.org/all/20230321014115.997841-1-kuba@kernel.org/
->> This is where i would need thorough reviews from you and Willem as my area of expertise is limited to part of network stack and BPF is not one of them. 
->> But i have plan on this and i know how to do it. 
->>
->> Expect patches to be arriving to your inboxes next week, as we have a long weekend in Qualcomm 
->> Fingers crossed :) 
->>
->>>
->>>
->>>> 3. This will be a first step to make the design scalable.
->>>> 4. Tomorrow if we have more timestamp to support, upstream community has to do is
->>>> update the enum and increase the bitfield from 2=>3 and so on.
->>>>
->>>> I need help from Martin to test the patch which renames the mono_delivery_time
->>>> to tstamp_type (Which i feel should be straight forward as the value of the bit is 1)
->>>
->>> The bpf change is not a no-op rename of mono_delivery_time. It needs to take care of the new bit added to the tstamp_type. Please see the previous email (and I also left it in the beginning of this email).
->>>
->>> Thus, you need to compile the selftests/bpf/ and run it to verify the changes when handling the new bit. The Documentation/bpf/bpf_devel_QA.rst has the howto details. You probably only need the newer llvm (newer gcc should work also as bpf CI has been using it) and the newer pahole. I can definitely help if there is issue in running the test_progs in selftests/bpf or you have question on making the changes in filter.c. To run the test: "./test_progs -t tc_redirect/tc_redirect_dtime"
->>>
+[1]
+ # selftests: net/forwarding: vxlan_bridge_1d_port_8472_ipv6.sh
+ # INFO: Running tests with UDP port 8472
+ # TEST: ping: local->local                                            [ OK ]
+ # TEST: ping: local->remote 1                                         [FAIL]
+ # Ping failed
+ [...]
 
-Martin,
-I was able to compile test_progs and execute the above command mentioned by you . Does the output look okay for you ? 
+Fixes: b07e9957f220 ("selftests: forwarding: Add VxLAN tests with a VLAN-unaware bridge for IPv6")
+Fixes: 728b35259e28 ("selftests: forwarding: Add VxLAN tests with a VLAN-aware bridge for IPv6")
+Reported-by: Paolo Abeni <pabeni@redhat.com>
+Closes: https://lore.kernel.org/netdev/24a7051fdcd1f156c3704bca39e4b3c41dfc7c4b.camel@redhat.com/
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+---
+ .../testing/selftests/net/forwarding/vxlan_bridge_1d_ipv6.sh  | 4 ++--
+ .../testing/selftests/net/forwarding/vxlan_bridge_1q_ipv6.sh  | 4 ++--
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-[ 3076.040766] IPv6: ADDRCONF(NETDEV_CHANGE): veth_src_fwd: link becomes ready
-[ 3076.040809] IPv6: ADDRCONF(NETDEV_CHANGE): veth_src: link becomes ready
-[ 3076.072844] IPv6: ADDRCONF(NETDEV_CHANGE): veth_dst: link becomes ready
-[ 3076.072880] IPv6: ADDRCONF(NETDEV_CHANGE): veth_dst_fwd: link becomes ready
-#214/5   tc_redirect/tc_redirect_dtime:OK
-#214     tc_redirect:OK
-Summary: 1/1 PASSED, 0 SKIPPED, 0 FAILED
-
-
+diff --git a/tools/testing/selftests/net/forwarding/vxlan_bridge_1d_ipv6.sh b/tools/testing/selftests/net/forwarding/vxlan_bridge_1d_ipv6.sh
+index a0bb4524e1e9..a603f7b0a08f 100755
+--- a/tools/testing/selftests/net/forwarding/vxlan_bridge_1d_ipv6.sh
++++ b/tools/testing/selftests/net/forwarding/vxlan_bridge_1d_ipv6.sh
+@@ -354,7 +354,7 @@ __ping_ipv4()
+ 
+ 	# Send 100 packets and verify that at least 100 packets hit the rule,
+ 	# to overcome ARP noise.
+-	PING_COUNT=100 PING_TIMEOUT=11 ping_do $dev $dst_ip
++	PING_COUNT=100 PING_TIMEOUT=20 ping_do $dev $dst_ip
+ 	check_err $? "Ping failed"
+ 
+ 	tc_check_at_least_x_packets "dev $rp1 egress" 101 10 100
+@@ -410,7 +410,7 @@ __ping_ipv6()
+ 
+ 	# Send 100 packets and verify that at least 100 packets hit the rule,
+ 	# to overcome neighbor discovery noise.
+-	PING_COUNT=100 PING_TIMEOUT=11 ping6_do $dev $dst_ip
++	PING_COUNT=100 PING_TIMEOUT=20 ping6_do $dev $dst_ip
+ 	check_err $? "Ping failed"
+ 
+ 	tc_check_at_least_x_packets "dev $rp1 egress" 101 100
+diff --git a/tools/testing/selftests/net/forwarding/vxlan_bridge_1q_ipv6.sh b/tools/testing/selftests/net/forwarding/vxlan_bridge_1q_ipv6.sh
+index d880df89bc8b..e83fde79f40d 100755
+--- a/tools/testing/selftests/net/forwarding/vxlan_bridge_1q_ipv6.sh
++++ b/tools/testing/selftests/net/forwarding/vxlan_bridge_1q_ipv6.sh
+@@ -457,7 +457,7 @@ __ping_ipv4()
+ 
+ 	# Send 100 packets and verify that at least 100 packets hit the rule,
+ 	# to overcome ARP noise.
+-	PING_COUNT=100 PING_TIMEOUT=11 ping_do $dev $dst_ip
++	PING_COUNT=100 PING_TIMEOUT=20 ping_do $dev $dst_ip
+ 	check_err $? "Ping failed"
+ 
+ 	tc_check_at_least_x_packets "dev $rp1 egress" 101 10 100
+@@ -522,7 +522,7 @@ __ping_ipv6()
+ 
+ 	# Send 100 packets and verify that at least 100 packets hit the rule,
+ 	# to overcome neighbor discovery noise.
+-	PING_COUNT=100 PING_TIMEOUT=11 ping6_do $dev $dst_ip
++	PING_COUNT=100 PING_TIMEOUT=20 ping6_do $dev $dst_ip
+ 	check_err $? "Ping failed"
+ 
+ 	tc_check_at_least_x_packets "dev $rp1 egress" 101 100
+-- 
+2.43.0
 
 
