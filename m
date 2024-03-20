@@ -1,226 +1,279 @@
-Return-Path: <netdev+bounces-80754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 584A0880F59
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:10:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 78771880F64
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:13:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA0A11F230DC
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 10:10:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0649F1F21EB4
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 10:13:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A7B13CF65;
-	Wed, 20 Mar 2024 10:10:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Rf+Geptr"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D23FC3BB48;
+	Wed, 20 Mar 2024 10:13:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B113BBE3;
-	Wed, 20 Mar 2024 10:10:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710929426; cv=fail; b=KMA9TM2g4LAYsMdZbZhVEg2DHM49CH2/sHUJXHqwzrtF6Zt51pLJe3a/+90jV9yMNylk5Yw1r4vnaYXMeY8Ke4d0mbndxkFzs5bMHqOp5gurretSwvMUvs2qm7POtnAq72UvkSDD7A3spty+VSUKZ1usLbB7O0Pp57wn83oDBiU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710929426; c=relaxed/simple;
-	bh=EVp7g9wtJGUVcceWGBmBi+JBR4nt01UINtucOAeFTic=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=uWcXapkwhkoTRSCAUCttNlRjO8XLgJBd4koA2+ft7il3DfcFZsqMA3V1BdafmTcmXdlJWVcSd2iDW/pguDwVV1gdStAtBFX1HEOMulDXQYU9qCW7GYlFlYp3AqC8HAHBH8HSpnAwImHUpzKbmnRbDLrRHQAHGgsVc4QqBpTq+3M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Rf+Geptr; arc=fail smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1710929425; x=1742465425;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=EVp7g9wtJGUVcceWGBmBi+JBR4nt01UINtucOAeFTic=;
-  b=Rf+GeptrZ0uH6eS0pAaqJ1xOUa23rbCsX5U4eXqUryCZnFCFaNXD+pMU
-   hZdJwMsiirr07AaBF/+M0Ts81V4/Wg5MHGYdsfi5NkfypYiSy1FrgCwaF
-   50/q0BBmrMp2f5qneaJ6euLPkiB0nxV04h1/LIMtVFOWzmpcXo3f3qsEV
-   IhmA8utjZ3V7//MVZ3tva6qmpACjjvn/mkX6zmcAiNRZveXjw2wViEQka
-   hZFk7zoKPxdisdvyZ2bffGZ3JonJY8h3mjtrTU8NvakQOBMOUxgS8WcjQ
-   eNfX82PnmFWHp9xEIMTvGFYhR6xuugDuZ0JiJ6o3BkpOnedLHVcCfsGEL
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11018"; a="23344810"
-X-IronPort-AV: E=Sophos;i="6.07,139,1708416000"; 
-   d="scan'208";a="23344810"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2024 03:10:23 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,139,1708416000"; 
-   d="scan'208";a="14181712"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Mar 2024 03:10:18 -0700
-Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 20 Mar 2024 03:10:17 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 20 Mar 2024 03:10:17 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Wed, 20 Mar 2024 03:10:17 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Wed, 20 Mar 2024 03:10:17 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=e3Sg+2Aa/ziUwIWOvFUWZItibpJ/sq5DvGcGfaCZeX+lhGk0c27PeHz/CBiyn9oeoQiHcLRlRew1Bs1ng4SggV8ZP8rlHR2eW6Io+PamwKLYyR7ZFiHeAT22Sp5dpRuxpmNSToPjREcbMkA4va30F4V0SNP+udRq8JjJptjTyBvm8cP56asozBDxvnCBZ1a8VkwYbCieIOQNFQtBygIZyXWiEJUKVDFHIUG4GluDlmwwHd5zFggo5W4PUfHTTH5aw2bxKocmE+oBwwIXxcQLAY7CyZgaAk3ErYpPAgMcssM7Y6E3gPAAbEy0R7TdBm6pXBra7Uf8VNMeCRSund95YA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=M2ybXOpUAXQD41T49rzcYC5m7iogLhZ4804Bi3FVamI=;
- b=UZfvI+f/KJG2v6yKpUn1qVl/KtVb/t5E0IKTGQeGzgKthr5JgSHlqVCSzkmbHzCzTUZbpEz6CZzIP75EpCF+6TNbuuXvo6dE3ssfbljW5ZYTUXsfq/S3tNc66i2RM6HFafeNDI2ZWH2AL+P3SaSvDac1RHHL7YdjvQWP18qldIm4nYRe5Mq1gvkZVxpI0KedXJ4Mc3E+eXWrVD0fbdbm8zBcz23dBSzbjaSBYIyRfxyDi07mPNACVj4rNR4ODZ4T5p6W7QmHTFG0NjBKr7n8EInVf8BV7Hj7Iywot34INzURDqSPpAj8ZYVhzZ7MybPvgUfw+K0bt2eG2zp5onaALg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
- by PH0PR11MB4982.namprd11.prod.outlook.com (2603:10b6:510:37::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.11; Wed, 20 Mar
- 2024 10:10:15 +0000
-Received: from DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::654c:d66a:ec8e:45e9]) by DS0PR11MB8718.namprd11.prod.outlook.com
- ([fe80::654c:d66a:ec8e:45e9%6]) with mapi id 15.20.7409.010; Wed, 20 Mar 2024
- 10:10:15 +0000
-Message-ID: <058f6e5d-369e-48c7-a5ea-976eccccaafe@intel.com>
-Date: Wed, 20 Mar 2024 11:10:09 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH RFC kspp-next 3/3] idpf: sprinkle __counted_by{,_le}() in
- the virtchnl2 header
-Content-Language: en-US
-To: Kees Cook <keescook@chromium.org>, Simon Horman <horms@kernel.org>
-CC: <linux-hardening@vger.kernel.org>, "Gustavo A. R. Silva"
-	<gustavoars@kernel.org>, Marco Elver <elver@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20240318130354.2713265-1-aleksander.lobakin@intel.com>
- <20240318130354.2713265-4-aleksander.lobakin@intel.com>
- <20240319185718.GO185808@kernel.org> <202403191442.219F77E672@keescook>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <202403191442.219F77E672@keescook>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MI1P293CA0021.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:3::14) To DS0PR11MB8718.namprd11.prod.outlook.com
- (2603:10b6:8:1b9::20)
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46BE93C097
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 10:12:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710929580; cv=none; b=n+wSXGQNN2tvpwl9GMBejVM1CJuU39vpU2KMaVfqQKTABDy+8+CNLfvUdCffMpyONauU9duN+8NLaVHNt51/4eQbuYja4RPMDHTVCMPhnuRpaPDlBpmMVDAYwTxzzfjw5isUGvBXmaC6J95E9Z8KPvln30nMVRqSh7a5UBXwPL8=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710929580; c=relaxed/simple;
+	bh=p6qBKdkFhKRhtiGkRgRhIhc04idA02RF6tLmT0KZZ8s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qty7sByl7FPp64yvEzThhE7xFfxqR8zYrq5Jkl1sgOJXE6OIcrss/gzte4948kaTqAheMxfZTbHCO77Ea9QbMmXvfjvv49dbY17x/LAiJ2+Fk6wN65FErjKlGHFho8fo4lFTlJjt9ZMFU2pb4n065q4oI/Xg7o5L2GWd3l2nT24=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.109.198])
+	by gateway (Coremail) with SMTP id _____8AxOOintvpl3jYbAA--.45343S3;
+	Wed, 20 Mar 2024 18:12:55 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.109.198])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxLs+ktvplllBeAA--.50034S3;
+	Wed, 20 Mar 2024 18:12:53 +0800 (CST)
+Message-ID: <ff211347-df96-4ce1-83ab-3dc9e18dfce0@loongson.cn>
+Date: Wed, 20 Mar 2024 18:12:52 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|PH0PR11MB4982:EE_
-X-MS-Office365-Filtering-Correlation-Id: 35c30941-74e5-4006-c468-08dc48c5f005
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YWYGI3c1zu2K/s033kfHrb51WXO9jzHb5hVP3CdcrUmd71b6G0QSqSu6xg14eGLPX8OJpkRPLEQGzDaFgKqps1FCDsSv1CGVuu4ABzJyFlfA+4Shp9UI4IiaIAFLpkK+6xjcj8rSrlxO82PZTSbzUa9AihgpZPIlRLAL8q78H4IcHHBjWqJndVu91Ugi5G6lDbJdrijU00b6AdkhT4RTXQiP4tmqEDs5etdeyNqdFqlJwo/U5yuuViT+HOQZgMl7RtDFDFvBsTqSZ1e9s38pdu1cMxqtSaYT1DnBOvQx/r9tenLW0bREsT2UJbJ0e27B/qzUUpI+xvb6ghC+vSSz1f9ZZ3a0Uk/YtwpSVCVgbsTtuIjVzuf2ci5cKnrW67VWeVbdulhioknf9zKmyYeWwvdNAIsTl2dPhy1bMyC+R3Vk/Ho95DlbaH5kjBJoemQWBHNJ1GVI3eOWrPD84htNrBnpUsX0/Fz4IHl+iHHrGfRkHT2dmukcUjWrnUvKF1UHi5MocRSkuwrYYzCRnZPOF8iENZOAWJBOx9YtHRZFn9N/OUS4nos5jqH8t/uVuBLI3m+H0iicDLCMHtmXIBmwABMX4A/UQV3vL8sxNtLVhGj4kM1lSja9E0wtv9Ow4ayF8e2gsmkXqpuza7LqD6+6nZqsgGVoTYZA5P8U+gfwj4c=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y3JBSmJTZHFQVkoxN0ZMbGdpU3h5NnFtVWtjNGxNOEp1aGNvdHQrWWJkeG9u?=
- =?utf-8?B?Y2szaVVPL1N4ZHJWK0pkY083ZXNRVzdOQjdVWUZkM0Q3bjhuN2xVamxYcEIv?=
- =?utf-8?B?UzV6bnhxK0ZNTG54V3FQbWplWm9JRzE0TyttNWhMb0ZRNkJzV21VQlNFeVcr?=
- =?utf-8?B?R3pud0dTN2kycWJCV1piNmQvUklaOWh2Tm0zNXFZVEc2U2p6SEtJWU5QdGNH?=
- =?utf-8?B?S3dSenlpc2s3WHR6anY3aEhmdWpwQ2RVenlaWUkyOFRpNkxMWlcrcXVxUk5L?=
- =?utf-8?B?VWJ0Skc1Q1ZhMUN6TjhkZmhWeU9zZmcxOWFuWmZGdU54SndMYmNIRHBGYmg0?=
- =?utf-8?B?YWJlTWNlQlBqdXYxRFB3SUUyTDlMQTBqYlB2S0ZrcU5HaFNndFpMRDVwYm9v?=
- =?utf-8?B?U1hid2p0U1lPRk9FZUVxZEp4RGszakk0dHdLbDFzMkZDcU5jTUMzT3BhMU0v?=
- =?utf-8?B?cXhra0VmVU1sejE2dDY5OVloRmRMM2EwWk52c2F1S3hRdnpFd2RpSE5Oak93?=
- =?utf-8?B?ZndVKzJueDE4L3VBbGFLZ3EzL3MxdE14UzJ6dzVGQ3o3NS9DcWFDRERhRW14?=
- =?utf-8?B?ZHY4WmRVamltYldsMFdLTXRzbXBubmtwZEI1SG03WkVBb3BlL2VTWXZMcGN1?=
- =?utf-8?B?QlBOUk4rREx2WUVCUk91OHMvRlBMUFVNdGNxT1VRek9WMWZVUEFBVE5JR2pN?=
- =?utf-8?B?VHNMcm1VdnlzVEo0aVlzVUZNUjI4TzJnWlN5b1JaaVlhUlRLQ2Vhc05qRVdv?=
- =?utf-8?B?YldEYk4vbUJwa2VQczdEOTRlU016VVB6Wmd1c1d5K0w2bmd2cE9WM3pWRWZM?=
- =?utf-8?B?Q1hWZnE2NThUT0dGU291VUcxdm1UUWN0cEdaaG50K0U3L2tIQS9CY2huWTFD?=
- =?utf-8?B?dWs0bXBmdnZ4SE45UVFwZU1zSUY0MGR3dk1iQnk3Z1p3My9ycUdFZzNSTEt5?=
- =?utf-8?B?MHN3OXlMRE0weWY5Y3I5cEsxY1k2SmF3bUQ1Y1ZxNnRob1RvZ0lEWGRUaTdw?=
- =?utf-8?B?MDFSVlNCM3JPOW42dGRrc3Fac2NDZytmODdiRU1pcHkxYmdlMHB5TkF2dzVu?=
- =?utf-8?B?MTh5MEpRc2ZtcTZJai8xWnpNZEw1Y25XMzRsWGc1R3lxalNOcU00ZUoyZG9v?=
- =?utf-8?B?U0g2L3UwbE44MEhDWGlkaUFOR1h3WGU1aGl5clVHZ3Y1bC9kRjBPb0grUDUx?=
- =?utf-8?B?SlRaWGZvWHk2YlVLU3pacVYzRkNtam9zdXZ4VVVlUUw2UDhCY3pIUW1ha1Nj?=
- =?utf-8?B?WVFvSnlNZFRnZWM5ei9LMU10ZVJQWDJ2dXVDTDVmSlNCNDVRcFBSM3c0ZVBV?=
- =?utf-8?B?bHJmL0dyalloNmxEVlk5a2ZXMnhOSkpURlRqNjQxejVYVnU5eUc5cmpsdzRh?=
- =?utf-8?B?UHVhcUh3Z0NqZXFNbnR1a0EwUU05ZXZINWpjZ2I1NlExOWltMFJlRVBZeXZN?=
- =?utf-8?B?RTdJWlhpeU0zb1dxTWpJcmpha0EzQmNJNlQwcEtid2FjMW1kQWc2dW15K2JN?=
- =?utf-8?B?QnB6ei8rTE9GZ1pxVVhRRlFoSTQwU0M2cklzQ3hmSVBpY3dMeU9nSnRFWjJK?=
- =?utf-8?B?SjVPVnk3ZEI0T3pWTE5RSSszWjJMN3RmUmxwRzZ6TngxMlkwWm52VlFFaTRB?=
- =?utf-8?B?MFVoQTJLV2xHNTIrTzY2RU5MMVRreTNaMUxZdCswbjNJcGh4RGN5Y1RodlRP?=
- =?utf-8?B?UlgxV0tVc1dUUUp3ajIvNWxkTmMrMGR5SlBIWmUzV05LRVJYRWFJajNaaTd2?=
- =?utf-8?B?eXVpelhSSE1sMFpya3MrTDc4d3BJZHU5K25EbWpyc1NNV2JjNUlGN2pjWU8w?=
- =?utf-8?B?NmVlRTErdE9GZTRLRWFPekgvSkF4b2FBVU5ydXpuSTdlV0prdE9XczFpM3Bu?=
- =?utf-8?B?R00zWDdyRjlRMmhFQ2dUcW5xSDczbEMzb2Rwank0VHp6MjVvcVJiUEhhUldy?=
- =?utf-8?B?NlV4ZzRKditKSkNKTVVZOGhOUnRxd1lTVDBNQVhGbEt4QnZhQktzNktMdkxY?=
- =?utf-8?B?dGowNmJ5Z1NhNFpUQjZvV1IxczQySFZHdnlPRW1ES3I1NGdLWXB6RHB4Yjdj?=
- =?utf-8?B?dkVReGdDVFlRaWpUVTRhN2RCUmtMUjdYTFppR05teFhCdlZJRDF2RnBrS0NU?=
- =?utf-8?B?dlZZSmU3VitkRTVOQXRub3YzLzJId3JjdFh3YXNsWFB4T2pOQzMzVFlUVEtM?=
- =?utf-8?B?bVE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 35c30941-74e5-4006-c468-08dc48c5f005
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2024 10:10:15.3291
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MFhaYBSf3b7JqziS7DSVHVLjpwjj5IZOFSRuYg67oCTfD1ynRtvRqd83K3WNTJSxfcRaOCAzWfSNA0rTK/NI/wNQhwZHhhqooJwA+nf1Fi8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4982
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 04/11] net: stmmac: dwmac-loongson: Move irq
+ config to loongson_gmac_config
+Content-Language: en-US
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+References: <cover.1706601050.git.siyanteng@loongson.cn>
+ <776bfe84003b203ebe320dc7bf6b98707a667fa9.1706601050.git.siyanteng@loongson.cn>
+ <xjfd4effff6572fohxsgannqjr2w44qm4tru4aan2agojs77dl@tneltus7zqo6>
+ <6e7e2765-5074-4252-820f-e9b34960e8b3@loongson.cn>
+ <6x5fg66cr2vwwcgr6yi45ipov5ejkst5fggcxd4y2mxkq7m6po@nkghfpdeduyj>
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <6x5fg66cr2vwwcgr6yi45ipov5ejkst5fggcxd4y2mxkq7m6po@nkghfpdeduyj>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8BxLs+ktvplllBeAA--.50034S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW3GF4fWFWfKw1fXrWfAF48Xwc_yoWxAryDpr
+	W3Aa4YkrWDXry7Wa1qvw45XF9IyrW2yry8Ww47Aw17Was0vF9aqF18tr1UuFyxArZ8GF17
+	Xr4UCFWfuF95AFgCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
+	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0b6pPUUUUU==
 
-From: Kees Cook <keescook@chromium.org>
-Date: Tue, 19 Mar 2024 14:42:56 -0700
 
-> On Tue, Mar 19, 2024 at 06:57:18PM +0000, Simon Horman wrote:
->> On Mon, Mar 18, 2024 at 02:03:54PM +0100, Alexander Lobakin wrote:
->>> Both virtchnl2.h and its consumer idpf_virtchnl.c are very error-prone.
->>> There are 10 structures with flexible arrays at the end, but 9 of them
->>> has flex member counter in Little Endian.
->>> Make the code a bit more robust by applying __counted_by_le() to those
->>> 9. LE platforms is the main target for this driver, so they would
->>> receive additional protection.
->>> While we're here, add __counted_by() to virtchnl2_ptype::proto_id, as
->>> its counter is `u8` regardless of the Endianness.
->>> Compile test on x86_64 (LE) didn't reveal any new issues after applying
->>> the attributes.
->>>
->>> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
->>
->> Hi Alexander,
->>
->> with this patch applied ./scripts/kernel-doc -none reports the following.
->> I think that this means that the kernel-doc needs to be taught
->> about __counted_by_le (and __counted_by_be).
-> 
-> Oh, yes, I should have remembered that need. Sorry! It should be
-> addressed by adding them where __counted_by is already listed in
-> Documentation/conf.py.
+在 2024/3/19 21:43, Serge Semin 写道:
+> On Wed, Mar 13, 2024 at 04:14:28PM +0800, Yanteng Si wrote:
+>> 在 2024/2/6 01:01, Serge Semin 写道:
+>>> On Tue, Jan 30, 2024 at 04:43:24PM +0800, Yanteng Si wrote:
+>>>> Add loongson_dwmac_config and moving irq config related
+>>>> code to loongson_dwmac_config.
+>>>>
+>>>> Removing MSI to prepare for adding loongson multi-channel
+>>>> support later.
+>>> Please detach this change into a separate patch and thoroughly explain
+>>> why it was necessary.
+>> OK.
+>>>> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
+>>>> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
+>>>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
+>>>> ---
+>>>>    .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 85 ++++++++++++-------
+>>>>    1 file changed, 55 insertions(+), 30 deletions(-)
+>>>>
+>>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>>>> index 979c9b6dab3f..e7ce027cc14e 100644
+>>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
+>>>> @@ -11,8 +11,46 @@
+>>>>    struct stmmac_pci_info {
+>>>>    	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
+>>>> +	int (*config)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat,
+>>>> +		      struct stmmac_resources *res, struct device_node *np);
+>>>>    };
+>>>> +static int loongson_dwmac_config_legacy(struct pci_dev *pdev,
+>>>> +					struct plat_stmmacenet_data *plat,
+>>>> +					struct stmmac_resources *res,
+>>>> +					struct device_node *np)
+>>>> +{
+>>>> +	if (np) {
+>>>> +		res->irq = of_irq_get_byname(np, "macirq");
+>>>> +		if (res->irq < 0) {
+>>>> +			dev_err(&pdev->dev, "IRQ macirq not found\n");
+>>>> +			return -ENODEV;
+>>>> +		}
+>>>> +
+>>>> +		res->wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+>>>> +		if (res->wol_irq < 0) {
+>>>> +			dev_info(&pdev->dev,
+>>>> +				 "IRQ eth_wake_irq not found, using macirq\n");
+>>>> +			res->wol_irq = res->irq;
+>>>> +		}
+>>>> +
+>>>> +		res->lpi_irq = of_irq_get_byname(np, "eth_lpi");
+>>>> +		if (res->lpi_irq < 0) {
+>>>> +			dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+>>>> +			return -ENODEV;
+>>>> +		}
+>>>> +	} else {
+>>>> +		res->irq = pdev->irq;
+>>>> +		res->wol_irq = res->irq;
+>>>> +	}
+>>>> +
+>>>> +	plat->flags &= ~STMMAC_FLAG_MULTI_MSI_EN;
+>>>> +	dev_info(&pdev->dev, "%s: Single IRQ enablement successful\n",
+>>>> +		 __func__);
+>>> Why is this here all of the sudden? I don't see this in the original
+>>> code. Please move it to the patch which requires the flag
+>>> setup/cleanup or drop if it isn't necessary.
+>> +	plat->flags &= ~STMMAC_FLAG_MULTI_MSI_EN;
+>> This cannot be removed because it appeared in a rebase(v4 -> v5). See
+>> <https://lore.kernel.org/all/20230710090001.303225-9-brgl@bgdev.pl/>
+> AFAICS it _can_ be removed. The patch you referred to is a formal
+> conversion of
+> -	plat->multi_msi_en = 0;
+> to
+> +	plat->flags &= ~STMMAC_FLAG_MULTI_MSI_EN;
+> First of all the "multi_msi_en" field clearance had been
+> redundant there since the code setting the flag was executed after the
+> code which may cause the field clearance performed. Second AFAICS the
+> "multi_msi_en" field clearance was originally added to emphasize the
+> functions semantics:
+> intel_eth_config_multi_msi() - config multi IRQ device,
+> intel_eth_config_single_msi() - config single IRQ device.
+>
+> So in your case there is no any reason of clearing the
+> STMMAC_FLAG_MULTI_MSI_EN flag. Please, either drop it or move the
+> change into a separate patch.
 
-Oh, thanks to both of you! I'll do that before sending v1.
+OK, you are right. drop it.
 
-> 
-> -Kees
-> 
->>
->> .../virtchnl2.h:559: warning: Excess struct member 'chunks' description in 'virtchnl2_queue_reg_chunks'
->> .../virtchnl2.h:707: warning: Excess struct member 'qinfo' description in 'virtchnl2_config_tx_queues'
->> .../virtchnl2.h:786: warning: Excess struct member 'qinfo' description in 'virtchnl2_config_rx_queues'
->> .../virtchnl2.h:872: warning: Excess struct member 'vchunks' description in 'virtchnl2_vector_chunks'
->> .../virtchnl2.h:916: warning: Excess struct member 'lut' description in 'virtchnl2_rss_lut'
->> .../virtchnl2.h:1108: warning: Excess struct member 'key_flex' description in 'virtchnl2_rss_key'
->> .../virtchnl2.h:1199: warning: Excess struct member 'qv_maps' description in 'virtchnl2_queue_vector_maps'
->> .../virtchnl2.h:1251: warning: Excess struct member 'mac_addr_list' description in 'virtchnl2_mac_addr_list'
->>
->> ...
-> 
 
 Thanks,
-Olek
+
+Yanteng
+
+>
+> -Serge(y)
+>
+>> +	dev_info(&pdev->dev, "%s: Single IRQ enablement successful\n",
+>> +		 __func__);
+>>
+>> OK, drop it.
+>>
+>>>> +
+>>>> +	return 0;
+>>>> +}
+>>>> +
+>>>>    static void loongson_default_data(struct pci_dev *pdev,
+>>>>    				  struct plat_stmmacenet_data *plat)
+>>>>    {
+>>>> @@ -66,8 +104,21 @@ static int loongson_gmac_data(struct pci_dev *pdev,
+>>>>    	return 0;
+>>>>    }
+>>>> +static int loongson_gmac_config(struct pci_dev *pdev,
+>>>> +				struct plat_stmmacenet_data *plat,
+>>>> +				struct stmmac_resources *res,
+>>>> +				struct device_node *np)
+>>>> +{
+>>>> +	int ret;
+>>>> +
+>>>> +	ret = loongson_dwmac_config_legacy(pdev, plat, res, np);
+>>>> +
+>>>> +	return ret;
+>>>> +}
+>>>> +
+>>> You introduce the config callback here and convert to a dummy method
+>>> in
+>>> [PATCH 07/11] net: stmmac: dwmac-loongson: Add multi-channel supports for loongson
+>>> It's just pointless. What about introducing the
+>>> loongson_dwmac_config_legacy() method and call it directly?
+>> OK, I will try.
+>>>>    static struct stmmac_pci_info loongson_gmac_pci_info = {
+>>>>    	.setup = loongson_gmac_data,
+>>>> +	.config = loongson_gmac_config,
+>>>>    };
+>>>>    static int loongson_dwmac_probe(struct pci_dev *pdev,
+>>>> @@ -139,44 +190,19 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
+>>>>    		plat->phy_interface = phy_mode;
+>>>>    	}
+>>>> -	pci_enable_msi(pdev);
+>>> See my first note in this message.
+>> OK.
+>>
+>>
+>> Thanks,
+>>
+>> Yanteng
+>>
+>>> -Serge(y)
+>>>
+>>>>    	memset(&res, 0, sizeof(res));
+>>>>    	res.addr = pcim_iomap_table(pdev)[0];
+>>>> -	if (np) {
+>>>> -		res.irq = of_irq_get_byname(np, "macirq");
+>>>> -		if (res.irq < 0) {
+>>>> -			dev_err(&pdev->dev, "IRQ macirq not found\n");
+>>>> -			ret = -ENODEV;
+>>>> -			goto err_disable_msi;
+>>>> -		}
+>>>> -
+>>>> -		res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
+>>>> -		if (res.wol_irq < 0) {
+>>>> -			dev_info(&pdev->dev,
+>>>> -				 "IRQ eth_wake_irq not found, using macirq\n");
+>>>> -			res.wol_irq = res.irq;
+>>>> -		}
+>>>> -
+>>>> -		res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
+>>>> -		if (res.lpi_irq < 0) {
+>>>> -			dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
+>>>> -			ret = -ENODEV;
+>>>> -			goto err_disable_msi;
+>>>> -		}
+>>>> -	} else {
+>>>> -		res.irq = pdev->irq;
+>>>> -		res.wol_irq = pdev->irq;
+>>>> -	}
+>>>> +	ret = info->config(pdev, plat, &res, np);
+>>>> +	if (ret)
+>>>> +		goto err_disable_device;
+>>>>    	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
+>>>>    	if (ret)
+>>>> -		goto err_disable_msi;
+>>>> +		goto err_disable_device;
+>>>>    	return ret;
+>>>> -err_disable_msi:
+>>>> -	pci_disable_msi(pdev);
+>>>>    err_disable_device:
+>>>>    	pci_disable_device(pdev);
+>>>>    err_put_node:
+>>>> @@ -200,7 +226,6 @@ static void loongson_dwmac_remove(struct pci_dev *pdev)
+>>>>    		break;
+>>>>    	}
+>>>> -	pci_disable_msi(pdev);
+>>>>    	pci_disable_device(pdev);
+>>>>    }
+>>>> -- 
+>>>> 2.31.4
+>>>>
+
 
