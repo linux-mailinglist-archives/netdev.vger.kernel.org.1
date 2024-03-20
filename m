@@ -1,516 +1,416 @@
-Return-Path: <netdev+bounces-80899-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80900-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DFA48818F9
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 22:19:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBA0E88193A
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 22:41:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A21128365A
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 21:19:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 599F21F21BC2
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 21:41:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8384185944;
-	Wed, 20 Mar 2024 21:19:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="VOrT8yrS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44AE285955;
+	Wed, 20 Mar 2024 21:41:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1304F8B2;
-	Wed, 20 Mar 2024 21:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD3F1400A
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 21:41:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710969546; cv=none; b=J3RQ29ojwQj/UING/qN1zUHToASe+QGb0wldd1KatJnmjubYT1Q/aj9TwUgE4jtchIJVoTRd/Z0PWgxP+KfBbWCoZlh1X2Kqo2PNlVe7RZv/OzjpTy72v14NKpGr72IyDUuwTZLuaqoC496YyF4Lf5HNMenMyTTMaMhRrtYcxd4=
+	t=1710970888; cv=none; b=F0ukiZltNruFMwyTKY+ETDs8OtqG060c1Enw2tZANMDLxU7VrPniHWN7AOK1QGt+Rtee1f4pZrdKyMx99hIR4rWD2c4o2UP50NnAwjLJoixsCaWJ5+eZHhYfl6PYJ9zBAY5Bv5KM2ERjGECJVnxnRt3G6XFKpxO4+q+GS7ANt+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710969546; c=relaxed/simple;
-	bh=+0mxs9pp75Nz3dbwfkyI9AI1qJISBMm4k9F2F9mwXlQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PjUwSm/JT0a+bLxxm9YA27g1ZhLqNcIyUULbpSaf25nM1LHNumoxB4w571FBMfASZ7/p2n4DqwcUBQUstSOfVpADPxdnDPLnaMxOXalbhJNbAGD16GObGotiHdfuTPLfORKj2tDcb4e3e39cs+QEeDtXNkDc9O44ZS5d2sQW5Pg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=qualcomm.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=VOrT8yrS; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qualcomm.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42KKdUSp005983;
-	Wed, 20 Mar 2024 21:18:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding; s=qcppdkim1; bh=ir3Z0tUjv2xyS6jrhndo
-	a24roJ50MsmSYuMTOzNzEGY=; b=VOrT8yrSmWN9N/TWbCKpf2Kx4rW1iDAztS/Q
-	G7xNUv2a94PYipDkzI3eZ+8MsyFE8rvibE4f/OZAO7lKLIrYSPO/pOaHCu22Sv0c
-	rhahkRFxXTaFpuLChnVK5CPHTmdlhh5STyPeZDPjNXHjmve4VgTCourm+nV0O789
-	f6/IogsASjQVqfNo8kTt1YCb7M/cxWpWvOwqmB6c9H7xl5+v80oG0GPVq71kSbfq
-	7DrxeOXG/nwQPJL4nzTxV9FLlqFowlA1eWNmBN7Q88HdaGDBMGi4/Lr4m5ye2FzY
-	wGyQm/Ht9JW1hL8X4V6ehH3NRp5rEVXmu9gnqXvc58ZUSn8+pw==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wyrp7a536-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Mar 2024 21:18:41 +0000 (GMT)
-Received: from pps.filterd (NALASPPMTA03.qualcomm.com [127.0.0.1])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 42KLHVtN010662;
-	Wed, 20 Mar 2024 21:18:40 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 3x00nwaujg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Mar 2024 21:18:40 +0000
-Received: from NALASPPMTA03.qualcomm.com (NALASPPMTA03.qualcomm.com [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42KLIdcj011537;
-	Wed, 20 Mar 2024 21:18:39 GMT
-Received: from hu-devc-lv-u20-a-new.qualcomm.com (hu-abchauha-lv.qualcomm.com [10.81.25.35])
-	by NALASPPMTA03.qualcomm.com (PPS) with ESMTPS id 42KLIdvH011536
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 20 Mar 2024 21:18:39 +0000
-Received: by hu-devc-lv-u20-a-new.qualcomm.com (Postfix, from userid 214165)
-	id 6B053220C3; Wed, 20 Mar 2024 14:18:39 -0700 (PDT)
-From: Abhishek Chauhan <quic_abchauha@quicinc.com>
-To: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Andrew Halaney <ahalaney@redhat.com>,
-        Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-        Martin KaFai Lau <martin.lau@kernel.org>,
-        Martin KaFai Lau <martin.lau@linux.dev>,
-        Daniel Borkmann <daniel@iogearbox.net>
-Cc: kernel@quicinc.com
-Subject: [PATCH net-next v1] net: Rename mono_delivery_time to tstamp_type for scalibilty
-Date: Wed, 20 Mar 2024 14:18:39 -0700
-Message-Id: <20240320211839.1214034-1-quic_abchauha@quicinc.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1710970888; c=relaxed/simple;
+	bh=lIwShWRE1RH4UutF9KXq7V7u+wxGXaGextOuV96WtjM=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ePIWdGcB3nP9NXmutkAsLwbj5lrSYmU5mB9X4VPplZX8CCn3J+WlqhmLUYtITzqBdb6IDY8a5ht2ZWD6WZCulOdlNo7qbpoSoh61FYFHcaNms9YALGtTGvSCSLhRUsOinmHuzFaqNUFv9WM/F0m2QyBSr6jh1lBh5X5bTTQxGpY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3684e275874so3037285ab.3
+        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 14:41:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710970885; x=1711575685;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=SmVrrjalo9YM4iU9/gvZoCra5ETa+uZO/hJohZ6TG30=;
+        b=tiDHQp+1S4nWSpvRJ8hVlh+/Nt6iBpuigBOJGfj3dlr3ayqbgKR+BciUR0/dd+HwRg
+         wSfHSOeN/Kq135El7XfLSg5CKPmN029rqLZUg2ODBUL4wi/OlDHwdKXG8i9J56TZInNI
+         Yxeu4OYqCIhrR/28XbV00E3YtUWvCnDZ2yDtIIBE5/yrY1OND+yL9FMB3G1g0C5txk9m
+         v5UrpyFc3TfLjkbDPuQF7v0r5O1ju3q5laEumfSP27sTBQikbZWdm8DZFZSgLIeBh2X5
+         4P13uiRGAj2AROj4TyaMTlXk7cK/DqWiNc/XGE1AbADjXdf+ajUgagWy9ocxhUS8mauO
+         wV0w==
+X-Forwarded-Encrypted: i=1; AJvYcCVa+gFQHEbCRLYU+5NcYe5VJhz6XTNTFMGxAw+D5WQ8zNJFEns211Twp5p5o6ZFnfjGtZTsgidN1VebPFrr547TIagrmduV
+X-Gm-Message-State: AOJu0YyhD9juu2sOYm0oCGzvqY1Z5NTPlW2bD7G1PqL0lI84hb7BfKMj
+	/EHmOEYPglEOwOsVzvnPdm+fe6Mjsomnv3hNOTrJo/Z4XFOQVkX1hgwMen3WhX1VuPVHxUVi198
+	NRvGoTf/xhuYgV+P9GbcMPBJxLYPUBk3TdcsThy5DHK+ki1RKi/P1O00=
+X-Google-Smtp-Source: AGHT+IGh8Dr6YncD8irfJjiYVBaF+FvGVf8uiSd5bgIptbVLtJZ4n6ARrEsbMBLxm6G6nUpZxpFB4igiXYtCNtXmzJLG2Jrj56sV
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QCInternal: smtphost
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: _CuLB5MxZpGOnORXBCA3FTupoxxNs6wP
-X-Proofpoint-GUID: _CuLB5MxZpGOnORXBCA3FTupoxxNs6wP
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-20_11,2024-03-18_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0
- mlxlogscore=999 priorityscore=1501 phishscore=0 spamscore=0
- impostorscore=0 suspectscore=0 bulkscore=0 mlxscore=0 adultscore=0
- lowpriorityscore=0 clxscore=1015 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2403140001 definitions=main-2403200169
+X-Received: by 2002:a05:6e02:2193:b0:366:9ead:6446 with SMTP id
+ j19-20020a056e02219300b003669ead6446mr956236ila.2.1710970885433; Wed, 20 Mar
+ 2024 14:41:25 -0700 (PDT)
+Date: Wed, 20 Mar 2024 14:41:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000d8fd6b06141e73a4@google.com>
+Subject: [syzbot] [bpf?] [net?] possible deadlock in wq_worker_tick
+From: syzbot <syzbot+8627369462e8429d7cd6@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
+	jakub@cloudflare.com, john.fastabend@gmail.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-mono_delivery_time was added to check if skb->tstamp has delivery
-time in mono clock base (i.e. EDT) otherwise skb->tstamp has
-timestamp in ingress and delivery_time at egress.
+Hello,
 
-Renaming the bitfield from mono_delivery_time to tstamp_type is for
-extensibilty for other timestamps such as userspace timestamp
-(i.e. SO_TXTIME) set via sock opts.
+syzbot found the following issue on:
 
-Bridge driver today has no support to forward the userspace timestamp
-packets and ends up resetting the timestamp. ETF qdisc checks the
-packet coming from userspace and encounters to be 0 thereby dropping
-time sensitive packets. These changes will allow userspace timestamps
-packets to be forwarded from the bridge to NIC drivers.
+HEAD commit:    ea80e3ed09ab net: ethernet: mtk_eth_soc: fix PPE hanging i..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=13f2ea6e180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
+dashboard link: https://syzkaller.appspot.com/bug?extid=8627369462e8429d7cd6
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15a8fac9180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1619b83a180000
 
-In future tstamp_type:1 can be extended to support userspace timestamp
-by increasing the bitfield.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/4c6c49a7ef5c/disk-ea80e3ed.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/242942b30f2d/vmlinux-ea80e3ed.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/74dcc2059655/bzImage-ea80e3ed.xz
 
-Link: https://lore.kernel.org/netdev/bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev/
-Signed-off-by: Abhishek Chauhan <quic_abchauha@quicinc.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8627369462e8429d7cd6@syzkaller.appspotmail.com
+
+=====================================================
+WARNING: HARDIRQ-safe -> HARDIRQ-unsafe lock order detected
+6.8.0-syzkaller-05221-gea80e3ed09ab #0 Not tainted
+-----------------------------------------------------
+kworker/0:2/782 [HC0[0]:SC0[2]:HE0:SE0] is trying to acquire:
+ffff888022c5e820 (&htab->buckets[i].lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ffff888022c5e820 (&htab->buckets[i].lock){+...}-{2:2}, at: sock_hash_delete_elem+0xb0/0x300 net/core/sock_map.c:939
+
+and this task is already holding:
+ffff888014ca0018 (&pool->lock){-.-.}-{2:2}, at: __queue_work+0x6ec/0xec0
+which would create a new lock dependency:
+ (&pool->lock){-.-.}-{2:2} -> (&htab->buckets[i].lock){+...}-{2:2}
+
+but this new dependency connects a HARDIRQ-irq-safe lock:
+ (&pool->lock){-.-.}-{2:2}
+
+... which became HARDIRQ-irq-safe at:
+  lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
+  __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+  _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+  wq_worker_tick+0x207/0x440 kernel/workqueue.c:1501
+  scheduler_tick+0x375/0x6e0 kernel/sched/core.c:5699
+  update_process_times+0x202/0x230 kernel/time/timer.c:2481
+  tick_periodic+0x190/0x220 kernel/time/tick-common.c:100
+  tick_handle_periodic+0x4a/0x160 kernel/time/tick-common.c:112
+  local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
+  __sysvec_apic_timer_interrupt+0x107/0x3a0 arch/x86/kernel/apic/apic.c:1049
+  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+  sysvec_apic_timer_interrupt+0xa1/0xc0 arch/x86/kernel/apic/apic.c:1043
+  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+  __sanitizer_cov_trace_switch+0x6/0x120 kernel/kcov.c:317
+  unwind_next_frame+0xff6/0x2a00 arch/x86/kernel/unwind_orc.c:581
+  __unwind_start+0x641/0x7c0 arch/x86/kernel/unwind_orc.c:760
+  unwind_start arch/x86/include/asm/unwind.h:64 [inline]
+  arch_stack_walk+0x103/0x1b0 arch/x86/kernel/stacktrace.c:24
+  stack_trace_save+0x118/0x1d0 kernel/stacktrace.c:122
+  save_stack+0xfb/0x1f0 mm/page_owner.c:129
+  __set_page_owner+0x29/0x380 mm/page_owner.c:195
+  set_page_owner include/linux/page_owner.h:31 [inline]
+  post_alloc_hook+0x1ea/0x210 mm/page_alloc.c:1533
+  prep_new_page mm/page_alloc.c:1540 [inline]
+  get_page_from_freelist+0x33ea/0x3580 mm/page_alloc.c:3311
+  __alloc_pages+0x256/0x680 mm/page_alloc.c:4569
+  alloc_pages_mpol+0x3de/0x650 mm/mempolicy.c:2133
+  __get_free_pages+0xc/0x30 mm/page_alloc.c:4616
+  kasan_populate_vmalloc_pte+0x38/0xe0 mm/kasan/shadow.c:311
+  apply_to_pte_range mm/memory.c:2619 [inline]
+  apply_to_pmd_range mm/memory.c:2663 [inline]
+  apply_to_pud_range mm/memory.c:2699 [inline]
+  apply_to_p4d_range mm/memory.c:2735 [inline]
+  __apply_to_page_range+0x8ec/0xe40 mm/memory.c:2769
+  pcpu_get_vm_areas+0x3749/0x4fb0 mm/vmalloc.c:4232
+  pcpu_create_chunk+0x69a/0xbc0 mm/percpu-vm.c:342
+  pcpu_balance_populated mm/percpu.c:2101 [inline]
+  pcpu_balance_workfn+0xc4d/0xd40 mm/percpu.c:2238
+  process_one_work kernel/workqueue.c:3254 [inline]
+  process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+  worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+  kthread+0x2f0/0x390 kernel/kthread.c:388
+  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+
+to a HARDIRQ-irq-unsafe lock:
+ (&htab->buckets[i].lock){+...}-{2:2}
+
+... which became HARDIRQ-irq-unsafe at:
+...
+  lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
+  __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+  _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
+  spin_lock_bh include/linux/spinlock.h:356 [inline]
+  sock_hash_free+0x164/0x820 net/core/sock_map.c:1154
+  bpf_map_free_deferred+0xe6/0x110 kernel/bpf/syscall.c:734
+  process_one_work kernel/workqueue.c:3254 [inline]
+  process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+  worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+  kthread+0x2f0/0x390 kernel/kthread.c:388
+  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+
+other info that might help us debug this:
+
+ Possible interrupt unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&htab->buckets[i].lock);
+                               local_irq_disable();
+                               lock(&pool->lock);
+                               lock(&htab->buckets[i].lock);
+  <Interrupt>
+    lock(&pool->lock);
+
+ *** DEADLOCK ***
+
+5 locks held by kworker/0:2/782:
+ #0: ffff888014c78948 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3229 [inline]
+ #0: ffff888014c78948 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x8e0/0x1770 kernel/workqueue.c:3335
+ #1: ffffc90004097d00 ((work_completion)(&aux->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3230 [inline]
+ #1: ffffc90004097d00 ((work_completion)(&aux->work)){+.+.}-{0:0}, at: process_scheduled_works+0x91b/0x1770 kernel/workqueue.c:3335
+ #2: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #2: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+ #2: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: __queue_work+0x198/0xec0 kernel/workqueue.c:2324
+ #3: ffff888014ca0018 (&pool->lock){-.-.}-{2:2}, at: __queue_work+0x6ec/0xec0
+ #4: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
+ #4: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
+ #4: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2380 [inline]
+ #4: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run3+0x14a/0x460 kernel/trace/bpf_trace.c:2421
+
+the dependencies between HARDIRQ-irq-safe lock and the holding lock:
+-> (&pool->lock){-.-.}-{2:2} {
+   IN-HARDIRQ-W at:
+                    lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
+                    __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+                    _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+                    wq_worker_tick+0x207/0x440 kernel/workqueue.c:1501
+                    scheduler_tick+0x375/0x6e0 kernel/sched/core.c:5699
+                    update_process_times+0x202/0x230 kernel/time/timer.c:2481
+                    tick_periodic+0x190/0x220 kernel/time/tick-common.c:100
+                    tick_handle_periodic+0x4a/0x160 kernel/time/tick-common.c:112
+                    local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
+                    __sysvec_apic_timer_interrupt+0x107/0x3a0 arch/x86/kernel/apic/apic.c:1049
+                    instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+                    sysvec_apic_timer_interrupt+0xa1/0xc0 arch/x86/kernel/apic/apic.c:1043
+                    asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+                    __sanitizer_cov_trace_switch+0x6/0x120 kernel/kcov.c:317
+                    unwind_next_frame+0xff6/0x2a00 arch/x86/kernel/unwind_orc.c:581
+                    __unwind_start+0x641/0x7c0 arch/x86/kernel/unwind_orc.c:760
+                    unwind_start arch/x86/include/asm/unwind.h:64 [inline]
+                    arch_stack_walk+0x103/0x1b0 arch/x86/kernel/stacktrace.c:24
+                    stack_trace_save+0x118/0x1d0 kernel/stacktrace.c:122
+                    save_stack+0xfb/0x1f0 mm/page_owner.c:129
+                    __set_page_owner+0x29/0x380 mm/page_owner.c:195
+                    set_page_owner include/linux/page_owner.h:31 [inline]
+                    post_alloc_hook+0x1ea/0x210 mm/page_alloc.c:1533
+                    prep_new_page mm/page_alloc.c:1540 [inline]
+                    get_page_from_freelist+0x33ea/0x3580 mm/page_alloc.c:3311
+                    __alloc_pages+0x256/0x680 mm/page_alloc.c:4569
+                    alloc_pages_mpol+0x3de/0x650 mm/mempolicy.c:2133
+                    __get_free_pages+0xc/0x30 mm/page_alloc.c:4616
+                    kasan_populate_vmalloc_pte+0x38/0xe0 mm/kasan/shadow.c:311
+                    apply_to_pte_range mm/memory.c:2619 [inline]
+                    apply_to_pmd_range mm/memory.c:2663 [inline]
+                    apply_to_pud_range mm/memory.c:2699 [inline]
+                    apply_to_p4d_range mm/memory.c:2735 [inline]
+                    __apply_to_page_range+0x8ec/0xe40 mm/memory.c:2769
+                    pcpu_get_vm_areas+0x3749/0x4fb0 mm/vmalloc.c:4232
+                    pcpu_create_chunk+0x69a/0xbc0 mm/percpu-vm.c:342
+                    pcpu_balance_populated mm/percpu.c:2101 [inline]
+                    pcpu_balance_workfn+0xc4d/0xd40 mm/percpu.c:2238
+                    process_one_work kernel/workqueue.c:3254 [inline]
+                    process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+                    worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+                    kthread+0x2f0/0x390 kernel/kthread.c:388
+                    ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+                    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+   IN-SOFTIRQ-W at:
+                    lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
+                    __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+                    _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+                    __queue_work+0x6ec/0xec0
+                    call_timer_fn+0x17e/0x600 kernel/time/timer.c:1792
+                    expire_timers kernel/time/timer.c:1838 [inline]
+                    __run_timers kernel/time/timer.c:2408 [inline]
+                    __run_timer_base+0x695/0x8e0 kernel/time/timer.c:2419
+                    run_timer_base kernel/time/timer.c:2428 [inline]
+                    run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2438
+                    __do_softirq+0x2bc/0x943 kernel/softirq.c:554
+                    invoke_softirq kernel/softirq.c:428 [inline]
+                    __irq_exit_rcu+0xf2/0x1c0 kernel/softirq.c:633
+                    irq_exit_rcu+0x9/0x30 kernel/softirq.c:645
+                    instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
+                    sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1043
+                    asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+                    native_safe_halt arch/x86/include/asm/irqflags.h:48 [inline]
+                    arch_safe_halt arch/x86/include/asm/irqflags.h:86 [inline]
+                    default_idle+0x13/0x20 arch/x86/kernel/process.c:742
+                    default_idle_call+0x74/0xb0 kernel/sched/idle.c:117
+                    cpuidle_idle_call kernel/sched/idle.c:191 [inline]
+                    do_idle+0x22f/0x5d0 kernel/sched/idle.c:332
+                    cpu_startup_entry+0x42/0x60 kernel/sched/idle.c:430
+                    rest_init+0x2e0/0x300 init/main.c:730
+                    arch_call_rest_init+0xe/0x10 init/main.c:831
+                    start_kernel+0x47a/0x500 init/main.c:1077
+                    x86_64_start_reservations+0x2a/0x30 arch/x86/kernel/head64.c:509
+                    x86_64_start_kernel+0x99/0xa0 arch/x86/kernel/head64.c:490
+                    common_startup_64+0x13e/0x147
+   INITIAL USE at:
+                   lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
+                   __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
+                   _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
+                   __queue_work+0x6ec/0xec0
+                   queue_work_on+0x14f/0x250 kernel/workqueue.c:2435
+                   queue_work include/linux/workqueue.h:605 [inline]
+                   start_poll_synchronize_rcu_expedited+0xf7/0x150 kernel/rcu/tree_exp.h:1017
+                   rcu_init+0xea/0x140 kernel/rcu/tree.c:5240
+                   start_kernel+0x1f7/0x500 init/main.c:969
+                   x86_64_start_reservations+0x2a/0x30 arch/x86/kernel/head64.c:509
+                   x86_64_start_kernel+0x99/0xa0 arch/x86/kernel/head64.c:490
+                   common_startup_64+0x13e/0x147
+ }
+ ... key      at: [<ffffffff926c0e60>] init_worker_pool.__key+0x0/0x20
+
+the dependencies between the lock to be acquired
+ and HARDIRQ-irq-unsafe lock:
+-> (&htab->buckets[i].lock){+...}-{2:2} {
+   HARDIRQ-ON-W at:
+                    lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
+                    __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+                    _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
+                    spin_lock_bh include/linux/spinlock.h:356 [inline]
+                    sock_hash_free+0x164/0x820 net/core/sock_map.c:1154
+                    bpf_map_free_deferred+0xe6/0x110 kernel/bpf/syscall.c:734
+                    process_one_work kernel/workqueue.c:3254 [inline]
+                    process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+                    worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+                    kthread+0x2f0/0x390 kernel/kthread.c:388
+                    ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+                    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+   INITIAL USE at:
+                   lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
+                   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+                   _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
+                   spin_lock_bh include/linux/spinlock.h:356 [inline]
+                   sock_hash_free+0x164/0x820 net/core/sock_map.c:1154
+                   bpf_map_free_deferred+0xe6/0x110 kernel/bpf/syscall.c:734
+                   process_one_work kernel/workqueue.c:3254 [inline]
+                   process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+                   worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+                   kthread+0x2f0/0x390 kernel/kthread.c:388
+                   ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+                   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+ }
+ ... key      at: [<ffffffff94882300>] sock_hash_alloc.__key+0x0/0x20
+ ... acquired at:
+   lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
+   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+   _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
+   spin_lock_bh include/linux/spinlock.h:356 [inline]
+   sock_hash_delete_elem+0xb0/0x300 net/core/sock_map.c:939
+   bpf_prog_2c29ac5cdc6b1842+0x42/0x46
+   bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
+   __bpf_prog_run include/linux/filter.h:657 [inline]
+   bpf_prog_run include/linux/filter.h:664 [inline]
+   __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
+   bpf_trace_run3+0x238/0x460 kernel/trace/bpf_trace.c:2421
+   trace_workqueue_queue_work include/trace/events/workqueue.h:23 [inline]
+   __queue_work+0xe5b/0xec0 kernel/workqueue.c:2382
+   queue_work_on+0x14f/0x250 kernel/workqueue.c:2435
+   __bpf_free_used_maps kernel/bpf/core.c:2716 [inline]
+   bpf_free_used_maps kernel/bpf/core.c:2722 [inline]
+   bpf_prog_free_deferred+0x21d/0x710 kernel/bpf/core.c:2761
+   process_one_work kernel/workqueue.c:3254 [inline]
+   process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+   worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+   kthread+0x2f0/0x390 kernel/kthread.c:388
+   ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+
+
+stack backtrace:
+CPU: 0 PID: 782 Comm: kworker/0:2 Not tainted 6.8.0-syzkaller-05221-gea80e3ed09ab #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+Workqueue: events bpf_prog_free_deferred
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
+ print_bad_irq_dependency kernel/locking/lockdep.c:2626 [inline]
+ check_irq_usage kernel/locking/lockdep.c:2865 [inline]
+ check_prev_add kernel/locking/lockdep.c:3138 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3253 [inline]
+ validate_chain+0x4dc7/0x58e0 kernel/locking/lockdep.c:3869
+ __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
+ lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
+ __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+ _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
+ spin_lock_bh include/linux/spinlock.h:356 [inline]
+ sock_hash_delete_elem+0xb0/0x300 net/core/sock_map.c:939
+ bpf_prog_2c29ac5cdc6b1842+0x42/0x46
+ bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
+ __bpf_prog_run include/linux/filter.h:657 [inline]
+ bpf_prog_run include/linux/filter.h:664 [inline]
+ __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
+ bpf_trace_run3+0x238/0x460 kernel/trace/bpf_trace.c:2421
+ trace_workqueue_queue_work include/trace/events/workqueue.h:23 [inline]
+ __queue_work+0xe5b/0xec0 kernel/workqueue.c:2382
+ queue_work_on+0x14f/0x250 kernel/workqueue.c:2435
+ __bpf_free_used_maps kernel/bpf/core.c:2716 [inline]
+ bpf_free_used_maps kernel/bpf/core.c:2722 [inline]
+ bpf_prog_free_deferred+0x21d/0x710 kernel/bpf/core.c:2761
+ process_one_work kernel/workqueue.c:3254 [inline]
+ process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
+ worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
+
+
 ---
-Test case executed from bpf selftest
-./test_progs -t tc_redirect/tc_redirect_dtime
-[ 3076.040766] IPv6: ADDRCONF(NETDEV_CHANGE): veth_src_fwd: link becomes ready
-[ 3076.040809] IPv6: ADDRCONF(NETDEV_CHANGE): veth_src: link becomes ready
-[ 3076.072844] IPv6: ADDRCONF(NETDEV_CHANGE): veth_dst: link becomes ready
-[ 3076.072880] IPv6: ADDRCONF(NETDEV_CHANGE): veth_dst_fwd: link becomes ready
-#214/5   tc_redirect/tc_redirect_dtime:OK
-#214     tc_redirect:OK 
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
- include/linux/skbuff.h                     | 18 +++++++++---------
- include/net/inet_frag.h                    |  4 ++--
- net/bridge/netfilter/nf_conntrack_bridge.c |  6 +++---
- net/core/dev.c                             |  2 +-
- net/core/filter.c                          |  8 ++++----
- net/ipv4/inet_fragment.c                   |  2 +-
- net/ipv4/ip_fragment.c                     |  2 +-
- net/ipv4/ip_output.c                       |  8 ++++----
- net/ipv6/ip6_output.c                      |  6 +++---
- net/ipv6/netfilter.c                       |  6 +++---
- net/ipv6/netfilter/nf_conntrack_reasm.c    |  2 +-
- net/ipv6/reassembly.c                      |  2 +-
- net/sched/act_bpf.c                        |  4 ++--
- net/sched/cls_bpf.c                        |  4 ++--
- 14 files changed, 37 insertions(+), 37 deletions(-)
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-index 0c7c67b3a87b..8210d699d8e9 100644
---- a/include/linux/skbuff.h
-+++ b/include/linux/skbuff.h
-@@ -821,7 +821,7 @@ typedef unsigned char *sk_buff_data_t;
-  *	@dst_pending_confirm: need to confirm neighbour
-  *	@decrypted: Decrypted SKB
-  *	@slow_gro: state present at GRO time, slower prepare step required
-- *	@mono_delivery_time: When set, skb->tstamp has the
-+ *	@tstamp_type: When set, skb->tstamp has the
-  *		delivery_time in mono clock base (i.e. EDT).  Otherwise, the
-  *		skb->tstamp has the (rcv) timestamp at ingress and
-  *		delivery_time at egress.
-@@ -955,7 +955,7 @@ struct sk_buff {
- 	/* private: */
- 	__u8			__mono_tc_offset[0];
- 	/* public: */
--	__u8			mono_delivery_time:1;	/* See SKB_MONO_DELIVERY_TIME_MASK */
-+	__u8			tstamp_type:1;	/* See SKB_MONO_DELIVERY_TIME_MASK */
- #ifdef CONFIG_NET_XGRESS
- 	__u8			tc_at_ingress:1;	/* See TC_AT_INGRESS_MASK */
- 	__u8			tc_skip_classify:1;
-@@ -4257,7 +4257,7 @@ static inline void skb_get_new_timestampns(const struct sk_buff *skb,
- static inline void __net_timestamp(struct sk_buff *skb)
- {
- 	skb->tstamp = ktime_get_real();
--	skb->mono_delivery_time = 0;
-+	skb->tstamp_type = 0;
- }
- 
- static inline ktime_t net_timedelta(ktime_t t)
-@@ -4269,7 +4269,7 @@ static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
- 					 bool mono)
- {
- 	skb->tstamp = kt;
--	skb->mono_delivery_time = kt && mono;
-+	skb->tstamp_type = kt && mono;
- }
- 
- DECLARE_STATIC_KEY_FALSE(netstamp_needed_key);
-@@ -4279,8 +4279,8 @@ DECLARE_STATIC_KEY_FALSE(netstamp_needed_key);
-  */
- static inline void skb_clear_delivery_time(struct sk_buff *skb)
- {
--	if (skb->mono_delivery_time) {
--		skb->mono_delivery_time = 0;
-+	if (skb->tstamp_type) {
-+		skb->tstamp_type = 0;
- 		if (static_branch_unlikely(&netstamp_needed_key))
- 			skb->tstamp = ktime_get_real();
- 		else
-@@ -4290,7 +4290,7 @@ static inline void skb_clear_delivery_time(struct sk_buff *skb)
- 
- static inline void skb_clear_tstamp(struct sk_buff *skb)
- {
--	if (skb->mono_delivery_time)
-+	if (skb->tstamp_type)
- 		return;
- 
- 	skb->tstamp = 0;
-@@ -4298,7 +4298,7 @@ static inline void skb_clear_tstamp(struct sk_buff *skb)
- 
- static inline ktime_t skb_tstamp(const struct sk_buff *skb)
- {
--	if (skb->mono_delivery_time)
-+	if (skb->tstamp_type)
- 		return 0;
- 
- 	return skb->tstamp;
-@@ -4306,7 +4306,7 @@ static inline ktime_t skb_tstamp(const struct sk_buff *skb)
- 
- static inline ktime_t skb_tstamp_cond(const struct sk_buff *skb, bool cond)
- {
--	if (!skb->mono_delivery_time && skb->tstamp)
-+	if (!skb->tstamp_type && skb->tstamp)
- 		return skb->tstamp;
- 
- 	if (static_branch_unlikely(&netstamp_needed_key) || cond)
-diff --git a/include/net/inet_frag.h b/include/net/inet_frag.h
-index 153960663ce4..5af6eb14c5db 100644
---- a/include/net/inet_frag.h
-+++ b/include/net/inet_frag.h
-@@ -76,7 +76,7 @@ struct frag_v6_compare_key {
-  * @stamp: timestamp of the last received fragment
-  * @len: total length of the original datagram
-  * @meat: length of received fragments so far
-- * @mono_delivery_time: stamp has a mono delivery time (EDT)
-+ * @tstamp_type: stamp has a mono delivery time (EDT)
-  * @flags: fragment queue flags
-  * @max_size: maximum received fragment size
-  * @fqdir: pointer to struct fqdir
-@@ -97,7 +97,7 @@ struct inet_frag_queue {
- 	ktime_t			stamp;
- 	int			len;
- 	int			meat;
--	u8			mono_delivery_time;
-+	u8			tstamp_type;
- 	__u8			flags;
- 	u16			max_size;
- 	struct fqdir		*fqdir;
-diff --git a/net/bridge/netfilter/nf_conntrack_bridge.c b/net/bridge/netfilter/nf_conntrack_bridge.c
-index 6f877e31709b..989435bd1690 100644
---- a/net/bridge/netfilter/nf_conntrack_bridge.c
-+++ b/net/bridge/netfilter/nf_conntrack_bridge.c
-@@ -32,7 +32,7 @@ static int nf_br_ip_fragment(struct net *net, struct sock *sk,
- 					   struct sk_buff *))
- {
- 	int frag_max_size = BR_INPUT_SKB_CB(skb)->frag_max_size;
--	bool mono_delivery_time = skb->mono_delivery_time;
-+	bool tstamp_type = skb->tstamp_type;
- 	unsigned int hlen, ll_rs, mtu;
- 	ktime_t tstamp = skb->tstamp;
- 	struct ip_frag_state state;
-@@ -82,7 +82,7 @@ static int nf_br_ip_fragment(struct net *net, struct sock *sk,
- 			if (iter.frag)
- 				ip_fraglist_prepare(skb, &iter);
- 
--			skb_set_delivery_time(skb, tstamp, mono_delivery_time);
-+			skb_set_delivery_time(skb, tstamp, tstamp_type);
- 			err = output(net, sk, data, skb);
- 			if (err || !iter.frag)
- 				break;
-@@ -113,7 +113,7 @@ static int nf_br_ip_fragment(struct net *net, struct sock *sk,
- 			goto blackhole;
- 		}
- 
--		skb_set_delivery_time(skb2, tstamp, mono_delivery_time);
-+		skb_set_delivery_time(skb2, tstamp, tstamp_type);
- 		err = output(net, sk, data, skb2);
- 		if (err)
- 			goto blackhole;
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 303a6ff46e4e..8b88f8118052 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -2113,7 +2113,7 @@ EXPORT_SYMBOL(net_disable_timestamp);
- static inline void net_timestamp_set(struct sk_buff *skb)
- {
- 	skb->tstamp = 0;
--	skb->mono_delivery_time = 0;
-+	skb->tstamp_type = 0;
- 	if (static_branch_unlikely(&netstamp_needed_key))
- 		skb->tstamp = ktime_get_real();
- }
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 8adf95765cdd..0f535defdd2c 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -7698,13 +7698,13 @@ BPF_CALL_3(bpf_skb_set_tstamp, struct sk_buff *, skb,
- 		if (!tstamp)
- 			return -EINVAL;
- 		skb->tstamp = tstamp;
--		skb->mono_delivery_time = 1;
-+		skb->tstamp_type = 1;
- 		break;
- 	case BPF_SKB_TSTAMP_UNSPEC:
- 		if (tstamp)
- 			return -EINVAL;
- 		skb->tstamp = 0;
--		skb->mono_delivery_time = 0;
-+		skb->tstamp_type = 0;
- 		break;
- 	default:
- 		return -EINVAL;
-@@ -9413,7 +9413,7 @@ static struct bpf_insn *bpf_convert_tstamp_read(const struct bpf_prog *prog,
- 					TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK);
- 		*insn++ = BPF_JMP32_IMM(BPF_JNE, tmp_reg,
- 					TC_AT_INGRESS_MASK | SKB_MONO_DELIVERY_TIME_MASK, 2);
--		/* skb->tc_at_ingress && skb->mono_delivery_time,
-+		/* skb->tc_at_ingress && skb->tstamp_type:1,
- 		 * read 0 as the (rcv) timestamp.
- 		 */
- 		*insn++ = BPF_MOV64_IMM(value_reg, 0);
-@@ -9438,7 +9438,7 @@ static struct bpf_insn *bpf_convert_tstamp_write(const struct bpf_prog *prog,
- 	 * the bpf prog is aware the tstamp could have delivery time.
- 	 * Thus, write skb->tstamp as is if tstamp_type_access is true.
- 	 * Otherwise, writing at ingress will have to clear the
--	 * mono_delivery_time bit also.
-+	 * mono_delivery_time (skb->tstamp_type:1)bit also.
- 	 */
- 	if (!prog->tstamp_type_access) {
- 		__u8 tmp_reg = BPF_REG_AX;
-diff --git a/net/ipv4/inet_fragment.c b/net/ipv4/inet_fragment.c
-index 7072fc0783ef..25f8ee14ea73 100644
---- a/net/ipv4/inet_fragment.c
-+++ b/net/ipv4/inet_fragment.c
-@@ -578,7 +578,7 @@ void inet_frag_reasm_finish(struct inet_frag_queue *q, struct sk_buff *head,
- 	skb_mark_not_on_list(head);
- 	head->prev = NULL;
- 	head->tstamp = q->stamp;
--	head->mono_delivery_time = q->mono_delivery_time;
-+	head->tstamp_type = q->tstamp_type;
- }
- EXPORT_SYMBOL(inet_frag_reasm_finish);
- 
-diff --git a/net/ipv4/ip_fragment.c b/net/ipv4/ip_fragment.c
-index a4941f53b523..1edba0d0ae90 100644
---- a/net/ipv4/ip_fragment.c
-+++ b/net/ipv4/ip_fragment.c
-@@ -355,7 +355,7 @@ static int ip_frag_queue(struct ipq *qp, struct sk_buff *skb)
- 		qp->iif = dev->ifindex;
- 
- 	qp->q.stamp = skb->tstamp;
--	qp->q.mono_delivery_time = skb->mono_delivery_time;
-+	qp->q.tstamp_type = skb->tstamp_type;
- 	qp->q.meat += skb->len;
- 	qp->ecn |= ecn;
- 	add_frag_mem_limit(qp->q.fqdir, skb->truesize);
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
-index 1fe794967211..e8ec7e8ae2e0 100644
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -764,7 +764,7 @@ int ip_do_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
- {
- 	struct iphdr *iph;
- 	struct sk_buff *skb2;
--	bool mono_delivery_time = skb->mono_delivery_time;
-+	bool tstamp_type = skb->tstamp_type;
- 	struct rtable *rt = skb_rtable(skb);
- 	unsigned int mtu, hlen, ll_rs;
- 	struct ip_fraglist_iter iter;
-@@ -856,7 +856,7 @@ int ip_do_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
- 				}
- 			}
- 
--			skb_set_delivery_time(skb, tstamp, mono_delivery_time);
-+			skb_set_delivery_time(skb, tstamp, tstamp_type);
- 			err = output(net, sk, skb);
- 
- 			if (!err)
-@@ -912,7 +912,7 @@ int ip_do_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
- 		/*
- 		 *	Put this fragment into the sending queue.
- 		 */
--		skb_set_delivery_time(skb2, tstamp, mono_delivery_time);
-+		skb_set_delivery_time(skb2, tstamp, tstamp_type);
- 		err = output(net, sk, skb2);
- 		if (err)
- 			goto fail;
-@@ -1649,7 +1649,7 @@ void ip_send_unicast_reply(struct sock *sk, struct sk_buff *skb,
- 			  arg->csumoffset) = csum_fold(csum_add(nskb->csum,
- 								arg->csum));
- 		nskb->ip_summed = CHECKSUM_NONE;
--		nskb->mono_delivery_time = !!transmit_time;
-+		nskb->tstamp_type = !!transmit_time;
- 		if (txhash)
- 			skb_set_hash(nskb, txhash, PKT_HASH_TYPE_L4);
- 		ip_push_pending_frames(sk, &fl4);
-diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
-index b9dd3a66e423..61ddc9549160 100644
---- a/net/ipv6/ip6_output.c
-+++ b/net/ipv6/ip6_output.c
-@@ -859,7 +859,7 @@ int ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
- 	struct rt6_info *rt = (struct rt6_info *)skb_dst(skb);
- 	struct ipv6_pinfo *np = skb->sk && !dev_recursion_level() ?
- 				inet6_sk(skb->sk) : NULL;
--	bool mono_delivery_time = skb->mono_delivery_time;
-+	bool tstamp_type = skb->tstamp_type;
- 	struct ip6_frag_state state;
- 	unsigned int mtu, hlen, nexthdr_offset;
- 	ktime_t tstamp = skb->tstamp;
-@@ -955,7 +955,7 @@ int ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
- 			if (iter.frag)
- 				ip6_fraglist_prepare(skb, &iter);
- 
--			skb_set_delivery_time(skb, tstamp, mono_delivery_time);
-+			skb_set_delivery_time(skb, tstamp, tstamp_type);
- 			err = output(net, sk, skb);
- 			if (!err)
- 				IP6_INC_STATS(net, ip6_dst_idev(&rt->dst),
-@@ -1016,7 +1016,7 @@ int ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
- 		/*
- 		 *	Put this fragment into the sending queue.
- 		 */
--		skb_set_delivery_time(frag, tstamp, mono_delivery_time);
-+		skb_set_delivery_time(frag, tstamp, tstamp_type);
- 		err = output(net, sk, frag);
- 		if (err)
- 			goto fail;
-diff --git a/net/ipv6/netfilter.c b/net/ipv6/netfilter.c
-index 53d255838e6a..61f28b9a2d34 100644
---- a/net/ipv6/netfilter.c
-+++ b/net/ipv6/netfilter.c
-@@ -126,7 +126,7 @@ int br_ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
- 				  struct sk_buff *))
- {
- 	int frag_max_size = BR_INPUT_SKB_CB(skb)->frag_max_size;
--	bool mono_delivery_time = skb->mono_delivery_time;
-+	bool tstamp_type = skb->tstamp_type;
- 	ktime_t tstamp = skb->tstamp;
- 	struct ip6_frag_state state;
- 	u8 *prevhdr, nexthdr = 0;
-@@ -192,7 +192,7 @@ int br_ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
- 			if (iter.frag)
- 				ip6_fraglist_prepare(skb, &iter);
- 
--			skb_set_delivery_time(skb, tstamp, mono_delivery_time);
-+			skb_set_delivery_time(skb, tstamp, tstamp_type);
- 			err = output(net, sk, data, skb);
- 			if (err || !iter.frag)
- 				break;
-@@ -225,7 +225,7 @@ int br_ip6_fragment(struct net *net, struct sock *sk, struct sk_buff *skb,
- 			goto blackhole;
- 		}
- 
--		skb_set_delivery_time(skb2, tstamp, mono_delivery_time);
-+		skb_set_delivery_time(skb2, tstamp, tstamp_type);
- 		err = output(net, sk, data, skb2);
- 		if (err)
- 			goto blackhole;
-diff --git a/net/ipv6/netfilter/nf_conntrack_reasm.c b/net/ipv6/netfilter/nf_conntrack_reasm.c
-index 1a51a44571c3..6376555de1ae 100644
---- a/net/ipv6/netfilter/nf_conntrack_reasm.c
-+++ b/net/ipv6/netfilter/nf_conntrack_reasm.c
-@@ -264,7 +264,7 @@ static int nf_ct_frag6_queue(struct frag_queue *fq, struct sk_buff *skb,
- 		fq->iif = dev->ifindex;
- 
- 	fq->q.stamp = skb->tstamp;
--	fq->q.mono_delivery_time = skb->mono_delivery_time;
-+	fq->q.tstamp_type = skb->tstamp_type;
- 	fq->q.meat += skb->len;
- 	fq->ecn |= ecn;
- 	if (payload_len > fq->q.max_size)
-diff --git a/net/ipv6/reassembly.c b/net/ipv6/reassembly.c
-index acb4f119e11f..ea724ff558b4 100644
---- a/net/ipv6/reassembly.c
-+++ b/net/ipv6/reassembly.c
-@@ -198,7 +198,7 @@ static int ip6_frag_queue(struct frag_queue *fq, struct sk_buff *skb,
- 		fq->iif = dev->ifindex;
- 
- 	fq->q.stamp = skb->tstamp;
--	fq->q.mono_delivery_time = skb->mono_delivery_time;
-+	fq->q.tstamp_type = skb->tstamp_type;
- 	fq->q.meat += skb->len;
- 	fq->ecn |= ecn;
- 	add_frag_mem_limit(fq->q.fqdir, skb->truesize);
-diff --git a/net/sched/act_bpf.c b/net/sched/act_bpf.c
-index 0e3cf11ae5fc..d62edd36b455 100644
---- a/net/sched/act_bpf.c
-+++ b/net/sched/act_bpf.c
-@@ -54,8 +54,8 @@ TC_INDIRECT_SCOPE int tcf_bpf_act(struct sk_buff *skb,
- 		bpf_compute_data_pointers(skb);
- 		filter_res = bpf_prog_run(filter, skb);
- 	}
--	if (unlikely(!skb->tstamp && skb->mono_delivery_time))
--		skb->mono_delivery_time = 0;
-+	if (unlikely(!skb->tstamp && skb->tstamp_type))
-+		skb->tstamp_type = 0;
- 	if (skb_sk_is_prefetched(skb) && filter_res != TC_ACT_OK)
- 		skb_orphan(skb);
- 
-diff --git a/net/sched/cls_bpf.c b/net/sched/cls_bpf.c
-index 5e83e890f6a4..f9cb4378c754 100644
---- a/net/sched/cls_bpf.c
-+++ b/net/sched/cls_bpf.c
-@@ -104,8 +104,8 @@ TC_INDIRECT_SCOPE int cls_bpf_classify(struct sk_buff *skb,
- 			bpf_compute_data_pointers(skb);
- 			filter_res = bpf_prog_run(prog->filter, skb);
- 		}
--		if (unlikely(!skb->tstamp && skb->mono_delivery_time))
--			skb->mono_delivery_time = 0;
-+		if (unlikely(!skb->tstamp && skb->tstamp_type))
-+			skb->tstamp_type = 0;
- 
- 		if (prog->exts_integrated) {
- 			res->class   = 0;
--- 
-2.25.1
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
