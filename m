@@ -1,416 +1,136 @@
-Return-Path: <netdev+bounces-80900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80901-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBA0E88193A
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 22:41:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBB2788196D
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 23:18:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 599F21F21BC2
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 21:41:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 848DBB2474C
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 22:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44AE285955;
-	Wed, 20 Mar 2024 21:41:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F20285C65;
+	Wed, 20 Mar 2024 22:18:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pnJUoYR4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80006.amazon.com (smtp-fw-80006.amazon.com [99.78.197.217])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DD3F1400A
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 21:41:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD68F52F78;
+	Wed, 20 Mar 2024 22:18:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.217
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710970888; cv=none; b=F0ukiZltNruFMwyTKY+ETDs8OtqG060c1Enw2tZANMDLxU7VrPniHWN7AOK1QGt+Rtee1f4pZrdKyMx99hIR4rWD2c4o2UP50NnAwjLJoixsCaWJ5+eZHhYfl6PYJ9zBAY5Bv5KM2ERjGECJVnxnRt3G6XFKpxO4+q+GS7ANt+s=
+	t=1710973113; cv=none; b=Vf3uXsGSylCUxN9vUSmwHlGGkaMwCR6qezRlxEIZ9V2p1IzfSR0FBV/5OlQ/0M0po++w4K+AgERnTsEIaOgGqBA4f7AchJuylNgsysMmh9uxEjD/mPEKQovmwecXgfPI6tUXDshm/KPsejvRHekdF6OFzUeqBYY1uj3l6ziOiY0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710970888; c=relaxed/simple;
-	bh=lIwShWRE1RH4UutF9KXq7V7u+wxGXaGextOuV96WtjM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ePIWdGcB3nP9NXmutkAsLwbj5lrSYmU5mB9X4VPplZX8CCn3J+WlqhmLUYtITzqBdb6IDY8a5ht2ZWD6WZCulOdlNo7qbpoSoh61FYFHcaNms9YALGtTGvSCSLhRUsOinmHuzFaqNUFv9WM/F0m2QyBSr6jh1lBh5X5bTTQxGpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3684e275874so3037285ab.3
-        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 14:41:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710970885; x=1711575685;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SmVrrjalo9YM4iU9/gvZoCra5ETa+uZO/hJohZ6TG30=;
-        b=tiDHQp+1S4nWSpvRJ8hVlh+/Nt6iBpuigBOJGfj3dlr3ayqbgKR+BciUR0/dd+HwRg
-         wSfHSOeN/Kq135El7XfLSg5CKPmN029rqLZUg2ODBUL4wi/OlDHwdKXG8i9J56TZInNI
-         Yxeu4OYqCIhrR/28XbV00E3YtUWvCnDZ2yDtIIBE5/yrY1OND+yL9FMB3G1g0C5txk9m
-         v5UrpyFc3TfLjkbDPuQF7v0r5O1ju3q5laEumfSP27sTBQikbZWdm8DZFZSgLIeBh2X5
-         4P13uiRGAj2AROj4TyaMTlXk7cK/DqWiNc/XGE1AbADjXdf+ajUgagWy9ocxhUS8mauO
-         wV0w==
-X-Forwarded-Encrypted: i=1; AJvYcCVa+gFQHEbCRLYU+5NcYe5VJhz6XTNTFMGxAw+D5WQ8zNJFEns211Twp5p5o6ZFnfjGtZTsgidN1VebPFrr547TIagrmduV
-X-Gm-Message-State: AOJu0YyhD9juu2sOYm0oCGzvqY1Z5NTPlW2bD7G1PqL0lI84hb7BfKMj
-	/EHmOEYPglEOwOsVzvnPdm+fe6Mjsomnv3hNOTrJo/Z4XFOQVkX1hgwMen3WhX1VuPVHxUVi198
-	NRvGoTf/xhuYgV+P9GbcMPBJxLYPUBk3TdcsThy5DHK+ki1RKi/P1O00=
-X-Google-Smtp-Source: AGHT+IGh8Dr6YncD8irfJjiYVBaF+FvGVf8uiSd5bgIptbVLtJZ4n6ARrEsbMBLxm6G6nUpZxpFB4igiXYtCNtXmzJLG2Jrj56sV
+	s=arc-20240116; t=1710973113; c=relaxed/simple;
+	bh=6RCHskeT2RU1mpvpXM4MlikboPygYC9zP58QNF0vw+o=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TKU3nUO5MA3W+oCjAyLdFC5oz/yaSNyy2VRKCEE6tzKV8GStOybmaGzS/d+YfGnUOc8r+190CFFoPqfv0vEqfmKETzI7PQ1K65ffxvqbHD5nqbdkUhV7sjb1Ndg3jLvoG4gzbcYBBX9rnhxrhabJJ2P0WO249DBfUFtJqJ0dyBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=pnJUoYR4; arc=none smtp.client-ip=99.78.197.217
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1710973112; x=1742509112;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=KeocE86M7cxnIG2egIo+ph/Sy8YD4j7ADzzQLHu2U8M=;
+  b=pnJUoYR4/ZlGLU8VhaNNZ90uaaR5JVQfKspAaOG7LgnxeyDDLULqx0kZ
+   pIX6CDWU4hDw7RT6npfY3aHw/DjZ9Gl+430Pc9TzUtnlWyj2pkQ1kOKbr
+   xZvw015XT2NBXQhcr31IuirdDP6R1gZCJCl28QUyhF5oQFeWe7Jka+H0O
+   8=;
+X-IronPort-AV: E=Sophos;i="6.07,141,1708387200"; 
+   d="scan'208";a="281588042"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80006.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2024 22:18:29 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:55675]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.9.15:2525] with esmtp (Farcaster)
+ id 5d501bbe-28c3-4f65-9498-0173a723cae1; Wed, 20 Mar 2024 22:18:28 +0000 (UTC)
+X-Farcaster-Flow-ID: 5d501bbe-28c3-4f65-9498-0173a723cae1
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 20 Mar 2024 22:18:28 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.88.162.81) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Wed, 20 Mar 2024 22:18:26 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <nicolas.cavallari@green-communications.fr>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: Re: [PATCH] ipv6: delay procfs initialization after the ipv6 structs are ready
+Date: Wed, 20 Mar 2024 15:18:13 -0700
+Message-ID: <20240320221813.11611-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20240320171858.2671-1-nicolas.cavallari@green-communications.fr>
+References: <20240320171858.2671-1-nicolas.cavallari@green-communications.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2193:b0:366:9ead:6446 with SMTP id
- j19-20020a056e02219300b003669ead6446mr956236ila.2.1710970885433; Wed, 20 Mar
- 2024 14:41:25 -0700 (PDT)
-Date: Wed, 20 Mar 2024 14:41:25 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000d8fd6b06141e73a4@google.com>
-Subject: [syzbot] [bpf?] [net?] possible deadlock in wq_worker_tick
-From: syzbot <syzbot+8627369462e8429d7cd6@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
-	jakub@cloudflare.com, john.fastabend@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D038UWC002.ant.amazon.com (10.13.139.238) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Hello,
+From: Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
+Date: Wed, 20 Mar 2024 18:17:36 +0100
+> procfs files are created before the structure they reference are
+> initialized.  For example, if6_proc_init() creates procfs files that
+> access structures initialized by addrconf_init().
+> 
+> If ipv6 is compiled as a module and a program manages to open an ipv6
+> procfs file during the loading of the module, it can oops the kernel.
+> 
+> It appears that we were unlucky enough to reproduce this problem
+> multiple times already, out of maybe 100 boots:
+> 
+> NET: Registered PF_INET6 protocol family
+> 8<--- cut here ---
+> pwm-backlight backlight: supply power not found, using dummy regulator
+> Segment Routing with IPv6
+> In-situ OAM (IOAM) with IPv6
+> Unable to handle kernel NULL pointer dereference at virtual address
+>  00000000
+> mt7915e 0000:03:00.0 wlp3s0: renamed from wlan0
+> [00000000] *pgd=00000000
+> Internal error: Oops: 5 [#1] SMP ARM
+> Modules linked in: ipv6 mt7915e mt76_connac_lib mt76 dw_hdmi_imx
+>  mac80211 dw_hdmi drm_display_helper imxdrm drm_dma_helper
+>  drm_kms_helper snd_soc_imx_sgtl5000 syscopyarea sysfillrect sysimgblt
+>  fb_sys_fops imx_ipu_v3 snd_soc_fsl_asoc_card cfg80211 snd_soc_sgtl5000
+>  drm libarc4 snd_soc_fsl_ssi snd_soc_simple_card_utils imx_pcm_dma
+>  snd_soc_core rfkill snd_pcm_dmaengine snd_pcm
+>  drm_panel_orientation_quirks cfbfillrect cfbimgblt cfbcopyarea
+>  snd_timer snd egalax_ts snd_soc_imx_audmux soundcore flexcan mux_mmio
+>  imx2_wdt mux_core can_dev pwm_bl
+> CPU: 2 PID: 850 Comm: snmpd Not tainted 6.1.14 #1
+> Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
+> PC is at if6_seq_start+0x2c/0x98 [ipv6]
+> LR is at init_net+0x0/0xc00
+> [...]
+>  if6_seq_start [ipv6] from seq_read_iter+0xb4/0x510
+>  seq_read_iter from seq_read+0x80/0xac
+>  seq_read from proc_reg_read+0xac/0x100
+>  proc_reg_read from vfs_read+0xb0/0x284
+>  vfs_read from ksys_read+0x64/0xec
+>  ksys_read from ret_fast_syscall+0x0/0x54
+> Exception stack(0xf0e31fa8 to 0xf0e31ff0)
+> 1fa0:                   b67fd0b0 be8a666b 0000000a b67fd148 00000400
+>  00000000
+> 1fc0: b67fd0b0 be8a666b 00000001 00000003 be8a67ec 00000000 b6d7e000
+>  b6c9954a
+> 1fe0: b6d7eb30 be8a6638 b6ef11b4 b6ef0ddc
+> Code: e5931004 e35100ff ca000014 e59e25dc (e7920101)
+> ---[ end trace 0000000000000000 ]---
+> 
+> Signed-off-by: Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
 
-syzbot found the following issue on:
-
-HEAD commit:    ea80e3ed09ab net: ethernet: mtk_eth_soc: fix PPE hanging i..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=13f2ea6e180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
-dashboard link: https://syzkaller.appspot.com/bug?extid=8627369462e8429d7cd6
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15a8fac9180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1619b83a180000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/4c6c49a7ef5c/disk-ea80e3ed.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/242942b30f2d/vmlinux-ea80e3ed.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/74dcc2059655/bzImage-ea80e3ed.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8627369462e8429d7cd6@syzkaller.appspotmail.com
-
-=====================================================
-WARNING: HARDIRQ-safe -> HARDIRQ-unsafe lock order detected
-6.8.0-syzkaller-05221-gea80e3ed09ab #0 Not tainted
------------------------------------------------------
-kworker/0:2/782 [HC0[0]:SC0[2]:HE0:SE0] is trying to acquire:
-ffff888022c5e820 (&htab->buckets[i].lock){+...}-{2:2}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
-ffff888022c5e820 (&htab->buckets[i].lock){+...}-{2:2}, at: sock_hash_delete_elem+0xb0/0x300 net/core/sock_map.c:939
-
-and this task is already holding:
-ffff888014ca0018 (&pool->lock){-.-.}-{2:2}, at: __queue_work+0x6ec/0xec0
-which would create a new lock dependency:
- (&pool->lock){-.-.}-{2:2} -> (&htab->buckets[i].lock){+...}-{2:2}
-
-but this new dependency connects a HARDIRQ-irq-safe lock:
- (&pool->lock){-.-.}-{2:2}
-
-... which became HARDIRQ-irq-safe at:
-  lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-  __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-  _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
-  wq_worker_tick+0x207/0x440 kernel/workqueue.c:1501
-  scheduler_tick+0x375/0x6e0 kernel/sched/core.c:5699
-  update_process_times+0x202/0x230 kernel/time/timer.c:2481
-  tick_periodic+0x190/0x220 kernel/time/tick-common.c:100
-  tick_handle_periodic+0x4a/0x160 kernel/time/tick-common.c:112
-  local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
-  __sysvec_apic_timer_interrupt+0x107/0x3a0 arch/x86/kernel/apic/apic.c:1049
-  instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
-  sysvec_apic_timer_interrupt+0xa1/0xc0 arch/x86/kernel/apic/apic.c:1043
-  asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-  __sanitizer_cov_trace_switch+0x6/0x120 kernel/kcov.c:317
-  unwind_next_frame+0xff6/0x2a00 arch/x86/kernel/unwind_orc.c:581
-  __unwind_start+0x641/0x7c0 arch/x86/kernel/unwind_orc.c:760
-  unwind_start arch/x86/include/asm/unwind.h:64 [inline]
-  arch_stack_walk+0x103/0x1b0 arch/x86/kernel/stacktrace.c:24
-  stack_trace_save+0x118/0x1d0 kernel/stacktrace.c:122
-  save_stack+0xfb/0x1f0 mm/page_owner.c:129
-  __set_page_owner+0x29/0x380 mm/page_owner.c:195
-  set_page_owner include/linux/page_owner.h:31 [inline]
-  post_alloc_hook+0x1ea/0x210 mm/page_alloc.c:1533
-  prep_new_page mm/page_alloc.c:1540 [inline]
-  get_page_from_freelist+0x33ea/0x3580 mm/page_alloc.c:3311
-  __alloc_pages+0x256/0x680 mm/page_alloc.c:4569
-  alloc_pages_mpol+0x3de/0x650 mm/mempolicy.c:2133
-  __get_free_pages+0xc/0x30 mm/page_alloc.c:4616
-  kasan_populate_vmalloc_pte+0x38/0xe0 mm/kasan/shadow.c:311
-  apply_to_pte_range mm/memory.c:2619 [inline]
-  apply_to_pmd_range mm/memory.c:2663 [inline]
-  apply_to_pud_range mm/memory.c:2699 [inline]
-  apply_to_p4d_range mm/memory.c:2735 [inline]
-  __apply_to_page_range+0x8ec/0xe40 mm/memory.c:2769
-  pcpu_get_vm_areas+0x3749/0x4fb0 mm/vmalloc.c:4232
-  pcpu_create_chunk+0x69a/0xbc0 mm/percpu-vm.c:342
-  pcpu_balance_populated mm/percpu.c:2101 [inline]
-  pcpu_balance_workfn+0xc4d/0xd40 mm/percpu.c:2238
-  process_one_work kernel/workqueue.c:3254 [inline]
-  process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
-  worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
-  kthread+0x2f0/0x390 kernel/kthread.c:388
-  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-
-to a HARDIRQ-irq-unsafe lock:
- (&htab->buckets[i].lock){+...}-{2:2}
-
-... which became HARDIRQ-irq-unsafe at:
-...
-  lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-  __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-  _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-  spin_lock_bh include/linux/spinlock.h:356 [inline]
-  sock_hash_free+0x164/0x820 net/core/sock_map.c:1154
-  bpf_map_free_deferred+0xe6/0x110 kernel/bpf/syscall.c:734
-  process_one_work kernel/workqueue.c:3254 [inline]
-  process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
-  worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
-  kthread+0x2f0/0x390 kernel/kthread.c:388
-  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-
-other info that might help us debug this:
-
- Possible interrupt unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&htab->buckets[i].lock);
-                               local_irq_disable();
-                               lock(&pool->lock);
-                               lock(&htab->buckets[i].lock);
-  <Interrupt>
-    lock(&pool->lock);
-
- *** DEADLOCK ***
-
-5 locks held by kworker/0:2/782:
- #0: ffff888014c78948 ((wq_completion)events){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3229 [inline]
- #0: ffff888014c78948 ((wq_completion)events){+.+.}-{0:0}, at: process_scheduled_works+0x8e0/0x1770 kernel/workqueue.c:3335
- #1: ffffc90004097d00 ((work_completion)(&aux->work)){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:3230 [inline]
- #1: ffffc90004097d00 ((work_completion)(&aux->work)){+.+.}-{0:0}, at: process_scheduled_works+0x91b/0x1770 kernel/workqueue.c:3335
- #2: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #2: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
- #2: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: __queue_work+0x198/0xec0 kernel/workqueue.c:2324
- #3: ffff888014ca0018 (&pool->lock){-.-.}-{2:2}, at: __queue_work+0x6ec/0xec0
- #4: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:298 [inline]
- #4: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:750 [inline]
- #4: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: __bpf_trace_run kernel/trace/bpf_trace.c:2380 [inline]
- #4: ffffffff8e131920 (rcu_read_lock){....}-{1:2}, at: bpf_trace_run3+0x14a/0x460 kernel/trace/bpf_trace.c:2421
-
-the dependencies between HARDIRQ-irq-safe lock and the holding lock:
--> (&pool->lock){-.-.}-{2:2} {
-   IN-HARDIRQ-W at:
-                    lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-                    __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-                    _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
-                    wq_worker_tick+0x207/0x440 kernel/workqueue.c:1501
-                    scheduler_tick+0x375/0x6e0 kernel/sched/core.c:5699
-                    update_process_times+0x202/0x230 kernel/time/timer.c:2481
-                    tick_periodic+0x190/0x220 kernel/time/tick-common.c:100
-                    tick_handle_periodic+0x4a/0x160 kernel/time/tick-common.c:112
-                    local_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1032 [inline]
-                    __sysvec_apic_timer_interrupt+0x107/0x3a0 arch/x86/kernel/apic/apic.c:1049
-                    instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
-                    sysvec_apic_timer_interrupt+0xa1/0xc0 arch/x86/kernel/apic/apic.c:1043
-                    asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-                    __sanitizer_cov_trace_switch+0x6/0x120 kernel/kcov.c:317
-                    unwind_next_frame+0xff6/0x2a00 arch/x86/kernel/unwind_orc.c:581
-                    __unwind_start+0x641/0x7c0 arch/x86/kernel/unwind_orc.c:760
-                    unwind_start arch/x86/include/asm/unwind.h:64 [inline]
-                    arch_stack_walk+0x103/0x1b0 arch/x86/kernel/stacktrace.c:24
-                    stack_trace_save+0x118/0x1d0 kernel/stacktrace.c:122
-                    save_stack+0xfb/0x1f0 mm/page_owner.c:129
-                    __set_page_owner+0x29/0x380 mm/page_owner.c:195
-                    set_page_owner include/linux/page_owner.h:31 [inline]
-                    post_alloc_hook+0x1ea/0x210 mm/page_alloc.c:1533
-                    prep_new_page mm/page_alloc.c:1540 [inline]
-                    get_page_from_freelist+0x33ea/0x3580 mm/page_alloc.c:3311
-                    __alloc_pages+0x256/0x680 mm/page_alloc.c:4569
-                    alloc_pages_mpol+0x3de/0x650 mm/mempolicy.c:2133
-                    __get_free_pages+0xc/0x30 mm/page_alloc.c:4616
-                    kasan_populate_vmalloc_pte+0x38/0xe0 mm/kasan/shadow.c:311
-                    apply_to_pte_range mm/memory.c:2619 [inline]
-                    apply_to_pmd_range mm/memory.c:2663 [inline]
-                    apply_to_pud_range mm/memory.c:2699 [inline]
-                    apply_to_p4d_range mm/memory.c:2735 [inline]
-                    __apply_to_page_range+0x8ec/0xe40 mm/memory.c:2769
-                    pcpu_get_vm_areas+0x3749/0x4fb0 mm/vmalloc.c:4232
-                    pcpu_create_chunk+0x69a/0xbc0 mm/percpu-vm.c:342
-                    pcpu_balance_populated mm/percpu.c:2101 [inline]
-                    pcpu_balance_workfn+0xc4d/0xd40 mm/percpu.c:2238
-                    process_one_work kernel/workqueue.c:3254 [inline]
-                    process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
-                    worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
-                    kthread+0x2f0/0x390 kernel/kthread.c:388
-                    ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-                    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-   IN-SOFTIRQ-W at:
-                    lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-                    __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-                    _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
-                    __queue_work+0x6ec/0xec0
-                    call_timer_fn+0x17e/0x600 kernel/time/timer.c:1792
-                    expire_timers kernel/time/timer.c:1838 [inline]
-                    __run_timers kernel/time/timer.c:2408 [inline]
-                    __run_timer_base+0x695/0x8e0 kernel/time/timer.c:2419
-                    run_timer_base kernel/time/timer.c:2428 [inline]
-                    run_timer_softirq+0xb7/0x170 kernel/time/timer.c:2438
-                    __do_softirq+0x2bc/0x943 kernel/softirq.c:554
-                    invoke_softirq kernel/softirq.c:428 [inline]
-                    __irq_exit_rcu+0xf2/0x1c0 kernel/softirq.c:633
-                    irq_exit_rcu+0x9/0x30 kernel/softirq.c:645
-                    instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1043 [inline]
-                    sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1043
-                    asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
-                    native_safe_halt arch/x86/include/asm/irqflags.h:48 [inline]
-                    arch_safe_halt arch/x86/include/asm/irqflags.h:86 [inline]
-                    default_idle+0x13/0x20 arch/x86/kernel/process.c:742
-                    default_idle_call+0x74/0xb0 kernel/sched/idle.c:117
-                    cpuidle_idle_call kernel/sched/idle.c:191 [inline]
-                    do_idle+0x22f/0x5d0 kernel/sched/idle.c:332
-                    cpu_startup_entry+0x42/0x60 kernel/sched/idle.c:430
-                    rest_init+0x2e0/0x300 init/main.c:730
-                    arch_call_rest_init+0xe/0x10 init/main.c:831
-                    start_kernel+0x47a/0x500 init/main.c:1077
-                    x86_64_start_reservations+0x2a/0x30 arch/x86/kernel/head64.c:509
-                    x86_64_start_kernel+0x99/0xa0 arch/x86/kernel/head64.c:490
-                    common_startup_64+0x13e/0x147
-   INITIAL USE at:
-                   lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-                   __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-                   _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
-                   __queue_work+0x6ec/0xec0
-                   queue_work_on+0x14f/0x250 kernel/workqueue.c:2435
-                   queue_work include/linux/workqueue.h:605 [inline]
-                   start_poll_synchronize_rcu_expedited+0xf7/0x150 kernel/rcu/tree_exp.h:1017
-                   rcu_init+0xea/0x140 kernel/rcu/tree.c:5240
-                   start_kernel+0x1f7/0x500 init/main.c:969
-                   x86_64_start_reservations+0x2a/0x30 arch/x86/kernel/head64.c:509
-                   x86_64_start_kernel+0x99/0xa0 arch/x86/kernel/head64.c:490
-                   common_startup_64+0x13e/0x147
- }
- ... key      at: [<ffffffff926c0e60>] init_worker_pool.__key+0x0/0x20
-
-the dependencies between the lock to be acquired
- and HARDIRQ-irq-unsafe lock:
--> (&htab->buckets[i].lock){+...}-{2:2} {
-   HARDIRQ-ON-W at:
-                    lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-                    __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-                    _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-                    spin_lock_bh include/linux/spinlock.h:356 [inline]
-                    sock_hash_free+0x164/0x820 net/core/sock_map.c:1154
-                    bpf_map_free_deferred+0xe6/0x110 kernel/bpf/syscall.c:734
-                    process_one_work kernel/workqueue.c:3254 [inline]
-                    process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
-                    worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
-                    kthread+0x2f0/0x390 kernel/kthread.c:388
-                    ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-                    ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-   INITIAL USE at:
-                   lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-                   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-                   _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-                   spin_lock_bh include/linux/spinlock.h:356 [inline]
-                   sock_hash_free+0x164/0x820 net/core/sock_map.c:1154
-                   bpf_map_free_deferred+0xe6/0x110 kernel/bpf/syscall.c:734
-                   process_one_work kernel/workqueue.c:3254 [inline]
-                   process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
-                   worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
-                   kthread+0x2f0/0x390 kernel/kthread.c:388
-                   ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-                   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
- }
- ... key      at: [<ffffffff94882300>] sock_hash_alloc.__key+0x0/0x20
- ... acquired at:
-   lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
-   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
-   _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
-   spin_lock_bh include/linux/spinlock.h:356 [inline]
-   sock_hash_delete_elem+0xb0/0x300 net/core/sock_map.c:939
-   bpf_prog_2c29ac5cdc6b1842+0x42/0x46
-   bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
-   __bpf_prog_run include/linux/filter.h:657 [inline]
-   bpf_prog_run include/linux/filter.h:664 [inline]
-   __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
-   bpf_trace_run3+0x238/0x460 kernel/trace/bpf_trace.c:2421
-   trace_workqueue_queue_work include/trace/events/workqueue.h:23 [inline]
-   __queue_work+0xe5b/0xec0 kernel/workqueue.c:2382
-   queue_work_on+0x14f/0x250 kernel/workqueue.c:2435
-   __bpf_free_used_maps kernel/bpf/core.c:2716 [inline]
-   bpf_free_used_maps kernel/bpf/core.c:2722 [inline]
-   bpf_prog_free_deferred+0x21d/0x710 kernel/bpf/core.c:2761
-   process_one_work kernel/workqueue.c:3254 [inline]
-   process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
-   worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
-   kthread+0x2f0/0x390 kernel/kthread.c:388
-   ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-
-
-stack backtrace:
-CPU: 0 PID: 782 Comm: kworker/0:2 Not tainted 6.8.0-syzkaller-05221-gea80e3ed09ab #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-Workqueue: events bpf_prog_free_deferred
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
- print_bad_irq_dependency kernel/locking/lockdep.c:2626 [inline]
- check_irq_usage kernel/locking/lockdep.c:2865 [inline]
- check_prev_add kernel/locking/lockdep.c:3138 [inline]
- check_prevs_add kernel/locking/lockdep.c:3253 [inline]
- validate_chain+0x4dc7/0x58e0 kernel/locking/lockdep.c:3869
- __lock_acquire+0x1346/0x1fd0 kernel/locking/lockdep.c:5137
- lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
- _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- sock_hash_delete_elem+0xb0/0x300 net/core/sock_map.c:939
- bpf_prog_2c29ac5cdc6b1842+0x42/0x46
- bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
- __bpf_prog_run include/linux/filter.h:657 [inline]
- bpf_prog_run include/linux/filter.h:664 [inline]
- __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
- bpf_trace_run3+0x238/0x460 kernel/trace/bpf_trace.c:2421
- trace_workqueue_queue_work include/trace/events/workqueue.h:23 [inline]
- __queue_work+0xe5b/0xec0 kernel/workqueue.c:2382
- queue_work_on+0x14f/0x250 kernel/workqueue.c:2435
- __bpf_free_used_maps kernel/bpf/core.c:2716 [inline]
- bpf_free_used_maps kernel/bpf/core.c:2722 [inline]
- bpf_prog_free_deferred+0x21d/0x710 kernel/bpf/core.c:2761
- process_one_work kernel/workqueue.c:3254 [inline]
- process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
- worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
- kthread+0x2f0/0x390 kernel/kthread.c:388
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
