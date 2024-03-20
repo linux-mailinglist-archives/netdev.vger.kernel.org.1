@@ -1,155 +1,207 @@
-Return-Path: <netdev+bounces-80892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3EA3388186F
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 21:12:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C04DD88189A
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 21:31:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C25982818A3
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 20:12:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35FBA1F21FFA
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 20:31:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE0DE8594E;
-	Wed, 20 Mar 2024 20:12:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8233717578;
+	Wed, 20 Mar 2024 20:30:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ugwBxS45"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="trJNLKF7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8180185940;
-	Wed, 20 Mar 2024 20:12:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937A312B97
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 20:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710965554; cv=none; b=UpQTW8DjNG5HBb1zh6Qd5XUUw/lmxGUWCH7LwWo6pzdZ9OCpJqfawQcYDonJW1NCxfFgkq3JeliBKOzAUROLGZb86dU5pZp4KFXKsGXB0QJQgdmpSbKXFnM//eJyVuodS6ok5ORbAzggodRkrp4puS9rrvF1L+/1dpjgacWG+Co=
+	t=1710966656; cv=none; b=KZdqgaEz66Woj4fyQ1EvKQeurZIMH6Aqc+qau3ozMoYNCu9ZUOx9F/fUBjz7mwY2ZabXd2FadG2mPuQ42UAKjocP9/VFpC4h4CYZW29AH1yAYDWJ4tiOdpPDp2NDtEHpiFHc3+jRDQqChfJe5jBMtZ921F+10sgLmg0J9HmWnss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710965554; c=relaxed/simple;
-	bh=picUtc9j30ONjruWmUIIt1zS4ebWfPWBN1xsnqXmIvA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=kPhLVlWV5WoRmcFTx6ksTmF30BhZNrxsbFVk95M6HuxpoA2I6dh2DXrChH8cipIsh6uYN/8woCVUKeRS7TIgVUiQtsyHIJ5Gf1gU24GtD/oiwsLYCkPPOlqAiyrm3bgUn6kIG3558KkGQNwdv+7WGAI6NzDOTtcQIy8ByK68o24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ugwBxS45; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26399C433C7;
-	Wed, 20 Mar 2024 20:12:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710965554;
-	bh=picUtc9j30ONjruWmUIIt1zS4ebWfPWBN1xsnqXmIvA=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=ugwBxS45FwHEXuDQ6LhILv39BzzuJrH9e3Oq6ZmvS54hO/mWuT84LeFJ1Pb6GPJ0T
-	 2Zb8F1pNZmg0qeccpMgJWPdaSuj+7YozZpXrjfqmpyAdxGzlkTdd9D2T+5KcKaYEBU
-	 xzuvaOghYy/kxdKUrsFN7ewlPmK/vi6UR1dbue7f8W+Ay4rlcUgqgK/Rhv01yP3SXB
-	 qPqBeK99Z/DGomwAjkubf8EscVVAjtzVahDYR0VXbsasumvLhf9xn01kNdPxP9lwo5
-	 z2q2av9JKA9VWEb0GzBcDBn4UC2OsRQ6ZHjvxFl0e6bV+gyEUc5YoVQKzVGf2lIMUa
-	 WOTaB2feA5pbg==
-Message-ID: <ca81387b31025198808df6c55f411b00d74cb047.camel@kernel.org>
-Subject: Re: [PATCH RFC 08/24] vfs: make vfs_mknod break delegations on
- parent directory
-From: Jeff Layton <jlayton@kernel.org>
-To: Christian Brauner <brauner@kernel.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, Chuck
- Lever <chuck.lever@oracle.com>, Alexander Aring <alex.aring@gmail.com>,
- Trond Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker
- <anna@kernel.org>, Steve French <sfrench@samba.org>, Paulo Alcantara
- <pc@manguebit.com>, Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam
- Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, David Howells <dhowells@redhat.com>, Tyler Hicks
- <code@tyhicks.com>,  Neil Brown <neilb@suse.de>, Olga Kornievskaia
- <kolga@netapp.com>, Dai Ngo <Dai.Ngo@oracle.com>, Miklos Szeredi
- <miklos@szeredi.hu>, Amir Goldstein <amir73il@gmail.com>, Namjae Jeon
- <linkinjeon@kernel.org>, Sergey Senozhatsky <senozhatsky@chromium.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, linux-fsdevel@vger.kernel.org,
- linux-kernel@vger.kernel.org,  linux-nfs@vger.kernel.org,
- linux-cifs@vger.kernel.org,  samba-technical@lists.samba.org,
- netfs@lists.linux.dev, ecryptfs@vger.kernel.org, 
- linux-unionfs@vger.kernel.org, netdev@vger.kernel.org
-Date: Wed, 20 Mar 2024 16:12:29 -0400
-In-Reply-To: <20240320-jaguar-bildband-699e7ef5dc64@brauner>
-References: <20240315-dir-deleg-v1-0-a1d6209a3654@kernel.org>
-	 <20240315-dir-deleg-v1-8-a1d6209a3654@kernel.org>
-	 <20240320-jaguar-bildband-699e7ef5dc64@brauner>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
-	kZWuOsJdJQdmwlWC5L5ln9xgfr/4mOY38B0U=
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1710966656; c=relaxed/simple;
+	bh=ZZZObk/YowPHtsO1uwyK8eJ5XKLcbo5ffCQqoEZxZmo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HEQaCub27tIcpq2D3sPllWVCz4bFZe3qCfL8BvqEx223OWXe2JW83vvPFNLnm3UD7Z29JEJDMr2OvhH3VdA/68bNS7xaD0jxQ307YinoL5F584CdSz5l28rCCcyg1p6mCZQZH06SvIh6wzmTTU8HWC3MU6xqPX5oMkfvZqI234c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=trJNLKF7; arc=none smtp.client-ip=91.218.175.186
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <a3f8eff9-c51b-43d4-9d69-fe8b48f77473@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1710966652;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=LF+fu9EHYD3041F1vyxJbb1QuQ8m4zUJPrgflEgxH8I=;
+	b=trJNLKF7FMRuhYIASp1pf1wKk2+AsxTA+3VrKy2Vopp5DFX6yYfzBd2Xqtu/vZWErdhy6o
+	qMcT7L4XXwhwijrrGEO4kU182p6tzBLAvjpXTsoZHhpBXqbuVADtCQsPBl9XFiezZFdH5+
+	K4SZVuWAypNaL2lJjrv63ss/iqfcKfQ=
+Date: Wed, 20 Mar 2024 13:30:44 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH net-next v4] net: Re-use and set mono_delivery_time bit
+ for userspace tstamp packets
+Content-Language: en-US
+To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, kernel@quicinc.com,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Andrew Halaney <ahalaney@redhat.com>,
+ Martin KaFai Lau <martin.lau@kernel.org>, bpf <bpf@vger.kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>,
+ Andrii Nakryiko <andrii@kernel.org>
+References: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
+ <2a4cb416-5d95-459d-8c1c-3fb225240363@linux.dev>
+ <65f16946cd33e_344ff1294fc@willemb.c.googlers.com.notmuch>
+ <28282905-065a-4233-a0a2-53aa9b85f381@linux.dev>
+ <65f2004e65802_3d1e792943e@willemb.c.googlers.com.notmuch>
+ <0dff8f05-e18d-47c8-9f19-351c44ea8624@linux.dev>
+ <e5da91bc-5827-4347-ab38-36c92ae2dfa2@quicinc.com>
+ <65f21d65820fc_3d934129463@willemb.c.googlers.com.notmuch>
+ <bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev>
+ <65f2c81fc7988_3ee61729465@willemb.c.googlers.com.notmuch>
+ <5692ddb3-9558-4440-a7bf-47fcc47401ed@linux.dev>
+ <65f35e00a83c0_2132294f5@willemb.c.googlers.com.notmuch>
+ <e270b646-dae0-41cf-9ef8-e991738b9c57@quicinc.com>
+ <8d245f5a-0c75-4634-9513-3d420eb2c88f@linux.dev>
+ <d10254cc-a908-4d81-98d2-2eed715e521f@quicinc.com>
+ <66ad9e5b-0126-476e-bf0f-6a33f446c976@quicinc.com>
+ <ac03f67c-604a-4fb8-a0ca-c187e27855be@quicinc.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <ac03f67c-604a-4fb8-a0ca-c187e27855be@quicinc.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, 2024-03-20 at 14:42 +0100, Christian Brauner wrote:
-> > =A0int vfs_mknod(struct mnt_idmap *, struct inode *, struct dentry *,
-> > -              umode_t, dev_t);
-> > +              umode_t, dev_t, struct inode **);
->=20
-> So we will have at least the following helpers with an additional
-> delegated inode argument.
->=20
-> vfs_unlink()
-> vfs_link()
-> notify_change()
-> vfs_create()
-> vfs_mknod()
-> vfs_mkdir()
-> vfs_rmdir()
->=20
-> From looking at callers all these helpers will be called with non-NULL
-> delegated inode argument in vfs only. Unless it is generally conceivable
-> that other callers will want to pass a non-NULL inode argument over time
-> it might make more sense to add vfs_<operation>_delegated() or
-> __vfs_<operation>() and make vfs_mknod() and friends exported wrappers
-> around it.
->=20
-> I mean it's a matter of preference ultimately but this seems cleaner to
-> me. So at least for the new ones we should consider it. Would also make
-> the patch smaller.
->=20
+On 3/19/24 11:22 PM, Abhishek Chauhan (ABC) wrote:
+> 
+> 
+> On 3/18/2024 12:02 PM, Abhishek Chauhan (ABC) wrote:
+>>
+>>
+>> On 3/14/2024 3:29 PM, Abhishek Chauhan (ABC) wrote:
+>>>
+>>>
+>>> On 3/14/2024 2:48 PM, Martin KaFai Lau wrote:
+>>>> On 3/14/24 1:53 PM, Abhishek Chauhan (ABC) wrote:
+>>>>>>> The bpf_convert_tstamp_{read,write} and the helper bpf_skb_set_tstamp need to be
+>>>>>>> changed to handle the new "user_delivery_time" bit anyway, e.g.
+>>>>>>> bpf_skb_set_tstamp(BPF_SKB_TSTAMP_DELIVERY_MONO) needs to clear the
+>>>>>>> "user_delivery_time" bit.
+>>>>>>>
+>>>>>>> I think the "struct inet_frag_queue" also needs a new "user_delivery_time"
+>>>>>>> field. "mono_delivery_time" is already in there.
+>>>>
+>>>> [ ... ]
+>>>>
+>>
+>> Martin, Do we really need to add user_delivery_time as part of inet_frag_queue struct? I was wondering why is this required since we are using tstamp_type:2 to
+>> distinguish between timestamp anyway .
+>>
+>> Let me know what you think ?
+>>
+>>>> I would think the first step is to revert this patch. I don't think much of the current patch can be reused.
+>>>>
+>>>>> 1. I will raise one patch to introduce rename mono_delivery_time to
+>>>>> tstamp_type
+>>>>
+>>>> Right, I expect something like this:
+>>>>
+>>>> struct sk_buff {
+>>>>          /* ... */
+>>>> -            __u8                    mono_delivery_time:1;
+>>>> +        __u8            tstamp_type:1;
+>>>>          /* ... */
+>>>> };
+>>>>
+>>>
+>>> Okay ,This should be straight-forward.
+>>>
+>>>>> 2. I will introduce setting of userspace timestamp type as the second bit
+>>>>> whem transmit_time is set.
+>>>>
+>>>> I expect the second patch should be introducing the enum first
+>>>>
+>>>> enum skb_tstamp_type {
+>>>>      SKB_TSTAMP_TYPE_RX_REAL = 0, /* A RX (receive) time in real */
+>>>>      SKB_TSTAMP_TYPE_TX_MONO = 1, /* A TX (delivery) time in mono */
+>>>> };
+>>>>
+>>>> and start doing "skb->tstamp_type = SKB_TSTAMP_TYPE_TX_MONO;" instead of
+>>>> "skb->tstamp_type = 1;"
+>>>>
+>>>> and the same for "skb->tstamp_type = SKB_TSTAMP_TYPE_RX_REAL;" instead of
+>>>> "skb->tstamp_type = 0;"
+>>>>
+>>>>
+>>>> This one I am not sure but probably need to change the skb_set_delivery_time() function signature also:
+>>>>
+>>>> static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
+>>>> -                                        bool mono)
+>>>> +                     enum skb_tstamp_type tstamp_type)
+>>>>
+>>> This should be straight-forward as well
+>>>
+>>>> The third patch is to change tstamp_type from 1 bit to 2 bits and add SKB_TSTAMP_TYPE_TX_USER.
+>>>>
+>>>> struct sk_buff {
+>>>>          /* ... */
+>>>> -        __u8            tstamp_type:1;
+>>>> +        __u8            tstamp_type:2;
+>>>>          /* ... */
+>>>> };
+>>>>
+>>>> enum skb_tstamp_type {
+>>>>      SKB_TSTAMP_TYPE_RX_REAL = 0,    /* A RX (receive) time in real */
+>>>>      SKB_TSTAMP_TYPE_TX_MONO = 1,    /* A TX (delivery) time in mono */
+>>>> +    SKB_TSTAMP_TYPE_TX_USER = 2,    /* A TX (delivery) time and its clock
+>>>>                       * is in skb->sk->sk_clockid.
+>>>>                       */
+>>>>                 
+>>>> };
+>>>>
+>>>> This will shift a bit out of the byte where tstamp_type lives. It should be the "inner_protocol_type" bit by my hand count. Please check if it is directly used in bpf instruction (filter.c). As far as I look, it is not, so should be fine. Some details about bpf instruction accessible skb bit field here: https://lore.kernel.org/all/20230321014115.997841-1-kuba@kernel.org/
+>>> This is where i would need thorough reviews from you and Willem as my area of expertise is limited to part of network stack and BPF is not one of them.
+>>> But i have plan on this and i know how to do it.
+>>>
+>>> Expect patches to be arriving to your inboxes next week, as we have a long weekend in Qualcomm
+>>> Fingers crossed :)
+>>>
+>>>>
+>>>>
+>>>>> 3. This will be a first step to make the design scalable.
+>>>>> 4. Tomorrow if we have more timestamp to support, upstream community has to do is
+>>>>> update the enum and increase the bitfield from 2=>3 and so on.
+>>>>>
+>>>>> I need help from Martin to test the patch which renames the mono_delivery_time
+>>>>> to tstamp_type (Which i feel should be straight forward as the value of the bit is 1)
+>>>>
+>>>> The bpf change is not a no-op rename of mono_delivery_time. It needs to take care of the new bit added to the tstamp_type. Please see the previous email (and I also left it in the beginning of this email).
+>>>>
+>>>> Thus, you need to compile the selftests/bpf/ and run it to verify the changes when handling the new bit. The Documentation/bpf/bpf_devel_QA.rst has the howto details. You probably only need the newer llvm (newer gcc should work also as bpf CI has been using it) and the newer pahole. I can definitely help if there is issue in running the test_progs in selftests/bpf or you have question on making the changes in filter.c. To run the test: "./test_progs -t tc_redirect/tc_redirect_dtime"
+>>>>
+> 
+> Martin,
+> I was able to compile test_progs and execute the above command mentioned by you . Does the output look okay for you ?
+> 
+> [ 3076.040766] IPv6: ADDRCONF(NETDEV_CHANGE): veth_src_fwd: link becomes ready
+> [ 3076.040809] IPv6: ADDRCONF(NETDEV_CHANGE): veth_src: link becomes ready
+> [ 3076.072844] IPv6: ADDRCONF(NETDEV_CHANGE): veth_dst: link becomes ready
+> [ 3076.072880] IPv6: ADDRCONF(NETDEV_CHANGE): veth_dst_fwd: link becomes ready
+> #214/5   tc_redirect/tc_redirect_dtime:OK
+> #214     tc_redirect:OK
 
-Good suggestion. I just respun along those lines and it's a lot cleaner.
-I'm still testing it but here is the new diffstat. It's a little larger
-actually, but it keeps the changes more confined to namei.c:
-
-jlayton@tleilax:~/git/linux$ git diff master --stat
- fs/locks.c                |  12 +++-
- fs/namei.c                | 227 ++++++++++++++++++++++++++++++++++++++++++=
-++++--------------------
- fs/nfs/delegation.c       |   5 ++
- fs/nfs/dir.c              |  20 ++++++
- fs/nfs/internal.h         |   2 +-
- fs/nfs/nfs4file.c         |   2 +
- fs/nfs/nfs4proc.c         |  62 +++++++++++++++++-
- fs/nfs/nfs4trace.h        | 104 ++++++++++++++++++++++++++++++
- fs/nfs/nfs4xdr.c          | 136 +++++++++++++++++++++++++++++++++++++++
- fs/nfs/nfstrace.h         |   8 ++-
- fs/nfsd/filecache.c       |  37 +++++++++--
- fs/nfsd/filecache.h       |   2 +
- fs/nfsd/nfs4proc.c        |  48 ++++++++++++++
- fs/nfsd/nfs4state.c       | 113 ++++++++++++++++++++++++++++++++-
- fs/nfsd/nfs4xdr.c         |  91 ++++++++++++++++++++++++++-
- fs/nfsd/state.h           |   5 ++
- fs/nfsd/vfs.c             |   5 +-
- fs/nfsd/vfs.h             |   2 +-
- fs/nfsd/xdr4.h            |  19 ++++++
- fs/smb/client/cifsfs.c    |   3 +
- include/linux/filelock.h  |  14 +++++
- include/linux/nfs4.h      |   7 +++
- include/linux/nfs_fs.h    |   1 +
- include/linux/nfs_fs_sb.h |   1 +
- include/linux/nfs_xdr.h   |   2 +
- 25 files changed, 838 insertions(+), 90 deletions(-)
-
---=20
-Jeff Layton <jlayton@kernel.org>
+lgtm. thanks.
 
