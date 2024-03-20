@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-80716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D7A5880A0C
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 04:10:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89CFA880A0E
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 04:10:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F37FC1F22FD5
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 03:10:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2B38FB21E3B
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 03:10:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54B6210976;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5642010A16;
 	Wed, 20 Mar 2024 03:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jXBwi//I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WhMsKjZx"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30BA8101E8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30BDA101EC
 	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 03:10:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710904229; cv=none; b=qJ0Yz64UlA853fNNY7tVOBummC9pE3oMv7sK1glVY+OawIz4EqmRexTIfjrSyEXcdZ6eLv0kWbzL0ilvglzlffn3sXM50cMfMPL6/i4kMmF7XBcPf0serWPNyCeYgT3AY3gQCmYjg1W2UStv/x+l7D7ym1LM4Z+h5NFV/xBjxeE=
+	t=1710904229; cv=none; b=AXnAcROVYajohy2zB0lbwXBSv7YeUuT9hvGapkG9SkgqdHIBrYNumo8BxkxZcLsyosbFDdwhFZ9spl1j942zMd0hJZC3chC2WZ2na4xXSFrTFBis7DDCLgxa+peeIiR5AY5yUhw5K+tEyUVEA81YRZOqw+rH25h8M2QTvUxOgUA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1710904229; c=relaxed/simple;
-	bh=URnZAuQbJ81Dov0vNaP7Nl3UpyKSHf5yBUDBwuKLAnc=;
+	bh=XC9LExbGc4sgbkJI9YoBREazlw1B/FA8E0LAhQeZFR8=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=FPokDttEkVeYHxR8Q6d26agW7K5d4nAEjHUXvjIBLstLjoYs1+4qNMiz1QKz8ebPDZhGsIVd0zIMJx0fKvHklps2PVSymAcItId40blqOFiYcYy3DekKeGBfIi0WXMeF6NchxJacDIF2EgLwq5WQveL9G7L2+MH9Bwk+zvxpBzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jXBwi//I; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C344CC43394;
+	 In-Reply-To:To:Cc; b=PL2cHD1zDQXwN53mbr8vOGPjC9JTrrpPStl7YIK6HYuQVVJsaEyB9OjkAt2So8g5QPgp0h4zE1F2QY+Pl21gqZvPkdxNLB+t/Ffobl03jzm+ygnFjnTSD1UjhBHfRwB1RRLoGVULfh1M231wyJ101O61rQZA4J4doiykUCX9R0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WhMsKjZx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C9255C43399;
 	Wed, 20 Mar 2024 03:10:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1710904228;
-	bh=URnZAuQbJ81Dov0vNaP7Nl3UpyKSHf5yBUDBwuKLAnc=;
+	bh=XC9LExbGc4sgbkJI9YoBREazlw1B/FA8E0LAhQeZFR8=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=jXBwi//Ip6OgBzkD5gr33j6G5xoPYsv9ebdDUAkDWwaEhGD9hjpQGyX9GvK2yGNVV
-	 /xCiPseYuXLr9Ex3ll6/vo9/Gh09YWSzxL7eChUYlAzsZlO/wKWhmZoJQJpkwWFDvT
-	 kJsji2vQwz1PF/G1uL/RmjgEswbycl+M/xnGG+Qisz4MJjc0G4GFrgwWAx2ROlMyMa
-	 /oaOUI9ahP6kD6l3iPHy/F9tfm7oDTWLIdteNibIt2aWQXViFAbFNwpEX6VT9jasWp
-	 2Saj8yOaamwEX0j+b126zVvWXHIozvMGyFmVcgOw5wjyPAsEitwT0RP5Ig0BF0Gi1p
-	 Pfc6XxVxA79kQ==
+	b=WhMsKjZx7xhqlOML+imkD9o0nN5SCxBZOI18RIxK9X348h3MuHlyMRQANHChjHBvN
+	 d5ZguWd9cmCffCTe1gF0G/W/zbOn3xI7isT8EQrGK14GWLGAToQXULvZj9CFMIrXCE
+	 f22iMuJWeVwEXNyqbqxxi2bnGZawe0MS7Fgw3G5pbZJMQ/dGV/XxCMsinnL809EcUp
+	 fQmpK4ESauqYOWtHl4CfcQgQCUAYJGkVZoljVPLo4xXiMBElCT+RfCIK/0EjVFXxd9
+	 Az1HbY6VpKpCqYxeRKFmwLt2WDhenefBic+HHOpbjoxeZQgvIh+BhdjCb08Sd6YYSH
+	 1VuOWmGYYdBtA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AF002D98302;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B837ED98301;
 	Wed, 20 Mar 2024 03:10:28 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,43 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v11] net/bnx2x: Prevent access to a freed page in page_pool
+Subject: Re: [patch net] devlink: fix port new reply cmd type
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171090422871.19504.16129773459568231603.git-patchwork-notify@kernel.org>
+ <171090422875.19504.8889845619032895082.git-patchwork-notify@kernel.org>
 Date: Wed, 20 Mar 2024 03:10:28 +0000
-References: <20240315205535.1321-1-thinhtr@linux.ibm.com>
-In-Reply-To: <20240315205535.1321-1-thinhtr@linux.ibm.com>
-To: Thinh Tran <thinhtr@linux.ibm.com>
-Cc: jacob.e.keller@intel.com, kuba@kernel.org, netdev@vger.kernel.org,
- VENKATA.SAI.DUGGI@ibm.com, abdhalee@in.ibm.com, aelior@marvell.com,
- davem@davemloft.net, drc@linux.vnet.ibm.com, edumazet@google.com,
- manishc@marvell.com, pabeni@redhat.com, simon.horman@corigine.com,
- skalluru@marvell.com
+References: <20240318091908.2736542-1-jiri@resnulli.us>
+In-Reply-To: <20240318091908.2736542-1-jiri@resnulli.us>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ davem@davemloft.net, edumazet@google.com, parav@nvidia.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Fri, 15 Mar 2024 15:55:35 -0500 you wrote:
-> Fix race condition leading to system crash during EEH error handling
+On Mon, 18 Mar 2024 10:19:08 +0100 you wrote:
+> From: Jiri Pirko <jiri@nvidia.com>
 > 
-> During EEH error recovery, the bnx2x driver's transmit timeout logic
-> could cause a race condition when handling reset tasks. The
-> bnx2x_tx_timeout() schedules reset tasks via bnx2x_sp_rtnl_task(),
-> which ultimately leads to bnx2x_nic_unload(). In bnx2x_nic_unload()
-> SGEs are freed using bnx2x_free_rx_sge_range(). However, this could
-> overlap with the EEH driver's attempt to reset the device using
-> bnx2x_io_slot_reset(), which also tries to free SGEs. This race
-> condition can result in system crashes due to accessing freed memory
-> locations in bnx2x_free_rx_sge()
+> Due to a c&p error, port new reply fills-up cmd with wrong value,
+> any other existing port command replies and notifications.
+> 
+> Fix it by filling cmd with value DEVLINK_CMD_PORT_NEW.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v11] net/bnx2x: Prevent access to a freed page in page_pool
-    https://git.kernel.org/netdev/net/c/d27e2da94a42
+  - [net] devlink: fix port new reply cmd type
+    https://git.kernel.org/netdev/net/c/78a2f5e6c15d
 
 You are awesome, thank you!
 -- 
