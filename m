@@ -1,225 +1,149 @@
-Return-Path: <netdev+bounces-80819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB2F18812B6
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 14:53:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDB458812BB
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 14:55:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 107EBB218E0
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 13:53:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 648B51F2536B
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 13:55:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EB1941C93;
-	Wed, 20 Mar 2024 13:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB78243179;
+	Wed, 20 Mar 2024 13:55:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="KX/wcd4c"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="154gHE8q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BBB341C85
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 13:53:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2F041C85
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 13:55:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710942815; cv=none; b=T3aRvM7ZbR4P9zYlgAyGn78PbscLBSTqP/qKz4mG9X1K7UEGNt7qtzVKYQfP6jb2lv+2PwsRkW+RgadttrKVNyCpqBa9HaeD9dNXaPoUURGp4va0HQ3xGwlyLbdcuZXeAxuCcCRNYg1AFjaI9Jswy2qYHZYyMVRsOCXC0Lo+Tvs=
+	t=1710942902; cv=none; b=scp8JVGC9JAwq0qDPbq8MCRWXWuTX8ZF2QIagNiyznNH/8d+X5oXHMLHEf6boYi4rXOBPwickkZZJnzp0uFfO0m/E9WhPPwO43Lx5cSYMtBxIUTIbMCTilpFFyka5yTiYlM3qgl/JTpYldgN1NhCPcCUmmt4VJJomHqjR4nSy/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710942815; c=relaxed/simple;
-	bh=ly8fHhevMrUPHAa1SJdVK4I83vyhT+PL07JMQ4uQjVE=;
+	s=arc-20240116; t=1710942902; c=relaxed/simple;
+	bh=r4Ox4Fkb6OTqvzf3uywc2+X20ucxQSfPB6rzlahv6SI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XaPVkg9c9DqYQPlGsOfp3VaoeVNohS5qTmPSlF7iiIrAg5n++j4FMkGSDn8YwCYwrmPuCeUawOAuJqgJT5QH7Mjad6+fSHLqf82MMRNt/ct0C+29bPC8qGmgBHm8G5z7RAatUb6jRD/Lbv++kOkWAHBeudLEGHh+2qtzR59aO84=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=KX/wcd4c; arc=none smtp.client-ip=209.85.167.52
+	 Content-Type:Content-Disposition:In-Reply-To; b=C1DOxi/UwMgxeK/HrtV68EEV6LRVl5fTOtN8R4hHYU6UUxtadYfxY71SRlG26/RQvQRbwcFPkMIe4DmZ0ws/iIRK50ytENcIoiYaATNwRj4UUvYMQYe3UncBZeV70u1Ff/YRBz+1V24zBJm5h8SuOuGUtP67uSn4i9VgYccx3Z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=154gHE8q; arc=none smtp.client-ip=209.85.128.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-513d717269fso7408114e87.0
-        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 06:53:33 -0700 (PDT)
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-414689ba80eso11802095e9.2
+        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 06:55:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710942812; x=1711547612; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ChZ+TyXOvYy1ah8gL21kzvgA8EEA23PpGW0mrSGZkzk=;
-        b=KX/wcd4ccGINwKflR4v/bqWjZ+UfuVsBHJNewtk4VbWvP7+wBVNMjEAxPOfGijNwSN
-         o2SG7TuMsN6kRxBlKs6fL+b2/Zz/LvdX/MvRmGkysiGvMp9qdPzkRP7RG6eeURzbS5xy
-         wRqb8MRbSmqSxH9+IglKgQnh5JypmRf4kA3t1fri2r/RlHypxUw38ymtkW2GkXVi1KZD
-         3a7b88dd8OzFl/94Zt8axo/7Y2tUvjCgRjWgHDBenN4ZVrQgh/zFlciBnOM4NegA2AkQ
-         txuubsYrMfK7ozHRy+oUfU/lf5NPuu8XbAaX9Nlv1EVLbHU3cVfxgpQPQityycCX+WxM
-         rZiw==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710942899; x=1711547699; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=etnN6SZNp2ppKiE78svR6WauCS8nWrn17DdW65QvDEA=;
+        b=154gHE8qy7yOZCJJ1Xt/LeHIcIGT/hYh7JqT7waAlJKMVXBMbUbFpS7WJEUCUjy8jP
+         xjNnQ7fizKDe/MvKfylyQ/dRZHF3d+k7jWRzxpSrTbmrjMnWmvo41vC+e93HLfLTqUNS
+         fOGCoFpYCeFN63zrAwiBE/EsMNyrGO6XkkldNtyvzXXUoAlqdDVkUk1XqUskCfNAVNqv
+         /jGIstUEvqSCgAlAuy8nPngV63TPslRtYTthqIaxlaIzW+26xBw+yp+RzOWAkwVTtqiz
+         HLMEjGVzayyO9EYZ5nMc5myUTJoobuL1wNPoHcjN8NBp/T0Dm9/uRgMr5mPc/6037yHA
+         K+5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710942812; x=1711547612;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ChZ+TyXOvYy1ah8gL21kzvgA8EEA23PpGW0mrSGZkzk=;
-        b=n4PfnfzFqyu0gjiYgnkqXOYu1vN9kiiAQA4N7o6cIoRgNNbUPXKF85GwLxZMPECjKt
-         lBcuTUZlETvkNOv9PdpDw53jt5kzg+XoPtKZ7MoCc9ySgBgaXtWdfHT/gwynjpQ0B/Q8
-         pfX4Za1ihj0/6Y05Frxl9jVAFfU8HDRFxwnSTZNWpZVibKavLYAEx3moJRO00PwV4RUK
-         eYodDoMbrznENjUROCUwnT64+71xxuaDvAe15IFUUwHIcPADVyzU40BjZWLDZC37SMIL
-         tc76fNDuFkUPaEkRviWZ18WL27hq5ElfZWy8PYK+yZUxE1wwUEM4Ww706ef90C6n4fqR
-         YQ1Q==
-X-Gm-Message-State: AOJu0Ywe6+PuEkzzzQZPrAdY3UXoHakqPHGTbm76XCRFGRc9ZHQqQSry
-	v52/goWobFwlTr7ffK0M0mjeozWIUugnSoaMM67T4j3XZ9bo4eYGXbcBE6geRlw=
-X-Google-Smtp-Source: AGHT+IFg3/d06M8z52w1yeILFGztJOLlV7D8UkzEPm+JNf1V8eTqV8gVcYkKpnKeszsVnZT5RwcR+Q==
-X-Received: by 2002:ac2:4d09:0:b0:513:e918:42e9 with SMTP id r9-20020ac24d09000000b00513e91842e9mr1790375lfi.62.1710942811584;
-        Wed, 20 Mar 2024 06:53:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710942899; x=1711547699;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=etnN6SZNp2ppKiE78svR6WauCS8nWrn17DdW65QvDEA=;
+        b=bckNdmK4HQ1MTxhXhRtB0gpSxmOsOn7qFRew5OvPRx8gBzrSJKxDxcqWu8ohfpNfBv
+         oRQK6ZrjWmxsduruZrHu3zpswbzan2Re7azZGKYT8m2H6KkOXyGa7mj+VAz5167FWzvU
+         mcGFOVldqSiAUvTXy0Xo8xtCtOuRMadhFvb3EXeOLd97KyK0xpcxIezof2vCjBRLyM0u
+         nIpgsBso70Kypm8OIcHRN2GbOUek9MKZgG9peQjXFOEuh7Y8sEpMIvtQFlb4iATyvqrN
+         O4//w+Wa7dpwLIrcH1oQ64AyqaGaXMP7e9EDV+n6MH0ziQY23Wc557u9bZI0uJ7xlKJl
+         DaRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUciwVuHE5dQQK+JYjQiFue4/Zbw5WiPvcbg1Wm4I2IWz6f01qfKYJQ1/9hozphZWaOjYDT5seTVLsQbNFPpa0gewcuRPDQ
+X-Gm-Message-State: AOJu0Yw+ODFgiB5nvS+wNKRoVgLeUQoFx8RzZ4M7OTjDMNMdWFEf3nZA
+	4FiVkcmF1jTG31pk2ZvCBNh7NdS+6WfZgioBJGTg7tIyp/w7BDCrIo3u+kE01Mk=
+X-Google-Smtp-Source: AGHT+IEpHJYPqFkm54qsQPALph+urmE6SbsV52Q/66EPFqFlXg1+XSmnIdO3q28cfq7EEso8Wo5/gQ==
+X-Received: by 2002:a05:600c:3106:b0:414:846:4469 with SMTP id g6-20020a05600c310600b0041408464469mr1779197wmo.38.1710942899121;
+        Wed, 20 Mar 2024 06:54:59 -0700 (PDT)
 Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id m5-20020a05600c4f4500b00414692977c3sm2325201wmq.14.2024.03.20.06.53.30
+        by smtp.gmail.com with ESMTPSA id t17-20020a05600c199100b004146e58cc32sm1397539wmq.12.2024.03.20.06.54.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Mar 2024 06:53:30 -0700 (PDT)
-Date: Wed, 20 Mar 2024 14:53:29 +0100
+        Wed, 20 Mar 2024 06:54:58 -0700 (PDT)
+Date: Wed, 20 Mar 2024 14:54:57 +0100
 From: Jiri Pirko <jiri@resnulli.us>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com,
-	linux-kernel@vger.kernel.org, bryan.whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net V2 1/2] net: lan743x: disable WOL upon resume to
- restore full data path operation
-Message-ID: <ZfrqWec_eiPw1uzd@nanopsycho>
-References: <20240320042107.903051-1-Raju.Lakkaraju@microchip.com>
- <20240320042107.903051-2-Raju.Lakkaraju@microchip.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Anastasia Belova <abelova@astralinux.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+Subject: Re: [PATCH] flow_dissector: prevent NULL pointer dereference in
+ __skb_flow_dissect
+Message-ID: <ZfrqsQJtIliZDjQc@nanopsycho>
+References: <20240320125635.1444-1-abelova@astralinux.ru>
+ <Zfrmv4u0tVcYGS5n@nanopsycho>
+ <CANn89iLz4ZesK23DQJmMdn5EA2akh_z+8ZLU-oEuRKy3JDEbAw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240320042107.903051-2-Raju.Lakkaraju@microchip.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89iLz4ZesK23DQJmMdn5EA2akh_z+8ZLU-oEuRKy3JDEbAw@mail.gmail.com>
 
-Wed, Mar 20, 2024 at 05:21:06AM CET, Raju.Lakkaraju@microchip.com wrote:
->In order for datapath to be restored to normal functionality after resume
->we disable all wakeup events. Additionally we clear all W1C status bits by
->writing 1's to them.
+Wed, Mar 20, 2024 at 02:43:22PM CET, edumazet@google.com wrote:
+>On Wed, Mar 20, 2024 at 2:38 PM Jiri Pirko <jiri@resnulli.us> wrote:
+>>
+>> Wed, Mar 20, 2024 at 01:56:35PM CET, abelova@astralinux.ru wrote:
+>> >skb is an optional parameter, so it may be NULL.
+>> >Add check defore dereference in eth_hdr.
+>> >
+>> >Found by Linux Verification Center (linuxtesting.org) with SVACE.
+>>
+>> Either drop this line which provides no value, or attach a link to the
+>> actual report.
+>>
+>>
+>> >
+>> >Fixes: 67a900cc0436 ("flow_dissector: introduce support for Ethernet addresses")
+>>
+>> This looks incorrect. I believe that this is the offending commit:
+>> commit 690e36e726d00d2528bc569809048adf61550d80
+>> Author: David S. Miller <davem@davemloft.net>
+>> Date:   Sat Aug 23 12:13:41 2014 -0700
+>>
+>>     net: Allow raw buffers to be passed into the flow dissector.
+>>
+>>
+>>
+>> >Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
+>> >---
+>> > net/core/flow_dissector.c | 2 +-
+>> > 1 file changed, 1 insertion(+), 1 deletion(-)
+>> >
+>> >diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
+>> >index 272f09251343..05db3a8aa771 100644
+>> >--- a/net/core/flow_dissector.c
+>> >+++ b/net/core/flow_dissector.c
+>> >@@ -1137,7 +1137,7 @@ bool __skb_flow_dissect(const struct net *net,
+>> >               rcu_read_unlock();
+>> >       }
+>> >
+>> >-      if (dissector_uses_key(flow_dissector,
+>> >+      if (skb && dissector_uses_key(flow_dissector,
+>> >                              FLOW_DISSECTOR_KEY_ETH_ADDRS)) {
+>> >               struct ethhdr *eth = eth_hdr(skb);
+>> >               struct flow_dissector_key_eth_addrs *key_eth_addrs;
+>>
+>> Looks like FLOW_DISSECT_RET_OUT_BAD should be returned in case the
+>> FLOW_DISSECTOR_KEY_ETH_ADDRS are selected and there is no skb, no?
+>>
+>
+>It would be nice knowing in which context we could have a NULL skb and
+>FLOW_DISSECTOR_KEY_ETH_ADDRS
+>at the same time.
+>
+>It seems this fix is based on some kind of static analysis, but no real bug.
 
-Not sure who's "we", but in the patch description, it is good to
-describe the problem first and then to describe the fix but telling the
-codebase what to do/change/fix in imperative mood:
-
-https://www.kernel.org/doc/html/v6.6/process/submitting-patches.html#describe-your-changes
-
-
->
->Fixes: 4d94282afd95 ("lan743x: Add power management support")
->Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
->---
->Change List:
->------------
->V1 -> V2:
->  - Repost - No change
->V0 -> V1:
->  - Variable "data" change from "int" to "unsigned int"
->
-> drivers/net/ethernet/microchip/lan743x_main.c | 24 ++++++++++++++++++-
-> drivers/net/ethernet/microchip/lan743x_main.h | 24 +++++++++++++++++++
-> 2 files changed, 47 insertions(+), 1 deletion(-)
->
->diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
->index bd8aa83b47e5..385e9dcd8cd9 100644
->--- a/drivers/net/ethernet/microchip/lan743x_main.c
->+++ b/drivers/net/ethernet/microchip/lan743x_main.c
->@@ -3550,7 +3550,7 @@ static void lan743x_pm_set_wol(struct lan743x_adapter *adapter)
-> 
-> 	/* clear wake settings */
-> 	pmtctl = lan743x_csr_read(adapter, PMT_CTL);
->-	pmtctl |= PMT_CTL_WUPS_MASK_;
->+	pmtctl |= PMT_CTL_WUPS_MASK_ | PMT_CTL_RES_CLR_WKP_MASK_;
-> 	pmtctl &= ~(PMT_CTL_GPIO_WAKEUP_EN_ | PMT_CTL_EEE_WAKEUP_EN_ |
-> 		PMT_CTL_WOL_EN_ | PMT_CTL_MAC_D3_RX_CLK_OVR_ |
-> 		PMT_CTL_RX_FCT_RFE_D3_CLK_OVR_ | PMT_CTL_ETH_PHY_WAKE_EN_);
->@@ -3685,6 +3685,7 @@ static int lan743x_pm_resume(struct device *dev)
-> 	struct pci_dev *pdev = to_pci_dev(dev);
-> 	struct net_device *netdev = pci_get_drvdata(pdev);
-> 	struct lan743x_adapter *adapter = netdev_priv(netdev);
->+	u32 data;
-> 	int ret;
-> 
-> 	pci_set_power_state(pdev, PCI_D0);
->@@ -3715,6 +3716,27 @@ static int lan743x_pm_resume(struct device *dev)
-> 	netif_info(adapter, drv, adapter->netdev,
-> 		   "Wakeup source : 0x%08X\n", ret);
-> 
->+	/* Clear the wol configuration and status bits when system
->+	 * events occurs.
->+	 * The status bits are "Write One to Clear (W1C)"
->+	 */
->+	data = MAC_WUCSR_EEE_TX_WAKE_ | MAC_WUCSR_EEE_RX_WAKE_ |
->+	       MAC_WUCSR_RFE_WAKE_FR_ | MAC_WUCSR_PFDA_FR_ | MAC_WUCSR_WUFR_ |
->+	       MAC_WUCSR_MPR_ | MAC_WUCSR_BCAST_FR_;
->+	lan743x_csr_write(adapter, MAC_WUCSR, data);
->+
->+	data = MAC_WUCSR2_NS_RCD_ | MAC_WUCSR2_ARP_RCD_ |
->+	       MAC_WUCSR2_IPV6_TCPSYN_RCD_ | MAC_WUCSR2_IPV4_TCPSYN_RCD_;
->+	lan743x_csr_write(adapter, MAC_WUCSR2, data);
->+
->+	data = MAC_WK_SRC_ETH_PHY_WK_ | MAC_WK_SRC_IPV6_TCPSYN_RCD_WK_ |
->+	       MAC_WK_SRC_IPV4_TCPSYN_RCD_WK_ | MAC_WK_SRC_EEE_TX_WK_ |
->+	       MAC_WK_SRC_EEE_RX_WK_ | MAC_WK_SRC_RFE_FR_WK_ |
->+	       MAC_WK_SRC_PFDA_FR_WK_ | MAC_WK_SRC_MP_FR_WK_ |
->+	       MAC_WK_SRC_BCAST_FR_WK_ | MAC_WK_SRC_WU_FR_WK_ |
->+	       MAC_WK_SRC_WK_FR_SAVED_;
->+	lan743x_csr_write(adapter, MAC_WK_SRC, data);
->+
-> 	return 0;
-> }
-> 
->diff --git a/drivers/net/ethernet/microchip/lan743x_main.h b/drivers/net/ethernet/microchip/lan743x_main.h
->index be79cb0ae5af..77fc3abc1428 100644
->--- a/drivers/net/ethernet/microchip/lan743x_main.h
->+++ b/drivers/net/ethernet/microchip/lan743x_main.h
->@@ -60,6 +60,7 @@
-> #define PMT_CTL_RX_FCT_RFE_D3_CLK_OVR_		BIT(18)
-> #define PMT_CTL_GPIO_WAKEUP_EN_			BIT(15)
-> #define PMT_CTL_EEE_WAKEUP_EN_			BIT(13)
->+#define PMT_CTL_RES_CLR_WKP_MASK_		GENMASK(9, 8)
-> #define PMT_CTL_READY_				BIT(7)
-> #define PMT_CTL_ETH_PHY_RST_			BIT(4)
-> #define PMT_CTL_WOL_EN_				BIT(3)
->@@ -226,12 +227,31 @@
-> #define MAC_WUCSR				(0x140)
-> #define MAC_MP_SO_EN_				BIT(21)
-> #define MAC_WUCSR_RFE_WAKE_EN_			BIT(14)
->+#define MAC_WUCSR_EEE_TX_WAKE_			BIT(13)
->+#define MAC_WUCSR_EEE_RX_WAKE_			BIT(11)
->+#define MAC_WUCSR_RFE_WAKE_FR_			BIT(9)
->+#define MAC_WUCSR_PFDA_FR_			BIT(7)
->+#define MAC_WUCSR_WUFR_				BIT(6)
->+#define MAC_WUCSR_MPR_				BIT(5)
->+#define MAC_WUCSR_BCAST_FR_			BIT(4)
-> #define MAC_WUCSR_PFDA_EN_			BIT(3)
-> #define MAC_WUCSR_WAKE_EN_			BIT(2)
-> #define MAC_WUCSR_MPEN_				BIT(1)
-> #define MAC_WUCSR_BCST_EN_			BIT(0)
-> 
-> #define MAC_WK_SRC				(0x144)
->+#define MAC_WK_SRC_ETH_PHY_WK_			BIT(17)
->+#define MAC_WK_SRC_IPV6_TCPSYN_RCD_WK_		BIT(16)
->+#define MAC_WK_SRC_IPV4_TCPSYN_RCD_WK_		BIT(15)
->+#define MAC_WK_SRC_EEE_TX_WK_			BIT(14)
->+#define MAC_WK_SRC_EEE_RX_WK_			BIT(13)
->+#define MAC_WK_SRC_RFE_FR_WK_			BIT(12)
->+#define MAC_WK_SRC_PFDA_FR_WK_			BIT(11)
->+#define MAC_WK_SRC_MP_FR_WK_			BIT(10)
->+#define MAC_WK_SRC_BCAST_FR_WK_			BIT(9)
->+#define MAC_WK_SRC_WU_FR_WK_			BIT(8)
->+#define MAC_WK_SRC_WK_FR_SAVED_			BIT(7)
->+
-> #define MAC_MP_SO_HI				(0x148)
-> #define MAC_MP_SO_LO				(0x14C)
-> 
->@@ -294,6 +314,10 @@
-> #define RFE_INDX(index)			(0x580 + (index << 2))
-> 
-> #define MAC_WUCSR2			(0x600)
->+#define MAC_WUCSR2_NS_RCD_		BIT(7)
->+#define MAC_WUCSR2_ARP_RCD_		BIT(6)
->+#define MAC_WUCSR2_IPV6_TCPSYN_RCD_	BIT(5)
->+#define MAC_WUCSR2_IPV4_TCPSYN_RCD_	BIT(4)
-> 
-> #define SGMII_ACC			(0x720)
-> #define SGMII_ACC_SGMII_BZY_		BIT(31)
->-- 
->2.34.1
->
->
+Yeah, I agree. That's the main reason I asked for the link to the report.
 
