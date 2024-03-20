@@ -1,57 +1,57 @@
-Return-Path: <netdev+bounces-80789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEF168810EE
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 12:29:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 868458810F7
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 12:31:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F3501F242F1
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:29:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B5D2F1C20B8F
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:30:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E1773D556;
-	Wed, 20 Mar 2024 11:29:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA60A3D57A;
+	Wed, 20 Mar 2024 11:30:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="A5Ce6O1t";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="6AbpP4Vo"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="MET3jxyq";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="KD+F/3vI"
 X-Original-To: netdev@vger.kernel.org
 Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19A363D541;
-	Wed, 20 Mar 2024 11:29:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2A7A3BBC8;
+	Wed, 20 Mar 2024 11:30:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710934151; cv=none; b=B/7C4mGHtuWVKt2NlMNKeqsaTjGdY0SRa+7CBHEHpYCgeKiQzr1z/bqXqBXE9s6LuTcthkJOIW5ZU9SLed1QzIwss31Nve8jMUmXyebTEJigJvMkovopxefFrwSUebe0pPPx9a85jZSc8ppyKxqtn4IObehKawbaXACJJRTYpcE=
+	t=1710934256; cv=none; b=dZtF/N88IPJDVE/cwljpyuWXFhn9maDRfKXwdLcZbFXMugA8RNkrv3GjLGLoIxHVfCIjAD4VCf1EerZ0dI2pN2Y3UDSfqKvluooT+x+hMu0xrcrG8dfhVYEglXzAqBG5GvJu+jaUM45GzXoFvM37Uozs2wdrUgl1hTQ2YIZ+PKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710934151; c=relaxed/simple;
-	bh=M4qZDfeqdgUN7WwW07gOdPYTQ8hzgSGfC9I8vI9ySrQ=;
+	s=arc-20240116; t=1710934256; c=relaxed/simple;
+	bh=a8TOprEuyws5CRENEXE+KPayvt7+FUvQnptRl61id2g=;
 	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=Pbhkvagy/oJmYgSZmasExGQ9maLGZ8bcSz4GP2dDbaGsnUoRq7Ge1pmjweSXeG0+sV3Er0Gu/Lu2LOkcuewY1crcqFe26by1hU2soyAG5cEtSEw/dS21c965fJtp5A5XGI39XGaco6P8Ql7PN1ypaJpPitK7fL2ZPSNwipQhdbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=A5Ce6O1t; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=6AbpP4Vo; arc=none smtp.client-ip=193.142.43.55
+	 MIME-Version:Content-Type; b=VjzTdcXQDUf/yZItJ/KhFghpbxqzXP2DVzahW+5TDyS+cRg62pJJ3DtZxH+Tf8srnVKGqPb7M29i7PK2fLcuTqju5I1Sq0FQPJQAqTBLK1cYatoTn9ThlR2m6FKVfLMAD7pPKnL7yT3ChavhYBTgYR6tm3wX75UH8BkgGnErVy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=MET3jxyq; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=KD+F/3vI; arc=none smtp.client-ip=193.142.43.55
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
 From: Thomas Gleixner <tglx@linutronix.de>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1710934148;
+	s=2020; t=1710934253;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=M4qZDfeqdgUN7WwW07gOdPYTQ8hzgSGfC9I8vI9ySrQ=;
-	b=A5Ce6O1tFxISLyNmqEAZsC9uJLadVd1q3mUS3sjqQ4msM7jFzzl79ffArFw+5Hvx0kNO4o
-	QPnJExm9F+pf/ZrruBvzkEquNVkyZyRDxIecapw+UAPWH/+V2hQpvbUDKl15gbqoABhlLq
-	+hzuxBEzbsujR4jnk2Xfpjk2IIDQrFPFhY3aJ/ktQsASuYS0VGsAHjQEG679MbXA6/b4xn
-	9tIuH8P88GR6nzKxlWTRKd7EA/eXU5YGpVs/to5qzFuAqQxJsrrbPRHiNqjnMjs5T9vJ5b
-	suCc3kbrUVmlBwGHnJLosTvbfQ780/i9scNqwwYj7kDawAUignheWsMht8MaTQ==
+	bh=pwE/GBJYLkV/7/yUUomeUZHide/jRSkFJUzETBE/thU=;
+	b=MET3jxyqm1sXOQn5gphkidNCjfG+Tr/p2/ki9n+/AqGfDi6uzTb2aT/MyL+ioOWks6ndHO
+	MI95oCOA1zQP2cwvzPcoi7DRiq7z2zXhoQrgJCUxMxEHjz9x4uvFfD/XYPX3zBQTUr65XL
+	lNTFECeMgVwWMspuPc3Omri78q9n2MBo8amNB3KLmOlgidIbjna0YRPG5+YXucDf8l0X6t
+	Xe5iJoS5QZsKia9g+j3+SDVmp31i41KL3GoBs5cawaUNf+yvjjaPvcxueJEeMTUBz6dcYS
+	q1ELLfg0R+vKzoni0nnLM5iim2DRcVOb6v7gUhRjGS7rNFMU1AXrXD/j6iMeew==
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1710934148;
+	s=2020e; t=1710934253;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=M4qZDfeqdgUN7WwW07gOdPYTQ8hzgSGfC9I8vI9ySrQ=;
-	b=6AbpP4VorMVdt2xHPU/GrukrmO9bQSz9DqdX8PyH0teQhWqnYHp1IKhd40ae9cWC2jPdLz
-	UraY84+UL0kipbCg==
+	bh=pwE/GBJYLkV/7/yUUomeUZHide/jRSkFJUzETBE/thU=;
+	b=KD+F/3vIh9T1cQ/PXywhSvE5rgPwIOfCSkG52QZ7ALq7BZCiJ1z2qhgQYCog3Dp3vC7iyf
+	WkvevLWZUyLc3cCw==
 To: lakshmi.sowjanya.d@intel.com, jstultz@google.com, giometti@enneenne.com,
  corbet@lwn.net, linux-kernel@vger.kernel.org
 Cc: x86@kernel.org, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
@@ -64,13 +64,13 @@ Cc: x86@kernel.org, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
  pandith.n@intel.com, mallikarjunappa.sangannavar@intel.com,
  subramanian.mohan@intel.com, basavaraj.goudar@intel.com,
  thejesh.reddy.t.r@intel.com, lakshmi.sowjanya.d@intel.com
-Subject: Re: [PATCH v5 02/11] timekeeping: Add function to convert realtime
- to base clock
-In-Reply-To: <20240319130547.4195-3-lakshmi.sowjanya.d@intel.com>
+Subject: Re: [PATCH v5 01/11] x86/tsc: Add base clock properties in
+ clocksource structure
+In-Reply-To: <875xxhi1ty.ffs@tglx>
 References: <20240319130547.4195-1-lakshmi.sowjanya.d@intel.com>
- <20240319130547.4195-3-lakshmi.sowjanya.d@intel.com>
-Date: Wed, 20 Mar 2024 12:29:07 +0100
-Message-ID: <8734sli1ks.ffs@tglx>
+ <20240319130547.4195-2-lakshmi.sowjanya.d@intel.com> <875xxhi1ty.ffs@tglx>
+Date: Wed, 20 Mar 2024 12:30:52 +0100
+Message-ID: <87zfutgmxf.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,17 +79,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain
 
-On Tue, Mar 19 2024 at 18:35, lakshmi.sowjanya.d@intel.com wrote:
-> From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
->
-> PPS(Pulse Per Second) generates signals in realtime, but Timed IO
-> hardware understands time in base clock reference. Add an interface,
-> ktime_real_to_base_clock() to convert realtime to base clock.
->
-> Convert the base clock to the system clock using convert_base_to_cs() in
-> get_device_system_crosststamp().
+On Wed, Mar 20 2024 at 12:23, Thomas Gleixner wrote:
 
-This really is doing two unrelated things. ktime_real_to_base_clock()
-has absolutely nothing to do with the clocksource_base related changes
-to get_device_system_crosststamp()
+> On Tue, Mar 19 2024 at 18:35, lakshmi.sowjanya.d@intel.com wrote:
+>> From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
+>>
+>> Add base clock hardware abstraction in clocksource structure.
+>>
+>> Add clocksource ID for x86 ART(Always Running Timer).
+>
+> This change log tells the WHAT but not the WHY. You have to add context
+> and explanation WHY this change is required and why it makes sense.
+>
+> Also I think this should be ordered differently:
+>
+>   1) Add the clocksource_base struct and provide the infrastructure in
+>      get_device_system_crosststamp()
+>
+>   2) Make TSC/ART use it
+
+    2a) Remove the art to tsc conversion in drivers
+    2b) Remove art to tsc
+
+>   3) Add the realtime muck
+>
+> Thanks,
+>
+>         tglx
 
