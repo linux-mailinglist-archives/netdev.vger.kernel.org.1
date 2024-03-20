@@ -1,115 +1,98 @@
-Return-Path: <netdev+bounces-80770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99421881042
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:50:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6846D881045
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:51:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10D99B230F2
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 10:50:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 94E7C1C20DB6
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 10:51:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0555B38F96;
-	Wed, 20 Mar 2024 10:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G0DN0sPi"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27B2C29CEB;
+	Wed, 20 Mar 2024 10:51:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1D3129CEB;
-	Wed, 20 Mar 2024 10:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2EDE38F96
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 10:51:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710931829; cv=none; b=mYdYday9QIx9bxukESpFycLFHgCmr5iDzhAzxx0uc7HOvY39yN3bQ5r/wY15BUrQOVp2gCGYTNfOK03FstmTudgoM+0c5/MmNJ/VCy1k1XQy5XcOs73IIEHNX9Ly6ifXb8pIYypKT9zlz2+W7eo8SCRlGhOHb3B62/oVmmpGbQQ=
+	t=1710931914; cv=none; b=EWDiV3ph402IR7PvNNygb9dxWzEXvG7Zu4Vw9lmeguD3zQwDYyP+OgsgWYAmZgJt4MPJGKplNH8jpUcL6Pm7iySM0jiMuwQu2w3pYrexhhmp55078dnXfPyYuPx2TnUNi3WZl9wd+tKnPken8b7Wy58tjE3REjTerRETDdheOo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710931829; c=relaxed/simple;
-	bh=33eYdkLv+vFOfzW7fW+bW6YTvn0TxW/yQv61af3+pCw=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SdlUv5HWw5OpE73JoLwlGBXQ0dq5lXZwnCXQpSwbmUcTvfUzXgoNSbCnj72ow4X3YaLOLJBlpcxVpn6Ei6IGCIU2ttK7JGiH2MBY6K9XMQ4JSksO0dE7mMDBp45QgWDqktrPMdpD98af8qM+/lud6i8Qo/j7jSpI3jYaFG1IRBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G0DN0sPi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 56951C433C7;
-	Wed, 20 Mar 2024 10:50:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710931829;
-	bh=33eYdkLv+vFOfzW7fW+bW6YTvn0TxW/yQv61af3+pCw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=G0DN0sPidV9DZaSKasMn2t9y3aA7tTejW/wV3BwaYb9BrHSudtxiWh94qn4zC/0oy
-	 QwCF5y7d0t+j8mxolVgaBrtn2z2yrvOvR4LNRmnyjFOJdlqZ6cQHVNnSRoViVO12wg
-	 xbgKQ2mEl+BT/Z+KaxgpkRuLCTGmfIfegZgcQipyl1jZ7o/OadfScNl/OL7b7N3gsZ
-	 Gb8QrZ3afXE0yjcmphzsy+ZjeqvRjysEHEq2LmbFRCB5WfXXn2saOzm/xA4eqaIOB0
-	 kcKDoKhRkXAZWnDogvSmwHV9K0pTZMW32nTq20E20xIq71vYmDP5inTBbiKFAwB2Xx
-	 Lt0rYsO6esHkw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 45E89D95060;
-	Wed, 20 Mar 2024 10:50:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1710931914; c=relaxed/simple;
+	bh=NglWa/4Ql7qpAGKsiD9NA3/FthotYHvf2w26wpap5D8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZyTmDnIQWi5hS2ENdOM2xiM614A2MCHWSujL5bs3hbCBphu5I63rviZAIfKPaCU8uib8/k82gTwmc1VOKsXwWqPR3RyW01txM4KRZK6KtrdISFTz7kHhCuTPyav/062FsgJNq7v/XGmhj0IKIEg3UHvCjXJT8hRXXWr9P/lb1ac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.109.198])
+	by gateway (Coremail) with SMTP id _____8Cx2ujEv_pl0DkbAA--.45524S3;
+	Wed, 20 Mar 2024 18:51:48 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.109.198])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxLs_Dv_plwFdeAA--.50108S3;
+	Wed, 20 Mar 2024 18:51:48 +0800 (CST)
+Message-ID: <fe30d071-bd3f-4b06-af95-7b3e41657a36@loongson.cn>
+Date: Wed, 20 Mar 2024 18:51:47 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 01/11] net: stmmac: Add multi-channel support
+Content-Language: en-US
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Serge Semin <fancer.lancer@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@loongson.cn, guyinggang@loongson.cn, netdev@vger.kernel.org,
+ chris.chenfeiyang@gmail.com
+References: <cover.1706601050.git.siyanteng@loongson.cn>
+ <a2f467fd7e3cecc7dc4cc0bfd2968f371cd40888.1706601050.git.siyanteng@loongson.cn>
+ <bhnrczwm2numoce3olexw4ope7svz6uktk44ozefxyeqrof4um@7vkl2fr6uexc>
+ <673510eb-21a8-47ca-b910-476b9b09e2bf@loongson.cn>
+ <yzs6eqx2swdhaegxxcbijhtb5tkhkvvyvso2perkessv5swq47@ywmea5xswsug>
+ <ee2ffb6a-fe34-47a1-9734-b0e6697a5f09@loongson.cn>
+ <034d1f08-a110-4e68-abf5-35e7714ea5ae@loongson.cn>
+ <3djgq4zsafxdiimb236gvbipwkgedqvubhuyorgvgpz7gqf7ae@4xjsdtrvg4hj>
+ <Zfqyeebvr0B3GWpo@shell.armlinux.org.uk>
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <Zfqyeebvr0B3GWpo@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Subject: Re: [v2 net PATCH 0/5] octeontx2-pf: RVU Mailbox fixes
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171093182928.6411.11540341489392829464.git-patchwork-notify@kernel.org>
-Date: Wed, 20 Mar 2024 10:50:29 +0000
-References: <1710754198-18632-1-git-send-email-sbhatta@marvell.com>
-In-Reply-To: <1710754198-18632-1-git-send-email-sbhatta@marvell.com>
-To: Subbaraya Sundeep <sbhatta@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- sgoutham@marvell.com, lcherian@marvell.com, gakula@marvell.com,
- hkelam@marvell.com, naveenm@marvell.com, horms@kernel.org
+X-CM-TRANSID:AQAAf8BxLs_Dv_plwFdeAA--.50108S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7KY7
+	ZEXasCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29K
+	BjDU0xBIdaVrnRJUUUBKb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26c
+	xKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vE
+	j48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxV
+	AFwI0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x02
+	67AKxVW8Jr0_Cr1UM2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2x26I8E6x
+	ACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q6rW5McIj6I8E
+	87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41l42xK82IYc2
+	Ij64vIr41l4c8EcI0En4kS14v26r126r1DMxAqzxv26xkF7I0En4kS14v26r126r1DMxC2
+	0s026xCaFVCjc4AY6r1j6r4UMxCIbckI1I0E14v26r1q6r43MI8I3I0E5I8CrVAFwI0_Jr
+	0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0E
+	wIxGrwCI42IY6xIIjxv20xvE14v26r4j6ryUMIIF0xvE2Ix0cI8IcVCY1x0267AKxVW8JV
+	WxJwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAI
+	cVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU8l38UUUUUU==
 
-Hello:
 
-This series was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+在 2024/3/20 17:55, Russell King (Oracle) 写道:
+> Please also trim appropriately your replies (that goes for both of you.)
+> I tried to work out whether you'd provided any content apart from the
+> above, but I really couldn't be bothered to page through the message.
 
-On Mon, 18 Mar 2024 14:59:53 +0530 you wrote:
-> This patchset fixes the problems related to RVU mailbox.
-> During long run tests some times VF commands like setting
-> MTU or toggling interface fails because VF mailbox is timedout
-> waiting for response from PF.
-> 
-> Below are the fixes
-> Patch 1: There are two types of messages in RVU mailbox namely up and down
-> messages. Down messages are synchronous messages where a PF/VF sends
-> a message to AF and AF replies back with response. UP messages are
-> notifications and are asynchronous like AF sending link events to
-> PF. When VF sends a down message to PF, PF forwards to AF and sends
-> the response from AF back to VF. PF has to forward VF messages since
-> there is no path in hardware for VF to send directly to AF.
-> There is one mailbox interrupt from AF to PF when raised could mean
-> two scenarios one is where AF sending reply to PF for a down message
-> sent by PF and another one is AF sending up message asynchronously
-> when link changed for that PF. Receiving the up message interrupt while
-> PF is in middle of forwarding down message causes mailbox errors.
-> Fix this by receiver detecting the type of message from the mbox data register
-> set by sender.
-> 
-> [...]
+Sorry, I will.  I'm sorry to have caused you trouble.  I just saw this 
+comment.
 
-Here is the summary with links:
-  - [v2,net,1/5] octeontx2: Detect the mbox up or down message via register
-    https://git.kernel.org/netdev/net/c/a88e0f936ba9
-  - [v2,net,2/5] octeontx2-pf: Wait till detach_resources msg is complete
-    https://git.kernel.org/netdev/net/c/cbf2f24939a5
-  - [v2,net,3/5] octeontx2-pf: Use default max_active works instead of one
-    https://git.kernel.org/netdev/net/c/7558ce0d974c
-  - [v2,net,4/5] octeontx2-pf: Send UP messages to VF only when VF is up.
-    https://git.kernel.org/netdev/net/c/dfcf6355f53b
-  - [v2,net,5/5] octeontx2-af: Use separate handlers for interrupts
-    https://git.kernel.org/netdev/net/c/50e60de381c3
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Thanks,
 
+Yanteng
 
 
