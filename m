@@ -1,48 +1,74 @@
-Return-Path: <netdev+bounces-80764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7463880FF0
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:33:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2ACC7880FFC
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:35:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 756C71F217CF
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 10:33:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C1DDB22AB2
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 10:35:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE65D2D057;
-	Wed, 20 Mar 2024 10:30:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3F8F2770B;
+	Wed, 20 Mar 2024 10:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ol7/ItQM"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="PTiF9aPH"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AFC51E48E;
-	Wed, 20 Mar 2024 10:30:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BBA220DCC
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 10:34:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710930628; cv=none; b=XRdzK1Ei13NYG3HaqFu5uw//kb/v2mlAoP5VoXmeZd6K1d2JSJSytqhnjssS9oAerYNK9ynqHpiYl7iP/BTmQKFz0b5jApfHBsk7KcFwCu2sS/SoPdV+nT1U25nBSYmPuc2LzqcMS/ZuxqVi22DQGaUKgOFVa6sr1gVwbMwfHMI=
+	t=1710930846; cv=none; b=ecnRjEAGMQwoa9V7HP9EAAIfXoB8pLWf0h+iSrgFeYIn0d+OynXfibwtgOL21d8+AvA4vYS8FUIxwtv7C/zlV6uba+BS/5n+JTiNkTwr4l0j5+O+DTazK/yU6CRyVk56lRjvqGJZ4CDV7B84Y29aF6q9tKo1W1laDNCQayuxyzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710930628; c=relaxed/simple;
-	bh=Ng5N4KT0SCm8Zb4mwGaTwyWKHKjaLEy2Wm0KyGEcEto=;
+	s=arc-20240116; t=1710930846; c=relaxed/simple;
+	bh=h75awBsQ3kdyC4gjdvhNQLxVEteauituEChyhuecsvQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aykgGPaDT4JDYFTpikBAJurw3JalHSw43vsltg4eG46i4KpPnVFG5UP3yIGOe5MCWOa0Gsc0AGVfPNyzGEapA4xlbhjOPyHHf/5UKULFWTiYZFObyjs7wyF+3xKXVW7iY4Iw97YacsutKWL0o1TXwj07gIXd34nbjBXZ0x3azW0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ol7/ItQM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 920B6C433C7;
-	Wed, 20 Mar 2024 10:30:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710930628;
-	bh=Ng5N4KT0SCm8Zb4mwGaTwyWKHKjaLEy2Wm0KyGEcEto=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ol7/ItQM72RsqGXTgcikxJy4dTlaUDho4Kqr5tT+d6X3xM8PArvo61vgr5a1KFSSu
-	 QCjmG1YljRplfNm4JTZdB2xsYsks86a1/z/hL8c7Lsw/X3x6RuLLJ/6VQ25cWsSznv
-	 HyRsrTEIQPmSvit7T+Fj7A3tTy8+9TLd6vrU0J87HGRbeD+XJrEQVod323EJiUUzk+
-	 JIbajnxGaDABod60v59IdWD0zGBcjeSZxM0uVoDsL7UOVz6U2AD8X4NDTAtghd5esM
-	 sgVmRO2DateKvrWQrhbbjte8mLladypCMuXXtDYl39pSNLHVqzjS4Z1/41fOyjRmyA
-	 Fx6LA7Zqb842g==
-Message-ID: <4e251463-8cfb-4cc6-b9b6-ce1dcd7c7052@kernel.org>
-Date: Wed, 20 Mar 2024 11:30:21 +0100
+	 In-Reply-To:Content-Type; b=fLUOl91o++CyFnNphLJR7GjaE8d9jXF6TElMTSDhe6R+HsuhNArK4y5WQXG8SdDsGsxANlunBSxQQLbH4Au7wwj+b50As17TbvWhO41EIIasyvUaXOKSNRDsvb8MnkI22LgmXjOkVJo8ck51azyHsoghI29LYO00zDgDsJ/9UMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=PTiF9aPH; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-563c403719cso7992180a12.2
+        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 03:34:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1710930843; x=1711535643; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pU0oFHPpizQoibbeCMsLY0ImCdqkE+8lma6xbs74EUw=;
+        b=PTiF9aPHuYwc9SQb8OgFoG5kt9fRkEs89SA3z51iAmgkzIaiUyWT/P3Txu5kjBd6kP
+         Z+VcwM4TlKhBEQMIyoUde41r2sS7XNWayDl8rkattJkmt/EiAlTZXoY9Ic11VQawvgII
+         ZMQknUxhbsnsMzHsuzjG+WkLw0QOCChV6OS1u7nnpAU2HDX2gHex+hLcM+CB8riaJzd/
+         e3CzeKrmw/pyyBY/8pw2WQrPWxvvx7VhG14V+yIoKJlFCHCw4Swukya4KkHrXU/sevdR
+         SLVn0aIZPuvp9w9lUt6RdLZTMIWg8LlX4kvM6TkJoKQ51WgFBsAvFgOLmKdLmB3aR7Ty
+         HfeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710930843; x=1711535643;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pU0oFHPpizQoibbeCMsLY0ImCdqkE+8lma6xbs74EUw=;
+        b=b1OijLHtoyOHIn1m/fQusmaNeGQfbRJps15KhHCQpoG9L2+bR9V1gyjeNsUNTOj6Yb
+         Q9byMj/nPFncwUhu+/G/qXKJEzuP595kUJny4cmYRAMGeNtRr9qNVIMJIMYq1P+M5xvn
+         YFhPqcRRo/r47ZpJwoVFFDLEnqIzr9/aSULD6g2Ups5HdYJK+cnD0FPKUAwRV4ZNYj1b
+         FdKpc/yL4GtVKFUJPR8c2/27iuZyLiagxNfBIlInIuEZRpf/MLPN9tgkzn0ESDPA8idm
+         JxxwPTLgQ6betA9N5J7Rn1iPoaiUb4ckFH7UnUU9stR1Bmg6SkorbcezUs2KruTUc6xj
+         J3zw==
+X-Forwarded-Encrypted: i=1; AJvYcCUKTopKyTGhq3RgbnvFOFLBqYFGE/XdMpkQytft3sOTbO6uR2pwMM5XDvdtdFqOIwCw0YOXdcFi8vZUc8jn9sxlnpDjH9W6
+X-Gm-Message-State: AOJu0YzaXnH4Tdpf7t8ITL5UteBLTIAuSqzMnn8cE+QL9BrkaYUcvK1/
+	d7DhKxFaNn0bERPFqXxszjWRNyFqYXVEyowkkrvfd2k5NbI/IgfuUD35+ttUHd8=
+X-Google-Smtp-Source: AGHT+IGi3JUvj2YvDNINsM2O8nMuJRLfqvY70xpGgIPwbsg92PP8RGrp9qhy9v4jCqpMO5jioRYasQ==
+X-Received: by 2002:a17:906:c202:b0:a46:ca55:477a with SMTP id d2-20020a170906c20200b00a46ca55477amr5311288ejz.72.1710930843314;
+        Wed, 20 Mar 2024 03:34:03 -0700 (PDT)
+Received: from [192.168.0.106] (176.111.182.227.kyiv.volia.net. [176.111.182.227])
+        by smtp.gmail.com with ESMTPSA id j7-20020a17090643c700b00a46c8dbd5e4sm2981606ejn.7.2024.03.20.03.34.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 20 Mar 2024 03:34:02 -0700 (PDT)
+Message-ID: <99098715-6b36-456a-869e-39f9b211a8bc@blackwall.org>
+Date: Wed, 20 Mar 2024 12:34:01 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,89 +76,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net 0/3] Report RCU QS for busy network kthreads
-To: Yan Zhai <yan@cloudflare.com>, netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Jiri Pirko <jiri@resnulli.us>,
- Simon Horman <horms@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Coco Li <lixiaoyan@google.com>,
- Wei Wang <weiwan@google.com>, Alexander Duyck <alexanderduyck@fb.com>,
- linux-kernel@vger.kernel.org, rcu@vger.kernel.org, bpf@vger.kernel.org,
- kernel-team@cloudflare.com, Joel Fernandes <joel@joelfernandes.org>,
- "Paul E. McKenney" <paulmck@kernel.org>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Alexei Starovoitov <alexei.starovoitov@gmail.com>,
- Steven Rostedt <rostedt@goodmis.org>, mark.rutland@arm.com,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-References: <cover.1710877680.git.yan@cloudflare.com>
+Subject: Re: [PATCH net v2 1/4] udp: do not accept non-tunnel GSO skbs landing
+ in a tunnel
+To: Antoine Tenart <atenart@kernel.org>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com
+Cc: steffen.klassert@secunet.com, willemdebruijn.kernel@gmail.com,
+ netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>
+References: <20240319093140.499123-1-atenart@kernel.org>
+ <20240319093140.499123-2-atenart@kernel.org>
 Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <cover.1710877680.git.yan@cloudflare.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20240319093140.499123-2-atenart@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
+On 3/19/24 11:31, Antoine Tenart wrote:
+[snip]
+> @@ -163,6 +181,16 @@ static inline bool udp_unexpected_gso(struct sock *sk, struct sk_buff *skb)
+>   	    !udp_test_bit(ACCEPT_FRAGLIST, sk))
+>   		return true;
+>   
+> +	/* GSO packets lacking the SKB_GSO_UDP_TUNNEL/_CUSM bits might still
 
-On 19/03/2024 21.44, Yan Zhai wrote:
-> This changeset fixes a common problem for busy networking kthreads.
-> These threads, e.g. NAPI threads, typically will do:
-> 
-> * polling a batch of packets
-> * if there are more work, call cond_resched() to allow scheduling
-> * continue to poll more packets when rx queue is not empty
-> 
-> We observed this being a problem in production, since it can block RCU
-> tasks from making progress under heavy load. Investigation indicates
-> that just calling cond_resched() is insufficient for RCU tasks to reach
-> quiescent states. This also has the side effect of frequently clearing
-> the TIF_NEED_RESCHED flag on voluntary preempt kernels. As a result,
-> schedule() will not be called in these circumstances, despite schedule()
-> in fact provides required quiescent states. This at least affects NAPI
-> threads, napi_busy_loop, and also cpumap kthread.
-> 
-> By reporting RCU QSes in these kthreads periodically before cond_resched, the
-> blocked RCU waiters can correctly progress. Instead of just reporting QS for
-> RCU tasks, these code share the same concern as noted in the commit
-> d28139c4e967 ("rcu: Apply RCU-bh QSes to RCU-sched and RCU-preempt when safe").
-> So report a consolidated QS for safety.
-> 
-> It is worth noting that, although this problem is reproducible in
-> napi_busy_loop, it only shows up when setting the polling interval to as high
-> as 2ms, which is far larger than recommended 50us-100us in the documentation.
-> So napi_busy_loop is left untouched.
-> 
-> Lastly, this does not affect RT kernels, which does not enter the scheduler
-> through cond_resched(). Without the mentioned side effect, schedule() will
-> be called time by time, and clear the RCU task holdouts.
-> 
-> V4: https://lore.kernel.org/bpf/cover.1710525524.git.yan@cloudflare.com/
-> V3: https://lore.kernel.org/lkml/20240314145459.7b3aedf1@kernel.org/t/
-> V2: https://lore.kernel.org/bpf/ZeFPz4D121TgvCje@debian.debian/
-> V1: https://lore.kernel.org/lkml/Zd4DXTyCf17lcTfq@debian.debian/#t
-> 
-> changes since v4:
->   * polished comments and docs for the RCU helper as Paul McKenney suggested
-> 
-> changes since v3:
->   * fixed kernel-doc errors
-> 
-> changes since v2:
->   * created a helper in rcu header to abstract the behavior
->   * fixed cpumap kthread in addition
-> 
-> changes since v1:
->   * disable preemption first as Paul McKenney suggested
-> 
-> Yan Zhai (3):
->    rcu: add a helper to report consolidated flavor QS
->    net: report RCU QS on threaded NAPI repolling
->    bpf: report RCU QS in cpumap kthread
-> 
->   include/linux/rcupdate.h | 31 +++++++++++++++++++++++++++++++
->   kernel/bpf/cpumap.c      |  3 +++
->   net/core/dev.c           |  3 +++
->   3 files changed, 37 insertions(+)
-> 
+s/CUSM/CSUM/
 
-Acked-by: Jesper Dangaard Brouer <hawk@kernel.org>
+> +	 * land in a tunnel as the socket check in udp_gro_receive cannot be
+> +	 * foolproof.
+> +	 */
+> +	if (udp_encap_needed() &&
+> +	    READ_ONCE(udp_sk(sk)->encap_rcv) &&
+> +	    !(skb_shinfo(skb)->gso_type &
+> +	      (SKB_GSO_UDP_TUNNEL | SKB_GSO_UDP_TUNNEL_CSUM)))
+> +		return true;
+> +
+>   	return false;
+>   }
+>   
+> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+> index b9880743765c..e9719afe91cf 100644
+> --- a/net/ipv4/udp_offload.c
+> +++ b/net/ipv4/udp_offload.c
+> @@ -551,8 +551,10 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
+>   	unsigned int off = skb_gro_offset(skb);
+>   	int flush = 1;
+>   
+> -	/* we can do L4 aggregation only if the packet can't land in a tunnel
+> -	 * otherwise we could corrupt the inner stream
+> +	/* We can do L4 aggregation only if the packet can't land in a tunnel
+> +	 * otherwise we could corrupt the inner stream. Detecting such packets
+> +	 * cannot be foolproof and the aggregation might still happen in some
+> +	 * cases. Such packets should be caught in udp_unexpected_gso later.
+>   	 */
+>   	NAPI_GRO_CB(skb)->is_flist = 0;
+>   	if (!sk || !udp_sk(sk)->gro_receive) {
+
 
