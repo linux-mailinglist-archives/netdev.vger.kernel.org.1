@@ -1,207 +1,114 @@
-Return-Path: <netdev+bounces-80893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C04DD88189A
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 21:31:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC3AE8818B0
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 21:41:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35FBA1F21FFA
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 20:31:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28C311C2105E
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 20:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8233717578;
-	Wed, 20 Mar 2024 20:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D3A2E842;
+	Wed, 20 Mar 2024 20:41:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="trJNLKF7"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="OrA6x1pw"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-186.mta0.migadu.com (out-186.mta0.migadu.com [91.218.175.186])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937A312B97
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 20:30:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.186
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5389512E48;
+	Wed, 20 Mar 2024 20:41:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710966656; cv=none; b=KZdqgaEz66Woj4fyQ1EvKQeurZIMH6Aqc+qau3ozMoYNCu9ZUOx9F/fUBjz7mwY2ZabXd2FadG2mPuQ42UAKjocP9/VFpC4h4CYZW29AH1yAYDWJ4tiOdpPDp2NDtEHpiFHc3+jRDQqChfJe5jBMtZ921F+10sgLmg0J9HmWnss=
+	t=1710967287; cv=none; b=RNdCdsCjIC7FsXgBjGSZiKztYcSYpsueqiYZlYXIOG62perQbHxjg/XkIrQoO6PVnLosw14snTvYfCEN4BGQcdMC0Zan8Tfc02My2/dhWhIvsQwv2NWOgBBu88tsXbyv5OnBpUHbqWoY6yp1gJRoKayxlaAxW90sF5behbc8bAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710966656; c=relaxed/simple;
-	bh=ZZZObk/YowPHtsO1uwyK8eJ5XKLcbo5ffCQqoEZxZmo=;
+	s=arc-20240116; t=1710967287; c=relaxed/simple;
+	bh=91yG2vmO+tazo8NZS2KIt/t4gbAjam+wzYjaZ8suBzo=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HEQaCub27tIcpq2D3sPllWVCz4bFZe3qCfL8BvqEx223OWXe2JW83vvPFNLnm3UD7Z29JEJDMr2OvhH3VdA/68bNS7xaD0jxQ307YinoL5F584CdSz5l28rCCcyg1p6mCZQZH06SvIh6wzmTTU8HWC3MU6xqPX5oMkfvZqI234c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=trJNLKF7; arc=none smtp.client-ip=91.218.175.186
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <a3f8eff9-c51b-43d4-9d69-fe8b48f77473@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1710966652;
+	 In-Reply-To:Content-Type; b=YmZWNv2iUDzG8GDYR9tR4+Zr6TR3g4u2AJ2n6AOxN+1fNC1wIF4jlwUVYaAIn0zv0LpPHl/R00vZT3rY8ljp/b6txuxyzmYqU1X1N79CkOzhVxyNBRn8jp26n0SVSyCq0/1SUMOU/7aNYgDu0Q+yCGViDQjMs2ZoEAc0I/F6baM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=OrA6x1pw; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 64A981BF203;
+	Wed, 20 Mar 2024 20:41:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1710967282;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=LF+fu9EHYD3041F1vyxJbb1QuQ8m4zUJPrgflEgxH8I=;
-	b=trJNLKF7FMRuhYIASp1pf1wKk2+AsxTA+3VrKy2Vopp5DFX6yYfzBd2Xqtu/vZWErdhy6o
-	qMcT7L4XXwhwijrrGEO4kU182p6tzBLAvjpXTsoZHhpBXqbuVADtCQsPBl9XFiezZFdH5+
-	K4SZVuWAypNaL2lJjrv63ss/iqfcKfQ=
-Date: Wed, 20 Mar 2024 13:30:44 -0700
+	bh=V1rjsEgyVWVkG2lBkygNFoS+ERY9yY1N//Uw/xuZ26A=;
+	b=OrA6x1pw+oPiuzJyJ6Pla7RsogCFk+LQcK4+lE0F3bjgNfUapB5dc+J9P9L6oKhRsURsYY
+	1+wzoAlDzufeHPBu4hIfEgvqTui3nNq4Q7Cfa1x7I9LMd4tBO6sEmJrS0iVbVaTaD1WFB1
+	KkQ/HhxIibIrs0EvHBweSj/5Z7lXSKJJhuatUETaxN8QrZVo6AZIe5DHSADPq0Q77arMbB
+	Kug78hCkX7MmcOPQn+W1L89iwFAHrht83noEZWNrhifBHDefOvwNekMlWe2AO6arp1lc6f
+	wHlWDRxSM7I/HYJqePmmg5vcSEnEB1cARMmii3dEj6Qs9Ozpb+EQLEDHCfDRrg==
+Message-ID: <3698b522-d6dc-46c1-bab2-d5ee3bed1fce@arinc9.com>
+Date: Wed, 20 Mar 2024 23:40:56 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v4] net: Re-use and set mono_delivery_time bit
- for userspace tstamp packets
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] net: phy: mediatek-ge: do not disable EEE
+ advertisement
+To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ =?UTF-8?Q?Ren=C3=A9_van_Dorst?= <opensource@vdorst.com>,
+ Russell King <linux@armlinux.org.uk>,
+ SkyLake Huang <SkyLake.Huang@mediatek.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v1-0-3f17226344e8@arinc9.com>
+ <20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v1-3-3f17226344e8@arinc9.com>
 Content-Language: en-US
-To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, kernel@quicinc.com,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Andrew Halaney <ahalaney@redhat.com>,
- Martin KaFai Lau <martin.lau@kernel.org>, bpf <bpf@vger.kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>
-References: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
- <2a4cb416-5d95-459d-8c1c-3fb225240363@linux.dev>
- <65f16946cd33e_344ff1294fc@willemb.c.googlers.com.notmuch>
- <28282905-065a-4233-a0a2-53aa9b85f381@linux.dev>
- <65f2004e65802_3d1e792943e@willemb.c.googlers.com.notmuch>
- <0dff8f05-e18d-47c8-9f19-351c44ea8624@linux.dev>
- <e5da91bc-5827-4347-ab38-36c92ae2dfa2@quicinc.com>
- <65f21d65820fc_3d934129463@willemb.c.googlers.com.notmuch>
- <bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev>
- <65f2c81fc7988_3ee61729465@willemb.c.googlers.com.notmuch>
- <5692ddb3-9558-4440-a7bf-47fcc47401ed@linux.dev>
- <65f35e00a83c0_2132294f5@willemb.c.googlers.com.notmuch>
- <e270b646-dae0-41cf-9ef8-e991738b9c57@quicinc.com>
- <8d245f5a-0c75-4634-9513-3d420eb2c88f@linux.dev>
- <d10254cc-a908-4d81-98d2-2eed715e521f@quicinc.com>
- <66ad9e5b-0126-476e-bf0f-6a33f446c976@quicinc.com>
- <ac03f67c-604a-4fb8-a0ca-c187e27855be@quicinc.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <ac03f67c-604a-4fb8-a0ca-c187e27855be@quicinc.com>
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v1-3-3f17226344e8@arinc9.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+X-Spam-Flag: yes
+X-Spam-Level: **************************
+X-GND-Spam-Score: 400
+X-GND-Status: SPAM
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On 3/19/24 11:22 PM, Abhishek Chauhan (ABC) wrote:
+On 18.03.2024 10:46, Arınç ÜNAL via B4 Relay wrote:
+> From: Arınç ÜNAL <arinc.unal@arinc9.com>
 > 
+> There's no need to disable Energy-Efficient Ethernet (EEE) advertisement on
+> the MT7530 and MT7531 switch PHYs. EEE works fine on MT7530 and MT7531
+> switch PHYs. Remove the code where EEE advertisement is disabled.
 > 
-> On 3/18/2024 12:02 PM, Abhishek Chauhan (ABC) wrote:
->>
->>
->> On 3/14/2024 3:29 PM, Abhishek Chauhan (ABC) wrote:
->>>
->>>
->>> On 3/14/2024 2:48 PM, Martin KaFai Lau wrote:
->>>> On 3/14/24 1:53 PM, Abhishek Chauhan (ABC) wrote:
->>>>>>> The bpf_convert_tstamp_{read,write} and the helper bpf_skb_set_tstamp need to be
->>>>>>> changed to handle the new "user_delivery_time" bit anyway, e.g.
->>>>>>> bpf_skb_set_tstamp(BPF_SKB_TSTAMP_DELIVERY_MONO) needs to clear the
->>>>>>> "user_delivery_time" bit.
->>>>>>>
->>>>>>> I think the "struct inet_frag_queue" also needs a new "user_delivery_time"
->>>>>>> field. "mono_delivery_time" is already in there.
->>>>
->>>> [ ... ]
->>>>
->>
->> Martin, Do we really need to add user_delivery_time as part of inet_frag_queue struct? I was wondering why is this required since we are using tstamp_type:2 to
->> distinguish between timestamp anyway .
->>
->> Let me know what you think ?
->>
->>>> I would think the first step is to revert this patch. I don't think much of the current patch can be reused.
->>>>
->>>>> 1. I will raise one patch to introduce rename mono_delivery_time to
->>>>> tstamp_type
->>>>
->>>> Right, I expect something like this:
->>>>
->>>> struct sk_buff {
->>>>          /* ... */
->>>> -            __u8                    mono_delivery_time:1;
->>>> +        __u8            tstamp_type:1;
->>>>          /* ... */
->>>> };
->>>>
->>>
->>> Okay ,This should be straight-forward.
->>>
->>>>> 2. I will introduce setting of userspace timestamp type as the second bit
->>>>> whem transmit_time is set.
->>>>
->>>> I expect the second patch should be introducing the enum first
->>>>
->>>> enum skb_tstamp_type {
->>>>      SKB_TSTAMP_TYPE_RX_REAL = 0, /* A RX (receive) time in real */
->>>>      SKB_TSTAMP_TYPE_TX_MONO = 1, /* A TX (delivery) time in mono */
->>>> };
->>>>
->>>> and start doing "skb->tstamp_type = SKB_TSTAMP_TYPE_TX_MONO;" instead of
->>>> "skb->tstamp_type = 1;"
->>>>
->>>> and the same for "skb->tstamp_type = SKB_TSTAMP_TYPE_RX_REAL;" instead of
->>>> "skb->tstamp_type = 0;"
->>>>
->>>>
->>>> This one I am not sure but probably need to change the skb_set_delivery_time() function signature also:
->>>>
->>>> static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
->>>> -                                        bool mono)
->>>> +                     enum skb_tstamp_type tstamp_type)
->>>>
->>> This should be straight-forward as well
->>>
->>>> The third patch is to change tstamp_type from 1 bit to 2 bits and add SKB_TSTAMP_TYPE_TX_USER.
->>>>
->>>> struct sk_buff {
->>>>          /* ... */
->>>> -        __u8            tstamp_type:1;
->>>> +        __u8            tstamp_type:2;
->>>>          /* ... */
->>>> };
->>>>
->>>> enum skb_tstamp_type {
->>>>      SKB_TSTAMP_TYPE_RX_REAL = 0,    /* A RX (receive) time in real */
->>>>      SKB_TSTAMP_TYPE_TX_MONO = 1,    /* A TX (delivery) time in mono */
->>>> +    SKB_TSTAMP_TYPE_TX_USER = 2,    /* A TX (delivery) time and its clock
->>>>                       * is in skb->sk->sk_clockid.
->>>>                       */
->>>>                 
->>>> };
->>>>
->>>> This will shift a bit out of the byte where tstamp_type lives. It should be the "inner_protocol_type" bit by my hand count. Please check if it is directly used in bpf instruction (filter.c). As far as I look, it is not, so should be fine. Some details about bpf instruction accessible skb bit field here: https://lore.kernel.org/all/20230321014115.997841-1-kuba@kernel.org/
->>> This is where i would need thorough reviews from you and Willem as my area of expertise is limited to part of network stack and BPF is not one of them.
->>> But i have plan on this and i know how to do it.
->>>
->>> Expect patches to be arriving to your inboxes next week, as we have a long weekend in Qualcomm
->>> Fingers crossed :)
->>>
->>>>
->>>>
->>>>> 3. This will be a first step to make the design scalable.
->>>>> 4. Tomorrow if we have more timestamp to support, upstream community has to do is
->>>>> update the enum and increase the bitfield from 2=>3 and so on.
->>>>>
->>>>> I need help from Martin to test the patch which renames the mono_delivery_time
->>>>> to tstamp_type (Which i feel should be straight forward as the value of the bit is 1)
->>>>
->>>> The bpf change is not a no-op rename of mono_delivery_time. It needs to take care of the new bit added to the tstamp_type. Please see the previous email (and I also left it in the beginning of this email).
->>>>
->>>> Thus, you need to compile the selftests/bpf/ and run it to verify the changes when handling the new bit. The Documentation/bpf/bpf_devel_QA.rst has the howto details. You probably only need the newer llvm (newer gcc should work also as bpf CI has been using it) and the newer pahole. I can definitely help if there is issue in running the test_progs in selftests/bpf or you have question on making the changes in filter.c. To run the test: "./test_progs -t tc_redirect/tc_redirect_dtime"
->>>>
-> 
-> Martin,
-> I was able to compile test_progs and execute the above command mentioned by you . Does the output look okay for you ?
-> 
-> [ 3076.040766] IPv6: ADDRCONF(NETDEV_CHANGE): veth_src_fwd: link becomes ready
-> [ 3076.040809] IPv6: ADDRCONF(NETDEV_CHANGE): veth_src: link becomes ready
-> [ 3076.072844] IPv6: ADDRCONF(NETDEV_CHANGE): veth_dst: link becomes ready
-> [ 3076.072880] IPv6: ADDRCONF(NETDEV_CHANGE): veth_dst_fwd: link becomes ready
-> #214/5   tc_redirect/tc_redirect_dtime:OK
-> #214     tc_redirect:OK
+> This is a bugfix because there's a possible race condition where the
+> mediatek-ge driver would kick in after the MT7530 DSA subdriver which would
+> have EEE disabled until manually enabled.
 
-lgtm. thanks.
+Can I get an opinion on this? Is it actually possible that the PHY driver
+would start probing after the DSA subdriver? On the console logs for the
+DSA subdriver, I can see that the name of the PHY driver will appear, which
+makes me believe the PHY driver would actually never probe after the DSA
+subdriver.
+
+[    4.402641] mt7530-mdio mdio-bus:1f wan (uninitialized): PHY [mt7530-0:00] driver [MediaTek MT7530 PHY] (irq=POLL)
+[    4.420392] mt7530-mdio mdio-bus:1f lan0 (uninitialized): PHY [mt7530-0:01] driver [MediaTek MT7530 PHY] (irq=POLL)
+[    4.437791] mt7530-mdio mdio-bus:1f lan1 (uninitialized): PHY [mt7530-0:02] driver [MediaTek MT7530 PHY] (irq=POLL)
+[    4.455096] mt7530-mdio mdio-bus:1f lan2 (uninitialized): PHY [mt7530-0:03] driver [MediaTek MT7530 PHY] (irq=POLL)
+[    4.472422] mt7530-mdio mdio-bus:1f lan3 (uninitialized): PHY [mt7530-0:04] driver [MediaTek MT7530 PHY] (irq=POLL)
+
+I don't want to submit a bugfix to the net tree if the bug won't ever
+happen in real life.
+
+Arınç
 
