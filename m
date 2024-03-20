@@ -1,149 +1,172 @@
-Return-Path: <netdev+bounces-80820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDB458812BB
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 14:55:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 256988812F7
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 15:09:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 648B51F2536B
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 13:55:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A0C591F23AF7
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 14:09:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB78243179;
-	Wed, 20 Mar 2024 13:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 166C64207B;
+	Wed, 20 Mar 2024 14:09:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="154gHE8q"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="qM5SVBSo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2F041C85
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 13:55:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F098B3EA98
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 14:09:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710942902; cv=none; b=scp8JVGC9JAwq0qDPbq8MCRWXWuTX8ZF2QIagNiyznNH/8d+X5oXHMLHEf6boYi4rXOBPwickkZZJnzp0uFfO0m/E9WhPPwO43Lx5cSYMtBxIUTIbMCTilpFFyka5yTiYlM3qgl/JTpYldgN1NhCPcCUmmt4VJJomHqjR4nSy/w=
+	t=1710943748; cv=none; b=F8GY/PlZlGTbyVICUtQ+zIB2UfZXc1Pd8ogccc6m8gIUmAHrQ5AwYrygjtGuXDPqoAKZukAW81hmWUlBL54U4OLUiXAxfVs4fpPh1ttlYYBxe37tcFlij+02sBNYXnaG6SfHXrxsVDvJe71VCi1QSgfH9lb2io2Jcvqdzw0m2og=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710942902; c=relaxed/simple;
-	bh=r4Ox4Fkb6OTqvzf3uywc2+X20ucxQSfPB6rzlahv6SI=;
+	s=arc-20240116; t=1710943748; c=relaxed/simple;
+	bh=H1XOmKD7bRcfqq1UFgWSVIBC/zw9QBBFa1xm/jed5/g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C1DOxi/UwMgxeK/HrtV68EEV6LRVl5fTOtN8R4hHYU6UUxtadYfxY71SRlG26/RQvQRbwcFPkMIe4DmZ0ws/iIRK50ytENcIoiYaATNwRj4UUvYMQYe3UncBZeV70u1Ff/YRBz+1V24zBJm5h8SuOuGUtP67uSn4i9VgYccx3Z4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=154gHE8q; arc=none smtp.client-ip=209.85.128.45
+	 Content-Type:Content-Disposition:In-Reply-To; b=hcUM5d7giWNG8lFQ7XNP2aorhU2vxhRPjoDpgiTr3f3TzmbtNi+lRdls80ufMEvD7/FRWk3NZD7gSqt62NTaZSjelp2lF2THiukyeHzweyVATXAJJv0a5i/8ioZJjS9Zc4UyZZm7ftmmWdwOyGqqpPePajx6AU/Uzd1uEtjrxvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=qM5SVBSo; arc=none smtp.client-ip=209.85.218.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-414689ba80eso11802095e9.2
-        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 06:55:00 -0700 (PDT)
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a46d0a8399aso166545566b.1
+        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 07:09:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710942899; x=1711547699; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=etnN6SZNp2ppKiE78svR6WauCS8nWrn17DdW65QvDEA=;
-        b=154gHE8qy7yOZCJJ1Xt/LeHIcIGT/hYh7JqT7waAlJKMVXBMbUbFpS7WJEUCUjy8jP
-         xjNnQ7fizKDe/MvKfylyQ/dRZHF3d+k7jWRzxpSrTbmrjMnWmvo41vC+e93HLfLTqUNS
-         fOGCoFpYCeFN63zrAwiBE/EsMNyrGO6XkkldNtyvzXXUoAlqdDVkUk1XqUskCfNAVNqv
-         /jGIstUEvqSCgAlAuy8nPngV63TPslRtYTthqIaxlaIzW+26xBw+yp+RzOWAkwVTtqiz
-         HLMEjGVzayyO9EYZ5nMc5myUTJoobuL1wNPoHcjN8NBp/T0Dm9/uRgMr5mPc/6037yHA
-         K+5g==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710943744; x=1711548544; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=SIdJ3/H6efkxnibONQiSADbnnZKfOXj3hF+4ocmjhSc=;
+        b=qM5SVBSoKeNhdvQn/Y5ZfyBfAt7AxFmnl0fF+cYjriNoMYpfaAzVV0O2X5rq9n1C0X
+         4L+jkUWg/FgyOKTd7RCSCcCkrQfzfRapLvr1n+lCTvCOeBvjAAPXO083Q55t51m5mFKL
+         cEaJUlY7E1ZBp6+2yrBjWSAzGQFj62+5NLR/QbmyFD4M7VzpRyK/rClnQO6TfiAoMzSk
+         vDb9XCqcLY5iFC9JfInA9SuOJVhh6eXk+WsbSEQDgGzwjsAgnlxlB0mCT+tBpXlNbZmK
+         ndgH2FPWPeCEmmNv1yLybCTtCd79TXNS//bH2xARGTYQCKwjvVmI0Jhw9rCbA6jcyzDe
+         vIOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710942899; x=1711547699;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=etnN6SZNp2ppKiE78svR6WauCS8nWrn17DdW65QvDEA=;
-        b=bckNdmK4HQ1MTxhXhRtB0gpSxmOsOn7qFRew5OvPRx8gBzrSJKxDxcqWu8ohfpNfBv
-         oRQK6ZrjWmxsduruZrHu3zpswbzan2Re7azZGKYT8m2H6KkOXyGa7mj+VAz5167FWzvU
-         mcGFOVldqSiAUvTXy0Xo8xtCtOuRMadhFvb3EXeOLd97KyK0xpcxIezof2vCjBRLyM0u
-         nIpgsBso70Kypm8OIcHRN2GbOUek9MKZgG9peQjXFOEuh7Y8sEpMIvtQFlb4iATyvqrN
-         O4//w+Wa7dpwLIrcH1oQ64AyqaGaXMP7e9EDV+n6MH0ziQY23Wc557u9bZI0uJ7xlKJl
-         DaRQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUciwVuHE5dQQK+JYjQiFue4/Zbw5WiPvcbg1Wm4I2IWz6f01qfKYJQ1/9hozphZWaOjYDT5seTVLsQbNFPpa0gewcuRPDQ
-X-Gm-Message-State: AOJu0Yw+ODFgiB5nvS+wNKRoVgLeUQoFx8RzZ4M7OTjDMNMdWFEf3nZA
-	4FiVkcmF1jTG31pk2ZvCBNh7NdS+6WfZgioBJGTg7tIyp/w7BDCrIo3u+kE01Mk=
-X-Google-Smtp-Source: AGHT+IEpHJYPqFkm54qsQPALph+urmE6SbsV52Q/66EPFqFlXg1+XSmnIdO3q28cfq7EEso8Wo5/gQ==
-X-Received: by 2002:a05:600c:3106:b0:414:846:4469 with SMTP id g6-20020a05600c310600b0041408464469mr1779197wmo.38.1710942899121;
-        Wed, 20 Mar 2024 06:54:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1710943744; x=1711548544;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=SIdJ3/H6efkxnibONQiSADbnnZKfOXj3hF+4ocmjhSc=;
+        b=cNAbyLrOBl4xO59sfNCRZLOK4yzAx39SpXvCU6c7DFMxePbzRZu0aSYQfh4eJUN4Nk
+         1BCSKeWVtXbHSNKM9yEZ+GhxZXilLpyDiQDYnVqRWDeQuzh0KN6VmA2vCdwasLe5Wf90
+         zs9Cqe2LfO8WiAiKf6+n2JKU23B1lXnW1FZ1tpqiYDR/mF+/bTORv6tKV1jDap4o6G0M
+         NTMb8czdYZPqskIzk/ViwnF69WsPaFApvfbcOYSGDC6HjU1jmqQWiDfEAseAwBQNvoDy
+         VtwYP0V6ahIPj9G0a1AKPgRRKHguVD1dzqVMqQoTQvh7b9vV5x4LfdZEgvO8unMaGpfK
+         KOtg==
+X-Forwarded-Encrypted: i=1; AJvYcCXq1kVmRwGhIAWOdbI++pCW/0z6UeBL2ptuiM0ic9tKqDmEk5onQK4BLAbRwmqecTaO7z3vJPsKbBejKYTp+dXDtYDmtJ3f
+X-Gm-Message-State: AOJu0YxDYx0rvyHQ207akaOup2gLL6rd2Fl4p0fDJ/1iOg7bqNkLuUdL
+	/ndPBKUCwDKqDRw3YkYf/96tcreeX9Y+GxvFEGva0AUVRP4ABPVP/Di5KcJWgw4=
+X-Google-Smtp-Source: AGHT+IHKaLgVKjjmaMssGPhGPgENyTmaminl2pI+37dLFhxxBpGvoUD3MhYFhaUXJ1R45Y5fsUtQ3g==
+X-Received: by 2002:a17:906:b247:b0:a45:f9c5:3024 with SMTP id ce7-20020a170906b24700b00a45f9c53024mr5416028ejb.11.1710943743915;
+        Wed, 20 Mar 2024 07:09:03 -0700 (PDT)
 Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id t17-20020a05600c199100b004146e58cc32sm1397539wmq.12.2024.03.20.06.54.58
+        by smtp.gmail.com with ESMTPSA id bp14-20020a17090726ce00b00a46bdc6278csm3699309ejc.71.2024.03.20.07.09.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Mar 2024 06:54:58 -0700 (PDT)
-Date: Wed, 20 Mar 2024 14:54:57 +0100
+        Wed, 20 Mar 2024 07:09:03 -0700 (PDT)
+Date: Wed, 20 Mar 2024 15:09:01 +0100
 From: Jiri Pirko <jiri@resnulli.us>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Anastasia Belova <abelova@astralinux.ru>,
+To: Josua Mayer <josua@solid-run.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
-Subject: Re: [PATCH] flow_dissector: prevent NULL pointer dereference in
- __skb_flow_dissect
-Message-ID: <ZfrqsQJtIliZDjQc@nanopsycho>
-References: <20240320125635.1444-1-abelova@astralinux.ru>
- <Zfrmv4u0tVcYGS5n@nanopsycho>
- <CANn89iLz4ZesK23DQJmMdn5EA2akh_z+8ZLU-oEuRKy3JDEbAw@mail.gmail.com>
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: dsa: mv88e6xxx: add warning for truncated mdio bus
+ id
+Message-ID: <Zfrt_dlYvBzlxull@nanopsycho>
+References: <20240320-mv88e6xxx-truncate-busid-v1-1-cface50b2efb@solid-run.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iLz4ZesK23DQJmMdn5EA2akh_z+8ZLU-oEuRKy3JDEbAw@mail.gmail.com>
+In-Reply-To: <20240320-mv88e6xxx-truncate-busid-v1-1-cface50b2efb@solid-run.com>
 
-Wed, Mar 20, 2024 at 02:43:22PM CET, edumazet@google.com wrote:
->On Wed, Mar 20, 2024 at 2:38 PM Jiri Pirko <jiri@resnulli.us> wrote:
->>
->> Wed, Mar 20, 2024 at 01:56:35PM CET, abelova@astralinux.ru wrote:
->> >skb is an optional parameter, so it may be NULL.
->> >Add check defore dereference in eth_hdr.
->> >
->> >Found by Linux Verification Center (linuxtesting.org) with SVACE.
->>
->> Either drop this line which provides no value, or attach a link to the
->> actual report.
->>
->>
->> >
->> >Fixes: 67a900cc0436 ("flow_dissector: introduce support for Ethernet addresses")
->>
->> This looks incorrect. I believe that this is the offending commit:
->> commit 690e36e726d00d2528bc569809048adf61550d80
->> Author: David S. Miller <davem@davemloft.net>
->> Date:   Sat Aug 23 12:13:41 2014 -0700
->>
->>     net: Allow raw buffers to be passed into the flow dissector.
->>
->>
->>
->> >Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
->> >---
->> > net/core/flow_dissector.c | 2 +-
->> > 1 file changed, 1 insertion(+), 1 deletion(-)
->> >
->> >diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
->> >index 272f09251343..05db3a8aa771 100644
->> >--- a/net/core/flow_dissector.c
->> >+++ b/net/core/flow_dissector.c
->> >@@ -1137,7 +1137,7 @@ bool __skb_flow_dissect(const struct net *net,
->> >               rcu_read_unlock();
->> >       }
->> >
->> >-      if (dissector_uses_key(flow_dissector,
->> >+      if (skb && dissector_uses_key(flow_dissector,
->> >                              FLOW_DISSECTOR_KEY_ETH_ADDRS)) {
->> >               struct ethhdr *eth = eth_hdr(skb);
->> >               struct flow_dissector_key_eth_addrs *key_eth_addrs;
->>
->> Looks like FLOW_DISSECT_RET_OUT_BAD should be returned in case the
->> FLOW_DISSECTOR_KEY_ETH_ADDRS are selected and there is no skb, no?
->>
+Wed, Mar 20, 2024 at 02:48:55PM CET, josua@solid-run.com wrote:
+>mv88e6xxx supports multiple mdio buses as children, e.g. to model both
+>internal and external phys. If the child buses mdio ids are truncated,
+>they might collide which each other leading to an obscure error from
+>kobject_add.
 >
->It would be nice knowing in which context we could have a NULL skb and
->FLOW_DISSECTOR_KEY_ETH_ADDRS
->at the same time.
->
->It seems this fix is based on some kind of static analysis, but no real bug.
+>The maximum length of bus id is currently defined as 61
+>(MII_BUS_ID_SIZE). Truncation can occur on platforms with long node
+>names and multiple levels before the parent bus on whiich the dsa switch
 
-Yeah, I agree. That's the main reason I asked for the link to the report.
+s/whiich/which/
+
+
+>sits such as on CN9130 [1].
+>
+>Test whether the return value of snprintf exceeds the maximum bus id
+>length and print a warning.
+>
+>[1]
+>[    8.324631] mv88e6085 f212a200.mdio-mii:04: switch 0x1760 detected: Marvell 88E6176, revision 1
+>[    8.389516] mv88e6085 f212a200.mdio-mii:04: Truncated bus-id may collide.
+>[    8.592367] mv88e6085 f212a200.mdio-mii:04: Truncated bus-id may collide.
+>[    8.623593] sysfs: cannot create duplicate filename '/devices/platform/cp0/cp0:config-space@f2000000/f212a200.mdio/mdio_bus/f212a200.mdio-mii/f212a200.mdio-mii:04/mdio_bus/!cp0!config-space@f2000000!mdio@12a200!ethernet-switch@4!mdi'
+>[    8.785480] kobject: kobject_add_internal failed for !cp0!config-space@f2000000!mdio@12a200!ethernet-switch@4!mdi with -EEXIST, don't try to register things with the same name in the same directory.
+>[    8.936514] libphy: mii_bus /cp0/config-space@f2000000/mdio@12a200/ethernet-switch@4/mdi failed to register
+>[    8.946300] mdio_bus !cp0!config-space@f2000000!mdio@12a200!ethernet-switch@4!mdi: __mdiobus_register: -22
+>[    8.956003] mv88e6085 f212a200.mdio-mii:04: Cannot register MDIO bus (-22)
+>[    8.965329] mv88e6085: probe of f212a200.mdio-mii:04 failed with error -22
+>
+>Signed-off-by: Josua Mayer <josua@solid-run.com>
+
+This is not bug fix, assume you target net-next. Please:
+1) Next time, indicate that in the patch subject like this:
+   [patch net-next] xxx
+2) net-next is currently closed, repost next week.
+
+
+>---
+> drivers/net/dsa/mv88e6xxx/chip.c | 6 ++++--
+> 1 file changed, 4 insertions(+), 2 deletions(-)
+>
+>diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+>index 614cabb5c1b0..1c40f7631ab1 100644
+>--- a/drivers/net/dsa/mv88e6xxx/chip.c
+>+++ b/drivers/net/dsa/mv88e6xxx/chip.c
+>@@ -3731,10 +3731,12 @@ static int mv88e6xxx_mdio_register(struct mv88e6xxx_chip *chip,
+> 
+> 	if (np) {
+> 		bus->name = np->full_name;
+>-		snprintf(bus->id, MII_BUS_ID_SIZE, "%pOF", np);
+>+		if (snprintf(bus->id, MII_BUS_ID_SIZE, "%pOF", np) >= MII_BUS_ID_SIZE)
+>+			dev_warn(chip->dev, "Truncated bus-id may collide.\n");
+
+How about instead of warn&fail fallback to some different name in this
+case?
+
+
+> 	} else {
+> 		bus->name = "mv88e6xxx SMI";
+>-		snprintf(bus->id, MII_BUS_ID_SIZE, "mv88e6xxx-%d", index++);
+>+		if (snprintf(bus->id, MII_BUS_ID_SIZE, "mv88e6xxx-%d", index++) >= MII_BUS_ID_SIZE)
+
+How exactly this may happen?
+
+
+
+>+			dev_warn(chip->dev, "Truncated bus-id may collide.\n");
+> 	}
+> 
+> 	bus->read = mv88e6xxx_mdio_read;
+>
+>---
+>base-commit: e8f897f4afef0031fe618a8e94127a0934896aba
+>change-id: 20240320-mv88e6xxx-truncate-busid-34a1d2769bbf
+>
+>Sincerely,
+>-- 
+>Josua Mayer <josua@solid-run.com>
+>
+>
 
