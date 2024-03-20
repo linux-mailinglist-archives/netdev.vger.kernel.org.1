@@ -1,105 +1,124 @@
-Return-Path: <netdev+bounces-80734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A94A880C15
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 08:32:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87391880C4F
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 08:46:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 647831C20DD0
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 07:32:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F00D2835D4
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 07:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCDAC2231C;
-	Wed, 20 Mar 2024 07:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="hvE5SlOa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAD732260A;
+	Wed, 20 Mar 2024 07:46:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp81.cstnet.cn [159.226.251.81])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05DEB210FE;
-	Wed, 20 Mar 2024 07:32:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7540D20DCC;
+	Wed, 20 Mar 2024 07:46:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710919951; cv=none; b=aIK8bvyze5/fdjR8r7f3qQ8CSKFf7KMkQy0lxcJZ5ZQlJf0dXqDLI4yrLbum7ksE/5Pql0qAWlj26Yfffg2CRMzmuGgoS2asCAc4qVwAXp5LH3UKCEHgUd5lhptFrGk38lLv88WZU3Gga/YD8+ORfMDQpZD3xbFC9/5bURzhiYk=
+	t=1710920808; cv=none; b=tw5PffJttBJ7Sn2j6OmYgy6NqciEhH8dowwrYiyo5vYmJ4aFFBGfceaPb1/o291HEX0CVehfBROPyVSqtfr37FuWUIA0O2OB6tqTy1lQB83jxcKpEJFqtWlSLmClgmbPKsyXwMofCzQtjEqIH4RfGyvOVa4XZVtOilHImIS8l18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710919951; c=relaxed/simple;
-	bh=W352MWh4bC/sCGnq6hRHMpiRENfzvwFGb/Q+kSMC+Cs=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=fe4XVgy0eNqIB36lbwUh4vDDXLd4E7kRyNZnEQdq6Xn6DgTUZ5kADaJgCmjjtLUk5h/0sT+CfjSUkS3z2zcZvqQ7//EEGRvuW5LTDfKaKhdJJAewLom3oP4UchyrlVMkAOxYUhp7qppmzqICgNPiSwrrl2kzyNV7zoQzuuvqbb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=hvE5SlOa; arc=none smtp.client-ip=192.134.164.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=qzcBOQ9A2gjB2nXWLEneAyXAgJH2MzSNJvie31esoxU=;
-  b=hvE5SlOaaYtsnN0MQvi5uhuOIyDe8W3ACZt7Xy+mVsU0ATlOQNLPa2BJ
-   bL5yAPtVv0Ru0aanmuHg7DuVoqohm8Fw3aEqNQSjKqTyZkJONR+6yfeRJ
-   ionEiL2ncdyt87/84p3UwUr1tbbXr0ZssuoZq9LQbojhkPCb002PysCzG
-   s=;
-Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=julia.lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.07,139,1708383600"; 
-   d="scan'208";a="82621728"
-Received: from dt-lawall.paris.inria.fr ([128.93.67.65])
-  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2024 08:32:18 +0100
-Date: Wed, 20 Mar 2024 08:32:17 +0100 (CET)
-From: Julia Lawall <julia.lawall@inria.fr>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-cc: Jakub Kicinski <kuba@kernel.org>, 
-    Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
-    Jesse Brandeburg <jesse.brandeburg@intel.com>, 
-    Tony Nguyen <anthony.l.nguyen@intel.com>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-    Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
-    intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-    linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org, 
-    Jonathan Cameron <jic23@kernel.org>
-Subject: Re: [PATCH net] ice: Fix freeing uninitialized pointers
-In-Reply-To: <facf5615-d7ac-4167-b23c-6bab7c123138@moroto.mountain>
-Message-ID: <f1bdbed9-8549-3787-bd17-ecd62851e8a@inria.fr>
-References: <77145930-e3df-4e77-a22d-04851cf3a426@moroto.mountain> <20240319124317.3c3f16cd@kernel.org> <facf5615-d7ac-4167-b23c-6bab7c123138@moroto.mountain>
+	s=arc-20240116; t=1710920808; c=relaxed/simple;
+	bh=R8qWnT0pcFEIMIHAwgUqU6SjvSra2zMocjTcX/gqfSU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WTKaP8KOtuShYbg6SiC/TsjWw4dHYLe63VR2U+AFybE5iavlAfYnxC/iJoWz18PbC3PlvXp4Rw3vtYFYPRbCPBeqSPP+UxTBkF90Nwobw3FtKjiDE+p4gcRZDcr5PrKmkHmzjCWKnlXYR1APwQeaO+7bjZ82bs6tssu/C9sbf1U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost (unknown [124.16.138.129])
+	by APP-03 (Coremail) with SMTP id rQCowACHZwBdkvplsfItBw--.36178S2;
+	Wed, 20 Mar 2024 15:38:06 +0800 (CST)
+From: Chen Ni <nichen@iscas.ac.cn>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	grundler@chromium.org,
+	christian.riesch@omicron.at,
+	linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Chen Ni <nichen@iscas.ac.cn>
+Subject: [PATCH net] net: asix: Add check for usbnet_get_endpoints
+Date: Wed, 20 Mar 2024 07:37:15 +0000
+Message-Id: <20240320073715.2002973-1-nichen@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:rQCowACHZwBdkvplsfItBw--.36178S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tFy3AFyDGr1DXr18Aw1fWFg_yoW8Wry5pF
+	48Ga98tr48JrW8G3yDtw48urW5ZFn2qa42kF92kw1a9Fy3AF93Gr10kw1Yy3s29FWfXa4q
+	yF4DGw4Yqr15WaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv014x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26r4j6ryUM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
+	1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
+	6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr
+	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7M4IIrI8v6xkF7I0E
+	8cxan2IY04v7MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I
+	8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8
+	ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x
+	0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_
+	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUb
+	0D73UUUUU==
+X-CM-SenderInfo: xqlfxv3q6l2u1dvotugofq/
 
+Add check for usbnet_get_endpoints() and return the error if it fails
+in order to transfer the error.
 
+Fixes: b4cdae20ef95 ("asix: Rename asix.c to asix_devices.c")
+Signed-off-by: Chen Ni <nichen@iscas.ac.cn>
+---
+ drivers/net/usb/asix_devices.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-On Wed, 20 Mar 2024, Dan Carpenter wrote:
+diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices.c
+index f7cff58fe044..4732a2951bf2 100644
+--- a/drivers/net/usb/asix_devices.c
++++ b/drivers/net/usb/asix_devices.c
+@@ -230,7 +230,9 @@ static int ax88172_bind(struct usbnet *dev, struct usb_interface *intf)
+ 	int i;
+ 	unsigned long gpio_bits = dev->driver_info->data;
+ 
+-	usbnet_get_endpoints(dev,intf);
++	ret = usbnet_get_endpoints(dev, intf);
++	if (ret < 0)
++		goto out;
+ 
+ 	/* Toggle the GPIOs in a manufacturer/model specific way */
+ 	for (i = 2; i >= 0; i--) {
+@@ -834,7 +836,9 @@ static int ax88772_bind(struct usbnet *dev, struct usb_interface *intf)
+ 
+ 	dev->driver_priv = priv;
+ 
+-	usbnet_get_endpoints(dev, intf);
++	ret = usbnet_get_endpoints(dev, intf);
++	if (ret < 0)
++		return ret;
+ 
+ 	/* Maybe the boot loader passed the MAC address via device tree */
+ 	if (!eth_platform_get_mac_address(&dev->udev->dev, buf)) {
+@@ -1258,7 +1262,9 @@ static int ax88178_bind(struct usbnet *dev, struct usb_interface *intf)
+ 	int ret;
+ 	u8 buf[ETH_ALEN] = {0};
+ 
+-	usbnet_get_endpoints(dev,intf);
++	ret = usbnet_get_endpoints(dev, intf);
++	if (ret < 0)
++		return ret;
+ 
+ 	/* Get the MAC address */
+ 	ret = asix_read_cmd(dev, AX_CMD_READ_NODE_ID, 0, 0, ETH_ALEN, buf, 0);
+-- 
+2.25.1
 
-> On Tue, Mar 19, 2024 at 12:43:17PM -0700, Jakub Kicinski wrote:
-> > On Sat, 16 Mar 2024 12:44:40 +0300 Dan Carpenter wrote:
-> > > -	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree);
-> > > -	void *mac_buf __free(kfree);
-> > > +	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) = NULL;
-> > > +	void *mac_buf __free(kfree) = NULL;
-> >
-> > This is just trading one kind of bug for another, and the __free()
-> > magic is at a cost of readability.
-> >
-> > I think we should ban the use of __free() in all of networking,
-> > until / unless it cleanly handles the NULL init case.
->
-> Free handles the NULL init case, it doesn't handle the uninitialized
-> case.  I had previously argued that checkpatch should complain about
-> every __free() pointer if the declaration doesn't have an assignment.
->
-> The = NULL assignment is unnecessary if the pointer is assigned to
-> something else before the first return, so this might cause "unused
-> assignment" warnings?  I don't know if there are any tools which
-> complain about that in that situation.  I think probably we should just
-> make that an exception and do the checkpatch thing because it's such a
-> simple rule to implement.
-
-My understanding from Jonathan Cameron was that Linus wants a NULL always,
-unless there is an initialization with the declaration.
-
-julia
 
