@@ -1,142 +1,120 @@
-Return-Path: <netdev+bounces-80726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CD86880A5E
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 05:33:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2E4F880A81
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 06:02:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E89CB1C2103A
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 04:33:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 525C71F22B02
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 05:02:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BCE8846D;
-	Wed, 20 Mar 2024 04:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12ADF12E58;
+	Wed, 20 Mar 2024 05:01:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="okk1hCbs"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="c3+JZmgx"
 X-Original-To: netdev@vger.kernel.org
-Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C2879C2
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 04:33:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AA3412B9F
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 05:01:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710909204; cv=none; b=DFbojoMCxjFHnRMS/+mRps1xKReNkvD8CmPkXULuir0ADOodMnm5xdgpWgkGaN76VnWscERAhww9w6DeEodNHLu+s47Vvu4lYnXvLCWqYmnfaQQnq1vVpFhsZznDO8uQofEEyh8N5pTlItYrUK/ijO4qlrdPaBiRvkvO2SVn9JY=
+	t=1710910918; cv=none; b=Sb6ypYKW1JP9P9zC0fTJLTlOtX4CpsjK5x0eQIOoG0GvwgvtXrGeDZqNkakAmf5khIRIO7Ec7VM6V3DjWaDoCzTcXBFNnIN5QwMx5rlZZ4o+HDwJB/wD1sfWesphCE25QlAwtQSils/EqDJCL7ELVyeDs/qZuygTrrpViovcI+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710909204; c=relaxed/simple;
-	bh=+R6gMPqirv2uzFN88bnlpZK2RK8kuDMgDFLXSBRKhiQ=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=M0MK93AWkyP73fcP55n9utxeAoQ445Yxd4GLHPLiDtmY4oGP+Cz4QmBJMAZ/oTSuF699q5ajY/2GX2HOFuyO6HhDPjDNXV8FpksD3WALWFy5xTcHc5vdPZT0wr7JQYqnEfbV6cG5EpMp2xC48kd8sPw05I2PkzmcVMzNc8PlB9c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=okk1hCbs; arc=none smtp.client-ip=62.96.220.36
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
-Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 81B17207D1;
-	Wed, 20 Mar 2024 05:33:18 +0100 (CET)
-X-Virus-Scanned: by secunet
-Received: from a.mx.secunet.com ([127.0.0.1])
-	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id lX9INqCMPbuW; Wed, 20 Mar 2024 05:33:13 +0100 (CET)
-Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id AA064207C6;
-	Wed, 20 Mar 2024 05:33:13 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com AA064207C6
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1710909193;
-	bh=dJy0HDIkV0FP6kndGZRvV/BwhBdkBnztl/U9ROavgc0=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
-	b=okk1hCbs88M9cNrHej+mLN0i8rzzlMJS0Ye31ftklPnXDLV3Rp/M6AAZR2fjAh+zT
-	 Riipoa1icCILxELLP2etN1qEyoC9wNLnTEqWqVYV3xdUCIJQDc0ao3FlpNwBVP2tN5
-	 0+E6ShngC4w3Wxg83BGKL5zSYnZXp0/Qmj9US4Z7jqRrqyQNTs1P+iHDc0vMWIHG9K
-	 OO6wctrH50hfHOIm1Q1IVtKYOFQNmpMazlnZAcnZXPW2qjGme1Z2tIwE1mWwDhgT9B
-	 y2K+e8kH1xcRWBkSKlzy+UJidqBb7dKvdQD6zlXZbhtPEsV1535jLbNytldusUwBBW
-	 T1Sr05VvFwi9w==
-Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
-	by mailout1.secunet.com (Postfix) with ESMTP id 8A64480004A;
-	Wed, 20 Mar 2024 05:33:13 +0100 (CET)
-Received: from mbx-essen-02.secunet.de (10.53.40.198) by
- cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Wed, 20 Mar 2024 05:33:13 +0100
-Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
- (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 20 Mar
- 2024 05:33:12 +0100
-Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id 6ED6131824F9; Wed, 20 Mar 2024 05:33:12 +0100 (CET)
-Date: Wed, 20 Mar 2024 05:33:12 +0100
-From: Steffen Klassert <steffen.klassert@secunet.com>
-To: Feng Wang <wangfe@google.com>
-CC: Leon Romanovsky <leon@kernel.org>, <netdev@vger.kernel.org>,
-	<herbert@gondor.apana.org.au>, <davem@davemloft.net>
-Subject: Re: [PATCH] [PATCH ipsec] xfrm: Store ipsec interface index
-Message-ID: <ZfpnCIv+8eYd7CpO@gauss3.secunet.de>
-References: <20240318231328.2086239-1-wangfe@google.com>
- <20240319084235.GA12080@unreal>
- <CADsK2K_65Wytnr5y+5Biw=ebtb-+hO=K7hxhSNJd6X+q9nAieg@mail.gmail.com>
+	s=arc-20240116; t=1710910918; c=relaxed/simple;
+	bh=OY1yJiqGKNtzEHd+k+wwWigcHefXcqgg1Yu1bcQ78IU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Wn0/cMZEZnTrXDO2V5qJdoL67avQkbrZUsCA/DO0292K6sBGHgBHH5AUbzls7FKB/Gl3yscFtIs3lbmiX19Eo/FJMYRpczFm2wW1jPZuwX+d8eDsQv7H8T1dVI0g8waYEZIqoN+T5tMpIu6U3bcVzW2gjLExx4hxCpz9agctVvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=c3+JZmgx; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-41412411672so20638775e9.3
+        for <netdev@vger.kernel.org>; Tue, 19 Mar 2024 22:01:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1710910914; x=1711515714; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=S0B7vWKH9/N5Rr83D0ntmMC2zkFMIdP3Ld+bd82Q6BI=;
+        b=c3+JZmgxwOpNCkx47skUtLAwUXGnq6vf4ArrYKzGWhKlt3en5hwR53PjNQby5GVOJ9
+         BwYfmrS4CIygYv3hlFcUJzpNnTfXIc4vUi8srVQBpuGR6rJQPIHpaFarNYdsi9z96zfk
+         59pjkesvZXaqkJRhFA2wmRFOLkRxRoyZjr3Jxv+b0XeXr0DEaJTU9PzidsreC+yetJjG
+         JAfM6d90M1AuTHnL98Ix7p2/VSlnaKfYwvRPLsYAeyyFtNQwICOOHNbVhDWBck8CdfgO
+         rvoOHKU3M4/FA7NiDDbbatjWqzJ3yOKMtOaXdxDG2K3f8eCce6lNUcP6sEVeywJ9x2VC
+         wuOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710910914; x=1711515714;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=S0B7vWKH9/N5Rr83D0ntmMC2zkFMIdP3Ld+bd82Q6BI=;
+        b=AwUQhnZQj6GDuNdATmSzlwfkw8L8l6XkRfWHHlzozdeNkVNYubX7smGdhiiJmVEO2Y
+         qRi8tQb8c7/aDn+tl+alUABXG/jY4ZNb5B8rZG40PnL1J9MLl9cm2jcvfjf7dUXwmFLz
+         0cAewgEpuUPAdJ+zrzOEhtBPFR8bVVRmeuJzpsyNWxnO3iALyiS3SyaAun4nHRXJiqDR
+         ssOuxqYyG6AbQj5QJosn06vbD55oXgyr13lUCOwMy+v5mq4bJAhFfX/cuHEOp29jdmnr
+         FqHtuXB1sBZqXKJ4IoSaigxiSdMGhmGdtbIgevLAgGekIS+8EbeszTarT64SC+OV+rDd
+         VbBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU/Gjx2w0sYUbPujehQMxNn484A0Wi6FOwdtU7MXpwKIFwtDrpB0W34ODp3BvMEQn48cfXg6fWPSVLtNcKjl8nNO32cjwZt
+X-Gm-Message-State: AOJu0YxJRP6nRJa8P1VwgkHermmQo5BaSInxbyJ8Zg0o4TRuGhtcJIoR
+	h3GDYD4oZDlC5UHto2ZlHrljmBLI7/u7ZKv2NzSrOEfl5w3HWyCVHPj20i/s2I4=
+X-Google-Smtp-Source: AGHT+IFGGKSK87rcnJmgzexq+3rYiVKaJtZ99H0a3zsNHEKEaF3v2b0OfuXy/cpjUcYbMSTlWTKjgQ==
+X-Received: by 2002:a05:600c:3546:b0:414:ca1:6531 with SMTP id i6-20020a05600c354600b004140ca16531mr833716wmq.41.1710910914424;
+        Tue, 19 Mar 2024 22:01:54 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id s14-20020a05600c45ce00b00414618bea7csm893210wmo.37.2024.03.19.22.01.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 19 Mar 2024 22:01:53 -0700 (PDT)
+Date: Wed, 20 Mar 2024 08:01:49 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] ice: Fix freeing uninitialized pointers
+Message-ID: <facf5615-d7ac-4167-b23c-6bab7c123138@moroto.mountain>
+References: <77145930-e3df-4e77-a22d-04851cf3a426@moroto.mountain>
+ <20240319124317.3c3f16cd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADsK2K_65Wytnr5y+5Biw=ebtb-+hO=K7hxhSNJd6X+q9nAieg@mail.gmail.com>
-X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
- mbx-essen-02.secunet.de (10.53.40.198)
-X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+In-Reply-To: <20240319124317.3c3f16cd@kernel.org>
 
-On Tue, Mar 19, 2024 at 10:15:13AM -0700, Feng Wang wrote:
-> Hi Leon,
+On Tue, Mar 19, 2024 at 12:43:17PM -0700, Jakub Kicinski wrote:
+> On Sat, 16 Mar 2024 12:44:40 +0300 Dan Carpenter wrote:
+> > -	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree);
+> > -	void *mac_buf __free(kfree);
+> > +	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) = NULL;
+> > +	void *mac_buf __free(kfree) = NULL;
 > 
-> There is no "packet offload driver" in the current kernel tree.  The packet
-> offload driver mostly is vendor specific, it implements hardware packet
-> offload.
-
-There are 'packet offload drivers' in the kernel, that's why we
-support this kind of offload. We don't add code for proprietary
-drivers.
-
-> On Tue, Mar 19, 2024 at 1:42 AM Leon Romanovsky <leon@kernel.org> wrote:
+> This is just trading one kind of bug for another, and the __free()
+> magic is at a cost of readability.
 > 
-> > On Mon, Mar 18, 2024 at 04:13:28PM -0700, Feng Wang wrote:
-> > > From: wangfe <wangfe@google.com>
-> > >
-> > > When there are multiple ipsec sessions, packet offload driver
-> > > can use the index to distinguish the packets from the different
-> > > sessions even though xfrm_selector are same.
-> >
-> > Do we have such "packet offload driver" in the kernel tree?
-> >
-> > Thanks
-> >
-> > > Thus each packet is handled corresponding to its session parameter.
-> > >
-> > > Signed-off-by: wangfe <wangfe@google.com>
-> > > ---
-> > >  net/xfrm/xfrm_interface_core.c | 4 +++-
-> > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > >
-> > > diff --git a/net/xfrm/xfrm_interface_core.c
-> > b/net/xfrm/xfrm_interface_core.c
-> > > index 21d50d75c260..996571af53e5 100644
-> > > --- a/net/xfrm/xfrm_interface_core.c
-> > > +++ b/net/xfrm/xfrm_interface_core.c
-> > > @@ -506,7 +506,9 @@ xfrmi_xmit2(struct sk_buff *skb, struct net_device
-> > *dev, struct flowi *fl)
-> > >       xfrmi_scrub_packet(skb, !net_eq(xi->net, dev_net(dev)));
-> > >       skb_dst_set(skb, dst);
-> > >       skb->dev = tdev;
-> > > -
-> > > +#ifdef CONFIG_XFRM_OFFLOAD
-> > > +     skb->skb_iif = if_id;
-> > > +#endif
+> I think we should ban the use of __free() in all of networking,
+> until / unless it cleanly handles the NULL init case.
 
-This looks wrong. The network interface ID is not the same as the xfrm
-interface ID.
+Free handles the NULL init case, it doesn't handle the uninitialized
+case.  I had previously argued that checkpatch should complain about
+every __free() pointer if the declaration doesn't have an assignment.
+
+The = NULL assignment is unnecessary if the pointer is assigned to
+something else before the first return, so this might cause "unused
+assignment" warnings?  I don't know if there are any tools which
+complain about that in that situation.  I think probably we should just
+make that an exception and do the checkpatch thing because it's such a
+simple rule to implement.
+
+regards,
+dan carpenter
 
