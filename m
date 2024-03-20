@@ -1,71 +1,70 @@
-Return-Path: <netdev+bounces-80814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBE78881270
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 14:39:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27505881279
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 14:43:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76A29286842
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 13:39:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D11851F24B6F
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 13:43:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D13FE42065;
-	Wed, 20 Mar 2024 13:39:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC1A541C86;
+	Wed, 20 Mar 2024 13:42:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fIijF2lc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eU92nmlr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3852C41233
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 13:38:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D2AB4120C;
+	Wed, 20 Mar 2024 13:42:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710941941; cv=none; b=KuFBiK1t0I6qhJ6lDmhaLHGst3BHNrqybLWhAyAZRFMrggsf8N1hVL51+fbTucGv77BaWk1gzvdHSAXqlcMraa/KVOBRyU4oVaY235/rtscx4tXCDtR7E84HqZqpoNnTGaLDM5Kb9fGe488x+YjlssPpdT+5tmbe3rkcstG3JZ4=
+	t=1710942174; cv=none; b=tcxmIDcXfT9lxEHd+fM0+nnPF/GYwKcFEZtsmwkuV57oXo0AY5kH8Ym7NDIsBwplADx2O5c3m+9wmQANeAkaJ1V89ifSzmrcMDiUo5TDNnThs8r7+0mi5KB6SMhXWyD8blWOSyRbp+VMKW4TNQJlays/QWIjzD6e5m6sF1hrHEc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710941941; c=relaxed/simple;
-	bh=8HG3lMRM1eo4wBzIUV+zS7eMBAvUauYxIjL5f0ACs14=;
+	s=arc-20240116; t=1710942174; c=relaxed/simple;
+	bh=SL7EEqxB06odAsm7W+93qYmrjXMwy6G5bg6bHVOjX4k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kwC0IJp+cUtffXAFRotDeaUMuINswTn+U/lD0tA3l6dBbmmedzt3XeMYjz7Lh47yVngBMpK9ijKgC4uIrFNfY9AlCvu5GjWrk0hlZNbgPqawvNxqmUIertorMSpeEsVQw/HCIRdF1ikm8FE0gw1QgkllPlbEK6kdX329HH3gJa8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fIijF2lc; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710941939;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=obHBarWxk+ROrmEnXbSe1lZadfgNP9noxnJHktLqcg0=;
-	b=fIijF2lckeV7fXJY13IxInAZukYg67xcO5Jjv4B2CznYXToVOUrhYz8sRefYuABL9on9Yg
-	FkwzPuQy8eF6ekxBAch5/SWxuhXqBjRXsqpZy0Alz4J4QU2ZwKPZcQYb6oAmfNaNA+1rS1
-	JDrhKoHOY3oILG4FApISHtFKP/J6TIA=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-688-pYPacII4OECEEpeoufjukg-1; Wed, 20 Mar 2024 09:38:53 -0400
-X-MC-Unique: pYPacII4OECEEpeoufjukg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D412C8F4121;
-	Wed, 20 Mar 2024 13:38:52 +0000 (UTC)
-Received: from alecto.usersys.redhat.com (unknown [10.43.17.36])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 713721121306;
-	Wed, 20 Mar 2024 13:38:51 +0000 (UTC)
-Date: Wed, 20 Mar 2024 14:38:49 +0100
-From: Artem Savkov <asavkov@redhat.com>
-To: Xu Kuohai <xukuohai@huaweicloud.com>
-Cc: Xi Wang <xi.wang@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH bpf-next] arm64: bpf: zero upper bits after rev32
-Message-ID: <20240320133849.GA142600@alecto.usersys.redhat.com>
-References: <20240313140205.3191564-1-asavkov@redhat.com>
- <ab5e6307-8d80-4751-940f-4faa5bc41d82@huaweicloud.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=HV4sUEGpstgXm77j0VrOYuXSqAtbZSVKNvqw9zhcO5UDbzrqh7/gCFmEYKUeYBOEptzDyo7PxF2zxdZrVeXvtHrmioeoYg8lN0CaxiNVyU4m5LKf83pSssnrPFvXPZBSMLf1NVyX7Xw1TbDCbQEfQ0aMDor+YmUlnLXZeMqyb0A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eU92nmlr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 068A1C433F1;
+	Wed, 20 Mar 2024 13:42:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710942173;
+	bh=SL7EEqxB06odAsm7W+93qYmrjXMwy6G5bg6bHVOjX4k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=eU92nmlr0GgktT6+bpsfmN+xC5VvXw5CpLfwFEwtc5AI+tOUb/Y+LyFVBQymaGUgi
+	 WN36NQnrdDRFhd+zvg2dD0Qb/O4nVB7z5uUfzFipL+xdE3OskfqvKoynC0DSJBj+L2
+	 L24/fz+d5jFyMZLE8D2/DqorwLJk7xpQ08sbWY9Y8ZaWe8h3vzfC9c6laNosm0/aqO
+	 Esqxqf++mSLwyiOf/PgEk6IABgu37OL3s1Qj96/v/8dSImS8H9L6uozkCOpY2Txz7h
+	 dvvaiYvSchaZv5AIf3Opfz24chH4J04CfvAcABhqejZ9pyKlfmtt1lsllgMDBILzKm
+	 VBFifxxs//eyA==
+Date: Wed, 20 Mar 2024 14:42:41 +0100
+From: Christian Brauner <brauner@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
+	Chuck Lever <chuck.lever@oracle.com>, Alexander Aring <alex.aring@gmail.com>, 
+	Trond Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker <anna@kernel.org>, 
+	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
+	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
+	Tom Talpey <tom@talpey.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
+	"Rafael J. Wysocki" <rafael@kernel.org>, David Howells <dhowells@redhat.com>, 
+	Tyler Hicks <code@tyhicks.com>, Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, 
+	Dai Ngo <Dai.Ngo@oracle.com>, Miklos Szeredi <miklos@szeredi.hu>, 
+	Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
+	Sergey Senozhatsky <senozhatsky@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
+	netfs@lists.linux.dev, ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH RFC 08/24] vfs: make vfs_mknod break delegations on
+ parent directory
+Message-ID: <20240320-jaguar-bildband-699e7ef5dc64@brauner>
+References: <20240315-dir-deleg-v1-0-a1d6209a3654@kernel.org>
+ <20240315-dir-deleg-v1-8-a1d6209a3654@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,61 +73,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <ab5e6307-8d80-4751-940f-4faa5bc41d82@huaweicloud.com>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.3
+In-Reply-To: <20240315-dir-deleg-v1-8-a1d6209a3654@kernel.org>
 
-On Wed, Mar 20, 2024 at 07:34:46PM +0800, Xu Kuohai wrote:
-> On 3/13/2024 10:02 PM, Artem Savkov wrote:
-> > Commit d63903bbc30c7 ("arm64: bpf: fix endianness conversion bugs")
-> > added upper bits zeroing to byteswap operations, but it assumes they
-> > will be already zeroed after rev32, which is not the case on some
-> > systems at least:
-> > 
-> > [ 9757.262607] test_bpf: #312 BSWAP 16: 0x0123456789abcdef -> 0xefcd jited:1 8 PASS
-> > [ 9757.264435] test_bpf: #313 BSWAP 32: 0x0123456789abcdef -> 0xefcdab89 jited:1 ret 1460850314 != -271733879 (0x5712ce8a != 0xefcdab89)FAIL (1 times)
-> > [ 9757.266260] test_bpf: #314 BSWAP 64: 0x0123456789abcdef -> 0x67452301 jited:1 8 PASS
-> > [ 9757.268000] test_bpf: #315 BSWAP 64: 0x0123456789abcdef >> 32 -> 0xefcdab89 jited:1 8 PASS
-> > [ 9757.269686] test_bpf: #316 BSWAP 16: 0xfedcba9876543210 -> 0x1032 jited:1 8 PASS
-> > [ 9757.271380] test_bpf: #317 BSWAP 32: 0xfedcba9876543210 -> 0x10325476 jited:1 ret -1460850316 != 271733878 (0xa8ed3174 != 0x10325476)FAIL (1 times)
-> > [ 9757.273022] test_bpf: #318 BSWAP 64: 0xfedcba9876543210 -> 0x98badcfe jited:1 7 PASS
-> > [ 9757.274721] test_bpf: #319 BSWAP 64: 0xfedcba9876543210 >> 32 -> 0x10325476 jited:1 9 PASS
-> > 
-> > Fixes: d63903bbc30c7 ("arm64: bpf: fix endianness conversion bugs")
-> > Signed-off-by: Artem Savkov <asavkov@redhat.com>
-> > ---
-> >   arch/arm64/net/bpf_jit_comp.c | 3 ++-
-> >   1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/arch/arm64/net/bpf_jit_comp.c b/arch/arm64/net/bpf_jit_comp.c
-> > index c5b461dda4385..e86e5ba74dca2 100644
-> > --- a/arch/arm64/net/bpf_jit_comp.c
-> > +++ b/arch/arm64/net/bpf_jit_comp.c
-> > @@ -944,7 +944,8 @@ static int build_insn(const struct bpf_insn *insn, struct jit_ctx *ctx,
-> >   			break;
-> >   		case 32:
-> >   			emit(A64_REV32(is64, dst, dst), ctx);
-> > -			/* upper 32 bits already cleared */
-> > +			/* zero-extend 32 bits into 64 bits */
-> > +			emit(A64_UXTW(is64, dst, dst), ctx);
-> 
-> I think the problem only occurs when is64 == 1. In this case, the generated rev32
-> insn reverses byte order in both high and low 32-bit word. To fix it, we could just
-> set the first arg to 0 for A64_REV32:
-> 
-> emit(A64_REV32(0, dst, dst), ctx);
-> 
-> No need to add an extra uxtw isnn.
+>  int vfs_mknod(struct mnt_idmap *, struct inode *, struct dentry *,
+> -              umode_t, dev_t);
+> +              umode_t, dev_t, struct inode **);
 
-I can confirm this approach fixes the test issue as well.
+So we will have at least the following helpers with an additional
+delegated inode argument.
 
-> 
-> >   			break;
-> >   		case 64:
-> >   			emit(A64_REV64(dst, dst), ctx);
-> 
-> 
+vfs_unlink()
+vfs_link()
+notify_change()
+vfs_create()
+vfs_mknod()
+vfs_mkdir()
+vfs_rmdir()
 
--- 
- Artem
+From looking at callers all these helpers will be called with non-NULL
+delegated inode argument in vfs only. Unless it is generally conceivable
+that other callers will want to pass a non-NULL inode argument over time
+it might make more sense to add vfs_<operation>_delegated() or
+__vfs_<operation>() and make vfs_mknod() and friends exported wrappers
+around it.
 
+I mean it's a matter of preference ultimately but this seems cleaner to
+me. So at least for the new ones we should consider it. Would also make
+the patch smaller.
+
+>  int vfs_symlink(struct mnt_idmap *, struct inode *,
+>  		struct dentry *, const char *);
+>  int vfs_link(struct dentry *, struct mnt_idmap *, struct inode *,
+> @@ -1879,7 +1879,7 @@ static inline int vfs_whiteout(struct mnt_idmap *idmap,
+>  			       struct inode *dir, struct dentry *dentry)
+>  {
+>  	return vfs_mknod(idmap, dir, dentry, S_IFCHR | WHITEOUT_MODE,
+> -			 WHITEOUT_DEV);
+> +			 WHITEOUT_DEV, NULL);
+>  }
+>  
+>  struct file *kernel_tmpfile_open(struct mnt_idmap *idmap,
+> diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+> index 0748e7ea5210..34fbcc90c984 100644
+> --- a/net/unix/af_unix.c
+> +++ b/net/unix/af_unix.c
+> @@ -1227,7 +1227,7 @@ static int unix_bind_bsd(struct sock *sk, struct sockaddr_un *sunaddr,
+>  	idmap = mnt_idmap(parent.mnt);
+>  	err = security_path_mknod(&parent, dentry, mode, 0);
+>  	if (!err)
+> -		err = vfs_mknod(idmap, d_inode(parent.dentry), dentry, mode, 0);
+> +		err = vfs_mknod(idmap, d_inode(parent.dentry), dentry, mode, 0, NULL);
+>  	if (err)
+>  		goto out_path;
+>  	err = mutex_lock_interruptible(&u->bindlock);
+> 
+> -- 
+> 2.44.0
+> 
 
