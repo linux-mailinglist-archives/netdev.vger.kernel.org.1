@@ -1,265 +1,226 @@
-Return-Path: <netdev+bounces-80753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2E4D880F56
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:10:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 584A0880F59
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:10:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F26C41C20D58
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 10:10:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA0A11F230DC
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 10:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4812B3BB36;
-	Wed, 20 Mar 2024 10:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A7B13CF65;
+	Wed, 20 Mar 2024 10:10:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="A0q4qtST"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Rf+Geptr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C59E3C060
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 10:10:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710929412; cv=none; b=BwQacSgTuKoAHpCAfPbgq/lpg3vQ/zSt487IziJTZLMbbthX9iT6W6VO4FojNH2kwKmine5Pp4xbPoUfu3o1eZbmbCgf9IORsuq/qodcu9wJosynvNPaxwRuDlDxN3VQrsB41809zCBfq2jFBFl9Yf/0DKvZpbf0N2Ykg9fNBX8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710929412; c=relaxed/simple;
-	bh=Cxm19imkyicEHoBGhA1VF+3OlH/L/2B6Sylu2bNghwA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PIFelB4oUgxWB08i1wwbXd+t5PTDuTNiEBtZBiFmW16THDCTycRgAo6omLpftHJLrTQvsr8iTBsaWmQ6v9bQp+DGVjHcZPGPsKmAfFraP0M/bki5zPqv2mdcu1knSfMiUGBw+MUiDo9Nl1/KI6k646vdVWk6es4K6FSMxBYvQUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=A0q4qtST; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-513e89d0816so4030028e87.0
-        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 03:10:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710929408; x=1711534208; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=oaFQBAeySLc/4g1+NxFK/xDpRmO1vnuBvQEiNv0Zh50=;
-        b=A0q4qtSTgFw8CU4+pe84knBrJmxP0W1w61zl8QZuTgZD92l1Cu23sN7htU3q6uP9VK
-         OoO9VcSW21t1BLe6vUa3zrOUCTk3BPIdcW/TFyiFGG+OvOaAdDU5vnGYHB30LggqM4Ie
-         viYLnOGFybYgFls2mtTvfk09UUAGwaC8e9uWGnjsiGBCCcP3RLE0redq28rzQLYkbt+S
-         DA+dcOUoL0ZIywTg19yvmTN4IEd63FrLVajWOjwYsDUmCZfpq7rKFW+beM3Q8Tjj1Xwc
-         yQkLLfk6cK0zaSCyT/DNluXhb1GMuIuwQgyXXD06iFefO8MA8Ohwy8zZZZWLxH+WUQOI
-         UKIA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710929408; x=1711534208;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oaFQBAeySLc/4g1+NxFK/xDpRmO1vnuBvQEiNv0Zh50=;
-        b=BdHBxv5tuK7voMbM3jDLDa1H/I7c9QlzxVbFn12l7fDgez8N2mn9REO41zkDdAgKx/
-         BQMb6cyn9xI++dx7T3liLAhi8xhCYHUeNKrQULLXGYUPtSVxMKgYbrwSWzNncL4AnBit
-         8TyvaOk8FhpFOl7zb+sFjpa3bUwnhGnSwqtkBK1lXsGcNql3bEY33WHB23fbcOJDn8Ox
-         +hfLkG/MY14zCQCnWkC8K6s/1yks8ieJiZMzX5qxl2rEkKPe0XwHkhZ2QOGmt4i9Z4uC
-         4poAmVfVj2RyOzJlasLBcJjZka/PHPNhSmrpST7c/Jq3I03G7UAziXhMNyKSCDKWr+WJ
-         QxCg==
-X-Forwarded-Encrypted: i=1; AJvYcCWT6hUHXJNOWT9ST4H1Av5VZOoQ6k5YSNmPCLh17Tqn2ni2MewBWjnccbDm71aaEL+3itfdQwVA2dvigyBDioAYaHLhGMu/
-X-Gm-Message-State: AOJu0YwJpglDQa7PnGXHlGArZWHvK3+GzrG4AFKGg8m4xcyDNRgtqD74
-	qeV3vwX+WIJcs+Wf2ZemTYlzHS2YNINzJR/KX8NPA/uUlNqYgYCJTUZebNk3
-X-Google-Smtp-Source: AGHT+IH54AqWCKuvyXoQ8mbzoshEjz/RVW7gJrCsgTUIkC/WZ+uoe5586EThMo0D2diHYHZTXtv9og==
-X-Received: by 2002:ac2:43d5:0:b0:513:4105:6b34 with SMTP id u21-20020ac243d5000000b0051341056b34mr3465400lfl.64.1710929408028;
-        Wed, 20 Mar 2024 03:10:08 -0700 (PDT)
-Received: from mobilestation ([178.176.56.174])
-        by smtp.gmail.com with ESMTPSA id q13-20020ac246ed000000b0051355ec71absm2211614lfo.220.2024.03.20.03.10.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Mar 2024 03:10:07 -0700 (PDT)
-Date: Wed, 20 Mar 2024 13:10:04 +0300
-From: Serge Semin <fancer.lancer@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Yanteng Si <siyanteng@loongson.cn>, andrew@lunn.ch, 
-	hkallweit1@gmail.com, peppe.cavallaro@st.com, alexandre.torgue@foss.st.com, 
-	joabreu@synopsys.com, Jose.Abreu@synopsys.com, chenhuacai@loongson.cn, 
-	guyinggang@loongson.cn, netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH net-next v8 09/11] net: stmmac: dwmac-loongson: Fix half
- duplex
-Message-ID: <em3r6w7ydvjxualqifjurtrrfpztpil564t5k5b4kxv4f6ddrd@4weteqhekyae>
-References: <cover.1706601050.git.siyanteng@loongson.cn>
- <3382be108772ce56fe3e9bb99c9c53b7e9cd6bad.1706601050.git.siyanteng@loongson.cn>
- <dp4fhkephitylrf6a3rygjeftqf4mwrlgcdasstrq2osans3zd@zyt6lc7nu2e3>
- <vostvybxawyhzmcnabnh7hsc7kk6vdxfdzqu4rkuqv6sdm7cuw@fd2y2o7di5am>
- <88c8f5a4-16c1-498b-9a2a-9ba04a9b0215@loongson.cn>
- <ZfF+IAWbe1rwx3Xs@shell.armlinux.org.uk>
- <cd8be3b1-fcfa-4836-9d28-ced735169615@loongson.cn>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2B113BBE3;
+	Wed, 20 Mar 2024 10:10:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.8
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710929426; cv=fail; b=KMA9TM2g4LAYsMdZbZhVEg2DHM49CH2/sHUJXHqwzrtF6Zt51pLJe3a/+90jV9yMNylk5Yw1r4vnaYXMeY8Ke4d0mbndxkFzs5bMHqOp5gurretSwvMUvs2qm7POtnAq72UvkSDD7A3spty+VSUKZ1usLbB7O0Pp57wn83oDBiU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710929426; c=relaxed/simple;
+	bh=EVp7g9wtJGUVcceWGBmBi+JBR4nt01UINtucOAeFTic=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=uWcXapkwhkoTRSCAUCttNlRjO8XLgJBd4koA2+ft7il3DfcFZsqMA3V1BdafmTcmXdlJWVcSd2iDW/pguDwVV1gdStAtBFX1HEOMulDXQYU9qCW7GYlFlYp3AqC8HAHBH8HSpnAwImHUpzKbmnRbDLrRHQAHGgsVc4QqBpTq+3M=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Rf+Geptr; arc=fail smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1710929425; x=1742465425;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=EVp7g9wtJGUVcceWGBmBi+JBR4nt01UINtucOAeFTic=;
+  b=Rf+GeptrZ0uH6eS0pAaqJ1xOUa23rbCsX5U4eXqUryCZnFCFaNXD+pMU
+   hZdJwMsiirr07AaBF/+M0Ts81V4/Wg5MHGYdsfi5NkfypYiSy1FrgCwaF
+   50/q0BBmrMp2f5qneaJ6euLPkiB0nxV04h1/LIMtVFOWzmpcXo3f3qsEV
+   IhmA8utjZ3V7//MVZ3tva6qmpACjjvn/mkX6zmcAiNRZveXjw2wViEQka
+   hZFk7zoKPxdisdvyZ2bffGZ3JonJY8h3mjtrTU8NvakQOBMOUxgS8WcjQ
+   eNfX82PnmFWHp9xEIMTvGFYhR6xuugDuZ0JiJ6o3BkpOnedLHVcCfsGEL
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11018"; a="23344810"
+X-IronPort-AV: E=Sophos;i="6.07,139,1708416000"; 
+   d="scan'208";a="23344810"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Mar 2024 03:10:23 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,139,1708416000"; 
+   d="scan'208";a="14181712"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa006.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 20 Mar 2024 03:10:18 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 20 Mar 2024 03:10:17 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 20 Mar 2024 03:10:17 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Wed, 20 Mar 2024 03:10:17 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Wed, 20 Mar 2024 03:10:17 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=e3Sg+2Aa/ziUwIWOvFUWZItibpJ/sq5DvGcGfaCZeX+lhGk0c27PeHz/CBiyn9oeoQiHcLRlRew1Bs1ng4SggV8ZP8rlHR2eW6Io+PamwKLYyR7ZFiHeAT22Sp5dpRuxpmNSToPjREcbMkA4va30F4V0SNP+udRq8JjJptjTyBvm8cP56asozBDxvnCBZ1a8VkwYbCieIOQNFQtBygIZyXWiEJUKVDFHIUG4GluDlmwwHd5zFggo5W4PUfHTTH5aw2bxKocmE+oBwwIXxcQLAY7CyZgaAk3ErYpPAgMcssM7Y6E3gPAAbEy0R7TdBm6pXBra7Uf8VNMeCRSund95YA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=M2ybXOpUAXQD41T49rzcYC5m7iogLhZ4804Bi3FVamI=;
+ b=UZfvI+f/KJG2v6yKpUn1qVl/KtVb/t5E0IKTGQeGzgKthr5JgSHlqVCSzkmbHzCzTUZbpEz6CZzIP75EpCF+6TNbuuXvo6dE3ssfbljW5ZYTUXsfq/S3tNc66i2RM6HFafeNDI2ZWH2AL+P3SaSvDac1RHHL7YdjvQWP18qldIm4nYRe5Mq1gvkZVxpI0KedXJ4Mc3E+eXWrVD0fbdbm8zBcz23dBSzbjaSBYIyRfxyDi07mPNACVj4rNR4ODZ4T5p6W7QmHTFG0NjBKr7n8EInVf8BV7Hj7Iywot34INzURDqSPpAj8ZYVhzZ7MybPvgUfw+K0bt2eG2zp5onaALg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by PH0PR11MB4982.namprd11.prod.outlook.com (2603:10b6:510:37::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.11; Wed, 20 Mar
+ 2024 10:10:15 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::654c:d66a:ec8e:45e9]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::654c:d66a:ec8e:45e9%6]) with mapi id 15.20.7409.010; Wed, 20 Mar 2024
+ 10:10:15 +0000
+Message-ID: <058f6e5d-369e-48c7-a5ea-976eccccaafe@intel.com>
+Date: Wed, 20 Mar 2024 11:10:09 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC kspp-next 3/3] idpf: sprinkle __counted_by{,_le}() in
+ the virtchnl2 header
+Content-Language: en-US
+To: Kees Cook <keescook@chromium.org>, Simon Horman <horms@kernel.org>
+CC: <linux-hardening@vger.kernel.org>, "Gustavo A. R. Silva"
+	<gustavoars@kernel.org>, Marco Elver <elver@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20240318130354.2713265-1-aleksander.lobakin@intel.com>
+ <20240318130354.2713265-4-aleksander.lobakin@intel.com>
+ <20240319185718.GO185808@kernel.org> <202403191442.219F77E672@keescook>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <202403191442.219F77E672@keescook>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MI1P293CA0021.ITAP293.PROD.OUTLOOK.COM
+ (2603:10a6:290:3::14) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <cd8be3b1-fcfa-4836-9d28-ced735169615@loongson.cn>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|PH0PR11MB4982:EE_
+X-MS-Office365-Filtering-Correlation-Id: 35c30941-74e5-4006-c468-08dc48c5f005
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: YWYGI3c1zu2K/s033kfHrb51WXO9jzHb5hVP3CdcrUmd71b6G0QSqSu6xg14eGLPX8OJpkRPLEQGzDaFgKqps1FCDsSv1CGVuu4ABzJyFlfA+4Shp9UI4IiaIAFLpkK+6xjcj8rSrlxO82PZTSbzUa9AihgpZPIlRLAL8q78H4IcHHBjWqJndVu91Ugi5G6lDbJdrijU00b6AdkhT4RTXQiP4tmqEDs5etdeyNqdFqlJwo/U5yuuViT+HOQZgMl7RtDFDFvBsTqSZ1e9s38pdu1cMxqtSaYT1DnBOvQx/r9tenLW0bREsT2UJbJ0e27B/qzUUpI+xvb6ghC+vSSz1f9ZZ3a0Uk/YtwpSVCVgbsTtuIjVzuf2ci5cKnrW67VWeVbdulhioknf9zKmyYeWwvdNAIsTl2dPhy1bMyC+R3Vk/Ho95DlbaH5kjBJoemQWBHNJ1GVI3eOWrPD84htNrBnpUsX0/Fz4IHl+iHHrGfRkHT2dmukcUjWrnUvKF1UHi5MocRSkuwrYYzCRnZPOF8iENZOAWJBOx9YtHRZFn9N/OUS4nos5jqH8t/uVuBLI3m+H0iicDLCMHtmXIBmwABMX4A/UQV3vL8sxNtLVhGj4kM1lSja9E0wtv9Ow4ayF8e2gsmkXqpuza7LqD6+6nZqsgGVoTYZA5P8U+gfwj4c=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y3JBSmJTZHFQVkoxN0ZMbGdpU3h5NnFtVWtjNGxNOEp1aGNvdHQrWWJkeG9u?=
+ =?utf-8?B?Y2szaVVPL1N4ZHJWK0pkY083ZXNRVzdOQjdVWUZkM0Q3bjhuN2xVamxYcEIv?=
+ =?utf-8?B?UzV6bnhxK0ZNTG54V3FQbWplWm9JRzE0TyttNWhMb0ZRNkJzV21VQlNFeVcr?=
+ =?utf-8?B?R3pud0dTN2kycWJCV1piNmQvUklaOWh2Tm0zNXFZVEc2U2p6SEtJWU5QdGNH?=
+ =?utf-8?B?S3dSenlpc2s3WHR6anY3aEhmdWpwQ2RVenlaWUkyOFRpNkxMWlcrcXVxUk5L?=
+ =?utf-8?B?VWJ0Skc1Q1ZhMUN6TjhkZmhWeU9zZmcxOWFuWmZGdU54SndMYmNIRHBGYmg0?=
+ =?utf-8?B?YWJlTWNlQlBqdXYxRFB3SUUyTDlMQTBqYlB2S0ZrcU5HaFNndFpMRDVwYm9v?=
+ =?utf-8?B?U1hid2p0U1lPRk9FZUVxZEp4RGszakk0dHdLbDFzMkZDcU5jTUMzT3BhMU0v?=
+ =?utf-8?B?cXhra0VmVU1sejE2dDY5OVloRmRMM2EwWk52c2F1S3hRdnpFd2RpSE5Oak93?=
+ =?utf-8?B?ZndVKzJueDE4L3VBbGFLZ3EzL3MxdE14UzJ6dzVGQ3o3NS9DcWFDRERhRW14?=
+ =?utf-8?B?ZHY4WmRVamltYldsMFdLTXRzbXBubmtwZEI1SG03WkVBb3BlL2VTWXZMcGN1?=
+ =?utf-8?B?QlBOUk4rREx2WUVCUk91OHMvRlBMUFVNdGNxT1VRek9WMWZVUEFBVE5JR2pN?=
+ =?utf-8?B?VHNMcm1VdnlzVEo0aVlzVUZNUjI4TzJnWlN5b1JaaVlhUlRLQ2Vhc05qRVdv?=
+ =?utf-8?B?YldEYk4vbUJwa2VQczdEOTRlU016VVB6Wmd1c1d5K0w2bmd2cE9WM3pWRWZM?=
+ =?utf-8?B?Q1hWZnE2NThUT0dGU291VUcxdm1UUWN0cEdaaG50K0U3L2tIQS9CY2huWTFD?=
+ =?utf-8?B?dWs0bXBmdnZ4SE45UVFwZU1zSUY0MGR3dk1iQnk3Z1p3My9ycUdFZzNSTEt5?=
+ =?utf-8?B?MHN3OXlMRE0weWY5Y3I5cEsxY1k2SmF3bUQ1Y1ZxNnRob1RvZ0lEWGRUaTdw?=
+ =?utf-8?B?MDFSVlNCM3JPOW42dGRrc3Fac2NDZytmODdiRU1pcHkxYmdlMHB5TkF2dzVu?=
+ =?utf-8?B?MTh5MEpRc2ZtcTZJai8xWnpNZEw1Y25XMzRsWGc1R3lxalNOcU00ZUoyZG9v?=
+ =?utf-8?B?U0g2L3UwbE44MEhDWGlkaUFOR1h3WGU1aGl5clVHZ3Y1bC9kRjBPb0grUDUx?=
+ =?utf-8?B?SlRaWGZvWHk2YlVLU3pacVYzRkNtam9zdXZ4VVVlUUw2UDhCY3pIUW1ha1Nj?=
+ =?utf-8?B?WVFvSnlNZFRnZWM5ei9LMU10ZVJQWDJ2dXVDTDVmSlNCNDVRcFBSM3c0ZVBV?=
+ =?utf-8?B?bHJmL0dyalloNmxEVlk5a2ZXMnhOSkpURlRqNjQxejVYVnU5eUc5cmpsdzRh?=
+ =?utf-8?B?UHVhcUh3Z0NqZXFNbnR1a0EwUU05ZXZINWpjZ2I1NlExOWltMFJlRVBZeXZN?=
+ =?utf-8?B?RTdJWlhpeU0zb1dxTWpJcmpha0EzQmNJNlQwcEtid2FjMW1kQWc2dW15K2JN?=
+ =?utf-8?B?QnB6ei8rTE9GZ1pxVVhRRlFoSTQwU0M2cklzQ3hmSVBpY3dMeU9nSnRFWjJK?=
+ =?utf-8?B?SjVPVnk3ZEI0T3pWTE5RSSszWjJMN3RmUmxwRzZ6TngxMlkwWm52VlFFaTRB?=
+ =?utf-8?B?MFVoQTJLV2xHNTIrTzY2RU5MMVRreTNaMUxZdCswbjNJcGh4RGN5Y1RodlRP?=
+ =?utf-8?B?UlgxV0tVc1dUUUp3ajIvNWxkTmMrMGR5SlBIWmUzV05LRVJYRWFJajNaaTd2?=
+ =?utf-8?B?eXVpelhSSE1sMFpya3MrTDc4d3BJZHU5K25EbWpyc1NNV2JjNUlGN2pjWU8w?=
+ =?utf-8?B?NmVlRTErdE9GZTRLRWFPekgvSkF4b2FBVU5ydXpuSTdlV0prdE9XczFpM3Bu?=
+ =?utf-8?B?R00zWDdyRjlRMmhFQ2dUcW5xSDczbEMzb2Rwank0VHp6MjVvcVJiUEhhUldy?=
+ =?utf-8?B?NlV4ZzRKditKSkNKTVVZOGhOUnRxd1lTVDBNQVhGbEt4QnZhQktzNktMdkxY?=
+ =?utf-8?B?dGowNmJ5Z1NhNFpUQjZvV1IxczQySFZHdnlPRW1ES3I1NGdLWXB6RHB4Yjdj?=
+ =?utf-8?B?dkVReGdDVFlRaWpUVTRhN2RCUmtMUjdYTFppR05teFhCdlZJRDF2RnBrS0NU?=
+ =?utf-8?B?dlZZSmU3VitkRTVOQXRub3YzLzJId3JjdFh3YXNsWFB4T2pOQzMzVFlUVEtM?=
+ =?utf-8?B?bVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 35c30941-74e5-4006-c468-08dc48c5f005
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Mar 2024 10:10:15.3291
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MFhaYBSf3b7JqziS7DSVHVLjpwjj5IZOFSRuYg67oCTfD1ynRtvRqd83K3WNTJSxfcRaOCAzWfSNA0rTK/NI/wNQhwZHhhqooJwA+nf1Fi8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB4982
+X-OriginatorOrg: intel.com
 
-On Thu, Mar 14, 2024 at 09:08:41PM +0800, Yanteng Si wrote:
-> 
-> 在 2024/3/13 18:21, Russell King (Oracle) 写道:
-> > On Wed, Mar 13, 2024 at 05:24:52PM +0800, Yanteng Si wrote:
-> > > 在 2024/2/6 06:06, Serge Semin 写道:
-> > > > On Tue, Feb 06, 2024 at 12:58:17AM +0300, Serge Semin wrote:
-> > > > > On Tue, Jan 30, 2024 at 04:49:14PM +0800, Yanteng Si wrote:
-> > > > > > Current GNET does not support half duplex mode.
-> > > > > > 
-> > > > > > Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
-> > > > > > Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
-> > > > > > Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
-> > > > > > ---
-> > > > > >    drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 11 ++++++++++-
-> > > > > >    drivers/net/ethernet/stmicro/stmmac/stmmac_main.c    |  3 ++-
-> > > > > >    include/linux/stmmac.h                               |  1 +
-> > > > > >    3 files changed, 13 insertions(+), 2 deletions(-)
-> > > > > > 
-> > > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > > > > index 264c4c198d5a..1753a3c46b77 100644
-> > > > > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > > > > @@ -432,8 +432,17 @@ static int loongson_gnet_config(struct pci_dev *pdev,
-> > > > > >    				struct stmmac_resources *res,
-> > > > > >    				struct device_node *np)
-> > > > > >    {
-> > > > > > -	if (pdev->revision == 0x00 || pdev->revision == 0x01)
-> > > > > > +	switch (pdev->revision) {
-> > > > > > +	case 0x00:
-> > > > > > +		plat->flags |= STMMAC_FLAG_DISABLE_FORCE_1000 |
-> > > > > > +			       STMMAC_FLAG_DISABLE_HALF_DUPLEX;
-> > > > > > +		break;
-> > > > > > +	case 0x01:
-> > > > > >    		plat->flags |= STMMAC_FLAG_DISABLE_FORCE_1000;
-> > > > > > +		break;
-> > > > > > +	default:
-> > > > > > +		break;
-> > > > > > +	}
-> > > > > Move this change into the patch
-> > > > > [PATCH net-next v8 06/11] net: stmmac: dwmac-loongson: Add GNET support
-> > > > > 
-> > > > > >    	return 0;
-> > > > > >    }
-> > > > > > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > > > > index 5617b40abbe4..3aa862269eb0 100644
-> > > > > > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > > > > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > > > > > @@ -1201,7 +1201,8 @@ static int stmmac_init_phy(struct net_device *dev)
-> > > > > >    static void stmmac_set_half_duplex(struct stmmac_priv *priv)
-> > > > > >    {
-> > > > > >    	/* Half-Duplex can only work with single tx queue */
-> > > > > > -	if (priv->plat->tx_queues_to_use > 1)
-> > > > > > +	if (priv->plat->tx_queues_to_use > 1 ||
-> > > > > > +	    (STMMAC_FLAG_DISABLE_HALF_DUPLEX & priv->plat->flags))
-> > > > > >    		priv->phylink_config.mac_capabilities &=
-> > > > > >    			~(MAC_10HD | MAC_100HD | MAC_1000HD);
-> > > > > >    	else
-> > > > > > diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-> > > > > > index 2810361e4048..197f6f914104 100644
-> > > > > > --- a/include/linux/stmmac.h
-> > > > > > +++ b/include/linux/stmmac.h
-> > > > > > @@ -222,6 +222,7 @@ struct dwmac4_addrs {
-> > > > > >    #define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
-> > > > > >    #define STMMAC_FLAG_HWTSTAMP_CORRECT_LATENCY	BIT(12)
-> > > > > >    #define STMMAC_FLAG_DISABLE_FORCE_1000	BIT(13)
-> > > > > > +#define STMMAC_FLAG_DISABLE_HALF_DUPLEX	BIT(14)
-> > > > > Place the patch with this change before
-> > > > > [PATCH net-next v8 06/11] net: stmmac: dwmac-loongson: Add GNET support
-> > > > > as a pre-requisite/preparation patch. Don't forget a thorough
-> > > > > description of what is wrong with the GNET Half-Duplex mode.
-> > > > BTW what about re-defining the stmmac_ops.phylink_get_caps() callback
-> > > > instead of adding fixup flags in this patch and in the next one?
-> > > ok.
-> > > 
-> > > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > index ac1b48ff7199..b57e1325ce62 100644
-> > > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > > @@ -238,6 +234,13 @@ static int loongson_gnet_get_hw_feature(void __iomem
-> > > *ioaddr,
-> > >       return 0;
-> > >   }
-> 
-> Hi Russell,
-> 
-> > > +static void loongson_phylink_get_caps(struct stmmac_priv *priv)
-> > > +{
-> > > +    priv->phylink_config.mac_capabilities = (MAC_10FD |
-> > > +        MAC_100FD | MAC_1000FD) & ~(MAC_10HD | MAC_100HD | MAC_1000HD);
-> > Why is this so complicated? It would be silly if the _full duplex_
-> > definitions also defined the _half duplex_ bits. This should be just:
-> > 
-> > 	priv->phylink_config.mac_capabilities = MAC_10FD | MAC_100FD |
-> > 						MAC_1000FD;
-> 
-> Yes, you are right. Our gnet device (7a2000) does not support half-duplex,
-> while the gnet device (2k2000) does.
-> 
-> I plan to use PCI IDand IP CORE as the condition to separate full-duplex and
-> half-duplex.
-> 
-> > 
-> > if that is all you support. Do you not support any pause modes (they
-> > would need to be included as well here.)
-> 
-> I have tested it and our gnet device supports MAC_ASYM_PAUSE and
-> MAC_SYM_PAUSE, but gmac does not. I will fix this in the patch v9.
-> 
-> This is also easy to do because all GMAC devices have the same PCI ID.
-> 
-> > 
+From: Kees Cook <keescook@chromium.org>
+Date: Tue, 19 Mar 2024 14:42:56 -0700
 
-> > As to this approach, I don't think it's a good model to override the
-> > stmmac MAC operations. Instead, I would suggest that a better approach
-> > would be for the platform to provide its capabilities to the stmmac
-> > core code (maybe a new member in stmmac_priv) which, when set, is used
-> > to reduce the capabilities provided to phylink via
-> > priv->phylink_config.mac_capabilities.
-> > 
-> > Why? The driver has several components that are involved in the
-> > overall capabilities, and the capabilities of the system is the
-> > logical subset of all these capabilities. One component should not
-> > be setting capabilities that a different component doesn't support.
+> On Tue, Mar 19, 2024 at 06:57:18PM +0000, Simon Horman wrote:
+>> On Mon, Mar 18, 2024 at 02:03:54PM +0100, Alexander Lobakin wrote:
+>>> Both virtchnl2.h and its consumer idpf_virtchnl.c are very error-prone.
+>>> There are 10 structures with flexible arrays at the end, but 9 of them
+>>> has flex member counter in Little Endian.
+>>> Make the code a bit more robust by applying __counted_by_le() to those
+>>> 9. LE platforms is the main target for this driver, so they would
+>>> receive additional protection.
+>>> While we're here, add __counted_by() to virtchnl2_ptype::proto_id, as
+>>> its counter is `u8` regardless of the Endianness.
+>>> Compile test on x86_64 (LE) didn't reveal any new issues after applying
+>>> the attributes.
+>>>
+>>> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+>>
+>> Hi Alexander,
+>>
+>> with this patch applied ./scripts/kernel-doc -none reports the following.
+>> I think that this means that the kernel-doc needs to be taught
+>> about __counted_by_le (and __counted_by_be).
+> 
+> Oh, yes, I should have remembered that need. Sorry! It should be
+> addressed by adding them where __counted_by is already listed in
+> Documentation/conf.py.
 
-In general you are right for sure - it's better to avoid one part
-setting capabilities and another part unsetting them at least from the
-readability and maintainability point of view. But in this case we've
-already got implemented a ready-to-use internal interface
-stmmac_ops::phylink_get_caps() which can be used to extend/reduce the
-capabilities field based on the particular MAC abilities. Moreover
-it's called right from the component setting the capabilities. Are you
-saying that the callback is supposed to be utilized for extending the
-capabilities only?
-
-If you insist on not overriding the stmmac_ops::phylink_get_caps()
-anyway then please explain what is the principal difference
-between the next two code snippets:
-	/* Get the MAC specific capabilities */
-        stmmac_mac_phylink_get_caps(priv);
-and
-	priv->phylink_config.mac_capabilities &= ~priv->plat->mac_caps_mask;
-in the MAC-capabilities update implementation? Do you think the later
-approach would be more descriptive? If so then would the
-callback-based approach almost equally descriptive if the callback
-name was, suppose, stmmac_mac_phylink_set_caps() or similar?
-
-In anyway I am sure the approach suggested in the initial patch of
-this thread isn't good since it motivates the developers to implement
-more-and-more DW MAC-specific platform capabilities flags fixing
-another flags, which makes the generic code even more complicated
-than it already is with endless if-else-plat-flags statements.
-
--Serge(y)
+Oh, thanks to both of you! I'll do that before sending v1.
 
 > 
-> Hi Serge,
+> -Kees
 > 
-> It seems to be going back again, what do you think?
+>>
+>> .../virtchnl2.h:559: warning: Excess struct member 'chunks' description in 'virtchnl2_queue_reg_chunks'
+>> .../virtchnl2.h:707: warning: Excess struct member 'qinfo' description in 'virtchnl2_config_tx_queues'
+>> .../virtchnl2.h:786: warning: Excess struct member 'qinfo' description in 'virtchnl2_config_rx_queues'
+>> .../virtchnl2.h:872: warning: Excess struct member 'vchunks' description in 'virtchnl2_vector_chunks'
+>> .../virtchnl2.h:916: warning: Excess struct member 'lut' description in 'virtchnl2_rss_lut'
+>> .../virtchnl2.h:1108: warning: Excess struct member 'key_flex' description in 'virtchnl2_rss_key'
+>> .../virtchnl2.h:1199: warning: Excess struct member 'qv_maps' description in 'virtchnl2_queue_vector_maps'
+>> .../virtchnl2.h:1251: warning: Excess struct member 'mac_addr_list' description in 'virtchnl2_mac_addr_list'
+>>
+>> ...
 > 
-> Thanks,
-> 
-> Yanteng
-> 
-> > 
-> 
-> 
+
+Thanks,
+Olek
 
