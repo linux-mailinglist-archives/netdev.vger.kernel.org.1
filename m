@@ -1,146 +1,140 @@
-Return-Path: <netdev+bounces-80798-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80799-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 755078811C3
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 13:39:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C16FE8811C4
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 13:40:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30365285D38
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 12:39:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CE3BB21296
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 12:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E7D3BBC8;
-	Wed, 20 Mar 2024 12:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA13C3BBC8;
+	Wed, 20 Mar 2024 12:40:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VnE5SgoM"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="TFTPBjkV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57FE3FE20
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 12:39:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBAC21DFD9
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 12:40:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710938376; cv=none; b=qV34PqHq4MGxBij1jyO0T0LIBGwTFYiMOfzKKYL6Co2nPxOZBMOmbyPqzSkyi3nvugWj5mqi4zjGEL5dBHAC9ju2meSSXHt0y7MrAppAv+8b+RyeDGaeMaERGacQiO6XeYAy4FNlQQ3G4ghXKg5kLeArXdS/TidRgGNnnYWFVpc=
+	t=1710938406; cv=none; b=Iz7VwxvnzWObUadvTNnMc8YMqMJbo3ohIFJnRm3wy5HybNb0FSiixvz8B7LRaDv5kyk5DOgLpy1MpwlLuPsFiClmhl0zLLWm/jbNBOyekvM1XTlNII77p+jpMtIbYlYVH1w+t9PbhaudiAjwUi0dvzMZ9/dGjkicTzW0jYHjFBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710938376; c=relaxed/simple;
-	bh=Wunx9RkS5kAS7EP8GV7ofSvEH6Bug37mEESmRmm4X88=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=SHYEw8kHRc2jkZnRmodkelCdgTN1J8cZF/QcphLAEOjQjOKXEVwhLxdTf/VRp5kE4KiaCR0B/3rLS+QbX3rohLc8vN5rEPBhsf0jGOYaYPcTt6XgS+TS053wiPkaed+5NlMeu9sWHo82Rb0PY4GoUGEO601+jZiDEmY/X8HftRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VnE5SgoM; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710938372;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pwD1DlHDJoiZ+BASl5M1X9taC4Av7K/8w3on45P9Dug=;
-	b=VnE5SgoM1YaUMivRuddNt0uVoYHUojtOhTLRH172Wyaulp7+rDTohhN55FfVxsMsYbvx7d
-	YQfdy7piNYYG+5hk9G8fGtud+BpcNXOUvWDl+99pIavYNUPOJ88O9v7nLqyNg71UMeQAph
-	CrwSpfeepgrYzxmSYuA2UaFM4O2JAPE=
-Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
- [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-218-OwzYUCm4P8i5eq6lgk7V5g-1; Wed, 20 Mar 2024 08:39:30 -0400
-X-MC-Unique: OwzYUCm4P8i5eq6lgk7V5g-1
-Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-5c6245bc7caso4215946a12.3
-        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 05:39:30 -0700 (PDT)
+	s=arc-20240116; t=1710938406; c=relaxed/simple;
+	bh=VPTB02eUHcf6amZ8zAAObXu+TD5PCWzhQS/wvYo6jTE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LiTk7A7pkUf/Vok51qzvgVuWsJgXygT7RtbyshyGiLI7tebgzGWoJcjC00j/kNCxBjDEBUjcbYBiORSTfvB7I/wXcsRXXFBAvDeQceKlvJcgNW0dvMhl3E0yRx1AhDXpnzX2MrWcvqlv67nqVDFe5gHqjB4NNq+HMhdEIy4a5GI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=TFTPBjkV; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a46f79f60afso67374866b.2
+        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 05:40:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710938401; x=1711543201; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=4u0IMn0rzxmgFh4QmFwfGq97t80c3tYp2T28y44KFi8=;
+        b=TFTPBjkVsq7LYwKvmKFNaq/ZX5ItiJ9tgFxqkb0IKIn37/jyrWs8QPh+ipzke+E5fY
+         YLY4pUEkaUhYsmP/OHqF3cFikzOjvqZM21CKKZ8iuKre9TBy1R8X0V6qMtTdTfMtXSYY
+         pcghNXJonpgziDaVIFZkp/rBbCko25qLTlvxLb8F9gTG6pDNYK7KYmapcd2XJzTiaIIX
+         2qUP3v9K0jM/kIBWId/42/1MPpmkVfAgAe5nx/qb6t2W+3FTV+G7douqy5LRlHOLft4z
+         gk3dvBJTfH0DnON2VIGwEo3B5vZUYCjCQDOyDZ/NJTe/QzUin2QOwMHYP3XeTxs0j8Ju
+         VO7Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710938369; x=1711543169;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=pwD1DlHDJoiZ+BASl5M1X9taC4Av7K/8w3on45P9Dug=;
-        b=hEjIv20S5xfgCcsadKtcBnf3tL9b/l6CtwSRfzn3L9Ra9PJPnviLWchXscfWq2PtGv
-         Oys7f9q+eD47TH+gdmVNMxmsITgrWb14KYez6YuvZXPXRoIolrFKSrD6WSBIIwxqaPuq
-         kzQsGcVUtYL+xXMWbxgyJGvkeq8O/GvvG4PqaSCVbBBF3xmEViNZSn5AmoSr930snNF/
-         RbC6g6jAXQQT8UfY7hWobA61TDkpL377uxecM/6XnEKHhpvhn3LXsINI+/gV+PyfFCaX
-         F959TaT6DvQZ6GOXGtj1L6XOKas0T1FyP8Oro4qpVyVVSMuTLweiacv37yEvAKEqmYJ1
-         +Ubw==
-X-Gm-Message-State: AOJu0YxZNja7RowwyVvKlpH9M8IxArlqIwHt4x6/9JRoJWHlsVeMA4Hq
-	p/hh/YKTKSh+iuqw38foPbvakQRkF9R5Pp2SeQfeZ9ZUEYbWEgVG3orxlTYEcvq9oq0QzqbXwPL
-	OcFsTe/5ugHFsLIIs/ZZaQua2WGRIkfb5yT5SITbvbVV4tFkzpgn1dQ==
-X-Received: by 2002:a05:6a20:b297:b0:1a3:6ed2:ee27 with SMTP id ei23-20020a056a20b29700b001a36ed2ee27mr5397295pzb.16.1710938369603;
-        Wed, 20 Mar 2024 05:39:29 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFlcuStyWu3TlWrrisDP8mtM6DjNM279tXgyIaSQ2Jz6K6uDf2Hr7dvEXshrk3XT1ZYHq+R8w==
-X-Received: by 2002:a05:6a20:b297:b0:1a3:6ed2:ee27 with SMTP id ei23-20020a056a20b29700b001a36ed2ee27mr5397286pzb.16.1710938369255;
-        Wed, 20 Mar 2024 05:39:29 -0700 (PDT)
-Received: from localhost ([240d:1a:c0d:9f00:523b:c871:32d4:ccd0])
-        by smtp.gmail.com with ESMTPSA id g20-20020aa78754000000b006e672b48b49sm11548252pfo.157.2024.03.20.05.39.27
+        d=1e100.net; s=20230601; t=1710938401; x=1711543201;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4u0IMn0rzxmgFh4QmFwfGq97t80c3tYp2T28y44KFi8=;
+        b=bntoawlwH+b1xYgYF1bAF0EftHzMdSKSNdZQTLDk11wov/94Hy5srqsHyZQCtPzsOS
+         LezHYf658WF/xNKNUkn9JLR53yKoTJc00DRUJ/O2m5fVgbMfkhnjEk8zzHcbBq5B/FZ+
+         YyGupHo3knQUQ7miguMtVumuNyXNuyXOpmWKLFboGSqxW1ZSBQLKAQ4TlZaC7U73OyDe
+         MjYGyScGhA3YLdiKbXK0PvzbNU7ccCgl1vodry63CC4k4NQ4gkJ1Tzh25RmHnxaZvt/B
+         HkGklRMYKDetutdb9ME9bZkh2XlzXShRJP26lhzc+o2p+smw+eVr7v5BohtWIUkFe4HO
+         xHdw==
+X-Gm-Message-State: AOJu0YzHoSwUbocg1WchwoOAphHEhztCe3CY1zBRB+z2Y9+ibRCm09Wh
+	2w8g2LTgRciiv/QNQpU0e/J6pBHYy1a8POxwJC7ikZdV/YeyO7IBk0lTIIxd2ko=
+X-Google-Smtp-Source: AGHT+IF49P8lbqFW3OO1t/QptwHBl+tdDfzeat3GyEz6znZwt3j7+rKy9LpsBqC3Fwm9y2lV3uwVoA==
+X-Received: by 2002:a17:906:a1da:b0:a46:e81e:5294 with SMTP id bx26-20020a170906a1da00b00a46e81e5294mr2887184ejb.27.1710938400670;
+        Wed, 20 Mar 2024 05:40:00 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id kh18-20020a170906f81200b00a46e56c8764sm1657203ejb.114.2024.03.20.05.39.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Mar 2024 05:39:28 -0700 (PDT)
-Date: Wed, 20 Mar 2024 21:39:24 +0900 (JST)
-Message-Id: <20240320.213924.690460440850932744.syoshida@redhat.com>
-To: chr@terma.com
-Cc: netdev@vger.kernel.org, davem@davemloft.net
-Subject: Re: [PATCH] net: ll_temac: platform_get_resource replaced by wrong
- function
-From: Shigeru Yoshida <syoshida@redhat.com>
-In-Reply-To: <41c3ea1df1af4f03b2c66728af6812fb@terma.com>
-References: <41c3ea1df1af4f03b2c66728af6812fb@terma.com>
-X-Mailer: Mew version 6.9 on Emacs 29.2
+        Wed, 20 Mar 2024 05:40:00 -0700 (PDT)
+Date: Wed, 20 Mar 2024 13:39:56 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Jordan Crouse <jorcrous@amazon.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH 1/1] devlink: Fixup port identifiers for 'port param show'
+Message-ID: <ZfrZHAmJEf-frH5R@nanopsycho>
+References: <20240319220953.46573-1-jorcrous@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240319220953.46573-1-jorcrous@amazon.com>
 
-On Tue, 19 Mar 2024 19:45:26 +0000, Claus Hansen Ries wrote:
-> From: Claus Hansen ries <chr@terma.com>
-> 
-> devm_platform_ioremap_resource_byname is called using 0 as name, which eventually 
-> ends up in platform_get_resource_byname, where it causes a null pointer in strcmp.
-> 
->                 if (type == resource_type(r) && !strcmp(r->name, name))
-> 
-> The correct function is devm_platform_ioremap_resource.
-> 
-> Fixes: bd69058 ("net: ll_temac: Use devm_platform_ioremap_resource_byname()")
-> Signed-off-by: Claus H. Ries <chr@terma.com>
-> Cc: stable@vger.kernel.org
+Regarding subject, please put "iproute2" alongside with "patch" into the
+brackets.
 
-This patch LGTM. Before the commit bd69058 ("net: ll_temac: Use
-devm_platform_ioremap_resource_byname()"), temac_probe() calls
-platform_get_resource() with the index 0 to get the resource. So we
-have to use devm_platform_ioremap_resource() with the index 0 here.
 
-> ---
->  drivers/net/ethernet/xilinx/ll_temac_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+Tue, Mar 19, 2024 at 11:09:53PM CET, jorcrous@amazon.com wrote:
+>Commit 70faecdca8f5 ("devlink: implement dump selector for devlink objects show commands")
+>inadvertently removed DL_OP_HANDLEP from the required flags so that
+>port definitions no longer worked:
+>
+>  $ devlink port param show pci/0000:01:00.0/52 name bc_kbyte_per_sec_rate
+>  Devlink identification ("bus_name/dev_name") expected
+
+Yeah, nobody should care as there is no in-tree kernel implementation of
+this :)
+
+
+>
+>Return DL_OP_HANDLEP to the mask so the code correctly goes down the
+>dl_argv_handle_both() path and handles both types of identifiers.
+>
+
+
+Provide proper fixes tag please.
+
+>Signed-off-by: Jordan Crouse <jorcrous@amazon.com>
+
+>---
+> devlink/devlink.c | 3 ++-
+> 1 file changed, 2 insertions(+), 1 deletion(-)
+>
+>diff --git a/devlink/devlink.c b/devlink/devlink.c
+>index dbeb6e39..355e521c 100644
+>--- a/devlink/devlink.c
+>+++ b/devlink/devlink.c
+>@@ -5050,7 +5050,8 @@ static int cmd_port_param_show(struct dl *dl)
 > 
-> diff --git a/drivers/net/ethernet/xilinx/ll_temac_main.c b/drivers/net/ethernet/xilinx/ll_temac_main.c
-> index 9df39cf8b097..1072e2210aed 100644
-> --- a/drivers/net/ethernet/xilinx/ll_temac_main.c
-> +++ b/drivers/net/ethernet/xilinx/ll_temac_main.c
-> @@ -1443,7 +1443,7 @@ static int temac_probe(struct platform_device *pdev)
->         }
->           /* map device registers */
-> -       lp->regs = devm_platform_ioremap_resource_byname(pdev, 0);
-> +       lp->regs = devm_platform_ioremap_resource(pdev, 0);
->         if (IS_ERR(lp->regs)) {
->                 dev_err(&pdev->dev, "could not map TEMAC registers\n");
->                 return -ENOMEM;
+> 	err = dl_argv_parse_with_selector(dl, &flags,
+> 					  DEVLINK_CMD_PORT_PARAM_GET,
+>-					  DL_OPT_HANDLE | DL_OPT_PARAM_NAME, 0,
+>+					  DL_OPT_HANDLE | DL_OPT_HANDLEP |
+>+					  DL_OPT_PARAM_NAME, 0,
 
-However, it seems that the patch is indented by spaces instead of tabs
-(maybe your mail client replaced this?). I recommend running
-checkpatch.pl before submitting patches.
+Should be only: DL_OPT_HANDLEP | DL_OPT_PARAM_NAME, Remove
+DL_OPT_HANDLE.
 
-Also, we should put appropriate prefix, i.e. "net" or "net-next", in
-the subject. As for this patch, I think "[PATCH net]" is appropriate.
 
-Thanks,
-Shigeru
+pw-bot: cr
 
-> base-commit: d95fcdf4961d27a3d17e5c7728367197adc89b8d
-> --  2.39.3 (Apple Git-146)
-> 
-> 
-> 
-
+> 					  DL_OPT_HANDLE | DL_OPT_HANDLEP, 0);
+> 	if (err)
+> 		return err;
+>-- 
+>2.40.1
+>
+>
 
