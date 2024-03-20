@@ -1,86 +1,59 @@
-Return-Path: <netdev+bounces-80902-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80904-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6752881978
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 23:35:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B23708819A5
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 23:53:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D12D31C211C7
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 22:35:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 680461F22981
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 22:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FB731EB45;
-	Wed, 20 Mar 2024 22:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 001106BFDB;
+	Wed, 20 Mar 2024 22:53:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TfC5lqXb"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zQXJE7vc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 232F312E52;
-	Wed, 20 Mar 2024 22:35:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9D5BA45;
+	Wed, 20 Mar 2024 22:53:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710974111; cv=none; b=mojlw9YvJiTXPlEAGUzN//kqvgs6uksa8q4HNk3hfEiV9LC/75igOkaQn5iu5mblbWjyFcS9d8DStg8UNdnWt8aU4E8QjhmL5BRsEbeXYvtNFQr5ftzs+Tsdg4tuYmry5KMc+mpqVvK0oO80hhKBy4a3DCbyyHWcodSPyFvLhDs=
+	t=1710975198; cv=none; b=GC/zu8yTPNG6x+ksE/mD96HIeWdGK3X85bIT+/z3WyPgBAP1wuGy8lpyFxqlTCqg8Hv1qAM8UNtYhMkZBoXeAPFZaJwIZIb8af+xFtEKyH9TCLDlCoBCwfKKpeScAA14jmeAXSTzMtiyoaTWj+vkImxX3kyFIIGTWoJSbnPqKEM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710974111; c=relaxed/simple;
-	bh=/fsBbXw03619bUqlEGeLUsRsq6EMtANrA9Jhs5wFcvQ=;
+	s=arc-20240116; t=1710975198; c=relaxed/simple;
+	bh=LxOwNqItoGww2SXOkAgOwGKpdrnrybWfJpdwcqgsAxI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eXKUH4oZKCwia1AvbMUvVx1aiuyNuHiwncIUsLSYfAncrhlI+1Q3Q4czbtc9hPKt64CHwk4z8XSIVeV4LaCoERgrJjJrSf2GTAFU7BLzaOtETF8whGfJH6yykQtUSIR/ivMfdqNVx/MZfTJZxT6clDkbaVJxKjMuiBOYeNbNN+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TfC5lqXb; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-51381021af1so623929e87.0;
-        Wed, 20 Mar 2024 15:35:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710974107; x=1711578907; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y6uLkytCveodnbEWWcUmeLnZpizFS2D2Bpb03TRInaE=;
-        b=TfC5lqXbdG75Cw1pRoBG1lxRBLQ4mCUhENBzaN593gWlGlAxL+kIGsij0FMpbRSo9M
-         JbbNvj4OqXNoTGtd3VEwmFeUizojmVC4J0fzeOC5UYMlFR+SE/EJSn3B4p4WpDMTye2d
-         HDh7xFinFC8rDlbJ2ALJO9P14tMsWEGxu7fVEQOb7Waw8LpxA0B7skQBxN5wF2sPd5S4
-         kgajKofxzxauzwppfc2QMD0B4WPlVQpK5v10iTigfoAU0fwHfjzlrJMp6XC0xxbKXS36
-         nsF/ppQgJRmJj2baKekZcnUePPN7F7v/qzcTK9UG/0sWutH6uI1YadaIBol1SnWrLFdC
-         T1Yg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710974107; x=1711578907;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Y6uLkytCveodnbEWWcUmeLnZpizFS2D2Bpb03TRInaE=;
-        b=sDZaLdST2SUTPqMZIbYtGyaajklRZ4PiWtRnAsTkgXbx3ZO39sggIoKTO6tZNk6E3F
-         yajc5b+nWc4++IGfbbkG8G5qPM2SXwM5zlYOMkZ4RSZSg/quGI0QmWEbYYo758zCZ5gk
-         9xw7GGzXKgsOXbWZOcKYEY4E7jwtr/+83ef2ICUJFO1UHMUOG1jubtk0ZE+u7SEnYqhP
-         9/iuQKsGRsraKm3NSjHIgI3HQcNA0CIPTBiI5eTZ09DdbNwF1bpzfR29RZQHsSY6WeFl
-         40TT/uIewy7h2RIxw3bMHfHutKpRll12EDpYd8VI5iAO3VKodtlXgAo/qPK2uRkxNkQW
-         LeSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVEYfcav2a7ZswySdgvSlYHcCJriFaSxZAHlAss1hgiUlJN5MD3kQjIHa6VQWuev0TemXGcFrU/sGca9W5dJnhFAoXa0VsCbKZXSSAKtuPdgi9rKwlvFJ9X44nldCHv9yCBDOAgG57qFXHfsVsUePl0uOzHlWdx9f91f1meCdMj
-X-Gm-Message-State: AOJu0YwtoKXbbv63cFASMgjw6UlXrXgqWaz6gm5FdSJFJWf02KTUmIZM
-	GRXT0mhT5Mxm8lcOKeH8HaqOyURMHT1CCe0C6Bw79/6ndbkmkx6cExaHl/2qMetOdQ==
-X-Google-Smtp-Source: AGHT+IG5bitWH3Wn0hUC64Y2ptJDiGS2is9++uKcULphEyCayziP1oG59fDb4lRmo1n/NpFN50q/KQ==
-X-Received: by 2002:ac2:46d6:0:b0:513:d372:20e5 with SMTP id p22-20020ac246d6000000b00513d37220e5mr290631lfo.16.1710974107030;
-        Wed, 20 Mar 2024 15:35:07 -0700 (PDT)
-Received: from fedora (host-95-250-206-50.retail.telecomitalia.it. [95.250.206.50])
-        by smtp.gmail.com with ESMTPSA id an14-20020a17090656ce00b00a465b72a1f3sm5262273ejc.85.2024.03.20.15.35.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Mar 2024 15:35:06 -0700 (PDT)
-Date: Wed, 20 Mar 2024 23:35:05 +0100
-From: Francesco Valla <valla.francesco@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Oliver Hartkopp <socketcan@hartkopp.net>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	fabio@redaril.me, linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] Documentation: networking: document CAN ISO-TP
-Message-ID: <ZftkmQfna3HIyYal@fedora>
-References: <20240313223445.87170-1-valla.francesco@gmail.com>
- <20240313223445.87170-2-valla.francesco@gmail.com>
- <20240319120625.GI185808@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=J0osLWcpI0Gn0+MSCVhrVUfe61TrP0Ri973/wU3omoQpRBrwOJBW7X8J/e1K5hU46LUe9tecAzaOaCpw1vkFvCRgfY5Joa3zG1Mm3Wdy1YkyQQJBQFwrTiCRpjPN/a6E7axSl9u3wjCUPhW9Kg2u5LcpzBCqIF90/aqpP5tM4Yo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zQXJE7vc; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ZQ5bl/zj2pbCCs6ni9E3xhdbegTyO49cnfIVZy3JuwA=; b=zQXJE7vcEnb8875Wcv3yKIaFRV
+	c77Zm+c2VOVNjh1jPlygBo1Rt0fCPqwz7w1DRQdNU/1pfRleV0ZZUcwudmd25Mu1Zw4j3Rrtqm9MG
+	IgEWuMa8LGsA0gvZdQkI6exWlqgpRDltj7xrE/S9sW7qgVlH0coevNGQnZUl78QAXBeI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rn4o2-00AosD-Gf; Wed, 20 Mar 2024 23:53:10 +0100
+Date: Wed, 20 Mar 2024 23:53:10 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com,
+	linux-kernel@vger.kernel.org, bryan.whitehead@microchip.com,
+	UNGLinuxDriver@microchip.com
+Subject: Re: [PATCH net V2 2/2] net: lan743x: support WOL in MAC even when
+ PHY does not
+Message-ID: <22089299-a3e2-4cbd-942a-65ea070657b8@lunn.ch>
+References: <20240320042107.903051-1-Raju.Lakkaraju@microchip.com>
+ <20240320042107.903051-3-Raju.Lakkaraju@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,58 +62,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240319120625.GI185808@kernel.org>
+In-Reply-To: <20240320042107.903051-3-Raju.Lakkaraju@microchip.com>
 
+> +	if (netdev->phydev) {
+> +		ret = phy_ethtool_set_wol(netdev->phydev, wol);
+> +		if (ret != -EOPNOTSUPP && ret != 0)
+> +			return ret;
 
-Hi Simon,
+I'm not sure this condition is correct.
 
-On Tue, Mar 19, 2024 at 12:06:25PM +0000, Simon Horman wrote:
-> On Wed, Mar 13, 2024 at 11:34:31PM +0100, Francesco Valla wrote:
-> > Document basic concepts, APIs and behaviour of the CAN ISO-TP (ISO
-> > 15765-2) stack.
-> > 
-> > Signed-off-by: Francesco Valla <valla.francesco@gmail.com>
-> 
-> Hi Francesco,
-> 
-> As it looks like there will be a v2 of this patchset
-> please consider running checkpatch.pl --codespell
-> and addressing the warnings it reports.
-> 
+If there is an error, and the error is not EOPNOTSUPP, you want to
+report that error. However, if the PHY can support the WoL
+configuration, it will return 0, and this function should exit, WoL in
+the MAC is not needed. And doing WoL in the PHY consumes less power
+since you can suspend the MAC.
 
-Will do before v2, thanks for the suggestion.
+So i think it should simply be:
 
-> ...
-> 
-> > +Transport protocol and associated frame types
-> > +---------------------------------------------
-> > +
-> > +When transmitting data using the ISO-TP protocol, the payload can either fit
-> > +inside one single CAN message or not, also considering the overhead the protocol
-> > +is generating and the optional extended addressing. In the first case, the data
-> > +is transmitted at once using a so-called Single Frame (SF). In the second case,
-> > +ISO-TP defines a multi-frame protocol, in which the sender asks (through a First
-> > +Frame - FF) to the receiver the maximum supported size of a macro data block
-> > +(``blocksize``) and the minimum time time between the single CAN messages
-> > +composing such block (``stmin``). Once these informations have been received,
-> 
-> nit: Once this information has
+> +		if (ret != -EOPNOTSUPP)
+> +			return ret;
 
-I never grasped the usage of "information" in English, which is not my
-first language. I'll make this correction here.
+Do you have a board with this MAC with a PHY which does have some WoL
+support. Could you test PHY WoL is used when appropriate?
 
-> 
-> > +the sender starts to send frames containing fragments of the data payload
-> > +(called Consecutive Frames - CF), stopping after every ``blocksize``-sized block
-> > +to wait confirmation from the receiver (which should then send a Flow Control
-> > +frame - FC - to inform the sender about its availability to receive more data).
-> > +
-> 
-> ...
-
-Thanks for the review!
-
-Regards,
-Francesco
-
+	Andrew
 
