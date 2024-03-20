@@ -1,120 +1,99 @@
-Return-Path: <netdev+bounces-80742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 281F6880CCB
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 09:12:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1C4E880CC4
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 09:10:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A51A2B21908
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 08:12:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C1A01C20C5E
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 08:10:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F252C85A;
-	Wed, 20 Mar 2024 08:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AC852C698;
+	Wed, 20 Mar 2024 08:10:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="xMent+6C"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="PfB7bBnl"
 X-Original-To: netdev@vger.kernel.org
-Received: from out199-13.us.a.mail.aliyun.com (out199-13.us.a.mail.aliyun.com [47.90.199.13])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8033381AA;
-	Wed, 20 Mar 2024 08:12:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.199.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D705A2C68A;
+	Wed, 20 Mar 2024 08:10:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710922351; cv=none; b=UxYGRFthWnlEK1BfDPjM4HHl/lo7YtbmXsRhTknEPTmC4Rbr1xn3aotXggUwUDg5FWuMyJB9sNqiYKPsYxZwUKDjp4rGaH0cwiVPdzVZf840RM66OQvbGG9BexEX/gzDkuoRMN9AT02dhkm8tyac2rm6ZDU0Ty6SKl1ml7QLFq4=
+	t=1710922254; cv=none; b=LkggX0ELxPxL1y3mpe2CAGL0p7ez1tEU/M11RYk9b7vWnzN8LWL1ipqaXxh6ndghJA3hiOMT3bq8oVSnfj1HtvEv7UZepv4CV2+fL+BHzm3h3nJwNHAOLfrfnljqon+3PhvN1QrK3RCUROOy4LFxumJuYibz3S8JG/jRgEc649Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710922351; c=relaxed/simple;
-	bh=2Oq8Uun0tT2JiU0cIwoDYug7ugm+rPl/BjiEmuLGDr0=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=JIx8mDh+tkRNnCA/7OQqtLjoVvyb71rQMsHHRFbkyGFvmrkLwJfYuJUr6HSaQpwU/sOsCuDGT8+2BQRQBXeWFukqalmFmuQq7aLE5jwibpHE6XHqIG6fqGmXaIdTxOhtz+1KqB9RXQtWkWrtoeKZUlPHvyiv6B/uxvICHEyF9R4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=xMent+6C; arc=none smtp.client-ip=47.90.199.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1710922330; h=Message-ID:Subject:Date:From:To;
-	bh=2Oq8Uun0tT2JiU0cIwoDYug7ugm+rPl/BjiEmuLGDr0=;
-	b=xMent+6Cd0amDN0wtKwklPgyJhlNIoFx6MSRQON91LDq2g5OKr6deJxXA3vidOjc633ypmu/UbSwIZ4RfKOPROmhzvCf6fyePC5hxGvKlK8GN0RRFhb/AUVvSUpDYouo1EE+vzwo75XY9m69LQNr58caAIV4QFOT7Oh4bXl4rVo=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0W2wfq-K_1710922327;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W2wfq-K_1710922327)
-          by smtp.aliyun-inc.com;
-          Wed, 20 Mar 2024 16:12:08 +0800
-Message-ID: <1710921861.9268863-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH net-next v5 0/9] virtio-net: support device stats
-Date: Wed, 20 Mar 2024 16:04:21 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>,
- Eric  Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- "Michael  S. Tsirkin" <mst@redhat.com>,
- Jason Wang <jasowang@redhat.com>,
- Alexei  Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Stanislav Fomichev <sdf@google.com>,
- Amritha  Nambiar <amritha.nambiar@intel.com>,
- Larysa Zaremba <larysa.zaremba@intel.com>,
- Sridhar Samudrala <sridhar.samudrala@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- virtualization@lists.linux.dev,
- bpf@vger.kernel.org,
- Jiri Pirko <jiri@resnulli.us>
-References: <20240318110602.37166-1-xuanzhuo@linux.alibaba.com>
- <Zfgq8k2Q-olYWiuw@nanopsycho>
- <1710762818.1520293-1-xuanzhuo@linux.alibaba.com>
- <ZfgxSug4sekWGyNd@nanopsycho>
- <316ea06417279a45d2d54bf4cc4afd2d775b419a.camel@redhat.com>
-In-Reply-To: <316ea06417279a45d2d54bf4cc4afd2d775b419a.camel@redhat.com>
+	s=arc-20240116; t=1710922254; c=relaxed/simple;
+	bh=WIh25D4UDwcanH5bYSHrwFXTlS6u6SDi3NuZcoh1ptc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Bjhswm5KHJcrbhV2/U8D7ZbAvwIr2lfsnYttiQk/eFm0W/r1OjMIzjqmGyUOYsqxQqCmstXL4HO8hbEKiTfKGcu+Y1lpkqYa0d0l6eRA95dueuMwSOSp1vhafV5xXb61MhgjO/kIysmMTRpQTWTnsUd4Il2rBaFgjVlyrEnly9U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=PfB7bBnl; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 59D56C000D;
+	Wed, 20 Mar 2024 08:10:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1710922246;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SaWDM3C4NrbrAUXV6EDAofx5hE7nR6MhxlVcBrFRh+U=;
+	b=PfB7bBnliBYXJICYCLKkGAUdhqDbSe1Sjs8BsDpqoiBbXMMZuapjDYLwI4WR3e0HWifNUl
+	kcGtmIrXrDK1U2uIGf1sKPv/tyxOpCEgWihHoJuGa166wDxniLBi/4p2bueL2CpFKMMJea
+	uJI2T4pzWMw3GtHZaD7swteQgcqm3whZ8mJBLrAGR1s6+2UwZrdkQO9kZJ5896ihbNKkQQ
+	JHIfK6+xssnsH+YH/pfk1DC3oZJXhc6xKMBhcQD81kvrSIljRRFZYjfinei42CJ4Io6B2f
+	GIaBr1GZkasDCw01DmMlCCE6HZItBsQBLXJjVIPlvsTJ+/EuvnkMEOYHLCl/XQ==
+Message-ID: <9d111cc9-c73a-4d3c-83f5-3f59e6c8841f@arinc9.com>
+Date: Wed, 20 Mar 2024 11:10:19 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] Fix EEE support for MT7531 and MT7988 SoC switch
+To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ =?UTF-8?Q?Ren=C3=A9_van_Dorst?= <opensource@vdorst.com>,
+ Russell King <linux@armlinux.org.uk>,
+ SkyLake Huang <SkyLake.Huang@mediatek.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v1-0-3f17226344e8@arinc9.com>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v1-0-3f17226344e8@arinc9.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: yes
+X-Spam-Level: **************************
+X-GND-Spam-Score: 400
+X-GND-Status: SPAM
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On Tue, 19 Mar 2024 11:12:23 +0100, Paolo Abeni <pabeni@redhat.com> wrote:
-> On Mon, 2024-03-18 at 13:19 +0100, Jiri Pirko wrote:
-> > Mon, Mar 18, 2024 at 12:53:38PM CET, xuanzhuo@linux.alibaba.com wrote:
-> > > On Mon, 18 Mar 2024 12:52:18 +0100, Jiri Pirko <jiri@resnulli.us> wrote:
-> > > > Mon, Mar 18, 2024 at 12:05:53PM CET, xuanzhuo@linux.alibaba.com wrote:
-> > > > > As the spec:
-> > > > >
-> > > > > https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
-> > > > >
-> > > > > The virtio net supports to get device stats.
-> > > > >
-> > > > > Please review.
-> > > >
-> > > > net-next is closed. Please resubmit next week.
-> > >
-> > >
-> > > For review.
-> >
-> > RFC, or wait.
->
-> @Xuan, please note that you received exactly the same feedback on your
-> previous submission, a few days ago. While I do understand the legit
-> interest in reviews, ignoring explicit feedback tend to bring no
-> feedback at all.
+On 18.03.2024 10:46, Arınç ÜNAL via B4 Relay wrote:
+> Hi.
+> 
+> This patch series fixes EEE support for MT7531 and the switch on the MT7988
+> SoC. EEE did not work on MT7531 on most boards before this, it is unclear
+> what's the status on MT7988 SoC switch as I don't have the hardware.
+> 
+> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
 
-Sorry.
+I see the state of this patch series is deferred on patchwork. I see that I
+forgot to delegate this to the net tree. As I don't see any objections in
+this series, I'll send v2 with it tomorrow.
 
-I have a question regarding the workflow for feature discussions. If we
-consistently engage in discussions about a particular feature, this may result
-in the submission of multiple patch sets. In light of this, should we modify the
-usage of "PATCH" or "RFC" in our submissions depending on whether the merge
-window is open or closed? This causes the title of our patch sets to keep
-changing.
-
-Or I miss something.
-
-
-Thanks.
-
-
->
-> Paolo
->
+Arınç
 
