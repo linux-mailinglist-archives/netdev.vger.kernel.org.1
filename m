@@ -1,74 +1,50 @@
-Return-Path: <netdev+bounces-80723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BF84880A58
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 05:24:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 44C73880A5B
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 05:30:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D5AB1F23720
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 04:24:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D81211F23171
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 04:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C66B12B97;
-	Wed, 20 Mar 2024 04:23:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B1679C2;
+	Wed, 20 Mar 2024 04:30:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="1l4KoSOl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LuLxEWHU"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF6A1125B4;
-	Wed, 20 Mar 2024 04:23:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D305E1C2D
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 04:30:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710908639; cv=none; b=Thg5JzDN4Z0LNmG2tUD40oKck9ueqk/RUGrfgw5CKTwEZ5KHko1dXGUQlgivqU79yum7oAop2v32P1thf8x5+PjM0KrhoXzSck/EehKY4GjNzk7opN4c97IAovmbsoLNiI12ekUla43P/g0PikmPoDd/JWFgZEmXo9S2BmrzFlU=
+	t=1710909029; cv=none; b=e4x2FHPygCMLB9v1ap87bnJQE3RAhMLZVoOnwpVIS1hTZyUvJlUnEbtyFSKI+ehFxhe8GaW3rwohE5PNuKoJAb7y0EtwQ8rUqgCW3O55gpuktknq1h269Lk35D3bQ7jCUp7zXeU9AkPVoe0QV655k7VIuAjKznaGkTS3tu517TA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710908639; c=relaxed/simple;
-	bh=a9vk03hNsTjcx8GvEOxNTYnV0dld9yAXOB3booaeIag=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XsHeZnVFkld/TpfzPyOnWw9MQUnPYhZS65HCWgIA8Ddgk7baOunabvsjIQwyOe5mMcfmLIcoAKfugintj47qWjC3oE40nzUAO97xGgOnbtw68k86jdu8U8SXWI/fmPbX1C0iKZkKhvLUsLuwreSjztBSJbUAROjBxQ9hRGD1Mgw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=1l4KoSOl; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1710908638; x=1742444638;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=a9vk03hNsTjcx8GvEOxNTYnV0dld9yAXOB3booaeIag=;
-  b=1l4KoSOl4SVbEEO5FTngXq/96BZmhxtLbJ0baJcgopm9YoEYdRVDPdL+
-   VIDpiNIMcxZtYVtCuhmm9GHiR/nYMaq6E5vnDNtVkyxANNHBJkTMj0iB9
-   eXBKbkbpO2vuZcXoSEAf5ZioqQxvoNXyWVp5kXSmPpTPkDzmX9F2cbHhi
-   pl176/IrL0MbKFKA2Mex+BGMGt6MvK3SK4OJpolbewKCwDoOzCtAUrkn1
-   FWtBv5asrgEtf3Q6bysMRgAsvRiC5XjmEkh4quSwmvyZ0YSZdq7Nd7CJ3
-   vWFqCX/C+U6R8vHCmaDD3duFjl41EcuLsQLWrrVqwLlsz0iMOEO4LT2dV
-   Q==;
-X-CSE-ConnectionGUID: OBzKC0jNRNK2Qzt8Vawdqg==
-X-CSE-MsgGUID: YFt001kqS6ykjhBIcO/FVg==
-X-IronPort-AV: E=Sophos;i="6.07,139,1708412400"; 
-   d="scan'208";a="248652320"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 19 Mar 2024 21:23:55 -0700
-Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Tue, 19 Mar 2024 21:23:46 -0700
-Received: from HYD-DK-UNGSW21.microchip.com (10.10.85.11) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Tue, 19 Mar 2024 21:23:43 -0700
-From: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <linux-kernel@vger.kernel.org>,
-	<bryan.whitehead@microchip.com>, <UNGLinuxDriver@microchip.com>
-Subject: [PATCH net V2 2/2] net: lan743x: support WOL in MAC even when PHY does not
-Date: Wed, 20 Mar 2024 09:51:07 +0530
-Message-ID: <20240320042107.903051-3-Raju.Lakkaraju@microchip.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240320042107.903051-1-Raju.Lakkaraju@microchip.com>
-References: <20240320042107.903051-1-Raju.Lakkaraju@microchip.com>
+	s=arc-20240116; t=1710909029; c=relaxed/simple;
+	bh=aJM+Qj4IySUKJ3GhJkHmGtdo1dEF4zmMeYif3zqJA6M=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=JsQqeHBqRxAn2U9Sc6c3C0Ko3PUtskdSNO/fEnoBDR4Z1MwRep/6gcPhfnjKHCk5bBeQixWjVta+SbLD3bXDsHlOUev6zYpjXJLs+TIF3crqckuWpHr3ZzyIomr3vkj9e3hX7vzhm7c8/SYjcuKOYNCtZPY+a8WVXQHWuwtCcm4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LuLxEWHU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6AC63C433C7;
+	Wed, 20 Mar 2024 04:30:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710909029;
+	bh=aJM+Qj4IySUKJ3GhJkHmGtdo1dEF4zmMeYif3zqJA6M=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LuLxEWHUwxu/W5mvh6qbYXQteXs23fPUqHOqsaBQOOl3mexnIyb781MfVmDr34m80
+	 OZvXgzU1WGideeOj2Xlbahr1AZHxU7qXaBW5BzPmP8OgxcKoJ7vwDrIzC6ha6qHb7q
+	 boVBASBUhPs2Ltj+8exscXdk7Msm3Q4VtarLBshNVkf6cY9xBhC/H7bRKhc8p7g+Cg
+	 v8xxTUfO+sUc4dGpam7oPnp/tiO+R78FWSPs5pWIqMhHfavWKfyb6bk7/jvFbnH6ju
+	 VvTyU33eakoYyMpPoRv9gSNQ9AEB84+hvIY7es4yjoxDJwOdiEl54tkf6lma57WwPS
+	 3LehSt+Av2AXw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4CC88D84BB0;
+	Wed, 20 Mar 2024 04:30:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,57 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Subject: Re: [PATCH iproute2 v2] ifstat: handle strdup return value
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171090902931.27266.1895053888910896704.git-patchwork-notify@kernel.org>
+Date: Wed, 20 Mar 2024 04:30:29 +0000
+References: <20240318091541.2595-1-dkirjanov@suse.de>
+In-Reply-To: <20240318091541.2595-1-dkirjanov@suse.de>
+To: Denis Kirjanov <kirjanov@gmail.com>
+Cc: stephen@networkplumber.org, dsahern@kernel.org, netdev@vger.kernel.org,
+ dkirjanov@suse.de
 
-Allow WOL support if MAC supports it, even if the PHY does not support it
+Hello:
 
-Fixes: e9e13b6adc338 ("lan743x: fix for potential NULL pointer dereference with bare card")
-Signed-off-by: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
----
-Change List:
-------------
-V1 -> V2:
-  - Repost - No change
-V0 -> V1:
-  - Change the "phy does not support WOL" print from netif_info() to
-    netif_dbg()
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
 
- drivers/net/ethernet/microchip/lan743x_ethtool.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+On Mon, 18 Mar 2024 05:15:41 -0400 you wrote:
+> get_nlmsg_extended is missing the check as
+> it's done in get_nlmsg
+> 
+> v2: don't set the errno value explicitly
+> 
+> Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
+> 
+> [...]
 
-diff --git a/drivers/net/ethernet/microchip/lan743x_ethtool.c b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-index 8a6ae171e375..7509a19269c3 100644
---- a/drivers/net/ethernet/microchip/lan743x_ethtool.c
-+++ b/drivers/net/ethernet/microchip/lan743x_ethtool.c
-@@ -1163,6 +1163,17 @@ static int lan743x_ethtool_set_wol(struct net_device *netdev,
- 				   struct ethtool_wolinfo *wol)
- {
- 	struct lan743x_adapter *adapter = netdev_priv(netdev);
-+	int ret;
-+
-+	if (netdev->phydev) {
-+		ret = phy_ethtool_set_wol(netdev->phydev, wol);
-+		if (ret != -EOPNOTSUPP && ret != 0)
-+			return ret;
-+
-+		if (ret == -EOPNOTSUPP)
-+			netif_dbg(adapter, drv, adapter->netdev,
-+				  "phy does not support WOL\n");
-+	}
- 
- 	adapter->wolopts = 0;
- 	if (wol->wolopts & WAKE_UCAST)
-@@ -1187,8 +1198,7 @@ static int lan743x_ethtool_set_wol(struct net_device *netdev,
- 
- 	device_set_wakeup_enable(&adapter->pdev->dev, (bool)wol->wolopts);
- 
--	return netdev->phydev ? phy_ethtool_set_wol(netdev->phydev, wol)
--			: -ENETDOWN;
-+	return 0;
- }
- #endif /* CONFIG_PM */
- 
+Here is the summary with links:
+  - [iproute2,v2] ifstat: handle strdup return value
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=b22a3430bd17
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
