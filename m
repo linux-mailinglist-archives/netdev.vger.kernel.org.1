@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-80906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88684881A06
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 00:00:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00529881A3C
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 00:48:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA9AF1C211C7
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 23:00:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 935181F2313B
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 23:48:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E91285C48;
-	Wed, 20 Mar 2024 23:00:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D5E88615F;
+	Wed, 20 Mar 2024 23:48:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EWD6at8M"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mN275+VG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f179.google.com (mail-qt1-f179.google.com [209.85.160.179])
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22871E87E;
-	Wed, 20 Mar 2024 23:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 172591E87E;
+	Wed, 20 Mar 2024 23:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710975609; cv=none; b=XTQu0CzlKC+R1+9KJe8773Ds2VHs/y+YPZz+sH3s1Bqbl64OgkomEkmG3uXBIC150klr+iDq+0nODOXUunc/yz6T30QCYFqEkRRE6gJJS7Whan9UbCnGtbWusnz0W6GNcmWALc9C6pB+wTk8l8YtmkpWAlkMa2Gins/n9Xm8w/c=
+	t=1710978517; cv=none; b=YkCQ8/JJIHcc50Tok6GBnic0d97C1yO3KRKW0lc+CVGMak4uaANYc4seYBbqOaXFueF3l+/6wMde95/0ExgwrRL+lk27SJkdqzDgCvjnPlEhjocPnjOWc13hB22/Kta3c/NzuPRgBCnnL9mWBP18g38WPjfQVvdcRTCfhgEvkdY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710975609; c=relaxed/simple;
-	bh=XnbPtg+O2IYA+qWONEybl7Qhpn7SsiI2acn8i+RwEFg=;
+	s=arc-20240116; t=1710978517; c=relaxed/simple;
+	bh=KL5CfvgrzAOdpA4+ntk7QuKHud0kFyGAeVm4Y7ZfCSM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PM2aMOOHDHXR/56qQe5RKbTMWXpI29607LbLsTKZKJVLbc6zQD5ZB8bZkq0OCHrnBnOnTgXK0iDRwCV3P2Zrad9FOYNb/D4P467yBvkhP0K4D6hp8LdfeKOjotj34P9OYQBA4LyaN5m3oEALKbchYc7xJCm7xXuy5D98r4QlMhE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EWD6at8M; arc=none smtp.client-ip=209.85.160.179
+	 In-Reply-To:Content-Type; b=o1rQs7E29KTjU3f4kKjP6QR3fszWBFm5czpuXdTk7dvwUTdhJvu4l24Ru4m1CI2NjPwLqNG6AHItVhTekJm9Wn7+btj3tKiCbMhvsHinc5r1pBFOA/9gCuhaf63C8V5xTl0rOvXZ6go965cQHipbTsu2vADD1KDMYmLDLgooY7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mN275+VG; arc=none smtp.client-ip=209.85.210.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f179.google.com with SMTP id d75a77b69052e-42e323a2e39so3955801cf.1;
-        Wed, 20 Mar 2024 16:00:07 -0700 (PDT)
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6e7425a6714so399703b3a.0;
+        Wed, 20 Mar 2024 16:48:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710975607; x=1711580407; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=gmail.com; s=20230601; t=1710978515; x=1711583315; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=B6v8eA1cPx7sUw+dmQFSGsW4h/lZzNvuLTYyd3ImSWM=;
-        b=EWD6at8MQLH3XdwqupvpEpVqMPlN+ap/F99lrUiJarzYYINJin+KIxgDv+azz6hPx7
-         oC3JY5fjePyixStUAHJictFncJEbtof/DnTlr1fg4d3kZsA3wljhczfOLdelbi8eMn3j
-         D4gQq/asqecbCNXPrJtWzOwOblhCncXT69e9F3PKb0jfr53Rt63SK86LFZnZoyZNGMdY
-         aC0eQhUsBEFRjmse7xKzKg17GJnSlJfxGJ4+Zhi2rJCRH51juWXRjfrtQno76WlfVjir
-         vIDNELZ6rjtmwsgVAE+GPGZyuurLIj22Q5aHxJb6/yq4yGLq8MBSZvOH37eJTo6PXXf9
-         s+MA==
+        bh=VOvh2NpicGofkRCrFi8PYG6o+1WRhQwAy0mztmTg8ZE=;
+        b=mN275+VGuNlAyw7llDMhoZiihoKzWTSHvUYJLtE/i5yMbZSePS7io3wmztVvBMBKld
+         W0Iarf0GYRGIotcwuPocBZrCC9bMLfW/NTbPO1T9B4GwzIOjlXBfePLm9F/9+MdvHUbU
+         12IXrVzYlV+yUvFqbwTkTBeh86SYwnw+k/Gv34lUubJtOXp66XTca5HYQu5SNnebHAyC
+         XLLmB0bEsYoraXA3mcF6QFl0LIYdZIOL1o6smksL8JaPTrctTDv5FRrpqhX38UQMrLx6
+         fa21BG1S3xhJskSn9czJN3+qWvQP2dFySHap+VEg7wKcnq304PD5Zu+bGTo31aKclBGA
+         PjQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710975607; x=1711580407;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1710978515; x=1711583315;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B6v8eA1cPx7sUw+dmQFSGsW4h/lZzNvuLTYyd3ImSWM=;
-        b=Ob0vwVd4a5fK6sz9hfEoVkabnlv/REqrFAgvRpTmjzVyvs+hQgV44Psy5cjjAUrzp3
-         XpIba+JatXA5bZYFInvZ0sASRtv1i/3kNTGw7zYZn9I4ZWQ7/jKI/0OoNeooQ892QDZ8
-         kOJzquEK6Na46xYQQOw9i3NBG3mY4s90G/RzOObxvsYU4Ek7w10AmO/KdckQqnRM08Ll
-         kz/eII9+6wqQf9vFWk1d315Ouv6ooC0QCQECROHHz1LYRFYh16wMxqGSraWwwRWR3q8C
-         QySMefrLkHhzitAebD7EdeFuD9ppNd921RYzH+X9wH9FWi4NoUZl4Pj/CTgcXX5y/AID
-         6+OQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVD9EuFDRw0ZZ8vaaHmqcLZshg7X9Y2tda6MRgi6MCYtg8C6je79uZEaUC4HiIYKi9/GjYYQtnTSu3E8u90KFyg+AiwiBjkmPAMKnk5
-X-Gm-Message-State: AOJu0YyFqMyVJw/qHeorTn/h3STRpXWYQBDdKZqgrtCVEGVltfzBFpqW
-	QMdEwNTSjQwZnkJTAqRzSxbTSJiXhuy28g34rBHmnKvSafnzUdZ5
-X-Google-Smtp-Source: AGHT+IFzdVkgFVucq+ZP1v8OpUIXwkxjGJR9OB5Tn+7GHhqMBG8/1E9dagmdQZXN7zOjwbPCjYaFAQ==
-X-Received: by 2002:ac8:7e89:0:b0:431:1d8d:9229 with SMTP id w9-20020ac87e89000000b004311d8d9229mr1897432qtj.24.1710975605218;
-        Wed, 20 Mar 2024 16:00:05 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.googlemail.com with ESMTPSA id d4-20020ac85344000000b00430ac082732sm7169592qto.70.2024.03.20.16.00.01
+        bh=VOvh2NpicGofkRCrFi8PYG6o+1WRhQwAy0mztmTg8ZE=;
+        b=RMCBdpwz7toWw5b8dJyGU+ybJLSw4wck0X3BOTroFHNOxkXIAhmYBLURbqGXWyce/T
+         gq1em4xI2k2YYTEsoUKn61m1nUCLNBGEXB2b7lTDAs2Q+7ucj2kKG46zPDrt/AZesF9O
+         sufweT6gyPNvuEG9VCKmr2CfXLqCk3LBMs/6j+HgEXaCYTcvGqftPTw9BY2/Rcf6DEbt
+         e4hWM9XBdKehk8plmUiKD9ZoX5nnWaq42Ef2YDEH3O+eWGnLC5lyZAx5x0oASLqpCq4q
+         NmXzeYs9B0fv/41hKFkuSUrcF32CU3HV4cCiKzeD9A7oLLgamErQYInaQnQOXRiApASc
+         lLYw==
+X-Forwarded-Encrypted: i=1; AJvYcCVNgWE3TzDdRIBXnix+leatHLS0gjkWL5+6ftUkKLhksb3rMyiElLt2dxJkEBjT4OoTLq8wewVqEM0Bt4hf7y8EBqygUvsj7BylsBBc7rxmAYPnDTDJiBmrATWjLymEFS9iWZXo
+X-Gm-Message-State: AOJu0YzrYXIj4HePiN52+xKwteYmpBETQZjBQrth9FHm+nlwoG3KHFos
+	Yj+f38AY1yWCA7iLphem+bry48VnRLB/f+NQ6owgK7GeR9BQ1qQg
+X-Google-Smtp-Source: AGHT+IEELZrDc9PEiDf1iLRCYKxe9npw673W69ut+cyK7NVGDUO4VcRKLQPH8W3IVerjr8T2DRHZfg==
+X-Received: by 2002:a05:6a00:4605:b0:6e7:355a:2f62 with SMTP id ko5-20020a056a00460500b006e7355a2f62mr3550039pfb.6.1710978515194;
+        Wed, 20 Mar 2024 16:48:35 -0700 (PDT)
+Received: from ?IPV6:2600:8802:b00:ba1:11e9:93a1:c5e1:1a7b? ([2600:8802:b00:ba1:11e9:93a1:c5e1:1a7b])
+        by smtp.gmail.com with ESMTPSA id i3-20020a056a00004300b006e56e5c09absm12522162pfk.14.2024.03.20.16.48.32
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 20 Mar 2024 16:00:03 -0700 (PDT)
-Message-ID: <6059f7e5-fd2c-493f-a1dd-acfc7e9e7701@gmail.com>
-Date: Wed, 20 Mar 2024 15:59:59 -0700
+        Wed, 20 Mar 2024 16:48:32 -0700 (PDT)
+Message-ID: <05a042d5-95fa-4eff-b2ad-c26e865837b1@gmail.com>
+Date: Wed, 20 Mar 2024 16:48:31 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,43 +76,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net V2 2/2] net: lan743x: support WOL in MAC even when PHY
- does not
+Subject: Re: [PATCH] net: dsa: add return value check of genphy_read_status()
+To: =?UTF-8?B?0JDQu9C10LrRgdCw0L3QtNGA0LAg0JTRjtC/0LjQvdCw?=
+ <adiupina@astralinux.ru>, Andrew Lunn <andrew@lunn.ch>
+Cc: Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Sebastian Reichel <sre@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+References: <20240314063008.11214-1-adiupina@astralinux.ru>
+ <99631ba3-36f9-4eed-80d9-4a663ef46d80@lunn.ch>
+ <bb752899-dbf3-4dd2-89f0-d280488bd8bf@astralinux.ru>
 Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>,
- Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, linux-kernel@vger.kernel.org,
- bryan.whitehead@microchip.com, UNGLinuxDriver@microchip.com
-References: <20240320042107.903051-1-Raju.Lakkaraju@microchip.com>
- <20240320042107.903051-3-Raju.Lakkaraju@microchip.com>
- <22089299-a3e2-4cbd-942a-65ea070657b8@lunn.ch>
 From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <22089299-a3e2-4cbd-942a-65ea070657b8@lunn.ch>
+In-Reply-To: <bb752899-dbf3-4dd2-89f0-d280488bd8bf@astralinux.ru>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 3/20/24 15:53, Andrew Lunn wrote:
->> +	if (netdev->phydev) {
->> +		ret = phy_ethtool_set_wol(netdev->phydev, wol);
->> +		if (ret != -EOPNOTSUPP && ret != 0)
->> +			return ret;
-> 
-> I'm not sure this condition is correct.
-> 
-> If there is an error, and the error is not EOPNOTSUPP, you want to
-> report that error. However, if the PHY can support the WoL
-> configuration, it will return 0, and this function should exit, WoL in
-> the MAC is not needed. And doing WoL in the PHY consumes less power
-> since you can suspend the MAC.
-> 
-> So i think it should simply be:
-> 
->> +		if (ret != -EOPNOTSUPP)
->> +			return ret;
 
-Agreed, that's what I did for bcmgenet_wol.c.
+
+On 15/03/2024 03:25, Александра Дюпина wrote:
+> Hello, Andrew!
+
+(please do not top-post)
+
+> 
+> The dsa_register_switch() function is used in various DSA
+> drivers (in probe function), so it is necessary to check all
+> possible errors. If the return value (may be an error code)
+> of genphy_read_status() is not checked in
+> dsa_shared_port_fixed_link_register_of(), a possible error
+> in dsa_register_switch() may be missed.
+
+This is not a path that will fail, because the fixed PHY emulation layer 
+is not a real piece of hardware, therefore no MDIO read could really 
+cause a problem here. I don't have a strong opinion however if you want 
+to propagate it properly.
 -- 
 Florian
-
 
