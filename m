@@ -1,197 +1,146 @@
-Return-Path: <netdev+bounces-80804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0D5888120E
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 14:07:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 755078811C3
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 13:39:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 775EF281A04
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 13:07:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 30365285D38
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 12:39:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1F140847;
-	Wed, 20 Mar 2024 13:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98E7D3BBC8;
+	Wed, 20 Mar 2024 12:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=terma.com header.i=@terma.com header.b="moWbLjUj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VnE5SgoM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out12.electric.net (smtp-out12.electric.net [89.104.206.34])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A5011A38E6
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 13:07:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.104.206.34
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D57FE3FE20
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 12:39:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710940071; cv=none; b=VGMapldSMcpOdmJqSGYphMeUbm43smCtsl6yIKLABPFCviYOiQSNnbbK1TCz5Vj9TzlYtRZK9aX0YK0CvN+R/KL051w4JftQEVIBo/mzgnCuJsMQYhyoKl+ZvLY8IHkBgAZUuUmc7f5awSYyS1XIEakMfiRx3i9rEmgS3fGM3E8=
+	t=1710938376; cv=none; b=qV34PqHq4MGxBij1jyO0T0LIBGwTFYiMOfzKKYL6Co2nPxOZBMOmbyPqzSkyi3nvugWj5mqi4zjGEL5dBHAC9ju2meSSXHt0y7MrAppAv+8b+RyeDGaeMaERGacQiO6XeYAy4FNlQQ3G4ghXKg5kLeArXdS/TidRgGNnnYWFVpc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710940071; c=relaxed/simple;
-	bh=RQAn0ZMhq0kHjTTEjswIDH4Lr2VXmAhNdK3BGWZqg2E=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=GtmHNOoKNSyNEoZqcmhngUGYF3AVOQJztSBaW+OTV/xxVglKpyyfhicDJVcmoeliZhbA6q8iPcBu9fSggncrDpU45O5UJpEKZYUSI5vwZTEDsw+eJobsiUYEZV3JizpxPCEBxssZJexoIu3TdxJv4UI6DzT2f6uCgGdvWN8K9I8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=terma.com; spf=pass smtp.mailfrom=terma.com; dkim=pass (2048-bit key) header.d=terma.com header.i=@terma.com header.b=moWbLjUj; arc=none smtp.client-ip=89.104.206.34
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=terma.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=terma.com
-Received: from 1rmvDQ-000307-TT by out12b.electric.net with emc1-ok (Exim 4.96.1)
-	(envelope-from <chr@terma.com>)
-	id 1rmvDT-0003TL-W0;
-	Wed, 20 Mar 2024 05:38:47 -0700
-Received: by emcmailer; Wed, 20 Mar 2024 05:38:47 -0700
-Received: from [193.163.1.101] (helo=EXCH07.terma.com)
-	by out12b.electric.net with esmtpsa  (TLS1.2) tls TLS_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96.1)
-	(envelope-from <chr@terma.com>)
-	id 1rmvDQ-000307-TT;
-	Wed, 20 Mar 2024 05:38:44 -0700
-Received: from EXCH09.terma.com (10.12.2.69) by EXCH07.terma.com (10.12.2.67)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Wed, 20 Mar
- 2024 13:38:43 +0100
-Received: from EXCH09.terma.com ([fe80::d8f4:f3a1:6899:e2da]) by
- EXCH09.terma.com ([fe80::d8f4:f3a1:6899:e2da%17]) with mapi id
- 15.01.2507.034; Wed, 20 Mar 2024 13:38:43 +0100
-From: Claus Hansen Ries <chr@terma.com>
-To: Simon Horman <horms@kernel.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Michal Simek
-	<michal.simek@amd.com>, Alex Elder <elder@linaro.org>, Wei Fang
-	<wei.fang@nxp.com>, =?utf-8?B?VXdlIEtsZWluZS1Lw7ZuaWc=?=
-	<u.kleine-koenig@pengutronix.de>, Dan Carpenter <dan.carpenter@linaro.org>,
-	Rob Herring <robh@kernel.org>, Wang Hai <wanghai38@huawei.com>
-Subject: RE: [PATCH] net: ll_temac: platform_get_resource replaced by wrong
+	s=arc-20240116; t=1710938376; c=relaxed/simple;
+	bh=Wunx9RkS5kAS7EP8GV7ofSvEH6Bug37mEESmRmm4X88=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=SHYEw8kHRc2jkZnRmodkelCdgTN1J8cZF/QcphLAEOjQjOKXEVwhLxdTf/VRp5kE4KiaCR0B/3rLS+QbX3rohLc8vN5rEPBhsf0jGOYaYPcTt6XgS+TS053wiPkaed+5NlMeu9sWHo82Rb0PY4GoUGEO601+jZiDEmY/X8HftRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VnE5SgoM; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1710938372;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pwD1DlHDJoiZ+BASl5M1X9taC4Av7K/8w3on45P9Dug=;
+	b=VnE5SgoM1YaUMivRuddNt0uVoYHUojtOhTLRH172Wyaulp7+rDTohhN55FfVxsMsYbvx7d
+	YQfdy7piNYYG+5hk9G8fGtud+BpcNXOUvWDl+99pIavYNUPOJ88O9v7nLqyNg71UMeQAph
+	CrwSpfeepgrYzxmSYuA2UaFM4O2JAPE=
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com
+ [209.85.215.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-218-OwzYUCm4P8i5eq6lgk7V5g-1; Wed, 20 Mar 2024 08:39:30 -0400
+X-MC-Unique: OwzYUCm4P8i5eq6lgk7V5g-1
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-5c6245bc7caso4215946a12.3
+        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 05:39:30 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710938369; x=1711543169;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=pwD1DlHDJoiZ+BASl5M1X9taC4Av7K/8w3on45P9Dug=;
+        b=hEjIv20S5xfgCcsadKtcBnf3tL9b/l6CtwSRfzn3L9Ra9PJPnviLWchXscfWq2PtGv
+         Oys7f9q+eD47TH+gdmVNMxmsITgrWb14KYez6YuvZXPXRoIolrFKSrD6WSBIIwxqaPuq
+         kzQsGcVUtYL+xXMWbxgyJGvkeq8O/GvvG4PqaSCVbBBF3xmEViNZSn5AmoSr930snNF/
+         RbC6g6jAXQQT8UfY7hWobA61TDkpL377uxecM/6XnEKHhpvhn3LXsINI+/gV+PyfFCaX
+         F959TaT6DvQZ6GOXGtj1L6XOKas0T1FyP8Oro4qpVyVVSMuTLweiacv37yEvAKEqmYJ1
+         +Ubw==
+X-Gm-Message-State: AOJu0YxZNja7RowwyVvKlpH9M8IxArlqIwHt4x6/9JRoJWHlsVeMA4Hq
+	p/hh/YKTKSh+iuqw38foPbvakQRkF9R5Pp2SeQfeZ9ZUEYbWEgVG3orxlTYEcvq9oq0QzqbXwPL
+	OcFsTe/5ugHFsLIIs/ZZaQua2WGRIkfb5yT5SITbvbVV4tFkzpgn1dQ==
+X-Received: by 2002:a05:6a20:b297:b0:1a3:6ed2:ee27 with SMTP id ei23-20020a056a20b29700b001a36ed2ee27mr5397295pzb.16.1710938369603;
+        Wed, 20 Mar 2024 05:39:29 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFlcuStyWu3TlWrrisDP8mtM6DjNM279tXgyIaSQ2Jz6K6uDf2Hr7dvEXshrk3XT1ZYHq+R8w==
+X-Received: by 2002:a05:6a20:b297:b0:1a3:6ed2:ee27 with SMTP id ei23-20020a056a20b29700b001a36ed2ee27mr5397286pzb.16.1710938369255;
+        Wed, 20 Mar 2024 05:39:29 -0700 (PDT)
+Received: from localhost ([240d:1a:c0d:9f00:523b:c871:32d4:ccd0])
+        by smtp.gmail.com with ESMTPSA id g20-20020aa78754000000b006e672b48b49sm11548252pfo.157.2024.03.20.05.39.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Mar 2024 05:39:28 -0700 (PDT)
+Date: Wed, 20 Mar 2024 21:39:24 +0900 (JST)
+Message-Id: <20240320.213924.690460440850932744.syoshida@redhat.com>
+To: chr@terma.com
+Cc: netdev@vger.kernel.org, davem@davemloft.net
+Subject: Re: [PATCH] net: ll_temac: platform_get_resource replaced by wrong
  function
-Thread-Topic: [PATCH] net: ll_temac: platform_get_resource replaced by wrong
- function
-Thread-Index: Adp6NO47DhzC33LDRRqZX1YF4VLPmAAgA96AAAIsztA=
-Date: Wed, 20 Mar 2024 12:38:43 +0000
-Message-ID: <6ba038acc328407195fc8c4a1af7dce9@terma.com>
+From: Shigeru Yoshida <syoshida@redhat.com>
+In-Reply-To: <41c3ea1df1af4f03b2c66728af6812fb@terma.com>
 References: <41c3ea1df1af4f03b2c66728af6812fb@terma.com>
- <20240320115433.GT185808@kernel.org>
-In-Reply-To: <20240320115433.GT185808@kernel.org>
-Accept-Language: en-150, en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+X-Mailer: Mew version 6.9 on Emacs 29.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Authenticated: smtp.out@terma.com
-X-Outbound-IP: 193.163.1.101
-X-Env-From: chr@terma.com
-X-Proto: esmtpsa
-X-Revdns: r2d2.lystrup.terma.com
-X-HELO: EXCH07.terma.com
-X-TLS: TLS1.2:AES256-GCM-SHA384:256
-X-Authenticated_ID: smtp.out@terma.com
-X-VIPRE-Scanners:virus_clamav;virus_bd;
-X-PolicySMART: 6001202, 19049467
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=terma.com; s=mailanyone20180424;h=MIME-Version:In-Reply-To:References:Message-ID:Date:To:From; bh=RQAn0ZMhq0kHjTTEjswIDH4Lr2VXmAhNdK3BGWZqg2E=;b=moWbLjUjO2qUkYrxqgQv9EPo5yuC4mVTACpBwd/uGQGIju+R3C+MrA9xzvsE8US7xazBqvFAVuQGSw00iSosai9yu9fhVZfglgVzkvRjZKK7mX4X0uMeREs0R9b5jzu07quvrP08uWTiWc7iBvBtCHQvMKQJkacSpwKSLHHHJegq/XjYni+pFjL1Y37tJP7viievMfL57naObU1CMx/xDuY9dJ99HzGNB+HRac/gk0De93QMNgqSG3vxNtsBGloZ2iDfBPFIV+DG2qFEU44n8Da8MYdaQf3W6vywllEy4Mg0aREhNK5X78T0QExKAUGDS9DTQRtn8jnsfv9umreN3g==;
-X-PolicySMART: 6001202, 19049467
-X-PolicySMART: 6001202, 19049467
-X-PolicySMART: 6001202, 19049467
-X-PolicySMART: 6001202, 19049467
-X-PolicySMART: 6001202, 19049467
-X-PolicySMART: 6001202, 19049467
-X-PolicySMART: 6001202, 19049467
-X-PolicySMART: 6001202, 19049467
-X-PolicySMART: 6001202, 19049467
-X-PolicySMART: 6001202, 19049467
-X-PolicySMART: 6001202, 19049467
-X-PolicySMART: 6001202, 19049467
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-SGksDQoNCldlIHJhbiBpbnRvIHRoZSBpc3N1ZSB3aGVuIHVwZ3JhZGluZyBmcm9tIGtlcm5lbCA1
-LjQueCB0byA2LjEueC4gSSBkb24ndCB0aGluayBpdCBpcyBhIG11Y2ggdXNlZCBkcml2ZXIuDQoN
-CkNhbid0IHNheSBpZiB0aGlzIHdvdWxkIHdvcmsgb24gZGlmZmVyZW50IGltcGxlbWVudGF0aW9u
-cyBvZiBYaWxpbnggSERMLCBidXQgbG9va2luZyBhdCB0aGUgY29kZSwgSSBjYW4ndCBzZWUgZGV2
-bV9wbGF0Zm9ybV9pb3JlbWFwX3Jlc291cmNlX2J5bmFtZS9wbGF0Zm9ybV9nZXRfcmVzb3VyY2Vf
-YnluYW1lIHN1Y2NlZWQgd2l0aG91dCBoaXR0aW5nIHN0cmNtcCwgYW55IG90aGVyIHBhdGggbWFr
-ZXMgdGhlIHBsYXRmb3JtX2dldF9yZXNvdXJjZV9ieW5hbWUgcmV0dXJuIE5VTEwgYW5kIF9fZGV2
-bV9pb3JlbWFwX3Jlc291cmNlIGZhaWwgd2l0aCAicmVzID09IE5VTEwiIChhcyBmYXIgSSBjYW4g
-c2VlKS4gSXQgd291bGQgcmVxdWlyZSBzdHJjbXAgYmVpbmcgYWJsZSB0byBzdXJ2aXZlIHdpdGgg
-dGhlIG5hbWUgcG9pbnRlciBiZWluZyBlcXVhbCB0byAwLg0KDQp2b2lkIF9faW9tZW0gKg0KZGV2
-bV9wbGF0Zm9ybV9pb3JlbWFwX3Jlc291cmNlX2J5bmFtZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNl
-ICpwZGV2LA0KCQkJCSAgICAgIGNvbnN0IGNoYXIgKm5hbWUpDQp7DQoJc3RydWN0IHJlc291cmNl
-ICpyZXM7DQoNCglyZXMgPSBwbGF0Zm9ybV9nZXRfcmVzb3VyY2VfYnluYW1lKHBkZXYsIElPUkVT
-T1VSQ0VfTUVNLCBuYW1lKTsNCglyZXR1cm4gZGV2bV9pb3JlbWFwX3Jlc291cmNlKCZwZGV2LT5k
-ZXYsIHJlcyk7DQp9DQoNCg0KDQpzdHJ1Y3QgcmVzb3VyY2UgKnBsYXRmb3JtX2dldF9yZXNvdXJj
-ZV9ieW5hbWUoc3RydWN0IHBsYXRmb3JtX2RldmljZSAqZGV2LA0KCQkJCQkgICAgICB1bnNpZ25l
-ZCBpbnQgdHlwZSwNCgkJCQkJICAgICAgY29uc3QgY2hhciAqbmFtZSkNCnsNCgl1MzIgaTsNCg0K
-CWZvciAoaSA9IDA7IGkgPCBkZXYtPm51bV9yZXNvdXJjZXM7IGkrKykgew0KCQlzdHJ1Y3QgcmVz
-b3VyY2UgKnIgPSAmZGV2LT5yZXNvdXJjZVtpXTsNCg0KCQlpZiAodW5saWtlbHkoIXItPm5hbWUp
-KQ0KCQkJY29udGludWU7DQoNCgkJaWYgKHR5cGUgPT0gcmVzb3VyY2VfdHlwZShyKSAmJiAhc3Ry
-Y21wKHItPm5hbWUsIG5hbWUpKQ0KCQkJcmV0dXJuIHI7DQoJfQ0KCXJldHVybiBOVUxMOw0KfQ0K
-DQp2b2lkIF9faW9tZW0gKmRldm1faW9yZW1hcF9yZXNvdXJjZShzdHJ1Y3QgZGV2aWNlICpkZXYs
-DQoJCQkJICAgIGNvbnN0IHN0cnVjdCByZXNvdXJjZSAqcmVzKQ0Kew0KCXJldHVybiBfX2Rldm1f
-aW9yZW1hcF9yZXNvdXJjZShkZXYsIHJlcywgREVWTV9JT1JFTUFQKTsNCn0NCg0KX19kZXZtX2lv
-cmVtYXBfcmVzb3VyY2Uoc3RydWN0IGRldmljZSAqZGV2LCBjb25zdCBzdHJ1Y3QgcmVzb3VyY2Ug
-KnJlcywNCgkJCWVudW0gZGV2bV9pb3JlbWFwX3R5cGUgdHlwZSkNCnsNCglyZXNvdXJjZV9zaXpl
-X3Qgc2l6ZTsNCgl2b2lkIF9faW9tZW0gKmRlc3RfcHRyOw0KCWNoYXIgKnByZXR0eV9uYW1lOw0K
-DQoJQlVHX09OKCFkZXYpOw0KDQoJaWYgKCFyZXMgfHwgcmVzb3VyY2VfdHlwZShyZXMpICE9IElP
-UkVTT1VSQ0VfTUVNKSB7DQoJCWRldl9lcnIoZGV2LCAiaW52YWxpZCByZXNvdXJjZSAlcFJcbiIs
-IHJlcyk7DQoJCXJldHVybiBJT01FTV9FUlJfUFRSKC1FSU5WQUwpOw0KCX0NCi4uLi4NCg0KQ2xh
-dXMgSGFuc2VuIFJpZXMNClNwZWNpYWxpc3QsIFNvZnR3YXJlIEVuZ2luZWVyaW5nDQpSYWRhciBB
-cHBsaWNhdGlvbiBTb2Z0d2FyZQ0KVGVybWEgQS9TDQoNCi0tLS0tT3JpZ2luYWwgTWVzc2FnZS0t
-LS0tDQpGcm9tOiBTaW1vbiBIb3JtYW4gPGhvcm1zQGtlcm5lbC5vcmc+IA0KU2VudDogMjAuIG1h
-cnRzIDIwMjQgMTI6NTUNClRvOiBDbGF1cyBIYW5zZW4gUmllcyA8Y2hyQHRlcm1hLmNvbT4NCkNj
-OiBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBEYXZpZCBTLiBNaWxsZXIgPGRhdmVtQGRhdmVtbG9m
-dC5uZXQ+OyBFcmljIER1bWF6ZXQgPGVkdW1hemV0QGdvb2dsZS5jb20+OyBKYWt1YiBLaWNpbnNr
-aSA8a3ViYUBrZXJuZWwub3JnPjsgUGFvbG8gQWJlbmkgPHBhYmVuaUByZWRoYXQuY29tPjsgTWlj
-aGFsIFNpbWVrIDxtaWNoYWwuc2ltZWtAYW1kLmNvbT47IEFsZXggRWxkZXIgPGVsZGVyQGxpbmFy
-by5vcmc+OyBXZWkgRmFuZyA8d2VpLmZhbmdAbnhwLmNvbT47IFV3ZSBLbGVpbmUtS8O2bmlnIDx1
-LmtsZWluZS1rb2VuaWdAcGVuZ3V0cm9uaXguZGU+OyBEYW4gQ2FycGVudGVyIDxkYW4uY2FycGVu
-dGVyQGxpbmFyby5vcmc+OyBSb2IgSGVycmluZyA8cm9iaEBrZXJuZWwub3JnPjsgV2FuZyBIYWkg
-PHdhbmdoYWkzOEBodWF3ZWkuY29tPg0KU3ViamVjdDogUmU6IFtQQVRDSF0gbmV0OiBsbF90ZW1h
-YzogcGxhdGZvcm1fZ2V0X3Jlc291cmNlIHJlcGxhY2VkIGJ5IHdyb25nIGZ1bmN0aW9uDQoNCkNB
-VVRJT046IFRoaXMgZW1haWwgb3JpZ2luYXRlZCBmcm9tIG91dHNpZGUgb2YgVGVybWEuIERvIG5v
-dCBjbGljayBsaW5rcyBvciBvcGVuIGF0dGFjaG1lbnRzIHVubGVzcyB5b3UgcmVjb2duaXplIHRo
-ZSBzZW5kZXIgYW5kIGtub3cgdGhlIGNvbnRlbnQgaXMgc2FmZS4NCg0KKyBFcmljIER1bWF6ZXQs
-IEpha3ViIEtpY2luc2tpLCBQYW9sbyBBYmVuaSwgTWljaGFsIFNpbWVrLCBBbGV4IEVsZGVyDQog
-IFdlaSBGYW5nLCBVd2UgS2xlaW5lLUvDtm5pZywgRGFuIENhcnBlbnRlciwgUm9iIEhlcnJpbmcs
-IFdhbmcgSGFpDQoNCk9uIFR1ZSwgTWFyIDE5LCAyMDI0IGF0IDA3OjQ1OjI2UE0gKzAwMDAsIENs
-YXVzIEhhbnNlbiBSaWVzIHdyb3RlOg0KPiBGcm9tOiBDbGF1cyBIYW5zZW4gcmllcyA8Y2hyQHRl
-cm1hLmNvbT4NCj4NCj4gZGV2bV9wbGF0Zm9ybV9pb3JlbWFwX3Jlc291cmNlX2J5bmFtZSBpcyBj
-YWxsZWQgdXNpbmcgMCBhcyBuYW1lLCB3aGljaCANCj4gZXZlbnR1YWxseSBlbmRzIHVwIGluIHBs
-YXRmb3JtX2dldF9yZXNvdXJjZV9ieW5hbWUsIHdoZXJlIGl0IGNhdXNlcyBhIG51bGwgcG9pbnRl
-ciBpbiBzdHJjbXAuDQo+DQo+ICAgICAgICAgICAgICAgICBpZiAodHlwZSA9PSByZXNvdXJjZV90
-eXBlKHIpICYmICFzdHJjbXAoci0+bmFtZSwgDQo+IG5hbWUpKQ0KPg0KPiBUaGUgY29ycmVjdCBm
-dW5jdGlvbiBpcyBkZXZtX3BsYXRmb3JtX2lvcmVtYXBfcmVzb3VyY2UuDQoNCkhpIENsYXVzLA0K
-DQpJdCBpcyBjdXJpb3VzIHRoYXQgdGhpcyB3YXNuJ3Qgbm90aWNlZCBlYXJsaWVyIC0gZG9lcyB0
-aGUgZHJpdmVyIGZ1bmN0aW9uIGluIHNvbWUgY2lyY3Vtc3RhbmNlcyB3aXRob3V0IHRoaXMgY2hh
-bmdlPw0KDQo+DQo+IEZpeGVzOiBiZDY5MDU4ICgibmV0OiBsbF90ZW1hYzogVXNlIA0KPiBkZXZt
-X3BsYXRmb3JtX2lvcmVtYXBfcmVzb3VyY2VfYnluYW1lKCkiKQ0KDQpuaXQ6IEZpeGVzIHRhZ3Mg
-c2hvdWxkIHVzZSAxMiBvciBtb3JlIGNoYXJhY3RlcnMgZm9yIHRoZSBoYXNoLg0KDQpGaXhlczog
-YmQ2OTA1OGY1MGQ1ICgibmV0OiBsbF90ZW1hYzogVXNlIGRldm1fcGxhdGZvcm1faW9yZW1hcF9y
-ZXNvdXJjZV9ieW5hbWUoKSIpDQoNCj4gU2lnbmVkLW9mZi1ieTogQ2xhdXMgSC4gUmllcyA8Y2hy
-QHRlcm1hLmNvbT4NCj4gQ2M6IHN0YWJsZUB2Z2VyLmtlcm5lbC5vcmcNCg0KVW5mb3J0dW5hdGVs
-eSB0aGUgcGF0Y2ggZG9lcyBub3QgYXBwbHkgLSBpdCBzZWVtcyB0aGF0IHRhYnMgaGF2ZSBiZWVu
-IHJlcGxhY2VkIGJ5IHNwYWNlcyBzb21ld2hlcmUgYWxvbmcgdGhlIHdheS4gSXQgd291bGQgYmUg
-YmVzdCB0byByZXBvc3Qgd2l0aCB0aGF0IGFkZHJlc3NlZC4gVXNpbmcgZ2l0IHNlbmQtZW1haWwg
-dXN1YWxseSB3b3Jrcy4NCg0KQWxzbywgYXMgdGhpcyBpcyBhIGZpeCwgcGxlYXNlIHRhcmdldCBp
-dCBhdCB0aGUgbmV0IHRyZWUuDQpUaGF0IG1lYW5zIGl0IHNob3VsZCBiZSBiYXNlZCBvbiB0aGF0
-IHRyZWUgKHRoYXQgcGFydCBpcyBmaW5lIDopIGFuZCBkZXNpZ25hdGVkIGFzIGJlaW5nIGZvciBu
-ZXQgaW4gdGhlIHN1YmplY3QuDQoNCiAgICAgICAgU3ViamVjdDogW1BBVENIIG5ldF0gLi4uDQoN
-Ckxhc3RseSwgcGxlYXNlIHJ1biBnZXRfbWFpbnRhaW5lci5wbCBvbiB5b3VyIHBhdGNoIHRvIHBy
-b3ZpZGUgdGhlIGxpc3Qgb2YgcGFydGllcyB0byBDQy4NCg0KaHR0cHM6Ly9kb2NzLmtlcm5lbC5v
-cmcvcHJvY2Vzcy9tYWludGFpbmVyLW5ldGRldi5odG1sDQoNCj4gLS0tDQo+ICBkcml2ZXJzL25l
-dC9ldGhlcm5ldC94aWxpbngvbGxfdGVtYWNfbWFpbi5jIHwgMiArLQ0KPiAgMSBmaWxlIGNoYW5n
-ZWQsIDEgaW5zZXJ0aW9uKCspLCAxIGRlbGV0aW9uKC0pDQo+DQo+IGRpZmYgLS1naXQgYS9kcml2
-ZXJzL25ldC9ldGhlcm5ldC94aWxpbngvbGxfdGVtYWNfbWFpbi5jIA0KPiBiL2RyaXZlcnMvbmV0
-L2V0aGVybmV0L3hpbGlueC9sbF90ZW1hY19tYWluLmMNCj4gaW5kZXggOWRmMzljZjhiMDk3Li4x
-MDcyZTIyMTBhZWQgMTAwNjQ0DQo+IC0tLSBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L3hpbGlueC9s
-bF90ZW1hY19tYWluLmMNCj4gKysrIGIvZHJpdmVycy9uZXQvZXRoZXJuZXQveGlsaW54L2xsX3Rl
-bWFjX21haW4uYw0KPiBAQCAtMTQ0Myw3ICsxNDQzLDcgQEAgc3RhdGljIGludCB0ZW1hY19wcm9i
-ZShzdHJ1Y3QgcGxhdGZvcm1fZGV2aWNlICpwZGV2KQ0KPiAgICAgICAgIH0NCj4gICAgICAgICAg
-IC8qIG1hcCBkZXZpY2UgcmVnaXN0ZXJzICovDQo+IC0gICAgICAgbHAtPnJlZ3MgPSBkZXZtX3Bs
-YXRmb3JtX2lvcmVtYXBfcmVzb3VyY2VfYnluYW1lKHBkZXYsIDApOw0KPiArICAgICAgIGxwLT5y
-ZWdzID0gZGV2bV9wbGF0Zm9ybV9pb3JlbWFwX3Jlc291cmNlKHBkZXYsIDApOw0KPiAgICAgICAg
-IGlmIChJU19FUlIobHAtPnJlZ3MpKSB7DQo+ICAgICAgICAgICAgICAgICBkZXZfZXJyKCZwZGV2
-LT5kZXYsICJjb3VsZCBub3QgbWFwIFRFTUFDIHJlZ2lzdGVyc1xuIik7DQo+ICAgICAgICAgICAg
-ICAgICByZXR1cm4gLUVOT01FTTsNCj4NCj4gYmFzZS1jb21taXQ6IGQ5NWZjZGY0OTYxZDI3YTNk
-MTdlNWM3NzI4MzY3MTk3YWRjODliOGQNCj4gLS0gIDIuMzkuMyAoQXBwbGUgR2l0LTE0NikNCj4N
-Cj4NCj4NCg0KLS0NCnB3LWJvdDogY2hhbmdlcy1yZXF1ZXN0ZWQNCg==
+On Tue, 19 Mar 2024 19:45:26 +0000, Claus Hansen Ries wrote:
+> From: Claus Hansen ries <chr@terma.com>
+> 
+> devm_platform_ioremap_resource_byname is called using 0 as name, which eventually 
+> ends up in platform_get_resource_byname, where it causes a null pointer in strcmp.
+> 
+>                 if (type == resource_type(r) && !strcmp(r->name, name))
+> 
+> The correct function is devm_platform_ioremap_resource.
+> 
+> Fixes: bd69058 ("net: ll_temac: Use devm_platform_ioremap_resource_byname()")
+> Signed-off-by: Claus H. Ries <chr@terma.com>
+> Cc: stable@vger.kernel.org
+
+This patch LGTM. Before the commit bd69058 ("net: ll_temac: Use
+devm_platform_ioremap_resource_byname()"), temac_probe() calls
+platform_get_resource() with the index 0 to get the resource. So we
+have to use devm_platform_ioremap_resource() with the index 0 here.
+
+> ---
+>  drivers/net/ethernet/xilinx/ll_temac_main.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/xilinx/ll_temac_main.c b/drivers/net/ethernet/xilinx/ll_temac_main.c
+> index 9df39cf8b097..1072e2210aed 100644
+> --- a/drivers/net/ethernet/xilinx/ll_temac_main.c
+> +++ b/drivers/net/ethernet/xilinx/ll_temac_main.c
+> @@ -1443,7 +1443,7 @@ static int temac_probe(struct platform_device *pdev)
+>         }
+>           /* map device registers */
+> -       lp->regs = devm_platform_ioremap_resource_byname(pdev, 0);
+> +       lp->regs = devm_platform_ioremap_resource(pdev, 0);
+>         if (IS_ERR(lp->regs)) {
+>                 dev_err(&pdev->dev, "could not map TEMAC registers\n");
+>                 return -ENOMEM;
+
+However, it seems that the patch is indented by spaces instead of tabs
+(maybe your mail client replaced this?). I recommend running
+checkpatch.pl before submitting patches.
+
+Also, we should put appropriate prefix, i.e. "net" or "net-next", in
+the subject. As for this patch, I think "[PATCH net]" is appropriate.
+
+Thanks,
+Shigeru
+
+> base-commit: d95fcdf4961d27a3d17e5c7728367197adc89b8d
+> --  2.39.3 (Apple Git-146)
+> 
+> 
+> 
+
 
