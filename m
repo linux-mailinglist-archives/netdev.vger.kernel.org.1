@@ -1,267 +1,355 @@
-Return-Path: <netdev+bounces-80863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B3388815CD
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 17:41:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEA3D8815DF
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 17:46:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C59B281B8B
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:41:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0AE8DB21AB3
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:46:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7A5710FF;
-	Wed, 20 Mar 2024 16:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2FF469D37;
+	Wed, 20 Mar 2024 16:46:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=solidrn.onmicrosoft.com header.i=@solidrn.onmicrosoft.com header.b="Du/UBjhx"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="Krdwp1bF"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-DBA-obe.outbound.protection.outlook.com (mail-dbaeur03on2090.outbound.protection.outlook.com [40.107.104.90])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f181.google.com (mail-yb1-f181.google.com [209.85.219.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81B1FD516;
-	Wed, 20 Mar 2024 16:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.104.90
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710952876; cv=fail; b=Fd4iAtWcxSr5TfZXSowKVCKtBwVmWxAIQEvXBkPeWQycCrOjBLAlPP3Y8IlYbtUnJBKBZkTKx8uiRYfKQ04nHFwYKTAp5NBHEdgkVxciZn4jVCiBTwrJCHNy2IlZ9J53M2YWWjxc2KRH0KMJlKEJz9BOUWYnAGQE4vIILjCxWCA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710952876; c=relaxed/simple;
-	bh=1SOS47T04+i/yzVdiE04RjEk5FxpSnn4RmdA7Aw1+7w=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=j+7L84NOnvJSu3NuW0w3gOS44VTex00ECRLdVBpud8vu0nBZ/CaE5Ost8PqshWLKUt3szdzoT6pGk+Yh+fCdgf0caY1VE1da2fO0dI4YaBDaYr10cdQYgM2RhhqnmvU5dkuU3vEds01HxvVl+VJWCJvj7AQGSMkdHvkdyLxYW4c=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=solid-run.com; spf=pass smtp.mailfrom=solid-run.com; dkim=pass (1024-bit key) header.d=solidrn.onmicrosoft.com header.i=@solidrn.onmicrosoft.com header.b=Du/UBjhx; arc=fail smtp.client-ip=40.107.104.90
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=solid-run.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=solid-run.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mVVacJI1cvLFEIunXA5Tpzvql3tWUqPVH7O4jkntlENL8hc9z8csIW5JGJ4Iv+zQ7Xy/p18D6c+1nwx/YAoLCXb4h0pq/noNpdpbGe4hd1UYcG6zLheP/VT84r1okIQa27SGzChgukczi5IwaHfKKG4DabywBFbCxiMfQRd+6+dyjQoQBPg3caGpLii6uCDL5Ssr7pGTTmr7CQ/YG+nerD0PdabuC8m01LUib7QXLENFKzfXkszg8ZZwZ55Q3K5ZGqm/JkVBRJP6QnSx0e+eHovCnLyyarf9ncshzoFU3a7Qk3sq94u9o4N6u3RXjJ6EeB1kYFgLJV6wlnw1eVLGzw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1SOS47T04+i/yzVdiE04RjEk5FxpSnn4RmdA7Aw1+7w=;
- b=Cyk7D7GT1bpT43Xi+OjBi5nKKdcw6MxXZqaVEIqrueCsYFVnJOSjRKyAMGROkDTUawlOEJeCB3S5dhJ8dHor3J64dbYMBrg1MGFfG6f82qZx/B2BtAxD89vlzqp5OLOtqreaCQf3JRmf33Unj7BNNzxUM3qKbNArQUCA3h/2ST6s66dLfAR6pzKoCKsg4pfLHiO5DWT4nLhJTsjcpkm8FYgOZdRZdIE31D0Yx2uj81ygJMJoE1eSVk1eQdmkttOI16s5SnHQuyGgtji1qehlNwVKa01nWNmJ+Gkts6qlIrc4A5ZcJgkb03hKePzYD11Z1MvZkHMNOGuN5PfeJJ/xxA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=solid-run.com; dmarc=pass action=none
- header.from=solid-run.com; dkim=pass header.d=solid-run.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49B0169D35
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 16:46:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.181
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710953204; cv=none; b=o4HoxhcOn6hUfn9qei463LwBba8YHOsKpUhW5AdY7PT2YISHEqdo8ExJ9O6NBu+ivqxPgjWZwmJt/d+Q/fe/ibXEdC6n6Vpeksne4Y/AQHKCScOU3wUOSQ3UdGM/hIKY8hxfCbghYGBlumq4RI5qfxBOjX5iEmLW4G7f5CQ0I7Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710953204; c=relaxed/simple;
+	bh=Bk2/yrj8Abux20fTqgMeEq0o3C4MoDRLdMIVJ3nN2Qw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=TNhScg6B5GEf81DORsO3SLdjxEl68Y2zTD61Vihsm9KsbAKwjA0kkfIYl43zxMIjmGVoa0ZbPy1+yaLFXYSzblqiJ2gzyOvwPPbFLpwJ9GHNT6BpbbLYpCoDQkXADaupSMI6QolycG1F6LxGmpgx6k0CDl57t4XtBjZUK7bzmA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=Krdwp1bF; arc=none smtp.client-ip=209.85.219.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-yb1-f181.google.com with SMTP id 3f1490d57ef6-db4364ecd6aso5912165276.2
+        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 09:46:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=solidrn.onmicrosoft.com; s=selector1-solidrn-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1SOS47T04+i/yzVdiE04RjEk5FxpSnn4RmdA7Aw1+7w=;
- b=Du/UBjhx+moAGJt8DH9MRZXqc2bX/TQ3QtWv/m2QZTvDcyiuL1JB/TZgr8RiudOOl2+wTKP9sdt6YwtZrFs4J+Mvp5gcOpvopDAih0CjHi+3kxQAsHdCLcdKsP4XFLr108AjF9UaJ36G1iAZiwtuR9tEowzQjvgsw5ZgixsnDiI=
-Received: from AM9PR04MB7586.eurprd04.prod.outlook.com (2603:10a6:20b:2d5::17)
- by DBBPR04MB7788.eurprd04.prod.outlook.com (2603:10a6:10:1e4::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.31; Wed, 20 Mar
- 2024 16:41:09 +0000
-Received: from AM9PR04MB7586.eurprd04.prod.outlook.com
- ([fe80::57e1:e1cb:74e2:2e9d]) by AM9PR04MB7586.eurprd04.prod.outlook.com
- ([fe80::57e1:e1cb:74e2:2e9d%5]) with mapi id 15.20.7386.031; Wed, 20 Mar 2024
- 16:41:09 +0000
-From: Josua Mayer <josua@solid-run.com>
-To: Jiri Pirko <jiri@resnulli.us>
-CC: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] net: dsa: mv88e6xxx: add warning for truncated mdio bus
- id
-Thread-Topic: [PATCH] net: dsa: mv88e6xxx: add warning for truncated mdio bus
- id
-Thread-Index: AQHaes1eqLrk3YtcdE6GnHKqfgAD+rFAqraAgAAHmgCAABh7gIAACmyA
-Date: Wed, 20 Mar 2024 16:41:09 +0000
-Message-ID: <fe937905-9641-4c21-8160-4c8943f97c9e@solid-run.com>
-References:
- <20240320-mv88e6xxx-truncate-busid-v1-1-cface50b2efb@solid-run.com>
- <Zfrt_dlYvBzlxull@nanopsycho>
- <c76c95af-71cb-4eb6-b3af-846ae318d18d@solid-run.com>
- <ZfsI57371KtaRV4a@nanopsycho>
-In-Reply-To: <ZfsI57371KtaRV4a@nanopsycho>
-Accept-Language: de-DE, en-US
-Content-Language: de-DE
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=solid-run.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM9PR04MB7586:EE_|DBBPR04MB7788:EE_
-x-ms-office365-filtering-correlation-id: 092ebc19-e1d1-4b3a-5fcd-08dc48fc8bb3
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- ssMNa9bvcIe/nKfZG3eFbc+o+L+EdLPxtgZJbOan+QFjrT0xSDa+Nn1k7w6AAbpgFbLTRXHsjqGMLMiC+Joc/d29p4rSDM+sgJd5wnQwDzrvw9X5bhnRrVd0ItatuvGrZVxavwwU6k7wwOZrFSYp8lM8FyNUbj5hzq++Cnzz0xYNMMRDmtpN91ofbOqR4skGS6DbRt1XZ+3+aIe2nX1ZTJuzqXPdbEDcBFNMJ1KezqZqpt2VlsUAmgt1wmuKzdjTIriVprpfSW5tHy7OlExxx4avXAyoQjcsNBPXqTtRyAP+pagYAiwpKfdOdF9I2IsIyZLZyJaMEX5UxphOpItJ6bwMBnfziZymzWROVtmrygYTjoRgzhCfHtt8Igz0OPcvsXsu7YgPZlDhxMmzaN5z6UBaDJYIcZmUuMzD7Cc2EePZgJsS6YmX/SA1v4SHUM3iiIbicKQDH0YEbWpdt6U5qqdC0LQkCwyXqHry34qSeId1ZAVVfR/h0sPXJATF6OjrgGv+8pmHOqXs5gBU00UI88eWSq4Xy4On7U2OdA4yw1BTVe5IxRP2NnYOCP2ETeTgCgXyyC71Zx9O6wsPRmYFxbxC3Bz6tHIBWHrOdO/+9V0hZiYidr+NWwczwCF7/rgaoYrlmNvAy7C0ubigcYataODPgQQVjov92sgtMSxfP/kR6MMlbw7b1CRTMHhkGrup9abFvlNcQVpmg2d4YFBn9g==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB7586.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(1800799015)(7416005)(38070700009);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?akg2K0ZYR1lQQ3lIV1JQVmxUVjVsaVdkdU5TN3dBaFpLNXVkZGNZOXF3RUR1?=
- =?utf-8?B?UFYwK2xhMnBSYU1xZDllaUxPQkhUOW8ybnhmRVRQb1JpbHNXekw4SS9RU1p5?=
- =?utf-8?B?TkY0bkp1WGk4NVgrYUZXcVpEMkhGTHpuYm1MTldkdjB0WDJnUFN4c1hHdGZD?=
- =?utf-8?B?RTFjR2xVYUgzY2FuYnE0QXFNeWZWU21JZzlqdzk4eitMcUJPV05Dcmp2RUlT?=
- =?utf-8?B?STdhZHRKVzFjNFpNeHFEbmRvenJGUlRpSWhRV2p0NmR5bEZOZm54UWNsNnVS?=
- =?utf-8?B?RHBseG1HTnpKU2IzSWFzdGo5M3JFV0R5QnJkV2VMZk9tZ3dWTnZHQ3A2cmNy?=
- =?utf-8?B?RjZIWXNCRkRqS2g3aWx0UGNGY3lMOFhucXl4WS9PamJWd3Flb2lJZHkzTjJ3?=
- =?utf-8?B?dmdQVUNTZmFZM3o4eEJDRkhJQVAyc2hyejdHL2ZvNzEvT0RuOGtabzlncjA2?=
- =?utf-8?B?VDJNdjdBL1dLRytyZlZDSnJpYll6dFJrcGxFa3puMGRKRlFZeTloRG1iNm15?=
- =?utf-8?B?akZ1NWpJN0hvSC9EN1ZWUlVLUFJxVENHYnVONlNmMkp6TjdHb0l5OGRmeU03?=
- =?utf-8?B?eUNvQ3laQzJxY09sUVZLUTF6TW9oNG1uVEtobVRXdjA4UVRUUDZyeE1pRm53?=
- =?utf-8?B?Tm9WWDVaQ0NhdEhJNFJQei9aY1NiTGJpZ0Z6RHNXd0MwQnpvaklyMmhINFYr?=
- =?utf-8?B?dnJpVGtxTGcxWFYydjYyc0Nsa2kveUt3b21reSt4K2srMlZiTzZqRjhacEU0?=
- =?utf-8?B?SmM4bWMzd1FQMFRPZEdLUTBCeFg3TS81WERlYlpXemhpdHpmNTZPaEh0T2Fu?=
- =?utf-8?B?eENCSno1S0laUjdiSVIzUzVTTlpRRGpoRnFheHI1U2gxcUpkWk9LRU5YemF4?=
- =?utf-8?B?Z3FBY1EyOUQ2OXhQQW9obnJaQ1FyK1VORDIydXhPcUwyWUcwT2EyT0R4VHd3?=
- =?utf-8?B?eTZPcnpQc3FoMzl6amRyUmkybkVXM2t1Uy9pZlpvcGxndnAyYy9pTjFCVTRI?=
- =?utf-8?B?MXVCZDFjeU44UGF5Rjh2L0ZlU3VVcFlwZmxDenFPMVFDQ1hFcHNBM3g3T0dP?=
- =?utf-8?B?ZGFlWkZuRnNOVkcxZlVJcnc1QWJja2NOZU81Z25lVUxDMFVtd1M0cVJRTTBk?=
- =?utf-8?B?Wk02K0dONmc3UWZSR1dMVE50R1NGTmp3cnM2dVpoNXgxSHF5SDNiTW5JL3JS?=
- =?utf-8?B?eTBOcUhyNmxlak56UmxWdWNRcS83YjBhUC9RczZzTnJsYjFtM3YvdGo2Uk9h?=
- =?utf-8?B?Y3FmMjJGSmNhR3JLTDAyQVRYNnovU05QdjdGQ3oyUXl3L2NPOUJsOWFKOGpQ?=
- =?utf-8?B?YUh1NXVGOFRjNzBQdmFUaVNWTE9ibHpsMGVsbGJKNkJIVjN4NUJyTTk2OExs?=
- =?utf-8?B?MFdCN0ZMMHo2dGFETVkzQVlXSmIvcjQ1aWgxR0ZYY1RPdWRsZzBzR3ZPbFRo?=
- =?utf-8?B?QmxVa0dlZDc1N0RybHNsQ25kUnpTTVo3enNtOXduMmFWSm0zREdUbHM3bnRk?=
- =?utf-8?B?RFAxaWlmbGNVWjNEZkowZmlrZ0c1akFQVC9VeXpQb25Gc1BVN3JLYitSUFRp?=
- =?utf-8?B?RFBLRkMxNlg3Y01MbDcyUTNlSnY2Y0ZFNzA1TnhZMitDQWRZQU16YlFlUkt4?=
- =?utf-8?B?ODgrRnpSMHJvNzdZUUJZWDlwUHh4UTVVS0hLWWRoSTQvWmppMlFCR2t5UlUv?=
- =?utf-8?B?NmxRUzhZOUlqZnczSE5BQjVxdXZEeUlZYlZKRlNNUzJPRVJWT1ZDZ2MwUENi?=
- =?utf-8?B?NC9SS0xoNENXUjc2SW91WDk3OE5uQlVoZ1pwQWhTSkkzUlNNbXNOdUlIaHJY?=
- =?utf-8?B?N2VFNCsyNHZTN3VSNVVGVDZBdkpOTmtvYndJVUJZNzdTNTNuc2dtTWZDa0pF?=
- =?utf-8?B?Vm5USHVMTmJtV3ErMUUrZy9wYVVONU5CVnJRbC9iSkg3cnlQMlNjVFQxQXFJ?=
- =?utf-8?B?dHNDazFoVXBBbWJ6RWY5cERPelBXNGNLRWRUSGZKdGkrdHcvNXBPdDJXMzV6?=
- =?utf-8?B?RFNHaTVzL3NyRUxQZzBzQ3BYU1l0SVo1bE9WSStHdVphcXI4c2xveFZTQzV2?=
- =?utf-8?B?anlGendEZWR3SU5BUlpPL1NsdTljWjBMb3JOVndEMktaeU91U0JIR3BvNm5Z?=
- =?utf-8?Q?BmBs=3D?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <8ED7838B02F5C246BD03FA0092F9AF0C@eurprd04.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1710953201; x=1711558001; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wkNGBWmag1XR3BsTrsrM+MZvjzUWvTMndIkqJRf/Ebs=;
+        b=Krdwp1bFpk3D4ySCi6o3vHBUCYLi67oyK+7MStbkE+rHowhKymGmYLlYDGMLhRxJMs
+         TmJQbNlHFfbLQFpPQxc089nS8/ssK3ks1hW5uclSk4xP+3yhY9iq3lITbpN0DLMAFUQK
+         g3s1ZqLpmUUi1o+kyAZD4rqM89J3PhuSFv3eSzAoopLXqH5xrzKju+ZmDgcuejP9EM9d
+         bT3olralMEixCinE6R3MjWXwWUu2gQTEILHehv2brBXk6eXHE2b91Q8O9VdfTZXjUQcn
+         QdSGRnDUsDDHJXJnoeRzzPletBXgiUPGDI5iuZvxjcsS2dIPFVE9YctzMwxhIELhjyHC
+         4ZHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710953201; x=1711558001;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=wkNGBWmag1XR3BsTrsrM+MZvjzUWvTMndIkqJRf/Ebs=;
+        b=PCIe4shhd6IN7pJ/b66ZuUhNFNSQVJPxqacV3m9+oxivKy52faEW0Fxu707/olMYms
+         +oXfCuZErVzqdueKA1uzVRS9u2x0199MjOn1nnG9YOeGaUmpoFCcOqDmR3NLbO+egCY7
+         nZg6vfExxs0WUza0HgcKO/wOUS920NrYcXI7nkYL5u3yTTaEV8LRp337N+g1LjzBYum/
+         GgP2M3rQUiK7vgIpAu8ZqaY5Vjyc75i/sPk1NPJV6e5Q2UDBPXn+A3MrCKmsIvDNuBM9
+         mjnOYKIrqR6CVu/ZmoHrh4lV4Nb5ocpR72TurydmHN3M7JmK+7Pjow3zQynsMPZ9wJ1Z
+         dpuw==
+X-Forwarded-Encrypted: i=1; AJvYcCUqXACjqr5sjUc62yoqHZdzes8ghoHFsZiyoVRwJWApYlgutJma7iKI4VDWVoxmaOID6IwOYG/TFdATftZy4OD5IhekHbPj
+X-Gm-Message-State: AOJu0YxFPJAyhlfYtZoy1NxuvV0rOYCSdif4eewrA/1zP7UaiRCZ10U+
+	AoQIREsbm6wvLCfFrhIVEDYbDi7vjfqrK1yo1ipI8AhvWYc2HSRxs7Pplfid1a4xm1IPzQ7ARlP
+	53uyhXpg/hiPNF+H09nwzmSuVVRZRLslm3Qdb
+X-Google-Smtp-Source: AGHT+IHgWW+jZGVbEhcv6unH1i0iR1Oj5ixGQeg7uAI+dCJGg4KTCVtY+0Nb+bIDV27l0kgMguYYGegD0oCIk4BX4ms=
+X-Received: by 2002:a25:107:0:b0:dcc:f8e5:c8d4 with SMTP id
+ 7-20020a250107000000b00dccf8e5c8d4mr14634945ybb.32.1710953201042; Wed, 20 Mar
+ 2024 09:46:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: solid-run.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB7586.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 092ebc19-e1d1-4b3a-5fcd-08dc48fc8bb3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Mar 2024 16:41:09.2321
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: a4a8aaf3-fd27-4e27-add2-604707ce5b82
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: hvgdGG02N3zrhU9KUGK3yFPlYZ0dIkF6h+lqaBa/Fkvtp82r10cc6EVRNwuD4k9FjOvwUwbnyn8FT9Lo1skDRg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7788
+References: <20240314111713.5979-1-renmingshuai@huawei.com>
+ <CAM0EoMmqVHGC4_YVHj=rUPj+XBS_N99rCKk1S7wCi1wJ8__Pyw@mail.gmail.com>
+ <CAM0EoMkZKvvPVaCGFVTE_P1YCyS-r2b3gq3QRhDuEF=Cm-sY4g@mail.gmail.com>
+ <CAM0EoMm+W3X7TG8qjb8LWsBbAQ8_rntr7kwhSTy7Sxk=Yj=R2g@mail.gmail.com>
+ <CANn89iL_hfoWTqr+KaKZoO8fKoZdd-xcY040NeSb-WL7pHMLGQ@mail.gmail.com>
+ <CAM0EoMkqhmDtpg09ktnkxjAtddvXzwQo4Qh2-LX2r8iqrECogw@mail.gmail.com>
+ <CANn89iK2e4csrApZjY+kpR9TwaFpN9rcbRSPtyQnw5P_qkyYfA@mail.gmail.com>
+ <CAM0EoMkDexWQ_Rj_=gKMhWzSgQqtbAdyDv8DXgY+nk_2Rp3drg@mail.gmail.com>
+ <CANn89iLuYjQGrutsN17t2QARGzn-PY7rscTeHSi0zsWcO-tbTA@mail.gmail.com> <CAM0EoM=WCLvjCxkDGSEP-+NqEd2HnieiW8emNoV1LeV6n6w9VQ@mail.gmail.com>
+In-Reply-To: <CAM0EoM=WCLvjCxkDGSEP-+NqEd2HnieiW8emNoV1LeV6n6w9VQ@mail.gmail.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Wed, 20 Mar 2024 12:46:29 -0400
+Message-ID: <CAM0EoM=ckuc3-YTi8guyzNeej8sLAk2OQR2=KcbzFW5w-WPRfA@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: Forbid assigning mirred action to a filter
+ attached to the egress
+To: Eric Dumazet <edumazet@google.com>
+Cc: renmingshuai <renmingshuai@huawei.com>, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	davem@davemloft.net, vladbu@nvidia.com, netdev@vger.kernel.org, 
+	yanan@huawei.com, liaichun@huawei.com, caowangbao@huawei.com, 
+	Eric Dumazet <eric.dumazet@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Davide Caratti <dcaratti@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-QW0gMjAuMDMuMjQgdW0gMTc6MDMgc2NocmllYiBKaXJpIFBpcmtvOg0KPiBXZWQsIE1hciAyMCwg
-MjAyNCBhdCAwMzozMzoyNFBNIENFVCwgam9zdWFAc29saWQtcnVuLmNvbSB3cm90ZToNCj4+IEFt
-IDIwLjAzLjI0IHVtIDE1OjA5IHNjaHJpZWIgSmlyaSBQaXJrbzoNCj4+PiBXZWQsIE1hciAyMCwg
-MjAyNCBhdCAwMjo0ODo1NVBNIENFVCwgam9zdWFAc29saWQtcnVuLmNvbSB3cm90ZToNCj4+Pj4g
-bXY4OGU2eHh4IHN1cHBvcnRzIG11bHRpcGxlIG1kaW8gYnVzZXMgYXMgY2hpbGRyZW4sIGUuZy4g
-dG8gbW9kZWwgYm90aA0KPj4+PiBpbnRlcm5hbCBhbmQgZXh0ZXJuYWwgcGh5cy4gSWYgdGhlIGNo
-aWxkIGJ1c2VzIG1kaW8gaWRzIGFyZSB0cnVuY2F0ZWQsDQo+Pj4+IHRoZXkgbWlnaHQgY29sbGlk
-ZSB3aGljaCBlYWNoIG90aGVyIGxlYWRpbmcgdG8gYW4gb2JzY3VyZSBlcnJvciBmcm9tDQo+Pj4+
-IGtvYmplY3RfYWRkLg0KPj4+Pg0KPj4+PiBUaGUgbWF4aW11bSBsZW5ndGggb2YgYnVzIGlkIGlz
-IGN1cnJlbnRseSBkZWZpbmVkIGFzIDYxDQo+Pj4+IChNSUlfQlVTX0lEX1NJWkUpLiBUcnVuY2F0
-aW9uIGNhbiBvY2N1ciBvbiBwbGF0Zm9ybXMgd2l0aCBsb25nIG5vZGUNCj4+Pj4gbmFtZXMgYW5k
-IG11bHRpcGxlIGxldmVscyBiZWZvcmUgdGhlIHBhcmVudCBidXMgb24gd2hpaWNoIHRoZSBkc2Eg
-c3dpdGNoDQo+Pj4gcy93aGlpY2gvd2hpY2gvDQo+Pj4NCj4+Pg0KPj4+PiBzaXRzIHN1Y2ggYXMg
-b24gQ045MTMwIFsxXS4NCj4+Pj4NCj4+Pj4gVGVzdCB3aGV0aGVyIHRoZSByZXR1cm4gdmFsdWUg
-b2Ygc25wcmludGYgZXhjZWVkcyB0aGUgbWF4aW11bSBidXMgaWQNCj4+Pj4gbGVuZ3RoIGFuZCBw
-cmludCBhIHdhcm5pbmcuDQo+Pj4+DQo+Pj4+IFsxXQ0KPj4+PiBbICAgIDguMzI0NjMxXSBtdjg4
-ZTYwODUgZjIxMmEyMDAubWRpby1taWk6MDQ6IHN3aXRjaCAweDE3NjAgZGV0ZWN0ZWQ6IE1hcnZl
-bGwgODhFNjE3NiwgcmV2aXNpb24gMQ0KPj4+PiBbICAgIDguMzg5NTE2XSBtdjg4ZTYwODUgZjIx
-MmEyMDAubWRpby1taWk6MDQ6IFRydW5jYXRlZCBidXMtaWQgbWF5IGNvbGxpZGUuDQo+Pj4+IFsg
-ICAgOC41OTIzNjddIG12ODhlNjA4NSBmMjEyYTIwMC5tZGlvLW1paTowNDogVHJ1bmNhdGVkIGJ1
-cy1pZCBtYXkgY29sbGlkZS4NCj4+Pj4gWyAgICA4LjYyMzU5M10gc3lzZnM6IGNhbm5vdCBjcmVh
-dGUgZHVwbGljYXRlIGZpbGVuYW1lICcvZGV2aWNlcy9wbGF0Zm9ybS9jcDAvY3AwOmNvbmZpZy1z
-cGFjZUBmMjAwMDAwMC9mMjEyYTIwMC5tZGlvL21kaW9fYnVzL2YyMTJhMjAwLm1kaW8tbWlpL2Yy
-MTJhMjAwLm1kaW8tbWlpOjA0L21kaW9fYnVzLyFjcDAhY29uZmlnLXNwYWNlQGYyMDAwMDAwIW1k
-aW9AMTJhMjAwIWV0aGVybmV0LXN3aXRjaEA0IW1kaScNCj4+Pj4gWyAgICA4Ljc4NTQ4MF0ga29i
-amVjdDoga29iamVjdF9hZGRfaW50ZXJuYWwgZmFpbGVkIGZvciAhY3AwIWNvbmZpZy1zcGFjZUBm
-MjAwMDAwMCFtZGlvQDEyYTIwMCFldGhlcm5ldC1zd2l0Y2hANCFtZGkgd2l0aCAtRUVYSVNULCBk
-b24ndCB0cnkgdG8gcmVnaXN0ZXIgdGhpbmdzIHdpdGggdGhlIHNhbWUgbmFtZSBpbiB0aGUgc2Ft
-ZSBkaXJlY3RvcnkuDQo+Pj4+IFsgICAgOC45MzY1MTRdIGxpYnBoeTogbWlpX2J1cyAvY3AwL2Nv
-bmZpZy1zcGFjZUBmMjAwMDAwMC9tZGlvQDEyYTIwMC9ldGhlcm5ldC1zd2l0Y2hANC9tZGkgZmFp
-bGVkIHRvIHJlZ2lzdGVyDQo+Pj4+IFsgICAgOC45NDYzMDBdIG1kaW9fYnVzICFjcDAhY29uZmln
-LXNwYWNlQGYyMDAwMDAwIW1kaW9AMTJhMjAwIWV0aGVybmV0LXN3aXRjaEA0IW1kaTogX19tZGlv
-YnVzX3JlZ2lzdGVyOiAtMjINCj4+Pj4gWyAgICA4Ljk1NjAwM10gbXY4OGU2MDg1IGYyMTJhMjAw
-Lm1kaW8tbWlpOjA0OiBDYW5ub3QgcmVnaXN0ZXIgTURJTyBidXMgKC0yMikNCj4+Pj4gWyAgICA4
-Ljk2NTMyOV0gbXY4OGU2MDg1OiBwcm9iZSBvZiBmMjEyYTIwMC5tZGlvLW1paTowNCBmYWlsZWQg
-d2l0aCBlcnJvciAtMjINCj4+Pj4NCj4+Pj4gU2lnbmVkLW9mZi1ieTogSm9zdWEgTWF5ZXIgPGpv
-c3VhQHNvbGlkLXJ1bi5jb20+DQo+Pj4gVGhpcyBpcyBub3QgYnVnIGZpeCwgYXNzdW1lIHlvdSB0
-YXJnZXQgbmV0LW5leHQuIFBsZWFzZToNCj4+PiAxKSBOZXh0IHRpbWUsIGluZGljYXRlIHRoYXQg
-aW4gdGhlIHBhdGNoIHN1YmplY3QgbGlrZSB0aGlzOg0KPj4+ICAgIFtwYXRjaCBuZXQtbmV4dF0g
-eHh4DQo+Pj4gMikgbmV0LW5leHQgaXMgY3VycmVudGx5IGNsb3NlZCwgcmVwb3N0IG5leHQgd2Vl
-ay4NCj4+IENvcnJlY3QsIHRoYW5rcyAtIHdpbGwgZG8uDQo+PiBKdXN0IGZvciBmdXR1cmUgcmVm
-ZXJlbmNlIGZvciB0aG9zZSBvY2Nhc2lvbmFsIGNvbnRyaWJ1dG9ycyAtDQo+PiBpcyB0aGVyZSBz
-dWNoIGEgdGhpbmcgYXMgYW4gbGttbCBjYWxlbmRhcj8NCj4+Pj4gLS0tDQo+Pj4+IGRyaXZlcnMv
-bmV0L2RzYS9tdjg4ZTZ4eHgvY2hpcC5jIHwgNiArKysrLS0NCj4+Pj4gMSBmaWxlIGNoYW5nZWQs
-IDQgaW5zZXJ0aW9ucygrKSwgMiBkZWxldGlvbnMoLSkNCj4+Pj4NCj4+Pj4gZGlmZiAtLWdpdCBh
-L2RyaXZlcnMvbmV0L2RzYS9tdjg4ZTZ4eHgvY2hpcC5jIGIvZHJpdmVycy9uZXQvZHNhL212ODhl
-Nnh4eC9jaGlwLmMNCj4+Pj4gaW5kZXggNjE0Y2FiYjVjMWIwLi4xYzQwZjc2MzFhYjEgMTAwNjQ0
-DQo+Pj4+IC0tLSBhL2RyaXZlcnMvbmV0L2RzYS9tdjg4ZTZ4eHgvY2hpcC5jDQo+Pj4+ICsrKyBi
-L2RyaXZlcnMvbmV0L2RzYS9tdjg4ZTZ4eHgvY2hpcC5jDQo+Pj4+IEBAIC0zNzMxLDEwICszNzMx
-LDEyIEBAIHN0YXRpYyBpbnQgbXY4OGU2eHh4X21kaW9fcmVnaXN0ZXIoc3RydWN0IG12ODhlNnh4
-eF9jaGlwICpjaGlwLA0KPj4+Pg0KPj4+PiAJaWYgKG5wKSB7DQo+Pj4+IAkJYnVzLT5uYW1lID0g
-bnAtPmZ1bGxfbmFtZTsNCj4+Pj4gLQkJc25wcmludGYoYnVzLT5pZCwgTUlJX0JVU19JRF9TSVpF
-LCAiJXBPRiIsIG5wKTsNCj4+Pj4gKwkJaWYgKHNucHJpbnRmKGJ1cy0+aWQsIE1JSV9CVVNfSURf
-U0laRSwgIiVwT0YiLCBucCkgPj0gTUlJX0JVU19JRF9TSVpFKQ0KPj4+PiArCQkJZGV2X3dhcm4o
-Y2hpcC0+ZGV2LCAiVHJ1bmNhdGVkIGJ1cy1pZCBtYXkgY29sbGlkZS5cbiIpOw0KPj4+IEhvdyBh
-Ym91dCBpbnN0ZWFkIG9mIHdhcm4mZmFpbCBmYWxsYmFjayB0byBzb21lIGRpZmZlcmVudCBuYW1l
-IGluIHRoaXMNCj4+PiBjYXNlPw0KPj4gRHVwbGljYXRlIGNvdWxkIGJlIGF2b2lkZWQgYnkgdHJ1
-bmNhdGluZyBmcm9tIHRoZSBzdGFydCwNCj4+IGhvd2V2ZXIgSSBkb24ndCBrbm93IGlmIHRoYXQg
-aXMgYSBnb29kIGlkZWEuDQo+PiBJdCBhZmZlY3RzIG5hbWluZyBvZiBwYXRocyBpbiBzeXNmcywg
-YW5kIHRoZSByb290IGNhdXNlIGlzDQo+PiBkaWZmaWN1bHQgdG8gc3BvdC4NCj4+Pj4gCX0gZWxz
-ZSB7DQo+Pj4+IAkJYnVzLT5uYW1lID0gIm12ODhlNnh4eCBTTUkiOw0KPj4+PiAtCQlzbnByaW50
-ZihidXMtPmlkLCBNSUlfQlVTX0lEX1NJWkUsICJtdjg4ZTZ4eHgtJWQiLCBpbmRleCsrKTsNCj4+
-Pj4gKwkJaWYgKHNucHJpbnRmKGJ1cy0+aWQsIE1JSV9CVVNfSURfU0laRSwgIm12ODhlNnh4eC0l
-ZCIsIGluZGV4KyspID49IE1JSV9CVVNfSURfU0laRSkNCj4+PiBIb3cgZXhhY3RseSB0aGlzIG1h
-eSBoYXBwZW4/DQo+PiBJdCBjYW4gaGFwcGVuIG9uIHN3aXRjaCBub2RlcyBhdCBkZWVwIGxldmVs
-cyBpbiB0aGUgZGV2aWNlLXRyZWUsDQo+IFJlYWQgYWdhaW4sIG15IHF1ZXN0aW9uIGlzIGFib3V0
-IHRoZSBlbHNlIGJyYW5jaC4NCk9oIQ0KVGhlIGVsc2UgY2FzZSBvY2N1cnMgd2hlbiB0aGUgc3dp
-dGNoIG5vZGUgZG9lcw0Kbm90IGhhdmUgYSBjaGlsZCBub2RlIG5hbWVkICJtZGlvIjoNCg0KwqDC
-oMKgIC8qIEFsd2F5cyByZWdpc3RlciBvbmUgbWRpbyBidXMgZm9yIHRoZSBpbnRlcm5hbC9kZWZh
-dWx0IG1kaW8NCg0KwqDCoCDCoCAqIGJ1cy4gVGhpcyBtYXliZSByZXByZXNlbnRlZCBpbiB0aGUg
-ZGV2aWNlIHRyZWUsIGJ1dCBpcw0KwqDCoCDCoCAqIG9wdGlvbmFsLg0KwqDCoCDCoCAqLw0KwqDC
-oCDCoGNoaWxkID0gb2ZfZ2V0X2NoaWxkX2J5X25hbWUobnAsICJtZGlvIik7DQrCoMKgIMKgZXJy
-ID0gbXY4OGU2eHh4X21kaW9fcmVnaXN0ZXIoY2hpcCwgY2hpbGQsIGZhbHNlKTsNCsKgwqAgwqBv
-Zl9ub2RlX3B1dChjaGlsZCk7DQoNCkluIHRoaXMgY2FzZSBjaGlsZCBpcyBwYXNzZWQgdG8gbnAg
-YXMgTlVMTC4NCg0KRm9yIGV4YW1wbGUgaWYgd2UgaGF2ZSBubyAibWRpbyIgY2hpbGQgbm9kZSwg
-YnV0IGRvIGhhdmUgIm1kaW8tZXh0ZXJuYWwiLA0KdGhlIGVsc2UgY2FzZSBjcmVhdGVzIGFuIG1k
-aW8gYnVzIG5hbWVkICJtdjg4ZTZ4eHgtJWQiLg0KDQpUaGVuIHdlIHdvdWxkIGVuZCB1cCAtIGlu
-IG15IGV4YW1wbGUgLSB3aXRoIHRoZXNlIHR3bzoNCmNwMCFjb25maWctc3BhY2VAZjIwMDAwMDAh
-bWRpb0AxMmEyMDAhZXRoZXJuZXQtc3dpdGNoQDQhbXY4OGU2eHh4LTANCmNwMCFjb25maWctc3Bh
-Y2VAZjIwMDAwMDAhbWRpb0AxMmEyMDAhZXRoZXJuZXQtc3dpdGNoQDQhbWRpby1leHRlcm5hbA0K
-VHJ1bmNhdGVkIHRvIE1JSV9CVVNfSURfU0laRToNCmNwMCFjb25maWctc3BhY2VAZjIwMDAwMDAh
-bWRpb0AxMmEyMDAhZXRoZXJuZXQtc3dpdGNoQDQhbXY4DQpjcDAhY29uZmlnLXNwYWNlQGYyMDAw
-MDAwIW1kaW9AMTJhMjAwIWV0aGVybmV0LXN3aXRjaEA0IW1kaQ0KDQpUaGV5IGFyZSBub3QgZHVw
-bGljYXRlcywgYnV0IHRvbyBjbG9zZSBmb3IgY29tZm9ydC4NCkRpZmZlcmVudCBkZXZpY2UgbWF5
-IGV4Y2VlZCBtYXhpbXVtIHNpemUgYWdhaW4uDQoNCj4+IHdoaWxlIGRlc2NyaWJpbmcgYm90aCBp
-bnRlcm5hbCBhbmQgZXh0ZXJuYWwgbWRpbyBidXNlcyBvZiBhIHN3aXRjaC4NCj4+IEUuZy4gRG9j
-dW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL25ldC9kc2EvbWFydmVsbCxtdjg4ZTZ4eHgu
-eWFtbA0KPj4NCj4+IE9uIENOOTEzMCBwbGF0Zm9ybSBkZXZpY2UtdHJlZSBsb29rcyBsaWtlIHRo
-aXM6DQo+Pg0KPj4gLyB7DQo+PiDCoMKgIMKgY3AwIHsNCj4+IMKgwqAgwqDCoMKgwqAgY29uZmln
-LXNwYWNlQGYyMDAwMDAwIHsNCj4+IMKgwqAgwqDCoMKgwqAgwqDCoMKgIG1kaW9AMTJhMjAwIHsN
-Cj4+IMKgwqAgwqDCoMKgwqAgwqDCoMKgIMKgwqDCoCBldGhlcm5ldC1zd2l0Y2hANCB7DQo+PiDC
-oMKgIMKgwqDCoMKgIMKgwqDCoCDCoMKgwqAgwqDCoMKgIG1kaW8geyAuLi4gfTsNCj4+IMKgwqAg
-wqDCoMKgwqAgwqDCoMKgIMKgwqDCoCDCoMKgwqAgbWRpby1leHRlcm5hbCB7IC4uLiB9Ow0KPj4g
-wqDCoCDCoMKgwqDCoCDCoMKgwqAgwqDCoMKgIH07DQo+PiDCoMKgIMKgwqDCoMKgIMKgwqDCoCB9
-Ow0KPj4gwqDCoCDCoMKgwqDCoCB9Ow0KPj4gwqDCoCDCoH07DQo+PiB9Ow0KPj4NCj4+IEZvciBt
-ZGlvLWV4dGVybmFsIGNoaWxkIGFsbCB0aGUgbmFtZXMgYWxvbmUsIHdpdGhvdXQgc2VwYXJhdG9y
-cywNCj4+IG1ha2UgdXAgNjYgY2hhcmFjdGVycywgZXhjZWVkaW5nOiBNSUlfQlVTX0lEX1NJWkU6
-DQo+PiBjcDBjb25maWctc3BhY2VAZjIwMDAwMDBtZGlvQDEyYTIwMGV0aGVybmV0LXN3aXRjaEA0
-bWRpby1leHRlcm5hbA0KPj4NCj4+IFdpdGggc2VwYXJhdG9ycyAoJyEnKSB3ZSBoYXZlOg0KPj4g
-Y3AwIWNvbmZpZy1zcGFjZUBmMjAwMDAwMCFtZGlvQDEyYTIwMCFldGhlcm5ldC1zd2l0Y2hANCFt
-ZGlvDQo+PiBjcDAhY29uZmlnLXNwYWNlQGYyMDAwMDAwIW1kaW9AMTJhMjAwIWV0aGVybmV0LXN3
-aXRjaEA0IW1kaW8tZXh0ZXJuYWwNCj4+IFRydW5jYXRlZCB0byBNSUlfQlVTX0lEX1NJWkU6DQo+
-PiBjcDAhY29uZmlnLXNwYWNlQGYyMDAwMDAwIW1kaW9AMTJhMjAwIWV0aGVybmV0LXN3aXRjaEA0
-IW1kaQ0KPj4gY3AwIWNvbmZpZy1zcGFjZUBmMjAwMDAwMCFtZGlvQDEyYTIwMCFldGhlcm5ldC1z
-d2l0Y2hANCFtZGkNCj4+IFRoZXkgYmVjb21lIGR1cGxpY2F0ZXMuDQo+Pg0KPj4+PiArCQkJZGV2
-X3dhcm4oY2hpcC0+ZGV2LCAiVHJ1bmNhdGVkIGJ1cy1pZCBtYXkgY29sbGlkZS5cbiIpOw0KPj4g
-QW5vdGhlciBvcHRpb24gKGltbykgaXMgdG8gZm9yY2UgdGhlIGlzc3VlIGFuZCByZXR1cm4gZXJy
-b3IgY29kZS4NCj4+IFRoZW4gdGhlIG9ubHkgd2F5IG91dCB3b3VsZCBiZSBpbmNyZWFzZSBvZiBN
-SUlfQlVTX0lEX1NJWkUuDQo+Pj4+IAl9DQo+Pj4+DQo+Pj4+IAlidXMtPnJlYWQgPSBtdjg4ZTZ4
-eHhfbWRpb19yZWFkOw0KPj4+Pg0KPj4+PiAtLS0NCj4+Pj4gYmFzZS1jb21taXQ6IGU4Zjg5N2Y0
-YWZlZjAwMzFmZTYxOGE4ZTk0MTI3YTA5MzQ4OTZhYmENCj4+Pj4gY2hhbmdlLWlkOiAyMDI0MDMy
-MC1tdjg4ZTZ4eHgtdHJ1bmNhdGUtYnVzaWQtMzRhMWQyNzY5YmJmDQo+Pj4+DQo+Pj4+IFNpbmNl
-cmVseSwNCj4+Pj4gLS0gDQo+Pj4+IEpvc3VhIE1heWVyIDxqb3N1YUBzb2xpZC1ydW4uY29tPg0K
-Pj4+Pg0KPj4+Pg0K
+On Tue, Mar 19, 2024 at 4:54=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> On Tue, Mar 19, 2024 at 5:38=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Mon, Mar 18, 2024 at 11:05=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu=
+.com> wrote:
+> > >
+> > > On Mon, Mar 18, 2024 at 3:11=E2=80=AFPM Eric Dumazet <edumazet@google=
+.com> wrote:
+> > > >
+> > > > On Mon, Mar 18, 2024 at 6:36=E2=80=AFPM Jamal Hadi Salim <jhs@mojat=
+atu.com> wrote:
+> > > > >
+> > > > > On Mon, Mar 18, 2024 at 11:46=E2=80=AFAM Eric Dumazet <edumazet@g=
+oogle.com> wrote:
+> > > > > >
+> > > > > > On Mon, Mar 18, 2024 at 3:27=E2=80=AFPM Jamal Hadi Salim <jhs@m=
+ojatatu.com> wrote:
+> > > > > > >
+> > > > > > > On Sun, Mar 17, 2024 at 12:10=E2=80=AFPM Jamal Hadi Salim <jh=
+s@mojatatu.com> wrote:
+> > > > > > > >
+> > > > > > > > On Thu, Mar 14, 2024 at 1:14=E2=80=AFPM Jamal Hadi Salim <j=
+hs@mojatatu.com> wrote:
+> > > > > > > > >
+> > > > > > > > > On Thu, Mar 14, 2024 at 7:18=E2=80=AFAM renmingshuai <ren=
+mingshuai@huawei.com> wrote:
+> > > > > > > > > >
+> > > > > > > > > > As we all know the mirred action is used to mirroring o=
+r redirecting the
+> > > > > > > > > > packet it receives. Howerver, add mirred action to a fi=
+lter attached to
+> > > > > > > > > > a egress qdisc might cause a deadlock. To reproduce the=
+ problem, perform
+> > > > > > > > > > the following steps:
+> > > > > > > > > > (1)tc qdisc add dev eth0 root handle 1: htb default 30 =
+\n
+> > > > > > > > > > (2)tc filter add dev eth2 protocol ip prio 2 flower ver=
+bose \
+> > > > > > > > > >      action police rate 100mbit burst 12m conform-excee=
+d jump 1 \
+> > > > > > > > > >      / pipe mirred egress redirect dev eth2 action drop
+> > > > > > > > > >
+> > > > > > > > >
+> > > > > > > > > I think you meant both to be the same device eth0 or eth2=
+?
+> > > > > > > > >
+> > > > > > > > > > The stack is show as below:
+> > > > > > > > > > [28848.883915]  _raw_spin_lock+0x1e/0x30
+> > > > > > > > > > [28848.884367]  __dev_queue_xmit+0x160/0x850
+> > > > > > > > > > [28848.884851]  ? 0xffffffffc031906a
+> > > > > > > > > > [28848.885279]  tcf_mirred_act+0x3ab/0x596 [act_mirred]
+> > > > > > > > > > [28848.885863]  tcf_action_exec.part.0+0x88/0x130
+> > > > > > > > > > [28848.886401]  fl_classify+0x1ca/0x1e0 [cls_flower]
+> > > > > > > > > > [28848.886970]  ? dequeue_entity+0x145/0x9e0
+> > > > > > > > > > [28848.887464]  ? newidle_balance+0x23f/0x2f0
+> > > > > > > > > > [28848.887973]  ? nft_lookup_eval+0x57/0x170 [nf_tables=
+]
+> > > > > > > > > > [28848.888566]  ? nft_do_chain+0xef/0x430 [nf_tables]
+> > > > > > > > > > [28848.889137]  ? __flush_work.isra.0+0x35/0x80
+> > > > > > > > > > [28848.889657]  ? nf_ct_get_tuple+0x1cf/0x210 [nf_connt=
+rack]
+> > > > > > > > > > [28848.890293]  ? do_select+0x637/0x870
+> > > > > > > > > > [28848.890735]  tcf_classify+0x52/0xf0
+> > > > > > > > > > [28848.891177]  htb_classify+0x9d/0x1c0 [sch_htb]
+> > > > > > > > > > [28848.891722]  htb_enqueue+0x3a/0x1c0 [sch_htb]
+> > > > > > > > > > [28848.892251]  __dev_queue_xmit+0x2d8/0x850
+> > > > > > > > > > [28848.892738]  ? nf_hook_slow+0x3c/0xb0
+> > > > > > > > > > [28848.893198]  ip_finish_output2+0x272/0x580
+> > > > > > > > > > [28848.893692]  __ip_queue_xmit+0x193/0x420
+> > > > > > > > > > [28848.894179]  __tcp_transmit_skb+0x8cc/0x970
+> > > > > > > > > >
+> > > > > > > > > > In this case, the process has hold the qdisc spin lock =
+in __dev_queue_xmit
+> > > > > > > > > > before the egress packets are mirred, and it will attem=
+pt to obtain the
+> > > > > > > > > > spin lock again after packets are mirred, which cause a=
+ deadlock.
+> > > > > > > > > >
+> > > > > > > > > > Fix the issue by forbidding assigning mirred action to =
+a filter attached
+> > > > > > > > > > to the egress.
+> > > > > > > > > >
+> > > > > > > > > > Signed-off-by: Mingshuai Ren <renmingshuai@huawei.com>
+> > > > > > > > > > ---
+> > > > > > > > > >  net/sched/act_mirred.c                        |  4 +++
+> > > > > > > > > >  .../tc-testing/tc-tests/actions/mirred.json   | 32 +++=
+++++++++++++++++
+> > > > > > > > > >  2 files changed, 36 insertions(+)
+> > > > > > > > > >
+> > > > > > > > > > diff --git a/net/sched/act_mirred.c b/net/sched/act_mir=
+red.c
+> > > > > > > > > > index 5b3814365924..fc96705285fb 100644
+> > > > > > > > > > --- a/net/sched/act_mirred.c
+> > > > > > > > > > +++ b/net/sched/act_mirred.c
+> > > > > > > > > > @@ -120,6 +120,10 @@ static int tcf_mirred_init(struct =
+net *net, struct nlattr *nla,
+> > > > > > > > > >                 NL_SET_ERR_MSG_MOD(extack, "Mirred requ=
+ires attributes to be passed");
+> > > > > > > > > >                 return -EINVAL;
+> > > > > > > > > >         }
+> > > > > > > > > > +       if (tp->chain->block->q->parent !=3D TC_H_INGRE=
+SS) {
+> > > > > > > > > > +               NL_SET_ERR_MSG_MOD(extack, "Mirred can =
+only be assigned to the filter attached to ingress");
+> > > > > > > > > > +               return -EINVAL;
+> > > > > > > > > > +       }
+> > > > > > > > >
+> > > > > > > > > Sorry, this is too restrictive as Jiri said. We'll try to=
+ reproduce. I
+> > > > > > > > > am almost certain this used to work in the old days.
+> > > > > > > >
+> > > > > > > > Ok, i looked at old notes - it did work at "some point" pre=
+-tdc.
+> > > > > > > > Conclusion is things broke around this time frame:
+> > > > > > > > https://lore.kernel.org/netdev/1431679850-31896-1-git-send-=
+email-fw@strlen.de/
+> > > > > > > > https://lore.kernel.org/netdev/1465095748.2968.45.camel@edu=
+mazet-glaptop3.roam.corp.google.com/
+> > > > > > > >
+> > > > > > > > Looking further into it.
+> > > > > > >
+> > > > > > > This is what we came up with. Eric, please take a look...
+> > > > > > >
+> > > > > > > cheers,
+> > > > > > > jamal
+> > > > > > >
+> > > > > > >
+> > > > > > > --- a/net/core/dev.c
+> > > > > > > +++ b/net/core/dev.c
+> > > > > > > @@ -3789,7 +3789,14 @@ static inline int __dev_xmit_skb(struc=
+t sk_buff
+> > > > > > > *skb, struct Qdisc *q,
+> > > > > > >         if (unlikely(contended))
+> > > > > > >                 spin_lock(&q->busylock);
+> > > > > > >
+> > > > > > > +       if (dev_recursion_level()) {
+> > > > > >
+> > > > > > I am not sure what your intent is, but this seems wrong to me.
+> > > > > >
+> > > > >
+> > > > > There is a deadlock if you reenter the same device which has a qd=
+isc
+> > > > > attached to it more than once.
+> > > > > Essentially entering __dev_xmit_skb() we grab the root qdisc lock=
+ then
+> > > > > run some action which requires it to grab the root qdisc lock (ag=
+ain).
+> > > > > This is easy to show with mirred (although i am wondering if syzk=
+aller
+> > > > > may have produced this at some point)..
+> > > > > $TC qdisc add dev $DEV root handle 1: htb default 1
+> > > > > $TC filter add dev $DEV protocol ip u32 match ip protocol 1 0xff
+> > > > > action mirred egress mirror dev $DEV
+> > > > >
+> > > > > Above example is essentially egress $DEV-> egress $DEV in both ca=
+ses
+> > > > > "egress $DEV" grabs the root qdisc lock. You could also create an=
+other
+> > > > > example with egress($DEV1->$DEV2->back to $DEV1).
+> > > > >
+> > > > > > Some valid setup use :
+> > > > > >
+> > > > > > A bonding device, with HTB qdisc (or other qdisc)
+> > > > > >   (This also could be a tunnel device with a qdisc)
+> > > > > >
+> > > > > > -> one or multiple physical NIC, wth FQ or other qdisc.
+> > > > > >
+> > > > > > Packets would be dropped here when we try to reach the physical=
+ device.
+> > > > > >
+> > > > >
+> > > > > If you have an example handy please send it. I am trying to imagi=
+ne
+> > > > > how those would have worked if they have to reenter the root qdis=
+c of
+> > > > > the same dev multiple times..
+> > > >
+> > > > Any virtual device like a GRE/SIT/IPIP/... tunnel, add a qdisc on i=
+t ?
+> > > >
+> > > > dev_xmit_recursion_inc() is global (per-cpu), it is not per-device.
+> > > >
+> > > > A stack of devices A -> B -> C  would elevate the recursion level t=
+o
+> > > > three just fine.
+> > > >
+> > > > After your patch, a stack of devices would no longer work.
+> > > >
+> > > > It seems mirred correctly injects packets to the top of the stack f=
+or
+> > > > ingress (via netif_rx() / netif_receive_skb()),
+> > > > but thinks it is okay to call dev_queue_xmit(), regardless of the c=
+ontext ?
+> > > >
+> > > > Perhaps safe-guard mirred, instead of adding more code to fast path=
+.
+> > >
+> > > I agree not to penalize everybody for a "bad config" like this
+> > > (surprising syzkaller hasnt caught this). But i dont see how doing th=
+e
+> > > checking within mirred will catch this (we cant detect the A->B->A
+> > > case).
+> > > I think you are suggesting a backlog-like queue for mirred? Not far
+> > > off from that is how it used to work before
+> > > (https://lore.kernel.org/netdev/1465095748.2968.45.camel@edumazet-gla=
+ptop3.roam.corp.google.com/)
+> >
+> >
+> > spin_trylock() had to go. There is no way we could keep this.
+> >
+>
+> Not asking for it to come back... just pointing out why it worked before.
+>
+> > > - i.e we had a trylock for the qdisc lock and if it failed we tagged
+> > > the rx softirq for a reschedule. That in itself is insufficient, we
+> > > would need a loop check which is per-skb (which we had before
+> > > https://lore.kernel.org/netdev/1431679850-31896-1-git-send-email-fw@s=
+trlen.de/).
+> > > There are other gotchas there, potentially packet reordering.
+> >
+> > If we want to make sure dev_queue_xmit() is called from the top (no
+> > spinlock held),
+> > then we need a queue, serviced from another context.
+> >
+> > This extra queueing could happen if
+> > __this_cpu_read(softnet_data.xmit.recursion) > 0
+> >
+>
+> I dont see a way to detect softnet_data.xmit.recursion > 0 at mirred
+> level. The first time we enter it will be 0. The second time we would
+> deadlock before we hit mirred. I am also worried about packet
+> reordering avoidance logic code amount needed just to deal with a
+> buggy configuration. Dropping the packet for this exact config should
+> be ok.
+> How about adding a per-qdisc per-cpu recursion counter? Incremented
+> when we enter the cpu from the top, decremented when we leave. If we
+> detect __this_cpu_read(qdisc.xmit_recursion) > 0 we drop as per that
+> patch?
+>
+
+Actually scratch this idea. It wont work since we added tc block
+support in mirred which complicates things further.
+Need some more thinking...
+
+cheers,
+jamal
+
+
+> cheers,
+> jamal
+> > This can be done from net/sched/act_mirred.c with no additional change
+> > in net/core/dev.c,
+> > and no new skb field.
 
