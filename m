@@ -1,90 +1,142 @@
-Return-Path: <netdev+bounces-80724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABFB0880A5C
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 05:30:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CD86880A5E
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 05:33:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31306B21A19
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 04:30:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E89CB1C2103A
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 04:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B458460;
-	Wed, 20 Mar 2024 04:30:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BCE8846D;
+	Wed, 20 Mar 2024 04:33:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DmbszD0x"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="okk1hCbs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3026184F
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 04:30:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C2879C2
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 04:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710909029; cv=none; b=TuxvXTJchmAVyuTs4NJFYel23b3IsqSqWVqjAlaip+pPTUOB+Y6GFvUheWd9siWApegUrjFREHcsK0FOwuvHwPViWDEyYGmIsGIiV0lQA7G4Br2aUJwkl3Q1dypQTLWkCmRWzzV81Cg9ZfDFWb8IW8ZtNvFJJ196J449h/o1j2Y=
+	t=1710909204; cv=none; b=DFbojoMCxjFHnRMS/+mRps1xKReNkvD8CmPkXULuir0ADOodMnm5xdgpWgkGaN76VnWscERAhww9w6DeEodNHLu+s47Vvu4lYnXvLCWqYmnfaQQnq1vVpFhsZznDO8uQofEEyh8N5pTlItYrUK/ijO4qlrdPaBiRvkvO2SVn9JY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710909029; c=relaxed/simple;
-	bh=GK9YWsI/z7UyRmkmrsNlL42xv15+lOlYUbqbXTyWVxY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uIh6FSZ2BMO6UaUsyiPRH6KspzPV+87HfQ60+aJJ8zirJE2g4XE6F5Ie8rukTsvzN1+4SRX3OCF3JkACcrzFOtBXo3cdXNl0ARkjy1x9/GJdz0AiAhrtL0EqPjKIFCk2f1y4K5kDjKvitzGZPJuR14xy88pIyFecOEy1zHrqmWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DmbszD0x; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 56B06C43390;
-	Wed, 20 Mar 2024 04:30:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710909029;
-	bh=GK9YWsI/z7UyRmkmrsNlL42xv15+lOlYUbqbXTyWVxY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DmbszD0xAR3NeC5fL3Ga1kVPSh+0B0K0LQWUvgagqGkR6LfLuW3oL6T7YbbYcqkV4
-	 wFfiixOUK7yJ3x04L1vBi2QOm9LFuQHkXrKEcmEq29dXzUCWE5skpjPzJ9fXW3Lgjf
-	 GgEkr/mSrWpzVR1FErALDaXt4ni57HmW//vON6RVb+wi3fpde/qABcokmxTbGgmOEF
-	 y1T9GDknvEDhkqNddEpI5CtvK+wsFp5yr8pzXzTUocdnx03GAKV50IlMc1A0wGRNIq
-	 W4mt3QEzFS4vcg2a37juha6z6R7HHuioF76FtLHNf1TGQCIzIiQf4WMjABrtIp+5aH
-	 Ok7SIqa0MG7zg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 438C4D982E4;
-	Wed, 20 Mar 2024 04:30:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1710909204; c=relaxed/simple;
+	bh=+R6gMPqirv2uzFN88bnlpZK2RK8kuDMgDFLXSBRKhiQ=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=M0MK93AWkyP73fcP55n9utxeAoQ445Yxd4GLHPLiDtmY4oGP+Cz4QmBJMAZ/oTSuF699q5ajY/2GX2HOFuyO6HhDPjDNXV8FpksD3WALWFy5xTcHc5vdPZT0wr7JQYqnEfbV6cG5EpMp2xC48kd8sPw05I2PkzmcVMzNc8PlB9c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=okk1hCbs; arc=none smtp.client-ip=62.96.220.36
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 81B17207D1;
+	Wed, 20 Mar 2024 05:33:18 +0100 (CET)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id lX9INqCMPbuW; Wed, 20 Mar 2024 05:33:13 +0100 (CET)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id AA064207C6;
+	Wed, 20 Mar 2024 05:33:13 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com AA064207C6
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
+	s=202301; t=1710909193;
+	bh=dJy0HDIkV0FP6kndGZRvV/BwhBdkBnztl/U9ROavgc0=;
+	h=Date:From:To:CC:Subject:References:In-Reply-To:From;
+	b=okk1hCbs88M9cNrHej+mLN0i8rzzlMJS0Ye31ftklPnXDLV3Rp/M6AAZR2fjAh+zT
+	 Riipoa1icCILxELLP2etN1qEyoC9wNLnTEqWqVYV3xdUCIJQDc0ao3FlpNwBVP2tN5
+	 0+E6ShngC4w3Wxg83BGKL5zSYnZXp0/Qmj9US4Z7jqRrqyQNTs1P+iHDc0vMWIHG9K
+	 OO6wctrH50hfHOIm1Q1IVtKYOFQNmpMazlnZAcnZXPW2qjGme1Z2tIwE1mWwDhgT9B
+	 y2K+e8kH1xcRWBkSKlzy+UJidqBb7dKvdQD6zlXZbhtPEsV1535jLbNytldusUwBBW
+	 T1Sr05VvFwi9w==
+Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
+	by mailout1.secunet.com (Postfix) with ESMTP id 8A64480004A;
+	Wed, 20 Mar 2024 05:33:13 +0100 (CET)
+Received: from mbx-essen-02.secunet.de (10.53.40.198) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Wed, 20 Mar 2024 05:33:13 +0100
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
+ (10.53.40.198) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Wed, 20 Mar
+ 2024 05:33:12 +0100
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id 6ED6131824F9; Wed, 20 Mar 2024 05:33:12 +0100 (CET)
+Date: Wed, 20 Mar 2024 05:33:12 +0100
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Feng Wang <wangfe@google.com>
+CC: Leon Romanovsky <leon@kernel.org>, <netdev@vger.kernel.org>,
+	<herbert@gondor.apana.org.au>, <davem@davemloft.net>
+Subject: Re: [PATCH] [PATCH ipsec] xfrm: Store ipsec interface index
+Message-ID: <ZfpnCIv+8eYd7CpO@gauss3.secunet.de>
+References: <20240318231328.2086239-1-wangfe@google.com>
+ <20240319084235.GA12080@unreal>
+ <CADsK2K_65Wytnr5y+5Biw=ebtb-+hO=K7hxhSNJd6X+q9nAieg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2] ifstat: don't set errno if strdup fails
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171090902927.27266.18265340517235211753.git-patchwork-notify@kernel.org>
-Date: Wed, 20 Mar 2024 04:30:29 +0000
-References: <20240318091640.2672-1-dkirjanov@suse.de>
-In-Reply-To: <20240318091640.2672-1-dkirjanov@suse.de>
-To: Denis Kirjanov <kirjanov@gmail.com>
-Cc: stephen@networkplumber.org, dsahern@kernel.org, netdev@vger.kernel.org,
- dkirjanov@suse.de
+In-Reply-To: <CADsK2K_65Wytnr5y+5Biw=ebtb-+hO=K7hxhSNJd6X+q9nAieg@mail.gmail.com>
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-02.secunet.de (10.53.40.198)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-Hello:
-
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
-
-On Mon, 18 Mar 2024 05:16:40 -0400 you wrote:
-> the strdup man page states that the errno value
-> set by the function so there is not need to set it.
+On Tue, Mar 19, 2024 at 10:15:13AM -0700, Feng Wang wrote:
+> Hi Leon,
 > 
-> Signed-off-by: Denis Kirjanov <dkirjanov@suse.de>
-> ---
->  misc/ifstat.c | 1 -
->  1 file changed, 1 deletion(-)
+> There is no "packet offload driver" in the current kernel tree.  The packet
+> offload driver mostly is vendor specific, it implements hardware packet
+> offload.
 
-Here is the summary with links:
-  - [iproute2] ifstat: don't set errno if strdup fails
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=4da7bfbf917b
+There are 'packet offload drivers' in the kernel, that's why we
+support this kind of offload. We don't add code for proprietary
+drivers.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> On Tue, Mar 19, 2024 at 1:42 AM Leon Romanovsky <leon@kernel.org> wrote:
+> 
+> > On Mon, Mar 18, 2024 at 04:13:28PM -0700, Feng Wang wrote:
+> > > From: wangfe <wangfe@google.com>
+> > >
+> > > When there are multiple ipsec sessions, packet offload driver
+> > > can use the index to distinguish the packets from the different
+> > > sessions even though xfrm_selector are same.
+> >
+> > Do we have such "packet offload driver" in the kernel tree?
+> >
+> > Thanks
+> >
+> > > Thus each packet is handled corresponding to its session parameter.
+> > >
+> > > Signed-off-by: wangfe <wangfe@google.com>
+> > > ---
+> > >  net/xfrm/xfrm_interface_core.c | 4 +++-
+> > >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > >
+> > > diff --git a/net/xfrm/xfrm_interface_core.c
+> > b/net/xfrm/xfrm_interface_core.c
+> > > index 21d50d75c260..996571af53e5 100644
+> > > --- a/net/xfrm/xfrm_interface_core.c
+> > > +++ b/net/xfrm/xfrm_interface_core.c
+> > > @@ -506,7 +506,9 @@ xfrmi_xmit2(struct sk_buff *skb, struct net_device
+> > *dev, struct flowi *fl)
+> > >       xfrmi_scrub_packet(skb, !net_eq(xi->net, dev_net(dev)));
+> > >       skb_dst_set(skb, dst);
+> > >       skb->dev = tdev;
+> > > -
+> > > +#ifdef CONFIG_XFRM_OFFLOAD
+> > > +     skb->skb_iif = if_id;
+> > > +#endif
 
-
+This looks wrong. The network interface ID is not the same as the xfrm
+interface ID.
 
