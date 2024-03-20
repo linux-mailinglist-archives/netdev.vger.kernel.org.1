@@ -1,107 +1,83 @@
-Return-Path: <netdev+bounces-80775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B76288108A
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 12:11:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C0F588108C
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 12:13:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D915B23A92
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:11:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78A691C21194
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FCBB3BB3D;
-	Wed, 20 Mar 2024 11:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC02D3B293;
+	Wed, 20 Mar 2024 11:13:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hd1hhKpi"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RTzS+vnB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3DD3B1B2
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 11:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C53DB79D1;
+	Wed, 20 Mar 2024 11:13:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710933079; cv=none; b=SsyEsp4/mQhwD0HZfcFt1CPpmZDPNNJMVo46qZKBYGzqfqR8JJl3xNoYy/seZzWn9hd+A+kU3ki/vxziuuMl2cALVtn0OYuKt+pe9aDAdXPti18ilLpiaKo6Jkm7OMm8TnARzTLbZJpjp+9IrdB9C0s+aiztUYJj8IXCy8Bx2vc=
+	t=1710933182; cv=none; b=YoveDZPFUrFA++U3wvR9/meS4lSV+a01eWerbqQlVgWrtcVpdAok6YHU13uCsDDu4X50jf09hrmkIkRGRbX+spN+pxh+gPm04Punp1wnPAlZvzY5Cky8R+gB+JE63mwYEcLLX7RClaIRk4b9Xs0ED0AB5KwSMDnlYnsDe4217P8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710933079; c=relaxed/simple;
-	bh=pdchhpQnt3CQHuZw8DTa8vf5YnjfPZ9D1i3TB34sEQA=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
-	 To:Date:Message-ID; b=CtWZpsV00XYGt/uU54xu35r9PnZDgWFQiNPhAPEe2mPZ2Fsw9PBe2B5Mz/O5gWixvXVIhg9ff7/aMCLxB9k9biPxVuVuHuWbP2be8W3I6jiwDUKF/Yv3kLzLH62SjWSIzIUA1TyHioWJGM6SOvjApyOrvucvCg3XDcXeiiqTq2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hd1hhKpi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD795C433C7;
-	Wed, 20 Mar 2024 11:11:18 +0000 (UTC)
+	s=arc-20240116; t=1710933182; c=relaxed/simple;
+	bh=phF0nuKu6gpYF1LZiFjmhaxtKVxdGfyoSjfL/Nmi9Ng=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kNcWP0VA+ip2rAY17SrC7hQvR1AzOmQLdQETnbh8oJ7fwGNcO8sGkM/H2lNwojuALFmZSApzckSv21FrQXaNdWEnpicmwOqKFS0TWdJEONGpC17LJer3f0qpB3QNau9aGE2HBxFelU05MYhCsSevtLQ6CPQ2VO8N5FsdB9kaZwk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RTzS+vnB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 34126C433F1;
+	Wed, 20 Mar 2024 11:13:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710933079;
-	bh=pdchhpQnt3CQHuZw8DTa8vf5YnjfPZ9D1i3TB34sEQA=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=Hd1hhKpiw/xhzQGYn4hJjf3rapHhglHSMRDNuyKeSovAYqHJDCtGP0taQM9GjhleQ
-	 e62wimEJTgU/ZUeH0IYb7BsQUiLF+5vC+qF4JD8Qjp9HzGYBjfSKkNn0mdBogQ8ewz
-	 IezPjittlAoh79R2T+tfYLcgyq2GWB0bsLqyAAnlLBUto4U7Lblz9GDjkTU060Vd4V
-	 qJEYbkKIJEtH4w8ikzctARvBphkyFbb5pPsdOgNJ1rNFUksGELHiP/WmJNFZzpL9YQ
-	 InLXGo8DbWPdVi4ucDsqrkfy+u/PSktV+h47H2IcVvT4+eTcaBXlrwG3xAAfsqCAHL
-	 b14Sad3riX9gw==
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1710933182;
+	bh=phF0nuKu6gpYF1LZiFjmhaxtKVxdGfyoSjfL/Nmi9Ng=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=RTzS+vnBTCDxuZ2CVpDo4BIj29TCRfezDGVOK87W/c4mb95mBkamdItnymmWArqiK
+	 aTsSfd9641G22q9bWcg0VwIG7PuhxWcyW3C/Pif5twG/b1W8vpYSE6xCvZ7oL84K17
+	 AQ54H7Z/4LjsqZPCK7K8ElUXYq8noWmPnmXyPn2uVCv5lYF4Qm+P1n9+GPhyoTMzeL
+	 ucud+6GP2eGdk0mC9ITnuldm15Cvxv9BFvwLJP4IViB3es+SUKmvQqSqEWni9zjxvA
+	 gzXcm2TY/nVWMe01FMUgCqSd9DrQwS3H7n/vYPCeR3/gq1CTyrvudeLMS+kmj4L2/O
+	 x33LkUPosAUJQ==
+Date: Wed, 20 Mar 2024 11:12:58 +0000
+From: Simon Horman <horms@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: Re: [PATCH net-next v1 1/1] nfc: st95hf: Switch to using gpiod API
+Message-ID: <20240320111258.GP185808@kernel.org>
+References: <20240318203923.183943-1-andriy.shevchenko@linux.intel.com>
+ <ZfloHvWaTOQErWfU@nanopsycho>
+ <Zfq6GYnPAn000my0@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240319194124.25097f5a@kernel.org>
-References: <20240319093140.499123-1-atenart@kernel.org> <20240319093140.499123-2-atenart@kernel.org> <20240319194124.25097f5a@kernel.org>
-Subject: Re: [PATCH net v2 1/4] udp: do not accept non-tunnel GSO skbs landing in a tunnel
-From: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, steffen.klassert@secunet.com, willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Date: Wed, 20 Mar 2024 12:11:16 +0100
-Message-ID: <171093307600.5492.12887061012668630550@kwain>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zfq6GYnPAn000my0@smile.fi.intel.com>
 
-Quoting Jakub Kicinski (2024-03-20 03:41:24)
-> On Tue, 19 Mar 2024 10:31:36 +0100 Antoine Tenart wrote:
-> > +DECLARE_STATIC_KEY_FALSE(udp_encap_needed_key);
->=20
-> nit: our build bot says you need to export this as well for v6=3Dm.
+On Wed, Mar 20, 2024 at 12:27:37PM +0200, Andy Shevchenko wrote:
+> On Tue, Mar 19, 2024 at 11:25:34AM +0100, Jiri Pirko wrote:
+> > Mon, Mar 18, 2024 at 09:39:23PM CET, andriy.shevchenko@linux.intel.com wrote:
+> > >This updates the driver to gpiod API, and removes yet another use of
+> > >of_get_named_gpio().
+> > >
+> > net-next is closed, send again next week.
+> 
+> Same Q: Why to resend? Can't you utilise lore.kernel.org?
 
-Thanks for the heads up, missed that. And udpv6_encap_needed_key needs
-to be defined outside ipv6.ko and exported as well. The following should
-fix the remaining build issues,
+Because that is how Netdev development currently operates.
+A system which I believe emerged as a way to handle the
+enormous volume of patches involved. Maybe it could change,
+but that is a different conversation.
 
-  diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-  index 661d0e0d273f..c02bf011d4a6 100644
-  --- a/net/ipv4/udp.c
-  +++ b/net/ipv4/udp.c
-  @@ -582,6 +582,13 @@ static inline bool __udp_is_mcast_sock(struct net *n=
-et, const struct sock *sk,
-   }
+Other subsystems work differently, and that is fine too.
 
-   DEFINE_STATIC_KEY_FALSE(udp_encap_needed_key);
-  +EXPORT_SYMBOL(udp_encap_needed_key);
-  +
-  +#if IS_ENABLED(CONFIG_IPV6)
-  +DEFINE_STATIC_KEY_FALSE(udpv6_encap_needed_key);
-  +EXPORT_SYMBOL(udpv6_encap_needed_key);
-  +#endif
-  +
-   void udp_encap_enable(void)
-   {
-          static_branch_inc(&udp_encap_needed_key);
-  diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-  index 7c1e6469d091..8b1dd7f51249 100644
-  --- a/net/ipv6/udp.c
-  +++ b/net/ipv6/udp.c
-  @@ -447,7 +447,7 @@ int udpv6_recvmsg(struct sock *sk, struct msghdr *msg=
-, size_t len,
-          goto try_again;
-   }
-
-  -DEFINE_STATIC_KEY_FALSE(udpv6_encap_needed_key);
-  +DECLARE_STATIC_KEY_FALSE(udpv6_encap_needed_key);
-   void udpv6_encap_enable(void)
-   {
-          static_branch_inc(&udpv6_encap_needed_key);
-
-Thanks!
-Antoine
+https://docs.kernel.org/process/maintainer-netdev.html#git-trees-and-patch-flow
 
