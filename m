@@ -1,140 +1,117 @@
-Return-Path: <netdev+bounces-80860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80859-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F903881580
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 17:22:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5060B88157E
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 17:22:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 003971F23BB7
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:22:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D44E2B23BFB
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F16755C3A;
-	Wed, 20 Mar 2024 16:21:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C3B54FAD;
+	Wed, 20 Mar 2024 16:21:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b="Cb+pOU2J"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SoUKb1BM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpcmd0641.aruba.it (smtpcmd0641.aruba.it [62.149.156.41])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E22554FBE
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 16:21:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.149.156.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC55154F92;
+	Wed, 20 Mar 2024 16:21:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710951682; cv=none; b=FCTNka5S0aeKV4pPYqvYLgMLc2Xgm1k2jyCLEGIO3rjCFneZbF7VbXY9VEFcUVRiyOoJPHEwlCp1zOBf2qATYD+jdIdRV38bG5Gp7RGAM3MTtUdwhe7u1j/Wecp8cI1vjVXz8b/m+mI8gmlTn9GxEeuSdvAugThRVmO1K8JMmaQ=
+	t=1710951680; cv=none; b=o4SteFlYDJMzxr99czu+zK8+fqt1NHRPoAAm1aiUeSoF7Q/BpQf1v6T3KMm2XadNPmr0qJQDmZiHzk/XJqkrZwXT4pHFBtCvibqbbHUO3Hw42JSsrHPnevD92T2Qkv+2ihQqtAZzus0Gc37GC5NSU5NkOWo6ZSyb3fdtvFpGVXE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710951682; c=relaxed/simple;
-	bh=gyvF1IOsSNtV7DoTvXZKG2k2ZhsNRKW2d7JqAyYwi1M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h7B1Qmd46u7MjyudmL2C1j8ouminA3wJJgkuOM8NaVWcorMUfLIJXHORp65Kt8RoqUS5HsEuiRBWif3oyDVnEZ/dwNTk8kr/rTyFpv5Dc/FuK5bnxgtqqtFaw1gZIKWR1a4DVgMEwEDQtm6RqAQfag6jsPIllUoGVJvQyDMU9Q8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com; spf=pass smtp.mailfrom=enneenne.com; dkim=pass (2048-bit key) header.d=aruba.it header.i=@aruba.it header.b=Cb+pOU2J; arc=none smtp.client-ip=62.149.156.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=enneenne.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=enneenne.com
-Received: from [192.168.1.59] ([79.0.204.227])
-	by Aruba Outgoing Smtp  with ESMTPSA
-	id mydRrZKfJABX0myduraZxG; Wed, 20 Mar 2024 17:18:19 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
-	t=1710951499; bh=gyvF1IOsSNtV7DoTvXZKG2k2ZhsNRKW2d7JqAyYwi1M=;
-	h=Date:MIME-Version:Subject:To:From:Content-Type;
-	b=Cb+pOU2J8Aw6MULICnHrsOP4Vu0ugOjgLhTyHPXNblEf+7luegmZJ40Upu4t+CxQa
-	 a2P+bCjmnHch7OOZXS7xrWRxcooWiR9PxobAwft9jpGtZMoepArg5ziguejvHr3Km0
-	 0icQ8k2W+Ys9xMHFQu2a2OkHtYHSQx2RL+38AoXS+sfCZBltGpw9eHTMj9RGxcSc45
-	 dYgJxkk2qBUCEzzMJIgSzfpeSmsXvmhEp752r6wYG++cA09OzG3wiOJJ3Ir5PHA7Ur
-	 CzetCyMinj18glk7HPxfB3ZBQiQc9aNtbHQ1F0/utudyYZPrkGDiQakzZQ7AzqaXgS
-	 xgSftN5+/rHKw==
-Message-ID: <7e268aa0-f999-48af-8188-9158fc61a8c2@enneenne.com>
-Date: Wed, 20 Mar 2024 17:18:18 +0100
+	s=arc-20240116; t=1710951680; c=relaxed/simple;
+	bh=Knp+GyIrxjiqzs9RPdIV6EPSjw9Di62CuHFlK7en0Zg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eQhh4LUOR6Jc5LmCJFPYxssV4C2UZFDI8IrFQE9eD6ClxPs6b5pBjTz/Qmis+5ytFiFmLChW0GqR1gER8Y8GRJ5cJlB9yXDuJPvrxj7WPbhVkRVTzWr93uLYbdn4I7XW/T0+UsflDimdhycNiJMDD44KXbRPT3pG2hNyR5VcgKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SoUKb1BM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14062C433F1;
+	Wed, 20 Mar 2024 16:21:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710951679;
+	bh=Knp+GyIrxjiqzs9RPdIV6EPSjw9Di62CuHFlK7en0Zg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SoUKb1BMv1Y/6RqB9NPHqWw3cag7uoAQCxuLrtYBsMxFhQEo9SUBzYhW685e+bgNk
+	 0AZ6w1twoo1I9FuwcyAv8rrpudPPXMGwFaIyVDQgfSSMNzf4fj1kH9ehWNAuvFFddG
+	 hHReE1PEggMbRoyzIW4V0ecGcfKfFX880RgyxCK61aQZFQt0QYYIBIi3Suj3OgDypr
+	 Xb/EarmFUDYC57fuNxmiWlpJV15K0DWT/lWgLJ5ueCnkkp0JKH+74jnyEUHp+WvwI2
+	 KGiX771tL5i6OesbpSQ5EdqinoLLu0eVXgJsSdomDrd14W4vyR31kH16zSOfIF8R9g
+	 tqKHN5i8horBA==
+Date: Wed, 20 Mar 2024 16:21:12 +0000
+From: Simon Horman <horms@kernel.org>
+To: Diogo Ivo <diogo.ivo@siemens.com>
+Cc: danishanwar@ti.com, rogerq@kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	andrew@lunn.ch, dan.carpenter@linaro.org, jacob.e.keller@intel.com,
+	robh@kernel.org, robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+	vigneshr@ti.com, wsa+renesas@sang-engineering.com,
+	hkallweit1@gmail.com, arnd@arndb.de, vladimir.oltean@nxp.com,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, jan.kiszka@siemens.com
+Subject: Re: [PATCH net-next v5 00/10] Support ICSSG-based Ethernet on AM65x
+ SR1.0 devices
+Message-ID: <20240320162112.GW185808@kernel.org>
+References: <20240320144234.313672-1-diogo.ivo@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 10/11] Documentation: driver-api: pps: Add Intel Timed
- I/O PPS generator
-Content-Language: en-US
-To: lakshmi.sowjanya.d@intel.com, tglx@linutronix.de, jstultz@google.com,
- corbet@lwn.net, linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, andriy.shevchenko@linux.intel.com,
- eddie.dong@intel.com, christopher.s.hall@intel.com,
- jesse.brandeburg@intel.com, davem@davemloft.net,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- mcoquelin.stm32@gmail.com, perex@perex.cz, linux-sound@vger.kernel.org,
- anthony.l.nguyen@intel.com, peter.hilber@opensynergy.com,
- pandith.n@intel.com, mallikarjunappa.sangannavar@intel.com,
- subramanian.mohan@intel.com, basavaraj.goudar@intel.com,
- thejesh.reddy.t.r@intel.com
-References: <20240319130547.4195-1-lakshmi.sowjanya.d@intel.com>
- <20240319130547.4195-11-lakshmi.sowjanya.d@intel.com>
-From: Rodolfo Giometti <giometti@enneenne.com>
-In-Reply-To: <20240319130547.4195-11-lakshmi.sowjanya.d@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CMAE-Envelope: MS4xfNi53SUDrigdbafA9GBsqTqvM52X7RdKb2VN1nxiFbtXbh5YcINBQR4rU5BXna+feDNynxbJcMJajiRI4vbed/FlpHFMA77WSAOYTX6AQjR/ta1DYJOn
- dDdNiSOWoAraOsufMMsPfo69B+uZQhAa6QMeVlBNZFEQIRtiJKAO4cTXKT51M2LIazKucN8o3A6GZo2ETtp30EjTcXvd/GCrlv/7p12EFmFHmGGn6uOGiGsS
- Jmcp76+bagWjvobBkHEYc/WGGUsMif5iRwohuL5hbEOvwtnE4mxiywkQ21yn7Ugx/t7DU5GRRrGdKqhV5w8Z6JnrGaNElKGhm0dmiIKmi3PfuOTwaSFBiBzi
- /Y8ACyFN2gA4+iPyMoeUi0EyawZhqIDD7pD/tvnCHb6jM1DvqUoydiUtWUdVSC9EkgW+5+eUHxc3gyTGcK0zJTLLzRrbruSbQsth3wZj7pkwUzpGScNyJxSt
- ONcgOtr36HwTuEkvuIhkJcEjJ4ODHCBumXEGy+svEpDkQcHtclO1lNVMbHT7iXAVwcJ4T8mYLNOlXrxAPY3YXthLXY1QGR9tHKo0NlybiGeYAt+68ZSIfSWc
- 9AHGKUbe+hnOG0IIUThIn1sWZpBGRxYwDF3QEHToJvkTrxa0fEM26jolw86JqyayKedzPS4boZV21w2rFDi5/Hqpc8G/sx26ripVyAzpjFOKuNuJnvzW2rL3
- gD6M9yqR7qWvTsTCuh+6HC7EghcTuwtoBMVpwk+g0pwAo675NdySZDh2Hl04azaOlP76skXrOoxJplHvf+pJAkOmQ1PTyOjq2eUkMqnADsr9VIiIO5SPkNmx
- NzVmpIOqVuzdReEkHEHlNHZquccMTi5kNFmppGtPvFuBnSxRxSXkD86OBef2YoH1APKk4wGg6GQFlNHIwozbgkwm1p7c7l3uUKINUD+tJdUqbpOnSInQQ6rX
- KES82y59243FOS6wLChS2E2pfTMu1brxzhDlHyoRwMMMBIeA7rnSTYsl/WriEcL3L8PI2SY031EKgxOxqECjp7uKTOqABX/oCM9Q8saGrdr9OBMTVpXpIENh
- eRrRat2V+cAvFNapga5vhiMSQOtj5gmfJea9OTxiYl4nSm5shfzhIUMudLBxydoyclthvQYPVipznQ==
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240320144234.313672-1-diogo.ivo@siemens.com>
 
-On 19/03/24 14:05, lakshmi.sowjanya.d@intel.com wrote:
-> From: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
+On Wed, Mar 20, 2024 at 02:42:22PM +0000, Diogo Ivo wrote:
+> Hello,
 > 
-> Add Intel Timed I/O PPS usage instructions.
+> This series extends the current ICSSG-based Ethernet driver to support
+> AM65x Silicon Revision 1.0 devices.
 > 
-> Co-developed-by: Pandith N <pandith.n@intel.com>
-> Signed-off-by: Pandith N <pandith.n@intel.com>
-> Signed-off-by: Lakshmi Sowjanya D <lakshmi.sowjanya.d@intel.com>
-> Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-
-Acked-by: Rodolfo Giometti <giometti@enneenne.com>
-
-> ---
->   Documentation/driver-api/pps.rst | 22 ++++++++++++++++++++++
->   1 file changed, 22 insertions(+)
+> Notable differences between the Silicon Revisions are that there is
+> no TX core in SR1.0 with this being handled by the firmware, requiring
+> extra DMA channels to manage communication with the firmware (with the
+> firmware being different as well) and in the packet classifier.
 > 
-> diff --git a/Documentation/driver-api/pps.rst b/Documentation/driver-api/pps.rst
-> index 78dded03e5d8..52a6d5faf885 100644
-> --- a/Documentation/driver-api/pps.rst
-> +++ b/Documentation/driver-api/pps.rst
-> @@ -246,3 +246,25 @@ delay between assert and clear edge as small as possible to reduce system
->   latencies. But if it is too small slave won't be able to capture clear edge
->   transition. The default of 30us should be good enough in most situations.
->   The delay can be selected using 'delay' pps_gen_parport module parameter.
-> +
-> +
-> +Intel Timed I/O PPS signal generator
-> +------------------------------------
-> +
-> +Intel Timed I/O is a high precision device, present on 2019 and newer Intel
-> +CPUs, that can generate PPS signals.
-> +
-> +Timed I/O and system time are both driven by same hardware clock. The signal
-> +is generated with a precision of ~20 nanoseconds. The generated PPS signal
-> +is used to synchronize an external device with system clock. For example,
-> +share your clock with a device that receives PPS signal, generated by
-> +Timed I/O device. There are dedicated Timed I/O pins to deliver the PPS signal
-> +to an external device.
-> +
-> +Usage of Intel Timed I/O as PPS generator:
-> +
-> +Start generating PPS signal::
-> +        $echo 1 > /sys/devices/platform/INTCxxxx\:00/enable
-> +
-> +Stop generating PPS signal::
-> +        $echo 0 > /sys/devices/platform/INTCxxxx\:00/enable
+> The motivation behind it is that a significant number of Siemens
+> devices containing SR1.0 silicon have been deployed in the field
+> and need to be supported and updated to newer kernel versions
+> without losing functionality.
+> 
+> This series is based on TI's 5.10 SDK [1].
+> 
+> The fourth version of this patch series can be found in [2].
+> 
+> Detailed descriptions of the changes in this series can be found in
+> each commit's message.
+> 
+> Both of the problems mentioned in v4 have been addressed by disabling
+> those functionalities, meaning that this driver currently only supports
+> one TX queue and does not support a 100Mbit/s half-duplex connection.
+> The removal of these features has been commented in the appropriate 
+> locations in the code.
+> 
+> [1]: https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tree/?h=ti-linux-5.10.y
+> [2]: https://lore.kernel.org/netdev/20240305114045.388893-1-diogo.ivo@siemens.com/
 
--- 
-GNU/Linux Solutions                  e-mail: giometti@enneenne.com
-Linux Device Driver                          giometti@linux.it
-Embedded Systems                     phone:  +39 349 2432127
-UNIX programming
+## Form letter - net-next-closed
 
+(original text from Jakub)
+
+The merge window for v6.9 has begun and therefore net-next is closed
+for new drivers, features, code refactoring and optimizations.
+We are currently accepting bug fixes only.
+
+Please repost when net-next reopens after March 25th.
+
+RFC patches sent for review only are welcome at any time.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+--
+pw-bot: defer
 
