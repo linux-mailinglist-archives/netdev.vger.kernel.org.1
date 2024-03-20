@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-80904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B23708819A5
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 23:53:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1146F8819BA
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 23:58:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 680461F22981
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 22:53:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 431B81C215D6
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 22:58:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 001106BFDB;
-	Wed, 20 Mar 2024 22:53:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9772C85C7D;
+	Wed, 20 Mar 2024 22:58:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="zQXJE7vc"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JIY3LCEt"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B9D5BA45;
-	Wed, 20 Mar 2024 22:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C50DF85C6C;
+	Wed, 20 Mar 2024 22:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710975198; cv=none; b=GC/zu8yTPNG6x+ksE/mD96HIeWdGK3X85bIT+/z3WyPgBAP1wuGy8lpyFxqlTCqg8Hv1qAM8UNtYhMkZBoXeAPFZaJwIZIb8af+xFtEKyH9TCLDlCoBCwfKKpeScAA14jmeAXSTzMtiyoaTWj+vkImxX3kyFIIGTWoJSbnPqKEM=
+	t=1710975507; cv=none; b=Ow3PE5FyslolZ49qU5MsNB0vXdiObjbxGXX37QebmKa1k2iHrdNQl5qnu8RFuOFmO0tFiifdG3aF03cs5BCNfw0dh8fYzyfm2K/zhRIKtyJ4p6tDViaEo8nn3TszrNZ58CaSQ9+eHZjGMmpW4m+IBzvFMtzHkDUjGrsyYOr0eqU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710975198; c=relaxed/simple;
-	bh=LxOwNqItoGww2SXOkAgOwGKpdrnrybWfJpdwcqgsAxI=;
+	s=arc-20240116; t=1710975507; c=relaxed/simple;
+	bh=yxbUKjR/eQ+A4TDHgpThQwIVWkZZpAq34ngZ7oYpkAc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J0osLWcpI0Gn0+MSCVhrVUfe61TrP0Ri973/wU3omoQpRBrwOJBW7X8J/e1K5hU46LUe9tecAzaOaCpw1vkFvCRgfY5Joa3zG1Mm3Wdy1YkyQQJBQFwrTiCRpjPN/a6E7axSl9u3wjCUPhW9Kg2u5LcpzBCqIF90/aqpP5tM4Yo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=zQXJE7vc; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=EzkgQRAWhNJerfKyjbuvxHrjCBVJ8JbpiMOJrjrHSw+BftxyAl0Cx/jwMImyKVrYc7kvI2DA0WtZ52pMyaACZ43CmvcKvyuhHESzo5a6BSdOb63qxbOVjSc75oW8cZyEMsJuqYRTX7wni8p/3sgJ4x8O+CRU+EQ/yPDc4UB9P30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JIY3LCEt; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,24 +36,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ZQ5bl/zj2pbCCs6ni9E3xhdbegTyO49cnfIVZy3JuwA=; b=zQXJE7vcEnb8875Wcv3yKIaFRV
-	c77Zm+c2VOVNjh1jPlygBo1Rt0fCPqwz7w1DRQdNU/1pfRleV0ZZUcwudmd25Mu1Zw4j3Rrtqm9MG
-	IgEWuMa8LGsA0gvZdQkI6exWlqgpRDltj7xrE/S9sW7qgVlH0coevNGQnZUl78QAXBeI=;
+	bh=13ghe/Dcccxys0JDUXSMtaJE6mxH8x5jhjb9llYFpQ0=; b=JIY3LCEtex2FFYR6+ZBGIDiPy/
+	A6RA+5Cr8x6nVJ3eM+rLlJ0SiKV3IUDeOWsJp7VQVd050LKeI6Jjn6ZUJaPIFDk23BFoEXLsjiLa/
+	75rGtVicd8Z2/sE4uNqdlcUfv8VslqHlP4RxirFhJKMr6CIxVJG2YUbc78qxFJyZP1W4=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rn4o2-00AosD-Gf; Wed, 20 Mar 2024 23:53:10 +0100
-Date: Wed, 20 Mar 2024 23:53:10 +0100
+	id 1rn4st-00AotP-Vv; Wed, 20 Mar 2024 23:58:11 +0100
+Date: Wed, 20 Mar 2024 23:58:11 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Raju Lakkaraju <Raju.Lakkaraju@microchip.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com,
-	linux-kernel@vger.kernel.org, bryan.whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com
-Subject: Re: [PATCH net V2 2/2] net: lan743x: support WOL in MAC even when
- PHY does not
-Message-ID: <22089299-a3e2-4cbd-942a-65ea070657b8@lunn.ch>
-References: <20240320042107.903051-1-Raju.Lakkaraju@microchip.com>
- <20240320042107.903051-3-Raju.Lakkaraju@microchip.com>
+To: Elad Nachman <enachman@marvell.com>
+Cc: taras.chornyi@plvision.eu, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, kory.maincent@bootlin.com,
+	thomas.petazzoni@bootlin.com, miquel.raynal@bootlin.com,
+	przemyslaw.kitszel@intel.com, dkirjanov@suse.de,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 1/5] net: marvell: prestera: fix driver reload
+Message-ID: <d02e6c38-042f-416e-b5c8-96dc55e1fd5f@lunn.ch>
+References: <20240320172008.2989693-1-enachman@marvell.com>
+ <20240320172008.2989693-2-enachman@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,28 +62,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240320042107.903051-3-Raju.Lakkaraju@microchip.com>
+In-Reply-To: <20240320172008.2989693-2-enachman@marvell.com>
 
-> +	if (netdev->phydev) {
-> +		ret = phy_ethtool_set_wol(netdev->phydev, wol);
-> +		if (ret != -EOPNOTSUPP && ret != 0)
-> +			return ret;
+On Wed, Mar 20, 2024 at 07:20:04PM +0200, Elad Nachman wrote:
+> From: Elad Nachman <enachman@marvell.com>
+> 
+> Driver rmmod after insmod would fail because API call to reset the switch
+> HW and restart the firmware CPU code loading procedure was missing in
+> driver removal code handler.
+> 
+> Firmware reset and reload is needed as the firmware termination will make
+> the firmware loader change its state machine to the firmware loading state,
+> and thus will be able to load new firmware, which is done at the beginning
+> of the probing of the prestera_pci module.
+> 
+> Without this reset, the firmware loader will stay in the wrong state,
+> causing the next firmware loading phase in the probe to fail.
 
-I'm not sure this condition is correct.
+What is missing from this is an explanation why you need to reload the
+firmware at the next re-probe. That just seems like a waste of time if
+you have already loaded it once.
 
-If there is an error, and the error is not EOPNOTSUPP, you want to
-report that error. However, if the PHY can support the WoL
-configuration, it will return 0, and this function should exit, WoL in
-the MAC is not needed. And doing WoL in the PHY consumes less power
-since you can suspend the MAC.
-
-So i think it should simply be:
-
-> +		if (ret != -EOPNOTSUPP)
-> +			return ret;
-
-Do you have a board with this MAC with a PHY which does have some WoL
-support. Could you test PHY WoL is used when appropriate?
-
-	Andrew
+    Andrew
 
