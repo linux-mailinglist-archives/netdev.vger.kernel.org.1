@@ -1,146 +1,154 @@
-Return-Path: <netdev+bounces-80795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ADE9881191
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 13:19:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D65288119B
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 13:24:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A10181C20D48
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 12:19:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 164D7284F64
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 12:24:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85DED3FB82;
-	Wed, 20 Mar 2024 12:19:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AB763FB85;
+	Wed, 20 Mar 2024 12:23:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="ey69IQD+"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NSUiLflQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [217.72.192.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4173EA98;
-	Wed, 20 Mar 2024 12:19:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.72.192.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D143DBB7
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 12:23:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710937162; cv=none; b=KMpiOBgLAMETMEr0XaVE0Jr1IRxGU6OilG062zoa0FCnNRAsyQtuQ5n96OrHIM6qidS6oElrFa4NI+AftueevzFchHfnXm9gq868pzVniClViQcbppzU1BglxnhIv9xWB4ZTKxc6Ckf6UYzr0h+bBRSkq4WpvRd5YgRld91KaKo=
+	t=1710937437; cv=none; b=Nv7nMCdsFftQ/jw2Wg4+rNoFpEi1b+g8kZDrV+1iYoOkm7r78ALRhvuAP8bkmlDwFZxeJrsjt32KHSpSZS95fjDtJRm79oAeLZC5hza3n2d79P1Fr3yVCBB1SO9fiG/z352OniaSgHRL/P5wAo2QD4nrMh2+efy8BI204t6ag+E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710937162; c=relaxed/simple;
-	bh=lRT9oSTfLR+JQlZUwPoWrQebKedyDM3ti0p4qPc/OEY=;
-	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
-	 In-Reply-To:Content-Type; b=nNaRyxB2XFrYgqu1Q3JuHjgXPen0CYJVdm/kYuLoW+x0oW0W4sQgBoue/CZje5BZ5lWuINHN6E4nhwh7HrBlYAc0x6gAG1IToqoL706IbPk+xz+7t2amzQAi6MTCzDSoJYSwcLmsGhiRxbR+VBk6OPXfa8tvY9Z3541VAhi2ImM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=ey69IQD+; arc=none smtp.client-ip=217.72.192.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1710937128; x=1711541928; i=markus.elfring@web.de;
-	bh=KhP5z213JRHgg+2Y4l04p0agR635gtrVnTmlg2I++II=;
-	h=X-UI-Sender-Class:Date:To:Cc:References:Subject:From:
-	 In-Reply-To;
-	b=ey69IQD+cdUgDYt2KtdYDS6PfEx1U3euVUDVZQd/I3lnASEWs2+7iDm8CTAAXG+c
-	 V907K5kHdsPrLxJ2DVHtBBzI1Wq8lwQ40+w2s7Qec3kJmhT9goNqPphA5lAY+HI6M
-	 CZW3YFtxbaK4PPFPgig47U7fz9lEm4tU5r4qTtmzWHfiE0CCyQHQvOdxyNckBl+ha
-	 IJOD63OrVpIKSAZiqod03i1daYuSVRGSnqLZZMDMgGJGqls8pNEqau/ijaBFAePYn
-	 ZHQnu5jyoobtE+z4aNDmxFc+l+nZK3/xh4HwE44TLdIdFKmbCLXvjb+rGSOTVGRMp
-	 JHUi//IsZIr0l0/AHw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb106
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1N9LIc-1qjpQC2DWG-015dwE; Wed, 20
- Mar 2024 13:18:48 +0100
-Message-ID: <4b8ee072-70bc-4a0a-8e43-e244f8ee2f22@web.de>
-Date: Wed, 20 Mar 2024 13:18:33 +0100
+	s=arc-20240116; t=1710937437; c=relaxed/simple;
+	bh=256hIVOWqKGNs0clZdEecQjT2nDPiAh+uHQB0f0lp0s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QEJ5XSZSYneH1Z7r08pri+gZRx5YarEJr3AH7Y3nCN0J+lGlfxjWeBCKB/tFAi86NCDoERQ2jl1tcq1NIrpN/8S5keBXtB9yWOZf+joLfi/oGoS8TDrTHXgpI/Mt6w5+DnqeSKAxOO9CLbiFWUYrMqsVfGIYWxgeWccUS9Rnsvw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=NSUiLflQ; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4146e9e45c8so1968685e9.1
+        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 05:23:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1710937433; x=1711542233; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=256hIVOWqKGNs0clZdEecQjT2nDPiAh+uHQB0f0lp0s=;
+        b=NSUiLflQsFZrJcTy9HNt0D+03APSNlTLySOzRCr8/z2df6InbuxCojYJqk9QBWxlVD
+         1TfM4ipK4kasMHBrNmQAKQW8o2MdNQPEoZecWJGCUFyMBdyCpUEzdFa5CeCCo6dDcSxX
+         JpmU4mwSmSNKXGhZ0rFP0O3wlPwJrri9aN5L4N7qLPhtSurYDoaVlUBGAppPahKDNstu
+         ENtke0L9J4A29aWIPAnlyZMWrt/NgfyDmW0tdYU48vaIF1vuZCFsfZR64CS1QE2f22xQ
+         JD0S0MIF+TmebuIIVrvcYBWjQSsF1cn7/k7c8UeLHPaJE2EUIJS+fVrucMO6+yfr3yct
+         ulLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710937433; x=1711542233;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=256hIVOWqKGNs0clZdEecQjT2nDPiAh+uHQB0f0lp0s=;
+        b=tRLbCzRz2/dNu3nsh3FjvHtED3GKchSxSGcC9eFkVSXgSwl3NPKeskmvXgR7GKc0yw
+         Y46NmRKHy5+iWsHYvP4usaUb3HQE2C+WDxx2Fa+nyacS0T0vI57aCJq1Om9gVU9rXXFR
+         GRzgJ84SJtJOxsrQamr+8HCTot93ej/pL+/yiggzpLltDw8r+fqnu9NZIrkQf4G74sIA
+         zLvG8a0it1Fu/WCy9JUStZR2VfqZ7w7coFwKHMA7HknZPi3p7IAVvN+9l197lrp+PDvT
+         IVT/1McFKrlEsnLdlfoAHb9t0c+6iVmddbvXHecbx+58OLQB4RZnl/VHoU1jygCqRBFn
+         IHAw==
+X-Forwarded-Encrypted: i=1; AJvYcCUilYAcBzYVWtOMDcgKtaJmuqduRPeRxpU5zI2ANloRv2HUCY0kugzUz9zKZNaiRgDA7mRci+ZlRhSocFE81qxKXmd6k5Ke
+X-Gm-Message-State: AOJu0YxNEOYGl2FdO97FNEb7hnUoPSemRV8EtDRToFvBPMuFj+VL365u
+	LLJznlPKSpN/jMelRIlnaSV5LiSH5UFNNFaC2/uVD72dCp/9kjbTVI2BZlFMd9w=
+X-Google-Smtp-Source: AGHT+IEeP+QulfChhn2oDlevD/cXp00IH9MWfPkU71hEwGa+tm6JDBn0nfQzXtMpTmqHCqJzlI6TMw==
+X-Received: by 2002:a7b:cbd0:0:b0:414:6467:d8e9 with SMTP id n16-20020a7bcbd0000000b004146467d8e9mr2347163wmi.17.1710937433216;
+        Wed, 20 Mar 2024 05:23:53 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id z20-20020a05600c0a1400b004146c80ade5sm1725802wmp.12.2024.03.20.05.23.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 20 Mar 2024 05:23:52 -0700 (PDT)
+Date: Wed, 20 Mar 2024 13:23:48 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"Michael  S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Stanislav Fomichev <sdf@google.com>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	virtualization@lists.linux.dev, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v5 0/9] virtio-net: support device stats
+Message-ID: <ZfrVVGUG5rGZxjRx@nanopsycho>
+References: <20240318110602.37166-1-xuanzhuo@linux.alibaba.com>
+ <Zfgq8k2Q-olYWiuw@nanopsycho>
+ <1710762818.1520293-1-xuanzhuo@linux.alibaba.com>
+ <ZfgxSug4sekWGyNd@nanopsycho>
+ <316ea06417279a45d2d54bf4cc4afd2d775b419a.camel@redhat.com>
+ <1710921861.9268863-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-To: Dan Carpenter <dan.carpenter@linaro.org>,
- kernel-janitors@vger.kernel.org, netdev@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: LKML <linux-kernel@vger.kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>, Jiri Pirko
- <jiri@resnulli.us>, Paolo Abeni <pabeni@redhat.com>,
- Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-References: <77145930-e3df-4e77-a22d-04851cf3a426@moroto.mountain>
-Subject: Re: [PATCH net] ice: Fix freeing uninitialized pointers
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <77145930-e3df-4e77-a22d-04851cf3a426@moroto.mountain>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:PTUuB43Z3DS7y5k1LlzvJWE5GpgoYr2z888JWO4A8Mid5gKORZl
- MkpJK4sPj0ibCEfU/Pw4f5+CIFy2gNMghqQLHOhx/qdJ2joepGCvIS4FT/vzNi3ZISYJm5m
- W0rWME1EqkcsjFu2+pZtTZTKhWraCRg+epsZkoQ6DCHkmtw8Mxj9kbPwzJj8jb9ofEii8JW
- 9eLlGudzZsRxA81ao1Igw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:soozx22Hh6Q=;7yVwJkmtUEyeQXzSrPhICqaGpWL
- wbPjm8iTqr9BUqyukACz4OdGv9m9vWc3/fg29pK0KYzZZsDLtEvH0ZrLwJFZP48im70E3QMh8
- D+g2/gtmggCoy70i5gd0tQMWyrix8wTEIPRATPDCqtwdr1aockW3cszBmSfN3+g9fgUJEr03n
- X2AZXgrXdislMFF9cKmCiuxQUib6tkR5jLqQ/jT3eEK/3FbAVSsz94RsiMGpfbPaczIM0E5AZ
- L3bwe2yFjjVrZkOg/oBVqXfrC3+J1T//XU18zo2T0b0AjqgZwRVbXVSQQj+Ms7IbmhuvlNw+/
- fveFWGbZ1sMyvO9A5fma3wCii4WBsBBly70rIpn9021AXkNkNIXgw3YWRsS5ytNUtqJDacZdQ
- oxtzxCA0eWVlZYEpGByshiLpTEX9anZf20Q8icqiwfFUEeDU7a0jdKODkHo+n2wSPUyBko6LS
- 2AHZ+k48/WmQHiXsW5u2RTZuqJTcXJE5yln/0Lw4ujuU7nlN4faOW9g+mFNWp1kNyFNx5sCgY
- Yb8YfPFPED0KE8yRRm5xbEuB3U/ggpVTOvgB00yuUdmTGsbisqimEEnfbgurwAa0x+M3eSKNu
- 1GKcJZqia2LYnli/+5Yyysb7oy5LonCTHWVhOtcNKw2xuF9gdmdFcWDscJsN3ch8Nn8jRXB0b
- tz57Ae48zbuB0FHfO9Zg+ebV4uho2nVHhkKsF06LOfd462kDywP1pSssWQZupeUu51OSNV9PG
- KabbQuuIq0xxf0CNFfT+twKeG13Z+yZddKXnl8gNE2b3wFBvooJ2Xvqgyr8CBJbow1ahPmu4B
- 8WEuUavjN7uJsok8ZYho4JjUckMm8s/fThJNp3TJv9U6Y=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1710921861.9268863-1-xuanzhuo@linux.alibaba.com>
 
-> Automatically cleaned up pointers need to be initialized before exiting
-> their scope.  In this case, they need to be initialized to NULL before
-> any return statement.
+Wed, Mar 20, 2024 at 09:04:21AM CET, xuanzhuo@linux.alibaba.com wrote:
+>On Tue, 19 Mar 2024 11:12:23 +0100, Paolo Abeni <pabeni@redhat.com> wrote:
+>> On Mon, 2024-03-18 at 13:19 +0100, Jiri Pirko wrote:
+>> > Mon, Mar 18, 2024 at 12:53:38PM CET, xuanzhuo@linux.alibaba.com wrote:
+>> > > On Mon, 18 Mar 2024 12:52:18 +0100, Jiri Pirko <jiri@resnulli.us> wrote:
+>> > > > Mon, Mar 18, 2024 at 12:05:53PM CET, xuanzhuo@linux.alibaba.com wrote:
+>> > > > > As the spec:
+>> > > > >
+>> > > > > https://github.com/oasis-tcs/virtio-spec/commit/42f389989823039724f95bbbd243291ab0064f82
+>> > > > >
+>> > > > > The virtio net supports to get device stats.
+>> > > > >
+>> > > > > Please review.
+>> > > >
+>> > > > net-next is closed. Please resubmit next week.
+>> > >
+>> > >
+>> > > For review.
+>> >
+>> > RFC, or wait.
+>>
+>> @Xuan, please note that you received exactly the same feedback on your
+>> previous submission, a few days ago. While I do understand the legit
+>> interest in reviews, ignoring explicit feedback tend to bring no
+>> feedback at all.
+>
+>Sorry.
+>
+>I have a question regarding the workflow for feature discussions. If we
+>consistently engage in discussions about a particular feature, this may result
+>in the submission of multiple patch sets. In light of this, should we modify the
+>usage of "PATCH" or "RFC" in our submissions depending on whether the merge
 
-I suggest to reconsider such information a bit more.
+No, just wait 2 weeks, simple.
 
 
-=E2=80=A6
-> +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-> @@ -1002,8 +1002,8 @@ static void ice_get_itr_intrl_gran(struct ice_hw *=
-hw)
->   */
->  int ice_init_hw(struct ice_hw *hw)
->  {
-> -	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree);
-> -	void *mac_buf __free(kfree);
-> +	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) =3D NULL;
-> +	void *mac_buf __free(kfree) =3D NULL;
->  	u16 mac_buf_len;
->  	int status;
-
-How do you think about to reduce the scope for affected local variables in=
-stead
-with the help of a small script (like the following) for the semantic patc=
-h language?
-
-
-@movement1@
-attribute name __free;
-@@
--struct ice_aqc_get_phy_caps_data *pcaps __free(kfree);
- ... when any
-+struct ice_aqc_get_phy_caps_data *
- pcaps
-+__free(kfree)
- =3D kzalloc(sizeof(*pcaps), ...);
-
-@movement2@
-attribute name __free;
-@@
--void *mac_buf __free(kfree);
- ... when any
-+void *
- mac_buf
-+__free(kfree)
- =3D kcalloc(2, sizeof(struct ice_aqc_manage_mac_read_resp), ...);
-
-
-Regards,
-Markus
+>window is open or closed? This causes the title of our patch sets to keep
+>changing.
+>
+>Or I miss something.
+>
+>
+>Thanks.
+>
+>
+>>
+>> Paolo
+>>
 
