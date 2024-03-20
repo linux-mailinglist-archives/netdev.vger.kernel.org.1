@@ -1,406 +1,444 @@
-Return-Path: <netdev+bounces-80883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F0FF88172E
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 19:08:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92DAD88173A
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 19:14:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8EEC281859
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 18:08:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B780A1C20F0F
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 18:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A598E6AF86;
-	Wed, 20 Mar 2024 18:08:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40CFE6A323;
+	Wed, 20 Mar 2024 18:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q4glrX9D"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yz4SDPVD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 760FF6A33E;
-	Wed, 20 Mar 2024 18:08:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C861DFC6
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 18:13:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710958118; cv=none; b=R2QlYkDTWcnqj9xgZcGVWe+51hGE7ArEdwMYxUEBJ8I1zBHxzyiz7LUyFm2a6D812QpJDg/wEUMRo7yTMbjw0R6z8Av1jxxHko1KWDUUrfExbj/Iz9yUBot/OLBhYK3KD37cKuZ6gi5GesNSHomaEjYWxzmvtlrMZtWNbARa2yg=
+	t=1710958439; cv=none; b=M2iIgUQyfnf5ar5bxCuuqbLrNbUEFfxem+KBRtiIhmZHfQuG45EyM79MkYyivo4aW1HECzqTCO2bBS2/wMtqTnuwb/sSw75QEXvzHoNStXIc90iDq0f1AxEK50bNAJI7mrXY46kVmTJfhb9epWjxgrQVmJTd+H6WFRFMz9Ktwwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710958118; c=relaxed/simple;
-	bh=s8hh5ibfmoqAlMKecBCXc82EDZUFeDU9i99TMxqttOw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WMtdvDg3tn6qrufwrejszD6oqZMb9KUiw2+iYFxUeyvsxmdvxRniJZ1jREqxOH/m84QP9ZyiMqN2W1iEEHVFvsnzgC69kVqY7/6HmnxrvUvj6J3VPRbawi3U4t48Q5bboxocPQJJIgJt1nrKOzaGlLFcH1e6FUwiwcwL5MOQflQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q4glrX9D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FD5FC433B1;
-	Wed, 20 Mar 2024 18:08:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710958118;
-	bh=s8hh5ibfmoqAlMKecBCXc82EDZUFeDU9i99TMxqttOw=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Q4glrX9DQ+6EEuXw8ushrXysECS5j5nMhmSfRKrXH3wx/ne+0beyx7JFv5DgWPao6
-	 GQ+Vr223mLFVwqzUXq+mbI3eMCkkNuW52/+xBFh7L8LEHtdF+sEb12UXkjUayvHVKx
-	 WdYDxHvmgh/AWDVAxEPmxLfL4xdixjtI1afcmy76zIxm+5LNism5FHdvsaC/deCfcG
-	 vi+jdr1Iz0ygXbfX4MiRxlI5CwcktEYOpWmBHO2CQ9rbaJOPlQIOnnr8TvFUCMKoya
-	 8ir+LDcBs8QfVS9kKeWYZ04hvPQaraSVob2DGjZatjOJM3JjOFqxjvD9lE1ivGD0vr
-	 lhcRvHGSIPuCg==
-From: Arnd Bergmann <arnd@kernel.org>
-To: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Simon Horman <horms@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Yevgeny Kliteynik <kliteyn@nvidia.com>,
-	Alex Vesker <valex@nvidia.com>,
-	Erez Shitrit <erezsh@nvidia.com>,
-	Hamdan Igbaria <hamdani@nvidia.com>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] [v3] net/mlx5: fix possible stack overflows
-Date: Wed, 20 Mar 2024 19:08:09 +0100
-Message-Id: <20240320180831.185128-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	s=arc-20240116; t=1710958439; c=relaxed/simple;
+	bh=SMUsyxSc4teBbD6tXP62VxNRkjdgEu6FYwuoKGkFUT4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t+ONQP+6ddipzcgMLAnLMqbQ7tci/QpSpneVjPGOETPTSCVXO6Lp216WwdLyleQg+RKXgfGOnpByR4Fuh6xRfLLT5HM6dts69BfNHsYLGMdIR9F2gHDR07HgdCIxh7+GAOG/ksYddguMIiIYYE/W2qAUEKw7HKRSBwwYI2pimXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yz4SDPVD; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-56b9dac4e6cso1676a12.1
+        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 11:13:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710958435; x=1711563235; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mhMXAo1aFRirZXz8INB5ZWmjxvvirk8mjxGkMEkLLsg=;
+        b=Yz4SDPVDwH5MrMVKig+3SW7fTfiDFi6V77IHWSexT4OAuRz+lX+DlX3wItUqZFR0RN
+         TwGC61IsmFe8QMLh3DAQxn6fU5hZ4lKx0AUbsHkeOwVKg/a/kXuk+1FSJ7fuuic2ta9a
+         zf1JJENoocmDWp0pVASt7obvzSBl8T34sxBGKepXSSUAj7lVJ2X4VBrNpA7u12vjfQIo
+         kgWqLcbpZRZmOvbBdymIXynL9zkocNqJ+4e79NDRQ6wf8++qLyOBM8fiU4h0/oKZbQQh
+         J2eJSlxgGOaR/6gX3cBM9+K09y9vWtIImVe5CSVRwjN1h+MSYczUmFWVL4AhrrH5npGy
+         HP4w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710958435; x=1711563235;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mhMXAo1aFRirZXz8INB5ZWmjxvvirk8mjxGkMEkLLsg=;
+        b=svvMLRDiVPOJaTMIBH4SIk0mv7e5/6ep3CnXkNhzKBUYq0bm6xm20Z41IyN33ketra
+         JOXTkbuOLpP+g0Dmkt7EvrnF7C00YqC025nkdFxvw0ZDup3OIkt8E1+/tYyoFKaHcaEm
+         IuFpCPXc7FfuRvnE5epOwsVPmKGFjWaPqV7aWPDb8rWzyIX2lAgkgWvkJPfBgGNIPywz
+         7vI165YY5/kzT1HF3FBzjNYwaidgJtRNEJFRg6z7oFrgDJl9dtBs9DL+E4v5f95LVJbS
+         GSJ7K6JGoC2XUfmD74pyKz9JHQrd7LWrBCjo5vqvo9b3PpAF1cumaNwPs6mm7uYqRtR3
+         qobA==
+X-Forwarded-Encrypted: i=1; AJvYcCWtu4x61hy0WR1qpB3p3FvaMXNLfJ5wfi5fFC9vtKozIDro1r3fFQ22BDwPuLHc498culzOGYjjrH9gm/RicTxtOMe66Yva
+X-Gm-Message-State: AOJu0Yxkqhde6XRmtQ17wPOk8DdQP+7PZiTXLxImu1VRtg6NwiBFusMi
+	7aKbh6lD81wtWr/kB5prgGOhAPozrPd/z9dlEnD8i6U/Hhlp7e3ejudnzP+SKkmErCHGEbys+Qy
+	i8ruH9gVveuo6irYjsA671IfaRRl+3B0SwFFQ
+X-Google-Smtp-Source: AGHT+IFACVZtMnF4suFvyXy2FPQELjiVll6kKkd3ECrC0IZHj00KzgU+/aSkzycitVHr4R9YySDK8bhqBwbroOmISZY=
+X-Received: by 2002:a05:6402:7c9:b0:56a:9184:9ab with SMTP id
+ u9-20020a05640207c900b0056a918409abmr5157edy.7.1710958434833; Wed, 20 Mar
+ 2024 11:13:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240314111713.5979-1-renmingshuai@huawei.com>
+ <CAM0EoMmqVHGC4_YVHj=rUPj+XBS_N99rCKk1S7wCi1wJ8__Pyw@mail.gmail.com>
+ <CAM0EoMkZKvvPVaCGFVTE_P1YCyS-r2b3gq3QRhDuEF=Cm-sY4g@mail.gmail.com>
+ <CAM0EoMm+W3X7TG8qjb8LWsBbAQ8_rntr7kwhSTy7Sxk=Yj=R2g@mail.gmail.com>
+ <CANn89iL_hfoWTqr+KaKZoO8fKoZdd-xcY040NeSb-WL7pHMLGQ@mail.gmail.com>
+ <CAM0EoMkqhmDtpg09ktnkxjAtddvXzwQo4Qh2-LX2r8iqrECogw@mail.gmail.com>
+ <CANn89iK2e4csrApZjY+kpR9TwaFpN9rcbRSPtyQnw5P_qkyYfA@mail.gmail.com>
+ <CAM0EoMkDexWQ_Rj_=gKMhWzSgQqtbAdyDv8DXgY+nk_2Rp3drg@mail.gmail.com>
+ <CANn89iLuYjQGrutsN17t2QARGzn-PY7rscTeHSi0zsWcO-tbTA@mail.gmail.com>
+ <CAM0EoM=WCLvjCxkDGSEP-+NqEd2HnieiW8emNoV1LeV6n6w9VQ@mail.gmail.com>
+ <CANn89iLjK3vf-yHvKdY=wvOdEeWubB0jt2=5d-1m7dkTYBwBOg@mail.gmail.com>
+ <CAM0EoMmYiwDPEqo6TrZ9dWbVdv2Ry3Yz8W-p9u+s6=ZAtZOWhw@mail.gmail.com> <CAM0EoMnddJgPYR75qTfxAdKsN3-bRuqXrDMxuwAa3y95iahWFQ@mail.gmail.com>
+In-Reply-To: <CAM0EoMnddJgPYR75qTfxAdKsN3-bRuqXrDMxuwAa3y95iahWFQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 20 Mar 2024 19:13:43 +0100
+Message-ID: <CANn89iKrW4em3Ck=czoR32WBkhqXs7P=K3_dMX9hdv7wVGvKJA@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: Forbid assigning mirred action to a filter
+ attached to the egress
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: renmingshuai <renmingshuai@huawei.com>, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	davem@davemloft.net, vladbu@nvidia.com, netdev@vger.kernel.org, 
+	yanan@huawei.com, liaichun@huawei.com, caowangbao@huawei.com, 
+	Eric Dumazet <eric.dumazet@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Davide Caratti <dcaratti@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Wed, Mar 20, 2024 at 6:50=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> On Wed, Mar 20, 2024 at 1:31=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.co=
+m> wrote:
+> >
+> > On Wed, Mar 20, 2024 at 12:58=E2=80=AFPM Eric Dumazet <edumazet@google.=
+com> wrote:
+> > >
+> > > On Tue, Mar 19, 2024 at 9:54=E2=80=AFPM Jamal Hadi Salim <jhs@mojatat=
+u.com> wrote:
+> > > >
+> > > > On Tue, Mar 19, 2024 at 5:38=E2=80=AFAM Eric Dumazet <edumazet@goog=
+le.com> wrote:
+> > > > >
+> > > > > On Mon, Mar 18, 2024 at 11:05=E2=80=AFPM Jamal Hadi Salim <jhs@mo=
+jatatu.com> wrote:
+> > > > > >
+> > > > > > On Mon, Mar 18, 2024 at 3:11=E2=80=AFPM Eric Dumazet <edumazet@=
+google.com> wrote:
+> > > > > > >
+> > > > > > > On Mon, Mar 18, 2024 at 6:36=E2=80=AFPM Jamal Hadi Salim <jhs=
+@mojatatu.com> wrote:
+> > > > > > > >
+> > > > > > > > On Mon, Mar 18, 2024 at 11:46=E2=80=AFAM Eric Dumazet <edum=
+azet@google.com> wrote:
+> > > > > > > > >
+> > > > > > > > > On Mon, Mar 18, 2024 at 3:27=E2=80=AFPM Jamal Hadi Salim =
+<jhs@mojatatu.com> wrote:
+> > > > > > > > > >
+> > > > > > > > > > On Sun, Mar 17, 2024 at 12:10=E2=80=AFPM Jamal Hadi Sal=
+im <jhs@mojatatu.com> wrote:
+> > > > > > > > > > >
+> > > > > > > > > > > On Thu, Mar 14, 2024 at 1:14=E2=80=AFPM Jamal Hadi Sa=
+lim <jhs@mojatatu.com> wrote:
+> > > > > > > > > > > >
+> > > > > > > > > > > > On Thu, Mar 14, 2024 at 7:18=E2=80=AFAM renmingshua=
+i <renmingshuai@huawei.com> wrote:
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > As we all know the mirred action is used to mirro=
+ring or redirecting the
+> > > > > > > > > > > > > packet it receives. Howerver, add mirred action t=
+o a filter attached to
+> > > > > > > > > > > > > a egress qdisc might cause a deadlock. To reprodu=
+ce the problem, perform
+> > > > > > > > > > > > > the following steps:
+> > > > > > > > > > > > > (1)tc qdisc add dev eth0 root handle 1: htb defau=
+lt 30 \n
+> > > > > > > > > > > > > (2)tc filter add dev eth2 protocol ip prio 2 flow=
+er verbose \
+> > > > > > > > > > > > >      action police rate 100mbit burst 12m conform=
+-exceed jump 1 \
+> > > > > > > > > > > > >      / pipe mirred egress redirect dev eth2 actio=
+n drop
+> > > > > > > > > > > > >
+> > > > > > > > > > > >
+> > > > > > > > > > > > I think you meant both to be the same device eth0 o=
+r eth2?
+> > > > > > > > > > > >
+> > > > > > > > > > > > > The stack is show as below:
+> > > > > > > > > > > > > [28848.883915]  _raw_spin_lock+0x1e/0x30
+> > > > > > > > > > > > > [28848.884367]  __dev_queue_xmit+0x160/0x850
+> > > > > > > > > > > > > [28848.884851]  ? 0xffffffffc031906a
+> > > > > > > > > > > > > [28848.885279]  tcf_mirred_act+0x3ab/0x596 [act_m=
+irred]
+> > > > > > > > > > > > > [28848.885863]  tcf_action_exec.part.0+0x88/0x130
+> > > > > > > > > > > > > [28848.886401]  fl_classify+0x1ca/0x1e0 [cls_flow=
+er]
+> > > > > > > > > > > > > [28848.886970]  ? dequeue_entity+0x145/0x9e0
+> > > > > > > > > > > > > [28848.887464]  ? newidle_balance+0x23f/0x2f0
+> > > > > > > > > > > > > [28848.887973]  ? nft_lookup_eval+0x57/0x170 [nf_=
+tables]
+> > > > > > > > > > > > > [28848.888566]  ? nft_do_chain+0xef/0x430 [nf_tab=
+les]
+> > > > > > > > > > > > > [28848.889137]  ? __flush_work.isra.0+0x35/0x80
+> > > > > > > > > > > > > [28848.889657]  ? nf_ct_get_tuple+0x1cf/0x210 [nf=
+_conntrack]
+> > > > > > > > > > > > > [28848.890293]  ? do_select+0x637/0x870
+> > > > > > > > > > > > > [28848.890735]  tcf_classify+0x52/0xf0
+> > > > > > > > > > > > > [28848.891177]  htb_classify+0x9d/0x1c0 [sch_htb]
+> > > > > > > > > > > > > [28848.891722]  htb_enqueue+0x3a/0x1c0 [sch_htb]
+> > > > > > > > > > > > > [28848.892251]  __dev_queue_xmit+0x2d8/0x850
+> > > > > > > > > > > > > [28848.892738]  ? nf_hook_slow+0x3c/0xb0
+> > > > > > > > > > > > > [28848.893198]  ip_finish_output2+0x272/0x580
+> > > > > > > > > > > > > [28848.893692]  __ip_queue_xmit+0x193/0x420
+> > > > > > > > > > > > > [28848.894179]  __tcp_transmit_skb+0x8cc/0x970
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > In this case, the process has hold the qdisc spin=
+ lock in __dev_queue_xmit
+> > > > > > > > > > > > > before the egress packets are mirred, and it will=
+ attempt to obtain the
+> > > > > > > > > > > > > spin lock again after packets are mirred, which c=
+ause a deadlock.
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > Fix the issue by forbidding assigning mirred acti=
+on to a filter attached
+> > > > > > > > > > > > > to the egress.
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > Signed-off-by: Mingshuai Ren <renmingshuai@huawei=
+.com>
+> > > > > > > > > > > > > ---
+> > > > > > > > > > > > >  net/sched/act_mirred.c                        | =
+ 4 +++
+> > > > > > > > > > > > >  .../tc-testing/tc-tests/actions/mirred.json   | =
+32 +++++++++++++++++++
+> > > > > > > > > > > > >  2 files changed, 36 insertions(+)
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > diff --git a/net/sched/act_mirred.c b/net/sched/a=
+ct_mirred.c
+> > > > > > > > > > > > > index 5b3814365924..fc96705285fb 100644
+> > > > > > > > > > > > > --- a/net/sched/act_mirred.c
+> > > > > > > > > > > > > +++ b/net/sched/act_mirred.c
+> > > > > > > > > > > > > @@ -120,6 +120,10 @@ static int tcf_mirred_init(s=
+truct net *net, struct nlattr *nla,
+> > > > > > > > > > > > >                 NL_SET_ERR_MSG_MOD(extack, "Mirre=
+d requires attributes to be passed");
+> > > > > > > > > > > > >                 return -EINVAL;
+> > > > > > > > > > > > >         }
+> > > > > > > > > > > > > +       if (tp->chain->block->q->parent !=3D TC_H=
+_INGRESS) {
+> > > > > > > > > > > > > +               NL_SET_ERR_MSG_MOD(extack, "Mirre=
+d can only be assigned to the filter attached to ingress");
+> > > > > > > > > > > > > +               return -EINVAL;
+> > > > > > > > > > > > > +       }
+> > > > > > > > > > > >
+> > > > > > > > > > > > Sorry, this is too restrictive as Jiri said. We'll =
+try to reproduce. I
+> > > > > > > > > > > > am almost certain this used to work in the old days=
+.
+> > > > > > > > > > >
+> > > > > > > > > > > Ok, i looked at old notes - it did work at "some poin=
+t" pre-tdc.
+> > > > > > > > > > > Conclusion is things broke around this time frame:
+> > > > > > > > > > > https://lore.kernel.org/netdev/1431679850-31896-1-git=
+-send-email-fw@strlen.de/
+> > > > > > > > > > > https://lore.kernel.org/netdev/1465095748.2968.45.cam=
+el@edumazet-glaptop3.roam.corp.google.com/
+> > > > > > > > > > >
+> > > > > > > > > > > Looking further into it.
+> > > > > > > > > >
+> > > > > > > > > > This is what we came up with. Eric, please take a look.=
+..
+> > > > > > > > > >
+> > > > > > > > > > cheers,
+> > > > > > > > > > jamal
+> > > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > --- a/net/core/dev.c
+> > > > > > > > > > +++ b/net/core/dev.c
+> > > > > > > > > > @@ -3789,7 +3789,14 @@ static inline int __dev_xmit_skb=
+(struct sk_buff
+> > > > > > > > > > *skb, struct Qdisc *q,
+> > > > > > > > > >         if (unlikely(contended))
+> > > > > > > > > >                 spin_lock(&q->busylock);
+> > > > > > > > > >
+> > > > > > > > > > +       if (dev_recursion_level()) {
+> > > > > > > > >
+> > > > > > > > > I am not sure what your intent is, but this seems wrong t=
+o me.
+> > > > > > > > >
+> > > > > > > >
+> > > > > > > > There is a deadlock if you reenter the same device which ha=
+s a qdisc
+> > > > > > > > attached to it more than once.
+> > > > > > > > Essentially entering __dev_xmit_skb() we grab the root qdis=
+c lock then
+> > > > > > > > run some action which requires it to grab the root qdisc lo=
+ck (again).
+> > > > > > > > This is easy to show with mirred (although i am wondering i=
+f syzkaller
+> > > > > > > > may have produced this at some point)..
+> > > > > > > > $TC qdisc add dev $DEV root handle 1: htb default 1
+> > > > > > > > $TC filter add dev $DEV protocol ip u32 match ip protocol 1=
+ 0xff
+> > > > > > > > action mirred egress mirror dev $DEV
+> > > > > > > >
+> > > > > > > > Above example is essentially egress $DEV-> egress $DEV in b=
+oth cases
+> > > > > > > > "egress $DEV" grabs the root qdisc lock. You could also cre=
+ate another
+> > > > > > > > example with egress($DEV1->$DEV2->back to $DEV1).
+> > > > > > > >
+> > > > > > > > > Some valid setup use :
+> > > > > > > > >
+> > > > > > > > > A bonding device, with HTB qdisc (or other qdisc)
+> > > > > > > > >   (This also could be a tunnel device with a qdisc)
+> > > > > > > > >
+> > > > > > > > > -> one or multiple physical NIC, wth FQ or other qdisc.
+> > > > > > > > >
+> > > > > > > > > Packets would be dropped here when we try to reach the ph=
+ysical device.
+> > > > > > > > >
+> > > > > > > >
+> > > > > > > > If you have an example handy please send it. I am trying to=
+ imagine
+> > > > > > > > how those would have worked if they have to reenter the roo=
+t qdisc of
+> > > > > > > > the same dev multiple times..
+> > > > > > >
+> > > > > > > Any virtual device like a GRE/SIT/IPIP/... tunnel, add a qdis=
+c on it ?
+> > > > > > >
+> > > > > > > dev_xmit_recursion_inc() is global (per-cpu), it is not per-d=
+evice.
+> > > > > > >
+> > > > > > > A stack of devices A -> B -> C  would elevate the recursion l=
+evel to
+> > > > > > > three just fine.
+> > > > > > >
+> > > > > > > After your patch, a stack of devices would no longer work.
+> > > > > > >
+> > > > > > > It seems mirred correctly injects packets to the top of the s=
+tack for
+> > > > > > > ingress (via netif_rx() / netif_receive_skb()),
+> > > > > > > but thinks it is okay to call dev_queue_xmit(), regardless of=
+ the context ?
+> > > > > > >
+> > > > > > > Perhaps safe-guard mirred, instead of adding more code to fas=
+t path.
+> > > > > >
+> > > > > > I agree not to penalize everybody for a "bad config" like this
+> > > > > > (surprising syzkaller hasnt caught this). But i dont see how do=
+ing the
+> > > > > > checking within mirred will catch this (we cant detect the A->B=
+->A
+> > > > > > case).
+> > > > > > I think you are suggesting a backlog-like queue for mirred? Not=
+ far
+> > > > > > off from that is how it used to work before
+> > > > > > (https://lore.kernel.org/netdev/1465095748.2968.45.camel@edumaz=
+et-glaptop3.roam.corp.google.com/)
+> > > > >
+> > > > >
+> > > > > spin_trylock() had to go. There is no way we could keep this.
+> > > > >
+> > > >
+> > > > Not asking for it to come back... just pointing out why it worked b=
+efore.
+> > > >
+> > > > > > - i.e we had a trylock for the qdisc lock and if it failed we t=
+agged
+> > > > > > the rx softirq for a reschedule. That in itself is insufficient=
+, we
+> > > > > > would need a loop check which is per-skb (which we had before
+> > > > > > https://lore.kernel.org/netdev/1431679850-31896-1-git-send-emai=
+l-fw@strlen.de/).
+> > > > > > There are other gotchas there, potentially packet reordering.
+> > > > >
+> > > > > If we want to make sure dev_queue_xmit() is called from the top (=
+no
+> > > > > spinlock held),
+> > > > > then we need a queue, serviced from another context.
+> > > > >
+> > > > > This extra queueing could happen if
+> > > > > __this_cpu_read(softnet_data.xmit.recursion) > 0
+> > > > >
+> > > >
+> > > > I dont see a way to detect softnet_data.xmit.recursion > 0 at mirre=
+d
+> > > > level. The first time we enter it will be 0.
+> > >
+> > > Then it is fine, no qdisc spinlock is held at this point.
+> > >
+> > >  The second time we would
+> > > > deadlock before we hit mirred.
+> > >
+> > > This is not how I see the trace.
+> > >
+> > > Mirred would detect that and either drop or queue the packet to a wor=
+k
+> > > queue or something.
+> > >
+> > > diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+> > > index 5b38143659249e66718348e0ec4ed3c7bc21c13d..a2c53e200629a17130f38=
+246ab3cdb8c89c6d30e
+> > > 100644
+> > > --- a/net/sched/act_mirred.c
+> > > +++ b/net/sched/act_mirred.c
+> > > @@ -237,9 +237,15 @@ tcf_mirred_forward(bool at_ingress, bool
+> > > want_ingress, struct sk_buff *skb)
+> > >  {
+> > >         int err;
+> > >
+> > > -       if (!want_ingress)
+> > > +       if (!want_ingress) {
+> > > +               if (__this_cpu_read(softnet_data.xmit.recursion) > 0)=
+ {
+> > > +                       // TODO increment a drop counter perhaps ?
+> > > +                       kfree_skb(skb);
+> > > +                       return -EINVAL;
+> > > +               }
+> > > +
+> > >                 err =3D tcf_dev_queue_xmit(skb, dev_queue_xmit);
+> > > -       else if (!at_ingress)
+> > > +       } else if (!at_ingress)
+> > >                 err =3D netif_rx(skb);
+> > >         else
+> > >                 err =3D netif_receive_skb(skb);
+> >
+> >
+> > I doubt this will work - who increments softnet_data.xmit.recursion?
+> > We enter __dev_xmit_skb (grab lock) --> qdisc_enq-->classify-->mirred
+> > (recursion is zero) which redirects entering back into  __dev_xmit_skb
+> > again and deadlocks trying to grab lock.
+> >  Maybe something is not clear to me, trying your suggestion...
+> >
+>
+> jhs@mojaone:~$
+> [   82.890330] __this_cpu_read(softnet_data.xmit.recursion) 0 in
+> tcf_mirred_forward
+> [   82.890906]
+> [   82.890906] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> [   82.890906] WARNING: possible recursive locking detected
+> [   82.890906] 6.8.0-05205-g77fadd89fe2d-dirty #213 Tainted: G        W
+> [   82.890906] --------------------------------------------
+> [   82.890906] ping/418 is trying to acquire lock:
+> [   82.890906] ffff888006994110 (&sch->q.lock){+.-.}-{3:3}, at:
+> __dev_queue_xmit+0x1778/0x3550
+> [   82.890906]
+> [   82.890906] but task is already holding lock:
+> [   82.890906] ffff888006994110 (&sch->q.lock){+.-.}-{3:3}, at:
+> __dev_queue_xmit+0x1778/0x3550
+> [   82.890906]
+> [   82.890906] other info that might help us debug this:
+> [   82.890906]  Possible unsafe locking scenario:
+> [   82.890906]
+> [   82.890906]        CPU0
+> [   82.890906]        ----
+> [   82.890906]   lock(&sch->q.lock);
+> [   82.890906]   lock(&sch->q.lock);
+> [   82.890906]
+> [   82.890906]  *** DEADLOCK ***
+> [   82.890906]
+> [..... other info removed for brevity....]
+>
+> Needs more thinking...
+> A fool proof solution is to add the per-recursion counter to be per
+> netdevice but that maybe considered blasphemy? ;->
 
-A couple of debug functions use a 512 byte temporary buffer and call another
-function that has another buffer of the same size, which in turn exceeds the
-usual warning limit for excessive stack usage:
-
-drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c:1073:1: error: stack frame size (1448) exceeds limit (1024) in 'dr_dump_start' [-Werror,-Wframe-larger-than]
-dr_dump_start(struct seq_file *file, loff_t *pos)
-drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c:1009:1: error: stack frame size (1120) exceeds limit (1024) in 'dr_dump_domain' [-Werror,-Wframe-larger-than]
-dr_dump_domain(struct seq_file *file, struct mlx5dr_domain *dmn)
-drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c:705:1: error: stack frame size (1104) exceeds limit (1024) in 'dr_dump_matcher_rx_tx' [-Werror,-Wframe-larger-than]
-dr_dump_matcher_rx_tx(struct seq_file *file, bool is_rx,
-
-Rework these so that each of the various code paths only ever has one of
-these buffers in it, and exactly the functions that declare one have
-the 'noinline_for_stack' annotation that prevents them from all being
-inlined into the same caller.
-
-Fixes: 917d1e799ddf ("net/mlx5: DR, Change SWS usage to debug fs seq_file interface")
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://lore.kernel.org/all/20240219100506.648089-1-arnd@kernel.org/
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
-[v3] no changes, sending again without a second patch
-[v2] no changes, just based on patch 1/2 but can still be applied independently
----
- .../mellanox/mlx5/core/steering/dr_dbg.c      | 82 +++++++++----------
- 1 file changed, 41 insertions(+), 41 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c
-index 64f4cc284aea..030a5776c937 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_dbg.c
-@@ -205,12 +205,11 @@ dr_dump_hex_print(char hex[DR_HEX_SIZE], char *src, u32 size)
- }
- 
- static int
--dr_dump_rule_action_mem(struct seq_file *file, const u64 rule_id,
-+dr_dump_rule_action_mem(struct seq_file *file, char *buff, const u64 rule_id,
- 			struct mlx5dr_rule_action_member *action_mem)
- {
- 	struct mlx5dr_action *action = action_mem->action;
- 	const u64 action_id = DR_DBG_PTR_TO_ID(action);
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	u64 hit_tbl_ptr, miss_tbl_ptr;
- 	u32 hit_tbl_id, miss_tbl_id;
- 	int ret;
-@@ -488,10 +487,9 @@ dr_dump_rule_action_mem(struct seq_file *file, const u64 rule_id,
- }
- 
- static int
--dr_dump_rule_mem(struct seq_file *file, struct mlx5dr_ste *ste,
-+dr_dump_rule_mem(struct seq_file *file, char *buff, struct mlx5dr_ste *ste,
- 		 bool is_rx, const u64 rule_id, u8 format_ver)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	char hw_ste_dump[DR_HEX_SIZE];
- 	u32 mem_rec_type;
- 	int ret;
-@@ -522,7 +520,8 @@ dr_dump_rule_mem(struct seq_file *file, struct mlx5dr_ste *ste,
- }
- 
- static int
--dr_dump_rule_rx_tx(struct seq_file *file, struct mlx5dr_rule_rx_tx *rule_rx_tx,
-+dr_dump_rule_rx_tx(struct seq_file *file, char *buff,
-+		   struct mlx5dr_rule_rx_tx *rule_rx_tx,
- 		   bool is_rx, const u64 rule_id, u8 format_ver)
- {
- 	struct mlx5dr_ste *ste_arr[DR_RULE_MAX_STES + DR_ACTION_MAX_STES];
-@@ -533,7 +532,7 @@ dr_dump_rule_rx_tx(struct seq_file *file, struct mlx5dr_rule_rx_tx *rule_rx_tx,
- 		return 0;
- 
- 	while (i--) {
--		ret = dr_dump_rule_mem(file, ste_arr[i], is_rx, rule_id,
-+		ret = dr_dump_rule_mem(file, buff, ste_arr[i], is_rx, rule_id,
- 				       format_ver);
- 		if (ret < 0)
- 			return ret;
-@@ -542,7 +541,8 @@ dr_dump_rule_rx_tx(struct seq_file *file, struct mlx5dr_rule_rx_tx *rule_rx_tx,
- 	return 0;
- }
- 
--static int dr_dump_rule(struct seq_file *file, struct mlx5dr_rule *rule)
-+static noinline_for_stack int
-+dr_dump_rule(struct seq_file *file, struct mlx5dr_rule *rule)
- {
- 	struct mlx5dr_rule_action_member *action_mem;
- 	const u64 rule_id = DR_DBG_PTR_TO_ID(rule);
-@@ -565,19 +565,19 @@ static int dr_dump_rule(struct seq_file *file, struct mlx5dr_rule *rule)
- 		return ret;
- 
- 	if (rx->nic_matcher) {
--		ret = dr_dump_rule_rx_tx(file, rx, true, rule_id, format_ver);
-+		ret = dr_dump_rule_rx_tx(file, buff, rx, true, rule_id, format_ver);
- 		if (ret < 0)
- 			return ret;
- 	}
- 
- 	if (tx->nic_matcher) {
--		ret = dr_dump_rule_rx_tx(file, tx, false, rule_id, format_ver);
-+		ret = dr_dump_rule_rx_tx(file, buff, tx, false, rule_id, format_ver);
- 		if (ret < 0)
- 			return ret;
- 	}
- 
- 	list_for_each_entry(action_mem, &rule->rule_actions_list, list) {
--		ret = dr_dump_rule_action_mem(file, rule_id, action_mem);
-+		ret = dr_dump_rule_action_mem(file, buff, rule_id, action_mem);
- 		if (ret < 0)
- 			return ret;
- 	}
-@@ -586,10 +586,10 @@ static int dr_dump_rule(struct seq_file *file, struct mlx5dr_rule *rule)
- }
- 
- static int
--dr_dump_matcher_mask(struct seq_file *file, struct mlx5dr_match_param *mask,
-+dr_dump_matcher_mask(struct seq_file *file, char *buff,
-+		     struct mlx5dr_match_param *mask,
- 		     u8 criteria, const u64 matcher_id)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	char dump[DR_HEX_SIZE];
- 	int ret;
- 
-@@ -681,10 +681,10 @@ dr_dump_matcher_mask(struct seq_file *file, struct mlx5dr_match_param *mask,
- }
- 
- static int
--dr_dump_matcher_builder(struct seq_file *file, struct mlx5dr_ste_build *builder,
-+dr_dump_matcher_builder(struct seq_file *file, char *buff,
-+			struct mlx5dr_ste_build *builder,
- 			u32 index, bool is_rx, const u64 matcher_id)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	int ret;
- 
- 	ret = snprintf(buff, MLX5DR_DEBUG_DUMP_BUFF_LENGTH,
-@@ -702,11 +702,10 @@ dr_dump_matcher_builder(struct seq_file *file, struct mlx5dr_ste_build *builder,
- }
- 
- static int
--dr_dump_matcher_rx_tx(struct seq_file *file, bool is_rx,
-+dr_dump_matcher_rx_tx(struct seq_file *file, char *buff, bool is_rx,
- 		      struct mlx5dr_matcher_rx_tx *matcher_rx_tx,
- 		      const u64 matcher_id)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	enum dr_dump_rec_type rec_type;
- 	u64 s_icm_addr, e_icm_addr;
- 	int i, ret;
-@@ -731,7 +730,7 @@ dr_dump_matcher_rx_tx(struct seq_file *file, bool is_rx,
- 		return ret;
- 
- 	for (i = 0; i < matcher_rx_tx->num_of_builders; i++) {
--		ret = dr_dump_matcher_builder(file,
-+		ret = dr_dump_matcher_builder(file, buff,
- 					      &matcher_rx_tx->ste_builder[i],
- 					      i, is_rx, matcher_id);
- 		if (ret < 0)
-@@ -741,7 +740,7 @@ dr_dump_matcher_rx_tx(struct seq_file *file, bool is_rx,
- 	return 0;
- }
- 
--static int
-+static noinline_for_stack int
- dr_dump_matcher(struct seq_file *file, struct mlx5dr_matcher *matcher)
- {
- 	struct mlx5dr_matcher_rx_tx *rx = &matcher->rx;
-@@ -763,19 +762,19 @@ dr_dump_matcher(struct seq_file *file, struct mlx5dr_matcher *matcher)
- 	if (ret)
- 		return ret;
- 
--	ret = dr_dump_matcher_mask(file, &matcher->mask,
-+	ret = dr_dump_matcher_mask(file, buff, &matcher->mask,
- 				   matcher->match_criteria, matcher_id);
- 	if (ret < 0)
- 		return ret;
- 
- 	if (rx->nic_tbl) {
--		ret = dr_dump_matcher_rx_tx(file, true, rx, matcher_id);
-+		ret = dr_dump_matcher_rx_tx(file, buff, true, rx, matcher_id);
- 		if (ret < 0)
- 			return ret;
- 	}
- 
- 	if (tx->nic_tbl) {
--		ret = dr_dump_matcher_rx_tx(file, false, tx, matcher_id);
-+		ret = dr_dump_matcher_rx_tx(file, buff, false, tx, matcher_id);
- 		if (ret < 0)
- 			return ret;
- 	}
-@@ -803,11 +802,10 @@ dr_dump_matcher_all(struct seq_file *file, struct mlx5dr_matcher *matcher)
- }
- 
- static int
--dr_dump_table_rx_tx(struct seq_file *file, bool is_rx,
-+dr_dump_table_rx_tx(struct seq_file *file, char *buff, bool is_rx,
- 		    struct mlx5dr_table_rx_tx *table_rx_tx,
- 		    const u64 table_id)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	enum dr_dump_rec_type rec_type;
- 	u64 s_icm_addr;
- 	int ret;
-@@ -829,7 +827,8 @@ dr_dump_table_rx_tx(struct seq_file *file, bool is_rx,
- 	return 0;
- }
- 
--static int dr_dump_table(struct seq_file *file, struct mlx5dr_table *table)
-+static noinline_for_stack int
-+dr_dump_table(struct seq_file *file, struct mlx5dr_table *table)
- {
- 	struct mlx5dr_table_rx_tx *rx = &table->rx;
- 	struct mlx5dr_table_rx_tx *tx = &table->tx;
-@@ -848,14 +847,14 @@ static int dr_dump_table(struct seq_file *file, struct mlx5dr_table *table)
- 		return ret;
- 
- 	if (rx->nic_dmn) {
--		ret = dr_dump_table_rx_tx(file, true, rx,
-+		ret = dr_dump_table_rx_tx(file, buff, true, rx,
- 					  DR_DBG_PTR_TO_ID(table));
- 		if (ret < 0)
- 			return ret;
- 	}
- 
- 	if (tx->nic_dmn) {
--		ret = dr_dump_table_rx_tx(file, false, tx,
-+		ret = dr_dump_table_rx_tx(file, buff, false, tx,
- 					  DR_DBG_PTR_TO_ID(table));
- 		if (ret < 0)
- 			return ret;
-@@ -881,10 +880,10 @@ static int dr_dump_table_all(struct seq_file *file, struct mlx5dr_table *tbl)
- }
- 
- static int
--dr_dump_send_ring(struct seq_file *file, struct mlx5dr_send_ring *ring,
-+dr_dump_send_ring(struct seq_file *file, char *buff,
-+		  struct mlx5dr_send_ring *ring,
- 		  const u64 domain_id)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	int ret;
- 
- 	ret = snprintf(buff, MLX5DR_DEBUG_DUMP_BUFF_LENGTH,
-@@ -902,13 +901,13 @@ dr_dump_send_ring(struct seq_file *file, struct mlx5dr_send_ring *ring,
- 	return 0;
- }
- 
--static noinline_for_stack int
-+static int
- dr_dump_domain_info_flex_parser(struct seq_file *file,
-+				char *buff,
- 				const char *flex_parser_name,
- 				const u8 flex_parser_value,
- 				const u64 domain_id)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	int ret;
- 
- 	ret = snprintf(buff, MLX5DR_DEBUG_DUMP_BUFF_LENGTH,
-@@ -925,11 +924,11 @@ dr_dump_domain_info_flex_parser(struct seq_file *file,
- 	return 0;
- }
- 
--static noinline_for_stack int
--dr_dump_domain_info_caps(struct seq_file *file, struct mlx5dr_cmd_caps *caps,
-+static int
-+dr_dump_domain_info_caps(struct seq_file *file, char *buff,
-+			 struct mlx5dr_cmd_caps *caps,
- 			 const u64 domain_id)
- {
--	char buff[MLX5DR_DEBUG_DUMP_BUFF_LENGTH];
- 	struct mlx5dr_cmd_vport_cap *vport_caps;
- 	unsigned long i, vports_num;
- 	int ret;
-@@ -969,34 +968,35 @@ dr_dump_domain_info_caps(struct seq_file *file, struct mlx5dr_cmd_caps *caps,
- }
- 
- static int
--dr_dump_domain_info(struct seq_file *file, struct mlx5dr_domain_info *info,
-+dr_dump_domain_info(struct seq_file *file, char *buff,
-+		    struct mlx5dr_domain_info *info,
- 		    const u64 domain_id)
- {
- 	int ret;
- 
--	ret = dr_dump_domain_info_caps(file, &info->caps, domain_id);
-+	ret = dr_dump_domain_info_caps(file, buff, &info->caps, domain_id);
- 	if (ret < 0)
- 		return ret;
- 
--	ret = dr_dump_domain_info_flex_parser(file, "icmp_dw0",
-+	ret = dr_dump_domain_info_flex_parser(file, buff, "icmp_dw0",
- 					      info->caps.flex_parser_id_icmp_dw0,
- 					      domain_id);
- 	if (ret < 0)
- 		return ret;
- 
--	ret = dr_dump_domain_info_flex_parser(file, "icmp_dw1",
-+	ret = dr_dump_domain_info_flex_parser(file, buff, "icmp_dw1",
- 					      info->caps.flex_parser_id_icmp_dw1,
- 					      domain_id);
- 	if (ret < 0)
- 		return ret;
- 
--	ret = dr_dump_domain_info_flex_parser(file, "icmpv6_dw0",
-+	ret = dr_dump_domain_info_flex_parser(file, buff, "icmpv6_dw0",
- 					      info->caps.flex_parser_id_icmpv6_dw0,
- 					      domain_id);
- 	if (ret < 0)
- 		return ret;
- 
--	ret = dr_dump_domain_info_flex_parser(file, "icmpv6_dw1",
-+	ret = dr_dump_domain_info_flex_parser(file, buff, "icmpv6_dw1",
- 					      info->caps.flex_parser_id_icmpv6_dw1,
- 					      domain_id);
- 	if (ret < 0)
-@@ -1032,12 +1032,12 @@ dr_dump_domain(struct seq_file *file, struct mlx5dr_domain *dmn)
- 	if (ret)
- 		return ret;
- 
--	ret = dr_dump_domain_info(file, &dmn->info, domain_id);
-+	ret = dr_dump_domain_info(file, buff, &dmn->info, domain_id);
- 	if (ret < 0)
- 		return ret;
- 
- 	if (dmn->info.supp_sw_steering) {
--		ret = dr_dump_send_ring(file, dmn->send_ring, domain_id);
-+		ret = dr_dump_send_ring(file, buff, dmn->send_ring, domain_id);
- 		if (ret < 0)
- 			return ret;
- 	}
--- 
-2.39.2
-
+Nope, you just have to complete the patch, moving around
+dev_xmit_recursion_inc() and dev_xmit_recursion_dec()
 
