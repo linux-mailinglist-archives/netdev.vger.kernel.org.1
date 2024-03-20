@@ -1,109 +1,111 @@
-Return-Path: <netdev+bounces-80862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 204668815A9
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 17:30:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F35368815E0
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 17:47:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF6A4282F4F
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:30:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C2CDB21A75
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:47:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A433F5579F;
-	Wed, 20 Mar 2024 16:30:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="E6r73Ipx"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC1CF69D3D;
+	Wed, 20 Mar 2024 16:47:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx2.mythic-beasts.com (mx2.mythic-beasts.com [46.235.227.24])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EABB5579A
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 16:30:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D64C187F;
+	Wed, 20 Mar 2024 16:47:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.227.24
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710952217; cv=none; b=eyc3PA3evzrurxKMBMfs/5r3F2HG2MBqVecHSaXg8qlbJTjDJQqH1QVSY2CcXSFhyy6tPv0Il+qjwkXwmnpvDcrP/fyRI9fPpxMaWRvl1GfkJKUIU2Hjvdrg5+QrSruHQFozzAwm+5M95YMcmv03FEPCbLHj2shduM7X5cG4gd4=
+	t=1710953240; cv=none; b=n6rdhA6rApr1gHPOZErXqu/xOXmq8JXaMPm4emyvMG376w3I82JakTgNHeHlUbYd2CUFT/U0PSHEArk2zVqCMk43Ymj8AUGsMpWwYzltqeNRqaw1eBxfmM/qjgVMp4jh1Ku6rMrCGHJLnqdxnz3qlGuSc5gXqPuwwEzXTIRnymU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710952217; c=relaxed/simple;
-	bh=qNnsYh7Y68Rjw/N7fSgyOG5ZuO8x+F08Ajb4ys1zsbI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IK8pO0v+M6EtOGgorBJ6eKTuyJwrWN0RflZ/VrnKVKDhIF1Fm+qe/HVAU1ThHFsqvRRBBnPijRmYltSIygbDe0315aOk1asVmrujH8vMyUUF7OfyrtxBXq0XhRQ4LtDJx2iAyNuIGL7DVf9R6SSrHJU6Pk0mNmVqKM0vMSmPdX4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=E6r73Ipx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27905C433C7
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 16:30:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710952217;
-	bh=qNnsYh7Y68Rjw/N7fSgyOG5ZuO8x+F08Ajb4ys1zsbI=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=E6r73IpxnE+MivxnWLa2S7xSVq/po6dZt7nSik9IWCcneK9K3nDPSjevSYVp+yLqv
-	 erT58Mk2Gd4XvBwAOWG17nc0vbfvW8BxH3ZvgiAEKS9AFdP1CNWDg/ItOof9lT2BPS
-	 8+TNTzmZVUy6Ld0lCJN6b3Jj991A7ZHxIu1AemLpiZqpQxxijRKQck/JfPzlgVhLbc
-	 TDlzZRie3gOvKehQQbyJrMN06qlOZ0j+6jmyW/Hb1S4YsGkNWiMDMo+f1KITtI1CJp
-	 /Vb2zxxyfUENOQBUY61y+GyOzrvLN95T45py3ch1PNHERA2L9Z3Agh8vR+H/KQwKq3
-	 Pfrr3sw3fuopQ==
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-512e39226efso68563e87.0
-        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 09:30:17 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCWnNN5ptw7VzM2PJApr5yx3/bmU+xk7vswP+bgjQxIGLQ0i+tbAWdULsRe37TLA4juKzDgEusc2gRqUtwx2juMhn6mavCsE
-X-Gm-Message-State: AOJu0YxdG3YcfkZap9gzhVYnxIS4vsjC8vi1NjO0vVYV/1TNDCgH4InL
-	FDnKO/Y4RJtGIElHJPq9Im52lJ7pfcUC7G+l8gkAXUrpJRwJ/a3MZlCtduLOGQffv7mv3NBDZMG
-	aZoEiySowoG8diNGNQdhFQ5mxIw==
-X-Google-Smtp-Source: AGHT+IE26y+BcFSBLQawYWlyO9wRRWO1a1dvrlPvlHWMEhVeXIMrgD0ydvKYbJW/6SdHCIzahkIlvXtYB7fvrRLk7y8=
-X-Received: by 2002:a05:6512:102a:b0:512:e00b:8da4 with SMTP id
- r10-20020a056512102a00b00512e00b8da4mr11822875lfr.53.1710952215507; Wed, 20
- Mar 2024 09:30:15 -0700 (PDT)
+	s=arc-20240116; t=1710953240; c=relaxed/simple;
+	bh=KB4S6lfaY4jS9DUXhlshuPyIa2efuohtTmYPcJtq7Ew=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:Message-ID:
+	 MIME-Version:Content-Type; b=sPwo2cPnYNDSKFwNUoF3awNzsqU26V7RYGJkurI1laFuy7SDXD4TLj1z2HdrE8NG8pkG6pE5B++uaeYz/bMt+7fc0jj2265IC1Mr8ouF9u9t/F+74VN549rHrQtI7wPREJh/vAVlfTbwcsgUAhAwJGrgETJOcvgNpA9jfTEd690=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jic23.retrosnub.co.uk; spf=pass smtp.mailfrom=jic23.retrosnub.co.uk; arc=none smtp.client-ip=46.235.227.24
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jic23.retrosnub.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jic23.retrosnub.co.uk
+Received: by mailhub-hex-d.mythic-beasts.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <jic23@jic23.retrosnub.co.uk>)
+	id 1rmyt8-00BNeD-Pz; Wed, 20 Mar 2024 16:34:18 +0000
+Date: Wed, 20 Mar 2024 16:33:02 +0000
+From: Jonathan Cameron <jic23@jic23.retrosnub.co.uk>
+To: Julia Lawall <julia.lawall@inria.fr>,
+ Dan Carpenter <dan.carpenter@linaro.org>
+CC: Jakub Kicinski <kuba@kernel.org>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+ Jonathan Cameron <jic23@kernel.org>
+Subject: Re: [PATCH net] ice: Fix freeing uninitialized pointers
+User-Agent: K-9 Mail for Android
+In-Reply-To: <f1bdbed9-8549-3787-bd17-ecd62851e8a@inria.fr>
+References: <77145930-e3df-4e77-a22d-04851cf3a426@moroto.mountain> <20240319124317.3c3f16cd@kernel.org> <facf5615-d7ac-4167-b23c-6bab7c123138@moroto.mountain> <f1bdbed9-8549-3787-bd17-ecd62851e8a@inria.fr>
+Message-ID: <10F403F7-E8B7-48F0-90CF-3C8A8BEB10F2@jic23.retrosnub.co.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <41c3ea1df1af4f03b2c66728af6812fb@terma.com> <20240320115433.GT185808@kernel.org>
- <342875f8-e209-456c-bbac-032a5b7de057@moroto.mountain>
-In-Reply-To: <342875f8-e209-456c-bbac-032a5b7de057@moroto.mountain>
-From: Rob Herring <robh@kernel.org>
-Date: Wed, 20 Mar 2024 11:30:02 -0500
-X-Gmail-Original-Message-ID: <CAL_JsqLep6DDecq-HonMd8HF0hD7xGB_ucbZrYUYJSx8t28fFQ@mail.gmail.com>
-Message-ID: <CAL_JsqLep6DDecq-HonMd8HF0hD7xGB_ucbZrYUYJSx8t28fFQ@mail.gmail.com>
-Subject: Re: [PATCH] net: ll_temac: platform_get_resource replaced by wrong function
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Simon Horman <horms@kernel.org>, Claus Hansen Ries <chr@terma.com>, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Michal Simek <michal.simek@amd.com>, 
-	Alex Elder <elder@linaro.org>, Wei Fang <wei.fang@nxp.com>, 
-	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@pengutronix.de>, 
-	Wang Hai <wanghai38@huawei.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
+X-BlackCat-Spam-Score: 0
 
-On Wed, Mar 20, 2024 at 10:13=E2=80=AFAM Dan Carpenter <dan.carpenter@linar=
-o.org> wrote:
+
+
+On 20 March 2024 07:32:17 GMT, Julia Lawall <julia=2Elawall@inria=2Efr> wr=
+ote:
 >
-> On Wed, Mar 20, 2024 at 11:54:33AM +0000, Simon Horman wrote:
-> > > ---
-> > >  drivers/net/ethernet/xilinx/ll_temac_main.c | 2 +-
-> > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/xilinx/ll_temac_main.c b/drivers/ne=
-t/ethernet/xilinx/ll_temac_main.c
-> > > index 9df39cf8b097..1072e2210aed 100644
-> > > --- a/drivers/net/ethernet/xilinx/ll_temac_main.c
-> > > +++ b/drivers/net/ethernet/xilinx/ll_temac_main.c
-> > > @@ -1443,7 +1443,7 @@ static int temac_probe(struct platform_device *=
-pdev)
-> > >         }
-> > >           /* map device registers */
-> > > -       lp->regs =3D devm_platform_ioremap_resource_byname(pdev, 0);
-> > > +       lp->regs =3D devm_platform_ioremap_resource(pdev, 0);
 >
-> This should have triggered a Sparse warning "warning: Using plain
-> integer as NULL pointer" but the problem is that this file does not have
-> correct endian annotations and after a certain number of warnings Sparse
-> gives up.
+>On Wed, 20 Mar 2024, Dan Carpenter wrote:
+>
+>> On Tue, Mar 19, 2024 at 12:43:17PM -0700, Jakub Kicinski wrote:
+>> > On Sat, 16 Mar 2024 12:44:40 +0300 Dan Carpenter wrote:
+>> > > -	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree);
+>> > > -	void *mac_buf __free(kfree);
+>> > > +	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) =3D NULL;
+>> > > +	void *mac_buf __free(kfree) =3D NULL;
+>> >
+>> > This is just trading one kind of bug for another, and the __free()
+>> > magic is at a cost of readability=2E
+>> >
+>> > I think we should ban the use of __free() in all of networking,
+>> > until / unless it cleanly handles the NULL init case=2E
+>>
+>> Free handles the NULL init case, it doesn't handle the uninitialized
+>> case=2E  I had previously argued that checkpatch should complain about
+>> every __free() pointer if the declaration doesn't have an assignment=2E
+>>
+>> The =3D NULL assignment is unnecessary if the pointer is assigned to
+>> something else before the first return, so this might cause "unused
+>> assignment" warnings?  I don't know if there are any tools which
+>> complain about that in that situation=2E  I think probably we should ju=
+st
+>> make that an exception and do the checkpatch thing because it's such a
+>> simple rule to implement=2E
+>
+>My understanding from Jonathan Cameron was that Linus wants a NULL always=
+,
+>unless there is an initialization with the declaration=2E
 
-It did[1] along with linker errors on s390. Just no one was CC'ed
-other than the author. I guess 0-day gave up after a while.
+I don't have thread to hand but Linus strongly preferred moving any declar=
+ation using this to
+ where it is assigned so that it was obvious that the allocator and freer =
+match=2E
 
-Rob
-
-[1] https://lore.kernel.org/all/202008070052.yH1Em3c1%25lkp@intel.com/
+Not checked if that makes sense here though=20
+>
+>julia
 
