@@ -1,437 +1,363 @@
-Return-Path: <netdev+bounces-80881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 996BF8816D0
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 18:50:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6FC08816CE
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 18:50:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0FA84B221FC
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 17:50:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 106201F21F38
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 17:50:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C6C6A8B2;
-	Wed, 20 Mar 2024 17:50:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 848666A32B;
+	Wed, 20 Mar 2024 17:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="WHdBeUjO"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dZVgSgSx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f170.google.com (mail-yb1-f170.google.com [209.85.219.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2050.outbound.protection.outlook.com [40.107.237.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 396F66A35F
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 17:50:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.170
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710957030; cv=none; b=kRSxDwCtjJe8G9NCul8MgIjJz2cY5rSAXGaK33MAdzkjSbTS/jSrk8FWxiCt8dluz1+Z5aOg9TTB/jE+kp9YAwqRCXD3/rnofSJz1YGFc3uOJtesuu18J1Xxrp/xzfVEmKEJEvzyb0h8S92BVS1kvbQJ7yieGg5JA9eAacjeN04=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710957030; c=relaxed/simple;
-	bh=UjXWUvJopG5q754nqPt8w4RVgjmeWVIEHL64qfNUAdg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AWb37CQRQMIZfDa7e82YbQ3+j8+1dX7I8eH8ltkFfVM4WOi+3FuvCWGrC7/KCxpEi3wyjENIMcMe78S9n4RxXOrGEdHs/sIk40BbRAbp0gRpTc8/DjH5sMaDv0XZWYFa9QACR36YM11Jh/QbUqW8yQSulYMSGWyPTXeilIvpYeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=WHdBeUjO; arc=none smtp.client-ip=209.85.219.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-yb1-f170.google.com with SMTP id 3f1490d57ef6-dc74e33fe1bso67701276.0
-        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 10:50:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1710957027; x=1711561827; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e6ISNMMDzXZ+r6NjIexQ9uVO/oDKNpvVF49eIPoa25o=;
-        b=WHdBeUjO+V0Kw2SXroWEufti8BwyPIsGFlpHa6XffsSpt6HXx0GdGyRMKb4ngwoyPh
-         6/JnoU/G0HZFaHzK95CsoIbUQi8Fw2ITByaGT57C6vIjoE/oflZ7bwXjq8tKoPJbQcwK
-         lU5FPIXakbBEq6cwNoSYBH21qLyS/yg/ee/WTmPlFJylRwQAaKCHdC72duiFLCsgpJML
-         /AkqS0RYnfOsKs8kDqKKaAV5Cd6vV8wquKgKBreaqjTElyskI/7biGXt5MlZLgFQRl2D
-         Z7UY2O9nCk2oA+HViGUlYfysWaYPhpTHWe7YVpoeiIrcH2vUGdmB9mXuaPAjjGgH9oiM
-         zDeg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710957027; x=1711561827;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=e6ISNMMDzXZ+r6NjIexQ9uVO/oDKNpvVF49eIPoa25o=;
-        b=BKqF77IklK1Tqt6eiNHtDXgTSHNPJ+HDDko7BWbbGl2msN5Zrf5GRni0Dd9HyzUrOe
-         mGiOoPzBRMzC7hXqmW8tLsQA1V1rYnc2lXzXX9GBfMNl75nOh9Oc8qGg08BHRf+5tH0l
-         91UxOBqMKzMj41mjKDmBm4lkaaaRkyl/H4BbKe88Bh428d0zyZxL+F4NmHq9rxu1VtE3
-         dQXy9sciJ7DesXKry3LbGH5hsyr0A5N1P2Z23tX2Q3v4BZr8R+AhqHLYt1weIJQ/y2Vv
-         gh0ZbWNLNCsJxs4KFFX08XdcVIqFyYIlQ3sFo0aeJG1cHhvNHG8N2cE8jnlPzLYlFRd8
-         D5KA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5V5Eo2HXM45x2q6oNREferxcdK7bvQ/9RYQ7ziCwRTjjoFV7uiLch9dv5AmBZzU65jQ0dTaZm3/lwI5fRnjaFtWMG00Rm
-X-Gm-Message-State: AOJu0Yz2hf/Kj4v6n5wWnvsNy9hRjlkalHwcilwQKPeYSVSztq7Vdw2i
-	MarX11OOQgT+gpM5eN9L5hu/kAOo/tOGWTcFSnuC3FRCKFAeCMkJGr+dZmb980ORrh7wYoLFxyL
-	kzn5QqE61B86UZTKPFPmMDOE9ssnBR+fSkTyy3C5zepdr5y8/rA==
-X-Google-Smtp-Source: AGHT+IEBoVHlwV2qyuagz/Vv9wCMqhRYrkAgd9xa9VleNQRIbAioTRv4gxZd6sEwjrFr2x1w0LwjEJfOoaqWol2UNP0=
-X-Received: by 2002:a25:844b:0:b0:dcd:741f:490a with SMTP id
- r11-20020a25844b000000b00dcd741f490amr5796794ybm.7.1710957026975; Wed, 20 Mar
- 2024 10:50:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 563521E516;
+	Wed, 20 Mar 2024 17:50:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1710957026; cv=fail; b=dptwgsCs/JYOX5JoNU8sZdtuTuW+xKhYxjbWn5bfALjaQgU40at76nPyXKtnwdArpDEOiXKaD1V8JLRr9fxwBs6Ih80IkYuxFWNZH4Dp/4FPuBXFh0kUdO4G+6aomEDsg/MkMNfgY3PljooiQlyEzXGSxJJA0iinas9COwGSkjM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1710957026; c=relaxed/simple;
+	bh=YgdLAPw1w+bR0B9drNL4kTgBBfIPXEeVPRbmhd4xzc8=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=r0C2g2o4uZuoHkM5i1WflXJ6GlJ+SQfKK699vNhkSd0MH18o0WonWHcIuYuSf+wiU5iOKtuPDPDfZYHwo/PCXaqcl12C5TkDDE0lGF8ZIi92j5ccvTG5IwYMAa4s7oH7DBbtsp190y0EYEs8VTRXjF2sPhCVHmzbpSitce+KzLY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dZVgSgSx; arc=fail smtp.client-ip=40.107.237.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jQ1Lqd3Fn8MuG7g6EmIa+4cVJMwLCX/crnYGI5635dzKkJP3Cl3fqbGvAw+m2cfHqfWINeBF+iUdOx8YXkebEBkNueqGWNwDj5MBtcKT/qncQqR2v1C2TSng/grbiI79igV3JwTGvUq9RDHe1lnYORmhd5OOOPXwWX5VnslAhA9M47yiPsDJkUnojH3BRu4a3uSb0QGsDt2z+F0qKki2LmcXPxRjcc6H0DQpkDlZ9cxS/xM68/v/0qhXqSo6r3rpffyRQ6DV0oGi+fC6YJSnmdxP/JlIrBmeopFYpLR9ZgdXdJVjSMH98ElHhiM3dcbDa1s86X4oRGOEpHeypteoMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vtqbt90lXGYUsq315/bJOO7FwYsUFLC96geFQCIOJwY=;
+ b=SJqcIucg1GPtTSvR4cTVrTVa0W3JTpdzESy3K6k/6VTd6Og/e/bud940WCFwVHHHnXHRnu+WXJIRyqE8Sksemtxfaunn3viw5UUgR0bBhRcB+LYpvc6nmkBpGVhg9xuMno8PUPwoL6ZsOg5XBIW9FeEXsyw+xoyRt0zplCSlIJwOWyJzmU+UG70L6YUoasgzxPnVfW2nSRm8iT0QHh68gHv2mm2kB9ayTwRbCTkA1VSMxO9EAjE19ovW46SDT6kP8/NZlrjNV+EA+wdxY5aBAxp0crEnr2tJcoR1Raggi7E9/C40QPgCLXug5h3ekwSJy1CLNJXFceb9tbW6aqeJPQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vtqbt90lXGYUsq315/bJOO7FwYsUFLC96geFQCIOJwY=;
+ b=dZVgSgSxNNgjwqmLfLUHpdmwCASFx73XqBwHgMHSWHKaMf0RSct1EMpKFxGC6JY7EYCy8XUyz49Mq/k1OO0V8/5/Y7Ze4/Q42nvlOpjOf9RH+p1iWxH/KL41equ60Ux0U/6v2cSvo8jjRHFd1g21FOzK1/sqxQVME5E3PkNEc5g3pk2qDsNcinE0Ba6Mg/tg/B7lRDCNnEFNp4te+637N6+Ga3m9vh3DLRd9XgaOowH1TQ66UEx/XTQe6wFm94KBzAx0qor7wDi1EkwboiSzXGlAqq5gBrYB3mU2XlYE5EoHm870+YPwrrgomalg3aJTiGdTka9XX+yh9AkaorfZAA==
+Received: from DM6PR12MB5534.namprd12.prod.outlook.com (2603:10b6:5:20b::9) by
+ IA0PR12MB8280.namprd12.prod.outlook.com (2603:10b6:208:3df::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.30; Wed, 20 Mar
+ 2024 17:50:20 +0000
+Received: from DM6PR12MB5534.namprd12.prod.outlook.com
+ ([fe80::4578:4ad4:b52f:3b0]) by DM6PR12MB5534.namprd12.prod.outlook.com
+ ([fe80::4578:4ad4:b52f:3b0%7]) with mapi id 15.20.7386.031; Wed, 20 Mar 2024
+ 17:50:19 +0000
+From: David Thompson <davthompson@nvidia.com>
+To: Jiri Pirko <jiri@resnulli.us>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "u.kleine-koenig@pengutronix.de"
+	<u.kleine-koenig@pengutronix.de>, "leon@kernel.org" <leon@kernel.org>, Asmaa
+ Mnebhi <asmaa@nvidia.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: RE: [PATCH net v2] mlxbf_gige: call request_irq() after NAPI
+ initialized
+Thread-Topic: [PATCH net v2] mlxbf_gige: call request_irq() after NAPI
+ initialized
+Thread-Index: AQHaeinA+nVQDKBrM0eX1paqrbZKw7FAkM2AgABYTRA=
+Date: Wed, 20 Mar 2024 17:50:19 +0000
+Message-ID:
+ <DM6PR12MB5534C61A0BE655B4BE072D9EC7332@DM6PR12MB5534.namprd12.prod.outlook.com>
+References: <20240319181732.12878-1-davthompson@nvidia.com>
+ <ZfrXL8yKhxduWm9D@nanopsycho>
+In-Reply-To: <ZfrXL8yKhxduWm9D@nanopsycho>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR12MB5534:EE_|IA0PR12MB8280:EE_
+x-ms-office365-filtering-correlation-id: 49c81b5f-d74a-43d5-1393-08dc49063596
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ jhhym/iyC9t1Sn6rlZUsGEhH4rJQzVSRtyByPIoCT9Q+tLDbq9f200+QCDOoUN/k1KF9z+DEAzWLGUOhphzL5vMyo4VXpBzJTL4jXQ5yA5azIf7b1F3BxUizx4X2MkN9G2tN74GXgxm6hVXQ16TusE1VpX0H30jqMSYmChHKGyInfDa8uLrFfm9RpzNYJWhuTX45O59luWkwr9reaQj300XTE+CwaJnr9qLW1x9/+TzBLwpvH+wgAB+w/sftHC8ygI/g1SA7Dn5R/WNEmaU95nVrnaNgmlkII34gQOo4PFbk+OGvt35Y2jiCdPGia0kdHY8Ph/Xew0LADKRVeMv/dwcur4QjmLm2OAjHZNZYFu5ExL4hQThCLW9P+IQ3X62ggKoBliqEkpNvfJ6Jhmr/evGCJsLoA13SSLBFvvOluu22SFCt1OAQv96iZNjQPGb8FaJErkB9L8/v6lZ91kVXpQBSKg27I+vAkZcrnR89B9Qhf+ZLXe0INrGEjoO6GyzRT7xdJQej1IRFOr3OhUOO0A5c1iojygRyGwy9S8CbEmWgD9S9rSF7g/th0ra88ut5kJrJGxQGwjJakbM7d7CcaAsYRci7OFk4/YrJc2t0QssNvSdvSjP7NVQ09EGeJrnLSwEBI5RFJGPx1ddONZiHGq3oSTdgtj5TdE4eKRm6lIZLbMClh0xdkzmIw0LHol4i417KD0/x0RHOD6RMm6vQeMrmWpF5l67cgN2zhPGOuUQ=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB5534.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?/24vc1Oq0iJAREdhLu+GaHm740FPQ4FY0beYdDAmP5ZZ1zSx9Lt6icWBNAKf?=
+ =?us-ascii?Q?6/9ARLnZ7eMOsDbckx0lOFLfuGNyJCyNFiuDjCeO4UHpZaLDHox3jw6jwOHL?=
+ =?us-ascii?Q?h3tx7t3H3+qGO0rAgFa2hOSCnn0xdNZKkKW+gCLUVlDUbOOeP3KkkNx6AXkH?=
+ =?us-ascii?Q?3xOyI7HwgcinjRKbAKAlgiFnNvLy30XJxsqKzWk0E7azX1rA1bED5brDktRY?=
+ =?us-ascii?Q?LXFkHwo5AGYRM7ywNWYOgxJhsi2JwsW+eoUfRCcHTdrIt045yI2UItob1/m4?=
+ =?us-ascii?Q?iEOXtAeZaO5gArBJDqU2c8emVZ69KlSS/J0m/2ksq1fLA24fvHy6PN9Vwwrz?=
+ =?us-ascii?Q?8HfK4mvgkgrfRnY9gVnnaCieMq1ECW/qnx+cG6mIYFjr2NbKQdodMbb2gwYD?=
+ =?us-ascii?Q?cjSbLIug4wU0zHaS8ZQl9UhjV+dvG8pLocxfbooF3eweyUwS1NvWNH+lLEw2?=
+ =?us-ascii?Q?tvBMGmTnn8GaDms+LVLgAujTcz75twYDcsP8A7BEvyU1pA2aBiPfdp3tfNJn?=
+ =?us-ascii?Q?sRMdBDRSIHSOiXRY9eL44+s7naMXm/2fSn/7jOEY5VmXuojaCAAMY9x7uFJh?=
+ =?us-ascii?Q?GOn3uMWWjDmdvSGh5W5UpoW08IG2Bx8MIVXYXfVo8m3h7hWyBRfHamrFkQ+D?=
+ =?us-ascii?Q?oRFUvNMMZqwhkC+hhrSq4a5R02UUXzegRtQFRMqkrW1SBXlaHHN+lNNSjufD?=
+ =?us-ascii?Q?nQv8ZZirVQ9P3sec2SfFvOTr0/e3/KCroVbDlcf4rue4EDg1REtjuiPOOP/k?=
+ =?us-ascii?Q?CadHzzl/5NuFLMmsZV9nDM/wBQmBGwZQygmfOdzKstHgHjgyxhscbIBMfp3+?=
+ =?us-ascii?Q?rxK0OYl/rAUIEo/vdnpztwniCU15ysMAgHyKQ3xKM9VnFStuo7Aq3SpJVXjT?=
+ =?us-ascii?Q?sUT/4Yhux5KvIwSqJ0Xs+JDGT5wdPMBmLG7ZkwmVReMZ7E9ZYADdY95Oi/nK?=
+ =?us-ascii?Q?2oRH8h3To7Df/v7jYtT6XzmMloiWt5KUrebQZ+ZPddGiZwz+woCxBeY8y8eg?=
+ =?us-ascii?Q?y4Ycuv8xxBDdgZSJW+xSk8ib9uvZQrquPVnrDxQp9TT1q/gWmDBd6eyVigXZ?=
+ =?us-ascii?Q?eMvoAG/ezU2X5epKK1KxOVI8j1CAH6e9tlt6Ou2MRJ43XfbP56fLON9jDDGr?=
+ =?us-ascii?Q?v50C8dDT2sS5kGM6nR/sHkeZXbPAMAZTOpbDj6yMw9QGNJTPDcOFKdTI7/N8?=
+ =?us-ascii?Q?JNZVhz9wgrTdf5f2TH0Qd7bfBET5CDIO6/iJ1I5sLbSKWa7wnOxgf4nxI0bZ?=
+ =?us-ascii?Q?HKifDTwczyLlp582EhiZTe2tbq6NY4y1lKUVC1YL5TZA7k9b2WGMprBzsIlV?=
+ =?us-ascii?Q?TbLXAuA1mIGCWwR4h8khXC6XKhn3evvFDUj+iPIsNJEJ2tAKEmB9zMMus6TT?=
+ =?us-ascii?Q?E1k5Rzc994yNarE4GTAgBzF21+ed+Z8cK0Xs1kIGZTeHyJtcka9J0WmhORVO?=
+ =?us-ascii?Q?bTL7nPz9nu9hG+Otv2Vx4NrPxnjY3/58Wb3yXVtpX19v3/P8Y6vUEHjjIjXc?=
+ =?us-ascii?Q?kqhgEoFhhLWK8mKk/uONRbJbvbUclzF6N1WJ3V4vZrETsUuF+IlvPXUExPTX?=
+ =?us-ascii?Q?3fpkQMPqJq2Rtu5bBF6XxdOUMtxfJcg38tb/TvnP?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240314111713.5979-1-renmingshuai@huawei.com>
- <CAM0EoMmqVHGC4_YVHj=rUPj+XBS_N99rCKk1S7wCi1wJ8__Pyw@mail.gmail.com>
- <CAM0EoMkZKvvPVaCGFVTE_P1YCyS-r2b3gq3QRhDuEF=Cm-sY4g@mail.gmail.com>
- <CAM0EoMm+W3X7TG8qjb8LWsBbAQ8_rntr7kwhSTy7Sxk=Yj=R2g@mail.gmail.com>
- <CANn89iL_hfoWTqr+KaKZoO8fKoZdd-xcY040NeSb-WL7pHMLGQ@mail.gmail.com>
- <CAM0EoMkqhmDtpg09ktnkxjAtddvXzwQo4Qh2-LX2r8iqrECogw@mail.gmail.com>
- <CANn89iK2e4csrApZjY+kpR9TwaFpN9rcbRSPtyQnw5P_qkyYfA@mail.gmail.com>
- <CAM0EoMkDexWQ_Rj_=gKMhWzSgQqtbAdyDv8DXgY+nk_2Rp3drg@mail.gmail.com>
- <CANn89iLuYjQGrutsN17t2QARGzn-PY7rscTeHSi0zsWcO-tbTA@mail.gmail.com>
- <CAM0EoM=WCLvjCxkDGSEP-+NqEd2HnieiW8emNoV1LeV6n6w9VQ@mail.gmail.com>
- <CANn89iLjK3vf-yHvKdY=wvOdEeWubB0jt2=5d-1m7dkTYBwBOg@mail.gmail.com> <CAM0EoMmYiwDPEqo6TrZ9dWbVdv2Ry3Yz8W-p9u+s6=ZAtZOWhw@mail.gmail.com>
-In-Reply-To: <CAM0EoMmYiwDPEqo6TrZ9dWbVdv2Ry3Yz8W-p9u+s6=ZAtZOWhw@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 20 Mar 2024 13:50:15 -0400
-Message-ID: <CAM0EoMnddJgPYR75qTfxAdKsN3-bRuqXrDMxuwAa3y95iahWFQ@mail.gmail.com>
-Subject: Re: [PATCH] net/sched: Forbid assigning mirred action to a filter
- attached to the egress
-To: Eric Dumazet <edumazet@google.com>
-Cc: renmingshuai <renmingshuai@huawei.com>, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
-	davem@davemloft.net, vladbu@nvidia.com, netdev@vger.kernel.org, 
-	yanan@huawei.com, liaichun@huawei.com, caowangbao@huawei.com, 
-	Eric Dumazet <eric.dumazet@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Davide Caratti <dcaratti@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB5534.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 49c81b5f-d74a-43d5-1393-08dc49063596
+X-MS-Exchange-CrossTenant-originalarrivaltime: 20 Mar 2024 17:50:19.7131
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 8TkdHtdrlez5TAtvdBDcu9a7HvT4MdvdFudgUYC/WyYc5nqE2zrxY5BCdV+nkKL6i58rCz7aDsoopj/CuKeuwA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8280
 
-On Wed, Mar 20, 2024 at 1:31=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
- wrote:
->
-> On Wed, Mar 20, 2024 at 12:58=E2=80=AFPM Eric Dumazet <edumazet@google.co=
-m> wrote:
+> -----Original Message-----
+> From: Jiri Pirko <jiri@resnulli.us>
+> Sent: Wednesday, March 20, 2024 8:32 AM
+> To: David Thompson <davthompson@nvidia.com>
+> Cc: davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> pabeni@redhat.com; u.kleine-koenig@pengutronix.de; leon@kernel.org; Asmaa
+> Mnebhi <asmaa@nvidia.com>; netdev@vger.kernel.org; linux-
+> kernel@vger.kernel.org
+> Subject: Re: [PATCH net v2] mlxbf_gige: call request_irq() after NAPI ini=
+tialized
+>=20
+> Tue, Mar 19, 2024 at 07:17:32PM CET, davthompson@nvidia.com wrote:
+> >The mlxbf_gige driver encounters a NULL pointer exception in
+> >mlxbf_gige_open() when kdump is enabled.  The sequence to reproduce the
+> >exception is as follows:
+> >a) enable kdump
+> >b) trigger kdump via "echo c > /proc/sysrq-trigger"
+> >c) kdump kernel executes
+> >d) kdump kernel loads mlxbf_gige module
+> >e) the mlxbf_gige module runs its open() as the
+> >   the "oob_net0" interface is brought up
+> >f) mlxbf_gige module will experience an exception
+> >   during its open(), something like:
 > >
-> > On Tue, Mar 19, 2024 at 9:54=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.=
-com> wrote:
-> > >
-> > > On Tue, Mar 19, 2024 at 5:38=E2=80=AFAM Eric Dumazet <edumazet@google=
-.com> wrote:
-> > > >
-> > > > On Mon, Mar 18, 2024 at 11:05=E2=80=AFPM Jamal Hadi Salim <jhs@moja=
-tatu.com> wrote:
-> > > > >
-> > > > > On Mon, Mar 18, 2024 at 3:11=E2=80=AFPM Eric Dumazet <edumazet@go=
-ogle.com> wrote:
-> > > > > >
-> > > > > > On Mon, Mar 18, 2024 at 6:36=E2=80=AFPM Jamal Hadi Salim <jhs@m=
-ojatatu.com> wrote:
-> > > > > > >
-> > > > > > > On Mon, Mar 18, 2024 at 11:46=E2=80=AFAM Eric Dumazet <edumaz=
-et@google.com> wrote:
-> > > > > > > >
-> > > > > > > > On Mon, Mar 18, 2024 at 3:27=E2=80=AFPM Jamal Hadi Salim <j=
-hs@mojatatu.com> wrote:
-> > > > > > > > >
-> > > > > > > > > On Sun, Mar 17, 2024 at 12:10=E2=80=AFPM Jamal Hadi Salim=
- <jhs@mojatatu.com> wrote:
-> > > > > > > > > >
-> > > > > > > > > > On Thu, Mar 14, 2024 at 1:14=E2=80=AFPM Jamal Hadi Sali=
-m <jhs@mojatatu.com> wrote:
-> > > > > > > > > > >
-> > > > > > > > > > > On Thu, Mar 14, 2024 at 7:18=E2=80=AFAM renmingshuai =
-<renmingshuai@huawei.com> wrote:
-> > > > > > > > > > > >
-> > > > > > > > > > > > As we all know the mirred action is used to mirrori=
-ng or redirecting the
-> > > > > > > > > > > > packet it receives. Howerver, add mirred action to =
-a filter attached to
-> > > > > > > > > > > > a egress qdisc might cause a deadlock. To reproduce=
- the problem, perform
-> > > > > > > > > > > > the following steps:
-> > > > > > > > > > > > (1)tc qdisc add dev eth0 root handle 1: htb default=
- 30 \n
-> > > > > > > > > > > > (2)tc filter add dev eth2 protocol ip prio 2 flower=
- verbose \
-> > > > > > > > > > > >      action police rate 100mbit burst 12m conform-e=
-xceed jump 1 \
-> > > > > > > > > > > >      / pipe mirred egress redirect dev eth2 action =
-drop
-> > > > > > > > > > > >
-> > > > > > > > > > >
-> > > > > > > > > > > I think you meant both to be the same device eth0 or =
-eth2?
-> > > > > > > > > > >
-> > > > > > > > > > > > The stack is show as below:
-> > > > > > > > > > > > [28848.883915]  _raw_spin_lock+0x1e/0x30
-> > > > > > > > > > > > [28848.884367]  __dev_queue_xmit+0x160/0x850
-> > > > > > > > > > > > [28848.884851]  ? 0xffffffffc031906a
-> > > > > > > > > > > > [28848.885279]  tcf_mirred_act+0x3ab/0x596 [act_mir=
-red]
-> > > > > > > > > > > > [28848.885863]  tcf_action_exec.part.0+0x88/0x130
-> > > > > > > > > > > > [28848.886401]  fl_classify+0x1ca/0x1e0 [cls_flower=
-]
-> > > > > > > > > > > > [28848.886970]  ? dequeue_entity+0x145/0x9e0
-> > > > > > > > > > > > [28848.887464]  ? newidle_balance+0x23f/0x2f0
-> > > > > > > > > > > > [28848.887973]  ? nft_lookup_eval+0x57/0x170 [nf_ta=
-bles]
-> > > > > > > > > > > > [28848.888566]  ? nft_do_chain+0xef/0x430 [nf_table=
-s]
-> > > > > > > > > > > > [28848.889137]  ? __flush_work.isra.0+0x35/0x80
-> > > > > > > > > > > > [28848.889657]  ? nf_ct_get_tuple+0x1cf/0x210 [nf_c=
-onntrack]
-> > > > > > > > > > > > [28848.890293]  ? do_select+0x637/0x870
-> > > > > > > > > > > > [28848.890735]  tcf_classify+0x52/0xf0
-> > > > > > > > > > > > [28848.891177]  htb_classify+0x9d/0x1c0 [sch_htb]
-> > > > > > > > > > > > [28848.891722]  htb_enqueue+0x3a/0x1c0 [sch_htb]
-> > > > > > > > > > > > [28848.892251]  __dev_queue_xmit+0x2d8/0x850
-> > > > > > > > > > > > [28848.892738]  ? nf_hook_slow+0x3c/0xb0
-> > > > > > > > > > > > [28848.893198]  ip_finish_output2+0x272/0x580
-> > > > > > > > > > > > [28848.893692]  __ip_queue_xmit+0x193/0x420
-> > > > > > > > > > > > [28848.894179]  __tcp_transmit_skb+0x8cc/0x970
-> > > > > > > > > > > >
-> > > > > > > > > > > > In this case, the process has hold the qdisc spin l=
-ock in __dev_queue_xmit
-> > > > > > > > > > > > before the egress packets are mirred, and it will a=
-ttempt to obtain the
-> > > > > > > > > > > > spin lock again after packets are mirred, which cau=
-se a deadlock.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Fix the issue by forbidding assigning mirred action=
- to a filter attached
-> > > > > > > > > > > > to the egress.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Signed-off-by: Mingshuai Ren <renmingshuai@huawei.c=
-om>
-> > > > > > > > > > > > ---
-> > > > > > > > > > > >  net/sched/act_mirred.c                        |  4=
- +++
-> > > > > > > > > > > >  .../tc-testing/tc-tests/actions/mirred.json   | 32=
- +++++++++++++++++++
-> > > > > > > > > > > >  2 files changed, 36 insertions(+)
-> > > > > > > > > > > >
-> > > > > > > > > > > > diff --git a/net/sched/act_mirred.c b/net/sched/act=
-_mirred.c
-> > > > > > > > > > > > index 5b3814365924..fc96705285fb 100644
-> > > > > > > > > > > > --- a/net/sched/act_mirred.c
-> > > > > > > > > > > > +++ b/net/sched/act_mirred.c
-> > > > > > > > > > > > @@ -120,6 +120,10 @@ static int tcf_mirred_init(str=
-uct net *net, struct nlattr *nla,
-> > > > > > > > > > > >                 NL_SET_ERR_MSG_MOD(extack, "Mirred =
-requires attributes to be passed");
-> > > > > > > > > > > >                 return -EINVAL;
-> > > > > > > > > > > >         }
-> > > > > > > > > > > > +       if (tp->chain->block->q->parent !=3D TC_H_I=
-NGRESS) {
-> > > > > > > > > > > > +               NL_SET_ERR_MSG_MOD(extack, "Mirred =
-can only be assigned to the filter attached to ingress");
-> > > > > > > > > > > > +               return -EINVAL;
-> > > > > > > > > > > > +       }
-> > > > > > > > > > >
-> > > > > > > > > > > Sorry, this is too restrictive as Jiri said. We'll tr=
-y to reproduce. I
-> > > > > > > > > > > am almost certain this used to work in the old days.
-> > > > > > > > > >
-> > > > > > > > > > Ok, i looked at old notes - it did work at "some point"=
- pre-tdc.
-> > > > > > > > > > Conclusion is things broke around this time frame:
-> > > > > > > > > > https://lore.kernel.org/netdev/1431679850-31896-1-git-s=
-end-email-fw@strlen.de/
-> > > > > > > > > > https://lore.kernel.org/netdev/1465095748.2968.45.camel=
-@edumazet-glaptop3.roam.corp.google.com/
-> > > > > > > > > >
-> > > > > > > > > > Looking further into it.
-> > > > > > > > >
-> > > > > > > > > This is what we came up with. Eric, please take a look...
-> > > > > > > > >
-> > > > > > > > > cheers,
-> > > > > > > > > jamal
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > > --- a/net/core/dev.c
-> > > > > > > > > +++ b/net/core/dev.c
-> > > > > > > > > @@ -3789,7 +3789,14 @@ static inline int __dev_xmit_skb(s=
-truct sk_buff
-> > > > > > > > > *skb, struct Qdisc *q,
-> > > > > > > > >         if (unlikely(contended))
-> > > > > > > > >                 spin_lock(&q->busylock);
-> > > > > > > > >
-> > > > > > > > > +       if (dev_recursion_level()) {
-> > > > > > > >
-> > > > > > > > I am not sure what your intent is, but this seems wrong to =
-me.
-> > > > > > > >
-> > > > > > >
-> > > > > > > There is a deadlock if you reenter the same device which has =
-a qdisc
-> > > > > > > attached to it more than once.
-> > > > > > > Essentially entering __dev_xmit_skb() we grab the root qdisc =
-lock then
-> > > > > > > run some action which requires it to grab the root qdisc lock=
- (again).
-> > > > > > > This is easy to show with mirred (although i am wondering if =
-syzkaller
-> > > > > > > may have produced this at some point)..
-> > > > > > > $TC qdisc add dev $DEV root handle 1: htb default 1
-> > > > > > > $TC filter add dev $DEV protocol ip u32 match ip protocol 1 0=
-xff
-> > > > > > > action mirred egress mirror dev $DEV
-> > > > > > >
-> > > > > > > Above example is essentially egress $DEV-> egress $DEV in bot=
-h cases
-> > > > > > > "egress $DEV" grabs the root qdisc lock. You could also creat=
-e another
-> > > > > > > example with egress($DEV1->$DEV2->back to $DEV1).
-> > > > > > >
-> > > > > > > > Some valid setup use :
-> > > > > > > >
-> > > > > > > > A bonding device, with HTB qdisc (or other qdisc)
-> > > > > > > >   (This also could be a tunnel device with a qdisc)
-> > > > > > > >
-> > > > > > > > -> one or multiple physical NIC, wth FQ or other qdisc.
-> > > > > > > >
-> > > > > > > > Packets would be dropped here when we try to reach the phys=
-ical device.
-> > > > > > > >
-> > > > > > >
-> > > > > > > If you have an example handy please send it. I am trying to i=
-magine
-> > > > > > > how those would have worked if they have to reenter the root =
-qdisc of
-> > > > > > > the same dev multiple times..
-> > > > > >
-> > > > > > Any virtual device like a GRE/SIT/IPIP/... tunnel, add a qdisc =
-on it ?
-> > > > > >
-> > > > > > dev_xmit_recursion_inc() is global (per-cpu), it is not per-dev=
-ice.
-> > > > > >
-> > > > > > A stack of devices A -> B -> C  would elevate the recursion lev=
-el to
-> > > > > > three just fine.
-> > > > > >
-> > > > > > After your patch, a stack of devices would no longer work.
-> > > > > >
-> > > > > > It seems mirred correctly injects packets to the top of the sta=
-ck for
-> > > > > > ingress (via netif_rx() / netif_receive_skb()),
-> > > > > > but thinks it is okay to call dev_queue_xmit(), regardless of t=
-he context ?
-> > > > > >
-> > > > > > Perhaps safe-guard mirred, instead of adding more code to fast =
-path.
-> > > > >
-> > > > > I agree not to penalize everybody for a "bad config" like this
-> > > > > (surprising syzkaller hasnt caught this). But i dont see how doin=
-g the
-> > > > > checking within mirred will catch this (we cant detect the A->B->=
-A
-> > > > > case).
-> > > > > I think you are suggesting a backlog-like queue for mirred? Not f=
-ar
-> > > > > off from that is how it used to work before
-> > > > > (https://lore.kernel.org/netdev/1465095748.2968.45.camel@edumazet=
--glaptop3.roam.corp.google.com/)
-> > > >
-> > > >
-> > > > spin_trylock() had to go. There is no way we could keep this.
-> > > >
-> > >
-> > > Not asking for it to come back... just pointing out why it worked bef=
-ore.
-> > >
-> > > > > - i.e we had a trylock for the qdisc lock and if it failed we tag=
-ged
-> > > > > the rx softirq for a reschedule. That in itself is insufficient, =
-we
-> > > > > would need a loop check which is per-skb (which we had before
-> > > > > https://lore.kernel.org/netdev/1431679850-31896-1-git-send-email-=
-fw@strlen.de/).
-> > > > > There are other gotchas there, potentially packet reordering.
-> > > >
-> > > > If we want to make sure dev_queue_xmit() is called from the top (no
-> > > > spinlock held),
-> > > > then we need a queue, serviced from another context.
-> > > >
-> > > > This extra queueing could happen if
-> > > > __this_cpu_read(softnet_data.xmit.recursion) > 0
-> > > >
-> > >
-> > > I dont see a way to detect softnet_data.xmit.recursion > 0 at mirred
-> > > level. The first time we enter it will be 0.
+> >     Unable to handle kernel NULL pointer dereference at virtual address
+> 0000000000000000
+> >     Mem abort info:
+> >       ESR =3D 0x0000000086000004
+> >       EC =3D 0x21: IABT (current EL), IL =3D 32 bits
+> >       SET =3D 0, FnV =3D 0
+> >       EA =3D 0, S1PTW =3D 0
+> >       FSC =3D 0x04: level 0 translation fault
+> >     user pgtable: 4k pages, 48-bit VAs, pgdp=3D00000000e29a4000
+> >     [0000000000000000] pgd=3D0000000000000000, p4d=3D0000000000000000
+> >     Internal error: Oops: 0000000086000004 [#1] SMP
+> >     CPU: 0 PID: 812 Comm: NetworkManager Tainted: G           OE     5.=
+15.0-1035-
+> bluefield #37-Ubuntu
+> >     Hardware name: https://www.mellanox.com BlueField-3 SmartNIC Main
+> Card/BlueField-3 SmartNIC Main Card, BIOS 4.6.0.13024 Jan 19 2024
+> >     pstate: 80400009 (Nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=3D--)
+> >     pc : 0x0
+> >     lr : __napi_poll+0x40/0x230
+> >     sp : ffff800008003e00
+> >     x29: ffff800008003e00 x28: 0000000000000000 x27: 00000000ffffffff
+> >     x26: ffff000066027238 x25: ffff00007cedec00 x24: ffff800008003ec8
+> >     x23: 000000000000012c x22: ffff800008003eb7 x21: 0000000000000000
+> >     x20: 0000000000000001 x19: ffff000066027238 x18: 0000000000000000
+> >     x17: ffff578fcb450000 x16: ffffa870b083c7c0 x15: 0000aaab010441d0
+> >     x14: 0000000000000001 x13: 00726f7272655f65 x12: 6769675f6662786c
+> >     x11: 0000000000000000 x10: 0000000000000000 x9 : ffffa870b0842398
+> >     x8 : 0000000000000004 x7 : fe5a48b9069706ea x6 : 17fdb11fc84ae0d2
+> >     x5 : d94a82549d594f35 x4 : 0000000000000000 x3 : 0000000000400100
+> >     x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff000066027238
+> >     Call trace:
+> >      0x0
+> >      net_rx_action+0x178/0x360
+> >      __do_softirq+0x15c/0x428
+> >      __irq_exit_rcu+0xac/0xec
+> >      irq_exit+0x18/0x2c
+> >      handle_domain_irq+0x6c/0xa0
+> >      gic_handle_irq+0xec/0x1b0
+> >      call_on_irq_stack+0x20/0x2c
+> >      do_interrupt_handler+0x5c/0x70
+> >      el1_interrupt+0x30/0x50
+> >      el1h_64_irq_handler+0x18/0x2c
+> >      el1h_64_irq+0x7c/0x80
+> >      __setup_irq+0x4c0/0x950
+> >      request_threaded_irq+0xf4/0x1bc
+> >      mlxbf_gige_request_irqs+0x68/0x110 [mlxbf_gige]
+> >      mlxbf_gige_open+0x5c/0x170 [mlxbf_gige]
+> >      __dev_open+0x100/0x220
+> >      __dev_change_flags+0x16c/0x1f0
+> >      dev_change_flags+0x2c/0x70
+> >      do_setlink+0x220/0xa40
+> >      __rtnl_newlink+0x56c/0x8a0
+> >      rtnl_newlink+0x58/0x84
+> >      rtnetlink_rcv_msg+0x138/0x3c4
+> >      netlink_rcv_skb+0x64/0x130
+> >      rtnetlink_rcv+0x20/0x30
+> >      netlink_unicast+0x2ec/0x360
+> >      netlink_sendmsg+0x278/0x490
+> >      __sock_sendmsg+0x5c/0x6c
+> >      ____sys_sendmsg+0x290/0x2d4
+> >      ___sys_sendmsg+0x84/0xd0
+> >      __sys_sendmsg+0x70/0xd0
+> >      __arm64_sys_sendmsg+0x2c/0x40
+> >      invoke_syscall+0x78/0x100
+> >      el0_svc_common.constprop.0+0x54/0x184
+> >      do_el0_svc+0x30/0xac
+> >      el0_svc+0x48/0x160
+> >      el0t_64_sync_handler+0xa4/0x12c
+> >      el0t_64_sync+0x1a4/0x1a8
+> >     Code: bad PC value
+> >     ---[ end trace 7d1c3f3bf9d81885 ]---
+> >     Kernel panic - not syncing: Oops: Fatal exception in interrupt
+> >     Kernel Offset: 0x2870a7a00000 from 0xffff800008000000
+> >     PHYS_OFFSET: 0x80000000
+> >     CPU features: 0x0,000005c1,a3332a5a
+> >     Memory Limit: none
+> >     ---[ end Kernel panic - not syncing: Oops: Fatal exception in
+> > interrupt ]---
 > >
-> > Then it is fine, no qdisc spinlock is held at this point.
+> >The exception happens because there is a pending RX interrupt before
+> >the call to request_irq(RX IRQ) executes.  Then, the RX IRQ handler
+> >fires immediately after this request_irq() completes. The RX IRQ
+> >handler runs "napi_schedule()" before NAPI is fully initialized via
+> "netif_napi_add()"
+> >and "napi_enable()", both which happen later in the open() logic.
 > >
-> >  The second time we would
-> > > deadlock before we hit mirred.
+> >The logic in mlxbf_gige_open() has been re-ordered so that the
+> >request_irq() calls execute after NAPI is fully initialized.
+>=20
+> This should be in imperative mood so the reader know right away that you =
+are not
+> talking about existing code and it's history, but you rather command the =
+codebase
+> what to change/do/fix/etc.
+>=20
+
+OK, will update the wording.
+
 > >
-> > This is not how I see the trace.
-> >
-> > Mirred would detect that and either drop or queue the packet to a work
-> > queue or something.
-> >
-> > diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
-> > index 5b38143659249e66718348e0ec4ed3c7bc21c13d..a2c53e200629a17130f3824=
-6ab3cdb8c89c6d30e
-> > 100644
-> > --- a/net/sched/act_mirred.c
-> > +++ b/net/sched/act_mirred.c
-> > @@ -237,9 +237,15 @@ tcf_mirred_forward(bool at_ingress, bool
-> > want_ingress, struct sk_buff *skb)
-> >  {
-> >         int err;
-> >
-> > -       if (!want_ingress)
-> > +       if (!want_ingress) {
-> > +               if (__this_cpu_read(softnet_data.xmit.recursion) > 0) {
-> > +                       // TODO increment a drop counter perhaps ?
-> > +                       kfree_skb(skb);
-> > +                       return -EINVAL;
-> > +               }
-> > +
-> >                 err =3D tcf_dev_queue_xmit(skb, dev_queue_xmit);
-> > -       else if (!at_ingress)
-> > +       } else if (!at_ingress)
-> >                 err =3D netif_rx(skb);
-> >         else
-> >                 err =3D netif_receive_skb(skb);
->
->
-> I doubt this will work - who increments softnet_data.xmit.recursion?
-> We enter __dev_xmit_skb (grab lock) --> qdisc_enq-->classify-->mirred
-> (recursion is zero) which redirects entering back into  __dev_xmit_skb
-> again and deadlocks trying to grab lock.
->  Maybe something is not clear to me, trying your suggestion...
+> >Also, the logic in mlxbf_gige_open() was missing a call to phy_stop()
+> >in the error path, so that has been added.
+>=20
+> Same here.
 >
 
-jhs@mojaone:~$
-[   82.890330] __this_cpu_read(softnet_data.xmit.recursion) 0 in
-tcf_mirred_forward
-[   82.890906]
-[   82.890906] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-[   82.890906] WARNING: possible recursive locking detected
-[   82.890906] 6.8.0-05205-g77fadd89fe2d-dirty #213 Tainted: G        W
-[   82.890906] --------------------------------------------
-[   82.890906] ping/418 is trying to acquire lock:
-[   82.890906] ffff888006994110 (&sch->q.lock){+.-.}-{3:3}, at:
-__dev_queue_xmit+0x1778/0x3550
-[   82.890906]
-[   82.890906] but task is already holding lock:
-[   82.890906] ffff888006994110 (&sch->q.lock){+.-.}-{3:3}, at:
-__dev_queue_xmit+0x1778/0x3550
-[   82.890906]
-[   82.890906] other info that might help us debug this:
-[   82.890906]  Possible unsafe locking scenario:
-[   82.890906]
-[   82.890906]        CPU0
-[   82.890906]        ----
-[   82.890906]   lock(&sch->q.lock);
-[   82.890906]   lock(&sch->q.lock);
-[   82.890906]
-[   82.890906]  *** DEADLOCK ***
-[   82.890906]
-[..... other info removed for brevity....]
+Yes, will update the wording here.
+=20
+> Also, could you please have the missing phy_stop() as a separate patch as=
+ Paolo
+> suggested? It's a different bug.
+>=20
 
-Needs more thinking...
-A fool proof solution is to add the per-recursion counter to be per
-netdevice but that maybe considered blasphemy? ;->
+Sure, will create a separate patch for the missing phy_stop()
 
-cheers,
-jamal
-
-> cheers,
-> jamal
+> pw-bot: cr
+>=20
+>=20
+> >
+> >Fixes: f92e1869d74e ("Add Mellanox BlueField Gigabit Ethernet driver")
+> >Signed-off-by: David Thompson <davthompson@nvidia.com>
+> >Reviewed-by: Asmaa Mnebhi <asmaa@nvidia.com>
+> >---
+> >v2
+> >- re-worded commit message and subject for clarity
+> >- updated commit message to mention that phy_stop() was added
+> >  to the error path in mlxbf_gige_open()
+> >---
+> > .../mellanox/mlxbf_gige/mlxbf_gige_main.c     | 21 ++++++++++++-------
+> > 1 file changed, 14 insertions(+), 7 deletions(-)
+> >
+> >diff --git a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c
+> >b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c
+> >index 3d09fa54598f..77134ca92938 100644
+> >--- a/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c
+> >+++ b/drivers/net/ethernet/mellanox/mlxbf_gige/mlxbf_gige_main.c
+> >@@ -139,13 +139,10 @@ static int mlxbf_gige_open(struct net_device
+> *netdev)
+> > 	control |=3D MLXBF_GIGE_CONTROL_PORT_EN;
+> > 	writeq(control, priv->base + MLXBF_GIGE_CONTROL);
+> >
+> >-	err =3D mlxbf_gige_request_irqs(priv);
+> >-	if (err)
+> >-		return err;
+> > 	mlxbf_gige_cache_stats(priv);
+> > 	err =3D mlxbf_gige_clean_port(priv);
+> > 	if (err)
+> >-		goto free_irqs;
+> >+		return err;
+> >
+> > 	/* Clear driver's valid_polarity to match hardware,
+> > 	 * since the above call to clean_port() resets the @@ -157,7 +154,7
+> >@@ static int mlxbf_gige_open(struct net_device *netdev)
+> >
+> > 	err =3D mlxbf_gige_tx_init(priv);
+> > 	if (err)
+> >-		goto free_irqs;
+> >+		goto phy_deinit;
+> > 	err =3D mlxbf_gige_rx_init(priv);
+> > 	if (err)
+> > 		goto tx_deinit;
+> >@@ -166,6 +163,10 @@ static int mlxbf_gige_open(struct net_device *netde=
+v)
+> > 	napi_enable(&priv->napi);
+> > 	netif_start_queue(netdev);
+> >
+> >+	err =3D mlxbf_gige_request_irqs(priv);
+> >+	if (err)
+> >+		goto napi_deinit;
+> >+
+> > 	/* Set bits in INT_EN that we care about */
+> > 	int_en =3D MLXBF_GIGE_INT_EN_HW_ACCESS_ERROR |
+> > 		 MLXBF_GIGE_INT_EN_TX_CHECKSUM_INPUTS | @@ -182,11
+> +183,17 @@ static
+> >int mlxbf_gige_open(struct net_device *netdev)
+> >
+> > 	return 0;
+> >
+> >+napi_deinit:
+> >+	netif_stop_queue(netdev);
+> >+	napi_disable(&priv->napi);
+> >+	netif_napi_del(&priv->napi);
+> >+	mlxbf_gige_rx_deinit(priv);
+> >+
+> > tx_deinit:
+> > 	mlxbf_gige_tx_deinit(priv);
+> >
+> >-free_irqs:
+> >-	mlxbf_gige_free_irqs(priv);
+> >+phy_deinit:
+> >+	phy_stop(phydev);
+> > 	return err;
+> > }
+> >
+> >--
+> >2.30.1
+> >
+> >
 
