@@ -1,166 +1,139 @@
-Return-Path: <netdev+bounces-80896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9231D8818B6
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 21:45:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFC838818D2
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 21:54:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C36C01C20E80
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 20:45:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3DAF1F21769
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 20:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9266481C0;
-	Wed, 20 Mar 2024 20:45:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8748169DE9;
+	Wed, 20 Mar 2024 20:54:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fQWk37H3"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jQptVRca"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEF6221100;
-	Wed, 20 Mar 2024 20:45:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F784481C0;
+	Wed, 20 Mar 2024 20:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710967550; cv=none; b=Y4H3J6GKvKDT2PNYGuL/D1NkuziC0EdV5PWaB2sfNrBr2hEf8UTsS5DmN7dP7rvKvEVVk7Z/DouRwwZzk9WCw011yCZ707fBkL7H60Is9XXIAof9qnRbJizXBIvDOapkEGQs7tcc0BLWjnKF7+VhaaUPaumW6njJ78p9QOC2EWM=
+	t=1710968056; cv=none; b=P6n029BXkgQiO3QcoOz/wGV14iBk97/S7H+x2YG2zHR5bkmD0j5uByoREhKNStmomtPSIMffNTIpeD6w2yQH1pyc9DPQxGVK6DonvnwqBW1VrgrzlCjtoxiPUlg7pKe6PNw8TCYZR/2clUj2kECwTq+ZsVYbKew2oxzIi7nhDyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710967550; c=relaxed/simple;
-	bh=DVMjMGP9QqjEmQ/ua/wWgAorznBOZGn26NsNd5cqvw4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=ClGRgXdi/UICB6/NeMrF5SSKk7M+mgsO4OXFikIxGoJ44pPNgyOFUqn1in6TA72TuJXi4XGGQ4AN32VFf7YULjrqdt+HpUEqfYtA0WSIPI5m0IIXWfwjRVGLAfKuI+NgLSPfbB2zarKtsreL80WLzsOWCCmbe4TGFMFUl0hC9C8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fQWk37H3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 3714CC433F1;
-	Wed, 20 Mar 2024 20:45:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710967550;
-	bh=DVMjMGP9QqjEmQ/ua/wWgAorznBOZGn26NsNd5cqvw4=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=fQWk37H3YAnWdUfmua2LrFMrdSv6ydI/zeM+G0NOt/G/k7k25jQvMj0nW5hLfXZSK
-	 /Nn/SQYnrA7dO9G6cXz3P2jRXtyKmdrD4iI0xqozXV+4saEuMV9A25SV98lDqUPAoF
-	 DiUJ6VaSy44Y9sqw2JI1zFzQWp/utcsb7lgTdKTA3gphXu+ExQmF+A3o8PkVA6cZC6
-	 IO7RSb19qSNzTXXRP6KA/YbhDPXczoo+0aRvom2OpsCkXsgxkqf+tmq3JmYldpgXj2
-	 aOOnM90wZLR9eHkGU9lmS4iCKTf4wrOtKjLtwRoUfDcfhKTIYViQKeGqgEWT4rNBbt
-	 bZpStGapkm1wg==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23FCCC54E58;
-	Wed, 20 Mar 2024 20:45:50 +0000 (UTC)
-From: =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL_via_B4_Relay?= <devnull+arinc.unal.arinc9.com@kernel.org>
-Date: Wed, 20 Mar 2024 23:45:30 +0300
-Subject: [PATCH net] net: dsa: mt7530: fix improper frames on all 25MHz and
- 40MHz XTAL MT7530
+	s=arc-20240116; t=1710968056; c=relaxed/simple;
+	bh=pF/xOd23yYrYMplKbbxbwQmPeh9HgaZeB0PVlGdg90U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kt+LPd0RvwTOhWXg1HiYAW54x6PHqikqsKfRckHRw8EPMtvUyKtIBAuTHxG0mQoDAWckvPEX+z6UcqGMyzIgDJcglu2ARcMPokJOtf6AarkhGJD7bO146/z3c+5rQ4HHYQOT9LyKJJhZC7fhl2TD9w89wBafmRGEPfutdXhBmjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jQptVRca; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=m3hah0VF3NuI3zxNyk+AIvcTPzt/CGCx8sXbYOztIEc=; b=jQptVRcaF1M/OvF8SdX5NTowuO
+	dpufXaBGQkvFQQB8JCvtzPsaXmwTLiKNVCH8bdDvzjeFmUcGL3iDaG3U2O0wAMtlxxECD1jWS260Z
+	0ECiVcRX/NaNtrxetJ5rQX59JtTUeJqpagHqsGp2MELPl7CwRfmlX354xeYzCMPbz72Qt9MsCjKh8
+	9VEFD+OlOIHAm5BSC1cPqgeqQwQw+GTWmV9CJo5RfyOCEzq339X4mIK5mREBXr5s64nf6aOhz6F0w
+	YlY0soxifFXkqVm3z7ghTXGHJfwiW/bkqeyXZCmWefkRD46GDcch/bI+dIvFof3lYDaTSJvNQYDQu
+	r7b6PKfQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:55412)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rn2wa-0006uN-0N;
+	Wed, 20 Mar 2024 20:53:52 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rn2wU-0002yT-JV; Wed, 20 Mar 2024 20:53:46 +0000
+Date: Wed, 20 Mar 2024 20:53:46 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	=?iso-8859-1?Q?Ren=E9?= van Dorst <opensource@vdorst.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH 3/3] net: phy: mediatek-ge: do not disable EEE
+ advertisement
+Message-ID: <ZftM2vDYQ2+5nSRV@shell.armlinux.org.uk>
+References: <20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v1-0-3f17226344e8@arinc9.com>
+ <20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v1-3-3f17226344e8@arinc9.com>
+ <3698b522-d6dc-46c1-bab2-d5ee3bed1fce@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Message-Id: <20240320-for-net-mt7530-fix-25mhz-xtal-with-direct-phy-access-v1-1-d92f605f1160@arinc9.com>
-X-B4-Tracking: v=1; b=H4sIAOlK+2UC/x2NQQrCMBBFr1Jm7YeYGgSvIi5CMpoBm5Zk0Grp3
- R3cfHiL/95GnZtwp8uwUeOXdJmrwfEwUCqxPhiSjck7f3Kjd7jPDZUVk57DaCgrfJjKF6vGJ96
- iBVkaJ8VSPogpce9gHyPnEJwNmXppbMd/9kpmo9u+/wAysgF6iwAAAA==
-To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
- Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
- Florian Fainelli <f.fainelli@gmail.com>, 
- Vladimir Oltean <olteanv@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
- Landen Chao <Landen.Chao@mediatek.com>
-Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>, 
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, 
- =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1710967529; l=2945;
- i=arinc.unal@arinc9.com; s=arinc9-patatt; h=from:subject:message-id;
- bh=IUAz2iG3lPTlOnHitW8WZ64dit6oJNL3iK9bUDlrZFc=;
- b=9MtA/Y9vEntM4ULwpnIWKrfqRMckl0Wp+4r/3tLyQSs8Vp/HogUBUCCrb6G8Bmi+gvgL+E48f
- eNL7rncPs4HDH+51dumgEwZZhzuvjTqevdlI0Ad8n0q7H08iJY9JB0M
-X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
- pk=VmvgMWwm73yVIrlyJYvGtnXkQJy9CvbaeEqPQO9Z4kA=
-X-Endpoint-Received: by B4 Relay for arinc.unal@arinc9.com/arinc9-patatt
- with auth_id=115
-X-Original-From: =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
-Reply-To: arinc.unal@arinc9.com
+In-Reply-To: <3698b522-d6dc-46c1-bab2-d5ee3bed1fce@arinc9.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-From: Arınç ÜNAL <arinc.unal@arinc9.com>
+On Wed, Mar 20, 2024 at 11:40:56PM +0300, Arınç ÜNAL wrote:
+> On 18.03.2024 10:46, Arınç ÜNAL via B4 Relay wrote:
+> > From: Arınç ÜNAL <arinc.unal@arinc9.com>
+> > 
+> > There's no need to disable Energy-Efficient Ethernet (EEE) advertisement on
+> > the MT7530 and MT7531 switch PHYs. EEE works fine on MT7530 and MT7531
+> > switch PHYs. Remove the code where EEE advertisement is disabled.
+> > 
+> > This is a bugfix because there's a possible race condition where the
+> > mediatek-ge driver would kick in after the MT7530 DSA subdriver which would
+> > have EEE disabled until manually enabled.
+> 
+> Can I get an opinion on this? Is it actually possible that the PHY driver
+> would start probing after the DSA subdriver? On the console logs for the
+> DSA subdriver, I can see that the name of the PHY driver will appear, which
+> makes me believe the PHY driver would actually never probe after the DSA
+> subdriver.
+> 
+> [    4.402641] mt7530-mdio mdio-bus:1f wan (uninitialized): PHY [mt7530-0:00] driver [MediaTek MT7530 PHY] (irq=POLL)
+> [    4.420392] mt7530-mdio mdio-bus:1f lan0 (uninitialized): PHY [mt7530-0:01] driver [MediaTek MT7530 PHY] (irq=POLL)
+> [    4.437791] mt7530-mdio mdio-bus:1f lan1 (uninitialized): PHY [mt7530-0:02] driver [MediaTek MT7530 PHY] (irq=POLL)
+> [    4.455096] mt7530-mdio mdio-bus:1f lan2 (uninitialized): PHY [mt7530-0:03] driver [MediaTek MT7530 PHY] (irq=POLL)
+> [    4.472422] mt7530-mdio mdio-bus:1f lan3 (uninitialized): PHY [mt7530-0:04] driver [MediaTek MT7530 PHY] (irq=POLL)
+> 
+> I don't want to submit a bugfix to the net tree if the bug won't ever
+> happen in real life.
 
-The MT7530 switch after reset initialises with a core clock frequency that
-works with a 25MHz XTAL connected to it. For 40MHz XTAL, the core clock
-frequency must be set to 500MHz.
+It would be really great if you could tell us which bug fixes you're
+submitting are for a real problem that you or a user have encountered,
+and which are down to essentially code inspection and things that
+"aren't correct". Basically, don't do this.
 
-The mt7530_pll_setup() function is responsible of setting the core clock
-frequency. Currently, it runs on MT7530 with 25MHz and 40MHz XTAL. This
-causes MT7530 switch with 25MHz XTAL to egress and ingress frames
-improperly.
+It isn't true that the PHY specific driver will be probed before DSA
+initialises - consider the case where the DSA driver is built-in but
+the PHY specific driver is modular and on the not-yet-mounted rootfs.
+That would result in the generic PHY driver being used even when the
+PHY specific driver were to be loaded later - and thus only basic
+standard 802.3 PHY behaviour will be supported.
 
-Introduce a check to run it only on MT7530 with 40MHz XTAL.
+That's not specific to mt7530, it applies to everything that uses
+phylib. It isn't something that really warrants "bug fixing" in each
+and every driver.
 
-The core clock frequency is set by writing to a switch PHY's register.
-Access to the PHY's register is done via the MDIO bus the switch is also
-on. Therefore, it works only when the switch makes switch PHYs listen on
-the MDIO bus the switch is on. This is controlled either by the state of
-the ESW_P1_LED_1 pin after reset deassertion or modifying bit 5 of the
-modifiable trap register.
-
-When ESW_P1_LED_1 is pulled high, PHY indirect access is used. That means
-accessing PHY registers via the PHY indirect access control register of the
-switch.
-
-When ESW_P1_LED_1 is pulled low, PHY direct access is used. That means
-accessing PHY registers via the MDIO bus the switch is on.
-
-For MT7530 switch with 40MHz XTAL on a board with ESW_P1_LED_1 pulled high,
-the core clock frequency won't be set to 500MHz, causing the switch to
-egress and ingress frames improperly.
-
-Run mt7530_pll_setup() after PHY direct access is set on the modifiable
-trap register.
-
-With these two changes, all MT7530 switches with 25MHz and 40MHz, and
-P1_LED_1 pulled high or low, will egress and ingress frames properly.
-
-Link: https://github.com/BPI-SINOVOIP/BPI-R2-bsp/blob/4a5dd143f2172ec97a2872fa29c7c4cd520f45b5/linux-mt/drivers/net/ethernet/mediatek/gsw_mt7623.c#L1039
-Fixes: b8f126a8d543 ("net-next: dsa: add dsa support for Mediatek MT7530 switch")
-Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
----
- drivers/net/dsa/mt7530.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 6986f538a4d0..c856a13bc2f1 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -2232,8 +2232,6 @@ mt7530_setup(struct dsa_switch *ds)
- 		     SYS_CTRL_PHY_RST | SYS_CTRL_SW_RST |
- 		     SYS_CTRL_REG_RST);
- 
--	mt7530_pll_setup(priv);
--
- 	/* Lower Tx driving for TRGMII path */
- 	for (i = 0; i < NUM_TRGMII_CTRL; i++)
- 		mt7530_write(priv, MT7530_TRGMII_TD_ODT(i),
-@@ -2249,6 +2247,9 @@ mt7530_setup(struct dsa_switch *ds)
- 	val |= MHWTRAP_MANUAL;
- 	mt7530_write(priv, MT7530_MHWTRAP, val);
- 
-+	if ((val & HWTRAP_XTAL_MASK) == HWTRAP_XTAL_40MHZ)
-+		mt7530_pll_setup(priv);
-+
- 	mt753x_trap_frames(priv);
- 
- 	/* Enable and reset MIB counters */
-
----
-base-commit: 9c6a59543a3965071d65b0f9ea43aa396ce2ed14
-change-id: 20240320-for-net-mt7530-fix-25mhz-xtal-with-direct-phy-access-e2aaed550ed5
-
-Best regards,
 -- 
-Arınç ÜNAL <arinc.unal@arinc9.com>
-
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
