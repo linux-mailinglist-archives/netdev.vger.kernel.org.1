@@ -1,95 +1,107 @@
-Return-Path: <netdev+bounces-80774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80775-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33592881076
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 12:09:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B76288108A
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 12:11:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 632471C211F3
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:09:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D915B23A92
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:11:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AC643D3AC;
-	Wed, 20 Mar 2024 11:08:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FCBB3BB3D;
+	Wed, 20 Mar 2024 11:11:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hd1hhKpi"
 X-Original-To: netdev@vger.kernel.org
-Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34A2E3BBFA;
-	Wed, 20 Mar 2024 11:08:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3DD3B1B2
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 11:11:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710932934; cv=none; b=b4vunODEKQhwh3pBnwaE3cCvQWil0GpUJ9cb9F2YjhzR7IcTpOdzBuRqyjKws99SNCBeRk/Of8ASObuKOqhXN6RkfgLXU3Gou3rv7ZpjIAZ91U3fniTwo2a03NLfl5vNcdayhahlkpgk76y5yy1Ftpunz9fzivCfXGhWEnzfRr0=
+	t=1710933079; cv=none; b=SsyEsp4/mQhwD0HZfcFt1CPpmZDPNNJMVo46qZKBYGzqfqR8JJl3xNoYy/seZzWn9hd+A+kU3ki/vxziuuMl2cALVtn0OYuKt+pe9aDAdXPti18ilLpiaKo6Jkm7OMm8TnARzTLbZJpjp+9IrdB9C0s+aiztUYJj8IXCy8Bx2vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710932934; c=relaxed/simple;
-	bh=GVLutt18GQlJPG4WB2z9PrJepa+Hhk6WaYlpmouuWbo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bJdN8Jg2hvPkuOEstgUTl6ZAlU32JLnEIeAEgva18tjs0eBtUcCGDC6AiB1P/Y+fRp3084+K6l2LL/mHQfLRbhSDfJT+bvqBNvHO6ANq0SJY3paHMR1rXoJ5cazbDpdhKSlnt8usrYVndEja4KCMvRgylhB3HfqdcCpiAte055c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
-Received: from local
-	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
-	 (Exim 4.96.2)
-	(envelope-from <daniel@makrotopia.org>)
-	id 1rmtnv-00017k-0M;
-	Wed, 20 Mar 2024 11:08:19 +0000
-Date: Wed, 20 Mar 2024 11:08:12 +0000
-From: Daniel Golle <daniel@makrotopia.org>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	=?iso-8859-1?Q?Ren=E9?= van Dorst <opensource@vdorst.com>,
-	Russell King <linux@armlinux.org.uk>,
-	SkyLake Huang <SkyLake.Huang@mediatek.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
-	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH 0/3] Fix EEE support for MT7531 and MT7988 SoC switch
-Message-ID: <ZfrDnFyGay5YTTFg@makrotopia.org>
-References: <20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v1-0-3f17226344e8@arinc9.com>
- <9d111cc9-c73a-4d3c-83f5-3f59e6c8841f@arinc9.com>
+	s=arc-20240116; t=1710933079; c=relaxed/simple;
+	bh=pdchhpQnt3CQHuZw8DTa8vf5YnjfPZ9D1i3TB34sEQA=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=CtWZpsV00XYGt/uU54xu35r9PnZDgWFQiNPhAPEe2mPZ2Fsw9PBe2B5Mz/O5gWixvXVIhg9ff7/aMCLxB9k9biPxVuVuHuWbP2be8W3I6jiwDUKF/Yv3kLzLH62SjWSIzIUA1TyHioWJGM6SOvjApyOrvucvCg3XDcXeiiqTq2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hd1hhKpi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD795C433C7;
+	Wed, 20 Mar 2024 11:11:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710933079;
+	bh=pdchhpQnt3CQHuZw8DTa8vf5YnjfPZ9D1i3TB34sEQA=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=Hd1hhKpiw/xhzQGYn4hJjf3rapHhglHSMRDNuyKeSovAYqHJDCtGP0taQM9GjhleQ
+	 e62wimEJTgU/ZUeH0IYb7BsQUiLF+5vC+qF4JD8Qjp9HzGYBjfSKkNn0mdBogQ8ewz
+	 IezPjittlAoh79R2T+tfYLcgyq2GWB0bsLqyAAnlLBUto4U7Lblz9GDjkTU060Vd4V
+	 qJEYbkKIJEtH4w8ikzctARvBphkyFbb5pPsdOgNJ1rNFUksGELHiP/WmJNFZzpL9YQ
+	 InLXGo8DbWPdVi4ucDsqrkfy+u/PSktV+h47H2IcVvT4+eTcaBXlrwG3xAAfsqCAHL
+	 b14Sad3riX9gw==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <9d111cc9-c73a-4d3c-83f5-3f59e6c8841f@arinc9.com>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20240319194124.25097f5a@kernel.org>
+References: <20240319093140.499123-1-atenart@kernel.org> <20240319093140.499123-2-atenart@kernel.org> <20240319194124.25097f5a@kernel.org>
+Subject: Re: [PATCH net v2 1/4] udp: do not accept non-tunnel GSO skbs landing in a tunnel
+From: Antoine Tenart <atenart@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, steffen.klassert@secunet.com, willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org, Willem de Bruijn <willemb@google.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Date: Wed, 20 Mar 2024 12:11:16 +0100
+Message-ID: <171093307600.5492.12887061012668630550@kwain>
 
-On Wed, Mar 20, 2024 at 11:10:19AM +0300, Arınç ÜNAL wrote:
-> On 18.03.2024 10:46, Arınç ÜNAL via B4 Relay wrote:
-> > Hi.
-> > 
-> > This patch series fixes EEE support for MT7531 and the switch on the MT7988
-> > SoC. EEE did not work on MT7531 on most boards before this, it is unclear
-> > what's the status on MT7988 SoC switch as I don't have the hardware.
-> > 
-> > Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> 
-> I see the state of this patch series is deferred on patchwork. I see that I
-> forgot to delegate this to the net tree. As I don't see any objections in
-> this series, I'll send v2 with it tomorrow.
+Quoting Jakub Kicinski (2024-03-20 03:41:24)
+> On Tue, 19 Mar 2024 10:31:36 +0100 Antoine Tenart wrote:
+> > +DECLARE_STATIC_KEY_FALSE(udp_encap_needed_key);
+>=20
+> nit: our build bot says you need to export this as well for v6=3Dm.
 
-Sorry, but imho it should go to net-next, and you might have overlook
-it but there have been some concerns.
+Thanks for the heads up, missed that. And udpv6_encap_needed_key needs
+to be defined outside ipv6.ko and exported as well. The following should
+fix the remaining build issues,
 
-For sure it should not go to net tree as you are enabling a new feature
-and not fixing anything which is broken. EEE on MT7988 works fine as
-of now (see my reply), EEE on MT7531 was supposedly intentionally
-disabled for reasons we should ask MTK people about.
+  diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+  index 661d0e0d273f..c02bf011d4a6 100644
+  --- a/net/ipv4/udp.c
+  +++ b/net/ipv4/udp.c
+  @@ -582,6 +582,13 @@ static inline bool __udp_is_mcast_sock(struct net *n=
+et, const struct sock *sk,
+   }
+
+   DEFINE_STATIC_KEY_FALSE(udp_encap_needed_key);
+  +EXPORT_SYMBOL(udp_encap_needed_key);
+  +
+  +#if IS_ENABLED(CONFIG_IPV6)
+  +DEFINE_STATIC_KEY_FALSE(udpv6_encap_needed_key);
+  +EXPORT_SYMBOL(udpv6_encap_needed_key);
+  +#endif
+  +
+   void udp_encap_enable(void)
+   {
+          static_branch_inc(&udp_encap_needed_key);
+  diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+  index 7c1e6469d091..8b1dd7f51249 100644
+  --- a/net/ipv6/udp.c
+  +++ b/net/ipv6/udp.c
+  @@ -447,7 +447,7 @@ int udpv6_recvmsg(struct sock *sk, struct msghdr *msg=
+, size_t len,
+          goto try_again;
+   }
+
+  -DEFINE_STATIC_KEY_FALSE(udpv6_encap_needed_key);
+  +DECLARE_STATIC_KEY_FALSE(udpv6_encap_needed_key);
+   void udpv6_encap_enable(void)
+   {
+          static_branch_inc(&udpv6_encap_needed_key);
+
+Thanks!
+Antoine
 
