@@ -1,122 +1,165 @@
-Return-Path: <netdev+bounces-80850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 059A9881484
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:26:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B9738814D4
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:46:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 86B64B22B54
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 15:26:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49915B22680
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 15:46:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E48150260;
-	Wed, 20 Mar 2024 15:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED7C452F78;
+	Wed, 20 Mar 2024 15:46:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ig4aatuc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.actia.se (mail.actia.se [212.181.117.226])
+Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD74453E31;
-	Wed, 20 Mar 2024 15:26:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.181.117.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A8321A291;
+	Wed, 20 Mar 2024 15:46:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710948369; cv=none; b=DAkcayd1hNomYtsyBeb93SX8RuYPs2VvV77rHDLo3VJfEV4NgfVUQoxcwqBPLRTGrBOnS4N6U6qsAXxynMcl2t30rX+QVjHv+ZhGlHVP8ZMHKaZm5Gt/FWh/XGVWA9daA9U6Lgfpg89XA1fT00fV+C2zTBZ41O/dB2DSODVUk9U=
+	t=1710949598; cv=none; b=tB7ikERN95RqdKTbK4y0Gxi4ptOvVNbrKsdDCw8YFvDVDBily5pk598mvdnVPXmo+lTSznGV8bJq/yVStEgFvjwF7NVN9dVaElJnUxQO8/Yg0WH5rEMC1akHXg/hWGxICaVqQcuWyGf7QKbtN6ECIBxOQAD02X3kMVnLibr2pZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710948369; c=relaxed/simple;
-	bh=+uAsyfOj24pfCzz6PstZDCpbRt+0wQJHGildU+NO1X0=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=Wfu3xuusSxUgd1pG09cwX8HhIZkr8LMOqWdU9YIfLNR6EzQ4JaZYd6MN3oyAvwjUXHTdGpYxJDIM13UdP5eZJ4TfyQ4U8IVUkeCBCfvnxWbs+BC4s8HjI5qIyr0n5J54Y9IsPr9N0xU+zNyyDDw0gPyAtXAYijazDqsLjCL52AA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=actia.se; spf=pass smtp.mailfrom=actia.se; arc=none smtp.client-ip=212.181.117.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=actia.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=actia.se
-Received: from S036ANL.actianordic.se (10.12.31.117) by S036ANL.actianordic.se
- (10.12.31.117) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Wed, 20 Mar
- 2024 16:25:54 +0100
-Received: from S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69]) by
- S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69%4]) with mapi id
- 15.01.2507.037; Wed, 20 Mar 2024 16:25:54 +0100
-From: John Ernberg <john.ernberg@actia.se>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-CC: Maxime Chevallier <maxime.chevallier@bootlin.com>, Wei Fang
-	<wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Heiner Kallweit
-	<hkallweit1@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Lunn
-	<andrew@lunn.ch>
-Subject: Re: [PATCH net v3 2/2] net: fec: Suspend the PHY on probe
-Thread-Topic: [PATCH net v3 2/2] net: fec: Suspend the PHY on probe
-Thread-Index: AQHab8t46xO1JP3Hxke5Lu7SCFbkbbEq8XCAgBPPogCAAAPagIACAISA
-Date: Wed, 20 Mar 2024 15:25:54 +0000
-Message-ID: <f89bec78-0dae-4518-a461-2e64a3dfb9fc@actia.se>
-References: <20240306133734.4144808-1-john.ernberg@actia.se>
- <20240306133734.4144808-3-john.ernberg@actia.se>
- <20240306190539.4ab9f369@device-28.home>
- <9490ed31-dede-4a14-9c62-5ef83e30593a@actia.se>
- <ZflSE8AaYLE3Ri8L@shell.armlinux.org.uk>
-In-Reply-To: <ZflSE8AaYLE3Ri8L@shell.armlinux.org.uk>
-Accept-Language: en-US, sv-SE
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-esetresult: clean, is OK
-x-esetid: 37303A2958D729556D7C66
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <2BB5AB19795F52459FDDF45DB426B3FB@actia.se>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1710949598; c=relaxed/simple;
+	bh=ViYPNM62rKHftFHn8EtCwM10ykuEE7S2GB4Mq6QRH9I=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=F0ONlRtgybO8Kb3wUKFcbr6y8FFbhMF0mpi8dDJxK/TqCnhwCto/fpYjAltnaLN+ox/tfi4ewul0A4TIgFdwsT4sAI+68sp18jc7EgyJV7eijo3NfefFP8odJWlErQGSCeQCZc6E0S+9p47wwPp7FEuhPWHsqXmqFRs5Eqr/2/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ig4aatuc; arc=none smtp.client-ip=209.85.208.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d29aad15a5so84561831fa.3;
+        Wed, 20 Mar 2024 08:46:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1710949595; x=1711554395; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oaXJM9ZvZn/4LaQiASqOr/xxq5nAZPZqRyNDIlEESuA=;
+        b=Ig4aatucE/O8jMGTpjBdR8oyefLUCu7vccGd365GHV/VBgF63OFYkk6ZeV2N1LFWHq
+         IuoIlWmDJuihpCpYTKFc8MgxBHPK6L+VIuc6IylwHHle984vgLwns+G8LocgRASd/3ID
+         Sp3y4JzZIj6eZ0Qtu9yfueb1vdUiyUTWzLbaXlKFp24Tm9xBTf9ng/rANZrDfDlFRbgA
+         epgDGMWZUJEX9gBc0UN3zAkJiKBZGMJFsG3AdD14H6POawlyodDjhzUVy0plN1AcFA6/
+         p20qBJ/doQHvZ/DfTpGALec65LPX4STBGcVE+LWHRiSRm9NkNfajAYOky7/wElgJgtM1
+         Z04A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710949595; x=1711554395;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=oaXJM9ZvZn/4LaQiASqOr/xxq5nAZPZqRyNDIlEESuA=;
+        b=tEZJZlNBD1oPQznBtPheIM7dNSykzJrTV3jEjxDqUOF9z+NV/54euhcT3om8TlR7Nt
+         sR13yEb69e2Gn7QRBY8tN2lGSxrHbpReXn/sAfYv1v3oqoZZMulKV2N75MukJ+UKeOzu
+         +4Sm+el30Rmh6K0XJ9woYBn9Zggk2zjTGWLc6JfPYi3XxVIZEFqYXnTNDrcEeriUaabF
+         6ghlnjLB1AmWQM3hT+GfV4jKn7/HobHVLp+soD7p66V2RoRR/Wp6K3vNn3gwJsFiLq0v
+         c0o7bom9hBNdGsJQq7Mfst1dkjxHFoWyedyzMu53EmnKiQtACEBYpiix8/YJpzHZap9D
+         aGoA==
+X-Forwarded-Encrypted: i=1; AJvYcCVShIIl/ibxz69Hkrg1HHQfbonKr2aeFoRCnUgflnCf4veBV6JjKSlg290AjrxI8/TCvL7hELVuzRmoeFpMBw4EUIURA3ICUeUFmjwNXnhismJ6S2BL8X+cFQFDQIPp5sVr1WznhitffnQ5npsYYCI5yTokT+Ah5yQL
+X-Gm-Message-State: AOJu0YyccXI9qH2XiZfTyejerWnJGzrKpplnZ59sH+JAWt4im7TEEZg7
+	x5CWJfYOMLlP+Kc8H2fx9dbWBd/REUXBbGqCkp6SCwsOAmpaq5cx
+X-Google-Smtp-Source: AGHT+IHtAQBGTDzEKsd2vJSQqMdsoYc7Xoc9c6idIuX7GW2nJu0OCfI8MTqhgP4XquycBw3saVi47w==
+X-Received: by 2002:a2e:22c3:0:b0:2d4:764f:8256 with SMTP id i186-20020a2e22c3000000b002d4764f8256mr10808698lji.53.1710949594945;
+        Wed, 20 Mar 2024 08:46:34 -0700 (PDT)
+Received: from localhost (54-240-197-239.amazon.com. [54.240.197.239])
+        by smtp.gmail.com with ESMTPSA id n39-20020a05600c3ba700b0041409cabb39sm2607210wms.18.2024.03.20.08.46.34
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 20 Mar 2024 08:46:34 -0700 (PDT)
+From: Puranjay Mohan <puranjay12@gmail.com>
+To: Artem Savkov <asavkov@redhat.com>, Xu Kuohai <xukuohai@huaweicloud.com>
+Cc: Xi Wang <xi.wang@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf-next] arm64: bpf: zero upper bits after rev32
+In-Reply-To: <20240320133849.GA142600@alecto.usersys.redhat.com>
+References: <20240313140205.3191564-1-asavkov@redhat.com>
+ <ab5e6307-8d80-4751-940f-4faa5bc41d82@huaweicloud.com>
+ <20240320133849.GA142600@alecto.usersys.redhat.com>
+Date: Wed, 20 Mar 2024 15:46:31 +0000
+Message-ID: <mb61pbk78x5wo.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
 
-SGkgUnVzc2VsLA0KDQpPbiAzLzE5LzI0IDA5OjUxLCBSdXNzZWxsIEtpbmcgKE9yYWNsZSkgd3Jv
-dGU6DQo+IE9uIFR1ZSwgTWFyIDE5LCAyMDI0IGF0IDA4OjM3OjQ0QU0gKzAwMDAsIEpvaG4gRXJu
-YmVyZyB3cm90ZToNCj4+IFRoZXJlIGlzIGFsc28gYSBjYXNlIHdoZXJlIHRoZSBwaHkgZHJpdmVy
-IG1vZHVsZSBpcyBub3QgYXV0b21hdGljYWxseQ0KPj4gbG9hZGVkLCBpbiBjYXNlcyB3aGVyZSBy
-ZXF1ZXN0X21vZHVsZSgpIGZhaWxzLCBlaXRoZXIgZHVlIHRvIHRoZQ0KPj4gdXNlcnNwYWNlIGhl
-bHBlciBmZWF0dXJlIGJlaW5nIGNvbXBpbGVkIG91dCBvciBvdGhlciByZWFzb25zLCBhbmQgdGhl
-DQo+PiBtb2R1bGUgaXMgbG9hZGVkIG1hbnVhbGx5IGxhdGVyLiBJIHN1c3BlY3QgZm9yIHJlYXNv
-bnMgbGlrZSB0aGVzZSB0aGUNCj4+IGdlbnBoeSBwcm9iZSBoYXBwZW5zIHNvIGxhdGUuIE15IHNv
-bHV0aW9uIGhlcmUgZG9lc24ndCBjb3ZlciBub24tbG9hZGVkDQo+PiBtb2R1bGVzIGVpdGhlciwg
-YnV0IHRoaXMgY291bGQgbWF5YmUgYmUgY292ZXJlZCBieSBtb3ZpbmcgcGh5X3N1c3BlbmQoKQ0K
-Pj4gdG8gcGh5X3Byb2JlKCkuIFVubGVzcyB0aGVyZSBpcyBhbiBldmVuIG1vcmUgY2xldmVyIHdh
-eSB0byBnbyBhYm91dCBpdA0KPj4gd2hpY2ggSSBjYW4ndCBzZWUgZnJvbSBpbmV4cGVyaWVuY2Uu
-DQo+IA0KPiBOb3RlIHRoYXQgaW4gdGhlIGNhc2Ugd2hlcmUgdGhlIFBIWSBkcml2ZXIgbW9kdWxl
-IGlzIGxvYWRlZCBsYXRlLA0KPiBwaHlfcHJvYmUoKSB3b24ndCBiZSBjYWxsZWQgZm9yIHRoZSBQ
-SFkgdW50aWwgdGhhdCBoYXBwZW5zLg0KPiANCj4gSSB3b3VsZCBzYXkgaWYgb25lIHdhbnRzIGEg
-cGxhdGZvcm0gdG8gYmVoYXZlIHdpdGggbWluaW1hbCBwb3dlcg0KPiBjb25zdW1wdGlvbiwgdGhh
-dCBpcyBzb21ldGhpbmcgdGhhdCBoYXMgdG8gYmUgZG9uZSBhY3Jvc3MgdGhlDQo+IHNvZnR3YXJl
-IHN0YWNrLCBhbmQgdGhhdCBpbmNsdWRlcyB0aGUgYm9vdCBmaXJtd2FyZS4gU28sIGlmIG9uZQ0K
-PiB3YW50cyB0aGUgUEhZIHRvIGJlIGluIGEgbG93IHBvd2VyIHN0YXRlIGF0IGJvb3QgdGltZSwg
-dGhlbg0KPiBmaXJtd2FyZSBuZWVkcyB0byBlbnN1cmUgdGhhdCBoYXBwZW5zLg0KPiANCj4gVHJ5
-aW5nIHRvIHNob2UtaG9ybiB0aGF0IGludG8gdGhlIGtlcm5lbCBpc24ndCBnb2luZyB0byB3b3Jr
-DQo+IGJlY2F1c2Ugd2UgZ2V0IHRvIGRlY2lkZSB3aGF0IHRvIGRvIHdpdGggdGhlIFBIWSB3YXkg
-dG9vIGxhdGUNCj4gKGR1ZSB0byBQSFkgZHJpdmVycyBiZWluZyBtb2R1bGFyIGFuZCBvbiB0aGUg
-cm9vdGZzLikNCj4gDQoNCldoYXQgd2UgcmVhbGx5IHdhbnQgaXMgdGhlIFBIWSB0byBiZSBzdXNw
-ZW5kZWQgb24gc3VzcGVuZCB0byBSQU0gDQpyZWdhcmRsZXNzIG9mDQp1cyBoYXZpbmcgaGFkIGFu
-IGluaXRpYWwgbGluayB1cCBvciBub3QuDQoNClRoaXMgd29ya2VkIHByaW9yIHRvIDRjMGQyZTk2
-YmEwNSAoIm5ldDogcGh5OiBjb25zaWRlciB0aGF0IHN1c3BlbmQycmFtIA0KbWF5IGN1dA0Kb2Zm
-IFBIWSBwb3dlciIpIHdoaWNoIHdhcyBhZGRlZCBpbiBMaW51eCA1LjExLCBhbmQgNTU3ZDVkYzgz
-ZjY4ICgibmV0OiANCmZlYzogdXNlDQptYWMtbWFuYWdlZCBQSFkgUE0iKSB3aGljaCB3YXMgYWRk
-ZWQgaW4gTGludXggNS4xMi4NCg0KU2luY2UgRkVDIHJlcXVpcmVzIG1hY19tYW5hZ2VkX3BtIHRo
-ZSBnZW5lcmljIFBNIHN1c3BlbmQtcmVzdW1lIHBhdGhzIA0KYXJlIG5vdA0KdGFrZW4uIFRoZSBy
-ZXN1bWUgc2VxdWVuY2luZyB3aXRoIGdlbmVyaWMgUE0gaGFzIGJlZW4gYnJva2VuIHdpdGggdGhl
-IA0KRkVDIHNpbmNlDQpnZW5lcmljIFBNIG9mIHRoZSBtZGlvIGJ1cyB3YXMgYWRkZWQsIGFzIHRo
-ZSBGRUMgd2lsbCBkbyBwaHlfc3RhcnQoKSANCih2aWEgRkVDDQpyZXN1bWUpIGFuZCB0aGVuIGdl
-bmVyaWMgUE0gcnVucyBwaHlfaW5pdF9odygpIHZpYSBtZGlvIGJ1cyByZXN1bWUgDQoocHJldmlv
-dXNseToNCmxlc3MgZGFtYWdpbmcgcGh5X3Jlc3VtZSgpKSBkdWUgdG8gaG93IHRoZSBGRUMgSVAg
-YmxvY2sgd29ya3MuDQoNClNvbWUgYmFja2dyb3VuZCBjb250ZXh0IHRvIG91ciB1c2VjYXNlIHdo
-aWNoIG1pZ2h0IGhhdmUgYmVlbiBsb3N0IGlzIA0KdGhhdCBvdXINCnN5c3RlbSBicmluZyB0aGUg
-bGluayB1cCBiYXNlZCBvbiBvdXRzaWRlIGlucHV0IGFuZCB0byBjb25zZXJ2ZSBwb3dlciB3ZSAN
-CnN1c3BlbmQNCnJlZ3VsYXJseSwgYW5kIHRoaXMgaXMgdGhlIG9ubHkgc2l0dWF0aW9uIHdoZXJl
-IHdlIGNhcmUgYWJvdXQgdGhlIHBvd2VyDQpjb25zdW1wdGlvbi4gU2luY2Ugd2UgY2Fubm90IGRl
-Y2lkZSBpZiBsaW5rIHNoYWxsIGJlIHVwIG91cnNlbHZlcyB3ZSBjYW4gZ28NCnRocm91Z2ggbnVt
-ZXJvdXMgc3VzcGVuZCBjeWNsZXMgYmVmb3JlIHRoZSBmaXJzdCBsaW5rIHVwLiBXZSBjb3VsZCBp
-biB0aGVvcnkNCndvcmsgYXJvdW5kIGl0IGluIHVzZXJzcGFjZSBieSBkb2luZyAiaXAgbGluayBz
-ZXQgPGV0aD4gdXAgJiYgaXAgbGluayANCnNldCA8ZXRoPg0KZG93biIsIGJ1dCBpdCB3YXNuJ3Qg
-cmVxdWlyZWQgYmVmb3JlLg0KDQpUaGFua3MhIC8vIEpvaG4gRXJuYmVyZw==
+Artem Savkov <asavkov@redhat.com> writes:
+
+> On Wed, Mar 20, 2024 at 07:34:46PM +0800, Xu Kuohai wrote:
+>> On 3/13/2024 10:02 PM, Artem Savkov wrote:
+>> > Commit d63903bbc30c7 ("arm64: bpf: fix endianness conversion bugs")
+>> > added upper bits zeroing to byteswap operations, but it assumes they
+>> > will be already zeroed after rev32, which is not the case on some
+>> > systems at least:
+>> > 
+>> > [ 9757.262607] test_bpf: #312 BSWAP 16: 0x0123456789abcdef -> 0xefcd jited:1 8 PASS
+>> > [ 9757.264435] test_bpf: #313 BSWAP 32: 0x0123456789abcdef -> 0xefcdab89 jited:1 ret 1460850314 != -271733879 (0x5712ce8a != 0xefcdab89)FAIL (1 times)
+>> > [ 9757.266260] test_bpf: #314 BSWAP 64: 0x0123456789abcdef -> 0x67452301 jited:1 8 PASS
+>> > [ 9757.268000] test_bpf: #315 BSWAP 64: 0x0123456789abcdef >> 32 -> 0xefcdab89 jited:1 8 PASS
+>> > [ 9757.269686] test_bpf: #316 BSWAP 16: 0xfedcba9876543210 -> 0x1032 jited:1 8 PASS
+>> > [ 9757.271380] test_bpf: #317 BSWAP 32: 0xfedcba9876543210 -> 0x10325476 jited:1 ret -1460850316 != 271733878 (0xa8ed3174 != 0x10325476)FAIL (1 times)
+>> > [ 9757.273022] test_bpf: #318 BSWAP 64: 0xfedcba9876543210 -> 0x98badcfe jited:1 7 PASS
+>> > [ 9757.274721] test_bpf: #319 BSWAP 64: 0xfedcba9876543210 >> 32 -> 0x10325476 jited:1 9 PASS
+>> > 
+>> > Fixes: d63903bbc30c7 ("arm64: bpf: fix endianness conversion bugs")
+>> > Signed-off-by: Artem Savkov <asavkov@redhat.com>
+>> > ---
+>> >   arch/arm64/net/bpf_jit_comp.c | 3 ++-
+>> >   1 file changed, 2 insertions(+), 1 deletion(-)
+>> > 
+>> > diff --git a/arch/arm64/net/bpf_jit_comp.c b/arch/arm64/net/bpf_jit_comp.c
+>> > index c5b461dda4385..e86e5ba74dca2 100644
+>> > --- a/arch/arm64/net/bpf_jit_comp.c
+>> > +++ b/arch/arm64/net/bpf_jit_comp.c
+>> > @@ -944,7 +944,8 @@ static int build_insn(const struct bpf_insn *insn, struct jit_ctx *ctx,
+>> >   			break;
+>> >   		case 32:
+>> >   			emit(A64_REV32(is64, dst, dst), ctx);
+>> > -			/* upper 32 bits already cleared */
+>> > +			/* zero-extend 32 bits into 64 bits */
+>> > +			emit(A64_UXTW(is64, dst, dst), ctx);
+>> 
+>> I think the problem only occurs when is64 == 1. In this case, the generated rev32
+>> insn reverses byte order in both high and low 32-bit word. To fix it, we could just
+>> set the first arg to 0 for A64_REV32:
+>> 
+>> emit(A64_REV32(0, dst, dst), ctx);
+>> 
+>> No need to add an extra uxtw isnn.
+>
+> I can confirm this approach fixes the test issue as well.
+
+Yes, the following diff fixes the issue:
+
+diff --git a/arch/arm64/net/bpf_jit_comp.c b/arch/arm64/net/bpf_jit_comp.c
+index bc16eb694..64deff221 100644
+--- a/arch/arm64/net/bpf_jit_comp.c
++++ b/arch/arm64/net/bpf_jit_comp.c
+@@ -943,7 +943,7 @@ static int build_insn(const struct bpf_insn *insn, struct jit_ctx *ctx,
+                        emit(A64_UXTH(is64, dst, dst), ctx);
+                        break;
+                case 32:
+-                       emit(A64_REV32(is64, dst, dst), ctx);
++                       emit(A64_REV32(0, dst, dst), ctx);
+                        /* upper 32 bits already cleared */
+                        break;
+                case 64:
+
+All tests pass with this change:
+
+test_bpf: Summary: 1049 PASSED, 0 FAILED, [1037/1037 JIT'ed]
+test_bpf: test_tail_calls: Summary: 10 PASSED, 0 FAILED, [10/10 JIT'ed]
+test_bpf: test_skb_segment: Summary: 2 PASSED, 0 FAILED
+
+When you send a patch please add:
+
+Tested-by: Puranjay Mohan <puranjay12@gmail.com>
+Acked-by: Puranjay Mohan <puranjay12@gmail.com>
+
+
+Thanks,
+Puranjay
 
