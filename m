@@ -1,160 +1,368 @@
-Return-Path: <netdev+bounces-80867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49D2A8815F2
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 17:54:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 773298815FD
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 17:58:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B69D1C20F76
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:54:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E24F2B23438
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:58:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C9E769DE8;
-	Wed, 20 Mar 2024 16:54:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 400D46A010;
+	Wed, 20 Mar 2024 16:58:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="J4MviXSq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="va8cuuFg"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA69628;
-	Wed, 20 Mar 2024 16:54:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF4BC69DF7
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 16:58:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710953681; cv=none; b=Z5zXpLUbDNOOz1Lt+lD5Ho+7dIzO+REAofYU1TONbgK4kF9QcIFN/sFU5wttZvquRPA6EGUM53LqOQHgrdHH5JQC98RenKe6cBn1VtrY6MOLXEslKuVYXI8nmGzAc0p/irWfaqr7+ZkQZiM8v+uuiDJ7fnN7Fb7EcapwaoJkttU=
+	t=1710953887; cv=none; b=aHFlR52v9Tt6zywfp4WrJ7pbAFU3OnhU3gJtILhKQHgjUmykX3WK2uMDRI2FTNZb4S6NEVQ5V0DjOi/TkN70PdRUbDaJZVNDaH/87ojlXVrF/XVqcSXtqG5x5VZ+CoyMndIjClJNjiF7JxSNC48h3eZeza/5sCmqU36960lGVPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710953681; c=relaxed/simple;
-	bh=hVvpQc/myDQMdBDigQy4sHR6Pca16XS2T42ZMishL8w=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MIdoslfBuJ1wh7Wy1usu1cdl7ity5KZpbYpipwi81rHlNJd3andVQH3vBNiohCKJe/+w1GBHdwFQh/VlTNlYkeSevNPbmZAGsy5WpN8RYofInnNIuyBEkD5wkRHcGu7ePVJ1iqLEggnj1ECWF8voBTRVz9RvJpb6RUAJ+XFcp/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=J4MviXSq; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=/TsYsIa12qttkUZur28k+MhSiJXF4P4wa++ZZvt18t0=; b=J4MviXSqbprojtwtHefqABgh5u
-	4Ti8LCtni5WZ2M57LsHsKIOYsRItoy0mRGDt0aWk6ATO7bxtiJRP0aWZq9+i6ymb6iRSuZXg+UcPJ
-	ckqIMRYn8m55LUyfrVbHYUq8miwjn12X1m/r5HuGQnXL3StggWA/t2YLNbiv6wz2d/mDStskU7dnc
-	RGcmIkyh4oe8BK7D10qXrdWPDpP5pil66efitGJY4xaTK8ll1CUr64mhqHbhUawXHgEW+sbtSz831
-	IqBYIsql2fFa7ywIiCmAEVz3vHZot7w2462CFcD7QcnBmztaMWQsHbLQkSTyXr/EHzlAdAAi3ksh+
-	tnuzMiJQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48652)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rmzCs-0006je-0V;
-	Wed, 20 Mar 2024 16:54:26 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rmzCo-0002pw-U8; Wed, 20 Mar 2024 16:54:22 +0000
-Date: Wed, 20 Mar 2024 16:54:22 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: John Ernberg <john.ernberg@actia.se>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>,
-	NXP Linux Team <linux-imx@nxp.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH net v3 2/2] net: fec: Suspend the PHY on probe
-Message-ID: <ZfsUvm9YC5O7il3h@shell.armlinux.org.uk>
-References: <20240306133734.4144808-1-john.ernberg@actia.se>
- <20240306133734.4144808-3-john.ernberg@actia.se>
- <20240306190539.4ab9f369@device-28.home>
- <9490ed31-dede-4a14-9c62-5ef83e30593a@actia.se>
- <ZflSE8AaYLE3Ri8L@shell.armlinux.org.uk>
- <f89bec78-0dae-4518-a461-2e64a3dfb9fc@actia.se>
+	s=arc-20240116; t=1710953887; c=relaxed/simple;
+	bh=mJrymtDICi7bFPltbPdz2gu7QDCeDyi2aNoLDRK3u2o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a9uqJwnoRzzOw7dB9r+Z0d46IR09biNT3bSw8rb8bmEnGSGnJOmg9jlEaUtiqqmPBbnx6XDixV/B/L5Ub/pii2MFtocxc+Ji6HjNwvjh3f9KQZokHsGOc8ifEiy/o8m4Lh+aDEnjcyPNtZyqSn5AOuOZoSUjrCygTUh2WQwPcLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=va8cuuFg; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56b9dac4e6cso310a12.1
+        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 09:58:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1710953883; x=1711558683; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tzPodG4qFomJO8EjbK+loR6z9eNmrS/kvFeMe1pqOxg=;
+        b=va8cuuFgWChWq9anC9kEUlY+hJRsS6KzTS3VAMb6RkGw8k6czYlS6i7A6Jq3HF8goR
+         EJNvg0D27+AAPA31e4od1RI4X6R2ILOFHWqE7xlCuNC26hpoHN9S9J/fThnKBVMe5EAa
+         RQ3LMUFD0mofm9aSXNFC3XJFnLuPotiDKup7DpUbS7/P2VlgeoWhStCMUckgzIoIApWb
+         VOqMq+FBNCcV1Cll5fNhudV7V7YPyMCu23NXhACGyJvbppw3URz36zYDkQfJg+5zoAmZ
+         w/G73KV37sZBQEvYvBdzIGz5OdtKrzOLPSVT0fIDfHnOIMQBpT6GtbLVXpRudfF2JXE/
+         oLfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1710953883; x=1711558683;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tzPodG4qFomJO8EjbK+loR6z9eNmrS/kvFeMe1pqOxg=;
+        b=Zb/2r3ypulKy4TZykEuMFkECTRVzxicCeoJNMzIreUIzAyrf/OJSj30kwXdRkDI82W
+         MpYyRoU9arZEkFx2N6N59Rx+quSVfTJM6rR40Lpu+23Fe84wyzGolLA9DEp8qmp+2fbU
+         siTsrlmf1tK3aUDyelkGvfi+ZeD+chbP9cMS05VgEWc2I7QuRYRH97U/VlDpVcSrLU9A
+         51It2gy8SUp1OZ7y8QgoHjIVffl0BgzgAgoS62ZkqHmennH+IfyUPBgC0us+36F+U8XN
+         qpsk6Cc9rFfiWKwjQ0Zy4UFu4FRnWtcBHa+ha7VePn14sYCeuweSYmZYUFvA/YvhnLYr
+         RnkQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU67mtIl+kZipj6davGOCUnJ+xqtFRmymSUMQp/dwOi+xV1ivitOImVytMc0HSKmlSmmscNOBGgEN5I/+qSSbtxurwgu/zd
+X-Gm-Message-State: AOJu0Yw27zx3eQtsLw2NUz6B7LTak0h00/jeVDk3zNX2kDsxi/7ApMaH
+	IAS7E3kHGwN0CtCCJ/0PsEzO407rqsqEej4INQbIdld/4T4G1vFFYw07AgDhV9llWr51lOgodzZ
+	m+Hb59sdtzX15+SYitvuxgUUrB1UBmwvhgdjR
+X-Google-Smtp-Source: AGHT+IHp9rpPNLc7D04a2Vlegq+BarNCT0eDwVjBHcW3jFj+1I/j4pCFnbEipACZrmhKgZC99ZKmx2zW+xfSlFRiicE=
+X-Received: by 2002:a05:6402:1d08:b0:56b:b856:7eb5 with SMTP id
+ dg8-20020a0564021d0800b0056bb8567eb5mr90332edb.4.1710953882883; Wed, 20 Mar
+ 2024 09:58:02 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f89bec78-0dae-4518-a461-2e64a3dfb9fc@actia.se>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20240314111713.5979-1-renmingshuai@huawei.com>
+ <CAM0EoMmqVHGC4_YVHj=rUPj+XBS_N99rCKk1S7wCi1wJ8__Pyw@mail.gmail.com>
+ <CAM0EoMkZKvvPVaCGFVTE_P1YCyS-r2b3gq3QRhDuEF=Cm-sY4g@mail.gmail.com>
+ <CAM0EoMm+W3X7TG8qjb8LWsBbAQ8_rntr7kwhSTy7Sxk=Yj=R2g@mail.gmail.com>
+ <CANn89iL_hfoWTqr+KaKZoO8fKoZdd-xcY040NeSb-WL7pHMLGQ@mail.gmail.com>
+ <CAM0EoMkqhmDtpg09ktnkxjAtddvXzwQo4Qh2-LX2r8iqrECogw@mail.gmail.com>
+ <CANn89iK2e4csrApZjY+kpR9TwaFpN9rcbRSPtyQnw5P_qkyYfA@mail.gmail.com>
+ <CAM0EoMkDexWQ_Rj_=gKMhWzSgQqtbAdyDv8DXgY+nk_2Rp3drg@mail.gmail.com>
+ <CANn89iLuYjQGrutsN17t2QARGzn-PY7rscTeHSi0zsWcO-tbTA@mail.gmail.com> <CAM0EoM=WCLvjCxkDGSEP-+NqEd2HnieiW8emNoV1LeV6n6w9VQ@mail.gmail.com>
+In-Reply-To: <CAM0EoM=WCLvjCxkDGSEP-+NqEd2HnieiW8emNoV1LeV6n6w9VQ@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 20 Mar 2024 17:57:51 +0100
+Message-ID: <CANn89iLjK3vf-yHvKdY=wvOdEeWubB0jt2=5d-1m7dkTYBwBOg@mail.gmail.com>
+Subject: Re: [PATCH] net/sched: Forbid assigning mirred action to a filter
+ attached to the egress
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: renmingshuai <renmingshuai@huawei.com>, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	davem@davemloft.net, vladbu@nvidia.com, netdev@vger.kernel.org, 
+	yanan@huawei.com, liaichun@huawei.com, caowangbao@huawei.com, 
+	Eric Dumazet <eric.dumazet@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Davide Caratti <dcaratti@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 20, 2024 at 03:25:54PM +0000, John Ernberg wrote:
-> Hi Russel,
+On Tue, Mar 19, 2024 at 9:54=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com>=
+ wrote:
+>
+> On Tue, Mar 19, 2024 at 5:38=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
+> >
+> > On Mon, Mar 18, 2024 at 11:05=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu=
+.com> wrote:
+> > >
+> > > On Mon, Mar 18, 2024 at 3:11=E2=80=AFPM Eric Dumazet <edumazet@google=
+.com> wrote:
+> > > >
+> > > > On Mon, Mar 18, 2024 at 6:36=E2=80=AFPM Jamal Hadi Salim <jhs@mojat=
+atu.com> wrote:
+> > > > >
+> > > > > On Mon, Mar 18, 2024 at 11:46=E2=80=AFAM Eric Dumazet <edumazet@g=
+oogle.com> wrote:
+> > > > > >
+> > > > > > On Mon, Mar 18, 2024 at 3:27=E2=80=AFPM Jamal Hadi Salim <jhs@m=
+ojatatu.com> wrote:
+> > > > > > >
+> > > > > > > On Sun, Mar 17, 2024 at 12:10=E2=80=AFPM Jamal Hadi Salim <jh=
+s@mojatatu.com> wrote:
+> > > > > > > >
+> > > > > > > > On Thu, Mar 14, 2024 at 1:14=E2=80=AFPM Jamal Hadi Salim <j=
+hs@mojatatu.com> wrote:
+> > > > > > > > >
+> > > > > > > > > On Thu, Mar 14, 2024 at 7:18=E2=80=AFAM renmingshuai <ren=
+mingshuai@huawei.com> wrote:
+> > > > > > > > > >
+> > > > > > > > > > As we all know the mirred action is used to mirroring o=
+r redirecting the
+> > > > > > > > > > packet it receives. Howerver, add mirred action to a fi=
+lter attached to
+> > > > > > > > > > a egress qdisc might cause a deadlock. To reproduce the=
+ problem, perform
+> > > > > > > > > > the following steps:
+> > > > > > > > > > (1)tc qdisc add dev eth0 root handle 1: htb default 30 =
+\n
+> > > > > > > > > > (2)tc filter add dev eth2 protocol ip prio 2 flower ver=
+bose \
+> > > > > > > > > >      action police rate 100mbit burst 12m conform-excee=
+d jump 1 \
+> > > > > > > > > >      / pipe mirred egress redirect dev eth2 action drop
+> > > > > > > > > >
+> > > > > > > > >
+> > > > > > > > > I think you meant both to be the same device eth0 or eth2=
+?
+> > > > > > > > >
+> > > > > > > > > > The stack is show as below:
+> > > > > > > > > > [28848.883915]  _raw_spin_lock+0x1e/0x30
+> > > > > > > > > > [28848.884367]  __dev_queue_xmit+0x160/0x850
+> > > > > > > > > > [28848.884851]  ? 0xffffffffc031906a
+> > > > > > > > > > [28848.885279]  tcf_mirred_act+0x3ab/0x596 [act_mirred]
+> > > > > > > > > > [28848.885863]  tcf_action_exec.part.0+0x88/0x130
+> > > > > > > > > > [28848.886401]  fl_classify+0x1ca/0x1e0 [cls_flower]
+> > > > > > > > > > [28848.886970]  ? dequeue_entity+0x145/0x9e0
+> > > > > > > > > > [28848.887464]  ? newidle_balance+0x23f/0x2f0
+> > > > > > > > > > [28848.887973]  ? nft_lookup_eval+0x57/0x170 [nf_tables=
+]
+> > > > > > > > > > [28848.888566]  ? nft_do_chain+0xef/0x430 [nf_tables]
+> > > > > > > > > > [28848.889137]  ? __flush_work.isra.0+0x35/0x80
+> > > > > > > > > > [28848.889657]  ? nf_ct_get_tuple+0x1cf/0x210 [nf_connt=
+rack]
+> > > > > > > > > > [28848.890293]  ? do_select+0x637/0x870
+> > > > > > > > > > [28848.890735]  tcf_classify+0x52/0xf0
+> > > > > > > > > > [28848.891177]  htb_classify+0x9d/0x1c0 [sch_htb]
+> > > > > > > > > > [28848.891722]  htb_enqueue+0x3a/0x1c0 [sch_htb]
+> > > > > > > > > > [28848.892251]  __dev_queue_xmit+0x2d8/0x850
+> > > > > > > > > > [28848.892738]  ? nf_hook_slow+0x3c/0xb0
+> > > > > > > > > > [28848.893198]  ip_finish_output2+0x272/0x580
+> > > > > > > > > > [28848.893692]  __ip_queue_xmit+0x193/0x420
+> > > > > > > > > > [28848.894179]  __tcp_transmit_skb+0x8cc/0x970
+> > > > > > > > > >
+> > > > > > > > > > In this case, the process has hold the qdisc spin lock =
+in __dev_queue_xmit
+> > > > > > > > > > before the egress packets are mirred, and it will attem=
+pt to obtain the
+> > > > > > > > > > spin lock again after packets are mirred, which cause a=
+ deadlock.
+> > > > > > > > > >
+> > > > > > > > > > Fix the issue by forbidding assigning mirred action to =
+a filter attached
+> > > > > > > > > > to the egress.
+> > > > > > > > > >
+> > > > > > > > > > Signed-off-by: Mingshuai Ren <renmingshuai@huawei.com>
+> > > > > > > > > > ---
+> > > > > > > > > >  net/sched/act_mirred.c                        |  4 +++
+> > > > > > > > > >  .../tc-testing/tc-tests/actions/mirred.json   | 32 +++=
+++++++++++++++++
+> > > > > > > > > >  2 files changed, 36 insertions(+)
+> > > > > > > > > >
+> > > > > > > > > > diff --git a/net/sched/act_mirred.c b/net/sched/act_mir=
+red.c
+> > > > > > > > > > index 5b3814365924..fc96705285fb 100644
+> > > > > > > > > > --- a/net/sched/act_mirred.c
+> > > > > > > > > > +++ b/net/sched/act_mirred.c
+> > > > > > > > > > @@ -120,6 +120,10 @@ static int tcf_mirred_init(struct =
+net *net, struct nlattr *nla,
+> > > > > > > > > >                 NL_SET_ERR_MSG_MOD(extack, "Mirred requ=
+ires attributes to be passed");
+> > > > > > > > > >                 return -EINVAL;
+> > > > > > > > > >         }
+> > > > > > > > > > +       if (tp->chain->block->q->parent !=3D TC_H_INGRE=
+SS) {
+> > > > > > > > > > +               NL_SET_ERR_MSG_MOD(extack, "Mirred can =
+only be assigned to the filter attached to ingress");
+> > > > > > > > > > +               return -EINVAL;
+> > > > > > > > > > +       }
+> > > > > > > > >
+> > > > > > > > > Sorry, this is too restrictive as Jiri said. We'll try to=
+ reproduce. I
+> > > > > > > > > am almost certain this used to work in the old days.
+> > > > > > > >
+> > > > > > > > Ok, i looked at old notes - it did work at "some point" pre=
+-tdc.
+> > > > > > > > Conclusion is things broke around this time frame:
+> > > > > > > > https://lore.kernel.org/netdev/1431679850-31896-1-git-send-=
+email-fw@strlen.de/
+> > > > > > > > https://lore.kernel.org/netdev/1465095748.2968.45.camel@edu=
+mazet-glaptop3.roam.corp.google.com/
+> > > > > > > >
+> > > > > > > > Looking further into it.
+> > > > > > >
+> > > > > > > This is what we came up with. Eric, please take a look...
+> > > > > > >
+> > > > > > > cheers,
+> > > > > > > jamal
+> > > > > > >
+> > > > > > >
+> > > > > > > --- a/net/core/dev.c
+> > > > > > > +++ b/net/core/dev.c
+> > > > > > > @@ -3789,7 +3789,14 @@ static inline int __dev_xmit_skb(struc=
+t sk_buff
+> > > > > > > *skb, struct Qdisc *q,
+> > > > > > >         if (unlikely(contended))
+> > > > > > >                 spin_lock(&q->busylock);
+> > > > > > >
+> > > > > > > +       if (dev_recursion_level()) {
+> > > > > >
+> > > > > > I am not sure what your intent is, but this seems wrong to me.
+> > > > > >
+> > > > >
+> > > > > There is a deadlock if you reenter the same device which has a qd=
+isc
+> > > > > attached to it more than once.
+> > > > > Essentially entering __dev_xmit_skb() we grab the root qdisc lock=
+ then
+> > > > > run some action which requires it to grab the root qdisc lock (ag=
+ain).
+> > > > > This is easy to show with mirred (although i am wondering if syzk=
+aller
+> > > > > may have produced this at some point)..
+> > > > > $TC qdisc add dev $DEV root handle 1: htb default 1
+> > > > > $TC filter add dev $DEV protocol ip u32 match ip protocol 1 0xff
+> > > > > action mirred egress mirror dev $DEV
+> > > > >
+> > > > > Above example is essentially egress $DEV-> egress $DEV in both ca=
+ses
+> > > > > "egress $DEV" grabs the root qdisc lock. You could also create an=
+other
+> > > > > example with egress($DEV1->$DEV2->back to $DEV1).
+> > > > >
+> > > > > > Some valid setup use :
+> > > > > >
+> > > > > > A bonding device, with HTB qdisc (or other qdisc)
+> > > > > >   (This also could be a tunnel device with a qdisc)
+> > > > > >
+> > > > > > -> one or multiple physical NIC, wth FQ or other qdisc.
+> > > > > >
+> > > > > > Packets would be dropped here when we try to reach the physical=
+ device.
+> > > > > >
+> > > > >
+> > > > > If you have an example handy please send it. I am trying to imagi=
+ne
+> > > > > how those would have worked if they have to reenter the root qdis=
+c of
+> > > > > the same dev multiple times..
+> > > >
+> > > > Any virtual device like a GRE/SIT/IPIP/... tunnel, add a qdisc on i=
+t ?
+> > > >
+> > > > dev_xmit_recursion_inc() is global (per-cpu), it is not per-device.
+> > > >
+> > > > A stack of devices A -> B -> C  would elevate the recursion level t=
+o
+> > > > three just fine.
+> > > >
+> > > > After your patch, a stack of devices would no longer work.
+> > > >
+> > > > It seems mirred correctly injects packets to the top of the stack f=
+or
+> > > > ingress (via netif_rx() / netif_receive_skb()),
+> > > > but thinks it is okay to call dev_queue_xmit(), regardless of the c=
+ontext ?
+> > > >
+> > > > Perhaps safe-guard mirred, instead of adding more code to fast path=
+.
+> > >
+> > > I agree not to penalize everybody for a "bad config" like this
+> > > (surprising syzkaller hasnt caught this). But i dont see how doing th=
+e
+> > > checking within mirred will catch this (we cant detect the A->B->A
+> > > case).
+> > > I think you are suggesting a backlog-like queue for mirred? Not far
+> > > off from that is how it used to work before
+> > > (https://lore.kernel.org/netdev/1465095748.2968.45.camel@edumazet-gla=
+ptop3.roam.corp.google.com/)
+> >
+> >
+> > spin_trylock() had to go. There is no way we could keep this.
+> >
+>
+> Not asking for it to come back... just pointing out why it worked before.
+>
+> > > - i.e we had a trylock for the qdisc lock and if it failed we tagged
+> > > the rx softirq for a reschedule. That in itself is insufficient, we
+> > > would need a loop check which is per-skb (which we had before
+> > > https://lore.kernel.org/netdev/1431679850-31896-1-git-send-email-fw@s=
+trlen.de/).
+> > > There are other gotchas there, potentially packet reordering.
+> >
+> > If we want to make sure dev_queue_xmit() is called from the top (no
+> > spinlock held),
+> > then we need a queue, serviced from another context.
+> >
+> > This extra queueing could happen if
+> > __this_cpu_read(softnet_data.xmit.recursion) > 0
+> >
+>
+> I dont see a way to detect softnet_data.xmit.recursion > 0 at mirred
+> level. The first time we enter it will be 0.
 
-Growl. Hi Peter.
+Then it is fine, no qdisc spinlock is held at this point.
 
-> What we really want is the PHY to be suspended on suspend to RAM 
-> regardless of us having had an initial link up or not.
+ The second time we would
+> deadlock before we hit mirred.
 
-So what you're asking is for the PHY to be suspended when the system
-is entering suspend, which is a long time after the system booted and
-thus phy_probe() was called, and could be some time before the system
-resumes.
+This is not how I see the trace.
 
-I'm not sure what the relevance is of phy_probe() that was brought up
-previously then.
+Mirred would detect that and either drop or queue the packet to a work
+queue or something.
 
-> This worked prior to 4c0d2e96ba05 ("net: phy: consider that suspend2ram 
-> may cut
-> off PHY power") which was added in Linux 5.11, and 557d5dc83f68 ("net: 
-> fec: use
-> mac-managed PHY PM") which was added in Linux 5.12.
+diff --git a/net/sched/act_mirred.c b/net/sched/act_mirred.c
+index 5b38143659249e66718348e0ec4ed3c7bc21c13d..a2c53e200629a17130f38246ab3=
+cdb8c89c6d30e
+100644
+--- a/net/sched/act_mirred.c
++++ b/net/sched/act_mirred.c
+@@ -237,9 +237,15 @@ tcf_mirred_forward(bool at_ingress, bool
+want_ingress, struct sk_buff *skb)
+ {
+        int err;
 
-Looking at the former commit, that looks to me like it is only
-affecting the resume paths, not the suspend paths, so wouldn't have
-any impact itself on what happens when suspend happens.
-
-The latter commit states that it is a work around for an issue with a
-particular PHY. What happens if you revert just this commit, does your
-problem then go away?
-
-Also, please clarify. It seems that you are reporting a regression -
-it used to work for you prior to 557d5dc83f68, but 557d5dc83f68 stops
-it working for you?
-
-> Since FEC requires mac_managed_pm the generic PM suspend-resume paths 
-> are not
-> taken. The resume sequencing with generic PM has been broken with the 
-> FEC since
-> generic PM of the mdio bus was added, as the FEC will do phy_start() 
-> (via FEC
-> resume) and then generic PM runs phy_init_hw() via mdio bus resume 
-> (previously:
-> less damaging phy_resume()) due to how the FEC IP block works.
-
-That suggests that even with 557d5dc83f68 reverted, it's broken.
-Digging into the history, what you're referring to dates from January
-2016, so are you reporting a regression that occured 8 _years_ ago,
-at which point I'd question why it's taken 8 years.
-
-Given the time that has passed, I don't think reverting commits is
-a sane approach. Quite what the right solution is though, I'm not
-sure.
-
-From the description and the commits pointed to, I just don't see
-that there is anything that could've changed with respect to the first
-boot - if that has changed, then I think more research into what caused
-it is needed.
-
-If it's the subsequent state after a suspend-resume cycle, then yes,
-I would agree that its possible that these changes broke this for you.
-Would clearing ndev->phydev->mac_managed_pm just before
-phy_disconnect() in fec_enet_close() fix it for you, so the suspend/
-resume paths for the PHY get used when the network interface is down?
-
-Maybe, however, that's something that should happen in any case inside
-phylib on phy_disconnect() as a matter of course, since the PHY will
-at that point be no longer under the control of the network driver for
-PM purposes. Could you give this idea a try please?
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+-       if (!want_ingress)
++       if (!want_ingress) {
++               if (__this_cpu_read(softnet_data.xmit.recursion) > 0) {
++                       // TODO increment a drop counter perhaps ?
++                       kfree_skb(skb);
++                       return -EINVAL;
++               }
++
+                err =3D tcf_dev_queue_xmit(skb, dev_queue_xmit);
+-       else if (!at_ingress)
++       } else if (!at_ingress)
+                err =3D netif_rx(skb);
+        else
+                err =3D netif_receive_skb(skb);
 
