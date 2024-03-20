@@ -1,279 +1,204 @@
-Return-Path: <netdev+bounces-80755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78771880F64
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:13:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56263880F86
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 11:20:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0649F1F21EB4
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 10:13:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89415B2180C
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 10:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D23FC3BB48;
-	Wed, 20 Mar 2024 10:13:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 532F83CF51;
+	Wed, 20 Mar 2024 10:19:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="ortV1WbK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46BE93C097
-	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 10:12:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.219])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5E673D0A1;
+	Wed, 20 Mar 2024 10:19:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710929580; cv=none; b=n+wSXGQNN2tvpwl9GMBejVM1CJuU39vpU2KMaVfqQKTABDy+8+CNLfvUdCffMpyONauU9duN+8NLaVHNt51/4eQbuYja4RPMDHTVCMPhnuRpaPDlBpmMVDAYwTxzzfjw5isUGvBXmaC6J95E9Z8KPvln30nMVRqSh7a5UBXwPL8=
+	t=1710929989; cv=none; b=hAcLq6bPCiQMlSbvdq8EGJayaz/XVOCdxwVMJo6wvsB76zuNOVtf1WqUIH1hL+uO+GUNqwv3hCsJaNRqLZi09tyYLvz5HlgTz2TauV63oLo4op3X9KqNZgdBsyi/NMIc9plx0ytjWxx2zaUMC1+3DlqU3gm9EAFkFUV6qB11J20=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710929580; c=relaxed/simple;
-	bh=p6qBKdkFhKRhtiGkRgRhIhc04idA02RF6tLmT0KZZ8s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qty7sByl7FPp64yvEzThhE7xFfxqR8zYrq5Jkl1sgOJXE6OIcrss/gzte4948kaTqAheMxfZTbHCO77Ea9QbMmXvfjvv49dbY17x/LAiJ2+Fk6wN65FErjKlGHFho8fo4lFTlJjt9ZMFU2pb4n065q4oI/Xg7o5L2GWd3l2nT24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.109.198])
-	by gateway (Coremail) with SMTP id _____8AxOOintvpl3jYbAA--.45343S3;
-	Wed, 20 Mar 2024 18:12:55 +0800 (CST)
-Received: from [192.168.100.8] (unknown [112.20.109.198])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxLs+ktvplllBeAA--.50034S3;
-	Wed, 20 Mar 2024 18:12:53 +0800 (CST)
-Message-ID: <ff211347-df96-4ce1-83ab-3dc9e18dfce0@loongson.cn>
-Date: Wed, 20 Mar 2024 18:12:52 +0800
+	s=arc-20240116; t=1710929989; c=relaxed/simple;
+	bh=xIi+cW4w2WN3sLl/pWDZi4mIfB8RX4auWJofB6sJ99c=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=GJNGjiFsBvUb/s1yBIroNt4Fi7dp5saPBfkCzxXv/3DFUKuNEZqcsRP17VdfNIdzc7CP/+DxDhpK9YEYQp5E18aUX7qx+Nl+O0ZBpYiXhzjzpuIkD4/NLLT/ur3nXvp2Wq/7nX8Y3FmcfW/hkyc3aWekgeUpYcLsvQRTNhz9I5Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=ortV1WbK; arc=none smtp.client-ip=45.254.50.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=1oeuD
+	vFn2YDBckFkO47Q7YRsJ8OZ8rJl2dHg14vkSuw=; b=ortV1WbKJzj6lpEmSXyvL
+	h2kbUcPWGRGzjC/OzoXLMd2R/kn/a3AECnO54dT5Gq5+sHqK9C55X1p6IrN79kuD
+	SH3Bm3bQ1FnuFM7BFtMCtCQk2JjuLKXunHn3WNmamQZ3xhRDni5/ZMi9BQjcrEPy
+	5YYJ3UwTBQ+DRSamx0eAHs=
+Received: from localhost.localdomain (unknown [39.144.124.65])
+	by gzga-smtp-mta-g0-4 (Coremail) with SMTP id _____wDnL5ciuPpliawpBA--.38680S2;
+	Wed, 20 Mar 2024 18:19:15 +0800 (CST)
+From: Wang Rong <w_angrong@163.com>
+To: mst@redhat.com,
+	jasowang@redhat.com
+Cc: kvm@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Rong Wang <w_angrong@163.com>
+Subject: [PATCH v3] vhost/vdpa: Add MSI translation tables to iommu for software-managed MSI
+Date: Wed, 20 Mar 2024 18:19:12 +0800
+Message-Id: <20240320101912.28210-1-w_angrong@163.com>
+X-Mailer: git-send-email 2.20.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 04/11] net: stmmac: dwmac-loongson: Move irq
- config to loongson_gmac_config
-Content-Language: en-US
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-References: <cover.1706601050.git.siyanteng@loongson.cn>
- <776bfe84003b203ebe320dc7bf6b98707a667fa9.1706601050.git.siyanteng@loongson.cn>
- <xjfd4effff6572fohxsgannqjr2w44qm4tru4aan2agojs77dl@tneltus7zqo6>
- <6e7e2765-5074-4252-820f-e9b34960e8b3@loongson.cn>
- <6x5fg66cr2vwwcgr6yi45ipov5ejkst5fggcxd4y2mxkq7m6po@nkghfpdeduyj>
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <6x5fg66cr2vwwcgr6yi45ipov5ejkst5fggcxd4y2mxkq7m6po@nkghfpdeduyj>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8BxLs+ktvplllBeAA--.50034S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoW3GF4fWFWfKw1fXrWfAF48Xwc_yoWxAryDpr
-	W3Aa4YkrWDXry7Wa1qvw45XF9IyrW2yry8Ww47Aw17Was0vF9aqF18tr1UuFyxArZ8GF17
-	Xr4UCFWfuF95AFgCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUBYb4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AK
-	xVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7IU0b6pPUUUUU==
+X-CM-TRANSID:_____wDnL5ciuPpliawpBA--.38680S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxWrWkGF4ftw1DJF45Jr18Xwb_yoWrXry7pF
+	ZrCFy5Gr4UJw4xWrsxAF4DZFnYk3s2y3y8Caya9anakr1Utr90kaykGa4jyF15AFWrJF17
+	XF42kr18uw4UJ37anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0pEb18DUUUUU=
+X-CM-SenderInfo: xzbd0wpurqwqqrwthudrp/1tbiNgSniGXAkngAPAAAsu
 
+From: Rong Wang <w_angrong@163.com>
 
-在 2024/3/19 21:43, Serge Semin 写道:
-> On Wed, Mar 13, 2024 at 04:14:28PM +0800, Yanteng Si wrote:
->> 在 2024/2/6 01:01, Serge Semin 写道:
->>> On Tue, Jan 30, 2024 at 04:43:24PM +0800, Yanteng Si wrote:
->>>> Add loongson_dwmac_config and moving irq config related
->>>> code to loongson_dwmac_config.
->>>>
->>>> Removing MSI to prepare for adding loongson multi-channel
->>>> support later.
->>> Please detach this change into a separate patch and thoroughly explain
->>> why it was necessary.
->> OK.
->>>> Signed-off-by: Yanteng Si <siyanteng@loongson.cn>
->>>> Signed-off-by: Feiyang Chen <chenfeiyang@loongson.cn>
->>>> Signed-off-by: Yinggang Gu <guyinggang@loongson.cn>
->>>> ---
->>>>    .../ethernet/stmicro/stmmac/dwmac-loongson.c  | 85 ++++++++++++-------
->>>>    1 file changed, 55 insertions(+), 30 deletions(-)
->>>>
->>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
->>>> index 979c9b6dab3f..e7ce027cc14e 100644
->>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
->>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
->>>> @@ -11,8 +11,46 @@
->>>>    struct stmmac_pci_info {
->>>>    	int (*setup)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat);
->>>> +	int (*config)(struct pci_dev *pdev, struct plat_stmmacenet_data *plat,
->>>> +		      struct stmmac_resources *res, struct device_node *np);
->>>>    };
->>>> +static int loongson_dwmac_config_legacy(struct pci_dev *pdev,
->>>> +					struct plat_stmmacenet_data *plat,
->>>> +					struct stmmac_resources *res,
->>>> +					struct device_node *np)
->>>> +{
->>>> +	if (np) {
->>>> +		res->irq = of_irq_get_byname(np, "macirq");
->>>> +		if (res->irq < 0) {
->>>> +			dev_err(&pdev->dev, "IRQ macirq not found\n");
->>>> +			return -ENODEV;
->>>> +		}
->>>> +
->>>> +		res->wol_irq = of_irq_get_byname(np, "eth_wake_irq");
->>>> +		if (res->wol_irq < 0) {
->>>> +			dev_info(&pdev->dev,
->>>> +				 "IRQ eth_wake_irq not found, using macirq\n");
->>>> +			res->wol_irq = res->irq;
->>>> +		}
->>>> +
->>>> +		res->lpi_irq = of_irq_get_byname(np, "eth_lpi");
->>>> +		if (res->lpi_irq < 0) {
->>>> +			dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
->>>> +			return -ENODEV;
->>>> +		}
->>>> +	} else {
->>>> +		res->irq = pdev->irq;
->>>> +		res->wol_irq = res->irq;
->>>> +	}
->>>> +
->>>> +	plat->flags &= ~STMMAC_FLAG_MULTI_MSI_EN;
->>>> +	dev_info(&pdev->dev, "%s: Single IRQ enablement successful\n",
->>>> +		 __func__);
->>> Why is this here all of the sudden? I don't see this in the original
->>> code. Please move it to the patch which requires the flag
->>> setup/cleanup or drop if it isn't necessary.
->> +	plat->flags &= ~STMMAC_FLAG_MULTI_MSI_EN;
->> This cannot be removed because it appeared in a rebase(v4 -> v5). See
->> <https://lore.kernel.org/all/20230710090001.303225-9-brgl@bgdev.pl/>
-> AFAICS it _can_ be removed. The patch you referred to is a formal
-> conversion of
-> -	plat->multi_msi_en = 0;
-> to
-> +	plat->flags &= ~STMMAC_FLAG_MULTI_MSI_EN;
-> First of all the "multi_msi_en" field clearance had been
-> redundant there since the code setting the flag was executed after the
-> code which may cause the field clearance performed. Second AFAICS the
-> "multi_msi_en" field clearance was originally added to emphasize the
-> functions semantics:
-> intel_eth_config_multi_msi() - config multi IRQ device,
-> intel_eth_config_single_msi() - config single IRQ device.
->
-> So in your case there is no any reason of clearing the
-> STMMAC_FLAG_MULTI_MSI_EN flag. Please, either drop it or move the
-> change into a separate patch.
+Once enable iommu domain for one device, the MSI
+translation tables have to be there for software-managed MSI.
+Otherwise, platform with software-managed MSI without an
+irq bypass function, can not get a correct memory write event
+from pcie, will not get irqs.
+The solution is to obtain the MSI phy base address from
+iommu reserved region, and set it to iommu MSI cookie,
+then translation tables will be created while request irq.
 
-OK, you are right. drop it.
+Change log
+----------
 
+v1->v2:
+- add resv iotlb to avoid overlap mapping.
+v2->v3:
+- there is no need to export the iommu symbol anymore.
 
-Thanks,
+Signed-off-by: Rong Wang <w_angrong@163.com>
+---
+ drivers/vhost/vdpa.c | 59 +++++++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 56 insertions(+), 3 deletions(-)
 
-Yanteng
-
->
-> -Serge(y)
->
->> +	dev_info(&pdev->dev, "%s: Single IRQ enablement successful\n",
->> +		 __func__);
->>
->> OK, drop it.
->>
->>>> +
->>>> +	return 0;
->>>> +}
->>>> +
->>>>    static void loongson_default_data(struct pci_dev *pdev,
->>>>    				  struct plat_stmmacenet_data *plat)
->>>>    {
->>>> @@ -66,8 +104,21 @@ static int loongson_gmac_data(struct pci_dev *pdev,
->>>>    	return 0;
->>>>    }
->>>> +static int loongson_gmac_config(struct pci_dev *pdev,
->>>> +				struct plat_stmmacenet_data *plat,
->>>> +				struct stmmac_resources *res,
->>>> +				struct device_node *np)
->>>> +{
->>>> +	int ret;
->>>> +
->>>> +	ret = loongson_dwmac_config_legacy(pdev, plat, res, np);
->>>> +
->>>> +	return ret;
->>>> +}
->>>> +
->>> You introduce the config callback here and convert to a dummy method
->>> in
->>> [PATCH 07/11] net: stmmac: dwmac-loongson: Add multi-channel supports for loongson
->>> It's just pointless. What about introducing the
->>> loongson_dwmac_config_legacy() method and call it directly?
->> OK, I will try.
->>>>    static struct stmmac_pci_info loongson_gmac_pci_info = {
->>>>    	.setup = loongson_gmac_data,
->>>> +	.config = loongson_gmac_config,
->>>>    };
->>>>    static int loongson_dwmac_probe(struct pci_dev *pdev,
->>>> @@ -139,44 +190,19 @@ static int loongson_dwmac_probe(struct pci_dev *pdev,
->>>>    		plat->phy_interface = phy_mode;
->>>>    	}
->>>> -	pci_enable_msi(pdev);
->>> See my first note in this message.
->> OK.
->>
->>
->> Thanks,
->>
->> Yanteng
->>
->>> -Serge(y)
->>>
->>>>    	memset(&res, 0, sizeof(res));
->>>>    	res.addr = pcim_iomap_table(pdev)[0];
->>>> -	if (np) {
->>>> -		res.irq = of_irq_get_byname(np, "macirq");
->>>> -		if (res.irq < 0) {
->>>> -			dev_err(&pdev->dev, "IRQ macirq not found\n");
->>>> -			ret = -ENODEV;
->>>> -			goto err_disable_msi;
->>>> -		}
->>>> -
->>>> -		res.wol_irq = of_irq_get_byname(np, "eth_wake_irq");
->>>> -		if (res.wol_irq < 0) {
->>>> -			dev_info(&pdev->dev,
->>>> -				 "IRQ eth_wake_irq not found, using macirq\n");
->>>> -			res.wol_irq = res.irq;
->>>> -		}
->>>> -
->>>> -		res.lpi_irq = of_irq_get_byname(np, "eth_lpi");
->>>> -		if (res.lpi_irq < 0) {
->>>> -			dev_err(&pdev->dev, "IRQ eth_lpi not found\n");
->>>> -			ret = -ENODEV;
->>>> -			goto err_disable_msi;
->>>> -		}
->>>> -	} else {
->>>> -		res.irq = pdev->irq;
->>>> -		res.wol_irq = pdev->irq;
->>>> -	}
->>>> +	ret = info->config(pdev, plat, &res, np);
->>>> +	if (ret)
->>>> +		goto err_disable_device;
->>>>    	ret = stmmac_dvr_probe(&pdev->dev, plat, &res);
->>>>    	if (ret)
->>>> -		goto err_disable_msi;
->>>> +		goto err_disable_device;
->>>>    	return ret;
->>>> -err_disable_msi:
->>>> -	pci_disable_msi(pdev);
->>>>    err_disable_device:
->>>>    	pci_disable_device(pdev);
->>>>    err_put_node:
->>>> @@ -200,7 +226,6 @@ static void loongson_dwmac_remove(struct pci_dev *pdev)
->>>>    		break;
->>>>    	}
->>>> -	pci_disable_msi(pdev);
->>>>    	pci_disable_device(pdev);
->>>>    }
->>>> -- 
->>>> 2.31.4
->>>>
+diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+index ba52d128aeb7..28b56b10372b 100644
+--- a/drivers/vhost/vdpa.c
++++ b/drivers/vhost/vdpa.c
+@@ -49,6 +49,7 @@ struct vhost_vdpa {
+ 	struct completion completion;
+ 	struct vdpa_device *vdpa;
+ 	struct hlist_head as[VHOST_VDPA_IOTLB_BUCKETS];
++	struct vhost_iotlb resv_iotlb;
+ 	struct device dev;
+ 	struct cdev cdev;
+ 	atomic_t opened;
+@@ -247,6 +248,7 @@ static int _compat_vdpa_reset(struct vhost_vdpa *v)
+ static int vhost_vdpa_reset(struct vhost_vdpa *v)
+ {
+ 	v->in_batch = 0;
++	vhost_iotlb_reset(&v->resv_iotlb);
+ 	return _compat_vdpa_reset(v);
+ }
+ 
+@@ -1219,10 +1221,15 @@ static int vhost_vdpa_process_iotlb_update(struct vhost_vdpa *v,
+ 	    msg->iova + msg->size - 1 > v->range.last)
+ 		return -EINVAL;
+ 
++	if (vhost_iotlb_itree_first(&v->resv_iotlb, msg->iova,
++					msg->iova + msg->size - 1))
++		return -EINVAL;
++
+ 	if (vhost_iotlb_itree_first(iotlb, msg->iova,
+ 				    msg->iova + msg->size - 1))
+ 		return -EEXIST;
+ 
++
+ 	if (vdpa->use_va)
+ 		return vhost_vdpa_va_map(v, iotlb, msg->iova, msg->size,
+ 					 msg->uaddr, msg->perm);
+@@ -1307,6 +1314,45 @@ static ssize_t vhost_vdpa_chr_write_iter(struct kiocb *iocb,
+ 	return vhost_chr_write_iter(dev, from);
+ }
+ 
++static int vhost_vdpa_resv_iommu_region(struct iommu_domain *domain, struct device *dma_dev,
++	struct vhost_iotlb *resv_iotlb)
++{
++	struct list_head dev_resv_regions;
++	phys_addr_t resv_msi_base = 0;
++	struct iommu_resv_region *region;
++	int ret = 0;
++	bool with_sw_msi = false;
++	bool with_hw_msi = false;
++
++	INIT_LIST_HEAD(&dev_resv_regions);
++	iommu_get_resv_regions(dma_dev, &dev_resv_regions);
++
++	list_for_each_entry(region, &dev_resv_regions, list) {
++		ret = vhost_iotlb_add_range_ctx(resv_iotlb, region->start,
++				region->start + region->length - 1,
++				0, 0, NULL);
++		if (ret) {
++			vhost_iotlb_reset(resv_iotlb);
++			break;
++		}
++
++		if (region->type == IOMMU_RESV_MSI)
++			with_hw_msi = true;
++
++		if (region->type == IOMMU_RESV_SW_MSI) {
++			resv_msi_base = region->start;
++			with_sw_msi = true;
++		}
++	}
++
++	if (!ret && !with_hw_msi && with_sw_msi)
++		ret = iommu_get_msi_cookie(domain, resv_msi_base);
++
++	iommu_put_resv_regions(dma_dev, &dev_resv_regions);
++
++	return ret;
++}
++
+ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+ {
+ 	struct vdpa_device *vdpa = v->vdpa;
+@@ -1335,11 +1381,16 @@ static int vhost_vdpa_alloc_domain(struct vhost_vdpa *v)
+ 
+ 	ret = iommu_attach_device(v->domain, dma_dev);
+ 	if (ret)
+-		goto err_attach;
++		goto err_alloc_domain;
+ 
+-	return 0;
++	ret = vhost_vdpa_resv_iommu_region(v->domain, dma_dev, &v->resv_iotlb);
++	if (ret)
++		goto err_attach_device;
+ 
+-err_attach:
++	return 0;
++err_attach_device:
++	iommu_detach_device(v->domain, dma_dev);
++err_alloc_domain:
+ 	iommu_domain_free(v->domain);
+ 	v->domain = NULL;
+ 	return ret;
+@@ -1595,6 +1646,8 @@ static int vhost_vdpa_probe(struct vdpa_device *vdpa)
+ 		goto err;
+ 	}
+ 
++	vhost_iotlb_init(&v->resv_iotlb, 0, 0);
++
+ 	r = dev_set_name(&v->dev, "vhost-vdpa-%u", minor);
+ 	if (r)
+ 		goto err;
+-- 
+2.27.0
 
 
