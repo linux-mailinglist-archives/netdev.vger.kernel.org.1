@@ -1,167 +1,144 @@
-Return-Path: <netdev+bounces-80831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60E4F88136A
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 15:36:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA5CF881393
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 15:43:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ED7D31F23FC1
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 14:36:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 56FA71F2298A
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 14:43:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54A5247F63;
-	Wed, 20 Mar 2024 14:36:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5ACF481A0;
+	Wed, 20 Mar 2024 14:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="ZEqyDKdi"
+	dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b="JEOyQC+G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
+Received: from mta-65-227.siemens.flowmailer.net (mta-65-227.siemens.flowmailer.net [185.136.65.227])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25EED482C2;
-	Wed, 20 Mar 2024 14:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.244.183.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EC014AEFE
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 14:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710945410; cv=none; b=QdgFTa/QZ6Z0yXF0QSvkqAXlSsYOLSXnR3NY62jXTff8yPJGAi3u4PkIn90ZkJIg4wU6jaJ5ccI0guETWD3GluVKjO8B1EELDHTiNNMtsReLFr79dZdlfJltAo6ETa6QeR0sU2bb9QklAMgCm4TxNtQ3uJnAeaNftBVTLnnfKys=
+	t=1710945773; cv=none; b=pMtIyQ8CCRmoQIdNDSWD0mf48m/Im3PG5qAPrK/OwRTO31iABV7E8UM81vPaOP39mrVDq3DpL3BTuaDJYQMqD+aw6DixFhNB6Sga4XhhZ4wmPJtMlMXCLZdq3KMeZK2l6U/LVjIABSElHHIg9z03ddUeSEfJ38C004R4EkdSltY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710945410; c=relaxed/simple;
-	bh=rKmkWc4e2EhEBiayogKPrTMTuUv8pY/OTgZiEvSpCqg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=TnOJYFaIoEPj2bPq69wisQ5k8Rv3ErRqFjkGrFK/vUibTfFKyc0zTcbifnDIWAMlgTM6XZQfVCqvnaFIfzI6esAsBB6Ffi4QPzPjLDSMfHxSOMEcCgTjYhLiyqAQb3aN6P1YT5IeN0Sq3x8wWJj93OLKttI5bXvUn/hEb9S5E+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=ZEqyDKdi; arc=none smtp.client-ip=91.244.183.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infotecs.ru
-Received: from mx0.infotecs-nt (localhost [127.0.0.1])
-	by mx0.infotecs.ru (Postfix) with ESMTP id A30BB10DD2A5;
-	Wed, 20 Mar 2024 17:36:38 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru A30BB10DD2A5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
-	t=1710945399; bh=EUA97dIpRpSS5ssM3JPMExLE+bnjf2A0BRQL9P73M7M=;
-	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=ZEqyDKdiAanHARG3ItZDGA9sGP4gQa6W7cqU7/qNTtSpEAfurbtXd9F3AVnhLM19m
-	 AAk+vkJt/mWZ2PPpgmk1LhXkz4f6YSD5cYEu2sGzFZbduhoNFlm9o6UlexiG0nCXGi
-	 ji9V+2ibo33iJzsQ66n9LzrZVNpmLGhQyNgAU/9w=
-Received: from msk-exch-02.infotecs-nt (msk-exch-02.infotecs-nt [10.0.7.192])
-	by mx0.infotecs-nt (Postfix) with ESMTP id A0DFD30B3690;
-	Wed, 20 Mar 2024 17:36:38 +0300 (MSK)
-From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-To: "stable@vger.kernel.org" <stable@vger.kernel.org>, Greg Kroah-Hartman
-	<gregkh@linuxfoundation.org>
-CC: Michal Ostrowski <mostrows@earthlink.net>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "lvc-project@linuxtesting.org"
-	<lvc-project@linuxtesting.org>,
-	"syzbot+6bdfd184eac7709e5cc9@syzkaller.appspotmail.com"
-	<syzbot+6bdfd184eac7709e5cc9@syzkaller.appspotmail.com>, Guillaume Nault
-	<gnault@redhat.com>
-Subject: [PATCH 6.6/6.1 1/1] pppoe: Fix memory leak in pppoe_sendmsg()
-Thread-Topic: [PATCH 6.6/6.1 1/1] pppoe: Fix memory leak in pppoe_sendmsg()
-Thread-Index: AQHaetQEkOAKLKqGI0iXqJKxr6PViQ==
-Date: Wed, 20 Mar 2024 14:36:38 +0000
-Message-ID: <20240320143637.2904385-2-Ilia.Gavrilov@infotecs.ru>
-References: <20240320143637.2904385-1-Ilia.Gavrilov@infotecs.ru>
-In-Reply-To: <20240320143637.2904385-1-Ilia.Gavrilov@infotecs.ru>
-Accept-Language: ru-RU, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1710945773; c=relaxed/simple;
+	bh=AZ9qaaGQLRaLh2erSzhK0546WiFMXsWnmx6StL2v698=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=NJ3fCp9xn+Tst9Gj3jeiR0jbzvJgDvN5kdOoBh4/tYi7bsreGjPRJ2Q8QaYIdCbfVuXIajSByUaUo4CT64Fhvv//bf7F+7eUkckQ6gNzJaVVEkZlDxiw6Ft/ChACyMw85c51X4/sl57xEHE/6NYBQAh5SgE0Ryy4wYCzM4u9piA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (1024-bit key) header.d=siemens.com header.i=diogo.ivo@siemens.com header.b=JEOyQC+G; arc=none smtp.client-ip=185.136.65.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-65-227.siemens.flowmailer.net with ESMTPSA id 2024032014424166d86f649d3ecbb9f9
+        for <netdev@vger.kernel.org>;
+        Wed, 20 Mar 2024 15:42:41 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=diogo.ivo@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
+ bh=cEHbLT2jVMdGX6hNOXRPoDNWmYXIjvyLR3rnxVrloAg=;
+ b=JEOyQC+G6Df3UxPUC6GR75I+3In8YqORK9QBRfp0779YntWoaX4uT4kR7jdzWPaBP4HgSt
+ PZRb7CpeQXzeY8J18hL0SSbsyaCywPSYR/WPiBIM/JCxQfFEwR7OKeDlAzbb1jMTGuIVOE5m
+ MymEvUAZ6AdUz7/sz2YbWAnU4Pi/4=;
+From: Diogo Ivo <diogo.ivo@siemens.com>
+To: danishanwar@ti.com,
+	rogerq@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew@lunn.ch,
+	dan.carpenter@linaro.org,
+	jacob.e.keller@intel.com,
+	robh@kernel.org,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	vigneshr@ti.com,
+	wsa+renesas@sang-engineering.com,
+	hkallweit1@gmail.com,
+	arnd@arndb.de,
+	vladimir.oltean@nxp.com,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org
+Cc: Diogo Ivo <diogo.ivo@siemens.com>,
+	jan.kiszka@siemens.com
+Subject: [PATCH net-next v5 00/10] Support ICSSG-based Ethernet on AM65x SR1.0 devices
+Date: Wed, 20 Mar 2024 14:42:22 +0000
+Message-ID: <20240320144234.313672-1-diogo.ivo@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KLMS-Rule-ID: 5
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Status: not scanned, disabled by settings
-X-KLMS-AntiSpam-Interceptor-Info: not scanned
-X-KLMS-AntiPhishing: Clean, bases: 2024/03/20 07:32:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2024/03/20 12:55:00 #24319174
-X-KLMS-AntiVirus-Status: Clean, skipped
+Content-Transfer-Encoding: 8bit
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-1320519:519-21489:flowmailer
 
-From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+Hello,
 
-commit dc34ebd5c018b0edf47f39d11083ad8312733034 upstream.
+This series extends the current ICSSG-based Ethernet driver to support
+AM65x Silicon Revision 1.0 devices.
 
-syzbot reports a memory leak in pppoe_sendmsg [1].
+Notable differences between the Silicon Revisions are that there is
+no TX core in SR1.0 with this being handled by the firmware, requiring
+extra DMA channels to manage communication with the firmware (with the
+firmware being different as well) and in the packet classifier.
 
-The problem is in the pppoe_recvmsg() function that handles errors
-in the wrong order. For the skb_recv_datagram() function, check
-the pointer to skb for NULL first, and then check the 'error' variable,
-because the skb_recv_datagram() function can set 'error'
-to -EAGAIN in a loop but return a correct pointer to socket buffer
-after a number of attempts, though 'error' remains set to -EAGAIN.
+The motivation behind it is that a significant number of Siemens
+devices containing SR1.0 silicon have been deployed in the field
+and need to be supported and updated to newer kernel versions
+without losing functionality.
 
-skb_recv_datagram
-      __skb_recv_datagram          // Loop. if (err =3D=3D -EAGAIN) then
-                                   // go to the next loop iteration
-          __skb_try_recv_datagram  // if (skb !=3D NULL) then return 'skb'
-                                   // else if a signal is received then
-                                   // return -EAGAIN
+This series is based on TI's 5.10 SDK [1].
 
-Found by InfoTeCS on behalf of Linux Verification Center
-(linuxtesting.org) with Syzkaller.
+The fourth version of this patch series can be found in [2].
 
-Link: https://syzkaller.appspot.com/bug?extid=3D6bdfd184eac7709e5cc9 [1]
+Detailed descriptions of the changes in this series can be found in
+each commit's message.
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Reported-by: syzbot+6bdfd184eac7709e5cc9@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=3D6bdfd184eac7709e5cc9
-Signed-off-by: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
-Link: https://lore.kernel.org/r/20240214085814.3894917-1-Ilia.Gavrilov@info=
-tecs.ru
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- drivers/net/ppp/pppoe.c | 23 +++++++++--------------
- 1 file changed, 9 insertions(+), 14 deletions(-)
+Both of the problems mentioned in v4 have been addressed by disabling
+those functionalities, meaning that this driver currently only supports
+one TX queue and does not support a 100Mbit/s half-duplex connection.
+The removal of these features has been commented in the appropriate 
+locations in the code.
 
-diff --git a/drivers/net/ppp/pppoe.c b/drivers/net/ppp/pppoe.c
-index ba8b6bd8233c..96cca4ee470a 100644
---- a/drivers/net/ppp/pppoe.c
-+++ b/drivers/net/ppp/pppoe.c
-@@ -1007,26 +1007,21 @@ static int pppoe_recvmsg(struct socket *sock, struc=
-t msghdr *m,
- 	struct sk_buff *skb;
- 	int error =3D 0;
-=20
--	if (sk->sk_state & PPPOX_BOUND) {
--		error =3D -EIO;
--		goto end;
--	}
-+	if (sk->sk_state & PPPOX_BOUND)
-+		return -EIO;
-=20
- 	skb =3D skb_recv_datagram(sk, flags, &error);
--	if (error < 0)
--		goto end;
-+	if (!skb)
-+		return error;
-=20
--	if (skb) {
--		total_len =3D min_t(size_t, total_len, skb->len);
--		error =3D skb_copy_datagram_msg(skb, 0, m, total_len);
--		if (error =3D=3D 0) {
--			consume_skb(skb);
--			return total_len;
--		}
-+	total_len =3D min_t(size_t, total_len, skb->len);
-+	error =3D skb_copy_datagram_msg(skb, 0, m, total_len);
-+	if (error =3D=3D 0) {
-+		consume_skb(skb);
-+		return total_len;
- 	}
-=20
- 	kfree_skb(skb);
--end:
- 	return error;
- }
-=20
---=20
-2.39.2
+[1]: https://git.ti.com/cgit/ti-linux-kernel/ti-linux-kernel/tree/?h=ti-linux-5.10.y
+[2]: https://lore.kernel.org/netdev/20240305114045.388893-1-diogo.ivo@siemens.com/
+
+Diogo Ivo (10):
+  dt-bindings: net: Add support for AM65x SR1.0 in ICSSG
+  eth: Move IPv4/IPv6 multicast address bases to their own symbols
+  net: ti: icssg-prueth: Move common functions into a separate file
+  net: ti: icssg-prueth: Add SR1.0-specific configuration bits
+  net: ti: icssg-prueth: Add SR1.0-specific description bits
+  net: ti: icssg-prueth: Adjust IPG configuration for SR1.0
+  net: ti: icssg-prueth: Adjust the number of TX channels for SR1.0
+  net: ti: icssg-prueth: Add functions to configure SR1.0 packet
+    classifier
+  net: ti: icssg-prueth: Modify common functions for SR1.0
+  net: ti: icssg-prueth: Add ICSSG Ethernet driver for AM65x SR1.0
+    platforms
+
+ .../bindings/net/ti,icssg-prueth.yaml         |   35 +-
+ drivers/net/ethernet/ti/Kconfig               |   15 +
+ drivers/net/ethernet/ti/Makefile              |    9 +
+ .../net/ethernet/ti/icssg/icssg_classifier.c  |  113 +-
+ drivers/net/ethernet/ti/icssg/icssg_common.c  | 1221 +++++++++++++++++
+ drivers/net/ethernet/ti/icssg/icssg_config.c  |   14 +-
+ drivers/net/ethernet/ti/icssg/icssg_config.h  |   56 +
+ drivers/net/ethernet/ti/icssg/icssg_ethtool.c |   10 +
+ drivers/net/ethernet/ti/icssg/icssg_prueth.c  | 1189 +---------------
+ drivers/net/ethernet/ti/icssg/icssg_prueth.h  |   79 +-
+ .../net/ethernet/ti/icssg/icssg_prueth_sr1.c  | 1181 ++++++++++++++++
+ include/linux/etherdevice.h                   |   12 +-
+ 12 files changed, 2724 insertions(+), 1210 deletions(-)
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_common.c
+ create mode 100644 drivers/net/ethernet/ti/icssg/icssg_prueth_sr1.c
+
+-- 
+2.44.0
+
 
