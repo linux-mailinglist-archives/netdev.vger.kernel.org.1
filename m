@@ -1,140 +1,239 @@
-Return-Path: <netdev+bounces-80729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B7E0880ADF
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 06:59:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B590880B29
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 07:23:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E83FA1C20BA7
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 05:59:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0477282F0E
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 06:23:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF04171C2;
-	Wed, 20 Mar 2024 05:59:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35B6B1802E;
+	Wed, 20 Mar 2024 06:23:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MOuL+v2E"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="lQdBdNWD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01BC511C83;
-	Wed, 20 Mar 2024 05:59:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F49E1DDDB;
+	Wed, 20 Mar 2024 06:23:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710914374; cv=none; b=fak/v80jjeO2C/OGD/5ARMgS0MqfkiNtRXPqI1r4s0MCKuomA4hMpclRmosl9p+oIgd4HY8jQEaf2ePldbJGvDb+gDdTPnHwHhuOYmmo/7ChxXUYiiAWzGtH0h4+60cIwOcp+FmxUY/NpnFes/ogWzMucv1MCV5bDUj5brWdVtk=
+	t=1710915796; cv=none; b=cdwLC0f3of4uFasdUDeFHzTefPm6k8Nn1lLBFC+WFv81AJRPuwLtMiBqm808rQz2mgDgS0T3Q81FMT8DbuRhkOxIE4sr4mIX//fT5RqxonNzJUk/RokEIX+tgrOGLEvPPySye+6Uaf07zDw7Nmlp+MkLzZg35g+TISFDEG03KGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710914374; c=relaxed/simple;
-	bh=wnWVQmhHXO6OdkrpkR/yCVSPqVGouB39dOVXMCOUoG8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eNFDx4JWSO+L4EuEv0eV+P/lNcWZYEtwGa+GIrFYJVfuF6W8pLfUniye8k9YxSu08Av8CGy6xN54ohKi0TtgGpjKr0NYHmnMThfnTuAYoSNmT5/NE9NIEWUY32jD7QIq0dNRY5F2ra1CYG2NI0Ks3S6MlrjwNNV/cr1PxAwd4jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MOuL+v2E; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-33ed7ba1a42so2435867f8f.2;
-        Tue, 19 Mar 2024 22:59:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710914371; x=1711519171; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZpRbuT9S1qz2rJkIt3EtSAXCW5aYksYriH4Qy/fKXiY=;
-        b=MOuL+v2EuMmX3l5RjILiophWn1QkjST1W8KtboMWu2csIvnk+L3v5CV8JPuIS3ZJ4Y
-         DtUSZWvI+WaQpufROY/BecWSWwQStSA/DXdNkargr3Kz0Z4NQJOiP8046hAXekrvAPo9
-         7hv9DJZamiFMmkrwPaX7CPB0IgKJGj8v4oftpjfSWqcO0kiAwWnkvjTULBDWvTjn0DhI
-         /Njt2MUia+oN1UfNSQkbStAIMONms75z8IXU4uwabHioNWBjJXcPgiTj/ayAQHGdOP9u
-         qVNMoJ5at55lXDo8uRUMGZy7oZpKd/5ABuW23pkY1VAdWoqvbZczceHLPLZZ1aY4MjoH
-         kuXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710914371; x=1711519171;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZpRbuT9S1qz2rJkIt3EtSAXCW5aYksYriH4Qy/fKXiY=;
-        b=a91UQAeJyLArwfbEHZrSsZ/I2ljp8wBOAxYAleNnX8QBWaEcSMsitv3CzBa1fgLvf0
-         NNKPuzkImyr3FXULvU+9KAnmY56nVRF7o754E57sahyiS/355+A2vQKZRxjNM9Uq+7Li
-         ZbZ+RtgZBxoJA4npboyJuGQ9bEefe88o70v8dHZbVzfYl13HAXePee526v13TS1fPKbb
-         XI/mBxwL4n8iDoz8fTSCRrDO21KwG/FvjH7FC8jTzkBxOgwtia6QsJUrH5NnuXMHVozN
-         nk8XV9nMtyqic9aMt7UJ+i8FIH52t5RnMcG9BzLrMZa1QGr7RW8pfitKx6x7BC6YyqCp
-         iaYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU3CVu/7VqLQpjYW3AVtRh/kYPPPIuVj1MIjV2eJCbV1p13H2H62h32RExwR3FFAAuOkZPYDakajtNEwAUZT/QSu0uFIiaiAq+x5DCKROhVXZyH2EDbidFmNgHyQj2yHS6IQfKQiLAPUDHLrtAyHVjmuzD3ztugOZIi
-X-Gm-Message-State: AOJu0YwG48q5jwBaHmvqddL/yakLGPvevXBvSdthxvR0oLaPXtQvgJ3K
-	gj/8DCn8UZXbUdxgcxeW33vyM2qQa6C1R+lS66OWI9Sv6Zd1qDK/CW2Gr5Mr6xaHLxD8Np3hvb6
-	A4y+vvQdQG+aEEorosDj+H2oEm20=
-X-Google-Smtp-Source: AGHT+IEuKq/oeh8snLQ1ysN7bWmnWgb0yRXr8arOzHpM4V7w0eKbDoS/ntI55AumVzU20oSWmMMY7wkSNpe+2XjHps4=
-X-Received: by 2002:a5d:4c82:0:b0:33b:187c:4ca0 with SMTP id
- z2-20020a5d4c82000000b0033b187c4ca0mr3345363wrs.62.1710914371012; Tue, 19 Mar
- 2024 22:59:31 -0700 (PDT)
+	s=arc-20240116; t=1710915796; c=relaxed/simple;
+	bh=JepxoVn/y92Zm8LSWzg0iAPKkXS0xVOaDszLYrBRltk=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:CC:References:
+	 In-Reply-To:Content-Type; b=ewHl250FmRDJHEKMvyJ14yprOwamHynkoVW1GpqbApxFyXSiAKuLkEmjNFLZ6C6W24BcCgNmKo17cbVobcVY0A8LdjuODu6s9bqWujrO9+gaNdafIGtHq5SzzMPu89P3cnR4q2OfZLsailLJSBGvFe4D3/TVOP5r6KRajO6kdNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=lQdBdNWD; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279869.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42K585e5025111;
+	Wed, 20 Mar 2024 06:22:47 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	message-id:date:mime-version:subject:from:to:cc:references
+	:in-reply-to:content-type:content-transfer-encoding; s=
+	qcppdkim1; bh=OMPXI3u8TkCfqqrW7UKeDyKVc2JyB9/Mz90//A5Weeo=; b=lQ
+	dBdNWDRiSduSQ8MKPf7UDbwEaZYbYRAF0DNdVpRFqQVfIEjei3V8ZujgI+bs4Wlr
+	nmqRVmwXlQZ/MCNdJfjyfE6zvUgJPxlQWmD8LDzR41JRN0QAQLbi1jrfu77hrQ/n
+	WAVP9mh9vNwQSdXeZYOZwbzRZOjCp63SaZtC+4A+pI8lyTtrCLWSAvKf2ndDcoSL
+	ezCLeiptKcsdOlss97JnfKBGsyTheNO8ojw6FllFwjw2hbb9+zS+gyC/5VEArD6i
+	PjveUx34Y2cZu8cmrkQYcbkK+4Pxt95zTLkMvqYscsLW0ntMET2HUUuRQNeJ/2IU
+	65VpnWwdIIme1a8X2sgg==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3wyqpe09ds-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Mar 2024 06:22:47 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 42K6MkqO030140
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 20 Mar 2024 06:22:46 GMT
+Received: from [10.110.44.107] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.40; Tue, 19 Mar
+ 2024 23:22:42 -0700
+Message-ID: <ac03f67c-604a-4fb8-a0ca-c187e27855be@quicinc.com>
+Date: Tue, 19 Mar 2024 23:22:41 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240313140205.3191564-1-asavkov@redhat.com>
-In-Reply-To: <20240313140205.3191564-1-asavkov@redhat.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 19 Mar 2024 22:59:20 -0700
-Message-ID: <CAADnVQKgkz=gUHbPc0-hcAcirzUe-mYhioACNpORuXGS6-moaA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next] arm64: bpf: zero upper bits after rev32
-To: Artem Savkov <asavkov@redhat.com>, Puranjay Mohan <puranjay12@gmail.com>
-Cc: Xi Wang <xi.wang@gmail.com>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4] net: Re-use and set mono_delivery_time bit
+ for userspace tstamp packets
+Content-Language: en-US
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+CC: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, <kernel@quicinc.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Andrew Halaney
+	<ahalaney@redhat.com>,
+        Martin KaFai Lau <martin.lau@kernel.org>, bpf
+	<bpf@vger.kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        "Alexei
+ Starovoitov" <ast@kernel.org>,
+        Andrii Nakryiko <andrii@kernel.org>
+References: <20240301201348.2815102-1-quic_abchauha@quicinc.com>
+ <2a4cb416-5d95-459d-8c1c-3fb225240363@linux.dev>
+ <65f16946cd33e_344ff1294fc@willemb.c.googlers.com.notmuch>
+ <28282905-065a-4233-a0a2-53aa9b85f381@linux.dev>
+ <65f2004e65802_3d1e792943e@willemb.c.googlers.com.notmuch>
+ <0dff8f05-e18d-47c8-9f19-351c44ea8624@linux.dev>
+ <e5da91bc-5827-4347-ab38-36c92ae2dfa2@quicinc.com>
+ <65f21d65820fc_3d934129463@willemb.c.googlers.com.notmuch>
+ <bc037db4-58bb-4861-ac31-a361a93841d3@linux.dev>
+ <65f2c81fc7988_3ee61729465@willemb.c.googlers.com.notmuch>
+ <5692ddb3-9558-4440-a7bf-47fcc47401ed@linux.dev>
+ <65f35e00a83c0_2132294f5@willemb.c.googlers.com.notmuch>
+ <e270b646-dae0-41cf-9ef8-e991738b9c57@quicinc.com>
+ <8d245f5a-0c75-4634-9513-3d420eb2c88f@linux.dev>
+ <d10254cc-a908-4d81-98d2-2eed715e521f@quicinc.com>
+ <66ad9e5b-0126-476e-bf0f-6a33f446c976@quicinc.com>
+In-Reply-To: <66ad9e5b-0126-476e-bf0f-6a33f446c976@quicinc.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: spoDDDnBw54sPQ9lWY3jvni3HkwhnNgA
+X-Proofpoint-ORIG-GUID: spoDDDnBw54sPQ9lWY3jvni3HkwhnNgA
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-20_03,2024-03-18_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 bulkscore=0
+ adultscore=0 clxscore=1015 malwarescore=0 lowpriorityscore=0
+ impostorscore=0 spamscore=0 phishscore=0 mlxlogscore=999
+ priorityscore=1501 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2403140001 definitions=main-2403200048
 
-On Wed, Mar 13, 2024 at 7:02=E2=80=AFAM Artem Savkov <asavkov@redhat.com> w=
-rote:
->
-> Commit d63903bbc30c7 ("arm64: bpf: fix endianness conversion bugs")
-> added upper bits zeroing to byteswap operations, but it assumes they
-> will be already zeroed after rev32, which is not the case on some
-> systems at least:
->
-> [ 9757.262607] test_bpf: #312 BSWAP 16: 0x0123456789abcdef -> 0xefcd jite=
-d:1 8 PASS
-> [ 9757.264435] test_bpf: #313 BSWAP 32: 0x0123456789abcdef -> 0xefcdab89 =
-jited:1 ret 1460850314 !=3D -271733879 (0x5712ce8a !=3D 0xefcdab89)FAIL (1 =
-times)
-> [ 9757.266260] test_bpf: #314 BSWAP 64: 0x0123456789abcdef -> 0x67452301 =
-jited:1 8 PASS
-> [ 9757.268000] test_bpf: #315 BSWAP 64: 0x0123456789abcdef >> 32 -> 0xefc=
-dab89 jited:1 8 PASS
-> [ 9757.269686] test_bpf: #316 BSWAP 16: 0xfedcba9876543210 -> 0x1032 jite=
-d:1 8 PASS
-> [ 9757.271380] test_bpf: #317 BSWAP 32: 0xfedcba9876543210 -> 0x10325476 =
-jited:1 ret -1460850316 !=3D 271733878 (0xa8ed3174 !=3D 0x10325476)FAIL (1 =
-times)
-> [ 9757.273022] test_bpf: #318 BSWAP 64: 0xfedcba9876543210 -> 0x98badcfe =
-jited:1 7 PASS
-> [ 9757.274721] test_bpf: #319 BSWAP 64: 0xfedcba9876543210 >> 32 -> 0x103=
-25476 jited:1 9 PASS
->
-> Fixes: d63903bbc30c7 ("arm64: bpf: fix endianness conversion bugs")
-> Signed-off-by: Artem Savkov <asavkov@redhat.com>
-> ---
->  arch/arm64/net/bpf_jit_comp.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/arch/arm64/net/bpf_jit_comp.c b/arch/arm64/net/bpf_jit_comp.=
-c
-> index c5b461dda4385..e86e5ba74dca2 100644
-> --- a/arch/arm64/net/bpf_jit_comp.c
-> +++ b/arch/arm64/net/bpf_jit_comp.c
-> @@ -944,7 +944,8 @@ static int build_insn(const struct bpf_insn *insn, st=
-ruct jit_ctx *ctx,
->                         break;
->                 case 32:
->                         emit(A64_REV32(is64, dst, dst), ctx);
-> -                       /* upper 32 bits already cleared */
-> +                       /* zero-extend 32 bits into 64 bits */
-> +                       emit(A64_UXTW(is64, dst, dst), ctx);
 
-What does arm64 ISA say about rev32?
-Since rev16 is special, it kinda makes sense, but still.
 
-Puranjay,
-could you please help review this fix?
+On 3/18/2024 12:02 PM, Abhishek Chauhan (ABC) wrote:
+> 
+> 
+> On 3/14/2024 3:29 PM, Abhishek Chauhan (ABC) wrote:
+>>
+>>
+>> On 3/14/2024 2:48 PM, Martin KaFai Lau wrote:
+>>> On 3/14/24 1:53 PM, Abhishek Chauhan (ABC) wrote:
+>>>>>> The bpf_convert_tstamp_{read,write} and the helper bpf_skb_set_tstamp need to be
+>>>>>> changed to handle the new "user_delivery_time" bit anyway, e.g.
+>>>>>> bpf_skb_set_tstamp(BPF_SKB_TSTAMP_DELIVERY_MONO) needs to clear the
+>>>>>> "user_delivery_time" bit.
+>>>>>>
+>>>>>> I think the "struct inet_frag_queue" also needs a new "user_delivery_time"
+>>>>>> field. "mono_delivery_time" is already in there.
+>>>
+>>> [ ... ]
+>>>
+> 
+> Martin, Do we really need to add user_delivery_time as part of inet_frag_queue struct? I was wondering why is this required since we are using tstamp_type:2 to 
+> distinguish between timestamp anyway .
+> 
+> Let me know what you think ? 
+> 
+>>> I would think the first step is to revert this patch. I don't think much of the current patch can be reused.
+>>>
+>>>> 1. I will raise one patch to introduce rename mono_delivery_time to
+>>>> tstamp_type
+>>>
+>>> Right, I expect something like this:
+>>>
+>>> struct sk_buff {
+>>>         /* ... */
+>>> -            __u8                    mono_delivery_time:1;
+>>> +        __u8            tstamp_type:1;
+>>>         /* ... */
+>>> };
+>>>
+>>
+>> Okay ,This should be straight-forward. 
+>>
+>>>> 2. I will introduce setting of userspace timestamp type as the second bit
+>>>> whem transmit_time is set.
+>>>
+>>> I expect the second patch should be introducing the enum first
+>>>
+>>> enum skb_tstamp_type {
+>>>     SKB_TSTAMP_TYPE_RX_REAL = 0, /* A RX (receive) time in real */
+>>>     SKB_TSTAMP_TYPE_TX_MONO = 1, /* A TX (delivery) time in mono */
+>>> };
+>>>
+>>> and start doing "skb->tstamp_type = SKB_TSTAMP_TYPE_TX_MONO;" instead of
+>>> "skb->tstamp_type = 1;"
+>>>
+>>> and the same for "skb->tstamp_type = SKB_TSTAMP_TYPE_RX_REAL;" instead of
+>>> "skb->tstamp_type = 0;"
+>>>
+>>>
+>>> This one I am not sure but probably need to change the skb_set_delivery_time() function signature also:
+>>>
+>>> static inline void skb_set_delivery_time(struct sk_buff *skb, ktime_t kt,
+>>> -                                        bool mono)
+>>> +                     enum skb_tstamp_type tstamp_type)
+>>>
+>> This should be straight-forward as well 
+>>
+>>> The third patch is to change tstamp_type from 1 bit to 2 bits and add SKB_TSTAMP_TYPE_TX_USER.
+>>>
+>>> struct sk_buff {
+>>>         /* ... */
+>>> -        __u8            tstamp_type:1;
+>>> +        __u8            tstamp_type:2;
+>>>         /* ... */
+>>> };
+>>>
+>>> enum skb_tstamp_type {
+>>>     SKB_TSTAMP_TYPE_RX_REAL = 0,    /* A RX (receive) time in real */
+>>>     SKB_TSTAMP_TYPE_TX_MONO = 1,    /* A TX (delivery) time in mono */
+>>> +    SKB_TSTAMP_TYPE_TX_USER = 2,    /* A TX (delivery) time and its clock
+>>>                      * is in skb->sk->sk_clockid.
+>>>                      */
+>>>                
+>>> };
+>>>
+>>> This will shift a bit out of the byte where tstamp_type lives. It should be the "inner_protocol_type" bit by my hand count. Please check if it is directly used in bpf instruction (filter.c). As far as I look, it is not, so should be fine. Some details about bpf instruction accessible skb bit field here: https://lore.kernel.org/all/20230321014115.997841-1-kuba@kernel.org/
+>> This is where i would need thorough reviews from you and Willem as my area of expertise is limited to part of network stack and BPF is not one of them. 
+>> But i have plan on this and i know how to do it. 
+>>
+>> Expect patches to be arriving to your inboxes next week, as we have a long weekend in Qualcomm 
+>> Fingers crossed :) 
+>>
+>>>
+>>>
+>>>> 3. This will be a first step to make the design scalable.
+>>>> 4. Tomorrow if we have more timestamp to support, upstream community has to do is
+>>>> update the enum and increase the bitfield from 2=>3 and so on.
+>>>>
+>>>> I need help from Martin to test the patch which renames the mono_delivery_time
+>>>> to tstamp_type (Which i feel should be straight forward as the value of the bit is 1)
+>>>
+>>> The bpf change is not a no-op rename of mono_delivery_time. It needs to take care of the new bit added to the tstamp_type. Please see the previous email (and I also left it in the beginning of this email).
+>>>
+>>> Thus, you need to compile the selftests/bpf/ and run it to verify the changes when handling the new bit. The Documentation/bpf/bpf_devel_QA.rst has the howto details. You probably only need the newer llvm (newer gcc should work also as bpf CI has been using it) and the newer pahole. I can definitely help if there is issue in running the test_progs in selftests/bpf or you have question on making the changes in filter.c. To run the test: "./test_progs -t tc_redirect/tc_redirect_dtime"
+>>>
+
+Martin,
+I was able to compile test_progs and execute the above command mentioned by you . Does the output look okay for you ? 
+
+[ 3076.040766] IPv6: ADDRCONF(NETDEV_CHANGE): veth_src_fwd: link becomes ready
+[ 3076.040809] IPv6: ADDRCONF(NETDEV_CHANGE): veth_src: link becomes ready
+[ 3076.072844] IPv6: ADDRCONF(NETDEV_CHANGE): veth_dst: link becomes ready
+[ 3076.072880] IPv6: ADDRCONF(NETDEV_CHANGE): veth_dst_fwd: link becomes ready
+#214/5   tc_redirect/tc_redirect_dtime:OK
+#214     tc_redirect:OK
+Summary: 1/1 PASSED, 0 SKIPPED, 0 FAILED
+
+
+
 
