@@ -1,129 +1,111 @@
-Return-Path: <netdev+bounces-80844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1424F881410
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:04:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A7911881430
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 16:08:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B961F1F23131
-	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 15:04:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B8CE1F218F1
+	for <lists+netdev@lfdr.de>; Wed, 20 Mar 2024 15:08:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26E064AEE0;
-	Wed, 20 Mar 2024 15:04:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 567174AEFE;
+	Wed, 20 Mar 2024 15:08:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="RfSA+UhG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MZsKaDnL"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3495414A96;
-	Wed, 20 Mar 2024 15:04:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32356848E
+	for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 15:08:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710947076; cv=none; b=pycuaz93X5tbYIxwTxq+SeZ758fHhypJzxkTpFRWSItwft8Ej2D5ctyKmGcTWgbNvwOow85nskyp2RbTT1Q/CmYyD4kCjExu/B8wekcHVhqs3VmULBY3OdxePLiDWEdYVmofeijarxRvJRp6b4Dqg+tTuBrjMfKXH91w7jGjmqQ=
+	t=1710947333; cv=none; b=A06ixivnl2Lglnai2s45bUONsIDO+b58jPyjgPOOMXKwdIdi6DxEYyZtf83aSjYYq6rMR25gz+WsvchgPj75seyWIGj6XFwH+x2uSTJ0mrcqtsU6mJoBSqe2XMU5SC/KyxC4f4sfD3HY0N2WNRzP+/f4e/9/vNe/7j3AO1VjyBQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710947076; c=relaxed/simple;
-	bh=r4qoU7caFTXFSMlxngYHYAdTz9WvdriqwGcpKPfwAew=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Si8kDR0CxLKDgzPf+XOztJgX+Q9r7/cAGEodJGrmJ2M4uObQ5l+jAIm53rGjtCs2gCW5CA3lqNePTug5WNEbtP2Zu45DnU4tzGRa629xR1NLALIt8KBorz3sMcU0Q7fcAUtW9k7vfXyN0EqJxciPJ15qZLD6InObQi0tDCd+Dns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=RfSA+UhG; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 58E531BF20E;
-	Wed, 20 Mar 2024 15:04:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1710947064;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EPnVyRoNctObdniIj1LYajBfdJ4KCDXA+i1lA4eN1Ok=;
-	b=RfSA+UhG2CCvT8s3keKol+jqb3t/l0Vw21Xp4Ejm+XNwtdyVT4kjlB4XEFKVcqv5bzcEc6
-	wX2fJI42+LksHzhgi+T8TAmfla9hnLdU+63L5FqEOR4RrIYVfXmtUA/3sJowNB6/+arSRJ
-	3dFMAdGdEzNXaiy8FAEvb8FtIzrr5Vxb9YQ7bKsxPoC8ZgCMnQnAxL22vjNo5Fq3DMpZUm
-	Kke1u5XpWYxbbu46BlExMVGZnIoUjRccIf7WwxCtnHn+6L53zQ+ApgAEm+geG9ansi2ZK8
-	+CmSUNTM/kXi9eyCtDL/HRfWUApIC3Ffp4N1/L3Y20iQ+oCjVqfw8FzG3GvelQ==
-Message-ID: <3ee60bfe-1283-46b3-9b7e-07526912f763@arinc9.com>
-Date: Wed, 20 Mar 2024 18:03:57 +0300
+	s=arc-20240116; t=1710947333; c=relaxed/simple;
+	bh=Uw+gOmimtWuv2d7PJnn+iIToqf+2wYCbqCbAl14Xi4Y=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=cQoisu1iSnfuEJ+aSbFq0LRLeR0FbIwAH7H2gke5d3GaN9oLOZ5xKsPGWTXOTnHxAnqWObDUkP6ejLD3VoDeIs2Ca+Ea0UbEnbHxzDshN3P55fNz7QyHT/UDH0k68WlKn3TUCIEvEjj2lfHUGw2ht7ZQpJqMCWuMGY4TfyXG+ec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MZsKaDnL; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69129C433C7;
+	Wed, 20 Mar 2024 15:08:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710947332;
+	bh=Uw+gOmimtWuv2d7PJnn+iIToqf+2wYCbqCbAl14Xi4Y=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=MZsKaDnL9XvbC5d/32PgoCjETuYdePUM78JLkDniJKOcN9hpy5FFul6kqvKPeFlhC
+	 kqCY6zRylgZYDC2ryFliGP7ILq0S8p2CSg0/gFEyYKSeCKvxFwISvjBjOA04c8izM0
+	 ySm85ZODbo6A9RmsxjzWoZLVIE5rolMzfaF/6Heymzf8HgoSepM2fXl7FPCf+7+R0g
+	 m8rCwzUGGCe2UYgrmqUtggtkpKbcdGwUOsUlf69JX8dGpm08gCLX6VTzlEDUT50RCD
+	 FZZzWthQmzOTsK39sQlZxe9jjrIIfwH5+/+ppGavt7sPm0UokjqGoAEXjexI0VBjJz
+	 +wkl3dJE69h7A==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 0/3] Fix EEE support for MT7531 and MT7988 SoC switch
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- =?UTF-8?Q?Ren=C3=A9_van_Dorst?= <opensource@vdorst.com>,
- Russell King <linux@armlinux.org.uk>,
- SkyLake Huang <SkyLake.Huang@mediatek.com>,
- Heiner Kallweit <hkallweit1@gmail.com>,
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v1-0-3f17226344e8@arinc9.com>
- <9d111cc9-c73a-4d3c-83f5-3f59e6c8841f@arinc9.com>
- <ZfrDnFyGay5YTTFg@makrotopia.org>
-Content-Language: en-US
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <ZfrDnFyGay5YTTFg@makrotopia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Flag: yes
-X-Spam-Level: **************************
-X-GND-Spam-Score: 400
-X-GND-Status: SPAM
-X-GND-Sasl: arinc.unal@arinc9.com
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <65fade00e4c24_1c19b8294cf@willemb.c.googlers.com.notmuch>
+References: <20240319093140.499123-1-atenart@kernel.org> <20240319093140.499123-4-atenart@kernel.org> <65f9954c70e28_11543d294f3@willemb.c.googlers.com.notmuch> <171086409633.4835.11427072260403202761@kwain> <65fade00e4c24_1c19b8294cf@willemb.c.googlers.com.notmuch>
+Subject: Re: [PATCH net v2 3/4] udp: do not transition UDP fraglist to unnecessary checksum
+From: Antoine Tenart <atenart@kernel.org>
+Cc: steffen.klassert@secunet.com, willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Date: Wed, 20 Mar 2024 16:08:49 +0100
+Message-ID: <171094732998.5492.6523626232845873652@kwain>
 
-On 20.03.2024 14:08, Daniel Golle wrote:
-> On Wed, Mar 20, 2024 at 11:10:19AM +0300, Arınç ÜNAL wrote:
->> On 18.03.2024 10:46, Arınç ÜNAL via B4 Relay wrote:
->>> Hi.
->>>
->>> This patch series fixes EEE support for MT7531 and the switch on the MT7988
->>> SoC. EEE did not work on MT7531 on most boards before this, it is unclear
->>> what's the status on MT7988 SoC switch as I don't have the hardware.
->>>
->>> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
->>
->> I see the state of this patch series is deferred on patchwork. I see that I
->> forgot to delegate this to the net tree. As I don't see any objections in
->> this series, I'll send v2 with it tomorrow.
-> 
-> Sorry, but imho it should go to net-next, and you might have overlook
-> it but there have been some concerns.
+Quoting Willem de Bruijn (2024-03-20 14:00:48)
+> Antoine Tenart wrote:
+> > Quoting Willem de Bruijn (2024-03-19 14:38:20)
+> > >=20
+> > > The original patch converted to CHECKSUM_UNNECESSARY for a reason.
+> > > The skb->csum of the main gso_skb is not valid?
+> > >=20
+> > > Should instead only the csum_level be adjusted, to always keep
+> > > csum_level =3D=3D 0?
+> >=20
+> > The above trace is an ICMPv6 packet being tunneled and GROed at the UDP
+> > level, thus we have:
+> >   UDP(CHECKSUM_PARTIAL)/Geneve/ICMPv6(was CHECKSUM_NONE)
+> > csum_level would need to be 1 here; but we can't know that.
+>=20
+> Is this a packet looped internally? Else it is not CHECKSUM_PARTIAL.
 
-I don't believe I overlooked anything. I've come to this conclusion after
-reading every response in this thread.
+I'm not sure to follow, CHECKSUM_NONE packets going in a tunnel will be
+encapsulated and the outer UDP header will be CHECKSUM_PARTIAL. The
+packet can be looped internally or going to a remote host.
 
-> 
-> For sure it should not go to net tree as you are enabling a new feature
-> and not fixing anything which is broken. EEE on MT7988 works fine as
+> > There is another issue (no kernel trace): if a packet has partial csum
+> > and is being GROed that information is lost and the packet ends up with
+> > an invalid csum.
+>=20
+> CHECKSUM_PARTIAL should be converted to CHECKSUM_UNNECESSARY for this
+> reason. CHECKSUM_PARTIAL implies the header is prepared with pseudo
+> header checksum. Similarly CHECKSUM_COMPLETE implies skb csum is valid.
+> CHECKSUM_UNNECESSARY has neither expectations.
 
-EEE support exists since the commit which I've mentioned on my patches
-here. I am fixing it. I thought I had explained this clearly on the
-patches.
+But not if the packet is sent to a remote host. Otherwise an inner
+partial csum is never fixed by the stack/NIC before going out.
 
-> of now (see my reply), EEE on MT7531 was supposedly intentionally
-> disabled for reasons we should ask MTK people about.
+> > Packets with CHECKSUM_UNNECESSARY should end up with the same info. My
+> > impression is this checksum conversion is at best setting the same info
+> > and otherwise is overriding valuable csum information.
+> >=20
+> > Or would packets with CSUM_NONE being GROed would benefit from the
+> > CHECKSUM_UNNECESSARY conversion?
+>=20
+> Definitely. If the packet has CHECKSUM_NONE and GRO checks its
+> validity in software, converting it to CHECKSUM_UNNECESSARY avoids
+> potential additional checks at later stages in the packet path.
 
-Are you talking about the EEE_DIS bit on the trap? There's no default
-setting there, it's up to the board vendor to enable/disable EEE by pulling
-the affine pin low or high. So there's no intentional disabling by MediaTek
-there. I see no need to ask the corporate regarding this.
+Makes sense. The current code really looks like
+__skb_incr_checksum_unnecessary, w/o the CHECKSUM_NONE check to only
+convert those packets.
 
-This patch series does not in any way enable EEE on the switch PHYs and
-MACs when it's disabled by default.
-
-Arınç
+Thanks!
+Antoine
 
