@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-81132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D99E98860ED
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 20:22:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D303B886136
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 20:42:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 171581C21CD3
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 19:22:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C3361F222D4
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 19:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 396DC133994;
-	Thu, 21 Mar 2024 19:22:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F2C133997;
+	Thu, 21 Mar 2024 19:42:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="WJS/i5Rg"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ASDidFR+"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93459383A4;
-	Thu, 21 Mar 2024 19:22:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFA3847B;
+	Thu, 21 Mar 2024 19:42:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711048962; cv=none; b=ClNpmqehLfLHbW+FbUYRYDhix9mva18nFuLNauYimlawf/3BZoZ/qSyuirE71jy8Au+/E9J/kmHH5NgvqmrrwQQCao7AcYdPxsWfDsfd1Ls2EiPFmYV4ayUnp4vU8yAIbC8wZLCyVIUt/jMFJR/WjimlbQyPdezYwzOz/qtqwrw=
+	t=1711050159; cv=none; b=rPQbGGK55221dpV3nSwjzZ+N1p+VYEaZIkMwqBt07o9whe78conXNMLaMP/vuYNTM5xo6aZxOl4C80HRjbOcjXzu+ncOdhzVBkc0o1wX0R1WCuen6TOVWTceB9bAaex1yvudQugMI66wNT9HoI5GO6PpDE3xQMvzwNK0jd0biWw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711048962; c=relaxed/simple;
-	bh=wS8i8FIdhCjUypMo/Cb6EE93+qGvdAIFzzqWejT/LTI=;
+	s=arc-20240116; t=1711050159; c=relaxed/simple;
+	bh=YSAribocTF+rrupZDIuD87XtJLJvbUFIofeJ1GmRNqE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E9CMJ4oMHdO9rbx3D+PzfAEIgKPmOc1Wtha+ucv78OwhkZFGUFOzMl1rfaX8+ueoqleqFxoBYxjYm/Shg/JVwxziRjsq9G22oVSEsQg4KSOuP+TcHJV83KH9XChS8lRLgnOrYjFLGPcqrKgQZ+Cyfub7y4SUgIoyZi7loz/DoBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=WJS/i5Rg; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=DWdZx3+b6LOD4MmuA0BvOR7aPAVUuBwCX5E1UuY5nX0yPbA5Mb3Pz1JhQOjhe5D7A7yIrtItXfw4huR/R/w451llO6EGb/+kDDzW+jzCcFroVAHo893CbVBjV3jTPCX04spsU3O49b/Jp6xoPDlVtke1Ody2fclCXtLAAv+mSzA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ASDidFR+; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,33 +36,50 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=vqL7u9oyMANO/zy+gwhMEpFhK/8938wkNZRvMcW8tm0=; b=WJS/i5RgaG93bD4JOTAmcdNflV
-	JwAY8j81Ni6XQ0qCZYvhXNk3AKxh2FlBCQWj4/ekzaZmfDQ3ucotQ271s7d35W+OmcGbNFonYE5QQ
-	2Htw4esdZyyYVfGgodIXuXJDtCkE3DNGF18scB0tRarE2rS6HggfHzMBa03wQu22HhBk=;
+	bh=CSMqwDKzbAF07LEj16Y/SY3uynIQ3ZDCh9oahh4/HcU=; b=ASDidFR+i4iYNluQP0rJyHKR+9
+	MA14ki1enjp3yP1hOvsRmysiDbELxsPMxXQPk/M+1NUURfmZQeOIdKIC6kU22hynxmMBBalxTl2Ey
+	TIbTKUAN37DFqIZgesWvog5zZdyXU42VxFl9IVicM6sVxLXhb7QCeU7Rkh1xS1LqxN8E=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rnNzJ-00Au1Z-C2; Thu, 21 Mar 2024 20:22:05 +0100
-Date: Thu, 21 Mar 2024 20:22:05 +0100
+	id 1rnOIw-00Au4Q-Dp; Thu, 21 Mar 2024 20:42:22 +0100
+Date: Thu, 21 Mar 2024 20:42:22 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Elad Nachman <enachman@marvell.com>
-Cc: Taras Chornyi <taras.chornyi@plvision.eu>,
+To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
+Cc: "Parthiban.Veerasooran@microchip.com" <Parthiban.Veerasooran@microchip.com>,
 	"davem@davemloft.net" <davem@davemloft.net>,
 	"edumazet@google.com" <edumazet@google.com>,
 	"kuba@kernel.org" <kuba@kernel.org>,
 	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
-	"thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
-	"miquel.raynal@bootlin.com" <miquel.raynal@bootlin.com>,
-	"przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
-	"dkirjanov@suse.de" <dkirjanov@suse.de>,
+	"horms@kernel.org" <horms@kernel.org>,
+	"saeedm@nvidia.com" <saeedm@nvidia.com>,
+	"anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
 	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [EXTERNAL] Re: [PATCH v2 0/5] Fix prestera driver fail to probe
- twice
-Message-ID: <89a01616-57c2-4338-b469-695bdc731dee@lunn.ch>
-References: <20240320172008.2989693-1-enachman@marvell.com>
- <4104387a-d7b5-4029-b822-060ef478c6e3@lunn.ch>
- <BN9PR18MB42517F8E84C8C18078E45C37DB322@BN9PR18MB4251.namprd18.prod.outlook.com>
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"robh+dt@kernel.org" <robh+dt@kernel.org>,
+	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
+	"conor+dt@kernel.org" <conor+dt@kernel.org>,
+	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+	"Horatiu.Vultur@microchip.com" <Horatiu.Vultur@microchip.com>,
+	"ruanjinjie@huawei.com" <ruanjinjie@huawei.com>,
+	"Steen.Hegelund@microchip.com" <Steen.Hegelund@microchip.com>,
+	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
+	"UNGLinuxDriver@microchip.com" <UNGLinuxDriver@microchip.com>,
+	"Thorsten.Kummermehr@microchip.com" <Thorsten.Kummermehr@microchip.com>,
+	Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
+	"Nicolas.Ferre@microchip.com" <Nicolas.Ferre@microchip.com>,
+	"benjamin.bigler@bernformulastudent.ch" <benjamin.bigler@bernformulastudent.ch>
+Subject: Re: [PATCH net-next v3 08/12] net: ethernet: oa_tc6: implement
+ transmit path to transfer tx ethernet frames
+Message-ID: <f9ded7f6-7f7d-4564-8b06-e73e603ef927@lunn.ch>
+References: <20240306085017.21731-1-Parthiban.Veerasooran@microchip.com>
+ <20240306085017.21731-9-Parthiban.Veerasooran@microchip.com>
+ <208fb61b-4740-46bf-8c70-29ab59cbb965@lunn.ch>
+ <f9d8a18c-b1fe-450c-a5ca-d91f96793a04@microchip.com>
+ <96dd422f-0bf9-411d-8cc2-5755c1e60e27@lunn.ch>
+ <53b090b1-d7bb-4a81-9f0b-9979db8dec59@microchip.com>
+ <BYAPR02MB5958A04EF61FF6B7512CE7EE83322@BYAPR02MB5958.namprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,42 +88,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <BN9PR18MB42517F8E84C8C18078E45C37DB322@BN9PR18MB4251.namprd18.prod.outlook.com>
+In-Reply-To: <BYAPR02MB5958A04EF61FF6B7512CE7EE83322@BYAPR02MB5958.namprd02.prod.outlook.com>
 
-> Originally, the pain point for Kory was the rmmod + insmod re-probing failure,
-> Which is only fixed by the first two commits, so I see little point in submitting 3-5 alone,
-> Without fixing Kory's problem.
+> > > This second part is clearly an optimisation. If you have lots of full
+> > > MTU packets, 1514 bytes, they take around 24 chunks. Having the last
+> > > chunk only 1/2 full does not waste too much bandwidth. But if you are
+> > > carrying lots of small packets, say voice, 130 bytes, the wasted
+> > > bandwidth starts to add up. But is there a use case for 10Mbps of
+> > > small packets? I doubt it.
+> > Yes, for sure there is a possibility to get into this scenario and the protocol also
+> > supports that. But as proposed by you below, let's implement it as part of
+> > optimization later.
+> > >
+> > > So if you don't have the ability to combine two packets into one
+> > > chunk, i would do that later. Lets get the basics merged first, it can
+> > > be optimised later.
+> > Yes, I agree with this proposal to get the basic version merged first.
+> 
+> While latency is important, so is using the available bandwidth efficiently. Here is a suggestion.  We know that the tx credit available basically tells us,
+> how many chunks could be transmitted without overflow. Instead of stopping the netif queue based on number of skbs queued, why not stop the queue based on
+> number of bytes accumulated? Basically, at any given point of time, we enqueue the tx_skb_q until we are have enough bytes to cross the threshold of (tc6->tc_credit * OA_TC6_CHUNK_PAYLOAD_SIZE).
+> This way, during the next transmit, we could utilize the whole available credits. Bandwidth utilization between bigger frames and smaller frames would be not be vastly different.
 
-I thought Kory's problem was actually EPROBE_DEFER? The resources
-needed for the PoE are not available, so probing the switch needs to
-happen again later, when PoE can get the resources it needs.
+Please configure your email client to wrap emails at around 70
+characters.
 
-But if that is going to take 30 seconds, i'm not sure we can call
-EPROBE_DEFER solved.
+tc_credit is 5 bits. So it is a maximum of 32.
 
-The later patches are pretty simple, don't need discussion, so could
-be merged. However, i think we need to explore different possible
-solutions for firmware {re}loading.
+A 1514 frame takes around 24 chunks. So you only need two full size
+frames to consume all your possible credit.
 
-> The problem is not with the hardware, but with the existing firmware code on the
-> Firmware cpu, most probably secure-boot protected, which lacks the ABIs to report to
-> The kernel what is loaded, what version, what state, etc.
+If you happen to have smaller voice packets, say 130 bytes, you need
+three chunks to send it. So you might want to have 10 such packets on
+hand in order to make use of all your credit. But if you have 10 voice
+packets to send in a burst, your voice quality is going to be bad,
+they should be 10ms to 20ms apart, not in a burst...
 
-Can you at least tell if it is running firmware?
+I don't like the original idea of having lots of packets in a transmit
+queue. But having 1/2 dozen should not be an issue.
 
-Can you explain the boot in a bit more detail. Are you saying it could
-be running an old firmware when the driver first loads? So you need to
-hit it with a reset in order to load the firmware for /lib/firmware,
-which might be newer than what it is already running?
+In general, we prefer things to be simple. We can then optimise later,
+and use benchmarks to show the optimisations really do bring a benefit
+to justify the added complexity.
 
-That would imply the device has FLASH and has a copy of firmware in
-it? And if that is true, i think that also implies you have no way to
-upgrade the image in FLASH? Otherwise you would implement "devlink
-flash" to allow it to be upgraded. You then would not need to load the
-firmware on driver probe....
-
-	Andrew
-
-
-
+   Andrew
 
