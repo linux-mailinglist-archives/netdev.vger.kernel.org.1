@@ -1,135 +1,157 @@
-Return-Path: <netdev+bounces-81134-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D303B886136
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 20:42:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5171988617D
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 21:11:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C3361F222D4
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 19:42:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06F4A1F229A6
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 20:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60F2C133997;
-	Thu, 21 Mar 2024 19:42:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30F3013443F;
+	Thu, 21 Mar 2024 20:11:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ASDidFR+"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Ohj113M2"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mout.web.de (mout.web.de [212.227.15.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFA3847B;
-	Thu, 21 Mar 2024 19:42:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712A156B98;
+	Thu, 21 Mar 2024 20:11:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711050159; cv=none; b=rPQbGGK55221dpV3nSwjzZ+N1p+VYEaZIkMwqBt07o9whe78conXNMLaMP/vuYNTM5xo6aZxOl4C80HRjbOcjXzu+ncOdhzVBkc0o1wX0R1WCuen6TOVWTceB9bAaex1yvudQugMI66wNT9HoI5GO6PpDE3xQMvzwNK0jd0biWw=
+	t=1711051905; cv=none; b=OMeC+fpjwAN0DtJvflQnKjYQkXZvQ3RDU526dBw4g9SekL+ksvjD2UwRKMmg3bfGYLBQ1ooMpfYp21u53TfO2blYd4v63cteyhsrgONBL5cHvGpyFyZ2qc4yThjH8qp8IvS5gmvzauKucd/rY7crjEFbevjrTbaJSutHpeA8ZD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711050159; c=relaxed/simple;
-	bh=YSAribocTF+rrupZDIuD87XtJLJvbUFIofeJ1GmRNqE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DWdZx3+b6LOD4MmuA0BvOR7aPAVUuBwCX5E1UuY5nX0yPbA5Mb3Pz1JhQOjhe5D7A7yIrtItXfw4huR/R/w451llO6EGb/+kDDzW+jzCcFroVAHo893CbVBjV3jTPCX04spsU3O49b/Jp6xoPDlVtke1Ody2fclCXtLAAv+mSzA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ASDidFR+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=CSMqwDKzbAF07LEj16Y/SY3uynIQ3ZDCh9oahh4/HcU=; b=ASDidFR+i4iYNluQP0rJyHKR+9
-	MA14ki1enjp3yP1hOvsRmysiDbELxsPMxXQPk/M+1NUURfmZQeOIdKIC6kU22hynxmMBBalxTl2Ey
-	TIbTKUAN37DFqIZgesWvog5zZdyXU42VxFl9IVicM6sVxLXhb7QCeU7Rkh1xS1LqxN8E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rnOIw-00Au4Q-Dp; Thu, 21 Mar 2024 20:42:22 +0100
-Date: Thu, 21 Mar 2024 20:42:22 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Selvamani Rajagopal <Selvamani.Rajagopal@onsemi.com>
-Cc: "Parthiban.Veerasooran@microchip.com" <Parthiban.Veerasooran@microchip.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"saeedm@nvidia.com" <saeedm@nvidia.com>,
-	"anthony.l.nguyen@intel.com" <anthony.l.nguyen@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"robh+dt@kernel.org" <robh+dt@kernel.org>,
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"Horatiu.Vultur@microchip.com" <Horatiu.Vultur@microchip.com>,
-	"ruanjinjie@huawei.com" <ruanjinjie@huawei.com>,
-	"Steen.Hegelund@microchip.com" <Steen.Hegelund@microchip.com>,
-	"vladimir.oltean@nxp.com" <vladimir.oltean@nxp.com>,
-	"UNGLinuxDriver@microchip.com" <UNGLinuxDriver@microchip.com>,
-	"Thorsten.Kummermehr@microchip.com" <Thorsten.Kummermehr@microchip.com>,
-	Piergiorgio Beruto <Pier.Beruto@onsemi.com>,
-	"Nicolas.Ferre@microchip.com" <Nicolas.Ferre@microchip.com>,
-	"benjamin.bigler@bernformulastudent.ch" <benjamin.bigler@bernformulastudent.ch>
-Subject: Re: [PATCH net-next v3 08/12] net: ethernet: oa_tc6: implement
- transmit path to transfer tx ethernet frames
-Message-ID: <f9ded7f6-7f7d-4564-8b06-e73e603ef927@lunn.ch>
-References: <20240306085017.21731-1-Parthiban.Veerasooran@microchip.com>
- <20240306085017.21731-9-Parthiban.Veerasooran@microchip.com>
- <208fb61b-4740-46bf-8c70-29ab59cbb965@lunn.ch>
- <f9d8a18c-b1fe-450c-a5ca-d91f96793a04@microchip.com>
- <96dd422f-0bf9-411d-8cc2-5755c1e60e27@lunn.ch>
- <53b090b1-d7bb-4a81-9f0b-9979db8dec59@microchip.com>
- <BYAPR02MB5958A04EF61FF6B7512CE7EE83322@BYAPR02MB5958.namprd02.prod.outlook.com>
+	s=arc-20240116; t=1711051905; c=relaxed/simple;
+	bh=/2XDIlMNYS8/iY2ARJ5Fld7/GNYjUZk7UV6XTc7Kqsk=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=eq8tuzO7t1c+wAwKD99wDP6dImS7hpEux7D+5MMcdxxUPEa2hTNCf6B6KFOn7Qg/Pi2r63H+AnNKAdyv/W8uXdq4i4n5ucxFJGFrZFyxx6tGVA8nmgHGVFDi7R8p3r4G6UdHdR4JZD3QDlJobTvIOhum/dYrtkbepxS4EiscCwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Ohj113M2; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1711051895; x=1711656695; i=markus.elfring@web.de;
+	bh=HP94er+kV3GasVjf02u3F9ZYkvcXZGx9D3xC+m1al/k=;
+	h=X-UI-Sender-Class:Date:To:Cc:References:Subject:From:
+	 In-Reply-To;
+	b=Ohj113M2xWNnZpo7zw6o3IRAbBcp6R/t4iips3r3U920IM3MjiGXBn15VjlXyh2b
+	 iszYGr5qT9m6SsC5r3viqzQ9GkIs8+AXPkRcTvMgiH75mFEhvOEDNx0ezD/Vb0Fdv
+	 hP3Qm3UHC+pZCytnyRUinD7w+2QmtfOhHzykHXmw1X/8N17Pnsgd3V9J27LDUjWiL
+	 K7GmKt2QTfjYy3uQJlDFW9AyGDsa3WUt2izVju3+IIdqmBEuwN+PHfVKl/UkUEOLW
+	 TsDlKXLFuIgcSXUqRZv0v9Ps+OQctuJnMr5MSwlYBUNzXWuN3q45rrlW5ZIkXDFfL
+	 L+RW7rMXRujdp9jmXg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1M8C07-1rjnlJ0KNn-00CkW1; Thu, 21
+ Mar 2024 21:05:38 +0100
+Message-ID: <0d7062e1-995b-42bc-8a62-d57c8cb588ee@web.de>
+Date: Thu, 21 Mar 2024 21:05:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BYAPR02MB5958A04EF61FF6B7512CE7EE83322@BYAPR02MB5958.namprd02.prod.outlook.com>
+User-Agent: Mozilla Thunderbird
+To: Dan Carpenter <dan.carpenter@linaro.org>,
+ kernel-janitors@vger.kernel.org, netdev@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ David Laight <David.Laight@aculab.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>, Jiri Pirko
+ <jiri@resnulli.us>, Jonathan Cameron <jic23@kernel.org>,
+ Julia Lawall <julia.lawall@inria.fr>, Kees Cook <keescook@chromium.org>,
+ Lukasz Czapnik <lukasz.czapnik@intel.com>, Paolo Abeni <pabeni@redhat.com>,
+ Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+References: <0efe132b-b343-4438-bb00-5a4b82722ed3@moroto.mountain>
+Subject: Re: [PATCH v2 net] ice: Fix freeing uninitialized pointers
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <0efe132b-b343-4438-bb00-5a4b82722ed3@moroto.mountain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:f30MnlCTiWPDt1zm7PlXXn3w8Vl/ZOlATngou/8kstVjQ3Vtjmc
+ NwEr7iAZYqjF/kCilniZdpv/ZLPs3A65OoLDtTMhNEIpAf2F3c8X9j/zin2Z/6rxkVK/bL3
+ Wd7ZA7beckUcLMwzclkVVdoZI80PLUcb7qXLoHdtCIh0JsPV3Ctj3JBF/3V2PoYrWqycho0
+ 7onxYACnS19+yZ9c1V4Ag==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:X2SR5Bg9eus=;EsgC33vWFTVn58hHEBNEPF38Rrl
+ CULKBP/GMFGAZzCkl/I+QKpv2zx/UmKeEXzWhzA8tkpmH4pA05yI58gXd8aPMlQRo+vXZ0g9e
+ 3vdZ9gUpf1OvJ5ENRAHCnG+NQZabvdjqV/6JwkdcO06hQYZqEUL6w1svA2UmD8fTX3L7eDuSy
+ GthD2D2GbGCQN3t4gIypBIGb1bD0ATnGsIL1qSaVEr34JZtp2H8QZYootESVtgminvoM5ZIHz
+ CrETzHiOnDA9HSVpijq0dh7Gk29iyNk4CjyKBx2nnC9Oa6+HuhEiE8VKNKOkQLKscw5S+rz0r
+ n+IRXcV95zmeKDKKr7ICaj6oRIXfJ+SuIf6YBEZhjK16xQ3bhXUKRpvl6WFKxw1ibBrrg4r7N
+ JOdj2N9961SHi9BJsH0gKdka+QsUM93IbN1Mjy1d/mv4lKZmx83TDciQVgF71Dq6lFkwWPye6
+ YHPXzvmcQmPRvgCyNmGBhyKcMlw9E4Pf9b1ABrq8Trf2psGZHrDUtWCN5pcMP+NoSkVJwqTGm
+ kRAYADbhG6fDuduIZWi3kYTWSMmF2E+HnN6xHjox+VRGFx+0Mrg8APJrVR55AnRpmaIwK6fPF
+ /I891Y3iTsB+qN2zup5tfSw072LFbBWBYq/BNwxDYuSOH17vkWLoEhpG6bKy5vvoXGMNl9qY+
+ IDt5KkknnGPMuSGwxczBT4PZeQIYsQHf7tuaPt24XxSofTBQNJ87zdG4pp2OUNzAC2xDjAoqf
+ Cx/ojIX9EGvYib8qjgKvy8asvEyUZ9e9uzCh7kkNekla2o60ns7KRvW17qUhZZl9DFw0jvI0Q
+ oUSTbhHJflD2aEv7pc2aOHIYjEEoYQLDzH960/3o/GttE=
 
-> > > This second part is clearly an optimisation. If you have lots of full
-> > > MTU packets, 1514 bytes, they take around 24 chunks. Having the last
-> > > chunk only 1/2 full does not waste too much bandwidth. But if you are
-> > > carrying lots of small packets, say voice, 130 bytes, the wasted
-> > > bandwidth starts to add up. But is there a use case for 10Mbps of
-> > > small packets? I doubt it.
-> > Yes, for sure there is a possibility to get into this scenario and the protocol also
-> > supports that. But as proposed by you below, let's implement it as part of
-> > optimization later.
-> > >
-> > > So if you don't have the ability to combine two packets into one
-> > > chunk, i would do that later. Lets get the basics merged first, it can
-> > > be optimised later.
-> > Yes, I agree with this proposal to get the basic version merged first.
-> 
-> While latency is important, so is using the available bandwidth efficiently. Here is a suggestion.  We know that the tx credit available basically tells us,
-> how many chunks could be transmitted without overflow. Instead of stopping the netif queue based on number of skbs queued, why not stop the queue based on
-> number of bytes accumulated? Basically, at any given point of time, we enqueue the tx_skb_q until we are have enough bytes to cross the threshold of (tc6->tc_credit * OA_TC6_CHUNK_PAYLOAD_SIZE).
-> This way, during the next transmit, we could utilize the whole available credits. Bandwidth utilization between bigger frames and smaller frames would be not be vastly different.
+> Automatically cleaned up pointers need to be initialized before exiting
+> their scope.  In this case, they need to be initialized to NULL before
+> any return statement.
 
-Please configure your email client to wrap emails at around 70
-characters.
+Will any adjustments become relevant also for this change description
+if scope reductions would become more appealing for affected local variables?
 
-tc_credit is 5 bits. So it is a maximum of 32.
+How much can a small script (like the following) for the semantic patch language
+(Coccinelle software) help to achieve a better common understanding for
+possible source code transformations?
 
-A 1514 frame takes around 24 chunks. So you only need two full size
-frames to consume all your possible credit.
+// See also:
+// drivers/net/ethernet/intel/ice/ice_common.c
+@movement1@
+attribute name __free;
+@@
+-struct ice_aqc_get_phy_caps_data *pcaps __free(kfree);
+ ... when any
++struct ice_aqc_get_phy_caps_data *
+ pcaps
++__free(kfree)
+ = kzalloc(sizeof(*pcaps), ...);
 
-If you happen to have smaller voice packets, say 130 bytes, you need
-three chunks to send it. So you might want to have 10 such packets on
-hand in order to make use of all your credit. But if you have 10 voice
-packets to send in a burst, your voice quality is going to be bad,
-they should be 10ms to 20ms apart, not in a burst...
+@movement2@
+attribute name __free;
+@@
+-void *mac_buf __free(kfree);
+ ... when any
++void *
+ mac_buf
++__free(kfree)
+ = kcalloc(2, sizeof(struct ice_aqc_manage_mac_read_resp), ...);
 
-I don't like the original idea of having lots of packets in a transmit
-queue. But having 1/2 dozen should not be an issue.
+// See also:
+// drivers/net/ethernet/intel/ice/ice_ethtool.c
+@movement3@
+attribute name __free;
+@@
+-u8 *tx_frame __free(kfree);
+ int i;
+ ... when any
+ if (ice_fltr_add_mac(test_vsi, ...))
+ { ... }
++
++{
++u8 *tx_frame __free(kfree) = NULL;
+ if (ice_lbtest_create_frame(pf, &tx_frame, ...))
+ { ... }
+ ... when any
++}
++
+ valid_frames = ice_lbtest_receive_frames(...);
 
-In general, we prefer things to be simple. We can then optimise later,
-and use benchmarks to show the optimisations really do bring a benefit
-to justify the added complexity.
 
-   Andrew
+Regards,
+Markus
 
