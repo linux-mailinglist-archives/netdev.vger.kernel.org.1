@@ -1,127 +1,618 @@
-Return-Path: <netdev+bounces-81041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F54188590F
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:26:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 999E8885918
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:31:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E2CF1C21909
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:26:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DEA61F23EB7
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:31:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9486762E6;
-	Thu, 21 Mar 2024 12:26:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9072C78B66;
+	Thu, 21 Mar 2024 12:30:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dJNkMPoy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XgDiIYH2"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10489757F7
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 12:26:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27D0878B41;
+	Thu, 21 Mar 2024 12:30:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711023977; cv=none; b=Cn7At2nD4SLSHDwYo5r8nS2gNr1GZYWUqsSlnlCS7T4dXvyDRMs/+spFT89ydxAw9HV0QbcUCsIodtj7vrfY0VAaDmNAxuj+vKoXOHI/RC2ChjREGQabP2584vucGMJxQ7QSS5jd3h9GKMhkkbdpWu4AUHFHUAbobnIBO5qTmJI=
+	t=1711024257; cv=none; b=tPQRDUkvE7OGYKcOjZanRgZG+uIWfSnYr86KWDExsjix/LCSbVZ2z1Lgmfn6FKBlPH91MC6saza2QL3NOf/bggjmzTj/w9HHDPLJLASfVQApJEwb2Xk+JwHQtW1nGL3RV1sMhULIeiFNJALUSGIo5EGgrabJNflmGVXgnyniljU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711023977; c=relaxed/simple;
-	bh=asNxUABtcbFsSQGHR2XvI5++jNl/Wy6Tq921v8Lu2V4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=tA9F4D6w16N0zzEWTDRChJ1/cdMhKxU7KSCLGhnDlf76hOqlaXkwLqC4kR8BHHB1EUtaq/lAzmVA+wYxgbgw5pgltPmAXS+7I417pkES9yvyp+lIDZPL1m53gDKEkSN6xfbiQtGxb27aGnP1qgsnkls9P9Om/NHTxsqiQbtXe+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dJNkMPoy; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711023974;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=asNxUABtcbFsSQGHR2XvI5++jNl/Wy6Tq921v8Lu2V4=;
-	b=dJNkMPoy2wq7DqQnbUHLKl+vbeE2SbKedGBw7kkVoalyxwTx4w6pQFO5TjkYyoXAj1Y6g/
-	wMZm1xM7yc0AMaDHxoF8Vhvni1/dJlV4zZqDgoQH6GQ3HL2aQtYYrRJqc7RajkYi0rwvsQ
-	YjShggqgFhn5P/OmTbw94IrnjHgJyvU=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-357-oKQrMTdiPvaDLr-w0wu-rw-1; Thu, 21 Mar 2024 08:26:12 -0400
-X-MC-Unique: oKQrMTdiPvaDLr-w0wu-rw-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-41472b798a2so1809555e9.1
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 05:26:12 -0700 (PDT)
+	s=arc-20240116; t=1711024257; c=relaxed/simple;
+	bh=c0G7y4064kWepgY4H9XjLAUB71A1ERH33FepzlttQiw=;
+	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=FFwEhEnULvUMyzPWp0LDHouc2hihzNr4bLm8RMCTRnZAlxKWoL5jYDaKjWph/E93hG8TaosepKZhagfpcmRcKi+etcgZtv547doTgJ3bNp3YVFfdHKFInZDsUKbztlACMYNOzQCUVRUvkipI20MQFJONEDt50h4guh9XrNzZMe8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XgDiIYH2; arc=none smtp.client-ip=209.85.208.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d21cdbc85bso14976101fa.2;
+        Thu, 21 Mar 2024 05:30:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711024253; x=1711629053; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=bFNB2YjBMfxGKEHlP6iEiBMA46z7+jm+qO12uAk7rtc=;
+        b=XgDiIYH26Q2NKceyVoJkmCgjwfAaZrTX+lTFmsRiMaxgls5wg9dZ7gdduH3mrHx9B1
+         PpgkNbqnu99HjpJoW0/L1JByzVaNFZfAZM7602GUcAYMJ9zi8pfzA5f7VDEh+uQTWeLS
+         plL+R116ZT4QO7x72nUSK3m0SJDcGu9hnQIbUPYab1UjZ3FyPWZzJFRoQb1Gow2D15ni
+         tzpEaL85BpIYTQ0NfocvI4jW8A0mWgRLA5fql8NepxPQ2O+4o66h0gsb83bvdcUqpER+
+         CHI2nanBLYWYYAEamhe+rOwTywVxtkCcDzmT4R9n0NaVmQ2hibLCS5w/bBmBs6lurCfo
+         U/4A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711023971; x=1711628771;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=asNxUABtcbFsSQGHR2XvI5++jNl/Wy6Tq921v8Lu2V4=;
-        b=iq6Df2le+mdGRttk5F5XL8QgL4MozNyb23CqxX6dXu86I0iF0r0e2+sajoxazXF5OY
-         ME0KoCV+1sJYOeGrp3Dh2z5suIHyxdfh0tZMD0oqU361CDjY/qaEy10aoOyg8Zwl/dCd
-         WoudlbZYn5b+9Htx5sbqAXvlJwD65rFOCmpbpRQRhsm+1fqnCw1/Acnat7WKMQuipx3i
-         wqiFMlh298uTs/OZoQsv2+pGd4TYIJyjFwwRxBbU6tX/demIXg86DKx8d64spkV60ixn
-         bxvmYRLSSqRlCrETn6KoWjOtbBzNGFcBNLVYDxeBBspGdzN5WF4E/W4N+8UGjJtCe8CA
-         9PNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXkzhwxCgyFH+d+E5TxZK978oo4M+pxRXtwjQW0HGx7iQUpUXINug1Vu9cKvdOhTHiqtq3773444Af4oDwEyxgyPeqZIznG
-X-Gm-Message-State: AOJu0Yzo6C4SBl7XFxC8sPg0AvtZOHaTH+pUDyYzbJkbJOpKWWn7lpJE
-	lp+kU4K3KdN7EG5QJ/B1qRCPwosQkQEAXifVe3UiBjMNju6deWz+N2ggd2y3otlXLQmTsQhxdeY
-	7fxmlv/jpPxMvtk/QR7gUc3GeD6t2dCXa++ttmSNxf3i6SDrpY+/CKw==
-X-Received: by 2002:a05:600c:1c9b:b0:414:2894:d446 with SMTP id k27-20020a05600c1c9b00b004142894d446mr7311191wms.4.1711023971578;
-        Thu, 21 Mar 2024 05:26:11 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFhW9N0wGR4j4LK7zUT4IVCd+OqZVL12rVrnpPybi9dFVPkppnj+DbNdmr3/iz5olOs5kyeyQ==
-X-Received: by 2002:a05:600c:1c9b:b0:414:2894:d446 with SMTP id k27-20020a05600c1c9b00b004142894d446mr7311170wms.4.1711023971209;
-        Thu, 21 Mar 2024 05:26:11 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-249-130.dyn.eolo.it. [146.241.249.130])
-        by smtp.gmail.com with ESMTPSA id fs7-20020a05600c3f8700b00414038162e1sm5334655wmb.23.2024.03.21.05.26.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Mar 2024 05:26:10 -0700 (PDT)
-Message-ID: <8edda7aa8ff27cee1b3fa60421734e508d319481.camel@redhat.com>
-Subject: Re: [PATCH net v3] dpaa_eth: fix XDP queue index
-From: Paolo Abeni <pabeni@redhat.com>
-To: David Gouarin <dgouarin@gmail.com>
-Cc: david.gouarin@thalesgroup.com, Madalin Bucur <madalin.bucur@nxp.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,  Alexei
+        d=1e100.net; s=20230601; t=1711024253; x=1711629053;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:to:from:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=bFNB2YjBMfxGKEHlP6iEiBMA46z7+jm+qO12uAk7rtc=;
+        b=SFPftLeXCX6Dii0IS/eg9uSexwMEP2soxB6AXeK4AwOHDHlOQ8zQfD04TTMY2pATvz
+         VNZCdXOQa+YYgh6yIl73rI30zA10gUcMZInbidCKXoCbk1xFOc+H1/nZtPaaoDgIkFxe
+         PUA+QtSdAubQ5mboUuwH0hIUJXEJ6igNj0hB/kIcc/pJ6QeNlaY9syn4YTo8nVlTH096
+         WXiyJLmtvBDDI8GlA1tlxF/RbYBeJY7Yd1Z8kYI2o38yqb7lWPQ5pfoNDlPXIZKXotu8
+         8CMkqkhy9wZ+oys047Zv+FijR6LE3DsU0hkmw4VVnP6FKvSzplXYYMDKOtCajHAALBmo
+         LDKg==
+X-Forwarded-Encrypted: i=1; AJvYcCVFdbS8EK0pXX4+kEnKWUTrYrxBmltJFS+/6+6CptFO+aWkqwyb6b4e7sf1QcPbyCWLJjNPwNqi/DcjiKDzDCov2iYLs88Vof8xacDcJrAwqL7kydCypmMSEUwaNHJ+X/LhoAXB66DSRBP65Fn/1NoQ7F3t55Prtn+G
+X-Gm-Message-State: AOJu0Yxxs/pI/5G9GXsgEoTyVgea5zSk35KK0xmr8UZ0cwVO/ZpNudMy
+	wn8gvIXPrQuBoZm1+WQz8dosFsKZ6m0oY/9UXaPgv4/cLvnXYL8k
+X-Google-Smtp-Source: AGHT+IHRmxGvDvujXJKy8YCykfAQPUrAoCqJrKq5arIkSLnLCgR+gFQvWK7O6fih7VbEH+809JVDVw==
+X-Received: by 2002:a2e:b8cb:0:b0:2d3:f81b:7f9 with SMTP id s11-20020a2eb8cb000000b002d3f81b07f9mr4350662ljp.21.1711024253003;
+        Thu, 21 Mar 2024 05:30:53 -0700 (PDT)
+Received: from localhost (54-240-197-231.amazon.com. [54.240.197.231])
+        by smtp.gmail.com with ESMTPSA id r13-20020a05600c458d00b00414038b4d64sm5442657wmo.27.2024.03.21.05.30.52
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 21 Mar 2024 05:30:52 -0700 (PDT)
+From: Puranjay Mohan <puranjay12@gmail.com>
+To: Ilya Leoshkevich <iii@linux.ibm.com>, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Alexei
  Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Camelia Groza <camelia.groza@nxp.com>, Maciej
- Fijalkowski <maciej.fijalkowski@intel.com>,  netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Date: Thu, 21 Mar 2024 13:26:09 +0100
-In-Reply-To: <20240320112519.5311-1-dgouarin@gmail.com>
-References: <ZenidKFF/gQefijz@boxer>
-	 <20240320112519.5311-1-dgouarin@gmail.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, "Eduard
+ Zingerman" <eddyz87@gmail.com>, Song Liu <song@kernel.org>, Yonghong Song
+ <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, "KP
+ Singh" <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Thomas Gleixner
+ <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, Borislav Petkov
+ <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>, Jean-Philippe Brucker
+ <jean-philippe@linaro.org>, netdev@vger.kernel.org, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH bpf v3] bpf: verifier: prevent userspace memory access
+In-Reply-To: <2ef29d6b7ed800631f228ea41f27c0242e96f941.camel@linux.ibm.com>
+References: <20240321120842.78983-1-puranjay12@gmail.com>
+ <2ef29d6b7ed800631f228ea41f27c0242e96f941.camel@linux.ibm.com>
+Date: Thu, 21 Mar 2024 12:30:50 +0000
+Message-ID: <mb61p4jczix6t.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 2024-03-20 at 12:25 +0100, David Gouarin wrote:
-> Make it possible to bind a XDP socket to a queue id.
-> The DPAA FQ Id was passed to the XDP program in the
-> xdp_rxq_info->queue_index instead of the Ethernet device queue number,
-> which made it unusable with bpf_map_redirect.
-> Instead of the DPAA FQ Id, initialise the XDP rx queue with the queue num=
-ber.
->=20
-> Fixes: d57e57d0cd04 ("dpaa_eth: add XDP_TX support")
->=20
-> Signed-off-by: David Gouarin <dgouarin@gmail.com>
+Ilya Leoshkevich <iii@linux.ibm.com> writes:
 
-The patch LGTM, but you must avoid empty lines in after the 'Fixes'
-tag.
+> On Thu, 2024-03-21 at 12:08 +0000, Puranjay Mohan wrote:
+>> With BPF_PROBE_MEM, BPF allows de-referencing an untrusted pointer.
+>> To
+>> thwart invalid memory accesses, the JITs add an exception table entry
+>> for all such accesses. But in case the src_reg + offset overflows and
+>> turns into a userspace address, the BPF program might read that
+>> memory if
+>> the user has mapped it.
+>>=20
+>> There are architectural features that prevent the kernel from
+>> accessing
+>> userspace memory, like Privileged Access Never (PAN) on ARM64,
+>> Supervisor Mode Access Prevention (SMAP) on x86-64, Supervisor User
+>> Memory access (SUM) on RISC-V, etc. But BPF should not rely on the
+>> existence of these features.
+>>=20
+>> Make the verifier add guard instructions around such memory accesses
+>> and
+>> skip the load if the address falls into the userspace region.
+>>=20
+>> The JITs need to implement bpf_arch_uaddress_limit() to define where
+>> the userspace addresses end for that architecture or TASK_SIZE is
+>> taken
+>> as default.
+>>=20
+>> The implementation is as follows:
+>>=20
+>> REG_AX =3D=C2=A0 SRC_REG
+>> if(offset)
+>> 	REG_AX +=3D offset;
+>> REG_AX >>=3D 32;
+>> if (REG_AX <=3D (uaddress_limit >> 32))
+>> 	DST_REG =3D 0;
+>> else
+>> 	DST_REG =3D *(size *)(SRC_REG + offset);
+>>=20
+>> Comparing just the upper 32 bits of the load address with the upper
+>> 32 bits of uaddress_limit implies that the values are being aligned
+>> down
+>> to a 4GB boundary before comparison.
+>>=20
+>> The above means that all loads with address <=3D uaddress_limit + 4GB
+>> are
+>> skipped. This is acceptable because there is a large hole (much
+>> larger
+>> than 4GB) between userspace and kernel space memory, therefore a
+>> correctly functioning BPF program should not access this 4GB memory
+>> above the userspace.
+>>=20
+>> Let's analyze what this patch does to the following fentry program
+>> dereferencing an untrusted pointer:
+>>=20
+>> =C2=A0 SEC("fentry/tcp_v4_connect")
+>> =C2=A0 int BPF_PROG(fentry_tcp_v4_connect, struct sock *sk)
+>> =C2=A0 {
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 *(volatile long *)sk;
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 return 0;
+>> =C2=A0 }
+>>=20
+>> =C2=A0=C2=A0=C2=A0 BPF Program before=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 BPF Program after
+>> =C2=A0=C2=A0=C2=A0 ------------------=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -----------------
+>>=20
+>> =C2=A0 0: (79) r1 =3D *(u64 *)(r1 +0)=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 0: (79) r1 =3D *(u64 *)(r1 +0)
+>> =C2=A0 -----------------------------------------------------------------=
+--
+>> ----
+>> =C2=A0 1: (79) r1 =3D *(u64 *)(r1 +0) --\=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+1: (bf) r11 =3D r1
+>> =C2=A0 ----------------------------\=C2=A0=C2=A0 \=C2=A0=C2=A0=C2=A0=C2=
+=A0 2: (77) r11 >>=3D 32
+>> =C2=A0 2: (b7) r0 =3D 0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \=C2=A0=C2=A0 \=C2=A0=C2=A0=C2=A0 3: (=
+b5) if r11 <=3D 0x8000 goto
+>> pc+2
+>> =C2=A0 3: (95) exit=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \=C2=A0=C2=A0 \-> 4: (7=
+9) r1 =3D *(u64 *)(r1 +0)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 5: (05) goto pc+1
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \=C2=A0=C2=A0=C2=A0=C2=
+=A0 6: (b7) r1 =3D 0
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \----------------=
+-----------------
+>> -----
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 7: (b7) r0 =3D 0
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 8: (95) exit
+>>=20
+>> As you can see from above, in the best case (off=3D0), 5 extra
+>> instructions
+>> are emitted.
+>>=20
+>> Now, we analyse the same program after it has gone through the JITs
+>> of
+>> X86-64, ARM64, and RISC-V architectures. We follow the single load
+>> instruction that has the untrusted pointer and see what
+>> instrumentation
+>> has been added around it.
+>>=20
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 x86-64 JIT
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>> =C2=A0=C2=A0=C2=A0=C2=A0 JIT's Instrumentation=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 Verifier's
+>> Instrumentation
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (upstream)=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0 (This patch)
+>> =C2=A0=C2=A0=C2=A0=C2=A0 ---------------------=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 -------------------------
+>> -
+>>=20
+>> =C2=A0=C2=A0 0:=C2=A0=C2=A0 nopl=C2=A0=C2=A0 0x0(%rax,%rax,1)=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0:=C2=A0=C2=
+=A0 nopl=C2=A0=C2=A0
+>> 0x0(%rax,%rax,1)
+>> =C2=A0=C2=A0 5:=C2=A0=C2=A0 xchg=C2=A0=C2=A0 %ax,%ax=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 5:=C2=A0=C2=A0 xchg=C2=A0=C2=A0 %ax,%ax
+>> =C2=A0=C2=A0 7:=C2=A0=C2=A0 push=C2=A0=C2=A0 %rbp=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 7:=C2=A0=C2=A0 push=C2=A0=
+=C2=A0 %rbp
+>> =C2=A0=C2=A0 8:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0 %rsp,%rbp=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 8:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0 %rsp,%rbp
+>> =C2=A0=C2=A0 b:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0 0x0(%rdi),%rdi=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 b:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0
+>> 0x0(%rdi),%rdi
+>> =C2=A0 -----------------------------------------------------------------=
+--
+>> -----
+>> =C2=A0=C2=A0 f:=C2=A0=C2=A0 movabs $0x800000000000,%r11=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 f:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0 %rdi=
+,%r10
+>> =C2=A0 19:=C2=A0=C2=A0 cmp=C2=A0=C2=A0=C2=A0 %r11,%rdi=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 12:=C2=A0=C2=A0 shr=C2=A0=C2=A0=C2=A0 $0x20,%r10
+>> =C2=A0 1c:=C2=A0=C2=A0 jb=C2=A0=C2=A0=C2=A0=C2=A0 0x000000000000002a=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 16:=C2=A0=C2=A0 cmp=C2=
+=A0=C2=A0=C2=A0 $0x8000,%r10
+>> =C2=A0 1e:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0 %rdi,%r11=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 1d:=C2=A0=C2=A0 jbe=C2=A0=C2=A0=C2=A0
+>> 0x0000000000000025
+>> =C2=A0 21:=C2=A0=C2=A0 add=C2=A0=C2=A0=C2=A0 $0x0,%r11=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /--> 1f:=C2=A0=
+=C2=A0 mov=C2=A0=C2=A0=C2=A0
+>> 0x0(%rdi),%rdi
+>> =C2=A0 28:=C2=A0=C2=A0 jae=C2=A0=C2=A0=C2=A0 0x000000000000002e=C2=A0=C2=
+=A0=C2=A0 /=C2=A0=C2=A0=C2=A0=C2=A0 23:=C2=A0=C2=A0 jmp=C2=A0=C2=A0=C2=A0
+>> 0x0000000000000027
+>> =C2=A0 2a:=C2=A0=C2=A0 xor=C2=A0=C2=A0=C2=A0 %edi,%edi=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 25:=C2=A0=C2=A0 xor=C2=A0=C2=A0=C2=A0 %edi,%edi
+>> =C2=A0 2c:=C2=A0=C2=A0 jmp=C2=A0=C2=A0=C2=A0 0x0000000000000032=C2=A0 / =
+/-------------------------------
+>> -----
+>> =C2=A0 2e:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0 0x0(%rdi),%rdi=C2=A0 ---/ /=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 27:=C2=A0=C2=A0 xor=C2=A0=C2=A0=C2=A0 %eax,%=
+eax
+>> =C2=A0 ---------------------------------/=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 29:=C2=A0=C2=A0 leave
+>> =C2=A0 32:=C2=A0=C2=A0 xor=C2=A0=C2=A0=C2=A0 %eax,%eax=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0 2a:=C2=A0=C2=A0 ret
+>> =C2=A0 34:=C2=A0=C2=A0 leave
+>> =C2=A0 35:=C2=A0=C2=A0 ret
+>>=20
+>> The x86-64 JIT already emits some instructions to protect against
+>> user
+>> memory access. The implementation in this patch leads to a smaller
+>> number of instructions being emitted. In the worst case the JIT will
+>> emit 9 extra instructions and this patch decreases it to 7.
+>>=20
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ARM64 JIT
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+>>=20
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 No Intrumentation=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Verifier's
+>> Instrumentation
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (upstream)=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (This patch)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -----------------=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 ---------------------
+>> -----
+>>=20
+>> =C2=A0=C2=A0 0:=C2=A0=C2=A0 add=C2=A0=C2=A0=C2=A0=C2=A0 x9, x30, #0x0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 0:=C2=A0=C2=A0 add=C2=A0=C2=A0=C2=A0=C2=A0 x9, x30,
+>> #0x0
+>> =C2=A0=C2=A0 4:=C2=A0=C2=A0 nop=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 4:=C2=A0=C2=A0 nop
+>> =C2=A0=C2=A0 8:=C2=A0=C2=A0 paciasp=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 8:=C2=A0=C2=
+=A0 paciasp
+>> =C2=A0=C2=A0 c:=C2=A0=C2=A0 stp=C2=A0=C2=A0=C2=A0=C2=A0 x29, x30, [sp, #=
+-16]!=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 c:=C2=A0=C2=A0 stp=C2=A0=C2=
+=A0=C2=A0=C2=A0 x29, x30,
+>> [sp, #-16]!
+>> =C2=A0 10:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0=C2=A0 x29, sp=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 10:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0=C2=
+=A0 x29, sp
+>> =C2=A0 14:=C2=A0=C2=A0 stp=C2=A0=C2=A0=C2=A0=C2=A0 x19, x20, [sp, #-16]!=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 14:=C2=A0=C2=A0 stp=C2=A0=C2=A0=C2=A0=
+=C2=A0 x19, x20,
+>> [sp, #-16]!
+>> =C2=A0 18:=C2=A0=C2=A0 stp=C2=A0=C2=A0=C2=A0=C2=A0 x21, x22, [sp, #-16]!=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 18:=C2=A0=C2=A0 stp=C2=A0=C2=A0=C2=A0=
+=C2=A0 x21, x22,
+>> [sp, #-16]!
+>> =C2=A0 1c:=C2=A0=C2=A0 stp=C2=A0=C2=A0=C2=A0=C2=A0 x25, x26, [sp, #-16]!=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 1c:=C2=A0=C2=A0 stp=C2=A0=C2=A0=C2=A0=
+=C2=A0 x25, x26,
+>> [sp, #-16]!
+>> =C2=A0 20:=C2=A0=C2=A0 stp=C2=A0=C2=A0=C2=A0=C2=A0 x27, x28, [sp, #-16]!=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 20:=C2=A0=C2=A0 stp=C2=A0=C2=A0=C2=A0=
+=C2=A0 x27, x28,
+>> [sp, #-16]!
+>> =C2=A0 24:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0=C2=A0 x25, sp=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 24:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0=C2=
+=A0 x25, sp
+>> =C2=A0 28:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0=C2=A0 x26, #0x0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 28:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0=C2=A0 x26, #0x0
+>> =C2=A0 2c:=C2=A0=C2=A0 sub=C2=A0=C2=A0=C2=A0=C2=A0 x27, x25, #0x0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 2c=
+:=C2=A0=C2=A0 sub=C2=A0=C2=A0=C2=A0=C2=A0 x27, x25,
+>> #0x0
+>> =C2=A0 30:=C2=A0=C2=A0 sub=C2=A0=C2=A0=C2=A0=C2=A0 sp, sp, #0x0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 30:=C2=A0=C2=A0 sub=C2=A0=C2=A0=C2=A0=C2=A0 sp, sp,
+>> #0x0
+>> =C2=A0 34:=C2=A0=C2=A0 ldr=C2=A0=C2=A0=C2=A0=C2=A0 x0, [x0]=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 34:=C2=A0=C2=A0 ldr=C2=A0=C2=A0=C2=A0=C2=A0 x0,=
+ [x0]
+>> ---------------------------------------------------------------------
+>> -----------
+>> =C2=A0 38:=C2=A0=C2=A0 ldr=C2=A0=C2=A0=C2=A0=C2=A0 x0, [x0] ----------\=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 38:=C2=A0=C2=A0 add=C2=A0=C2=A0=
+=C2=A0=C2=A0 x9, x0,
+>> #0x0
+>> -----------------------------------\\=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 3c:=C2=A0=C2=A0 lsr=C2=A0=C2=A0=C2=A0=C2=A0 x9, x9, #32
+>> =C2=A0 3c:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0=C2=A0 x7, #0x0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \\=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 40:=C2=A0=C2=A0 cmp=C2=A0=C2=A0=C2=A0=C2=A0 x9, #0x10,
+>> lsl #12
+>> =C2=A0 40:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0=C2=A0 sp, sp=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \\=C2=
+=A0=C2=A0=C2=A0=C2=A0 44:=C2=A0=C2=A0 b.ls=C2=A0=C2=A0=C2=A0
+>> 0x0000000000000050
+>> =C2=A0 44:=C2=A0=C2=A0 ldp=C2=A0=C2=A0=C2=A0=C2=A0 x27, x28, [sp], #16=
+=C2=A0=C2=A0 \\--> 48:=C2=A0=C2=A0 ldr=C2=A0=C2=A0=C2=A0=C2=A0 x0, [x0]
+>> =C2=A0 48:=C2=A0=C2=A0 ldp=C2=A0=C2=A0=C2=A0=C2=A0 x25, x26, [sp], #16=
+=C2=A0=C2=A0=C2=A0 \=C2=A0=C2=A0=C2=A0 4c:=C2=A0=C2=A0 b=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0
+>> 0x0000000000000054
+>> =C2=A0 4c:=C2=A0=C2=A0 ldp=C2=A0=C2=A0=C2=A0=C2=A0 x21, x22, [sp], #16=
+=C2=A0=C2=A0=C2=A0=C2=A0 \=C2=A0=C2=A0 50:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=
+=A0=C2=A0 x0, #0x0
+>> =C2=A0 50:=C2=A0=C2=A0 ldp=C2=A0=C2=A0=C2=A0=C2=A0 x19, x20, [sp], #16=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \---------------------------
+>> ------------
+>> =C2=A0 54:=C2=A0=C2=A0 ldp=C2=A0=C2=A0=C2=A0=C2=A0 x29, x30, [sp], #16=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 54:=C2=A0=C2=A0 mov=C2=A0=
+=C2=A0=C2=A0=C2=A0 x7, #0x0
+>> =C2=A0 58:=C2=A0=C2=A0 add=C2=A0=C2=A0=C2=A0=C2=A0 x0, x7, #0x0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 58:=C2=A0=C2=A0 mov=C2=A0=C2=A0=C2=A0=C2=A0 sp, sp
+>> =C2=A0 5c:=C2=A0=C2=A0 autiasp=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 5c:=C2=A0=C2=A0 ldp=C2=
+=A0=C2=A0=C2=A0=C2=A0 x27, x28,
+>> [sp], #16
+>> =C2=A0 60:=C2=A0=C2=A0 ret=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 60=
+:=C2=A0=C2=A0 ldp=C2=A0=C2=A0=C2=A0=C2=A0 x25, x26,
+>> [sp], #16
+>> =C2=A0 64:=C2=A0=C2=A0 nop=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 64=
+:=C2=A0=C2=A0 ldp=C2=A0=C2=A0=C2=A0=C2=A0 x21, x22,
+>> [sp], #16
+>> =C2=A0 68:=C2=A0=C2=A0 ldr=C2=A0=C2=A0=C2=A0=C2=A0 x10, 0x00000000000000=
+70=C2=A0=C2=A0=C2=A0=C2=A0 68:=C2=A0=C2=A0 ldp=C2=A0=C2=A0=C2=A0=C2=A0 x19,=
+ x20,
+>> [sp], #16
+>> =C2=A0 6c:=C2=A0=C2=A0 br=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 x10=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 6c:=C2=A0=C2=A0 l=
+dp=C2=A0=C2=A0=C2=A0=C2=A0 x29, x30,
+>> [sp], #16
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 70:=C2=A0=C2=A0 add=C2=A0=C2=A0=C2=A0=
+=C2=A0 x0, x7,
+>> #0x0
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 74:=C2=A0=C2=A0 autiasp
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 78:=C2=A0=C2=A0 ret
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 7c:=C2=A0=C2=A0 nop
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 80:=C2=A0=C2=A0 ldr=C2=A0=C2=A0=C2=A0=
+=C2=A0 x10,
+>> 0x0000000000000088
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 84:=C2=A0=C2=A0 br=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 x10
+>>=20
+>> There are 6 extra instructions added in ARM64 in the best case. This
+>> will
+>> become 7 in the worst case (off !=3D 0).
+>>=20
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 RISC-V JIT (RISCV_ISA_C Disabled)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0 =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>>=20
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 No Intrumentation=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 Verifier's Instrumentation
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (upstream)=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 (This patch)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 -----------------=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 --------------------------
+>>=20
+>> =C2=A0=C2=A0 0:=C2=A0=C2=A0 nop=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 0:=C2=A0=C2=A0 nop
+>> =C2=A0=C2=A0 4:=C2=A0=C2=A0 nop=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 4:=C2=A0=C2=A0 nop
+>> =C2=A0=C2=A0 8:=C2=A0=C2=A0 li=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 a6, 33=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 8:=C2=A0=C2=A0 li=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 a6, 33
+>> =C2=A0=C2=A0 c:=C2=A0=C2=A0 addi=C2=A0=C2=A0=C2=A0 sp, sp, -16=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 c:=C2=A0=C2=A0 ad=
+di=C2=A0=C2=A0=C2=A0 sp, sp, -16
+>> =C2=A0 10:=C2=A0=C2=A0 sd=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s0, 8(sp)=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 10:=C2=
+=A0=C2=A0 sd=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s0, 8(sp)
+>> =C2=A0 14:=C2=A0=C2=A0 addi=C2=A0=C2=A0=C2=A0 s0, sp, 16=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 14:=C2=A0=C2=A0 addi=C2=
+=A0=C2=A0=C2=A0 s0, sp, 16
+>> =C2=A0 18:=C2=A0=C2=A0 ld=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 a0, 0(a0)=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 18:=C2=
+=A0=C2=A0 ld=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 a0, 0(a0)
+>> ---------------------------------------------------------------
+>> =C2=A0 1c:=C2=A0=C2=A0 ld=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 a0, 0(a0) --\=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 1c:=C2=A0=C2=A0 mv=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 t0, a0
+>> --------------------------\=C2=A0 \=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 20:=C2=A0=C2=A0 srli=C2=A0=C2=A0=C2=A0 t0, t0, 32
+>> =C2=A0 20:=C2=A0=C2=A0 li=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 a5, 0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 \=C2=A0 \=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 24:=C2=
+=A0=C2=A0 lui=C2=A0=C2=A0=C2=A0=C2=A0 t1, 4096
+>> =C2=A0 24:=C2=A0=C2=A0 ld=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s0, 8(sp)=C2=A0=
+=C2=A0 \=C2=A0 \=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 28:=C2=A0=C2=A0 sext.w=C2=A0=
+ t1, t1
+>> =C2=A0 28:=C2=A0=C2=A0 addi=C2=A0=C2=A0=C2=A0 sp, sp, 16=C2=A0=C2=A0 \=
+=C2=A0 \=C2=A0=C2=A0=C2=A0=C2=A0 2c:=C2=A0=C2=A0 bgeu=C2=A0=C2=A0=C2=A0 t1,=
+ t0, 12
+>> =C2=A0 2c:=C2=A0=C2=A0 sext.w=C2=A0 a0, a5=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0 \=C2=A0 \--> 30:=C2=A0=C2=A0 ld=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 =
+a0, 0(a0)
+>> =C2=A0 30:=C2=A0=C2=A0 ret=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0 34:=C2=A0=C2=A0 j=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 8
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \=C2=A0=C2=A0=C2=A0=C2=A0 38:=C2=A0=
+=C2=A0 li=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 a0, 0
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 \----------------------------=
+--
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ 3c:=C2=A0=C2=A0 li=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 a5, 0
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ 40:=C2=A0=C2=A0 ld=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 s0, 8(sp)
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ 44:=C2=A0=C2=A0 addi=C2=A0=C2=A0=C2=A0 sp, sp, 16
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ 48:=C2=A0=C2=A0 sext.w=C2=A0 a0, a5
+>> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+ 4c:=C2=A0=C2=A0 ret
+>>=20
+>> There are 7 extra instructions added in RISC-V.
+>>=20
+>> Fixes: 800834285361 ("bpf, arm64: Add BPF exception tables")
+>> Reported-by: Breno Leitao <leitao@debian.org>
+>> Suggested-by: Alexei Starovoitov <ast@kernel.org>
+>> Signed-off-by: Puranjay Mohan <puranjay12@gmail.com>
+>> ---
+>> V2:
+>> https://lore.kernel.org/bpf/20240321101058.68530-1-puranjay12@gmail.com/
+>> Changes in V3:
+>> - Return 0 from bpf_arch_uaddress_limit() in disabled case because it
+>> =C2=A0 returns u64.
+>> - Modify the check in verifier to no do instrumentation when
+>> uaddress_limit
+>> =C2=A0 is 0.
+>>=20
+>> V1:
+>> https://lore.kernel.org/bpf/20240320105436.4781-1-puranjay12@gmail.com/
+>> Changes in V2:
+>> - Disable this feature on s390x.
+>> ---
+>> =C2=A0arch/s390/net/bpf_jit_comp.c |=C2=A0 5 +++
+>> =C2=A0arch/x86/net/bpf_jit_comp.c=C2=A0 | 72 ++++-----------------------=
+-------
+>> --
+>> =C2=A0include/linux/filter.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0=
+ 1 +
+>> =C2=A0kernel/bpf/core.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 |=C2=A0 9 +++++
+>> =C2=A0kernel/bpf/verifier.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | =
+30 +++++++++++++++
+>> =C2=A05 files changed, 53 insertions(+), 64 deletions(-)
+>
+> [...]
+> =C2=A0
+>> diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+>> index 5aacb1d3c4cc..c131bee33ac3 100644
+>> --- a/kernel/bpf/core.c
+>> +++ b/kernel/bpf/core.c
+>> @@ -2958,6 +2958,15 @@ bool __weak bpf_jit_supports_arena(void)
+>> =C2=A0	return false;
+>> =C2=A0}
+>> =C2=A0
+>> +u64 __weak bpf_arch_uaddress_limit(void)
+>> +{
+>> +#ifdef CONFIG_64BIT
+>> +	return TASK_SIZE;
+>> +#else
+>> +	return 0;
+>> +#endif
+>> +}
+>> +
+>
+> How about the following?
+>
+> #if defined(CONFIG_64BIT) &&=C2=A0\
+>     defined(CONFIG_ARCH_HAS_NON_OVERLAPPING_ADDRESS_SPACE)
+>
+> Then we won't need to do anything for s390x explicitly.`
 
-Please have an accurate reading of the process documentation.
-
-Thanks,
-
-Paolo
-
+Thanks for the suggestion, I will use this in v4.
 
