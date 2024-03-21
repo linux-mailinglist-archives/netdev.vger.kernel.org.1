@@ -1,145 +1,132 @@
-Return-Path: <netdev+bounces-81127-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8952188605E
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 19:13:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9019886071
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 19:20:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4313A284D9C
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 18:13:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0ABAE1C22237
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 18:20:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5692E132494;
-	Thu, 21 Mar 2024 18:13:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E13F1332BC;
+	Thu, 21 Mar 2024 18:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bpWSYiTq"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="imqIXKmB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.3])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29A8E57B
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 18:13:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB4DF79C8;
+	Thu, 21 Mar 2024 18:20:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711044819; cv=none; b=b6MwNE7EWZ0sIWjK+tsMVkcbOxSGISD5z7t/HPNbVmANrZnNmvQixu8nCoALDS9019xTErUitFguLNfIvsg6kP5o7vgSXQiN5J3DGrOoiK57gZLrlUWdVbnI9Z2PfwTNyyNdlYlCZQPGGjWBAUdqY4BPY4hPjIBF98QZV2MHNl0=
+	t=1711045206; cv=none; b=E/HIZsC9Z0TcysghIKeQLNSYFKGFLzGB9CPJHvcbisdRIvKk1ei9ZN8ewQzGWXpaNuOUNqcU3iFOClzG2OHTt46dd+izVbU0sVQLGU+uMUVWSpHjU+6We9pk5DyuiTIhhY8k6bC5i2+m8PhQGAlnbrSuSdDU8JBqCOjqIjEpEe4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711044819; c=relaxed/simple;
-	bh=NeqEFbM/GuBohUeq3XtNKKAHUAoEpwds4r/DXvi3a7E=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=SV8ch+UZFbmVgPe+bThCySHTUBhTMKjjE4ni0nIUwSDV4bkPbXt+yvEMAWXlgWrNMaxvoYFQvJmr7ShGmpiRQ8z2uZ/bEHbmlGfPKjZ9o49o17was81nNWUhPatr0R+M0wqlJvElbflSqF38FvcwDh3VlmG6kgoId7XHR+IzP/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bpWSYiTq; arc=none smtp.client-ip=209.85.219.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-690d7a8f904so21361536d6.1
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 11:13:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711044816; x=1711649616; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rWQnoaNGoM6g3Y8+ZCFtXlAiCdEz9aXtDHKGEKH5S1g=;
-        b=bpWSYiTq9pFVX7axxIGljA6LV7pLHu6QwLuY/mGzEidfRQOz0LHjlRuYBNiIxBkzFr
-         hEqpcRtH6JkAVyBGy4ks6pYL5d8RsCsj10m+lAR0Uaa1Kihpe/gqPGs1zyafdWH2b2TC
-         R6JjXGi2hlLU0JqSX5zFGI6CjB9EaqLsRr4tcA5PwvizNC5qe0DKlYLGOfEROBCVYrv0
-         JZknVOoJG728JHUyW+cpwi55BXPK7/uEF4cN9fnb9+mssbiQvS3ME4gDI3/lVv+cPFGL
-         /aI2GSBfnw6ZKMMnmkGVZO1r+IykS5u3aHf65IYdMGISrFJSq90aU+vFiD0+KZn46N1v
-         VfaA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711044816; x=1711649616;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=rWQnoaNGoM6g3Y8+ZCFtXlAiCdEz9aXtDHKGEKH5S1g=;
-        b=n7mM5tWbqNrsVJQBZgAgbgHnDFtTEMEMYxdDlHb3VhSpkUiwzkrLecCr9M6DRFuF4k
-         Hv456N1uJYRuJaPmtrw6xuD1qXohD0EIMasrYS+ctK0g1dEPgodQdKI483eyv+6KbVF6
-         TFo6sGHSkqDoSTNygjJBmLfutWnpwYsVmvzIKCZpve6/KLzSKNX/V5De496L4qJJxNkk
-         l8hlXxuDy4uXW47KcLJWreIQv6SH6o1L/jmaEb+ZVUd9A+39PC3H3Kx+ydgDyD4dwA9X
-         O6GNYAmkAs88iWTMyl3DXsLAp8er/qKcsVEPEbXNDjNezk+cTZ/b0qGH6jZjRKhexLto
-         zlhw==
-X-Forwarded-Encrypted: i=1; AJvYcCXZiIKACAzXZYX87fWwpNlI+SsfBIBCeRoqIlBIvpC835TsnmxaIbsXlfZ11kk+rPN37/tBxUqyAmqcfvaweTYv9NE5+r35
-X-Gm-Message-State: AOJu0YyBDofV1upRrNjRbMwTvFZw2S1OwwMQXnaNHiRimVJaSCp70dTd
-	SUheXqp1rESsDGVKBTd8IFNgl1GOwzk9wU3UXbDLgDlqDqSUOT0u
-X-Google-Smtp-Source: AGHT+IHwZtJH/61IVzWoFrrIi603ZfpbR8Dz6mG4eAWWAUesKNpyD2VbAK52iKqKV5l0wKy88OxP7g==
-X-Received: by 2002:a05:6214:4005:b0:692:494f:f0aa with SMTP id kd5-20020a056214400500b00692494ff0aamr558561qvb.9.1711044816613;
-        Thu, 21 Mar 2024 11:13:36 -0700 (PDT)
-Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
-        by smtp.gmail.com with ESMTPSA id q14-20020ad4574e000000b00690f9ea30aesm138943qvx.26.2024.03.21.11.13.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Mar 2024 11:13:36 -0700 (PDT)
-Date: Thu, 21 Mar 2024 14:13:35 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Antoine Tenart <atenart@kernel.org>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com
-Cc: steffen.klassert@secunet.com, 
- willemdebruijn.kernel@gmail.com, 
- netdev@vger.kernel.org
-Message-ID: <65fc78cfe99a2_25798a29475@willemb.c.googlers.com.notmuch>
-In-Reply-To: <171104177952.222877.10664469615735463255@kwain>
-References: <20240319093140.499123-1-atenart@kernel.org>
- <20240319093140.499123-4-atenart@kernel.org>
- <65f9954c70e28_11543d294f3@willemb.c.googlers.com.notmuch>
- <171086409633.4835.11427072260403202761@kwain>
- <65fade00e4c24_1c19b8294cf@willemb.c.googlers.com.notmuch>
- <171094732998.5492.6523626232845873652@kwain>
- <65fb4a8b1389_1faab3294c8@willemb.c.googlers.com.notmuch>
- <171101093713.5492.11530876509254833591@kwain>
- <65fc4b09a422a_2191e6294a8@willemb.c.googlers.com.notmuch>
- <171104177952.222877.10664469615735463255@kwain>
-Subject: Re: [PATCH net v2 3/4] udp: do not transition UDP fraglist to
- unnecessary checksum
+	s=arc-20240116; t=1711045206; c=relaxed/simple;
+	bh=8fW3dhh9hYG5Y1ZObjvWtGoPkBZ9p9ImMfwLnxDrke0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EHz3w6RixgA1Zm1WKlAEuO89YpPI1mEqTVcDUhMxlKfJdIJmtVno+LGEFSmo6txAUFta/xK9R6+Xks1nipUipPbP45z4bZIR6skbc6VKLYlMLLfXd/CW6fUpUqz5W+4CWMOeaaFik1QQpdKeXohBxnYyc5XgbyZrJaBTv6kZ6wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=imqIXKmB; arc=none smtp.client-ip=212.227.15.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1711045201; x=1711650001; i=markus.elfring@web.de;
+	bh=HgrbIRE7VEvNM/7O+kRv8lnP7tFYK9W1rOWWA2jQum4=;
+	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
+	 In-Reply-To;
+	b=imqIXKmB46uAN+rH9XXuN6v+H6/1USJchXf21JZZfoDez/vI50B/Krg5G8vJlTRB
+	 rqLlISWCkSHkVJ+PtHNFiZqXOLZ+edi2sYwDSr0aH580tKVhR/z/3d0G6EtpztHPI
+	 yzmQktctnT6Z2/wceX+H0y7/ILWYKs5t6cHsKQPkb5EA7fwKwbUkYdhWu7SmjslT+
+	 fYFNe1tSNIBH9vLBgiBVV7UAvTG+gVhBhCG7SpPHsUXrNxiIPw/TWz9Z1hfXk7XV2
+	 tujXbiQ3hIGJpoZlDQsyIM3CyOYHKwL78y5jBZEEhXnxL1nx49uH49vfphKQdqo09
+	 IX8NweSGATuKTL8m0A==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1N5lnT-1qi0cQ3Muh-00sdt1; Thu, 21
+ Mar 2024 19:14:13 +0100
+Message-ID: <e5172afb-427b-423e-877a-10352cf4a007@web.de>
+Date: Thu, 21 Mar 2024 19:14:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] ice: Fix freeing uninitialized pointers
+Content-Language: en-GB
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>, kernel-janitors@vger.kernel.org,
+ netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: LKML <linux-kernel@vger.kernel.org>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ David Laight <David.Laight@aculab.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>, Jiri Pirko
+ <jiri@resnulli.us>, Jonathan Cameron <jic23@kernel.org>,
+ Julia Lawall <julia.lawall@inria.fr>, Kees Cook <keescook@chromium.org>,
+ Lukasz Czapnik <lukasz.czapnik@intel.com>, Paolo Abeni <pabeni@redhat.com>,
+ Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+References: <77145930-e3df-4e77-a22d-04851cf3a426@moroto.mountain>
+ <d2b1f3bd-42f1-483b-916e-3735b39a30e1@web.de>
+ <Zfx2VL7xnj4rQoV8@smile.fi.intel.com>
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <Zfx2VL7xnj4rQoV8@smile.fi.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:sgi560zt2vi0QRILaOf8Dno1paTZMF0JEueGv8qFTmpY2UfKHsL
+ 7YAth+4h13SGVefnGT3MdnvQlXK2uzciuQAvypP075NmJwH+S1f5f2BOQ79WNEYzGNYW9gQ
+ yz0royLM51YEA7NL75PeQ8OuPHo/abXi7N/DUbBLsSMqyhUaUrXgvBCO1neaNLoBXEkxfq2
+ wtnF/rBwxxzKrMKDBHRhg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:vB8mFuwR+dI=;qdq3to6uVb96t9XCtTO/xTNQNBA
+ 3vFin/ZvWWkItGHHjrW/mWM2bguPoLo5sndULVGKvZiQEensFDzpaHrh/upGXHGqoXRC1g3aR
+ N4rqgZWS5CCS8eh1/O4esq+ktaet89gS7lvDZ9mwy5416tk/sredsdR59l0TmmRjoPOEurYAv
+ CdFX2mNx4VZNFTXlS32DFH4sl2xib4YB7IF52pavgztyhC3dvKrB+PE156FP5LwIZth7Ufv4m
+ X0/6RAQiKdW8GYN1XrhBtQ8Zi0Gv0IJAQvyiHkOQHo8Z7h4txtQfLQ78ZUbErNEXPK7t9IVb2
+ 125/sOLjtTnnqWxhFkRuusB/yaWba8cehhn/qJgM3gGoks1JpOWoR4oRZsufZNk/V0hKvKiJ6
+ T8gKk9BYpmZ2rdD6RL0F2roH/TWpC/d06Hp/juOqx5GQ1RvxIdXdokbRcOmbE1J0lUsPS8e+o
+ 9nexNQ9gvw1kMZfZI2Dl68cus4HkwwnKagrCljYSP1c2wOgbaa2WEf9X6OU6J7ofvwwb9yKgn
+ Xgcdk4twUBx8m5t72T/0CX1Ud0RRYPUwlrT7zg2mjwycLBVx8O5F1bq15hVX0O2HvwovrhDzM
+ jcozV9lFf6WRf2VPsgwXMCgIrNQwAVAgQs4UzeH9MIQrZ6pW2L+f31pWYFnZdHn5ebltufL1C
+ yqF6N3uDqQx0PcBayqL5F4aaGZe6O7m5yDuvBLFeSWz83ObmaYwJ7gxZn+bSc+PqwHXQoKwEH
+ q3NwV6Lgxw8EpowwLl0qPGOZZ4KJFQypcMWNs8F7IyTq0DWlZsXI5RfNFpv9nyoi3sIsEpygf
+ brnjCROtc9T7cwDCoGZcrfM9SRIswXVGWeVjOrFTRGZNM=
 
-Antoine Tenart wrote:
-> Quoting Willem de Bruijn (2024-03-21 15:58:17)
-> > Antoine Tenart wrote:
-> > > 
-> > > If I sum up our discussion CHECKSUM_NONE conversion is wanted,
-> > > CHECKSUM_UNNECESSARY conversion is a no-op and CHECKSUM_PARTIAL
-> > > conversion breaks things. What about we just convert CHECKSUM_NONE to
-> > > CHECKSUM_UNNECESSARY?
-> > 
-> > CHECKSUM_NONE cannot be converted to CHECKSUM_UNNECESSARY in the
-> > receive path. Unless it is known to have been locally generated,
-> > this means that the packet has not been verified yet.
-> 
-> I'm not sure to follow, non-partial checksums are being verified by
-> skb_gro_checksum_validate_zero_check in udp4/6_gro_receive before ending
-> up in udp4/6_gro_complete. That's also probably what the original commit
-> msg refers to: "After validating the csum, we mark ip_summed as
-> CHECKSUM_UNNECESSARY for fraglist GRO packets".
-> 
-> With fraglist, the csum can then be converted to CHECKSUM_UNNECESSARY.
+>> How do you think about to reduce the scope for the affected local varia=
+ble instead
+>> with the help of a small script (like the following) for the semantic p=
+atch language?
+>>
+>> @movement@
+>> attribute name __free;
+>> @@
+>> -u8 *tx_frame __free(kfree);
+>>  int i;
+>>  ... when any
+>>  if (ice_fltr_add_mac(test_vsi, ...))
+>>  { ... }
+>> +
+>> +{
+>> +u8 *tx_frame __free(kfree) =3D NULL;
+>>  if (ice_lbtest_create_frame(pf, &tx_frame, ...))
+>>  { ... }
+>>  ... when any
+>> +}
+>> +
+>>  valid_frames =3D ice_lbtest_receive_frames(...);
+>
+> I believe you don't understand what the scope of the above can be.
 
-Oh yes, of course.
+Will the understanding improve for the proposed source code transformation=
+?
 
-> Except for CHECKSUM_PARTIAL, as we discussed.
-
-Because that is treated as equivalent to CHECKSUM_UNNECESSARY in the
-ingress path, and if forwarded to an egress path, csum_start and
-csum_off are set correctly. Also for all segs after segmentation.
-Okay, that sounds fine then.
-
-There are two cases here: csum_start points to the outer header or it
-points to the inner header. I suppose that does not matter for
-correctness post segmentation.
-
-> Does that make sense? Anything we can do to help moving this forward?
-> 
-> Thanks!
-> Antoine
-
-
+Regards,
+Markus
 
