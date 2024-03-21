@@ -1,151 +1,145 @@
-Return-Path: <netdev+bounces-80985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 289B9885686
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:30:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14D0488568F
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:32:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D4E7E282BF7
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:30:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2C671F232E5
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:32:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2197953E0D;
-	Thu, 21 Mar 2024 09:30:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D7047F58;
+	Thu, 21 Mar 2024 09:32:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ISac2DrF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ef2qCtNU"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55EA341C73
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 09:30:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95EC20326
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 09:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711013409; cv=none; b=nzJUoihKJY9WAEpzqgcKHYMin1ScbmG40XSR6P7dtqza5vqqK5mATs3nbIJzY6cCSskjErrstodmBvARJ28ivQ9La1br6kXW0xICXD1JgnsdNd/kSIh48x4vFD0iQaCqzRlxNLvtYH90R2r3nmKvVgNsX4aiiyaAMrlfm3AUf9E=
+	t=1711013572; cv=none; b=XOj5Ez4E2/MkJPmAL8TUo4cQs66upJGhm+UzZ495Cxi57Npk5NUK54Gbx5Fh+d0NvJRtuTUCWDyurn0eT4E/THmNgBjvIA9JpcW69yfwV6/SZv/PNXIsjGT5Tcg01g+UoHnvevVvWuF24I3d/yGqHdCsxyq8IgEURuAJ+CnDg60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711013409; c=relaxed/simple;
-	bh=japXyDrgoxK2sEHIfmb7U37Fp1/eWTziAQmL49rcESs=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=HaM1AbsTrJQ8BXUvPNJkG1JEJCD3CtcFGeGLioVaEFKsxDez9OwIAeM6SKkXDvJPqNWBZzAzkXsETtHOs8F3S8WPgU17oyhvQduedFsmLJZJOor5DthNmNPpB/MMnQAAq61MtEL2F39rXEUwp0ZxXLFqNtkFTLLLEZHikhW7QeM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ISac2DrF; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711013406;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=gEOWOzX6IKoL6c6ii5LxOxTGEF/+O/+tJriUbFX64KY=;
-	b=ISac2DrF0/vD+uJlGV0KpnBTDsAjQ3kRv9Nq8A/l/uOADY4cEfamKzUDuSlW/SEYkNSrc6
-	YBg4Orf5iOMZt5rFTbeuhdxu2i1ARucBzZmPGeD8KIn/9xdhI4nEo5jFUvWEnfBKq5+cUg
-	KJGu2CaheFzXlt0UEBVlQXFTMj+q6jk=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-27-ZLiWJ_7_Oa-S2YfJ1mxAtA-1; Thu, 21 Mar 2024 05:30:03 -0400
-X-MC-Unique: ZLiWJ_7_Oa-S2YfJ1mxAtA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-33ed4bb926cso131761f8f.0
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 02:30:03 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711013402; x=1711618202;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gEOWOzX6IKoL6c6ii5LxOxTGEF/+O/+tJriUbFX64KY=;
-        b=EdQCUac/QW+SP+tguD47RDSa65aBQvUd1Ub+bonmeHCyRm9FgM8AOAqimiWLFFisbQ
-         LCigwgU5sU9jI3cIU7/kk2AHvGavobPqg35P8BWNyB7XT+j6Qup3ExcyUxuTu9UD5Rux
-         DDAZaG9QI8h0mrfpn8rd3BRFgnC9ysV1ahQ6ZMyWv3/Y1jBt+dxRtSghAJc/YGwMqG2t
-         b4prCSKY4UyfDZCpsqUF1m2KcaAx94/lygORBqdm6K98g8rvz0PlI5Wa+2PSooCUZeWy
-         p8HOknB1Oltucr/VuQLyiy2mRrpdfalm3Tk6t8MHKxsLYiYhzHfWsUWdI2gmT/V/uwMp
-         meEw==
-X-Forwarded-Encrypted: i=1; AJvYcCXHPgemq7IiMTmq/tKVrf1NhYNes+V4CBJwVFKqQoMKlhNEexV5yynWIKv2lO5TQk98tBr7uPg6SZh86fFmVYbe7ln/ZbRJ
-X-Gm-Message-State: AOJu0Yw+L5N9EnzVNAkEZpnpRHc7co6X+KwmSmwBJ7Z6mVNl8CaVT2b9
-	ccg8V13QYY8/8yHEJ4Sq2bpB1Ae20kKE5dRvBcCV4ure+2fZHxaF6thShIazyOB2VbRYwRaqGL0
-	DM4ePJ5yzgtX3p6d42SM15doxe6Rq1j532G3K2ops8r1jY82J3nGqZw==
-X-Received: by 2002:a5d:420d:0:b0:33e:cf64:3cae with SMTP id n13-20020a5d420d000000b0033ecf643caemr2795188wrq.6.1711013401718;
-        Thu, 21 Mar 2024 02:30:01 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFZKL38fQ0kBB0YPNBOPou+NBPXAESCQCgqsVcrPya+gVQ9qcjAyLxm+5+FxxlReXioFo/UjA==
-X-Received: by 2002:a5d:420d:0:b0:33e:cf64:3cae with SMTP id n13-20020a5d420d000000b0033ecf643caemr2795161wrq.6.1711013401310;
-        Thu, 21 Mar 2024 02:30:01 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-249-130.dyn.eolo.it. [146.241.249.130])
-        by smtp.gmail.com with ESMTPSA id i18-20020adffc12000000b0033e786abf84sm16745438wrr.54.2024.03.21.02.29.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Mar 2024 02:30:00 -0700 (PDT)
-Message-ID: <9762d71f1b3858c6b362696277702409e885fa1d.camel@redhat.com>
-Subject: Re: [PATCH net v2 0/2] MT7530 DSA subdriver fix VLAN egress and
- handling of all link-local frames
-From: Paolo Abeni <pabeni@redhat.com>
-To: =?UTF-8?Q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>, Daniel
- Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, Sean Wang
- <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
- <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Frank Wunderlich <frank-w@public-files.de>, Bartel Eerdekens
- <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com, 
- erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org,  linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-Date: Thu, 21 Mar 2024 10:29:59 +0100
-In-Reply-To: <f6f064b8-efb2-4ab0-94f1-468d5d273d6e@arinc9.com>
-References: 
-	<20240314-b4-for-net-mt7530-fix-link-local-vlan-v2-0-7dbcf6429ba0@arinc9.com>
-	 <f6f064b8-efb2-4ab0-94f1-468d5d273d6e@arinc9.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+	s=arc-20240116; t=1711013572; c=relaxed/simple;
+	bh=HnGE5lrb+ed+jZVNTRGh9kbSwPoRyH8eoBWAR6n0moM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kkYLuHmT54C0x6fT/yJbh7ivIYCrkBYpvv/b3kMQpJ12Oz9l4045viSd9cxYDHLF8lsXrcKrgI4VuQz1yQkxRIJjixp9ioYsK6PfwnHmUODzgVAtq2KNiSESdUHBk4F8LIPmRKfYrULueSpNtbwGpG0GAheo35pUqW98jLaU8qA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ef2qCtNU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB61BC433C7;
+	Thu, 21 Mar 2024 09:32:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711013572;
+	bh=HnGE5lrb+ed+jZVNTRGh9kbSwPoRyH8eoBWAR6n0moM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ef2qCtNUiLY5ebRSyaw0H+w+ZXaMgp3IUWZFer4qwYu/3peKtoZpv9InBU6ySkkxY
+	 YAE0XpR7/8VyDGm9E9Xp1BiUcJP7dmdYTcrPP+IU+HvUnbjLkxbJXRrui/ICgpblLA
+	 G10PHw0wXoK6LjBtCccO1vgGF2NQXo6qiEJxyvZZW5eLzgb3fAgsYCyAvlDI6wwBaa
+	 B/d7Sxtrm1lw0OTyXzgc2bF7hdKA59oxIZxbEKILP+Sc4bQJY1AILySVUSiZAWoj29
+	 REeylqFjse5KBSDJLj+QcMzj4OcThjg+2EZxQwOHt6imNVjwUd6GvIMc9Mmktep6vI
+	 XZnL/y7c/jbzg==
+Date: Thu, 21 Mar 2024 11:32:48 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Feng Wang <wangfe@google.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org,
+	herbert@gondor.apana.org.au, davem@davemloft.net
+Subject: Re: [PATCH] [PATCH ipsec] xfrm: Store ipsec interface index
+Message-ID: <20240321093248.GC14887@unreal>
+References: <20240318231328.2086239-1-wangfe@google.com>
+ <20240319084235.GA12080@unreal>
+ <CADsK2K_65Wytnr5y+5Biw=ebtb-+hO=K7hxhSNJd6X+q9nAieg@mail.gmail.com>
+ <ZfpnCIv+8eYd7CpO@gauss3.secunet.de>
+ <CADsK2K-WFG2+2NQ08xBq89ty-G-xcoV517Eq5D7kNePcT4z0MQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CADsK2K-WFG2+2NQ08xBq89ty-G-xcoV517Eq5D7kNePcT4z0MQ@mail.gmail.com>
 
-On Wed, 2024-03-20 at 19:41 +0300, Ar=C4=B1n=C3=A7 =C3=9CNAL wrote:
-> On 14.03.2024 12:33, Ar=C4=B1n=C3=A7 =C3=9CNAL via B4 Relay wrote:
-> > Hi.
-> >=20
-> > This patch series fixes the VLAN tag egress procedure for link-local
-> > frames, and fixes handling of all link-local frames.
-> >=20
-> > Signed-off-by: Ar=C4=B1n=C3=A7 =C3=9CNAL <arinc.unal@arinc9.com>
-> > ---
-> > Changes in v2:
-> > - Add Fixes: tag to both patches.
-> > - Link to v1: https://lore.kernel.org/r/20240311-b4-for-net-mt7530-fix-=
-link-local-vlan-v1-0-d67e6cc31af2@arinc9.com
-> >=20
-> > ---
-> > Ar=C4=B1n=C3=A7 =C3=9CNAL (2):
-> >        net: dsa: mt7530: fix link-local frames that ingress vlan filter=
-ing ports
-> >        net: dsa: mt7530: fix handling of all link-local frames
-> >=20
-> >   drivers/net/dsa/mt7530.c | 52 +++++++++++++++++++++++++++++++++++++++=
-+--------
-> >   drivers/net/dsa/mt7530.h | 22 +++++++++++++++++++-
-> >   2 files changed, 65 insertions(+), 9 deletions(-)
-> > ---
-> > base-commit: d7d75124965aee23e5e4421d78376545cf070b0a
-> > change-id: 20240208-b4-for-net-mt7530-fix-link-local-vlan-af6e9928ad8d
-> >=20
-> > Best regards,
->=20
-> Reminder this patch series is waiting to be applied.
+On Wed, Mar 20, 2024 at 11:05:13AM -0700, Feng Wang wrote:
+> Hi Steffen,
+> 
+> Thanks for your comment.  Firstly,  the patch is using the xfrm interface
+> ID instead of network interface ID. Secondly, would you please point me to
+> the 'packet offload drivers' in the kernel tree?
 
-I hoped to get some feedback from the DSA crew, so it waited a bit in
-patchwork. Anyway it looks like it staged long enough and I'll go
-through it soon.
+First, please don't reply to emails in top-post format.
+Second, did you try to search for "packet offload drivers" in the kernel?
+https://elixir.bootlin.com/linux/v6.8.1/source/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c#L1152
 
-Cheers,
+Thanks
 
-Paolo
-
+> I want to understand how the offload driver can distinguish 2 ipsec
+> sessions if two sessions accidentally have the same address/mask and proto
+> values(same xfrm_selector)? The offload driver needs to find the
+> corresponding encryption parameters to do the work.
+> 
+> Thank you for your help,
+> 
+> Feng
+> 
+> 
+> 
+> On Tue, Mar 19, 2024 at 9:33 PM Steffen Klassert <
+> steffen.klassert@secunet.com> wrote:
+> 
+> > On Tue, Mar 19, 2024 at 10:15:13AM -0700, Feng Wang wrote:
+> > > Hi Leon,
+> > >
+> > > There is no "packet offload driver" in the current kernel tree.  The
+> > packet
+> > > offload driver mostly is vendor specific, it implements hardware packet
+> > > offload.
+> >
+> > There are 'packet offload drivers' in the kernel, that's why we
+> > support this kind of offload. We don't add code for proprietary
+> > drivers.
+> >
+> > > On Tue, Mar 19, 2024 at 1:42 AM Leon Romanovsky <leon@kernel.org> wrote:
+> > >
+> > > > On Mon, Mar 18, 2024 at 04:13:28PM -0700, Feng Wang wrote:
+> > > > > From: wangfe <wangfe@google.com>
+> > > > >
+> > > > > When there are multiple ipsec sessions, packet offload driver
+> > > > > can use the index to distinguish the packets from the different
+> > > > > sessions even though xfrm_selector are same.
+> > > >
+> > > > Do we have such "packet offload driver" in the kernel tree?
+> > > >
+> > > > Thanks
+> > > >
+> > > > > Thus each packet is handled corresponding to its session parameter.
+> > > > >
+> > > > > Signed-off-by: wangfe <wangfe@google.com>
+> > > > > ---
+> > > > >  net/xfrm/xfrm_interface_core.c | 4 +++-
+> > > > >  1 file changed, 3 insertions(+), 1 deletion(-)
+> > > > >
+> > > > > diff --git a/net/xfrm/xfrm_interface_core.c
+> > > > b/net/xfrm/xfrm_interface_core.c
+> > > > > index 21d50d75c260..996571af53e5 100644
+> > > > > --- a/net/xfrm/xfrm_interface_core.c
+> > > > > +++ b/net/xfrm/xfrm_interface_core.c
+> > > > > @@ -506,7 +506,9 @@ xfrmi_xmit2(struct sk_buff *skb, struct
+> > net_device
+> > > > *dev, struct flowi *fl)
+> > > > >       xfrmi_scrub_packet(skb, !net_eq(xi->net, dev_net(dev)));
+> > > > >       skb_dst_set(skb, dst);
+> > > > >       skb->dev = tdev;
+> > > > > -
+> > > > > +#ifdef CONFIG_XFRM_OFFLOAD
+> > > > > +     skb->skb_iif = if_id;
+> > > > > +#endif
+> >
+> > This looks wrong. The network interface ID is not the same as the xfrm
+> > interface ID.
+> >
 
