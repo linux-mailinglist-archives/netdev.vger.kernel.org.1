@@ -1,85 +1,62 @@
-Return-Path: <netdev+bounces-81091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F209885C2E
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 16:40:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7264885C32
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 16:41:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 745BC1C22565
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:40:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 138CA1C22C78
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4C9128385;
-	Thu, 21 Mar 2024 15:35:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D29128836;
+	Thu, 21 Mar 2024 15:35:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="zCyF18DF"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="YVKySJfw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B72F86AD8
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 15:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC2D86ADB
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 15:35:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711035320; cv=none; b=B4SLFrEfbrVlJpCWfl4fOT4KNZnI38stSV+NwqdpmZfS4zackmTTByW+g5+2vKGHuiDwQjul7m7wrNK56BKg4ztCUevtZaSryqXhy1wEbpJpl4p8HIxw9VFyp5RQ3t3zmoQaXsA8VosM/eqq141UPPGy4WMaJwEUf2KRAUoc7S8=
+	t=1711035331; cv=none; b=ICP/v8KyFBljkzuL0C1NFfvvMbJSYLcgmsr0kHvLT+x/QiujJ2vuylwRMvYHhzJDKxhjwa/HRPVrxb60cxBtIPFV4WzfwZFQSOr3FswTiwkUwLB6vz6PG3LykIgFjuWhgMbrtWhLRJS3U/VJgT0TuZeyTPZ2zJUByyeSLTOAWDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711035320; c=relaxed/simple;
-	bh=7/Vr7UGZFgfY5hiZbZVagMHjl3VeIKITw0zb4mGRSdw=;
+	s=arc-20240116; t=1711035331; c=relaxed/simple;
+	bh=82p/KyuPYX4kgzjg36RQleurmfIva7WuEX0FUqez6k0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oKFEPgVuSZsJPPEyiIciNedfdMcTSNRj5ArZB5CTSrPM+8MvYIWBKPCSBja1ZR7iEKsZ3z5L5d1s07GWLDdX+rSQAO1IxhYB8prl3ClZNWqy/SvYiMHUXY4F6VsT4LN7ALSDzoLNlWwiw3MGl1+w/ebguOJ9XcLbVyelWscjNJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=zCyF18DF; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a4707502aafso201837166b.0
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 08:35:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1711035317; x=1711640117; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7/Vr7UGZFgfY5hiZbZVagMHjl3VeIKITw0zb4mGRSdw=;
-        b=zCyF18DFXr31m/24zPy4vHD0iVUXK/iO3DFdA+PsRBeOnabwqpwQZrSrqXFNLntlWj
-         YdpGS2H4cq0aZtqGlfu0Dwqn0Be7UQ6OfvOAWkYHJqLFGpMfZLiiwtN7oNdOFV52hnxO
-         v22ae/TBDNPTQ2Z9nq+MDnhRZxKkKLpSTr5HB4tgq9vmtJ11+Wku1Sn53OjHYtYWmtsD
-         D6DFom5lcCNMTPSHD84mhxpVJWDElwzv8nSpNujgS0nt2eDW7BxA+9aTGrYHUQT/kz+e
-         qzrAkupnUu/IRQIshLWaZN/nY+4yDnPw2W+oiPPnku4+VrX9Ma673TspLhmb31dKUO+M
-         ZTSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711035317; x=1711640117;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7/Vr7UGZFgfY5hiZbZVagMHjl3VeIKITw0zb4mGRSdw=;
-        b=jqLDgZdVaysm/2rjn5EMa6Y5SkHyfA+UaegryixCO57x3nG20VgeWVN2avJRL5QYXt
-         oW1RGwLLzKA4fitHLOc0fkD1cPjh8PZbbUU/QOBl3PLc2GG5PrawdqQ3/tqTbnVB6Fqf
-         YnEplOAmpy7W1kSA1LxaWNUM63ZpEmfsLLyZ8/7A/0fv5NTMsgrT8l1e03qtxBoCDjoa
-         ujWp27POpcyRby1ftX4YsQvDssD+APWegAqrlGE1rBEEQ49f8c8bbgzGJZLf3IUOxZDj
-         6DVqPJJGzC6cBtR+kFVgzDTwHq4z08CD7Ol/vAueZpIty8tbpc7N+EKC+4PnGjMoSCBq
-         BSKg==
-X-Forwarded-Encrypted: i=1; AJvYcCUnZIwYY/ylHz84+xK624cp66jJvEkipYDUXgkg5+Ux40YBWX9bfEPL4lpxrpWtdLyp5K59Acr6JcDGry5Q4BQYG981aceL
-X-Gm-Message-State: AOJu0YzafwBurcq5qJ58TggAx1GdAaGOWUYpI6T/GXCGzt9J4b45YTBO
-	6A6NlEvLupIKpK53QvSXNDtQMhEyZDHBgvTRxeGRTBQrMImQpu9VCK9FOyX/AKc=
-X-Google-Smtp-Source: AGHT+IFzD7bSzwoych8HcblWm59fVdm+D+wuiZhdHvhn9H6Gbm7/4alQeCSXNlk1PpFwllpAsWO2gw==
-X-Received: by 2002:a17:906:590c:b0:a46:a85d:de81 with SMTP id h12-20020a170906590c00b00a46a85dde81mr2754941ejq.12.1711035316755;
-        Thu, 21 Mar 2024 08:35:16 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id w1-20020a1709067c8100b00a46a04d7dc4sm40922ejo.61.2024.03.21.08.35.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Mar 2024 08:35:16 -0700 (PDT)
-Date: Thu, 21 Mar 2024 16:35:13 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Ido Schimmel <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=aEjG8Nh3u5C7B+gPyT8+SUApcmtBOqudy2EagkeRf6iZL5bzzyCwZINTybsaFq/jZfNf5n5POMZz1WkxmItt9Us7fWmL0Phtxn2Rz7UNV2kBHKP9ANC4FdLlMD5QgsDOk2d3MsUs1ybMdPymlfdcik/F96m+42+TZwtu/iUexCQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=YVKySJfw; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/kNv2t+2TnUZMom71UUgFkiGAJYEn1nqpGJ6PwDqECQ=; b=YVKySJfwwuPo+OnmgGEEtNEe8u
+	okRvehkGtR9wY/ZcfRsGd/v/LhOZjH8ej3JJxOu3LhqNe3Hw76+EHflAW71zZ7exdjnmYMPvMRjSl
+	78W9G6JWdoH9lRM11T2mKAMYeXBNPAwwlzNW+yX6ojvmH71LkA6jKgWiumVDw/tZlNXk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rnKRs-00At7N-CU; Thu, 21 Mar 2024 16:35:20 +0100
+Date: Thu, 21 Mar 2024 16:35:20 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Petr Machata <petrm@nvidia.com>, Kees Cook <keescook@chromium.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH v2 net] nexthop: fix uninitialized variable in
- nla_put_nh_group_stats()
-Message-ID: <ZfxTsVPwYbruXJfY@nanopsycho>
-References: <f08ac289-d57f-4a1a-830f-cf9a0563cb9c@moroto.mountain>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Gregory Clement <gregory.clement@bootlin.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH RFC 2/7] net: Add helpers for netdev LEDs
+Message-ID: <18007239-f555-4225-b184-46baed8b89ee@lunn.ch>
+References: <20240317-v6-8-0-net-next-mv88e6xxx-leds-v4-v1-0-80a4e6c6293e@lunn.ch>
+ <20240317-v6-8-0-net-next-mv88e6xxx-leds-v4-v1-2-80a4e6c6293e@lunn.ch>
+ <20240321080155.1352b481@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,14 +65,40 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f08ac289-d57f-4a1a-830f-cf9a0563cb9c@moroto.mountain>
+In-Reply-To: <20240321080155.1352b481@kernel.org>
 
-Thu, Mar 21, 2024 at 03:42:18PM CET, dan.carpenter@linaro.org wrote:
->The "*hw_stats_used" value needs to be set on the success paths to prevent
->an uninitialized variable bug in the caller, nla_put_nh_group_stats().
->
->Fixes: 5072ae00aea4 ("net: nexthop: Expose nexthop group HW stats to user space")
->Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+On Thu, Mar 21, 2024 at 08:01:55AM -0700, Jakub Kicinski wrote:
+> On Sun, 17 Mar 2024 16:45:15 -0500 Andrew Lunn wrote:
+> > +	struct device *dev = &ndev->dev;
+> > +	struct netdev_led *netdev_led;
+> > +	struct led_classdev *cdev;
+> > +	u32 index;
+> > +	int err;
+> > +
+> > +	netdev_led = devm_kzalloc(dev, sizeof(*netdev_led), GFP_KERNEL);
+> > +	if (!netdev_led)
+> > +		return -ENOMEM;
+> 
+> Are we guaranteed to have a real bus device under ndev->dev ?
+> I'm not aware of any use of devres in netdev core today.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+devm_ does not require a real bus device. It just needs a struct
+device. It does not care if it is physical or virtual. All it needs is
+that something destroys the struct device using the usual device model
+methods.
+
+The struct device is actually part of struct net_device. It is not a
+pointer to a bus device. We have register_netdevice() ->
+netdev_register_kobject() -> device_initialize(). So the struct device
+in struct net_device to registered to the driver core.
+
+unregister_netdevice_many_notify() -> netdev_unregister_kobject() ->
+device_del() -> devres_release_all().
+
+So it also gets deleted from the driver core, at which point the
+driver core will release all the resources.
+
+So i don't see a reason why this should not work.
+
+	Andrew
 
