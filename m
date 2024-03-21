@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-80938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83433881BFB
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 05:40:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A236E881BFD
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 05:40:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37E9C1F22541
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 04:40:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5DC6B2836E2
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 04:40:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AD5D1BDF4;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6FA42B2F2;
 	Thu, 21 Mar 2024 04:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kh2h7OyI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O+zbZA2p"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E411170B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E046FBF;
 	Thu, 21 Mar 2024 04:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710996028; cv=none; b=fu/lmQ+4V/6y/r6msaaRFFUKdQcMDR6g9u2PJZG5MvkD203d2PvlWAJ0BDx2FBPAbP5TpgSwNeQWpt+l8HtOyQJBw1ah/x+ud1EK2mvVTDRQtO9b0I1HceviT9dkzMEUHj32ILiF/+bdB6zLbbWUUpwel1POqve6wJLStWyn4rE=
+	t=1710996028; cv=none; b=Rnu8GrJcvaS8M+KuapW45OW3yHwIlvvydVFnbQsXad60/84DnLFFLdZ1b3K+IrVnV23no39+EiwGHJmWdPH12l+qzKcoRfW4ZTdfRhaI/kwhA9PbF3ipZNJA7QnPBLXc3UhdfB4Jw5dxDZCRFdmMIpkUSFsOIEv2Z9eTsGks7ow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1710996028; c=relaxed/simple;
-	bh=uA9xvKenq6yzo4uiIv9CvYKDW+9ns9ESg8gM94/FWnQ=;
+	bh=Stz/LtxZ0oNUWGPAkL2Gm2OiNn6QXW8wUeEfkZyKsoU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EXvwCMjrE5VYxahi0tu4ItcZ520R9Z7smurynji3OnjhRaBxuAvPwUmK2UOP8nl6TCBtjcODW1fIG91qID1x1pyVDseBYOf6lZnTQyZGhcnl2Z18DkJ1h2BmxiKOPBUG+SD2MzBmXQ8GmIhNigneJAoh3V24ZDBs7QfD9NXTLNM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kh2h7OyI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 159B6C43390;
+	 In-Reply-To:To:Cc; b=nZPFDJnWVY65/wDXyFkQTCQmIEw2jlxOCflq2EiRewrclWCkNls8fBgpmsB0mcr1qDPCNXyID4+HQQBZ47Mwi82wTPAiJwb8vY/sIUh8J2gja5FPEsZhN3SJstJHKolAom8lIU51k3CxNkq2plVeBllDdZ1OTejjWGUH7anp7Q8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O+zbZA2p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 032DBC433F1;
 	Thu, 21 Mar 2024 04:40:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1710996028;
-	bh=uA9xvKenq6yzo4uiIv9CvYKDW+9ns9ESg8gM94/FWnQ=;
+	bh=Stz/LtxZ0oNUWGPAkL2Gm2OiNn6QXW8wUeEfkZyKsoU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kh2h7OyIodoxf8k66YguqbUr1lpsUxqidO7QB3LDXnWBH3bcQt6PWMtmlsqaRPIXl
-	 +vQW2lX/KgLyhS/ARALe8hb8cF7IQV7d78zUAGZ8UTEulPWgx7yqL81wMOMtCfmHZM
-	 60skzxE6YCub9ww/ZnW5jVtl7MuSSxEJEZfHWUKXm4coVKGJjTDuPHBY226mROyNCz
-	 Azz6TKE3jZBE/QVPyUkVyfXobBIdYfaz6ma/o+BUoqi3G0xZ4DrZVW1wQpQ2h61C2N
-	 UAjPFBlwD2XhoJ9G6fp3Sk0Ag5lQJ7TlHLeTelgTGWahreUEpdKFLR5PGwmDPm8qFm
-	 W6YufAou9QsUw==
+	b=O+zbZA2pqkmYFD/+/+lpoOlvB35mFNlw9t+ZWFMewtPpQMLzIXXtiMjV77SIowIQJ
+	 52zBlYz3bQbRL2I0vYZbVkDofZ477Pzs/ymzi2XUB/UKMrXA+dxoM+DINL/ZefSwSF
+	 sIT4pHnAIV6csAHBZEYfWIhpXhBTGe1SpFMuD1uoSWheIxSK/oKUxtYAduNylxNiDK
+	 VNWH6cUQfZCMTF2lZrxO5goILCMy14m4Q4DFy4D22LCQdzpjerGYwSTg5bHff8SzfY
+	 HZWbPCDmZWrfV49pEn06fnBOaPcdTCPozuSbw6tXeQtMJB7jio9FmRTFYPuYY+0TUM
+	 poAoYMWUGqFMg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id F0AECD982FC;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E5818D982E3;
 	Thu, 21 Mar 2024 04:40:27 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -52,36 +52,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] ionic: update documentation for XDP support
+Subject: Re: [PATCH v5 net 0/3] Report RCU QS for busy network kthreads
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <171099602798.26207.6141228760505625495.git-patchwork-notify@kernel.org>
+ <171099602793.26207.3374009714899466289.git-patchwork-notify@kernel.org>
 Date: Thu, 21 Mar 2024 04:40:27 +0000
-References: <20240319163534.38796-1-shannon.nelson@amd.com>
-In-Reply-To: <20240319163534.38796-1-shannon.nelson@amd.com>
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, corbet@lwn.net, bagasdotme@gmail.com,
- linux-doc@vger.kernel.org, brett.creeley@amd.com, drivers@pensando.io
+References: <cover.1710877680.git.yan@cloudflare.com>
+In-Reply-To: <cover.1710877680.git.yan@cloudflare.com>
+To: Yan Zhai <yan@cloudflare.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, jiri@resnulli.us, horms@kernel.org,
+ daniel@iogearbox.net, lorenzo@kernel.org, lixiaoyan@google.com,
+ weiwan@google.com, alexanderduyck@fb.com, linux-kernel@vger.kernel.org,
+ rcu@vger.kernel.org, bpf@vger.kernel.org, kernel-team@cloudflare.com,
+ joel@joelfernandes.org, paulmck@kernel.org, toke@redhat.com,
+ alexei.starovoitov@gmail.com, rostedt@goodmis.org, mark.rutland@arm.com,
+ hawk@kernel.org, bigeasy@linutronix.de
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 19 Mar 2024 09:35:34 -0700 you wrote:
-> Add information to our documentation for the XDP features
-> and related ethtool stats.
+On Tue, 19 Mar 2024 13:44:30 -0700 you wrote:
+> This changeset fixes a common problem for busy networking kthreads.
+> These threads, e.g. NAPI threads, typically will do:
 > 
-> While we're here, we also add the missing timestamp stats.
-> 
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+> * polling a batch of packets
+> * if there are more work, call cond_resched() to allow scheduling
+> * continue to poll more packets when rx queue is not empty
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net] ionic: update documentation for XDP support
-    https://git.kernel.org/netdev/net/c/f7bf0ec1e73d
+  - [v5,net,1/3] rcu: add a helper to report consolidated flavor QS
+    https://git.kernel.org/netdev/net/c/1a77557d48cf
+  - [v5,net,2/3] net: report RCU QS on threaded NAPI repolling
+    https://git.kernel.org/netdev/net/c/d6dbbb11247c
+  - [v5,net,3/3] bpf: report RCU QS in cpumap kthread
+    https://git.kernel.org/netdev/net/c/00bf63122459
 
 You are awesome, thank you!
 -- 
