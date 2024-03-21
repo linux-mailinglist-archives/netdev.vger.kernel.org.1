@@ -1,84 +1,98 @@
-Return-Path: <netdev+bounces-80980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1FBD885643
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:13:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E14488564F
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:20:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87C3D282442
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:13:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9A1CEB213C9
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72E13BB35;
-	Thu, 21 Mar 2024 09:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9D973A8EF;
+	Thu, 21 Mar 2024 09:20:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b="oXA4lNj1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0D212B81
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 09:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 252F220326;
+	Thu, 21 Mar 2024 09:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.244.183.115
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711012432; cv=none; b=t4siKXaXKFEtOgGNBtX1Hi6D5kEf4vdbxMwvH6dOrkz4Exfs0OIs8vH1Zk75OWZe2HDR6Sp8P5QhD61xBtlI4syoTnGXLq4jtcuw9GgiUbtjWuYMh7KoRBh6whlquyBrgCHgnvd/orrnv+G1QyP5oTAsplXF0qR+vihZh3QaCfo=
+	t=1711012831; cv=none; b=pPag0es7u9nezeBZfdqJW7GBUhAUghFMKlDZz5HB1l35zlkytwtx0GJIxLAcT0lglLLa3eAYvOWN8yNkEr/CYQJGUqJgeNdsawnX2K4Ndq4Sg5m0HiaZzu2LGLl/avgusy1iNvJ+dpELTJPnRH9jEBXUuQ9vKK1SQDcAVqg2Ygs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711012432; c=relaxed/simple;
-	bh=fo4gtK5z5PyFuB28Yk40tv9Ltho3oCAUMTrB1OFrr/Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cbnigfqeDQLrzbxvC0gcnosf9nUADyoAE23lzqAeAO4vnC5MK7oSAG/kdFxakJSwEl/RnFKkBqhf5KhqhUb6cFLlEkZwhwN/g3QgyiFb1G+2mcy6MsPLkeTrGWRSeLRkGka+B0kkA8SZY1DutqN2s6wTlrjsOZIL41ErpFJ6wgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-568a53d2ce0so957566a12.0
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 02:13:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711012429; x=1711617229;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Tu1CPOXxxTeFPRVEqGjdY1c+JYzwQ/+HNzCVCyHRYsE=;
-        b=IHwoC5fmlQARHwXpaWMKs9TzwbKyYJq6pH0GVJpi12dNc9I/1hkz4w8sfJQNo4RCgy
-         fiv7ukVeZwu3ndYTlbbwTzJQbwafLYT6U0pjckCnAu81bMol+veD0UUM+WpgLddlhvR6
-         jwwxj/4/o4iuBORpeAayByczUnlnaWvpGMnaAjqSkEmz3EiJ8OA14YAGYcslsDGoxbho
-         MJ41zmlB+iF5Tn7LxNhHnlsxiS54OjKoiVgHcp2k6sN3N61dCQqxIkaUrLcWBQOGSo0d
-         h0aHbPAH0IkWZhRurkwE9yQWCocThg1fYwFx6V/cSbKBR9nd/nQJyfz+gEKFoCSbG7n/
-         473A==
-X-Forwarded-Encrypted: i=1; AJvYcCVg6Nb3buRB8elY5E8EdDbCT9ep5g+3oaAhn8JVlMT62MLr67yyeZxFTifrAlWN4czlFL9Kfg+XVg3uHVW0EtvLtjKb4W3A
-X-Gm-Message-State: AOJu0YxKXlWC8eMMJve37Nv8PHwKKaRQ9OlDr57oHTHZ9V6l5QEHN1EW
-	wpXDvvGMPRqhsEwVq1cIyz6IN6uKylydAdiEfRgjnT75NF+w6/nHwgHVRVu/
-X-Google-Smtp-Source: AGHT+IGUBBwVl0SlpzBG5lYulXLO9rGnsueKl7Dk31MRESA41cWBlZKeWv/5f/aKbzUXMnFAxUuODQ==
-X-Received: by 2002:a17:906:36d0:b0:a46:f69b:49b1 with SMTP id b16-20020a17090636d000b00a46f69b49b1mr931147ejc.46.1711012428924;
-        Thu, 21 Mar 2024 02:13:48 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
-        by smtp.gmail.com with ESMTPSA id be7-20020a1709070a4700b00a46a9c38b16sm5929726ejc.138.2024.03.21.02.13.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Mar 2024 02:13:48 -0700 (PDT)
-Date: Thu, 21 Mar 2024 02:13:46 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, sdf@google.com
-Subject: Re: [PATCH net] tools: ynl: fix setting presence bits in simple nests
-Message-ID: <Zfv6SocBxYXCFmQF@gmail.com>
-References: <20240321020214.1250202-1-kuba@kernel.org>
+	s=arc-20240116; t=1711012831; c=relaxed/simple;
+	bh=tgiiZuGtuUlJKNeJLR3fyE1KgyZ0B2GEPWyE4RXlKF4=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=cZyNJmaA19pV3X9klV4dbUzHOMfDjooWWu+c/+EDun8oKtFA6WY4HmROHhObjl7pjcNzTo4jR/fXHRPsCpJ2I2ii2v8EODo7CeHAxFU2XNmmIxI0qFt7TubylryG/91pA+fvRcPPuyVDs58DGTsRCICn2w/VYH8DoYHWAEZa9ZY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru; spf=pass smtp.mailfrom=infotecs.ru; dkim=pass (1024-bit key) header.d=infotecs.ru header.i=@infotecs.ru header.b=oXA4lNj1; arc=none smtp.client-ip=91.244.183.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=infotecs.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=infotecs.ru
+Received: from mx0.infotecs-nt (localhost [127.0.0.1])
+	by mx0.infotecs.ru (Postfix) with ESMTP id 0F92F1500A63;
+	Thu, 21 Mar 2024 12:20:27 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru 0F92F1500A63
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
+	t=1711012827; bh=tgiiZuGtuUlJKNeJLR3fyE1KgyZ0B2GEPWyE4RXlKF4=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=oXA4lNj1d6mFFkvv9o7B3d/XAIHjpFU6/obACmhPfoUgCi+yKk81CuB6Quk+2PUN2
+	 o3MLkd45mXUeHa3kjANK4hS6uFyxoiDCgoRqKVsssTDmDqaUEnCHofi48U7L5LFLHR
+	 sReTOD87SkE+eKEiAxIEuVynTG9VGjKT/dr+Wz5c=
+Received: from msk-exch-01.infotecs-nt (msk-exch-01.infotecs-nt [10.0.7.191])
+	by mx0.infotecs-nt (Postfix) with ESMTP id 0C1C831906E0;
+	Thu, 21 Mar 2024 12:20:27 +0300 (MSK)
+From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+To: "stable@vger.kernel.org" <stable@vger.kernel.org>, Greg Kroah-Hartman
+	<gregkh@linuxfoundation.org>
+CC: "lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, Guillaume Nault
+	<gnault@redhat.com>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, "Michal
+ Ostrowski" <mostrows@earthlink.net>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
+Subject: Re: [lvc-project] [PATCH 5.15/5.10/5.4/4.19 0/1] pppoe: Fix memory
+ leak in pppoe_sendmsg()
+Thread-Topic: [lvc-project] [PATCH 5.15/5.10/5.4/4.19 0/1] pppoe: Fix memory
+ leak in pppoe_sendmsg()
+Thread-Index: AQHae2/2z5M9RYxR80KDHqxv8N3w3bFBuNkA
+Date: Thu, 21 Mar 2024 09:20:26 +0000
+Message-ID: <abf90a29-33ec-40a0-a386-0f2a36b39bf4@infotecs.ru>
+References: <20240321091256.467553-1-Ilia.Gavrilov@infotecs.ru>
+In-Reply-To: <20240321091256.467553-1-Ilia.Gavrilov@infotecs.ru>
+Accept-Language: ru-RU, en-US
+Content-Language: ru-RU
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <222D597251679049B45BD513401BC5A7@infotecs.ru>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240321020214.1250202-1-kuba@kernel.org>
+X-KLMS-Rule-ID: 5
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Status: not scanned, disabled by settings
+X-KLMS-AntiSpam-Interceptor-Info: not scanned
+X-KLMS-AntiPhishing: Clean, bases: 2024/03/21 07:23:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2024/03/21 04:23:00 #24331522
+X-KLMS-AntiVirus-Status: Clean, skipped
 
-On Wed, Mar 20, 2024 at 07:02:14PM -0700, Jakub Kicinski wrote:
-> When we set members of simple nested structures in requests
-> we need to set "presence" bits for all the nesting layers
-> below. This has nothing to do with the presence type of
-> the last layer.
-> 
-> Fixes: be5bea1cc0bf ("net: add basic C code generators for Netlink")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-
-Reviewed-by: Breno Leitao <leitao@debian.org>
+T24gMy8yMS8yNCAxMjoxMiwgR2F2cmlsb3YgSWxpYSB3cm90ZToNCj4gc3l6Ym90IHJlcG9ydHMg
+YSBtZW1vcnkgbGVhayBpbiBwcHBvZV9zZW5kbXNnIGluIDYuNiBhbmQgNi4xIHN0YWJsZQ0KPiBy
+ZWxlYXNlcy4gVGhlIHByb2JsZW0gaGFzIGJlZW4gZml4ZWQgYnkgdGhlIGZvbGxvd2luZyBwYXRj
+aCB3aGljaCBjYW4gYmUNCj4gY2xlYW5seSBhcHBsaWVkIHRvIHRoZSA2LjYgYW5kIDYuMSBicmFu
+Y2hlcy4NCj4gDQo+IEZvdW5kIGJ5IEluZm9UZUNTIG9uIGJlaGFsZiBvZiBMaW51eCBWZXJpZmlj
+YXRpb24gQ2VudGVyDQo+IChsaW51eHRlc3Rpbmcub3JnKSB3aXRoIFN5emthbGxlcg0KPiANCj4g
+R2F2cmlsb3YgSWxpYSAoMSk6DQo+ICAgIHBwcG9lOiBGaXggbWVtb3J5IGxlYWsgaW4gcHBwb2Vf
+c2VuZG1zZygpDQo+IA0KPiAgIGRyaXZlcnMvbmV0L3BwcC9wcHBvZS5jIHwgMjMgKysrKysrKysr
+LS0tLS0tLS0tLS0tLS0NCj4gICAxIGZpbGUgY2hhbmdlZCwgOSBpbnNlcnRpb25zKCspLCAxNCBk
+ZWxldGlvbnMoLSkNCj4gDQoNCkknbSBzbyBzb3JyeS4gSSBtZWFudCB0aGUgYnJhbmNoZXMgNS4x
+NSwgNS4xMCwgNS40LCA0LjE5Lg0K
 
