@@ -1,125 +1,85 @@
-Return-Path: <netdev+bounces-81060-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 073818859AA
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 14:09:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8539D8859E6
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 14:19:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9ABD7B21419
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:09:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1C3E1F22FFD
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:19:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB51884039;
-	Thu, 21 Mar 2024 13:09:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3014784A4B;
+	Thu, 21 Mar 2024 13:19:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="NO8O8H4G"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="US4NyYmO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2F185474D
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 13:09:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C09134CD;
+	Thu, 21 Mar 2024 13:19:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711026588; cv=none; b=NJxR2Tf9kALZI53rczxIFqOfi5QGa4uIA++ibags6E7Ju9zAM0ikH38jzwZer5vWWoO/gNWeQtkzEWOdDbysUryz+maBuCPkRyJUPKRnATlbu1jXa6TKBk6H/MntvZHVwHk1wfL7/a7lAEk7J8mXlR8XXQDuAoEBfJdVnb5B+CY=
+	t=1711027150; cv=none; b=OimOm5yrf5v5r2jw6UiNFvzYdT5X680hiBUJCqRghWILtniT/zeCCIz9Bj+Nh4vn+k91V6+nQeHJ0k0+zlHpJTtULnZIh5AQR2OrWsHOT0w+2okAxpjasbCj6IKPv0ovC2JKZV1UvMAQSV5n+HBZOytgCarnnjHVRLt3dX0ea6o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711026588; c=relaxed/simple;
-	bh=PbVKPsffYFmxEJA1XYvBvrzU6/dGh2IFtbUeXpnCS7c=;
+	s=arc-20240116; t=1711027150; c=relaxed/simple;
+	bh=AQiVU6QDBK9keYmpVAn9qAMVZHSVfZCCrd90QaWx1Yo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PVHqKuzDeTT23KOrbIbMf8ixnP6cRaoqsZv4wKfjVYnpdntmIsl5FSs1J0uw4bmOHN6NWOfVPmGsDcTQC/nqFBEGkIAHrD5SqX9NniZ6pA9VV8UJoKVIrMLPS9N4s5CP8HNCGbknldfmHlWnKtxeyq8LI9TPJayLBmNi6WKzq5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=NO8O8H4G; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-513d717269fso1241862e87.0
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 06:09:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1711026585; x=1711631385; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tVqnt2+40OCgkEXDOdVpYA4SPoTMaikFQyoQIW+DZj4=;
-        b=NO8O8H4GDDgHoDw+iXsSQ/4s9ynOmbReJETdkAj1QBi6pP4J3kACzbW4UWyfw9+arj
-         /HCI0NVl9Yk4sgIlyRL/GLEvNiHDNDvl8o1egL1Q+DQoAXkrin4Sp7IL06bJU3c/QwP/
-         5CIMSjazyjTQWkgFiWeCCjIJ9TfJKF8vmEAtH7yWChR3Q165rnbC9+Fh1VA6i9jNHCdR
-         hqvoaM5epJSClc9DyMu+LSvmW+saxVRnMC21csxjz8gN0vdHMqRUY4QOqeYsamb5YB0j
-         I8JOsTc0MHdw7M9LblpDnri4gUGOaMTvFT9NUvXvXKobCsoT/8x2S8WYxwD3QrfwKnzp
-         q4VQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711026585; x=1711631385;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tVqnt2+40OCgkEXDOdVpYA4SPoTMaikFQyoQIW+DZj4=;
-        b=ACFter9Qp9S0pNOemQ8Nl2Cn0x6jDUFT9kNJOhlTKOL0vFaZQKBWox907/OcaHYpXS
-         YcyAA9WGqGnq+l6CiAReJtXaSBMH90NwxjisrClUu3W2EGWwDW3Nu8O0SikQRkdvrvrb
-         f9W9ON3z9BsxQvKxUvdDPZfN3++SJrHg4scazJ4k2V1mKcjw6jebeNDNyKDg9zw7SxPf
-         NPzmUdu4vmturkiseDGIztZZcHP0g86aejrvVxR8F0PESJoDFKoMD+GWqo6bkM6vuHUg
-         2hG3TPtc7/uVOxX+gQhT5x8na2WarSPvt0EZliXrWDmdBRFAkEjDGKFHGVXVckQS/+uz
-         d18g==
-X-Forwarded-Encrypted: i=1; AJvYcCVQLY6GiK20twCyZ+73pZEFpWxU/6GmiHLp3mxDoAta9NDhl4yFr0YXTwCDW9q5PIkYFrwFlfiJ1pbED6YXxGs/wte1hc9c
-X-Gm-Message-State: AOJu0YygqfbFPKQ+uACysvr3qrucyOa8AAsHcY3dL7G7cyjbrPuPKaGb
-	8EVXNUlgxaMFdGw91igV/NZckSGq4O/BDTqfWPkyuCJxS6GJ+FTnIAH4c46sXE4=
-X-Google-Smtp-Source: AGHT+IFoxUwogxt2jW8OyxX+Q7X84NaLZXeb02y01FrPcmFmJQwtGUA2j/OumLiUYpeVff+Zpysujw==
-X-Received: by 2002:a19:3856:0:b0:515:92fe:4356 with SMTP id d22-20020a193856000000b0051592fe4356mr974126lfj.2.1711026584869;
-        Thu, 21 Mar 2024 06:09:44 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id z1-20020aa7cf81000000b0056835320f76sm8107371edx.8.2024.03.21.06.09.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Mar 2024 06:09:44 -0700 (PDT)
-Date: Thu, 21 Mar 2024 14:09:40 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Anastasia Belova <abelova@astralinux.ru>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
-Subject: Re: [PATCH v2] flow_dissector: prevent NULL pointer dereference in
- __skb_flow_dissect
-Message-ID: <ZfwxlB9vkI9Y88K8@nanopsycho>
-References: <Zfrmv4u0tVcYGS5n@nanopsycho>
- <20240321123446.7012-1-abelova@astralinux.ru>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Rrw+/QdVOng9GeKb1X57EdzhE+TlKb78uZY2d2LsLKEM/WngrohXn/VXT8WZS3QuWG3csKIXbJc6VVoJK1sPH0uXJ98+xPqvfvKMsfF4PkUsq4HyRm6Xsrjlhpyh2BbYvvLdZEkuYiwaYjT7ILKra8/WDfPKK/bqlGzyBOe2Ztc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=US4NyYmO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D109C433C7;
+	Thu, 21 Mar 2024 13:19:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1711027149;
+	bh=AQiVU6QDBK9keYmpVAn9qAMVZHSVfZCCrd90QaWx1Yo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=US4NyYmO+vr/1M7HF2tzRimSFK18hbGocDhHbiUlo7G1pqn0qc0vhb7fW/4M0XYST
+	 eiCkPbe8OP8p3aWVMafV8hGp451QD4uRzoA+maDjioFTGjYZ3TBYjiaWYmC+HurTWY
+	 fy7JoENbFyfEIPqwC96GGEINpHULXLsUNh2tuf20=
+Date: Thu, 21 Mar 2024 09:19:02 -0400
+From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Daniel Golle <daniel@makrotopia.org>, 
+	DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>, erkin.bozoglu@xeront.com, mithat.guner@xeront.com
+Subject: Re: [PATCH net v2 0/2] MT7530 DSA subdriver fix VLAN egress and
+ handling of all link-local frames
+Message-ID: <20240321-tentacled-pearl-ferret-efd5be@lemur>
+References: <20240314-b4-for-net-mt7530-fix-link-local-vlan-v2-0-7dbcf6429ba0@arinc9.com>
+ <f6f064b8-efb2-4ab0-94f1-468d5d273d6e@arinc9.com>
+ <49d23df1340f342822702de0439674ddbc5bff6f.camel@redhat.com>
+ <7a7e6c46-03a4-48eb-9f46-84a05259cf26@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20240321123446.7012-1-abelova@astralinux.ru>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7a7e6c46-03a4-48eb-9f46-84a05259cf26@arinc9.com>
 
-Thu, Mar 21, 2024 at 01:34:46PM CET, abelova@astralinux.ru wrote:
->skb is an optional parameter, so it may be NULL.
->Add check defore dereference in eth_hdr.
->
->Found by Linux Verification Center (linuxtesting.org) with SVACE.
->
->Fixes: 690e36e726d0 ("net: Allow raw buffers to be passed into the flow dissector.")
->Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
->---
-> net/core/flow_dissector.c | 2 ++
-> 1 file changed, 2 insertions(+)
->
->diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
->index 272f09251343..68a8228ffae3 100644
->--- a/net/core/flow_dissector.c
->+++ b/net/core/flow_dissector.c
->@@ -1139,6 +1139,8 @@ bool __skb_flow_dissect(const struct net *net,
+On Thu, Mar 21, 2024 at 02:29:19PM +0300, Arınç ÜNAL wrote:
+> > For future memory: I think the SoB in the cover letter is not required,
+> > and is, at least to me, a bit confusing.
+> > 
+> > No action needed here, I'll keep this unmodified, but I suggest to omit
+> > it in future submission.
 > 
-> 	if (dissector_uses_key(flow_dissector,
-> 			       FLOW_DISSECTOR_KEY_ETH_ADDRS)) {
->+		if (!skb)
->+			goto out_bad;
+> b4 puts it on the cover letter so it's not my doing.
 
-Please read my recent reply to v1.
+This is done because many subsystems use the cover letter as the merge commit
+message. Those subsystems who don't follow this practice don't generally care
+if there's a Signed-Off-By in the cover letter anyway, so I don't see why this
+is a concern that it's there.
 
-pw-bot: cr
-
-
-> 		struct ethhdr *eth = eth_hdr(skb);
-> 		struct flow_dissector_key_eth_addrs *key_eth_addrs;
-> 
->-- 
->2.30.2
->
+-K
 
