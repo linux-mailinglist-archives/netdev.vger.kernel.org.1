@@ -1,297 +1,185 @@
-Return-Path: <netdev+bounces-81025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEDB088589B
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:55:26 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E7288858A2
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:56:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 59B541F218FC
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:55:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B78A91F2174C
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:56:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 078875A0FA;
-	Thu, 21 Mar 2024 11:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136A95A0FA;
+	Thu, 21 Mar 2024 11:56:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bqR5j3EO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="itpAkv0S"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C541B27456
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 11:55:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4401758AAF;
+	Thu, 21 Mar 2024 11:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711022120; cv=none; b=WM3KrcvQIkbcJqVbBv+SWFHVROW76WnJhVSYSUA0f0YtpaBEjirbpWiAiqDdOREM1w/LiF1ZEYo8glPNylDshu7Fv8wBYNc7YDvHcD4bD+RK37430bF6QC/Qvv3VwZ0tdZ3yGr8DYnbR+Gx0W26NeHXranUap5KyJyXKTp9rteA=
+	t=1711022203; cv=none; b=REmNzSYE4z8pioBMe/aMD2zIaq3Dasad4v/Aw2C+nCaAeGYB+G1QoLMxyBmNAW/FqFfsZk93pH8kBED+pqjPy8LCOj9/joEmeEXt0eVAdMe4RTInC8tuNhA12v+/hRWzISQCnfUvGvFsKG52ST1LvdPsb4mANx9dP8Hsy1MRX6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711022120; c=relaxed/simple;
-	bh=M7rrx/tj/7cm7v6OqWu1lwee64D1yHNq/+n62D56OFg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mPuFxZfa2Scy2PjwRIkLtbzVrbIkExn6ZWlCKa6YnJfQR1FPXTxSOHxdZB0XyfQkmIuuM2HVr7ZYvhjTvz5EYI1hZVAMsT7vevcUj+S6FpJtZdu9xJ6T+vN/pjjHzlHBeQhdnIN7SfNDrrF/XzQy+DaXidmQ+DGhXAI2MITb4Ic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bqR5j3EO; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711022117;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=XDBSGogvTfMEiiiAhO5bwULBPt5bFujWQnwhyU3va9s=;
-	b=bqR5j3EOjJ2DrXklUIrWwCf5DJDQfGZic3T2ylUXEDpTBEM+1p+KAuB6+AvuCL3xy0h1y+
-	xuV+AK7COt91lvgQnLItkVWbvDUEVl0bBhEWUnzeZrnDMR8Mr56Tr+OPGmDl30sMVq5XRA
-	ZCoY9c4JCfZbRZBg11hHUYKGzDWpjHo=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-212-y1q8IzT2PGG9qwyawt9bLA-1; Thu, 21 Mar 2024 07:55:15 -0400
-X-MC-Unique: y1q8IzT2PGG9qwyawt9bLA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33ed4bb926cso158546f8f.0
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 04:55:15 -0700 (PDT)
+	s=arc-20240116; t=1711022203; c=relaxed/simple;
+	bh=ClOpV1tUHPrV9xbbPmCV71AFRJniHeEgt5+wDpHdPuI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oLlkUKUK2s0VUt1U34uN+CBjF50CgFhBkQq0yOzbNpi/Zo0Y0BC4K2bLAhzTCeF7Swgx4dHclVRrCHipYeMJlSOPfjhTZEZGaRDPkLUjJlEbwPutgALngFr1Nltc+rU7q3mQCDWLZX5BbLZVK4rAnxujt4ZdQBSsN/kwtwhe2xM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=itpAkv0S; arc=none smtp.client-ip=209.85.167.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-512f54fc2dbso910903e87.1;
+        Thu, 21 Mar 2024 04:56:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711022199; x=1711626999; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=qroAAFcs7TC1tOdTn1sB37AUBpgXbN1aHENpqRPoyEw=;
+        b=itpAkv0SePTYNevgPlq4Ns4hfmR8925Z4mz1eYaF7VZiPy9+ThNzBkC9aHnkUmEFcx
+         PCD/gof8HJvnrgNM6lheFsDVrVsUp17EELTW03Zx761R0Y8wO+XO64ubt6jOuaRwLKkg
+         k3l9ij4FfC1BwOP79tyq10SbX6/UwXSpUn4xbiV7MQ6UtBOmCTYOuH4dqnuisgq+C+x+
+         K5ZCV+IMq6dZnggvcHWgICdSJPXR7kQDnOz4kJ9WB6kwLMF3AHzdlKanv0pDbD+Zq91r
+         eHMyH5FYzw2J9x5x70UcPywJ96MO9xQb6RZKU7Mfs/9S1EZAEzz+CxbQccnJ8vn2OFjF
+         sWcw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711022114; x=1711626914;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XDBSGogvTfMEiiiAhO5bwULBPt5bFujWQnwhyU3va9s=;
-        b=TevdOX0gkKdgPDrJ6+Jdi/FepjpHjHQoPaPDfTaoYURYcfb5gRDGKw8B5mtb2HLxOa
-         uxmT4vtY+tVNlnNNyUNVBmK81w3oemXmothCb0Vxmn5BInzBda0VzEGHnfh8eS5J/UkD
-         tPWedYc8FxIG3BGD0ER5bTwa8xa7S1TYxdCpkA/rzCySIHQxzDTnWJR6588lHO5zA9Ao
-         by6cEuIR36w7F5JMuK0XNrdQyH934p/BQcxX3Nmamnvm3lKe287zUU/Io8yucgKSMQ7/
-         RkTUlCSqf7Z2e0OsYqhDzAJDmkffvWQzI+TKX0JXD3PJzOW+TogZhIKdqGV6AHVa7Bbn
-         +82A==
-X-Gm-Message-State: AOJu0YysJTeeWcEXa49zzfs1k+2w1AZeOEf538EQTlNFj3ZfXGK3vsOD
-	Wi+cW4KnnspruHX8F4u5gYtY9lng/mPBLA9vldXozlu5z7B8hpGeOPJcETtIc59ApgxoUaIDSSS
-	E5F5zw9ADA3EsvQ+Onn1kiaqh8Lha68uUVlWx/L9gq3N+hRfkRc3S2Q==
-X-Received: by 2002:a05:6000:1044:b0:341:90a1:3e09 with SMTP id c4-20020a056000104400b0034190a13e09mr2960638wrx.1.1711022114303;
-        Thu, 21 Mar 2024 04:55:14 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IF8S/hD8D1xjZ43PSNQn4IbIlw/LoHvIG1ScdsnjssBF0X6RaA70evBLiWEjWcqgtpo+3Kl4A==
-X-Received: by 2002:a05:6000:1044:b0:341:90a1:3e09 with SMTP id c4-20020a056000104400b0034190a13e09mr2960625wrx.1.1711022113923;
-        Thu, 21 Mar 2024 04:55:13 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-249-130.dyn.eolo.it. [146.241.249.130])
-        by smtp.gmail.com with ESMTPSA id i7-20020a5d5587000000b0033ec68dd3c3sm17102683wrv.96.2024.03.21.04.55.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Mar 2024 04:55:13 -0700 (PDT)
-Message-ID: <cde2dc9e07c49e642f16ab80c6f5b9f605ecbef4.camel@redhat.com>
-Subject: Re: [PATCH net] inet: inet_defrag: prevent sk release while still
- in use
-From: Paolo Abeni <pabeni@redhat.com>
-To: Eric Dumazet <edumazet@google.com>, Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, dsahern@kernel.org, kuba@kernel.org, 
- netfilter-devel@vger.kernel.org, xingwei lee <xrivendell7@gmail.com>, yue
- sun <samsun1006219@gmail.com>, 
- syzbot+e5167d7144a62715044c@syzkaller.appspotmail.com
-Date: Thu, 21 Mar 2024 12:55:12 +0100
-In-Reply-To: <CANn89i+S0EYPM4N-3RsN5-QDQts5wobJjBikF7=feMo6hHY3Lw@mail.gmail.com>
-References: <20240319122310.27474-1-fw@strlen.de>
-	 <CANn89i+S0EYPM4N-3RsN5-QDQts5wobJjBikF7=feMo6hHY3Lw@mail.gmail.com>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        d=1e100.net; s=20230601; t=1711022199; x=1711626999;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=qroAAFcs7TC1tOdTn1sB37AUBpgXbN1aHENpqRPoyEw=;
+        b=oeedb5k08ClJOAYbHjM5oBI+h4VIwWNuSXHEl9Y6KfWOWW+aOakpqAsUi87nZzUr5s
+         YgUfY3Fj5efWufxceHrMD7glqSFkRI2tiG9Elxq7oK2trSuGUfFD2uYP9IOABXqXHQmh
+         35n/HIo+L8oAh8GV3827JyTIBWEBwSrEd3lSjdeKFQPW4kJnht0dvSiEM0GkXmVnECzW
+         ouoVZ6TeSfhzkVoO3lO9ZR2f8iKbELGCm9HBn2jAYDBX/s8DnbkylvB8/JLqzzAskOll
+         TqK/Nk3oku9UZBdt86W6YnPpxkKYouxHt/4BFKbOj7RsWgeUpX1KRrTjHtvjSLYV/5x/
+         2ssQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVUI6LcleibY41khsjPOelNfELVzEJWTJ5CYE8EJY03FukNKPuhRp5qo0SqwBt/uuFI3nxkVfweRlDiWHFO+/6A33K2gvumN5PzOQzMKGJ8YcEhiUGB/aA0ejsq1InLKzjKWtJPdQnk005/YF/8qJ+jyXp/yG9mnq7ak8fGjjSkcw==
+X-Gm-Message-State: AOJu0Yw2MIVZsKJ62yp0qD3sxFZdo2AUDbTbIpDTHUUU+Gg3G07LtYYe
+	YIseVuOZOV6WP+cROZ7H1hDLfdyE9pVC7EryW5l8LNMtYvccdqBiRVcjTWzE3g/HCpW+k9BDmm4
+	vUgCSkLTJGD56LI9A3qtBkt3LypQ=
+X-Google-Smtp-Source: AGHT+IGoMlZM1r7Zbtwlbo2uEyA+VsoDZudn1PSQ5QwgZ9K0dJhVnqBX5wuYEerXv39Ut1ues4IiMPxranFe7AEBRTc=
+X-Received: by 2002:a19:ca5a:0:b0:515:9479:a997 with SMTP id
+ h26-20020a19ca5a000000b005159479a997mr691094lfj.10.1711022199188; Thu, 21 Mar
+ 2024 04:56:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com>
+ <20240310-realtek-led-v1-1-4d9813ce938e@gmail.com> <d2568101-f3e0-4c2d-8613-52d023e22b77@kernel.org>
+In-Reply-To: <d2568101-f3e0-4c2d-8613-52d023e22b77@kernel.org>
+From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Date: Thu, 21 Mar 2024 08:56:27 -0300
+Message-ID: <CAJq09z6q2gaZYqc-=fQEMOA1ViAKTEJqT9iF2xsYCde9syouig@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dsa: realtek: describe LED usage
+To: Krzysztof Kozlowski <krzk@kernel.org>
+Cc: Linus Walleij <linus.walleij@linaro.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	devicetree@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi,
+Hi Krzysztof
 
-On Wed, 2024-03-20 at 15:14 +0100, Eric Dumazet wrote:
-> On Tue, Mar 19, 2024 at 12:36=E2=80=AFPM Florian Westphal <fw@strlen.de> =
-wrote:
-> >=20
-> > ip_local_out() and other functions can pass skb->sk as function argumen=
-t.
-> >=20
-> > If the skb is a fragment and reassembly happens before such function ca=
-ll
-> > returns, the sk must not be released.
-> >=20
-> > This affects skb fragments reassembled via netfilter or similar
-> > modules, e.g. openvswitch or ct_act.c, when run as part of tx pipeline.
-> >=20
-> > Eric Dumazet made an initial analysis of this bug.  Quoting Eric:
-> >   Calling ip_defrag() in output path is also implying skb_orphan(),
-> >   which is buggy because output path relies on sk not disappearing.
-> >=20
-> >   A relevant old patch about the issue was :
-> >   8282f27449bf ("inet: frag: Always orphan skbs inside ip_defrag()")
-> >=20
-> >   [..]
-> >=20
-> >   net/ipv4/ip_output.c depends on skb->sk being set, and probably to an
-> >   inet socket, not an arbitrary one.
-> >=20
-> >   If we orphan the packet in ipvlan, then downstream things like FQ
-> >   packet scheduler will not work properly.
-> >=20
-> >   We need to change ip_defrag() to only use skb_orphan() when really
-> >   needed, ie whenever frag_list is going to be used.
-> >=20
-> > Eric suggested to stash sk in fragment queue and made an initial patch.
-> > However there is a problem with this:
-> >=20
-> > If skb is refragmented again right after, ip_do_fragment() will copy
-> > head->sk to the new fragments, and sets up destructor to sock_wfree.
-> > IOW, we have no choice but to fix up sk_wmem accouting to reflect the
-> > fully reassembled skb, else wmem will underflow.
-> >=20
-> > This change moves the orphan down into the core, to last possible momen=
-t.
-> > As ip_defrag_offset is aliased with sk_buff->sk member, we must move th=
-e
-> > offset into the FRAG_CB, else skb->sk gets clobbered.
-> >=20
-> > This allows to delay the orphaning long enough to learn if the skb has
-> > to be queued or if the skb is completing the reasm queue.
-> >=20
-> > In the former case, things work as before, skb is orphaned.  This is
-> > safe because skb gets queued/stolen and won't continue past reasm engin=
-e.
-> >=20
-> > In the latter case, we will steal the skb->sk reference, reattach it to
-> > the head skb, and fix up wmem accouting when inet_frag inflates truesiz=
-e.
-> >=20
-> > Diagnosed-by: Eric Dumazet <edumazet@google.com>
-> > Reported-by: xingwei lee <xrivendell7@gmail.com>
-> > Reported-by: yue sun <samsun1006219@gmail.com>
-> > Reported-by: syzbot+e5167d7144a62715044c@syzkaller.appspotmail.com
+> On 10/03/2024 05:51, Luiz Angelo Daros de Luca wrote:
+> > Each port can have up to 4 LEDs (3 for current rtl8365mb devices). The
+> > LED reg property will indicate its LED group.
+> >
+>
+> Please use scripts/get_maintainers.pl to get a list of necessary people
+> and lists to CC (and consider --no-git-fallback argument). It might
+> happen, that command when run on an older kernel, gives you outdated
+> entries. Therefore please be sure you base your patches on recent Linux
+> kernel.
+>
+> Tools like b4 or scripts/get_maintainer.pl provide you proper list of
+> people, so fix your workflow. Tools might also fail if you work on some
+> ancient tree (don't, instead use mainline), work on fork of kernel
+> (don't, instead use mainline) or you ignore some maintainers (really
+> don't). Just use b4 and everything should be fine, although remember
+> about `b4 prep --auto-to-cc` if you added new patches to the patchset.
+>
+> > An example of LED usage was included in an existing switch example.
+> >
+> > Cc: devicetree@vger.kernel.org
+>
+> Please drop the autogenerated scripts/get_maintainer.pl CC-entries from
+> commit msg. There is no single need to store automated output of
+> get_maintainers.pl in the git log. It can be easily re-created at any
+> given time, thus its presence in the git history is redundant and
+> obfuscates the log.
 
-Possibly:
+It is a left-over before I adopted b4. I'll do the cleanup.
 
-Fixes: 2ad7bf363841 ("ipvlan: Initial check-in of the IPVLAN driver.")
+>
 
-it's not very accurate but should be a reasonable oldest affected
-version.
-
-> > Signed-off-by: Florian Westphal <fw@strlen.de>
-> > ---
-> >  include/linux/skbuff.h                  |  7 +--
-> >  net/ipv4/inet_fragment.c                | 71 ++++++++++++++++++++-----
-> >  net/ipv4/ip_fragment.c                  |  2 +-
-> >  net/ipv6/netfilter/nf_conntrack_reasm.c |  2 +-
-> >  4 files changed, 61 insertions(+), 21 deletions(-)
-> >=20
-> > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> > index 7d56ce195120..6d08ff8a9357 100644
-> > --- a/include/linux/skbuff.h
-> > +++ b/include/linux/skbuff.h
-> > @@ -753,8 +753,6 @@ typedef unsigned char *sk_buff_data_t;
-> >   *     @list: queue head
-> >   *     @ll_node: anchor in an llist (eg socket defer_list)
-> >   *     @sk: Socket we are owned by
-> > - *     @ip_defrag_offset: (aka @sk) alternate use of @sk, used in
-> > - *             fragmentation management
-> >   *     @dev: Device we arrived on/are leaving by
-> >   *     @dev_scratch: (aka @dev) alternate use of @dev when @dev would =
-be %NULL
-> >   *     @cb: Control buffer. Free for use by every layer. Put private v=
-ars here
-> > @@ -875,10 +873,7 @@ struct sk_buff {
-> >                 struct llist_node       ll_node;
-> >         };
-> >=20
-> > -       union {
-> > -               struct sock             *sk;
-> > -               int                     ip_defrag_offset;
-> > -       };
-> > +       struct sock             *sk;
-> >=20
-> >         union {
-> >                 ktime_t         tstamp;
-> > diff --git a/net/ipv4/inet_fragment.c b/net/ipv4/inet_fragment.c
-> > index 7072fc0783ef..7254b640ba06 100644
-> > --- a/net/ipv4/inet_fragment.c
-> > +++ b/net/ipv4/inet_fragment.c
-> > @@ -24,6 +24,8 @@
-> >  #include <net/ip.h>
-> >  #include <net/ipv6.h>
-> >=20
-> > +#include "../core/sock_destructor.h"
+> > +patternProperties:
+> > +  '^(ethernet-)?ports$':
+> > +    type: object
+> > +    additionalProperties: true
 > > +
-> >  /* Use skb->cb to track consecutive/adjacent fragments coming at
-> >   * the end of the queue. Nodes in the rb-tree queue will
-> >   * contain "runs" of one or more adjacent fragments.
-> > @@ -39,6 +41,7 @@ struct ipfrag_skb_cb {
-> >         };
-> >         struct sk_buff          *next_frag;
-> >         int                     frag_run_len;
-> > +       int                     ip_defrag_offset;
-> >  };
-> >=20
-> >  #define FRAG_CB(skb)           ((struct ipfrag_skb_cb *)((skb)->cb))
-> > @@ -396,12 +399,12 @@ int inet_frag_queue_insert(struct inet_frag_queue=
- *q, struct sk_buff *skb,
-> >          */
-> >         if (!last)
-> >                 fragrun_create(q, skb);  /* First fragment. */
-> > -       else if (last->ip_defrag_offset + last->len < end) {
-> > +       else if (FRAG_CB(last)->ip_defrag_offset + last->len < end) {
-> >                 /* This is the common case: skb goes to the end. */
-> >                 /* Detect and discard overlaps. */
-> > -               if (offset < last->ip_defrag_offset + last->len)
-> > +               if (offset < FRAG_CB(last)->ip_defrag_offset + last->le=
-n)
-> >                         return IPFRAG_OVERLAP;
-> > -               if (offset =3D=3D last->ip_defrag_offset + last->len)
-> > +               if (offset =3D=3D FRAG_CB(last)->ip_defrag_offset + las=
-t->len)
-> >                         fragrun_append_to_last(q, skb);
-> >                 else
-> >                         fragrun_create(q, skb);
-> > @@ -418,13 +421,13 @@ int inet_frag_queue_insert(struct inet_frag_queue=
- *q, struct sk_buff *skb,
-> >=20
-> >                         parent =3D *rbn;
-> >                         curr =3D rb_to_skb(parent);
-> > -                       curr_run_end =3D curr->ip_defrag_offset +
-> > +                       curr_run_end =3D FRAG_CB(curr)->ip_defrag_offse=
-t +
-> >                                         FRAG_CB(curr)->frag_run_len;
-> > -                       if (end <=3D curr->ip_defrag_offset)
-> > +                       if (end <=3D FRAG_CB(curr)->ip_defrag_offset)
-> >                                 rbn =3D &parent->rb_left;
-> >                         else if (offset >=3D curr_run_end)
-> >                                 rbn =3D &parent->rb_right;
-> > -                       else if (offset >=3D curr->ip_defrag_offset &&
-> > +                       else if (offset >=3D FRAG_CB(curr)->ip_defrag_o=
-ffset &&
-> >                                  end <=3D curr_run_end)
-> >                                 return IPFRAG_DUP;
-> >                         else
-> > @@ -438,23 +441,39 @@ int inet_frag_queue_insert(struct inet_frag_queue=
- *q, struct sk_buff *skb,
-> >                 rb_insert_color(&skb->rbnode, &q->rb_fragments);
-> >         }
-> >=20
-> > -       skb->ip_defrag_offset =3D offset;
-> > +       FRAG_CB(skb)->ip_defrag_offset =3D offset;
-> >=20
-> >         return IPFRAG_OK;
-> >  }
-> >  EXPORT_SYMBOL(inet_frag_queue_insert);
-> >=20
-> > +void tcp_wfree(struct sk_buff *skb);
->=20
-> Thanks a lot Florian for looking at this !
->=20
-> Since you had : #include "../core/sock_destructor.h", perhaps the line
-> can be removed,
-> because it includes <net/tcp.h>
+> > +    patternProperties:
+> > +      '^(ethernet-)?port@[0-6]$':
+> > +        type: object
+> > +        additionalProperties: true
+> > +
+> > +        properties:
+> > +          leds:
+>
+> type: object
+> additionalProperties: false
+>
+> > +            description:
+> > +              "LEDs associated with this port"
+>
+> Drop quotes.
 
-I think Florian will not able to reply for a few days.
+At some in my frequent system upgrades (rolling release), it
+uninstalled the yamllint
 
-Since the issue looks ancient and we are early in the cycle, I guess
-there are no problems with that.
+warning: python package 'yamllint' not installed, skipping
 
-Cheers,
+It should have catched that before.
 
-Paolo
+>
+> > +
+> > +            patternProperties:
+> > +              '^led@[a-f0-9]+$':
+>
+> [0-3]
 
+leds are already defined for a port. I'm just trying to add a
+restriction to allow only 0-3 leds and use that to identify the group.
+These suggestions will redefine the leds property, forcing me to
+declare #address-cells, #size-cells for leds and reference the led
+schema in led@[0-3]. Is there a way to just add a constraint to what
+is already present?
+
+>
+> > +                type: object
+> > +                additionalProperties: true
+>
+> This cannot be 'true'. Which then will point you to errors and missing
+> ref to leds schema and need to use unevaluatedProperties: false.
+>
+>
+> > +
+> > +                properties:
+> > +                  reg:
+> > +                    description:
+> > +                      "reg indicates the LED group for this LED"
+>
+> Drop quotes
+>
+>
+> Best regards,
+> Krzysztof
+>
 
