@@ -1,163 +1,160 @@
-Return-Path: <netdev+bounces-81058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4A988598B
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 14:06:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 018028859A8
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 14:09:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B47AA2814FE
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:06:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3410E1C21898
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:09:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21A983CCB;
-	Thu, 21 Mar 2024 13:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF67384A31;
+	Thu, 21 Mar 2024 13:09:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="joRUocov"
+	dkim=pass (2048-bit key) header.d=terma.com header.i=@terma.com header.b="fVzMyOFI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-out6.electric.net (smtp-out6.electric.net [192.162.217.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D2B55474D;
-	Thu, 21 Mar 2024 13:06:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DD8783CD9;
+	Thu, 21 Mar 2024 13:09:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.162.217.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711026413; cv=none; b=JD1XPBK5/kba0img+XfmmceQyzY4zm+cyE4ivcu+4ela9ymqh0rrGCiqvXhQR8rub3Sf8+I0VtcKfqoylaAOtfqXyzwmvaEZk6WGcWuCptXWaJP3ByLaEZQROy05gkpKZXeC4UYaqd9fH7jSf6PUgUAR3qEfy93Xl9ciCZ56tq0=
+	t=1711026560; cv=none; b=IPEWLxcYHs3AP6VLUtHkHEJT8kShcgy14F3epvcni2rvjQ1FHAiS06s0nt2HISmEDjubPVSreuKoTczfogWnMrNDovk4UJKm+ytJLO0z9Vv2hw2yNzebnGTXA4JeDZntVz6le/1+MSYIFIjijWjok+ZZRDlMqz2WSK6HM8m/lKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711026413; c=relaxed/simple;
-	bh=J7WM9ULq1ctPdLnRjs/NRSRzZV/Z1VC6LsNLeIwE95Y=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=PnXWDn29a3+tjWjl/ko8Xt0Kk3Ov8iyjkMKkV66FYJKPoXPql2c1PQC9aAyyv5h7dozS3NoPLTHtydmG6eSEimww+z+dbekv6ZI7tPrb18g4b2u3p1heAPjBxtN+9grk0lpJZ/HGH+44UWU/JMG7fG2g9h/dWCFlF/5UL53xxnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=joRUocov; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-29b7164eef6so710796a91.2;
-        Thu, 21 Mar 2024 06:06:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711026412; x=1711631212; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=6lQU1dHKYz0aWn2kYVD5L2i0npLLqY0Qe96LtlSMcqg=;
-        b=joRUocovLyuQ2Vhh0HKfw0Nx6zwyQNqFgwiq4qvc54jPMtrH8rGCD/ZKXAzOVtOQK4
-         iaEUXmSotV7wZ8P9CDoKJLcBbrapfbkkaScBAWSF72UpxPiToUk2tVj3Me2ZifKttZh0
-         9eRyp2czdrqwBmuKBTFzAsFOD+/MN2ZngqhUMC4TugHPXqKMkBTT/FL6bC3/VszjeAdz
-         9GvP1px4Jf9S8FpoQrNaz/xSoQPpmZvcBRM5fNOv2tVqBxzhOlQWpQcXr0h61Tq8HGnk
-         0HOHB4mUSt7FTwsVfBNpDRLvJYaQPhWsBjVMkuA18WrEDyJM6Qgh181ykEOHSWoXO1BS
-         jNCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711026412; x=1711631212;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=6lQU1dHKYz0aWn2kYVD5L2i0npLLqY0Qe96LtlSMcqg=;
-        b=MzuDPr0o8LqnyNEmfpCeRCkq9h5rcyYeOwqhSa6AcY+UIGy/fv1fQ8wmK7d9dZMFUK
-         wVEylyyisYOR7/bxWXRpQLqHmPL1LQxfcU5ua9pla9KUI5yqyUtgXFvR7I7Fkwshgcat
-         9A2Nc20jccDCV9T+LEaSLzvBXnTd8RXR3E3zZ6NcF6n8FKIJTWI7Cx5Vem+bUD8SFrmK
-         BG4dGaI9WEbI27GcvPMK+FoMwT6BdvbSjeOSN8WG6Ocz/atUHoVnRS4O1u1JhYTW0Asr
-         yQBuqvNWDAaznqiszfDE85hkoCE6uqlx019K+Yxg2OJ8TNtxqSvrD2TbJj52VeO4zm2B
-         TSPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXHbzYzmv1wk0r7OI+TYGi58zlaavRw4GE1v0/R3QeTyNjfh30+DqZ80pWekFjY3HVSnYjvWm8T95wPzc5cGatzHwzhoborsoUWCRv4redvJtygCNYJWt9ORqF7E7emWBF0+0Rr
-X-Gm-Message-State: AOJu0Yzk2uboOwhxZhLOGWH9d1/bXVWn6MLtsrxuAeIsB+vRptP7TKtZ
-	iDTtGbCyzJHqb+RjtY9wNEXd3NiIa/gz8J9jmP9lyFhSQFehHpEo
-X-Google-Smtp-Source: AGHT+IE3DONaBayPhy5iD3ilQlhpUEBuHPdRJeoebi0FhDK3USPJAsaLs0eDXEGs1nV4vHOopk77FQ==
-X-Received: by 2002:a17:90b:b07:b0:29f:7672:7fee with SMTP id bf7-20020a17090b0b0700b0029f76727feemr2058506pjb.31.1711026401913;
-        Thu, 21 Mar 2024 06:06:41 -0700 (PDT)
-Received: from [192.168.1.3] (ip68-4-215-93.oc.oc.cox.net. [68.4.215.93])
-        by smtp.gmail.com with ESMTPSA id w22-20020a17090aaf9600b0029fbfb620cdsm3496931pjq.28.2024.03.21.06.06.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 21 Mar 2024 06:06:41 -0700 (PDT)
-Message-ID: <61624f55-2f1f-4cb3-8845-0dc3988a849d@gmail.com>
-Date: Thu, 21 Mar 2024 06:06:39 -0700
+	s=arc-20240116; t=1711026560; c=relaxed/simple;
+	bh=nvDy37NnImA8JV6W3BgDMDsvWpmT/Ree2g5/I0T58fY=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=tjyw9j7irLFSx93/Tf6EpmvJ1BqN7L5XuZv9TgCvRMXLQDkynxEiXnt3zV/3HZi4gbUAjmG8EwjTgmI91D/l8WnxTwGcKzxE8/0TyntlzUmWA1JYrYJBdSNHNp48v0v7K1UA8A/HxHwfTPRGOhXqqosjFecwSQLzkHKcRdBA2Ig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=terma.com; spf=pass smtp.mailfrom=terma.com; dkim=pass (2048-bit key) header.d=terma.com header.i=@terma.com header.b=fVzMyOFI; arc=none smtp.client-ip=192.162.217.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=terma.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=terma.com
+Received: from 1rnIAF-000CK3-W3 by out6b.electric.net with emc1-ok (Exim 4.96.1)
+	(envelope-from <chr@terma.com>)
+	id 1rnIAL-000Cjc-VL;
+	Thu, 21 Mar 2024 06:09:05 -0700
+Received: by emcmailer; Thu, 21 Mar 2024 06:09:05 -0700
+Received: from [193.163.1.101] (helo=EXCH07.terma.com)
+	by out6b.electric.net with esmtpsa  (TLS1.2) tls TLS_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96.1)
+	(envelope-from <chr@terma.com>)
+	id 1rnIAF-000CK3-W3;
+	Thu, 21 Mar 2024 06:08:59 -0700
+Received: from EXCH09.terma.com (10.12.2.69) by EXCH07.terma.com (10.12.2.67)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.34; Thu, 21 Mar
+ 2024 14:08:59 +0100
+Received: from EXCH09.terma.com ([fe80::d8f4:f3a1:6899:e2da]) by
+ EXCH09.terma.com ([fe80::d8f4:f3a1:6899:e2da%17]) with mapi id
+ 15.01.2507.034; Thu, 21 Mar 2024 14:08:59 +0100
+From: Claus Hansen Ries <chr@terma.com>
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "michal.simek@amd.com"
+	<michal.simek@amd.com>, "wei.fang@nxp.com" <wei.fang@nxp.com>,
+	"yangyingliang@huawei.com" <yangyingliang@huawei.com>, "robh@kernel.org"
+	<robh@kernel.org>, "harini.katakam@amd.com" <harini.katakam@amd.com>,
+	"dan.carpenter@linaro.org" <dan.carpenter@linaro.org>,
+	"u.kleine-koenig@pengutronix.de" <u.kleine-koenig@pengutronix.de>,
+	"wanghai38@huawei.com" <wanghai38@huawei.com>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, Simon Horman <horms@kernel.org>
+Subject: [PATCH net v3] net: ll_temac: platform_get_resource replaced by wrong
+ function
+Thread-Topic: [PATCH net v3] net: ll_temac: platform_get_resource replaced by
+ wrong function
+Thread-Index: AQHae5DvcBQGjutR3k6qenCAG00K5Q==
+Date: Thu, 21 Mar 2024 13:08:59 +0000
+Message-ID: <cca18f9c630a41c18487729770b492bb@terma.com>
+References: <f512ff25a2cd484791757c18facb526c@terma.com>
+In-Reply-To: <f512ff25a2cd484791757c18facb526c@terma.com>
+Accept-Language: en-150, en-GB, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v4] net: txgbe: fix i2c dev name cannot match clkdev
-To: Duanqiang Wen <duanqiangwen@net-swift.com>, netdev@vger.kernel.org,
- jiawenwu@trustnetic.com, mengyuanlou@net-swift.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- maciej.fijalkowski@intel.com, andrew@lunn.ch, wangxiongfeng2@huawei.com,
- linux-kernel@vger.kernel.org
-References: <20240321054742.446481-1-duanqiangwen@net-swift.com>
-Content-Language: en-US
-From: Florian Fainelli <f.fainelli@gmail.com>
-Autocrypt: addr=f.fainelli@gmail.com; keydata=
- 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
- HGuUuzv+GKZ6nsysJw==
-In-Reply-To: <20240321054742.446481-1-duanqiangwen@net-swift.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Authenticated: smtp.out@terma.com
+X-Outbound-IP: 193.163.1.101
+X-Env-From: chr@terma.com
+X-Proto: esmtpsa
+X-Revdns: r2d2.lystrup.terma.com
+X-HELO: EXCH07.terma.com
+X-TLS: TLS1.2:AES256-GCM-SHA384:256
+X-Authenticated_ID: smtp.out@terma.com
+X-VIPRE-Scanners:virus_clamav;virus_bd;
+X-PolicySMART: 6001202, 19049467
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=terma.com; s=mailanyone20180424;h=MIME-Version:In-Reply-To:References:Message-ID:Date:To:From; bh=IDfZnO7QGbsU29t2V7zzkrAVifHGRoHP+pRJ13Ln7PY=;b=fVzMyOFI8+XHvlRrj+xR0VnXD4btKfoLyjx5VIpYGOxLTZCwK8LWKXKOvt97iSiT0JSSc0Oymy8VJMXSdKD99mB5N0Cg/0yN2XVSgb8UFVHLJUBEkv7i71eTJ6TFOsOYZSTmbaZvA1Z9IPirWs/nQsF2Qfosrjk4BTGq9Jq3Rotv28+AFzMU8pASm5d4xwqVkX5N2ntWiHiRI7J139GRuVIaz3bp/uCsvj6N0UqQ/qnNpas4raxzCz9m9s7vqa/N9D5gKlhiRz6KCRf7Qp3F3y59GcNRfs/bjG0Q/Mws4xgc+sy1s9PHnWE0e3OEz3s8dE/iM8pQ4cZnjoEfjuxNNQ==;
+X-PolicySMART: 6001202, 19049467
+X-PolicySMART: 6001202, 19049467
+X-PolicySMART: 6001202, 19049467
+X-PolicySMART: 6001202, 19049467
+X-PolicySMART: 6001202, 19049467
+X-PolicySMART: 6001202, 19049467
+X-PolicySMART: 6001202, 19049467
+X-PolicySMART: 6001202, 19049467
+X-PolicySMART: 6001202, 19049467
+X-PolicySMART: 6001202, 19049467
+X-PolicySMART: 6001202, 19049467
+X-PolicySMART: 6001202, 19049467
+X-PolicySMART: 6001202, 19049467
+X-PolicySMART: 6001202, 19049467
+X-PolicySMART: 6001202, 19049467
+
+The function platform_get_resource was replaced with=20
+devm_platform_ioremap_resource_byname and is called using 0 as name.=20
+
+This eventually ends up in platform_get_resource_byname in the call=20
+stack, where it causes a null pointer in strcmp.
+
+	if (type =3D=3D resource_type(r) && !strcmp(r->name, name))
+
+It should have been replaced with devm_platform_ioremap_resource.
+
+Fixes: bd69058f50d5 ("net: ll_temac: Use devm_platform_ioremap_resource_byn=
+ame()")
+Signed-off-by: Claus Hansen Ries <chr@terma.com>
+Cc: stable@vger.kernel.org
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+v3:
+  - Cleanup of patch message
+v2: https://marc.info/?l=3Dlinux-netdev&m=3D171094427802626&w=3D2
+  - fix accidently converting tabs to spaces and wording in commit message
+v1: https://marc.info/?l=3Dlinux-netdev&m=3D171087828129633&w=3D2
+
+ drivers/net/ethernet/xilinx/ll_temac_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/xilinx/ll_temac_main.c b/drivers/net/ethe=
+rnet/xilinx/ll_temac_main.c
+index 9df39cf8b097..1072e2210aed 100644
+--- a/drivers/net/ethernet/xilinx/ll_temac_main.c
++++ b/drivers/net/ethernet/xilinx/ll_temac_main.c
+@@ -1443,7 +1443,7 @@ static int temac_probe(struct platform_device *pdev)
+ 	}
+=20
+ 	/* map device registers */
+-	lp->regs =3D devm_platform_ioremap_resource_byname(pdev, 0);
++	lp->regs =3D devm_platform_ioremap_resource(pdev, 0);
+ 	if (IS_ERR(lp->regs)) {
+ 		dev_err(&pdev->dev, "could not map TEMAC registers\n");
+ 		return -ENOMEM;
+
+base-commit: d95fcdf4961d27a3d17e5c7728367197adc89b8d
+--=20
+2.39.3 (Apple Git-146)
 
 
 
-On 3/20/2024 10:47 PM, Duanqiang Wen wrote:
-> txgbe clkdev shortened clk_name, so i2c_dev info_name
-> also need to shorten. Otherwise, i2c_dev cannot initialize
-> clock. And had "i2c_dw" string in a define.
-> 
-> Fixes: e30cef001da2 ("net: txgbe: fix clk_name exceed MAX_DEV_ID limits")
-> Signed-off-by: Duanqiang Wen <duanqiangwen@net-swift.com>
-
-When Jiri suggested to use a define, I did not read it as meaning a 
-define local within the driver, but rather a define that would span 
-beyond you driver that would match what is expected to be used by 
-drivers/i2c/busses/i2c-designware-pcidrv.c.
-
-As a matter of fact, there are quite a few drivers that expect to use 
-this driver name:
-
-git grep i2c_designware *
-drivers/i2c/busses/i2c-designware-pcidrv.c:MODULE_ALIAS("i2c_designware-pci");
-drivers/i2c/busses/i2c-designware-platdrv.c:MODULE_ALIAS("platform:i2c_designware");
-drivers/i2c/busses/i2c-designware-platdrv.c:            .name   = 
-"i2c_designware",
-drivers/mfd/intel-lpss.c:       .name = "i2c_designware",
-drivers/mfd/intel_quark_i2c_gpio.c:#define 
-INTEL_QUARK_I2C_CONTROLLER_CLK "i2c_designware.0"
-drivers/mfd/intel_quark_i2c_gpio.c:             .name = "i2c_designware",
-drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c: snprintf(clk_name, 
-sizeof(clk_name), "i2c_designware.%d",
-drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c: info.name = 
-"i2c_designware";
-
-so they should all be covered by using a define under 
-include/linux/i2c-designware.h.
-
---
-Florian
 
