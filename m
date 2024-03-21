@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-81028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 863B88858A9
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:58:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E54A28858B1
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:01:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE0D7B21938
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:58:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 232111C218DB
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:01:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F26895B5A6;
-	Thu, 21 Mar 2024 11:58:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 801DD757F2;
+	Thu, 21 Mar 2024 12:01:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MuZnIPiU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FE5wj60C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f53.google.com (mail-lf1-f53.google.com [209.85.167.53])
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7B958129;
-	Thu, 21 Mar 2024 11:58:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C73F4757EA;
+	Thu, 21 Mar 2024 12:01:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711022315; cv=none; b=HHEpbuQXUBha7l+iZQgXRkdAou2ukqc6RSxKKO+cWWJZPf2v4qgJhPDL6VlK8Ew+D7/znPL7b5c+aWWeDuLN5e0LWXkKO+MMf6sXRnRMp8psJHF6+n1oWmGjHUgNpIJM9hqF/Vkh4NmIG9/3ur1A/grR3SRpZAY/y6Xf1KHsJ0M=
+	t=1711022467; cv=none; b=Osfx1CXEa0QCfHO9mBdldra9c3fe7pGRVmxStTHflY750RancN9JLHG9kpF0BvNYGlcnD2W9trnfOshwXMUoDZQhqAWeb8qdcu0D8DRBdHVzNXvWLdXUqbU57pDA2rte1jGZNjo1tKGPn83vd72ZZHeHFIl6bFc4oD433Lqg408=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711022315; c=relaxed/simple;
-	bh=fkUBrpoYx1ATKFVJL/j0P62CoCtirla+CHXyhjvnFhk=;
+	s=arc-20240116; t=1711022467; c=relaxed/simple;
+	bh=jEAcj7FA1xpGcOnT8Yj8QRxI7X6OlOrv2Im+lb/0udY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N0Bwk/VVhIEq7bryKF0yhOpya5ZPrePTiVQr4v+y42bctZBSdUaycuCQrA6tKjZYz3vCboiUtzWrarqE0eIDGeCHLYGA0VDTll+adE8omcWOMqFUVWQMKT59JBCmdp56APP7doV+/6WAISTtibXD5UHvKFelB2i1maigN93yerI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MuZnIPiU; arc=none smtp.client-ip=209.85.167.53
+	 To:Cc:Content-Type; b=ZzdWrq98ieJdJYhW4UXr/odM9cEkwAUx3w3JdI8/ioLW4O8DL5eQUQPcjiRiC6bv3zn25LbXclubPEkRzP0VGa96TQiy28o23/1x/icBYpG/DdGgu5NycrKiEIkMpgRrmNm5dhIWdi3ZIkHd1c4YzXA/+n5XPqqposaA1AqT0iY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FE5wj60C; arc=none smtp.client-ip=209.85.208.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f53.google.com with SMTP id 2adb3069b0e04-51381021af1so1387670e87.0;
-        Thu, 21 Mar 2024 04:58:34 -0700 (PDT)
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-56ba6c83805so1057774a12.0;
+        Thu, 21 Mar 2024 05:01:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711022312; x=1711627112; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711022464; x=1711627264; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lg7XPh+CmMjSrvskyjTz4DOgGAvevT98Cl2JzAVnwSg=;
-        b=MuZnIPiUXx7m1T9ydJQDsRmg5e9WvCz3xwvbkezqCrj/jjGvNmj5SRG8GpfC3ybuji
-         bxEQgIdDmtJbh9ymvFnRo8Tjx5e7S1cK9OcM/TU5oNYZA+G9E1/ljdzLUAiAWlYDgsgW
-         nZR8zhTtLFK1w+iZmF5vFrmPgLB20NRJb1w+n/AnQwSNG2IWaNlUQP33yIIiNDzfFvph
-         IzR3Ewi2/VXA+lW5/WBhkFKBfbsv4yyiyMbW2tIyVAkeY+4uCRMAZl4XY8+rVJC5mwIv
-         cEmCR93vQ7gZyo9AjEA33ebW5q6i0msu06kQzpJ3kGh8ubkE4vlOmzETsqAVtjrL9xLQ
-         sNDw==
+        bh=5jo2tFjPMb91hTmox9RMKszVECbzxnaqz/EYbUtdrg0=;
+        b=FE5wj60Cw3e+U69mMK7vCdzu7vrXoERsOnVJLRyQ+rDm0I8Q9d50Cu4IhwivzTIdDv
+         UjWCwMsSVvlhnFO2E/BhR/jOXuSJd9vcsCAORch5wdc0LJ71akG5fiIAA+HEWb7buce4
+         A57x+V10EHjJk8VKyJjUR3XZfjLsY4UVz0otJYu0339Q3Mq7LyEpbkuToZ5Oi6+KVSjD
+         8M/iSwV/V2GpWr7QrgXr4CUdc96rckCXpvGjI5e39dcETZ6+16VHCmO8ZSS2oX1z3r6Y
+         3OSB3wS9/9z1u2wjYyrlRCdVZV8NF/s8BlxILQkWbAnwffeF5LIaCg2wwRzjCWseKOZk
+         gSow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711022312; x=1711627112;
+        d=1e100.net; s=20230601; t=1711022464; x=1711627264;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=Lg7XPh+CmMjSrvskyjTz4DOgGAvevT98Cl2JzAVnwSg=;
-        b=P5HIY8ngqs+kO5ELy0d2ARqPOm4nQKNXoQjNegbfp1/iIDwDz1pOw5ROxt95xw8KoN
-         4W/+b85RQ66r9vRjdKd18Mb4yiRR0Efru2SB8qY1TdW/Hr2y00iA9YuxJPwn6aMEOnwW
-         ng8kgtUkixxFm4kVRYQw1N5temDlZT0c22Mzu2hLhPi6bQnU4Rh+40Q1QutFLuehcIQI
-         kxnDN8UhfYXBdHcLF6jF9HtrCdDF+nuOLFtA95cgDXrcJe5Cb0bxeNOjiQ86ssCUM9uB
-         dZOIgiiVUMpHTt8sepOLDAD1fmZlGdgzfipqBjBkZbfVrBUE6THMFBWjqpqHgzk+xBCm
-         vQJg==
-X-Forwarded-Encrypted: i=1; AJvYcCVm+LBN04zJXqupWtOKrYYbqUwmcAF9/+a2RLLutA8VsYWL991LUxy5XGQqOXOm6+3lZ+cG0jHU5acH3fGQsSB0Sxw+l8YRpmRvuLdE4Ea63NGYeuP00sk8UJw+cqbrgOvdcEUV5OVWT6dOEiej6JoOaqO6FFoMOkDtEeDkme8J2w==
-X-Gm-Message-State: AOJu0YxATGbzGRcZ967Rzva0j8ENj5mpV6w6ojgszfM/biWTfpyqEmAk
-	Ckxdq4nXfOcXQr52YTcfJUQE3HKGnxoiUF6bx3cYf+p2CkmQ8cxY/z/TeFHhxPDaSpC098zkygK
-	KN11vSUfDP06lIG6HlWpITfU6WxI=
-X-Google-Smtp-Source: AGHT+IFmvFGsX+AsNhUeRNMeg16urp0jTvglZhVWZEy18X/aYK1Pz52OqOcqdqZPvrcm6AZoMyhROkso76tXKFsr9Fk=
-X-Received: by 2002:a19:a416:0:b0:513:80b3:3eef with SMTP id
- q22-20020a19a416000000b0051380b33eefmr1680700lfc.24.1711022312248; Thu, 21
- Mar 2024 04:58:32 -0700 (PDT)
+        bh=5jo2tFjPMb91hTmox9RMKszVECbzxnaqz/EYbUtdrg0=;
+        b=GpAfzX7XiUevqQrL4U6X/n2uvhGEOXGIzEY/cLJc+Ex9M2O0943qEPSHtUyiV/5MDD
+         mLBrXUnFGIU1zWc9NleU8dShuf03xEEk3y1oy6Fk+c/esEwiTJhT43J1ozQ/G+oQsf+G
+         JKyBVR45504TjH39ibSF8HpHJZGY2vAgmVffxIF5cIuQPn4fr8DChmWcW9YUvevgTVWg
+         zpoAsp80PrfsCYsBuR8bFvwI6ABSYjV6J2gYFnhWrK01xSOAXR5jtEkq+6PmuqHxG9b4
+         JajCXc4W57LytyAXk3sX71oHoOe/gWPi0pHHDb11XS9gfERR8tvQnqRZCQlcOBwTwvnr
+         o8mA==
+X-Forwarded-Encrypted: i=1; AJvYcCXtVEHNbeqi26XW1jPqbArsTrqlcUkrResJUmwIDDFFtaOHy0C6pfS7/btlaOH6Hz1EcPBnSh953x2sBW5a3KS3WZERwiY+YEIblPHvC78ER7KHQv63AYEvk8RA/0mgk57qQPMRNRhv01GIfGRuinGlF3680s3GHZeUOFnSCeDZ3Q==
+X-Gm-Message-State: AOJu0YwczKeFrh91/gQDyO3Lh+X6XjznVOwht3bLemlHDJ6ohwdMLSsi
+	LCOFZrfPFP6udmpvn80LvbcpgTRPGoGvCAzCgL2kj+urKVCKbrkUgDYsJfCuLdiCuYu4IsIynSE
+	fNFBD6zyq/1saffzy1SnF7zM5m2E=
+X-Google-Smtp-Source: AGHT+IEU3tE0383g6xgf9YKDZI5ZO8Hcpp1K70IDdZx5e0isf2fdROf2HUy22Wmea9BNbWw344w2RE7OC+PV0BGI8wA=
+X-Received: by 2002:aa7:d591:0:b0:56b:8439:6d91 with SMTP id
+ r17-20020aa7d591000000b0056b84396d91mr4802172edq.40.1711022463791; Thu, 21
+ Mar 2024 05:01:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,38 +71,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com>
- <20240310-realtek-led-v1-1-4d9813ce938e@gmail.com> <80fee2d0-356b-4baf-bd7a-b338df3644fa@lunn.ch>
-In-Reply-To: <80fee2d0-356b-4baf-bd7a-b338df3644fa@lunn.ch>
+ <20240310-realtek-led-v1-1-4d9813ce938e@gmail.com> <171011208646.4168843.11425236211455218194.robh@kernel.org>
+In-Reply-To: <171011208646.4168843.11425236211455218194.robh@kernel.org>
 From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Thu, 21 Mar 2024 08:58:20 -0300
-Message-ID: <CAJq09z5puvUCkvR+zJx5Jd3EAELQ56PtctspZwzuSBnMPZCASg@mail.gmail.com>
+Date: Thu, 21 Mar 2024 09:00:51 -0300
+Message-ID: <CAJq09z76RXiQ4bii5XhA4DA7EShT9JrkGHFRBLAXBAad_=jBPA@mail.gmail.com>
 Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dsa: realtek: describe LED usage
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Linus Walleij <linus.walleij@linaro.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org
+To: Rob Herring <robh@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, Vladimir Oltean <olteanv@gmail.com>, Andrew Lunn <andrew@lunn.ch>, 
+	Linus Walleij <linus.walleij@linaro.org>, Florian Fainelli <f.fainelli@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, devicetree@vger.kernel.org, 
+	=?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Andrew,
+Hi Rob,
 
+> On Sun, 10 Mar 2024 01:51:58 -0300, Luiz Angelo Daros de Luca wrote:
+> > Each port can have up to 4 LEDs (3 for current rtl8365mb devices). The
+> > LED reg property will indicate its LED group.
+> >
+> > An example of LED usage was included in an existing switch example.
+> >
+> > Cc: devicetree@vger.kernel.org
+> > Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+> > ---
+> >  .../devicetree/bindings/net/dsa/realtek.yaml       | 46 ++++++++++++++++++++++
+> >  1 file changed, 46 insertions(+)
+> >
 >
-> > +                properties:
-> > +                  reg:
-> > +                    description:
-> > +                      "reg indicates the LED group for this LED"
-> > +                    enum: [0, 1, 2, 3]
+> My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+> on your patch (DT_CHECKER_FLAGS is new in v5.13):
 >
-> Having read the code, i don't think the binding needs to say anything
-> about the group. It is implicit. Port LED 0 is in group 0. Port LED 1
-> is in group 1. So there is nothing here which is outside of the
-> standard LED binding. So as Linus said, i don't think you need any
-> YAML at all, the DSA port binding should be sufficient.
+> yamllint warnings/errors:
+> ./Documentation/devicetree/bindings/net/dsa/realtek.yaml:121:15: [error] string value is redundantly quoted with any quotes (quoted-strings)
+> ./Documentation/devicetree/bindings/net/dsa/realtek.yaml:131:23: [error] string value is redundantly quoted with any quotes (quoted-strings)
 
-The only purpose for this patch is to limit led numbers to 0-3 and
-describe that the reg number is the group. If that is not important,
-I'll just drop it.
+Thanks for the tip. I just noticed my yamllint got uninstalled,
+probably related to a python upgrade, and I missed the warning.
+
+warning: python package 'yamllint' not installed, skipping
+
+Sorry for the fuss.
 
 Regards,
 
