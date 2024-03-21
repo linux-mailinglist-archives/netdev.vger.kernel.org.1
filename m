@@ -1,405 +1,120 @@
-Return-Path: <netdev+bounces-80924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91878881B45
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 03:45:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 485E8881B60
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 04:03:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91CC31C2155D
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 02:45:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F9FE1C20CE3
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 03:03:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5393524F;
-	Thu, 21 Mar 2024 02:45:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7D26FB2;
+	Thu, 21 Mar 2024 03:03:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g6Q6UHtS"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="QVwWePKB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A31BE17FD;
-	Thu, 21 Mar 2024 02:45:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.220])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB8DF6D39
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 03:02:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710989141; cv=none; b=FYFIpJ3T8l6HnGueq1K4FpGkp+j6Hq3QopLcAo8Uae4hFuJPM21QVRzoudlHWEJpHWJPC2XHyF5cvMKVNvxjecHp4EyQVFLAE7eytenFpEDQX4EsY8ZR8NErN6SZXohwxS+jvQHy7Yw0sc+576HBl0tJfnwrMHRRpFKU5YdkDdg=
+	t=1710990181; cv=none; b=mgDjPa/aHLol5rVWGELZEL7b4lFHsieN3qMufzISjtD7Wba3Sssar07X67CJSlKmN25cIKgIRIHhGERezXzWfaUhQDyfrvefVx/KLmFi7CNMPM05PSB/jBth+TObDKdjgexx343VFz1Oi/cUL9CJQvk8hnTpgLA8WrcE+WetYRo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710989141; c=relaxed/simple;
-	bh=N/5e6Wo2NvNUp6BkAhcewLwS9AaNyGsynBAZFyDdAvk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PkZ5CvlAL+t2Et+vggLOLc65cjKyON511zxKKnfV3Nu7GpAJo1eLsqpH2ToT89dr/X6Ut2B+RpnVzCtFjUVx2t6NjXcDyKiic/QeoPfVg6msAXDblBtjdEE9zJ2ZxkI33OnFwtxBk6mo/sMUVoGAzZKPNZRBHYPnJBheV/3pg4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g6Q6UHtS; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-513dc99b709so669389e87.1;
-        Wed, 20 Mar 2024 19:45:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1710989138; x=1711593938; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/N1nqPevCl9m3t5cemtmMWTvFAKvP6o30UTDsDnLhYY=;
-        b=g6Q6UHtSyaPxOe7YD/QcVL7xzOmssXWaGNWtNLL3aCm9t/uPzcwsTVTja2xEdwpK69
-         hgtKWmzJZZFI8slESoiU54UlVzapHEURNNrf1XdYgNsWGURbvGKcgDh0n4tsY6egeTnN
-         ovcXT9unlo0NRbqoWR9Ycd5eMkZcUkFCme/ys40WpC0WMI5wEGyD9sl2a7x1FJmWTk/l
-         vhxiUC8vnOc5fEZg9h7H3i+yV5GON9a2kAX19G5IV8gFvZjyghhCv1xNDY3W9Wi4lugU
-         3nCIZb+32WJ8+WkAsE8rEZ8zIfPCkIYclrSObcU8FVWStSQYu36Gycac8cHm+VusoiNl
-         snZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710989138; x=1711593938;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/N1nqPevCl9m3t5cemtmMWTvFAKvP6o30UTDsDnLhYY=;
-        b=POv+4iSoq8qQqBAy/wyBT+tDOi7STW8lIEXqfsnNolZ7Sd33n1Kmv2iamHNUB6gZ4X
-         Or1nCVaE16Sd2wf0YXiyBzX6zaC93mIt+D4pDMzM7cvBmNcc7LdtVdp2CiZ9gK6iWEZE
-         vkwsPj05cGWOH9tw+TZGuak9E24rnhwPOSy3ocBRMilDolkuqejxHqY5Auw73D5OMk2U
-         z5qWcBqhtI73YvUp09oHTzjE+AbX28buw4ONMRWYenS+NWKDvgX8UBhlnL/ixTFOOj2x
-         xyhS7+v6iqW1/tu/Gjw9pCY0wlUZJbIB2GaCJXxvw7Dy3GWNH0b8YyKcjx0oFPjCcsNZ
-         SQTA==
-X-Forwarded-Encrypted: i=1; AJvYcCXFlgPOXsviLzS20dfVnCNJbvQgpWW90icNVA+qVe/x28Evw7EfF7OuUaifu7soWPvzYXsZKNszTAlCGKWYyzCo4BegJJxVWbqXi4OR1bmOQOcNEVC+/GZ05uf+9zhO7Y4oGwXfl0HWQpGU0HBHBvnvCYi+XELsFdOTAPYXYFg3F1bPKnhN/Ke+
-X-Gm-Message-State: AOJu0YxQSB/PPK3t8XA3n6JSmFE37niJlvtORu/c5+KdGmFqZ9ZnhLAS
-	l1EmqA3tPBEVv9sVHA93GWsnejK+XyW86IKqM7D2cTnPkW3PT4LMTG2/QO2F6/6YBZLyqm0Ckzj
-	j54+CcSrsxmBVbo+CnPKlNgxXNXn1ZKft
-X-Google-Smtp-Source: AGHT+IF8BG8VC7B4QycQ5j6G55em6ar8SVHTiw4TNt5ZOoYm+HDKyXzhZWC8seECEPIrTyK8pB1UsUhXbqTXGhfzV2g=
-X-Received: by 2002:a05:6512:ba3:b0:513:4705:a4f3 with SMTP id
- b35-20020a0565120ba300b005134705a4f3mr6870348lfv.65.1710989137570; Wed, 20
- Mar 2024 19:45:37 -0700 (PDT)
+	s=arc-20240116; t=1710990181; c=relaxed/simple;
+	bh=CqIEiuVYe2BRVibqyYvIatl1+Wb+7tHRc8z7RdY2GqY=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=JxTo2L3uY2qWRkpVNo4xknuZinyCKiasqBcxKRNfEY4ZhhQKgVyOAX2WpSoXRUTRufZcFlVfCYtD/fKMpv4maRROCmp8v4pjc/SMhYdMwYK7jA93EDswEK3UwpKVhlUf9Jp8f13e80K/5rMsCUeyzAWcLOHfaKI+l1k8kVbRGtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=QVwWePKB; arc=none smtp.client-ip=45.254.50.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Message-ID:Date:MIME-Version:From:Subject:
+	Content-Type; bh=7fG3Oq5+uPbIt7iydqFSQ6UpWBpcnEwstevVPkWEQd0=;
+	b=QVwWePKBWZktc+wIeSaMfx40HxO/yUIzWDCChVbACMouJ19SYh0YtfAS8lUhGa
+	JYbl/tDujXHO0gqO1XjiHfKG3hEIibxs1t2WKUGAXLzS4jlsk+G5Wd6Cyof+uYMe
+	10E/m4YBRZHI5U0eHEfWCrFjEtbjmZdBvGKX+jTIo7UuQ=
+Received: from [172.22.5.12] (unknown [27.148.194.72])
+	by gzga-smtp-mta-g0-1 (Coremail) with SMTP id _____wD338NMo_tlVPPZBA--.60211S2;
+	Thu, 21 Mar 2024 11:02:36 +0800 (CST)
+Message-ID: <23b5678b-1e5a-be6c-ea68-b7a20dff4bbc@163.com>
+Date: Thu, 21 Mar 2024 11:02:36 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <202403211010443485000@zte.com.cn>
-In-Reply-To: <202403211010443485000@zte.com.cn>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 21 Mar 2024 10:45:00 +0800
-Message-ID: <CAL+tcoAdZOKnHTbRnmrjtrhJynGfDy4xXvus1hh_UTbh5eSMTA@mail.gmail.com>
-Subject: Re:  [PATCH v3] net/ipv4: add tracepoint for icmp_send
-To: xu.xin16@zte.com.cn
-Cc: edumazet@google.com, davem@davemloft.net, rostedt@goodmis.org, 
-	mhiramat@kernel.org, dsahern@kernel.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, yang.yang29@zte.com.cn, he.peilin@zte.com.cn, 
-	liu.chun2@zte.com.cn, jiang.xuexin@zte.com.cn, zhang.yunkai@zte.com.cn
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.15.1
+To: netdev <netdev@vger.kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, davem@davemloft.net, kuniyu@amazon.com
+From: Jianguo Wu <wujianguo106@163.com>
+Subject: [PATCH] tcp: Fix inet_bind2_bucket_match_addr_any() regression
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:_____wD338NMo_tlVPPZBA--.60211S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7Kr45WryxuF4UGF1xWry3Jwb_yoW8Zr43pw
+	1UKr4akry5KF1rJrnYyF9Ykw1akr4UAFnrCry3tFyFkFyDXrZIvF40kw1ak3Z2qayvqan5
+	KF4rZa4j9a93Ca7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UTUDAUUUUU=
+X-CM-SenderInfo: 5zxmxt5qjx0iiqw6il2tof0z/1tbiJxyokGXAk+UuIAABsf
 
-On Thu, Mar 21, 2024 at 10:12=E2=80=AFAM <xu.xin16@zte.com.cn> wrote:
->
-> From: he peilin <he.peilin@zte.com.cn>
->
->
-> Introduce a tracepoint for icmp_send, which can help users to get more
->
-> detail information conveniently when icmp abnormal events happen.
->
->
-> 1. Giving an usecase example:
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
->
-> When an application experiences packet loss due to an unreachable UDP
->
-> destination port, the kernel will send an exception message through the
->
-> icmp_send function. By adding a trace point for icmp_send, developers or
->
-> system administrators can obtain detailed information about the UDP
->
-> packet loss, including the type, code, source address, destination addres=
-s,
->
-> source port, and destination port. This facilitates the trouble-shooting
->
-> of UDP packet loss issues especially for those network-service
->
-> applications.
->
->
-> 2. Operation Instructions:
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
->
-> Switch to the tracing directory.
->
->         cd /sys/kernel/tracing
->
-> Filter for destination port unreachable.
->
->         echo "type=3D=3D3 && code=3D=3D3" > events/icmp/icmp_send/filter
->
-> Enable trace event.
->
->         echo 1 > events/icmp/icmp_send/enable
->
->
-> 3. Result View:
->
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
->  udp_client_erro-11370   [002] ...s.12   124.728002:
->
->  icmp_send: icmp_send: type=3D3, code=3D3.
->
->  From 127.0.0.1:41895 to 127.0.0.1:6666 ulen=3D23
->
->  skbaddr=3D00000000589b167a
->
->
-> Changelog
->
-> ---------
->
-> v2->v3:
->
-> Some fixes according to
->
-> https://lore.kernel.org/all/20240319102549.7f7f6f53@gandalf.local.home/
->
-> 1. Change the tracking directory to/sys/kernel/tracking.
->
-> 2. Adjust the layout of the TP-STRUCT_entry parameter structure.
->
->
-> v1->v2:
->
-> Some fixes according to
->
-> https://lore.kernel.org/all/CANn89iL-y9e_VFpdw=3DsZtRnKRu_tnUwqHuFQTJvJsv=
--nz1xPDw@mail.gmail.com/
->
-> 1. adjust the trace_icmp_send() to more protocols than UDP.
->
-> 2. move the calling of trace_icmp_send after sanity checks
->
-> in __icmp_send().
->
->
-> Signed-off-by: Peilin He<he.peilin@zte.com.cn>
->
-> Reviewed-by: xu xin <xu.xin16@zte.com.cn>
->
-> Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
->
-> Cc: Yang Yang <yang.yang29@zte.com.cn>
->
-> Cc: Liu Chun <liu.chun2@zte.com.cn>
->
-> Cc: Xuexin Jiang <jiang.xuexin@zte.com.cn>
+From: Jianguo Wu <wujianguo@chinatelecom.cn>
 
-The format of the whole patch looks strange... Did you send this patch
-by using 'git send-email' instead of pasting the text and sending?
+If we bind() a TCPv4 socket to 0.0.0.0:8090, then bind() a TCPv6(ipv6only) socket
+to :::8090, both without SO_REUSEPORT, then bind() 127.0.0.1:8090, it should fail
+but now succeeds. like this:
+  tcp        0      0 127.0.0.1:8090          0.0.0.0:*               LISTEN
+  tcp        0      0 0.0.0.0:8090            0.0.0.0:*               LISTEN
+  tcp6       0      0 :::8090                 :::*                    LISTEN
 
->
-> ---
->
->  include/trace/events/icmp.h | 64 +++++++++++++++++++++++++++++++++++++
->
->  net/ipv4/icmp.c             |  4 +++
->
->  2 files changed, 68 insertions(+)
->
->  create mode 100644 include/trace/events/icmp.h
->
->
-> diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
->
-> new file mode 100644
->
-> index 000000000000..2098d4b1b12e
->
-> --- /dev/null
->
-> +++ b/include/trace/events/icmp.h
->
-> @@ -0,0 +1,64 @@
->
-> +/* SPDX-License-Identifier: GPL-2.0 */
->
-> +#undef TRACE_SYSTEM
->
-> +#define TRACE_SYSTEM icmp
->
-> +
->
-> +#if !defined(_TRACE_ICMP_H) || defined(TRACE_HEADER_MULTI_READ)
->
-> +#define _TRACE_ICMP_H
->
-> +
->
-> +#include <linux/icmp.h>
->
-> +#include <linux/tracepoint.h>
->
-> +
->
-> +TRACE_EVENT(icmp_send,
->
-> +
->
-> + TP_PROTO(const struct sk_buff *skb, int type, int code),
->
-> +
->
-> + TP_ARGS(skb, type, code),
->
-> +
->
-> + TP_STRUCT__entry(
->
-> + __field(const void *, skbaddr)
->
-> + __field(int, type)
->
-> + __field(int, code)
->
-> + __array(__u8, saddr, 4)
->
-> + __array(__u8, daddr, 4)
->
-> + __field(__u16, sport)
->
-> + __field(__u16, dport)
->
-> + __field(unsigned short, ulen)
->
-> + ),
->
-> +
->
-> + TP_fast_assign(
->
-> + struct iphdr *iph =3D ip_hdr(skb);
->
-> + int proto_4 =3D iph->protocol;
->
-> + __be32 *p32;
->
-> +
->
-> + __entry->skbaddr =3D skb;
->
-> + __entry->type =3D type;
->
-> + __entry->code =3D code;
->
-> +
->
-> + if (proto_4 =3D=3D IPPROTO_UDP) {
->
-> + struct udphdr *uh =3D udp_hdr(skb);
->
-> + __entry->sport =3D ntohs(uh->source);
->
-> + __entry->dport =3D ntohs(uh->dest);
->
-> + __entry->ulen =3D ntohs(uh->len);
->
-> + } else {
->
-> + __entry->sport =3D 0;
->
-> + __entry->dport =3D 0;
->
-> + __entry->ulen =3D 0;
->
-> + }
->
-> +
->
-> + p32 =3D (__be32 *) __entry->saddr;
->
-> + *p32 =3D iph->saddr;
->
-> +
->
-> + p32 =3D (__be32 *) __entry->daddr;
->
-> + *p32 =3D iph->daddr;
->
-> + ),
->
-> +
->
-> + TP_printk("icmp_send: type=3D%d, code=3D%d. From %pI4:%u to %pI4:%u ule=
-n=3D%d skbaddr=3D%p",
->
-> + __entry->type, __entry->code,
->
-> + __entry->saddr, __entry->sport, __entry->daddr,
->
-> + __entry->dport, __entry->ulen, __entry->skbaddr)
->
-> +);
->
-> +
->
-> +#endif /* _TRACE_ICMP_H */
->
-> +
->
-> +/* This part must be outside protection */
->
-> +#include <trace/define_trace.h>
->
-> \ No newline at end of file
->
-> diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
->
-> index e63a3bf99617..21fb41257fe9 100644
->
-> --- a/net/ipv4/icmp.c
->
-> +++ b/net/ipv4/icmp.c
->
-> @@ -92,6 +92,8 @@
->
->  #include <net/inet_common.h>
->
->  #include <net/ip_fib.h>
->
->  #include <net/l3mdev.h>
->
-> +#define CREATE_TRACE_POINTS
->
-> +#include <trace/events/icmp.h>
->
->
->
->  /*
->
->   * Build xmit assembly blocks
->
-> @@ -672,6 +674,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, in=
-t code, __be32 info,
->
->   }
->
->   }
->
->
->
-> + trace_icmp_send(skb_in, type, code);
->
-> +
->
->   /* Needed by both icmp_global_allow and icmp_xmit_lock */
->
->   local_bh_disable();
->
->
->
-> --
->
-> 2.44.0
->
->
->
->
->
+bind() 0.0.0.0:8090, :::8090 and ::1:8090 are all fail.
+
+But if we bind() a TCPv6(ipv6only) socket to :::8090 first, then  bind() a TCPv4
+socket to 0.0.0.0:8090, then bind() 127.0.0.1:8090, 0.0.0.0:8090, :::8090 and ::1:8090 are all fail.
+
+When bind() 127.0.0.1:8090, inet_bind2_bucket_match_addr_any() will return true as tb->addr_type == IPV6_ADDR_ANY,
+and tb is refer to the TCPv6 socket(:::8090), then inet_bhash2_conflict() return false, That is, there is no conflict,
+so bind() succeeds.
+
+  inet_bhash2_addr_any_conflict()
+  {
+	inet_bind_bucket_for_each(tb2, &head2->chain)
+		// tb2 is IPv6
+		if (inet_bind2_bucket_match_addr_any(tb2, net, port, l3mdev, sk))
+			break;
+
+	// inet_bhash2_conflict() return false
+	if (tb2 && inet_bhash2_conflict(sk, tb2, uid, relax, reuseport_cb_ok,
+                                reuseport_ok)) {
+		spin_unlock(&head2->lock);
+		return true;
+	}
+
+  }
+
+Fixes: 5a22bba13d01 ("tcp: Save address type in inet_bind2_bucket.")
+---
+ net/ipv4/inet_hashtables.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
+index 7498af320164..3eeaca8a113f 100644
+--- a/net/ipv4/inet_hashtables.c
++++ b/net/ipv4/inet_hashtables.c
+@@ -830,8 +830,8 @@ bool inet_bind2_bucket_match_addr_any(const struct inet_bind2_bucket *tb, const
+ 		return false;
+
+ #if IS_ENABLED(CONFIG_IPV6)
+-	if (tb->addr_type == IPV6_ADDR_ANY)
+-		return true;
++	if (sk->sk_family == AF_INET6)
++		return tb->addr_type == IPV6_ADDR_ANY;
+
+ 	if (tb->addr_type != IPV6_ADDR_MAPPED)
+ 		return false;
+-- 
+1.8.3.1
+
 
