@@ -1,126 +1,157 @@
-Return-Path: <netdev+bounces-80971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5470B8855F1
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:45:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C07D98855F3
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:46:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B4CDEB2159B
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 08:45:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 782E3285694
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 08:46:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 094681C6AD;
-	Thu, 21 Mar 2024 08:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E81451D6BD;
+	Thu, 21 Mar 2024 08:46:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b="AH/OJooV"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="WLHgw0Oc"
 X-Original-To: netdev@vger.kernel.org
-Received: from out203-205-251-53.mail.qq.com (out203-205-251-53.mail.qq.com [203.205.251.53])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A58711B274;
-	Thu, 21 Mar 2024 08:45:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.205.251.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7961CD1E;
+	Thu, 21 Mar 2024 08:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711010742; cv=none; b=OWFG/Kkkvn8+7VDV6enGynbqrksoApo8OL3PJleni3zmv18GzsUdNfulnz/+a/C4qwQ+Pd2w2ESuMd2YG4uxy7amgmVIsDK1f1c/roMZc8sXVPPiS1zrWDZeKBqoCKT6gx3OohlCy+5RrRVZZbFqm1noPAzYtUjd9vunBMdsRNI=
+	t=1711010761; cv=none; b=XvpEklfknJgyVsVgUFpbgaPizJ+9JKhHUUt25/gYfubdccjaukBq4PP4YbNsF2L+wLUquOivw+uY6jPPmcGmZgcbJBYnT1X1Bw/SInGcAPw3EwfkvWBkiCNXk9H1PMpVmnYdTMleyoE6XV+FOQFwGS5oeiZ+Uw6dMq9dPwRWEEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711010742; c=relaxed/simple;
-	bh=g+LZfdeazFTGr+JGC7jK8BjXtn7+zTNcTqi19c48N1o=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=Ak1tiWueV4muZxeuQIlzvZAfg5GjoSPbtCqXWLKtmWxi7+r/a37hdVIwaXpDhE9StfUfc6giZby65tIA+7Ig9EumWM00z5pnSjAgTRVJvHsn8O84YaOvLmFcLYwyArWSZz3CEuxgprunTdGvXHfVMxuUrsmVFEt+C5B7VGV4z3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com; spf=pass smtp.mailfrom=qq.com; dkim=pass (1024-bit key) header.d=qq.com header.i=@qq.com header.b=AH/OJooV; arc=none smtp.client-ip=203.205.251.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=qq.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=qq.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qq.com; s=s201512;
-	t=1711010738; bh=NcoVocOkWa2L4ddhVp5EYLo8ptljqh0gPzB6q2afhGc=;
-	h=From:To:Cc:Subject:Date;
-	b=AH/OJooVQpNPbnUDUhrwe+dtACwT+6nr8TUSA02GN1RTXJ7UCX7aZjCzEs9D7/4hn
-	 xuViZZ27dDGhHlQvWayT4Uxw3xmT5m2+mb71UaXexrTecqTZWoS/0nsbaDkuarq8kN
-	 1zgp1amJzhEqrxvSaCd1yPuRn12eB7FwFLv+EJIo=
-Received: from localhost.localdomain ([153.3.156.52])
-	by newxmesmtplogicsvrsza1-0.qq.com (NewEsmtp) with SMTP
-	id B1906E6A; Thu, 21 Mar 2024 16:44:25 +0800
-X-QQ-mid: xmsmtpt1711010665t9a31la8x
-Message-ID: <tencent_5A50BC27A519EBD14E1B0A8685E89405850A@qq.com>
-X-QQ-XMAILINFO: MGSlRwRrdVfIzOHlmzt7HFB38+yD/VxqpPe+ETTIPusgI7/sRwZyhCEntj8TCv
-	 X5nrteOiqlzuaKzuNo7oXLcEJSt4IAUqBBAx2b/xZxjebA/siv1UgrccT8WzXTpMNeom7pCPbvSi
-	 6opVthSXevqyHCrT1a4tB/ZxOdums61e0A973Zgk0eD7VgvBMnWP+6Fsg09DFx8ZXRnwo+FSSMav
-	 XFGw5KcStBVFkEsuRC4De0beRCE5Wsd/eVBhHIdwcV1FstpkoBYMx0j6W36JrXKMEVqmdvvRrCZL
-	 Xb/oRA71VfQtsJly1tiffZkLOSpBJMfOKxoPOGlOwCucX0jr9OA8XxTje3JEWoNI+cvkPTLv4DzB
-	 lI3LVTGH448iZP8E7wOwrPuIfRnoOkWSlDyTt08Hzo6TthlWn0x+eorH7/3KGnpnxj4G7W8Nfw7K
-	 vbgm+k7Hnan8brhBhr/VxFxo9uxzbxEugEUlsXoZnZYrBXZLpqw7YzoDHzZXUn9CPvi/rRxkHGCE
-	 RABmy+F0SYj4z2+t7vo1ApZQ0u4fxFQsKwcKNa22R8LjL998w6pWdxA26U4tVES4L40cdVtvBG6z
-	 CcRpowmM3UFGgO8hjeE8AeesXWxdH53GTHqa+83zJ/ZYd+q3X7PhPcwsjvI8xJSS+Usr5n/5LJuu
-	 ClC9ClYXkVXCtJzRwwajG6Ne51TJ2CLmQPySCq2pMx6BcXjOJcoZX8MBkT8MtBTfU1YlB8MzHG+G
-	 uZ+F4ivkylbGou6wl4Rhi1X+YIDsqw/w3lqYDnAVGVvA/s+KE7Nv7EjMLAzD8cf8OP0JtZsekiqb
-	 eoQonEO7lECL3RQTsbslUKsrXBB85dpgJxw4yzHMazIdzWgk19xj25VZbJLsaIoEYa1mrL2QcjeG
-	 nlQ09Aydy5/gYIlce7hmncofX0JYAl3Eg0PKiq3ZfqbExBNa7hvCRZVtneGVx0L3MnLKyaQHxHwe
-	 IhLOQooUjlUbsOjytJYpa9Y//0YZHYEBvHuokPaTa+fmWrgoAxg6A5SYZ3VWFQgP4JEDggcFGXcp
-	 dU3OTjNwSyRP1lVsYy/uvdiAbsgvc=
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-From: linke li <lilinke99@qq.com>
-To: 
-Cc: xujianhao01@gmail.com,
-	linke li <lilinke99@qq.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Abel Wu <wuyun.abel@bytedance.com>,
-	Breno Leitao <leitao@debian.org>,
-	Alexander Mikhalitsyn <alexander@mihalicyn.com>,
-	David Howells <dhowells@redhat.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2] net: mark racy access on sk->sk_rcvbuf
-Date: Thu, 21 Mar 2024 16:44:10 +0800
-X-OQ-MSGID: <20240321084414.63519-1-lilinke99@qq.com>
-X-Mailer: git-send-email 2.39.3 (Apple Git-146)
+	s=arc-20240116; t=1711010761; c=relaxed/simple;
+	bh=vY+pgNxP5agnZS3lZvczA7j/a5myVK7NY475boIDNL0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A96jZQQiHesxXknOxe/AuYdl5++CRcb4t2TxR6Fjb86YhUMmPi7sO/SDXxzdw5nPR87/x5NmZ2IrHS40rjHMHN/BQXKC6fN6JNO9qasR02LmCp8swipjLf6we3y7AUsNCU7+LcIVJsXBspKMI/6CaBKQkNYD88eTqxpfBxxH/xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=WLHgw0Oc; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42L8VgFu006435;
+	Thu, 21 Mar 2024 08:45:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=date : from : to : cc :
+ subject : message-id : references : mime-version : content-type :
+ content-transfer-encoding : in-reply-to; s=pp1;
+ bh=eON5wf8vXjUbhAWLa3fsuk9PyIi46INytgA4dC5vzVQ=;
+ b=WLHgw0Ocq6Z0manE5cztoT1WoD+LXEfUa0QtTLvNJNv0/1KqRSXpRkxV1CojFnbUbI1k
+ Z6D1JjqJWTHI0Yt/TEKujnfD0LG3YP17BOS4dKY/E4Arm0kthsQqhivq3Y0zZqEY87q2
+ 7w11pnYRlUTmM9Wf2lqETVpshSnxBS47iv2KNAhlxo3UmxXvXSf7t+xOynGSePuRzYPg
+ 5PobxeUVyxOrJ5LayeIPRFeg3YVqUA3Z4t3leqaWaAL7+T/mfEbA6CY3e3b2w6274sQw
+ xgaLvzamiZiCjhWvLWGZkmga/xfukuYdNBoSAVE0R+zUeVQujoflpCWEX8Lp0I1zz/Kb zg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x0hfb80vb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Mar 2024 08:45:14 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42L8jDBD028522;
+	Thu, 21 Mar 2024 08:45:13 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x0hfb80v4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Mar 2024 08:45:13 +0000
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42L7FR6h019872;
+	Thu, 21 Mar 2024 08:45:12 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 3wwqykum6x-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Mar 2024 08:45:12 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42L8j8RQ30999282
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 21 Mar 2024 08:45:10 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9324520040;
+	Thu, 21 Mar 2024 08:45:08 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 531A32004B;
+	Thu, 21 Mar 2024 08:45:07 +0000 (GMT)
+Received: from heavy (unknown [9.171.8.38])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 21 Mar 2024 08:45:07 +0000 (GMT)
+Date: Thu, 21 Mar 2024 09:45:05 +0100
+From: Ilya Leoshkevich <iii@linux.ibm.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        Puranjay Mohan <puranjay12@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        Martin KaFai Lau <martin.lau@linux.dev>,
+        Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+        Yonghong Song <yonghong.song@linux.dev>,
+        John Fastabend <john.fastabend@gmail.com>,
+        KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+        Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+        Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+        Borislav Petkov <bp@alien8.de>,
+        Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>,
+        "H. Peter Anvin" <hpa@zytor.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Network Development <netdev@vger.kernel.org>,
+        bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH bpf] bpf: verifier: prevent userspace memory access
+Message-ID: <ed5cozsc7mduzmgbwrlw3lou4tlb6zpivhs2xrqwgpq2rhvkue@l7aifknll4tb>
+References: <20240320105436.4781-1-puranjay12@gmail.com>
+ <CAADnVQJ3o6DsURi=N_KXx+mbW9r7__3LrwYLyYwuoMOsqFHPkw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAADnVQJ3o6DsURi=N_KXx+mbW9r7__3LrwYLyYwuoMOsqFHPkw@mail.gmail.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: TYjvFxQwEBdE5__OC1dzjMlHjdsm_YEY
+X-Proofpoint-GUID: Op4zlibBI5OweaTnIoIg1COwJwRAnpk3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-21_06,2024-03-18_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ phishscore=0 adultscore=0 bulkscore=0 mlxlogscore=798 priorityscore=1501
+ mlxscore=0 spamscore=0 suspectscore=0 malwarescore=0 impostorscore=0
+ clxscore=1011 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2403140000 definitions=main-2403210059
 
-sk->sk_rcvbuf in __sock_queue_rcv_skb() and __sk_receive_skb() can be
-changed by other threads. Mark this as benign using READ_ONCE(). 
+On Wed, Mar 20, 2024 at 11:08:00PM -0700, Alexei Starovoitov wrote:
+> On Wed, Mar 20, 2024 at 3:55 AM Puranjay Mohan <puranjay12@gmail.com> wrote:
+> >
+> > The JITs need to implement bpf_arch_uaddress_limit() to define where
+> > the userspace addresses end for that architecture or TASK_SIZE is taken
+> > as default.
+> >
+> > The implementation is as follows:
+> >
+> > REG_AX =  SRC_REG
+> > if(offset)
+> >         REG_AX += offset;
+> > REG_AX >>= 32;
+> > if (REG_AX <= (uaddress_limit >> 32))
+> >         DST_REG = 0;
+> > else
+> >         DST_REG = *(size *)(SRC_REG + offset);
+> 
+> The patch looks good, but it seems to be causing s390 CI failures.
+> 
+> Ilya,
+> could you help us understand is this check needed on s390
+> and if so, what should be the uaddress_limit ?
 
-This patch is aimed at reducing the number of benign races reported by
-KCSAN in order to focus future debugging effort on harmful races.
-
-Signed-off-by: linke li <lilinke99@qq.com>
----
-v1 -> v2: include sk->sk_rcvbuf in __sock_queue_rcv_skb()
-
- net/core/sock.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 5e78798456fd..61c14623a218 100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -481,7 +481,7 @@ int __sock_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
- 	unsigned long flags;
- 	struct sk_buff_head *list = &sk->sk_receive_queue;
- 
--	if (atomic_read(&sk->sk_rmem_alloc) >= sk->sk_rcvbuf) {
-+	if (atomic_read(&sk->sk_rmem_alloc) >= READ_ONCE(sk->sk_rcvbuf)) {
- 		atomic_inc(&sk->sk_drops);
- 		trace_sock_rcvqueue_full(sk, skb);
- 		return -ENOMEM;
-@@ -551,7 +551,7 @@ int __sk_receive_skb(struct sock *sk, struct sk_buff *skb,
- 
- 	skb->dev = NULL;
- 
--	if (sk_rcvqueues_full(sk, sk->sk_rcvbuf)) {
-+	if (sk_rcvqueues_full(sk, READ_ONCE(sk->sk_rcvbuf))) {
- 		atomic_inc(&sk->sk_drops);
- 		goto discard_and_relse;
- 	}
--- 
-2.39.3 (Apple Git-146)
-
+s390x does not define ARCH_HAS_NON_OVERLAPPING_ADDRESS_SPACE.
+Userspace and kernel run in completely different and isolated address
+spaces, so it's not possible to determine from a pointer value whether
+it's a user or a kernel pointer.
+But the good news is that whatever you deference without using
+special instruction sequences will refer to the kernel address space.
+So I wonder if we could somehow disable this check on s390x altogether?
+And if we are not sure whether it's a valid pointer, use BPF_PROBE_MEM
+as always.
 
