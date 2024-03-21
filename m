@@ -1,123 +1,302 @@
-Return-Path: <netdev+bounces-80960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1696885593
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:19:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2DE9885595
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:21:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCB111C20F90
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 08:19:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7571A2812DF
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 08:21:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4F377656;
-	Thu, 21 Mar 2024 08:18:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ED0253819;
+	Thu, 21 Mar 2024 08:21:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="THXXtBXW"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="i+/Ka54T"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E5E69956
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 08:18:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D2EEBE4E
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 08:21:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711009102; cv=none; b=Q+rd6W0e/dNnK/yXCOIjSmJe3yLn1iBalhkU01nfBhKBZi6AkOZ4HMvKqXMWtr8GcvH/bVC1y4sTrg40CBFJKOZa85g3ISsc8Xam/DlAATUBqIOfGTkrL+C1U/vgxAqTwdEqmlh2wSof3q34jUZ58t3/faV14Dbp57HIrsU/YTs=
+	t=1711009274; cv=none; b=RePmMd76ptIm6jPbUKdA9/7qNsm03wnfNnH42H6YrzdKmGFKXYKP9S0C9BgAzBWmMJD6JxCyQ0q9WyjYeEpGDcn/z2z2kcogxAv8v+fnALQrpjlCElgjgnn+Xd5PrNeC0IwgigHz8ipC4OwG1c8DhUAjgNl2c9gGmWgtWqwZdKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711009102; c=relaxed/simple;
-	bh=tUl6Y+ILB3eCX9Bq6p+WZ/03L1ZXrx8Zy6xZm4TJ2Rg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=q7jSKdJiaYKtGbaNc8JNxQYPj8Sw2R0LQfIerxxCoep659EIbgdblXHNKJpeegAs/JcknQrfV9faO0VEguc7V0ZSK7Az6bvFrD7Q+exIbKT+TdXa8nzpevDKClfcgTWRAoodAh8jELua9vt99P8xYbabI7ohArdO6993UC8rJFw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=THXXtBXW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711009100;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fNwara8hmM/oqZZWTbZfweFJpIhXMITtHmwHDwGJec8=;
-	b=THXXtBXWU/5wpmQO8usZVrxPtmfNeJThIP9u3oHEpEbQTaZ4FDwLezXA3twlxHQhc4J6VK
-	c6+F0ff4GCi+WMR5HyQoWtJF6nl0YnVWsbBkqkDVl9iRAuE9uhzigYezJ4MVGntV1Z1Qt6
-	Zp12RJcFJrOTUxDG8q+YrYDN1zihnGY=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-611-wsHdh9YcM1OadUS2IBFShg-1; Thu, 21 Mar 2024 04:18:14 -0400
-X-MC-Unique: wsHdh9YcM1OadUS2IBFShg-1
-Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A11E9185A786;
-	Thu, 21 Mar 2024 08:18:13 +0000 (UTC)
-Received: from alecto.usersys.redhat.com (unknown [10.43.17.36])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id F0A041C060A4;
-	Thu, 21 Mar 2024 08:18:11 +0000 (UTC)
-From: Artem Savkov <asavkov@redhat.com>
-To: Xu Kuohai <xukuohai@huawei.com>,
-	Xi Wang <xi.wang@gmail.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Catalin Marinas <catalin.marinas@arm.com>,
-	linux-kernel@vger.kernel.org,
-	Artem Savkov <asavkov@redhat.com>,
-	Puranjay Mohan <puranjay12@gmail.com>
-Subject: [PATCH bpf-next v2] arm64: bpf: fix 32bit unconditional bswap
-Date: Thu, 21 Mar 2024 09:18:09 +0100
-Message-ID: <20240321081809.158803-1-asavkov@redhat.com>
-In-Reply-To: <20240313140205.3191564-1-asavkov@redhat.com>
-References: <20240313140205.3191564-1-asavkov@redhat.com>
+	s=arc-20240116; t=1711009274; c=relaxed/simple;
+	bh=FQ9/99AzWEN2KSFnQAaimh8EVpHMWb/vBgPgnz4qBTo=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=Pnmd1dXiMSif9wXiF8qR66ew1jGD2t33SeS3bD0JbvhtTxHd51sAfsmT57ZomTZU5VNiq2XGgGpVhUB9YhCiJ12NJP3s79k2a+5nHhYBei2+i6hYLdIT2LWq2bk+d1spDS9oPuCLGzn+VnyxrLPcq3ub/WTVUGN0KPVH9HhW2X8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=i+/Ka54T; arc=none smtp.client-ip=115.124.30.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711009268; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=EqQ4bkSb/XLfISlbX9PN2a8ugSba+NZmIerwF5wTXPg=;
+	b=i+/Ka54TpNpqP5JtKZQXpWWOctuSn4sQpfNfN6oeFqJCG8tJ/YlmAjn64AiBwDONcmsuIWk9z2ikgsNaVYlddUqJlPFwo0+H80CV/4WSx3v0CQSmIZS1Bk5pBWYPocFhPzDnbzdAX+zkqPMz1c0IcDtrToiKOsURb5IASa36/G0=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R101e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W3-BwmK_1711009267;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W3-BwmK_1711009267)
+          by smtp.aliyun-inc.com;
+          Thu, 21 Mar 2024 16:21:08 +0800
+Message-ID: <1711009209.0488706-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v4 02/10] virtio_ring: packed: remove double check of the unmap ops
+Date: Thu, 21 Mar 2024 16:20:09 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <20240312033557.6351-1-xuanzhuo@linux.alibaba.com>
+ <20240312033557.6351-3-xuanzhuo@linux.alibaba.com>
+ <CACGkMEtd1L=Cm0DWLZbfSazxxHr+iPP77B1kM=PmjdqeYoAz4w@mail.gmail.com>
+In-Reply-To: <CACGkMEtd1L=Cm0DWLZbfSazxxHr+iPP77B1kM=PmjdqeYoAz4w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-In case when is64 == 1 in emit(A64_REV32(is64, dst, dst), ctx) the
-generated insn reverses byte order for both high and low 32-bit words,
-resuling in an incorrect swap as indicated by the jit test:
+On Thu, 21 Mar 2024 13:57:06 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Tue, Mar 12, 2024 at 11:36=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibab=
+a.com> wrote:
+> >
+> > In the functions vring_unmap_extra_packed and vring_unmap_desc_packed,
+> > multiple checks are made whether unmap is performed and whether it is
+> > INDIRECT.
+> >
+> > These two functions are usually called in a loop, and we should put the
+> > check outside the loop.
+> >
+> > And we unmap the descs with VRING_DESC_F_INDIRECT on the same path with
+> > other descs, that make the thing more complex. If we distinguish the
+> > descs with VRING_DESC_F_INDIRECT before unmap, thing will be clearer.
+> >
+> > 1. only one desc of the desc table is used, we do not need the loop
+> > 2. the called unmap api is difference from the other desc
+> > 3. the vq->premapped is not needed to check
+> > 4. the vq->indirect is not needed to check
+> > 5. the state->indir_desc must not be null
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  drivers/virtio/virtio_ring.c | 78 ++++++++++++++++++------------------
+> >  1 file changed, 40 insertions(+), 38 deletions(-)
+> >
+> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> > index c2779e34aac7..0dfbd17e5a87 100644
+> > --- a/drivers/virtio/virtio_ring.c
+> > +++ b/drivers/virtio/virtio_ring.c
+> > @@ -1214,6 +1214,7 @@ static u16 packed_last_used(u16 last_used_idx)
+> >         return last_used_idx & ~(-(1 << VRING_PACKED_EVENT_F_WRAP_CTR));
+> >  }
+> >
+> > +/* caller must check vring_need_unmap_buffer() */
+> >  static void vring_unmap_extra_packed(const struct vring_virtqueue *vq,
+> >                                      const struct vring_desc_extra *ext=
+ra)
+> >  {
+> > @@ -1221,33 +1222,18 @@ static void vring_unmap_extra_packed(const stru=
+ct vring_virtqueue *vq,
+> >
+> >         flags =3D extra->flags;
+> >
+> > -       if (flags & VRING_DESC_F_INDIRECT) {
+> > -               if (!vq->use_dma_api)
+> > -                       return;
+> > -
+> > -               dma_unmap_single(vring_dma_dev(vq),
+> > -                                extra->addr, extra->len,
+> > -                                (flags & VRING_DESC_F_WRITE) ?
+> > -                                DMA_FROM_DEVICE : DMA_TO_DEVICE);
+> > -       } else {
+> > -               if (!vring_need_unmap_buffer(vq))
+> > -                       return;
+> > -
+> > -               dma_unmap_page(vring_dma_dev(vq),
+> > -                              extra->addr, extra->len,
+> > -                              (flags & VRING_DESC_F_WRITE) ?
+> > -                              DMA_FROM_DEVICE : DMA_TO_DEVICE);
+> > -       }
+> > +       dma_unmap_page(vring_dma_dev(vq),
+> > +                      extra->addr, extra->len,
+> > +                      (flags & VRING_DESC_F_WRITE) ?
+> > +                      DMA_FROM_DEVICE : DMA_TO_DEVICE);
+> >  }
+> >
+> > +/* caller must check vring_need_unmap_buffer() */
+> >  static void vring_unmap_desc_packed(const struct vring_virtqueue *vq,
+> >                                     const struct vring_packed_desc *des=
+c)
+> >  {
+> >         u16 flags;
+> >
+> > -       if (!vring_need_unmap_buffer(vq))
+> > -               return;
+> > -
+> >         flags =3D le16_to_cpu(desc->flags);
+> >
+> >         dma_unmap_page(vring_dma_dev(vq),
+> > @@ -1323,7 +1309,7 @@ static int virtqueue_add_indirect_packed(struct v=
+ring_virtqueue *vq,
+> >                         total_sg * sizeof(struct vring_packed_desc),
+> >                         DMA_TO_DEVICE);
+> >         if (vring_mapping_error(vq, addr)) {
+> > -               if (vq->premapped)
+> > +               if (!vring_need_unmap_buffer(vq))
+> >                         goto free_desc;
+> >
+> >                 goto unmap_release;
+> > @@ -1338,10 +1324,11 @@ static int virtqueue_add_indirect_packed(struct=
+ vring_virtqueue *vq,
+> >                 vq->packed.desc_extra[id].addr =3D addr;
+> >                 vq->packed.desc_extra[id].len =3D total_sg *
+> >                                 sizeof(struct vring_packed_desc);
+> > -               vq->packed.desc_extra[id].flags =3D VRING_DESC_F_INDIRE=
+CT |
+> > -                                                 vq->packed.avail_used=
+_flags;
+> >         }
+> >
+> > +       vq->packed.desc_extra[id].flags =3D VRING_DESC_F_INDIRECT |
+> > +               vq->packed.avail_used_flags;
+> > +
+> >         /*
+> >          * A driver MUST NOT make the first descriptor in the list
+> >          * available before all subsequent descriptors comprising
+> > @@ -1382,6 +1369,8 @@ static int virtqueue_add_indirect_packed(struct v=
+ring_virtqueue *vq,
+> >  unmap_release:
+> >         err_idx =3D i;
+> >
+> > +       WARN_ON(!vring_need_unmap_buffer(vq));
+> > +
+> >         for (i =3D 0; i < err_idx; i++)
+> >                 vring_unmap_desc_packed(vq, &desc[i]);
+> >
+> > @@ -1475,12 +1464,13 @@ static inline int virtqueue_add_packed(struct v=
+irtqueue *_vq,
+> >                         desc[i].len =3D cpu_to_le32(sg->length);
+> >                         desc[i].id =3D cpu_to_le16(id);
+> >
+> > -                       if (unlikely(vq->use_dma_api)) {
+> > +                       if (vring_need_unmap_buffer(vq)) {
+> >                                 vq->packed.desc_extra[curr].addr =3D ad=
+dr;
+> >                                 vq->packed.desc_extra[curr].len =3D sg-=
+>length;
+> > -                               vq->packed.desc_extra[curr].flags =3D
+> > -                                       le16_to_cpu(flags);
+> >                         }
+> > +
+> > +                       vq->packed.desc_extra[curr].flags =3D le16_to_c=
+pu(flags);
+> > +
+> >                         prev =3D curr;
+> >                         curr =3D vq->packed.desc_extra[curr].next;
+> >
+> > @@ -1530,6 +1520,8 @@ static inline int virtqueue_add_packed(struct vir=
+tqueue *_vq,
+> >
+> >         vq->packed.avail_used_flags =3D avail_used_flags;
+> >
+> > +       WARN_ON(!vring_need_unmap_buffer(vq));
+> > +
+> >         for (n =3D 0; n < total_sg; n++) {
+> >                 if (i =3D=3D err_idx)
+> >                         break;
+> > @@ -1599,7 +1591,9 @@ static void detach_buf_packed(struct vring_virtqu=
+eue *vq,
+> >         struct vring_desc_state_packed *state =3D NULL;
+> >         struct vring_packed_desc *desc;
+> >         unsigned int i, curr;
+> > +       u16 flags;
+> >
+> > +       flags =3D vq->packed.desc_extra[id].flags;
+> >         state =3D &vq->packed.desc_state[id];
+> >
+> >         /* Clear data ptr. */
+> > @@ -1609,22 +1603,32 @@ static void detach_buf_packed(struct vring_virt=
+queue *vq,
+> >         vq->free_head =3D id;
+> >         vq->vq.num_free +=3D state->num;
+> >
+> > -       if (unlikely(vq->use_dma_api)) {
+> > -               curr =3D id;
+> > -               for (i =3D 0; i < state->num; i++) {
+> > -                       vring_unmap_extra_packed(vq,
+> > -                                                &vq->packed.desc_extra=
+[curr]);
+> > -                       curr =3D vq->packed.desc_extra[curr].next;
+> > +       if (!(flags & VRING_DESC_F_INDIRECT)) {
+> > +               if (vring_need_unmap_buffer(vq)) {
+> > +                       curr =3D id;
+> > +                       for (i =3D 0; i < state->num; i++) {
+> > +                               vring_unmap_extra_packed(vq,
+> > +                                                        &vq->packed.de=
+sc_extra[curr]);
+> > +                               curr =3D vq->packed.desc_extra[curr].ne=
+xt;
+> > +                       }
+> >                 }
+> > -       }
+> >
+> > -       if (vq->indirect) {
+> > +               if (ctx)
+> > +                       *ctx =3D state->indir_desc;
+> > +       } else {
+> > +               const struct vring_desc_extra *extra;
+> >                 u32 len;
+> >
+> > +               if (vq->use_dma_api) {
+> > +                       extra =3D &vq->packed.desc_extra[id];
+> > +                       dma_unmap_single(vring_dma_dev(vq),
+> > +                                        extra->addr, extra->len,
+> > +                                        (flags & VRING_DESC_F_WRITE) ?
+> > +                                        DMA_FROM_DEVICE : DMA_TO_DEVIC=
+E);
+> > +               }
+>
+> Theoretically, indirect descriptors could be chained. It is supported
+> without this patch but not here.
 
-[ 9757.262607] test_bpf: #312 BSWAP 16: 0x0123456789abcdef -> 0xefcd jited:1 8 PASS
-[ 9757.264435] test_bpf: #313 BSWAP 32: 0x0123456789abcdef -> 0xefcdab89 jited:1 ret 1460850314 != -271733879 (0x5712ce8a != 0xefcdab89)FAIL (1 times)
-[ 9757.266260] test_bpf: #314 BSWAP 64: 0x0123456789abcdef -> 0x67452301 jited:1 8 PASS
-[ 9757.268000] test_bpf: #315 BSWAP 64: 0x0123456789abcdef >> 32 -> 0xefcdab89 jited:1 8 PASS
-[ 9757.269686] test_bpf: #316 BSWAP 16: 0xfedcba9876543210 -> 0x1032 jited:1 8 PASS
-[ 9757.271380] test_bpf: #317 BSWAP 32: 0xfedcba9876543210 -> 0x10325476 jited:1 ret -1460850316 != 271733878 (0xa8ed3174 != 0x10325476)FAIL (1 times)
-[ 9757.273022] test_bpf: #318 BSWAP 64: 0xfedcba9876543210 -> 0x98badcfe jited:1 7 PASS
-[ 9757.274721] test_bpf: #319 BSWAP 64: 0xfedcba9876543210 >> 32 -> 0x10325476 jited:1 9 PASS
 
-Fix this by forcing 32bit variant of rev32.
+YES. But now, that is not supported by "add", so I think we
+do not need to think about it.
 
-Fixes: 1104247f3f979 ("bpf, arm64: Support unconditional bswap")
-Signed-off-by: Artem Savkov <asavkov@redhat.com>
-Tested-by: Puranjay Mohan <puranjay12@gmail.com>
-Acked-by: Puranjay Mohan <puranjay12@gmail.com>
----
- arch/arm64/net/bpf_jit_comp.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Thanks.
 
-diff --git a/arch/arm64/net/bpf_jit_comp.c b/arch/arm64/net/bpf_jit_comp.c
-index c5b461dda4385..c3ededd23cbf6 100644
---- a/arch/arm64/net/bpf_jit_comp.c
-+++ b/arch/arm64/net/bpf_jit_comp.c
-@@ -943,7 +943,7 @@ static int build_insn(const struct bpf_insn *insn, struct jit_ctx *ctx,
- 			emit(A64_UXTH(is64, dst, dst), ctx);
- 			break;
- 		case 32:
--			emit(A64_REV32(is64, dst, dst), ctx);
-+			emit(A64_REV32(0, dst, dst), ctx);
- 			/* upper 32 bits already cleared */
- 			break;
- 		case 64:
--- 
-2.44.0
-
+>
+> Thanks
+>
+> > +
+> >                 /* Free the indirect table, if any, now that it's unmap=
+ped. */
+> >                 desc =3D state->indir_desc;
+> > -               if (!desc)
+> > -                       return;
+> >
+> >                 if (vring_need_unmap_buffer(vq)) {
+> >                         len =3D vq->packed.desc_extra[id].len;
+> > @@ -1634,8 +1638,6 @@ static void detach_buf_packed(struct vring_virtqu=
+eue *vq,
+> >                 }
+> >                 kfree(desc);
+> >                 state->indir_desc =3D NULL;
+> > -       } else if (ctx) {
+> > -               *ctx =3D state->indir_desc;
+> >         }
+> >  }
+> >
+> > --
+> > 2.32.0.3.g01195cf9f
+> >
+>
 
