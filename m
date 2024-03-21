@@ -1,113 +1,81 @@
-Return-Path: <netdev+bounces-80909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80912-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 614A2881A53
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 01:06:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 871F2881A5C
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 01:10:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9368F1C20DBC
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 00:06:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B98A1F21C2F
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 00:10:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0151396;
-	Thu, 21 Mar 2024 00:06:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3AB370;
+	Thu, 21 Mar 2024 00:10:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1M21YGue"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0E64181;
-	Thu, 21 Mar 2024 00:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2001063C;
+	Thu, 21 Mar 2024 00:10:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710979609; cv=none; b=m2GXw8h7qYXrN8hey2A8wMNH9JjKO9/acbvCTXD73ft455ZW1p9MQUuwla9NLuGLImjM8z2AliuPxETRJrdl4Wsx3cCbDm/92sOnz+8WNsl2NT3uGEGGR+ujaPVeTeCJ8SDVOtO1r2sHn9LaFKSeFHuLShEl2vBa061uvAfmNZo=
+	t=1710979838; cv=none; b=OpKWK1cgqhN38iWQJeqbKylp1aRRPm74EQwLeizPJ46lxIsCFIUKKS/hmgObIijsT071dOMLgKU5R/dM5iF1bv+O2k75+s6Fx0ryyPpLAqfbSkrbADar9DWbDPNQETVf8Qd3tWljBjrHziGni10y6srsSL36RPMpVrDA+g4me/M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710979609; c=relaxed/simple;
-	bh=F9YHcCxjrLSORTOGYcveR3LZxbLdh6ZamF/xWmv+IPk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=UFz9nNiSB/BF/CgSrB4DhU7Ei4qSqQl9eTjn6sx6bwhkuWTPxV3mS7HwaMgbym+k8jT9tZjvPkv2lK+5s7ycCMY0AkFMw+k40++PrKt+Ja79wDRUe1LCP7JLv3h20oI3wtUsiffLvZ1nrrJby6G2ZppjfzWOpZ9rAn8hhmIoxm4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com
-Subject: [PATCH net 3/3] netfilter: nf_tables: Fix a memory leak in nf_tables_updchain
-Date: Thu, 21 Mar 2024 01:06:35 +0100
-Message-Id: <20240321000635.31865-4-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240321000635.31865-1-pablo@netfilter.org>
-References: <20240321000635.31865-1-pablo@netfilter.org>
+	s=arc-20240116; t=1710979838; c=relaxed/simple;
+	bh=XF+QbRwExUSVDbOeZC0JJnQAl1pkZTUOdsQR3pkmSpI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=W7eHCiZ+siglkHINTQxYNr5r6+NMpk+nPI8PZKnH/s1VXKXzeF8QksIy90uTaCm4e4rHhtZF+rcUyGMOUKrpnUBNhxDdBCaDzLUdWfBdEhqotn552rLKzh1EhXX/5IftaEq7Koowd69EVwNI53MRRKUsyiwaAKUmpbVd08IqjNg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1M21YGue; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=qYTfryt6uzT4gEzIjPEXIhCxudEshHluSopJ4l+iWUY=; b=1M21YGueS2/3kQUt04LM3AquuH
+	xFt8tOZY9vJd4QGqlsHqHTpZ4i0eeGvpb46l+8dzE/idVmoAFThGhkyoGyXyoG4pcRsFiFP9hCm0e
+	7fm5nbXbnJfZZ1dSecPrO8t+G3HxDYMqNuEtkzBtfJ7YmWBSeslnCy4B/8IQ2vForgp8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rn60k-00ApEo-DT; Thu, 21 Mar 2024 01:10:22 +0100
+Date: Thu, 21 Mar 2024 01:10:22 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Elad Nachman <enachman@marvell.com>
+Cc: taras.chornyi@plvision.eu, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, kory.maincent@bootlin.com,
+	thomas.petazzoni@bootlin.com, miquel.raynal@bootlin.com,
+	przemyslaw.kitszel@intel.com, dkirjanov@suse.de,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 2/5] net: marvell: prestera: enlarge fw restart time
+Message-ID: <259379aa-e9b9-4524-a092-5338314791d4@lunn.ch>
+References: <20240320172008.2989693-1-enachman@marvell.com>
+ <20240320172008.2989693-3-enachman@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240320172008.2989693-3-enachman@marvell.com>
 
-From: Quan Tian <tianquan23@gmail.com>
+On Wed, Mar 20, 2024 at 07:20:05PM +0200, Elad Nachman wrote:
+> From: Elad Nachman <enachman@marvell.com>
+> 
+> Increase firmware restart timeout, as current timeout value of 5 seconds
+> was too small, in actual life it can take up to 30 seconds for firmware
+> to shutdown and for the firmware loader to shift to the ready to receive
+> firmware code state.
 
-If nft_netdev_register_hooks() fails, the memory associated with
-nft_stats is not freed, causing a memory leak.
+So this means the probe can be waiting 30 seconds?
 
-This patch fixes it by moving nft_stats_alloc() down after
-nft_netdev_register_hooks() succeeds.
+This seems like a really good reason not to reset the hardware during
+-EPROBE_DEFER.
 
-Fixes: b9703ed44ffb ("netfilter: nf_tables: support for adding new devices to an existing netdev chain")
-Signed-off-by: Quan Tian <tianquan23@gmail.com>
----
- net/netfilter/nf_tables_api.c | 27 ++++++++++++++-------------
- 1 file changed, 14 insertions(+), 13 deletions(-)
-
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index 984c1c83ee38..5fa3d3540c93 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -2631,19 +2631,6 @@ static int nf_tables_updchain(struct nft_ctx *ctx, u8 genmask, u8 policy,
- 		}
- 	}
- 
--	if (nla[NFTA_CHAIN_COUNTERS]) {
--		if (!nft_is_base_chain(chain)) {
--			err = -EOPNOTSUPP;
--			goto err_hooks;
--		}
--
--		stats = nft_stats_alloc(nla[NFTA_CHAIN_COUNTERS]);
--		if (IS_ERR(stats)) {
--			err = PTR_ERR(stats);
--			goto err_hooks;
--		}
--	}
--
- 	if (!(table->flags & NFT_TABLE_F_DORMANT) &&
- 	    nft_is_base_chain(chain) &&
- 	    !list_empty(&hook.list)) {
-@@ -2658,6 +2645,20 @@ static int nf_tables_updchain(struct nft_ctx *ctx, u8 genmask, u8 policy,
- 	}
- 
- 	unregister = true;
-+
-+	if (nla[NFTA_CHAIN_COUNTERS]) {
-+		if (!nft_is_base_chain(chain)) {
-+			err = -EOPNOTSUPP;
-+			goto err_hooks;
-+		}
-+
-+		stats = nft_stats_alloc(nla[NFTA_CHAIN_COUNTERS]);
-+		if (IS_ERR(stats)) {
-+			err = PTR_ERR(stats);
-+			goto err_hooks;
-+		}
-+	}
-+
- 	err = -ENOMEM;
- 	trans = nft_trans_alloc(ctx, NFT_MSG_NEWCHAIN,
- 				sizeof(struct nft_trans_chain));
--- 
-2.30.2
-
+	Andrew
 
