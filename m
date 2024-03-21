@@ -1,79 +1,105 @@
-Return-Path: <netdev+bounces-81095-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20B28885C59
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 16:44:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01ADC885C72
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 16:45:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F30B1C21158
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:44:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E596B24A45
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:45:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D3C38626B;
-	Thu, 21 Mar 2024 15:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jvhRJMMA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932638662B;
+	Thu, 21 Mar 2024 15:44:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pidgin.makrotopia.org (pidgin.makrotopia.org [185.142.180.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 799C586263
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 15:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B681A224F2;
+	Thu, 21 Mar 2024 15:44:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.142.180.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711035803; cv=none; b=lLQlMkAnnOBN/IiP4tOrnk+f2rhMRkS4KXTcToTVPTQIpbQLJMyXTnvbb9sPSfl/wKvU2OcPVG3BpG4tLd1Na2TjBl3Ba8AP51Rj9QKEBhiBzfGyELUB6o7v5u0LAa7T0rsisaHL9PuvBDHCGNxIGoFL1V6C/dK+K6WmR3993Tw=
+	t=1711035892; cv=none; b=pQkwhqkd1cGxA+zJqgAgv7oM0cJE6j5VEAS7JEyYF2AuCqNkOyIo7BoaNx1yes1swh5r8AR9iVNAxTWIalvJ3a1jebj4zzMwA9+MZy87AVbSq7AG6GO6JpM4+4Xuitrnbm5wFy8Acw2cC9kBfplWKu5eSHTPuXF1oVKd8KHQ0n4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711035803; c=relaxed/simple;
-	bh=jiJ9eqOcJAa3SAwgLp5xqGOvCh4FDcyQBoW4hn4b9do=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t5p8XchVWqY9Uo6YAtqtPSvyJ7goVmT4ZkRrgPxUyIBpiBlZFnCqdvqrY9ATjbwW8bLapTq49n00a24QpPh8EwzwIASY0JCypNeuFjOd54BHxMbIisyt0pgznS4nM/QO2myWOY4c6p0fqpdYXz+Ednfu/Ac/8RS5koq6WW2aRmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jvhRJMMA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B35E2C43390;
-	Thu, 21 Mar 2024 15:43:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711035803;
-	bh=jiJ9eqOcJAa3SAwgLp5xqGOvCh4FDcyQBoW4hn4b9do=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jvhRJMMANX/6pI0KiatEfaeV8m7Ci4ZGyEwA2P636pt9z54JejdGNDQJa3eywcKwc
-	 1hQrxkValTC/v4Lv+uekxznfQ3LrzgAuy7aETLROecjj3c9VO/RdL5fqu1X5ma/8Vx
-	 kRb/tfuV/3JrpPcIZu2m5Yv40v8HAZG5ASrh/aGuPjGtPHhZOtuxF17rLn8gZnMM2J
-	 Z5WVYYz8x4rQf2+F9ojcV9MXmfZ1c+rNn10a1Ds4nilZA7GDYyIgXZZtvfDJpzvGJT
-	 LwhDo0Ef3dLZp2HZB579hqUHpE7pmcL7DvoNw4iqAp4aJvENjnUEleRH2r8TjYKDhw
-	 7UggjI8XIgOoQ==
-Date: Thu, 21 Mar 2024 08:43:21 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Russell King
- <linux@armlinux.org.uk>, Gregory Clement <gregory.clement@bootlin.com>,
- netdev@vger.kernel.org
-Subject: Re: [PATCH RFC 2/7] net: Add helpers for netdev LEDs
-Message-ID: <20240321084321.10cb669c@kernel.org>
-In-Reply-To: <18007239-f555-4225-b184-46baed8b89ee@lunn.ch>
-References: <20240317-v6-8-0-net-next-mv88e6xxx-leds-v4-v1-0-80a4e6c6293e@lunn.ch>
-	<20240317-v6-8-0-net-next-mv88e6xxx-leds-v4-v1-2-80a4e6c6293e@lunn.ch>
-	<20240321080155.1352b481@kernel.org>
-	<18007239-f555-4225-b184-46baed8b89ee@lunn.ch>
+	s=arc-20240116; t=1711035892; c=relaxed/simple;
+	bh=T4H0ERp4UEzD6+VME4K23Ub9xg5TJjr1AVHthGvEjwE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gCqxKtidDGBgD0RU9EOIxFcbJkyK0PqlDNjS/ylBEDbfyigJFrJWPQIO45wo43QiAG9lyV5+ngyVXi8q9ItAyJ6X3YhvmhaixUwb1LkTxL8gWBte98qQ9rocVypssMC5rEw1yka7hb3flk7NbdMmRZsgJS/ZFG9PMIOhlcesPds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org; spf=pass smtp.mailfrom=makrotopia.org; arc=none smtp.client-ip=185.142.180.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=makrotopia.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=makrotopia.org
+Received: from local
+	by pidgin.makrotopia.org with esmtpsa (TLS1.3:TLS_AES_256_GCM_SHA384:256)
+	 (Exim 4.96.2)
+	(envelope-from <daniel@makrotopia.org>)
+	id 1rnKai-0007eQ-2t;
+	Thu, 21 Mar 2024 15:44:29 +0000
+Date: Thu, 21 Mar 2024 15:44:25 +0000
+From: Daniel Golle <daniel@makrotopia.org>
+To: Vinod Koul <vkoul@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Bc-bocun Chen <bc-bocun.chen@mediatek.com>,
+	Steven Liu <steven.liu@mediatek.com>,
+	John Crispin <john@phrozen.org>,
+	Chunfeng Yun <chunfeng.yun@mediatek.com>,
+	Kishon Vijay Abraham I <kishon@kernel.org>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Qingfang Deng <dqfext@gmail.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, linux-phy@lists.infradead.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v3 2/2] phy: add driver for MediaTek XFI T-PHY
+Message-ID: <ZfxV2c-JBCFrpSRV@makrotopia.org>
+References: <745f8b46f676e94c1a396df8c46aefe0e8b4771c.1707530671.git.daniel@makrotopia.org>
+ <3bb95f1d795eede63284dbcb224e06ea6886b421.1707530671.git.daniel@makrotopia.org>
+ <ZevJwSq-A43vqO6k@makrotopia.org>
+ <20240308193632.158b3c42@kernel.org>
+ <Ze3j-7WzbTM52kAs@matsya>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Ze3j-7WzbTM52kAs@matsya>
 
-On Thu, 21 Mar 2024 16:35:20 +0100 Andrew Lunn wrote:
-> The struct device is actually part of struct net_device. It is not a
-> pointer to a bus device. We have register_netdevice() ->
-> netdev_register_kobject() -> device_initialize(). So the struct device
-> in struct net_device to registered to the driver core.
+Hi Vinod,
+
+On Sun, Mar 10, 2024 at 10:16:51PM +0530, Vinod Koul wrote:
+> On 08-03-24, 19:36, Jakub Kicinski wrote:
+> > On Sat, 9 Mar 2024 02:30:25 +0000 Daniel Golle wrote:
+> > > > Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> > > > Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>  
+> > > 
+> > > It's been a month since this patch was posted. Maybe it has somehow
+> > > slipped under the table (or even under the carpet)?
 > 
-> unregister_netdevice_many_notify() -> netdev_unregister_kobject() ->
-> device_del() -> devres_release_all().
+> Nope, somehow I dont have this in inbox, i think i have some issues with
+> gmail and list server,
 
-Ah, I thought it's only triggered on bus remove. I guess it must be
-triggered on both.
+The series can be found here, just in case:
+
+https://patchwork.kernel.org/project/linux-phy/list/?series=824861
+
+> 
+> > Lots of people in To:, lets direct the question to Vinod? 
+> > Most active generic PHY maintainer according to git, Vinod?
+> 
+> thanks for letting me know...
+> I will review it in next few days (pulled it from lore using b4)
+
+It'd be great if you can take a look and maybe merge this so
+we can proceed adding support for MT7988.
+
+Thank you!
 
