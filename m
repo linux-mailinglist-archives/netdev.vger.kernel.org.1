@@ -1,265 +1,180 @@
-Return-Path: <netdev+bounces-81052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED10988595D
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:48:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2DB288595A
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:47:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EC0028270C
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:48:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24C36282308
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:47:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E91F83CDD;
-	Thu, 21 Mar 2024 12:48:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BFED83CBA;
+	Thu, 21 Mar 2024 12:47:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="NMYbxKjV";
-	dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b="B8z9YuAR"
+	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="Ja8pHUrU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9BB083CC6;
-	Thu, 21 Mar 2024 12:48:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A03A76029
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 12:47:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711025286; cv=none; b=uG96Zqy1Yy8bNb2T1Xt3uvoObB7gRQyeJHovIsGRZ+QB8QJdm0IBnqcvvoAKz+7YZE0GCAEa7eHnEuhFJwiN89TupCCNRs9L+sejUblNzLpAopomp09THvlz7GGgRanE7ZIQ2lRF+8t1a3JmyOPo9iA4RZp19+UFNy1rjv9Vxj8=
+	t=1711025270; cv=none; b=S/AtjmzZFyKARif1FNmCyBXdPFyd2HpBX9pNqbsA566P7MW8ka1AUsm3NU6YIQdv7F6V6nC21Gi6A9r6gcWHGpV7+TCKoTGEHz2gaJHHjbvaa4QdEKVT20vYQimG323u5vQYbFiktNIScbzpFL0MFFxqPDSk+qqJGVd9fSJhHng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711025286; c=relaxed/simple;
-	bh=4pwkuVPASujLtvUAcOeumSFvUYsF5sf+M00LrdtdnmY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=RXtXJoSnSduzo4epT1DPxftCzmeQV27meVCXzop/H2xNr5eWTXZ1c7bVfxxR6GSuA6g8AUzLCp82UIJVevHGdzDNU+qMM9clr3MzwC/7A++I0Zvw58X8C1Jx8rHYrh6h3SNAy5iimh+ud0F05T48+PSOD7WJ6HVtdTOhSElU2io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=NMYbxKjV; dkim=pass (1024-bit key) header.d=suse.com header.i=@suse.com header.b=B8z9YuAR; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	s=arc-20240116; t=1711025270; c=relaxed/simple;
+	bh=1c3ojoTL56EbnU4NtNLQXUjfDG51FKcjYr23h72rp+Y=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=mIy7OHiCL0V3hj9mG/c8MmtxanqvDzuYj73Z0KWSxZsib/BHfOdBTF05XlgvJv2zbFz/ULirgSw7KlvIVDi1w/vo/5ByPCtE5CazVoXp30j3RC225ix5Ic7zxLff0hzmxYGTz5XDYf93DTocQnboXCQb99OrKULDTisJSEPTFIE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=Ja8pHUrU; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
+	s=201909; t=1711025264;
+	bh=VpTgsHsE8Gwfx7YFHfRPL4F/osaBTmZy0HilednQEpY=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=Ja8pHUrUQvzu5RY8zFcgOwKslWfGRly7LXNffj17mBPyISG4D9nO5B4xwkMcsDUCG
+	 cIMcvey7zJjBOZwfSMY+LNafAC55wMlzZm8O8hBODwzTCxgJKR9EFnSDH9h5Ot3XJe
+	 yd2tvTiJDTeS2MbssbzK1fULqtg4gYUgU8TUy+di12moX1whg+7rKsKrxC2MuyihA0
+	 KlWpUQXCmytoN6ZbBCjM0kaQMVsbZVuI4Wd2esQjZXsrNr8wMxKxGATiAiEET8ke5O
+	 LPZXVzbUVfooAqrB3DOpHr51RDxmhwkneZ0/02M11IsLVaU/a667pG2wWKeVENYoOC
+	 uDuMVGhWqeJDQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id EAE551FC83;
-	Thu, 21 Mar 2024 12:48:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1711025282; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=gVje2G/MWNXU76aPP5C7g31t/cKVQY55RCzo6eErdoU=;
-	b=NMYbxKjVzVQqSddBaVOYu7ujpvbBArz5B1aY6U+HuybMK/O4wdmPrFCt+mDs3yudNjpFKh
-	qZiuF+I1UgZoxm2cDDmV5So1PsipAfVQJCMej9iuhMRRoINGYrcMo9KM1nc7i92dUGwxTD
-	DHsVciLld0fAjcd2fnhmFtKkMqwedKM=
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.com; s=susede1;
-	t=1711025281; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
-	bh=gVje2G/MWNXU76aPP5C7g31t/cKVQY55RCzo6eErdoU=;
-	b=B8z9YuARPR1yqmPrxgg9bQI98U1yx3nTKtFsfVmMplhd2KJK/3hs+/NRGTCFQm4VXcHe4g
-	zyXjgI4EzvJ8SafYlgtDSBHNOpfBrmtzPe08zePc26C5LTvouJU5adEPQRtPjqSCwXnYNm
-	4PbLJm/Az1UUZ2zsjYhW2lg612QQ1+U=
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 7D666136AD;
-	Thu, 21 Mar 2024 12:48:01 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([10.150.64.162])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id y0NXHIEs/GVCTQAAD6G6ig
-	(envelope-from <oneukum@suse.com>); Thu, 21 Mar 2024 12:48:01 +0000
-From: Oliver Neukum <oneukum@suse.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Oliver Neukum <oneukum@suse.com>,
-	syzbot+9665bf55b1c828bbcd8a@syzkaller.appspotmail.com
-Subject: [PATCH net-next] usbnet: fix cyclical race on disconnect with work queue
-Date: Thu, 21 Mar 2024 13:46:41 +0100
-Message-ID: <20240321124758.6302-1-oneukum@suse.com>
-X-Mailer: git-send-email 2.44.0
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4V0lbx3xtpz4wc1;
+	Thu, 21 Mar 2024 23:47:41 +1100 (AEDT)
+From: Michael Ellerman <mpe@ellerman.id.au>
+To: Michal =?utf-8?Q?Such=C3=A1nek?= <msuchanek@suse.de>
+Cc: netdev@vger.kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+ linuxppc-dev@lists.ozlabs.org, wireguard@lists.zx2c4.com,
+ dtsen@linux.ibm.com, Herbert Xu <herbert@gondor.apana.org.au>
+Subject: Re: Cannot load wireguard module
+In-Reply-To: <20240320160428.GQ20665@kitsune.suse.cz>
+References: <20240315122005.GG20665@kitsune.suse.cz>
+ <87jzm32h7q.fsf@mail.lhotse> <87r0g7zrl2.fsf@mail.lhotse>
+ <20240318170855.GK20665@kitsune.suse.cz>
+ <20240319124742.GM20665@kitsune.suse.cz> <87le6dyt1f.fsf@mail.lhotse>
+ <20240320160428.GQ20665@kitsune.suse.cz>
+Date: Thu, 21 Mar 2024 23:47:41 +1100
+Message-ID: <87frwjzr82.fsf@mail.lhotse>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Score: 2.20
-X-Spamd-Result: default: False [2.20 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 BAYES_HAM(-3.00)[100.00%];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 R_MISSING_CHARSET(2.50)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 TAGGED_RCPT(0.00)[9665bf55b1c828bbcd8a];
-	 MIME_GOOD(-0.10)[text/plain];
-	 BROKEN_CONTENT_TYPE(1.50)[];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.com:s=susede1];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCPT_COUNT_SEVEN(0.00)[9];
-	 MID_CONTAINS_FROM(1.00)[];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.com:email];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 RCVD_TLS_ALL(0.00)[];
-	 SUSPICIOUS_RECIPS(1.50)[]
-X-Spam-Level: **
-Authentication-Results: smtp-out2.suse.de;
-	none
-X-Spam-Flag: NO
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-The work can submit URBs and the URBs can schedule the work.
-This cycle needs to be broken, when a device is to be stopped.
-Use a flag to do so.
+Michal Such=C3=A1nek <msuchanek@suse.de> writes:
+> On Wed, Mar 20, 2024 at 11:41:32PM +1100, Michael Ellerman wrote:
+>> Michal Such=C3=A1nek <msuchanek@suse.de> writes:
+>> > On Mon, Mar 18, 2024 at 06:08:55PM +0100, Michal Such=C3=A1nek wrote:
+>> >> On Mon, Mar 18, 2024 at 10:50:49PM +1100, Michael Ellerman wrote:
+>> >> > Michael Ellerman <mpe@ellerman.id.au> writes:
+>> >> > > Michal Such=C3=A1nek <msuchanek@suse.de> writes:
+>> >> > >> Hello,
+>> >> > >>
+>> >> > >> I cannot load the wireguard module.
+>> >> > >>
+>> >> > >> Loading the module provides no diagnostic other than 'No such de=
+vice'.
+>> >> > >>
+>> >> > >> Please provide maningful diagnostics for loading software-only d=
+river,
+>> >> > >> clearly there is no particular device needed.
+>> >> > >
+>> >> > > Presumably it's just bubbling up an -ENODEV from somewhere.
+>> >> > >
+>> >> > > Can you get a trace of it?
+>> >> > >
+>> >> > > Something like:
+>> >> > >
+>> >> > >   # trace-cmd record -p function_graph -F modprobe wireguard
+>> >
+>> > Attached.
+>>=20
+>> Sorry :/, you need to also trace children of modprobe, with -c.
+>>=20
+>> But, I was able to reproduce the same issue here.
+>>=20
+>> On a P9, a kernel with CONFIG_CRYPTO_CHACHA20_P10=3Dn everything works:
+>>=20
+>>   $ modprobe -v wireguard
+>>   insmod /lib/modules/6.8.0/kernel/net/ipv4/udp_tunnel.ko
+>>   insmod /lib/modules/6.8.0/kernel/net/ipv6/ip6_udp_tunnel.ko
+>>   insmod /lib/modules/6.8.0/kernel/lib/crypto/libchacha.ko
+>>   insmod /lib/modules/6.8.0/kernel/lib/crypto/libchacha20poly1305.ko
+>>   insmod /lib/modules/6.8.0/kernel/drivers/net/wireguard/wireguard.ko
+>>   [   19.180564][  T692] wireguard: allowedips self-tests: pass
+>>   [   19.185080][  T692] wireguard: nonce counter self-tests: pass
+>>   [   19.310438][  T692] wireguard: ratelimiter self-tests: pass
+>>   [   19.310639][  T692] wireguard: WireGuard 1.0.0 loaded. See www.wire=
+guard.com for information.
+>>   [   19.310746][  T692] wireguard: Copyright (C) 2015-2019 Jason A. Don=
+enfeld <Jason@zx2c4.com>. All Rights Reserved.
+>>=20
+>>=20
+>> If I build CONFIG_CRYPTO_CHACHA20_P10 as a module then it breaks:
+>>=20
+>>   $ modprobe -v wireguard
+>>   insmod /lib/modules/6.8.0/kernel/net/ipv4/udp_tunnel.ko
+>>   insmod /lib/modules/6.8.0/kernel/net/ipv6/ip6_udp_tunnel.ko
+>>   insmod /lib/modules/6.8.0/kernel/lib/crypto/libchacha.ko
+>>   insmod /lib/modules/6.8.0/kernel/arch/powerpc/crypto/chacha-p10-crypto=
+.ko
+>>   modprobe: ERROR: could not insert 'wireguard': No such device
+>>=20
+>>=20
+>> The ENODEV is coming from module_cpu_feature_match(), which blocks the
+>> driver from loading on non-p10.
+>>=20
+>> Looking at other arches (arm64 at least) it seems like the driver should
+>> instead be loading but disabling the p10 path. Which then allows
+>> chacha_crypt_arch() to exist, and it has a fallback to use
+>> chacha_crypt_generic().
+>>=20
+>> I don't see how module_cpu_feature_match() can co-exist with the driver
+>> also providing a fallback. Hopefully someone who knows crypto better
+>> than me can explain it.
+>
+> Maybe it doesn't. ppc64le is the only platform that needs the fallback,
+> on other platforms that have hardware-specific chacha implementation it
+> seems to be using pretty common feature so the fallback is rarely if
+> ever needed in practice.
 
-Fixes: f29fc259976e9 ("[PATCH] USB: usbnet (1/9) clean up framing")
-Reported-by: syzbot+9665bf55b1c828bbcd8a@syzkaller.appspotmail.com
-Signed-off-by: Oliver Neukum <oneukum@suse.com>
----
- drivers/net/usb/usbnet.c   | 37 ++++++++++++++++++++++++++++---------
- include/linux/usb/usbnet.h | 18 ++++++++++++++++++
- 2 files changed, 46 insertions(+), 9 deletions(-)
+Yeah you are probably right.
 
-diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c
-index e84efa661589..422d91635045 100644
---- a/drivers/net/usb/usbnet.c
-+++ b/drivers/net/usb/usbnet.c
-@@ -467,10 +467,12 @@ static enum skb_state defer_bh(struct usbnet *dev, struct sk_buff *skb,
- void usbnet_defer_kevent (struct usbnet *dev, int work)
+The arm64 NEON code was changed by Ard to behave like a library in
+b3aad5bad26a ("crypto: arm64/chacha - expose arm64 ChaCha routine as
+library function").
+
+Which included this change:
+
+@@ -179,14 +207,17 @@ static struct skcipher_alg algs[] =3D {
+ static int __init chacha_simd_mod_init(void)
  {
- 	set_bit (work, &dev->flags);
--	if (!schedule_work (&dev->kevent))
--		netdev_dbg(dev->net, "kevent %s may have been dropped\n", usbnet_event_names[work]);
--	else
--		netdev_dbg(dev->net, "kevent %s scheduled\n", usbnet_event_names[work]);
-+	if (!usbnet_going_away(dev)) {
-+		if (!schedule_work (&dev->kevent))
-+			netdev_dbg(dev->net, "kevent %s may have been dropped\n", usbnet_event_names[work]);
-+		else
-+			netdev_dbg(dev->net, "kevent %s scheduled\n", usbnet_event_names[work]);
-+	}
+        if (!cpu_have_named_feature(ASIMD))
+-               return -ENODEV;
++               return 0;
++
++       static_branch_enable(&have_neon);
+
+        return crypto_register_skciphers(algs, ARRAY_SIZE(algs));
  }
- EXPORT_SYMBOL_GPL(usbnet_defer_kevent);
- 
-@@ -538,7 +540,8 @@ static int rx_submit (struct usbnet *dev, struct urb *urb, gfp_t flags)
- 			tasklet_schedule (&dev->bh);
- 			break;
- 		case 0:
--			__usbnet_queue_skb(&dev->rxq, skb, rx_start);
-+			if (!usbnet_going_away(dev))
-+				__usbnet_queue_skb(&dev->rxq, skb, rx_start);
- 		}
- 	} else {
- 		netif_dbg(dev, ifdown, dev->net, "rx: stopped\n");
-@@ -849,6 +852,16 @@ int usbnet_stop (struct net_device *net)
- 	del_timer_sync (&dev->delay);
- 	tasklet_kill (&dev->bh);
- 	cancel_work_sync(&dev->kevent);
-+
-+	/*
-+	 * we have cyclic dependencies. Those calls are needed
-+	 * to break a cycle. We cannot fall into the gaps because
-+	 * we have a flag
-+	 */
-+	tasklet_kill (&dev->bh);
-+	del_timer_sync (&dev->delay);
-+	cancel_work_sync(&dev->kevent);
-+
- 	if (!pm)
- 		usb_autopm_put_interface(dev->intf);
- 
-@@ -1174,7 +1187,8 @@ usbnet_deferred_kevent (struct work_struct *work)
- 					   status);
- 		} else {
- 			clear_bit (EVENT_RX_HALT, &dev->flags);
--			tasklet_schedule (&dev->bh);
-+			if (!usbnet_going_away(dev))
-+				tasklet_schedule (&dev->bh);
- 		}
- 	}
- 
-@@ -1196,10 +1210,13 @@ usbnet_deferred_kevent (struct work_struct *work)
- 			}
- 			if (rx_submit (dev, urb, GFP_KERNEL) == -ENOLINK)
- 				resched = 0;
--			usb_autopm_put_interface(dev->intf);
- fail_lowmem:
--			if (resched)
-+			usb_autopm_put_interface(dev->intf);
-+			if (resched) {
-+				set_bit (EVENT_RX_MEMORY, &dev->flags);
-+
- 				tasklet_schedule (&dev->bh);
-+			}
- 		}
- 	}
- 
-@@ -1212,13 +1229,13 @@ usbnet_deferred_kevent (struct work_struct *work)
- 		if (status < 0)
- 			goto skip_reset;
- 		if(info->link_reset && (retval = info->link_reset(dev)) < 0) {
--			usb_autopm_put_interface(dev->intf);
- skip_reset:
- 			netdev_info(dev->net, "link reset failed (%d) usbnet usb-%s-%s, %s\n",
- 				    retval,
- 				    dev->udev->bus->bus_name,
- 				    dev->udev->devpath,
- 				    info->description);
-+			usb_autopm_put_interface(dev->intf);
- 		} else {
- 			usb_autopm_put_interface(dev->intf);
- 		}
-@@ -1562,6 +1579,7 @@ static void usbnet_bh (struct timer_list *t)
- 	} else if (netif_running (dev->net) &&
- 		   netif_device_present (dev->net) &&
- 		   netif_carrier_ok(dev->net) &&
-+		   !usbnet_going_away(dev) &&
- 		   !timer_pending(&dev->delay) &&
- 		   !test_bit(EVENT_RX_PAUSED, &dev->flags) &&
- 		   !test_bit(EVENT_RX_HALT, &dev->flags)) {
-@@ -1609,6 +1627,7 @@ void usbnet_disconnect (struct usb_interface *intf)
- 	usb_set_intfdata(intf, NULL);
- 	if (!dev)
- 		return;
-+	usbnet_mark_going_away(dev);
- 
- 	xdev = interface_to_usbdev (intf);
- 
-diff --git a/include/linux/usb/usbnet.h b/include/linux/usb/usbnet.h
-index 9f08a584d707..d26599faab33 100644
---- a/include/linux/usb/usbnet.h
-+++ b/include/linux/usb/usbnet.h
-@@ -76,8 +76,26 @@ struct usbnet {
- #		define EVENT_LINK_CHANGE	11
- #		define EVENT_SET_RX_MODE	12
- #		define EVENT_NO_IP_ALIGN	13
-+/*
-+ * this one is special, as it indicates that the device is going away
-+ * there are cyclic dependencies between tasklet, timer and bh
-+ * that must be broken
-+ */
-+#		define EVENT_UNPLUG		31
- };
- 
-+static inline bool usbnet_going_away(struct usbnet *ubn)
-+{
-+	smp_mb__before_atomic();
-+	return test_bit(EVENT_UNPLUG, &ubn->flags);
-+}
-+
-+static inline void usbnet_mark_going_away(struct usbnet *ubn)
-+{
-+	set_bit(EVENT_UNPLUG, &ubn->flags);
-+	smp_mb__after_atomic();
-+}
-+
- static inline struct usb_driver *driver_of(struct usb_interface *intf)
- {
- 	return to_usb_driver(intf->dev.driver);
--- 
-2.44.0
 
+It didn't use module_cpu_feature_match(), but the above is basically the
+same pattern.
+
+I don't actually see the point of using module_cpu_feature_match() for
+this code.
+
+There's no point loading it unless someone wants to use chacha, and that
+should be handled by MODULE_ALIAS_CRYPTO("chacha20") etc.
+
+cheers
 
