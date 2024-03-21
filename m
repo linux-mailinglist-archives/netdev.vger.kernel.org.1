@@ -1,192 +1,100 @@
-Return-Path: <netdev+bounces-81080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6939885B30
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:53:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B957E885B34
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:55:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5039A1F2251F
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 14:53:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD77F1C20FE8
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 14:55:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37D9385277;
-	Thu, 21 Mar 2024 14:53:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EDBB8593F;
+	Thu, 21 Mar 2024 14:55:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Bo1mXDrd";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="72pv6KOl"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5WaKaz9Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84B9B58232;
-	Thu, 21 Mar 2024 14:53:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1C7F84FBC
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 14:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711032806; cv=none; b=qhnUqNgDztqkKxIOgjobSlv9FmSqD8aFN3LLp4KZQcOaCF0vSsVeZ7WPZmnq35C/SFHyc+aPv0yB9stBxqUCdrkH37q3p8sxxmzuhz1Q1zfPNRlthWTZX5x+c0Olm4iC7EEd6lNXSibc23ywE7v+s4ZhkqUUeZpbx/+vl/qWezk=
+	t=1711032937; cv=none; b=mjaYPiHYMEDhiIHe7NNmeKQWp4qixqiUb7jpPmTgfzJdzqtbzRpi6RGhnm+0HRfJJ/+eQXvqLL4Sv/kjRyjFaREzkIKVZsm/OAzJsnCTql2t0PKGPTi0h1hk9erPPdM1tVzr1n5pZV6njLZ+i5WLX7qImz+8kmw0FtIs/hwUoJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711032806; c=relaxed/simple;
-	bh=xrAps+kQb2l8QaGn7Q6eCI50hbOHvxC5cKDHNy6xTB4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=la2+WOKCeVTqiB9laHJY+86CtaBZeqdDFefQk5kbEx50VqUmWXIrjf7B2NFIt+ULAFbCEVmTfUacFnHoozzaEQz8uc3uoHCpSgpTBVJbNqhYZuccqUPJW6Pfel4zzkijkvlBj/7wRAWBNO28B8D7lPbrqgnr0m1auWrBa7GS34g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Bo1mXDrd; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=72pv6KOl; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1711032802;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2r4kmlwH724Y4qI43//rL/0kpwyX9e5Eqqy+Tzlxna4=;
-	b=Bo1mXDrdv9XN9ZfmeP7xgJh41zMLO8nOEsx6Tq0pqTkcVSOjDALigxXRNqQR8I0ICkjnfE
-	jKO/rVkdvlpkv5QW3DdVSUE4ZpI6JNA5PUc3upt94pt9Nne/B2u264SiabjnUjwD2L0TvP
-	nviHQ1omFuOg+DMG4rX7W/RNABhShvvJfJ6ph9bQLYwJbxU4c3B+hFv6o3gbZL6IO1et4L
-	Ea2A6wYiuyQJAU+QkrkR+1uaIIBGH4tu9wPipDWhkzBy9amAzqt4KSNAnaeYkgXyRKtEan
-	ZKOg7m+zHEJ3/7TT611E4X5nrcCwVRrIumMmrk9MKxUMp7ci7AOVlnh1U81J0g==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1711032802;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2r4kmlwH724Y4qI43//rL/0kpwyX9e5Eqqy+Tzlxna4=;
-	b=72pv6KOlbz95mP5aFQ19r1gYUoZf8dUWfzAVreSPhDIR2yaW8/hAvL1hmsHdgv1+EU9W0K
-	esvYdHhzFZEGnZDg==
-To: lakshmi.sowjanya.d@intel.com, jstultz@google.com, giometti@enneenne.com,
- corbet@lwn.net, linux-kernel@vger.kernel.org
-Cc: x86@kernel.org, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org, andriy.shevchenko@linux.intel.com,
- eddie.dong@intel.com, christopher.s.hall@intel.com,
- jesse.brandeburg@intel.com, davem@davemloft.net,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com,
- mcoquelin.stm32@gmail.com, perex@perex.cz, linux-sound@vger.kernel.org,
- anthony.l.nguyen@intel.com, peter.hilber@opensynergy.com,
- pandith.n@intel.com, mallikarjunappa.sangannavar@intel.com,
- subramanian.mohan@intel.com, basavaraj.goudar@intel.com,
- thejesh.reddy.t.r@intel.com, lakshmi.sowjanya.d@intel.com
-Subject: Re: [PATCH v5 02/11] timekeeping: Add function to convert realtime
- to base clock
-In-Reply-To: <20240319130547.4195-3-lakshmi.sowjanya.d@intel.com>
-References: <20240319130547.4195-1-lakshmi.sowjanya.d@intel.com>
- <20240319130547.4195-3-lakshmi.sowjanya.d@intel.com>
-Date: Thu, 21 Mar 2024 15:53:22 +0100
-Message-ID: <87le6bhc0t.ffs@tglx>
+	s=arc-20240116; t=1711032937; c=relaxed/simple;
+	bh=uyahtdgdPkXVVOhSVN1WKtJkuacZaoYwK2ioxP4JXpU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j+y9O+K8qUfHYjEOEI7N/bgrp5OyNSNGQxT5Fs9lzrHq4DfbAjofopMLRoO5l5IP4Lt3Z45lUQvRJMF6OQixidL3JqSjgx9u1u+JwqF+W5IGz7sHk9abaqpfK2W1k4nfgQKyUOZE7zP0Fsi8gpWCmagT0ipfgVCQS+rQksDVFLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5WaKaz9Q; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=yh8EYlQ4m/DKJg9xQn1MNNl+VoPTz84vXNwKBwO+qmo=; b=5W
+	aKaz9QB/A5VD4jKhKGLBqDwNmi/2x6WJeqdR5lj5MXYwA9DniEpo5BaqYN031ogbM3m959mBnhHAt
+	e5sNLJIJ3ZB4kLOmfLNRwqkhURMwSdaBmMnoD9jnk1/qtfHDaRT/jh6Hi+IzByR30143K1li4wlH4
+	ZF0felBq0mdIvoM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rnJpC-00Asq1-VR; Thu, 21 Mar 2024 15:55:22 +0100
+Date: Thu, 21 Mar 2024 15:55:22 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: Serge Semin <fancer.lancer@gmail.com>, hkallweit1@gmail.com,
+	peppe.cavallaro@st.com, alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+	chenhuacai@loongson.cn, linux@armlinux.org.uk,
+	guyinggang@loongson.cn, netdev@vger.kernel.org,
+	chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH net-next v8 06/11] net: stmmac: dwmac-loongson: Add GNET
+ support
+Message-ID: <09698d20-7188-45ed-89c5-1161bd52f2b1@lunn.ch>
+References: <cover.1706601050.git.siyanteng@loongson.cn>
+ <027b4ee29d4d7c8a22d2f5c551f5c21ced3fb046.1706601050.git.siyanteng@loongson.cn>
+ <ftqxjh67a7s4iprpiuw5xxmncj3bveezf5vust7cej3kowwcvj@m7nqrxq7oe2f>
+ <d0e56c9b-9549-4061-8e44-2504b6b96897@loongson.cn>
+ <466f138d-0baa-4a86-88af-c690105e650e@loongson.cn>
+ <x6wwfvuzqpzfzstb3l5adp354z2buevo35advv7q347gnmo3zn@vfzwca5fafd3>
+ <a9958d92-41da-4c3a-8c57-615158c3c8a2@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <a9958d92-41da-4c3a-8c57-615158c3c8a2@loongson.cn>
 
-On Tue, Mar 19 2024 at 18:35, lakshmi.sowjanya.d@intel.com wrote:
-> +bool ktime_real_to_base_clock(ktime_t treal, enum clocksource_ids base_id, u64 *cycles)
-> +{
-> +	struct timekeeper *tk = &tk_core.timekeeper;
-> +	unsigned int seq;
-> +	u64 delta;
-> +
-> +	do {
-> +		seq = read_seqcount_begin(&tk_core.seq);
-> +		delta = (u64)treal - tk->tkr_mono.base_real;
-> +		if (delta > tk->tkr_mono.clock->max_idle_ns)
-> +			return false;
+> Because the default return value of gnet's mdio is 0xffff, when scanning for
+> phy,
+> 
+> if the return value is not 0, it will be assumed that the phy for that
+> address exists.
 
-I don't think this cutoff is valid. There is no guarantee that this is
-linear unless:
+That is not correct. The MDIO bus has a pull up on the data line. If
+there is no device at a given address, that pull up results in 0xffff
+being read. phylib understands this, it knows that a read with the
+value of 0xffff probably means there is no device at that address. So
+it will not create a device.
 
-       Treal[last timekeeper update] <= treal < Treal[next timekeeper update]
+>  Not specifying an address will cause all addresses' phy to be detected, and
+> the
+> 
+> lowest address' phy will be selected by default. so then, the network is
+> unavailable.
 
-Look at the dance in get_device_system_crosststamp() and
-adjust_historical_crosststamp() to see why.
+Do you have multiple PHYs on the bus? If there is only one PHY the
+first PHY should be the PHY you want, and phy_find_first() will do
+what you need. However, if there are multiple PHYs on the bus, you
+really should use a phandle in DT to point to the correct PHY.
 
-> +		*cycles = tk->tkr_mono.cycle_last + convert_ns_to_cs(delta);
-> +		if (!convert_cs_to_base(cycles, base_id))
-> +			return false;
-> +	} while (read_seqcount_retry(&tk_core.seq, seq));
-> +
-> +	return true;
-> +}
-> +EXPORT_SYMBOL_GPL(ktime_real_to_base_clock);
-
-Looking at the usage site:
-
-> +static bool pps_generate_next_pulse(struct pps_tio *tio, ktime_t expires)
-> +{
-> +	u64 art;
-> +
-> +	if (!ktime_real_to_base_clock(expires, CSID_X86_ART, &art)) {
-> +		pps_tio_disable(tio);
-
-I'm pretty sure this can happen when there is sufficient delay between
-the check for (now - expires < SAFE_TIME_NS) and the delta computation
-in ktime_real_to_base_clock() if there is a timerkeeper update
-interleaving which brings tkr_mono.base_real in front of expires.
-
-Is that intentional and correct?
-
-If so, then it's inconsistent with the behaviour of the hrtimer
-callback:
-
-> +		return false;
-> +	}
-> +
-> +	pps_compv_write(tio, art - ART_HW_DELAY_CYCLES);
-> +	return true;
-> +}
-> +
-> +static enum hrtimer_restart hrtimer_callback(struct hrtimer *timer)
-> +{
-> +	struct pps_tio *tio = container_of(timer, struct pps_tio, timer);
-> +	ktime_t expires, now;
-> +
-> +	guard(spinlock)(&tio->lock);
-> +
-> +	expires = hrtimer_get_expires(timer);
-> +	now = ktime_get_real();
-> +
-> +	if (now - expires < SAFE_TIME_NS) {
-> +		if (!pps_generate_next_pulse(tio, expires + SAFE_TIME_NS))
-> +			return HRTIMER_NORESTART;
-> +	}
-
-This safe guard does not care about time being set. I'm not familiar
-with the PPS logic, but is it expected that the pulse pattern will be
-like this:
-
-         
-
-    ---|-----|-----|-----|----------------->
-       P     P  ^        P
-                |
-        clock_settime(CLOCK_REALTIME, now - 2 seconds)         
-        
-        Obviously the pulse gap will be as big as the time is set
-        backwards, which might be way more than 2 seconds.
-        
-
-    ---|-----|-----|-----|----------------->
-       P     P  ^  P     P
-                |
-        clock_settime(CLOCK_REALTIME, now + 2 seconds)         
-
-I don't see anything in this code which cares about CLOCK_REALTIME being
-set via clock_settime() or adjtimex().
-
-Aside of that I have a question about how the TIO hardware treats this
-case:
-
-   ktime_real_to_base_clock(expires, &art);
-
--> GAP which makes @art get into the past
-
-   pps_compv_write(tio, art - ART_HW_DELAY_CYCLES);
-
-Will the hardware ignore that already expired value or just emit a pulse
-immediately? In the latter case the pulse will be at a random point in
-time, which does not sound correct.
-
-Thanks,
-
-        tglx
+       Andrew
 
