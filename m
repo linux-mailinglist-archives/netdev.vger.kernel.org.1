@@ -1,208 +1,122 @@
-Return-Path: <netdev+bounces-80966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5582F8855BE
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:33:09 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F0418855C5
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:33:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9AE91F21191
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 08:33:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60CB81C20CE2
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 08:33:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D741CD1C;
-	Thu, 21 Mar 2024 08:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CrHW+3pu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1040239870;
+	Thu, 21 Mar 2024 08:32:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA12ADF41
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 08:32:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CE81200BA;
+	Thu, 21 Mar 2024 08:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711009972; cv=none; b=UBUIjKTCZS7v2ldBNnuzgEdAs/YuwiWpMewqgUMZbGuqhe/+fp29mE3cZ3zJltJB30Wu9C+ajzhIdJPvKrmsM1NEBSm1TEu3ZbF5AeVnm5gn2LqA2ppREO1NlAYHZmq+BzJcIa2yhITDmEV3CXmA2sBQgj28Oz5SF7U9sRjS4Y0=
+	t=1711009975; cv=none; b=UQZ2bCH0jTrHZ/RWlAuLm0Wt7WQ6t1VUPKPelczORBVI4FK4H7b1KI9bRZQwLr0UvCv3dN0r4QYd2ObmpNb3H/HxKqdtu7N2qq42G4AzW338AqNFLjFXIdEdIP8RUQTOPItE3xShyeUKgmFJN4DjDY7aHnLiMLHcQs+QuzwRYm4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711009972; c=relaxed/simple;
-	bh=jjXZnyIwwnqHtpyXY9kprbHen6nKmOUvgl7EyNGh+2E=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=hrPBzehXESj91xbzv6Y73MxqThdHBk/DNV/rNxfFL/WS5rGPFvItmIEEVPnw5elQscghUlcSFs2Q+CG2z3J8b3N9jXbMoQyzWH4zBFWzqiLb2vr5GVBlNpTQmG+ZspWBY89vCw9pvWveB+Pi71gBRbT0703aVOlDhsp+mEWg8SA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CrHW+3pu; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711009961; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=BLoHe15uKdp14O/oRqVBuqsIWpnD38/Sd4/X0Jt2YMY=;
-	b=CrHW+3puIv3yfWo+Tn/BSP9ilbUaYIR4HnoJHLcN9EvT10UxhmhMbVJFpHxQHWyagwv9q3/NBNpVa8+NDaeOtwjBuw/LiWCzKmCycYlIXsIwF+EavtEI844X4xqQZS579R/1OVgv5th8m99BnuYfxQpi8azZ7w925sDHomYq/14=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R651e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W3-AsBW_1711009960;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W3-AsBW_1711009960)
-          by smtp.aliyun-inc.com;
-          Thu, 21 Mar 2024 16:32:40 +0800
-Message-ID: <1711009827.9194505-5-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v4 00/10] virtio: drivers maintain dma info for premapped vq
-Date: Thu, 21 Mar 2024 16:30:27 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux.dev,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org
-References: <20240312033557.6351-1-xuanzhuo@linux.alibaba.com>
- <CACGkMEt0O1tjJu_paVWvxUQqnq_wMv+9YmOBzFGuGLy9_0-qVA@mail.gmail.com>
-In-Reply-To: <CACGkMEt0O1tjJu_paVWvxUQqnq_wMv+9YmOBzFGuGLy9_0-qVA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1711009975; c=relaxed/simple;
+	bh=JQe2hA73NUK4BTZbJZTGWFApkIPtA+TtSzkxkKSsioU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tQuv85h6z0nWddQbqwDCbAxaqmkUpFM9l5OePm0nRZFAiff/87BP+KluYLYxGxyn5gouS78CAQit2lBBd1V39c7Vd+TgbLUq5KwBvTnMeUALJEiG+70xPkAlPSMb8eiuaeIOJlmEyJplyE05rTiqBBYgSilrqDd7JpiXskn77GE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4V0dxl4zyTz4f3kFP;
+	Thu, 21 Mar 2024 16:32:43 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.252])
+	by mail.maildlp.com (Postfix) with ESMTP id B383E1A0172;
+	Thu, 21 Mar 2024 16:32:49 +0800 (CST)
+Received: from [10.67.111.192] (unknown [10.67.111.192])
+	by APP3 (Coremail) with SMTP id _Ch0CgDH05uw8PtlnGQCHg--.7682S2;
+	Thu, 21 Mar 2024 16:32:49 +0800 (CST)
+Message-ID: <dec82e88-6961-4bf6-92b7-9acc753aaad4@huaweicloud.com>
+Date: Thu, 21 Mar 2024 16:32:48 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH bpf-next v2] arm64: bpf: fix 32bit unconditional bswap
+Content-Language: en-US
+To: Artem Savkov <asavkov@redhat.com>, Xi Wang <xi.wang@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Catalin Marinas <catalin.marinas@arm.com>, linux-kernel@vger.kernel.org,
+ Puranjay Mohan <puranjay12@gmail.com>
+References: <20240313140205.3191564-1-asavkov@redhat.com>
+ <20240321081809.158803-1-asavkov@redhat.com>
+From: Xu Kuohai <xukuohai@huaweicloud.com>
+In-Reply-To: <20240321081809.158803-1-asavkov@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:_Ch0CgDH05uw8PtlnGQCHg--.7682S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7Cry3KF1fKF1DKF45CF1ftFb_yoW8ur1fpr
+	43trsakrWUKF17Jay0gws7Ar1fAFWvy34UAr90qrW3ta90yw1DWr1rK3y29rsxtrWvvw45
+	uFyjyF93C3Z7tw7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkjb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7MxAIw28IcxkI
+	7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxV
+	Cjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY
+	6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6x
+	AIw20EY4v20xvaj40_WFyUJVCq3wCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv
+	6xkF7I0E14v26r1j6r4UYxBIdaVFxhVjvjDU0xZFpf9x07UWE__UUUUU=
+X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
 
-On Thu, 21 Mar 2024 12:45:08 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Tue, Mar 12, 2024 at 11:36=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibab=
-a.com> wrote:
-> >
-> > As discussed:
-> >
-> > http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVmJ3rH=
-YqRZxYg@mail.gmail.com
-> >
-> > If the virtio is premapped mode, the driver should manage the dma info =
-by self.
-> > So the virtio core should not store the dma info. We can release the me=
-mory used
-> > to store the dma info.
-> >
-> > For virtio-net xmit queue, if the virtio-net maintains the dma info,
-> > the virtio-net must allocate too much memory(19 * queue_size for per-qu=
-eue), so
-> > we do not plan to make the virtio-net to maintain the dma info by defau=
-lt. The
-> > virtio-net xmit queue only maintain the dma info when premapped mode is=
- enable
-> > (such as AF_XDP is enable).
-> >
-> > So this patch set try to do:
-> >
-> > 1. make the virtio core to do not store the dma info
->
-> I think you mean "make the virtio core to do not store the dma info
-> when driver can do that"
+On 3/21/2024 4:18 PM, Artem Savkov wrote:
+> In case when is64 == 1 in emit(A64_REV32(is64, dst, dst), ctx) the
+> generated insn reverses byte order for both high and low 32-bit words,
+> resuling in an incorrect swap as indicated by the jit test:
+> 
+> [ 9757.262607] test_bpf: #312 BSWAP 16: 0x0123456789abcdef -> 0xefcd jited:1 8 PASS
+> [ 9757.264435] test_bpf: #313 BSWAP 32: 0x0123456789abcdef -> 0xefcdab89 jited:1 ret 1460850314 != -271733879 (0x5712ce8a != 0xefcdab89)FAIL (1 times)
+> [ 9757.266260] test_bpf: #314 BSWAP 64: 0x0123456789abcdef -> 0x67452301 jited:1 8 PASS
+> [ 9757.268000] test_bpf: #315 BSWAP 64: 0x0123456789abcdef >> 32 -> 0xefcdab89 jited:1 8 PASS
+> [ 9757.269686] test_bpf: #316 BSWAP 16: 0xfedcba9876543210 -> 0x1032 jited:1 8 PASS
+> [ 9757.271380] test_bpf: #317 BSWAP 32: 0xfedcba9876543210 -> 0x10325476 jited:1 ret -1460850316 != 271733878 (0xa8ed3174 != 0x10325476)FAIL (1 times)
+> [ 9757.273022] test_bpf: #318 BSWAP 64: 0xfedcba9876543210 -> 0x98badcfe jited:1 7 PASS
+> [ 9757.274721] test_bpf: #319 BSWAP 64: 0xfedcba9876543210 >> 32 -> 0x10325476 jited:1 9 PASS
+> 
+> Fix this by forcing 32bit variant of rev32.
+> 
+> Fixes: 1104247f3f979 ("bpf, arm64: Support unconditional bswap")
+> Signed-off-by: Artem Savkov <asavkov@redhat.com>
+> Tested-by: Puranjay Mohan <puranjay12@gmail.com>
+> Acked-by: Puranjay Mohan <puranjay12@gmail.com>
+> ---
+>   arch/arm64/net/bpf_jit_comp.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/arch/arm64/net/bpf_jit_comp.c b/arch/arm64/net/bpf_jit_comp.c
+> index c5b461dda4385..c3ededd23cbf6 100644
+> --- a/arch/arm64/net/bpf_jit_comp.c
+> +++ b/arch/arm64/net/bpf_jit_comp.c
+> @@ -943,7 +943,7 @@ static int build_insn(const struct bpf_insn *insn, struct jit_ctx *ctx,
+>   			emit(A64_UXTH(is64, dst, dst), ctx);
+>   			break;
+>   		case 32:
+> -			emit(A64_REV32(is64, dst, dst), ctx);
+> +			emit(A64_REV32(0, dst, dst), ctx);
+>   			/* upper 32 bits already cleared */
+>   			break;
+>   		case 64:
 
-YES.
+Acked-by: Xu Kuohai <xukuohai@huawei.com>
 
-
->
-> >     - But if the desc_extra has not dma info, we face a new question,
-> >       it is hard to get the dma info of the desc with indirect flag.
->
-> I guess you want to avoid allocating desc_extra array, otherwise you
-> won't have this issue.
->
-> How about keeping that?
-
-This is a way. But when we allocate the indirect desc, we alloc
-more memory to save that, I think that is a good way.
-And in the future, we can handen the unmap for the indirect buffer
-with more memory allocated by once.
-
-Thanks.
-
-
->
-> >       For split mode, that is easy from desc, but for the packed mode,
-> >       it is hard to get the dma info from the desc. And hardening
-> >       the dma unmap is safe, we should store the dma info of indirect
-> >       descs when the virtio core does not store the bufer dma info.
-> >
-> >       So I introduce the "structure the indirect desc table" to
-> >       allocate space to store dma info of the desc table.
-> >
-> >         +struct vring_split_desc_indir {
-> >         +       dma_addr_t addr;                /* Descriptor Array DMA=
- addr. */
-> >         +       u32 len;                        /* Descriptor Array len=
-gth. */
-> >         +       u32 num;
->
-> We can probably just reuse vring_desc_extra here with a known flag
-> (read only for device).
->
-> >         +       struct vring_desc desc[];
-> >         +};
-> >
-> >       The follow patches to this:
-> >          * virtio_ring: packed: structure the indirect desc table
-> >          * virtio_ring: split: structure the indirect desc table
-> >
-> >     - On the other side, in the umap handle, we mix the indirect descs =
-with
-> >       other descs. That make things too complex. I found if we we disti=
-nguish
-> >       the descs with VRING_DESC_F_INDIRECT before unmap, thing will be =
-clearer.
-> >
-> >       The follow patches do this.
-> >          * virtio_ring: packed: remove double check of the unmap ops
-> >          * virtio_ring: split: structure the indirect desc table
-> >
-> > 2. make the virtio core to enable premapped mode by find_vqs() params
-> >     - Because the find_vqs() will try to allocate memory for the dma in=
-fo.
-> >       If we set the premapped mode after find_vqs() and release the
-> >       dma info, that is odd.
->
-> Thanks
->
-> >
-> >
-> > Please review.
-> >
-> > Thanks
-> >
-> > v4:
-> >     1. virtio-net xmit queue does not enable premapped mode by default
-> >
-> > v3:
-> >     1. fix the conflict with the vp_modern_create_avq().
-> >
-> > v2:
-> >     1. change the dma item of virtio-net, every item have MAX_SKB_FRAGS=
- + 2 addr + len pairs.
-> >     2. introduce virtnet_sq_free_stats for __free_old_xmit
-> >
-> > v1:
-> >     1. rename transport_vq_config to vq_transport_config
-> >     2. virtio-net set dma meta number to (ring-size + 1)(MAX_SKB_FRGAS =
-+2)
-> >     3. introduce virtqueue_dma_map_sg_attrs
-> >     4. separate vring_create_virtqueue to an independent commit
-> >
-> > Xuan Zhuo (10):
-> >   virtio_ring: introduce vring_need_unmap_buffer
-> >   virtio_ring: packed: remove double check of the unmap ops
-> >   virtio_ring: packed: structure the indirect desc table
-> >   virtio_ring: split: remove double check of the unmap ops
-> >   virtio_ring: split: structure the indirect desc table
-> >   virtio_ring: no store dma info when unmap is not needed
-> >   virtio: find_vqs: add new parameter premapped
-> >   virtio_ring: export premapped to driver by struct virtqueue
-> >   virtio_net: set premapped mode by find_vqs()
-> >   virtio_ring: virtqueue_set_dma_premapped support disable
-> >
-> >  drivers/net/virtio_net.c      |  57 +++--
-> >  drivers/virtio/virtio_ring.c  | 436 +++++++++++++++++++++-------------
-> >  include/linux/virtio.h        |   3 +-
-> >  include/linux/virtio_config.h |  17 +-
-> >  4 files changed, 307 insertions(+), 206 deletions(-)
-> >
-> > --
-> > 2.32.0.3.g01195cf9f
-> >
->
 
