@@ -1,145 +1,128 @@
-Return-Path: <netdev+bounces-80986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14D0488568F
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:32:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3670885697
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:33:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2C671F232E5
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:32:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64FD1B21958
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:33:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D7047F58;
-	Thu, 21 Mar 2024 09:32:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBBBC5337F;
+	Thu, 21 Mar 2024 09:33:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ef2qCtNU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ql67lD25"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95EC20326
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 09:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635C64D9E7
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 09:33:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711013572; cv=none; b=XOj5Ez4E2/MkJPmAL8TUo4cQs66upJGhm+UzZ495Cxi57Npk5NUK54Gbx5Fh+d0NvJRtuTUCWDyurn0eT4E/THmNgBjvIA9JpcW69yfwV6/SZv/PNXIsjGT5Tcg01g+UoHnvevVvWuF24I3d/yGqHdCsxyq8IgEURuAJ+CnDg60=
+	t=1711013613; cv=none; b=dK9Zihm4s594iY2oI1ohHfxc/oQNZejd6OIjv6cnNjW42hDInUySHFcMsQYUKz0BHfpimv5c4hd5B5mqaDIZZWP/hA24d99VqzC/nbEf7v/r0DjLfFNbv7dwVnKdvjzep6hnw3fzmMU6GMfkRjdeGjw1Y0SSB0GWr+VPFTKjLNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711013572; c=relaxed/simple;
-	bh=HnGE5lrb+ed+jZVNTRGh9kbSwPoRyH8eoBWAR6n0moM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kkYLuHmT54C0x6fT/yJbh7ivIYCrkBYpvv/b3kMQpJ12Oz9l4045viSd9cxYDHLF8lsXrcKrgI4VuQz1yQkxRIJjixp9ioYsK6PfwnHmUODzgVAtq2KNiSESdUHBk4F8LIPmRKfYrULueSpNtbwGpG0GAheo35pUqW98jLaU8qA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ef2qCtNU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB61BC433C7;
-	Thu, 21 Mar 2024 09:32:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711013572;
-	bh=HnGE5lrb+ed+jZVNTRGh9kbSwPoRyH8eoBWAR6n0moM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ef2qCtNUiLY5ebRSyaw0H+w+ZXaMgp3IUWZFer4qwYu/3peKtoZpv9InBU6ySkkxY
-	 YAE0XpR7/8VyDGm9E9Xp1BiUcJP7dmdYTcrPP+IU+HvUnbjLkxbJXRrui/ICgpblLA
-	 G10PHw0wXoK6LjBtCccO1vgGF2NQXo6qiEJxyvZZW5eLzgb3fAgsYCyAvlDI6wwBaa
-	 B/d7Sxtrm1lw0OTyXzgc2bF7hdKA59oxIZxbEKILP+Sc4bQJY1AILySVUSiZAWoj29
-	 REeylqFjse5KBSDJLj+QcMzj4OcThjg+2EZxQwOHt6imNVjwUd6GvIMc9Mmktep6vI
-	 XZnL/y7c/jbzg==
-Date: Thu, 21 Mar 2024 11:32:48 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Feng Wang <wangfe@google.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>, netdev@vger.kernel.org,
-	herbert@gondor.apana.org.au, davem@davemloft.net
-Subject: Re: [PATCH] [PATCH ipsec] xfrm: Store ipsec interface index
-Message-ID: <20240321093248.GC14887@unreal>
-References: <20240318231328.2086239-1-wangfe@google.com>
- <20240319084235.GA12080@unreal>
- <CADsK2K_65Wytnr5y+5Biw=ebtb-+hO=K7hxhSNJd6X+q9nAieg@mail.gmail.com>
- <ZfpnCIv+8eYd7CpO@gauss3.secunet.de>
- <CADsK2K-WFG2+2NQ08xBq89ty-G-xcoV517Eq5D7kNePcT4z0MQ@mail.gmail.com>
+	s=arc-20240116; t=1711013613; c=relaxed/simple;
+	bh=yqdjQVNbcauOFxaogP8b3/2502Vi0LT+CvmPhASCPlU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rph0E65QltD/5O2tbzUigeyt4BEunQgtqOQ3qwBj0Q0AtNRqkiyNDR8yCj5+ozMmItl6DU9p3p9qKdfsRXWIxXidKMx2t06+FICXVdLEVL2wB9TwKuTH9qEICDxJPasVaysClIPBQzXSPWqMuT1tbuHsDu4Sw/d3RQSK333/hLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ql67lD25; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711013611;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rs6XYbBWQxRBg0YMTrNuobAVa9pvsnukIpqnddxJZbc=;
+	b=Ql67lD25mjYGPiGx5fcGug7MFFT+p1AXSGgULTZASu5MgCtecDhpjJOf8J921qasdEaD1B
+	AW+ccmGe5gKX9/gTTjnGeN/zKro309MoENq3S9ooVDg3tzDBWJK47jilbeP+NXGzmy9/LC
+	Xt87SXMuykEml3suAWs6JeoSb7nvVlY=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-173-Dob_UXorNx2b4J-k8THHIg-1; Thu, 21 Mar 2024 05:33:27 -0400
+X-MC-Unique: Dob_UXorNx2b4J-k8THHIg-1
+Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4759D89C661;
+	Thu, 21 Mar 2024 09:33:27 +0000 (UTC)
+Received: from [10.45.225.240] (unknown [10.45.225.240])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 0B6331D091;
+	Thu, 21 Mar 2024 09:33:25 +0000 (UTC)
+Message-ID: <3540c6da-edbd-48e8-8bcb-effe64470ca0@redhat.com>
+Date: Thu, 21 Mar 2024 10:33:21 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADsK2K-WFG2+2NQ08xBq89ty-G-xcoV517Eq5D7kNePcT4z0MQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next 5/7] i40e: Consolidate checks whether given VSI
+ is main
+To: Paolo Abeni <pabeni@redhat.com>, intel-wired-lan@lists.osuosl.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+ open list <linux-kernel@vger.kernel.org>
+References: <20240318143058.287014-1-ivecera@redhat.com>
+ <20240318143058.287014-6-ivecera@redhat.com>
+ <557e819bc6acdfc2311fe2254b1f382bad8368fc.camel@redhat.com>
+Content-Language: en-US
+From: Ivan Vecera <ivecera@redhat.com>
+In-Reply-To: <557e819bc6acdfc2311fe2254b1f382bad8368fc.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.5
 
-On Wed, Mar 20, 2024 at 11:05:13AM -0700, Feng Wang wrote:
-> Hi Steffen,
-> 
-> Thanks for your comment.  Firstly,  the patch is using the xfrm interface
-> ID instead of network interface ID. Secondly, would you please point me to
-> the 'packet offload drivers' in the kernel tree?
 
-First, please don't reply to emails in top-post format.
-Second, did you try to search for "packet offload drivers" in the kernel?
-https://elixir.bootlin.com/linux/v6.8.1/source/drivers/net/ethernet/mellanox/mlx5/core/en_accel/ipsec.c#L1152
 
-Thanks
+On 19. 03. 24 11:17, Paolo Abeni wrote:
+> On Mon, 2024-03-18 at 15:30 +0100, Ivan Vecera wrote:
+>> In the driver code there are 3 types of checks whether given
+>> VSI is main or not:
+>> 1. vsi->type ==/!= I40E_VSI_MAIN
+>> 2. vsi ==/!= pf->vsi[pf->lan_vsi]
+>> 3. vsi->seid ==/!= pf->vsi[pf->lan_vsi]->seid
+>>
+>> All of them are equivalent and can be consolidated. Convert cases
+>> 2 and 3 to case 1.
+> 
+> Minor nit: while at it, what about introducing an helper for such
+> check?
+> Reordering the patches you could use it also in i40e_pf_get_main_vsi()
 
-> I want to understand how the offload driver can distinguish 2 ipsec
-> sessions if two sessions accidentally have the same address/mask and proto
-> values(same xfrm_selector)? The offload driver needs to find the
-> corresponding encryption parameters to do the work.
-> 
-> Thank you for your help,
-> 
-> Feng
-> 
-> 
-> 
-> On Tue, Mar 19, 2024 at 9:33 PM Steffen Klassert <
-> steffen.klassert@secunet.com> wrote:
-> 
-> > On Tue, Mar 19, 2024 at 10:15:13AM -0700, Feng Wang wrote:
-> > > Hi Leon,
-> > >
-> > > There is no "packet offload driver" in the current kernel tree.  The
-> > packet
-> > > offload driver mostly is vendor specific, it implements hardware packet
-> > > offload.
-> >
-> > There are 'packet offload drivers' in the kernel, that's why we
-> > support this kind of offload. We don't add code for proprietary
-> > drivers.
-> >
-> > > On Tue, Mar 19, 2024 at 1:42 AM Leon Romanovsky <leon@kernel.org> wrote:
-> > >
-> > > > On Mon, Mar 18, 2024 at 04:13:28PM -0700, Feng Wang wrote:
-> > > > > From: wangfe <wangfe@google.com>
-> > > > >
-> > > > > When there are multiple ipsec sessions, packet offload driver
-> > > > > can use the index to distinguish the packets from the different
-> > > > > sessions even though xfrm_selector are same.
-> > > >
-> > > > Do we have such "packet offload driver" in the kernel tree?
-> > > >
-> > > > Thanks
-> > > >
-> > > > > Thus each packet is handled corresponding to its session parameter.
-> > > > >
-> > > > > Signed-off-by: wangfe <wangfe@google.com>
-> > > > > ---
-> > > > >  net/xfrm/xfrm_interface_core.c | 4 +++-
-> > > > >  1 file changed, 3 insertions(+), 1 deletion(-)
-> > > > >
-> > > > > diff --git a/net/xfrm/xfrm_interface_core.c
-> > > > b/net/xfrm/xfrm_interface_core.c
-> > > > > index 21d50d75c260..996571af53e5 100644
-> > > > > --- a/net/xfrm/xfrm_interface_core.c
-> > > > > +++ b/net/xfrm/xfrm_interface_core.c
-> > > > > @@ -506,7 +506,9 @@ xfrmi_xmit2(struct sk_buff *skb, struct
-> > net_device
-> > > > *dev, struct flowi *fl)
-> > > > >       xfrmi_scrub_packet(skb, !net_eq(xi->net, dev_net(dev)));
-> > > > >       skb_dst_set(skb, dst);
-> > > > >       skb->dev = tdev;
-> > > > > -
-> > > > > +#ifdef CONFIG_XFRM_OFFLOAD
-> > > > > +     skb->skb_iif = if_id;
-> > > > > +#endif
-> >
-> > This looks wrong. The network interface ID is not the same as the xfrm
-> > interface ID.
-> >
+No, I couldn't, that helper does not check vsi->type value:
+
+/**
+  * i40e_pf_get_main_vsi - get pointer to main VSI
+  * @pf: pointer to a PF
+  *
+  * Return pointer to main VSI or NULL if it does not exist
+  **/
+static inline struct i40e_vsi *i40e_pf_get_main_vsi(struct i40e_pf *pf)
+{
+	return (pf->lan_vsi != I40E_NO_VSI) ? pf->vsi[pf->lan_vsi] : NULL;
+}
+
+I had an idea with helper like:
+static inline bool i40e_is_main_vsi(struct i40e_vsi *vsi)
+{
+	struct i40e_pf *pf = vsi->back;
+	return (pf->vsi[pf->lan_vsi] == vsi);
+}
+
+but I think that `vsi->type == I40E_VSI_MAIN` is simple enough.
+
+Thanks,
+Ivan
+
 
