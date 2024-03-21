@@ -1,114 +1,144 @@
-Return-Path: <netdev+bounces-81142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE86E886337
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 23:20:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 861A0886338
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 23:21:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F387C1C225ED
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 22:20:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26C5C1F2134E
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 22:21:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2DD135A50;
-	Thu, 21 Mar 2024 22:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SDLMhVpW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CCD132C37;
+	Thu, 21 Mar 2024 22:21:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail115-118.sinamail.sina.com.cn (mail115-118.sinamail.sina.com.cn [218.30.115.118])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDBC136662
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 22:20:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635A012BF28
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 22:21:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.118
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711059643; cv=none; b=k15GlOhgdegNvC75LfMY7NcPXoH1aXnBhluCzL3cuIwtaUdG4RG3PxUsIrUYzaJyBYQuOpSQYH7KY8bcadyH+ecGaLGSDYb8/ylx+xvXET6fB390buCEPnDCmlklR0Da9Tr0eQeC5TWEtL/Eg8rxCDrZQj6TubiB86FZpJbutis=
+	t=1711059681; cv=none; b=kLexdP6VKYQfroIX/go36EyXQ6BIUwsRrIoFX2ET0EQWvuEAHIu+871w8CI1dGNtJRClSzfvbZYZTv49riDxJMtdHLDNq1IuqvuhZC4LAkpDLt1dk/ktEcxLJNxv6H/hffHeskt6XWcr+gpGdIEQKYJiwtwdNu0KbRGgTioSXKo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711059643; c=relaxed/simple;
-	bh=cxBLQcUnFjnG0EBatiMZwDr+PiAisOufnqISJvyd2fk=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Z8FRjRFGaTwka+m9snrq76+6g+guj+7GMMxtATonuWRGInCsu/8IsmqsSgDQ3CVZZXAgZh5UUd/zKppZDTF93QQIaPXba8IxzyTATXINGjwmtj5r2iFyzsZnmvK7HH/8FZjNDvpu6k910GmYsozLX9uUGedn4xc5Wu+hfFzGss8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jfraker.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SDLMhVpW; arc=none smtp.client-ip=209.85.210.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jfraker.bounces.google.com
-Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6ea80a33cf6so217363b3a.1
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 15:20:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711059642; x=1711664442; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=HIRVAKUCXrsW19Rfk9rX09ZKBuFyXSBcI1QnMauRAwM=;
-        b=SDLMhVpWpklDU0gq0n7zXlzyUQH7RFRck7vof7Cy5+ZpzloHrwjs+HVAe04AoFQHgb
-         zXtzkYtmEMyRnTkKCvFGmVegmIIaKoYrToYZu2wTjwklJnN99kuIGZj5Gl7ndTG7onRh
-         wBL1rI3mIpMg9we6vVqR9vL7ArLAontQOMs0E+TAYjovNgsMAKPzzgwRhx+5qqDevldc
-         LgXknb1mSSm/XB2gjcFpjGwwVZppWkgcsQLhxHFXXj7O7Dfb9G9CSzAt6jQH2vI+Awvo
-         n4c8zkHGlHOuPQRoI/YyHvQDN/kvyElEPU7keDUaZUnvAE6mnJGumycW7LMnCohpdpvR
-         92Dg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711059642; x=1711664442;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HIRVAKUCXrsW19Rfk9rX09ZKBuFyXSBcI1QnMauRAwM=;
-        b=nAGM3Lqmism0I5CQRSvkfQGncVTuuEaxXWZu2u3rARhLTIwNFbcnPYs/aECqExASsH
-         stYBKf8t2ZG4ZtuHnlwkRifWDiMxBAhtGcaBg91GbfK1o9pwOhhFmcb+rpC3WAi4SSWI
-         MXmvHda40DIa2s2SkHveemsM8GXlpJk9vd5Eg2PIbkqa9sTGOAhG/1gqneW9Bb1C0us8
-         7z4rf2aFfxCVMDZFNy0eg+RT/wWKM329NAU8qvf/iCEX1YU+OP2ywlJQ+F/BWs1QkNAp
-         Ne3aCsJEze+A9PYDV6/F/2CHWT3cnRprtUCRgGf24zRDSN31eExk47mOC7l6h4vwwAGI
-         KQKw==
-X-Gm-Message-State: AOJu0YzqPhoJ+3jLtkRH7tMr8yOcAshTRSufu8m68dlDaxuaAn1sClS7
-	2Ype39bEOOoeZVDG2fcOvJuufthcljeKPssCOsigOJNcXI+kT32BSxrFBTA+ZyoZUWV29cTsCGe
-	SqXGUr6gUE0yRbG+SnOnLQejUYDl5XkcPR1YKEYRXFULqHLfgfekwK5QqtRTFgaavgL9tbWbJ7t
-	iTy1kESEg/bmfSiZ4GnW/uP9E4ZW5tg0VIw231lg==
-X-Google-Smtp-Source: AGHT+IGTKxrV07AWiIfuIZ3JrZZ+cFZusyGMNMZvswIYb6VwBbFfXPAahwqAKuasvimJ+K+6q8QqKIrmLqH+
-X-Received: from jfraker202.plv.corp.google.com ([2620:15c:11c:202:8558:543c:cfee:9677])
- (user=jfraker job=sendgmr) by 2002:a05:6a00:938f:b0:6e8:3d58:fb22 with SMTP
- id ka15-20020a056a00938f00b006e83d58fb22mr72303pfb.3.1711059641617; Thu, 21
- Mar 2024 15:20:41 -0700 (PDT)
-Date: Thu, 21 Mar 2024 15:20:20 -0700
+	s=arc-20240116; t=1711059681; c=relaxed/simple;
+	bh=9lGxldt3FbC/qdsB/K46SIm3mDeWP61ycUXkypW+u+s=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Oc2//lcnalV8A4pDG9fUszs8oJHNcDrxn0xAIzdPTn1bMQJaAXPgabjE45N6jYANm684+DNOeiWEotGOVGyRPVhdbp2F/sDdS8QvOda1fSVXt6PzVaiDN0lyE1UhCgtcYTAjwzamw6EYsZ9OkBnLMvMhnxD2Zet2/mw6QVxwxpM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([113.118.69.35])
+	by sina.com (172.16.235.25) with ESMTP
+	id 65FCB2D0000027B1; Thu, 22 Mar 2024 06:21:07 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 2410634210281
+X-SMAIL-UIID: CD374027FD7243C79AF4A8326B3E6537-20240322-062107-1
+From: Hillf Danton <hdanton@sina.com>
+To: Antoine Tenart <atenart@kernel.org>
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com,
+	Eric Dumazet <edumazet@google.com>,
+	syzbot <syzbot+99b8125966713aa4b0c3@syzkaller.appspotmail.com>
+Subject: Re: [syzbot] [net?] INFO: task hung in register_nexthop_notifier (3)
+Date: Fri, 22 Mar 2024 06:20:54 +0800
+Message-Id: <20240321222054.2462-1-hdanton@sina.com>
+In-Reply-To: <171101294595.5492.6904692183666798713@kwain>
+References: <0000000000009485160613eda067@google.com> <CANn89iKnOzz_Bs_ygLWZGjsTw=266p8KALv=QWheTanoHYj+nw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.396.g6e790dbe36-goog
-Message-ID: <20240321222020.31032-1-jfraker@google.com>
-Subject: [PATCH net] gve: Add counter adminq_get_ptype_map_cnt to stats report
-From: John Fraker <jfraker@google.com>
-To: netdev@vger.kernel.org
-Cc: John Fraker <jfraker@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-This counter counts the number of times get_ptype_map is executed on the
-admin queue, and was previously missing from the stats report.
+On Thu, 21 Mar 2024 10:22:25 +0100 Antoine Tenart <atenart@kernel.org>
+> Quoting Eric Dumazet (2024-03-18 15:46:37)
+> > On Mon, Mar 18, 2024 at 12:26=E2=80=AFPM syzbot
+> > <syzbot+99b8125966713aa4b0c3@syzkaller.appspotmail.com> wrote:
+> > >
+> > > INFO: task syz-executor.3:6975 blocked for more than 143 seconds.
+> > >       Not tainted 6.8.0-rc7-syzkaller-02500-g76839e2f1fde #0
+> > > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
+> e.
+> > > task:syz-executor.3  state:D stack:20920 pid:6975  tgid:6975  ppid:1   =
+>    flags:0x00004006
+> > > Call Trace:
+> > >  <TASK>
+> > >  context_switch kernel/sched/core.c:5400 [inline]
+> > >  __schedule+0x17d1/0x49f0 kernel/sched/core.c:6727
+> > >  __schedule_loop kernel/sched/core.c:6802 [inline]
+> > >  schedule+0x149/0x260 kernel/sched/core.c:6817
+> > >  schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6874
+> > >  __mutex_lock_common kernel/locking/mutex.c:684 [inline]
+> > >  __mutex_lock+0x6a3/0xd70 kernel/locking/mutex.c:752
+> > >  register_nexthop_notifier+0x84/0x290 net/ipv4/nexthop.c:3863
+> > >  nsim_fib_create+0x8a6/0xa70 drivers/net/netdevsim/fib.c:1587
+> > >  nsim_drv_probe+0x747/0xb80 drivers/net/netdevsim/dev.c:1582
+> > >  really_probe+0x29e/0xc50 drivers/base/dd.c:658
+> > >  __driver_probe_device+0x1a2/0x3e0 drivers/base/dd.c:800
+> > >  driver_probe_device+0x50/0x430 drivers/base/dd.c:830
+> > >  __device_attach_driver+0x2d6/0x530 drivers/base/dd.c:958
+> > >  bus_for_each_drv+0x24e/0x2e0 drivers/base/bus.c:457
+> > >  __device_attach+0x333/0x520 drivers/base/dd.c:1030
+> > >  bus_probe_device+0x189/0x260 drivers/base/bus.c:532
+> > >  device_add+0x8ff/0xca0 drivers/base/core.c:3639
+> > >  nsim_bus_dev_new drivers/net/netdevsim/bus.c:442 [inline]
+> > >  new_device_store+0x3f2/0x890 drivers/net/netdevsim/bus.c:173
+> > >  kernfs_fop_write_iter+0x3a4/0x500 fs/kernfs/file.c:334
+> >=20
+> > So we have a sysfs handler ultimately calling register_nexthop_notifier()=
+>  or any
+> > other network control path requiring RTNL.
+> >=20
+> > Note that we have rtnl_trylock() for a reason...
+> 
+> Mentioning the below in case that gives some ideas; feel free to
+> disregard.
+> 
+> When I looked at similar issues a while ago the rtnl deadlock actually
+> happened with the kernfs_node refcount; haven't looked at this one in
+> details though. The mutex in there was just preventing concurrent
+> writers.
+> 
+> > Or maybe the reason is wrong, if we could change kernfs_fop_write_iter()
+> > to no longer hold a mutex...
 
-Fixes: c4b87ac87635 ("gve: Add support for DQO RX PTYPE map")
-Signed-off-by: John Fraker <jfraker@google.com>
----
- drivers/net/ethernet/google/gve/gve_ethtool.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Better after working out why RCU stalled [1]
 
-diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
-index 9aebfb843..dbe05402d 100644
---- a/drivers/net/ethernet/google/gve/gve_ethtool.c
-+++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
-@@ -73,7 +73,7 @@ static const char gve_gstrings_adminq_stats[][ETH_GSTRING_LEN] = {
- 	"adminq_create_tx_queue_cnt", "adminq_create_rx_queue_cnt",
- 	"adminq_destroy_tx_queue_cnt", "adminq_destroy_rx_queue_cnt",
- 	"adminq_dcfg_device_resources_cnt", "adminq_set_driver_parameter_cnt",
--	"adminq_report_stats_cnt", "adminq_report_link_speed_cnt"
-+	"adminq_report_stats_cnt", "adminq_report_link_speed_cnt", "adminq_get_ptype_map_cnt"
- };
- 
- static const char gve_gstrings_priv_flags[][ETH_GSTRING_LEN] = {
-@@ -428,6 +428,7 @@ gve_get_ethtool_stats(struct net_device *netdev,
- 	data[i++] = priv->adminq_set_driver_parameter_cnt;
- 	data[i++] = priv->adminq_report_stats_cnt;
- 	data[i++] = priv->adminq_report_link_speed_cnt;
-+	data[i++] = priv->adminq_get_ptype_map_cnt;
- }
- 
- static void gve_get_channels(struct net_device *netdev,
--- 
-2.44.0.291.gc1ea87d7ee-goog
+5 locks held by kworker/u4:7/23559:
+ #0: ffff888015ea4938 ((wq_completion)netns){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2608 [inline]
+ #0: ffff888015ea4938 ((wq_completion)netns){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2706
+ #1: ffffc90012b8fd20 (net_cleanup_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2608 [inline]
+ #1: ffffc90012b8fd20 (net_cleanup_work){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2706
+ #2: ffffffff8f36d250 (pernet_ops_rwsem){++++}-{3:3}, at: cleanup_net+0x16a/0xcc0 net/core/net_namespace.c:591
+ #3: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: cleanup_net+0x6af/0xcc0 net/core/net_namespace.c:627
+ #4: ffffffff8e136440 (rcu_state.barrier_mutex){+.+.}-{3:3}, at: rcu_barrier+0x4c/0x550 kernel/rcu/tree.c:4064
 
+[1] https://lore.kernel.org/lkml/0000000000009485160613eda067@google.com/
+
+> 
+> At the time I found a way to safely drop the refcount of those
+> kernfs_node which then allowed to call rtnl_lock from sysfs handlers,
+> https://lore.kernel.org/all/20231018154804.420823-1-atenart@kernel.org/T/
+> 
+> Note that this relied on how net device are unregistered (calling
+> device_del under rtnl and later waiting for refs on the netdev to drop
+> outside of the lock; and a few other things), so extra modifications
+> would be needed to generalize the approach. Also it's a tradeoff between
+> fixing those deadlocks without rtnl_trylock and maintaining a quite
+> complex logic...
+> 
+> Antoine
+> 
 
