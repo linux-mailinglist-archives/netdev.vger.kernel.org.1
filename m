@@ -1,118 +1,208 @@
-Return-Path: <netdev+bounces-80964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFC0B8855AD
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:29:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5582F8855BE
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:33:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68DD3281429
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 08:29:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9AE91F21191
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 08:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 538206995B;
-	Thu, 21 Mar 2024 08:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91D741CD1C;
+	Thu, 21 Mar 2024 08:32:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S3PLOttA"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="CrHW+3pu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F87E6994D;
-	Thu, 21 Mar 2024 08:29:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA12ADF41
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 08:32:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711009763; cv=none; b=Uahta9xDGZDTXOroliyVeFMtxmrlZM1cFE2+FRhNkozGqV1FPy6Nx4+Z/XGtKWDFpv9HJs7wrX92AlO79uDj4eYSYuzID/azHj6RjJLBQzCzQ8FMR/ttGXaYjNWsR2/G2kd/PYC11o9WNoYyvZQsPieS5IVJmmgVZOAyWRuvXoo=
+	t=1711009972; cv=none; b=UBUIjKTCZS7v2ldBNnuzgEdAs/YuwiWpMewqgUMZbGuqhe/+fp29mE3cZ3zJltJB30Wu9C+ajzhIdJPvKrmsM1NEBSm1TEu3ZbF5AeVnm5gn2LqA2ppREO1NlAYHZmq+BzJcIa2yhITDmEV3CXmA2sBQgj28Oz5SF7U9sRjS4Y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711009763; c=relaxed/simple;
-	bh=7kCuWcguJfXb+C5s5vznrmpMKt2aumVRMMbZ27GwQRI=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=Tn6tPdeIMWlzv+iDYBWF7av1ygEI6GnjVUEb/DDZ1I+gFqZb0vmYwNyZlIVWyK7nPA74HlXtnSP84GTeYwbmfYR5MtFUE95k/+hp7RqatF1fnchsZLpBFN/rCR9xQ9a14Ho4q4bUwfWKGpporTaDPcK82ndu4LQW5Jvr/nfFpH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S3PLOttA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDFA4C433C7;
-	Thu, 21 Mar 2024 08:29:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711009762;
-	bh=7kCuWcguJfXb+C5s5vznrmpMKt2aumVRMMbZ27GwQRI=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=S3PLOttAxQVJs5+U1SxWEPd1adUzlZKsRvspPFtIee7I+PkW7lYi5w01c5dKOfR8K
-	 qvGRCZ2YCxx6++ElMesCX5CyH73jUNLxtPE4cKM6a9wo8lzNe1tcRBIbYxoKXdojFh
-	 rzGySzbifLgGxwVRBD7BKLGlx+Pu7nln3i78b/welbNKlYgUrQKOln7QJV/aHj/TNw
-	 ZtVAjCUxOLAvyXT/5kGJzi/Xys4ZhypuKbrShGMAcbNkruLovn5Auw/TV4+Skul6uF
-	 zShoCG2AovfLVmh8Odh0g7HqKFPD92U/d8sBpZ5hcpg41eNmllphYZ4nSfmO0OrINj
-	 rT9nl9deErSgA==
-From: Kalle Valo <kvalo@kernel.org>
-To: Edward Adam Davis <eadavis@qq.com>
-Cc: syzbot+93cbd5fbb85814306ba1@syzkaller.appspotmail.com,
-  linux-kernel@vger.kernel.org,  linux-usb@vger.kernel.org,
-  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
-  syzkaller-bugs@googlegroups.com,  toke@toke.dk
-Subject: Re: [PATCH usb] wifi: ath9k: fix oob in htc_issue_send
-References: <0000000000004e41110614187d35@google.com>
-	<tencent_7225DC0D859205DD8BDDAE191CCFBF0D8907@qq.com>
-Date: Thu, 21 Mar 2024 10:29:18 +0200
-In-Reply-To: <tencent_7225DC0D859205DD8BDDAE191CCFBF0D8907@qq.com> (Edward
-	Adam Davis's message of "Thu, 21 Mar 2024 15:31:33 +0800")
-Message-ID: <87bk789ee9.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1711009972; c=relaxed/simple;
+	bh=jjXZnyIwwnqHtpyXY9kprbHen6nKmOUvgl7EyNGh+2E=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=hrPBzehXESj91xbzv6Y73MxqThdHBk/DNV/rNxfFL/WS5rGPFvItmIEEVPnw5elQscghUlcSFs2Q+CG2z3J8b3N9jXbMoQyzWH4zBFWzqiLb2vr5GVBlNpTQmG+ZspWBY89vCw9pvWveB+Pi71gBRbT0703aVOlDhsp+mEWg8SA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=CrHW+3pu; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711009961; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=BLoHe15uKdp14O/oRqVBuqsIWpnD38/Sd4/X0Jt2YMY=;
+	b=CrHW+3puIv3yfWo+Tn/BSP9ilbUaYIR4HnoJHLcN9EvT10UxhmhMbVJFpHxQHWyagwv9q3/NBNpVa8+NDaeOtwjBuw/LiWCzKmCycYlIXsIwF+EavtEI844X4xqQZS579R/1OVgv5th8m99BnuYfxQpi8azZ7w925sDHomYq/14=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R651e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W3-AsBW_1711009960;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W3-AsBW_1711009960)
+          by smtp.aliyun-inc.com;
+          Thu, 21 Mar 2024 16:32:40 +0800
+Message-ID: <1711009827.9194505-5-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v4 00/10] virtio: drivers maintain dma info for premapped vq
+Date: Thu, 21 Mar 2024 16:30:27 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <20240312033557.6351-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEt0O1tjJu_paVWvxUQqnq_wMv+9YmOBzFGuGLy9_0-qVA@mail.gmail.com>
+In-Reply-To: <CACGkMEt0O1tjJu_paVWvxUQqnq_wMv+9YmOBzFGuGLy9_0-qVA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
 
-Edward Adam Davis <eadavis@qq.com> writes:
-
-> [syzbot reported]
-> usb 1-1: ath9k_htc: Transferred FW: ath9k_htc/htc_9271-1.4.0.fw, size: 51008
-> ath9k_htc 1-1:1.0: ath9k_htc: HTC initialized with 33 credits
-> ------------[ cut here ]------------
-> UBSAN: array-index-out-of-bounds in drivers/net/wireless/ath/ath9k/htc_hst.c:26:51
-> index 255 is out of range for type 'htc_endpoint [22]'
-> CPU: 1 PID: 2494 Comm: kworker/1:2 Not tainted 6.8.0-rc6-syzkaller-00190-ga788e53c05ae #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-> Workqueue: events request_firmware_work_func
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:88 [inline]
->  dump_stack_lvl+0x125/0x1b0 lib/dump_stack.c:106
->  ubsan_epilogue lib/ubsan.c:217 [inline]
->  __ubsan_handle_out_of_bounds+0x111/0x150 lib/ubsan.c:347
->  htc_issue_send.constprop.0+0x209/0x230 drivers/net/wireless/ath/ath9k/htc_hst.c:26
->  ath9k_wmi_cmd_issue drivers/net/wireless/ath/ath9k/wmi.c:305 [inline]
->  ath9k_wmi_cmd+0x424/0x630 drivers/net/wireless/ath/ath9k/wmi.c:342
->  ath9k_regread+0xdb/0x160 drivers/net/wireless/ath/ath9k/htc_drv_init.c:242
->  ath9k_hw_read_revisions drivers/net/wireless/ath/ath9k/hw.c:287 [inline]
->  __ath9k_hw_init drivers/net/wireless/ath/ath9k/hw.c:572 [inline]
->  ath9k_hw_init+0xf02/0x2b30 drivers/net/wireless/ath/ath9k/hw.c:700
->  ath9k_init_priv drivers/net/wireless/ath/ath9k/htc_drv_init.c:662 [inline]
->  ath9k_init_device drivers/net/wireless/ath/ath9k/htc_drv_init.c:839 [inline]
->  ath9k_htc_probe_device+0xb37/0x25f0 drivers/net/wireless/ath/ath9k/htc_drv_init.c:963
->  ath9k_htc_hw_init+0x33/0x70 drivers/net/wireless/ath/ath9k/htc_hst.c:529
->  ath9k_hif_usb_firmware_cb+0x272/0x620 drivers/net/wireless/ath/ath9k/hif_usb.c:1273
->  request_firmware_work_func+0x13a/0x240 drivers/base/firmware_loader/main.c:1163
->  process_one_work+0x886/0x15d0 kernel/workqueue.c:2633
->  process_scheduled_works kernel/workqueue.c:2706 [inline]
->  worker_thread+0x8b9/0x1290 kernel/workqueue.c:2787
->  kthread+0x2c6/0x3a0 kernel/kthread.c:388
->  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:243
->  </TASK>
-> ---[ end trace ]---
-> [Fix]
-> If the target does not return a valid end point id during the device connection
-> process, returns a failure.
+On Thu, 21 Mar 2024 12:45:08 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Tue, Mar 12, 2024 at 11:36=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibab=
+a.com> wrote:
+> >
+> > As discussed:
+> >
+> > http://lore.kernel.org/all/CACGkMEvq0No8QGC46U4mGsMtuD44fD_cfLcPaVmJ3rH=
+YqRZxYg@mail.gmail.com
+> >
+> > If the virtio is premapped mode, the driver should manage the dma info =
+by self.
+> > So the virtio core should not store the dma info. We can release the me=
+mory used
+> > to store the dma info.
+> >
+> > For virtio-net xmit queue, if the virtio-net maintains the dma info,
+> > the virtio-net must allocate too much memory(19 * queue_size for per-qu=
+eue), so
+> > we do not plan to make the virtio-net to maintain the dma info by defau=
+lt. The
+> > virtio-net xmit queue only maintain the dma info when premapped mode is=
+ enable
+> > (such as AF_XDP is enable).
+> >
+> > So this patch set try to do:
+> >
+> > 1. make the virtio core to do not store the dma info
 >
-> Fixes: fb9987d0f748 ("ath9k_htc: Support for AR9271 chipset.")
-> Reported-and-tested-by: syzbot+93cbd5fbb85814306ba1@syzkaller.appspotmail.com
-> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> I think you mean "make the virtio core to do not store the dma info
+> when driver can do that"
 
-This should go to ath tree, not usb. No need to resend because of this.
+YES.
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
 
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+>
+> >     - But if the desc_extra has not dma info, we face a new question,
+> >       it is hard to get the dma info of the desc with indirect flag.
+>
+> I guess you want to avoid allocating desc_extra array, otherwise you
+> won't have this issue.
+>
+> How about keeping that?
+
+This is a way. But when we allocate the indirect desc, we alloc
+more memory to save that, I think that is a good way.
+And in the future, we can handen the unmap for the indirect buffer
+with more memory allocated by once.
+
+Thanks.
+
+
+>
+> >       For split mode, that is easy from desc, but for the packed mode,
+> >       it is hard to get the dma info from the desc. And hardening
+> >       the dma unmap is safe, we should store the dma info of indirect
+> >       descs when the virtio core does not store the bufer dma info.
+> >
+> >       So I introduce the "structure the indirect desc table" to
+> >       allocate space to store dma info of the desc table.
+> >
+> >         +struct vring_split_desc_indir {
+> >         +       dma_addr_t addr;                /* Descriptor Array DMA=
+ addr. */
+> >         +       u32 len;                        /* Descriptor Array len=
+gth. */
+> >         +       u32 num;
+>
+> We can probably just reuse vring_desc_extra here with a known flag
+> (read only for device).
+>
+> >         +       struct vring_desc desc[];
+> >         +};
+> >
+> >       The follow patches to this:
+> >          * virtio_ring: packed: structure the indirect desc table
+> >          * virtio_ring: split: structure the indirect desc table
+> >
+> >     - On the other side, in the umap handle, we mix the indirect descs =
+with
+> >       other descs. That make things too complex. I found if we we disti=
+nguish
+> >       the descs with VRING_DESC_F_INDIRECT before unmap, thing will be =
+clearer.
+> >
+> >       The follow patches do this.
+> >          * virtio_ring: packed: remove double check of the unmap ops
+> >          * virtio_ring: split: structure the indirect desc table
+> >
+> > 2. make the virtio core to enable premapped mode by find_vqs() params
+> >     - Because the find_vqs() will try to allocate memory for the dma in=
+fo.
+> >       If we set the premapped mode after find_vqs() and release the
+> >       dma info, that is odd.
+>
+> Thanks
+>
+> >
+> >
+> > Please review.
+> >
+> > Thanks
+> >
+> > v4:
+> >     1. virtio-net xmit queue does not enable premapped mode by default
+> >
+> > v3:
+> >     1. fix the conflict with the vp_modern_create_avq().
+> >
+> > v2:
+> >     1. change the dma item of virtio-net, every item have MAX_SKB_FRAGS=
+ + 2 addr + len pairs.
+> >     2. introduce virtnet_sq_free_stats for __free_old_xmit
+> >
+> > v1:
+> >     1. rename transport_vq_config to vq_transport_config
+> >     2. virtio-net set dma meta number to (ring-size + 1)(MAX_SKB_FRGAS =
++2)
+> >     3. introduce virtqueue_dma_map_sg_attrs
+> >     4. separate vring_create_virtqueue to an independent commit
+> >
+> > Xuan Zhuo (10):
+> >   virtio_ring: introduce vring_need_unmap_buffer
+> >   virtio_ring: packed: remove double check of the unmap ops
+> >   virtio_ring: packed: structure the indirect desc table
+> >   virtio_ring: split: remove double check of the unmap ops
+> >   virtio_ring: split: structure the indirect desc table
+> >   virtio_ring: no store dma info when unmap is not needed
+> >   virtio: find_vqs: add new parameter premapped
+> >   virtio_ring: export premapped to driver by struct virtqueue
+> >   virtio_net: set premapped mode by find_vqs()
+> >   virtio_ring: virtqueue_set_dma_premapped support disable
+> >
+> >  drivers/net/virtio_net.c      |  57 +++--
+> >  drivers/virtio/virtio_ring.c  | 436 +++++++++++++++++++++-------------
+> >  include/linux/virtio.h        |   3 +-
+> >  include/linux/virtio_config.h |  17 +-
+> >  4 files changed, 307 insertions(+), 206 deletions(-)
+> >
+> > --
+> > 2.32.0.3.g01195cf9f
+> >
+>
 
