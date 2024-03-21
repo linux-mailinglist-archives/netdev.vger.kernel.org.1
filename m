@@ -1,124 +1,131 @@
-Return-Path: <netdev+bounces-81138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3464F88618B
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 21:20:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2AE6886217
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 21:52:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 658601C21AAB
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 20:20:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 160A51C21B0A
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 20:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68DC9134CC2;
-	Thu, 21 Mar 2024 20:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="b+iOeAwy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3521353FC;
+	Thu, 21 Mar 2024 20:52:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B9713442F;
-	Thu, 21 Mar 2024 20:20:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 710BE134420;
+	Thu, 21 Mar 2024 20:52:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711052428; cv=none; b=A0d2H9eMhfAb8eUHXEf7v0Z3aTndG+3QFrbF6QloFL63K6C6ctgzDO0VDxRHD+XjMTt730PBBLo8Qxcrb3hmRAJT7k8b9L3BVviMQ/vHPX9qFOKviRdLmxHt56GuTnTbHMhcljsJZUxHQ1ggsEMLWLfY18ujOny0+Y/VGd0SgpQ=
+	t=1711054361; cv=none; b=dQYumnxS9263jc0N3cyn3UZc9UMQalUJotQ2nccMixqP7PZzTDjGt5ggPCjAbxAXChYfwg2N9TEA5gaE6UtrmgqcBNR3VLB/FgSJeabFuyW25DXWMXkcGTEDuZBWApfVwt5N/aaVHF1Gbvg5Y+36ES6Q4o5DWswoABC8Q9rhWpg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711052428; c=relaxed/simple;
-	bh=eFrHAh7BJNnqflbNawWUWzv1wOsF6n2g6fArJ0mZMlY=;
-	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
-	 Cc:In-Reply-To:To; b=HBuwUnTrq3NSZ94qAPalJo5/CNSkP/oI/pKXuO/RYwWMz9qZJ+4xcaj/FjiEFWbcyun92kpixYHkX1raOVTB0G/7Ve3ieg/ArHWQZfTRT+aHMw0oPfyLjjuhI9o8wlPvZhedkJqbrI/h2gS/s8Ag9lil8LRxXMyFuqtU+Cg0cRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=b+iOeAwy; arc=none smtp.client-ip=192.134.164.104
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=content-transfer-encoding:from:mime-version:subject:date:
-   message-id:references:cc:in-reply-to:to;
-  bh=eFrHAh7BJNnqflbNawWUWzv1wOsF6n2g6fArJ0mZMlY=;
-  b=b+iOeAwyum6sXPaLJdb+fWcvioaIay6A5QdvQAH59gWJUsmGC9jNdIvf
-   /ahM63HH30yJBWqhsW2vS2WPc5h/9lkl9FlcxgEizgMNTAwfqQZw4FHWI
-   d57CFM4Nc+XCYjiqBF+Y6RbCzR99H+QXO1yy2H4bghO54mhDp3Cik0xCj
-   0=;
-Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.07,143,1708383600"; 
-   d="scan'208";a="82803127"
-Received: from 184-074-243-067.biz.spectrum.com (HELO smtpclient.apple) ([184.74.243.67])
-  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 21:20:12 +0100
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-From: Julia Lawall <Julia.Lawall@inria.fr>
+	s=arc-20240116; t=1711054361; c=relaxed/simple;
+	bh=9zlC3L4tt8Mzkzt3jkTnHSaQIRdB72fowZOWPPC5Zko=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Yfu4ALOekNJrxhTu/C156bMlqNqD90qTGYqQ7DhJpPIrhDr0AQguFAdmKDdg7tYQMpqKOoPBIwFy70qAoJhD7knSdLkhuDDvG/F0vMHGTVl5l5wVuHuvvx+IyR2VxFK1Fe58rBTlchB/artoGfzUSpVp5hio6kqNhOjQKi3MfDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Date: Thu, 21 Mar 2024 21:52:27 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Linus =?utf-8?Q?L=C3=BCssing?= <linus.luessing@c0d3.blue>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Dietmar Maurer <dietmar@proxmox.com>,
+	Thomas Lamprecht <t.lamprecht@proxmox.com>,
+	Wolfgang Bumiller <w.bumiller@proxmox.com>,
+	Alexandre Derumier <aderumier@odiso.com>
+Subject: Re: [PATCH net] netfilter: conntrack: fix ct-state for ICMPv6
+ Multicast Router Discovery
+Message-ID: <ZfyeC8mjLnGkqnVT@calendula>
+References: <20240306141805.17679-1-linus.luessing@c0d3.blue>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (1.0)
-Subject: Re: [PATCH net] ice: Fix freeing uninitialized pointers
-Date: Thu, 21 Mar 2024 16:20:09 -0400
-Message-Id: <F2FBADE8-EDF9-4987-A97B-CF4D2D1452E0@inria.fr>
-References: <e5172afb-427b-423e-877a-10352cf4a007@web.de>
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Dan Carpenter <dan.carpenter@linaro.org>, kernel-janitors@vger.kernel.org,
- netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- LKML <linux-kernel@vger.kernel.org>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- David Laight <David.Laight@aculab.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Jiri Pirko <jiri@resnulli.us>, Jonathan Cameron <jic23@kernel.org>,
- Kees Cook <keescook@chromium.org>,
- Lukasz Czapnik <lukasz.czapnik@intel.com>, Paolo Abeni <pabeni@redhat.com>,
- Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-In-Reply-To: <e5172afb-427b-423e-877a-10352cf4a007@web.de>
-To: Markus Elfring <Markus.Elfring@web.de>
-X-Mailer: iPhone Mail (19H384)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240306141805.17679-1-linus.luessing@c0d3.blue>
 
-Does one prefer an initialization of null at the top of the function or an i=
-nitialization to a meaningful value in the middle of the function ?
+On Wed, Mar 06, 2024 at 03:18:04PM +0100, Linus Lüssing wrote:
+> So far Multicast Router Advertisements and Multicast Router
+> Solicitations from the Multicast Router Discovery protocol (RFC4286)
+> would be marked as INVALID for IPv6, even if they are in fact intact
+> and adhering to RFC4286.
 
-(Sorry for top posting)
+There is also RFC4890 which specifies that also acts as multicast
+routers need to process these message on their interfaces.
 
+> This broke MRA reception and by that multicast reception on
+> IPv6 multicast routers in a Proxmox managed setup, where Proxmox
+> would install a rule like "-m conntrack --ctstate INVALID -j DROP"
+> at the top of the FORWARD chain with br-nf-call-ip6tables enabled
+> by default.
+> 
+> Similar to as it's done for MLDv1, MLDv2 and IPv6 Neighbor Discovery
+> already, fix this issue by excluding MRD from connection tracking
+> handling as MRD always uses predefined multicast destinations
+> for its messages, too. This changes the ct-state for ICMPv6 MRD messages
+> from INVALID to UNTRACKED.
 
-Sent from my iPhone
+An explicit rule will be still needed to accept this traffic, assuming
+default policy to drop. I think that the issue is likely that this
+"drop invalid rules" is the at the very beginning of the ruleset.
 
-> On 21 Mar 2024, at 14:14, Markus Elfring <Markus.Elfring@web.de> wrote:
->=20
-> =EF=BB=BF
->>=20
->>> How do you think about to reduce the scope for the affected local variab=
-le instead
->>> with the help of a small script (like the following) for the semantic pa=
-tch language?
->>>=20
->>> @movement@
->>> attribute name __free;
->>> @@
->>> -u8 *tx_frame __free(kfree);
->>> int i;
->>> ... when any
->>> if (ice_fltr_add_mac(test_vsi, ...))
->>> { ... }
->>> +
->>> +{
->>> +u8 *tx_frame __free(kfree) =3D NULL;
->>> if (ice_lbtest_create_frame(pf, &tx_frame, ...))
->>> { ... }
->>> ... when any
->>> +}
->>> +
->>> valid_frames =3D ice_lbtest_receive_frames(...);
->>=20
->> I believe you don't understand what the scope of the above can be.
->=20
-> Will the understanding improve for the proposed source code transformation=
-?
->=20
-> Regards,
-> Markus
+Anyway, turning this from invalid to untracked seems sensible to me.
+Users will still have to explicitly allow for this in their ruleset
+assuming default policy to drop.
 
+I am going to include your Fixes: tag and pass up this patch upstream.
+
+Thanks.
+
+> This issue was found and fixed with the help of the mrdisc tool
+> (https://github.com/troglobit/mrdisc).
+> 
+> Signed-off-by: Linus Lüssing <linus.luessing@c0d3.blue>
+> ---
+>  include/uapi/linux/icmpv6.h               | 1 +
+>  net/netfilter/nf_conntrack_proto_icmpv6.c | 4 +++-
+>  2 files changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/uapi/linux/icmpv6.h b/include/uapi/linux/icmpv6.h
+> index ecaece3af38d..4eaab89e2856 100644
+> --- a/include/uapi/linux/icmpv6.h
+> +++ b/include/uapi/linux/icmpv6.h
+> @@ -112,6 +112,7 @@ struct icmp6hdr {
+>  #define ICMPV6_MOBILE_PREFIX_ADV	147
+>  
+>  #define ICMPV6_MRDISC_ADV		151
+> +#define ICMPV6_MRDISC_SOL		152
+>  
+>  #define ICMPV6_MSG_MAX          255
+>  
+> diff --git a/net/netfilter/nf_conntrack_proto_icmpv6.c b/net/netfilter/nf_conntrack_proto_icmpv6.c
+> index 1020d67600a9..327b8059025d 100644
+> --- a/net/netfilter/nf_conntrack_proto_icmpv6.c
+> +++ b/net/netfilter/nf_conntrack_proto_icmpv6.c
+> @@ -62,7 +62,9 @@ static const u_int8_t noct_valid_new[] = {
+>  	[NDISC_ROUTER_ADVERTISEMENT - 130] = 1,
+>  	[NDISC_NEIGHBOUR_SOLICITATION - 130] = 1,
+>  	[NDISC_NEIGHBOUR_ADVERTISEMENT - 130] = 1,
+> -	[ICMPV6_MLD2_REPORT - 130] = 1
+> +	[ICMPV6_MLD2_REPORT - 130] = 1,
+> +	[ICMPV6_MRDISC_ADV - 130] = 1,
+> +	[ICMPV6_MRDISC_SOL - 130] = 1
+>  };
+>  
+>  bool nf_conntrack_invert_icmpv6_tuple(struct nf_conntrack_tuple *tuple,
+> -- 
+> 2.43.0
+> 
 
