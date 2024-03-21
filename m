@@ -1,470 +1,189 @@
-Return-Path: <netdev+bounces-81022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 304DE885889
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:46:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 302A688588F
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:49:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 546201C21823
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:46:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8ACBDB21492
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:49:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7C35F466;
-	Thu, 21 Mar 2024 11:46:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B54D59148;
+	Thu, 21 Mar 2024 11:48:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="IJw26sxE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AUI3aR36"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C90359148
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 11:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9FC558AD1;
+	Thu, 21 Mar 2024 11:48:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711021567; cv=none; b=PP0ai0gR7f/Uw+FxuLJa+takp6zI0Iqt7gu6mE45Mig+fm2PSe+koneue3VIdkA0hz2uaznbNwwTxtYumP8h/Wb/7WlkNKeoX2kR8vWxCSFPtbAcDc0d537sYgwKcSSasL2ATvZrNhdNugamROfP3CPH7Qmx7XMkVjyf/h8qJQs=
+	t=1711021738; cv=none; b=ZvsWviEVhDZFdSvaFIxgZ/I2IAWfnPyZJwwn3AtOU1gK7Tic0zKthcPsuDslnksB1x97Pi7VuAz+sGxQhsLhqj6JaaS7Cp0CtsNL8qBD7o1iDQxfFf6U6NzDMmM1zlGw86CaMwNBdtNNWJViqj5NACsrzt2p605vPf094C81rX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711021567; c=relaxed/simple;
-	bh=jSCAfVC5zxGX+Rxvz2EuB8guVTDQKe5d+rKvKDECHg4=;
-	h=From:To:Subject:Date:Message-Id:In-Reply-To:References; b=qI9+pFZmqm6ii/ubucNEjlhCMQtP131aYtiP4540nUCWGq3PR/1KMuwSigjqP1A3XmLku+vKqk4jUMxEjz9eC2LdImP7nVI1xSR/2QPFItTTzOq8nUT2euGASlqO5aHex48GIULUX0a/nH57aPPlStjaZd1i7ACBuV1nKp8e2lY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=IJw26sxE; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711021561; h=From:To:Subject:Date:Message-Id;
-	bh=+x97TFd8xWnRJBIeuKiZQYQ97T4nZhUStWpb1DfxRl4=;
-	b=IJw26sxEsUCbJ3hztuiuEoNqyECCxANqxD/oV4BdJ6fAbK+H8AnYmv3QK4ffPCwWAwMYKHgtLg/rSAcNzvsCeGABqgDUQgxF7wjEwSDXKOycr8k26kqfKwvt5haOivNpBbfA2hDJqI6cthuTJk2Gwa5WMe8yhaJ9zoDaWxQ11fk=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R491e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W3-bpQT_1711021560;
-Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W3-bpQT_1711021560)
-          by smtp.aliyun-inc.com;
-          Thu, 21 Mar 2024 19:46:01 +0800
-From: Heng Qi <hengqi@linux.alibaba.com>
-To: netdev@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: [PATCH 2/2] virtio-net: reduce the CPU consumption of dim worker
-Date: Thu, 21 Mar 2024 19:45:57 +0800
-Message-Id: <1711021557-58116-3-git-send-email-hengqi@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1711021557-58116-1-git-send-email-hengqi@linux.alibaba.com>
-References: <1711021557-58116-1-git-send-email-hengqi@linux.alibaba.com>
+	s=arc-20240116; t=1711021738; c=relaxed/simple;
+	bh=oyaxk/plSkXwNqfy8BRBwP+1IHu4SESNTkIjkLiy/fs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=uYBf3YRiKIUXVLv18i+RnWPaphvnggIHb7T6Uaocx7J8OkRULSvzAmapJEHhMvWCa7eIQt9KKi1HLa2Ic+nloxzYsBmsXF6ddH5VG8IIZ6mtR+OrNOEBQL2Pak86t+uKzU2kJum1O+JTuuPYWiZxVRMoBkLo79RZjH0px+nt/Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AUI3aR36; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-41476ddf668so1623805e9.3;
+        Thu, 21 Mar 2024 04:48:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711021735; x=1711626535; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SBXuSoXBGzyYnzCyTr2t1+PEE5aIYSRJOIe9GFH+E6Y=;
+        b=AUI3aR36uNe8KLc3VQPVmQ4m/N78hhQMRjy5sUrVHgBWX3rLhWIXj/XkTxnyDv3JOT
+         rCNjrMBQ0KCmFU/g6T+Eieyr9fwv2BhFxsY9YpaFFK89NgoQZV74Bu1m5+s0PfJeeaMJ
+         AyRQAMgGECCfYUHvPmcQ0eOQKXAwhZK+Kh5Cj/TTzwgOHzmhyZzjOv7+rRNjrBsbgn4X
+         8r//ciIRmdIyQ4M6akOzZV7g9eLutrGjlCu4vQhlDNdtWfpvC2gqU34ye95ZM2U95kI+
+         i/kQof9ysRhsikNBDZlqGL8Mtd56AmIhjdPL32IqZN0FwjmsSJD8usHWmnVaMef4oac6
+         l/lw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711021735; x=1711626535;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SBXuSoXBGzyYnzCyTr2t1+PEE5aIYSRJOIe9GFH+E6Y=;
+        b=WzS8IkSTcixZ81pVMhe9YX4Kg/Eot6InLauFy32V0x4eXVYNBCt73HGPoQZ22KpAOt
+         5aXswGiBEw6PrZ+OnUKJxF+zOY0KqzuLKUtRpUEBp4rUSzO3qmMa9vlzlZtHRtcZQgxY
+         8+mJVvMrD7STVjKEPtjEiGPEkm62x6KTmi4yZRKwx23e9mAyRvM22m06OZ9Fw94T5aF8
+         31NCQUYyHS861qIi1QqFzHM0ApS6zKbNHPDmUDCIuar+9K2Nzjzlr9ihF71lVntnNWJU
+         qnjlviA080Dx1AB+/kVygX68wY+V1lrVS5eOfg4/eI6kn38mhYqW4DDa6+VnFM2E8Cqr
+         tMMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXmqAZ6j8v2Du8JAdO9iNyIxunbHyjRAANhgIypEdeA6FAdiEvcsPT90h1UnijS3UZYBC3cUZH+7lyUXLemIIkjofQZuZw0scXi0uQqBk2tyVi0PSX8RA6ugB9wVZUXVY4xl32wKxGRuPymB2pE0zCdMvuFGEtaYyx6
+X-Gm-Message-State: AOJu0Yz0s6H9pweHgAOnJutA2btLisxD1x+AbOHAuX8Of6zTvqpUyjCP
+	I99UxNjC0foJveoqoSThNcbVBXV6Jv8d80+EuP7wyYtDHhFhryF1
+X-Google-Smtp-Source: AGHT+IHgvLDMn+HkPdYkZPwv15NBsccTvbOlqisMgSHZldgyQSO7CfPZdAwWDR8KqP6FTQIBVCRBDQ==
+X-Received: by 2002:a05:600c:19cf:b0:414:7751:c55e with SMTP id u15-20020a05600c19cf00b004147751c55emr355510wmq.0.1711021734847;
+        Thu, 21 Mar 2024 04:48:54 -0700 (PDT)
+Received: from localhost (54-240-197-231.amazon.com. [54.240.197.231])
+        by smtp.gmail.com with ESMTPSA id bj25-20020a0560001e1900b0033e68338fbasm9338930wrb.81.2024.03.21.04.48.54
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 21 Mar 2024 04:48:54 -0700 (PDT)
+From: Puranjay Mohan <puranjay12@gmail.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Ilya Leoshkevich
+ <iii@linux.ibm.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
+ <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, "H. Peter Anvin"
+ <hpa@zytor.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, Network
+ Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, LKML
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH bpf v2] bpf: verifier: prevent userspace memory access
+In-Reply-To: <CAADnVQLHrmkJ5p2gEUJkf_CRxq9gv8rcSuBm5GeZ_nUJxQOE0Q@mail.gmail.com>
+References: <20240321101058.68530-1-puranjay12@gmail.com>
+ <CAADnVQLhwLgq=QuXD-Ls=t9Scr_4Zn9JwdkXfZQfZkT=ysx64Q@mail.gmail.com>
+ <CAADnVQLHrmkJ5p2gEUJkf_CRxq9gv8rcSuBm5GeZ_nUJxQOE0Q@mail.gmail.com>
+Date: Thu, 21 Mar 2024 11:48:52 +0000
+Message-ID: <mb61pwmpvst3v.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Currently, ctrlq processes commands in a synchronous manner,
-which increases the delay of dim commands when configuring
-multi-queue VMs, which in turn causes the CPU utilization to
-increase and interferes with the performance of dim.
+Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
 
-Therefore we asynchronously process ctlq's dim commands.
+> On Thu, Mar 21, 2024 at 4:05=E2=80=AFAM Alexei Starovoitov
+> <alexei.starovoitov@gmail.com> wrote:
+>>
+>> On Thu, Mar 21, 2024 at 3:11=E2=80=AFAM Puranjay Mohan <puranjay12@gmail=
+.com> wrote:
+>> >
+>> > diff --git a/arch/s390/net/bpf_jit_comp.c b/arch/s390/net/bpf_jit_comp=
+.c
+>> > index e613eebfd349..e61a51a5b4be 100644
+>> > --- a/arch/s390/net/bpf_jit_comp.c
+>> > +++ b/arch/s390/net/bpf_jit_comp.c
+>> > @@ -2691,3 +2691,8 @@ bool bpf_jit_supports_subprog_tailcalls(void)
+>> >  {
+>> >         return true;
+>> >  }
+>> > +
+>> > +u64 bpf_arch_uaddress_limit(void)
+>> > +{
+>> > +       return -ENOTSUPP;
+>> > +}
+>>
+>> Looks good and should work, but s390 CI is still not happy.
+>> Ideas?
+>> sock tests were not failing before. So something is going on.
+>
+> I think I have an explanation.
+> -ENOTSUPP and u64... and later:
+> u64 uaddress_limit =3D bpf_arch_uaddress_limit()
+> if (uaddress_limit < 0)
+>
+> I bet the compiler simply removes this check since unsigned cannot
+> be negative.
+> Odd that there is no compiler warning.
+>
+> pw-bot: cr
+>
 
-Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
----
- drivers/net/virtio_net.c | 269 ++++++++++++++++++++++++++++++++++++++++++-----
- 1 file changed, 243 insertions(+), 26 deletions(-)
+Yes, I verified that the compiler is removing this:
 
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 0ebe322..460fc9e 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -138,6 +138,13 @@ struct virtnet_interrupt_coalesce {
- 	u32 max_usecs;
- };
- 
-+struct virtnet_coal_node {
-+	struct virtio_net_ctrl_hdr hdr;
-+	virtio_net_ctrl_ack status;
-+	struct virtio_net_ctrl_coal_vq coal_vqs;
-+	struct list_head list;
-+};
-+
- /* The dma information of pages allocated at a time. */
- struct virtnet_rq_dma {
- 	dma_addr_t addr;
-@@ -300,6 +307,9 @@ struct virtnet_info {
- 	/* Work struct for delayed refilling if we run low on memory. */
- 	struct delayed_work refill;
- 
-+	/* Work struct for delayed acquisition of cvq processing results. */
-+	struct delayed_work get_cvq;
-+
- 	/* Is delayed refill enabled? */
- 	bool refill_enabled;
- 
-@@ -332,6 +342,10 @@ struct virtnet_info {
- 	bool rx_dim_enabled;
- 
- 	/* Interrupt coalescing settings */
-+	int cvq_cmd_nums;
-+	int batch_dim_nums;
-+	int dim_loop_index;
-+	struct list_head coal_list;
- 	struct virtnet_interrupt_coalesce intr_coal_tx;
- 	struct virtnet_interrupt_coalesce intr_coal_rx;
- 
-@@ -2522,6 +2536,64 @@ static int virtnet_tx_resize(struct virtnet_info *vi,
- 	return err;
- }
- 
-+static void virtnet_process_dim_cmd(struct virtnet_info *vi, void *res)
-+{
-+	struct virtnet_coal_node *coal_node;
-+	u16 queue;
-+
-+	vi->cvq_cmd_nums--;
-+
-+	coal_node = (struct virtnet_coal_node *)res;
-+	list_add(&coal_node->list, &vi->coal_list);
-+
-+	queue = le16_to_cpu(coal_node->coal_vqs.vqn) / 2;
-+	vi->rq[queue].dim.state = DIM_START_MEASURE;
-+}
-+
-+/**
-+ * virtnet_cvq_response - get the response for filled ctrlq requests
-+ * @poll: keep polling ctrlq when a NULL buffer is obtained.
-+ * @dim_oneshot: process a dim cmd then exit, excluding user commands.
-+ *
-+ * Note that user commands must be processed synchronously
-+ *  (poll = true, dim_oneshot = false).
-+ */
-+static void virtnet_cvq_response(struct virtnet_info *vi,
-+				 bool poll,
-+				 bool dim_oneshot)
-+{
-+	unsigned tmp;
-+	void *res;
-+
-+	while (true) {
-+		res = virtqueue_get_buf(vi->cvq, &tmp);
-+		if (virtqueue_is_broken(vi->cvq)) {
-+			dev_warn(&vi->dev->dev, "Control vq is broken.\n");
-+			return;
-+		}
-+
-+		if (!res) {
-+			if (!poll)
-+				return;
-+
-+			cond_resched();
-+			cpu_relax();
-+			continue;
-+		}
-+
-+		/* this does not occur inside the process of waiting dim */
-+		if (res == ((void *)vi))
-+			return;
-+
-+		virtnet_process_dim_cmd(vi, res);
-+		/* When it is a user command, we must wait until the
-+		 * processing result is processed synchronously.
-+		 */
-+		if (dim_oneshot)
-+			return;
-+	}
-+}
-+
- /*
-  * Send command via the control virtqueue and check status.  Commands
-  * supported by the hypervisor, as indicated by feature bits, should
-@@ -2531,7 +2603,7 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
- 				 struct scatterlist *out)
- {
- 	struct scatterlist *sgs[4], hdr, stat;
--	unsigned out_num = 0, tmp;
-+	unsigned out_num = 0;
- 	int ret;
- 
- 	/* Caller should know better */
-@@ -2552,6 +2624,13 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
- 	sgs[out_num] = &stat;
- 
- 	BUG_ON(out_num + 1 > ARRAY_SIZE(sgs));
-+
-+	/* The additional task (dim) consumes the descriptor asynchronously,
-+	 * so we must ensure that there is a location for us.
-+	 */
-+	if (vi->cvq->num_free <= 3)
-+		virtnet_cvq_response(vi, true, true);
-+
- 	ret = virtqueue_add_sgs(vi->cvq, sgs, out_num, 1, vi, GFP_ATOMIC);
- 	if (ret < 0) {
- 		dev_warn(&vi->vdev->dev,
-@@ -2565,11 +2644,7 @@ static bool virtnet_send_command(struct virtnet_info *vi, u8 class, u8 cmd,
- 	/* Spin for a response, the kick causes an ioport write, trapping
- 	 * into the hypervisor, so the request should be handled immediately.
- 	 */
--	while (!virtqueue_get_buf(vi->cvq, &tmp) &&
--	       !virtqueue_is_broken(vi->cvq)) {
--		cond_resched();
--		cpu_relax();
--	}
-+	virtnet_cvq_response(vi, true, false);
- 
- 	return vi->ctrl->status == VIRTIO_NET_OK;
- }
-@@ -2721,6 +2796,7 @@ static int virtnet_close(struct net_device *dev)
- 		cancel_work_sync(&vi->rq[i].dim.work);
- 	}
- 
-+	cancel_delayed_work_sync(&vi->get_cvq);
- 	return 0;
- }
- 
-@@ -3553,48 +3629,148 @@ static int virtnet_send_notf_coal_vq_cmds(struct virtnet_info *vi,
- 	return 0;
- }
- 
-+static bool virtnet_add_dim_command(struct virtnet_info *vi,
-+				    struct virtnet_coal_node *ctrl)
-+{
-+	struct scatterlist *sgs[4], hdr, stat, out;
-+	unsigned out_num = 0;
-+	int ret;
-+
-+	BUG_ON(!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL_VQ));
-+
-+	ctrl->hdr.class = VIRTIO_NET_CTRL_NOTF_COAL;
-+	ctrl->hdr.cmd = VIRTIO_NET_CTRL_NOTF_COAL_VQ_SET;
-+
-+	sg_init_one(&hdr, &ctrl->hdr, sizeof(ctrl->hdr));
-+	sgs[out_num++] = &hdr;
-+
-+	sg_init_one(&out, &ctrl->coal_vqs, sizeof(ctrl->coal_vqs));
-+	sgs[out_num++] = &out;
-+
-+	ctrl->status = VIRTIO_NET_OK;
-+	sg_init_one(&stat, &ctrl->status, sizeof(ctrl->status));
-+	sgs[out_num] = &stat;
-+
-+	BUG_ON(out_num + 1 > ARRAY_SIZE(sgs));
-+	ret = virtqueue_add_sgs(vi->cvq, sgs, out_num, 1, ctrl, GFP_ATOMIC);
-+	if (ret < 0) {
-+		dev_warn(&vi->vdev->dev, "Failed to add sgs for command vq: %d\n.", ret);
-+		return false;
-+	}
-+
-+	virtqueue_kick(vi->cvq);
-+
-+	vi->cvq_cmd_nums++;
-+
-+	return true;
-+}
-+
-+static void virtnet_get_cvq_work(struct work_struct *work)
-+{
-+	struct virtnet_info *vi =
-+		container_of(work, struct virtnet_info, get_cvq.work);
-+
-+	if (!rtnl_trylock()) {
-+		schedule_delayed_work(&vi->get_cvq, 1);
-+		return;
-+	}
-+
-+	if (!vi->cvq_cmd_nums)
-+		goto ret;
-+
-+	virtnet_cvq_response(vi, false, false);
-+
-+	if (vi->cvq_cmd_nums)
-+		schedule_delayed_work(&vi->get_cvq, 1);
-+
-+ret:
-+	rtnl_unlock();
-+}
-+
-+static int virtnet_config_dim(struct virtnet_info *vi, struct receive_queue *rq,
-+			      struct dim *dim)
-+{
-+	struct virtnet_coal_node *avail_coal;
-+	struct dim_cq_moder update_moder;
-+	int qnum = rq - vi->rq;
-+
-+	update_moder = net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
-+	if (update_moder.usec != rq->intr_coal.max_usecs ||
-+	    update_moder.pkts != rq->intr_coal.max_packets) {
-+		avail_coal = list_first_entry(&vi->coal_list,
-+					      struct virtnet_coal_node, list);
-+		avail_coal->coal_vqs.vqn = cpu_to_le16(rxq2vq(qnum));
-+		avail_coal->coal_vqs.coal.max_usecs = cpu_to_le32(update_moder.usec);
-+		avail_coal->coal_vqs.coal.max_packets = cpu_to_le32(update_moder.pkts);
-+		list_del(&avail_coal->list);
-+		if (!virtnet_add_dim_command(vi, avail_coal))
-+			return -EINVAL;
-+
-+		rq->intr_coal.max_usecs = update_moder.usec;
-+		rq->intr_coal.max_packets = update_moder.pkts;
-+	} else if (dim->state == DIM_APPLY_NEW_PROFILE) {
-+		dim->state = DIM_START_MEASURE;
-+	}
-+
-+	return 0;
-+}
-+
- static void virtnet_rx_dim_work(struct work_struct *work)
- {
- 	struct dim *dim = container_of(work, struct dim, work);
--	struct receive_queue *rq = container_of(dim,
-+	struct receive_queue *rq, *rq_ = container_of(dim,
- 			struct receive_queue, dim);
--	struct virtnet_info *vi = rq->vq->vdev->priv;
--	struct net_device *dev = vi->dev;
--	struct dim_cq_moder update_moder;
--	int i, qnum, err;
-+	struct virtnet_info *vi = rq_->vq->vdev->priv;
-+	int i = 0, err;
- 
- 	if (!rtnl_trylock()) {
- 		schedule_work(&dim->work);
- 		return;
- 	}
- 
-+	if (list_empty(&vi->coal_list) || vi->cvq->num_free <= 3)
-+		virtnet_cvq_response(vi, true, true);
-+
-+	/* The request scheduling the worker must be processed first
-+	 * to avoid not having enough descs for ctrlq, causing the
-+	 * request to fail, and the parameters of the queue will never
-+	 * be updated again in the future.
-+	 */
-+	err = virtnet_config_dim(vi, rq_, dim);
-+	if (err)
-+		goto ret;
-+
- 	/* Each rxq's work is queued by "net_dim()->schedule_work()"
- 	 * in response to NAPI traffic changes. Note that dim->profile_ix
- 	 * for each rxq is updated prior to the queuing action.
- 	 * So we only need to traverse and update profiles for all rxqs
- 	 * in the work which is holding rtnl_lock.
- 	 */
--	for (i = 0; i < vi->curr_queue_pairs; i++) {
-+	for (i = vi->dim_loop_index; i < vi->curr_queue_pairs; i++) {
- 		rq = &vi->rq[i];
- 		dim = &rq->dim;
--		qnum = rq - vi->rq;
- 
--		if (!rq->dim_enabled)
-+		if (list_empty(&vi->coal_list) || vi->cvq->num_free <= 3)
-+			break;
-+
-+		if (!rq->dim_enabled || rq == rq_)
- 			continue;
- 
--		update_moder = net_dim_get_rx_moderation(dim->mode, dim->profile_ix);
--		if (update_moder.usec != rq->intr_coal.max_usecs ||
--		    update_moder.pkts != rq->intr_coal.max_packets) {
--			err = virtnet_send_rx_ctrl_coal_vq_cmd(vi, qnum,
--							       update_moder.usec,
--							       update_moder.pkts);
--			if (err)
--				pr_debug("%s: Failed to send dim parameters on rxq%d\n",
--					 dev->name, qnum);
--			dim->state = DIM_START_MEASURE;
--		}
-+		err = virtnet_config_dim(vi, rq, dim);
-+		if (err)
-+			goto ret;
-+
- 	}
- 
-+	if (vi->cvq_cmd_nums)
-+		schedule_delayed_work(&vi->get_cvq, 1);
-+
-+ret:
-+	if (i == vi->curr_queue_pairs)
-+		vi->dim_loop_index = 0;
-+	else
-+		vi->dim_loop_index = i;
-+
- 	rtnl_unlock();
- }
- 
-@@ -4439,6 +4615,7 @@ static int virtnet_alloc_queues(struct virtnet_info *vi)
- 		goto err_rq;
- 
- 	INIT_DELAYED_WORK(&vi->refill, refill_work);
-+	INIT_DELAYED_WORK(&vi->get_cvq, virtnet_get_cvq_work);
- 	for (i = 0; i < vi->max_queue_pairs; i++) {
- 		vi->rq[i].pages = NULL;
- 		netif_napi_add_weight(vi->dev, &vi->rq[i].napi, virtnet_poll,
-@@ -4623,6 +4800,35 @@ static void virtnet_set_big_packets(struct virtnet_info *vi, const int mtu)
- 	}
- }
- 
-+static void virtnet_del_coal_list(struct virtnet_info *vi)
-+{
-+	struct virtnet_coal_node *coal_node, *tmp;
-+
-+	list_for_each_entry_safe(coal_node, tmp,  &vi->coal_list, list) {
-+		list_del(&coal_node->list);
-+		kfree(coal_node);
-+	}
-+}
-+
-+static int virtnet_init_coal_list(struct virtnet_info *vi)
-+{
-+	struct virtnet_coal_node *coal_node;
-+	int i;
-+
-+	vi->batch_dim_nums = min((unsigned int)vi->max_queue_pairs,
-+				 virtqueue_get_vring_size(vi->cvq) / 3);
-+	for (i = 0; i < vi->batch_dim_nums; i++) {
-+		coal_node = kmalloc(sizeof(*coal_node), GFP_KERNEL);
-+		if (!coal_node) {
-+			virtnet_del_coal_list(vi);
-+			return -ENOMEM;
-+		}
-+		list_add(&coal_node->list, &vi->coal_list);
-+	}
-+
-+	return 0;
-+}
-+
- static int virtnet_probe(struct virtio_device *vdev)
- {
- 	int i, err = -ENOMEM;
-@@ -4816,11 +5022,20 @@ static int virtnet_probe(struct virtio_device *vdev)
- 			vi->intr_coal_tx.max_packets = 0;
- 	}
- 
-+	INIT_LIST_HEAD(&vi->coal_list);
- 	if (virtio_has_feature(vi->vdev, VIRTIO_NET_F_VQ_NOTF_COAL)) {
-+		vi->cvq_cmd_nums = 0;
-+		vi->dim_loop_index = 0;
-+
-+		if (virtnet_init_coal_list(vi))
-+			goto free;
-+
- 		/* The reason is the same as VIRTIO_NET_F_NOTF_COAL. */
--		for (i = 0; i < vi->max_queue_pairs; i++)
-+		for (i = 0; i < vi->max_queue_pairs; i++) {
-+			vi->rq[i].packets_in_napi = 0;
- 			if (vi->sq[i].napi.weight)
- 				vi->sq[i].intr_coal.max_packets = 1;
-+		}
- 	}
- 
- #ifdef CONFIG_SYSFS
-@@ -4949,6 +5164,8 @@ static void virtnet_remove(struct virtio_device *vdev)
- 
- 	net_failover_destroy(vi->failover);
- 
-+	virtnet_del_coal_list(vi);
-+
- 	remove_vq_common(vi);
- 
- 	free_netdev(vi->dev);
--- 
-1.8.3.1
 
+                if (BPF_CLASS(insn->code) =3D=3D BPF_LDX &&
+    a944:       7100047f        cmp     w3, #0x1
+    a948:       540013e1        b.ne    abc4 <do_misc_fixups+0x66c>  // b.a=
+ny
+    a94c:       721a041f        tst     w0, #0xc0
+    a950:       54fff4e1        b.ne    a7ec <do_misc_fixups+0x294>  // b.a=
+ny
+                        u64 uaddress_limit =3D bpf_arch_uaddress_limit();
+    a954:       b90003e6        str     w6, [sp]
+    a958:       94000000        bl      0 <bpf_arch_uaddress_limit>
+                        *patch++ =3D BPF_MOV64_REG(BPF_REG_AX, insn->src_re=
+g);
+
+
+We should do:
+   if (!uaddress_limit)
+        goto next_insn;
+
+and in the disabled case return 0 in place of -ENOSUPP.
+
+Doing this adds the check:
+
+
+             if (BPF_CLASS(insn->code) =3D=3D BPF_LDX &&
+    a944:       7100047f        cmp     w3, #0x1
+    a948:       54001401        b.ne    abc8 <do_misc_fixups+0x670>  // b.a=
+ny
+    a94c:       721a041f        tst     w0, #0xc0
+    a950:       54fff4e1        b.ne    a7ec <do_misc_fixups+0x294>  // b.a=
+ny
+                        u64 uaddress_limit =3D bpf_arch_uaddress_limit();
+    a954:       b90003e6        str     w6, [sp]
+    a958:       94000000        bl      0 <bpf_arch_uaddress_limit>
+                        if (!uaddress_limit)
+    a95c:       b4fff020        cbz     x0, a760 <do_misc_fixups+0x208>
+                        *patch++ =3D BPF_MOV64_REG(BPF_REG_AX, insn->src_re=
+g);
+
+
+
+I will send v3 with this approach.
+
+
+Thanks,
+Puranjay
 
