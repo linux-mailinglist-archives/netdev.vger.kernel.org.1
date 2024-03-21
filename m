@@ -1,87 +1,85 @@
-Return-Path: <netdev+bounces-81090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5AC0885C2B
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 16:40:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F209885C2E
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 16:40:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B7A81F26AD3
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:40:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 745BC1C22565
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16642127B76;
-	Thu, 21 Mar 2024 15:34:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4C9128385;
+	Thu, 21 Mar 2024 15:35:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="rBJFnCZ8"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="zCyF18DF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E3D86AC6
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 15:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B72F86AD8
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 15:35:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711035286; cv=none; b=rFDsQSmFsvFhFRtm0SAmF8diCKsFJaWAbmvXeQYYKGZbnw4CJxpCw7NrovGDUjC+2qGdlq83py9zdD6Fjjh2LkudpH0xcE1sDbu89Ezyii/wiksgC0QfVIaAOf4NQd3EK8FmjUy0M5EjNB2t2sLIkrvLcLVgTyj6pCNg3/VX5hE=
+	t=1711035320; cv=none; b=B4SLFrEfbrVlJpCWfl4fOT4KNZnI38stSV+NwqdpmZfS4zackmTTByW+g5+2vKGHuiDwQjul7m7wrNK56BKg4ztCUevtZaSryqXhy1wEbpJpl4p8HIxw9VFyp5RQ3t3zmoQaXsA8VosM/eqq141UPPGy4WMaJwEUf2KRAUoc7S8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711035286; c=relaxed/simple;
-	bh=0zc0ujxsUZDSCIMa8DgsBxEKHxlROrz8eSt1YZrNcQ4=;
+	s=arc-20240116; t=1711035320; c=relaxed/simple;
+	bh=7/Vr7UGZFgfY5hiZbZVagMHjl3VeIKITw0zb4mGRSdw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hk0mvwWSJxsyZMgiGuP4KUM93fmAoG6c73lXIWQl4AF0zFOQxzlZI1TezxCmldDWcdZDl/SpEzkgUyRH+T6DolgtaVfYMnzpay+FA5lJZ4JTvr+SaQRqbcXgaaa2awTkh3uflb8ngtPb/AbAF7lss+uVVPpsfXa7wQlEv03Oz7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=rBJFnCZ8; arc=none smtp.client-ip=209.85.218.51
+	 Content-Type:Content-Disposition:In-Reply-To; b=oKFEPgVuSZsJPPEyiIciNedfdMcTSNRj5ArZB5CTSrPM+8MvYIWBKPCSBja1ZR7iEKsZ3z5L5d1s07GWLDdX+rSQAO1IxhYB8prl3ClZNWqy/SvYiMHUXY4F6VsT4LN7ALSDzoLNlWwiw3MGl1+w/ebguOJ9XcLbVyelWscjNJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=zCyF18DF; arc=none smtp.client-ip=209.85.218.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a450bedffdfso137122866b.3
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 08:34:42 -0700 (PDT)
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a4707502aafso201837166b.0
+        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 08:35:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1711035280; x=1711640080; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1711035317; x=1711640117; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=jJZsBHwcwq2EKhTfcmV2KDI1h+H2DDxIsRSU6ooknBA=;
-        b=rBJFnCZ8c3RnzjxFqOxzxWJgQxe7jDYkFCqIH/I+fB+EkHpRmALmBcSvc3iZuvZzpS
-         c1FgWMQ97WBNK5QcioH/mp7nJdfZk62SZbHxQMBc3o9a+KEwOdDWM4kLQj43RWvEbpIq
-         CSiqr72MaK2JeaSuZNIhqY17FnnOacF1o4Cet+NLrV/bAcWuEpVeBcQLByR9el/ESeAh
-         5rXJrIMtwBIIW7tMCcIyszaR5Lt0CoAY0hdyQVFG3y0sO/Xm5QytDbkoNLP7wqMLUktT
-         4cG3UYMwpAg6HShIi7aClPYV2rMipYC5FZ5Y0Mi88qQHF59MltgMvJXQI4bsNXMoa+wF
-         VcTw==
+        bh=7/Vr7UGZFgfY5hiZbZVagMHjl3VeIKITw0zb4mGRSdw=;
+        b=zCyF18DFXr31m/24zPy4vHD0iVUXK/iO3DFdA+PsRBeOnabwqpwQZrSrqXFNLntlWj
+         YdpGS2H4cq0aZtqGlfu0Dwqn0Be7UQ6OfvOAWkYHJqLFGpMfZLiiwtN7oNdOFV52hnxO
+         v22ae/TBDNPTQ2Z9nq+MDnhRZxKkKLpSTr5HB4tgq9vmtJ11+Wku1Sn53OjHYtYWmtsD
+         D6DFom5lcCNMTPSHD84mhxpVJWDElwzv8nSpNujgS0nt2eDW7BxA+9aTGrYHUQT/kz+e
+         qzrAkupnUu/IRQIshLWaZN/nY+4yDnPw2W+oiPPnku4+VrX9Ma673TspLhmb31dKUO+M
+         ZTSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711035280; x=1711640080;
+        d=1e100.net; s=20230601; t=1711035317; x=1711640117;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=jJZsBHwcwq2EKhTfcmV2KDI1h+H2DDxIsRSU6ooknBA=;
-        b=fmrX7GrXGFKeo5fKf9GXhTGPK27umkItYVGrxw8UlJA5J0NhWIaZKXXcYQ97eoA679
-         zojH6vhFV7nqMETZNfMkGurTWN1C5YTGpQnoJvy+r3jmtAu10nm+PBCYh/mZ+pupwxx/
-         2SKc5nJZucj98yqgfKYOGBckBOcokYTS3U1lPnPFxy1iDXfmYqKYrf7G8kXFYd12zQpf
-         VzbK0N2F78L6m0BxuuEtVq7mW5F46O2/M2vELm/w0GPlKwGD2PleUGuGcmu6gmCpJvPv
-         3FO5Gi/NEcYBcpxhvLApzotubs8zogrhqyJ8GxhNl66tpEH7/wnG2jNDGi/vzN2ZjRQ0
-         Nnqw==
-X-Forwarded-Encrypted: i=1; AJvYcCWxsNupf3oyXAYobO+1GP0duxjdaLSq/88utR3eD4Y+f1Y1rnN4w2ZTn6M1uzuoI5qeTuq1p0S7BO7ufFRpt3KrgT9L2QIu
-X-Gm-Message-State: AOJu0YyomIh/Dfyub7r963rt0segPFUTQKYj11rjCDJ0KUQKGiAh+gaI
-	fQm7QhEHjhXmDzgO6JAmtvXkpAlZPnmJ+3mmi6/2VNrQAUc6YkURnU3FMOFVM9DFxTSq1gf039x
-	jaFI=
-X-Google-Smtp-Source: AGHT+IGBqgVfVrdiQ/+9M8CkXnHsQmBgBd+MDFecT1hmDvu9F6AyiYmNOC25nNXzC5ijEZZ+4GiHwQ==
-X-Received: by 2002:a17:906:ee89:b0:a46:be83:36e2 with SMTP id wt9-20020a170906ee8900b00a46be8336e2mr10664449ejb.24.1711035280409;
-        Thu, 21 Mar 2024 08:34:40 -0700 (PDT)
+        bh=7/Vr7UGZFgfY5hiZbZVagMHjl3VeIKITw0zb4mGRSdw=;
+        b=jqLDgZdVaysm/2rjn5EMa6Y5SkHyfA+UaegryixCO57x3nG20VgeWVN2avJRL5QYXt
+         oW1RGwLLzKA4fitHLOc0fkD1cPjh8PZbbUU/QOBl3PLc2GG5PrawdqQ3/tqTbnVB6Fqf
+         YnEplOAmpy7W1kSA1LxaWNUM63ZpEmfsLLyZ8/7A/0fv5NTMsgrT8l1e03qtxBoCDjoa
+         ujWp27POpcyRby1ftX4YsQvDssD+APWegAqrlGE1rBEEQ49f8c8bbgzGJZLf3IUOxZDj
+         6DVqPJJGzC6cBtR+kFVgzDTwHq4z08CD7Ol/vAueZpIty8tbpc7N+EKC+4PnGjMoSCBq
+         BSKg==
+X-Forwarded-Encrypted: i=1; AJvYcCUnZIwYY/ylHz84+xK624cp66jJvEkipYDUXgkg5+Ux40YBWX9bfEPL4lpxrpWtdLyp5K59Acr6JcDGry5Q4BQYG981aceL
+X-Gm-Message-State: AOJu0YzafwBurcq5qJ58TggAx1GdAaGOWUYpI6T/GXCGzt9J4b45YTBO
+	6A6NlEvLupIKpK53QvSXNDtQMhEyZDHBgvTRxeGRTBQrMImQpu9VCK9FOyX/AKc=
+X-Google-Smtp-Source: AGHT+IFzD7bSzwoych8HcblWm59fVdm+D+wuiZhdHvhn9H6Gbm7/4alQeCSXNlk1PpFwllpAsWO2gw==
+X-Received: by 2002:a17:906:590c:b0:a46:a85d:de81 with SMTP id h12-20020a170906590c00b00a46a85dde81mr2754941ejq.12.1711035316755;
+        Thu, 21 Mar 2024 08:35:16 -0700 (PDT)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id n19-20020a170906725300b00a46a9c38a64sm39732ejk.65.2024.03.21.08.34.39
+        by smtp.gmail.com with ESMTPSA id w1-20020a1709067c8100b00a46a04d7dc4sm40922ejo.61.2024.03.21.08.35.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Mar 2024 08:34:39 -0700 (PDT)
-Date: Thu, 21 Mar 2024 16:34:37 +0100
+        Thu, 21 Mar 2024 08:35:16 -0700 (PDT)
+Date: Thu, 21 Mar 2024 16:35:13 +0100
 From: Jiri Pirko <jiri@resnulli.us>
 To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
+Cc: Ido Schimmel <idosch@nvidia.com>, David Ahern <dsahern@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH v2 net] ice: Fix freeing uninitialized pointers
-Message-ID: <ZfxTjYUPAFz_LRlk@nanopsycho>
-References: <0efe132b-b343-4438-bb00-5a4b82722ed3@moroto.mountain>
+	Petr Machata <petrm@nvidia.com>, Kees Cook <keescook@chromium.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH v2 net] nexthop: fix uninitialized variable in
+ nla_put_nh_group_stats()
+Message-ID: <ZfxTsVPwYbruXJfY@nanopsycho>
+References: <f08ac289-d57f-4a1a-830f-cf9a0563cb9c@moroto.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,104 +88,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <0efe132b-b343-4438-bb00-5a4b82722ed3@moroto.mountain>
+In-Reply-To: <f08ac289-d57f-4a1a-830f-cf9a0563cb9c@moroto.mountain>
 
-Thu, Mar 21, 2024 at 03:42:12PM CET, dan.carpenter@linaro.org wrote:
->Automatically cleaned up pointers need to be initialized before exiting
->their scope.  In this case, they need to be initialized to NULL before
->any return statement.
+Thu, Mar 21, 2024 at 03:42:18PM CET, dan.carpenter@linaro.org wrote:
+>The "*hw_stats_used" value needs to be set on the success paths to prevent
+>an uninitialized variable bug in the caller, nla_put_nh_group_stats().
 >
->Fixes: 90f821d72e11 ("ice: avoid unnecessary devm_ usage")
+>Fixes: 5072ae00aea4 ("net: nexthop: Expose nexthop group HW stats to user space")
 >Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
 
 Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-
-
->---
->v2: I missed a couple pointers in v1.
->
->The change to ice_update_link_info() isn't required because it's
->assigned on the very next line...  But I did that because it's harmless
->and makes __free() stuff easier to verify.  I felt like moving the
->declarations into the code would be controversial and it also ends up
->making the lines really long.
->
->		goto goto err_unroll_sched;
->
->	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) =
->		kzalloc(sizeof(*pcaps), GFP_KERNEL);
-
-Yeah, that is why I'm proposing KZALLOC_FREE helper:
-https://lore.kernel.org/all/20240315132249.2515468-1-jiri@resnulli.us/
-
-
->
-> drivers/net/ethernet/intel/ice/ice_common.c | 10 +++++-----
-> drivers/net/ethernet/intel/ice/ice_ethtool.c | 2 +-
-> 2 file changed, 6 insertion(+), 6 deletion(-)
->
->diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
->index 4d8111aeb0ff..6f2db603b36e 100644
->--- a/drivers/net/ethernet/intel/ice/ice_common.c
->+++ b/drivers/net/ethernet/intel/ice/ice_common.c
->@@ -1002,8 +1002,8 @@ static void ice_get_itr_intrl_gran(struct ice_hw *hw)
->  */
-> int ice_init_hw(struct ice_hw *hw)
-> {
->-	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree);
->-	void *mac_buf __free(kfree);
->+	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) = NULL;
->+	void *mac_buf __free(kfree) = NULL;
-> 	u16 mac_buf_len;
-> 	int status;
-> 
->@@ -3272,7 +3272,7 @@ int ice_update_link_info(struct ice_port_info *pi)
-> 		return status;
-> 
-> 	if (li->link_info & ICE_AQ_MEDIA_AVAILABLE) {
->-		struct ice_aqc_get_phy_caps_data *pcaps __free(kfree);
->+		struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) = NULL;
-> 
-> 		pcaps = kzalloc(sizeof(*pcaps), GFP_KERNEL);
-> 		if (!pcaps)
->@@ -3420,7 +3420,7 @@ ice_cfg_phy_fc(struct ice_port_info *pi, struct ice_aqc_set_phy_cfg_data *cfg,
-> int
-> ice_set_fc(struct ice_port_info *pi, u8 *aq_failures, bool ena_auto_link_update)
-> {
->-	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree);
->+	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) = NULL;
-> 	struct ice_aqc_set_phy_cfg_data cfg = { 0 };
-> 	struct ice_hw *hw;
-> 	int status;
->@@ -3561,7 +3561,7 @@ int
-> ice_cfg_phy_fec(struct ice_port_info *pi, struct ice_aqc_set_phy_cfg_data *cfg,
-> 		enum ice_fec_mode fec)
-> {
->-	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree);
->+	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) = NULL;
-> 	struct ice_hw *hw;
-> 	int status;
-> 
->diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
->index 255a9c8151b4..78b833b3e1d7 100644
->--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
->+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
->@@ -941,11 +941,11 @@ static u64 ice_loopback_test(struct net_device *netdev)
-> 	struct ice_netdev_priv *np = netdev_priv(netdev);
-> 	struct ice_vsi *orig_vsi = np->vsi, *test_vsi;
-> 	struct ice_pf *pf = orig_vsi->back;
->+	u8 *tx_frame __free(kfree) = NULL;
-> 	u8 broadcast[ETH_ALEN], ret = 0;
-> 	int num_frames, valid_frames;
-> 	struct ice_tx_ring *tx_ring;
-> 	struct ice_rx_ring *rx_ring;
->-	u8 *tx_frame __free(kfree);
-> 	int i;
-> 
-> 	netdev_info(netdev, "loopback test\n");
->-- 
->2.43.0
->
->
->
 
