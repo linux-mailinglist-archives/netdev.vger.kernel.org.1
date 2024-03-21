@@ -1,144 +1,79 @@
-Return-Path: <netdev+bounces-81143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 861A0886338
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 23:21:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EF94588633E
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 23:25:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26C5C1F2134E
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 22:21:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 917AE1F2159B
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 22:25:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9CCD132C37;
-	Thu, 21 Mar 2024 22:21:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8127C136990;
+	Thu, 21 Mar 2024 22:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pU6rYWCz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail115-118.sinamail.sina.com.cn (mail115-118.sinamail.sina.com.cn [218.30.115.118])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635A012BF28
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 22:21:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=218.30.115.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59556136982;
+	Thu, 21 Mar 2024 22:25:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711059681; cv=none; b=kLexdP6VKYQfroIX/go36EyXQ6BIUwsRrIoFX2ET0EQWvuEAHIu+871w8CI1dGNtJRClSzfvbZYZTv49riDxJMtdHLDNq1IuqvuhZC4LAkpDLt1dk/ktEcxLJNxv6H/hffHeskt6XWcr+gpGdIEQKYJiwtwdNu0KbRGgTioSXKo=
+	t=1711059922; cv=none; b=UU5Sy+xTMFzLiPb1kRwW3aF9vRQ3Q+3Hj2M/WntoQMYdES5v0BYpbfPc8iI75nIU79BYJhuPt1AulbdwpaJrPzmmnz/vYK+TdkngfpwhB4a8OlE0ClbWmTSQGYhAdlKZ6puRzEPayMXyCgUby+5ttMYoDVqyvM8hTyTmj+qv4cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711059681; c=relaxed/simple;
-	bh=9lGxldt3FbC/qdsB/K46SIm3mDeWP61ycUXkypW+u+s=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Oc2//lcnalV8A4pDG9fUszs8oJHNcDrxn0xAIzdPTn1bMQJaAXPgabjE45N6jYANm684+DNOeiWEotGOVGyRPVhdbp2F/sDdS8QvOda1fSVXt6PzVaiDN0lyE1UhCgtcYTAjwzamw6EYsZ9OkBnLMvMhnxD2Zet2/mw6QVxwxpM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=218.30.115.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
-X-SMAIL-HELO: localhost.localdomain
-Received: from unknown (HELO localhost.localdomain)([113.118.69.35])
-	by sina.com (172.16.235.25) with ESMTP
-	id 65FCB2D0000027B1; Thu, 22 Mar 2024 06:21:07 +0800 (CST)
-X-Sender: hdanton@sina.com
-X-Auth-ID: hdanton@sina.com
-Authentication-Results: sina.com;
-	 spf=none smtp.mailfrom=hdanton@sina.com;
-	 dkim=none header.i=none;
-	 dmarc=none action=none header.from=hdanton@sina.com
-X-SMAIL-MID: 2410634210281
-X-SMAIL-UIID: CD374027FD7243C79AF4A8326B3E6537-20240322-062107-1
-From: Hillf Danton <hdanton@sina.com>
-To: Antoine Tenart <atenart@kernel.org>
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com,
-	Eric Dumazet <edumazet@google.com>,
-	syzbot <syzbot+99b8125966713aa4b0c3@syzkaller.appspotmail.com>
-Subject: Re: [syzbot] [net?] INFO: task hung in register_nexthop_notifier (3)
-Date: Fri, 22 Mar 2024 06:20:54 +0800
-Message-Id: <20240321222054.2462-1-hdanton@sina.com>
-In-Reply-To: <171101294595.5492.6904692183666798713@kwain>
-References: <0000000000009485160613eda067@google.com> <CANn89iKnOzz_Bs_ygLWZGjsTw=266p8KALv=QWheTanoHYj+nw@mail.gmail.com>
+	s=arc-20240116; t=1711059922; c=relaxed/simple;
+	bh=fi7aHAiZniVdG0Ix/kdINY3ArwDoV3J1FeZiTeK053c=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=ll6/aM1gyuiSMY7Idpk10U8jkFGXA8kP49vyxt8RAivzKJz8pXiwacg3iW1QPYAXplgjXyUoaKDRHfMFVZzrBHmOjXOVY0V+ZbwBxVm8B4XaAjKBfaE6EdAs4DvvRpLK2K2AB4wefOo1wE/QLb4a9ZRA9b4QG3jYhPt0nKF6qx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pU6rYWCz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2B315C43394;
+	Thu, 21 Mar 2024 22:25:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711059922;
+	bh=fi7aHAiZniVdG0Ix/kdINY3ArwDoV3J1FeZiTeK053c=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=pU6rYWCzr8A6mOj6evcZPDgMw+U0Q8ZdcRHqVBXbmCT50VoHepPqcy3PeoHjNJ7r+
+	 FbIA+feb6vdl518pxxFXDksNL6NRK4MYrmrKhPKRmdjl344nsRkK8RRuwtdZfIhC8F
+	 scuDtXxDm0iifSA3ujktRdFFsgcPIG4en4Hypcgdl04pRaOnR9RF7jQkSrDi69BHDN
+	 owBqUg81JhUvTGuQ2spTRvs70v3UfFN7QjiIcSTlXk+Z0N0UNd1pCZ490IVvqpFgCm
+	 m6Ca754DcaOCXZ0LOHCPQP/H4y7/fkA+lpdrzqk3EvXwYdV32cvYa1HTQqG3+kkSyk
+	 d+7jS5yOnDsqA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 22E0AD84BA9;
+	Thu, 21 Mar 2024 22:25:22 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.9-rc1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20240321173325.3227312-1-kuba@kernel.org>
+References: <20240321173325.3227312-1-kuba@kernel.org>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20240321173325.3227312-1-kuba@kernel.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.9-rc1
+X-PR-Tracked-Commit-Id: f99c5f563c174a49ea1cbf4754539b05cfde40c4
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: cba9ffdb9913dfe6be29f049ce920ce451ce7cc4
+Message-Id: <171105992213.29795.12770691855553503458.pr-tracker-bot@kernel.org>
+Date: Thu, 21 Mar 2024 22:25:22 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-On Thu, 21 Mar 2024 10:22:25 +0100 Antoine Tenart <atenart@kernel.org>
-> Quoting Eric Dumazet (2024-03-18 15:46:37)
-> > On Mon, Mar 18, 2024 at 12:26=E2=80=AFPM syzbot
-> > <syzbot+99b8125966713aa4b0c3@syzkaller.appspotmail.com> wrote:
-> > >
-> > > INFO: task syz-executor.3:6975 blocked for more than 143 seconds.
-> > >       Not tainted 6.8.0-rc7-syzkaller-02500-g76839e2f1fde #0
-> > > "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this messag=
-> e.
-> > > task:syz-executor.3  state:D stack:20920 pid:6975  tgid:6975  ppid:1   =
->    flags:0x00004006
-> > > Call Trace:
-> > >  <TASK>
-> > >  context_switch kernel/sched/core.c:5400 [inline]
-> > >  __schedule+0x17d1/0x49f0 kernel/sched/core.c:6727
-> > >  __schedule_loop kernel/sched/core.c:6802 [inline]
-> > >  schedule+0x149/0x260 kernel/sched/core.c:6817
-> > >  schedule_preempt_disabled+0x13/0x30 kernel/sched/core.c:6874
-> > >  __mutex_lock_common kernel/locking/mutex.c:684 [inline]
-> > >  __mutex_lock+0x6a3/0xd70 kernel/locking/mutex.c:752
-> > >  register_nexthop_notifier+0x84/0x290 net/ipv4/nexthop.c:3863
-> > >  nsim_fib_create+0x8a6/0xa70 drivers/net/netdevsim/fib.c:1587
-> > >  nsim_drv_probe+0x747/0xb80 drivers/net/netdevsim/dev.c:1582
-> > >  really_probe+0x29e/0xc50 drivers/base/dd.c:658
-> > >  __driver_probe_device+0x1a2/0x3e0 drivers/base/dd.c:800
-> > >  driver_probe_device+0x50/0x430 drivers/base/dd.c:830
-> > >  __device_attach_driver+0x2d6/0x530 drivers/base/dd.c:958
-> > >  bus_for_each_drv+0x24e/0x2e0 drivers/base/bus.c:457
-> > >  __device_attach+0x333/0x520 drivers/base/dd.c:1030
-> > >  bus_probe_device+0x189/0x260 drivers/base/bus.c:532
-> > >  device_add+0x8ff/0xca0 drivers/base/core.c:3639
-> > >  nsim_bus_dev_new drivers/net/netdevsim/bus.c:442 [inline]
-> > >  new_device_store+0x3f2/0x890 drivers/net/netdevsim/bus.c:173
-> > >  kernfs_fop_write_iter+0x3a4/0x500 fs/kernfs/file.c:334
-> >=20
-> > So we have a sysfs handler ultimately calling register_nexthop_notifier()=
->  or any
-> > other network control path requiring RTNL.
-> >=20
-> > Note that we have rtnl_trylock() for a reason...
-> 
-> Mentioning the below in case that gives some ideas; feel free to
-> disregard.
-> 
-> When I looked at similar issues a while ago the rtnl deadlock actually
-> happened with the kernfs_node refcount; haven't looked at this one in
-> details though. The mutex in there was just preventing concurrent
-> writers.
-> 
-> > Or maybe the reason is wrong, if we could change kernfs_fop_write_iter()
-> > to no longer hold a mutex...
+The pull request you sent on Thu, 21 Mar 2024 10:33:25 -0700:
 
-Better after working out why RCU stalled [1]
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.9-rc1
 
-5 locks held by kworker/u4:7/23559:
- #0: ffff888015ea4938 ((wq_completion)netns){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2608 [inline]
- #0: ffff888015ea4938 ((wq_completion)netns){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2706
- #1: ffffc90012b8fd20 (net_cleanup_work){+.+.}-{0:0}, at: process_one_work kernel/workqueue.c:2608 [inline]
- #1: ffffc90012b8fd20 (net_cleanup_work){+.+.}-{0:0}, at: process_scheduled_works+0x825/0x1420 kernel/workqueue.c:2706
- #2: ffffffff8f36d250 (pernet_ops_rwsem){++++}-{3:3}, at: cleanup_net+0x16a/0xcc0 net/core/net_namespace.c:591
- #3: ffffffff8f3798c8 (rtnl_mutex){+.+.}-{3:3}, at: cleanup_net+0x6af/0xcc0 net/core/net_namespace.c:627
- #4: ffffffff8e136440 (rcu_state.barrier_mutex){+.+.}-{3:3}, at: rcu_barrier+0x4c/0x550 kernel/rcu/tree.c:4064
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/cba9ffdb9913dfe6be29f049ce920ce451ce7cc4
 
-[1] https://lore.kernel.org/lkml/0000000000009485160613eda067@google.com/
+Thank you!
 
-> 
-> At the time I found a way to safely drop the refcount of those
-> kernfs_node which then allowed to call rtnl_lock from sysfs handlers,
-> https://lore.kernel.org/all/20231018154804.420823-1-atenart@kernel.org/T/
-> 
-> Note that this relied on how net device are unregistered (calling
-> device_del under rtnl and later waiting for refs on the netdev to drop
-> outside of the lock; and a few other things), so extra modifications
-> would be needed to generalize the approach. Also it's a tradeoff between
-> fixing those deadlocks without rtnl_trylock and maintaining a quite
-> complex logic...
-> 
-> Antoine
-> 
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
