@@ -1,97 +1,74 @@
-Return-Path: <netdev+bounces-81074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8036885A90
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:20:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1685F885ADC
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:31:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AEAC283230
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 14:20:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C602D2844E3
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 14:31:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54DD88526E;
-	Thu, 21 Mar 2024 14:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D605185C5E;
+	Thu, 21 Mar 2024 14:30:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pYEOeXfG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="InpN5d4J"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E5885266;
-	Thu, 21 Mar 2024 14:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B16C284A50
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 14:30:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711030828; cv=none; b=rDUYsTSRL3YC785GZikWpTv1aN9aYUUbK7nWwFrycX0SckfBBM26nLywPDqNUzz5/A8oyw0TPZzt0eDJfb+YewV/S9tzZdv5VcfHFchKHrU3SSJu3Ss1e9D7KGOw1Fjv9Rg3JMF7j/xpdHLBKHHLjbJyVp8xB4R4w1J2SawRwPk=
+	t=1711031448; cv=none; b=k+H3u+zkDmHYhqTw63dC0ZWudwT7PmUH1KfvNRKa3NnyO9SriB3Af2gVtvEx3GutgnY2WCWv0AcxY0iK8GXb4AnVKCErXbedRyJ9TANf7YEDIYdM0bj5M2V7ep0tUa3tcFZMZpgZLOE0l1sbiJciPTei7yXoWcPV4AqZ5BYMcvM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711030828; c=relaxed/simple;
-	bh=YsaJU7yU5UXT4dwymitMoladXmLHepBOYhkmIslJq/I=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=hzUn4k+F7ZKDppW2pOAny7lboOHYS7TiEnHU1kTG5TJVZ4wzlrdb/Evcw8QOvlV4d8ENoEmcEv/eB4G/IsiiSWyQSPxW/VI6lQf/AOehUroIQiOM4yQc8gHp8ErzfIRSU1iXmx2DE1lL3c28Emp6FeU6GJZSjRDMjGtGuQ0yF/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pYEOeXfG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 934BCC43390;
-	Thu, 21 Mar 2024 14:20:27 +0000 (UTC)
+	s=arc-20240116; t=1711031448; c=relaxed/simple;
+	bh=pQtjH+pTMInREJIjM32PY8nkyllfkOtwzCUnNyEAvoM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rDXtVLtaSwPZPKu9zm/s8Bh+MadzXMe+ESi+Bn6L358X/Om/xGeMUjho0esd99Y4gglss2TxlbjhLzjwvhjZRD6ybWdRTTmgMs4UdvmUuboyUmMqNI6F1priv5xf6li8MIjVXipHLS4Q+wBGy0enLu7iRVjLtIXZi9aG2VmGA6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=InpN5d4J; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C87FCC433C7;
+	Thu, 21 Mar 2024 14:30:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711030827;
-	bh=YsaJU7yU5UXT4dwymitMoladXmLHepBOYhkmIslJq/I=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pYEOeXfGnRVAbqxBcvCan2jnhrC9JDNzYWDqSmvi7v+6tZh8jIxSvb1eVHZn2zSSE
-	 SJGn7EWSuaqz8PdqtTPDu1L3H4uVYN5+/DfVFHwzkH9Q1rjdOOE9PiD+99VpyqsqLW
-	 T1R90/yJkeCZlO23U94zh20ZxiYtkgkrPrfA+B360qE8fpY6fbZIoyFObGxrUSGFQF
-	 Jj4GTXAWMYajgB2+/0qaJGATWGSGDj6p7Rrp6x9b4UHIeyEcPWMBOPzUgTjomBjTrc
-	 wHM/61XcZSvBgy0lraF4MZ3WeNyg/4XXQb/pQWplrm/zlSNtp5fYKkoNgrbTfEWU3J
-	 rgP5S1y3Nc87A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7D918D982E4;
-	Thu, 21 Mar 2024 14:20:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1711031448;
+	bh=pQtjH+pTMInREJIjM32PY8nkyllfkOtwzCUnNyEAvoM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=InpN5d4JGUiZDotzf/3UiUg25jT0g1aLzvjeSWkcbHStOkF0syLA4mMJwQ+zz0vbb
+	 BiqyZUe73eIbCJ5857ji0WVJjnaNMNDyaiuuIWzDVXL0RIqKANhMglLdOh9ucImZwQ
+	 MIJQfa0LvodFBNt9t2bx+wzS1cshoWiU+Yt8geT+9qwjeJntPwmgdLWafwIOZuGGSL
+	 oYtDVRMQ9F6dCahnrvTRhh3j1Fdx5AH8SZ71OWJ2DmQOlPAorTw4u8IyvfOdm29FCe
+	 4BC6IEz3/Fg3N+2TTxM7AFPd4nPLd0qJWMLoCzWfznzFliRUhhXr683lfAeSA4JDUy
+	 S9YI26LWhrBFw==
+Date: Thu, 21 Mar 2024 07:30:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: renmingshuai <renmingshuai@huawei.com>
+Cc: <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <idosch@nvidia.com>, <netdev@vger.kernel.org>, <yanan@huawei.com>,
+ <chenzhen126@huawei.com>, <liaichun@huawei.com>
+Subject: Re: [PATCH] net/netlink: how to deal with the problem of exceeding
+ the maximum reach of nlattr's nla_len
+Message-ID: <20240321073045.3ee6127d@kernel.org>
+In-Reply-To: <20240321141400.38639-1-renmingshuai@huawei.com>
+References: <20240321141400.38639-1-renmingshuai@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/3] netfilter: nft_set_pipapo: release elements in clone
- only from destroy path
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171103082750.11634.16678808488889700011.git-patchwork-notify@kernel.org>
-Date: Thu, 21 Mar 2024 14:20:27 +0000
-References: <20240321112117.36737-2-pablo@netfilter.org>
-In-Reply-To: <20240321112117.36737-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 21 Mar 2024 22:14:00 +0800 renmingshuai wrote:
+> RTM_GETLINK for greater than about 220 VFs truncates IFLA_VFINFO_LIST
+> due to the maximum reach of nlattr's nla_len being exceeded. As a result,
+> the value of nla_len overflows in nla_nest_end(). According to [1],
+> changing the type of nla_len is not possible, but how can we deal with this
+> overflow problem? The nla_len is constantly set to the
+> maximum value when it overflows? Or some better ways?
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
-
-On Thu, 21 Mar 2024 12:21:15 +0100 you wrote:
-> Clone already always provides a current view of the lookup table, use it
-> to destroy the set, otherwise it is possible to destroy elements twice.
-> 
-> This fix requires:
-> 
->  212ed75dc5fb ("netfilter: nf_tables: integrate pipapo into commit protocol")
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,1/3] netfilter: nft_set_pipapo: release elements in clone only from destroy path
-    https://git.kernel.org/netdev/net/c/b0e256f3dd2b
-  - [net,2/3] netfilter: nf_tables: do not compare internal table flags on updates
-    https://git.kernel.org/netdev/net/c/4a0e7f2decbf
-  - [net,3/3] netfilter: nf_tables: Fix a memory leak in nf_tables_updchain
-    https://git.kernel.org/netdev/net/c/7eaf837a4eb5
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+It's a known limitation of the legacy SRIOV VF API.
+Use switchdev mode instead, please.
 
