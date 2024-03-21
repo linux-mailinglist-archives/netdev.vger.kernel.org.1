@@ -1,59 +1,57 @@
-Return-Path: <netdev+bounces-80933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FED1881B9B
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 04:44:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89E61881BA1
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 04:46:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01CF1281F39
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 03:44:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2971D1F2385D
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 03:46:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE78AB657;
-	Thu, 21 Mar 2024 03:44:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14CB3B662;
+	Thu, 21 Mar 2024 03:46:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jWY6btUx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="trvVzPXI"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73DFC6FC5;
-	Thu, 21 Mar 2024 03:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFF1AB651;
+	Thu, 21 Mar 2024 03:46:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710992666; cv=none; b=RXnY+nY+j0Vlz+e0v8KJVWJ+J7ZGzgCJoUbT0Djw5zI24KptMeUAIToDYTU3Dp1pbNBeFxI3AHwlAy1rVFYlXr7AweZi2Um5sI017n+Wqj+U2rtJWK8iRdAPAw6GE9Jx4xl007mYl+yGLTTQEcrup2O1tW3fq3PGoJo/i6Bx7vY=
+	t=1710992764; cv=none; b=WH3zhjPnKGheVUUnR1OsWHMNg1ddMhoJ3S3KL8HMUfXO+O05gLzZzwsRilvv+ATk8YdQDX9TAtx0fz2T8H3lghJbQHnKrgJw6LG00WJkOVFI8DFvjI5Qq+e4QgGEyaDOQVjXWknwYgNIjm4gBTx7bieCex/lfdqfCWSPvSN3gyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710992666; c=relaxed/simple;
-	bh=+l6G01eCUl5Gixax34NKHd4Ib4Zzzbyh1A0DAfjMr/E=;
+	s=arc-20240116; t=1710992764; c=relaxed/simple;
+	bh=bwid3uwKWHuUNT9wA19C7cl1ryQUBQSJA1FQcFOtxnE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ItXXYMW9j6SqIQd7UbCO90WPmR/GbFzBO9mV2vttKlvhbfgizw8CUOVR+7yqaPGVECHshjqk0i9cSB3Z7PNbix1QgKgKI7Wv7arcCCN7y2fy984kPKV9XtPsJJ+W3PUnZiw1p7C0Wa70FXfTb835vGSfEt3coxWaT69bGURB3uE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jWY6btUx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7796DC433C7;
-	Thu, 21 Mar 2024 03:44:24 +0000 (UTC)
+	 MIME-Version:Content-Type; b=iagPZ9m/91lDIhh35GaDjSGDZeOoDz1izSfivIGxweOubZMEK/sN7VM+gLyMsZn1glQy3RwhxJi5q/l3alzUjKDA1jSwaANe3ShGe/GB0TFOEjgIYtdj4RXoPXTRuycuJhssmxT/Qu9Fg3fNhCHUuDnuM5VwwWEF08QjN3TjTXI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=trvVzPXI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 014D5C433C7;
+	Thu, 21 Mar 2024 03:46:02 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710992665;
-	bh=+l6G01eCUl5Gixax34NKHd4Ib4Zzzbyh1A0DAfjMr/E=;
+	s=k20201202; t=1710992763;
+	bh=bwid3uwKWHuUNT9wA19C7cl1ryQUBQSJA1FQcFOtxnE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jWY6btUxJH6gi6gBIF3xu62qAwvuRi6n1aBwzEN5pAQ2zH5mGOjZm60e51J6VDzTy
-	 P8FHmG7bfUmzig9uL2BICMtgdFjqZtv9ap/N3wVjMg95LJ8YvrI9Hp0qeemyFiqQIW
-	 8AZyGYfD/MMmJxCUZSKK3p0ABWnPCETbwMVaQlgMkELJr/4Ezmp5KcY8lCOI9Juax3
-	 90KC50omagrdLUs2g9PUL19ATYpTY+cm90Hdf9GzgUZr44yD+31e0crCp1XajeNdqE
-	 cB/jMFe1qLT1Tp4l/QZ08ckCPTcCAs8VMQ3eGilXkWc3KK3h9J7FgVo6n2Hv0QElQR
-	 qFhSRKy36eVQg==
-Date: Wed, 20 Mar 2024 20:44:23 -0700
+	b=trvVzPXI+hS8/hfoisdeodsAoz8BsbzpM+9oedrBNyS616bHlDU6Z3FrXdZm85mdD
+	 EZ1IClPq0vDJLftlZ871oyE7P1NBLOlgC34rIUmlVaeCUBHdkn8hv14Sg6W60XGmzp
+	 0dGU6tQO07ePCpgxQs111SBGv1qeT1brjDN6y0tHA8MAM0ZLJj6DBDRcpqB2BSH7CT
+	 P7yYN40hCo2b9NDP7Qiu4OzlKVjneu4/sPybCx6hjvRvrfjAJ1C5HPM5zhWGEh38MJ
+	 FfhDalCvQwu2NS/JjklpTRlIsIDaTTudrp7h4p7kC3BYcI9xGCQ5KvbYo9GR2Ci7f/
+	 zaLHXnJ/Pqu2A==
+Date: Wed, 20 Mar 2024 20:46:02 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: <xu.xin16@zte.com.cn>
-Cc: <edumazet@google.com>, <davem@davemloft.net>, <rostedt@goodmis.org>,
- <mhiramat@kernel.org>, <dsahern@kernel.org>,
- <linux-kernel@vger.kernel.org>, <linux-trace-kernel@vger.kernel.org>,
- <netdev@vger.kernel.org>, <yang.yang29@zte.com.cn>, <he.peilin@zte.com.cn>,
- <liu.chun2@zte.com.cn>, <jiang.xuexin@zte.com.cn>,
- <zhang.yunkai@zte.com.cn>
-Subject: Re: [PATCH v3 resend] net/ipv4: add tracepoint for icmp_send
-Message-ID: <20240320204423.270570c2@kernel.org>
-In-Reply-To: <202403211109183894466@zte.com.cn>
-References: <202403211109183894466@zte.com.cn>
+To: Duanqiang Wen <duanqiangwen@net-swift.com>
+Cc: netdev@vger.kernel.org, jiawenwu@trustnetic.com,
+ mengyuanlou@net-swift.com, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, maciej.fijalkowski@intel.com, andrew@lunn.ch,
+ wangxiongfeng2@huawei.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v3] net: txgbe: fix i2c dev name cannot match clkdev
+Message-ID: <20240320204602.59687f28@kernel.org>
+In-Reply-To: <20240321020901.443642-1-duanqiangwen@net-swift.com>
+References: <20240321020901.443642-1-duanqiangwen@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,18 +61,20 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 21 Mar 2024 11:09:18 +0800 (CST) xu.xin16@zte.com.cn wrote:
-> +/* This part must be outside protection */
-> +#include <trace/define_trace.h>
-> \ No newline at end of file
+On Thu, 21 Mar 2024 10:09:01 +0800 Duanqiang Wen wrote:
+> txgbe clkdev shortened clk_name, so i2c_dev info_name
+> also need to shorten. Otherwise, i2c_dev cannot initialize
+> clock. And had "i2c_dw" string in a define.
+> 
+> Fixes: e30cef001da2 ("net: txgbe: fix clk_name exceed MAX_DEV_ID limits")
+> 
+> Signed-off-by: Duanqiang Wen <duanqiangwen@net-swift.com>
 
-In addition to Jason's comments please make sure there is a new line at
-the end of the file.
+No empty lines between Fixes and Signed-off... please.
 
-And please post v4 on Monday, net-next is currently closed.
-
-While you wait have a read of:
+And please read:
 https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
-
-:)
+-- 
+pw-bot: cr
+pv-bot: 24h
 
