@@ -1,170 +1,114 @@
-Return-Path: <netdev+bounces-81140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81142-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A5C188623D
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 22:06:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE86E886337
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 23:20:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E827E1F218F6
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 21:06:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F387C1C225ED
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 22:20:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ED56135A52;
-	Thu, 21 Mar 2024 21:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D2DD135A50;
+	Thu, 21 Mar 2024 22:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SDLMhVpW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7E012B171;
-	Thu, 21 Mar 2024 21:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from mail-pf1-f201.google.com (mail-pf1-f201.google.com [209.85.210.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CDBC136662
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 22:20:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711055183; cv=none; b=ge0NUceymRIlwFARhqn7XD9PhAAjNlSjO8ESVmRZue0v/5qjxg5e7+Z7640n1+boCmh6jCarwbOuLOOG1wpSlcCTqfk7Evh+jiZGBUBLGHidZvp4nAlXL+HTX4ofcwwal9QkG0e+J8hUTtWPTTHUqQaYJW58TfQiDXmTXHTzZbo=
+	t=1711059643; cv=none; b=k15GlOhgdegNvC75LfMY7NcPXoH1aXnBhluCzL3cuIwtaUdG4RG3PxUsIrUYzaJyBYQuOpSQYH7KY8bcadyH+ecGaLGSDYb8/ylx+xvXET6fB390buCEPnDCmlklR0Da9Tr0eQeC5TWEtL/Eg8rxCDrZQj6TubiB86FZpJbutis=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711055183; c=relaxed/simple;
-	bh=hM2UzG3TY+IQ75WVNb8tSTq9gEs6yeTrLXZcM+B8/fg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yl6u8n3y6qk142hf+kdhIUbTzh97nY7WmpdydJmev7rgm9Vr5WGMbBFw8B73DmXSMynfKGZomEMO2d1IUUlyTy10BK286QKzA2V38lLwZlJs9lyQZVl3PtxZVQjT0tabiDdbVgZjpQovYCm7rhARL368ihxqfGMXryksvOAWwiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Date: Thu, 21 Mar 2024 22:06:15 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: edumazet@google.com, kadlec@netfilter.org, fw@strlen.de,
-	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH nf-next v2] netfilter: conntrack: avoid sending RST to
- reply out-of-window skb
-Message-ID: <ZfyhR_24HmShs78t@calendula>
-References: <20240311070550.7438-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1711059643; c=relaxed/simple;
+	bh=cxBLQcUnFjnG0EBatiMZwDr+PiAisOufnqISJvyd2fk=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Z8FRjRFGaTwka+m9snrq76+6g+guj+7GMMxtATonuWRGInCsu/8IsmqsSgDQ3CVZZXAgZh5UUd/zKppZDTF93QQIaPXba8IxzyTATXINGjwmtj5r2iFyzsZnmvK7HH/8FZjNDvpu6k910GmYsozLX9uUGedn4xc5Wu+hfFzGss8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jfraker.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SDLMhVpW; arc=none smtp.client-ip=209.85.210.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jfraker.bounces.google.com
+Received: by mail-pf1-f201.google.com with SMTP id d2e1a72fcca58-6ea80a33cf6so217363b3a.1
+        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 15:20:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711059642; x=1711664442; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HIRVAKUCXrsW19Rfk9rX09ZKBuFyXSBcI1QnMauRAwM=;
+        b=SDLMhVpWpklDU0gq0n7zXlzyUQH7RFRck7vof7Cy5+ZpzloHrwjs+HVAe04AoFQHgb
+         zXtzkYtmEMyRnTkKCvFGmVegmIIaKoYrToYZu2wTjwklJnN99kuIGZj5Gl7ndTG7onRh
+         wBL1rI3mIpMg9we6vVqR9vL7ArLAontQOMs0E+TAYjovNgsMAKPzzgwRhx+5qqDevldc
+         LgXknb1mSSm/XB2gjcFpjGwwVZppWkgcsQLhxHFXXj7O7Dfb9G9CSzAt6jQH2vI+Awvo
+         n4c8zkHGlHOuPQRoI/YyHvQDN/kvyElEPU7keDUaZUnvAE6mnJGumycW7LMnCohpdpvR
+         92Dg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711059642; x=1711664442;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HIRVAKUCXrsW19Rfk9rX09ZKBuFyXSBcI1QnMauRAwM=;
+        b=nAGM3Lqmism0I5CQRSvkfQGncVTuuEaxXWZu2u3rARhLTIwNFbcnPYs/aECqExASsH
+         stYBKf8t2ZG4ZtuHnlwkRifWDiMxBAhtGcaBg91GbfK1o9pwOhhFmcb+rpC3WAi4SSWI
+         MXmvHda40DIa2s2SkHveemsM8GXlpJk9vd5Eg2PIbkqa9sTGOAhG/1gqneW9Bb1C0us8
+         7z4rf2aFfxCVMDZFNy0eg+RT/wWKM329NAU8qvf/iCEX1YU+OP2ywlJQ+F/BWs1QkNAp
+         Ne3aCsJEze+A9PYDV6/F/2CHWT3cnRprtUCRgGf24zRDSN31eExk47mOC7l6h4vwwAGI
+         KQKw==
+X-Gm-Message-State: AOJu0YzqPhoJ+3jLtkRH7tMr8yOcAshTRSufu8m68dlDaxuaAn1sClS7
+	2Ype39bEOOoeZVDG2fcOvJuufthcljeKPssCOsigOJNcXI+kT32BSxrFBTA+ZyoZUWV29cTsCGe
+	SqXGUr6gUE0yRbG+SnOnLQejUYDl5XkcPR1YKEYRXFULqHLfgfekwK5QqtRTFgaavgL9tbWbJ7t
+	iTy1kESEg/bmfSiZ4GnW/uP9E4ZW5tg0VIw231lg==
+X-Google-Smtp-Source: AGHT+IGTKxrV07AWiIfuIZ3JrZZ+cFZusyGMNMZvswIYb6VwBbFfXPAahwqAKuasvimJ+K+6q8QqKIrmLqH+
+X-Received: from jfraker202.plv.corp.google.com ([2620:15c:11c:202:8558:543c:cfee:9677])
+ (user=jfraker job=sendgmr) by 2002:a05:6a00:938f:b0:6e8:3d58:fb22 with SMTP
+ id ka15-20020a056a00938f00b006e83d58fb22mr72303pfb.3.1711059641617; Thu, 21
+ Mar 2024 15:20:41 -0700 (PDT)
+Date: Thu, 21 Mar 2024 15:20:20 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20240311070550.7438-1-kerneljasonxing@gmail.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.396.g6e790dbe36-goog
+Message-ID: <20240321222020.31032-1-jfraker@google.com>
+Subject: [PATCH net] gve: Add counter adminq_get_ptype_map_cnt to stats report
+From: John Fraker <jfraker@google.com>
+To: netdev@vger.kernel.org
+Cc: John Fraker <jfraker@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Mar 11, 2024 at 03:05:50PM +0800, Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> Supposing we set DNAT policy converting a_port to b_port on the
-> server at the beginning, the socket is set up by using 4-tuple:
-> 
-> client_ip:client_port <--> server_ip:b_port
-> 
-> Then, some strange skbs from client or gateway, say, out-of-window
-> skbs are eventually sent to the server_ip:a_port (not b_port)
-> in TCP layer due to netfilter clearing skb->_nfct value in
-> nf_conntrack_in() function. Why? Because the tcp_in_window()
-> considers the incoming skb as an invalid skb by returning
-> NFCT_TCP_INVALID.
-> 
-> At last, the TCP layer process the out-of-window
-> skb (client_ip,client_port,server_ip,a_port) and try to look up
-> such an socket in tcp_v4_rcv(), as we can see, it will fail for sure
-> because the port is a_port not our expected b_port and then send
-> back an RST to the client.
-> 
-> The detailed call graphs go like this:
-> 1)
-> nf_conntrack_in()
->   -> nf_conntrack_handle_packet()
->     -> nf_conntrack_tcp_packet()
->       -> tcp_in_window() // tests if the skb is out-of-window
->       -> return -NF_ACCEPT;
->   -> skb->_nfct = 0; // if the above line returns a negative value
-> 2)
-> tcp_v4_rcv()
->   -> __inet_lookup_skb() // fails, then jump to no_tcp_socket
->   -> tcp_v4_send_reset()
-> 
-> The moment the client receives the RST, it will drop. So the RST
-> skb doesn't hurt the client (maybe hurt some gateway which cancels
-> the session when filtering the RST without validating
-> the sequence because of performance reason). Well, it doesn't
-> matter. However, we can see many strange RST in flight.
-> 
-> The key reason why I wrote this patch is that I don't think
-> the behaviour is expected because the RFC 793 defines this
-> case:
-> 
-> "If the connection is in a synchronized state (ESTABLISHED,
->  FIN-WAIT-1, FIN-WAIT-2, CLOSE-WAIT, CLOSING, LAST-ACK, TIME-WAIT),
->  any unacceptable segment (out of window sequence number or
->  unacceptible acknowledgment number) must elicit only an empty
->  acknowledgment segment containing the current send-sequence number
->  and an acknowledgment..."
-> 
-> I think, even we have set DNAT policy, it would be better if the
-> whole process/behaviour adheres to the original TCP behaviour as
-> default.
-> 
-> Suggested-by: Florian Westphal <fw@strlen.de>
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
-> v2
-> Link: https://lore.kernel.org/netdev/20240307090732.56708-1-kerneljasonxing@gmail.com/
-> 1. add one more test about NAT and then drop the skb (Florian)
-> ---
->  net/netfilter/nf_conntrack_proto_tcp.c | 15 +++++++++++++--
->  1 file changed, 13 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/netfilter/nf_conntrack_proto_tcp.c b/net/netfilter/nf_conntrack_proto_tcp.c
-> index ae493599a3ef..19ddac526ea0 100644
-> --- a/net/netfilter/nf_conntrack_proto_tcp.c
-> +++ b/net/netfilter/nf_conntrack_proto_tcp.c
-> @@ -1256,10 +1256,21 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
->  	case NFCT_TCP_IGNORE:
->  		spin_unlock_bh(&ct->lock);
->  		return NF_ACCEPT;
-> -	case NFCT_TCP_INVALID:
-> +	case NFCT_TCP_INVALID: {
-> +		int verdict = -NF_ACCEPT;
-> +
-> +		if (ct->status & IPS_NAT_MASK)
-> +			/* If DNAT is enabled and netfilter receives
-> +			 * out-of-window skbs, we should drop it directly,
+This counter counts the number of times get_ptype_map is executed on the
+admin queue, and was previously missing from the stats report.
 
-Yes, if _be_liberal toggle is disabled this can happen.
+Fixes: c4b87ac87635 ("gve: Add support for DQO RX PTYPE map")
+Signed-off-by: John Fraker <jfraker@google.com>
+---
+ drivers/net/ethernet/google/gve/gve_ethtool.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-> +			 * or else skb would miss NAT transformation and
-> +			 * trigger corresponding RST sending to the flow
-> +			 * in TCP layer, which is not supposed to happen.
-> +			 */
-> +			verdict = NF_DROP;
+diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
+index 9aebfb843..dbe05402d 100644
+--- a/drivers/net/ethernet/google/gve/gve_ethtool.c
++++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
+@@ -73,7 +73,7 @@ static const char gve_gstrings_adminq_stats[][ETH_GSTRING_LEN] = {
+ 	"adminq_create_tx_queue_cnt", "adminq_create_rx_queue_cnt",
+ 	"adminq_destroy_tx_queue_cnt", "adminq_destroy_rx_queue_cnt",
+ 	"adminq_dcfg_device_resources_cnt", "adminq_set_driver_parameter_cnt",
+-	"adminq_report_stats_cnt", "adminq_report_link_speed_cnt"
++	"adminq_report_stats_cnt", "adminq_report_link_speed_cnt", "adminq_get_ptype_map_cnt"
+ };
+ 
+ static const char gve_gstrings_priv_flags[][ETH_GSTRING_LEN] = {
+@@ -428,6 +428,7 @@ gve_get_ethtool_stats(struct net_device *netdev,
+ 	data[i++] = priv->adminq_set_driver_parameter_cnt;
+ 	data[i++] = priv->adminq_report_stats_cnt;
+ 	data[i++] = priv->adminq_report_link_speed_cnt;
++	data[i++] = priv->adminq_get_ptype_map_cnt;
+ }
+ 
+ static void gve_get_channels(struct net_device *netdev,
+-- 
+2.44.0.291.gc1ea87d7ee-goog
 
-One comment for the SNAT case.
-
-nf_conntrack_in() calls this function from the prerouting hook. For
-the very first packet, IPS_NAT_MASK might not be yet fully set on
-(masquerade/snat happens in postrouting), then still one packet can be
-leaked without NAT mangling in the SNAT case.
-
-Rulesets should really need to set default policy to drop in NAT
-chains to address this.
-
-And after this update, user has no chance anymore to bump counters at
-the end of the policy, to debug issues.
-
-We have relied on the rule that "conntrack should not drop packets"
-since the very beginning, instead signal rulesets that something is
-invalid, so user decides what to do.
-
-I'm ambivalent about this, Jozsef?
-
->  		nf_tcp_handle_invalid(ct, dir, index, skb, state);
->  		spin_unlock_bh(&ct->lock);
-> -		return -NF_ACCEPT;
-> +		return verdict;
-> +	}
->  	case NFCT_TCP_ACCEPT:
->  		break;
->  	}
-> -- 
-> 2.37.3
-> 
 
