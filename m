@@ -1,89 +1,166 @@
-Return-Path: <netdev+bounces-81062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEB91885A09
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 14:36:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F07D885A43
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:05:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BA6B1C2137D
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:36:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2DC7B1F225AD
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 14:05:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FC184A4B;
-	Thu, 21 Mar 2024 13:36:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6615284FAD;
+	Thu, 21 Mar 2024 14:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fV9ZJCbW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693F3134CD;
-	Thu, 21 Mar 2024 13:36:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 715F258AA8;
+	Thu, 21 Mar 2024 14:05:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711028199; cv=none; b=kStpAIsYqVa0ch9BLt84SNr9PcoMRV+Tx7hK+SCj6Tspqa8YQ5RMM1hnJtxxMxkqlyQO+v7CcCmJWWbdm641FukMVfUd5j1o5ZCegVjawHTth0lqNVBz0yT23k0Ll3cyQjZyl08vmk1BmcMJJ86WD0vY+VOHTayZGHvP4zKlDME=
+	t=1711029916; cv=none; b=q7IVoavlhJhsqLyVL40Kq2ClDUrZL1E/Or6mAW9qykyCawly/6LqsCcCHgINKQyGXZZYRB+RMWiaDIYKLC7gm7ckgZsMVrDyeKsZoSnj/Sh5/EeFIZiVu0J6nJHhcX2P20YBfqTIVa3gtxWY/tLAQCEc2EEJGpx5U9pZjxJk0sQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711028199; c=relaxed/simple;
-	bh=ra8zoPHUNwWfEZK3+SNr/xeXhA/VoCBJ9K+j+pIxJ2o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Vi3Am+pUDhSQS7pxgOLvs599zA3czrm4Oa8tZlHWW1hofoNvUdVku1RXxlV125Eez9QqWp3fWtYyCe+kxZ+kmyjyM2IvO6R53fsL4SrThbdzTAtA5bms9PfUTJJ8gA2tqbe1Hk20GuD92KGeH07KEBxwR3Y0RdAhH/DoQihGVs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7566DC433F1;
-	Thu, 21 Mar 2024 13:36:37 +0000 (UTC)
-Date: Thu, 21 Mar 2024 09:39:04 -0400
-From: Steven Rostedt <rostedt@goodmis.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: xu.xin16@zte.com.cn, edumazet@google.com, davem@davemloft.net,
- mhiramat@kernel.org, dsahern@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- netdev@vger.kernel.org, yang.yang29@zte.com.cn, he.peilin@zte.com.cn,
- liu.chun2@zte.com.cn, jiang.xuexin@zte.com.cn, zhang.yunkai@zte.com.cn
-Subject: Re:  [PATCH v3] net/ipv4: add tracepoint for icmp_send
-Message-ID: <20240321093904.65f91d10@gandalf.local.home>
-In-Reply-To: <CAL+tcoAdZOKnHTbRnmrjtrhJynGfDy4xXvus1hh_UTbh5eSMTA@mail.gmail.com>
-References: <202403211010443485000@zte.com.cn>
-	<CAL+tcoAdZOKnHTbRnmrjtrhJynGfDy4xXvus1hh_UTbh5eSMTA@mail.gmail.com>
-X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1711029916; c=relaxed/simple;
+	bh=jH8bQ0u9CUSKqXv05SFVoT15Aw5bdy9ExHvUoS+Bugs=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TGU8sLko0CFDb7drVCkmAGB1adNI/mEYRGZuHnIqfNRegBl++pPom43YknxBl6f4gkcQTgeUVRi6UqNm+u0L5etIOoo518O1CojrmVtvxfvkyiFBudBr3c13elq4pYu2uGHxM+xoDQqvXhp2lflyKrozNKkuvwnAgAZzC6HNJFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fV9ZJCbW; arc=none smtp.client-ip=198.175.65.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711029914; x=1742565914;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=jH8bQ0u9CUSKqXv05SFVoT15Aw5bdy9ExHvUoS+Bugs=;
+  b=fV9ZJCbWP2Fy8lvQYvJ3L5NVLdYYz/l6v2QDNHtcy9YRtzZEylOtompg
+   6ruFzeQz07s81/UpCflOQun5Wi2TY3KLtcGFwdnpdNlgi+UHKdgulz4/+
+   dWUym8BZbI/wgfibUi4oAqrtoBWIOandRLM0IHHKKiCIGc6R0qEOXTChu
+   XOpp9br9IRBxQaR8+QQY3Z4oORdCAygziuJpLGIwQ2hAJrWrsHh99y098
+   vefgMGPUVcoim1xVcmWg3pUTGQfPu+xKByZJphXcdooqSITwg2Nzw1AC1
+   jRSiwrnmql9zuN5VeGleeJFV/g3upKzA2swEXPU/jIuEDewKuz9do/7ol
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11019"; a="5910895"
+X-IronPort-AV: E=Sophos;i="6.07,143,1708416000"; 
+   d="scan'208";a="5910895"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 07:05:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,143,1708416000"; 
+   d="scan'208";a="14911250"
+Received: from intel.iind.intel.com (HELO brc5..) ([10.190.162.156])
+  by orviesa007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 07:05:09 -0700
+From: Tushar Vyavahare <tushar.vyavahare@intel.com>
+To: bpf@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	bjorn@kernel.org,
+	magnus.karlsson@intel.com,
+	maciej.fijalkowski@intel.com,
+	jonathan.lemon@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	tirthendu.sarkar@intel.com,
+	tushar.vyavahare@intel.com
+Subject: [PATCH bpf-next v2 0/7] Selftests/xsk: Test with maximum and minimum HW ring size configurations
+Date: Thu, 21 Mar 2024 13:49:04 +0000
+Message-Id: <20240321134911.120091-1-tushar.vyavahare@intel.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu, 21 Mar 2024 10:45:00 +0800
-Jason Xing <kerneljasonxing@gmail.com> wrote:
+Please find enclosed a patch set that introduces enhancements and new test
+cases to the selftests/xsk framework. These test the robustness and
+reliability of AF_XDP across both minimal and maximal ring size
+configurations.
 
-> The format of the whole patch looks strange... Did you send this patch
-> by using 'git send-email' instead of pasting the text and sending?
+While running these tests, a bug [1] was identified when the batch size is
+roughly the same as the NIC ring size. This has now been addressed by
+Maciej's fix.
 
-Yeah, it's uuencoded.
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=913eda2b08cc49d31f382579e2be34c2709eb789
 
-Subject: =?UTF-8?B?wqBbUEFUQ0ggdjNdIG5ldC9pcHY0OiBhZGQgdHJhY2Vwb2ludCBmb3IgaWNtcF9zZW5k?=
-Content-Type: multipart/mixed;
-	boundary="=====_001_next====="
-X-MAIL:mse-fl2.zte.com.cn 42L2Ahm2097008
-X-Fangmail-Gw-Spam-Type: 0
-X-Fangmail-Anti-Spam-Filtered: true
-X-Fangmail-MID-QID: 65FB975E.000/4V0TV60kJlz8XrRb
+Patch Summary:
 
+1. This commit syncs the ethtool.h header file between the kernel source
+   tree and the tools directory to maintain consistency.
 
+2: Modifies the BATCH_SIZE from a constant to a variable, batch_size, to
+   support dynamic modification at runtime for testing different hardware
+   ring sizes.
 
---=====_001_next=====
-Content-Type: multipart/related;
-	boundary="=====_002_next====="
+3: Implements a function, get_hw_ring_size, to retrieve the current
+   maximum interface size and store this information in the
+   ethtool_ringparam structure.
 
+4: Implements a new function, set_hw_ring_size, which allows for the
+   dynamic configuration of the ring size within an interface.
 
---=====_002_next=====
-Content-Type: multipart/alternative;
-	boundary="=====_003_next====="
+5: Introduce a new function, set_ring_size(), to manage asynchronous AF_XDP
+   socket closure. Make sure to retry the set_hw_ring_size function
+   multiple times, up to SOCK_RECONF_CTR, if it fails due to an active
+   AF_XDP socket. Immediately return an error for non-EBUSY errors.
 
+6: Adds a new test case that puts the AF_XDP driver under stress by
+   configuring minimal hardware and software ring sizes, verifying its
+   functionality under constrained conditions.
 
---=====_003_next=====
-Content-Type: text/plain;
-	charset="UTF-8"
-Content-Transfer-Encoding: base64
+7: Add a new test case that evaluates the maximum ring sizes for AF_XDP,
+   ensuring its reliability under maximum ring utilization.
 
--- Steve
+Testing Strategy:
+
+Check the system in extreme scenarios, such as maximum and minimum
+configurations. This helps identify and fix any bugs that may occur.
+
+Tushar Vyavahare (7):
+  tools/include: copy ethtool.h to tools directory
+  selftests/xsk: make batch size variable
+  selftests/bpf: implement get_hw_ring_size function to retrieve current
+    and max interface size
+  selftests/bpf: implement set_hw_ring_size function to configure
+    interface ring size
+  selftests/xsk: introduce set_ring_size function with a retry mechanism
+    for handling AF_XDP socket closures
+  selftests/xsk: test AF_XDP functionality under minimal ring
+    configurations
+  selftests/xsk: add new test case for AF_XDP under max ring sizes
+
+Signed-off-by: Tushar Vyavahare <tushar.vyavahare@intel.com>
+
+---
+Changelog:
+v1->v2
+- copy ethtool.h to tools directory [Stanislav]
+- Use ethtool_ringparam directly for get_hw_ring_size() [Stanislav]
+- get_hw_ring_size() and get_hw_ring_size() moved to network_helpers.c [Stanislav]
+- return -errno to match the other cases where errors are < 0. [Stanislav]
+- Cleaned up set_ring_size() function by removing unused variables and
+  refactoring logic for clarity. [Alexei]
+- Implement a retry mechanism for the set_ring_size function to handle
+  the asynchronous nature of AF_XDP socket closure. [Magnus]
+---
+
+ tools/include/uapi/linux/ethtool.h            | 2229 ++++++++++++++++-
+ tools/testing/selftests/bpf/Makefile          |    2 +-
+ tools/testing/selftests/bpf/network_helpers.c |   48 +
+ tools/testing/selftests/bpf/network_helpers.h |    5 +
+ tools/testing/selftests/bpf/xdp_hw_metadata.c |   14 -
+ tools/testing/selftests/bpf/xskxceiver.c      |  123 +-
+ tools/testing/selftests/bpf/xskxceiver.h      |   12 +-
+ 7 files changed, 2376 insertions(+), 57 deletions(-)
+
+-- 
+2.34.1
+
 
