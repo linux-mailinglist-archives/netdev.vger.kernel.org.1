@@ -1,207 +1,219 @@
-Return-Path: <netdev+bounces-81101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B21D885CF9
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 17:06:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56269885D0E
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 17:10:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD36E1F2130B
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 16:06:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C269287831
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 16:10:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 551A012C558;
-	Thu, 21 Mar 2024 16:03:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6DFD12C543;
+	Thu, 21 Mar 2024 16:10:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oRla4iUb"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="UIyozjzi"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BF9A12C54B
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 16:03:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1C278662F;
+	Thu, 21 Mar 2024 16:09:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711037032; cv=none; b=UnhgFi8yOsJBwDBP2txptWL2gDFQGRs/6Zi4TJDYtcICXPi4OEVw0nYwnqpQVBdUNhn2duqzzavjcxAZvc4TPnIrHj++EubosLUF7YbWMdUUGf+xNh90m9NO7AOGJ5iO7r2mIfydmKqlOd6r9xrp9m13qlwKzrbFOtwwe8J0FTk=
+	t=1711037401; cv=none; b=AUhy8u0T7IfhwrJ1h0goVFHqEuydb/WzxIbInmEhXYwdKdkBzHqyDQ6XlN6vokPY78cqABgZ0MCLMIzMIKZgvwXG3vc4DI7xv3OOOFJaX4leN9uN9HNvhIqUrixIi5pVX2v1iZpxWBg7rhDkv1dMioE38Nv3vSCCj07rGxdDy4g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711037032; c=relaxed/simple;
-	bh=jNRUz0jgIfEStM4yZqy3zC7tNXMNEa7Xo+ybcbIyIkM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NaTA4q1aegcYDiccC157rPdmm3sPZR67ioc4VZ7x2rYUaWOTioB3LP+YAMR/geIxjLY6jO1KyRL2Yt3rUM/suJ1gsUI+ulqUxAI+CxrD2DYN4AL9KpP8QEGYFmKiM9fKZfb5W0lSvbU/tE7n0rkw5pbRbKV4Eihq/NC9zxKMPSo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oRla4iUb; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D60BDC43394;
-	Thu, 21 Mar 2024 16:03:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711037031;
-	bh=jNRUz0jgIfEStM4yZqy3zC7tNXMNEa7Xo+ybcbIyIkM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oRla4iUbEx6nG542xSnwJ0XyEGVpQalababI2bIf2LB8VMh9GYjl/6ByNU76m09Q3
-	 Ta0xrymfq6q8VZjLbGF+4+BoRN8bwI2RK4qkEiEIDUG5UHmki4WwdiUwXzudvaSJJx
-	 Rc2Rh8F1MaUiUCkbtsgeQAE0b3GNc8+mlSCq1SQ0yVtOP2W00IDU4Jx/Sam7seAoiH
-	 n/96nG/WmdocJg8rVOdGHK2/rXQt2maGSzZta3L+m2+FHjQIDrKGzK8QmTn17yY2P3
-	 A5x09z40g4kLyGo1MBKsOnpmG2SRz72zIBdbTnp+0CA0JjarzeKMUeScrdSjgCApNC
-	 gxWiZRJDN1lPg==
-Date: Thu, 21 Mar 2024 09:03:49 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: drozdi70 <drozdi70@o2.pl>
-Cc: netdev <netdev@vger.kernel.org>, "chandrashekar.devegowda"
- <chandrashekar.devegowda@intel.com>, linuxwwan <linuxwwan@intel.com>,
- "chiranjeevi.rapolu" <chiranjeevi.rapolu@linux.intel.com>, "haijun.liu"
- <haijun.liu@mediatek.com>, "m.chetan.kumar"
- <m.chetan.kumar@linux.intel.com>, "ricardo.martinez"
- <ricardo.martinez@linux.intel.com>, "loic.poulain"
- <loic.poulain@linaro.org>, "ryazanov.s.a" <ryazanov.s.a@gmail.com>,
- johannes <johannes@sipsolutions.net>, davem <davem@davemloft.net>, edumazet
- <edumazet@google.com>, pabeni <pabeni@redhat.com>
-Subject: Re: [BUG] mtk-t7xx driver on aarch64/cortex-a53
-Message-ID: <20240321090349.7f3a1150@kernel.org>
-In-Reply-To: <0a79d2339b29438a84986bad97290ebe@grupawp.pl>
-References: <0a79d2339b29438a84986bad97290ebe@grupawp.pl>
+	s=arc-20240116; t=1711037401; c=relaxed/simple;
+	bh=/COouxoyd/nzT49ztSHw7buRXFW3G2DZYDfUjusNGhQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qsgUONZqueW/o7Sw88YWo4DU9PsIIMJf2EzTToM7cSRBNmhG94EQqQEMHj0BpY5UjkmZHD0fhKd+2/pe58IyIzYUyNxEWnGDZ8x6pO+QaMyqdx7le+gZ3rdN+s3Rl61VVdielCEzQZZhJPiz2dbfYd09n9PBpAENmqXXxIFgjPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=UIyozjzi; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 458D240008;
+	Thu, 21 Mar 2024 16:09:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
+	t=1711037391;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZrChM2bMyOZ06ublb4gFN2AgR2OzWBbSVut/5tc1iQ8=;
+	b=UIyozjziieWmwYdBiKJK/bXdSKQEvgtMNVegmQmAe4mwYJCgXOAcMxQvzG/DPZ+XWLySwG
+	pNYm2J+wW5gZocJM+aMbHexmQsarqcic1FreLWeSQcv/adAf1+zEBm9morWBlpBTtjmzaM
+	jEyUrtNPdC/7tmq/ZMpdzYUbmUVhrVIHvtYvbl0OQTMlEf/BCKEymvLVx74RI3wAp7kzPW
+	HamM2GmpYUIWzXrZHsiovGBhJ0C/Qa3osDjZwLWmXEx0n81f1ncu5iW/T9W+Zif/uoHtAG
+	8HcSm9MGLTbFzIa88JkwITb5Ur/PiTQ5p1VUbReXCsxWNOxvua0UyZY8/IR9qQ==
+Message-ID: <0fbe7ba2-6529-4118-b050-8ea76d28b712@arinc9.com>
+Date: Thu, 21 Mar 2024 19:09:25 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 0/3] Fix EEE support for MT7531 and MT7988 SoC switch
+To: Florian Fainelli <f.fainelli@gmail.com>,
+ Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>
+Cc: DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ =?UTF-8?Q?Ren=C3=A9_van_Dorst?= <opensource@vdorst.com>,
+ Russell King <linux@armlinux.org.uk>,
+ SkyLake Huang <SkyLake.Huang@mediatek.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
+ erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v>
+ <ZfnYkuzuvwLepIfC@makrotopia.org>
+ <00ec9779-19ce-4005-83f0-f4abf37350fc@arinc9.com>
+ <6cb585f6-6da8-45a2-a28b-2fb556f95672@lunn.ch>
+ <Zfn1DxkEa3u-f7l2@makrotopia.org>
+ <38798882-c033-4949-9446-4c6f15c25ebe@gmail.com>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <38798882-c033-4949-9446-4c6f15c25ebe@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Flag: yes
+X-Spam-Level: **************************
+X-GND-Spam-Score: 400
+X-GND-Status: SPAM
+X-GND-Sasl: arinc.unal@arinc9.com
 
-On Thu, 21 Mar 2024 09:07:24 +0100 drozdi70 wrote:
-> We are facing possible bug in the driver mtk-t7xx under OpenWrt linux 6.1=
-/6.6.
->=20
-> From first glance it looks like the driver is accessing an address in the=
- PCIe MMIO range in 32-bit alignment (ffffffc084a1d004)
-> but likely the SoC only supports 64-bit aligned (so only addresses ending=
- on 0 or 8 will work) access there,
-> hence the [ 294.051349] FSC =3D 0x21: alignment fault.
+On 20.03.2024 00:31, Florian Fainelli wrote:
+> On 3/19/24 13:26, Daniel Golle wrote:
+>> On Tue, Mar 19, 2024 at 08:38:03PM +0100, Andrew Lunn wrote:
+>>>> I would argue that EEE advertisement on the PHY should be enabled by
+>>>> default.
+>>>
+>>> That is an open question at the moment. For some use cases, it can add
+>>> extra delay and jitter which can cause problems. I've heard people
+>>> doing PTP don't like EEE for example.
+>>
+>> MediaTek consumer-grade hardware doesn't support PTP and hence that
+>> quite certainly won't ever be an issue with all switch ICs supported
+>> by the mt7530 driver.
+>>
+>> I'd rather first change the (configuration) default in OpenWrt (which
+>> is arguable the way most people are using this hardware), also because
+>> that will be more visible/obvious for users. Or even just make EEE
+>> configurable in the LuCI web-UI as a first step so users start playing
+>> with it.
+>>
+>> After all, I also have a hard time imagining that MediaTek disabled
+>> EEE in their downstream driver for no reason:
+>>
+>> https://git01.mediatek.com/plugins/gitiles/openwrt/feeds/mtk-openwrt-feeds/+/24091177a18ba7f2dd8d928a8f5b27b14df46b16
+> 
+> EEE tends to be an interoperability trap and typically results in unexplained link drops with different link partners which are difficult to debug and root cause. It would be great to have more context as to why it was disabled in the downstream tree to know what we are up against, though I would not be surprised if there had been a number of issues reported.
 
-You gotta send pain text emails, linux MLs don't accept HTML.
+I have started testing MT7531 with EEE enabled and immediately experienced
+frames that wouldn't egress the switch or improperly received on the link
+partner.
 
-Could you run the stack trace thru scripts/decode_stacktrace.sh
-to get line numbers?
+SoC MAC       <-EEE off-> MT7531 P6 MAC (acting as PHY)
+MT7531 P0 MAC <-EEE on -> MT7531 P0 PHY
+MT7531 P0 PHY <-EEE on -> Computer connected with twisted pair
 
-> [CUT]
-> ...
-> [=C2=A0=C2=A0 12.285356] mtk_t7xx 0003:01:00.0: assign IRQ: got 113
-> [=C2=A0=C2=A0 12.290512] mtk_t7xx 0003:01:00.0: enabling device (0000 -> =
-0002)
-> [=C2=A0=C2=A0 12.296612] mtk_t7xx 0003:01:00.0: enabling bus mastering
-> [=C2=A0=C2=A0 12.303087] (unnamed net_device) (dummy): netif_napi_add_wei=
-ght() called with weight 128
-> [=C2=A0=C2=A0 12.312160] mtk-pcie-gen3 11280000.pcie: msi#0x1 address_hi =
-0x0 address_lo 0x11280c00 data 1
-> [=C2=A0=C2=A0 12.320666] mtk-pcie-gen3 11280000.pcie: msi#0x2 address_hi =
-0x0 address_lo 0x11280c00 data 2
-> [=C2=A0=C2=A0 12.329153] mtk-pcie-gen3 11280000.pcie: msi#0x3 address_hi =
-0x0 address_lo 0x11280c00 data 3
-> [=C2=A0=C2=A0 12.331706] Unable to handle kernel paging request at virtua=
-l address ffffffc083a1d004
-> [=C2=A0=C2=A0 12.345488] Mem abort info:
-> [=C2=A0=C2=A0 12.345518] mtk-pcie-gen3 11280000.pcie: msi#0x4 address_hi =
-0x0 address_lo 0x11280c00 data 4
-> [=C2=A0=C2=A0 12.348269]=C2=A0=C2=A0 ESR =3D 0x0000000096000061
-> [=C2=A0=C2=A0 12.356716] mtk-pcie-gen3 11280000.pcie: msi#0x5 address_hi =
-0x0 address_lo 0x11280c00 data 5
-> [=C2=A0=C2=A0 12.360421]=C2=A0=C2=A0 EC =3D 0x25: DABT (current EL), IL =
-=3D 32 bits
-> [=C2=A0=C2=A0 12.368862] mtk-pcie-gen3 11280000.pcie: msi#0x6 address_hi =
-0x0 address_lo 0x11280c00 data 6
-> [=C2=A0=C2=A0 12.374133]=C2=A0=C2=A0 SET =3D 0, FnV =3D 0
-> [=C2=A0=C2=A0 12.374135]=C2=A0=C2=A0 EA =3D 0, S1PTW =3D 0
-> [=C2=A0=C2=A0 12.382574] mtk-pcie-gen3 11280000.pcie: msi#0x7 address_hi =
-0x0 address_lo 0x11280c00 data 7
-> [=C2=A0=C2=A0 12.385593]=C2=A0=C2=A0 FSC =3D 0x21: alignment fault
-> [=C2=A0=C2=A0 12.388751] mtk-pcie-gen3 11280000.pcie: msi#0x8 address_hi =
-0x0 address_lo 0x11280c00 data 8
-> [=C2=A0=C2=A0 12.397137] Data abort info:
-> [=C2=A0=C2=A0 12.397138]=C2=A0=C2=A0 ISV =3D 0, ISS =3D 0x00000061, ISS2 =
-=3D 0x00000000
-> [=C2=A0=C2=A0 12.397140]=C2=A0=C2=A0 CM =3D 0, WnR =3D 1, TnD =3D 0, TagA=
-ccess =3D 0
-> [=C2=A0=C2=A0 12.422958]=C2=A0=C2=A0 GCS =3D 0, Overlay =3D 0, DirtyBit =
-=3D 0, Xs =3D 0
-> [=C2=A0=C2=A0 12.428261] swapper pgtable: 4k pages, 39-bit VAs, pgdp=3D00=
-00000046ad6000
-> [=C2=A0=C2=A0 12.434950] [ffffffc083a1d004] pgd=3D100000013ffff003, p4d=
-=3D100000013ffff003, pud=3D100000013ffff003, pmd=3D0068000020a00711
-> [=C2=A0=C2=A0 12.445552] Internal error: Oops: 0000000096000061 [#1] SMP
-> [=C2=A0=C2=A0 12.451113] Modules linked in: mtk_t7xx mt7996e(O) mt792x_us=
-b(O) mt792x_lib(O) mt7915e(O) mt76_usb(O) mt76_sdio(O) mt76_connac_lib(O) m=
-t76(O) mac80211(O) iwlwifi(O) huawei_cdc_ncm cfg80211(O) cdc_ncm cdc_ether =
-wwan usbserial usbnet slhc sfp rtc_pcf8563 nfnetlink nf_reject_ipv6 nf_reje=
-ct_ipv4 nf_log_syslog nf_defrag_ipv6 nf_defrag_ipv4 mt6577_auxadc mdio_i2c =
-libcrc32c compat(O) cdc_wdm cdc_acm at24 crypto_safexcel pwm_fan i2c_gpio i=
-2c_smbus industrialio i2c_algo_bit i2c_mux_reg i2c_mux_pca954x i2c_mux_pca9=
-541 i2c_mux_gpio i2c_mux dummy oid_registry tun sha512_arm64 sha1_ce sha1_g=
-eneric seqiv md5 geniv des_generic libdes cbc authencesn authenc leds_gpio =
-xhci_plat_hcd xhci_pci xhci_mtk_hcd xhci_hcd nvme nvme_core gpio_button_hot=
-plug(O) dm_mirror dm_region_hash dm_log dm_crypt dm_mod dax usbcore usb_com=
-mon ptp aquantia pps_core mii tpm encrypted_keys trusted
-> [=C2=A0=C2=A0 12.526834] CPU: 2 PID: 1526 Comm: kworker/u9:0 Tainted: G=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 O=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 6.6.22 #0
-> [=C2=A0=C2=A0 12.534740] Hardware name: Bananapi BPI-R4 (DT)
-> [=C2=A0=C2=A0 12.539259] Workqueue: md_hk_wq t7xx_fsm_uninit [mtk_t7xx]
-> [=C2=A0=C2=A0 12.542217] sfp sfp2: module XICOM=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 XC-SFP+-SR=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 rev A=C2=A0=C2=A0=C2=A0 sn C202307141626=C2=A0=C2=A0=C2=A0 =
-dc 230714
-> [=C2=A0=C2=A0 12.544746] pstate: 804000c5 (Nzcv daIF +PAN -UAO -TCO -DIT =
--SSBS BTYPE=3D--)
-> [=C2=A0=C2=A0 12.554144] mtk_soc_eth 15100000.ethernet eth1: switched to =
-inband/10gbase-r link mode
-> [=C2=A0=C2=A0 12.561064] pc : t7xx_cldma_hw_set_start_addr+0x1c/0x3c [mtk=
-_t7xx]
-> [=C2=A0=C2=A0 12.575139] lr : t7xx_cldma_start+0xac/0x13c [mtk_t7xx]
-> [=C2=A0=C2=A0 12.580359] sp : ffffffc0813dbd30
-> [=C2=A0=C2=A0 12.583661] x29: ffffffc0813dbd30 x28: 0000000000000000 x27:=
- 0000000000000000
-> [=C2=A0=C2=A0 12.590786] x26: 0000000000000000 x25: ffffff80c6888140 x24:=
- ffffff80c11f7e05
-> [=C2=A0=C2=A0 12.591893] sfp sfp1: module XICOM=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 XC-SFP+-LR=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0 rev A=C2=A0=C2=A0=C2=A0 sn C202307141707=C2=A0=C2=A0=C2=A0 =
-dc 230714
-> [=C2=A0=C2=A0 12.593855] hwmon hwmon2: temp1_input not attached to any th=
-ermal zone
-> [=C2=A0=C2=A0 12.597909] x23: 0000000000000000 x22: ffffff80c0fdb9b8
-> [=C2=A0=C2=A0 12.607297] mtk_soc_eth 15100000.ethernet eth2: switched to =
-inband/10gbase-r link mode
-> [=C2=A0=C2=A0 12.613792]=C2=A0 x21: ffffff80c0fdb128
-> [=C2=A0=C2=A0 12.613794] x20: 0000000000000001 x19: ffffff80c0fdb080 x18:=
- 0000000000000014
-> [=C2=A0=C2=A0 12.631986] hwmon hwmon3: temp1_input not attached to any th=
-ermal zone
-> [=C2=A0=C2=A0 12.637419] x17: 00000000752a0f20 x16: 00000000468ff952 x15:=
- 00000000246d1885
-> [=C2=A0=C2=A0 12.651056] x14: 00000000b48c7dff x13: 000000001b6aa29e x12:=
- 0000000000000001
-> [=C2=A0=C2=A0 12.658180] x11: 0000000000000000 x10: 0000000000000000 x9 :=
- 0000000000000000
-> [=C2=A0=C2=A0 12.665304] x8 : ffffff80c90fdfb4 x7 : ffffff80c0fdb818 x6 :=
- 0000000000000018
-> [=C2=A0=C2=A0 12.672428] x5 : 0000000000000870 x4 : 0000000000000000 x3 :=
- 0000000000000000
-> [=C2=A0=C2=A0 12.679553] x2 : 00000001090f0000 x1 : ffffffc083a1d004 x0 :=
- ffffffc083a1d004
-> [=C2=A0=C2=A0 12.686678] Call trace:
-> [=C2=A0=C2=A0 12.689114]=C2=A0 t7xx_cldma_hw_set_start_addr+0x1c/0x3c [mt=
-k_t7xx]
-> [=C2=A0=C2=A0 12.694942]=C2=A0 t7xx_fsm_uninit+0x578/0x5ec [mtk_t7xx]
-> [=C2=A0=C2=A0 12.699814]=C2=A0 process_one_work+0x154/0x2a0
-> [=C2=A0=C2=A0 12.703818]=C2=A0 worker_thread+0x2ac/0x488
-> [=C2=A0=C2=A0 12.707558]=C2=A0 kthread+0xe0/0xec
-> [=C2=A0=C2=A0 12.710603]=C2=A0 ret_from_fork+0x10/0x20
-> [=C2=A0=C2=A0 12.714172] Code: f9400800 91001000 8b214001 d50332bf (f9000=
-022)
-> [=C2=A0=C2=A0 12.720253] ---[ end trace 0000000000000000 ]---
-> [=C2=A0=C2=A0 12.731558] pstore: backend (ramoops) writing error (-28)
-> [=C2=A0=C2=A0 12.736948] Kernel panic - not syncing: Oops: Fatal exception
-> [=C2=A0=C2=A0 12.742680] SMP: stopping secondary CPUs
-> [=C2=A0=C2=A0 12.746593] Kernel Offset: disabled
-> [=C2=A0=C2=A0 12.750069] CPU features: 0x0,00000000,20000000,1000400b
-> [=C2=A0=C2=A0 12.755370] Memory Limit: none
-> [=C2=A0=C2=A0 12.765071] Rebooting in 1 seconds..
-> PANIC at PC : 0x000000004300490c
+I've tested pinging from the SoC's CPU. Packet capturing on the twisted
+pair computer showed very few frames were being received.
+
+# ping 192.168.2.2
+PING 192.168.2.2 (192.168.2.2): 56 data bytes
+64 bytes from 192.168.2.2: seq=36 ttl=64 time=0.486 ms
+^C
+--- 192.168.2.2 ping statistics ---
+64 packets transmitted, 1 packets received, 98% packet loss
+round-trip min/avg/max = 0.486/0.486/0.486 ms
+
+It seems there's less loss when frames are passed more frequently.
+
+# ping 192.168.2.2 -i 0.06
+PING 192.168.2.2 (192.168.2.2): 56 data bytes
+64 bytes from 192.168.2.2: seq=5 ttl=64 time=0.285 ms
+64 bytes from 192.168.2.2: seq=6 ttl=64 time=0.155 ms
+64 bytes from 192.168.2.2: seq=7 ttl=64 time=0.243 ms
+64 bytes from 192.168.2.2: seq=8 ttl=64 time=0.139 ms
+64 bytes from 192.168.2.2: seq=9 ttl=64 time=0.224 ms
+64 bytes from 192.168.2.2: seq=68 ttl=64 time=0.350 ms
+64 bytes from 192.168.2.2: seq=69 ttl=64 time=0.242 ms
+64 bytes from 192.168.2.2: seq=70 ttl=64 time=0.230 ms
+64 bytes from 192.168.2.2: seq=71 ttl=64 time=0.242 ms
+64 bytes from 192.168.2.2: seq=72 ttl=64 time=0.276 ms
+64 bytes from 192.168.2.2: seq=101 ttl=64 time=0.224 ms
+64 bytes from 192.168.2.2: seq=102 ttl=64 time=0.238 ms
+64 bytes from 192.168.2.2: seq=103 ttl=64 time=0.240 ms
+...
+--- 192.168.2.2 ping statistics ---
+214 packets transmitted, 32 packets received, 85% packet loss
+round-trip min/avg/max = 0.099/0.225/0.350 ms
+
+# ping 192.168.2.2 -i 0.05
+PING 192.168.2.2 (192.168.2.2): 56 data bytes
+64 bytes from 192.168.2.2: seq=1 ttl=64 time=0.277 ms
+64 bytes from 192.168.2.2: seq=2 ttl=64 time=0.240 ms
+64 bytes from 192.168.2.2: seq=3 ttl=64 time=0.133 ms
+64 bytes from 192.168.2.2: seq=4 ttl=64 time=0.233 ms
+64 bytes from 192.168.2.2: seq=5 ttl=64 time=0.223 ms
+64 bytes from 192.168.2.2: seq=6 ttl=64 time=0.228 ms
+64 bytes from 192.168.2.2: seq=7 ttl=64 time=0.236 ms
+64 bytes from 192.168.2.2: seq=8 ttl=64 time=0.150 ms
+...
+--- 192.168.2.2 ping statistics ---
+41 packets transmitted, 40 packets received, 2% packet loss
+round-trip min/avg/max = 0.112/0.206/0.277 ms
+
+> 
+> That said as an user, if someone has a well controlled environment, they should absolutely be able to turn on EEE and see how stable it holds in their environment.
+
+Looks like this is the way to go. I'm planning to submit v2 with patch 1
+as:
+
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index 678b51f9cea6..6aa99b590329 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -2458,6 +2458,20 @@ mt7531_setup(struct dsa_switch *ds)
+  	/* Reset the switch through internal reset */
+  	mt7530_write(priv, MT7530_SYS_CTRL, SYS_CTRL_SW_RST | SYS_CTRL_REG_RST);
+  
++	/* Allow modifying the trap and enable Energy-Efficient Ethernet (EEE).
++	 */
++	val = mt7530_read(priv, MT7531_HWTRAP);
++	val |= CHG_STRAP;
++	val &= ~EEE_DIS;
++	mt7530_write(priv, MT7530_MHWTRAP, val);
++
++	/* Disable EEE advertisement on the switch PHYs. */
++	for (i = MT753X_CTRL_PHY_ADDR;
++	     i < MT753X_CTRL_PHY_ADDR + MT7530_NUM_PHYS; i++) {
++		mt7531_ind_c45_phy_write(priv, i, MDIO_MMD_AN, MDIO_AN_EEE_ADV,
++					 0);
++	}
++
+  	if (!priv->p5_sgmii) {
+  		mt7531_pll_setup(priv);
+  	} else {
+diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
+index a71166e0a7fc..509ed5362236 100644
+--- a/drivers/net/dsa/mt7530.h
++++ b/drivers/net/dsa/mt7530.h
+@@ -457,6 +457,7 @@ enum mt7531_clk_skew {
+  #define  XTAL_FSEL_M			BIT(7)
+  #define  PHY_EN				BIT(6)
+  #define  CHG_STRAP			BIT(8)
++#define  EEE_DIS			BIT(4)
+  
+  /* Register for hw trap modification */
+  #define MT7530_MHWTRAP			0x7804
+
+Arınç
 
