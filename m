@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-81026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E7288858A2
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:56:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 944398858A6
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:57:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B78A91F2174C
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:56:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 834BCB21BCC
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:57:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136A95A0FA;
-	Thu, 21 Mar 2024 11:56:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 337935A4D8;
+	Thu, 21 Mar 2024 11:57:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="itpAkv0S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b+6CBuyI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4401758AAF;
-	Thu, 21 Mar 2024 11:56:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8DB3C17;
+	Thu, 21 Mar 2024 11:57:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711022203; cv=none; b=REmNzSYE4z8pioBMe/aMD2zIaq3Dasad4v/Aw2C+nCaAeGYB+G1QoLMxyBmNAW/FqFfsZk93pH8kBED+pqjPy8LCOj9/joEmeEXt0eVAdMe4RTInC8tuNhA12v+/hRWzISQCnfUvGvFsKG52ST1LvdPsb4mANx9dP8Hsy1MRX6M=
+	t=1711022256; cv=none; b=ZxFrVioMe/6Z2f2ttm5YhkJqPb7UlycFWvBBEgNfSn8cJYi/5cNHvIefbwnEx+Jg1u/xK2YhidKFjxHBIrLGdc/o01qxWsZpfbF9vHOROPZXhU6il+BJcPoE3oe2arfhVBo2DKQ9zEtGpTUPiO3EbAHZcaXTu0KG3e3LbTpgzMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711022203; c=relaxed/simple;
-	bh=ClOpV1tUHPrV9xbbPmCV71AFRJniHeEgt5+wDpHdPuI=;
+	s=arc-20240116; t=1711022256; c=relaxed/simple;
+	bh=WKo7lMBV3y6mSyjQLzk2rabAfgWOP15LEZqx38+JJJw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oLlkUKUK2s0VUt1U34uN+CBjF50CgFhBkQq0yOzbNpi/Zo0Y0BC4K2bLAhzTCeF7Swgx4dHclVRrCHipYeMJlSOPfjhTZEZGaRDPkLUjJlEbwPutgALngFr1Nltc+rU7q3mQCDWLZX5BbLZVK4rAnxujt4ZdQBSsN/kwtwhe2xM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=itpAkv0S; arc=none smtp.client-ip=209.85.167.48
+	 To:Cc:Content-Type; b=LY2QpRizj+w2iV8YewsWj4xYLMA2EqXZEar0wYMMekzDT6EAagqvPGm7dj7acXukhN31HcZHG+p95A4vWpWVk6v1TZyrn6pT3v67P8QYrK3GjqlWUvYdkDyUmFlPdYsdGn1aT5VOElVYKQw1HqkLSiFfLB70rIhIWUMo4tFiOrw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b+6CBuyI; arc=none smtp.client-ip=209.85.208.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-512f54fc2dbso910903e87.1;
-        Thu, 21 Mar 2024 04:56:41 -0700 (PDT)
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-566e869f631so909444a12.0;
+        Thu, 21 Mar 2024 04:57:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711022199; x=1711626999; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711022253; x=1711627053; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=qroAAFcs7TC1tOdTn1sB37AUBpgXbN1aHENpqRPoyEw=;
-        b=itpAkv0SePTYNevgPlq4Ns4hfmR8925Z4mz1eYaF7VZiPy9+ThNzBkC9aHnkUmEFcx
-         PCD/gof8HJvnrgNM6lheFsDVrVsUp17EELTW03Zx761R0Y8wO+XO64ubt6jOuaRwLKkg
-         k3l9ij4FfC1BwOP79tyq10SbX6/UwXSpUn4xbiV7MQ6UtBOmCTYOuH4dqnuisgq+C+x+
-         K5ZCV+IMq6dZnggvcHWgICdSJPXR7kQDnOz4kJ9WB6kwLMF3AHzdlKanv0pDbD+Zq91r
-         eHMyH5FYzw2J9x5x70UcPywJ96MO9xQb6RZKU7Mfs/9S1EZAEzz+CxbQccnJ8vn2OFjF
-         sWcw==
+        bh=WKo7lMBV3y6mSyjQLzk2rabAfgWOP15LEZqx38+JJJw=;
+        b=b+6CBuyIDunHRwF4dW3djjwT0DuXG7rRyAETzGlrUvBHAyvCn8Q8T5E3/HaNTr7/fO
+         kfBZllwE3E48EfHIyOzNo9ypvmmh31fn5RGzRybQ5nzMI+q4dB8p6OqoOBRwQb3eed7Q
+         tbe+TwBWIzo1wbgmMPfF8GVQQSVmvlEUz/8LbXxFigqsJmf0IhXS66fyikw7y0ni2qHb
+         zCz1PdVSUSymvxlC13IsngODOcb9qCS31RUr4ZD1V8kdy7rRQdBMFFTfRo6Dgt1IK4yI
+         ll8Twzvvwz9ZoP6hzObRAOQo34nU5b1Ae8xuAn7d6rjkgkbfrI57VwAL1Sl67pqetGIl
+         Eprg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711022199; x=1711626999;
+        d=1e100.net; s=20230601; t=1711022253; x=1711627053;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=qroAAFcs7TC1tOdTn1sB37AUBpgXbN1aHENpqRPoyEw=;
-        b=oeedb5k08ClJOAYbHjM5oBI+h4VIwWNuSXHEl9Y6KfWOWW+aOakpqAsUi87nZzUr5s
-         YgUfY3Fj5efWufxceHrMD7glqSFkRI2tiG9Elxq7oK2trSuGUfFD2uYP9IOABXqXHQmh
-         35n/HIo+L8oAh8GV3827JyTIBWEBwSrEd3lSjdeKFQPW4kJnht0dvSiEM0GkXmVnECzW
-         ouoVZ6TeSfhzkVoO3lO9ZR2f8iKbELGCm9HBn2jAYDBX/s8DnbkylvB8/JLqzzAskOll
-         TqK/Nk3oku9UZBdt86W6YnPpxkKYouxHt/4BFKbOj7RsWgeUpX1KRrTjHtvjSLYV/5x/
-         2ssQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVUI6LcleibY41khsjPOelNfELVzEJWTJ5CYE8EJY03FukNKPuhRp5qo0SqwBt/uuFI3nxkVfweRlDiWHFO+/6A33K2gvumN5PzOQzMKGJ8YcEhiUGB/aA0ejsq1InLKzjKWtJPdQnk005/YF/8qJ+jyXp/yG9mnq7ak8fGjjSkcw==
-X-Gm-Message-State: AOJu0Yw2MIVZsKJ62yp0qD3sxFZdo2AUDbTbIpDTHUUU+Gg3G07LtYYe
-	YIseVuOZOV6WP+cROZ7H1hDLfdyE9pVC7EryW5l8LNMtYvccdqBiRVcjTWzE3g/HCpW+k9BDmm4
-	vUgCSkLTJGD56LI9A3qtBkt3LypQ=
-X-Google-Smtp-Source: AGHT+IGoMlZM1r7Zbtwlbo2uEyA+VsoDZudn1PSQ5QwgZ9K0dJhVnqBX5wuYEerXv39Ut1ues4IiMPxranFe7AEBRTc=
-X-Received: by 2002:a19:ca5a:0:b0:515:9479:a997 with SMTP id
- h26-20020a19ca5a000000b005159479a997mr691094lfj.10.1711022199188; Thu, 21 Mar
- 2024 04:56:39 -0700 (PDT)
+        bh=WKo7lMBV3y6mSyjQLzk2rabAfgWOP15LEZqx38+JJJw=;
+        b=wBsGpfb2OUH/0UlNrqUrPYGIxACFr8AxlQFJuuHNnSd2EP2gPjMM7zkEcQTEpeg0SH
+         +hMcu6pbmeSmVx2alkS13Zmwt9M6bYmLtxXwAxQsbuOQd2es7rRBo/FQZAWq0bKBq7mw
+         CnIdg7j7YPY4bHpR3RnhJp6yYE8D8cgLZdEN6UlmdnO9ZIjgFkcLOcQ2wB3L8sPtjKYd
+         GfTfwTMHfS/Biq79b6b69VAd60saJv/YdAkItVauwYxjbwEHQhOemTmvT/44GC+S+1b1
+         MDSHADNC/ojHry5zohRHk6GzE/nlUDJ6xrOkFvpD3D+lI2uUZjLaaaUGrntFAwLo7+E4
+         0m1w==
+X-Forwarded-Encrypted: i=1; AJvYcCWPaYmExLg6AXJMU+7fj4qAPaSnvKFhAFFsUDyBa0ZA04/2BcOiwitDJmkS+9p/9FqvLFKGM/wpnINeUPVYWwHbBLXtH6kxi9bnExq16nns0Fp6t9YNrIMNo/NnOeqjfYTcQujAdoJLpJJN3y/sKBvpzL4nu5AIfJ+VZdjHy/DGcg==
+X-Gm-Message-State: AOJu0YwNf05Qa+dP8Z9Dl+8RzVq4G5/jVQ2XJif29IzGeMfk1JaWkhYA
+	eFqNMvFk38nDPLxt00n+PLcxyb0TXimZn8cosz0jgyBDAwKrAOYoAfKOewp1SxrJeJq/JFn0KkC
+	BFkYLBlhJV0mup/ZRB66a2mzUsuQ=
+X-Google-Smtp-Source: AGHT+IHgxJcjpLLDV6C0F9FTKvUt88fHTWgTQGM4RtwmlfR6vttufKSeVESgX3vn+TpNUWCIG3JcM6sJM8oKVMreYOk=
+X-Received: by 2002:a05:6402:194b:b0:56b:b698:accd with SMTP id
+ f11-20020a056402194b00b0056bb698accdmr3635745edz.25.1711022252514; Thu, 21
+ Mar 2024 04:57:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,14 +71,14 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com>
- <20240310-realtek-led-v1-1-4d9813ce938e@gmail.com> <d2568101-f3e0-4c2d-8613-52d023e22b77@kernel.org>
-In-Reply-To: <d2568101-f3e0-4c2d-8613-52d023e22b77@kernel.org>
+ <20240310-realtek-led-v1-1-4d9813ce938e@gmail.com> <CACRpkdasa4VBZUk2gwFjwCQyHkFyozokXqeOJqM8hq3BqmCJzQ@mail.gmail.com>
+In-Reply-To: <CACRpkdasa4VBZUk2gwFjwCQyHkFyozokXqeOJqM8hq3BqmCJzQ@mail.gmail.com>
 From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Thu, 21 Mar 2024 08:56:27 -0300
-Message-ID: <CAJq09z6q2gaZYqc-=fQEMOA1ViAKTEJqT9iF2xsYCde9syouig@mail.gmail.com>
+Date: Thu, 21 Mar 2024 08:57:20 -0300
+Message-ID: <CAJq09z6SPbW8+OuatS1y0miRO+3U4u00qCBYfw+_-jzfZithBg@mail.gmail.com>
 Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dsa: realtek: describe LED usage
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Linus Walleij <linus.walleij@linaro.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
+To: Linus Walleij <linus.walleij@linaro.org>
+Cc: =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
 	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
 	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -86,100 +86,27 @@ Cc: Linus Walleij <linus.walleij@linaro.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <al
 	devicetree@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 
-Hi Krzysztof
+Hi Linus,
 
-> On 10/03/2024 05:51, Luiz Angelo Daros de Luca wrote:
+>
 > > Each port can have up to 4 LEDs (3 for current rtl8365mb devices). The
 > > LED reg property will indicate its LED group.
 > >
->
-> Please use scripts/get_maintainers.pl to get a list of necessary people
-> and lists to CC (and consider --no-git-fallback argument). It might
-> happen, that command when run on an older kernel, gives you outdated
-> entries. Therefore please be sure you base your patches on recent Linux
-> kernel.
->
-> Tools like b4 or scripts/get_maintainer.pl provide you proper list of
-> people, so fix your workflow. Tools might also fail if you work on some
-> ancient tree (don't, instead use mainline), work on fork of kernel
-> (don't, instead use mainline) or you ignore some maintainers (really
-> don't). Just use b4 and everything should be fine, although remember
-> about `b4 prep --auto-to-cc` if you added new patches to the patchset.
->
 > > An example of LED usage was included in an existing switch example.
 > >
 > > Cc: devicetree@vger.kernel.org
+> > Signed-off-by: Luiz Angelo Daros de Luca <luizluca@gmail.com>
 >
-> Please drop the autogenerated scripts/get_maintainer.pl CC-entries from
-> commit msg. There is no single need to store automated output of
-> get_maintainers.pl in the git log. It can be easily re-created at any
-> given time, thus its presence in the git history is redundant and
-> obfuscates the log.
+> But... is this patch even needed at all?
 
-It is a left-over before I adopted b4. I'll do the cleanup.
+Yes, leds is a property already supported. The only purpose for this
+patch is to limit led numbers to 0-3 and describe that the reg number
+is the group.
 
->
+I don't know if there is a better way to add restrictions to something
+already defined. Anyway, if that is not necessary, I can drop it.
 
-> > +patternProperties:
-> > +  '^(ethernet-)?ports$':
-> > +    type: object
-> > +    additionalProperties: true
-> > +
-> > +    patternProperties:
-> > +      '^(ethernet-)?port@[0-6]$':
-> > +        type: object
-> > +        additionalProperties: true
-> > +
-> > +        properties:
-> > +          leds:
->
-> type: object
-> additionalProperties: false
->
-> > +            description:
-> > +              "LEDs associated with this port"
->
-> Drop quotes.
+Regards,
 
-At some in my frequent system upgrades (rolling release), it
-uninstalled the yamllint
-
-warning: python package 'yamllint' not installed, skipping
-
-It should have catched that before.
-
->
-> > +
-> > +            patternProperties:
-> > +              '^led@[a-f0-9]+$':
->
-> [0-3]
-
-leds are already defined for a port. I'm just trying to add a
-restriction to allow only 0-3 leds and use that to identify the group.
-These suggestions will redefine the leds property, forcing me to
-declare #address-cells, #size-cells for leds and reference the led
-schema in led@[0-3]. Is there a way to just add a constraint to what
-is already present?
-
->
-> > +                type: object
-> > +                additionalProperties: true
->
-> This cannot be 'true'. Which then will point you to errors and missing
-> ref to leds schema and need to use unevaluatedProperties: false.
->
->
-> > +
-> > +                properties:
-> > +                  reg:
-> > +                    description:
-> > +                      "reg indicates the LED group for this LED"
->
-> Drop quotes
->
->
-> Best regards,
-> Krzysztof
->
+Luiz
 
