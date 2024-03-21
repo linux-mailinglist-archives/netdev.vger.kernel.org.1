@@ -1,85 +1,89 @@
-Return-Path: <netdev+bounces-81061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8539D8859E6
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 14:19:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEB91885A09
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 14:36:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1C3E1F22FFD
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:19:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BA6B1C2137D
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:36:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3014784A4B;
-	Thu, 21 Mar 2024 13:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="US4NyYmO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FC184A4B;
+	Thu, 21 Mar 2024 13:36:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C09134CD;
-	Thu, 21 Mar 2024 13:19:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 693F3134CD;
+	Thu, 21 Mar 2024 13:36:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711027150; cv=none; b=OimOm5yrf5v5r2jw6UiNFvzYdT5X680hiBUJCqRghWILtniT/zeCCIz9Bj+Nh4vn+k91V6+nQeHJ0k0+zlHpJTtULnZIh5AQR2OrWsHOT0w+2okAxpjasbCj6IKPv0ovC2JKZV1UvMAQSV5n+HBZOytgCarnnjHVRLt3dX0ea6o=
+	t=1711028199; cv=none; b=kStpAIsYqVa0ch9BLt84SNr9PcoMRV+Tx7hK+SCj6Tspqa8YQ5RMM1hnJtxxMxkqlyQO+v7CcCmJWWbdm641FukMVfUd5j1o5ZCegVjawHTth0lqNVBz0yT23k0Ll3cyQjZyl08vmk1BmcMJJ86WD0vY+VOHTayZGHvP4zKlDME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711027150; c=relaxed/simple;
-	bh=AQiVU6QDBK9keYmpVAn9qAMVZHSVfZCCrd90QaWx1Yo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rrw+/QdVOng9GeKb1X57EdzhE+TlKb78uZY2d2LsLKEM/WngrohXn/VXT8WZS3QuWG3csKIXbJc6VVoJK1sPH0uXJ98+xPqvfvKMsfF4PkUsq4HyRm6Xsrjlhpyh2BbYvvLdZEkuYiwaYjT7ILKra8/WDfPKK/bqlGzyBOe2Ztc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=US4NyYmO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5D109C433C7;
-	Thu, 21 Mar 2024 13:19:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1711027149;
-	bh=AQiVU6QDBK9keYmpVAn9qAMVZHSVfZCCrd90QaWx1Yo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=US4NyYmO+vr/1M7HF2tzRimSFK18hbGocDhHbiUlo7G1pqn0qc0vhb7fW/4M0XYST
-	 eiCkPbe8OP8p3aWVMafV8hGp451QD4uRzoA+maDjioFTGjYZ3TBYjiaWYmC+HurTWY
-	 fy7JoENbFyfEIPqwC96GGEINpHULXLsUNh2tuf20=
-Date: Thu, 21 Mar 2024 09:19:02 -0400
-From: Konstantin Ryabitsev <konstantin@linuxfoundation.org>
-To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Daniel Golle <daniel@makrotopia.org>, 
-	DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org, linux-arm-kernel@lists.infradead.org, 
-	Bartel Eerdekens <bartel.eerdekens@constell8.be>, erkin.bozoglu@xeront.com, mithat.guner@xeront.com
-Subject: Re: [PATCH net v2 0/2] MT7530 DSA subdriver fix VLAN egress and
- handling of all link-local frames
-Message-ID: <20240321-tentacled-pearl-ferret-efd5be@lemur>
-References: <20240314-b4-for-net-mt7530-fix-link-local-vlan-v2-0-7dbcf6429ba0@arinc9.com>
- <f6f064b8-efb2-4ab0-94f1-468d5d273d6e@arinc9.com>
- <49d23df1340f342822702de0439674ddbc5bff6f.camel@redhat.com>
- <7a7e6c46-03a4-48eb-9f46-84a05259cf26@arinc9.com>
+	s=arc-20240116; t=1711028199; c=relaxed/simple;
+	bh=ra8zoPHUNwWfEZK3+SNr/xeXhA/VoCBJ9K+j+pIxJ2o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Vi3Am+pUDhSQS7pxgOLvs599zA3czrm4Oa8tZlHWW1hofoNvUdVku1RXxlV125Eez9QqWp3fWtYyCe+kxZ+kmyjyM2IvO6R53fsL4SrThbdzTAtA5bms9PfUTJJ8gA2tqbe1Hk20GuD92KGeH07KEBxwR3Y0RdAhH/DoQihGVs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7566DC433F1;
+	Thu, 21 Mar 2024 13:36:37 +0000 (UTC)
+Date: Thu, 21 Mar 2024 09:39:04 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: xu.xin16@zte.com.cn, edumazet@google.com, davem@davemloft.net,
+ mhiramat@kernel.org, dsahern@kernel.org, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, yang.yang29@zte.com.cn, he.peilin@zte.com.cn,
+ liu.chun2@zte.com.cn, jiang.xuexin@zte.com.cn, zhang.yunkai@zte.com.cn
+Subject: Re:  [PATCH v3] net/ipv4: add tracepoint for icmp_send
+Message-ID: <20240321093904.65f91d10@gandalf.local.home>
+In-Reply-To: <CAL+tcoAdZOKnHTbRnmrjtrhJynGfDy4xXvus1hh_UTbh5eSMTA@mail.gmail.com>
+References: <202403211010443485000@zte.com.cn>
+	<CAL+tcoAdZOKnHTbRnmrjtrhJynGfDy4xXvus1hh_UTbh5eSMTA@mail.gmail.com>
+X-Mailer: Claws Mail 3.19.1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7a7e6c46-03a4-48eb-9f46-84a05259cf26@arinc9.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 21, 2024 at 02:29:19PM +0300, Arınç ÜNAL wrote:
-> > For future memory: I think the SoB in the cover letter is not required,
-> > and is, at least to me, a bit confusing.
-> > 
-> > No action needed here, I'll keep this unmodified, but I suggest to omit
-> > it in future submission.
-> 
-> b4 puts it on the cover letter so it's not my doing.
+On Thu, 21 Mar 2024 10:45:00 +0800
+Jason Xing <kerneljasonxing@gmail.com> wrote:
 
-This is done because many subsystems use the cover letter as the merge commit
-message. Those subsystems who don't follow this practice don't generally care
-if there's a Signed-Off-By in the cover letter anyway, so I don't see why this
-is a concern that it's there.
+> The format of the whole patch looks strange... Did you send this patch
+> by using 'git send-email' instead of pasting the text and sending?
 
--K
+Yeah, it's uuencoded.
+
+Subject: =?UTF-8?B?wqBbUEFUQ0ggdjNdIG5ldC9pcHY0OiBhZGQgdHJhY2Vwb2ludCBmb3IgaWNtcF9zZW5k?=
+Content-Type: multipart/mixed;
+	boundary="=====_001_next====="
+X-MAIL:mse-fl2.zte.com.cn 42L2Ahm2097008
+X-Fangmail-Gw-Spam-Type: 0
+X-Fangmail-Anti-Spam-Filtered: true
+X-Fangmail-MID-QID: 65FB975E.000/4V0TV60kJlz8XrRb
+
+
+
+--=====_001_next=====
+Content-Type: multipart/related;
+	boundary="=====_002_next====="
+
+
+--=====_002_next=====
+Content-Type: multipart/alternative;
+	boundary="=====_003_next====="
+
+
+--=====_003_next=====
+Content-Type: text/plain;
+	charset="UTF-8"
+Content-Transfer-Encoding: base64
+
+-- Steve
 
