@@ -1,50 +1,42 @@
-Return-Path: <netdev+bounces-81008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82E5288581B
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:20:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA579885820
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:21:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E9AB28154E
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:20:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 645E428139D
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:21:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F52C5813B;
-	Thu, 21 Mar 2024 11:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rhwb3exD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80DB357867;
+	Thu, 21 Mar 2024 11:21:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4644F57880;
-	Thu, 21 Mar 2024 11:20:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3AF554F89;
+	Thu, 21 Mar 2024 11:21:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711020028; cv=none; b=ow1nzuMEaWn/w46+p9sIG47E9HCPwPAer/BcYhZ4M1T0MC/PKwZroA8lWZjORUAc45yX7kfcxDBaxUQhjWAJTeb2c4b2gGynX5kE6A/2qawUWs2SMzJjf6ZT5f3rxFujH1Gy/3fI5tPhqMNDuBDdF+vBlAhBO083oh4YmAL6iss=
+	t=1711020086; cv=none; b=AbdGpSUV3MYo2Foebwz3spl9+/YZqUv5/nInPKKslvX4kPenOeNEwQ+HzGYvmS+PnY58AAQ3mg8K1bvHNI5kptsNNcVO97wIlYMTpjkmkHhN2bzBCrpBRCsqAeYZfgSDLmqAp4XbuRLg4/Yl9bxw8+lNulT+M6Oh7PSPnIVKmhg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711020028; c=relaxed/simple;
-	bh=d1IRr9TtFAq/n2fJtDW0qRO01a2/SWstmEFZu1BOraE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=lI70w8Yf7LYZL/QWbslPEvIkxYgx0qjPU5cCPbjIOIA9WKUmwO7sb2BXSBAR2imHVkKY5q4fBhBRY0S0Gzo3XV8AoL5QJROrtUFp5bmsrqEE3cpdF+9lX3Rcnki+6BHVZYrzZW5u4pTZsmZI7cdlyhEJf7o14bsGbgclDODLRFE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rhwb3exD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C12E2C43390;
-	Thu, 21 Mar 2024 11:20:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711020027;
-	bh=d1IRr9TtFAq/n2fJtDW0qRO01a2/SWstmEFZu1BOraE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Rhwb3exDfDWmBO90fT1a0fkQLgef4yEAzzKgEAobppkvMshOCR2wZN3cqDBmrtaOx
-	 7c4y5T0NGz9+bGnVBzRyiVvFZTYEJ5XCayNNjUFxciIKD1kZBUKKl8AOdewq+s4Kt/
-	 nYMA5ak/WYGfjjy1lzoa3aAcMZLxeDJUV8Knw92odKp/9MyZgFQwcVosjYtNw/W3dk
-	 hW+H1+Q/gCs6H9veYwlVtjGbTIqD0jBTWqFM9oo7I+33Ro6NOcUjZjPfahjSG67hcS
-	 avWM+6RxAyjlgb/R3UALjpEPhlGgKUbvX/YY2o+PdDZLWOC/Hy5bMUOvcoccHYOVE+
-	 uPya8JOMmBB4g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A62C9D982E3;
-	Thu, 21 Mar 2024 11:20:27 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1711020086; c=relaxed/simple;
+	bh=dgcYgmlarTCQWg9j4VVOldGPOW0VJqWYp52FkwDZlYE=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ehLunRIX1dlf6KQQGCCe1JaFKQx23iE9SbEdazeoekjhYKYADbCun3vfMFRaaaMrrGJ5a3rTrgeDEBUWHcTnXrVCa3wYFgcwdCnEyeCWsDBWC2d8McWEoCUKmus4CYrNq2JZ7lZ50m8XriICsfu58wHnTmpLSqjxN65ee2/QwCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com
+Subject: [PATCH net 0/3,v2] Netfilter fixes for net
+Date: Thu, 21 Mar 2024 12:21:14 +0100
+Message-Id: <20240321112117.36737-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,50 +44,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/2] MT7530 DSA subdriver fix VLAN egress and
- handling of all link-local frames
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171102002767.1229.13788293979924606218.git-patchwork-notify@kernel.org>
-Date: Thu, 21 Mar 2024 11:20:27 +0000
-References: <20240314-b4-for-net-mt7530-fix-link-local-vlan-v2-0-7dbcf6429ba0@arinc9.com>
-In-Reply-To: <20240314-b4-for-net-mt7530-fix-link-local-vlan-v2-0-7dbcf6429ba0@arinc9.com>
-To: =?utf-8?b?QXLEsW7DpyDDnE5BTCB2aWEgQjQgUmVsYXkgPGRldm51bGwrYXJpbmMudW5hbC5h?=@codeaurora.org,
-	=?utf-8?b?cmluYzkuY29tQGtlcm5lbC5vcmc+?=@codeaurora.org
-Cc: daniel@makrotopia.org, dqfext@gmail.com, sean.wang@mediatek.com,
- andrew@lunn.ch, f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- matthias.bgg@gmail.com, angelogioacchino.delregno@collabora.com,
- frank-w@public-files.de, bartel.eerdekens@constell8.be,
- mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org, arinc.unal@arinc9.com
 
-Hello:
+v2: Amended missing SOB in patch 3/3.
 
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+-o-
 
-On Thu, 14 Mar 2024 12:33:40 +0300 you wrote:
-> Hi.
-> 
-> This patch series fixes the VLAN tag egress procedure for link-local
-> frames, and fixes handling of all link-local frames.
-> 
-> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
-> 
-> [...]
+Hi,
 
-Here is the summary with links:
-  - [net,v2,1/2] net: dsa: mt7530: fix link-local frames that ingress vlan filtering ports
-    https://git.kernel.org/netdev/net/c/e8bf353577f3
-  - [net,v2,2/2] net: dsa: mt7530: fix handling of all link-local frames
-    https://git.kernel.org/netdev/net/c/69ddba9d170b
+The following patchset contains Netfilter fixes for net. There is a
+larger batch of fixes still pending that will follow up asap, this is
+what I deemed to be more urgent at this time:
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+1) Use clone view in pipapo set backend to release elements from destroy
+   path, otherwise it is possible to destroy elements twice.
 
+2) Incorrect check for internal table flags lead to bogus transaction
+   objects.
 
+3) Fix counters memleak in netdev basechain update error path,
+   from Quan Tian.
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git nf-24-03-21
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit 9c6a59543a3965071d65b0f9ea43aa396ce2ed14:
+
+  Merge branch 'octeontx2-pf-mbox-fixes' (2024-03-20 10:49:08 +0000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git tags/nf-24-03-21
+
+for you to fetch changes up to 7eaf837a4eb5f74561e2486972e7f5184b613f6e:
+
+  netfilter: nf_tables: Fix a memory leak in nf_tables_updchain (2024-03-21 12:12:06 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 24-03-21
+
+----------------------------------------------------------------
+Pablo Neira Ayuso (2):
+      netfilter: nft_set_pipapo: release elements in clone only from destroy path
+      netfilter: nf_tables: do not compare internal table flags on updates
+
+Quan Tian (1):
+      netfilter: nf_tables: Fix a memory leak in nf_tables_updchain
+
+ net/netfilter/nf_tables_api.c  | 29 +++++++++++++++--------------
+ net/netfilter/nft_set_pipapo.c |  5 +----
+ 2 files changed, 16 insertions(+), 18 deletions(-)
 
