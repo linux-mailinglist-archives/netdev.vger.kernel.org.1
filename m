@@ -1,137 +1,150 @@
-Return-Path: <netdev+bounces-81122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81123-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F70B885FF0
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 18:41:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAFC8886007
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 18:48:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF94E1C21504
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 17:41:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 664CF282419
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 17:48:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3E9C762EB;
-	Thu, 21 Mar 2024 17:41:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CA6D12CD8A;
+	Thu, 21 Mar 2024 17:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Xf79fn3N"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="vZrOFnam"
 X-Original-To: netdev@vger.kernel.org
-Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1948C0A
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 17:41:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C29888592D
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 17:48:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711042898; cv=none; b=rDx+UmtQ5CBZoa8xRn0c7xEha3c13hItze8wgTenS29UfImqRyXXNaFjpKWO1mAtTH+KcU/p8pdT7ZfeG2akhy710/SGrCe9FGIz+awqgkt9YfpM8/AoQyxojeicEICtYSb8q+aTT/w9Etj3RXTcwW58M3kzIfkyj0/VjklFzwk=
+	t=1711043284; cv=none; b=jitWjRVNfOB1dtPOkZ5az0tfVbLu/nCJGTGwrCLQEpmJ+eXb0agh42n6Bl5cmGX0R/XZirs7eheffxAI5xJgOaejEgCpM2PcAdkDXnrTqurNRphExDGNyN0SdqjJNVMNRwZXvQjhtfOl94yZ9KmX6oh43I5TicVfut79B6Ey+js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711042898; c=relaxed/simple;
-	bh=Ddafupa7iYOvMi+sXqfxmGGV7rCcvsCabj+hxTgAiD4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P4eH6+Vt56Wwg8Kstz4qdMGBOpWkF5OyHDqtnHUb4thRADahU9ZCbambxJ8FNJPiZm7fLv/mb7V4iASBxg+D76mS7J5fRD9yEk3d8EanCYTr/gH9+83nOtKsz5Fktbg3jLTJPEO2aZzACIQKF24+beTRJbuKgLMpXNgX4rZSBxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Xf79fn3N; arc=none smtp.client-ip=64.147.123.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
-	by mailout.west.internal (Postfix) with ESMTP id BF66832000D7;
-	Thu, 21 Mar 2024 13:41:34 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute2.internal (MEProxy); Thu, 21 Mar 2024 13:41:36 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=
-	fm2; t=1711042894; x=1711129294; bh=822J1JVuqbXk+PxzQ6ijlTZ3vZ4t
-	+qgKbmLkE0nki7U=; b=Xf79fn3NQTPgG2ZH8lu1f6ILueo9nFJ50LN0RW2vm546
-	xQIl3agmcH6jxCu6b6ATBmuHS6zPROApOsAVPF4mi0W6WJiLUT/gTxj08901hH9O
-	01jVpqOWLT9y5AP0BQYxx1F9VSrIJWhZXVdWsiQmLBhnDHtzHubtOhckNrva4vk3
-	Amq6jU2g89V1tgw1HNJUdw8WZyOHM9AP7RvXGjBNmTOoEooGFU9WVWfhQtjvlEc5
-	9WBR+fQZzI6a87XjyilaqrjuzdmpD3gy0GYivx2bcPMB07y1TxGpdZbX2uVC/zIL
-	OlaA411tZjgYa+KT3KXNsSLVY0zvrmsXA82beDECRA==
-X-ME-Sender: <xms:TXH8ZcBzZP37zlI71NqPAIWBN-y-nHC1WYLSWh57JjS-zTjvqb3kjw>
-    <xme:TXH8ZejkuaAe6A-UoLIEKI1GTh2CkAiCLXcJJevdXFHcroXbZYIzoNXDScO9i2qmk
-    ljN3dl9VvnE8Ks>
-X-ME-Received: <xmr:TXH8Zfk-D6D3eMkIOBa68UKvd2FHSxQ7ngCDXhiDYMBfq74pvKpa6v_sTNJh>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledrleejgdegvdcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpeffhffvvefukfhfgggtuggjsehttdortddttddvnecuhfhrohhmpefkughoucfu
-    tghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorhhgqeenucggtffrrghtth
-    gvrhhnpeffueevhffhuddvjeetfeeuudfgheegledvveehheeuueduvdehgedtteefheeg
-    feenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptd
-    enucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrgh
-X-ME-Proxy: <xmx:TXH8ZSzygBnMovpcbDpDbjBMEo4J-USgOeq55moGZyBAAJuIx58rLQ>
-    <xmx:TXH8ZRRpTlootCA443LWB4bd1_WOzwSb6qyPy-UP7Rfg74coBEyokw>
-    <xmx:TXH8ZdZRIZ30dDNhzdMu3lbGCuo6CgXEGFAV3-y9OEFn8WAzS6h3Cw>
-    <xmx:TXH8ZaStm07fWqHALk9zifaFGFztozZvHN7ONoSSNlHj612YyThx6w>
-    <xmx:TnH8ZQJf3gFwOHy8nz1QxM4U58nPXEeAho9Jr3UEtnbwImQP9TWHtw>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 21 Mar 2024 13:41:32 -0400 (EDT)
-Date: Thu, 21 Mar 2024 19:41:28 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Gal Pressman <gal.pressman@linux.dev>, Jakub Kicinski <kuba@kernel.org>,
-	Stefano Brivio <sbrivio@redhat.com>, davem@davemloft.net,
-	netdev@vger.kernel.org, pabeni@redhat.com, jiri@resnulli.us,
-	johannes@sipsolutions.net, fw@strlen.de, pablo@netfilter.org,
-	Martin Pitt <mpitt@redhat.com>,
-	Paul Holzinger <pholzing@redhat.com>,
-	David Gibson <david@gibson.dropbear.id.au>
-Subject: Re: [PATCH net-next v2 3/3] genetlink: fit NLMSG_DONE into same
- read() as families
-Message-ID: <ZfxxSBddQnLPfafc@shredder>
-References: <20240303052408.310064-1-kuba@kernel.org>
- <20240303052408.310064-4-kuba@kernel.org>
- <20240315124808.033ff58d@elisabeth>
- <20240319085545.76445a1e@kernel.org>
- <CANn89i+afBvqP564v6TuL3OGeRxfDNMuwe=EdH_3N4UuHsvfuA@mail.gmail.com>
- <20240319104046.203df045@kernel.org>
- <7e261328-42eb-411d-b1b4-ad884eeaae4d@linux.dev>
- <Zfw7YB4nZrquW4Bo@shredder>
- <CANn89i+kqdRZrM6Z4TaUcW8q3UL1yzrsOm76mkP2znDAVX2YFA@mail.gmail.com>
+	s=arc-20240116; t=1711043284; c=relaxed/simple;
+	bh=O+Af9kym1NkobnQrECieIq6cEV6FPsvxxJSg1+NLtsA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=vB1Pxzmc3+FiI23YjNTUfsmVhQoJG063XxyF80R2YLx2Vgr3bqMiKiKa496Crfu7U4UPBcWJh2DUpL75RULZ1kTUBkcB5BRE19pd+SW/SSu/auXEbWbVtgJ84rEn6+Ec5orecqCFQB3M+Ch25hVeDOKJM+q580ZpvhlZiVBFLKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=vZrOFnam; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56bb5b9ab89so1511a12.1
+        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 10:48:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711043281; x=1711648081; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ulL31+7TLEa1USxhPrvoRDQYnq2BRkS4H57usirjYLM=;
+        b=vZrOFnamyFWGFi8uBxMNSOnxoxhwJK3N3U2x1apP8kO84PSDmPVcYVslosLLslt4ny
+         XEl9XRK3OZO+1qpHjeJGfrnfoZxc5ONM8K+mM8we6sMzjX0G5AtRRaCWVidmgylAStoj
+         /VF0oTwAeoUec86BL+Tfeh8kBf4GZkUAczTr4AHzPaEJpWt10vwqiH0DLPcftKqE/saf
+         5Q1rnw+QJuuo74JUG6msa9lhlUPvKCdqAgIq1f0pNVIpKcuWCiy96RVS9taa4YBlDkCO
+         dCA2WK5OuhjX0+5w2vl0QhKCz4T6dEuoBFo+uVzwsdkRN0iLMcVgaD9xJZpCAd8/PFDc
+         xkBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711043281; x=1711648081;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ulL31+7TLEa1USxhPrvoRDQYnq2BRkS4H57usirjYLM=;
+        b=j1t3DkFWuR1/4z3Sn+q3jL8If0ctJAcLCwTiMfvLQosHILZS/dO1bDzxn/2hOg/A9H
+         /qhoScSrTHgpk8G0Ccwy1ZdgWjJtRYPt2mCgbY/RBPOv4Ixu0xI6uYpceOaCcY9eiw0P
+         wMXqcV4GsV+bwL2moQtNXRCY8QlSAn4cfTUD8GqsC1Xc78kR4qv6DjQlO0IzTPMat3nK
+         rprwCX0/60pXbj8bLuWuZIav79wo3uVMdle4wH6jZuZ0encJitrAlEL8CbjdMLkg6Sr+
+         2upvNSPHpKUhOVglQ51FaEnuTIiVz0fR1U9ToUruMdMHIOLsA+MhAS0tPO8BSeqqYgBZ
+         wGSw==
+X-Gm-Message-State: AOJu0Yz8H1Bf8DAa7rKmCPp878ZsXB2oz+bULVQdN3PiMyWdJDFONXj3
+	duDV7FXVvZKhgHZSAkTV+jfQTWKiN9WIvg80FOfRYnvnMmPH//H9zrjWldFc7aRrovpjHdZn2Ri
+	sZuiPrvnH+RBYUxeyI0yQNFzlNuyMGj2Vbo28
+X-Google-Smtp-Source: AGHT+IH2uzgFK10nhsaC3tLlChgyxaqwJD5genmrgampsUyD90LhRxqpiZqQpl5GUTiV9JiFCt0oXwiuG+fJ3/gXHsk=
+X-Received: by 2002:aa7:d703:0:b0:56b:826e:d77d with SMTP id
+ t3-20020aa7d703000000b0056b826ed77dmr184395edq.3.1711043280733; Thu, 21 Mar
+ 2024 10:48:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANn89i+kqdRZrM6Z4TaUcW8q3UL1yzrsOm76mkP2znDAVX2YFA@mail.gmail.com>
+References: <20240321173042.2151756-1-idosch@nvidia.com>
+In-Reply-To: <20240321173042.2151756-1-idosch@nvidia.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 21 Mar 2024 18:47:47 +0100
+Message-ID: <CANn89iLZ2NoNCVTEa0pn510S1rW=eJu2z+ihSV6PzE2awWG7Pg@mail.gmail.com>
+Subject: Re: [PATCH net] ipv6: Fix address dump when IPv6 is disabled on an interface
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, gal@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Mar 21, 2024 at 06:26:31PM +0100, Eric Dumazet wrote:
-> The following seems to react quite differently :
-> 
-> # ip addr  show lo
-> 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN
-> group default qlen 1000
->     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
->     inet 127.0.0.1/8 scope host lo
->        valid_lft forever preferred_lft forever
->     inet6 ::1/128 scope host proto kernel_lo
->        valid_lft forever preferred_lft forever
-> # ip link set dev lo mtu 1000
-> # ip addr  show lo
-> 1: lo: <LOOPBACK,UP,LOWER_UP> mtu 1000 qdisc noqueue state UNKNOWN
-> group default qlen 1000
->     link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
->     inet 127.0.0.1/8 scope host lo
->        valid_lft forever preferred_lft forever
+On Thu, Mar 21, 2024 at 6:31=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wr=
+ote:
+>
+> Cited commit started returning an error when user space requests to dump
+> the interface's IPv6 addresses and IPv6 is disabled on the interface.
+> Restore the previous behavior and do not return an error.
+>
+> Before cited commit:
+>
+>  # ip address show dev dummy1
+>  2: dummy1: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UN=
+KNOWN group default qlen 1000
+>      link/ether 1a:52:02:5a:c2:6e brd ff:ff:ff:ff:ff:ff
+>      inet6 fe80::1852:2ff:fe5a:c26e/64 scope link proto kernel_ll
+>         valid_lft forever preferred_lft forever
+>  # ip link set dev dummy1 mtu 1000
+>  # ip address show dev dummy1
+>  2: dummy1: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1000 qdisc noqueue state UN=
+KNOWN group default qlen 1000
+>      link/ether 1a:52:02:5a:c2:6e brd ff:ff:ff:ff:ff:ff
+>
+> After cited commit:
+>
+>  # ip address show dev dummy1
+>  2: dummy1: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UN=
+KNOWN group default qlen 1000
+>      link/ether 1e:9b:94:00:ac:e8 brd ff:ff:ff:ff:ff:ff
+>      inet6 fe80::1c9b:94ff:fe00:ace8/64 scope link proto kernel_ll
+>         valid_lft forever preferred_lft forever
+>  # ip link set dev dummy1 mtu 1000
+>  # ip address show dev dummy1
+>  RTNETLINK answers: No such device
+>  Dump terminated
+>
+> With this patch:
+>
+>  # ip address show dev dummy1
+>  2: dummy1: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1500 qdisc noqueue state UN=
+KNOWN group default qlen 1000
+>      link/ether 42:35:fc:53:66:cf brd ff:ff:ff:ff:ff:ff
+>      inet6 fe80::4035:fcff:fe53:66cf/64 scope link proto kernel_ll
+>         valid_lft forever preferred_lft forever
+>  # ip link set dev dummy1 mtu 1000
+>  # ip address show dev dummy1
+>  2: dummy1: <BROADCAST,NOARP,UP,LOWER_UP> mtu 1000 qdisc noqueue state UN=
+KNOWN group default qlen 1000
+>      link/ether 42:35:fc:53:66:cf brd ff:ff:ff:ff:ff:ff
+>
+> Fixes: 9cc4cc329d30 ("ipv6: use xa_array iterator to implement inet6_dump=
+_addr()")
+> Reported-by: Gal Pressman <gal@nvidia.com>
+> Closes: https://lore.kernel.org/netdev/7e261328-42eb-411d-b1b4-ad884eeaae=
+4d@linux.dev/
+> Tested-by: Gal Pressman <gal@nvidia.com>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+> A similar change was done for IPv4 in commit cdb2f80f1c10 ("inet: use
+> xa_array iterator to implement inet_dump_ifaddr()"), but I'm not aware
+> of a way to disable IPv4 other than unregistering the interface, so I
+> don't see a reason to change the IPv4 code.
+> ---
 
-Yes, for loopback the NETDEV_CHANGEMTU event is treated as NETDEV_DOWN
-rather than NETDEV_UNREGISTER:
+Thanks for the fix.
 
-if (dev->mtu < IPV6_MIN_MTU) {
-	addrconf_ifdown(dev, dev != net->loopback_dev);
-	break;
-}
-
-vim net/ipv6/addrconf.c +3656
-
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
-
-Sorry Eric, already sent the patch without your tag:
-
-https://lore.kernel.org/netdev/20240321173042.2151756-1-idosch@nvidia.com/
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
