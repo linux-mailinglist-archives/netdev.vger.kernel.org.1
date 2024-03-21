@@ -1,154 +1,127 @@
-Return-Path: <netdev+bounces-80999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5493888577A
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:31:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20E3D885780
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:35:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 785E01C21555
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:31:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 412851C21260
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:35:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D00D527456;
-	Thu, 21 Mar 2024 10:31:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 551FE54F89;
+	Thu, 21 Mar 2024 10:34:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VJjXeciO"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F+bdIDkG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BE11F95F
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 10:31:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB7814284
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 10:34:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711017109; cv=none; b=jeZvxd6r1eNzC6dta+/loB1bHqk40lgZK4YeqfcsQyKEfMg7Ih3AEAfzrfxOUsEal9w+wAKGx6roOqt/dDF+9vYZAx09SSipR0o1+41TlePpPct7z0qpWeDuQDZQ4wyECERGZRXOc16ZWfVV8WkydgDG2/+n+0PmOdj0qQT2f/o=
+	t=1711017297; cv=none; b=R3OVrSGOMOHHInN/qKy2IVwsrtGMtsiw+Fo2JF9GxkDYMOeUEhhqcAMq1oadeDeX7apxqAH5s6tJvL92cqUu3JNHNPzxEU7/PnYTvQElADTB3HTlzt+hTzQlOHYRY6cyz1rg/h88hq7aPTsrxwrohOfpvM7sR3BbSrNCkKAg8UY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711017109; c=relaxed/simple;
-	bh=qrAPSr/2hKJt6tofgtaxEuVTZ83RATwk68X5umTxr+k=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=B/IkeqpZAsg+Cdh1sRXRla7OuT2cJ4uP/Rw9sfEM/McKL7CC8wIcGjMG463L50tM9S19vZ/wGZ+ays8coa9tK4hzuaord+Pz8/1kByGmSu7bxdmY+PMAAZlm3YOy4Bf6mHycl3XnH+T/3+dWNj9r6puqQ4jAsB8IWKK2VmbnI+E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VJjXeciO; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711017106;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=HWutRb+BC/KyXEZzVnQQbmesF8Bx2Puf/xuEZBqN4Z8=;
-	b=VJjXeciOSLWcgREZ1Nl2633Hl5XMInFuCT9G9M30afc3DhV4LHwHcElVBtU5Mr2aBPV99b
-	Y+XSE4jk1QfdhQe21UtECQf5N5zqcGGOzlW2/J9W1h4MCT5o2U6M9h67vXlz9jFhm0wWC+
-	3dQWuiiG46dZ/5MEvI7/HGj/cVnQDq4=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-518-JiSEIT15OsWsUsPE3H80Yw-1; Thu, 21 Mar 2024 06:31:44 -0400
-X-MC-Unique: JiSEIT15OsWsUsPE3H80Yw-1
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-33ecafa5d4dso164480f8f.1
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 03:31:44 -0700 (PDT)
+	s=arc-20240116; t=1711017297; c=relaxed/simple;
+	bh=y4emFXGGAZffpUX9wn8XGyawcIby/7BxyXLMzGwuUlE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cvece5Gf+Or1C+6iMkJfqJBpD9v+z0B5XQNJz6CxaaGBgMUmCm8HleEsRHSETzW3bC2phlldrqa+WHey3gStrZmx1YYo2L5VCS6TqZyeAhpQLPnJYytM/8JAs3JRffB3WnGSugQzb/OAT7+9I8RlDZ7IkFQtJ67fmDE36tNJd/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=F+bdIDkG; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-512f3e75391so608259e87.2
+        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 03:34:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1711017294; x=1711622094; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3XNkgAQnQ6LBfF2NFDRpA/pvI0NsrzPvIEpAHL8Ayt0=;
+        b=F+bdIDkGzDaBLrdVKjtUiTAA/Dz/rG/yZGAAhu9b6bZyDlDxnqHH/dnruulUpT+v9U
+         R3k8FXVXkP5Vq0vtxbabSaL+XA0fAnef5O1D9JX08rrjYnvo84uNaVDZBdQYIMM5jokC
+         YznDdInJHUrbrEbKHBeOXvKRF9lEfTLkRcGHaQaxi5egEiWqt7h89143Lvlujrqlh+dE
+         X+T/LB0p+6GND7LVAf3d1BkYxUAegyQs65YCKSP4815PMQefPb3OW/Rujv3nY4KGuNWy
+         OzTCtUB0OCifQdV4X5hnlscNLyoGHMwOluJ9eJzeI+AmbiQ3GHtiqogejqO2TjiZwhCB
+         0RzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711017104; x=1711621904;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HWutRb+BC/KyXEZzVnQQbmesF8Bx2Puf/xuEZBqN4Z8=;
-        b=PNp3iLG4gMa/rWQiKINrd2Coqx+NwMUNjZxrFTjN5F0nQnCAOCJKXWCx2TNYEHt369
-         qVz4n4ifG8hT3ZMkH+xi+Zw7F5ORDaC8ip8XJXGYiw5Ehv3WWsIog7Tf0sBTsMEva6vq
-         1yGWlDHnaUfmF//VcTKOIWLum7bHU3/brgpEQ2vk0XPP4TtANlPZ2sKX8/SxN38fMbji
-         VVsZcDO4npzFyfSuVhMNa3Yb+cZyeFeQ0SSba0RfMA+nWaE/k+5WfhJp+VkWxIPM9lK1
-         nhah3mniEoW1fSyQ6en143bzxnS3La/QZdVyVxxvREX8Fakq9xtR2xN06+kv+cr/5lPW
-         jd0Q==
-X-Gm-Message-State: AOJu0YxU0Px7otUXVosj80EdEoOoH1TZu/ye2lxOdFjH6WCIOfpywcD4
-	Gvd/8OlKKo+Df1GyK8sb43hleE8NnDB3x9VsLcm5LH80MKFyAnUWpypGWbr5zaIzyA54XC1i3BO
-	9y5FUP8We7YO22zFNVnKyYkffmGjar8wcsavZcJqsllasgdAxTlndxg==
-X-Received: by 2002:a05:600c:3147:b0:414:6460:a249 with SMTP id h7-20020a05600c314700b004146460a249mr3156058wmo.4.1711017102362;
-        Thu, 21 Mar 2024 03:31:42 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IESPfYwj5iH+DOxNWZXZW3pKfza1SJa5ciczEx2zDnjKImCW11Up480LLm0BwgvJfi9pL7AWQ==
-X-Received: by 2002:a05:600c:3147:b0:414:6460:a249 with SMTP id h7-20020a05600c314700b004146460a249mr3156036wmo.4.1711017101976;
-        Thu, 21 Mar 2024 03:31:41 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-249-130.dyn.eolo.it. [146.241.249.130])
-        by smtp.gmail.com with ESMTPSA id n18-20020a05600c501200b004146bdce3fesm5056095wmr.4.2024.03.21.03.31.41
+        d=1e100.net; s=20230601; t=1711017294; x=1711622094;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3XNkgAQnQ6LBfF2NFDRpA/pvI0NsrzPvIEpAHL8Ayt0=;
+        b=EiVXiBW7MfaLFliCwiIcnI3fyIdhhnkpt5nIi9PDf3hdyb+E8mSdNJte4oMdy1Hq1e
+         MflQXRzYmJxU1zF+yCzIkCnw8mbcSRHOmNPNhllnVdHdknNu8SHyqd0ST8NWi8UBSXye
+         JSQpOxeXQF0CzDYxaiNg3+L+4Wg477H2aTyx4XUohgkeXz8xl2PYdbPxon9s1wlrYwTF
+         +2lMQ5KEbnTFORV8L8rQXGBPyH+HwQxPXxWVJG3ESo5ak8Ahtawgo1NbImZML4wa7Bgj
+         7RR6u5sETwL2CPpLSxEFd/2xqLi8g9hnoL1YITtBsmOUPXRFiOcBWlI0Z2KIXOMYhfPx
+         hZvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWcjhzCwywe4tR4RdtIQmbIxLESnZOYwhVvzFAxes0pXoey67yurmJUms0QTJTXCjyDyydwCu1u8a1U4gBbOagxaecf03sQ
+X-Gm-Message-State: AOJu0YwYyu24fEuTi0v67H5s1oJHo6WfdydrOCulHmjEiRPwvosWsLj0
+	TD7I/NHPJRgfW9nLWC4KgIeRKR6jFdgY3ZPbBFDSvAVm4z/NJ8IoaCWTjYuxT7s=
+X-Google-Smtp-Source: AGHT+IHcrMw9qmrRmKJ+2QA1uL5wiYGSUSyvOjThedDZOBU+nrthRuPB8s9XAlNO95sJ+RIlSU9Jkw==
+X-Received: by 2002:ac2:5b8f:0:b0:513:ec32:aa8a with SMTP id o15-20020ac25b8f000000b00513ec32aa8amr5682658lfn.11.1711017293674;
+        Thu, 21 Mar 2024 03:34:53 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id iv20-20020a05600c549400b004146bce65f4sm5064318wmb.13.2024.03.21.03.34.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Mar 2024 03:31:41 -0700 (PDT)
-Message-ID: <e5e430e6c6fd079847cb7547b96c2cab70906abb.camel@redhat.com>
-Subject: Re: Regarding UDP-Lite deprecation and removal
-From: Paolo Abeni <pabeni@redhat.com>
-To: Lynne <dev@lynne.ee>, Florian Westphal <fw@strlen.de>
-Cc: Netdev <netdev@vger.kernel.org>, Kuniyu <kuniyu@amazon.com>, 
-	Willemdebruijn Kernel <willemdebruijn.kernel@gmail.com>
-Date: Thu, 21 Mar 2024 11:31:40 +0100
-In-Reply-To: <NtHhf_6--3-9@lynne.ee>
-References: <Nt8pHPQ--B-9@lynne.ee> <ZfhLUb_b_szay3GG@strlen.de>
-	 <NtHhf_6--3-9@lynne.ee>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        Thu, 21 Mar 2024 03:34:53 -0700 (PDT)
+Date: Thu, 21 Mar 2024 13:34:48 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	Kees Cook <keescook@chromium.org>,
+	David Laight <David.Laight@aculab.com>,
+	"Czapnik, Lukasz" <lukasz.czapnik@intel.com>
+Subject: Re: [PATCH net] ice: Fix freeing uninitialized pointers
+Message-ID: <22ba28d7-e8ed-4b5a-9b6f-42d944d2f67d@moroto.mountain>
+References: <77145930-e3df-4e77-a22d-04851cf3a426@moroto.mountain>
+ <20240319124317.3c3f16cd@kernel.org>
+ <facf5615-d7ac-4167-b23c-6bab7c123138@moroto.mountain>
+ <20240320202916.2f2bda73@kernel.org>
+ <6266c75a-c02a-431f-a4f2-43b51586ffb4@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <6266c75a-c02a-431f-a4f2-43b51586ffb4@intel.com>
 
-On Mon, 2024-03-18 at 18:58 +0100, Lynne wrote:
-> Mar 18, 2024, 14:18 by fw@strlen.de:
->=20
-> > Lynne <dev@lynne.ee> wrote:
-> >=20
-> > > UDP-Lite was scheduled to be removed in 2025 in commit
-> > > be28c14ac8bbe1ff due to a lack of real-world users, and
-> > > a long-outstanding security bug being left undiscovered.
-> > >=20
-> > > I would like to open a discussion to perhaps either avoid this,
-> > > or delay it, conditionally.
-> > >=20
-> >=20
-> > Is there any evidence UDP-Lite works in practice?
-> >=20
-> > I am not aware of any HW that will peek into L3/L4 payload to figure ou=
-t
-> > that the 'udplite' payload should be passed up even though it has bad c=
-sum.
-> >=20
-> > So, AFAIU L2 FCS/CRC essentially renders entire 'partial csum' premise =
-moot,
-> > stack will never receive udplite frames that are damaged.
-> >=20
-> > Did things change?
-> >=20
->=20
-> I do somehow get CRC errors past the Ethernet layer on consumer rtl cards=
-,
-> by default, with no ethtool changes, so maybe things did change.
->=20
-> I haven't sacrificed a good cable yet to get a definitive proof.
-> The cargo-culted way to be sure is to enable rx-all.
+On Thu, Mar 21, 2024 at 10:59:42AM +0100, Przemek Kitszel wrote:
+> Simplest solution would be to add a macro wrapper, especially that there
+> are only a few deallocation methods.
+> 
+> in cleanup.h:
+> +#define auto_kfree __free(kfree) = NULL
+> 
+> and similar macros for auto vfree(), etc.
+> 
+> then in the drivers:
+> -struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) = NULL,
+> 				  *othercaps __free(kfree) = NULL;
+> +struct ice_aqc_get_phy_caps_data *pcaps auto_kfree,
+> 				  *othercaps auto_kfree;
 
-I did not consider the mac-level csum - thanks Florian for bringing
-that up.
+The auto_kfree looks like a variable to my eyes.  I'd prefer something
+like:
 
-Yes, you can disable FCS checking on the local host - for some NIC at
-least - and AFAIK that is the only way to receive csum corrupted
-packets.=C2=A0Delivery packets with bad FCS without F_RXALL set would be a
-bug.
+#define __FREE(p) p __free(kfree) = NULL
 
-And you need to set F_RXALL on all the intermediate hops.
+	struct ice_aqc_get_phy_caps_data *__FREE(pcaps);
 
-All in all, the use-case looks very thin at best.
-
-In any case, to  step-in to maintain a specific protocol you should
-start first contributing. I *guess* a reasonable good start would be
-implementing UDP-lite selftests.
-
-Cheers,
-
-Paolo
-
+regards,
+dan carpenter
 
 
