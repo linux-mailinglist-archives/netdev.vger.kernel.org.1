@@ -1,104 +1,91 @@
-Return-Path: <netdev+bounces-81014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B97C885859
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:29:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A8EB88585B
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:30:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA9EF282FF1
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:29:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA1992831C5
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:30:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC63C58AA8;
-	Thu, 21 Mar 2024 11:29:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40C9F58AA6;
+	Thu, 21 Mar 2024 11:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="c3AQ44u9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q4B0LIMh"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 209EA5821C;
-	Thu, 21 Mar 2024 11:29:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1979458129;
+	Thu, 21 Mar 2024 11:30:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711020589; cv=none; b=eyHVcC3VnFbGwHCulKJBkOW2QgjhMAbk05c7/2VWNIqEYv1pQKhtlQW29xr294nzOl4NVejmt6dl7xIuOumYrWAvWysDQxjh3h5FRbfzifi8PBlIHUMmLuTaFQh6TXLFQXxKn6zwhsENa/clWe6Q2DUWUGtrEc9ndy6yumGvdHI=
+	t=1711020628; cv=none; b=XL/HjjexM7AYNY82nlLo8+6HUoTVJAr9S+skXE6zYJLJqMCxpR9LaUOpG5gSBhZuzNZNoNTLYK25GCYO0vufP2U2kIMaXX758gSqU/DPquQP5FvnOQ6F3fKnkPbr8a0+I6ZOAoofaqJZKXXehrZ8OL3XpTMyIzWNUIbzVVA5W6Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711020589; c=relaxed/simple;
-	bh=ksSyNW0wNrkEBNSoVV67M2aOFO6/uzRBSWFIG87WRmU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=EN5cbKmnVKB3Q6TK5OImOFEFbYC/c3LjWGM+zMB5X6tBYbnZ3Ee2kq41DkleIkOTyxg95Gsd7JqA17dHdxNZqDDxJWPe9Pa7zU6eCcRrb0Y9oZBheOFBDRq9hSwiq+pfYsDa8Us0P8zOCQzgXOVWW5bibi1lUzfCDyzKPLa4vHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=c3AQ44u9; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B4CA11C0005;
-	Thu, 21 Mar 2024 11:29:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com; s=gm1;
-	t=1711020585;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yeLG59GiMIC7TpDQreGN4Aqa0n5VIMq4qD3CPUv15rQ=;
-	b=c3AQ44u9VSNtVM9V18+m1ULhvTv/RSHzhf10eB/a8aBI7AJ54a9jcW7KiHA1INt545vWu9
-	mFu9f1WZImT+SmLgniWC6K9MSNK7xKSiFVG85tmKts/qFnOpc6hQ89w7bz6eVg6hr7w1io
-	i8jTOtYtZAgidSmML778xymJ15qWecwmqTc46ZMcOuzjsFHl56FoDXuqNUrf7geO60LRLQ
-	XttjEBy95jFqiVwpSzUtTvjhTRnPRhK79DgOIgFpvkCg1fx5tJKjmvR/ttswS1tfoRmilP
-	ApljAwD+kcDtte5h244c0O+3UqLM8kvIjZqr/vWhgD3Me/D6y/CGFY+LEXjJzw==
-Message-ID: <7a7e6c46-03a4-48eb-9f46-84a05259cf26@arinc9.com>
-Date: Thu, 21 Mar 2024 14:29:19 +0300
+	s=arc-20240116; t=1711020628; c=relaxed/simple;
+	bh=/zDXgs/8yJDitqcsFp4hXCsj5PMMuUopeXf++m5GMU0=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=GGBI+wE15RCJ23qbwHQN4GoIaed0ythqhLsGjb83OM3TV35EI+hHo8q9ta9O2pBAtjy4BGx7vaq5KFLW2RJ5ydw7e+8FBSDt1l+1+0bYhYnM6hwjGJNJw2m6jv6iCMmbCv4gUhdaNQvFmxydeYsNrBVHBb3fuMHY7rgh5x9XFP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q4B0LIMh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 937B1C43390;
+	Thu, 21 Mar 2024 11:30:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711020627;
+	bh=/zDXgs/8yJDitqcsFp4hXCsj5PMMuUopeXf++m5GMU0=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=q4B0LIMhyzJgS+/kvNkHnVlv4Z0U9BR06AwFv938/Jo0OpA579tgi57io0vP1IFQz
+	 txxnjruOQJsQaqImeQdFWrkD1eZ9ahK64CkUjwkoe/GgcVmw9EwALs+PVQx4M4lc3U
+	 D62Kq5rUgXmK9qPxvZA7tpX64uim4Uo57ZuaZLmx0JhPTG2M/DuyNaDORHzVuFcwQ9
+	 DACcKDoIFSx9UwgPFxccQtlL5lbKJWlZ1POA4UrmgXMxJ/gzmKhsJ3EoGODBzmysFM
+	 2PIuu12LhYnsgOc1/3MOq5X3oLo+xwEEKx6qGsxgqVDg+aDR54JIQVA7C1AZptOGE+
+	 WVEUUklb+g7mg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7FC7ED95060;
+	Thu, 21 Mar 2024 11:30:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 0/2] MT7530 DSA subdriver fix VLAN egress and
- handling of all link-local frames
-To: Paolo Abeni <pabeni@redhat.com>, Daniel Golle <daniel@makrotopia.org>,
- DENG Qingfang <dqfext@gmail.com>, Sean Wang <sean.wang@mediatek.com>,
- Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: Frank Wunderlich <frank-w@public-files.de>,
- Bartel Eerdekens <bartel.eerdekens@constell8.be>, mithat.guner@xeront.com,
- erkin.bozoglu@xeront.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-mediatek@lists.infradead.org
-References: <20240314-b4-for-net-mt7530-fix-link-local-vlan-v2-0-7dbcf6429ba0@arinc9.com>
- <f6f064b8-efb2-4ab0-94f1-468d5d273d6e@arinc9.com>
- <49d23df1340f342822702de0439674ddbc5bff6f.camel@redhat.com>
-Content-Language: en-US
-From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
-In-Reply-To: <49d23df1340f342822702de0439674ddbc5bff6f.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Flag: yes
-X-Spam-Level: **************************
-X-GND-Spam-Score: 400
-X-GND-Status: SPAM
-X-GND-Sasl: arinc.unal@arinc9.com
+Subject: Re: [PATCH net] MAINTAINERS: step down as netfilter maintainer
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171102062751.7572.15636806653890056442.git-patchwork-notify@kernel.org>
+Date: Thu, 21 Mar 2024 11:30:27 +0000
+References: <20240319121223.24474-1-fw@strlen.de>
+In-Reply-To: <20240319121223.24474-1-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ pablo@netfilter.org
 
-On 21.03.2024 14:18, Paolo Abeni wrote:
-> On Wed, 2024-03-20 at 19:41 +0300, Arınç ÜNAL wrote:
->> On 14.03.2024 12:33, Arınç ÜNAL via B4 Relay wrote:
->>> Hi.
->>>
->>> This patch series fixes the VLAN tag egress procedure for link-local
->>> frames, and fixes handling of all link-local frames.
->>>
->>> Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Tue, 19 Mar 2024 13:11:54 +0100 you wrote:
+> I do not feel that I'm up to the task anymore.
 > 
-> For future memory: I think the SoB in the cover letter is not required,
-> and is, at least to me, a bit confusing.
+> I hope this to be a temporary emergeny measure, but for now I'm sure this
+> is the best course of action for me.
 > 
-> No action needed here, I'll keep this unmodified, but I suggest to omit
-> it in future submission.
+> Signed-off-by: Florian Westphal <fw@strlen.de>
+> 
+> [...]
 
-b4 puts it on the cover letter so it's not my doing.
+Here is the summary with links:
+  - [net] MAINTAINERS: step down as netfilter maintainer
+    https://git.kernel.org/netdev/net/c/b5048d27872a
 
-Arınç
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
