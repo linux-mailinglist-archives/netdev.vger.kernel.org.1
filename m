@@ -1,120 +1,96 @@
-Return-Path: <netdev+bounces-80920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BB14881AD0
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 03:00:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B599881AD3
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 03:02:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 50D381F21D8E
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 02:00:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0FD391F21B19
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 02:02:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D23B1FA2;
-	Thu, 21 Mar 2024 02:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A7F0A23;
+	Thu, 21 Mar 2024 02:02:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O5/rSQvf"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7405F187F;
-	Thu, 21 Mar 2024 02:00:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14EB420E6
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 02:02:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710986448; cv=none; b=Qm1UJ0Rom42ZNaAniVlcVlP47wGDLhJi5B3VlWbrJgLMRGb881FiyUaSm5kyKZJW4sLmfX6uy3Q0LLpKCwx8ycacGSGEJObjMFjJz5RF8fS1z3CkaVdKPLIt93QqFEFXBLYr9OIigJOztff59RKdvth+e5qX5/Gw8gJl4Wyidf0=
+	t=1710986538; cv=none; b=uCEcJR+x0ww+Iy6B5jWu8Q8cllsbCgCB3M8cI6uxuTbezYI/nvk97jq3k3UItwZRtvGcxRTEb7OPkQO2QSaNo2do7sfAB9G56SsJ8TmmDxGYW+FSjUfIyefi3xGbGRUsnBIIOEIWWtch7K98HcQ+UyuYl1KqvCWUZkXFMy2YAaA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710986448; c=relaxed/simple;
-	bh=4XNZOZhuU588jqDg6qXSd3S65FNa9UbFKh0DmUDjSXc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=QCMuMGS1+8yYzXKvbrEIl8bJcFHl8WY2a+eywxYaQCPnoKKpoPGCX+CMWIAlxmVSN/YDvi8AVNciO27A5BjLezg2vDyyYPWyaMyzZdLdg7kOjq4g4MHFIuqp8LP6cFICSxwZqw9/c3cTx7WxDjq3Jwzwr5489nEiXBGn5+6M0X4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4V0TBL2QRLz2BgLp;
-	Thu, 21 Mar 2024 09:58:02 +0800 (CST)
-Received: from kwepemd100012.china.huawei.com (unknown [7.221.188.214])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4F6541A016C;
-	Thu, 21 Mar 2024 10:00:36 +0800 (CST)
-Received: from [10.67.111.192] (10.67.111.192) by
- kwepemd100012.china.huawei.com (7.221.188.214) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 21 Mar 2024 10:00:35 +0800
-Message-ID: <0c011cbb-0528-40de-8037-6a76120014fe@huawei.com>
-Date: Thu, 21 Mar 2024 10:00:35 +0800
+	s=arc-20240116; t=1710986538; c=relaxed/simple;
+	bh=dfxDnNU2G7fZmZ5Uv283tT0oWFLycNamh5QEPp08OLs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qUgNw5PzetbVVGN+AyJnwa/4nm2Gc44C5f01aCCiO5zSYO27wh4dtVLphSa+K+UJhlrnxnsR4xhC32lWtkURQypfV/rJOxyD2rp/kHQ+cYVSnjK5QvdOko+QQVO+Um3JdV0SjAqCFb7/ojmhcHLtQ4Ioc3P0X/7bWj6qaTFAVhc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O5/rSQvf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 372FDC433F1;
+	Thu, 21 Mar 2024 02:02:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1710986537;
+	bh=dfxDnNU2G7fZmZ5Uv283tT0oWFLycNamh5QEPp08OLs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=O5/rSQvfrXaaCB7Nd/Fun0m+7tgLBe/NZn0/Ok/klGNDs7EytbY57DUzFn59t7wZX
+	 VXQUp+Bmzl/XFzJgszYbHQlARyGVj6+85XW2I5Rnkkf6hH21gCYnD0133lei6rmP1N
+	 5395vLSAtYt9Q/vTXuGPMSWkeQBsbg1X0hLvYZd3Xq+o9jVZIKVWyFZl898tKgSQVn
+	 9p8Fi08M0sunEII4ysddY+fGQhmlJy6y1aRzu0pAWZOkl4//16u0V5GeACM5FOVOhM
+	 Fv4oT6k/XozQK3yMVtIeZgsPJdh3pbIYrGsIn8kKhdNNEZkpMgv0jii2ckXIDsQCMs
+	 J+9EKhvTCDZVA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	sdf@google.com
+Subject: [PATCH net] tools: ynl: fix setting presence bits in simple nests
+Date: Wed, 20 Mar 2024 19:02:14 -0700
+Message-ID: <20240321020214.1250202-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next] arm64: bpf: zero upper bits after rev32
-Content-Language: en-US
-To: Xi Wang <xi.wang@gmail.com>, Artem Savkov <asavkov@redhat.com>
-CC: Catalin Marinas <catalin.marinas@arm.com>, Alexei Starovoitov
-	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
-	<andrii@kernel.org>, <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20240313140205.3191564-1-asavkov@redhat.com>
- <CAKU6vyZ1LOUtJz-XeQz8i8f9nyvN+TZxOMfEf6JP1Tfuwneiqw@mail.gmail.com>
-From: Xu Kuohai <xukuohai@huawei.com>
-In-Reply-To: <CAKU6vyZ1LOUtJz-XeQz8i8f9nyvN+TZxOMfEf6JP1Tfuwneiqw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemd100012.china.huawei.com (7.221.188.214)
 
-On 3/21/2024 12:15 AM, Xi Wang wrote:
-> On Wed, Mar 13, 2024 at 7:02 AM Artem Savkov <asavkov@redhat.com> wrote:
->> Commit d63903bbc30c7 ("arm64: bpf: fix endianness conversion bugs")
->> added upper bits zeroing to byteswap operations, but it assumes they
->> will be already zeroed after rev32, which is not the case on some
->> systems at least:
->>
->> [ 9757.262607] test_bpf: #312 BSWAP 16: 0x0123456789abcdef -> 0xefcd jited:1 8 PASS
->> [ 9757.264435] test_bpf: #313 BSWAP 32: 0x0123456789abcdef -> 0xefcdab89 jited:1 ret 1460850314 != -271733879 (0x5712ce8a != 0xefcdab89)FAIL (1 times)
->> [ 9757.266260] test_bpf: #314 BSWAP 64: 0x0123456789abcdef -> 0x67452301 jited:1 8 PASS
->> [ 9757.268000] test_bpf: #315 BSWAP 64: 0x0123456789abcdef >> 32 -> 0xefcdab89 jited:1 8 PASS
->> [ 9757.269686] test_bpf: #316 BSWAP 16: 0xfedcba9876543210 -> 0x1032 jited:1 8 PASS
->> [ 9757.271380] test_bpf: #317 BSWAP 32: 0xfedcba9876543210 -> 0x10325476 jited:1 ret -1460850316 != 271733878 (0xa8ed3174 != 0x10325476)FAIL (1 times)
->> [ 9757.273022] test_bpf: #318 BSWAP 64: 0xfedcba9876543210 -> 0x98badcfe jited:1 7 PASS
->> [ 9757.274721] test_bpf: #319 BSWAP 64: 0xfedcba9876543210 >> 32 -> 0x10325476 jited:1 9 PASS
->>
->> Fixes: d63903bbc30c7 ("arm64: bpf: fix endianness conversion bugs")
-> 
-> This tag is not right.  It's unlikely that the bug has been around for 9 years.
-> 
-> Maybe you meant 1104247f3f979 ("bpf, arm64: Support unconditional bswap")?
->
+When we set members of simple nested structures in requests
+we need to set "presence" bits for all the nesting layers
+below. This has nothing to do with the presence type of
+the last layer.
 
-Agree, thanks for pointing it out.
+Fixes: be5bea1cc0bf ("net: add basic C code generators for Netlink")
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+CC: sdf@google.com
+---
+ tools/net/ynl/ynl-gen-c.py | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
->> Signed-off-by: Artem Savkov <asavkov@redhat.com>
->> ---
->>   arch/arm64/net/bpf_jit_comp.c | 3 ++-
->>   1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/arch/arm64/net/bpf_jit_comp.c b/arch/arm64/net/bpf_jit_comp.c
->> index c5b461dda4385..e86e5ba74dca2 100644
->> --- a/arch/arm64/net/bpf_jit_comp.c
->> +++ b/arch/arm64/net/bpf_jit_comp.c
->> @@ -944,7 +944,8 @@ static int build_insn(const struct bpf_insn *insn, struct jit_ctx *ctx,
->>                          break;
->>                  case 32:
->>                          emit(A64_REV32(is64, dst, dst), ctx);
->> -                       /* upper 32 bits already cleared */
->> +                       /* zero-extend 32 bits into 64 bits */
->> +                       emit(A64_UXTW(is64, dst, dst), ctx);
-> 
-> The fix can pass the tests, but emitting an extra instruction is
-> unnecessary as the bug applies only to unconditional bswap.
-> 
->>                          break;
->>                  case 64:
->>                          emit(A64_REV64(dst, dst), ctx);
->> --
->> 2.44.0
->>
-> 
+diff --git a/tools/net/ynl/ynl-gen-c.py b/tools/net/ynl/ynl-gen-c.py
+index 6b7eb2d2aaf1..a451cbfbd781 100755
+--- a/tools/net/ynl/ynl-gen-c.py
++++ b/tools/net/ynl/ynl-gen-c.py
+@@ -228,8 +228,11 @@ from lib import SpecFamily, SpecAttrSet, SpecAttr, SpecOperation, SpecEnumSet, S
+         presence = ''
+         for i in range(0, len(ref)):
+             presence = f"{var}->{'.'.join(ref[:i] + [''])}_present.{ref[i]}"
+-            if self.presence_type() == 'bit':
+-                code.append(presence + ' = 1;')
++            # Every layer below last is a nest, so we know it uses bit presence
++            # last layer is "self" and may be a complex type
++            if i == len(ref) - 1 and self.presence_type() != 'bit':
++                continue
++            code.append(presence + ' = 1;')
+         code += self._setter_lines(ri, member, presence)
+ 
+         func_name = f"{op_prefix(ri, direction, deref=deref)}_set_{'_'.join(ref)}"
+-- 
+2.44.0
 
 
