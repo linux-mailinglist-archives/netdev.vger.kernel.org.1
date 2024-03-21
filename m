@@ -1,127 +1,124 @@
-Return-Path: <netdev+bounces-81136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B750B88617A
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 21:11:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3464F88618B
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 21:20:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E50291C21AE3
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 20:11:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 658601C21AAB
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 20:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E467E13443F;
-	Thu, 21 Mar 2024 20:11:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68DC9134CC2;
+	Thu, 21 Mar 2024 20:20:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="qTF7Ea2T";
-	dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b="RxMk2VDo"
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="b+iOeAwy"
 X-Original-To: netdev@vger.kernel.org
-Received: from domac.alu.hr (domac.alu.unizg.hr [161.53.235.3])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail3-relais-sop.national.inria.fr (mail3-relais-sop.national.inria.fr [192.134.164.104])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061E5134404;
-	Thu, 21 Mar 2024 20:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=161.53.235.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B9713442F;
+	Thu, 21 Mar 2024 20:20:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.104
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711051862; cv=none; b=eIc1J9fE5dPQtw1oK/kXtz+yFdnoDx4hvOmoESMf2JPk7HHzwL2UfOWn//8lED56HeSiYxDlIGHBQI9wPUlPI0ysbO3FJfWbTAt+B5E9cKa/zwasmY0LyVSEoZRQm7Ma42hcWnqc+Rkm5/Tzndtk6zLusMzRGQSy7EW/Y1G9S0M=
+	t=1711052428; cv=none; b=A0d2H9eMhfAb8eUHXEf7v0Z3aTndG+3QFrbF6QloFL63K6C6ctgzDO0VDxRHD+XjMTt730PBBLo8Qxcrb3hmRAJT7k8b9L3BVviMQ/vHPX9qFOKviRdLmxHt56GuTnTbHMhcljsJZUxHQ1ggsEMLWLfY18ujOny0+Y/VGd0SgpQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711051862; c=relaxed/simple;
-	bh=QMqBRt3qEO8LJ5O3+VuzCT6Y+LAtdZG1pvlw1Zc6YBA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BmDDDIdm5A4TlQOM8rNGS4pgkxYhmTOSDQksbBEubAbpNW8hOiiyiy/cH417mpTJ/UuvDH0FHwBUxHkbOjlxyNI4VAXhqNHRHy4tjNrunZsvo2XouL60DPqUNQTuZanFAhw+GtZ9kG1e1pWTkiGkM97+nunmOzKCG09jW6Ptyhw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alu.unizg.hr; spf=pass smtp.mailfrom=alu.unizg.hr; dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b=qTF7Ea2T; dkim=pass (2048-bit key) header.d=alu.unizg.hr header.i=@alu.unizg.hr header.b=RxMk2VDo; arc=none smtp.client-ip=161.53.235.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=alu.unizg.hr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alu.unizg.hr
-Received: from localhost (localhost [127.0.0.1])
-	by domac.alu.hr (Postfix) with ESMTP id 70F4960171;
-	Thu, 21 Mar 2024 21:10:54 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1711051854; bh=QMqBRt3qEO8LJ5O3+VuzCT6Y+LAtdZG1pvlw1Zc6YBA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=qTF7Ea2TZj0ZR8M2xBt59oIED5u0OnJ/1jaw5qjQRHg3LP1xsTyIB4JpgUYbxudhH
-	 vWmK6PLGMXi51V42xlytWBA0fxo0sG4arD2zEG1tw2iCeVz5yAT4f4lSlthFX6aDUP
-	 YDxdyDzHGn7Og/1WmcXoBuPlfOvcJkt8s0KffU6ux7qoOyE0ocqnWJcIZ9QqYgDrHX
-	 sVy/CLwTOVgaHqt3naiaaWqr9LRn1Ugvw43aCP37rotI1GZKM3vPXWeVZv+voeA4Od
-	 ackSVpmdxiMY5pDDGTAUB2TRxkH85euvzgvrVcBQL/Xpa3wqctFyViG1SwE5FwHMh2
-	 IfzkJ2Q8a2lFA==
-X-Virus-Scanned: Debian amavisd-new at domac.alu.hr
-Received: from domac.alu.hr ([127.0.0.1])
-	by localhost (domac.alu.hr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id pS2AF6Qr0691; Thu, 21 Mar 2024 21:10:44 +0100 (CET)
-Received: from [192.168.178.20] (dh207-43-75.xnet.hr [88.207.43.75])
-	by domac.alu.hr (Postfix) with ESMTPSA id 2802160177;
-	Thu, 21 Mar 2024 21:10:43 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=alu.unizg.hr; s=mail;
-	t=1711051843; bh=QMqBRt3qEO8LJ5O3+VuzCT6Y+LAtdZG1pvlw1Zc6YBA=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=RxMk2VDoS1Xe2p92oLh6nE2faWGkoGYE06lNsWwrBA9RiIjQN5uxdrP9N21zyc10J
-	 KBo9E0kdJjNTQArZ/tIyDjkkofaRua/M+cK7wqURk+tfrnRO6qWwDNqM2wQhAEvtSI
-	 JQyzIIP45dN2KyRypxycHoy4Cvgn0QDxzdztrF7lYmq4+g3ORtH7k6UeUcCdGmFBPA
-	 P5m61aG1Rh40p1OzAy+XcHlzg0IUmU1Qck8qlkh0oymRiSwAR81BD8cju9HPIhSbXa
-	 QSd1RBtHxlaLukwPb+JQ9DFTSrtw5JcQQZpYBONN1rAYnj5p+1AqmivFSQ2gfhHSoe
-	 r7tC1vpJO2p9Q==
-Message-ID: <a2bfb669-e201-44eb-9a16-38c671e8ef00@alu.unizg.hr>
-Date: Thu, 21 Mar 2024 21:10:42 +0100
+	s=arc-20240116; t=1711052428; c=relaxed/simple;
+	bh=eFrHAh7BJNnqflbNawWUWzv1wOsF6n2g6fArJ0mZMlY=;
+	h=Content-Type:From:Mime-Version:Subject:Date:Message-Id:References:
+	 Cc:In-Reply-To:To; b=HBuwUnTrq3NSZ94qAPalJo5/CNSkP/oI/pKXuO/RYwWMz9qZJ+4xcaj/FjiEFWbcyun92kpixYHkX1raOVTB0G/7Ve3ieg/ArHWQZfTRT+aHMw0oPfyLjjuhI9o8wlPvZhedkJqbrI/h2gS/s8Ag9lil8LRxXMyFuqtU+Cg0cRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=b+iOeAwy; arc=none smtp.client-ip=192.134.164.104
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=inria.fr; s=dc;
+  h=content-transfer-encoding:from:mime-version:subject:date:
+   message-id:references:cc:in-reply-to:to;
+  bh=eFrHAh7BJNnqflbNawWUWzv1wOsF6n2g6fArJ0mZMlY=;
+  b=b+iOeAwyum6sXPaLJdb+fWcvioaIay6A5QdvQAH59gWJUsmGC9jNdIvf
+   /ahM63HH30yJBWqhsW2vS2WPc5h/9lkl9FlcxgEizgMNTAwfqQZw4FHWI
+   d57CFM4Nc+XCYjiqBF+Y6RbCzR99H+QXO1yy2H4bghO54mhDp3Cik0xCj
+   0=;
+Authentication-Results: mail3-relais-sop.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="6.07,143,1708383600"; 
+   d="scan'208";a="82803127"
+Received: from 184-074-243-067.biz.spectrum.com (HELO smtpclient.apple) ([184.74.243.67])
+  by mail3-relais-sop.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 21:20:12 +0100
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+From: Julia Lawall <Julia.Lawall@inria.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [BUG] selftests/net: test_vxlan_mdb.sh: 84 out of 642 tests
- [FAIL]
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <5bb50349-196d-4892-8ed2-f37543aa863f@alu.unizg.hr>
- <Zfe2cGv_EWFAZXAJ@Laptop-X1>
- <f005453c-c7cf-4e1d-b266-ffe1cf8fc79e@alu.unizg.hr>
- <ZfmgdVUmy-DgNklu@shredder>
- <87634afb-d14b-42ce-be25-1000591ee57c@alu.unizg.hr>
- <ZfrB7hATyOcl4RSy@shredder>
-Content-Language: en-US
-From: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-In-Reply-To: <ZfrB7hATyOcl4RSy@shredder>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0 (1.0)
+Subject: Re: [PATCH net] ice: Fix freeing uninitialized pointers
+Date: Thu, 21 Mar 2024 16:20:09 -0400
+Message-Id: <F2FBADE8-EDF9-4987-A97B-CF4D2D1452E0@inria.fr>
+References: <e5172afb-427b-423e-877a-10352cf4a007@web.de>
+Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>, kernel-janitors@vger.kernel.org,
+ netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ LKML <linux-kernel@vger.kernel.org>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ David Laight <David.Laight@aculab.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Jiri Pirko <jiri@resnulli.us>, Jonathan Cameron <jic23@kernel.org>,
+ Kees Cook <keescook@chromium.org>,
+ Lukasz Czapnik <lukasz.czapnik@intel.com>, Paolo Abeni <pabeni@redhat.com>,
+ Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+In-Reply-To: <e5172afb-427b-423e-877a-10352cf4a007@web.de>
+To: Markus Elfring <Markus.Elfring@web.de>
+X-Mailer: iPhone Mail (19H384)
+
+Does one prefer an initialization of null at the top of the function or an i=
+nitialization to a meaningful value in the middle of the function ?
+
+(Sorry for top posting)
 
 
+Sent from my iPhone
 
-On 3/20/24 12:01, Ido Schimmel wrote:
-> On Wed, Mar 20, 2024 at 01:47:36AM +0100, Mirsad Todorovac wrote:
->> On 3/19/24 15:25, Ido Schimmel wrote:
->>> Will look into it today or later this week.
->>
->> Thank you for considering this.
-> 
-> Can you please try the following patch?
-> 
-> https://github.com/idosch/linux/commit/58f25dd8766dbe9ac50c76b44f9ba92350ebb5c6.patch
+> On 21 Mar 2024, at 14:14, Markus Elfring <Markus.Elfring@web.de> wrote:
+>=20
+> =EF=BB=BF
+>>=20
+>>> How do you think about to reduce the scope for the affected local variab=
+le instead
+>>> with the help of a small script (like the following) for the semantic pa=
+tch language?
+>>>=20
+>>> @movement@
+>>> attribute name __free;
+>>> @@
+>>> -u8 *tx_frame __free(kfree);
+>>> int i;
+>>> ... when any
+>>> if (ice_fltr_add_mac(test_vsi, ...))
+>>> { ... }
+>>> +
+>>> +{
+>>> +u8 *tx_frame __free(kfree) =3D NULL;
+>>> if (ice_lbtest_create_frame(pf, &tx_frame, ...))
+>>> { ... }
+>>> ... when any
+>>> +}
+>>> +
+>>> valid_frames =3D ice_lbtest_receive_frames(...);
+>>=20
+>> I believe you don't understand what the scope of the above can be.
+>=20
+> Will the understanding improve for the proposed source code transformation=
+?
+>=20
+> Regards,
+> Markus
 
-Congratulations, apparently, your patch had fixed them all:
-
-# TEST: Torture test                                                  [ OK ]
-#
-# Data path: MDB torture test - IPv6 overlay / IPv6 underlay
-# ----------------------------------------------------------
-# TEST: Torture test                                                  [ OK ]
-#
-# Tests passed: 642
-# Tests failed:   0
-ok 90 selftests: net: test_vxlan_mdb.sh
-
-Please consider adding:
-
-Tested-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-
-at your convenience.
-
-Shalom, and have a great evening!
-
-Best regards,
-Mirsad Todorovac
 
