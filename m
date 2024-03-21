@@ -1,123 +1,127 @@
-Return-Path: <netdev+bounces-81040-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81041-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8430688590C
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:25:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F54188590F
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:26:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B081E1C21185
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:25:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E2CF1C21909
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:26:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0CC876038;
-	Thu, 21 Mar 2024 12:25:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9486762E6;
+	Thu, 21 Mar 2024 12:26:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="sft0ykV+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dJNkMPoy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 877CB5A4D4
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 12:25:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10489757F7
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 12:26:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711023955; cv=none; b=njBESFXVfWsfob/D33CksuRMWfcli0UDZsCK9q7FXC4PlUQwXBN8GJoHMe1KQAAHU29SLm9OMLsZuARgl27STq0DaWkk3CVMmoMBYMluVDbqtMVANRvChHwGBI6yneHNy0BlfkbMArohELwjJpl3Gppy21caaljJrOwP7uffRBM=
+	t=1711023977; cv=none; b=Cn7At2nD4SLSHDwYo5r8nS2gNr1GZYWUqsSlnlCS7T4dXvyDRMs/+spFT89ydxAw9HV0QbcUCsIodtj7vrfY0VAaDmNAxuj+vKoXOHI/RC2ChjREGQabP2584vucGMJxQ7QSS5jd3h9GKMhkkbdpWu4AUHFHUAbobnIBO5qTmJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711023955; c=relaxed/simple;
-	bh=f0UFDOliM0/oFqbShrqNpo9zCLLTLt/hpgBvhtyDe20=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LGby/dAjnWZwfnmUN97K/PoMgYxLJWeJbE8mwWvpobzsy1JKwFgWGKn+Wfq51wDsPzMB2ZQ3tZT/qjwf7ghM0T+u32xaoLP1piCilPLT4mizPiOBPpjsnmyGfdCTYExN14oKZh24J5U2LvQfdIcfcFWEcAngsy8sK2hVp8PxBHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=sft0ykV+; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-33ececeb19eso480811f8f.3
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 05:25:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1711023952; x=1711628752; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=m56XLFlbHMb5W7WCW5wQ6I/h2Kkdc9w2hy23AT0x+8w=;
-        b=sft0ykV+UrAfrPgr79cd80zj73jXjxyorNdZgOvu3AVF1TEcM6ls5QF2r2koABIUuY
-         cp8VcWo43NwpgZGuMiWXZGcieTkyoISFRQfCD6PPVYL54AcoS9MfPDf/LIe/LFzAFyhI
-         W74w+NtDy2s9h/UDR7fY7d0rPPK6NJX+Elrj2bLzowrQ1AYcNZa9S3+fzPTluNOIEgbq
-         18sU0BlfYM0uIa3yquTlDwpf4u3YJu0Um8EiU6V8Il4g2kp0fzp4UxLdwSvxTsyh9R82
-         1yTP+ffIGD6yIZOBUcUABPjZoQn/7T7bimRgJ2t3wQ6euX0gIWRL66wTBun1zv8QNqO0
-         18Xw==
+	s=arc-20240116; t=1711023977; c=relaxed/simple;
+	bh=asNxUABtcbFsSQGHR2XvI5++jNl/Wy6Tq921v8Lu2V4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=tA9F4D6w16N0zzEWTDRChJ1/cdMhKxU7KSCLGhnDlf76hOqlaXkwLqC4kR8BHHB1EUtaq/lAzmVA+wYxgbgw5pgltPmAXS+7I417pkES9yvyp+lIDZPL1m53gDKEkSN6xfbiQtGxb27aGnP1qgsnkls9P9Om/NHTxsqiQbtXe+w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dJNkMPoy; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711023974;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=asNxUABtcbFsSQGHR2XvI5++jNl/Wy6Tq921v8Lu2V4=;
+	b=dJNkMPoy2wq7DqQnbUHLKl+vbeE2SbKedGBw7kkVoalyxwTx4w6pQFO5TjkYyoXAj1Y6g/
+	wMZm1xM7yc0AMaDHxoF8Vhvni1/dJlV4zZqDgoQH6GQ3HL2aQtYYrRJqc7RajkYi0rwvsQ
+	YjShggqgFhn5P/OmTbw94IrnjHgJyvU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-357-oKQrMTdiPvaDLr-w0wu-rw-1; Thu, 21 Mar 2024 08:26:12 -0400
+X-MC-Unique: oKQrMTdiPvaDLr-w0wu-rw-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-41472b798a2so1809555e9.1
+        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 05:26:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711023952; x=1711628752;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=m56XLFlbHMb5W7WCW5wQ6I/h2Kkdc9w2hy23AT0x+8w=;
-        b=BiXMDGTf960xHgzuTFDvGLQEU13+w6tAlEfGtP4The45HTxrJ5c5QrJHI6mETVFclX
-         WzeexBfEbDhUt+sGMOSJiB8PX1azv57DUxmslZ7HWLNoNFajdbW76ZpXcpHHvm+qgfq/
-         bgN6W8x+aMN+JyP3MhPBhgK88/gvj6/Ui2/nAE/znQ4YowdESo6jm4WLce7oPSHHAr0w
-         3CleGMxu46kh5N8ktWghNl/ri+ccW612zNVOWqkU8jv1X2F4gzfmqDGFU3AW/b+jTC76
-         UzS+vphKLwFZV8t/W6kP2LiFZ0jn2cfiZSCCyvC/gLn5iRqKPhJmHavexV4Mfw2T7yj0
-         DoVg==
-X-Gm-Message-State: AOJu0YxHYLF282W13DW78Oa/xeuwONsQcr8ApHLXo90up7oJANZKCczK
-	Rj4YsWGKehD0/i50Xt/dedG/R16L2ck8dHxla72jLN33OzxHqabIAmE/ozJLIOQ=
-X-Google-Smtp-Source: AGHT+IGhXuA9mSb9k6iVMD5LLd452Lwv0mOTj1BFgjLiBJYBANZoXhSViPIyKUvXNEgYKATgMq1kHQ==
-X-Received: by 2002:a5d:4483:0:b0:33e:7650:58b4 with SMTP id j3-20020a5d4483000000b0033e765058b4mr1434697wrq.27.1711023951565;
-        Thu, 21 Mar 2024 05:25:51 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id q2-20020a05600000c200b0033dedd63382sm17012019wrx.101.2024.03.21.05.25.50
+        d=1e100.net; s=20230601; t=1711023971; x=1711628771;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=asNxUABtcbFsSQGHR2XvI5++jNl/Wy6Tq921v8Lu2V4=;
+        b=iq6Df2le+mdGRttk5F5XL8QgL4MozNyb23CqxX6dXu86I0iF0r0e2+sajoxazXF5OY
+         ME0KoCV+1sJYOeGrp3Dh2z5suIHyxdfh0tZMD0oqU361CDjY/qaEy10aoOyg8Zwl/dCd
+         WoudlbZYn5b+9Htx5sbqAXvlJwD65rFOCmpbpRQRhsm+1fqnCw1/Acnat7WKMQuipx3i
+         wqiFMlh298uTs/OZoQsv2+pGd4TYIJyjFwwRxBbU6tX/demIXg86DKx8d64spkV60ixn
+         bxvmYRLSSqRlCrETn6KoWjOtbBzNGFcBNLVYDxeBBspGdzN5WF4E/W4N+8UGjJtCe8CA
+         9PNQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXkzhwxCgyFH+d+E5TxZK978oo4M+pxRXtwjQW0HGx7iQUpUXINug1Vu9cKvdOhTHiqtq3773444Af4oDwEyxgyPeqZIznG
+X-Gm-Message-State: AOJu0Yzo6C4SBl7XFxC8sPg0AvtZOHaTH+pUDyYzbJkbJOpKWWn7lpJE
+	lp+kU4K3KdN7EG5QJ/B1qRCPwosQkQEAXifVe3UiBjMNju6deWz+N2ggd2y3otlXLQmTsQhxdeY
+	7fxmlv/jpPxMvtk/QR7gUc3GeD6t2dCXa++ttmSNxf3i6SDrpY+/CKw==
+X-Received: by 2002:a05:600c:1c9b:b0:414:2894:d446 with SMTP id k27-20020a05600c1c9b00b004142894d446mr7311191wms.4.1711023971578;
+        Thu, 21 Mar 2024 05:26:11 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFhW9N0wGR4j4LK7zUT4IVCd+OqZVL12rVrnpPybi9dFVPkppnj+DbNdmr3/iz5olOs5kyeyQ==
+X-Received: by 2002:a05:600c:1c9b:b0:414:2894:d446 with SMTP id k27-20020a05600c1c9b00b004142894d446mr7311170wms.4.1711023971209;
+        Thu, 21 Mar 2024 05:26:11 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-249-130.dyn.eolo.it. [146.241.249.130])
+        by smtp.gmail.com with ESMTPSA id fs7-20020a05600c3f8700b00414038162e1sm5334655wmb.23.2024.03.21.05.26.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Mar 2024 05:25:50 -0700 (PDT)
-Date: Thu, 21 Mar 2024 13:25:47 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
-	Jason Wang <jasowang@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH 0/2] virtio-net: a fix and some updates for virtio dim
-Message-ID: <ZfwnSz5vP4KzXNxa@nanopsycho>
-References: <1711021557-58116-1-git-send-email-hengqi@linux.alibaba.com>
+        Thu, 21 Mar 2024 05:26:10 -0700 (PDT)
+Message-ID: <8edda7aa8ff27cee1b3fa60421734e508d319481.camel@redhat.com>
+Subject: Re: [PATCH net v3] dpaa_eth: fix XDP queue index
+From: Paolo Abeni <pabeni@redhat.com>
+To: David Gouarin <dgouarin@gmail.com>
+Cc: david.gouarin@thalesgroup.com, Madalin Bucur <madalin.bucur@nxp.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,  Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Camelia Groza <camelia.groza@nxp.com>, Maciej
+ Fijalkowski <maciej.fijalkowski@intel.com>,  netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Date: Thu, 21 Mar 2024 13:26:09 +0100
+In-Reply-To: <20240320112519.5311-1-dgouarin@gmail.com>
+References: <ZenidKFF/gQefijz@boxer>
+	 <20240320112519.5311-1-dgouarin@gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1711021557-58116-1-git-send-email-hengqi@linux.alibaba.com>
 
-Thu, Mar 21, 2024 at 12:45:55PM CET, hengqi@linux.alibaba.com wrote:
->Patch 1 fixes an existing bug. Belongs to the net branch.
+On Wed, 2024-03-20 at 12:25 +0100, David Gouarin wrote:
+> Make it possible to bind a XDP socket to a queue id.
+> The DPAA FQ Id was passed to the XDP program in the
+> xdp_rxq_info->queue_index instead of the Ethernet device queue number,
+> which made it unusable with bpf_map_redirect.
+> Instead of the DPAA FQ Id, initialise the XDP rx queue with the queue num=
+ber.
+>=20
+> Fixes: d57e57d0cd04 ("dpaa_eth: add XDP_TX support")
+>=20
+> Signed-off-by: David Gouarin <dgouarin@gmail.com>
 
-Send separately with "net" indication in the patch brackets:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html?highlight=network#tl-dr
+The patch LGTM, but you must avoid empty lines in after the 'Fixes'
+tag.
 
+Please have an accurate reading of the process documentation.
 
->Patch 2 attempts to modify the sending of dim cmds to an asynchronous way.
-Not a bugfix, then send separately with "net-next" indication. Net-next
-is currently closed, send it next week.
+Thanks,
 
+Paolo
 
->
->Heng Qi (2):
->  virtio-net: fix possible dim status unrecoverable
->  virtio-net: reduce the CPU consumption of dim worker
-
-The name of the driver is "virtio_net".
-
-
-
-pw-bot: cr
-
-
->
-> drivers/net/virtio_net.c | 273 ++++++++++++++++++++++++++++++++++++++++++-----
-> 1 file changed, 246 insertions(+), 27 deletions(-)
->
->-- 
->1.8.3.1
->
->
 
