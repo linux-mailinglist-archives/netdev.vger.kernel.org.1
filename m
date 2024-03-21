@@ -1,69 +1,57 @@
-Return-Path: <netdev+bounces-80931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0E30881B93
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 04:38:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4F52881B95
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 04:39:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4545FB2135D
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 03:38:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 404141F21D66
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 03:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36412B641;
-	Thu, 21 Mar 2024 03:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5C2DB64A;
+	Thu, 21 Mar 2024 03:39:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="feTiWOad"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WO0sjH0V"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074736FB9;
-	Thu, 21 Mar 2024 03:38:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BFE26D39;
+	Thu, 21 Mar 2024 03:39:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710992284; cv=none; b=VTCGkrpj3viDPaa8ZPfpF+199DauzLvJ/4Pw72rILFh3RFmYD2oivXOdDG2omhHXMLPqTLFBCtDBazWHp3k/inOPYFfUeSYS5USip0m4OUo4k3CPV4gLnPt9v1/7+K5e96XYRAvyMssOZYoo+N5JTUtJHYLTaZgujPY6Gf2vJYY=
+	t=1710992382; cv=none; b=U3OYtAYfOM107XsGUQeHlLUBiBgkGaSIGMg3+jKnaBXbO6CEFhq5Cz8+PDzzof2kQu4i5nuE9RkY1akdSR+l8rTA26YrMhq5vI3liFjAXTBEwAib1UDEvys/48sGhqbf+MkIT/hCbs7D9U10pFpS8CG+ThsVG6fSItCvCk9Vl0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710992284; c=relaxed/simple;
-	bh=Fas2GPcJqSFKc4TRosyOnXTJyUpVpqqdoA8FKsHNKkA=;
+	s=arc-20240116; t=1710992382; c=relaxed/simple;
+	bh=NgxJz8/GSPa4b2iJMDM324FgVNSenq+WPseRkTzNdB4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t2TgVwHavW4s4ObEbGTzLYgqhL6a06gNe6pYp5ef41Mz6/JCsNuFH7gIgad7q7LDIVVM9PKFNPJA4Kx6VwEEia0jn3KeHDvKtuUQ/Pzb2J7H1fDiC/g+9GA/wrOkKGmH8DQF/JIxwXXjcddCQ4JFpvZU8CvSDVXmdRLAwrDrhTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=feTiWOad; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F379C433C7;
-	Thu, 21 Mar 2024 03:38:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=cqQaSneZkvgQFkMsZbHVZumiosHNf+1WMsIDXNnu9XZgs7Bynsba7jUMujmxqaUVnMALEYEvRfKy487vbwmLjDlEgA7BsViPRQnAChfSpIv7ZgdEBBjCdwht3QcAa/1+oAK5/iVjK4QBbcsXZvbO7ZVLa4H9g5CFUiSy+9mqLaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WO0sjH0V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11CF7C433C7;
+	Thu, 21 Mar 2024 03:39:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1710992283;
-	bh=Fas2GPcJqSFKc4TRosyOnXTJyUpVpqqdoA8FKsHNKkA=;
+	s=k20201202; t=1710992382;
+	bh=NgxJz8/GSPa4b2iJMDM324FgVNSenq+WPseRkTzNdB4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=feTiWOadsvmjA6vBTMbtF62EasYWdZd9ARTvh9kiSSi9JdbveqtIHAiu8v9rJeaqF
-	 9c5GXMIaQvEl4WHgilK+lCphWPmlHADTKkWROZk/tLT9bYk8SXz8M8a9RvpGL+SLZk
-	 htGF3LJZhjDiHWNRO8WAFqyecAct5WO1VuZucheNZqRVWKg6Ve5dSbNSqUtSl34mNQ
-	 xH/gea+MYw+DQ3anCel4k5mim9kW5Sen4m1boLtrlBuFlwI0Rhw5C5pzdOYIi9fagh
-	 coJTutsn1kz9p2f+bsJTx5nBpg67du+EvjHc6o1dkM0MHOHAbZaL9iW3x3l6VoKEv1
-	 XRVQTvMKEVLxQ==
-Date: Wed, 20 Mar 2024 20:38:01 -0700
+	b=WO0sjH0Vx1fxUpvANddcEPbuwbR5R7WVdXvtLu7J4iz/mOoOWiC+YTwZuwFessUx4
+	 PMJvmYtGnczzaTFdpvkxHDBxAwKVVZvBHhRF75zU6HRytv27TUFrnCqCXy7dcAGsDf
+	 pNzE5k4bfBlJHk2U750GvZTwKOi1QR2YmU5m6XEb7wBjZE4MsEWaNC+pVQYQwjZWnA
+	 vcpeFizWoXOYHQpBFVeyhFHHIV30/KpJ/r1cCzQlKT5PxFf2KQ1Ol7bscPk9vX6Omi
+	 K6ifnJuMeqx0ICSc42T4L2tymHMIOFvi0t7iR/Pv94N9wqNh/JqdtPQMvpnqGxF/7+
+	 lzhe549sbEefA==
+Date: Wed, 20 Mar 2024 20:39:41 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, "David S.
- Miller" <davem@davemloft.net>, Eric  Dumazet <edumazet@google.com>,
- "Michael  S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Alexei  Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@google.com>,
- Amritha  Nambiar <amritha.nambiar@intel.com>, Larysa Zaremba
- <larysa.zaremba@intel.com>, Sridhar Samudrala
- <sridhar.samudrala@intel.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>, virtualization@lists.linux.dev,
- bpf@vger.kernel.org, Jiri Pirko <jiri@resnulli.us>
-Subject: Re: [PATCH net-next v5 0/9] virtio-net: support device stats
-Message-ID: <20240320203801.5950fb1d@kernel.org>
-In-Reply-To: <1710921861.9268863-1-xuanzhuo@linux.alibaba.com>
-References: <20240318110602.37166-1-xuanzhuo@linux.alibaba.com>
-	<Zfgq8k2Q-olYWiuw@nanopsycho>
-	<1710762818.1520293-1-xuanzhuo@linux.alibaba.com>
-	<ZfgxSug4sekWGyNd@nanopsycho>
-	<316ea06417279a45d2d54bf4cc4afd2d775b419a.camel@redhat.com>
-	<1710921861.9268863-1-xuanzhuo@linux.alibaba.com>
+To: Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ipv6: delay procfs initialization after the ipv6
+ structs are ready
+Message-ID: <20240320203941.70facba3@kernel.org>
+In-Reply-To: <20240320171858.2671-1-nicolas.cavallari@green-communications.fr>
+References: <20240320171858.2671-1-nicolas.cavallari@green-communications.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,18 +61,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 20 Mar 2024 16:04:21 +0800 Xuan Zhuo wrote:
-> I have a question regarding the workflow for feature discussions. If we
-> consistently engage in discussions about a particular feature, this may result
-> in the submission of multiple patch sets. In light of this, should we modify the
-> usage of "PATCH" or "RFC" in our submissions depending on whether the merge
-> window is open or closed? This causes the title of our patch sets to keep
-> changing.
+On Wed, 20 Mar 2024 18:17:36 +0100 Nicolas Cavallari wrote:
+> procfs files are created before the structure they reference are
+> initialized.  For example, if6_proc_init() creates procfs files that
+> access structures initialized by addrconf_init().
+> 
+> If ipv6 is compiled as a module and a program manages to open an ipv6
+> procfs file during the loading of the module, it can oops the kernel.
+> 
+> It appears that we were unlucky enough to reproduce this problem
+> multiple times already, out of maybe 100 boots:
 
-Is switching between RFC and PATCH causing issues?
-Should be a simple modification to the git format-patch argument.
-But perhaps your workload is different than mine.
-
-The merge window is only 2 weeks every 10 weeks, it's not changing
-often, I don't think.
+I haven't investigated too closely but looks like this breaks
+all selftests. Please run all net/forwarding selftests before
+posting v2?
 
