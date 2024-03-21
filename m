@@ -1,136 +1,118 @@
-Return-Path: <netdev+bounces-80945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4013B881C4C
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 07:04:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83F2D881C53
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 07:08:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 719A21C21098
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 06:04:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ACEC283BF6
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 06:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D687D39ACA;
-	Thu, 21 Mar 2024 06:02:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D8438F99;
+	Thu, 21 Mar 2024 06:08:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Zz093ayf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="joL1OcsK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2486B3A1C5
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 06:02:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2AB6FBF;
+	Thu, 21 Mar 2024 06:08:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711000951; cv=none; b=qWoJwUcG6IRmVpV/7R3RlgPJL8NZEwMKFb53+C4k4h60xBpzLO508EgHpYNGyYO/HURGjOKQOjKByQTSXz3j6whIQgYnpyg6J1EOD4rIcUHJoHy3Trv8DWAuFqhvHM4m+I21wyQ057DDamQ4emftGDrqA/LX7A4WM55x2TxlCK4=
+	t=1711001296; cv=none; b=GZn5pnSKomV04Me6BMyR4CpMWwOUiaCV9480yJN5Sr34eeyut/rP8vt7guAJTKmBXEmtm34ZBOVMl5eSpxmvxHXBLgHqDgH61KoWhM1goG028J+AxHOM6TmPr9jQ3Nk5k8AnqJO+diMC0qhi592I5TPoDWeJwMTJhN7pW32VztQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711000951; c=relaxed/simple;
-	bh=/XNaH2GsOU/WDny4Wlc5IeXExDMJDiR5r+yWcuxVMGA=;
+	s=arc-20240116; t=1711001296; c=relaxed/simple;
+	bh=Wea1fSqHpz3J/JBua4hd15llvV+QZuuLz+xrfQq/WvE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GQ8ky4lF0Hsg4bd/0J/EKNgTgI1nmUfZbNfnfUCH82eUPzYtf4gQiFW6nqoKJ0/HJXEigGqD4texX/BxXHHGIzly/E6lAwBiIOCbSD0fFmtXP3ToZWXXyz0fbUykLpoxqnhZauVnfVhs9JcQ/b+OWVOIfybpE0zqxr+swnIQQ2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Zz093ayf; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711000949;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=8vuicHnylxzGQDV+/ztVXw13jQ4DoAJlRs6KRNLC5Rs=;
-	b=Zz093ayfUUlwx88jSHSWf3vvzzcKyjuN5ZF49+fyB9mrla5A0mQuSn4hW+LfKN5N0z12vF
-	wS+J/aUb2BWEZA+8ZiyV9p1Iu+nYV8T+4VxPpyw1oZO5s2VgWXMgOall8qrYSOB+PqOgOl
-	V4Jaxm64Bc2uKM+vjN799sfp63PPYJw=
-Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
- [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-314-FZI4PwqjM329Ln8f6zLITg-1; Thu, 21 Mar 2024 02:02:27 -0400
-X-MC-Unique: FZI4PwqjM329Ln8f6zLITg-1
-Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-29a5bae5b3fso504332a91.2
-        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 23:02:26 -0700 (PDT)
+	 To:Cc:Content-Type; b=cQwLv0iPauVoCCnjSHXHkOa7IaCjCSnI3JqkC03wVad8LjgZSkfWHMY7z31fwED9ZHZ/KA6mK1/jelVmHm1o4BC8G/qzOXhi7lOrbzChND6a+YoAmSIF0LUHfgmXA1J3Hw9Ntt+M2CQj1ix5LgyloofkKkhXHYF8QvJXD4TKDg0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=joL1OcsK; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-33ececeb19eso307831f8f.3;
+        Wed, 20 Mar 2024 23:08:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711001293; x=1711606093; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MAOWqEugmsLZcY5+XlGTS+PYzImgKXVHs0T7fAbF/hY=;
+        b=joL1OcsK5VI1Hooc7A5Lbdq40cfB29ry2iLhCLT9HcdvSM2En78nmBZe1+0mmZ0XlZ
+         J8a5OwP3hfZgsyCzHJ7Epmb3ABe3NGtqhmGK6Tsl6h7wBYC3+q5+dqyLOleDfU4EyHtE
+         VJkzB09g1yBz3XuQ2DwtAsmabV6NRsgRvfG7lB1qBwG5C7F0DXjEPeT9N5a4Ui4mkE3Q
+         8JmPJRwTCtaMIszPZGLVRpK72921T/eyLglFAZMEVVwwWwtZQAirLagoL3/PzT5qNL5Z
+         icDVuvbNktuO0D2LpeLSMc029nETieU2Ni0foKs/cDlg2lfu89akEvvXvYyybz9+mpHJ
+         5uHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711000946; x=1711605746;
+        d=1e100.net; s=20230601; t=1711001293; x=1711606093;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8vuicHnylxzGQDV+/ztVXw13jQ4DoAJlRs6KRNLC5Rs=;
-        b=ubzRc4R5HQMzU4Nu5QVic0qDz3NTP9JGTNXAuCS/1qClWvyrzdYLXiHmKxST/QPvwA
-         iVO/TosOK4jElmnL6p7Ae76jO8rs6txeLT5+ckoSsUBUVV3z3ZUIq9vVqIYhUqlreMiX
-         syECGtmViGeYssI/dVg7++st7VrUNYhBC0deQEKgM+rP/L13e/nbPM1vQe4zlnbDX05s
-         pZrizxuc0WPPgfRzCYNcrBeyM3j2ZbCNgnYL4vyab2JGstAe1W0QWNdHYm9nVjX+Zon+
-         T2xETO0ZyFg0a8beR1I8uwLKpg8rKSSh3w1KfYjge94A6ZG7TVPdpnZH3OQjRNeHtYZ1
-         NOaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWc+CAuzbDlPKT7QzOyIT5xxxGJj+/hOTXge4zQiHWV88s8Z8vc5sGpBS5YxpwzxPDTvggmSvhkrZj/A1L1BEsaubv6swES
-X-Gm-Message-State: AOJu0Yzs+ykx2u6dvDtV0fNJlquwueVI+EecYSz1NUklZpQFiwMCWiPj
-	ghBg15rBo2maVhPQvSfmvYAHNjTCzJw8ebUOGUPtZFS5gvDkO6w9dDMrFuY5FMFvb5CtGPB5xxI
-	Jpozlm3PtMMOjIttOmc1KUS6R/wDzYYGQSuyqplOElpMLkJenbMh5S6J2b8t+Q6+vCBNMJQwNDP
-	pkpGjuoIMUMAhcZdeUXBV5vhloYHls9GGn0L4R
-X-Received: by 2002:a17:90a:c205:b0:2a0:1f2:e3ca with SMTP id e5-20020a17090ac20500b002a001f2e3camr3552637pjt.36.1711000945859;
-        Wed, 20 Mar 2024 23:02:25 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEHeLVf5h4LzIZIfZKxP80v82NuonNGoI4t71vA7UUS8pYlEZwb9YyuJi9GDa0d3KhkDallWmzSZ2z5u2omwAU=
-X-Received: by 2002:a17:90a:c205:b0:2a0:1f2:e3ca with SMTP id
- e5-20020a17090ac20500b002a001f2e3camr3552621pjt.36.1711000945573; Wed, 20 Mar
- 2024 23:02:25 -0700 (PDT)
+        bh=MAOWqEugmsLZcY5+XlGTS+PYzImgKXVHs0T7fAbF/hY=;
+        b=GeZHu5IrzI6X4e+1yYGolPkggAsc6PhOONFWOsmPXwZIbYmXGW6A4VpoSzCRpbZuPF
+         CrFwuBZwJ+Ugh5vviDwSnb6mQOSy7bh5ZLp0uBZa8ik/CxKyqWm1db2ofBc5jmwN5tRu
+         iRmJCbd5kL0gqdK6t7GqpgLWR4NtqGKTgESZJuz+4dJVhNN8/sprdxeWuET10tovDrqM
+         WFsoDe9dW4fcQLV+AVjKjwo/R9Z/ffHvRr2xvFKEwBNg9EVWZG8SCkug3l+pKIuLP8Fm
+         J1b1WblRJDoaVOi8ASgbLKIISCb2QAoKtlTnysLBaQAxA1LA81BhXBKXeMeRmsUEP5kO
+         TBvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWHfVhVNcMrGwbxDJPAmwn1+BLlsMtYUyvu/EPgk3e9wRslIPyx/76Py+Cb5JgTMcDPTpihvw84XFekrGkV6avVtzfJhbb7lr3wKveOQ7++F2jTl4F+hzvThQ+7wMc1749jCSdQR1iN6nfDFkfpjLQ+FIMDvIGamK8V
+X-Gm-Message-State: AOJu0Yz2k8vMjUpBZLC+mXGfEeIEhyqL2mSKieXztGbxFENQQBPzF6RN
+	6kszFOMPuSxJydxCxJSORHgNJfdRNM/r2Hpl2W5ipur+6FLIit6cOmoGoSUessvh01lRzSXlkXZ
+	0lPm7g6tsLYeGlkyDjQhmGWVnioY=
+X-Google-Smtp-Source: AGHT+IG1ZQ91dGzNjV3S/a0sal/vPAwq07eP4TWvORk3wU+AEnbxoMNPW+53b4pyrDj05zRUsivgsb8wShGrtFAdUwQ=
+X-Received: by 2002:adf:e005:0:b0:33d:886d:bb51 with SMTP id
+ s5-20020adfe005000000b0033d886dbb51mr673479wrh.60.1711001292385; Wed, 20 Mar
+ 2024 23:08:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240312033557.6351-1-xuanzhuo@linux.alibaba.com> <20240312033557.6351-11-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20240312033557.6351-11-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 21 Mar 2024 14:02:14 +0800
-Message-ID: <CACGkMEuM35+jDY3kQXtKNBFJi32+hVSnqDuOc2GVqX6L2hcafw@mail.gmail.com>
-Subject: Re: [PATCH vhost v4 10/10] virtio_ring: virtqueue_set_dma_premapped
- support disable
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+References: <20240320105436.4781-1-puranjay12@gmail.com>
+In-Reply-To: <20240320105436.4781-1-puranjay12@gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 20 Mar 2024 23:08:00 -0700
+Message-ID: <CAADnVQJ3o6DsURi=N_KXx+mbW9r7__3LrwYLyYwuoMOsqFHPkw@mail.gmail.com>
+Subject: Re: [PATCH bpf] bpf: verifier: prevent userspace memory access
+To: Puranjay Mohan <puranjay12@gmail.com>, Ilya Leoshkevich <iii@linux.ibm.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 12, 2024 at 11:36=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.alibaba.=
-com> wrote:
+On Wed, Mar 20, 2024 at 3:55=E2=80=AFAM Puranjay Mohan <puranjay12@gmail.co=
+m> wrote:
 >
-> Now, the API virtqueue_set_dma_premapped just support to
-> enable premapped mode.
+> The JITs need to implement bpf_arch_uaddress_limit() to define where
+> the userspace addresses end for that architecture or TASK_SIZE is taken
+> as default.
 >
-> If we allow enabling the premapped dynamically, we should
-> make this API to support disable the premapped mode.
+> The implementation is as follows:
 >
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->  drivers/virtio/virtio_ring.c | 34 ++++++++++++++++++++++++++--------
->  include/linux/virtio.h       |  2 +-
->  2 files changed, 27 insertions(+), 9 deletions(-)
->
-> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index 34f4b2c0c31e..3bf69cae4965 100644
-> --- a/drivers/virtio/virtio_ring.c
-> +++ b/drivers/virtio/virtio_ring.c
-> @@ -2801,6 +2801,7 @@ EXPORT_SYMBOL_GPL(virtqueue_resize);
->  /**
->   * virtqueue_set_dma_premapped - set the vring premapped mode
->   * @_vq: the struct virtqueue we're talking about.
-> + * @premapped: enable/disable the premapped mode.
->   *
->   * Enable the premapped mode of the vq.
->   *
-> @@ -2819,9 +2820,10 @@ EXPORT_SYMBOL_GPL(virtqueue_resize);
->   * 0: success.
->   * -EINVAL: vring does not use the dma api, so we can not enable premapp=
-ed mode.
->   */
-> -int virtqueue_set_dma_premapped(struct virtqueue *_vq)
-> +int virtqueue_set_dma_premapped(struct virtqueue *_vq, bool premapped)
+> REG_AX =3D  SRC_REG
+> if(offset)
+>         REG_AX +=3D offset;
+> REG_AX >>=3D 32;
+> if (REG_AX <=3D (uaddress_limit >> 32))
+>         DST_REG =3D 0;
+> else
+>         DST_REG =3D *(size *)(SRC_REG + offset);
 
-I think we need to document the requirement for calling this.
+The patch looks good, but it seems to be causing s390 CI failures.
 
-Looking at the code, it seems it requires to stop the datapath and
-detach all the used buffers?
-
-Thanks
-
+Ilya,
+could you help us understand is this check needed on s390
+and if so, what should be the uaddress_limit ?
 
