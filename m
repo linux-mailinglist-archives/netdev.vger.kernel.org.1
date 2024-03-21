@@ -1,115 +1,69 @@
-Return-Path: <netdev+bounces-81005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 507FD8857C1
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:05:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4C828857D2
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:11:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 834891C22572
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:05:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E592C1C21610
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:11:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B9DB57871;
-	Thu, 21 Mar 2024 11:05:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dRfMWvmS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C755058121;
+	Thu, 21 Mar 2024 11:11:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04DC58207;
-	Thu, 21 Mar 2024 11:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58E7057876;
+	Thu, 21 Mar 2024 11:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711019131; cv=none; b=pXnjNl1dfd35L70+c2Q4ksURi55nvLkk4s2aPFYqde9rxzVqw57SbkcLeYC/tivwk2NzHzbvtiYKLkRTF2b0WmHH/NLVkHcURmYGN5l9jUSDf28O6uoK0LpdHwk8RWMUxxX28oKzKzWiHceKCXYk+ydqan32vHk7/tee2lSJp+k=
+	t=1711019478; cv=none; b=KzZMA9vbQAopu5lGFvpffRje4hRib/OOXcvhYIEqx8zgw22ReC/ATZQ3h9p8fcYiEej8Y6VacCwrWcRAkrOIH6HQ1OdX3ZiDbaK2jocisesUOCkpV3RsD1i9J/zx1+kn4XIWLiCsctrJv3GE5AQKZ7M1bHAYPH8dLh3bV/t4a9o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711019131; c=relaxed/simple;
-	bh=T7oRw9U9YOvtDCNp0N0dPXzwXcNyyNi8HOvwsjPUjMI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OCxVrP3mEFsegIaowZfZokuapogQQQidozREPiM3pFXMHf64U4rhWpCyJVXLuwVrEaYvVmYyRHS+PeBykIr8biShpKy3WUdQs3p1ibSBfC9supcmtnYW1A9sTNEFOVvKYta3b1F69xG11rmDieiDrFfs2VqPJ86Sa3I5ufp6LG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dRfMWvmS; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-513da1c1f26so1133528e87.3;
-        Thu, 21 Mar 2024 04:05:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711019128; x=1711623928; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Ph7DhApLQf9g5u+GJFqkGKLK8oTg9+BlB4tUDorFzNk=;
-        b=dRfMWvmSMzOVV7s3NeF+4+OR5Jv2susbkXvWpU5wn7JaK7wJncV4HhRiXJk6QsnPLZ
-         elFTsRN2zGJkoFpDmV4Oe6/ZUXVqIjuy0BMClYGWmVI1+5J8y+37JDZSa0sXX7ajFISh
-         Jn938ck7H/fBtCsPfRr9QgCQnJtS0Kk2iUwQYinW5FEJNMPdk53xZ5b6dJyVP0+gDcKE
-         xmeRyu5LTdUMgsR8s0eP1it8CcwCNAFaGufEw08/bqh+NsCSJocOgJCsntUln7gSpEZx
-         7GyBLg+aUbdF10Y8pWe0+qLSAmvE83DYZgtLbDBAi5+tUedVm1vMRPTOpgDXH8TmfTEl
-         XrTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711019128; x=1711623928;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Ph7DhApLQf9g5u+GJFqkGKLK8oTg9+BlB4tUDorFzNk=;
-        b=JehzA7KAJiE2Xec/LjLLcFLim7TRSi/tyGR80tWeqb3XtaTpd0dtYMB/ZJxSXN6IWF
-         hqJ3q24nTsPrWE8dYh8Ylzdx5kK8kW7dXNvhEW6UrgXkZk/7eAuuO1qntdmIGR+5kiz4
-         Sq6zCvpu7rhXiyncfM92BoeYmQyuYlwikX3zxK9Up+086EmvXeYQXsktF+pUqZsrrUuv
-         IqUtMO8yMZOyR7kbpJyQQpIOSI1M20Hva+WlCIJTvOtBtiEdD1uFYhB/z/R5PUpmB+Fl
-         CNnRZLYd5dGxrw6t9/XYCV4qHXmneR1VZ1pcGyVyGGNCI3FI7ff0YEMScvRDlss7DOwM
-         t3pg==
-X-Forwarded-Encrypted: i=1; AJvYcCWVmFoOng4p7dw+Pd7PCHwkepleGV6tYAx8IvZFgxre919jkelyQuSZ0qKe2QNvX+lHjez1Ru9AZ04U29/Zg1n8HUHZrCpcClWxLWjDGA31obgggqFwPZBk/mii4B/xHqwWnB1030NTidsJIlgw+Mm/qKl3RRfL/Myl
-X-Gm-Message-State: AOJu0YzQ7yrBq5VXiq1DFBmF6rH4naeqFtXDJ8IHI/jWLevfznPMwD7x
-	DcYwU3sAo/wZedNp59xgBc1tdfzNbN9QCQOP2FioO6z3v86oE0eZqVWzUw79UImkdI4SwfPfKDw
-	w0MzG4itOH077rkLgKVG4ynu2E6cD2WenBTw=
-X-Google-Smtp-Source: AGHT+IHpE1IvxAZxMsCwH8ke7VHalqSTikT1Qp9JTWVuYMlf3WlhFObfM/yD4osrKm0OAmcEU+VUnbAvw5dE9JTBc10=
-X-Received: by 2002:ac2:5b9c:0:b0:513:dba5:ac67 with SMTP id
- o28-20020ac25b9c000000b00513dba5ac67mr12168547lfn.32.1711019127516; Thu, 21
- Mar 2024 04:05:27 -0700 (PDT)
+	s=arc-20240116; t=1711019478; c=relaxed/simple;
+	bh=AsSp33wfcQ6xtm/iImY5mOvO+b8R3QdhsH9rsrmM4gA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lyWd5HVD2+pX7Sk58u/DjiRXo2cxx6Edh3aWBqt26FBafJnnuKR3Jvpxb0apLQWwcCMoonyW8Moz1dgJ4g+L8l8CXROyZuwd9UX5htPDTDz3xW105vcbW2ZKNFp6PrCQaCJpRcx/rj1/ABJslWX1ejomn7VFJn9u6J52/ARasXQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Date: Thu, 21 Mar 2024 12:11:08 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+	netdev@vger.kernel.org, kuba@kernel.org, edumazet@google.com
+Subject: Re: [PATCH net 3/3] netfilter: nf_tables: Fix a memory leak in
+ nf_tables_updchain
+Message-ID: <ZfwVzPeSh2RrA2hT@calendula>
+References: <20240321000635.31865-1-pablo@netfilter.org>
+ <20240321000635.31865-4-pablo@netfilter.org>
+ <1c84b33599ba6d10680162a43ea729f7353327b3.camel@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240321101058.68530-1-puranjay12@gmail.com>
-In-Reply-To: <20240321101058.68530-1-puranjay12@gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 21 Mar 2024 04:05:15 -0700
-Message-ID: <CAADnVQLhwLgq=QuXD-Ls=t9Scr_4Zn9JwdkXfZQfZkT=ysx64Q@mail.gmail.com>
-Subject: Re: [PATCH bpf v2] bpf: verifier: prevent userspace memory access
-To: Puranjay Mohan <puranjay12@gmail.com>, Ilya Leoshkevich <iii@linux.ibm.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
-	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1c84b33599ba6d10680162a43ea729f7353327b3.camel@redhat.com>
 
-On Thu, Mar 21, 2024 at 3:11=E2=80=AFAM Puranjay Mohan <puranjay12@gmail.co=
-m> wrote:
->
-> diff --git a/arch/s390/net/bpf_jit_comp.c b/arch/s390/net/bpf_jit_comp.c
-> index e613eebfd349..e61a51a5b4be 100644
-> --- a/arch/s390/net/bpf_jit_comp.c
-> +++ b/arch/s390/net/bpf_jit_comp.c
-> @@ -2691,3 +2691,8 @@ bool bpf_jit_supports_subprog_tailcalls(void)
->  {
->         return true;
->  }
-> +
-> +u64 bpf_arch_uaddress_limit(void)
-> +{
-> +       return -ENOTSUPP;
-> +}
+On Thu, Mar 21, 2024 at 11:52:29AM +0100, Paolo Abeni wrote:
+> On Thu, 2024-03-21 at 01:06 +0100, Pablo Neira Ayuso wrote:
+> > From: Quan Tian <tianquan23@gmail.com>
+> > 
+> > If nft_netdev_register_hooks() fails, the memory associated with
+> > nft_stats is not freed, causing a memory leak.
+> > 
+> > This patch fixes it by moving nft_stats_alloc() down after
+> > nft_netdev_register_hooks() succeeds.
+> > 
+> > Fixes: b9703ed44ffb ("netfilter: nf_tables: support for adding new devices to an existing netdev chain")
+> > Signed-off-by: Quan Tian <tianquan23@gmail.com>
+> 
+> I'm sorry for nit-picking, but our tag verification scripts are unhappy
+> WRT this commit, it lacks your SoB. Would you mind sending an updated
+> PR?
 
-Looks good and should work, but s390 CI is still not happy.
-Ideas?
-sock tests were not failing before. So something is going on.
+Sure, sorry about this.
 
