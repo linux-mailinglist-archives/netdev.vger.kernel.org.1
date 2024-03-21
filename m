@@ -1,213 +1,160 @@
-Return-Path: <netdev+bounces-80973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id F09578855FE
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:47:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27822885608
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:49:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 56FF5B2176B
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 08:47:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC5BE2820AF
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 08:49:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72A0D1D6A8;
-	Thu, 21 Mar 2024 08:47:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9995320312;
+	Thu, 21 Mar 2024 08:49:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="bMN+2a6v"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="INDYTehX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65A601D6AA
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 08:46:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758B8199AD
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 08:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711010821; cv=none; b=uJ1SIrv9Fq7VCOQrcAI2plSdh74uStrsD9qea5meU7jEqfU3Ke3cY3kFoi4l/UnQ2N2dAc0LRNGrHzJto+Bl74k8tZYKZVHy1ox8ib4LfS+oAV4XX0R31OFMepJRq1LjdAcYE/skBmLOwgNqVouYEuuk7/UpjRFEeFMb7pZQLGA=
+	t=1711010940; cv=none; b=ogoguUASdSfOjf+Cz3XtseaU50deQSJvQRKUxdZT87+NzBBNZ20C6YKADnrVM5eNEPfNcNFyYbDuyzvIJOdYZVI4LSYi7MtuWLyA2v0Ve5MMSVCzESoIPWt521sVPuN1a9Wb3SKc2bNWgI7ePEMllydX0/AVVzHiRorSBEllb4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711010821; c=relaxed/simple;
-	bh=+Rmkc1IORQccIOlPY3ZhEo5XU8iz3NH59BUtX8LN5q8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=spuSYT8w5RFxwcW1h6uLav8PdOIcNQI6Lr+4EUC+ehUj9VLZ1rVOewR6iTYoLKSbC0XBieYbuDNahMADNu5Vp0Zp99MGIQTdbi34hfqxMuaEZK41AzXi7TzJMAZe2L7Fhfx2bppxh2MQrK/42mu1Rkqzqbg9OS/GTEeoyLINxwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=bMN+2a6v; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56b9dac4e6cso6194a12.1
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 01:46:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711010817; x=1711615617; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=B724oPchdBWjT5XXJ1vQrCAJneU+efmilm3tnFDFnE0=;
-        b=bMN+2a6vb0hl4f1ZEQvzzbtV+Ss5S9tCwcy3y7OlyH0hX0MkIdX/TQUf2wZgq0rPbv
-         iUNAyca+LR5jNxFrHaQyt/pAmTuum9BbM7oYQyjw5+kSZKR+C+pQJ6uLMFvYZ2TIhkQT
-         Q6h1ZNHKx0BkoAVncfiHt4SQJboh8uZNS0V2Wxoxw7TF6Se6BUcP/CP/pYJlSSHnXzBg
-         hXh39w5JLWRgU0RsQceiKRsjeQ6ItNCulG4liM84n3Z3lpH6OuRPrcFb3+0fGmLFL31k
-         sh4LdDjlqBl2tAO9o+oEtKqGhbj9ZjU/7ifKTsmvpEBAC0RCBo6O9xssctqf9MK2O6cm
-         0Uig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711010817; x=1711615617;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=B724oPchdBWjT5XXJ1vQrCAJneU+efmilm3tnFDFnE0=;
-        b=VUz0ttQu2crm5cQRsg0jjsxXVAXznZ+kChFga7IrlyTHSp8ufmz7dQbSxH3jJYyOm7
-         ztUchxb+ROjOqd286OAhk5MCUXTDHfPk4tv2WsIwmca5ri4J6hYY7iaqQA0mRp4eswSd
-         aLvOmHDxc2ZJoWpnXjuDl7xcrRMDVjYnFM5nEy8uFB5hdTUv5GqzDbLY4tmU0/tgfnh6
-         6qyi4q2j2usAbOtNoN4h8J+zCU0OuwFMTlrUTn6SaEOVl2uaUdQjFNIjJvLA4nMDkF4+
-         CR4Xe+PqPszlGpjGoZiNpN+Fco7xz2k+hCNHMqry1TADaOJ7DyfeaBbQY+gPVY2lhIuE
-         WSwg==
-X-Forwarded-Encrypted: i=1; AJvYcCUT3NZGTAtlnAStbxWVIJn6qxfxW4ewLRFJWF5W+1KkICfZ77YJlSRC7QM9lGyWAe9Yhio8yBoGURq6HmvPp9u3amiPgUiW
-X-Gm-Message-State: AOJu0YyJ+f00Ak8nRd00ICzytNBzGuIrjsw+G7rHjaK6FYFPQXrF1ti1
-	qPdodcy68PlEHBVsf3GBid9ZMnJ9Wvy0574nISBLpx8HGmcUpRlNBbHSy0HhAp9GQlkETxulX6i
-	NXZfcx8wEfC8rI5y08l48v94Lch3ap6Vdr1k3
-X-Google-Smtp-Source: AGHT+IEbRYrlpXkhd0lnpQqEYVrVNOIkzB/SF1w9et9ulzmJB8NM+mOEIHjg6+KJO7hb2vlQkp+BB59h+btB03Ozg70=
-X-Received: by 2002:a05:6402:202e:b0:56a:9184:9ab with SMTP id
- ay14-20020a056402202e00b0056a918409abmr92421edb.7.1711010817369; Thu, 21 Mar
- 2024 01:46:57 -0700 (PDT)
+	s=arc-20240116; t=1711010940; c=relaxed/simple;
+	bh=A648/ivjaayAatNcA2V4iinwFgxH1OJvHbuOVG7H7E4=;
+	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
+	 To:Date:Message-ID; b=HLtlenxxRGS+uRZFgNz6XJPjs46nReVuSOx2aiwRMJqggQpbfX0z9cL7w4CQFG8MeJVGRDPUrTIeP3O60aNwJLdmv9aZdNUz59zwjiA1K2Zvvf8/eoRTk9caQVyb1e11cv1sQYmPGp4H1+usiISVc9XwKHVAaP6i8NmRad6JkQ4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=INDYTehX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C45E5C433C7;
+	Thu, 21 Mar 2024 08:48:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711010940;
+	bh=A648/ivjaayAatNcA2V4iinwFgxH1OJvHbuOVG7H7E4=;
+	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
+	b=INDYTehXe4/x3uzXuk3vtQ6aZ74eEbFqTANivxCbU/3BrdcJF0+i4cBJy9h/oz+Vj
+	 QRB/KGmDEeOKh7jJxK5gtCi9o9r1IQN6K0301S1VldviphHXft5/gezryP+Ai13hfb
+	 /fBWtU4UBNNUGyUc4Pjuru6lU41oLUTSAQL+R7ZjFCedSQ5CrGzWe9a9dzSP2l4v6Z
+	 nc6QG0UWDzeCaTWGgDh/NMAYIzGEiyG9l38RopzL6PEVKzrciY7xgipXxr92Vji07G
+	 dOflPDQnBkQetpKcIdLwbLVFH7vFp0Ec6sjUalgO92LaKjLnAmCPt7mcXqMi2845aK
+	 3FtHE+8aukpBw==
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <202403211109183894466@zte.com.cn>
-In-Reply-To: <202403211109183894466@zte.com.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 21 Mar 2024 09:46:46 +0100
-Message-ID: <CANn89i+EFEr7VHXNdOi59Ba_R1nFKSBJzBzkJFVgCTdXBx=YBg@mail.gmail.com>
-Subject: Re: [PATCH v3 resend] net/ipv4: add tracepoint for icmp_send
-To: xu.xin16@zte.com.cn
-Cc: davem@davemloft.net, rostedt@goodmis.org, mhiramat@kernel.org, 
-	dsahern@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	yang.yang29@zte.com.cn, he.peilin@zte.com.cn, liu.chun2@zte.com.cn, 
-	jiang.xuexin@zte.com.cn, zhang.yunkai@zte.com.cn
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <65fb4a8b1389_1faab3294c8@willemb.c.googlers.com.notmuch>
+References: <20240319093140.499123-1-atenart@kernel.org> <20240319093140.499123-4-atenart@kernel.org> <65f9954c70e28_11543d294f3@willemb.c.googlers.com.notmuch> <171086409633.4835.11427072260403202761@kwain> <65fade00e4c24_1c19b8294cf@willemb.c.googlers.com.notmuch> <171094732998.5492.6523626232845873652@kwain> <65fb4a8b1389_1faab3294c8@willemb.c.googlers.com.notmuch>
+Subject: Re: [PATCH net v2 3/4] udp: do not transition UDP fraglist to unnecessary checksum
+From: Antoine Tenart <atenart@kernel.org>
+Cc: steffen.klassert@secunet.com, willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Date: Thu, 21 Mar 2024 09:48:57 +0100
+Message-ID: <171101093713.5492.11530876509254833591@kwain>
 
-On Thu, Mar 21, 2024 at 4:09=E2=80=AFAM <xu.xin16@zte.com.cn> wrote:
->
-> From: he peilin <he.peilin@zte.com.cn>
->
-> Introduce a tracepoint for icmp_send, which can help users to get more
-> detail information conveniently when icmp abnormal events happen.
->
-> 1. Giving an usecase example:
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> When an application experiences packet loss due to an unreachable UDP
-> destination port, the kernel will send an exception message through the
-> icmp_send function. By adding a trace point for icmp_send, developers or
-> system administrators can obtain detailed information about the UDP
-> packet loss, including the type, code, source address, destination addres=
-s,
-> source port, and destination port. This facilitates the trouble-shooting
-> of UDP packet loss issues especially for those network-service
-> applications.
->
-> 2. Operation Instructions:
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-> Switch to the tracing directory.
->         cd /sys/kernel/tracing
-> Filter for destination port unreachable.
->         echo "type=3D=3D3 && code=3D=3D3" > events/icmp/icmp_send/filter
-> Enable trace event.
->         echo 1 > events/icmp/icmp_send/enable
->
-> 3. Result View:
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->  udp_client_erro-11370   [002] ...s.12   124.728002:
->  icmp_send: icmp_send: type=3D3, code=3D3.
->  From 127.0.0.1:41895 to 127.0.0.1:6666 ulen=3D23
->  skbaddr=3D00000000589b167a
->
-> Changelog
-> ---------
-> v2->v3:
-> Some fixes according to
-> https://lore.kernel.org/all/20240319102549.7f7f6f53@gandalf.local.home/
-> 1. Change the tracking directory to/sys/kernel/tracking.
-> 2. Adjust the layout of the TP-STRUCT_entry parameter structure.
->
-> v1->v2:
-> Some fixes according to
-> https://lore.kernel.org/all/CANn89iL-y9e_VFpdw=3DsZtRnKRu_tnUwqHuFQTJvJsv=
--nz1xPDw@mail.gmail.com/
-> 1. adjust the trace_icmp_send() to more protocols than UDP.
-> 2. move the calling of trace_icmp_send after sanity checks
-> in __icmp_send().
->
-> Signed-off-by: Peilin He<he.peilin@zte.com.cn>
-> Reviewed-by: xu xin <xu.xin16@zte.com.cn>
-> Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
-> Cc: Yang Yang <yang.yang29@zte.com.cn>
-> Cc: Liu Chun <liu.chun2@zte.com.cn>
-> Cc: Xuexin Jiang <jiang.xuexin@zte.com.cn>
-> ---
->  include/trace/events/icmp.h | 64 +++++++++++++++++++++++++++++++++++++
->  net/ipv4/icmp.c             |  4 +++
->  2 files changed, 68 insertions(+)
->  create mode 100644 include/trace/events/icmp.h
->
-> diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
-> new file mode 100644
-> index 000000000000..2098d4b1b12e
-> --- /dev/null
-> +++ b/include/trace/events/icmp.h
-> @@ -0,0 +1,64 @@
-> +/* SPDX-License-Identifier: GPL-2.0 */
-> +#undef TRACE_SYSTEM
-> +#define TRACE_SYSTEM icmp
-> +
-> +#if !defined(_TRACE_ICMP_H) || defined(TRACE_HEADER_MULTI_READ)
-> +#define _TRACE_ICMP_H
-> +
-> +#include <linux/icmp.h>
-> +#include <linux/tracepoint.h>
-> +
-> +TRACE_EVENT(icmp_send,
-> +
-> +               TP_PROTO(const struct sk_buff *skb, int type, int code),
-> +
-> +               TP_ARGS(skb, type, code),
-> +
-> +               TP_STRUCT__entry(
-> +                       __field(const void *, skbaddr)
-> +                       __field(int, type)
-> +                       __field(int, code)
-> +                       __array(__u8, saddr, 4)
-> +                       __array(__u8, daddr, 4)
-> +                       __field(__u16, sport)
-> +                       __field(__u16, dport)
-> +                       __field(unsigned short, ulen)
-> +               ),
-> +
-> +               TP_fast_assign(
-> +                       struct iphdr *iph =3D ip_hdr(skb);
-> +                       int proto_4 =3D iph->protocol;
-> +                       __be32 *p32;
-> +
-> +                       __entry->skbaddr =3D skb;
-> +                       __entry->type =3D type;
-> +                       __entry->code =3D code;
-> +
-> +                       if (proto_4 =3D=3D IPPROTO_UDP) {
-> +                               struct udphdr *uh =3D udp_hdr(skb);
-> +                               __entry->sport =3D ntohs(uh->source);
-> +                               __entry->dport =3D ntohs(uh->dest);
-> +                               __entry->ulen =3D ntohs(uh->len);
+Quoting Willem de Bruijn (2024-03-20 21:43:55)
+> Antoine Tenart wrote:
+> > Quoting Willem de Bruijn (2024-03-20 14:00:48)
+> > > Antoine Tenart wrote:
+> > > > Quoting Willem de Bruijn (2024-03-19 14:38:20)
+> > > > >=20
+> > > > > The original patch converted to CHECKSUM_UNNECESSARY for a reason.
+> > > > > The skb->csum of the main gso_skb is not valid?
+> > > > >=20
+> > > > > Should instead only the csum_level be adjusted, to always keep
+> > > > > csum_level =3D=3D 0?
+> > > >=20
+> > > > The above trace is an ICMPv6 packet being tunneled and GROed at the=
+ UDP
+> > > > level, thus we have:
+> > > >   UDP(CHECKSUM_PARTIAL)/Geneve/ICMPv6(was CHECKSUM_NONE)
+> > > > csum_level would need to be 1 here; but we can't know that.
+> > >=20
+> > > Is this a packet looped internally? Else it is not CHECKSUM_PARTIAL.
+> >=20
+> > I'm not sure to follow, CHECKSUM_NONE packets going in a tunnel will be
+> > encapsulated and the outer UDP header will be CHECKSUM_PARTIAL. The
+> > packet can be looped internally or going to a remote host.
+>=20
+> That is on transmit. To come into contact with UDP_GRO while having
+> CHECKSUM_PARTIAL the packet will have to loop into the receive path,
+> in some way that triggers GRO. Perhaps through gro_cells, as other
+> GRO paths are hardware NIC drivers.
 
-This is completely bogus.
+I get what you meant now, thanks. Yes, those Tx packets loop into the Rx
+path. One easy way is through veth pairs, eg. packet get tunneled in a
+netns, connected to another one via a veth pair.
 
-Adding tracepoints is ok if there are no side effects like bugs :/
+> > > > There is another issue (no kernel trace): if a packet has partial c=
+sum
+> > > > and is being GROed that information is lost and the packet ends up =
+with
+> > > > an invalid csum.
+> > >=20
+> > > CHECKSUM_PARTIAL should be converted to CHECKSUM_UNNECESSARY for this
+> > > reason. CHECKSUM_PARTIAL implies the header is prepared with pseudo
+> > > header checksum. Similarly CHECKSUM_COMPLETE implies skb csum is vali=
+d.
+> > > CHECKSUM_UNNECESSARY has neither expectations.
+> >=20
+> > But not if the packet is sent to a remote host. Otherwise an inner
+> > partial csum is never fixed by the stack/NIC before going out.
+>=20
+> The stack will only offload a single checksum. With local checksum
+> offload, this can be the inner checksum and the outer can be cheaply
+> computed in software. udp_set_csum() handles this. It indeed sets lco
+> if the inner packet has CHECKSUM_PARTIAL. Otherwise it sets ip_summed
+> to CHECKSUM_PARTIAL, now pointing to the outer UDP header.
+>=20
+> You're right. Regardless of whether it points to the inner or outer
+> checksum, a conversion of CHECKSUM_PARTIAL to CHECKSUM_UNNECESSARY
+> will break checksum offload in the forwarding case.
+>=20
+> > > > Packets with CHECKSUM_UNNECESSARY should end up with the same info.=
+ My
+> > > > impression is this checksum conversion is at best setting the same =
+info
+> > > > and otherwise is overriding valuable csum information.
+> > > >=20
+> > > > Or would packets with CSUM_NONE being GROed would benefit from the
+> > > > CHECKSUM_UNNECESSARY conversion?
+> > >=20
+> > > Definitely. If the packet has CHECKSUM_NONE and GRO checks its
+> > > validity in software, converting it to CHECKSUM_UNNECESSARY avoids
+> > > potential additional checks at later stages in the packet path.
+> >=20
+> > Makes sense. The current code really looks like
+> > __skb_incr_checksum_unnecessary, w/o the CHECKSUM_NONE check to only
+> > convert those packets.
 
-At this point there is no guarantee the UDP header is complete/present
-in skb->head
+If I sum up our discussion CHECKSUM_NONE conversion is wanted,
+CHECKSUM_UNNECESSARY conversion is a no-op and CHECKSUM_PARTIAL
+conversion breaks things. What about we just convert CHECKSUM_NONE to
+CHECKSUM_UNNECESSARY?
 
-Look at the existing checks between lines 619 and 623
+diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
+index 50a8a65fad23..44779d4c538b 100644
+--- a/net/ipv6/udp_offload.c
++++ b/net/ipv6/udp_offload.c
+@@ -174,7 +174,7 @@ INDIRECT_CALLABLE_SCOPE int udp6_gro_complete(struct sk=
+_buff *skb, int nhoff)
+                if (skb->ip_summed =3D=3D CHECKSUM_UNNECESSARY) {
+                        if (skb->csum_level < SKB_MAX_CSUM_LEVEL)
+                                skb->csum_level++;
+-               } else {
++               } else if (skb->ip_summed =3D=3D CHECKSUM_NONE) {
+                        skb->ip_summed =3D CHECKSUM_UNNECESSARY;
+                        skb->csum_level =3D 0;
+                }
 
-Then audit all icmp_send() callers, and ask yourself if UDP packets
-can not be malicious (like with a truncated UDP header)
+Or directly call __skb_incr_checksum_unnecessary.
+
+Thanks,
+Antoine
 
