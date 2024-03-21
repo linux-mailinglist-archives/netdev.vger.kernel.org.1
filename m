@@ -1,164 +1,125 @@
-Return-Path: <netdev+bounces-80917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DCDE881AAB
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 02:36:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28CEA881AC8
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 02:54:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C7BB9B21190
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 01:36:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB9621F21C7D
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 01:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4079A23;
-	Thu, 21 Mar 2024 01:36:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qlr4FR2t"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A430C17FD;
+	Thu, 21 Mar 2024 01:54:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA50524F
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 01:36:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C5EC1877;
+	Thu, 21 Mar 2024 01:54:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=18.169.211.239
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710984991; cv=none; b=Th5ZKFwgsmzmG96dODajTUDsti/N/+inGIrZsyjvvn6yG0svrngJ14K9ss2yvxz7DqmerDuOCfbp/8Hz9qIIDNxvIQt5D/pVrdlll8SDnGfmQ//6O58BJ0cv7a7QhR24KA0musVJJzf259NUX9FIZBqXxaMDIg2spUJWuVSOoNI=
+	t=1710986051; cv=none; b=YyB8JhzIofVz97AVX+mYri6SKgxRWSLD1+ZFQ6+d+MjUxPohkfx455ulhctQWujUh74UnaN2DvMKA/lx7ov0Nm5kZIOWDtKSjIS8XPaZLGtdk78NZotXjmyWAhATlaVwb1DiF6PPa5sin8V6v7J1dKY/Iw1sHfEP4llT8sXeF8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710984991; c=relaxed/simple;
-	bh=7VkvRogsC1DlJ9ZCQtEG9aRl90Whrc+CFOdxK7Eaddo=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=IhnztAjeAdKGjhMhGS+KakVEZX4dHplLXDYu585EimZfqzjL5Ozs3vhi2TuVGf37VNXvQbDskGPn3NKik//usv4CPr1v8MXKj5B6D44yqko6YxwOjtmV0vIYw7JZOIO0IBtyTURZg+j3VbZSKZ+qaKbLOoHrb+4gfRmpZah0cbk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qlr4FR2t; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1710984988;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zLQEXqBep038/fndbOqYRXUu8u8+wrifOJGOB/c+1L8=;
-	b=Qlr4FR2t7PFOsSW/5FOmry7vHjPBHz72tpmdr0kagctadiiZFywmYht1Op3ERCOLlAEb9s
-	Pv79Vg2rAY4rBvpxmrqvysMlv9JzwrwvceIYrianTFtyAtH80Z22rU2lKQhZzp+YHFnmPP
-	QlhgOQvbkydMvIvYTTxiG8NVOekSEq4=
-Received: from mail-oi1-f198.google.com (mail-oi1-f198.google.com
- [209.85.167.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-552-k3efULalM32ZSIuWo3YQeg-1; Wed, 20 Mar 2024 21:36:27 -0400
-X-MC-Unique: k3efULalM32ZSIuWo3YQeg-1
-Received: by mail-oi1-f198.google.com with SMTP id 5614622812f47-3c37c00d253so496017b6e.2
-        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 18:36:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1710984986; x=1711589786;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=zLQEXqBep038/fndbOqYRXUu8u8+wrifOJGOB/c+1L8=;
-        b=aq02bfQTxmykbe4vijiSw6liCEFVq1qqKThSBHAZLFJv4te33BvqakCMhHkC3UzcUZ
-         JzJrtQNIe5S+5uvnXk6nj9G/8UW0aIXeMFGuPxf6HyDiv6TFqtyMJrTHDtxZelWvWcwE
-         Vcu1Nw3fKZL2ft/7AYj4MiOc1kVJCi3G6kqQdrNrL8yntfSlIzX4qyzck0jB8NaEZ8Wa
-         22JohplonMUAER6e1xtYu/7fvk7CmWvsTuhTM6E6zveWEbkbJPMS70Y1KhslH2Nxasf/
-         SVX6GHhMEHCuzeEbjl9u9eCSz5Hq7lMpjMgZnk724rUgSQuOt2BxzFFoBhvQECne/YMN
-         5UZA==
-X-Forwarded-Encrypted: i=1; AJvYcCXDiw2zgo3LgviUhTR3G4F//QlsO2NMLcpgzTn5J6cSTY1MqzO8acgyfkfMYMF+nLLTkPJAFNIvx5u+ovKBLoqYQSuMc23x
-X-Gm-Message-State: AOJu0YzcT1+xuFTl18L6+Euxvn5i7u9wOlEG6hROyzdBy58BRP+w4bZ/
-	wUtbqVSlWShiiNa67oUh8cjFi6Vpk3eW5iD07kYjNVf8r+FsXSkuJ+woXsgY+s6ukHL49nCjeMw
-	64A22F+eyKko3Pkylo1KumTGoxuax994sdPnU8uCikkgf2nAyZHwAEg==
-X-Received: by 2002:a05:6808:23c8:b0:3c3:882a:a874 with SMTP id bq8-20020a05680823c800b003c3882aa874mr12868667oib.5.1710984986368;
-        Wed, 20 Mar 2024 18:36:26 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHvpOAEjidxxnm9g5v1ek+06XqJIRZ1NeXBKttMUFfjx0y0CxF+IjoOGV02PelwsXUui8j5nw==
-X-Received: by 2002:a05:6808:23c8:b0:3c3:882a:a874 with SMTP id bq8-20020a05680823c800b003c3882aa874mr12868649oib.5.1710984986098;
-        Wed, 20 Mar 2024 18:36:26 -0700 (PDT)
-Received: from localhost ([240d:1a:c0d:9f00:523b:c871:32d4:ccd0])
-        by smtp.gmail.com with ESMTPSA id fm4-20020a056a002f8400b006e669357e83sm12286869pfb.189.2024.03.20.18.36.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 20 Mar 2024 18:36:25 -0700 (PDT)
-Date: Thu, 21 Mar 2024 10:36:21 +0900 (JST)
-Message-Id: <20240321.103621.1433494402179493599.syoshida@redhat.com>
-To: nicolas.cavallari@green-communications.fr
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ipv6: delay procfs initialization after the ipv6
- structs are ready
-From: Shigeru Yoshida <syoshida@redhat.com>
-In-Reply-To: <20240320171858.2671-1-nicolas.cavallari@green-communications.fr>
-References: <20240320171858.2671-1-nicolas.cavallari@green-communications.fr>
-X-Mailer: Mew version 6.9 on Emacs 29.2
+	s=arc-20240116; t=1710986051; c=relaxed/simple;
+	bh=OAXe9PQlq17asOfDjShl9e6DBsvArHfVr7liqKH+XE4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ikd+8rlxoQpEm4Scw90CIqfNPgS8vEH7ClQIRrg/TgvCXJTqQdQc1IhWIDRPFJkznvYbUvuLz4i1ucl3SUpQcBYMPAvhl8CqwK9YSR0DyvaFk+WAkQG/UoTu++FsEkrs2V9EHtOiNfAdUkUqPl+Kfzunz2nc75PyP0uDnwdFwZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=18.169.211.239
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: bizesmtp81t1710985960ta4oe8mn
+X-QQ-Originating-IP: K4MtTSgi3savbGAI3VMA7OWxK9HTgOYQ4VuiXRtMf1I=
+Received: from localhost.trustnetic.com ( [36.20.53.11])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 21 Mar 2024 09:52:38 +0800 (CST)
+X-QQ-SSF: 01400000000000E0E000000A0000000
+X-QQ-FEAT: C46Rb8GPIEchRFcWlJ3D+/pMFI1tYLcQ65M7g5F56loHd2jqUJPGDlT9j4vlG
+	I07JNSdxYIPUXeDUVAGtFih0CdL1XYmCwMoNyFnaJrI9AZazMcAue/USHZF3qZGkqZC2QY1
+	RbJDIPSmSXtqOcqjGTM93OGHambdSVfZ2biOJxSQOrMeAuL3S9m1eoOZbkS0drwHgMgOC8M
+	Vfda0gpGhlT5BFLzcaKTP95wcY+8NgsMSkQSzzz6eaFlhcm0ku9dRRg7YJGRV1PXxbsqJBM
+	Qo12YmPsmhc/r2+vngTLaYVMEWcJyMYs752Zx5Db+07ktsHZ1EcYQHffKxABQQ3KEAwqo7G
+	0gK4Jf7CBBB1+ovcNN2Jn3WOneuh+dI5otp6icXYa7WJDBDipLN9kQAlm0Z2o17vg4ffsnu
+	Ukqwoor4Elc=
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 11865926464332669648
+From: Duanqiang Wen <duanqiangwen@net-swift.com>
+To: netdev@vger.kernel.org,
+	jiawenwu@trustnetic.com,
+	mengyuanlou@net-swift.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	maciej.fijalkowski@intel.com,
+	andrew@lunn.ch,
+	wangxiongfeng2@huawei.com,
+	linux-kernel@vger.kernel.org
+Cc: Duanqiang Wen <duanqiangwen@net-swift.com>
+Subject: [PATCH net v2] net: txgbe: fix i2c dev name cannot match clkdev
+Date: Thu, 21 Mar 2024 09:51:39 +0800
+Message-Id: <20240321015139.437376-1-duanqiangwen@net-swift.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrsz:qybglogicsvrsz3a-1
 
-On Wed, 20 Mar 2024 18:17:36 +0100, Nicolas Cavallari wrote:
-> procfs files are created before the structure they reference are
-> initialized.  For example, if6_proc_init() creates procfs files that
-> access structures initialized by addrconf_init().
-> 
-> If ipv6 is compiled as a module and a program manages to open an ipv6
-> procfs file during the loading of the module, it can oops the kernel.
-> 
-> It appears that we were unlucky enough to reproduce this problem
-> multiple times already, out of maybe 100 boots:
-> 
-> NET: Registered PF_INET6 protocol family
-> 8<--- cut here ---
-> pwm-backlight backlight: supply power not found, using dummy regulator
-> Segment Routing with IPv6
-> In-situ OAM (IOAM) with IPv6
-> Unable to handle kernel NULL pointer dereference at virtual address
->  00000000
-> mt7915e 0000:03:00.0 wlp3s0: renamed from wlan0
-> [00000000] *pgd=00000000
-> Internal error: Oops: 5 [#1] SMP ARM
-> Modules linked in: ipv6 mt7915e mt76_connac_lib mt76 dw_hdmi_imx
->  mac80211 dw_hdmi drm_display_helper imxdrm drm_dma_helper
->  drm_kms_helper snd_soc_imx_sgtl5000 syscopyarea sysfillrect sysimgblt
->  fb_sys_fops imx_ipu_v3 snd_soc_fsl_asoc_card cfg80211 snd_soc_sgtl5000
->  drm libarc4 snd_soc_fsl_ssi snd_soc_simple_card_utils imx_pcm_dma
->  snd_soc_core rfkill snd_pcm_dmaengine snd_pcm
->  drm_panel_orientation_quirks cfbfillrect cfbimgblt cfbcopyarea
->  snd_timer snd egalax_ts snd_soc_imx_audmux soundcore flexcan mux_mmio
->  imx2_wdt mux_core can_dev pwm_bl
-> CPU: 2 PID: 850 Comm: snmpd Not tainted 6.1.14 #1
-> Hardware name: Freescale i.MX6 Quad/DualLite (Device Tree)
-> PC is at if6_seq_start+0x2c/0x98 [ipv6]
-> LR is at init_net+0x0/0xc00
-> [...]
->  if6_seq_start [ipv6] from seq_read_iter+0xb4/0x510
->  seq_read_iter from seq_read+0x80/0xac
->  seq_read from proc_reg_read+0xac/0x100
->  proc_reg_read from vfs_read+0xb0/0x284
->  vfs_read from ksys_read+0x64/0xec
->  ksys_read from ret_fast_syscall+0x0/0x54
-> Exception stack(0xf0e31fa8 to 0xf0e31ff0)
-> 1fa0:                   b67fd0b0 be8a666b 0000000a b67fd148 00000400
->  00000000
-> 1fc0: b67fd0b0 be8a666b 00000001 00000003 be8a67ec 00000000 b6d7e000
->  b6c9954a
-> 1fe0: b6d7eb30 be8a6638 b6ef11b4 b6ef0ddc
-> Code: e5931004 e35100ff ca000014 e59e25dc (e7920101)
-> ---[ end trace 0000000000000000 ]---
-> 
-> Signed-off-by: Nicolas Cavallari <nicolas.cavallari@green-communications.fr>
+txgbe clkdev shortened clk_name, so i2c_dev info_name
+also need to shorten. Otherwise, i2c_dev cannot initialize
+clock. And had "i2c_dw" string in a define.
 
-The following tag is needed?
+Fixes: e30cef001da2 ("net: txgbe: fix clk_name exceed MAX_DEV_ID limits")
 
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Duanqiang Wen <duanqiangwen@net-swift.com>
+---
+ drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 6 +++---
+ drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h | 2 ++
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-Also, we should put appropriate prefix in the subject for netdev
-patches, i.e. "net" or "net-next". As for this patch, I think
-appropriate prefix is "[PATCH net]".
-
-Anyway,
-
-Reviewed-by: Shigeru Yoshida <syoshida@redhat.com>
-
-Thanks,
-Shigeru
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+index 5b5d5e4310d1..3f61f161f1ed 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+@@ -571,8 +571,8 @@ static int txgbe_clock_register(struct txgbe *txgbe)
+ 	char clk_name[32];
+ 	struct clk *clk;
+ 
+-	snprintf(clk_name, sizeof(clk_name), "i2c_dw.%d",
+-		 pci_dev_id(pdev));
++	snprintf(clk_name, sizeof(clk_name), "%s.%d",
++		 TXGBE_I2C_CLK_DEV_NAME, pci_dev_id(pdev));
+ 
+ 	clk = clk_register_fixed_rate(NULL, clk_name, NULL, 0, 156250000);
+ 	if (IS_ERR(clk))
+@@ -634,7 +634,7 @@ static int txgbe_i2c_register(struct txgbe *txgbe)
+ 
+ 	info.parent = &pdev->dev;
+ 	info.fwnode = software_node_fwnode(txgbe->nodes.group[SWNODE_I2C]);
+-	info.name = "i2c_designware";
++	info.name = TXGBE_I2C_CLK_DEV_NAME;
+ 	info.id = pci_dev_id(pdev);
+ 
+ 	info.res = &DEFINE_RES_IRQ(pdev->irq);
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
+index 8a026d804fe2..c7f2157f3d95 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.h
+@@ -4,6 +4,8 @@
+ #ifndef _TXGBE_PHY_H_
+ #define _TXGBE_PHY_H_
+ 
++#define TXGBE_I2C_CLK_DEV_NAME "i2c_dw"
++
+ irqreturn_t txgbe_gpio_irq_handler(int irq, void *data);
+ void txgbe_reinit_gpio_intr(struct wx *wx);
+ irqreturn_t txgbe_link_irq_handler(int irq, void *data);
+-- 
+2.27.0
 
 
