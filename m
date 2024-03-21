@@ -1,122 +1,101 @@
-Return-Path: <netdev+bounces-81001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECC398857A7
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:52:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65D5E8857AC
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:56:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 779DC1F21DF2
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:52:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DCBCEB2177D
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:56:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8656F57311;
-	Thu, 21 Mar 2024 10:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807A557304;
+	Thu, 21 Mar 2024 10:56:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QWgowL4J"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="TAaoyP98"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D84957300
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 10:52:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07E3F5645E
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 10:56:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711018357; cv=none; b=H0tWINPpwNxpbBVw6dbYnVEY/800rHq+lh2NjH5bgoArh1nl3adQMGFMzegE71C/RubQvEv3XIr2mK4FWlYWtYIwaiX3NIIC4javCI7fwgc4rgyZRZfSAeMcw558DL9dS6LMi21GA7mtcX+9+uRFvJ249F6hALI3o2WZNUaFBHg=
+	t=1711018568; cv=none; b=E5pBO1SxjOX/59asEcJSnhqqzfYLkNePtnUN9xHUn/4+tVR1MWfOjS8aIBJcJndbqxf+2SbviIEG0ygJ42OqxQCLk3bFXdwK79SD4roABO5vIWXJtc9NzmHXgY179Xth7Uz1DxDW6W+AtoQR62D8qs16zkGDhy2aPWmmmxpUOew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711018357; c=relaxed/simple;
-	bh=gsoCm4Wgk2v70XacpU05b7R7RosfW3s9rjwHL5092VU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=FyVPUwHylUx++JXdjBq3rgEBQ/76ygIN8LvjI6TUXCp0LY/kQ7+3qIhjtKdbQH120EEoSe07PsM7OZ5S6Dk4lAgVIKO1KvT0wE+i2SYpbM0ClCXKtPUcpHPgM230mOuVzp+YneDOpZpvLa7Qus5dee7VAX7zio566yfWrt0aNh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QWgowL4J; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711018354;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
-	bh=gsoCm4Wgk2v70XacpU05b7R7RosfW3s9rjwHL5092VU=;
-	b=QWgowL4Jsgr4kDBhaCYwwY6TXFNeONyetTLgVwbPdpyTDQbcAoWpc2zxbrlNtrXzSvQV5R
-	h/rW8+BmBgX3JErPPUTdTrzWKVuOqgTW3Z85ckZVXgrDnuupezUGgVjimDn8eVvpY1C6U+
-	9qxGTvBYFrE/Ou90FE6E0qHw8UWthZs=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-56-z1IFHPxbPfeywcysk_eL4g-1; Thu, 21 Mar 2024 06:52:32 -0400
-X-MC-Unique: z1IFHPxbPfeywcysk_eL4g-1
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-41472b798a2so1618855e9.1
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 03:52:32 -0700 (PDT)
+	s=arc-20240116; t=1711018568; c=relaxed/simple;
+	bh=7f4eip5JEJW6TLMZgvqhzGTrSnJn/FcmClI9rkbbgzE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nKtb2pAurrBrqAD/4sQXDj+QmHnadipTK1OovBkrCfaMenmRhZKPuB1Nnm3kvunrVYWT1vuQmJB0GKs620llqvxOp0LisrY+Sjz7VwzUbwgC7CbOJ6XAqU8SVGpfrxJAuru87JH8uGrHzUu1prghPymzo0Ft4RpRaZB7b64hs0I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=TAaoyP98; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-414701303f7so7911045e9.2
+        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 03:56:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1711018564; x=1711623364; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=7f4eip5JEJW6TLMZgvqhzGTrSnJn/FcmClI9rkbbgzE=;
+        b=TAaoyP987hOhLZSPKB3K3k7zw4Q1FGORnZM8hSS6VC8auxHi8VoEJH/bCi0L3V3zm6
+         vGt2cPsYo9kqsTfmQ3Ix5Qr/aLoLL7D4wkeEpbObF62dQKnyC5mkRhCyNy5nwWe9foUf
+         p13SfhTWaZxpJA/ZlAKWaqbmcTymFdjLdjfSDfd45DVGjcYuIra0oW3yIjxaMT1C4l/c
+         2nFPkFvKQUbmVb62IwNqkgQOlTSVYVcHeGvYO3aGH669JEN1WeSOZ+aebusYYaEc2tWR
+         T1KQVD9u1lZsFkbveKiL7mDLmKei43Jzj3N7R66WG1xd/e11oQletXzlyx/wYLiADMwM
+         Bx5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711018351; x=1711623151;
-        h=mime-version:user-agent:content-transfer-encoding:autocrypt
-         :references:in-reply-to:date:cc:to:from:subject:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gsoCm4Wgk2v70XacpU05b7R7RosfW3s9rjwHL5092VU=;
-        b=OXGkB9zU+IYK/guVxoXiXiuX1QjLSovCN4PJSbnLBCcFdyKSg1E/r7vXd5z12opOvO
-         CdWva1BkhoVL6B+bChgSzKR7VZnwUJ5fp8NRkAHUMmv7Id7lC8mR2cG4J79jZxkD+EQL
-         dmq8vuKwj0CpBRDJtbAHnjjiQFd+zK7j6E57pWDEKWbdxVNlgF0JGrS7hn5CCCYoQyBb
-         SnytRtJX2Gt6SAofe52yH4kfREAfJGOM999byxib9Ai0h5DTYIII7x7q5mjcKjV+uoAx
-         cdfs3d0/2o59gc2rIxgsRQy1dhXwQyWviZBBvIYSgOfUsNEUnXtssLGrBkWvpI87X5pc
-         4frg==
-X-Forwarded-Encrypted: i=1; AJvYcCUSl91O/cXokzIvsHM6Ng/cO8hr/x8Yo4DnACSBDflRtRWe9L4OmTVqYqCCJGUE1HbzpBl6UBRI7sTbtiN/UdxH+d0J0+p2
-X-Gm-Message-State: AOJu0YzO3fNvbVm8jUmkxzuqhB6K5mbQtc37oIGHK7WsMF8m+tprrbDe
-	87pCDKIeakPnfOexg86SRgm9dJJj1Wt9FjQMBbz40lWo2QLSyXpqeBjY/7Xg8bX2nF1n45zDMkO
-	yAvSgXQfVxe5pWWlBqkELAw6/fPaSJX3kA6YL3TSzhSY/vyKVv/lv6w==
-X-Received: by 2002:a05:6000:1849:b0:341:8f18:db39 with SMTP id c9-20020a056000184900b003418f18db39mr5641235wri.1.1711018351695;
-        Thu, 21 Mar 2024 03:52:31 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFC+aYfcvUIaLD708MwzlkLyOTxpcs2HGHrfSDGKBbltBf4gJYZfWTB0xukFigbeuvwxrW7ug==
-X-Received: by 2002:a05:6000:1849:b0:341:8f18:db39 with SMTP id c9-20020a056000184900b003418f18db39mr5641219wri.1.1711018351321;
-        Thu, 21 Mar 2024 03:52:31 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-249-130.dyn.eolo.it. [146.241.249.130])
-        by smtp.gmail.com with ESMTPSA id bk12-20020a0560001d8c00b0033e88eb0ab9sm17143460wrb.11.2024.03.21.03.52.30
+        d=1e100.net; s=20230601; t=1711018564; x=1711623364;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7f4eip5JEJW6TLMZgvqhzGTrSnJn/FcmClI9rkbbgzE=;
+        b=NGVLDp7Ck/DWc6D6sqMV0tL527Dw6Dw8BmOyNLLEFA29qXDqI9TODH1aoNPMMBgSJ5
+         6leOadDGG1X582BrEEGQJTqJe7vRNFIsVL6V9IBuXkYOAmvO5VGciW+OmC0jTeZWVYUE
+         +uVv/P+GwnxSuD0ZWzGRtiYJFgxtqegH9s3m3A6pJ0f1J40xsae4JRkrf7Fol9jSKIP8
+         0YzWsQ3MG/w/hfryV45jO6FlFCMM/jzN5iZ9UmHb+PH2CCIBIn2nppQ9yqQWaiXO1Y2h
+         bo+JjcI+DEiJvhzVPen6y66iQIASIL+m63+eGgY5rY72aGPtNgTbCsuv3NMmX/MxpEkI
+         Tvdw==
+X-Gm-Message-State: AOJu0YzVCtxHBqGzxr0cIGOM2ok0qkEj6tGIXUJIkFlvmlPu9FBfl6QL
+	TxpQr3QGQrkW4zTQ8s9v77rO5gjQ0TTu/UAwFg2JVZ9io8taRcWjFqX5HJmqkuU=
+X-Google-Smtp-Source: AGHT+IF95q2KYQIcfSxFavafFREETN51D41DItEvcPJDVPif2jYc0myp6Gj6jwpAwpJ98fKIrTYHzA==
+X-Received: by 2002:a05:600c:4f94:b0:413:f033:e1ee with SMTP id n20-20020a05600c4f9400b00413f033e1eemr1381399wmq.9.1711018564140;
+        Thu, 21 Mar 2024 03:56:04 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id iv11-20020a05600c548b00b0041463334822sm5227207wmb.26.2024.03.21.03.56.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Mar 2024 03:52:30 -0700 (PDT)
-Message-ID: <1c84b33599ba6d10680162a43ea729f7353327b3.camel@redhat.com>
-Subject: Re: [PATCH net 3/3] netfilter: nf_tables: Fix a memory leak in
- nf_tables_updchain
-From: Paolo Abeni <pabeni@redhat.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org, 
-	edumazet@google.com
-Date: Thu, 21 Mar 2024 11:52:29 +0100
-In-Reply-To: <20240321000635.31865-4-pablo@netfilter.org>
-References: <20240321000635.31865-1-pablo@netfilter.org>
-	 <20240321000635.31865-4-pablo@netfilter.org>
-Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
+        Thu, 21 Mar 2024 03:56:03 -0700 (PDT)
+Date: Thu, 21 Mar 2024 11:55:59 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Duanqiang Wen <duanqiangwen@net-swift.com>
+Cc: netdev@vger.kernel.org, jiawenwu@trustnetic.com,
+	mengyuanlou@net-swift.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, maciej.fijalkowski@intel.com,
+	andrew@lunn.ch, wangxiongfeng2@huawei.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v4] net: txgbe: fix i2c dev name cannot match clkdev
+Message-ID: <ZfwSP5-mZoKIFaTV@nanopsycho>
+References: <20240321054742.446481-1-duanqiangwen@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240321054742.446481-1-duanqiangwen@net-swift.com>
 
-On Thu, 2024-03-21 at 01:06 +0100, Pablo Neira Ayuso wrote:
-> From: Quan Tian <tianquan23@gmail.com>
->=20
-> If nft_netdev_register_hooks() fails, the memory associated with
-> nft_stats is not freed, causing a memory leak.
->=20
-> This patch fixes it by moving nft_stats_alloc() down after
-> nft_netdev_register_hooks() succeeds.
->=20
-> Fixes: b9703ed44ffb ("netfilter: nf_tables: support for adding new device=
-s to an existing netdev chain")
-> Signed-off-by: Quan Tian <tianquan23@gmail.com>
+Thu, Mar 21, 2024 at 06:47:42AM CET, duanqiangwen@net-swift.com wrote:
+>txgbe clkdev shortened clk_name, so i2c_dev info_name
+>also need to shorten. Otherwise, i2c_dev cannot initialize
+>clock. And had "i2c_dw" string in a define.
+>
+>Fixes: e30cef001da2 ("net: txgbe: fix clk_name exceed MAX_DEV_ID limits")
+>Signed-off-by: Duanqiang Wen <duanqiangwen@net-swift.com>
 
-I'm sorry for nit-picking, but our tag verification scripts are unhappy
-WRT this commit, it lacks your SoB. Would you mind sending an updated
-PR?
-
+As Jakub asked you, could you please take a break and read
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
+?
 Thanks!
-
-Paolo
-
 
