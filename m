@@ -1,131 +1,77 @@
-Return-Path: <netdev+bounces-81097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DDDD885C7E
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 16:49:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 326C5885CA3
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 16:53:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 901CD1C20834
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:49:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42F431C22D05
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:53:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A0E386255;
-	Thu, 21 Mar 2024 15:49:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B471B1292CD;
+	Thu, 21 Mar 2024 15:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="PMrdRguP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WnzNOqgk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE014224F2
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 15:49:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D8EF86622;
+	Thu, 21 Mar 2024 15:53:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711036176; cv=none; b=rFlYl1BfO3I75xhWRJdS1rJ47KApIYzpuAucW9Sui0rTXZMHxZzQYi67GuKiFRYyR33n90zBzNvivaEW6V43BAl9dHmfhMONOvAqaRUd5753PnVSfzkDNKK7qOYTiqjeIQ7ltFNT9QeiYSzWE2E73VlcGzlb0S4eHc90fJvXaF4=
+	t=1711036385; cv=none; b=hMW5xg283dkv2Qn8uEqcv6w5rOyRHkZhXq+x3BjW96YxC0T/FF2WIpYlNba1yM7FXoy+WbF0p8V8gyQSQsede6nMY7lT2nBUrFX3J0undDMShzhgJ9OJTxzBhFlJj08nKdqYp/B7d6a2y2/N97qJx4W+BROqPBJSQ5m7q3iGwcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711036176; c=relaxed/simple;
-	bh=03zm1CMeVrOLuwdydHw+vTkdItfVFTx9tilzNEsOzoU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iCLF1eL8WaHMNy4Sw2helAKYcRMQZhsnfcsCoYkx6+t+3tqq+rlag6kk3nthvi0lYW2aXnvJSRYV2tgMSHt9ekmJaMbKkMZmZlyN0ewQtxUHMdg5+AKFpixiRfa1hBCwTZybboWr15jDss8QlMtbsrr5RJibLFkb6hw8ikMi9So=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=PMrdRguP; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4141156f245so8068055e9.2
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 08:49:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711036173; x=1711640973; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=nn0KXLTmKo1UAHS+ioXMLgSp1Jk0+gNJVUyK//P+Ags=;
-        b=PMrdRguP2ivpzCDwlpDiGj7Y33QDj9TXMe8qZDuExe9fO0k69kvZgx0AUTyFzAHUtM
-         ogjIWBCLEg+voM0Ix7SMZMwC4ji1RXw3RCzIQ9j99/ZPvJ3hzkioHac7FZxp8qEkBaSm
-         utk3u/RZ3SJJzQol5EyTlY9WkG4XnI/L1IaghSPMrKNVmYI6NLe9YW0MJphqIxc6b+6q
-         9/WlE6s0MH/782ma4zQ5KeH0MLB0go50vYgRNcMHVWsMlTK4t2IiGerfq764d6hoJYar
-         XKy9HR7YnWMpJvE+UhIocNUbzfpeuHYem9+Y40kIJL+k00Tktc1NiuZZIuXJnAwKCgTy
-         YNKA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711036173; x=1711640973;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nn0KXLTmKo1UAHS+ioXMLgSp1Jk0+gNJVUyK//P+Ags=;
-        b=MoqyrRopKi/7S1CuVfZZLv2G7X0+EcWAXq+SUT/14XlCNCc/2ZcwgU4knputIxzI5B
-         WS+0Rwvu2MVugx7s3R7lVtaC7bExjqpmvTlElS1cM/LQGsfophD1h1FFsbt6TtdUZJLe
-         6Nrm2PHuU5MPw9ZI0KKI8lMqwAUtfGZcVrg8Rx4RKhmOKgPb633lPfl6aaGwaDW2ld6W
-         NPne8Yq89HumJ6XlEZXegQfUMGo23LmYZhnzDSU2aj9KzSuKBMQSHQEbBsZdl1bj8ZNd
-         HCBQzI7No03U6ckH3lOPABmV95YVNt9sn1NK6QRuEeHTjsOngLfKvvh02T6a6kJnvxj8
-         b6GQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWb4fvHOjb3P50DsrqtUupDVU/ASGrxv8kKH3nudsH2n5FhNllAszlVkZwuCDbgNk5/WtQAnS9DK4MZ8SACdlvX96hE+KWa
-X-Gm-Message-State: AOJu0Yz5no5fJoWiCdbM2JRzPChdXQ4y1RhdIgA83tSlp2v6GNJF5hx3
-	Ng7uDyJpqkAmlA0y+4BO4V+v0V01BpvI/yBSBoD05B8WpJYL1qf+NQd5yFPkZbI=
-X-Google-Smtp-Source: AGHT+IHS0COvGmxGWKzVrLFKmJH2kCt88HgGRRr5C/qE0aKfK7wiVDsrmhkHV9SjTOUK91PmmME4Iw==
-X-Received: by 2002:a05:600c:218e:b0:414:a6d:52d8 with SMTP id e14-20020a05600c218e00b004140a6d52d8mr1687053wme.17.1711036172968;
-        Thu, 21 Mar 2024 08:49:32 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id jh2-20020a05600ca08200b00413e63bb140sm5997582wmb.41.2024.03.21.08.49.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Mar 2024 08:49:32 -0700 (PDT)
-Date: Thu, 21 Mar 2024 18:49:29 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH v2 net] ice: Fix freeing uninitialized pointers
-Message-ID: <dd392ed9-9f68-4364-bc9a-ab95d6b54cda@moroto.mountain>
-References: <0efe132b-b343-4438-bb00-5a4b82722ed3@moroto.mountain>
- <ZfxTjYUPAFz_LRlk@nanopsycho>
+	s=arc-20240116; t=1711036385; c=relaxed/simple;
+	bh=u1plv30F+lG476X5KY0kDYqxcIkHdlACBUkujzCpDsE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PsRrmx6SLSAfvAoOmJWZiXbi3NMVLMSQ67x0nm3MoXGkGZakW07uRUPvVuKSsdPOtIYJzHZazoEdVZ+rDet0RHJFPelTkFddTID1n+YF1aCnJtC5GfHH0C3Aa94KRoDWhtgrMqOH9LkPMYNzEZH9tT1lrXv76g/42T1bfSgZbm8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WnzNOqgk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65DA1C433C7;
+	Thu, 21 Mar 2024 15:53:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711036385;
+	bh=u1plv30F+lG476X5KY0kDYqxcIkHdlACBUkujzCpDsE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=WnzNOqgkRAeL8SObeU/x5fTVlijinaevTys2p3gfi32uA64d1fElRYy7G5ACQFRiJ
+	 +16TTUcYkC1LaYlEEyDWVxYZ8oYVCfWYX0G/7knDgUrW8FhTqeJeFYN8CuGkWQ04ZM
+	 gCZINdNYuxXgAf3GcedrGM7tZ1F7zaWKL+xgZv+9QwyntK/zYc0eX2FzmliN9bu6QZ
+	 20ZUZVCU3dq/s62TqNs2PIYLDlu7ZPmeWu76quGnLXP7FNrHHLphME8kBeyWX/Ol5Q
+	 nu4VzoQM0CaF4vMwT3HFQ5705pYGAm/jikceVDtu460C52AuZUn5mGMOPstBMoUJ3Y
+	 wY1+vkiJi556g==
+Date: Thu, 21 Mar 2024 08:53:03 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Elad Nachman <enachman@marvell.com>, <taras.chornyi@plvision.eu>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <andrew@lunn.ch>, <thomas.petazzoni@bootlin.com>,
+ <miquel.raynal@bootlin.com>, <przemyslaw.kitszel@intel.com>,
+ <dkirjanov@suse.de>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2 0/5] Fix prestera driver fail to probe twice
+Message-ID: <20240321085303.489feb4a@kernel.org>
+In-Reply-To: <20240321100600.5ccba11d@kmaincent-XPS-13-7390>
+References: <20240320172008.2989693-1-enachman@marvell.com>
+	<20240321100600.5ccba11d@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZfxTjYUPAFz_LRlk@nanopsycho>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 21, 2024 at 04:34:37PM +0100, Jiri Pirko wrote:
-> >The change to ice_update_link_info() isn't required because it's
-> >assigned on the very next line...  But I did that because it's harmless
-> >and makes __free() stuff easier to verify.  I felt like moving the
-> >declarations into the code would be controversial and it also ends up
-> >making the lines really long.
-> >
-> >		goto goto err_unroll_sched;
-> >
-> >	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) =
-> >		kzalloc(sizeof(*pcaps), GFP_KERNEL);
+On Thu, 21 Mar 2024 10:06:00 +0100 Kory Maincent wrote:
+> > Fix issues resulting from insmod, rmmod and insmod of the
+> > prestera driver:  
 > 
-> Yeah, that is why I'm proposing KZALLOC_FREE helper:
-> https://lore.kernel.org/all/20240315132249.2515468-1-jiri@resnulli.us/
+> Please add "net" prefixes to all your patches subject, like that:
+> [PATCH net v2 x/5]
 > 
+> I think the maintainers bots won't works if you don't.
 
-I like the idea, but I'm not keen on the format.  What about something
-like?
-
-#define __ALLOC(p) p __free(kfree) = kzalloc(sizeof(*p), GFP_KERNEL)
-
-	struct ice_aqc_get_phy_caps_data *__ALLOC(pcaps);
-
-I'm not a huge fan of putting functions which can fail into the
-declaration block but I feel like we're going to officially say that
-small allocations can't fail.
-
-https://lwn.net/Articles/964793/
-https://lore.kernel.org/all/170925937840.24797.2167230750547152404@noble.neil.brown.name/
-
-Normally we would try to delay the allocations until after all the
-sanity checks have run but that's optimizing for the failure case.  In
-the normal case we're going to want these allocations.
-
-regards,
-damn carpenter
+They will default to net-next, which right now is perfectly fine.
 
