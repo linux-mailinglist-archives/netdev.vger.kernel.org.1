@@ -1,180 +1,129 @@
-Return-Path: <netdev+bounces-81054-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81055-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B3B588596E
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:52:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92D3D885977
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 13:56:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DA8961F211CD
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:52:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E183281F78
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:56:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 367AC83CC6;
-	Thu, 21 Mar 2024 12:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF0B483CC4;
+	Thu, 21 Mar 2024 12:56:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="eoVNRrd4";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LFpWYcGw";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="eoVNRrd4";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="LFpWYcGw"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pPc+IfHR"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 779B7134CD;
-	Thu, 21 Mar 2024 12:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 737F383CB7
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 12:56:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711025536; cv=none; b=JdeWPcEfP4Wx5OOwM82HMlNQk3Sh6gdEpheizuHTntzT6v03X7hmec24TZLXdv7zbM+5Edbo1yZxNBtBXeex9iwvyDvWgHzRujgqG5EECztNbSbjqYvYDBjLS35CBaD5sbbo6sb9VnF8/0UVpqzetH3ObqEgP5saLA+rzlu61Cg=
+	t=1711025812; cv=none; b=Y0QHN0Ood5cdcn0Okb+L237mvpWFcIJF1L4JnZfFXjRJK+MToNgQI1OZnkOFpfxA9MMbLJiNanOSKZAfYTk3kFx8mCFD8vwZip6pEdS+4V0ezDoKykUh24vF0FtZrhV47RWUTqTNyFZ09jZw7jK4rL3X1cgUGSIYKczuSyOvkM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711025536; c=relaxed/simple;
-	bh=dFQnHdvjN+PdZaRydPaL5YzOnVbqxPf19LkEFEHeg70=;
+	s=arc-20240116; t=1711025812; c=relaxed/simple;
+	bh=Ksx1B8S0HuTXY77hiHMqkey4XaIabz9nNjNx5yMCyeM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lunPOsCXyrLUmS1tcLQxi2/e3CrfaT5SKzuvP+hRn8NjAtLVOHOApy033g36uVKnqYS/042qnf4WpwhVjrxyXRN2oMiDANYVhP5FT/ywUZfdrDQh4ZQXVo5Nbw0dbQDJL4/F+8gyxHqcHq524iqsZoyUp6msymUV36Taam8CjXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=eoVNRrd4; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LFpWYcGw; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=eoVNRrd4; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=LFpWYcGw; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 68B5A373B8;
-	Thu, 21 Mar 2024 12:52:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1711025532; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
+	 In-Reply-To:Content-Type; b=mgpWeeWx+GIAxPJ5UjOFJdzGwtuKAMw1IFmJSkXmWOTOUy3XuDXfYJr8zmG2ExHZmPBIkOC7HPnjS7OtbksmYBaZkEeDehm4GwKPPNDZH3MO5I1j1oyo+dRC1kMxiKN8qjI2QaRVJKHif4qKlj5NAsXofElJNjoj4A+M1h6SIu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pPc+IfHR; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <7e261328-42eb-411d-b1b4-ad884eeaae4d@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1711025807;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=diCeKBUDpUeOaEDHZJ+/O8iEUxC3MlV9oxExIu8D4cg=;
-	b=eoVNRrd493B4kd4SgEFrTiFnhtXtfXH4QfaHq19hp2F9W/017zepPUlWvUCyv+CLJGFyvf
-	TWUNjXNgBHy+5dXd22I1bL4zaAz4oSICy6BMYFHjDoZqXle5J5bQofjK2l6Ibw85p8IZhe
-	VakJ63YYdJNzhF3i13AiV6d2L7qZT3k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1711025532;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=diCeKBUDpUeOaEDHZJ+/O8iEUxC3MlV9oxExIu8D4cg=;
-	b=LFpWYcGwnvQABaHyDr3USzpnLGp/1HpgFX5uqxBY0aD9RiPl1y49qIR7K1wb6LfVALwaQR
-	G+bn68nAIntgWPCg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1711025532; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=diCeKBUDpUeOaEDHZJ+/O8iEUxC3MlV9oxExIu8D4cg=;
-	b=eoVNRrd493B4kd4SgEFrTiFnhtXtfXH4QfaHq19hp2F9W/017zepPUlWvUCyv+CLJGFyvf
-	TWUNjXNgBHy+5dXd22I1bL4zaAz4oSICy6BMYFHjDoZqXle5J5bQofjK2l6Ibw85p8IZhe
-	VakJ63YYdJNzhF3i13AiV6d2L7qZT3k=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1711025532;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=diCeKBUDpUeOaEDHZJ+/O8iEUxC3MlV9oxExIu8D4cg=;
-	b=LFpWYcGwnvQABaHyDr3USzpnLGp/1HpgFX5uqxBY0aD9RiPl1y49qIR7K1wb6LfVALwaQR
-	G+bn68nAIntgWPCg==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 99F1A136AD;
-	Thu, 21 Mar 2024 12:52:11 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id Ib5vIXst/GXVTgAAD6G6ig
-	(envelope-from <dkirjanov@suse.de>); Thu, 21 Mar 2024 12:52:11 +0000
-Message-ID: <a8174c07-00c9-4a8e-9c2e-c2d759379f09@suse.de>
-Date: Thu, 21 Mar 2024 15:52:10 +0300
+	bh=hXohp44bVJqyA9VP99U4GSaIHGvh6261AUTii/uNcwA=;
+	b=pPc+IfHRjTUQXqaF1xnn0n8NOiZnClXRhJ6USlcGAc0lZdRH6uu2Gr4VMxI9yYvWABcmLg
+	50GuzCPE5SHZjOCfGNnwJFW3kWFoXAXKqSCgDq6KrDwWbhzgBOqUFQnvM0+VzYKdfib+yU
+	2TmwAsNu5vrkcvRj3ZVCTMQTxfHFSvM=
+Date: Thu, 21 Mar 2024 14:56:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] flow_dissector: prevent NULL pointer dereference in
- __skb_flow_dissect
+Subject: Re: [PATCH net-next v2 3/3] genetlink: fit NLMSG_DONE into same
+ read() as families
+To: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>
+Cc: Stefano Brivio <sbrivio@redhat.com>, davem@davemloft.net,
+ netdev@vger.kernel.org, pabeni@redhat.com, jiri@resnulli.us,
+ idosch@idosch.org, johannes@sipsolutions.net, fw@strlen.de,
+ pablo@netfilter.org, Martin Pitt <mpitt@redhat.com>,
+ Paul Holzinger <pholzing@redhat.com>,
+ David Gibson <david@gibson.dropbear.id.au>
+References: <20240303052408.310064-1-kuba@kernel.org>
+ <20240303052408.310064-4-kuba@kernel.org> <20240315124808.033ff58d@elisabeth>
+ <20240319085545.76445a1e@kernel.org>
+ <CANn89i+afBvqP564v6TuL3OGeRxfDNMuwe=EdH_3N4UuHsvfuA@mail.gmail.com>
+ <20240319104046.203df045@kernel.org>
 Content-Language: en-US
-To: Anastasia Belova <abelova@astralinux.ru>,
- "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Jiri Pirko <jiri@resnulli.us>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
-References: <20240321123446.7012-1-abelova@astralinux.ru>
-From: Denis Kirjanov <dkirjanov@suse.de>
-In-Reply-To: <20240321123446.7012-1-abelova@astralinux.ru>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Gal Pressman <gal.pressman@linux.dev>
+In-Reply-To: <20240319104046.203df045@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Level: 
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=eoVNRrd4;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=LFpWYcGw
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Spamd-Result: default: False [-2.50 / 50.00];
-	 ARC_NA(0.00)[];
-	 RCVD_VIA_SMTP_AUTH(0.00)[];
-	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 XM_UA_NO_VERSION(0.01)[];
-	 FROM_HAS_DN(0.00)[];
-	 TO_DN_SOME(0.00)[];
-	 TO_MATCH_ENVRCPT_ALL(0.00)[];
-	 BAYES_HAM(-0.00)[41.68%];
-	 MIME_GOOD(-0.10)[text/plain];
-	 SPAMHAUS_XBL(0.00)[2a07:de40:b281:104:10:150:64:97:from];
-	 NEURAL_HAM_LONG(-1.00)[-1.000];
-	 DWL_DNSWL_LOW(-1.00)[suse.de:dkim];
-	 RCVD_COUNT_THREE(0.00)[3];
-	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	 DKIM_TRACE(0.00)[suse.de:+];
-	 MX_GOOD(-0.01)[];
-	 RCPT_COUNT_SEVEN(0.00)[8];
-	 DBL_BLOCKED_OPENRESOLVER(0.00)[astralinux.ru:email,suse.de:dkim,linuxtesting.org:url];
-	 FUZZY_BLOCKED(0.00)[rspamd.com];
-	 FROM_EQ_ENVFROM(0.00)[];
-	 MIME_TRACE(0.00)[0:+];
-	 NEURAL_HAM_SHORT(-0.20)[-1.000];
-	 RCVD_TLS_ALL(0.00)[];
-	 MID_RHS_MATCH_FROM(0.00)[]
-X-Spam-Score: -2.50
-X-Rspamd-Queue-Id: 68B5A373B8
-X-Spam-Flag: NO
+X-Migadu-Flow: FLOW_OUT
 
-
-
-On 3/21/24 15:34, Anastasia Belova wrote:
-> skb is an optional parameter, so it may be NULL.
-> Add check defore dereference in eth_hdr.
+On 19/03/2024 19:40, Jakub Kicinski wrote:
+> On Tue, 19 Mar 2024 18:17:47 +0100 Eric Dumazet wrote:
+>>> Hi Stefano! I was worried this may happen :( I think we should revert
+>>> offending commits, but I'd like to take it on case by case basis.
+>>> I'd imagine majority of netlink is only exercised by iproute2 and
+>>> libmnl-based tools. Does passt hang specifically on genetlink family
+>>> dump? Your commit also mentions RTM_GETROUTE. This is not the only
+>>> commit which removed DONE:
+>>>
+>>> $ git log --since='1 month ago' --grep=NLMSG_DONE --no-merges  --oneline
+>>>
+>>> 9cc4cc329d30 ipv6: use xa_array iterator to implement inet6_dump_addr()
+>>> 87d381973e49 genetlink: fit NLMSG_DONE into same read() as families
+>>> 4ce5dc9316de inet: switch inet_dump_fib() to RCU protection
+>>> 6647b338fc5c netlink: fix netlink_diag_dump() return value  
+>>
+>> Lets not bring back more RTNL locking please for the handlers that
+>> still require it.
 > 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+> Definitely. My git log copy/paste is pretty inaccurate, these two are
+> better examples:
 > 
-> Fixes: 690e36e726d0 ("net: Allow raw buffers to be passed into the flow dissector.")
-> Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
-
-As request in the previous email please show the actual data flow that leads to a null pointer
-dereference.
-Also please read function description:
-...
- * @skb: sk_buff to extract the flow from, can be NULL if the rest are specified
-...
-
-> ---
->  net/core/flow_dissector.c | 2 ++
->  1 file changed, 2 insertions(+)
+> 5d9b7cb383bb nexthop: Simplify dump error handling
+> 02e24903e5a4 netlink: let core handle error cases in dump operations
 > 
-> diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
-> index 272f09251343..68a8228ffae3 100644
-> --- a/net/core/flow_dissector.c
-> +++ b/net/core/flow_dissector.c
-> @@ -1139,6 +1139,8 @@ bool __skb_flow_dissect(const struct net *net,
->  
->  	if (dissector_uses_key(flow_dissector,
->  			       FLOW_DISSECTOR_KEY_ETH_ADDRS)) {
-> +		if (!skb)
-> +			goto out_bad;
->  		struct ethhdr *eth = eth_hdr(skb);
->  		struct flow_dissector_key_eth_addrs *key_eth_addrs;
->  
+> I was trying to point out that we merged a handful of DONE "coalescing"
+> patches, and if we need to revert - let's only do that for the exact
+> commands needed. The comment was raised on my genetlink patch while
+> the discussion in the link points to RTM_GETROUTE.
+> 
+>> The core can generate an NLMSG_DONE by itself, if we decide this needs
+>> to be done.
+> 
+> Exactly.
+> 
+
+We've encountered a new issue recently which I believe is related to
+this discussion.
+
+Following Eric's patch:
+9cc4cc329d30 ("ipv6: use xa_array iterator to implement inet6_dump_addr()")
+
+Setting the interface mtu to < 1280 results in 'ip addr show eth2'
+returning an error, because the ipv6 dump fails. This is a degradation
+from the user's perspective.
+
+# ip addr show eth2
+4: eth2: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group
+default qlen 1000
+    link/ether 24:42:53:21:52:44 brd ff:ff:ff:ff:ff:ff
+    altname enp6s0f0np0
+# ip link set dev eth2 mtu 1000
+# ip addr show eth2
+RTNETLINK answers: No such device
+Dump terminated
 
