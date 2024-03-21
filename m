@@ -1,129 +1,84 @@
-Return-Path: <netdev+bounces-80981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7DFF885644
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:14:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1FBD885643
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:13:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 525E0B2147A
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:14:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87C3D282442
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50CFF3D0C6;
-	Thu, 21 Mar 2024 09:13:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72E13BB35;
+	Thu, 21 Mar 2024 09:13:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF0F23A8EF
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 09:13:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB0D212B81
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 09:13:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711012436; cv=none; b=Ez6xZrJc5XKQkSTHGkNmSI4uKTW4mEoJSL/gH6PN6cVsaRdJGYQG24Cjz2x6mjxLXiucDT+jB5+/elvTnTQlkzMgEKMqHcCU3sQs6SeSMWuX1NGDqHjfshRAaREMQlf05Veerk8vo2yOdgDLyHNJ42n7nJB4N8LWgLDOuk+MVeU=
+	t=1711012432; cv=none; b=t4siKXaXKFEtOgGNBtX1Hi6D5kEf4vdbxMwvH6dOrkz4Exfs0OIs8vH1Zk75OWZe2HDR6Sp8P5QhD61xBtlI4syoTnGXLq4jtcuw9GgiUbtjWuYMh7KoRBh6whlquyBrgCHgnvd/orrnv+G1QyP5oTAsplXF0qR+vihZh3QaCfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711012436; c=relaxed/simple;
-	bh=El7Lg12kFaitdq/ohqrzq61GvimKgufkhGpfdo1lhfo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aIOKo/S7B6kct7lNZjff6poqp0DfcHBVLqBzVZTmJcQXfwfIj+XhOx2j21MXtVW5St2N3gan2HBDnQL1wcS5eLgQFPE83BlXll62aEULGVERJIRkbI9fNiytfVCxhTB2/fXXudG17wTyN5SMZRmkhXJvHv0wwNNyZLxvh0MTuMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [112.20.109.198])
-	by gateway (Coremail) with SMTP id _____8BxHOtN+vtlvMEbAA--.56152S3;
-	Thu, 21 Mar 2024 17:13:49 +0800 (CST)
-Received: from [192.168.100.8] (unknown [112.20.109.198])
-	by localhost.localdomain (Coremail) with SMTP id AQAAf8AxjhNJ+vtlGbxfAA--.64423S3;
-	Thu, 21 Mar 2024 17:13:46 +0800 (CST)
-Message-ID: <a9958d92-41da-4c3a-8c57-615158c3c8a2@loongson.cn>
-Date: Thu, 21 Mar 2024 17:13:45 +0800
+	s=arc-20240116; t=1711012432; c=relaxed/simple;
+	bh=fo4gtK5z5PyFuB28Yk40tv9Ltho3oCAUMTrB1OFrr/Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cbnigfqeDQLrzbxvC0gcnosf9nUADyoAE23lzqAeAO4vnC5MK7oSAG/kdFxakJSwEl/RnFKkBqhf5KhqhUb6cFLlEkZwhwN/g3QgyiFb1G+2mcy6MsPLkeTrGWRSeLRkGka+B0kkA8SZY1DutqN2s6wTlrjsOZIL41ErpFJ6wgc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-568a53d2ce0so957566a12.0
+        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 02:13:50 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711012429; x=1711617229;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Tu1CPOXxxTeFPRVEqGjdY1c+JYzwQ/+HNzCVCyHRYsE=;
+        b=IHwoC5fmlQARHwXpaWMKs9TzwbKyYJq6pH0GVJpi12dNc9I/1hkz4w8sfJQNo4RCgy
+         fiv7ukVeZwu3ndYTlbbwTzJQbwafLYT6U0pjckCnAu81bMol+veD0UUM+WpgLddlhvR6
+         jwwxj/4/o4iuBORpeAayByczUnlnaWvpGMnaAjqSkEmz3EiJ8OA14YAGYcslsDGoxbho
+         MJ41zmlB+iF5Tn7LxNhHnlsxiS54OjKoiVgHcp2k6sN3N61dCQqxIkaUrLcWBQOGSo0d
+         h0aHbPAH0IkWZhRurkwE9yQWCocThg1fYwFx6V/cSbKBR9nd/nQJyfz+gEKFoCSbG7n/
+         473A==
+X-Forwarded-Encrypted: i=1; AJvYcCVg6Nb3buRB8elY5E8EdDbCT9ep5g+3oaAhn8JVlMT62MLr67yyeZxFTifrAlWN4czlFL9Kfg+XVg3uHVW0EtvLtjKb4W3A
+X-Gm-Message-State: AOJu0YxKXlWC8eMMJve37Nv8PHwKKaRQ9OlDr57oHTHZ9V6l5QEHN1EW
+	wpXDvvGMPRqhsEwVq1cIyz6IN6uKylydAdiEfRgjnT75NF+w6/nHwgHVRVu/
+X-Google-Smtp-Source: AGHT+IGUBBwVl0SlpzBG5lYulXLO9rGnsueKl7Dk31MRESA41cWBlZKeWv/5f/aKbzUXMnFAxUuODQ==
+X-Received: by 2002:a17:906:36d0:b0:a46:f69b:49b1 with SMTP id b16-20020a17090636d000b00a46f69b49b1mr931147ejc.46.1711012428924;
+        Thu, 21 Mar 2024 02:13:48 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
+        by smtp.gmail.com with ESMTPSA id be7-20020a1709070a4700b00a46a9c38b16sm5929726ejc.138.2024.03.21.02.13.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Mar 2024 02:13:48 -0700 (PDT)
+Date: Thu, 21 Mar 2024 02:13:46 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, sdf@google.com
+Subject: Re: [PATCH net] tools: ynl: fix setting presence bits in simple nests
+Message-ID: <Zfv6SocBxYXCFmQF@gmail.com>
+References: <20240321020214.1250202-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 06/11] net: stmmac: dwmac-loongson: Add GNET
- support
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
- chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
- netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
-References: <cover.1706601050.git.siyanteng@loongson.cn>
- <027b4ee29d4d7c8a22d2f5c551f5c21ced3fb046.1706601050.git.siyanteng@loongson.cn>
- <ftqxjh67a7s4iprpiuw5xxmncj3bveezf5vust7cej3kowwcvj@m7nqrxq7oe2f>
- <d0e56c9b-9549-4061-8e44-2504b6b96897@loongson.cn>
- <466f138d-0baa-4a86-88af-c690105e650e@loongson.cn>
- <x6wwfvuzqpzfzstb3l5adp354z2buevo35advv7q347gnmo3zn@vfzwca5fafd3>
-Content-Language: en-US
-From: Yanteng Si <siyanteng@loongson.cn>
-In-Reply-To: <x6wwfvuzqpzfzstb3l5adp354z2buevo35advv7q347gnmo3zn@vfzwca5fafd3>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:AQAAf8AxjhNJ+vtlGbxfAA--.64423S3
-X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7KFyrKFW8uF4kKFW8Zw4xGrX_yoW8Xry5pr
-	ZrGayDKrZrWry7K34vvwn8ZrnavayrWw109ryUGw1jvrs0kFWxWw1Uur4UCF97CrZ5Cr1U
-	Xw4jyay7ua98W3gCm3ZEXasCq-sJn29KB7ZKAUJUUUUx529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_JFI_Gr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
-	xVW8Jr0_Cr1UM2kKe7AKxVWUAVWUtwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
-	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
-	AVWUtwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
-	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
-	6r4UMxCIbckI1I0E14v26r126r1DMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
-	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
-	0xvE14v26r1I6r4UMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
-	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
-	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxU4SoGDUUUU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240321020214.1250202-1-kuba@kernel.org>
 
+On Wed, Mar 20, 2024 at 07:02:14PM -0700, Jakub Kicinski wrote:
+> When we set members of simple nested structures in requests
+> we need to set "presence" bits for all the nesting layers
+> below. This has nothing to do with the presence type of
+> the last layer.
+> 
+> Fixes: be5bea1cc0bf ("net: add basic C code generators for Netlink")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-在 2024/3/19 23:03, Serge Semin 写道:
->>>>>   >> +static int loongson_gnet_data(struct pci_dev *pdev,
->>>>> +			      struct plat_stmmacenet_data *plat)
->>>>> +{
->>>>> +	loongson_default_data(pdev, plat);
->>>>> +
->>>>> +	plat->multicast_filter_bins = 256;
->>>>> +
->>>>> +	plat->mdio_bus_data->phy_mask =  ~(u32)BIT(2);
->>>>> +
->>>>> +	plat->phy_addr = 2;
->>>>> +	plat->phy_interface = PHY_INTERFACE_MODE_INTERNAL;
->>>> Are you sure PHY-interface is supposed to be defined as "internal"?
->>> Yes, because the gnet hardware has a integrated PHY, so we set it to internal，
->>>
-> Why do you need the phy_addr set to 2 then? Is PHY still discoverable
-> on the subordinate MDIO-bus?
-
-Because the default return value of gnet's mdio is 0xffff, when scanning 
-for phy,
-
-if the return value is not 0, it will be assumed that the phy for that 
-address exists.
-
-  Not specifying an address will cause all addresses' phy to be 
-detected, and the
-
-lowest address' phy will be selected by default. so then, the network is 
-unavailable.
-
->
-> kdoc in "include/linux/phy.h" defines the PHY_INTERFACE_MODE_INTERNAL
-> mode as for a case of the MAC and PHY being combined. IIUC it's
-> reserved for a case when you can't determine actual interface between
-> the MAC and PHY. Is it your case? Are you sure the interface between
-> MAC and PHY isn't something like GMII/RGMII/etc?
-Hmmm. the interface between MAC and PHY is GMII, so let's use
-
-PHY_INTERFACE_MODE_GMII?
-
-
-Thanks,
-
-Yanteng
-
+Reviewed-by: Breno Leitao <leitao@debian.org>
 
