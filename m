@@ -1,124 +1,163 @@
-Return-Path: <netdev+bounces-81085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1553C885B59
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 16:03:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37F62885B5E
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 16:04:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25FE71C219DA
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:03:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB8321F21CE6
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:04:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31B7285C77;
-	Thu, 21 Mar 2024 15:03:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF3EE8613B;
+	Thu, 21 Mar 2024 15:04:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="DTTpOzyE"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="eNoMiKT6"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta1.migadu.com (out-185.mta1.migadu.com [95.215.58.185])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75B2555792
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 15:03:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D2118662A
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 15:04:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711033430; cv=none; b=mdQkSeWhVN+udRnGiob8YNT+GiWKYMVBZGPHdBUYCEs8xqiJVZ7V3FFalbO1VNnCuY5ZF8WGuc9vSgfFNYKMO5OB1h0lKpQLQkCZRNgk2ntoo1VdV1hPWZgyV5NphVxtITVP2wAmqsb3ofVsrmwC7n1SFju+FNZrAx79tfUw8EE=
+	t=1711033470; cv=none; b=ThIHQDbXFU/kMkEPykYZx8cbEV3+SVjYhNVlhfdPcdxcyCTF8Cve6gLrMU6BDG8d0lOfOgdcQxKPdH1Lm4Hl8cWBCDw8Uyc9osLxVP7ovTjBKkhQGzdxwq21EAvHylCihD++SOyM3OWlwgg7dyox4kRn2mQ9a1YBiG1bHUtkGPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711033430; c=relaxed/simple;
-	bh=q4+x0aifIbtTM1xEwbov/PjIHQy/aphdvdy48hnYllk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gdD/MaEoz/sU/e1IoSG9tjreE85+6bZmV/+9XCW7mBOVsOv/a2ZB8eyZWVbBXdG40tPsAmei00fvuVMVqpJHitu5uJ+K0oXiNUavrppA2h0ER63aKqwNQ8JpwAqze6B8ZnnOciTPYtfsgtzQsAizUehByoFPct9yTP2UzFl2Rlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=DTTpOzyE; arc=none smtp.client-ip=95.215.58.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <bb4d62d9-fbe2-41e3-90ff-02d7c2a05443@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1711033425;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TZkcn1F/1RBtLueSk/qCM/2jZl7o2S0liUO3Wa0+rRQ=;
-	b=DTTpOzyENbR+CkYaYba7eMIyUSN3CS9rh8vHbc42AT4EeyrTfbZJvedpFCrsIKuDXG7nw2
-	3v1Gbfg4d2xoB12i4QcJ7MvUqHT65McQ9wufUjIK1Bx1/o+1QCCPfJ49BvYKwWGDqgE0ew
-	B0iQVC5lyC/laL0Jyn7DktlVxz2gl/o=
-Date: Thu, 21 Mar 2024 17:03:39 +0200
+	s=arc-20240116; t=1711033470; c=relaxed/simple;
+	bh=Vq7IOpduPovhWTfIlq7OpToTmsK0spCNnOeA70VT+y0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sWX2P2i7UmNv56VmMoeXqUQH7iY1ceB5K4bZMc+DwKBbKBiAWBzKmQ5omTwYl11/MREmSUPRFBbiIi24GvYQ9xuAmcSdn+nfujQQCDpU1VAJYajtH4h+gam2eFQMC/IaoebQW/hZCtal8Aa1xWJYCq+BG45pfcP4nTc+QT0z98g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=eNoMiKT6; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a3fb8b0b7acso123448266b.2
+        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 08:04:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1711033466; x=1711638266; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=C+M26qwP0oSliowXOMgjRNibYsMtGqN5dSYVPUjBSio=;
+        b=eNoMiKT6XYtKZHsskb7rdYNAAS4SQs7CfVWlA6ZJDSzJOfgeN4mxnY1uLWloSTH2cD
+         JKGgq48bc+g8P0+ZIQguxYIyArnmkBnNrhg9khh/bHov4A0OOs3hWfDdf5OTJJMW2QmG
+         kSqoqcq5XkhRheMWC5brD6HLMp6Jr1bI97JwdrEElrq9HeJOHHeUKatWEYemtpsIxduC
+         G7gUMJdW1IKrVsPPf0fuCQZMBhEVwfDSTYbOhWc9iLggqBWBGCOTM3RN9Lc+NixigToX
+         2s8NZ3KU/8mscLUK6QbPmx2wqaQrptc7xZk1Ag3oWl1X5duBDyiBuk83Ls16av4HfwT2
+         r7cQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711033466; x=1711638266;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C+M26qwP0oSliowXOMgjRNibYsMtGqN5dSYVPUjBSio=;
+        b=e6Z1fN9yPD73A//JOf5UKbi5OpJCHq/fXS6PGwIdWyqqfatHE+Rg/DWqYTZpQZjUUW
+         9rTWL6nmPIm25u214jaqq5McRF/k9HeoiKHMslMUIp7pMMl9Cp2TK0Ji2UjhDm8tKq0x
+         I3/dl0l5vCpc0qJ7WBelMhUpEaXjhGdKRi+fJPOJVvE5ev4cmnN2r6+n1TlTHG4ZDBHA
+         7UPOzIvFFohC22v5pCdCoZRaNA/4rSTB1Old+Q3jBHMjdJbiMPr/SZHTY6/5rM55ZiTl
+         4JdLaBkSlXk2E0Uz8zF2kmYSVO1K1GtcvScOZJJkbjxvioNYz3UtihuyZiotQOJyQbWw
+         5JrQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXdRCwZevRLVw3MDgxTJGJtdXjo9Vfi/SSE/GXbaBnupbRkRUSrJ9nVSfnYCQG+y5l+WNe9ECliAFJ9VA0tLWKNWvjE/ZKx
+X-Gm-Message-State: AOJu0YyZyt3EwopgZNklRdb9l7xC1RWjSKn0epzy3Uza/7f/lBpqprzn
+	J8+Yka2j851tnHUkTKxK1AlTjsVgPnlyMzioi99p/lLGFj4tGhdL2Gyp3mure10=
+X-Google-Smtp-Source: AGHT+IHEcr1Lc61NMyPIBSb8z115P5vSr6cXrLSqEMELys5uxp7RSzY4HAP3yVuJ9q6mhhIjpF5WHw==
+X-Received: by 2002:a17:906:1817:b0:a46:af3e:dedc with SMTP id v23-20020a170906181700b00a46af3ededcmr1426310eje.40.1711033466146;
+        Thu, 21 Mar 2024 08:04:26 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id t21-20020a170906179500b00a46cffe6d06sm13598eje.42.2024.03.21.08.04.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Mar 2024 08:04:25 -0700 (PDT)
+Date: Thu, 21 Mar 2024 16:04:22 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Mikhail Malyshev <mike.malyshev@gmail.com>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: stmmac: Do not enable/disable runtime PM for PCI
+ devices
+Message-ID: <ZfxMdihnVqSNJZG6@nanopsycho>
+References: <20240321-stmmac-fix-v1-1-3aef470494c6@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v2 3/3] genetlink: fit NLMSG_DONE into same
- read() as families
-To: Ido Schimmel <idosch@idosch.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Stefano Brivio <sbrivio@redhat.com>, davem@davemloft.net,
- netdev@vger.kernel.org, pabeni@redhat.com, jiri@resnulli.us,
- johannes@sipsolutions.net, fw@strlen.de, pablo@netfilter.org,
- Martin Pitt <mpitt@redhat.com>, Paul Holzinger <pholzing@redhat.com>,
- David Gibson <david@gibson.dropbear.id.au>
-References: <20240303052408.310064-1-kuba@kernel.org>
- <20240303052408.310064-4-kuba@kernel.org> <20240315124808.033ff58d@elisabeth>
- <20240319085545.76445a1e@kernel.org>
- <CANn89i+afBvqP564v6TuL3OGeRxfDNMuwe=EdH_3N4UuHsvfuA@mail.gmail.com>
- <20240319104046.203df045@kernel.org>
- <7e261328-42eb-411d-b1b4-ad884eeaae4d@linux.dev> <Zfw7YB4nZrquW4Bo@shredder>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Gal Pressman <gal.pressman@linux.dev>
-Content-Language: en-US
-In-Reply-To: <Zfw7YB4nZrquW4Bo@shredder>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240321-stmmac-fix-v1-1-3aef470494c6@gmail.com>
 
-On 21/03/2024 15:51, Ido Schimmel wrote:
-> On Thu, Mar 21, 2024 at 02:56:41PM +0200, Gal Pressman wrote:
->> We've encountered a new issue recently which I believe is related to
->> this discussion.
->>
->> Following Eric's patch:
->> 9cc4cc329d30 ("ipv6: use xa_array iterator to implement inet6_dump_addr()")
->>
->> Setting the interface mtu to < 1280 results in 'ip addr show eth2'
->> returning an error, because the ipv6 dump fails. This is a degradation
->> from the user's perspective.
->>
->> # ip addr show eth2
->> 4: eth2: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN group
->> default qlen 1000
->>     link/ether 24:42:53:21:52:44 brd ff:ff:ff:ff:ff:ff
->>     altname enp6s0f0np0
->> # ip link set dev eth2 mtu 1000
->> # ip addr show eth2
->> RTNETLINK answers: No such device
->> Dump terminated
-> 
-> I don't think it's the same issue. Original issue was about user space
-> not knowing how to handle NLMSG_DONE being sent together with dump
-> responses. The issue you reported seems to be related to an
-> unintentional change in the return code when IPv6 is disabled on an
-> interface. Can you please test the following patch?
-> 
-> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-> index 247bd4d8ee45..92db9b474f2b 100644
-> --- a/net/ipv6/addrconf.c
-> +++ b/net/ipv6/addrconf.c
-> @@ -5416,10 +5416,11 @@ static int inet6_dump_addr(struct sk_buff *skb, struct netlink_callback *cb,
->  
->                 err = 0;
->                 if (fillargs.ifindex) {
-> -                       err = -ENODEV;
->                         dev = dev_get_by_index_rcu(tgt_net, fillargs.ifindex);
-> -                       if (!dev)
-> +                       if (!dev) {
-> +                               err = -ENODEV;
->                                 goto done;
-> +                       }
->                         idev = __in6_dev_get(dev);
->                         if (idev)
->                                 err = in6_dump_addrs(idev, skb, cb,
+Thu, Mar 21, 2024 at 02:54:15PM CET, mike.malyshev@gmail.com wrote:
+>Common function stmmac_dvr_probe is called for both PCI and non-PCI
+>device. For PCI devices pm_runtime_enable/disable are called by framework
+>and should not be called by the driver.
 
-This seems to fix it, thanks!
-Will you submit a patch?
+I don't follow. The rest of the pm_runtime* functions are okay to call,
+but enable() is not. Why? You need to provide more reasoning.
+
+
+>
+>For PCI devices plat->pdev != NULL. Use this fact to detect PCI devices
+
+Sentence ends with "."
+
+I assume this is a bug fix. Do you have a trace or some other symptoms?
+Please add it to the patch description. You also need to add "Fixes"
+tag.
+
+Make sure you read:
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html?highlight=network#tl-dr
+
+Thanks
+
+pw-bot: cr
+
+
+>
+>Signed-off-by: Mikhail Malyshev <mike.malyshev@gmail.com>
+>---
+> drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 9 +++++++--
+> 1 file changed, 7 insertions(+), 2 deletions(-)
+>
+>diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>index 24cd80490d19..db45d8dbc1eb 100644
+>--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+>@@ -7743,7 +7743,9 @@ int stmmac_dvr_probe(struct device *device,
+> 
+> 	pm_runtime_get_noresume(device);
+> 	pm_runtime_set_active(device);
+>-	if (!pm_runtime_enabled(device))
+>+
+>+	/* For PCI devices PM is disabled/enabled by the framework */
+>+	if (!priv->plat->pdev)
+> 		pm_runtime_enable(device);
+> 
+> 	if (priv->hw->pcs != STMMAC_PCS_TBI &&
+>@@ -7846,7 +7848,10 @@ void stmmac_dvr_remove(struct device *dev)
+> 	mutex_destroy(&priv->lock);
+> 	bitmap_free(priv->af_xdp_zc_qps);
+> 
+>-	pm_runtime_disable(dev);
+>+	/* For PCI devices PM is disabled/enabled by the framework */
+>+	if (!priv->plat->pdev)
+>+		pm_runtime_disable(dev);
+>+
+> 	pm_runtime_put_noidle(dev);
+> }
+> EXPORT_SYMBOL_GPL(stmmac_dvr_remove);
+>
+>---
+>base-commit: 23956900041d968f9ad0f30db6dede4daccd7aa9
+>change-id: 20240321-stmmac-fix-f506d52882d2
+>
+>Best regards,
+>-- 
+>Mikhail Malyshev <mike.malyshev@gmail.com>
+>
+>
 
