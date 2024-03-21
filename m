@@ -1,214 +1,224 @@
-Return-Path: <netdev+bounces-80947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2C91881C62
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 07:11:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90E8E881C8D
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 07:40:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A81881F22172
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 06:11:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 54931282678
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 06:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1155F38F99;
-	Thu, 21 Mar 2024 06:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DE5F4AED7;
+	Thu, 21 Mar 2024 06:40:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gsdy1iMi"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="pyEQneVA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2054.outbound.protection.outlook.com [40.107.93.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616C9883C
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 06:11:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711001490; cv=none; b=p69LmLOiBY/yu+85kirMULLvN824RIxtTBUcIFXHoGiyRRpuGqmqECbggAQjP4JagVRLoTAu0a/+pPP+eB/yGHP8BPJjEiQa7pzWG0dLb5OwgnJEK2gQwi8kPg634Um9dgInJFMj1QmtVJ86SbiW8SyX8Jh7W8nPXDHimQpCn7g=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711001490; c=relaxed/simple;
-	bh=nS3ZtkcmRWYQhNRSA+8PL8l9Y6ENrB3adeY74KvxwmI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DA21OKHgBfo/OLSpIoHQzBjZRjIUippcyLw2znzywWEUTSGZrBolkTEzJIfKYQCPj8ZBSv8ZxKsbni32XCPw1H+nqnojpWQm+rkdSj7bEWPsBy5qbJmUl4hBzyg6dOzsjVBV93aIBH4GnDC54pK0XJW3HsQqYKvDf9l5f/TUWNk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gsdy1iMi; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711001487;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TRr6w2hmwgDNs0vVbChBiZJi7/+SS06endfvm4wx2Qo=;
-	b=gsdy1iMimCz1El2RBlf7BpXJDpxPDJDA0IzveM0Kp1GEm1eIbx5Vr11o0Glt8KACuBGxcL
-	fDYWaPIx/LIAZ/AlT6Jjk5ip7e9EqupxsRjmTRp5WYMDhBj5G1zPgcDFFif/bIL5waCzZg
-	oa+Ai32Z3WyNEmX8beKxRNNueqGTVoQ=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-179-4SLgwePeN7OBv1IWXyQq5g-1; Thu, 21 Mar 2024 02:11:25 -0400
-X-MC-Unique: 4SLgwePeN7OBv1IWXyQq5g-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-29de982f09aso527129a91.1
-        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 23:11:25 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711001484; x=1711606284;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TRr6w2hmwgDNs0vVbChBiZJi7/+SS06endfvm4wx2Qo=;
-        b=EmdDiSr9U+vXx5uRbqPLPBqcJ2Mlr38+BSURK2AOeQTTmHv7D1JhzwPeKuD0repkCo
-         EOs4Zi/k85Rb1xjAgLQ67SCvqfN/b628c8Vew3hIuVjLKyFGKtKZYawk3tmQFe++jK+E
-         n9W/gam39EVhJ45X+TJBYRt0qN7x3HSaJPGfTVLs4VmE8XzPpcQK7LSPqzxVrJGw8wRV
-         AqKc1Du75QRG0VCUeZ0P9dJ4kOc4QfSe/f+tO7kcQ2tHtgPzQ/yNqnBiLiGB7rodG6l0
-         xrbgfVVwn/SLImFcPx1J7uNhnVLIjM7n9XpK3mmssOvR1ZOTLB5qPglQZ6DVYYMeb4K4
-         hwSw==
-X-Forwarded-Encrypted: i=1; AJvYcCXh4FgIP1kcl7oHi8XZuRjcmvaNRVlAHmzOJB3DC6JG6niwSL9EDb5pnTDwBh6TY/lmfP68802oKxf0G3voWl5UU9TtuvAo
-X-Gm-Message-State: AOJu0YwrYmHjaR2od76MNlaockxslx1Z7TGBfWbpKur8a1w3o7XB9KuC
-	R0g0zJf6sUmmagHy74EOIy4Nm1dHD20NT6sOCRfHeY31FOUDidpRyBQhBsuHccpBbee6zV+fZVe
-	st3asueTlHz7iv8BDC59n9TTYLrDvpZH9DpAqXsbnyUx1Mv3mFtSSsrdPdE5/xf0uxMsEInmybF
-	1IskKKJASfpB2GDDCGzZ30nSBTBCXC
-X-Received: by 2002:a17:90a:ee94:b0:29d:dd93:5865 with SMTP id i20-20020a17090aee9400b0029ddd935865mr6337690pjz.46.1711001484416;
-        Wed, 20 Mar 2024 23:11:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFMJs5m8yPCol1xvp4yJO6WcRnRdD98Sx8BFnN7+XFFZjVg6pV1bOfqeO7BXwqMn4EG2HGLFM86gzFGtPZgAf4=
-X-Received: by 2002:a17:90a:ee94:b0:29d:dd93:5865 with SMTP id
- i20-20020a17090aee9400b0029ddd935865mr6337683pjz.46.1711001484139; Wed, 20
- Mar 2024 23:11:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03244D5B0;
+	Thu, 21 Mar 2024 06:40:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711003213; cv=fail; b=WBDoPMFSwEzXCb8AU8MBnVDFuoJtAlRLIiB+Sr543beLHS+3UrZLkOGY2nABchgv0E7QytxCz3qJcqjEAWIGe6gqW3pmStBBMx8KmWNJskLb3qr9JELQl9GLU1yr45kwb4I5GVmMCO9tE4hDUFsbRpR9TlwSDkW+dU5qYIZMCqA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711003213; c=relaxed/simple;
+	bh=8ssqXe7/jUEMP3eJpTvqTb9uBoifA1wvz/Kim5TJqtg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YVTvN+CC17GlTAOfYm2NaK3HO9ZjAgtmKBzR45BWysHF/lbqRbXRCAcm0xoZqcA4LLkeGbv6qXDAph5I5PVd0hhsii+0kEIePyMYGU36GtvqQOaGJD+rbUdC2PZDlkRTTq3psbo2tzlNUMsX25EUUUFxSxGyef8PwRuf3GVdsMg=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=pyEQneVA; arc=fail smtp.client-ip=40.107.93.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ENITnfIVMeJjDf7/Fm6ZAUIK35XfYJvkuAKB1EBeK8ItjinEx/B/gYlvHuTeNHUenS+9lp1oCYVzLJ4LBq+P3fcCoCutUVNTwLBkPMk64AMlnbxmTXS4uGoe07aMZbjuW0iIMPYHDaidhNfDW+uP7VcFk9C0Ss7q+eym6I4zXUKVsBxyq4t4ervyzYBT5bsbAPzuHlSirZjeW3x5mQSDyxQypn7G81HSMOpD6aPybrg4LWlSC0zN/jA0WXfaz2fFCj1iF6CJ8ZB4FCvqCOfOR8Utgi/BXnyU2+6yNKyt6+jUsE2cAjBwlaDHaj4NI3ejfflfki/EFJMsnQchMw7yoA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OhFrfR5HruaKH12AfRpYgs7Ch6unS5iggFGuNLcDgQA=;
+ b=iR6w2kjiyd39Z/3il0UsEDDALpSK1fG7oVOK7VL20ec0qtcxCFeARsnFl6H625s5y4os3b3pPQ3YHKeSevkrxsOvshefTCrY3TaqlTOnwVHTOwWJA7Wb09Wd0UAPBZ+PkeDxmZrcQHNgttrC+94RKZNeRFFWr6Jn4jbJdXi5HXvsc8MWngZ4oASpJh/wHpjhkiBAkIHiNOdCejST1xXlahL1fYAWXdyGb3CI1FmwF9yUJvLtuGwcSpjq5ISQ37oYdN7abwzjJSxYTjrRZZSdnNAWs0HPVmjkM/SukJl+oD/QqKWPV95jTIU4p3FxrDeG0nM7joGQbFL4HBbcXxc8Ng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OhFrfR5HruaKH12AfRpYgs7Ch6unS5iggFGuNLcDgQA=;
+ b=pyEQneVAsqimp98eDLLjite0cIIdD8RvHn9aw8nCy3MVf2TqrPHCAfNIZADRxP7Fflpf77LY86uM60Wa+kZ6Lv9txEz7+ja+8qyyffArn19+GgX2D6nHHKQf6Qv+5CrDSeqLN9NPKqN6oST+yR3+PqmIQWebHIlCppiaapW/cnw=
+Received: from BYAPR21CA0013.namprd21.prod.outlook.com (2603:10b6:a03:114::23)
+ by CY5PR12MB6323.namprd12.prod.outlook.com (2603:10b6:930:20::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.34; Thu, 21 Mar
+ 2024 06:40:08 +0000
+Received: from CO1PEPF000042A8.namprd03.prod.outlook.com
+ (2603:10b6:a03:114:cafe::ae) by BYAPR21CA0013.outlook.office365.com
+ (2603:10b6:a03:114::23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.9 via Frontend
+ Transport; Thu, 21 Mar 2024 06:40:08 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1PEPF000042A8.mail.protection.outlook.com (10.167.243.37) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.7409.10 via Frontend Transport; Thu, 21 Mar 2024 06:40:07 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.35; Thu, 21 Mar
+ 2024 01:40:05 -0500
+From: Brett Creeley <brett.creeley@amd.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <shannon.nelson@amd.com>, <brett.creeley@amd.com>
+Subject: [PATCH net] pds_core: Fix pdsc_check_pci_health function to print warning
+Date: Wed, 20 Mar 2024 23:39:54 -0700
+Message-ID: <20240321063954.18711-1-brett.creeley@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240320101912.28210-1-w_angrong@163.com>
-In-Reply-To: <20240320101912.28210-1-w_angrong@163.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 21 Mar 2024 14:11:13 +0800
-Message-ID: <CACGkMEst2ixZrtBUEWArQT+CkDqzSr9E3V7qMyVU6xX+FnBChA@mail.gmail.com>
-Subject: Re: [PATCH v3] vhost/vdpa: Add MSI translation tables to iommu for
- software-managed MSI
-To: Wang Rong <w_angrong@163.com>
-Cc: mst@redhat.com, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000042A8:EE_|CY5PR12MB6323:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4d3c2490-fe3d-4070-3174-08dc4971bfeb
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	luWdq5D2mQawkmwKtkoEWon1vncI8MrMIW5Ff9njOPni5q+jH2Oq0B+DsyAhReVzOSEa0kLrHJeBf3v+VgOVe1G8FklEBV6SKZ7lj/d1yIlZOYeN8kVGp+s6ua0s7XBq3F2l04iu9kKCg2bAKM/UOetkfd2AxbZjNYGb0q17aePLyzXVQAcILexJEbNek9+Ophq6+nOocu0oJIofrIgjHukllDzcn8jr41fTthB4xv6jkog5yPgOOrsIQKMm57moi3zOHMCz517vX49qSG40I3MnrBR48ullAr1s6KFuIwQjWW8VxE3ZFF6BMERla7LOUDEmrSPQDQWAQPSRN5rq/2ZbzpIwYdlhu8COv5AgWOFOnsVo8E4Lbx3GDulHwJ+xWBc3Ry9XUMibfcK8BDp9wLG1wWCUbIzFu9N037VBM0GBXpk0xqgvRZOYzQd2/K5GMLUAzop+s0xcVbyfZWOsuQyC8iXYHXYmu2s2VSzIfGyOJCnm0xnOfHpVLK27eE9ev0KucqLBlNSbUe0cOPUEoLjP0mBE05Ojv7LKQyWfYoczYi5aSOmIFD0+W4mOheKJNTKXpGyI+29yrWOHfRfXZgJDtowkUQfKYJMXWkeltuc/+WofSYgLvMofUAqiEG1H51OnQoMipKW/kmlngNoL+6zqepk8ESTCvQJt/FVx4ny1SJF3V016qd4Tp5JST8ZHDnBLIijV58DZWXS+DPEu2vKQ7uySRWezcekCbNsvAHPgSPjii9hXtGBGqVuUljP/
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230031)(1800799015)(36860700004)(82310400014)(376005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Mar 2024 06:40:07.8355
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d3c2490-fe3d-4070-3174-08dc4971bfeb
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000042A8.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6323
 
-On Wed, Mar 20, 2024 at 6:20=E2=80=AFPM Wang Rong <w_angrong@163.com> wrote=
-:
->
-> From: Rong Wang <w_angrong@163.com>
->
-> Once enable iommu domain for one device, the MSI
-> translation tables have to be there for software-managed MSI.
-> Otherwise, platform with software-managed MSI without an
-> irq bypass function, can not get a correct memory write event
-> from pcie, will not get irqs.
-> The solution is to obtain the MSI phy base address from
-> iommu reserved region, and set it to iommu MSI cookie,
-> then translation tables will be created while request irq.
->
-> Change log
-> ----------
->
-> v1->v2:
-> - add resv iotlb to avoid overlap mapping.
-> v2->v3:
-> - there is no need to export the iommu symbol anymore.
->
-> Signed-off-by: Rong Wang <w_angrong@163.com>
-> ---
->  drivers/vhost/vdpa.c | 59 +++++++++++++++++++++++++++++++++++++++++---
->  1 file changed, 56 insertions(+), 3 deletions(-)
->
-> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> index ba52d128aeb7..28b56b10372b 100644
-> --- a/drivers/vhost/vdpa.c
-> +++ b/drivers/vhost/vdpa.c
-> @@ -49,6 +49,7 @@ struct vhost_vdpa {
->         struct completion completion;
->         struct vdpa_device *vdpa;
->         struct hlist_head as[VHOST_VDPA_IOTLB_BUCKETS];
-> +       struct vhost_iotlb resv_iotlb;
+When the driver notices fw_status == 0xff it tries to perform a PCI
+reset on itself via pci_reset_function() in the context of the driver's
+health thread. However, pdsc_reset_prepare calls
+pdsc_stop_health_thread(), which attempts to stop/flush the health
+thread. This results in a deadlock because the stop/flush will never
+complete since the driver called pci_reset_function() from the health
+thread context. Fix this by changing the pdsc_check_pci_health_function()
+to print a dev_warn() once every fw_down/fw_up cycle and requiring the
+user to perform a reset on the device via sysfs's reset interface,
+reloading the driver, rebinding the device, etc.
 
-Is it better to introduce a reserved flag like VHOST_MAP_RESERVED,
-which means it can't be modified by the userspace but the kernel.
+Unloading the driver in the fw_down/dead state uncovered another issue,
+which can be seen in the following trace:
 
-So we don't need to have two IOTLB. But I guess the reason you have
-this is because we may have multiple address spaces where the MSI
-routing should work for all of them?
+WARNING: CPU: 51 PID: 6914 at kernel/workqueue.c:1450 __queue_work+0x358/0x440
+[...]
+RIP: 0010:__queue_work+0x358/0x440
+[...]
+Call Trace:
+ <TASK>
+ ? __warn+0x85/0x140
+ ? __queue_work+0x358/0x440
+ ? report_bug+0xfc/0x1e0
+ ? handle_bug+0x3f/0x70
+ ? exc_invalid_op+0x17/0x70
+ ? asm_exc_invalid_op+0x1a/0x20
+ ? __queue_work+0x358/0x440
+ queue_work_on+0x28/0x30
+ pdsc_devcmd_locked+0x96/0xe0 [pds_core]
+ pdsc_devcmd_reset+0x71/0xb0 [pds_core]
+ pdsc_teardown+0x51/0xe0 [pds_core]
+ pdsc_remove+0x106/0x200 [pds_core]
+ pci_device_remove+0x37/0xc0
+ device_release_driver_internal+0xae/0x140
+ driver_detach+0x48/0x90
+ bus_remove_driver+0x6d/0xf0
+ pci_unregister_driver+0x2e/0xa0
+ pdsc_cleanup_module+0x10/0x780 [pds_core]
+ __x64_sys_delete_module+0x142/0x2b0
+ ? syscall_trace_enter.isra.18+0x126/0x1a0
+ do_syscall_64+0x3b/0x90
+ entry_SYSCALL_64_after_hwframe+0x72/0xdc
+RIP: 0033:0x7fbd9d03a14b
+[...]
 
-Another note, vhost-vDPA support virtual address mapping, so this
-should only work for physicall address mapping. E.g in the case of
-SVA, MSI iova is a valid IOVA for the driver/usrespace.
+Fix this by preventing the devcmd reset if the FW is not running.
 
->         struct device dev;
->         struct cdev cdev;
->         atomic_t opened;
-> @@ -247,6 +248,7 @@ static int _compat_vdpa_reset(struct vhost_vdpa *v)
->  static int vhost_vdpa_reset(struct vhost_vdpa *v)
->  {
->         v->in_batch =3D 0;
-> +       vhost_iotlb_reset(&v->resv_iotlb);
+Fixes: d9407ff11809 ("pds_core: Prevent health thread from running during reset/remove")
+Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
+Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+---
+ drivers/net/ethernet/amd/pds_core/core.c | 9 ++++++++-
+ drivers/net/ethernet/amd/pds_core/core.h | 1 +
+ drivers/net/ethernet/amd/pds_core/dev.c  | 3 +++
+ 3 files changed, 12 insertions(+), 1 deletion(-)
 
-We try hard to avoid this for performance, see this commit:
-
-commit 4398776f7a6d532c466f9e41f601c9a291fac5ef
-Author: Si-Wei Liu <si-wei.liu@oracle.com>
-Date:   Sat Oct 21 02:25:15 2023 -0700
-
-    vhost-vdpa: introduce IOTLB_PERSIST backend feature bit
-
-Any reason you need to do this?
-
->         return _compat_vdpa_reset(v);
->  }
->
-> @@ -1219,10 +1221,15 @@ static int vhost_vdpa_process_iotlb_update(struct=
- vhost_vdpa *v,
->             msg->iova + msg->size - 1 > v->range.last)
->                 return -EINVAL;
->
-> +       if (vhost_iotlb_itree_first(&v->resv_iotlb, msg->iova,
-> +                                       msg->iova + msg->size - 1))
-> +               return -EINVAL;
-> +
->         if (vhost_iotlb_itree_first(iotlb, msg->iova,
->                                     msg->iova + msg->size - 1))
->                 return -EEXIST;
->
-> +
->         if (vdpa->use_va)
->                 return vhost_vdpa_va_map(v, iotlb, msg->iova, msg->size,
->                                          msg->uaddr, msg->perm);
-> @@ -1307,6 +1314,45 @@ static ssize_t vhost_vdpa_chr_write_iter(struct ki=
-ocb *iocb,
->         return vhost_chr_write_iter(dev, from);
->  }
->
-> +static int vhost_vdpa_resv_iommu_region(struct iommu_domain *domain, str=
-uct device *dma_dev,
-> +       struct vhost_iotlb *resv_iotlb)
-> +{
-> +       struct list_head dev_resv_regions;
-> +       phys_addr_t resv_msi_base =3D 0;
-> +       struct iommu_resv_region *region;
-> +       int ret =3D 0;
-> +       bool with_sw_msi =3D false;
-> +       bool with_hw_msi =3D false;
-> +
-> +       INIT_LIST_HEAD(&dev_resv_regions);
-> +       iommu_get_resv_regions(dma_dev, &dev_resv_regions);
-> +
-> +       list_for_each_entry(region, &dev_resv_regions, list) {
-> +               ret =3D vhost_iotlb_add_range_ctx(resv_iotlb, region->sta=
-rt,
-> +                               region->start + region->length - 1,
-> +                               0, 0, NULL);
-
-I think MSI should be write-only?
-
-> +               if (ret) {
-> +                       vhost_iotlb_reset(resv_iotlb);
-
-Need to report an error here.
-
-Thanks
+diff --git a/drivers/net/ethernet/amd/pds_core/core.c b/drivers/net/ethernet/amd/pds_core/core.c
+index 9662ee72814c..8e5e3797cf0c 100644
+--- a/drivers/net/ethernet/amd/pds_core/core.c
++++ b/drivers/net/ethernet/amd/pds_core/core.c
+@@ -587,6 +587,9 @@ void pdsc_fw_up(struct pdsc *pdsc)
+ 						     DEVLINK_HEALTH_REPORTER_STATE_HEALTHY);
+ 	pdsc_notify(PDS_EVENT_RESET, &reset_event);
+ 
++	/* Allow for fw_status == 0xff to print another warning */
++	pdsc->bad_pci_warned = false;
++
+ 	return;
+ 
+ err_out:
+@@ -607,7 +610,11 @@ static void pdsc_check_pci_health(struct pdsc *pdsc)
+ 	if (fw_status != PDS_RC_BAD_PCI)
+ 		return;
+ 
+-	pci_reset_function(pdsc->pdev);
++	if (!pdsc->bad_pci_warned) {
++		dev_warn(pdsc->dev, "fw not reachable due to failed PCI connection, fw_status = 0x%x\n",
++			 fw_status);
++		pdsc->bad_pci_warned = true;
++	}
+ }
+ 
+ void pdsc_health_thread(struct work_struct *work)
+diff --git a/drivers/net/ethernet/amd/pds_core/core.h b/drivers/net/ethernet/amd/pds_core/core.h
+index 92d7657dd614..10979118be00 100644
+--- a/drivers/net/ethernet/amd/pds_core/core.h
++++ b/drivers/net/ethernet/amd/pds_core/core.h
+@@ -165,6 +165,7 @@ struct pdsc {
+ 	unsigned long state;
+ 	u8 fw_status;
+ 	u8 fw_generation;
++	bool bad_pci_warned;
+ 	unsigned long last_fw_time;
+ 	u32 last_hb;
+ 	struct timer_list wdtimer;
+diff --git a/drivers/net/ethernet/amd/pds_core/dev.c b/drivers/net/ethernet/amd/pds_core/dev.c
+index e494e1298dc9..495ef4ef8c10 100644
+--- a/drivers/net/ethernet/amd/pds_core/dev.c
++++ b/drivers/net/ethernet/amd/pds_core/dev.c
+@@ -229,6 +229,9 @@ int pdsc_devcmd_reset(struct pdsc *pdsc)
+ 		.reset.opcode = PDS_CORE_CMD_RESET,
+ 	};
+ 
++	if (!pdsc_is_fw_running(pdsc))
++		return 0;
++
+ 	return pdsc_devcmd(pdsc, &cmd, &comp, pdsc->devcmd_timeout);
+ }
+ 
+-- 
+2.17.1
 
 
