@@ -1,130 +1,204 @@
-Return-Path: <netdev+bounces-81016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 339A088585E
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:31:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70BC2885877
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:39:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1B4E282F43
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:31:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A7935B2119A
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3976F58ACE;
-	Thu, 21 Mar 2024 11:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC1F658AC0;
+	Thu, 21 Mar 2024 11:39:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cIa9ZBj0"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="GBGnGY7Y";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="u3XlXb9O";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="vhZWhXi5";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="hQK9qFSQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C60A58210;
-	Thu, 21 Mar 2024 11:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DF6E5FB81;
+	Thu, 21 Mar 2024 11:39:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711020704; cv=none; b=jDILXFJ763BX0kz6jjIWe4durwt2e69Il6udAJZN6YufzvXHLlIHH8wfY7O2nHiGnXm5KsuNGo7+cXPK5NWtOIsK2vO4XrT0jrCZjgyYRik3wdPlBYATiVhJXgqV8FUx4ZVIM6nhrbxrbOXA94fc0sixrwVdZxDXPm9vgety87g=
+	t=1711021179; cv=none; b=FyUEC4ilJl77qqEZDyTsugaG/dRaIZJz2W05400rSoCp+vfLSpYT2yE5QZU6xwsHAs3vZoxQq4Q0CtpBBHd4o8lQl9jnGR6SbMqe8LwQ8Gwjv98tipxNScImSCE2ahMs3LShtO9jQRvsGpUJh17AaN4ZiMQGKG+1I8URNKdMpkw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711020704; c=relaxed/simple;
-	bh=DJO28aVkOmnoGoHQnSfeSZEZa0r4jTvfugf4tMA0Cmg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d3FLrjS/dS+5PB9RUW+YKqgqJ5tEbnpTZYDwYGFnOr8Oya6dPDoJOB4+pwox9jb7dp8JoDfNkAd1H6J5ycIxxRfZfWmdv9MkH/LbUz74pBNzJdjJsIGqGUGAQtMaoy5/wD/yQwcGcPAi5ql2iHSJoUYa0qQ1WyGKe7tVdbEKq1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cIa9ZBj0; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4146e5c719bso6539585e9.2;
-        Thu, 21 Mar 2024 04:31:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711020701; x=1711625501; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Tm9RUXritdc1cmBd9a/YU9HuV2GGTJD40+SLLBPKFHk=;
-        b=cIa9ZBj0rzk28pfg4tvUCyCKUYnZNrHRyFAe+TIkyo9yXHZVRHw0z+DOI6GgTxgNzj
-         9AoT4+ZbkYq3JRNF201b6FJ7PUzKSjvK6bRZJP6+o4DqAXmvi/nBsNT2/bsEzWK8oqjl
-         5GRGyQ0N+wHf5UAl+v4Ho0zPy8fMTN6sZjtSjGyVNVvGa1Bdg7kaHk1Ih6sFtqUW8OXQ
-         FkbtgVBP//Z4ng6MgTFHyIAfMrjMPVqSnBJGM4iCg0/7E1OnKzouH3yTq+yv2QUXWm6N
-         jrgcz+aPTk1AieTm9aOtUKHhVZTorhfOrmUlXQwtXPKysDis6js8/LKVvVJTzgUhyweB
-         llRg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711020701; x=1711625501;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Tm9RUXritdc1cmBd9a/YU9HuV2GGTJD40+SLLBPKFHk=;
-        b=JjYrSsmXo7k5YlQkn5oVJYKAnluQXv5LrPVbCLNKsFJ6Gs/CuNZ1fQ4CBmvrpIzG2E
-         vGknOkXv/1kNP7YJL1Mqg3RJHXOWTuuPMl5nG6uhY1tUxGH7gBLn7otNrrwExpbFjYK/
-         tMoahybDXSbL9lQE1cNon7f8UpbZ/Un+Sha03vjlstOmNaW5kBLR3BBE5gYT4ArfOAgq
-         bnVMvOohH7GFm+OSkzRFYJ1ADU6WKNkamreEkeNRFIksNmahYNPl8NrgdEgzmQC5H43M
-         TNccENtTwoxjtoGvP22V6j9wRbVGQYPwOX0GLkaSKsrQp+Xxi87DWQv21WZHIAb1vzoe
-         TpCw==
-X-Forwarded-Encrypted: i=1; AJvYcCUx5can+MN3BXs8UH5XoVKEOCJRrIZWsiDjilN0ZPG4TQ48cGuBIAOcJdFb0bsb1+ZHwARJ1EmuoIBbIAh/STmxznfMDfWalgzqUIhf1wt62lETDIK4Vxe/opMaid2HWn/Y6Gu4MQXgmtgkE38lKvF1b2B5aEnbIrjs
-X-Gm-Message-State: AOJu0YzTcJeN7e5Lu9sFHnLASdOOBIZKKDFDWib0jO0GaDBRxOwbZ1oF
-	eO4oIaUwiudVxCgsmvDapNOWcJ0+Sa+yvR7uRAtCT+uHwY2UYIKjSi+UEAnqyWFsSt59Nl8sGGC
-	b/Y+vTqUKo2YY8V2uMydcYtHSH50=
-X-Google-Smtp-Source: AGHT+IEGBweFJd+BeGA1qee4nfD63A/jOmAnFJCswQxI8IsENzoWjQqN3QQEBc36ULLJ0pzbxlzmG5i1Hh5X0pNdZio=
-X-Received: by 2002:a5d:668e:0:b0:341:80fc:4913 with SMTP id
- l14-20020a5d668e000000b0034180fc4913mr2936875wru.67.1711020700630; Thu, 21
- Mar 2024 04:31:40 -0700 (PDT)
+	s=arc-20240116; t=1711021179; c=relaxed/simple;
+	bh=vJ791anuvB8t8GIBHGJ8C+s5alJbeJIp7vc6EwMHfHU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Hx+50jfwboYhQ0vrV0vlCqA33JbNGOdJjwturI2dohw+BnMJNHKAns8Z12argLEUPxfkzmc6PEwa/e/ZsDVQ7H9I8dNLj1Enjtwt9JS1MtxIprKsbvrzmPHUC6y8EJCwdlEUP52/8oAZ/COhDqRIEPoZB+dDalKUizGT20nSTyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=GBGnGY7Y; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=u3XlXb9O; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=vhZWhXi5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=hQK9qFSQ; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [10.150.64.97])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 5A7A2372E0;
+	Thu, 21 Mar 2024 11:39:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1711021176; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B1EI9gkxhBA49ptnSU9hxPOI/RB588le3UPlmmKJ3rY=;
+	b=GBGnGY7YmVNzKjUpQrAPaWZrciK0LYPg2kT//oFbBuL8o3U9rgDc0xDj+MkQVOiRMmkYfN
+	DA6nFE2BX/BiVXZ8DKn7KObHa4anY/gosL0Ihtr2k1X/hgtjePDni2xfOwaH7gBraUD1XK
+	33FxdT0WNbO/G4d3LbBkercelQy0tMc=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1711021176;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B1EI9gkxhBA49ptnSU9hxPOI/RB588le3UPlmmKJ3rY=;
+	b=u3XlXb9OrP1RAIoOVdkUVBEdfPvJVuhGO8+45th6e8EyRQIq0ozIn5aEahlodiSO1uKJcq
+	XK0XBkT2OFBeqKAw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1711021174; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B1EI9gkxhBA49ptnSU9hxPOI/RB588le3UPlmmKJ3rY=;
+	b=vhZWhXi5BW4nPtTRBB7Ua1bTCDfez63fP5zFmO51UtrOn1yJm5t4YjAhkCo1i4MFhpanw6
+	nm1i4kZ3vegyxFKzBecv8WBHUO6xMdspH0p6Rb0/hXN2s7RnG5hWgI4QCmd1aCvsFtA2+E
+	Py6e7nmShVxWdsAuK98akIVew4T6iac=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1711021174;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=B1EI9gkxhBA49ptnSU9hxPOI/RB588le3UPlmmKJ3rY=;
+	b=hQK9qFSQiirubEaPqhnMpJy6YUSZGkp7w/Ma5/X5Gjg0LY/5PdsjJKX+91nlsaZwH2pPPR
+	CDmNjIFK0B+cKBBw==
+Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id CA95313976;
+	Thu, 21 Mar 2024 11:39:33 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap1.dmz-prg2.suse.org with ESMTPSA
+	id 3AYALnUc/GXJNQAAD6G6ig
+	(envelope-from <dkirjanov@suse.de>); Thu, 21 Mar 2024 11:39:33 +0000
+Message-ID: <01390102-200d-4d5d-9982-d7f93c8f950b@suse.de>
+Date: Thu, 21 Mar 2024 14:39:33 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240321101058.68530-1-puranjay12@gmail.com> <CAADnVQLhwLgq=QuXD-Ls=t9Scr_4Zn9JwdkXfZQfZkT=ysx64Q@mail.gmail.com>
-In-Reply-To: <CAADnVQLhwLgq=QuXD-Ls=t9Scr_4Zn9JwdkXfZQfZkT=ysx64Q@mail.gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Thu, 21 Mar 2024 04:31:29 -0700
-Message-ID: <CAADnVQLHrmkJ5p2gEUJkf_CRxq9gv8rcSuBm5GeZ_nUJxQOE0Q@mail.gmail.com>
-Subject: Re: [PATCH bpf v2] bpf: verifier: prevent userspace memory access
-To: Puranjay Mohan <puranjay12@gmail.com>, Ilya Leoshkevich <iii@linux.ibm.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
-	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] flow_dissector: prevent NULL pointer dereference in
+ __skb_flow_dissect
+Content-Language: en-US
+To: Jiri Pirko <jiri@resnulli.us>, Anastasia Belova <abelova@astralinux.ru>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ lvc-project@linuxtesting.org
+References: <20240320125635.1444-1-abelova@astralinux.ru>
+ <Zfrmv4u0tVcYGS5n@nanopsycho>
+ <b67f3efb-509e-4280-90f2-729d217c20c7@astralinux.ru>
+ <ZfwSmlZ-Ie1dFlue@nanopsycho>
+From: Denis Kirjanov <dkirjanov@suse.de>
+In-Reply-To: <ZfwSmlZ-Ie1dFlue@nanopsycho>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Spam-Score: -4.25
+X-Spamd-Result: default: False [-4.25 / 50.00];
+	 ARC_NA(0.00)[];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_DN_SOME(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 BAYES_HAM(-3.00)[100.00%];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 NEURAL_HAM_SHORT(-0.16)[-0.789];
+	 RCPT_COUNT_SEVEN(0.00)[8];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 RCVD_TLS_ALL(0.00)[];
+	 MID_RHS_MATCH_FROM(0.00)[]
+X-Spam-Level: 
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spam-Flag: NO
 
-On Thu, Mar 21, 2024 at 4:05=E2=80=AFAM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
->
-> On Thu, Mar 21, 2024 at 3:11=E2=80=AFAM Puranjay Mohan <puranjay12@gmail.=
-com> wrote:
-> >
-> > diff --git a/arch/s390/net/bpf_jit_comp.c b/arch/s390/net/bpf_jit_comp.=
-c
-> > index e613eebfd349..e61a51a5b4be 100644
-> > --- a/arch/s390/net/bpf_jit_comp.c
-> > +++ b/arch/s390/net/bpf_jit_comp.c
-> > @@ -2691,3 +2691,8 @@ bool bpf_jit_supports_subprog_tailcalls(void)
-> >  {
-> >         return true;
-> >  }
-> > +
-> > +u64 bpf_arch_uaddress_limit(void)
-> > +{
-> > +       return -ENOTSUPP;
-> > +}
->
-> Looks good and should work, but s390 CI is still not happy.
-> Ideas?
-> sock tests were not failing before. So something is going on.
 
-I think I have an explanation.
--ENOTSUPP and u64... and later:
-u64 uaddress_limit =3D bpf_arch_uaddress_limit()
-if (uaddress_limit < 0)
 
-I bet the compiler simply removes this check since unsigned cannot
-be negative.
-Odd that there is no compiler warning.
+On 3/21/24 13:57, Jiri Pirko wrote:
+> Thu, Mar 21, 2024 at 10:36:53AM CET, abelova@astralinux.ru wrote:
+>>
+>>
+>> 20/03/24 16:38, Jiri Pirko пишет:
+>>> Wed, Mar 20, 2024 at 01:56:35PM CET, abelova@astralinux.ru wrote:
+>>>> skb is an optional parameter, so it may be NULL.
+>>>> Add check defore dereference in eth_hdr.
+>>>>
+>>>> Found by Linux Verification Center (linuxtesting.org) with SVACE.
+>>> Either drop this line which provides no value, or attach a link to the
+>>> actual report.
+>>>
+>>
+>> It is an established practice for our project. You can find 700+ applied
+>> patches with similar line:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log/?qt=grep&q=linuxtesting.org
+> 
+> Okay. So would it be possible to attach a link to the actual report?
+> 
+>>
+>>
+>>>> Fixes: 67a900cc0436 ("flow_dissector: introduce support for Ethernet addresses")
+>>> This looks incorrect. I believe that this is the offending commit:
+>>> commit 690e36e726d00d2528bc569809048adf61550d80
+>>> Author: David S. Miller <davem@davemloft.net>
+>>> Date:   Sat Aug 23 12:13:41 2014 -0700
+>>>
+>>>      net: Allow raw buffers to be passed into the flow dissector.
+>>>
+>>
+>> Got it.
 
-pw-bot: cr
+Looks like it's a static checker, there is no actual bug report or kernel oops/crash 
+
+>>
+>>>
+>>>> Signed-off-by: Anastasia Belova <abelova@astralinux.ru>
+>>>> ---
+>>>> net/core/flow_dissector.c | 2 +-
+>>>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>>>>
+>>>> diff --git a/net/core/flow_dissector.c b/net/core/flow_dissector.c
+>>>> index 272f09251343..05db3a8aa771 100644
+>>>> --- a/net/core/flow_dissector.c
+>>>> +++ b/net/core/flow_dissector.c
+>>>> @@ -1137,7 +1137,7 @@ bool __skb_flow_dissect(const struct net *net,
+>>>> 		rcu_read_unlock();
+>>>> 	}
+>>>>
+>>>> -	if (dissector_uses_key(flow_dissector,
+>>>> +	if (skb && dissector_uses_key(flow_dissector,
+>>>> 			       FLOW_DISSECTOR_KEY_ETH_ADDRS)) {
+>>>> 		struct ethhdr *eth = eth_hdr(skb);
+>>>> 		struct flow_dissector_key_eth_addrs *key_eth_addrs;
+>>> Looks like FLOW_DISSECT_RET_OUT_BAD should be returned in case the
+>>> FLOW_DISSECTOR_KEY_ETH_ADDRS are selected and there is no skb, no?
+>>
+>> I agree, I'll send the second version.
+>>
+>> Anastasia Belova
+>>
+> 
 
