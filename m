@@ -1,83 +1,118 @@
-Return-Path: <netdev+bounces-80963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EB928855AB
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:29:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFC0B8855AD
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 09:29:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03ADE1F23F91
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 08:29:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68DD3281429
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 08:29:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C9E658ACB;
-	Thu, 21 Mar 2024 08:29:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 538206995B;
+	Thu, 21 Mar 2024 08:29:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lynne.ee header.i=@lynne.ee header.b="J5ur5qdj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S3PLOttA"
 X-Original-To: netdev@vger.kernel.org
-Received: from w4.tutanota.de (w4.tutanota.de [81.3.6.165])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CECE1DFD2
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 08:29:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.3.6.165
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F87E6994D;
+	Thu, 21 Mar 2024 08:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711009756; cv=none; b=oUbCSi3FClUR/J7NCkCdofafId3F9TK1HIc4bYcxKfXi+fTCOgi2XxENHDc/mCATfeHDJyxeSKaLoYe0tAyLKJsv+cqoIL0Ro/4luxvWnwlZooop+Z1XS+o52PIL4S4XtzCRpIeM9pwTzfW461lCJamv27oV1R5ih5/ADflBcIw=
+	t=1711009763; cv=none; b=Uahta9xDGZDTXOroliyVeFMtxmrlZM1cFE2+FRhNkozGqV1FPy6Nx4+Z/XGtKWDFpv9HJs7wrX92AlO79uDj4eYSYuzID/azHj6RjJLBQzCzQ8FMR/ttGXaYjNWsR2/G2kd/PYC11o9WNoYyvZQsPieS5IVJmmgVZOAyWRuvXoo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711009756; c=relaxed/simple;
-	bh=2V1nTFt2diEohmhfAUKGzJ0EWP63RxdFbT/k7yY4lZE=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=Vb3vKOBwzC97m3TYj2I/KbujD09EJUk9UrS3b4vMLrTFIn2GIXDFCAs7+MpjXpdoHCaEIaWKp56Rd+uTWwZUnMo6SMqEjKPLY7mRxJ6C81g8YVmNhBVe9PvMdqHVm5afUof6bUX9oLN5RFLScjvdXMLgVyhzJIHPJJjyl08SR2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lynne.ee; spf=pass smtp.mailfrom=lynne.ee; dkim=pass (2048-bit key) header.d=lynne.ee header.i=@lynne.ee header.b=J5ur5qdj; arc=none smtp.client-ip=81.3.6.165
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lynne.ee
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lynne.ee
-Received: from tutadb.w10.tutanota.de (unknown [192.168.1.10])
-	by w4.tutanota.de (Postfix) with ESMTP id 6CAD41060254;
-	Thu, 21 Mar 2024 08:29:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1711009743;
-	s=s1; d=lynne.ee;
-	h=From:From:To:To:Subject:Subject:Content-Description:Content-ID:Content-Type:Content-Type:Content-Transfer-Encoding:Content-Transfer-Encoding:Cc:Cc:Date:Date:In-Reply-To:In-Reply-To:MIME-Version:MIME-Version:Message-ID:Message-ID:Reply-To:References:References:Sender;
-	bh=2V1nTFt2diEohmhfAUKGzJ0EWP63RxdFbT/k7yY4lZE=;
-	b=J5ur5qdjhZwdS+BBCfRu3lhSEs7waEmDuoQ3tAN2iN5xzTNor4KRJX1uG8Khoj1x
-	G4+wiUt0qxR79i5ckjI02S94aJ4W8oIUsdTF6wHYsom9u/3pwf963++XH9DjiHZcaSv
-	9Bq33JrNRCkZtZPpzOYC8BsUr28FCI4g18OKeaMUUXC8FXHI5Fi9XJUmVmjQzRxaiHi
-	JLUaw1UMg41eLsdoLhlr5Y0XLm+BVQkrpDB7DeHNkltzV7oW0p21eajZRJrdUlxPtWL
-	/0Zx0648nl0kUlf289/oN+w33kzxZuzAhvS51ov55GswCKlMSn+Y+O9WIeqga4MgWPH
-	Awps5NJPaQ==
-Date: Thu, 21 Mar 2024 09:29:03 +0100 (CET)
-From: Lynne <dev@lynne.ee>
-To: Netdev <netdev@vger.kernel.org>
-Cc: Kuniyu <kuniyu@amazon.com>,
-	Willemdebruijn Kernel <willemdebruijn.kernel@gmail.com>
-Message-ID: <NtV7B0y--3-9@lynne.ee>
-In-Reply-To: <Nt8pHPQ--B-9@lynne.ee>
-References: <Nt8pHPQ--B-9@lynne.ee>
-Subject: Re: Regarding UDP-Lite deprecation and removal
+	s=arc-20240116; t=1711009763; c=relaxed/simple;
+	bh=7kCuWcguJfXb+C5s5vznrmpMKt2aumVRMMbZ27GwQRI=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=Tn6tPdeIMWlzv+iDYBWF7av1ygEI6GnjVUEb/DDZ1I+gFqZb0vmYwNyZlIVWyK7nPA74HlXtnSP84GTeYwbmfYR5MtFUE95k/+hp7RqatF1fnchsZLpBFN/rCR9xQ9a14Ho4q4bUwfWKGpporTaDPcK82ndu4LQW5Jvr/nfFpH8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S3PLOttA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDFA4C433C7;
+	Thu, 21 Mar 2024 08:29:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711009762;
+	bh=7kCuWcguJfXb+C5s5vznrmpMKt2aumVRMMbZ27GwQRI=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
+	b=S3PLOttAxQVJs5+U1SxWEPd1adUzlZKsRvspPFtIee7I+PkW7lYi5w01c5dKOfR8K
+	 qvGRCZ2YCxx6++ElMesCX5CyH73jUNLxtPE4cKM6a9wo8lzNe1tcRBIbYxoKXdojFh
+	 rzGySzbifLgGxwVRBD7BKLGlx+Pu7nln3i78b/welbNKlYgUrQKOln7QJV/aHj/TNw
+	 ZtVAjCUxOLAvyXT/5kGJzi/Xys4ZhypuKbrShGMAcbNkruLovn5Auw/TV4+Skul6uF
+	 zShoCG2AovfLVmh8Odh0g7HqKFPD92U/d8sBpZ5hcpg41eNmllphYZ4nSfmO0OrINj
+	 rT9nl9deErSgA==
+From: Kalle Valo <kvalo@kernel.org>
+To: Edward Adam Davis <eadavis@qq.com>
+Cc: syzbot+93cbd5fbb85814306ba1@syzkaller.appspotmail.com,
+  linux-kernel@vger.kernel.org,  linux-usb@vger.kernel.org,
+  linux-wireless@vger.kernel.org,  netdev@vger.kernel.org,
+  syzkaller-bugs@googlegroups.com,  toke@toke.dk
+Subject: Re: [PATCH usb] wifi: ath9k: fix oob in htc_issue_send
+References: <0000000000004e41110614187d35@google.com>
+	<tencent_7225DC0D859205DD8BDDAE191CCFBF0D8907@qq.com>
+Date: Thu, 21 Mar 2024 10:29:18 +0200
+In-Reply-To: <tencent_7225DC0D859205DD8BDDAE191CCFBF0D8907@qq.com> (Edward
+	Adam Davis's message of "Thu, 21 Mar 2024 15:31:33 +0800")
+Message-ID: <87bk789ee9.fsf@kernel.org>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-Mar 17, 2024, 01:34 by dev@lynne.ee:
+Edward Adam Davis <eadavis@qq.com> writes:
 
-> Hello,
+> [syzbot reported]
+> usb 1-1: ath9k_htc: Transferred FW: ath9k_htc/htc_9271-1.4.0.fw, size: 51008
+> ath9k_htc 1-1:1.0: ath9k_htc: HTC initialized with 33 credits
+> ------------[ cut here ]------------
+> UBSAN: array-index-out-of-bounds in drivers/net/wireless/ath/ath9k/htc_hst.c:26:51
+> index 255 is out of range for type 'htc_endpoint [22]'
+> CPU: 1 PID: 2494 Comm: kworker/1:2 Not tainted 6.8.0-rc6-syzkaller-00190-ga788e53c05ae #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+> Workqueue: events request_firmware_work_func
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:88 [inline]
+>  dump_stack_lvl+0x125/0x1b0 lib/dump_stack.c:106
+>  ubsan_epilogue lib/ubsan.c:217 [inline]
+>  __ubsan_handle_out_of_bounds+0x111/0x150 lib/ubsan.c:347
+>  htc_issue_send.constprop.0+0x209/0x230 drivers/net/wireless/ath/ath9k/htc_hst.c:26
+>  ath9k_wmi_cmd_issue drivers/net/wireless/ath/ath9k/wmi.c:305 [inline]
+>  ath9k_wmi_cmd+0x424/0x630 drivers/net/wireless/ath/ath9k/wmi.c:342
+>  ath9k_regread+0xdb/0x160 drivers/net/wireless/ath/ath9k/htc_drv_init.c:242
+>  ath9k_hw_read_revisions drivers/net/wireless/ath/ath9k/hw.c:287 [inline]
+>  __ath9k_hw_init drivers/net/wireless/ath/ath9k/hw.c:572 [inline]
+>  ath9k_hw_init+0xf02/0x2b30 drivers/net/wireless/ath/ath9k/hw.c:700
+>  ath9k_init_priv drivers/net/wireless/ath/ath9k/htc_drv_init.c:662 [inline]
+>  ath9k_init_device drivers/net/wireless/ath/ath9k/htc_drv_init.c:839 [inline]
+>  ath9k_htc_probe_device+0xb37/0x25f0 drivers/net/wireless/ath/ath9k/htc_drv_init.c:963
+>  ath9k_htc_hw_init+0x33/0x70 drivers/net/wireless/ath/ath9k/htc_hst.c:529
+>  ath9k_hif_usb_firmware_cb+0x272/0x620 drivers/net/wireless/ath/ath9k/hif_usb.c:1273
+>  request_firmware_work_func+0x13a/0x240 drivers/base/firmware_loader/main.c:1163
+>  process_one_work+0x886/0x15d0 kernel/workqueue.c:2633
+>  process_scheduled_works kernel/workqueue.c:2706 [inline]
+>  worker_thread+0x8b9/0x1290 kernel/workqueue.c:2787
+>  kthread+0x2c6/0x3a0 kernel/kthread.c:388
+>  ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x11/0x20 arch/x86/entry/entry_64.S:243
+>  </TASK>
+> ---[ end trace ]---
+> [Fix]
+> If the target does not return a valid end point id during the device connection
+> process, returns a failure.
 >
-> UDP-Lite was scheduled to be removed in 2025 in commit
-> be28c14ac8bbe1ff due to a lack of real-world users, and
-> a long-outstanding security bug being left undiscovered.
->
-> I would like to open a discussion to perhaps either avoid this,
-> or delay it, conditionally.
->
+> Fixes: fb9987d0f748 ("ath9k_htc: Support for AR9271 chipset.")
+> Reported-and-tested-by: syzbot+93cbd5fbb85814306ba1@syzkaller.appspotmail.com
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
 
-Ping. To be clear, I am offering to maintain it if the current
-maintainers do not have time to.
+This should go to ath tree, not usb. No need to resend because of this.
 
-Should I send a patch to remove the warning? I wanted to
-know the opinions of the ones who maintain/deprecated
-the code first.
+-- 
+https://patchwork.kernel.org/project/linux-wireless/list/
+
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
