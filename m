@@ -1,189 +1,218 @@
-Return-Path: <netdev+bounces-81023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 302A688588F
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:49:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC590885899
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 12:53:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8ACBDB21492
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:49:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 822FD28201A
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:53:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B54D59148;
-	Thu, 21 Mar 2024 11:48:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F70259154;
+	Thu, 21 Mar 2024 11:53:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AUI3aR36"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="tdrXED7A"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9FC558AD1;
-	Thu, 21 Mar 2024 11:48:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8EB57329;
+	Thu, 21 Mar 2024 11:53:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711021738; cv=none; b=ZvsWviEVhDZFdSvaFIxgZ/I2IAWfnPyZJwwn3AtOU1gK7Tic0zKthcPsuDslnksB1x97Pi7VuAz+sGxQhsLhqj6JaaS7Cp0CtsNL8qBD7o1iDQxfFf6U6NzDMmM1zlGw86CaMwNBdtNNWJViqj5NACsrzt2p605vPf094C81rX0=
+	t=1711022032; cv=none; b=W/QQqeEWbBmksgzVhNWr8aH38oumPQtnjuQDG3qqfYI8uKJp1Vjn3b4oHBlpCWCVil5hh62FTZ76G6QP0BvdKWaQ8TzN9INDkNZXwTkZ6LhV02BvRrZpTHiLApNVV+UD3UAbggKEQZwcN+te3T2xVxUNkb3XW6XGuB1pLDF113c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711021738; c=relaxed/simple;
-	bh=oyaxk/plSkXwNqfy8BRBwP+1IHu4SESNTkIjkLiy/fs=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=uYBf3YRiKIUXVLv18i+RnWPaphvnggIHb7T6Uaocx7J8OkRULSvzAmapJEHhMvWCa7eIQt9KKi1HLa2Ic+nloxzYsBmsXF6ddH5VG8IIZ6mtR+OrNOEBQL2Pak86t+uKzU2kJum1O+JTuuPYWiZxVRMoBkLo79RZjH0px+nt/Ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AUI3aR36; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-41476ddf668so1623805e9.3;
-        Thu, 21 Mar 2024 04:48:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711021735; x=1711626535; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SBXuSoXBGzyYnzCyTr2t1+PEE5aIYSRJOIe9GFH+E6Y=;
-        b=AUI3aR36uNe8KLc3VQPVmQ4m/N78hhQMRjy5sUrVHgBWX3rLhWIXj/XkTxnyDv3JOT
-         rCNjrMBQ0KCmFU/g6T+Eieyr9fwv2BhFxsY9YpaFFK89NgoQZV74Bu1m5+s0PfJeeaMJ
-         AyRQAMgGECCfYUHvPmcQ0eOQKXAwhZK+Kh5Cj/TTzwgOHzmhyZzjOv7+rRNjrBsbgn4X
-         8r//ciIRmdIyQ4M6akOzZV7g9eLutrGjlCu4vQhlDNdtWfpvC2gqU34ye95ZM2U95kI+
-         i/kQof9ysRhsikNBDZlqGL8Mtd56AmIhjdPL32IqZN0FwjmsSJD8usHWmnVaMef4oac6
-         l/lw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711021735; x=1711626535;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SBXuSoXBGzyYnzCyTr2t1+PEE5aIYSRJOIe9GFH+E6Y=;
-        b=WzS8IkSTcixZ81pVMhe9YX4Kg/Eot6InLauFy32V0x4eXVYNBCt73HGPoQZ22KpAOt
-         5aXswGiBEw6PrZ+OnUKJxF+zOY0KqzuLKUtRpUEBp4rUSzO3qmMa9vlzlZtHRtcZQgxY
-         8+mJVvMrD7STVjKEPtjEiGPEkm62x6KTmi4yZRKwx23e9mAyRvM22m06OZ9Fw94T5aF8
-         31NCQUYyHS861qIi1QqFzHM0ApS6zKbNHPDmUDCIuar+9K2Nzjzlr9ihF71lVntnNWJU
-         qnjlviA080Dx1AB+/kVygX68wY+V1lrVS5eOfg4/eI6kn38mhYqW4DDa6+VnFM2E8Cqr
-         tMMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXmqAZ6j8v2Du8JAdO9iNyIxunbHyjRAANhgIypEdeA6FAdiEvcsPT90h1UnijS3UZYBC3cUZH+7lyUXLemIIkjofQZuZw0scXi0uQqBk2tyVi0PSX8RA6ugB9wVZUXVY4xl32wKxGRuPymB2pE0zCdMvuFGEtaYyx6
-X-Gm-Message-State: AOJu0Yz0s6H9pweHgAOnJutA2btLisxD1x+AbOHAuX8Of6zTvqpUyjCP
-	I99UxNjC0foJveoqoSThNcbVBXV6Jv8d80+EuP7wyYtDHhFhryF1
-X-Google-Smtp-Source: AGHT+IHgvLDMn+HkPdYkZPwv15NBsccTvbOlqisMgSHZldgyQSO7CfPZdAwWDR8KqP6FTQIBVCRBDQ==
-X-Received: by 2002:a05:600c:19cf:b0:414:7751:c55e with SMTP id u15-20020a05600c19cf00b004147751c55emr355510wmq.0.1711021734847;
-        Thu, 21 Mar 2024 04:48:54 -0700 (PDT)
-Received: from localhost (54-240-197-231.amazon.com. [54.240.197.231])
-        by smtp.gmail.com with ESMTPSA id bj25-20020a0560001e1900b0033e68338fbasm9338930wrb.81.2024.03.21.04.48.54
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 21 Mar 2024 04:48:54 -0700 (PDT)
-From: Puranjay Mohan <puranjay12@gmail.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Ilya Leoshkevich
- <iii@linux.ibm.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
- <dsahern@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
- Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu
- <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
- <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
- <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, "H. Peter Anvin"
- <hpa@zytor.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, Network
- Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, LKML
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH bpf v2] bpf: verifier: prevent userspace memory access
-In-Reply-To: <CAADnVQLHrmkJ5p2gEUJkf_CRxq9gv8rcSuBm5GeZ_nUJxQOE0Q@mail.gmail.com>
-References: <20240321101058.68530-1-puranjay12@gmail.com>
- <CAADnVQLhwLgq=QuXD-Ls=t9Scr_4Zn9JwdkXfZQfZkT=ysx64Q@mail.gmail.com>
- <CAADnVQLHrmkJ5p2gEUJkf_CRxq9gv8rcSuBm5GeZ_nUJxQOE0Q@mail.gmail.com>
-Date: Thu, 21 Mar 2024 11:48:52 +0000
-Message-ID: <mb61pwmpvst3v.fsf@gmail.com>
+	s=arc-20240116; t=1711022032; c=relaxed/simple;
+	bh=rwPmiBcBsUr4KjLrfM6Lo+lOB+JQBc9cNLMb7nVG1Os=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=EtNW/XJ4XV3A1p5T6d1CuxV8RBWKElDjvVxb1w31dNM3/IIQMKeZgcMmnR/zF3qr8/0w996YujyuNq1iHlKMwH9RfzzznaJOMwZUVrNYMZHXGfQ4zOMC4h1LgfklzWn2nOsiXIHwoxF1nktOWxU1ETo+NDqT//FbPss9+ryqZDE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=de.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=tdrXED7A; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=de.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42LBPleK009494;
+	Thu, 21 Mar 2024 11:53:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=nSiRR9rlBEwGjKc09GxxaGTYVNNqkADKqe8G2AFbDQU=;
+ b=tdrXED7Ab8pYjodt+IH/BoQrvEOHvoMtpspQr3VZeFOV72Fm3r/zSt21Ro85XcW7WJ4b
+ rtDxmFuQMhGoPkDQf0jMK7TMz0hsqRdEwkwhoOAOaGL5AG6eaNzBajHrycY/L/06+X0S
+ wIajTn04v/VviRwEUSdq3BGipKt+rL9q/e06o+y8R+Gj/QAoIdg7mzKTbZmAk4HrZAoG
+ Wj1cXi+wzu3JejSMpUArLsfXeh91Vn/BevbYebLL5ZREMBF1D/hrOBkkjCxVvGWa69vy
+ sYxIuWHAJXyrjAbyXsZL2qIfY1AfA9iHchs5D15L8most4z+Zx0plGbgv2UxPbNQdR1T DA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x0gc80kkv-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Mar 2024 11:53:45 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 42LBriTP025520;
+	Thu, 21 Mar 2024 11:53:44 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3x0gc80kkq-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Mar 2024 11:53:44 +0000
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 42LBM9EH010083;
+	Thu, 21 Mar 2024 11:53:43 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 3wxvav9tu0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 21 Mar 2024 11:53:43 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 42LBrbg017564012
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 21 Mar 2024 11:53:39 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 9E3E32004B;
+	Thu, 21 Mar 2024 11:53:37 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8A49120040;
+	Thu, 21 Mar 2024 11:53:37 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Thu, 21 Mar 2024 11:53:37 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
+	id 39D59E01DD; Thu, 21 Mar 2024 12:53:37 +0100 (CET)
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: Peter Oberparleiter <oberpar@linux.ibm.com>,
+        Vineeth Vijayan <vneethv@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>
+Subject: [PATCH net v3] s390/qeth: handle deferred cc1
+Date: Thu, 21 Mar 2024 12:53:37 +0100
+Message-Id: <20240321115337.3564694-1-wintera@linux.ibm.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: fxjla53e2cCmzHXuirsbBI7jrKM2NP4B
+X-Proofpoint-GUID: hlqnJDvQAuuzUyChFxUpKQprQtiPJZEu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-21_08,2024-03-18_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
+ impostorscore=0 lowpriorityscore=0 malwarescore=0 spamscore=0 phishscore=0
+ mlxscore=0 bulkscore=0 clxscore=1015 adultscore=0 suspectscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2403140000 definitions=main-2403210084
 
-Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
+The IO subsystem expects a driver to retry a ccw_device_start, when the
+subsequent interrupt response block (irb) contains a deferred
+condition code 1.
 
-> On Thu, Mar 21, 2024 at 4:05=E2=80=AFAM Alexei Starovoitov
-> <alexei.starovoitov@gmail.com> wrote:
->>
->> On Thu, Mar 21, 2024 at 3:11=E2=80=AFAM Puranjay Mohan <puranjay12@gmail=
-.com> wrote:
->> >
->> > diff --git a/arch/s390/net/bpf_jit_comp.c b/arch/s390/net/bpf_jit_comp=
-.c
->> > index e613eebfd349..e61a51a5b4be 100644
->> > --- a/arch/s390/net/bpf_jit_comp.c
->> > +++ b/arch/s390/net/bpf_jit_comp.c
->> > @@ -2691,3 +2691,8 @@ bool bpf_jit_supports_subprog_tailcalls(void)
->> >  {
->> >         return true;
->> >  }
->> > +
->> > +u64 bpf_arch_uaddress_limit(void)
->> > +{
->> > +       return -ENOTSUPP;
->> > +}
->>
->> Looks good and should work, but s390 CI is still not happy.
->> Ideas?
->> sock tests were not failing before. So something is going on.
->
-> I think I have an explanation.
-> -ENOTSUPP and u64... and later:
-> u64 uaddress_limit =3D bpf_arch_uaddress_limit()
-> if (uaddress_limit < 0)
->
-> I bet the compiler simply removes this check since unsigned cannot
-> be negative.
-> Odd that there is no compiler warning.
->
-> pw-bot: cr
->
+Symptoms before this commit:
+On the read channel we always trigger the next read anyhow, so no
+different behaviour here.
+On the write channel we may experience timeout errors, because the
+expected reply will never be received without the retry.
+Other callers of qeth_send_control_data() may wrongly assume that the ccw
+was successful, which may cause problems later.
 
-Yes, I verified that the compiler is removing this:
+Note that since
+commit 2297791c92d0 ("s390/cio: dont unregister subchannel from child-drivers")
+and
+commit 5ef1dc40ffa6 ("s390/cio: fix invalid -EBUSY on ccw_device_start")
+deferred CC1s are much more likely to occur. See the commit message of the
+latter for more background information.
 
+Fixes: 2297791c92d0 ("s390/cio: dont unregister subchannel from child-drivers")
+Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+Co-developed-by: Thorsten Winkler <twinkler@linux.ibm.com>
+Signed-off-by: Thorsten Winkler <twinkler@linux.ibm.com>
+Reviewed-by: Peter Oberparleiter <oberpar@linux.ibm.com>
+---
+v1->v2: correct patch format
+v2->v3: unlock qeth channel before scheduling recovery
+---
+ drivers/s390/net/qeth_core_main.c | 38 +++++++++++++++++++++++++++++--
+ 1 file changed, 36 insertions(+), 2 deletions(-)
 
-                if (BPF_CLASS(insn->code) =3D=3D BPF_LDX &&
-    a944:       7100047f        cmp     w3, #0x1
-    a948:       540013e1        b.ne    abc4 <do_misc_fixups+0x66c>  // b.a=
-ny
-    a94c:       721a041f        tst     w0, #0xc0
-    a950:       54fff4e1        b.ne    a7ec <do_misc_fixups+0x294>  // b.a=
-ny
-                        u64 uaddress_limit =3D bpf_arch_uaddress_limit();
-    a954:       b90003e6        str     w6, [sp]
-    a958:       94000000        bl      0 <bpf_arch_uaddress_limit>
-                        *patch++ =3D BPF_MOV64_REG(BPF_REG_AX, insn->src_re=
-g);
+diff --git a/drivers/s390/net/qeth_core_main.c b/drivers/s390/net/qeth_core_main.c
+index cf8506d0f185..601d00e09de4 100644
+--- a/drivers/s390/net/qeth_core_main.c
++++ b/drivers/s390/net/qeth_core_main.c
+@@ -1179,6 +1179,20 @@ static int qeth_check_irb_error(struct qeth_card *card, struct ccw_device *cdev,
+ 	}
+ }
+ 
++/**
++ * qeth_irq() - qeth interrupt handler
++ * @cdev: ccw device
++ * @intparm: expect pointer to iob
++ * @irb: Interruption Response Block
++ *
++ * In the good path:
++ * corresponding qeth channel is locked with last used iob as active_cmd.
++ * But this function is also called for error interrupts.
++ *
++ * Caller ensures that:
++ * Interrupts are disabled; ccw device lock is held;
++ *
++ */
+ static void qeth_irq(struct ccw_device *cdev, unsigned long intparm,
+ 		struct irb *irb)
+ {
+@@ -1220,11 +1234,10 @@ static void qeth_irq(struct ccw_device *cdev, unsigned long intparm,
+ 		iob = (struct qeth_cmd_buffer *) (addr_t)intparm;
+ 	}
+ 
+-	qeth_unlock_channel(card, channel);
+-
+ 	rc = qeth_check_irb_error(card, cdev, irb);
+ 	if (rc) {
+ 		/* IO was terminated, free its resources. */
++		qeth_unlock_channel(card, channel);
+ 		if (iob)
+ 			qeth_cancel_cmd(iob, rc);
+ 		return;
+@@ -1268,6 +1281,7 @@ static void qeth_irq(struct ccw_device *cdev, unsigned long intparm,
+ 		rc = qeth_get_problem(card, cdev, irb);
+ 		if (rc) {
+ 			card->read_or_write_problem = 1;
++			qeth_unlock_channel(card, channel);
+ 			if (iob)
+ 				qeth_cancel_cmd(iob, rc);
+ 			qeth_clear_ipacmd_list(card);
+@@ -1276,6 +1290,26 @@ static void qeth_irq(struct ccw_device *cdev, unsigned long intparm,
+ 		}
+ 	}
+ 
++	if (scsw_cmd_is_valid_cc(&irb->scsw) && irb->scsw.cmd.cc == 1 && iob) {
++		/* channel command hasn't started: retry.
++		 * active_cmd is still set to last iob
++		 */
++		QETH_CARD_TEXT(card, 2, "irqcc1");
++		rc = ccw_device_start_timeout(cdev, __ccw_from_cmd(iob),
++					      (addr_t)iob, 0, 0, iob->timeout);
++		if (rc) {
++			QETH_DBF_MESSAGE(2,
++					 "ccw retry on %x failed, rc = %i\n",
++					 CARD_DEVID(card), rc);
++			QETH_CARD_TEXT_(card, 2, " err%d", rc);
++			qeth_unlock_channel(card, channel);
++			qeth_cancel_cmd(iob, rc);
++		}
++		return;
++	}
++
++	qeth_unlock_channel(card, channel);
++
+ 	if (iob) {
+ 		/* sanity check: */
+ 		if (irb->scsw.cmd.count > iob->length) {
+-- 
+2.40.1
 
-
-We should do:
-   if (!uaddress_limit)
-        goto next_insn;
-
-and in the disabled case return 0 in place of -ENOSUPP.
-
-Doing this adds the check:
-
-
-             if (BPF_CLASS(insn->code) =3D=3D BPF_LDX &&
-    a944:       7100047f        cmp     w3, #0x1
-    a948:       54001401        b.ne    abc8 <do_misc_fixups+0x670>  // b.a=
-ny
-    a94c:       721a041f        tst     w0, #0xc0
-    a950:       54fff4e1        b.ne    a7ec <do_misc_fixups+0x294>  // b.a=
-ny
-                        u64 uaddress_limit =3D bpf_arch_uaddress_limit();
-    a954:       b90003e6        str     w6, [sp]
-    a958:       94000000        bl      0 <bpf_arch_uaddress_limit>
-                        if (!uaddress_limit)
-    a95c:       b4fff020        cbz     x0, a760 <do_misc_fixups+0x208>
-                        *patch++ =3D BPF_MOV64_REG(BPF_REG_AX, insn->src_re=
-g);
-
-
-
-I will send v3 with this approach.
-
-
-Thanks,
-Puranjay
 
