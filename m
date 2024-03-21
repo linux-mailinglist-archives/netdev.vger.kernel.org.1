@@ -1,127 +1,122 @@
-Return-Path: <netdev+bounces-81000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20E3D885780
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:35:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECC398857A7
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:52:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 412851C21260
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:35:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 779DC1F21DF2
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:52:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 551FE54F89;
-	Thu, 21 Mar 2024 10:34:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8656F57311;
+	Thu, 21 Mar 2024 10:52:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="F+bdIDkG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QWgowL4J"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFB7814284
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 10:34:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D84957300
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 10:52:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711017297; cv=none; b=R3OVrSGOMOHHInN/qKy2IVwsrtGMtsiw+Fo2JF9GxkDYMOeUEhhqcAMq1oadeDeX7apxqAH5s6tJvL92cqUu3JNHNPzxEU7/PnYTvQElADTB3HTlzt+hTzQlOHYRY6cyz1rg/h88hq7aPTsrxwrohOfpvM7sR3BbSrNCkKAg8UY=
+	t=1711018357; cv=none; b=H0tWINPpwNxpbBVw6dbYnVEY/800rHq+lh2NjH5bgoArh1nl3adQMGFMzegE71C/RubQvEv3XIr2mK4FWlYWtYIwaiX3NIIC4javCI7fwgc4rgyZRZfSAeMcw558DL9dS6LMi21GA7mtcX+9+uRFvJ249F6hALI3o2WZNUaFBHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711017297; c=relaxed/simple;
-	bh=y4emFXGGAZffpUX9wn8XGyawcIby/7BxyXLMzGwuUlE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cvece5Gf+Or1C+6iMkJfqJBpD9v+z0B5XQNJz6CxaaGBgMUmCm8HleEsRHSETzW3bC2phlldrqa+WHey3gStrZmx1YYo2L5VCS6TqZyeAhpQLPnJYytM/8JAs3JRffB3WnGSugQzb/OAT7+9I8RlDZ7IkFQtJ67fmDE36tNJd/Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=F+bdIDkG; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-512f3e75391so608259e87.2
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 03:34:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711017294; x=1711622094; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=3XNkgAQnQ6LBfF2NFDRpA/pvI0NsrzPvIEpAHL8Ayt0=;
-        b=F+bdIDkGzDaBLrdVKjtUiTAA/Dz/rG/yZGAAhu9b6bZyDlDxnqHH/dnruulUpT+v9U
-         R3k8FXVXkP5Vq0vtxbabSaL+XA0fAnef5O1D9JX08rrjYnvo84uNaVDZBdQYIMM5jokC
-         YznDdInJHUrbrEbKHBeOXvKRF9lEfTLkRcGHaQaxi5egEiWqt7h89143Lvlujrqlh+dE
-         X+T/LB0p+6GND7LVAf3d1BkYxUAegyQs65YCKSP4815PMQefPb3OW/Rujv3nY4KGuNWy
-         OzTCtUB0OCifQdV4X5hnlscNLyoGHMwOluJ9eJzeI+AmbiQ3GHtiqogejqO2TjiZwhCB
-         0RzA==
+	s=arc-20240116; t=1711018357; c=relaxed/simple;
+	bh=gsoCm4Wgk2v70XacpU05b7R7RosfW3s9rjwHL5092VU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=FyVPUwHylUx++JXdjBq3rgEBQ/76ygIN8LvjI6TUXCp0LY/kQ7+3qIhjtKdbQH120EEoSe07PsM7OZ5S6Dk4lAgVIKO1KvT0wE+i2SYpbM0ClCXKtPUcpHPgM230mOuVzp+YneDOpZpvLa7Qus5dee7VAX7zio566yfWrt0aNh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QWgowL4J; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711018354;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=gsoCm4Wgk2v70XacpU05b7R7RosfW3s9rjwHL5092VU=;
+	b=QWgowL4Jsgr4kDBhaCYwwY6TXFNeONyetTLgVwbPdpyTDQbcAoWpc2zxbrlNtrXzSvQV5R
+	h/rW8+BmBgX3JErPPUTdTrzWKVuOqgTW3Z85ckZVXgrDnuupezUGgVjimDn8eVvpY1C6U+
+	9qxGTvBYFrE/Ou90FE6E0qHw8UWthZs=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-56-z1IFHPxbPfeywcysk_eL4g-1; Thu, 21 Mar 2024 06:52:32 -0400
+X-MC-Unique: z1IFHPxbPfeywcysk_eL4g-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-41472b798a2so1618855e9.1
+        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 03:52:32 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711017294; x=1711622094;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3XNkgAQnQ6LBfF2NFDRpA/pvI0NsrzPvIEpAHL8Ayt0=;
-        b=EiVXiBW7MfaLFliCwiIcnI3fyIdhhnkpt5nIi9PDf3hdyb+E8mSdNJte4oMdy1Hq1e
-         MflQXRzYmJxU1zF+yCzIkCnw8mbcSRHOmNPNhllnVdHdknNu8SHyqd0ST8NWi8UBSXye
-         JSQpOxeXQF0CzDYxaiNg3+L+4Wg477H2aTyx4XUohgkeXz8xl2PYdbPxon9s1wlrYwTF
-         +2lMQ5KEbnTFORV8L8rQXGBPyH+HwQxPXxWVJG3ESo5ak8Ahtawgo1NbImZML4wa7Bgj
-         7RR6u5sETwL2CPpLSxEFd/2xqLi8g9hnoL1YITtBsmOUPXRFiOcBWlI0Z2KIXOMYhfPx
-         hZvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWcjhzCwywe4tR4RdtIQmbIxLESnZOYwhVvzFAxes0pXoey67yurmJUms0QTJTXCjyDyydwCu1u8a1U4gBbOagxaecf03sQ
-X-Gm-Message-State: AOJu0YwYyu24fEuTi0v67H5s1oJHo6WfdydrOCulHmjEiRPwvosWsLj0
-	TD7I/NHPJRgfW9nLWC4KgIeRKR6jFdgY3ZPbBFDSvAVm4z/NJ8IoaCWTjYuxT7s=
-X-Google-Smtp-Source: AGHT+IHcrMw9qmrRmKJ+2QA1uL5wiYGSUSyvOjThedDZOBU+nrthRuPB8s9XAlNO95sJ+RIlSU9Jkw==
-X-Received: by 2002:ac2:5b8f:0:b0:513:ec32:aa8a with SMTP id o15-20020ac25b8f000000b00513ec32aa8amr5682658lfn.11.1711017293674;
-        Thu, 21 Mar 2024 03:34:53 -0700 (PDT)
-Received: from localhost ([102.222.70.76])
-        by smtp.gmail.com with ESMTPSA id iv20-20020a05600c549400b004146bce65f4sm5064318wmb.13.2024.03.21.03.34.52
+        d=1e100.net; s=20230601; t=1711018351; x=1711623151;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gsoCm4Wgk2v70XacpU05b7R7RosfW3s9rjwHL5092VU=;
+        b=OXGkB9zU+IYK/guVxoXiXiuX1QjLSovCN4PJSbnLBCcFdyKSg1E/r7vXd5z12opOvO
+         CdWva1BkhoVL6B+bChgSzKR7VZnwUJ5fp8NRkAHUMmv7Id7lC8mR2cG4J79jZxkD+EQL
+         dmq8vuKwj0CpBRDJtbAHnjjiQFd+zK7j6E57pWDEKWbdxVNlgF0JGrS7hn5CCCYoQyBb
+         SnytRtJX2Gt6SAofe52yH4kfREAfJGOM999byxib9Ai0h5DTYIII7x7q5mjcKjV+uoAx
+         cdfs3d0/2o59gc2rIxgsRQy1dhXwQyWviZBBvIYSgOfUsNEUnXtssLGrBkWvpI87X5pc
+         4frg==
+X-Forwarded-Encrypted: i=1; AJvYcCUSl91O/cXokzIvsHM6Ng/cO8hr/x8Yo4DnACSBDflRtRWe9L4OmTVqYqCCJGUE1HbzpBl6UBRI7sTbtiN/UdxH+d0J0+p2
+X-Gm-Message-State: AOJu0YzO3fNvbVm8jUmkxzuqhB6K5mbQtc37oIGHK7WsMF8m+tprrbDe
+	87pCDKIeakPnfOexg86SRgm9dJJj1Wt9FjQMBbz40lWo2QLSyXpqeBjY/7Xg8bX2nF1n45zDMkO
+	yAvSgXQfVxe5pWWlBqkELAw6/fPaSJX3kA6YL3TSzhSY/vyKVv/lv6w==
+X-Received: by 2002:a05:6000:1849:b0:341:8f18:db39 with SMTP id c9-20020a056000184900b003418f18db39mr5641235wri.1.1711018351695;
+        Thu, 21 Mar 2024 03:52:31 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFC+aYfcvUIaLD708MwzlkLyOTxpcs2HGHrfSDGKBbltBf4gJYZfWTB0xukFigbeuvwxrW7ug==
+X-Received: by 2002:a05:6000:1849:b0:341:8f18:db39 with SMTP id c9-20020a056000184900b003418f18db39mr5641219wri.1.1711018351321;
+        Thu, 21 Mar 2024 03:52:31 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-249-130.dyn.eolo.it. [146.241.249.130])
+        by smtp.gmail.com with ESMTPSA id bk12-20020a0560001d8c00b0033e88eb0ab9sm17143460wrb.11.2024.03.21.03.52.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Mar 2024 03:34:53 -0700 (PDT)
-Date: Thu, 21 Mar 2024 13:34:48 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-	Kees Cook <keescook@chromium.org>,
-	David Laight <David.Laight@aculab.com>,
-	"Czapnik, Lukasz" <lukasz.czapnik@intel.com>
-Subject: Re: [PATCH net] ice: Fix freeing uninitialized pointers
-Message-ID: <22ba28d7-e8ed-4b5a-9b6f-42d944d2f67d@moroto.mountain>
-References: <77145930-e3df-4e77-a22d-04851cf3a426@moroto.mountain>
- <20240319124317.3c3f16cd@kernel.org>
- <facf5615-d7ac-4167-b23c-6bab7c123138@moroto.mountain>
- <20240320202916.2f2bda73@kernel.org>
- <6266c75a-c02a-431f-a4f2-43b51586ffb4@intel.com>
+        Thu, 21 Mar 2024 03:52:30 -0700 (PDT)
+Message-ID: <1c84b33599ba6d10680162a43ea729f7353327b3.camel@redhat.com>
+Subject: Re: [PATCH net 3/3] netfilter: nf_tables: Fix a memory leak in
+ nf_tables_updchain
+From: Paolo Abeni <pabeni@redhat.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org, 
+	edumazet@google.com
+Date: Thu, 21 Mar 2024 11:52:29 +0100
+In-Reply-To: <20240321000635.31865-4-pablo@netfilter.org>
+References: <20240321000635.31865-1-pablo@netfilter.org>
+	 <20240321000635.31865-4-pablo@netfilter.org>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <6266c75a-c02a-431f-a4f2-43b51586ffb4@intel.com>
 
-On Thu, Mar 21, 2024 at 10:59:42AM +0100, Przemek Kitszel wrote:
-> Simplest solution would be to add a macro wrapper, especially that there
-> are only a few deallocation methods.
-> 
-> in cleanup.h:
-> +#define auto_kfree __free(kfree) = NULL
-> 
-> and similar macros for auto vfree(), etc.
-> 
-> then in the drivers:
-> -struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) = NULL,
-> 				  *othercaps __free(kfree) = NULL;
-> +struct ice_aqc_get_phy_caps_data *pcaps auto_kfree,
-> 				  *othercaps auto_kfree;
+On Thu, 2024-03-21 at 01:06 +0100, Pablo Neira Ayuso wrote:
+> From: Quan Tian <tianquan23@gmail.com>
+>=20
+> If nft_netdev_register_hooks() fails, the memory associated with
+> nft_stats is not freed, causing a memory leak.
+>=20
+> This patch fixes it by moving nft_stats_alloc() down after
+> nft_netdev_register_hooks() succeeds.
+>=20
+> Fixes: b9703ed44ffb ("netfilter: nf_tables: support for adding new device=
+s to an existing netdev chain")
+> Signed-off-by: Quan Tian <tianquan23@gmail.com>
 
-The auto_kfree looks like a variable to my eyes.  I'd prefer something
-like:
+I'm sorry for nit-picking, but our tag verification scripts are unhappy
+WRT this commit, it lacks your SoB. Would you mind sending an updated
+PR?
 
-#define __FREE(p) p __free(kfree) = NULL
+Thanks!
 
-	struct ice_aqc_get_phy_caps_data *__FREE(pcaps);
-
-regards,
-dan carpenter
+Paolo
 
 
