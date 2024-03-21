@@ -1,118 +1,214 @@
-Return-Path: <netdev+bounces-80946-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80947-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83F2D881C53
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 07:08:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2C91881C62
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 07:11:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ACEC283BF6
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 06:08:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A81881F22172
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 06:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26D8438F99;
-	Thu, 21 Mar 2024 06:08:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1155F38F99;
+	Thu, 21 Mar 2024 06:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="joL1OcsK"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gsdy1iMi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2AB6FBF;
-	Thu, 21 Mar 2024 06:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 616C9883C
+	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 06:11:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711001296; cv=none; b=GZn5pnSKomV04Me6BMyR4CpMWwOUiaCV9480yJN5Sr34eeyut/rP8vt7guAJTKmBXEmtm34ZBOVMl5eSpxmvxHXBLgHqDgH61KoWhM1goG028J+AxHOM6TmPr9jQ3Nk5k8AnqJO+diMC0qhi592I5TPoDWeJwMTJhN7pW32VztQ=
+	t=1711001490; cv=none; b=p69LmLOiBY/yu+85kirMULLvN824RIxtTBUcIFXHoGiyRRpuGqmqECbggAQjP4JagVRLoTAu0a/+pPP+eB/yGHP8BPJjEiQa7pzWG0dLb5OwgnJEK2gQwi8kPg634Um9dgInJFMj1QmtVJ86SbiW8SyX8Jh7W8nPXDHimQpCn7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711001296; c=relaxed/simple;
-	bh=Wea1fSqHpz3J/JBua4hd15llvV+QZuuLz+xrfQq/WvE=;
+	s=arc-20240116; t=1711001490; c=relaxed/simple;
+	bh=nS3ZtkcmRWYQhNRSA+8PL8l9Y6ENrB3adeY74KvxwmI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cQwLv0iPauVoCCnjSHXHkOa7IaCjCSnI3JqkC03wVad8LjgZSkfWHMY7z31fwED9ZHZ/KA6mK1/jelVmHm1o4BC8G/qzOXhi7lOrbzChND6a+YoAmSIF0LUHfgmXA1J3Hw9Ntt+M2CQj1ix5LgyloofkKkhXHYF8QvJXD4TKDg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=joL1OcsK; arc=none smtp.client-ip=209.85.221.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-33ececeb19eso307831f8f.3;
-        Wed, 20 Mar 2024 23:08:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711001293; x=1711606093; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MAOWqEugmsLZcY5+XlGTS+PYzImgKXVHs0T7fAbF/hY=;
-        b=joL1OcsK5VI1Hooc7A5Lbdq40cfB29ry2iLhCLT9HcdvSM2En78nmBZe1+0mmZ0XlZ
-         J8a5OwP3hfZgsyCzHJ7Epmb3ABe3NGtqhmGK6Tsl6h7wBYC3+q5+dqyLOleDfU4EyHtE
-         VJkzB09g1yBz3XuQ2DwtAsmabV6NRsgRvfG7lB1qBwG5C7F0DXjEPeT9N5a4Ui4mkE3Q
-         8JmPJRwTCtaMIszPZGLVRpK72921T/eyLglFAZMEVVwwWwtZQAirLagoL3/PzT5qNL5Z
-         icDVuvbNktuO0D2LpeLSMc029nETieU2Ni0foKs/cDlg2lfu89akEvvXvYyybz9+mpHJ
-         5uHw==
+	 To:Cc:Content-Type; b=DA21OKHgBfo/OLSpIoHQzBjZRjIUippcyLw2znzywWEUTSGZrBolkTEzJIfKYQCPj8ZBSv8ZxKsbni32XCPw1H+nqnojpWQm+rkdSj7bEWPsBy5qbJmUl4hBzyg6dOzsjVBV93aIBH4GnDC54pK0XJW3HsQqYKvDf9l5f/TUWNk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gsdy1iMi; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711001487;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=TRr6w2hmwgDNs0vVbChBiZJi7/+SS06endfvm4wx2Qo=;
+	b=gsdy1iMimCz1El2RBlf7BpXJDpxPDJDA0IzveM0Kp1GEm1eIbx5Vr11o0Glt8KACuBGxcL
+	fDYWaPIx/LIAZ/AlT6Jjk5ip7e9EqupxsRjmTRp5WYMDhBj5G1zPgcDFFif/bIL5waCzZg
+	oa+Ai32Z3WyNEmX8beKxRNNueqGTVoQ=
+Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
+ [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-179-4SLgwePeN7OBv1IWXyQq5g-1; Thu, 21 Mar 2024 02:11:25 -0400
+X-MC-Unique: 4SLgwePeN7OBv1IWXyQq5g-1
+Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-29de982f09aso527129a91.1
+        for <netdev@vger.kernel.org>; Wed, 20 Mar 2024 23:11:25 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711001293; x=1711606093;
+        d=1e100.net; s=20230601; t=1711001484; x=1711606284;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MAOWqEugmsLZcY5+XlGTS+PYzImgKXVHs0T7fAbF/hY=;
-        b=GeZHu5IrzI6X4e+1yYGolPkggAsc6PhOONFWOsmPXwZIbYmXGW6A4VpoSzCRpbZuPF
-         CrFwuBZwJ+Ugh5vviDwSnb6mQOSy7bh5ZLp0uBZa8ik/CxKyqWm1db2ofBc5jmwN5tRu
-         iRmJCbd5kL0gqdK6t7GqpgLWR4NtqGKTgESZJuz+4dJVhNN8/sprdxeWuET10tovDrqM
-         WFsoDe9dW4fcQLV+AVjKjwo/R9Z/ffHvRr2xvFKEwBNg9EVWZG8SCkug3l+pKIuLP8Fm
-         J1b1WblRJDoaVOi8ASgbLKIISCb2QAoKtlTnysLBaQAxA1LA81BhXBKXeMeRmsUEP5kO
-         TBvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWHfVhVNcMrGwbxDJPAmwn1+BLlsMtYUyvu/EPgk3e9wRslIPyx/76Py+Cb5JgTMcDPTpihvw84XFekrGkV6avVtzfJhbb7lr3wKveOQ7++F2jTl4F+hzvThQ+7wMc1749jCSdQR1iN6nfDFkfpjLQ+FIMDvIGamK8V
-X-Gm-Message-State: AOJu0Yz2k8vMjUpBZLC+mXGfEeIEhyqL2mSKieXztGbxFENQQBPzF6RN
-	6kszFOMPuSxJydxCxJSORHgNJfdRNM/r2Hpl2W5ipur+6FLIit6cOmoGoSUessvh01lRzSXlkXZ
-	0lPm7g6tsLYeGlkyDjQhmGWVnioY=
-X-Google-Smtp-Source: AGHT+IG1ZQ91dGzNjV3S/a0sal/vPAwq07eP4TWvORk3wU+AEnbxoMNPW+53b4pyrDj05zRUsivgsb8wShGrtFAdUwQ=
-X-Received: by 2002:adf:e005:0:b0:33d:886d:bb51 with SMTP id
- s5-20020adfe005000000b0033d886dbb51mr673479wrh.60.1711001292385; Wed, 20 Mar
- 2024 23:08:12 -0700 (PDT)
+        bh=TRr6w2hmwgDNs0vVbChBiZJi7/+SS06endfvm4wx2Qo=;
+        b=EmdDiSr9U+vXx5uRbqPLPBqcJ2Mlr38+BSURK2AOeQTTmHv7D1JhzwPeKuD0repkCo
+         EOs4Zi/k85Rb1xjAgLQ67SCvqfN/b628c8Vew3hIuVjLKyFGKtKZYawk3tmQFe++jK+E
+         n9W/gam39EVhJ45X+TJBYRt0qN7x3HSaJPGfTVLs4VmE8XzPpcQK7LSPqzxVrJGw8wRV
+         AqKc1Du75QRG0VCUeZ0P9dJ4kOc4QfSe/f+tO7kcQ2tHtgPzQ/yNqnBiLiGB7rodG6l0
+         xrbgfVVwn/SLImFcPx1J7uNhnVLIjM7n9XpK3mmssOvR1ZOTLB5qPglQZ6DVYYMeb4K4
+         hwSw==
+X-Forwarded-Encrypted: i=1; AJvYcCXh4FgIP1kcl7oHi8XZuRjcmvaNRVlAHmzOJB3DC6JG6niwSL9EDb5pnTDwBh6TY/lmfP68802oKxf0G3voWl5UU9TtuvAo
+X-Gm-Message-State: AOJu0YwrYmHjaR2od76MNlaockxslx1Z7TGBfWbpKur8a1w3o7XB9KuC
+	R0g0zJf6sUmmagHy74EOIy4Nm1dHD20NT6sOCRfHeY31FOUDidpRyBQhBsuHccpBbee6zV+fZVe
+	st3asueTlHz7iv8BDC59n9TTYLrDvpZH9DpAqXsbnyUx1Mv3mFtSSsrdPdE5/xf0uxMsEInmybF
+	1IskKKJASfpB2GDDCGzZ30nSBTBCXC
+X-Received: by 2002:a17:90a:ee94:b0:29d:dd93:5865 with SMTP id i20-20020a17090aee9400b0029ddd935865mr6337690pjz.46.1711001484416;
+        Wed, 20 Mar 2024 23:11:24 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFMJs5m8yPCol1xvp4yJO6WcRnRdD98Sx8BFnN7+XFFZjVg6pV1bOfqeO7BXwqMn4EG2HGLFM86gzFGtPZgAf4=
+X-Received: by 2002:a17:90a:ee94:b0:29d:dd93:5865 with SMTP id
+ i20-20020a17090aee9400b0029ddd935865mr6337683pjz.46.1711001484139; Wed, 20
+ Mar 2024 23:11:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240320105436.4781-1-puranjay12@gmail.com>
-In-Reply-To: <20240320105436.4781-1-puranjay12@gmail.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 20 Mar 2024 23:08:00 -0700
-Message-ID: <CAADnVQJ3o6DsURi=N_KXx+mbW9r7__3LrwYLyYwuoMOsqFHPkw@mail.gmail.com>
-Subject: Re: [PATCH bpf] bpf: verifier: prevent userspace memory access
-To: Puranjay Mohan <puranjay12@gmail.com>, Ilya Leoshkevich <iii@linux.ibm.com>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
-	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>
+References: <20240320101912.28210-1-w_angrong@163.com>
+In-Reply-To: <20240320101912.28210-1-w_angrong@163.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 21 Mar 2024 14:11:13 +0800
+Message-ID: <CACGkMEst2ixZrtBUEWArQT+CkDqzSr9E3V7qMyVU6xX+FnBChA@mail.gmail.com>
+Subject: Re: [PATCH v3] vhost/vdpa: Add MSI translation tables to iommu for
+ software-managed MSI
+To: Wang Rong <w_angrong@163.com>
+Cc: mst@redhat.com, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Mar 20, 2024 at 3:55=E2=80=AFAM Puranjay Mohan <puranjay12@gmail.co=
-m> wrote:
+On Wed, Mar 20, 2024 at 6:20=E2=80=AFPM Wang Rong <w_angrong@163.com> wrote=
+:
 >
-> The JITs need to implement bpf_arch_uaddress_limit() to define where
-> the userspace addresses end for that architecture or TASK_SIZE is taken
-> as default.
+> From: Rong Wang <w_angrong@163.com>
 >
-> The implementation is as follows:
+> Once enable iommu domain for one device, the MSI
+> translation tables have to be there for software-managed MSI.
+> Otherwise, platform with software-managed MSI without an
+> irq bypass function, can not get a correct memory write event
+> from pcie, will not get irqs.
+> The solution is to obtain the MSI phy base address from
+> iommu reserved region, and set it to iommu MSI cookie,
+> then translation tables will be created while request irq.
 >
-> REG_AX =3D  SRC_REG
-> if(offset)
->         REG_AX +=3D offset;
-> REG_AX >>=3D 32;
-> if (REG_AX <=3D (uaddress_limit >> 32))
->         DST_REG =3D 0;
-> else
->         DST_REG =3D *(size *)(SRC_REG + offset);
+> Change log
+> ----------
+>
+> v1->v2:
+> - add resv iotlb to avoid overlap mapping.
+> v2->v3:
+> - there is no need to export the iommu symbol anymore.
+>
+> Signed-off-by: Rong Wang <w_angrong@163.com>
+> ---
+>  drivers/vhost/vdpa.c | 59 +++++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 56 insertions(+), 3 deletions(-)
+>
+> diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> index ba52d128aeb7..28b56b10372b 100644
+> --- a/drivers/vhost/vdpa.c
+> +++ b/drivers/vhost/vdpa.c
+> @@ -49,6 +49,7 @@ struct vhost_vdpa {
+>         struct completion completion;
+>         struct vdpa_device *vdpa;
+>         struct hlist_head as[VHOST_VDPA_IOTLB_BUCKETS];
+> +       struct vhost_iotlb resv_iotlb;
 
-The patch looks good, but it seems to be causing s390 CI failures.
+Is it better to introduce a reserved flag like VHOST_MAP_RESERVED,
+which means it can't be modified by the userspace but the kernel.
 
-Ilya,
-could you help us understand is this check needed on s390
-and if so, what should be the uaddress_limit ?
+So we don't need to have two IOTLB. But I guess the reason you have
+this is because we may have multiple address spaces where the MSI
+routing should work for all of them?
+
+Another note, vhost-vDPA support virtual address mapping, so this
+should only work for physicall address mapping. E.g in the case of
+SVA, MSI iova is a valid IOVA for the driver/usrespace.
+
+>         struct device dev;
+>         struct cdev cdev;
+>         atomic_t opened;
+> @@ -247,6 +248,7 @@ static int _compat_vdpa_reset(struct vhost_vdpa *v)
+>  static int vhost_vdpa_reset(struct vhost_vdpa *v)
+>  {
+>         v->in_batch =3D 0;
+> +       vhost_iotlb_reset(&v->resv_iotlb);
+
+We try hard to avoid this for performance, see this commit:
+
+commit 4398776f7a6d532c466f9e41f601c9a291fac5ef
+Author: Si-Wei Liu <si-wei.liu@oracle.com>
+Date:   Sat Oct 21 02:25:15 2023 -0700
+
+    vhost-vdpa: introduce IOTLB_PERSIST backend feature bit
+
+Any reason you need to do this?
+
+>         return _compat_vdpa_reset(v);
+>  }
+>
+> @@ -1219,10 +1221,15 @@ static int vhost_vdpa_process_iotlb_update(struct=
+ vhost_vdpa *v,
+>             msg->iova + msg->size - 1 > v->range.last)
+>                 return -EINVAL;
+>
+> +       if (vhost_iotlb_itree_first(&v->resv_iotlb, msg->iova,
+> +                                       msg->iova + msg->size - 1))
+> +               return -EINVAL;
+> +
+>         if (vhost_iotlb_itree_first(iotlb, msg->iova,
+>                                     msg->iova + msg->size - 1))
+>                 return -EEXIST;
+>
+> +
+>         if (vdpa->use_va)
+>                 return vhost_vdpa_va_map(v, iotlb, msg->iova, msg->size,
+>                                          msg->uaddr, msg->perm);
+> @@ -1307,6 +1314,45 @@ static ssize_t vhost_vdpa_chr_write_iter(struct ki=
+ocb *iocb,
+>         return vhost_chr_write_iter(dev, from);
+>  }
+>
+> +static int vhost_vdpa_resv_iommu_region(struct iommu_domain *domain, str=
+uct device *dma_dev,
+> +       struct vhost_iotlb *resv_iotlb)
+> +{
+> +       struct list_head dev_resv_regions;
+> +       phys_addr_t resv_msi_base =3D 0;
+> +       struct iommu_resv_region *region;
+> +       int ret =3D 0;
+> +       bool with_sw_msi =3D false;
+> +       bool with_hw_msi =3D false;
+> +
+> +       INIT_LIST_HEAD(&dev_resv_regions);
+> +       iommu_get_resv_regions(dma_dev, &dev_resv_regions);
+> +
+> +       list_for_each_entry(region, &dev_resv_regions, list) {
+> +               ret =3D vhost_iotlb_add_range_ctx(resv_iotlb, region->sta=
+rt,
+> +                               region->start + region->length - 1,
+> +                               0, 0, NULL);
+
+I think MSI should be write-only?
+
+> +               if (ret) {
+> +                       vhost_iotlb_reset(resv_iotlb);
+
+Need to report an error here.
+
+Thanks
+
 
