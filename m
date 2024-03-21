@@ -1,52 +1,50 @@
-Return-Path: <netdev+bounces-81075-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81074-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 114DA885AA9
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:27:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8036885A90
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 15:20:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 431FE1C2107C
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 14:27:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AEAC283230
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 14:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1756185279;
-	Thu, 21 Mar 2024 14:27:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54DD88526E;
+	Thu, 21 Mar 2024 14:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pYEOeXfG"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DC1C85639
-	for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 14:27:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E5885266;
+	Thu, 21 Mar 2024 14:20:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711031256; cv=none; b=LDOZ9tzAB1hcjE1d80D2SfN0P/bqJP84Dw9QHlqKspAOYmSfoE/s0hRXgTSyukG8hKwFjDP1EGWN+43KQmwDNvRiM097I4yKou7jdod5oprmbN/XmK6JvrC2Ve99YcgQIqE4OECEQd7GRhBIjz+wfYxpvj8CghYwiGp4Es/DOKw=
+	t=1711030828; cv=none; b=rDUYsTSRL3YC785GZikWpTv1aN9aYUUbK7nWwFrycX0SckfBBM26nLywPDqNUzz5/A8oyw0TPZzt0eDJfb+YewV/S9tzZdv5VcfHFchKHrU3SSJu3Ss1e9D7KGOw1Fjv9Rg3JMF7j/xpdHLBKHHLjbJyVp8xB4R4w1J2SawRwPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711031256; c=relaxed/simple;
-	bh=xIQmHTJQZluUt03kHsPGGCvZmh1fklh5ZKbS1v0EOyA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=I4dWtnaNeHIfQ/LEghrmPcWu4QZg6I+on81VpdzHua/KZdrAdPw7pmTViRuq0rOQwooWG8fjSTsE9UFf29rXhMokyM/YUmhAe9CwfjGUe/kLvX8z4OWhflfnbrL89vk1AG5chDGMHZCWe1vLyTVLku0A/MDTOAX50fE4UHoONHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.44])
-	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4V0nm72TBDz1R7Xf;
-	Thu, 21 Mar 2024 22:24:55 +0800 (CST)
-Received: from dggpemd100005.china.huawei.com (unknown [7.185.36.102])
-	by mail.maildlp.com (Postfix) with ESMTPS id 1F7C31402CC;
-	Thu, 21 Mar 2024 22:27:30 +0800 (CST)
-Received: from localhost.huawei.com (10.137.16.203) by
- dggpemd100005.china.huawei.com (7.185.36.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Thu, 21 Mar 2024 22:27:29 +0800
-From: renmingshuai <renmingshuai@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <idosch@nvidia.com>, <netdev@vger.kernel.org>
-CC: <renmingshuai@huawei.com>, <yanan@huawei.com>, <chenzhen126@huawei.com>,
-	<liaichun@huawei.com>
-Subject: [PATCH] net/netlink: how to deal with the problem of exceeding the maximum reach of nlattr's nla_len
-Date: Thu, 21 Mar 2024 22:14:00 +0800
-Message-ID: <20240321141400.38639-1-renmingshuai@huawei.com>
-X-Mailer: git-send-email 2.33.0
+	s=arc-20240116; t=1711030828; c=relaxed/simple;
+	bh=YsaJU7yU5UXT4dwymitMoladXmLHepBOYhkmIslJq/I=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=hzUn4k+F7ZKDppW2pOAny7lboOHYS7TiEnHU1kTG5TJVZ4wzlrdb/Evcw8QOvlV4d8ENoEmcEv/eB4G/IsiiSWyQSPxW/VI6lQf/AOehUroIQiOM4yQc8gHp8ErzfIRSU1iXmx2DE1lL3c28Emp6FeU6GJZSjRDMjGtGuQ0yF/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pYEOeXfG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 934BCC43390;
+	Thu, 21 Mar 2024 14:20:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711030827;
+	bh=YsaJU7yU5UXT4dwymitMoladXmLHepBOYhkmIslJq/I=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pYEOeXfGnRVAbqxBcvCan2jnhrC9JDNzYWDqSmvi7v+6tZh8jIxSvb1eVHZn2zSSE
+	 SJGn7EWSuaqz8PdqtTPDu1L3H4uVYN5+/DfVFHwzkH9Q1rjdOOE9PiD+99VpyqsqLW
+	 T1R90/yJkeCZlO23U94zh20ZxiYtkgkrPrfA+B360qE8fpY6fbZIoyFObGxrUSGFQF
+	 Jj4GTXAWMYajgB2+/0qaJGATWGSGDj6p7Rrp6x9b4UHIeyEcPWMBOPzUgTjomBjTrc
+	 wHM/61XcZSvBgy0lraF4MZ3WeNyg/4XXQb/pQWplrm/zlSNtp5fYKkoNgrbTfEWU3J
+	 rgP5S1y3Nc87A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7D918D982E4;
+	Thu, 21 Mar 2024 14:20:27 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,16 +52,46 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggpemd100005.china.huawei.com (7.185.36.102)
+Subject: Re: [PATCH net 1/3] netfilter: nft_set_pipapo: release elements in clone
+ only from destroy path
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171103082750.11634.16678808488889700011.git-patchwork-notify@kernel.org>
+Date: Thu, 21 Mar 2024 14:20:27 +0000
+References: <20240321112117.36737-2-pablo@netfilter.org>
+In-Reply-To: <20240321112117.36737-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com
 
-RTM_GETLINK for greater than about 220 VFs truncates IFLA_VFINFO_LIST
-due to the maximum reach of nlattr's nla_len being exceeded. As a result,
-the value of nla_len overflows in nla_nest_end(). According to [1],
-changing the type of nla_len is not possible, but how can we deal with this
-overflow problem? The nla_len is constantly set to the
-maximum value when it overflows? Or some better ways?
+Hello:
 
-[1] https://lore.kernel.org/netdev/20210123045321.2797360-1-edwin.peer@broadcom.com/
+This series was applied to netdev/net.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
+
+On Thu, 21 Mar 2024 12:21:15 +0100 you wrote:
+> Clone already always provides a current view of the lookup table, use it
+> to destroy the set, otherwise it is possible to destroy elements twice.
+> 
+> This fix requires:
+> 
+>  212ed75dc5fb ("netfilter: nf_tables: integrate pipapo into commit protocol")
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/3] netfilter: nft_set_pipapo: release elements in clone only from destroy path
+    https://git.kernel.org/netdev/net/c/b0e256f3dd2b
+  - [net,2/3] netfilter: nf_tables: do not compare internal table flags on updates
+    https://git.kernel.org/netdev/net/c/4a0e7f2decbf
+  - [net,3/3] netfilter: nf_tables: Fix a memory leak in nf_tables_updchain
+    https://git.kernel.org/netdev/net/c/7eaf837a4eb5
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
