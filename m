@@ -1,127 +1,130 @@
-Return-Path: <netdev+bounces-81104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81105-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78812885D2D
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 17:15:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D02BA885D68
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 17:29:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA4C91C2085B
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 16:15:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 861FA2838F7
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 16:29:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D754C12BF38;
-	Thu, 21 Mar 2024 16:15:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 734B612CD8F;
+	Thu, 21 Mar 2024 16:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JVQmafOY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S5oA0Gq0"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20715A934;
-	Thu, 21 Mar 2024 16:15:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B02C85650;
+	Thu, 21 Mar 2024 16:29:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711037730; cv=none; b=eB5Xdb9hzMHLn0Lt2iyXTCg1D9r51olHEnsvNDEdfK9DZ0w6eu5t0w7OS7Po03tL0nLOFWZH8QxS26W6COaYDQr7CtA1WSaWB6VTfhKbodC8rvwjvWSCiIaaU3W5Ppf8q37j3aHiALryuyU1ipVzKkm2j8u6og9JNDUhoQOKTR8=
+	t=1711038580; cv=none; b=JPncBgG85xpyMOocVH+xCp5Y/Ov3iqVgb5TcfCuWjBcMbuxvc9xmQZSBNicR3J7ohNk03pjnmfLlMe2m6Br6KC4zgH5W0VlrAfQPAdmeQYN+kkLuupX0BhY8Y9THjywy/TxPj3Ya5VqbmpAi8uPl7nlxYNLgb5I3wT2EMylZggQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711037730; c=relaxed/simple;
-	bh=uw1fUO1KkmlnLMpuvD4Agl5GA1mZui2h2+xJbDsq49M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ug72Mj8gDb+Gj3F6fdnGilnxXHsm0i9cXjtOwU1v+Q1eruouXDPddyU+acYY8DGp4Zzl4GonrjnZ7BOE1weswWBjmZnBdID1zDq4FI3dHw03TJRYY+We1z71lWoIw+4i00ckGj40x2k9RrteYVi+NKhtEhhE4AXn2O6UdOGlA80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JVQmafOY; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 01D6640005;
-	Thu, 21 Mar 2024 16:15:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1711037726;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ss8gXzP5nhwWey64bCP2DtTV4v6oGXUHUEc5COfyiuA=;
-	b=JVQmafOYYWEykWC9frbdpTxxpEAxB6Fmsi4emB05jKPNrdIr0NnFWYXegP8Lg++svK4vVb
-	0xWtbphUl+JSSrsM/LE/p1I9PFg8ZnZHVJqQCVxqyHjKiJmyvJ9x+GsevTt7FHkCypQjkm
-	UYJbkFFOqwd/1dTM2ynNbkYtL3xiECxySYsjaIOE/joy4/3L2xefVz+e0p6zOHkAfs0ooe
-	RxnCnDPCaP9RsU5eYpNAwzaPJgPwYC3EgMxndB4EwJanto9AWvYtH3C5GcrecWgN1I0oKB
-	oqPpnTi//xPyrWpQMV8pUbhP6e3CPIwE745aCszXMVlRB2OoZPY+Obb8xBtw2g==
-Date: Thu, 21 Mar 2024 17:15:24 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Mark Brown <broonie@kernel.org>, Frank Rowand <frowand.list@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v5 13/17] net: pse-pd: Use regulator framework
- within PSE framework
-Message-ID: <20240321171524.0b04bfcc@kmaincent-XPS-13-7390>
-In-Reply-To: <ZeWi90H-B4XeSkFs@pengutronix.de>
-References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
-	<20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
-	<ZeObuKHkPN3tiWz_@pengutronix.de>
-	<20240304102708.5bb5d95c@kmaincent-XPS-13-7390>
-	<ZeWi90H-B4XeSkFs@pengutronix.de>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1711038580; c=relaxed/simple;
+	bh=f2s9m94GQMqwkep6RHvJkC24pYKjgeZXaB8gUvBmMLU=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=TCL/IBJcbffNAsjE2J9yMIvJTp6zNUdq7wJnwtUQOtDhnJMN+nLNHLcNSvk/3bqLbnZzL9wI1d/m/ZnFjdr2gWi9DsN6xGLkK3+Z1sxSFBSFPGk1hBOXEk0dC2qJC0VNYFS4st//lNuA31+FJXa4SkZmzUdmDzDF/TioJhGmsz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S5oA0Gq0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D5B48C433F1;
+	Thu, 21 Mar 2024 16:29:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711038579;
+	bh=f2s9m94GQMqwkep6RHvJkC24pYKjgeZXaB8gUvBmMLU=;
+	h=From:Subject:Date:To:Cc:Reply-To:From;
+	b=S5oA0Gq0eAVWR+Pej9Urae3ZTdKr/uoodQAKanMLWoqSGrkIqXlLs/hepKk0eUoqN
+	 Oa1MYLr309GZvyybpJ17qKscdQpjG2sN23tP8ER4+PDSl3Rn9w8sahfYYloVlZSnGy
+	 XFYcoiec8Np3A+9ckzEtLWP4ZNPU16S/gjn6FP4+io41DNnaTFXba6rXtxglzqcEp6
+	 488l/HawOH1bQtg56NA8+A6DYQ3X/I/1sAhofg8JEWVFQj0uldD/3L2TDCzoW4wn19
+	 +rP9tz+ArcXHzv8SdgT7bInOHgOB4lOLyQblesMhbRsI5OieV/pAgu4y8cG5b74U+o
+	 2ybU7cPO9FZpg==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C93A0C6FD1F;
+	Thu, 21 Mar 2024 16:29:39 +0000 (UTC)
+From: =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL_via_B4_Relay?= <devnull+arinc.unal.arinc9.com@kernel.org>
+Subject: [PATCH net v2 0/2] Fix EEE support for MT7531 and MT7988 SoC
+ switch
+Date: Thu, 21 Mar 2024 19:29:12 +0300
+Message-Id: <20240321-for-net-mt7530-fix-eee-for-mt7531-mt7988-v2-0-9af9d5041bfe@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
+X-B4-Tracking: v=1; b=H4sIAFhg/GUC/42NTQ6CMBCFr0Jm7Zj+SmHlPQwLUgeZBa1pCdEQ7
+ m5tPICryfve5H07ZEpMGfpmh0QbZ46hBHVqwM9jeBDyvWRQQhmhZYtTTBhoxWVtrRY48QuJqOK
+ K5Pd0zuFovTVWey/IQZl7JirPVXWDsgBDgTPnNaZ31W+yVj+T+9+0SRSoJ9kqddHGkLuOiYPvz
+ j4uMBzH8QGfp2+35gAAAA==
+To: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ =?utf-8?q?Ren=C3=A9_van_Dorst?= <opensource@vdorst.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ SkyLake Huang <SkyLake.Huang@mediatek.com>, 
+ Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Bartel Eerdekens <bartel.eerdekens@constell8.be>, 
+ mithat.guner@xeront.com, erkin.bozoglu@xeront.com, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, 
+ =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>, 
+ Florian Fainelli <florian.fainelli@broadcom.com>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1711038558; l=1342;
+ i=arinc.unal@arinc9.com; s=arinc9-patatt; h=from:subject:message-id;
+ bh=f2s9m94GQMqwkep6RHvJkC24pYKjgeZXaB8gUvBmMLU=;
+ b=/6PP6fK764ZhfuLKywgjtgj/pSH6Pl3WLUSpeldm0cf8TIM2N7wD6Nyxiz1esoC3fNTmSwYep
+ kfWBjAIgHnnDt+DUNRcOtb3r9KceZ8aeSscFgEEeQTFI+SDR9nOGJli
+X-Developer-Key: i=arinc.unal@arinc9.com; a=ed25519;
+ pk=VmvgMWwm73yVIrlyJYvGtnXkQJy9CvbaeEqPQO9Z4kA=
+X-Endpoint-Received: by B4 Relay for arinc.unal@arinc9.com/arinc9-patatt
+ with auth_id=115
+X-Original-From: =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>
+Reply-To: arinc.unal@arinc9.com
 
-Hello Oleksij,
+Hi.
 
-On Mon, 4 Mar 2024 11:31:19 +0100
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+This patch series fixes EEE support for MT7531 and the switch on the MT7988
+SoC. EEE could not be enabled on MT7531 on most boards using ethtool before
+this. On MT7988 SoC switch, EEE is disabled by default but can be turned on
+normally using ethtool. EEE is enabled by default on MT7530 and there's no
+need to make changes on the DSA subdriver for it. This patch series
+disables EEE by default on MT7531 but makes it possible to enable it using
+ethtool.
 
-> >   =20
-> > > Should be tested, but if, instead of "vin-supply", we will use
-> > > "pse-supply" it will make most part of pse_regulator.c obsolete. =20
-> >=20
-> > Don't know, if it is done at the pse-pi node level it may not break
-> > pse_regulator.c. Not sure about it. =20
->=20
-> me too. Before your patch set, the regulator topology for PoDL PSE was
-> following:
-> power-source
->   fixed-regulator
->      PoDL_PSE-consumer
->=20
-> Now it will be:
-> power-source
->   fixed-regulator
->      PoDL_PSE-consumer
->        PSE-PI-provider
->          PSE-PI-consumer
->=20
-> By porting porting PSE framework to regulator, probably it make sense to
-> remove two levels of regulators?
-> power-source
->   fixed-regulator
->      PSE-PI-consumer
+Signed-off-by: Arınç ÜNAL <arinc.unal@arinc9.com>
+---
+Changes in v2:
+- Delegate the patch to the net tree.
+- Remove patch 3, it was revealed that it doesn't fix a bug.
+- Patch 1
+  - Disable EEE advertisement on MT7531 by default.
+- Link to v1: https://lore.kernel.org/r/20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v1-0-3f17226344e8@arinc9.com
 
-Sorry, I forgot to reply about this.
-This is specific to pse_regulator driver. Could we tackle this change in an=
-other
-patch series when the current patch series got applied?
-Also I don't have the hardware to test it.
+---
+Arınç ÜNAL (2):
+      net: dsa: mt7530: fix enabling EEE on MT7531 switch on all boards
+      net: dsa: mt7530: fix disabling EEE on failure on MT7531 and MT7988
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+ drivers/net/dsa/mt7530.c | 14 ++++++++++++++
+ drivers/net/dsa/mt7530.h |  7 ++++++-
+ 2 files changed, 20 insertions(+), 1 deletion(-)
+---
+base-commit: ea80e3ed09ab2c2b75724faf5484721753e92c31
+change-id: 20240317-for-net-mt7530-fix-eee-for-mt7531-mt7988-a5c5453cc0e8
+
+Best regards,
+-- 
+Arınç ÜNAL <arinc.unal@arinc9.com>
+
+
 
