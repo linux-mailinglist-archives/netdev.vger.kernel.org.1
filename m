@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-80912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80913-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 871F2881A5C
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 01:10:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AD8E881A64
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 01:13:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B98A1F21C2F
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 00:10:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2EE1E1F215A5
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 00:13:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF3AB370;
-	Thu, 21 Mar 2024 00:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10F1B63C;
+	Thu, 21 Mar 2024 00:13:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="1M21YGue"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fOYpeqKe"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2001063C;
-	Thu, 21 Mar 2024 00:10:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D44D181;
+	Thu, 21 Mar 2024 00:13:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1710979838; cv=none; b=OpKWK1cgqhN38iWQJeqbKylp1aRRPm74EQwLeizPJ46lxIsCFIUKKS/hmgObIijsT071dOMLgKU5R/dM5iF1bv+O2k75+s6Fx0ryyPpLAqfbSkrbADar9DWbDPNQETVf8Qd3tWljBjrHziGni10y6srsSL36RPMpVrDA+g4me/M=
+	t=1710980004; cv=none; b=AgV+T7Ih9Gm71trdAvQ0g6ebyw6KQvNU8Xka+XfyhIOBVGInKJwOmYsILqzTRQsUxjY+m9Ptd8tEiLTA6z+VgIvsxgXHCJ/ohzJ+tofv54V5Lsckl4vJalf4BudtGSDS59HkVJ05md3wiOkeq0DoVMPSKVtwqPPCqsoYsZqgsBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1710979838; c=relaxed/simple;
-	bh=XF+QbRwExUSVDbOeZC0JJnQAl1pkZTUOdsQR3pkmSpI=;
+	s=arc-20240116; t=1710980004; c=relaxed/simple;
+	bh=idt34RCsmjQa9sg1HF413GfcyPC/eDnTis7MJWPyj5g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=W7eHCiZ+siglkHINTQxYNr5r6+NMpk+nPI8PZKnH/s1VXKXzeF8QksIy90uTaCm4e4rHhtZF+rcUyGMOUKrpnUBNhxDdBCaDzLUdWfBdEhqotn552rLKzh1EhXX/5IftaEq7Koowd69EVwNI53MRRKUsyiwaAKUmpbVd08IqjNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=1M21YGue; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=PycABMlEW1zZCkBZowjviwuN44y37MQNsl7x5TIAxjh/wPcUVNpPto6Cg5jyVOokJMJpS0Mbo6sC64scfOijGz8CcFzLXqGFhSXp9SK1S06tcPwz/R8v7uOzP6X0i4ZKgyg1uzVKaARhjbO1aknnLrdtb/LoDyHPnXZaTffH4qQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fOYpeqKe; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=qYTfryt6uzT4gEzIjPEXIhCxudEshHluSopJ4l+iWUY=; b=1M21YGueS2/3kQUt04LM3AquuH
-	xFt8tOZY9vJd4QGqlsHqHTpZ4i0eeGvpb46l+8dzE/idVmoAFThGhkyoGyXyoG4pcRsFiFP9hCm0e
-	7fm5nbXbnJfZZ1dSecPrO8t+G3HxDYMqNuEtkzBtfJ7YmWBSeslnCy4B/8IQ2vForgp8=;
+	bh=gv/K5XLmRYXt/pW1HUc3KeLmTK/ySVp7kwxWVc+y47c=; b=fOYpeqKetM3L0Xo5Efv6ZGCPO/
+	mfkTT387NHowiUY3ZFCMinZYn8lf1Wq0AN6ghtcZYekBTkJ7GKyhXC6s8U0on1Z30IxwKtuOtZz6L
+	4D5APpuj/IR0xP2YRY0CZcWFwq98rjbvt9QGoBQqqk0wp0QBV0UYF7tRi2MZDW2eDwOw=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rn60k-00ApEo-DT; Thu, 21 Mar 2024 01:10:22 +0100
-Date: Thu, 21 Mar 2024 01:10:22 +0100
+	id 1rn63R-00ApGM-4B; Thu, 21 Mar 2024 01:13:09 +0100
+Date: Thu, 21 Mar 2024 01:13:09 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Elad Nachman <enachman@marvell.com>
 Cc: taras.chornyi@plvision.eu, davem@davemloft.net, edumazet@google.com,
@@ -50,10 +50,10 @@ Cc: taras.chornyi@plvision.eu, davem@davemloft.net, edumazet@google.com,
 	thomas.petazzoni@bootlin.com, miquel.raynal@bootlin.com,
 	przemyslaw.kitszel@intel.com, dkirjanov@suse.de,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 2/5] net: marvell: prestera: enlarge fw restart time
-Message-ID: <259379aa-e9b9-4524-a092-5338314791d4@lunn.ch>
+Subject: Re: [PATCH v2 4/5] net: marvell: prestera: force good base mac
+Message-ID: <d58e8059-66b7-4545-896a-6194b98000ef@lunn.ch>
 References: <20240320172008.2989693-1-enachman@marvell.com>
- <20240320172008.2989693-3-enachman@marvell.com>
+ <20240320172008.2989693-5-enachman@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,20 +62,26 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240320172008.2989693-3-enachman@marvell.com>
+In-Reply-To: <20240320172008.2989693-5-enachman@marvell.com>
 
-On Wed, Mar 20, 2024 at 07:20:05PM +0200, Elad Nachman wrote:
+On Wed, Mar 20, 2024 at 07:20:07PM +0200, Elad Nachman wrote:
 > From: Elad Nachman <enachman@marvell.com>
 > 
-> Increase firmware restart timeout, as current timeout value of 5 seconds
-> was too small, in actual life it can take up to 30 seconds for firmware
-> to shutdown and for the firmware loader to shift to the ready to receive
-> firmware code state.
+> The switching ASIC router HW unit MAC Source Address is configured with
+> 40-bits of MAC base address in its registers (done in the firmware code),
+> requiring all ports doing L3 routing in HW to have the same upper 40-bit
+> MAC address.
+> 
+> Since each switchport MAC address uses the switch base mac address and
+> then adds the physical port number to it, Force the last byte of the
+> switch base mac address to be at most 127, so when adding to it, we
+> will not wrap around the previous (more significant) mac address byte,
+> resulting in a warning message.
+> 
+> Fixes: 501ef3066c89 ("net: marvell: prestera: Add driver for Prestera family ASIC devices")
+> Signed-off-by: Elad Nachman <enachman@marvell.com>
 
-So this means the probe can be waiting 30 seconds?
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-This seems like a really good reason not to reset the hardware during
--EPROBE_DEFER.
-
-	Andrew
+    Andrew
 
