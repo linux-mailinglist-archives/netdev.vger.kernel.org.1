@@ -1,241 +1,497 @@
-Return-Path: <netdev+bounces-80995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-80996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18BBF885700
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:00:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E86A2885724
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 11:11:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 72D13B20E6D
-	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:00:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4C3111F22771
+	for <lists+netdev@lfdr.de>; Thu, 21 Mar 2024 10:11:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB53255774;
-	Thu, 21 Mar 2024 09:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10D5E55782;
+	Thu, 21 Mar 2024 10:11:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eFcCvnOZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cV8GIqMO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C340A1CD1E;
-	Thu, 21 Mar 2024 09:59:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711015197; cv=fail; b=K9PSgjyhR54I4R7hh9OefC5J3GmOZk6xjBuzaRrf1FCelcrrChsXCNsecmM0VWWVc3xF7aKpl156tEYrS3ECHxRZ0y/Ek+2rD2bUJMsWoq9BgkMnAMFMoJRU84gWXxBim/OCr5C/urGgvyqZZVZoY+2P5ViQUrjFmd9JLm9vprQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711015197; c=relaxed/simple;
-	bh=G0DqkXk8APd69H86G7oAFna7pJyB2jgkKr9ASX3KTPs=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=NbxkkR+zR+2rzsDK9PCowg5RdmXtKYFJZ3QYkscuiZGdXpjwKvsnd+Cy8y3Q51VK+vIb++DjCKobXhNH9klw8aAMKN30WHeq93kiQFM7aRhvOiUSY2uUGrlnGmFqisoX/vkK0KYep7RAVLj/NQJkrWo79zSaUR5FGzfD7xzRsIU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eFcCvnOZ; arc=fail smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711015196; x=1742551196;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=G0DqkXk8APd69H86G7oAFna7pJyB2jgkKr9ASX3KTPs=;
-  b=eFcCvnOZXMoscl40/S1VjKtuDuoKQ3CNR2PR8V2u8bgZozVz+/tYBGYP
-   7ZDha1+U+nh4bQrlpMsxBcupUdzCmmgM26XLidMlVmdHK0jC+vZrqRs78
-   gvHsgo1mHjaqhFY0axTPFqogQDAVMw8hAAy6Jp3o11yxHNJRaeoxq/4H6
-   JjKwvrRXtuoZ7iafHOddilKiI3i52gahUHuUaQ4yWWUmrNl2wP+UjhsH6
-   GETVzL+06ExnaeHWYZCGswwbdtaSgUwNnp+G/fVSTMuz5Zjz1M29BkvV/
-   NnzAQJERSH95ZqGvViwy1unAZvMdDpXM3AzvF4EAakwxvjmtKQ8SVyT8M
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11019"; a="16539437"
-X-IronPort-AV: E=Sophos;i="6.07,142,1708416000"; 
-   d="scan'208";a="16539437"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Mar 2024 02:59:55 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,142,1708416000"; 
-   d="scan'208";a="19093998"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 21 Mar 2024 02:59:54 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 21 Mar 2024 02:59:54 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35 via Frontend Transport; Thu, 21 Mar 2024 02:59:54 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.169)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Thu, 21 Mar 2024 02:59:52 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=J6SYsUfFBogDjPggaopgARwqk1AaGK6g9YW36Fg9ZvKYni2wklOgeXlh+2IP/jMHxuTiWyCzemh7/qsFd0l3Jv/A/f3UVDUWzBHZsYutUDTpAe6r1yH7CTQANajpKnUiOmPaytELmECJW71be9NguYN3TZD0DKaff4OTVbxP2e6HSoCkNDhMGxP7ZHnOL7R+dyfh8ZusI/tt42Frvlzi10cyN8aVL6lIS9bii+YhXMlnuQ2FVhhReQdtMdlsxpjGrPJI8StLVH6LQoyhskY0ujX9EYOb0RX5282IkmuBNLvvadPJan/R5nMhzG9Y7naFZUu2s5e3j/uTBFDLVekWUw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tOM7tXc2NDno7HpmJofd4rn7nHKkivLNzQ5XvYkRuUc=;
- b=ACPbxcsSwUNU+q9GUXfBj/s/7bwIVtsG4fioL6GJDkx00244gWsjyrwfHQoUFIqaz2rihjqU2mCjEVrz62r0zCQ3r8ZJAb6CsA7iOlM0V2qV7P1fdpCE7vf1Rr/hAkdVBps6PRS19N4z+uPeiAmi4ZJqRThqoityknC8wKQsAFr7NlIMpfqfRF2nOMcivOtoxj7S/khjGe2QSUP9lcs0D7XDYig5yXf+//Hnnuqfjcsk5gIAVx/6T7Mame/Vrm6ur+WYi803MnjAbdxITMVXkULHZ+6qlgxeaKmn6cNzRDC5yZWmAZHucQxmb+QN0aFX3StWjTkMRKfQ3yuWDQUpIQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
- by PH7PR11MB7596.namprd11.prod.outlook.com (2603:10b6:510:27e::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.15; Thu, 21 Mar
- 2024 09:59:50 +0000
-Received: from MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::618b:b1ee:1f99:76ea]) by MN6PR11MB8102.namprd11.prod.outlook.com
- ([fe80::618b:b1ee:1f99:76ea%5]) with mapi id 15.20.7409.010; Thu, 21 Mar 2024
- 09:59:49 +0000
-Message-ID: <6266c75a-c02a-431f-a4f2-43b51586ffb4@intel.com>
-Date: Thu, 21 Mar 2024 10:59:42 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] ice: Fix freeing uninitialized pointers
-To: Jakub Kicinski <kuba@kernel.org>, Dan Carpenter <dan.carpenter@linaro.org>
-CC: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Jesse Brandeburg
-	<jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, <intel-wired-lan@lists.osuosl.org>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<kernel-janitors@vger.kernel.org>, Alexander Lobakin
-	<aleksander.lobakin@intel.com>, Andy Shevchenko
-	<andriy.shevchenko@linux.intel.com>, Kees Cook <keescook@chromium.org>,
-	"David Laight" <David.Laight@ACULAB.COM>, "Czapnik, Lukasz"
-	<lukasz.czapnik@intel.com>
-References: <77145930-e3df-4e77-a22d-04851cf3a426@moroto.mountain>
- <20240319124317.3c3f16cd@kernel.org>
- <facf5615-d7ac-4167-b23c-6bab7c123138@moroto.mountain>
- <20240320202916.2f2bda73@kernel.org>
-Content-Language: en-US
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-In-Reply-To: <20240320202916.2f2bda73@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MI1P293CA0008.ITAP293.PROD.OUTLOOK.COM
- (2603:10a6:290:2::11) To MN6PR11MB8102.namprd11.prod.outlook.com
- (2603:10b6:208:46d::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C678754BF7;
+	Thu, 21 Mar 2024 10:11:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711015868; cv=none; b=Gycf5q+rVmZQwRQGyvDOqhCdVJxx6zf+zgh/Z5UqTlTwOSbFqtM5xm8X9qfE83e2gQTk7QnwseAtNKfkowFWYSl3BKCyX518hTZBYcgtwyVkl+G4LMf/MGJjw0WWbimZhAM5m04x42ycWMMcEhzwWzczIlBlqHqMTQnswljtRTM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711015868; c=relaxed/simple;
+	bh=8ryGPZAqJ62ZGVG3dJfNlA8eTocN+i3zocYUpKDrEgc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rOxeZCJwhNSFxcSgyy1e9zCVi5mqoybgWrtrW1I+Sbdirx/3WRHr0CThMDVVHmVtq0QK96hx+dfwW9X/37uYZ5W9Xn64hiNOKV93WFZ9tO21zB4crjhGfIs7COjEmUPW539a/50k/gIn+96wlGFokQOPp5efrUhZ7h9zt4T5n0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cV8GIqMO; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-4146d750dcdso4612665e9.1;
+        Thu, 21 Mar 2024 03:11:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711015864; x=1711620664; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MWUzN7HIXOMLwdAw7WcPvNXy4h4fFkUlZB+w9r6nWks=;
+        b=cV8GIqMO9a+JLUuslzD2FtXYFsQw4dImHeamNV5gVwNF7G2IhbY0auyBpj2Wcfxh0c
+         UQYCSuDYVdCloPE5doPLgteCu+OgUjg8SeKSINrnN4KitAPHa3V13WhaxvmkXu2nsjt7
+         QB8n3Kg0nsmdf3lHAC/VR+ufIfUm6pgoC7XBVREtyTYRbQNsNbOAnGo9v0BDEfP+2w0F
+         PQxe02B3aiNN/9nAY9DOIF8amXh9FhNy60Gf7wPPluC/2MSUKZ57QEGN3q0EFvfHjcmS
+         NDcvkRvEOGLcZllyTZX+0N/4dBTFVbL6eSAb72xNLGUpr3QPqHm/Y89HCbL5Zy49Ox5q
+         TirQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711015864; x=1711620664;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MWUzN7HIXOMLwdAw7WcPvNXy4h4fFkUlZB+w9r6nWks=;
+        b=fstQC1rFGXdGj6OTa58LlmYHpV80DKRMwJ0FfYGpF+KwEkh4ebTCdBOjHJ0BRiKopR
+         JtjSivKExrfN+k6lqvYHzQEiscDLKk5V08iAhSWAg8ubHM1M8zc6yAHhKMMYDxbmO6cR
+         pZnr3y95bpR6GZOqWF/icqBud6Dhl17zZIH4PjJpbp4HjuDARO3iLFZjTN6KcBbdBd30
+         uoE0dktusaD1vO6Yr4o4iTnfn/G9WSi89vWvUnOOGRcx4bjxvTO58jRqG9WMuwPXK8Z4
+         Zyyf9lWnLV0O2kHsVKsFwKuCpLWg/3HMkR4zBvsTiE+Bek5J4UlFapIXCedN6+iJqUIM
+         DNPw==
+X-Forwarded-Encrypted: i=1; AJvYcCXurQWRmQP9EE/JMd7Dj/+sRm+cmvXoqK/+qisYfqHtYWzAuyiHpGyHaayXsFP5Wfe5wMF1Vrv7AetR9CkarOXZvvayfAfWwBP6tqz3qidC5oWKYBX+HayMUVXv1aPE/+I1eru170GU1bKFQ+4MtuqEc1nnxZ7j0Nil
+X-Gm-Message-State: AOJu0YxEbxot9juGdPKn3XjyyFPCQX4S2o5Uy0oI1Uz6jGul6ulpDzTv
+	umJTLwp+fse+tP/tz9MgKAdR/Hf3xqreYDewK8cwW5SqkrPs1Co/
+X-Google-Smtp-Source: AGHT+IE/VMQbvpip2dljR0bvobfp/Y38/g41TFiyOzFnGY7E7ZXsmCvppE4QhQ6+5R6IE2+SG4RPeA==
+X-Received: by 2002:a05:600c:3b0f:b0:414:10a1:3f7c with SMTP id m15-20020a05600c3b0f00b0041410a13f7cmr2142889wms.11.1711015863675;
+        Thu, 21 Mar 2024 03:11:03 -0700 (PDT)
+Received: from localhost (54-240-197-231.amazon.com. [54.240.197.231])
+        by smtp.gmail.com with ESMTPSA id m2-20020a05600c3b0200b0041463c2c6ccsm5130819wms.4.2024.03.21.03.11.02
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 21 Mar 2024 03:11:03 -0700 (PDT)
+From: Puranjay Mohan <puranjay12@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>,
+	Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	x86@kernel.org,
+	"H. Peter Anvin" <hpa@zytor.com>,
+	Jean-Philippe Brucker <jean-philippe@linaro.org>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: puranjay12@gmail.com
+Subject: [PATCH bpf v2] bpf: verifier: prevent userspace memory access
+Date: Thu, 21 Mar 2024 10:10:58 +0000
+Message-Id: <20240321101058.68530-1-puranjay12@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|PH7PR11MB7596:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7bc5f747-cbc0-4221-6d82-08dc498da510
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 46FFJll2gQtfJBU4Eo0ehMP1AIm6oED60EHgzD4XYBB2mJsCF2ocSBDTgRjlEuj4rct+YCe3FHLS3vvmwBa05vP93K0ijiJyr2TvRekPyigTF+picMqnB1tb+QGpuECk60zx+wK42oAvf3mxnFv7cELqVCmc80lREpM3ppTwTBJHrgXcnc1dnACJDtyCpVBsckC2wVdEjGwqktfZOSoeQLGsrrvgikdhvEUtAolQSk2kJ6Se675jwURVeW2ZquWwcHKF4FzZ3rNtABLEN68Zj7wiWo1xBp3c5wcn76ecEg78aJc8lRolKQ6BHEXBz6d3NdnJ8bAbUw3Zg27g6KAgIh1Bb6aAlXov/izQwdYRSsgD+Xf0oV+AeuE7ypoyLfiLrktDcS1azn/9R/AHsUWFKDrtgwBMiiGaqh7ba4Z3s0Sn8b3JoxMpMfLWfRIkxWhe+P1hCQaXTTJp8u7uzLhiYGR55zlFEeKXBaUcpavd+1qwF+XtdkZ1Wd8lJseXKuAQulO9tT1/Bqqpw8gtQcdbL+TNUdAfk3Xiw6BC4gRi6dlCH2a4mjURjjIZGWV0Lh6T+WItLtcos4yfVn0pGtZPUe3IcvU6af/PV1vMsLvtF8KCkbVGkrAU/xLjV7HtXlVmppAogvnhdeZBnJWWavyxMb+FN15f6LeiTlZ6QXbCJr8=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(7416005)(1800799015)(376005)(366007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?c1ZUOUVEeWZURG41d21zV2s1ODh4bnV2TjdvRm4xakpRdzdqY3cwdXl0cHp6?=
- =?utf-8?B?NE5oUFVUSHNndEoxNHlOdnJTRkVuYlRxb2t0MEZGUEd1MEFsa2lpYXF2cFNk?=
- =?utf-8?B?eWkvckN5d0tkcStmUXJuYnlGc2E4MU53WWVJRmVxY3JHOUU2U3UzcTlnMWtM?=
- =?utf-8?B?QngvRUlsQU10dENHd2hwaFlNZ216YUswdC9OMGlOdWlmM01rbnk5aEVjUmlu?=
- =?utf-8?B?N3hXZ3FqMGY2cEIyZ1VYYnZoak9SZkNLNitmQzZ1RndlNjlVbk9lRVc0QXVv?=
- =?utf-8?B?bG5OZndSb2tzckN0T3FsQ3paSURZN3RvcU1zcG02V0tDMEROeElyY1pnczlu?=
- =?utf-8?B?bEYrTmd6dEF4bmQ5UE1jQzBGSDBZcVVFRmVHa2tlT0FmeENmYTB0TkVYanJR?=
- =?utf-8?B?c0h2WWt6VDJmTkNtdWlHenNoZmdGVXpDanpOS2hMR2tBeFBZNmJKYVI1U3ZU?=
- =?utf-8?B?UFVHWUhhREM1L2pSU2I1dnFZUWNkVklTRjRwdHZna3RVbUJkV3RXQnBvb212?=
- =?utf-8?B?ZkpNSzBUWjZvWTFoM1VQVEZSZDI2N1ZINDdLa2ZGbSt3Y05RQU5GM25QaFFM?=
- =?utf-8?B?OFE4TC9BM0tGakhZa0dQRktxYVdITFpLbW5iY3I5cmI1akx0UFRXWVJVUXJU?=
- =?utf-8?B?d0c0cmJ0YlhibVMwSCt3V2VvV2xTSDdBbkRHcXJMYlFpeC9TcStNdUZPRGlq?=
- =?utf-8?B?WExZMXVieG5HdUZna0thWkNBS2U1OUQyRjZvbWVPcEVMeStjaDdNNTRFQkpi?=
- =?utf-8?B?MjJPeHBRdlJTbUg2MWExNUkrK2ZJYzd6TE5GSE9SczR2NTQ5MTNjelo0N1ZE?=
- =?utf-8?B?bXd1eC81bGQ1Q2hLTkNIaVM3TjdrODlQOFVWRXIxcElnaE5aSjNDWXdxNmR2?=
- =?utf-8?B?dDlmR2JsN1hEWU1xaDR0YlEzbFRTdUNJa3FWUFk1cjNvZ1BsVi95SDlpaGgr?=
- =?utf-8?B?c0FMQUZwRmJ0WUNkMjRyKzlKNzdWRndKbUw2YUZ1ME5lSlFsM0RDSVNNWWlx?=
- =?utf-8?B?ZTNkWHNrZXBrSXJ1ZzhISUorMzhwUGE0a0dER0wwMnZwRWg3Q0Q5cTBRK2Zk?=
- =?utf-8?B?ams2SmxLRzg2NENjRU1HU1R4K0FGbUR0elNvSEdsSVR0OXFyUStFd1BUYzc0?=
- =?utf-8?B?bU1KQjZjTGJvSUxIL1J0KzYyNitPa1V2WE1CcWZUY2szVjBYbnhKeXVFUUhF?=
- =?utf-8?B?TEZoc3FmZFFTSUdlQTRhdVlFeFA1dWJtSXdKbjFvSmdRRlBjR2FCQTA5ZWph?=
- =?utf-8?B?QjYyalp5RklRU1ExajI1VVNIdnhRNElxOFB1T3cwM2lzMW5VQlA5VFhvaExv?=
- =?utf-8?B?dCsxK1lUU0xRTktQMm94NkxVblZOckhXVkJSMGRacmdCQVdVQjBLM01nNytY?=
- =?utf-8?B?RjhiMEs5WFdtQ1pZamxhZ3J2T1JQSUtXeW5iQ2oyUG1QYUY1VTgyV2dvMHpW?=
- =?utf-8?B?YjlHY01ZQTY1Sm5rKy9SdlZldGRDUmNWMGJWMTNYS244Nkhld1UyWXU0OGQ5?=
- =?utf-8?B?L2o2dDBOUWV2dmszU2lQWitYUE5rMVdENzFhSXVQakwzcy9lVmhSWHh3b0h6?=
- =?utf-8?B?MDlkbEJsSDhhZ21sZUpacHZtV0U0V3BzWlh2eGF3Ly9hM1ZIb3dkV3pHeGdM?=
- =?utf-8?B?Sk9aZ2VTbml6bGNVcGt4SUk3d0RFdW1TcGR3L0Q0YUtCQ1VFYjZSYmRDL3dk?=
- =?utf-8?B?MjRuZ3NOT2tNRGdkbklhb2F0Mnd0WjJrYkw1ZFpZdnlDOFVNTUcwNnkwREJ4?=
- =?utf-8?B?bzk4VHdsYXhkUjJEZnNWK2hmdmZHM2VGMVZnMW5WVnJzVEJyY0tPU2FSbEYx?=
- =?utf-8?B?SUdhdmZJZHNWQXloTWxkOXFaeEY4V3h6V3A1VTltekRWRzlQanlhZGlHVCsr?=
- =?utf-8?B?QTdDSjNuR0J5SVU4KzBXMEVhYjMyaDVCZUVNc21WeTB2bWpuc0lnSTUxVlFt?=
- =?utf-8?B?ZEZJN2tPdHcxekxrTnZOR21IbFdidUJzL0d6VjFZcTU4dFdVY0p1Wlh4Q3ZD?=
- =?utf-8?B?OEllcEZuMThlcStvZGgxRnVidjhxYVJoc1lLMGY4RUovYnVDSjJEVkVxNjBU?=
- =?utf-8?B?MG1BazJkV0FpdEswTllHdHZGVXducU1qRWxuczF5ZGRKZXVDZGNyR1dJM0l3?=
- =?utf-8?B?RTB1MXRXa1JvUTVVaG0zaFo4eXFvWGpxc2ZSNm44TTFsdzAyY3p2NmppYUYy?=
- =?utf-8?B?ZEE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7bc5f747-cbc0-4221-6d82-08dc498da510
-X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Mar 2024 09:59:49.0389
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: C6p4Nc5DFy1Jw57ilFCNwe+8HhtKW+UUzGEP1M/TmEZgUaGDDFbArqHvb/s8seB923nfS/b9cHYxwgnwFUPlLynVuJKSYgmmPtx4XLkFnZs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7596
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 
-On 3/21/24 04:29, Jakub Kicinski wrote:
-> On Wed, 20 Mar 2024 08:01:49 +0300 Dan Carpenter wrote:
->>> This is just trading one kind of bug for another, and the __free()
->>> magic is at a cost of readability.
+With BPF_PROBE_MEM, BPF allows de-referencing an untrusted pointer. To
+thwart invalid memory accesses, the JITs add an exception table entry
+for all such accesses. But in case the src_reg + offset overflows and
+turns into a userspace address, the BPF program might read that memory if
+the user has mapped it.
 
-Apologies for not catching it during review.
-It's good that we have started small, with just a few functions.
+There are architectural features that prevent the kernel from accessing
+userspace memory, like Privileged Access Never (PAN) on ARM64,
+Supervisor Mode Access Prevention (SMAP) on x86-64, Supervisor User
+Memory access (SUM) on RISC-V, etc. But BPF should not rely on the
+existence of these features.
 
->>>
->>> I think we should ban the use of __free() in all of networking,
->>> until / unless it cleanly handles the NULL init case.
+Make the verifier add guard instructions around such memory accesses and
+skip the load if the address falls into the userspace region.
 
-Current API is indeed asking for bugs, especially when combined with RCT
-and early error checking rules. Perhaps that's why there is double
-underscore prefix ;)
+The JITs need to implement bpf_arch_uaddress_limit() to define where
+the userspace addresses end for that architecture or TASK_SIZE is taken
+as default.
 
-Simplest solution would be to add a macro wrapper, especially that there
-are only a few deallocation methods.
+The implementation is as follows:
 
-in cleanup.h:
-+#define auto_kfree __free(kfree) = NULL
+REG_AX =  SRC_REG
+if(offset)
+	REG_AX += offset;
+REG_AX >>= 32;
+if (REG_AX <= (uaddress_limit >> 32))
+	DST_REG = 0;
+else
+	DST_REG = *(size *)(SRC_REG + offset);
 
-and similar macros for auto vfree(), etc.
+Comparing just the upper 32 bits of the load address with the upper
+32 bits of uaddress_limit implies that the values are being aligned down
+to a 4GB boundary before comparison.
 
-then in the drivers:
--struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) = NULL,
-				  *othercaps __free(kfree) = NULL;
-+struct ice_aqc_get_phy_caps_data *pcaps auto_kfree,
-				  *othercaps auto_kfree;
+The above means that all loads with address <= uaddress_limit + 4GB are
+skipped. This is acceptable because there is a large hole (much larger
+than 4GB) between userspace and kernel space memory, therefore a
+correctly functioning BPF program should not access this 4GB memory
+above the userspace.
 
-With that only developers introducing new allocators/wrappers would be
-using bare __free(), the rest of us will be free to focus on other
-things.
-One could argue (+CC David Laight) that additional zero-init would not
-be wiped out by compiler, but that is a price I would happily pay in
-almost all cases.
+Let's analyze what this patch does to the following fentry program
+dereferencing an untrusted pointer:
 
-I have no idea if someone already proposed exactly that, as this is
-almost obvious solution.
+  SEC("fentry/tcp_v4_connect")
+  int BPF_PROG(fentry_tcp_v4_connect, struct sock *sk)
+  {
+                *(volatile long *)sk;
+                return 0;
+  }
 
->>
->> Free handles the NULL init case, it doesn't handle the uninitialized
->> case.  I had previously argued that checkpatch should complain about
->> every __free() pointer if the declaration doesn't have an assignment.
->>
->> The = NULL assignment is unnecessary if the pointer is assigned to
->> something else before the first return, so this might cause "unused
->> assignment" warnings?  I don't know if there are any tools which
->> complain about that in that situation.  I think probably we should just
->> make that an exception and do the checkpatch thing because it's such a
->> simple rule to implement.
-> 
-> What I was trying to say is that the __free() thing is supposed to
-> prevent bugs, and it's not. Even if it was easy to write the matcher
-> rule, if __free() needs a rule to double check its use - it's failing
-> at making it easier to write correct code.
-> 
-> In any case. This is a patch for Intel wired, I'll let Intel folks
-> decide.
+    BPF Program before              |           BPF Program after
+    ------------------              |           -----------------
+
+  0: (79) r1 = *(u64 *)(r1 +0)          0: (79) r1 = *(u64 *)(r1 +0)
+  -----------------------------------------------------------------------
+  1: (79) r1 = *(u64 *)(r1 +0) --\      1: (bf) r11 = r1
+  ----------------------------\   \     2: (77) r11 >>= 32
+  2: (b7) r0 = 0               \   \    3: (b5) if r11 <= 0x8000 goto pc+2
+  3: (95) exit                  \   \-> 4: (79) r1 = *(u64 *)(r1 +0)
+                                 \      5: (05) goto pc+1
+                                  \     6: (b7) r1 = 0
+                                   \--------------------------------------
+                                        7: (b7) r0 = 0
+                                        8: (95) exit
+
+As you can see from above, in the best case (off=0), 5 extra instructions
+are emitted.
+
+Now, we analyse the same program after it has gone through the JITs of
+X86-64, ARM64, and RISC-V architectures. We follow the single load
+instruction that has the untrusted pointer and see what instrumentation
+has been added around it.
+
+                                x86-64 JIT
+                                ==========
+     JIT's Instrumentation                  Verifier's Instrumentation
+          (upstream)                               (This patch)
+     ---------------------                  --------------------------
+
+   0:   nopl   0x0(%rax,%rax,1)             0:   nopl   0x0(%rax,%rax,1)
+   5:   xchg   %ax,%ax                      5:   xchg   %ax,%ax
+   7:   push   %rbp                         7:   push   %rbp
+   8:   mov    %rsp,%rbp                    8:   mov    %rsp,%rbp
+   b:   mov    0x0(%rdi),%rdi               b:   mov    0x0(%rdi),%rdi
+  ------------------------------------------------------------------------
+   f:   movabs $0x800000000000,%r11         f:   mov    %rdi,%r10
+  19:   cmp    %r11,%rdi                   12:   shr    $0x20,%r10
+  1c:   jb     0x000000000000002a          16:   cmp    $0x8000,%r10
+  1e:   mov    %rdi,%r11                   1d:   jbe    0x0000000000000025
+  21:   add    $0x0,%r11              /--> 1f:   mov    0x0(%rdi),%rdi
+  28:   jae    0x000000000000002e    /     23:   jmp    0x0000000000000027
+  2a:   xor    %edi,%edi            /      25:   xor    %edi,%edi
+  2c:   jmp    0x0000000000000032  / /------------------------------------
+  2e:   mov    0x0(%rdi),%rdi  ---/ /      27:   xor    %eax,%eax
+  ---------------------------------/       29:   leave
+  32:   xor    %eax,%eax                   2a:   ret
+  34:   leave
+  35:   ret
+
+The x86-64 JIT already emits some instructions to protect against user
+memory access. The implementation in this patch leads to a smaller
+number of instructions being emitted. In the worst case the JIT will
+emit 9 extra instructions and this patch decreases it to 7.
+
+                                  ARM64 JIT
+                                  =========
+
+        No Intrumentation                       Verifier's Instrumentation
+           (upstream)                                  (This patch)
+        -----------------                       --------------------------
+
+   0:   add     x9, x30, #0x0                0:   add     x9, x30, #0x0
+   4:   nop                                  4:   nop
+   8:   paciasp                              8:   paciasp
+   c:   stp     x29, x30, [sp, #-16]!        c:   stp     x29, x30, [sp, #-16]!
+  10:   mov     x29, sp                     10:   mov     x29, sp
+  14:   stp     x19, x20, [sp, #-16]!       14:   stp     x19, x20, [sp, #-16]!
+  18:   stp     x21, x22, [sp, #-16]!       18:   stp     x21, x22, [sp, #-16]!
+  1c:   stp     x25, x26, [sp, #-16]!       1c:   stp     x25, x26, [sp, #-16]!
+  20:   stp     x27, x28, [sp, #-16]!       20:   stp     x27, x28, [sp, #-16]!
+  24:   mov     x25, sp                     24:   mov     x25, sp
+  28:   mov     x26, #0x0                   28:   mov     x26, #0x0
+  2c:   sub     x27, x25, #0x0              2c:   sub     x27, x25, #0x0
+  30:   sub     sp, sp, #0x0                30:   sub     sp, sp, #0x0
+  34:   ldr     x0, [x0]                    34:   ldr     x0, [x0]
+--------------------------------------------------------------------------------
+  38:   ldr     x0, [x0] ----------\        38:   add     x9, x0, #0x0
+-----------------------------------\\       3c:   lsr     x9, x9, #32
+  3c:   mov     x7, #0x0            \\      40:   cmp     x9, #0x10, lsl #12
+  40:   mov     sp, sp               \\     44:   b.ls    0x0000000000000050
+  44:   ldp     x27, x28, [sp], #16   \\--> 48:   ldr     x0, [x0]
+  48:   ldp     x25, x26, [sp], #16    \    4c:   b       0x0000000000000054
+  4c:   ldp     x21, x22, [sp], #16     \   50:   mov     x0, #0x0
+  50:   ldp     x19, x20, [sp], #16      \---------------------------------------
+  54:   ldp     x29, x30, [sp], #16         54:   mov     x7, #0x0
+  58:   add     x0, x7, #0x0                58:   mov     sp, sp
+  5c:   autiasp                             5c:   ldp     x27, x28, [sp], #16
+  60:   ret                                 60:   ldp     x25, x26, [sp], #16
+  64:   nop                                 64:   ldp     x21, x22, [sp], #16
+  68:   ldr     x10, 0x0000000000000070     68:   ldp     x19, x20, [sp], #16
+  6c:   br      x10                         6c:   ldp     x29, x30, [sp], #16
+                                            70:   add     x0, x7, #0x0
+                                            74:   autiasp
+                                            78:   ret
+                                            7c:   nop
+                                            80:   ldr     x10, 0x0000000000000088
+                                            84:   br      x10
+
+There are 6 extra instructions added in ARM64 in the best case. This will
+become 7 in the worst case (off != 0).
+
+                           RISC-V JIT (RISCV_ISA_C Disabled)
+                           ==========
+
+        No Intrumentation           Verifier's Instrumentation
+           (upstream)                      (This patch)
+        -----------------           --------------------------
+
+   0:   nop                            0:   nop
+   4:   nop                            4:   nop
+   8:   li      a6, 33                 8:   li      a6, 33
+   c:   addi    sp, sp, -16            c:   addi    sp, sp, -16
+  10:   sd      s0, 8(sp)             10:   sd      s0, 8(sp)
+  14:   addi    s0, sp, 16            14:   addi    s0, sp, 16
+  18:   ld      a0, 0(a0)             18:   ld      a0, 0(a0)
+---------------------------------------------------------------
+  1c:   ld      a0, 0(a0) --\         1c:   mv      t0, a0
+--------------------------\  \        20:   srli    t0, t0, 32
+  20:   li      a5, 0      \  \       24:   lui     t1, 4096
+  24:   ld      s0, 8(sp)   \  \      28:   sext.w  t1, t1
+  28:   addi    sp, sp, 16   \  \     2c:   bgeu    t1, t0, 12
+  2c:   sext.w  a0, a5        \  \--> 30:   ld      a0, 0(a0)
+  30:   ret                    \      34:   j       8
+                                \     38:   li      a0, 0
+                                 \------------------------------
+                                      3c:   li      a5, 0
+                                      40:   ld      s0, 8(sp)
+                                      44:   addi    sp, sp, 16
+                                      48:   sext.w  a0, a5
+                                      4c:   ret
+
+There are 7 extra instructions added in RISC-V.
+
+Fixes: 800834285361 ("bpf, arm64: Add BPF exception tables")
+Reported-by: Breno Leitao <leitao@debian.org>
+Suggested-by: Alexei Starovoitov <ast@kernel.org>
+Signed-off-by: Puranjay Mohan <puranjay12@gmail.com>
+---
+V1: https://lore.kernel.org/bpf/20240320105436.4781-1-puranjay12@gmail.com/
+Changes in V2:
+- Disable this feature on s390x.
+---
+ arch/s390/net/bpf_jit_comp.c |  5 +++
+ arch/x86/net/bpf_jit_comp.c  | 72 ++++--------------------------------
+ include/linux/filter.h       |  1 +
+ kernel/bpf/core.c            |  9 +++++
+ kernel/bpf/verifier.c        | 30 +++++++++++++++
+ 5 files changed, 53 insertions(+), 64 deletions(-)
+
+diff --git a/arch/s390/net/bpf_jit_comp.c b/arch/s390/net/bpf_jit_comp.c
+index e613eebfd349..e61a51a5b4be 100644
+--- a/arch/s390/net/bpf_jit_comp.c
++++ b/arch/s390/net/bpf_jit_comp.c
+@@ -2691,3 +2691,8 @@ bool bpf_jit_supports_subprog_tailcalls(void)
+ {
+ 	return true;
+ }
++
++u64 bpf_arch_uaddress_limit(void)
++{
++	return -ENOTSUPP;
++}
+diff --git a/arch/x86/net/bpf_jit_comp.c b/arch/x86/net/bpf_jit_comp.c
+index 4900b1ee019f..9b3136187938 100644
+--- a/arch/x86/net/bpf_jit_comp.c
++++ b/arch/x86/net/bpf_jit_comp.c
+@@ -1327,7 +1327,6 @@ static int do_jit(struct bpf_prog *bpf_prog, int *addrs, u8 *image, u8 *rw_image
+ 		u8 b2 = 0, b3 = 0;
+ 		u8 *start_of_ldx;
+ 		s64 jmp_offset;
+-		s16 insn_off;
+ 		u8 jmp_cond;
+ 		u8 *func;
+ 		int nops;
+@@ -1802,78 +1801,18 @@ st:			if (is_imm8(insn->off))
+ 		case BPF_LDX | BPF_PROBE_MEMSX | BPF_B:
+ 		case BPF_LDX | BPF_PROBE_MEMSX | BPF_H:
+ 		case BPF_LDX | BPF_PROBE_MEMSX | BPF_W:
+-			insn_off = insn->off;
+-
+-			if (BPF_MODE(insn->code) == BPF_PROBE_MEM ||
+-			    BPF_MODE(insn->code) == BPF_PROBE_MEMSX) {
+-				/* Conservatively check that src_reg + insn->off is a kernel address:
+-				 *   src_reg + insn->off >= TASK_SIZE_MAX + PAGE_SIZE
+-				 * src_reg is used as scratch for src_reg += insn->off and restored
+-				 * after emit_ldx if necessary
+-				 */
+-
+-				u64 limit = TASK_SIZE_MAX + PAGE_SIZE;
+-				u8 *end_of_jmp;
+-
+-				/* At end of these emitted checks, insn->off will have been added
+-				 * to src_reg, so no need to do relative load with insn->off offset
+-				 */
+-				insn_off = 0;
+-
+-				/* movabsq r11, limit */
+-				EMIT2(add_1mod(0x48, AUX_REG), add_1reg(0xB8, AUX_REG));
+-				EMIT((u32)limit, 4);
+-				EMIT(limit >> 32, 4);
+-
+-				if (insn->off) {
+-					/* add src_reg, insn->off */
+-					maybe_emit_1mod(&prog, src_reg, true);
+-					EMIT2_off32(0x81, add_1reg(0xC0, src_reg), insn->off);
+-				}
+-
+-				/* cmp src_reg, r11 */
+-				maybe_emit_mod(&prog, src_reg, AUX_REG, true);
+-				EMIT2(0x39, add_2reg(0xC0, src_reg, AUX_REG));
+-
+-				/* if unsigned '>=', goto load */
+-				EMIT2(X86_JAE, 0);
+-				end_of_jmp = prog;
+-
+-				/* xor dst_reg, dst_reg */
+-				emit_mov_imm32(&prog, false, dst_reg, 0);
+-				/* jmp byte_after_ldx */
+-				EMIT2(0xEB, 0);
+-
+-				/* populate jmp_offset for JAE above to jump to start_of_ldx */
+-				start_of_ldx = prog;
+-				end_of_jmp[-1] = start_of_ldx - end_of_jmp;
+-			}
++			start_of_ldx = prog;
+ 			if (BPF_MODE(insn->code) == BPF_PROBE_MEMSX ||
+ 			    BPF_MODE(insn->code) == BPF_MEMSX)
+-				emit_ldsx(&prog, BPF_SIZE(insn->code), dst_reg, src_reg, insn_off);
++				emit_ldsx(&prog, BPF_SIZE(insn->code), dst_reg, src_reg, insn->off);
+ 			else
+-				emit_ldx(&prog, BPF_SIZE(insn->code), dst_reg, src_reg, insn_off);
++				emit_ldx(&prog, BPF_SIZE(insn->code), dst_reg, src_reg, insn->off);
+ 			if (BPF_MODE(insn->code) == BPF_PROBE_MEM ||
+ 			    BPF_MODE(insn->code) == BPF_PROBE_MEMSX) {
+ 				struct exception_table_entry *ex;
+ 				u8 *_insn = image + proglen + (start_of_ldx - temp);
+ 				s64 delta;
+ 
+-				/* populate jmp_offset for JMP above */
+-				start_of_ldx[-1] = prog - start_of_ldx;
+-
+-				if (insn->off && src_reg != dst_reg) {
+-					/* sub src_reg, insn->off
+-					 * Restore src_reg after "add src_reg, insn->off" in prev
+-					 * if statement. But if src_reg == dst_reg, emit_ldx
+-					 * above already clobbered src_reg, so no need to restore.
+-					 * If add src_reg, insn->off was unnecessary, no need to
+-					 * restore either.
+-					 */
+-					maybe_emit_1mod(&prog, src_reg, true);
+-					EMIT2_off32(0x81, add_1reg(0xE8, src_reg), insn->off);
+-				}
+-
+ 				if (!bpf_prog->aux->extable)
+ 					break;
+ 
+@@ -3473,3 +3412,8 @@ bool bpf_jit_supports_ptr_xchg(void)
+ {
+ 	return true;
+ }
++
++u64 bpf_arch_uaddress_limit(void)
++{
++	return TASK_SIZE_MAX + PAGE_SIZE;
++}
+diff --git a/include/linux/filter.h b/include/linux/filter.h
+index c0d51bff8f96..cf12bfa2a78c 100644
+--- a/include/linux/filter.h
++++ b/include/linux/filter.h
+@@ -965,6 +965,7 @@ bool bpf_jit_supports_far_kfunc_call(void);
+ bool bpf_jit_supports_exceptions(void);
+ bool bpf_jit_supports_ptr_xchg(void);
+ bool bpf_jit_supports_arena(void);
++u64 bpf_arch_uaddress_limit(void);
+ void arch_bpf_stack_walk(bool (*consume_fn)(void *cookie, u64 ip, u64 sp, u64 bp), void *cookie);
+ bool bpf_helper_changes_pkt_data(void *func);
+ 
+diff --git a/kernel/bpf/core.c b/kernel/bpf/core.c
+index 5aacb1d3c4cc..bb8024eacc31 100644
+--- a/kernel/bpf/core.c
++++ b/kernel/bpf/core.c
+@@ -2958,6 +2958,15 @@ bool __weak bpf_jit_supports_arena(void)
+ 	return false;
+ }
+ 
++u64 __weak bpf_arch_uaddress_limit(void)
++{
++#ifdef CONFIG_64BIT
++	return TASK_SIZE;
++#else
++	return -ENOTSUPP;
++#endif
++}
++
+ /* Return TRUE if the JIT backend satisfies the following two conditions:
+  * 1) JIT backend supports atomic_xchg() on pointer-sized words.
+  * 2) Under the specific arch, the implementation of xchg() is the same
+diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+index de7813947981..6eb0d7643af1 100644
+--- a/kernel/bpf/verifier.c
++++ b/kernel/bpf/verifier.c
+@@ -19657,6 +19657,36 @@ static int do_misc_fixups(struct bpf_verifier_env *env)
+ 			goto next_insn;
+ 		}
+ 
++		/* Make it impossible to de-reference a userspace address */
++		if (BPF_CLASS(insn->code) == BPF_LDX &&
++		    (BPF_MODE(insn->code) == BPF_PROBE_MEM ||
++		     BPF_MODE(insn->code) == BPF_PROBE_MEMSX)) {
++			struct bpf_insn *patch = &insn_buf[0];
++			u64 uaddress_limit = bpf_arch_uaddress_limit();
++
++			if (uaddress_limit < 0)
++				goto next_insn;
++
++			*patch++ = BPF_MOV64_REG(BPF_REG_AX, insn->src_reg);
++			if (insn->off)
++				*patch++ = BPF_ALU64_IMM(BPF_ADD, BPF_REG_AX, insn->off);
++			*patch++ = BPF_ALU64_IMM(BPF_RSH, BPF_REG_AX, 32);
++			*patch++ = BPF_JMP_IMM(BPF_JLE, BPF_REG_AX, uaddress_limit >> 32, 2);
++			*patch++ = *insn;
++			*patch++ = BPF_JMP_IMM(BPF_JA, 0, 0, 1);
++			*patch++ = BPF_MOV64_IMM(insn->dst_reg, 0);
++
++			cnt = patch - insn_buf;
++			new_prog = bpf_patch_insn_data(env, i + delta, insn_buf, cnt);
++			if (!new_prog)
++				return -ENOMEM;
++
++			delta    += cnt - 1;
++			env->prog = prog = new_prog;
++			insn      = new_prog->insnsi + i + delta;
++			goto next_insn;
++		}
++
+ 		/* Implement LD_ABS and LD_IND with a rewrite, if supported by the program type. */
+ 		if (BPF_CLASS(insn->code) == BPF_LD &&
+ 		    (BPF_MODE(insn->code) == BPF_ABS ||
+-- 
+2.40.1
 
 
