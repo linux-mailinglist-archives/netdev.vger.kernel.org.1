@@ -1,122 +1,148 @@
-Return-Path: <netdev+bounces-81202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9F80886878
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 09:49:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A340E88687C
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 09:49:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36749B24A08
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 08:49:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 411401F2208E
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 08:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A1E918EB9;
-	Fri, 22 Mar 2024 08:49:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CEE41863B;
+	Fri, 22 Mar 2024 08:49:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Sz+QOfoT"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="y8CNUMnj";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="isbvmZQJ";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="y8CNUMnj";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="isbvmZQJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85F031756B;
-	Fri, 22 Mar 2024 08:49:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FA5D19452;
+	Fri, 22 Mar 2024 08:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711097351; cv=none; b=Rbi9vgl4ELQ6rm0eoNINUTzRHbKRekWKMjB99xnOdKc1hpjzbYG2CuAO/XnJb8nNE3AP4Y8KZWGHYoGerdxe2y2ifkkwzYsvHv7YBUIcV4p5rsOLMg4XwJu4vP5ejgmSZPVkfuhgvmYGe7Ko0TV3PWs5cqN0JMIB6TM6zScrQ0U=
+	t=1711097387; cv=none; b=i6NGHouzsRCkhLaQDe3BnYpgwwOVICqwyFC1EQGdxArzOhBcpCwKFtvJ60Rw4gTiygs+Q1lKTHYvJuyhpKtuOfzo7EXLNv6X3kGEJrtzGZap6VhvuQGp6j9MKwfAHp7ocS9Ug3buic6uE9vuTT7Tkvve8CGIwWKRLILKtzmxRfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711097351; c=relaxed/simple;
-	bh=dTYtO0jE8wKYKJFcNaD+LqthVoE8a2KnRw+uYik6gTg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FCoFbH4RQarIfBIRs95EMzpE1Pb+d3ZXCnKT321acnKeyQwCjoRxP5jvJcrbIqGQMzThpo9ror8EIVz5fagzD1LZ0IRTwES61crD1msRUxkZwFRjXqZfCoV8tpNdxZdxHJyZ7yZxLekg/EtPz9hiSgdU2H8wNSNsywd+jms7GvM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Sz+QOfoT; arc=none smtp.client-ip=212.227.15.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1711097319; x=1711702119; i=markus.elfring@web.de;
-	bh=dTYtO0jE8wKYKJFcNaD+LqthVoE8a2KnRw+uYik6gTg=;
-	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
-	 In-Reply-To;
-	b=Sz+QOfoTD5Bpl9wGXJrzR7Ksj2hc9ZMWXKuPOVVkcJIo/2955grVbFz9Zkdlqq+1
-	 a3yjXRxAtaAEZlRun5zFoV8E2k03VmQPOlM03BzQjQtK9rLmwAkzBIL+4TJ+DVE9j
-	 QvpLEA95pWcJy/f4HblymlKI7wdYytyGtbqaES/4877+2ehtdioJb6hbQp31cVpQ0
-	 9y2WPLi1zLfG7tcLRHJn1HktVcNvXnbp5ygTFaIys19EBO9fuvRwOcs5vX0jpEGrG
-	 J1eeCBie4ftMdtGE5YLi4Dft6t+yCP4q0/peaFSiHsLazxJqgDdvIfDanQblKCuq3
-	 9H6qvkbL/dy7u9Wbcg==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MECGX-1rdRYY2bZd-006i6z; Fri, 22
- Mar 2024 09:48:39 +0100
-Message-ID: <5412e9e1-2470-497a-a879-d28e6039be15@web.de>
-Date: Fri, 22 Mar 2024 09:48:27 +0100
+	s=arc-20240116; t=1711097387; c=relaxed/simple;
+	bh=Rus4EOlYjpMcjkHVpN+7Cwqd1GjzJuQxBDkGG/aunOE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=csYcT1BbFnWTREhTGKvqSuswm7ATlAe5xtTXMQKzwX1BqWRZuWC0dbdI0/H+GF1CLkOKUVlXwq86EdWv4zSiueDxNoH15rdhMoP5rIHnAA075c8csbjxIhCXJsPAqln/HfyYtS4yXMMnGAxdV1pRTKqVSf3FhawGATI7/x93hiA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=y8CNUMnj; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=isbvmZQJ; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=y8CNUMnj; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=isbvmZQJ; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from lion.mk-sys.cz (unknown [10.100.225.114])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 47F8D382B0;
+	Fri, 22 Mar 2024 08:49:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1711097383; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rus4EOlYjpMcjkHVpN+7Cwqd1GjzJuQxBDkGG/aunOE=;
+	b=y8CNUMnjl7AtHfrpc0fCXd2UwyPa4Ub748sc5+GmKAVam87psdAIPAC7ikpP5+eNbW7kHV
+	nJQ/ucT/uxS5CUGdqtjhIrd2jWWSa7bqB0zuCGGAMQo5mseCdrFm8s8d2Dv2EPwi6lXfst
+	e9b/S8vyVN3RndrdOX/3WFH60+l0HuM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1711097383;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rus4EOlYjpMcjkHVpN+7Cwqd1GjzJuQxBDkGG/aunOE=;
+	b=isbvmZQJNTnQ8jY7mycgQAJVRRIpIj2W+R+OvPTNzi0y/6D5y08b+GP73P30B7zP6HOvDg
+	p7WTxlqS90PS4DDw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1711097383; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rus4EOlYjpMcjkHVpN+7Cwqd1GjzJuQxBDkGG/aunOE=;
+	b=y8CNUMnjl7AtHfrpc0fCXd2UwyPa4Ub748sc5+GmKAVam87psdAIPAC7ikpP5+eNbW7kHV
+	nJQ/ucT/uxS5CUGdqtjhIrd2jWWSa7bqB0zuCGGAMQo5mseCdrFm8s8d2Dv2EPwi6lXfst
+	e9b/S8vyVN3RndrdOX/3WFH60+l0HuM=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1711097383;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Rus4EOlYjpMcjkHVpN+7Cwqd1GjzJuQxBDkGG/aunOE=;
+	b=isbvmZQJNTnQ8jY7mycgQAJVRRIpIj2W+R+OvPTNzi0y/6D5y08b+GP73P30B7zP6HOvDg
+	p7WTxlqS90PS4DDw==
+Received: by lion.mk-sys.cz (Postfix, from userid 1000)
+	id 332CF2013C; Fri, 22 Mar 2024 09:49:43 +0100 (CET)
+Date: Fri, 22 Mar 2024 09:49:43 +0100
+From: Michal Kubecek <mkubecek@suse.cz>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: gaoxingwang <gaoxingwang1@huawei.com>, idosch@nvidia.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	yanan@huawei.com, liaichun@huawei.com
+Subject: Re: [PATCH] netlink: fix typo
+Message-ID: <20240322084943.5xodsuxt45jr5l3l@lion.mk-sys.cz>
+References: <20240322072456.1251387-1-gaoxingwang1@huawei.com>
+ <Zf09wW36JcpObTPC@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: ice: Fix freeing uninitialized pointers
-To: Julia Lawall <Julia.Lawall@inria.fr>, kernel-janitors@vger.kernel.org,
- netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org
-Cc: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Dan Carpenter <dan.carpenter@linaro.org>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>, LKML
- <linux-kernel@vger.kernel.org>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- David Laight <David.Laight@aculab.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>, Jiri Pirko
- <jiri@resnulli.us>, Jonathan Cameron <jic23@kernel.org>,
- Kees Cook <keescook@chromium.org>, Lukasz Czapnik
- <lukasz.czapnik@intel.com>, Paolo Abeni <pabeni@redhat.com>,
- Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
- Dan Williams <dan.j.williams@intel.com>
-References: <e5172afb-427b-423e-877a-10352cf4a007@web.de>
- <F2FBADE8-EDF9-4987-A97B-CF4D2D1452E0@inria.fr>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <F2FBADE8-EDF9-4987-A97B-CF4D2D1452E0@inria.fr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:9YXkvZdYpqeXj5WB8AcK0LWQYNWMZbgwO0vYGnbOxScaxdApu0A
- /wGrtYc+l2huJpHcvNNT/1tZcW/e7ub95xlO4cy1Zi2g5iveCJACnZEZAxlbdwyQfqkN5ee
- 3JfFsFxlVMK775YZ8vqtGLBwf74q6UBIBZyWpm0F3PNzdPiKJdcSuT1zLtKuEqGCdgRbVOy
- 9HIZtqoXS2nyv+XOb1+1g==
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="ukcioxpoksvkjmav"
+Content-Disposition: inline
+In-Reply-To: <Zf09wW36JcpObTPC@nanopsycho>
+Authentication-Results: smtp-out1.suse.de;
+	none
+X-Spam-Level: 
+X-Spam-Score: -3.50
+X-Spamd-Result: default: False [-3.50 / 50.00];
+	 TO_DN_SOME(0.00)[];
+	 NEURAL_HAM_SHORT(-0.18)[-0.900];
+	 RCPT_COUNT_SEVEN(0.00)[7];
+	 SIGNED_PGP(-2.00)[];
+	 RCVD_COUNT_ZERO(0.00)[0];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+,1:+,2:~];
+	 BAYES_HAM(-0.16)[69.36%];
+	 ARC_NA(0.00)[];
+	 FROM_HAS_DN(0.00)[];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 NEURAL_HAM_LONG(-0.96)[-0.962];
+	 MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	 DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	 FUZZY_BLOCKED(0.00)[rspamd.com]
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:eGYjQvfGa2w=;8aqjLC4e8Qn3i8gHlnKYxMR90PI
- otP3Ewl1/O20JuaFJwwDQibzoecYfetjeu9HAkew3SG+utku+ttOzFmVK5+nnJOF39MPo1dZJ
- Ht3GGhh5IUrvv82ADmD1A0w+f6++0BVbJcUX30PKHKz2ZRc5tNneT0vTREp+W5elGnouMV+x2
- TXjV/R0A7RVgJ9+hvPqMsUgEqvKa6GXbaH16ERyx/gLpirXkdFAsn4phqqWcY3AuiLgvp/z6D
- 4pG3dYpEE3o0ZpXFtob3KUEJuzDQSmlxz0Ok2ANTBt43rLnNICwi8SPvYVOZYM4nqgXl2Fmu8
- xvFoytyWjrHCzbIONmIpHyT6uCG6fwfDc4s2U0n+/BIC+ebPdv4nLUHT248MsQleGKxpGZ7xe
- 9wfA6QD6IA5nA70QnMYr4RDvI9oLKihilwDGw8rExQtkixGtDrsEBFRk6GjSqW6v0exz76oSy
- F74K6nFt/WkVHW5Kbuj4vWwegMapIwxDLAdA3Jn5U1NdSo3Y+tmpctsQCB7TmULsqQ1af3bOc
- L4uGN4ZaqKEuPVXX80aCa97ibUCSStQCzQWgvas7st7w4fhGwNgDGGlXbFFKBEfej2RU/rKZ4
- 1nSYTE3/tRvFu6BUnPV7jmtWKW0lkuU/s688IhVHYgah6V/wyLP9+p+Xu9ZEGHSmkBUG1Qh3b
- 6G8PI/cwldbw2t5R/4ZpUMYltcaTAKy7gQ3Nv4Z235ovhlOyRjPXtYHSASEPKcv6WU6TfoaUw
- Joe7kDDizCqbYkGbK2fbxZJG7Y5/zYA1rAVsSA2SZtLuZt+gcuhfQ2unsbbYd1odhctZE5Avd
- y+KFWCW0whvRwvg7LZgy8bzOrLOA+d1k2pKeNPb+oHRRM=
-
-> Does one prefer an initialization of null at the top of the function
-
-Several developers got used to such a programming approach.
 
 
-> or an initialization to a meaningful value in the middle of the function ?
+--ukcioxpoksvkjmav
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Coding style preferences are evolving more with the growing support for
-the discussed scope-based resource management (cleanup functions and guards),
-aren't they?
+On Fri, Mar 22, 2024 at 09:13:53AM +0100, Jiri Pirko wrote:
+> Please make clear indication which project/tree you target with your
+> patch by putting appropriate name in the [patch NAME] brackets
 
-Further developers can handle variable definitions at the beginning of
-a compound statement (a code block) at least.
-Corresponding clarifications will influence the change acceptance for such definitions
-without adding extra curly brackets.
-Would you like to consider design possibilities with scope reductions?
+In this case, it should be "[PATCH ethtool]".
 
-Regards,
-Markus
+Michal
+
+--ukcioxpoksvkjmav
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmX9RiIACgkQ538sG/LR
+dpV54Qf9FtN1QlHG75yHE/hJz2aF1y3i5z0dOYv9E3lxYq+FZCZiJmupSZ8oprnw
+uU9WgpCodagxtfKvO3g9XQjAEe/wljfpoVebyHoKumDqQIh7RRUaVbPy1Vb+3I+J
+c/JrDUVGj5n360v0iFYVA6RP4Ss8dQRTLzVkZImrkuvMPP+Pw/+xENFHGrGRHca3
+1avhqxI3ypvNsA17+f9Nek4TRC+eGA/5JD28dW3LVshetkOmwFuyhauV++Cn/Yb/
+m+AiPuO+71cYNiMUgFbmhlu7Qe2pyGCPzW6nDQ75zi4il6dEJZ2szlUQOIWcdWH4
+h7MbPIvU4WHO16edrDyRUrZwGodz3A==
+=94wM
+-----END PGP SIGNATURE-----
+
+--ukcioxpoksvkjmav--
 
