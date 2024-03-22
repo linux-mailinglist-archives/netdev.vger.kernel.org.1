@@ -1,109 +1,113 @@
-Return-Path: <netdev+bounces-81214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2C328869E7
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 11:05:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DDAB886A04
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 11:16:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00D791C242E5
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 10:05:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EFE6B213B3
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 10:16:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF6A23778;
-	Fri, 22 Mar 2024 10:05:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C94288AE;
+	Fri, 22 Mar 2024 10:16:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="uKNCIuEC"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Y2ReAm1C"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+Received: from mout.web.de (mout.web.de [212.227.15.4])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9412E648;
-	Fri, 22 Mar 2024 10:05:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C70926ADB;
+	Fri, 22 Mar 2024 10:16:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711101913; cv=none; b=ddywX4byW9pXFLdAom11QzT5YysTCrc7rwsQINnK5WCumcG0m11ofCgDPbrGeHNpG/e2XkrrrZSegQa3wi69map4VDLaTs/TkRbBKv4Np2ajnWcYrSyjPYpGCpVB5IK565BQhzFpwq2UwuNDYNm2dRiR5qdbXSU4IbIRmLNhG1E=
+	t=1711102570; cv=none; b=AR+wv5zqn0D91qd2/VWbQAAT2yA8RYRr8pD22gWT95pe47bv3M5uWyFqHszfpUcgmqBJbuGDzX4GVzLpqdCj9HnQ72XDyAKwCGDePI3muEwKpTIPu7OtTN+qD7SFQ1WUMK6pgz1+Vwiv0jGzzCdKqrAq+ffK/8Wlf/ir+89QawQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711101913; c=relaxed/simple;
-	bh=DU4C6ZnSVjEOzuxtOUUtZGkQexs4RZVz4JduuXYhlmw=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DIjuYaN6W+yKEPC5+1JJd7djuBFljjXEdMhBmex9Ej8kZId4NnnL8UJd2mRWVjRGY0UVaLFE4J7ISLVT5I1SQ+WVOafHqxyXXf9pm7845YnJV2jVJjlu0zIgDEL1b9KqVaojZ7KP2zfot33P/1RzN9FAxHI5sTwjqgWhDpAX8v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=uKNCIuEC; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 42MA4prq120425;
-	Fri, 22 Mar 2024 05:04:51 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1711101891;
-	bh=wxmqxb97DIpuCkv7FzBoW5vCyp0JMEHH0BIft+uHWtY=;
-	h=From:To:CC:Subject:Date;
-	b=uKNCIuECes+3/mEfav50g7Ac6G81U+ypdQPiE+N5PZD0+U6TiIC+fNUJwO6rZONBJ
-	 Q8mnxq7DELAZ26Xa9LGe2PlzTW0mKiyqh7ryzBIMHpJe4DIU2MRKmSh4LMoqgRWETt
-	 5LUTQQFWBir/QOiklMKEDZzpcbs1e1OMFhWou94Q=
-Received: from DFLE111.ent.ti.com (dfle111.ent.ti.com [10.64.6.32])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 42MA4pUc005727
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 22 Mar 2024 05:04:51 -0500
-Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE111.ent.ti.com
- (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 22
- Mar 2024 05:04:51 -0500
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE102.ent.ti.com
- (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 22 Mar 2024 05:04:51 -0500
-Received: from uda0500640.dal.design.ti.com (uda0500640.dhcp.ti.com [172.24.227.88])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 42MA4lAP058877;
-	Fri, 22 Mar 2024 05:04:48 -0500
-From: Ravi Gunasekaran <r-gunasekaran@ti.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>
-CC: <r-gunasekaran@ti.com>, <horms@kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>
-Subject: [PATCH net] net: hsr: hsr_slave: Fix the promiscuous mode in offload mode
-Date: Fri, 22 Mar 2024 15:34:47 +0530
-Message-ID: <20240322100447.27615-1-r-gunasekaran@ti.com>
-X-Mailer: git-send-email 2.17.1
+	s=arc-20240116; t=1711102570; c=relaxed/simple;
+	bh=GadESi8ONSV56erp89XTT+vSta6NjyXh9DD7OG2fFAk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GzhD8K+syW30a0xPXWftCf6RkJwjT81eUQ/qqHiw9tt35KOmjoM10zlyB0S23uFlKscVoDCghNnsxCuTu0zhMPpxFmMCJxiSNVYLqLEY+fkswO+6oitxHZqnXhNhIqGZSJk5tjvDrGQRwSddP1aiO8Eh99nd8GzWamr2JHirGbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Y2ReAm1C; arc=none smtp.client-ip=212.227.15.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1711102564; x=1711707364; i=markus.elfring@web.de;
+	bh=YITSdSNKjtGWKQJCqVlDxMIGXLNZSJ1FOmf8VqHMVLI=;
+	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
+	 In-Reply-To;
+	b=Y2ReAm1Cd4sNe5u0ne9uK6PLGurzdh+kkALmaxx1M8WJ19BTpB/sxYqatqgkFwzP
+	 HNF6CiMavemFWZHCjCubLFrgKKREtpcm54KNbLjWzuDbNgiCTymtjqR23i11rdQhb
+	 /jsC0CFngbzNkN5VYgk6g9PyNKArXi5Mrpdfnjj+8m3wLJeQ+ifFhl1ZzhMRiju1f
+	 9ASJjnPNlrnDdQAZBiLiUD8HpjBHbUSXIl3tqKcquS2n347ya0QQ1U3zAb0PyBpt1
+	 cmsN0xV+5bpWjRmzfaTXqNXoLqHvTf/2sVlyTXTYeAwf0dMUTQrJgA9vrYO/Sy0xn
+	 tyLUC+DMpTYrbbW5Pw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mfc4q-1r7vNl0NY0-00jbRy; Fri, 22
+ Mar 2024 11:10:13 +0100
+Message-ID: <9b09c797-2b01-40d8-9e83-ecb6e25ee78a@web.de>
+Date: Fri, 22 Mar 2024 11:10:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
+User-Agent: Mozilla Thunderbird
+Subject: Re: [v2] ice: Fix freeing uninitialized pointers
+Content-Language: en-GB
+To: Dan Carpenter <dan.carpenter@linaro.org>,
+ kernel-janitors@vger.kernel.org, netdev@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>, LKML
+ <linux-kernel@vger.kernel.org>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ David Laight <David.Laight@aculab.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>, Jiri Pirko
+ <jiri@resnulli.us>, Jonathan Cameron <jic23@kernel.org>,
+ Julia Lawall <julia.lawall@inria.fr>, Kees Cook <keescook@chromium.org>,
+ Lukasz Czapnik <lukasz.czapnik@intel.com>, Paolo Abeni <pabeni@redhat.com>,
+ Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
+ Dan Williams <dan.j.williams@intel.com>
+References: <0efe132b-b343-4438-bb00-5a4b82722ed3@moroto.mountain>
+ <0d7062e1-995b-42bc-8a62-d57c8cb588ee@web.de>
+ <7ca4a907-2a9c-4711-a13c-22cbfec15e0e@moroto.mountain>
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <7ca4a907-2a9c-4711-a13c-22cbfec15e0e@moroto.mountain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Provags-ID: V03:K1:OPtKNGD3xEcd1Z7sJW7cRkjajBmWMTdxQ7djE0xUhQ1czhFk4yH
+ OVOh6h+sux0OGb4dFA5OaxAiv2F5OWxkUlsDdTB4f5Pvtz2WBLmL0CV0DgoYjprq1yAbO5G
+ b1/blJMXPlAmdOtqF6VrJzL01o8nYCkjLkbKyX1X5vVNYHTjvXF9uZyFXaI1Skgc3NRMsNq
+ SWWI3YTNfkGNTd1Y5yQHw==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:HTHlWZPjstg=;x80qYP9/CGxP7aDaVgcrNlTbZCo
+ 8+g3feTSIdzmhy59CGiNd+Y2CkUnn3bhYyjDFbhgKuFyi2US31K4d4Ssaxf46f6LbTg0mG2VT
+ Ab/N2Olz2GjX0FyMg45JwCzWCYE3uD8KY6fMpk12gmaM6V/5MVZwjpKZEWSG5ZNrWLTTucvh4
+ QK3vq3Vdj4ySXAb4t0aO61TTUM731MJyrzzSkQTo4+OtNBwkWxj2988EECm13MTv/p8yLdU2z
+ Tvuh3H/k1ZQVZRpJIGsZzewOm2nD8xRl96OzPcwnbfPrcblQd2aXfTvhAXJrtfOr+kUiZplDN
+ ztRgIs3VeZ/IM7zUAxg/9k/G1gH8hPV/p5sr7/nDRAhsOwzbYPNipSEE0VUoV+C9NDVrr1WzD
+ J3gxC7v4YH//04J2kPQG4NYGA+B5e5csAAJbPtw/VuQ4IIeWli1Pxz5gXDxMiwpzd2dCiivtU
+ 4c4CwlgrN2r/+O8qNKWxwnnOYZrPaaM3Acgk24988vlrWUEGwT3VuA1ZWnNnx8KW5zY4AIQkj
+ TN8LcARbvYrz3PIFKLvS5gxFwB3qhL5CY8Pfi9xr6Ya3EmZPJXsCrWt7UNUdxiHrFezfRks+j
+ i5RCd4l79gskUd+XK89dCmxsQbpFvxLciO8Bs7alT7ijXgrcyXH+8SqrL3YvswgZ8et8Cj4Kg
+ SRs5UcH8oE0TFL7Xd1fPlkRViExswSYDryUW8adaulV5vmf9993ce+YQplB2juw4X/+5hr8Rc
+ Pxd8Z2+k0GNykhsagBTe5nrJ1vlFpRZUzmKhdwWd+W6Xag6D6gkUzAxVIBHdTd5DPIAFsOG0O
+ tiMMF+iecfcmaEdmBPSHq00WfyvuMa/OjmqXEAy0kMyO8=
 
-commit e748d0fd66ab ("net: hsr: Disable promiscuous mode in
-offload mode") disables promiscuous mode of slave devices
-while creating an HSR interface. But while deleting the
-HSR interface, it does not take care of it. It decreases the
-promiscuous mode count, which eventually enables promiscuous
-mode on the slave devices when creating HSR interface again.
+> Markus please don't do this.  Don't take a controversial opinion and
+> start trying to force it on everyone via review comments and an
+> automatic converstion script.
 
-Fix this by not decrementing the promiscuous mode count while
-deleting the HSR interface when offload is enabled.
+I dare also to point additional change possibilities out.
+I hope that further collateral evolution will become better supported.
 
-Fixes: e748d0fd66ab ("net: hsr: Disable promiscuous mode in offload mode")
-Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
----
- net/hsr/hsr_slave.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
-
-diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
-index e5742f2a2d52..1b6457f357bd 100644
---- a/net/hsr/hsr_slave.c
-+++ b/net/hsr/hsr_slave.c
-@@ -220,7 +220,8 @@ void hsr_del_port(struct hsr_port *port)
- 		netdev_update_features(master->dev);
- 		dev_set_mtu(master->dev, hsr_get_max_mtu(hsr));
- 		netdev_rx_handler_unregister(port->dev);
--		dev_set_promiscuity(port->dev, -1);
-+		if (!port->hsr->fwd_offloaded)
-+			dev_set_promiscuity(port->dev, -1);
- 		netdev_upper_dev_unlink(port->dev, master->dev);
- 	}
- 
--- 
-2.17.1
-
+Regards,
+Markus
 
