@@ -1,56 +1,80 @@
-Return-Path: <netdev+bounces-81228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFF38886B15
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:10:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3125B886B18
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:11:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7FC2B1F23F44
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 11:10:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C562B234F9
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 11:11:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932B53EA71;
-	Fri, 22 Mar 2024 11:10:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF6A23E479;
+	Fri, 22 Mar 2024 11:11:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VQ0XuAcM"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="L2ezaGws"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FAF3F9C7;
-	Fri, 22 Mar 2024 11:10:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6B12C18D
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 11:11:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711105804; cv=none; b=KXVP107DYdNGpbWl7E1JJVBPbM0hkqm2IhOuOHKSfUiZ6uyNv/dbhBr8BDVTOmnoVN3EzhqDqEXmL3qiSJZuYN1JaUqBeE58XCYE3+YLrRQHtY/L6G+46Qw6lEBgtzQYAr41F2dFAikRwW3T4usRxrRpwW1Z2g9hbAmwgHyh2Pw=
+	t=1711105873; cv=none; b=gPO+yyBvKVx5vfEdEgwsV21OHJRiVeZXcaMZ/XM/2XeepMlHKpqHB/nK+/fOXy2KAevyMFiUmypPSiLfh72w3atie/FsQaP7hNL41BqUpwi+TdPxX1a2jIrvPrhaGB5k8buK8gK57NsLnKIpmWBqoFMcF1iK32rMP9pdVq97ynI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711105804; c=relaxed/simple;
-	bh=QPJatH0sgxvvMTKa/sKQ4wAo3u2RfrMDqrbaWUPt4kc=;
+	s=arc-20240116; t=1711105873; c=relaxed/simple;
+	bh=OlXYRIH/s09HittZWeVyvp0YZvyM3t+mnfmS05nM6EQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ql+rM0pLbI34/ehed+mgoT9LZ89PKZQEqNLOw7kXS4TTwLUb5odcaRf62u7JY3Db+WI5Yhum+KklMdhuM9Zeaq7gfB7AMLklmfshmNJ4YwvaTgayC1Yheho6vuQN6ntvLd32zHH0FT6KOcj9Y8UfwWDebQqShoh5Y3rY9Kxloto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VQ0XuAcM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E2A4C433C7;
-	Fri, 22 Mar 2024 11:10:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711105803;
-	bh=QPJatH0sgxvvMTKa/sKQ4wAo3u2RfrMDqrbaWUPt4kc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=VQ0XuAcMo+KfpKuq+hLIydBJoqsMcXHd5r1L6haEIixsM/uy6ntEJSFQqSIOSccs7
-	 2AvfofF/84VFHiqKOX71bephghtQSwdgt2JIDiMiW2IubcNJfiw8GzOWkCkXBj8wT9
-	 rQMx1Wz6nuoCfplJN5goDqRFZGGdx0pQU0DjtkExZVeVx2bzJ06RjcRt23kC3is7l8
-	 ELzIZanfq9GO5cMHq9x16MtHV8ruqQK5mLgkFimRBEFJnXtYSG0So1K844uHKFT9Lp
-	 sNsgTszKIC0AswkkSohyhesMRscfHxb8Enn6BwwA3wpLnEhNdvNwIYhbEsWd492ZDc
-	 SfUjXAV3f/sCA==
-Date: Fri, 22 Mar 2024 11:09:59 +0000
-From: Simon Horman <horms@kernel.org>
-To: Brett Creeley <brett.creeley@amd.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, shannon.nelson@amd.com
-Subject: Re: [PATCH net] pds_core: Fix pdsc_check_pci_health function to
- print warning
-Message-ID: <20240322110959.GA372561@kernel.org>
-References: <20240321063954.18711-1-brett.creeley@amd.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Er5SiEU2oFIClQoRTm3lxE+y94zZLmAx98tl5hgrtFu1WuK8Tlytn3QJ8K+bi+yghchOXEi/kQNnGGBszUEnLAtOefaLKyNBc0pTITqtuvIUnBvdAEHFoT/vkOmCJmgxNEQn9r4H7IyBfqZs6HvzXYHDPf0TT+/Fcg6p56b6RZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=L2ezaGws; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-513e134f73aso2541883e87.2
+        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 04:11:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1711105869; x=1711710669; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=C1Q0JqQ2lDHQx2HBzkx09xDtDVBpVyqq5z/MmDmfT8A=;
+        b=L2ezaGwsvNeakqwdSdcW4L3EnzHJXZWqQvismbITfGVfY7KN3Xn7xdEZV0S9EmH1md
+         qZoaNf/7olGCKIoESln70hf413Hf5PQm+7ei4zhlZRK7USZs5qEVwZBLpIKQNeKRXr8y
+         smQo1Eil715FznLMMqEh7jaj2zUV1fthv4nHLY9Gli3o4nKBO/soseIRNlAiFZkfVdQE
+         3/gHME6bM5jb7bLiku1EAWohwm9EMPed2UTTcEUNBIiY1LjVcT7EyFH6Y0lHJMX5a+iX
+         MzjEt+dqI8D2Rf2ptW56mwzhpWXyKyu38PK39NLff6ua6hGJd/8keNRHUvKSL7iyRqGz
+         0rHA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711105869; x=1711710669;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C1Q0JqQ2lDHQx2HBzkx09xDtDVBpVyqq5z/MmDmfT8A=;
+        b=RC0YabXdBqK7kgYRB2tOVlxygvBTbO2jXutfMXf07wxwXQzRkCWqSIbx3MP5Y6m+Ho
+         rQG7yyUJGO4U0xoKRCYDpbEoBzczFIUhurTOwKvORUUAZ+MB+WMqFfugYKEJFmCh3aGZ
+         idI8D54ch7p62KPYBwTAVrcpDBnoazIrnpp404hFv8e5gTRCWgJjYjaljEO8RuisK4C0
+         BTSktB6dLFRmmJ79dqULWKtJzpmUg31djzMOzO018bWU1X93xGQQhGsZfXyBrMSndZkG
+         QNi9ojhP4g1uUkylAtKuoCXYjf4M8IGbrKkmBVsdDYmvNi/WqU1Qd/wS8jYkuAO8rphI
+         zaEw==
+X-Forwarded-Encrypted: i=1; AJvYcCXY3O7S+q61gV9gZbc+ntQ4bZlRgdm84I0yRg1bkKOkKKA4bdJ0OZlha5Mk+FXZAvxaJp1irQy6fjUu3t2mvzRiiR0fOTcC
+X-Gm-Message-State: AOJu0YyYqSABoaPOFEwA0/eBc0KBWIYKqfohTOtgvrOOzAoVms8vrw3P
+	OwUF2zDE1Jj9NAL23jjJdp5vmwNJfx5udxiPoKG0CevmFubmw/lssHxNZW2Ttho=
+X-Google-Smtp-Source: AGHT+IHfuBMs9ozLEaCvAc3Ons6Whq3N/3ZypNoAuNB5koWwo+4NlOYdEqvdO+8bdlDTI/6oSVdeIQ==
+X-Received: by 2002:a19:4302:0:b0:513:df6:dcd3 with SMTP id q2-20020a194302000000b005130df6dcd3mr1476012lfa.48.1711105869299;
+        Fri, 22 Mar 2024 04:11:09 -0700 (PDT)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id n7-20020a5d4847000000b0033ec9b26b7asm1814855wrs.25.2024.03.22.04.11.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Mar 2024 04:11:08 -0700 (PDT)
+Date: Fri, 22 Mar 2024 12:11:05 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Prasad Pandit <ppandit@redhat.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	netdev@vger.kernel.org, Prasad Pandit <pjp@fedoraproject.org>
+Subject: Re: [PATCH] dpll: indent DPLL option type by a tab
+Message-ID: <Zf1nSa1F8Nj1oAi9@nanopsycho>
+References: <20240322105649.1798057-1-ppandit@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,60 +83,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240321063954.18711-1-brett.creeley@amd.com>
+In-Reply-To: <20240322105649.1798057-1-ppandit@redhat.com>
 
-On Wed, Mar 20, 2024 at 11:39:54PM -0700, Brett Creeley wrote:
-> When the driver notices fw_status == 0xff it tries to perform a PCI
-> reset on itself via pci_reset_function() in the context of the driver's
-> health thread. However, pdsc_reset_prepare calls
-> pdsc_stop_health_thread(), which attempts to stop/flush the health
-> thread. This results in a deadlock because the stop/flush will never
-> complete since the driver called pci_reset_function() from the health
-> thread context. Fix this by changing the pdsc_check_pci_health_function()
-> to print a dev_warn() once every fw_down/fw_up cycle and requiring the
-> user to perform a reset on the device via sysfs's reset interface,
-> reloading the driver, rebinding the device, etc.
-> 
-> Unloading the driver in the fw_down/dead state uncovered another issue,
-> which can be seen in the following trace:
-> 
-> WARNING: CPU: 51 PID: 6914 at kernel/workqueue.c:1450 __queue_work+0x358/0x440
-> [...]
-> RIP: 0010:__queue_work+0x358/0x440
-> [...]
-> Call Trace:
->  <TASK>
->  ? __warn+0x85/0x140
->  ? __queue_work+0x358/0x440
->  ? report_bug+0xfc/0x1e0
->  ? handle_bug+0x3f/0x70
->  ? exc_invalid_op+0x17/0x70
->  ? asm_exc_invalid_op+0x1a/0x20
->  ? __queue_work+0x358/0x440
->  queue_work_on+0x28/0x30
->  pdsc_devcmd_locked+0x96/0xe0 [pds_core]
->  pdsc_devcmd_reset+0x71/0xb0 [pds_core]
->  pdsc_teardown+0x51/0xe0 [pds_core]
->  pdsc_remove+0x106/0x200 [pds_core]
->  pci_device_remove+0x37/0xc0
->  device_release_driver_internal+0xae/0x140
->  driver_detach+0x48/0x90
->  bus_remove_driver+0x6d/0xf0
->  pci_unregister_driver+0x2e/0xa0
->  pdsc_cleanup_module+0x10/0x780 [pds_core]
->  __x64_sys_delete_module+0x142/0x2b0
->  ? syscall_trace_enter.isra.18+0x126/0x1a0
->  do_syscall_64+0x3b/0x90
->  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> RIP: 0033:0x7fbd9d03a14b
-> [...]
-> 
-> Fix this by preventing the devcmd reset if the FW is not running.
-> 
-> Fixes: d9407ff11809 ("pds_core: Prevent health thread from running during reset/remove")
-> Reviewed-by: Shannon Nelson <shannon.nelson@amd.com>
-> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
+Fri, Mar 22, 2024 at 11:56:49AM CET, ppandit@redhat.com wrote:
+>From: Prasad Pandit <pjp@fedoraproject.org>
+>
+>Indent config option type by a tab. It helps Kconfig parsers
+>to read file without error.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+You should indicate the target tree:
 
+https://www.kernel.org/doc/html/next/process/maintainer-netdev.html?highlight=network#tl-dr
+
+Also, please include "Fixes" tag.
+
+net-next is closed, repost next week
+
+pw-bot: defer
+
+>
+>Signed-off-by: Prasad Pandit <pjp@fedoraproject.org>
+>---
+> drivers/dpll/Kconfig | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+>
+>diff --git a/drivers/dpll/Kconfig b/drivers/dpll/Kconfig
+>index a4cae73f20d3..20607ed54243 100644
+>--- a/drivers/dpll/Kconfig
+>+++ b/drivers/dpll/Kconfig
+>@@ -4,4 +4,4 @@
+> #
+> 
+> config DPLL
+>-  bool
+>+	bool
+>-- 
+>2.44.0
+>
 
