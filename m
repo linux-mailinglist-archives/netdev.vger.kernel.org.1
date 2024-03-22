@@ -1,57 +1,61 @@
-Return-Path: <netdev+bounces-81345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 584AF8874E9
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 23:47:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 823898874EA
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 23:50:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E34F01F2400F
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 22:47:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D64E4B20CC4
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 22:50:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1766E81750;
-	Fri, 22 Mar 2024 22:47:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57DE82877;
+	Fri, 22 Mar 2024 22:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i2brwd7U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BY56IZxS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E837226AD4
-	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 22:47:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4D61CD00;
+	Fri, 22 Mar 2024 22:49:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711147626; cv=none; b=EVtl1qlh9Z3YUIX7nUY8wP0FmkIml4b6HnPryVAQo0FMUVElm5nzwt3P/bhr4R9w7t/Ux+fAwhCAp7IIenB7mrtAvBabBAcgFHImonLX/mMCSRVj/nv/cnpcyu9VV7yMWMsrg5kLI5bLG35R9McwY1CpIaTBjKWOFFWDvsJyY4Y=
+	t=1711147795; cv=none; b=n9W+dCYclGnyGqbH9ZrHtrH2xePwZ+bbvpMswqte84d8j4yhswmpKrPTgQv9xDXaDOfa6GkATFLu98jVRq5nOQJnB67vw4qZfCx1KaMKIejKyRN4ApiKFTSY/903NefVq5YYuLQT5zUR6ee1GP3Oipv7p+jRuOIgcuMgN4GMveI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711147626; c=relaxed/simple;
-	bh=SupyVteZIW2XkRPxZ1srwhsGPIY/5D/mJC0Ki4YGOC4=;
+	s=arc-20240116; t=1711147795; c=relaxed/simple;
+	bh=H3FeOQH6sBeVeQM36PEvoaOUsJ0P5+pGKeNAJLCnNOQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=beYp+zTM2jM7osb2znMpax21XqFUJegSnj9YV4dqGKPN9P2+AFVuO8CaXC1hMlny6QrAALDep0fex+nMOyHiwWSrdEi69u7IeD2vK3Ez1QoUVaaEmQ6dPIRTgZzPP88rjl1JIKHv+6eFm+++oytGBWyfhSkGMZ5comPOshfSd4M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i2brwd7U; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17A84C433F1;
-	Fri, 22 Mar 2024 22:47:05 +0000 (UTC)
+	 MIME-Version:Content-Type; b=GRbXha5JLU+EokT2MqOWrJDY/aL5uuMx0KIRpPW5RS/UA1fn7kJSbfcYjoOPyfDRO3hy5laVzfx4JN4jPDVbGyGHtsj/VGIf1FRTevNEQP/Y+VGGgTemqiZaGzjyYZ3CFIhrCkGNJ0ZWwUfpAarmKuul4PkLDmGMxDUNsuUYVQg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BY56IZxS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D296FC433F1;
+	Fri, 22 Mar 2024 22:49:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711147625;
-	bh=SupyVteZIW2XkRPxZ1srwhsGPIY/5D/mJC0Ki4YGOC4=;
+	s=k20201202; t=1711147795;
+	bh=H3FeOQH6sBeVeQM36PEvoaOUsJ0P5+pGKeNAJLCnNOQ=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=i2brwd7UzvIuvC7hVD6lwvAhocOXRZmgUzNkmxL4rrWb2D6zl1sM6+U6blvYwKR4C
-	 bAGyAVp83LYqUYVWPJP8gMNEDXBSgRHDNTUD+R/Mbq30ooYXQPfJUz5vVV1esZTKTY
-	 wKzl18ePC8kdAEKoyAgPuTcyWvde+34EE66yyANMmmogBnYIY1Ppc24lEx5+8doh+9
-	 N5m0rKf8Lzosd6JH2uITDq2DHoVO8fXoIkaDOgLDH3aQKj8ydYXfWYaApeMjG8CkB5
-	 zTLhsgwv9UBvAG6D3o5o0aRO+bcSBCiHNGXLrRhMNBwFDkBdzJ+GqmqzVtZQ2oHSH0
-	 C4jUWiH+phTYw==
-Date: Fri, 22 Mar 2024 15:47:04 -0700
+	b=BY56IZxSnLvGQyUIDb5I3i9eQgwqsYRGVsf3+3OzXMYPH75+9HTDnAyfZf7V1mElw
+	 ZSnRJhUDigGAyXF9NDpt96iIzSm9ROaQW+BWVt2RDit0FwMIBK4RWT1SelqVn3D4WW
+	 TN6ABBfmkNBImKVeyT5lbHKoaS8B9wyl/G2fXNaHeF68qy7puBYxOCDUBRVwdPat+O
+	 73Huvp87w2p3+TcWMqV7IMEjD/F2apHUM7z4I94k7NWMsCFDRYerHMNVylB+BPE52B
+	 Z8d4F3xYkn/e8HbQMOtJmFyuWj8AfOBQGhn0wo/FQ4Y8Z8XE8+jouc67QchGY61OZ7
+	 t1KRLYWI3l9ug==
+Date: Fri, 22 Mar 2024 15:49:53 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, Josef
- Bacik <josef@toxicpanda.com>, Tetsuo Handa
- <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: Re: [PATCH net] tcp: properly terminate timers for kernel sockets
-Message-ID: <20240322154704.7ed4d55f@kernel.org>
-In-Reply-To: <20240322135732.1535772-1-edumazet@google.com>
-References: <20240322135732.1535772-1-edumazet@google.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Arnd Bergmann <arnd@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, YOSHIFUJI Hideaki
+ <yoshfuji@linux-ipv6.org>, Ville Nuorvala <vnuorval@tcs.hut.fi>, Arnd
+ Bergmann <arnd@arndb.de>, Kui-Feng Lee <thinker.li@gmail.com>, Breno Leitao
+ <leitao@debian.org>, Kunwu Chan <chentao@kylinos.cn>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ipv6: fib: hide unused 'pn' variable
+Message-ID: <20240322154953.0f3618b4@kernel.org>
+In-Reply-To: <20240322132549.GG372561@kernel.org>
+References: <20240322131746.904943-1-arnd@kernel.org>
+	<20240322132549.GG372561@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,12 +65,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 22 Mar 2024 13:57:32 +0000 Eric Dumazet wrote:
-> +	if (!sk->sk_net_refcnt)
-> +		inet_csk_clear_xmit_timers_sync(sk);
+On Fri, 22 Mar 2024 13:25:49 +0000 Simon Horman wrote:
+> > Fixes: 66729e18df08 ("[IPV6] ROUTE: Make sure we have fn->leaf when adding a node on subtree.")
+> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>  
+> 
+> ## Form letter - net-next-closed
 
-The thought that we should clear or poison sk_net at this point
-(whether sk->sk_net_refcnt or not) keeps coming back to me.
-If we don't guarantee the pointer is valid - to make it easier
-for syzbot to catch invalid accesses?
+I guess... If it's a W=1 warning there's no real urgency.
+We should probably also drop the Fixes tag, then.
 
