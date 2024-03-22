@@ -1,61 +1,63 @@
-Return-Path: <netdev+bounces-81346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 823898874EA
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 23:50:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F5AC8874F0
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 23:52:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D64E4B20CC4
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 22:50:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60EAF1C22C47
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 22:52:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57DE82877;
-	Fri, 22 Mar 2024 22:49:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CCDF8288B;
+	Fri, 22 Mar 2024 22:52:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BY56IZxS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xu+/ScIr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E4D61CD00;
-	Fri, 22 Mar 2024 22:49:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4094D1CD00;
+	Fri, 22 Mar 2024 22:52:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711147795; cv=none; b=n9W+dCYclGnyGqbH9ZrHtrH2xePwZ+bbvpMswqte84d8j4yhswmpKrPTgQv9xDXaDOfa6GkATFLu98jVRq5nOQJnB67vw4qZfCx1KaMKIejKyRN4ApiKFTSY/903NefVq5YYuLQT5zUR6ee1GP3Oipv7p+jRuOIgcuMgN4GMveI=
+	t=1711147955; cv=none; b=DyH7dD0Vxq+oSZH2oFX20DSJEggmcNEyKfrfEIn1KuRuzPzpqjHSndbe/6sM86R+mWwc/1/QAyDm+TCh9SrMgH6fra/ST28d8uHpFovLUPbDccq4QvI7Xkg1Qwe46wY/tVc4HGDWE8VJwWKAxeWeyTlCNOe3x4LbA5tlBb35QM4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711147795; c=relaxed/simple;
-	bh=H3FeOQH6sBeVeQM36PEvoaOUsJ0P5+pGKeNAJLCnNOQ=;
+	s=arc-20240116; t=1711147955; c=relaxed/simple;
+	bh=hKZFEeKpoc/pNzTRJQzWbV56PN2qw+KOa9bJztyzp6I=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GRbXha5JLU+EokT2MqOWrJDY/aL5uuMx0KIRpPW5RS/UA1fn7kJSbfcYjoOPyfDRO3hy5laVzfx4JN4jPDVbGyGHtsj/VGIf1FRTevNEQP/Y+VGGgTemqiZaGzjyYZ3CFIhrCkGNJ0ZWwUfpAarmKuul4PkLDmGMxDUNsuUYVQg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BY56IZxS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D296FC433F1;
-	Fri, 22 Mar 2024 22:49:54 +0000 (UTC)
+	 MIME-Version:Content-Type; b=YYgkKxXIVvF7OqFznrrC0fosBoQ7A7SRczFYkZCuT3kw5IXkmvHVLHpM8KQLsI2pr2t0Nli7jNEmfitrTjzMGsvPn/p88YxpGHNtSPYCxC7uxjF1p37mMvJQPSYbLGawsn3P1u3MckGSJutauDRfDvFAOCw5STHXRRVv8TTx8iE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xu+/ScIr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E8ACC433F1;
+	Fri, 22 Mar 2024 22:52:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711147795;
-	bh=H3FeOQH6sBeVeQM36PEvoaOUsJ0P5+pGKeNAJLCnNOQ=;
+	s=k20201202; t=1711147954;
+	bh=hKZFEeKpoc/pNzTRJQzWbV56PN2qw+KOa9bJztyzp6I=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BY56IZxSnLvGQyUIDb5I3i9eQgwqsYRGVsf3+3OzXMYPH75+9HTDnAyfZf7V1mElw
-	 ZSnRJhUDigGAyXF9NDpt96iIzSm9ROaQW+BWVt2RDit0FwMIBK4RWT1SelqVn3D4WW
-	 TN6ABBfmkNBImKVeyT5lbHKoaS8B9wyl/G2fXNaHeF68qy7puBYxOCDUBRVwdPat+O
-	 73Huvp87w2p3+TcWMqV7IMEjD/F2apHUM7z4I94k7NWMsCFDRYerHMNVylB+BPE52B
-	 Z8d4F3xYkn/e8HbQMOtJmFyuWj8AfOBQGhn0wo/FQ4Y8Z8XE8+jouc67QchGY61OZ7
-	 t1KRLYWI3l9ug==
-Date: Fri, 22 Mar 2024 15:49:53 -0700
+	b=Xu+/ScIrlTsDPj9UZG+4uKHIoNFjGpxlEEKAPyt8hzlwWBqmd9SC5LWiFETpdCD2Z
+	 bozJduZe+PexSYCRHYN8JJJamnREaem1a5BobeKYSC0oeacyV3q+zlA6ll4b8nvgu1
+	 8MjjpGReyCeTdeF5wLun5k9YdDuT3GvU1ZZz7oGEaOtEEBAZ+GuF7VNJ9cZExGQrdG
+	 xVBDfk/w8i7jA3IXPFtcOqhoFQ9FgXl1NiRYTp6fvLLfUSWLZQJ7xgXWocc9kYRYKs
+	 u2d5siRZu10W3+lAmKuKsyceRI8BkwvuYKil67YqiDiFsWmQdnfsPEatSfdXsSegBB
+	 Rcq+CQ6M/8aNQ==
+Date: Fri, 22 Mar 2024 15:52:33 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Arnd Bergmann <arnd@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, YOSHIFUJI Hideaki
- <yoshfuji@linux-ipv6.org>, Ville Nuorvala <vnuorval@tcs.hut.fi>, Arnd
- Bergmann <arnd@arndb.de>, Kui-Feng Lee <thinker.li@gmail.com>, Breno Leitao
- <leitao@debian.org>, Kunwu Chan <chentao@kylinos.cn>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ipv6: fib: hide unused 'pn' variable
-Message-ID: <20240322154953.0f3618b4@kernel.org>
-In-Reply-To: <20240322132549.GG372561@kernel.org>
-References: <20240322131746.904943-1-arnd@kernel.org>
-	<20240322132549.GG372561@kernel.org>
+To: Jarkko Sakkinen <jarkko@kernel.org>
+Cc: linux-integrity@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+ "Daniel P . Smith" <dpsmith@apertussolutions.com>, Lino Sanfilippo
+ <l.sanfilippo@kunbus.com>, Jason Gunthorpe <jgg@ziepe.ca>, Peter Huewe
+ <peterhuewe@gmx.de>, James Bottomley
+ <James.Bottomley@HansenPartnership.com>, Alexander Steffen
+ <Alexander.Steffen@infineon.com>, keyrings@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Randy Dunlap
+ <rdunlap@infradead.org>, Richard Cochran <richardcochran@gmail.com>,
+ netdev@vger.kernel.org (open list:PTP HARDWARE CLOCK
+ SUPPORT:Keyword:(?:\b|_)ptp(?:\b|_))
+Subject: Re: [PATCH v4] Documentation: tpm_tis
+Message-ID: <20240322155233.30422299@kernel.org>
+In-Reply-To: <20240322123542.24158-1-jarkko@kernel.org>
+References: <20240322123542.24158-1-jarkko@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,12 +67,13 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 22 Mar 2024 13:25:49 +0000 Simon Horman wrote:
-> > Fixes: 66729e18df08 ("[IPV6] ROUTE: Make sure we have fn->leaf when adding a node on subtree.")
-> > Signed-off-by: Arnd Bergmann <arnd@arndb.de>  
-> 
-> ## Form letter - net-next-closed
+On Fri, 22 Mar 2024 14:35:36 +0200 Jarkko Sakkinen wrote:
+> +TCG PTP Specification defines two interface types: FIFO and CRB. The former is
 
-I guess... If it's a W=1 warning there's no real urgency.
-We should probably also drop the Fixes tag, then.
+Could be worth spelling out the PTP part here, I'm guessing
+get_maintainer made you CC netdev because it thought it stands
+for Precision Time Protocol. And one has to read till the end
+to see:
+
+> +TCG PC Client Platform TPM Profile (PTP) Specification
 
