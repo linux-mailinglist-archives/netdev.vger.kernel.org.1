@@ -1,115 +1,140 @@
-Return-Path: <netdev+bounces-81287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEBA0886E3F
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 15:14:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39BC2886E49
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 15:16:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D04F1C21E39
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 14:14:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B244528B422
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 14:16:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76FD347796;
-	Fri, 22 Mar 2024 14:14:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 556314778E;
+	Fri, 22 Mar 2024 14:16:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KeMF9jho"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TJYL418B"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 327E047F41;
-	Fri, 22 Mar 2024 14:14:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF8E46453;
+	Fri, 22 Mar 2024 14:16:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711116841; cv=none; b=mkcXTODEShvPT4ClQohkuYPXBpLLXPBDfH2gRJd2j7662xBuXEmxDTvIJ8Tnt/CUlYVDloTVU+tAvpCFDt3EY7HPCUldXCx87xdW5bPaf+FuUZlDZT6rDOlaIvTi+PNSh/7lJPlt0r7jy5o7wICr41ERaE6fqhg3YF+fgtfRHwA=
+	t=1711116984; cv=none; b=EbAeLogffZ2k0BFL7r7E4nu+bfNo7zu+6numwkO/PtiGY31tdLUiQM9B0xdP+LPQlIEqzEqoLmJoQAS+zW5cQObl1sIx6xmx/KPaVEdGsu0m4fFtXjIoDsQlX99OUtz5m2Ash/P+vNjNHXpbFve+eOMeaU9wDBllCDK1G4WTRTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711116841; c=relaxed/simple;
-	bh=SUDjNJPFhmAni//UFuk6ejixrIl+KvydT+avjE5yPXk=;
+	s=arc-20240116; t=1711116984; c=relaxed/simple;
+	bh=phfJNFUwcoMsIHQsKhH8XlWFMITiLSgKhBPTTxTE03k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cmj5QM0oobGNMbW2DzC8hZGIdbAnGJm1Xg5Vbcbw/ONa3f+rKjcjJlWeo4n9PiGNSKBJ1cxtsRWHMk3F6tdEs+yIYVWFBTDXPJmJuzK9svRcc83nCt7APF2SXmJQVmAxkU1fNuumHlRUkilHR3YCss1YH1YxISMiQJeflho1uJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KeMF9jho; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D7E46C433F1;
-	Fri, 22 Mar 2024 14:13:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711116840;
-	bh=SUDjNJPFhmAni//UFuk6ejixrIl+KvydT+avjE5yPXk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=KeMF9jho3Zpr5om0OFiOLl9KpzEzOaTtk4rmviui6eKtaIeHS2GaiAnDBikdvN1dg
-	 PuNe6dc6VvndWjiFZvMcdgJWvRG87lKektQkFeKPhqv0nMnD0uxG8mbiPWYKYWjkiK
-	 l5M51M81gYo1MmhSljC6G3LoNk6P1qOqIpHWiiiEHzlSGPt2XCfH23vSkf35B5mjiC
-	 hmBSi4SDc4noVEbhfSrQd7Jmp3qK5owiZEdDDQq9bECFdLebLhkdDP5XZaGgyjqC7K
-	 DpAouu4DyEai6cbIaE/cPVjw2HMGrzV1cXMMCdzPhH5mNsS3jzG1p3YGat+F93bppe
-	 u1MPy/83AH2ow==
-Date: Fri, 22 Mar 2024 15:13:49 +0100
-From: Christian Brauner <brauner@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Alexander Viro <viro@zeniv.linux.org.uk>, Jan Kara <jack@suse.cz>, 
-	Chuck Lever <chuck.lever@oracle.com>, Alexander Aring <alex.aring@gmail.com>, 
-	Trond Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker <anna@kernel.org>, 
-	Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, 
-	Ronnie Sahlberg <ronniesahlberg@gmail.com>, Shyam Prasad N <sprasad@microsoft.com>, 
-	Tom Talpey <tom@talpey.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>, 
-	"Rafael J. Wysocki" <rafael@kernel.org>, David Howells <dhowells@redhat.com>, 
-	Tyler Hicks <code@tyhicks.com>, Neil Brown <neilb@suse.de>, Olga Kornievskaia <kolga@netapp.com>, 
-	Dai Ngo <Dai.Ngo@oracle.com>, Miklos Szeredi <miklos@szeredi.hu>, 
-	Amir Goldstein <amir73il@gmail.com>, Namjae Jeon <linkinjeon@kernel.org>, 
-	Sergey Senozhatsky <senozhatsky@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-nfs@vger.kernel.org, linux-cifs@vger.kernel.org, samba-technical@lists.samba.org, 
-	netfs@lists.linux.dev, ecryptfs@vger.kernel.org, linux-unionfs@vger.kernel.org, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH RFC 08/24] vfs: make vfs_mknod break delegations on
- parent directory
-Message-ID: <20240322-laienhaft-lastwagen-63b3ef508466@brauner>
-References: <20240315-dir-deleg-v1-0-a1d6209a3654@kernel.org>
- <20240315-dir-deleg-v1-8-a1d6209a3654@kernel.org>
- <20240320-jaguar-bildband-699e7ef5dc64@brauner>
- <ca81387b31025198808df6c55f411b00d74cb047.camel@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=aFIXMnwsOVY+trgEWJVIUw9PEQhU+FS7ughWYRHmduy9IyKnx5fni1Dmy8pY0UiUMIcscarnpYLgHCOUCCd/oV2jU32gPcgMfNm6UwzunWS+fl6EqCqTkK/7YgJzeJGkvezQbcR9mlGsmpj0HxpNZ2GOhX4chvuxiz03btGLtfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TJYL418B; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-1e0189323b4so14464675ad.1;
+        Fri, 22 Mar 2024 07:16:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711116982; x=1711721782; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=h2KrFVSkasLEwSaFBHHLTFFybIGgLI9ihUKme+W+V2o=;
+        b=TJYL418BjnTjnsnzdHaGZUHaVMK2KBSkgT+sJa0Uwqiv/hlEMPMM28OYKuqcpUeYc+
+         uQheqVn4PP1G5x18z0fDkX/T4ACJN4lLwrQerUDVvt9VeIXdyLc3KholcyF6npwY94oZ
+         gefEbJ8vxYF1dwdGvlUw+2J73oYwioKRFbb8wHkm98nAvdYPspCkG2G33dJQ522ovW51
+         Cd8CMiY05/21BCbDdwe5i0pJVRf8zSCVfrMzT6ePZJDbRg6rI6vRR9NPI//1d+Ma3bm+
+         9M9pQqTJoapwFKt6ThfFyVlTgoBmxacUk28gu9T+BNCWn7E1isRU0rl7jPHm2fKCWnJ5
+         s/Gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711116982; x=1711721782;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=h2KrFVSkasLEwSaFBHHLTFFybIGgLI9ihUKme+W+V2o=;
+        b=iFB/l4qvD6k5e4ZQL3bU5apDWleL5na8I1caN72b4vOpwXuBbRtxFmOw4ATpe3DDc4
+         syyJHLr6T20Cf0Gujpqp+Kw7hLWfxS5n557HGIpBGdljE+89X0kn8HcLcoo73tscaLQ/
+         +3H0biZLvMnmIv53LYJa43Tswpt7hvLpx9qRbj9c6JP/x2WqNFOamzXf04Wx5nZEZSre
+         rxt+KT6IL7mGHfvlaTnuZf0d5t332L/xUo9srZkgTgT44fLmMoi78P8Z481QuESN7hwb
+         +uJ6diWzs7q5fGgVyLBEWzlQo4Imrg2HFtLiafYVHWn4etZYP8TxIqHppHAMOUaoo3Z/
+         FNGg==
+X-Forwarded-Encrypted: i=1; AJvYcCXvimAJ6IZIK/kLsviESgr3YTpriez0jFZmO3oNSdf+8yROaGVD7lck3t4HbVJqKlh7aBS9SHwVJnkyUmC7btosT5EyxaVmI6dUB0xpY8ijAY8AIMwCV8Tf49smrrCMEQ1CFYhLSkFhtT1oy9zL2s+rt68EpfXMCKbkJdilBI1gHA==
+X-Gm-Message-State: AOJu0YzSM1Q0cLwp8gAkLoXn31YxqaVSG1+uD3tIu5tHCgMh74x7eKA/
+	zPsBgalPq9/jbolglixrvoOadSv+mVjjo1LmIBJoxIUyPRC6qQsxDiW41j/O
+X-Google-Smtp-Source: AGHT+IGHKP6GHfaK0CJSsC1/8ul21i9Rgu7jfCypgVaXamxumA/1/NQ5qG+dab1GP9lDvCigP7RxPg==
+X-Received: by 2002:a17:903:11c4:b0:1dd:a3d6:3af8 with SMTP id q4-20020a17090311c400b001dda3d63af8mr3422258plh.31.1711116981683;
+        Fri, 22 Mar 2024 07:16:21 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id j8-20020a170903024800b001dde004b31bsm1946248plh.166.2024.03.22.07.16.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Mar 2024 07:16:20 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Fri, 22 Mar 2024 07:16:19 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+To: Chris Leech <cleech@redhat.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Nilesh Javali <njavali@marvell.com>, Christoph Hellwig <hch@lst.de>,
+	John Meneghini <jmeneghi@redhat.com>, Lee Duncan <lduncan@suse.com>,
+	Mike Christie <michael.christie@oracle.com>,
+	Hannes Reinecke <hare@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
+	GR-QLogic-Storage-Upstream@marvell.com,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH v6 1/4] uio: introduce UIO_MEM_DMA_COHERENT type
+Message-ID: <4f606e50-865c-46f2-b89e-6c1dfe02f527@roeck-us.net>
+References: <20240201233400.3394996-2-cleech@redhat.com>
+ <20240205200137.138302-1-cleech@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <ca81387b31025198808df6c55f411b00d74cb047.camel@kernel.org>
+In-Reply-To: <20240205200137.138302-1-cleech@redhat.com>
 
-On Wed, Mar 20, 2024 at 04:12:29PM -0400, Jeff Layton wrote:
-> On Wed, 2024-03-20 at 14:42 +0100, Christian Brauner wrote:
-> > >  int vfs_mknod(struct mnt_idmap *, struct inode *, struct dentry *,
-> > > -              umode_t, dev_t);
-> > > +              umode_t, dev_t, struct inode **);
-> > 
-> > So we will have at least the following helpers with an additional
-> > delegated inode argument.
-> > 
-> > vfs_unlink()
-> > vfs_link()
-> > notify_change()
-> > vfs_create()
-> > vfs_mknod()
-> > vfs_mkdir()
-> > vfs_rmdir()
-> > 
-> > From looking at callers all these helpers will be called with non-NULL
-> > delegated inode argument in vfs only. Unless it is generally conceivable
-> > that other callers will want to pass a non-NULL inode argument over time
-> > it might make more sense to add vfs_<operation>_delegated() or
-> > __vfs_<operation>() and make vfs_mknod() and friends exported wrappers
-> > around it.
-> > 
-> > I mean it's a matter of preference ultimately but this seems cleaner to
-> > me. So at least for the new ones we should consider it. Would also make
-> > the patch smaller.
-> > 
+On Mon, Feb 05, 2024 at 12:01:37PM -0800, Chris Leech wrote:
+> Add a UIO memtype specifically for sharing dma_alloc_coherent
+> memory with userspace, backed by dma_mmap_coherent.
 > 
-> Good suggestion. I just respun along those lines and it's a lot cleaner.
-> I'm still testing it but here is the new diffstat. It's a little larger
-> actually, but it keeps the changes more confined to namei.c:
+> This is mainly for the bnx2/bnx2x/bnx2i "cnic" interface, although there
+> are a few other uio drivers which map dma_alloc_coherent memory and will
+> be converted to use dma_mmap_coherent as well.
+> 
+> Signed-off-by: Nilesh Javali <njavali@marvell.com>
+> Signed-off-by: Chris Leech <cleech@redhat.com>
+> ---
 
-Sounds good to me!
+Building i386:allyesconfig ... failed
+--------------
+Error log:
+drivers/uio/uio.c: In function 'uio_mmap_dma_coherent':
+drivers/uio/uio.c:795:16: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
+  795 |         addr = (void *)mem->addr;
+      |                ^
+cc1: all warnings being treated as errors
+make[5]: [scripts/Makefile.build:244: drivers/uio/uio.o] Error 1 (ignored)
+drivers/uio/uio_dmem_genirq.c: In function 'uio_dmem_genirq_open':
+drivers/uio/uio_dmem_genirq.c:63:39: error: cast from pointer to integer of different size [-Werror=pointer-to-int-cast]
+   63 |                 uiomem->addr = addr ? (phys_addr_t) addr : DMEM_MAP_ERROR;
+      |                                       ^
+drivers/uio/uio_dmem_genirq.c: In function 'uio_dmem_genirq_release':
+drivers/uio/uio_dmem_genirq.c:92:43: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
+   92 |                                           (void *) uiomem->addr,
+      |                                           ^
+cc1: all warnings being treated as errors
+make[5]: [scripts/Makefile.build:244: drivers/uio/uio_dmem_genirq.o] Error 1 (ignored)
+drivers/uio/uio_pruss.c: In function 'pruss_probe':
+drivers/uio/uio_pruss.c:194:34: error: cast from pointer to integer of different size [-Werror=pointer-to-int-cast]
+  194 |                 p->mem[2].addr = (phys_addr_t) gdev->ddr_vaddr;
+      |                                  ^
+cc1: all warnings being treated as errors
+
+Caused by this patch and "uio_dmem_genirq: UIO_MEM_DMA_COHERENT conversion" as well
+as "uio_pruss: UIO_MEM_DMA_COHERENT conversion".
+
+I'd suggest to make uio dependent on 64 bit if 32 bit is no longer supported
+to prevent waste of test builds resources.
+
+Guenter
 
