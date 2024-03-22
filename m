@@ -1,135 +1,97 @@
-Return-Path: <netdev+bounces-81298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5988E886F4B
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 15:59:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDCF8886F5B
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 16:03:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B1DB1C20FC7
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 14:59:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E13E1F21D93
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 15:03:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 567C44C601;
-	Fri, 22 Mar 2024 14:59:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20D1C4CE04;
+	Fri, 22 Mar 2024 15:03:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b="bDKBAvqX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HsMClaxW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DF9F495F0
-	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 14:58:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E24B9482E4;
+	Fri, 22 Mar 2024 15:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711119541; cv=none; b=pH+EWvGc0lDLN4Q8kYlgZ9Sz57xNixr1pu+Zgh3fTzHe0FU0udtGMQ/ajzua2JgDh9dP+YdP13QifFzOm151VfWBW3q0OVKX9SUrMVIHBsJ/9kQu6Laam2YZkzxLs08BJgy03k9oIWldHYbOY1r2LPn7yL3jhaGcPEr2Q6S8+p8=
+	t=1711119820; cv=none; b=fHEfA+o9g9YL6MHnxiH0+CMRuoEGGpIXRhO00Qg3a9HNg+6jgN7QQD58jeDeH2WU4ctK6OZQojhfqEaktbWo/MrUJU1Zi3cZuID/yCEXdUDCaaXrNaPUhyYX5gGvvy0kEgT6B0jsE1XdczahcvT1v716HIxDWh02lLXPzI6/Mwo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711119541; c=relaxed/simple;
-	bh=AiQFctbzaTK1HCkBXEgz3gqDQuvM6F+0ZtsNNz8c2is=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i/0yyJTyFVPeIU3eoVeWKdaQrhsyAievyWS2ty2ZCDt2Q3uKSHj2DvYuLQ2HVnZn/MYHgIVso4unstScl/47T3nSJNWpymrop5Kk7Mmmw4H1PQfG1SCI3PG4J6nJgCo6FTYoG7a5AEzZCaQacCpoMkm6HZvq7mALNQcpns1o494=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com; spf=none smtp.mailfrom=toxicpanda.com; dkim=pass (2048-bit key) header.d=toxicpanda-com.20230601.gappssmtp.com header.i=@toxicpanda-com.20230601.gappssmtp.com header.b=bDKBAvqX; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=toxicpanda.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=toxicpanda.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-69674639df2so1343876d6.1
-        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 07:58:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=toxicpanda-com.20230601.gappssmtp.com; s=20230601; t=1711119538; x=1711724338; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MTDU5Wg5nn1gg+QWYYBqICfB2mdqSCGNI1maZh4gTUY=;
-        b=bDKBAvqXPCOq1SYaeGYjDzAnkGbsVNWCjwiigso0X+C+g0bjSkTfm82v7mxN09MzmO
-         Ho8/I/cfcJVZcz2+OHVKuuX6TVmVwoI4aWF2VKZeN1uIswX75CHqhu+yA70njtWXTL9Z
-         irxaWwsdMJQMJwrErXHX5HsBiOev5GTR2h3d04CNIpL8utN7TZLR9PC8i0LrXSbBQAXN
-         9vU7bhQptXrycGJ7oFa/MNVwbgIPZtgQMqNeNvCSzAM8sIf8uvcg3Jc9+5zuwZh8UrAs
-         uPsV2LPmXOFUwzUYFa3H6+wgtcNllZpaxpJokkjLHe7/J9ivHNXRqf+J354preWylc2p
-         5UWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711119538; x=1711724338;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MTDU5Wg5nn1gg+QWYYBqICfB2mdqSCGNI1maZh4gTUY=;
-        b=UYkcBb5ISaGsSbo0o8Js03VJJoiTzFcRqzSnwYHYle8QGz4eloQrlKvHUkNcKRQNa6
-         9FCwIlgkxdOLiosHKlay6mQmRmBea+n2v3hx1AKmwkIk5ALOOyp9M1tNlFXYnK61E52z
-         XIwAIrTGmgs4o0vgIpoyhjOJyXhgJX7WWdro50TV46kciDE7Ie74m+B7RkPFh8pMdMaO
-         Ug5VqXiMpQacJPCTxUK9SaVqLTwbUcW6pythlYwcHCoto6Q8kacuRGSxk7eS58C0AUEV
-         bCqtshNzhaxCk+7KJqF6mTA5l9pmHT8oPDomEAowlooa11Wn7DvD72MFOfTQN57grR+Q
-         2t9A==
-X-Forwarded-Encrypted: i=1; AJvYcCUeoNoeYU50vV6+k046pyPhU541TH7W4bQWPunhfw3uvDEy6vzR5bsZKlryHM1OnQ9ei88DTiaLR73G4D+R4DuvH27/yV0a
-X-Gm-Message-State: AOJu0Yyuc3nhjLZV8PxscjFSOITaTLnYN3ggn3YiOwaif32iDxxCrtgQ
-	lYQEI7TF4PMA84uSrtzdsy5JzVPAJCF4ntvVge5sHOdYp0CdwHJjlQcv5kUJBehomlL3j2enYtB
-	D
-X-Google-Smtp-Source: AGHT+IH0Kt9HxGG2lANH6AQq1guApf7R8uf0U24WWMCnk3F6Is2VwqhcqRyfaiW/sgH5mdS4Zcn+9w==
-X-Received: by 2002:a05:6214:f2e:b0:690:afbf:56d1 with SMTP id iw14-20020a0562140f2e00b00690afbf56d1mr3052823qvb.8.1711119538002;
-        Fri, 22 Mar 2024 07:58:58 -0700 (PDT)
-Received: from localhost (076-182-020-124.res.spectrum.com. [76.182.20.124])
-        by smtp.gmail.com with ESMTPSA id t12-20020a0562140c6c00b0068fddcdc381sm1161050qvj.18.2024.03.22.07.58.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Mar 2024 07:58:57 -0700 (PDT)
-Date: Fri, 22 Mar 2024 10:58:56 -0400
-From: Josef Bacik <josef@toxicpanda.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Subject: Re: [PATCH net] tcp: properly terminate timers for kernel sockets
-Message-ID: <20240322145856.GA3202449@perftesting>
-References: <20240322135732.1535772-1-edumazet@google.com>
+	s=arc-20240116; t=1711119820; c=relaxed/simple;
+	bh=wLpygW9FYxva6ods0rOQA5KWZKfQ7KIT6Udekt7Xvzc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AtNdujTpJP7Q4eFOp+OdRtzGSfQXCYah33qkT8ncN8sNtitqNTWyX+3Ju4X69jRyMRrKmo29LZE9eWjlCtiK2foQzYgFXvelUMtNd62HS4WN2AYeKc40Lm2YkbU72j7ShsrSW5LaIJvoANVlHHV37H2fqBRbdz2it0P/ykhw7YM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HsMClaxW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 677EEC433C7;
+	Fri, 22 Mar 2024 15:03:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711119819;
+	bh=wLpygW9FYxva6ods0rOQA5KWZKfQ7KIT6Udekt7Xvzc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HsMClaxWIL79OYvoZ8cCAZo3NCiLqVUVbM8EsiW5QpNgi93yEvJawTHzns5ULfJCO
+	 n00xPAvdfP0vMk06wppenLie8WV1EIjMZueUVspAQwVEmI/p2+aA3KDQK1DUESxRaW
+	 1acKFSnQkigbvo4uCcwwFDlVPgBW7lZzMB4r0dLyKweS5jummg5uz+yUlwrXwf05ba
+	 bfd6ZO/dqMDWuKkXAUs209wP8DGJflrkBVylnANK/kTyBSK4eyPaKmoKxVbCor5lDs
+	 EPK2D8hNL7Qu/eF2buvDTZ13shSleFGNj79wORHDYxPPTtkgXskAfoagKcoA6d9A33
+	 WlEuxdWcIUeMQ==
+Date: Fri, 22 Mar 2024 08:03:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Julia Lawall <julia.lawall@inria.fr>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, Dan Carpenter
+ <dan.carpenter@linaro.org>, kernel-janitors@vger.kernel.org,
+ netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org, Maciej
+ Fijalkowski <maciej.fijalkowski@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ LKML <linux-kernel@vger.kernel.org>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, David Laight <David.Laight@aculab.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jiri Pirko <jiri@resnulli.us>, Jonathan Cameron
+ <jic23@kernel.org>, Kees Cook <keescook@chromium.org>, Lukasz Czapnik
+ <lukasz.czapnik@intel.com>, Paolo Abeni <pabeni@redhat.com>, Pucha
+ Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>, Dan Williams
+ <dan.j.williams@intel.com>
+Subject: Re: [PATCH net] ice: Fix freeing uninitialized pointers
+Message-ID: <20240322080337.77a10cfd@kernel.org>
+In-Reply-To: <82b49991-eb5a-7e8c-67e0-b0fd932f40b4@inria.fr>
+References: <e5172afb-427b-423e-877a-10352cf4a007@web.de>
+	<F2FBADE8-EDF9-4987-A97B-CF4D2D1452E0@inria.fr>
+	<b9dc2c7a-2688-4a7b-8482-1e762c39449c@intel.com>
+	<20240321184828.3e22c698@kernel.org>
+	<82b49991-eb5a-7e8c-67e0-b0fd932f40b4@inria.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240322135732.1535772-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 22, 2024 at 01:57:32PM +0000, Eric Dumazet wrote:
-> We had various syzbot reports about tcp timers firing after
-> the corresponding netns has been dismantled.
-> 
-> Fortunately Josef Bacik could trigger the issue more often,
-> and could test a patch I wrote two years ago.
-> 
-> When TCP sockets are closed, we call inet_csk_clear_xmit_timers()
-> to 'stop' the timers.
-> 
-> inet_csk_clear_xmit_timers() can be called from any context,
-> including when socket lock is held.
-> This is the reason it uses sk_stop_timer(), aka del_timer().
-> This means that ongoing timers might finish much later.
-> 
-> For user sockets, this is fine because each running timer
-> holds a reference on the socket, and the user socket holds
-> a reference on the netns.
-> 
-> For kernel sockets, we risk that the netns is freed before
-> timer can complete, because kernel sockets do not hold
-> reference on the netns.
-> 
-> This patch adds inet_csk_clear_xmit_timers_sync() function
-> that using sk_stop_timer_sync() to make sure all timers
-> are terminated before the kernel socket is released.
-> Modules using kernel sockets close them in their netns exit()
-> handler.
-> 
-> Also add sock_not_owned_by_me() helper to get LOCKDEP
-> support : inet_csk_clear_xmit_timers_sync() must not be called
-> while socket lock is held.
-> 
-> It is very possible we can revert in the future commit
-> 3a58f13a881e ("net: rds: acquire refcount on TCP sockets")
-> which attempted to solve the issue in rds only.
-> (net/smc/af_smc.c and net/mptcp/subflow.c have similar code)
-> 
-> We probably can remove the check_net() tests from
-> tcp_out_of_resources() and __tcp_close() in the future.
-> 
+On Fri, 22 Mar 2024 03:24:56 -0400 (EDT) Julia Lawall wrote:
+> > At present I find this construct unreadable.
+> > I may get used to it, hard to say.
+> >
+> > Also I don't see the benefit of the auto-freeing construct,
+> > I'd venture a guess that all the bugs it may prevent would
+> > have been caught by smatch. But I'm an old curmudgeon stuck
+> > in my ways. Feel free to experiment in Intel drivers, and we'll
+> > see how it works out =F0=9F=A4=B7=EF=B8=8F =20
+>=20
+> In my experiments with of_node_put, there seem to be many functions where
+> removing the frees makes the function much more readable.  But
+> kmalloc/kfree may be used in different contexts, where the management of
+> the memory is a smaller percentage of the overall code.  So the tradeoffs
+> may be different.
 
-Thanks so much for your help with this Eric!
-
-Josef
+Good point! References are likely a very good use case for this sort
+of thing. The act of bumping a counter lacks the feeling of lifetime
+we get with an object :(
 
