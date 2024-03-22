@@ -1,139 +1,135 @@
-Return-Path: <netdev+bounces-81307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12DE88870D9
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 17:28:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B4848870E3
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 17:31:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCD821F2284B
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 16:28:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2DA5282FB9
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 16:31:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E165674E;
-	Fri, 22 Mar 2024 16:28:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02DA1E88C;
+	Fri, 22 Mar 2024 16:31:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="EWBrLKgq"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="in9L/Owx"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1152B57876;
-	Fri, 22 Mar 2024 16:28:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26065D468;
+	Fri, 22 Mar 2024 16:31:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711124933; cv=none; b=qrA+MsD2Oplsxos9p7TT5RCyNJ/mZZRTZLJy1oJEsXA6OgIIsm8x3ujAS5UxW4+TgEZR4h8+9aQ3jsrqigmEqyV9A3bLlPllKisPmBHr6SQUX+aIM8jt8Yoz6nXyjmtc92uT+vWyfThIJtRnGmV8pEoPryXHddhThPbM9q83zP0=
+	t=1711125105; cv=none; b=JYHU+JSjugnr/rD8Lt6Ud6SvZQIEpQUC7LEs2aT+i05MAWo7efl0O4sHCr7ppjIdL5hJs0sW6e2s4oCuZE21W7Mac+sBoKDpHcWR3SGKj6xtcEFzwXqt4xvOnuxq1IZbT8Sx/MHfT7In6JnNQ9/TNKVDdtV5wv3Kl2mfV7ZPY74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711124933; c=relaxed/simple;
-	bh=HCHPduluDxyIyH+NvikE4NsWGI6bZ5WsJcGstMkaba8=;
-	h=Subject:To:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=LAggexJTMmkMOKqgPMmOVUByzRcohbVw4v71ILzq8UgAxII/jK0b1xZsw6iDVUojsCCmDEaxEjY+sUu/UwfufoMpwny3uqBQiIFKKT7y0OY82IuqSU/7Ast/n9+6xMKIkYNFWd6vxUY0mHJd1TxY0/OxZC9m+DBmKQyKcWk3V9w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=EWBrLKgq; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:Subject:Sender:
-	Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=hixCqn+Oc2muuJ+PQhMb4XfVD5sY/7+CWBK1O86fCP8=; b=EWBrLKgqN4m8l3O6+O94qP2ODo
-	URMp6tGn683BPwRb8Fpew2vnz3OQ5WBxW29yWsVTp4ehqWT/HbD247K0L1F1lqRMaHZexptq5uaLg
-	x/rWMQysn22z28qRpDQaOBNykOb7EYHGrlrEoihYdaHLXUY5bXE+OkuSuafWrJ/phSNR8xCmM3wVj
-	OEkGRc6cuEz6RpKsXPLA3segwnrc+WKTj08v26v02VUkjw4JJtqUpcyYidyqRTcRBKEy4l82bDbh2
-	k5wOf5tBTYOPLzFyF+4FqK+CG3zivP2hhwVYJbvxPwDrIFVBNc+mSndvNs0JTMhu8XJoEeF2CtMWZ
-	atWNIHvw==;
-Received: from sslproxy07.your-server.de ([78.47.199.104])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rnhks-000Ook-0x; Fri, 22 Mar 2024 17:28:30 +0100
-Received: from [178.197.248.30] (helo=linux.home)
-	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1rnhkq-000BhN-1s;
-	Fri, 22 Mar 2024 17:28:28 +0100
-Subject: Re: [PATCH bpf v4] bpf: verifier: prevent userspace memory access
-To: Puranjay Mohan <puranjay12@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
- <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
- Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>,
- Jean-Philippe Brucker <jean-philippe@linaro.org>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- Ilya Leoshkevich <iii@linux.ibm.com>
-References: <20240321124640.8870-1-puranjay12@gmail.com>
- <9f2b63b5-569c-1e00-a635-93d9cd695517@iogearbox.net>
- <mb61p4jcyxq5m.fsf@gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <15ba79e3-14b2-d92e-3f94-e4f5f963e15d@iogearbox.net>
-Date: Fri, 22 Mar 2024 17:28:27 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	s=arc-20240116; t=1711125105; c=relaxed/simple;
+	bh=8LJhxXCQD+wqtKoDkgpPXOqd45cr4Vf2KPCBquLBOjo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m51hG468eSifZ5qKyD2lPxylsd+GR+8qimLKm8+6C/D/e+BH2tg0nImlGNv1KsMFwC/FOaedeEt44J/o8R1iqMjyqSEtQFmtP6G9ANqr16Kg4uLXO2JptZ+OmXAoZssawByqqtfcR6VJ7+tYTtPXa6uJkcgLo40SmVfM9lUM7nQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=in9L/Owx; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1711125098;
+	bh=8LJhxXCQD+wqtKoDkgpPXOqd45cr4Vf2KPCBquLBOjo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=in9L/OwxVLBeWYnkf8nGXvSJmViCoHW5+lzOtfOpf/PwuJqIUlGjqh1QGOQeYRzEf
+	 e8RtkjcnB5s8/M5RNO5OAeJkcLiraaToEUIwlJ4kmYdrDaY1e8GY40M3AOHAU9Um4K
+	 JbzvoN3HXduDPwuqh3jAVV7/k/IC3UeVMiRF4TQA=
+Date: Fri, 22 Mar 2024 17:31:37 +0100
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+To: Joel Granados <j.granados@samsung.com>
+Cc: Luis Chamberlain <mcgrof@kernel.org>, 
+	Kees Cook <keescook@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v3 0/2] sysctl: treewide: prepare ctl_table_root for
+ ctl_table constification
+Message-ID: <e4de72dc-8dad-4c57-85b3-174272bd1530@t-8ch.de>
+References: <CGME20240315181141eucas1p267385cd08f77d720e58b038be06d292e@eucas1p2.samsung.com>
+ <20240315-sysctl-const-ownership-v3-0-b86680eae02e@weissschuh.net>
+ <20240322124709.w5ntjwb5tbumltoy@joelS2.panther.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <mb61p4jcyxq5m.fsf@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27222/Fri Mar 22 09:30:59 2024)
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20240322124709.w5ntjwb5tbumltoy@joelS2.panther.com>
 
-On 3/22/24 4:05 PM, Puranjay Mohan wrote:
-[...]
->>> +		/* Make it impossible to de-reference a userspace address */
->>> +		if (BPF_CLASS(insn->code) == BPF_LDX &&
->>> +		    (BPF_MODE(insn->code) == BPF_PROBE_MEM ||
->>> +		     BPF_MODE(insn->code) == BPF_PROBE_MEMSX)) {
->>> +			struct bpf_insn *patch = &insn_buf[0];
->>> +			u64 uaddress_limit = bpf_arch_uaddress_limit();
->>> +
->>> +			if (!uaddress_limit)
->>> +				goto next_insn;
->>> +
->>> +			*patch++ = BPF_MOV64_REG(BPF_REG_AX, insn->src_reg);
->>> +			if (insn->off)
->>> +				*patch++ = BPF_ALU64_IMM(BPF_ADD, BPF_REG_AX, insn->off);
->>> +			*patch++ = BPF_ALU64_IMM(BPF_RSH, BPF_REG_AX, 32);
->>> +			*patch++ = BPF_JMP_IMM(BPF_JLE, BPF_REG_AX, uaddress_limit >> 32, 2);
->>> +			*patch++ = *insn;
->>> +			*patch++ = BPF_JMP_IMM(BPF_JA, 0, 0, 1);
->>> +			*patch++ = BPF_MOV64_IMM(insn->dst_reg, 0);
->>
->> But how does this address other cases where we could fault e.g. non-canonical,
->> vsyscall page, etc? Technically, we would have to call to copy_from_kernel_nofault_allowed()
->> to really address all the cases aside from the overflow (good catch btw!) where kernel
->> turns into user address.
+On 2024-03-22 13:47:09+0100, Joel Granados wrote:
+> On Fri, Mar 15, 2024 at 07:11:29PM +0100, Thomas Weißschuh wrote:
+> > The two patches were previously submitted on their own.
+> > In commit f9436a5d0497
+> > ("sysctl: allow to change limits for posix messages queues")
+> > a code dependency was introduced between the two callbacks.
+> > This code dependency results in a dependency between the two patches, so
+> > now they are submitted as a series.
+> > 
+> > The series is meant to be merged via the sysctl tree.
+> > 
+> > There is an upcoming series that will introduce a new implementation of
+> > .set_ownership and .permissions which would need to be adapted [0].
+> > 
+> > These changes ere originally part of the sysctl-const series [1].
+> > To slim down that series and reduce the message load on other
+> > maintainers to a minimum, the patches are split out.
+> > 
+> > [0] https://lore.kernel.org/lkml/20240222160915.315255-1-aleksandr.mikhalitsyn@canonical.com/
+> > [1] https://lore.kernel.org/lkml/20231204-const-sysctl-v2-2-7a5060b11447@weissschuh.net/
+> > 
+> > Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+> > ---
+> > Changes in v3:
+> > - Drop now spurious argument in fs/proc/proc_sysctl.c
+> > - Rebase on next-20240315
+> > - Incorporate permissions patch.
+> > - Link to v2 (ownership): https://lore.kernel.org/r/20240223-sysctl-const-ownership-v2-1-f9ba1795aaf2@weissschuh.net
+> > - Link to v1 (permissions): https://lore.kernel.org/r/20231226-sysctl-const-permissions-v1-1-5cd3c91f6299@weissschuh.net
+> > 
+> > Changes in v2:
+> > - Rework commit message
+> > - Mention potential conflict with upcoming per-namespace kernel.pid_max
+> >   sysctl
+> > - Delete unused parameter table
+> > - Link to v1: https://lore.kernel.org/r/20231226-sysctl-const-ownership-v1-1-d78fdd744ba1@weissschuh.net
+> > 
+> > ---
+> > Thomas Weißschuh (2):
+> >       sysctl: treewide: drop unused argument ctl_table_root::set_ownership(table)
+> >       sysctl: treewide: constify argument ctl_table_root::permissions(table)
+> > 
+> >  fs/proc/proc_sysctl.c  | 2 +-
+> >  include/linux/sysctl.h | 3 +--
+> >  ipc/ipc_sysctl.c       | 5 ++---
+> >  ipc/mq_sysctl.c        | 5 ++---
+> >  kernel/ucount.c        | 2 +-
+> >  net/sysctl_net.c       | 3 +--
+> >  6 files changed, 8 insertions(+), 12 deletions(-)
+> > ---
+> > base-commit: a1e7655b77e3391b58ac28256789ea45b1685abb
+> > change-id: 20231226-sysctl-const-ownership-ff75e67b4eea
+> > 
+> > Best regards,
+> > -- 
+> > Thomas Weißschuh <linux@weissschuh.net>
+> > 
 > 
-> So, we are trying to ~simulate a call to
-> copy_from_kernel_nofault_allowed() here. If the address under
-> consideration is below TASK_SIZE (TASK_SIZE + 4GB to be precise) then we
-> skip that load because that address could be mapped by the user.
-> 
-> If the address is above TASK_SIZE + 4GB, we allow the load and it could
-> cause a fault if the address is invalid, non-canonical etc. Taking the
-> fault is fine because JIT will add an exception table entry for
-> for that load with BPF_PBOBE_MEM.
+> Will put this to test and then try to rebase it to 6.9-rc1 once it comes
+> out.
 
-Are you sure? I don't think the kernel handles non-canonical fixup.
+Thanks!
+Your changes to the commit messages look good.
 
-> The vsyscall page is special, this approach skips all loads from this
-> page. I am not sure if that is acceptable.
+For my other changes I'm planning to resubmit all of them during the
+weekend or next week.
 
-The bpf_probe_read_kernel() does handle it fine via copy_from_kernel_nofault().
 
-So there is tail risk that BPF_PROBE_* could trigger a crash. Other archs might
-have other quirks, e.g. in case of loongarch it says highest bit set means kernel
-space.
+Thomas
 
