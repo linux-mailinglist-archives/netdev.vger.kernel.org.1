@@ -1,60 +1,57 @@
-Return-Path: <netdev+bounces-81344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81345-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CCB98874E3
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 23:43:52 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 584AF8874E9
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 23:47:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 111E92830DA
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 22:43:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E34F01F2400F
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 22:47:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44D8082885;
-	Fri, 22 Mar 2024 22:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1766E81750;
+	Fri, 22 Mar 2024 22:47:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ROSxjC4G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i2brwd7U"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB7881740;
-	Fri, 22 Mar 2024 22:43:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E837226AD4
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 22:47:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711147419; cv=none; b=YqXVxquRofCS2/D5cDG0DNQLoD1Fmpx0tu9/ynetO5lJEeXGbiR21k09wx8kDXLGmQGlmaq1mfSNAtnM2nlhSLjV/SMm2A9x5ykGfgKgcrcVXyT05W5mrXr7726nYqXYbpgbEQcz0D5O16t4HMyYdcQYzaOxtLhaYJsS2TwxYiQ=
+	t=1711147626; cv=none; b=EVtl1qlh9Z3YUIX7nUY8wP0FmkIml4b6HnPryVAQo0FMUVElm5nzwt3P/bhr4R9w7t/Ux+fAwhCAp7IIenB7mrtAvBabBAcgFHImonLX/mMCSRVj/nv/cnpcyu9VV7yMWMsrg5kLI5bLG35R9McwY1CpIaTBjKWOFFWDvsJyY4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711147419; c=relaxed/simple;
-	bh=aN/sBseW/A42djcc7C5Ic5yAvi5gLg7pYn4+yQh8174=;
+	s=arc-20240116; t=1711147626; c=relaxed/simple;
+	bh=SupyVteZIW2XkRPxZ1srwhsGPIY/5D/mJC0Ki4YGOC4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RrS5kyS0Wxco4YShG0BLZxaX7oXhI2aMB/7zDUE2MsdLRcIiv6nRaHQ/6mHpXJaembxnuBTC3Dfi/o974i0WO4zSY+iRAoOHadT81degfCtIxe9bDyVYNrkaEFST/u7o4SAterLPH8GQLbMjWCPK8aVb+IS65ChpqgzTkKFkNkc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ROSxjC4G; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E3DBC433C7;
-	Fri, 22 Mar 2024 22:43:38 +0000 (UTC)
+	 MIME-Version:Content-Type; b=beYp+zTM2jM7osb2znMpax21XqFUJegSnj9YV4dqGKPN9P2+AFVuO8CaXC1hMlny6QrAALDep0fex+nMOyHiwWSrdEi69u7IeD2vK3Ez1QoUVaaEmQ6dPIRTgZzPP88rjl1JIKHv+6eFm+++oytGBWyfhSkGMZ5comPOshfSd4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i2brwd7U; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17A84C433F1;
+	Fri, 22 Mar 2024 22:47:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711147418;
-	bh=aN/sBseW/A42djcc7C5Ic5yAvi5gLg7pYn4+yQh8174=;
+	s=k20201202; t=1711147625;
+	bh=SupyVteZIW2XkRPxZ1srwhsGPIY/5D/mJC0Ki4YGOC4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ROSxjC4GSYNreV1Fl54PtXf0zi8Y7Km8p6pIlE8+RGOvXHTaWFDKPO75Ipmrd23nM
-	 3UPKezPW93eUTC093iowNoZb9vGYcKxDlRy9MipM0Dq5BzJmY+OHICt0ayBEJ/q5Vc
-	 ppP/Bf4i6CLJbLrx49r+JyEUB32NwFCP5KC1qc1npEnLHNZQ4lAFITesi0btb9oE2C
-	 +QhnYIUYFf/id5ZmHBo+sCcmuevd1R36I3mPt9rQPWLazBuFdxrQCGXTsLYkAIvBjB
-	 hbxO8MISgN5hv4MHz47XsQio5GeGXLbcuZ5r4M7qOQ8wxwCMQ12b1aujIN7GFpuHqS
-	 BguX/FXG9DXDw==
-Date: Fri, 22 Mar 2024 15:43:37 -0700
+	b=i2brwd7UzvIuvC7hVD6lwvAhocOXRZmgUzNkmxL4rrWb2D6zl1sM6+U6blvYwKR4C
+	 bAGyAVp83LYqUYVWPJP8gMNEDXBSgRHDNTUD+R/Mbq30ooYXQPfJUz5vVV1esZTKTY
+	 wKzl18ePC8kdAEKoyAgPuTcyWvde+34EE66yyANMmmogBnYIY1Ppc24lEx5+8doh+9
+	 N5m0rKf8Lzosd6JH2uITDq2DHoVO8fXoIkaDOgLDH3aQKj8ydYXfWYaApeMjG8CkB5
+	 zTLhsgwv9UBvAG6D3o5o0aRO+bcSBCiHNGXLrRhMNBwFDkBdzJ+GqmqzVtZQ2oHSH0
+	 C4jUWiH+phTYw==
+Date: Fri, 22 Mar 2024 15:47:04 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Aleksandr Mishin <amishin@t-argos.ru>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Kees Cook
- <keescook@chromium.org>, Justin Stitt <justinstitt@google.com>, Felix
- Manlunas <felix.manlunas@cavium.com>, Satanand Burla
- <satananda.burla@cavium.com>, Raghu Vatsavayi <raghu.vatsavayi@cavium.com>,
- Vijaya Mohan Guvva <vijaya.guvva@cavium.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
-Subject: Re: [PATCH net v2] liquidio: Fix potential null pointer dereference
-Message-ID: <20240322154337.4f78858c@kernel.org>
-In-Reply-To: <20240322195744.9050-1-amishin@t-argos.ru>
-References: <20240322195744.9050-1-amishin@t-argos.ru>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, Josef
+ Bacik <josef@toxicpanda.com>, Tetsuo Handa
+ <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: Re: [PATCH net] tcp: properly terminate timers for kernel sockets
+Message-ID: <20240322154704.7ed4d55f@kernel.org>
+In-Reply-To: <20240322135732.1535772-1-edumazet@google.com>
+References: <20240322135732.1535772-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,15 +61,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 22 Mar 2024 22:57:44 +0300 Aleksandr Mishin wrote:
-> In lio_vf_rep_copy_packet() pg_info->page is compared to a NULL value,
-> but then it is unconditionally passed to skb_add_rx_frag() which could
-> lead to null pointer dereference.
-> Fix this bug by moving skb_add_rx_frag() into conditional scope.
+On Fri, 22 Mar 2024 13:57:32 +0000 Eric Dumazet wrote:
+> +	if (!sk->sk_net_refcnt)
+> +		inet_csk_clear_xmit_timers_sync(sk);
 
-The explanation should tell us how the bug can happen, i.e. what
-sequence of events leads to null-deref. Not what logic your tool
-matched on, perhaps the NULL check is unnecessary.
--- 
-pw-bot: cr
+The thought that we should clear or poison sk_net at this point
+(whether sk->sk_net_refcnt or not) keeps coming back to me.
+If we don't guarantee the pointer is valid - to make it easier
+for syzbot to catch invalid accesses?
 
