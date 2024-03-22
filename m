@@ -1,142 +1,134 @@
-Return-Path: <netdev+bounces-81341-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81342-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 103D18874B6
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 23:08:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DBDA38874D5
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 23:29:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 429951C21628
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 22:08:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF0141C225E6
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 22:29:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E87481204;
-	Fri, 22 Mar 2024 22:07:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54B6F7FBA7;
+	Fri, 22 Mar 2024 22:29:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="borZRU/G"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yfrvu1U/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA23680629;
-	Fri, 22 Mar 2024 22:07:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2514C17589;
+	Fri, 22 Mar 2024 22:29:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711145277; cv=none; b=WNcD/eH7wEXoU1Jv95hBdJzohyn5tXIFG9No/jJXYmbfh5VGxzW5sQTHlfBLT9xi6b8d2qoC+JyJWVs54+tcRQHvJ5hlPy9Vrr3TcxygIj46eyM5wmS6aS+k1Vl18A4SLSenPrEeDDdJy3WB22vb+Qeej5DRxfT3dwxVZto9P9w=
+	t=1711146567; cv=none; b=LeC19TV5WLBB83RQG2I3IylUr9rVpAN4LnOstS8p2Um3YTGOPufaEdYAqFgAn//yO+LvpgCUy/yz04oFFP6KVWPHezjUEaWW8OfXK1YiwTbkXcBh1bmAJ86nnWsYB+hpZMebQlZrobNuDgq5+1cq4BjmSyJI0c0jWtFOhy2qaWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711145277; c=relaxed/simple;
-	bh=6hrbMTOU1EYyulynZyTwGilqoefgMexug9LPZylnaWg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BMKyV54M8MmPBLvxgN8mkjmo87J49qrD2hlWT+4V3kXCEVf7+z1tFycHIIQDtUzPnHhKTJJLoEvB9PrwmVG5WxfGE1t5rDWFh7MzGISM3bbk3dmjoT8NgADqQ6dLSlJ/G7p07gPfS2mQqPSYuGvl6RwtA9HGlaGLyw6HUN0WFD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=borZRU/G; arc=none smtp.client-ip=99.78.197.220
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1711145272; x=1742681272;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=h/WOCoJGg/LvM9qqN1EvQhSNHgEtToPxH0fvwMToOoI=;
-  b=borZRU/GF7TZu7uxHo6uS6nBDZG1DkpLAK6YnfAgNHENLrSABMOSCIBn
-   waPvSrn1+sOxT6FjK9ax2NgZzAFrIngAqhrakzwy+ofgbxgLVFz3nH7vc
-   uX4r6wdtOhai/WUTNBhR9uX4BlmXofZdiQt3DoWwQb40GtmMvYZ7A7X8c
-   0=;
-X-IronPort-AV: E=Sophos;i="6.07,147,1708387200"; 
-   d="scan'208";a="75530079"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 22:07:50 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:49113]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.15.55:2525] with esmtp (Farcaster)
- id d4817f84-8b84-4d23-be95-419932aa795a; Fri, 22 Mar 2024 22:07:50 +0000 (UTC)
-X-Farcaster-Flow-ID: d4817f84-8b84-4d23-be95-419932aa795a
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 22 Mar 2024 22:07:49 +0000
-Received: from 88665a182662.ant.amazon.com (10.106.101.48) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Fri, 22 Mar 2024 22:07:46 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <linux@weissschuh.net>
-CC: <davem@davemloft.net>, <dmitry.torokhov@gmail.com>,
-	<ebiederm@xmission.com>, <edumazet@google.com>, <j.granados@samsung.com>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <linux-kernel@vger.kernel.org>,
-	<mcgrof@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
-	<stable@vger.kernel.org>
-Subject: Re: [PATCH v2] fs/proc/proc_sysctl.c: always initialize i_uid/i_gid
-Date: Fri, 22 Mar 2024 15:07:36 -0700
-Message-ID: <20240322220736.77465-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20240322-sysctl-net-ownership-v2-1-a8b4a3306542@weissschuh.net>
-References: <20240322-sysctl-net-ownership-v2-1-a8b4a3306542@weissschuh.net>
+	s=arc-20240116; t=1711146567; c=relaxed/simple;
+	bh=OYmXPcRz/hhM71/Ak6y2mWSI2AZdABQ0mCMqdj6Hv+Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gwXPrSoROsHvAqpzD7+Ubbz8ufJJChLCKxM6M45ti0nmdxMavJ3HDFMI98zODqp5rlCPWoWHry+KEun2XZ78ZifRpzoDEN7EpWwfiWypb6+ZdXIAqwqtuGllnGFyKPxvRjig8GcDC5XOuUFKeRa/fvKbJhQRNIPPSilv0GvxRLM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yfrvu1U/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CD6BC433C7;
+	Fri, 22 Mar 2024 22:29:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711146565;
+	bh=OYmXPcRz/hhM71/Ak6y2mWSI2AZdABQ0mCMqdj6Hv+Y=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Yfrvu1U/BJGu9shuXoAnC8YCF9MGozwb2uRn+f4hbCJV1/SCdGlJxas6knlCf2NVB
+	 thF9XuIm5SBVV6s7QWk/gorDlBSTldqgtPk5xfSUTVSOkWWPM5+7iL/OuqwgGpkAJC
+	 k5ANzIfdjdT2rhUrFwRWC+0NzFF1e6AeeGV8+JspTmoFl8mwigDZAEHLAGBTJzPknM
+	 tJR/gl6Qf3wlrl0Rco2s2bHalXNLnGZb8nmcU6vpddf/ZIMLfRw0zCUbS38T4TIwOD
+	 VI4+DFBUHTe/Xi9xGw7XukiDD4quZA8FXFepAOhFLAOBoOBrTD5sAiNj0bdAF9TiTQ
+	 ohBkVrjcT+TUg==
+Date: Fri, 22 Mar 2024 15:29:24 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jason Gunthorpe <jgg@nvidia.com>
+Cc: Andy Gospodarek <andrew.gospodarek@broadcom.com>, David Ahern
+ <dsahern@kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Christoph Hellwig <hch@infradead.org>, Saeed Mahameed <saeed@kernel.org>,
+ Arnd Bergmann <arnd@arndb.de>, Leon Romanovsky <leonro@nvidia.com>, Jiri
+ Pirko <jiri@nvidia.com>, Leonid Bloch <lbloch@nvidia.com>, Itay Avraham
+ <itayavr@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>, Aron Silverton
+ <aron.silverton@oracle.com>, linux-kernel@vger.kernel.org,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
+Message-ID: <20240322152924.64be7ec4@kernel.org>
+In-Reply-To: <20240322214423.GL159172@nvidia.com>
+References: <20240207072435.14182-1-saeed@kernel.org>
+	<Zcx53N8lQjkpEu94@infradead.org>
+	<ZczntnbWpxUFLxjp@C02YVCJELVCG.dhcp.broadcom.net>
+	<20240214175735.GG1088888@nvidia.com>
+	<20240304160237.GA2909161@nvidia.com>
+	<9cc7127f-8674-43bc-b4d7-b1c4c2d96fed@kernel.org>
+	<2024032248-ardently-ribcage-a495@gregkh>
+	<510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
+	<Zf2n02q0GevGdS-Z@C02YVCJELVCG>
+	<20240322135826.1c4655e2@kernel.org>
+	<20240322214423.GL159172@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D046UWA003.ant.amazon.com (10.13.139.18) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: "Thomas Weißschuh" <linux@weissschuh.net>
-Date: Fri, 22 Mar 2024 20:51:11 +0100
-> Commit e79c6a4fc923 ("net: make net namespace sysctls belong to container's owner")
-> added default values for i_uid/i_gid.
+On Fri, 22 Mar 2024 18:44:23 -0300 Jason Gunthorpe wrote:
+> On Fri, Mar 22, 2024 at 01:58:26PM -0700, Jakub Kicinski wrote:
+> > > Well said, David.
+> > > 
+> > > I would totally support doing something like this in a fairly generic
+> > > way that could be leveraged/instantiated by drivers that will allow
+> > > communication/inspection of hardware blocks in the datapath.  There are
+> > > lots of different ways this could go, so feedback on this would help get
+> > > us all moving in the right direction.  
+> > 
+> > The more I learn, the more I am convinced that the technical
+> > justifications here are just smoke and mirrors.  
+> 
+> Let's see some evidence of this then, point to some sillicon devices
+> in the multibillion gate space that don't have complex FW built into
+> their design?
 
-The commit that added the default is 5ec27ec735ba ("fs/proc/proc_sysctl.c:
-fix the default values of i_uid/i_gid on /proc/sys inodes.")
+Existence of complex FW does not imply that production systems must
+have a backdoor to talk to that FW in kernel-unmitigated fashion.
 
+As an existence proof I give you NICs we use at Meta.
+Or old Netronome NICs, you can pick.
 
-> These however are only used when ctl_table_root->set_ownership is not
-> implemented.
-> But the callbacks themselves could fail to compute i_uid/i_gid and they
-> all need to have the same fallback logic for this case.
+> > The main motivation for nVidia, Broadcom, (and Enfabrica?) being to
+> > hide as much as possible of what you consider your proprietary
+> > advantage in the "AI gold rush".  
 > 
-> This is unnecessary code duplication and prone to errors.
-> For example net_ctl_set_ownership() missed the fallback.
+> Despite all of those having built devices like this well before the
+> "AI gold rush" and it being a general overall design principle for the
+> industry because, yes, the silicon technology available actually
+> demands it.
 > 
-> Instead always initialize i_uid/i_gid inside the sysfs core so
-> set_ownership() can safely skip setting them.
+> It is not to say you couldn't do otherwise, it is just simply too
+> expensive.
+
+I do agree that it is expensive, not sure if it's "too" expensive.
+But Linux never promised that our way of doing SW development would
+always be the most cost effective option, right? Especially short
+term. Or that we'll be competitive time to market.
+
+> > RDMA is what it is but I really hate how you're trying to pretend
+> > that it's is somehow an inherent need of advanced technology and
+> > we need to lower the openness standards for all of the kernel.  
 > 
-> Fixes: e79c6a4fc923 ("net: make net namespace sysctls belong to container's owner")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
-> ---
-> Changes in v2:
-> - Move the fallback logic to the sysctl core
-> - Link to v1: https://lore.kernel.org/r/20240315-sysctl-net-ownership-v1-1-2b465555a292@weissschuh.net
-> ---
->  fs/proc/proc_sysctl.c | 6 ++----
->  1 file changed, 2 insertions(+), 4 deletions(-)
-> 
-> diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
-> index 37cde0efee57..9e34ab9c21e4 100644
-> --- a/fs/proc/proc_sysctl.c
-> +++ b/fs/proc/proc_sysctl.c
-> @@ -479,12 +479,10 @@ static struct inode *proc_sys_make_inode(struct super_block *sb,
->  			make_empty_dir_inode(inode);
->  	}
->  
-> +	inode->i_uid = GLOBAL_ROOT_UID;
-> +	inode->i_gid = GLOBAL_ROOT_GID;
->  	if (root->set_ownership)
->  		root->set_ownership(head, table, &inode->i_uid, &inode->i_gid);
-> -	else {
-> -		inode->i_uid = GLOBAL_ROOT_UID;
-> -		inode->i_gid = GLOBAL_ROOT_GID;
-> -	}
->  
->  	return inode;
->  }
-> 
-> ---
-> base-commit: ff9c18e435b042596c9d48badac7488e3fa76a55
-> change-id: 20240315-sysctl-net-ownership-bc4e17eaeea6
-> 
-> Best regards,
-> -- 
-> Thomas Weißschuh <linux@weissschuh.net>
+> Open hardware has never been an "openness standard" for the kernel.
+
+I was in the meeting with a vendor this morning and when explicitly
+asked by an SRE (not from my org nor in any way "primed" by me)
+whether configuration of some run of the mill PCI thing can be exposed
+via devlink params instead of whatever proprietary thing the vendor was
+pitching, the vendor's answer was silence and then a pitch of another
+proprietary mechanism.
+
+So no, the "open hardware" is certainly not a requirement for the
+kernel. But users can't get vendors to implement standard Linux
+configuration interfaces, and your proposal will make it a lot worse.
 
