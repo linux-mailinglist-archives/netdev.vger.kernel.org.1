@@ -1,109 +1,99 @@
-Return-Path: <netdev+bounces-81278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90E92886CAB
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 14:18:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6841886CD1
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 14:26:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B8D9286576
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:18:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5774FB21D71
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:25:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24FC64596E;
-	Fri, 22 Mar 2024 13:18:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A02F45BFC;
+	Fri, 22 Mar 2024 13:25:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qNjPHxbB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JnrrkVnm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFCC23B2AD;
-	Fri, 22 Mar 2024 13:18:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20B8D4501D;
+	Fri, 22 Mar 2024 13:25:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711113504; cv=none; b=rgY3e5DSjod76lJRX3kayx9W1gAcg26Z28aDviahinbzGRx4krXnZ6YWsZi8gebhVcyGZSpx/JDp9njloM6DujD+pUGQTSY42BK/b2bSCnXC/flQjYlsoMS/Hi5PDA8VQIWvkeOMxOSqV5Asklv1ffk8uB5h1d5/LVQx3O49Xxk=
+	t=1711113955; cv=none; b=nG9U3WJHSBvYkPwF3fQf783YMd1PqFC73VVx2l7PCQLFBwI6bBmbAO9tPcIbaGm56FSVl9nLB98uOXlPJx5Nnb3iZyEe1DIv0GxaxwnkbOMYqW+47h/rMDiQkFgpHagthAgcgxBf5aMaGodVg33vlWrj+iMcLlmLdvn7iXPyEng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711113504; c=relaxed/simple;
-	bh=QkxlbL9Dz3q0VP2PaBOmanPcZ3wN5llL2k7kbQgmFS4=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kL6EI4OwF+xirxKhcxuCxFAXAaS5fMfe/Go452H9/qgHWNaFM5UdgakzOen1yuCU17WRFs9sMf7UXitx6A2ZabJAh4MN15wLV4ZAcmH4tSgpn8Z+Drv4vXio5PdZrzXjAFw7Q13mNKPpdriPeD1JDLQOddTXsBgRJBN1MFrl4bI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qNjPHxbB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DDAEC433C7;
-	Fri, 22 Mar 2024 13:18:20 +0000 (UTC)
+	s=arc-20240116; t=1711113955; c=relaxed/simple;
+	bh=CENpD5NgmAJhS3D1ZXkdYGmEklIoEZGQs/+tbDdphNA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cbXA6TZZRI4ysZppLSCGjsoknu8n4Cy4PHFm7hPiSZ+ZA9Emdai9Ooo4/vnREk5W5AQOTcxIfH+wkno49Zu1xc6KA8xGXdVaNPJPOtF+ap/7Am1jjNVgnf0oZAMQRDP2nU1hzzhtiIYTo0QQ+eB0zzS92m+HJ4wT9iFk06fOrcU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JnrrkVnm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5D02C433F1;
+	Fri, 22 Mar 2024 13:25:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711113503;
-	bh=QkxlbL9Dz3q0VP2PaBOmanPcZ3wN5llL2k7kbQgmFS4=;
-	h=From:To:Cc:Subject:Date:From;
-	b=qNjPHxbBHGaPbBGHkNFLf5H/PUZMJpbo6UtkZvj0XJQu5FlNb281smi/D1927oI4l
-	 mlktAC1BrW53lQl5cs5ENEotjKZQ+k1kB5LfBpOD1l8daFVEobHTbKvSeLa+N9C/6/
-	 UsYGM+dDI9w0DUJaAdQO1Fgx4/pEoT+7hjyRc/Rk6tB8hljQwQhaspdO1JKKDJTSVi
-	 lM1isxgLX/LsHWRwHGuwppXZwLvKwYwdOasHfFbucv8HLU2GvDxOkRtDlMOSAEWJGE
-	 I0tGjNKYKZ3QibhF4o3BmHRh4p5uif229XV1HDinXxdeHutrprblfgFD7AB243BHe9
-	 5gvzcw9tlV+uA==
-From: Arnd Bergmann <arnd@kernel.org>
-To: "David S. Miller" <davem@davemloft.net>,
+	s=k20201202; t=1711113954;
+	bh=CENpD5NgmAJhS3D1ZXkdYGmEklIoEZGQs/+tbDdphNA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JnrrkVnmIrKqbKLZjGbRSzx7y3YfQyc7PgmFZWmwbjz345aiSwtKplKgRuaEnTF5u
+	 uU3T+NlHWG3MCJ5Vwaej26vx0+N6U9YtsgnG5nW3l+mtpEL7IgNFH323KXJLhZyyOV
+	 tMDyRgPVO2+qzNtj84FS5qcnKiHuk/iGk3hufWopnrK3NMjud6qZ0cWWWrQHejWZB3
+	 JtAKPT4expA4Jvck6GCuitaHss6aJ0optS4vhUqewcBP8okggAXfJ0zb42eZvDJm6f
+	 CnDkhQo370bZnamTExR0XEYe63E0VHbf2k5iqzYWNLJS05jq4KGI/XXVIYeuaF+SOE
+	 B57PNzZdlWsQA==
+Date: Fri, 22 Mar 2024 13:25:49 +0000
+From: Simon Horman <horms@kernel.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	Kunwu Chan <chentao@kylinos.cn>,
-	Joel Granados <joel.granados@gmail.com>,
-	Zhengchao Shao <shaozhengchao@huawei.com>,
-	Wangyang Guo <wangyang.guo@intel.com>,
-	Kyle Zeng <zengyhkyle@gmail.com>,
-	Beniamino Galvani <b.galvani@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] ipv4/route: avoid unused-but-set-variable warning
-Date: Fri, 22 Mar 2024 14:18:12 +0100
-Message-Id: <20240322131817.905700-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>,
+	Ville Nuorvala <vnuorval@tcs.hut.fi>, Arnd Bergmann <arnd@arndb.de>,
+	Kui-Feng Lee <thinker.li@gmail.com>,
+	Breno Leitao <leitao@debian.org>, Kunwu Chan <chentao@kylinos.cn>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] ipv6: fib: hide unused 'pn' variable
+Message-ID: <20240322132549.GG372561@kernel.org>
+References: <20240322131746.904943-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240322131746.904943-1-arnd@kernel.org>
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Fri, Mar 22, 2024 at 02:14:10PM +0100, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> When CONFIG_IPV6_SUBTREES is disabled, the only user is hidden, causing
+> a 'make W=1' warning:
+> 
+> net/ipv6/ip6_fib.c: In function 'fib6_add':
+> net/ipv6/ip6_fib.c:1388:32: error: variable 'pn' set but not used [-Werror=unused-but-set-variable]
+> 
+> Add another #ifdef around the variable declaration, matching the other
+> uses in this file.
+> 
+> Fixes: 66729e18df08 ("[IPV6] ROUTE: Make sure we have fn->leaf when adding a node on subtree.")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 
-The log_martians variable is only used in an #ifdef, causing a 'make W=1'
-warning with gcc:
+## Form letter - net-next-closed
 
-net/ipv4/route.c: In function 'ip_rt_send_redirect':
-net/ipv4/route.c:880:13: error: variable 'log_martians' set but not used [-Werror=unused-but-set-variable]
+(text from Jakub)
 
-Change the #ifdef to an equivalent IS_ENABLED() to let the compiler
-see where the variable is used.
+The merge window for v6.9 has begun and therefore net-next is closed
+for new drivers, features, code refactoring and optimizations.
+We are currently accepting bug fixes only.
 
-Fixes: 30038fc61adf ("net: ip_rt_send_redirect() optimization")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- net/ipv4/route.c | 4 +---
- 1 file changed, 1 insertion(+), 3 deletions(-)
+Please repost when net-next reopens after March 25th.
 
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index c8f76f56dc16..d36ace160d42 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -926,13 +926,11 @@ void ip_rt_send_redirect(struct sk_buff *skb)
- 		icmp_send(skb, ICMP_REDIRECT, ICMP_REDIR_HOST, gw);
- 		peer->rate_last = jiffies;
- 		++peer->n_redirects;
--#ifdef CONFIG_IP_ROUTE_VERBOSE
--		if (log_martians &&
-+		if (IS_ENABLED(CONFIG_IP_ROUTE_VERBOSE) && log_martians &&
- 		    peer->n_redirects == ip_rt_redirect_number)
- 			net_warn_ratelimited("host %pI4/if%d ignores redirects for %pI4 to %pI4\n",
- 					     &ip_hdr(skb)->saddr, inet_iif(skb),
- 					     &ip_hdr(skb)->daddr, &gw);
--#endif
- 	}
- out_put_peer:
- 	inet_putpeer(peer);
--- 
-2.39.2
+RFC patches sent for review only are welcome at any time.
 
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+--
+pw-bot: defer
 
