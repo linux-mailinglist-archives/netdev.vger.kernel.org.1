@@ -1,254 +1,202 @@
-Return-Path: <netdev+bounces-81146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D85C8886491
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 02:07:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DB788864AE
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 02:28:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2E37B224EE
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 01:07:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF3361F236FE
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 01:28:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B7AF376;
-	Fri, 22 Mar 2024 01:07:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38BB06FAE;
+	Fri, 22 Mar 2024 01:28:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fOD4c2OG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JptDIvyH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6286D10E3;
-	Fri, 22 Mar 2024 01:07:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E96CD4A3C;
+	Fri, 22 Mar 2024 01:28:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711069642; cv=none; b=JOc0z5JX1ujYQKEi/kqhwRb36BbVdidqK9po1vfm619vWYQ/C2TiugxsVX7SJUSI7YRNFrb4Xe+Gpv8Xm2uEbx2JmJQnaE6CbHgxPYJYvKIIKTscaUWah9ZZzFcmBmrSn4QJ0gArsYCKsLf1WAmXqO9neJ2ymFBWXvxRztyLqAA=
+	t=1711070907; cv=none; b=W91QYvCg/mMrdb7X9vcCNgk7tRH3vtgy3LFNtpI0vlcpQ6VKIQKRAKsNBkumPOitzAHz0VhgL/eku5au+pvDbfA8FzLBlVivGdCL7s8ftXhpi4SNn5DiDwrXgWZKfzomHGhRGSnF3Y7vVy/6PzvnB3o9eBKFCicfOTlLaI5n+Sc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711069642; c=relaxed/simple;
-	bh=nJns0ykI9BUIolxCHFqmEyPMsLF/6Gg8ckxT3RYpSPM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KgIt6vfNvZ5OqMFG+FeoK+qX5hwAXKvTQTGgJjCQWg7q/ZSFq8A1lyOGINh5K05NdyAZsOoZXw05BkLImRmrLGbJGizReUwshuMRp4q8GtmXA716raaw/+vu7yqVkqrUSCdSfbEh3KHAMfagvjed1vLj6JN0l2YYm1t28x2fC48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fOD4c2OG; arc=none smtp.client-ip=209.85.167.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-513e6777af4so2996226e87.2;
-        Thu, 21 Mar 2024 18:07:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711069638; x=1711674438; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e4Uuo87+sc0z28M9xFIQmQL9MvP8aEW+1s2QNiqTOto=;
-        b=fOD4c2OGCGv5W10SsmejSxiem7Qd8QfwNKZJCPxn3C01/kcbGA9RsmDwUUjcBmkF+F
-         Z4usr6Oldz0U7nAcxYqktlY1t/7JC6PzyERFLirnOoqsCIcz0R0ELNhrzfKaOeHcBQZs
-         qn4pcTyPQuCqpq+R/y0JbkE5SgqfyncPiM99yze+K2EfR4n5wkWoC2lYfr32ZD/aci8w
-         dTxeiHbLnISWTa4hPXeBXHDruPOkBruLLxiaEdXUJPBf0D3s72H7hv7+chBAj+STEBaB
-         /dmf302odOVM280Xi2Zd8wC+iZgVn016UwYimc40TWD1yfZ4GnytD5sgnAO6IhP9ZTwf
-         IR+w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711069638; x=1711674438;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=e4Uuo87+sc0z28M9xFIQmQL9MvP8aEW+1s2QNiqTOto=;
-        b=RsBvM6bFKkPTu1R+em02ejvKVppatDYUAu5vrsF+7kaJvXHQxNZJxmB8OfSNGAZd35
-         EIMpXhPiiZEWMYrV1vV2BFRIuTXz6apbyiCJSR8pz5tzDmv70JNvTPpKz5bNcdveOHbk
-         k5N14ZvK9P0PvHE3ZA6Sdhv0EnMtwgUmPnuA8OOaFXfQhtRzFa1PSj1eRM9HPFj2hwZu
-         bRR3rKk7rM4WIiyOgBSGsKHmuBU6hqNaq6pht/lCg+YUy01U7ErYS0Vlt+PT+4ErOsgm
-         hdadf5dJBBa0wKKtZeh2yQCn4j3+FvuZURH7A0e+2l9DB6i5yPl8FgSpDjEDzkB7+RvC
-         I1Bw==
-X-Forwarded-Encrypted: i=1; AJvYcCWCDfy22ZPMNBsTn1jdV028VbMKvDPulPaIeHanaZlkFJkKnHNBzVI3vf/ffpFDwwByKJ0dqHT1aw5aAKJNJP7q7CIOOIBe3UZJQzHDQj/4x9jtYtWp+JYpt6gcCAEnZMF2gTsUBmaj
-X-Gm-Message-State: AOJu0Yz2zila2tHOG1UzGUv6Q5tL8JUilOESBrvXyWMY6fJzHrBj19il
-	BOv358oa2oMGogikkO6V4ePLAiK32Uu9/q/+j0PE7Jn/mz7Cc6ZVxgrpDz3CVAxStj6jSs03otq
-	izIbT7X8H759SJMVlNYrqA81Dle0=
-X-Google-Smtp-Source: AGHT+IHlZCJ8LWEW3G10FVuiLTWDrENwNdsLK8C9nLfvPwUNiYXR/MTREIrRQsIhAi3XkjM7G2BCrGM3AQVbCRrqFLM=
-X-Received: by 2002:ac2:5214:0:b0:513:c50d:db59 with SMTP id
- a20-20020ac25214000000b00513c50ddb59mr685402lfl.15.1711069638179; Thu, 21 Mar
- 2024 18:07:18 -0700 (PDT)
+	s=arc-20240116; t=1711070907; c=relaxed/simple;
+	bh=gZdZ3hdWBfYEkQG7B5WtoNrgHjqYlmm69pYdgNV6Mk0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=XSRdzLILfCj0/xUcFHLTprxLDsTdWWKlPxiGXPn9z27m6Wb16Xe8aUr2MqNr8H+BJ6qbsPvfe+3VwDbAAKTTsnTkgB89TUroFO1Z5quuGj8/FoKyv4DPZM4fUDrSPfqHlprTo11QpZ0Wv09o7Hh6LsODbkFwxSbBBs3q/JtKG9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JptDIvyH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A987CC433C7;
+	Fri, 22 Mar 2024 01:28:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711070906;
+	bh=gZdZ3hdWBfYEkQG7B5WtoNrgHjqYlmm69pYdgNV6Mk0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=JptDIvyH6Lk1TmKhg29yIXW8CU/5X/6PWx45s3vY34YKDq0AM+pTMp6YGC528/cO7
+	 3djFon33VsXp/e+Ortmxx2l8wjb7GKBWI+Vdjnn0C2N/usIhV9SNc+XVITkN+uMf5P
+	 S+Ek7tuOehjNFd4THI3sapLN5U+qKp3hiAdl7bhz8Ujx4V5X9zpYY3NTr6rMhrhOce
+	 OIx61xZ/gjjDMF4xDQpEdn7tMqzbWDwhMqDxVe8ZfgPso6HHR1J7HinvHAXwckMtOA
+	 YrlmYt02q88Muiiw6ExpZxhPfEXQOklhrwLd4h6RVeTRScmEE2a9aAbhiZ9Z9ZOWtS
+	 X/tzzCuobz1DQ==
+Date: Thu, 21 Mar 2024 18:28:24 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: asmadeus@codewreck.org
+Cc: ericvh@kernel.org, Lizhi Xu <lizhi.xu@windriver.com>,
+ syzbot+7a3d75905ea1a830dbe5@syzkaller.appspotmail.com,
+ linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux_oss@crudebyte.com, lucho@ionkov.net, syzkaller-bugs@googlegroups.com,
+ v9fs@lists.linux.dev, regressions@lists.linux.dev, netdev@vger.kernel.org
+Subject: Re: [PATCH next] fs/9p: fix uaf in in v9fs_stat2inode_dotl
+Message-ID: <20240321182824.6f303e38@kernel.org>
+In-Reply-To: <ZeXGZS1-X8_CYCUz@codewreck.org>
+References: <00000000000055ecb906105ed669@google.com>
+	<20240202121531.2550018-1-lizhi.xu@windriver.com>
+	<ZeXGZS1-X8_CYCUz@codewreck.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240311070550.7438-1-kerneljasonxing@gmail.com> <ZfyhR_24HmShs78t@calendula>
-In-Reply-To: <ZfyhR_24HmShs78t@calendula>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 22 Mar 2024 09:06:41 +0800
-Message-ID: <CAL+tcoBHU7RKWvDkDVK+8poXK_XdNU0sskwuY6R-B0oatmDOxg@mail.gmail.com>
-Subject: Re: [PATCH nf-next v2] netfilter: conntrack: avoid sending RST to
- reply out-of-window skb
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: edumazet@google.com, kadlec@netfilter.org, fw@strlen.de, kuba@kernel.org, 
-	pabeni@redhat.com, davem@davemloft.net, netfilter-devel@vger.kernel.org, 
-	coreteam@netfilter.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello Pablo,
+On Mon, 4 Mar 2024 22:02:29 +0900 asmadeus@codewreck.org wrote:
+> Lizhi Xu wrote on Fri, Feb 02, 2024 at 08:15:31PM +0800:
+> > The incorrect logical order of accessing the st object code in v9fs_fid_iget_dotl
+> > is causing this uaf.  
+> 
+> Thanks for the fix!
+> 
+> Eric, this is also for your tree.
+> 
+> > Fixes: 724a08450f74 ("fs/9p: simplify iget to remove unnecessary paths")  
+> 
+> (careful if you rebase your tree as this commit isn't merged yet)
+> 
+> > Reported-and-tested-by: syzbot+7a3d75905ea1a830dbe5@syzkaller.appspotmail.com
+> > Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>  
+> 
+> Reviewed-by: Dominique Martinet <asmadeus@codewreck.org>
 
-On Fri, Mar 22, 2024 at 5:06=E2=80=AFAM Pablo Neira Ayuso <pablo@netfilter.=
-org> wrote:
->
-> On Mon, Mar 11, 2024 at 03:05:50PM +0800, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Supposing we set DNAT policy converting a_port to b_port on the
-> > server at the beginning, the socket is set up by using 4-tuple:
-> >
-> > client_ip:client_port <--> server_ip:b_port
-> >
-> > Then, some strange skbs from client or gateway, say, out-of-window
-> > skbs are eventually sent to the server_ip:a_port (not b_port)
-> > in TCP layer due to netfilter clearing skb->_nfct value in
-> > nf_conntrack_in() function. Why? Because the tcp_in_window()
-> > considers the incoming skb as an invalid skb by returning
-> > NFCT_TCP_INVALID.
-> >
-> > At last, the TCP layer process the out-of-window
-> > skb (client_ip,client_port,server_ip,a_port) and try to look up
-> > such an socket in tcp_v4_rcv(), as we can see, it will fail for sure
-> > because the port is a_port not our expected b_port and then send
-> > back an RST to the client.
-> >
-> > The detailed call graphs go like this:
-> > 1)
-> > nf_conntrack_in()
-> >   -> nf_conntrack_handle_packet()
-> >     -> nf_conntrack_tcp_packet()
-> >       -> tcp_in_window() // tests if the skb is out-of-window
-> >       -> return -NF_ACCEPT;
-> >   -> skb->_nfct =3D 0; // if the above line returns a negative value
-> > 2)
-> > tcp_v4_rcv()
-> >   -> __inet_lookup_skb() // fails, then jump to no_tcp_socket
-> >   -> tcp_v4_send_reset()
-> >
-> > The moment the client receives the RST, it will drop. So the RST
-> > skb doesn't hurt the client (maybe hurt some gateway which cancels
-> > the session when filtering the RST without validating
-> > the sequence because of performance reason). Well, it doesn't
-> > matter. However, we can see many strange RST in flight.
-> >
-> > The key reason why I wrote this patch is that I don't think
-> > the behaviour is expected because the RFC 793 defines this
-> > case:
-> >
-> > "If the connection is in a synchronized state (ESTABLISHED,
-> >  FIN-WAIT-1, FIN-WAIT-2, CLOSE-WAIT, CLOSING, LAST-ACK, TIME-WAIT),
-> >  any unacceptable segment (out of window sequence number or
-> >  unacceptible acknowledgment number) must elicit only an empty
-> >  acknowledgment segment containing the current send-sequence number
-> >  and an acknowledgment..."
-> >
-> > I think, even we have set DNAT policy, it would be better if the
-> > whole process/behaviour adheres to the original TCP behaviour as
-> > default.
-> >
-> > Suggested-by: Florian Westphal <fw@strlen.de>
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> > v2
-> > Link: https://lore.kernel.org/netdev/20240307090732.56708-1-kerneljason=
-xing@gmail.com/
-> > 1. add one more test about NAT and then drop the skb (Florian)
-> > ---
-> >  net/netfilter/nf_conntrack_proto_tcp.c | 15 +++++++++++++--
-> >  1 file changed, 13 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/netfilter/nf_conntrack_proto_tcp.c b/net/netfilter/nf_=
-conntrack_proto_tcp.c
-> > index ae493599a3ef..19ddac526ea0 100644
-> > --- a/net/netfilter/nf_conntrack_proto_tcp.c
-> > +++ b/net/netfilter/nf_conntrack_proto_tcp.c
-> > @@ -1256,10 +1256,21 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
-> >       case NFCT_TCP_IGNORE:
-> >               spin_unlock_bh(&ct->lock);
-> >               return NF_ACCEPT;
-> > -     case NFCT_TCP_INVALID:
-> > +     case NFCT_TCP_INVALID: {
-> > +             int verdict =3D -NF_ACCEPT;
-> > +
-> > +             if (ct->status & IPS_NAT_MASK)
-> > +                     /* If DNAT is enabled and netfilter receives
-> > +                      * out-of-window skbs, we should drop it directly=
-,
->
-> Yes, if _be_liberal toggle is disabled this can happen.
->
-> > +                      * or else skb would miss NAT transformation and
-> > +                      * trigger corresponding RST sending to the flow
-> > +                      * in TCP layer, which is not supposed to happen.
-> > +                      */
-> > +                     verdict =3D NF_DROP;
->
-> One comment for the SNAT case.
+Looks like this UAF is in Linus's tree now, and possibly getting hit
+by anyone using virtme to test the kernel? I can't vouch for the
+correctness of the fix but it does make the KASAN splat go away for me.
 
-Thanks for the comment :)
-
->
-> nf_conntrack_in() calls this function from the prerouting hook. For
-> the very first packet, IPS_NAT_MASK might not be yet fully set on
-> (masquerade/snat happens in postrouting), then still one packet can be
-> leaked without NAT mangling in the SNAT case.
-
-It's possible if the flag is not set and out-of-window skb comes first...
-
->
-> Rulesets should really need to set default policy to drop in NAT
-> chains to address this.
->
-> And after this update, user has no chance anymore to bump counters at
-> the end of the policy, to debug issues.
-
-You mean 'set default policy' is using iptables command to set, right?
-If that's the case, I suspect the word "address" because it just hides
-the issue and not lets people see it. I think many users don't know
-this case. If I tell them about this "just set one more sysctl knob
-and you'll be fine", they will definitely question me... Actually I
-was questioned many times last week.
-
-We have a _be_liberal sysctl knob to "address" this, yes, but what I'm
-thinking is : the less we resort to sysctl knob, the easier life we
-have.
-
-It's very normal to drop an out-of-window skb without S/DNAT enabled.
-Naturally, we're supposed to drop it finally with S/DNAT enabled. It
-can be the default behaviour. Why would we use a knob to do it
-instead? :/
-
->
-> We have relied on the rule that "conntrack should not drop packets"
-> since the very beginning, instead signal rulesets that something is
-> invalid, so user decides what to do.
-
-Yes, I know that rule, but we already have some exceptions for this:
-we dropped the unexpected skb in the netfilter unless there are no
-other better alternatives.
-
-My logic in the V1 patch is not setting invalid (in order to not clear
-skb->_nfct field) and letting it go until it is passed to the TCP
-layer which will drop it finally.
-
->
-> I'm ambivalent about this, Jozsef?
-
-Hope to see more comments and suggestions from you two maintainers :)
-
-Thanks,
-Jason
-
->
-> >               nf_tcp_handle_invalid(ct, dir, index, skb, state);
-> >               spin_unlock_bh(&ct->lock);
-> > -             return -NF_ACCEPT;
-> > +             return verdict;
-> > +     }
-> >       case NFCT_TCP_ACCEPT:
-> >               break;
-> >       }
-> > --
-> > 2.37.3
-> >
+[   12.474676][    T1] ==================================================================
+[   12.474870][    T1] BUG: KASAN: slab-use-after-free in v9fs_stat2inode_dotl+0x9d6/0xb80
+[   12.475060][    T1] Read of size 8 at addr ffff888002bdbad8 by task swapper/0/1
+[   12.475248][    T1] 
+[   12.475314][    T1] CPU: 3 PID: 1 Comm: swapper/0 Not tainted 6.8.0-virtme #1
+[   12.475503][    T1] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+[   12.475811][    T1] Call Trace:
+[   12.475908][    T1]  <TASK>
+[   12.475976][    T1]  dump_stack_lvl+0x82/0xd0
+[   12.476133][    T1]  print_address_description.constprop.0+0x2c/0x3b0
+[   12.476295][    T1]  ? v9fs_stat2inode_dotl+0x9d6/0xb80
+[   12.476425][    T1]  print_report+0xb4/0x270
+[   12.476552][    T1]  ? kasan_addr_to_slab+0x4e/0x90
+[   12.476679][    T1]  kasan_report+0xbd/0xf0
+[   12.476775][    T1]  ? v9fs_stat2inode_dotl+0x9d6/0xb80
+[   12.476903][    T1]  v9fs_stat2inode_dotl+0x9d6/0xb80
+[   12.477053][    T1]  v9fs_fid_iget_dotl+0x18c/0x210
+[   12.477180][    T1]  v9fs_mount+0x3fe/0x7d0
+[   12.477281][    T1]  ? __pfx_v9fs_mount+0x10/0x10
+[   12.477406][    T1]  ? vfs_parse_fs_string+0xdb/0x130
+[   12.477533][    T1]  ? __pfx_vfs_parse_fs_string+0x10/0x10
+[   12.477660][    T1]  ? __pfx_v9fs_mount+0x10/0x10
+[   12.477786][    T1]  legacy_get_tree+0x107/0x200
+[   12.477912][    T1]  vfs_get_tree+0x8a/0x2e0
+[   12.478042][    T1]  do_new_mount+0x27d/0x5e0
+[   12.478170][    T1]  ? __pfx_do_new_mount+0x10/0x10
+[   12.478294][    T1]  ? __pfx___debug_check_no_obj_freed+0x10/0x10
+[   12.478453][    T1]  ? __virt_addr_valid+0x227/0x420
+[   12.478583][    T1]  path_mount+0x271/0x14f0
+[   12.478713][    T1]  ? __pfx_path_mount+0x10/0x10
+[   12.478840][    T1]  ? kmem_cache_free+0xd7/0x220
+[   12.478970][    T1]  ? kern_path+0x3d/0x50
+[   12.479068][    T1]  init_mount+0x9d/0xf0
+[   12.479164][    T1]  ? __pfx_init_mount+0x10/0x10
+[   12.479292][    T1]  do_mount_root+0xbc/0x330
+[   12.479419][    T1]  mount_root_generic+0x22c/0x470
+[   12.479550][    T1]  ? __pfx_mount_root_generic+0x10/0x10
+[   12.479680][    T1]  ? mount_root+0x25b/0x2f0
+[   12.479807][    T1]  prepare_namespace+0xa5/0x2d0
+[   12.479933][    T1]  ? __pfx_prepare_namespace+0x10/0x10
+[   12.480061][    T1]  ? __pfx_kernel_init+0x10/0x10
+[   12.480188][    T1]  kernel_init+0x20/0x200
+[   12.480285][    T1]  ? __pfx_kernel_init+0x10/0x10
+[   12.480410][    T1]  ret_from_fork+0x31/0x70
+[   12.480543][    T1]  ? __pfx_kernel_init+0x10/0x10
+[   12.480670][    T1]  ret_from_fork_asm+0x1a/0x30
+[   12.480807][    T1]  </TASK>
+[   12.480904][    T1] 
+[   12.480969][    T1] Allocated by task 1:
+[   12.481063][    T1]  kasan_save_stack+0x24/0x50
+[   12.481191][    T1]  kasan_save_track+0x14/0x30
+[   12.481323][    T1]  __kasan_kmalloc+0x7f/0x90
+[   12.481449][    T1]  p9_client_getattr_dotl+0x4c/0x1a0
+[   12.481576][    T1]  v9fs_fid_iget_dotl+0xca/0x210
+[   12.481706][    T1]  v9fs_mount+0x3fe/0x7d0
+[   12.481801][    T1]  legacy_get_tree+0x107/0x200
+[   12.481927][    T1]  vfs_get_tree+0x8a/0x2e0
+[   12.482053][    T1]  do_new_mount+0x27d/0x5e0
+[   12.482178][    T1]  path_mount+0x271/0x14f0
+[   12.482303][    T1]  init_mount+0x9d/0xf0
+[   12.482397][    T1]  do_mount_root+0xbc/0x330
+[   12.482523][    T1]  mount_root_generic+0x22c/0x470
+[   12.482649][    T1]  prepare_namespace+0xa5/0x2d0
+[   12.482779][    T1]  kernel_init+0x20/0x200
+[   12.482876][    T1]  ret_from_fork+0x31/0x70
+[   12.483002][    T1]  ret_from_fork_asm+0x1a/0x30
+[   12.483128][    T1] 
+[   12.483191][    T1] Freed by task 1:
+[   12.483283][    T1]  kasan_save_stack+0x24/0x50
+[   12.483409][    T1]  kasan_save_track+0x14/0x30
+[   12.483535][    T1]  kasan_save_free_info+0x3b/0x60
+[   12.483662][    T1]  __kasan_slab_free+0xf4/0x180
+[   12.483788][    T1]  kfree+0xd3/0x230
+[   12.483886][    T1]  v9fs_fid_iget_dotl+0x15e/0x210
+[   12.484017][    T1]  v9fs_mount+0x3fe/0x7d0
+[   12.484112][    T1]  legacy_get_tree+0x107/0x200
+[   12.484238][    T1]  vfs_get_tree+0x8a/0x2e0
+[   12.484365][    T1]  do_new_mount+0x27d/0x5e0
+[   12.484492][    T1]  path_mount+0x271/0x14f0
+[   12.484619][    T1]  init_mount+0x9d/0xf0
+[   12.484713][    T1]  do_mount_root+0xbc/0x330
+[   12.484846][    T1]  mount_root_generic+0x22c/0x470
+[   12.484974][    T1]  prepare_namespace+0xa5/0x2d0
+[   12.485100][    T1]  kernel_init+0x20/0x200
+[   12.485196][    T1]  ret_from_fork+0x31/0x70
+[   12.485324][    T1]  ret_from_fork_asm+0x1a/0x30
+[   12.485449][    T1] 
+[   12.485512][    T1] The buggy address belongs to the object at ffff888002bdbad8
+[   12.485512][    T1]  which belongs to the cache kmalloc-192 of size 192
+[   12.485825][    T1] The buggy address is located 0 bytes inside of
+[   12.485825][    T1]  freed 192-byte region [ffff888002bdbad8, ffff888002bdbb98)
+[   12.486131][    T1] 
+[   12.486194][    T1] The buggy address belongs to the physical page:
+[   12.486347][    T1] page: refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff888002bdbc10 pfn:0x2bda
+[   12.486600][    T1] head: order:1 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+[   12.486795][    T1] flags: 0x80000000000a40(workingset|slab|head|node=0|zone=1)
+[   12.486989][    T1] page_type: 0xffffffff()
+[   12.487088][    T1] raw: 0080000000000a40 ffff888001042c40 ffff888001040a88 ffff888001040a88
+[   12.487315][    T1] raw: ffff888002bdbc10 00000000001a0017 00000001ffffffff 0000000000000000
+[   12.487538][    T1] head: 0080000000000a40 ffff888001042c40 ffff888001040a88 ffff888001040a88
+[   12.487765][    T1] head: ffff888002bdbc10 00000000001a0017 00000001ffffffff 0000000000000000
+[   12.487992][    T1] head: 0080000000000001 ffffea00000af681 dead000000000122 00000000ffffffff
+[   12.488213][    T1] head: 0000000200000000 0000000000000000 00000000ffffffff 0000000000000000
+[   12.488436][    T1] page dumped because: kasan: bad access detected
+[   12.488590][    T1] 
+[   12.488653][    T1] Memory state around the buggy address:
+[   12.488797][    T1]  ffff888002bdb980: fc fc fc fc 00 00 00 00 00 00 00 00 00 00 00 00
+[   12.488986][    T1]  ffff888002bdba00: 00 00 00 00 00 00 00 00 00 00 fc fc fc fc fc fc
+[   12.489168][    T1] >ffff888002bdba80: fc fc fc fc fc fc fc fc fc fc fc fa fb fb fb fb
+[   12.489353][    T1]                                                     ^
+[   12.489506][    T1]  ffff888002bdbb00: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+[   12.489688][    T1]  ffff888002bdbb80: fb fb fb fc fc fc fc fc fc fc fc fc fc fc fc fc
+[   12.489873][    T1] ==================================================================
 
