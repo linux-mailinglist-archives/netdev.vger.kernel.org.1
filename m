@@ -1,309 +1,206 @@
-Return-Path: <netdev+bounces-81255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25A50886C14
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:30:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C522886C1F
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:32:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48B231C2123E
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:30:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CE13DB23220
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A9B941232;
-	Fri, 22 Mar 2024 12:30:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4611D1E892;
+	Fri, 22 Mar 2024 12:32:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="U/0v5Z3Y"
+	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="AJQO+iHn"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-133.freemail.mail.aliyun.com (out30-133.freemail.mail.aliyun.com [115.124.30.133])
+Received: from IND01-MAX-obe.outbound.protection.outlook.com (mail-maxind01olkn2094.outbound.protection.outlook.com [40.92.102.94])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001329475;
-	Fri, 22 Mar 2024 12:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.133
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711110618; cv=none; b=aCDfTkG7iO7myefkwvDqoN1heTyqUyvHEUdp89JKoEm1pQ9/L+lUpO3zJyW0k9COW3Zoo9ItL/JTxAMMWGMMVskdd5kgkHm4NeRYw2jFf5CQYDoXnxdouzsINEBYxc/Lel2ZrXa0M7H51dZNO5Z7SGob6WNJJtTBF5WNKnLG7iw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711110618; c=relaxed/simple;
-	bh=fEfFlBr4ugsPaCueHsYIH4SSAkF3+xAFPa2Sh0wjXT4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r5TUimGUqJ0PCsAWiIxw1tN266nS3CrFE9THIEpq2aRVK4Rvq4m6WDiit4/fAcahDFYDtac2i0djL2RZo25Y4pGBS4uxjLf/Gf8FTpfU75dT7WnfVtOvV+Oq7cK4tfGcsdB5qR9Id7TadGUgkWvoh5ejW45d+erX0UwHw643ccw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=U/0v5Z3Y; arc=none smtp.client-ip=115.124.30.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711110605; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=mYTbCPy1WTTUyflrWQMEy9SpU9P1T1WTxZVaPvhJG5M=;
-	b=U/0v5Z3YUpYg90VVjyeDI0m/O9FhprTbR+H6CTCfqWeIqASq4CSuFV/tNA1386u2ONQAErYd3tjCCKlv38BGgFEfBJjbcJunQtA8nAw+nriL5ei9G505pqJFIlMj9P9uFHlcwCdyYwWlIcm+b52rvCtCOjAgRNj7ME3mz0vCRXE=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R531e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W329hih_1711110603;
-Received: from 30.221.130.60(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W329hih_1711110603)
-          by smtp.aliyun-inc.com;
-          Fri, 22 Mar 2024 20:30:05 +0800
-Message-ID: <a5566d49-db9e-48ca-801b-37bfa1134748@linux.alibaba.com>
-Date: Fri, 22 Mar 2024 20:30:03 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7326116429
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 12:32:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.102.94
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711110733; cv=fail; b=KhCICfCQ7GiEorscCMeipYpiyrOCSNe1a7f3Bai6TRD376zjvPRzxxvQhnpxMls9a07wF3zRTP51Uvv38wAxrs2dhKc88d0HUEK8zyN+WXW2dj/65grYAltcIue75p7KFQyDgsOxoOyxfXXGEfNK+pKCUSH08OxoL+gz020OVkI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711110733; c=relaxed/simple;
+	bh=WtFoH9f3rp2VG9zMZm1gnajWeEYWUsP1FhELYDMSEr0=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=oUnxiYvt2wJxy+uxrWPkz3oT4ikq020NZ1f3iLT6eAgY8pIWVgoaenKJZUhgeU2kF62C3jxlh8z0kxR4+EaSvc/ftoFjGB6vv4eYMTJfAdKpIzdug8PJXKSs6ByqOLLarXShia/on6r4miGH9LjKBPiKRHZlCiJrvcyovT09BwE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=hotmail.com; dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b=AJQO+iHn; arc=fail smtp.client-ip=40.92.102.94
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EBVM5goBYnDpa2CTQOl4DYpLatB6QN6HHuqNGNN0UCjImTKU4cxMijk6xbGCp+nxws2VgZ+INFA+FELnHm3J1D76DevngonVaokJuQ/ppBnRpXky2W2suohB4V5G9IlPQAC+gUAyAJvkEKxRYTMfc1LlYc5sdJrS3aR0agzvzBuXesQE1y2lmPrJSaFtnOxKCyR7ywNy3ET7/Nhpsf2g2nxHFpOEpDwDA4eaLUtrFihG600ErUX0ScV/LNWIdYuqrcS05HhuzP8hDRZaF8zqXegDSvGnqw+CIF9lAQMSbKXv2bInzilkOZrr1dAcTLQgYr42W0acfaPzu8ZUjPEdlg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PSfKJ7pXOZy7tFQ2ImoipFXLrORHAg+J3ilcnc00qdE=;
+ b=E6o8LcKM3ZTknNmfxK6asLS/eFiAnKhWCJHY8ON8mReMDfYYgsavS4taqytIwpbRdizwtamJxlY4UUUvl386mC4SNBlMKitE7UggPVFYzuquck0CeXpk7ILLP+soe0VXFEBo73D0LPZM8zIfWUFXswNRKnJmgpISbEjukoOTbbTxeY94lRq8vxjVXeFd8zcghPZBKmtF9kl4y/5KCOsMGYP2NsKpRyovM2sVgPHKAncL2t4gg5wuIo7LeYXsYfyJHy8tZAnukjJk0bwQMesOjYnYTzTDGo/VLH/HfOYV5nZFsjEnz7q3rsBgYDX3cCbfv+Gl9miv6wy3p2ykvACOGQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PSfKJ7pXOZy7tFQ2ImoipFXLrORHAg+J3ilcnc00qdE=;
+ b=AJQO+iHnHmp/PfHENsqbG0UNpjEN5HEXnpYmtHHai4gYmQtQ/qgyfm0m3meMBm2ct4rnibbV96+8y1xm0SW8c6l7d9VvhsrGdjjNNSdfGeZtGZ8acwWqWcQxWVp3Lf5gZ48n7zJlZM6F6qg1lk70mswr4XyD79zgG0653Sx21c11K24HUwhCAhGjRbYZP6dGiBdpjJ/NYmWY2LRVY4BA3T1yVUozCkV73QDtkMT2Zqh89GXBdj8pdOaqD0fiPwwmlz8/zWGjNazGBTnpBDLc1DjXGrbpy0UDTWDedfcR+marHRJsyqnI42WujM3nweGxAb9twS3seoQ2cRxa9QYoEA==
+Received: from MAZP287MB0503.INDP287.PROD.OUTLOOK.COM (2603:1096:a01:d3::8) by
+ MA0P287MB2022.INDP287.PROD.OUTLOOK.COM (2603:1096:a01:123::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.7409.23; Fri, 22 Mar 2024 12:32:05 +0000
+Received: from MAZP287MB0503.INDP287.PROD.OUTLOOK.COM
+ ([fe80::be9c:e08:2db4:9a60]) by MAZP287MB0503.INDP287.PROD.OUTLOOK.COM
+ ([fe80::be9c:e08:2db4:9a60%3]) with mapi id 15.20.7409.010; Fri, 22 Mar 2024
+ 12:32:05 +0000
+Message-ID:
+ <MAZP287MB05036EF508C09397B4BE31CEE4312@MAZP287MB0503.INDP287.PROD.OUTLOOK.COM>
+Date: Fri, 22 Mar 2024 20:32:03 +0800
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] bridge: vlan: fix compressvlans manpage and usage
+To: Nikolay Aleksandrov <razor@blackwall.org>, roopa@nvidia.com
+Cc: netdev@vger.kernel.org, bridge@lists.linux-foundation.org
+References: <MAZP287MB0503CBCF2FB4C165F0460D70E4312@MAZP287MB0503.INDP287.PROD.OUTLOOK.COM>
+ <d6ac805e-1bcd-4e06-b3eb-58fc2bb84461@blackwall.org>
+Content-Language: en-US
+From: Date Huang <tjjh89017@hotmail.com>
+In-Reply-To: <d6ac805e-1bcd-4e06-b3eb-58fc2bb84461@blackwall.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TMN:
+ [cD8BIeC/DZAjtwmQ61P6RBE834rdrY8pjevJvNaVK4VizkAa/droiT5crFXRi022LVg1JBiGHWk=]
+X-ClientProxiedBy: SGAP274CA0020.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b6::32)
+ To MAZP287MB0503.INDP287.PROD.OUTLOOK.COM (2603:1096:a01:d3::8)
+X-Microsoft-Original-Message-ID:
+ <9473db69-135b-439a-8301-83b98ee6ba8d@hotmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v4 05/11] net/smc: implement DMB-related
- operations of loopback-ism
-To: Jan Karcher <jaka@linux.ibm.com>, wintera@linux.ibm.com,
- twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
- agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240317100545.96663-1-guwen@linux.alibaba.com>
- <20240317100545.96663-6-guwen@linux.alibaba.com>
- <da8a60f1-dadf-4ab4-89b3-77e1ee45be03@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <da8a60f1-dadf-4ab4-89b3-77e1ee45be03@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MAZP287MB0503:EE_|MA0P287MB2022:EE_
+X-MS-Office365-Filtering-Correlation-Id: ea1ebb31-ed37-46a5-17fc-08dc4a6c1548
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	jxVtGN5MsFVSJUMsu/93HDjj70gct3Hs2A0hqEaO78k/E1MBblWmAKShHqDmJvXw7nLSoujaCANjITXmvLXPMEwete5z4wE0GaZivt+KIFtAvczUX0IfkBvr1Lge0irWx5hGk6/5wQFo9ucxmQ4lerdoofqwnUND/vAZCOY7YVqCPfdbl3W8X9VJNVCed3Gnwux8oWXCmySStULnqrD71uctIYqVKQKAI0No25wxQMoTlZauIxPIRdiPMkfVMxASTlg1MCCJFcx0GWbKPVUVZz7rvrQCl9ve1I65Xl/NLGv9aG05lex/xfBtrLL2dzs02RY94yjANYUHSOPKAi3uJX536P+gOaes+vnETgGxjarjfjSsjCLa0pcFOk+dF9I86Jg0dnNqNDDbOtY0zzvt6d0oW8uPGpeAQcVtLrc0nUZDaS4m/p/lnqsioh7SzxUvd29EYFRrhWU4U8Ux0tfOF9pVtkqMsaXxmi0umHlJtQdLUI4Mix6qOFb1w0uxHrfC8VHGe/VR0Rv9kDcQU5BKF1Pl7Ocz/ITS9fDF2n/+1VgBim2FNHDinTYeOjP9XkiU
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SThqbEtJRnNYUFJSSyt4L0YwcUVQaUtoZ2lTNFExMGZlSzlGR2l2dTFsV3RH?=
+ =?utf-8?B?dXJEZXFRYUpSZjJrK3MyT3plUXpBdk43SGJJcXhmNGNHeDRJSmRuTG1GdElP?=
+ =?utf-8?B?ZTlYMGJTYXNhTVpnN2s1WXM4d21iQkE0MnR0eTdXeVdJMUQ2cHBjTzIvWXhr?=
+ =?utf-8?B?dTFLZ29zUVN4WmtPeXdSRFZzeFZCcTlvWDhvS3NreVNIa3VvR0RmZjFWS0Fl?=
+ =?utf-8?B?aHEwWnpSTzZISDBUZ21teWxXdVJ3bTZIUE9KdjdidmpsZnZMYytPbmVZSTVI?=
+ =?utf-8?B?SmpyY3hLZUdhSGRoRHlzaXM1c2xObWtSTFRQVitpNXVKallmVE03L0RJK0tX?=
+ =?utf-8?B?QnNSd1RyWDZoNGVtTmIzUDZUeEJpYlRUWnZYRWZDeGUrWjV4Znl2L28xV2VG?=
+ =?utf-8?B?SFhjQ3VvUVArUFNUL1d4UEFUd2RQRWk4anlxKzJhbmpxL2tWZWhkNFBwRVVs?=
+ =?utf-8?B?VzZKdkdCWlhjdmcvVzhnazNBUTNhaDd6eGk4eGdYclFLSDhJWUJyQjVxTXVm?=
+ =?utf-8?B?dXFBS2JJa21PdEoxUFpJVE9wTDRPbUxVaVJyQTVHcWVxOUlJd2JkMXY0NDY2?=
+ =?utf-8?B?QnpuMWFYd3E2RzNCLzFTUGFPZnBWMTYyMm9tNk5sQ29makxhNms4WTlDdmFC?=
+ =?utf-8?B?RXdRODlzUkdtdlNjOFpoVFQ1MktqTUhMTEhnQnh0R2I5TFJudGZoYUk1Mmh0?=
+ =?utf-8?B?eE9FRGcramtQYks3ZVg1Zk1WQnVVdERUd05NL05uY1dsSkRwWXpoZ29SUXlq?=
+ =?utf-8?B?Z3VVSU5MVDRqSThwcENTL0w3ZTBrTElqMzErUTdOVFhnMmdoWmZwRCtJc1ZG?=
+ =?utf-8?B?SU5DeXIrWlZBbURLeHJ0ZFJxRVZqaG1HVUxTVjQ5a3Z2bXZWUnhmbmt0ZDJE?=
+ =?utf-8?B?dmFUZXFUdkpqWmlCcjRobENWakVrZjdJK3Vpc3hCVVg5V1c5ODFLeHAwOXp0?=
+ =?utf-8?B?ZmxDRUptQldUTVlGK1ZyajdnMWJCTzBaaTg3aUt6dVkvRWtoN2RLSXYzSmhp?=
+ =?utf-8?B?bEpzTUkvOVBHa051cEZDOEVXcmtvcXVVZnhhNG9VM0pVMFFaSnRNK0ljcnR2?=
+ =?utf-8?B?ZnlsYmhMczVuWTlZZmFqZVZaZjhSeW5JTjJrWk5rdGVkT0kyYm1HbUZTTGUx?=
+ =?utf-8?B?TFlTbytMZFVKOERtbWl1Y2ZWVW1TN0ZhdFg1bVBDdjdzM0ZhQTAzaVNscHVa?=
+ =?utf-8?B?NU8xZzlGbFkrWUhHcEIybVAvdnpRYmZndWNiUms2TURSSGM0cURTOGNwR2hP?=
+ =?utf-8?B?cVZjaXhZbTQ0blh4ZHp3YnVXWlRhL2toMmw4SWxaRTVIK2xjWXNNWkpNcC9q?=
+ =?utf-8?B?blR6eXI4R2xuUERyMHBabmFMQU1FVTEwVnV4M283blBuQmJqcTZaL3JXY0NN?=
+ =?utf-8?B?SkYyeks4Mm5lZ2w1d1kvN0JITzdxZnk0YTY4SVJLTmFLMHp5dUdQc0VNQXg2?=
+ =?utf-8?B?VWxJY2d3V1hzOTBaQWs2YytwWHlVVzRDaForZUI3T2dxQldoYU04enpCTjU3?=
+ =?utf-8?B?RmsxTjc5eXVaQm51V1RkL1l6djh3eEtSNWlybU95THhFWFNxWVY3UzkrajNu?=
+ =?utf-8?B?TkJ4Rk5JRWRucVFvckdtT0x4aFQ2dWdkOXBteHRUdEE1djF6S1VXUTdCVG9t?=
+ =?utf-8?B?UzFLeUo1UkZ4Vno5c2U3YklaZnpKWVJDZ2lSc1BNNCtrRm10S3p0bnFPVlA1?=
+ =?utf-8?B?dFNyajVNcjY0Ui9rSVk2di94cGpWb05JZER4cFdzL3FFTkthaU1LTjJST0Zx?=
+ =?utf-8?Q?8nKOrydLoS1Ix6Sr6rSUu38v3zEK7mbS8WXlZya?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-bafef.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea1ebb31-ed37-46a5-17fc-08dc4a6c1548
+X-MS-Exchange-CrossTenant-AuthSource: MAZP287MB0503.INDP287.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Mar 2024 12:32:05.6502
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MA0P287MB2022
 
+Hi Nikolay
 
-
-On 2024/3/21 16:12, Jan Karcher wrote:
-> 
-> 
-> On 17/03/2024 11:05, Wen Gu wrote:
->> This implements DMB (un)registration and data move operations of
->> loopback-ism device.
+On 3/22/2024 5:25 PM, Nikolay Aleksandrov wrote:
+> On 3/22/24 10:56, Date Huang wrote:
+>> Add the missing 'compressvlans' to man page.
+>> Fix the incorrect short opt for compressvlans and color
+>> in usage.
 >>
->> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+>> Signed-off-by: Date Huang <tjjh89017@hotmail.com>
 >> ---
->>   net/smc/smc_loopback.c | 131 ++++++++++++++++++++++++++++++++++++++++-
->>   net/smc/smc_loopback.h |  13 ++++
->>   2 files changed, 141 insertions(+), 3 deletions(-)
+> 
+> Hi,
+> This should be targeted at iproute2. Nit below,
+
+Thank you, I will update this in the latest patch.
+
+> 
+>>   bridge/bridge.c   | 2 +-
+>>   man/man8/bridge.8 | 5 +++++
+>>   2 files changed, 6 insertions(+), 1 deletion(-)
 >>
->> diff --git a/net/smc/smc_loopback.c b/net/smc/smc_loopback.c
->> index 253128c77208..7335acb03920 100644
->> --- a/net/smc/smc_loopback.c
->> +++ b/net/smc/smc_loopback.c
->> @@ -15,11 +15,13 @@
->>   #include <linux/types.h>
->>   #include <net/smc.h>
->> +#include "smc_cdc.h"
->>   #include "smc_ism.h"
->>   #include "smc_loopback.h"
->>   #if IS_ENABLED(CONFIG_SMC_LO)
->>   #define SMC_LO_V2_CAPABLE    0x1 /* loopback-ism acts as ISMv2 */
->> +#define SMC_DMA_ADDR_INVALID    (~(dma_addr_t)0)
->>   static const char smc_lo_dev_name[] = "loopback-ism";
->>   static struct smc_lo_dev *lo_dev;
->> @@ -49,6 +51,93 @@ static int smc_lo_query_rgid(struct smcd_dev *smcd, struct smcd_gid *rgid,
->>       return 0;
+>> diff --git a/bridge/bridge.c b/bridge/bridge.c
+>> index f4805092..345f5b5f 100644
+>> --- a/bridge/bridge.c
+>> +++ b/bridge/bridge.c
+>> @@ -39,7 +39,7 @@ static void usage(void)
+>>   "where  OBJECT := { link | fdb | mdb | vlan | vni | monitor }\n"
+>>   "       OPTIONS := { -V[ersion] | -s[tatistics] | -d[etails] |\n"
+>>   "                    -o[neline] | -t[imestamp] | -n[etns] name |\n"
+>> -"                    -c[ompressvlans] -color -p[retty] -j[son] }\n");
+>> +"                    -compressvlans -c[olor] -p[retty] -j[son] }\n");
+>>       exit(-1);
 >>   }
->> +static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
->> +                   void *client_priv)
->> +{
->> +    struct smc_lo_dmb_node *dmb_node, *tmp_node;
->> +    struct smc_lo_dev *ldev = smcd->priv;
->> +    int sba_idx, rc;
->> +
->> +    /* check space for new dmb */
->> +    for_each_clear_bit(sba_idx, ldev->sba_idx_mask, SMC_LO_MAX_DMBS) {
->> +        if (!test_and_set_bit(sba_idx, ldev->sba_idx_mask))
->> +            break;
->> +    }
->> +    if (sba_idx == SMC_LO_MAX_DMBS)
->> +        return -ENOSPC;
->> +
->> +    dmb_node = kzalloc(sizeof(*dmb_node), GFP_KERNEL);
->> +    if (!dmb_node) {
->> +        rc = -ENOMEM;
->> +        goto err_bit;
->> +    }
->> +
->> +    dmb_node->sba_idx = sba_idx;
->> +    dmb_node->len = dmb->dmb_len;
->> +    dmb_node->cpu_addr = kzalloc(dmb_node->len, GFP_KERNEL |
->> +                     __GFP_NOWARN | __GFP_NORETRY |
->> +                     __GFP_NOMEMALLOC);
->> +    if (!dmb_node->cpu_addr) {
->> +        rc = -ENOMEM;
->> +        goto err_node;
->> +    }
->> +    dmb_node->dma_addr = SMC_DMA_ADDR_INVALID;
->> +
->> +again:
->> +    /* add new dmb into hash table */
->> +    get_random_bytes(&dmb_node->token, sizeof(dmb_node->token));
->> +    write_lock_bh(&ldev->dmb_ht_lock);
->> +    hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb_node->token) {
->> +        if (tmp_node->token == dmb_node->token) {
->> +            write_unlock_bh(&ldev->dmb_ht_lock);
->> +            goto again;
->> +        }
->> +    }
->> +    hash_add(ldev->dmb_ht, &dmb_node->list, dmb_node->token);
->> +    write_unlock_bh(&ldev->dmb_ht_lock);
->> +
->> +    dmb->sba_idx = dmb_node->sba_idx;
->> +    dmb->dmb_tok = dmb_node->token;
->> +    dmb->cpu_addr = dmb_node->cpu_addr;
->> +    dmb->dma_addr = dmb_node->dma_addr;
->> +    dmb->dmb_len = dmb_node->len;
->> +
->> +    return 0;
->> +
->> +err_node:
->> +    kfree(dmb_node);
->> +err_bit:
->> +    clear_bit(sba_idx, ldev->sba_idx_mask);
->> +    return rc;
->> +}
->> +
->> +static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
->> +{
->> +    struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
->> +    struct smc_lo_dev *ldev = smcd->priv;
->> +
->> +    /* remove dmb from hash table */
->> +    write_lock_bh(&ldev->dmb_ht_lock);
->> +    hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb->dmb_tok) {
->> +        if (tmp_node->token == dmb->dmb_tok) {
->> +            dmb_node = tmp_node;
->> +            break;
->> +        }
->> +    }
->> +    if (!dmb_node) {
->> +        write_unlock_bh(&ldev->dmb_ht_lock);
->> +        return -EINVAL;
->> +    }
->> +    hash_del(&dmb_node->list);
->> +    write_unlock_bh(&ldev->dmb_ht_lock);
->> +
->> +    clear_bit(dmb_node->sba_idx, ldev->sba_idx_mask);
->> +    kfree(dmb_node->cpu_addr);
->> +    kfree(dmb_node);
->> +
->> +    return 0;
->> +}
->> +
->>   static int smc_lo_add_vlan_id(struct smcd_dev *smcd, u64 vlan_id)
->>   {
->>       return -EOPNOTSUPP;
->> @@ -75,6 +164,40 @@ static int smc_lo_signal_event(struct smcd_dev *dev, struct smcd_gid *rgid,
->>       return 0;
->>   }
->> +static int smc_lo_move_data(struct smcd_dev *smcd, u64 dmb_tok,
->> +                unsigned int idx, bool sf, unsigned int offset,
->> +                void *data, unsigned int size)
->> +{
->> +    struct smc_lo_dmb_node *rmb_node = NULL, *tmp_node;
->> +    struct smc_lo_dev *ldev = smcd->priv;
->> +
->> +    read_lock_bh(&ldev->dmb_ht_lock);
->> +    hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb_tok) {
->> +        if (tmp_node->token == dmb_tok) {
->> +            rmb_node = tmp_node;
->> +            break;
->> +        }
->> +    }
->> +    if (!rmb_node) {
->> +        read_unlock_bh(&ldev->dmb_ht_lock);
->> +        return -EINVAL;
->> +    }
->> +    read_unlock_bh(&ldev->dmb_ht_lock);
->> +
->> +    memcpy((char *)rmb_node->cpu_addr + offset, data, size);
+>> diff --git a/man/man8/bridge.8 b/man/man8/bridge.8
+>> index eeea4073..9a023227 100644
+>> --- a/man/man8/bridge.8
+>> +++ b/man/man8/bridge.8
+>> @@ -22,6 +22,7 @@ bridge \- show / manipulate bridge addresses and 
+>> devices
+>>   \fB\-s\fR[\fItatistics\fR] |
+>>   \fB\-n\fR[\fIetns\fR] name |
+>>   \fB\-b\fR[\fIatch\fR] filename |
+>> +\fB\-compressvlans |
+>>   \fB\-c\fR[\fIolor\fR] |
+>>   \fB\-p\fR[\fIretty\fR] |
+>>   \fB\-j\fR[\fIson\fR] |
+>> @@ -345,6 +346,10 @@ Don't terminate bridge command on errors in batch 
+>> mode.
+>>   If there were any errors during execution of the commands, the 
+>> application
+>>   return code will be non zero.
+>> +.TP
+>> +.BR \-compressvlans
+>> +Show compressed vlan list
 > 
-> Hi Wen Gu,
-> 
-> Could we get into use after free trouble here if the dmb gets unregistered between the read_unlock and memcpy?
-> 
+> s/vlan/VLAN/
+> also the explanation is lacking, please add a little bit of details and
+> what the default is
 
-rmb_node won't be unregistered until smc_lgr_free_bufs() in __smc_lgr_free(). At
-that time, the connections on this lgr should be all freed (smc_conn_free() and
-then lgr->refcnt == 0), so I think there will be no move data operation at that
-point. But in case there is something unforeseen, I will put memcpy between dmb_ht_lock.
-
-Thanks!
+Ok, I updated this in the latest patch v2.
 
 > 
 >> +
->> +    if (sf) {
->> +        struct smc_connection *conn =
->> +            smcd->conn[rmb_node->sba_idx];
+>>   .TP
+>>   .BR \-c [ color ][ = { always | auto | never }
+>>   Configure color output. If parameter is omitted or
 > 
-> Please put the `struct smc_connection *conn = NULL` at the top of the function and assign the value here.
+> Thanks,
+>   Nik
 > 
 
-OK, I will put it at the top. Thanks!
-
-> Thanks
-> - Jan
-> 
->> +
->> +        if (conn && !conn->killed)
->> +            tasklet_schedule(&conn->rx_tsklet);
->> +        else
->> +            return -EPIPE;
->> +    }
->> +    return 0;
->> +}
->> +
->>   static int smc_lo_supports_v2(void)
->>   {
->>       return SMC_LO_V2_CAPABLE;
->> @@ -101,14 +224,14 @@ static struct device *smc_lo_get_dev(struct smcd_dev *smcd)
->>   static const struct smcd_ops lo_ops = {
->>       .query_remote_gid = smc_lo_query_rgid,
->> -    .register_dmb        = NULL,
->> -    .unregister_dmb        = NULL,
->> +    .register_dmb = smc_lo_register_dmb,
->> +    .unregister_dmb = smc_lo_unregister_dmb,
->>       .add_vlan_id = smc_lo_add_vlan_id,
->>       .del_vlan_id = smc_lo_del_vlan_id,
->>       .set_vlan_required = smc_lo_set_vlan_required,
->>       .reset_vlan_required = smc_lo_reset_vlan_required,
->>       .signal_event = smc_lo_signal_event,
->> -    .move_data        = NULL,
->> +    .move_data = smc_lo_move_data,
->>       .supports_v2 = smc_lo_supports_v2,
->>       .get_local_gid = smc_lo_get_local_gid,
->>       .get_chid = smc_lo_get_chid,
->> @@ -173,6 +296,8 @@ static void smcd_lo_unregister_dev(struct smc_lo_dev *ldev)
->>   static int smc_lo_dev_init(struct smc_lo_dev *ldev)
->>   {
->>       smc_lo_generate_id(ldev);
->> +    rwlock_init(&ldev->dmb_ht_lock);
->> +    hash_init(ldev->dmb_ht);
->>       return smcd_lo_register_dev(ldev);
->>   }
->> diff --git a/net/smc/smc_loopback.h b/net/smc/smc_loopback.h
->> index 55b41133a97f..24ab9d747613 100644
->> --- a/net/smc/smc_loopback.h
->> +++ b/net/smc/smc_loopback.h
->> @@ -20,13 +20,26 @@
->>   #if IS_ENABLED(CONFIG_SMC_LO)
->>   #define SMC_LO_MAX_DMBS        5000
->> +#define SMC_LO_DMBS_HASH_BITS    12
->>   #define SMC_LO_CHID        0xFFFF
->> +struct smc_lo_dmb_node {
->> +    struct hlist_node list;
->> +    u64 token;
->> +    u32 len;
->> +    u32 sba_idx;
->> +    void *cpu_addr;
->> +    dma_addr_t dma_addr;
->> +};
->> +
->>   struct smc_lo_dev {
->>       struct smcd_dev *smcd;
->>       struct device dev;
->>       u16 chid;
->>       struct smcd_gid local_gid;
->> +    rwlock_t dmb_ht_lock;
->> +    DECLARE_BITMAP(sba_idx_mask, SMC_LO_MAX_DMBS);
->> +    DECLARE_HASHTABLE(dmb_ht, SMC_LO_DMBS_HASH_BITS);
->>   };
->>   #endif
+Thanks,
+Date
 
