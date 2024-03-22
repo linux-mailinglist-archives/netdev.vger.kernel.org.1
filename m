@@ -1,96 +1,109 @@
-Return-Path: <netdev+bounces-81213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A69C18869AC
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 10:50:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2C328869E7
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 11:05:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CC341F26000
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 09:50:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00D791C242E5
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 10:05:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0872921340;
-	Fri, 22 Mar 2024 09:50:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF6A23778;
+	Fri, 22 Mar 2024 10:05:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TAHfX5s6"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="uKNCIuEC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D325513ADD;
-	Fri, 22 Mar 2024 09:50:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA9412E648;
+	Fri, 22 Mar 2024 10:05:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711101028; cv=none; b=rozjgosnGhu4OXJnVYxjO8++3cfy1DwOsAm3SX3jKXOWlcTiV/kg1zVLgzI7doKOAbSNXa4R+3h7GpwK4exV6XEtCVfvc3MoWhYfyxzM63dja85bavww5AGrEUGABQ7VYIeqvwRrleHx5npLsbJHneeSkVlE5kDYW3OE4nPqNTs=
+	t=1711101913; cv=none; b=ddywX4byW9pXFLdAom11QzT5YysTCrc7rwsQINnK5WCumcG0m11ofCgDPbrGeHNpG/e2XkrrrZSegQa3wi69map4VDLaTs/TkRbBKv4Np2ajnWcYrSyjPYpGCpVB5IK565BQhzFpwq2UwuNDYNm2dRiR5qdbXSU4IbIRmLNhG1E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711101028; c=relaxed/simple;
-	bh=8NhJlCsJEn3+K8HPGyA7RWOSgZk2ki01G6VnRJsG2VY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cIePc8fJzKfuu0o2RImvpf97reuiG1qbHBCihR8Q3KugLoPfqoPWHzKHMxi5kbf18Y6thrvuO4ZLRcC1C9Sdd3qDPVOcUNb75nXnG6wsMiT+/W9eu1jy7QB1BB4fIsk3i+PTnHy3xXO2112FOyeFPYN+R0mRM99rf+fDBjI3zEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TAHfX5s6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5BACAC43390;
-	Fri, 22 Mar 2024 09:50:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711101028;
-	bh=8NhJlCsJEn3+K8HPGyA7RWOSgZk2ki01G6VnRJsG2VY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TAHfX5s6RABSgflwVs8L568zgFD7Eu0mv7I8vLQ4NfOZ8arI1CtY00B/+vygTC9xV
-	 qnXAAWfjxCOQY7HsDDMkQtP0nP2QHjaXO/0k6RhHXUhCXn7MjKw/7bypn4DwkMIPcG
-	 SOj7y8YV14/fnpWR+zhsKm3ZZKe9I5bwenpFXPLmyLThPDOKQJx2alOK7oVQphhCP7
-	 wSlsg9z1eenQmNFm9lxijKpZLImAYIdRH+Xl/YPt84WKG8Zn4Pb6e59nyai8Bqy5lJ
-	 z/0qjglCmM2U2nq3Sf/jcIw55N65i3FJQ3xNC+MAvGh7RVxrkudjQYIPT3pUARyEaS
-	 5Mp5KYBiwzE+Q==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 375E6D982E4;
-	Fri, 22 Mar 2024 09:50:28 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1711101913; c=relaxed/simple;
+	bh=DU4C6ZnSVjEOzuxtOUUtZGkQexs4RZVz4JduuXYhlmw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DIjuYaN6W+yKEPC5+1JJd7djuBFljjXEdMhBmex9Ej8kZId4NnnL8UJd2mRWVjRGY0UVaLFE4J7ISLVT5I1SQ+WVOafHqxyXXf9pm7845YnJV2jVJjlu0zIgDEL1b9KqVaojZ7KP2zfot33P/1RzN9FAxHI5sTwjqgWhDpAX8v4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=uKNCIuEC; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 42MA4prq120425;
+	Fri, 22 Mar 2024 05:04:51 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1711101891;
+	bh=wxmqxb97DIpuCkv7FzBoW5vCyp0JMEHH0BIft+uHWtY=;
+	h=From:To:CC:Subject:Date;
+	b=uKNCIuECes+3/mEfav50g7Ac6G81U+ypdQPiE+N5PZD0+U6TiIC+fNUJwO6rZONBJ
+	 Q8mnxq7DELAZ26Xa9LGe2PlzTW0mKiyqh7ryzBIMHpJe4DIU2MRKmSh4LMoqgRWETt
+	 5LUTQQFWBir/QOiklMKEDZzpcbs1e1OMFhWou94Q=
+Received: from DFLE111.ent.ti.com (dfle111.ent.ti.com [10.64.6.32])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 42MA4pUc005727
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Fri, 22 Mar 2024 05:04:51 -0500
+Received: from DFLE102.ent.ti.com (10.64.6.23) by DFLE111.ent.ti.com
+ (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 22
+ Mar 2024 05:04:51 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE102.ent.ti.com
+ (10.64.6.23) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Fri, 22 Mar 2024 05:04:51 -0500
+Received: from uda0500640.dal.design.ti.com (uda0500640.dhcp.ti.com [172.24.227.88])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 42MA4lAP058877;
+	Fri, 22 Mar 2024 05:04:48 -0500
+From: Ravi Gunasekaran <r-gunasekaran@ti.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>
+CC: <r-gunasekaran@ti.com>, <horms@kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <srk@ti.com>
+Subject: [PATCH net] net: hsr: hsr_slave: Fix the promiscuous mode in offload mode
+Date: Fri, 22 Mar 2024 15:34:47 +0530
+Message-ID: <20240322100447.27615-1-r-gunasekaran@ti.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] nfc: nci: Fix uninit-value in nci_dev_up and
- nci_ntf_packet
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171110102821.24590.15255416599958880632.git-patchwork-notify@kernel.org>
-Date: Fri, 22 Mar 2024 09:50:28 +0000
-References: <20240320005412.905060-1-ryasuoka@redhat.com>
-In-Reply-To: <20240320005412.905060-1-ryasuoka@redhat.com>
-To: Ryosuke Yasuoka <ryasuoka@redhat.com>
-Cc: krzysztof.kozlowski@linaro.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, jeremy@jcline.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, syoshida@redhat.com,
- syzbot+7ea9413ea6749baf5574@syzkaller.appspotmail.com,
- syzbot+29b5ca705d2e0f4a44d2@syzkaller.appspotmail.com
+Content-Type: text/plain
+X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
 
-Hello:
+commit e748d0fd66ab ("net: hsr: Disable promiscuous mode in
+offload mode") disables promiscuous mode of slave devices
+while creating an HSR interface. But while deleting the
+HSR interface, it does not take care of it. It decreases the
+promiscuous mode count, which eventually enables promiscuous
+mode on the slave devices when creating HSR interface again.
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+Fix this by not decrementing the promiscuous mode count while
+deleting the HSR interface when offload is enabled.
 
-On Wed, 20 Mar 2024 09:54:10 +0900 you wrote:
-> syzbot reported the following uninit-value access issue [1][2]:
-> 
-> nci_rx_work() parses and processes received packet. When the payload
-> length is zero, each message type handler reads uninitialized payload
-> and KMSAN detects this issue. The receipt of a packet with a zero-size
-> payload is considered unexpected, and therefore, such packets should be
-> silently discarded.
-> 
-> [...]
+Fixes: e748d0fd66ab ("net: hsr: Disable promiscuous mode in offload mode")
+Signed-off-by: Ravi Gunasekaran <r-gunasekaran@ti.com>
+---
+ net/hsr/hsr_slave.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-Here is the summary with links:
-  - [net,v2] nfc: nci: Fix uninit-value in nci_dev_up and nci_ntf_packet
-    https://git.kernel.org/netdev/net/c/d24b03535e5e
-
-You are awesome, thank you!
+diff --git a/net/hsr/hsr_slave.c b/net/hsr/hsr_slave.c
+index e5742f2a2d52..1b6457f357bd 100644
+--- a/net/hsr/hsr_slave.c
++++ b/net/hsr/hsr_slave.c
+@@ -220,7 +220,8 @@ void hsr_del_port(struct hsr_port *port)
+ 		netdev_update_features(master->dev);
+ 		dev_set_mtu(master->dev, hsr_get_max_mtu(hsr));
+ 		netdev_rx_handler_unregister(port->dev);
+-		dev_set_promiscuity(port->dev, -1);
++		if (!port->hsr->fwd_offloaded)
++			dev_set_promiscuity(port->dev, -1);
+ 		netdev_upper_dev_unlink(port->dev, master->dev);
+ 	}
+ 
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.17.1
 
 
