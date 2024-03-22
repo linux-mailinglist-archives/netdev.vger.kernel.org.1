@@ -1,69 +1,92 @@
-Return-Path: <netdev+bounces-81301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04652886F6C
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 16:07:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E741886F87
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 16:11:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32D7E1C221FF
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 15:07:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26E3B28931C
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 15:11:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8CC4D108;
-	Fri, 22 Mar 2024 15:07:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA77537F0;
+	Fri, 22 Mar 2024 15:10:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tolfqZJr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ILqw2lM2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F337B50A6C;
-	Fri, 22 Mar 2024 15:07:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35C9F53395;
+	Fri, 22 Mar 2024 15:10:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711120049; cv=none; b=vC0JBoVqhxgsCKGktFyBJI/ZsEXYkZ5vEis2pPHxjwcSYAMj1Fwq4Lr8LxjYt98cJDkFIz5hOrnap+kZkW96J+LjBuDjKPsnsZy6L6FJAtDUWEVaGsB9zo/mQt/GKuQeoSbhYe5t/O2VZysTD5LSYvTEhc/CDaOmEjaikjg0/k8=
+	t=1711120241; cv=none; b=LFdOlsSCVvaYahwisX/IGg2H3oK5Lsbho5wiKDX49h4Z9IlEc/htX1k+Xn0fevrMnLF586BkBbIOdwdpHBI0HuOsQZR+01E0gmpqWwwB7fZqJzc8H5v6WSH4+L9mgWYV0RLeoqgcAMyOt8P8PxRQChpD6US0X+0YXZwmxYQY0hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711120049; c=relaxed/simple;
-	bh=cOjxN5a8Uxoq5RZDOaVWJjUpOyf8vxk4lYzck1Oloh8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Lf+CijmLzq0mxO3oeWcSOagiThvJEtVk7eGiVe7ZsnQIi2w7i4shXJyLh3M86ayQi1xV2F9XSotsNP4PhFkmXrLka88ClPNiChY5lq4LQ1FKBz5TcIOchyxXSSbuL7BUAQT9KxsdFQM7z+uLkI0IoVhpdch4xfiSix5mEznfY+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tolfqZJr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15942C433C7;
-	Fri, 22 Mar 2024 15:07:28 +0000 (UTC)
+	s=arc-20240116; t=1711120241; c=relaxed/simple;
+	bh=zuAJ4KqMjN/DpBCJhAzyfFMIpKPo4o0Xr2xSP1cuuW4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZyVvYESSCEq+FugNc27ldzAYqaB2zbyHI+iMeyNZsvlQeomZbBT90KdEWtF5qsfaE2t1BudBRxo2++7lXbGQJuzqd0E7CASOYTV13qtgSB76jiInskeT1oM5Bim/SCjYvsz/8ZrGFs3SH1zH45hWyCk2UrfdKxeVwFqWTClfY78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ILqw2lM2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FB1FC433F1;
+	Fri, 22 Mar 2024 15:10:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711120048;
-	bh=cOjxN5a8Uxoq5RZDOaVWJjUpOyf8vxk4lYzck1Oloh8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tolfqZJrO+Z3wfVlqqFejJv6TQ2YOXt2+91MUkKj4NcF0/SakEipDbZyE2ehaj4yM
-	 dJz/m6/2UCXerb/eqH193Tfu2lnTrTQGI8YM0pr83GaNwp/Qyx+2DI/uF0uSQEb1hs
-	 CtgPX07D7x1kA13np4oH5E53+8gAAdJAYYsBI+lcF8xUDlCIJ9fIwFbRBhGRzVsdOP
-	 xe73vy8tIT5+kCJOAJSGF3hss31q2NcLYbfR3VG2w7Nf8UQ9qgqA7I5sOMEhq1ewBs
-	 IE93Mq98NskOF0d0hsa9zOqxgfPfWObK/8j2TwjrMBIPlmczlfGjw9+Li425rM++y4
-	 SeXLCfk8tynHg==
-Date: Fri, 22 Mar 2024 08:07:27 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: gaoxingwang <gaoxingwang1@huawei.com>, mkubecek@suse.cz,
- idosch@nvidia.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- yanan@huawei.com, liaichun@huawei.com
-Subject: Re: [PATCH] netlink: fix typo
-Message-ID: <20240322080727.786dd760@kernel.org>
-In-Reply-To: <Zf097_S2K9uxGsR5@nanopsycho>
-References: <20240322072456.1251387-1-gaoxingwang1@huawei.com>
-	<Zf097_S2K9uxGsR5@nanopsycho>
+	s=k20201202; t=1711120241;
+	bh=zuAJ4KqMjN/DpBCJhAzyfFMIpKPo4o0Xr2xSP1cuuW4=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ILqw2lM2KoUGCN9xfK9q4QR88Tja0wqBbaWYl749k/Ao4mPktKoyQte9b+wjHNeUd
+	 IdY1rcrUc50AegJV3nVEnazLG5nd+DhirwSYwMxM9xHmFCOekg45kDMUUlZvm3Ewgt
+	 djdjusIxPtY/EZP1Apuuaq753dHDe3eG/hDseOOwjxoRsU3huM7TAL2LPdeM+xpbrf
+	 vpKsDQr4KzwnXQo/vNPPsgy9Wa0Dijbo+qx4OC3MppYHHRjEBCJDH+Vui96CXkRRlX
+	 dxi6UcLO/9oUgNXABZtJgv2Whwa6VuQ5TqwWXdY5kKunNT502ocyWoPkX0nmE7rBV0
+	 WZPVvjfqUDtYQ==
+Message-ID: <4f1aed2e-d382-4147-912a-c915026f8f0c@kernel.org>
+Date: Fri, 22 Mar 2024 09:10:39 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ipv4/route: avoid unused-but-set-variable warning
+Content-Language: en-US
+To: Arnd Bergmann <arnd@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Arnd Bergmann <arnd@arndb.de>, Kunwu Chan <chentao@kylinos.cn>,
+ Joel Granados <joel.granados@gmail.com>,
+ Zhengchao Shao <shaozhengchao@huawei.com>,
+ Wangyang Guo <wangyang.guo@intel.com>, Kyle Zeng <zengyhkyle@gmail.com>,
+ Beniamino Galvani <b.galvani@gmail.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240322131817.905700-1-arnd@kernel.org>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240322131817.905700-1-arnd@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Fri, 22 Mar 2024 09:14:39 +0100 Jiri Pirko wrote:
-> "gaoxingwang" certainly is not.
+On 3/22/24 7:18 AM, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> The log_martians variable is only used in an #ifdef, causing a 'make W=1'
+> warning with gcc:
+> 
+> net/ipv4/route.c: In function 'ip_rt_send_redirect':
+> net/ipv4/route.c:880:13: error: variable 'log_martians' set but not used [-Werror=unused-but-set-variable]
+> 
+> Change the #ifdef to an equivalent IS_ENABLED() to let the compiler
+> see where the variable is used.
+> 
+> Fixes: 30038fc61adf ("net: ip_rt_send_redirect() optimization")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  net/ipv4/route.c | 4 +---
+>  1 file changed, 1 insertion(+), 3 deletions(-)
+> 
 
-According to what rules? Honest question, I don't know much about
-transliteration of what I guess is a Chinese name.
+Reviewed-by: David Ahern <dsahern@kernel.org>
+
+
 
