@@ -1,127 +1,132 @@
-Return-Path: <netdev+bounces-81187-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81188-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7677F8867B8
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 08:59:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ECE48867EB
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 09:07:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D5511F24C16
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 07:59:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70C7B1C2156C
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 08:07:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E11813AC4;
-	Fri, 22 Mar 2024 07:59:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V979Jrjf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0348714014;
+	Fri, 22 Mar 2024 08:06:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbgsg1.qq.com (smtpbgsg1.qq.com [54.254.200.92])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 734EE16429;
-	Fri, 22 Mar 2024 07:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A4114AAE;
+	Fri, 22 Mar 2024 08:06:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.92
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711094351; cv=none; b=Ffj6VcUGhXt9sXXllYMHiqLm9bpUra4ga6CYhcVm1nKahqgd+0qfS9BgP8D9rcPqwiCZWL6jFjpvAtJdpTJ1W6/ew1TnyIUYAHbAhOeKxX79IU8e6kVeKJy9GTUYVnG7WHC8JvNunSwAmQayn/UQqA0Hk1ploiwyQHOi2sJ/pZo=
+	t=1711094817; cv=none; b=Pu67heYFRuTS22PG5kZeNpJZmTLIV0uEr2Ysu6qwyRZbkmApl37X4TZoDo6Q6Mh/iKse5Yx2f/RxdRdw86Zov0tL14ygnmkqq7oEH4CnOBwp7n6eV4YogqwGoxjiLrl9Qh2HYcQqVuPT1hCjlwi1HOJDS7xSlfc6ld19ry9UqUY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711094351; c=relaxed/simple;
-	bh=RUZ5/53DHnVGJizqo5Aou3AF5iR7J4ZbuYQ9yPxcxYs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Z5sl7H7HUVceA3t5qiA2YvPbyMo0rd1QDVGhvojDwPG/oQf34A257s7b7L3Yn+VqPy5Ew8ALs2IqgALweYJ49YC/VQz2JdKyLqfcU2/31v6lrSMbsB23SY/gW+sJpGLnhgQ28BvOac1qhrvwSpi8CDxYj5JlgGRtddPCaurECRI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V979Jrjf; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a46f97b8a1bso241178466b.0;
-        Fri, 22 Mar 2024 00:59:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711094348; x=1711699148; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Evota0EZ/I3ybP8XWAvtgwwod+AOlk4QbEeMKUypvQo=;
-        b=V979JrjfTK5WT7/QRY9MvbCcoI9UaLZXTu3OSdVXIgXEVgjiiwg1CaSKdYbhRe6a+P
-         JSPTO/KZJILmPq2cORuLMPOU3v5IMh+w8ANs2tAC/NoKBXztSOUzhW95NlZEYUytQZjs
-         cQoy+3bK4UuTqjtcCkMI5kwp1I/wxXiAUSdtt82yr7qb5qUW4nONKryvGo/zHXI+WPcv
-         9cAqb/MVDeV8EAHnJdjRVqfuMIccLtIuv8/HrszbHFB5jQ3/2sIaD6Becf+4T85H7krW
-         WHen6lQ14QOGCawDPa5Tjmfgs4p3xYMl+utDxmSw1IVam44S4XHzmcIY/1A/z/JnQZdU
-         UV9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711094348; x=1711699148;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Evota0EZ/I3ybP8XWAvtgwwod+AOlk4QbEeMKUypvQo=;
-        b=RSkp6RyhYQmBx9r8jaeQvPK10+cZuvs4SLBx+5ZIS6K69+qNQAvgXU0kyDLkSYpsI8
-         HpZOuZnu+CFa+R8blOvVbNdOsG7nLkwWaK0eO8aj7wppw7OFiGTl2A4b7cuCF91k6ys7
-         e0Rst4ekOnWtpMD/pvZJAx9buMQaTqGxjThywK6//zt9HFUUORugm0dUSK1tUlYvrQp7
-         nJiJHAuqx9lcjTbir4blyYerHMc9n5WiId7nmah9hNhZb3INP0y/OiIaSzhls2K3KzI7
-         Awgm1PoQHEmiZhGYSG6pdQb1DdTDz+AzPvXi6v+IT4JaLJf+3cqx+89OaIGQFnrtmWQS
-         emGA==
-X-Forwarded-Encrypted: i=1; AJvYcCV265TyG8Znm0gCiGXr993nYdeFlCozmuzckR2N+e4fUB9S9TmvEkFvTavsFaqwX32uCfEmapy/BPVD5t9nu6shZCtXaDAjrQMIVnb43pTHZS6KcRd46p+r9fb11AD+JVTGN4bC
-X-Gm-Message-State: AOJu0YyKgbEpL2VCOQV12DaRWjtmWTlBZKnold9Lkd70Jyf/7Qu6zjUB
-	A79zAsGA498t4IbR/TI685NUvQBy09S5qsSnKNusFIrn+Xy4zD5ttHW77uANU4aplp5grANBRxE
-	J2JyIPpfjSws6HLLbQTWxcBq9pCshG5T/DRk=
-X-Google-Smtp-Source: AGHT+IHkR+Uv6+IgiN5dfa5Enx06mQZLfIB4lxnLzZNQy7D1C/g7lY+vQ4BsGOZEyOxg98z6/qnNJgOXSkr8CzIc/m8=
-X-Received: by 2002:a17:906:6b17:b0:a46:4d16:439b with SMTP id
- q23-20020a1709066b1700b00a464d16439bmr1103225ejr.43.1711094347623; Fri, 22
- Mar 2024 00:59:07 -0700 (PDT)
+	s=arc-20240116; t=1711094817; c=relaxed/simple;
+	bh=zeEyzkGVsnYT+UEL/kKr4eYf2sxQMgOT0Az3cEDXNQg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=RjiX+YXIYu4/k0MfSGx69euOhN76lwp7+rIKTHiuPllM6aQT7GXCcb+/RpUHvzTObxz1I+hdy2rrtoC9pX6gfvrnvZFO7Ac6Ngk78Wb0dyL2GxdH4ENDhmDyFbG5LD2qXpV0rvQOp/4VY96UYXLJ+NE5epn2IxPBGzOI7APj/18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.254.200.92
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
+X-QQ-mid: bizesmtp86t1711094719tskd1b4r
+X-QQ-Originating-IP: 6/spgvc5G+FNS3fcq5kQX1slQ/CH+qbDWACeJxyYghs=
+Received: from localhost.trustnetic.com ( [183.159.169.46])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Fri, 22 Mar 2024 16:05:17 +0800 (CST)
+X-QQ-SSF: 01400000000000E0E000000A0000000
+X-QQ-FEAT: q+yjhizk/eKkPiEx3g0rTO1cZf/nFOdAGzzaWF1yIEfzYx7KehWAxm3MDQ52i
+	dDgGud7Zr33pGI5ZtyN6g5WuhNPzvwa+8pcVPfPqqrX0C8PcQisqBGSRf6Negv1nw0HH9h2
+	PSkBb/N3wX8U16X5dhCBU6CkZnPs7Vexi+S1OipUcLBeMkhFJetxvxdPwJLhMVZkiuItfPS
+	NGL7grd5+IMQotNmLp0Gqgam4tWODxgaUgwLhh3qYZgSObjgMcv3mKo9G62CE3SieyKv0dJ
+	pWoIoUezwQXnnDcjarlHRvAPPqcbVolRvRTlwKuy5jmCalg6DjocFh+NTZFsQWScfsJbtmX
+	AyZVhzDw+0nRGpMNwoggnBZbMHFhbpiyglJN/OsSlEMFGSbUubRIChQ7CDyhxufvDUHFiZa
+	HwAAxn+eQnQ=
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 18032392528168127567
+From: Duanqiang Wen <duanqiangwen@net-swift.com>
+To: netdev@vger.kernel.org,
+	jiawenwu@trustnetic.com,
+	mengyuanlou@net-swift.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	maciej.fijalkowski@intel.com,
+	andrew@lunn.ch,
+	wangxiongfeng2@huawei.com,
+	linux-kernel@vger.kernel.org,
+	michal.kubiak@intel.com
+Cc: Duanqiang Wen <duanqiangwen@net-swift.com>
+Subject: [PATCH net v5] net: txgbe: fix i2c dev name cannot match clkdev
+Date: Fri, 22 Mar 2024 16:04:16 +0800
+Message-Id: <20240322080416.470517-1-duanqiangwen@net-swift.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240322072456.1251387-1-gaoxingwang1@huawei.com>
-In-Reply-To: <20240322072456.1251387-1-gaoxingwang1@huawei.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 22 Mar 2024 15:58:30 +0800
-Message-ID: <CAL+tcoDiSsqhef=aAAwRP92pNv=K43UE--T_MikxpmsTchxCaA@mail.gmail.com>
-Subject: Re: [PATCH] netlink: fix typo
-To: gaoxingwang <gaoxingwang1@huawei.com>
-Cc: mkubecek@suse.cz, idosch@nvidia.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, yanan@huawei.com, liaichun@huawei.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrsz:qybglogicsvrsz3a-1
 
-On Fri, Mar 22, 2024 at 3:26=E2=80=AFPM gaoxingwang <gaoxingwang1@huawei.co=
-m> wrote:
->
-> Add missing colon in coalesce_reply_cb
->
-> Fixes: ec573f209d (netlink: settings: add netlink support for coalesce tx=
- aggr params)
+txgbe clkdev shortened clk_name, so i2c_dev info_name
+also need to shorten. Otherwise, i2c_dev cannot initialize
+clock.
 
-This commit cannot be found in net/net-next tree...
+Change log:
+v4-v5: address comments:
+	Jiri Pirko:
+	Well, since it is used in txgbe_phy.c, it should be probably
+	rather defined locally in txgbe_phy.c.
+v3->v4: address comments:
+	Jakub Kicinski:
+	No empty lines between Fixes and Signed-off... please.
+v2->v3: address comments:
+	Jiawen Wu:
+	Please add the define in txgbe_type.h
 
-> Signed-off-by: gaoxingwang <gaoxingwang1@huawei.com>
->
-> Signed-off-by: gaoxingwang <gaoxingwang1@huawei.com>
+Fixes: e30cef001da2 ("net: txgbe: fix clk_name exceed MAX_DEV_ID limits")
+Signed-off-by: Duanqiang Wen <duanqiangwen@net-swift.com>
+---
+ drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-nit: two duplicated SoB
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+index 5b5d5e4310d1..2fa511227eac 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+@@ -20,6 +20,8 @@
+ #include "txgbe_phy.h"
+ #include "txgbe_hw.h"
+ 
++#define TXGBE_I2C_CLK_DEV_NAME "i2c_dw"
++
+ static int txgbe_swnodes_register(struct txgbe *txgbe)
+ {
+ 	struct txgbe_nodes *nodes = &txgbe->nodes;
+@@ -571,8 +573,8 @@ static int txgbe_clock_register(struct txgbe *txgbe)
+ 	char clk_name[32];
+ 	struct clk *clk;
+ 
+-	snprintf(clk_name, sizeof(clk_name), "i2c_dw.%d",
+-		 pci_dev_id(pdev));
++	snprintf(clk_name, sizeof(clk_name), "%s.%d",
++		 TXGBE_I2C_CLK_DEV_NAME, pci_dev_id(pdev));
+ 
+ 	clk = clk_register_fixed_rate(NULL, clk_name, NULL, 0, 156250000);
+ 	if (IS_ERR(clk))
+@@ -634,7 +636,7 @@ static int txgbe_i2c_register(struct txgbe *txgbe)
+ 
+ 	info.parent = &pdev->dev;
+ 	info.fwnode = software_node_fwnode(txgbe->nodes.group[SWNODE_I2C]);
+-	info.name = "i2c_designware";
++	info.name = TXGBE_I2C_CLK_DEV_NAME;
+ 	info.id = pci_dev_id(pdev);
+ 
+ 	info.res = &DEFINE_RES_IRQ(pdev->irq);
+-- 
+2.27.0
 
-> ---
->  netlink/coalesce.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/netlink/coalesce.c b/netlink/coalesce.c
-> index bc34d3d..bb93f9b 100644
-> --- a/netlink/coalesce.c
-> +++ b/netlink/coalesce.c
-
-Where is this file? I suspect you're not using the standard mainline?
-
-> @@ -93,7 +93,7 @@ int coalesce_reply_cb(const struct nlmsghdr *nlhdr, voi=
-d *data)
->                  tb[ETHTOOL_A_COALESCE_TX_AGGR_MAX_BYTES]);
->         show_u32("tx-aggr-max-frames", "tx-aggr-max-frames:\t",
->                  tb[ETHTOOL_A_COALESCE_TX_AGGR_MAX_FRAMES]);
-> -       show_u32("tx-aggr-time-usecs", "tx-aggr-time-usecs\t",
-> +       show_u32("tx-aggr-time-usecs", "tx-aggr-time-usecs:\t",
->                  tb[ETHTOOL_A_COALESCE_TX_AGGR_TIME_USECS]);
->         show_cr();
->
-> --
-> 2.27.0
->
->
 
