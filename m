@@ -1,162 +1,314 @@
-Return-Path: <netdev+bounces-81257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4A4E886C21
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:32:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68253886C23
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:33:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1096AB236E7
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:32:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF8D21F21677
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A77AD38FA3;
-	Fri, 22 Mar 2024 12:32:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D43703FB96;
+	Fri, 22 Mar 2024 12:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PXiBX+fd"
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="CfMdGlK3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB661E892
-	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 12:32:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85844DF4A;
+	Fri, 22 Mar 2024 12:32:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.118.77.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711110754; cv=none; b=l/Mf7j5gjBBcxRsLlQSA7RiBF+k6Ww4jCEZOSF218PGmX3OmgSBYSszxYb/6csIZsfoJs1WEhJ6U/BtBr2c2q+bum+AuwAy3kT1PqoKDL61W7eMItjon2faM/eymX0BxxDPbSHnOjpVnlZZkl4Jw4scLcsWn7bzlh+c+AXcQMng=
+	t=1711110780; cv=none; b=jXZQbngrZKOb8nfWFIDgLL+w+kyW+TEOGezB43NSmXrGYQlH8gPJQr9T1hi4fmU+9HTPXUNRTsAypZSmPqiJHVxnSzCNRLhxa38dBZ+eMCvC7RIPlUnwPR1pSLUsZgQpZgNPLO0+9ym6ttjjOjrE2Ij+rmACAPl4Hdnj8mN02zI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711110754; c=relaxed/simple;
-	bh=MSth3NUJYhCxQqw8nX3MWsVkHAIF0iMGn8NhujNAFT0=;
-	h=Message-ID:Date:MIME-Version:Subject:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bwm0ssAuXWwyh/ZsUR5EzlaP42N+82AboKadn+TC5ORGhgt5YDWFE7FvWE6Fb+4HKbcqpZsv7fZQqS1UZOz3P0The3MN19Jkn+ErPgNYbeWbgTvcKXMvLjwJMW38VUTzxX66K4qca1avIt0AYcdBurMXpxCFRpTMtpo57kZH2Dw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PXiBX+fd; arc=none smtp.client-ip=209.85.167.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-515830dc79cso2270594e87.1
-        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 05:32:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711110751; x=1711715551; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5ACWCBBBDQsVgE9tJrsRZi6E6Z9JJQgSatT+1My1XZ0=;
-        b=PXiBX+fdnNoGrH43hkWKU1r2bkigdaKnHdTyN+Egyb6TfsTOfXXSpLIGLGNtuI/6NV
-         uyYy/8y7wDLYc27MHWUIwY5u6PpwAMW9hwjjfJG5cCadPw0J8uARb70MVSXStZQMQTUT
-         A/iXaFKGpsMFJZwCUVrc8ZWtKiKQU9NQ/YKsOeLBpDnSzMtIUi/+6e0B2sBVAGsdpXXZ
-         mmjLFOPzJ9gQoarPPWX6RNok5rXNyfxxgta88Zz/E2V3AmGfrTeFgmwTrITJZSai2sUa
-         mw06U0F4Qv4/FI6iuQKvtRZgoirqEqtavdY56gVAOppYv0xfS1+QkHdSwnON7cBjVTYT
-         wyVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711110751; x=1711715551;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from:references:cc
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5ACWCBBBDQsVgE9tJrsRZi6E6Z9JJQgSatT+1My1XZ0=;
-        b=JXaHnd8AIi4uGtrLvGfPPt7i5bcR7PDOVb9YajqYoVNC6JLQg/bazdUqT0U4cRXP6S
-         0Iy5dya49hLAfxAqgd8kNtNuFT4CPC8KtS288mDq1E2syFnv3PkoPLrzb7+idT5XAvjI
-         6SIvg4TD4OvQ4gMhihdzJiUE+p3bHr5uM2vWpN2i67QPOSlhVDKlSSrKIUA1gFRlo/DH
-         XgbRToMo+Ond3CIn+YQET6z7DSOmkGv1sdnpqNJTzab9yiJa6ZoOhL8of7kNWBrlNByQ
-         7A5FAcoPVTiijGRDcBMEftIooOUg1iPjCDvY4RoG+A5h6Onuo8Sq6Oi3hmE+Amum0hIO
-         Zk4g==
-X-Forwarded-Encrypted: i=1; AJvYcCXoq8Ezki0SKNx0yq4bnsM+8AVxBUborFw13m9VQXw6WmDDt3PL6DL4RqmOoy5Vvfp1uKu/yorMXl+IrJ5APGgXgSdzqWHc
-X-Gm-Message-State: AOJu0YxJbbrkJ9scttgDKI6E5Itz1DSE3iUrEh0E02lRjahoKO6BkB2d
-	i9WdsZvqEbJXBsfOsaJRhEoHQ7nkc2gptrS6Kx31Vf+bXtZLVn4UZMnpVYpH
-X-Google-Smtp-Source: AGHT+IFTNRBW5IivMBoLyLvNOBlY2+x9P2QFM2IomF4Xiyjhhm6HwuIVrA0ZTCS2vLw6yk0kQ5JRSA==
-X-Received: by 2002:a05:6512:529:b0:513:af26:8cd0 with SMTP id o9-20020a056512052900b00513af268cd0mr1628632lfc.68.1711110750998;
-        Fri, 22 Mar 2024 05:32:30 -0700 (PDT)
-Received: from ?IPV6:2a01:c23:b9ee:2200:3c84:d0e4:1607:95e7? (dynamic-2a01-0c23-b9ee-2200-3c84-d0e4-1607-95e7.c23.pool.telefonica.de. [2a01:c23:b9ee:2200:3c84:d0e4:1607:95e7])
-        by smtp.googlemail.com with ESMTPSA id v22-20020a50a456000000b0056bb65f4a1esm1019410edb.94.2024.03.22.05.32.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Mar 2024 05:32:30 -0700 (PDT)
-Message-ID: <99d1e399-16bd-49fd-9fcf-4db6fc029780@gmail.com>
-Date: Fri, 22 Mar 2024 13:32:32 +0100
+	s=arc-20240116; t=1711110780; c=relaxed/simple;
+	bh=PXuKlHhR0rmIvfh4GOdhC5xMukDBTJzH8gQ4WFtG6vE=;
+	h=Date:From:To:CC:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To:References; b=FPql8NYS8rLV3UYWxGsZJaY5IX2RJdKaWyoWyNJJAz2xr3bscKKu4dUplN3DArxCApwtyNIwmQpTMU07p6mHVlb7p3KFANlhokNCz2Y2NBm9Pn9SOuTkV4+1EThOUrTxHyImAP5heVKY6FxTOX/L7YdUxCInGnI3Xw2mzNT/oWU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=CfMdGlK3; arc=none smtp.client-ip=210.118.77.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20240322123250euoutp02081a57b24397ba21136c1b21f7f9e21f~-Fi38aX2A1168711687euoutp02O;
+	Fri, 22 Mar 2024 12:32:50 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20240322123250euoutp02081a57b24397ba21136c1b21f7f9e21f~-Fi38aX2A1168711687euoutp02O
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1711110770;
+	bh=MOUxdcjbFgurg/K2m4yHjaRurqkgz9QnPyQZuqj01dg=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=CfMdGlK3S3TOzua/sPBMidRB995/6Rs8LdqJD/T1EXknesCOxLNX8xcduQPBhNYjt
+	 x4ouqssqZmnJ2hW118vlt7jjSfkH+lrjXZUYZPQcW9HTyi/bC5EEUKJxg5BVlUP7rx
+	 268LdbfM0UI7cqW4BTOjsOneLnYWXU0EjDuM3idY=
+Received: from eusmges2new.samsung.com (unknown [203.254.199.244]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTP id
+	20240322123249eucas1p1e9609d790d5749de34403cec87d0d1f4~-Fi3rVxyn2695626956eucas1p1h;
+	Fri, 22 Mar 2024 12:32:49 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+	eusmges2new.samsung.com (EUCPMTA) with SMTP id AA.CF.09814.17A7DF56; Fri, 22
+	Mar 2024 12:32:49 +0000 (GMT)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTPA id
+	20240322123249eucas1p2c0f47dbdf2e726d51676507c466a28a6~-Fi3NYOeg2864028640eucas1p25;
+	Fri, 22 Mar 2024 12:32:49 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20240322123249eusmtrp10a9a3c3c08395bb2edf90d934a448d97~-Fi3MiarW1391313913eusmtrp1U;
+	Fri, 22 Mar 2024 12:32:49 +0000 (GMT)
+X-AuditID: cbfec7f4-727ff70000002656-b2-65fd7a71f329
+Received: from eusmtip1.samsung.com ( [203.254.199.221]) by
+	eusmgms2.samsung.com (EUCPMTA) with SMTP id 9F.43.10702.17A7DF56; Fri, 22
+	Mar 2024 12:32:49 +0000 (GMT)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+	eusmtip1.samsung.com (KnoxPortal) with ESMTPA id
+	20240322123249eusmtip19f189b2e3fedcffa72acab8eef83d240~-Fi3Aqy3T1666116661eusmtip1p;
+	Fri, 22 Mar 2024 12:32:49 +0000 (GMT)
+Received: from localhost (106.210.248.248) by CAMSVWEXC02.scsc.local
+	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+	Fri, 22 Mar 2024 12:32:48 +0000
+Date: Fri, 22 Mar 2024 13:32:46 +0100
+From: Joel Granados <j.granados@samsung.com>
+To: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+CC: Luis Chamberlain <mcgrof@kernel.org>, Kees Cook <keescook@chromium.org>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH v3 2/2] sysctl: treewide: constify argument
+ ctl_table_root::permissions(table)
+Message-ID: <20240322123246.bxxgiiwb3hjbmvb2@joelS2.panther.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: r8169 DASH-related issue
-Content-Language: en-US
-Cc: atlas.yu@canonical.com, davem@davemloft.net, edumazet@google.com,
- hau@realtek.com, kuba@kernel.org, netdev@vger.kernel.org,
- nic_swsd@realtek.com, pabeni@redhat.com
-References: <0dee563a-08ea-4e50-b285-5d0527458057@gmail.com>
- <20240322104955.60990-1-atlas.yu@canonical.com>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <20240322104955.60990-1-atlas.yu@canonical.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="6v6kdadjlfixw7rp"
+Content-Disposition: inline
+In-Reply-To: <20240315-sysctl-const-ownership-v3-2-b86680eae02e@weissschuh.net>
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFnrCKsWRmVeSWpSXmKPExsWy7djPc7qFVX9TDY6261nMOd/CYvH02CN2
+	izPduRYXtvWxWuzZe5LF4vKuOWwWv388Y7K4MeEpo8WxBWIW306/YXTg8pjdcJHFY8vKm0we
+	CzaVemxa1cnm8X7fVTaPz5vkPPq7j7EHsEdx2aSk5mSWpRbp2yVwZeybuo2pYKZexYIPn5ka
+	GLvVuhg5OCQETCTWHy3vYuTiEBJYwSgx8fw+NgjnC6PE8tnHWSCcz4wSG5s+sncxcoJ19B+e
+	D5VYziix89wUhKq5jZeYIZytjBIbuq4xgSxhEVCVuD2BC6SbTUBH4vybO8wgtoiAjcTKb5/Z
+	QeqZBfYxSXy82Aa2QlggReLB4fVMIDavgIPEwa/T2SBsQYmTM5+wgNjMAhUSf57sBZvPLCAt
+	sfwfB0iYU8BfYvPic4wQlypLXN+3mA3CrpU4teUWE8guCYHdnBJtW/qhEi4SG87sYoawhSVe
+	Hd8C9aaMxOnJPSwQDZMZJfb/+8AO4axmlFjW+JUJospaouXKE6gOR4m+H5tYIMHKJ3HjrSDE
+	oXwSk7ZNZ4YI80p0tAlBVKtJrL73hmUCo/IsJK/NQvLaLITXIMJ6EjemTmHDENaWWLbwNTOE
+	bSuxbt17lgWM7KsYxVNLi3PTU4uN8lLL9YoTc4tL89L1kvNzNzECE9/pf8e/7GBc/uqj3iFG
+	Jg7GQ4wqQM2PNqy+wCjFkpefl6okwrvj/59UId6UxMqq1KL8+KLSnNTiQ4zSHCxK4ryqKfKp
+	QgLpiSWp2ampBalFMFkmDk6pBqamx3GOD6IkTG/c/TvxQsi+hMt99ySe3zG6m5mzUMyZ9T3v
+	VvPdIbWv924zLN92WoFthd1E+etqfJt3cbv+8u1rafkvv08jRZpjyw3XOqbrCqvUbf9mpOxz
+	3uCUaxjOb3z5ls9ReYYOMw/5c6UMe/g9Xuxi1U1vWX7wyKTr+yW1OnhFf4c4uCRN82LT9i3Z
+	uD/S0m0pv7Is953yP03pEi82373u17amZvLjL3d4tFbMu3czd9LfdZeMZ3Z/XHS7W+/uUn72
+	6phpzCLrI+94bbQW6JpxWlI8yJM7eE/FhuYsu9dbVadP2pV8fpbeodzbmfsLDkYcq4iLPrhm
+	20POrXc/bbyWNuWw8xzVNbOEbsQrsRRnJBpqMRcVJwIA3ksZoPcDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFmpkleLIzCtJLcpLzFFi42I5/e/4Xd3Cqr+pBo+bhSzmnG9hsXh67BG7
+	xZnuXIsL2/pYLfbsPclicXnXHDaL3z+eMVncmPCU0eLYAjGLb6ffMDpwecxuuMjisWXlTSaP
+	BZtKPTat6mTzeL/vKpvH501yHv3dx9gD2KP0bIryS0tSFTLyi0tslaINLYz0DC0t9IxMLPUM
+	jc1jrYxMlfTtbFJSczLLUov07RL0Mh7P2sNSMF2vYseV60wNjJ1qXYycHBICJhL9h+ezdDFy
+	cQgJLGWUWPX0PDNEQkZi45errBC2sMSfa11sEEUfGSX+ztgK5WxllDgycR17FyMHB4uAqsTt
+	CVwgDWwCOhLn39wBGyQiYCOx8ttndpB6ZoF9TBIfL7axgySEBVIkHhxezwRi8wo4SBz8Oh1q
+	6HNGiS07t7BDJAQlTs58wgJiMwuUSay4epgZZBmzgLTE8n8cIGFOAX+JzYvPMUJcqixxfd9i
+	Ngi7VuLz32eMExiFZyGZNAvJpFkIkyDCOhI7t95hwxDWlli28DUzhG0rsW7de5YFjOyrGEVS
+	S4tz03OLjfSKE3OLS/PS9ZLzczcxAuN/27GfW3Ywrnz1Ue8QIxMH4yFGFaDORxtWX2CUYsnL
+	z0tVEuHd8f9PqhBvSmJlVWpRfnxRaU5q8SFGU2AoTmSWEk3OByamvJJ4QzMDU0MTM0sDU0sz
+	YyVxXs+CjkQhgfTEktTs1NSC1CKYPiYOTqkGpgk8nx1yNy1lWeLTsir53zGOTtG0qzJb9FYI
+	Ld62+YHJ4uvVCzn+PD6tsn3lM8PChZ93x3C/Z6zPSAziXv71s2Fp0zJN9dNZardeHrG59E1m
+	23qhkpcTF2SJNhY6f/UOEp/YLHFtkfXubVYtZ4/nh+yW2eB/12XJYtZ/3M2rtjx2uRqybdIM
+	s1OGm3iTT0283rote8GDR9EB3sw9Z0s0jLhaGteWRyhaP8pJuX/AWjZc9NpZ3UnBhbz366d0
+	bwvVPVseIumRz+Fbz81225k7z2eL9Nk874duW989CH6W19BmcmhGscBNw5vHUxJmBN9KOiax
+	QElwfVpz0v1l4rwH1vsYvPatleJdy/92t+WfaiWW4oxEQy3mouJEAAhTRpmUAwAA
+X-CMS-MailID: 20240322123249eucas1p2c0f47dbdf2e726d51676507c466a28a6
+X-Msg-Generator: CA
+X-RootMTR: 20240315181140eucas1p229d306ff1d983bb302d24631e4381c5e
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20240315181140eucas1p229d306ff1d983bb302d24631e4381c5e
+References: <20240315-sysctl-const-ownership-v3-0-b86680eae02e@weissschuh.net>
+	<CGME20240315181140eucas1p229d306ff1d983bb302d24631e4381c5e@eucas1p2.samsung.com>
+	<20240315-sysctl-const-ownership-v3-2-b86680eae02e@weissschuh.net>
 
-On 22.03.2024 11:49, Atlas Yu wrote:
-> On Fri, Mar 22, 2024 at 6:16 PM Heiner Kallweit <hkallweit1@gmail.com> wrote:
-> 
->> No, this only checks whether DASH is enabled.
->> I don't think is redundant, because the original change explicitly mentions that
->> DASH fw may impact behavior even if DASH is disabled.
-> 
-> I see, thanks for the clarification.
-> 
->> I understand that on your test system DASH is disabled. But does your system have
->> a DASH fw or not?
-> 
-> I am not familiar with DASH, my system's DASH type is "RTL_DASH_EP", and I have no
-> idea if it has a DASH firmware or not. I am glad to check it if you tell me how.
+--6v6kdadjlfixw7rp
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-I don't have access to datasheets and can't tell. Therefore I asked Realtek to comment.
+On Fri, Mar 15, 2024 at 07:11:31PM +0100, Thomas Wei=DFschuh wrote:
+> The permissions callback is not supposed to modify the ctl_table.
+> Enforce this expectation via the typesystem.
+>=20
+> The patch was created with the following coccinelle script:
+>=20
+>   @@
+>   identifier func, head, ctl;
+>   @@
+>=20
+>   int func(
+>     struct ctl_table_header *head,
+>   - struct ctl_table *ctl)
+>   + const struct ctl_table *ctl)
+>   { ... }
+>=20
+> (insert_entry() from fs/proc/proc_sysctl.c is a false-positive)
+>=20
+> The three changed locations were validated through manually inspection
+> and compilation.
+Will remove this when I add it to constfy branch as it is unclear (for
+me) what "manually inspection" is and also I do not know what config you
+used to compile. IMO, we can just do without it.
 
-> My patched r8169 driver and r8168 driver both work well on my system.
-> 
->> My assumption is that the poll loop is relevant on systems with DASH fw, even if
->> DASH is disabled.
-> 
-> I know your concern, but in my case it is wasting 300ms on driver startup. Maybe
-> we can find a way to avoid this together.
-Before applying the change I'd like to ensure that it doesn't break anything on
-systems with a different DASH setup. So let's see whether Realtek provides some
-more insight.
+>=20
+> In addition a search for '.permissions =3D' was done over the full tree to
+> look for places that were missed by coccinelle.
+> None were found.
+>=20
+> This change also is a step to put "struct ctl_table" into .rodata
+> throughout the kernel.
 
+This LGTM. Will add this to the constfy testing branch with these
+changes in the commit message:
+"""
+sysctl: treewide: constify argument ctl_table_root::permissions(table)
+
+The permissions callback should not modify the ctl_table. Enforce this
+expectation via the typesystem. This is a step to put "struct ctl_table"
+into .rodata throughout the kernel.
+
+The patch was created with the following coccinelle script:
+
+  @@
+  identifier func, head, ctl;
+  @@
+
+  int func(
+    struct ctl_table_header *head,
+  - struct ctl_table *ctl)
+  + const struct ctl_table *ctl)
+  { ... }
+
+(insert_entry() from fs/proc/proc_sysctl.c is a false-positive)
+
+No additional occurances of '.permissions =3D' were found after a
+tree-wide search for places missed by the conccinelle script.
+
+"""
+
+Reviewed-by: Joel Granados <j.granados@samsung.com>
+>=20
+> Signed-off-by: Thomas Wei=DFschuh <linux@weissschuh.net>
+> ---
+>  include/linux/sysctl.h | 2 +-
+>  ipc/ipc_sysctl.c       | 2 +-
+>  ipc/mq_sysctl.c        | 2 +-
+>  kernel/ucount.c        | 2 +-
+>  net/sysctl_net.c       | 2 +-
+>  5 files changed, 5 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/include/linux/sysctl.h b/include/linux/sysctl.h
+> index 60333a6b9370..f9214de0490c 100644
+> --- a/include/linux/sysctl.h
+> +++ b/include/linux/sysctl.h
+> @@ -206,7 +206,7 @@ struct ctl_table_root {
+>  	struct ctl_table_set *(*lookup)(struct ctl_table_root *root);
+>  	void (*set_ownership)(struct ctl_table_header *head,
+>  			      kuid_t *uid, kgid_t *gid);
+> -	int (*permissions)(struct ctl_table_header *head, struct ctl_table *tab=
+le);
+> +	int (*permissions)(struct ctl_table_header *head, const struct ctl_tabl=
+e *table);
+>  };
+> =20
+>  #define register_sysctl(path, table)	\
+> diff --git a/ipc/ipc_sysctl.c b/ipc/ipc_sysctl.c
+> index 1a5085e5b178..19b2a67aef40 100644
+> --- a/ipc/ipc_sysctl.c
+> +++ b/ipc/ipc_sysctl.c
+> @@ -204,7 +204,7 @@ static void ipc_set_ownership(struct ctl_table_header=
+ *head,
+>  	*gid =3D gid_valid(ns_root_gid) ? ns_root_gid : GLOBAL_ROOT_GID;
+>  }
+> =20
+> -static int ipc_permissions(struct ctl_table_header *head, struct ctl_tab=
+le *table)
+> +static int ipc_permissions(struct ctl_table_header *head, const struct c=
+tl_table *table)
+>  {
+>  	int mode =3D table->mode;
+> =20
+> diff --git a/ipc/mq_sysctl.c b/ipc/mq_sysctl.c
+> index 6bb1c5397c69..43c0825da9e8 100644
+> --- a/ipc/mq_sysctl.c
+> +++ b/ipc/mq_sysctl.c
+> @@ -90,7 +90,7 @@ static void mq_set_ownership(struct ctl_table_header *h=
+ead,
+>  	*gid =3D gid_valid(ns_root_gid) ? ns_root_gid : GLOBAL_ROOT_GID;
+>  }
+> =20
+> -static int mq_permissions(struct ctl_table_header *head, struct ctl_tabl=
+e *table)
+> +static int mq_permissions(struct ctl_table_header *head, const struct ct=
+l_table *table)
+>  {
+>  	int mode =3D table->mode;
+>  	kuid_t ns_root_uid;
+> diff --git a/kernel/ucount.c b/kernel/ucount.c
+> index 4aa6166cb856..90300840256b 100644
+> --- a/kernel/ucount.c
+> +++ b/kernel/ucount.c
+> @@ -38,7 +38,7 @@ static int set_is_seen(struct ctl_table_set *set)
+>  }
+> =20
+>  static int set_permissions(struct ctl_table_header *head,
+> -				  struct ctl_table *table)
+> +			   const struct ctl_table *table)
+>  {
+>  	struct user_namespace *user_ns =3D
+>  		container_of(head->set, struct user_namespace, set);
+> diff --git a/net/sysctl_net.c b/net/sysctl_net.c
+> index a0a7a79991f9..f5017012a049 100644
+> --- a/net/sysctl_net.c
+> +++ b/net/sysctl_net.c
+> @@ -40,7 +40,7 @@ static int is_seen(struct ctl_table_set *set)
+> =20
+>  /* Return standard mode bits for table entry. */
+>  static int net_ctl_permissions(struct ctl_table_header *head,
+> -			       struct ctl_table *table)
+> +			       const struct ctl_table *table)
+>  {
+>  	struct net *net =3D container_of(head->set, struct net, sysctls);
+> =20
+>=20
+> --=20
+> 2.44.0
+>=20
+
+--=20
+
+Joel Granados
+
+--6v6kdadjlfixw7rp
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmX9em0ACgkQupfNUreW
+QU+JRQv/R0MDqGXzC3NYKMv+wIm47Ltk3eMtQmkY12yK0OcF47dm6WzpobwWXL+f
+4n5LwquGatNednUTNHw8HOhGxtfHvqJo34aNgfGKQXF9wsKVBVPNUrCA9R1exdb6
++M9Q0NrLC2cOMR19BxLjQPH2AABzcHzR3Q48d6vtFbAw3URWGPO387tmQFbvr3g4
+26dmdaTKhmtzBRLWTdQp6sqQhDt1b2GCr1CL9bvlUTEJf7b7FD6F7/t29Of5O3YZ
+8XJbhlzGvh8kcvAdGokSURjInmZjp2aSpeyCJjY7e6VqghFTi975qc5Tnf286Nw8
+iZBavNVO21hioGmYu/7ZvlZIv2/zuPKKCQpmqZPu6E2XR9AtNzFT3NODvhYV1Gsh
+/QvkKYFRHsMWIPtmaXBRG29Br/BDQkZG43OoT6KATZ9piTP8G50OrbWNLZZmouy+
+P/sRR2UXvnOHTYUXX4pFUnV7LUDbUJU2aIsY0Bsr0ChyS+pUEQwo4NUCEYptJKXM
+aGTz0BJL
+=QTWi
+-----END PGP SIGNATURE-----
+
+--6v6kdadjlfixw7rp--
 
