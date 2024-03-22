@@ -1,127 +1,121 @@
-Return-Path: <netdev+bounces-81329-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81330-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E73AD887404
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 20:51:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E76C88740E
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 20:57:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 816691F230FF
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 19:51:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF684282028
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 19:57:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32FEC7EF05;
-	Fri, 22 Mar 2024 19:51:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59B6D7A702;
+	Fri, 22 Mar 2024 19:57:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="JQXN5m+Q"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VYG0xVp/"
 X-Original-To: netdev@vger.kernel.org
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426C117589;
-	Fri, 22 Mar 2024 19:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B815871733
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 19:57:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711137098; cv=none; b=VcHCx07/II5wxoRC7U5G4cWaL5F9tNTwQG0izpSb6JbKyMqGKYZN0YcJCwbuWODwJy7wqloADWz2iJlNFl7FTfwCK/i5bzFngtta+khPLYK/zf9rZQ4xYKkrIrhufh9JihTU3tUNW3KR96arElzeYj/gZKxxDRxnO6effKtFV8M=
+	t=1711137440; cv=none; b=hp6AZe/dfoS4SDCNvHHgHTkjNyYS9K+dJufM9T3fVyUPT9P/DZodl+kLFl5QVnH/wxSJTD/GRPAhEsC7d/duB8bGONR0XYjQIGrLmwG+wskm0KCUgQ/zwfxYt7kO4VglteVQMfq+c31jILYZ6JI992cklKt+unlSkIlQvT4df4E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711137098; c=relaxed/simple;
-	bh=72Kdlh+PeCaC0JgXHs4uX5Eocp2863XVaM6CXcHJbm0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=pOwddbuJYdgwO0TMi8dEqfmG541d2PxAOKDAVFG2ZgE766IdNjjXveySESVKHK/DsS6FEVdTbytQBDWs28tageOPQe2uof76TY/mnGlY+XR3LP8jcK3QpVmraIFUAxkqnV/xqahH5JQWPoEsh/LmytrL09ZZ0IsXvj60J24YDFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=JQXN5m+Q; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1711137092;
-	bh=72Kdlh+PeCaC0JgXHs4uX5Eocp2863XVaM6CXcHJbm0=;
-	h=From:Date:Subject:To:Cc:From;
-	b=JQXN5m+QdMw2QCyoPeGUyDWN4k0AuD4kkKnRMVw2J3dfukKHyBg5fCK7KJ1tNcvnl
-	 +YYTt8d4PKeK32kHn8ri0RBbPfvSNY7QIvFyjQb6dA/EvOhg9FKMTc8+8tteoWfcfc
-	 2hYeWAKVqxWNuXukXzYhOOpm3kaD61HL2fYyAVTI=
-From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-Date: Fri, 22 Mar 2024 20:51:11 +0100
-Subject: [PATCH v2] fs/proc/proc_sysctl.c: always initialize i_uid/i_gid
+	s=arc-20240116; t=1711137440; c=relaxed/simple;
+	bh=o75SRdTkUMmQcC2lL8a8S3pSKWUGJdtOgfiyXIzEscE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CgmIm+pOU/WDU9vRnxP5oub/Fv4oaKzPqRExvgBMtiu/pDjt17Uxd20+qInsKZNGmAX5N33CjHp9SImp77rleNcpjRcIAN+KILjUP09S2bj3+C6b7YduWzpez3JI8TOeUI86pIR976XNml8zvWivTtn3MdPe0S1a9tbrJTPb/vQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VYG0xVp/; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=amIrGlkmaB76KZoaSlBCudgSjqmh6MBWuV9e0ATMQMY=; b=VYG0xVp/g0svrTKpM8hk0FFQBg
+	Yb5zCDOhNV0t0ZBF+V75bXYpl6ZYkNSMh2rsSGOgNLC6kw6Qu3EM5UkhzMmDTc/h3Cd8ql/swu0qj
+	v7W53bzXaiTuzGY3yJRr7IkU4/inMStOrOY1LHZe82rl5X9keeaBdgQrbXrIkvRhigcdnAKRcDs6C
+	EnIRfcKOc2XM3hXTT6s+ZgeT8wMxx5Skt6jl4LIGUrRKvUbQG3+2FPDp4Od6+pGFsdROMkXOe4Zvs
+	Ay8eMwtQ57hxOyoKg0LaklRDR4ML7cRXTT4dofT0+7bLO9jywWSXLqCRg9HnUaNEtFbfUIOdOEx2K
+	5qiDyptw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44742)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1rnl0S-0000lE-28;
+	Fri, 22 Mar 2024 19:56:48 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1rnl0O-0004vy-7X; Fri, 22 Mar 2024 19:56:44 +0000
+Date: Fri, 22 Mar 2024 19:56:44 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: Yanteng Si <siyanteng@loongson.cn>, andrew@lunn.ch,
+	hkallweit1@gmail.com, peppe.cavallaro@st.com,
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
+	Jose.Abreu@synopsys.com, chenhuacai@loongson.cn,
+	guyinggang@loongson.cn, netdev@vger.kernel.org,
+	chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH net-next v8 09/11] net: stmmac: dwmac-loongson: Fix half
+ duplex
+Message-ID: <Zf3ifH/CjyHtmXE3@shell.armlinux.org.uk>
+References: <cover.1706601050.git.siyanteng@loongson.cn>
+ <3382be108772ce56fe3e9bb99c9c53b7e9cd6bad.1706601050.git.siyanteng@loongson.cn>
+ <dp4fhkephitylrf6a3rygjeftqf4mwrlgcdasstrq2osans3zd@zyt6lc7nu2e3>
+ <vostvybxawyhzmcnabnh7hsc7kk6vdxfdzqu4rkuqv6sdm7cuw@fd2y2o7di5am>
+ <88c8f5a4-16c1-498b-9a2a-9ba04a9b0215@loongson.cn>
+ <ZfF+IAWbe1rwx3Xs@shell.armlinux.org.uk>
+ <cd8be3b1-fcfa-4836-9d28-ced735169615@loongson.cn>
+ <em3r6w7ydvjxualqifjurtrrfpztpil564t5k5b4kxv4f6ddrd@4weteqhekyae>
+ <Zfq8TNrt0KxW/IWh@shell.armlinux.org.uk>
+ <fu3f6uoakylnb6eijllakeu5i4okcyqq7sfafhp5efaocbsrwe@w74xe7gb6x7p>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20240322-sysctl-net-ownership-v2-1-a8b4a3306542@weissschuh.net>
-X-B4-Tracking: v=1; b=H4sIAC7h/WUC/4WNTQ6CMBCFr0Jm7RhaAaMr7mFYlDraSUxLOlgkp
- He3cgHf7nt5PxsIRSaBa7VBpMTCwRfQhwqsM/5JyPfCoGvd1CfVoqxi5xd6mjEsnqI4nnC0Dak
- zGSLTQalOkR782WdvQ2HHMoe47i9J/dw/g0mhQj02XVtk9EX3C7GIWPd2xxKFIef8BQ8u26K9A
- AAA
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
- "Eric W. Biederman" <ebiederm@xmission.com>, 
- Joel Granados <j.granados@samsung.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Luis Chamberlain <mcgrof@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
- stable@vger.kernel.org, 
- =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
-X-Mailer: b4 0.13.0
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1711137092; l=1753;
- i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
- bh=72Kdlh+PeCaC0JgXHs4uX5Eocp2863XVaM6CXcHJbm0=;
- b=AHfmIoxytnUEQFA5MfwfoRoRpJGA6Tspr/zU56SHlqDFrZZns1LRwaTeQ2kMKUFXfoZ2WdVNY
- 1dXk+g3rws6Des2y4Y15HNbuCrGUHEf/A3U5trLOQcAYOMXSovp96ut
-X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
- pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <fu3f6uoakylnb6eijllakeu5i4okcyqq7sfafhp5efaocbsrwe@w74xe7gb6x7p>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Commit e79c6a4fc923 ("net: make net namespace sysctls belong to container's owner")
-added default values for i_uid/i_gid.
-These however are only used when ctl_table_root->set_ownership is not
-implemented.
-But the callbacks themselves could fail to compute i_uid/i_gid and they
-all need to have the same fallback logic for this case.
+On Fri, Mar 22, 2024 at 09:07:19PM +0300, Serge Semin wrote:
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index 25519952f754..24ff5d1eb963 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -936,6 +936,22 @@ static void stmmac_mac_flow_ctrl(struct stmmac_priv *priv, u32 duplex)
+>  			priv->pause, tx_cnt);
+>  }
+>  
+> +static unsigned long stmmac_mac_get_caps(struct phylink_config *config,
+> +					 phy_interface_t interface)
+> +{
+> +	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
+> +
+> +	/* Get the MAC-specific capabilities */
+> +	stmmac_mac_phylink_get_caps(priv);
+> +
+> +	config->mac_capabilities = priv->hw->link.caps;
+> +
+> +	if (priv->plat->max_speed)
+> +		phylink_limit_mac_speed(config, priv->plat->max_speed);
+> +
+> +	return config->mac_capabilities;
 
-This is unnecessary code duplication and prone to errors.
-For example net_ctl_set_ownership() missed the fallback.
+Yes, I think your approach is better - and it still allows for the
+platform's capabilities to be masked in towards the end of this
+function.
 
-Instead always initialize i_uid/i_gid inside the sysfs core so
-set_ownership() can safely skip setting them.
+Thanks.
 
-Fixes: e79c6a4fc923 ("net: make net namespace sysctls belong to container's owner")
-Cc: stable@vger.kernel.org
-Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
----
-Changes in v2:
-- Move the fallback logic to the sysctl core
-- Link to v1: https://lore.kernel.org/r/20240315-sysctl-net-ownership-v1-1-2b465555a292@weissschuh.net
----
- fs/proc/proc_sysctl.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
-
-diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
-index 37cde0efee57..9e34ab9c21e4 100644
---- a/fs/proc/proc_sysctl.c
-+++ b/fs/proc/proc_sysctl.c
-@@ -479,12 +479,10 @@ static struct inode *proc_sys_make_inode(struct super_block *sb,
- 			make_empty_dir_inode(inode);
- 	}
- 
-+	inode->i_uid = GLOBAL_ROOT_UID;
-+	inode->i_gid = GLOBAL_ROOT_GID;
- 	if (root->set_ownership)
- 		root->set_ownership(head, table, &inode->i_uid, &inode->i_gid);
--	else {
--		inode->i_uid = GLOBAL_ROOT_UID;
--		inode->i_gid = GLOBAL_ROOT_GID;
--	}
- 
- 	return inode;
- }
-
----
-base-commit: ff9c18e435b042596c9d48badac7488e3fa76a55
-change-id: 20240315-sysctl-net-ownership-bc4e17eaeea6
-
-Best regards,
 -- 
-Thomas Weißschuh <linux@weissschuh.net>
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
