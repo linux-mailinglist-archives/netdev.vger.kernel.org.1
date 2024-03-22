@@ -1,53 +1,75 @@
-Return-Path: <netdev+bounces-81215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DDAB886A04
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 11:16:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEDBF886A0B
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 11:16:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7EFE6B213B3
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 10:16:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 094D61F22535
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 10:16:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55C94288AE;
-	Fri, 22 Mar 2024 10:16:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA2F22C689;
+	Fri, 22 Mar 2024 10:16:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="Y2ReAm1C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZGuhItoS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.4])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C70926ADB;
-	Fri, 22 Mar 2024 10:16:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DD58374CF
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 10:16:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711102570; cv=none; b=AR+wv5zqn0D91qd2/VWbQAAT2yA8RYRr8pD22gWT95pe47bv3M5uWyFqHszfpUcgmqBJbuGDzX4GVzLpqdCj9HnQ72XDyAKwCGDePI3muEwKpTIPu7OtTN+qD7SFQ1WUMK6pgz1+Vwiv0jGzzCdKqrAq+ffK/8Wlf/ir+89QawQ=
+	t=1711102612; cv=none; b=b2F8BN3CkCPjq25b9CT+C6K4ynhrJj6bUnVuaGsTVgXI1hmZziMk4PoY1I/RKsnSgc7ox9AvE6ByL8oAG+yaVkeVHubmTzI/ZnwpS7pXxyHxjo65dgemZkm6lC8vBhiY+rXeIYuW4GZ9iVyeFEFBiMu0S67Uf1q3w1yrRD538gk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711102570; c=relaxed/simple;
-	bh=GadESi8ONSV56erp89XTT+vSta6NjyXh9DD7OG2fFAk=;
+	s=arc-20240116; t=1711102612; c=relaxed/simple;
+	bh=LwCoZKf3jbpJ5rZT1SDtb8RsBCDGys81ba46VZ48G8c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GzhD8K+syW30a0xPXWftCf6RkJwjT81eUQ/qqHiw9tt35KOmjoM10zlyB0S23uFlKscVoDCghNnsxCuTu0zhMPpxFmMCJxiSNVYLqLEY+fkswO+6oitxHZqnXhNhIqGZSJk5tjvDrGQRwSddP1aiO8Eh99nd8GzWamr2JHirGbs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=Y2ReAm1C; arc=none smtp.client-ip=212.227.15.4
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1711102564; x=1711707364; i=markus.elfring@web.de;
-	bh=YITSdSNKjtGWKQJCqVlDxMIGXLNZSJ1FOmf8VqHMVLI=;
-	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
-	 In-Reply-To;
-	b=Y2ReAm1Cd4sNe5u0ne9uK6PLGurzdh+kkALmaxx1M8WJ19BTpB/sxYqatqgkFwzP
-	 HNF6CiMavemFWZHCjCubLFrgKKREtpcm54KNbLjWzuDbNgiCTymtjqR23i11rdQhb
-	 /jsC0CFngbzNkN5VYgk6g9PyNKArXi5Mrpdfnjj+8m3wLJeQ+ifFhl1ZzhMRiju1f
-	 9ASJjnPNlrnDdQAZBiLiUD8HpjBHbUSXIl3tqKcquS2n347ya0QQ1U3zAb0PyBpt1
-	 cmsN0xV+5bpWjRmzfaTXqNXoLqHvTf/2sVlyTXTYeAwf0dMUTQrJgA9vrYO/Sy0xn
-	 tyLUC+DMpTYrbbW5Pw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1Mfc4q-1r7vNl0NY0-00jbRy; Fri, 22
- Mar 2024 11:10:13 +0100
-Message-ID: <9b09c797-2b01-40d8-9e83-ecb6e25ee78a@web.de>
-Date: Fri, 22 Mar 2024 11:10:10 +0100
+	 In-Reply-To:Content-Type; b=SvKIBTXsSs1p6gN1xCRrTChq4ma6TWT0Rrfx4zdMpFABMeBhHCwHp7L9gEinGt7uTV27xlhNDqmRW+nQZFuMbFb+dIoioHqcuM/3tSVlhCPWm8yE00cVRteJjj3htuYz0rKUGUd7wC/18uDQ7/XW6u5w3c+g3T23aPuOUgNqs2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZGuhItoS; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a4707502aafso335973666b.0
+        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 03:16:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711102609; x=1711707409; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=h9F40IAxeQkX+KSNjo4dXkZUF4u60YPSpgxjbQowPfE=;
+        b=ZGuhItoSvj82y6jtmabd9P9ovhZekPyk5NmBxnPfsxyVXJjKeCCzSHCv/PjJvrv9IF
+         Dj1dsWyfXVhQsPsfXzTOT7gQPSnkfsgNbANjO2ACAaNgREVVmxqgVFiFasc/6juNm0As
+         xL5MxXrrnwTdHc00Evq2dIJ0cCPMtMuhkvnt3xihihJLFUrtlJEafMf4C0BqIRdaRE9d
+         7+wSNNxr4ZOEulN0ilWpguctG8NM07jpfixhgJKbzYThMLb3zen8tz2z+gI87DCH33f8
+         wJGqn9lbnz5FMFBG/poKxY1n3Zm2hfHApuumMAhk9iy90xMziJPGVPLtTa8EHQzxAMuD
+         WRsw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711102609; x=1711707409;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=h9F40IAxeQkX+KSNjo4dXkZUF4u60YPSpgxjbQowPfE=;
+        b=RG0VB1CGNqHoXbahvIWAzkZMRkgA87CB//XJKoLb+XjMmu1LdYYJPvCJCg4vnrfDL0
+         zUZQhi9joOGgGcXG0kcIRexSSJ8sTXFT+Py5KfOXZHDUhOpIR1tSMez+Rezbt7DWk9SI
+         ptR0rdXHO9DOwWQlkrGBuzoMTy809FwiVxpvb23OAtHyhjHjHHzr94FrJUEdf/lgis+O
+         es4cYly+HLLpXG8QJ2EZW5ITekHD5jzNRsfk69M6KKI/4GdJZ6vwRXWVtTqiGI1FRts3
+         8A0aDMLUI/CLl3WZFo+z/9SgduG0DJzL9EbWR8VNfIXf5bWPHCKg+oixvdG4E8HqB3oV
+         SjlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVKOt1UNki/o541OfCKoUtM7KsxB385aO2+zUsEC7ID0QXSQFVHShay/R507GFsetqhZs5fyDE5gFSKcEubwlIR6pgm5wDV
+X-Gm-Message-State: AOJu0Yy4qHvMdkzU/hS3m0f4tHkPAlkRQ1Xip93uuaRvTvoDZrtIRgYx
+	wliGw+w8i9EC6MWh2Kekq66kj5bDL6sR3G09YEQDH9TujCuGj6rF
+X-Google-Smtp-Source: AGHT+IH9Ah+PEZ9qJysaszCR6x/tpY+LtmplWicvuL8AflaL/Q1/St+JSHCsHwPHMqMKIGBezxcBXg==
+X-Received: by 2002:a17:907:548:b0:a47:acc:6ebb with SMTP id wk8-20020a170907054800b00a470acc6ebbmr1231257ejb.32.1711102608953;
+        Fri, 22 Mar 2024 03:16:48 -0700 (PDT)
+Received: from ?IPV6:2a01:c23:b9ee:2200:f561:5083:802a:9d7f? (dynamic-2a01-0c23-b9ee-2200-f561-5083-802a-9d7f.c23.pool.telefonica.de. [2a01:c23:b9ee:2200:f561:5083:802a:9d7f])
+        by smtp.googlemail.com with ESMTPSA id u18-20020a170906125200b00a465a012cf1sm873584eja.18.2024.03.22.03.16.48
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Mar 2024 03:16:48 -0700 (PDT)
+Message-ID: <0dee563a-08ea-4e50-b285-5d0527458057@gmail.com>
+Date: Fri, 22 Mar 2024 11:16:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,59 +77,92 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [v2] ice: Fix freeing uninitialized pointers
-Content-Language: en-GB
-To: Dan Carpenter <dan.carpenter@linaro.org>,
- kernel-janitors@vger.kernel.org, netdev@vger.kernel.org,
- intel-wired-lan@lists.osuosl.org
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>, LKML
- <linux-kernel@vger.kernel.org>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- David Laight <David.Laight@aculab.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>, Jiri Pirko
- <jiri@resnulli.us>, Jonathan Cameron <jic23@kernel.org>,
- Julia Lawall <julia.lawall@inria.fr>, Kees Cook <keescook@chromium.org>,
- Lukasz Czapnik <lukasz.czapnik@intel.com>, Paolo Abeni <pabeni@redhat.com>,
- Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
- Dan Williams <dan.j.williams@intel.com>
-References: <0efe132b-b343-4438-bb00-5a4b82722ed3@moroto.mountain>
- <0d7062e1-995b-42bc-8a62-d57c8cb588ee@web.de>
- <7ca4a907-2a9c-4711-a13c-22cbfec15e0e@moroto.mountain>
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <7ca4a907-2a9c-4711-a13c-22cbfec15e0e@moroto.mountain>
+Subject: Re: [PATCH] r8169: skip DASH fw status checks when DASH is disabled
+To: pseudoc <atlas.yu@canonical.com>, hau@realtek.com
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ netdev@vger.kernel.org, nic_swsd@realtek.com, pabeni@redhat.com
+References: <50974cc4-ca03-465c-8c3d-a9d78ee448ed@gmail.com>
+ <20240322083315.47477-1-atlas.yu@canonical.com>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <20240322083315.47477-1-atlas.yu@canonical.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:OPtKNGD3xEcd1Z7sJW7cRkjajBmWMTdxQ7djE0xUhQ1czhFk4yH
- OVOh6h+sux0OGb4dFA5OaxAiv2F5OWxkUlsDdTB4f5Pvtz2WBLmL0CV0DgoYjprq1yAbO5G
- b1/blJMXPlAmdOtqF6VrJzL01o8nYCkjLkbKyX1X5vVNYHTjvXF9uZyFXaI1Skgc3NRMsNq
- SWWI3YTNfkGNTd1Y5yQHw==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:HTHlWZPjstg=;x80qYP9/CGxP7aDaVgcrNlTbZCo
- 8+g3feTSIdzmhy59CGiNd+Y2CkUnn3bhYyjDFbhgKuFyi2US31K4d4Ssaxf46f6LbTg0mG2VT
- Ab/N2Olz2GjX0FyMg45JwCzWCYE3uD8KY6fMpk12gmaM6V/5MVZwjpKZEWSG5ZNrWLTTucvh4
- QK3vq3Vdj4ySXAb4t0aO61TTUM731MJyrzzSkQTo4+OtNBwkWxj2988EECm13MTv/p8yLdU2z
- Tvuh3H/k1ZQVZRpJIGsZzewOm2nD8xRl96OzPcwnbfPrcblQd2aXfTvhAXJrtfOr+kUiZplDN
- ztRgIs3VeZ/IM7zUAxg/9k/G1gH8hPV/p5sr7/nDRAhsOwzbYPNipSEE0VUoV+C9NDVrr1WzD
- J3gxC7v4YH//04J2kPQG4NYGA+B5e5csAAJbPtw/VuQ4IIeWli1Pxz5gXDxMiwpzd2dCiivtU
- 4c4CwlgrN2r/+O8qNKWxwnnOYZrPaaM3Acgk24988vlrWUEGwT3VuA1ZWnNnx8KW5zY4AIQkj
- TN8LcARbvYrz3PIFKLvS5gxFwB3qhL5CY8Pfi9xr6Ya3EmZPJXsCrWt7UNUdxiHrFezfRks+j
- i5RCd4l79gskUd+XK89dCmxsQbpFvxLciO8Bs7alT7ijXgrcyXH+8SqrL3YvswgZ8et8Cj4Kg
- SRs5UcH8oE0TFL7Xd1fPlkRViExswSYDryUW8adaulV5vmf9993ce+YQplB2juw4X/+5hr8Rc
- Pxd8Z2+k0GNykhsagBTe5nrJ1vlFpRZUzmKhdwWd+W6Xag6D6gkUzAxVIBHdTd5DPIAFsOG0O
- tiMMF+iecfcmaEdmBPSHq00WfyvuMa/OjmqXEAy0kMyO8=
+Content-Transfer-Encoding: 8bit
 
-> Markus please don't do this.  Don't take a controversial opinion and
-> start trying to force it on everyone via review comments and an
-> automatic converstion script.
+On 22.03.2024 09:33, pseudoc wrote:
+> On Fri, Mar 22, 2024 at 3:01 PM Heiner Kallweit <hkallweit1@gmail.com> wrote:
+>> To me this seems to be somewhat in conflict with the commit message of the
+>> original change. There's a statement that DASH firmware may influence driver
+>> behavior even if DASH is disabled.
+>> I think we have to consider three cases in the driver:
+>> 1. DASH enabled (implies firmware is present)
+>> 2. DASH disabled (firmware present)
+>> 3. DASH disabled (no firmware)
+> 
+>> I assume your change is for case 3.
+> I checked the r8168 driver[1], for both DP and EP DASH types,
+> "rtl8168_wait_dash_fw_ready" will immediately return if DASH is disabled.
+> So I think the firmware presence doesn't really matter.
+> 
+>> Is there a way to detect firmware presence on driver load?
+> By comparing r8168_n.c and r8169_main.c, I think "rtl_ep_ocp_read_cond" and
+> "rtl_dp_ocp_read_cond" is checking that, which is redundant when DASH is disabled.
+> 
+No, this only checks whether DASH is enabled.
+I don't think is redundant, because the original change explicitly mentions that
+DASH fw may impact behavior even if DASH is disabled.
 
-I dare also to point additional change possibilities out.
-I hope that further collateral evolution will become better supported.
+I understand that on your test system DASH is disabled. But does your system have
+a DASH fw or not?
 
-Regards,
-Markus
+My assumption is that the poll loop is relevant on systems with DASH fw, even if
+DASH is disabled. I'd appreciate if somebody from Realtek could comment on this. Hau?
+Including the question whether DASH fw presence can be detected, even if DASH is disabled.
+
+> [1] r8168 driver: https://www.realtek.com/en/component/zoo/category/network-interface-controllers-10-100-1000m-gigabit-ethernet-pci-express-software
+
+
 
