@@ -1,123 +1,198 @@
-Return-Path: <netdev+bounces-81229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3125B886B18
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:11:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC9A8886B34
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:20:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C562B234F9
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 11:11:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65AE61F23A8A
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 11:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF6A23E479;
-	Fri, 22 Mar 2024 11:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599BD3F9F9;
+	Fri, 22 Mar 2024 11:20:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="L2ezaGws"
+	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="S9tZLIyF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB6B12C18D
-	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 11:11:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749D33F9C5
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 11:20:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711105873; cv=none; b=gPO+yyBvKVx5vfEdEgwsV21OHJRiVeZXcaMZ/XM/2XeepMlHKpqHB/nK+/fOXy2KAevyMFiUmypPSiLfh72w3atie/FsQaP7hNL41BqUpwi+TdPxX1a2jIrvPrhaGB5k8buK8gK57NsLnKIpmWBqoFMcF1iK32rMP9pdVq97ynI=
+	t=1711106412; cv=none; b=n+Hse2WHvluODBBRGincHp2yNTiV8CljpXc3csNdynUMXAQW325lt2Fx5SGfEREq5kIA9ag7uuAiI7UDGGu+/b/EQnIAcA1sJ/a7Yxv7cGBmO/WFYQ9Fyd54vvSZ6uThqMrIBZAE+RML5ILNWCHkoFYTdD/4geWOg2t9gRspk9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711105873; c=relaxed/simple;
-	bh=OlXYRIH/s09HittZWeVyvp0YZvyM3t+mnfmS05nM6EQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Er5SiEU2oFIClQoRTm3lxE+y94zZLmAx98tl5hgrtFu1WuK8Tlytn3QJ8K+bi+yghchOXEi/kQNnGGBszUEnLAtOefaLKyNBc0pTITqtuvIUnBvdAEHFoT/vkOmCJmgxNEQn9r4H7IyBfqZs6HvzXYHDPf0TT+/Fcg6p56b6RZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=L2ezaGws; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-513e134f73aso2541883e87.2
-        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 04:11:11 -0700 (PDT)
+	s=arc-20240116; t=1711106412; c=relaxed/simple;
+	bh=Dc1VXE9yH2PnZcGdcCavMP4IzoG/6X0QQBcgmuwQZpg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iqyRlYSREONI2lIbjFyxQBlku5tnzBgeaFgcg3lg2Q+an8OiZE5TWnvtMedlLhpwbFpWqHQfzjkBY0c2LcSh0APjbgzmML/3YC/wZvoD0lcqj1W9w95fttF/Un3tIfk4KwkZmTluEVJntWz2zUhe3YBJUMr9zB8y6RUrmuNZCSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=S9tZLIyF; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d4360ab3daso31579471fa.3
+        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 04:20:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1711105869; x=1711710669; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=C1Q0JqQ2lDHQx2HBzkx09xDtDVBpVyqq5z/MmDmfT8A=;
-        b=L2ezaGwsvNeakqwdSdcW4L3EnzHJXZWqQvismbITfGVfY7KN3Xn7xdEZV0S9EmH1md
-         qZoaNf/7olGCKIoESln70hf413Hf5PQm+7ei4zhlZRK7USZs5qEVwZBLpIKQNeKRXr8y
-         smQo1Eil715FznLMMqEh7jaj2zUV1fthv4nHLY9Gli3o4nKBO/soseIRNlAiFZkfVdQE
-         3/gHME6bM5jb7bLiku1EAWohwm9EMPed2UTTcEUNBIiY1LjVcT7EyFH6Y0lHJMX5a+iX
-         MzjEt+dqI8D2Rf2ptW56mwzhpWXyKyu38PK39NLff6ua6hGJd/8keNRHUvKSL7iyRqGz
-         0rHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711105869; x=1711710669;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gooddata.com; s=google; t=1711106409; x=1711711209; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=C1Q0JqQ2lDHQx2HBzkx09xDtDVBpVyqq5z/MmDmfT8A=;
-        b=RC0YabXdBqK7kgYRB2tOVlxygvBTbO2jXutfMXf07wxwXQzRkCWqSIbx3MP5Y6m+Ho
-         rQG7yyUJGO4U0xoKRCYDpbEoBzczFIUhurTOwKvORUUAZ+MB+WMqFfugYKEJFmCh3aGZ
-         idI8D54ch7p62KPYBwTAVrcpDBnoazIrnpp404hFv8e5gTRCWgJjYjaljEO8RuisK4C0
-         BTSktB6dLFRmmJ79dqULWKtJzpmUg31djzMOzO018bWU1X93xGQQhGsZfXyBrMSndZkG
-         QNi9ojhP4g1uUkylAtKuoCXYjf4M8IGbrKkmBVsdDYmvNi/WqU1Qd/wS8jYkuAO8rphI
-         zaEw==
-X-Forwarded-Encrypted: i=1; AJvYcCXY3O7S+q61gV9gZbc+ntQ4bZlRgdm84I0yRg1bkKOkKKA4bdJ0OZlha5Mk+FXZAvxaJp1irQy6fjUu3t2mvzRiiR0fOTcC
-X-Gm-Message-State: AOJu0YyYqSABoaPOFEwA0/eBc0KBWIYKqfohTOtgvrOOzAoVms8vrw3P
-	OwUF2zDE1Jj9NAL23jjJdp5vmwNJfx5udxiPoKG0CevmFubmw/lssHxNZW2Ttho=
-X-Google-Smtp-Source: AGHT+IHfuBMs9ozLEaCvAc3Ons6Whq3N/3ZypNoAuNB5koWwo+4NlOYdEqvdO+8bdlDTI/6oSVdeIQ==
-X-Received: by 2002:a19:4302:0:b0:513:df6:dcd3 with SMTP id q2-20020a194302000000b005130df6dcd3mr1476012lfa.48.1711105869299;
-        Fri, 22 Mar 2024 04:11:09 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id n7-20020a5d4847000000b0033ec9b26b7asm1814855wrs.25.2024.03.22.04.11.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Mar 2024 04:11:08 -0700 (PDT)
-Date: Fri, 22 Mar 2024 12:11:05 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Prasad Pandit <ppandit@redhat.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	netdev@vger.kernel.org, Prasad Pandit <pjp@fedoraproject.org>
-Subject: Re: [PATCH] dpll: indent DPLL option type by a tab
-Message-ID: <Zf1nSa1F8Nj1oAi9@nanopsycho>
-References: <20240322105649.1798057-1-ppandit@redhat.com>
+        bh=b8Z2cPio152grV1Iquho6qxXho3Ihem2O1xD4vwJq7w=;
+        b=S9tZLIyFstIgTFDEee22A8izkJsXyBOsfVQmbrbRWiwsp/WoxxomFuUt5gxiYFQHYH
+         dhZJnVyT7ZXrp/szD9BcfG6ye/yxnEobkAXyuPodMRon08mhvcOO929gcNvSomgLKdSu
+         YKoDmq3+ayU+oB9BsZtkaFrClsi4cyu7GsXf8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711106409; x=1711711209;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b8Z2cPio152grV1Iquho6qxXho3Ihem2O1xD4vwJq7w=;
+        b=DLID3KtxeO/iW/DHOwSiXhgzLkz674Y6ovZiak+YkzoMNE/wNhXRDpesryO21aWF+Y
+         few6xW4xIQpsAeHhJe7njACU45cNhu7Xnsw2mlG0RJKgK2ZUnUNGBiICjLY70nI6a8KJ
+         wTEUxDiDCZyRssMi7y1Fqf5vgfP31jmbj8f3smabTEl4kXYdcisv3N9k4AxY7eE6aF+K
+         NUPE+52MeO+t9E3L7MbV53tCq8o2Avnm+/vmS14uH1YEBm5SEmX9XO3UcES6s1rSnXv2
+         NP1TWNLDmQgyIHi8VelSuolAkUtW/MK4MssV/RsHc0cPXfV2isb3V6PvHQh+2wMn36ml
+         0v+A==
+X-Forwarded-Encrypted: i=1; AJvYcCXRITnR8tfkkKFJyLMg3MbGg6S3pDXsx3XaD2GDlVN5ZEYea/FsPb8s1cZGQMXIlyTUqDVB0p72tgvfQBa3DSbvqhO8FCJp
+X-Gm-Message-State: AOJu0YxfuelJXzqsgdUyc1IRyrN0N8zHGlkHpzsXhKfKvYOAleX9sv9v
+	l5BQVx61MqWFBKJ8PSxy1ffBv0cGYF+XCKWkbKGOphs30haK576Yba4SWwoxSZDUVqVjmy0GmFJ
+	FPiI2Ir8xhOa0rApGNcSXOkXO+dFKvmf46s+6
+X-Google-Smtp-Source: AGHT+IE5B/6o5n4TIUzWoHJA0LUv6jqqQxDzWAjlw9/W/j757fLkHrcsphOrz4YqKMe0il4fcrriHnRTf6nOt7T/eGA=
+X-Received: by 2002:a2e:9b48:0:b0:2d2:b840:1c78 with SMTP id
+ o8-20020a2e9b48000000b002d2b8401c78mr1383212ljj.48.1711106408602; Fri, 22 Mar
+ 2024 04:20:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240322105649.1798057-1-ppandit@redhat.com>
+References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
+ <20240319131207.GB1096131@fedora> <CA+9S74jMBbgrxaH2Nit50uDQsHES+e+VHnOXkxnq2TrUFtAQRA@mail.gmail.com>
+ <CACGkMEvX2R+wKcH5V45Yd6CkgGhADVbpvfmWsHducN2zCS=OKw@mail.gmail.com>
+ <CA+9S74g5fR=hBxWk1U2TyvW1uPmU3XgJnjw4Owov8LNwLiiOZw@mail.gmail.com>
+ <CACGkMEt4MbyDgdqDGUqQ+0gV-1kmp6CWASDgwMpZnRU8dfPd2Q@mail.gmail.com> <CA+9S74hUt_aZCrgN3Yx9Y2OZtwHNan7gmbBa1TzBafW6=YLULQ@mail.gmail.com>
+In-Reply-To: <CA+9S74hUt_aZCrgN3Yx9Y2OZtwHNan7gmbBa1TzBafW6=YLULQ@mail.gmail.com>
+From: Igor Raits <igor@gooddata.com>
+Date: Fri, 22 Mar 2024 12:19:57 +0100
+Message-ID: <CA+9S74ia-vUag2QMo6zFL7r+wZyOZVmcpe317RdMbK-rpomn+Q@mail.gmail.com>
+Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
+To: Jason Wang <jasowang@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	Stefano Garzarella <sgarzare@redhat.com>, Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fri, Mar 22, 2024 at 11:56:49AM CET, ppandit@redhat.com wrote:
->From: Prasad Pandit <pjp@fedoraproject.org>
+Hi Jason,
+
+On Fri, Mar 22, 2024 at 9:39=E2=80=AFAM Igor Raits <igor@gooddata.com> wrot=
+e:
 >
->Indent config option type by a tab. It helps Kconfig parsers
->to read file without error.
-
-You should indicate the target tree:
-
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html?highlight=network#tl-dr
-
-Also, please include "Fixes" tag.
-
-net-next is closed, repost next week
-
-pw-bot: defer
-
+> Hi Jason,
 >
->Signed-off-by: Prasad Pandit <pjp@fedoraproject.org>
->---
-> drivers/dpll/Kconfig | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> On Fri, Mar 22, 2024 at 6:31=E2=80=AFAM Jason Wang <jasowang@redhat.com> =
+wrote:
+> >
+> > On Thu, Mar 21, 2024 at 5:44=E2=80=AFPM Igor Raits <igor@gooddata.com> =
+wrote:
+> > >
+> > > Hello Jason & others,
+> > >
+> > > On Wed, Mar 20, 2024 at 10:33=E2=80=AFAM Jason Wang <jasowang@redhat.=
+com> wrote:
+> > > >
+> > > > On Tue, Mar 19, 2024 at 9:15=E2=80=AFPM Igor Raits <igor@gooddata.c=
+om> wrote:
+> > > > >
+> > > > > Hello Stefan,
+> > > > >
+> > > > > On Tue, Mar 19, 2024 at 2:12=E2=80=AFPM Stefan Hajnoczi <stefanha=
+@redhat.com> wrote:
+> > > > > >
+> > > > > > On Tue, Mar 19, 2024 at 10:00:08AM +0100, Igor Raits wrote:
+> > > > > > > Hello,
+> > > > > > >
+> > > > > > > We have started to observe kernel crashes on 6.7.y kernels (a=
+tm we
+> > > > > > > have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6.9 whe=
+re we
+> > > > > > > have nodes of cluster it looks stable. Please see stacktrace =
+below. If
+> > > > > > > you need more information please let me know.
+> > > > > > >
+> > > > > > > We do not have a consistent reproducer but when we put some b=
+igger
+> > > > > > > network load on a VM, the hypervisor's kernel crashes.
+> > > > > > >
+> > > > > > > Help is much appreciated! We are happy to test any patches.
+> > > > > >
+> > > > > > CCing Michael Tsirkin and Jason Wang for vhost_net.
+> > > > > >
+> > > > > > >
+> > > > > > > [62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOPTI
+> > > > > > > [62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Tainted: =
+G
+> > > > > > >    E      6.7.10-1.gdc.el9.x86_64 #1
+> > > > > >
+> > > > > > Are there any patches in this kernel?
+> > > > >
+> > > > > Only one, unrelated to this part. Removal of pr_err("EEVDF schedu=
+ling
+> > > > > fail, picking leftmost\n"); line (reported somewhere few months a=
+go
+> > > > > and it was suggested workaround until proper solution comes).
+> > > >
+> > > > Btw, a bisection would help as well.
+> > >
+> > > In the end it seems like we don't really have "stable" setup, so
+> > > bisection looks to be useless but we did find few things meantime:
+> > >
+> > > 1. On 6.6.9 it crashes either with unexpected GSO type or usercopy:
+> > > Kernel memory exposure attempt detected from SLUB object
+> > > 'skbuff_head_cache'
+> >
+> > Do you have a full calltrace for this?
 >
->diff --git a/drivers/dpll/Kconfig b/drivers/dpll/Kconfig
->index a4cae73f20d3..20607ed54243 100644
->--- a/drivers/dpll/Kconfig
->+++ b/drivers/dpll/Kconfig
->@@ -4,4 +4,4 @@
-> #
-> 
-> config DPLL
->-  bool
->+	bool
->-- 
->2.44.0
+> I have shared it in one of the messages in this thread.
+> https://marc.info/?l=3Dlinux-virtualization&m=3D171085443512001&w=3D2
 >
+> > > 2. On 6.7.5, 6.7.10 and 6.8.1 it crashes with RIP:
+> > > 0010:skb_release_data+0xb8/0x1e0
+> >
+> > And for this?
+>
+> https://marc.info/?l=3Dlinux-netdev&m=3D171083870801761&w=3D2
+>
+> > > 3. It does NOT crash on 6.8.1 when VM does not have multi-queue setup
+> > >
+> > > Looks like the multi-queue setup (we have 2 interfaces =C3=97 3 virti=
+o
+> > > queues for each) is causing problems as if we set only one queue for
+> > > each interface the issue is gone.
+> > > Maybe there is some race condition in __pfx_vhost_task_fn+0x10/0x10 o=
+r
+> > > somewhere around?
+> >
+> > I can't tell now, but it seems not because if we have 3 queue pairs we
+> > will have 3 vhost threads.
+> >
+> > > We have noticed that there are 3 of such functions
+> > > in the stacktrace that gave us hints about what we could try=E2=80=A6
+> >
+> > Let's try to enable SLUB_DEBUG and KASAN to see if we can get
+> > something interesting.
+>
+> We were able to reproduce it even with 1 vhost queue... And now we
+> have slub_debug + kasan so I hopefully have more useful data for you
+> now.
+> I have attached it for better readability.
+
+Looks like we have found a "stable" kernel and that is 6.1.32. The
+6.3.y is broken and we are testing 6.2.y now.
+My guess it would be related to virtio/vsock: replace virtio_vsock_pkt
+with sk_buff that was done around that time but we are going to test,
+bisect and let you know more.
 
