@@ -1,115 +1,202 @@
-Return-Path: <netdev+bounces-81219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 30D7E886A88
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 11:40:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40EE4886A8C
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 11:41:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C4CD9B216B1
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 10:40:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1A301F21C77
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 10:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361F83B2A8;
-	Fri, 22 Mar 2024 10:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Abs65TWj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B57E3B2A8;
+	Fri, 22 Mar 2024 10:41:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817B73DB9A;
-	Fri, 22 Mar 2024 10:39:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A3FD20B27;
+	Fri, 22 Mar 2024 10:40:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711104000; cv=none; b=OHAZRQxnYbzDjTX9PT8q20rnLMIYfxCT//iBNNOr/QIAP4ZIIJ6yBPfeWsbZ+cu76deS0pc/7I7kHJcOtcni5S48TeHSLmmv9+Tt3LebWAxHIXAxG6eaqB5p2oAdS885YFGoNZxqb7acnW9FARnGczHRUVF+lWJaKUia0/vs3lc=
+	t=1711104060; cv=none; b=b9ofB5MDgMwNQucSvFIoGOJLL3DBVioSXDtK8Duje9S55KEtAj9EFoW0+URosaTAy2M3+M4jOS+pqCkk8vzgI8rDxuHxVwQ1P1TmBcJ/khX/O/zK1TXBaMNGbQmYmJXDnwedIITz+snPuvoy0XKCY1R8HIILhT3FallIm/tTH2k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711104000; c=relaxed/simple;
-	bh=mbCfCKEKkGI+oF9DOo3BjBASMhgsvFpxmE1dYl1oeYo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=eElb8GaMfu/RYLfQegyjhO0wbM8yjwXjSNZURHOxfWAZg6E5RVRw+DOisxNBAxe/WLp95n06htke/CXF1YDvvnLiy93F/XcocercOxm80YI6jmRGlw+mB/Zt3N5xCRyMKIe0pewKzlGx3jvJWOGf7tuOivFZLcoagUp3ge5wr+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Abs65TWj; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 8BA7040009;
-	Fri, 22 Mar 2024 10:39:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1711103993;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mbCfCKEKkGI+oF9DOo3BjBASMhgsvFpxmE1dYl1oeYo=;
-	b=Abs65TWjIPymsT85gW9nGnQpgIGr9KiT9Gv2MVsg/9VrWqqW8BgIoe5JtB+BFcqEm2mik+
-	9LxLqoBDweMoBwKelRyPlawVI+DJyg2CkGUOt8mS6QeAa/EX8yQEL49hWTTipnwQaSh1CH
-	+DyQnuXdKUbP4sprV3J+U3wOf0rPVkeN3I+gl2Lt/4bpz6R1gRfJOZBKM5+ALsELMvhZSg
-	V7umSn7hZY/d9mtHhC4rqI4Js8rwcydFkG86LbGaTEJAOBJu5eJjgByGWZB8yD/nj2Ggzc
-	dxKOQ9VU/Bauu1rL0pg3AHLvTE8ZYypx6layXd6CGjdo2x5ZCJRWOfUmuTXNtg==
-Date: Fri, 22 Mar 2024 11:39:50 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
- <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
- <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Mark Brown <broonie@kernel.org>, Frank Rowand <frowand.list@gmail.com>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
-Subject: Re: [PATCH net-next v5 13/17] net: pse-pd: Use regulator framework
- within PSE framework
-Message-ID: <20240322113950.27d35376@kmaincent-XPS-13-7390>
-In-Reply-To: <ZfxjosqPMo0ECBmx@pengutronix.de>
-References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
-	<20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
-	<ZeObuKHkPN3tiWz_@pengutronix.de>
-	<20240304102708.5bb5d95c@kmaincent-XPS-13-7390>
-	<ZeWi90H-B4XeSkFs@pengutronix.de>
-	<20240321171524.0b04bfcc@kmaincent-XPS-13-7390>
-	<ZfxjosqPMo0ECBmx@pengutronix.de>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1711104060; c=relaxed/simple;
+	bh=WNbm9BKeW+52olRaQ9fXdh9kaGSnI0KyIBBLfetg+NM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dL4kEy57I/d0LrBrU511lYvUzIE5Qmi82JNwGQgs7viIR3OqdgiWqEJGeN04Qwk24wqufQXXwqOrlblAlfP1giVuoneZ65HxhYQ1xRMrajxEajECJlMZD0in7IyutrWhgIL50FyPOSaZYC3Ya1NsiiMYPt78aW+2Yk2iSNgEbAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Date: Fri, 22 Mar 2024 11:40:52 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: edumazet@google.com, kadlec@netfilter.org, fw@strlen.de,
+	kuba@kernel.org, pabeni@redhat.com, davem@davemloft.net,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
+Subject: Re: [PATCH nf-next v2] netfilter: conntrack: avoid sending RST to
+ reply out-of-window skb
+Message-ID: <Zf1gNAt3gprnQPjb@calendula>
+References: <20240311070550.7438-1-kerneljasonxing@gmail.com>
+ <ZfyhR_24HmShs78t@calendula>
+ <CAL+tcoBHU7RKWvDkDVK+8poXK_XdNU0sskwuY6R-B0oatmDOxg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAL+tcoBHU7RKWvDkDVK+8poXK_XdNU0sskwuY6R-B0oatmDOxg@mail.gmail.com>
 
-Hello Oleksij,
+On Fri, Mar 22, 2024 at 09:06:41AM +0800, Jason Xing wrote:
+> Hello Pablo,
+> 
+> On Fri, Mar 22, 2024 at 5:06 AM Pablo Neira Ayuso <pablo@netfilter.org> wrote:
+> >
+> > On Mon, Mar 11, 2024 at 03:05:50PM +0800, Jason Xing wrote:
+> > > From: Jason Xing <kernelxing@tencent.com>
+> > >
+> > > Supposing we set DNAT policy converting a_port to b_port on the
+> > > server at the beginning, the socket is set up by using 4-tuple:
+> > >
+> > > client_ip:client_port <--> server_ip:b_port
+> > >
+> > > Then, some strange skbs from client or gateway, say, out-of-window
+> > > skbs are eventually sent to the server_ip:a_port (not b_port)
+> > > in TCP layer due to netfilter clearing skb->_nfct value in
+> > > nf_conntrack_in() function. Why? Because the tcp_in_window()
+> > > considers the incoming skb as an invalid skb by returning
+> > > NFCT_TCP_INVALID.
+> > >
+> > > At last, the TCP layer process the out-of-window
+> > > skb (client_ip,client_port,server_ip,a_port) and try to look up
+> > > such an socket in tcp_v4_rcv(), as we can see, it will fail for sure
+> > > because the port is a_port not our expected b_port and then send
+> > > back an RST to the client.
+> > >
+> > > The detailed call graphs go like this:
+> > > 1)
+> > > nf_conntrack_in()
+> > >   -> nf_conntrack_handle_packet()
+> > >     -> nf_conntrack_tcp_packet()
+> > >       -> tcp_in_window() // tests if the skb is out-of-window
+> > >       -> return -NF_ACCEPT;
+> > >   -> skb->_nfct = 0; // if the above line returns a negative value
+> > > 2)
+> > > tcp_v4_rcv()
+> > >   -> __inet_lookup_skb() // fails, then jump to no_tcp_socket
+> > >   -> tcp_v4_send_reset()
+> > >
+> > > The moment the client receives the RST, it will drop. So the RST
+> > > skb doesn't hurt the client (maybe hurt some gateway which cancels
+> > > the session when filtering the RST without validating
+> > > the sequence because of performance reason). Well, it doesn't
+> > > matter. However, we can see many strange RST in flight.
+> > >
+> > > The key reason why I wrote this patch is that I don't think
+> > > the behaviour is expected because the RFC 793 defines this
+> > > case:
+> > >
+> > > "If the connection is in a synchronized state (ESTABLISHED,
+> > >  FIN-WAIT-1, FIN-WAIT-2, CLOSE-WAIT, CLOSING, LAST-ACK, TIME-WAIT),
+> > >  any unacceptable segment (out of window sequence number or
+> > >  unacceptible acknowledgment number) must elicit only an empty
+> > >  acknowledgment segment containing the current send-sequence number
+> > >  and an acknowledgment..."
+> > >
+> > > I think, even we have set DNAT policy, it would be better if the
+> > > whole process/behaviour adheres to the original TCP behaviour as
+> > > default.
+> > >
+> > > Suggested-by: Florian Westphal <fw@strlen.de>
+> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > ---
+> > > v2
+> > > Link: https://lore.kernel.org/netdev/20240307090732.56708-1-kerneljasonxing@gmail.com/
+> > > 1. add one more test about NAT and then drop the skb (Florian)
+> > > ---
+> > >  net/netfilter/nf_conntrack_proto_tcp.c | 15 +++++++++++++--
+> > >  1 file changed, 13 insertions(+), 2 deletions(-)
+> > >
+> > > diff --git a/net/netfilter/nf_conntrack_proto_tcp.c b/net/netfilter/nf_conntrack_proto_tcp.c
+> > > index ae493599a3ef..19ddac526ea0 100644
+> > > --- a/net/netfilter/nf_conntrack_proto_tcp.c
+> > > +++ b/net/netfilter/nf_conntrack_proto_tcp.c
+> > > @@ -1256,10 +1256,21 @@ int nf_conntrack_tcp_packet(struct nf_conn *ct,
+> > >       case NFCT_TCP_IGNORE:
+> > >               spin_unlock_bh(&ct->lock);
+> > >               return NF_ACCEPT;
+> > > -     case NFCT_TCP_INVALID:
+> > > +     case NFCT_TCP_INVALID: {
+> > > +             int verdict = -NF_ACCEPT;
+> > > +
+> > > +             if (ct->status & IPS_NAT_MASK)
+> > > +                     /* If DNAT is enabled and netfilter receives
+> > > +                      * out-of-window skbs, we should drop it directly,
+> >
+> > Yes, if _be_liberal toggle is disabled this can happen.
+> >
+> > > +                      * or else skb would miss NAT transformation and
+> > > +                      * trigger corresponding RST sending to the flow
+> > > +                      * in TCP layer, which is not supposed to happen.
+> > > +                      */
+> > > +                     verdict = NF_DROP;
+> >
+> > One comment for the SNAT case.
+> 
+> Thanks for the comment :)
+> 
+> >
+> > nf_conntrack_in() calls this function from the prerouting hook. For
+> > the very first packet, IPS_NAT_MASK might not be yet fully set on
+> > (masquerade/snat happens in postrouting), then still one packet can be
+> > leaked without NAT mangling in the SNAT case.
+> 
+> It's possible if the flag is not set and out-of-window skb comes first...
 
-On Thu, 21 Mar 2024 17:43:14 +0100
-Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+Not only out-of-window packets. Any invalid initial packet being sent
+that triggers a transition to invalid state will be dropped, eg.
+spoofed TCP traffic, right?
 
-> On Thu, Mar 21, 2024 at 05:15:24PM +0100, Kory Maincent wrote:
-> > Hello Oleksij,
-> > Sorry, I forgot to reply about this.
-> > This is specific to pse_regulator driver. Could we tackle this change in
-> > another patch series when the current patch series got applied?
-> > Also I don't have the hardware to test it. =20
->=20
-> ACK, no problem.
+> > Rulesets should really need to set default policy to drop in NAT
+> > chains to address this.
+> >
+> > And after this update, user has no chance anymore to bump counters at
+> > the end of the policy, to debug issues.
+> 
+> You mean 'set default policy' is using iptables command to set, right?
+> If that's the case, I suspect the word "address" because it just hides
+> the issue and not lets people see it. I think many users don't know
+> this case. If I tell them about this "just set one more sysctl knob
+> and you'll be fine", they will definitely question me... Actually I
+> was questioned many times last week.
+>
+> We have a _be_liberal sysctl knob to "address" this, yes, but what I'm
+> thinking is : the less we resort to sysctl knob, the easier life we
+> have.
+> 
+> It's very normal to drop an out-of-window skb without S/DNAT enabled.
+> Naturally, we're supposed to drop it finally with S/DNAT enabled. It
+> can be the default behaviour. Why would we use a knob to do it
+> instead? :/
 
-I have a question unrelated to this.
-Why do you add refcount on the pse_control struct?
-The pse control is related to the RJ45 port. Each port is exclusively relat=
-ed
-to one pse control.
-Shouldn't we return an error in case of two get of the same pse control ind=
-ex?
-Do you see use cases where a pse control could be get two times?
+My concern is that, if conntrack drops invalid traffic by default,
+user gets no reports that this is going on other than enabling
+conntrack logging, because the rule that matches and drop INVALID
+packets does match anymore.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+> > We have relied on the rule that "conntrack should not drop packets"
+> > since the very beginning, instead signal rulesets that something is
+> > invalid, so user decides what to do.
+> 
+> Yes, I know that rule, but we already have some exceptions for this:
+> we dropped the unexpected skb in the netfilter unless there are no
+> other better alternatives.
+>
+> My logic in the V1 patch is not setting invalid (in order to not clear
+> skb->_nfct field) and letting it go until it is passed to the TCP
+> layer which will drop it finally.
 
