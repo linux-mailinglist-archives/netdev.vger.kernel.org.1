@@ -1,170 +1,178 @@
-Return-Path: <netdev+bounces-81310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29FE788715C
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 17:57:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33CB68871E6
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 18:29:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAD011F22C22
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 16:57:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9EC40B214B6
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 17:29:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CD3F5FDCC;
-	Fri, 22 Mar 2024 16:53:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37BC35FBA6;
+	Fri, 22 Mar 2024 17:29:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fSTRqoW8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G3clEoEh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EB15FDA9;
-	Fri, 22 Mar 2024 16:53:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9024E5D72B
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 17:29:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711126434; cv=none; b=TbIVGtju+9PBzPLrtD1kX5qqn4d4LfcPylAMRoLv3hp9WChhiEhb984HARgOG6TzQn0LUqaHGp8C4v4oZiVRHH0yz0Y0d5h2R0d/mI0jhH3IvuL200vbjpeGCOpR+yTZ6KQlozgAL+hKVQCCYSgvpq0QRMWsUsu1S03g5068/YE=
+	t=1711128584; cv=none; b=UggIUiPSVkXfI09fz2LRBjtsP1j8e6TZPOmIKD/FE6mbIGKk0hxbCc9ZMNDKemI8/Txo5ljWgpKEomyFrSZ5yK9kz6N3yzrWEJV63EXOh48UELU2sMKKvSi/2B1HWLs6CH8gb/GKKgAFIErhj5TR9xt6qZQ6NU9z1OLTZ/uCBJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711126434; c=relaxed/simple;
-	bh=Rc4e+9q8cteiwcWOIW7T38A8/ToMIlusvAVBDyOL15M=;
-	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=S9f987mJBqRcXtUS1B54gNZz9B2zDOITnnnrwUPgaUKDh8wzgIvHxKDocdfUgNm3A3DWvkG6+2xzOlEfW2E1V00h9waHpcsvLITLPDmfgKMymTzVBA4qIlNMfWqUs3fw+8VuVSuWCSMOKzF4uv3HsRPodk3wGpVQnfOGV+BXR5M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fSTRqoW8; arc=none smtp.client-ip=209.85.221.46
+	s=arc-20240116; t=1711128584; c=relaxed/simple;
+	bh=wsMwUpOL7JW1OHIJ/6b1Lh6VfBeVFEE6DXXlE5V1nLg=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=ovCe07Ef/9VHq5yPz/dgKMEe+Rs7y9CMEJxROyiul7h7tbJsMlLXQVHwoh6TUmXae+ZzHwTC4cUVIcPkZv3qgoumnFnrAto/wn+CEnDBLgcf04Nol54clG8skyWlUHXoyJ7QCt/jYYvX6r4VPRDhFI38GU56kThHkmRkWoRquoI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G3clEoEh; arc=none smtp.client-ip=209.85.222.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-33e570ef661so1085874f8f.1;
-        Fri, 22 Mar 2024 09:53:52 -0700 (PDT)
+Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-787edfea5adso101404585a.2
+        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 10:29:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711126431; x=1711731231; darn=vger.kernel.org;
-        h=mime-version:message-id:date:references:in-reply-to:subject:to:from
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=prwGqiUDr2MIwI/u9qAD6n1rOIPI2RfxncckA/0+HG4=;
-        b=fSTRqoW8949esGuLPcYwLS05SHr93J/p4Q+HD3xdNqD32TbrFtjBMb/Cq27vplJFav
-         Q4Q2yxfLIwU2IMT9CTvA3raUW3NxxJq0cARd8qNii89PELbVD1y4MrsYX50IC4j38GmE
-         1HLwWRqzv9eSsV6oA7GYDMgBlNYKeB9LkPRYH8o1F98R2hUEBxbga+x4oZgsnbMNyN+q
-         fpzQq3ermhDhLIXPBM4qg6CcTW2HAAa3nTIlGeuq5nz1YP6QpkhnqnvQzlBo4gbXBIey
-         LQEXdzK8+oNky4SuXsOvXNrl14W1P0wKnyOyscIUcThiphObd7hhjplIVShdT6Qp4dBH
-         SxVQ==
+        d=gmail.com; s=20230601; t=1711128581; x=1711733381; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4gWqkyWvghvlzeWzcDppW1JEWTC6Aw10YkW8NitFWl8=;
+        b=G3clEoEhrt0CPeczRcuhm7o6OpBo9y+XjN9MsPO/URf1esjQxhc1o6ijh/kfausLqO
+         5O/2cDuUEMbGcSVt3bPpvIpN1pQyAp13xZvBl5R6W2k/HdyUwt0ZJC0w+h67FtZfVDV6
+         ctco1VBnSTmPOgDdN0uU2v6/JezvZvfwXLNex2gISHP1I0/gHLz5FCuBK0Rzl6vM6G6r
+         wibnyrOIM5SinfSrT9qpWW2ebmsqgpZpjpULb0WBGFygmLUYPtt3FCujQJFiukVZen3q
+         zh//yxYQN6n8Z+WfbSCqwIuewiLtdaFJs0CVj9CITiLV2JlqqQAukQAYguX7gOgFEeMh
+         RYww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711126431; x=1711731231;
-        h=mime-version:message-id:date:references:in-reply-to:subject:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=prwGqiUDr2MIwI/u9qAD6n1rOIPI2RfxncckA/0+HG4=;
-        b=m/wT/3ElWiJII232Yc9R3+cqwoqHOEfhKNgR+cKHGP04iFjuBuoTcRObZxv9AdlKPY
-         X/oE1L+vwp7PbuihPBMOkAiLvInbPlV/VkslHA0JlI0/Fsgxy5lVuvzMbivzJKLb7jqQ
-         9xWQ2LvLuqHqKHXgdjPlpINR6c8J2NflLwNsy7JoXSA4E0PGF04uGdS/KGGSTHb9rZkB
-         PmfFJ2Yo7rTWToWbHixJrrmLwPTA4FXx9jaaDqeVx2bms2QIYX0l0YdlPKszoIJi8OmD
-         FY7AQg5RiHNxq3RzOwrI62Bk+ffdUc3fHwu8JKo+exTuUe4ZC1Pm3OqiT9BS/bZ+5NAl
-         NULw==
-X-Forwarded-Encrypted: i=1; AJvYcCV5rhlBgcA4TcW5c+BaenT/qO4MsKUEUqekTmdbX9Eers8Ul12WmVQqbkVINI6zdXyIyVNlfKAmyzG+DHkamO9/lHilmSm8QBz7x2FDlc947jxCXJgSIGXKhuG01AQxpTlnnKbvjm0IbwT+4y/CecWIEdpTEs1n7Gln
-X-Gm-Message-State: AOJu0YzuzuorbiMDA5wObNvxfU9nbYbbAuEhxif043FJJSZpzRZahBHs
-	wqL6ZWeqvb56VP2yMVKgQB4gyBrcK1QQUZs2v3D81vlm7u2DI5fS
-X-Google-Smtp-Source: AGHT+IH3aziBPUEw2pxrSbVmh2Fqw5q35d7kuBZURy7unTQvxoYvMLMvNLA3cDHQEFkQSZnpaw7PLw==
-X-Received: by 2002:a5d:4944:0:b0:33e:7cdd:b559 with SMTP id r4-20020a5d4944000000b0033e7cddb559mr1991710wrs.56.1711126430520;
-        Fri, 22 Mar 2024 09:53:50 -0700 (PDT)
-Received: from localhost (54-240-197-231.amazon.com. [54.240.197.231])
-        by smtp.gmail.com with ESMTPSA id y17-20020adff151000000b0033e43756d11sm2435796wro.85.2024.03.22.09.53.49
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Fri, 22 Mar 2024 09:53:50 -0700 (PDT)
-From: Puranjay Mohan <puranjay12@gmail.com>
-To: Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
- <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Alexei
- Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Martin
- KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John
- Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri
- Olsa <jolsa@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
- <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
- <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
- <hpa@zytor.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
- netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
- Ilya Leoshkevich <iii@linux.ibm.com>
-Subject: Re: [PATCH bpf v4] bpf: verifier: prevent userspace memory access
-In-Reply-To: <15ba79e3-14b2-d92e-3f94-e4f5f963e15d@iogearbox.net>
-References: <20240321124640.8870-1-puranjay12@gmail.com>
- <9f2b63b5-569c-1e00-a635-93d9cd695517@iogearbox.net>
- <mb61p4jcyxq5m.fsf@gmail.com>
- <15ba79e3-14b2-d92e-3f94-e4f5f963e15d@iogearbox.net>
-Date: Fri, 22 Mar 2024 16:53:47 +0000
-Message-ID: <mb61pcyrm8axw.fsf@gmail.com>
+        d=1e100.net; s=20230601; t=1711128581; x=1711733381;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=4gWqkyWvghvlzeWzcDppW1JEWTC6Aw10YkW8NitFWl8=;
+        b=U0ep5YJIQ08e//Ic0t/eBOMOqohrIecmHRPJPNPjIomDUDjUFriaw0xzoEOycHLY9g
+         Vtzj96Hq4MalqSzPo9reTgHTSkgHV3esQCv59hYxH+kTotG7uuaPjBHfv7Rt/eQ1/0yg
+         9egZChOg2hfKcTdHjUAQb8165BeBK06wdSusFoJhxPUZsqLe78tQq9MOddxuAs2+LPEw
+         NTK1AbSFMPspctCJ3aQqe+CFSZm+KQfbN/DXn+WXEj5QxR8E8eW1Mrf8S3QjzAyOP5EG
+         d9pYe9SZ4ym/Ln/GiNZUAScbSnLpnQmqF0Piqs4hoeoWaLX5mmOgMGcL7sXn8ywEsIe+
+         PMQg==
+X-Forwarded-Encrypted: i=1; AJvYcCVn856BiG4RdiVJYL+5NvNYDK+3ZiHwKEtrvB9s+ctecslUYe0sslzYqFngFdPzeaMIozzRK1WFk1mqswoTsEoBWPX5zlsd
+X-Gm-Message-State: AOJu0YwzI+FZgca7btIBKsIXZhO36aEI34B9hZ6ez4d27Q0kwt3Ekoua
+	FELdu/JEY0n9ToJY9B4TLxV1ee2B2K8TUeoOXBkJyCYl3qXfOBP/5dqH1reI
+X-Google-Smtp-Source: AGHT+IEOu/e64ZF6u0awNol2V1Ot/f4fYbcEe0WQ0k+dGMf+2rz48lkEp7Rh1+0tTRtifCKfyjmYkQ==
+X-Received: by 2002:a05:620a:2908:b0:78a:5c2:d23d with SMTP id m8-20020a05620a290800b0078a05c2d23dmr190573qkp.0.1711128581411;
+        Fri, 22 Mar 2024 10:29:41 -0700 (PDT)
+Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
+        by smtp.gmail.com with ESMTPSA id bk31-20020a05620a1a1f00b00789ea49fd22sm13440qkb.49.2024.03.22.10.29.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Mar 2024 10:29:40 -0700 (PDT)
+Date: Fri, 22 Mar 2024 13:29:40 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Antoine Tenart <atenart@kernel.org>, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ edumazet@google.com
+Cc: Antoine Tenart <atenart@kernel.org>, 
+ steffen.klassert@secunet.com, 
+ willemdebruijn.kernel@gmail.com, 
+ netdev@vger.kernel.org
+Message-ID: <65fdc00454e16_2bd0fb2948c@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240322114624.160306-4-atenart@kernel.org>
+References: <20240322114624.160306-1-atenart@kernel.org>
+ <20240322114624.160306-4-atenart@kernel.org>
+Subject: Re: [PATCH net v3 3/4] udp: do not transition UDP GRO fraglist
+ partial checksums to unnecessary
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Daniel Borkmann <daniel@iogearbox.net> writes:
+Antoine Tenart wrote:
+> UDP GRO validates checksums and in udp4/6_gro_complete fraglist packets
+> are converted to CHECKSUM_UNNECESSARY to avoid later checks. However
+> this is an issue for CHECKSUM_PARTIAL packets as they can be looped in
+> an egress path and then their partial checksums are not fixed.
+> 
+> Different issues can be observed, from invalid checksum on packets to
+> traces like:
+> 
+>   gen01: hw csum failure
+>   skb len=3008 headroom=160 headlen=1376 tailroom=0
+>   mac=(106,14) net=(120,40) trans=160
+>   shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
+>   csum(0xffff232e ip_summed=2 complete_sw=0 valid=0 level=0)
+>   hash(0x77e3d716 sw=1 l4=1) proto=0x86dd pkttype=0 iif=12
+>   ...
+> 
+> Fix this by only converting CHECKSUM_NONE packets to
+> CHECKSUM_UNNECESSARY by reusing __skb_incr_checksum_unnecessary.
+> 
+> Fixes: 9fd1ff5d2ac7 ("udp: Support UDP fraglist GRO/GSO.")
+> Signed-off-by: Antoine Tenart <atenart@kernel.org>
 
-> On 3/22/24 4:05 PM, Puranjay Mohan wrote:
-> [...]
->>>> +		/* Make it impossible to de-reference a userspace address */
->>>> +		if (BPF_CLASS(insn->code) == BPF_LDX &&
->>>> +		    (BPF_MODE(insn->code) == BPF_PROBE_MEM ||
->>>> +		     BPF_MODE(insn->code) == BPF_PROBE_MEMSX)) {
->>>> +			struct bpf_insn *patch = &insn_buf[0];
->>>> +			u64 uaddress_limit = bpf_arch_uaddress_limit();
->>>> +
->>>> +			if (!uaddress_limit)
->>>> +				goto next_insn;
->>>> +
->>>> +			*patch++ = BPF_MOV64_REG(BPF_REG_AX, insn->src_reg);
->>>> +			if (insn->off)
->>>> +				*patch++ = BPF_ALU64_IMM(BPF_ADD, BPF_REG_AX, insn->off);
->>>> +			*patch++ = BPF_ALU64_IMM(BPF_RSH, BPF_REG_AX, 32);
->>>> +			*patch++ = BPF_JMP_IMM(BPF_JLE, BPF_REG_AX, uaddress_limit >> 32, 2);
->>>> +			*patch++ = *insn;
->>>> +			*patch++ = BPF_JMP_IMM(BPF_JA, 0, 0, 1);
->>>> +			*patch++ = BPF_MOV64_IMM(insn->dst_reg, 0);
->>>
->>> But how does this address other cases where we could fault e.g. non-canonical,
->>> vsyscall page, etc? Technically, we would have to call to copy_from_kernel_nofault_allowed()
->>> to really address all the cases aside from the overflow (good catch btw!) where kernel
->>> turns into user address.
->> 
->> So, we are trying to ~simulate a call to
->> copy_from_kernel_nofault_allowed() here. If the address under
->> consideration is below TASK_SIZE (TASK_SIZE + 4GB to be precise) then we
->> skip that load because that address could be mapped by the user.
->> 
->> If the address is above TASK_SIZE + 4GB, we allow the load and it could
->> cause a fault if the address is invalid, non-canonical etc. Taking the
->> fault is fine because JIT will add an exception table entry for
->> for that load with BPF_PBOBE_MEM.
->
-> Are you sure? I don't think the kernel handles non-canonical fixup.
+Sorry to have yet more questions, but
 
-Atleast for ARM64 for I don't see a differentiation between the handling
-of canonical and non-canonical addresses.
-do_translation_fault() checks if addr < TASK_SIZE and calls
-do_page_fault() or if the address is greater than TASK_SIZE (it is a
-kernel address), do_bad_area() is called.
+Should fraglist UDP GRO and non-fraglist (udp_gro_complete_segment)
+have the same checksumming behavior?
 
-Both of these call __do_kernel_fault() if fault is from kernel mode and it
-does fixup_exception().
+Second, this leaves CHECKSUM_COMPLETE as is. Is that intentional? I
+don't immediately see where GSO skb->csum would be updated.
 
->
->> The vsyscall page is special, this approach skips all loads from this
->> page. I am not sure if that is acceptable.
->
-> The bpf_probe_read_kernel() does handle it fine via copy_from_kernel_nofault().
-bpf_probe_read_kernel() is skipping reading from the vsyscall page, that
-is what this patch does as well.
+I can take a closer look too, but did not want to delay feedback.
 
-ARM64, RISCV, and some other archs don't implement
-copy_from_kernel_nofault_allowed() so I think the we should fix the
-common case where the BPF program should not be allowed to access memory
-below TASK_SIZE. This would be true for all architectures. 
+> ---
+>  net/ipv4/udp_offload.c | 8 +-------
+>  net/ipv6/udp_offload.c | 8 +-------
+>  2 files changed, 2 insertions(+), 14 deletions(-)
+> 
+> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+> index 3bb69464930b..548476d78237 100644
+> --- a/net/ipv4/udp_offload.c
+> +++ b/net/ipv4/udp_offload.c
+> @@ -722,13 +722,7 @@ INDIRECT_CALLABLE_SCOPE int udp4_gro_complete(struct sk_buff *skb, int nhoff)
+>  		skb_shinfo(skb)->gso_type |= (SKB_GSO_FRAGLIST|SKB_GSO_UDP_L4);
+>  		skb_shinfo(skb)->gso_segs = NAPI_GRO_CB(skb)->count;
+>  
+> -		if (skb->ip_summed == CHECKSUM_UNNECESSARY) {
+> -			if (skb->csum_level < SKB_MAX_CSUM_LEVEL)
+> -				skb->csum_level++;
+> -		} else {
+> -			skb->ip_summed = CHECKSUM_UNNECESSARY;
+> -			skb->csum_level = 0;
+> -		}
+> +		__skb_incr_checksum_unnecessary(skb);
+>  
+>  		return 0;
+>  	}
+> diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
+> index 312bcaeea96f..bbd347de00b4 100644
+> --- a/net/ipv6/udp_offload.c
+> +++ b/net/ipv6/udp_offload.c
+> @@ -174,13 +174,7 @@ INDIRECT_CALLABLE_SCOPE int udp6_gro_complete(struct sk_buff *skb, int nhoff)
+>  		skb_shinfo(skb)->gso_type |= (SKB_GSO_FRAGLIST|SKB_GSO_UDP_L4);
+>  		skb_shinfo(skb)->gso_segs = NAPI_GRO_CB(skb)->count;
+>  
+> -		if (skb->ip_summed == CHECKSUM_UNNECESSARY) {
+> -			if (skb->csum_level < SKB_MAX_CSUM_LEVEL)
+> -				skb->csum_level++;
+> -		} else {
+> -			skb->ip_summed = CHECKSUM_UNNECESSARY;
+> -			skb->csum_level = 0;
+> -		}
+> +		__skb_incr_checksum_unnecessary(skb);
+>  
+>  		return 0;
+>  	}
+> -- 
+> 2.44.0
+> 
 
->
-> So there is tail risk that BPF_PROBE_* could trigger a crash. Other archs might
 
-Can you explain this a bit more, how will BPF_PROBE_* trigger a crash?
-
-> have other quirks, e.g. in case of loongarch it says highest bit set means kernel
-> space.
-
-Thanks,
-Puranjay
 
