@@ -1,110 +1,116 @@
-Return-Path: <netdev+bounces-81276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F5F9886C97
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 14:09:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C6D8886CA7
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 14:18:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B16961C2114D
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:09:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA4C8B222B9
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80B3A446B6;
-	Fri, 22 Mar 2024 13:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658904502D;
+	Fri, 22 Mar 2024 13:17:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m2s/kC8s"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b8uGsZVG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D4DC3B2AD
-	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 13:09:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350783F9FD;
+	Fri, 22 Mar 2024 13:17:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711112963; cv=none; b=GRepzcQfS3NVKC1a9GJKgsY3rQPlqRqTNrNfM9Azc06CZ0luY0C0YChhoWCEaLqGgSWCqXmdhrN8n9dJvdCJIdagYCERQ4lnQZ8G6Qa6xqEmToQ7b4vXnkW6YodQSqUyk+HS2nK6NyN3/acENbi5nr5nm4ODBc6rlHNd7AGGSE4=
+	t=1711113473; cv=none; b=bE/bzjYSSIsQ8DJQXxJyu5uqxRNkrgj0FBAuNZ80ZI4EXv9YiMIdZLbo21IuUPl6jJh2gVGxFzquaaGXrpPvtWA3hHx20BjgMWoMfTBpO8BniFpmuE9VWMd0M9xkkN5zKh9uHaT/gRCBlXPfZENnHObdNFIm7SHPKJkA/UULsgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711112963; c=relaxed/simple;
-	bh=lSFgrfIG14QdtpDlr1nh6gwDIDmJROxlu+q2g6emlHI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=baQWTIud1RiSGg/aLSWFyBRNkNifoGql/syzj/jRRfI3RF+rOr8Z2xCs9LOWGzxr1cpo/448Ktf2rXg0hKd0my/7YbO5kDT7pIrIWBDTJeu1BEPyckoE6WLbeRB+bQUSzpY1FCOEvGseo0r3UN/m9c/FXaZP//3qpwbaxm/Kb7Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m2s/kC8s; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3BBC8C433C7;
-	Fri, 22 Mar 2024 13:09:22 +0000 (UTC)
+	s=arc-20240116; t=1711113473; c=relaxed/simple;
+	bh=x8FKlYxdpZPEJEcYc42RZj3Ld0nf+hduPeef1yCM4KU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=poUf1C9+/h35gdiY3n3IP4Quq2cAajxrm2E7Xzwmh3iymSOy1q0DsSuM3n2T66vT7yTRT5BKcw73Lcd1R/h9rnGg1niEUBQbKv2AnqoRHfIJFeq4l69buR8Fv3Eitey2WNR65tqY3iWSnfS0/JFLCCv/YiautH7NRMO4aiLKcaY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b8uGsZVG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5A77C433C7;
+	Fri, 22 Mar 2024 13:17:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711112962;
-	bh=lSFgrfIG14QdtpDlr1nh6gwDIDmJROxlu+q2g6emlHI=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=m2s/kC8sEJS4254w2QuudVcNv0HwuQYqZTbZdq61NBGddvNNfmKTxDlI5G+x7BJ6d
-	 VmwOyVu9Ngevmm7CCrkuZpwp71/6AJi+PzPwJ+hc3BezaIcsPXnuyNIY9DAYGPIDoa
-	 2I64OnwdSESMS+RweR46K9AVhDFOQ0AxsvZ3Sr4t0fYeR982tejF86fHfs4i8OSR0b
-	 sZL+Ltbutmz05M76zz1042IJm/CB0NdxuOZOFSCqkXsTjwFcdD7OlUJAgcK/GL5/rb
-	 E8asMg8rxbyaeVb2IfY98ltMdheOkpZou8WRTPz9qlq5QgFM8kn5un8jj+ttEFXplk
-	 3nRGyYoULd8+Q==
-Date: Fri, 22 Mar 2024 13:09:20 +0000
-From: Simon Horman <horms@kernel.org>
-To: John Fraker <jfraker@google.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH net] gve: Add counter adminq_get_ptype_map_cnt to stats
- report
-Message-ID: <20240322130920.GF372561@kernel.org>
-References: <20240321222020.31032-1-jfraker@google.com>
+	s=k20201202; t=1711113472;
+	bh=x8FKlYxdpZPEJEcYc42RZj3Ld0nf+hduPeef1yCM4KU=;
+	h=From:To:Cc:Subject:Date:From;
+	b=b8uGsZVGj3oXY28nV8Jb6LRkI5oCnOJNKT/a2CGD2mW3FZ62N9JQD8oiVaiUMA2YP
+	 +SyE4ZAeXyrrlfCZ3kgMdi5bVn0aVSsSP4VKKWWhR3DrTZY2djNcfggMQm/akMGW+U
+	 k1jMY5/9LDO7nZVHRPmsPw0kTESEWtmXR09B5RRQPQdOaXXpUJHJJqfSVd5Vzr/xJS
+	 wqb7KRrQjmqNgASJfEmmf16+96LMkfwpXdLkdVrc2i5Nxy80OwQ/x6cmf0xwt42q8T
+	 JqvAFxlSxtOftdpCUh7kSfGRas6EIu4VDO1dfS9EuLSDefTHx6Ob19eoFtO+YB7Psg
+	 GzIevVXEdVyrg==
+From: Arnd Bergmann <arnd@kernel.org>
+To: "David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	YOSHIFUJI Hideaki <yoshfuji@linux-ipv6.org>,
+	Ville Nuorvala <vnuorval@tcs.hut.fi>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Kui-Feng Lee <thinker.li@gmail.com>,
+	Breno Leitao <leitao@debian.org>,
+	Kunwu Chan <chentao@kylinos.cn>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] ipv6: fib: hide unused 'pn' variable
+Date: Fri, 22 Mar 2024 14:14:10 +0100
+Message-Id: <20240322131746.904943-1-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240321222020.31032-1-jfraker@google.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Mar 21, 2024 at 03:20:20PM -0700, John Fraker wrote:
-> This counter counts the number of times get_ptype_map is executed on the
-> admin queue, and was previously missing from the stats report.
-> 
-> Fixes: c4b87ac87635 ("gve: Add support for DQO RX PTYPE map")
-> Signed-off-by: John Fraker <jfraker@google.com>
+From: Arnd Bergmann <arnd@arndb.de>
 
-Hi John,
+When CONFIG_IPV6_SUBTREES is disabled, the only user is hidden, causing
+a 'make W=1' warning:
 
-I'm fine with this patch but it feels more like an enhancement
-for net-next than a fix for net.
+net/ipv6/ip6_fib.c: In function 'fib6_add':
+net/ipv6/ip6_fib.c:1388:32: error: variable 'pn' set but not used [-Werror=unused-but-set-variable]
 
-If so, please drop the Fixes tag and repost next week after
-net-next has reopened.
+Add another #ifdef around the variable declaration, matching the other
+uses in this file.
 
-> ---
->  drivers/net/ethernet/google/gve/gve_ethtool.c | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
-> index 9aebfb843..dbe05402d 100644
-> --- a/drivers/net/ethernet/google/gve/gve_ethtool.c
-> +++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
-> @@ -73,7 +73,7 @@ static const char gve_gstrings_adminq_stats[][ETH_GSTRING_LEN] = {
->  	"adminq_create_tx_queue_cnt", "adminq_create_rx_queue_cnt",
->  	"adminq_destroy_tx_queue_cnt", "adminq_destroy_rx_queue_cnt",
->  	"adminq_dcfg_device_resources_cnt", "adminq_set_driver_parameter_cnt",
-> -	"adminq_report_stats_cnt", "adminq_report_link_speed_cnt"
-> +	"adminq_report_stats_cnt", "adminq_report_link_speed_cnt", "adminq_get_ptype_map_cnt"
+Fixes: 66729e18df08 ("[IPV6] ROUTE: Make sure we have fn->leaf when adding a node on subtree.")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ net/ipv6/ip6_fib.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-If you do repost, please consider reformatting this so the lines
-remain no longer than 80 characters.
+diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
+index 5c558dc1c683..a2888bda3a87 100644
+--- a/net/ipv6/ip6_fib.c
++++ b/net/ipv6/ip6_fib.c
+@@ -1385,7 +1385,10 @@ int fib6_add(struct fib6_node *root, struct fib6_info *rt,
+ 	     struct nl_info *info, struct netlink_ext_ack *extack)
+ {
+ 	struct fib6_table *table = rt->fib6_table;
+-	struct fib6_node *fn, *pn = NULL;
++	struct fib6_node *fn;
++#ifdef CONFIG_IPV6_SUBTREES
++	struct fib6_node *pn = NULL;
++#endif
+ 	int err = -ENOMEM;
+ 	int allow_create = 1;
+ 	int replace_required = 0;
+@@ -1409,9 +1412,9 @@ int fib6_add(struct fib6_node *root, struct fib6_info *rt,
+ 		goto out;
+ 	}
+ 
++#ifdef CONFIG_IPV6_SUBTREES
+ 	pn = fn;
+ 
+-#ifdef CONFIG_IPV6_SUBTREES
+ 	if (rt->fib6_src.plen) {
+ 		struct fib6_node *sn;
+ 
+-- 
+2.39.2
 
->  };
->  
->  static const char gve_gstrings_priv_flags[][ETH_GSTRING_LEN] = {
-> @@ -428,6 +428,7 @@ gve_get_ethtool_stats(struct net_device *netdev,
->  	data[i++] = priv->adminq_set_driver_parameter_cnt;
->  	data[i++] = priv->adminq_report_stats_cnt;
->  	data[i++] = priv->adminq_report_link_speed_cnt;
-> +	data[i++] = priv->adminq_get_ptype_map_cnt;
->  }
->  
->  static void gve_get_channels(struct net_device *netdev,
-> -- 
-> 2.44.0.291.gc1ea87d7ee-goog
-> 
-> 
 
