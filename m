@@ -1,121 +1,132 @@
-Return-Path: <netdev+bounces-81330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E76C88740E
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 20:57:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8400E88741F
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 21:16:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF684282028
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 19:57:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 12A56B21EC8
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 20:16:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59B6D7A702;
-	Fri, 22 Mar 2024 19:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E6357868B;
+	Fri, 22 Mar 2024 20:15:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VYG0xVp/"
+	dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b="NB3wWpxT"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx1.t-argos.ru (mx1.t-argos.ru [109.73.34.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B815871733
-	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 19:57:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60D767F483;
+	Fri, 22 Mar 2024 20:15:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=109.73.34.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711137440; cv=none; b=hp6AZe/dfoS4SDCNvHHgHTkjNyYS9K+dJufM9T3fVyUPT9P/DZodl+kLFl5QVnH/wxSJTD/GRPAhEsC7d/duB8bGONR0XYjQIGrLmwG+wskm0KCUgQ/zwfxYt7kO4VglteVQMfq+c31jILYZ6JI992cklKt+unlSkIlQvT4df4E=
+	t=1711138557; cv=none; b=Mb1NA2Ov9pcuj5NVGpnx08pVdWojQVcG64Ad4D7WZQfZNvBxtEg2g0GooSwK5ZGBfOlI3CnQtJ5C/YALOAVHpISMjPNm6HLoCsqnaR8RvqLTdW2FTGTNeCrHwyGc9urXqA21an87RWp3C40Dksu8ZwJ32XcT9HOh7XrDz6a8mdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711137440; c=relaxed/simple;
-	bh=o75SRdTkUMmQcC2lL8a8S3pSKWUGJdtOgfiyXIzEscE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CgmIm+pOU/WDU9vRnxP5oub/Fv4oaKzPqRExvgBMtiu/pDjt17Uxd20+qInsKZNGmAX5N33CjHp9SImp77rleNcpjRcIAN+KILjUP09S2bj3+C6b7YduWzpez3JI8TOeUI86pIR976XNml8zvWivTtn3MdPe0S1a9tbrJTPb/vQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VYG0xVp/; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=amIrGlkmaB76KZoaSlBCudgSjqmh6MBWuV9e0ATMQMY=; b=VYG0xVp/g0svrTKpM8hk0FFQBg
-	Yb5zCDOhNV0t0ZBF+V75bXYpl6ZYkNSMh2rsSGOgNLC6kw6Qu3EM5UkhzMmDTc/h3Cd8ql/swu0qj
-	v7W53bzXaiTuzGY3yJRr7IkU4/inMStOrOY1LHZe82rl5X9keeaBdgQrbXrIkvRhigcdnAKRcDs6C
-	EnIRfcKOc2XM3hXTT6s+ZgeT8wMxx5Skt6jl4LIGUrRKvUbQG3+2FPDp4Od6+pGFsdROMkXOe4Zvs
-	Ay8eMwtQ57hxOyoKg0LaklRDR4ML7cRXTT4dofT0+7bLO9jywWSXLqCRg9HnUaNEtFbfUIOdOEx2K
-	5qiDyptw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44742)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1rnl0S-0000lE-28;
-	Fri, 22 Mar 2024 19:56:48 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1rnl0O-0004vy-7X; Fri, 22 Mar 2024 19:56:44 +0000
-Date: Fri, 22 Mar 2024 19:56:44 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Serge Semin <fancer.lancer@gmail.com>
-Cc: Yanteng Si <siyanteng@loongson.cn>, andrew@lunn.ch,
-	hkallweit1@gmail.com, peppe.cavallaro@st.com,
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com,
-	Jose.Abreu@synopsys.com, chenhuacai@loongson.cn,
-	guyinggang@loongson.cn, netdev@vger.kernel.org,
-	chris.chenfeiyang@gmail.com
-Subject: Re: [PATCH net-next v8 09/11] net: stmmac: dwmac-loongson: Fix half
- duplex
-Message-ID: <Zf3ifH/CjyHtmXE3@shell.armlinux.org.uk>
-References: <cover.1706601050.git.siyanteng@loongson.cn>
- <3382be108772ce56fe3e9bb99c9c53b7e9cd6bad.1706601050.git.siyanteng@loongson.cn>
- <dp4fhkephitylrf6a3rygjeftqf4mwrlgcdasstrq2osans3zd@zyt6lc7nu2e3>
- <vostvybxawyhzmcnabnh7hsc7kk6vdxfdzqu4rkuqv6sdm7cuw@fd2y2o7di5am>
- <88c8f5a4-16c1-498b-9a2a-9ba04a9b0215@loongson.cn>
- <ZfF+IAWbe1rwx3Xs@shell.armlinux.org.uk>
- <cd8be3b1-fcfa-4836-9d28-ced735169615@loongson.cn>
- <em3r6w7ydvjxualqifjurtrrfpztpil564t5k5b4kxv4f6ddrd@4weteqhekyae>
- <Zfq8TNrt0KxW/IWh@shell.armlinux.org.uk>
- <fu3f6uoakylnb6eijllakeu5i4okcyqq7sfafhp5efaocbsrwe@w74xe7gb6x7p>
+	s=arc-20240116; t=1711138557; c=relaxed/simple;
+	bh=HwkJQSGxRgGjbePLX2h1Rv1MHm0zl/nPYHxGd9cCXrc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ijaWBwuPjc6uQX8ioSjDmvkCVSmnjttrjRDAwi90Q6qWzPLgPpFXK2EzdWEyUIKjLeLM35kShuyNu6zqew1jMD6jm9jgGMaAW1ac9jO9rxPmaiFArb27nRgLtJ8XgvngYI6E29y6w32gYC6GrGF41h3y1HYKzrntARDJPl8TPyA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru; spf=pass smtp.mailfrom=t-argos.ru; dkim=pass (2048-bit key) header.d=t-argos.ru header.i=@t-argos.ru header.b=NB3wWpxT; arc=none smtp.client-ip=109.73.34.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=t-argos.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=t-argos.ru
+Received: from mx1.t-argos.ru (localhost [127.0.0.1])
+	by mx1.t-argos.ru (Postfix) with ESMTP id EA364100002;
+	Fri, 22 Mar 2024 23:00:21 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=t-argos.ru; s=mail;
+	t=1711137622; bh=UW+aPfVPIjEjrOCStLiM6dlN4mJg5sptGWy0tcnbKZI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type;
+	b=NB3wWpxTF4d/KUpLvkSFY/s+u8EQ1saR6XBeCuueL05MLbMbMofRcl03RoZdkQfDo
+	 2wbdV72wLQWY3+BPB7RqbcjDqCHu+aitHSx6xM91tMMzK4z7JKNWa4zxOmwUFTyISe
+	 6dI2ArylH/q39So2MBd2RP6XKxv403HGXdjp0CKabNXnvPlLTo2pl3Qj66uGHMo/YZ
+	 eJ/35zpecSY9y0RADecC98W5mFHvLEHAssCMtTh8rXIX5Vdehv6bGqRw77cneFgv6B
+	 j/BV4bOHiZ8AWAQmZQ3TYNBjRlf7pyh31e2w6m5N3nHl5gfaIpRELjf8R2iZwoEQUL
+	 ffEwBpSSL/dBA==
+Received: from mx1.t-argos.ru.ru (mail.t-argos.ru [172.17.13.212])
+	by mx1.t-argos.ru (Postfix) with ESMTP;
+	Fri, 22 Mar 2024 22:59:05 +0300 (MSK)
+Received: from localhost.localdomain (172.17.215.6) by ta-mail-02
+ (172.17.13.212) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 22 Mar
+ 2024 22:58:44 +0300
+From: Aleksandr Mishin <amishin@t-argos.ru>
+To: "David S. Miller" <davem@davemloft.net>
+CC: Aleksandr Mishin <amishin@t-argos.ru>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Kees Cook
+	<keescook@chromium.org>, Justin Stitt <justinstitt@google.com>, Felix
+ Manlunas <felix.manlunas@cavium.com>, Satanand Burla
+	<satananda.burla@cavium.com>, Raghu Vatsavayi <raghu.vatsavayi@cavium.com>,
+	Vijaya Mohan Guvva <vijaya.guvva@cavium.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Subject: [PATCH net v2] liquidio: Fix potential null pointer dereference
+Date: Fri, 22 Mar 2024 22:57:44 +0300
+Message-ID: <20240322195744.9050-1-amishin@t-argos.ru>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fu3f6uoakylnb6eijllakeu5i4okcyqq7sfafhp5efaocbsrwe@w74xe7gb6x7p>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ta-mail-02.ta.t-argos.ru (172.17.13.212) To ta-mail-02
+ (172.17.13.212)
+X-KSMG-Rule-ID: 1
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 184367 [Mar 22 2024]
+X-KSMG-AntiSpam-Version: 6.1.0.4
+X-KSMG-AntiSpam-Envelope-From: amishin@t-argos.ru
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 11 0.3.11 5ecf9895443a5066245fcb91e8430edf92b1b594, {Tracking_from_domain_doesnt_match_to}, mx1.t-argos.ru.ru:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;t-argos.ru:7.1.1;127.0.0.199:7.1.2, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2024/03/22 19:47:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2024/03/22 14:30:00 #24353062
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On Fri, Mar 22, 2024 at 09:07:19PM +0300, Serge Semin wrote:
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 25519952f754..24ff5d1eb963 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -936,6 +936,22 @@ static void stmmac_mac_flow_ctrl(struct stmmac_priv *priv, u32 duplex)
->  			priv->pause, tx_cnt);
->  }
->  
-> +static unsigned long stmmac_mac_get_caps(struct phylink_config *config,
-> +					 phy_interface_t interface)
-> +{
-> +	struct stmmac_priv *priv = netdev_priv(to_net_dev(config->dev));
-> +
-> +	/* Get the MAC-specific capabilities */
-> +	stmmac_mac_phylink_get_caps(priv);
-> +
-> +	config->mac_capabilities = priv->hw->link.caps;
-> +
-> +	if (priv->plat->max_speed)
-> +		phylink_limit_mac_speed(config, priv->plat->max_speed);
-> +
-> +	return config->mac_capabilities;
+In lio_vf_rep_copy_packet() pg_info->page is compared to a NULL value,
+but then it is unconditionally passed to skb_add_rx_frag() which could
+lead to null pointer dereference.
+Fix this bug by moving skb_add_rx_frag() into conditional scope.
 
-Yes, I think your approach is better - and it still allows for the
-platform's capabilities to be masked in towards the end of this
-function.
+Found by Linux Verification Center (linuxtesting.org) with SVACE.
 
-Thanks.
+Fixes: 1f233f327913 ("liquidio: switchdev support for LiquidIO NIC")
+Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+---
+v2: Fix incorrect 'Fixes' tag format
 
+ drivers/net/ethernet/cavium/liquidio/lio_vf_rep.c | 11 +++++------
+ 1 file changed, 5 insertions(+), 6 deletions(-)
+
+diff --git a/drivers/net/ethernet/cavium/liquidio/lio_vf_rep.c b/drivers/net/ethernet/cavium/liquidio/lio_vf_rep.c
+index aa6c0dfb6f1c..e26b4ed33dc8 100644
+--- a/drivers/net/ethernet/cavium/liquidio/lio_vf_rep.c
++++ b/drivers/net/ethernet/cavium/liquidio/lio_vf_rep.c
+@@ -272,13 +272,12 @@ lio_vf_rep_copy_packet(struct octeon_device *oct,
+ 				pg_info->page_offset;
+ 			memcpy(skb->data, va, MIN_SKB_SIZE);
+ 			skb_put(skb, MIN_SKB_SIZE);
++			skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags,
++					pg_info->page,
++					pg_info->page_offset + MIN_SKB_SIZE,
++					len - MIN_SKB_SIZE,
++					LIO_RXBUFFER_SZ);
+ 		}
+-
+-		skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags,
+-				pg_info->page,
+-				pg_info->page_offset + MIN_SKB_SIZE,
+-				len - MIN_SKB_SIZE,
+-				LIO_RXBUFFER_SZ);
+ 	} else {
+ 		struct octeon_skb_page_info *pg_info =
+ 			((struct octeon_skb_page_info *)(skb->cb));
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.30.2
+
 
