@@ -1,103 +1,129 @@
-Return-Path: <netdev+bounces-81270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A96D4886C5F
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:52:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FC28886C65
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:54:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3803D283B89
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:52:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EF9E41F2320B
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E54394176D;
-	Fri, 22 Mar 2024 12:52:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACABA40843;
+	Fri, 22 Mar 2024 12:54:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=raspberrypi.com header.i=@raspberrypi.com header.b="fGAV9BAo"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="eaYuLFGZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 196AD20DDB
-	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 12:52:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE651EB31
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 12:54:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711111937; cv=none; b=lvHsBNwtPU0oav2nAuTiArzqsa7HazMW0+P8FPjn8DQAvZVRVCKXxvmJ75Qk+UTEAI6LGM+7OezpHIFM4YtHhOroe/yrVuqIspAzkQFqi7ScVfZRrA3X2CYVpWonNGhIDkXBZLr+GYZz2SHBqXeF+zeJ8SH2/KNoEs5PUyDgQmM=
+	t=1711112062; cv=none; b=WUkzGwfJelnaqM2uEIoGd7N6WDdqrwNGeENmyQYkoCVnwiJPOuGlHWcx0ZvjaJQZlv7X15hZbDYPfoxmITt72nzbtA0wevPy/Kg5tvw8XKQgv/AwTRkN7g5vOC5IjIrB12NGk7qr1Ry0MHPyIftJHKlbQjfKzx2oySNzWYHNQB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711111937; c=relaxed/simple;
-	bh=dsdO5CH7Qw9um70/10M+qgZza75yAcO0Og8Zl3IogeM=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=lqYrlk9iNU98nvIR1R5aMRtIv83p/vLatd5Glb5fwofamCz74/Y6jL0Y95KMO2fg71uIsP+1r1rjV4mzYtufg3l3uCDbuY9YI937VhK99+UVuXYWhNM8Mcp5f4C+D3wAOkdEBQz60YI1Br2kwW6xSplzXroblAe8G6ng9Fj/q8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raspberrypi.com; spf=pass smtp.mailfrom=raspberrypi.com; dkim=pass (2048-bit key) header.d=raspberrypi.com header.i=@raspberrypi.com header.b=fGAV9BAo; arc=none smtp.client-ip=209.85.219.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=raspberrypi.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=raspberrypi.com
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-dcc7cdb3a98so2085888276.2
-        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 05:52:15 -0700 (PDT)
+	s=arc-20240116; t=1711112062; c=relaxed/simple;
+	bh=QqV7VV5EObT8Q/oxcBr4k0DipDuTOpP52G2tdoq8gjk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Gdo3x5QkIKnuTV1WuQzekZhIlL6DdPlGTjqXjXfWIQKBLj4xJMtseSm/dafPYD70lYPlB9rnK+UOcrtabPR8oy/2p920b01LvASx0xwC25vWtBjKRKUo0Cd9d4wCCu8cEeoVgk2ImpIByFMOGWfPcM5t+6XXXtywW0kqaX1VKIM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=eaYuLFGZ; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a4715991c32so222445166b.1
+        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 05:54:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=raspberrypi.com; s=google; t=1711111935; x=1711716735; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=5fDq+eHdChttsC3g5E8atTUdfB857ql9+BEatZ6I/YY=;
-        b=fGAV9BAoIPYXJu/eFT2lxZKdWE5P08Mv45SBbm2UMU7B/G3Q6L45rY9MPeUcbG2OHQ
-         lJnkel47QRaNfNbF+v5s12fzU2C7MJCHTe8AtaG8Z9FIwJmgKn7WGnCfJz0cmznTIosH
-         ErloHCmbkH05A/Wk6nhk1OQY+6tFCa4OQy+F2deTPOgbdzsfLk6MKGP5DVKCkwM/+SBg
-         QihM1GTXZhqbQ9fzRurrR87dWkTdiTCtgQYrbAhucju+u3QZq5sebq4axvaVWTGqfz37
-         Ayhb5ybo9g/bdEKYciv4QeXREw3IdXgWCvJSkhb5WdEf1Rx9Gm+6kBKYtLscXfBgQsXZ
-         rsVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711111935; x=1711716735;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1711112059; x=1711716859; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=5fDq+eHdChttsC3g5E8atTUdfB857ql9+BEatZ6I/YY=;
-        b=wRRulLXIHl2+dvWhbpE3R37nh148lRBFSTz2gg4b6t5Tr2tCzzcfAJyaHskUp+uuYs
-         l4VniUOn2qjqtxTav3BV6/M8FFo6bSafTiDG3clM1uXpy/SCaZzl75xi/+xwS7222+lD
-         mUjbET3A8xlCc751fEoRt/0VHjrCLSt/VXAfljUnzeTgWIf7Yz/Yi+VdLRwycS7UsEtQ
-         84nQ0j6LWZzm8P3TUtzgWGBuEUIadoZrmhJJbwDjkrnTplBAAcOAavd+Dog7/TKWN0fF
-         00Um1x9PZnLhQuMqNn0EZg92vH35YyJBm8+7OPQGEUXdPTf4AeOAlaLMJtvcRxVpNDNZ
-         WK/A==
-X-Gm-Message-State: AOJu0YwjUhFXqLGP6LbrYAq8EIbNTiozbXsyLpzM68aEvRnATjDqjVF6
-	t03PTrnxGlfcP6kS+3r+KaM7pd+/sZoNKUp7kFNJob6RZccmqDa3czxtUlBBafBQwwyQc3q1CTe
-	wOAV4rhGlKqbc26nDhRShtFBLUEc0XNZWKKHzgw==
-X-Google-Smtp-Source: AGHT+IH+sJwKt075SU02C975lfAqjJ+tKId9+ftNDtqo7PX0yYP1sKhjfrVXmozphh6uYc8bbM2vpz3ifondIxHkc1E=
-X-Received: by 2002:a05:6902:567:b0:dc6:cbb9:e with SMTP id
- a7-20020a056902056700b00dc6cbb9000emr2190263ybt.41.1711111935163; Fri, 22 Mar
- 2024 05:52:15 -0700 (PDT)
+        bh=J6RemCy6dcZjDYEdLINT2xX2A+yK+ZiPj+rD9BKuGTk=;
+        b=eaYuLFGZczNR96Sk+S6zd44QL+xgEt2ra/sTNVnPX/VcnwWhUiLg5HsowQjPerAJaX
+         AxyhTbVTKOtcifS12f/Z+gfVI1A2s4DVDeZO4XRm9TAkPa642EjkClCUcYOXKncA0ezq
+         8XZfHBxa3vZSUAj8Pljhahj6iegBzRNXvWQo+n0nQkZU6yGpKDUea/9xSbIdZMpbN2Yq
+         aZUW+IbKVskc8zoe7/PDr3W/k6k5xNUi/2WkbC+HXi4HLg9vzd8/1DLbpJh1NUwyxAOR
+         6+UjmAa0FjAF3Gf7anVlBf+NrYB8gh9AYdxbxRAvZsU+CukEOvpqrSnVq/nI9DkgevIN
+         EqVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711112059; x=1711716859;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=J6RemCy6dcZjDYEdLINT2xX2A+yK+ZiPj+rD9BKuGTk=;
+        b=V2EyZ30ew97/pjsRpAwJjFJHcxOc79yTUyTr4uneDS5ss5kDcrCh9G1JQptzucggB+
+         Qm/crV6RXLwGRM5OFdEEqW8bvRQo9sTA3uJUXcc7MxRrQ/yTfBH2YZ8e1S4nTgNFgqy7
+         U+eMHtTAXEaSpYzOXw/6LAi7jMN5YDBBzM+nHfOxAMlJSlT6GHJRp14ge/ZRaXzpmXw2
+         Yz3qTnqKZ+3KwEvAp1oQY2uEvBQF/Vb1Og4WACWmItgzGCnr5Mz/TNkz3/HnALanSZXH
+         9IzlcCsGL2egYit5YJmWfTYARikzgZYVP4ll1JX+2sAzW7iWYjTNKcrLB0RrykQWfdYJ
+         QdWA==
+X-Gm-Message-State: AOJu0Yz4mVONLQKD2YZWEcde0NVw9FzJLiy/8m8jJRq+IxjKJMmCZ0y5
+	5Gb3QglWnZTTnW7D3YTHSeJIs0eeNiDxHecIxv2C6b3WEgHtnGlRWMF9XpP2lbs=
+X-Google-Smtp-Source: AGHT+IEOk/CQbPfNPXKEWjYKhI/+zm9LAWF+rORIUKr2/t6WfDjz6KaNKQe8OqPEypnYRDeg2IXDVw==
+X-Received: by 2002:a17:906:6958:b0:a47:1ebb:d8e8 with SMTP id c24-20020a170906695800b00a471ebbd8e8mr1697819ejs.2.1711112058900;
+        Fri, 22 Mar 2024 05:54:18 -0700 (PDT)
+Received: from [192.168.0.106] (176.111.182.227.kyiv.volia.net. [176.111.182.227])
+        by smtp.gmail.com with ESMTPSA id f6-20020a1709067f8600b00a4674ad8ab9sm980245ejr.211.2024.03.22.05.54.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Mar 2024 05:54:18 -0700 (PDT)
+Message-ID: <7a59719c-c0c4-49e0-af78-dc3a6eed6cb4@blackwall.org>
+Date: Fri, 22 Mar 2024 14:54:17 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Dave Stevenson <dave.stevenson@raspberrypi.com>
-Date: Fri, 22 Mar 2024 12:51:58 +0000
-Message-ID: <CAPY8ntBB+qDuw9M+2ZSFFuP78dFP9d5WPL93TdYAGxbdg=Msfw@mail.gmail.com>
-Subject: AX88179 interface is always NET_ADDR_RANDOM after d2689b6a86b9
-To: jtornosm@redhat.com, weihao.bj@ieisystem.com
-Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com, 
-	kuba@kernel.org, davem@davemloft.net
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next v2 2/2] bridge: vlan: fix compressvlans
+ usage
+Content-Language: en-US
+To: Date Huang <tjjh89017@hotmail.com>, roopa@nvidia.com, jiri@resnulli.us
+Cc: netdev@vger.kernel.org, bridge@lists.linux-foundation.org
+References: <20240322123923.16346-1-tjjh89017@hotmail.com>
+ <MAZP287MB0503BB0A5D2584B43A734CB6E4312@MAZP287MB0503.INDP287.PROD.OUTLOOK.COM>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <MAZP287MB0503BB0A5D2584B43A734CB6E4312@MAZP287MB0503.INDP287.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi
+On 3/22/24 14:39, Date Huang wrote:
+> Add the missing 'compressvlans' to man page
+> 
+> Signed-off-by: Date Huang <tjjh89017@hotmail.com>
+> ---
+>   man/man8/bridge.8 | 6 ++++++
+>   1 file changed, 6 insertions(+)
+>
+> diff --git a/man/man8/bridge.8 b/man/man8/bridge.8
+> index eeea4073..bb02bd27 100644
+> --- a/man/man8/bridge.8
+> +++ b/man/man8/bridge.8
+> @@ -22,6 +22,7 @@ bridge \- show / manipulate bridge addresses and devices
+>   \fB\-s\fR[\fItatistics\fR] |
+>   \fB\-n\fR[\fIetns\fR] name |
+>   \fB\-b\fR[\fIatch\fR] filename |
+> +\fB\-com\fR[\fIpressvlans\fR] |
+>   \fB\-c\fR[\fIolor\fR] |
+>   \fB\-p\fR[\fIretty\fR] |
+>   \fB\-j\fR[\fIson\fR] |
+> @@ -345,6 +346,11 @@ Don't terminate bridge command on errors in batch mode.
+>   If there were any errors during execution of the commands, the application
+>   return code will be non zero.
+>   
+> +.TP
+> +.BR "\-com", " \-compressvlans"
+> +Show compressed VLAN list. It will show continuous VLANs with the range instead
+> +of separated VLANs. Default is off.
+> +
 
-A few of our users have reported that in 6.6 and 6.8 an AX88179 is not
-using predictable net names.
+How about:
+Show a compressed VLAN list of continuous VLAN IDs as ranges. All VLANs 
+in a range have identical configuration. Default is off (show each VLAN 
+separately).
 
-Digging into it, it's because addr_assign_type is NET_ADDR_RANDOM, and
-that is caused by commit d2689b6a86b9 "net: usb: ax88179_178a: avoid
-two consecutive device resets" (I haven't got that patch in my
-mailbox, so I can't reply to it directly). That has also been
-backported to 6.6.
+>   .TP
+>   .BR \-c [ color ][ = { always | auto | never }
+>   Configure color output. If parameter is omitted or
 
-Prior to that commit ax88179_reset was called as part of ax88179_bind,
-and therefore set dev_addr before usbnet_probe looked at it.
-That now doesn't happen, so usbnet_probe flags the interface as
-NET_ADDR_RANDOM. The flag is not removed when ax88179_reset comes
-along later and sets dev_addr.
-
-I can fully understand the intention of the patch, but it seems that
-dev_addr must be set as part of the device binding. I don't know this
-driver well enough, so am making the report for those more familiar to
-be able to evaluate it.
-
-Many thanks
-  Dave
 
