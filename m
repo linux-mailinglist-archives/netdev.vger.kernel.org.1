@@ -1,101 +1,188 @@
-Return-Path: <netdev+bounces-81246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 33E4E886BE9
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:15:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AC1AC886BF0
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:17:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E31C428338D
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:14:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6224E2833A6
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77A7C3FB96;
-	Fri, 22 Mar 2024 12:14:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="EC756TnO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F8A03FBB2;
+	Fri, 22 Mar 2024 12:17:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f178.google.com (mail-lj1-f178.google.com [209.85.208.178])
+Received: from mail-io1-f70.google.com (mail-io1-f70.google.com [209.85.166.70])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F120E3FBA3
-	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 12:14:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3F3E3D968
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 12:17:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.70
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711109697; cv=none; b=XGexkM91Q159g1lBkHovpybek4RzSQhknwq+udjty/qlwUxY83bmmjeJbMD0ZVuWtqsoxLA07NoSvzHg2PESGhiMKDRrwUPG6DYC0SMjO0bChtCI3qQm1X4XZ41Vf82359tjVggkR6y+LB84yA/BYmoQObjDLtZUYZ313fdjIJg=
+	t=1711109841; cv=none; b=cNQOL+AMXbB2gMNeC2trhHvEqp3MkzSUNVQIOw4191umm1MSchqCMpS5JcyC0nFK5vFxQP6xMfhWrgJSBixJlM4BT/9OW79K+2laqp65L/P+806aAlvAipEUHDIXgLsyXk0/CYp7hCfstyEKqh17BuMYQNU4Shh6EPQOOMF89fU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711109697; c=relaxed/simple;
-	bh=zZsG9GLN8dsvNBjxY5iKeUEMx/EFbSsTptiLrr1sNsg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nZU+lok8yCl7UL/S5PaNUjGXmevbgQIozaM9lB6ZmicuCZbV5yXb6F1XJ78YY2a5kyIoqy6JFyUEjgfLiUTJI0tB91NyfLuROyUJDD9LlUtB2Mt9u3hkPKzL4US4vCV2soFmHyFBRxkwFUpt0EI4BQqEPmE663aWwduKrr2Ho7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=EC756TnO; arc=none smtp.client-ip=209.85.208.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-lj1-f178.google.com with SMTP id 38308e7fff4ca-2d68cf90ec4so34281071fa.1
-        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 05:14:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1711109693; x=1711714493; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=zZsG9GLN8dsvNBjxY5iKeUEMx/EFbSsTptiLrr1sNsg=;
-        b=EC756TnONcY8q3g3lpt7UZSZzOvGaCzNkDbbWDLWv6XYtZUREDR4uYSKCLMFdoaxOo
-         OHFlu4WmYk1+JTkI7qWX4k/0wVYKckAzBBd2L0yDAI6etYfzAG1viDWJHjqTrw7u4DOQ
-         vkyHx9gWao0EwcPpvf6ANmPV7WvYjUku+uYThkGq/zUUGdCbAvt8OSnysjwoNnixEv2d
-         /yMxAck+FGwSPnsWJgftlN9LMzbCOWGUpTaFQiWLfoKUC0FQg8TjTmyLUD6B4MSqT6lJ
-         ldU928uhTlxHTXYmi5MkcdjCDnyUr6TJbVZk0A0b1bElSfqYlpzQgBkUTBUGgKXa9mFz
-         dRyw==
+	s=arc-20240116; t=1711109841; c=relaxed/simple;
+	bh=0pbRR2vkbIB7Z3gkQkplpo2Ziv0vQOMlC6ZXoJM3okM=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=IVjrtJWAolMynai8qFd7L6iZUmfIqJJMddQECe/LXTO9GGEYfXFEY1PHZJQXQXp4Ag3+EHpu2JV6U/dXSAgqxm2Me9kj1G9bGym0TgvrIlcAti0238lbyEf82Ib18W+9ez5lZiYKOCoA6HPTP+MD7m9QTdfdPV43Mj9UqD+OQR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.70
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f70.google.com with SMTP id ca18e2360f4ac-7cc7a6a043bso233751739f.0
+        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 05:17:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711109693; x=1711714493;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zZsG9GLN8dsvNBjxY5iKeUEMx/EFbSsTptiLrr1sNsg=;
-        b=Y3aD4Z6xAWi/kdT8YCZogiCn8zv+DlvoqWPZ2e4jr5uQb/xIXkBlm3O7w2pFMXeRqU
-         J3u+94aJSX6XOf1QmwJioS1x327Shl1dxTXogU7mB+sA7bNM4Hl4Cequ34Tof4tvCVK7
-         PjcHwtXw32+FlEC3gNCzdUtVsJ8ajWPZ+/vo6cYNJPzo0tkLrILvKLmyQOBFRXQ3hxK4
-         PJNRt55KmvnB5da0guVxMGNLZHMOfEIFSGq4GAmp3LCw3xZ4omK58jvSdGHvcWyx3Lo5
-         aGADjuWAF+fQuFmA0DCUmyR5biFnW/pLskgcu/A5q6zJL9UlqdVJPt79P88MayVEuR+w
-         zk/A==
-X-Forwarded-Encrypted: i=1; AJvYcCXtCVTK095eYjvU+1Ad1FRFS8eB2sZdUKzjVYLI4kbPLfRzbSWoBn8X6qc5HO9sE5VDXFwsiVCeUqKk+irNwyirW/SkJUsh
-X-Gm-Message-State: AOJu0YwL/8YmGNuCDTIP4B3KEDQvCM9NhV0lu/NlnQ+E3r0nsEUC0kqG
-	CQOp/Y/IpIG+EDiE3uYgvp93LWq4AC35xvALeWZgPEqKsdEEOxbqEG+MeJ6lrK9RMNllKVBWzvR
-	E
-X-Google-Smtp-Source: AGHT+IEaQl4+2yhplbIBm4NOBJcyx82S3na+uASlPZ/S07tHfKQXRPEADTaCAdVeqgWWzkL+QlX3AA==
-X-Received: by 2002:a2e:a416:0:b0:2d4:3c32:814d with SMTP id p22-20020a2ea416000000b002d43c32814dmr1595735ljn.26.1711109693070;
-        Fri, 22 Mar 2024 05:14:53 -0700 (PDT)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id r10-20020a05600c35ca00b0041462294fe3sm2924459wmq.42.2024.03.22.05.14.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Mar 2024 05:14:52 -0700 (PDT)
-Date: Fri, 22 Mar 2024 13:14:49 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: Prasad Pandit <ppandit@redhat.com>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	netdev@vger.kernel.org, Prasad Pandit <pjp@fedoraproject.org>
-Subject: Re: [PATCH net v1] dpll: indent DPLL option type by a tab
-Message-ID: <Zf12OSZZ2kVOwRCB@nanopsycho>
-References: <20240322114819.1801795-1-ppandit@redhat.com>
+        d=1e100.net; s=20230601; t=1711109839; x=1711714639;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rcqXujar57OhAQTqX7QZ4R+z6KDBiN43Nl6ZNtRa3F4=;
+        b=uNjWBnkQWRYaKidaRLxLeT+Dpt9mBAdEebDU58QgWeTBCqzg3DZxRC041ZS8GR5q+Y
+         tEXwivFxrBjDhJ0r5zp2A4wSbUO59TIn6lqIXCUwPEQvycNj6vynVp59Qlwd2K4WBpcf
+         TmeCiDyU5jJGSj/t7fTdR3pZ+T9AzVZzpbHuuTzSNpW77FEn9yMM5Fes6taCH24SHd1v
+         /zbTpGYRM4dF808tyfm/yhbDgcvpOI5sSpcdDadB+MOqgnXvlv1aWWf1lVml9+OKKy78
+         n/e0XYLkkUjIeXygu4Lfoz4AtcMOYEP8I6vSg45uwrdfibJgorGpg6vvBh2JvAAIhkkc
+         w7gA==
+X-Forwarded-Encrypted: i=1; AJvYcCXJcXGxvFkbhmo6AE+9lkppr5gUZscvzCinN51evE5vhzfwnUNhtFB+mzgJgfa3E70JeF6YT9MO0aJnp0EBg0qqS/w2IOe0
+X-Gm-Message-State: AOJu0Yy/swZ1ubKIkU6HrG3/1oLLF/U/T+6glxLuwG1zUKUCiWR3IZty
+	63wYnKAVoy4LEtieCQWXxm3YGrnwda6mMj0tCMAXY4O7G/8ExhqhX00cizxlDMhtarU9TRg5mCm
+	MOK7T7YYeBtq9E8G0Axlzy9vA89AYnAh7DEfwOlwB11lXeiEblnLF5VY=
+X-Google-Smtp-Source: AGHT+IGE/RCFPMJfBXSSfiLYr8RuHW+ea3Rnm0hwY/q+klNFkh+wLxljOkSaNDyyrkeMWE0xNGNiJyY4T7RcribgVZdtys/LVTYg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240322114819.1801795-1-ppandit@redhat.com>
+X-Received: by 2002:a92:c26b:0:b0:366:be6a:10b7 with SMTP id
+ h11-20020a92c26b000000b00366be6a10b7mr112493ild.2.1711109839014; Fri, 22 Mar
+ 2024 05:17:19 -0700 (PDT)
+Date: Fri, 22 Mar 2024 05:17:19 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000205af206143ece22@google.com>
+Subject: [syzbot] [net?] KMSAN: uninit-value in erspan_build_header (2)
+From: syzbot <syzbot+9e27778c0edc62cb97d8@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Fri, Mar 22, 2024 at 12:48:19PM CET, ppandit@redhat.com wrote:
->From: Prasad Pandit <pjp@fedoraproject.org>
->
->Indent config option type by a tab. It helps Kconfig parsers
->to read file without error.
->
->Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions")
->Signed-off-by: Prasad Pandit <pjp@fedoraproject.org>
+Hello,
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+syzbot found the following issue on:
 
-Next time please wait 24hours before you send another patch version.
+HEAD commit:    a4145ce1e7bc Merge tag 'bcachefs-2024-03-19' of https://ev..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=154a06a5180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=5c1d7ee7e74661a8
+dashboard link: https://syzkaller.appspot.com/bug?extid=9e27778c0edc62cb97d8
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1126e1a5180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15c14e31180000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/ce90c7e9c4b9/disk-a4145ce1.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/fc2e82754c55/vmlinux-a4145ce1.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/dfc8b656ea07/bzImage-a4145ce1.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9e27778c0edc62cb97d8@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in erspan_build_header+0x170/0x2f0 include/net/erspan.h:197
+ erspan_build_header+0x170/0x2f0 include/net/erspan.h:197
+ erspan_xmit+0x128a/0x1ec0 net/ipv4/ip_gre.c:706
+ __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4917 [inline]
+ xmit_one net/core/dev.c:3531 [inline]
+ dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3547
+ sch_direct_xmit+0x3c5/0xd50 net/sched/sch_generic.c:343
+ __dev_xmit_skb net/core/dev.c:3760 [inline]
+ __dev_queue_xmit+0x2e6a/0x52c0 net/core/dev.c:4301
+ dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+ __bpf_tx_skb net/core/filter.c:2136 [inline]
+ __bpf_redirect_common net/core/filter.c:2180 [inline]
+ __bpf_redirect+0x14a6/0x1620 net/core/filter.c:2187
+ ____bpf_clone_redirect net/core/filter.c:2460 [inline]
+ bpf_clone_redirect+0x328/0x470 net/core/filter.c:2432
+ ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:1997
+ __bpf_prog_run512+0xb5/0xe0 kernel/bpf/core.c:2238
+ bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
+ __bpf_prog_run include/linux/filter.h:657 [inline]
+ bpf_prog_run include/linux/filter.h:664 [inline]
+ bpf_test_run+0x499/0xc30 net/bpf/test_run.c:425
+ bpf_prog_test_run_skb+0x14ea/0x1f20 net/bpf/test_run.c:1058
+ bpf_prog_test_run+0x6b7/0xad0 kernel/bpf/syscall.c:4240
+ __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5649
+ __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
+ __x64_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5736
+ do_syscall_64+0xd5/0x1f0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:3804 [inline]
+ slab_alloc_node mm/slub.c:3845 [inline]
+ kmem_cache_alloc_node+0x613/0xc50 mm/slub.c:3888
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
+ pskb_expand_head+0x222/0x19d0 net/core/skbuff.c:2245
+ __skb_cow include/linux/skbuff.h:3671 [inline]
+ skb_cow_head include/linux/skbuff.h:3705 [inline]
+ erspan_xmit+0xb08/0x1ec0 net/ipv4/ip_gre.c:692
+ __netdev_start_xmit include/linux/netdevice.h:4903 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4917 [inline]
+ xmit_one net/core/dev.c:3531 [inline]
+ dev_hard_start_xmit+0x247/0xa20 net/core/dev.c:3547
+ sch_direct_xmit+0x3c5/0xd50 net/sched/sch_generic.c:343
+ __dev_xmit_skb net/core/dev.c:3760 [inline]
+ __dev_queue_xmit+0x2e6a/0x52c0 net/core/dev.c:4301
+ dev_queue_xmit include/linux/netdevice.h:3091 [inline]
+ __bpf_tx_skb net/core/filter.c:2136 [inline]
+ __bpf_redirect_common net/core/filter.c:2180 [inline]
+ __bpf_redirect+0x14a6/0x1620 net/core/filter.c:2187
+ ____bpf_clone_redirect net/core/filter.c:2460 [inline]
+ bpf_clone_redirect+0x328/0x470 net/core/filter.c:2432
+ ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:1997
+ __bpf_prog_run512+0xb5/0xe0 kernel/bpf/core.c:2238
+ bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
+ __bpf_prog_run include/linux/filter.h:657 [inline]
+ bpf_prog_run include/linux/filter.h:664 [inline]
+ bpf_test_run+0x499/0xc30 net/bpf/test_run.c:425
+ bpf_prog_test_run_skb+0x14ea/0x1f20 net/bpf/test_run.c:1058
+ bpf_prog_test_run+0x6b7/0xad0 kernel/bpf/syscall.c:4240
+ __sys_bpf+0x6aa/0xd90 kernel/bpf/syscall.c:5649
+ __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
+ __x64_sys_bpf+0xa0/0xe0 kernel/bpf/syscall.c:5736
+ do_syscall_64+0xd5/0x1f0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+CPU: 0 PID: 5041 Comm: syz-executor167 Not tainted 6.8.0-syzkaller-11743-ga4145ce1e7bc #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
