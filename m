@@ -1,134 +1,131 @@
-Return-Path: <netdev+bounces-81289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD2C0886E4E
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 15:16:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34044886E62
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 15:22:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AF061C208DE
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 14:16:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DDD8F1F22399
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 14:22:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25A3547A57;
-	Fri, 22 Mar 2024 14:16:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6C147A53;
+	Fri, 22 Mar 2024 14:22:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ACJjhCFd"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YahQzIVQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF33646546;
-	Fri, 22 Mar 2024 14:16:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E68B3EA69;
+	Fri, 22 Mar 2024 14:22:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711117013; cv=none; b=HLQ9Gocun+uKbD4nJZ9B57RFIXG3Pv17rMkSNLKksfS7LuIrazAJxDfDIsG5Z+Jq5HBZiyI4piJjsqlRqH6LI1m/aabpdSrzRQGrvIJt2gJvBajNHsIP/pjXRXW77F8wYsfFX3OH15dTwiEB0MwKP3fZDh47QLjZi27AjuML04k=
+	t=1711117360; cv=none; b=J9R+mNwep1S3rlYk04HWB4UqJ8Xci2CitcTz+Slj9zOGq+KMNBiweedDGuVx3NX2rOWQdzvDPiJ0WT3njprJu8oIEYN9e5BSp91TymmbtQmiTPdElOzOOSjcWdnUulJY81PFwqBivqdwZqd7Sosc32wa3hQk+2yI35YeIB7xKcA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711117013; c=relaxed/simple;
-	bh=2KeOzt6+e2pFDwhqfLnCeh7Ap5am70wfBW1us6UaZEk=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=YQlnZyjF+smAPuA0iDqM162I+Q7pChE2/VxQbMhVHEEoG19xdqxcSlKrbO+m9C7mMSnOh+5+qmkePuEKSYDMG+vj2qNxa23n7cFoLbKp2UXVgR5gr/gO/QRbfYwoSdAFysFu4nENdktHxreRTlByhW0+Yz7vkn//wCn3/+7H9mg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ACJjhCFd; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711117012; x=1742653012;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=2KeOzt6+e2pFDwhqfLnCeh7Ap5am70wfBW1us6UaZEk=;
-  b=ACJjhCFd6/QVOSzMQM+vy17EH4uIHumSnJt1fgPSbhdDEhPPS6N2iCqf
-   +79Mkw7iueVL/o4KnDoOmBAIn0GvXUr9et6ARzSVq2D14anKA72Iu0xjb
-   7tdsDzeDFGhexuL0mX2zkGmkexz3/MwdhxDUnlKaKI70UEiatbe2u2gxN
-   aUeTcG2TJqPdfCXWYoGayp3JhslgFrBntC/Annf7bGf3Ty7NiCg5HapZM
-   8/SXXA0uaXstU2nvS7U0xd5XKVF9IIYlLX0jVYFNGa6Eg/Hbul15DftL2
-   Fmzhf++yZIO/+mhBBs8PwmYBl+32RHWRw9SAfhNIlFpGvgP3JScocrEiT
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11020"; a="5994961"
-X-IronPort-AV: E=Sophos;i="6.07,146,1708416000"; 
-   d="scan'208";a="5994961"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 07:16:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,146,1708416000"; 
-   d="scan'208";a="15352468"
-Received: from ijarvine-desk1.ger.corp.intel.com (HELO localhost) ([10.245.247.18])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Mar 2024 07:16:42 -0700
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Fri, 22 Mar 2024 16:16:37 +0200 (EET)
-To: Bjorn Helgaas <helgaas@kernel.org>, Bjorn Helgaas <bhelgaas@google.com>
-cc: linux-pci@vger.kernel.org, Jesse Brandeburg <jesse.brandeburg@intel.com>, 
-    intel-wired-lan@lists.osuosl.org, Tony Nguyen <anthony.l.nguyen@intel.com>, 
-    Ard Biesheuvel <ardb@kernel.org>, Borislav Petkov <bp@alien8.de>, 
-    "David S. Miller" <davem@davemloft.net>, 
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-    linux-edac@vger.kernel.org, linux-efi@vger.kernel.org, 
-    LKML <linux-kernel@vger.kernel.org>, linuxppc-dev@lists.ozlabs.org, 
-    Mahesh J Salgaonkar <mahesh@linux.ibm.com>, 
-    Netdev <netdev@vger.kernel.org>, Oliver O'Halloran <oohall@gmail.com>, 
-    Paolo Abeni <pabeni@redhat.com>, Tony Luck <tony.luck@intel.com>
-Subject: Re: [PATCH 0/4] PCI: Consolidate TLP Log reading and printing
-In-Reply-To: <cc3f6a32-a00d-3c68-bc89-c042d238e7fe@linux.intel.com>
-Message-ID: <771bb522-c4eb-b515-e315-6ad1c622cbd9@linux.intel.com>
-References: <20240308213107.GA700934@bhelgaas> <cc3f6a32-a00d-3c68-bc89-c042d238e7fe@linux.intel.com>
+	s=arc-20240116; t=1711117360; c=relaxed/simple;
+	bh=BR0WlKret8eILef1rpRsE7FbijXE68ZU4YU5Orzxgn4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HQJdsga4Zb/5E3+ZY9ch1XNSXLdyhoajkbwR4z7Nl2VKhWuvFtTC+wQZkJrcE88/xhuLGM8u0COkE2pUhN2gTu0R1mIl5jHtf38fbyI/21URXsyfwfolyINZJTfovGD5tyfAK4oiq4dI3lOYbyf6CnCLRVjIM2gpds5E4vDCZjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YahQzIVQ; arc=none smtp.client-ip=217.70.183.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 2B31AE0004;
+	Fri, 22 Mar 2024 14:22:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1711117349;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SH1XRhULQIs8JPRuZsRMbAGpvto0OH+vLr70bNJGEho=;
+	b=YahQzIVQq0jJ1ScOJhQ/K+EwS4rg6H7JA024lGZUDBFPIlgbkqTCFwDO5ePCgG+fjLWptk
+	Es6WkS2daYPgFJsTy9CiAkveBWPlcPHZApIlp6nlAepa1ykZHJWcsb6GE9jRaEMcj4A6bE
+	2xNxzOT6ZuruAE8/uWn/8MuIHYlhHUDq9gWgVKBZb2tjg9nJnULQdy/nJnGFz+ULMhcyiD
+	C5wdMigkNMVqYqwwHGK6KUsrwnq6HtYYzLhIwt2HQw0xH+TbTmm+tZng3Q6FY6+TpHOLmt
+	b+gsW6jyAQhDTC9Mi6bP4ureTAOgB3GiqQpiXRVNptdmT02lrzTQ1RlB/DoTuQ==
+Date: Fri, 22 Mar 2024 15:22:26 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Luis Chamberlain
+ <mcgrof@kernel.org>, Russ Weight <russ.weight@linux.dev>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, "Rafael J. Wysocki"
+ <rafael@kernel.org>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
+ <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
+ Mark Brown <broonie@kernel.org>, Frank Rowand <frowand.list@gmail.com>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, Thomas Petazzoni
+ <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ devicetree@vger.kernel.org, Dent Project <dentproject@linuxfoundation.org>
+Subject: Re: [PATCH net-next v5 13/17] net: pse-pd: Use regulator framework
+ within PSE framework
+Message-ID: <20240322152226.7de347a6@kmaincent-XPS-13-7390>
+In-Reply-To: <Zf2QsfsxcPoCq_SC@pengutronix.de>
+References: <20240227-feature_poe-v5-0-28f0aa48246d@bootlin.com>
+	<20240227-feature_poe-v5-13-28f0aa48246d@bootlin.com>
+	<ZeObuKHkPN3tiWz_@pengutronix.de>
+	<20240304102708.5bb5d95c@kmaincent-XPS-13-7390>
+	<ZeWi90H-B4XeSkFs@pengutronix.de>
+	<20240321171524.0b04bfcc@kmaincent-XPS-13-7390>
+	<ZfxjosqPMo0ECBmx@pengutronix.de>
+	<20240322113950.27d35376@kmaincent-XPS-13-7390>
+	<Zf2QsfsxcPoCq_SC@pengutronix.de>
+Organization: bootlin
+X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323328-20305305-1711116997=:1115"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+On Fri, 22 Mar 2024 15:07:45 +0100
+Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
---8323328-20305305-1711116997=:1115
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: QUOTED-PRINTABLE
-
-On Mon, 11 Mar 2024, Ilpo J=C3=A4rvinen wrote:
-
-> On Fri, 8 Mar 2024, Bjorn Helgaas wrote:
+> Hay Kory,
 >=20
-> > On Tue, Feb 06, 2024 at 03:57:13PM +0200, Ilpo J=C3=A4rvinen wrote:
-> > > This series consolidates AER & DPC TLP Log handling code. Helpers are
-> > > added for reading and printing the TLP Log and the format is made to
-> > > include E-E Prefixes in both cases (previously only one DPC RP PIO
-> > > displayed the E-E Prefixes).
+> On Fri, Mar 22, 2024 at 11:39:50AM +0100, Kory Maincent wrote:
+> > Hello Oleksij,
+> >=20
+> > On Thu, 21 Mar 2024 17:43:14 +0100
+> > Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+> >  =20
+> > > On Thu, Mar 21, 2024 at 05:15:24PM +0100, Kory Maincent wrote: =20
+> > > > Hello Oleksij,
+> > > > Sorry, I forgot to reply about this.
+> > > > This is specific to pse_regulator driver. Could we tackle this chan=
+ge in
+> > > > another patch series when the current patch series got applied?
+> > > > Also I don't have the hardware to test it.   =20
 > > >=20
-> > > I'd appreciate if people familiar with ixgbe could check the error
-> > > handling conversion within the driver is correct.
-> > >=20
-> > > Ilpo J=C3=A4rvinen (4):
-> > >   PCI/AER: Cleanup register variable
-> > >   PCI: Generalize TLP Header Log reading
+> > > ACK, no problem. =20
 > >=20
-> > I applied these first two to pci/aer for v6.9, thanks, these are all
-> > nice improvements!
-> >=20
-> > I postponed the ixgbe part for now because I think we should get an
-> > ack from those maintainers or just send it to them since it subtly
-> > changes the error and device removal checking there.
+> > I have a question unrelated to this.
+> > Why do you add refcount on the pse_control struct?
+> > The pse control is related to the RJ45 port. Each port is exclusively
+> > related to one pse control.
+> > Shouldn't we return an error in case of two get of the same pse control
+> > index? Do you see use cases where a pse control could be get two times?=
+ =20
 >=20
-> Okay, I'll make sure they're separated properly for the remaining patches=
-=20
-> (I was already planning on doing that separation and posting v2 to avoid=
-=20
-> their input blocking the changed but you beat me to it).
->=20
-> > >   PCI: Add TLP Prefix reading into pcie_read_tlp_log()
-> > >   PCI: Create helper to print TLP Header and Prefix Log
-> >=20
-> > I'll respond to these with some minor comments.
->=20
-> Did you forget to send those comments?
+> I assume, any instance which need coordinate PSE behavior with own action=
+s.
+> For example - PHY will probably need to coordinate PHY state with PSE PD
+> classification process.
 
-Ping.
+Indeed, I was focused on devicetree and didn't thought of coordination
+between PHY and PSE. Thanks for your reply.
 
-I still haven't received those comments for patches 3 & 4.
-
+Regards,
 --=20
- i.
-
---8323328-20305305-1711116997=:1115--
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
