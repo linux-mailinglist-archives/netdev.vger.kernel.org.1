@@ -1,187 +1,109 @@
-Return-Path: <netdev+bounces-81209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CE3C886909
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 10:16:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E190D886917
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 10:20:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CE8691F223B1
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 09:16:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BCD628821B
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 09:20:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBEE71C6AB;
-	Fri, 22 Mar 2024 09:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC481BDC8;
+	Fri, 22 Mar 2024 09:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="Pq5a4a/S"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbg156.qq.com (smtpbg156.qq.com [15.184.82.18])
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 658EB1B7F3;
-	Fri, 22 Mar 2024 09:13:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=15.184.82.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94B5E10A35
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 09:20:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711098846; cv=none; b=qZe59SjwAIZKyhPyOkVybbONXqBRFFpbFHE8sDOC4G/2IhXiU97OkyH6sjH0y5ZU960S/RXCK4HFx9HIvYrqGT3igWy0Yt2WwDqjxhDA4q8Zw206u4Ooe04WFm5y12QM8DH/egne8CjHoFsq7zKM8fnkGeG9Hlz4l47VeJjUoBQ=
+	t=1711099228; cv=none; b=k4myJtnXq8z90B+TX62kd2IsZacL5I1TLSNKr2+BJPcVvANn5OcGHyH1QHlBpe2wXSmZFGIS4dei57q/k/oo78zZrkMUu0YUEwItkAfwuV0a5EcGAeFcaOYL9rmA+jyUVKl75iZhK1oFVayYMilsRTdTJysARqLny158yO9Cyzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711098846; c=relaxed/simple;
-	bh=aTE6zAKVV5uqZysPm/I63UdVchbAgigUe18rr48Hj7Y=;
-	h=From:To:Cc:References:In-Reply-To:Subject:Date:Message-ID:
-	 MIME-Version:Content-Type; b=huZKAbln+vX42ufja1po6hVLoBhGjSQcRDQ421TNE/Z2htUojlmjsmx9x2y7XQzB4roytn3ptpUqIIKanf7rvrDuumFS6kM/QGeacAiYAhBkjBLNNWmYJvXUSs7mjJHoh7NrXPeYxdSFtQxvHsW2ZMvN1Q8j+9FYkaDni+vMBwM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=15.184.82.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid:Yeas8t1711098743t325t20718
-Received: from 73E00E8BC808433CB9DB281092DFBE6B (duanqiangwen@net-swift.com [183.159.169.46])
-X-QQ-SSF:00400000000000F0FH4000000000000
-From: duanqiangwen@net-swift.com
-X-BIZMAIL-ID: 1856326279137474112
-To: "'Jiri Pirko'" <jiri@resnulli.us>
-Cc: "'netdev'" <netdev@vger.kernel.org>,
-	"'jiawenwu'" <jiawenwu@trustnetic.com>,
-	"'mengyuanlou'" <mengyuanlou@net-swift.com>,
-	"'davem'" <davem@davemloft.net>,
-	"'edumazet'" <edumazet@google.com>,
-	"'kuba'" <kuba@kernel.org>,
-	"'pabeni'" <pabeni@redhat.com>,
-	"'maciej.fijalkowski'" <maciej.fijalkowski@intel.com>,
-	"'andrew'" <andrew@lunn.ch>,
-	"'wangxiongfeng2'" <wangxiongfeng2@huawei.com>,
-	"'linux-kernel'" <linux-kernel@vger.kernel.org>,
-	"'michal.kubiak'" <michal.kubiak@intel.com>
-References: <20240322080416.470517-1-duanqiangwen@net-swift.com> <Zf09VnR2YI_WOchd@nanopsycho> <000001da7c31$be2330f0$3a6992d0$@net-swift.com> <Zf1JEfIq1E1SHiBD@nanopsycho>
-In-Reply-To: <Zf1JEfIq1E1SHiBD@nanopsycho>
-Subject: RE: [PATCH net v5] net: txgbe: fix i2c dev name cannot match clkdev
-Date: Fri, 22 Mar 2024 17:12:22 +0800
-Message-ID: <000001da7c39$0c8eb4b0$25ac1e10$@net-swift.com>
+	s=arc-20240116; t=1711099228; c=relaxed/simple;
+	bh=5R5Hd/bpG5D/sYlSYBUFIhlAzdpYqVPsRjEZcZxIwpI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=u94SSXXM+zcS8btIA5lbR57/vy2xei7tqVuUlCYXqb6/U5kc0yYHJ70k63IAMJ+sG8AwD4ml8LGqS6he/DVfzIjViDGAnbuv4waK1V68Bhlir6JMF4DhsHS2tg0n9hYbakacXlKSjXKbiMdQhXLRMvwGOTkSMcS2xsaYdyWzzqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=Pq5a4a/S; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id A00A73FB74
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 09:20:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1711099224;
+	bh=5R5Hd/bpG5D/sYlSYBUFIhlAzdpYqVPsRjEZcZxIwpI=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version;
+	b=Pq5a4a/SiVAWxTJPoj+2WdJRNmK2tW8dmMZ8dvfvo6yO+1D9L1G7PER+DzPLWVvD0
+	 /rqtF8B+eR25x37Hti7RKSCfKjvCDPW1WRZOTbimekJrBrjv724kvcEzqZ8w/5zDXG
+	 eMrNsYGIGhY5e6w5nTPVcD+eAt2VHdORl3G6ydXA605CBlvoMJjXwKh0BBrzhRpe3v
+	 BxpHLnjcu9YQdZXjac8JgXJ4+TlbfqbkNo/zXMwmUevBCHLFWayQO+4J5KZIhCkFJH
+	 d9p0DJr8Io6A0pReJ6lKAE7sOkuzY/mHEJ3oW5xcdAEWodqxSoFx9bmo1JdWB5fMIW
+	 TdudSNSkNZ+ZA==
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-29c7744a891so1245017a91.2
+        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 02:20:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711099223; x=1711704023;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5R5Hd/bpG5D/sYlSYBUFIhlAzdpYqVPsRjEZcZxIwpI=;
+        b=auaAEXc0zd4reGQis/ORlfHDsZ8oJtdrtUbYB4fEuUnJbor/GTpEGoJacekwY0a/Wr
+         fVXrqiEkEVztmD4dSzrdc0O5zyuFtXgSI/bT20D8uRAACDv1ANuTHrYjd33yWe2Fxj4j
+         s3zAPdDQoDjR1F+MjIpWvGiDuRT2kQ85sEG7T0XC2WAz2VG3OXGqLBC2q6b8fbiYnzIE
+         sYz9N8VgruCClyMj9fQdE1r3DEheQUKHhtMnkwqf6TAcIW51f0q+bZUj2Z+kZjoagXU1
+         D9Z3rMVkBEukwZnmMpxsBwIuI1JE9VXOHEn912JeHDpJhvA95xspI/hM9LagmlLNvpOy
+         5Hcw==
+X-Forwarded-Encrypted: i=1; AJvYcCVDJlKczK4ZBsxu2qz4EAKjFdtUvi0h8QDU7PP8ZAw9zypbwwiKDsNTPFI6CY/ZFjzrzAfrwNh4f7G05EqvlIeTTywSUrHu
+X-Gm-Message-State: AOJu0Yzo4ERb80jflqsOWBwIBSSECw+T9Po6X+ykp101A4IqQyWuAqsM
+	yOgTdWtGkfUQ6RQX0ySobqmoSyk/DOHZ75u98eIydV6Lw1xgDdfBCRhbeQpxfiGOEVyqZnLw/ug
+	eP2cZ4kdFUDabos02lbAXuifVZA/FOlBMO5xrydQ4pud8I6D0xqsBh0cPLX2tY+psDNINnw==
+X-Received: by 2002:a17:90a:cc0c:b0:29b:c493:5c73 with SMTP id b12-20020a17090acc0c00b0029bc4935c73mr1714681pju.25.1711099223147;
+        Fri, 22 Mar 2024 02:20:23 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFwVoLbtWH8pLVYIog9xok9r1jOv+2Y43kT9a7VvHfO7hbgUmk7tMw1z4XqEvaM79xdHBnLfg==
+X-Received: by 2002:a17:90a:cc0c:b0:29b:c493:5c73 with SMTP id b12-20020a17090acc0c00b0029bc4935c73mr1714658pju.25.1711099222860;
+        Fri, 22 Mar 2024 02:20:22 -0700 (PDT)
+Received: from localhost (211-75-139-218.hinet-ip.hinet.net. [211.75.139.218])
+        by smtp.gmail.com with UTF8SMTPSA id nn11-20020a17090b38cb00b0029b32b85d3dsm4980671pjb.29.2024.03.22.02.20.18
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Mar 2024 02:20:22 -0700 (PDT)
+From: pseudoc <atlas.yu@canonical.com>
+To: jiri@resnulli.us
+Cc: atlas.yu@canonical.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	hau@realtek.com,
+	hkallweit1@gmail.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	nic_swsd@realtek.com,
+	pabeni@redhat.com
+Subject: Sorry Jiri Pirko
+Date: Fri, 22 Mar 2024 17:20:16 +0800
+Message-Id: <20240322092016.52941-1-atlas.yu@canonical.com>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <Zf1KN_YYg-LrCQLh@nanopsycho>
+References: <Zf1KN_YYg-LrCQLh@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AQFwLs5rgYGClTpBePjvbYMXpqMxXgKXsSFcAjPmTUsCO1Kfl7Hf3JRw
-Content-Language: zh-cn
-X-QQ-SENDSIZE: 520
-Feedback-ID: Yeas:net-swift.com:qybglogicsvrsz:qybglogicsvrsz3a-1
+Content-Transfer-Encoding: 8bit
 
+I am sorry Jiri Pirko, I had sent the [PATCH v2] before I saw your reply.
+I will send it as [PATCH v2 net] tomorrow with a proper name in the
+"From:" and "Signed-off-by:" fields.
 
-> -----Original Message-----
-> From: Jiri Pirko <jiri@resnulli.us>
-> Sent: 2024=E5=B9=B43=E6=9C=8822=E6=97=A5 17:02
-> To: duanqiangwen@net-swift.com
-> Cc: netdev@vger.kernel.org; jiawenwu@trustnetic.com;
-> mengyuanlou@net-swift.com; davem@davemloft.net;
-> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
-> maciej.fijalkowski@intel.com; andrew@lunn.ch;
-> wangxiongfeng2@huawei.com; linux-kernel@vger.kernel.org;
-> michal.kubiak@intel.com
-> Subject: Re: [PATCH net v5] net: txgbe: fix i2c dev name cannot match =
-clkdev
->=20
-> Fri, Mar 22, 2024 at 09:20:04AM CET, duanqiangwen@net-swift.com wrote:
-> >
-> >-----Original Message-----
-> >From: Jiri Pirko <jiri@resnulli.us>
-> >Sent: 2024=E5=B9=B43=E6=9C=8822=E6=97=A5 16:12
-> >To: Duanqiang Wen <duanqiangwen@net-swift.com>
-> >Cc: netdev@vger.kernel.org; jiawenwu@trustnetic.com;
-> >mengyuanlou@net-swift.com; davem@davemloft.net;
-> edumazet@google.com;
-> >kuba@kernel.org; pabeni@redhat.com; maciej.fijalkowski@intel.com;
-> >andrew@lunn.ch; wangxiongfeng2@huawei.com;
-> >linux-kernel@vger.kernel.org; michal.kubiak@intel.com
-> >Subject: Re: [PATCH net v5] net: txgbe: fix i2c dev name cannot match
-> >clkdev
-> >
-> >Fri, Mar 22, 2024 at 09:04:16AM CET, duanqiangwen@net-swift.com =
-wrote:
-> >>txgbe clkdev shortened clk_name, so i2c_dev info_name also need to
-> >>shorten. Otherwise, i2c_dev cannot initialize clock.
-> >>
-> >>Change log:
-> >>v4-v5: address comments:
-> >>	Jiri Pirko:
-> >>	Well, since it is used in txgbe_phy.c, it should be probably
-> >>	rather defined locally in txgbe_phy.c.
-> >
-> >Did you read Florian's comment? Please do.
-> >
-> >pw-bot: cr
-> >--------
-> >I replied to Florian:
-> >" I want to shorten "i2c_desginware" to "i2c_dw" in txgbe driver, so
-> >other drivers which use "i2c_designware" need another patch to use a
-> >define. "
-> >
-> >Sorry, this email forgot to cc the mailing list.
->=20
-> Could you please use some sane email client that properly prefixes the
-> original text by ">"?
-
-I'm sorry, and I have  set up the right email client settings now.
-
-> >
-> >>v3->v4: address comments:
-> >>	Jakub Kicinski:
-> >>	No empty lines between Fixes and Signed-off... please.
-> >>v2->v3: address comments:
-> >>	Jiawen Wu:
-> >>	Please add the define in txgbe_type.h
-> >>
-> >>Fixes: e30cef001da2 ("net: txgbe: fix clk_name exceed MAX_DEV_ID
-> >>limits")
-> >>Signed-off-by: Duanqiang Wen <duanqiangwen@net-swift.com>
-> >>---
-> >> drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c | 8 +++++---
-> >> 1 file changed, 5 insertions(+), 3 deletions(-)
-> >>
-> >>diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-> >>b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-> >>index 5b5d5e4310d1..2fa511227eac 100644
-> >>--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-> >>+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
-> >>@@ -20,6 +20,8 @@
-> >> #include "txgbe_phy.h"
-> >> #include "txgbe_hw.h"
-> >>
-> >>+#define TXGBE_I2C_CLK_DEV_NAME "i2c_dw"
-> >>+
-> >> static int txgbe_swnodes_register(struct txgbe *txgbe)  {
-> >> 	struct txgbe_nodes *nodes =3D &txgbe->nodes; @@ -571,8 +573,8
-> @@
-> >static
-> >>int txgbe_clock_register(struct txgbe *txgbe)
-> >> 	char clk_name[32];
-> >> 	struct clk *clk;
-> >>
-> >>-	snprintf(clk_name, sizeof(clk_name), "i2c_dw.%d",
-> >>-		 pci_dev_id(pdev));
-> >>+	snprintf(clk_name, sizeof(clk_name), "%s.%d",
-> >>+		 TXGBE_I2C_CLK_DEV_NAME, pci_dev_id(pdev));
-> >>
-> >> 	clk =3D clk_register_fixed_rate(NULL, clk_name, NULL, 0, =
-156250000);
-> >> 	if (IS_ERR(clk))
-> >>@@ -634,7 +636,7 @@ static int txgbe_i2c_register(struct txgbe =
-*txgbe)
-> >>
-> >> 	info.parent =3D &pdev->dev;
-> >> 	info.fwnode =3D software_node_fwnode(txgbe-
-> >nodes.group[SWNODE_I2C]);
-> >>-	info.name =3D "i2c_designware";
-> >>+	info.name =3D TXGBE_I2C_CLK_DEV_NAME;
-> >> 	info.id =3D pci_dev_id(pdev);
-> >>
-> >> 	info.res =3D &DEFINE_RES_IRQ(pdev->irq);
-> >>--
-> >>2.27.0
-> >>
-> >>
-> >
-> >
->=20
-
+Bear with me, I am new to this. Sorry for the inconvenience and thanks
+for your patience.
 
