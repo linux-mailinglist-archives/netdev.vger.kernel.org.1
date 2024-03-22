@@ -1,116 +1,92 @@
-Return-Path: <netdev+bounces-81305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EFBB886FE8
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 16:42:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C367887013
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 16:56:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB1E8284909
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 15:42:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D156CB22477
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 15:56:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B76235101A;
-	Fri, 22 Mar 2024 15:41:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1318E53811;
+	Fri, 22 Mar 2024 15:56:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="DIdm02ks"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qg+gMoCJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA265B5A6
-	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 15:41:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531AD524DF;
+	Fri, 22 Mar 2024 15:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711122110; cv=none; b=mpeXVKI7bDDFG0NcQ97Jpd0TtILY5Qa6uR6gwfYPh5gn9Lk0uby91AigLF9F8s4KYZ8WD45pedcyhIe6XQ7qJXRpstFaWRBk/fzUUkFUngoL7dnsFHN6MNwn81xaeiLFpXg9NFtOsA2ZPaBNxMAmRXW0mRddnBffPe7rFe8yjfE=
+	t=1711123007; cv=none; b=UyG96QPf29aAb14fWekieLv2/6y2JO7yNahDmz8wDcuXVrWpQgZ2wD3bcUWKzIyywSI4xKrk0BoaM4ppAoWs2VRukPtU1vJopodGrfGbF5ePpNTn9cTgkn1ZHawtQFUN/5Qvk3VZ8qFIOvuAsZNb3koWd0Ocztfj1WOioQXKVFI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711122110; c=relaxed/simple;
-	bh=B+/xFuqJmP6elqhGJxvQk8WSM6hnGTFg7P7zXygPy7E=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Osd8em/t6KTfIEwjdwogei13c7yV4x5J1iR/bLb2K43081oGYRPuBSl7C+XRmS8Z2vNAjSsIwRmtlhS6lO7g2DUpzm0t5/3GZGivYYz5/w6py62gB/reKGkU4iDb8spparLKwHSe3+usQEwkWN4xEjKTTEc6JIhHzKLsdI18Hjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=DIdm02ks; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-1def59b537cso14503815ad.2
-        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 08:41:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1711122107; x=1711726907; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mJh29uvbzp8qLyreE66ADZk3coO9VHHThpMV9LfpmGI=;
-        b=DIdm02ksDdgTuLdIvvKYHbFxSR8/rYOHKa+EPL6f4lYx2opCIGs5XdNN4OQsiKXyGn
-         xo9+/53J4DyIEpkVSU6YxEAybfRCiqZvk5BhvKPqR68NSgx67B4O04CGrZVUNt97XeKv
-         Ug7Lyjpswww+Zf5dWCRd2vXBdI+iISzomEVdWw0d4IqaMvj+ZD/hnFyUhbdSGOV3ImrL
-         pTF3DteuJSLnJAcDOs0bI+0+3pH0J+ugu5vAqHgDBqFHhXhEv9EduiM9kycZ3UwxIycg
-         D8ZsCu4mlbqG0YsJamDiTB8EuP/2D9RRWADODgOVeiuFYpr4lmJSxju/nJ/hbS6fgpov
-         bA0g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711122107; x=1711726907;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mJh29uvbzp8qLyreE66ADZk3coO9VHHThpMV9LfpmGI=;
-        b=I+ze3GIxTYC6DMfKW3vKr5bkWY5CPiSwZ0pNoecUYzt04xZuwUY7rMxUG3twwx4Lfj
-         cUf8dHkWABTkD3GvWOrULm988/WIJRQmOoroiYMTibLRScM8UQZ1Vb2k1eLsnTNrakks
-         HCi3wErHIzzNTN1mvAbhPutEXLjAGEzkrbHWREJE9XSxGmPVubC0cd489TPMFETcRzUs
-         umxAu2zZBqR49se5AS62XFANhD6+7qfpqOM0hv7c0+KzZ9ue6BvpA0dQz6utibqsySQt
-         g9+e2xWBoDRLZSocdq7IpYmTlfa2XiXAZBk71DYMP55LatHrV3SkTLAIFRxdwEviMQmN
-         isoQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX89+7l5rnEoaVaOuavo9rp1HMrNAjPuPcr5HEVtZ5gOCXFsw9kLNV/PtS+btwDC9JMEz30udfnT0pP0WjnKQ1E3mBTLOAz
-X-Gm-Message-State: AOJu0YxQNX1mw1PsVMZBLbyPp5eC6TTT3/c42KHYvJBbkgpNTLrTEJO0
-	daUWR3JOJTpG55c3By5wChMFImkWS/YqqnO0//hb2fXZ7ITTD0wY031lfTdUtkY=
-X-Google-Smtp-Source: AGHT+IGYi1VQSz+fvk1a/BPp0AjYfkPeTAMoiRUqwMq0c6i+v20HMcjlyCMfPn2Jh6oGAPrzWCN/MQ==
-X-Received: by 2002:a17:902:ef44:b0:1dd:b45f:4cc9 with SMTP id e4-20020a170902ef4400b001ddb45f4cc9mr122024plx.23.1711122107584;
-        Fri, 22 Mar 2024 08:41:47 -0700 (PDT)
-Received: from hermes.local (204-195-123-203.wavecable.com. [204.195.123.203])
-        by smtp.gmail.com with ESMTPSA id e4-20020a170902d38400b001dc91b4081dsm2056441pld.271.2024.03.22.08.41.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Mar 2024 08:41:47 -0700 (PDT)
-Date: Fri, 22 Mar 2024 08:41:45 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Date Huang <tjjh89017@hotmail.com>
-Cc: roopa@nvidia.com, razor@blackwall.org, jiri@resnulli.us,
- netdev@vger.kernel.org, bridge@lists.linux-foundation.org
-Subject: Re: [PATCH iproute2-next v2 2/2] bridge: vlan: fix compressvlans
- usage
-Message-ID: <20240322084145.3e081475@hermes.local>
-In-Reply-To: <MAZP287MB0503BB0A5D2584B43A734CB6E4312@MAZP287MB0503.INDP287.PROD.OUTLOOK.COM>
-References: <20240322123923.16346-1-tjjh89017@hotmail.com>
-	<MAZP287MB0503BB0A5D2584B43A734CB6E4312@MAZP287MB0503.INDP287.PROD.OUTLOOK.COM>
+	s=arc-20240116; t=1711123007; c=relaxed/simple;
+	bh=TN6iWFQ6tks/7SD6PC2cwdtWsPju4N4ielJpFORj08Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aFhnEfJ4WD+AjaxguyqJKyARb3tJNm9IMkQes7eCsqAh4ndOtIumL+dHi3zog4h3U9tlHBcahh4jXTZdmf+aRRKuPf91e2O0hiNClZ+uFFtNc1JQvyymHp9IVDphZVeXUKpkAlhYB+vgJWlvoSNio5UwgYvqZ1uZK5Dp+XmNok0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qg+gMoCJ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=bFqRY/K29N5KY4oWl3hHzhxOBffmPcj/lfWbmVtrjFY=; b=qg+gMoCJCGMDoZ5fvzr4D2pcHv
+	fjWbyQ5pmoQok07RbG+aciz9Jd3XbkrxVzu+FOK+4a2p5+LhaAYtwcGBaLrNO0XY+TSK7fiKyjq0Z
+	fmYW94VP/KBohx0uO/VCJQXHqPs2/BTmlwBHyx+Ers5NAYxSif2r0FcusvFMA6IjL/2M=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rnhFx-00AyDl-8A; Fri, 22 Mar 2024 16:56:33 +0100
+Date: Fri, 22 Mar 2024 16:56:33 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: POPESCU Catalin <catalin.popescu@leica-geosystems.com>
+Cc: "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>,
+	"m.felsch@pengutronix.de" <m.felsch@pengutronix.de>
+Subject: Re: [PATCH net-next] net: phy: dp8382x: keep WOL setting across
+ suspends
+Message-ID: <5746c9da-1d45-4d06-a925-4150e680b8ec@lunn.ch>
+References: <20240306171446.859750-1-catalin.popescu@leica-geosystems.com>
+ <8de1d4e3-6d80-45a5-a638-48451d9b5c15@lunn.ch>
+ <b53818a7-66a4-4c7a-b687-efaea6cb9e4e@leica-geosystems.com>
+ <f8bfbe80-f308-4b8d-b8f0-5a5f6ca5fa0e@leica-geosystems.com>
+ <e9b85f71-f494-4fa6-acce-13ee8e147c21@leica-geosystems.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e9b85f71-f494-4fa6-acce-13ee8e147c21@leica-geosystems.com>
 
-On Fri, 22 Mar 2024 20:39:23 +0800
-Date Huang <tjjh89017@hotmail.com> wrote:
+> > It looks like the issue I'm trying to address in this patch is not
+> > specific to dp8382x. Right now, depending on if the PHY is reset or not
+> > during resume (either through mdio_device reset_gpio/reset_ctrl or
+> > phy_driver soft_reset callback), the WOL configuration is either the PHY
+> > reset value or the BIOS value. I could still make the patch but it
+> > doesn't really make sense to address only dp8382x.
 
-> diff --git a/man/man8/bridge.8 b/man/man8/bridge.8
-> index eeea4073..bb02bd27 100644
-> --- a/man/man8/bridge.8
-> +++ b/man/man8/bridge.8
-> @@ -22,6 +22,7 @@ bridge \- show / manipulate bridge addresses and devices
->  \fB\-s\fR[\fItatistics\fR] |
->  \fB\-n\fR[\fIetns\fR] name |
->  \fB\-b\fR[\fIatch\fR] filename |
-> +\fB\-com\fR[\fIpressvlans\fR] |
->  \fB\-c\fR[\fIolor\fR] |
->  \fB\-p\fR[\fIretty\fR] |
->  \fB\-j\fR[\fIson\fR] |
-> @@ -345,6 +346,11 @@ Don't terminate bridge command on errors in batch mode.
->  If there were any errors during execution of the commands, the application
->  return code will be non zero.
->  
-> +.TP
-> +.BR "\-com", " \-compressvlans"
-> +Show compressed VLAN list. It will show continuous VLANs with the range instead
-> +of separated VLANs. Default is off.
-> +
+This is an interesting point. soft_reset the driver is in control
+off. It can preserve the WoL setting over the soft reset.
+A hardware reset is a different matter.
 
-Overlapping option strings can cause problems, maybe a better word?
+However, if we woke up due to WoL, the PHY never went to sleep, its
+state is intact, so why are we doing a hardware reset?
+
+      Andrew
+
 
