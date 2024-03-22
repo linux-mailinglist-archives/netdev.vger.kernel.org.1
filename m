@@ -1,128 +1,88 @@
-Return-Path: <netdev+bounces-81293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 439AD886E98
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 15:30:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BD4E886EBF
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 15:36:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EE7DA1F238B9
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 14:30:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ED62285A98
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 14:36:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B651482FF;
-	Fri, 22 Mar 2024 14:30:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4CC247F6C;
+	Fri, 22 Mar 2024 14:36:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="F0ZEsdOm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FEYTZR9t"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A431481D0;
-	Fri, 22 Mar 2024 14:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEE943AB2;
+	Fri, 22 Mar 2024 14:36:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711117842; cv=none; b=O74AiG/nNJSOJrd7ryfYhWz8V4o2He8QH9Ti31nfj+xbtIAu3pgCZbz1MNwxzNlgwTnRiG60Il9lkMp9j9d7Pfi+q6N0qTm0UwEhin8OAuY4eoVG3Hvakz53Vr32zsCMelI+DeA3ZHcrHn3znuQEhBQ/JOP2XLAoTTIB7DJ5lG0=
+	t=1711118207; cv=none; b=dbioPZBVpgRv9UYDIaKPR2mj6jSZBRoIjLX54tStnkUv9SIkjOiYse2pXAo4G8WC/QI6Q35LWSjQSrMQHO0ZHPBmWsq03blXc9F1FXm5leQyDWHnWqCO2Dn7l9RNPiq5LSjRuGEsGCFjYVArXHrqIjx4J8F6rkUtJf9C5M3t9Dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711117842; c=relaxed/simple;
-	bh=T/jKj4/iW9yfrA6kGZOg1yFTxBhpOhojURXvqMGy8G8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Yo71IMW3fnY2ofuvFOM1MgauP/SHgZ9QAHpn7Oh9q6S+G1LXQxKPyFeKFe5qVLKiWw+4uMYpFVy489yjnXnbORU0P43s32cjgYRs/92B5WAIGbjEYtw07eUd9Xywgm8Wx7jHA4E2udRCRjadNvfyF4Wkong+EPboMhjjtk+ybTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=F0ZEsdOm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1DC57C43394;
-	Fri, 22 Mar 2024 14:30:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1711117840;
-	bh=T/jKj4/iW9yfrA6kGZOg1yFTxBhpOhojURXvqMGy8G8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=F0ZEsdOm1JYUMZqeYJCE3EC0AqqMsFWIxQlVCZSY7N3Sz+NIlaceCz/FL7RMbHsF1
-	 K1hxFhrj1aFF5dzMmZawvCKTkGWNzYeCxdfDR4Pj5Ge18QboRFf7Oxum1G8M8uvleA
-	 8eyNN8JcSOma2IRKCrnpd5ToWxjRUzMV0/7UlJpg=
-Date: Fri, 22 Mar 2024 15:30:37 +0100
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: Chris Leech <cleech@redhat.com>, Nilesh Javali <njavali@marvell.com>,
-	Christoph Hellwig <hch@lst.de>,
-	John Meneghini <jmeneghi@redhat.com>, Lee Duncan <lduncan@suse.com>,
-	Mike Christie <michael.christie@oracle.com>,
-	Hannes Reinecke <hare@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-scsi@vger.kernel.org,
-	GR-QLogic-Storage-Upstream@marvell.com,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH v6 1/4] uio: introduce UIO_MEM_DMA_COHERENT type
-Message-ID: <2024032203-dawn-crestless-4199@gregkh>
-References: <20240201233400.3394996-2-cleech@redhat.com>
- <20240205200137.138302-1-cleech@redhat.com>
- <4f606e50-865c-46f2-b89e-6c1dfe02f527@roeck-us.net>
+	s=arc-20240116; t=1711118207; c=relaxed/simple;
+	bh=or1Gn+RA1pWhx4yqAzYUiva3aoBlbjp13O+FP9ZcQEc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lBCgrgsB3pu+VXGgVUuDZncfvXBO3n7d32Z3QtTCYE6gwnvh61zsBmkeUnBMi489n9zJsYx3r+NkW5cFrLaHt0k5N2Hv6/GyONthxc1z578JnZAE0j2B5wyo6C78h36nJ2453OI8EHjdpUIgpsFyKZyRApd2uA7aLGwDWqXrlfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FEYTZR9t; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EECAC433C7;
+	Fri, 22 Mar 2024 14:36:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711118207;
+	bh=or1Gn+RA1pWhx4yqAzYUiva3aoBlbjp13O+FP9ZcQEc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=FEYTZR9tWAPx6fRWZAUimt4zk6jDgFdDx9iLxPaP3Kk4ohMnHknF/r1F2PavKZ7kU
+	 nKjucfS5J3TB2h4Q71q8SurP0HNVHyGhKcQ1FM0EIdSZesrzcODd9Iq6UI9TVJr6zS
+	 aLH0cM9C4e5c/Qv3/jIEfC4bNyoKotapP25/RZQ26hHPPARfhlpSeuubBAFzQYla7J
+	 O0CL+jWYVotEjaR4IP18e5iibEMmlbq+zAAdhrv2fuW4J+WpgxwovpN6gdliUzNhem
+	 An07uYG91Gow+N/Lg1kggriwj+jRnRqyM/1PF8mrMRUqYesS0vbYdwZ7rnH4vW1TZH
+	 5rElHpW4IbCKQ==
+Message-ID: <f6c0bf7e-bd8f-49f4-abb0-df04fe0e4333@kernel.org>
+Date: Fri, 22 Mar 2024 08:36:44 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4f606e50-865c-46f2-b89e-6c1dfe02f527@roeck-us.net>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] ipv6: fib: hide unused 'pn' variable
+Content-Language: en-US
+To: Arnd Bergmann <arnd@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, YOSHIFUJI Hideaki
+ <yoshfuji@linux-ipv6.org>, Ville Nuorvala <vnuorval@tcs.hut.fi>
+Cc: Arnd Bergmann <arnd@arndb.de>, Kui-Feng Lee <thinker.li@gmail.com>,
+ Breno Leitao <leitao@debian.org>, Kunwu Chan <chentao@kylinos.cn>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20240322131746.904943-1-arnd@kernel.org>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20240322131746.904943-1-arnd@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Mar 22, 2024 at 07:16:19AM -0700, Guenter Roeck wrote:
-> On Mon, Feb 05, 2024 at 12:01:37PM -0800, Chris Leech wrote:
-> > Add a UIO memtype specifically for sharing dma_alloc_coherent
-> > memory with userspace, backed by dma_mmap_coherent.
-> > 
-> > This is mainly for the bnx2/bnx2x/bnx2i "cnic" interface, although there
-> > are a few other uio drivers which map dma_alloc_coherent memory and will
-> > be converted to use dma_mmap_coherent as well.
-> > 
-> > Signed-off-by: Nilesh Javali <njavali@marvell.com>
-> > Signed-off-by: Chris Leech <cleech@redhat.com>
-> > ---
+On 3/22/24 7:14 AM, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 > 
-> Building i386:allyesconfig ... failed
-> --------------
-> Error log:
-> drivers/uio/uio.c: In function 'uio_mmap_dma_coherent':
-> drivers/uio/uio.c:795:16: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
->   795 |         addr = (void *)mem->addr;
->       |                ^
-
-So on 32bit systems phys_addr_t != the same size as (void *)?  How is
-that possible?  We also are doing an explicit cast here, how does this
-not work?
-
-Ah, do you have CONFIG_X86_PAE enabled?  That would cause that mess,
-ick.
-
-
-> cc1: all warnings being treated as errors
-> make[5]: [scripts/Makefile.build:244: drivers/uio/uio.o] Error 1 (ignored)
-> drivers/uio/uio_dmem_genirq.c: In function 'uio_dmem_genirq_open':
-> drivers/uio/uio_dmem_genirq.c:63:39: error: cast from pointer to integer of different size [-Werror=pointer-to-int-cast]
->    63 |                 uiomem->addr = addr ? (phys_addr_t) addr : DMEM_MAP_ERROR;
->       |                                       ^
-> drivers/uio/uio_dmem_genirq.c: In function 'uio_dmem_genirq_release':
-> drivers/uio/uio_dmem_genirq.c:92:43: error: cast to pointer from integer of different size [-Werror=int-to-pointer-cast]
->    92 |                                           (void *) uiomem->addr,
->       |                                           ^
-> cc1: all warnings being treated as errors
-> make[5]: [scripts/Makefile.build:244: drivers/uio/uio_dmem_genirq.o] Error 1 (ignored)
-> drivers/uio/uio_pruss.c: In function 'pruss_probe':
-> drivers/uio/uio_pruss.c:194:34: error: cast from pointer to integer of different size [-Werror=pointer-to-int-cast]
->   194 |                 p->mem[2].addr = (phys_addr_t) gdev->ddr_vaddr;
->       |                                  ^
-> cc1: all warnings being treated as errors
+> When CONFIG_IPV6_SUBTREES is disabled, the only user is hidden, causing
+> a 'make W=1' warning:
 > 
-> Caused by this patch and "uio_dmem_genirq: UIO_MEM_DMA_COHERENT conversion" as well
-> as "uio_pruss: UIO_MEM_DMA_COHERENT conversion".
+> net/ipv6/ip6_fib.c: In function 'fib6_add':
+> net/ipv6/ip6_fib.c:1388:32: error: variable 'pn' set but not used [-Werror=unused-but-set-variable]
 > 
-> I'd suggest to make uio dependent on 64 bit if 32 bit is no longer supported
-> to prevent waste of test builds resources.
+> Add another #ifdef around the variable declaration, matching the other
+> uses in this file.
+> 
+> Fixes: 66729e18df08 ("[IPV6] ROUTE: Make sure we have fn->leaf when adding a node on subtree.")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  net/ipv6/ip6_fib.c | 7 +++++--
+>  1 file changed, 5 insertions(+), 2 deletions(-)
 
-Perhaps disable it if PHYS_ADDR_T_64BIT is not enabled?
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-Chris, can you make up a patch?  Odd that this didn't show up in 0-day
-before this, does it not test 32bit builds anymore?
-
-thanks,
-
-greg k-h
 
