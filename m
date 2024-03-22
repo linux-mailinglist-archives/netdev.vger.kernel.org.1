@@ -1,111 +1,118 @@
-Return-Path: <netdev+bounces-81168-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F9FD8865F3
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 06:19:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 863E9886637
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 06:32:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B2281F23CA5
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 05:19:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A19041C226A1
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 05:32:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 061D08BE8;
-	Fri, 22 Mar 2024 05:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2602BFBF2;
+	Fri, 22 Mar 2024 05:30:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bv3H24bz"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="pjzZtlJT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6388915BB
-	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 05:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B281118C
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 05:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711084787; cv=none; b=b04eFiuW1ZWwq7sS0G3QfmiH7W62g1neY2SDeaWNYriDkP9HSgReFm1IvE4uYeCL/z+plodkZacC3pD+jCRb7oWVtWNaUucSTwZS9jVuRJr+ugl3ZN/VlCkrSKIo5qJUDVqyChjegn5F/W4CLsAQsws/PpoAk/Thao2YCJXedrs=
+	t=1711085435; cv=none; b=O4lKFz6Z5//KFcKaPWMQdBxpe0S0yWWM3WiwLJBcA14kav0qyKrgUKSDO/CeswkVImu89Uz05YORpxv3CCDnv6aR15cKGanFXY0u/GO9nR8B5hJ+p4t9LOFn9HQgqcWNtvqRTh3G2i9LR4cQcP0GSGB1xj6ED38jxW+MNoqSato=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711084787; c=relaxed/simple;
-	bh=9WljUklEtnqgFdT0/2aUVbLCn9e8lCLCn5JN6nZDEas=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n2SbuXLk4o3FJBF4ZEMtK0s6+IxfmwT47aVyAbfMnaOBhjDkU8Ou6AgLjFTFwdWGCOpnjfr1zy7f0+0apPQf5KKaG5FheVpq18Xj872OLmf83von/jWJhJM+sP5nZY+vXD7dv91raW9e2Zgi+62sLlPlriblExTpDXLfW2C8Jos=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bv3H24bz; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711084785;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=9WljUklEtnqgFdT0/2aUVbLCn9e8lCLCn5JN6nZDEas=;
-	b=Bv3H24bzbHnWrow5nl0oPvsJ6+IHidSY0uVJedQ5RBY72QHftQB1hsHPhFNhZVEwOcxUnV
-	SOhf8PcRw+gBcL9ocymh9SXIu1vDFWPd59bbj4hMkZOwdXBuc2aPLq4JSjWJQzDX3EjpcY
-	3s89PsUGvTyrRjM9/3M4dnWwbEBBNKw=
-Received: from mail-pg1-f197.google.com (mail-pg1-f197.google.com
- [209.85.215.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-297-BBxO39lqOyeTjqerRkuwfg-1; Fri, 22 Mar 2024 01:19:43 -0400
-X-MC-Unique: BBxO39lqOyeTjqerRkuwfg-1
-Received: by mail-pg1-f197.google.com with SMTP id 41be03b00d2f7-5ce12b4c1c9so866716a12.1
-        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 22:19:43 -0700 (PDT)
+	s=arc-20240116; t=1711085435; c=relaxed/simple;
+	bh=gH5pexmzbUGwNCHZ9PTUYn/hBvXARLC8S6NicdNMIyQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Twz8C/nH7FCEUFkVU/Cc5G1U7dyk99YdgM2BS4VUy0itETsUID4RoMD7NDHLVYZtwpdCV862TAf1SIVBkIOCT6ryRYXp2b93ZKspOrIij26FCGw3OApfWUZ4ajVPOztgW0ACz/dfGYA+K1bNz/eGwJ7RW92owMrE8fSm5ziXVyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=pjzZtlJT; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-414782fac28so5636375e9.1
+        for <netdev@vger.kernel.org>; Thu, 21 Mar 2024 22:30:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1711085431; x=1711690231; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=321mETi/Adac/ZBnxDuN0Y4/HnqrpGTboku9RcY+CYU=;
+        b=pjzZtlJT5WlhO9Ui5ZQAd9bqJUv176W//paUoTCZqRTFkBlzf20OGUuqKWkYu1TOxW
+         yK702v89lw8vrsTshQ+2RHwA/tYKBvefv27s8szJJ3ZZxYBZmzsAeQUeo/bk21nNJzw6
+         eDIkEoiyQOyflCUZ+mypoqVU/CSqCZV7GtYIJGUMfIoFG1BBCwJugFG1R+xhDMJ4tF4u
+         9Hra/fHyksrTDX0Y6p0Jed0KJm+Spvj3n5+snkOKqxA3wGc6qNw1N9Ovp94xlYkzw9XI
+         YoUFkClmPOaIg1aMU3QNkoeeS7jEr49kQV+5d7ffp/bug7P+0fK96z69g7PJDZmkFJWG
+         5+og==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711084781; x=1711689581;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9WljUklEtnqgFdT0/2aUVbLCn9e8lCLCn5JN6nZDEas=;
-        b=YYVKtIfaZvB3rWaUnGLEFnleBSb/m8JEzvVVTe/nX2g7H0x3odQYthFl95S0rJwNrN
-         99vZUGKIvnpGfW/YL/c7YJdsnF9t0zaxDmwUp8Ugk3glLJu14s564gIJohKjNMmIZC/q
-         aQ7Mux4NrMvSRmH3jS+J6ZeIkB8/H4CyT0aPX6COB4Bspv3+uknr9uEgVJ//TF4/uB86
-         dYIaIZhvOefEuS+5uwBfq5IdUDtZlhzp8d6PJ9ylpzLpBs7hogJfmNBRoI/88uNuclwm
-         PX56aWKPcn3l5xKCTE6iDzRNY/ucXsxL2XwPd/1l92v6Zw0Xcr70Lbtf0XDRN9omUVAf
-         QeUw==
-X-Gm-Message-State: AOJu0YxJbieKOLXlGPs96L8qVvvi82+aMGHb/WgI4XJgnZh+OGsyuBqW
-	dnpUkOMc2JMQhKwBRyZbtQHLKFjuc42k6Z+vIDRfeYnLZRpH7QH3aiCEGLtZegOrnC4oBwmnjD7
-	C2JB8+fbH32jZ18hNmq8s4ABxXcSlJymc9Clcgsv0YORro7yzFzjLt3vOCqpzFrSuHbwyc98XVX
-	ppMl+YtpsxF/K/3SV+YmT8KRreF/brULciGAv6jH0=
-X-Received: by 2002:a17:90a:e54f:b0:2a0:39e9:bbff with SMTP id ei15-20020a17090ae54f00b002a039e9bbffmr800508pjb.8.1711084781617;
-        Thu, 21 Mar 2024 22:19:41 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEEqlxvXagJuFEUOF4z/T7yo9ZWXfypHCNh8PgRY3CFCwWph4hQ9De6Peq6FbRIVJmZmGRYpZVicf0gqBNYJMI=
-X-Received: by 2002:a17:90a:e54f:b0:2a0:39e9:bbff with SMTP id
- ei15-20020a17090ae54f00b002a039e9bbffmr800493pjb.8.1711084781374; Thu, 21 Mar
- 2024 22:19:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711085431; x=1711690231;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=321mETi/Adac/ZBnxDuN0Y4/HnqrpGTboku9RcY+CYU=;
+        b=BJEIHZiAE5N67ni0GZZyH24C1O58gtXgkHTFhRRD2VAxU7dMksB0fYZbXAxnI+5/Ma
+         khf7RQ4kl+V3/mpvnu1GiQPk6IdbEjcwalPS3YXVyKmi2iiTQ2ZDXb1106QKbEyi11R8
+         iIrJHSE3BtqLD62zqSScetTkqoImzpN2M7ByOZqbVJl7aNihadDaFGH1OU2hk7Vq9FUh
+         HfQFvhru8Oh0fZfrP/eaRUsOQsrqTN1iS7OgX8hriX/2d7TPUVdP81Fr99vWTAQ89BR/
+         KE+53zm8fld/2sPmEcioOOr3nNcs4SwmYaF4vQE0iSiPupY4XS3evtTiDKS8pTWwbGqt
+         B5BQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXkSJ0SJvqIXFKy0k+ootKqEwzd/KGu6Ra3pyVUhRQVayHY7oW+fcW4ys8RenNYtwBD960EzvU0TgbjQDJ3ic+JFoaK2hak
+X-Gm-Message-State: AOJu0YyRb1WI0Zs/WXGwYEguVNJZDtJdyupwOrr5TCXTOK6G8OSkt+7M
+	bAGc7XZAn4JY4Rivew/9wNg0UrWaWuQ4/vIIa8DFQ+Z4NfVw6jhOXQQGLL/UQtc=
+X-Google-Smtp-Source: AGHT+IHkKxlHhdE6WoCQw6vjGFcdk5VzZZM3XWQTSj4P8n78wnFsREbl0RQB8AA7bcd6TncGfFNFEA==
+X-Received: by 2002:a05:600c:4f89:b0:414:262:df45 with SMTP id n9-20020a05600c4f8900b004140262df45mr764816wmq.32.1711085431191;
+        Thu, 21 Mar 2024 22:30:31 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id f9-20020a05600c4e8900b00413e79344b7sm1882713wmq.19.2024.03.21.22.30.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 21 Mar 2024 22:30:30 -0700 (PDT)
+Date: Fri, 22 Mar 2024 08:30:26 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Julia Lawall <Julia.Lawall@inria.fr>
+Cc: Markus Elfring <Markus.Elfring@web.de>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	kernel-janitors@vger.kernel.org, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	LKML <linux-kernel@vger.kernel.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	David Laight <David.Laight@aculab.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, Jonathan Cameron <jic23@kernel.org>,
+	Kees Cook <keescook@chromium.org>,
+	Lukasz Czapnik <lukasz.czapnik@intel.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Subject: Re: [PATCH net] ice: Fix freeing uninitialized pointers
+Message-ID: <1655b591-1259-4d71-8f93-e840b1ccc22e@moroto.mountain>
+References: <e5172afb-427b-423e-877a-10352cf4a007@web.de>
+ <F2FBADE8-EDF9-4987-A97B-CF4D2D1452E0@inria.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <1711021557-58116-1-git-send-email-hengqi@linux.alibaba.com> <1711021557-58116-3-git-send-email-hengqi@linux.alibaba.com>
-In-Reply-To: <1711021557-58116-3-git-send-email-hengqi@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 22 Mar 2024 13:19:29 +0800
-Message-ID: <CACGkMEuZ457UU6MhPtKHd_Y0VryvZoNU+uuKOc_4OK7jc62WwA@mail.gmail.com>
-Subject: Re: [PATCH 2/2] virtio-net: reduce the CPU consumption of dim worker
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <F2FBADE8-EDF9-4987-A97B-CF4D2D1452E0@inria.fr>
 
-On Thu, Mar 21, 2024 at 7:46=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.com> =
-wrote:
->
-> Currently, ctrlq processes commands in a synchronous manner,
-> which increases the delay of dim commands when configuring
-> multi-queue VMs, which in turn causes the CPU utilization to
-> increase and interferes with the performance of dim.
->
-> Therefore we asynchronously process ctlq's dim commands.
->
-> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+On Thu, Mar 21, 2024 at 04:20:09PM -0400, Julia Lawall wrote:
+> Does one prefer an initialization of null at the top of the function
+> or an initialization to a meaningful value in the middle of the
+> function?
 
-I may miss some previous discussions.
+I prefer at the top, but it will be interesting to see where the
+consensus is.  Kent Overstreet has said we should move away from
+declarations at the top generally.  I don't know if anyone else agrees
+with him though.
 
-But at least the changelog needs to explain why you don't use interrupt.
-
-Thanks
+regards,
+dan carpenter
 
 
