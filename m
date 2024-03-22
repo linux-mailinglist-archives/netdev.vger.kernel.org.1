@@ -1,155 +1,137 @@
-Return-Path: <netdev+bounces-81323-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81324-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94927887391
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 20:06:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 373C588739A
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 20:09:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 508D9284F36
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 19:06:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 69A721C20944
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 19:09:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32EFB77624;
-	Fri, 22 Mar 2024 19:06:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5247E77649;
+	Fri, 22 Mar 2024 19:09:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WF0MXAbc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jp7OSOtd"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f49.google.com (mail-lf1-f49.google.com [209.85.167.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F09876EE1
-	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 19:06:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9017377645
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 19:09:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711134379; cv=none; b=qtpiAIkaWeL37sL9V/xygrnFCVtQbXkk68ym+iXiNQ0PRdqQ35EK8y0P0bCLbJg4o+nExmHKX8tlAK6JvB7td1EHNVqHGOSasTXHexi+z7zaGNQICazQ9QqFgBbb4bhF2RQq74sIYAY1cAXWRPPehva9HU9TIKIN1tw3ZdnkrL0=
+	t=1711134597; cv=none; b=BYwbhm7sQf4bMDXWUgYixKEvFyjyA8G9idX7UjxrdNbj6Ne1A3oy4GWVbuau89kj8wab5WpmcuhQ0ZulDC2Ay7DWTohIfYK9pwwHc4RYuFQsEyYMx+UlbtxOuZNC5Nj3K+t2ZcIYncNmTKQtzDXnvTn1IE++lX5/RBrFOH81UFQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711134379; c=relaxed/simple;
-	bh=G8IGxwSbCA7VtBX8XkVa1ambOdnemi9fnCfUORqa5dI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=k29me4fAlJUOuHrfMfgrC0YsnLCO8EYrKH6cFEkL7wSUvy0Mr4esXJSV+LUUNHxbHwrhvxMFBlS7vyOB06+/F0N2LwvXlag2Gls4RfqIWnsPbGz3HE//Zw2fZ7BgDVCnkqftQuybuDXa0kGvUyEg1I/1UCSgmUliT8DssrBw044=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WF0MXAbc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711134376;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=bYv+g1I7ptnV6etPECbKRE2B/hEhZ4xk0E1ZHt/7Sok=;
-	b=WF0MXAbc32d+0yKHCTUhrXPQuCU1Fg+cMiNHW9X4Ucv7EAUp8zskxytTq+9rV75aMESy2m
-	78iy772wNHqBcCash4ntHCQ4an1m1MRiObbkTfGDEhP7pSZeoJj3ZuRaDpRhXl+8hk0ToU
-	Sz2bf859u6GmgxPxaUMAykYvs4JdIk4=
-Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-131-gBjFs-OwO1uIF-FNgKwg-Q-1; Fri,
- 22 Mar 2024 15:06:12 -0400
-X-MC-Unique: gBjFs-OwO1uIF-FNgKwg-Q-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 214A7280480F;
-	Fri, 22 Mar 2024 19:06:12 +0000 (UTC)
-Received: from RHTPC1VM0NT.redhat.com (unknown [10.22.33.162])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 55FDA492BC6;
-	Fri, 22 Mar 2024 19:06:11 +0000 (UTC)
-From: Aaron Conole <aconole@redhat.com>
-To: netdev@vger.kernel.org
-Cc: Pravin B Shelar <pshelar@ovn.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	dev@openvswitch.org,
-	linux-kernel@vger.kernel.org,
-	Numan Siddique <nusiddiq@redhat.com>
-Subject: [PATCH net] openvswitch: Set the skbuff pkt_type for proper pmtud support.
-Date: Fri, 22 Mar 2024 15:06:03 -0400
-Message-ID: <20240322190603.251831-1-aconole@redhat.com>
+	s=arc-20240116; t=1711134597; c=relaxed/simple;
+	bh=Dii4B/GDONqZC92D2Yx3ZUE86PZgNfy0Sq1RFO1tg4U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P3ukf0LqCGGevcGBFoMj7t+0bxzJQ9Ut4a3te7kaWlEBQlnvYX2BAU64iLQdz+1cfUk/bF3fw3N73RRx9+p+z8iqGLZ5o8XZR7JRIP3h0Z+qcJ8zPO4RtMyQkcQmiV1HDE76fSK197Cqk2PDed8VaN3VQoqJRrAxXGkIbeQFNF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jp7OSOtd; arc=none smtp.client-ip=209.85.167.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f49.google.com with SMTP id 2adb3069b0e04-513ccc70a6dso4336838e87.1
+        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 12:09:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711134594; x=1711739394; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=HSQr+CLd9lHiwoJr1IAPlmNPUSAVt2q0xRHLwbhYjjA=;
+        b=Jp7OSOtdD2IKjCkrY8vHYu0L43gQrrDjL7cANFEAmDXU99TLT2XVv4CudxXWp4+pzM
+         8HRD1GTLUGdyx4WTuxuIsaE+daWg+xPVh+22SAzfLqe/LdNSKIxW46AJGJTqRlc5VO0Y
+         ddEQ7qKZ7pRBDt4ZcsJlnI3HI12hZgxSFdMUzu0no/mH+19swFZ4w9dqEBi03RfouFr0
+         rERlBfusVSt0nihDxjmMRfpco5Vj+K1Qk0yY1xi9HbxPhGS3vTBwkFsiv8hQBZjG+cKq
+         md5Z8XQMuvlKhvyJ7Wgc5+xfU+/43Zj4m5aekXBmNfflY3rjXEk7Z3lJAtlic2N3kJhB
+         r2Sg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711134594; x=1711739394;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=HSQr+CLd9lHiwoJr1IAPlmNPUSAVt2q0xRHLwbhYjjA=;
+        b=AJe8y9XoGfgMqyhAWIm39OePOWFc7Cpe9xlSg8nqxb0zM2WWlKzyOJ7B2DQ6ZjShpg
+         uFAmawYIEPl46oPIijDiqT5vf9fDwTrdMmQT65tK3XVDVok+74CxYwwOmhEIrWE7Fe8m
+         osbJ+7/fbUSa/z+YOYeCWiKphxtrIKr+F6HdANktFczgdkiKvyhMFHS0+fFefM69sghV
+         e4hf5lb2eeIvj7g599WKKuUieeIV1L9Yv7PYbkCayzFczmi7z0YYy1uYNDK90eqsg5vR
+         2RJV/mUcai6ChhjEAx2+ukJG2p29bafNGhzohJrqBoxCQ/6W7WCNeJ8OHwFf8vSkYGmb
+         tInA==
+X-Forwarded-Encrypted: i=1; AJvYcCWWpkOkk9jdXlXmBaVKA46F0eRPS+IEw2jorkToeX+xVny4STT8GAUlix7gsO8J/UAWkPV7H+uxjvt8Iqih7bmNcRbIppTF
+X-Gm-Message-State: AOJu0Ywar0rfw1NKR/O9C9VZUCqCFYSBPQqWdPcGFcozrt7AiIDFbroY
+	vqDCP2Xui8KDEMcj+SEnbuuGYbfFklT1wKCeiYtN/D6MocoH23zZ
+X-Google-Smtp-Source: AGHT+IFX1ZsCoA1KgyTR9M6iC3tUcJcepoxzDlNp1KFkacedLDBAih7SLNb9xkSvXxO2BDK75MLS9A==
+X-Received: by 2002:a19:9108:0:b0:513:e6db:5bee with SMTP id t8-20020a199108000000b00513e6db5beemr274032lfd.64.1711134593556;
+        Fri, 22 Mar 2024 12:09:53 -0700 (PDT)
+Received: from mobilestation ([178.176.56.174])
+        by smtp.gmail.com with ESMTPSA id u20-20020a196a14000000b005159eaf5c35sm15833lfu.276.2024.03.22.12.09.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 22 Mar 2024 12:09:52 -0700 (PDT)
+Date: Fri, 22 Mar 2024 22:09:50 +0300
+From: Serge Semin <fancer.lancer@gmail.com>
+To: Yanteng Si <siyanteng@loongson.cn>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, peppe.cavallaro@st.com, 
+	alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com, 
+	chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn, 
+	netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+Subject: Re: [PATCH net-next v8 06/11] net: stmmac: dwmac-loongson: Add GNET
+ support
+Message-ID: <2lljn7cqgnh3l3mfr3h6ztgs3bk4vqziavicij2ak4guiup6v4@y47wrn5arodt>
+References: <cover.1706601050.git.siyanteng@loongson.cn>
+ <027b4ee29d4d7c8a22d2f5c551f5c21ced3fb046.1706601050.git.siyanteng@loongson.cn>
+ <ftqxjh67a7s4iprpiuw5xxmncj3bveezf5vust7cej3kowwcvj@m7nqrxq7oe2f>
+ <d0e56c9b-9549-4061-8e44-2504b6b96897@loongson.cn>
+ <466f138d-0baa-4a86-88af-c690105e650e@loongson.cn>
+ <x6wwfvuzqpzfzstb3l5adp354z2buevo35advv7q347gnmo3zn@vfzwca5fafd3>
+ <a9958d92-41da-4c3a-8c57-615158c3c8a2@loongson.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
+In-Reply-To: <a9958d92-41da-4c3a-8c57-615158c3c8a2@loongson.cn>
 
-Open vSwitch is originally intended to switch at layer 2, only dealing with
-Ethernet frames.  With the introduction of l3 tunnels support, it crossed
-into the realm of needing to care a bit about some routing details when
-making forwarding decisions.  If an oversized packet would need to be
-fragmented during this forwarding decision, there is a chance for pmtu
-to get involved and generate a routing exception.  This is gated by the
-skbuff->pkt_type field.
+On Thu, Mar 21, 2024 at 05:13:45PM +0800, Yanteng Si wrote:
+> 
+> 在 2024/3/19 23:03, Serge Semin 写道:
+> > > > > >   >> +static int loongson_gnet_data(struct pci_dev *pdev,
+> > > > > > +			      struct plat_stmmacenet_data *plat)
+> > > > > > +{
+> > > > > > +	loongson_default_data(pdev, plat);
+> > > > > > +
+> > > > > > +	plat->multicast_filter_bins = 256;
+> > > > > > +
+> > > > > > +	plat->mdio_bus_data->phy_mask =  ~(u32)BIT(2);
+> > > > > > +
+> > > > > > +	plat->phy_addr = 2;
+> > > > > > +	plat->phy_interface = PHY_INTERFACE_MODE_INTERNAL;
+> > > > > Are you sure PHY-interface is supposed to be defined as "internal"?
+> > > > Yes, because the gnet hardware has a integrated PHY, so we set it to internal，
+> > > > 
+> ...
+> > kdoc in "include/linux/phy.h" defines the PHY_INTERFACE_MODE_INTERNAL
+> > mode as for a case of the MAC and PHY being combined. IIUC it's
+> > reserved for a case when you can't determine actual interface between
+> > the MAC and PHY. Is it your case? Are you sure the interface between
+> > MAC and PHY isn't something like GMII/RGMII/etc?
+> Hmmm. the interface between MAC and PHY is GMII, so let's use
+> 
 
-When a flow is already loaded into the openvswitch module this field is
-set up and transitioned properly as a packet moves from one port to
-another.  In the case that a packet execute is invoked after a flow is
-newly installed this field is not properly initialized.  This causes the
-pmtud mechanism to omit sending the required exception messages across
-the tunnel boundary and a second attempt needs to be made to make sure
-that the routing exception is properly setup.  To fix this, we set the
-outgoing packet's pkt_type to PACKET_OUTGOING, since it can only get
-to the openvswitch module via a port device or packet command.
+> PHY_INTERFACE_MODE_GMII?
 
-This issue is periodically encountered in complex setups, such as large
-openshift deployments, where multiple sets of tunnel traversal occurs.
-A way to recreate this is with the ovn-heater project that can setup
-a networking environment which mimics such large deployments.  In that
-environment, without this patch, we can see:
+If MAC<->PHY interface is GMII, then PHY_INTERFACE_MODE_GMII should be
+used to indicate that.
 
-  ./ovn_cluster.sh start
-  podman exec ovn-chassis-1 ip r a 170.168.0.5/32 dev eth1 mtu 1200
-  podman exec ovn-chassis-1 ip netns exec sw01p1  ip r flush cache
-  podman exec ovn-chassis-1 ip netns exec sw01p1 ping 21.0.0.3 -M do -s 1300 -c2
-  PING 21.0.0.3 (21.0.0.3) 1300(1328) bytes of data.
-  From 21.0.0.3 icmp_seq=2 Frag needed and DF set (mtu = 1142)
+-Serge(y)
 
-  --- 21.0.0.3 ping statistics ---
-  2 packets transmitted, 0 received, +1 errors, 100% packet loss, time 1017ms
-
-Using tcpdump, we can also see the expected ICMP FRAG_NEEDED message is not
-sent into the server.
-
-With this patch, setting the pkt_type, we see the following:
-
-  podman exec ovn-chassis-1 ip netns exec sw01p1 ping 21.0.0.3 -M do -s 1300 -c2
-  PING 21.0.0.3 (21.0.0.3) 1300(1328) bytes of data.
-  From 21.0.0.3 icmp_seq=1 Frag needed and DF set (mtu = 1222)
-  ping: local error: message too long, mtu=1222
-
-  --- 21.0.0.3 ping statistics ---
-  2 packets transmitted, 0 received, +2 errors, 100% packet loss, time 1061ms
-
-In this case, the first ping request receives the FRAG_NEEDED message and
-a local routing exception is created.
-
-Reported-at: https://issues.redhat.com/browse/FDP-164
-Fixes: 58264848a5a7 ("openvswitch: Add vxlan tunneling support.")
-Signed-off-by: Aaron Conole <aconole@redhat.com>
----
-NOTE: An alternate approach would be to add a netlink attribute to preserve
-      pkt_type across the kernel->user boundary, but that does require some
-      userspace cooperation.
-
- net/openvswitch/actions.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index 6fcd7e2ca81fe..952c6292100d0 100644
---- a/net/openvswitch/actions.c
-+++ b/net/openvswitch/actions.c
-@@ -936,6 +936,8 @@ static void do_output(struct datapath *dp, struct sk_buff *skb, int out_port,
- 				pskb_trim(skb, ovs_mac_header_len(key));
- 		}
- 
-+		skb->pkt_type = PACKET_OUTGOING;
-+
- 		if (likely(!mru ||
- 		           (skb->len <= mru + vport->dev->hard_header_len))) {
- 			ovs_vport_send(vport, skb, ovs_key_mac_proto(key));
--- 
-2.41.0
-
+> 
+> 
+> Thanks,
+> 
+> Yanteng
+> 
 
