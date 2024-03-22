@@ -1,92 +1,139 @@
-Return-Path: <netdev+bounces-81306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C367887013
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 16:56:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12DE88870D9
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 17:28:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D156CB22477
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 15:56:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCD821F2284B
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 16:28:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1318E53811;
-	Fri, 22 Mar 2024 15:56:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E165674E;
+	Fri, 22 Mar 2024 16:28:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="qg+gMoCJ"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="EWBrLKgq"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531AD524DF;
-	Fri, 22 Mar 2024 15:56:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1152B57876;
+	Fri, 22 Mar 2024 16:28:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711123007; cv=none; b=UyG96QPf29aAb14fWekieLv2/6y2JO7yNahDmz8wDcuXVrWpQgZ2wD3bcUWKzIyywSI4xKrk0BoaM4ppAoWs2VRukPtU1vJopodGrfGbF5ePpNTn9cTgkn1ZHawtQFUN/5Qvk3VZ8qFIOvuAsZNb3koWd0Ocztfj1WOioQXKVFI=
+	t=1711124933; cv=none; b=qrA+MsD2Oplsxos9p7TT5RCyNJ/mZZRTZLJy1oJEsXA6OgIIsm8x3ujAS5UxW4+TgEZR4h8+9aQ3jsrqigmEqyV9A3bLlPllKisPmBHr6SQUX+aIM8jt8Yoz6nXyjmtc92uT+vWyfThIJtRnGmV8pEoPryXHddhThPbM9q83zP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711123007; c=relaxed/simple;
-	bh=TN6iWFQ6tks/7SD6PC2cwdtWsPju4N4ielJpFORj08Y=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aFhnEfJ4WD+AjaxguyqJKyARb3tJNm9IMkQes7eCsqAh4ndOtIumL+dHi3zog4h3U9tlHBcahh4jXTZdmf+aRRKuPf91e2O0hiNClZ+uFFtNc1JQvyymHp9IVDphZVeXUKpkAlhYB+vgJWlvoSNio5UwgYvqZ1uZK5Dp+XmNok0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=qg+gMoCJ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=bFqRY/K29N5KY4oWl3hHzhxOBffmPcj/lfWbmVtrjFY=; b=qg+gMoCJCGMDoZ5fvzr4D2pcHv
-	fjWbyQ5pmoQok07RbG+aciz9Jd3XbkrxVzu+FOK+4a2p5+LhaAYtwcGBaLrNO0XY+TSK7fiKyjq0Z
-	fmYW94VP/KBohx0uO/VCJQXHqPs2/BTmlwBHyx+Ers5NAYxSif2r0FcusvFMA6IjL/2M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rnhFx-00AyDl-8A; Fri, 22 Mar 2024 16:56:33 +0100
-Date: Fri, 22 Mar 2024 16:56:33 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: POPESCU Catalin <catalin.popescu@leica-geosystems.com>
-Cc: "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>,
-	"m.felsch@pengutronix.de" <m.felsch@pengutronix.de>
-Subject: Re: [PATCH net-next] net: phy: dp8382x: keep WOL setting across
- suspends
-Message-ID: <5746c9da-1d45-4d06-a925-4150e680b8ec@lunn.ch>
-References: <20240306171446.859750-1-catalin.popescu@leica-geosystems.com>
- <8de1d4e3-6d80-45a5-a638-48451d9b5c15@lunn.ch>
- <b53818a7-66a4-4c7a-b687-efaea6cb9e4e@leica-geosystems.com>
- <f8bfbe80-f308-4b8d-b8f0-5a5f6ca5fa0e@leica-geosystems.com>
- <e9b85f71-f494-4fa6-acce-13ee8e147c21@leica-geosystems.com>
+	s=arc-20240116; t=1711124933; c=relaxed/simple;
+	bh=HCHPduluDxyIyH+NvikE4NsWGI6bZ5WsJcGstMkaba8=;
+	h=Subject:To:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=LAggexJTMmkMOKqgPMmOVUByzRcohbVw4v71ILzq8UgAxII/jK0b1xZsw6iDVUojsCCmDEaxEjY+sUu/UwfufoMpwny3uqBQiIFKKT7y0OY82IuqSU/7Ast/n9+6xMKIkYNFWd6vxUY0mHJd1TxY0/OxZC9m+DBmKQyKcWk3V9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=EWBrLKgq; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:Subject:Sender:
+	Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=hixCqn+Oc2muuJ+PQhMb4XfVD5sY/7+CWBK1O86fCP8=; b=EWBrLKgqN4m8l3O6+O94qP2ODo
+	URMp6tGn683BPwRb8Fpew2vnz3OQ5WBxW29yWsVTp4ehqWT/HbD247K0L1F1lqRMaHZexptq5uaLg
+	x/rWMQysn22z28qRpDQaOBNykOb7EYHGrlrEoihYdaHLXUY5bXE+OkuSuafWrJ/phSNR8xCmM3wVj
+	OEkGRc6cuEz6RpKsXPLA3segwnrc+WKTj08v26v02VUkjw4JJtqUpcyYidyqRTcRBKEy4l82bDbh2
+	k5wOf5tBTYOPLzFyF+4FqK+CG3zivP2hhwVYJbvxPwDrIFVBNc+mSndvNs0JTMhu8XJoEeF2CtMWZ
+	atWNIHvw==;
+Received: from sslproxy07.your-server.de ([78.47.199.104])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rnhks-000Ook-0x; Fri, 22 Mar 2024 17:28:30 +0100
+Received: from [178.197.248.30] (helo=linux.home)
+	by sslproxy07.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1rnhkq-000BhN-1s;
+	Fri, 22 Mar 2024 17:28:28 +0100
+Subject: Re: [PATCH bpf v4] bpf: verifier: prevent userspace memory access
+To: Puranjay Mohan <puranjay12@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
+ Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman
+ <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+ Yonghong Song <yonghong.song@linux.dev>,
+ John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>,
+ Jiri Olsa <jolsa@kernel.org>, Thomas Gleixner <tglx@linutronix.de>,
+ Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>,
+ Jean-Philippe Brucker <jean-philippe@linaro.org>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Ilya Leoshkevich <iii@linux.ibm.com>
+References: <20240321124640.8870-1-puranjay12@gmail.com>
+ <9f2b63b5-569c-1e00-a635-93d9cd695517@iogearbox.net>
+ <mb61p4jcyxq5m.fsf@gmail.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <15ba79e3-14b2-d92e-3f94-e4f5f963e15d@iogearbox.net>
+Date: Fri, 22 Mar 2024 17:28:27 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e9b85f71-f494-4fa6-acce-13ee8e147c21@leica-geosystems.com>
+In-Reply-To: <mb61p4jcyxq5m.fsf@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27222/Fri Mar 22 09:30:59 2024)
 
-> > It looks like the issue I'm trying to address in this patch is not
-> > specific to dp8382x. Right now, depending on if the PHY is reset or not
-> > during resume (either through mdio_device reset_gpio/reset_ctrl or
-> > phy_driver soft_reset callback), the WOL configuration is either the PHY
-> > reset value or the BIOS value. I could still make the patch but it
-> > doesn't really make sense to address only dp8382x.
+On 3/22/24 4:05 PM, Puranjay Mohan wrote:
+[...]
+>>> +		/* Make it impossible to de-reference a userspace address */
+>>> +		if (BPF_CLASS(insn->code) == BPF_LDX &&
+>>> +		    (BPF_MODE(insn->code) == BPF_PROBE_MEM ||
+>>> +		     BPF_MODE(insn->code) == BPF_PROBE_MEMSX)) {
+>>> +			struct bpf_insn *patch = &insn_buf[0];
+>>> +			u64 uaddress_limit = bpf_arch_uaddress_limit();
+>>> +
+>>> +			if (!uaddress_limit)
+>>> +				goto next_insn;
+>>> +
+>>> +			*patch++ = BPF_MOV64_REG(BPF_REG_AX, insn->src_reg);
+>>> +			if (insn->off)
+>>> +				*patch++ = BPF_ALU64_IMM(BPF_ADD, BPF_REG_AX, insn->off);
+>>> +			*patch++ = BPF_ALU64_IMM(BPF_RSH, BPF_REG_AX, 32);
+>>> +			*patch++ = BPF_JMP_IMM(BPF_JLE, BPF_REG_AX, uaddress_limit >> 32, 2);
+>>> +			*patch++ = *insn;
+>>> +			*patch++ = BPF_JMP_IMM(BPF_JA, 0, 0, 1);
+>>> +			*patch++ = BPF_MOV64_IMM(insn->dst_reg, 0);
+>>
+>> But how does this address other cases where we could fault e.g. non-canonical,
+>> vsyscall page, etc? Technically, we would have to call to copy_from_kernel_nofault_allowed()
+>> to really address all the cases aside from the overflow (good catch btw!) where kernel
+>> turns into user address.
+> 
+> So, we are trying to ~simulate a call to
+> copy_from_kernel_nofault_allowed() here. If the address under
+> consideration is below TASK_SIZE (TASK_SIZE + 4GB to be precise) then we
+> skip that load because that address could be mapped by the user.
+> 
+> If the address is above TASK_SIZE + 4GB, we allow the load and it could
+> cause a fault if the address is invalid, non-canonical etc. Taking the
+> fault is fine because JIT will add an exception table entry for
+> for that load with BPF_PBOBE_MEM.
 
-This is an interesting point. soft_reset the driver is in control
-off. It can preserve the WoL setting over the soft reset.
-A hardware reset is a different matter.
+Are you sure? I don't think the kernel handles non-canonical fixup.
 
-However, if we woke up due to WoL, the PHY never went to sleep, its
-state is intact, so why are we doing a hardware reset?
+> The vsyscall page is special, this approach skips all loads from this
+> page. I am not sure if that is acceptable.
 
-      Andrew
+The bpf_probe_read_kernel() does handle it fine via copy_from_kernel_nofault().
 
+So there is tail risk that BPF_PROBE_* could trigger a crash. Other archs might
+have other quirks, e.g. in case of loongarch it says highest bit set means kernel
+space.
 
