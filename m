@@ -1,167 +1,349 @@
-Return-Path: <netdev+bounces-81312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86B9B8871F8
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 18:40:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9B1F887208
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 18:43:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31313B224DB
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 17:40:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CB601C22D43
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 17:43:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F64C5FDCF;
-	Fri, 22 Mar 2024 17:40:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEF225FBBA;
+	Fri, 22 Mar 2024 17:43:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NuAiMh/M"
+	dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b="or+twNsX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0B65FBBF
-	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 17:40:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711129243; cv=none; b=cSiFtjc6aQNxURVlJLumdtnXRJlTClD6JTB0hoQG3FF1a+1M5SvIBq8FUAL3Dcw3cPNpkgAfdwSU4es2QGs1TckQxi03Z2mq9dkkwgl30dVq14P43YE7t08qQ5Rqt8Xfyztlj19+hC7MV0oP+UWKgr87/fNLFOr4WS+w06lQn3I=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711129243; c=relaxed/simple;
-	bh=7T0QYgj6Z0QWJ7WZghtr6Q0zZ77ROAwtyZEJQAtnJrY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A8FI7NXMr68e7sdpmDWAJjuCRtjZsOMfTE0XEMO4dxd9CCgsQ82NGEYJ/s+HsMqTIwr088rcABgZDsipBdcJFM+TtnDvhQpfEFVe10PMIth0+RdkXPs8Zt/h/Abfd8HwVanliuTqm1eRlajeoyPkSApL1xgCO+cGxGaKKJSypbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NuAiMh/M; arc=none smtp.client-ip=209.85.218.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a468004667aso340701766b.2
-        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 10:40:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711129239; x=1711734039; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7YM4J2ObtCNq8IqrJeUkrlLZCafy3cmXh0Ri66R+dm4=;
-        b=NuAiMh/MosGpuJph6/CXhnqgtnF7qTB4wgozIjMxlP7xwIMTBUkxGp7jiLeBJeNUA8
-         uf3RbWvwApbMZFE+1zAiSE/rUFH1AmO4Inn/LeR4eLLIyJhCb6kAZF5e/IqWygoVbAS0
-         YNddRISS5xPN/6moDsAN0RJLCFP7BYfwoyTBXRz81dPr4VwAGpuAx4kKX1ddy3i+i8J0
-         GW8CtvhZyNMxHOAbds+zU9+r9Ux6hPYEAFI7Xi+I0b4x9bRWTLPNpPCI2wo9BHwHpm54
-         90xv2NndkuSs6tCPxxNLMeQMMbA9UkVREUUY00h8sSJNFZUydz03W+30nass1/Zv6OwQ
-         wtCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711129239; x=1711734039;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7YM4J2ObtCNq8IqrJeUkrlLZCafy3cmXh0Ri66R+dm4=;
-        b=Lqg2gEA6Q5i8C+gioc7wJVhCusRfXxxpBOwC0+CHdhvbxtpt8bCPMmQjtYI7wlguSK
-         mI6xf2UDg6N/i5/5G8HnsMTHYfJYh+gdjCyS5bnCaXgACoGQRVxOJg9Gks1JiRV3YgvV
-         RGJlMDiG8sFK81ooP98+Rna7xJWaG0juervo7AoTVBfRi3lXZJ235VEzlvqg5OGXXSAc
-         LNKAZcZ4U7T9aTBI38uj48wau4JSYRzkAF0g6bUBdaAjx7fNoinUuo9Tt+TG5NqyB1k5
-         HRAdefJvYhZlv+MwAY/GqXTJ/KqD50DxFxg7zNkBhNRnIlVgpaJEq8AVEjzl6yz6pv7A
-         N+4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVQxWGS8zpsh4QMu4TAwXk+DcIvafYMheNMj7+/7CMCLa66/ci9hT3l3B9ilqUg9Ij8lDxGR3xXnTU/H+Y1r9QDt0fSqfJz
-X-Gm-Message-State: AOJu0YwCQg4EKGhDCrZw2+0APD/VP+X0JdwKK5/1p1JyR3nvBUbvDkdz
-	14BBuqtAoaZDZNT0/vctse8BknLGpAji7oPY1ZNhfnwpEm9KlYogRlWo336rpE/R51G8NUtZxZ2
-	D0DAo7LV0+qvuGvJD45Co63J333TO75SO4K0o
-X-Google-Smtp-Source: AGHT+IH25NX6qQBoFnVnA4psBCYCRYBaiXOTPUtbfU8ggcYNeDelzQNuP6wH36Jj0kmkf8kYIMZ+vwfa54Dm4tCqR3s=
-X-Received: by 2002:a17:906:c2d4:b0:a46:befa:f0b0 with SMTP id
- ch20-20020a170906c2d400b00a46befaf0b0mr293662ejb.45.1711129238808; Fri, 22
- Mar 2024 10:40:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF0035FB86;
+	Fri, 22 Mar 2024 17:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=67.231.148.174
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711129418; cv=fail; b=GDokVvkPz1AVvdZFmLnXUCCoatQXERruw2N/WR6wsh7RJsA/6i4+e5Xyn7Fofe2SeMubeE+KdPbCr4luFB9KFtUV1zpwQa7hkCD+t8D641i0rOeqywRbqJL4eFO9RipIvS2IqJbq/P54j6cVMtcEgfMWtJU/8rXa3wLVqCoZ9PY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711129418; c=relaxed/simple;
+	bh=bObKwJ3CLPnEjJWlEcSgXEThOUQtqdSdOfXIXQBBtLQ=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=r/Ti3Bs2gWcA17H3jwc01NbpRdjbkdMNzmRqzRmGLZcSNDQwJrswpNOAV2FqH6zQD66vonyG99l3EvGF+pPtAapIgctcQ49+YReamSjso/5mGD2u83I66BG8pFU7nVBFCM6Ut8J/YKAD/rLkNePuhys7TxfPYoMqhlZbvzoxsWw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (1024-bit key) header.d=marvell.com header.i=@marvell.com header.b=or+twNsX; arc=fail smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42ME6Mt7019977;
+	Fri, 22 Mar 2024 10:43:15 -0700
+Received: from nam10-mw2-obe.outbound.protection.outlook.com (mail-mw2nam10lp2101.outbound.protection.outlook.com [104.47.55.101])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3x0ybuavu4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 22 Mar 2024 10:43:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=njgqBCO434ScqJiv4NgeRsbczla4o96gFU5ReLcw8/kDqjR9old8anzP1sWZZfh51+Bna5LRnlbP3lqynvkfCkGP3iRh1B817rLEcPgMIur8oycpoBhwPy4mFzBSa2qCWQGL9cPlUCjl56JyT4M8qJoMCMdeCmZJmLuHLVODqnMuHZ38pa4NdrXjcnca3efJBSnVpIZmQMIB12jkCItOtV+Z5xhrb1SU6Dzdyf87KL9un1LCRdwvdwZ7Ynfc7l5k9X4C4LmaNEVi+g2WtH5q8fOpBSoAG9gydWcF4usIlKCPx9fuelFOwtQk8uC4JPtxAJxP8rkU/VTveFIXDdkPYA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TlI1ztqwpjXnS5kLB8Q3ZWCOTlZAl/QUAS5Y8DVr5VM=;
+ b=Jcj1hU87zFkWVX07xYmSLG8Jna12g4FoT7VX1CHQgDB7mRnKAGXmNRWG3BtDeVNoDrB6vMa4/b2FM4kjSGtKX7uqAiK4TYGKv1c/fnQYO4X0lE/xkfDrgNAsRbnaOqXwyh4VOi98ajhkZwz0IGJMI+To58MFYMke3OIglQUdEueBf2QqWCEg3ZflFr8aDliwel2z2r3FsXWCWlaeKuNF0c2vkg5sa5jULpQyQi2E7H6vva/BtBgtsWl0Py2yE9V03GLbUh214ecgmACoYEUpvjZEtvCz8Gm/XtUGNP+8nc1UyOd7XYqYb6hG44bKAbjgBmcSCNSTLuc/ROZw7xV6jw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TlI1ztqwpjXnS5kLB8Q3ZWCOTlZAl/QUAS5Y8DVr5VM=;
+ b=or+twNsXaaJnPuH7YDhqkbKlD5Ma0TciFijo43EskTFzYPILl1oe4+xMbRT1AO87fnrmlEyHPXPZAraozadellXYWjMkg6xAGH/RxKnjPrjPpeQKFvdUMfADXeGLLxSEdFswFZssmMhEWD/+shBHA3jt4B9ArSBGNtK+K2P+Gy0=
+Received: from SA1PR18MB4709.namprd18.prod.outlook.com (2603:10b6:806:1d8::10)
+ by SA1PR18MB5994.namprd18.prod.outlook.com (2603:10b6:806:3e3::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7386.34; Fri, 22 Mar
+ 2024 17:43:12 +0000
+Received: from SA1PR18MB4709.namprd18.prod.outlook.com
+ ([fe80::ebe0:68b0:1b37:b100]) by SA1PR18MB4709.namprd18.prod.outlook.com
+ ([fe80::ebe0:68b0:1b37:b100%5]) with mapi id 15.20.7386.031; Fri, 22 Mar 2024
+ 17:43:12 +0000
+From: Sai Krishna Gajula <saikrishnag@marvell.com>
+To: Oliver Neukum <oneukum@suse.com>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+CC: "syzbot+9665bf55b1c828bbcd8a@syzkaller.appspotmail.com"
+	<syzbot+9665bf55b1c828bbcd8a@syzkaller.appspotmail.com>
+Subject: RE:  [PATCH net-next] usbnet: fix cyclical race on disconnect with
+ work queue
+Thread-Topic: [PATCH net-next] usbnet: fix cyclical race on disconnect with
+ work queue
+Thread-Index: AQHafIBp1dqMXcvK9kC5zLoffE3WoA==
+Date: Fri, 22 Mar 2024 17:43:12 +0000
+Message-ID: 
+ <SA1PR18MB470955BBB332D3A9F9A6F247A0312@SA1PR18MB4709.namprd18.prod.outlook.com>
+References: <20240321124758.6302-1-oneukum@suse.com>
+In-Reply-To: <20240321124758.6302-1-oneukum@suse.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR18MB4709:EE_|SA1PR18MB5994:EE_
+x-ms-office365-filtering-correlation-id: 881dd50b-085f-4afc-9124-08dc4a978be5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ svLRM3LA7Mxxhy8didAP9vqCHHSOh2g5FGy3oKpZF+oBlp7ag6D08VXbm7yNt7O1GvC6V1Fl9sWDErFYlTX+tMNzKmaeufteWbiNU6FhK2E2GCf94FIHW/wB8gEY46rMWvI8+GP1pYHnb41gwLOXPQqYCoZr4un2gLOIheTMBUR7SVSYOygcz+xY7RlOrcRT4wRxu+Ypjo6j4hMrqVPMJvRaqTV1Yjw+zcqfU4ln4sa59tCvBL3/531YPu5zIO9nBJGTXOZBN+VuwMNg226hr5ad7sA0jWipHiyBdN465JOo7Dbse72JMUloUu8pFbNBMdrxATndHF2KAe2l1Fco2f4fzGKfMQkM+4yvRjD7RUxFj8EpA88Ib7Hbg79eoghhvteFmF0WWlVw0EHfNOxf2RJJu7SzKuKhL/Sel4e1UJH0qr8wxW0WouC2Dyg+bypE+9Uy/BR7cRBdWdlQiiISQJ3qPug7+ejW7qXty2yuMKzSRYm85Bm3DmMFPnGxacixV6wB+mqKhQtgG4nDcJX2Y5ZGyhugJGORYKnjzd1YiqOljvvI0FiX7VcGtM4bfCy2m9KI12lq2lA9DLuVPgTN+MiOFIHXb2xUAJP0KA8JfeGxFltiXSF3GCsPnLCDhpjzH4S40dJZLcz8/5w4aj+Yn+bruz0fUGEQ/f0VOEoJrraWG6kflizkQJpAyZoYFt/QcS7n/MLbFQieZMztzKryut5RDg+IbvwQcOKl41BLnyM=
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR18MB4709.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(376005)(366007)(38070700009);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?sKcKHbbTmwPGb2HZ1u6sPqsh34wFGNvzbGd2DuKeOico+NWMDyNJTRKMRq2w?=
+ =?us-ascii?Q?QYZ5r9qeRlPHg0oypLfu8MO+3Ltsg/zSDEpeYRr0vGqGSN/ux82E9s2Gavrs?=
+ =?us-ascii?Q?NywtjQ2fCH+w6XXnW1bxuCtVWqAB4yo4Oj/Mpdvzx0cJgfKVfFy+/qYMTdmT?=
+ =?us-ascii?Q?lDgOX5WBC1UnUpiColVQjnDj+ga10r2poR5BSMVws0BdqRZf8tv+W1qreyLQ?=
+ =?us-ascii?Q?uT4v7Ze9S9B5bpwCMqLggKvWgaS/bDDltrUe4aQyv/vgRt7iFTCAZ4pK1l+v?=
+ =?us-ascii?Q?P+CEF0pJuSK1faZaTwsY2AQ03uCZ0lrzKKgnzUXBid7Le9EY5CSfmPQrOqdM?=
+ =?us-ascii?Q?RqxoubHrl7Ww7IamzkQolr3xQKJfz5R2AtOR4rEYIw1bmWdTxUjAXNoL6C1D?=
+ =?us-ascii?Q?iqye0oUVhhFnMBpwSBYbn98Y/25eoUvtSPyXGR+YMRorlZiGv7xzsz199Xuh?=
+ =?us-ascii?Q?38gZtJimsfOx9JWYV45U4jBAD4+Y9A3Fosg1qYs8D7bSceU6ph+c1O9S4GVE?=
+ =?us-ascii?Q?V5DMtjfnVyLuRTz583OUK0rpzGgtTc6t6pv8SM7+7+CfLz+gTC0brCfS0qJh?=
+ =?us-ascii?Q?iMKWCI6UM391FwURzOKGElJXkFp4Y3d87x3todWtYHUL/OcCFvH7TwvJLKVT?=
+ =?us-ascii?Q?eYfPst6V/HnxiHM3Kif7lgQu/P1I7/GgnofiXGCiUa9lS+7DIPNzgUPDtmAe?=
+ =?us-ascii?Q?eLzEQU8tTzoVyfamu4EP/lkC3KxdsrvD0hOJccN4Ket7rQ8DWu3QV1h/G8QS?=
+ =?us-ascii?Q?QUmp04UYALAm7+EoKBzotrMOL6Pw3iHQAlGg71A7JoCtEtOjJ/qHFwiJDrxW?=
+ =?us-ascii?Q?HiEyiSyh/Ll5AuGaPd0uvxQVlmMfoQCSvVVNo5hi9XFzwLaSQy+RuJu7THpM?=
+ =?us-ascii?Q?ziOYXjZ2yssZUuCtZnsgrK5qcWXqbx6SHHtVtTMXjr5zvoWcwYNOmFaMGoo9?=
+ =?us-ascii?Q?CRDjJxKBkT+Ct1+epbH9i/q4zYMNZkcnGDCGieP0adxSpfbrzYBKiDCoK0Uv?=
+ =?us-ascii?Q?x/CMB1wA0GE+7NL39qTZXDwwtFwJcIOeqZ68QeBbIc7z0WDMseFYOmozf8L0?=
+ =?us-ascii?Q?7Fw/5KA5ESzshYMQYdbrhkAOkP9wPmkUpONuikIoN6Bvx3a7H9+uE4uO+TxO?=
+ =?us-ascii?Q?t8efTMXgC5ijBGA8gXcr7VWNwydFiNNJbQnxeisiCbe+KcGkkeeDFzukmZNw?=
+ =?us-ascii?Q?5r4kPYhgrQJtQwNPJU+Is0qOmBWInJcPD9JWrjBI2WXB014qJH/tico7EL7T?=
+ =?us-ascii?Q?R52Y1z4SiR+IgUHx9DP7Z9l12L+f048miQnUUNIcOTgNmpTYTIVgk5TDISQt?=
+ =?us-ascii?Q?tmvUpLuKtQqAQSz3wTnr9opb3y5ei39USl9He0jKcQQik/4X6NkEsgWhcBNy?=
+ =?us-ascii?Q?UuBO/0VmpnTXiGoMrSySomIYuX+UeXcr5qPxpvoF8On35r4kXxgN5aWhcS+C?=
+ =?us-ascii?Q?3UJuzskYRo8KLiWUjqzsAvoUBk7jjCMVUgRKHC8yf8vmg92zVuR6L3RTz67j?=
+ =?us-ascii?Q?anjRJ7cQ1Xj0LIrkXcbubToqwyaCFb942DXW5TtjTF6jg7hu7q9SxxNGWQSM?=
+ =?us-ascii?Q?0jr8vSqPjTsDAWVv17eza8YxTwtu6CMtD6ti4Qy/?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240305020153.2787423-1-almasrymina@google.com>
- <20240305020153.2787423-3-almasrymina@google.com> <ZfegzB341oNc_Ocz@infradead.org>
- <b938514c-61cc-41e6-b592-1003b8deccae@davidwei.uk> <ZfjMopBl27-7asBc@infradead.org>
-In-Reply-To: <ZfjMopBl27-7asBc@infradead.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 22 Mar 2024 10:40:26 -0700
-Message-ID: <CAHS8izMT1Smz6UWu2uwAQRqgZPU7jTfS3GKiA_sDw9KLqoP-JA@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 02/15] net: page_pool: create hooks for
- custom page providers
-To: Christoph Hellwig <hch@infradead.org>
-Cc: David Wei <dw@davidwei.uk>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR18MB4709.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 881dd50b-085f-4afc-9124-08dc4a978be5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Mar 2024 17:43:12.7229
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: zZ59++4ndPBVD+WiyuinZc0gH+cF9bsON3i0nykYCJscwXevvshbrwPmc0u9voeAjUClYjGM8lFr2ElkUNonHA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR18MB5994
+X-Proofpoint-GUID: 5MOq8SKb9LkO3prPFPHgEf3QCA8V7NjH
+X-Proofpoint-ORIG-GUID: 5MOq8SKb9LkO3prPFPHgEf3QCA8V7NjH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
+ definitions=2024-03-22_10,2024-03-21_02,2023-05-22_02
 
-Hi Christoph,
 
-Sorry for the late reply, I've been out for a few days.
+> -----Original Message-----
+> From: Oliver Neukum <oneukum@suse.com>
+> Sent: Thursday, March 21, 2024 6:17 PM
+> To: davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> pabeni@redhat.com; netdev@vger.kernel.org; linux-usb@vger.kernel.org;
+> linux-kernel@vger.kernel.org
+> Cc: Oliver Neukum <oneukum@suse.com>;
+> syzbot+9665bf55b1c828bbcd8a@syzkaller.appspotmail.com
+> Subject: [PATCH net-next] usbnet: fix cyclical race on disconnect
+> with work queue
 
-On Mon, Mar 18, 2024 at 4:22=E2=80=AFPM Christoph Hellwig <hch@infradead.or=
-g> wrote:
->
-> On Sun, Mar 17, 2024 at 07:49:43PM -0700, David Wei wrote:
-> > I'm working on a similar proposal for zero copy Rx but to host memory
-> > and depend on this memory provider API.
->
-> How do you need a different provider for that vs just udmabuf?
->
+This patch seems to be a fix, in that case the subject need to be with [PAT=
+CH net]
 
-This was discussed on the io_uring ZC RFC in one of the earliest RFCs.
-Here is a link to Pavel's response:
+>=20
+> The work can submit URBs and the URBs can schedule the work.
+> This cycle needs to be broken, when a device is to be stopped.
+> Use a flag to do so.
+>=20
+> Fixes: f29fc259976e9 ("[PATCH] USB: usbnet (1/9) clean up framing")
 
-https://patchwork.kernel.org/project/netdevbpf/patch/20231106024413.2801438=
--6-almasrymina@google.com/#25589471
+Please use correct Fixes: style 'Fixes: <12 chars of sha1> ("<title line>")=
+' - ie: 'Fixes: f29fc259976e ("[PATCH] USB: usbnet (1/9) clean up framing")=
+'=20
 
-The UAPI of wrapping io_uring memory into a udmabuf just to use it
-with devmem TCP only for the user to have to unwrap it is undesirable
-to him.
+> Reported-by: syzbot+9665bf55b1c828bbcd8a@syzkaller.appspotmail.com
+> Signed-off-by: Oliver Neukum <oneukum@suse.com>
+> ---
+>  drivers/net/usb/usbnet.c   | 37 ++++++++++++++++++++++++++++---------
+>  include/linux/usb/usbnet.h | 18 ++++++++++++++++++
+>  2 files changed, 46 insertions(+), 9 deletions(-)
+>=20
+> diff --git a/drivers/net/usb/usbnet.c b/drivers/net/usb/usbnet.c index
+> e84efa661589..422d91635045 100644
+> --- a/drivers/net/usb/usbnet.c
+> +++ b/drivers/net/usb/usbnet.c
+> @@ -467,10 +467,12 @@ static enum skb_state defer_bh(struct usbnet *dev,
+> struct sk_buff *skb,  void usbnet_defer_kevent (struct usbnet *dev, int w=
+ork)
 
-> > Jakub also designed this API for hugepages too IIRC. Basically there's
-> > going to be at least three fancy ways of providing pages (one of which
-> > isn't actually pages, hence the merged netmem_t series) to drivers.
->
-> How do hugepages different from a normal page allocation?  They should
-> just a different ordered passed to the page allocator.
->
+space prohibited between function name and open parenthesis '('
 
-Yes, that's more-or-less what's what the hugepage memory provider
-Jakub proposed does. The memory provider would allocate a hugepage and
-hold a reference to it. Then when the page_pool needs a page, it would
-allocate a PAGE_SIZE page from said hugepage region and provide it to
-the page_pool, and the pool back to the driver. This allows the
-hugepages to work without the page_pool and driver to be hugepage
-aware and to insert huge page specific processing in it.
+> {
+>  	set_bit (work, &dev->flags);
+> -	if (!schedule_work (&dev->kevent))
+> -		netdev_dbg(dev->net, "kevent %s may have been
+> dropped\n", usbnet_event_names[work]);
+> -	else
+> -		netdev_dbg(dev->net, "kevent %s scheduled\n",
+> usbnet_event_names[work]);
+> +	if (!usbnet_going_away(dev)) {
+> +		if (!schedule_work (&dev->kevent))
+> +			netdev_dbg(dev->net, "kevent %s may have been
+> dropped\n", usbnet_event_names[work]);
+> +		else
+> +			netdev_dbg(dev->net, "kevent %s scheduled\n",
+> usbnet_event_names[work]);
+> +	}
+>  }
+>  EXPORT_SYMBOL_GPL(usbnet_defer_kevent);
+>=20
+> @@ -538,7 +540,8 @@ static int rx_submit (struct usbnet *dev, struct urb
+> *urb, gfp_t flags)
 
-Other designs for this hugepage use case are possible, I'm just
-describing Jakub's idea for it as a potential use-case for these
-hooks. For example technically the page_pool at the moment does
-support non-0 order allocations, but most drivers simply set the order
-to 0 and use the page pool only for PAGE_SIZE allocations. An
-alternative design could be to use this support in the page pool, but
-that requires every driver to adopt this rather than a core networking
-change that can apply transparently (to a large extent) to all
-page_pool drivers.
+space prohibited between function name and open parenthesis '(', where ever=
+ applicable.
 
---=20
-Thanks,
-Mina
+>  			tasklet_schedule (&dev->bh);
+>  			break;
+>  		case 0:
+> -			__usbnet_queue_skb(&dev->rxq, skb, rx_start);
+> +			if (!usbnet_going_away(dev))
+> +				__usbnet_queue_skb(&dev->rxq, skb,
+> rx_start);
+>  		}
+>  	} else {
+>  		netif_dbg(dev, ifdown, dev->net, "rx: stopped\n"); @@ -849,6
+> +852,16 @@ int usbnet_stop (struct net_device *net)
+>  	del_timer_sync (&dev->delay);
+>  	tasklet_kill (&dev->bh);
+>  	cancel_work_sync(&dev->kevent);
+> +
+> +	/*
+> +	 * we have cyclic dependencies. Those calls are needed
+> +	 * to break a cycle. We cannot fall into the gaps because
+> +	 * we have a flag
+> +	 */
+
+Networking block comments don't use an empty /* line, use /* Comment...
+
+> +	tasklet_kill (&dev->bh);
+> +	del_timer_sync (&dev->delay);
+> +	cancel_work_sync(&dev->kevent);
+> +
+>  	if (!pm)
+>  		usb_autopm_put_interface(dev->intf);
+>=20
+> @@ -1174,7 +1187,8 @@ usbnet_deferred_kevent (struct work_struct *work)
+>  					   status);
+>  		} else {
+>  			clear_bit (EVENT_RX_HALT, &dev->flags);
+> -			tasklet_schedule (&dev->bh);
+> +			if (!usbnet_going_away(dev))
+> +				tasklet_schedule (&dev->bh);
+>  		}
+>  	}
+>=20
+> @@ -1196,10 +1210,13 @@ usbnet_deferred_kevent (struct work_struct
+> *work)
+>  			}
+>  			if (rx_submit (dev, urb, GFP_KERNEL) =3D=3D -ENOLINK)
+>  				resched =3D 0;
+> -			usb_autopm_put_interface(dev->intf);
+>  fail_lowmem:
+> -			if (resched)
+> +			usb_autopm_put_interface(dev->intf);
+> +			if (resched) {
+> +				set_bit (EVENT_RX_MEMORY, &dev->flags);
+> +
+>  				tasklet_schedule (&dev->bh);
+> +			}
+>  		}
+>  	}
+>=20
+> @@ -1212,13 +1229,13 @@ usbnet_deferred_kevent (struct work_struct
+> *work)
+>  		if (status < 0)
+>  			goto skip_reset;
+>  		if(info->link_reset && (retval =3D info->link_reset(dev)) < 0) {
+> -			usb_autopm_put_interface(dev->intf);
+>  skip_reset:
+>  			netdev_info(dev->net, "link reset failed (%d) usbnet
+> usb-%s-%s, %s\n",
+>  				    retval,
+>  				    dev->udev->bus->bus_name,
+>  				    dev->udev->devpath,
+>  				    info->description);
+> +			usb_autopm_put_interface(dev->intf);
+>  		} else {
+>  			usb_autopm_put_interface(dev->intf);
+>  		}
+> @@ -1562,6 +1579,7 @@ static void usbnet_bh (struct timer_list *t)
+>  	} else if (netif_running (dev->net) &&
+>  		   netif_device_present (dev->net) &&
+>  		   netif_carrier_ok(dev->net) &&
+> +		   !usbnet_going_away(dev) &&
+>  		   !timer_pending(&dev->delay) &&
+>  		   !test_bit(EVENT_RX_PAUSED, &dev->flags) &&
+>  		   !test_bit(EVENT_RX_HALT, &dev->flags)) { @@ -1609,6
+> +1627,7 @@ void usbnet_disconnect (struct usb_interface *intf)
+>  	usb_set_intfdata(intf, NULL);
+>  	if (!dev)
+>  		return;
+> +	usbnet_mark_going_away(dev);
+>=20
+>  	xdev =3D interface_to_usbdev (intf);
+>=20
+> diff --git a/include/linux/usb/usbnet.h b/include/linux/usb/usbnet.h inde=
+x
+> 9f08a584d707..d26599faab33 100644
+> --- a/include/linux/usb/usbnet.h
+> +++ b/include/linux/usb/usbnet.h
+> @@ -76,8 +76,26 @@ struct usbnet {
+>  #		define EVENT_LINK_CHANGE	11
+>  #		define EVENT_SET_RX_MODE	12
+>  #		define EVENT_NO_IP_ALIGN	13
+> +/*
+> + * this one is special, as it indicates that the device is going away
+> + * there are cyclic dependencies between tasklet, timer and bh
+> + * that must be broken
+> + */
+
+Networking block comments don't use an empty /* line, use /* Comment...
+
+> +#		define EVENT_UNPLUG		31
+>  };
+>=20
+> +static inline bool usbnet_going_away(struct usbnet *ubn) {
+> +	smp_mb__before_atomic();
+> +	return test_bit(EVENT_UNPLUG, &ubn->flags); }
+> +
+> +static inline void usbnet_mark_going_away(struct usbnet *ubn) {
+> +	set_bit(EVENT_UNPLUG, &ubn->flags);
+> +	smp_mb__after_atomic();
+> +}
+> +
+>  static inline struct usb_driver *driver_of(struct usb_interface *intf)  =
+{
+>  	return to_usb_driver(intf->dev.driver);
+> --
+> 2.44.0
+>=20
+
 
