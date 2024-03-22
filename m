@@ -1,83 +1,81 @@
-Return-Path: <netdev+bounces-81194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7D7D886812
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 09:17:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8DCD88681A
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 09:17:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 110641C21526
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 08:17:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 267C71C239C7
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 08:17:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F0C916428;
-	Fri, 22 Mar 2024 08:16:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC64D15EA2;
+	Fri, 22 Mar 2024 08:17:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="nVJlp8GX"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="gupk1DVT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8702C168D9
-	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 08:16:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B195179B8
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 08:17:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711095417; cv=none; b=b8821jT89rA18oXEqxlup69SktWexZbo8aDxQrWeH6m1Gcs62k2GjhqfW9aHCg6teaq18O4gvV85JiqOl7fDUjQb01Sg2FtQ06djLzpVWkqwhRsF+KA+nO8wVRdEYHA+tQKm+Eis4aVo3Pe7aRQyewbpPIQX7RfGj5IlF5scjSE=
+	t=1711095461; cv=none; b=EiJXUwR6OzIceAwp8yStle9LTovKcWHBW07FIoP7SnC7DJpElAtEibygHZpyOxvAEV0LQ4D7WJlKT2hwArhcD36xM+rat14v4GmXoXGrHNKQ01daZ5DnIH7VRE4KG8ETkcYTQPtDw/g710L3llJyw/DaT3JIb0D/HtmjOT05Fok=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711095417; c=relaxed/simple;
-	bh=l39Kzwhk2oCmpGaik1tRTMAeTUKSMINYVASXw+4omn0=;
+	s=arc-20240116; t=1711095461; c=relaxed/simple;
+	bh=ptwNatMYfgsUJVbSiAzbIihvZ+5JeJgga03ggyXu/ns=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=s5Qyf2u7DSnJyVsZchmpJDoywYaKielH/zfkUZ5X4MIX8XrzuuAjWykJnTmA8uI6GMyanyNcHCJtVKtuIqtRHhrMV5NssYgntrXoAbUBoN7PzXEvbRkknUu9/2IAsHN1CBfSumojCRbjYsBEDqsuVMh8tn5fNSXYrNTqoQWrM/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=nVJlp8GX; arc=none smtp.client-ip=209.85.128.42
+	 Content-Type:Content-Disposition:In-Reply-To; b=rFx/Go6+qh04Xi+VfTwZVirE7tE5M5FZmJNsJYBRCxirZ0mZpKLrqAsvAVdZQ6qAJv6ZuvNI+8jRuIYShG3mvSHK1cVG9yY0yKlTSJIZtpAO3gTMlpi0pta6Ec3a6xXh0yVYSi4L5skrEnkMr3xA+HYGsY6Qx2fyraTm9MhBQzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=gupk1DVT; arc=none smtp.client-ip=209.85.208.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-41464711dc8so15069485e9.1
-        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 01:16:55 -0700 (PDT)
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5688eaf1165so2577616a12.1
+        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 01:17:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1711095413; x=1711700213; darn=vger.kernel.org;
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1711095457; x=1711700257; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PB54NDFUedyRI5XOiQhGkPf9QFhhfzoP+DfSevmI9uw=;
-        b=nVJlp8GX/afjxt1ANEJLgJDBsE/0qpg9uq2o1/c+hIot5DMWxV7EBqPgMkKXUuxeNR
-         SwAjtwfqs692SbHAjwhWOgyBTHOOjAdmgj8+FNqe3UvnsyeRBWqs7wRZccykpGEv0v28
-         wq1grgrJTr9Vu6AjQD9SDfzpWa+915tGK6yZupdxGaVFNgE/TfbDtCF93gL8F+Y5ruYH
-         Z5Ov/zMSssTw+tjsKeoRrsrleZI/cklwp3RkfgHi4+aMfF2bUuXIavi9vGlOzcfwEX78
-         UltWJqUzVhlu3QB8u3Xl/nz8lJNl29Wm+RJDKGA7W1VO8+6PMP8lMsxv5oggoHvcXRN7
-         ZQiQ==
+        bh=jJKr+ni+ahD+882dbB5DofObvOFlphxCJqClqDHnQdY=;
+        b=gupk1DVTQ5C21v8Et/EKQeRcmZKKmaR1zu1ImbiY+nXH9MiOBoj7kFQOHfC3hXk48s
+         kL/7JOKq0hTqpbqJtZR+dijYNVNvUrHtBE3bpW57DWpENkUIC2hS/0M6pJFDBECC4bXk
+         g6uXeXCaHLEI/pjijUBVOK9j/mzNBJiKKBfeGmJn1JR9rxoCPuc8dSz4gDsmH8haNaJq
+         NxS+VMQsJtewuhalS2IBDooUrTey/vv7tSoWcDVDTA9iHlVeW+QXHsZ8xWXdtHTMTZ5d
+         aMRuXhlKwV+5wxLM7kkgvK9+lmwxwAa18tvzFyMbG/diFqptvTvDMZXBucU+GY4/cFoB
+         TdMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711095413; x=1711700213;
+        d=1e100.net; s=20230601; t=1711095457; x=1711700257;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=PB54NDFUedyRI5XOiQhGkPf9QFhhfzoP+DfSevmI9uw=;
-        b=lgEeXqRDQqZdE8XYZFcYkoInucrDgkq8x1muVN3Qpsn12x9iQ/nAbw6sYy8PDeiZQK
-         jzwUIunzqOsETpCUZYScSvVhqgPzB+8HmKQzhrUU7cVqJOg7jLJ4e0gdN7ZLTAzRe9pT
-         cywR1KZQuqbs9bqcMTWZH2Z6NoCbU0MOFlHkT7kt3gTJGTVIRPC94uPLbdqUnxt5txmk
-         CtniFc7fgBMwdlVqx3t4ffN4DlFYE4fOXqt29s/iwV/+BZPa3j4Ai1fZ4doehGUKRaNZ
-         gAx9vFsl5plPoMhlIRGtsDgEBJxJVuYsevDzQC1n2Hbq+rI8d913X+SPVRHbIDzoO06i
-         pYLg==
-X-Forwarded-Encrypted: i=1; AJvYcCVQ/RYQ5j4zUnxThqJhKr5SGZ+JoWcVdqU6yAgXH/2yzScPPrT+uW2UrwgfVOAHaf0Pbesy5udpRKN6rzhCOvcS/+r+XdkD
-X-Gm-Message-State: AOJu0YzAlNe5cbsxtJ0O/Lq3fQ4J1hMPBpidY1V2YVVodcPZAwqcoZO/
-	jxssyVpSyPBh+3wACoUIWWz/fEMXEPvEAV6jyrWOuP+3hgUD9DjIAQ77HIy0y+mg/umD+6hia53
-	sVqk=
-X-Google-Smtp-Source: AGHT+IGfGWLQEzN5dPFkicOLrYnQsH+knmMtXfSU3ThnyvdvpIzpG4p6EFl45MbiBK4I2HJTHXqTpw==
-X-Received: by 2002:a05:600c:5487:b0:413:2c11:f795 with SMTP id iv7-20020a05600c548700b004132c11f795mr1009655wmb.39.1711095412789;
-        Fri, 22 Mar 2024 01:16:52 -0700 (PDT)
+        bh=jJKr+ni+ahD+882dbB5DofObvOFlphxCJqClqDHnQdY=;
+        b=grtRh31ZXHnz+PGeEHrpXzp7AiT251Nl66vJtr6FRSgsiPFF6geAMJeLqzjLxuyapU
+         5EV9iJAJHXUZZC30Oc8856U6bXPwJLwpG1Mh0mp23wgYc5In+lhoiyIzkUjYX8vIzJ1x
+         5SN6kQEveAe8BfvkJbcmbVatSdnQFsMCt44I8bAj3gEt19cuAmHiG8SzDxrHxnKSJpPF
+         Ik1w6lORPsb16WycrYxJrWn9BWjfyPF8mGeS4duquj/kkgoiQP5eCrqviLIr1+99c5z2
+         7huAqRTNweTSi5N+hpiopXAJ7+50LetVlv7E1x7Td+OeZL33PkwMDVKY1oii5Oxi4cwj
+         MP7w==
+X-Forwarded-Encrypted: i=1; AJvYcCX26Be6zD3RpOQzF/W6u7G/kFNHhmhAFRu5uiuztUSNXHKTPbJDd8wsVhzuZm0NkTwhdDpmN1T/P1z2AK1Gk9OU/tG/lMoi
+X-Gm-Message-State: AOJu0YxwmIPBdOES18mFxBXO4jlqMG5i45bWl7gswmUwf3NfIOgjZC1S
+	qiNEXLVv5Uu6Wwa9dDLFe/8dNcLbpAe8VoflO+IoGFBKHGvbEHZVfATR3mZfG3w+5QVU1dyJtsT
+	o//k=
+X-Google-Smtp-Source: AGHT+IETQ3xiDviQtZdArPfJnK5ddMoyddMhAGHC+OgVtJjfERs+egfMZbYssoVZwgrT8GbqbDBQeQ==
+X-Received: by 2002:a17:906:308e:b0:a47:1bab:f1d6 with SMTP id 14-20020a170906308e00b00a471babf1d6mr1095275ejv.72.1711095457327;
+        Fri, 22 Mar 2024 01:17:37 -0700 (PDT)
 Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id fk12-20020a05600c0ccc00b004147dd0915dsm329682wmb.21.2024.03.22.01.16.51
+        by smtp.gmail.com with ESMTPSA id s27-20020a1709060c1b00b00a473792da26sm17616ejf.19.2024.03.22.01.17.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Mar 2024 01:16:52 -0700 (PDT)
-Date: Fri, 22 Mar 2024 09:16:49 +0100
+        Fri, 22 Mar 2024 01:17:36 -0700 (PDT)
+Date: Fri, 22 Mar 2024 09:17:33 +0100
 From: Jiri Pirko <jiri@resnulli.us>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: pseudoc <atlas.yu@canonical.com>, nic_swsd@realtek.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, ChunHao Lin <hau@realtek.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] r8169: skip DASH fw status checks when DASH is disabled
-Message-ID: <Zf0-cXhouMkgebDR@nanopsycho>
-References: <20240322034617.23742-1-atlas.yu@canonical.com>
- <50974cc4-ca03-465c-8c3d-a9d78ee448ed@gmail.com>
+To: Jian Wen <wenjianhn@gmail.com>
+Cc: jiri@mellanox.com, edumazet@google.com, davem@davemloft.net,
+	Jian Wen <wenjian1@xiaomi.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] devlink: use kvzalloc() to allocate devlink
+ instance resources
+Message-ID: <Zf0-nW-NjjoF-_Mr@nanopsycho>
+References: <20240322015814.425050-1-wenjian1@xiaomi.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,97 +84,88 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <50974cc4-ca03-465c-8c3d-a9d78ee448ed@gmail.com>
+In-Reply-To: <20240322015814.425050-1-wenjian1@xiaomi.com>
 
-Fri, Mar 22, 2024 at 08:01:40AM CET, hkallweit1@gmail.com wrote:
->On 22.03.2024 04:46, pseudoc wrote:
->> On devices that support DASH, the current code in the "rtl_loop_wait" function
->> raises false alarms when DASH is disabled. This occurs because the function
->> attempts to wait for the DASH firmware to be ready, even though it's not
->> relevant in this case.
->> 
+Fri, Mar 22, 2024 at 02:58:14AM CET, wenjianhn@gmail.com wrote:
+>During live migration of a virtual machine, the SR-IOV VF need to be
+>re-registered. It may fail when the memory is badly fragmented.
 >
->To me this seems to be somewhat in conflict with the commit message of the
->original change. There's a statement that DASH firmware may influence driver
->behavior even if DASH is disabled.
->I think we have to consider three cases in the driver:
->1. DASH enabled (implies firmware is present)
->2. DASH disabled (firmware present)
->3. DASH disabled (no firmware)
+>The related log is as follows.
 >
->I assume your change is for case 3.
+>Mar  1 18:54:12  kernel: hv_netvsc 6045bdaa-c0d1-6045-bdaa-c0d16045bdaa eth0: VF slot 1 added
+>...
+>Mar  1 18:54:13  kernel: kworker/0:0: page allocation failure: order:7, mode:0x40dc0(GFP_KERNEL|__GFP_COMP|__GFP_ZERO), nodemask=(null),cpuset=/,mems_allowed=0
+>Mar  1 18:54:13  kernel: CPU: 0 PID: 24006 Comm: kworker/0:0 Tainted: G            E     5.4...x86_64 #1
+>Mar  1 18:54:13  kernel: Hardware name: Microsoft Corporation Virtual Machine/Virtual Machine, BIOS 090008  12/07/2018
+>Mar  1 18:54:13  kernel: Workqueue: events work_for_cpu_fn
+>Mar  1 18:54:13  kernel: Call Trace:
+>Mar  1 18:54:13  kernel: dump_stack+0x8b/0xc8
+>Mar  1 18:54:13  kernel: warn_alloc+0xff/0x170
+>Mar  1 18:54:13  kernel: __alloc_pages_slowpath+0x92c/0xb2b
+>Mar  1 18:54:13  kernel: ? get_page_from_freelist+0x1d4/0x1140
+>Mar  1 18:54:13  kernel: __alloc_pages_nodemask+0x2f9/0x320
+>Mar  1 18:54:13  kernel: alloc_pages_current+0x6a/0xb0
+>Mar  1 18:54:13  kernel: kmalloc_order+0x1e/0x70
+>Mar  1 18:54:13  kernel: kmalloc_order_trace+0x26/0xb0
+>Mar  1 18:54:13  kernel: ? __switch_to_asm+0x34/0x70
+>Mar  1 18:54:13  kernel: __kmalloc+0x276/0x280
+>Mar  1 18:54:13  kernel: ? _raw_spin_unlock_irqrestore+0x1e/0x40
+>Mar  1 18:54:13  kernel: devlink_alloc+0x29/0x110
+>Mar  1 18:54:13  kernel: mlx5_devlink_alloc+0x1a/0x20 [mlx5_core]
+>Mar  1 18:54:13  kernel: init_one+0x1d/0x650 [mlx5_core]
+>Mar  1 18:54:13  kernel: local_pci_probe+0x46/0x90
+>Mar  1 18:54:13  kernel: work_for_cpu_fn+0x1a/0x30
+>Mar  1 18:54:13  kernel: process_one_work+0x16d/0x390
+>Mar  1 18:54:13  kernel: worker_thread+0x1d3/0x3f0
+>Mar  1 18:54:13  kernel: kthread+0x105/0x140
+>Mar  1 18:54:13  kernel: ? max_active_store+0x80/0x80
+>Mar  1 18:54:13  kernel: ? kthread_bind+0x20/0x20
+>Mar  1 18:54:13  kernel: ret_from_fork+0x3a/0x50
 >
->Is there a way to detect firmware presence on driver load?
->
->> r8169 0000:0c:00.0 eth0: RTL8168ep/8111ep, 38:7c:76:49:08:d9, XID 502, IRQ 86
->> r8169 0000:0c:00.0 eth0: jumbo features [frames: 9194 bytes, tx checksumming: ko]
->> r8169 0000:0c:00.0 eth0: DASH disabled
->> ...
->> r8169 0000:0c:00.0 eth0: rtl_ep_ocp_read_cond == 0 (loop: 30, delay: 10000).
->> 
->> This patch modifies the driver start/stop functions to skip checking the DASH
->> firmware status when DASH is explicitly disabled. This prevents unnecessary
->> delays and false alarms.
->> 
->> The patch has been tested on several ThinkStation P8/PX workstations.
->> 
->> Fixes: 0ab0c45d8aae ("r8169: add handling DASH when DASH is disabled")
->
->SoB is missing
+>Signed-off-by: Jian Wen <wenjian1@xiaomi.com>
 
-Also, please fix the From email header to contain the same proper name
-and email address as SoB tag.
+net-next is closed, resent next week once it opens.
 
-Also, indicate the targetting tree. Please make sure you read again:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html?highlight=network#tl-dr
+pw-bot: defer
 
-pw-bot: cr
 
+>---
+> net/devlink/core.c | 6 +++---
+> 1 file changed, 3 insertions(+), 3 deletions(-)
 >
->> ---
->>  drivers/net/ethernet/realtek/r8169_main.c | 8 ++++++++
->>  1 file changed, 8 insertions(+)
->> 
->> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
->> index 5c879a5c86d7..a39520a3f41d 100644
->> --- a/drivers/net/ethernet/realtek/r8169_main.c
->> +++ b/drivers/net/ethernet/realtek/r8169_main.c
->> @@ -1317,6 +1317,8 @@ static void rtl8168ep_stop_cmac(struct rtl8169_private *tp)
->>  static void rtl8168dp_driver_start(struct rtl8169_private *tp)
->>  {
->>  	r8168dp_oob_notify(tp, OOB_CMD_DRIVER_START);
->> +	if (!tp->dash_enabled)
->> +		return;
->>  	rtl_loop_wait_high(tp, &rtl_dp_ocp_read_cond, 10000, 10);
->>  }
->>  
->> @@ -1324,6 +1326,8 @@ static void rtl8168ep_driver_start(struct rtl8169_private *tp)
->>  {
->>  	r8168ep_ocp_write(tp, 0x01, 0x180, OOB_CMD_DRIVER_START);
->>  	r8168ep_ocp_write(tp, 0x01, 0x30, r8168ep_ocp_read(tp, 0x30) | 0x01);
->> +	if (!tp->dash_enabled)
->> +		return;
->>  	rtl_loop_wait_high(tp, &rtl_ep_ocp_read_cond, 10000, 30);
->>  }
->>  
->> @@ -1338,6 +1342,8 @@ static void rtl8168_driver_start(struct rtl8169_private *tp)
->>  static void rtl8168dp_driver_stop(struct rtl8169_private *tp)
->>  {
->>  	r8168dp_oob_notify(tp, OOB_CMD_DRIVER_STOP);
->> +	if (!tp->dash_enabled)
->> +		return;
->>  	rtl_loop_wait_low(tp, &rtl_dp_ocp_read_cond, 10000, 10);
->>  }
->>  
->> @@ -1346,6 +1352,8 @@ static void rtl8168ep_driver_stop(struct rtl8169_private *tp)
->>  	rtl8168ep_stop_cmac(tp);
->>  	r8168ep_ocp_write(tp, 0x01, 0x180, OOB_CMD_DRIVER_STOP);
->>  	r8168ep_ocp_write(tp, 0x01, 0x30, r8168ep_ocp_read(tp, 0x30) | 0x01);
->> +	if (!tp->dash_enabled)
->> +		return;
->>  	rtl_loop_wait_low(tp, &rtl_ep_ocp_read_cond, 10000, 10);
->>  }
->>  
+>diff --git a/net/devlink/core.c b/net/devlink/core.c
+>index 7f0b093208d7..ffbac42918d7 100644
+>--- a/net/devlink/core.c
+>+++ b/net/devlink/core.c
+>@@ -314,7 +314,7 @@ static void devlink_release(struct work_struct *work)
+> 	mutex_destroy(&devlink->lock);
+> 	lockdep_unregister_key(&devlink->lock_key);
+> 	put_device(devlink->dev);
+>-	kfree(devlink);
+>+	kvfree(devlink);
+> }
+> 
+> void devlink_put(struct devlink *devlink)
+>@@ -420,7 +420,7 @@ struct devlink *devlink_alloc_ns(const struct devlink_ops *ops,
+> 	if (!devlink_reload_actions_valid(ops))
+> 		return NULL;
+> 
+>-	devlink = kzalloc(sizeof(*devlink) + priv_size, GFP_KERNEL);
+>+	devlink = kvzalloc(sizeof(*devlink) + priv_size, GFP_KERNEL);
+> 	if (!devlink)
+> 		return NULL;
+> 
+>@@ -455,7 +455,7 @@ struct devlink *devlink_alloc_ns(const struct devlink_ops *ops,
+> 	return devlink;
+> 
+> err_xa_alloc:
+>-	kfree(devlink);
+>+	kvfree(devlink);
+> 	return NULL;
+> }
+> EXPORT_SYMBOL_GPL(devlink_alloc_ns);
+>-- 
+>2.34.1
 >
 >
 
