@@ -1,100 +1,93 @@
-Return-Path: <netdev+bounces-81247-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7563B886BEA
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:16:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B31F886BDD
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:10:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C5133B227A4
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:16:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFC761F24BBC
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAB623FB96;
-	Fri, 22 Mar 2024 12:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3463F405E5;
+	Fri, 22 Mar 2024 12:10:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b="kkHOLx4B"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YD5g7g6S"
 X-Original-To: netdev@vger.kernel.org
-Received: from dilbert.mork.no (dilbert.mork.no [65.108.154.246])
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A727171C1;
-	Fri, 22 Mar 2024 12:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=65.108.154.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FB63E487
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 12:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711109757; cv=none; b=X4K3DK/xN1ZxXfzavrWX0DrlWLLNGtaLhnE5SEiHOv3hF/JS3nn5te3mIWu1HaxBvQGUduNFHNciR6a2phLR7Ul9BTn/UmK/MAYqnlSZgrDOJJdQFL3v37cNv9C0Wm0vEYG2T5vxCCiIjS0Dm2dnfm1r8BDM5q/05GKBk4c2wMA=
+	t=1711109425; cv=none; b=QRMqRW2xmWqHIq3OQ+W94FY8wdgCFDBqITPAp1zFGiKXLiEy+kSlvIFmpLagAn9N7v/x+sXmXBPQzTJm2nXxQOdCiR0J31PH/XU5LmPzcp2qXH6tzIkDhJc8Rznjq4ZYgXD7lO42s76OhY7d2tShfy8o5/DZPUihJlsRlN9DOiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711109757; c=relaxed/simple;
-	bh=JWlzNTdBPfHAxnqkWziniLXSJYrdVDBFRm2ImvbfiSc=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=QGYzJW/eckdZfrNWiZpOEvmNdIH861cyuvHEVJPnTyNr7JBWM6vxinv81vPg/s7LsvAR6mjbtCmEIYerU+0JHmNfojbLXnn+RtL/jvhhCjt+UmZ1xYZ+72P+GowrxKcACKSt85o4X+J6C09PLHWo9EV+21KgMd2iZZunz049AUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mork.no; spf=pass smtp.mailfrom=miraculix.mork.no; dkim=pass (1024-bit key) header.d=mork.no header.i=@mork.no header.b=kkHOLx4B; arc=none smtp.client-ip=65.108.154.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=mork.no
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=miraculix.mork.no
-Received: from canardo.dyn.mork.no ([IPv6:2a01:799:10da:6900:0:0:0:1])
-	(authenticated bits=0)
-	by dilbert.mork.no (8.17.1.9/8.17.1.9) with ESMTPSA id 42MC0OpO490219
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Fri, 22 Mar 2024 12:00:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mork.no; s=b;
-	t=1711108824; bh=v1Mw2t0DHAqma4CLFbfsRIpr8UUgEMDDKtBpdTfFWZo=;
-	h=From:To:Cc:Subject:References:Date:Message-ID:From;
-	b=kkHOLx4BY4hrINWm3v7suVdWXoyKOo9sC95WCxewPn7sSlV7Lq/GGm9SGPg3uiBu6
-	 0nNN2clcjmde6NDBXGWgN15PezfcHA8pRYU6YjCp3/aGAwS6dK28zDcMkHrzxtmheO
-	 5wldMRSxgX0W4n+7aPuuNQ47As7rQfhSMrfuheVM=
-Received: from miraculix.mork.no ([IPv6:2a01:799:10da:690a:d43d:737:5289:b66f])
-	(authenticated bits=0)
-	by canardo.dyn.mork.no (8.17.1.9/8.17.1.9) with ESMTPSA id 42MC0N8w3345610
-	(version=TLSv1.3 cipher=TLS_AES_256_GCM_SHA384 bits=256 verify=OK);
-	Fri, 22 Mar 2024 13:00:23 +0100
-Received: (nullmailer pid 1671577 invoked by uid 1000);
-	Fri, 22 Mar 2024 12:00:22 -0000
-From: =?utf-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>
-To: Liviu Dudau <liviu@dudau.co.uk>
-Cc: Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
-        Haijun Liu <haijun.liu@mediatek.com>,
-        Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
-        M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
-        Ricardo Martinez <ricardo.martinez@linux.intel.com>,
-        Loic Poulain <loic.poulain@linaro.org>,
-        Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: net: wwan: t7xx: BUG: Unaligned access when loading mtk_t7xx
- module
-Organization: m
-References: <Zfxlj3pYUk4ys47T@bart.dudau.co.uk>
-Date: Fri, 22 Mar 2024 13:00:22 +0100
-In-Reply-To: <Zfxlj3pYUk4ys47T@bart.dudau.co.uk> (Liviu Dudau's message of
-	"Thu, 21 Mar 2024 16:51:27 +0000")
-Message-ID: <87il1ezdbd.fsf@miraculix.mork.no>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1711109425; c=relaxed/simple;
+	bh=I3Jk5nesrXWQB9vsFuBtdZubxAsXAduwyL+nfRHe2U0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hWkN92Oe/DW3Nurs1nRUtGC4++D9hDxVMpjZWbVbiYOojYukYyGhNjqK3iHXAK9xKVDrAIASx4z6I9xXg69isBT2yVFWdb3eCaRGgiRKUgtZxEsizccXvylAQTx4kgouy5c3nlC0uPfwguDq8p7mKUEl+E+Wf8CXi3J6GxG1rMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YD5g7g6S; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <6002602f-47db-42a5-9171-6bdad714e9b7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1711109420;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=JFTcZCeNF3rcJ30Y7k8mKITzxXBHmzYgd3RvPsRTQ9s=;
+	b=YD5g7g6S7jswv7R4JuPaK5g16b4Ok2/uhNb0k9xqaqBkBbkbPJXnolqwJ82/DeE7SQh0Mk
+	BMu32jHQEdVevicK87wnpewaOKLZTsc6GUaeLnBPd/mOkUMzSYqr+aApmVXLrlsGbXX+Hz
+	g0gTt6InxZEXRGisiycvg/o39ZXqGW8=
+Date: Fri, 22 Mar 2024 12:10:15 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Virus-Scanned: clamav-milter 1.0.3 at canardo
-X-Virus-Status: Clean
+Subject: Re: [PATCH net v1] dpll: indent DPLL option type by a tab
+Content-Language: en-US
+To: Prasad Pandit <ppandit@redhat.com>, Jiri Pirko <jiri@resnulli.us>
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+ netdev@vger.kernel.org, Prasad Pandit <pjp@fedoraproject.org>
+References: <20240322114819.1801795-1-ppandit@redhat.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20240322114819.1801795-1-ppandit@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Liviu Dudau <liviu@dudau.co.uk> writes:
+On 22/03/2024 11:48, Prasad Pandit wrote:
+> From: Prasad Pandit <pjp@fedoraproject.org>
+> 
+> Indent config option type by a tab. It helps Kconfig parsers
+> to read file without error.
+> 
+> Fixes: 9431063ad323 ("dpll: core: Add DPLL framework base functions")
+> Signed-off-by: Prasad Pandit <pjp@fedoraproject.org>
+> ---
+>   drivers/dpll/Kconfig | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> v1:
+>    - Add Fixes tag and specify -net tree in the subject.
+> v0: https://lore.kernel.org/netdev/CAE8KmOx9-BgbOxV6-wDRz2XUasEzp2krqMPbVYYZbav+8dCtBw@mail.gmail.com/T/#t
+> 
+> diff --git a/drivers/dpll/Kconfig b/drivers/dpll/Kconfig
+> index a4cae73f20d3..20607ed54243 100644
+> --- a/drivers/dpll/Kconfig
+> +++ b/drivers/dpll/Kconfig
+> @@ -4,4 +4,4 @@
+>   #
+>   
+>   config DPLL
+> -  bool
+> +	bool
 
->  I had a
-> go at guessing that UL registers are at 0x8 and 0x48 offsets and DL
-> registers are at 0x0478 and 0x04b8, but while that fixes the alignment
-> exception, I now get a "CLDMA{0,1} queue 0 is not empty" message.
-
-I don't think you can assume the register offsets are wrong.  It looks
-more like the device doesn't care about alignment.
-
-But given that the driver includes <linux/io-64-nonatomic-lo-hi.h>, you
-can probably replace those unaligned 64bit accesses with two nonatomic
-32bit accesses.
-
-
-Bj=C3=B8rn
+Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
 
