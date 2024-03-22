@@ -1,120 +1,127 @@
-Return-Path: <netdev+bounces-81328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99BD48873F0
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 20:30:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E73AD887404
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 20:51:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EF171F23D00
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 19:30:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 816691F230FF
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 19:51:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A08B87A15F;
-	Fri, 22 Mar 2024 19:30:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32FEC7EF05;
+	Fri, 22 Mar 2024 19:51:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GI4W6i26"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="JQXN5m+Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A7787A157;
-	Fri, 22 Mar 2024 19:30:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 426C117589;
+	Fri, 22 Mar 2024 19:51:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711135813; cv=none; b=giOnuV2bUfdRzRm399Re2dvoBREVgcfnEo5Tv9xeGUu7i5emumD1erKCPKu33RHL2aXQuABPdX2hpu2IFmKp4rYJRFT/Pm5REQ0yQc2GrCEIZ5JsGxZxuWKeWF8tchpfEwsPTmq+nVpJEGc/fLCWIDrvpx0DVt4ID1jRe79t/ms=
+	t=1711137098; cv=none; b=VcHCx07/II5wxoRC7U5G4cWaL5F9tNTwQG0izpSb6JbKyMqGKYZN0YcJCwbuWODwJy7wqloADWz2iJlNFl7FTfwCK/i5bzFngtta+khPLYK/zf9rZQ4xYKkrIrhufh9JihTU3tUNW3KR96arElzeYj/gZKxxDRxnO6effKtFV8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711135813; c=relaxed/simple;
-	bh=9R6ki8LkQLAWyMMmV+81/0KXBdxdkaUt91oUyJxHRXQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=IYiU374NgAm5WgNqJKJUa0icEVzud0W4KOGo5y5dGAGfSCB9pcJ/G02TB71+Uk9ygIdUaQfIBo2ikyZyPUEdqVIXHFPIkT9bJRcdl+CehvksJCft5MmyW+alRyMYOv9yoCEdxO+hR9QsBTTXXKfY5xfLxtxAJvylCD2EO2G00Ec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GI4W6i26; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17D41C433F1;
-	Fri, 22 Mar 2024 19:30:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711135813;
-	bh=9R6ki8LkQLAWyMMmV+81/0KXBdxdkaUt91oUyJxHRXQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=GI4W6i26GH4YKoxcLI7lQ8yf1CYz3gnsVS5q/50obT5c+RAjHWdIx+1+1fcYFuMSK
-	 z7tq2Hy8gsByyk1C6HLUmIdEjEMjPlAEd5SPyoRNSsS1HUrAS8NtMtMQaTjVj8XtIP
-	 GfI5wwIhfK2ZdvFH8yfESIP4RXcrOtJGRVvTmGJafpDdRsj5RvAbXWu2XtvMvItr/Z
-	 Zoq9QazCmln///YbTsHQqQmawt8pLZ8s+57149iivVTAWIDAH/W5Cm1wZubwMH+tEE
-	 0i08O00EIoJelk5Ubc024aZSDXEmpIUnVRa35wSfyaEC/x0wB3d6Rabg6Z8TigwMBO
-	 GVbz6krwT5hCg==
-Date: Fri, 22 Mar 2024 14:30:11 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>
-Cc: linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Mahesh J Salgaonkar <mahesh@linux.ibm.com>,
-	Oliver O'Halloran <oohall@gmail.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	Ard Biesheuvel <ardb@kernel.org>, Borislav Petkov <bp@alien8.de>,
-	linux-edac@vger.kernel.org, linux-efi@vger.kernel.org,
-	Tony Luck <tony.luck@intel.com>
-Subject: Re: [PATCH 3/4] PCI: Add TLP Prefix reading into pcie_read_tlp_log()
-Message-ID: <20240322193011.GA701027@bhelgaas>
+	s=arc-20240116; t=1711137098; c=relaxed/simple;
+	bh=72Kdlh+PeCaC0JgXHs4uX5Eocp2863XVaM6CXcHJbm0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=pOwddbuJYdgwO0TMi8dEqfmG541d2PxAOKDAVFG2ZgE766IdNjjXveySESVKHK/DsS6FEVdTbytQBDWs28tageOPQe2uof76TY/mnGlY+XR3LP8jcK3QpVmraIFUAxkqnV/xqahH5JQWPoEsh/LmytrL09ZZ0IsXvj60J24YDFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=JQXN5m+Q; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1711137092;
+	bh=72Kdlh+PeCaC0JgXHs4uX5Eocp2863XVaM6CXcHJbm0=;
+	h=From:Date:Subject:To:Cc:From;
+	b=JQXN5m+QdMw2QCyoPeGUyDWN4k0AuD4kkKnRMVw2J3dfukKHyBg5fCK7KJ1tNcvnl
+	 +YYTt8d4PKeK32kHn8ri0RBbPfvSNY7QIvFyjQb6dA/EvOhg9FKMTc8+8tteoWfcfc
+	 2hYeWAKVqxWNuXukXzYhOOpm3kaD61HL2fYyAVTI=
+From: =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+Date: Fri, 22 Mar 2024 20:51:11 +0100
+Subject: [PATCH v2] fs/proc/proc_sysctl.c: always initialize i_uid/i_gid
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20240206135717.8565-4-ilpo.jarvinen@linux.intel.com>
+Message-Id: <20240322-sysctl-net-ownership-v2-1-a8b4a3306542@weissschuh.net>
+X-B4-Tracking: v=1; b=H4sIAC7h/WUC/4WNTQ6CMBCFr0Jm7RhaAaMr7mFYlDraSUxLOlgkp
+ He3cgHf7nt5PxsIRSaBa7VBpMTCwRfQhwqsM/5JyPfCoGvd1CfVoqxi5xd6mjEsnqI4nnC0Dak
+ zGSLTQalOkR782WdvQ2HHMoe47i9J/dw/g0mhQj02XVtk9EX3C7GIWPd2xxKFIef8BQ8u26K9A
+ AAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Dmitry Torokhov <dmitry.torokhov@gmail.com>, 
+ "Eric W. Biederman" <ebiederm@xmission.com>, 
+ Joel Granados <j.granados@samsung.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Luis Chamberlain <mcgrof@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+ stable@vger.kernel.org, 
+ =?utf-8?q?Thomas_Wei=C3=9Fschuh?= <linux@weissschuh.net>
+X-Mailer: b4 0.13.0
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1711137092; l=1753;
+ i=linux@weissschuh.net; s=20221212; h=from:subject:message-id;
+ bh=72Kdlh+PeCaC0JgXHs4uX5Eocp2863XVaM6CXcHJbm0=;
+ b=AHfmIoxytnUEQFA5MfwfoRoRpJGA6Tspr/zU56SHlqDFrZZns1LRwaTeQ2kMKUFXfoZ2WdVNY
+ 1dXk+g3rws6Des2y4Y15HNbuCrGUHEf/A3U5trLOQcAYOMXSovp96ut
+X-Developer-Key: i=linux@weissschuh.net; a=ed25519;
+ pk=KcycQgFPX2wGR5azS7RhpBqedglOZVgRPfdFSPB1LNw=
 
-On Tue, Feb 06, 2024 at 03:57:16PM +0200, Ilpo Järvinen wrote:
-> pcie_read_tlp_log() handles only 4 TLP Header Log DWORDs but TLP Prefix
-> Log (PCIe r6.1 secs 7.8.4.12 & 7.9.14.13) may also be present.
+Commit e79c6a4fc923 ("net: make net namespace sysctls belong to container's owner")
+added default values for i_uid/i_gid.
+These however are only used when ctl_table_root->set_ownership is not
+implemented.
+But the callbacks themselves could fail to compute i_uid/i_gid and they
+all need to have the same fallback logic for this case.
 
-s/TLP Header Log/Header Log/ to match spec terminology (also below)
+This is unnecessary code duplication and prone to errors.
+For example net_ctl_set_ownership() missed the fallback.
 
-> Generalize pcie_read_tlp_log() and struct pcie_tlp_log to handle also
-> TLP Prefix Log. The layout of relevant registers in AER and DPC
-> Capability is not identical but the offsets of TLP Header Log and TLP
-> Prefix Log vary so the callers must pass the offsets to
-> pcie_read_tlp_log().
+Instead always initialize i_uid/i_gid inside the sysfs core so
+set_ownership() can safely skip setting them.
 
-s/is not identical but/is identical, but/ ?
+Fixes: e79c6a4fc923 ("net: make net namespace sysctls belong to container's owner")
+Cc: stable@vger.kernel.org
+Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+---
+Changes in v2:
+- Move the fallback logic to the sysctl core
+- Link to v1: https://lore.kernel.org/r/20240315-sysctl-net-ownership-v1-1-2b465555a292@weissschuh.net
+---
+ fs/proc/proc_sysctl.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-The spec is a little obtuse about Header Log Size.
+diff --git a/fs/proc/proc_sysctl.c b/fs/proc/proc_sysctl.c
+index 37cde0efee57..9e34ab9c21e4 100644
+--- a/fs/proc/proc_sysctl.c
++++ b/fs/proc/proc_sysctl.c
+@@ -479,12 +479,10 @@ static struct inode *proc_sys_make_inode(struct super_block *sb,
+ 			make_empty_dir_inode(inode);
+ 	}
+ 
++	inode->i_uid = GLOBAL_ROOT_UID;
++	inode->i_gid = GLOBAL_ROOT_GID;
+ 	if (root->set_ownership)
+ 		root->set_ownership(head, table, &inode->i_uid, &inode->i_gid);
+-	else {
+-		inode->i_uid = GLOBAL_ROOT_UID;
+-		inode->i_gid = GLOBAL_ROOT_GID;
+-	}
+ 
+ 	return inode;
+ }
 
-> Convert eetlp_prefix_path into integer called eetlp_prefix_max and
-> make is available also when CONFIG_PCI_PASID is not configured to
-> be able to determine the number of E-E Prefixes.
+---
+base-commit: ff9c18e435b042596c9d48badac7488e3fa76a55
+change-id: 20240315-sysctl-net-ownership-bc4e17eaeea6
 
-I think this eetlp_prefix_path piece is right, but would be nice in a
-separate patch since it's a little bit different piece to review.
+Best regards,
+-- 
+Thomas Weißschuh <linux@weissschuh.net>
 
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-> @@ -11336,7 +11336,9 @@ static pci_ers_result_t ixgbe_io_error_detected(struct pci_dev *pdev,
->  	if (!pos)
->  		goto skip_bad_vf_detection;
->  
-> -	ret = pcie_read_tlp_log(pdev, pos + PCI_ERR_HEADER_LOG, &tlp_log);
-> +	ret = pcie_read_tlp_log(pdev, pos + PCI_ERR_HEADER_LOG,
-> +				pos + PCI_ERR_PREFIX_LOG,
-> +				aer_tlp_log_len(pdev), &tlp_log);
->  	if (ret < 0) {
->  		ixgbe_check_cfg_remove(hw, pdev);
->  		goto skip_bad_vf_detection;
-
-We applied the patch to export pcie_read_tlp_log(), but I'm having
-second thoughts about it.   I don't think drivers really have any
-business here, and I'd rather not expose either pcie_read_tlp_log() or
-aer_tlp_log_len().
-
-This part of ixgbe_io_error_detected() was added by 83c61fa97a7d
-("ixgbe: Add protection from VF invalid target DMA"), and to me it
-looks like debug code that probably doesn't need to be there as long
-as the PCI core does the appropriate logging.
-
-Bjorn
 
