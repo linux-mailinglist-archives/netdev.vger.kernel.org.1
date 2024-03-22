@@ -1,187 +1,170 @@
-Return-Path: <netdev+bounces-81309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F48B8870F4
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 17:34:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29FE788715C
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 17:57:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A2661C20873
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 16:34:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAD011F22C22
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 16:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABC34AEC1;
-	Fri, 22 Mar 2024 16:34:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CD3F5FDCC;
+	Fri, 22 Mar 2024 16:53:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b="emrsbpiK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fSTRqoW8"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-VI1-obe.outbound.protection.outlook.com (mail-vi1eur02on2086.outbound.protection.outlook.com [40.107.241.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B235E2208F;
-	Fri, 22 Mar 2024 16:34:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.241.86
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711125271; cv=fail; b=ps9G2ApkBrZQ0Y7cZG3A4yizAb5P+wLSSLxFO/CydGax6gG7DL7vyRj4vtyIGR3SV4NqAUOzKbsyuTEU16g32KajE8dGnmKKRovGMniIQfXl6mTfkbgDNSn6i6+NqvCj7DkSqctBwTCv8T5gnLNMBEFZYtfjau7D6A2tCseK9vs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711125271; c=relaxed/simple;
-	bh=dydPSn1y/UeEiDgxpc2Xom3Y8R1cwnzw2uOMGFmEAc8=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=tYi1Ww52CtlhHw+MXdJ1pUco8HbaC/5onsbbWRBaitE1YrZCZCiu9q0XsMmaGDolrQcOBz3Lk6Fun0k9t8djKRkff8QyK3PaH9+faHcHIrEN1dT4jvxPI3ndwjM5IIp/cqmCWH+Fsxd9GpdlJ0VqEskXgBFhIBtdccQSqgP7QVM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com; spf=fail smtp.mailfrom=leica-geosystems.com; dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b=emrsbpiK; arc=fail smtp.client-ip=40.107.241.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=leica-geosystems.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JIVpHye0vRVrpGiEnuSguyg0R9PqSHAYQIKI9bZCdSs59tY4+PGAXkHIoVxnJTHEqmAt5Xnm94aZ0zC8z8wtXpXP4XDFR9Moc10Conh8SIPZov9GFQG60QrlnCwNWPm9NF9kpZ2bXs7O5lC6nrZgpiz06sCuTiAVbiEHcTo+LX/n/q0/QIyRUmI1Rj1e3kWP6ATgWGb69zNJBcwFNnmnvWCC37HNmh9YFWhLXFRZlrmJuiq/NFeADWk6xiqkObnzwsWx9J1oc4lvSrt8+Hmv7X4ahgiJxELnZoWdOACQQsIGOrpzGODZ5Li9CNus122Os9K+y5l0laSpz7xPWZv4eQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dydPSn1y/UeEiDgxpc2Xom3Y8R1cwnzw2uOMGFmEAc8=;
- b=CZYQ6oVK+EhmzpsVF5LRDeagsvjqp7YwWZjl/S2kJ0afukX0ogGZdH/OeaZxjQkqXHQm8VymF385y/NmNMUWS6yDzwApn54nYpboQ84g2CMuUQdVNK9hUP3qDr867UZF1OvNGF8HXiMpUMIrWhfLGXHoXpykbLMhxzGDUKReveVOXTmPPZ1Nx+0QoKLwlYKDYRzNLkx3QBwRE/zLhm5E+h2nJNC46DQO/JAyQ+DczhbMeaGhdGpnILbJ0S1wf+dv+WOZyGAT6CKiN+SgBDFR6T7Rmh3xaZ/0FNRvOy9Ve7OOrcZ0H18VySg2zlrCdUnkSWV+p49ijUS39Ev5ZnLx+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=leica-geosystems.com; dmarc=pass action=none
- header.from=leica-geosystems.com; dkim=pass header.d=leica-geosystems.com;
- arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leica-geosystems.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dydPSn1y/UeEiDgxpc2Xom3Y8R1cwnzw2uOMGFmEAc8=;
- b=emrsbpiK22quL0uyTwxP8lE2ntRuo1AAl7Pk/2jbq/65wKPVDnZxj+NgW4RVDYPU9nJVSGjwYhYbZeXxJbR2Q1VpcmUfHWjJwYIaovG54+mjok843YsjGxh6ZGaivvX1/M6HQQxOX5Z8jRk2zyksX7QKb5i7tFDvPQpO6/gtwQw=
-Received: from VE1PR06MB6911.eurprd06.prod.outlook.com (2603:10a6:800:1a4::13)
- by AM9PR06MB7316.eurprd06.prod.outlook.com (2603:10a6:20b:2d0::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.24; Fri, 22 Mar
- 2024 16:34:26 +0000
-Received: from VE1PR06MB6911.eurprd06.prod.outlook.com
- ([fe80::9256:56bc:4cd2:d41]) by VE1PR06MB6911.eurprd06.prod.outlook.com
- ([fe80::9256:56bc:4cd2:d41%2]) with mapi id 15.20.7409.023; Fri, 22 Mar 2024
- 16:34:26 +0000
-From: POPESCU Catalin <catalin.popescu@leica-geosystems.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "hkallweit1@gmail.com" <hkallweit1@gmail.com>, "linux@armlinux.org.uk"
-	<linux@armlinux.org.uk>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	GEO-CHHER-bsp-development <bsp-development.geo@leica-geosystems.com>,
-	"m.felsch@pengutronix.de" <m.felsch@pengutronix.de>
-Subject: Re: [PATCH net-next] net: phy: dp8382x: keep WOL setting across
- suspends
-Thread-Topic: [PATCH net-next] net: phy: dp8382x: keep WOL setting across
- suspends
-Thread-Index:
- AQHab+nNNjxI3+NV+Uir0lLTLIYJU7ErVY4AgACd/ICAAh4MgIAVbpyAgACDAICAAAqVAA==
-Date: Fri, 22 Mar 2024 16:34:26 +0000
-Message-ID: <80d8a0ed-e54c-4d81-934b-94b16c84351a@leica-geosystems.com>
-References: <20240306171446.859750-1-catalin.popescu@leica-geosystems.com>
- <8de1d4e3-6d80-45a5-a638-48451d9b5c15@lunn.ch>
- <b53818a7-66a4-4c7a-b687-efaea6cb9e4e@leica-geosystems.com>
- <f8bfbe80-f308-4b8d-b8f0-5a5f6ca5fa0e@leica-geosystems.com>
- <e9b85f71-f494-4fa6-acce-13ee8e147c21@leica-geosystems.com>
- <5746c9da-1d45-4d06-a925-4150e680b8ec@lunn.ch>
-In-Reply-To: <5746c9da-1d45-4d06-a925-4150e680b8ec@lunn.ch>
-Accept-Language: en-CH, en-US
-Content-Language: aa
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=leica-geosystems.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: VE1PR06MB6911:EE_|AM9PR06MB7316:EE_
-x-ms-office365-filtering-correlation-id: febe7683-25d1-4c4e-b830-08dc4a8df0a9
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- Uj0BysVn1UT8xP/5WOEJcjJNzcrBS6TwOwsCCbQRPuVdgYzM6EegyDDvzyhYnCOxIhDzh3zz9+w1X02hpEsWXTfha8dCy0brJ996CTAslpXfP3GvmJ4SDHRe3fghzFU6R2yrvZwW1eDRU0xvn2ZnEdCAOHiPU93MmIeTQg4q7HcwxE3mzIsbi6lV/VLYd263QkduCy7T/pTnMDG036lmd1q+MjhwFpIdPAEu3xj6oSn/sUeWBJTXHU0QE8KFCQsWstuwY81ILJ5znLZXLhi2weK3sTYAhNcmCskdu4XuT/mY4NxUB7oYDVtUXrvd20DHB/LUI0sN1uGnIFawsgi9aAs/B93xCEqwASI5ZzApXvkryHxWepjIH2dtO1qudkiVRUhEl3cmeZFmhuI0Ze33KPn3fXdiss6QpSXjcABHL2bWnkT0WFcC0FbiH8IW/VMlcdm5c1Jw03MgC/CESSg9jknP35C4u5j1y5zMTYfLJUNf3GLn5v0m5Y4aX5Tsd+ExSGrdoI5ZXwkkwpoazQxjg3Ht63RLnoZO5PazW2FlUO1fwtdv/O9LCrc7b0XvKCJIdKzsYSADfqbfDjNn/7X5C+9+/ZM6+J9fYhhjH/wzHvioglETX+Oq5k5VDFaQaBKa2/bnP3zFJs7VGc0hXC/9rXrTm5loBDMVrkqn2Wm+lIYsltiJ3xaXTMkYQgOfC8E9Bk/7gGUHEr1OYQRtymgxk26XIjOflSmvzOQ7hJO/CdM=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:VE1PR06MB6911.eurprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(7416005)(38070700009);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?NC8rS28xU1djcWtEdlFiK0dBb2tKLzdVUWR5Zmo5T0F4U0xWWlF3eXpBRHcw?=
- =?utf-8?B?SWRoZTgzSUU0dzIwelB0TmV0QVBGOFY2TzRqYkF3WEVpbDZyaWI2aFUzazVl?=
- =?utf-8?B?cTRhS3psa25mZ2xzMkZHd1lRa0paSGliN1prM3NCWEI4b3Y1MUs1dlNVL2Uv?=
- =?utf-8?B?VmEzRTlIZ2NaYXY3RCsyR09zQzB1RXBwTU1yWXBIWjhpWE1GVnVKRmRFY2Qz?=
- =?utf-8?B?R1U5TmtWQnNpRGhLcCtCL0NCV0hEbUdiWnVOZDJqVzdtdFBGYU9yN0lSMDhC?=
- =?utf-8?B?UDJjYzQ3bEZ1N0I5WHR2V1NjODhRM3RlVkJuRHI1VVMrY0p4dHpGSUVLVjRL?=
- =?utf-8?B?RCtGV1E0dWMzVUtESklBbmp4T3lJbjNzZzNvVGhiNUpMTjBsUHlWVnI0UFlt?=
- =?utf-8?B?RUYrOHBGNFdTZXdqYTZJOFUrTXBMWWUxN25nVThRSU1zS3R1RGQwOUpTMnAx?=
- =?utf-8?B?SzFQUVVUc0xrTHVWS3I5cXIyY0NUTDM4QkpQVkl5NmxLZGZOWmtlL1Fwa0wx?=
- =?utf-8?B?SEF4Umx0Yy84bTVLSmpkS21MdVpXamxUNzdYbTFCMTQ4VGpxaHk3MkRMaHhP?=
- =?utf-8?B?UUFoV2hjSUQxK3BjN2l6THB1cCtXNUNrc1hnNWlQYy9Ma2ptV2hHa0Z4QXU0?=
- =?utf-8?B?d24zMU9yZzlEWFVVbHJPZ2puNUd0K1J4L0dEOXR1OXFDWnY1ZU1KMllxS2FT?=
- =?utf-8?B?bHVSVVZYMDNxS3BIeStYUUh6TDlRb2xOM3RrWW1TTm5KQUR1STA0aEZOK0Vx?=
- =?utf-8?B?Z1B5RHNTcEo3b2RNcXgxRyt4a0hxOU03a2FZMmtZTEdIUmY2UlF1VkRjRW53?=
- =?utf-8?B?c2IzRVlJbHBKQTdncVFQbWY4VnB2VWlsQjRzVkRQaHV2RnNXTXU4TjBwZlQ0?=
- =?utf-8?B?aDlpbTFkMWt5RUlLN01hb29iMiswSEViMDRtam01cjY2TmVLTjRXU2dPS2c4?=
- =?utf-8?B?eEptWGJrZ2lQbks1VGpnRS9icXd1eW1XTU9oSmNvR2JYdXplbjlvaWpvWGZP?=
- =?utf-8?B?elZNdlljN2NrRmVPcXR4aW90RlBmR1RXVVNQM3huYXJSM3FnTkRabXB3Ly9v?=
- =?utf-8?B?MXBmOGh6NXRSMFlZRmFyR2U5aFVxbkdtNXhWQjE3Zk9xUGdFbmZ1QzlMdHpJ?=
- =?utf-8?B?Q2QxR1g1VkpzWEhhQnZOZjI0N1JsbzhIdEgvNjJXdGw0YTFaOTFPSmhaU3NH?=
- =?utf-8?B?UllxRnhwbitWbzdlbkg0M1UxUEcxdVJUbThRSVB3bDNEOFlHMWNLQU80Vnlq?=
- =?utf-8?B?bzNuRjlWN1RzUGlZY0ZlL3kxemJUOFgyWmVpMGVxRDA5bFU0d3l1d3FiNUwy?=
- =?utf-8?B?WkhtN1Z5UWVMVG1CaDBYazJ2TWtzVlJDVE1DejF4aldKY0MrTHlTcHZReEpU?=
- =?utf-8?B?WmM3Z0hOZ3Urb09QbFhPMmx0Z0xPQnAzQVpTZlZXSXpkNGpySzlKN3JTUGsz?=
- =?utf-8?B?d0FEd3JpM2V3M1k3MG9ibVR4cysyMVoydnJzenBjZ0kvVjR1YXhvRXJudGlI?=
- =?utf-8?B?bk5iWmpCOXEreUNCUXprWDBHdmRlWXQraFF6WWZoWHNyd05ZQTZVejhMT0Vh?=
- =?utf-8?B?NjQxd2NwRWJSY2ltcXlNK3VhWUdPU1cvMHcyQjM5QzgwMTA3NnY5ck8wWVZL?=
- =?utf-8?B?dSt2THBZeHRVL1U5MkxLcXFRcmVXMUxBTzBmc1JTMkJCdXIvNFlzZjVxNndZ?=
- =?utf-8?B?M05ZK1gwRXJwemZ3QVUxM3dvak9leW5USUFpdWdYYWJQbHNYZ1g0UlZIOGh2?=
- =?utf-8?B?UjZFZEhQTnNaZGg3VitLb1UzK1ZhdWlGcm9CMmcwZkxVOWlZanhrTWtXWDlP?=
- =?utf-8?B?bnRPVTArTmVOZE5JMkNhY1ZSVjI0bGdNMEtTVnBZeEljUGZiZFJuZjcvMiti?=
- =?utf-8?B?QzhoM1N4S2p1YXF0dm94Unp2OXdreWgweTdBWG0xZ21TZ2xLWkNXUTJaQjNN?=
- =?utf-8?B?bFVwSThTSkQ1cUF2QndtU3NlamlrZklRSmtpK3dPWXB1WkxLazhzMWlPVjQx?=
- =?utf-8?B?WjAxdUM2VnB3YVZTUFJsVW54bUJ6bmJMdFN3eGRtQlJTMmVWVmlpTE9oY21E?=
- =?utf-8?B?ekt0RTAyWm5XYktIV2k2VUVsdlRLNFRXbkxIY1E3enFNK2s2NzdzcUpYTjBw?=
- =?utf-8?B?KzN3Ti9xTUdHOXRXMzNPUndjblYzamJZdFVRVnBXVkIyWFluVitsTzFsYjV2?=
- =?utf-8?B?NkE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FA45452A64A5F34CB7FC81614F581D4B@eurprd06.prod.outlook.com>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EB15FDA9;
+	Fri, 22 Mar 2024 16:53:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711126434; cv=none; b=TbIVGtju+9PBzPLrtD1kX5qqn4d4LfcPylAMRoLv3hp9WChhiEhb984HARgOG6TzQn0LUqaHGp8C4v4oZiVRHH0yz0Y0d5h2R0d/mI0jhH3IvuL200vbjpeGCOpR+yTZ6KQlozgAL+hKVQCCYSgvpq0QRMWsUsu1S03g5068/YE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711126434; c=relaxed/simple;
+	bh=Rc4e+9q8cteiwcWOIW7T38A8/ToMIlusvAVBDyOL15M=;
+	h=From:To:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=S9f987mJBqRcXtUS1B54gNZz9B2zDOITnnnrwUPgaUKDh8wzgIvHxKDocdfUgNm3A3DWvkG6+2xzOlEfW2E1V00h9waHpcsvLITLPDmfgKMymTzVBA4qIlNMfWqUs3fw+8VuVSuWCSMOKzF4uv3HsRPodk3wGpVQnfOGV+BXR5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fSTRqoW8; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-33e570ef661so1085874f8f.1;
+        Fri, 22 Mar 2024 09:53:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711126431; x=1711731231; darn=vger.kernel.org;
+        h=mime-version:message-id:date:references:in-reply-to:subject:to:from
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=prwGqiUDr2MIwI/u9qAD6n1rOIPI2RfxncckA/0+HG4=;
+        b=fSTRqoW8949esGuLPcYwLS05SHr93J/p4Q+HD3xdNqD32TbrFtjBMb/Cq27vplJFav
+         Q4Q2yxfLIwU2IMT9CTvA3raUW3NxxJq0cARd8qNii89PELbVD1y4MrsYX50IC4j38GmE
+         1HLwWRqzv9eSsV6oA7GYDMgBlNYKeB9LkPRYH8o1F98R2hUEBxbga+x4oZgsnbMNyN+q
+         fpzQq3ermhDhLIXPBM4qg6CcTW2HAAa3nTIlGeuq5nz1YP6QpkhnqnvQzlBo4gbXBIey
+         LQEXdzK8+oNky4SuXsOvXNrl14W1P0wKnyOyscIUcThiphObd7hhjplIVShdT6Qp4dBH
+         SxVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711126431; x=1711731231;
+        h=mime-version:message-id:date:references:in-reply-to:subject:to:from
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=prwGqiUDr2MIwI/u9qAD6n1rOIPI2RfxncckA/0+HG4=;
+        b=m/wT/3ElWiJII232Yc9R3+cqwoqHOEfhKNgR+cKHGP04iFjuBuoTcRObZxv9AdlKPY
+         X/oE1L+vwp7PbuihPBMOkAiLvInbPlV/VkslHA0JlI0/Fsgxy5lVuvzMbivzJKLb7jqQ
+         9xWQ2LvLuqHqKHXgdjPlpINR6c8J2NflLwNsy7JoXSA4E0PGF04uGdS/KGGSTHb9rZkB
+         PmfFJ2Yo7rTWToWbHixJrrmLwPTA4FXx9jaaDqeVx2bms2QIYX0l0YdlPKszoIJi8OmD
+         FY7AQg5RiHNxq3RzOwrI62Bk+ffdUc3fHwu8JKo+exTuUe4ZC1Pm3OqiT9BS/bZ+5NAl
+         NULw==
+X-Forwarded-Encrypted: i=1; AJvYcCV5rhlBgcA4TcW5c+BaenT/qO4MsKUEUqekTmdbX9Eers8Ul12WmVQqbkVINI6zdXyIyVNlfKAmyzG+DHkamO9/lHilmSm8QBz7x2FDlc947jxCXJgSIGXKhuG01AQxpTlnnKbvjm0IbwT+4y/CecWIEdpTEs1n7Gln
+X-Gm-Message-State: AOJu0YzuzuorbiMDA5wObNvxfU9nbYbbAuEhxif043FJJSZpzRZahBHs
+	wqL6ZWeqvb56VP2yMVKgQB4gyBrcK1QQUZs2v3D81vlm7u2DI5fS
+X-Google-Smtp-Source: AGHT+IH3aziBPUEw2pxrSbVmh2Fqw5q35d7kuBZURy7unTQvxoYvMLMvNLA3cDHQEFkQSZnpaw7PLw==
+X-Received: by 2002:a5d:4944:0:b0:33e:7cdd:b559 with SMTP id r4-20020a5d4944000000b0033e7cddb559mr1991710wrs.56.1711126430520;
+        Fri, 22 Mar 2024 09:53:50 -0700 (PDT)
+Received: from localhost (54-240-197-231.amazon.com. [54.240.197.231])
+        by smtp.gmail.com with ESMTPSA id y17-20020adff151000000b0033e43756d11sm2435796wro.85.2024.03.22.09.53.49
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 22 Mar 2024 09:53:50 -0700 (PDT)
+From: Puranjay Mohan <puranjay12@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Alexei
+ Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, Martin
+ KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, John
+ Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri
+ Olsa <jolsa@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar
+ <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>, Dave Hansen
+ <dave.hansen@linux.intel.com>, x86@kernel.org, "H. Peter Anvin"
+ <hpa@zytor.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>,
+ netdev@vger.kernel.org, bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Ilya Leoshkevich <iii@linux.ibm.com>
+Subject: Re: [PATCH bpf v4] bpf: verifier: prevent userspace memory access
+In-Reply-To: <15ba79e3-14b2-d92e-3f94-e4f5f963e15d@iogearbox.net>
+References: <20240321124640.8870-1-puranjay12@gmail.com>
+ <9f2b63b5-569c-1e00-a635-93d9cd695517@iogearbox.net>
+ <mb61p4jcyxq5m.fsf@gmail.com>
+ <15ba79e3-14b2-d92e-3f94-e4f5f963e15d@iogearbox.net>
+Date: Fri, 22 Mar 2024 16:53:47 +0000
+Message-ID: <mb61pcyrm8axw.fsf@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: leica-geosystems.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: VE1PR06MB6911.eurprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: febe7683-25d1-4c4e-b830-08dc4a8df0a9
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Mar 2024 16:34:26.8075
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: GnMI2HOzLAskuS9dNQ8nxR+gvsIP5AGbwwxJ6M0gTOn0EzOI++pCCY2NpAFZWdEcy1Tj1WmoJkMg5Ll/Wj+RxZ8byvZxc+Kdc/JaI4OagO9EeDu5lD0rqou8jEnKucDF
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR06MB7316
+Content-Type: text/plain
 
-T24gMjIvMDMvMjAyNCAxNjo1NiwgQW5kcmV3IEx1bm4gd3JvdGU6DQo+IFtTb21lIHBlb3BsZSB3
-aG8gcmVjZWl2ZWQgdGhpcyBtZXNzYWdlIGRvbid0IG9mdGVuIGdldCBlbWFpbCBmcm9tIGFuZHJl
-d0BsdW5uLmNoLiBMZWFybiB3aHkgdGhpcyBpcyBpbXBvcnRhbnQgYXQgaHR0cHM6Ly9ha2EubXMv
-TGVhcm5BYm91dFNlbmRlcklkZW50aWZpY2F0aW9uIF0NCj4NCj4gVGhpcyBlbWFpbCBpcyBub3Qg
-ZnJvbSBIZXhhZ29u4oCZcyBPZmZpY2UgMzY1IGluc3RhbmNlLiBQbGVhc2UgYmUgY2FyZWZ1bCB3
-aGlsZSBjbGlja2luZyBsaW5rcywgb3BlbmluZyBhdHRhY2htZW50cywgb3IgcmVwbHlpbmcgdG8g
-dGhpcyBlbWFpbC4NCj4NCj4NCj4+PiBJdCBsb29rcyBsaWtlIHRoZSBpc3N1ZSBJJ20gdHJ5aW5n
-IHRvIGFkZHJlc3MgaW4gdGhpcyBwYXRjaCBpcyBub3QNCj4+PiBzcGVjaWZpYyB0byBkcDgzODJ4
-LiBSaWdodCBub3csIGRlcGVuZGluZyBvbiBpZiB0aGUgUEhZIGlzIHJlc2V0IG9yIG5vdA0KPj4+
-IGR1cmluZyByZXN1bWUgKGVpdGhlciB0aHJvdWdoIG1kaW9fZGV2aWNlIHJlc2V0X2dwaW8vcmVz
-ZXRfY3RybCBvcg0KPj4+IHBoeV9kcml2ZXIgc29mdF9yZXNldCBjYWxsYmFjayksIHRoZSBXT0wg
-Y29uZmlndXJhdGlvbiBpcyBlaXRoZXIgdGhlIFBIWQ0KPj4+IHJlc2V0IHZhbHVlIG9yIHRoZSBC
-SU9TIHZhbHVlLiBJIGNvdWxkIHN0aWxsIG1ha2UgdGhlIHBhdGNoIGJ1dCBpdA0KPj4+IGRvZXNu
-J3QgcmVhbGx5IG1ha2Ugc2Vuc2UgdG8gYWRkcmVzcyBvbmx5IGRwODM4MnguDQo+IFRoaXMgaXMg
-YW4gaW50ZXJlc3RpbmcgcG9pbnQuIHNvZnRfcmVzZXQgdGhlIGRyaXZlciBpcyBpbiBjb250cm9s
-DQo+IG9mZi4gSXQgY2FuIHByZXNlcnZlIHRoZSBXb0wgc2V0dGluZyBvdmVyIHRoZSBzb2Z0IHJl
-c2V0Lg0KPiBBIGhhcmR3YXJlIHJlc2V0IGlzIGEgZGlmZmVyZW50IG1hdHRlci4NCj4NCj4gSG93
-ZXZlciwgaWYgd2Ugd29rZSB1cCBkdWUgdG8gV29MLCB0aGUgUEhZIG5ldmVyIHdlbnQgdG8gc2xl
-ZXAsIGl0cw0KPiBzdGF0ZSBpcyBpbnRhY3QsIHNvIHdoeSBhcmUgd2UgZG9pbmcgYSBoYXJkd2Fy
-ZSByZXNldD8NCg0KSSBjaGVja2VkIGFnYWluIHRoZSBjb2RlIGFuZCB0aGUgZGF0YXNoZWV0cyBh
-bmQgSSB3YXMgd3Jvbmc6IHRoZSBkcml2ZXIgDQpkb2VzIGEgImRpZ2l0YWwiIHJlc2V0IGluc3Rl
-YWQgb2YgInNvZnR3YXJlIGhhcmQiIHJlc2V0IDoNCi0gImRpZ2l0YWwiIHJlc2V0IDogcmVnaXN0
-ZXJzIGFyZSBwcmVzZXJ2ZWQNCi0gInNvZnR3YXJlIGhhcmQiIHJlc2V0IDogcmVnaXN0ZXJzIGFy
-ZSByZXNldA0KVGhlIG5hbWVzIGFyZSBtaXNsZWFkaW5nIGFuZCBleHBsYWlucyB3aHkgSSBtYWRl
-IHRoZSBtaXN0YWtlIDopDQoNClNvLCBpdCBtYWtlcyBzZW5zZSB0byBwcm92aWRlIGEgcGF0Y2gg
-Zm9yIGRwODM4MnggdGhhdCBlbnN1cmUgd2UgZG9uJ3QgDQpmb3JjZWZ1bGx5IGRpc2FibGUgV09M
-IG9uIHRoZSByZXN1bWUgcGF0aC4NCg0KPiAgICAgICAgQW5kcmV3DQo+DQoNCg==
+Daniel Borkmann <daniel@iogearbox.net> writes:
+
+> On 3/22/24 4:05 PM, Puranjay Mohan wrote:
+> [...]
+>>>> +		/* Make it impossible to de-reference a userspace address */
+>>>> +		if (BPF_CLASS(insn->code) == BPF_LDX &&
+>>>> +		    (BPF_MODE(insn->code) == BPF_PROBE_MEM ||
+>>>> +		     BPF_MODE(insn->code) == BPF_PROBE_MEMSX)) {
+>>>> +			struct bpf_insn *patch = &insn_buf[0];
+>>>> +			u64 uaddress_limit = bpf_arch_uaddress_limit();
+>>>> +
+>>>> +			if (!uaddress_limit)
+>>>> +				goto next_insn;
+>>>> +
+>>>> +			*patch++ = BPF_MOV64_REG(BPF_REG_AX, insn->src_reg);
+>>>> +			if (insn->off)
+>>>> +				*patch++ = BPF_ALU64_IMM(BPF_ADD, BPF_REG_AX, insn->off);
+>>>> +			*patch++ = BPF_ALU64_IMM(BPF_RSH, BPF_REG_AX, 32);
+>>>> +			*patch++ = BPF_JMP_IMM(BPF_JLE, BPF_REG_AX, uaddress_limit >> 32, 2);
+>>>> +			*patch++ = *insn;
+>>>> +			*patch++ = BPF_JMP_IMM(BPF_JA, 0, 0, 1);
+>>>> +			*patch++ = BPF_MOV64_IMM(insn->dst_reg, 0);
+>>>
+>>> But how does this address other cases where we could fault e.g. non-canonical,
+>>> vsyscall page, etc? Technically, we would have to call to copy_from_kernel_nofault_allowed()
+>>> to really address all the cases aside from the overflow (good catch btw!) where kernel
+>>> turns into user address.
+>> 
+>> So, we are trying to ~simulate a call to
+>> copy_from_kernel_nofault_allowed() here. If the address under
+>> consideration is below TASK_SIZE (TASK_SIZE + 4GB to be precise) then we
+>> skip that load because that address could be mapped by the user.
+>> 
+>> If the address is above TASK_SIZE + 4GB, we allow the load and it could
+>> cause a fault if the address is invalid, non-canonical etc. Taking the
+>> fault is fine because JIT will add an exception table entry for
+>> for that load with BPF_PBOBE_MEM.
+>
+> Are you sure? I don't think the kernel handles non-canonical fixup.
+
+Atleast for ARM64 for I don't see a differentiation between the handling
+of canonical and non-canonical addresses.
+do_translation_fault() checks if addr < TASK_SIZE and calls
+do_page_fault() or if the address is greater than TASK_SIZE (it is a
+kernel address), do_bad_area() is called.
+
+Both of these call __do_kernel_fault() if fault is from kernel mode and it
+does fixup_exception().
+
+>
+>> The vsyscall page is special, this approach skips all loads from this
+>> page. I am not sure if that is acceptable.
+>
+> The bpf_probe_read_kernel() does handle it fine via copy_from_kernel_nofault().
+bpf_probe_read_kernel() is skipping reading from the vsyscall page, that
+is what this patch does as well.
+
+ARM64, RISCV, and some other archs don't implement
+copy_from_kernel_nofault_allowed() so I think the we should fix the
+common case where the BPF program should not be allowed to access memory
+below TASK_SIZE. This would be true for all architectures. 
+
+>
+> So there is tail risk that BPF_PROBE_* could trigger a crash. Other archs might
+
+Can you explain this a bit more, how will BPF_PROBE_* trigger a crash?
+
+> have other quirks, e.g. in case of loongarch it says highest bit set means kernel
+> space.
+
+Thanks,
+Puranjay
 
