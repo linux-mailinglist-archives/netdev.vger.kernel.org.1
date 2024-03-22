@@ -1,209 +1,173 @@
-Return-Path: <netdev+bounces-81260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0471F886C28
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:33:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41D2A886C32
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:36:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD27F287747
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:33:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5D2F1F25A3E
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4C9D446BF;
-	Fri, 22 Mar 2024 12:33:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929BD40BE0;
+	Fri, 22 Mar 2024 12:35:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b="ikRakqPA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u/P+vTaH"
 X-Original-To: netdev@vger.kernel.org
-Received: from IND01-MAX-obe.outbound.protection.outlook.com (mail-maxind01olkn2109.outbound.protection.outlook.com [40.92.102.109])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 153DA446B4
-	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 12:33:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.102.109
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711110802; cv=fail; b=Yvu5L8XfFivwnkJO4nTLAP5QTy8kFnu0wQDxi3C5pGwKNz4XSONOnMZRwAuAozAHVUV+ufihaY53qoEQjDjQkWdP0rs80/lHcjOacQT4U85delgkOKddAqIuIPjxjsKtYTk1TzSiDcYikhWgXkeae65Wv3ny9m+vfMtZtRj47JM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711110802; c=relaxed/simple;
-	bh=3tMZ3ONwoo06esxoMRau84kojByTUgxR83zU9F1G8HY=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=LSsY7m9P7HVzfjahX+WUYq7KS/9LFmxkp4e2ygZd8tJDjVqbsIwgUyxnLp4pKCzVPXDn6eJByaP6j/KxU1FSadcQVgvHmfM3VPRiG2kmj+EeTHtq6XKMZa3G4qqIGOvypbHD2cJ/xsbi7MIUmVWEPaNoGgTps5mxLB7RktUpzoY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com; spf=pass smtp.mailfrom=hotmail.com; dkim=pass (2048-bit key) header.d=hotmail.com header.i=@hotmail.com header.b=ikRakqPA; arc=fail smtp.client-ip=40.92.102.109
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=hotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hotmail.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=aRZlhR2hg6YP5+R2BGoRnPpNlC6upB0d7kPmioDLDuObl0WG+KbhalkFxyzbkQ5Dh3K8CAasNE+EsgR79khwK/bDykJb4TZR7Rx3xr5OCQmPVRUMIdbqUKGdjNtNLsnjmxeaPfwyL0Xr7Y+4iK5BZnlrY409pD6I3FfLnieyjemLRQxySlUyImwkPoJAotJ4SYe8w4IpjmjqC2U+BZ4erB5FX0hVc43T+6A39bhy2vK3pR9jlnX3LHIgN10PoYQURXyqnrlJ6LueK/DVbgP4aFJS1ViX9KAa2+QnpZOKuJRw+QGJLUOHHTRCjRf8/Wz7E7CcNg1hJGcrHl1nHSvZ6A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QoEjGAg9RdyShnpJy5zbrEoyAKyhMisKUkxeF7cH2m4=;
- b=N0tc0QMSE5YegOXLv2ap3zjlbvRrxlBiUNG/L6nvTh5j5J2p8+xM9xps2ncdCpPlt1Em5MVF87hZQaiA1TBYp62y6SORzg7E+gHY4omFE4P5Dg+npEH6on57QRuS4jYve8oyv9grgBRgy0HI/6SVsN7SnLrRLY9oY9RO/LhY6cGfZSD+DUeVBbnlN+2OqmwaOTmSbzhxEcyeYhh7lsov3HW+bocsE0VhhHbXFQpTLLd+nDt4mpa+NW5LJHlw9B05eZTKkwJKWc+pbENp5OQXSSckXIdDqNwnSiTJ1cCC/6FfTmki77T/SJZcuSOLIsP3IE+UQx0M4tJdQy6wsNaugg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QoEjGAg9RdyShnpJy5zbrEoyAKyhMisKUkxeF7cH2m4=;
- b=ikRakqPAOkc1iJqpCUzjjrkr3GRcIbODKtE7YSQCs/oAY57oMaSZ12XG40HJBOZBbsYA50YIirya6LWykYZel9c8J5s4fWFLf/z7wT59rKQ+SRdZ/qBo9glNydOJ1qupPKkaNxk4n6/e/zdhA9K1cDqqEaJRrgw2tuTYtr1pVZvkrQ0aFSVl+DrkTqvHRnC9+dKEhQEyJxoo844j2VRF7AxQ0JDQrPV6x/9UKgy59XloZ/yPx31Zf+QzT1vUjOhrYDFUK1BVXY5HcZOhgOEMogxobd32U9ODokjV9TfvTMtXei1cHId7AuUq/71iNiNw9txfIvt6Wpy1NzRtYQ9Njg==
-Received: from MAZP287MB0503.INDP287.PROD.OUTLOOK.COM (2603:1096:a01:d3::8) by
- MA0P287MB2022.INDP287.PROD.OUTLOOK.COM (2603:1096:a01:123::6) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7409.23; Fri, 22 Mar 2024 12:33:14 +0000
-Received: from MAZP287MB0503.INDP287.PROD.OUTLOOK.COM
- ([fe80::be9c:e08:2db4:9a60]) by MAZP287MB0503.INDP287.PROD.OUTLOOK.COM
- ([fe80::be9c:e08:2db4:9a60%3]) with mapi id 15.20.7409.010; Fri, 22 Mar 2024
- 12:33:08 +0000
-Message-ID:
- <MAZP287MB0503ED9A05F83485CABD2513E4312@MAZP287MB0503.INDP287.PROD.OUTLOOK.COM>
-Date: Fri, 22 Mar 2024 20:33:06 +0800
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] bridge: vlan: fix compressvlans manpage and usage
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: roopa@nvidia.com, razor@blackwall.org, netdev@vger.kernel.org,
- bridge@lists.linux-foundation.org
-References: <MAZP287MB0503CBCF2FB4C165F0460D70E4312@MAZP287MB0503.INDP287.PROD.OUTLOOK.COM>
- <Zf1SH2ZVfBG6O2EE@nanopsycho>
-Content-Language: en-US
-From: Date Huang <tjjh89017@hotmail.com>
-In-Reply-To: <Zf1SH2ZVfBG6O2EE@nanopsycho>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TMN:
- [5odL/J55DusfiHBo8r9N7yFBotHUmJ+na7epajx+9+56rTr4BAkfcrim6a8KafeIbJU2KxzA1Ec=]
-X-ClientProxiedBy: SGXP274CA0004.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b8::16)
- To MAZP287MB0503.INDP287.PROD.OUTLOOK.COM (2603:1096:a01:d3::8)
-X-Microsoft-Original-Message-ID:
- <57e4a3b7-1aa1-4674-a84e-3f88b64b63f4@hotmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 590322F844;
+	Fri, 22 Mar 2024 12:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711110950; cv=none; b=GBP633D0mUZBXJU15Rmcqqhx/W2pjsmbXvAv0HZGaztR27kFnDhBXzmDfrIuCNFIuhWoSk/5ZT+Cq5wiroukp3q6gmcAf7gX3xWXHWPeb5tiVpd+gid3H8FAAc7RyjSFkFNwdDXQeDcll6lkW9kILu2xjkaSbLihLVSFoN1tDUo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711110950; c=relaxed/simple;
+	bh=DIU/riHW7d/Q828EtRoJMXqE8kp8ZnSjYwedK5XPRbA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=W7C3pUp6GAb9CYmMtAcJX3YTiXoXZGay86lpN+DotnckeUPvFCOobBi56peNtzZK6xovrxfd8sK07z+M5KyI8cGQAsXSr6RF4gCm7DJ/pVAd9tncs98ynRovyFLyM6hx368SXdS7trCr1RZ4oN5BJ/ltgZjGmngm0evi5df0cCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u/P+vTaH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5AF17C433F1;
+	Fri, 22 Mar 2024 12:35:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711110949;
+	bh=DIU/riHW7d/Q828EtRoJMXqE8kp8ZnSjYwedK5XPRbA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=u/P+vTaHBL1Qwg9rMUybG08tJuaCL6vcumDRR7PHiRZWZa0Ku+VsguA6Jz/oYwY/Y
+	 qNNIoY2JogVZ1Ih34hgni6rT+X0sJF9I3IoX44804pCZ7LbSe3umt2A5+eqqmmLAiM
+	 AUmjdLAmJGbLoBKHalDymv2gFjrcc/2aEUdPpgJpY2wEqv2Rq7FOxNtzSv0t8bS7cC
+	 AncIoFdtkl1HZmLT46qeG+GrUD80IwC58ceIku1ALmyCFxfPw6P6JRGyzbAMvlCjWC
+	 97XsAbbG1AQeTTAN6L4XZNUyXSmtZnEbDSZ33HwDvGBjmNtvCJ428TANpIUMF1rXwd
+	 Z9ItmEWNNiCQQ==
+From: Jarkko Sakkinen <jarkko@kernel.org>
+To: linux-integrity@vger.kernel.org
+Cc: Jarkko Sakkinen <jarkko@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	"Daniel P . Smith" <dpsmith@apertussolutions.com>,
+	Lino Sanfilippo <l.sanfilippo@kunbus.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Peter Huewe <peterhuewe@gmx.de>,
+	James Bottomley <James.Bottomley@HansenPartnership.com>,
+	Alexander Steffen <Alexander.Steffen@infineon.com>,
+	keyrings@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Randy Dunlap <rdunlap@infradead.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	netdev@vger.kernel.org (open list:PTP HARDWARE CLOCK SUPPORT:Keyword:(?:\b|_)ptp(?:\b|_))
+Subject: [PATCH v4] Documentation: tpm_tis
+Date: Fri, 22 Mar 2024 14:35:36 +0200
+Message-ID: <20240322123542.24158-1-jarkko@kernel.org>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MAZP287MB0503:EE_|MA0P287MB2022:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5c9975c8-d758-4f4e-711e-08dc4a6c3a9e
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	s6ovRZVWG9N+VuhHoNPIoZDkcCAJ1KzekqdtVNUQmss+Q9R9VLu0QinKfVcK4084/Z8JGJdmNP3cblKbkUKBN1+X6dNiUdVB2CEOTUo23sacPKtqlij7F+MnXlIvMPc9btbpLkREzqaO+mkf/QhtM7NB5r5R7+a4EVXIE++L5lKffKx0TqTeKQ+j5Bl28X28OFrEXvnNlOvb0hF/9twk5kvPWCuEIXXAVhwJutJIBpikGmnPmrDWF6gZ7Fi+eOfiMkzc/AJI2zDEJALT+xw+zG+8StwgViMwxmRxNyrisH9Dn0Z0LxWMsACIxgzSwXPrnPalnQAyUDyV4zvNfgwYr4XOksCAaFjGZ8HFHqY2A6QbXj2a5MxqMcUnCEY4Ezwj5AS0W9Y+1Yoy6mj1wZpbZSSHd6+WqzKmzsXrHzNhI6iOFZ9xMirycsMKgv+V8LZ1YFsKbh90hIXYGHr7QKQejkDHeKFaF75AWiHomMzN2+QfczTOFgK+I/4HVtQsk85e0LlR4QI+v+pgzD1MhmHUodifrthJeeHxOf/yGNpKs/j65oOW/jOsZpSPn2Rua5qz
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OUw2U0g2WlF6RDBQUGRVUlBPcXd4S2VFbDQzOHZ3TzRlSVZXOVd4cUVNRW05?=
- =?utf-8?B?NUFkaXZFS0dPd0NrSDNnZyt3cUVVRk1FZ1NrWkZVL3NKMmNEbDZ5Z2E2WFJ2?=
- =?utf-8?B?TUw2OXYvbTVoeFpFUVIzajFQbDJYRWY4d214cGpyVWxlTEUxeXYySFhQWVkv?=
- =?utf-8?B?YytUOGVzLytmWVFGWG5CNmdJZWRGMGxESTJCaEJlMHUyNkRtSUNDeUd4cHFs?=
- =?utf-8?B?cEVSbkVZZmpldEhLU05HbHJFa25jWWR5MGJWYzBOWlJjQTlLNDZNS2VTOGEv?=
- =?utf-8?B?OWt3a1pDbXlYaVFXRHJmTVZLd2xUL2VLcUhOZC9rYUV2aFJDYUd4YWVZMW9h?=
- =?utf-8?B?YS9seXhFcEppZ2JMdG5VUUFab0I5L0UxcFRqdkZNVmJsSXVSblYzLzN2Ni9U?=
- =?utf-8?B?QUEreDlITU4yOUZWME0yVkc3V3dXc1pyQkVNY000ZHdpc2dWSkg5ZjNaZFBm?=
- =?utf-8?B?UExuNkx4bkE5SHlXQTlvWTVZU3dWOHdqSXpxajZQTlFVb3NTNlhwNlJjUzhr?=
- =?utf-8?B?Y1A1YTVzVkdUM05TVHpuSU9tV21mS3EvTTdWcjUzL3dDV3drL282VTNuaUY0?=
- =?utf-8?B?ZXBqM2E5YmgzN295VHJEQ2VLZDNCNFV0RkFqeTlyWFZBZm5XY05jUVR6S21G?=
- =?utf-8?B?QTZXU25DWDVHL042VXNVL0VUOWViTjJ6b1hYWllKdVRjTmlaRFlEa3lDTis5?=
- =?utf-8?B?bmxOVW1QTDhQVzdDb24ycTdPOUx3Y0g2Nk53Y25oM1FMc0VZNmowZy9KSVlT?=
- =?utf-8?B?N3lZby96WllGaUVUZ3hib25tRU5tcFBDQlBuV2o0bnkvTEVNRnIvcmlUOURt?=
- =?utf-8?B?MENtb1R1NEdvKzhnR29WVmNraUJQa0xJUnZ0eXJkR25Ed1RiMkNreGtTb1ox?=
- =?utf-8?B?NmJuNWl4VWtEcHo1ckY5Yk82bDNmR0Z2NUJ3eUwxaGtOTjNCZGVpS1o2TkND?=
- =?utf-8?B?NVRJVXJVK3NpdDhFTWNRK1o5SFRFY1lWdWRnY05sTklxLzJYL1RyU05rcmVk?=
- =?utf-8?B?TEovUGhhaWJwclM3TG43MEpoNUxXNkxpNVhjZHNSTWlxTFlwMjlHTDJYTWpF?=
- =?utf-8?B?Nkxuc1E1ajhPMG5jYmQxTFV3STN6c1lyK1pBT2hlZGVza1ZmazVvODFnMlFp?=
- =?utf-8?B?S3JuV1duWExRbE9SUWJ1SHFpS0M2L2MxQU0reVBEaWRnUno5SGdTdzhFMFRx?=
- =?utf-8?B?L0V5MGFVWjhJaWgrcTlPUDcwd2ZpR3NmYmwwMEwwU1l0ZzJRL0lqd20xaXRH?=
- =?utf-8?B?ZHgwSnZ3K0pScXQ2OVFpcG45WUlJbCtYYnQ4VWljS2w4bVRVejlZcTZKVXNw?=
- =?utf-8?B?N0Q4Y0VOTnNDZUJOZEllcmVmeENGTUNEaC9DSHFySHZGSTlWZXNXekl5ZEVy?=
- =?utf-8?B?V2FwRmZKak9INVhuVm56ZUJkZVNRTEh3WmRYcXZOaFN6YUhxNEZHTm9WdXp1?=
- =?utf-8?B?VGplQ20wc2lPQi9FMUY3S3RlT0VUQS85VU5OU3RzTldIUnlvN0FIZWk4NURU?=
- =?utf-8?B?U0FXTllDUUZJV05ESEVSdUFUNjJoc0tYOUxraWlaakVNbTQxd25IVjdXN1h5?=
- =?utf-8?B?Nk5HWlRtM0h5R2s0ekZOQ0FWMjVnQ2xjZ09oUjNTcHU2Ni9qYWsyVlFzdWhY?=
- =?utf-8?B?R09TZEUzOEdma2o3TnJVbHl0RDhrWVlNcmgrbUZ1SVRTWllIMjJmdnExZ0pp?=
- =?utf-8?B?RUYxdG84TlNJbWZtT1VxVGx3M2dCVDhROFFSdXZLNzB0YkhudjJkdldJbzNp?=
- =?utf-8?Q?FS2ksH2S5IhXQm0juYRvBZ+OU9OE7DdQtZYXIBp?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-bafef.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5c9975c8-d758-4f4e-711e-08dc4a6c3a9e
-X-MS-Exchange-CrossTenant-AuthSource: MAZP287MB0503.INDP287.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Mar 2024 12:33:08.3107
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MA0P287MB2022
+Content-Transfer-Encoding: 8bit
 
-Hi Jiri
+Based recent discussions on LKML, provide preliminary bits of tpm_tis_core
+dependent drivers. Includes only bare essentials but can be extended later
+on case by case. This way some people may even want to read it later on.
 
-On 3/22/2024 5:40 PM, Jiri Pirko wrote:
-> Fri, Mar 22, 2024 at 09:56:29AM CET, tjjh89017@hotmail.com wrote:
->> Add the missing 'compressvlans' to man page.
->> Fix the incorrect short opt for compressvlans and color
->> in usage.
-> 
-> Split to 2 patches please.
-> 
-> Please fix your prefix to be in format "[patch iproute2-next] xxx"
-> to properly indicate the target project and tree.
+Cc: Jonathan Corbet <corbet@lwn.net>
+CC: Daniel P. Smith <dpsmith@apertussolutions.com>
+Cc: Lino Sanfilippo <l.sanfilippo@kunbus.com>
+Cc: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Peter Huewe <peterhuewe@gmx.de>
+Cc: James Bottomley <James.Bottomley@HansenPartnership.com>
+Cc: Alexander Steffen <Alexander.Steffen@infineon.com>
+Cc: keyrings@vger.kernel.org
+Cc: linux-doc@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-integrity@vger.kernel.org
+Cc: Randy Dunlap <rdunlap@infradead.org>
+Signed-off-by: Jarkko Sakkinen <jarkko@kernel.org>
+---
+v4:
+- Extended the text to address some of Stefan's concerns with v2.
+- Had to unfortunately remove Randy's reviewed-by because of this, given
+  the amount of text added.
+v3:
+- Fixed incorrect buffer size:
+  https://lore.kernel.org/linux-integrity/d957dbd3-4975-48d7-abc5-1a01c0959ea3@linux.ibm.com/
+v2:
+- Fixed errors reported by Randy:
+  https://lore.kernel.org/all/aed28265-d677-491a-a045-24b351854b24@infradead.org/
+- Improved the text a bit to have a better presentation.
+---
+ Documentation/security/tpm/index.rst   |  1 +
+ Documentation/security/tpm/tpm_tis.rst | 46 ++++++++++++++++++++++++++
+ 2 files changed, 47 insertions(+)
+ create mode 100644 Documentation/security/tpm/tpm_tis.rst
 
-Thank you, I will update this in v2.
+diff --git a/Documentation/security/tpm/index.rst b/Documentation/security/tpm/index.rst
+index fc40e9f23c85..f27a17f60a96 100644
+--- a/Documentation/security/tpm/index.rst
++++ b/Documentation/security/tpm/index.rst
+@@ -5,6 +5,7 @@ Trusted Platform Module documentation
+ .. toctree::
+ 
+    tpm_event_log
++   tpm_tis
+    tpm_vtpm_proxy
+    xen-tpmfront
+    tpm_ftpm_tee
+diff --git a/Documentation/security/tpm/tpm_tis.rst b/Documentation/security/tpm/tpm_tis.rst
+new file mode 100644
+index 000000000000..b448ea3db71d
+--- /dev/null
++++ b/Documentation/security/tpm/tpm_tis.rst
+@@ -0,0 +1,46 @@
++.. SPDX-License-Identifier: GPL-2.0
++
++=========================
++TPM FIFO interface driver
++=========================
++
++TCG PTP Specification defines two interface types: FIFO and CRB. The former is
++based on sequenced read and write operations,  and the latter is based on a
++buffer containing the full command or response.
++
++FIFO (First-In-First-Out) interface is used by the tpm_tis_core dependent
++drivers. Originally Linux had only a driver called tpm_tis, which covered
++memory mapped (aka MMIO) interface but it was later on extended to cover other
++physical interfaces supported by the TCG standard.
++
++For legacy compliance the original MMIO driver is called tpm_tis and the
++framework for FIFO drivers is named as tpm_tis_core. The postfix "tis" in
++tpm_tis comes from the TPM Interface Specification, which is the hardware
++interface specification for TPM 1.x chips.
++
++Communication is based on a 20 KiB buffer shared by the TPM chip through a
++hardware bus or memory map, depending on the physical wiring. The buffer is
++further split into five equal-size 4 KiB buffers, which provide equivalent
++sets of registers for communication between the CPU and TPM. These
++communication endpoints are called localities in the TCG terminology.
++
++When the kernel wants to send commands to the TPM chip, it first reserves
++locality 0 by setting the requestUse bit in the TPM_ACCESS register. The bit is
++cleared by the chip when the access is granted. Once it completes its
++communication, the kernel writes the TPM_ACCESS.activeLocality bit. This
++informs the chip that the locality has been relinquished.
++
++Pending localities are served in order by the chip in descending order, one at
++a time:
++
++- Locality 0 has the lowest priority.
++- Locality 5 has the highest priority.
++
++Further information on the purpose and meaning of the localities can be found
++in section 3.2 of the TCG PC Client Platform TPM Profile Specification.
++
++References
++==========
++
++TCG PC Client Platform TPM Profile (PTP) Specification
++https://trustedcomputinggroup.org/resource/pc-client-platform-tpm-profile-ptp-specification/
+-- 
+2.43.0
 
-> 
-> 
->>
->> Signed-off-by: Date Huang <tjjh89017@hotmail.com>
->> ---
->> bridge/bridge.c   | 2 +-
->> man/man8/bridge.8 | 5 +++++
->> 2 files changed, 6 insertions(+), 1 deletion(-)
->>
->> diff --git a/bridge/bridge.c b/bridge/bridge.c
->> index f4805092..345f5b5f 100644
->> --- a/bridge/bridge.c
->> +++ b/bridge/bridge.c
->> @@ -39,7 +39,7 @@ static void usage(void)
->> "where  OBJECT := { link | fdb | mdb | vlan | vni | monitor }\n"
->> "       OPTIONS := { -V[ersion] | -s[tatistics] | -d[etails] |\n"
->> "                    -o[neline] | -t[imestamp] | -n[etns] name |\n"
->> -"                    -c[ompressvlans] -color -p[retty] -j[son] }\n");
->> +"                    -compressvlans -c[olor] -p[retty] -j[son] }\n");
-> 
->  From how I read the code, shouldn't this be rather:
->    "                    -com[pressvlans] -c[olor] -p[retty] -j[son] }\n");
-> ?
-
-Agree with you, I will update it in v2.
-
-> 
->> 	exit(-1);
->> }
->>
->> diff --git a/man/man8/bridge.8 b/man/man8/bridge.8
->> index eeea4073..9a023227 100644
->> --- a/man/man8/bridge.8
->> +++ b/man/man8/bridge.8
->> @@ -22,6 +22,7 @@ bridge \- show / manipulate bridge addresses and devices
->> \fB\-s\fR[\fItatistics\fR] |
->> \fB\-n\fR[\fIetns\fR] name |
->> \fB\-b\fR[\fIatch\fR] filename |
->> +\fB\-compressvlans |
->> \fB\-c\fR[\fIolor\fR] |
->> \fB\-p\fR[\fIretty\fR] |
->> \fB\-j\fR[\fIson\fR] |
->> @@ -345,6 +346,10 @@ Don't terminate bridge command on errors in batch mode.
->> If there were any errors during execution of the commands, the application
->> return code will be non zero.
->>
->> +.TP
->> +.BR \-compressvlans
->> +Show compressed vlan list
->> +
->> .TP
->> .BR \-c [ color ][ = { always | auto | never }
->> Configure color output. If parameter is omitted or
->> -- 
->> 2.34.1
->>
->>
-
-Thanks,
-Date
 
