@@ -1,99 +1,126 @@
-Return-Path: <netdev+bounces-81274-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81275-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2578E886C6F
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:57:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8EE2886C77
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 13:58:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C261C1F22AD7
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:57:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A348C287272
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 12:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 837C0446D6;
-	Fri, 22 Mar 2024 12:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC30B45C16;
+	Fri, 22 Mar 2024 12:58:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mYOnqs3X"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="xcPlWOWU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5585F20DDB;
-	Fri, 22 Mar 2024 12:57:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2140845BF3
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 12:58:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711112252; cv=none; b=eo3gtzWbc+3CGWl9hwH80+zNC7Eny8XskvDLHpXXuqPlmTwXiviZXvjeN5YcZk1hQgLJUoRoHVNfBqP6UjM2gFcdPiKaQzQAI2lJzYT6Y3dHVsKY5Y/8zYb/LFpWIU4x6qLzSSSpESNT6/398EMbFte7dfjRcjcYgykosCXEM4s=
+	t=1711112309; cv=none; b=HDSeZbO1zYSvG1qxvVnRZrOg3PfVU/cyHBeYEwneIxhYsXObGvUOBzLVZ6OfVIr3CwGn3KywyXbSdNWlWZjO/WUT1fpiYpfSMCbHFAFU39lnrDrpFdcGuiQhxls3LvME71UZ2EKUWUKdrr5d+XDff5fcHH73oLuV8SaGYI59V9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711112252; c=relaxed/simple;
-	bh=vi6qepP3WZqihtomx/Ad9yWtRNe/QyPnUUouWN8vfoc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=K+Xx9z95nP8yTKu7kPKX1rTzd8Qyh6dGfYZdDZL5p4ME5nvjV40BzPAxf2WoXMCR1r4xWOJU7ZdYV29OpfSciCcepSLWpRtF/7H+AWR/pucz4e2dzLtIX4DMQbApmnJnqbmpZcP/qLhKXQb+dvoStgJ6Y8C8aAq6ChXCAPJOEe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mYOnqs3X; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C3C3C433F1;
-	Fri, 22 Mar 2024 12:57:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711112251;
-	bh=vi6qepP3WZqihtomx/Ad9yWtRNe/QyPnUUouWN8vfoc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=mYOnqs3XbPZ567x2XcqYUCB8z7YM6n71i0LA+G1lsomcgE09dZnAsQ5/jnVOTis/+
-	 RPvyII8VqC0yle9uD7ZI419zJtCNjPgh2PUXSiKJa6Ta6yS7/N3S6qkotXWZpmYiaz
-	 ppB5rTjd2bgLZ0m95ihhxh1d4FPmSMv95QhZaPRoxFx9kfF/ZQNmP/sejCpxpxZTKH
-	 Ma1dDeNOZD/KjfsULlkpWSYR7ICpajzsaCRnPE6iAFhSyZzf5lcP9KnPGqq1J9QFaF
-	 lFRUdJHIeZy5ZsdhHsNZBIgz0JCqnnWZKZ2v1ra6cd3Grj9LXoI4gMoFBUQoNJv0Ak
-	 YtYq2gOuwo3Qg==
-Date: Fri, 22 Mar 2024 12:57:27 +0000
-From: Simon Horman <horms@kernel.org>
-To: Dan Carpenter <dan.carpenter@linaro.org>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH v2 net] ice: Fix freeing uninitialized pointers
-Message-ID: <20240322125727.GE372561@kernel.org>
-References: <0efe132b-b343-4438-bb00-5a4b82722ed3@moroto.mountain>
+	s=arc-20240116; t=1711112309; c=relaxed/simple;
+	bh=qdq2a6bQB4zLF5y7rJfn6/zbx1ScX1p7uoT1aN+8DbU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=UASwi17P4CxnUmqEfnY/7LPFaaLrDZKPkutyufWsU1ILj2g7HczjS3SWNAcEPZWePHZHXxJ/DAkgyfLIMqLHinxJKbzyBpRpUFIOD5+u4vcK8ng7M88gKhNsowehq2pbZm+1KI2yaqopKyAtQttryaW+aXAtEsNEb9KPhrXlGzw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=xcPlWOWU; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-55a179f5fa1so2925252a12.0
+        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 05:58:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1711112306; x=1711717106; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=8LUGwsxLnMUWkae2CSge+OitZs3lt/HylfNAJOAD4fw=;
+        b=xcPlWOWUwMyfNjmr91ZsOJW2Ja3Ov4WqRWh//6Lw95DdwJXYZMB7JlWeIQr66myALl
+         c1J9PqqLjEP0GpAvTG4pFMDd46B0s9vspXgJwns6Dus7dXeH2cN1Pcw5Gr2lLo9TpDNc
+         wVs8bAcpphYzXW2sS05CmgoXrKqt1lGTVAyX39WAzZMyjTMC4s8vEe+j+yKaxMP4hXZF
+         MhtTeTQQUgHw399lw8J2wx9Mv6y24zjovU6pzKMAh20RdH/SghVdK3nQP4gnJzzG5RAM
+         x7y2TvWi4agGsb4eD2Bo3i1UNfpfQDMmqO79UPnvaYSKoAHgzaubfEWT7KGNp5qaeUpe
+         92jA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711112306; x=1711717106;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8LUGwsxLnMUWkae2CSge+OitZs3lt/HylfNAJOAD4fw=;
+        b=M4bHJ3r4gP/rlIk4uVx3ndI4jpL3Fk5GmaSe2ATQWe4/wzHVfsNq8TwXBBGfzBJVyF
+         VCEcD4gFCxSnVNi08XOTIHIgisp7eNGTslavsfrawp14xwxl+54Kr/DCjjKwYRXPbBEm
+         6eVyU5J41mXIyls/MxkEuhOuvliIq/Xjrg3+T702K52Dc0+7mIdgWpjIr7rxJZ47/Mic
+         zZgb6X/yubB3/6E5ZDK7Xia3JxI8A1WGyoaWzycCfXVjc8BgF3N9rOfnshHQsGuUfXTk
+         a/LLHkWTq0LbKGgq3Ud4s783u9MLkQSIdlX3IRFdKzuFoVRgdpQMHdiXKIXo3ylXn6R5
+         u9XQ==
+X-Gm-Message-State: AOJu0YwwqBlyMH1CiVk3ly9vrFlSigkqjTVASlFIcq9mw4ngnZ+Ckav+
+	LEZQPeHj+7tZtbxqPAwNcI93sZok0eYGFn380Auqn8VBLMUlI5QZoJ2MXjtIX9TZB6ciEY+EBve
+	B
+X-Google-Smtp-Source: AGHT+IFnlm+CULBYCrQvbVt0F/cdsUUhs/GbNE4xpUZg9du+9T7Z6vJNQjzykH1gIhhv//3ZXzIDwQ==
+X-Received: by 2002:a17:906:340c:b0:a47:1d03:f37a with SMTP id c12-20020a170906340c00b00a471d03f37amr1785429ejb.47.1711112306339;
+        Fri, 22 Mar 2024 05:58:26 -0700 (PDT)
+Received: from [192.168.0.106] (176.111.182.227.kyiv.volia.net. [176.111.182.227])
+        by smtp.gmail.com with ESMTPSA id e9-20020a170906c00900b00a4737dbff13sm229585ejz.3.2024.03.22.05.58.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 22 Mar 2024 05:58:25 -0700 (PDT)
+Message-ID: <95e8aab3-88cd-4120-a246-fd3589ff59ba@blackwall.org>
+Date: Fri, 22 Mar 2024 14:58:25 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <0efe132b-b343-4438-bb00-5a4b82722ed3@moroto.mountain>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next v2 0/2] bridge: vlan: add compressvlans
+ manpage
+Content-Language: en-US
+To: Date Huang <tjjh89017@hotmail.com>, roopa@nvidia.com, jiri@resnulli.us
+Cc: netdev@vger.kernel.org, bridge@lists.linux-foundation.org
+References: <MAZP287MB05039AA2ECF8022DD501D4BCE4312@MAZP287MB0503.INDP287.PROD.OUTLOOK.COM>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <MAZP287MB05039AA2ECF8022DD501D4BCE4312@MAZP287MB0503.INDP287.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Mar 21, 2024 at 05:42:12PM +0300, Dan Carpenter wrote:
-> Automatically cleaned up pointers need to be initialized before exiting
-> their scope.  In this case, they need to be initialized to NULL before
-> any return statement.
+On 3/22/24 14:39, Date Huang wrote:
+> Hi maintainers
 > 
-> Fixes: 90f821d72e11 ("ice: avoid unnecessary devm_ usage")
-> Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
-> ---
-> v2: I missed a couple pointers in v1.
+> I followed Nikolay and Jiri's comment and updated the patch to v2.
+> Please check it.
 > 
-> The change to ice_update_link_info() isn't required because it's
-> assigned on the very next line...  But I did that because it's harmless
-> and makes __free() stuff easier to verify.  I felt like moving the
-> declarations into the code would be controversial and it also ends up
-> making the lines really long.
+
+Your cover letter should contain an overview of what the set is doing.
+
+> Date Huang (2):
+>    bridge: vlan: fix compressvlans usage
+>    bridge: vlan: add compressvlans manpage
 > 
-> 		goto goto err_unroll_sched;
+>   bridge/bridge.c   | 2 +-
+>   man/man8/bridge.8 | 6 ++++++
+>   2 files changed, 7 insertions(+), 1 deletion(-)
 > 
-> 	struct ice_aqc_get_phy_caps_data *pcaps __free(kfree) =
-> 		kzalloc(sizeof(*pcaps), GFP_KERNEL);
 
-Thanks Dan,
+Generally it is good to give people time to review and wait at least
+24 hours before reposting another version. Also please write the
+changes between versions, something like:
 
-I agree with the approach you have taken here.
+v3: ...
+v2: split the patch into two separate patches
+     changed the option in patch 01
+     changed the man page description in patch 02
 
-And I apologise that it's quite likely that I skipped warnings regarding
-these problems when reviewing patches that introduced them - I did not
-understand the issue that this patch resolves.
+Keep the history from previous postings. Also you can note what changed
+in each individual patch for the version under the first ---, for 
+example for patch 02:
+---
+v2: changed the man page description
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+Cheers,
+  Nik
+
 
