@@ -1,98 +1,84 @@
-Return-Path: <netdev+bounces-81149-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81150-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2856B8864DB
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 02:39:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65B698864DE
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 02:40:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFB5F28332A
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 01:39:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6012B2299C
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 01:40:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8EC410FA;
-	Fri, 22 Mar 2024 01:39:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAAAD65C;
+	Fri, 22 Mar 2024 01:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="a4N9YfKS"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PECmN9yZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE3665C;
-	Fri, 22 Mar 2024 01:39:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4056D10E6
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 01:40:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711071588; cv=none; b=c/RlmPCf9hq0QXE4qhb3kC/8H7bn0eIj0ko7sI1eouN/LZDUG76mTab2JV9k7Ed45uj30VYq/MPkefL9V4sX74yxTrzTp2uDwZ34PnojP6SLLce2yZ2VBh0BcVS6Oss/rJ5VCDMSWh7JgjtC3DEvDZXmFyGR+Xds4tEkxb2heYw=
+	t=1711071605; cv=none; b=c0YgQj/CHWwaIUlYdxyDtxxzOHAcRykEabliEMxVTYdNHGZdFev/7RhTckJdlvG00L4ISfpgq/C++kjjf48Z/54RzlaOPHOrEwm86lQTsaNfHRc43fDluzBl8h3WubY9BFrDlOOoMphy8TT8E/oRb0KxudUPb6k8TPa0QA2wRvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711071588; c=relaxed/simple;
-	bh=Ci83oNfPdQPjt/Qc0YrD0Nwu4bs0yCyv1L2fuvgDdVY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SzGeQFzaJH7dLuu4gqnfFxmXzRFqP3CT2xx2Sz/935P8UO/naeWizBZuj+8EOrrasG+IX9EdoX8+stAzB6tb95fppsJzSEkeR+DJCrr6Ye1xZIeOw8XUjlt6+C8Tfy9p4xW3YNWKPXWFknOfmlouqKwJLrXoou4F8ctCgqJRX0Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=a4N9YfKS; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711071583; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=po3aBGMuRH/3JxdDPn9VskA6LLyQZSnOhsGvbug9sUo=;
-	b=a4N9YfKSW5uRD1McgVTo5P6QtSB4DBMl/EYLiGW9xVIZCNI9kYSQp7QW9jeCYd3NWJEAR5RllZcdNoJS1gnGeCdoVcCGNBHf68SfiQleS5px4RA86HWlzU4E6AWuKCOTnBz/IqIe4tdk2tKKmqPNo3mVtZfnJUfvlyfXkSsIvls=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R141e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=18;SR=0;TI=SMTPD_---0W307.QH_1711071581;
-Received: from 30.221.130.60(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W307.QH_1711071581)
-          by smtp.aliyun-inc.com;
-          Fri, 22 Mar 2024 09:39:42 +0800
-Message-ID: <d42c7545-4ff4-4337-9489-d9d757eee007@linux.alibaba.com>
-Date: Fri, 22 Mar 2024 09:39:41 +0800
+	s=arc-20240116; t=1711071605; c=relaxed/simple;
+	bh=FSw3je7gaoFVnx+4DXXiieRmGA2ZMVa24Naitm+peao=;
+	h=Message-ID:Date:MIME-Version:From:To:Subject:Cc:Content-Type; b=LkH1a2/R9GIuWMwT83ftm8JomOWMM3jSJhR823COc9FC9lclOrY6mFS2E2rkzdA6WWO433FbRtVWG72Uk8dtdM/wWI/D5jDpJeY/vqFbWsUHyL8/ThP5o7Kzx4afjzM+FyhmjAIEG2Gbz9JklOhz/YT6yRW+NGjt0tw1Zk2JAy0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PECmN9yZ; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <0edaead1-b20b-4222-9ed5-4347efcebbc2@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1711071600;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=IBq5836/mNksjwZnEwNG8ApcvfYSLR1dBN58rdXkk8A=;
+	b=PECmN9yZbBuAfHVOA+DvySPZtJgXsWaoo1ztmSKRq0tm8cENUU9N2oCUQA0U44KwpEiZol
+	mP2FaJ5cEOxibS4t3XcKpb7VjWarq6zTWT3gulSoE/OzsaITi8PMr0QMrQRNmQMWYNv7EL
+	oAYnjMlEVg6D36lcbpBDtgyvJwVwxck=
+Date: Thu, 21 Mar 2024 18:39:53 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net-next v4 04/11] net/smc: implement some unsupported
- operations of loopback-ism
-To: Jan Karcher <jaka@linux.ibm.com>, wintera@linux.ibm.com,
- twinkler@linux.ibm.com, hca@linux.ibm.com, gor@linux.ibm.com,
- agordeev@linux.ibm.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, wenjia@linux.ibm.com
-Cc: borntraeger@linux.ibm.com, svens@linux.ibm.com,
- alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20240317100545.96663-1-guwen@linux.alibaba.com>
- <20240317100545.96663-5-guwen@linux.alibaba.com>
- <f9bfbc0f-7cfc-47c0-b06c-23ee3e70a420@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <f9bfbc0f-7cfc-47c0-b06c-23ee3e70a420@linux.ibm.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Subject: BUG? flaky "migrate_reuseport/IPv4 TCP_NEW_SYN_RECV
+ reqsk_timer_handler" test
+Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>,
+ Kuniyuki Iwashima <kuni1840@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
+Hi Kuniyuki,
 
+The bpf CI has recently hit failure in the "migrate_reuseport/IPv4 
+TCP_NEW_SYN_RECV" test. It does not always fail but becomes more flaky recently:
+https://github.com/kernel-patches/bpf/actions/runs/8354884067/job/22869153115
 
-On 2024/3/21 16:12, Jan Karcher wrote:
-> 
-> 
-> On 17/03/2024 11:05, Wen Gu wrote:
->> vlan operations are not supported currently since the need for vlan in
->> loopback-ism situation does not seem to be strong.
->>
->> signal_event operation is not supported since no event now needs to be
->> processed by loopback-ism device.
-> 
-> Hi Wen Gu,
-> 
-> Could we re-phrase this commit message please? I had some trouble reading it. Maybe something along:
-> 
-> Operations that loopback-ism does not support currently:
-> - vlan operations, since there is no strong use-case for it
-> - signal_event operations, since there are no events to be processed
->      by the loopback-ism device.
-> 
-> Thanks
-> - Jan
-> 
->>
->> Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
+It could be due to some slowness in the bpf CI environment but failing because 
+of environment slowness is still not expected.
 
-OK, it will be improved as you suggested. Thanks!
+I took a very quick look. It seems like the test depends on the firing of the 
+timer's handler "reqsk_timer_handler()", so there is a sleep(1) in the test.
+May be the timer fired slower and the test failed? If that is the case, it may 
+help to directly trace the reqsk_timer_handler() and wait for enough time to 
+ensure it is called.
+
+This test has been temporarily disabled for now 
+(https://github.com/kernel-patches/vmtest/blob/master/ci/vmtest/configs/DENYLIST). 
+Once you have a fix, we can re-enable it again to ensure this migrate feature 
+will not regress.
+
+Thanks,
+Martin
 
