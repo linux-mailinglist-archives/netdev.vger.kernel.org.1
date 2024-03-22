@@ -1,71 +1,60 @@
-Return-Path: <netdev+bounces-81343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2954A8874DF
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 23:40:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CCB98874E3
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 23:43:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B5F08B21AD1
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 22:40:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 111E92830DA
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 22:43:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B8CA823DB;
-	Fri, 22 Mar 2024 22:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44D8082885;
+	Fri, 22 Mar 2024 22:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AswFhRNY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ROSxjC4G"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D546F1CD00;
-	Fri, 22 Mar 2024 22:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AB7881740;
+	Fri, 22 Mar 2024 22:43:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711147229; cv=none; b=TfvyFE/DDTxmG60UkMUoAh9XER0kmE8uh2txlMAWyZJFg83FfHUHfGQcFYrqGxsN0auRpgDYeq3cw8ZiSYYBqZ8jymNzBlb9lgzNf5JKeBwH+bTSaX/8XARP5DKzRAW+nGFN7QskZ3g7LFoig1hPN8pca9uHpyQpI8hjQJH61A0=
+	t=1711147419; cv=none; b=YqXVxquRofCS2/D5cDG0DNQLoD1Fmpx0tu9/ynetO5lJEeXGbiR21k09wx8kDXLGmQGlmaq1mfSNAtnM2nlhSLjV/SMm2A9x5ykGfgKgcrcVXyT05W5mrXr7726nYqXYbpgbEQcz0D5O16t4HMyYdcQYzaOxtLhaYJsS2TwxYiQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711147229; c=relaxed/simple;
-	bh=HE4o6Ei+IAibzVmwUO2PTyjRZtSjmEv+wCxxrI6+tGs=;
+	s=arc-20240116; t=1711147419; c=relaxed/simple;
+	bh=aN/sBseW/A42djcc7C5Ic5yAvi5gLg7pYn4+yQh8174=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aCEaV1ADSrgCOebHqHbtR6R215FaGqzC01Y28vCQa9iF3vV0aNzodoelHhWCwtenW/EQPf21MjHk9va4H5k7yq/eUas3mEIHZMjXNKXi6XcBdYssbiKgAyaRaNkXAihOlxgwG7JvgpXUkie/Trja7qvPd86xEoroDP6DyQpKsUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AswFhRNY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2945C433F1;
-	Fri, 22 Mar 2024 22:40:28 +0000 (UTC)
+	 MIME-Version:Content-Type; b=RrS5kyS0Wxco4YShG0BLZxaX7oXhI2aMB/7zDUE2MsdLRcIiv6nRaHQ/6mHpXJaembxnuBTC3Dfi/o974i0WO4zSY+iRAoOHadT81degfCtIxe9bDyVYNrkaEFST/u7o4SAterLPH8GQLbMjWCPK8aVb+IS65ChpqgzTkKFkNkc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ROSxjC4G; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E3DBC433C7;
+	Fri, 22 Mar 2024 22:43:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711147229;
-	bh=HE4o6Ei+IAibzVmwUO2PTyjRZtSjmEv+wCxxrI6+tGs=;
+	s=k20201202; t=1711147418;
+	bh=aN/sBseW/A42djcc7C5Ic5yAvi5gLg7pYn4+yQh8174=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AswFhRNYr0sQGvqmIWUxR0Fxj3Oi1eB4Pr7c3dHAVzm6X/Npi4pd1rTJbIWpcyzRC
-	 TXX5RN0bcSKAQUWdwXGx0VMTqzCQYFDdqQvd65MFEhpBBgAT2l7IM/RbAl868tMJ+m
-	 mhBZRfDgjnRALFv5b2alSOVS6vFRcoGMOAHOe5wQKTQ9biylxghalY2JIQIC+8ZKR4
-	 d+VrZJwXLHMccxIpQCe1J6oFLy4ho3SSeklWF9ySaxU9EeLRXtDTlj0Y+7WhRoVSFh
-	 pJfVHfijRAwfoS4Nu51qiVEuMbHtHMj/g0oTomcCo88HgIYlRpJZBWxSpt6n24gU86
-	 BS+0Nn1Ci2swg==
-Date: Fri, 22 Mar 2024 15:40:27 -0700
+	b=ROSxjC4GSYNreV1Fl54PtXf0zi8Y7Km8p6pIlE8+RGOvXHTaWFDKPO75Ipmrd23nM
+	 3UPKezPW93eUTC093iowNoZb9vGYcKxDlRy9MipM0Dq5BzJmY+OHICt0ayBEJ/q5Vc
+	 ppP/Bf4i6CLJbLrx49r+JyEUB32NwFCP5KC1qc1npEnLHNZQ4lAFITesi0btb9oE2C
+	 +QhnYIUYFf/id5ZmHBo+sCcmuevd1R36I3mPt9rQPWLazBuFdxrQCGXTsLYkAIvBjB
+	 hbxO8MISgN5hv4MHz47XsQio5GeGXLbcuZ5r4M7qOQ8wxwCMQ12b1aujIN7GFpuHqS
+	 BguX/FXG9DXDw==
+Date: Fri, 22 Mar 2024 15:43:37 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: David Ahern <dsahern@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Jason Gunthorpe
- <jgg@nvidia.com>, Christoph Hellwig <hch@infradead.org>, Saeed Mahameed
- <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Leon Romanovsky
- <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, Leonid Bloch
- <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>, Saeed Mahameed
- <saeedm@nvidia.com>, Aron Silverton <aron.silverton@oracle.com>,
- linux-kernel@vger.kernel.org, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-Message-ID: <20240322154027.5555780a@kernel.org>
-In-Reply-To: <e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
-References: <20240207072435.14182-1-saeed@kernel.org>
-	<Zcx53N8lQjkpEu94@infradead.org>
-	<ZczntnbWpxUFLxjp@C02YVCJELVCG.dhcp.broadcom.net>
-	<20240214175735.GG1088888@nvidia.com>
-	<20240304160237.GA2909161@nvidia.com>
-	<9cc7127f-8674-43bc-b4d7-b1c4c2d96fed@kernel.org>
-	<2024032248-ardently-ribcage-a495@gregkh>
-	<510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
-	<Zf2n02q0GevGdS-Z@C02YVCJELVCG>
-	<20240322135826.1c4655e2@kernel.org>
-	<e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
+To: Aleksandr Mishin <amishin@t-argos.ru>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Kees Cook
+ <keescook@chromium.org>, Justin Stitt <justinstitt@google.com>, Felix
+ Manlunas <felix.manlunas@cavium.com>, Satanand Burla
+ <satananda.burla@cavium.com>, Raghu Vatsavayi <raghu.vatsavayi@cavium.com>,
+ Vijaya Mohan Guvva <vijaya.guvva@cavium.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, <lvc-project@linuxtesting.org>
+Subject: Re: [PATCH net v2] liquidio: Fix potential null pointer dereference
+Message-ID: <20240322154337.4f78858c@kernel.org>
+In-Reply-To: <20240322195744.9050-1-amishin@t-argos.ru>
+References: <20240322195744.9050-1-amishin@t-argos.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,25 +64,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 22 Mar 2024 15:18:09 -0600 David Ahern wrote:
-> can you respond to Jason's email with the proposal for the new fwctl
-> subsystem and identify places you do not agree? That would provide more
-> concrete discussion points. Thanks,
+On Fri, 22 Mar 2024 22:57:44 +0300 Aleksandr Mishin wrote:
+> In lio_vf_rep_copy_packet() pg_info->page is compared to a NULL value,
+> but then it is unconditionally passed to skb_add_rx_frag() which could
+> lead to null pointer dereference.
+> Fix this bug by moving skb_add_rx_frag() into conditional scope.
 
-Respond in what way, David? Comment on technical aspects of whether 
-a common class device with a discovery mechanism and a sprinkling of
-semantically meaningless fields can be implemented? Some trivial object
-hierarchy?
-
-On whether someone can actually enforce any of the 4 "don't"s, and
-whether this interface is basically encouraging and giving a leg up
-to those willing to be dishonest?
-
-Or should we go for another loop of me talking about openness and
-building common abstractions, and vendors saying how their way of
-doing basic configuration is so very special, and this is just for
-debug and security and because others.
-
-There's absolutely no willingness to try and build a common interface
-here.
+The explanation should tell us how the bug can happen, i.e. what
+sequence of events leads to null-deref. Not what logic your tool
+matched on, perhaps the NULL check is unnecessary.
+-- 
+pw-bot: cr
 
