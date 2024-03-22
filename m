@@ -1,184 +1,127 @@
-Return-Path: <netdev+bounces-81186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3347C8867AE
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 08:58:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7677F8867B8
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 08:59:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D9971C2357D
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 07:58:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D5511F24C16
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 07:59:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14BC12E73;
-	Fri, 22 Mar 2024 07:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E11813AC4;
+	Fri, 22 Mar 2024 07:59:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Ahxstz4e"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V979Jrjf"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD7A168A8
-	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 07:58:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 734EE16429;
+	Fri, 22 Mar 2024 07:59:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711094290; cv=none; b=JfF7kp0qdz6Sv1xgfBsnK+OsQSymf+yGcSABN4xsnegcCvFWiDPdfnZcQIgdmXe9ZNoqTUT3ZO49npRlWaDjXltVDeWRmvmKdwgGxeb6GKC1373UwrFCwG3jGLq+cQ2c0nYdiNKxq1Zy9Fyg1Rqdpzkp3tgQEII5whImOC4081s=
+	t=1711094351; cv=none; b=Ffj6VcUGhXt9sXXllYMHiqLm9bpUra4ga6CYhcVm1nKahqgd+0qfS9BgP8D9rcPqwiCZWL6jFjpvAtJdpTJ1W6/ew1TnyIUYAHbAhOeKxX79IU8e6kVeKJy9GTUYVnG7WHC8JvNunSwAmQayn/UQqA0Hk1ploiwyQHOi2sJ/pZo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711094290; c=relaxed/simple;
-	bh=fgq3Ar4nYwPurlKzSdomPDCpRkNlzGySLfAfm9jZQsM=;
-	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
-	 Content-Type; b=RTK6MKfX7YIG7s+WOvWImvJTE4LZReVAMyBiR+gPm0wVLwbNopmIsdpk9R61BNSzBxYzl8R2+McMcnaB9UjQjF+8EBRQWO3YQuP7slergG86k+U6pe/KxJ3LgZ809m2+GAAJmaTPFiWs4SRzvOxvzY3v6x4t/JnxU6w4jCdF0Cs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Ahxstz4e; arc=none smtp.client-ip=115.124.30.100
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711094285; h=Message-ID:Subject:Date:From:To:Content-Type;
-	bh=RS7Q5/aJh5MuCEx/qwvTl65m32kKDl22PUwrCQVtmq4=;
-	b=Ahxstz4epa+ykTU6ucLUSVl5djHxXucxOBw9T3928J62a7dnUV7kPRRieHLT+sWMMg/UHHSOBeYRznzp3KA+fpwHkTu8wl8WnhrN0Eeflk30RU3LtU4AcHCygIk966wTqNFLUZKK20VjkZZ+bttaO8y4SAYkLSuXnMAbf/jYHss=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R111e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=8;SR=0;TI=SMTPD_---0W31VhFe_1711094284;
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0W31VhFe_1711094284)
-          by smtp.aliyun-inc.com;
-          Fri, 22 Mar 2024 15:58:04 +0800
-Message-ID: <1711093912.1488938-1-xuanzhuo@linux.alibaba.com>
-Subject: Re: [PATCH vhost v4 03/10] virtio_ring: packed: structure the indirect desc table
-Date: Fri, 22 Mar 2024 15:51:52 +0800
-From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: virtualization@lists.linux.dev,
- "Michael S. Tsirkin" <mst@redhat.com>,
- "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org
-References: <20240312033557.6351-1-xuanzhuo@linux.alibaba.com>
- <20240312033557.6351-4-xuanzhuo@linux.alibaba.com>
- <CACGkMEs_DT1309_hj8igcvX7H1sU+-s_OP6Jnp-c=0kmu+ia_g@mail.gmail.com>
- <1711009465.784253-4-xuanzhuo@linux.alibaba.com>
- <CACGkMEvimfmQRUZ04CykZs-6cOkASF8S02n2N7caJ4XivR8hNw@mail.gmail.com>
-In-Reply-To: <CACGkMEvimfmQRUZ04CykZs-6cOkASF8S02n2N7caJ4XivR8hNw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1711094351; c=relaxed/simple;
+	bh=RUZ5/53DHnVGJizqo5Aou3AF5iR7J4ZbuYQ9yPxcxYs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Z5sl7H7HUVceA3t5qiA2YvPbyMo0rd1QDVGhvojDwPG/oQf34A257s7b7L3Yn+VqPy5Ew8ALs2IqgALweYJ49YC/VQz2JdKyLqfcU2/31v6lrSMbsB23SY/gW+sJpGLnhgQ28BvOac1qhrvwSpi8CDxYj5JlgGRtddPCaurECRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V979Jrjf; arc=none smtp.client-ip=209.85.218.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a46f97b8a1bso241178466b.0;
+        Fri, 22 Mar 2024 00:59:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711094348; x=1711699148; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Evota0EZ/I3ybP8XWAvtgwwod+AOlk4QbEeMKUypvQo=;
+        b=V979JrjfTK5WT7/QRY9MvbCcoI9UaLZXTu3OSdVXIgXEVgjiiwg1CaSKdYbhRe6a+P
+         JSPTO/KZJILmPq2cORuLMPOU3v5IMh+w8ANs2tAC/NoKBXztSOUzhW95NlZEYUytQZjs
+         cQoy+3bK4UuTqjtcCkMI5kwp1I/wxXiAUSdtt82yr7qb5qUW4nONKryvGo/zHXI+WPcv
+         9cAqb/MVDeV8EAHnJdjRVqfuMIccLtIuv8/HrszbHFB5jQ3/2sIaD6Becf+4T85H7krW
+         WHen6lQ14QOGCawDPa5Tjmfgs4p3xYMl+utDxmSw1IVam44S4XHzmcIY/1A/z/JnQZdU
+         UV9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711094348; x=1711699148;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Evota0EZ/I3ybP8XWAvtgwwod+AOlk4QbEeMKUypvQo=;
+        b=RSkp6RyhYQmBx9r8jaeQvPK10+cZuvs4SLBx+5ZIS6K69+qNQAvgXU0kyDLkSYpsI8
+         HpZOuZnu+CFa+R8blOvVbNdOsG7nLkwWaK0eO8aj7wppw7OFiGTl2A4b7cuCF91k6ys7
+         e0Rst4ekOnWtpMD/pvZJAx9buMQaTqGxjThywK6//zt9HFUUORugm0dUSK1tUlYvrQp7
+         nJiJHAuqx9lcjTbir4blyYerHMc9n5WiId7nmah9hNhZb3INP0y/OiIaSzhls2K3KzI7
+         Awgm1PoQHEmiZhGYSG6pdQb1DdTDz+AzPvXi6v+IT4JaLJf+3cqx+89OaIGQFnrtmWQS
+         emGA==
+X-Forwarded-Encrypted: i=1; AJvYcCV265TyG8Znm0gCiGXr993nYdeFlCozmuzckR2N+e4fUB9S9TmvEkFvTavsFaqwX32uCfEmapy/BPVD5t9nu6shZCtXaDAjrQMIVnb43pTHZS6KcRd46p+r9fb11AD+JVTGN4bC
+X-Gm-Message-State: AOJu0YyKgbEpL2VCOQV12DaRWjtmWTlBZKnold9Lkd70Jyf/7Qu6zjUB
+	A79zAsGA498t4IbR/TI685NUvQBy09S5qsSnKNusFIrn+Xy4zD5ttHW77uANU4aplp5grANBRxE
+	J2JyIPpfjSws6HLLbQTWxcBq9pCshG5T/DRk=
+X-Google-Smtp-Source: AGHT+IHkR+Uv6+IgiN5dfa5Enx06mQZLfIB4lxnLzZNQy7D1C/g7lY+vQ4BsGOZEyOxg98z6/qnNJgOXSkr8CzIc/m8=
+X-Received: by 2002:a17:906:6b17:b0:a46:4d16:439b with SMTP id
+ q23-20020a1709066b1700b00a464d16439bmr1103225ejr.43.1711094347623; Fri, 22
+ Mar 2024 00:59:07 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20240322072456.1251387-1-gaoxingwang1@huawei.com>
+In-Reply-To: <20240322072456.1251387-1-gaoxingwang1@huawei.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 22 Mar 2024 15:58:30 +0800
+Message-ID: <CAL+tcoDiSsqhef=aAAwRP92pNv=K43UE--T_MikxpmsTchxCaA@mail.gmail.com>
+Subject: Re: [PATCH] netlink: fix typo
+To: gaoxingwang <gaoxingwang1@huawei.com>
+Cc: mkubecek@suse.cz, idosch@nvidia.com, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, yanan@huawei.com, liaichun@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 22 Mar 2024 13:15:10 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> On Thu, Mar 21, 2024 at 4:29=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
-.com> wrote:
-> >
-> > On Thu, 21 Mar 2024 12:47:18 +0800, Jason Wang <jasowang@redhat.com> wr=
-ote:
-> > > On Tue, Mar 12, 2024 at 11:36=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.al=
-ibaba.com> wrote:
-> > > >
-> > > > This commit structure the indirect desc table.
-> > > > Then we can get the desc num directly when doing unmap.
-> > > >
-> > > > And save the dma info to the struct, then the indirect
-> > > > will not use the dma fields of the desc_extra. The subsequent
-> > > > commits will make the dma fields are optional. But for
-> > > > the indirect case, we must record the dma info.
-> > > >
-> > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > ---
-> > > >  drivers/virtio/virtio_ring.c | 66 +++++++++++++++++++++-----------=
-----
-> > > >  1 file changed, 38 insertions(+), 28 deletions(-)
-> > > >
-> > > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_r=
-ing.c
-> > > > index 0dfbd17e5a87..22a588bba166 100644
-> > > > --- a/drivers/virtio/virtio_ring.c
-> > > > +++ b/drivers/virtio/virtio_ring.c
-> > > > @@ -72,9 +72,16 @@ struct vring_desc_state_split {
-> > > >         struct vring_desc *indir_desc;  /* Indirect descriptor, if =
-any. */
-> > > >  };
-> > > >
-> > > > +struct vring_packed_desc_indir {
-> > > > +       dma_addr_t addr;                /* Descriptor Array DMA add=
-r. */
-> > > > +       u32 len;                        /* Descriptor Array length.=
- */
-> > > > +       u32 num;
-> > > > +       struct vring_packed_desc desc[];
-> > > > +};
-> > > > +
-> > > >  struct vring_desc_state_packed {
-> > > >         void *data;                     /* Data for callback. */
-> > > > -       struct vring_packed_desc *indir_desc; /* Indirect descripto=
-r, if any. */
-> > > > +       struct vring_packed_desc_indir *indir_desc; /* Indirect des=
-criptor, if any. */
-> > >
-> > > Maybe it's better just to have a vring_desc_extra here.
-> >
-> >
-> > Do you mean replacing vring_packed_desc_indir by vring_desc_extra?
+On Fri, Mar 22, 2024 at 3:26=E2=80=AFPM gaoxingwang <gaoxingwang1@huawei.co=
+m> wrote:
 >
-> Just add a vring_desc_extra in vring_desc_state_packed.
+> Add missing colon in coalesce_reply_cb
 >
-> >
-> > I am ok for that. But vring_desc_extra has two extra items:
-> >
-> >         u16 flags;                      /* Descriptor flags. */
-> >         u16 next;                       /* The next desc state in a lis=
-t. */
-> >
-> > vring_packed_desc_indir has "desc". I think that is more convenient.
-> >
-> > So, I think vring_packed_desc_indir is appropriate.
+> Fixes: ec573f209d (netlink: settings: add netlink support for coalesce tx=
+ aggr params)
+
+This commit cannot be found in net/net-next tree...
+
+> Signed-off-by: gaoxingwang <gaoxingwang1@huawei.com>
 >
-> It reuses the existing structure so we had the chance to reuse the
-> helper.
+> Signed-off-by: gaoxingwang <gaoxingwang1@huawei.com>
 
-Do you mean vring_unmap_extra_packed()?
+nit: two duplicated SoB
 
-After last commit(virtio_ring: packed: remove double check of the unmap ops=
-):
-
-	/* caller must check vring_need_unmap_buffer() */
-	static void vring_unmap_extra_packed(const struct vring_virtqueue *vq,
-					     const struct vring_desc_extra *extra)
-	{
-		u16 flags;
-
-		flags =3D extra->flags;
-
-		dma_unmap_page(vring_dma_dev(vq),
-			       extra->addr, extra->len,
-			       (flags & VRING_DESC_F_WRITE) ?
-			       DMA_FROM_DEVICE : DMA_TO_DEVICE);
-	}
-
-But we should call dma_unmap_single() for indirect desc.
-
-We know, dma_unmap_single() and dma_unmap_page() are same in essence.
-So if we call dma_unmap_page for the indirect desc, we can reuse
-this function. But I do not prefer doing this.
-
-Thanks.
-
-
-> And it could be used for future chained indirect (if it turns
-> out to be necessary).
+> ---
+>  netlink/coalesce.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 >
-> Thanks
+> diff --git a/netlink/coalesce.c b/netlink/coalesce.c
+> index bc34d3d..bb93f9b 100644
+> --- a/netlink/coalesce.c
+> +++ b/netlink/coalesce.c
+
+Where is this file? I suspect you're not using the standard mainline?
+
+> @@ -93,7 +93,7 @@ int coalesce_reply_cb(const struct nlmsghdr *nlhdr, voi=
+d *data)
+>                  tb[ETHTOOL_A_COALESCE_TX_AGGR_MAX_BYTES]);
+>         show_u32("tx-aggr-max-frames", "tx-aggr-max-frames:\t",
+>                  tb[ETHTOOL_A_COALESCE_TX_AGGR_MAX_FRAMES]);
+> -       show_u32("tx-aggr-time-usecs", "tx-aggr-time-usecs\t",
+> +       show_u32("tx-aggr-time-usecs", "tx-aggr-time-usecs:\t",
+>                  tb[ETHTOOL_A_COALESCE_TX_AGGR_TIME_USECS]);
+>         show_cr();
 >
-> > Or I missed something.
-> >
-> >
-> > Thanks.
-> >
-> >
-> > >
-> > > Thanks
-> > >
-> >
+> --
+> 2.27.0
 >
 >
 
