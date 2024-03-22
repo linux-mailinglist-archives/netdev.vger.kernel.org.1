@@ -1,132 +1,150 @@
-Return-Path: <netdev+bounces-81217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D40E886A1D
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 11:21:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4D95886A7A
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 11:36:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 593732875A4
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 10:21:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 74655B22975
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 10:36:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D72B36AF3;
-	Fri, 22 Mar 2024 10:21:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32403335B5;
+	Fri, 22 Mar 2024 10:36:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7B2822611;
-	Fri, 22 Mar 2024 10:21:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA47A20B27
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 10:36:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711102888; cv=none; b=cd4vIBTANEytfhGQoYMRrLbogNEIUfSq9bBswj8QDD0wniDb22R+d4pMaXGpGiT7wKec3UvWVEWKgJeOqIaI/j17cu7uYUUkGzOHvYyr0lPk7Dn2JD1n2dJX7cJsSx2pDnv5aKB1Ih1iIPHQ6T7CeYYBfcMMoZwUD6dnrVf46aA=
+	t=1711103787; cv=none; b=fd4O42PGoQmaURFJ81b2P2l/I61RYpMTmN2FpNOlLbYpk9hRCoLnJyuGiFtaFc3ZVxfozkTRw4UzH1ZBC9gx11+stt50R2JMMObN1A9e/z4g1nUp3ccfP4yqJ4W3Ew9bAsLeky7z+IfezzZIzd6MjxrPph4LlvQDYOXTxUm4pAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711102888; c=relaxed/simple;
-	bh=S/hPbQEccrVNk5ZTyBsPVY3O7bBdsDl1BFMRxs5asfE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MmvFwML+Fr7A6g8ITg5DOdKp/lv+HmM2jbBP8cxpiCz9HQq+Ck+aHnHB6yjp4rYsuOrVFM3zCPjP+kuy93OhrXZYYALJu+YCqxMrimcEE+5eFWzFs5LtNPZTaMl4j2rWMbKWrnYMtZQgW9gNNaoLuemgdV9Mr0/xVDj4x5faBTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a470d7f77eeso229831766b.3;
-        Fri, 22 Mar 2024 03:21:26 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711102885; x=1711707685;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JGqjI6P0mTPBiKZTNOwbVNYIjw9Vw14Zd3G3C6QS6wY=;
-        b=h6Kmtg6uIlQhyQkO++ggq6xObWuREB9XLkkHrPXk6azO860k+NhrnDFkTqRT02CUoF
-         uATgxUP3U5S2A6wIXZRDKDeiyepcqR7xwkBd0AgTVYAXh68YcfyfWivl6b1xgODaPaZu
-         NGqiZp3y1Q7JUMDtv9dCafvb8apbYPeXJ+Fu+uoC9PeZ0amvcOqE6qq2fnsBjmtRv6hR
-         bgH8O+7JAoUlVAxp3yRaBPo2I088HagZxWrcbx1WYHeK14r6MktftoedIwc4ZuKOaDc/
-         1s/UXZV1qNv+3ME9QHDN7/fHBLlvS4tJkCA64OrCDmq4qlrtIKxCp00g7oICN+sda6G9
-         HntQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWsvvLWZ7WoQqHERKsl0EA52OxEgEHjpgSBAUa5pNbRkYkqy8/EQTSoXUY+FJrk8Eiw1qmIQWNpS5dOfIF/jN9f9Y3ySqxohdG6PO8WP8M0xdduHRnr2MT+n9iM4jalNRLOrR6Dm6Hw7rvrYzAfaO7c4ecMiZFVGnuQ2thy
-X-Gm-Message-State: AOJu0YykgEI7zpIP+FKcY0UVwVFJ4v7M4t2SASdwopgPxRVqKSgiaIHs
-	h5IdozuUy7As1bnKnvCzDjpSNPklL/bz+HzDpkMUmEsLF9kNLGoi
-X-Google-Smtp-Source: AGHT+IGEXDCR4iq9rvwz5B26z4GLijSPqxuBAhYB8+zqYJlK7HGPtfYNr6wzSSm9SN6zugWqLIWZmg==
-X-Received: by 2002:a17:907:7e94:b0:a47:3527:90c0 with SMTP id qb20-20020a1709077e9400b00a47352790c0mr673262ejc.14.1711102884800;
-        Fri, 22 Mar 2024 03:21:24 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-004.fbsv.net. [2a03:2880:30ff:4::face:b00c])
-        by smtp.gmail.com with ESMTPSA id bo10-20020a170906d04a00b00a4728151908sm705505ejb.93.2024.03.22.03.21.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Mar 2024 03:21:24 -0700 (PDT)
-Date: Fri, 22 Mar 2024 03:21:21 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: rbc@meta.com, riel@surriel.com, stable@vger.kernel.org,
-	qemu-devel@nongnu.org,
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Melnychenko <andrew@daynix.com>
-Subject: Re: [PATCH] virtio_net: Do not send RSS key if it is not supported
-Message-ID: <Zf1bofzE4x0wGEm+@gmail.com>
-References: <20240321165431.3517868-1-leitao@debian.org>
- <1711072822.882584-1-xuanzhuo@linux.alibaba.com>
+	s=arc-20240116; t=1711103787; c=relaxed/simple;
+	bh=KKyLD52sMTp3ny2o7pvQh8vk7BFUnV1+/Cq1IOtzYCw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fdUKwDn22O/86RKNyHDfVO6M85an4r3PCHPg2RH+NzBr5MQjiZhbEtYaMhW0MMdS1HIeJoZSnSXUqlphYoKQlGe74BTfNyYKuUmYszlC1WXYqtRBAc75MTFOGjIrDhL4Jt8AFHPGI8+uvxakTuBR+GapOjoky8nJMTFm7eUG6hY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
+Received: from loongson.cn (unknown [112.20.109.198])
+	by gateway (Coremail) with SMTP id _____8BxuvAlX_1ln20cAA--.2124S3;
+	Fri, 22 Mar 2024 18:36:21 +0800 (CST)
+Received: from [192.168.100.8] (unknown [112.20.109.198])
+	by localhost.localdomain (Coremail) with SMTP id AQAAf8BxnhMkX_1ljvFhAA--.5820S3;
+	Fri, 22 Mar 2024 18:36:21 +0800 (CST)
+Message-ID: <e57a6501-c9ae-4fed-8b8f-b05f0d50e118@loongson.cn>
+Date: Fri, 22 Mar 2024 18:36:20 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1711072822.882584-1-xuanzhuo@linux.alibaba.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8 07/11] net: stmmac: dwmac-loongson: Add
+ multi-channel supports for loongson
+To: Serge Semin <fancer.lancer@gmail.com>
+Cc: hkallweit1@gmail.com, andrew@lunn.ch, peppe.cavallaro@st.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, Jose.Abreu@synopsys.com,
+ chenhuacai@loongson.cn, linux@armlinux.org.uk, guyinggang@loongson.cn,
+ netdev@vger.kernel.org, chris.chenfeiyang@gmail.com
+References: <cover.1706601050.git.siyanteng@loongson.cn>
+ <bec0d6bf78c0dcf4797a148e3509058e46ccdb13.1706601050.git.siyanteng@loongson.cn>
+ <eqecwmi3guwda3wloxcttkx2xlteupvrsetb5ro5abupwhxqyu@ypliwpyswy23>
+ <e1c7b5fa-f3f8-4aa3-af4d-ca72b54d9c8c@loongson.cn>
+ <f9c5c697-6c3f-4cfb-aa60-2031b450a470@loongson.cn>
+ <roxfse6rf7ngnopn42f6la2ewzsaonjbrfokqjlumrpkobfvgh@7v7vblqi3mak>
+Content-Language: en-US
+From: Yanteng Si <siyanteng@loongson.cn>
+In-Reply-To: <roxfse6rf7ngnopn42f6la2ewzsaonjbrfokqjlumrpkobfvgh@7v7vblqi3mak>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:AQAAf8BxnhMkX_1ljvFhAA--.5820S3
+X-CM-SenderInfo: pvl1t0pwhqwqxorr0wxvrqhubq/
+X-Coremail-Antispam: 1Uk129KBj93XoW7ArWfWry8Wry7GF18Ww47KFX_yoW8Kr4DpF
+	ZxCF43GrZrJF13uF4qvanrGr1qvrW5ArWxWr1ftw4Dua1qk3srXrnrJa1Y9FZ7CrZ5Ar4U
+	u3yvkFZ2gFZ8JagCm3ZEXasCq-sJn29KB7ZKAUJUUUU7529EdanIXcx71UUUUU7KY7ZEXa
+	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
+	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
+	IYs7xG6rWj6s0DM7CIcVAFz4kK6r1Y6r17M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
+	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Gr0_Xr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
+	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW8Jr0_Cr1UM28EF7xvwVC2z280aVCY1x0267AK
+	xVW8Jr0_Cr1UM2kKe7AKxVWUXVWUAwAS0I0E0xvYzxvE52x082IY62kv0487Mc804VCY07
+	AIYIkI8VC2zVCFFI0UMc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0I7IYx2IY67AKxVWU
+	AVWUtwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r4UM4x0Y48IcVAKI4
+	8JMxkF7I0En4kS14v26r126r1DMxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j
+	6r4UMxCIbckI1I0E14v26r1Y6r17MI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwV
+	AFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv2
+	0xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4
+	v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AK
+	xVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUcpBTUUUUU
 
-Hello Xuan,
+>>>>> +{
+>>>>> +	int i, ret, vecs;
+>>>>> +
+>>>>> +	vecs = roundup_pow_of_two(channel_num * 2 + 1);
+>>>>> +	ret = pci_alloc_irq_vectors(pdev, vecs, vecs, PCI_IRQ_MSI);
+>>>>> +	if (ret < 0) {
+>>>>> +		dev_info(&pdev->dev,
+>>>>> +			 "MSI enable failed, Fallback to legacy interrupt\n");
+>>>>> +		return loongson_dwmac_config_legacy(pdev, plat, res, np);
+>>>> In what conditions is this possible? Will the
+>>>> loongson_dwmac_config_legacy() method work in that case? Did you test
+>>>> it out?
+I need to wait for special hardware and PMON for this.  Please give me 
+some time.
 
-On Fri, Mar 22, 2024 at 10:00:22AM +0800, Xuan Zhuo wrote:
-> On Thu, 21 Mar 2024 09:54:30 -0700, Breno Leitao <leitao@debian.org> wrote:
+> Then those platforms will _require_ to have the DT-node specified. This
+> will define the DT-bindings which I doubt you imply here. Am I wrong?
+>
+> Once again have you tested the loongson_dwmac_config_legacy() method
+> working in the case of the pci_alloc_irq_vectors() failure?
 
-> > 4) Since the command above does not have a key, then the last
-> >    scatter-gatter entry will be zeroed, since rss_key_size == 0.
-> >     sg_buf_size = vi->rss_key_size;
-> 
-> 
-> 
-> 	if (vi->has_rss || vi->has_rss_hash_report) {
-> 		vi->rss_indir_table_size =
-> 			virtio_cread16(vdev, offsetof(struct virtio_net_config,
-> 				rss_max_indirection_table_length));
-> 		vi->rss_key_size =
-> 			virtio_cread8(vdev, offsetof(struct virtio_net_config, rss_max_key_size));
-> 
-> 		vi->rss_hash_types_supported =
-> 		    virtio_cread32(vdev, offsetof(struct virtio_net_config, supported_hash_types));
-> 		vi->rss_hash_types_supported &=
-> 				~(VIRTIO_NET_RSS_HASH_TYPE_IP_EX |
-> 				  VIRTIO_NET_RSS_HASH_TYPE_TCP_EX |
-> 				  VIRTIO_NET_RSS_HASH_TYPE_UDP_EX);
-> 
-> 		dev->hw_features |= NETIF_F_RXHASH;
-> 	}
-> 
-> 
-> vi->rss_key_size is initiated here, I wonder if there is something wrong?
+Yes!  I have tested it, it works in single channel mode.
 
-Not really, the code above is never executed (in my machines). This is
-because `vi->has_rss` and `vi->has_rss_hash_report` are both unset.
+dmesg:
 
-Looking further, vdev does not have the VIRTIO_NET_F_RSS and
-VIRTIO_NET_F_HASH_REPORT features.
+[    3.935203] mdio_bus stmmac-18:02: attached PHY driver [unbound]
+(mii_bus:phy_addr=stmmac-18:02, irq=POLL)
+[    3.945625] dwmac-loongson-pci 0000:00:03.1: MSI enable failed, Fallback to
+legacy interrupt
+[    3.954175] dwmac-loongson-pci 0000:00:03.1: User ID: 0xd1, Synopsys ID: 0x10
+[    3.973676] dwmac-loongson-pci 0000:00:03.1: DMA HW capability register supported
+[    3.981135] dwmac-loongson-pci 0000:00:03.1: RX Checksum Offload Engine supported
 
-Also, when I run `ethtool -x`, I got:
+cat /proc/interrupt:
 
-	# ethtool  -x eth0
-	RX flow hash indirection table for eth0 with 1 RX ring(s):
-	Operation not supported
-	RSS hash key:
-	Operation not supported
-	RSS hash function:
-	    toeplitz: on
-	    xor: off
-	    crc32: off
+43:          0          0   PCH PIC  16  ahci[0000:00:08.0]
+   44:          0          0   PCH PIC  12  enp0s3f0
+   45:          0          0   PCH PIC  14  enp0s3f1
+   46:      16233          0   PCH PIC  17  enp0s3f2
+   47:      12698          0   PCH PIC  48  xhci-hcd:usb1
+
+
+the irq number 46 is the falkback legacy irq.
+
+> 	
+>
+>>>>> +	}
+>>>>> +
+>>>>> +	plat->rx_queues_to_use = channel_num;
+>>>>> +	plat->tx_queues_to_use = channel_num;
+>>>> This is supposed to be initialized in the setup() methods. Please move
+>>>> it to the dedicated patch.
+>>> No, referring to my previous reply, only the 0x10 gnet device has 8 channels,
+>>> and the 0x37 device has a single channel.
+> Yes. You have a perfectly suitable method for it. It's
+> loongson_gnet_data(). Init the number of channels there based on the
+> value read from the GMAC_VERSION.SNPSVER field. Thus the
+> loongson_gnet_config_multi_msi() will get to be more coherent setting
+> up the MSI IRQs only.
+You are right!  it works well.
+
+
+Thanks,
+
+Yanteng
+
+
 
