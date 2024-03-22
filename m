@@ -1,63 +1,56 @@
-Return-Path: <netdev+bounces-81347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F5AC8874F0
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 23:52:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F22CB8874F3
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 23:55:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60EAF1C22C47
-	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 22:52:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAA6C1C22B8F
+	for <lists+netdev@lfdr.de>; Fri, 22 Mar 2024 22:55:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CCDF8288B;
-	Fri, 22 Mar 2024 22:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 073F282881;
+	Fri, 22 Mar 2024 22:55:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xu+/ScIr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e4+rPui+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4094D1CD00;
-	Fri, 22 Mar 2024 22:52:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DEE81750
+	for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 22:55:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711147955; cv=none; b=DyH7dD0Vxq+oSZH2oFX20DSJEggmcNEyKfrfEIn1KuRuzPzpqjHSndbe/6sM86R+mWwc/1/QAyDm+TCh9SrMgH6fra/ST28d8uHpFovLUPbDccq4QvI7Xkg1Qwe46wY/tVc4HGDWE8VJwWKAxeWeyTlCNOe3x4LbA5tlBb35QM4=
+	t=1711148151; cv=none; b=Pqu33MqbakU1hMRDB6rfElM+ypOqoYe45xAIMqYxZbLjWzJYdt8+gESnrUcihW5TudGfxBQooLiAKHVKVVRdu8zUpDrchaiLpS61bgL+71dlZgraSNUAH+zyrfRgyIdK3oRvYmu6dx1juqaQ5BwcfAyhknOFLPDWn/7XwzC78zw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711147955; c=relaxed/simple;
-	bh=hKZFEeKpoc/pNzTRJQzWbV56PN2qw+KOa9bJztyzp6I=;
+	s=arc-20240116; t=1711148151; c=relaxed/simple;
+	bh=XZZfzTHi7snr1nsrLxfaDOVvbSdaxsIvIbn0m6uGTtE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YYgkKxXIVvF7OqFznrrC0fosBoQ7A7SRczFYkZCuT3kw5IXkmvHVLHpM8KQLsI2pr2t0Nli7jNEmfitrTjzMGsvPn/p88YxpGHNtSPYCxC7uxjF1p37mMvJQPSYbLGawsn3P1u3MckGSJutauDRfDvFAOCw5STHXRRVv8TTx8iE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xu+/ScIr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E8ACC433F1;
-	Fri, 22 Mar 2024 22:52:34 +0000 (UTC)
+	 MIME-Version:Content-Type; b=BzCXsJNikdlDxUr42HjGLRGEEOFbxHjlOqiPZYbMKGIfqGHERRJLbb2heHJg+8YYtpjYWonfboowJOUyhDpGFJMNd/YjqBDPz7dYXh/72/yUkTLu7cuilzXUwxqeomVTJJKjYC6gZCxF8J+RWb1gH9mwZB+YS1DpVibq7tdv3Bs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e4+rPui+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 18B0EC433F1;
+	Fri, 22 Mar 2024 22:55:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711147954;
-	bh=hKZFEeKpoc/pNzTRJQzWbV56PN2qw+KOa9bJztyzp6I=;
+	s=k20201202; t=1711148151;
+	bh=XZZfzTHi7snr1nsrLxfaDOVvbSdaxsIvIbn0m6uGTtE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Xu+/ScIrlTsDPj9UZG+4uKHIoNFjGpxlEEKAPyt8hzlwWBqmd9SC5LWiFETpdCD2Z
-	 bozJduZe+PexSYCRHYN8JJJamnREaem1a5BobeKYSC0oeacyV3q+zlA6ll4b8nvgu1
-	 8MjjpGReyCeTdeF5wLun5k9YdDuT3GvU1ZZz7oGEaOtEEBAZ+GuF7VNJ9cZExGQrdG
-	 xVBDfk/w8i7jA3IXPFtcOqhoFQ9FgXl1NiRYTp6fvLLfUSWLZQJ7xgXWocc9kYRYKs
-	 u2d5siRZu10W3+lAmKuKsyceRI8BkwvuYKil67YqiDiFsWmQdnfsPEatSfdXsSegBB
-	 Rcq+CQ6M/8aNQ==
-Date: Fri, 22 Mar 2024 15:52:33 -0700
+	b=e4+rPui+jbjF3elpbrRaPpbEhyStmhhCAnbt4CanYumkePfOnKGoVGiPPDcjANLwz
+	 2xIHIvuSRbkV2o57hSD3TUtmr7NXMAQ5NGeRly8EsOZFaMI1KWqc27nhyir+Myrmrf
+	 iyZDWEwNFnxaPib6ze73vIqL+eC968zsoqT5PsbfxhvD6wFyuBTpNonRElUw6wIvq8
+	 W3UnGBekczhjppx2X+x3pQIcF1vUJPmEx7sPJGAc+I+GpqzVrDo1l2UOPO1G/nG1Hz
+	 TiI9lqUIQaofSKxr7us6+mTSkJft69iP3pbXzBkVV0Q5zOmVCldBuycWUOSsKWdqO3
+	 DZcerpOJTYuYw==
+Date: Fri, 22 Mar 2024 15:55:50 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jarkko Sakkinen <jarkko@kernel.org>
-Cc: linux-integrity@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
- "Daniel P . Smith" <dpsmith@apertussolutions.com>, Lino Sanfilippo
- <l.sanfilippo@kunbus.com>, Jason Gunthorpe <jgg@ziepe.ca>, Peter Huewe
- <peterhuewe@gmx.de>, James Bottomley
- <James.Bottomley@HansenPartnership.com>, Alexander Steffen
- <Alexander.Steffen@infineon.com>, keyrings@vger.kernel.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, Randy Dunlap
- <rdunlap@infradead.org>, Richard Cochran <richardcochran@gmail.com>,
- netdev@vger.kernel.org (open list:PTP HARDWARE CLOCK
- SUPPORT:Keyword:(?:\b|_)ptp(?:\b|_))
-Subject: Re: [PATCH v4] Documentation: tpm_tis
-Message-ID: <20240322155233.30422299@kernel.org>
-In-Reply-To: <20240322123542.24158-1-jarkko@kernel.org>
-References: <20240322123542.24158-1-jarkko@kernel.org>
+To: Antoine Tenart <atenart@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com,
+ steffen.klassert@secunet.com, willemdebruijn.kernel@gmail.com,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net v3 0/4] gro: various fixes related to UDP tunnels
+Message-ID: <20240322155550.3779c85a@kernel.org>
+In-Reply-To: <20240322114624.160306-1-atenart@kernel.org>
+References: <20240322114624.160306-1-atenart@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,13 +60,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 22 Mar 2024 14:35:36 +0200 Jarkko Sakkinen wrote:
-> +TCG PTP Specification defines two interface types: FIFO and CRB. The former is
+On Fri, 22 Mar 2024 12:46:19 +0100 Antoine Tenart wrote:
+> We found issues when a UDP tunnel endpoint is in a different netns than
+> where UDP GRO happens. This kind of setup is actually quite diverse,
+> from having one leg of the tunnel on a remove host, to having a tunnel
+> between netns (eg. being bridged in another one or on the host). In our
+> case that UDP tunnel was geneve.
 
-Could be worth spelling out the PTP part here, I'm guessing
-get_maintainer made you CC netdev because it thought it stands
-for Precision Time Protocol. And one has to read till the end
-to see:
-
-> +TCG PC Client Platform TPM Profile (PTP) Specification
+I think this series makes net/udpgro_fwd.sh selftest fail.
 
