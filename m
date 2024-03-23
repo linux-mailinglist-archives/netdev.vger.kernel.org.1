@@ -1,172 +1,267 @@
-Return-Path: <netdev+bounces-81356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0711B887648
-	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 01:57:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 036B7887649
+	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 01:58:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A4E8B209E0
-	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 00:57:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACB66283074
+	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 00:58:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A1F1621;
-	Sat, 23 Mar 2024 00:57:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="COipAKc/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38827621;
+	Sat, 23 Mar 2024 00:58:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509F17E1
-	for <netdev@vger.kernel.org>; Sat, 23 Mar 2024 00:57:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+Received: from smtp.dudau.co.uk (dliviu.plus.com [80.229.23.120])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A08D7FD
+	for <netdev@vger.kernel.org>; Sat, 23 Mar 2024 00:58:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.229.23.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711155459; cv=none; b=hjT8bZxH4IQhw4jTe5eI8GcAkDOERViuTtGutbNIyz2piidMMpLDgJe28UMeoA0Z89sLMUdlem7zBkyeq5lhaNWraxZtZ2ryv57alqgrd/L4VuWIeeldiUPvgrB/svZCbRIqNPK80sOYNXL2eNun51XFze6f/3yTlkyJA7iLfHs=
+	t=1711155517; cv=none; b=O4cC6Qag1zGG7bNuHLLGvlT3NkSon9rwtfi/RUtOiq9ZDn9WcHOF9vafr+xM38eWfiO8L8uVNLgqNcY8gO9zIfiQ/G62QWUdBb+kwZLaIRg4t5Fkn1j5izrkDiAstkxV2WzFcG/KL7D+l6kXeaPetp840wOhedaN00XtbYEZmz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711155459; c=relaxed/simple;
-	bh=6hDVEYEvmvnvpC9MWE2nZ5nV0gSog6KWE4C1wcVWPJA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=PYX9XCG05RzEbcoCWi6V40/g+K1+U+hmfXoWiJw1JoVgSqXu/3Tz8Xbx8M8x86XOf+dtpXMwW0vLJ5BWVYFGvb8TbLHBv5j44AZBPOJBPtuY8xo1Fg0SmxDVhR/Pmd95YCP7hxzUpQlVlx6TPf+5csOkaZdpqrYdYg3rlFprgo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=COipAKc/; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-41412411672so21199075e9.3
-        for <netdev@vger.kernel.org>; Fri, 22 Mar 2024 17:57:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711155455; x=1711760255; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=6hDVEYEvmvnvpC9MWE2nZ5nV0gSog6KWE4C1wcVWPJA=;
-        b=COipAKc/E3pXZUDJzfkhC3NmUQ3cxkGUqf6gYrRPfVbAF50VQh/aJLVk/BjWxoTo+i
-         IuVdusp+E1ZRGVzAQtje9pBkpS3mIIt60qwrsmjRQnZXrp5NQlzA2t4T8GznDDCTMdWJ
-         dYSZgBFRu9gL4/guS9A62kNeN4gVlqgZSGvZc4zfUs5Hpnd1FwqVpZZo6E/o14h524U/
-         JiPUJ+AQM8KxhYI01V++XfcZYb0PhUV9O+aGB1mf7wyDeF81wTbTFRb82h4kgqphV9Sa
-         VDiTRbbmckDPukwY3q0UjKEzUYFAqV/Gpaf1zkf6vuJuFDTHqoPzhdFSbCN+pgKA3/V+
-         mcSg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711155455; x=1711760255;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=6hDVEYEvmvnvpC9MWE2nZ5nV0gSog6KWE4C1wcVWPJA=;
-        b=aABtvl4ObLnEBxjKHQWzPhG4QdUVLrEQck8czSIApG2jGgYUMJijwjGK+0q9LPi7FN
-         jxn+wxq6qXBptncL8eBiAZHofBHuDccjUERXLj8NXOT2u/Pw46/qSbCLVVwCziAGDIZ9
-         VBYCQXB+BQjAlP8kocqcyvqiFeaudT3IA3gGK4K6CP5lBAKlJrXkR4fpa6HPO5O03nSG
-         cYP4mpt0R6Pza35Rnr3BN4K+I71zexg2AuOU6uPsyW0U/7QT5Jsevc6nGqAS31iU9m12
-         DFrrgb0SWpD9jXMkKhjLxPOVeNoINAXYk+8zQXczb5a7VQNhaEPKW5vNklQ/4f1F3ZrL
-         0Jwg==
-X-Forwarded-Encrypted: i=1; AJvYcCVpTJgNA07EauGoetIv3drg65rjKq1I28mzKtk5BqUAoUUTtSutq5Tr0P/P+ZcIuB1Fl0DZSLnHj8SX6LwQale1WK+EDZq9
-X-Gm-Message-State: AOJu0Yzk0hoy6fxqcA71AHXBHiRp+78vVWfmG3hZQCFWybJErU5oyk1F
-	yWHNF93RqP3KGdMrBPo8rUUcJ4fGXKJgFrhTD+sJnicCLt/hXIbq
-X-Google-Smtp-Source: AGHT+IHBJChVKzKJ8Ha2DqnfkbtZYgesdtydIY4ye2NJ5g+9fT+XG0HZT9iUV72jyuZ2bSXgTVIQ4A==
-X-Received: by 2002:a05:600c:1386:b0:414:7ddd:b92e with SMTP id u6-20020a05600c138600b004147dddb92emr539890wmf.39.1711155455400;
-        Fri, 22 Mar 2024 17:57:35 -0700 (PDT)
-Received: from [192.168.0.3] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id t13-20020a5d42cd000000b0033ec312cd8asm3226194wrr.33.2024.03.22.17.57.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 22 Mar 2024 17:57:35 -0700 (PDT)
-Message-ID: <c9f40771-be55-40fc-b3a5-085bad5c6e8c@gmail.com>
-Date: Sat, 23 Mar 2024 02:57:50 +0200
+	s=arc-20240116; t=1711155517; c=relaxed/simple;
+	bh=tTZvu1ZDJN3HWNJZoYVrNXO74a3tb2J38WsCswp92Ug=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sWnO3FXMLng7Qw4M8QMDhzOZF736zfoeNO7y0AU9RcGjHXFLXum8tQKlrg9P/WQ36HEFmp3eFHrRq/3kBp8AJ+U+DsJvIIKqeeVJhOW0n4/SQhWrwmpJKfgGDJU/VGB7Fp4Tl25t9Fin7oHaR8zNpzxAv9Qxd4KWwe0X6yR6MdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dudau.co.uk; spf=pass smtp.mailfrom=dudau.co.uk; arc=none smtp.client-ip=80.229.23.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dudau.co.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dudau.co.uk
+Received: from mail.dudau.co.uk (bart.dudau.co.uk [192.168.14.2])
+	by smtp.dudau.co.uk (Postfix) with SMTP id 68ABB4172F42;
+	Sat, 23 Mar 2024 00:58:25 +0000 (GMT)
+Received: by mail.dudau.co.uk (sSMTP sendmail emulation); Sat, 23 Mar 2024 00:58:25 +0000
+Date: Sat, 23 Mar 2024 00:58:25 +0000
+From: Liviu Dudau <liviu@dudau.co.uk>
+To: =?utf-8?B?QmrDuHJu?= Mork <bjorn@mork.no>
+Cc: netdev@vger.kernel.org,
+	Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
+	Haijun Liu <haijun.liu@mediatek.com>,
+	Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
+	M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
+	Ricardo Martinez <ricardo.martinez@linux.intel.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	"David S . Miller" <davem@davemloft.net>
+Subject: Re: [PATCH net] net: wwan: t7xx: Split 64bit accesses to fix
+ alignment issues
+Message-ID: <Zf4pMcnEvCt/N25b@bart.dudau.co.uk>
+References: <20240322144000.1683822-1-bjorn@mork.no>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: wwan: t7xx: Split 64bit accesses to fix
- alignment issues
-Content-Language: en-US
-To: =?UTF-8?Q?Bj=C3=B8rn_Mork?= <bjorn@mork.no>, netdev@vger.kernel.org
-Cc: Liviu Dudau <liviu@dudau.co.uk>,
- Chandrashekar Devegowda <chandrashekar.devegowda@intel.com>,
- Haijun Liu <haijun.liu@mediatek.com>,
- Chiranjeevi Rapolu <chiranjeevi.rapolu@linux.intel.com>,
- M Chetan Kumar <m.chetan.kumar@linux.intel.com>,
- Ricardo Martinez <ricardo.martinez@linux.intel.com>,
- Loic Poulain <loic.poulain@linaro.org>,
- Johannes Berg <johannes@sipsolutions.net>,
- "David S . Miller" <davem@davemloft.net>
-References: <20240322144000.1683822-1-bjorn@mork.no>
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 In-Reply-To: <20240322144000.1683822-1-bjorn@mork.no>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: base64
 
-T24gMjIuMDMuMjAyNCAxNjo0MCwgQmrDuHJuIE1vcmsgd3JvdGU6DQo+IFNvbWUgb2YgdGhl
-IHJlZ2lzdGVycyBhcmUgYWxpZ25lZCBvbiBhIDMyYml0IGJvdW5kYXJ5LCBjYXVzaW5nDQo+
-IGFsaWdubWVudCBmYXVsdHMgb24gNjRiaXQgcGxhdGZvcm1zLg0KPiANCj4gICBVbmFibGUg
-dG8gaGFuZGxlIGtlcm5lbCBwYWdpbmcgcmVxdWVzdCBhdCB2aXJ0dWFsIGFkZHJlc3MgZmZm
-ZmZmYzA4NGExZDAwNA0KPiAgIE1lbSBhYm9ydCBpbmZvOg0KPiAgIEVTUiA9IDB4MDAwMDAw
-MDA5NjAwMDA2MQ0KPiAgIEVDID0gMHgyNTogREFCVCAoY3VycmVudCBFTCksIElMID0gMzIg
-Yml0cw0KPiAgIFNFVCA9IDAsIEZuViA9IDANCj4gICBFQSA9IDAsIFMxUFRXID0gMA0KPiAg
-IEZTQyA9IDB4MjE6IGFsaWdubWVudCBmYXVsdA0KPiAgIERhdGEgYWJvcnQgaW5mbzoNCj4g
-ICBJU1YgPSAwLCBJU1MgPSAweDAwMDAwMDYxLCBJU1MyID0gMHgwMDAwMDAwMA0KPiAgIENN
-ID0gMCwgV25SID0gMSwgVG5EID0gMCwgVGFnQWNjZXNzID0gMA0KPiAgIEdDUyA9IDAsIE92
-ZXJsYXkgPSAwLCBEaXJ0eUJpdCA9IDAsIFhzID0gMA0KPiAgIHN3YXBwZXIgcGd0YWJsZTog
-NGsgcGFnZXMsIDM5LWJpdCBWQXMsIHBnZHA9MDAwMDAwMDA0NmFkNjAwMA0KPiAgIFtmZmZm
-ZmZjMDg0YTFkMDA0XSBwZ2Q9MTAwMDAwMDEzZmZmZjAwMywgcDRkPTEwMDAwMDAxM2ZmZmYw
-MDMsIHB1ZD0xMDAwMDAwMTNmZmZmMDAzLCBwbWQ9MDA2ODAwMDAyMGEwMDcxMQ0KPiAgIElu
-dGVybmFsIGVycm9yOiBPb3BzOiAwMDAwMDAwMDk2MDAwMDYxIFsjMV0gU01QDQo+ICAgTW9k
-dWxlcyBsaW5rZWQgaW46IG10a190N3h4KCspIHFjc2VyaWFsIHBwcG9lIHBwcF9hc3luYyBv
-cHRpb24gbmZ0X2ZpYl9pbmV0IG5mX2Zsb3dfdGFibGVfaW5ldCBtdDc5MjF1KE8pIG10Nzky
-MXMoTykgbXQ3OTIxZShPKSBtdDc5MjFfY29tbW9uKE8pIGl3bG12bShPKSBpd2xkdm0oTykg
-dXNiX3d3YW4gcm5kaXNfaG9zdCBxbWlfd3dhbiBwcHBveCBwcHBfZ2VuZXJpYyBuZnRfcmVq
-ZWN0X2lwdjYgbmZ0X3JlamVjdF9pcHY0IG5mdF9yZWplY3RfaW5ldCBuZnRfcmVqZWN0IG5m
-dF9yZWRpciBuZnRfcXVvdGEgbmZ0X251bWdlbiBuZnRfbmF0IG5mdF9tYXNxIG5mdF9sb2cg
-bmZ0X2xpbWl0IG5mdF9oYXNoIG5mdF9mbG93X29mZmxvYWQgbmZ0X2ZpYl9pcHY2IG5mdF9m
-aWJfaXB2NCBuZnRfZmliIG5mdF9jdCBuZnRfY2hhaW5fbmF0IG5mX3RhYmxlcyBuZl9uYXQg
-bmZfZmxvd190YWJsZSBuZl9jb25udHJhY2sgbXQ3OTk2ZShPKSBtdDc5MnhfdXNiKE8pIG10
-NzkyeF9saWIoTykgbXQ3OTE1ZShPKSBtdDc2X3VzYihPKSBtdDc2X3NkaW8oTykgbXQ3Nl9j
-b25uYWNfbGliKE8pIG10NzYoTykgbWFjODAyMTEoTykgaXdsd2lmaShPKSBodWF3ZWlfY2Rj
-X25jbSBjZmc4MDIxMShPKSBjZGNfbmNtIGNkY19ldGhlciB3d2FuIHVzYnNlcmlhbCB1c2Ju
-ZXQgc2xoYyBzZnAgcnRjX3BjZjg1NjMgbmZuZXRsaW5rIG5mX3JlamVjdF9pcHY2IG5mX3Jl
-amVjdF9pcHY0IG5mX2xvZ19zeXNsb2cgbmZfZGVmcmFnX2lwdjYgbmZfZGVmcmFnX2lwdjQg
-bXQ2NTc3X2F1eGFkYyBtZGlvX2kyYyBsaWJjcmMzMmMgY29tcGF0KE8pIGNkY193ZG0gY2Rj
-X2FjbSBhdDI0IGNyeXB0b19zYWZleGNlbCBwd21fZmFuIGkyY19ncGlvIGkyY19zbWJ1cyBp
-bmR1c3RyaWFsaW8gaTJjX2FsZ29fYml0IGkyY19tdXhfcmVnIGkyY19tdXhfcGNhOTU0eCBp
-MmNfbXV4X3BjYTk1NDEgaTJjX211eF9ncGlvIGkyY19tdXggZHVtbXkgb2lkX3JlZ2lzdHJ5
-IHR1biBzaGE1MTJfYXJtNjQgc2hhMV9jZSBzaGExX2dlbmVyaWMgc2VxaXYNCj4gICBtZDUg
-Z2VuaXYgZGVzX2dlbmVyaWMgbGliZGVzIGNiYyBhdXRoZW5jZXNuIGF1dGhlbmMgbGVkc19n
-cGlvIHhoY2lfcGxhdF9oY2QgeGhjaV9wY2kgeGhjaV9tdGtfaGNkIHhoY2lfaGNkIG52bWUg
-bnZtZV9jb3JlIGdwaW9fYnV0dG9uX2hvdHBsdWcoTykgZG1fbWlycm9yIGRtX3JlZ2lvbl9o
-YXNoIGRtX2xvZyBkbV9jcnlwdCBkbV9tb2QgZGF4IHVzYmNvcmUgdXNiX2NvbW1vbiBwdHAg
-YXF1YW50aWEgcHBzX2NvcmUgbWlpIHRwbSBlbmNyeXB0ZWRfa2V5cyB0cnVzdGVkDQo+ICAg
-Q1BVOiAzIFBJRDogNTI2NiBDb21tOiBrd29ya2VyL3U5OjEgVGFpbnRlZDogRyBPIDYuNi4y
-MiAjMA0KPiAgIEhhcmR3YXJlIG5hbWU6IEJhbmFuYXBpIEJQSS1SNCAoRFQpDQo+ICAgV29y
-a3F1ZXVlOiBtZF9oa193cSB0N3h4X2ZzbV91bmluaXQgW210a190N3h4XQ0KPiAgIHBzdGF0
-ZTogODA0MDAwYzUgKE56Y3YgZGFJRiArUEFOIC1VQU8gLVRDTyAtRElUIC1TU0JTIEJUWVBF
-PS0tKQ0KPiAgIHBjIDogdDd4eF9jbGRtYV9od19zZXRfc3RhcnRfYWRkcisweDFjLzB4M2Mg
-W210a190N3h4XQ0KPiAgIGxyIDogdDd4eF9jbGRtYV9zdGFydCsweGFjLzB4MTNjIFttdGtf
-dDd4eF0NCj4gICBzcCA6IGZmZmZmZmMwODVkNjNkMzANCj4gICB4Mjk6IGZmZmZmZmMwODVk
-NjNkMzAgeDI4OiAwMDAwMDAwMDAwMDAwMDAwIHgyNzogMDAwMDAwMDAwMDAwMDAwMA0KPiAg
-IHgyNjogMDAwMDAwMDAwMDAwMDAwMCB4MjU6IGZmZmZmZjgwYzgwNGYyYzAgeDI0OiBmZmZm
-ZmY4MGNhMTk2YzA1DQo+ICAgeDIzOiAwMDAwMDAwMDAwMDAwMDAwIHgyMjogZmZmZmZmODBj
-ODE0YjliOCB4MjE6IGZmZmZmZjgwYzgxNGIxMjgNCj4gICB4MjA6IDAwMDAwMDAwMDAwMDAw
-MDEgeDE5OiBmZmZmZmY4MGM4MTRiMDgwIHgxODogMDAwMDAwMDAwMDAwMDAxNA0KPiAgIHgx
-NzogMDAwMDAwMDA1NWM5ODA2YiB4MTY6IDAwMDAwMDAwN2M1Mjk2ZDAgeDE1OiAwMDAwMDAw
-MDBmNmJjYTY4DQo+ICAgeDE0OiAwMDAwMDAwMGRiZGJkY2U0IHgxMzogMDAwMDAwMDAxYWVh
-ZjcyYSB4MTI6IDAwMDAwMDAwMDAwMDAwMDENCj4gICB4MTE6IDAwMDAwMDAwMDAwMDAwMDAg
-eDEwOiAwMDAwMDAwMDAwMDAwMDAwIHg5IDogMDAwMDAwMDAwMDAwMDAwMA0KPiAgIHg4IDog
-ZmZmZmZmODBjYTFlZjZiNCB4NyA6IGZmZmZmZjgwYzgxNGI4MTggeDYgOiAwMDAwMDAwMDAw
-MDAwMDE4DQo+ICAgeDUgOiAwMDAwMDAwMDAwMDAwODcwIHg0IDogMDAwMDAwMDAwMDAwMDAw
-MCB4MyA6IDAwMDAwMDAwMDAwMDAwMDANCj4gICB4MiA6IDAwMDAwMDAxMGE5NDcwMDAgeDEg
-OiBmZmZmZmZjMDg0YTFkMDA0IHgwIDogZmZmZmZmYzA4NGExZDAwNA0KPiAgIENhbGwgdHJh
-Y2U6DQo+ICAgdDd4eF9jbGRtYV9od19zZXRfc3RhcnRfYWRkcisweDFjLzB4M2MgW210a190
-N3h4XQ0KPiAgIHQ3eHhfZnNtX3VuaW5pdCsweDU3OC8weDVlYyBbbXRrX3Q3eHhdDQo+ICAg
-cHJvY2Vzc19vbmVfd29yaysweDE1NC8weDJhMA0KPiAgIHdvcmtlcl90aHJlYWQrMHgyYWMv
-MHg0ODgNCj4gICBrdGhyZWFkKzB4ZTAvMHhlYw0KPiAgIHJldF9mcm9tX2ZvcmsrMHgxMC8w
-eDIwDQo+ICAgQ29kZTogZjk0MDA4MDAgOTEwMDEwMDAgOGIyMTQwMDEgZDUwMzMyYmYgKGY5
-MDAwMDIyKQ0KPiAgIC0tLVsgZW5kIHRyYWNlIDAwMDAwMDAwMDAwMDAwMDAgXS0tLQ0KPiAN
-Cj4gVGhlIGluY2x1c2lvbiBvZiBpby02NC1ub25hdG9taWMtbG8taGkuaCBpbmRpY2F0ZXMg
-dGhhdCBhbGwgNjRiaXQNCj4gYWNjZXNzZXMgY2FuIGJlIHJlcGxhY2VkIGJ5IHBhaXJzIG9m
-IG5vbmF0b21pYyAzMmJpdCBhY2Nlc3MuICBGaXgNCj4gYWxpZ25tZW50IGJ5IGZvcmNpbmcg
-YWxsIGFjY2Vzc2VzIHRvIGJlIDMyYml0IG9uIDY0Yml0IHBsYXRmb3Jtcy4NCj4gDQo+IExp
-bms6IGh0dHBzOi8vZm9ydW0ub3BlbndydC5vcmcvdC9maWJvY29tLWZtMzUwLWdsLXN1cHBv
-cnQvMTQyNjgyLzcyDQo+IEZpeGVzOiAzOWQ0MzkwNDdmMWQgKCJuZXQ6IHd3YW46IHQ3eHg6
-IEFkZCBjb250cm9sIERNQSBpbnRlcmZhY2UiKQ0KPiBTaWduZWQtb2ZmLWJ5OiBCasO4cm4g
-TW9yayA8Ympvcm5AbW9yay5ubz4NCg0KUmV2aWV3ZWQtYnk6IFNlcmdleSBSeWF6YW5vdiA8
-cnlhemFub3Yucy5hQGdtYWlsLmNvbT4NCg==
+On Fri, Mar 22, 2024 at 03:40:00PM +0100, Bj=C3=B8rn Mork wrote:
+> Some of the registers are aligned on a 32bit boundary, causing
+> alignment faults on 64bit platforms.
+>=20
+>  Unable to handle kernel paging request at virtual address ffffffc084a1d0=
+04
+>  Mem abort info:
+>  ESR =3D 0x0000000096000061
+>  EC =3D 0x25: DABT (current EL), IL =3D 32 bits
+>  SET =3D 0, FnV =3D 0
+>  EA =3D 0, S1PTW =3D 0
+>  FSC =3D 0x21: alignment fault
+>  Data abort info:
+>  ISV =3D 0, ISS =3D 0x00000061, ISS2 =3D 0x00000000
+>  CM =3D 0, WnR =3D 1, TnD =3D 0, TagAccess =3D 0
+>  GCS =3D 0, Overlay =3D 0, DirtyBit =3D 0, Xs =3D 0
+>  swapper pgtable: 4k pages, 39-bit VAs, pgdp=3D0000000046ad6000
+>  [ffffffc084a1d004] pgd=3D100000013ffff003, p4d=3D100000013ffff003, pud=
+=3D100000013ffff003, pmd=3D0068000020a00711
+>  Internal error: Oops: 0000000096000061 [#1] SMP
+>  Modules linked in: mtk_t7xx(+) qcserial pppoe ppp_async option nft_fib_i=
+net nf_flow_table_inet mt7921u(O) mt7921s(O) mt7921e(O) mt7921_common(O) iw=
+lmvm(O) iwldvm(O) usb_wwan rndis_host qmi_wwan pppox ppp_generic nft_reject=
+_ipv6 nft_reject_ipv4 nft_reject_inet nft_reject nft_redir nft_quota nft_nu=
+mgen nft_nat nft_masq nft_log nft_limit nft_hash nft_flow_offload nft_fib_i=
+pv6 nft_fib_ipv4 nft_fib nft_ct nft_chain_nat nf_tables nf_nat nf_flow_tabl=
+e nf_conntrack mt7996e(O) mt792x_usb(O) mt792x_lib(O) mt7915e(O) mt76_usb(O=
+) mt76_sdio(O) mt76_connac_lib(O) mt76(O) mac80211(O) iwlwifi(O) huawei_cdc=
+_ncm cfg80211(O) cdc_ncm cdc_ether wwan usbserial usbnet slhc sfp rtc_pcf85=
+63 nfnetlink nf_reject_ipv6 nf_reject_ipv4 nf_log_syslog nf_defrag_ipv6 nf_=
+defrag_ipv4 mt6577_auxadc mdio_i2c libcrc32c compat(O) cdc_wdm cdc_acm at24=
+ crypto_safexcel pwm_fan i2c_gpio i2c_smbus industrialio i2c_algo_bit i2c_m=
+ux_reg i2c_mux_pca954x i2c_mux_pca9541 i2c_mux_gpio i2c_mux dummy oid_regis=
+try tun sha512_arm64 sha1_ce sha1_generic seqiv
+>  md5 geniv des_generic libdes cbc authencesn authenc leds_gpio xhci_plat_=
+hcd xhci_pci xhci_mtk_hcd xhci_hcd nvme nvme_core gpio_button_hotplug(O) dm=
+_mirror dm_region_hash dm_log dm_crypt dm_mod dax usbcore usb_common ptp aq=
+uantia pps_core mii tpm encrypted_keys trusted
+>  CPU: 3 PID: 5266 Comm: kworker/u9:1 Tainted: G O 6.6.22 #0
+>  Hardware name: Bananapi BPI-R4 (DT)
+>  Workqueue: md_hk_wq t7xx_fsm_uninit [mtk_t7xx]
+>  pstate: 804000c5 (Nzcv daIF +PAN -UAO -TCO -DIT -SSBS BTYPE=3D--)
+>  pc : t7xx_cldma_hw_set_start_addr+0x1c/0x3c [mtk_t7xx]
+>  lr : t7xx_cldma_start+0xac/0x13c [mtk_t7xx]
+>  sp : ffffffc085d63d30
+>  x29: ffffffc085d63d30 x28: 0000000000000000 x27: 0000000000000000
+>  x26: 0000000000000000 x25: ffffff80c804f2c0 x24: ffffff80ca196c05
+>  x23: 0000000000000000 x22: ffffff80c814b9b8 x21: ffffff80c814b128
+>  x20: 0000000000000001 x19: ffffff80c814b080 x18: 0000000000000014
+>  x17: 0000000055c9806b x16: 000000007c5296d0 x15: 000000000f6bca68
+>  x14: 00000000dbdbdce4 x13: 000000001aeaf72a x12: 0000000000000001
+>  x11: 0000000000000000 x10: 0000000000000000 x9 : 0000000000000000
+>  x8 : ffffff80ca1ef6b4 x7 : ffffff80c814b818 x6 : 0000000000000018
+>  x5 : 0000000000000870 x4 : 0000000000000000 x3 : 0000000000000000
+>  x2 : 000000010a947000 x1 : ffffffc084a1d004 x0 : ffffffc084a1d004
+>  Call trace:
+>  t7xx_cldma_hw_set_start_addr+0x1c/0x3c [mtk_t7xx]
+>  t7xx_fsm_uninit+0x578/0x5ec [mtk_t7xx]
+>  process_one_work+0x154/0x2a0
+>  worker_thread+0x2ac/0x488
+>  kthread+0xe0/0xec
+>  ret_from_fork+0x10/0x20
+>  Code: f9400800 91001000 8b214001 d50332bf (f9000022)
+>  ---[ end trace 0000000000000000 ]---
+>=20
+> The inclusion of io-64-nonatomic-lo-hi.h indicates that all 64bit
+> accesses can be replaced by pairs of nonatomic 32bit access.  Fix
+> alignment by forcing all accesses to be 32bit on 64bit platforms.
+>=20
+> Link: https://forum.openwrt.org/t/fibocom-fm350-gl-support/142682/72
+> Fixes: 39d439047f1d ("net: wwan: t7xx: Add control DMA interface")
+> Signed-off-by: Bj=C3=B8rn Mork <bjorn@mork.no>
+
+Tested-by: Liviu Dudau <liviu@dudau.co.uk>
+
+Modem still fails to transition from D3hot to D0, but that is unrelated
+to this patch.
+
+> ---
+>  drivers/net/wwan/t7xx/t7xx_cldma.c     | 4 ++--
+>  drivers/net/wwan/t7xx/t7xx_hif_cldma.c | 9 +++++----
+>  drivers/net/wwan/t7xx/t7xx_pcie_mac.c  | 8 ++++----
+>  3 files changed, 11 insertions(+), 10 deletions(-)
+>=20
+> diff --git a/drivers/net/wwan/t7xx/t7xx_cldma.c b/drivers/net/wwan/t7xx/t=
+7xx_cldma.c
+> index 9f43f256db1d..f0a4783baf1f 100644
+> --- a/drivers/net/wwan/t7xx/t7xx_cldma.c
+> +++ b/drivers/net/wwan/t7xx/t7xx_cldma.c
+> @@ -106,7 +106,7 @@ bool t7xx_cldma_tx_addr_is_set(struct t7xx_cldma_hw *=
+hw_info, unsigned int qno)
+>  {
+>  	u32 offset =3D REG_CLDMA_UL_START_ADDRL_0 + qno * ADDR_SIZE;
+> =20
+> -	return ioread64(hw_info->ap_pdn_base + offset);
+> +	return ioread64_lo_hi(hw_info->ap_pdn_base + offset);
+>  }
+> =20
+>  void t7xx_cldma_hw_set_start_addr(struct t7xx_cldma_hw *hw_info, unsigne=
+d int qno, u64 address,
+> @@ -117,7 +117,7 @@ void t7xx_cldma_hw_set_start_addr(struct t7xx_cldma_h=
+w *hw_info, unsigned int qn
+> =20
+>  	reg =3D tx_rx =3D=3D MTK_RX ? hw_info->ap_ao_base + REG_CLDMA_DL_START_=
+ADDRL_0 :
+>  				hw_info->ap_pdn_base + REG_CLDMA_UL_START_ADDRL_0;
+> -	iowrite64(address, reg + offset);
+> +	iowrite64_lo_hi(address, reg + offset);
+>  }
+> =20
+>  void t7xx_cldma_hw_resume_queue(struct t7xx_cldma_hw *hw_info, unsigned =
+int qno,
+> diff --git a/drivers/net/wwan/t7xx/t7xx_hif_cldma.c b/drivers/net/wwan/t7=
+xx/t7xx_hif_cldma.c
+> index abc41a7089fa..97163e1e5783 100644
+> --- a/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
+> +++ b/drivers/net/wwan/t7xx/t7xx_hif_cldma.c
+> @@ -137,8 +137,9 @@ static int t7xx_cldma_gpd_rx_from_q(struct cldma_queu=
+e *queue, int budget, bool
+>  				return -ENODEV;
+>  			}
+> =20
+> -			gpd_addr =3D ioread64(hw_info->ap_pdn_base + REG_CLDMA_DL_CURRENT_ADD=
+RL_0 +
+> -					    queue->index * sizeof(u64));
+> +			gpd_addr =3D ioread64_lo_hi(hw_info->ap_pdn_base +
+> +						  REG_CLDMA_DL_CURRENT_ADDRL_0 +
+> +						  queue->index * sizeof(u64));
+>  			if (req->gpd_addr =3D=3D gpd_addr || hwo_polling_count++ >=3D 100)
+>  				return 0;
+> =20
+> @@ -316,8 +317,8 @@ static void t7xx_cldma_txq_empty_hndl(struct cldma_qu=
+eue *queue)
+>  		struct t7xx_cldma_hw *hw_info =3D &md_ctrl->hw_info;
+> =20
+>  		/* Check current processing TGPD, 64-bit address is in a table by Q in=
+dex */
+> -		ul_curr_addr =3D ioread64(hw_info->ap_pdn_base + REG_CLDMA_UL_CURRENT_=
+ADDRL_0 +
+> -					queue->index * sizeof(u64));
+> +		ul_curr_addr =3D ioread64_lo_hi(hw_info->ap_pdn_base + REG_CLDMA_UL_CU=
+RRENT_ADDRL_0 +
+> +					      queue->index * sizeof(u64));
+>  		if (req->gpd_addr !=3D ul_curr_addr) {
+>  			spin_unlock_irqrestore(&md_ctrl->cldma_lock, flags);
+>  			dev_err(md_ctrl->dev, "CLDMA%d queue %d is not empty\n",
+
+I don't think any change past this point is needed. I don't know how the
+PCIe translation adddress registers are defined for T7xx devices, but they
+usually are 64bit aligned. In my local version of the patch I didn't had
+the changes below and I had the same results as with this patch.
+
+I will let others with access to the specs to decide though.
+
+Thanks for the quick patch!
+
+Best regards,
+Liviu
+
+> diff --git a/drivers/net/wwan/t7xx/t7xx_pcie_mac.c b/drivers/net/wwan/t7x=
+x/t7xx_pcie_mac.c
+> index 76da4c15e3de..f071ec7ff23d 100644
+> --- a/drivers/net/wwan/t7xx/t7xx_pcie_mac.c
+> +++ b/drivers/net/wwan/t7xx/t7xx_pcie_mac.c
+> @@ -75,7 +75,7 @@ static void t7xx_pcie_mac_atr_tables_dis(void __iomem *=
+pbase, enum t7xx_atr_src_
+>  	for (i =3D 0; i < ATR_TABLE_NUM_PER_ATR; i++) {
+>  		offset =3D ATR_PORT_OFFSET * port + ATR_TABLE_OFFSET * i;
+>  		reg =3D pbase + ATR_PCIE_WIN0_T0_ATR_PARAM_SRC_ADDR + offset;
+> -		iowrite64(0, reg);
+> +		iowrite64_lo_hi(0, reg);
+>  	}
+>  }
+> =20
+> @@ -112,17 +112,17 @@ static int t7xx_pcie_mac_atr_cfg(struct t7xx_pci_de=
+v *t7xx_dev, struct t7xx_atr_
+> =20
+>  	reg =3D pbase + ATR_PCIE_WIN0_T0_TRSL_ADDR + offset;
+>  	value =3D cfg->trsl_addr & ATR_PCIE_WIN0_ADDR_ALGMT;
+> -	iowrite64(value, reg);
+> +	iowrite64_lo_hi(value, reg);
+> =20
+>  	reg =3D pbase + ATR_PCIE_WIN0_T0_TRSL_PARAM + offset;
+>  	iowrite32(cfg->trsl_id, reg);
+> =20
+>  	reg =3D pbase + ATR_PCIE_WIN0_T0_ATR_PARAM_SRC_ADDR + offset;
+>  	value =3D (cfg->src_addr & ATR_PCIE_WIN0_ADDR_ALGMT) | (atr_size << 1) =
+| BIT(0);
+> -	iowrite64(value, reg);
+> +	iowrite64_lo_hi(value, reg);
+> =20
+>  	/* Ensure ATR is set */
+> -	ioread64(reg);
+> +	ioread64_lo_hi(reg);
+>  	return 0;
+>  }
+> =20
+> --=20
+> 2.39.2
+>=20
+
+--=20
+Everyone who uses computers frequently has had, from time to time,
+a mad desire to attack the precocious abacus with an axe.
+       	   	      	     	  -- John D. Clark, Ignition!
 
