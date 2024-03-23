@@ -1,168 +1,178 @@
-Return-Path: <netdev+bounces-81382-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81383-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A85B4887A20
-	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 20:13:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C982887A2C
+	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 20:19:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E34D2814D5
-	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 19:13:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4E3528202D
+	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 19:19:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0B165813E;
-	Sat, 23 Mar 2024 19:13:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A43859147;
+	Sat, 23 Mar 2024 19:19:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bAc0XgNl"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ht+b5B02"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E7241A85;
-	Sat, 23 Mar 2024 19:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544F15491E;
+	Sat, 23 Mar 2024 19:19:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711221200; cv=none; b=XxIUdMxmasrFJ4ikKwvBfgcd02CTjZEh3tJsH+hbMG3iVHb5+h2pq86rAkZ+PleOSNvh3t29OcZ8xXxJpPKoY6ZBEgmsEz9A1zlG6NzInkW/UF2vG8tgO2/B9MRvRRhle2kXrGoi6pHqi2cykTQNJ3WAcvCQnUR6cbsLIypJI1c=
+	t=1711221562; cv=none; b=IIpjJk5KaCGIV932r+6WcZIb7UsmfpM0XbTFcfsxPuXlKaTcHCs9fnPvQxysda6DRb15ADexbkGjDWML8mYEIK4sr+1CsKkwPVmSPZB3eoXTn8b1ZZaUEADu80gLDWCuMhhkJoOUMF/ibesFgUcCmBL8aKjqgtpBdCszXRKniAM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711221200; c=relaxed/simple;
-	bh=zHRblCkiuo8/H4paSUgyFpR9Eg5vekpRlutX0CYazKY=;
+	s=arc-20240116; t=1711221562; c=relaxed/simple;
+	bh=B5H1PblavKAzgnphm3RFVMD2i0BJwgN0qdA5tEYgrE4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=udQ9ZdaWx8wCQ6tWmg0+dObAIbrPfaXvYuOaQgEV93bty/eCgZPgwjnSPiYJUeeh1OrCmRUkmY6ihA/0/+cICFFT0F9EnTWmss+3AlcTDoPIpk1hGNwsRS00gI1TQ3tfv8Gk05JJ+eBaXAB5W5Ws/4RQ83Qeip/mJ5Pf/iO3XBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bAc0XgNl; arc=none smtp.client-ip=209.85.128.42
+	 To:Cc:Content-Type; b=NAYDJdVKf+S2mwGGI3fEdl5kb6IZQnQZ84SBFdH2upv/VW44A8zbjP65KIXy5xMWOLS8gJVH1n7Lqj0obmzjOjjPngQVDXuegYdaVjJ/mYn9XDbvZ2GgjrK+T0sWVr922xNNpTlTpDd3XUmMgBCjKu2rWKfq96VweMm0cKzSNdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ht+b5B02; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-41482aa8237so3912795e9.2;
-        Sat, 23 Mar 2024 12:13:18 -0700 (PDT)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-34175878e30so1992384f8f.3;
+        Sat, 23 Mar 2024 12:19:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711221197; x=1711825997; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711221558; x=1711826358; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=UQAPf2oDxn8ACJCwdYBh/RfidZ+NxZc7Gv33EcxYc4E=;
-        b=bAc0XgNlVZo/28gH6CURHUVSJ/JNONJ6f3LkduoXWYrdOgRfJwNuq2u6LLILUm2KgQ
-         xkLG6r/4YWW5MZdhWM0UTER6+cm7Z1JPVbK1ixGcqmTAh3PzreAm6p099xXQNFwuhBSd
-         LATHEIuTJkYqtlZYnGeewkAXXtFtKRJpOp1+F7LUHKLnUZP3coyTIYuutqf2x7OuiVQH
-         W2bLSrbxAMVvjQsCkGXJ9IJxAXc40AtTi5vJrGk+ue4SVsfVLNA2VbpFi/N5aonWZbaJ
-         LdN9H3iipkgb9AlhQkWMxqYNGSn4NxvG1P3G5+e961fIHanTO2Bk6hFzzaZw1Ib3cvp1
-         sZmw==
+        bh=yixKxMyJp9zitpdKye9pLVcWEHJONLO0fUVkk9RNx2Q=;
+        b=ht+b5B022yADnDN4bBtI8hIFZg6LP/qjoqSbPdqEGKF3W77asD0frBQ5Kw3XdZwQYK
+         nHavVdO5CaNHbr8HvQPLIr5wFr78x4bHiCFsqkhk+M7N1DWJOtVp243RPanS0rHQNNYZ
+         rHkE7EkevI0Vns01+SQfErkfW17U8hplCAa5EyFjWolpmpVY70Ckdcp7m0/7Z0nY2aEl
+         0abQz6lAEitw4cPUS0gxZWRg2ejgBs5IBx9WtwdWGQd1hzcn7hWfofuzWMwohwLKMgOA
+         tfV8/DZhFvhbzs13+TzljnOhT90p4dvBHvRbwu5UFoRHzUl4dHlGNOi/8zH0HqtO9vbM
+         aYMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711221197; x=1711825997;
+        d=1e100.net; s=20230601; t=1711221558; x=1711826358;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=UQAPf2oDxn8ACJCwdYBh/RfidZ+NxZc7Gv33EcxYc4E=;
-        b=eCbs2t1RBUXvWC62QG8ea81qywKY6q20UuCRYZRlO4XCtkPpEICLi1s/Jty9a9Ze54
-         DdRQNJIug9ivSFU3MwVMIqGqwjZTrfDWcUvC05WXVSzy8SXgO4pYpHpVLiBz/Y4aJHhR
-         EZ29FSa1F353uhn/BwwIwAOi+tYVuuhog+5gBFnaOkZc75xRSngSXKVSXL1wRr+YzdO6
-         MHS1bCyv7ywfkfFeVP8ljPkZc/wPWPPYHSCnyD+rr2PxPeijpov02ccTCro9SxUQJroh
-         3TXW6cQYT8O4eLOULSHp6yeExQaQCUvBHNs8HCp13gzm3/XtePD1TSCSFQyCm3IskrII
-         bQSQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU1YiU/r5IUc0JKUVSIA4CAuOGcgjYSJAWU4zGR91of/Sgl5lhoWwBAIRpsZeOmw7NL7UbGtCkl4bv03MycVfhbGxPbBG9vtphGjLqICKYp0hAz7tut7k9MqlpS3SB8pW/FAMmL5AqHuZMxAkPKWF+GdlUoJHzwsW/n
-X-Gm-Message-State: AOJu0YwJZUFHmYnusVd4UovHYBCwvWKhGRxW1nzybAfxoQxvuQOzY1Pp
-	NwA8jpYdQVMmJ61oWAQO8rCemz1bFhIViugw0hytcFRSkq90X/W4V15sTZM3fNEf/6qC/p8oi2U
-	R6/5MsLYwtxdI7kSpTymgonbdf/w=
-X-Google-Smtp-Source: AGHT+IGo47dPiuvVsByOeK1OBCQLAK2uBJGjcKscF1mmwIUcz7SfQhwIkXechtkvmpac/ySiNdCGjEP//B0jUCW1Lno=
-X-Received: by 2002:a05:600c:470a:b0:413:15ec:6f25 with SMTP id
- v10-20020a05600c470a00b0041315ec6f25mr2208645wmo.25.1711221197371; Sat, 23
- Mar 2024 12:13:17 -0700 (PDT)
+        bh=yixKxMyJp9zitpdKye9pLVcWEHJONLO0fUVkk9RNx2Q=;
+        b=F2dUdakindcc5Y8sDzuBkNt9i5lxawf6f0qHqE6tnttZdk4sIHwBiuNRWY2sJd7CBy
+         CFMDPi9tfbNBYSWIsK9Ve6Qc6k532MWnkKlvAmWWbXJ8C8/opMzsZYUkcurS2z4IzLEF
+         YeDF9GI5RXQOlwoO5IxHWYSi8ToXMjhk98UCugV9JKzMgaAFtI3DzvA8ozo1DfbXHDs2
+         ZZknxxhcTZubitQwxZ7qzMLP5JIiQT7cYYa5v6HGm+RRCdIVuiJN55RU8JZCp5xgriF3
+         /oTNrGUTM4LM2TNfByOt6UW/TuR0ViSjP1tug+DiJKV2QGenSvY/sF/xLigl+/HBvW7u
+         wWhA==
+X-Forwarded-Encrypted: i=1; AJvYcCWIeaQ/yiBpH2/hsPlo1ilbVrmGWbW1/Q/mj/lYUpLY0mNt9n+PMhtL1TwavvqIOG/JF4WlslG8qKucixGp+ulx+9Ej+OZsA3Uc30xeXt974R4DuKvjyStaBnI1QMrx9Bdc1XtgcDTzxMG2ijeNLuU+ozIdYh1pNbMfa3Fj0oPzOE4qLKz+sub0QqtOv3wrCcBUurTs5GF9dyTu4eEbpsHOcteP88UhdDEXpVBZ2vsoD1uht87SBw==
+X-Gm-Message-State: AOJu0YwIAcN4l75cdLzOXsAwgQs/J5QMQVzKbRZiIRYnXK7mmjuTvy9F
+	fEWYgQ2l8OtkYV3cNvaupghGRqHYDGAVVgsqE5Cv1Qgp5wwyzrzDyNuLvlhFvb5pZRI/Z3DCvPX
+	A0Tbi7m9tlRh5OUdEq0THSn/jme8=
+X-Google-Smtp-Source: AGHT+IHc7Rh/6RhzPxJ4eOoWSDDR7HLjhbFFeaswIwMDe7FN91r00me6FYQkMfPJGtPtWcjqOEHpzi5SqTmnbXU+fPk=
+X-Received: by 2002:a5d:5cc6:0:b0:33e:c522:a071 with SMTP id
+ cg6-20020a5d5cc6000000b0033ec522a071mr1942577wrb.51.1711221558546; Sat, 23
+ Mar 2024 12:19:18 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240321124640.8870-1-puranjay12@gmail.com> <9f2b63b5-569c-1e00-a635-93d9cd695517@iogearbox.net>
- <mb61p4jcyxq5m.fsf@gmail.com> <15ba79e3-14b2-d92e-3f94-e4f5f963e15d@iogearbox.net>
-In-Reply-To: <15ba79e3-14b2-d92e-3f94-e4f5f963e15d@iogearbox.net>
+References: <cover.1711113657.git.hodges.daniel.scott@gmail.com> <ac8e77881212e18d117059a698affd6afc2607af.1711113657.git.hodges.daniel.scott@gmail.com>
+In-Reply-To: <ac8e77881212e18d117059a698affd6afc2607af.1711113657.git.hodges.daniel.scott@gmail.com>
 From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Sat, 23 Mar 2024 12:13:06 -0700
-Message-ID: <CAADnVQJhxQV0xBJDWVkTGXJ+XYpsq5kFmMsuMEHBEaqUmkh0iw@mail.gmail.com>
-Subject: Re: [PATCH bpf v4] bpf: verifier: prevent userspace memory access
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Puranjay Mohan <puranjay12@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
-	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
-	"H. Peter Anvin" <hpa@zytor.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
-	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, Ilya Leoshkevich <iii@linux.ibm.com>
+Date: Sat, 23 Mar 2024 12:19:07 -0700
+Message-ID: <CAADnVQ+BsBcp5osqiG46gjtLViQjHStVnPsySffHsybaz7OYEw@mail.gmail.com>
+Subject: Re: [PATCH 1/3] leds: trigger: legtrig-bpf: Add ledtrig-bpf module
+To: Daniel Hodges <hodges.daniel.scott@gmail.com>, 
+	netfilter-devel <netfilter-devel@vger.kernel.org>, 
+	Network Development <netdev@vger.kernel.org>
+Cc: Alexei Starovoitov <ast@kernel.org>, Pavel Machek <pavel@ucw.cz>, Lee Jones <lee@kernel.org>, 
+	linux-leds@vger.kernel.org, Daniel Borkmann <daniel@iogearbox.net>, 
+	bpf <bpf@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Mar 22, 2024 at 9:28=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.n=
-et> wrote:
+On Fri, Mar 22, 2024 at 7:08=E2=80=AFAM Daniel Hodges
+<hodges.daniel.scott@gmail.com> wrote:
 >
-> On 3/22/24 4:05 PM, Puranjay Mohan wrote:
-> [...]
-> >>> +           /* Make it impossible to de-reference a userspace address=
- */
-> >>> +           if (BPF_CLASS(insn->code) =3D=3D BPF_LDX &&
-> >>> +               (BPF_MODE(insn->code) =3D=3D BPF_PROBE_MEM ||
-> >>> +                BPF_MODE(insn->code) =3D=3D BPF_PROBE_MEMSX)) {
-> >>> +                   struct bpf_insn *patch =3D &insn_buf[0];
-> >>> +                   u64 uaddress_limit =3D bpf_arch_uaddress_limit();
-> >>> +
-> >>> +                   if (!uaddress_limit)
-> >>> +                           goto next_insn;
-> >>> +
-> >>> +                   *patch++ =3D BPF_MOV64_REG(BPF_REG_AX, insn->src_=
-reg);
-> >>> +                   if (insn->off)
-> >>> +                           *patch++ =3D BPF_ALU64_IMM(BPF_ADD, BPF_R=
-EG_AX, insn->off);
-> >>> +                   *patch++ =3D BPF_ALU64_IMM(BPF_RSH, BPF_REG_AX, 3=
-2);
-> >>> +                   *patch++ =3D BPF_JMP_IMM(BPF_JLE, BPF_REG_AX, uad=
-dress_limit >> 32, 2);
-> >>> +                   *patch++ =3D *insn;
-> >>> +                   *patch++ =3D BPF_JMP_IMM(BPF_JA, 0, 0, 1);
-> >>> +                   *patch++ =3D BPF_MOV64_IMM(insn->dst_reg, 0);
-> >>
-> >> But how does this address other cases where we could fault e.g. non-ca=
-nonical,
-> >> vsyscall page, etc? Technically, we would have to call to copy_from_ke=
-rnel_nofault_allowed()
-> >> to really address all the cases aside from the overflow (good catch bt=
-w!) where kernel
-> >> turns into user address.
-> >
-> > So, we are trying to ~simulate a call to
-> > copy_from_kernel_nofault_allowed() here. If the address under
-> > consideration is below TASK_SIZE (TASK_SIZE + 4GB to be precise) then w=
+> This patch adds a led trigger that interfaces with the bpf subsystem. It
+> allows for BPF programs to control LED activity through calling bpf
+> kfuncs. This functionality is useful in giving users a physical
+> indication that a BPF program has performed an operation such as
+> handling a packet or probe point.
+>
+> Signed-off-by: Daniel Hodges <hodges.daniel.scott@gmail.com>
+> ---
+>  drivers/leds/trigger/Kconfig       | 10 +++++
+>  drivers/leds/trigger/Makefile      |  1 +
+>  drivers/leds/trigger/ledtrig-bpf.c | 72 ++++++++++++++++++++++++++++++
+>  3 files changed, 83 insertions(+)
+>  create mode 100644 drivers/leds/trigger/ledtrig-bpf.c
+>
+> diff --git a/drivers/leds/trigger/Kconfig b/drivers/leds/trigger/Kconfig
+> index d11d80176fc0..30b0fd3847be 100644
+> --- a/drivers/leds/trigger/Kconfig
+> +++ b/drivers/leds/trigger/Kconfig
+> @@ -152,4 +152,14 @@ config LEDS_TRIGGER_TTY
+>
+>           When build as a module this driver will be called ledtrig-tty.
+>
+> +config LEDS_TRIGGER_BPF
+> +       tristate "LED BPF Trigger"
+> +       depends on BPF
+> +       depends on BPF_SYSCALL
+> +       help
+> +         This allows LEDs to be controlled by the BPF subsystem. This tr=
+igger
+> +         must be used with a loaded BPF program in order to control LED =
+state.
+> +         BPF programs can control LED state with kfuncs.
+> +         If unsure, say N.
+> +
+>  endif # LEDS_TRIGGERS
+> diff --git a/drivers/leds/trigger/Makefile b/drivers/leds/trigger/Makefil=
 e
-> > skip that load because that address could be mapped by the user.
-> >
-> > If the address is above TASK_SIZE + 4GB, we allow the load and it could
-> > cause a fault if the address is invalid, non-canonical etc. Taking the
-> > fault is fine because JIT will add an exception table entry for
-> > for that load with BPF_PBOBE_MEM.
->
-> Are you sure? I don't think the kernel handles non-canonical fixup.
+> index 25c4db97cdd4..ac47128d406c 100644
+> --- a/drivers/leds/trigger/Makefile
+> +++ b/drivers/leds/trigger/Makefile
+> @@ -16,3 +16,4 @@ obj-$(CONFIG_LEDS_TRIGGER_NETDEV)     +=3D ledtrig-netd=
+ev.o
+>  obj-$(CONFIG_LEDS_TRIGGER_PATTERN)     +=3D ledtrig-pattern.o
+>  obj-$(CONFIG_LEDS_TRIGGER_AUDIO)       +=3D ledtrig-audio.o
+>  obj-$(CONFIG_LEDS_TRIGGER_TTY)         +=3D ledtrig-tty.o
+> +obj-$(CONFIG_LEDS_TRIGGER_BPF)         +=3D ledtrig-bpf.o
+> diff --git a/drivers/leds/trigger/ledtrig-bpf.c b/drivers/leds/trigger/le=
+dtrig-bpf.c
+> new file mode 100644
+> index 000000000000..e3b0b8281b70
+> --- /dev/null
+> +++ b/drivers/leds/trigger/ledtrig-bpf.c
+> @@ -0,0 +1,72 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * LED BPF Trigger
+> + *
+> + * Author: Daniel Hodges <hodges.daniel.scott@gmail.com>
+> + */
+> +
+> +#include <linux/bpf.h>
+> +#include <linux/btf.h>
+> +#include <linux/btf_ids.h>
+> +#include <linux/kernel.h>
+> +#include <linux/module.h>
+> +#include <linux/init.h>
+> +#include <linux/leds.h>
+> +
+> +
+> +DEFINE_LED_TRIGGER(ledtrig_bpf);
+> +
+> +__bpf_hook_start()
+> +
+> +__bpf_kfunc void bpf_ledtrig_blink(unsigned long delay_on, unsigned long=
+ delay_off, int invert)
+> +{
+> +       led_trigger_blink_oneshot(ledtrig_bpf, delay_on, delay_off, inver=
+t);
 
-I believe it handles it fine otherwise our selftest bpf_testmod_return_ptr:
-   case 4: return (void *)(1ull << 60);    /* non-canonical and invalid */
-would have been crashing for the last 3 years,
-since we've been running it.
-
-> > The vsyscall page is special, this approach skips all loads from this
-> > page. I am not sure if that is acceptable.
->
-> The bpf_probe_read_kernel() does handle it fine via copy_from_kernel_nofa=
-ult().
->
-> So there is tail risk that BPF_PROBE_* could trigger a crash.
-
-For this patch let's do
-return max(TASK_SIZE_MAX + PAGE_SIZE, VSYSCALL_ADDR)
-to cover both with one check?
-
-> Other archs might
-> have other quirks, e.g. in case of loongarch it says highest bit set mean=
-s kernel
-> space.
-
-let's tackle loongarch with whatever quirks it has separately.
+A new kernel module just to call this helper?
+Feels like overkill. Can it be a part of generic led bits?
+btw, have you looked at net/netfilter/xt_LED.c ?
+netfilter had the ability to blink led for a long time.
+I'm curious whether folks found it useful.
+It can also do led_trigger_event().
+Should that be another kfunc?
 
