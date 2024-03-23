@@ -1,111 +1,186 @@
-Return-Path: <netdev+bounces-81372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0D0F887782
-	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 09:12:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B21D8877FA
+	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 11:24:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 51DB2B218E0
-	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 08:12:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64DDEB213CF
+	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 10:24:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F4B4BA50;
-	Sat, 23 Mar 2024 08:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 342F11A38C9;
+	Sat, 23 Mar 2024 10:24:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XasEWQne"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Rr6zboSE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B812C9475;
-	Sat, 23 Mar 2024 08:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8803710949
+	for <netdev@vger.kernel.org>; Sat, 23 Mar 2024 10:24:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711181521; cv=none; b=E0bZbZRwllaDcfXxT1tKrO4t+gx9AyDHHlKi6xAdaOKbpQURZmOHAEkhcrk3dby/SOyUP4HxwNrpvH14LWTErhuOhFsJwpjfbN4CkNIq8LDdbs7XGJ27CC62e5hm0c/Z7fOdixCA71g3Al6J6WQv1o7a/uSaOcoxLrmXkMAO4E4=
+	t=1711189491; cv=none; b=YbND2VXUoC75cACSei8qeGZzo3i8ClVPSzRspQgt626OCX2yC6o7G4uKmfu/FnmRs6SUSV/lct2eFLfci1pwUGYHtZu3zTiolUdZy5Q8lurCrfzxQtGNHN0WiPBrIRqKiRYJOJsdkie4qYyjisrEwW4f3PyNZOshZH7lmKSLNxk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711181521; c=relaxed/simple;
-	bh=JMwKzzdKGu9tiwjUXIyxuCZpE3rZs/L8B0k/jGFBlRc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=grfEmH35vuXycuYLvFPNLmwBXjKX/kruX6b7CDmaHndGk5ps6ez+9XEMvwAa+L6fklcZMvIXdtcsvwixC9nzWC/NUge5+mle/jxEw2b5LSfD8OtjnhGT6deCncVI2aaKMhj7RywnYbP+IcYDQCN0pGqZ58lEZ+NXb8FyTlD4GWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XasEWQne; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-6e88e4c8500so2021649b3a.2;
-        Sat, 23 Mar 2024 01:11:59 -0700 (PDT)
+	s=arc-20240116; t=1711189491; c=relaxed/simple;
+	bh=EI4E2QPRZgdV+VYaFBNzKDcDkTtZXfPdSLG/1fRvzgw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WIX6Y6EBzVrB7A9/CSwOxcNgLeux6NmbmB3yJuPdWcYABtFfLZBK/mkuMRCUFYr3f04+sFOLXXSX4ycHx9RUcNdE09jfr5xQlhjXhr/xIAXvHyzzMDo7+W/uSmYO4sAfyjWpmBhatS0vNkGegrgd/r9P+lK/x2TwPKidYV3tJKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Rr6zboSE; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a47385a4379so182778166b.0
+        for <netdev@vger.kernel.org>; Sat, 23 Mar 2024 03:24:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711181519; x=1711786319; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=jBwYZ0KKBPOHeG9usQo7hTvvne/fVMxf6Cxd7oHuSmg=;
-        b=XasEWQnebBrbLIL53HfmNLANGxKnWywc5RcEMnHvbuNsB1Sk4MdhHb2SswFyrEhodR
-         FQ0LthsrkuNsft4Xh1Ux5N2r8PeCCA0aATwG0cLSESMecKK1zv9F6zIem5aDmC409m3x
-         zhcPCA2qlCCSef2RFf/KcXqhhtYUAKedcXXaPlWBW7WxbxA6x/t/+k2zrxEmhIhYK264
-         HYEh1lQVLDfeQJ/vwsyKlBuiq0UA7NqINVd0Y96wS0Faa+HUJGUeKBxBh3XcA0yEOFLD
-         FAdp1gmwMyWPbvHWfGJyB14qhUbpDY5/6FB4YpaN1f86EAN+eYvONy3Tx3f+BkW2sVAl
-         +u6w==
+        d=linaro.org; s=google; t=1711189488; x=1711794288; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=27eV0IsdHyW0CoX0dFZS8tHIPLcqxbkMkWnidM0bXYY=;
+        b=Rr6zboSE1nIuDsfatICRiiIPJO4Ee+sWRlIJ5ADV5K42zoubzLAnIUThu8iXReixF0
+         tK+Arq7OizleFgWZbO4gW8qKjDeLvP56RyyQ8DUdi7Ls/21vWx8oh9fPGySmva2FFIq+
+         SY4FEIq/Y2GphMCN7z2tnvyvv3h6Y8Ca9HOZraGiN2b/qHDeK5oCQnFvsv6I5c9ya4Cu
+         WKA7ajFRlGrixM/z+SQ+ijSFlGefLlhSqE6d5XJ8JPlFcOuzddZB1dFr77My5d4+DSX4
+         mGY1RFM4Gcud9VkpMB8zKoHs3+h3MKjTpfLYhEvBA4OFsL6+2E9CDb2t+cSseqoUilgR
+         FvKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711181519; x=1711786319;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jBwYZ0KKBPOHeG9usQo7hTvvne/fVMxf6Cxd7oHuSmg=;
-        b=BvUWZpiv1eJbMRFEMBnaEUbWFw0DUvxytYhvUqsLymcZiLFE8Yo4BAzf0bUNSpvnmp
-         oGlXbUjyoCw7oTyQpL7FRPUvxnw6IIewkbh0O/PtbdxNVwH36bxPAJlBAGVq3xd1/ceT
-         +m6NGPrQ8u3a89h+xiMOK1v9R122mzDwaxpXa0GtcCcX9vIUpD0SawhPnatfVfcaEtsI
-         a6DJ+of7QJAQm4VfLI2uU1HnRqUeOrpW+PtP3OqHbglBR2F+xQNw3LYMGpJtZafs58r4
-         BUfwHrx7j61EO+RN/+5THM6qbYSH40jRkTvH6i+AafVEoY0CzrUZFrnicRU8lBiv3MPa
-         0+/A==
-X-Forwarded-Encrypted: i=1; AJvYcCXxDvCvo9xXAzGDwcGQMAXkwZ8UWQ/jvDero4ja2Zg4wTDv/p+RBK8eVEQQP7bEZbPNXzVKMzfMrQOhTQEUQDv5CC21KwOOosZ/8AlFwf6UDPLPmE9bPX3mToWjJzK3VmBT
-X-Gm-Message-State: AOJu0Ywr7jMfdKrgh/7e/UHR2Wj+eZ2izkd8udnmeRENGVhZsYjZaIvX
-	vpE9J2tVVP2whKu+6N6eiofDzh6A5Ur2XwFh2wbycTL3W4ANmizH
-X-Google-Smtp-Source: AGHT+IEP+Fr0MNTTZdqJx3m+s+xZm/uW9BUfei/BUKpia/QAwq+U0bC1UvjPhIQ3sUINcpVE5aGcxw==
-X-Received: by 2002:a05:6a00:3d06:b0:6e6:b155:b9a3 with SMTP id lo6-20020a056a003d0600b006e6b155b9a3mr1996721pfb.11.1711181518914;
-        Sat, 23 Mar 2024 01:11:58 -0700 (PDT)
-Received: from bharathsm-Virtual-Machine.. ([131.107.147.61])
-        by smtp.googlemail.com with ESMTPSA id m5-20020a62f205000000b006ea810ceaf0sm912452pfh.217.2024.03.23.01.11.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 23 Mar 2024 01:11:58 -0700 (PDT)
-From: Bharath SM <bharathsm.hsk@gmail.com>
-X-Google-Original-From: Bharath SM <bharathsm@microsoft.com>
-To: davem@davemloft.net,
-	dhowells@redhat.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-doc@vger.kernel.org,
-	netdev@vger.kernel.org,
-	corbet@lwn.net,
-	pabeni@redhat.com
-Cc: Bharath SM <bharathsm@microsoft.com>
-Subject: [PATCH] dns_resolver: correct sysfs path name in dns resolver documentation
-Date: Sat, 23 Mar 2024 13:41:40 +0530
-Message-Id: <20240323081140.41558-1-bharathsm@microsoft.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1711189488; x=1711794288;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=27eV0IsdHyW0CoX0dFZS8tHIPLcqxbkMkWnidM0bXYY=;
+        b=xPxcyVfyS4CJXindG+k+UkHQNVg2Tcy34Pil4RRPjHayENLDLmOxni8cl86eaiZYt7
+         bd0eanI927QF2G3ExZmyBSguNk38YaZUVK+Tue/BsapcAKDIgSMzuWOZt66R7zJ6+KSr
+         onp/0v16ahOT3xoYY3ZH9SjToWuhb26enrHCckRVZMQhhKE7ksAPKCpGJ/axaRbaIzKh
+         kWfLjnZw/xhh1fPqYjr9Kkd0rIhpcYqYDoNmfhz2zJGmHY6aXS8sreh6PXSNv9jzhr0N
+         w0Kp+evKsecw3gbkGN3Jd5rjkI1i2I1LBnCDTC3vyDXOgktOibGRUMO1RJkVxqV+thWY
+         DFnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXsFmrQp848t3UhAeDImfZPLCmesd4AValrYgU83aDQ7Fw9/TR4rKL4P11uYgbFhnKRcEFJMFVjCQzj9yc7A4eOaaldYMAP
+X-Gm-Message-State: AOJu0YxkRfoqogvIMXzsWnw4Crc5JrZa7vc+xcYK6slSwZ7v2T0Zq6vj
+	0lMV8KshGC5wCsuslqWJpn6eREji1b02eKXKV0HcJoDAWcZ4S1QGlxB0GkB8Klk=
+X-Google-Smtp-Source: AGHT+IElMB+eq0Nqv/BFxyyEAHz5MAomDs2zRpTTQQ7d1Mgzoga3P3xV4zoLW3fiI2kzGmV2lirrNg==
+X-Received: by 2002:a17:907:7d8b:b0:a46:d04b:66e7 with SMTP id oz11-20020a1709077d8b00b00a46d04b66e7mr1340567ejc.25.1711189487936;
+        Sat, 23 Mar 2024 03:24:47 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.222.97])
+        by smtp.gmail.com with ESMTPSA id m19-20020a1709060d9300b00a45c9945251sm753897eji.192.2024.03.23.03.24.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 23 Mar 2024 03:24:47 -0700 (PDT)
+Message-ID: <703de50e-f271-4e65-bda4-85b1835afa6e@linaro.org>
+Date: Sat, 23 Mar 2024 11:24:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 12/12] dt-bindings: net: add Microchip's
+ LAN865X 10BASE-T1S MACPHY
+To: Parthiban.Veerasooran@microchip.com, conor@kernel.org
+Cc: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, saeedm@nvidia.com,
+ anthony.l.nguyen@intel.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, corbet@lwn.net, linux-doc@vger.kernel.org,
+ robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ devicetree@vger.kernel.org, Horatiu.Vultur@microchip.com,
+ ruanjinjie@huawei.com, Steen.Hegelund@microchip.com,
+ vladimir.oltean@nxp.com, UNGLinuxDriver@microchip.com,
+ Thorsten.Kummermehr@microchip.com, Pier.Beruto@onsemi.com,
+ Selvamani.Rajagopal@onsemi.com, Nicolas.Ferre@microchip.com,
+ benjamin.bigler@bernformulastudent.ch
+References: <20240306085017.21731-1-Parthiban.Veerasooran@microchip.com>
+ <20240306085017.21731-13-Parthiban.Veerasooran@microchip.com>
+ <20240306-spree-islamist-957acf0ee368@spud>
+ <4c5968a3-c043-45fc-8fff-2a9eaa6de341@lunn.ch>
+ <20240306-ripeness-dimple-e360a031ccde@spud>
+ <05a9a7ee-e4f0-443e-9c8a-8ee649a11448@microchip.com>
+ <2f384a54-74a0-4a75-a325-8985257b5d66@linaro.org>
+ <ba37c212-fb98-407d-9bee-6d14801754d9@microchip.com>
+ <96493beb-afbf-42f2-88f0-ad645422ecdb@linaro.org>
+ <1735add6-4a6a-452b-bf26-1cf19c95493e@microchip.com>
+ <20240321-upcountry-finless-b0e9b1ab4deb@spud>
+ <13a28ba3-2da4-428c-8091-25e75c6c11e8@microchip.com>
+ <d41a53bd-ea1e-476a-a18c-ed51dbac0a98@linaro.org>
+ <b3c5d217-a5e3-4957-884c-02e8c10aba9d@microchip.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <b3c5d217-a5e3-4957-884c-02e8c10aba9d@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Fix an incorrect sysfs path in dns resolver documentation
+On 22/03/2024 09:28, Parthiban.Veerasooran@microchip.com wrote:
+>>>
+>>>         - const: microchip,lan8650
+>>>
+>>>         - items:
+>>>
+>>>             - const: microchip,lan8651
+>>>
+>>>             - const: microchip,lan8650
+>>>
+>>> Executed dt_binding_check with the above update and it was successful.
+>>> Hope this is OK?
+>>
+>> This is the third time you ask us. None of the previous cases were
+>> actually tested. Maybe this one was, maybe not. I assume the latter.
+>>
+>> First, test your code.
+> As I mentioned in the previous email itself, I tested this case and the 
+> previous case both in my RPI 4 setup before replying to the comment. The 
 
-Signed-off-by: Bharath SM <bharathsm@microsoft.com>
----
- Documentation/networking/dns_resolver.rst | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I don't understand how one can test bindings and DTS on RPI 4. Testing
+is with dt_bindings_check and dtbs_check.
 
-diff --git a/Documentation/networking/dns_resolver.rst b/Documentation/networking/dns_resolver.rst
-index add4d59a99a5..99bf72a6ed45 100644
---- a/Documentation/networking/dns_resolver.rst
-+++ b/Documentation/networking/dns_resolver.rst
-@@ -152,4 +152,4 @@ Debugging
- Debugging messages can be turned on dynamically by writing a 1 into the
- following file::
- 
--	/sys/module/dnsresolver/parameters/debug
-+	/sys/module/dns_resolver/parameters/debug
--- 
-2.34.1
+
+
+Best regards,
+Krzysztof
 
 
