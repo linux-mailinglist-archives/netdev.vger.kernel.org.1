@@ -1,56 +1,57 @@
-Return-Path: <netdev+bounces-81376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81377-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D237888795F
-	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 17:27:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22CAA887962
+	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 17:30:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C1E51C20C4A
-	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 16:27:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE13728223F
+	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 16:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 183941EB34;
-	Sat, 23 Mar 2024 16:27:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3862B4778B;
+	Sat, 23 Mar 2024 16:30:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ttP9Ck0E"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SFVhEDm0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5137FBE9;
-	Sat, 23 Mar 2024 16:27:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D5F545BF3;
+	Sat, 23 Mar 2024 16:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711211262; cv=none; b=UqB8UBWfuq92dhLqxt43ZaxNevLqr9qZYVBqHLKNlEBEOmroPURAeyxaoGkGs1AdDOGmlHlZfLaC2ucAg58Cy3ja3rXMctU93nifGBHLo2nDcVE+Oy9gemb6u/eafo+j/wv5CxnUKsB7CtU91tSQYOvpGBk2wmBnUeJigL5Wxto=
+	t=1711211401; cv=none; b=BGtqG7bTvUofOxbO6oIv/9HSkhza6zKxGUTDJswgbaj0z6Dtqo4SWt258G3EuGT39NKoKk53YC9V4eEKwBlPf2oZe2UfrnPgChtQK8akT9cGtLN3VmX2URI2RZhK9y5x+2Ckt7Q79Jeb9jHcAXSy8ZIQQ3e23k2vr4Jdtn+gXpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711211262; c=relaxed/simple;
-	bh=Vma/pcEXNxYRvNdR137I9OIWj+Sze300TSp7nlJt978=;
+	s=arc-20240116; t=1711211401; c=relaxed/simple;
+	bh=0zNODIjquihCQsfOJOZQfa/hkNYmPJ81y3LTC3osk1I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gYrzmkcXFPKQnNWuc+T4K3uvgA7YwK1gJLyFEsmLrvRA5/rss7vet2C+ELEhVSqc7PjBCQa1lXhBnCPPRpPo4oZm4elxbrx9fAeBlvV/IA1nKRiXT1JBfEzpRw84VVSEgs/ua+8xHodjcIbwv+EOlWGibO4O56/nSjvAR1yp/wU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ttP9Ck0E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7943AC433F1;
-	Sat, 23 Mar 2024 16:27:39 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=BmqVW/EqmXyBjXRT+Ij1KEUUumZDYw95qX2kCPL3o6YoAUy2lwbDzjHg1NYBq3Z+5h7B2LihPNhIszujMpa39qxBaIS6TPYQXnkDLk2NIoLSpDI9vuhN4l9XuJPgS3f17evWmncisIh2456C274UF9zI1oYnGx/6/eaC+9cXIOg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SFVhEDm0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A8BBC433F1;
+	Sat, 23 Mar 2024 16:29:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711211261;
-	bh=Vma/pcEXNxYRvNdR137I9OIWj+Sze300TSp7nlJt978=;
+	s=k20201202; t=1711211400;
+	bh=0zNODIjquihCQsfOJOZQfa/hkNYmPJ81y3LTC3osk1I=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ttP9Ck0EP1jEQ5O+3QOt28aWBjd3+OPqTMJfFnQ3DqSZMgtrDgmMH8O/LXYqRc6mM
-	 ZCs10GX0Ff6ATkdeVNiSi/faEuQnrE4pu4gIh65UU3WMvWgOwiS+K5koNeEBHHVYK+
-	 Qy7n7QGEC1/T1JcCmOU6GkZy/aldhoJWkBySiLfnYEC4ygaUl9l96WjISHpbzIy+6R
-	 zwEvdSkkrj+ix0Qlv3FdHHmqO/HBIfRPVEZWhDZiGf2cSFe66YS5WWVKV2VzNmH0qa
-	 +gQrdHkNidxfJm7zG9jaOrrRE3ImYCh/Umjj2pUpqyTg/qU4L7+sik17Sf53CWj9QU
-	 exIkytD4TuVnQ==
-Date: Sat, 23 Mar 2024 16:27:37 +0000
+	b=SFVhEDm0dQ3ZgK3LNq7A1ywjh8hL0004p1ZReXgz67P7XitkMu08tLmyMO91xKakr
+	 SYXbaihEC6GvKlm2vhYDb/CejnZtP3zK3tZUFzglxR0AKPDUXPXHSP7ZmeOqV1AaWF
+	 XxkpKb6dK+QWg3Bpuqe/uLKBaQ6VhIDH0/hYT0elgVxq0OTABEXuD+ev4ovFP+1Dw+
+	 54X5J6c4GcJCfWIzl3n/AMED1fNG2ZHPelz40pNwAxHQ9nNLsgvYxOtbwBgjQr4IdF
+	 XMH91a6MqQERkOqPOVp7AaaHUP2PjOc++hS1/hWGjJrSjXKtRqBPl6AYEGC4Pt4p4x
+	 7u2nL9NofaN9w==
+Date: Sat, 23 Mar 2024 16:29:56 +0000
 From: Simon Horman <horms@kernel.org>
-To: Andrey Shumilin <shum.sdl@nppct.ru>
-Cc: 3chas3@gmail.com, linux-atm-general@lists.sourceforge.net,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org, khoroshilov@ispras.ru,
-	ykarpov@ispras.ru, vmerzlyakov@ispras.ru, vefanov@ispras.ru
-Subject: Re: [PATCH] iphase: Adding a null pointer check
-Message-ID: <20240323162737.GA403975@kernel.org>
-References: <20240323063852.665639-1-shum.sdl@nppct.ru>
+To: Bharath SM <bharathsm.hsk@gmail.com>
+Cc: davem@davemloft.net, dhowells@redhat.com, edumazet@google.com,
+	kuba@kernel.org, linux-doc@vger.kernel.org, netdev@vger.kernel.org,
+	corbet@lwn.net, pabeni@redhat.com,
+	Bharath SM <bharathsm@microsoft.com>
+Subject: Re: [PATCH] dns_resolver: correct sysfs path name in dns resolver
+ documentation
+Message-ID: <20240323162956.GB403975@kernel.org>
+References: <20240323081140.41558-1-bharathsm@microsoft.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,80 +60,34 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240323063852.665639-1-shum.sdl@nppct.ru>
+In-Reply-To: <20240323081140.41558-1-bharathsm@microsoft.com>
 
-On Sat, Mar 23, 2024 at 09:38:52AM +0300, Andrey Shumilin wrote:
-> The pointer <dev->desc_tbl[i].iavcc> is dereferenced on line 195.
-> Further in the code, it is checked for null on line 204.
-> It is proposed to add a check before dereferencing the pointer.
+On Sat, Mar 23, 2024 at 01:41:40PM +0530, Bharath SM wrote:
+> Fix an incorrect sysfs path in dns resolver documentation
 > 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
-> 
-> Signed-off-by: Andrey Shumilin <shum.sdl@nppct.ru>
+> Signed-off-by: Bharath SM <bharathsm@microsoft.com>
+
+Hi,
+
+There is another instance of "dnsresolver" in the same file.
+Should it also be changed?
+
 > ---
->  drivers/atm/iphase.c | 5 +++++
->  1 file changed, 5 insertions(+)
+>  Documentation/networking/dns_resolver.rst | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/drivers/atm/iphase.c b/drivers/atm/iphase.c
-> index 324148686953..596422fbfacc 100644
-> --- a/drivers/atm/iphase.c
-> +++ b/drivers/atm/iphase.c
-
-1.
-
-The line immediately above the provided patch is:
-
-	if (!dev->desc_tbl[i].timestamp) {
-
-> @@ -192,6 +192,11 @@ static u16 get_desc (IADEV *dev, struct ia_vcc *iavcc) {
->             i++;
->             continue;
->          }
-
-So the dereference will not be hit if .timestamp is zero.
-And, lightly examining the code, it seems likely to me
-that if .iavcc is NULL then .timestamp is always 0.
-
-As Eric and Jakub have stated in relation to other patches [1][2],
-it really would be best to provide a clear explanation of how
-the problem can manifest.
-
-[1] https://lore.kernel.org/all/CANn89iK1SO32Zggz5fh4J=NmrVW5RjkdbxJ+-ULP8ysmKXLGvg@mail.gmail.com/
-[2] https://lore.kernel.org/all/20240322154337.4f78858c@kernel.org/
-
-> +       if (!(iavcc_r = dev->desc_tbl[i].iavcc)) {
-> +	   printk("Fatal err, desc table vcc or skb is NULL\n");
-> +	   i++;
-> +	   continue;
-> +	}
->          ltimeout = dev->desc_tbl[i].iavcc->ltimeout; 
->          delta = jiffies - dev->desc_tbl[i].timestamp;
->          if (delta >= ltimeout) {
-
-2.
-
-A little further down is a check for NULL as described in the patch
-description:
-
-           if (!dev->desc_tbl[i].txskb || !(iavcc_r = dev->desc_tbl[i].iavcc))
-              printk("Fatal err, desc table vcc or skb is NULL\n");
-
-Assuming the proposed check should be added (which I do not believe
-is the case) then I believe that the "skb" portion of the message
-that has been copied from the existing check relates to checking
-.txskb. So either .txskb should also be checked or the "skb" portion of the
-message should be dropped.
-
-3.
-
-After a quick scan it seems to me that all changes to this file since the
-beginning of git history relate to tree-wide changes, clean-ups, addressing
-problems flagged by static analysis, and so on.
-
-I do not see a single commit to this file relating to real work on this driver,
-f.e. addressing a problem observed by someone using the driver.
-If so (please check!) perhaps we should discuss removing it?
-
--- 
-pw-bot: changes-requested
+> diff --git a/Documentation/networking/dns_resolver.rst b/Documentation/networking/dns_resolver.rst
+> index add4d59a99a5..99bf72a6ed45 100644
+> --- a/Documentation/networking/dns_resolver.rst
+> +++ b/Documentation/networking/dns_resolver.rst
+> @@ -152,4 +152,4 @@ Debugging
+>  Debugging messages can be turned on dynamically by writing a 1 into the
+>  following file::
+>  
+> -	/sys/module/dnsresolver/parameters/debug
+> +	/sys/module/dns_resolver/parameters/debug
+> -- 
+> 2.34.1
+> 
+> 
 
