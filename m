@@ -1,186 +1,122 @@
-Return-Path: <netdev+bounces-81386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0692887AA0
-	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 23:34:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AD6B887B20
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 00:53:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5FF50B21369
-	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 22:34:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A708281DD4
+	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 23:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D657383B9;
-	Sat, 23 Mar 2024 22:34:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 467105BAC1;
+	Sat, 23 Mar 2024 23:53:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="iGm9z0WJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DmcewiPA"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-185.mta0.migadu.com (out-185.mta0.migadu.com [91.218.175.185])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B9341F168
-	for <netdev@vger.kernel.org>; Sat, 23 Mar 2024 22:34:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.185
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C49B47A6F;
+	Sat, 23 Mar 2024 23:53:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711233264; cv=none; b=KXO2Loh8uKhcEPuMnM57sgLc3dXRtAqrjOBd8Y/t+YxvSbMY/zz3caJL23k5zxS/GK987ganYpTHA5+Z0qkuQv6oMMaREuoiUpF0ALfqBFps62gStuzWgFOVWr+guIjiwTkdduZWbQc1SQjGoOlulib5hrJHGoDEvs8H+IAdEbc=
+	t=1711238003; cv=none; b=FaISh1LdmOEqUf83BLAP5x995HI6kjxdyDnLWxGePTuWqRnwSarZ+3QcAQGgdToelr81Glh4h1JK1VJCJYc+RCNJHn8Z010eMhTJtcpBa7a/7FAmK7xoY4HAenwjr/ybch9Lbslh/Er0aKlkgjIYEzFwTTYi6eTbRbs3/z7qcrY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711233264; c=relaxed/simple;
-	bh=jSc/f6KNrT4dRGrDfXkgMbmzfQSuHTd5xlGEYqjjS+o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bULbeMKLeE8lHI2RFvxi6TGJhPFkGfhjLM/qpW1n1RFnz93hNc9BiXHcV7iVnOuRoQfwhfREx+EVNkB4V6JnncFqHeDY8461mJnM1BFdvrtezVdkZEfDNL6A3YJFp5fj3GAfb4QRdWNxK8/fvdyPnIpy/QYKbnscQJDV1PpKYrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=iGm9z0WJ; arc=none smtp.client-ip=91.218.175.185
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e8062ef6-b630-45e2-8009-4d2cdc0970ea@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1711233259;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1xCKYtbmHcZMip7AQYLMjc8FFzO4rsGABhN/J5Ub8Sc=;
-	b=iGm9z0WJgwpGRlvLB0hx1ObsOUTZu/ZeP7YY53fgHADIqJ+w9SIH1MWTS1zTJcGWmFzKsW
-	uMufMt4uFbWmOvr1XZ2+D4jqCf26OvEheDoFiElhaKOacvs3SgJwUKxA2PVQ+iG6lyww84
-	dFN5CI8VEIe7vDL6RF1hDs+Z6y1m0hY=
-Date: Sat, 23 Mar 2024 15:34:10 -0700
+	s=arc-20240116; t=1711238003; c=relaxed/simple;
+	bh=vmFfvdVj18dU0VJ6Z1xEA713RcZpihuFHhAv0tF42TU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NB3K3AvQXNGyKjrLaYri1doA99NcFCuZZ8Lfz1Mz906G1rrxOM/v1UHitEIZl2uHtF1JqTmTj3T58IK9R/5l6ZCq8BIqLJt/WpBoCqoAU22TMNm7uBiwE4l/jVuxw+Bnj5qVWRdQF9qNpC5yFWSAVyCap8iMQUUHdehqZQwpR9w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DmcewiPA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47FD8C433F1;
+	Sat, 23 Mar 2024 23:53:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711238002;
+	bh=vmFfvdVj18dU0VJ6Z1xEA713RcZpihuFHhAv0tF42TU=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=DmcewiPAJNssNaXh3O36mkS5ROlx6MavFxQd0xjT68rtGghRsWh1UL4ogi7EEY4O4
+	 AZiBifCSWEQ+RAjEswHukfqQMrKeSYpmHqxSnT/PDDKAWtFMF+96ZO6Ua6mPVq5mdz
+	 5qVyE+Gwe46zqJevDKswhok98roJJm35xaF47ikfljopfv8ecle6PQK2CA19lsUZN3
+	 I07tNDfAJC7t4yqrzayWhXu7sh/IpzT4uhby/pZImQDRofWyIYUhbiK//dyTMVfj7A
+	 2H4OFPvJ7VbWQj8ukU0vGxJM8uD98Ahwy09vtouqLqlJkfCxmqVIK9RiW+NB2ixm0m
+	 T5ae6vytnszCw==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id DD192CE0738; Sat, 23 Mar 2024 16:53:21 -0700 (PDT)
+Date: Sat, 23 Mar 2024 16:53:21 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Yan Zhai <yan@cloudflare.com>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jiri Pirko <jiri@resnulli.us>, Simon Horman <horms@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Coco Li <lixiaoyan@google.com>, Wei Wang <weiwan@google.com>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	linux-kernel@vger.kernel.org, rcu@vger.kernel.org,
+	bpf@vger.kernel.org, kernel-team@cloudflare.com,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+	Steven Rostedt <rostedt@goodmis.org>, mark.rutland@arm.com,
+	Jesper Dangaard Brouer <hawk@kernel.org>
+Subject: Re: [PATCH v5 net 1/3] rcu: add a helper to report consolidated
+ flavor QS
+Message-ID: <327fa73b-a7b3-4ad4-b170-d642c83e8764@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <cover.1710877680.git.yan@cloudflare.com>
+ <90431d46ee112d2b0af04dbfe936faaca11810a5.1710877680.git.yan@cloudflare.com>
+ <20240322112413.1UZFdBq5@linutronix.de>
+ <123ca494-dc8c-47cc-a6d5-3c529bc7f549@paulmck-laptop>
+ <CAO3-PbqRztEC1JFg3SrgUi9a404Xpou_Xx9_mxXoZVY-KVkyGg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v1 bpf-next 2/2] selftests/bpf: Add BPF_FIB_LOOKUP_MARK
- tests
-Content-Language: en-US
-To: Anton Protopopov <aspsk@isovalent.com>
-Cc: Rumen Telbizov <rumen.telbizov@menlosecurity.com>,
- David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Jiri Olsa <jolsa@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, bpf@vger.kernel.org
-References: <20240322140244.50971-1-aspsk@isovalent.com>
- <20240322140244.50971-3-aspsk@isovalent.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20240322140244.50971-3-aspsk@isovalent.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAO3-PbqRztEC1JFg3SrgUi9a404Xpou_Xx9_mxXoZVY-KVkyGg@mail.gmail.com>
 
-On 3/22/24 7:02 AM, Anton Protopopov wrote:
-> This patch extends the fib_lookup test suite by adding a few test
-> cases for each IP family to test the new BPF_FIB_LOOKUP_MARK flag
-> to the bpf_fib_lookup:
+On Fri, Mar 22, 2024 at 09:02:02PM -0500, Yan Zhai wrote:
+> On Fri, Mar 22, 2024 at 4:31 PM Paul E. McKenney <paulmck@kernel.org> wrote:
+> >
+> > On Fri, Mar 22, 2024 at 12:24:13PM +0100, Sebastian Andrzej Siewior wrote:
+> > > On 2024-03-19 13:44:34 [-0700], Yan Zhai wrote:
+> > > > + * The macro is not needed when CONFIG_PREEMPT_RT is defined. RT kernels would
+> > > > + * have more chance to invoke schedule() calls and provide necessary quiescent
+> > > > + * states. As a contrast, calling cond_resched() only won't achieve the same
+> > > > + * effect because cond_resched() does not provide RCU-Tasks quiescent states.
+> > > > + */
+> > >
+> > > Paul, so CONFIG_PREEMPTION is affected but CONFIG_PREEMPT_RT is not.
+> > > Why does RT have more scheduling points?
+> >
+> > In RT, isn't BH-disabled code preemptible?  But yes, this would not help
+> > RCU Tasks.
+> >
+> By "more chance to invoke schedule()", my thought was that
+> cond_resched becomes no op on RT or PREEMPT kernel. So it will not
+> call __schedule(SM_PEREEMPT), which clears the NEED_RESCHED flag. On a
+> normal irq exit like timer, when NEED_RESCHED is on,
+> schedule()/__schedule(0) can be called time by time then.
+> __schedule(0) is good for RCU tasks, __schedule(SM_PREEMPT) is not.
 > 
->    * Test destination IP address selection with and without a mark
->      and/or the BPF_FIB_LOOKUP_MARK flag set
-> 
-> To test this functionality another network namespace and a new veth
-> pair were added to the test.
-> 
+> But I think this code comment does not take into account frequent
+> preempt_schedule and irqentry_exit_cond_resched on a PREEMPT kernel.
+> When returning to these busy kthreads, irqentry_exit_cond_resched is
+> in fact called now, not schedule(). So likely __schedule(PREEMPT) is
+> still called frequently, or even more frequently. So the code comment
+> looks incorrect on the RT argument part. We probably should remove the
+> "IS_ENABLED" condition really. Paul and Sebastian, does this sound
+> reasonable to you?
 
-[ ... ]
+Removing the "IS_ENABLED(CONFIG_PREEMPT_RT)" condition makes a great deal
+of sense to me, but I must defer to Sebastian for any RT implications.
 
->   static const struct fib_lookup_test tests[] = {
-> @@ -90,10 +105,47 @@ static const struct fib_lookup_test tests[] = {
->   	  .daddr = IPV6_ADDR_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
->   	  .expected_src = IPV6_IFACE_ADDR_SEC,
->   	  .lookup_flags = BPF_FIB_LOOKUP_SRC | BPF_FIB_LOOKUP_SKIP_NEIGH, },
-> +	/* policy routing */
-> +	{ .desc = "IPv4 policy routing, default",
-> +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> +	  .expected_dst = IPV4_GW1, .ifname = "veth3",
-> +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH, },
-> +	{ .desc = "IPv4 policy routing, mark doesn't point to a policy",
-> +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> +	  .expected_dst = IPV4_GW1, .ifname = "veth3",
-> +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
-> +	  .mark = MARK_NO_POLICY, },
-> +	{ .desc = "IPv4 policy routing, mark points to a policy",
-> +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> +	  .expected_dst = IPV4_GW2, .ifname = "veth3",
-> +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
-> +	  .mark = MARK, },
-> +	{ .desc = "IPv4 policy routing, mark points to a policy, but no flag",
-> +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> +	  .expected_dst = IPV4_GW1, .ifname = "veth3",
-> +	  .lookup_flags = BPF_FIB_LOOKUP_SKIP_NEIGH,
-> +	  .mark = MARK, },
-> +	{ .desc = "IPv6 policy routing, default",
-> +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> +	  .expected_dst = IPV6_GW1, .ifname = "veth3",
-> +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH, },
-> +	{ .desc = "IPv6 policy routing, mark doesn't point to a policy",
-> +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> +	  .expected_dst = IPV6_GW1, .ifname = "veth3",
-> +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
-> +	  .mark = MARK_NO_POLICY, },
-> +	{ .desc = "IPv6 policy routing, mark points to a policy",
-> +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> +	  .expected_dst = IPV6_GW2, .ifname = "veth3",
-> +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
-> +	  .mark = MARK, },
-> +	{ .desc = "IPv6 policy routing, mark points to a policy, but no flag",
-> +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> +	  .expected_dst = IPV6_GW1, .ifname = "veth3",
-> +	  .lookup_flags = BPF_FIB_LOOKUP_SKIP_NEIGH,
-> +	  .mark = MARK, },
->   };
->   
-> -static int ifindex;
-> -
->   static int setup_netns(void)
->   {
->   	int err;
-> @@ -144,12 +196,40 @@ static int setup_netns(void)
->   	if (!ASSERT_OK(err, "write_sysctl(net.ipv6.conf.veth1.forwarding)"))
->   		goto fail;
->   
-> +	/* Setup for policy routing tests */
-> +	SYS(fail, "ip link add veth3 type veth peer name veth4");
-> +	SYS(fail, "ip link set dev veth3 up");
-> +	SYS(fail, "ip link set dev veth4 netns %s up", NS_REMOTE);
-> +
-> +	SYS(fail, "ip addr add %s/24 dev veth3", IPV4_LOCAL);
-> +	SYS(fail, "ip netns exec %s ip addr add %s/24 dev veth4", NS_REMOTE, IPV4_GW1);
-> +	SYS(fail, "ip netns exec %s ip addr add %s/24 dev veth4", NS_REMOTE, IPV4_GW2);
-> +	SYS(fail, "ip addr add %s/64 dev veth3 nodad", IPV6_LOCAL);
-> +	SYS(fail, "ip netns exec %s ip addr add %s/64 dev veth4 nodad", NS_REMOTE, IPV6_GW1);
-> +	SYS(fail, "ip netns exec %s ip addr add %s/64 dev veth4 nodad", NS_REMOTE, IPV6_GW2);
-
-Trying to see if the setup can be simplified.
-
-Does it need to add another netns and setup a reachable IPV[46]_GW[12] gateway?
-
-The test is not sending any traffic and it is a BPF_FIB_LOOKUP_SKIP_NEIGH test.
-
-> +	SYS(fail, "ip route add %s/32 via %s", IPV4_REMOTE_DST, IPV4_GW1);
-> +	SYS(fail, "ip route add %s/32 via %s table %s", IPV4_REMOTE_DST, IPV4_GW2, MARK_TABLE);
-> +	SYS(fail, "ip -6 route add %s/128 via %s", IPV6_REMOTE_DST, IPV6_GW1);
-> +	SYS(fail, "ip -6 route add %s/128 via %s table %s", IPV6_REMOTE_DST, IPV6_GW2, MARK_TABLE);
-> +	SYS(fail, "ip rule add prio 2 fwmark %d lookup %s", MARK, MARK_TABLE);
-> +	SYS(fail, "ip -6 rule add prio 2 fwmark %d lookup %s", MARK, MARK_TABLE);
-> +
-> +	err = write_sysctl("/proc/sys/net/ipv4/conf/veth3/forwarding", "1");
-> +	if (!ASSERT_OK(err, "write_sysctl(net.ipv4.conf.veth3.forwarding)"))
-> +		goto fail;
-> +
-> +	err = write_sysctl("/proc/sys/net/ipv6/conf/veth3/forwarding", "1");
-> +	if (!ASSERT_OK(err, "write_sysctl(net.ipv6.conf.veth3.forwarding)"))
-> +		goto fail;
-> +
->   	return 0;
->   fail:
->   	return -1;
->   }
-
-[ ... ]
-
-> @@ -248,6 +337,7 @@ void test_fib_lookup(void)
->   	prog_fd = bpf_program__fd(skel->progs.fib_lookup);
->   
->   	SYS(fail, "ip netns add %s", NS_TEST);
-> +	SYS(fail, "ip netns add %s", NS_REMOTE);
-
-
+							Thanx, Paul
 
