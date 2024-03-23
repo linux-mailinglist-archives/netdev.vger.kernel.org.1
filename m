@@ -1,83 +1,124 @@
-Return-Path: <netdev+bounces-81351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81352-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D668887602
-	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 01:19:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A193C887610
+	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 01:26:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D519A283EE2
-	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 00:19:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D320C1C211C6
+	for <lists+netdev@lfdr.de>; Sat, 23 Mar 2024 00:26:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB2B372;
-	Sat, 23 Mar 2024 00:19:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01AB8372;
+	Sat, 23 Mar 2024 00:26:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="TVio18lC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SOXdcWjN"
 X-Original-To: netdev@vger.kernel.org
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 098217F
-	for <netdev@vger.kernel.org>; Sat, 23 Mar 2024 00:18:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46ABC7F;
+	Sat, 23 Mar 2024 00:26:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711153143; cv=none; b=pCn7BrOvxYMcs4u1UfSKOAytEjQxYS6Zt1DOM9+XnUljXVRKi2FG2xeYQtjkmVujYtz0YxrLN1CqlI0p7AsJjUmgBN8Dplu3SIUnCLHmIzUZGquUQCthJzSehKNap8hgpcD9ehVJZNX7fzGOTgjqSTj/06nB1x9o/OGKXOu65qA=
+	t=1711153595; cv=none; b=g7H08pHfDfo4mH9rOgPPKu6rIylvo1RP+Fiyr0hehnFbh1aDYgNQMghNE4Bx4Rw54kRFSyXu+T0HeGbBUT7zmgmsSk5WCFzWvET7L9xzAQ7mHUJT+kDvMmpjTnVtBnUnsS8M6inNjo2PrxKBN4wKmUhHDbDzh1QuHH3YuBUQhBE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711153143; c=relaxed/simple;
-	bh=eNSZ3J4h9JLdPBKY4LazE6G9kzUQQlpJcfX+tZUCkaE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=E+Tg9HDEUF35p9Q+K3mOHPstNGptRx6zPcxEsYVf8pIckye78ym3Wr7DX7na3byAah2ujGp5grL4pV705Z3U+lDt/2aRj0gwVNaH0sP4Nqiog/n/mJSnXG7/UIE3vu2fXwQGKOp2g742oGHzda+O8yfAvbRkL7eV5HPkARLcSNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=TVio18lC; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1711153137;
-	bh=eNSZ3J4h9JLdPBKY4LazE6G9kzUQQlpJcfX+tZUCkaE=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=TVio18lCfxydqx3yzcNv2bxclUkvz2zxdnrNks8sBmuS1vLyQbjFpTb8RD2Zvuvmy
-	 VbwsQzY/Y3qjMUJ1LOKJGNIffIwJScZ0mMudGFP/o0AKMYke7YbYsh9GFDXfISMCM8
-	 DLDnGWFKQ9rQ03k6yscoCM74459SzQrbcuG4IvVDWMGNwo2ELh7+SxZmjwSY/wUBcu
-	 th+iW6lhKnQLegxNyN/lIUuNl1l0Rv9RxSsHmxPBtQlcmBJqY0i8cUhiel3Lvwvt4y
-	 SnnqGwgvrK0RDR9nOJ6Js9q26sazD9zIqaX2jt6ADesvZrzkIeH4BI/ZXof1bPSNkf
-	 KIvHphQKRLLYg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4V1fv36YRbz4wcq;
-	Sat, 23 Mar 2024 11:18:55 +1100 (AEDT)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: Michal =?utf-8?Q?Such=C3=A1nek?= <msuchanek@suse.de>,
- netdev@vger.kernel.org, "Jason A.
- Donenfeld" <Jason@zx2c4.com>, linuxppc-dev@lists.ozlabs.org,
- wireguard@lists.zx2c4.com, dtsen@linux.ibm.com
-Subject: Re: Cannot load wireguard module
-In-Reply-To: <Zf1sjAgBYCnJ7JEp@gondor.apana.org.au>
-References: <20240315122005.GG20665@kitsune.suse.cz>
- <87jzm32h7q.fsf@mail.lhotse> <87r0g7zrl2.fsf@mail.lhotse>
- <20240318170855.GK20665@kitsune.suse.cz>
- <20240319124742.GM20665@kitsune.suse.cz> <87le6dyt1f.fsf@mail.lhotse>
- <Zf1sjAgBYCnJ7JEp@gondor.apana.org.au>
-Date: Sat, 23 Mar 2024 11:18:54 +1100
-Message-ID: <8734shkdg1.fsf@mail.lhotse>
+	s=arc-20240116; t=1711153595; c=relaxed/simple;
+	bh=wU0zA8OoaYRHOvx/DIRzkdHTS/4bRP2mB1DWJA8wSWQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=twJNxAhz02AJYN7QEI+hvb1pn+6grgNxHU/vJKuHZov/Lxm/wfFGyDN//jPO0U5H4GpYY4WI59lkDPUSSCzaFQyUU6GG20nwbsrOJyVryySRmwgs/EuocpJYuP2+cjT9OozG3CFBVR+UJwK6s4KJFeSzNTfciwPBqqwznlRECfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SOXdcWjN; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-a47385a4379so141258466b.0;
+        Fri, 22 Mar 2024 17:26:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711153592; x=1711758392; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=wU0zA8OoaYRHOvx/DIRzkdHTS/4bRP2mB1DWJA8wSWQ=;
+        b=SOXdcWjNHm3pPTttpCga7l/2ltph3Bh6bK4oMk6Gtj6AS5SxlEpNIzoUmMciuQl8a5
+         rC/kfBO1g+X75hnxVzsuhISVuydxg96YcvXiQP1b1+eLA6B0IyKoUoeVYt4++65Lk3g/
+         ZUHanzBA18jcSCIFeZFvGH7J0ZHx07Uw6pGgqDZQXQd8kYcY6g75/GnnHTVC4D6wxcfb
+         SxfOicONOdi9EI9u4tMM95s9hvbgvNd3h9txwzZzmC9r/8A13dHNkaCTZuPPDWtU7hKu
+         EjrDGPMigNuREUP1bISxRp97HxvMEN9GGHQMhHRjzKdDIiU2lK104LLMQsayvoMeDm0L
+         OmjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711153592; x=1711758392;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wU0zA8OoaYRHOvx/DIRzkdHTS/4bRP2mB1DWJA8wSWQ=;
+        b=DQJkaVJEJ9V9sUcUiJ922M1ky4iNvazttjigP4Ta5N26cf9KAm4TG1vNtUZMb5/5ig
+         pxU5hR2xd8v68MB1w5ENAEfVl08WMVNjQHWv0e8WRnkrXlLToAWFkan71PknMvgXfkE8
+         AzJSvHgdjzAfDioyBNyS3v4zBSPRi2hKJHm0s97NASWJUyjkhdK9A3QohExSraDy77jt
+         MQEV2Xe19LhZTyo8InDsEo5gZc/QKXVDiGKlNwuvx732QOJkaRPSbxmeKeX/FGB64ZEv
+         jn66MHWsQVabEI5Vy7S2MO+xk4v4P4AJvizTkXWSpf7olAGYj9rZcuktVhPJMcgNzYhq
+         kGQg==
+X-Forwarded-Encrypted: i=1; AJvYcCUA9V/+7kXyRT3pQy6fPfK78/vmPjcmptRZ12hy0/hLSKhlLcgq2LEKgylk6UOpegZYTWmXX0TyyX0CvfGpO1bzsbxsmxOyHsvVUxW2ujPEAr3s4w0n9Wmk/+tAh+WKIOvoVbAkvtxq
+X-Gm-Message-State: AOJu0YxeuQjsVZYr+VnpTPuYNT6sZJJIsYq5vlg/sViNa4nu/4NSNWQF
+	qb33ppUt+LYTbXGBusVY+AipUojYTI4fV8YwJGm4M/zxuzcxir1gMEg/BY60j8KIIIKgtguvcHV
+	f1csLr6AwncQwSO+nxpmWhrZpNWk=
+X-Google-Smtp-Source: AGHT+IF3117YE3+ORlIw6dGfkG+zU6ybLu9Nvj3CXFO+gPHb+xi2TPfpqW0dJyzWVVVyRJejwAkFtbb4uBnZwDIQjsI=
+X-Received: by 2002:a17:906:8cc:b0:a47:3f10:b3c8 with SMTP id
+ o12-20020a17090608cc00b00a473f10b3c8mr419328eje.26.1711153592378; Fri, 22 Mar
+ 2024 17:26:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20240311070550.7438-1-kerneljasonxing@gmail.com>
+ <ZfyhR_24HmShs78t@calendula> <2aa340d2-c098-9ed8-4e65-896e1d63c2da@blackhole.kfki.hu>
+ <CAL+tcoDY55yXbo3=OtHpeVOfN8aJmDjwzpd8mRkOH2rMj6QUbA@mail.gmail.com> <b1b95a71-a4e8-288c-7731-811ad548d641@blackhole.kfki.hu>
+In-Reply-To: <b1b95a71-a4e8-288c-7731-811ad548d641@blackhole.kfki.hu>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 23 Mar 2024 08:25:55 +0800
+Message-ID: <CAL+tcoCe6YFOWOYvdu1UH+kHRYPEmfphOJzB0BcVR-HER0GZ8g@mail.gmail.com>
+Subject: Re: [PATCH nf-next v2] netfilter: conntrack: avoid sending RST to
+ reply out-of-window skb
+To: Jozsef Kadlecsik <kadlec@blackhole.kfki.hu>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>, edumazet@google.com, 
+	Florian Westphal <fw@strlen.de>, kuba@kernel.org, pabeni@redhat.com, 
+	David Miller <davem@davemloft.net>, netfilter-devel@vger.kernel.org, 
+	coreteam@netfilter.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
 
-Herbert Xu <herbert@gondor.apana.org.au> writes:
-> On Wed, Mar 20, 2024 at 11:41:32PM +1100, Michael Ellerman wrote:
->>
->> This diff fixes it for me:
+> I understand and appreciate your efforts. But please consider the case
+> when one have to diagnose a failing connection and conntrack drops
+> packets. What should be suspected? Firewall rules? One can enable TRACE
+> and check which rules are hit - but because conntrack drops packet,
+> nothing is shown there. Enable and check conntrack events? Because the
+> packets are INVALID, checking the events does not help either. Only when
+> one runs tcpdump and compares it with the TRACE/NFLOG/LOG entries can one
+> spot that some packets "disappeared".
 >
-> Yes I think this is the correct fix.
+> Compare the whole thing with the case when packets are not dropped
+> silently but can be logged via checking the INVALID flag. One can directly
+> tell that conntrack could not handle the packets and can see all packet
+> parameters.
 
-Thanks, I'll send a proper patch next week.
+Thanks for explaining such importance about why not drop silently. Now
+I can see :)
 
-cheers
+In my first version, I didn't drop it directly but let it go without
+clearing skb->_nfct fields and then let the TCP layer handle it. As
+you said, the out-of-window case is just one of some INVALID cases
+which could also cause RST behaviour, so it seems that the first
+version doesn't handle it well either. It has to take all INVALID
+cases into account...
+
+Is there anything left I can do like particular tracepoints something
+like this? No idea. I only hope somebody who encounters such an issue
+can notice this behaviour effortlessly :)
+
+Thanks,
+Jason
+
+>
+> Best regards,
+> Jozsef
 
