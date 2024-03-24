@@ -1,231 +1,250 @@
-Return-Path: <netdev+bounces-81448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 662C38894AE
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 09:05:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 23AAE8891B6
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 07:47:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88F921C2F452
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 08:05:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 44ACA1C247B0
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 06:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5B9F158DB8;
-	Mon, 25 Mar 2024 03:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FA4F13A41F;
+	Mon, 25 Mar 2024 00:34:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AA72145FF8
-	for <netdev@vger.kernel.org>; Sun, 24 Mar 2024 23:14:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93AFE262564
+	for <netdev@vger.kernel.org>; Sun, 24 Mar 2024 23:28:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711322066; cv=none; b=YdRxNQ8mzPzyWUy/0a4xGs13nmcHFpggb30tMvuxds7N7Pt66Xh8L1x0TQTZ6MYthBkiNEoA7hS7MYza8pF2/Gdym4uIZfXQTI+TXLEgTdRJr484UDtdbn++hn99981FRS95PtNZQ5r3UZxBTbJWFBoWceumV9jmyQSpf5SVDuw=
+	t=1711322906; cv=none; b=gRMFK0hHt9BW3G0cYfL0bkfEnZhOM8yckm31LvvvJnqSY9DqObSphgWwIb0L+Bp/jdy1rxOHGfw3XvGRTvGc/781xrMivgdHHtsZ/hx0kUZyQ9KfR1eSanRwdG4WT1iDc1/Hor+lpDU2KlaS59BGdeO7IH0DuZpf6nWCLotMFVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711322066; c=relaxed/simple;
-	bh=FCsm2VKwJJxpc9r6U50b1/9X/XTT9PodFUWa0VKg1bo=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=e6PcWGRrkqkqwlBUpzaUTP8/O9NmVMetHKLoB89Z7KiGb+RcW4WzPWm0EuV1XHMuF3GAXtZPKfdqpToAjEhxxUd5v+xwsc53ZluSDMWOP/U9N31tXYlL2jgwYJlosUrwEd+aUyiZ4necoB3NhFcffmCHH6/ZLunOI1eYBdSxLhE=
+	s=arc-20240116; t=1711322906; c=relaxed/simple;
+	bh=L3rirMAkG+wCxoaMqp9OoT3/KuPdSW8Pl4TcWXAuCHM=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=c+euoaNcV9bG1bkbfG72g1ppGbapn/KgfisnAOXSLxEJR1e4gFtlbMSBQM+ikJDFf8mUKUdVAlfmgiK08ccEaj5DfC0ETDAyQrwa4U4MUJHsXVGAv/6h00gh6t6N4fhBcaXSG1P6N4e9G/oApm4Dfp/2EDM9cqqTeA6wwcHfH+U=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
 Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7cc7a6a04d9so477117739f.3
-        for <netdev@vger.kernel.org>; Sun, 24 Mar 2024 16:14:23 -0700 (PDT)
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-7cbf092a502so428706439f.0
+        for <netdev@vger.kernel.org>; Sun, 24 Mar 2024 16:28:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711322062; x=1711926862;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+t/uLQ0VurYuY1cN1zZJdvO/LHb080kraLc9vqzMHk4=;
-        b=JgIu3nN/0H53C5dgceDkirllMLPomzA+GnqO5oDKK6zHRZiYs33EQfegfWnAKF4cWL
-         HdLGbGRM1Chu+majI0lssX/9AoS3APB6KV6MfMAPJB9gzOnb5d83NQ+Y4u2IsgNGDBWu
-         IboWVS7hE30lDfsF4hzZnmbZjbRTnrY8dVWbSbHb2FaLhHHPhRHuVpbujnySc0JVKgD8
-         3KVDA3sakmgKCs4Uhcmuooah8lbFMC589rCHrEspI4wb2Kx7MHUiaCD1U4qdFn/uSurY
-         uGLmzRo1Zrrni9Oy+0f8Hor6QJ2MgfdDpbmGZQMep+Y9B8hjreSYPonWM5eEbpAXO1P4
-         gHCQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU1eDeHpyBtFfCD5F2HyE4R5hUtFbXbSdVTgsZWQ7vIpco9K5x+YDjZLEQnY6+PtkxkJtjS1pyjscKPXQdhgeaaP8sdQATX
-X-Gm-Message-State: AOJu0YyKRAekrz+BDzXMtDeW/vDo32haRh8/UEPGq3opiuUW3zTk41iF
-	c943PQVzmLcy1HKbl0LxX4kMDxppm0zJvmq16P0AjgkfoA1MJw3u/7ieHLA8+c/VUnB96GA+jlk
-	98Nzi+J8SX63lgEpV6l7GU910oqyuEP3ZFE/ryPkhdB8yPYy/kmZNTUE=
-X-Google-Smtp-Source: AGHT+IHS0Q3oKTIXfluQ++b7ZjUVDueWkF0+ySWkBxV7It4EUFZG/E8xMb2WLucZrhhMXsTZpMSY/iPP8BAWEaWLBRoiuSVZ69H9
+        d=1e100.net; s=20230601; t=1711322903; x=1711927703;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3dYLu89uYfcbH8akytOwMScgCy7EygCEYMlMe5+0wXI=;
+        b=aqhJHMijUmZ0fYyjhX1dPHfi6W6yfS03CXOkBMbnml/Q+Wa1LTlOgm9SS7zCKrlb0n
+         1UR0MiMY7L4PwEj/orU34cspSjBhYfZ6/9INyfNmsAAabZgLM6Fhe/4veO9Hv+bPHg5J
+         nltaWU9Z12Vsibq+HM5HAGfH5DqXOs3oK5Vblr6ROB1D3B6NjslbFzz/Ao7O2ldFNQxO
+         EsIQl7VWw4PXFLq9XhYTCQyR1qMrHrZ2YjBOxcodpVENFruSN37LgI3NwRJbCh2JeTNc
+         CTXGe4LuflGJaN1keR2IQY9XO/kmIXcMSKXO+OYeVqOs+ZaRcBVsF2ogPhwXkbJT8kdt
+         q4jg==
+X-Forwarded-Encrypted: i=1; AJvYcCWRGpgbzfTpHGmhMeSjLr6Y/hHQYlwHqQ4Dj3dxO5lqE3nDvnCxIKMDODJYNyKu5MgHM8cQx+bg/4xlxN8/V57KeuNc8FJe
+X-Gm-Message-State: AOJu0YwFOCOKYMMnT5nk+5VzrXZVUrQ41eFxKnq9Avb7otAzVwNqaeqh
+	vIlXuJJJXJeO93kGBb2GMXnfy5kfBWddx7rVBmqAeEPRn63qvshVrAfyzP6mtBxVjQoWUdnfWT/
+	BphzkB7TeaX3stzTellnt75aNMtYoScbT30Sol5EQR0nQ1Rgnawo9/o0=
+X-Google-Smtp-Source: AGHT+IEMNq3/hgbAitmgosqeoB7PUYL2LJNbZHc2Jp0Xa0WQv8T5RbbXY7PIbp7hy25x+9Zwk83kbug7/vxhKcNHID2nQ82/1sFs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6602:154e:b0:7d0:36bb:6499 with SMTP id
- h14-20020a056602154e00b007d036bb6499mr257423iow.2.1711322062765; Sun, 24 Mar
- 2024 16:14:22 -0700 (PDT)
-Date: Sun, 24 Mar 2024 16:14:22 -0700
-In-Reply-To: <000000000000ef958c060cc9cc3d@google.com>
+X-Received: by 2002:a05:6638:3725:b0:47b:f666:f7ab with SMTP id
+ k37-20020a056638372500b0047bf666f7abmr371592jav.6.1711322902885; Sun, 24 Mar
+ 2024 16:28:22 -0700 (PDT)
+Date: Sun, 24 Mar 2024 16:28:22 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a5d0a30614703740@google.com>
-Subject: Re: [syzbot] [net?] WARNING in call_rcu (3)
-From: syzbot <syzbot+d17177af4afd8c6f804c@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, jhs@mojatatu.com, 
-	jiri@resnulli.us, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
-	vinicius.gomes@intel.com, xiyou.wangcong@gmail.com
+Message-ID: <000000000000b906b406147069d4@google.com>
+Subject: [syzbot] [bpf?] [trace?] KASAN: slab-use-after-free Read in bpf_trace_run1
+From: syzbot <syzbot+981935d9485a560bfbcb@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
+	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	martin.lau@linux.dev, mathieu.desnoyers@efficios.com, mhiramat@kernel.org, 
+	netdev@vger.kernel.org, rostedt@goodmis.org, sdf@google.com, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
 Content-Type: text/plain; charset="UTF-8"
 
-syzbot has found a reproducer for the following issue on:
+Hello,
 
-HEAD commit:    707081b61156 Merge branch 'for-next/core', remote-tracking..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=141d023a180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=caeac3f3565b057a
-dashboard link: https://syzkaller.appspot.com/bug?extid=d17177af4afd8c6f804c
+syzbot found the following issue on:
+
+HEAD commit:    520fad2e3206 selftests/bpf: scale benchmark counting by us..
+git tree:       bpf-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=105af946180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fb1be60a193d440
+dashboard link: https://syzkaller.appspot.com/bug?extid=981935d9485a560bfbcb
 compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=107d3aa5180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10611291180000
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=114f17a5180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=162bb7a5180000
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/6cad68bf7532/disk-707081b6.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1a27e5400778/vmlinux-707081b6.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/67dfc53755d0/Image-707081b6.gz.xz
+disk image: https://storage.googleapis.com/syzbot-assets/4eef3506c5ce/disk-520fad2e.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/24d60ebe76cc/vmlinux-520fad2e.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/8f883e706550/bzImage-520fad2e.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d17177af4afd8c6f804c@syzkaller.appspotmail.com
+Reported-by: syzbot+981935d9485a560bfbcb@syzkaller.appspotmail.com
 
-------------[ cut here ]------------
-ODEBUG: activate active (active state 1) object: 000000007c840c9e object type: rcu_head hint: 0x0
-WARNING: CPU: 0 PID: 0 at lib/debugobjects.c:517 debug_print_object lib/debugobjects.c:514 [inline]
-WARNING: CPU: 0 PID: 0 at lib/debugobjects.c:517 debug_object_activate+0x360/0x4ac lib/debugobjects.c:732
-Modules linked in:
-CPU: 0 PID: 0 Comm: swapper/0 Not tainted 6.8.0-rc7-syzkaller-g707081b61156 #0
+==================================================================
+BUG: KASAN: slab-use-after-free in __bpf_trace_run kernel/trace/bpf_trace.c:2376 [inline]
+BUG: KASAN: slab-use-after-free in bpf_trace_run1+0xcb/0x510 kernel/trace/bpf_trace.c:2430
+Read of size 8 at addr ffff8880290d9918 by task migration/0/19
+
+CPU: 0 PID: 19 Comm: migration/0 Not tainted 6.8.0-syzkaller-05233-g520fad2e3206 #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-pstate: 604000c5 (nZCv daIF +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : debug_print_object lib/debugobjects.c:514 [inline]
-pc : debug_object_activate+0x360/0x4ac lib/debugobjects.c:732
-lr : debug_print_object lib/debugobjects.c:514 [inline]
-lr : debug_object_activate+0x360/0x4ac lib/debugobjects.c:732
-sp : ffff800080007ad0
-x29: ffff800080007ad0 x28: ffff800093738000 x27: dfff800000000000
-x26: ffff80008aef0200 x25: 0000000000000001 x24: ffff0000d010cd00
-x23: 0000000000000003 x22: ffff80008b41a2e0 x21: 0000000000000000
-x20: ffff80008aef0200 x19: ffff0000d010cd00 x18: ffff800080006fa0
-x17: 3963303438633730 x16: ffff80008ad6b09c x15: 0000000000000001
-x14: 1fffe00036800002 x13: 0000000000000000 x12: 0000000000000000
-x11: 0000000000010004 x10: 0000000000ff0100 x9 : 42aaeb85fb1b0600
-x8 : 42aaeb85fb1b0600 x7 : 0000000000000001 x6 : 0000000000000001
-x5 : ffff8000800073b8 x4 : ffff80008ed822c0 x3 : ffff8000805ba130
-x2 : 0000000000000001 x1 : 0000000100010002 x0 : 0000000000000000
-Call trace:
- debug_print_object lib/debugobjects.c:514 [inline]
- debug_object_activate+0x360/0x4ac lib/debugobjects.c:732
- debug_rcu_head_queue kernel/rcu/rcu.h:227 [inline]
- __call_rcu_common kernel/rcu/tree.c:2700 [inline]
- call_rcu+0x48/0xaf4 kernel/rcu/tree.c:2829
- switch_schedules net/sched/sch_taprio.c:210 [inline]
- advance_sched+0x7e0/0xac0 net/sched/sch_taprio.c:984
- __run_hrtimer kernel/time/hrtimer.c:1689 [inline]
- __hrtimer_run_queues+0x484/0xca0 kernel/time/hrtimer.c:1753
- hrtimer_interrupt+0x2c0/0xb64 kernel/time/hrtimer.c:1815
- timer_handler drivers/clocksource/arm_arch_timer.c:674 [inline]
- arch_timer_handler_virt+0x74/0x88 drivers/clocksource/arm_arch_timer.c:685
- handle_percpu_devid_irq+0x2a4/0x804 kernel/irq/chip.c:942
- generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
- handle_irq_desc kernel/irq/irqdesc.c:672 [inline]
- generic_handle_domain_irq+0x7c/0xc4 kernel/irq/irqdesc.c:728
- __gic_handle_irq drivers/irqchip/irq-gic-v3.c:782 [inline]
- __gic_handle_irq_from_irqson drivers/irqchip/irq-gic-v3.c:833 [inline]
- gic_handle_irq+0x6c/0x190 drivers/irqchip/irq-gic-v3.c:877
- call_on_irq_stack+0x24/0x4c arch/arm64/kernel/entry.S:889
- do_interrupt_handler+0xd4/0x138 arch/arm64/kernel/entry-common.c:310
- __el1_irq arch/arm64/kernel/entry-common.c:536 [inline]
- el1_interrupt+0x34/0x68 arch/arm64/kernel/entry-common.c:551
- el1h_64_irq_handler+0x18/0x24 arch/arm64/kernel/entry-common.c:556
- el1h_64_irq+0x64/0x68 arch/arm64/kernel/entry.S:594
- __daif_local_irq_enable arch/arm64/include/asm/irqflags.h:27 [inline]
- arch_local_irq_enable+0x8/0xc arch/arm64/include/asm/irqflags.h:49
- cpuidle_idle_call kernel/sched/idle.c:170 [inline]
- do_idle+0x1f0/0x4e8 kernel/sched/idle.c:312
- cpu_startup_entry+0x5c/0x74 kernel/sched/idle.c:410
- rest_init+0x2dc/0x2f4 init/main.c:730
- start_kernel+0x0/0x4ec init/main.c:827
- start_kernel+0x3ec/0x4ec init/main.c:1072
- __primary_switched+0x84/0x8c arch/arm64/kernel/head.S:243
-irq event stamp: 700776
-hardirqs last  enabled at (700775): [<ffff80008ad6bc6c>] default_idle_call+0xf4/0x128 kernel/sched/idle.c:103
-hardirqs last disabled at (700776): [<ffff80008ad66a78>] __el1_irq arch/arm64/kernel/entry-common.c:533 [inline]
-hardirqs last disabled at (700776): [<ffff80008ad66a78>] el1_interrupt+0x24/0x68 arch/arm64/kernel/entry-common.c:551
-softirqs last  enabled at (700464): [<ffff80008002189c>] softirq_handle_end kernel/softirq.c:399 [inline]
-softirqs last  enabled at (700464): [<ffff80008002189c>] __do_softirq+0xac8/0xce4 kernel/softirq.c:582
-softirqs last disabled at (700459): [<ffff80008002ab48>] ____do_softirq+0x14/0x20 arch/arm64/kernel/irq.c:81
----[ end trace 0000000000000000 ]---
-------------[ cut here ]------------
-ODEBUG: active_state active (active state 1) object: 000000007c840c9e object type: rcu_head hint: 0x0
-WARNING: CPU: 0 PID: 0 at lib/debugobjects.c:517 debug_print_object lib/debugobjects.c:514 [inline]
-WARNING: CPU: 0 PID: 0 at lib/debugobjects.c:517 debug_object_active_state+0x2a8/0x37c lib/debugobjects.c:954
-Modules linked in:
-CPU: 0 PID: 0 Comm: swapper/0 Tainted: G        W          6.8.0-rc7-syzkaller-g707081b61156 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-pstate: 604000c5 (nZCv daIF +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : debug_print_object lib/debugobjects.c:514 [inline]
-pc : debug_object_active_state+0x2a8/0x37c lib/debugobjects.c:954
-lr : debug_print_object lib/debugobjects.c:514 [inline]
-lr : debug_object_active_state+0x2a8/0x37c lib/debugobjects.c:954
-sp : ffff800080007ad0
-x29: ffff800080007ad0 x28: 00000000000000c0 x27: dfff800000000000
-x26: 1fffe0001a95d34b x25: 0000000000000003 x24: ffff800093738000
-x23: 0000000000000001 x22: ffff80008aef0200 x21: ffff0000d010cd00
-x20: ffff80008b41a2e0 x19: 0000000000000000 x18: ffff800080006fa0
-x17: 3863373030303030 x16: ffff80008ad6b09c x15: 0000000000000001
-x14: 1fffe00036800002 x13: 0000000000000000 x12: 0000000000000000
-x11: 0000000000010004 x10: 0000000000ff0100 x9 : 42aaeb85fb1b0600
-x8 : 42aaeb85fb1b0600 x7 : 0000000000000001 x6 : 0000000000000001
-x5 : ffff8000800073b8 x4 : ffff80008ed822c0 x3 : ffff8000805ba130
-x2 : 0000000000000001 x1 : 0000000100010002 x0 : 0000000000000000
-Call trace:
- debug_print_object lib/debugobjects.c:514 [inline]
- debug_object_active_state+0x2a8/0x37c lib/debugobjects.c:954
- debug_rcu_head_queue kernel/rcu/rcu.h:228 [inline]
- __call_rcu_common kernel/rcu/tree.c:2700 [inline]
- call_rcu+0x60/0xaf4 kernel/rcu/tree.c:2829
- switch_schedules net/sched/sch_taprio.c:210 [inline]
- advance_sched+0x7e0/0xac0 net/sched/sch_taprio.c:984
- __run_hrtimer kernel/time/hrtimer.c:1689 [inline]
- __hrtimer_run_queues+0x484/0xca0 kernel/time/hrtimer.c:1753
- hrtimer_interrupt+0x2c0/0xb64 kernel/time/hrtimer.c:1815
- timer_handler drivers/clocksource/arm_arch_timer.c:674 [inline]
- arch_timer_handler_virt+0x74/0x88 drivers/clocksource/arm_arch_timer.c:685
- handle_percpu_devid_irq+0x2a4/0x804 kernel/irq/chip.c:942
- generic_handle_irq_desc include/linux/irqdesc.h:161 [inline]
- handle_irq_desc kernel/irq/irqdesc.c:672 [inline]
- generic_handle_domain_irq+0x7c/0xc4 kernel/irq/irqdesc.c:728
- __gic_handle_irq drivers/irqchip/irq-gic-v3.c:782 [inline]
- __gic_handle_irq_from_irqson drivers/irqchip/irq-gic-v3.c:833 [inline]
- gic_handle_irq+0x6c/0x190 drivers/irqchip/irq-gic-v3.c:877
- call_on_irq_stack+0x24/0x4c arch/arm64/kernel/entry.S:889
- do_interrupt_handler+0xd4/0x138 arch/arm64/kernel/entry-common.c:310
- __el1_irq arch/arm64/kernel/entry-common.c:536 [inline]
- el1_interrupt+0x34/0x68 arch/arm64/kernel/entry-common.c:551
- el1h_64_irq_handler+0x18/0x24 arch/arm64/kernel/entry-common.c:556
- el1h_64_irq+0x64/0x68 arch/arm64/kernel/entry.S:594
- __daif_local_irq_enable arch/arm64/include/asm/irqflags.h:27 [inline]
- arch_local_irq_enable+0x8/0xc arch/arm64/include/asm/irqflags.h:49
- cpuidle_idle_call kernel/sched/idle.c:170 [inline]
- do_idle+0x1f0/0x4e8 kernel/sched/idle.c:312
- cpu_startup_entry+0x5c/0x74 kernel/sched/idle.c:410
- rest_init+0x2dc/0x2f4 init/main.c:730
- start_kernel+0x0/0x4ec init/main.c:827
- start_kernel+0x3ec/0x4ec init/main.c:1072
- __primary_switched+0x84/0x8c arch/arm64/kernel/head.S:243
-irq event stamp: 700776
-hardirqs last  enabled at (700775): [<ffff80008ad6bc6c>] default_idle_call+0xf4/0x128 kernel/sched/idle.c:103
-hardirqs last disabled at (700776): [<ffff80008ad66a78>] __el1_irq arch/arm64/kernel/entry-common.c:533 [inline]
-hardirqs last disabled at (700776): [<ffff80008ad66a78>] el1_interrupt+0x24/0x68 arch/arm64/kernel/entry-common.c:551
-softirqs last  enabled at (700464): [<ffff80008002189c>] softirq_handle_end kernel/softirq.c:399 [inline]
-softirqs last  enabled at (700464): [<ffff80008002189c>] __do_softirq+0xac8/0xce4 kernel/softirq.c:582
-softirqs last disabled at (700459): [<ffff80008002ab48>] ____do_softirq+0x14/0x20 arch/arm64/kernel/irq.c:81
----[ end trace 0000000000000000 ]---
-rcu: __call_rcu_common(): Double-freed CB 000000007c840c9e->taprio_free_sched_cb+0x0/0x178()!!!   slab kmalloc-512 start ffff0000d010cc00 pointer offset 256 size 512
+Stopper: 0x0 <- 0x0
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1e7/0x2e0 lib/dump_stack.c:106
+ print_address_description mm/kasan/report.c:377 [inline]
+ print_report+0x169/0x550 mm/kasan/report.c:488
+ kasan_report+0x143/0x180 mm/kasan/report.c:601
+ __bpf_trace_run kernel/trace/bpf_trace.c:2376 [inline]
+ bpf_trace_run1+0xcb/0x510 kernel/trace/bpf_trace.c:2430
+ __traceiter_rcu_utilization+0x74/0xb0 include/trace/events/rcu.h:27
+ trace_rcu_utilization+0x194/0x1c0 include/trace/events/rcu.h:27
+ rcu_note_context_switch+0xc7c/0xff0 kernel/rcu/tree_plugin.h:360
+ __schedule+0x345/0x4a20 kernel/sched/core.c:6635
+ __schedule_loop kernel/sched/core.c:6813 [inline]
+ schedule+0x14b/0x320 kernel/sched/core.c:6828
+ smpboot_thread_fn+0x61e/0xa30 kernel/smpboot.c:160
+ kthread+0x2f0/0x390 kernel/kthread.c:388
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
+
+Allocated by task 5075:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
+ __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:387
+ kasan_kmalloc include/linux/kasan.h:211 [inline]
+ kmalloc_trace+0x1d9/0x360 mm/slub.c:4012
+ kmalloc include/linux/slab.h:590 [inline]
+ kzalloc include/linux/slab.h:711 [inline]
+ bpf_raw_tp_link_attach+0x2a0/0x6e0 kernel/bpf/syscall.c:3816
+ bpf_raw_tracepoint_open+0x1c2/0x240 kernel/bpf/syscall.c:3863
+ __sys_bpf+0x3c0/0x810 kernel/bpf/syscall.c:5673
+ __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
+ do_syscall_64+0xfb/0x240
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+Freed by task 5075:
+ kasan_save_stack mm/kasan/common.c:47 [inline]
+ kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+ kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:589
+ poison_slab_object+0xa6/0xe0 mm/kasan/common.c:240
+ __kasan_slab_free+0x37/0x60 mm/kasan/common.c:256
+ kasan_slab_free include/linux/kasan.h:184 [inline]
+ slab_free_hook mm/slub.c:2121 [inline]
+ slab_free mm/slub.c:4299 [inline]
+ kfree+0x14a/0x380 mm/slub.c:4409
+ bpf_link_release+0x3b/0x50 kernel/bpf/syscall.c:3071
+ __fput+0x429/0x8a0 fs/file_table.c:423
+ task_work_run+0x24f/0x310 kernel/task_work.c:180
+ exit_task_work include/linux/task_work.h:38 [inline]
+ do_exit+0xa1b/0x27e0 kernel/exit.c:878
+ do_group_exit+0x207/0x2c0 kernel/exit.c:1027
+ __do_sys_exit_group kernel/exit.c:1038 [inline]
+ __se_sys_exit_group kernel/exit.c:1036 [inline]
+ __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1036
+ do_syscall_64+0xfb/0x240
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+The buggy address belongs to the object at ffff8880290d9900
+ which belongs to the cache kmalloc-128 of size 128
+The buggy address is located 24 bytes inside of
+ freed 128-byte region [ffff8880290d9900, ffff8880290d9980)
+
+The buggy address belongs to the physical page:
+page:ffffea0000a43640 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x290d9
+anon flags: 0xfff00000000800(slab|node=0|zone=1|lastcpupid=0x7ff)
+page_type: 0xffffffff()
+raw: 00fff00000000800 ffff888014c418c0 0000000000000000 0000000000000001
+raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x12cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_NORETRY), pid 4527, tgid 4527 (udevd), ts 43150902736, free_ts 43094996342
+ set_page_owner include/linux/page_owner.h:31 [inline]
+ post_alloc_hook+0x1ea/0x210 mm/page_alloc.c:1533
+ prep_new_page mm/page_alloc.c:1540 [inline]
+ get_page_from_freelist+0x33ea/0x3580 mm/page_alloc.c:3311
+ __alloc_pages+0x256/0x680 mm/page_alloc.c:4569
+ __alloc_pages_node include/linux/gfp.h:238 [inline]
+ alloc_pages_node include/linux/gfp.h:261 [inline]
+ alloc_slab_page+0x5f/0x160 mm/slub.c:2190
+ allocate_slab mm/slub.c:2354 [inline]
+ new_slab+0x84/0x2f0 mm/slub.c:2407
+ ___slab_alloc+0xd1b/0x13e0 mm/slub.c:3540
+ __slab_alloc mm/slub.c:3625 [inline]
+ __slab_alloc_node mm/slub.c:3678 [inline]
+ slab_alloc_node mm/slub.c:3850 [inline]
+ kmalloc_trace+0x267/0x360 mm/slub.c:4007
+ kmalloc include/linux/slab.h:590 [inline]
+ kzalloc include/linux/slab.h:711 [inline]
+ kernfs_get_open_node fs/kernfs/file.c:523 [inline]
+ kernfs_fop_open+0x803/0xcd0 fs/kernfs/file.c:691
+ do_dentry_open+0x907/0x15a0 fs/open.c:956
+ do_open fs/namei.c:3643 [inline]
+ path_openat+0x2860/0x3240 fs/namei.c:3800
+ do_filp_open+0x235/0x490 fs/namei.c:3827
+ do_sys_openat2+0x13e/0x1d0 fs/open.c:1407
+ do_sys_open fs/open.c:1422 [inline]
+ __do_sys_openat fs/open.c:1438 [inline]
+ __se_sys_openat fs/open.c:1433 [inline]
+ __x64_sys_openat+0x247/0x2a0 fs/open.c:1433
+ do_syscall_64+0xfb/0x240
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+page last free pid 4526 tgid 4526 stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1140 [inline]
+ free_unref_page_prepare+0x968/0xa90 mm/page_alloc.c:2346
+ free_unref_page+0x37/0x3f0 mm/page_alloc.c:2486
+ rcu_do_batch kernel/rcu/tree.c:2196 [inline]
+ rcu_core+0xafd/0x1830 kernel/rcu/tree.c:2471
+ __do_softirq+0x2bc/0x943 kernel/softirq.c:554
+
+Memory state around the buggy address:
+ ffff8880290d9800: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+ ffff8880290d9880: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+>ffff8880290d9900: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+                            ^
+ ffff8880290d9980: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff8880290d9a00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+==================================================================
 
 
 ---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
 If you want syzbot to run the reproducer, reply with:
 #syz test: git://repo/address.git branch-or-commit-hash
 If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
