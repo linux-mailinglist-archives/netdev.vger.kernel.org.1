@@ -1,158 +1,134 @@
-Return-Path: <netdev+bounces-81408-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6043A887C9D
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 13:04:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07794887CD7
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 14:23:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D931FB20D50
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 12:04:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7725C2815A2
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 13:23:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95BCB179A8;
-	Sun, 24 Mar 2024 12:04:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24DB017BCB;
+	Sun, 24 Mar 2024 13:23:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bigler.one header.i=@bigler.one header.b="Bbvs2KiV"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="kQMkCT8m"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.yourmailgateway.de (relay.yourmailgateway.de [188.68.61.103])
+Received: from mout.web.de (mout.web.de [212.227.17.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B11C175A9;
-	Sun, 24 Mar 2024 12:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.68.61.103
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4D9BA55;
+	Sun, 24 Mar 2024 13:23:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711281853; cv=none; b=KfLYKXnPmDA0xlAnOSbaDd9rDmn8N3oEPzXcjXvjl1qkfZQ8cKoxfmtIeg5XEwjxd9U8i3EBUdWuVM4D3iiG9HnRXF+RvGvpXiy5IZE9dOeBVdiD8VCgbrXQFFGhnKoJg4pg3uQrQMfRW2Y+5KfiBf1nckFsJ5SJVk7mdZbLViU=
+	t=1711286604; cv=none; b=mQcjTo64fDMnu8zpxlWXN3fY9HID1SBd9sjk4rqPH/wBZUfyeN/hiCBOMTw6EltbgPKS/bsvsRsLTmnmU8P521ZHy6GHTnsdnj6//tE1fBQBdsvlhvxxp3ENn9oatW/PPr/14m6st44V6+KkqJYQR1fT0cPwDjJco3AfQIuXM9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711281853; c=relaxed/simple;
-	bh=a7LNXZGyhTHnJdRFDQFiEyndGv76THAe6Z6KbddtEB4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=hUV1VTKcTJM8FmrknEIFXQMK+5nbWsifMl5rtgxhAzv/hm8o899d0ZH0BpB1pMJ3UmU+ixnbYFpeZPSxwTxX8WsMxuGmX2LklAV5NswuyAFEQcIMMtcv5xUdzjh5mlPocVerkxRZSgCDSTk1uTmCAAVRS+aEmR6TsV09pez6qRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bigler.one; spf=pass smtp.mailfrom=bigler.one; dkim=pass (2048-bit key) header.d=bigler.one header.i=@bigler.one header.b=Bbvs2KiV; arc=none smtp.client-ip=188.68.61.103
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bigler.one
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bigler.one
-Received: from mors-relay-8403.netcup.net (localhost [127.0.0.1])
-	by mors-relay-8403.netcup.net (Postfix) with ESMTPS id 4V2ZJZ0JBpz810r;
-	Sun, 24 Mar 2024 12:55:42 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=bigler.one; s=key2;
-	t=1711281342; bh=a7LNXZGyhTHnJdRFDQFiEyndGv76THAe6Z6KbddtEB4=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=Bbvs2KiVc2rRfF8yA37KDFw+fEJ3kIEcife3kStcavleVNza/wVp/sjF6LfNkHRCa
-	 7fCe8KE6MyFhZb8N+hvmKpCemytQZBLq/rCSeK/mYI0lHNOMYqK2DtvPNYXc4Knp3N
-	 TpvlNy8mPlWq2Fk2Z/a8IPzNJUYbm42rhOdEVLziH5+K6lp0lEk5l9zgdSQFT0NN3Q
-	 12/vpyqxzR5Qp0V9T1DThtnY0erF3ysnThWAvcnmtFEw2sglSMNfqck71MvmZRnWSQ
-	 j8sPdxmLlJNFQW/3puTq48Udt8oZ+1jhQIh7IQ+HrEeDamoOaI3HJrlwQ5opFjE1UF
-	 +QDVIsxdRoIgw==
-Received: from policy02-mors.netcup.net (unknown [46.38.225.35])
-	by mors-relay-8403.netcup.net (Postfix) with ESMTPS id 4V2ZJY700fz810G;
-	Sun, 24 Mar 2024 12:55:41 +0100 (CET)
-Received: from mx2fc6.netcup.net (unknown [10.243.12.53])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by policy02-mors.netcup.net (Postfix) with ESMTPS id 4V2ZJW4Rp1z8sb7;
-	Sun, 24 Mar 2024 12:55:39 +0100 (CET)
-Received: from [192.168.1.24] (xdsl-188-155-38-242.adslplus.ch [188.155.38.242])
-	by mx2fc6.netcup.net (Postfix) with ESMTPSA id 5B868405C9;
-	Sun, 24 Mar 2024 12:55:34 +0100 (CET)
-Authentication-Results: mx2fc6;
-        spf=pass (sender IP is 188.155.38.242) smtp.mailfrom=benjamin@bigler.one smtp.helo=[192.168.1.24]
-Received-SPF: pass (mx2fc6: connection is authenticated)
-Message-ID: <ea86159bb555336ae21311770e3a1a6374092e64.camel@bigler.one>
-Subject: Re: [PATCH net-next v2 0/9] Add support for OPEN Alliance
- 10BASE-T1x MACPHY Serial Interface
-From: Benjamin Bigler <benjamin@bigler.one>
-To: Parthiban Veerasooran <Parthiban.Veerasooran@microchip.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
- horatiu.vultur@microchip.com, Woojung.Huh@microchip.com,
- Nicolas.Ferre@microchip.com, UNGLinuxDriver@microchip.com,
- Thorsten.Kummermehr@microchip.com, davem@davemloft.net,
- edumazet@google.com,  kuba@kernel.org, pabeni@redhat.com,
- robh+dt@kernel.org,  krzysztof.kozlowski+dt@linaro.org,
- conor+dt@kernel.org, corbet@lwn.net,  steen.hegelund@microchip.com,
- rdunlap@infradead.org, horms@kernel.org,  casper.casan@gmail.com,
- andrew@lunn.ch
-Date: Sun, 24 Mar 2024 12:55:34 +0100
-In-Reply-To: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
-References: <20231023154649.45931-1-Parthiban.Veerasooran@microchip.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.0
+	s=arc-20240116; t=1711286604; c=relaxed/simple;
+	bh=PZ1lJ8EZUKwwYkv9frDc8GCtVXzwadN5P2zxl/C7Vew=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aPBgtCnt+vByvkJJFuGkrPqrJ4qmBT0d2KmUR2tSnbwq3fSpXFUZdQDGs/Y643NgogEYH5/IzNPj/3sLIGx37bT0J2tRPGXyVmMHtT0pxgtSPOyvQDiFxgUNvRiACogApOYqApoRcs87GairV/C3KD7KxmnT2lHDCzFtCgWbnt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=kQMkCT8m; arc=none smtp.client-ip=212.227.17.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1711286567; x=1711891367; i=markus.elfring@web.de;
+	bh=MTqIB3naOtDYLJf0K8rUUG6vL07A9g5twS2/717iwn0=;
+	h=X-UI-Sender-Class:Date:Subject:To:Cc:References:From:
+	 In-Reply-To;
+	b=kQMkCT8m4qnhAjinVUeBCnUPEwveJL7b1XTagYv/8FdtFu0EMKMtUIVVYCqVa75w
+	 /3c8fG62V4M24e7nUi2Enyopu0uwExw8XTJCPsS3EWipxVW+O4tajAz/IHmfoVwCG
+	 QmQVAsYLSHWt403NGLaumyQ9pAf6LTTQgM8qUEJMwKJ350RlMU5gcN7hAYUyXs+hE
+	 TEEDsGYslfqrRz9XhPkwr+kZ1M3V2aH3Z8CGhIXr/bqXN40sio2duh7KaQnR3A67W
+	 IuZ0efVRBu4RdU3f7bm2EngEiq5zm15a+GgprRFRFO0dYlj8kvmBAiDtU6Hd4pqSR
+	 PyFMe0qAYgOviryUZg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.90.95]) by smtp.web.de (mrweb105
+ [213.165.67.124]) with ESMTPSA (Nemesis) id 1MdwJY-1sPNJp2ydq-00b2mp; Sun, 24
+ Mar 2024 14:22:47 +0100
+Message-ID: <4366d46d-0edc-4e45-8695-9fbaae571049@web.de>
+Date: Sun, 24 Mar 2024 14:22:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-PPP-Message-ID: <171128133508.28970.8297446260616691683@mx2fc6.netcup.net>
-X-Rspamd-Queue-Id: 5B868405C9
-X-Rspamd-Server: rspamd-worker-8404
-X-NC-CID: v2WY1NJuJOavqDS6N+mo2HKZCu2cke6cX3NwrAx0Pn64kxU=
+User-Agent: Mozilla Thunderbird
+Subject: Re: [v2] ice: Fix freeing uninitialized pointers
+To: Dan Carpenter <dan.carpenter@linaro.org>,
+ kernel-janitors@vger.kernel.org, netdev@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, smatch@vger.kernel.org
+Cc: LKML <linux-kernel@vger.kernel.org>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ David Laight <David.Laight@aculab.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>, Jiri Pirko
+ <jiri@resnulli.us>, Jonathan Cameron <jic23@kernel.org>,
+ Julia Lawall <julia.lawall@inria.fr>, Kees Cook <keescook@chromium.org>,
+ Lukasz Czapnik <lukasz.czapnik@intel.com>, Paolo Abeni <pabeni@redhat.com>,
+ Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
+ Dan Williams <dan.j.williams@intel.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>
+References: <0efe132b-b343-4438-bb00-5a4b82722ed3@moroto.mountain>
+ <08c9f970-3007-461a-b9f9-9ab414024f68@web.de>
+ <f292facc-8a22-42e1-9a41-5ec8bd665cb7@moroto.mountain>
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <f292facc-8a22-42e1-9a41-5ec8bd665cb7@moroto.mountain>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:CTdIMvqo4D4qp88LUdaGqZIeHr1rsg3dFK6XkIHsGrHhX8hygEY
+ xeM1L1NTweuW3yDjP7/0iUWobOfG1BjWaTh6I8vwbM+vIvzxR8Rk+KlwJTjzxlTOvCwFLiV
+ +ZneA5TyR0xTkqnQYujVvGiIS4L4sz89Ic4B4ewElUyLvHfwQP8x1gHUbg0FmhebGh9xuHv
+ M5jekW0cafP2FWuE+PxZg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:q96qtKu9Jgg=;9ZP3rm0Jn0OfUlIbeNEbpN9nU/M
+ xn8mc10NleKEXz9b2oluXRoccSYgAKwfacOkizrpDcGDnA9ZWAPjXgL0sHcLDNA893XhI5baF
+ Za+a0Dk7zhjy1NtgOnvWyo1VV/UazU3K/hCP7pN5n3u0QSt2GaCFi6B4yHoUq2Ca1IkSiKgGf
+ mPBqFcSyKwCofpDzEZzRMioDXbCcVphpYLX1UZmKVTZ9kWB3QeTYLNPiqwEXvYtoH6y7PVkPZ
+ 8/AAtegyu4TxtA55uI1LMi1g3y/oTkScC1n2JyvuIZSTyd+P7Aiu0/zI0sVEV6Fvh6LXyo9ar
+ HMVXM/t+fcB0cwP1jVYymweYswOrSkcjfxA1D3tHaPhbFU+36QYNWLxDc64kVOMFVAsqL1EN0
+ t9Fdg+UXNwFhJznxczvf6pUV+ji9bp/9YQsoglcoc0iCQgxAVv9QWk/lfReVIiThk9d5nxPGD
+ iPz3nrl6c5FQlW0yHtfCg+x3RHaPKHSL7OXjG3R/sNIvaVD4AhynRV20X00jEHmnwwoqpQkUs
+ WsH+pdc69FXbRYfMOxKH8Nx1DnTeFcs9qhzXhkq9Njp5il1TpSkUv5u9bzUo/u7dIXM3Eluur
+ q7getxrKfv/PYUUZlRrQgVuVBQYrllnrQLWWhxGdR6eyA6NOnpefkkkpH4yVGdRsqY+AgeV0V
+ t5Qb7luwnYivTUSN3geuL32ZCRpS6mL0G+CQx3wjQxVFmD2kU47/FShQQqTnLsedVWrq40npN
+ IYjTeRXrsJeAvWv2mPe+RLXDx2BghdjxTKoeGWSVVioGfXoUHr2SkEU7v2By3wcXP3FoJWrkH
+ BFs1R1u8LpCFyGRh9sx5j5NlL9a4aTob4DGb4OPMaPmFc=
 
-Hi Parthiban
+>>> Automatically cleaned up pointers need to be initialized before exitin=
+g
+>>> their scope.  In this case, they need to be initialized to NULL before
+>>> any return statement.
+>>
+>> * May we expect that compilers should report that affected variables
+>>   were only declared here instead of appropriately defined
+>>   (despite of attempts for scope-based resource management)?
+>>
+>
+> We disabled GCC's check for uninitialized variables a long time ago
+> because it had too many false positives.
 
-I hope I send this in the right context as it is not related to just one pa=
-tch or
-some specific code.
+Can further case distinctions (and compilation parameters) become more hel=
+pful
+according to the discussed handling of the attribute =E2=80=9C__cleanup=E2=
+=80=9D (or =E2=80=9C__free=E2=80=9D)?
 
-I conducted UDP load testing using three i.MX8MM boards in conjunction with=
- the
-LAN8651. The setup involved one board functioning as a server, which is jus=
-t
-echoing back received data, while the remaining two boards acted as clients=
-,
-sending UDP packets of different sizes in various bursts to the server.
-Due to hardware constraints, the SPI bus speed was limited to 15 MHz, which=
- might
-have influenced the results.
 
-During the tests I experienced some issues:
+>> * Did you extend detection support in the source code analysis tool =E2=
+=80=9CSmatch=E2=80=9D
+>>   for a questionable implementation detail?
+>
+> Yes.  Smatch detects this as an uninitialized variable.
 
-- The boards just start receiving after first sending something (ping anoth=
-er board).
-  Some measurements showed that the irq stays asserted after init. This mak=
-es sense
-  as far as I understand the chapter 7.7 of the specification, the irq is d=
-easserted
-  on reception of the first data header following CSn being asserted. As a =
-workaround
-  I trigger the thread at the end of oa_tc6_init.
+Does the corresponding warning indicate requirements for scope-based resou=
+rce management?
 
-- If there is a lot of traffic, the receive buffer overflow error spams the=
- log.
-
-- If there is a lot of traffic, I got various kernel panics in oa_tc6_updat=
-e_rx_skb.
-  Mostly because more data to rx_skb is added than allocated and sometimes =
-because
-  rx_skb is null in oa_tc6_update_rx_skb or oa_tc6_prcs_rx_frame_end. Some =
-debugging
-  with a logic analyzer showed that the chip is not behave correctly. There=
- is more
-  bytes between start_valid and end_valid than there should be. Also there
-  seems to be 2 end_valid without a start_valid between. What is common is =
-that the incorrect
-  frame starts in a chunk where end_valid and start_valid is set.
-  In my opinion its a problem in the chip (maybe related to the errata in t=
-he next point)
-  but the driver should be resilent and just drop the packet and not cause =
-a kernel panic.
-
-- Sometimes the chip stops working. It always asserts the irq but there is =
-no data (rca=3D0)
-  and also exst is not active. I found out that there is an errata (DS80001=
-075) point s3
-  that explains this. I set the ZARFE bit in CONFIG0. This also fixes the p=
-oint above.
-  The driver now works since about 2.5 weeks with various load with just on=
-e loss of frame
-  error where I had to reboot the system after about 4 days.
-
-Is there a reason why you removed the netdev watchdog which was active in v=
-2?
-
-Thanks,
-Benjamin Bigler
-
+Regards,
+Markus
 
