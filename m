@@ -1,96 +1,133 @@
-Return-Path: <netdev+bounces-81425-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81426-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA6C1887D7D
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 16:33:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BB9E887D9A
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 17:35:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 425501F21326
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 15:33:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 30F171F212A0
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 16:35:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 060C318645;
-	Sun, 24 Mar 2024 15:33:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D16114A90;
+	Sun, 24 Mar 2024 16:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="NkVGcMWH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QcV/uRfo"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FB1018651;
-	Sun, 24 Mar 2024 15:33:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4E5C2C8
+	for <netdev@vger.kernel.org>; Sun, 24 Mar 2024 16:34:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711294387; cv=none; b=FSENSWPQ5tGxL0CXiU7gugrY16okaY3D9C/sHEWEXQBXlHztPigitkNng6wx450nlGZ8jV0x9+zzr4opVxmSKhjUikOkLcVVnZ4jsK+jrMPge6Xua9dzWliZRjgDaHZ2ZGo8lpOUi5jnhSolJUmvagivocF4UUQ1YdPudhHAT4Y=
+	t=1711298096; cv=none; b=DB6G4sPe48Sm5hlyzlb/uftXnQjZQB2dZsW/nNsBOwZpEzEnH+EoZwScptYULdT75x3wacb01F2balq0LBVQmRi5xBJRO9jJL3d+7KJ0xJRnWuEmPGKxoHCGnyEC4FXUUmx01HnVIOno85udhN84H+s99lU9/RvGX9F9boMjzaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711294387; c=relaxed/simple;
-	bh=wUAtV8wQbBO1XcNrunnboFHejfDjPcWWK1zxAkVYNI4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=im4eu2V6WKpYGlb9lVElrwx8RQnaBBq6q+pduSrW4x+/KWnzzDkgZFfdedhUbaIgS3n+AFAcOEzDrVIOExK2jiKLHNsXCMTISFfR1WqzYFmRWKAYwZ4E4RK1VE0Kq7R57DLH/PDxA5Xksgf/F29HvkA592ewMjWN623HfgXitQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=NkVGcMWH; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=2TlEn+OknbnKMHjb6XpI9hq5uQzUBuHZ9lTXfUcMn94=; b=Nk
-	VGcMWHr/2wzNCPmwHvsmx+9GLsGt5NjrUwpnHMrtWL5Z9hzFLS8v3wd0ibOCK69KHdVYswtdigpbn
-	3dk6rkf1r42P4xn5gy/+/Bkk+6+nQYmFRArMRe/91Kl05l0cIMRPo7cIB4bWbwCx2dr5OXlKOysXZ
-	WgWcFIpuY8OcVNc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1roPq9-00B6On-FO; Sun, 24 Mar 2024 16:32:53 +0100
-Date: Sun, 24 Mar 2024 16:32:53 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>,
-	Alvin =?utf-8?Q?=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 4/4] net: dsa: realtek: add LED drivers for
- rtl8366rb
-Message-ID: <f76754f9-4141-4d48-81e8-f43aa2dfa90c@lunn.ch>
-References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com>
- <20240310-realtek-led-v1-4-4d9813ce938e@gmail.com>
- <d064b1be-1004-487b-9944-b62d91b671c9@lunn.ch>
- <CAJq09z54+049aPL2LzAqAFigrvpchPhv_YQ6yJ5C9b9J7mngLQ@mail.gmail.com>
+	s=arc-20240116; t=1711298096; c=relaxed/simple;
+	bh=HlSq4+53kpIvVV698i52HU1Q1lk4N9kxKXA5tq73oPU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JqtIBOhPyJYMkU2elgi0iwEiDxj11OSBkjOtwO4kv8k6eqeKZoSHS8URc1KqNnzaK6D28Mnt6DypSA2F/1OCOMqp5nGAbP1NSD+RU5p1/v0dbdC5ize/oi2kjo3/3wP708D5vqfu/894OXxuP4p9ci6tOXp062EhuJZrtH1zwZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QcV/uRfo; arc=none smtp.client-ip=209.85.208.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2d476d7972aso59368321fa.1
+        for <netdev@vger.kernel.org>; Sun, 24 Mar 2024 09:34:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711298092; x=1711902892; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=11PbC9TVWukv/d0s3ZoI8BIqTTqQkSG5khgm1hVUYh4=;
+        b=QcV/uRfoX+eoA1dtiAXqFU61XHWPraHVspqZDSfKszhJ29dHDd1Lronggakl0pX0+A
+         HL0Po1oRcS2gZv4cYzg/MkEkxki8B8xrcyfXHi2vmYhC0ktpkONUWUVvSSQxXqOOt3D5
+         YIg4CDJyDYxhCOBcXxKtnL/gJCNGHJ2ulc/pakpr+N7wCFVRzfUwGOfnJ0EMAYhqHNnm
+         HyrN4vXBQFukPiBcyn5P2lwPZ79flbXkuWdtN++cQOKteI8D4OsovmhF26hW1DbELyAw
+         ckhmWgx7+1t4LqjuBoo00h4+1zgWtRPnwqM41nT+cmJxv0GjpKSAL1IY4Ca0ROH004rS
+         2/LQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711298092; x=1711902892;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=11PbC9TVWukv/d0s3ZoI8BIqTTqQkSG5khgm1hVUYh4=;
+        b=ogGCdu/uxSnS5vGq6OexNqfm3GuSDBn412CekJOFspREkHY+A4WKuzZTfnb1JMQRLL
+         hGwdYjdDWe66gX4Gq/WSGAUiAuYWqaIm+R7NmTWU97j3IgMGkSBQ8Z36xP/l6PPOIv+x
+         mrnJlicgVX41tBoPcSMoFyWtlMbf+wwyh9PNpYs1oIODuyB0Zn0yrn7k2MaQu07T53ds
+         IXKCTe8U+fpL3LkboaVhun1XneUPBRH8ZyivFBRSKJklRMMExgoL21CfhgF5rjPQt7vO
+         O4ZhenofTwNSY/3e6ovosOuz8QhhEEQlso3pPkax2tHY9fMcjn1K4te1yHx5G+xyZrge
+         ZSQA==
+X-Gm-Message-State: AOJu0YyTZfnGeast/PvhXa3Qhlt9YAeg8j/jMDVM6M+MpbsnaAbSCteU
+	2H4L9hUAP3mlP8fQGMS2GNSOikudhF6oLILoWl4QGt8WT1KuVEpTgTZIWUH1lKM=
+X-Google-Smtp-Source: AGHT+IEbgF4X9+z0HsTbg6NlbMpUQJCyHEZ1N8C45cXBtVldokNcffXEwNJIlck5RcJpyjyJJxKx+Q==
+X-Received: by 2002:a05:651c:b1f:b0:2d4:6e08:34a2 with SMTP id b31-20020a05651c0b1f00b002d46e0834a2mr4106000ljr.47.1711298092102;
+        Sun, 24 Mar 2024 09:34:52 -0700 (PDT)
+Received: from lenovo-lap.localdomain (89-138-235-214.bb.netvision.net.il. [89.138.235.214])
+        by smtp.googlemail.com with ESMTPSA id fm25-20020a05600c0c1900b0041486785b97sm2421010wmb.1.2024.03.24.09.34.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Mar 2024 09:34:51 -0700 (PDT)
+From: Yedaya Katsman <yedaya.ka@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	Yedaya Katsman <yedaya.ka@gmail.com>
+Subject: [PATCH] ip: Exit exec in child process if setup fails
+Date: Sun, 24 Mar 2024 18:34:36 +0200
+Message-Id: <20240324163436.23276-1-yedaya.ka@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJq09z54+049aPL2LzAqAFigrvpchPhv_YQ6yJ5C9b9J7mngLQ@mail.gmail.com>
 
-> OK, I'll add _group_/_GROUP_ both to the enum name and macros. Led
-> blink rate, for example, is global, used by all groups. However, it
-> will be difficult to respect the 80 columns limit passing
-> RTL8366RB_LED_GROUP_OFF to a rb8366rb_set_ledgroup_mode function with
-> only two levels of indentation. Do you have any recommendations?
+If we forked, returning from the function will make the calling code to
+continue in both the child and parent process. Make cmd_exec exit if
+setup failed and it forked already.
 
-https://www.kernel.org/doc/html/v4.10/process/coding-style.html
+An example of issues this causes, where a failure in setup causes
+multiple unnecessary tries:
 
-  Now, some people will claim that having 8-character indentations
-  makes the code move too far to the right, and makes it hard to read
-  on a 80-character terminal screen. The answer to that is that if you
-  need more than 3 levels of indentation, you’re screwed anyway, and
-  should fix your program.
+```
+$ ip netns
+ef
+ab
+$ ip -all netns exec ls
 
-  Functions should be short and sweet, and do just one thing. They
-  should fit on one or two screenfuls of text (the ISO/ANSI screen
-  size is 80x24, as we all know), and do one thing and do that well.
+netns: ef
+setting the network namespace "ef" failed: Operation not permitted
 
-Maybe you need to use more helper functions?
+netns: ab
+setting the network namespace "ab" failed: Operation not permitted
 
-      Andrew
+netns: ab
+setting the network namespace "ab" failed: Operation not permitted
+```
+
+Signed-off-by: Yedaya Katsman <yedaya.ka@gmail.com>
+---
+ lib/exec.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/lib/exec.c b/lib/exec.c
+index 9b1c8f4a1396..893937550079 100644
+--- a/lib/exec.c
++++ b/lib/exec.c
+@@ -36,8 +36,13 @@ int cmd_exec(const char *cmd, char **argv, bool do_fork,
+ 		}
+ 	}
+ 
+-	if (setup && setup(arg))
++	if (setup && setup(arg)) {
++		if (do_fork) {
++			/* In child, nothing to do */
++			_exit(1);
++		}
+ 		return -1;
++	}
+ 
+ 	if (execvp(cmd, argv)  < 0)
+ 		fprintf(stderr, "exec of \"%s\" failed: %s\n",
+-- 
+2.34.1
+
 
