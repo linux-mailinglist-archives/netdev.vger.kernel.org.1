@@ -1,127 +1,190 @@
-Return-Path: <netdev+bounces-81405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87757887C68
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 12:04:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A35B887C87
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 12:39:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4103C281733
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 11:04:32 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5016FB20E31
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 11:39:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C6B4175A9;
-	Sun, 24 Mar 2024 11:04:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B869A17730;
+	Sun, 24 Mar 2024 11:39:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="t7zxPixu";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="0zP5b/bm"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wpDcD+vY"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBC92171B6;
-	Sun, 24 Mar 2024 11:04:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 699246FB5;
+	Sun, 24 Mar 2024 11:39:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711278267; cv=none; b=oVqCPF1Se4RQfCcQz+VHvJWsBxVZhclnn60wwuTydp8C2o/gqvxsqVTNxJpbSJ9gYpwudEQQUPjlO5onDr+uXVRvC9adJd+Ryv6TEmnagbQIScPISN5MZc2NkgfZmnL4PV/eXl0ZRHQpyDp1K1YGXT3NQXW7JFNNHFn2RH/u1To=
+	t=1711280389; cv=none; b=qJ0rKQYL3BpxH/mKY2h7anNLd5qwU7um7pHjb3cTDHVhJEK5wYbmCbuTq2x0oRXZgZdiTCg9NtkfMBHPWZffx8v/x4N8gQy3XWimPbB7RLsxRw83ifaorjsXsUCnR3B++TC4sBXeaXhBUuSm/HzsmOyNroA3XZLjSr+wsSKzHaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711278267; c=relaxed/simple;
-	bh=oVWt1URKKwcX1yBL2A/VUlUd8pg+WwR5QCUkGAW00E8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=ZwhjuIlr3QFth+i4t4U5wl7GHSJk7sC2MqPyVjJYkzTWws5iEj6WS6rJvWGSIlH9myVN0xW+WrRtD8/hFeyd0L4ESQqN0r+JpvVoggfhrNewAkfOsLqr1z4Sj7udOA/m6FWVc45IvP7QgtDYgTaSeO1DCjNCtpgDNmL2oWodg5k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=t7zxPixu; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=0zP5b/bm; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1711278262;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2/mH+jshQDq36UblDsSyrijdM7u3yitlRALbmDQiFhQ=;
-	b=t7zxPixu7qaYG51JCvo1ZOQWA/ACxTuuj8zFnDgHzHPztgwklM3NQLGEeGfO8BtnUwz/9i
-	pMirW20R4/jgtZHyn4BZtu2Aw10yVVIbYif1WtvymjBtuXW6Zq1kE8o3Ub5vLfyVU7QfxG
-	0UvoNfkcKVyNQgQNJYAtQZTDia3pdd9N/ttYXkZL5zIN0Qlcjw7QPiLkgaz6k5y0x62R9d
-	gb4gV1ENpfo41Fs4Vh9hxDWidwK3q5uwumbcrHQ6ypY/0fa2+ZRexzovLfG0d0Iuv2RrWA
-	6nfB/08D+O2qpTLhxDIfCO1B7j8WuvenOW9n9RbCBDfUh2ZAZfAWfLtdRXNmtg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1711278262;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2/mH+jshQDq36UblDsSyrijdM7u3yitlRALbmDQiFhQ=;
-	b=0zP5b/bmPCg1ZQGyVupWSN3TpJwnNzP0yHkov/wwsnDRr2CvA/XIPR6n90Ossh1xnUewt0
-	gBjxUzMze3k1OaAQ==
-To: Thomas Gleixner <tglx@linutronix.de>, Sagi Maimon <maimon.sagi@gmail.com>
-Cc: richardcochran@gmail.com, luto@kernel.org, mingo@redhat.com,
- bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- arnd@arndb.de, geert@linux-m68k.org, peterz@infradead.org,
- hannes@cmpxchg.org, sohil.mehta@intel.com, rick.p.edgecombe@intel.com,
- nphamcs@gmail.com, palmer@sifive.com, keescook@chromium.org,
- legion@kernel.org, mark.rutland@arm.com, mszeredi@redhat.com,
- casey@schaufler-ca.com, reibax@gmail.com, davem@davemloft.net,
- brauner@kernel.org, linux-kernel@vger.kernel.org,
- linux-api@vger.kernel.org, linux-arch@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH v7] posix-timers: add clock_compare system call
-In-Reply-To: <875xxdhj8k.ffs@tglx>
-References: <878r29hjds.ffs@tglx> <875xxdhj8k.ffs@tglx>
-Date: Sun, 24 Mar 2024 12:04:20 +0100
-Message-ID: <87msqnrivf.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1711280389; c=relaxed/simple;
+	bh=3DAN+ZuR4BCK0R8mQkOH/01GQK1FQY2hVj9coW1xG4k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ksNQwmYojcfflDl1rOC2v0a6uKUfMwXMP1NHr7XivScvmCrokhPHhZ5A7K+o4Tgps5761R8uTEeAULnRhe1KN74lG/DRA1ptliWI0/aqsZtndJ2KFhl0zgSLMU18B19eJqZH6CDh8H3F4VrRrkhQQwZN53+6KaqRq567IniFEuA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wpDcD+vY; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=/pm71XqUg2Me/5kzVzyvAIWcLcizOGK383LNxU+r5/U=; b=wpDcD+vYSME5DYWATYlNDH/YEg
+	/jTLStgE7PwCf0v4Whv7leAPkpSEkEs08V3YRE91IZ0qWmO7QOBStdHNfbEwxncMIqr4agFzSG94Z
+	eC1i59HSLICUSu/PbGSGEnjt0s2ar/Upqey60Jd3DoTiAiIrbMNSBtEVRHEOAkXFEsGBvGZaVemYs
+	9tb8rb+A2OBfdHY8c7uVIzCcQMLQorS6o26D9Dp67R48HrLs0Nf6ntIpYMENrpaELL/DW+qAcfWSr
+	gyTYpakQ9VyLcSGyEoFS0wjOJ6Ja5eaXk9tf8zXSaPGi32wYs/rLH6VnAfGd+L75WSPgjlG7Fh7Lk
+	dR4fLziA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:59938)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1roMC7-0002Ei-1W;
+	Sun, 24 Mar 2024 11:39:19 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1roMC0-0006UM-Tn; Sun, 24 Mar 2024 11:39:13 +0000
+Date: Sun, 24 Mar 2024 11:39:12 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: =?utf-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Daniel Golle <daniel@makrotopia.org>, Andrew Lunn <andrew@lunn.ch>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	=?iso-8859-1?Q?Ren=E9?= van Dorst <opensource@vdorst.com>,
+	SkyLake Huang <SkyLake.Huang@mediatek.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Bartel Eerdekens <bartel.eerdekens@constell8.be>,
+	mithat.guner@xeront.com, erkin.bozoglu@xeront.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH 0/3] Fix EEE support for MT7531 and MT7988 SoC switch
+Message-ID: <ZgAQ4Ihsn6RCk7xx@shell.armlinux.org.uk>
+References: <20240318-for-net-mt7530-fix-eee-for-mt7531-mt7988-v>
+ <ZfnYkuzuvwLepIfC@makrotopia.org>
+ <00ec9779-19ce-4005-83f0-f4abf37350fc@arinc9.com>
+ <6cb585f6-6da8-45a2-a28b-2fb556f95672@lunn.ch>
+ <Zfn1DxkEa3u-f7l2@makrotopia.org>
+ <38798882-c033-4949-9446-4c6f15c25ebe@gmail.com>
+ <0fbe7ba2-6529-4118-b050-8ea76d28b712@arinc9.com>
+ <11b2a4d1-66d8-4bcf-b1a8-20a635b99cc4@gmail.com>
+ <5a4c0436-cd78-419f-af14-9c4e0c0435e3@arinc9.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <5a4c0436-cd78-419f-af14-9c4e0c0435e3@arinc9.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
---=-=-=
-Content-Type: text/plain
+On Sun, Mar 24, 2024 at 12:47:08PM +0300, Arınç ÜNAL wrote:
+> On 21/03/2024 18:31, Florian Fainelli wrote:
+> > On 3/21/24 09:09, Arınç ÜNAL wrote:
+> > > I have started testing MT7531 with EEE enabled and immediately experienced
+> > > frames that wouldn't egress the switch or improperly received on the link
+> > > partner.
+> > > 
+> > > SoC MAC       <-EEE off-> MT7531 P6 MAC (acting as PHY)
+> > > MT7531 P0 MAC <-EEE on -> MT7531 P0 PHY
+> > > MT7531 P0 PHY <-EEE on -> Computer connected with twisted pair
+> > 
+> > OK, so this is intended to describe that the SoC's Ethernet MAC link to the integrated switch did not use EEE only the user-facing ports. That makes sense because it's all digital logic and you are not going to be seeing much power saving from having EEE enabled between the SoC's Ethernet MAC and CPU port of the switch, that said, however, I wonder if this has an impact on any form of flow control within the switch that is reacting to LPI and you need EEE to be enabled end-to-end?
+> 
+> I've tested pinging between my computers with EEE enabled interfaces. The
+> behaviour is identical.
+> 
+> > 
+> > > 
+> > > I've tested pinging from the SoC's CPU. Packet capturing on the twisted
+> > > pair computer showed very few frames were being received.
+> > > 
+> > > # ping 192.168.2.2
+> > > PING 192.168.2.2 (192.168.2.2): 56 data bytes
+> > > 64 bytes from 192.168.2.2: seq=36 ttl=64 time=0.486 ms
+> > > ^C
+> > > --- 192.168.2.2 ping statistics ---
+> > > 64 packets transmitted, 1 packets received, 98% packet loss
+> > > round-trip min/avg/max = 0.486/0.486/0.486 ms
+> > > 
+> > > It seems there's less loss when frames are passed more frequently.
+> > 
+> > That would point to an issue getting in and out of LPI, do you see these packet losses even with different LPI timeouts?
+> 
+> The NICs on my computers don't seem to allow changing the tx-lpi and
+> tx-timer options.
+> 
+> Computer 1 (Intel I219-V, driver: e1000e):
+> 
+> $ sudo ethtool --set-eee eno1 tx-timer 15
+> netlink error: Invalid argument
+> 
+> $ sudo ethtool --show-eee eno1
+> EEE settings for eno1:
+> 	EEE status: enabled - active
+> 	Tx LPI: 17 (us)
+> 	Supported EEE link modes:  100baseT/Full
+> 	                           1000baseT/Full
+> 	Advertised EEE link modes:  100baseT/Full
+> 	                            1000baseT/Full
+> 	Link partner advertised EEE link modes:  100baseT/Full
+> 	                                         1000baseT/Full
+> 
+> Computer 2 (Realtek RTL8111H, driver: r8169):
+> 
+> $ sudo ethtool --set-eee eno1 tx-lpi on
+> 
+> $ sudo ethtool --show-eee eno1
+> EEE settings for eno1:
+> 	EEE status: enabled - active
+> 	Tx LPI: disabled
+> 	Supported EEE link modes:  100baseT/Full
+> 	                           1000baseT/Full
+> 	Advertised EEE link modes:  100baseT/Full
+> 	                            1000baseT/Full
+> 	Link partner advertised EEE link modes:  100baseT/Full
+> 	                                         1000baseT/Full
+> 
+> I've tested with switch ports interfaces' tx-timer from 0 to 40, same
+> tx-timer for both interfaces. Loss is still there.
 
-On Sat Mar 23 2024, Thomas Gleixner wrote:
-> On Sat, Mar 23 2024 at 01:38, Thomas Gleixner wrote:
->> PTP_SYS_OFFSET_EXTENDED moves the outer sample points as close as
->> possible to the actual PCH read and provides both outer samples to user
->> space for analysis. It was introduced for a reason, no?
->
-> That said, it's a sad state of affairs that 16 drivers which did exist
-> before the introduction of the gettimex64() callback have not been
-> converted over to it within 4.5 years.
->
-> What's even worse is that 14 drivers have been merged _after_ the
-> gettimex64() callback got introduced without implementing it:
->
+EEE implementations tend to be a mess in the way drivers implement the
+API, so one can't at the moment rely on what ethtool says about the
+status. Sadly, this is what happens when driver authors are left to
+their own ends. :(
 
-[...]
+> I suppose the MT7531 switch PHYs need calibration for EEE that is currently
+> missing from the mediatek-ge driver.
 
-> 2020-11-05   drivers/net/dsa/hirschmann/hellcreek_ptp.c
+EEE is quite simple from the software point of view. There is software
+negotiation of the modules that EEE supports, and then there is are
+one or more timers that affect the behaviour of EEE. The LPI timer is
+"how long the link needs to be idle for before _this_ end signals that
+it _can_ enter low power state". The link only enters low power state
+when *both* ends of the link signal that they can enter low power
+state.
 
-Oh, my bad. Let me switch this one to gettimex64() then.
+What calibration would be necessary?
 
-Thanks,
-Kurt
-
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmYACLQTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzgkX6D/0Up3j+XE9kDqSQoc2pu9NoxF6Srmub
-lTxnMPB7Vq5dkXM1EYUhK4Mji31dmYDdt70y0O9DrAke9RcGbWk3v45Yb2fMMWNe
-UHjol/JoZIuFdqOw8Tm8soYkB76mf1vTBgZvwDJrmBoJhVYHGZgpQhd7/VxRp1Kn
-TON3EpUj1kH9BoZTmzai8NFVivqMPrkdJTtErYZckaD7uO3lqxzTQsQ1C3SPaqZM
-TGe/WHSDudT6vov8ousEzNxoHPJt/JcJj9CFJnyYVk1wtaGBrbuU68tht4AgBd7o
-v6jiTKxpGFFqtMZISPLUgYasPwUjxCgsrEVxQmQGBzZOG+nHfP+kKKEwgafV+HSc
-jZOK52LBnaaVCdGIlwEMJUOpk8AVN6rReeUqWIHJEcezKUVn6Elo3RRyrH33aq5t
-L6sm3k1IzMGHwyhmLgp6ep/YDBHgWbSJ3qXyEr7Bet7Zq99IiynTLg11GX68QSc2
-MVBb1zldKucN3BnFl2B6sqwexbtxPNGNm5dXPJWKLLIdmh47kVFOH4+0fvwBpveu
-5Gwp5q+JZYSlqit9SfLkt2jRORt1MZmwxn4JH06+23CQ+fT/+uQBZMA8AfUtK4PJ
-7+R8WDXAZnr/ZDjXzv5zJbj49Z3X8CPKFFGWfQdCC16VMpUQPDLLslO4nZFnrXtM
-Ig6ltOiLusm+Ew==
-=e9pu
------END PGP SIGNATURE-----
---=-=-=--
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
