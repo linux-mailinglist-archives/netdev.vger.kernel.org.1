@@ -1,217 +1,149 @@
-Return-Path: <netdev+bounces-81422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFDEC887D4B
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 16:02:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B5C3887D75
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 16:26:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C09AB20EB0
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 15:02:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67D89281082
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 15:26:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5944A18638;
-	Sun, 24 Mar 2024 15:02:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92C471862B;
+	Sun, 24 Mar 2024 15:26:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b="B3U1Sp1d"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eJiQuMTb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776281946B
-	for <netdev@vger.kernel.org>; Sun, 24 Mar 2024 15:02:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE1852107;
+	Sun, 24 Mar 2024 15:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711292531; cv=none; b=XKmEMWbxyGuq2ecMia4FNxZc3HOYpe0Th8nDIuhGuTM8/UtYHJQiXjRv9Z8CEv2W9O0/fSlVTupkfER1Ho3LNQQy+gvG13vgpT8EHTVLxlosK2cELhH0cVDSIE6gBjcb59zka2F65xmIxV3hZ9FjBWR0nuZ2RhQybvbpzTJ5HjA=
+	t=1711293960; cv=none; b=WBqSjuS9nf+1jI/4WkOeL9i9BkBpvCGKw7WDaLXXMitpm5ABn0vlrRQTGJlyQCmgcko6JVzcbqw9sj7Disa55k2CfznwepBS2uxkCTZjqX6ZHi1YoOepBqdHb/z6FKuiXX5oP+YCk6INg5S1JqWJx4JWIu719ISE5X/L8xUIAm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711292531; c=relaxed/simple;
-	bh=S6qfD0zgm/C1QM9Fjq9ddi/LiYV0zs+lIqLpWZeK7t0=;
+	s=arc-20240116; t=1711293960; c=relaxed/simple;
+	bh=4uehC6kd6vVBhjMWaG54gnvU5tDXuRlGD+paJ+A4wNM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N0WNYcpKGo5ea9KxPQJu7IoGKJwqf5OT6k9sXrd0h7d/XRIQ/VrloahYq+yYMaJ7Y6TP6hZqB4hbhjgUHLI4mDo+88WpUpZAPTFLAMPmHuWhHtOJvOtJzoP0QyIqWviDZIiKIXFxptyW/+kqIxwQiHQUgqD6OodThdC0zXIFqVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com; spf=pass smtp.mailfrom=isovalent.com; dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b=B3U1Sp1d; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isovalent.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33fd12a06fdso2481510f8f.1
-        for <netdev@vger.kernel.org>; Sun, 24 Mar 2024 08:02:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1711292528; x=1711897328; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EwGW9a4Qg8RuP4nfFSPxy3bqmYCTRCuNE09UvfgZEmE=;
-        b=B3U1Sp1dPyJNFkgBDmjST2PC5m2HnkAW1/bEUvsaL53/6TKLaG9iq5nB7RmmSDQH+i
-         MHjR3CiJN4Eg6HMt3Y8Kgce8HN0yTCl26ZU2Ocd+HjhPy0rxXyk+Aq+Sxqc7rin38036
-         X+RpyNfyOTWBrq+KvLUg02uG6S/IBBQLRk0qkqOc8ix/EC+nKQ8CiPV/IQh0UW02zkon
-         LfJ9aY/0QBXiqT73OlMsKKGEUwwpHD0gUuGubK3pir14cBaQOFccpQ0BQriwrc03xDY3
-         sNytQprQLNCTlUFdgtVvzP7anZ/fdESyiuC05F+NPnqtYbPlNWXQck9AYpuUhSegarsR
-         lPxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711292528; x=1711897328;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EwGW9a4Qg8RuP4nfFSPxy3bqmYCTRCuNE09UvfgZEmE=;
-        b=nz1xxV9J8geA4nlsA4jsLBy7XZ2/5E7Ncw8hXuaoqRibc7p8QS58LZi82uYByRTMIb
-         dPAogAqgloza9vaEA46rCYVq4x96jVtsx1dcN/xSSBLdjiIPpMgZcN+wr+WGPYf/OsXd
-         IG3nKQMInZNXOhydI1EM3rLT7XPKlQMSUAQYEI4mC54F7ksgRMoVTZkH8KRSCR1IJ/h+
-         qHtmqFUyE19JceFQYihsTeVZXFF5KnqunlS/FEXcivfBN6o6vqgbWThVcQJJ0mIlZtQv
-         jEU2D60vqI5ep870bptxTHfiaugxLchlMh7IG1ONsg1BIbnPXcamCzSZhqRxVvhrsXzB
-         ysiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXCkxQTG69vqnhtcdu6lpnLElBK2oilXCT3zm6+e3Pr/4jqN9r5vwBarzabKIfKMasVBGbbHdqN4GnYw2torNSL3ZlTijHz
-X-Gm-Message-State: AOJu0YxnIzH7AJeRH6FEG6arZJm4nRq+S9SM5mMCqP8ug/cAsqwecph7
-	aPvQFWcl372fm6mJAW10tbAXY83c1vdwH5IA2ifOP1jS7LO5PuAdD6qxCiSsrY4=
-X-Google-Smtp-Source: AGHT+IHI0jRg3J5ZCBnBgPwg4wJJT0IzHTHgGiW+iEnazuNFOaYuYRXy/Bq7C0Ctq/vQ5kY9VEz6gg==
-X-Received: by 2002:adf:cd11:0:b0:341:8083:b2a3 with SMTP id w17-20020adfcd11000000b003418083b2a3mr2953087wrm.30.1711292527738;
-        Sun, 24 Mar 2024 08:02:07 -0700 (PDT)
-Received: from zh-lab-node-5 ([2a02:168:f656:0:1ac0:4dff:fe0f:3782])
-        by smtp.gmail.com with ESMTPSA id df4-20020a5d5b84000000b0033e7b433498sm6987249wrb.111.2024.03.24.08.02.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Mar 2024 08:02:07 -0700 (PDT)
-Date: Sun, 24 Mar 2024 15:04:09 +0000
-From: Anton Protopopov <aspsk@isovalent.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Rumen Telbizov <rumen.telbizov@menlosecurity.com>,
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
-	Alexei Starovoitov <ast@kernel.org>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jiri Olsa <jolsa@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH v1 bpf-next 2/2] selftests/bpf: Add BPF_FIB_LOOKUP_MARK
- tests
-Message-ID: <ZgBA6X0QgP+TMFd9@zh-lab-node-5>
-References: <20240322140244.50971-1-aspsk@isovalent.com>
- <20240322140244.50971-3-aspsk@isovalent.com>
- <e8062ef6-b630-45e2-8009-4d2cdc0970ea@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AJjyN1JqRM77nh0sGcO9NV7NEGCy8kFi04e3T1x8Mj8mhlOxFvCivlitGSqIQ8W8z1hRHLox+ami86qXHKsQLuNE3C0/KoAV+rXMIb4QsBkaAO8ON1Zw7F0CzuY4K8mPC5VGuX+tX0nsZxIEtXZCY4+ZHhDtvfSwRhbpW9tXkXs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eJiQuMTb; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=Tp7gUCtuROuSbcpwnhbXJLwSPqSbYkCqzDSlfDFnpWI=; b=eJ
+	iQuMTbTSPacdDPPXFm8ZF4DcIkLkDalxUt5Be8FAhI9Cxe9N9sTkqhJxo1YoVsJ+qlSixIYJnp9Ei
+	Kx1NrE41BOIg66jSUd+W+fbyjGar30/kc8pbKGLrFn3ufJgAMoE9qY8hbDBB6wvLCT2OWkYgRp0RI
+	wBgP3Xaa8kGp8cM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1roPiy-00B6N8-ED; Sun, 24 Mar 2024 16:25:28 +0100
+Date: Sun, 24 Mar 2024 16:25:28 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Elad Nachman <enachman@marvell.com>
+Cc: Taras Chornyi <taras.chornyi@plvision.eu>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"kory.maincent@bootlin.com" <kory.maincent@bootlin.com>,
+	"thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
+	"miquel.raynal@bootlin.com" <miquel.raynal@bootlin.com>,
+	"przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
+	"dkirjanov@suse.de" <dkirjanov@suse.de>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: [EXTERNAL] Re: [PATCH v2 0/5] Fix prestera driver fail to probe
+ twice
+Message-ID: <6dae31dc-8c4f-4b8d-80e4-120619119326@lunn.ch>
+References: <20240320172008.2989693-1-enachman@marvell.com>
+ <4104387a-d7b5-4029-b822-060ef478c6e3@lunn.ch>
+ <BN9PR18MB42517F8E84C8C18078E45C37DB322@BN9PR18MB4251.namprd18.prod.outlook.com>
+ <89a01616-57c2-4338-b469-695bdc731dee@lunn.ch>
+ <BL1PR18MB42488523A5E05291EA57D0AEDB372@BL1PR18MB4248.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <e8062ef6-b630-45e2-8009-4d2cdc0970ea@linux.dev>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <BL1PR18MB42488523A5E05291EA57D0AEDB372@BL1PR18MB4248.namprd18.prod.outlook.com>
 
-On Sat, Mar 23, 2024 at 03:34:10PM -0700, Martin KaFai Lau wrote:
-> On 3/22/24 7:02 AM, Anton Protopopov wrote:
-> > This patch extends the fib_lookup test suite by adding a few test
-> > cases for each IP family to test the new BPF_FIB_LOOKUP_MARK flag
-> > to the bpf_fib_lookup:
+> > > Originally, the pain point for Kory was the rmmod + insmod re-probing
+> > > failure, Which is only fixed by the first two commits, so I see little
+> > > point in submitting 3-5 alone, Without fixing Kory's problem.
 > > 
-> >    * Test destination IP address selection with and without a mark
-> >      and/or the BPF_FIB_LOOKUP_MARK flag set
+> > I thought Kory's problem was actually EPROBE_DEFER? The resources needed
+> > for the PoE are not available, so probing the switch needs to happen again
+> > later, when PoE can get the resources it needs.
+> 
+> No, the PoE is the general high level application where he noted the problem.
+> There is no PoE code nor special PoE resources in the Prestera driver.
+
+So here is Köry email:
+
+https://lore.kernel.org/netdev/20240208101005.29e8c7f3@kmaincent-XPS-13-7390/T/#mb898bb2a4bf07776d79f1a19b6a8420716ecb4a3
+
+I don't see why the prestera needs to be involved in PoE itself. It is
+just a MAC. PoE happens much lower down in the network stack. Same as
+Prestera uses phylink, it does not need to know about the PHYs or the
+SFP modules, phylink manages them, not prestera.
+
+> The problem was caused because the module exit was lacking the so called
+> "switch HW reset" API call which would cause the firmware to exit to the firmware
+> loader on the firmware CPU, and move to the state in the state machine when
+> it can receive new firmware from the host CPU (running the Prestera switchDev
+> driver).
+> 
 > > 
-> > To test this functionality another network namespace and a new veth
-> > pair were added to the test.
+> > But if that is going to take 30 seconds, i'm not sure we can call EPROBE_DEFER
+> > solved.
 > > 
+> > The later patches are pretty simple, don't need discussion, so could be
+> > merged. However, i think we need to explore different possible solutions for
+> > firmware {re}loading.
+> > 
+> > > The problem is not with the hardware, but with the existing firmware
+> > > code on the Firmware cpu, most probably secure-boot protected, which
+> > > lacks the ABIs to report to The kernel what is loaded, what version, what
+> > state, etc.
+> > 
+> > Can you at least tell if it is running firmware?
 > 
-> [ ... ]
-> 
-> >   static const struct fib_lookup_test tests[] = {
-> > @@ -90,10 +105,47 @@ static const struct fib_lookup_test tests[] = {
-> >   	  .daddr = IPV6_ADDR_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> >   	  .expected_src = IPV6_IFACE_ADDR_SEC,
-> >   	  .lookup_flags = BPF_FIB_LOOKUP_SRC | BPF_FIB_LOOKUP_SKIP_NEIGH, },
-> > +	/* policy routing */
-> > +	{ .desc = "IPv4 policy routing, default",
-> > +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> > +	  .expected_dst = IPV4_GW1, .ifname = "veth3",
-> > +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH, },
-> > +	{ .desc = "IPv4 policy routing, mark doesn't point to a policy",
-> > +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> > +	  .expected_dst = IPV4_GW1, .ifname = "veth3",
-> > +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
-> > +	  .mark = MARK_NO_POLICY, },
-> > +	{ .desc = "IPv4 policy routing, mark points to a policy",
-> > +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> > +	  .expected_dst = IPV4_GW2, .ifname = "veth3",
-> > +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
-> > +	  .mark = MARK, },
-> > +	{ .desc = "IPv4 policy routing, mark points to a policy, but no flag",
-> > +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> > +	  .expected_dst = IPV4_GW1, .ifname = "veth3",
-> > +	  .lookup_flags = BPF_FIB_LOOKUP_SKIP_NEIGH,
-> > +	  .mark = MARK, },
-> > +	{ .desc = "IPv6 policy routing, default",
-> > +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> > +	  .expected_dst = IPV6_GW1, .ifname = "veth3",
-> > +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH, },
-> > +	{ .desc = "IPv6 policy routing, mark doesn't point to a policy",
-> > +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> > +	  .expected_dst = IPV6_GW1, .ifname = "veth3",
-> > +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
-> > +	  .mark = MARK_NO_POLICY, },
-> > +	{ .desc = "IPv6 policy routing, mark points to a policy",
-> > +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> > +	  .expected_dst = IPV6_GW2, .ifname = "veth3",
-> > +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
-> > +	  .mark = MARK, },
-> > +	{ .desc = "IPv6 policy routing, mark points to a policy, but no flag",
-> > +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
-> > +	  .expected_dst = IPV6_GW1, .ifname = "veth3",
-> > +	  .lookup_flags = BPF_FIB_LOOKUP_SKIP_NEIGH,
-> > +	  .mark = MARK, },
-> >   };
-> > -static int ifindex;
-> > -
-> >   static int setup_netns(void)
-> >   {
-> >   	int err;
-> > @@ -144,12 +196,40 @@ static int setup_netns(void)
-> >   	if (!ASSERT_OK(err, "write_sysctl(net.ipv6.conf.veth1.forwarding)"))
-> >   		goto fail;
-> > +	/* Setup for policy routing tests */
-> > +	SYS(fail, "ip link add veth3 type veth peer name veth4");
-> > +	SYS(fail, "ip link set dev veth3 up");
-> > +	SYS(fail, "ip link set dev veth4 netns %s up", NS_REMOTE);
-> > +
-> > +	SYS(fail, "ip addr add %s/24 dev veth3", IPV4_LOCAL);
-> > +	SYS(fail, "ip netns exec %s ip addr add %s/24 dev veth4", NS_REMOTE, IPV4_GW1);
-> > +	SYS(fail, "ip netns exec %s ip addr add %s/24 dev veth4", NS_REMOTE, IPV4_GW2);
-> > +	SYS(fail, "ip addr add %s/64 dev veth3 nodad", IPV6_LOCAL);
-> > +	SYS(fail, "ip netns exec %s ip addr add %s/64 dev veth4 nodad", NS_REMOTE, IPV6_GW1);
-> > +	SYS(fail, "ip netns exec %s ip addr add %s/64 dev veth4 nodad", NS_REMOTE, IPV6_GW2);
-> 
-> Trying to see if the setup can be simplified.
-> 
-> Does it need to add another netns and setup a reachable IPV[46]_GW[12] gateway?
-> 
-> The test is not sending any traffic and it is a BPF_FIB_LOOKUP_SKIP_NEIGH test.
+> There is no existing API/ABI for that.
 
-I think this will not work without another namespace, as FIB lookup will
-return DST="final destination", not DST="gateway", as the gateway is in the
-same namespace and can be skipped.
+Do you at least have the ability to determine if an API call exists or
+not? It sounds like your firmware needs extending to support returning
+the version. If the API is missing, you know it is 4.1 or older. If it
+does exist, it will return 4.2 or higher.
 
-Instead of adding a new namespace I can move the second interface to the
-root namespace. This will work, but then we're interfering with the root
-namespace.
+> > Can you explain the boot in a bit more detail. Are you saying it could be
+> > running an old firmware when the driver first loads? So you need to hit it with
+> 
+> Exactly.
+> 
+> > a reset in order to load the firmware for /lib/firmware, which might be newer
+> > than what it is already running?
+> 
+> Right. And there is also the configuration. There is no telling what kind of
+> Configuration the existing firmware is running. Just using the existing firmware
+> Will lead to the situation where Linux kernel side will report certain configuration
+> (via ip link / ip addr / tc , etc.) but the firmware configuration is completely different.
 
-> > +	SYS(fail, "ip route add %s/32 via %s", IPV4_REMOTE_DST, IPV4_GW1);
-> > +	SYS(fail, "ip route add %s/32 via %s table %s", IPV4_REMOTE_DST, IPV4_GW2, MARK_TABLE);
-> > +	SYS(fail, "ip -6 route add %s/128 via %s", IPV6_REMOTE_DST, IPV6_GW1);
-> > +	SYS(fail, "ip -6 route add %s/128 via %s table %s", IPV6_REMOTE_DST, IPV6_GW2, MARK_TABLE);
-> > +	SYS(fail, "ip rule add prio 2 fwmark %d lookup %s", MARK, MARK_TABLE);
-> > +	SYS(fail, "ip -6 rule add prio 2 fwmark %d lookup %s", MARK, MARK_TABLE);
-> > +
-> > +	err = write_sysctl("/proc/sys/net/ipv4/conf/veth3/forwarding", "1");
-> > +	if (!ASSERT_OK(err, "write_sysctl(net.ipv4.conf.veth3.forwarding)"))
-> > +		goto fail;
-> > +
-> > +	err = write_sysctl("/proc/sys/net/ipv6/conf/veth3/forwarding", "1");
-> > +	if (!ASSERT_OK(err, "write_sysctl(net.ipv6.conf.veth3.forwarding)"))
-> > +		goto fail;
-> > +
-> >   	return 0;
-> >   fail:
-> >   	return -1;
-> >   }
-> 
-> [ ... ]
-> 
-> > @@ -248,6 +337,7 @@ void test_fib_lookup(void)
-> >   	prog_fd = bpf_program__fd(skel->progs.fib_lookup);
-> >   	SYS(fail, "ip netns add %s", NS_TEST);
-> > +	SYS(fail, "ip netns add %s", NS_REMOTE);
-> 
-> 
+Well, during probe and -EPRODE_DEFER, linux has no configuration,
+since the driver failed to probe. However, for a rmmod/modprobe, the
+firmware could have stale configuration. However pretty much every
+device i've come across has the concept of a software reset which
+clears out the configuration. Seems to be something else your firmware
+is missing.
+
+	Andrew
 
