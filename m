@@ -1,147 +1,140 @@
-Return-Path: <netdev+bounces-81390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E33F887B5D
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 03:11:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A3533887B61
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 03:12:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1A52B219D5
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 02:11:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 43FDFB2193B
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 02:12:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD8217F5;
-	Sun, 24 Mar 2024 02:11:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76E5017F3;
+	Sun, 24 Mar 2024 02:12:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jfRclf39"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ItqIjY5L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0649981E;
-	Sun, 24 Mar 2024 02:11:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB08B81E;
+	Sun, 24 Mar 2024 02:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711246267; cv=none; b=HJRim6hDMnmmM4AOlQC+tQQdx8SRe/ogPdWYE5KNNIWOWk/YoEscS8Kb5XNx4hAZtxVn7prjgnxcP7o7u/BYy+88CyKVn52Z/DoNW6BJhQAkwrUJ61VKUDfcZof5s4cDePBXoFHDKPuuIsimLSsWZYDDeqyP0LRcKUevRh79DHI=
+	t=1711246359; cv=none; b=EtjMgwHCs/jcnizINBnu+N93g6QAvCaoiKWOSAioyHZ0SzmJtmUqH4OGwFS4KAxshyqtiPM03Dic8sHACKGpRoRj4cvPmcHzv+LJ1o2Ziew7q72B+BrOqkhBmcCqa8pRs0Y44PXgByz1Pmv8KNP8XbJmtN5IMKPGBxN5D/w2rz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711246267; c=relaxed/simple;
-	bh=O4mxWIZtqaCaa6tGkopSI4pdla5nDON3z7rbb6/L1r0=;
+	s=arc-20240116; t=1711246359; c=relaxed/simple;
+	bh=ovHUKz8Xzqtw0vfM9uEg01DKZBo+9/U+IEf7Cmmf4X0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LZDUS7Kqa3nOaSE8Ru+Qhrv5iaNuZ3Yqb+lkcYz3mA03YCW/GRnuJbzlKIf4LTxv0QInE9cRmv8ccyfqTzIZlO8HmlMWKjRHfg5DTQqFfRbUjSt/mebIRWvGjrYAnjW1Qwf4Yhkf4pQiVzJge2Eb92mbJHBDWTrXHXGcJoU2qsE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jfRclf39; arc=none smtp.client-ip=209.85.167.47
+	 To:Cc:Content-Type; b=gGTHHKGyKXdcd+HmlcrblBmjMAGwfyOp0zdJSQwE8iyCjElXeZkGQkPixs1J4axOZQMw/ealQs0DhzpkkguNP6MWzkeQGy0AQeE+ZvH/YF5PHM4KDUk3u2NFOdDuz5H9wD7ETc0C808r1+nWUH0Ky9BGIAY3tOnIWS2JrMZCf/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ItqIjY5L; arc=none smtp.client-ip=209.85.208.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-513e10a4083so3777936e87.1;
-        Sat, 23 Mar 2024 19:11:05 -0700 (PDT)
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-56bc753f58eso3991841a12.3;
+        Sat, 23 Mar 2024 19:12:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711246264; x=1711851064; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Y9wMu56cuKN3w+mxBDS/FvXc6kf2qXtgJwy0PKkso6k=;
-        b=jfRclf398hU7aTyO7NtvZCVMKolLLjtNA39qTjKiqvgvEk13vpdGBzFkAzvgldCYWa
-         M9Ex0K4w9B15L1SEyDENr+u2gTv8vAIImOhnNVOgmTZmum+Suc6Z+OVKB97DLF1EmXBP
-         VFmTbugOwthsrkT8M4q0ilrBrwZ7PY84vtOvknoisczX9ul6Gc4ZJqiUzaXuISc+GyDg
-         wnPd57sUqrvCpY1SL8R+2tpQm8cQtNLxtEe2tdffVkou6pfogGe33OJty5l5vUFLyg9N
-         zSBPukXPYytekGjG/h7dG9o12codxKLUNfHcZVhLu+FQZgwGHSwHOkRxtmVIjh7ookeU
-         rEXg==
+        d=gmail.com; s=20230601; t=1711246356; x=1711851156; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xHFyLHQgXPjbo6X2x+pg5cZRKKgfaicsQUJCH3BgxQg=;
+        b=ItqIjY5L9G4l/EolYckTAegP2/t89zzCBmoZYS2JG2KPkFKTFXRF6gvUG1NPdCOrM0
+         hevpKSPYg3En4sF6/YtVrpG9UtorMa7ub8sbE/HDC7fuuVYRugSr4HfFsOqHyhpKB922
+         U4XgmbQGLDKR5+//BIyuQNcDWcxWxa2ul+D47Mua1mlU6vnQg2GRhUGqjkkn87Garm50
+         PrWUO5qR62MtP7p6ZLZoex/SCIpo0sPOidsD0ETFB1CsNSHrL/wgP1idNLsclzn09GOB
+         MksMY7kk7j6klxs7W3/zmDXyo3WcI7qezvGwvVchcZFskxKzPdcDv9hc0eq3gkB06Qoq
+         HZxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711246264; x=1711851064;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Y9wMu56cuKN3w+mxBDS/FvXc6kf2qXtgJwy0PKkso6k=;
-        b=hE3qFeSVk5la2ruGbPrKc5r6l6rwhtJ2oIHY1vtHR7H8/u6OfgaOBKkC3CWezHgcfY
-         O+LnIY/tHqllQk83J1oqcUu0zUKEuMm4fU1bzs7lE4FvlZ9/i5wcpfPbRov8yEKoIMRN
-         69KSVWgWt2sSrSzOSDYeOTXNLjcelVGuyYKbmHeozF6jRgM1tZ2U6hyxRactvQAFglrB
-         bibcQNx2LTCA6Wv+LVPW/6NM5zERwQpp4W6jdMD3+kKC8A1TiJ7cZJwhFY+p/6o/ND0C
-         GbUr85a5KfkIJPEqVkgvSBsm1wA3g4f38CCmz6CrP1nKPFw6JvdRUJS+CsqzOOrZK7WX
-         Saig==
-X-Forwarded-Encrypted: i=1; AJvYcCXxe3JyREYhVGUD6GozFAtGaL+bGQD2co3QoIy4p9EbD7zSi0C+kdlP6Zy149tFt/oAs1lkehTHxA8fqQdv/4ZsGO6lNk3d7r+P22qTeMU01YrTYBvYGN1ZAJdWEma/LTYf0GdPFART0PWiARL4Vo70DIM1umwVM9pjKY+iHx+iOQ==
-X-Gm-Message-State: AOJu0YyJ1DPvxsO4d19sUCe/mUhvnEcf19IHem1YIdjJXX+fR577Zgld
-	AAHWIK7rS4hA7MqQe52aZ+6G3sSIvY/FDnriqOIFN6YB/X0JIQ2scxsDIGUkAL1rnfsTMba3CV2
-	F+RBL1hxqBr9+wblTS8CAUnM+H8o=
-X-Google-Smtp-Source: AGHT+IFOyuKElypawmVuALXhEMGMLfWqusJVVb7LEmch8qfvQf/2Qx6F4tMq/LvEII9lATb9de4+2xPCidrrfM4YdL8=
-X-Received: by 2002:a05:6512:1ce:b0:513:cf5a:f872 with SMTP id
- f14-20020a05651201ce00b00513cf5af872mr2003294lfp.69.1711246263889; Sat, 23
- Mar 2024 19:11:03 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711246356; x=1711851156;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xHFyLHQgXPjbo6X2x+pg5cZRKKgfaicsQUJCH3BgxQg=;
+        b=Xh9JSN11nGuc74Uz15ldRiU3/MPMaGy5N8GSZtPxC+o7y/hxtdy2GwTql8A+V5BplS
+         3h+nlEczCHQJ2KHPknnVmKWFhkDDeN/H+4jHIi/WG8xomraY2Hr6tTNfqZHHT8oiE2zc
+         GR1StWC/yRGhiKq5LqYX9E1VBNJTYmRsO+eJzT15clnRxjBhix2PL1TZmrov9Cw72NSh
+         s3nyHEVYGD9OYMn+PRn+JiGaRuRC537QVIFT/8AH1r/wlNrPhAoEhM3mKVy+eVuyhX1Q
+         rexoCxcD7vxj29YsQjKx/qkpCbERN/fkj5lBtHROjuUjLF9GVXGtyELr8rFt0z6zKTD6
+         lQ7w==
+X-Forwarded-Encrypted: i=1; AJvYcCUvRhbVe9nxlR4Iuc50vXNgQIXqBt8Ri/Ln6IO+RfGbt2pCxzHuWcrZk4ksYvV+CSWwcjgX6754gBRyifylS4twUHS8arwgpCiLOQva5qwCILGZTiX2k0rX4UBhZ5pcEhO7BPD7+Bi7LJrocBD/VsJIQUzMj0A2lyng
+X-Gm-Message-State: AOJu0YwXl3E0BkURQd9xzndrwj2a8H6uVZDx6xxKVo16ZAm9sDVlkEal
+	ibjDAnLHrGVhWOzcMAF1v4Q0mausLwIAQeZ+oefUuU0FYHI5wZ+4gTnlpCdv6+IFNcPIb03rEOp
+	3/pU2LHj8yhgS4+BVu0qUAhK/UxI=
+X-Google-Smtp-Source: AGHT+IE3n/ABSUmQrtfhds4VBheKUGJxl8W+GXZYl4WJsJsQR1l0p3vVcyqk0Xk5a+Al6NQVoeJTBbmKlDhWEPmrs30=
+X-Received: by 2002:a50:ab49:0:b0:56b:ed78:f58 with SMTP id
+ t9-20020a50ab49000000b0056bed780f58mr2235343edc.33.1711246355828; Sat, 23 Mar
+ 2024 19:12:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com>
- <20240310-realtek-led-v1-1-4d9813ce938e@gmail.com> <d2568101-f3e0-4c2d-8613-52d023e22b77@kernel.org>
- <CAJq09z6q2gaZYqc-=fQEMOA1ViAKTEJqT9iF2xsYCde9syouig@mail.gmail.com> <e32363b2-66c4-4b76-a56a-40eec3a3c907@kernel.org>
-In-Reply-To: <e32363b2-66c4-4b76-a56a-40eec3a3c907@kernel.org>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Sat, 23 Mar 2024 23:10:52 -0300
-Message-ID: <CAJq09z6qinM-bp3ht35JdcggVpwQscThAQOAs2yB2do-BFN9VA@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dsa: realtek: describe LED usage
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Linus Walleij <linus.walleij@linaro.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	devicetree@vger.kernel.org
+References: <0000000000003dc8e00614076ab6@google.com> <CAADnVQLORV5PT0iTAhRER+iLBTkByCYNBYyvBSgjN1T31K+gOw@mail.gmail.com>
+ <CABWLsetXQ8Xj-RECoyC7mp4YrdSsPwmSvkS36Eq2JKLfAYULuw@mail.gmail.com> <CAADnVQJAa1SREsqz9LY+-1OnbazWC-=O=TPuq-VEWkzp1ckH1Q@mail.gmail.com>
+In-Reply-To: <CAADnVQJAa1SREsqz9LY+-1OnbazWC-=O=TPuq-VEWkzp1ckH1Q@mail.gmail.com>
+From: Andrei Matei <andreimatei1@gmail.com>
+Date: Sat, 23 Mar 2024 22:12:23 -0400
+Message-ID: <CABWLseuLmAys-YuyFVeug+XR0_xjZROvgRTXz3U6cNiT+pBX0g@mail.gmail.com>
+Subject: Re: stack access issue. Re: [syzbot] [bpf?] UBSAN:
+ array-index-out-of-bounds in check_stack_range_initialized
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Edward Adam Davis <eadavis@qq.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Eddy Z <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>, 
+	John Fastabend <john.fastabend@gmail.com>, Jiri Olsa <jolsa@kernel.org>, 
+	KP Singh <kpsingh@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Network Development <netdev@vger.kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Song Liu <song@kernel.org>, 
+	syzkaller-bugs <syzkaller-bugs@googlegroups.com>, Yonghong Song <yonghong.song@linux.dev>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Krzysztof,
-
-> >>
-> >>> +
-> >>> +            patternProperties:
-> >>> +              '^led@[a-f0-9]+$':
-> >>
-> >> [0-3]
+On Sat, Mar 23, 2024 at 8:52=E2=80=AFPM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+>
+> On Sat, Mar 23, 2024 at 5:50=E2=80=AFPM Andrei Matei <andreimatei1@gmail.=
+com> wrote:
 > >
-> > leds are already defined for a port. I'm just trying to add a
-> > restriction to allow only 0-3 leds and use that to identify the group.
->
-> Where is the restriction, in your original patch?
-
-I tried to limit the led index to [0-3] (from the original
-'^led@[a-f0-9]+$') and reg also to [0-3] (originally not constrained).
-
->
-> > These suggestions will redefine the leds property, forcing me to
->
-> How? I really do not see it.
-
-I thought it was including the previous object definition when I
-mentioned the same property again. However, the
-"unevaluatedProperties: false" made it clear that it is actually
-replacing the previous declaration. Sorry for my lack of experience.
-
-> > declare #address-cells, #size-cells for leds and reference the led
-> > schema in led@[0-3]. Is there a way to just add a constraint to what
-> > is already present?
->
-> I don't follow.
-
-I would like to somehow add a restriction without replacing the
-existing subnode definition. I'm not sure if the YAML scheme can
-modify an heritaged sub-sub-property without redefining it all over
-again or if the parent object requires a specific subobject property.
-Anyway, the discussion ended up concluding that it was not worth it to
-add such complexity for this situation.
-
-Thank you for your time.
-
->
+> > + Edward
 > >
-> >>
-> >>> +                type: object
-> >>> +                additionalProperties: true
-> >>
-> >> This cannot be 'true'. Which then will point you to errors and missing
-> >> ref to leds schema and need to use unevaluatedProperties: false.
-> Best regards,
-> Krzysztof
+> > On Thu, Mar 21, 2024 at 3:33=E2=80=AFAM Alexei Starovoitov
+> > <alexei.starovoitov@gmail.com> wrote:
+> > >
+> > > Hi Andrei,
+> > >
+> > > looks like the refactoring of stack access introduced a bug.
+> > > See the reproducer below.
+> > > positive offsets are not caught by check_stack_access_within_bounds()=
+.
+> >
+> > check_stack_access_within_bounds() tries to catch positive offsets;
+> > It does: [1]
+> >
+> > err =3D check_stack_slot_within_bounds(env, min_off, state, type);
+> > if (!err && max_off > 0)
+> >   err =3D -EINVAL; /* out of stack access into non-negative offsets */
+> >
+> > Notice the max_off > 0 in there.
+> > And we have various tests that seem to check that positive offsets are
+> > rejected. Do you know what the bug is?
+> > I'm thinking maybe there's some overflow going on, except that UBSAN
+> > reported an index of -1 as being the problem.
+> >
+> > Edward, I see that you've been tickling the robot trying to narrow the =
+issue;
+> > perhaps you've figured it out?
+> >
+> > If the bug is not immediately apparent to anyone, I would really apprec=
+iate a
+> > bit of tutoring around how to reproduce and get verifier logs.
 >
+> The repro is right there in the email I forwarded:
+>
+> > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D15c38711180=
+000
 
-Regards,
-
-Luiz
+I understand, but how does one go from this to either BPF assembly,
+or to running it in such a way that you also get verifier logs?
 
