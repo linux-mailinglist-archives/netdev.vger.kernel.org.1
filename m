@@ -1,156 +1,144 @@
-Return-Path: <netdev+bounces-81437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BC74887EE0
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 21:40:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89767887EE1
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 21:43:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B86B6B20AEC
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 20:40:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A59661C2089A
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 20:43:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 501E4DF51;
-	Sun, 24 Mar 2024 20:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B24C410798;
+	Sun, 24 Mar 2024 20:43:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XDJ0xsgi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A5371426B;
-	Sun, 24 Mar 2024 20:40:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0158533EE;
+	Sun, 24 Mar 2024 20:43:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711312830; cv=none; b=hmFqI5YAc4KG1XWQiWjRr+hJdGnq2gquM3K03H/OlwYqhFzlI78A/McTgY3UXrUK+EtYxzoTOZhrOdHZcax3Dp73rRF+AXu3E0URCM7zi7+6cs/UbNTBE5FA5ryGPjsThDEp3cTjkKtQXiLNnzgac7F22zKHCifIyirmCTxlJSY=
+	t=1711313001; cv=none; b=R/IBHrI/VhKZq+dV4jnxpO2Rx8zuRBwnSWq3foQPfUFZptbUDQmDMOkxn17jZFG/D/l16LanZNBpX3/+DWvLzQY3u3RpH25BjZRO8mgkych8fqFzMlnNK8ju+QGIZ5BQJ8l9IE24qalLcVzPVFQZzEatrrHCYhBAHOvyeOGcMRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711312830; c=relaxed/simple;
-	bh=eSkzbNcdxq5i+ZjblDTJMZq8oGFlJYYvqI2qfkQZXCE=;
-	h=From:Subject:To:Message-ID:Date:MIME-Version:Content-Type; b=JWzoezMPKLj6uGbnuIuIF8u1CfJSJccXAMaCbjK3Z3gudxkKjWLs8TgdmM+1zcRPTeCrlsD8hFjg20GDf0fwHk7nX+JSEkmfCzIFhcH1SA8VXMDW59rRA5eL7AHHTkqY1tlSWzvjioBPS17qlvrCh+vpLBJxU2r7KR/RXCwZqq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
-Received: from [192.168.1.105] (178.176.73.119) by msexch01.omp.ru
- (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Sun, 24 Mar
- 2024 23:40:10 +0300
-From: Sergey Shtylyov <s.shtylyov@omp.ru>
-Subject: [PATCH net] MAINTAINERS: split Renesas Ethernet drivers entry
-To: <netdev@vger.kernel.org>, <linux-renesas-soc@vger.kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yoshihiro
- Shimoda <yoshihiro.shimoda.uh@renesas.com>
-Organization: Open Mobile Platform
-Message-ID: <de0ccc1d-6fc0-583f-4f80-f70e6461d62d@omp.ru>
-Date: Sun, 24 Mar 2024 23:40:09 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+	s=arc-20240116; t=1711313001; c=relaxed/simple;
+	bh=BWpC5Sb75blq1j1DSHb+BAr/ABqvga9SnLzwpTWDWFU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Shj20MJaYo7s64SW66Y7AhlwIMwm4c9KTkUaoTYBtscNQazW/x5hUbESrXkVsm6idHkX3tpFEBzB410PjD2b6Xb9tcNSUbmnPPChcYOV2AakbA4IUcSMyE2q//RgpSTsBHBEJDmcUw70LY6F/N7cJNpwipS0f2yvuxEQro0jeQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XDJ0xsgi; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-33edbc5932bso2648483f8f.3;
+        Sun, 24 Mar 2024 13:43:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711312998; x=1711917798; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tHiCJgwsQKJHisSLfnjluPrewQvoA1WkSLlpjUnXjuI=;
+        b=XDJ0xsgiI8AOcofSHtqtsCE5otWVjKmG/9aXCmPEE4u6UWK3KXt4CFmbB7pylujag3
+         /nBmNg28by+xvb7biAVogYa5T4ZlziHP6bwLnBJubjIu5hDLENaz2nZ2J55LlfyUda2J
+         mgV4/F4sIBhEQKPnwdr0dIPO0DGMm20Kcgs5v80Gi4mB7M90K0yPhFcCNdhF7tCxRELi
+         x0Y5vZ/ImURYI7iNRbXE8hoOkTbdTCaI8GeANJO4jMSLxt71XD/2zJhs2BWNiMRIltMi
+         7YSWE+dSwQJZ7EVXSJHdS77tYpErvHnrtnqYZANzkXoLbABJxBsWBZQhAZlK7BrB9HcI
+         gupw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711312998; x=1711917798;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tHiCJgwsQKJHisSLfnjluPrewQvoA1WkSLlpjUnXjuI=;
+        b=KNbzxr9EDmF7c7Ed9r8Hc/jybhFi5riafYL2DKq4SSkLWg+pB69Do8lZAI1ZEyxiS+
+         5PU1wpZ2MLjqcC8kqTO+SNfxmicBZwMmAeYqqX1fw6DI4fGMumQkvCwf0RWge6UWycsB
+         I7szsbE3B9t2mLP/iQZCqIZZucJQyrtjao+gy+Gt2WqyESUnXa9MganoGSHfHwbSolc4
+         vFuxJ3uPmYWUIu3qkkGxaBR3eaF+3LJOp/BWdXVE9mOhpKHFhhyCV5pkobFwYkAtz9tk
+         SkHKNo361uyI4Wws6oOoMwWRW7IIfXFigWSsnz78KFEO/lenO+CXHx2CH/+ATBkdFZdC
+         gP6w==
+X-Forwarded-Encrypted: i=1; AJvYcCW8c+LF2Zhl9Du90G0DMeR5EAVPHebab9ftgx1pdzZKQ+SDedUNrKhjno16rCiNqHk/tREiuSoWGwB4G6bmLMJU79nN39B9FQM0dkJJSh1oQQdPqiVeCZNxeQtmqko/ZfhuNrlD84/Lp7coU65ionEwJq4UP0STV5yC
+X-Gm-Message-State: AOJu0YxyMoCmBPeO0ytU4mWKJwXP3XN/9vjqXP96Er+XdU2WHqi3B9et
+	xP50PLmyyuBzKhipRVH8Oi/xJh7PlM0SsQB3oSlL8i0qk9tacYa5nFMvMt01/KluAZ8ooql4YEt
+	grzSm10LztB9eQaowR3Cke1hHSCo=
+X-Google-Smtp-Source: AGHT+IFoiwVmSJXpx+u8eZwRD+8Ldre0v1Olns54nZKxRx8/MslmrdcRAB9ZhVFcHGzG8mgvOd4r/s/Ohlf+su+loBc=
+X-Received: by 2002:a5d:69d0:0:b0:341:bf1e:45a5 with SMTP id
+ s16-20020a5d69d0000000b00341bf1e45a5mr3460066wrw.46.1711312997972; Sun, 24
+ Mar 2024 13:43:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
- (10.188.4.12)
-X-KSE-ServerInfo: msexch01.omp.ru, 9
-X-KSE-AntiSpam-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 6.1.0, Database issued on: 03/24/2024 20:18:51
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 59
-X-KSE-AntiSpam-Info: Lua profiles 184373 [Mar 24 2024]
-X-KSE-AntiSpam-Info: Version: 6.1.0.4
-X-KSE-AntiSpam-Info: Envelope from: s.shtylyov@omp.ru
-X-KSE-AntiSpam-Info: LuaCore: 11 0.3.11
- 5ecf9895443a5066245fcb91e8430edf92b1b594
-X-KSE-AntiSpam-Info: {rep_avail}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: {relay has no DNS name}
-X-KSE-AntiSpam-Info: {SMTP from is not routable}
-X-KSE-AntiSpam-Info:
-	127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;omp.ru:7.1.1
-X-KSE-AntiSpam-Info: ApMailHostAddress: 178.176.73.119
-X-KSE-AntiSpam-Info: {DNS response errors}
-X-KSE-AntiSpam-Info: Rate: 59
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
- smtp.mailfrom=omp.ru;dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 03/24/2024 20:24:00
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: Clean, bases: 3/24/2024 3:38:00 PM
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
+References: <20240320105436.4781-1-puranjay12@gmail.com> <CAADnVQJ3o6DsURi=N_KXx+mbW9r7__3LrwYLyYwuoMOsqFHPkw@mail.gmail.com>
+ <1686adb401b34adaa3b703ec1a8ffe49@AcuMS.aculab.com>
+In-Reply-To: <1686adb401b34adaa3b703ec1a8ffe49@AcuMS.aculab.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Sun, 24 Mar 2024 13:43:06 -0700
+Message-ID: <CAADnVQJzfnK0Mv6HVKZ38VDuAemzbmSMeYscf77YoEy0SgWw+A@mail.gmail.com>
+Subject: Re: [PATCH bpf] bpf: verifier: prevent userspace memory access
+To: David Laight <David.Laight@aculab.com>
+Cc: Puranjay Mohan <puranjay12@gmail.com>, Ilya Leoshkevich <iii@linux.ibm.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>, 
+	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
+	"H. Peter Anvin" <hpa@zytor.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Since the Renesas Ethernet Switch driver was added by Yoshihiro Shimoda,
-I started receiving the patches to review for it -- which I was unable to
-do, as I don't know this hardware and don't even have the manuals for it.
-Fortunately, Shimoda-san has volunteered to be a reviewer for this new
-driver, thus let's now split the single entry into 3 per-driver entries,
-each with its own reviewer...
+On Sun, Mar 24, 2024 at 1:05=E2=80=AFPM David Laight <David.Laight@aculab.c=
+om> wrote:
+>
+> From: Alexei Starovoitov
+> > Sent: 21 March 2024 06:08
+> >
+> > On Wed, Mar 20, 2024 at 3:55=E2=80=AFAM Puranjay Mohan <puranjay12@gmai=
+l.com> wrote:
+> > >
+> > > The JITs need to implement bpf_arch_uaddress_limit() to define where
+> > > the userspace addresses end for that architecture or TASK_SIZE is tak=
+en
+> > > as default.
+> > >
+> > > The implementation is as follows:
+> > >
+> > > REG_AX =3D  SRC_REG
+> > > if(offset)
+> > >         REG_AX +=3D offset;
+> > > REG_AX >>=3D 32;
+> > > if (REG_AX <=3D (uaddress_limit >> 32))
+> > >         DST_REG =3D 0;
+> > > else
+> > >         DST_REG =3D *(size *)(SRC_REG + offset);
+> >
+> > The patch looks good, but it seems to be causing s390 CI failures.
+>
+> I'm confused by the need for this check (and, IIRC, some other bpf
+> code that does kernel copies that can fault - and return an error).
+>
+> I though that the entire point of bpf was that is sanitised and
+> verified everything to limit what the 'program' could do in order
+> to stop it overwriting (or even reading) kernel structures that
+> is wasn't supposed to access.
+>
+> So it just shouldn't have a address that might be (in any way)
+> invalid.
 
-Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+bpf tracing progs can call bpf_probe_read_kernel() which
+can read any kernel memory.
+This is nothing but an inlined version of it.
 
----
-The patch is against the 'main' branch of the Netdev Group's 'net.git' repo...
+> The only possible address verify is access_ok() to ensure that
+> a uses address really is a user address.
 
- MAINTAINERS |   29 +++++++++++++++++++++++++----
- 1 file changed, 25 insertions(+), 4 deletions(-)
-
-Index: net/MAINTAINERS
-===================================================================
---- net.orig/MAINTAINERS
-+++ net/MAINTAINERS
-@@ -18724,13 +18724,24 @@ S:	Supported
- F:	Documentation/devicetree/bindings/i2c/renesas,iic-emev2.yaml
- F:	drivers/i2c/busses/i2c-emev2.c
- 
--RENESAS ETHERNET DRIVERS
-+RENESAS ETHERNET AVB DRIVER
- R:	Sergey Shtylyov <s.shtylyov@omp.ru>
- L:	netdev@vger.kernel.org
- L:	linux-renesas-soc@vger.kernel.org
--F:	Documentation/devicetree/bindings/net/renesas,*.yaml
--F:	drivers/net/ethernet/renesas/
--F:	include/linux/sh_eth.h
-+F:	Documentation/devicetree/bindings/net/renesas,etheravb.yaml
-+F:	drivers/net/ethernet/renesas/Kconfig
-+F:	drivers/net/ethernet/renesas/Makefile
-+F:	drivers/net/ethernet/renesas/ravb*
-+
-+RENESAS ETHERNET SWITCH DRIVER
-+R:	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
-+L:	netdev@vger.kernel.org
-+L:	linux-renesas-soc@vger.kernel.org
-+F:	Documentation/devicetree/bindings/net/renesas,*ether-switch.yaml
-+F:	drivers/net/ethernet/renesas/Kconfig
-+F:	drivers/net/ethernet/renesas/Makefile
-+F:	drivers/net/ethernet/renesas/rcar_gen4*
-+F:	drivers/net/ethernet/renesas/rswitch*
- 
- RENESAS IDT821034 ASoC CODEC
- M:	Herve Codina <herve.codina@bootlin.com>
-@@ -18840,6 +18851,16 @@ S:	Supported
- F:	Documentation/devicetree/bindings/i2c/renesas,rzv2m.yaml
- F:	drivers/i2c/busses/i2c-rzv2m.c
- 
-+RENESAS SUPERH ETHERNET DRIVER
-+R:	Sergey Shtylyov <s.shtylyov@omp.ru>
-+L:	netdev@vger.kernel.org
-+L:	linux-renesas-soc@vger.kernel.org
-+F:	Documentation/devicetree/bindings/net/renesas,ether.yaml
-+F:	drivers/net/ethernet/renesas/Kconfig
-+F:	drivers/net/ethernet/renesas/Makefile
-+F:	drivers/net/ethernet/renesas/sh_eth*
-+F:	include/linux/sh_eth.h
-+
- RENESAS USB PHY DRIVER
- M:	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
- L:	linux-renesas-soc@vger.kernel.org
+access_ok() considerations don't apply.
+We're not dealing with user memory access.
 
