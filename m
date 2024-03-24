@@ -1,315 +1,217 @@
-Return-Path: <netdev+bounces-81421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D627C887D1C
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 14:59:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFDEC887D4B
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 16:02:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 599271F212EA
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 13:59:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0C09AB20EB0
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 15:02:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A88182DD;
-	Sun, 24 Mar 2024 13:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5944A18638;
+	Sun, 24 Mar 2024 15:02:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="N6QaobJ0"
+	dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b="B3U1Sp1d"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7FDE383B4;
-	Sun, 24 Mar 2024 13:55:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776281946B
+	for <netdev@vger.kernel.org>; Sun, 24 Mar 2024 15:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711288562; cv=none; b=ByYZPf3nae+GA5WQ7LZRcUbNgsfxXXvOoy3Egjw6FquDuFys+wGDBrgTQ30J9QciK98jXCr084wmDN3RKY4DPYV1HTU+E5ztZZiJXy8xmE0R7KVGfZZxp0hSHYbn0OASuAsfttNwx8ZtBXNzlvP8W9sh/x0O2bnV2HrrtzgQRAM=
+	t=1711292531; cv=none; b=XKmEMWbxyGuq2ecMia4FNxZc3HOYpe0Th8nDIuhGuTM8/UtYHJQiXjRv9Z8CEv2W9O0/fSlVTupkfER1Ho3LNQQy+gvG13vgpT8EHTVLxlosK2cELhH0cVDSIE6gBjcb59zka2F65xmIxV3hZ9FjBWR0nuZ2RhQybvbpzTJ5HjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711288562; c=relaxed/simple;
-	bh=MEMyVWwFXUdYJbDBPPuv+X0Lhx+p+uOvDEHukNdAhCk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sm/X845xeoEq/WiaN6u39SRicLeFg9S0DrxNxwf1/AGM61irMeRR2T20DTaMzQ1kc/Wbqo627Fz/K2RgmMxkBu/epQY7SXBSWv/+2zitGk8+czRc+7FDxLi/h8w01NRZtJXsdYt6l+J5OouMcLgNsjIULbzCtWJURktC1S78Z2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=N6QaobJ0; arc=none smtp.client-ip=115.124.30.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711288552; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=7mu1bAnb4l7G1Oqg6FtYEfRH8TPZdH4clawae2CV+OI=;
-	b=N6QaobJ0X8ms/qiCdNG1yuki6vDrX2LNARUNjBHZgQm5s8CQXTY5ca/bX3eaAcb3noJI5gKSsCltwQebhPc+WEasS//+Q2ZC4Ho2omvwmyQbPtv8tiqAGXGu5FU8fANuSrPIl9DNRhv+JtUj2GzXD1HqWztcfIN/FxK8a8/XeOU=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R151e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=19;SR=0;TI=SMTPD_---0W372tDs_1711288549;
-Received: from localhost(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W372tDs_1711288549)
-          by smtp.aliyun-inc.com;
-          Sun, 24 Mar 2024 21:55:51 +0800
-From: Wen Gu <guwen@linux.alibaba.com>
-To: wintera@linux.ibm.com,
-	twinkler@linux.ibm.com,
-	hca@linux.ibm.com,
-	gor@linux.ibm.com,
-	agordeev@linux.ibm.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	wenjia@linux.ibm.com,
-	jaka@linux.ibm.com
-Cc: borntraeger@linux.ibm.com,
-	svens@linux.ibm.com,
-	alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com,
-	guwen@linux.alibaba.com,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [RFC PATCH net-next v5 11/11] net/smc: implement DMB-merged operations of loopback-ism
-Date: Sun, 24 Mar 2024 21:55:22 +0800
-Message-Id: <20240324135522.108564-12-guwen@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20240324135522.108564-1-guwen@linux.alibaba.com>
-References: <20240324135522.108564-1-guwen@linux.alibaba.com>
+	s=arc-20240116; t=1711292531; c=relaxed/simple;
+	bh=S6qfD0zgm/C1QM9Fjq9ddi/LiYV0zs+lIqLpWZeK7t0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N0WNYcpKGo5ea9KxPQJu7IoGKJwqf5OT6k9sXrd0h7d/XRIQ/VrloahYq+yYMaJ7Y6TP6hZqB4hbhjgUHLI4mDo+88WpUpZAPTFLAMPmHuWhHtOJvOtJzoP0QyIqWviDZIiKIXFxptyW/+kqIxwQiHQUgqD6OodThdC0zXIFqVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com; spf=pass smtp.mailfrom=isovalent.com; dkim=pass (2048-bit key) header.d=isovalent.com header.i=@isovalent.com header.b=B3U1Sp1d; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=isovalent.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=isovalent.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-33fd12a06fdso2481510f8f.1
+        for <netdev@vger.kernel.org>; Sun, 24 Mar 2024 08:02:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=isovalent.com; s=google; t=1711292528; x=1711897328; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=EwGW9a4Qg8RuP4nfFSPxy3bqmYCTRCuNE09UvfgZEmE=;
+        b=B3U1Sp1dPyJNFkgBDmjST2PC5m2HnkAW1/bEUvsaL53/6TKLaG9iq5nB7RmmSDQH+i
+         MHjR3CiJN4Eg6HMt3Y8Kgce8HN0yTCl26ZU2Ocd+HjhPy0rxXyk+Aq+Sxqc7rin38036
+         X+RpyNfyOTWBrq+KvLUg02uG6S/IBBQLRk0qkqOc8ix/EC+nKQ8CiPV/IQh0UW02zkon
+         LfJ9aY/0QBXiqT73OlMsKKGEUwwpHD0gUuGubK3pir14cBaQOFccpQ0BQriwrc03xDY3
+         sNytQprQLNCTlUFdgtVvzP7anZ/fdESyiuC05F+NPnqtYbPlNWXQck9AYpuUhSegarsR
+         lPxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711292528; x=1711897328;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EwGW9a4Qg8RuP4nfFSPxy3bqmYCTRCuNE09UvfgZEmE=;
+        b=nz1xxV9J8geA4nlsA4jsLBy7XZ2/5E7Ncw8hXuaoqRibc7p8QS58LZi82uYByRTMIb
+         dPAogAqgloza9vaEA46rCYVq4x96jVtsx1dcN/xSSBLdjiIPpMgZcN+wr+WGPYf/OsXd
+         IG3nKQMInZNXOhydI1EM3rLT7XPKlQMSUAQYEI4mC54F7ksgRMoVTZkH8KRSCR1IJ/h+
+         qHtmqFUyE19JceFQYihsTeVZXFF5KnqunlS/FEXcivfBN6o6vqgbWThVcQJJ0mIlZtQv
+         jEU2D60vqI5ep870bptxTHfiaugxLchlMh7IG1ONsg1BIbnPXcamCzSZhqRxVvhrsXzB
+         ysiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXCkxQTG69vqnhtcdu6lpnLElBK2oilXCT3zm6+e3Pr/4jqN9r5vwBarzabKIfKMasVBGbbHdqN4GnYw2torNSL3ZlTijHz
+X-Gm-Message-State: AOJu0YxnIzH7AJeRH6FEG6arZJm4nRq+S9SM5mMCqP8ug/cAsqwecph7
+	aPvQFWcl372fm6mJAW10tbAXY83c1vdwH5IA2ifOP1jS7LO5PuAdD6qxCiSsrY4=
+X-Google-Smtp-Source: AGHT+IHI0jRg3J5ZCBnBgPwg4wJJT0IzHTHgGiW+iEnazuNFOaYuYRXy/Bq7C0Ctq/vQ5kY9VEz6gg==
+X-Received: by 2002:adf:cd11:0:b0:341:8083:b2a3 with SMTP id w17-20020adfcd11000000b003418083b2a3mr2953087wrm.30.1711292527738;
+        Sun, 24 Mar 2024 08:02:07 -0700 (PDT)
+Received: from zh-lab-node-5 ([2a02:168:f656:0:1ac0:4dff:fe0f:3782])
+        by smtp.gmail.com with ESMTPSA id df4-20020a5d5b84000000b0033e7b433498sm6987249wrb.111.2024.03.24.08.02.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Mar 2024 08:02:07 -0700 (PDT)
+Date: Sun, 24 Mar 2024 15:04:09 +0000
+From: Anton Protopopov <aspsk@isovalent.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Rumen Telbizov <rumen.telbizov@menlosecurity.com>,
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jiri Olsa <jolsa@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH v1 bpf-next 2/2] selftests/bpf: Add BPF_FIB_LOOKUP_MARK
+ tests
+Message-ID: <ZgBA6X0QgP+TMFd9@zh-lab-node-5>
+References: <20240322140244.50971-1-aspsk@isovalent.com>
+ <20240322140244.50971-3-aspsk@isovalent.com>
+ <e8062ef6-b630-45e2-8009-4d2cdc0970ea@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e8062ef6-b630-45e2-8009-4d2cdc0970ea@linux.dev>
 
-This implements operations related to merging sndbuf with peer DMB in
-loopback-ism. The DMB won't be freed until no sndbuf is attached to it.
+On Sat, Mar 23, 2024 at 03:34:10PM -0700, Martin KaFai Lau wrote:
+> On 3/22/24 7:02 AM, Anton Protopopov wrote:
+> > This patch extends the fib_lookup test suite by adding a few test
+> > cases for each IP family to test the new BPF_FIB_LOOKUP_MARK flag
+> > to the bpf_fib_lookup:
+> > 
+> >    * Test destination IP address selection with and without a mark
+> >      and/or the BPF_FIB_LOOKUP_MARK flag set
+> > 
+> > To test this functionality another network namespace and a new veth
+> > pair were added to the test.
+> > 
+> 
+> [ ... ]
+> 
+> >   static const struct fib_lookup_test tests[] = {
+> > @@ -90,10 +105,47 @@ static const struct fib_lookup_test tests[] = {
+> >   	  .daddr = IPV6_ADDR_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
+> >   	  .expected_src = IPV6_IFACE_ADDR_SEC,
+> >   	  .lookup_flags = BPF_FIB_LOOKUP_SRC | BPF_FIB_LOOKUP_SKIP_NEIGH, },
+> > +	/* policy routing */
+> > +	{ .desc = "IPv4 policy routing, default",
+> > +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
+> > +	  .expected_dst = IPV4_GW1, .ifname = "veth3",
+> > +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH, },
+> > +	{ .desc = "IPv4 policy routing, mark doesn't point to a policy",
+> > +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
+> > +	  .expected_dst = IPV4_GW1, .ifname = "veth3",
+> > +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
+> > +	  .mark = MARK_NO_POLICY, },
+> > +	{ .desc = "IPv4 policy routing, mark points to a policy",
+> > +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
+> > +	  .expected_dst = IPV4_GW2, .ifname = "veth3",
+> > +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
+> > +	  .mark = MARK, },
+> > +	{ .desc = "IPv4 policy routing, mark points to a policy, but no flag",
+> > +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
+> > +	  .expected_dst = IPV4_GW1, .ifname = "veth3",
+> > +	  .lookup_flags = BPF_FIB_LOOKUP_SKIP_NEIGH,
+> > +	  .mark = MARK, },
+> > +	{ .desc = "IPv6 policy routing, default",
+> > +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
+> > +	  .expected_dst = IPV6_GW1, .ifname = "veth3",
+> > +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH, },
+> > +	{ .desc = "IPv6 policy routing, mark doesn't point to a policy",
+> > +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
+> > +	  .expected_dst = IPV6_GW1, .ifname = "veth3",
+> > +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
+> > +	  .mark = MARK_NO_POLICY, },
+> > +	{ .desc = "IPv6 policy routing, mark points to a policy",
+> > +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
+> > +	  .expected_dst = IPV6_GW2, .ifname = "veth3",
+> > +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
+> > +	  .mark = MARK, },
+> > +	{ .desc = "IPv6 policy routing, mark points to a policy, but no flag",
+> > +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
+> > +	  .expected_dst = IPV6_GW1, .ifname = "veth3",
+> > +	  .lookup_flags = BPF_FIB_LOOKUP_SKIP_NEIGH,
+> > +	  .mark = MARK, },
+> >   };
+> > -static int ifindex;
+> > -
+> >   static int setup_netns(void)
+> >   {
+> >   	int err;
+> > @@ -144,12 +196,40 @@ static int setup_netns(void)
+> >   	if (!ASSERT_OK(err, "write_sysctl(net.ipv6.conf.veth1.forwarding)"))
+> >   		goto fail;
+> > +	/* Setup for policy routing tests */
+> > +	SYS(fail, "ip link add veth3 type veth peer name veth4");
+> > +	SYS(fail, "ip link set dev veth3 up");
+> > +	SYS(fail, "ip link set dev veth4 netns %s up", NS_REMOTE);
+> > +
+> > +	SYS(fail, "ip addr add %s/24 dev veth3", IPV4_LOCAL);
+> > +	SYS(fail, "ip netns exec %s ip addr add %s/24 dev veth4", NS_REMOTE, IPV4_GW1);
+> > +	SYS(fail, "ip netns exec %s ip addr add %s/24 dev veth4", NS_REMOTE, IPV4_GW2);
+> > +	SYS(fail, "ip addr add %s/64 dev veth3 nodad", IPV6_LOCAL);
+> > +	SYS(fail, "ip netns exec %s ip addr add %s/64 dev veth4 nodad", NS_REMOTE, IPV6_GW1);
+> > +	SYS(fail, "ip netns exec %s ip addr add %s/64 dev veth4 nodad", NS_REMOTE, IPV6_GW2);
+> 
+> Trying to see if the setup can be simplified.
+> 
+> Does it need to add another netns and setup a reachable IPV[46]_GW[12] gateway?
+> 
+> The test is not sending any traffic and it is a BPF_FIB_LOOKUP_SKIP_NEIGH test.
 
-Signed-off-by: Wen Gu <guwen@linux.alibaba.com>
----
- net/smc/smc_loopback.c | 120 +++++++++++++++++++++++++++++++++++------
- net/smc/smc_loopback.h |   3 ++
- 2 files changed, 108 insertions(+), 15 deletions(-)
+I think this will not work without another namespace, as FIB lookup will
+return DST="final destination", not DST="gateway", as the gateway is in the
+same namespace and can be skipped.
 
-diff --git a/net/smc/smc_loopback.c b/net/smc/smc_loopback.c
-index 5b35e68d9cdf..994fe39930ad 100644
---- a/net/smc/smc_loopback.c
-+++ b/net/smc/smc_loopback.c
-@@ -21,6 +21,7 @@
- 
- #if IS_ENABLED(CONFIG_SMC_LO)
- #define SMC_LO_V2_CAPABLE	0x1 /* loopback-ism acts as ISMv2 */
-+#define SMC_LO_SUPPORT_NOCOPY	0x1
- #define SMC_DMA_ADDR_INVALID	(~(dma_addr_t)0)
- 
- static const char smc_lo_dev_name[] = "loopback-ism";
-@@ -82,6 +83,7 @@ static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
- 		goto err_node;
- 	}
- 	dmb_node->dma_addr = SMC_DMA_ADDR_INVALID;
-+	refcount_set(&dmb_node->refcnt, 1);
- 
- again:
- 	/* add new dmb into hash table */
-@@ -95,6 +97,7 @@ static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
- 	}
- 	hash_add(ldev->dmb_ht, &dmb_node->list, dmb_node->token);
- 	write_unlock_bh(&ldev->dmb_ht_lock);
-+	atomic_inc(&ldev->dmb_cnt);
- 
- 	dmb->sba_idx = dmb_node->sba_idx;
- 	dmb->dmb_tok = dmb_node->token;
-@@ -111,13 +114,29 @@ static int smc_lo_register_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb,
- 	return rc;
- }
- 
-+static void __smc_lo_unregister_dmb(struct smc_lo_dev *ldev,
-+				    struct smc_lo_dmb_node *dmb_node)
-+{
-+	/* remove dmb from hash table */
-+	write_lock_bh(&ldev->dmb_ht_lock);
-+	hash_del(&dmb_node->list);
-+	write_unlock_bh(&ldev->dmb_ht_lock);
-+
-+	clear_bit(dmb_node->sba_idx, ldev->sba_idx_mask);
-+	kvfree(dmb_node->cpu_addr);
-+	kfree(dmb_node);
-+
-+	if (atomic_dec_and_test(&ldev->dmb_cnt))
-+		wake_up(&ldev->ldev_release);
-+}
-+
- static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
- {
- 	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
- 	struct smc_lo_dev *ldev = smcd->priv;
- 
--	/* remove dmb from hash table */
--	write_lock_bh(&ldev->dmb_ht_lock);
-+	/* find dmb from hash table */
-+	read_lock_bh(&ldev->dmb_ht_lock);
- 	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb->dmb_tok) {
- 		if (tmp_node->token == dmb->dmb_tok) {
- 			dmb_node = tmp_node;
-@@ -125,16 +144,76 @@ static int smc_lo_unregister_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
- 		}
- 	}
- 	if (!dmb_node) {
--		write_unlock_bh(&ldev->dmb_ht_lock);
-+		read_unlock_bh(&ldev->dmb_ht_lock);
- 		return -EINVAL;
- 	}
--	hash_del(&dmb_node->list);
--	write_unlock_bh(&ldev->dmb_ht_lock);
-+	read_unlock_bh(&ldev->dmb_ht_lock);
- 
--	clear_bit(dmb_node->sba_idx, ldev->sba_idx_mask);
--	kfree(dmb_node->cpu_addr);
--	kfree(dmb_node);
-+	if (refcount_dec_and_test(&dmb_node->refcnt))
-+		__smc_lo_unregister_dmb(ldev, dmb_node);
-+	return 0;
-+}
-+
-+static int smc_lo_support_dmb_nocopy(struct smcd_dev *smcd)
-+{
-+	return SMC_LO_SUPPORT_NOCOPY;
-+}
-+
-+static int smc_lo_attach_dmb(struct smcd_dev *smcd, struct smcd_dmb *dmb)
-+{
-+	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
-+	struct smc_lo_dev *ldev = smcd->priv;
-+
-+	/* find dmb_node according to dmb->dmb_tok */
-+	read_lock_bh(&ldev->dmb_ht_lock);
-+	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb->dmb_tok) {
-+		if (tmp_node->token == dmb->dmb_tok) {
-+			dmb_node = tmp_node;
-+			break;
-+		}
-+	}
-+	if (!dmb_node) {
-+		read_unlock_bh(&ldev->dmb_ht_lock);
-+		return -EINVAL;
-+	}
-+	read_unlock_bh(&ldev->dmb_ht_lock);
-+
-+	if (!refcount_inc_not_zero(&dmb_node->refcnt))
-+		/* the dmb is being unregistered, but has
-+		 * not been removed from the hash table.
-+		 */
-+		return -EINVAL;
- 
-+	/* provide dmb information */
-+	dmb->sba_idx = dmb_node->sba_idx;
-+	dmb->dmb_tok = dmb_node->token;
-+	dmb->cpu_addr = dmb_node->cpu_addr;
-+	dmb->dma_addr = dmb_node->dma_addr;
-+	dmb->dmb_len = dmb_node->len;
-+	return 0;
-+}
-+
-+static int smc_lo_detach_dmb(struct smcd_dev *smcd, u64 token)
-+{
-+	struct smc_lo_dmb_node *dmb_node = NULL, *tmp_node;
-+	struct smc_lo_dev *ldev = smcd->priv;
-+
-+	/* find dmb_node according to dmb->dmb_tok */
-+	read_lock_bh(&ldev->dmb_ht_lock);
-+	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, token) {
-+		if (tmp_node->token == token) {
-+			dmb_node = tmp_node;
-+			break;
-+		}
-+	}
-+	if (!dmb_node) {
-+		read_unlock_bh(&ldev->dmb_ht_lock);
-+		return -EINVAL;
-+	}
-+	read_unlock_bh(&ldev->dmb_ht_lock);
-+
-+	if (refcount_dec_and_test(&dmb_node->refcnt))
-+		__smc_lo_unregister_dmb(ldev, dmb_node);
- 	return 0;
- }
- 
-@@ -172,6 +251,12 @@ static int smc_lo_move_data(struct smcd_dev *smcd, u64 dmb_tok,
- 	struct smc_lo_dev *ldev = smcd->priv;
- 	struct smc_connection *conn;
- 
-+	if (!sf)
-+		/* since sndbuf is merged with peer DMB, there is
-+		 * no need to copy data from sndbuf to peer DMB.
-+		 */
-+		return 0;
-+
- 	read_lock_bh(&ldev->dmb_ht_lock);
- 	hash_for_each_possible(ldev->dmb_ht, tmp_node, list, dmb_tok) {
- 		if (tmp_node->token == dmb_tok) {
-@@ -186,13 +271,10 @@ static int smc_lo_move_data(struct smcd_dev *smcd, u64 dmb_tok,
- 	memcpy((char *)rmb_node->cpu_addr + offset, data, size);
- 	read_unlock_bh(&ldev->dmb_ht_lock);
- 
--	if (sf) {
--		conn = smcd->conn[rmb_node->sba_idx];
--		if (conn && !conn->killed)
--			tasklet_schedule(&conn->rx_tsklet);
--		else
--			return -EPIPE;
--	}
-+	conn = smcd->conn[rmb_node->sba_idx];
-+	if (!conn || conn->killed)
-+		return -EPIPE;
-+	tasklet_schedule(&conn->rx_tsklet);
- 	return 0;
- }
- 
-@@ -224,6 +306,9 @@ static const struct smcd_ops lo_ops = {
- 	.query_remote_gid = smc_lo_query_rgid,
- 	.register_dmb = smc_lo_register_dmb,
- 	.unregister_dmb = smc_lo_unregister_dmb,
-+	.support_dmb_nocopy = smc_lo_support_dmb_nocopy,
-+	.attach_dmb = smc_lo_attach_dmb,
-+	.detach_dmb = smc_lo_detach_dmb,
- 	.add_vlan_id = smc_lo_add_vlan_id,
- 	.del_vlan_id = smc_lo_del_vlan_id,
- 	.set_vlan_required = smc_lo_set_vlan_required,
-@@ -302,12 +387,17 @@ static int smc_lo_dev_init(struct smc_lo_dev *ldev)
- 	smc_lo_generate_ids(ldev);
- 	rwlock_init(&ldev->dmb_ht_lock);
- 	hash_init(ldev->dmb_ht);
-+	atomic_set(&ldev->dmb_cnt, 0);
-+	init_waitqueue_head(&ldev->ldev_release);
-+
- 	return smcd_lo_register_dev(ldev);
- }
- 
- static void smc_lo_dev_exit(struct smc_lo_dev *ldev)
- {
- 	smcd_lo_unregister_dev(ldev);
-+	if (atomic_read(&ldev->dmb_cnt))
-+		wait_event(ldev->ldev_release, !atomic_read(&ldev->dmb_cnt));
- }
- 
- static void smc_lo_dev_release(struct device *dev)
-diff --git a/net/smc/smc_loopback.h b/net/smc/smc_loopback.h
-index 6c4a390430f3..9a1c5eee5bbc 100644
---- a/net/smc/smc_loopback.h
-+++ b/net/smc/smc_loopback.h
-@@ -30,6 +30,7 @@ struct smc_lo_dmb_node {
- 	u32 sba_idx;
- 	void *cpu_addr;
- 	dma_addr_t dma_addr;
-+	refcount_t refcnt;
- };
- 
- struct smc_lo_dev {
-@@ -37,9 +38,11 @@ struct smc_lo_dev {
- 	struct device dev;
- 	u16 chid;
- 	struct smcd_gid local_gid;
-+	atomic_t dmb_cnt;
- 	rwlock_t dmb_ht_lock;
- 	DECLARE_BITMAP(sba_idx_mask, SMC_LO_MAX_DMBS);
- 	DECLARE_HASHTABLE(dmb_ht, SMC_LO_DMBS_HASH_BITS);
-+	wait_queue_head_t ldev_release;
- };
- #endif
- 
--- 
-2.32.0.3.g01195cf9f
+Instead of adding a new namespace I can move the second interface to the
+root namespace. This will work, but then we're interfering with the root
+namespace.
 
+> > +	SYS(fail, "ip route add %s/32 via %s", IPV4_REMOTE_DST, IPV4_GW1);
+> > +	SYS(fail, "ip route add %s/32 via %s table %s", IPV4_REMOTE_DST, IPV4_GW2, MARK_TABLE);
+> > +	SYS(fail, "ip -6 route add %s/128 via %s", IPV6_REMOTE_DST, IPV6_GW1);
+> > +	SYS(fail, "ip -6 route add %s/128 via %s table %s", IPV6_REMOTE_DST, IPV6_GW2, MARK_TABLE);
+> > +	SYS(fail, "ip rule add prio 2 fwmark %d lookup %s", MARK, MARK_TABLE);
+> > +	SYS(fail, "ip -6 rule add prio 2 fwmark %d lookup %s", MARK, MARK_TABLE);
+> > +
+> > +	err = write_sysctl("/proc/sys/net/ipv4/conf/veth3/forwarding", "1");
+> > +	if (!ASSERT_OK(err, "write_sysctl(net.ipv4.conf.veth3.forwarding)"))
+> > +		goto fail;
+> > +
+> > +	err = write_sysctl("/proc/sys/net/ipv6/conf/veth3/forwarding", "1");
+> > +	if (!ASSERT_OK(err, "write_sysctl(net.ipv6.conf.veth3.forwarding)"))
+> > +		goto fail;
+> > +
+> >   	return 0;
+> >   fail:
+> >   	return -1;
+> >   }
+> 
+> [ ... ]
+> 
+> > @@ -248,6 +337,7 @@ void test_fib_lookup(void)
+> >   	prog_fd = bpf_program__fd(skel->progs.fib_lookup);
+> >   	SYS(fail, "ip netns add %s", NS_TEST);
+> > +	SYS(fail, "ip netns add %s", NS_REMOTE);
+> 
+> 
 
