@@ -1,301 +1,166 @@
-Return-Path: <netdev+bounces-81395-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11DC6887B8F
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 04:47:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFADD887BB8
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 06:06:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A470A281DE0
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 03:47:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B36A1F2121C
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 05:06:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EF5A17F3;
-	Sun, 24 Mar 2024 03:47:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DF8E134D1;
+	Sun, 24 Mar 2024 05:06:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fHoh0enZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dZuLejmo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com [209.85.167.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9631C17C8;
-	Sun, 24 Mar 2024 03:46:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE291944F
+	for <netdev@vger.kernel.org>; Sun, 24 Mar 2024 05:06:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711252020; cv=none; b=MihU8Qkbv+KNzNqi401TaPZTMI8/YsvL/fCxYZ2chK2whAtHI/a9vUHwsbAMqb2D4KrFODhvt0HrCGH5D6JhsdOx5BKVOLtDaHRhT7sQb1pUfk/ce5Xfq87R+7eZym4V3DfkvITuz8VVe+x/YgtgKigmUELyPD4wNuz24cwmQOM=
+	t=1711256766; cv=none; b=tM2ev4hj9l10nC3CEHi3YKiAM2g84l1hbD31mAUDV0sLtm39b7bz8QNLq8DAPWiOdC9VnmX/J69LugcfewR59C4VSoHE/MyyFpMTKalhrHvsvdeqNFypoDluI43e37Csa+eNYRvbuSKU73rro8HA++2VLSn3ON++jyrhBP3rqUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711252020; c=relaxed/simple;
-	bh=gVqqkRGU/3els7tcz6OsDQKpy7LxTpDMrrgR0NlEdlA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=N17yL3KruFZrUDBtjZ1MBdomYtbJDf+IPay1jyVRlr92ne+PwzMnYtmN0PwbzujDLFl4z6i2M0BiPO7yojk2QsrLm5egqkstrl23Nfc0vV56gT5pIB45hd9wD7wyT4bUD3yQrAjMDkH6sf3o26L/E03RV4NJ3acb+nwnmY+u95o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fHoh0enZ; arc=none smtp.client-ip=209.85.167.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f52.google.com with SMTP id 2adb3069b0e04-513e14b2bd9so4106113e87.2;
-        Sat, 23 Mar 2024 20:46:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711252017; x=1711856817; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=+SbCCM4Rqqk3o4wOpzi2ca6RVXsIMPypp6pppWrvaAY=;
-        b=fHoh0enZTi25qyawpWdjj9m/frgSMN9b3ciYP5MiNXmTF3PM3BcNXAp0QgbDnn1AEb
-         Majn6ZPBiZi6wKC7XyoqKlB+13pjDUF53q9WTIDDWdoyUpWyRB0J5qFDKBl8i/cxAGsI
-         c0GP2FGxUhBXvE4TtoYAif0YT4pMJ2FjmOTnwyBNVlblZFkyOE0v9hEVVc8QmuKGSh1J
-         QIua9XEuyAJqYKDQeTcor9JXnRzpnJPart2Ilq7C28WSjPS1w+wHodoTTvmZWM6bz2c3
-         eo/dEcV6Xf0MlUgXaNcgF8Nr4gbzpu2DvS1kiagMDpqyA3iTJeZvGZ6VWotqufDPiRrC
-         z5cw==
+	s=arc-20240116; t=1711256766; c=relaxed/simple;
+	bh=R1JIMxCTBe/b+a+qC/2RObOqzW1ENmG9//PB/KrwKSk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YwW4O0G1lwX4ssb83PuSOp/RHSBwU3H/4BtMCOAa7ksrJF8cqaB2gDF3ZnyfHMGrLZOG1sLe5CQ1OI4EEHjTVVKiMEQ74oyNzjgmQ3A0FKs0mp00Q+WZdZL2eK/S9uGMe+s4wdZOPJsGcEkqCn9o1DYk0hkRd395lTHhKvzgHKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dZuLejmo; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711256763;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=9duXSLuXHV8vFOCQXD8+b0A+1FBJ4vf3M5EGD4lf1a4=;
+	b=dZuLejmo1vKHfuGe/f9hWOPrKb3Od/2BrM2G3qrHnxEHQUdHf/chSa+alO6qF4WS1gfePq
+	JmstYlqPvIcIblwbuVwaiYwiNzDnitQVKKjeTdkQsiNrJ9V12/t1PpyOcRGAw9h3WYDYS1
+	Q78HnsYryW3zybeVL9VgQ2vNorIAW+0=
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
+ [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-541-nIWxQRj0NbOT4IPxIiU7yQ-1; Sun, 24 Mar 2024 01:06:02 -0400
+X-MC-Unique: nIWxQRj0NbOT4IPxIiU7yQ-1
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5cfd6ba1c11so2196817a12.0
+        for <netdev@vger.kernel.org>; Sat, 23 Mar 2024 22:06:02 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711252017; x=1711856817;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1711256761; x=1711861561;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+SbCCM4Rqqk3o4wOpzi2ca6RVXsIMPypp6pppWrvaAY=;
-        b=w0MgsnoMx2DpqF3ZSBKsi5Zv9YU58bvuEqH6nS8CBC8LKePnLL82uzDwtYGnVCRyEX
-         XWR3Xo4X/7O7CXRUXCA25+ZAmcsh5X6xHuEr67TNg+p0hdMtQLspJrW2oBSbmEE6zbit
-         2h+gXq4Pc6WCghlNqF+P8tDcgclmu6YMJSdTPH4T01emjyHk/tILM5yCRCuaNiHvVdqz
-         q3JP+mEgTyIt0nfprecbHNd7aYOpkbxkXkqFyW3aMf+P5pqR5ArjBzetWFcV/erI2WK1
-         zy+/nBWh1t+GuW/shlTSucJNuNSzPTFX5hnpz1ioS6g5jRZUSMAtpGGJNLj4oSvRiCVR
-         H3hA==
-X-Forwarded-Encrypted: i=1; AJvYcCWt09AEQC0v7GkExV9HnUTu9LCzIM71yAz2SzHI9yWG3GohpUlZC0vm9h1T+j2xH5GTvGmA0F9pmNoxIA1F2Vy12NImeTPk/Y3FJqj6ef5i1VAGto2sP6NejXjIDJg9oBEvI/NT
-X-Gm-Message-State: AOJu0YxLlD83O45Hi8LQm7uqc+4ywKNTdFjBINqJXBy2uzdGvue7luS5
-	TQMicOtV4Fm+m/pzpvwk+03l6rxrX+WVxVLEawypc/l7YH66p0mqM40gpVSEqbA4Rg0Kro0cL/R
-	Uoq0D7BA3CSVJOqEFUXYljQDQBfw=
-X-Google-Smtp-Source: AGHT+IFe4xxZSB5uiqrgYTbUMVoUPUFnpmDPPgpUYdTBWP7/JgAhEFsqSZVQYC+6K2QFidWW8VfIZv3DZVLBnIsK9Nw=
-X-Received: by 2002:a19:9149:0:b0:513:dd23:7a02 with SMTP id
- y9-20020a199149000000b00513dd237a02mr2255369lfj.26.1711252016380; Sat, 23 Mar
- 2024 20:46:56 -0700 (PDT)
+        bh=9duXSLuXHV8vFOCQXD8+b0A+1FBJ4vf3M5EGD4lf1a4=;
+        b=OqSU9TGR3pWFfMw6VlyMhER1YK066DfwbkJ5FNkuVIFiKdbo3DFsaC61Bn/lozkTHB
+         J37Y1lQlsMWnovcpa9YX6VLUNvbl3C+DVquyxml3bBO0PUc25ZtS3/l+vjLCXMBrq3pl
+         AW7BCDP5FBek50uog88ReTVMlkqy5jlUNduYmYCPnmFDDB+V7OCi0DZVQGm85o4nTrqB
+         aVgMVMXd0FbA/JLTPHVXXey3yx+0KiFqmzy9RjfdZmzRTdZC2s19f2zBW7TOTDkAOYiI
+         s0EiCmFWcLdVn7XtxOl5VFT1xzerM1U5iIu+7tk5YF9c4CAA4sCEfhxWknRmJDeBbsns
+         0KCQ==
+X-Gm-Message-State: AOJu0YzFUQFN6BanUizr1HoWzJSnEnnRBRphcEPfI2+Ppd/v0mC4llx/
+	Br2VIsAmKwjMXhPmeV6mXPUw42oTUX4WnYYjz0y38JvLnTLGyEXVgwhjJswSI8DD8irrQKWVlk9
+	n3ifaP1Bnz+FVmW/4IEJazg8yEIGCqbAIOoWB8TSWhHnhiaJGr1e3KQ==
+X-Received: by 2002:a17:902:6ac9:b0:1dd:d431:3388 with SMTP id i9-20020a1709026ac900b001ddd4313388mr3044295plt.68.1711256761169;
+        Sat, 23 Mar 2024 22:06:01 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEz5guYJ9WMtWgo31CoOgbHkCiVmglV+L41zWnEE9mIBfhDjcUN0Qp+RadlqkxX65rQUFW1AQ==
+X-Received: by 2002:a17:902:6ac9:b0:1dd:d431:3388 with SMTP id i9-20020a1709026ac900b001ddd4313388mr3044285plt.68.1711256760796;
+        Sat, 23 Mar 2024 22:06:00 -0700 (PDT)
+Received: from kernel-devel.local ([240d:1a:c0d:9f00:6883:65ff:fe1c:cf69])
+        by smtp.gmail.com with ESMTPSA id x16-20020a1709027c1000b001dc486f0cbesm2379329pll.222.2024.03.23.22.05.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 23 Mar 2024 22:06:00 -0700 (PDT)
+From: Shigeru Yoshida <syoshida@redhat.com>
+To: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shigeru Yoshida <syoshida@redhat.com>,
+	syzkaller <syzkaller@googlegroups.com>
+Subject: [PATCH net] ipv4: Fix uninit-value access in __ip_make_skb()
+Date: Sun, 24 Mar 2024 14:05:54 +0900
+Message-ID: <20240324050554.1609460-1-syoshida@redhat.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com>
- <20240310-realtek-led-v1-4-4d9813ce938e@gmail.com> <d064b1be-1004-487b-9944-b62d91b671c9@lunn.ch>
-In-Reply-To: <d064b1be-1004-487b-9944-b62d91b671c9@lunn.ch>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Sun, 24 Mar 2024 00:46:44 -0300
-Message-ID: <CAJq09z54+049aPL2LzAqAFigrvpchPhv_YQ6yJ5C9b9J7mngLQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/4] net: dsa: realtek: add LED drivers for rtl8366rb
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Linus Walleij <linus.walleij@linaro.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hi Andrew,
+KMSAN reported uninit-value access in __ip_make_skb() [1].  __ip_make_skb()
+tests HDRINCL to know if the skb has icmphdr. However, HDRINCL can cause a
+race condition. If calling setsockopt(2) with IP_HDRINCL changes HDRINCL
+while __ip_make_skb() is running, the function will access icmphdr in the
+skb even if it is not included. This causes the issue reported by KMSAN.
 
-Thanks for the review.
+Check FLOWI_FLAG_KNOWN_NH on fl4->flowi4_flags instead of testing HDRINCL
+on the socket.
 
-> > This commit introduces LED drivers for rtl8366rb, enabling LEDs to be
-> > described in the device tree using the same format as qca8k. Each port
-> > can configure up to 4 LEDs.
-> >
-> > If all LEDs in a group use the default state "keep", they will use the
-> > default behavior after a reset. Changing the brightness of one LED,
-> > either manually or by a trigger, will disable the default hardware
-> > trigger and switch the entire LED group to manually controlled LEDs.
->
->
-> The previous patch said:
->
->   This switch family supports four LEDs for each of its six
->   ports. Each LED group is composed of one of these four LEDs from all
->   six ports. LED groups can be configured to display hardware
->   information, such as link activity, or manually controlled through a
->   bitmap in registers RTL8366RB_LED_0_1_CTRL_REG and
->   RTL8366RB_LED_2_3_CTRL_REG.
->
-> I could be understanding this wrongly, but to me, it sounds like an
-> LED is either controlled via the group, or you can take an LED out of
-> the group and software on/off control it? Ah, after looking at the
-> code. The group can be put into forced mode, and then each LED in the
-> group controlled in software.
+[1]
+BUG: KMSAN: uninit-value in __ip_make_skb+0x2b74/0x2d20 net/ipv4/ip_output.c:1481
+ __ip_make_skb+0x2b74/0x2d20 net/ipv4/ip_output.c:1481
+ ip_finish_skb include/net/ip.h:243 [inline]
+ ip_push_pending_frames+0x4c/0x5c0 net/ipv4/ip_output.c:1508
+ raw_sendmsg+0x2381/0x2690 net/ipv4/raw.c:654
+ inet_sendmsg+0x27b/0x2a0 net/ipv4/af_inet.c:851
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x274/0x3c0 net/socket.c:745
+ __sys_sendto+0x62c/0x7b0 net/socket.c:2191
+ __do_sys_sendto net/socket.c:2203 [inline]
+ __se_sys_sendto net/socket.c:2199 [inline]
+ __x64_sys_sendto+0x130/0x200 net/socket.c:2199
+ do_syscall_64+0xd8/0x1f0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
 
-The group of a LED is a HW property. There are pins for each LED on
-each group. You cannot move LEDs out of a group, not even to simply
-disable a single LED.
-The trigger mode is the same for all LEDs in a group as it is a LED
-group property and not a LED characteristic. There is a special
-trigger mode (manual) that disables HW triggers and lets the LEDs be
-controlled by software triggers using a register bitmap.
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:3804 [inline]
+ slab_alloc_node mm/slub.c:3845 [inline]
+ kmem_cache_alloc_node+0x5f6/0xc50 mm/slub.c:3888
+ kmalloc_reserve+0x13c/0x4a0 net/core/skbuff.c:577
+ __alloc_skb+0x35a/0x7c0 net/core/skbuff.c:668
+ alloc_skb include/linux/skbuff.h:1318 [inline]
+ __ip_append_data+0x49ab/0x68c0 net/ipv4/ip_output.c:1128
+ ip_append_data+0x1e7/0x260 net/ipv4/ip_output.c:1365
+ raw_sendmsg+0x22b1/0x2690 net/ipv4/raw.c:648
+ inet_sendmsg+0x27b/0x2a0 net/ipv4/af_inet.c:851
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x274/0x3c0 net/socket.c:745
+ __sys_sendto+0x62c/0x7b0 net/socket.c:2191
+ __do_sys_sendto net/socket.c:2203 [inline]
+ __se_sys_sendto net/socket.c:2199 [inline]
+ __x64_sys_sendto+0x130/0x200 net/socket.c:2199
+ do_syscall_64+0xd8/0x1f0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
 
-> > Once in this mode, there is no way to revert to hardware-controlled LEDs
-> > (except by resetting the switch).
->
-> Just for my understanding.... This is a software limitation. You could
-> check if all LEDs in a group are using the same trigger, and then set
-> the group to that trigger?
+Fixes: 99e5acae193e ("ipv4: Fix potential uninit variable access bug in __ip_make_skb()")
+Reported-by: syzkaller <syzkaller@googlegroups.com>
+Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+---
+I think IPv6 has a similar issue. If this patch is accepted, I will send
+a patch for IPv6.
+---
+ net/ipv4/ip_output.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-I tried to implement that but I failed. There was some discussion
-about it in the RFC thread. The main issue is that hw offload is only
-evaluated when a LED changes its sysfs settings. The driver has
-limited control about the hw offload decision, only being notified
-when led_cdev->hw_control_is_supported() is called. The driver will
-not be notified, for example, if the trigger_data->net_dev was changed
-or if hw_control was disabled. However, even if you know a HW trigger
-could be enabled, you cannot put those other LEDs in HW offload mode.
-It is only enabled from sysfs calls but not from the kernel space and
-AFAIK, you should not poke with sysfs from the kernel space.
+diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+index 1fe794967211..39229fd0601a 100644
+--- a/net/ipv4/ip_output.c
++++ b/net/ipv4/ip_output.c
+@@ -1473,7 +1473,7 @@ struct sk_buff *__ip_make_skb(struct sock *sk,
+ 		 * by icmp_hdr(skb)->type.
+ 		 */
+ 		if (sk->sk_type == SOCK_RAW &&
+-		    !inet_test_bit(HDRINCL, sk))
++		    !(fl4->flowi4_flags & FLOWI_FLAG_KNOWN_NH))
+ 			icmp_type = fl4->fl4_icmp_type;
+ 		else
+ 			icmp_type = icmp_hdr(skb)->type;
+-- 
+2.44.0
 
-The incompatibility with LDE API also has some unexpected
-side-effects. For example, LEDS_DEFSTATE_KEEP will only really keep
-the default vendor state if all LEDs in a group use that setting or
-are missing in the DT. If one of them differs, it will switch the
-group to manual mode.
-
-> I do understand how the current offload concept causes problems here.
-> You need a call into the trigger to ask it to re-evaluate if offload
-> can be performed for an LED.
-
-The trigger_data->hw_control is only set from netdev_led_attr_store()
-(or during trigger activation). That code is only exposed to sysfs
-calls. We'll need an exported function that could set that. Also, the
-driver can only control that decision from
-led_cdev->hw_control_is_supported. However, it is not enough to
-surelly decide if a LED is still in a state that would support HW
-offload (i.e. because trigger_data->net_dev could have changed). So,
-we need to:
-
-1) expose internal ledtrig-netdev data required for deciding if
-offload is supported for any LED at any time
-2) expose a way to reevaluate trigger_data->hw_control (or a way to
-forcely enable it)
-
-> What you have here seems like a good first step, offloaded could be
-> added later if somebody wants to.
-
-Yes, it is, at least, working. The current code is simply not usable.
-
-> > +enum rtl8366_led_mode {
-> > +     RTL8366RB_LED_OFF               = 0x0,
-> > +     RTL8366RB_LED_DUP_COL           = 0x1,
-> > +     RTL8366RB_LED_LINK_ACT          = 0x2,
-> > +     RTL8366RB_LED_SPD1000           = 0x3,
-> > +     RTL8366RB_LED_SPD100            = 0x4,
-> > +     RTL8366RB_LED_SPD10             = 0x5,
-> > +     RTL8366RB_LED_SPD1000_ACT       = 0x6,
-> > +     RTL8366RB_LED_SPD100_ACT        = 0x7,
-> > +     RTL8366RB_LED_SPD10_ACT         = 0x8,
-> > +     RTL8366RB_LED_SPD100_10_ACT     = 0x9,
-> > +     RTL8366RB_LED_FIBER             = 0xa,
-> > +     RTL8366RB_LED_AN_FAULT          = 0xb,
-> > +     RTL8366RB_LED_LINK_RX           = 0xc,
-> > +     RTL8366RB_LED_LINK_TX           = 0xd,
-> > +     RTL8366RB_LED_MASTER            = 0xe,
-> > +     RTL8366RB_LED_FORCE             = 0xf,
->
-> This is what the group shows? Maybe put _GROUP_ into the name? This
-> concept of a group is pretty unusual, so we should be careful with
-> naming to make it clear when we are referring to one LED or a group of
-> LEDs. I would also put _group_ into the enum.
-
-I don't know if this concept of group is unusual but LED API
-definitely does not handle it well.
-
-OK, I'll add _group_/_GROUP_ both to the enum name and macros. Led
-blink rate, for example, is global, used by all groups. However, it
-will be difficult to respect the 80 columns limit passing
-RTL8366RB_LED_GROUP_OFF to a rb8366rb_set_ledgroup_mode function with
-only two levels of indentation. Do you have any recommendations?
-
->
-> > +
-> > +     __RTL8366RB_LED_MAX
-> > +};
-> > +
-> > +struct rtl8366rb_led {
-> > +     u8 port_num;
-> > +     u8 led_group;
-> > +     struct realtek_priv *priv;
-> > +     struct led_classdev cdev;
-> > +};
-> > +
-> >  /**
-> >   * struct rtl8366rb - RTL8366RB-specific data
-> >   * @max_mtu: per-port max MTU setting
-> >   * @pvid_enabled: if PVID is set for respective port
-> > + * @leds: per-port and per-ledgroup led info
-> >   */
-> >  struct rtl8366rb {
-> >       unsigned int max_mtu[RTL8366RB_NUM_PORTS];
-> >       bool pvid_enabled[RTL8366RB_NUM_PORTS];
-> > +     struct rtl8366rb_led leds[RTL8366RB_NUM_PORTS][RTL8366RB_NUM_LEDGROUPS];
-> >  };
-> >
-> >  static struct rtl8366_mib_counter rtl8366rb_mib_counters[] = {
-> > @@ -809,6 +829,208 @@ static int rtl8366rb_jam_table(const struct rtl8366rb_jam_tbl_entry *jam_table,
-> >       return 0;
-> >  }
-> >
-> > +static int rb8366rb_set_ledgroup_mode(struct realtek_priv *priv,
-> > +                                   u8 led_group,
-> > +                                   enum rtl8366_led_mode mode)
-> > +{
-> > +     int ret;
-> > +     u32 val;
-> > +
-> > +     val = mode << RTL8366RB_LED_CTRL_OFFSET(led_group);
-> > +
-> > +     ret = regmap_update_bits(priv->map,
-> > +                              RTL8366RB_LED_CTRL_REG,
-> > +                              RTL8366RB_LED_CTRL_MASK(led_group),
-> > +                              val);
-> > +     if (ret)
-> > +             return ret;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +static inline u32 rtl8366rb_led_group_port_mask(u8 led_group, u8 port)
-> > +{
-> > +     switch (led_group) {
-> > +     case 0:
-> > +             return FIELD_PREP(RTL8366RB_LED_0_X_CTRL_MASK, BIT(port));
-> > +     case 1:
-> > +             return FIELD_PREP(RTL8366RB_LED_0_X_CTRL_MASK, BIT(port));
-> > +     case 2:
-> > +             return FIELD_PREP(RTL8366RB_LED_0_X_CTRL_MASK, BIT(port));
-> > +     case 3:
-> > +             return FIELD_PREP(RTL8366RB_LED_0_X_CTRL_MASK, BIT(port));
-> > +     default:
-> > +             return 0;
-> > +     }
-> > +}
-> > +
-> > +static int rb8366rb_get_port_led(struct rtl8366rb_led *led, bool enable)
->
-> enable seems unused here. It also seems an odd parameter to pass to a
-> _get_ function.
-
-Yes, copy/paste mistake. Thanks.
-
->
-> > +{
-> > +     struct realtek_priv *priv = led->priv;
-> > +     u8 led_group = led->led_group;
-> > +     u8 port_num = led->port_num;
-> > +     int ret;
-> > +     u32 val;
-> > +
-> > +     if (led_group >= RTL8366RB_NUM_LEDGROUPS) {
-> > +             dev_err(priv->dev, "Invalid LED group %d for port %d",
-> > +                     led_group, port_num);
-> > +             return -EINVAL;
-> > +     }
->
-> This check seems odd. You can validate it once when you create the
-> struct rtl8366rb_led. After that, just trust it?
-
-Yes, I was redundant. If memory is intact, led->led_group is
-guaranteed to be in range. I'll drop it in both get/set.
-
->
->        Andrew
-
-Regards,
-
-Luiz
 
