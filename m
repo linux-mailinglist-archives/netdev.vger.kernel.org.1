@@ -1,86 +1,85 @@
-Return-Path: <netdev+bounces-81438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89767887EE1
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 21:43:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07865887EE9
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 21:48:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A59661C2089A
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 20:43:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94F8E2812B2
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 20:48:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B24C410798;
-	Sun, 24 Mar 2024 20:43:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0D031CD00;
+	Sun, 24 Mar 2024 20:48:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XDJ0xsgi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="e7yn+zEW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0158533EE;
-	Sun, 24 Mar 2024 20:43:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E84B61C6B6;
+	Sun, 24 Mar 2024 20:48:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711313001; cv=none; b=R/IBHrI/VhKZq+dV4jnxpO2Rx8zuRBwnSWq3foQPfUFZptbUDQmDMOkxn17jZFG/D/l16LanZNBpX3/+DWvLzQY3u3RpH25BjZRO8mgkych8fqFzMlnNK8ju+QGIZ5BQJ8l9IE24qalLcVzPVFQZzEatrrHCYhBAHOvyeOGcMRU=
+	t=1711313293; cv=none; b=W7Lkt7HiGuw6AC5UnRs1abkMGLZe5Ow5qiw3fOF0fxeXGkbgDbQEfp5tCGamfR1iVqFBVwy3WLeO3kZHKt4M9Bil49A0AI+3iU0FnDz0ChN2ata8G2saeYKKaeRzL32kFc3sMahIhurNKRO8x4kXvTnVWGQ3/rM0wMP/dwwOf0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711313001; c=relaxed/simple;
-	bh=BWpC5Sb75blq1j1DSHb+BAr/ABqvga9SnLzwpTWDWFU=;
+	s=arc-20240116; t=1711313293; c=relaxed/simple;
+	bh=3RO0I2wKpwij7HkA5K8tjfw8jlhh3LvlW6e5OC+73p4=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Shj20MJaYo7s64SW66Y7AhlwIMwm4c9KTkUaoTYBtscNQazW/x5hUbESrXkVsm6idHkX3tpFEBzB410PjD2b6Xb9tcNSUbmnPPChcYOV2AakbA4IUcSMyE2q//RgpSTsBHBEJDmcUw70LY6F/N7cJNpwipS0f2yvuxEQro0jeQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XDJ0xsgi; arc=none smtp.client-ip=209.85.221.42
+	 To:Cc:Content-Type; b=I7ysDDgU/fyZYvXmQXwHVECPVyD6u8f5Zi0JBIU94wkHxh+hIyffKtLRQKaVf7+sutFEhdgI3lsBXXuyjkI2fZuQ9m/6gxQ0A+rJ7ajDOI1hubIeVXudJ1mVR6wNFm5mePUiWL1vCnKmD6g0DEkyqTYIsZ/ZrTNA+wcM8CV2DSc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=e7yn+zEW; arc=none smtp.client-ip=209.85.221.53
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-33edbc5932bso2648483f8f.3;
-        Sun, 24 Mar 2024 13:43:19 -0700 (PDT)
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-33ed7ba1a42so2528576f8f.2;
+        Sun, 24 Mar 2024 13:48:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711312998; x=1711917798; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711313290; x=1711918090; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tHiCJgwsQKJHisSLfnjluPrewQvoA1WkSLlpjUnXjuI=;
-        b=XDJ0xsgiI8AOcofSHtqtsCE5otWVjKmG/9aXCmPEE4u6UWK3KXt4CFmbB7pylujag3
-         /nBmNg28by+xvb7biAVogYa5T4ZlziHP6bwLnBJubjIu5hDLENaz2nZ2J55LlfyUda2J
-         mgV4/F4sIBhEQKPnwdr0dIPO0DGMm20Kcgs5v80Gi4mB7M90K0yPhFcCNdhF7tCxRELi
-         x0Y5vZ/ImURYI7iNRbXE8hoOkTbdTCaI8GeANJO4jMSLxt71XD/2zJhs2BWNiMRIltMi
-         7YSWE+dSwQJZ7EVXSJHdS77tYpErvHnrtnqYZANzkXoLbABJxBsWBZQhAZlK7BrB9HcI
-         gupw==
+        bh=9E06WwqE1mYNwqT0s+qKXIFxzOo9G0k2mK8nywS/aUw=;
+        b=e7yn+zEWc19meUC4ahT2ESoElkBeg6lNUBITi6SzSDeviYDwjp/NfcpsNO98gzkv/d
+         UIFffCq5GIA5DL1wOZLBNN1JzVCwOwg1GEh7GRVeX5phcRrqw2690t2MlusUIRUtGL/b
+         g4JB+6nchFrGqjpLCgM6yuHVuZuZTvFlqH3lSQaQY1RHqgDHO6PEynXCukpEWNvV//lP
+         tOtVNFEJMEGnsO9B5rlGhWAF7lLIJhZjCWqvmcmCIlxxORZu3Qz68jp3VF80t/DboYxg
+         wzrZK6G8+7VM2nUzbt+vWHL0OkxhSzp5/kSEJDQias6YdCThUXBSF97YX6RT0PLq9uFo
+         ozgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711312998; x=1711917798;
+        d=1e100.net; s=20230601; t=1711313290; x=1711918090;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=tHiCJgwsQKJHisSLfnjluPrewQvoA1WkSLlpjUnXjuI=;
-        b=KNbzxr9EDmF7c7Ed9r8Hc/jybhFi5riafYL2DKq4SSkLWg+pB69Do8lZAI1ZEyxiS+
-         5PU1wpZ2MLjqcC8kqTO+SNfxmicBZwMmAeYqqX1fw6DI4fGMumQkvCwf0RWge6UWycsB
-         I7szsbE3B9t2mLP/iQZCqIZZucJQyrtjao+gy+Gt2WqyESUnXa9MganoGSHfHwbSolc4
-         vFuxJ3uPmYWUIu3qkkGxaBR3eaF+3LJOp/BWdXVE9mOhpKHFhhyCV5pkobFwYkAtz9tk
-         SkHKNo361uyI4Wws6oOoMwWRW7IIfXFigWSsnz78KFEO/lenO+CXHx2CH/+ATBkdFZdC
-         gP6w==
-X-Forwarded-Encrypted: i=1; AJvYcCW8c+LF2Zhl9Du90G0DMeR5EAVPHebab9ftgx1pdzZKQ+SDedUNrKhjno16rCiNqHk/tREiuSoWGwB4G6bmLMJU79nN39B9FQM0dkJJSh1oQQdPqiVeCZNxeQtmqko/ZfhuNrlD84/Lp7coU65ionEwJq4UP0STV5yC
-X-Gm-Message-State: AOJu0YxyMoCmBPeO0ytU4mWKJwXP3XN/9vjqXP96Er+XdU2WHqi3B9et
-	xP50PLmyyuBzKhipRVH8Oi/xJh7PlM0SsQB3oSlL8i0qk9tacYa5nFMvMt01/KluAZ8ooql4YEt
-	grzSm10LztB9eQaowR3Cke1hHSCo=
-X-Google-Smtp-Source: AGHT+IFoiwVmSJXpx+u8eZwRD+8Ldre0v1Olns54nZKxRx8/MslmrdcRAB9ZhVFcHGzG8mgvOd4r/s/Ohlf+su+loBc=
-X-Received: by 2002:a5d:69d0:0:b0:341:bf1e:45a5 with SMTP id
- s16-20020a5d69d0000000b00341bf1e45a5mr3460066wrw.46.1711312997972; Sun, 24
- Mar 2024 13:43:17 -0700 (PDT)
+        bh=9E06WwqE1mYNwqT0s+qKXIFxzOo9G0k2mK8nywS/aUw=;
+        b=S7C+UwObuLq4XAGZyaxaOOfwk/cRXHf/C4z8Fo4nAhrqTJ2qAwS6tOK9+ldcSHZRue
+         tXs4iEbTcJzblbhhw0ixRFaceQ6NKdJ4gcsr9d3Gi4jmvMAdgsmeuMHgrSgCeAJvxP3X
+         TET3nnXnc8FmwhWiYqtxcs/lMa3z4wIXaLpsuTVtbnyT7v3TZjK3bGNIXK0db05+iSuf
+         a8wwgUeOs1odPF3823wagSR9Rp81kJ+aeSD8Ehk096P8pgN2cmetROLSbWIE4pUr15Lv
+         tabrYRDWgc7Y5TGuMIopNI9UwYJu2/sC7fwr8jxy7jqfKknL2TJR/tpDC7dAHBKZKxGj
+         YI8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXcEHdXhO0zIRd/ci/KmnXi0spbq0hDEeabFlr0O64IqCvcqJNZpgrr82SFII6eaUTiB+rA1ifxpYGFGJNI+adCwRJpl7yM1pobgWaFfER/17+KiQr7Id3wbqYQQ3QCml3y9GBzlBmg7nOkaoHv7pSNjqk/3KSpPL5O
+X-Gm-Message-State: AOJu0YwSAsykTdZ061ej7+qXBKSe9WJZ9JmpenBODnlyvieqxqbfyyaW
+	x3XDdwZzo4naGS3BMXYPpRCtvQQggrZSY3HyMZyveqI/fnRNM3O1va1Mhmp+BFNbwGvHJ3S2jfS
+	nJ2s3TBEvvuMvKESpHx6g7sxLCcY=
+X-Google-Smtp-Source: AGHT+IGC0xab3YuWtcN0TLka25yNA8BVbK9IBY8BQCUNgCF5rwmkRMKj6d3YN4/qnQhDtPElGlQh5n9hnjaXy50FGi4=
+X-Received: by 2002:a5d:6884:0:b0:341:be5f:ff21 with SMTP id
+ h4-20020a5d6884000000b00341be5fff21mr3782685wru.55.1711313290050; Sun, 24 Mar
+ 2024 13:48:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240320105436.4781-1-puranjay12@gmail.com> <CAADnVQJ3o6DsURi=N_KXx+mbW9r7__3LrwYLyYwuoMOsqFHPkw@mail.gmail.com>
- <1686adb401b34adaa3b703ec1a8ffe49@AcuMS.aculab.com>
-In-Reply-To: <1686adb401b34adaa3b703ec1a8ffe49@AcuMS.aculab.com>
+References: <20240324185356.59111-1-puranjay12@gmail.com> <CAADnVQKW2ajQ25BkOO_D2=N2wOHt9fdNY+tWRunXe_sN-w+33g@mail.gmail.com>
+ <mb61pwmprbezj.fsf@gmail.com>
+In-Reply-To: <mb61pwmprbezj.fsf@gmail.com>
 From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Sun, 24 Mar 2024 13:43:06 -0700
-Message-ID: <CAADnVQJzfnK0Mv6HVKZ38VDuAemzbmSMeYscf77YoEy0SgWw+A@mail.gmail.com>
-Subject: Re: [PATCH bpf] bpf: verifier: prevent userspace memory access
-To: David Laight <David.Laight@aculab.com>
-Cc: Puranjay Mohan <puranjay12@gmail.com>, Ilya Leoshkevich <iii@linux.ibm.com>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+Date: Sun, 24 Mar 2024 13:47:58 -0700
+Message-ID: <CAADnVQJdoC6JaVu+m2bfC3QHkTSpbA9LyiMyAnjhght_-_EP5Q@mail.gmail.com>
+Subject: Re: [PATCH bpf v5] bpf: verifier: prevent userspace memory access
+To: Puranjay Mohan <puranjay12@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
 	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
 	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
 	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
@@ -90,55 +89,43 @@ Cc: Puranjay Mohan <puranjay12@gmail.com>, Ilya Leoshkevich <iii@linux.ibm.com>,
 	Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>, X86 ML <x86@kernel.org>, 
 	"H. Peter Anvin" <hpa@zytor.com>, Jean-Philippe Brucker <jean-philippe@linaro.org>, 
 	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>
+	LKML <linux-kernel@vger.kernel.org>, Ilya Leoshkevich <iii@linux.ibm.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Mar 24, 2024 at 1:05=E2=80=AFPM David Laight <David.Laight@aculab.c=
+On Sun, Mar 24, 2024 at 12:35=E2=80=AFPM Puranjay Mohan <puranjay12@gmail.c=
 om> wrote:
 >
-> From: Alexei Starovoitov
-> > Sent: 21 March 2024 06:08
+> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
+>
+> > On Sun, Mar 24, 2024 at 11:54=E2=80=AFAM Puranjay Mohan <puranjay12@gma=
+il.com> wrote:
+> >>
+> >> +u64 bpf_arch_uaddress_limit(void)
+> >> +{
+> >> +       return max(TASK_SIZE_MAX + PAGE_SIZE, VSYSCALL_ADDR);
 > >
-> > On Wed, Mar 20, 2024 at 3:55=E2=80=AFAM Puranjay Mohan <puranjay12@gmai=
-l.com> wrote:
-> > >
-> > > The JITs need to implement bpf_arch_uaddress_limit() to define where
-> > > the userspace addresses end for that architecture or TASK_SIZE is tak=
-en
-> > > as default.
-> > >
-> > > The implementation is as follows:
-> > >
-> > > REG_AX =3D  SRC_REG
-> > > if(offset)
-> > >         REG_AX +=3D offset;
-> > > REG_AX >>=3D 32;
-> > > if (REG_AX <=3D (uaddress_limit >> 32))
-> > >         DST_REG =3D 0;
-> > > else
-> > >         DST_REG =3D *(size *)(SRC_REG + offset);
-> >
-> > The patch looks good, but it seems to be causing s390 CI failures.
+> > This is broken. See my other email.
+> > Sadly you didn't test it.
 >
-> I'm confused by the need for this check (and, IIRC, some other bpf
-> code that does kernel copies that can fault - and return an error).
+> Yes, sorry for this. I was relying on the CI for the test this time as
+> thought it would work. I just realised this would reject all addresses!
 >
-> I though that the entire point of bpf was that is sanitised and
-> verified everything to limit what the 'program' could do in order
-> to stop it overwriting (or even reading) kernel structures that
-> is wasn't supposed to access.
->
-> So it just shouldn't have a address that might be (in any way)
-> invalid.
+> Given that the current x86-64 JIT just tests for TASK_SIZE_MAX +
+> PAGE_SIZE can we go ahead with this and later fix it for VSYSCALL_ADDR
+> as it is specific for x86-64?
 
-bpf tracing progs can call bpf_probe_read_kernel() which
-can read any kernel memory.
-This is nothing but an inlined version of it.
+This patch deletes a bunch of code from arch/x86/net/bpf_jit_comp.c.
+If you're proposing to deal with vsyscall check in JIT then
+very similar code in the same spot will be re-introduced.
+So we should address all issues at once to avoid code churn.
 
-> The only possible address verify is access_ok() to ensure that
-> a uses address really is a user address.
+> Also, I will spend some time figuring out the best way to do this, there
+> should be some mathematical trick somewhere.
 
-access_ok() considerations don't apply.
-We're not dealing with user memory access.
+Let's think of it right now.
+
+For the next patch you can reduce the cc list to avoid spamming all
+mailing lists.
+bpf@vger plus JIT folks for affected arches will be enough.
 
