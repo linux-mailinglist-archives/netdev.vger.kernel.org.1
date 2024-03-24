@@ -1,166 +1,130 @@
-Return-Path: <netdev+bounces-81400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94A2E887C43
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 11:32:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23E6C887C48
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 11:43:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A0AE281CF7
-	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 10:32:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C91751F2151D
+	for <lists+netdev@lfdr.de>; Sun, 24 Mar 2024 10:43:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6F4017559;
-	Sun, 24 Mar 2024 10:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C42CF1759E;
+	Sun, 24 Mar 2024 10:43:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="t+sp3ErF"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CAE817991;
-	Sun, 24 Mar 2024 10:32:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA70915E97
+	for <netdev@vger.kernel.org>; Sun, 24 Mar 2024 10:43:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711276325; cv=none; b=nrq+SjdTDDbNgMheMVzdHz2e/gZ8juckGCAzYrfa5FxHVk+4B6EC5Zm8mYq1MC0EEvAjJiDVpBb5jK91ueO6JTfioeL/1KuUhV5XLJoGpbepBRMjs+0FbcwdLzNR31fc1CLMLf//1FNqQN/iMRq3b2sbG2l0eIfOaOAhMhPhPzY=
+	t=1711277000; cv=none; b=LsrAkW1GZWd0c7EEZ3VuFOq9hhpMUXkB4v15fTkzV5DeGVAtO3Arf4bLzktgi2Bg7w29ujWyNdQQ2SNEZ/ICVcpU7CNs5vkXpdDH87NhBp/VvTwOA1HvxxGStECGOc/Mul7/nLj1SWw0S8Ja4YL9xiJvc8Y4OOnDhPTePMcb/wc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711276325; c=relaxed/simple;
-	bh=JaLRqPL2VdDNRB2V7rpBmRl8eSyG0Sse/khcixW7Dtc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=OEAQMBXQ1SjSU/lkl0DS2C6SV1Rttx6mmYrHdFPpBO9SAXDnckGgWwiN852JG8P8KWHXp5edIFZrF0boHI7O2ZQg9PCUwgehq6jqWaZni3CYMW+nyvST+ITah9+Z+ny34oZWNwbTJr4R319odJe+xBLV646mbTpUcxek0axOHTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.163.235])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4V2XRn2YDDz4f3jk6;
-	Sun, 24 Mar 2024 18:31:49 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.252])
-	by mail.maildlp.com (Postfix) with ESMTP id 518181A0B85;
-	Sun, 24 Mar 2024 18:31:53 +0800 (CST)
-Received: from ultra.huawei.com (unknown [10.90.53.71])
-	by APP3 (Coremail) with SMTP id _Ch0CgAXI5sXAQBmLI08Hw--.23015S2;
-	Sun, 24 Mar 2024 18:31:53 +0800 (CST)
-From: Pu Lehui <pulehui@huaweicloud.com>
-To: bpf@vger.kernel.org,
-	linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org
-Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Luke Nelson <luke.r.nels@gmail.com>,
-	Pu Lehui <pulehui@huawei.com>,
-	Pu Lehui <pulehui@huaweicloud.com>
-Subject: [PATCH bpf] riscv, bpf: Fix kfunc parameters incompatibility between bpf and riscv abi
-Date: Sun, 24 Mar 2024 10:33:06 +0000
-Message-Id: <20240324103306.2202954-1-pulehui@huaweicloud.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1711277000; c=relaxed/simple;
+	bh=9MObCN77I7tUZOnnNXSJUXOLNM1PpU+2YR/y22SVpzg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NFCybdAAOa1id8KBeifdYIf+I9lpXBUHJdimf1P7WqBJtO8xTacYrSq7NZ/QbRvVhZ0Hzr/nekKXo6BLFJKTjWPYydnpe6KVLsAsZKV3nyyz/bZGkNtZ1ax/brjRvKEYbYuIu0xZ+udleiddrbqbmIXshxkOFTu0qXawvRXw+NA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=t+sp3ErF; arc=none smtp.client-ip=209.85.167.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-515a86daf09so510233e87.3
+        for <netdev@vger.kernel.org>; Sun, 24 Mar 2024 03:43:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1711276997; x=1711881797; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=Ribv/O+whBGnqTci5nPx7uHIdlxoMvUZURqWTthedJw=;
+        b=t+sp3ErFqzNFszzBMy6tw6WIgal1gAoHxTi8DSEIS89alD/K1V8uSxLiuHsPubEeH9
+         XCB/kWFkmqFsX0PpZpMwWpkSbHW8Glptt0tvlM29pHmaO8niMED1fDuwugxlACvqhdpc
+         egPjhfQnuohak0iE9JCZv57zaLcCFGV32ehBUAtQw2d6ZVeGyw5FzT7zqcwGw4DtwT8j
+         4GIAsFpu4isbHJiqmT1J/aZOlp+g5x8mgI/5iT782IS8eVQqiljC1RwPAHXz7e0BwC0Y
+         6v3fhShEnn2QHb0FhXcXPtXsLIgfE6xlWDp6qsak+xjdBrDX6uh1YCq9NgonLIXgtjcg
+         1HnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711276997; x=1711881797;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ribv/O+whBGnqTci5nPx7uHIdlxoMvUZURqWTthedJw=;
+        b=bZc9Eutn4JuQJStHvLrTks3w8w8+HCXFzQguPxaFDv8u+TDrcudHBpU68kJtWISddh
+         wcs3By7nVuZHZ/msiYKyO0xA+hmKbAsdBhGqJYfQo+S3zlChFq8fstMK/D93vrnV+Fwy
+         7x/mlE++cHfoXPoLCgSv2MTVpa5H9vBQxFm1J1YMVQwM9mgwxWqQKYliJ/eu3s3Ld86g
+         3RzYVYY0ztjqWmIKmToz/dYMd6nPKds9wNctTeO/UFLEjm6W0sqPW6Ulnt6VrufF8dB5
+         pe1f38oA1ngUIir/s5v5/NSB3lxuFe1H296IwvKpoiEevFjRfxN1UGkeN3j85gu+qLb+
+         imaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWG+tYx+rOt8dG9xIB4mTuSamFXniYUHWqYl7bn1ElTxDYY7X5xfBHoWkFoeG+xUjcD7ndcSGPSNBUC1DwozhmZBlvSxjbA
+X-Gm-Message-State: AOJu0YwOsyASBhBNdhAPLwR1DpQHGUKj+17cgtZ9Eb4Zf4WZg6jH9k5v
+	bvT9pSBiHRBXGJ0VNbzUIS9/r/w5bsUS01ZznzoNV5v5GtV+SUI46MQxvMbv6FNLiGFRotJtfIh
+	d
+X-Google-Smtp-Source: AGHT+IG4o6Yn5vUl781OaAZhuvbmnwlLG9/TmJ93NsAHIltWR7Tebhzu896a3DsWYdgcU18bziiJ7g==
+X-Received: by 2002:ac2:5b9a:0:b0:512:dfa1:6a1c with SMTP id o26-20020ac25b9a000000b00512dfa16a1cmr3000023lfn.10.1711276996932;
+        Sun, 24 Mar 2024 03:43:16 -0700 (PDT)
+Received: from localhost ([102.222.70.76])
+        by smtp.gmail.com with ESMTPSA id f13-20020a056402004d00b005689bfe2688sm1816184edu.39.2024.03.24.03.43.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Mar 2024 03:43:16 -0700 (PDT)
+Date: Sun, 24 Mar 2024 13:43:12 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Markus Elfring <Markus.Elfring@web.de>
+Cc: kernel-janitors@vger.kernel.org, netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org, smatch@vger.kernel.org,
+	LKML <linux-kernel@vger.kernel.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	David Laight <David.Laight@aculab.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>, Jonathan Cameron <jic23@kernel.org>,
+	Julia Lawall <julia.lawall@inria.fr>,
+	Kees Cook <keescook@chromium.org>,
+	Lukasz Czapnik <lukasz.czapnik@intel.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>,
+	Dan Williams <dan.j.williams@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: Re: [PATCH v2 net] ice: Fix freeing uninitialized pointers
+Message-ID: <f292facc-8a22-42e1-9a41-5ec8bd665cb7@moroto.mountain>
+References: <0efe132b-b343-4438-bb00-5a4b82722ed3@moroto.mountain>
+ <08c9f970-3007-461a-b9f9-9ab414024f68@web.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_Ch0CgAXI5sXAQBmLI08Hw--.23015S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7WrW5Xw13GF13Xr48uw4kJFb_yoW8tFy5pF
-	45Gr1Ykr4kXw1xZrnayF48Jr1fCr4v9a1avFyxWFy5GrZFgay5Jr4Yk3yYva45Cr15Wa4a
-	yrWDWrn0k34kA3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv014x267AKxVW5JVWrJwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4j
-	6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
-	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
-	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
-	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
-	n2kIc2xKxwCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c02F4
-	0E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_GFv_Wryl
-	IxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7CjxV
-	AFwI0_Gr0_Cr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAFwI0_
-	Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa7VUb
-	QVy7UUUUU==
-X-CM-SenderInfo: psxovxtxl6x35dzhxuhorxvhhfrp/
+In-Reply-To: <08c9f970-3007-461a-b9f9-9ab414024f68@web.de>
 
-From: Pu Lehui <pulehui@huawei.com>
+On Sat, Mar 23, 2024 at 05:56:29PM +0100, Markus Elfring wrote:
+> > Automatically cleaned up pointers need to be initialized before exiting
+> > their scope.  In this case, they need to be initialized to NULL before
+> > any return statement.
+> 
+> * May we expect that compilers should report that affected variables
+>   were only declared here instead of appropriately defined
+>   (despite of attempts for scope-based resource management)?
+> 
 
-We encountered a failing case when running selftest in no_alu32 mode:
+We disabled GCC's check for uninitialized variables a long time ago
+because it had too many false positives.
 
-The failure case is `kfunc_call/kfunc_call_test4` and its source code is
-like bellow:
-```
-long bpf_kfunc_call_test4(signed char a, short b, int c, long d) __ksym;
-int kfunc_call_test4(struct __sk_buff *skb)
-{
-	...
-	tmp = bpf_kfunc_call_test4(-3, -30, -200, -1000);
-	...
-}
-```
+> * Did you extend detection support in the source code analysis tool “Smatch”
+>   for a questionable implementation detail?
 
-And its corresponding asm code is:
-```
-0: r1 = -3
-1: r2 = -30
-2: r3 = 0xffffff38 # opcode: 18 03 00 00 38 ff ff ff 00 00 00 00 00 00 00 00
-4: r4 = -1000
-5: call bpf_kfunc_call_test4
-```
+Yes.  Smatch detects this as an uninitialized variable.
 
-insn 2 is parsed to ld_imm64 insn to emit 0x00000000ffffff38 imm, and
-converted to int type and then send to bpf_kfunc_call_test4. But since
-it is zero-extended in the bpf calling convention, riscv jit will
-directly treat it as an unsigned 32-bit int value, and then fails with
-the message "actual 4294966063 != expected -1234".
-
-The reason is the incompatibility between bpf and riscv abi, that is,
-bpf will do zero-extension on uint, but riscv64 requires sign-extension
-on int or uint. We can solve this problem by sign extending the 32-bit
-parameters in kfunc.
-
-The issue is related to [0], and thanks to Yonghong and Alexei.
-
-Link: https://github.com/llvm/llvm-project/pull/84874 [0]
-Fixes: d40c3847b485 ("riscv, bpf: Add kfunc support for RV64")
-Signed-off-by: Pu Lehui <pulehui@huawei.com>
----
- arch/riscv/net/bpf_jit_comp64.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
-
-diff --git a/arch/riscv/net/bpf_jit_comp64.c b/arch/riscv/net/bpf_jit_comp64.c
-index 869e4282a2c4..e3fc39370f7d 100644
---- a/arch/riscv/net/bpf_jit_comp64.c
-+++ b/arch/riscv/net/bpf_jit_comp64.c
-@@ -1454,6 +1454,22 @@ int bpf_jit_emit_insn(const struct bpf_insn *insn, struct rv_jit_context *ctx,
- 		if (ret < 0)
- 			return ret;
- 
-+		if (insn->src_reg == BPF_PSEUDO_KFUNC_CALL) {
-+			const struct btf_func_model *fm;
-+			int idx;
-+
-+			fm = bpf_jit_find_kfunc_model(ctx->prog, insn);
-+			if (!fm)
-+				return -EINVAL;
-+
-+			for (idx = 0; idx < fm->nr_args; idx++) {
-+				u8 reg = bpf_to_rv_reg(BPF_REG_1 + idx, ctx);
-+
-+				if (fm->arg_size[idx] == sizeof(int))
-+					emit_sextw(reg, reg, ctx);
-+			}
-+		}
-+
- 		ret = emit_call(addr, fixed_addr, ctx);
- 		if (ret)
- 			return ret;
--- 
-2.34.1
+regards,
+dan carpenter
 
 
