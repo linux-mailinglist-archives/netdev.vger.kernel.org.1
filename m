@@ -1,72 +1,107 @@
-Return-Path: <netdev+bounces-81699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E30888AD98
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 19:19:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 132C288B300
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 22:43:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90FF61C3EF83
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 18:19:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F0660B61F1D
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 18:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 648C25B697;
-	Mon, 25 Mar 2024 17:51:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB0B57D09F;
+	Mon, 25 Mar 2024 17:52:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rGywCu7H"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SMLdE8Nh"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D5919470
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 17:51:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC7757316D;
+	Mon, 25 Mar 2024 17:52:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711389094; cv=none; b=mNaStyMgr93uUFFxAQbPlGIXs/HiKRL3yxaH1nWmWVfWFzqyVJSFMubtzRdcLu1x97X6BozpaeR/RWhAI0DuIH8c6TOP6oe6XbVqcN5DZoP66kPah4JLmyHBSz56E5BfeIKvurmMawzOtgTYc3E9tFQsBgA3FhkwZxnd3juQePw=
+	t=1711389178; cv=none; b=fiSbPfuHu7mnkKKibi5PSwc/4EW69FBMuYNGLdsffM7KPxdy90OL89dPua4Eho/JpHntM1D8rPF0xm41L4BU9ZfDCkWODwzWH9ynfmx7XZYLYaLx0gtokmxkvYwUagtyGHeI8xHaYkRXkkVJEBNgjfM+GYNuvFIFGXAEfH4rxtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711389094; c=relaxed/simple;
-	bh=oFpHfxEjjRkNLqnsvIUKqne7g3O5V4xs8FadzevC+Fo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Je/XBz+LS5d61XT1wyVydwaxzU7m1tqopS3G3smyrJQx6Gr7zrPeUevc+qFYiGrogygxztkdSQDnZy04BSsJkykDywOXFri7KTe9AQyrFT0Dt8NRFHXC0slmqH5LCMaMlgGsVgSxyJgAMEUDsUmV00o01eCT76cPKSxFF4gdIo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rGywCu7H; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1711389178; c=relaxed/simple;
+	bh=VOccJ8b4F3FXwu0VomVq1foVe5FqXJomPjb+iB5b73s=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fp72Ylo/oPBGRwhBW3phHW6IPEtCDuwdk+agY3d8XmlhCi6O3kF/FXmT7JR+4wBguarCo/60xR1IQzKRyWcHTX2t6w07RQeuJJKU6Umj7udhXuk221xmtx+Qwn3fijiNceQ3O3Ao7pbMbEkD6D0/RY4r5nijF26ihc3IH2itqww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SMLdE8Nh; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-6e6ee9e3cffso3160916b3a.1;
+        Mon, 25 Mar 2024 10:52:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1711389092; x=1742925092;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Y1wTvNSJ5qZH0QMGxScVxerKjnvhRgA790JYY+X/zvI=;
-  b=rGywCu7HUNN/cMUkvz/G7NRQNzruZxXoZgFFBSiQZCTfaa9NmxoJ+7VU
-   IWUd0vIc4QRNxXdI4XWnT5tyEtc52WMPn3sha9qZ22EIpSpuXg2V3XtrP
-   2tACfXYktbBjuLk3BZHN2NzxmyQs3qf9DlVivcvVOMP58X/WjHkB/cld8
-   0=;
-X-IronPort-AV: E=Sophos;i="6.07,153,1708387200"; 
-   d="scan'208";a="643440557"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 17:51:29 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:29039]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.51.164:2525] with esmtp (Farcaster)
- id 8f0dbf91-4c20-4388-a9c9-b0875f1d4056; Mon, 25 Mar 2024 17:51:28 +0000 (UTC)
-X-Farcaster-Flow-ID: 8f0dbf91-4c20-4388-a9c9-b0875f1d4056
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 25 Mar 2024 17:51:28 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.171.62) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.28;
- Mon, 25 Mar 2024 17:51:26 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <wujianguo106@163.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH] tcp: Fix inet_bind2_bucket_match_addr_any() regression
-Date: Mon, 25 Mar 2024 10:51:17 -0700
-Message-ID: <20240325175117.45750-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <94d400d8-cb71-9f3a-32ad-a2492c1a5bd8@163.com>
-References: <94d400d8-cb71-9f3a-32ad-a2492c1a5bd8@163.com>
+        d=gmail.com; s=20230601; t=1711389175; x=1711993975; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=XNSADZIa55EnhS6o0yIL3ifpTu+GjUejKXDxEmLThHE=;
+        b=SMLdE8NhIvS+23/6Ri6e6rdzSwgwu2ycsoDk5lDGQRGURaJu5cYQcP+2EjwCRUYeb2
+         wGweWJsxo2A9fKbb+6RpI1gm2i9Ll1wBBJcQX4hoMQPjhnVs6eQHch5uLbT6NRkeULNy
+         W6OGx2oPSewur/f4TvTbmNCaDD+o/gAicBhvAAv+8U099zp7a77vs3myPhDJv3Ehcgg5
+         a8W6MpxsloS67xWWk0rVDI4tFwRdjooGIEuNvBmdY+hFWLc+sEW0f7Jih7WBDtJaP56v
+         bmzB6PQ2cTPF1MmXnyTng3FOarpsbRUCagneumu5wE8OpaAt417pJf7kSYHcf5MM/xdm
+         YZ7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711389175; x=1711993975;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XNSADZIa55EnhS6o0yIL3ifpTu+GjUejKXDxEmLThHE=;
+        b=pTOmskKrO1h0mgcGLJvQt8/IHGLF3LSeMLJWMMmD9Wc6ZuE46w3NpB+GEDctLWwLj9
+         Wl3I0jJ5A7aEBPjkYXyLQgbn/dfmhm6Q+VJBjanYdRPG9uUAzfiI3t4V4TC68YvNW/os
+         0+aCVKZ5U1LuUocaQGBJoNEdjmnQcO1a3JdG804tXRP9Tw++S1SoWvb2+J1P0+OTdhwi
+         NlOlTl5E5p/WrWnzTty1SYnPc9//MumF31MlKUMPo3ZZBeBUYoLqkHuTNjhAP4bn5IMs
+         z9FSx2Vb/vPKFiG0zpIi1Jpq2AVOXF48JpWfG8GGCJEQkLgjoBF8plEQCOoxdd1nZEnt
+         Ny8A==
+X-Forwarded-Encrypted: i=1; AJvYcCUKJUIL4B6OFUGp438YAZhGqW3a8Ccq+nTu+Z0rkTNkdoZB7XxNXgCexfTqVursAWlfZpYzdJp4DFmEtmZfN2YDKZ9VCaGSR11DCKq0lpwQE7xgguIoWJM123rQQEpgUO3uR+cmrRXccF5kDCfRKyWH/jcTOKWZ93/MBOP1bhe1gzJA4wQnaVZJ6UxVLu+y6p2BGm8OV5w1uMQmDkvwfkZ64IA9M9Lt7kzBZS+X812WUoNNSHpthZACLZp9+kKNGL1TigbCcu4sXdRZaMKrIvins0bLmL+RqsHfiGEA/vJQAauoIsLbhZbbPmQh7z+oug==
+X-Gm-Message-State: AOJu0Yx+1f1tqoAf2v28Y3okPnVCpeNchqGfAGpD/pRkukccziO7HuLf
+	6hCfIewTZnvBH8lvsAk1HqNdcYZ+C6FElfKb+qCpvhDUXiSbvmsxblKSciuu
+X-Google-Smtp-Source: AGHT+IGIDWtPHdUbX+7LWIxScptU3Z3k9sozN35URR01B7XvfxcUzrh1Z1HYjZAKi2mO+Me8ITFPPw==
+X-Received: by 2002:a05:6a20:6a0e:b0:1a3:c4ba:a453 with SMTP id p14-20020a056a206a0e00b001a3c4baa453mr6509702pzk.7.1711389175417;
+        Mon, 25 Mar 2024 10:52:55 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id dr18-20020a056a020fd200b005cd835182c5sm5239787pgb.79.2024.03.25.10.52.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Mar 2024 10:52:53 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+From: Guenter Roeck <linux@roeck-us.net>
+To: linux-kselftest@vger.kernel.org
+Cc: David Airlie <airlied@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	=?UTF-8?q?Ma=C3=ADra=20Canal?= <mcanal@igalia.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Kees Cook <keescook@chromium.org>,
+	Daniel Diaz <daniel.diaz@linaro.org>,
+	David Gow <davidgow@google.com>,
+	Arthur Grillo <arthurgrillo@riseup.net>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Maxime Ripard <mripard@kernel.org>,
+	=?UTF-8?q?Ville=20Syrj=C3=A4l=C3=A4?= <ville.syrjala@linux.intel.com>,
+	Daniel Vetter <daniel@ffwll.ch>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	dri-devel@lists.freedesktop.org,
+	kunit-dev@googlegroups.com,
+	linux-arch@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-parisc@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org,
+	linux-s390@vger.kernel.org,
+	linux-sh@vger.kernel.org,
+	loongarch@lists.linux.dev,
+	netdev@vger.kernel.org,
+	Guenter Roeck <linux@roeck-us.net>
+Subject: [PATCH v2 00/14] Add support for suppressing warning backtraces
+Date: Mon, 25 Mar 2024 10:52:34 -0700
+Message-Id: <20240325175248.1499046-1-linux@roeck-us.net>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,256 +109,78 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D036UWB001.ant.amazon.com (10.13.139.133) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Jianguo Wu <wujianguo106@163.com>
-Date: Fri, 22 Mar 2024 11:16:09 +0800
-> Hi Kuniyuki,
-> Thanks for your reply!
-> 
-> On 2024/3/21 12:55, Kuniyuki Iwashima wrote:
-> > Hi,
-> > 
-> > Thanks for the patch.
-> > 
-> > From: Jianguo Wu <wujianguo106@163.com>
-> > Date: Thu, 21 Mar 2024 11:02:36 +0800
-> >> From: Jianguo Wu <wujianguo@chinatelecom.cn>
-> >>
-> >> If we bind() a TCPv4 socket to 0.0.0.0:8090, then bind() a TCPv6(ipv6only) socket
-> > 
-> > Please wrap each line at <75 characters except for logs/output like below.
-> > 
-> OK.
-> > 
-> >> to :::8090, both without SO_REUSEPORT, then bind() 127.0.0.1:8090, it should fail
-> > 
-> > [::]:8090 is easier to read and the recommended way.
-> > https://datatracker.ietf.org/doc/html/rfc5952#section-6
-> > 
-> > But please keep the netstat output as is.
-> > 
-> >> but now succeeds. like this:
-> >>   tcp        0      0 127.0.0.1:8090          0.0.0.0:*               LISTEN
-> >>   tcp        0      0 0.0.0.0:8090            0.0.0.0:*               LISTEN
-> >>   tcp6       0      0 :::8090                 :::*                    LISTEN
-> >>
-> >> bind() 0.0.0.0:8090, :::8090 and ::1:8090 are all fail.
-> > 
-> > What do you mean by all fail ?
-> > At least, [::1]:8090 would fail with the current code in this case.
-> In my test, 127.0.0.1:8090  succeeds, 0.0.0.0:8090, [::]:8090 and [::1]:8090 are all fail
-> 
-> > 
-> > 
-> >> But if we bind() a TCPv6(ipv6only) socket to :::8090 first, then  bind() a TCPv4
-> >> socket to 0.0.0.0:8090, then bind() 127.0.0.1:8090, 0.0.0.0:8090, :::8090 and ::1:8090 are all fail.
-> >>
-> >> When bind() 127.0.0.1:8090, inet_bind2_bucket_match_addr_any() will return true as tb->addr_type == IPV6_ADDR_ANY,
-> > 
-> > Let's use tb2 here for inet_bind2_bucket.. yes it's not consistent
-> > in some functions like inet_bind2_bucket_match_addr_any() though.
-> yes, inet_bind2_bucket_match_addr_any() use tb, so I use tb here.
-> 
-> > 
-> > 
-> >> and tb is refer to the TCPv6 socket(:::8090), then inet_bhash2_conflict() return false, That is, there is no conflict,
-> > 
-> > Also make it clear that the TCPv6 socket is ipv6only one.
-> > 
-> > 
-> >> so bind() succeeds.
-> >>
-> >>   inet_bhash2_addr_any_conflict()
-> >>   {
-> >> 	inet_bind_bucket_for_each(tb2, &head2->chain)
-> >> 		// tb2 is IPv6
-> >> 		if (inet_bind2_bucket_match_addr_any(tb2, net, port, l3mdev, sk))
-> >> 			break;
-> >>
-> >> 	// inet_bhash2_conflict() return false
-> >> 	if (tb2 && inet_bhash2_conflict(sk, tb2, uid, relax, reuseport_cb_ok,
-> >>                                 reuseport_ok)) {
-> >> 		spin_unlock(&head2->lock);
-> >> 		return true;
-> >> 	}
-> >>
-> >>   }
-> >>
-> >> Fixes: 5a22bba13d01 ("tcp: Save address type in inet_bind2_bucket.")
-> > 
-> > This is not the commit that introduced the regression.
-> I will remove this.
-> > 
-> > Also, you need Signed-off-by tag here.
-> OK.
-> > 
-> > 
-> >> ---
-> >>  net/ipv4/inet_hashtables.c | 4 ++--
-> >>  1 file changed, 2 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> >> index 7498af320164..3eeaca8a113f 100644
-> >> --- a/net/ipv4/inet_hashtables.c
-> >> +++ b/net/ipv4/inet_hashtables.c
-> >> @@ -830,8 +830,8 @@ bool inet_bind2_bucket_match_addr_any(const struct inet_bind2_bucket *tb, const
-> >>  		return false;
-> >>
-> >>  #if IS_ENABLED(CONFIG_IPV6)
-> >> -	if (tb->addr_type == IPV6_ADDR_ANY)
-> >> -		return true;
-> >> +	if (sk->sk_family == AF_INET6)
-> >> +		return tb->addr_type == IPV6_ADDR_ANY;
-> > 
-> > This fix is not correct and will break v4-mapped-v6 address cases.
-> > You can run bind_wildcard under the selftest directory.
-> >> Probably we need v6_only bit in tb2 and should add some test cases
-> > in the selftest.
-> How about this?
-> I add a new field ipv6_only to struct inet_bind2_bucket{}
-> 
-> diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
-> index 7f1b38458743..fb7c250a663b 100644
-> --- a/include/net/inet_hashtables.h
-> +++ b/include/net/inet_hashtables.h
-> @@ -96,6 +96,7 @@ struct inet_bind2_bucket {
->  	int			l3mdev;
->  	unsigned short		port;
->  #if IS_ENABLED(CONFIG_IPV6)
-> +	bool			ipv6_only;
->  	unsigned short		addr_type;
->  	struct in6_addr		v6_rcv_saddr;
->  #define rcv_saddr		v6_rcv_saddr.s6_addr32[3]
-> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> index cf88eca5f1b4..5fc749f8f2b1 100644
-> --- a/net/ipv4/inet_hashtables.c
-> +++ b/net/ipv4/inet_hashtables.c
-> @@ -110,6 +110,7 @@ static void inet_bind2_bucket_init(struct inet_bind2_bucket *tb2,
->  	tb2->port = tb->port;
->  #if IS_ENABLED(CONFIG_IPV6)
->  	BUILD_BUG_ON(USHRT_MAX < (IPV6_ADDR_ANY | IPV6_ADDR_MAPPED));
-> +	tb2->ipv6_only = ipv6_only_sock(sk);
->  	if (sk->sk_family == AF_INET6) {
->  		tb2->addr_type = ipv6_addr_type(&sk->sk_v6_rcv_saddr);
->  		tb2->v6_rcv_saddr = sk->sk_v6_rcv_saddr;
-> @@ -831,7 +832,8 @@ bool inet_bind2_bucket_match_addr_any(const struct inet_bind2_bucket *tb, const
-> 
->  #if IS_ENABLED(CONFIG_IPV6)
->  	if (tb->addr_type == IPV6_ADDR_ANY)
-> -		return true;
-> +		if (sk->sk_family == AF_INET6 || !tb->ipv6_only)
-> +			return true;
-> 
->  	if (tb->addr_type != IPV6_ADDR_MAPPED)
->  		return false;
-> 
+Some unit tests intentionally trigger warning backtraces by passing bad
+parameters to kernel API functions. Such unit tests typically check the
+return value from such calls, not the existence of the warning backtrace.
 
-I found a corner case that does not work with this change.
-The 3rd bind() should fail but succeeds with the v6only flag approach.
+Such intentionally generated warning backtraces are neither desirable
+nor useful for a number of reasons.
+- They can result in overlooked real problems.
+- A warning that suddenly starts to show up in unit tests needs to be
+  investigated and has to be marked to be ignored, for example by
+  adjusting filter scripts. Such filters are ad-hoc because there is
+  no real standard format for warnings. On top of that, such filter
+  scripts would require constant maintenance.
 
----8<---
-from socket import *
+One option to address problem would be to add messages such as "expected
+warning backtraces start / end here" to the kernel log.  However, that
+would again require filter scripts, it might result in missing real
+problematic warning backtraces triggered while the test is running, and
+the irrelevant backtrace(s) would still clog the kernel log.
 
-s1 = socket(AF_INET6)
-s1.setsockopt(41, IPV6_V6ONLY, 1)
-s1.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-s1.bind(('::', 8000))
+Solve the problem by providing a means to identify and suppress specific
+warning backtraces while executing test code. Support suppressing multiple
+backtraces while at the same time limiting changes to generic code to the
+absolute minimum. Architecture specific changes are kept at minimum by
+retaining function names only if both CONFIG_DEBUG_BUGVERBOSE and
+CONFIG_KUNIT are enabled.
 
-s2 = socket(AF_INET6)
-s2.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-s2.bind(('::', 8000))
+The first patch of the series introduces the necessary infrastructure.
+The second patch introduces support for counting suppressed backtraces.
+This capability is used in patch three to implement unit tests.
+Patch four documents the new API.
+The next two patches add support for suppressing backtraces in drm_rect
+and dev_addr_lists unit tests. These patches are intended to serve as
+examples for the use of the functionality introduced with this series.
+The remaining patches implement the necessary changes for all
+architectures with GENERIC_BUG support.
 
-s3 = socket(AF_INET)
-s3.bind(('127.0.0.1', 8000))
----8<---
+With CONFIG_KUNIT enabled, image size increase with this series applied is
+approximately 1%. The image size increase (and with it the functionality
+introduced by this series) can be avoided by disabling
+CONFIG_KUNIT_SUPPRESS_BACKTRACE.
 
+This series is based on the RFC patch and subsequent discussion at
+https://patchwork.kernel.org/project/linux-kselftest/patch/02546e59-1afe-4b08-ba81-d94f3b691c9a@moroto.mountain/
+and offers a more comprehensive solution of the problem discussed there.
 
-To cover this case, the only solution is to iterate over the buckets
-in the same hash.  Also, this change can be backported to 6.1.
+Design note:
+  Function pointers are only added to the __bug_table section if both
+  CONFIG_KUNIT_SUPPRESS_BACKTRACE and CONFIG_DEBUG_BUGVERBOSE are enabled
+  to avoid image size increases if CONFIG_KUNIT is disabled. There would be
+  some benefits to adding those pointers all the time (reduced complexity,
+  ability to display function names in BUG/WARNING messages). That change,
+  if desired, can be made later.
 
----8<---
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-index 612aa1d2eff7..63e8f2df0681 100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -288,6 +288,7 @@ static bool inet_bhash2_addr_any_conflict(const struct sock *sk, int port, int l
- 	struct sock_reuseport *reuseport_cb;
- 	struct inet_bind_hashbucket *head2;
- 	struct inet_bind2_bucket *tb2;
-+	bool conflict = false;
- 	bool reuseport_cb_ok;
- 
- 	rcu_read_lock();
-@@ -300,18 +301,20 @@ static bool inet_bhash2_addr_any_conflict(const struct sock *sk, int port, int l
- 
- 	spin_lock(&head2->lock);
- 
--	inet_bind_bucket_for_each(tb2, &head2->chain)
--		if (inet_bind2_bucket_match_addr_any(tb2, net, port, l3mdev, sk))
--			break;
-+	inet_bind_bucket_for_each(tb2, &head2->chain) {
-+		if (!inet_bind2_bucket_match_addr_any(tb2, net, port, l3mdev, sk))
-+			continue;
- 
--	if (tb2 && inet_bhash2_conflict(sk, tb2, uid, relax, reuseport_cb_ok,
--					reuseport_ok)) {
--		spin_unlock(&head2->lock);
--		return true;
-+		if (!inet_bhash2_conflict(sk, tb2, uid, relax, reuseport_cb_ok,	reuseport_ok))
-+			continue;
-+
-+		conflict = true;
-+		break;
- 	}
- 
- 	spin_unlock(&head2->lock);
--	return false;
-+
-+	return conflict;
- }
- 
- /*
----8<---
+Checkpatch note:
+  Remaining checkpatch errors and warnings were deliberately ignored.
+  Some are triggered by matching coding style or by comments interpreted
+  as code, others by assembler macros which are disliked by checkpatch.
+  Suggestions for improvements are welcome.
 
+Changes since RFC:
+- Introduced CONFIG_KUNIT_SUPPRESS_BACKTRACE
+- Minor cleanups and bug fixes
+- Added support for all affected architectures
+- Added support for counting suppressed warnings
+- Added unit tests using those counters
+- Added patch to suppress warning backtraces in dev_addr_lists tests
 
-Also, I found another regression that my recent patch introduced.
-The second bind() should succeed but now fails.
-
----8<---
-from socket import *
-
-s1 = socket(AF_INET6)
-s1.setsockopt(41, IPV6_V6ONLY, 1)
-s1.bind(('::', 8000))
-
-s2 = socket(AF_INET6)
-s2.bind(('::ffff:127.0.0.1', 8000))
----8<---
-
-and we need this change.
-
----8<---
-diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
-index 7d8090f109ef..612aa1d2eff7 100644
---- a/net/ipv4/inet_connection_sock.c
-+++ b/net/ipv4/inet_connection_sock.c
-@@ -203,7 +203,8 @@ static bool __inet_bhash2_conflict(const struct sock *sk, struct sock *sk2,
- 				   kuid_t sk_uid, bool relax,
- 				   bool reuseport_cb_ok, bool reuseport_ok)
- {
--	if (sk->sk_family == AF_INET && ipv6_only_sock(sk2))
-+	if (ipv6_only_sock(sk2) &&
-+	    (sk->sk_family == AF_INET || ipv6_addr_v4mapped(&sk->sk_v6_rcv_saddr)))
- 		return false;
- 
- 	return inet_bind_conflict(sk, sk2, sk_uid, relax,
----8<---
-
-
-I'll post a series including necessary tests.
-
-Thanks!
+Changes since v1:
+- Rebased to v6.9-rc1
+- Added Tested-by:, Acked-by:, and Reviewed-by: tags
+  [I retained those tags since there have been no functional changes]
+- Introduced KUNIT_SUPPRESS_BACKTRACE configuration option, enabled by
+  default.
 
