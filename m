@@ -1,47 +1,48 @@
-Return-Path: <netdev+bounces-81502-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF3D9889FB1
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:36:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13370889FC1
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:38:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8281E2C26D6
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 12:36:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 361971C3691B
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 12:38:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0FCB18928E;
-	Mon, 25 Mar 2024 07:32:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A392189A4A;
+	Mon, 25 Mar 2024 07:32:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="NsGqJAA5"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="dXtWnxiT"
 X-Original-To: netdev@vger.kernel.org
-Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.219])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0000E4317B;
-	Mon, 25 Mar 2024 04:01:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.219
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDD8E6EB40;
+	Mon, 25 Mar 2024 04:05:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711339299; cv=none; b=Gv71jqONa4jmKfywnGsPPlb8gn0SFnInUcZzXWMrhQFJNyrXfmmPiswKQsZMIGu4ZRhX43VHpIGT3m9eng3dalL/MXtB7+EuVVTiRKrx6TVbB/454qL8XWJ+CF5380uOh6UWoJ6v3IsvCGrilDsSoSnS+8QWPt7D7Rqib54MdR4=
+	t=1711339510; cv=none; b=ZfUmkn9rxt9JztKaIWtMhWFKfEeyEUhzyisVmPrYgDjVV2DvOXZpHdWrohG0sybOOoh94OtGImoEatWXvKJNm/jhLgxjkVAWrwAXWH65LB9TxpxWKD2ViUoSFhUf4S7phMeU4nnABwo/rnO/BiwcSD79ErZoeOd6csH7Yuirztw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711339299; c=relaxed/simple;
-	bh=Xrto1isUre/YOZl7rOJbD4TAJ6P1KNC0m3iMnvHrYc8=;
+	s=arc-20240116; t=1711339510; c=relaxed/simple;
+	bh=rgwIpB0WPqzeg+xu8gCr5ED6nFgEZ11bQhARANcvMyI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aDh58WcbcVXWCknwYOwWztjzx650ImKkdb72KL77QtLGK17PzO+eC0+gaD9Q3O9a+TM38BTPd425kOWmlmYOgMnC9i8z/jTn27fuctwQbXv6YxOrK8MRrsRDchgcADTesV+sDQu7qmZVN8bdI8A/yc5WSPwc+fMr2JcJsqOpYaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=NsGqJAA5; arc=none smtp.client-ip=45.254.50.219
+	 MIME-Version; b=tFo4ZayJZXhIbaSFylzQsKnTMBf+RAuwr2WJyv+x6mY4Qz6OW32qyVOOGbdb0v7rz+8roZt4QMFDPv/NnWoApHtxLgcRJh/Ha6vyuzagG3VKRVasmBabhdznPaLwbZXJ4JP8VcfiUA0Ar3HMviv9kmG0TNn2fgi5KDPcHyKXy0g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=dXtWnxiT; arc=none smtp.client-ip=220.197.31.4
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=GRkUX
-	HpEGK2aXuxqbIEPhXhKHaUg92/b19NkuDLSQuo=; b=NsGqJAA511U9cs0LdI7Jv
-	hfw0aeqHvBd9m0X2dkYEc9m5pkfGNFkauliWVAvOPCUT9TXv4wH09WVbz1Qd8pi0
-	5lMWmYROUhS4z4AUdSqi6sn0Qib7MHqjSulUsrWnOxYG7H1nmXbkCNmY1YsIT3ZL
-	4nImX5nzx5xvmXQXSnsfuo=
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=gIh4l
+	B0xITLrabRKSwTrKCIpHwQ83Dk2koTT84qc7og=; b=dXtWnxiTmR9fkp/pVgNQg
+	Vnl12TeBTNhwO3SNbSCYVJ7a1eIt7h58ds0WFO9cVojyxUPTF8vES3QS7SXoNdB6
+	Tia4oVCqMq6osmMD7NUql/YiGen9/WWfrWGMZOtoMd0BErkomiXhOvRjd7gi6Sry
+	noAfqOE6EKd0qINdgCyC2U=
 Received: from localhost.localdomain (unknown [193.203.214.57])
-	by gzga-smtp-mta-g0-3 (Coremail) with SMTP id _____wD3X2YD9wBmoJnGBw--.35036S2;
-	Mon, 25 Mar 2024 12:01:09 +0800 (CST)
+	by gzga-smtp-mta-g2-0 (Coremail) with SMTP id _____wD3v7nN9wBmtFqfBw--.51546S2;
+	Mon, 25 Mar 2024 12:04:31 +0800 (CST)
 From: Peilin He <peilinhe2020@163.com>
-To: edumazet@google.com
+To: kerneljasonxing@gmail.com
 Cc: davem@davemloft.net,
 	dsahern@kernel.org,
+	edumazet@google.com,
 	he.peilin@zte.com.cn,
 	jiang.xuexin@zte.com.cn,
 	kuba@kernel.org,
@@ -55,11 +56,11 @@ Cc: davem@davemloft.net,
 	yang.yang29@zte.com.cn,
 	zhang.yunkai@zte.com.cn
 Subject: Re: Re: [PATCH v3 resend] net/ipv4: add tracepoint for icmp_send
-Date: Mon, 25 Mar 2024 04:01:07 +0000
-Message-Id: <20240325040107.3776173-1-peilinhe2020@163.com>
+Date: Mon, 25 Mar 2024 04:04:29 +0000
+Message-Id: <20240325040429.3776225-1-peilinhe2020@163.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CANn89i+EFEr7VHXNdOi59Ba_R1nFKSBJzBzkJFVgCTdXBx=YBg@mail.gmail.com>
-References: <CANn89i+EFEr7VHXNdOi59Ba_R1nFKSBJzBzkJFVgCTdXBx=YBg@mail.gmail.com>
+In-Reply-To: <CAL+tcoDT01EL7g_73Whrz753oEBuRtBrfmo2PHvTdifXKP4fhQ@mail.gmail.com>
+References: <CAL+tcoDT01EL7g_73Whrz753oEBuRtBrfmo2PHvTdifXKP4fhQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,48 +68,13 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3X2YD9wBmoJnGBw--.35036S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3WF1fAr17try7tr1rCw13CFg_yoW7Xr1fpF
-	yDAF1rKr4ktrsrCw13Zw4jqr15Way8GryUGr1Iqw4xCr1Dtrn8t3y2gr1YkF95Zrs8K34a
-	v3WYk3s8Cwn8XaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j4Ap8UUUUU=
-X-CM-SenderInfo: xshlzxhqkhjiisq6il2tof0z/1tbiZRWssWXAkuWgygABsU
+X-CM-TRANSID:_____wD3v7nN9wBmtFqfBw--.51546S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxtryDuw1kJr1xXF1UGw18uFg_yoW7GFy7pF
+	1DAFn5Grn7tr47u34fZw4aqFn3X3yruryUKr4jgw1Ykwn2vr1xtrWvgrn09FykZrs0kryS
+	vF1jv3s8G3WYqrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jwmiiUUUUU=
+X-CM-SenderInfo: xshlzxhqkhjiisq6il2tof0z/1tbiYxSssWV4HUoocQAAs5
 
->>
->> Introduce a tracepoint for icmp_send, which can help users to get more
->> detail information conveniently when icmp abnormal events happen.
->>
->> 1. Giving an usecase example:
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
->=3D=3D=3D=3D=3D
->> When an application experiences packet loss due to an unreachable UDP
->> destination port, the kernel will send an exception message through the
->> icmp_send function. By adding a trace point for icmp_send, developers or
->> system administrators can obtain detailed information about the UDP
->> packet loss, including the type, code, source address, destination addres=
->s,
->> source port, and destination port. This facilitates the trouble-shooting
->> of UDP packet loss issues especially for those network-service
->> applications.
->>
->> 2. Operation Instructions:
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
->=3D=3D
->> Switch to the tracing directory.
->>         cd /sys/kernel/tracing
->> Filter for destination port unreachable.
->>         echo "type=3D=3D3 && code=3D=3D3" > events/icmp/icmp_send/filter
->> Enable trace event.
->>         echo 1 > events/icmp/icmp_send/enable
->>
->> 3. Result View:
->> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->>  udp_client_erro-11370   [002] ...s.12   124.728002:
->>  icmp_send: icmp_send: type=3D3, code=3D3.
->>  From 127.0.0.1:41895 to 127.0.0.1:6666 ulen=3D23
->>  skbaddr=3D00000000589b167a
->>
->> Changelog
 >> ---------
 >> v2->v3:
 >> Some fixes according to
@@ -130,6 +96,11 @@ X-CM-SenderInfo: xshlzxhqkhjiisq6il2tof0z/1tbiZRWssWXAkuWgygABsU
 >> Cc: Yang Yang <yang.yang29@zte.com.cn>
 >> Cc: Liu Chun <liu.chun2@zte.com.cn>
 >> Cc: Xuexin Jiang <jiang.xuexin@zte.com.cn>
+>
+>I think it would be better to target net-next tree since it's not a
+>fix or something else important.
+>
+OK. I would target it for net-next.
 >> ---
 >>  include/trace/events/icmp.h | 64 +++++++++++++++++++++++++++++++++++++
 >>  net/ipv4/icmp.c             |  4 +++
@@ -183,38 +154,82 @@ X-CM-SenderInfo: xshlzxhqkhjiisq6il2tof0z/1tbiZRWssWXAkuWgygABsU
 >> +                               __entry->sport =3D ntohs(uh->source);
 >> +                               __entry->dport =3D ntohs(uh->dest);
 >> +                               __entry->ulen =3D ntohs(uh->len);
+>> +                       } else {
+>> +                               __entry->sport =3D 0;
+>> +                               __entry->dport =3D 0;
+>> +                               __entry->ulen =3D 0;
+>> +                       }
 >
->This is completely bogus.
+>What about using the TP_STORE_ADDR_PORTS_SKB macro to record the sport
+>and dport like the patch[1] did through extending the use of header
+>for TCP and UDP?
 >
->Adding tracepoints is ok if there are no side effects like bugs :/
->
->At this point there is no guarantee the UDP header is complete/present
->in skb->head
->
->Look at the existing checks between lines 619 and 623
->
->Then audit all icmp_send() callers, and ask yourself if UDP packets
->can not be malicious (like with a truncated UDP header)
-Yeah, you are correct. Directly parsing udphdr through the sdk may
-conceal bugs, such as illegal skb. To handle such exceptional scenarios,
-we can determine the legitimacy of skb by checking whether the position
-of the uh pointer is out of bounds.
+I believe patch[1] is a good idea as it moves the TCP protocol parsing
+previously done inside the TP_STORE_ADDR_PORTS_SKB macro to TP_fast_assign,
+and extracts the TP_STORE_ADDR_PORTS_SKB macro into a common file,
+enabling support for both UDP and TCP protocol parsing simultaneously.
 
-Perhaps it could be modified like this:	
-	struct udphdr *uh = udp_hdr(skb);
-	
-	if (proto_4 != IPPROTO_UDP || (u8 *)uh < skb->head ||
-		(u8 *)uh + sizeof(struct udphdr) > skb_tail_pointer(skb)) {
-		__entry->sport = 0;
-		__entry->dport = 0;
-		__entry->ulen = 0;
-	} else {
-		__entry->sport = ntohs(uh->source);
-		__entry->dport = ntohs(uh->dest);
-		__entry->ulen = ntohs(uh->len);
-	}
-	
-Additionally, the validity of all parameters in the current patch has been
-confirmed without any issues. Thank you once again for your reminder.
+However, patch[1] only extracts the source and destination addresses of
+the packet, but does not extract the source port and destination port,
+which limits the significance of my submitted patch.
+
+Perhaps the patch[1] could be referenced for integration after it is merged.
+>And, I wonder what the use of tracing ulen of that skb?
+>
+The tracking of ulen is primarily aimed at ensuring the legality of received
+UDP packets and providing developers with more detailed information
+on exceptions. See net/ipv4/udp.c:2494-2501.
+>[1]: https://lore.kernel.org/all/1c7156a3f164eb33ef3a25b8432e359f0bb60a8e.1=
+>710866188.git.balazs.scheidler@axoflow.com/
+>
+>Thanks,
+>Jason
+>
+>> +
+>> +                       p32 =3D (__be32 *) __entry->saddr;
+>> +                       *p32 =3D iph->saddr;
+>> +
+>> +                       p32 =3D (__be32 *) __entry->daddr;
+>> +                       *p32 =3D iph->daddr;
+>> +               ),
+>> +
+>> +               TP_printk("icmp_send: type=3D%d, code=3D%d. From %pI4:%u =
+>to %pI4:%u ulen=3D%d skbaddr=3D%p",
+>> +                       __entry->type, __entry->code,
+>> +                       __entry->saddr, __entry->sport, __entry->daddr,
+>> +                       __entry->dport, __entry->ulen, __entry->skbaddr)
+>> +);
+>> +
+>> +#endif /* _TRACE_ICMP_H */
+>> +
+>> +/* This part must be outside protection */
+>> +#include <trace/define_trace.h>
+>> \ No newline at end of file
+>> diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+>> index e63a3bf99617..21fb41257fe9 100644
+>> --- a/net/ipv4/icmp.c
+>> +++ b/net/ipv4/icmp.c
+>> @@ -92,6 +92,8 @@
+>>  #include <net/inet_common.h>
+>>  #include <net/ip_fib.h>
+>>  #include <net/l3mdev.h>
+>> +#define CREATE_TRACE_POINTS
+>> +#include <trace/events/icmp.h>
+>>
+>>  /*
+>>   *     Build xmit assembly blocks
+>> @@ -672,6 +674,8 @@ void __icmp_send(struct sk_buff *skb_in, int type, in=
+>t code, __be32 info,
+>>                 }
+>>         }
+>>
+>> +       trace_icmp_send(skb_in, type, code);
+>> +
+>>         /* Needed by both icmp_global_allow and icmp_xmit_lock */
+>>         local_bh_disable();
+>>
+>> --
+>> 2.44.0
+>>
 
 
