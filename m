@@ -1,106 +1,89 @@
-Return-Path: <netdev+bounces-81851-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAB5B88B47D
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 23:49:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F4BA88B4F8
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 00:06:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1C061C3A267
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 22:49:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D329E1F27DA6
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 23:06:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00FD47FBC4;
-	Mon, 25 Mar 2024 22:49:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13EEC82C69;
+	Mon, 25 Mar 2024 23:06:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d9gatwuB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="miVONJQ5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C16987F7C0;
-	Mon, 25 Mar 2024 22:49:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A33918174F;
+	Mon, 25 Mar 2024 23:06:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711406978; cv=none; b=P0LERfy2vSJsmRgmr6LdystUlBeoXXF1Zo9GZk0Cq2sHz68dMUxXnFXpGmxDbuwNQY8+CHbGAl6rNfsbAwsI+e6u1Kg/WBDX9p01bo9d+KUFXzVHCPN6BwN4V2qJWXUX4DaKsjY49eNKo34IEhTjnIEcqKkQHD0eDVbKrRt7Uls=
+	t=1711407987; cv=none; b=Z29K7eEwFD8D9Ohg3BbTwPi3/uonv1sd4VSpiOX0NiG+X2J5cC5E2pTG3FS04dqsrvjD9TEsy4aALd/UAQZmy/4UOWM7LX2QUQi1vWaFK2EFl1oiP816I30FVOk1K1N7YaL8bcb4Ic60ipXATPmKPZkh/QKgeURO/KrkAOBSDYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711406978; c=relaxed/simple;
-	bh=mpENNzXqB34PkfN3qWk4baDeHWXS11DwgtTCQWCof7E=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=WehbatLSysQRut8KplU2oxzR4cE86wvqU0sP+qXKeQLIdNBzkVsMy78Jeb3dqoPEZGlrI95weGKUUg6J2xQ9QbtGcLyVhfYn6lD/dS+gQBucnGRsLbyMlkxzUvRMimr8LEcSun09Fa4VU+QFzF6frQKK7cAJguzvhtI/Dcyc4GY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d9gatwuB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D68EC433F1;
-	Mon, 25 Mar 2024 22:49:37 +0000 (UTC)
+	s=arc-20240116; t=1711407987; c=relaxed/simple;
+	bh=1QyVL22FJBxcb4t1+dh5JP6zFPMFsBApFX/CuykGQcQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HRMHVPKE1Fd9LSqmSwz8I1rSNnJkX4Wy6WS6K2IDieW1JHO8u/bvy5Zm+5hGyQGE9PP93o/8FqhNcJvlJbFPDmOqumSRoR3PEyq/YDPQHzLxq2hfalYGx5Su+DUMiG6Z9Txgs9OZmct7yg8oTNh/02gudtTvlu6UgUAM7UML6p8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=miVONJQ5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D81ECC433F1;
+	Mon, 25 Mar 2024 23:06:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711406978;
-	bh=mpENNzXqB34PkfN3qWk4baDeHWXS11DwgtTCQWCof7E=;
-	h=From:To:Cc:Subject:Date:From;
-	b=d9gatwuBzcGbQxPOdikSyNqT+DW3r6dusOgETC2TS+5LpMd5fcEGm9X70IvtcRpAs
-	 xE1BTe7Zbmq5vUIcgrD/nRL1WSk7s/3Onu83T0XIFAdkvv+P8AocDmxfmbgh4dwtPU
-	 z2ykTBqjq1gfNPca/TDnwoE5d3gAdUQLlSPaYCaJzZSQz+xi0fDSBr9UcrNFSMD5bN
-	 4hiMGKnFfYiG1fA6CSzmXOCCkurpdlXr6dQDuVV3GymwAu3vt4QWnQIhp8b89h4lZi
-	 WtITY6fXEFgLowSagOKMneoO6cjSGlg58GKUi3w6zR2gYqNUNXIRdemVdUO3PDl7s+
-	 mDW9fgjoKUG4w==
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Ariel Elior <aelior@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Bjorn Helgaas <bhelgaas@google.com>
-Subject: [PATCH] qed: Drop useless pci_params.pm_cap
-Date: Mon, 25 Mar 2024 17:49:31 -0500
-Message-Id: <20240325224931.1462051-1-helgaas@kernel.org>
-X-Mailer: git-send-email 2.34.1
+	s=k20201202; t=1711407987;
+	bh=1QyVL22FJBxcb4t1+dh5JP6zFPMFsBApFX/CuykGQcQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=miVONJQ5NXRsG7mtEQGjb5OCHUFlD7yIcjL8Zczot8iH1PlPuzLpzXUWN779YGM8y
+	 sdRSypBm9jXhiqw1IzSFooBJQq5k1wtRXrJIOTx4xbzUnA1RJeHfwPvxzQkJwqjAA2
+	 N6YIqez7RTTZpmbSlWcSMzhmaSXkYG9rvLI4m7dYZcw7TieXzKum/7A5nU+P13vC61
+	 T1cLGk10rXaP0S8Iok04wj1ZA1e/YPTPkHaE8qnOaUkw/8fA7OGzdEbCdysSpVND4U
+	 Gsl75wBe1MjtRVXYky/7xx56/oe9JwwwMEAsu3NP0isHTJVisTQU7YEP34h3oAU2oc
+	 dvb52RefFwqtw==
+Message-ID: <ea5a0baa-64f3-40f8-a775-433eeb0b430e@kernel.org>
+Date: Tue, 26 Mar 2024 08:06:22 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/28] Remove PCI_IRQ_LEGACY
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+ Manivannan Sadhasivami <manivannan.sadhasivam@linaro.org>,
+ linux-scsi@vger.kernel.org, "Martin K . Petersen"
+ <martin.petersen@oracle.com>, Jaroslav Kysela <perex@perex.cz>,
+ linux-sound@vger.kernel.org, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
+ linux-serial@vger.kernel.org, Hans de Goede <hdegoede@redhat.com>,
+ platform-driver-x86@vger.kernel.org, ntb@lists.linux.dev,
+ Lee Jones <lee@kernel.org>, David Airlie <airlied@gmail.com>,
+ amd-gfx@lists.freedesktop.org, Jason Gunthorpe <jgg@ziepe.ca>,
+ linux-rdma@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240325175941.GA1443646@bhelgaas>
+Content-Language: en-US
+From: Damien Le Moal <dlemoal@kernel.org>
+Organization: Western Digital Research
+In-Reply-To: <20240325175941.GA1443646@bhelgaas>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Bjorn Helgaas <bhelgaas@google.com>
+On 3/26/24 02:59, Bjorn Helgaas wrote:
+> I applied all these to pci/enumeration for v6.10, thanks!
+> 
+> I added acks and reviewed-by and will update if we receive more, and
+> adjusted subject lines to add "... instead of PCI_IRQ_LEGACY" and in
+> some cases to match history of the file.
 
-qed_init_pci() used pci_params.pm_cap only to cache the pci_dev.pm_cap.
-Drop the cache and use pci_dev.pm_cap directly.
+Thanks Bjorn !
 
-Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
----
- drivers/net/ethernet/qlogic/qed/qed.h      | 2 --
- drivers/net/ethernet/qlogic/qed/qed_main.c | 3 +--
- 2 files changed, 1 insertion(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/qlogic/qed/qed.h b/drivers/net/ethernet/qlogic/qed/qed.h
-index 1d719726f72b..b7def3b54937 100644
---- a/drivers/net/ethernet/qlogic/qed/qed.h
-+++ b/drivers/net/ethernet/qlogic/qed/qed.h
-@@ -662,8 +662,6 @@ struct qed_hwfn {
- };
- 
- struct pci_params {
--	int		pm_cap;
--
- 	unsigned long	mem_start;
- 	unsigned long	mem_end;
- 	unsigned int	irq;
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_main.c b/drivers/net/ethernet/qlogic/qed/qed_main.c
-index c278f8893042..408da4312e01 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_main.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_main.c
-@@ -323,8 +323,7 @@ static int qed_init_pci(struct qed_dev *cdev, struct pci_dev *pdev)
- 		goto err2;
- 	}
- 
--	cdev->pci_params.pm_cap = pci_find_capability(pdev, PCI_CAP_ID_PM);
--	if (IS_PF(cdev) && !cdev->pci_params.pm_cap)
-+	if (IS_PF(cdev) && !pdev->pm_cap)
- 		DP_NOTICE(cdev, "Cannot find power management capability\n");
- 
- 	rc = dma_set_mask_and_coherent(&cdev->pdev->dev, DMA_BIT_MASK(64));
 -- 
-2.34.1
+Damien Le Moal
+Western Digital Research
 
 
