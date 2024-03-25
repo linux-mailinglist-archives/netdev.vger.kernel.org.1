@@ -1,124 +1,85 @@
-Return-Path: <netdev+bounces-81521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 959F588A19A
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 14:21:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8650D88A1DB
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 14:29:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 10CE7BC7573
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:13:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F87229F16A
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:29:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A3AC174EFB;
-	Mon, 25 Mar 2024 09:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="iqxWQa4i"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39FCA85941;
+	Mon, 25 Mar 2024 10:20:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50C901869DA
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 07:17:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
+Received: from mail.nfschina.com (unknown [42.101.60.195])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id 394D8127B7F;
+	Mon, 25 Mar 2024 07:36:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711351076; cv=none; b=AhdB23OIriv4LC/G8EZ/G6Nf+d0LKJsDZ5tAAyNOtErFmb/eJRNIl5XsLkvl+/C34vw+n7KrJpodsblIaM4PqS/zJYWALU+/iBqn2rMYra0YoiKr0k1iv1suIvfmvbxNPN5ff/uSx1PByqEylK5IqpmWhinumqQcdQOm6k0CiU0=
+	t=1711352180; cv=none; b=MSeNy+YRIAwhcQpJc0GHCvLDbFdwnckz/mHKhraZ55HGxoX8FYIMXS8G6SbPdxRtw/AIxOAzhYGxeJu4KYCTAZXg2lp4ruVuSO6X57J7/yB824VRvqV/dzYe0O9GY7G1dU61/EmsEJspcuBKt5bGXSbr3GO684bg0tQxcZJ5g6E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711351076; c=relaxed/simple;
-	bh=JtxnzxGrTffDEA0XnqvlYJualvaU/GrEhGNY/kmUU7k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JRk6UE7aAfBDadk/hBktpp6ayfULATH+ikfKrlibzj7qgCqwmg3PoZWrwIQ/4lrA6YkWSAQY+VkoYGuq3AnHzSTMXYvtk9xVXLVjkTu0tLoaCA7Px1gTL8OFG6Zh/xq8CmxAWlV1F67MdmMa2SBaJxAOTSHBzovKmCKTq3e8Kg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=iqxWQa4i; arc=none smtp.client-ip=115.124.30.110
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711351071; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=uiAJzlkaILI73D+td4TN5g1wQlkiDXtOcSrE97onzLo=;
-	b=iqxWQa4ih7FSTNcCG3hmgk/zPSkYlnjGB4cL9pGH4pypySHC9Igz0RcyPt/ZJQMRQ+AcJQKn9bu9O3c5sZFD3DR9s7KDRG3QN1+FitRighrrHpj+dXdGFa0bw5qp1ARFfdlBUdnMWCV8MvEi4gLvHP7K2gHSJIFT7rLZAUEmJKs=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W3B4ysg_1711351069;
-Received: from 30.221.148.153(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W3B4ysg_1711351069)
-          by smtp.aliyun-inc.com;
-          Mon, 25 Mar 2024 15:17:50 +0800
-Message-ID: <b54ad370-67bd-4b8c-82fb-54625e68288b@linux.alibaba.com>
-Date: Mon, 25 Mar 2024 15:17:47 +0800
+	s=arc-20240116; t=1711352180; c=relaxed/simple;
+	bh=LZaq53O1GNO3two+ZlL0W1CK0F15y8eavHKu0/CkY/g=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TvaUMllQBw8oSCB3jsXU5XkUqz3NvtVeNc+9lTP0t+zytCR+jZh/h1BxHK27q2C9c7pYyFu0bv0IHat/gOsIw1J0p5cmSPhFWGEf03mHK3m34qvnoHz/PEd40x7PEko+q7TTZYMrA/lrhIIIbB+eFTQT3olJdg4o2jG3wuEcg/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
+Received: from localhost.localdomain (unknown [180.167.10.98])
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPSA id 5067F602E36D9;
+	Mon, 25 Mar 2024 15:36:04 +0800 (CST)
+X-MD-Sfrom: suhui@nfschina.com
+X-MD-SrcIP: 180.167.10.98
+From: Su Hui <suhui@nfschina.com>
+To: sgoutham@marvell.com,
+	gakula@marvell.com,
+	sbhatta@marvell.com,
+	hkelam@marvell.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: Su Hui <suhui@nfschina.com>,
+	saikrishnag@marvell.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH 1/2] octeontx2-pf: check negative error code in otx2_open()
+Date: Mon, 25 Mar 2024 15:35:49 +0800
+Message-Id: <20240325073549.823832-1-suhui@nfschina.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] virtio-net: reduce the CPU consumption of dim worker
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
- "Michael S. Tsirkin" <mst@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- "David S. Miller" <davem@davemloft.net>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-References: <1711021557-58116-1-git-send-email-hengqi@linux.alibaba.com>
- <1711021557-58116-3-git-send-email-hengqi@linux.alibaba.com>
- <CACGkMEuZ457UU6MhPtKHd_Y0VryvZoNU+uuKOc_4OK7jc62WwA@mail.gmail.com>
- <5708312a-d8eb-40ee-88a9-e16930b94dda@linux.alibaba.com>
- <CACGkMEu8or7+fw3+vX_PY3Qsrm7zVSf6TS9SiE20NpOsz-or6g@mail.gmail.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <CACGkMEu8or7+fw3+vX_PY3Qsrm7zVSf6TS9SiE20NpOsz-or6g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+otx2_rxtx_enable() return negative error code such as -EIO,
+check -EIO rather than EIO to fix this problem.
 
+Fixes: c926252205c4 ("octeontx2-pf: Disable packet I/O for graceful exit")
+Signed-off-by: Su Hui <suhui@nfschina.com>
+---
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-在 2024/3/25 下午1:57, Jason Wang 写道:
-> On Mon, Mar 25, 2024 at 10:21 AM Heng Qi <hengqi@linux.alibaba.com> wrote:
->>
->>
->> 在 2024/3/22 下午1:19, Jason Wang 写道:
->>> On Thu, Mar 21, 2024 at 7:46 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
->>>> Currently, ctrlq processes commands in a synchronous manner,
->>>> which increases the delay of dim commands when configuring
->>>> multi-queue VMs, which in turn causes the CPU utilization to
->>>> increase and interferes with the performance of dim.
->>>>
->>>> Therefore we asynchronously process ctlq's dim commands.
->>>>
->>>> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
->>> I may miss some previous discussions.
->>>
->>> But at least the changelog needs to explain why you don't use interrupt.
->> Will add, but reply here first.
->>
->> When upgrading the driver's ctrlq to use interrupt, problems may occur
->> with some existing devices.
->> For example, when existing devices are replaced with new drivers, they
->> may not work.
->> Or, if the guest OS supported by the new device is replaced by an old
->> downstream OS product, it will not be usable.
->>
->> Although, ctrlq has the same capabilities as IOq in the virtio spec,
->> this does have historical baggage.
-> I don't think the upstream Linux drivers need to workaround buggy
-> devices. Or it is a good excuse to block configure interrupts.
-
-Of course I agree. Our DPU devices support ctrlq irq natively, as long 
-as the guest os opens irq to ctrlq.
-
-If other products have no problem with this, I would prefer to use irq 
-to solve this problem, which is the most essential solution.
-
->
-> And I remember you told us your device doesn't have such an issue.
-
-YES.
-
-Thanks,
-Heng
-
->
-> Thanks
->
->> Thanks,
->> Heng
->>
->>> Thanks
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index b40bd0e46751..3f46d5e0fb2e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -1933,7 +1933,7 @@ int otx2_open(struct net_device *netdev)
+ 	 * mcam entries are enabled to receive the packets. Hence disable the
+ 	 * packet I/O.
+ 	 */
+-	if (err == EIO)
++	if (err == -EIO)
+ 		goto err_disable_rxtx;
+ 	else if (err)
+ 		goto err_tx_stop_queues;
+-- 
+2.30.2
 
 
