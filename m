@@ -1,256 +1,138 @@
-Return-Path: <netdev+bounces-81533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81534-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D74D888A27F
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 14:38:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76B1788A192
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 14:21:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65C841F37F7F
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:38:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 302932C657E
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:21:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ADE2154BFF;
-	Mon, 25 Mar 2024 10:24:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6646813FD87;
+	Mon, 25 Mar 2024 10:26:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="YJPR8d88"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Cqu3ww2+"
 X-Original-To: netdev@vger.kernel.org
-Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.219])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF9961552F2;
-	Mon, 25 Mar 2024 07:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.219
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37F3A14F103
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 08:22:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711353508; cv=none; b=iHb8okMgwTXi77nQj67To8S4jzdc9TeeZh1DAZsV9wPVsID4y2OFnYMmJITW0K3+drNkx+U36BgIK4z9a4hsPwxdL3BehtNHUYtqG0Ejzozu9NgDYedmiBqAGZtQt1BSvjsKMUyBkaHkyQtp9SvqOJ2sAvF7WGUZckqBZZdX+ck=
+	t=1711354946; cv=none; b=T9nTV9ps/leu6aESkNMqVdh6Udoh+VdLh0ZHum5VJ5yVdEZ2Y4q8IdAXQts99scL8KwzHc4kgubWNQwLEjzJB0wVh2hKKnlz8Twcubrjb5CrelqGb4/DAKbkOWKH2rttKnuwJaLTr2Rwv8lMROxs9/tw1H2kuby2WwzAMHAzXiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711353508; c=relaxed/simple;
-	bh=qAMdxk9ji2QCFFg8RS2v2wmwbMlv3YUwfuW6++YvFMM=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=sLEiB6FlmpWTf2bB9AV7pLwKgmOwM14yvle1Av1POxeip/PxzDe1Xp0y1zpEY7TimjtwH1QDQH6CbZdu7VEWSKZSnFAWgn0gaEGXBDT58fZ59IFgiaDvLE9VQ8K3hg9nUfReXmrEOtEVqlrnvYFiDkXd4Pmc8iZHh2Y7F3rVF2M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=YJPR8d88; arc=none smtp.client-ip=45.254.50.219
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=dGjTw
-	JPlvMOsZV0qWvG51AfogZ0hB5BsOVHV486tDN4=; b=YJPR8d88hAiP31sTpq8Le
-	/sli5Vpp4k4aUGrProrKXLKra7NRVVQFA6wp6ehYDAVrRsRpjeqEtL9ILS8Ac7Ws
-	MP/BIhpKugrZrwvOl6i7tPWXapOXVeo0xOhm+wEt70e8I/nWx+Y2iTvKU4hmaotu
-	dcF34Bu6mcWytX2CQCtCW0=
-Received: from localhost.localdomain (unknown [193.203.214.57])
-	by gzga-smtp-mta-g0-2 (Coremail) with SMTP id _____wD3X6p5LgFmwnu9Bw--.57921S2;
-	Mon, 25 Mar 2024 15:57:47 +0800 (CST)
-From: Peilin He <peilinhe2020@163.com>
-To: kerneljasonxing@gmail.com
-Cc: davem@davemloft.net,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	he.peilin@zte.com.cn,
-	jiang.xuexin@zte.com.cn,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org,
-	liu.chun2@zte.com.cn,
-	mhiramat@kernel.org,
-	netdev@vger.kernel.org,
-	peilinhe2020@163.com,
-	rostedt@goodmis.org,
-	xu.xin16@zte.com.cn,
-	yang.yang29@zte.com.cn,
-	zhang.yunkai@zte.com.cn
-Subject: Re: Re: Re: [PATCH v3 resend] net/ipv4: add tracepoint for icmp_send
-Date: Mon, 25 Mar 2024 07:57:45 +0000
-Message-Id: <20240325075745.3777528-1-peilinhe2020@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CAL+tcoCOywxJ9VFs6PD4Wdsq1HvQ18YVhYX3DA5MfTSXA+Htug@mail.gmail.com>
-References: <CAL+tcoCOywxJ9VFs6PD4Wdsq1HvQ18YVhYX3DA5MfTSXA+Htug@mail.gmail.com>
+	s=arc-20240116; t=1711354946; c=relaxed/simple;
+	bh=b9FmiI9Sq+TCqOP+A6HV/teAqMiEHMNA8KXPT7w4IrE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=D7LgTa9+1TQ1w9jbu3yNJlDE6rcrzlqet616F4N9hWkd2b+L9jemqiT1S/a4bmmd0okNUKSNgSQukoG3ufC/LiFQQ/i2TSOkpkL1ynbLNWgWFkBFsXhce5NjD3cv8xS2baeST5xSjmpqKeWKjjgeBdXHzBjZaQ9/EYUEFT4WQO8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Cqu3ww2+; arc=none smtp.client-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711354941; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=bEzipBhG/k4adub5cfWHCJ/NQav+qWnAiGWpYm5ooOA=;
+	b=Cqu3ww2+6svRSgPr6tBIi+07xrbC1vhd+zMbMnfZ/qPvh/SrPv5/75e0u9lUE5+2ibKihkbf5Cazvyojeq0xTZWOTgDFZb5tob1KsNJUrHskKHrHIs8C4+Kxqip+P3mdw+k7Q+DVaBl+hd+8kFBzbfkL0MLs2KdYxZNppXH4bsY=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W3CFn.C_1711354940;
+Received: from 30.221.148.153(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W3CFn.C_1711354940)
+          by smtp.aliyun-inc.com;
+          Mon, 25 Mar 2024 16:22:21 +0800
+Message-ID: <36ce2bbf-3a31-4c01-99f3-1875f79e2831@linux.alibaba.com>
+Date: Mon, 25 Mar 2024 16:22:17 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] virtio-net: reduce the CPU consumption of dim worker
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+References: <1711021557-58116-1-git-send-email-hengqi@linux.alibaba.com>
+ <1711021557-58116-3-git-send-email-hengqi@linux.alibaba.com>
+ <CACGkMEuZ457UU6MhPtKHd_Y0VryvZoNU+uuKOc_4OK7jc62WwA@mail.gmail.com>
+ <5708312a-d8eb-40ee-88a9-e16930b94dda@linux.alibaba.com>
+ <CACGkMEu8or7+fw3+vX_PY3Qsrm7zVSf6TS9SiE20NpOsz-or6g@mail.gmail.com>
+ <b54ad370-67bd-4b8c-82fb-54625e68288b@linux.alibaba.com>
+ <CACGkMEv88U1_2K2b0KdmH97gfrdOvK_1ajqh=UTK6=KgZ4OYvQ@mail.gmail.com>
+From: Heng Qi <hengqi@linux.alibaba.com>
+In-Reply-To: <CACGkMEv88U1_2K2b0KdmH97gfrdOvK_1ajqh=UTK6=KgZ4OYvQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3X6p5LgFmwnu9Bw--.57921S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxtryDJw1DuryUXw48JFy8uFg_yoW7uryrpF
-	yDAF1rKw4ktr17Cw1S9w1aqFnIq3yrCryjgr12gw1akrnFqF17tr42qrn8CFykArs8Krya
-	vF1jv343GFyYqrJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0zRG2NtUUUUU=
-X-CM-SenderInfo: xshlzxhqkhjiisq6il2tof0z/1tbiThyssWVOB6CFMgAAs0
 
->> >> ---------
->> >> v2->v3:
->> >> Some fixes according to
->> >> https://lore.kernel.org/all/20240319102549.7f7f6f53@gandalf.local.home=
->/
->> >> 1. Change the tracking directory to/sys/kernel/tracking.
->> >> 2. Adjust the layout of the TP-STRUCT_entry parameter structure.
->> >>
->> >> v1->v2:
->> >> Some fixes according to
->> >> https://lore.kernel.org/all/CANn89iL-y9e_VFpdw=3D3DsZtRnKRu_tnUwqHuFQT=
->JvJsv=3D
->> >-nz1xPDw@mail.gmail.com/
->> >> 1. adjust the trace_icmp_send() to more protocols than UDP.
->> >> 2. move the calling of trace_icmp_send after sanity checks
->> >> in __icmp_send().
->> >>
->> >> Signed-off-by: Peilin He<he.peilin@zte.com.cn>
->> >> Reviewed-by: xu xin <xu.xin16@zte.com.cn>
->> >> Reviewed-by: Yunkai Zhang <zhang.yunkai@zte.com.cn>
->> >> Cc: Yang Yang <yang.yang29@zte.com.cn>
->> >> Cc: Liu Chun <liu.chun2@zte.com.cn>
->> >> Cc: Xuexin Jiang <jiang.xuexin@zte.com.cn>
->> >
->> >I think it would be better to target net-next tree since it's not a
->> >fix or something else important.
->> >
->> OK. I would target it for net-next.
->> >> ---
->> >>  include/trace/events/icmp.h | 64 ++++++++++++++++++++++++++++++++++++=
->+
->> >>  net/ipv4/icmp.c             |  4 +++
->> >>  2 files changed, 68 insertions(+)
->> >>  create mode 100644 include/trace/events/icmp.h
->> >>
->> >> diff --git a/include/trace/events/icmp.h b/include/trace/events/icmp.h
->> >> new file mode 100644
->> >> index 000000000000..2098d4b1b12e
->> >> --- /dev/null
->> >> +++ b/include/trace/events/icmp.h
->> >> @@ -0,0 +1,64 @@
->> >> +/* SPDX-License-Identifier: GPL-2.0 */
->> >> +#undef TRACE_SYSTEM
->> >> +#define TRACE_SYSTEM icmp
->> >> +
->> >> +#if !defined(_TRACE_ICMP_H) || defined(TRACE_HEADER_MULTI_READ)
->> >> +#define _TRACE_ICMP_H
->> >> +
->> >> +#include <linux/icmp.h>
->> >> +#include <linux/tracepoint.h>
->> >> +
->> >> +TRACE_EVENT(icmp_send,
->> >> +
->> >> +               TP_PROTO(const struct sk_buff *skb, int type, int code=
->),
->> >> +
->> >> +               TP_ARGS(skb, type, code),
->> >> +
->> >> +               TP_STRUCT__entry(
->> >> +                       __field(const void *, skbaddr)
->> >> +                       __field(int, type)
->> >> +                       __field(int, code)
->> >> +                       __array(__u8, saddr, 4)
->> >> +                       __array(__u8, daddr, 4)
->> >> +                       __field(__u16, sport)
->> >> +                       __field(__u16, dport)
->> >> +                       __field(unsigned short, ulen)
->> >> +               ),
->> >> +
->> >> +               TP_fast_assign(
->> >> +                       struct iphdr *iph =3D3D ip_hdr(skb);
->> >> +                       int proto_4 =3D3D iph->protocol;
->> >> +                       __be32 *p32;
->> >> +
->> >> +                       __entry->skbaddr =3D3D skb;
->> >> +                       __entry->type =3D3D type;
->> >> +                       __entry->code =3D3D code;
->> >> +
->> >> +                       if (proto_4 =3D3D=3D3D IPPROTO_UDP) {
->> >> +                               struct udphdr *uh =3D3D udp_hdr(skb);
->> >> +                               __entry->sport =3D3D ntohs(uh->source)=
->;
->> >> +                               __entry->dport =3D3D ntohs(uh->dest);
->> >> +                               __entry->ulen =3D3D ntohs(uh->len);
->> >> +                       } else {
->> >> +                               __entry->sport =3D3D 0;
->> >> +                               __entry->dport =3D3D 0;
->> >> +                               __entry->ulen =3D3D 0;
->> >> +                       }
->> >
->> >What about using the TP_STORE_ADDR_PORTS_SKB macro to record the sport
->> >and dport like the patch[1] did through extending the use of header
->> >for TCP and UDP?
->> >
->> I believe patch[1] is a good idea as it moves the TCP protocol parsing
->> previously done inside the TP_STORE_ADDR_PORTS_SKB macro to TP_fast_assig=
->n,
->> and extracts the TP_STORE_ADDR_PORTS_SKB macro into a common file,
->> enabling support for both UDP and TCP protocol parsing simultaneously.
+
+
+在 2024/3/25 下午3:56, Jason Wang 写道:
+> On Mon, Mar 25, 2024 at 3:18 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
 >>
->> However, patch[1] only extracts the source and destination addresses of
->> the packet, but does not extract the source port and destination port,
->> which limits the significance of my submitted patch.
->
->No, please take a look at TP_STORE_ADDR_PORTS_SKB() macro again. It
->records 4-tuples of the flow.
->
->Thanks,
->Jason
->
-Okay, after patch [1] is merged, we will propose an optimization patch based on it.
 >>
->> Perhaps the patch[1] could be referenced for integration after it is merg=
->ed.
->> >And, I wonder what the use of tracing ulen of that skb?
->> >
->> The tracking of ulen is primarily aimed at ensuring the legality of recei=
->ved
->> UDP packets and providing developers with more detailed information
->> on exceptions. See net/ipv4/udp.c:2494-2501.
->> >[1]: https://lore.kernel.org/all/1c7156a3f164eb33ef3a25b8432e359f0bb60a8=
->e.1=3D
->> >710866188.git.balazs.scheidler@axoflow.com/
->> >
->> >Thanks,
->> >Jason
->> >
->> >> +
->> >> +                       p32 =3D3D (__be32 *) __entry->saddr;
->> >> +                       *p32 =3D3D iph->saddr;
->> >> +
->> >> +                       p32 =3D3D (__be32 *) __entry->daddr;
->> >> +                       *p32 =3D3D iph->daddr;
->> >> +               ),
->> >> +
->> >> +               TP_printk("icmp_send: type=3D3D%d, code=3D3D%d. From %=
->pI4:%u =3D
->> >to %pI4:%u ulen=3D3D%d skbaddr=3D3D%p",
->> >> +                       __entry->type, __entry->code,
->> >> +                       __entry->saddr, __entry->sport, __entry->daddr=
->,
->> >> +                       __entry->dport, __entry->ulen, __entry->skbadd=
->r)
->> >> +);
->> >> +
->> >> +#endif /* _TRACE_ICMP_H */
->> >> +
->> >> +/* This part must be outside protection */
->> >> +#include <trace/define_trace.h>
->> >> \ No newline at end of file
->> >> diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
->> >> index e63a3bf99617..21fb41257fe9 100644
->> >> --- a/net/ipv4/icmp.c
->> >> +++ b/net/ipv4/icmp.c
->> >> @@ -92,6 +92,8 @@
->> >>  #include <net/inet_common.h>
->> >>  #include <net/ip_fib.h>
->> >>  #include <net/l3mdev.h>
->> >> +#define CREATE_TRACE_POINTS
->> >> +#include <trace/events/icmp.h>
->> >>
->> >>  /*
->> >>   *     Build xmit assembly blocks
->> >> @@ -672,6 +674,8 @@ void __icmp_send(struct sk_buff *skb_in, int type,=
-> in=3D
->> >t code, __be32 info,
->> >>                 }
->> >>         }
->> >>
->> >> +       trace_icmp_send(skb_in, type, code);
->> >> +
->> >>         /* Needed by both icmp_global_allow and icmp_xmit_lock */
->> >>         local_bh_disable();
->> >>
->> >> --
->> >> 2.44.0
+>> 在 2024/3/25 下午1:57, Jason Wang 写道:
+>>> On Mon, Mar 25, 2024 at 10:21 AM Heng Qi <hengqi@linux.alibaba.com> wrote:
+>>>>
+>>>> 在 2024/3/22 下午1:19, Jason Wang 写道:
+>>>>> On Thu, Mar 21, 2024 at 7:46 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
+>>>>>> Currently, ctrlq processes commands in a synchronous manner,
+>>>>>> which increases the delay of dim commands when configuring
+>>>>>> multi-queue VMs, which in turn causes the CPU utilization to
+>>>>>> increase and interferes with the performance of dim.
+>>>>>>
+>>>>>> Therefore we asynchronously process ctlq's dim commands.
+>>>>>>
+>>>>>> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+>>>>> I may miss some previous discussions.
+>>>>>
+>>>>> But at least the changelog needs to explain why you don't use interrupt.
+>>>> Will add, but reply here first.
+>>>>
+>>>> When upgrading the driver's ctrlq to use interrupt, problems may occur
+>>>> with some existing devices.
+>>>> For example, when existing devices are replaced with new drivers, they
+>>>> may not work.
+>>>> Or, if the guest OS supported by the new device is replaced by an old
+>>>> downstream OS product, it will not be usable.
+>>>>
+>>>> Although, ctrlq has the same capabilities as IOq in the virtio spec,
+>>>> this does have historical baggage.
+>>> I don't think the upstream Linux drivers need to workaround buggy
+>>> devices. Or it is a good excuse to block configure interrupts.
+>> Of course I agree. Our DPU devices support ctrlq irq natively, as long
+>> as the guest os opens irq to ctrlq.
+>>
+>> If other products have no problem with this, I would prefer to use irq
+>> to solve this problem, which is the most essential solution.
+> Let's do that.
+
+Ok, will do.
+
+Do you have the link to the patch where you previously modified the 
+control queue for interrupt notifications.
+I think a new patch could be made on top of it, but I can't seem to find it.
+
+Thanks,
+Heng
+
+>
+> Thanks
+>
+>>> And I remember you told us your device doesn't have such an issue.
+>> YES.
+>>
+>> Thanks,
+>> Heng
+>>
+>>> Thanks
+>>>
+>>>> Thanks,
+>>>> Heng
+>>>>
+>>>>> Thanks
 
 
