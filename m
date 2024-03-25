@@ -1,1085 +1,311 @@
-Return-Path: <netdev+bounces-81531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 000E588ABE3
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 18:37:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4219688A23E
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 14:35:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 93B7AB65A21
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:37:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF7D81F3BEAA
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:35:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C8D712F5B9;
-	Mon, 25 Mar 2024 10:22:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1388F1386C8;
+	Mon, 25 Mar 2024 10:22:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="D3ONBIfi"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VfaI6lPa"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2050.outbound.protection.outlook.com [40.107.101.50])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231D813A88F
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 07:51:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F2B13A885;
+	Mon, 25 Mar 2024 07:50:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711353085; cv=fail; b=lSgUCbn3ixcfVvDnXUIYm2chZDoSBkQfdacgFy8SrW6Z0U/Wloks9tYOc9H0Jd1Q+ZOe83fqYUGfvuuxKUeOEwIXoXKk6evUGrB6cidAWY2E7HZDMxZiEZKEFQ2V8OVWDZ0N3UcLI5iOZ0QWvgJAAO7Bg4KiX0j9dKuUQFSYpKY=
+	t=1711353055; cv=fail; b=JA2l8SJxX+03aB2RSZR+Yqv6Vn89/wpt7TeNV5wiJM9oLH1fE0iI8r85LS5GXkG9Sifxu2VpeNLvzz1r1rjBtm7XzXeFiGmY38Vf/xrb9GXpgAk7f9xsCYuKRZjfULLrRvpOwjgvyc7IQiy8icQCRJFKiIRjmqAROV79hANKeJM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711353085; c=relaxed/simple;
-	bh=ZtiFyDxRbiXR4JJ7JLe9RkD9joVELYxHcBDNo1YAjYE=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=UuBFItTRzZAT52lzegR6neuScsSvultzz6KGaZ8X5YEcQZY61eokDMf5kXMZFCRGY/mnYHZTb4oIx2nwzDHahFicRe0cX+ttYS7FgyBAkzGX37xr+zLzxKyoT0sFUROMa1OtCxwlTHAOYpFp6AthyGP6Q4WwJMpZFGFEM7MoDFE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=D3ONBIfi; arc=fail smtp.client-ip=40.107.101.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+	s=arc-20240116; t=1711353055; c=relaxed/simple;
+	bh=QAe8UFag18fE8K3W/IFZpmhhnU3SfVJCrHWkPV0tXFk=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=K0m6UJtNGhZbQ0i4wyiqGR4XFJtBoWJziXSXyDOJJ8e+CCi9DbWvZFsZdN0gL68AG7G0uLgMWI4OuS1pd9JRVmQ/qmIK5h9eUc5l7bt8S/OgT28VD4Rt6KVg2k5GhNKFO1q9/UB/Y3a9uIDeqT1/UEJ4BdtyMs85n7AMgMXEAuk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VfaI6lPa; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711353054; x=1742889054;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=QAe8UFag18fE8K3W/IFZpmhhnU3SfVJCrHWkPV0tXFk=;
+  b=VfaI6lPaLsJxLkJOTzltZJdfh/4i3H/c602uh5pQKvk04tPENu6q7efF
+   KU+Fu8JRKCcS4CZXSgqKM/4koM2r0yaz9ZfI6ji/MHx9yDs5FgYXytJ+x
+   Ese0ZSxEYubeelTxNaI4Ma4cwDaynLA7TY/VYRUcpkrE08sze8hq5480Q
+   FEBl3vjWacyoC18HwD6+fJ4waQMMfLppwx6bUKyJd5ZANjqge7J0ORbH/
+   6KdzsVFqHH5dTovvqJX79d4XFi84C9AqClPg9Un9BHndO1MxK7387Z6fT
+   rBubPco0Mwzk5o/XW0Orcg265A0zYWbiIL59XIV4ekA23g4uT7xh9YE1j
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11023"; a="17734703"
+X-IronPort-AV: E=Sophos;i="6.07,152,1708416000"; 
+   d="scan'208";a="17734703"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 00:50:53 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,152,1708416000"; 
+   d="scan'208";a="15937761"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 25 Mar 2024 00:50:53 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 25 Mar 2024 00:50:52 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 25 Mar 2024 00:50:52 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 25 Mar 2024 00:50:52 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YCq+jskGac9GrOLyA/FTeNU3rDGvSsIG/PGjbyqQYGHSWllKr2e64hsIl0oPVANkYEuhf1OUFxxyfSjoNrFiR2tCZPSC8uypgAFIMtvUjOKCQ0ft/u9xkIdeTJqsM80G/qZG337yWx8cta0zQWjmCq6ifozFIqGJXPDTMvl45oZqOCWYw2MPNQLA8Sd+3SDMREqX0Er62nl0tpBjIHZ7uuUW4gVUrI/2U7fTe0UqmgCMkqVoAwXFhmlHhqaUsvEpLrKRN090zn88ExXxu41VxitDAc10FLt066cscdwFyy2VwURlPxTkW7rmnba5CW/yIZTkoZvE7Zw6VtEL9Muz+Q==
+ b=lSB985btpQHC9oyMTAx3Yb3M0wAUhHgOaF/sz+IxAqp7e/bkyxMpDCQ8svlmppWfjQ5rELufZ8T7qF5QfBtZb4nAJxeO4LVLFeBJgiu5hBfVjEN6Pgg4pRR4V1RzPv9pdcGFAByciFLqfo3gWNAZftF8CG32DJ/09nnyaDlDenbLPC5bRqmO9SpEhNVLjL7tLa84z5aO8iLOxcnU6qVFFATlZcDpQMYRASWJrd0KHNTqx+Ac8nUqE05jJ4rQJHTrrqUNOYQElqaECIxP+WgQzJgv9q8b3EDoy4XqA+/KTYssi2q9wp6f7gIa3LskY15k3+F5Ay4mIiWQQzfhT4IX3w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=98iL2Ih3RwSqT6lI2GjtIoRBrG2vvMGeuR3yKr4Bujg=;
- b=Arv/4H0MCDV5EVL6t0YnE3qNrKy3R4Gmo56elC6rHMhXKBl27UynoJzvRJJAQY4GzY8XGDHgdaVam/fW9famgrTe/6FesUsqyoFt9dXioCxe4xgmKDeWBOZ4pvYAdcdBOk+9Pv0QFhmUTVNGXGYXNsLpfpV+E/8XdS7EK/lvAIBRqkeTjMVNy1+O01J3jMc5tSxJauRVTn2aN9cB6IaK5w8/cyUJct0ULrEqV9cG3w9BB8QEFmiswoxhLHb/dBzSTV9J4ymSggKiLzaPk2xtlPJUZ8PBjAe5ov6pUvV61Z8rxO+eKdLN9MUaknjEr/Seetp12J9TXGUj4jEYWI9iaA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=98iL2Ih3RwSqT6lI2GjtIoRBrG2vvMGeuR3yKr4Bujg=;
- b=D3ONBIfiDQTXz0Pb/qfdZh5RGvg0zez5X0ZkABERu2YRKnAABFyK2e+ESjIiRfatu9r2UIIeAl07fAL1P1CiP6wMECH/8pNWZXgtluqBT6Bf7bX0uj+30I/KFu89Q4WrWGBhb0GNGjFa77rwqAesUHPZ0ndmTDKl4Sf8ltRNc0XUg69eHLGq6QlJMhgdWYPBJ0COZE4JPlkjmD1p9B69t4RCVvWUpLt8+BNT8/hJU0UyxHgT+CsmuJTb9z+E1QL8ST8Zc0KkwMVbqw2mjjWmSDJ7V2Y2UI+vhRGe3Q+adOVyG7HK+4/COnIJEHHqGTebJwsvDFnEx2ivd8OslJo+tQ==
-Received: from CH2PR20CA0008.namprd20.prod.outlook.com (2603:10b6:610:58::18)
- by SA1PR12MB7174.namprd12.prod.outlook.com (2603:10b6:806:2b1::22) with
+ bh=zFeEXIsjV1bM+HuNgTYXTXsciEtrO/SCK4YGdjn65k8=;
+ b=ZaOKtzUbqYhJ8J9wrHKu5ns+EmgBmj3OL8/Q2rpcAIuEA7iV3NFmLMF2MCUeIp1V1QEwsNGJKbfuR6lbK0kmDK8Mqs7B++Pykt+inxslobjBWNhQbTKy+KQC/9kbx/33g/3Bh9Iv/V2LwkGHb21EZfkQHn1bcbu3CW8BX3yLBoSFjCady2SBC6kDy29RRpcf26O/YzigFYhnjMuQzL+Acr3DAMPqQZxueKSGUelqfREq6l7NVE5lsapOekdzkY+tqsagilFO6T8hDHYpMAbwMbdTBtQCd4KZOastgGRfDim+yIfGFr2gb2sAF46z+7gopv+b5IUI2dv6Df4qBdN1MQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
+ by SJ1PR11MB6276.namprd11.prod.outlook.com (2603:10b6:a03:455::8) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.31; Mon, 25 Mar
- 2024 07:51:17 +0000
-Received: from CH1PEPF0000A346.namprd04.prod.outlook.com
- (2603:10b6:610:58:cafe::a2) by CH2PR20CA0008.outlook.office365.com
- (2603:10b6:610:58::18) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.13 via Frontend
- Transport; Mon, 25 Mar 2024 07:51:17 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CH1PEPF0000A346.mail.protection.outlook.com (10.167.244.11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.7409.10 via Frontend Transport; Mon, 25 Mar 2024 07:51:17 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.41; Mon, 25 Mar
- 2024 00:51:06 -0700
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.12; Mon, 25 Mar 2024 00:51:03 -0700
-From: Ido Schimmel <idosch@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<edumazet@google.com>, <razor@blackwall.org>,
-	<mirsad.todorovac@alu.unizg.hr>, Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net] selftests: vxlan_mdb: Fix failures with old libnet
-Date: Mon, 25 Mar 2024 09:50:30 +0200
-Message-ID: <20240325075030.2379513-1-idosch@nvidia.com>
-X-Mailer: git-send-email 2.43.0
+ 2024 07:50:43 +0000
+Received: from CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4434:a739:7bae:39a9]) by CYYPR11MB8429.namprd11.prod.outlook.com
+ ([fe80::4434:a739:7bae:39a9%2]) with mapi id 15.20.7409.028; Mon, 25 Mar 2024
+ 07:50:43 +0000
+From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
+To: ivecera <ivecera@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>, "moderated
+ list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, open list
+	<linux-kernel@vger.kernel.org>, "Chmielewski, Pawel"
+	<pawel.chmielewski@intel.com>, Eric Dumazet <edumazet@google.com>, "Nguyen,
+ Anthony L" <anthony.l.nguyen@intel.com>, Hugo Ferreira <hferreir@redhat.com>,
+	"Keller, Jacob E" <jacob.e.keller@intel.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>
+Subject: RE: [Intel-wired-lan] [PATCH net v4] i40e: Enforce software interrupt
+ during busy-poll exit
+Thread-Topic: [Intel-wired-lan] [PATCH net v4] i40e: Enforce software
+ interrupt during busy-poll exit
+Thread-Index: AQHad5aP/O1kkXJ750KzKIspJgdvRrFIIgRg
+Date: Mon, 25 Mar 2024 07:50:43 +0000
+Message-ID: <CYYPR11MB8429BAF4E7A862465F90302FBD362@CYYPR11MB8429.namprd11.prod.outlook.com>
+References: <20240316113830.230718-1-ivecera@redhat.com>
+In-Reply-To: <20240316113830.230718-1-ivecera@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|SJ1PR11MB6276:EE_
+x-ms-office365-filtering-correlation-id: 01ec98dc-af24-42da-1d61-08dc4ca04649
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: RCJRuHDa3XkKOAxbvN1T25ifgFcSoVkwu79B3wtN4VRjex5B02ndfrv5Pt33BuCcZqiYaMY8wDa66+0De6ZMeqJ1dj+zxCLXcmh0QS8SgdjH9+eyk16SpVItwNb3DnGDVdQLvgkeIHVTtly/U7/6OZ8dTspWRDUFZkPMdTldIMS5seqZy2abEw9hKulQSVS2cvXgSqMSC2nn22j9M4EH5I4o5elUz+li0U++Y7GA8b7IatgatTMAUYHvwBYrFP7x6lqqrs1hE0KW1Hs1D/NxfglO0qdOSt3oortkDpX5w3nNineQZCiQTUAuyMLLKxKozxmNd6gpQniEd9ViARgiWuMduH803rTO25JwMbbrBBBGN8TfZ9ZAdtcv5XYkXGucYmaZ2x4ykvgid/3nNRlAUu1Qy9pMQTQiZYCNPt0lKmiocmdcrmuNxHuy4wiqVoJVLxzGOHGqkv6LvJk7VV0ONfQqjD8llTs9DaXcgeMxwmkki3ub7i6EHlacffeNkHObYf77AGPov5LvK69J1kLUNOqhAZ2DtMeKCWP4ZYaD0KRmT5hRL5fYtN4QespQPRnbtJ0UG4+5gT9+qC9l+DZJd0vKEl0sQtI7PSQHUSBbGajsdDKH/3QwDcEtn4Tnnevh749aBk9HoMyqh+u4WjkAeXDSzyOFZ6C7DBY67HJwlC11rglwbitxb+SGCFmjIn8jBhvQA8wPTx259RgqeUTz8wfBEQYHrpSVEDHHeqCQBGw=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(376005)(366007)(1800799015)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?zqbRMTMC+QXDNt2tNURp3eS0pitsjZ5LD16R3QzK1miGJhG4Ki0tCnhV5e3E?=
+ =?us-ascii?Q?uBYYDtaLTdnrJr0Ylv8TRr3+yuU7kVHDr5KJ6IoX7FBwRLomHIb5+7HzctAP?=
+ =?us-ascii?Q?Q4RPjl+Z4P6KQSfdYQFyDEGNJdOa5+b2aDxTTHrcT3toOsDbN+Ilw7aO8Ez4?=
+ =?us-ascii?Q?bZHqLQscB5j0Pj8t0NIKMEZSam+D4SyHm7RsMBmrsbg64LPHG4vsneGVQ4cz?=
+ =?us-ascii?Q?9o3ZfxGboPVDmHdgquV2FGKPzVou1woovIzJzLSqWAlfhMZYfDktdLM8lz3v?=
+ =?us-ascii?Q?0Ht8bD7YwIiOkfpiOZTTUY2Zw5fn2mccvqr610Q02wMqtf5CH60fVE627ukd?=
+ =?us-ascii?Q?dmhdBCJitgTRm5g7qa6Pt3WX3x6dPsFilruRKP2UNYBcAQIVwTxmVLHKC1zL?=
+ =?us-ascii?Q?zyb/wgCSYG4da31tohnwCNG5CiEenh5sI+52NvENHoTF7ZJExeQ6NE+NmsYe?=
+ =?us-ascii?Q?CtInWMEUZ8a7yI78BoyL9gROQ4ldDycqk1kJJImibhEhjRtq07kRtHbOEGH/?=
+ =?us-ascii?Q?BVbte7PWkquMJiECwYTIqhH2Q/ZgyeajgITFGVQck+bkcIPFsFWljQIgqPcT?=
+ =?us-ascii?Q?9PiWTtR46k/CapM78LVKF+ZjLSRhNFKbECyS/NNnyrOItNFiQMGeH/Y6KLU+?=
+ =?us-ascii?Q?eRvblgZo2tnTLoPa8eqmr6EF2s2+LinJ3Oh/KbvRBAMzI/czhabrPEyAzg8/?=
+ =?us-ascii?Q?j1+uUbWAlR2kOw9gW+xotQl4o4mc5dlIsepP12XbjOHINEAdjOw6bkUMalXz?=
+ =?us-ascii?Q?et2/sEvQis6/2H6c3Xavq4eAtQSgVrCwkXjOD5JaNmXFnpIjxMmGJVPd5atx?=
+ =?us-ascii?Q?L5kCXyF172mHxb8aloGHDm6VQDO7oN38SFhjb0wL0oV7lMBZr5X7CEvgP8MP?=
+ =?us-ascii?Q?lg3fq5WdL6DK/7SjKzNwyxQ5gLKcKP1dtJ3Ou4WB4JZmPNfIAfrWwf/6a9vj?=
+ =?us-ascii?Q?1hmBmETKabQM+wcIeBBJwyBgHgtUE2jEupIAXnOugzNUsiHdvOJ6kiudoP/n?=
+ =?us-ascii?Q?lbtncc9SFMVpYcfiajtenKermOBlDNQ995EuokODL8PCBqKixnKD5HFtqB/C?=
+ =?us-ascii?Q?ajmH4cWMsdn0PTiyfGhr4XxTRWu6sM2fHs267jCVXcdc5JEOq0GzGQ+D+kDn?=
+ =?us-ascii?Q?SelJqS7mw1WbX+2/uKk/RAW10CBc9yYYbg8o7yZv6O8ij2uWNgtqTGL0prtp?=
+ =?us-ascii?Q?MjVL2fzbrgS13ZhDdVlfiKDeA20cEupBLoVHU3fvxP8HuHGRjpkRlcfFShMm?=
+ =?us-ascii?Q?t7IewNiO6QW2xEc056lbYugklnhUQPzXxcyZXKhuToUzvmoZHW1+1Cg5vr85?=
+ =?us-ascii?Q?Xjy/7Zyh8rMdwXnKwurrbE20UeCfjLcM3RtjDYs4BZHs+WsI5vyLIHGfa3HI?=
+ =?us-ascii?Q?TdScC2UpzYuUC7xxR+R8UiKeFDOOTzpi7f9Z49qG0219qUgOY62RadlroD26?=
+ =?us-ascii?Q?K6ewUSXeMcNaCkNJaufbrtNa2gtRFU1PB2TWSRMxf3qK1AXmsfNXiOcwm1pX?=
+ =?us-ascii?Q?h0qMadeJbuBqt3LDro9K6DfLuAnq98OljIWz96O47I/4K88mTRTIeqpw/EvP?=
+ =?us-ascii?Q?dcWC6aPxZ8JnU82nNaWOSK7Mqfp1713YjLG1cRqdj5w6h2xLMGBKKxp5Vlpf?=
+ =?us-ascii?Q?smvMYUV3Pzm+k1kJTQFy6NeObinYf7Y5oJ9nyalqqQT+WXm0RQoPF4XmiJnv?=
+ =?us-ascii?Q?cNNSqQ=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH1PEPF0000A346:EE_|SA1PR12MB7174:EE_
-X-MS-Office365-Filtering-Correlation-Id: e4cb4125-a39f-40a2-2869-08dc4ca05a4d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	EeJtux84pb5FxgbqEwUxJMYKqjRZIGA3K30uVuYSeO+ZeyxZYLeZYGXC//PKVDC9SwgSs3eOYXSKnV++OBd/b4WcV1Mg15wQNXRoG2EB3BUwZ436DgGkUY6+xgrCTv9kNLcRlIyiQK67uHSYoHYhvZvRqAq5cKqao9RBcZqycf1wlhN7L0wlQM0e0Uow5QokXdmgkas+eKgIrRQrhlRrNDMp9Gp9YD2WbL2XIgC49U/kpKRzn4ProkDJc3VkZZNdaZASfOSk2gsXT9o2H9OSwN6vF2zrJJVppJlARNMx+r+wjvr389ANtdw/ZZYeEwDmAQlYcHoZFh6uJxgxBvmNaydG8i5aR0Obmu9BDiBnaZOzgJ4WQnj9OxzXGiZwswEMk8RqBVBXSYqhMereHo+AvvZsC9CVaDewQHxGMXWCEny+eyMeLZ+IJkgHV+a8woRwoUv9qkXhNmud+OFDeyqcsJs8woijezmWz/FGOZImuB25V3IFRedoF+Du06vFi1+zbWC/4fRN71WkKI+gQepN0uOcytnx6rphGnkmSw2QfJZO5QcqTpzEgjcCfAiPTOPAGGN21K1eU9cHfbBwLCf7pkVjirHEQGQByG9bhmiKdehkaYo9EsVP+6qseOXPfrEm6HVXhmekuuQh8aVk30lE3mwNvwA2TqoXoNTqgIzEjZilL62z57z67eiSGfBcK0k1HZK810lbyzgj9RndkospbIZNsgR4EbwcW7ilj76LvAef/etnpn7f5iVl9QNnzWam
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230031)(1800799015)(36860700004)(376005)(82310400014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2024 07:51:17.1533
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8429.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 01ec98dc-af24-42da-1d61-08dc4ca04649
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2024 07:50:43.7315
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4cb4125-a39f-40a2-2869-08dc4ca05a4d
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH1PEPF0000A346.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7174
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: jKXZqnDKyF/fVaS+RLB9tEHGLn87T4PzlTE8ivxNVBF4fiitFMLoT445gByU1Uf5mw4cyTDVMfgFtthYF7DjkpRAORwDTsgN81GTi6w5ZWya39dqof3Kyx8bt9pBoRMh
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR11MB6276
+X-OriginatorOrg: intel.com
 
-Locally generated IP multicast packets (such as the ones used in the
-test) do not perform routing and simply egress the bound device.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of I=
+van Vecera
+> Sent: Saturday, March 16, 2024 5:08 PM
+> To: netdev@vger.kernel.org
+> Cc: Loktionov, Aleksandr <aleksandr.loktionov@intel.com>; moderated list:=
+INTEL ETHERNET DRIVERS <intel-wired-lan@lists.osuosl.org>; open list <linux=
+-kernel@vger.kernel.org>; Chmielewski, Pawel <pawel.chmielewski@intel.com>;=
+ Eric Dumazet <edumazet@google.com>; Nguyen, Anthony L <anthony.l.nguyen@in=
+tel.com>; Hugo Ferreira <hferreir@redhat.com>; Keller, Jacob E <jacob.e.kel=
+ler@intel.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redha=
+t.com>; David S. Miller <davem@davemloft.net>
+> Subject: [Intel-wired-lan] [PATCH net v4] i40e: Enforce software interrup=
+t during busy-poll exit
+>
+> As for ice bug fixed by commit b7306b42beaf ("ice: manage interrupts duri=
+ng poll exit") followed by commit 23be7075b318 ("ice: fix software generati=
+ng extra interrupts") I'm seeing the similar issue also with i40e driver.
+>
+> In certain situation when busy-loop is enabled together with adaptive coa=
+lescing, the driver occasionally misses that there are outstanding descript=
+ors to clean when exiting busy poll.
+>
+> Try to catch the remaining work by triggering a software interrupt when e=
+xiting busy poll. No extra interrupts will be generated when busy polling i=
+s not used.
+>
+> The issue was found when running sockperf ping-pong tcp test with adaptiv=
+e coalescing and busy poll enabled (50 as value busy_pool and busy_read sys=
+ctl knobs) and results in huge latency spikes with more than 100000us.
+>
+> The fix is inspired from the ice driver and do the following:
+> 1) During napi poll exit in case of busy-poll (napo_complete_done()
+>    returns false) this is recorded to q_vector that we were in busy
+>    loop.
+> 2) Extends i40e_buildreg_itr() to be able to add an enforced software
+>    interrupt into built value
+> 2) In i40e_update_enable_itr() enforces a software interrupt trigger
+>    if we are exiting busy poll to catch any pending clean-ups
+> 3) Reuses unused 3rd ITR (interrupt throttle) index and set it to
+>    20K interrupts per second to limit the number of these sw interrupts.
+>
+> Test results
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> Prior:
+> [root@dell-per640-07 net]# sockperf ping-pong -i 10.9.9.1 --tcp -m 1000 -=
+-mps=3Dmax -t 120
+> sockperf: =3D=3D version #3.10-no.git =3D=3D
+> sockperf[CLIENT] send on:sockperf: using recvfrom() to block on socket(s)
+>
+> [ 0] IP =3D 10.9.9.1        PORT =3D 11111 # TCP
+> sockperf: Warmup stage (sending a few dummy messages)...
+> sockperf: Starting test...
+> sockperf: Test end (interrupted by timer)
+> sockperf: Test ended
+> sockperf: [Total Run] RunTime=3D119.999 sec; Warm up time=3D400 msec; Sen=
+tMessages=3D2438563; ReceivedMessages=3D2438562
+> sockperf: =3D=3D=3D=3D=3D=3D=3D=3D=3D Printing statistics for Server No: =
+0
+> sockperf: [Valid Duration] RunTime=3D119.549 sec; SentMessages=3D2429473;=
+ ReceivedMessages=3D2429473
+> sockperf: =3D=3D=3D=3D> avg-latency=3D24.571 (std-dev=3D93.297, mean-ad=
+=3D4.904, median-ad=3D1.510, siqr=3D1.063, cv=3D3.797, std-error=3D0.060, 9=
+9.0% ci=3D[24.417, 24.725])
+> sockperf: # dropped messages =3D 0; # duplicated messages =3D 0; # out-of=
+-order messages =3D 0
+> sockperf: Summary: Latency is 24.571 usec
+> sockperf: Total 2429473 observations; each percentile contains 24294.73 o=
+bservations
+> sockperf: ---> <MAX> observation =3D 103294.331
+> sockperf: ---> percentile 99.999 =3D   45.633
+> sockperf: ---> percentile 99.990 =3D   37.013
+> sockperf: ---> percentile 99.900 =3D   35.910
+> sockperf: ---> percentile 99.000 =3D   33.390
+> sockperf: ---> percentile 90.000 =3D   28.626
+> sockperf: ---> percentile 75.000 =3D   27.741
+> sockperf: ---> percentile 50.000 =3D   26.743
+> sockperf: ---> percentile 25.000 =3D   25.614
+> sockperf: ---> <MIN> observation =3D   12.220
+>
+> After:
+> [root@dell-per640-07 net]# sockperf ping-pong -i 10.9.9.1 --tcp -m 1000 -=
+-mps=3Dmax -t 120
+> sockperf: =3D=3D version #3.10-no.git =3D=3D
+> sockperf[CLIENT] send on:sockperf: using recvfrom() to block on socket(s)
+>
+> [ 0] IP =3D 10.9.9.1        PORT =3D 11111 # TCP
+> sockperf: Warmup stage (sending a few dummy messages)...
+> sockperf: Starting test...
+> sockperf: Test end (interrupted by timer)
+> sockperf: Test ended
+> sockperf: [Total Run] RunTime=3D119.999 sec; Warm up time=3D400 msec; Sen=
+tMessages=3D2400055; ReceivedMessages=3D2400054
+> sockperf: =3D=3D=3D=3D=3D=3D=3D=3D=3D Printing statistics for Server No: =
+0
+> sockperf: [Valid Duration] RunTime=3D119.549 sec; SentMessages=3D2391186;=
+ ReceivedMessages=3D2391186
+> sockperf: =3D=3D=3D=3D> avg-latency=3D24.965 (std-dev=3D5.934, mean-ad=3D=
+4.642, median-ad=3D1.485, siqr=3D1.067, cv=3D0.238, std-error=3D0.004, 99.0=
+% ci=3D[24.955, 24.975])
+> sockperf: # dropped messages =3D 0; # duplicated messages =3D 0; # out-of=
+-order messages =3D 0
+> sockperf: Summary: Latency is 24.965 usec
+> sockperf: Total 2391186 observations; each percentile contains 23911.86 o=
+bservations
+> sockperf: ---> <MAX> observation =3D  195.841
+> sockperf: ---> percentile 99.999 =3D   45.026
+> sockperf: ---> percentile 99.990 =3D   39.009
+> sockperf: ---> percentile 99.900 =3D   35.922
+> sockperf: ---> percentile 99.000 =3D   33.482
+> sockperf: ---> percentile 90.000 =3D   28.902
+> sockperf: ---> percentile 75.000 =3D   27.821
+> sockperf: ---> percentile 50.000 =3D   26.860
+> sockperf: ---> percentile 25.000 =3D   25.685
+> sockperf: ---> <MIN> observation =3D   12.277
+>
+> Fixes: 0bcd952feec7 ("ethernet/intel: consolidate NAPI and NAPI exit")
+> Reported-by: Hugo Ferreira <hferreir@redhat.com>
+> Reviewed-by: Michal Schmidt <mschmidt@redhat.com>
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> ---
+> Changes since v3
+> - fixed kdoc warnings (thx Tony)
+> Changes since v2
+>  - eliminated two writes in hot-path (thx Jesse) Changes since v1
+>  - added Fixes: tag
+>
+>  drivers/net/ethernet/intel/i40e/i40e.h        |  1 +
+>  drivers/net/ethernet/intel/i40e/i40e_main.c   |  6 ++
+>  .../net/ethernet/intel/i40e/i40e_register.h   |  3 +
+>  drivers/net/ethernet/intel/i40e/i40e_txrx.c   | 82 ++++++++++++++-----
+>  drivers/net/ethernet/intel/i40e/i40e_txrx.h   |  1 +
+>  5 files changed, 72 insertions(+), 21 deletions(-)
+>
 
-However, as explained in commit 8bcfb4ae4d97 ("selftests: forwarding:
-Fix failing tests with old libnet"), old versions of libnet (used by
-mausezahn) do not use the "SO_BINDTODEVICE" socket option. Specifically,
-the library started using the option for IPv6 sockets in version 1.1.6
-and for IPv4 sockets in version 1.2. This explains why on Ubuntu - which
-uses version 1.1.6 - the IPv4 overlay tests are failing whereas the IPv6
-ones are passing.
-
-Fix by specifying the source and destination MAC of the packets which
-will cause mausezahn to use a packet socket instead of an IP socket.
-
-Fixes: 62199e3f1658 ("selftests: net: Add VXLAN MDB test")
-Reported-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-Closes: https://lore.kernel.org/netdev/5bb50349-196d-4892-8ed2-f37543aa863f@alu.unizg.hr/
-Tested-by: Mirsad Todorovac <mirsad.todorovac@alu.unizg.hr>
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
----
- tools/testing/selftests/net/test_vxlan_mdb.sh | 205 +++++++++++-------
- 1 file changed, 128 insertions(+), 77 deletions(-)
-
-diff --git a/tools/testing/selftests/net/test_vxlan_mdb.sh b/tools/testing/selftests/net/test_vxlan_mdb.sh
-index 74ff9fb2a6f0..58da5de99ac4 100755
---- a/tools/testing/selftests/net/test_vxlan_mdb.sh
-+++ b/tools/testing/selftests/net/test_vxlan_mdb.sh
-@@ -1177,6 +1177,7 @@ encap_params_common()
- 	local plen=$1; shift
- 	local enc_ethtype=$1; shift
- 	local grp=$1; shift
-+	local grp_dmac=$1; shift
- 	local src=$1; shift
- 	local mz=$1; shift
- 
-@@ -1195,11 +1196,11 @@ encap_params_common()
- 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp $grp permanent dst $vtep2_ip src_vni 10020"
- 
- 	run_cmd "tc -n $ns2 filter replace dev vx0 ingress pref 1 handle 101 proto all flower enc_dst_ip $vtep1_ip action pass"
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "Destination IP - match"
- 
--	run_cmd "ip netns exec $ns1 $mz br0.20 -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.20 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "Destination IP - no match"
- 
-@@ -1212,20 +1213,20 @@ encap_params_common()
- 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp $grp permanent dst $vtep1_ip dst_port 1111 src_vni 10020"
- 
- 	run_cmd "tc -n $ns2 filter replace dev veth0 ingress pref 1 handle 101 proto $enc_ethtype flower ip_proto udp dst_port 4789 action pass"
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev veth0 ingress" 101 1
- 	log_test $? 0 "Default destination port - match"
- 
--	run_cmd "ip netns exec $ns1 $mz br0.20 -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.20 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev veth0 ingress" 101 1
- 	log_test $? 0 "Default destination port - no match"
- 
- 	run_cmd "tc -n $ns2 filter replace dev veth0 ingress pref 1 handle 101 proto $enc_ethtype flower ip_proto udp dst_port 1111 action pass"
--	run_cmd "ip netns exec $ns1 $mz br0.20 -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.20 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev veth0 ingress" 101 1
- 	log_test $? 0 "Non-default destination port - match"
- 
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev veth0 ingress" 101 1
- 	log_test $? 0 "Non-default destination port - no match"
- 
-@@ -1238,11 +1239,11 @@ encap_params_common()
- 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp $grp permanent dst $vtep1_ip src_vni 10020"
- 
- 	run_cmd "tc -n $ns2 filter replace dev vx0 ingress pref 1 handle 101 proto all flower enc_key_id 10010 action pass"
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "Default destination VNI - match"
- 
--	run_cmd "ip netns exec $ns1 $mz br0.20 -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.20 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "Default destination VNI - no match"
- 
-@@ -1250,11 +1251,11 @@ encap_params_common()
- 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp $grp permanent dst $vtep1_ip vni 10010 src_vni 10020"
- 
- 	run_cmd "tc -n $ns2 filter replace dev vx0 ingress pref 1 handle 101 proto all flower enc_key_id 10020 action pass"
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "Non-default destination VNI - match"
- 
--	run_cmd "ip netns exec $ns1 $mz br0.20 -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.20 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "Non-default destination VNI - no match"
- 
-@@ -1272,6 +1273,7 @@ encap_params_ipv4_ipv4()
- 	local plen=32
- 	local enc_ethtype="ip"
- 	local grp=239.1.1.1
-+	local grp_dmac=01:00:5e:01:01:01
- 	local src=192.0.2.129
- 
- 	echo
-@@ -1279,7 +1281,7 @@ encap_params_ipv4_ipv4()
- 	echo "------------------------------------------------------------------"
- 
- 	encap_params_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $enc_ethtype \
--		$grp $src "mausezahn"
-+		$grp $grp_dmac $src "mausezahn"
- }
- 
- encap_params_ipv6_ipv4()
-@@ -1291,6 +1293,7 @@ encap_params_ipv6_ipv4()
- 	local plen=32
- 	local enc_ethtype="ip"
- 	local grp=ff0e::1
-+	local grp_dmac=33:33:00:00:00:01
- 	local src=2001:db8:100::1
- 
- 	echo
-@@ -1298,7 +1301,7 @@ encap_params_ipv6_ipv4()
- 	echo "------------------------------------------------------------------"
- 
- 	encap_params_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $enc_ethtype \
--		$grp $src "mausezahn -6"
-+		$grp $grp_dmac $src "mausezahn -6"
- }
- 
- encap_params_ipv4_ipv6()
-@@ -1310,6 +1313,7 @@ encap_params_ipv4_ipv6()
- 	local plen=128
- 	local enc_ethtype="ipv6"
- 	local grp=239.1.1.1
-+	local grp_dmac=01:00:5e:01:01:01
- 	local src=192.0.2.129
- 
- 	echo
-@@ -1317,7 +1321,7 @@ encap_params_ipv4_ipv6()
- 	echo "------------------------------------------------------------------"
- 
- 	encap_params_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $enc_ethtype \
--		$grp $src "mausezahn"
-+		$grp $grp_dmac $src "mausezahn"
- }
- 
- encap_params_ipv6_ipv6()
-@@ -1329,6 +1333,7 @@ encap_params_ipv6_ipv6()
- 	local plen=128
- 	local enc_ethtype="ipv6"
- 	local grp=ff0e::1
-+	local grp_dmac=33:33:00:00:00:01
- 	local src=2001:db8:100::1
- 
- 	echo
-@@ -1336,7 +1341,7 @@ encap_params_ipv6_ipv6()
- 	echo "------------------------------------------------------------------"
- 
- 	encap_params_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $enc_ethtype \
--		$grp $src "mausezahn -6"
-+		$grp $grp_dmac $src "mausezahn -6"
- }
- 
- starg_exclude_ir_common()
-@@ -1347,6 +1352,7 @@ starg_exclude_ir_common()
- 	local vtep2_ip=$1; shift
- 	local plen=$1; shift
- 	local grp=$1; shift
-+	local grp_dmac=$1; shift
- 	local valid_src=$1; shift
- 	local invalid_src=$1; shift
- 	local mz=$1; shift
-@@ -1368,14 +1374,14 @@ starg_exclude_ir_common()
- 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp $grp permanent filter_mode exclude source_list $invalid_src dst $vtep2_ip src_vni 10010"
- 
- 	# Check that invalid source is not forwarded to any VTEP.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $invalid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $invalid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 0
- 	log_test $? 0 "Block excluded source - first VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 102 0
- 	log_test $? 0 "Block excluded source - second VTEP"
- 
- 	# Check that valid source is forwarded to both VTEPs.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "Forward valid source - first VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 102 1
-@@ -1385,14 +1391,14 @@ starg_exclude_ir_common()
- 	run_cmd "bridge -n $ns1 mdb del dev vx0 port vx0 grp $grp dst $vtep2_ip src_vni 10010"
- 
- 	# Check that invalid source is not forwarded to any VTEP.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $invalid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $invalid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "Block excluded source after removal - first VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 102 1
- 	log_test $? 0 "Block excluded source after removal - second VTEP"
- 
- 	# Check that valid source is forwarded to the remaining VTEP.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 2
- 	log_test $? 0 "Forward valid source after removal - first VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 102 1
-@@ -1407,6 +1413,7 @@ starg_exclude_ir_ipv4_ipv4()
- 	local vtep2_ip=198.51.100.200
- 	local plen=32
- 	local grp=239.1.1.1
-+	local grp_dmac=01:00:5e:01:01:01
- 	local valid_src=192.0.2.129
- 	local invalid_src=192.0.2.145
- 
-@@ -1415,7 +1422,7 @@ starg_exclude_ir_ipv4_ipv4()
- 	echo "-------------------------------------------------------------"
- 
- 	starg_exclude_ir_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $grp \
--		$valid_src $invalid_src "mausezahn"
-+		$grp_dmac $valid_src $invalid_src "mausezahn"
- }
- 
- starg_exclude_ir_ipv6_ipv4()
-@@ -1426,6 +1433,7 @@ starg_exclude_ir_ipv6_ipv4()
- 	local vtep2_ip=198.51.100.200
- 	local plen=32
- 	local grp=ff0e::1
-+	local grp_dmac=33:33:00:00:00:01
- 	local valid_src=2001:db8:100::1
- 	local invalid_src=2001:db8:200::1
- 
-@@ -1434,7 +1442,7 @@ starg_exclude_ir_ipv6_ipv4()
- 	echo "-------------------------------------------------------------"
- 
- 	starg_exclude_ir_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $grp \
--		$valid_src $invalid_src "mausezahn -6"
-+		$grp_dmac $valid_src $invalid_src "mausezahn -6"
- }
- 
- starg_exclude_ir_ipv4_ipv6()
-@@ -1445,6 +1453,7 @@ starg_exclude_ir_ipv4_ipv6()
- 	local vtep2_ip=2001:db8:2000::1
- 	local plen=128
- 	local grp=239.1.1.1
-+	local grp_dmac=01:00:5e:01:01:01
- 	local valid_src=192.0.2.129
- 	local invalid_src=192.0.2.145
- 
-@@ -1453,7 +1462,7 @@ starg_exclude_ir_ipv4_ipv6()
- 	echo "-------------------------------------------------------------"
- 
- 	starg_exclude_ir_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $grp \
--		$valid_src $invalid_src "mausezahn"
-+		$grp_dmac $valid_src $invalid_src "mausezahn"
- }
- 
- starg_exclude_ir_ipv6_ipv6()
-@@ -1464,6 +1473,7 @@ starg_exclude_ir_ipv6_ipv6()
- 	local vtep2_ip=2001:db8:2000::1
- 	local plen=128
- 	local grp=ff0e::1
-+	local grp_dmac=33:33:00:00:00:01
- 	local valid_src=2001:db8:100::1
- 	local invalid_src=2001:db8:200::1
- 
-@@ -1472,7 +1482,7 @@ starg_exclude_ir_ipv6_ipv6()
- 	echo "-------------------------------------------------------------"
- 
- 	starg_exclude_ir_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $grp \
--		$valid_src $invalid_src "mausezahn -6"
-+		$grp_dmac $valid_src $invalid_src "mausezahn -6"
- }
- 
- starg_include_ir_common()
-@@ -1483,6 +1493,7 @@ starg_include_ir_common()
- 	local vtep2_ip=$1; shift
- 	local plen=$1; shift
- 	local grp=$1; shift
-+	local grp_dmac=$1; shift
- 	local valid_src=$1; shift
- 	local invalid_src=$1; shift
- 	local mz=$1; shift
-@@ -1504,14 +1515,14 @@ starg_include_ir_common()
- 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp $grp permanent filter_mode include source_list $valid_src dst $vtep2_ip src_vni 10010"
- 
- 	# Check that invalid source is not forwarded to any VTEP.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $invalid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $invalid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 0
- 	log_test $? 0 "Block excluded source - first VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 102 0
- 	log_test $? 0 "Block excluded source - second VTEP"
- 
- 	# Check that valid source is forwarded to both VTEPs.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "Forward valid source - first VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 102 1
-@@ -1521,14 +1532,14 @@ starg_include_ir_common()
- 	run_cmd "bridge -n $ns1 mdb del dev vx0 port vx0 grp $grp dst $vtep2_ip src_vni 10010"
- 
- 	# Check that invalid source is not forwarded to any VTEP.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $invalid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $invalid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "Block excluded source after removal - first VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 102 1
- 	log_test $? 0 "Block excluded source after removal - second VTEP"
- 
- 	# Check that valid source is forwarded to the remaining VTEP.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 2
- 	log_test $? 0 "Forward valid source after removal - first VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 102 1
-@@ -1543,6 +1554,7 @@ starg_include_ir_ipv4_ipv4()
- 	local vtep2_ip=198.51.100.200
- 	local plen=32
- 	local grp=239.1.1.1
-+	local grp_dmac=01:00:5e:01:01:01
- 	local valid_src=192.0.2.129
- 	local invalid_src=192.0.2.145
- 
-@@ -1551,7 +1563,7 @@ starg_include_ir_ipv4_ipv4()
- 	echo "-------------------------------------------------------------"
- 
- 	starg_include_ir_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $grp \
--		$valid_src $invalid_src "mausezahn"
-+		$grp_dmac $valid_src $invalid_src "mausezahn"
- }
- 
- starg_include_ir_ipv6_ipv4()
-@@ -1562,6 +1574,7 @@ starg_include_ir_ipv6_ipv4()
- 	local vtep2_ip=198.51.100.200
- 	local plen=32
- 	local grp=ff0e::1
-+	local grp_dmac=33:33:00:00:00:01
- 	local valid_src=2001:db8:100::1
- 	local invalid_src=2001:db8:200::1
- 
-@@ -1570,7 +1583,7 @@ starg_include_ir_ipv6_ipv4()
- 	echo "-------------------------------------------------------------"
- 
- 	starg_include_ir_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $grp \
--		$valid_src $invalid_src "mausezahn -6"
-+		$grp_dmac $valid_src $invalid_src "mausezahn -6"
- }
- 
- starg_include_ir_ipv4_ipv6()
-@@ -1581,6 +1594,7 @@ starg_include_ir_ipv4_ipv6()
- 	local vtep2_ip=2001:db8:2000::1
- 	local plen=128
- 	local grp=239.1.1.1
-+	local grp_dmac=01:00:5e:01:01:01
- 	local valid_src=192.0.2.129
- 	local invalid_src=192.0.2.145
- 
-@@ -1589,7 +1603,7 @@ starg_include_ir_ipv4_ipv6()
- 	echo "-------------------------------------------------------------"
- 
- 	starg_include_ir_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $grp \
--		$valid_src $invalid_src "mausezahn"
-+		$grp_dmac $valid_src $invalid_src "mausezahn"
- }
- 
- starg_include_ir_ipv6_ipv6()
-@@ -1600,6 +1614,7 @@ starg_include_ir_ipv6_ipv6()
- 	local vtep2_ip=2001:db8:2000::1
- 	local plen=128
- 	local grp=ff0e::1
-+	local grp_dmac=33:33:00:00:00:01
- 	local valid_src=2001:db8:100::1
- 	local invalid_src=2001:db8:200::1
- 
-@@ -1608,7 +1623,7 @@ starg_include_ir_ipv6_ipv6()
- 	echo "-------------------------------------------------------------"
- 
- 	starg_include_ir_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $grp \
--		$valid_src $invalid_src "mausezahn -6"
-+		$grp_dmac $valid_src $invalid_src "mausezahn -6"
- }
- 
- starg_exclude_p2mp_common()
-@@ -1618,6 +1633,7 @@ starg_exclude_p2mp_common()
- 	local mcast_grp=$1; shift
- 	local plen=$1; shift
- 	local grp=$1; shift
-+	local grp_dmac=$1; shift
- 	local valid_src=$1; shift
- 	local invalid_src=$1; shift
- 	local mz=$1; shift
-@@ -1635,12 +1651,12 @@ starg_exclude_p2mp_common()
- 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp $grp permanent filter_mode exclude source_list $invalid_src dst $mcast_grp src_vni 10010 via veth0"
- 
- 	# Check that invalid source is not forwarded.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $invalid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $invalid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 0
- 	log_test $? 0 "Block excluded source"
- 
- 	# Check that valid source is forwarded.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "Forward valid source"
- 
-@@ -1648,7 +1664,7 @@ starg_exclude_p2mp_common()
- 	run_cmd "ip -n $ns2 address del $mcast_grp/$plen dev veth0"
- 
- 	# Check that valid source is not received anymore.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "Receive of valid source after removal from group"
- }
-@@ -1660,6 +1676,7 @@ starg_exclude_p2mp_ipv4_ipv4()
- 	local mcast_grp=238.1.1.1
- 	local plen=32
- 	local grp=239.1.1.1
-+	local grp_dmac=01:00:5e:01:01:01
- 	local valid_src=192.0.2.129
- 	local invalid_src=192.0.2.145
- 
-@@ -1667,7 +1684,7 @@ starg_exclude_p2mp_ipv4_ipv4()
- 	echo "Data path: (*, G) EXCLUDE - P2MP - IPv4 overlay / IPv4 underlay"
- 	echo "---------------------------------------------------------------"
- 
--	starg_exclude_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp \
-+	starg_exclude_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp $grp_dmac \
- 		$valid_src $invalid_src "mausezahn"
- }
- 
-@@ -1678,6 +1695,7 @@ starg_exclude_p2mp_ipv6_ipv4()
- 	local mcast_grp=238.1.1.1
- 	local plen=32
- 	local grp=ff0e::1
-+	local grp_dmac=33:33:00:00:00:01
- 	local valid_src=2001:db8:100::1
- 	local invalid_src=2001:db8:200::1
- 
-@@ -1685,7 +1703,7 @@ starg_exclude_p2mp_ipv6_ipv4()
- 	echo "Data path: (*, G) EXCLUDE - P2MP - IPv6 overlay / IPv4 underlay"
- 	echo "---------------------------------------------------------------"
- 
--	starg_exclude_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp \
-+	starg_exclude_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp $grp_dmac \
- 		$valid_src $invalid_src "mausezahn -6"
- }
- 
-@@ -1696,6 +1714,7 @@ starg_exclude_p2mp_ipv4_ipv6()
- 	local mcast_grp=ff0e::2
- 	local plen=128
- 	local grp=239.1.1.1
-+	local grp_dmac=01:00:5e:01:01:01
- 	local valid_src=192.0.2.129
- 	local invalid_src=192.0.2.145
- 
-@@ -1703,7 +1722,7 @@ starg_exclude_p2mp_ipv4_ipv6()
- 	echo "Data path: (*, G) EXCLUDE - P2MP - IPv4 overlay / IPv6 underlay"
- 	echo "---------------------------------------------------------------"
- 
--	starg_exclude_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp \
-+	starg_exclude_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp $grp_dmac \
- 		$valid_src $invalid_src "mausezahn"
- }
- 
-@@ -1714,6 +1733,7 @@ starg_exclude_p2mp_ipv6_ipv6()
- 	local mcast_grp=ff0e::2
- 	local plen=128
- 	local grp=ff0e::1
-+	local grp_dmac=33:33:00:00:00:01
- 	local valid_src=2001:db8:100::1
- 	local invalid_src=2001:db8:200::1
- 
-@@ -1721,7 +1741,7 @@ starg_exclude_p2mp_ipv6_ipv6()
- 	echo "Data path: (*, G) EXCLUDE - P2MP - IPv6 overlay / IPv6 underlay"
- 	echo "---------------------------------------------------------------"
- 
--	starg_exclude_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp \
-+	starg_exclude_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp $grp_dmac \
- 		$valid_src $invalid_src "mausezahn -6"
- }
- 
-@@ -1732,6 +1752,7 @@ starg_include_p2mp_common()
- 	local mcast_grp=$1; shift
- 	local plen=$1; shift
- 	local grp=$1; shift
-+	local grp_dmac=$1; shift
- 	local valid_src=$1; shift
- 	local invalid_src=$1; shift
- 	local mz=$1; shift
-@@ -1749,12 +1770,12 @@ starg_include_p2mp_common()
- 	run_cmd "bridge -n $ns1 mdb replace dev vx0 port vx0 grp $grp permanent filter_mode include source_list $valid_src dst $mcast_grp src_vni 10010 via veth0"
- 
- 	# Check that invalid source is not forwarded.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $invalid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $invalid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 0
- 	log_test $? 0 "Block excluded source"
- 
- 	# Check that valid source is forwarded.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "Forward valid source"
- 
-@@ -1762,7 +1783,7 @@ starg_include_p2mp_common()
- 	run_cmd "ip -n $ns2 address del $mcast_grp/$plen dev veth0"
- 
- 	# Check that valid source is not received anymore.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $valid_src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "Receive of valid source after removal from group"
- }
-@@ -1774,6 +1795,7 @@ starg_include_p2mp_ipv4_ipv4()
- 	local mcast_grp=238.1.1.1
- 	local plen=32
- 	local grp=239.1.1.1
-+	local grp_dmac=01:00:5e:01:01:01
- 	local valid_src=192.0.2.129
- 	local invalid_src=192.0.2.145
- 
-@@ -1781,7 +1803,7 @@ starg_include_p2mp_ipv4_ipv4()
- 	echo "Data path: (*, G) INCLUDE - P2MP - IPv4 overlay / IPv4 underlay"
- 	echo "---------------------------------------------------------------"
- 
--	starg_include_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp \
-+	starg_include_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp $grp_dmac \
- 		$valid_src $invalid_src "mausezahn"
- }
- 
-@@ -1792,6 +1814,7 @@ starg_include_p2mp_ipv6_ipv4()
- 	local mcast_grp=238.1.1.1
- 	local plen=32
- 	local grp=ff0e::1
-+	local grp_dmac=33:33:00:00:00:01
- 	local valid_src=2001:db8:100::1
- 	local invalid_src=2001:db8:200::1
- 
-@@ -1799,7 +1822,7 @@ starg_include_p2mp_ipv6_ipv4()
- 	echo "Data path: (*, G) INCLUDE - P2MP - IPv6 overlay / IPv4 underlay"
- 	echo "---------------------------------------------------------------"
- 
--	starg_include_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp \
-+	starg_include_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp $grp_dmac \
- 		$valid_src $invalid_src "mausezahn -6"
- }
- 
-@@ -1810,6 +1833,7 @@ starg_include_p2mp_ipv4_ipv6()
- 	local mcast_grp=ff0e::2
- 	local plen=128
- 	local grp=239.1.1.1
-+	local grp_dmac=01:00:5e:01:01:01
- 	local valid_src=192.0.2.129
- 	local invalid_src=192.0.2.145
- 
-@@ -1817,7 +1841,7 @@ starg_include_p2mp_ipv4_ipv6()
- 	echo "Data path: (*, G) INCLUDE - P2MP - IPv4 overlay / IPv6 underlay"
- 	echo "---------------------------------------------------------------"
- 
--	starg_include_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp \
-+	starg_include_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp $grp_dmac \
- 		$valid_src $invalid_src "mausezahn"
- }
- 
-@@ -1828,6 +1852,7 @@ starg_include_p2mp_ipv6_ipv6()
- 	local mcast_grp=ff0e::2
- 	local plen=128
- 	local grp=ff0e::1
-+	local grp_dmac=33:33:00:00:00:01
- 	local valid_src=2001:db8:100::1
- 	local invalid_src=2001:db8:200::1
- 
-@@ -1835,7 +1860,7 @@ starg_include_p2mp_ipv6_ipv6()
- 	echo "Data path: (*, G) INCLUDE - P2MP - IPv6 overlay / IPv6 underlay"
- 	echo "---------------------------------------------------------------"
- 
--	starg_include_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp \
-+	starg_include_p2mp_common $ns1 $ns2 $mcast_grp $plen $grp $grp_dmac \
- 		$valid_src $invalid_src "mausezahn -6"
- }
- 
-@@ -1847,6 +1872,7 @@ egress_vni_translation_common()
- 	local plen=$1; shift
- 	local proto=$1; shift
- 	local grp=$1; shift
-+	local grp_dmac=$1; shift
- 	local src=$1; shift
- 	local mz=$1; shift
- 
-@@ -1882,20 +1908,20 @@ egress_vni_translation_common()
- 	# Make sure that packets sent from the first VTEP over VLAN 10 are
- 	# received by the SVI corresponding to the L3VNI (14000 / VLAN 4000) on
- 	# the second VTEP, since it is configured as PVID.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev br0.4000 ingress" 101 1
- 	log_test $? 0 "Egress VNI translation - PVID configured"
- 
- 	# Remove PVID flag from VLAN 4000 on the second VTEP and make sure
- 	# packets are no longer received by the SVI interface.
- 	run_cmd "bridge -n $ns2 vlan add vid 4000 dev vx0"
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev br0.4000 ingress" 101 1
- 	log_test $? 0 "Egress VNI translation - no PVID configured"
- 
- 	# Reconfigure the PVID and make sure packets are received again.
- 	run_cmd "bridge -n $ns2 vlan add vid 4000 dev vx0 pvid"
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev br0.4000 ingress" 101 2
- 	log_test $? 0 "Egress VNI translation - PVID reconfigured"
- }
-@@ -1908,6 +1934,7 @@ egress_vni_translation_ipv4_ipv4()
- 	local plen=32
- 	local proto="ipv4"
- 	local grp=239.1.1.1
-+	local grp_dmac=01:00:5e:01:01:01
- 	local src=192.0.2.129
- 
- 	echo
-@@ -1915,7 +1942,7 @@ egress_vni_translation_ipv4_ipv4()
- 	echo "----------------------------------------------------------------"
- 
- 	egress_vni_translation_common $ns1 $ns2 $mcast_grp $plen $proto $grp \
--		$src "mausezahn"
-+		$grp_dmac $src "mausezahn"
- }
- 
- egress_vni_translation_ipv6_ipv4()
-@@ -1926,6 +1953,7 @@ egress_vni_translation_ipv6_ipv4()
- 	local plen=32
- 	local proto="ipv6"
- 	local grp=ff0e::1
-+	local grp_dmac=33:33:00:00:00:01
- 	local src=2001:db8:100::1
- 
- 	echo
-@@ -1933,7 +1961,7 @@ egress_vni_translation_ipv6_ipv4()
- 	echo "----------------------------------------------------------------"
- 
- 	egress_vni_translation_common $ns1 $ns2 $mcast_grp $plen $proto $grp \
--		$src "mausezahn -6"
-+		$grp_dmac $src "mausezahn -6"
- }
- 
- egress_vni_translation_ipv4_ipv6()
-@@ -1944,6 +1972,7 @@ egress_vni_translation_ipv4_ipv6()
- 	local plen=128
- 	local proto="ipv4"
- 	local grp=239.1.1.1
-+	local grp_dmac=01:00:5e:01:01:01
- 	local src=192.0.2.129
- 
- 	echo
-@@ -1951,7 +1980,7 @@ egress_vni_translation_ipv4_ipv6()
- 	echo "----------------------------------------------------------------"
- 
- 	egress_vni_translation_common $ns1 $ns2 $mcast_grp $plen $proto $grp \
--		$src "mausezahn"
-+		$grp_dmac $src "mausezahn"
- }
- 
- egress_vni_translation_ipv6_ipv6()
-@@ -1962,6 +1991,7 @@ egress_vni_translation_ipv6_ipv6()
- 	local plen=128
- 	local proto="ipv6"
- 	local grp=ff0e::1
-+	local grp_dmac=33:33:00:00:00:01
- 	local src=2001:db8:100::1
- 
- 	echo
-@@ -1969,7 +1999,7 @@ egress_vni_translation_ipv6_ipv6()
- 	echo "----------------------------------------------------------------"
- 
- 	egress_vni_translation_common $ns1 $ns2 $mcast_grp $plen $proto $grp \
--		$src "mausezahn -6"
-+		$grp_dmac $src "mausezahn -6"
- }
- 
- all_zeros_mdb_common()
-@@ -1982,12 +2012,18 @@ all_zeros_mdb_common()
- 	local vtep4_ip=$1; shift
- 	local plen=$1; shift
- 	local ipv4_grp=239.1.1.1
-+	local ipv4_grp_dmac=01:00:5e:01:01:01
- 	local ipv4_unreg_grp=239.2.2.2
-+	local ipv4_unreg_grp_dmac=01:00:5e:02:02:02
- 	local ipv4_ll_grp=224.0.0.100
-+	local ipv4_ll_grp_dmac=01:00:5e:00:00:64
- 	local ipv4_src=192.0.2.129
- 	local ipv6_grp=ff0e::1
-+	local ipv6_grp_dmac=33:33:00:00:00:01
- 	local ipv6_unreg_grp=ff0e::2
-+	local ipv6_unreg_grp_dmac=33:33:00:00:00:02
- 	local ipv6_ll_grp=ff02::1
-+	local ipv6_ll_grp_dmac=33:33:00:00:00:01
- 	local ipv6_src=2001:db8:100::1
- 
- 	# Install all-zeros (catchall) MDB entries for IPv4 and IPv6 traffic
-@@ -2023,7 +2059,7 @@ all_zeros_mdb_common()
- 
- 	# Send registered IPv4 multicast and make sure it only arrives to the
- 	# first VTEP.
--	run_cmd "ip netns exec $ns1 mausezahn br0.10 -A $ipv4_src -B $ipv4_grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 mausezahn br0.10 -a own -b $ipv4_grp_dmac -A $ipv4_src -B $ipv4_grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "Registered IPv4 multicast - first VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 102 0
-@@ -2031,7 +2067,7 @@ all_zeros_mdb_common()
- 
- 	# Send unregistered IPv4 multicast that is not link-local and make sure
- 	# it arrives to the first and second VTEPs.
--	run_cmd "ip netns exec $ns1 mausezahn br0.10 -A $ipv4_src -B $ipv4_unreg_grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 mausezahn br0.10 -a own -b $ipv4_unreg_grp_dmac -A $ipv4_src -B $ipv4_unreg_grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 2
- 	log_test $? 0 "Unregistered IPv4 multicast - first VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 102 1
-@@ -2039,7 +2075,7 @@ all_zeros_mdb_common()
- 
- 	# Send IPv4 link-local multicast traffic and make sure it does not
- 	# arrive to any VTEP.
--	run_cmd "ip netns exec $ns1 mausezahn br0.10 -A $ipv4_src -B $ipv4_ll_grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 mausezahn br0.10 -a own -b $ipv4_ll_grp_dmac -A $ipv4_src -B $ipv4_ll_grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 2
- 	log_test $? 0 "Link-local IPv4 multicast - first VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 102 1
-@@ -2074,7 +2110,7 @@ all_zeros_mdb_common()
- 
- 	# Send registered IPv6 multicast and make sure it only arrives to the
- 	# third VTEP.
--	run_cmd "ip netns exec $ns1 mausezahn -6 br0.10 -A $ipv6_src -B $ipv6_grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 mausezahn -6 br0.10 -a own -b $ipv6_grp_dmac -A $ipv6_src -B $ipv6_grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 103 1
- 	log_test $? 0 "Registered IPv6 multicast - third VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 104 0
-@@ -2082,7 +2118,7 @@ all_zeros_mdb_common()
- 
- 	# Send unregistered IPv6 multicast that is not link-local and make sure
- 	# it arrives to the third and fourth VTEPs.
--	run_cmd "ip netns exec $ns1 mausezahn -6 br0.10 -A $ipv6_src -B $ipv6_unreg_grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 mausezahn -6 br0.10 -a own -b $ipv6_unreg_grp_dmac -A $ipv6_src -B $ipv6_unreg_grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 103 2
- 	log_test $? 0 "Unregistered IPv6 multicast - third VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 104 1
-@@ -2090,7 +2126,7 @@ all_zeros_mdb_common()
- 
- 	# Send IPv6 link-local multicast traffic and make sure it does not
- 	# arrive to any VTEP.
--	run_cmd "ip netns exec $ns1 mausezahn -6 br0.10 -A $ipv6_src -B $ipv6_ll_grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 mausezahn -6 br0.10 -a own -b $ipv6_ll_grp_dmac -A $ipv6_src -B $ipv6_ll_grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 103 2
- 	log_test $? 0 "Link-local IPv6 multicast - third VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 104 1
-@@ -2165,6 +2201,7 @@ mdb_fdb_common()
- 	local plen=$1; shift
- 	local proto=$1; shift
- 	local grp=$1; shift
-+	local grp_dmac=$1; shift
- 	local src=$1; shift
- 	local mz=$1; shift
- 
-@@ -2188,7 +2225,7 @@ mdb_fdb_common()
- 
- 	# Send IP multicast traffic and make sure it is forwarded by the MDB
- 	# and only arrives to the first VTEP.
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "IP multicast - first VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 102 0
-@@ -2205,7 +2242,7 @@ mdb_fdb_common()
- 	# Remove the MDB entry and make sure that IP multicast is now forwarded
- 	# by the FDB to the second VTEP.
- 	run_cmd "bridge -n $ns1 mdb del dev vx0 port vx0 grp $grp dst $vtep1_ip src_vni 10010"
--	run_cmd "ip netns exec $ns1 $mz br0.10 -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
-+	run_cmd "ip netns exec $ns1 $mz br0.10 -a own -b $grp_dmac -A $src -B $grp -t udp sp=12345,dp=54321 -p 100 -c 1 -q"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 101 1
- 	log_test $? 0 "IP multicast after removal - first VTEP"
- 	tc_check_packets "$ns2" "dev vx0 ingress" 102 2
-@@ -2221,14 +2258,15 @@ mdb_fdb_ipv4_ipv4()
- 	local plen=32
- 	local proto="ipv4"
- 	local grp=239.1.1.1
-+	local grp_dmac=01:00:5e:01:01:01
- 	local src=192.0.2.129
- 
- 	echo
- 	echo "Data path: MDB with FDB - IPv4 overlay / IPv4 underlay"
- 	echo "------------------------------------------------------"
- 
--	mdb_fdb_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $proto $grp $src \
--		"mausezahn"
-+	mdb_fdb_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $proto $grp \
-+		$grp_dmac $src "mausezahn"
- }
- 
- mdb_fdb_ipv6_ipv4()
-@@ -2240,14 +2278,15 @@ mdb_fdb_ipv6_ipv4()
- 	local plen=32
- 	local proto="ipv6"
- 	local grp=ff0e::1
-+	local grp_dmac=33:33:00:00:00:01
- 	local src=2001:db8:100::1
- 
- 	echo
- 	echo "Data path: MDB with FDB - IPv6 overlay / IPv4 underlay"
- 	echo "------------------------------------------------------"
- 
--	mdb_fdb_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $proto $grp $src \
--		"mausezahn -6"
-+	mdb_fdb_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $proto $grp \
-+		$grp_dmac $src "mausezahn -6"
- }
- 
- mdb_fdb_ipv4_ipv6()
-@@ -2259,14 +2298,15 @@ mdb_fdb_ipv4_ipv6()
- 	local plen=128
- 	local proto="ipv4"
- 	local grp=239.1.1.1
-+	local grp_dmac=01:00:5e:01:01:01
- 	local src=192.0.2.129
- 
- 	echo
- 	echo "Data path: MDB with FDB - IPv4 overlay / IPv6 underlay"
- 	echo "------------------------------------------------------"
- 
--	mdb_fdb_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $proto $grp $src \
--		"mausezahn"
-+	mdb_fdb_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $proto $grp \
-+		$grp_dmac $src "mausezahn"
- }
- 
- mdb_fdb_ipv6_ipv6()
-@@ -2278,14 +2318,15 @@ mdb_fdb_ipv6_ipv6()
- 	local plen=128
- 	local proto="ipv6"
- 	local grp=ff0e::1
-+	local grp_dmac=33:33:00:00:00:01
- 	local src=2001:db8:100::1
- 
- 	echo
- 	echo "Data path: MDB with FDB - IPv6 overlay / IPv6 underlay"
- 	echo "------------------------------------------------------"
- 
--	mdb_fdb_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $proto $grp $src \
--		"mausezahn -6"
-+	mdb_fdb_common $ns1 $ns2 $vtep1_ip $vtep2_ip $plen $proto $grp \
-+		$grp_dmac $src "mausezahn -6"
- }
- 
- mdb_grp1_loop()
-@@ -2320,7 +2361,9 @@ mdb_torture_common()
- 	local vtep1_ip=$1; shift
- 	local vtep2_ip=$1; shift
- 	local grp1=$1; shift
-+	local grp1_dmac=$1; shift
- 	local grp2=$1; shift
-+	local grp2_dmac=$1; shift
- 	local src=$1; shift
- 	local mz=$1; shift
- 	local pid1
-@@ -2345,9 +2388,9 @@ mdb_torture_common()
- 	pid1=$!
- 	mdb_grp2_loop $ns1 $vtep1_ip $vtep2_ip $grp2 &
- 	pid2=$!
--	ip netns exec $ns1 $mz br0.10 -A $src -B $grp1 -t udp sp=12345,dp=54321 -p 100 -c 0 -q &
-+	ip netns exec $ns1 $mz br0.10 -a own -b $grp1_dmac -A $src -B $grp1 -t udp sp=12345,dp=54321 -p 100 -c 0 -q &
- 	pid3=$!
--	ip netns exec $ns1 $mz br0.10 -A $src -B $grp2 -t udp sp=12345,dp=54321 -p 100 -c 0 -q &
-+	ip netns exec $ns1 $mz br0.10 -a own -b $grp2_dmac -A $src -B $grp2 -t udp sp=12345,dp=54321 -p 100 -c 0 -q &
- 	pid4=$!
- 
- 	sleep 30
-@@ -2363,15 +2406,17 @@ mdb_torture_ipv4_ipv4()
- 	local vtep1_ip=198.51.100.100
- 	local vtep2_ip=198.51.100.200
- 	local grp1=239.1.1.1
-+	local grp1_dmac=01:00:5e:01:01:01
- 	local grp2=239.2.2.2
-+	local grp2_dmac=01:00:5e:02:02:02
- 	local src=192.0.2.129
- 
- 	echo
- 	echo "Data path: MDB torture test - IPv4 overlay / IPv4 underlay"
- 	echo "----------------------------------------------------------"
- 
--	mdb_torture_common $ns1 $vtep1_ip $vtep2_ip $grp1 $grp2 $src \
--		"mausezahn"
-+	mdb_torture_common $ns1 $vtep1_ip $vtep2_ip $grp1 $grp1_dmac $grp2 \
-+		$grp2_dmac $src "mausezahn"
- }
- 
- mdb_torture_ipv6_ipv4()
-@@ -2380,15 +2425,17 @@ mdb_torture_ipv6_ipv4()
- 	local vtep1_ip=198.51.100.100
- 	local vtep2_ip=198.51.100.200
- 	local grp1=ff0e::1
-+	local grp1_dmac=33:33:00:00:00:01
- 	local grp2=ff0e::2
-+	local grp2_dmac=33:33:00:00:00:02
- 	local src=2001:db8:100::1
- 
- 	echo
- 	echo "Data path: MDB torture test - IPv6 overlay / IPv4 underlay"
- 	echo "----------------------------------------------------------"
- 
--	mdb_torture_common $ns1 $vtep1_ip $vtep2_ip $grp1 $grp2 $src \
--		"mausezahn -6"
-+	mdb_torture_common $ns1 $vtep1_ip $vtep2_ip $grp1 $grp1_dmac $grp2 \
-+		$grp2_dmac $src "mausezahn -6"
- }
- 
- mdb_torture_ipv4_ipv6()
-@@ -2397,15 +2444,17 @@ mdb_torture_ipv4_ipv6()
- 	local vtep1_ip=2001:db8:1000::1
- 	local vtep2_ip=2001:db8:2000::1
- 	local grp1=239.1.1.1
-+	local grp1_dmac=01:00:5e:01:01:01
- 	local grp2=239.2.2.2
-+	local grp2_dmac=01:00:5e:02:02:02
- 	local src=192.0.2.129
- 
- 	echo
- 	echo "Data path: MDB torture test - IPv4 overlay / IPv6 underlay"
- 	echo "----------------------------------------------------------"
- 
--	mdb_torture_common $ns1 $vtep1_ip $vtep2_ip $grp1 $grp2 $src \
--		"mausezahn"
-+	mdb_torture_common $ns1 $vtep1_ip $vtep2_ip $grp1 $grp1_dmac $grp2 \
-+		$grp2_dmac $src "mausezahn"
- }
- 
- mdb_torture_ipv6_ipv6()
-@@ -2414,15 +2463,17 @@ mdb_torture_ipv6_ipv6()
- 	local vtep1_ip=2001:db8:1000::1
- 	local vtep2_ip=2001:db8:2000::1
- 	local grp1=ff0e::1
-+	local grp1_dmac=33:33:00:00:00:01
- 	local grp2=ff0e::2
-+	local grp2_dmac=33:33:00:00:00:02
- 	local src=2001:db8:100::1
- 
- 	echo
- 	echo "Data path: MDB torture test - IPv6 overlay / IPv6 underlay"
- 	echo "----------------------------------------------------------"
- 
--	mdb_torture_common $ns1 $vtep1_ip $vtep2_ip $grp1 $grp2 $src \
--		"mausezahn -6"
-+	mdb_torture_common $ns1 $vtep1_ip $vtep2_ip $grp1 $grp1_dmac $grp2 \
-+		$grp2_dmac $src "mausezahn -6"
- }
- 
- ################################################################################
--- 
-2.43.0
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
+ntingent worker at Intel)
 
 
