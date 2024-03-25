@@ -1,405 +1,237 @@
-Return-Path: <netdev+bounces-81655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF12E88A9FC
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:48:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6FBE88AA3E
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:54:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E2C991C2EBA5
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:48:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA29D1C2CDB4
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09B9B748A;
-	Mon, 25 Mar 2024 15:04:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55CC971741;
+	Mon, 25 Mar 2024 15:15:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XbErhIOz"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A1U1RgMy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E23179CD;
-	Mon, 25 Mar 2024 15:04:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0706BB37
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 15:15:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711379097; cv=none; b=IZtftQXbalqVwLlQAha0AakeMW9UjJ9Iv4gJk3+/HVeL42fwJ/ff6n7f4B3cEtPtLbHRxVcQ+vXZS5ymoByQtN7J+xozmimHO5Aa4EX203qY/qGG+zS86ryJ+4rxVW+Hi3y3R9Cc/TY5kA1e1abrXJEi+Fz3OOijGCfbEuXHKvc=
+	t=1711379733; cv=none; b=AVVaVmOmCrrrMB8Jk99nqpvaJohj++kofJHBVusUjKxcEYl5FLzMoxv24cg7gYo34/VN/eh/y8PJkkqtW0MrLH0UVbEsvSeMYmK8MY1KnL2eoguilemO1svOR/EQiBpAdJAWk4PHsenKH8i4GdkOinoL8mKGh6YGWkzkjimX4m4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711379097; c=relaxed/simple;
-	bh=llbW1zEuQ8ZP6tzdb+lMBFGFfOB7sgRP8pFPM8tlm4k=;
-	h=Date:From:To:Cc:Subject:Message-ID; b=gSugPq5vt2Z/iQBOwxQAnQRnJlA1TUQDsJmAxE8e8B9mFz0CtCqF9jg/UQWn7AVv3gjmrVE5y2D7cPMR8QQpdz5239C4eoQA84cpbRe40TyEoAf0yumudzlmIY8AU3opPR6UnVvWdeBLy8Mbb5nCR7OQ0aW47tPCXQw2+bziCs8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XbErhIOz; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711379094; x=1742915094;
-  h=date:from:to:cc:subject:message-id;
-  bh=llbW1zEuQ8ZP6tzdb+lMBFGFfOB7sgRP8pFPM8tlm4k=;
-  b=XbErhIOzUIOUsvixtGLEDjpTiIZgk4F+Q5uZ7KMG5iAIWgcQzj+bkKXw
-   q9ZXJSQ+EFz+NFmEnplYMu1iYPbeYOWg5qQnMj6doNdLCpavANHcjmT0X
-   LZbgA1YP+30K5YiMhMyv034SevhBb0bAUA+w0ldAcgqmZVcynVQglyOKb
-   oWdNnJyATyX/HFAJnpJReV43tgk6ozvX7ykp+kYx2IZiHhBVgQp91lVbl
-   gyMM7dZ+833UPLNRc3ePh3ZgflRJ56VDtWrJPkRTlaqKLMaWHw3/KOmMp
-   /uyDtgb3SGpn8+0xIqG1AKq66EG1HrR0lTcOImtVIUVfmJtRQAlUeF80s
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11023"; a="6250708"
-X-IronPort-AV: E=Sophos;i="6.07,153,1708416000"; 
-   d="scan'208";a="6250708"
-Received: from orviesa007.jf.intel.com ([10.64.159.147])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 08:04:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,153,1708416000"; 
-   d="scan'208";a="16043244"
-Received: from lkp-server01.sh.intel.com (HELO b21307750695) ([10.239.97.150])
-  by orviesa007.jf.intel.com with ESMTP; 25 Mar 2024 08:04:51 -0700
-Received: from kbuild by b21307750695 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rolsX-000MeA-1I;
-	Mon, 25 Mar 2024 15:04:49 +0000
-Date: Mon, 25 Mar 2024 23:04:19 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Linux Memory Management List <linux-mm@kvack.org>,
- bpf@vger.kernel.org, linux-mtd@lists.infradead.org,
- linux-omap@vger.kernel.org, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: [linux-next:master] BUILD REGRESSION
- 1fdad13606e104ff103ca19d2d660830cb36d43e
-Message-ID: <202403252312.IByykxpw-lkp@intel.com>
-User-Agent: s-nail v14.9.24
+	s=arc-20240116; t=1711379733; c=relaxed/simple;
+	bh=kPlMSaMqo39hTPJCm+rG6l2qBNgpVeSsC7Q20ufapqs=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=QLLl4MQW944jEhrzRiaIUdqQafP14n12jDqjMAnaTiKvobMBCOLODfhKGQQPuwF85v+Te+DFUozqNmu/47Htph9NmFHi8ZQ1tcC3r3r2K50hwICknqoyAyC5isCG8yqMGyVeyb9GXkJaUuIETxCfSV23ezpsaZvlYDtfA5cIQbE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A1U1RgMy; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711379730;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=k81rqq4hzeq4pWvLawuIvbOKMKqt9JCn+dSEFmJ+o2Q=;
+	b=A1U1RgMylqiE4tMU7/VgKDAfS6U48jUyixkq9fWaoqjJE7+fHP3G4ICShR9Eag1s/Ak/+f
+	ZpN49AHQig9it3i4pb6NKkobgVKiWSPP8Pd+JN0FF+ycIMSSZyCrMULjLLgBLBsoG5Zjia
+	yoo3n/2igAh0JCyUeN2D4/wpch2TJRc=
+Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
+ [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-644-2Mr78vQkMfeQWg7ofgCNSQ-1; Mon, 25 Mar 2024 11:15:28 -0400
+X-MC-Unique: 2Mr78vQkMfeQWg7ofgCNSQ-1
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-341c449d7beso286574f8f.1
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 08:15:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711379727; x=1711984527;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=k81rqq4hzeq4pWvLawuIvbOKMKqt9JCn+dSEFmJ+o2Q=;
+        b=oLhAQpjXfGjgG11HzyLKDdF526YUTxJjI/ecrcFUrRohPpJGF5h762eS1Yh8BH1y1K
+         udENolOZ6b+F67/Scez6AlhZPF5I+mJlmH1Gv8T3AEwTo9Q45vLT/ON9CvQ29yHpWi/F
+         9yqHeca5MxVAv/B4Q8LrSeUAxQt3x60xj1cbEHmKU53wxAU4A0DIxCCAY2Z2Hli4MavS
+         vhxlJzqACPBCH4H/TwkcRlRGu58PYX27ce818sAZJxMGVUX0VTE4hgV9Gn6iol6grm8/
+         etYv26MphVYKv1NN6ioXbNRFP2oVpjBuhTWzLAKMspSKdQlfGkIu09UJzOTTgDsCh6Ft
+         lFDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW6tP69obDd4DFPdvclvOVMy5HyOPV80yBEr5jHtRgp3DI2dFnRh+v+YsA0YwZLa/DsfWUdBlM9HfHxdj+GAKUhGyG0jS19
+X-Gm-Message-State: AOJu0Yz/4uh/5zX3KKHkXLYK5A6oHesHqBsQKzfj2VG2INndLSgiFgTz
+	AXbbRNKZeZabdCsFYzAXXS7UQ2rNQdwnVk5AzQ14ETJ9IWPzP3WTUeyK5Ya67z5ieIYC1I0FDZ+
+	/Bn2LrvfWmxKFkfLIv/rAoiGGH7xStBKoeuAduzUbjNCR4U5nVGqcNg==
+X-Received: by 2002:a5d:6147:0:b0:33e:cf2f:b0 with SMTP id y7-20020a5d6147000000b0033ecf2f00b0mr4915995wrt.3.1711379727664;
+        Mon, 25 Mar 2024 08:15:27 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGrc5zYv8VaDd+lWJa2+ZgmiNoBLCeQqToQYtu3I9B/QwbhTDXB0KOTKHOwhAIon9Sw1JN/Fg==
+X-Received: by 2002:a5d:6147:0:b0:33e:cf2f:b0 with SMTP id y7-20020a5d6147000000b0033ecf2f00b0mr4915976wrt.3.1711379727276;
+        Mon, 25 Mar 2024 08:15:27 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-229-40.dyn.eolo.it. [146.241.229.40])
+        by smtp.gmail.com with ESMTPSA id df4-20020a5d5b84000000b0033e7b433498sm9747308wrb.111.2024.03.25.08.15.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Mar 2024 08:15:26 -0700 (PDT)
+Message-ID: <e06f2c8537347a861dc27d100155cb721f7cf079.camel@redhat.com>
+Subject: Re: [PATCH v3 1/1] tcp/dcpp: Un-pin tw_timer
+From: Paolo Abeni <pabeni@redhat.com>
+To: Valentin Schneider <vschneid@redhat.com>, Eric Dumazet
+ <edumazet@google.com>
+Cc: dccp@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  linux-rt-users@vger.kernel.org, "David S.
+ Miller" <davem@davemloft.net>,  Jakub Kicinski <kuba@kernel.org>,
+ mleitner@redhat.com, David Ahern <dsahern@kernel.org>, Juri Lelli
+ <juri.lelli@redhat.com>, Tomas Glozar <tglozar@redhat.com>, Sebastian
+ Andrzej Siewior <bigeasy@linutronix.de>, Thomas Gleixner
+ <tglx@linutronix.de>
+Date: Mon, 25 Mar 2024 16:15:25 +0100
+In-Reply-To: <xhsmh1q82c7bt.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+References: <20240219095729.2339914-1-vschneid@redhat.com>
+	 <20240219095729.2339914-2-vschneid@redhat.com>
+	 <CANn89i+3-zgAkWukFavu1wgf1XG+K9U4BhJWw7H+QKwsfYL4WA@mail.gmail.com>
+	 <xhsmho7cbf33q.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+	 <CANn89iJpwUpAROOq7+ttwTMCZu0=XhS4dgwcs44t-gb7-_ejRg@mail.gmail.com>
+	 <xhsmhjzmxg40f.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+	 <47a0e30caff2a49d152aed521ef5e512fd11ae99.camel@redhat.com>
+	 <xhsmh1q82c7bt.mognet@vschneid-thinkpadt14sgen2i.remote.csb>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: 1fdad13606e104ff103ca19d2d660830cb36d43e  Add linux-next specific files for 20240325
+On Fri, 2024-03-22 at 21:58 +0100, Valentin Schneider wrote:
+> On 21/03/24 20:03, Paolo Abeni wrote:
+> > Something alike the following (completely untested!!!):
+> >=20
+> > WDYT?
+>=20
+> Thanks for the suggestion! I've been preempted by other things and haven'=
+t
+> had time to think more about this, so I really appreciate it :)
+>=20
+> > ---
+> > diff --git a/include/net/inet_timewait_sock.h b/include/net/inet_timewa=
+it_sock.h
+> > index f28da08a37b4..d696d10dc8ae 100644
+> > --- a/include/net/inet_timewait_sock.h
+> > +++ b/include/net/inet_timewait_sock.h
+> > @@ -93,8 +93,10 @@ struct inet_timewait_sock *inet_twsk_alloc(const str=
+uct sock *sk,
+> >  					   struct inet_timewait_death_row *dr,
+> >  					   const int state);
+> > =20
+> > -void inet_twsk_hashdance(struct inet_timewait_sock *tw, struct sock *s=
+k,
+> > -			 struct inet_hashinfo *hashinfo);
+> > +void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+> > +				  struct sock *sk,
+> > +				  struct inet_hashinfo *hashinfo,
+> > +				  int timeo);
+> > =20
+> >  void __inet_twsk_schedule(struct inet_timewait_sock *tw, int timeo,
+> >  			  bool rearm);
+> > diff --git a/net/dccp/minisocks.c b/net/dccp/minisocks.c
+> > index 64d805b27add..8e108a89d8e4 100644
+> > --- a/net/dccp/minisocks.c
+> > +++ b/net/dccp/minisocks.c
+> > @@ -58,11 +58,10 @@ void dccp_time_wait(struct sock *sk, int state, int=
+ timeo)
+> >  		 * we complete the initialization.
+> >  		 */
+> >  		local_bh_disable();
+> > -		inet_twsk_schedule(tw, timeo);
+> >  		/* Linkage updates.
+> >  		 * Note that access to tw after this point is illegal.
+> >  		 */
+> > -		inet_twsk_hashdance(tw, sk, &dccp_hashinfo);
+> > +		inet_twsk_hashdance_schedule(tw, sk, &dccp_hashinfo, timeo);
+> >  		local_bh_enable();
+> >  	} else {
+> >  		/* Sorry, if we're out of memory, just CLOSE this
+> > diff --git a/net/ipv4/inet_timewait_sock.c b/net/ipv4/inet_timewait_soc=
+k.c
+> > index e8de45d34d56..dd314b06c0cd 100644
+> > --- a/net/ipv4/inet_timewait_sock.c
+> > +++ b/net/ipv4/inet_timewait_sock.c
+> > @@ -97,8 +97,10 @@ static void inet_twsk_add_node_rcu(struct inet_timew=
+ait_sock *tw,
+> >   * Essentially we whip up a timewait bucket, copy the relevant info in=
+to it
+> >   * from the SK, and mess with hash chains and list linkage.
+> >   */
+> > -void inet_twsk_hashdance(struct inet_timewait_sock *tw, struct sock *s=
+k,
+> > -			   struct inet_hashinfo *hashinfo)
+> > +void inet_twsk_hashdance_schedule(struct inet_timewait_sock *tw,
+> > +				  struct sock *sk,
+> > +				  struct inet_hashinfo *hashinfo,
+> > +				  int timeo)
+> >  {
+> >  	const struct inet_sock *inet =3D inet_sk(sk);
+> >  	const struct inet_connection_sock *icsk =3D inet_csk(sk);
+> > @@ -135,6 +137,8 @@ void inet_twsk_hashdance(struct inet_timewait_sock =
+*tw, struct sock *sk,
+> >  	if (__sk_nulls_del_node_init_rcu(sk))
+> >  		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
+> > =20
+> > +	inet_twsk_schedule(tw, timeo);
+> > +
+> >  	spin_unlock(lock);
+> >=20
+>=20
+> That arms the timer before the refcounts are set up in the tail end of
+> the hashdance, which is what we have upstream ATM.
+>=20
+> Unfortunately this relies on the timer being TIMER_PINNED and having
+> softirqs disabled: the timer can only be enqueued on the local CPU, and i=
+t
+> can't fire until softirqs are enabled, so refcounts can safely be updated
+> after it is armed because it can't fire.
+>=20
+> For dynamic CPU isolation we want to make this timer not-pinned, so that =
+it
+> can be scheduled on housekeeping CPUs. However that means the
+> local_bh_disable() won't prevent the timer from firing, and that means th=
+e
+> refcounts need to be written to before it is armed.
 
-Error/Warning reports:
+Ouch, right you are, I underlooked that.
 
-https://lore.kernel.org/oe-kbuild-all/202403252127.967BczRr-lkp@intel.com
 
-Error/Warning: (recently discovered and may have been fixed)
+> Using the ehash lock is clever though, and the first thing inet_twsk_kill=
+()
+> does is grabbing it... Maybe something like the below? It (should) preven=
+t
+> this interleaving race:
+>=20
+>                              tcp_time_wait()
+>                                inet_twsk_hashdance()
+>   inet_twsk_deschedule_put()
+>     del_timer_sync()
+>                                inet_twsk_schedule()
+>=20
+> whether it is sane is another thing :-)
 
-ERROR: modpost: "memcpy" [crypto/cmac.ko] undefined!
-ERROR: modpost: "memcpy" [crypto/rsa_generic.ko] undefined!
-ERROR: modpost: "memcpy" [fs/ext4/ext4.ko] undefined!
-ERROR: modpost: "memcpy" [fs/f2fs/f2fs.ko] undefined!
-ERROR: modpost: "memcpy" [fs/isofs/isofs.ko] undefined!
-ERROR: modpost: "memcpy" [fs/jbd2/jbd2.ko] undefined!
-ERROR: modpost: "memcpy" [fs/nls/nls_euc-jp.ko] undefined!
-ERROR: modpost: "memcpy" [fs/xfs/xfs.ko] undefined!
-ERROR: modpost: "memcpy" [mm/zsmalloc.ko] undefined!
+[...]
 
-Error/Warning ids grouped by kconfigs:
+That looks safe to me but, compared to the current code, will need an
+additional WMB in tcp_time_wait() and will take the hash lock
+unconditionally in inet_twsk_deschedule_put(). The latter should not be
+fast-path, I'm unsure if the whole thing be acceptable from performance
+perspective??? Eric WDYT?
 
-gcc_recent_errors
-|-- alpha-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- alpha-randconfig-r022-20221031
-|   |-- ERROR:memcpy-crypto-cmac.ko-undefined
-|   |-- ERROR:memcpy-crypto-rsa_generic.ko-undefined
-|   |-- ERROR:memcpy-fs-ext4-ext4.ko-undefined
-|   |-- ERROR:memcpy-fs-f2fs-f2fs.ko-undefined
-|   |-- ERROR:memcpy-fs-isofs-isofs.ko-undefined
-|   |-- ERROR:memcpy-fs-jbd2-jbd2.ko-undefined
-|   |-- ERROR:memcpy-fs-nls-nls_euc-jp.ko-undefined
-|   |-- ERROR:memcpy-fs-xfs-xfs.ko-undefined
-|   `-- ERROR:memcpy-mm-zsmalloc.ko-undefined
-|-- arc-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arc-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arc-randconfig-002-20240325
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arm-allmodconfig
-|   |-- arch-arm-mach-omap2-prm33xx.c:warning:expecting-prototype-for-am33xx_prm_global_warm_sw_reset().-Prototype-was-for-am33xx_prm_global_sw_reset()-instead
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arm-allyesconfig
-|   |-- arch-arm-mach-omap2-prm33xx.c:warning:expecting-prototype-for-am33xx_prm_global_warm_sw_reset().-Prototype-was-for-am33xx_prm_global_sw_reset()-instead
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arm-vexpress_defconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arm64-defconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- csky-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- csky-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- i386-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- i386-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- i386-randconfig-002-20240325
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- i386-randconfig-011-20240325
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- i386-randconfig-141-20240325
-|   `-- drivers-usb-typec-tcpm-tcpm.c-tcpm_pd_svdm()-error:uninitialized-symbol-modep_prime-.
-|-- loongarch-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- loongarch-defconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- loongarch-randconfig-002-20240325
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- m68k-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- m68k-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- microblaze-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- microblaze-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- mips-allyesconfig
-|   |-- (.ref.text):relocation-truncated-to-fit:R_MIPS_26-against-start_secondary
-|   |-- (.text):relocation-truncated-to-fit:R_MIPS_26-against-kernel_entry
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- nios2-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- nios2-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- openrisc-allyesconfig
-|   |-- (.head.text):relocation-truncated-to-fit:R_OR1K_INSN_REL_26-against-no-symbol
-|   |-- (.text):relocation-truncated-to-fit:R_OR1K_INSN_REL_26-against-no-symbol
-|   |-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|   `-- main.c:(.text):relocation-truncated-to-fit:R_OR1K_INSN_REL_26-against-symbol-__muldi3-defined-in-.text-section-in-..-lib-gcc-or1k-linux-..-libgcc.a(_muldi3.o)
-|-- parisc-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- parisc-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- powerpc-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- s390-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- sh-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- sh-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- sparc-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- sparc64-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- sparc64-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- um-allyesconfig
-|   |-- collect2:error:ld-returned-exit-status
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- um-i386_defconfig
-|   `-- collect2:error:ld-returned-exit-status
-|-- um-randconfig-001-20240325
-|   `-- collect2:error:ld-returned-exit-status
-|-- x86_64-buildonly-randconfig-004-20240325
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-`-- xtensa-randconfig-001-20240325
-    `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-clang_recent_errors
-|-- arm-qcom_defconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- arm-randconfig-003-20240325
-|   `-- kernel-bpf-bpf_struct_ops.c:warning:bitwise-operation-between-different-enumeration-types-(-enum-bpf_type_flag-and-enum-bpf_reg_type-)
-|-- arm64-allmodconfig
-|   |-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|   `-- kernel-bpf-bpf_struct_ops.c:warning:bitwise-operation-between-different-enumeration-types-(-enum-bpf_type_flag-and-enum-bpf_reg_type-)
-|-- hexagon-allmodconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- hexagon-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- mips-loongson1b_defconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- powerpc-allyesconfig
-|   |-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|   `-- kernel-bpf-bpf_struct_ops.c:warning:bitwise-operation-between-different-enumeration-types-(-enum-bpf_type_flag-and-enum-bpf_reg_type-)
-|-- riscv-allmodconfig
-|   |-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|   `-- kernel-bpf-bpf_struct_ops.c:warning:bitwise-operation-between-different-enumeration-types-(-enum-bpf_type_flag-and-enum-bpf_reg_type-)
-|-- riscv-allyesconfig
-|   |-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|   `-- kernel-bpf-bpf_struct_ops.c:warning:bitwise-operation-between-different-enumeration-types-(-enum-bpf_type_flag-and-enum-bpf_reg_type-)
-|-- s390-allmodconfig
-|   |-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|   `-- kernel-bpf-bpf_struct_ops.c:warning:bitwise-operation-between-different-enumeration-types-(-enum-bpf_type_flag-and-enum-bpf_reg_type-)
-|-- s390-defconfig
-|   `-- kernel-bpf-bpf_struct_ops.c:warning:bitwise-operation-between-different-enumeration-types-(-enum-bpf_type_flag-and-enum-bpf_reg_type-)
-|-- s390-randconfig-002-20240325
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-|-- x86_64-allyesconfig
-|   `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
-`-- x86_64-buildonly-randconfig-001-20240325
-    `-- fs-ubifs-journal.c:warning:expecting-prototype-for-wake_up_reservation().-Prototype-was-for-add_or_start_queue()-instead
+Thanks,
 
-elapsed time: 729m
+Paolo
 
-configs tested: 164
-configs skipped: 19
-
-tested configs:
-alpha                             allnoconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-arc                              allmodconfig   gcc  
-arc                               allnoconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                   randconfig-001-20240325   gcc  
-arc                   randconfig-002-20240325   gcc  
-arm                              allmodconfig   gcc  
-arm                               allnoconfig   clang
-arm                              allyesconfig   gcc  
-arm                         axm55xx_defconfig   clang
-arm                            mps2_defconfig   clang
-arm                            qcom_defconfig   clang
-arm                   randconfig-001-20240325   clang
-arm                   randconfig-002-20240325   gcc  
-arm                   randconfig-003-20240325   clang
-arm                        realview_defconfig   clang
-arm                        vexpress_defconfig   gcc  
-arm64                            allmodconfig   clang
-arm64                             allnoconfig   gcc  
-arm64                               defconfig   gcc  
-arm64                 randconfig-004-20240325   gcc  
-csky                             allmodconfig   gcc  
-csky                              allnoconfig   gcc  
-csky                             allyesconfig   gcc  
-csky                                defconfig   gcc  
-csky                  randconfig-001-20240325   gcc  
-csky                  randconfig-002-20240325   gcc  
-hexagon                          allmodconfig   clang
-hexagon                          allyesconfig   clang
-i386                             allmodconfig   gcc  
-i386                              allnoconfig   gcc  
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-001-20240325   clang
-i386         buildonly-randconfig-002-20240325   gcc  
-i386         buildonly-randconfig-003-20240325   gcc  
-i386         buildonly-randconfig-004-20240325   gcc  
-i386         buildonly-randconfig-005-20240325   clang
-i386         buildonly-randconfig-006-20240325   clang
-i386                                defconfig   clang
-i386                  randconfig-001-20240325   gcc  
-i386                  randconfig-002-20240325   gcc  
-i386                  randconfig-003-20240325   clang
-i386                  randconfig-004-20240325   gcc  
-i386                  randconfig-005-20240325   gcc  
-i386                  randconfig-006-20240325   clang
-i386                  randconfig-011-20240325   gcc  
-i386                  randconfig-012-20240325   clang
-i386                  randconfig-013-20240325   clang
-i386                  randconfig-014-20240325   clang
-i386                  randconfig-015-20240325   gcc  
-i386                  randconfig-016-20240325   gcc  
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch             randconfig-001-20240325   gcc  
-loongarch             randconfig-002-20240325   gcc  
-m68k                             allmodconfig   gcc  
-m68k                              allnoconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-microblaze                       allmodconfig   gcc  
-microblaze                        allnoconfig   gcc  
-microblaze                       allyesconfig   gcc  
-microblaze                          defconfig   gcc  
-mips                              allnoconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                     loongson1b_defconfig   clang
-nios2                         10m50_defconfig   gcc  
-nios2                            allmodconfig   gcc  
-nios2                             allnoconfig   gcc  
-nios2                            allyesconfig   gcc  
-nios2                               defconfig   gcc  
-nios2                 randconfig-001-20240325   gcc  
-nios2                 randconfig-002-20240325   gcc  
-openrisc                          allnoconfig   gcc  
-openrisc                         allyesconfig   gcc  
-openrisc                            defconfig   gcc  
-parisc                           allmodconfig   gcc  
-parisc                            allnoconfig   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc                randconfig-001-20240325   gcc  
-parisc                randconfig-002-20240325   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                          allyesconfig   clang
-powerpc                       ebony_defconfig   clang
-powerpc                   lite5200b_defconfig   clang
-powerpc               mpc834x_itxgp_defconfig   clang
-powerpc                     taishan_defconfig   clang
-powerpc                     tqm8541_defconfig   clang
-powerpc                      walnut_defconfig   gcc  
-powerpc                 xes_mpc85xx_defconfig   gcc  
-riscv                            allmodconfig   clang
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   clang
-riscv                               defconfig   clang
-riscv                 randconfig-002-20240325   gcc  
-s390                             allmodconfig   clang
-s390                              allnoconfig   clang
-s390                             allyesconfig   gcc  
-s390                                defconfig   clang
-s390                  randconfig-001-20240325   gcc  
-s390                  randconfig-002-20240325   clang
-sh                               allmodconfig   gcc  
-sh                                allnoconfig   gcc  
-sh                               allyesconfig   gcc  
-sh                                  defconfig   gcc  
-sh                               j2_defconfig   gcc  
-sh                 kfr2r09-romimage_defconfig   gcc  
-sh                          lboxre2_defconfig   gcc  
-sh                    randconfig-001-20240325   gcc  
-sh                    randconfig-002-20240325   gcc  
-sparc                            allmodconfig   gcc  
-sparc                             allnoconfig   gcc  
-sparc                               defconfig   gcc  
-sparc64                          allmodconfig   gcc  
-sparc64                          allyesconfig   gcc  
-sparc64                             defconfig   gcc  
-sparc64               randconfig-001-20240325   gcc  
-sparc64               randconfig-002-20240325   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   gcc  
-um                                  defconfig   clang
-um                             i386_defconfig   gcc  
-um                    randconfig-001-20240325   gcc  
-um                    randconfig-002-20240325   gcc  
-um                           x86_64_defconfig   clang
-x86_64                            allnoconfig   clang
-x86_64                           allyesconfig   clang
-x86_64       buildonly-randconfig-001-20240325   clang
-x86_64       buildonly-randconfig-002-20240325   clang
-x86_64       buildonly-randconfig-003-20240325   clang
-x86_64       buildonly-randconfig-004-20240325   gcc  
-x86_64       buildonly-randconfig-005-20240325   clang
-x86_64       buildonly-randconfig-006-20240325   clang
-x86_64                              defconfig   gcc  
-x86_64                randconfig-001-20240325   clang
-x86_64                randconfig-002-20240325   gcc  
-x86_64                randconfig-003-20240325   gcc  
-x86_64                randconfig-004-20240325   gcc  
-x86_64                randconfig-005-20240325   gcc  
-x86_64                randconfig-006-20240325   clang
-x86_64                randconfig-011-20240325   clang
-x86_64                randconfig-012-20240325   clang
-x86_64                randconfig-013-20240325   gcc  
-x86_64                randconfig-014-20240325   gcc  
-x86_64                randconfig-015-20240325   clang
-x86_64                randconfig-016-20240325   gcc  
-x86_64                randconfig-071-20240325   clang
-x86_64                randconfig-072-20240325   clang
-x86_64                randconfig-073-20240325   gcc  
-x86_64                randconfig-074-20240325   clang
-x86_64                randconfig-075-20240325   clang
-x86_64                randconfig-076-20240325   gcc  
-x86_64                          rhel-8.3-rust   clang
-xtensa                            allnoconfig   gcc  
-xtensa                randconfig-001-20240325   gcc  
-xtensa                randconfig-002-20240325   gcc  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
