@@ -1,48 +1,47 @@
-Return-Path: <netdev+bounces-81501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CE0088A46C
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:27:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF3D9889FB1
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:36:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DAF3FBA771D
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 12:36:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8281E2C26D6
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 12:36:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEE54189283;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0FCB18928E;
 	Mon, 25 Mar 2024 07:32:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="Cnp4fQnZ"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="NsGqJAA5"
 X-Original-To: netdev@vger.kernel.org
-Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.220])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 786FF1B81F;
-	Mon, 25 Mar 2024 03:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.220
+Received: from m15.mail.163.com (m15.mail.163.com [45.254.50.219])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0000E4317B;
+	Mon, 25 Mar 2024 04:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.254.50.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711339154; cv=none; b=Klb6nIkmv8xzJTlVgi+JBopevSuQ4md29nqzDRDGacREVjS2fj8+4UuGpJxObo1dQNM2NIDGyMR5uobTuPnD9yeyH5tJ9s0TwDCKFtLcRXb7fB6QISbNPdfolOJ5/JnayKPTxx9e4qhaNK/juxkaIegqmLsyCFWXPrXqsak6SZw=
+	t=1711339299; cv=none; b=Gv71jqONa4jmKfywnGsPPlb8gn0SFnInUcZzXWMrhQFJNyrXfmmPiswKQsZMIGu4ZRhX43VHpIGT3m9eng3dalL/MXtB7+EuVVTiRKrx6TVbB/454qL8XWJ+CF5380uOh6UWoJ6v3IsvCGrilDsSoSnS+8QWPt7D7Rqib54MdR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711339154; c=relaxed/simple;
-	bh=dhSk9xYlvB9BWrRcYumZmtBULUH7LFBv69V2VOhVP2o=;
+	s=arc-20240116; t=1711339299; c=relaxed/simple;
+	bh=Xrto1isUre/YOZl7rOJbD4TAJ6P1KNC0m3iMnvHrYc8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ef/NKi5rrpl1BK/TBb6GbYIQ7UEf7J537CDrsZRBQ4Uqgji1XCIrzjbvkKgfeRTQaSPDp0tdxkzqlXbj1BVeY4HS4xMoRIXbiGJ9GbPdeZqqV0C/4CSXvcu+kOYu5Dl6LLd6GzqTnkIDcGLywZh/0wA1C5s/uL+Fq9XBt/ZPueI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=Cnp4fQnZ; arc=none smtp.client-ip=45.254.50.220
+	 MIME-Version; b=aDh58WcbcVXWCknwYOwWztjzx650ImKkdb72KL77QtLGK17PzO+eC0+gaD9Q3O9a+TM38BTPd425kOWmlmYOgMnC9i8z/jTn27fuctwQbXv6YxOrK8MRrsRDchgcADTesV+sDQu7qmZVN8bdI8A/yc5WSPwc+fMr2JcJsqOpYaE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=NsGqJAA5; arc=none smtp.client-ip=45.254.50.219
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=lPX/M
-	9qGGRnZuiwR3wscgK7y8VnR6FNWSaY4LI0hbT8=; b=Cnp4fQnZYB1ZdADCshVLN
-	WW+DHNyLyR5Y3lbyQut6Yyxfy3cadSwszv9vzrU9xkSTM/0QuVxKEojnzZMkov28
-	AQcYahqI8+hYGvFkBIsz9uyHTGcT6/OxFr3qc7WG76v/s8E7gmXBNaHRL7rF0Ieb
-	OnIwWSPZh4q9x7z5mZXsMc=
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=GRkUX
+	HpEGK2aXuxqbIEPhXhKHaUg92/b19NkuDLSQuo=; b=NsGqJAA511U9cs0LdI7Jv
+	hfw0aeqHvBd9m0X2dkYEc9m5pkfGNFkauliWVAvOPCUT9TXv4wH09WVbz1Qd8pi0
+	5lMWmYROUhS4z4AUdSqi6sn0Qib7MHqjSulUsrWnOxYG7H1nmXbkCNmY1YsIT3ZL
+	4nImX5nzx5xvmXQXSnsfuo=
 Received: from localhost.localdomain (unknown [193.203.214.57])
-	by gzga-smtp-mta-g0-5 (Coremail) with SMTP id _____wD3_0ov9gBmL4gpBg--.1652S2;
-	Mon, 25 Mar 2024 11:57:37 +0800 (CST)
+	by gzga-smtp-mta-g0-3 (Coremail) with SMTP id _____wD3X2YD9wBmoJnGBw--.35036S2;
+	Mon, 25 Mar 2024 12:01:09 +0800 (CST)
 From: Peilin He <peilinhe2020@163.com>
-To: kerneljasonxing@gmail.com
+To: edumazet@google.com
 Cc: davem@davemloft.net,
 	dsahern@kernel.org,
-	edumazet@google.com,
 	he.peilin@zte.com.cn,
 	jiang.xuexin@zte.com.cn,
 	kuba@kernel.org,
@@ -56,11 +55,11 @@ Cc: davem@davemloft.net,
 	yang.yang29@zte.com.cn,
 	zhang.yunkai@zte.com.cn
 Subject: Re: Re: [PATCH v3 resend] net/ipv4: add tracepoint for icmp_send
-Date: Mon, 25 Mar 2024 03:57:35 +0000
-Message-Id: <20240325035735.3776104-1-peilinhe2020@163.com>
+Date: Mon, 25 Mar 2024 04:01:07 +0000
+Message-Id: <20240325040107.3776173-1-peilinhe2020@163.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CAL+tcoDT01EL7g_73Whrz753oEBuRtBrfmo2PHvTdifXKP4fhQ@mail.gmail.com>
-References: <CAL+tcoDT01EL7g_73Whrz753oEBuRtBrfmo2PHvTdifXKP4fhQ@mail.gmail.com>
+In-Reply-To: <CANn89i+EFEr7VHXNdOi59Ba_R1nFKSBJzBzkJFVgCTdXBx=YBg@mail.gmail.com>
+References: <CANn89i+EFEr7VHXNdOi59Ba_R1nFKSBJzBzkJFVgCTdXBx=YBg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,12 +67,12 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3_0ov9gBmL4gpBg--.1652S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW3WF1fAr17try7tr1rCw13CFg_yoW7Xr4rpF
-	yDAF1rKrWktrsrCw1fZw42qr15uayrGryUJr1Iqw4xCr1Dtr1Dt3y2gr1YkF95Zrs8K34a
+X-CM-TRANSID:_____wD3X2YD9wBmoJnGBw--.35036S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3WF1fAr17try7tr1rCw13CFg_yoW7Xr1fpF
+	yDAF1rKr4ktrsrCw13Zw4jqr15Way8GryUGr1Iqw4xCr1Dtrn8t3y2gr1YkF95Zrs8K34a
 	v3WYk3s8Cwn8XaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jwkucUUUUU=
-X-CM-SenderInfo: xshlzxhqkhjiisq6il2tof0z/1tbiZRWssWXAkuWgygAAsV
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j4Ap8UUUUU=
+X-CM-SenderInfo: xshlzxhqkhjiisq6il2tof0z/1tbiZRWssWXAkuWgygABsU
 
 >>
 >> Introduce a tracepoint for icmp_send, which can help users to get more
@@ -199,8 +198,9 @@ X-CM-SenderInfo: xshlzxhqkhjiisq6il2tof0z/1tbiZRWssWXAkuWgygAAsV
 Yeah, you are correct. Directly parsing udphdr through the sdk may
 conceal bugs, such as illegal skb. To handle such exceptional scenarios,
 we can determine the legitimacy of skb by checking whether the position
-of the uh pointer is out of bounds. The modifications in the patch are
-as follows:	
+of the uh pointer is out of bounds.
+
+Perhaps it could be modified like this:	
 	struct udphdr *uh = udp_hdr(skb);
 	
 	if (proto_4 != IPPROTO_UDP || (u8 *)uh < skb->head ||
