@@ -1,206 +1,221 @@
-Return-Path: <netdev+bounces-81537-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81538-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4CF8488A1A9
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 14:22:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A44188A1A7
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 14:22:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 704B91C31F18
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:22:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3D891F3A45E
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:22:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCB9415539D;
-	Mon, 25 Mar 2024 10:28:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616E0156640;
+	Mon, 25 Mar 2024 10:28:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L5cZI1NR"
+	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="EMN1gPyj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B08179970
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 08:44:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A957F179FAA
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 08:44:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711356265; cv=none; b=oPKJhhCDQpVwID1KOwC0OnOZzUFWSY+of1E9fto8Egq+0B8228Cv0KBr96B9mMe0sSDpGScdKTGQFrnmyDE1e1j797NJM/MUpQhXAO/I0L9JMQyL87oEup/2kKmIOBLDKLMBc/Z/HYy0h0ZS4kJO5V2t3FaaOP2UKfqR1+yHc7k=
+	t=1711356279; cv=none; b=mydx1tZP44hWX91ysfS1ABKV3ZQQFD4oxxUV54glHSBHQhcvHk9horVBRxTNXG1UJabIHwBEUl1qaKV2i04ieyZNx0397/5FBNHyGIly9ANKg0nID+48S34CYmrqNmYtcqKqmE8aWsNX8PdAw29wCg6t0ThPnSmDJFAlNdwacRc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711356265; c=relaxed/simple;
-	bh=cdQBhEPIFiLVjBcaNV1Bn89SfFgexIJqtcggmv1x39M=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=R0ziIjUXtQuVHxbtqDXJHcBAjEYp8YXVi1scwhOVvEKCgdhE1BO1P3aIL5paoy/G8vztqTmuGRelPvz+Ex0AkQAD7mA1QosJBR/17SsblCvK1UoWQ8XhD4r+8b1cpnoTwS5hpIuJGcchZM0UcIk7hoc4f0Tf0dU6VyPbZTCGspI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L5cZI1NR; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711356262;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0cAw1vIzqpoWS5Z80GAOYQKaIMJGQe1l/kUnXEkorTI=;
-	b=L5cZI1NRqloLxioXFH8O/E8WBQz/uGQaLuzGgzlE9fFeCX32SrdOmNHZGcWawqw8ijvVDq
-	OMYyQP5f+IGckCPdgPCIR7bAUBNrgy1EmlXRI5U5LCZMetpYFv1r/n1e8m1I5ZOIze3M78
-	+Etv+gLRoChgLRJwrm9rgjAsJOfuH4c=
-Received: from mail-ed1-f69.google.com (mail-ed1-f69.google.com
- [209.85.208.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-88-F84R4VWsNuejSZAVqY4juA-1; Mon, 25 Mar 2024 04:44:20 -0400
-X-MC-Unique: F84R4VWsNuejSZAVqY4juA-1
-Received: by mail-ed1-f69.google.com with SMTP id 4fb4d7f45d1cf-568b1075d18so2241102a12.3
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 01:44:19 -0700 (PDT)
+	s=arc-20240116; t=1711356279; c=relaxed/simple;
+	bh=KlNZqGKcY8wJJqzBqoSqe94osLn2EZS8gGGi0MRJ1/Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YcpYyanuIjgsFzH8YWyx7Sh1PNFUY8bgmSBnkR1YMMJDgidB+RUcWGW0ja86R4FThhyuVPpfd+//gn5MZcitEGuQ4sAndCn5bzI+v+dTKYcUlgIaH6fnQktlOfMr00OFgD9Ezu23GqY6eA4ZoP18UT8FyQsT/MzqOc70Y9HN/fY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=EMN1gPyj; arc=none smtp.client-ip=209.85.208.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
+Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d4979cd8c8so42578841fa.0
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 01:44:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gooddata.com; s=google; t=1711356276; x=1711961076; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+AQnc+S8eeewHWVi7q229L+fZxCbZfHJQPdr0bWKRFA=;
+        b=EMN1gPyj3HLA0NFJ77dIOn39zfK9STgDgxUjpl06x9zA+PhdZ9zvr5Ys2KJGzUA/+t
+         h86/r1E71EvkidFmppQWz+KkRaoR/CJTw40rHCF3m4vMCqExLSw4ULT8CX5SYvZqoprj
+         V1YFiEMACEAa+hx9+6PxWcXWQKiO2f5eMFhu0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711356257; x=1711961057;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1711356276; x=1711961076;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0cAw1vIzqpoWS5Z80GAOYQKaIMJGQe1l/kUnXEkorTI=;
-        b=EdHJLExQXiDaloKmmPMHldPPPDwCFan7S/2/7La5fidOl/GQD4vVvKWuUoWbh9/WtO
-         StrGIBGwXcMLkBzIu2yKAd3qiUCNQHk2qf4AW8O+AVdmC2dKnX5yyYK4XC/dux7UzCX0
-         76JFfj4IqMt7jkcyXWDC7IO6WvAgtdzxk8HDl0vvqWZqpKRKbZvuh06xMwh0mDgLtvnJ
-         tuwrcibeyKt21dwfQk7FRV8nnVAfqTsnMqtP3t8uIrg4wWV2fzcAHpFuTUMEZvYTXcoZ
-         ChhCAur0/QPRRlAUDsF6/ExQ1kmMyokw0RKMzcmKIL9Vk/tUSgxzQrqQITlxa/wSsmnA
-         M78g==
-X-Gm-Message-State: AOJu0YyB//M6uJsrv1avd4lKU+OGhywqmGL4oGhVAHvhGjlcDkts9Soi
-	99sA+pz+0837ILAB1Uh1kIkJF6kTTD4qBDK7iw1i5oK6B5Tr4osvnDjlPl4GkvLPrtnRIX+tdsD
-	fcPXkE44OCQIRTaDpUuTackS7TnRpFFm4j82GylMt8YOPQz/48q7/k887aRb+Uw==
-X-Received: by 2002:a50:8d05:0:b0:566:fbf5:a279 with SMTP id s5-20020a508d05000000b00566fbf5a279mr4066301eds.20.1711356257723;
-        Mon, 25 Mar 2024 01:44:17 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFvUShEMrfi9tKxt+iYxeHTBBPxyZUeP8a62WImbipp6rM+N/Z56tOcX171CRPJlIQKv3wriQ==
-X-Received: by 2002:a50:8d05:0:b0:566:fbf5:a279 with SMTP id s5-20020a508d05000000b00566fbf5a279mr4066292eds.20.1711356257368;
-        Mon, 25 Mar 2024 01:44:17 -0700 (PDT)
-Received: from [172.16.1.27] (5920ab7b.static.cust.trined.nl. [89.32.171.123])
-        by smtp.gmail.com with ESMTPSA id s19-20020a056402521300b00568d5e737b0sm2701431edd.57.2024.03.25.01.44.16
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 25 Mar 2024 01:44:16 -0700 (PDT)
-From: Eelco Chaudron <echaudro@redhat.com>
-To: Aaron Conole <aconole@redhat.com>
-Cc: netdev@vger.kernel.org, Pravin B Shelar <pshelar@ovn.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- dev@openvswitch.org, linux-kernel@vger.kernel.org,
- Numan Siddique <nusiddiq@redhat.com>
-Subject: Re: [PATCH net] openvswitch: Set the skbuff pkt_type for proper pmtud
- support.
-Date: Mon, 25 Mar 2024 09:44:16 +0100
-X-Mailer: MailMate (1.14r6028)
-Message-ID: <7AFF5D6D-568C-449B-83CF-9436DE97CA91@redhat.com>
-In-Reply-To: <20240322190603.251831-1-aconole@redhat.com>
-References: <20240322190603.251831-1-aconole@redhat.com>
+        bh=+AQnc+S8eeewHWVi7q229L+fZxCbZfHJQPdr0bWKRFA=;
+        b=IhUDIRkQoQ1R8WxgKxgNZiQMaXQGEIVwPa8sf4jPM6g5+DtDHP8Vk0gbooga9QcTQE
+         pxpe45EhbeNK262b81v8Abn1ep0aW6xOJfP8VZs2A9uLOaON7cCBkR42GbyaJW/epbK3
+         pjl2EMJEDhVb2SAbPJhDT/R+HFtCanxIIcn5Aa3pdCzobMUsiGFGhbfnXeCoTAKkuNyN
+         lD5XsGRK4+ek9numjX/DvAbihdkIyruByeZjObSqNZghzHWNxBDnLQJU9Eo0RB6Q0M9f
+         HR8Qws9eCB7kE5Vw6BddhjvRtrq80U1PFFT0DFCbGAe+TYy09BIIJrFPq3qksLGw0r2s
+         BxPw==
+X-Forwarded-Encrypted: i=1; AJvYcCVqdElfFUeklYw/sPKAWuMOyKE4TW4Ms2NS+t5aFTF2KHIp35EapQQAHzZ/Z0VNZIcGAQB3i2yfc+8bQyBIDLGXaoOAzqFB
+X-Gm-Message-State: AOJu0Yx9wYUU81CMsxKm0P7+18C0yRo1hb1Bv4wsN6Lf7gfzqapVADwz
+	od2HTvcEehy34fFOLT0PBJrqb9XDbhsNTamgr1S4/oR20lmXu93kb/0S6IyzkRzbf88ug2DLEwg
+	f96l0c67INTxDIOSbFdJK4MocgbTittEYsvsj
+X-Google-Smtp-Source: AGHT+IHpPljUYvS/v6zIPdlCSCskC5KA1wMk0ygWW04BfrfXUTs4QbWjBPvQqYu8FjNfMaTN+Ytdl3l03Fm/KfIPCY0=
+X-Received: by 2002:a2e:b176:0:b0:2d4:9334:3c11 with SMTP id
+ a22-20020a2eb176000000b002d493343c11mr1669978ljm.16.1711356275855; Mon, 25
+ Mar 2024 01:44:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
+ <20240319131207.GB1096131@fedora> <CA+9S74jMBbgrxaH2Nit50uDQsHES+e+VHnOXkxnq2TrUFtAQRA@mail.gmail.com>
+ <CACGkMEvX2R+wKcH5V45Yd6CkgGhADVbpvfmWsHducN2zCS=OKw@mail.gmail.com>
+ <CA+9S74g5fR=hBxWk1U2TyvW1uPmU3XgJnjw4Owov8LNwLiiOZw@mail.gmail.com>
+ <CACGkMEt4MbyDgdqDGUqQ+0gV-1kmp6CWASDgwMpZnRU8dfPd2Q@mail.gmail.com>
+ <CA+9S74hUt_aZCrgN3Yx9Y2OZtwHNan7gmbBa1TzBafW6=YLULQ@mail.gmail.com> <CA+9S74ia-vUag2QMo6zFL7r+wZyOZVmcpe317RdMbK-rpomn+Q@mail.gmail.com>
+In-Reply-To: <CA+9S74ia-vUag2QMo6zFL7r+wZyOZVmcpe317RdMbK-rpomn+Q@mail.gmail.com>
+From: Igor Raits <igor@gooddata.com>
+Date: Mon, 25 Mar 2024 09:44:23 +0100
+Message-ID: <CA+9S74hs_1Ft9iyXOPU_vF_EFKuoG8LjDpSna0QSPMFnMywd_g@mail.gmail.com>
+Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
+To: Jason Wang <jasowang@redhat.com>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	Stefano Garzarella <sgarzare@redhat.com>, Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
+Hello,
 
-
-On 22 Mar 2024, at 20:06, Aaron Conole wrote:
-
-> Open vSwitch is originally intended to switch at layer 2, only dealing =
-with
-> Ethernet frames.  With the introduction of l3 tunnels support, it cross=
-ed
-> into the realm of needing to care a bit about some routing details when=
-
-> making forwarding decisions.  If an oversized packet would need to be
-> fragmented during this forwarding decision, there is a chance for pmtu
-> to get involved and generate a routing exception.  This is gated by the=
-
-> skbuff->pkt_type field.
+On Fri, Mar 22, 2024 at 12:19=E2=80=AFPM Igor Raits <igor@gooddata.com> wro=
+te:
 >
-> When a flow is already loaded into the openvswitch module this field is=
-
-> set up and transitioned properly as a packet moves from one port to
-> another.  In the case that a packet execute is invoked after a flow is
-> newly installed this field is not properly initialized.  This causes th=
+> Hi Jason,
+>
+> On Fri, Mar 22, 2024 at 9:39=E2=80=AFAM Igor Raits <igor@gooddata.com> wr=
+ote:
+> >
+> > Hi Jason,
+> >
+> > On Fri, Mar 22, 2024 at 6:31=E2=80=AFAM Jason Wang <jasowang@redhat.com=
+> wrote:
+> > >
+> > > On Thu, Mar 21, 2024 at 5:44=E2=80=AFPM Igor Raits <igor@gooddata.com=
+> wrote:
+> > > >
+> > > > Hello Jason & others,
+> > > >
+> > > > On Wed, Mar 20, 2024 at 10:33=E2=80=AFAM Jason Wang <jasowang@redha=
+t.com> wrote:
+> > > > >
+> > > > > On Tue, Mar 19, 2024 at 9:15=E2=80=AFPM Igor Raits <igor@gooddata=
+.com> wrote:
+> > > > > >
+> > > > > > Hello Stefan,
+> > > > > >
+> > > > > > On Tue, Mar 19, 2024 at 2:12=E2=80=AFPM Stefan Hajnoczi <stefan=
+ha@redhat.com> wrote:
+> > > > > > >
+> > > > > > > On Tue, Mar 19, 2024 at 10:00:08AM +0100, Igor Raits wrote:
+> > > > > > > > Hello,
+> > > > > > > >
+> > > > > > > > We have started to observe kernel crashes on 6.7.y kernels =
+(atm we
+> > > > > > > > have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6.9 w=
+here we
+> > > > > > > > have nodes of cluster it looks stable. Please see stacktrac=
+e below. If
+> > > > > > > > you need more information please let me know.
+> > > > > > > >
+> > > > > > > > We do not have a consistent reproducer but when we put some=
+ bigger
+> > > > > > > > network load on a VM, the hypervisor's kernel crashes.
+> > > > > > > >
+> > > > > > > > Help is much appreciated! We are happy to test any patches.
+> > > > > > >
+> > > > > > > CCing Michael Tsirkin and Jason Wang for vhost_net.
+> > > > > > >
+> > > > > > > >
+> > > > > > > > [62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOPTI
+> > > > > > > > [62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Tainted=
+: G
+> > > > > > > >    E      6.7.10-1.gdc.el9.x86_64 #1
+> > > > > > >
+> > > > > > > Are there any patches in this kernel?
+> > > > > >
+> > > > > > Only one, unrelated to this part. Removal of pr_err("EEVDF sche=
+duling
+> > > > > > fail, picking leftmost\n"); line (reported somewhere few months=
+ ago
+> > > > > > and it was suggested workaround until proper solution comes).
+> > > > >
+> > > > > Btw, a bisection would help as well.
+> > > >
+> > > > In the end it seems like we don't really have "stable" setup, so
+> > > > bisection looks to be useless but we did find few things meantime:
+> > > >
+> > > > 1. On 6.6.9 it crashes either with unexpected GSO type or usercopy:
+> > > > Kernel memory exposure attempt detected from SLUB object
+> > > > 'skbuff_head_cache'
+> > >
+> > > Do you have a full calltrace for this?
+> >
+> > I have shared it in one of the messages in this thread.
+> > https://marc.info/?l=3Dlinux-virtualization&m=3D171085443512001&w=3D2
+> >
+> > > > 2. On 6.7.5, 6.7.10 and 6.8.1 it crashes with RIP:
+> > > > 0010:skb_release_data+0xb8/0x1e0
+> > >
+> > > And for this?
+> >
+> > https://marc.info/?l=3Dlinux-netdev&m=3D171083870801761&w=3D2
+> >
+> > > > 3. It does NOT crash on 6.8.1 when VM does not have multi-queue set=
+up
+> > > >
+> > > > Looks like the multi-queue setup (we have 2 interfaces =C3=97 3 vir=
+tio
+> > > > queues for each) is causing problems as if we set only one queue fo=
+r
+> > > > each interface the issue is gone.
+> > > > Maybe there is some race condition in __pfx_vhost_task_fn+0x10/0x10=
+ or
+> > > > somewhere around?
+> > >
+> > > I can't tell now, but it seems not because if we have 3 queue pairs w=
 e
-> pmtud mechanism to omit sending the required exception messages across
-> the tunnel boundary and a second attempt needs to be made to make sure
-> that the routing exception is properly setup.  To fix this, we set the
-> outgoing packet's pkt_type to PACKET_OUTGOING, since it can only get
-> to the openvswitch module via a port device or packet command.
+> > > will have 3 vhost threads.
+> > >
+> > > > We have noticed that there are 3 of such functions
+> > > > in the stacktrace that gave us hints about what we could try=E2=80=
+=A6
+> > >
+> > > Let's try to enable SLUB_DEBUG and KASAN to see if we can get
+> > > something interesting.
+> >
+> > We were able to reproduce it even with 1 vhost queue... And now we
+> > have slub_debug + kasan so I hopefully have more useful data for you
+> > now.
+> > I have attached it for better readability.
+>
+> Looks like we have found a "stable" kernel and that is 6.1.32. The
+> 6.3.y is broken and we are testing 6.2.y now.
+> My guess it would be related to virtio/vsock: replace virtio_vsock_pkt
+> with sk_buff that was done around that time but we are going to test,
+> bisect and let you know more.
 
-Is this not a problem when the packet comes from the bridge port in the k=
-ernel?
+So we have been trying to bisect it but it is basically impossible for
+us to do so as the ICE driver was quite broken for most of the release
+cycle so we have no networking on 99% of the builds and we can't test
+such a setup.
+More specifically, the bug was introduced between 6.2 and 6.3 but we
+could not get much further. The last good commit we were able to test
+was f18f9845f2f10d3d1fc63e4ad16ee52d2d9292fa and then after 20 commits
+where we had no networking we gave up.
 
-> This issue is periodically encountered in complex setups, such as large=
+If you have some suspicious commit(s) we could revert - happy to test.
 
-> openshift deployments, where multiple sets of tunnel traversal occurs.
-> A way to recreate this is with the ovn-heater project that can setup
-> a networking environment which mimics such large deployments.  In that
-> environment, without this patch, we can see:
->
->   ./ovn_cluster.sh start
->   podman exec ovn-chassis-1 ip r a 170.168.0.5/32 dev eth1 mtu 1200
->   podman exec ovn-chassis-1 ip netns exec sw01p1  ip r flush cache
->   podman exec ovn-chassis-1 ip netns exec sw01p1 ping 21.0.0.3 -M do -s=
- 1300 -c2
->   PING 21.0.0.3 (21.0.0.3) 1300(1328) bytes of data.
->   From 21.0.0.3 icmp_seq=3D2 Frag needed and DF set (mtu =3D 1142)
->
->   --- 21.0.0.3 ping statistics ---
->   2 packets transmitted, 0 received, +1 errors, 100% packet loss, time =
-1017ms
->
-> Using tcpdump, we can also see the expected ICMP FRAG_NEEDED message is=
- not
-> sent into the server.
->
-> With this patch, setting the pkt_type, we see the following:
->
->   podman exec ovn-chassis-1 ip netns exec sw01p1 ping 21.0.0.3 -M do -s=
- 1300 -c2
->   PING 21.0.0.3 (21.0.0.3) 1300(1328) bytes of data.
->   From 21.0.0.3 icmp_seq=3D1 Frag needed and DF set (mtu =3D 1222)
->   ping: local error: message too long, mtu=3D1222
->
->   --- 21.0.0.3 ping statistics ---
->   2 packets transmitted, 0 received, +2 errors, 100% packet loss, time =
-1061ms
->
-> In this case, the first ping request receives the FRAG_NEEDED message a=
-nd
-> a local routing exception is created.
->
-> Reported-at: https://issues.redhat.com/browse/FDP-164
-> Fixes: 58264848a5a7 ("openvswitch: Add vxlan tunneling support.")
-> Signed-off-by: Aaron Conole <aconole@redhat.com>
-> ---
-> NOTE: An alternate approach would be to add a netlink attribute to pres=
-erve
->       pkt_type across the kernel->user boundary, but that does require =
-some
->       userspace cooperation.
-
-I prefer the method in this patch, as it requires no userspace change, i.=
-e. it will work even with older versions of OVS without the need for back=
-ports.
-
->  net/openvswitch/actions.c | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-> index 6fcd7e2ca81fe..952c6292100d0 100644
-> --- a/net/openvswitch/actions.c
-> +++ b/net/openvswitch/actions.c
-> @@ -936,6 +936,8 @@ static void do_output(struct datapath *dp, struct s=
-k_buff *skb, int out_port,
->  				pskb_trim(skb, ovs_mac_header_len(key));
->  		}
->
-> +		skb->pkt_type =3D PACKET_OUTGOING;
-> +
-
-Maybe add a comment based on the large explanation above?
-
->  		if (likely(!mru ||
->  		           (skb->len <=3D mru + vport->dev->hard_header_len))) {
->  			ovs_vport_send(vport, skb, ovs_key_mac_proto(key));
-> -- =
-
-> 2.41.0
-
+Thanks again.
 
