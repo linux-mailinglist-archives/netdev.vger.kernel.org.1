@@ -1,94 +1,185 @@
-Return-Path: <netdev+bounces-81597-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81598-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2CB188A6C7
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:35:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3433488A6C9
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:35:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 101381C3AFCF
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:35:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 588B81C3AED9
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:35:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01D5218E20;
-	Mon, 25 Mar 2024 13:04:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4109F433AF;
+	Mon, 25 Mar 2024 13:04:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vKpnVzl1"
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="mSEKPYR5";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="j5iaYn/S";
+	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="mSEKPYR5";
+	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="j5iaYn/S"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07FB23FEC;
-	Mon, 25 Mar 2024 13:04:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D69182D8
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 13:04:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711371868; cv=none; b=JTIVKnPvTIFu6/zp6oyO0sGZ+Vr3jaI53Elfx1Kp8BCbu1WJaKSONPWeVbSq1NbomxcCmnypMeg4K6z37spQhmJfTYpEoSuTyUvvzwS86RRL9QctVb1jcArTTWjlr09NK67ALDNQ+7aIFLgkZPMLSxLmev9a2IP2ltdOPsUXVOk=
+	t=1711371878; cv=none; b=ao4Y1R5YMaXGwLDpvfPscFh9+bKOU01dZBOzzhKlKBLQJzPJrKB1ik3U/PTcq+It7wfy1K4s0etSOQ2RxHIoHLzUmLC3CdLWZhkdqi9+RQrdtuoADmoHmRETDincdPYz64UMQfkNxjD12/Y3OBgp1tlHZGQB5MCTgNXTZh7AqVo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711371868; c=relaxed/simple;
-	bh=DrmCWdDLWDSGOltq0/ZEBbiqKQG2fiua/xjvLRoXu10=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QZ8WgWxHD4FCCbI83CViMXrZd+xzox3Ado3zkgThytBwYY78iMVAy+Gt9w0Tyt67BHDM6BizEfbK/jNYY5JRJplyHOIMjAHin7F5sqYWb0i80cCaRJwqb6YkoVpPChJ1HSpjVXhyvZBcZSHd1+u4ZbuNW+3j8p4B5xge8w1syzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vKpnVzl1; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9puSFQovfBN06iwz9da2ZyPCtyMVaryxiy4PBxWgMns=; b=vKpnVzl1im9WGoNBOtSpwUTLnn
-	j/QsLGQ+6woouAs6mQQ6YM7iErUH7Z/eWJ49VBF6+uD/HhGkbNFDaYlWq6/DX04PbaW7ju7ksp0R/
-	yBZngaC31us/fbK1XKoXGVvDjEqXX63C7arjDWeoZxy5qdazZhbPe7FbOPNX317ZvJ2E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rojzn-00B9WC-OV; Mon, 25 Mar 2024 14:04:11 +0100
-Date: Mon, 25 Mar 2024 14:04:11 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Elad Nachman <enachman@marvell.com>,
-	Taras Chornyi <taras.chornyi@plvision.eu>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
-	"miquel.raynal@bootlin.com" <miquel.raynal@bootlin.com>,
-	"przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
-	"dkirjanov@suse.de" <dkirjanov@suse.de>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [EXTERNAL] Re: [PATCH v2 0/5] Fix prestera driver fail to probe
- twice
-Message-ID: <7c79b1f8-a5b6-46b7-99fc-a0ac1bec5694@lunn.ch>
-References: <20240320172008.2989693-1-enachman@marvell.com>
- <4104387a-d7b5-4029-b822-060ef478c6e3@lunn.ch>
- <BN9PR18MB42517F8E84C8C18078E45C37DB322@BN9PR18MB4251.namprd18.prod.outlook.com>
- <89a01616-57c2-4338-b469-695bdc731dee@lunn.ch>
- <BL1PR18MB42488523A5E05291EA57D0AEDB372@BL1PR18MB4248.namprd18.prod.outlook.com>
- <6dae31dc-8c4f-4b8d-80e4-120619119326@lunn.ch>
- <20240325134537.1cc7560e@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1711371878; c=relaxed/simple;
+	bh=StXWaTBoyd9Tje91UaCId+bbkSFToXQL4cx0rhEEsfk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PI95e9mE8A5+p1m8fOqNdjoQO1a9nUjQSidtSZnzG65p3BEtF9SxZF0+6Qs7iJQBzcf3iAn5xdDCF7M2EvKdtodqfBDVY0wLXY5ucuajoWIhP2O8G8uzQqJZAw8kep8ZH9yVNsaxi/NIJ/0T2Poon0Cp8kdlKYlPJ3X7jyRcSPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=mSEKPYR5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=j5iaYn/S; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=mSEKPYR5; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=j5iaYn/S; arc=none smtp.client-ip=195.135.223.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
+Received: from imap2.dmz-prg2.suse.org (imap2.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:98])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 6BEA05C6E0;
+	Mon, 25 Mar 2024 13:04:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1711371874; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q+zT1+tu64VVL4YrYUd/902NqQlxbkUXi0Ke76WYDHo=;
+	b=mSEKPYR50oH/oPYE/X8NNkMY9E1I7WbJ88RKv6s33VYE1FaRjrl9CEeVMGe3Y8OIkVfhTc
+	cT/9X0VQnY2CZYDOc6MwJmfPdh6rXSiY9U6L0laBdGrTGet4rqaZ9+9+4wnxDwofmd+70U
+	u+c/w3vo5hOnGgOj06kQ+CWGdkem9SY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1711371874;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q+zT1+tu64VVL4YrYUd/902NqQlxbkUXi0Ke76WYDHo=;
+	b=j5iaYn/Sqh9XpXnd3nZGL++fXaaY7xt2UkDdID1q7HwQTmgwhxISfVdxUnwiqmSGdcdpZl
+	PCRx3PruUgiuH4AQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1711371874; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q+zT1+tu64VVL4YrYUd/902NqQlxbkUXi0Ke76WYDHo=;
+	b=mSEKPYR50oH/oPYE/X8NNkMY9E1I7WbJ88RKv6s33VYE1FaRjrl9CEeVMGe3Y8OIkVfhTc
+	cT/9X0VQnY2CZYDOc6MwJmfPdh6rXSiY9U6L0laBdGrTGet4rqaZ9+9+4wnxDwofmd+70U
+	u+c/w3vo5hOnGgOj06kQ+CWGdkem9SY=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1711371874;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q+zT1+tu64VVL4YrYUd/902NqQlxbkUXi0Ke76WYDHo=;
+	b=j5iaYn/Sqh9XpXnd3nZGL++fXaaY7xt2UkDdID1q7HwQTmgwhxISfVdxUnwiqmSGdcdpZl
+	PCRx3PruUgiuH4AQ==
+Received: from imap2.dmz-prg2.suse.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by imap2.dmz-prg2.suse.org (Postfix) with ESMTPS id 0F5EE13A2E;
+	Mon, 25 Mar 2024 13:04:33 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
+	by imap2.dmz-prg2.suse.org with ESMTPSA
+	id W7qQO2F2AWbGGQAAn2gu4w
+	(envelope-from <dkirjanov@suse.de>); Mon, 25 Mar 2024 13:04:33 +0000
+Message-ID: <455b0c17-e977-4647-8dc5-6c56530f7945@suse.de>
+Date: Mon, 25 Mar 2024 16:04:29 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240325134537.1cc7560e@kmaincent-XPS-13-7390>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iproute2-next v3 2/2] bridge: vlan: add compressvlans
+ manpage
+Content-Language: en-US
+To: Date Huang <tjjh89017@hotmail.com>, roopa@nvidia.com, razor@blackwall.org
+Cc: netdev@vger.kernel.org, bridge@lists.linux-foundation.org
+References: <20240325054916.37470-1-tjjh89017@hotmail.com>
+ <MAZP287MB0503FE53735FD12BD753C328E4362@MAZP287MB0503.INDP287.PROD.OUTLOOK.COM>
+From: Denis Kirjanov <dkirjanov@suse.de>
+In-Reply-To: <MAZP287MB0503FE53735FD12BD753C328E4362@MAZP287MB0503.INDP287.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Level: 
+Authentication-Results: smtp-out2.suse.de;
+	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=mSEKPYR5;
+	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="j5iaYn/S"
+X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
+X-Spamd-Result: default: False [-1.50 / 50.00];
+	 RCVD_VIA_SMTP_AUTH(0.00)[];
+	 XM_UA_NO_VERSION(0.01)[];
+	 TO_DN_SOME(0.00)[];
+	 RCPT_COUNT_FIVE(0.00)[5];
+	 RCVD_COUNT_THREE(0.00)[3];
+	 DKIM_TRACE(0.00)[suse.de:+];
+	 MX_GOOD(-0.01)[];
+	 NEURAL_HAM_SHORT(-0.20)[-1.000];
+	 FREEMAIL_TO(0.00)[hotmail.com,nvidia.com,blackwall.org];
+	 FROM_EQ_ENVFROM(0.00)[];
+	 MIME_TRACE(0.00)[0:+];
+	 MID_RHS_MATCH_FROM(0.00)[];
+	 BAYES_HAM(-0.00)[38.37%];
+	 ARC_NA(0.00)[];
+	 R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 FROM_HAS_DN(0.00)[];
+	 FREEMAIL_ENVRCPT(0.00)[hotmail.com];
+	 TO_MATCH_ENVRCPT_ALL(0.00)[];
+	 MIME_GOOD(-0.10)[text/plain];
+	 NEURAL_HAM_LONG(-1.00)[-1.000];
+	 DNSWL_BLOCKED(0.00)[2a07:de40:b281:104:10:150:64:98:from];
+	 DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
+	 DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
+	 FUZZY_BLOCKED(0.00)[rspamd.com];
+	 RCVD_TLS_ALL(0.00)[]
+X-Spam-Score: -1.50
+X-Rspamd-Queue-Id: 6BEA05C6E0
+X-Spam-Flag: NO
 
-> Prestera is indeed not directly involved in PoE. I wrote a hack to be able to
-> get the PoE ports control, for testing my PoE patch series.
+
+
+On 3/25/24 08:49, Date Huang wrote:
+> Add the missing 'compressvlans' to man page
 > 
-> The aim in the future will be to add RJ45 port abstraction.
-> The Prestera will get the port abstraction which will get the PoE ports control.
-> The prestera driver then might receive an EPROBE_DEFER from it.
+> Signed-off-by: Date Huang <tjjh89017@hotmail.com>
+> ---
+> v3: change man page desription
 
-O.K, so EPRODE_DEFER has to work in a meaningful way. I'm not sure we
-can call a 30 second delay meaningful.
+s/desription/description/
 
-And it is not just PoE. phylink_create() can return EPROBE_DEFER, and
-there are probably others.
 
-      Andrew
+> 
+>  man/man8/bridge.8 | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/man/man8/bridge.8 b/man/man8/bridge.8
+> index eeea4073..e614a221 100644
+> --- a/man/man8/bridge.8
+> +++ b/man/man8/bridge.8
+> @@ -22,6 +22,7 @@ bridge \- show / manipulate bridge addresses and devices
+>  \fB\-s\fR[\fItatistics\fR] |
+>  \fB\-n\fR[\fIetns\fR] name |
+>  \fB\-b\fR[\fIatch\fR] filename |
+> +\fB\-com\fR[\fIpressvlans\fR] |
+>  \fB\-c\fR[\fIolor\fR] |
+>  \fB\-p\fR[\fIretty\fR] |
+>  \fB\-j\fR[\fIson\fR] |
+> @@ -345,6 +346,12 @@ Don't terminate bridge command on errors in batch mode.
+>  If there were any errors during execution of the commands, the application
+>  return code will be non zero.
+>  
+> +.TP
+> +.BR "\-com", " \-compressvlans"
+> +Show a compressed VLAN list of continuous VLAN IDs as ranges.
+> +All VLANs in a range have identical configuration.
+> +Default is off (show each VLAN separately).
+> +
+>  .TP
+>  .BR \-c [ color ][ = { always | auto | never }
+>  Configure color output. If parameter is omitted or
 
