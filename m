@@ -1,126 +1,89 @@
-Return-Path: <netdev+bounces-81588-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0285988A658
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:24:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 667BA88A694
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:30:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33A9A1C37740
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:24:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3A9529DD0B
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FFE246B9B;
-	Mon, 25 Mar 2024 12:45:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="gOWraMsf"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC6CD45037;
+	Mon, 25 Mar 2024 12:51:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay4-d.mail.gandi.net (relay4-d.mail.gandi.net [217.70.183.196])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9286D1A1;
-	Mon, 25 Mar 2024 12:45:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E226047A6F;
+	Mon, 25 Mar 2024 12:51:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711370751; cv=none; b=uQA71A45mlnkFNRWwzFI/1MkaMht+gOlAkLDAkx2YJuM5Bfd636QoKUYq9gJL6JvmTKv13yHbyF+kbc/K47m9pjGuHsmoSbXTYH47hc49/pR2F9fWROEv8vbheZOTAnOxocw4cbPSaftWzRTlog8B1CiD9q1UkanEZImkjpKaxQ=
+	t=1711371104; cv=none; b=JJbHICv8aPeynWnNO38PWVwcAm0GRt4V2/X4VD2AIAGbBmaEqe13mbjHlITd+nFatvnaCIXP5r9h00vZmWbls+826gLfRKEHH+K7Fe5y3sye2RDHJ3YV5LCOi07GnNlXpKlKOfRI4iQYXa1VZWyaxsIL2wo2QQsQCdAjbDs2B1Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711370751; c=relaxed/simple;
-	bh=ZziF1wRZF7EhrN6ygPWhxE5dY6tJWM2rg/5wYnZVgck=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bt1v7k9RHtuz0Rc1n4piwagIBPkllwmb5+ydjrjL0b7Nfz4VoBtPXDCJziISpAczX06A63WOb0geZDIDuLJbME6T8zjQXNwUH+qUwgMz82a2m0STAA8Xa8R+kKM+5L8rvdLLrKq8lJAIwZRyAWsji94m2XHKq5cfdL0rBOpsUwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=gOWraMsf; arc=none smtp.client-ip=217.70.183.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 83341E000B;
-	Mon, 25 Mar 2024 12:45:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1711370746;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ZziF1wRZF7EhrN6ygPWhxE5dY6tJWM2rg/5wYnZVgck=;
-	b=gOWraMsfaOyNY3BvmuvwWgpgqmuqW0qlq15nInyFvgo05o8t7OSVPL5gUyKNLnvPExr/L5
-	MlA90aWdO7REc9rMhwPApqU03oBt7bMyuEa8Pg6QGvQPCbizl4Peuys4axsyd6Ve8b7f/j
-	Uajthkay40AWaJDc8b1KUTKS++S4sQzC5AYSmSoTa52q8FuN4AXhgh9asuQK+KQg6S1fnV
-	nRSqyHGF2SpiDVAHRSvedzrOO1adgmwG7zZttvB0OfOkdCxcRKVzIeL905Izs+fAcuuPmM
-	Hfdcga0inTk+xSuAT/zJP5R+UHCRV4pikPz7PxIHdoUDLIqzILiam7ok3rVIdQ==
-Date: Mon, 25 Mar 2024 13:45:37 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Elad Nachman <enachman@marvell.com>, Taras Chornyi
- <taras.chornyi@plvision.eu>, "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
- <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
- "thomas.petazzoni@bootlin.com" <thomas.petazzoni@bootlin.com>,
- "miquel.raynal@bootlin.com" <miquel.raynal@bootlin.com>,
- "przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
- "dkirjanov@suse.de" <dkirjanov@suse.de>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>
-Subject: Re: [EXTERNAL] Re: [PATCH v2 0/5] Fix prestera driver fail to probe
- twice
-Message-ID: <20240325134537.1cc7560e@kmaincent-XPS-13-7390>
-In-Reply-To: <6dae31dc-8c4f-4b8d-80e4-120619119326@lunn.ch>
-References: <20240320172008.2989693-1-enachman@marvell.com>
-	<4104387a-d7b5-4029-b822-060ef478c6e3@lunn.ch>
-	<BN9PR18MB42517F8E84C8C18078E45C37DB322@BN9PR18MB4251.namprd18.prod.outlook.com>
-	<89a01616-57c2-4338-b469-695bdc731dee@lunn.ch>
-	<BL1PR18MB42488523A5E05291EA57D0AEDB372@BL1PR18MB4248.namprd18.prod.outlook.com>
-	<6dae31dc-8c4f-4b8d-80e4-120619119326@lunn.ch>
-Organization: bootlin
-X-Mailer: Claws Mail 3.17.5 (GTK+ 2.24.32; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1711371104; c=relaxed/simple;
+	bh=ZVogx11ulyTOf9KakHLa9Y+wnnqXepPLDEtt7Xo49Rk=;
+	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=FQPwl3rstC5NwIjtlwmxstjeeglcWY1P2OWwWBa7e/PiPpoRYHFxn0QvR87QlZMOzp8T7SWru4Rpp5OGt7y1hp1YFnk9q7R8Xqxc/D2gtGM9YIe1ndTquDQpXjSSwB4ophHwguwUIgPeFKp4ZUO3VA51d5tjHMHovDYdtN7b9pU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.214])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4V3CV71mj4z1GD2P;
+	Mon, 25 Mar 2024 20:51:11 +0800 (CST)
+Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
+	by mail.maildlp.com (Postfix) with ESMTPS id 083661A016C;
+	Mon, 25 Mar 2024 20:51:40 +0800 (CST)
+Received: from [10.67.120.192] (10.67.120.192) by
+ kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Mon, 25 Mar 2024 20:51:39 +0800
+Message-ID: <ed3f0650-1c27-4daf-9f92-0fe0927acea9@huawei.com>
+Date: Mon, 25 Mar 2024 20:51:10 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
+User-Agent: Mozilla Thunderbird
+CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
+	<salil.mehta@huawei.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <michal.kubiak@intel.com>,
+	<rkannoth@marvell.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
+	<liuyonglong@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH V3 net 2/3] net: hns3: fix kernel crash when devlink
+ reload during pf initialization
+To: Jiri Pirko <jiri@resnulli.us>
+References: <20240318132948.3624333-1-shaojijie@huawei.com>
+ <20240318132948.3624333-3-shaojijie@huawei.com> <Zfl0Xz3vNNH_3Mfo@nanopsycho>
+From: Jijie Shao <shaojijie@huawei.com>
+In-Reply-To: <Zfl0Xz3vNNH_3Mfo@nanopsycho>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemm600007.china.huawei.com (7.193.23.208)
 
-On Sun, 24 Mar 2024 16:25:28 +0100
-Andrew Lunn <andrew@lunn.ch> wrote:
 
-> > > > Originally, the pain point for Kory was the rmmod + insmod re-probi=
-ng
-> > > > failure, Which is only fixed by the first two commits, so I see lit=
-tle
-> > > > point in submitting 3-5 alone, Without fixing Kory's problem. =20
-> > >=20
-> > > I thought Kory's problem was actually EPROBE_DEFER? The resources nee=
-ded
-> > > for the PoE are not available, so probing the switch needs to happen =
-again
-> > > later, when PoE can get the resources it needs. =20
-> >=20
-> > No, the PoE is the general high level application where he noted the
-> > problem. There is no PoE code nor special PoE resources in the Prestera
-> > driver. =20
->=20
-> So here is K=C3=B6ry email:
->=20
-> https://lore.kernel.org/netdev/20240208101005.29e8c7f3@kmaincent-XPS-13-7=
-390/T/#mb898bb2a4bf07776d79f1a19b6a8420716ecb4a3
->=20
-> I don't see why the prestera needs to be involved in PoE itself. It is
-> just a MAC. PoE happens much lower down in the network stack. Same as
-> Prestera uses phylink, it does not need to know about the PHYs or the
-> SFP modules, phylink manages them, not prestera.
+on 2024/3/19 19:17, Jiri Pirko wrote:
+> Mon, Mar 18, 2024 at 02:29:47PM CET, shaojijie@huawei.com wrote:
+>> From: Yonglong Liu <liuyonglong@huawei.com>
+>>
+>> The devlink reload process will access the hardware resources,
+>> but the register operation is done before the hardware is initialized.
+>> so, if process the devlink reload during initialization, may lead to kernel
+>> crash. This patch fixes this by checking whether the NIC is initialized.
+> Fix your locking, you should take devl_lock during your init. That would
+> disallow reload to race with it.
+>
+> pw-bot: cr
 
-Prestera is indeed not directly involved in PoE. I wrote a hack to be able =
-to
-get the PoE ports control, for testing my PoE patch series.
+Thanks，
 
-The aim in the future will be to add RJ45 port abstraction.
-The Prestera will get the port abstraction which will get the PoE ports con=
-trol.
-The prestera driver then might receive an EPROBE_DEFER from it.
+   We have fixed this in v4.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+   Jijie Shao
+
 
