@@ -1,78 +1,74 @@
-Return-Path: <netdev+bounces-81757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A958088B0E0
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:07:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D668E88B12F
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:19:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB1881C3F631
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:07:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8D1341F2A6DF
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9C1F46430;
-	Mon, 25 Mar 2024 20:07:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F07A845023;
+	Mon, 25 Mar 2024 20:19:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cYsqNnxZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fOqLjzvU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39AB046444
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 20:07:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25BF218645
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 20:19:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711397231; cv=none; b=alJXRfL3uskE+SFTKNaRl6jqyiniWhsQOixTC1mQIvrKq13Fy6HMlsq7sFypfz+cDt4/8XGL2cNk3bxnOG4mK4jfDNa4qguW5IP0RRusnsLBuQyWrEPER4Zo6DU0HqVLzU93zsVS1c7RIbmL51bJbc6uF1YZ7FdaLcPGILLwtxU=
+	t=1711397955; cv=none; b=Fe9WOKHCfyTwVRVl5MYq/lWgcLBb8V+ysvC4zmTrG/w+APU8oY8oH2K+h88gaIzhjmUYmblFrcNHH5v8jD5JZxuuTO9M6ldSo+r+6s5VAyKKES91DaBe4lozpQaRF6Y2otgJKsiGLElxfXxnZrLROdaqNLU8KjTrPQ8QeY+DiS0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711397231; c=relaxed/simple;
-	bh=7mdEEhGhs9FkjBQ7nEZvaUHWMyUw67/IaXf1QetROdw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kGvKsg5gZelPCC39W63SNxsq4FaLxLzTgtgDDhRjVYdVOvrB9UN0/dVb5sKz8pgqYGFNkkwdGBY4jwNgIeQ1ny6p2LuLlftydzkPesknAVCY4dnkyyILtkMSUO4UeCREJ26J3wjlHMwi9tMH3+sQX523rJO7Wn8UOqrNMcSh3tk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cYsqNnxZ; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711397230; x=1742933230;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=7mdEEhGhs9FkjBQ7nEZvaUHWMyUw67/IaXf1QetROdw=;
-  b=cYsqNnxZs2OcEa4gdJlgoRNm9q28dNJeIYa1iZvwNWpKEDiyNRKpxfPk
-   zzD5dnhj10zmaQT3FV8L7C7YzRPVQPkpl6UfWIJlePyyvlQqg1pCklI1B
-   Ge01RaTdICHkscWEWbYtrRZMo1U1+3HprNH97+iCx93TesSX2yRr5+YA9
-   xDAubt0F3R8Q5V7xqZ3BT2rpBWq00B7zKElGriNvwUnMxlP6C6nYjWCJz
-   9XA1H46BLfy1FtTchPa9BFWKUoHOCYxysTlbAo/ToJIjFHFJlkEGWwL2I
-   H3CP/PCP7oY8/A8IDxb3oCt6QUgjnGcVg8vIR76SRh5zB19KyWD/GXzGT
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11024"; a="17855113"
-X-IronPort-AV: E=Sophos;i="6.07,154,1708416000"; 
-   d="scan'208";a="17855113"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 13:07:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,154,1708416000"; 
-   d="scan'208";a="20459302"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa005.jf.intel.com with ESMTP; 25 Mar 2024 13:07:05 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
+	s=arc-20240116; t=1711397955; c=relaxed/simple;
+	bh=IdVCsrq7tOKkEg9iPBuyY/ynzK2AlcCUX1wvmPlnA74=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Knfd6WLa11eW2FF2zzRlB7bXuG+XGRKynVpWn4hYS5GaSdF74tabQp/3y/UeI7WkoL5MPlT3rIIDJAb1kwAmBjY2lXQ2t33c+0PMTXA0ovrA2+/QMiK4MOLY0U36DAwSuulsqUviicnd6Ha6wF7cPGdx2QX2zL3O4ptPNqTVwHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fOqLjzvU; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711397952;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=vHCr1hkVrt3zjsj8EZP+o7GfFXzd0IpEVKZBBTCHeI0=;
+	b=fOqLjzvUM/Bzv1oJVtTzSgRt7Ol6IgG2YHuiWK2/hPb1WuA4JGFHOkMQ7dBQS6No/8QePl
+	Z1v9LkjfN5ianMHtA6TMXrj80jjSrN6fsNosOKAafovBXGDrRPQdkL08TtmZLGk/+HME1o
+	WdVCJp2UMEt0TscjQ+Kxsuk5e3EuXO0=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-675-qwYNHUpaNJ6s8NxEaFpIGw-1; Mon,
+ 25 Mar 2024 16:19:08 -0400
+X-MC-Unique: qwYNHUpaNJ6s8NxEaFpIGw-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id F3100380671B;
+	Mon, 25 Mar 2024 20:19:07 +0000 (UTC)
+Received: from swamp.redhat.com (unknown [10.45.224.78])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 1DA6E492BD3;
+	Mon, 25 Mar 2024 20:19:06 +0000 (UTC)
+From: Petr Oros <poros@redhat.com>
+To: netdev@vger.kernel.org
+Cc: jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Kurt Kanzenbach <kurt@linutronix.de>,
-	anthony.l.nguyen@intel.com,
-	vladimir.oltean@nxp.com,
-	bigeasy@linutronix.de,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Naama Meir <naamax.meir@linux.intel.com>
-Subject: [PATCH net 4/4] igc: Remove stale comment about Tx timestamping
-Date: Mon, 25 Mar 2024 13:06:48 -0700
-Message-ID: <20240325200659.993749-5-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240325200659.993749-1-anthony.l.nguyen@intel.com>
-References: <20240325200659.993749-1-anthony.l.nguyen@intel.com>
+	horms@kernel.org,
+	michal.swiatkowski@linux.intel.com,
+	wojciech.drewek@intel.com,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] ice: fix enabling RX VLAN filtering
+Date: Mon, 25 Mar 2024 21:19:01 +0100
+Message-ID: <20240325201901.39365-1-poros@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,40 +76,63 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-From: Kurt Kanzenbach <kurt@linutronix.de>
+ice_port_vlan_on/off() was introduced in commit 2946204b3fa8 ("ice:
+implement bridge port vlan"). But ice_port_vlan_on() incorrectly assigns
+ena_rx_filtering to inner_vlan_ops in DVM mode.
+This causes an error when rx_filtering cannot be enabled in legacy mode.
 
-The initial igc Tx timestamping implementation used only one register for
-retrieving Tx timestamps. Commit 3ed247e78911 ("igc: Add support for
-multiple in-flight TX timestamps") added support for utilizing all four of
-them e.g., for multiple domain support. Remove the stale comment/FIXME.
+Reproducer:
+ echo 1 > /sys/class/net/$PF/device/sriov_numvfs
+ ip link set $PF vf 0 spoofchk off trust on vlan 3
+dmesg:
+ ice 0000:41:00.0: failed to enable Rx VLAN filtering for VF 0 VSI 9 during VF rebuild, error -95
 
-Fixes: 3ed247e78911 ("igc: Add support for multiple in-flight TX timestamps")
-Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
-Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+Fixes: 2946204b3fa8 ("ice: implement bridge port vlan")
+Signed-off-by: Petr Oros <poros@redhat.com>
 ---
- drivers/net/ethernet/intel/igc/igc_main.c | 4 ----
- 1 file changed, 4 deletions(-)
+ .../ethernet/intel/ice/ice_vf_vsi_vlan_ops.c   | 18 ++++++++----------
+ 1 file changed, 8 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 2e1cfbd82f4f..35ad40a803cb 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -1642,10 +1642,6 @@ static netdev_tx_t igc_xmit_frame_ring(struct sk_buff *skb,
+diff --git a/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c b/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c
+index 80dc4bcdd3a41c..b3e1bdcb80f84d 100644
+--- a/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c
++++ b/drivers/net/ethernet/intel/ice/ice_vf_vsi_vlan_ops.c
+@@ -26,24 +26,22 @@ static void ice_port_vlan_on(struct ice_vsi *vsi)
+ 	struct ice_vsi_vlan_ops *vlan_ops;
+ 	struct ice_pf *pf = vsi->back;
  
- 	if (unlikely(test_bit(IGC_RING_FLAG_TX_HWTSTAMP, &tx_ring->flags) &&
- 		     skb_shinfo(skb)->tx_flags & SKBTX_HW_TSTAMP)) {
--		/* FIXME: add support for retrieving timestamps from
--		 * the other timer registers before skipping the
--		 * timestamping request.
--		 */
- 		unsigned long flags;
- 		u32 tstamp_flags;
+-	if (ice_is_dvm_ena(&pf->hw)) {
+-		vlan_ops = &vsi->outer_vlan_ops;
+-
+-		/* setup outer VLAN ops */
+-		vlan_ops->set_port_vlan = ice_vsi_set_outer_port_vlan;
+-		vlan_ops->clear_port_vlan = ice_vsi_clear_outer_port_vlan;
++	/* setup inner VLAN ops */
++	vlan_ops = &vsi->inner_vlan_ops;
  
+-		/* setup inner VLAN ops */
+-		vlan_ops = &vsi->inner_vlan_ops;
++	if (ice_is_dvm_ena(&pf->hw)) {
+ 		vlan_ops->add_vlan = noop_vlan_arg;
+ 		vlan_ops->del_vlan = noop_vlan_arg;
+ 		vlan_ops->ena_stripping = ice_vsi_ena_inner_stripping;
+ 		vlan_ops->dis_stripping = ice_vsi_dis_inner_stripping;
+ 		vlan_ops->ena_insertion = ice_vsi_ena_inner_insertion;
+ 		vlan_ops->dis_insertion = ice_vsi_dis_inner_insertion;
+-	} else {
+-		vlan_ops = &vsi->inner_vlan_ops;
+ 
++		/* setup outer VLAN ops */
++		vlan_ops = &vsi->outer_vlan_ops;
++		vlan_ops->set_port_vlan = ice_vsi_set_outer_port_vlan;
++		vlan_ops->clear_port_vlan = ice_vsi_clear_outer_port_vlan;
++	} else {
+ 		vlan_ops->set_port_vlan = ice_vsi_set_inner_port_vlan;
+ 		vlan_ops->clear_port_vlan = ice_vsi_clear_inner_port_vlan;
+ 	}
 -- 
-2.41.0
+2.43.2
 
 
