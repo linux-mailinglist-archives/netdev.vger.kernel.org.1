@@ -1,70 +1,72 @@
-Return-Path: <netdev+bounces-81466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 293FE889F27
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:27:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 032F1889F29
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:27:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BED0A1F379F4
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 12:27:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E87C1F38090
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 12:27:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17C915F3F8;
-	Mon, 25 Mar 2024 07:31:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E2915F406;
+	Mon, 25 Mar 2024 07:31:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ar8yyvqi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f7HwJLgp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95BB618786F;
-	Mon, 25 Mar 2024 03:44:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945BD187872;
+	Mon, 25 Mar 2024 03:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711338242; cv=none; b=mVeL9UTqCy03rCFEo61TBJDoTq0xF6ZHO8Z+5c7VEavo1vJCFnP4Tws3ICi+xJpYUUUDGJxC9w/8UycnXJrHmolQ7OQ2HgEWEnfZVTRJ+Km3RcXBnbH2/w/arig12qJSiOIEROlz4nrsnqpRD6JYEKDFeed+u9uYb5Fwuo8pIk4=
+	t=1711338245; cv=none; b=p1DQIa0+bFSxIGP1dm4st8Y1m6n5DcZV1tJD4ACsuEzwI70bsMNxLDWwIolSE7F8relGAuQoZc4DaawDB5OBbI4fq8KY+mWuwKOK9QLjzU9JqOEk+S8P9FG4h+Mc88EbOYNDVqrd/XNoxxWsBlN5TiJnC/JOYJVYsPMNO5le5kw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711338242; c=relaxed/simple;
-	bh=teH38ASE4B1X90x37Shf8/P2G9yTLfaBtfwsGauPHPg=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PVsKRlzrzd6myRgfDMYND46vEP36mxQ9SdbFS2VMYu322aomskKqM4O+sHQjJaK3jP8/r2WXw0DkPwqlClEdznrG7Ik4/XEPI18v0ISG/CIiJX/PBXFXxn5G3VYF3mPJC6BoIxjSVnS1lR0pitsUYHNLQBv0gcktwgN0+jhVgG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ar8yyvqi; arc=none smtp.client-ip=209.85.210.42
+	s=arc-20240116; t=1711338245; c=relaxed/simple;
+	bh=zdcY5soF9BXG2lTs8P71BAAJR2cSoF7tMC4SEYlkG9k=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=jdsVWX2gSSEoo++dPWiChn7NmYXGkBtN90mlQ7Az7Ks/GoYNPJ+IBNBoMFen0XzoUfzKgU5nkxgIOparU9SRPiBjiz5JGrV2ynC7DN8vqQHNMXZcLKQwVf3PPbhf3k12Jh9dbNkfyKFjkpIBTw79ToGcYSv6Wd/zEIQNShsfazM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f7HwJLgp; arc=none smtp.client-ip=209.85.210.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6e682dbd84bso2474731a34.0;
-        Sun, 24 Mar 2024 20:44:00 -0700 (PDT)
+Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-6e6ee9e3cffso2603094b3a.1;
+        Sun, 24 Mar 2024 20:44:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711338239; x=1711943039; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=5XFLppo36Umvbtpc8RsHxYQfKcPgDsuGoxP0BP41l1g=;
-        b=ar8yyvqi1b9wz5VLzRHyMv1jub22l1k5pzDNjasIRX1xL3uxG0OnK0Wz95ptgJrDbm
-         DiZFL5iANzB5GgbEtV77KREpZH21wvlIHodtwWi4ch6O5+UE9w+8h7VpJ6AlsU/EnJnH
-         SdAMOsC47QAwfFZvgCAsP/SRtTkFJ2ckNulrlbaIjGvUqogXB4bdFd1J4F0u0K0hxO8l
-         5/62sEFueNYFPjZpbLZ/ik3Sragdtxw2OKrXe3iYB2DQvHmpBH0Rh36rlHwffkayucDu
-         Uml1rKQ4cgl+frHkHDQYgwZU4DPgFScCS0GP/ixD/ZKrh+YeQRVShb3lny4YQXrF24N7
-         CBIQ==
+        d=gmail.com; s=20230601; t=1711338243; x=1711943043; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xqoWsOzzwSicKy0P4YX659czjlZonHpQhh++FcV33Zc=;
+        b=f7HwJLgpEkZnjH6Xf1MM1jvzttNloJVA+qthIeUmF1NO2W1gsuACotfhTXUIifO7TY
+         zHvzefI8Dj6vXoO/Lgd9NwRK5/uhW97TLuSyI8V+Ha2mndcJ5j0Skhe33pj70qkT9ecn
+         NKSqbzBq+iUHUOUJiELH571Y7lGDq88ZFJxrwP2aH7W7sLTAkClm2PAc5mskcsPIN5oF
+         VwVW43a+UWsb7AwAueyz+A2PVYQXV4/CJumVk1SqW1ZoKZ9i1nnpsDefXnZpISZMAj1c
+         xK1BX6QTcC8dGFtn+vcIIZo7LOS7VIGem3SvkaM2bvMAM5WYP9i3z4YLSHdpsHEphrqI
+         t/iQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711338239; x=1711943039;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=5XFLppo36Umvbtpc8RsHxYQfKcPgDsuGoxP0BP41l1g=;
-        b=DnIKi2rZixDNTq7eeHskBzzD7sduHgFk4pAczLivduP9K2C2Y0yl6CNwFfEN4WXtl7
-         JyqMSxRUEumXUZBCP7caAH865MqdavNZRKH8fnjoikXcfJ8oKehTBx4uFrg+GMF+rXqy
-         Lr+7RZ6xNZODDUG/wkS9X4T9DAoMHCZVs5hnIuf1BD680Vqe+RO8FDdwzEPjZcf2whwL
-         T2fCAmGFLDeou3PJWTMIolxVnln1m6JfN+zgJceyNtTUdWSww/VrAon2uQyYo2fPSQqq
-         o7MiZd+k/SDE2lSf++8qOPJW00UxKbakF15uL/5W4j3a59+EDxzzycN0mDikqFElcf4h
-         /92Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUodisD9AR4Mp4MfaW8lQwlO6HAEFrwWgVjGAU3yDxLxV0kAl6W0+C3euDUgb+W6GXGzfDZwvgTL7ubcd1Um9B249684ZRZVSjVvNrZGOc3flTJ
-X-Gm-Message-State: AOJu0Yzz2iTE054IKszInnZI6sBE8t+YAMZ24UY/mVJans4qYMzdTagt
-	9RAP7LWOnA20ORaWakAjIeJtR8xVFNCHrkSEVWlAzqE/jwo/I9zb
-X-Google-Smtp-Source: AGHT+IHmYixcHV8K+3RjwVIoS1UeugbmyXSvhC1Y0NyEdKEFU/YXPCpy5uXz876h4cUN0hTlTyZI8w==
-X-Received: by 2002:a05:6870:6108:b0:221:9414:4519 with SMTP id s8-20020a056870610800b0022194144519mr7298644oae.46.1711338239656;
-        Sun, 24 Mar 2024 20:43:59 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711338243; x=1711943043;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xqoWsOzzwSicKy0P4YX659czjlZonHpQhh++FcV33Zc=;
+        b=rW81FQMKDS8zfb/XhMr5BOXYDav3Mh7pm5qygz+elHjMZZs2LeKrSpUmQuWkum/fMw
+         Khc97EZC5RdzJ9jz4eSy4tJtaPVrxa7qCuMt3/WL7kpap2SsDZXsJddVvGgwgZm8pqdt
+         HYLu64Ksjn16j+tKHPz+qnBWhtptQKBTXjQtr4NiVuuuJJNRRt5Heri+OqlWlL29r6LJ
+         37uDJjhZD/ILQrYCg941j+zfiQ2L77yYVD/jXoeuPZor8g5yKo7c/b/JPVo5PCkmtNvL
+         e6iACZ3d0wn40NRh07dgoZr9/ClIoHra/1mekEvpnenu5tPDxXv2275Tp4D/MlFbgqHK
+         EyAw==
+X-Forwarded-Encrypted: i=1; AJvYcCX5V8wVv5bpNa5B65gnOl0eMwPwBY34rNjyUslmgOsLaq4znH0WtOQ7QahZmc7EQ8RQzE/IjbdNuoZT3jU1Qh2AVVHGQv6bFpCSVC/v1hcdoIuL
+X-Gm-Message-State: AOJu0YwW2sB/l9r6Sz/ZRyJtUyi/Xki9oxM+SPzUHTpZH92Hq9j6WDp7
+	pfxlyEBlDS9YaHoZWfETOIdFfGdA5ojuLIg0H0Uniff+KqArmawHKUQ3Ux63
+X-Google-Smtp-Source: AGHT+IF2VV2YJlij1DrYmlsAl41QH/8CeXSo/eILZA1VGJV70d076KHfUFCWFIBWcNaWlVu/fybr8w==
+X-Received: by 2002:a05:6a00:14c6:b0:6ea:74d4:a00d with SMTP id w6-20020a056a0014c600b006ea74d4a00dmr7504774pfu.5.1711338242856;
+        Sun, 24 Mar 2024 20:44:02 -0700 (PDT)
 Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
-        by smtp.gmail.com with ESMTPSA id fk26-20020a056a003a9a00b006e6bf17ba8asm3300045pfb.65.2024.03.24.20.43.56
+        by smtp.gmail.com with ESMTPSA id fk26-20020a056a003a9a00b006e6bf17ba8asm3300045pfb.65.2024.03.24.20.43.59
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Mar 2024 20:43:59 -0700 (PDT)
+        Sun, 24 Mar 2024 20:44:02 -0700 (PDT)
 From: Jason Xing <kerneljasonxing@gmail.com>
 To: edumazet@google.com,
 	mhiramat@kernel.org,
@@ -77,10 +79,12 @@ Cc: netdev@vger.kernel.org,
 	linux-trace-kernel@vger.kernel.org,
 	kerneljasonxing@gmail.com,
 	Jason Xing <kernelxing@tencent.com>
-Subject: [PATCH net-next 0/3] trace: use TP_STORE_ADDRS macro
-Date: Mon, 25 Mar 2024 11:43:44 +0800
-Message-Id: <20240325034347.19522-1-kerneljasonxing@gmail.com>
+Subject: [PATCH net-next 1/3] trace: move to TP_STORE_ADDRS related macro to net_probe_common.h
+Date: Mon, 25 Mar 2024 11:43:45 +0800
+Message-Id: <20240325034347.19522-2-kerneljasonxing@gmail.com>
 X-Mailer: git-send-email 2.33.0
+In-Reply-To: <20240325034347.19522-1-kerneljasonxing@gmail.com>
+References: <20240325034347.19522-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,19 +95,93 @@ Content-Transfer-Encoding: 8bit
 
 From: Jason Xing <kernelxing@tencent.com>
 
-Using the macro for other tracepoints use to be more concise.
-No functional change.
+Put the macro into another standalone file for better extension.
+Some tracepoints can use this common part in the future.
 
-Jason Xing (3):
-  trace: move to TP_STORE_ADDRS related macro to net_probe_common.h
-  trace: use TP_STORE_ADDRS() macro in inet_sk_error_report()
-  trace: use TP_STORE_ADDRS() macro in inet_sock_set_state()
+Signed-off-by: Jason Xing <kernelxing@tencent.com>
+---
+ include/trace/events/net_probe_common.h | 29 +++++++++++++++++++++++++
+ include/trace/events/tcp.h              | 29 -------------------------
+ 2 files changed, 29 insertions(+), 29 deletions(-)
 
- include/trace/events/net_probe_common.h | 29 ++++++++++++++++++++
- include/trace/events/sock.h             | 35 ++++---------------------
- include/trace/events/tcp.h              | 29 --------------------
- 3 files changed, 34 insertions(+), 59 deletions(-)
-
+diff --git a/include/trace/events/net_probe_common.h b/include/trace/events/net_probe_common.h
+index 3930119cab08..b1f9a4d3ee13 100644
+--- a/include/trace/events/net_probe_common.h
++++ b/include/trace/events/net_probe_common.h
+@@ -41,4 +41,33 @@
+ 
+ #endif
+ 
++#define TP_STORE_V4MAPPED(__entry, saddr, daddr)		\
++	do {							\
++		struct in6_addr *pin6;				\
++								\
++		pin6 = (struct in6_addr *)__entry->saddr_v6;	\
++		ipv6_addr_set_v4mapped(saddr, pin6);		\
++		pin6 = (struct in6_addr *)__entry->daddr_v6;	\
++		ipv6_addr_set_v4mapped(daddr, pin6);		\
++	} while (0)
++
++#if IS_ENABLED(CONFIG_IPV6)
++#define TP_STORE_ADDRS(__entry, saddr, daddr, saddr6, daddr6)		\
++	do {								\
++		if (sk->sk_family == AF_INET6) {			\
++			struct in6_addr *pin6;				\
++									\
++			pin6 = (struct in6_addr *)__entry->saddr_v6;	\
++			*pin6 = saddr6;					\
++			pin6 = (struct in6_addr *)__entry->daddr_v6;	\
++			*pin6 = daddr6;					\
++		} else {						\
++			TP_STORE_V4MAPPED(__entry, saddr, daddr);	\
++		}							\
++	} while (0)
++#else
++#define TP_STORE_ADDRS(__entry, saddr, daddr, saddr6, daddr6)	\
++	TP_STORE_V4MAPPED(__entry, saddr, daddr)
++#endif
++
+ #endif
+diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
+index 699dafd204ea..3c08a0846c47 100644
+--- a/include/trace/events/tcp.h
++++ b/include/trace/events/tcp.h
+@@ -12,35 +12,6 @@
+ #include <net/tcp.h>
+ #include <linux/sock_diag.h>
+ 
+-#define TP_STORE_V4MAPPED(__entry, saddr, daddr)		\
+-	do {							\
+-		struct in6_addr *pin6;				\
+-								\
+-		pin6 = (struct in6_addr *)__entry->saddr_v6;	\
+-		ipv6_addr_set_v4mapped(saddr, pin6);		\
+-		pin6 = (struct in6_addr *)__entry->daddr_v6;	\
+-		ipv6_addr_set_v4mapped(daddr, pin6);		\
+-	} while (0)
+-
+-#if IS_ENABLED(CONFIG_IPV6)
+-#define TP_STORE_ADDRS(__entry, saddr, daddr, saddr6, daddr6)		\
+-	do {								\
+-		if (sk->sk_family == AF_INET6) {			\
+-			struct in6_addr *pin6;				\
+-									\
+-			pin6 = (struct in6_addr *)__entry->saddr_v6;	\
+-			*pin6 = saddr6;					\
+-			pin6 = (struct in6_addr *)__entry->daddr_v6;	\
+-			*pin6 = daddr6;					\
+-		} else {						\
+-			TP_STORE_V4MAPPED(__entry, saddr, daddr);	\
+-		}							\
+-	} while (0)
+-#else
+-#define TP_STORE_ADDRS(__entry, saddr, daddr, saddr6, daddr6)	\
+-	TP_STORE_V4MAPPED(__entry, saddr, daddr)
+-#endif
+-
+ /*
+  * tcp event with arguments sk and skb
+  *
 -- 
 2.37.3
 
