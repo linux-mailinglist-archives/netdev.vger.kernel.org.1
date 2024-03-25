@@ -1,90 +1,157 @@
-Return-Path: <netdev+bounces-81674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81675-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEAC288AB31
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 18:17:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEB6088AB44
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 18:18:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C9601C3BF94
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:17:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35E6C1C39409
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:18:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14B861534EA;
-	Mon, 25 Mar 2024 15:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365D484D03;
+	Mon, 25 Mar 2024 16:00:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="F4DiX7MJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6D4152E16
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 15:56:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC7361E48B
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 16:00:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711382220; cv=none; b=pzeBbn8Uq5D9qxtDSFpofkES3GQD5PbDMvoLwFNZKevjeIM8ZEIi3fceiuAeXUyZCV4xlYON08dFpuC3avhGuT4cyJHs5lbzvguhRneidlxqFsi5ipUuuRrvv9hkVumoNeKXPfYIyawkuyBxPbIViTS8PGhDY4I4rVUzHF4it6A=
+	t=1711382451; cv=none; b=i4AqggA0Qn0exBY1Lozq2VJuUXBCCXqjYZRR9ZQMkaOr3ayu3WH1PhpaU10vA36cn5bhXAw5BBGCjIz5axjxR6/DVfRKPwhDmb2STwYGHecbnXv3F1V25KSaPNnP6mfPG1oKroP+EhgCJFIP+GqkSQ+hkyRPCUJry6QdKKcrqbE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711382220; c=relaxed/simple;
-	bh=hBi2mR5fFUopUORGHBqnfiL4BtAwLkQXsixSqsThaMs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DX46BO02LaZMVDvzuKmOsLgXs92kon1KUkSEjO6XO0+76kYg/RSu8Sm4DGcNqYFI5xzY8wvUDgVUE//7F/3OPcozLcyO/HBIM943nr0n44UhfdQnoGcaX0Hr5tHcqHhAWpKTKY1evWpY6BAZKSqKHcDP23o891FFkaFZFNMqjPg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 09B4920004;
-	Mon, 25 Mar 2024 15:56:55 +0000 (UTC)
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: netdev@vger.kernel.org
-Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net 4/4] tls: get psock ref after taking rxlock to avoid leak
-Date: Mon, 25 Mar 2024 16:56:48 +0100
-Message-ID: <fe2ade22d030051ce4c3638704ed58b67d0df643.1711120964.git.sd@queasysnail.net>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <cover.1711120964.git.sd@queasysnail.net>
-References: <cover.1711120964.git.sd@queasysnail.net>
+	s=arc-20240116; t=1711382451; c=relaxed/simple;
+	bh=wqQe2DJZDzzMYImWv6Ki1IImWaVqSXITlgGJEpik5FA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ULmO3JzDaNQBfWUMOQUdfBp/Eet8heeOye72opSsgDNlDsTrp9lHcv6mVo7X64Iw4VbnBwuYa4l8kRBZAmuBE+yKfwhQZ8+esldNZbLGenM2WzfiQEJSAyKW0BGW7+gsi2Hfnnpe7Y9Xn1fy1tDxHxvIVKj3nhusgZCHQZaGcxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=F4DiX7MJ; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-33fd12a06fdso3204614f8f.1
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 09:00:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1711382447; x=1711987247; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=XguyOTPW8SaIMkmqZ21Rgli3joUrKCpC0w2AVoDmBo8=;
+        b=F4DiX7MJqyVEHpWldAiPsZtv6b3WfYNZD0xT7ypua34yOhi0UI6Q7CVUok+CLSUhlu
+         HA5p2jb04ilhNXD/Yk264dQ8YAMZ3lhrMpG3v+/yY6S60NQjBMG09mf0S3g1Oqxhztkk
+         2/ewEBjMfEWQs31rpZ70mYQQxG//XWEEeEalc3V+rogq25pHTz3Fhu2xCNkDyzIDq4J0
+         ZAeKy5cr+sqpRg9GNClvtb+tGX7LcYQTfkoPHlMx2Gb9Y2vLWGpL13uYF7qCgQc6yf8y
+         RwthqhhfdK1DC9Wz1xxpJ5AWLEFCvaKfom2+9BmXcSIWQB3+rGLNUpf3vt2v6Ap1WpAZ
+         FWXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711382447; x=1711987247;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=XguyOTPW8SaIMkmqZ21Rgli3joUrKCpC0w2AVoDmBo8=;
+        b=KS49T2ab3l6KnUJsD0ZLJZhmt/NEITA2dmRF8uFYTIZ3s2N8j0PNQX3G1egJGCmAAh
+         nYBVWFL55+wsh28HXEJfkWyAOvez/pj3rYNRL+evIzTwFbKL7E/iA9iLMU+aqRv5qo0S
+         8i1qiCuir4hkyO99atSlOdrFSEzmT1j2hBbOs1y8Xj6oQf7kHTK4jwI6MfSPWp1x7jLA
+         H1OiLJNgKdTIHt2czbceOohA9mJXpY9kYb1uMo/QRfaOky/yBlQ2wN9DndfMIdEz+3lC
+         eY6e/esTCdO9f11wPZJBzNiUz7RFg1wJFoLkoaMMCHMfHDAh840LZw3MLdmtC6KRjvj8
+         AZJg==
+X-Gm-Message-State: AOJu0YytNwP37GfUJ9iDTB0WMJpwtqzzEP1ykRJL3g/gChiTwShWFcoD
+	/z3Ka0GOzzRrAWWft/LkBN4YF0Vyxw4VWzy3axEQKfP5FTR95w8o4fTHBJYXodQvHGMcUsNlE99
+	E
+X-Google-Smtp-Source: AGHT+IHAQQRHljpHUkf1aqxlBTu/wdvUc6/R03vZ10abjHEyq0wyR/SvNz2BJXeAO3tvcYuIXdvPCA==
+X-Received: by 2002:a5d:51d1:0:b0:33e:34b7:895f with SMTP id n17-20020a5d51d1000000b0033e34b7895fmr5048233wrv.24.1711382447213;
+        Mon, 25 Mar 2024 09:00:47 -0700 (PDT)
+Received: from [127.0.1.1] (laubervilliers-658-1-213-31.w90-63.abo.wanadoo.fr. [90.63.244.31])
+        by smtp.gmail.com with ESMTPSA id r17-20020adff711000000b0033b6e26f0f9sm9839361wrp.42.2024.03.25.09.00.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Mar 2024 09:00:46 -0700 (PDT)
+From: Julien Panis <jpanis@baylibre.com>
+Subject: [PATCH net-next v4 0/3] Add minimal XDP support to TI AM65 CPSW
+ Ethernet driver
+Date: Mon, 25 Mar 2024 17:00:34 +0100
+Message-Id: <20240223-am65-cpsw-xdp-basic-v4-0-2e45e5dec048@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: sd@queasysnail.net
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAKKfAWYC/42OzWrDMBCEXyXo3G31ZyHn1PcoIexKSq0Sy0Yyj
+ kPwu1fxsYTi4+zMfDsPVkKOobDj4cFymGOJQ6pCvx2Y6zB9B4i+aia51FxKBdibBtxYbrD4EQh
+ LdKA9WWkbbklbVpv1GoAyJtc9uz8jplg+av7cY0zXmMJ55s/gmMMlLtv7L5bCBCksEztVp4tlG
+ vJ92zWLzf93wixAQHvhZBx5VIJ/Et6vkXJ4d0O/IWe5AyOBAxfOOESHROYFRu3AqIppfKs1tt5
+ qfLVG78DoilFWGYFGobb0B7Ou6y/0kPBSwQEAAA==
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Sumit Semwal <sumit.semwal@linaro.org>, 
+ =?utf-8?q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+ Simon Horman <horms@kernel.org>, Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ bpf@vger.kernel.org, linux-media@vger.kernel.org, 
+ dri-devel@lists.freedesktop.org, linaro-mm-sig@lists.linaro.org, 
+ Julien Panis <jpanis@baylibre.com>
+X-Mailer: b4 0.12.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1711382445; l=2133;
+ i=jpanis@baylibre.com; s=20230526; h=from:subject:message-id;
+ bh=wqQe2DJZDzzMYImWv6Ki1IImWaVqSXITlgGJEpik5FA=;
+ b=P1yzfio0eDcxAyUAY/a+nfJisXG0eTNG56agA256QD3aW0IbWjpNBGzvns98Nsg9Qqsm9+Nq5
+ 4QVR/fm2KNpAOWGfAES1MKvawg2+uGBn3Y7SBGyJB+8SciyAJxTQ5R3
+X-Developer-Key: i=jpanis@baylibre.com; a=ed25519;
+ pk=8eSM4/xkiHWz2M1Cw1U3m2/YfPbsUdEJPCWY3Mh9ekQ=
 
-At the start of tls_sw_recvmsg, we take a reference on the psock, and
-then call tls_rx_reader_lock. If that fails, we return directly
-without releasing the reference.
+This patch adds XDP support to TI AM65 CPSW Ethernet driver.
 
-Instead of adding a new label, just take the reference after locking
-has succeeded, since we don't need it before.
+The following features are implemented: NETDEV_XDP_ACT_BASIC,
+NETDEV_XDP_ACT_REDIRECT, and NETDEV_XDP_ACT_NDO_XMIT.
 
-Fixes: 4cbc325ed6b4 ("tls: rx: allow only one reader at a time")
-Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+Zero-copy and non-linear XDP buffer supports are NOT implemented.
+
+Besides, the page pool memory model is used to get better performance.
+
+Signed-off-by: Julien Panis <jpanis@baylibre.com>
 ---
- net/tls/tls_sw.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Changes in v4:
+- Add skb_mark_for_recycle() in am65_cpsw_nuss_rx_packets() function.
+- Specify napi page pool parameter in am65_cpsw_create_xdp_rxqs() function.
+- Add benchmark numbers (with VS without page pool) in the commit description.
+- Add xdp_do_flush() in am65_cpsw_run_xdp() function for XDP_REDIRECT case.
+- Link to v3: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v3-0-5d944a9d84a0@baylibre.com
 
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 14faf6189eb1..b783231668c6 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -1976,10 +1976,10 @@ int tls_sw_recvmsg(struct sock *sk,
- 	if (unlikely(flags & MSG_ERRQUEUE))
- 		return sock_recv_errqueue(sk, msg, len, SOL_IP, IP_RECVERR);
- 
--	psock = sk_psock_get(sk);
- 	err = tls_rx_reader_lock(sk, ctx, flags & MSG_DONTWAIT);
- 	if (err < 0)
- 		return err;
-+	psock = sk_psock_get(sk);
- 	bpf_strp_enabled = sk_psock_strp_enabled(psock);
- 
- 	/* If crypto failed the connection is broken */
+Changes in v3:
+- Fix a potential issue with TX buffer type, which is now set for each buffer.
+- Link to v2: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v2-0-01c6caacabb6@baylibre.com
+
+Changes in v2:
+- Use page pool memory model instead of MEM_TYPE_PAGE_ORDER0.
+- In am65_cpsw_alloc_skb(), release reference on the page pool page
+in case of error returned by build_skb().
+- [nit] Cleanup am65_cpsw_nuss_common_open/stop() functions.
+- [nit] Arrange local variables in reverse xmas tree order.
+- Link to v1: https://lore.kernel.org/r/20240223-am65-cpsw-xdp-basic-v1-1-9f0b6cbda310@baylibre.com
+
+---
+Julien Panis (3):
+      net: ethernet: ti: Add accessors for struct k3_cppi_desc_pool members
+      net: ethernet: ti: Add desc_infos member to struct k3_cppi_desc_pool
+      net: ethernet: ti: am65-cpsw: Add minimal XDP support
+
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c    | 536 +++++++++++++++++++++++++---
+ drivers/net/ethernet/ti/am65-cpsw-nuss.h    |  13 +
+ drivers/net/ethernet/ti/k3-cppi-desc-pool.c |  36 ++
+ drivers/net/ethernet/ti/k3-cppi-desc-pool.h |   4 +
+ 4 files changed, 539 insertions(+), 50 deletions(-)
+---
+base-commit: 6613476e225e090cc9aad49be7fa504e290dd33d
+change-id: 20240223-am65-cpsw-xdp-basic-4db828508b48
+
+Best regards,
 -- 
-2.43.0
+Julien Panis <jpanis@baylibre.com>
 
 
