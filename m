@@ -1,138 +1,167 @@
-Return-Path: <netdev+bounces-81740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7880D88AF69
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:07:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4230588AFB1
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:19:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E7662E3BB0
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 19:07:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 650AF1C61E0D
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 19:19:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11771C8F3;
-	Mon, 25 Mar 2024 19:07:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2B012B6C;
+	Mon, 25 Mar 2024 19:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nrcrqrb9"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iCsjd5/l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4457763A5;
-	Mon, 25 Mar 2024 19:07:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D7A1C6B6
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 19:19:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711393640; cv=none; b=IRaHDA+YvoFFYeRvfkp8GvRYXUlDryuuiX13DSNdfI8BfPhWZVNCS3EjqWQNcq0qRH4lsVQ/LPmUcbVN5jjv6FAWM41s2CCR4oaCfayoOSUu4f3c3jDzzqexVE3EqqEs5EROCGguV6Nq5mTBBUzMeo011W74gFU4wrZ1+Ear0BU=
+	t=1711394385; cv=none; b=H+W3iQU78T4LvTjMDpCKq5QfiQlqZTK91BYmTP8fjKm7mtVovBKgE53JAw4LuP4cuy1aQyOO4+DWQyatB2VdAzvQdBctfWY/FNwItQ0+ySagT/0S0hRxa5cFHSl0K73jzIAv88+QTx4rBfA+CbLSnYHBE7/waY9isbdLp6hTLY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711393640; c=relaxed/simple;
-	bh=R1gMQnITYg/OSZ7ny+xj4dwu+8HA375SzGX3LTp4nDs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bsftOcXpu9gNZY7hWwonOv/k2ljVcaycsT10KeButT4u2ghghIleOm93ANtbsDt/jFm2Bytb019/YM5n4eCoq2y0+11n4bLcXo4YIla3Gv0YF/hFPSiLE926ihkQPZY8Xbm5eSICzVO8zO5s5JOc+EjV4EoJ0pFa2jbm0rRj8d8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nrcrqrb9; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-34100f4f9a2so2803609f8f.2;
-        Mon, 25 Mar 2024 12:07:19 -0700 (PDT)
+	s=arc-20240116; t=1711394385; c=relaxed/simple;
+	bh=xEMxiJB0c6G9z0DMbm7e5y0kwjrYVcpjBOXOzjtHEAQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cHnnuOSk0o+pFp2b17qkfF4NKKZO9zFlnMC2YcXN/Qrc5oFHHFBUMKiAehGKizon5PV/nMKjb8kbYCMBRjEpZFbMBjrWGI4Ux9zGJjMNXhcyJHfdn6nSHKccrQ4g8XM4bTe28xI6ORS0jBPTxtBpA5lNpcYLVYoloSCxergMCyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iCsjd5/l; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-56a2bb1d84eso8383509a12.1
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 12:19:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711393637; x=1711998437; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=qdQF1e0DPL90+YfbR/8OadJounnRa7UNnfPsT8scWp8=;
-        b=nrcrqrb9CEYFxIWOC0GDtP8nI8HlAFvAV0PouQJM7UITUdo5V/EgoguLCgNKfYg0Y6
-         z3Zhr2P7j93/wHc5g92kidwfV40r7P5A/GacbxRQOio/icqLwJOf1B+KsaVB6pwCWXEx
-         iP2L+xQ7Z+mRsbdeuhSMq2Qe/uCwi2dI0dWpz6w1JSznpp7cc3PYD6Z/MDyVoE3bNEOi
-         1SES6gherOiC6T3f4td1B2lkaQ/HGIFqjAcW85j2XKAExGnGkkqjdxYP4AoON150fOID
-         s2QTdrQNDkgK+b3UQ5u6pn/YFohGczKqqf+ziSbCoAciQjj+FUpYf5UUJAACIYnZLw+C
-         1LsA==
+        d=linaro.org; s=google; t=1711394382; x=1711999182; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ugZz785W8pMDPhpwfMM+nuUMqogsJD2dq6g02eauybE=;
+        b=iCsjd5/lWV67rNMya7uouqwFYfrH+11sTrQjp5VODK8fhlyvpuE1uEpP92rCkA8AIJ
+         7gFVkx570SHOI/Ul9y3z1g6r46LPSkEPHIq5BXSf8ar44diMoEDWXZg6kt7NtiwEGkzD
+         JsNhWHN8xhW5p7uLZ9AXK++La1DDDBFD6eQRQ4ep2ljm9b+txluQvLA4rHWSdhWWzYG/
+         E15gYkOz2BhEm3DNukIfXdSACJ+nxdMeTaZEHq76T8ie/vQOjBwC4W/SOL/9OwLtHi6m
+         PODJ22yQ7p9zr7cNV+lbIQ82AEmcK1g5qkg5zAWHYnMsO3QLvM7BJmClEq1Yyfn9rZ2O
+         1pKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711393637; x=1711998437;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=qdQF1e0DPL90+YfbR/8OadJounnRa7UNnfPsT8scWp8=;
-        b=GsJXY5DvTj4Gjdjqxvi4rVp81kh1//7YsS5BCY3QJDorCMHC3K6YtQy6FH8EMm7IT0
-         oo8lRAMn4piqHdcDMMS9//oy3+ZiUWGofW25g3h8Sdh7SYipXHog6zlUXwLhF4eNJ3OQ
-         IK8wtyN+5h4eNFWsjDCab2rqAYJlklxE9xdOlNR0/1mIwdDJ09wYxv6CGEp2WOJr6YvX
-         /D7Qs6UwKfLNN53Lq1f9G+pAOlMq/SrqzuCiG/d7MSv1eg3nl8JsV3yPFhjJpOQrVeYE
-         joKYocGyH7wtValzT+zm0FDAeT4EcioSXJibwW/l1x7wtRLTu3nI+dXq5oVfzyJ/tDd0
-         GhNA==
-X-Forwarded-Encrypted: i=1; AJvYcCVGPCwjB3rN2u2t0tjDhCp3Cjoqb4As6qdMqV4G/7DiDmyNKeksYjHsUghFS2eMG8DnFTt4tjg2s0aWCtLM0IYZz4w5DtwT49SzsWixcIYqRN3+t+Dgfg9lhqQemSUe9wpDyCybyBUcCe+wTle6JPptkbBd7milZp8PQPkRDN08/d4gN6V/pzB3ww1fkdGwbqBwfoyMoV4ChtL+eg==
-X-Gm-Message-State: AOJu0YyGHsWucimrO9OO1u5j6YsOsYP4btMerCDGVTLPXYSijkyBhZ88
-	HCrlhVe64vEmZJrZns9QSoYbZ2p4MmsUWfxDWCtQc/yOEjfdkOvt
-X-Google-Smtp-Source: AGHT+IENJ2YH4rBbHJIjWpOfKAtf1CaSVXXM3dTe50OdTvMGqH+p41Vt6oGnzPE/SuDaUCicZYLPBg==
-X-Received: by 2002:adf:fa8b:0:b0:341:c449:d735 with SMTP id h11-20020adffa8b000000b00341c449d735mr4311383wrr.44.1711393637344;
-        Mon, 25 Mar 2024 12:07:17 -0700 (PDT)
-Received: from localhost.localdomain (93-34-89-13.ip49.fastwebnet.it. [93.34.89.13])
-        by smtp.googlemail.com with ESMTPSA id ay9-20020a5d6f09000000b0033b87c2725csm10356163wrb.104.2024.03.25.12.07.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Mar 2024 12:07:16 -0700 (PDT)
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: William Wortel <wwortel@dorpstraat.com>,
-	stable@vger.kernel.org
-Subject: [net PATCH] net: phy: qcom: at803x: fix kernel panic with at8031_probe
-Date: Mon, 25 Mar 2024 20:06:19 +0100
-Message-ID: <20240325190621.2665-1-ansuelsmth@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        d=1e100.net; s=20230601; t=1711394382; x=1711999182;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ugZz785W8pMDPhpwfMM+nuUMqogsJD2dq6g02eauybE=;
+        b=l3njTy1hzmu/O4fYM278NgJuT5N7XTuQ14Q5CVcgo8UcEomo3Yk5RgO2PRBudyxrYQ
+         rPNAcROpLYfAR1UFp4HJyGgiAmB/6C3bhIAFOyyQb/nE68IZNtUSgEz6TyLSiZPgtzzk
+         CxNv0DPY3+Mrz7K9AgQcoIeFCrSmAyjQycmv3QNb9D8AiVJ2nJh2M8tL98kx3RXNvMEk
+         /3FsRYWHZMXaoNZqFru1TAbGK7opFD2UapqSWHz5qNosjDVcFnhSuLepQ9imcrSC6YQF
+         V/3nmwcS0MrVfkwbaC8BnAJLeL4IsED6W4QcUFAcjccPYcQY/Y3ygp1//6rHubmXBKWM
+         ZXqg==
+X-Forwarded-Encrypted: i=1; AJvYcCXX+AjVX5Fm3SAp9mWH5lYQbk/LlmCG7AVe7gXxpJaa6946/JFXClDySzu2DKhvXOtqWz8TChT8SZ/zi/ZwB8OQUAG9JD72
+X-Gm-Message-State: AOJu0YxieI1Wu+qoC0wElRRrKFmqhaC7T+TJkN31DboSFpiHyYSEe51B
+	59Yr/+0kHsdlzWHFnsl/GNGQ/sWDv6psC21wOhzl5S3/67NLw+Lzk8gmrZIgmdc=
+X-Google-Smtp-Source: AGHT+IHpyNyOQRHz+kI0k7EHDSauGOF7bPHup2aMlbQZYZT2xJ/E/g1kriz8PbOzRAytkBellvwTjw==
+X-Received: by 2002:a50:9b4d:0:b0:568:b43f:e2a8 with SMTP id a13-20020a509b4d000000b00568b43fe2a8mr5605054edj.13.1711394381892;
+        Mon, 25 Mar 2024 12:19:41 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.222.44])
+        by smtp.gmail.com with ESMTPSA id b19-20020aa7d493000000b0056a2b87787dsm3272093edr.37.2024.03.25.12.19.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Mar 2024 12:19:41 -0700 (PDT)
+Message-ID: <17d40ec9-ee7d-4ff0-800d-d3da678d6b57@linaro.org>
+Date: Mon, 25 Mar 2024 20:19:39 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] nfc: nci: Fix uninit-value in nci_dev_up
+To: Paolo Abeni <pabeni@redhat.com>, Ryosuke Yasuoka <ryasuoka@redhat.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, syoshida@redhat.com,
+ syzbot+7ea9413ea6749baf5574@syzkaller.appspotmail.com
+References: <20240312145658.417288-1-ryasuoka@redhat.com>
+ <413249a5-13b0-4a06-9819-650eb4e82b37@linaro.org> <ZfLKjD6aMrGPEgHh@zeus>
+ <498dc99d25965877f7d15592dcbb340f97d803b4.camel@redhat.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <498dc99d25965877f7d15592dcbb340f97d803b4.camel@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On reworking and splitting the at803x driver, in splitting function of
-at803x PHYs it was added a NULL dereference bug where priv is referenced
-before it's actually allocated and then is tried to write to for the
-is_1000basex and is_fiber variables in the case of at8031, writing on
-the wrong address.
+On 14/03/2024 12:58, Paolo Abeni wrote:
+> On Thu, 2024-03-14 at 18:59 +0900, Ryosuke Yasuoka wrote:
+>> On Wed, Mar 13, 2024 at 10:01:27AM +0100, Krzysztof Kozlowski wrote:
+>>> On 12/03/2024 15:56, Ryosuke Yasuoka wrote:
+>>>
+>>>> CPU: 1 PID: 5012 Comm: syz-executor935 Not tainted 6.7.0-syzkaller-00562-g9f8413c4a66f #0
+>>>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
+>>>
+>>> These two lines are not really relevant, it's a virtual platform, so
+>>> whether this is Google or Amazon it does not matter, and your log paste
+>>> is already quite long. If there is going to be any resend, I propose to
+>>> drop.
+>>
+>> OK. Do you mean all these log messages that syzbot reported should be
+>> dropped or I should leave only relavant messages?
 
-Fix this by correctly setting priv local variable only after
-at803x_probe is called and actually allocates priv in the phydev struct.
+No, I proposed to drop "these two lines". Please look at where people
+put their comments and what do they trim from the response.
 
-Reported-by: William Wortel <wwortel@dorpstraat.com>
-Cc: <stable@vger.kernel.org>
-Fixes: 25d2ba94005f ("net: phy: at803x: move specific at8031 probe mode check to dedicated probe")
-Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
----
- drivers/net/phy/qcom/at803x.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> It's not a big deal either way, but there is a quite established
+> practice of including the whole splat.
 
-diff --git a/drivers/net/phy/qcom/at803x.c b/drivers/net/phy/qcom/at803x.c
-index 4717c59d51d0..e79657f76bea 100644
---- a/drivers/net/phy/qcom/at803x.c
-+++ b/drivers/net/phy/qcom/at803x.c
-@@ -797,7 +797,7 @@ static int at8031_parse_dt(struct phy_device *phydev)
- 
- static int at8031_probe(struct phy_device *phydev)
- {
--	struct at803x_priv *priv = phydev->priv;
-+	struct at803x_priv *priv;
- 	int mode_cfg;
- 	int ccr;
- 	int ret;
-@@ -806,6 +806,8 @@ static int at8031_probe(struct phy_device *phydev)
- 	if (ret)
- 		return ret;
- 
-+	priv = phydev->priv;
-+
- 	/* Only supported on AR8031/AR8033, the AR8030/AR8035 use strapping
- 	 * options.
- 	 */
--- 
-2.43.0
+Yeah, splat was fine in general.
+
+
+Best regards,
+Krzysztof
 
 
