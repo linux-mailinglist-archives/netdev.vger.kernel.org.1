@@ -1,441 +1,113 @@
-Return-Path: <netdev+bounces-81848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81844-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B718988B452
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 23:39:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D07C88B439
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 23:36:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB80F1C3FCCF
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 22:39:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F4051C61420
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 22:36:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E02F82D61;
-	Mon, 25 Mar 2024 22:39:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F2A11272DC;
+	Mon, 25 Mar 2024 22:33:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="ca77T0if"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eHWCTPxW"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 792D07FBDB
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 22:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA9E480C00
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 22:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711406355; cv=none; b=dENrET7ES+2DIwnMViGKEmVsMlPgE68660eOWRRhWZYgWTtNbSPwTtC4Udg3uo2PMO96pXADO0jEDNm4ldswaBuJnGibM1jFaAjMqRalSsXkGip0YHr/CdlOOXAM2FmEnIx5GM4U2xm7BCxRE1b9difA5scItgIHPLlVRX23mXY=
+	t=1711406034; cv=none; b=AxkC76nzR2B4lEIOrsmiAx728CsXxwDN7IkbZ6ir/fD0aLRW/gADDr0WxFkYsx14FZidsq/pYiMzz0/TUjPAg3ii4V0ALryLsghtyOJlj0f8zzgR1WlQxXsZ3so8neT099YM3OIrvQzKWWVQWNzh1wRbWSncyJld9kiGkZ9qldY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711406355; c=relaxed/simple;
-	bh=rY1wCLbT5D5DO1CDToRyD3EQjXxI8Yy8zo2WrAtI4TY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ai33U7BaXFINuFpYGEoiEZUbcD9rr2WRAVjd74ru+IM1leWvvsebysEflUQ+n4mgcKqQKhKWaW8cBPipoTUCJeIq5QINuJkWeAJD7sZPEHtqyZrJSmGPpCBrErxrKOT7cYQNTp1YK3eBj61bUcnmdCWVH6i1Ezz1eHOsDUwjOU8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=ca77T0if; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Content-Type:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=+LYedDKCZkt0knPWsjkvWVXu0FbM1x+GXHtBYWXFJVo=;
-	t=1711406352; x=1712615952; b=ca77T0ifDb1XWd2jPE5iKvH5esPSP9ryApXa/rePsyXLtle
-	HKh0/ZP+odXGcn61t9z7tNhyASy/AffD/LVvXftpG+Q/7SXLMoCNsHVCIkQL1Ms04FyT5NZnrUrKO
-	pmtnZKq6e6utmn69nfY6KJGA8sw/CvvwxCh5lXQsBDfYy8ZKwavvH2YbC3aT1pXjiPUZ7xovpDf01
-	YfKsp2hEHK0CjBzweNdGJ8xOUzhIAWHi7wbRYoOXH0Jbntk5TWVHkGXHikxJOUFAOyAZnm5+A73tl
-	QpYfEDwvHbMz3mnB3jQ3K4T6STRZ9s22y1wnyLhMFqC4ozEFdADnk70B1npxOOog==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.97)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1rosyE-0000000Ee2Q-0Fxi;
-	Mon, 25 Mar 2024 23:39:10 +0100
-From: Johannes Berg <johannes@sipsolutions.net>
-To: netdev@vger.kernel.org
-Cc: Johannes Berg <johannes.berg@intel.com>
-Subject: [PATCH 3/3] net: core: use guard/__free in core dev code
-Date: Mon, 25 Mar 2024 23:31:28 +0100
-Message-ID: <20240325233905.09e8c19d4207.I203795c6b809819c98532e5d6186c700a6c1c760@changeid>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20240325223905.100979-5-johannes@sipsolutions.net>
-References: <20240325223905.100979-5-johannes@sipsolutions.net>
+	s=arc-20240116; t=1711406034; c=relaxed/simple;
+	bh=YAwr12Pp2O0fRce/SvinYrPrRFd4LKtv/Fa7JsuY9Tw=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=okD/rzzbSpqGP8wWCefgm407fjUFRtU5fX14lkeXuymnBN9zzoCr957blrMn9eACL53efT0bnsv8J7dz6Qps/O2HH9wA3oLGmbXHf/Z/O5KCSqi9iDe5wg0KwN5Gzi9M0MopXUJftgYw8rljjwOiNd8CAU9qGXpo7Ttyh26dbrY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jfraker.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eHWCTPxW; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jfraker.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-609fb151752so88057367b3.2
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 15:33:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711406032; x=1712010832; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=3rg3ln9iHNo6T6jSs9z4j85QjgUED+D63VdkISPIXqU=;
+        b=eHWCTPxWO1I3mZpZ2+7YnBbW5G0vdCihT5JYVSq1Jegc5F58Z7EYErtDn4pG+St0ul
+         Wjrj6szhrGpu6YSxMRAlpwyqDKJt9R06KjOWUhbhrspcbElkIDjijJYME61DJvAi1zMT
+         nYHsCjHw4OSyjqOZ8sbsML/q3YdOCAoJLrjzJetrkY2JSHfUQwdMn2T0Vos9rNtv33T7
+         uH+QfV4jPmTJNKsGFqR2TI9b4dIdXumSJTt3kmVMUVBo3efGwq/TpETQ9HNWAQ7PVz2w
+         4tvX3jvGwnIoYUT6LEsswakJS2JB6YTy6+1LpSjOPy8joOaGDBbA0OsM4brGo8WVmt8q
+         ikHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711406032; x=1712010832;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3rg3ln9iHNo6T6jSs9z4j85QjgUED+D63VdkISPIXqU=;
+        b=I2Q9+0U5+l01/GQaDkTtIDMHqQXa2AyB2n5zDdfDWg/Qq/RqQ663w1F3tqGbePkNpt
+         9y+YeL6uMoByN/KfjjclZtzbjLj02tf9oExpw47HhsGONpyHJK2moKLMtHwwyJyX0bUs
+         zhD1uBential5eibhuuRULIufjvBxFVOTqONUOYy+gYVCEZLTb44tZ9si0IG/G2wOGvV
+         0zfzi+vnz9e0NNIs23CuY8eb2SsMTefSylOsRE0Poo99Z7+LTfzO4FpHXKCp4OGxEmBF
+         isxpbHnCFGgau8SiuPXKXcrHsDiy07cLXRFbPThONJ1DLcca5m24lRtyMxh/F61mGI5O
+         kOUA==
+X-Gm-Message-State: AOJu0YxgQoPYKMG9h4zi2IFFb4ia60A3SwlKPciIwrIjfGfSSn8zy0rB
+	AX0VvTTdwalzGdyCKABdKp5XysA2P76B7FQTenVPw+V8IFXk7KL9ZtTu2MYUC7pjdDwti4xNdtR
+	boVeIj3zbjTebVsZIrAn16opyIwZWwCmAdUCPCS0RTjOIWLUAVnw8k3dj9P0LV49lMzNkH02abP
+	eQM0xg3MxyrJ8w9T3sq1gi6G4UZuVXz1L+h7PeKw==
+X-Google-Smtp-Source: AGHT+IFySWPKbgqndk4LEmT9QalTHpgOGbN//3ETh80Lrtu7JdkxzemMu5BMSEqpkpwi+tEh+RLK8tgmt1Ua
+X-Received: from jfraker202.plv.corp.google.com ([2620:15c:11c:202:1ee9:1947:3da0:ccf0])
+ (user=jfraker job=sendgmr) by 2002:a0d:d844:0:b0:610:f447:159b with SMTP id
+ a65-20020a0dd844000000b00610f447159bmr2165530ywe.5.1711406031725; Mon, 25 Mar
+ 2024 15:33:51 -0700 (PDT)
+Date: Mon, 25 Mar 2024 15:33:08 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.44.0.396.g6e790dbe36-goog
+Message-ID: <20240325223308.618671-1-jfraker@google.com>
+Subject: [PATCH net-next] gve: Add counter adminq_get_ptype_map_cnt to stats report
+From: John Fraker <jfraker@google.com>
+To: netdev@vger.kernel.org
+Cc: horms@kernel.org, John Fraker <jfraker@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-From: Johannes Berg <johannes.berg@intel.com>
+This counter counts the number of times get_ptype_map is executed on the
+admin queue, and was previously missing from the stats report.
 
-Simplify the code a bit, mostly also to illustrate
-the new helpers.
-
-Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+Signed-off-by: John Fraker <jfraker@google.com>
 ---
- net/core/dev.c | 182 +++++++++++++++++++------------------------------
- 1 file changed, 72 insertions(+), 110 deletions(-)
+ drivers/net/ethernet/google/gve/gve_ethtool.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 9a67003e49db..f4f4627bb1e3 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -1367,9 +1367,8 @@ EXPORT_SYMBOL(__netdev_notify_peers);
-  */
- void netdev_notify_peers(struct net_device *dev)
- {
--	rtnl_lock();
-+	guard(rtnl)();
- 	__netdev_notify_peers(dev);
--	rtnl_unlock();
- }
- EXPORT_SYMBOL(netdev_notify_peers);
+diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
+index 9aebfb843..dbe05402d 100644
+--- a/drivers/net/ethernet/google/gve/gve_ethtool.c
++++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
+@@ -73,7 +73,7 @@ static const char gve_gstrings_adminq_stats[][ETH_GSTRING_LEN] = {
+ 	"adminq_create_tx_queue_cnt", "adminq_create_rx_queue_cnt",
+ 	"adminq_destroy_tx_queue_cnt", "adminq_destroy_rx_queue_cnt",
+ 	"adminq_dcfg_device_resources_cnt", "adminq_set_driver_parameter_cnt",
+-	"adminq_report_stats_cnt", "adminq_report_link_speed_cnt"
++	"adminq_report_stats_cnt", "adminq_report_link_speed_cnt", "adminq_get_ptype_map_cnt"
+ };
  
-@@ -1722,30 +1721,27 @@ int register_netdevice_notifier(struct notifier_block *nb)
- 	int err;
- 
- 	/* Close race with setup_net() and cleanup_net() */
--	down_write(&pernet_ops_rwsem);
--	rtnl_lock();
-+	guard(rwsem_write)(&pernet_ops_rwsem);
-+	guard(rtnl)();
- 	err = raw_notifier_chain_register(&netdev_chain, nb);
- 	if (err)
--		goto unlock;
-+		return err;
- 	if (dev_boot_phase)
--		goto unlock;
-+		return 0;
- 	for_each_net(net) {
- 		err = call_netdevice_register_net_notifiers(nb, net);
- 		if (err)
- 			goto rollback;
- 	}
- 
--unlock:
--	rtnl_unlock();
--	up_write(&pernet_ops_rwsem);
--	return err;
-+	return 0;
- 
- rollback:
- 	for_each_net_continue_reverse(net)
- 		call_netdevice_unregister_net_notifiers(nb, net);
- 
- 	raw_notifier_chain_unregister(&netdev_chain, nb);
--	goto unlock;
-+	return err;
- }
- EXPORT_SYMBOL(register_netdevice_notifier);
- 
-@@ -1769,19 +1765,16 @@ int unregister_netdevice_notifier(struct notifier_block *nb)
- 	int err;
- 
- 	/* Close race with setup_net() and cleanup_net() */
--	down_write(&pernet_ops_rwsem);
--	rtnl_lock();
-+	guard(rwsem_write)(&pernet_ops_rwsem);
-+	guard(rtnl)();
- 	err = raw_notifier_chain_unregister(&netdev_chain, nb);
- 	if (err)
--		goto unlock;
-+		return err;
- 
- 	for_each_net(net)
- 		call_netdevice_unregister_net_notifiers(nb, net);
- 
--unlock:
--	rtnl_unlock();
--	up_write(&pernet_ops_rwsem);
--	return err;
-+	return 0;
- }
- EXPORT_SYMBOL(unregister_netdevice_notifier);
- 
-@@ -1838,12 +1831,9 @@ static int __unregister_netdevice_notifier_net(struct net *net,
- 
- int register_netdevice_notifier_net(struct net *net, struct notifier_block *nb)
- {
--	int err;
-+	guard(rtnl)();
- 
--	rtnl_lock();
--	err = __register_netdevice_notifier_net(net, nb, false);
--	rtnl_unlock();
--	return err;
-+	return __register_netdevice_notifier_net(net, nb, false);
- }
- EXPORT_SYMBOL(register_netdevice_notifier_net);
- 
-@@ -1866,12 +1856,9 @@ EXPORT_SYMBOL(register_netdevice_notifier_net);
- int unregister_netdevice_notifier_net(struct net *net,
- 				      struct notifier_block *nb)
- {
--	int err;
-+	guard(rtnl)();
- 
--	rtnl_lock();
--	err = __unregister_netdevice_notifier_net(net, nb);
--	rtnl_unlock();
--	return err;
-+	return __unregister_netdevice_notifier_net(net, nb);
- }
- EXPORT_SYMBOL(unregister_netdevice_notifier_net);
- 
-@@ -1889,14 +1876,14 @@ int register_netdevice_notifier_dev_net(struct net_device *dev,
- {
- 	int err;
- 
--	rtnl_lock();
-+	guard(rtnl)();
- 	err = __register_netdevice_notifier_net(dev_net(dev), nb, false);
--	if (!err) {
--		nn->nb = nb;
--		list_add(&nn->list, &dev->net_notifier_list);
--	}
--	rtnl_unlock();
--	return err;
-+	if (err)
-+		return err;
-+
-+	nn->nb = nb;
-+	list_add(&nn->list, &dev->net_notifier_list);
-+	return 0;
- }
- EXPORT_SYMBOL(register_netdevice_notifier_dev_net);
- 
-@@ -1904,13 +1891,10 @@ int unregister_netdevice_notifier_dev_net(struct net_device *dev,
- 					  struct notifier_block *nb,
- 					  struct netdev_net_notifier *nn)
- {
--	int err;
-+	guard(rtnl)();
- 
--	rtnl_lock();
- 	list_del(&nn->list);
--	err = __unregister_netdevice_notifier_net(dev_net(dev), nb);
--	rtnl_unlock();
--	return err;
-+	return __unregister_netdevice_notifier_net(dev_net(dev), nb);
- }
- EXPORT_SYMBOL(unregister_netdevice_notifier_dev_net);
- 
-@@ -9453,7 +9437,7 @@ static void bpf_xdp_link_release(struct bpf_link *link)
- {
- 	struct bpf_xdp_link *xdp_link = container_of(link, struct bpf_xdp_link, link);
- 
--	rtnl_lock();
-+	guard(rtnl)();
- 
- 	/* if racing with net_device's tear down, xdp_link->dev might be
- 	 * already NULL, in which case link was already auto-detached
-@@ -9462,8 +9446,6 @@ static void bpf_xdp_link_release(struct bpf_link *link)
- 		WARN_ON(dev_xdp_detach_link(xdp_link->dev, NULL, xdp_link));
- 		xdp_link->dev = NULL;
- 	}
--
--	rtnl_unlock();
+ static const char gve_gstrings_priv_flags[][ETH_GSTRING_LEN] = {
+@@ -428,6 +428,7 @@ gve_get_ethtool_stats(struct net_device *netdev,
+ 	data[i++] = priv->adminq_set_driver_parameter_cnt;
+ 	data[i++] = priv->adminq_report_stats_cnt;
+ 	data[i++] = priv->adminq_report_link_speed_cnt;
++	data[i++] = priv->adminq_get_ptype_map_cnt;
  }
  
- static int bpf_xdp_link_detach(struct bpf_link *link)
-@@ -9485,10 +9467,10 @@ static void bpf_xdp_link_show_fdinfo(const struct bpf_link *link,
- 	struct bpf_xdp_link *xdp_link = container_of(link, struct bpf_xdp_link, link);
- 	u32 ifindex = 0;
- 
--	rtnl_lock();
--	if (xdp_link->dev)
--		ifindex = xdp_link->dev->ifindex;
--	rtnl_unlock();
-+	scoped_guard(rtnl) {
-+		if (xdp_link->dev)
-+			ifindex = xdp_link->dev->ifindex;
-+	}
- 
- 	seq_printf(seq, "ifindex:\t%u\n", ifindex);
- }
-@@ -9499,10 +9481,10 @@ static int bpf_xdp_link_fill_link_info(const struct bpf_link *link,
- 	struct bpf_xdp_link *xdp_link = container_of(link, struct bpf_xdp_link, link);
- 	u32 ifindex = 0;
- 
--	rtnl_lock();
--	if (xdp_link->dev)
--		ifindex = xdp_link->dev->ifindex;
--	rtnl_unlock();
-+	scoped_guard(rtnl) {
-+		if (xdp_link->dev)
-+			ifindex = xdp_link->dev->ifindex;
-+	}
- 
- 	info->xdp.ifindex = ifindex;
- 	return 0;
-@@ -9514,31 +9496,26 @@ static int bpf_xdp_link_update(struct bpf_link *link, struct bpf_prog *new_prog,
- 	struct bpf_xdp_link *xdp_link = container_of(link, struct bpf_xdp_link, link);
- 	enum bpf_xdp_mode mode;
- 	bpf_op_t bpf_op;
--	int err = 0;
-+	int err;
- 
--	rtnl_lock();
-+	guard(rtnl)();
- 
- 	/* link might have been auto-released already, so fail */
--	if (!xdp_link->dev) {
--		err = -ENOLINK;
--		goto out_unlock;
--	}
-+	if (!xdp_link->dev)
-+		return -ENOLINK;
-+
-+	if (old_prog && link->prog != old_prog)
-+		return -EPERM;
- 
--	if (old_prog && link->prog != old_prog) {
--		err = -EPERM;
--		goto out_unlock;
--	}
- 	old_prog = link->prog;
- 	if (old_prog->type != new_prog->type ||
--	    old_prog->expected_attach_type != new_prog->expected_attach_type) {
--		err = -EINVAL;
--		goto out_unlock;
--	}
-+	    old_prog->expected_attach_type != new_prog->expected_attach_type)
-+		return -EINVAL;
- 
- 	if (old_prog == new_prog) {
- 		/* no-op, don't disturb drivers */
- 		bpf_prog_put(new_prog);
--		goto out_unlock;
-+		return 0;
- 	}
- 
- 	mode = dev_xdp_mode(xdp_link->dev, xdp_link->flags);
-@@ -9546,14 +9523,11 @@ static int bpf_xdp_link_update(struct bpf_link *link, struct bpf_prog *new_prog,
- 	err = dev_xdp_install(xdp_link->dev, mode, bpf_op, NULL,
- 			      xdp_link->flags, new_prog);
- 	if (err)
--		goto out_unlock;
-+		return err;
- 
- 	old_prog = xchg(&link->prog, new_prog);
- 	bpf_prog_put(old_prog);
--
--out_unlock:
--	rtnl_unlock();
--	return err;
-+	return 0;
- }
- 
- static const struct bpf_link_ops bpf_xdp_link_lops = {
-@@ -9567,57 +9541,47 @@ static const struct bpf_link_ops bpf_xdp_link_lops = {
- 
- int bpf_xdp_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
- {
-+	/* link itself doesn't hold dev's refcnt to not complicate shutdown */
-+	struct net_device *dev __free(dev_put) = NULL;
- 	struct net *net = current->nsproxy->net_ns;
- 	struct bpf_link_primer link_primer;
- 	struct netlink_ext_ack extack = {};
- 	struct bpf_xdp_link *link;
--	struct net_device *dev;
--	int err, fd;
-+	int err;
- 
--	rtnl_lock();
--	dev = dev_get_by_index(net, attr->link_create.target_ifindex);
--	if (!dev) {
--		rtnl_unlock();
--		return -EINVAL;
--	}
-+	scoped_guard(rtnl) {
-+		dev = dev_get_by_index(net,
-+				       attr->link_create.target_ifindex);
-+		if (!dev)
-+			return -EINVAL;
- 
--	link = kzalloc(sizeof(*link), GFP_USER);
--	if (!link) {
--		err = -ENOMEM;
--		goto unlock;
--	}
-+		link = kzalloc(sizeof(*link), GFP_USER);
-+		if (!link)
-+			return -ENOMEM;
- 
--	bpf_link_init(&link->link, BPF_LINK_TYPE_XDP, &bpf_xdp_link_lops, prog);
--	link->dev = dev;
--	link->flags = attr->link_create.flags;
-+		bpf_link_init(&link->link, BPF_LINK_TYPE_XDP,
-+			      &bpf_xdp_link_lops, prog);
- 
--	err = bpf_link_prime(&link->link, &link_primer);
--	if (err) {
--		kfree(link);
--		goto unlock;
--	}
-+		link->dev = dev;
-+		link->flags = attr->link_create.flags;
- 
--	err = dev_xdp_attach_link(dev, &extack, link);
--	rtnl_unlock();
-+		err = bpf_link_prime(&link->link, &link_primer);
-+		if (err) {
-+			kfree(link);
-+			return err;
-+		}
-+
-+		err = dev_xdp_attach_link(dev, &extack, link);
-+	}
- 
- 	if (err) {
- 		link->dev = NULL;
- 		bpf_link_cleanup(&link_primer);
- 		trace_bpf_xdp_link_attach_failed(extack._msg);
--		goto out_put_dev;
-+		return err;
- 	}
- 
--	fd = bpf_link_settle(&link_primer);
--	/* link itself doesn't hold dev's refcnt to not complicate shutdown */
--	dev_put(dev);
--	return fd;
--
--unlock:
--	rtnl_unlock();
--
--out_put_dev:
--	dev_put(dev);
--	return err;
-+	return bpf_link_settle(&link_primer);
- }
- 
- /**
-@@ -11171,9 +11135,8 @@ EXPORT_SYMBOL(unregister_netdevice_many);
-  */
- void unregister_netdev(struct net_device *dev)
- {
--	rtnl_lock();
-+	guard(rtnl)();
- 	unregister_netdevice(dev);
--	rtnl_unlock();
- }
- EXPORT_SYMBOL(unregister_netdev);
- 
-@@ -11617,7 +11580,7 @@ static void __net_exit default_device_exit_batch(struct list_head *net_list)
- 	struct net *net;
- 	LIST_HEAD(dev_kill_list);
- 
--	rtnl_lock();
-+	guard(rtnl)();
- 	list_for_each_entry(net, net_list, exit_list) {
- 		default_device_exit_net(net);
- 		cond_resched();
-@@ -11632,7 +11595,6 @@ static void __net_exit default_device_exit_batch(struct list_head *net_list)
- 		}
- 	}
- 	unregister_netdevice_many(&dev_kill_list);
--	rtnl_unlock();
- }
- 
- static struct pernet_operations __net_initdata default_device_ops = {
+ static void gve_get_channels(struct net_device *netdev,
 -- 
-2.44.0
+2.44.0.291.gc1ea87d7ee-goog
 
 
