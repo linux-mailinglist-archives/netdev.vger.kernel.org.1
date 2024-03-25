@@ -1,202 +1,139 @@
-Return-Path: <netdev+bounces-81801-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB1D188B1FA
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:50:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 465EC88B213
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:54:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D46091C62D73
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:50:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 810481C3F0B6
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:54:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A93A126F2C;
-	Mon, 25 Mar 2024 20:45:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB596EB4E;
+	Mon, 25 Mar 2024 20:54:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YZKCIos0"
+	dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b="QNJKvQ8u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail1.fiberby.net (mail1.fiberby.net [193.104.135.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E84C126F05;
-	Mon, 25 Mar 2024 20:45:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B3285D724;
+	Mon, 25 Mar 2024 20:54:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.104.135.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711399541; cv=none; b=OjPDVGbfSdPr2I3HS06V1IT82MPLP15A9z+U23MJm9QCUrHW5eXJr80/6bok8xxN6hlD0Y6rJtn9/y4jHADbj8MpLkAXeQFsvNBdSlqQbGFI1HiKube5p140x6Xi774wn1MxGVDr5BhV1CEkINYDTYK3S0/LfFyWTmZ1S46wEZc=
+	t=1711400050; cv=none; b=hfNQ3BNgiNaFyx5huQawg+MvFymUofsYh+80YDCbbpOKZxFsB9q0taX1qW6SaMpAbvSplw9JwLZ2MhBIc1GYezfXHwEYdOOPCr1oXCtiQ1d3ZL7awTp7Js6mWfnusW0tAtGLwwx8cmSVKf9AOcy9A3sTIeSOTHyoJqEoQR4JRDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711399541; c=relaxed/simple;
-	bh=msFwLUgoInL49KijPQT3psq55laeDSaMjfTc1uVOExQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QmafQ2lHcLpr4bIFCm1TGWlUzv69AOe2pU6wxcO6V9+954DM2nr5GyGWpbxKdda3lT/8Z3QPmDKN+4zpH1gDPYhwv0O+m1CjeObyhxYVrX7EhoH9NF/nvJOcPpo2L93QAPQIuZfTY+nelGCGIGV/brRVij2+rikE9NKPHt0Sw7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YZKCIos0; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56829f41f81so5954206a12.2;
-        Mon, 25 Mar 2024 13:45:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711399537; x=1712004337; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=es8X5rKWvUhOVlQ7heJvrLyXvex4sJ4OBGyiyZz9Njc=;
-        b=YZKCIos0TEMt3OHDb7PWzSNVYzGk2s+uTxr/fJpBsGp7e7wsOBCmVHUwj16q0xTefS
-         egCR5Jv1bKhAre6HKc458/IKxvr7LpGTtOUbHT/f1hWdvlh5t/vKJKlZyAK4y7KQFRWa
-         bjAYoaeON4x4riOK3kBvLcD7cE+gXl6yyRKddHVG+VyPHPGULT4ggBoFpE2beezzxMef
-         BcZ68pL8hxtMFDwCSCvbnKA044sURb741TuNr6dHzwFPk7mr0/8+Ml5r1X1vsegGjueM
-         FND2l5E1B7bhDv5T+3pcQlvIMXkYPuXQ03tujye3Cwp5LKqDoX2XI8gCLfnEnOXNfUM0
-         bwig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711399537; x=1712004337;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=es8X5rKWvUhOVlQ7heJvrLyXvex4sJ4OBGyiyZz9Njc=;
-        b=ZzyKKeiNNTB2oGT17NVSy2LfTJ9SxUv244+oFKBrRrF5rlwu5EgiyOaWsJ7uT59PUv
-         Ms5uledj7HpxGfNXx3hEwRj02UDtioClZNtfjlb6cdyOoC53BZ5IL3slgM9FgxugAQE7
-         9wB38k/wixxDIuLlhn8IR5Q5afHW9rYSXk2jGAjqn3AvqxLFHJhPQsNm0Xfx2tOQogJB
-         rEOOVKdDWDINPWtxxK3ZdPGUua0Bi8cdcdOQDDb1xmybsWOG4Qyke8Q9nvsowkCjFHS7
-         qsdHGL868sdaID+lgWE4EaOW+kgMZGEmr6j3s44KFBQk/rJrgdklJNwAHLBMKVkswCqG
-         f/Yg==
-X-Forwarded-Encrypted: i=1; AJvYcCUvt5i2ljoCv82jnqD9HbWMzCIa5t4PeCkNuswDwVjRiCasDa4rzzgM2oW/xxaxX+oQmZHaFXlkE4woTNxkyy7+VmWpXBGzpCzAy0M/
-X-Gm-Message-State: AOJu0YwZaIy8sRwZg+FFMp8RNyaS9JoaedCu9+/bkSuorxHQqYM6W4sH
-	9qBKeBrfojQijzGEV0G7Yfov/dgu2uI9IvUPgpNpN3PSHw4r8rSrt0q2wPuhYNM=
-X-Google-Smtp-Source: AGHT+IGAMnjq3J0/O7f3rW1mKQF1cazGi150PHih2hz7HvEBnpeqOORATCMj5xfrL8v2v42qwrabYQ==
-X-Received: by 2002:a50:9352:0:b0:56c:274a:31df with SMTP id n18-20020a509352000000b0056c274a31dfmr277188eda.5.1711399537360;
-        Mon, 25 Mar 2024 13:45:37 -0700 (PDT)
-Received: from WBEC325.dom.lan ([185.188.71.122])
-        by smtp.gmail.com with ESMTPSA id k18-20020a056402049200b0056c1cba8480sm591751edv.25.2024.03.25.13.45.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Mar 2024 13:45:37 -0700 (PDT)
-From: Pawel Dembicki <paweldembicki@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Linus Walleij <linus.walleij@linaro.org>,
-	Simon Horman <horms@kernel.org>,
-	Pawel Dembicki <paweldembicki@gmail.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
+	s=arc-20240116; t=1711400050; c=relaxed/simple;
+	bh=SfX5F5wjnqqIWfjdFxEyw5/3OVHvgRFvzKFulbi0E1g=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=VYbROnfiVW9QvAMW0z6sEfYJy3+NnexgJFrTD7NTrcE1RILDhvwJcPRnxGlT66zdfmtKVBa+liMb/MzbtYJFjRO5BvNGp5G6o//OtAIMeLG+Iwf8cSdkGH4wBK9Xev7OlJpRt5BWb6kOpCZen21wAbgUsOTouDXBqF1pBSrjeZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net; spf=pass smtp.mailfrom=fiberby.net; dkim=pass (2048-bit key) header.d=fiberby.net header.i=@fiberby.net header.b=QNJKvQ8u; arc=none smtp.client-ip=193.104.135.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fiberby.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fiberby.net
+Received: from x201s (193-104-135-243.ip4.fiberby.net [193.104.135.243])
+	by mail1.fiberby.net (Postfix) with ESMTPSA id 55CD5600D4;
+	Mon, 25 Mar 2024 20:48:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=fiberby.net;
+	s=202008; t=1711399726;
+	bh=SfX5F5wjnqqIWfjdFxEyw5/3OVHvgRFvzKFulbi0E1g=;
+	h=From:To:Cc:Subject:Date:From;
+	b=QNJKvQ8uRXDehHTTmYDgt+93IyAhVuRG/V/8t9yNxDfPpsHLRIBCtHfy4heUiKX/3
+	 abUt73vg1jyAnmNnjnbKEhafUuvmESKt8E7PsPqe6hodLXvbLWK8UKygG/hUb4/IXU
+	 Upk8Uwb883Bf8MrKKi1QpeZtAZ63UXErxVJaleuS6cMNpB27N6t1p2w+2/4BIC2WQz
+	 HB1N68/02GEtxonjiGzauBUwt8LIgkV5KjNciM2sQBrlvp58j8npVlqNU/oSSC+4E0
+	 +E4HVNiGHCIpZZ6hQMhxoJrS33ayxuPV+Z3fYmgm9bENjAfyFadimAbHc7UTvmeReh
+	 qKsU5dA5+MzGA==
+Received: by x201s (Postfix, from userid 1000)
+	id 770DC20490F; Mon, 25 Mar 2024 20:47:48 +0000 (UTC)
+From: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>
+To: Jamal Hadi Salim <jhs@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Cc: =?UTF-8?q?Asbj=C3=B8rn=20Sloth=20T=C3=B8nnesen?= <ast@fiberby.net>,
+	Daniel Borkmann <daniel@iogearbox.net>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com,
-	Russell King <linux@armlinux.org.uk>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v7 16/16] net: dsa: vsc73xx: start treating the BR_LEARNING flag
-Date: Mon, 25 Mar 2024 21:43:41 +0100
-Message-Id: <20240325204344.2298241-17-paweldembicki@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20240325204344.2298241-1-paweldembicki@gmail.com>
-References: <20240325204344.2298241-1-paweldembicki@gmail.com>
+	Vlad Buslov <vladbu@nvidia.com>,
+	Marcelo Ricardo Leitner <mleitner@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	llu@fiberby.dk
+Subject: [PATCH net-next v4 0/3] make skip_sw actually skip software
+Date: Mon, 25 Mar 2024 20:47:33 +0000
+Message-ID: <20240325204740.1393349-1-ast@fiberby.net>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-This patch implements .port_pre_bridge_flags() and .port_bridge_flags(),
-which are required for properly treating the BR_LEARNING flag. Also,
-.port_stp_state_set() is tweaked and now disables learning for standalone
-ports.
+Hi,
 
-Disabling learning for standalone ports is required to avoid situations
-where one port sees traffic originating from another, which could cause
-packet drops.
+During development of flower-route[1], which I
+recently presented at FOSDEM[2], I noticed that
+CPU usage, would increase the more rules I installed
+into the hardware for IP forwarding offloading.
 
-Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
-Acked-by: Linus Walleij <linus.walleij@linaro.org>
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
-Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
----
-v7:
-  - added 'Acked-by' and 'Reviewed-by' and improve  commit message
-v6:
-  - fix arranging local variables in reverse xmas tree order
-v5:
-  - introduce patch
+Since we use TC flower offload for the hottest
+prefixes, and leave the long tail to the normal (non-TC)
+Linux network stack for slow-path IP forwarding.
+We therefore need both the hardware and software
+datapath to perform well.
 
- drivers/net/dsa/vitesse-vsc73xx-core.c | 41 ++++++++++++++++++++++----
- 1 file changed, 35 insertions(+), 6 deletions(-)
+I found that skip_sw rules, are quite expensive
+in the kernel datapath, since they must be evaluated
+and matched upon, before the kernel checks the
+skip_sw flag.
 
-diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
-index 5bfb8aba7428..8408f86d0936 100644
---- a/drivers/net/dsa/vitesse-vsc73xx-core.c
-+++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
-@@ -1588,6 +1588,31 @@ static int vsc73xx_tag_8021q_vlan_del(struct dsa_switch *ds, int port, u16 vid)
- 	return vsc73xx_update_vlan_table(vsc, port, vid, false);
- }
- 
-+static int vsc73xx_port_pre_bridge_flags(struct dsa_switch *ds, int port,
-+					 struct switchdev_brport_flags flags,
-+					 struct netlink_ext_ack *extack)
-+{
-+	if (flags.mask & ~BR_LEARNING)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static int vsc73xx_port_bridge_flags(struct dsa_switch *ds, int port,
-+				     struct switchdev_brport_flags flags,
-+				     struct netlink_ext_ack *extack)
-+{
-+	if (flags.mask & BR_LEARNING) {
-+		u32 val = flags.val & BR_LEARNING ? BIT(port) : 0;
-+		struct vsc73xx *vsc = ds->priv;
-+
-+		return vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
-+					   VSC73XX_LEARNMASK, BIT(port), val);
-+	}
-+
-+	return 0;
-+}
-+
- static int vsc73xx_port_bridge_join(struct dsa_switch *ds, int port,
- 				    struct dsa_bridge bridge,
- 				    bool *tx_fwd_offload,
-@@ -1693,19 +1718,21 @@ static void vsc73xx_refresh_fwd_map(struct dsa_switch *ds, int port, u8 state)
- static void vsc73xx_port_stp_state_set(struct dsa_switch *ds, int port,
- 				       u8 state)
- {
-+	struct dsa_port *dp = dsa_to_port(ds, port);
- 	struct vsc73xx *vsc = ds->priv;
--	u32 val;
-+	u32 val = 0;
-+
-+	if (state == BR_STATE_LEARNING || state == BR_STATE_FORWARDING)
-+		val = dp->learning ? BIT(port) : 0;
-+
-+	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
-+			    VSC73XX_LEARNMASK, BIT(port), val);
- 
- 	val = (state == BR_STATE_BLOCKING || state == BR_STATE_DISABLED) ?
- 	      0 : BIT(port);
- 	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
- 			    VSC73XX_RECVMASK, BIT(port), val);
- 
--	val = (state == BR_STATE_LEARNING || state == BR_STATE_FORWARDING) ?
--	      BIT(port) : 0;
--	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
--			    VSC73XX_LEARNMASK, BIT(port), val);
--
- 	/* CPU Port should always forward packets when user ports are forwarding
- 	 * so let's configure it from other ports only.
- 	 */
-@@ -1727,6 +1754,8 @@ static const struct dsa_switch_ops vsc73xx_ds_ops = {
- 	.port_setup = vsc73xx_port_setup,
- 	.port_enable = vsc73xx_port_enable,
- 	.port_disable = vsc73xx_port_disable,
-+	.port_pre_bridge_flags = vsc73xx_port_pre_bridge_flags,
-+	.port_bridge_flags = vsc73xx_port_bridge_flags,
- 	.port_bridge_join = vsc73xx_port_bridge_join,
- 	.port_bridge_leave = vsc73xx_port_bridge_leave,
- 	.port_change_mtu = vsc73xx_change_mtu,
+This patchset optimizes the case where all rules
+are skip_sw, by implementing a TC bypass for these
+cases, where TC is only used as a control plane
+for the hardware path.
+
+v4:
+- Rebased onto net-next, now that net-next is open again
+
+v3: https://lore.kernel.org/netdev/20240306165813.656931-1-ast@fiberby.net/
+- Patch 3:
+  - Fix source_inline
+  - Fix build failure, when CONFIG_NET_CLS without CONFIG_NET_CLS_ACT.
+
+v2: https://lore.kernel.org/netdev/20240305144404.569632-1-ast@fiberby.net/
+- Patch 1:
+  - Add Reviewed-By from Jiri Pirko
+- Patch 2:
+  - Move code, to avoid forward declaration (Jiri).
+- Patch 3
+  - Refactor to use a static key.
+  - Add performance data for trapping, or sending
+    a packet to a non-existent chain (as suggested by Marcelo).
+
+v1: https://lore.kernel.org/netdev/20240215160458.1727237-1-ast@fiberby.net/
+
+[1] flower-route
+    https://github.com/fiberby-dk/flower-route
+
+[2] FOSDEM talk
+    https://fosdem.org/2024/schedule/event/fosdem-2024-3337-flying-higher-hardware-offloading-with-bird/
+
+Asbjørn Sloth Tønnesen (3):
+  net: sched: cls_api: add skip_sw counter
+  net: sched: cls_api: add filter counter
+  net: sched: make skip_sw actually skip software
+
+ include/net/pkt_cls.h     |  9 +++++++++
+ include/net/sch_generic.h |  4 ++++
+ net/core/dev.c            | 10 ++++++++++
+ net/sched/cls_api.c       | 41 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 64 insertions(+)
+
 -- 
-2.34.1
+2.43.0
 
 
