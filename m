@@ -1,338 +1,144 @@
-Return-Path: <netdev+bounces-81772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B67E88B154
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:27:43 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A91C588B5E5
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 01:17:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 953881F25155
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:27:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85EA3B46FA8
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:42:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FEDE53360;
-	Mon, 25 Mar 2024 20:26:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E1659B70;
+	Mon, 25 Mar 2024 20:42:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O4Xa12V3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kZSoDOZk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9488D535BE
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 20:26:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAEB59B7A;
+	Mon, 25 Mar 2024 20:42:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711398399; cv=none; b=tFXIRtzHzN2OjS6ogxvt+oK6Q+R+rFCwSYRDwQJwcZx34oBYZgdiSVqyXBN5J9bFIDRX2mdYg5YlhsYels5Q0FeOugRreVpv5TsJ9mqk9C2HnVjcj89ickVvlAhAvVccXzPHqQN5r0NEPAk+EhcYZBYkX59jqWG1HZ+M50s1gC0=
+	t=1711399343; cv=none; b=tQXnT8JfxYOZdPD8Ur7EHWksj5aNW+/aN2IFMWyv6Oxf6m2obivboowHfSYmbZY6fo9r9nYMg6JBJfvlXu3VDRjSiI9i7hZdc+9476Qf7vWZ5d4Xfw2yAN47lDFBnzExet/CIv7+qnfZGFt+yvPig/Qe0rNtQLwNY7OwKa9wx6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711398399; c=relaxed/simple;
-	bh=hleQotf1JOR7zU6TT13Bxet+v4lCpz0sTE2wRMBP6Tc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MNo7OYfPsDzEQqUGxTuHabW3IMbAap1m7NEq2me424Qj919/m6dAkFx9KKRjytXARUMXTpbVyja9IXogDVJdnRtbVk01gKAHBSPPYoojV8MevrOklxCHFeWGpRIYbrDI1Tmsfqo6MGPfBsXraZp54hoZG0y42/lbfmUPr4xFHj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O4Xa12V3; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711398398; x=1742934398;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=hleQotf1JOR7zU6TT13Bxet+v4lCpz0sTE2wRMBP6Tc=;
-  b=O4Xa12V31AW36cnsvaqkuK6ZpQ3DPurunFB7b2HYMFaM3oBKHd3h80Z0
-   it3aV7G2whVfS0vnS9ui0Zzd2nMfQpB4vcnQXu/iqCNQTFrUnVPeO44l3
-   EMqTOt8tdiE8N5Sv5UULkitJa8yxeLZ3qHMX+i/ZHMpBZFBnfrdB9A1Rc
-   iEjtrbnwiwyuDsgXX30ezUbELOeEKeT+l/Ct1Gv2Dh2R7iMHVkkwych7S
-   49jb6a3x3PN19UTrDZRs75SGXeC5GEoQoibR9LC0AOpP8BuE4LTcC9cTv
-   gpDbV/TU9btYKAaaGiRpBL0GRnPAnYh2Rgu/ix49mxKVFT6H1HnQjNX7E
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11024"; a="10219673"
-X-IronPort-AV: E=Sophos;i="6.07,154,1708416000"; 
-   d="scan'208";a="10219673"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 13:26:34 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,154,1708416000"; 
-   d="scan'208";a="15787387"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by fmviesa006.fm.intel.com with ESMTP; 25 Mar 2024 13:26:33 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	anthony.l.nguyen@intel.com,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
-Subject: [PATCH net-next 8/8] ice: count representor stats
-Date: Mon, 25 Mar 2024 13:26:16 -0700
-Message-ID: <20240325202623.1012287-9-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20240325202623.1012287-1-anthony.l.nguyen@intel.com>
-References: <20240325202623.1012287-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1711399343; c=relaxed/simple;
+	bh=pC5vrAPVRrli7aVerpJXftZIlMpAFTi4jMQt7h4ZxrI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=PzIWzUEP5zwlZyQF42YUGhhO9si1+UiG2iAdIjhMCdkUEw3dp6VkVPQY8TmIyqC25Fmjw2DN8RcsenDSxjLBr5LrPrc0/9QcGohA1VJaLub3orrCCEk+H8hJpVsDageo/GYZEOD4SzTciE/vBJfiUU+bE+vRD5HM9F2pQORJ7L8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kZSoDOZk; arc=none smtp.client-ip=209.85.221.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-4d436ab8a36so1718231e0c.0;
+        Mon, 25 Mar 2024 13:42:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711399341; x=1712004141; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pC5vrAPVRrli7aVerpJXftZIlMpAFTi4jMQt7h4ZxrI=;
+        b=kZSoDOZkCE2wiK8BJANGHbxXzk9AofnVNrgN1A191Ywsgnm7MFva3fnrq7cH4HCwPT
+         oPesowAik9GmqoUhvq/P39YEALAeLrsIi35WszYRj5yyb+QDWKRI1Mdm+6MyrCQO6WwY
+         CADlUArxfsRHAi1N6G66snQH3snQjTBQeUtKgujW1Sp4guez6bDy3HyHUWkl7XlRewBw
+         0yjbk7mP1vSSR/zKdJJAgpDhcqb9Db7f1FBCrjtdIIzvM7qdQUz7Te8qPyw9Z+6hHRQ4
+         kSlpSEfWroI0lYo4zdOLjfumFa/uJVo4WGHYpSRJN7iCUx+y3l9P9XZLAfytmjhoXF2x
+         Q/eA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711399341; x=1712004141;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pC5vrAPVRrli7aVerpJXftZIlMpAFTi4jMQt7h4ZxrI=;
+        b=kb+BY6Itx7uVaONxwhlMl6LIHnnYixsXu86bWPGe1XJActEBIRwbiaSrylWDENDcJE
+         8hf8I3kF3nIM9zyBX1dBUv7nu1Xft8LXTljRxSb9+fnQPK+wC368j+FfVHgGe6ish6Ke
+         0tMd3xmSudscH+7JIqCZKThAnD53SWqkQxJEZ2WQ6wo1MPbTHV5DKWJoXbf+IlkY84DN
+         UK/9I+nfS6IQ2VewKvba5EPB6mdb9oOhkV7H75UCdUM2dvyG557LK+2tV/m5i2NsWyp/
+         1vKzcZs4L+Y9d/2gr7Gm8LvNNTTIRwErCxNgtCG2WALJjTzFQ+Jhfwx9OeKG97vs8LJp
+         RlWw==
+X-Forwarded-Encrypted: i=1; AJvYcCWdVXeXMrhTznQWAsbMsfZRTnri9mZfW3u+en6BYpER9JIzM9TuTw2B5r1ShkeUaoGvRmkyu7EDmhumaxOGsgPINALaJbCgpG3aeObqouRs/pl1H21k6M3Mxe43yHuWpU/gIJ3g
+X-Gm-Message-State: AOJu0YwCQHebOT9iGUkZ+NRkkUqHDPcley/bc6FWLQUKggiTHQ0x5pji
+	Su3hSxz4FKOOmEAH81k4sSINMu2tReZt0TvVFK9a+8WM+EAR7EfH069eVXYi9eJWtyZrOOCSi3/
+	ihYy1UgfIBrUxZ0/VgTfpfd3DcZI=
+X-Google-Smtp-Source: AGHT+IH7wuhgmBTWbyrg+4XcDEHdWND0NjDNLBpIvKN4mkdZZQN8XR1XJeS5EOpuSlmMzDRKFnCCBvt8g0qFPa8ecr0=
+X-Received: by 2002:a05:6122:1da0:b0:4d4:1340:df12 with SMTP id
+ gg32-20020a0561221da000b004d41340df12mr6403898vkb.0.1711399339236; Mon, 25
+ Mar 2024 13:42:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20240301221641.159542-1-paweldembicki@gmail.com>
+ <20240301221641.159542-8-paweldembicki@gmail.com> <20e792ad-33ce-43a6-8ed0-8db6e1a25c27@gmail.com>
+ <20240308130929.4kgctmtzecbpajao@skbuf>
+In-Reply-To: <20240308130929.4kgctmtzecbpajao@skbuf>
+From: =?UTF-8?Q?Pawe=C5=82_Dembicki?= <paweldembicki@gmail.com>
+Date: Mon, 25 Mar 2024 21:42:07 +0100
+Message-ID: <CAJN1Kkw0ufQC0k9LdQCkdVN0+7SD+MM9aZxNxdFnKunC8+MvWA@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 07/16] net: dsa: vsc73xx: Add vlan filtering
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org, 
+	Linus Walleij <linus.walleij@linaro.org>, Simon Horman <horms@kernel.org>, 
+	Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
+	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+pt., 8 mar 2024 o 14:09 Vladimir Oltean <olteanv@gmail.com> napisa=C5=82(a)=
+:
+>
+> On Tue, Mar 05, 2024 at 03:51:11PM -0800, Florian Fainelli wrote:
+> > On 3/1/24 14:16, Pawel Dembicki wrote:
+> > > This patch implements VLAN filtering for the vsc73xx driver.
+> > >
+> > > After starting VLAN filtering, the switch is reconfigured from QinQ t=
+o
+> > > a simple VLAN aware mode. This is required because VSC73XX chips do n=
+ot
+> > > support inner VLAN tag filtering.
+> > >
+> > > Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> > > ---
+> >
+> > [snip]
+> >
+> > [snip]
+> >
+> > Have to admit the logic is a bit hard to follow, but that is also becau=
+se of
+> > my lack of understanding of the requirements surrounding the use of
+> > tag_8021q.
+>
+> It's not only that. The code is also a bit hard on the brain for me.
+>
+> An alternative coding pattern would be to observe that certain hardware
+> registers (the egress-untagged VLAN, the PVID) depend on a constellation
+> of N input variables (the bridge VLAN filtering state, the tag_8021q
+> active state, the bridge VLAN table). So, to make the code easier to
+> follow and to ensure correctness, in theory a central function could be
+> written, which embeds the same invariant logic of determining what to
+> program the registers with, depending on the N inputs. This invariant
+> function is called from every place that modifies any of the N inputs.
+>
+> What Pawe=C5=82 did here was to have slightly different code paths for
+> modifying the hardware registers, each code path adjusted slightly on
+> the state change transition of individual inputs.
+>
+> This was a design choice on which I commented very early on, stating
+> that it's unusual but that I can go along with it. It is probably very
+> ingrained with the choice of the untagged_storage[] and pvid_storage[]
+> arrays, the logic of swapping the storage with the hardware at VLAN
+> filtering state change, and thus very hard to change at this stage of
+> development.
 
-Removing control plane VSI result in no information about slow-path
-statistic. In current solution statistics need to be counted in driver.
-
-Patch is based on similar implementation done by Simon Horman in nfp:
-commit eadfa4c3be99 ("nfp: add stats and xmit helpers for representors")
-
-Add const modifier to netdev parameter in ice_netdev_to_repr(). It isn't
-(and shouldn't be) modified in the function.
-
-Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_eswitch.c  |   7 +-
- drivers/net/ethernet/intel/ice/ice_repr.c     | 103 +++++++++++++-----
- drivers/net/ethernet/intel/ice/ice_repr.h     |  16 ++-
- drivers/net/ethernet/intel/ice/ice_txrx_lib.c |   2 +
- 4 files changed, 98 insertions(+), 30 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch.c b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-index 86a6d58ad3ec..af4e9530eb48 100644
---- a/drivers/net/ethernet/intel/ice/ice_eswitch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_eswitch.c
-@@ -192,13 +192,18 @@ netdev_tx_t
- ice_eswitch_port_start_xmit(struct sk_buff *skb, struct net_device *netdev)
- {
- 	struct ice_repr *repr = ice_netdev_to_repr(netdev);
-+	unsigned int len = skb->len;
-+	int ret;
- 
- 	skb_dst_drop(skb);
- 	dst_hold((struct dst_entry *)repr->dst);
- 	skb_dst_set(skb, (struct dst_entry *)repr->dst);
- 	skb->dev = repr->dst->u.port_info.lower_dev;
- 
--	return dev_queue_xmit(skb);
-+	ret = dev_queue_xmit(skb);
-+	ice_repr_inc_tx_stats(repr, len, ret);
-+
-+	return ret;
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_repr.c b/drivers/net/ethernet/intel/ice/ice_repr.c
-index b4fb74271811..2429727d5562 100644
---- a/drivers/net/ethernet/intel/ice/ice_repr.c
-+++ b/drivers/net/ethernet/intel/ice/ice_repr.c
-@@ -41,6 +41,47 @@ ice_repr_get_phys_port_name(struct net_device *netdev, char *buf, size_t len)
- 	return 0;
- }
- 
-+/**
-+ * ice_repr_inc_tx_stats - increment Tx statistic by one packet
-+ * @repr: repr to increment stats on
-+ * @len: length of the packet
-+ * @xmit_status: value returned by xmit function
-+ */
-+void ice_repr_inc_tx_stats(struct ice_repr *repr, unsigned int len,
-+			   int xmit_status)
-+{
-+	struct ice_repr_pcpu_stats *stats;
-+
-+	if (unlikely(xmit_status != NET_XMIT_SUCCESS &&
-+		     xmit_status != NET_XMIT_CN)) {
-+		this_cpu_inc(repr->stats->tx_drops);
-+		return;
-+	}
-+
-+	stats = this_cpu_ptr(repr->stats);
-+	u64_stats_update_begin(&stats->syncp);
-+	stats->tx_packets++;
-+	stats->tx_bytes += len;
-+	u64_stats_update_end(&stats->syncp);
-+}
-+
-+/**
-+ * ice_repr_inc_rx_stats - increment Rx statistic by one packet
-+ * @netdev: repr netdev to increment stats on
-+ * @len: length of the packet
-+ */
-+void ice_repr_inc_rx_stats(struct net_device *netdev, unsigned int len)
-+{
-+	struct ice_repr *repr = ice_netdev_to_repr(netdev);
-+	struct ice_repr_pcpu_stats *stats;
-+
-+	stats = this_cpu_ptr(repr->stats);
-+	u64_stats_update_begin(&stats->syncp);
-+	stats->rx_packets++;
-+	stats->rx_bytes += len;
-+	u64_stats_update_end(&stats->syncp);
-+}
-+
- /**
-  * ice_repr_get_stats64 - get VF stats for VFPR use
-  * @netdev: pointer to port representor netdev
-@@ -76,7 +117,7 @@ ice_repr_get_stats64(struct net_device *netdev, struct rtnl_link_stats64 *stats)
-  * ice_netdev_to_repr - Get port representor for given netdevice
-  * @netdev: pointer to port representor netdev
-  */
--struct ice_repr *ice_netdev_to_repr(struct net_device *netdev)
-+struct ice_repr *ice_netdev_to_repr(const struct net_device *netdev)
- {
- 	struct ice_netdev_priv *np = netdev_priv(netdev);
- 
-@@ -139,38 +180,35 @@ static int ice_repr_stop(struct net_device *netdev)
-  * ice_repr_sp_stats64 - get slow path stats for port representor
-  * @dev: network interface device structure
-  * @stats: netlink stats structure
-- *
-- * RX/TX stats are being swapped here to be consistent with VF stats. In slow
-- * path, port representor receives data when the corresponding VF is sending it
-- * (and vice versa), TX and RX bytes/packets are effectively swapped on port
-- * representor.
-  */
- static int
- ice_repr_sp_stats64(const struct net_device *dev,
- 		    struct rtnl_link_stats64 *stats)
- {
--	struct ice_netdev_priv *np = netdev_priv(dev);
--	int vf_id = np->repr->vf->vf_id;
--	struct ice_tx_ring *tx_ring;
--	struct ice_rx_ring *rx_ring;
--	u64 pkts, bytes;
--
--	tx_ring = np->vsi->tx_rings[vf_id];
--	ice_fetch_u64_stats_per_ring(&tx_ring->ring_stats->syncp,
--				     tx_ring->ring_stats->stats,
--				     &pkts, &bytes);
--	stats->rx_packets = pkts;
--	stats->rx_bytes = bytes;
--
--	rx_ring = np->vsi->rx_rings[vf_id];
--	ice_fetch_u64_stats_per_ring(&rx_ring->ring_stats->syncp,
--				     rx_ring->ring_stats->stats,
--				     &pkts, &bytes);
--	stats->tx_packets = pkts;
--	stats->tx_bytes = bytes;
--	stats->tx_dropped = rx_ring->ring_stats->rx_stats.alloc_page_failed +
--			    rx_ring->ring_stats->rx_stats.alloc_buf_failed;
--
-+	struct ice_repr *repr = ice_netdev_to_repr(dev);
-+	int i;
-+
-+	for_each_possible_cpu(i) {
-+		u64 tbytes, tpkts, tdrops, rbytes, rpkts;
-+		struct ice_repr_pcpu_stats *repr_stats;
-+		unsigned int start;
-+
-+		repr_stats = per_cpu_ptr(repr->stats, i);
-+		do {
-+			start = u64_stats_fetch_begin(&repr_stats->syncp);
-+			tbytes = repr_stats->tx_bytes;
-+			tpkts = repr_stats->tx_packets;
-+			tdrops = repr_stats->tx_drops;
-+			rbytes = repr_stats->rx_bytes;
-+			rpkts = repr_stats->rx_packets;
-+		} while (u64_stats_fetch_retry(&repr_stats->syncp, start));
-+
-+		stats->tx_bytes += tbytes;
-+		stats->tx_packets += tpkts;
-+		stats->tx_dropped += tdrops;
-+		stats->rx_bytes += rbytes;
-+		stats->rx_packets += rpkts;
-+	}
- 	return 0;
- }
- 
-@@ -291,6 +329,7 @@ static void ice_repr_remove_node(struct devlink_port *devlink_port)
-  */
- static void ice_repr_rem(struct ice_repr *repr)
- {
-+	free_percpu(repr->stats);
- 	free_netdev(repr->netdev);
- 	kfree(repr);
- }
-@@ -344,6 +383,12 @@ ice_repr_add(struct ice_pf *pf, struct ice_vsi *src_vsi, const u8 *parent_mac)
- 		goto err_alloc;
- 	}
- 
-+	repr->stats = netdev_alloc_pcpu_stats(struct ice_repr_pcpu_stats);
-+	if (!repr->stats) {
-+		err = -ENOMEM;
-+		goto err_stats;
-+	}
-+
- 	repr->src_vsi = src_vsi;
- 	repr->id = src_vsi->vsi_num;
- 	np = netdev_priv(repr->netdev);
-@@ -353,6 +398,8 @@ ice_repr_add(struct ice_pf *pf, struct ice_vsi *src_vsi, const u8 *parent_mac)
- 
- 	return repr;
- 
-+err_stats:
-+	free_netdev(repr->netdev);
- err_alloc:
- 	kfree(repr);
- 	return ERR_PTR(err);
-diff --git a/drivers/net/ethernet/intel/ice/ice_repr.h b/drivers/net/ethernet/intel/ice/ice_repr.h
-index eb8dec1f7de4..cff730b15ca0 100644
---- a/drivers/net/ethernet/intel/ice/ice_repr.h
-+++ b/drivers/net/ethernet/intel/ice/ice_repr.h
-@@ -6,12 +6,22 @@
- 
- #include <net/dst_metadata.h>
- 
-+struct ice_repr_pcpu_stats {
-+	struct u64_stats_sync syncp;
-+	u64 rx_packets;
-+	u64 rx_bytes;
-+	u64 tx_packets;
-+	u64 tx_bytes;
-+	u64 tx_drops;
-+};
-+
- struct ice_repr {
- 	struct ice_vsi *src_vsi;
- 	struct ice_vf *vf;
- 	struct net_device *netdev;
- 	struct metadata_dst *dst;
- 	struct ice_esw_br_port *br_port;
-+	struct ice_repr_pcpu_stats __percpu *stats;
- 	u32 id;
- 	u8 parent_mac[ETH_ALEN];
- };
-@@ -22,8 +32,12 @@ void ice_repr_rem_vf(struct ice_repr *repr);
- void ice_repr_start_tx_queues(struct ice_repr *repr);
- void ice_repr_stop_tx_queues(struct ice_repr *repr);
- 
--struct ice_repr *ice_netdev_to_repr(struct net_device *netdev);
-+struct ice_repr *ice_netdev_to_repr(const struct net_device *netdev);
- bool ice_is_port_repr_netdev(const struct net_device *netdev);
- 
- struct ice_repr *ice_repr_get_by_vsi(struct ice_vsi *vsi);
-+
-+void ice_repr_inc_tx_stats(struct ice_repr *repr, unsigned int len,
-+			   int xmit_status);
-+void ice_repr_inc_rx_stats(struct net_device *netdev, unsigned int len);
- #endif
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-index 676c00e1554c..df072ce767b1 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-@@ -240,6 +240,8 @@ ice_process_skb_fields(struct ice_rx_ring *rx_ring,
- 		struct net_device *netdev = ice_eswitch_get_target(rx_ring,
- 								   rx_desc);
- 
-+		if (ice_is_port_repr_netdev(netdev))
-+			ice_repr_inc_rx_stats(netdev, skb->len);
- 		skb->protocol = eth_type_trans(skb, netdev);
- 	} else {
- 		skb->protocol = eth_type_trans(skb, rx_ring->netdev);
--- 
-2.41.0
-
+I have to admit that it wasn't an optimal implementation. I focused on
+the wrong priorities, which led me astray. I prepared v7 and I tried
+to maximize simplicity. I hope it will be more acceptable than the v6
+version.
 
