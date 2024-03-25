@@ -1,252 +1,143 @@
-Return-Path: <netdev+bounces-81530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0365188A268
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 14:37:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2666788A21C
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 14:33:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5ADCC1F24E36
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:36:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D19EA1F3A9F2
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321471B4884;
-	Mon, 25 Mar 2024 10:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A77512C536;
+	Mon, 25 Mar 2024 10:21:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="P5EL3F4i";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DIxPDVP/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UmAQilOI"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 009A3139592
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 07:50:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E7D405F7;
+	Mon, 25 Mar 2024 07:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711353016; cv=none; b=nK0S0T2VPj+GQSvO7apsqENQQUGlkTzA00AIuur/NklZdKo+tQNj1wuP/B4tQzLkaoev8JwVtDsIf2mbcecY1PyRKJwp+24S3LtUtoDCazGh8BZfNITN7ju7BbHDV+AAvjxkwYil/fCa3PBjU+CPWvdj89ZvPMvxfmRvdaRUL8s=
+	t=1711352521; cv=none; b=H96ucAO8Pg91tkynXbAyeGgW9AzlyhTD9l4OMHbCvL18iegJzj64KvJApBjL0E9g38VZddGeHwb9j1V1LCnGutH8oF2XMfxgUislJQM4a87Lx+SI2jm+hG19/bry2Y04UETar7ANfvwucmMreGRwDuA0cz2DtH6NS6G6f7LiSuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711353016; c=relaxed/simple;
-	bh=QP3s3f1Xg5FYHrwymiZ1HJY5HswJeN22bmcr/OaXRBU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rYTVCgYmZ3L+KTmSAjW4nx3NMLbA9npBJGe5+91DTVgZXwaIx7HpucedrHCfNX/vSPHQWY09oT4nRyIuv5Mo7xFDc78UgHBf6gAlCE3YPlJqUbsJQOcxKPpmknDxEAJlBH/M3DQ3nzegLPLe/WcqdrZLcl6aXjhvwv1p+WRSQsw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=P5EL3F4i; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DIxPDVP/; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1711353013;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DZPsBE1waSwdEPk+Rue2mM/6zXcYLSe7me0RE5n3+Jo=;
-	b=P5EL3F4iDGc/bdQtJtSPafxKF5f+9gxxAMBsKPzOmdiv9BFaIxpk6dEuR5HvGVWGROATH1
-	C+tmdn3wiba3VYBbEB57CJudvhONjCIFazaLEbNx95YDj9f1RNh2XA8h/ehj6DqCG6VhX+
-	yc8FAFx+YVn7o0tMXuVVQFpODB2QmH5H7GVGPQpU+PteHRjX6mpLmFlNqarx20awJ2hz5w
-	IPYBADjdaEPcmamS7jOwiz5/rH9GdNE96jpHzh8N4TFjcbpJywu2NaAlG/F4zsiBnkvUbW
-	9Rt5OuYfuhihS7cRk4Sc5uuiKN28xcI+SxHCw8318T4xRPGTgqUitpU8HbmSQw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1711353013;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=DZPsBE1waSwdEPk+Rue2mM/6zXcYLSe7me0RE5n3+Jo=;
-	b=DIxPDVP/loqzTU0sF/pzERdIcICLRXEJfal343KwadI7rv9/QiVOOVm3G/c8fAcFfGHf1Z
-	XgMaiP8Q+3llVDDA==
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Wander Lairson Costa <wander@redhat.com>,
-	Yan Zhai <yan@cloudflare.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Subject: [PATCH v6 net-next 4/4] net: Rename rps_lock to backlog_lock.
-Date: Mon, 25 Mar 2024 08:40:31 +0100
-Message-ID: <20240325074943.289909-5-bigeasy@linutronix.de>
-In-Reply-To: <20240325074943.289909-1-bigeasy@linutronix.de>
-References: <20240325074943.289909-1-bigeasy@linutronix.de>
+	s=arc-20240116; t=1711352521; c=relaxed/simple;
+	bh=N+vMH/f1xAXLVOKF99Y4U/9AS89sQK5rmWtLu896KM8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YK0rXXb6soVsHXcHRCCS5llDfbfyeezeNAAwO7RqE1Ghn+G/OG0fxuHMxqyf3zhbc1yLn2nfUKCAiv19TT2a1+2aqTPZqHzSoLMMK0mMEKMpHcU+DpTg412SlvGSeepHy4IgLo7MCKc4q3wlfNMiGuEPVRVKQEnzhTREI3qFrYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UmAQilOI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC5AAC43390;
+	Mon, 25 Mar 2024 07:41:56 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711352521;
+	bh=N+vMH/f1xAXLVOKF99Y4U/9AS89sQK5rmWtLu896KM8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=UmAQilOIsFUQQVhgyRbu8YOTIo0YS7W6WUCO0hGqWHSkKhm5abI3a5iCyhBnwhJwn
+	 u1Zwnb23upldTpQruwHW9m4q148XU6o2BMy6hrCM1km45zriDhsi9NLJtkl2Q2joJO
+	 zPefjc7UqZrYRFa3mX7hMIT2USEDHyeuFF3dPBm9ApD3IBBh6tZVKhEbbn3J/taiI0
+	 xC3UKk7TD9OcBUDy9ETTLtl9515DFYddVy7i4TBrQHh6h01RVxBjbVTBM1g5W/Bphn
+	 oy8c8RcQR4/4kQwReBPRF14ZMLUiGs3TqXgmfVf0ECtKIDD4BHGWSdy3JHILNPhRCI
+	 DlrQB9JK1p4Wg==
+Message-ID: <e3a195b7-3684-4390-81af-2b3ea49b7673@kernel.org>
+Date: Mon, 25 Mar 2024 08:41:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/4] dt-bindings: net: dsa: realtek: describe LED
+ usage
+To: Luiz Angelo Daros de Luca <luizluca@gmail.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+ =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>,
+ Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+ Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ devicetree@vger.kernel.org
+References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com>
+ <20240310-realtek-led-v1-1-4d9813ce938e@gmail.com>
+ <d2568101-f3e0-4c2d-8613-52d023e22b77@kernel.org>
+ <CAJq09z6q2gaZYqc-=fQEMOA1ViAKTEJqT9iF2xsYCde9syouig@mail.gmail.com>
+ <e32363b2-66c4-4b76-a56a-40eec3a3c907@kernel.org>
+ <CAJq09z6qinM-bp3ht35JdcggVpwQscThAQOAs2yB2do-BFN9VA@mail.gmail.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <CAJq09z6qinM-bp3ht35JdcggVpwQscThAQOAs2yB2do-BFN9VA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The rps_lock.*() functions use the inner lock of a sk_buff_head for
-locking. This lock is used if RPS is enabled, otherwise the list is
-accessed lockless and disabling interrupts is enough for the
-synchronisation because it is only accessed CPU local. Not only the list
-is protected but also the NAPI state protected.
-With the addition of backlog threads, the lock is also needed because of
-the cross CPU access even without RPS. The clean up of the defer_list
-list is also done via backlog threads (if enabled).
+On 24/03/2024 03:10, Luiz Angelo Daros de Luca wrote:
+> Hi Krzysztof,
+> 
+>>>>
+>>>>> +
+>>>>> +            patternProperties:
+>>>>> +              '^led@[a-f0-9]+$':
+>>>>
+>>>> [0-3]
+>>>
+>>> leds are already defined for a port. I'm just trying to add a
+>>> restriction to allow only 0-3 leds and use that to identify the group.
+>>
+>> Where is the restriction, in your original patch?
+> 
+> I tried to limit the led index to [0-3] (from the original
+> '^led@[a-f0-9]+$') and reg also to [0-3] (originally not constrained).
 
-It has been suggested to rename the locking function since it is no
-longer just RPS.
+Where? I asked where, not what you tried to do. I don't think you tried
+to add any restriction on 0-3 leds.
 
-Rename the rps_lock*() functions to backlog_lock*().
-
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Acked-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
----
- net/core/dev.c | 34 +++++++++++++++++-----------------
- 1 file changed, 17 insertions(+), 17 deletions(-)
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 85e11dabab48c..9ce34164bcb1c 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -223,8 +223,8 @@ static bool use_backlog_threads(void)
-=20
- #endif
-=20
--static inline void rps_lock_irqsave(struct softnet_data *sd,
--				    unsigned long *flags)
-+static inline void backlog_lock_irq_save(struct softnet_data *sd,
-+					 unsigned long *flags)
- {
- 	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
- 		spin_lock_irqsave(&sd->input_pkt_queue.lock, *flags);
-@@ -232,7 +232,7 @@ static inline void rps_lock_irqsave(struct softnet_data=
- *sd,
- 		local_irq_save(*flags);
- }
-=20
--static inline void rps_lock_irq_disable(struct softnet_data *sd)
-+static inline void backlog_lock_irq_disable(struct softnet_data *sd)
- {
- 	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
- 		spin_lock_irq(&sd->input_pkt_queue.lock);
-@@ -240,8 +240,8 @@ static inline void rps_lock_irq_disable(struct softnet_=
-data *sd)
- 		local_irq_disable();
- }
-=20
--static inline void rps_unlock_irq_restore(struct softnet_data *sd,
--					  unsigned long *flags)
-+static inline void backlog_unlock_irq_restore(struct softnet_data *sd,
-+					      unsigned long *flags)
- {
- 	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
- 		spin_unlock_irqrestore(&sd->input_pkt_queue.lock, *flags);
-@@ -249,7 +249,7 @@ static inline void rps_unlock_irq_restore(struct softne=
-t_data *sd,
- 		local_irq_restore(*flags);
- }
-=20
--static inline void rps_unlock_irq_enable(struct softnet_data *sd)
-+static inline void backlog_unlock_irq_enable(struct softnet_data *sd)
- {
- 	if (IS_ENABLED(CONFIG_RPS) || use_backlog_threads())
- 		spin_unlock_irq(&sd->input_pkt_queue.lock);
-@@ -4727,12 +4727,12 @@ void kick_defer_list_purge(struct softnet_data *sd,=
- unsigned int cpu)
- 	unsigned long flags;
-=20
- 	if (use_backlog_threads()) {
--		rps_lock_irqsave(sd, &flags);
-+		backlog_lock_irq_save(sd, &flags);
-=20
- 		if (!__test_and_set_bit(NAPI_STATE_SCHED, &sd->backlog.state))
- 			__napi_schedule_irqoff(&sd->backlog);
-=20
--		rps_unlock_irq_restore(sd, &flags);
-+		backlog_unlock_irq_restore(sd, &flags);
-=20
- 	} else if (!cmpxchg(&sd->defer_ipi_scheduled, 0, 1)) {
- 		smp_call_function_single_async(cpu, &sd->defer_csd);
-@@ -4794,7 +4794,7 @@ static int enqueue_to_backlog(struct sk_buff *skb, in=
-t cpu,
- 	reason =3D SKB_DROP_REASON_NOT_SPECIFIED;
- 	sd =3D &per_cpu(softnet_data, cpu);
-=20
--	rps_lock_irqsave(sd, &flags);
-+	backlog_lock_irq_save(sd, &flags);
- 	if (!netif_running(skb->dev))
- 		goto drop;
- 	qlen =3D skb_queue_len(&sd->input_pkt_queue);
-@@ -4804,7 +4804,7 @@ static int enqueue_to_backlog(struct sk_buff *skb, in=
-t cpu,
- enqueue:
- 			__skb_queue_tail(&sd->input_pkt_queue, skb);
- 			input_queue_tail_incr_save(sd, qtail);
--			rps_unlock_irq_restore(sd, &flags);
-+			backlog_unlock_irq_restore(sd, &flags);
- 			return NET_RX_SUCCESS;
- 		}
-=20
-@@ -4819,7 +4819,7 @@ static int enqueue_to_backlog(struct sk_buff *skb, in=
-t cpu,
-=20
- drop:
- 	sd->dropped++;
--	rps_unlock_irq_restore(sd, &flags);
-+	backlog_unlock_irq_restore(sd, &flags);
-=20
- 	dev_core_stats_rx_dropped_inc(skb->dev);
- 	kfree_skb_reason(skb, reason);
-@@ -5885,7 +5885,7 @@ static void flush_backlog(struct work_struct *work)
- 	local_bh_disable();
- 	sd =3D this_cpu_ptr(&softnet_data);
-=20
--	rps_lock_irq_disable(sd);
-+	backlog_lock_irq_disable(sd);
- 	skb_queue_walk_safe(&sd->input_pkt_queue, skb, tmp) {
- 		if (skb->dev->reg_state =3D=3D NETREG_UNREGISTERING) {
- 			__skb_unlink(skb, &sd->input_pkt_queue);
-@@ -5893,7 +5893,7 @@ static void flush_backlog(struct work_struct *work)
- 			input_queue_head_incr(sd);
- 		}
- 	}
--	rps_unlock_irq_enable(sd);
-+	backlog_unlock_irq_enable(sd);
-=20
- 	skb_queue_walk_safe(&sd->process_queue, skb, tmp) {
- 		if (skb->dev->reg_state =3D=3D NETREG_UNREGISTERING) {
-@@ -5911,14 +5911,14 @@ static bool flush_required(int cpu)
- 	struct softnet_data *sd =3D &per_cpu(softnet_data, cpu);
- 	bool do_flush;
-=20
--	rps_lock_irq_disable(sd);
-+	backlog_lock_irq_disable(sd);
-=20
- 	/* as insertion into process_queue happens with the rps lock held,
- 	 * process_queue access may race only with dequeue
- 	 */
- 	do_flush =3D !skb_queue_empty(&sd->input_pkt_queue) ||
- 		   !skb_queue_empty_lockless(&sd->process_queue);
--	rps_unlock_irq_enable(sd);
-+	backlog_unlock_irq_enable(sd);
-=20
- 	return do_flush;
- #endif
-@@ -6033,7 +6033,7 @@ static int process_backlog(struct napi_struct *napi, =
-int quota)
-=20
- 		}
-=20
--		rps_lock_irq_disable(sd);
-+		backlog_lock_irq_disable(sd);
- 		if (skb_queue_empty(&sd->input_pkt_queue)) {
- 			/*
- 			 * Inline a custom version of __napi_complete().
-@@ -6049,7 +6049,7 @@ static int process_backlog(struct napi_struct *napi, =
-int quota)
- 			skb_queue_splice_tail_init(&sd->input_pkt_queue,
- 						   &sd->process_queue);
- 		}
--		rps_unlock_irq_enable(sd);
-+		backlog_unlock_irq_enable(sd);
- 	}
-=20
- 	return work;
---=20
-2.43.0
+Best regards,
+Krzysztof
 
 
