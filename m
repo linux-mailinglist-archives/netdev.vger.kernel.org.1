@@ -1,198 +1,104 @@
-Return-Path: <netdev+bounces-81818-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81819-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9760A88B64C
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 01:45:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFC5B88B307
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 22:45:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECCB4B2CD08
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:35:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 853FA1F2C26A
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2E46DCE8;
-	Mon, 25 Mar 2024 21:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF5226FE11;
+	Mon, 25 Mar 2024 21:45:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="NytJMmSf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ahLc+KHL"
 X-Original-To: netdev@vger.kernel.org
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D841C6D1A3;
-	Mon, 25 Mar 2024 21:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 026C16F085
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 21:45:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711402527; cv=none; b=oMuKzWoUTl6ZVZmABHXbkZTiafCXBq7zPYMrBHvlfiF3M2BQUA26kGF3u2SeFwU8pyxJQjcEnCVP/s94ri008t10aIIkyTfa4E41u1IALSxSHmu7Yk9e7ubvOgEH0etLL0FvLguJ54EOXsl555hbffvTMlZp0afAzpkba8/8Bxo=
+	t=1711403112; cv=none; b=S0ezR1f/vfoYQhquPbVU6h7lngbCOvCraOduZfKW6lZm7WwpiSqiIVTQlmjZfKzm5ZZQIw5FQ2urZ4lrNHD3sIL90t7kVoLR7rYn5PXIYzL4r4e2NzHMli2jQmtbjMvLHUZSgAcZ6MWv0L/kkpWAVSkTJGZLsiwZp5ymcxKItlc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711402527; c=relaxed/simple;
-	bh=z8rW+gaJh9oEjZWVYfIeBs5QTUurns59h3Zl/6mhWOk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ep44cd+6oduypGNRNT2yG0c85xt3g51TZWPGimz/ErFSCFSFjsypTjGXXFXnCYWv8qaB/CHVUAPMwdRnBCuHGa7zEfiaMtJguATQ0662JWG7V2rbBQdfFPMJ73s3KaPoJHi8mWU1hoQXORKroCLXzNGZTMmRKqFVwg+Ke/lr3UY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=NytJMmSf; arc=none smtp.client-ip=213.133.104.62
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=/7uCFdLyUcSLoN2CO/QqYsxgNqqrS5ZwWh/yFNNxePU=; b=NytJMmSfMiiFMWamhvlDYQ6iay
-	ZsVdGDTH+EVwLu2HILHKGji4/EXQDmdQfH+cfUIS1kC7vF58F/BIuctmhXSSWeOtUSboiS1WSBDoN
-	JTlY7vo/qKYafRYN2smHEO40gakwc2vSoT8wC4hbj8cVxAfflIIH2LRqvNX6NpKDvq1arYWTohHA0
-	MW1uJxtpSfsS68dZoAXMq6iMdmQVZsjTeXl7OWp1K4g9dpvSGBxV1jJ0UzdlftD2GkJbycpV/5Hzx
-	1rvKK4UfH8XoSFF7bbK2asjQN6VRNF3uldnhUQFp3amdlYNoKXuSs5KfFqxZ3yxsFrsj21IiNoJ6B
-	5qgQAgsA==;
-Received: from 30.248.197.178.dynamic.dsl-lte-bonding.zhbmb00p-msn.res.cust.swisscom.ch ([178.197.248.30] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1roryT-000IF1-DU; Mon, 25 Mar 2024 22:35:21 +0100
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf 2024-03-25
-Date: Mon, 25 Mar 2024 22:35:20 +0100
-Message-Id: <20240325213520.26688-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	s=arc-20240116; t=1711403112; c=relaxed/simple;
+	bh=dDHqG7cyGIqxwGd61GXG9jbFGtA/ejZsZ+y0aGUjYeo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MQFeG9sE7x5SEygJo2oZCr+Cg4Nx/3jVu25r8rAb/SUBoPAGw7yeXswcJpp1cHXUB4ObYtID7OHFC+s4ElXuRnGDovMIHnqlc8KJ2sLUyHp1uAzWYwLuJ0Ngkxa6QiDyL7Nf8gJ1wYPNdzh5SoIXJxPqfWBfWT1sIH9k4RqOnhU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ahLc+KHL; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4148c72db39so3521315e9.0
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 14:45:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711403108; x=1712007908; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ym+3+iAmVDfvw2iSJgOwfbEWZypO18/KuZnI7fMK36E=;
+        b=ahLc+KHLc3jkfZZcmzDUq6+nzxgVVnzf2Ra+LmZEdOg47Zskj58/yKfCd+05aDppDC
+         3qZ2FLUWVib2KRbNb6I67Qy+vMjWHzUpUtxbDwU8zRWE8TIpDfzkZ0jYbS9lrDYrzbAV
+         SqkEV3h6Csmq92qXlJm2TX+fVD1oJV8RcgoroyrhgzYCzdN8OYW1nwenBZEsRKk1QBPD
+         Rersk0S5W6Z9rr2Kr4sxRUkiD+SxPU4Xm1fmGqYj4x0+jaGB4TlYhWIqrkAKXggVsiMP
+         jfHvbzpyQomxqSCKBJBFsa9X5y6IX3i/ys8YRQFM3CFpMaXz3v40sN3PqnoGzN/8hZ6E
+         WQvQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711403108; x=1712007908;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Ym+3+iAmVDfvw2iSJgOwfbEWZypO18/KuZnI7fMK36E=;
+        b=weibpcflfFkMrhCE9bpYqObAYQvkyy1vcGFqkIIIZzKV3MVJNbTfPK+2U8oYArq02n
+         OR1p103yh4va+v+JR6hS41RZBwX90TAwsOd8t6//OiSt0WJ5lTkt2zxqOsLveVtp8dg7
+         2SU8DbgDkScpcDtwqm02rUeQSovaiJ0F1UsxMmpxazCuyz8rjWanbI2KC39VH+vDMRVT
+         RosgiH5OS8suJgqj9D6Wiq4FTltim4rN0VRYsf/nalxOc/CqMNmzrimaRKWsqusI5vZ9
+         Xlghx2RMALdclXxZDDIvr7qfSIL1mdwyzgdLwYAfH/ofzVglsazs5d+L02wYvk9hxEVB
+         Fb6w==
+X-Gm-Message-State: AOJu0Yy8rNbe5DBXAJ2EEhp397zwgvSDizw6ZVTv43TiKhtz/T4Pvr6J
+	e721i9w8cJjf/DFc3JPK0Seo4+59GJbhJIM2DilCVpPg9XefN91s0lRMpUtj3BM=
+X-Google-Smtp-Source: AGHT+IGIhsBKUJ6iv7FuZPyMJH3iOgBrX8zonTymIJe2KUMrNFcDJcYFslvFD3qQBEE9EZ9tfDNq0A==
+X-Received: by 2002:adf:cf01:0:b0:33e:c307:a00a with SMTP id o1-20020adfcf01000000b0033ec307a00amr5020495wrj.43.1711403108524;
+        Mon, 25 Mar 2024 14:45:08 -0700 (PDT)
+Received: from abode (89-138-235-214.bb.netvision.net.il. [89.138.235.214])
+        by smtp.gmail.com with ESMTPSA id dv13-20020a0560000d8d00b0033e25c39ac3sm10437130wrb.80.2024.03.25.14.45.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Mar 2024 14:45:08 -0700 (PDT)
+Date: Mon, 25 Mar 2024 23:45:05 +0200
+From: Yedaya <yedaya.ka@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Stephen Hemminger <stephen@networkplumber.org>,
+	Yedaya Katsman <yedaya.ka@gmail.com>
+Subject: Re: [PATCH] ip: Make errors direct to "list" instead of "show"
+Message-ID: <ZgHwYUtxrDP1Y+BS@abode>
+References: <20240325204837.3010-1-yedaya.ka@gmail.com>
+ <20240325141920.0fe4cb61@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27225/Mon Mar 25 09:30:27 2024)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240325141920.0fe4cb61@hermes.local>
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
-
-The following pull-request contains BPF updates for your *net* tree.
-
-We've added 17 non-merge commits during the last 12 day(s) which contain
-a total of 19 files changed, 184 insertions(+), 61 deletions(-).
-
-The main changes are:
-
-1) Fix an arm64 BPF JIT bug in BPF_LDX_MEMSX implementation's offset handling
-   found via test_bpf module, from Puranjay Mohan.
-
-2) Various fixups to the BPF arena code in particular in the BPF verifier and
-   around BPF selftests to match latest corresponding LLVM implementation,
-   from Puranjay Mohan and Alexei Starovoitov.
-
-3) Fix xsk to not assume that metadata is always requested in TX completion,
-   from Stanislav Fomichev.
-
-4) Fix riscv BPF JIT's kfunc parameter incompatibility between BPF and the riscv
-   ABI which requires sign-extension on int/uint, from Pu Lehui.
-
-5) Fix s390x BPF JIT's bpf_plt pointer arithmetic which triggered a crash when
-   testing struct_ops, from Ilya Leoshkevich.
-
-6) Fix libbpf's arena mmap handling which had incorrect u64-to-pointer cast on
-   32-bit architectures, from Andrii Nakryiko.
-
-7) Fix libbpf to define MFD_CLOEXEC when not available, from Arnaldo Carvalho de Melo.
-
-8) Fix arm64 BPF JIT implementation for 32bit unconditional bswap which
-   resulted in an incorrect swap as indicated by test_bpf, from Artem Savkov.
-
-9) Fix BPF man page build script to use silent mode, from Hangbin Liu.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Alejandro Colomar, Daniele Salvatore Albano, Kumar Kartikeya Dwivedi, 
-Puranjay Mohan, Quentin Monnet, Ryan Eatmon, Stanislav Fomichev, xingwei 
-lee, Xu Kuohai, yue sun
-
-----------------------------------------------------------------
-
-The following changes since commit e30cef001da259e8df354b813015d0e5acc08740:
-
-  net: txgbe: fix clk_name exceed MAX_DEV_ID limits (2024-03-14 13:49:02 +0100)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-for you to fetch changes up to 443574b033876c85a35de4c65c14f7fe092222b2:
-
-  riscv, bpf: Fix kfunc parameters incompatibility between bpf and riscv abi (2024-03-25 11:39:31 -0700)
-
-----------------------------------------------------------------
-bpf-for-netdev
-
-----------------------------------------------------------------
-Alexei Starovoitov (4):
-      bpf: Clarify bpf_arena comments.
-      libbpf, selftests/bpf: Adjust libbpf, bpftool, selftests to match LLVM
-      selftests/bpf: Remove hard coded PAGE_SIZE macro.
-      selftests/bpf: Add arena test case for 4Gbyte corner case
-
-Andrii Nakryiko (2):
-      Merge branch 'bpf-arena-followups'
-      libbpf: fix u64-to-pointer cast on 32-bit arches
-
-Arnaldo Carvalho de Melo (1):
-      libbpf: Define MFD_CLOEXEC if not available
-
-Artem Savkov (1):
-      arm64: bpf: fix 32bit unconditional bswap
-
-Hangbin Liu (1):
-      scripts/bpf_doc: Use silent mode when exec make cmd
-
-Ilya Leoshkevich (1):
-      s390/bpf: Fix bpf_plt pointer arithmetic
-
-Pu Lehui (1):
-      riscv, bpf: Fix kfunc parameters incompatibility between bpf and riscv abi
-
-Puranjay Mohan (5):
-      bpf: Temporarily disable atomic operations in BPF arena
-      bpf, arm64: fix bug in BPF_LDX_MEMSX
-      bpf: verifier: fix addr_space_cast from as(1) to as(0)
-      selftests/bpf: verifier_arena: fix mmap address for arm64
-      bpf: verifier: reject addr_space_cast insn without arena
-
-Quentin Monnet (1):
-      MAINTAINERS: Update email address for Quentin Monnet
-
-Stanislav Fomichev (1):
-      xsk: Don't assume metadata is always requested in TX completion
-
- .mailmap                                           |  3 +-
- MAINTAINERS                                        |  2 +-
- arch/arm64/net/bpf_jit_comp.c                      |  4 +-
- arch/riscv/net/bpf_jit_comp64.c                    | 16 +++++
- arch/s390/net/bpf_jit_comp.c                       | 46 +++++++--------
- include/net/xdp_sock.h                             |  2 +
- kernel/bpf/arena.c                                 | 25 +++++---
- kernel/bpf/verifier.c                              | 22 ++++++-
- scripts/bpf_doc.py                                 |  4 +-
- tools/bpf/bpftool/gen.c                            |  2 +-
- tools/lib/bpf/libbpf.c                             | 10 +++-
- tools/testing/selftests/bpf/bpf_arena_common.h     |  2 +-
- .../testing/selftests/bpf/prog_tests/arena_htab.c  |  8 ++-
- .../testing/selftests/bpf/prog_tests/arena_list.c  |  7 ++-
- tools/testing/selftests/bpf/prog_tests/verifier.c  |  2 +
- tools/testing/selftests/bpf/progs/arena_htab.c     |  2 +-
- tools/testing/selftests/bpf/progs/arena_list.c     | 10 ++--
- tools/testing/selftests/bpf/progs/verifier_arena.c | 10 +++-
- .../selftests/bpf/progs/verifier_arena_large.c     | 68 ++++++++++++++++++++++
- 19 files changed, 184 insertions(+), 61 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/progs/verifier_arena_large.c
+On Mon, Mar 25, 2024 at 02:19:20PM -0700, Stephen Hemminger wrote:
+> On Mon, 25 Mar 2024 22:48:37 +0200
+> Yedaya Katsman <yedaya.ka@gmail.com> wrote:
+> 
+> > The usage text and man pages only have "list" in them, but the errors
+> > when using "ip ila list" and "ip addrlabel list" incorrectly direct to
+> > running the "show" subcommand. Make them consistent by mentioning "list"
+> > instead.
+> > 
+> > Signed-off-by: Yedaya Katsman <yedaya.ka@gmail.com>
+> 
+> That is because ip command treats "list" and "show" the same.
+> Would it be better to do the same in all sub commands?
+>
+I'm not sure what else you're talking about changing, I couldn't find
+anywhere where a "show" is referenced in output. Do you mean treating
+"show" and "list" the same everywhere?
 
