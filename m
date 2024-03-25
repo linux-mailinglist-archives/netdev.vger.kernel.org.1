@@ -1,86 +1,64 @@
-Return-Path: <netdev+bounces-81746-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05A8D88B030
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:39:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B96E88B049
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:42:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37EFC1C3C465
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 19:39:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A98A41FA4B9C
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 19:42:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10A8F1BF2F;
-	Mon, 25 Mar 2024 19:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41B091BF38;
+	Mon, 25 Mar 2024 19:41:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HqQ7RdWG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Wr/mJECD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02232224DB;
-	Mon, 25 Mar 2024 19:39:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3F474E1A2;
+	Mon, 25 Mar 2024 19:41:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711395589; cv=none; b=tIOayVXut9KE/NYDUZcSvyTjAUdAlNKUepz8h3pwoMmawbQghj1W2LklMsrITmu8yUBDAyr865I3blXkQsZOXyRY1VF+6kH7p2oBCJ0mASP+2Sq2LqqrC1ItRPOudgmkOTnF+EQxXnlSj9RsoPKBsYLICl37vgzkNMryi4Yge6o=
+	t=1711395680; cv=none; b=RbFsdIoWzyW88gPe8qn0nW5DXYRF8DNxfozKASlocRILOjeEVZDEsqBmQMGjiNUDqyvSwYmBPm6hZI6vgBySIbtnvrvhYg4IrOYpLEuZUHyZdfPrgvUwLgToAaIamDxurA3D1cFba9fESL2wVrZGTy1OgMOR6I8qvgddqnTL6t4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711395589; c=relaxed/simple;
-	bh=D6MfnrEFK0/vmjnJEcjSthiQ8tmUlQRWp4661t4UP/k=;
+	s=arc-20240116; t=1711395680; c=relaxed/simple;
+	bh=3xnZx4O3dbcAf+Y7O5EM0rkpFufFse3NgrQVMqIYK90=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MwsJk27hpF2ClJvmWBeP+Kp+0rwh8ljR9mxXu4RuSJ36/nzsE/2DMAse0NuByJ1Dbdj5UmoVnkB6Xj3BKT7Ms69vnjvz4+DiiMb+AOnnjeBN1RhEKG3Hk6XLieehai55/qp/y3KoDM4yXbxtDGUe5j468vpASCtFBaHx4zPuG/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HqQ7RdWG; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711395587; x=1742931587;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=D6MfnrEFK0/vmjnJEcjSthiQ8tmUlQRWp4661t4UP/k=;
-  b=HqQ7RdWG+Lw1MCIjj21cTC1fwXcPU9/EMfx1ROyiBYbmE8eU38GdtPpH
-   YAjxZUCHoA+2MGA1Ui4aMl0u3s9RbcHeXqr5LNUX4n9cH0sEnSz6Y/7PL
-   Un7RgwCxyAWzDNw1MXQOjI3aebAj4Z4BYwKxInG6ciJOn/ra6ZdqoosCx
-   9zVX3W0fAu1teOrPKsy1hG0wLtoIpd7JXhmqMj2DpoyPtfT6kbvw37AMM
-   vjwYlMzlKrnJMvn7768pvnqK7+Qp8boyfYwwjpYufYlgjRYHagdzDmClg
-   imcLLoZmnEwfvDgbulyq927hXSJxo/2uwjubjmjcTipch8Fs5rjyiBGou
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11024"; a="6601587"
-X-IronPort-AV: E=Sophos;i="6.07,154,1708416000"; 
-   d="scan'208";a="6601587"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 12:39:46 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,11024"; a="914852875"
-X-IronPort-AV: E=Sophos;i="6.07,154,1708416000"; 
-   d="scan'208";a="914852875"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 12:39:42 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.97)
-	(envelope-from <andriy.shevchenko@intel.com>)
-	id 1roqAU-0000000G7FV-4928;
-	Mon, 25 Mar 2024 21:39:38 +0200
-Date: Mon, 25 Mar 2024 21:39:38 +0200
-From: Andy Shevchenko <andriy.shevchenko@intel.com>
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
-	Manivannan Sadhasivami <manivannan.sadhasivam@linaro.org>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Jaroslav Kysela <perex@perex.cz>, linux-sound@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-usb@vger.kernel.org, linux-serial@vger.kernel.org,
-	Hans de Goede <hdegoede@redhat.com>,
-	platform-driver-x86@vger.kernel.org, ntb@lists.linux.dev,
-	Lee Jones <lee@kernel.org>, David Airlie <airlied@gmail.com>,
-	amd-gfx@lists.freedesktop.org, Jason Gunthorpe <jgg@ziepe.ca>,
-	linux-rdma@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 09/28] mfd: intel-lpss-pci: Use PCI_IRQ_INTX
-Message-ID: <ZgHS-qZliVyFD5xh@smile.fi.intel.com>
-References: <20240325070944.3600338-1-dlemoal@kernel.org>
- <20240325070944.3600338-10-dlemoal@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=LbnYjy5UQt4uiq/kPjv7hRrNSWa6eiWfarefHWWWmIMjJBPWR4Y3GHqbWkaBa9fxQZQi/AqWqwg938xKhNeGFuXjh0nUT7bXpWdJ6g8JBstdE5Ckf5JZagRqu1wLdMOkbeJVXHGd+VyIxu7VVa4+4ynzi38LcabnYRQW9bJ4uCs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Wr/mJECD; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ib7GsXJL2hwjOEEuaNYmsfMXqAJ+kFKKW9Qz5HRmhc8=; b=Wr/mJECDMriqE1iWmGeyTFQbAo
+	rvKuQ545xY7dKNCtNQmC+5TBM/O8Rbg6xWUY7oypmsUuoQkcOUSohqcz9BIpC7sOPrBQEYOFKH/iU
+	uSWVsiY22Cjk0qNs9mZULIHVy7ox/XRNxYy86SRwBdb7bGMJ8+NzzkVZNZqalfhsF/TI=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1roqBf-00BC1C-AC; Mon, 25 Mar 2024 20:40:51 +0100
+Date: Mon, 25 Mar 2024 20:40:51 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	William Wortel <wwortel@dorpstraat.com>, stable@vger.kernel.org
+Subject: Re: [net PATCH] net: phy: qcom: at803x: fix kernel panic with
+ at8031_probe
+Message-ID: <28af27cd-52a5-443c-86a9-60c0699bc0ef@lunn.ch>
+References: <20240325190621.2665-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,20 +67,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240325070944.3600338-10-dlemoal@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+In-Reply-To: <20240325190621.2665-1-ansuelsmth@gmail.com>
 
-On Mon, Mar 25, 2024 at 04:09:20PM +0900, Damien Le Moal wrote:
-> Use the macro PCI_IRQ_INTX instead of the deprecated PCI_IRQ_LEGACY
-> macro.
+On Mon, Mar 25, 2024 at 08:06:19PM +0100, Christian Marangi wrote:
+> On reworking and splitting the at803x driver, in splitting function of
+> at803x PHYs it was added a NULL dereference bug where priv is referenced
+> before it's actually allocated and then is tried to write to for the
+> is_1000basex and is_fiber variables in the case of at8031, writing on
+> the wrong address.
+> 
+> Fix this by correctly setting priv local variable only after
+> at803x_probe is called and actually allocates priv in the phydev struct.
+> 
+> Reported-by: William Wortel <wwortel@dorpstraat.com>
+> Cc: <stable@vger.kernel.org>
+> Fixes: 25d2ba94005f ("net: phy: at803x: move specific at8031 probe mode check to dedicated probe")
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 
-Not needed anymore. MFD subsystem has a patch moving this to MSI support.
-But you need to coordinate with Lee how to proceed (in case of conflicts MFD
-version should be taken).
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+    Andrew
 
