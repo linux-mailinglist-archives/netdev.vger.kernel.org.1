@@ -1,150 +1,221 @@
-Return-Path: <netdev+bounces-81461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B01A8889E75
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:10:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DD82889C75
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 12:20:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D1D61F379BF
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 12:10:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B80512C174C
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 11:20:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7AC5FB8D;
-	Mon, 25 Mar 2024 07:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C7715B541;
+	Mon, 25 Mar 2024 06:36:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nsD79n78"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Qfe96/kj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 591B934E9CD;
-	Mon, 25 Mar 2024 02:51:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FEE374727;
+	Mon, 25 Mar 2024 03:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711335067; cv=none; b=U8LT2meAU/M9oJUjAa87wMh31dT+akAC4pz4sTC71OLJJAappD48XZuWAAJU2t+sxdJE7DUgHjfjox1lWPmgmX4NYjQJMw8pmLgUWXkWXKPxaaUdVzEuem92SPRqM46cXfVI2LgiKvYpMwQzy97dva6ilT1z9S+yDS9T7zivuDk=
+	t=1711335674; cv=none; b=bIRXb4pHOghrs2xkxkVzf9gPRvCxocb3rSOiHNgaHTf+XTDLI28pdCC+PIgbynVt7te4+f0ALRhecj1cmBXSpwYXMZxZV3m46iZPWREZB2G32ZluIQMloRwhsIldgzHJgWIvZgFaF1a3rYh8G6zLR1vrDFBcuEv4nIBaXNvXXOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711335067; c=relaxed/simple;
-	bh=biRFDuDFFmrGcVhDFXnntAOosUY7GJSIQ9cbUZxbPus=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q01/3KzMjeF88gp4ZagzbpCib3MazW0J9ERRL92EkV91XwPVc9LDSFbeXExTKCRlBJKNHQEBceMzgHV8phze3FjbVpctqWKie7+DZHqAr1bSOC6WLgy46VuGeNrRHm+Wv1TMSWaYaOxXaYr5nPSuzvziQh3IlyqcDEXmf6CiZHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nsD79n78; arc=none smtp.client-ip=209.85.208.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2d687da75c4so46885011fa.0;
-        Sun, 24 Mar 2024 19:51:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711335063; x=1711939863; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4LnrNtIij4Bn4X4TVnt4F69Di6fmhgYJ95GSudT4g/s=;
-        b=nsD79n78jjbGfEpAslqT6wW1qIR2qibW0xv8C767n6lfnsZ/wJ5lqKEMBSTx3yV4a6
-         hTCdQXhUTFPI7ibW1CHdAJJ6g7gtv2FHXy1jJPhQcNbW3EiaLPwkLyntUam5Km4jR9DJ
-         4vyiEtiQU0BKHfmtob+K93RAZr/TtKEIAovkAQq+EFnlhsyFtXtNaSkRYbgfNIDq74Pj
-         y6cdgtAJ0P8gOx01mj4vEF3ex5lzMAxWbUJpezdIzxxWxDI+s/ug+QEcMKUi7ELSmYT7
-         Q8UapWqkOK9yrUuPEtGCidXBc/ebeCxMMDHW98b2Zpgpd5a27wzEk69QTCeNQDU6diNX
-         y+dQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711335063; x=1711939863;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4LnrNtIij4Bn4X4TVnt4F69Di6fmhgYJ95GSudT4g/s=;
-        b=f1gCmHZr3qp8LkvN5c23M0+meYzO8sHaeybmugmpXfE1QD+g0KZyYmybwF4JtgNPSR
-         CaCdD2EyRE0BurItiyGnmtLVDeam+Zt3nha+IYqz111mFUd1aPSdjDHT4QVnTm8w825D
-         JG7Y+AlCGV08PqiyOY1VGO/8aIhObagrUI/bf7ZYGDXV+OYXmpmKqUp4bykWIHicW5Lw
-         G3ztostqfJ6smAGHhs9Wdm3PIC6VB5AVPVdtVNuVoF9lQyZKBPdoAgy61TninMcBz/ij
-         qsgE0zuGec44iLF/8z9H67Cr6ROzVDMkVRZCMkPkI4Q9b9OyQ+nbRsMxdSL53YSXStP9
-         XHKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVpMe6MYuctjDt9zes1j0uHMbYScasyLD90IeV6LXNgpPC9Ygmfc6wJMkW9MBugjGRl4w9TrbZksW3q6FMTkyAKvMmqju4XWEMxXKHICMSuJ9kZJW1xLNMKXQJicpnsNtdwwRla
-X-Gm-Message-State: AOJu0YyFStb2nWeMtzPBYkFDA8y1g2UbHDMD0j4Kj0hFRTTkJ8xKoCPM
-	7+6XxV/ZASf4u1PzJBMxra8LI8AMxz0dDDndfBhRe6cHhDoLOqor9+L4AiIzZqQPucSe5EQNzC8
-	fsIlMFI+7xOo8sZ7E8O1h2EYsoQ0=
-X-Google-Smtp-Source: AGHT+IEYeZivJLuYi6qTfbH9A+Steuz/SE2j9nSLFBiNGYXsF6GgH/e2x2XA5N89cjg8RRWrfD/hcIY0fJ++j665Jvw=
-X-Received: by 2002:a05:6512:3d22:b0:515:ab5c:4a2f with SMTP id
- d34-20020a0565123d2200b00515ab5c4a2fmr1675869lfv.26.1711335063232; Sun, 24
- Mar 2024 19:51:03 -0700 (PDT)
+	s=arc-20240116; t=1711335674; c=relaxed/simple;
+	bh=8Qfd+A8m4V1tqSb5szRlD3RAirI9yb2FDNe+L0MmL9I=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=sf18XiszyddsMCuIqCK7KQ7mpQF6aLqYHc7/TlWqCVRw1c3t/Hq2EmoxTfIFAIXQ03yeUDKznc0Mwfjt+e+mYQXYUyNH0BflqFwVX5QeGkRgUFbJDuiQOnhjwZVlnySGIgQgZT7fT6230Z4nx0lRgBsKVA3UxT6ob2pJpuX2S4Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Qfe96/kj; arc=none smtp.client-ip=115.124.30.110
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711335666; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=XmVeqKOAT32nVC7FjBmUhKXxG89ac3vc9NUHAgKmK0w=;
+	b=Qfe96/kjt9t6n7Fo4UD1SDcy5/CK8nyvyMHaAGKdygV5sC8P3vsC21zf9hWx7JjduTi/lJviBP7G5qa9CBobiG7p+FFiBv1S5qQBYR46dIlwKzZFzNJCv8PkwY88qbP6QZrOILYDnzSoUZIzDOmZrSNY8hcW0YN/RMHxtfv0Yc8=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R861e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046056;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=14;SR=0;TI=SMTPD_---0W38Wexa_1711335664;
+Received: from 30.221.130.215(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W38Wexa_1711335664)
+          by smtp.aliyun-inc.com;
+          Mon, 25 Mar 2024 11:01:06 +0800
+Message-ID: <f504328f-1fd2-4c85-a657-a14b272c321e@linux.alibaba.com>
+Date: Mon, 25 Mar 2024 11:01:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240310-realtek-led-v1-0-4d9813ce938e@gmail.com>
- <20240310-realtek-led-v1-4-4d9813ce938e@gmail.com> <d064b1be-1004-487b-9944-b62d91b671c9@lunn.ch>
- <CAJq09z54+049aPL2LzAqAFigrvpchPhv_YQ6yJ5C9b9J7mngLQ@mail.gmail.com> <f76754f9-4141-4d48-81e8-f43aa2dfa90c@lunn.ch>
-In-Reply-To: <f76754f9-4141-4d48-81e8-f43aa2dfa90c@lunn.ch>
-From: Luiz Angelo Daros de Luca <luizluca@gmail.com>
-Date: Sun, 24 Mar 2024 23:50:51 -0300
-Message-ID: <CAJq09z6ZYpwYiqo-XvLG1=_JZeCM2APmHqBjhD4rBSdRP3ERYA@mail.gmail.com>
-Subject: Re: [PATCH net-next 4/4] net: dsa: realtek: add LED drivers for rtl8366rb
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Linus Walleij <linus.walleij@linaro.org>, =?UTF-8?Q?Alvin_=C5=A0ipraga?= <alsi@bang-olufsen.dk>, 
-	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2][next] net/smc: Avoid -Wflex-array-member-not-at-end
+ warnings
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+ "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org,
+ Kees Cook <keescook@chromium.org>
+References: <ZfCXBykRw5XqBvf0@neat>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <ZfCXBykRw5XqBvf0@neat>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> > OK, I'll add _group_/_GROUP_ both to the enum name and macros. Led
-> > blink rate, for example, is global, used by all groups. However, it
-> > will be difficult to respect the 80 columns limit passing
-> > RTL8366RB_LED_GROUP_OFF to a rb8366rb_set_ledgroup_mode function with
-> > only two levels of indentation. Do you have any recommendations?
 
-Hi Andrew,
 
-> https://www.kernel.org/doc/html/v4.10/process/coding-style.html
->
->   Now, some people will claim that having 8-character indentations
->   makes the code move too far to the right, and makes it hard to read
->   on a 80-character terminal screen. The answer to that is that if you
->   need more than 3 levels of indentation, you=E2=80=99re screwed anyway, =
-and
->   should fix your program.
+On 2024/3/13 01:55, Gustavo A. R. Silva wrote:
+> -Wflex-array-member-not-at-end is coming in GCC-14, and we are getting
+> ready to enable it globally.
+> 
+> There are currently a couple of objects in `struct smc_clc_msg_proposal_area`
+> that contain a couple of flexible structures:
+> 
+> struct smc_clc_msg_proposal_area {
+> 	...
+> 	struct smc_clc_v2_extension             pclc_v2_ext;
+> 	...
+> 	struct smc_clc_smcd_v2_extension        pclc_smcd_v2_ext;
+> 	...
+> };
+> 
+> So, in order to avoid ending up with a couple of flexible-array members
+> in the middle of a struct, we use the `struct_group_tagged()` helper to
+> separate the flexible array from the rest of the members in the flexible
+> structure:
+> 
+> struct smc_clc_smcd_v2_extension {
+>          struct_group_tagged(smc_clc_smcd_v2_extension_fixed, fixed,
+>                              u8 system_eid[SMC_MAX_EID_LEN];
+>                              u8 reserved[16];
+>          );
+>          struct smc_clc_smcd_gid_chid gidchid[];
+> };
+> 
+> With the change described above, we now declare objects of the type of
+> the tagged struct without embedding flexible arrays in the middle of
+> another struct:
+> 
+> struct smc_clc_msg_proposal_area {
+>          ...
+>          struct smc_clc_v2_extension_fixed	pclc_v2_ext;
+>          ...
+>          struct smc_clc_smcd_v2_extension_fixed	pclc_smcd_v2_ext;
+>          ...
+> };
+> 
+> We also use `container_of()` when we need to retrieve a pointer to the
+> flexible structures.
+> 
+> So, with these changes, fix the following warnings:
+> 
+> In file included from net/smc/af_smc.c:42:
+> net/smc/smc_clc.h:186:49: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+>    186 |         struct smc_clc_v2_extension             pclc_v2_ext;
+>        |                                                 ^~~~~~~~~~~
+> net/smc/smc_clc.h:188:49: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+>    188 |         struct smc_clc_smcd_v2_extension        pclc_smcd_v2_ext;
+>        |                                                 ^~~~~~~~~~~~~~~~
+> 
+> Reviewed-by: Kees Cook <keescook@chromium.org>
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
 
-I need 3, not more than 3.
+Hi Gustavo,
 
->   Functions should be short and sweet, and do just one thing. They
->   should fit on one or two screenfuls of text (the ISO/ANSI screen
->   size is 80x24, as we all know), and do one thing and do that well.
->
-> Maybe you need to use more helper functions?
+Thank you for the v2. Some places may need improvement, see below.
 
-The call that violates (by 1) the limit is to
-rb8366rb_set_ledgroup_mode(). With its name (a little long), the now
-5-char longer macro/enum and 3 tabs, it has 81 columns when I align
-the argument to the opening parenthesis.
+> ---
+> Changes in v2:
+>   - Name the tagged struct *_fixed instead of *_hdr.
+>   - Add Kees' RB tag.
+> 
+>   net/smc/smc_clc.c |  5 +++--
+>   net/smc/smc_clc.h | 24 ++++++++++++++----------
+>   2 files changed, 17 insertions(+), 12 deletions(-)
+> 
+> diff --git a/net/smc/smc_clc.c b/net/smc/smc_clc.c
+> index e55026c7529c..63bb5745ab54 100644
+> --- a/net/smc/smc_clc.c
+> +++ b/net/smc/smc_clc.c
+> @@ -853,8 +853,9 @@ int smc_clc_send_proposal(struct smc_sock *smc, struct smc_init_info *ini)
+>   	pclc_smcd = &pclc->pclc_smcd;
+>   	pclc_prfx = &pclc->pclc_prfx;
+>   	ipv6_prfx = pclc->pclc_prfx_ipv6;
+> -	v2_ext = &pclc->pclc_v2_ext;
+> -	smcd_v2_ext = &pclc->pclc_smcd_v2_ext;
+> +	v2_ext = container_of(&pclc->pclc_v2_ext, struct smc_clc_v2_extension, fixed);
+checkpatch complained 'WARNING: line length of 86 exceeds 80 columns' here.
 
-static int rtl8366rb_setup(struct dsa_switch *ds)
-{
-       (...)
-       if (priv->leds_disabled) {
-               /* Turn everything off */
-               regmap_update_bits(priv->map,
-                                  RTL8366RB_INTERRUPT_CONTROL_REG,
-                                  RTL8366RB_P4_RGMII_LED,
-                                  0);
+It can be reproduced by:
 
-               for (i =3D 0; i < RTL8366RB_NUM_LEDGROUPS; i++) {
-                       ret =3D rb8366rb_set_ledgroup_mode(priv, i,
-                                                        RTL8366RB_LEDGROUP_=
-OFF);
-                       if (ret)
-                               return ret;
-               }
-        }
-}
+./scripts/checkpatch.pl --strict --max-line-length=80 
+--ignore=COMMIT_LOG_LONG_LINE,MACRO_ARG_REUSE,ALLOC_SIZEOF_STRUCT,NO_AUTHOR_SIGN_OFF,GIT_COMMIT_ID,CAMELCASE xxx.patch
 
-Should I rename the rb8366rb_set_ledgroup_mode function,
-RTL8366RB_LEDGROUP_OFF or is the violation here acceptable?
+> +	smcd_v2_ext = container_of(&pclc->pclc_smcd_v2_ext,
+> +				   struct smc_clc_smcd_v2_extension, fixed);
+>   	gidchids = pclc->pclc_gidchids;
+>   	trl = &pclc->pclc_trl;
+>   
+> diff --git a/net/smc/smc_clc.h b/net/smc/smc_clc.h
+> index 7cc7070b9772..2bfb51daf468 100644
+> --- a/net/smc/smc_clc.h
+> +++ b/net/smc/smc_clc.h
+> @@ -134,12 +134,14 @@ struct smc_clc_smcd_gid_chid {
+>   			 */
+>   
+>   struct smc_clc_v2_extension {
+> -	struct smc_clnt_opts_area_hdr hdr;
+> -	u8 roce[16];		/* RoCEv2 GID */
+> -	u8 max_conns;
+> -	u8 max_links;
+> -	__be16 feature_mask;
+> -	u8 reserved[12];
+> +	struct_group_tagged(smc_clc_v2_extension_fixed, fixed,
+> +		struct smc_clnt_opts_area_hdr hdr;
 
-Can I use the double tab indentation here like it appears in
-https://elixir.bootlin.com/linux/latest/source/net/8021q/vlanproc.c#L120?
+checkpatch: 'CHECK: Alignment should match open parenthesis'
 
-Regards,
+> +		u8 roce[16];		/* RoCEv2 GID */
+> +		u8 max_conns;
+> +		u8 max_links;
+> +		__be16 feature_mask;
+> +		u8 reserved[12];
+> +	);
+>   	u8 user_eids[][SMC_MAX_EID_LEN];
+>   };
+>   
+> @@ -159,8 +161,10 @@ struct smc_clc_msg_smcd {	/* SMC-D GID information */
+>   };
+>   
+>   struct smc_clc_smcd_v2_extension {
+> -	u8 system_eid[SMC_MAX_EID_LEN];
+> -	u8 reserved[16];
+> +	struct_group_tagged(smc_clc_smcd_v2_extension_fixed, fixed,
+> +		u8 system_eid[SMC_MAX_EID_LEN];
 
-Luiz
+checkpatch: 'CHECK: Alignment should match open parenthesis'
+
+Thanks!
+Wen Gu
+
+> +		u8 reserved[16];
+> +	);
+>   	struct smc_clc_smcd_gid_chid gidchid[];
+>   };
+>   
+> @@ -183,9 +187,9 @@ struct smc_clc_msg_proposal_area {
+>   	struct smc_clc_msg_smcd			pclc_smcd;
+>   	struct smc_clc_msg_proposal_prefix	pclc_prfx;
+>   	struct smc_clc_ipv6_prefix	pclc_prfx_ipv6[SMC_CLC_MAX_V6_PREFIX];
+> -	struct smc_clc_v2_extension		pclc_v2_ext;
+> +	struct smc_clc_v2_extension_fixed	pclc_v2_ext;
+>   	u8			user_eids[SMC_CLC_MAX_UEID][SMC_MAX_EID_LEN];
+> -	struct smc_clc_smcd_v2_extension	pclc_smcd_v2_ext;
+> +	struct smc_clc_smcd_v2_extension_fixed	pclc_smcd_v2_ext;
+>   	struct smc_clc_smcd_gid_chid
+>   				pclc_gidchids[SMCD_CLC_MAX_V2_GID_ENTRIES];
+>   	struct smc_clc_msg_trail		pclc_trl;
 
