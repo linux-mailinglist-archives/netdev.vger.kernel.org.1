@@ -1,232 +1,158 @@
-Return-Path: <netdev+bounces-81519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D508188AB48
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 18:19:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BF45889F91
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:32:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00BDCB40FA5
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:13:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FB941C32F02
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 12:32:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 411F61741E0;
-	Mon, 25 Mar 2024 09:10:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C951176A02;
+	Mon, 25 Mar 2024 07:31:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Pp7iCw9n"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QE/7hIf4"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96D7A177990
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 07:07:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5637717F392;
+	Mon, 25 Mar 2024 07:09:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711350459; cv=none; b=WGxN5ZDFM5oU+f6B8MwXzRJNA6YGduQWz9+qH2x0VqDRA/WnpAfSx8dlonQzMfJ7aZBRMFkbaMs/zp81e1ci9JLhmBzY+dmRJ43gI1JgismncBAfv4xZj5z4FLE3SiioDS9G/c7V85xzVT+rajUNqglyDtl4hmt2wV2OrTKPh1k=
+	t=1711350589; cv=none; b=jXBZJ1+KbfrRXyBjnPMCeCNSRXu8Tvo8slJLIgomnHd/EEZpiYdygxkqdazrOacidZVMEnvluvkkZXtKAcvR+QJqSX67fbXRSi1rZuY65W9XlIya3qwcXEkhg8XrXy/tHfL7uihtVClBbTuz0so4g4T0jKLeakwwGTbeLcq+dAo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711350459; c=relaxed/simple;
-	bh=ARjCIe424udFEsd3uJuk6RnAdYHEgY3jw+I7hjzyM8k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CsWTcNKRyYtYk0Ejec417GYvAPHfeuT4fnMiONWLtxtUUz9nUc4xMgp2330lmBA8wgo8CGB9fcYlyfaOiAzr5Bjnzk96n1QxI24ty0fX1Yguv6oBXfuzWoRHwZJ15rwyADCuC3tfYLpzVVtEwiHL7U9H5ZTRh5jaCpExp7rKH6c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Pp7iCw9n; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711350455;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cUebwkaaw2af/0TNVuDlZf4w4TWMS5Clz0gVbmMgFgM=;
-	b=Pp7iCw9nLcZ8qBynW5bzslVHHnJKuzZYVgC8ccqgrhaKx7b6sMvGitsEIApEQr340Lx5Bk
-	OXAMxTJkX5qMe3Db+GqQHi7gH8zQvHllBNAzyKYMfyGYDOLRwX1wKr+4PaEhZ2S15yqnsc
-	RBGe9OMXv07ZJGvjZMwZ63gbD2pFUGg=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-661-Iula5GXvNCCEFxGqT1YwDA-1; Mon, 25 Mar 2024 03:07:33 -0400
-X-MC-Unique: Iula5GXvNCCEFxGqT1YwDA-1
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-1dff9fccdbdso32989285ad.0
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 00:07:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711350452; x=1711955252;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cUebwkaaw2af/0TNVuDlZf4w4TWMS5Clz0gVbmMgFgM=;
-        b=aEQkvovPCNWOV/Xsf5SOzxe96nsaesD7+ZD2GAo2XJETF2cMPCZDyM4aXoPI6Rgysa
-         2jHwiZzRfmdQWlHvmyNOFyAYh9/MWB21L+ueWEgwIALUlrFLFPER0W/hU1X27KbiK2ur
-         GCgMauqcJ5RTxCbJbdBn1sNi0QfZA+WyXilKoe6B+QByYdfKuYFAmdi7pR6hN/yj0Tvl
-         ePvz7Uokc/nYkR3v0/dCPBCyexNJ11/QhUcMjSfvvOneXAqidYz076xSi8uBWu67pvbj
-         KmWsK106jx7ET3sk276MJiJkxjpgclBFLZptUDAtrO6YQZc7msVoBPNaPHHfyLD4nHlZ
-         Q+sA==
-X-Forwarded-Encrypted: i=1; AJvYcCVMwXu9WWIck+L89KLu849JrtpJyavmDcDYAO7DnbNfP4OwSTnT4mh7tKyvoN0wYETR+ZoaWupCkL2GCKHthLF+RSqKfw+Z
-X-Gm-Message-State: AOJu0Yy/UQ3d3lAV0TvjvMbHrG9n0CIOQznCmkRsmt+6k8WvX3tzjvS2
-	imiK6LiAIKZgxGZHEVxUifWyepD11DQemy0+HKjN1236akmZ+bj9pkUXp7JHwk511XG4CUgIS4c
-	RFZr5GpWW4Q0i58w/p7pxXGzlNhPe0ZQTv2GI0nFVYpjDujXDC5pRUJiXV1fZiufmk33YCEXYM1
-	N2tyC19rUb66cFe3cYx90DA3Vh1slT
-X-Received: by 2002:a17:902:fc45:b0:1dd:651d:cc47 with SMTP id me5-20020a170902fc4500b001dd651dcc47mr8964220plb.28.1711350452660;
-        Mon, 25 Mar 2024 00:07:32 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IG/BWFySxbF/18yFEVKedfsgxvmFX8m+dp9CMK81imISc1NkY+G2CRY2XNcdncErENNUcGTo4iXbIJ6WBwVRC8=
-X-Received: by 2002:a17:902:fc45:b0:1dd:651d:cc47 with SMTP id
- me5-20020a170902fc4500b001dd651dcc47mr8964212plb.28.1711350452376; Mon, 25
- Mar 2024 00:07:32 -0700 (PDT)
+	s=arc-20240116; t=1711350589; c=relaxed/simple;
+	bh=dGJkJbFdBqM1o9IeFZ+PlOQFJCVwRbT/Iii7yFVFMSI=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=XDYBAoZaCPis8y3DEnsXsrSM0trJV9sr2/VkpCkwR28fKJCQq4WRLYybrydHxEXccBzh3Txrs82BW+U5L7bemhxNFTcgm3BazX1JDo7xqFqwlwZ0pLnuj9cdYwhk1yTQItiO59ylIs2OPKsEkcx7Lp7w1tNdLgCQ1UEm82UhtjU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QE/7hIf4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7946AC433F1;
+	Mon, 25 Mar 2024 07:09:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711350588;
+	bh=dGJkJbFdBqM1o9IeFZ+PlOQFJCVwRbT/Iii7yFVFMSI=;
+	h=From:To:Subject:Date:From;
+	b=QE/7hIf4k1WdMYvCLYH6NWECK80CO9rFwUlKJkwfZ3wfMTBHrGASomESh4jVHXrIM
+	 QpknjzOPFaMLXXYDFsWUzeEjTgmzhhGoh2uEYo6ZaDnMv9KkNibR5UwQMPbzQWhjge
+	 4U/VOeJdCnGli7BcYDHsW1gEbczyXFxPW6Ouc/cZG194BBgVdKEra/Ri8v12n71hRy
+	 yxHTeeLcfPlZ0eYRVyOfM4PT0y5mXYStStFcX/563oqrleQ+x1z/BtOj2RklJxNr4G
+	 lE24FyJC+G1TiuwTkDXCNeL044b8fAkOJt1ES3F/I+1YxhlZB4bkmFEMKHpzoaZvPC
+	 5yzMMFW9kDEcg==
+From: Damien Le Moal <dlemoal@kernel.org>
+To: linux-pci@vger.kernel.org,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Manivannan Sadhasivami <manivannan.sadhasivam@linaro.org>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Jaroslav Kysela <perex@perex.cz>,
+	linux-sound@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-usb@vger.kernel.org,
+	linux-serial@vger.kernel.org,
+	Hans de Goede <hdegoede@redhat.com>,
+	platform-driver-x86@vger.kernel.org,
+	ntb@lists.linux.dev,
+	Lee Jones <lee@kernel.org>,
+	David Airlie <airlied@gmail.com>,
+	amd-gfx@lists.freedesktop.org,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	linux-rdma@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 00/28] Remove PCI_IRQ_LEGACY
+Date: Mon, 25 Mar 2024 16:09:11 +0900
+Message-ID: <20240325070944.3600338-1-dlemoal@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240312033557.6351-1-xuanzhuo@linux.alibaba.com>
- <20240312033557.6351-4-xuanzhuo@linux.alibaba.com> <CACGkMEs_DT1309_hj8igcvX7H1sU+-s_OP6Jnp-c=0kmu+ia_g@mail.gmail.com>
- <1711009465.784253-4-xuanzhuo@linux.alibaba.com> <CACGkMEvimfmQRUZ04CykZs-6cOkASF8S02n2N7caJ4XivR8hNw@mail.gmail.com>
- <1711093912.1488938-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1711093912.1488938-1-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 25 Mar 2024 15:07:21 +0800
-Message-ID: <CACGkMEtG-zY2kmzV1hzRoKWz21mQa1QuopbEeRNa2EbYw2cNgg@mail.gmail.com>
-Subject: Re: [PATCH vhost v4 03/10] virtio_ring: packed: structure the
- indirect desc table
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Mar 22, 2024 at 3:58=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
->
-> On Fri, 22 Mar 2024 13:15:10 +0800, Jason Wang <jasowang@redhat.com> wrot=
-e:
-> > On Thu, Mar 21, 2024 at 4:29=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
-ba.com> wrote:
-> > >
-> > > On Thu, 21 Mar 2024 12:47:18 +0800, Jason Wang <jasowang@redhat.com> =
-wrote:
-> > > > On Tue, Mar 12, 2024 at 11:36=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.=
-alibaba.com> wrote:
-> > > > >
-> > > > > This commit structure the indirect desc table.
-> > > > > Then we can get the desc num directly when doing unmap.
-> > > > >
-> > > > > And save the dma info to the struct, then the indirect
-> > > > > will not use the dma fields of the desc_extra. The subsequent
-> > > > > commits will make the dma fields are optional. But for
-> > > > > the indirect case, we must record the dma info.
-> > > > >
-> > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > > ---
-> > > > >  drivers/virtio/virtio_ring.c | 66 +++++++++++++++++++++---------=
-------
-> > > > >  1 file changed, 38 insertions(+), 28 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio=
-_ring.c
-> > > > > index 0dfbd17e5a87..22a588bba166 100644
-> > > > > --- a/drivers/virtio/virtio_ring.c
-> > > > > +++ b/drivers/virtio/virtio_ring.c
-> > > > > @@ -72,9 +72,16 @@ struct vring_desc_state_split {
-> > > > >         struct vring_desc *indir_desc;  /* Indirect descriptor, i=
-f any. */
-> > > > >  };
-> > > > >
-> > > > > +struct vring_packed_desc_indir {
-> > > > > +       dma_addr_t addr;                /* Descriptor Array DMA a=
-ddr. */
-> > > > > +       u32 len;                        /* Descriptor Array lengt=
-h. */
-> > > > > +       u32 num;
-> > > > > +       struct vring_packed_desc desc[];
-> > > > > +};
-> > > > > +
-> > > > >  struct vring_desc_state_packed {
-> > > > >         void *data;                     /* Data for callback. */
-> > > > > -       struct vring_packed_desc *indir_desc; /* Indirect descrip=
-tor, if any. */
-> > > > > +       struct vring_packed_desc_indir *indir_desc; /* Indirect d=
-escriptor, if any. */
-> > > >
-> > > > Maybe it's better just to have a vring_desc_extra here.
-> > >
-> > >
-> > > Do you mean replacing vring_packed_desc_indir by vring_desc_extra?
-> >
-> > Just add a vring_desc_extra in vring_desc_state_packed.
-> >
-> > >
-> > > I am ok for that. But vring_desc_extra has two extra items:
-> > >
-> > >         u16 flags;                      /* Descriptor flags. */
-> > >         u16 next;                       /* The next desc state in a l=
-ist. */
-> > >
-> > > vring_packed_desc_indir has "desc". I think that is more convenient.
-> > >
-> > > So, I think vring_packed_desc_indir is appropriate.
-> >
-> > It reuses the existing structure so we had the chance to reuse the
-> > helper.
->
-> Do you mean vring_unmap_extra_packed()?
+This patch series removes the use of the depracated PCI_IRQ_LEGACY macro
+and replace it with PCI_IRQ_INTX. No functional change.
 
-Yes.
+Damien Le Moal (28):
+  PCI: msi: Use PCI_IRQ_INTX
+  PCI: portdrv: Use PCI_IRQ_INTX
+  PCI: documentation: Use PCI_IRQ_INTX
+  sound: intel: Use PCI_IRQ_INTX
+  usb: hcd-pci: Use PCI_IRQ_INTX
+  tty: 8250_pci: Use PCI_IRQ_INTX
+  platform: intel_ips: Use PCI_IRQ_INTX
+  ntb: Use PCI_IRQ_INTX
+  mfd: intel-lpss-pci: Use PCI_IRQ_INTX
+  drm: amdgpu: Use PCI_IRQ_INTX
+  infiniband: qib: Use PCI_IRQ_INTX
+  infiniband: vmw_pvrdma: Use PCI_IRQ_INTX
+  misc: vmci_guest: Use PCI_IRQ_ALL_TYPES
+  net: xgbe: Use PCI_IRQ_INTX
+  net: aquantia atlantic: Use PCI_IRQ_INTX
+  net: atheros: alx: Use PCI_IRQ_INTX
+  net: realtek: r8169: Use PCI_IRQ_INTX
+  net: wangxun: Use PCI_IRQ_INTX
+  net: wireless: ath10k: Use references to INTX instead of LEGACY
+  net wireless; realtec: Use PCI_IRQ_INTX
+  scsi: arcmsr: Use PCI_IRQ_INTX
+  scsi: hpsa: Use PCI_IRQ_INTX
+  scsi: ipr: Use PCI_IRQ_INTX
+  scsi: megaraid: Use PCI_IRQ_INTX
+  scsi: mpt3sas: Use PCI_IRQ_INTX
+  scsi: pmcraid: Use PCI_IRQ_INTX
+  scsi: vmw_pvscsi: Do not use PCI_IRQ_LEGACY
+  PCI: Remove PCI_IRQ_LEGACY
 
+ Documentation/PCI/msi-howto.rst               |  2 +-
+ Documentation/PCI/pci.rst                     |  2 +-
+ .../translations/zh_CN/PCI/msi-howto.rst      |  2 +-
+ Documentation/translations/zh_CN/PCI/pci.rst  |  2 +-
+ drivers/gpu/drm/amd/amdgpu/amdgpu_irq.c       |  2 +-
+ drivers/infiniband/hw/qib/qib_iba7220.c       |  2 +-
+ drivers/infiniband/hw/qib/qib_iba7322.c       |  5 ++-
+ drivers/infiniband/hw/qib/qib_pcie.c          |  2 +-
+ .../infiniband/hw/vmw_pvrdma/pvrdma_main.c    |  2 +-
+ drivers/mfd/intel-lpss-pci.c                  |  2 +-
+ drivers/misc/vmw_vmci/vmci_guest.c            |  3 +-
+ drivers/net/ethernet/amd/xgbe/xgbe-pci.c      |  2 +-
+ .../net/ethernet/aquantia/atlantic/aq_cfg.h   |  2 +-
+ .../net/ethernet/aquantia/atlantic/aq_hw.h    |  2 +-
+ .../net/ethernet/aquantia/atlantic/aq_nic.c   |  2 +-
+ .../ethernet/aquantia/atlantic/aq_pci_func.c  |  9 ++---
+ .../aquantia/atlantic/hw_atl/hw_atl_a0.c      |  2 +-
+ .../aquantia/atlantic/hw_atl/hw_atl_b0.c      |  2 +-
+ .../aquantia/atlantic/hw_atl2/hw_atl2.c       |  2 +-
+ drivers/net/ethernet/atheros/alx/main.c       |  2 +-
+ drivers/net/ethernet/realtek/r8169_main.c     |  2 +-
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  8 ++---
+ drivers/net/wireless/ath/ath10k/ahb.c         | 18 +++++-----
+ drivers/net/wireless/ath/ath10k/pci.c         | 36 +++++++++----------
+ drivers/net/wireless/ath/ath10k/pci.h         |  6 ++--
+ drivers/net/wireless/realtek/rtw88/pci.c      |  2 +-
+ drivers/net/wireless/realtek/rtw89/pci.c      |  2 +-
+ drivers/ntb/hw/idt/ntb_hw_idt.c               |  2 +-
+ drivers/pci/msi/api.c                         |  8 ++---
+ drivers/pci/pcie/portdrv.c                    |  8 ++---
+ drivers/platform/x86/intel_ips.c              |  2 +-
+ drivers/scsi/arcmsr/arcmsr_hba.c              |  2 +-
+ drivers/scsi/hpsa.c                           |  2 +-
+ drivers/scsi/ipr.c                            |  2 +-
+ drivers/scsi/megaraid/megaraid_sas_base.c     |  4 +--
+ drivers/scsi/mpt3sas/mpt3sas_base.c           |  2 +-
+ drivers/scsi/pmcraid.c                        |  2 +-
+ drivers/scsi/vmw_pvscsi.c                     |  2 +-
+ drivers/tty/serial/8250/8250_pci.c            |  2 +-
+ drivers/usb/core/hcd-pci.c                    |  3 +-
+ include/linux/pci.h                           |  7 ++--
+ sound/soc/intel/avs/core.c                    |  2 +-
+ 42 files changed, 84 insertions(+), 91 deletions(-)
 
->
-> After last commit(virtio_ring: packed: remove double check of the unmap o=
-ps):
->
->         /* caller must check vring_need_unmap_buffer() */
->         static void vring_unmap_extra_packed(const struct vring_virtqueue=
- *vq,
->                                              const struct vring_desc_extr=
-a *extra)
->         {
->                 u16 flags;
->
->                 flags =3D extra->flags;
->
->                 dma_unmap_page(vring_dma_dev(vq),
->                                extra->addr, extra->len,
->                                (flags & VRING_DESC_F_WRITE) ?
->                                DMA_FROM_DEVICE : DMA_TO_DEVICE);
->         }
->
-> But we should call dma_unmap_single() for indirect desc.
->
-> We know, dma_unmap_single() and dma_unmap_page() are same in essence.
-
-Yes, it's worth tweaking in the future.
-
-> So if we call dma_unmap_page for the indirect desc, we can reuse
-> this function. But I do not prefer doing this.
-
-Ok.
-
-Thanks
-
->
-> Thanks.
->
->
-> > And it could be used for future chained indirect (if it turns
-> > out to be necessary).
-> >
-> > Thanks
-> >
-> > > Or I missed something.
-> > >
-> > >
-> > > Thanks.
-> > >
-> > >
-> > > >
-> > > > Thanks
-> > > >
-> > >
-> >
-> >
->
+-- 
+2.44.0
 
 
