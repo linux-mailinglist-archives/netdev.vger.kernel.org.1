@@ -1,94 +1,114 @@
-Return-Path: <netdev+bounces-81752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81753-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAB1688B0CF
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:05:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A99C788B10D
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:13:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96A032E4D90
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:05:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 30ACAB348FE
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:07:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90C5A48CC7;
-	Mon, 25 Mar 2024 20:04:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2DCF446D9;
+	Mon, 25 Mar 2024 20:07:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b="a9mXK77w"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QUGqlfxc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE90487AE;
-	Mon, 25 Mar 2024 20:04:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02D151F5F3
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 20:07:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711397068; cv=none; b=aLFENKEhPFGChM/q6MEub9Htbn16srfWSdXYGfCxVzYsk9a4Er/8FCcVAJSazmFmU8Z6fhP0Kexl5cnYH04+zIHLNbPZm6U0xAXEgSAKTfL8oU92K9UrEHyM3J7onLJ/hOW5GZ2pKEKrbGo9jwVkO2Wyyv7/MEEf5USQzLGRs9k=
+	t=1711397227; cv=none; b=TCbEb+gg2wSyjcjOtmT3eIKH6sXORQFNVBv5r4bXbI11vrJYNKR+xiGpXlrfhQn8McG/HK3X4vN/DNfSMRKld/ip1UTS6bsvo5aCqbJH4y1FGQw85CP4wsyVAB8egX/OIAeQ2blxi2W3yYxH4k6k/BqtBwW1xHsX2TKc32KKiV4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711397068; c=relaxed/simple;
-	bh=MVqf+1W2/O29sWIHzizwdV/AJ1AIoW9I4gu/EhMFulc=;
-	h=Date:From:To:Cc:Subject:Message-Id:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=SwHrLFjcowG63pbTxrDgXU3ptw5uTr5RCfZk8sJoX9+DNHp55AzTJdps6zzpXrESn9EGMePeRZ+PIqv8vKw8Omynq/K1FDrFr8nC8Q0KiaBqohrOUjyHKcR3BNr0bq5NyNEQ1LohqaalCcGxsvLc6V0mqHk1oshNh3qrBQcJPBk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linux-foundation.org header.i=@linux-foundation.org header.b=a9mXK77w; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC570C433F1;
-	Mon, 25 Mar 2024 20:04:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linux-foundation.org;
-	s=korg; t=1711397067;
-	bh=MVqf+1W2/O29sWIHzizwdV/AJ1AIoW9I4gu/EhMFulc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=a9mXK77waDCkVLz4nDbjGRzZeFm29rSR7jtobIf3ZvNDfIRcIhhPbuCRNaJP/3P0W
-	 gcTK7QJUkpnGxXLy5TOAUUQOEKnyDJyCTsH6VIu2p+QiEeAjXLLswIFVFV6I5Vs3F7
-	 xXliFaODWHltJW/IvV8nIyTZ8paI73yzBlZ4Izl0=
-Date: Mon, 25 Mar 2024 13:04:26 -0700
-From: Andrew Morton <akpm@linux-foundation.org>
-To: Edward Liaw <edliaw@google.com>
-Cc: linux-kernel@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
- <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Martin
- KaFai Lau <martin.lau@linux.dev>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
- Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
- <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Shuah Khan
- <shuah@kernel.org>, Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers
- <ndesaulniers@google.com>, Bill Wendling <morbo@google.com>, Justin Stitt
- <justinstitt@google.com>, Jann Horn <jannh@google.com>,
- linux-kselftest@vger.kernel.org, kernel-team@android.com, Lokesh Gidra
- <lokeshgidra@google.com>, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-mm@kvack.org, llvm@lists.linux.dev, Peter Xu <peterx@redhat.com>
-Subject: Re: [PATCH v3] selftests/mm: Fix ARM related issue with fork after
- pthread_create
-Message-Id: <20240325130426.fba5287fcc437475123e76cc@linux-foundation.org>
-In-Reply-To: <20240325194100.775052-1-edliaw@google.com>
-References: <20240325194100.775052-1-edliaw@google.com>
-X-Mailer: Sylpheed 3.8.0beta1 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1711397227; c=relaxed/simple;
+	bh=KuT6XdYYvq+HTuTpGFIELvmsAmA0qxG8HDCZ7yRtcSk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=uCRA5YkFUejM2nM2lzp1V/VKQc8nck0L1qLT5BtBOVFmQpVeaX0EY6s2Y1Zqxhb60PVbBsCQvh2L4pCHO+Pm+ioj1rrP6iP/oopaNDUsqEExZB/C+sb9+Qgme+u6jOnSgVxCdYsxA9eWBq7DdF0Pw9/YcRxE2KorYaen8wWL2dY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QUGqlfxc; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711397226; x=1742933226;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=KuT6XdYYvq+HTuTpGFIELvmsAmA0qxG8HDCZ7yRtcSk=;
+  b=QUGqlfxcQyyC4SMKMAdadmY7Qm5KGrgm68r1SDGHXQNcz0jjV6Fi1vsr
+   UIjhGA+wK6yjFoH0ObqN/HWH8R0ADKpl5uo4e1+J1yurAbbHIERunRAe7
+   BbeicWJm0p9ox8pchw6xzn4kTxmv6NXAbAHWMx20UrxRk/lYLxC7xJ2VC
+   3e9pdKMNqLvOlkmv2MXs4v6vX9WAmHICGRF8kftb+a7+EqB/mq30Lo+Sk
+   W4U4PjzG8GBKzrSgFm886crF4K5eZG1QuWLsnebhQYa3hZ/IN+MjMjKvj
+   ZY6jz9T6rYQwTqeXTVDY7rLBOmOnqAxj8biGrB0MhYEyA9AfXHyKJagfW
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11024"; a="17855092"
+X-IronPort-AV: E=Sophos;i="6.07,154,1708416000"; 
+   d="scan'208";a="17855092"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 13:07:06 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,154,1708416000"; 
+   d="scan'208";a="20459290"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa005.jf.intel.com with ESMTP; 25 Mar 2024 13:07:05 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net 0/4][pull request] Intel Wired LAN Driver Updates 2024-03-25 (ice, ixgbe, igc)
+Date: Mon, 25 Mar 2024 13:06:44 -0700
+Message-ID: <20240325200659.993749-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-On Mon, 25 Mar 2024 19:40:52 +0000 Edward Liaw <edliaw@google.com> wrote:
+This series contains updates to ice, ixgbe, and igc drivers.
 
-> Following issue was observed while running the uffd-unit-tests selftest
-> on ARM devices. On x86_64 no issues were detected:
-> 
-> pthread_create followed by fork caused deadlock in certain cases
-> wherein fork required some work to be completed by the created thread.
-> Used synchronization to ensure that created thread's start function has
-> started before invoking fork.
+Steven fixes incorrect casting of bitmap type for ice driver.
 
-hm, you cc'ed the whole world apart from peterx.  Fixed.
+Jesse fixes memory corruption issue with suspend flow on ice.
 
-> Signed-off-by: Lokesh Gidra <lokeshgidra@google.com>
-> [edliaw: Refactored to use atomic_bool]
-> Signed-off-by: Edward Liaw <edliaw@google.com>
+Przemek adds GFP_ATOMIC flag to avoid sleeping in IRQ context for ixgbe.
 
-I'll add cc:stable.  For which a Fixes: is desirable.  I used
-760aee0b71e3 ("selftests/mm: add tests for RO pinning vs fork()"),
-please check that.
+Kurt Kanzenbach removes no longer valid comment on igc.
+
+The following are changes since commit c2deb2e971f5d9aca941ef13ee05566979e337a4:
+  net: mark racy access on sk->sk_rcvbuf
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 100GbE
+
+Jesse Brandeburg (1):
+  ice: fix memory corruption bug with suspend and rebuild
+
+Kurt Kanzenbach (1):
+  igc: Remove stale comment about Tx timestamping
+
+Przemek Kitszel (1):
+  ixgbe: avoid sleeping allocation in ixgbe_ipsec_vf_add_sa()
+
+Steven Zou (1):
+  ice: Refactor FW data type and fix bitmap casting issue
+
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  3 ++-
+ drivers/net/ethernet/intel/ice/ice_lag.c      |  4 ++--
+ drivers/net/ethernet/intel/ice/ice_lib.c      | 18 +++++++-------
+ drivers/net/ethernet/intel/ice/ice_switch.c   | 24 +++++++++++--------
+ drivers/net/ethernet/intel/ice/ice_switch.h   |  4 ++--
+ drivers/net/ethernet/intel/igc/igc_main.c     |  4 ----
+ .../net/ethernet/intel/ixgbe/ixgbe_ipsec.c    | 16 ++++++-------
+ 7 files changed, 37 insertions(+), 36 deletions(-)
+
+-- 
+2.41.0
 
 
