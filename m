@@ -1,109 +1,178 @@
-Return-Path: <netdev+bounces-81562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E82F88A423
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:19:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89F5788A45C
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:25:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 386C82E1F08
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 14:19:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15EE41F60BC9
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 14:25:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18A5613248E;
-	Mon, 25 Mar 2024 10:47:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C39061B6FB9;
+	Mon, 25 Mar 2024 11:01:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YjW/FD99"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="yGfct/ci"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A59C182779
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 10:16:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36066131BB8
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 10:27:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711361788; cv=none; b=XeyinZKS9Vea/Bfz1Ej5ELjyvS1631LQAl5h8kSkWL+h7RM87WWukXslstoQlQxeUtjlFGTWbWzf0CxstH0nI85pySqPQWex4nV9urMEmWVwzqxfwkj7dOAYBpd9LFMRYt+joi5uQ03JIPiP6INF6Vw2DvdYdNveR0Nr8KTozKg=
+	t=1711362471; cv=none; b=Rs+Y9C66HPw4i2005DIngUHpkiFhGO9sqYWNs+hGm8EXILt0jVcqsjxLErN7YMOsQNb1JxwMYXEeu1E9xadFlkGwZfidFRz/+ZGJjiZv+Z8Nbh//9/gQZRcXV9LnA7DGH1oYVgAj4+3hyCHbyx3BkFFagqaKkaX+IZhEBco790A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711361788; c=relaxed/simple;
-	bh=eqfeLe+mLBn7xK4B9EUGIJ6rKwujXpsvi5InFJnb1fQ=;
-	h=Content-Type:MIME-Version:In-Reply-To:References:Subject:From:Cc:
-	 To:Date:Message-ID; b=EyECEKleJv5ZGF1m4B73LOVf3ZLElVapSNH1/C1NMpL3XjQugGNuzieCcchKdD6VMULJRGVWVSUqzLSgFKNctTrb5js3ySZ5vDxhT7jBS2f+SA8Cm3xAQNhCykyDqhCbXPDykVoRcjiTbODbMcrOlZNZIKlbdF147y14JhdaAZ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YjW/FD99; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A090C433F1;
-	Mon, 25 Mar 2024 10:16:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711361787;
-	bh=eqfeLe+mLBn7xK4B9EUGIJ6rKwujXpsvi5InFJnb1fQ=;
-	h=In-Reply-To:References:Subject:From:Cc:To:Date:From;
-	b=YjW/FD99drXS8yjUfT7MjCFRMTtUzQr+OJS+ue5x/43e0ciBSB1xj4JuccjtH5rjA
-	 aWX7NncUgiKS398/sDZoucLEOKlAW3tJReulmKmHjaSGeX2LrauLR73vkTPJkIwCoo
-	 RNzbRdg/ww0FpuEudvl1CwPNYg301dWa3K4Xkr6qsdZBRWWVoOvQldQgjwHeb6hVqP
-	 kh0/FI5faa9jeidj59KZmDfoxt+9eCgXfI0GyzDMF8U7rgP9tUVLNtaQmpkT3c1ZZ5
-	 hokyS7qiDUdsaWEz+M/WUq6GPIwU5M26P0yFMPk5TIsrpxOQ3NKF2+D6Qp+PxOUvfo
-	 Ija9rz4gqYBaA==
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1711362471; c=relaxed/simple;
+	bh=f4fourTNn3Y9VOXW+5bOT8tSE9a8rH8tpaj42qSXsus=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PBI5N1x2pLQ/bn45DWmjuypqPcAHfiGKRDQC80oxoLgImM04/WqJpSdE3UF0sl5BUsxT4tFHw1MwxO2AQg7MnRGfAmeiMIwjC3oCsXgESzmxpplg98B2BBJNOrZA/IL3O+l85WXc6oIAy4vPFTGxhv+5nOqoLec5UTSq6wuZ06g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=yGfct/ci; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a466fc8fcccso544745266b.1
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 03:27:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1711362467; x=1711967267; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=WyN0/plXDAmtEoHE9Q5NJaUkW+ebBHssQoVcKAW6yzY=;
+        b=yGfct/ciatwCjjqpmQzxdusKlbcfGJiZ7b09lG2wZ+iVCfnVZhOoYyibGqk3y5u2JH
+         p9on7oaF/ckyI2jIalBZKEwNR2IfEbEksy2U54n7aSrTNJTO9kWe3KHlXNpq/1k8ItUA
+         QECKLEJ+gYOndPifOVxDaaAQ9xjdL1Rtn/QTrpysADArggUdUrShGMYSpGlP60u21X6T
+         qsc/zb+BnsGYq+9S6D9+rriK+Y4yTlgAF4VPtVebwZ8ubAzj49ro8WsUrx5xMqYzixQ3
+         K8mYh8SJqnZt63ihpsIaxTEhlKsd7y60u6VWU7g8hlYJeFpY8p6FfiIUUTAtBRF3L+f2
+         uZAA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711362467; x=1711967267;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WyN0/plXDAmtEoHE9Q5NJaUkW+ebBHssQoVcKAW6yzY=;
+        b=jsRWwPZ1KGE1CuaU/9Wr5X14j4cFmMQ9PiDPIh06t0AAKq8fzHaMbVUQO+9J/sW85L
+         9WU22IMJsf0deAJw1/N7oeO+3chGClwyPL3O+1MnIXZzbyGZ/XVgBlIaYSzsUlfzHJVO
+         HqKcUsov/SKK928c5UQw/Lm6o00X2hmnQTJlbTScUXQFa/Vii57DdelVgmqiM5i5dvMV
+         F5Hu3mc7MMTECCZBLPpwMUvgLaBZkY4nh4hc7lRCy+TQRtZkaE0ZKttlDNSVB+ItexRj
+         f3MsY9VcCEs+lrYOA1I16rZyCpAYF3aExwXlnIiUjfxr3nC1wNXp4yrqkXtCKxmU81Ag
+         /4tg==
+X-Gm-Message-State: AOJu0YzRjvTnYRhuGCpz5eTh8xVGvw3IhPs3ztSicCQ9nyq1L1QgJpyU
+	No0I77z1ihA3e4xSNoGrriiKijqoJpZxxRQeEh3yA/2XED2iTxszSFZd0c8PnSk=
+X-Google-Smtp-Source: AGHT+IGK6ceUlIME9R4/GQMt+7uCDGXiKM/z9j/c9NgAopISUFCGzMjsAmm5gRr3FFpwsf7tVj1BrA==
+X-Received: by 2002:a17:907:7e9a:b0:a47:a340:c9c1 with SMTP id qb26-20020a1709077e9a00b00a47a340c9c1mr2736098ejc.27.1711362467565;
+        Mon, 25 Mar 2024 03:27:47 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.222.44])
+        by smtp.gmail.com with ESMTPSA id l20-20020a1709066b9400b00a4d95d4a8f7sm58042ejr.5.2024.03.25.03.27.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Mar 2024 03:27:47 -0700 (PDT)
+Message-ID: <49146c33-d698-4e3d-b204-ef567c7b7d38@linaro.org>
+Date: Mon, 25 Mar 2024 11:27:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20240322155550.3779c85a@kernel.org>
-References: <20240322114624.160306-1-atenart@kernel.org> <20240322155550.3779c85a@kernel.org>
-Subject: Re: [PATCH net v3 0/4] gro: various fixes related to UDP tunnels
-From: Antoine Tenart <atenart@kernel.org>
-Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, steffen.klassert@secunet.com, willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org
-To: Jakub Kicinski <kuba@kernel.org>
-Date: Mon, 25 Mar 2024 11:16:24 +0100
-Message-ID: <171136178469.5526.13954285367211651380@kwain>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v3 2/2] dt-bindings: net: dwmac: Document STM32 property
+ st,ext-phyclk
+To: Christophe Roullier <christophe.roullier@foss.st.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Richard Cochran <richardcochran@gmail.com>, Jose Abreu
+ <joabreu@synopsys.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>, Marek Vasut <marex@denx.de>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20240325094218.56934-1-christophe.roullier@foss.st.com>
+ <20240325094218.56934-3-christophe.roullier@foss.st.com>
+Content-Language: en-US
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
+ 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
+ D2GYIS41Kv4Isx2dEFh+/Q==
+In-Reply-To: <20240325094218.56934-3-christophe.roullier@foss.st.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Quoting Jakub Kicinski (2024-03-22 23:55:50)
-> On Fri, 22 Mar 2024 12:46:19 +0100 Antoine Tenart wrote:
-> > We found issues when a UDP tunnel endpoint is in a different netns than
-> > where UDP GRO happens. This kind of setup is actually quite diverse,
-> > from having one leg of the tunnel on a remove host, to having a tunnel
-> > between netns (eg. being bridged in another one or on the host). In our
-> > case that UDP tunnel was geneve.
->=20
-> I think this series makes net/udpgro_fwd.sh selftest fail.
+On 25/03/2024 10:42, Christophe Roullier wrote:
+> The Linux kernel dwmac-stm32 driver currently supports three DT
+> properties used to configure whether PHY clock are generated by
+> the MAC or supplied to the MAC from the PHY.
+> 
+> Originally there were two properties, st,eth-clk-sel and
+> st,eth-ref-clk-sel, each used to configure MAC clocking in
+> different bus mode and for different MAC clock frequency.
+> Since it is possible to determine the MAC 'eth-ck' clock
+> frequency from the clock subsystem and PHY bus mode from
+> the 'phy-mode' property, two disparate DT properties are
+> no longer required to configure MAC clocking.
+> 
+> Linux kernel commit
+> 1bb694e20839 ("net: ethernet: stmmac: simplify phy modes management for stm32")
 
-Thanks! Sorry for not checking this earlier...
+Don't wrap. Word commit must be followed by the commit. Syntax is:
+commit deadbeef ("foo
+bar").
 
-What happens is the vxlan tunnel tests expect GRO to happen at the veth
-level which is exactly the issues this series is fixing.
+> introduced a third, unified, property st,ext-phyclk. This property
+> covers both use cases of st,eth-clk-sel and st,eth-ref-clk-sel DT
+> properties, as well as a new use case for 25 MHz clock generated
+> by the MAC.
+> 
 
-The below diff should fix the tests. I think it's good to keep them to
-ensure GRO is actually not happening while packets are in an UDP tunnel;
-I also removed the "UDP tunnel fwd perf" test as it's not providing any
-useful data now IMO.
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-diff --git a/tools/testing/selftests/net/udpgro_fwd.sh b/tools/testing/self=
-tests/net/udpgro_fwd.sh
-index 380cb15e942e..83ed987cff34 100755
---- a/tools/testing/selftests/net/udpgro_fwd.sh
-+++ b/tools/testing/selftests/net/udpgro_fwd.sh
-@@ -244,7 +244,7 @@ for family in 4 6; do
-        create_vxlan_pair
-        ip netns exec $NS_DST ethtool -K veth$DST generic-receive-offload on
-        ip netns exec $NS_DST ethtool -K veth$DST rx-gro-list on
--       run_test "GRO frag list over UDP tunnel" $OL_NET$DST 1 1
-+       run_test "GRO frag list over UDP tunnel" $OL_NET$DST 10 10
-        cleanup
-=20
-        # use NAT to circumvent GRO FWD check
-@@ -258,13 +258,7 @@ for family in 4 6; do
-        # load arp cache before running the test to reduce the amount of
-        # stray traffic on top of the UDP tunnel
-        ip netns exec $NS_SRC $PING -q -c 1 $OL_NET$DST_NAT >/dev/null
--       run_test "GRO fwd over UDP tunnel" $OL_NET$DST_NAT 1 1 $OL_NET$DST
--       cleanup
--
--       create_vxlan_pair
--       run_bench "UDP tunnel fwd perf" $OL_NET$DST
--       ip netns exec $NS_DST ethtool -K veth$DST rx-udp-gro-forwarding on
--       run_bench "UDP tunnel GRO fwd perf" $OL_NET$DST
-+       run_test "GRO fwd over UDP tunnel" $OL_NET$DST_NAT 10 10 $OL_NET$DST
-        cleanup
- done
+Best regards,
+Krzysztof
+
 
