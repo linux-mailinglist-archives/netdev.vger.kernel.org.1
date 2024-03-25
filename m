@@ -1,72 +1,66 @@
-Return-Path: <netdev+bounces-81817-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A35188B2D2
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 22:31:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9760A88B64C
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 01:45:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE7CE1FA508E
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:31:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ECCB4B2CD08
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:35:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3A477317C;
-	Mon, 25 Mar 2024 21:30:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2E46DCE8;
+	Mon, 25 Mar 2024 21:35:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CVVDUOn2"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="NytJMmSf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BE366D1B9
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 21:30:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D841C6D1A3;
+	Mon, 25 Mar 2024 21:35:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711402210; cv=none; b=WLkGpI9lzSRCIYEruvSUW+Cc08x26etRjdulY3fwHLpzF/TITinnztHEjSx792Fi+KI5Z/KkE3SeBlKxoPLpP0D5nBrykhXO2Mrqqg4A6F0olF0Ms5AIk3+Fu25W0t9OrhkyF3V32QHre9dIHc0cfjAnwMLeQQkzBTuo0mf1QTU=
+	t=1711402527; cv=none; b=oMuKzWoUTl6ZVZmABHXbkZTiafCXBq7zPYMrBHvlfiF3M2BQUA26kGF3u2SeFwU8pyxJQjcEnCVP/s94ri008t10aIIkyTfa4E41u1IALSxSHmu7Yk9e7ubvOgEH0etLL0FvLguJ54EOXsl555hbffvTMlZp0afAzpkba8/8Bxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711402210; c=relaxed/simple;
-	bh=svMfBlLUAhgw33LS7DXsoVKFb0fJ5tSWXIWUQCBDyjs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=XkZbsTA7o31GZrTzT8h46N7cz/1KViTLkzseFNlzXgOotfC6FDHnUxNCH7WYVc3/HSh4Q6wHrok715wPeGpcaMjV9PxJ86MNzZcsSwA4M3xCqoCn0orvrua9Ft0Z05mCcfqsEYIEngCE379ha0XcSirH6Ou/Wp0hjzDdjHXY8SE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CVVDUOn2; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711402209; x=1742938209;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=svMfBlLUAhgw33LS7DXsoVKFb0fJ5tSWXIWUQCBDyjs=;
-  b=CVVDUOn2qb5z29xEGb1hfEuN751f9s4wAjRMNBG489BR6tvfDE8m9gG0
-   vgJzKxVzvS4JQOF6DHggBnYSAzgnpQ896+/9nSApU0Bh/paZQ5i8rqK4N
-   sm49cxIrFMjM2x0cTa4kPoLE069eGDkK6NUD29Oj9fNhrsIzf+VdHenVf
-   cflsfGoSmrFQsWpfRErNzNjgEPRctXiqom2QqngVnFrNR2DPKSJ36ffl4
-   HQPpOqRioQqBb21JGvrskf4E+JHI1N2aUglS+Qjofrc+dIBLI5EfImWHm
-   /shAmMnYbefsuFro1biscbtARETvJzLvMJfID707mw7Wy/qUUkNEWOys4
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11024"; a="17064554"
-X-IronPort-AV: E=Sophos;i="6.07,154,1708416000"; 
-   d="scan'208";a="17064554"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 14:30:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,154,1708416000"; 
-   d="scan'208";a="15713512"
-Received: from wasp.igk.intel.com (HELO GK3153-DR2-R750-36946.localdomain.com) ([10.102.20.192])
-  by orviesa009.jf.intel.com with ESMTP; 25 Mar 2024 14:30:06 -0700
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Wojciech Drewek <wojciech.drewek@intel.com>
-Subject: [iwl-next v1 3/3] ice: hold devlink lock for whole init/cleanup
-Date: Mon, 25 Mar 2024 22:34:33 +0100
-Message-ID: <20240325213433.829161-4-michal.swiatkowski@linux.intel.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20240325213433.829161-1-michal.swiatkowski@linux.intel.com>
-References: <20240325213433.829161-1-michal.swiatkowski@linux.intel.com>
+	s=arc-20240116; t=1711402527; c=relaxed/simple;
+	bh=z8rW+gaJh9oEjZWVYfIeBs5QTUurns59h3Zl/6mhWOk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ep44cd+6oduypGNRNT2yG0c85xt3g51TZWPGimz/ErFSCFSFjsypTjGXXFXnCYWv8qaB/CHVUAPMwdRnBCuHGa7zEfiaMtJguATQ0662JWG7V2rbBQdfFPMJ73s3KaPoJHi8mWU1hoQXORKroCLXzNGZTMmRKqFVwg+Ke/lr3UY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=NytJMmSf; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=/7uCFdLyUcSLoN2CO/QqYsxgNqqrS5ZwWh/yFNNxePU=; b=NytJMmSfMiiFMWamhvlDYQ6iay
+	ZsVdGDTH+EVwLu2HILHKGji4/EXQDmdQfH+cfUIS1kC7vF58F/BIuctmhXSSWeOtUSboiS1WSBDoN
+	JTlY7vo/qKYafRYN2smHEO40gakwc2vSoT8wC4hbj8cVxAfflIIH2LRqvNX6NpKDvq1arYWTohHA0
+	MW1uJxtpSfsS68dZoAXMq6iMdmQVZsjTeXl7OWp1K4g9dpvSGBxV1jJ0UzdlftD2GkJbycpV/5Hzx
+	1rvKK4UfH8XoSFF7bbK2asjQN6VRNF3uldnhUQFp3amdlYNoKXuSs5KfFqxZ3yxsFrsj21IiNoJ6B
+	5qgQAgsA==;
+Received: from 30.248.197.178.dynamic.dsl-lte-bonding.zhbmb00p-msn.res.cust.swisscom.ch ([178.197.248.30] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1roryT-000IF1-DU; Mon, 25 Mar 2024 22:35:21 +0100
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf 2024-03-25
+Date: Mon, 25 Mar 2024 22:35:20 +0100
+Message-Id: <20240325213520.26688-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,149 +68,131 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27225/Mon Mar 25 09:30:27 2024)
 
-Simplify devlink lock code in driver by taking it for whole init/cleanup
-path. Instead of calling devlink functions that taking lock call the
-lockless versions.
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-Suggested-by: Jiri Pirko <jiri@resnulli.us>
-Reviewed-by: Jesse Brandeburg <jesse.brandeburg@intel.com>
-Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- .../net/ethernet/intel/ice/devlink/devlink.c  | 32 +++++++++----------
- drivers/net/ethernet/intel/ice/ice_main.c     |  7 ++--
- 2 files changed, 19 insertions(+), 20 deletions(-)
+The following pull-request contains BPF updates for your *net* tree.
 
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-index 71c2f30984d8..8b57e455160d 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-@@ -1287,7 +1287,7 @@ void ice_devlink_register(struct ice_pf *pf)
- {
- 	struct devlink *devlink = priv_to_devlink(pf);
- 
--	devlink_register(devlink);
-+	devl_register(devlink);
- }
- 
- /**
-@@ -1298,21 +1298,21 @@ void ice_devlink_register(struct ice_pf *pf)
-  */
- void ice_devlink_unregister(struct ice_pf *pf)
- {
--	devlink_unregister(priv_to_devlink(pf));
-+	devl_unregister(priv_to_devlink(pf));
- }
- 
- int ice_devlink_register_params(struct ice_pf *pf)
- {
- 	struct devlink *devlink = priv_to_devlink(pf);
- 
--	return devlink_params_register(devlink, ice_devlink_params,
--				       ARRAY_SIZE(ice_devlink_params));
-+	return devl_params_register(devlink, ice_devlink_params,
-+				    ARRAY_SIZE(ice_devlink_params));
- }
- 
- void ice_devlink_unregister_params(struct ice_pf *pf)
- {
--	devlink_params_unregister(priv_to_devlink(pf), ice_devlink_params,
--				  ARRAY_SIZE(ice_devlink_params));
-+	devl_params_unregister(priv_to_devlink(pf), ice_devlink_params,
-+			       ARRAY_SIZE(ice_devlink_params));
- }
- 
- #define ICE_DEVLINK_READ_BLK_SIZE (1024 * 1024)
-@@ -1553,8 +1553,8 @@ void ice_devlink_init_regions(struct ice_pf *pf)
- 	u64 nvm_size, sram_size;
- 
- 	nvm_size = pf->hw.flash.flash_size;
--	pf->nvm_region = devlink_region_create(devlink, &ice_nvm_region_ops, 1,
--					       nvm_size);
-+	pf->nvm_region = devl_region_create(devlink, &ice_nvm_region_ops, 1,
-+					    nvm_size);
- 	if (IS_ERR(pf->nvm_region)) {
- 		dev_err(dev, "failed to create NVM devlink region, err %ld\n",
- 			PTR_ERR(pf->nvm_region));
-@@ -1562,17 +1562,17 @@ void ice_devlink_init_regions(struct ice_pf *pf)
- 	}
- 
- 	sram_size = pf->hw.flash.sr_words * 2u;
--	pf->sram_region = devlink_region_create(devlink, &ice_sram_region_ops,
--						1, sram_size);
-+	pf->sram_region = devl_region_create(devlink, &ice_sram_region_ops,
-+					     1, sram_size);
- 	if (IS_ERR(pf->sram_region)) {
- 		dev_err(dev, "failed to create shadow-ram devlink region, err %ld\n",
- 			PTR_ERR(pf->sram_region));
- 		pf->sram_region = NULL;
- 	}
- 
--	pf->devcaps_region = devlink_region_create(devlink,
--						   &ice_devcaps_region_ops, 10,
--						   ICE_AQ_MAX_BUF_LEN);
-+	pf->devcaps_region = devl_region_create(devlink,
-+						&ice_devcaps_region_ops, 10,
-+						ICE_AQ_MAX_BUF_LEN);
- 	if (IS_ERR(pf->devcaps_region)) {
- 		dev_err(dev, "failed to create device-caps devlink region, err %ld\n",
- 			PTR_ERR(pf->devcaps_region));
-@@ -1589,11 +1589,11 @@ void ice_devlink_init_regions(struct ice_pf *pf)
- void ice_devlink_destroy_regions(struct ice_pf *pf)
- {
- 	if (pf->nvm_region)
--		devlink_region_destroy(pf->nvm_region);
-+		devl_region_destroy(pf->nvm_region);
- 
- 	if (pf->sram_region)
--		devlink_region_destroy(pf->sram_region);
-+		devl_region_destroy(pf->sram_region);
- 
- 	if (pf->devcaps_region)
--		devlink_region_destroy(pf->devcaps_region);
-+		devl_region_destroy(pf->devcaps_region);
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index b8b7a47c3b8a..31e7c74c289f 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5180,21 +5180,20 @@ ice_probe(struct pci_dev *pdev, const struct pci_device_id __always_unused *ent)
- 
- 	devl_lock(priv_to_devlink(pf));
- 	err = ice_load(pf);
--	devl_unlock(priv_to_devlink(pf));
- 	if (err)
- 		goto err_load;
- 
- 	err = ice_init_devlink(pf);
- 	if (err)
- 		goto err_init_devlink;
-+	devl_unlock(priv_to_devlink(pf));
- 
- 	return 0;
- 
- err_init_devlink:
--	devl_lock(priv_to_devlink(pf));
- 	ice_unload(pf);
--	devl_unlock(priv_to_devlink(pf));
- err_load:
-+	devl_unlock(priv_to_devlink(pf));
- 	ice_deinit(pf);
- err_init:
- 	pci_disable_device(pdev);
-@@ -5291,9 +5290,9 @@ static void ice_remove(struct pci_dev *pdev)
- 	if (!ice_is_safe_mode(pf))
- 		ice_remove_arfs(pf);
- 
-+	devl_lock(priv_to_devlink(pf));
- 	ice_deinit_devlink(pf);
- 
--	devl_lock(priv_to_devlink(pf));
- 	ice_unload(pf);
- 	devl_unlock(priv_to_devlink(pf));
- 
--- 
-2.42.0
+We've added 17 non-merge commits during the last 12 day(s) which contain
+a total of 19 files changed, 184 insertions(+), 61 deletions(-).
 
+The main changes are:
+
+1) Fix an arm64 BPF JIT bug in BPF_LDX_MEMSX implementation's offset handling
+   found via test_bpf module, from Puranjay Mohan.
+
+2) Various fixups to the BPF arena code in particular in the BPF verifier and
+   around BPF selftests to match latest corresponding LLVM implementation,
+   from Puranjay Mohan and Alexei Starovoitov.
+
+3) Fix xsk to not assume that metadata is always requested in TX completion,
+   from Stanislav Fomichev.
+
+4) Fix riscv BPF JIT's kfunc parameter incompatibility between BPF and the riscv
+   ABI which requires sign-extension on int/uint, from Pu Lehui.
+
+5) Fix s390x BPF JIT's bpf_plt pointer arithmetic which triggered a crash when
+   testing struct_ops, from Ilya Leoshkevich.
+
+6) Fix libbpf's arena mmap handling which had incorrect u64-to-pointer cast on
+   32-bit architectures, from Andrii Nakryiko.
+
+7) Fix libbpf to define MFD_CLOEXEC when not available, from Arnaldo Carvalho de Melo.
+
+8) Fix arm64 BPF JIT implementation for 32bit unconditional bswap which
+   resulted in an incorrect swap as indicated by test_bpf, from Artem Savkov.
+
+9) Fix BPF man page build script to use silent mode, from Hangbin Liu.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Alejandro Colomar, Daniele Salvatore Albano, Kumar Kartikeya Dwivedi, 
+Puranjay Mohan, Quentin Monnet, Ryan Eatmon, Stanislav Fomichev, xingwei 
+lee, Xu Kuohai, yue sun
+
+----------------------------------------------------------------
+
+The following changes since commit e30cef001da259e8df354b813015d0e5acc08740:
+
+  net: txgbe: fix clk_name exceed MAX_DEV_ID limits (2024-03-14 13:49:02 +0100)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+for you to fetch changes up to 443574b033876c85a35de4c65c14f7fe092222b2:
+
+  riscv, bpf: Fix kfunc parameters incompatibility between bpf and riscv abi (2024-03-25 11:39:31 -0700)
+
+----------------------------------------------------------------
+bpf-for-netdev
+
+----------------------------------------------------------------
+Alexei Starovoitov (4):
+      bpf: Clarify bpf_arena comments.
+      libbpf, selftests/bpf: Adjust libbpf, bpftool, selftests to match LLVM
+      selftests/bpf: Remove hard coded PAGE_SIZE macro.
+      selftests/bpf: Add arena test case for 4Gbyte corner case
+
+Andrii Nakryiko (2):
+      Merge branch 'bpf-arena-followups'
+      libbpf: fix u64-to-pointer cast on 32-bit arches
+
+Arnaldo Carvalho de Melo (1):
+      libbpf: Define MFD_CLOEXEC if not available
+
+Artem Savkov (1):
+      arm64: bpf: fix 32bit unconditional bswap
+
+Hangbin Liu (1):
+      scripts/bpf_doc: Use silent mode when exec make cmd
+
+Ilya Leoshkevich (1):
+      s390/bpf: Fix bpf_plt pointer arithmetic
+
+Pu Lehui (1):
+      riscv, bpf: Fix kfunc parameters incompatibility between bpf and riscv abi
+
+Puranjay Mohan (5):
+      bpf: Temporarily disable atomic operations in BPF arena
+      bpf, arm64: fix bug in BPF_LDX_MEMSX
+      bpf: verifier: fix addr_space_cast from as(1) to as(0)
+      selftests/bpf: verifier_arena: fix mmap address for arm64
+      bpf: verifier: reject addr_space_cast insn without arena
+
+Quentin Monnet (1):
+      MAINTAINERS: Update email address for Quentin Monnet
+
+Stanislav Fomichev (1):
+      xsk: Don't assume metadata is always requested in TX completion
+
+ .mailmap                                           |  3 +-
+ MAINTAINERS                                        |  2 +-
+ arch/arm64/net/bpf_jit_comp.c                      |  4 +-
+ arch/riscv/net/bpf_jit_comp64.c                    | 16 +++++
+ arch/s390/net/bpf_jit_comp.c                       | 46 +++++++--------
+ include/net/xdp_sock.h                             |  2 +
+ kernel/bpf/arena.c                                 | 25 +++++---
+ kernel/bpf/verifier.c                              | 22 ++++++-
+ scripts/bpf_doc.py                                 |  4 +-
+ tools/bpf/bpftool/gen.c                            |  2 +-
+ tools/lib/bpf/libbpf.c                             | 10 +++-
+ tools/testing/selftests/bpf/bpf_arena_common.h     |  2 +-
+ .../testing/selftests/bpf/prog_tests/arena_htab.c  |  8 ++-
+ .../testing/selftests/bpf/prog_tests/arena_list.c  |  7 ++-
+ tools/testing/selftests/bpf/prog_tests/verifier.c  |  2 +
+ tools/testing/selftests/bpf/progs/arena_htab.c     |  2 +-
+ tools/testing/selftests/bpf/progs/arena_list.c     | 10 ++--
+ tools/testing/selftests/bpf/progs/verifier_arena.c | 10 +++-
+ .../selftests/bpf/progs/verifier_arena_large.c     | 68 ++++++++++++++++++++++
+ 19 files changed, 184 insertions(+), 61 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/verifier_arena_large.c
 
