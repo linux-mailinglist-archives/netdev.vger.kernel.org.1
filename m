@@ -1,47 +1,61 @@
-Return-Path: <netdev+bounces-81582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1031888A610
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:16:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C777B88AD0B
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 19:08:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9115B1F63353
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:16:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C9E1BCC6639
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:19:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA2A413CAA4;
-	Mon, 25 Mar 2024 12:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C426156F30;
+	Mon, 25 Mar 2024 12:35:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Pwf6YTS4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="meT28BSM"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-99.freemail.mail.aliyun.com (out30-99.freemail.mail.aliyun.com [115.124.30.99])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 776D913A245;
-	Mon, 25 Mar 2024 12:34:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607C8156669;
+	Mon, 25 Mar 2024 12:35:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711370080; cv=none; b=KZ3j8LgL1y1Uej4OvtcOPJbE1SXBAlGFkl+Nl9833RbytFImYS8DfovcLXfoxkHdvURyI3zht0ck5NeDXuWukJd4rZcnAWUJOdI5zfKT+nWrefWnOJrIOup+Z9nWdJtmSjbjF+VGi9GNKQEMM0wuhgj1NzhjfBkMvbLQJ5sPQNI=
+	t=1711370102; cv=none; b=XAglHPtgYw7zVIkczpU+mgdKekhOE8zhrhbaitr74x6hHeuou6gqJVdGkrPfonSIUFAusoO5ybOvpe5WqSLnPNjhpyZXGMLJfibcxuu5tywB4d7u9g5xmpIm17varEJDoOVa6rx9aRvg8OXJV61FJp4omOKxM2xtsJUmRzH27dY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711370080; c=relaxed/simple;
-	bh=/fVBMV2UWnw1wyfMQdYkFy0hz1HTu93VW89tfybxaps=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ry1q60ch45FawWVQ3/32nN2v6ahf2YdsdjcXflorG/acwRW7bo//PR7+e73DoYQt9kbd7Hud32gF14qbWur1BQYM6WDkpka/Qe3m7UnH69M8KnpNXJrJrumL0+ziQykoxDV6pOUl7aN74IlUq3VhLKrfJslDKaZLYIgNKLWEGjU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Pwf6YTS4; arc=none smtp.client-ip=115.124.30.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711370075; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=Ft3qtYaEtZMEshTVhjrwWpD5LD/8PLTqQczoDNnyhTg=;
-	b=Pwf6YTS4qqvm5smUiI3ABGoJvIn93uSPje3Ye7wYK2uXtWc4fLNmypHel0oOEAiZJbOYFeJz1Yn9W3x6pHKjA0ITHr3yWM/S9FyKfz6agrx7OfM8bWwsg6svUpgMd9LZL73XSVT6bMk6fpV5ZTD8K4doyyjh1r+epruNY+S3cMY=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R191e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045170;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=16;SR=0;TI=SMTPD_---0W3HQz9A_1711370072;
-Received: from 30.221.148.153(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W3HQz9A_1711370072)
-          by smtp.aliyun-inc.com;
-          Mon, 25 Mar 2024 20:34:33 +0800
-Message-ID: <3ea3a097-e119-4615-a262-62c5f878b6fe@linux.alibaba.com>
-Date: Mon, 25 Mar 2024 20:34:32 +0800
+	s=arc-20240116; t=1711370102; c=relaxed/simple;
+	bh=6jzjiwrkhrrxiOb3ouQm9/gN7kt04YtLniYwKlTluek=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=fNfM/HWZmJj7ltEr1HJE6UgsiNfIqo0JE6qXgrBcXcS0v0EKO7jgXt++mfs0spP8COdCuCBuaNccHgBkSCfkxYnKKP8ANu6yQ8Cxo72xVO7P7ZmgoozUzGyyo/Sg6BgBQLR0Uma+pHPD08my6ZYTgTM728SsK5WtMbMAEzAh7m0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=meT28BSM; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711370100; x=1742906100;
+  h=message-id:date:mime-version:subject:to:references:cc:
+   from:in-reply-to:content-transfer-encoding;
+  bh=6jzjiwrkhrrxiOb3ouQm9/gN7kt04YtLniYwKlTluek=;
+  b=meT28BSM18Q5CeqZIYtu9mWAq3MfHi6+rVVaqz1DPzkIq3liaJn3P1nk
+   lVozH64N2x/0psEQgAfOFmvF3e+zH4/DTzZa5J5YU/rVSTzLrUfNefPTe
+   dZVn1qfkyutYbO2Ki1kqY2fgWyxsSU9zzNEGyyHZAI8sMBo5yNoXu10lW
+   Sm4T7w64g6350vGEibsVq1GtaPeTfFSM8fGikouNS7VRcsyhtbewvPC+G
+   MeVcUrLnEMw2QsUeRaaFuFBxCM9x4MC/alv9yQ/Rk7DCnCEo37hTU6gJv
+   BkyY4/xA0BUjxmkaXomk7MlO2Zg/X45Laz+QtIS39Gr2C2oBYiFku/oLM
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,11023"; a="10139987"
+X-IronPort-AV: E=Sophos;i="6.07,153,1708416000"; 
+   d="scan'208";a="10139987"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 05:34:59 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,153,1708416000"; 
+   d="scan'208";a="16268554"
+Received: from aslawinx-mobl.ger.corp.intel.com (HELO [10.94.0.53]) ([10.94.0.53])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 05:34:54 -0700
+Message-ID: <3edd5823-bf54-4898-bcee-e1628c863388@linux.intel.com>
+Date: Mon, 25 Mar 2024 13:34:51 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,181 +63,53 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] virtio_net: Do not send RSS key if it is not supported
-To: Breno Leitao <leitao@debian.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: rbc@meta.com, riel@surriel.com, stable@vger.kernel.org,
- qemu-devel@nongnu.org,
- "open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
- "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
- open list <linux-kernel@vger.kernel.org>, "Michael S. Tsirkin"
- <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Melnychenko <andrew@daynix.com>
-References: <20240321165431.3517868-1-leitao@debian.org>
- <1711072822.882584-1-xuanzhuo@linux.alibaba.com> <Zf1bofzE4x0wGEm+@gmail.com>
- <1711346273.5079622-1-xuanzhuo@linux.alibaba.com>
- <ZgFfUHQhMdAWixqB@gmail.com>
- <1711366510.4360204-1-xuanzhuo@linux.alibaba.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <1711366510.4360204-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH 04/28] sound: intel: Use PCI_IRQ_INTX
+Content-Language: en-US
+To: Damien Le Moal <dlemoal@kernel.org>, linux-pci@vger.kernel.org,
+ Bjorn Helgaas <bhelgaas@google.com>,
+ Manivannan Sadhasivami <manivannan.sadhasivam@linaro.org>,
+ linux-scsi@vger.kernel.org, "Martin K . Petersen"
+ <martin.petersen@oracle.com>, Jaroslav Kysela <perex@perex.cz>,
+ linux-sound@vger.kernel.org, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
+ linux-serial@vger.kernel.org, Hans de Goede <hdegoede@redhat.com>,
+ platform-driver-x86@vger.kernel.org, ntb@lists.linux.dev,
+ Lee Jones <lee@kernel.org>, David Airlie <airlied@gmail.com>,
+ amd-gfx@lists.freedesktop.org, Jason Gunthorpe <jgg@ziepe.ca>,
+ linux-rdma@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20240325070944.3600338-1-dlemoal@kernel.org>
+ <20240325070944.3600338-5-dlemoal@kernel.org>
+Cc: Cezary Rojewski <cezary.rojewski@intel.com>
+From: =?UTF-8?Q?Amadeusz_S=C5=82awi=C5=84ski?=
+ <amadeuszx.slawinski@linux.intel.com>
+In-Reply-To: <20240325070944.3600338-5-dlemoal@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+On 3/25/2024 8:09 AM, Damien Le Moal wrote:
+> Use the macro PCI_IRQ_INTX instead of the deprecated PCI_IRQ_LEGACY
+> macro.
+> 
+> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+> ---
+>   sound/soc/intel/avs/core.c | 2 +-
+>   1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/sound/soc/intel/avs/core.c b/sound/soc/intel/avs/core.c
+> index d7f8940099ce..69818e4b43da 100644
+> --- a/sound/soc/intel/avs/core.c
+> +++ b/sound/soc/intel/avs/core.c
+> @@ -343,7 +343,7 @@ static int avs_hdac_acquire_irq(struct avs_dev *adev)
+>   	int ret;
+>   
+>   	/* request one and check that we only got one interrupt */
+> -	ret = pci_alloc_irq_vectors(pci, 1, 1, PCI_IRQ_MSI | PCI_IRQ_LEGACY);
+> +	ret = pci_alloc_irq_vectors(pci, 1, 1, PCI_IRQ_MSI | PCI_IRQ_INTX);
+>   	if (ret != 1) {
+>   		dev_err(adev->dev, "Failed to allocate IRQ vector: %d\n", ret);
+>   		return ret;
 
-
-在 2024/3/25 下午7:35, Xuan Zhuo 写道:
-> On Mon, 25 Mar 2024 04:26:08 -0700, Breno Leitao <leitao@debian.org> wrote:
->> Hello Xuan,
->>
->> On Mon, Mar 25, 2024 at 01:57:53PM +0800, Xuan Zhuo wrote:
->>> On Fri, 22 Mar 2024 03:21:21 -0700, Breno Leitao <leitao@debian.org> wrote:
->>>> Hello Xuan,
->>>>
->>>> On Fri, Mar 22, 2024 at 10:00:22AM +0800, Xuan Zhuo wrote:
->>>>> On Thu, 21 Mar 2024 09:54:30 -0700, Breno Leitao <leitao@debian.org> wrote:
->>>>>> 4) Since the command above does not have a key, then the last
->>>>>>     scatter-gatter entry will be zeroed, since rss_key_size == 0.
->>>>>>      sg_buf_size = vi->rss_key_size;
->>>>>
->>>>>
->>>>> 	if (vi->has_rss || vi->has_rss_hash_report) {
->>>>> 		vi->rss_indir_table_size =
->>>>> 			virtio_cread16(vdev, offsetof(struct virtio_net_config,
->>>>> 				rss_max_indirection_table_length));
->>>>> 		vi->rss_key_size =
->>>>> 			virtio_cread8(vdev, offsetof(struct virtio_net_config, rss_max_key_size));
->>>>>
->>>>> 		vi->rss_hash_types_supported =
->>>>> 		    virtio_cread32(vdev, offsetof(struct virtio_net_config, supported_hash_types));
->>>>> 		vi->rss_hash_types_supported &=
->>>>> 				~(VIRTIO_NET_RSS_HASH_TYPE_IP_EX |
->>>>> 				  VIRTIO_NET_RSS_HASH_TYPE_TCP_EX |
->>>>> 				  VIRTIO_NET_RSS_HASH_TYPE_UDP_EX);
->>>>>
->>>>> 		dev->hw_features |= NETIF_F_RXHASH;
->>>>> 	}
->>>>>
->>>>>
->>>>> vi->rss_key_size is initiated here, I wonder if there is something wrong?
->>>> Not really, the code above is never executed (in my machines). This is
->>>> because `vi->has_rss` and `vi->has_rss_hash_report` are both unset.
->>>>
->>>> Looking further, vdev does not have the VIRTIO_NET_F_RSS and
->>>> VIRTIO_NET_F_HASH_REPORT features.
->>>>
->>>> Also, when I run `ethtool -x`, I got:
->>>>
->>>> 	# ethtool  -x eth0
->>>> 	RX flow hash indirection table for eth0 with 1 RX ring(s):
->>>> 	Operation not supported
->>>> 	RSS hash key:
->>>> 	Operation not supported
->>>> 	RSS hash function:
->>>> 	    toeplitz: on
->>>> 	    xor: off
->>>> 	    crc32: off
->>>
->>> The spec saies:
->>> 	Note that if the device offers VIRTIO_NET_F_HASH_REPORT, even if it
->>> 	supports only one pair of virtqueues, it MUST support at least one of
->>> 	commands of VIRTIO_NET_CTRL_MQ class to configure reported hash
->>> 	parameters:
->>>
->>> 	If the device offers VIRTIO_NET_F_RSS, it MUST support
->>> 	VIRTIO_NET_CTRL_MQ_RSS_CONFIG command per 5.1.6.5.7.1.
->>>
->>> 	Otherwise the device MUST support VIRTIO_NET_CTRL_MQ_HASH_CONFIG command
->>> 	per 5.1.6.5.6.4.
->>>
->>>
->>> So if we have not anyone of `vi->has_rss` and `vi->has_rss_hash_report`,
->>> we should return from virtnet_set_rxfh directly.
->> Makes sense. Although it is not clear to me how vi->has_rss_hash_report
->> is related here, but, I am convinced that we shouldn't do any RSS
->> operation if the device doesn't have the RSS feature, i.e, vi->has_rss
->> is false.
->>
->> That said, I am thinking about something like this. How does it sound?
->>
->> 	diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
->> 	index 5a7700b103f8..8c1ad7361cf2 100644
->> 	--- a/drivers/net/virtio_net.c
->> 	+++ b/drivers/net/virtio_net.c
->> 	@@ -3780,6 +3780,9 @@ static int virtnet_set_rxfh(struct net_device *dev,
->> 		struct virtnet_info *vi = netdev_priv(dev);
->> 		int i;
->>
->> 	+	if (!vi->has_rss)
->> 	+		return -EOPNOTSUPP;
->> 	+
-> Should we check has_rss_hash_report?
-
-Hi, Breno.
-
-You can refer to the following modification. It is worth noting
-that \field{rss_max_indirection_table_length} should only be
-accessed if VIRTIO_NET_F_RSS is negotiated, which I have
-modified below:
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 727c874..fb4c438 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3836,10 +3836,16 @@ static int virtnet_set_rxfh(struct net_device *dev,
-         struct virtnet_info *vi = netdev_priv(dev);
-         int i;
-
-+       if (!vi->has_rss && !vi->has_rss_hash_report)
-+               return -EOPNOTSUPP;
-+
-         if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
-             rxfh->hfunc != ETH_RSS_HASH_TOP)
-                 return -EOPNOTSUPP;
-
-+       if (rxfh->indir && !vi->has_rss)
-+               return -EINVAL;
-+
-         if (rxfh->indir) {
-                 for (i = 0; i < vi->rss_indir_table_size; ++i)
-                         vi->ctrl->rss.indirection_table[i] = 
-rxfh->indir[i];
-@@ -4757,13 +4763,14 @@ static int virtnet_probe(struct virtio_device *vdev)
-         if (virtio_has_feature(vdev, VIRTIO_NET_F_HASH_REPORT))
-                 vi->has_rss_hash_report = true;
-
--       if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS))
-+       if (virtio_has_feature(vdev, VIRTIO_NET_F_RSS)) {
-                 vi->has_rss = true;
--
--       if (vi->has_rss || vi->has_rss_hash_report) {
-                 vi->rss_indir_table_size =
-                         virtio_cread16(vdev, offsetof(struct 
-virtio_net_config,
-                                 rss_max_indirection_table_length));
-+       }
-+
-+       if (vi->has_rss || vi->has_rss_hash_report) {
-                 vi->rss_key_size =
-                         virtio_cread8(vdev, offsetof(struct 
-virtio_net_config, rss_max_key_size));
-
-
-Regards,
-Heng
-
->
-> @Heng Qi
->
-> Could you help us?
->
-> Thanks.
->
->
->> 		if (rxfh->hfunc != ETH_RSS_HASH_NO_CHANGE &&
->> 		    rxfh->hfunc != ETH_RSS_HASH_TOP)
->> 			return -EOPNOTSUPP;
->>
->> Thanks!
-
+Reviewed-by: Amadeusz Sławiński <amadeuszx.slawinski@linux.intel.com>
 
