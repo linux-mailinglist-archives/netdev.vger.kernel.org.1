@@ -1,116 +1,102 @@
-Return-Path: <netdev+bounces-81666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 229E788AB0B
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 18:13:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2B8B88AB22
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 18:16:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C84D1C3D15F
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:13:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 012911C3CA8E
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:16:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B447A13DDCB;
-	Mon, 25 Mar 2024 15:52:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D39281514C3;
+	Mon, 25 Mar 2024 15:55:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HqANflu9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SeyOuI7h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AAE23D6B;
-	Mon, 25 Mar 2024 15:52:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A87E73DABE4;
+	Mon, 25 Mar 2024 15:55:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711381936; cv=none; b=Pfm3Jx1A9b3NMMuu1EmwubFN3OQnsB+QnFF1ttFp/UtGnZn0PFJhqYHBFC72axlyzfMGsyOaLZUEgNB7Vhrr0zAubMOowFdW5HgYPswUj5lVnGm+UK7XgDtRTMHMlJUOPHuc+nqLefzf2w/lH8XBlDAa71B+wbPtPWWF+YenDXI=
+	t=1711382123; cv=none; b=XB67EDXV4eAw5akSW/H6R8bekB3crwTr6O81r7SV0Qo3iI/ujR6SLZgwX4YMXALNhmh3ftiJd2ykt31ji+OHMPIwVOaVI+6sym+7MV7bJydbmlBcIvQig7rJ8pEh1nPN7yuLnORLh+rDelQmVdGnxifC3XrVioXuWay9TMb0IEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711381936; c=relaxed/simple;
-	bh=fyAjDgoqd4EtYQ6Hpyn+LEaIAbDw9+d9HFYSRYIDhfg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=scD1/oVH1XkCBUyowjmXY8v2TA1+ye2W/TBbgQeS5wRXA3NPQq6AD8gGwM4ng57iBS0VOfhOo9TxcMBAtxUVf1rKjUG90kYXGUVaChSxI/KMvgD4KWSaLyvajhCVThZ09q/XWWoPnOYanKo92sHGtbDeHmMo3wfW87PD3CIsu94=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HqANflu9; arc=none smtp.client-ip=192.198.163.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711381935; x=1742917935;
-  h=message-id:date:mime-version:subject:to:references:from:
-   in-reply-to:content-transfer-encoding;
-  bh=fyAjDgoqd4EtYQ6Hpyn+LEaIAbDw9+d9HFYSRYIDhfg=;
-  b=HqANflu90wEUJFuLOUclPd6zT6l8Asjb4rw+SdfyKizTMr+9tct7cgSq
-   ec3tEmRz01lXOKP54Exk+pPrHr7dfosg1vphOeQJNtSs7laIyGvPme8v8
-   WA/yGXjBCLZZSAC6+g5hPJH+exalQAHms39vBz7Neasy5MM5MkV6syxnP
-   Zl3m9CH1ijcU2Y274sVM84ABGvX8O/g6j9YdLH9/KGHUv0WKlmiJhCWYF
-   aBP05PgLTa76q9ee1sztB7Yo4gt4LuNugc4kuD+UDA+zZ5DiuG3c9me89
-   DMIM7wC+Ed0F+AgpwQkJlw4SDd2oNBJP0I01kpVNljAyQCbcFfGAiXoCg
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11024"; a="6254355"
-X-IronPort-AV: E=Sophos;i="6.07,153,1708416000"; 
-   d="scan'208";a="6254355"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 08:52:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,153,1708416000"; 
-   d="scan'208";a="15636553"
-Received: from djiang5-mobl3.amr.corp.intel.com (HELO [10.212.51.103]) ([10.212.51.103])
-  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 08:52:12 -0700
-Message-ID: <37fcc27a-7c6b-4aed-88be-92aadfaa67fe@intel.com>
-Date: Mon, 25 Mar 2024 08:52:11 -0700
+	s=arc-20240116; t=1711382123; c=relaxed/simple;
+	bh=KCKMR+ILD4PVJLMsuipVfj8QVOZrAGWjhVprqfmw3eM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KT6baVoFVlASoKVe0Y2e9qxFAFH81X/ffUor1uESQlJRvL5q3y0/ZUge/fPsiPFnN16X83u+srz4LEKamgPkqDFjg6xmPYGtgm6Geq+eDK4uBeHCcgG0uHIQ2Pa4Hl4nvYkXmyJPnkffgcLxpDV81B64Qb5lDuq++QsoiIWPai0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SeyOuI7h; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09906C433C7;
+	Mon, 25 Mar 2024 15:55:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711382123;
+	bh=KCKMR+ILD4PVJLMsuipVfj8QVOZrAGWjhVprqfmw3eM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=SeyOuI7hEeFDNtNHmTwXhfq1ktE+wDYayMxGK2ZLVMYuwp0kbnwLz5e7Jmt/ns1ym
+	 u2ofHLYbYwBOXyGplLOOVb+6dnJwPk6Q5ZFQze/PLrViEtIOruOSEr3wVUt0GpZRlq
+	 VlJEg31GSfcodBpziQTUS+4hVlu0/79hyrA3Qxa1H942H8Bto1U4Ekx1mLU46+2DMX
+	 9SUM9LAyWtepGWr5XWprmlsLhkKBUbI6s2EY/pxoV6lFEQUMruzqQQQw3dHVLystmT
+	 DEk6ONnMoC6dWei9FCiwuNihKscwW/Z2kirMneP00lkvqgGqhDAfXQotktbf6LDRCf
+	 wHsaoesDL0BkQ==
+Date: Mon, 25 Mar 2024 15:55:18 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Brendan Higgins <brendanhiggins@google.com>,
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com, x86@kernel.org,
+	linux-wireless@vger.kernel.org
+Subject: Re: kunit alltests runs broken in mainline
+Message-ID: <c01d6e1c-1dad-4012-b8b0-dccf19b2e3f2@sirena.org.uk>
+Mail-Followup-To: Johannes Berg <johannes@sipsolutions.net>,
+	Brendan Higgins <brendanhiggins@google.com>,
+	David Gow <davidgow@google.com>, Rae Moar <rmoar@google.com>,
+	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	kunit-dev@googlegroups.com, x86@kernel.org,
+	linux-wireless@vger.kernel.org
+References: <b743a5ec-3d07-4747-85e0-2fb2ef69db7c@sirena.org.uk>
+ <9c9e1297e2548b363fc93e774c8546e6ebf4efd6.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 08/28] ntb: Use PCI_IRQ_INTX
-Content-Language: en-US
-To: Damien Le Moal <dlemoal@kernel.org>, linux-pci@vger.kernel.org,
- Bjorn Helgaas <bhelgaas@google.com>,
- Manivannan Sadhasivami <manivannan.sadhasivam@linaro.org>,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>, Jaroslav Kysela <perex@perex.cz>,
- linux-sound@vger.kernel.org, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
- linux-serial@vger.kernel.org, Hans de Goede <hdegoede@redhat.com>,
- platform-driver-x86@vger.kernel.org, ntb@lists.linux.dev,
- Lee Jones <lee@kernel.org>, David Airlie <airlied@gmail.com>,
- amd-gfx@lists.freedesktop.org, Jason Gunthorpe <jgg@ziepe.ca>,
- linux-rdma@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240325070944.3600338-1-dlemoal@kernel.org>
- <20240325070944.3600338-9-dlemoal@kernel.org>
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <20240325070944.3600338-9-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="4jvBTpuTtm1bPuXu"
+Content-Disposition: inline
+In-Reply-To: <9c9e1297e2548b363fc93e774c8546e6ebf4efd6.camel@sipsolutions.net>
+X-Cookie: Evil isn't all bad.
 
 
+--4jvBTpuTtm1bPuXu
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 3/25/24 12:09 AM, Damien Le Moal wrote:
-> Use the macro PCI_IRQ_INTX instead of the deprecated PCI_IRQ_LEGACY
-> macro.
-> 
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
+On Mon, Mar 25, 2024 at 04:29:53PM +0100, Johannes Berg wrote:
 
-Reviewed-by: Dave Jiang <dave.jiang@intel.com>
+> But I'm not sure why ARCH=um is different?
 
-> ---
->  drivers/ntb/hw/idt/ntb_hw_idt.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/ntb/hw/idt/ntb_hw_idt.c b/drivers/ntb/hw/idt/ntb_hw_idt.c
-> index 48823b53ede3..48dfb1a69a77 100644
-> --- a/drivers/ntb/hw/idt/ntb_hw_idt.c
-> +++ b/drivers/ntb/hw/idt/ntb_hw_idt.c
-> @@ -2129,7 +2129,7 @@ static int idt_init_isr(struct idt_ntb_dev *ndev)
->  	int ret;
->  
->  	/* Allocate just one interrupt vector for the ISR */
-> -	ret = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_MSI | PCI_IRQ_LEGACY);
-> +	ret = pci_alloc_irq_vectors(pdev, 1, 1, PCI_IRQ_MSI | PCI_IRQ_INTX);
->  	if (ret != 1) {
->  		dev_err(&pdev->dev, "Failed to allocate IRQ vector");
->  		return ret;
+It's probably something to do with it lacking a bunch of features of
+normal architectures, especially around hardware support.
+
+--4jvBTpuTtm1bPuXu
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmYBnmUACgkQJNaLcl1U
+h9ALDgf/XYMGzxDASg1Yc8Xy1aYc9Vb0lyDqOp0iIGFDCn4UraS7RU63hYEfJ9R8
+DV/58lF9zliBinTQ4thT4fesKQsvQF51UJNH/WGUxyRg1McSxUtXkSK1DzRJmMKG
+JdFBftK8O4DlXrV96jszwXw9TZZNCaaRY8adwLVSZ1Y6FWlTTsz4miog5lZlIyWB
+N79/pkCbXjFD2MTtCiqNop+TXS1c24fLKH3G146bU4voKKd3Kx7Uo1uiiZQ2ebco
+Ofa+UNn14ETNn0YKsM5vngb5MaD+/EMFpxOPKEtX4fu0BPt+0akIr8UcnM5K6BTi
+z+U6vwsi/C1NgLQQLkS5Kpi0evb0vQ==
+=Pr7g
+-----END PGP SIGNATURE-----
+
+--4jvBTpuTtm1bPuXu--
 
