@@ -1,200 +1,243 @@
-Return-Path: <netdev+bounces-81747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC44688B047
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:41:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D7F588B0AB
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:59:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CD072E72C9
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 19:41:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC14230391A
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 19:59:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FF2D482EB;
-	Mon, 25 Mar 2024 19:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E267343AD0;
+	Mon, 25 Mar 2024 19:57:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eQnbFjAP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="oePNBB8M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f202.google.com (mail-pl1-f202.google.com [209.85.214.202])
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF7E54502E
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 19:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF5FE41A87
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 19:56:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711395667; cv=none; b=cWyoO/V1HUYkfcDBxNhtyTbbIyVobCSauQu/SMV/tp8bWADH79jZxwwGBKlVNk7D+5LNZJ03D9pcOa6eaawvGGw3hLIKYTFTzeJIADQlKB3Uq6hXrlNoiQriZalIvQYut1Fl4U0Pg6mcKV4dleMMU5jxTjgFmTmyRtntGfSYDMU=
+	t=1711396621; cv=none; b=HxnGTfCj5Z0neLtEEpRwX/VY+H4fTTJzdOz+eEh25eFT+yHM5H14ztJMZnypFbXemrrtSWdlr3Lugnk0YybPWr4PbOS43e0aVzLUVr4Xpcp8KYAP3gq/AT0fMLB9+tYFp9hWfAFmrZ+bdAAPUMNuii1oJiRYoE9QYOB9rmO3BTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711395667; c=relaxed/simple;
-	bh=PgpYmWwF+ZKkxz+jpDH8JrvQco+XVEcrWMSMSoX2y8M=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=Ky0sohHAZoR1KFO+EH/l6E3vt8R3lUGp1DMgfJzft9jibPY6d3vuXMWROUVTcNatKF2myF1ufrMyUCXJQzkzoQrejRSZroF2UvjuIsYw3YVdqvHhRTy0F0pjidl13ZmKY6RnEZrbJ9P6C29byS7UPggW4haNwv/I9Zs1EeThwtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eQnbFjAP; arc=none smtp.client-ip=209.85.214.202
+	s=arc-20240116; t=1711396621; c=relaxed/simple;
+	bh=vWN8XohjF1v16NaONsUY1Gt8ubP1b/GsLgsncu1sBW4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UZAdipnQ617FiSXe+TRGZIgaqQ1YOnxL5Gf6XbNtmeFYOmm/OuruJeGrBDBqic1+dL7SD3YvgidP4mtiMqIw98X7bpDWsQxD3ZFiqYv8FTzga4G6k+47mB5TyEBlcSd6SC53DnC7X9+oZYsmRvJSfG4Tmtf4fNLicAx4rs8qBkw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=oePNBB8M; arc=none smtp.client-ip=209.85.208.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edliaw.bounces.google.com
-Received: by mail-pl1-f202.google.com with SMTP id d9443c01a7336-1e0a5e0c734so11772945ad.0
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 12:41:04 -0700 (PDT)
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56c062d34bbso7a12.1
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 12:56:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711395664; x=1712000464; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=cX0Tst/fD3eEaDcxw6zP7p1X7prwnotLNua44hovj0E=;
-        b=eQnbFjAPZuE2cDH3+Mh10RyDVE+oRZe9JmkleOhzl4AKdO873iqBqCbow9sIIDfnmF
-         SqVr9aCDU6TkiIxOoYstytmbcbqHa+/o3mVvRgB9j/yuf20oUsUGsmj+SSg2cIZG92vk
-         i4GFc4w1qcLQcpd6W/hSi6rk/IfHUY9ZcLSg5dmihWqwxDL1Wzl0pLKiS6qzG6nZR/wa
-         kNQG3mvQ39KFHwc7XNlu4NYYoh1GVBoO7jk7fO/rBksBemtJiAESs7rfN5PsYjdQ2U2n
-         HFbX0T6u1uc1yb/j12WRTfUP/VYr3la7D/LAICXdYCGbQrwrdhqrEuH83/it0Bhvq+tL
-         +Gxg==
+        d=google.com; s=20230601; t=1711396618; x=1712001418; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xLJhanTyYYdfYx8SCY5kJ/vKByOFilWX6UgvBGxwVFs=;
+        b=oePNBB8MQMYPsKW/5WHuQZmLxgAa/YZOagIRucRtWK0uP8bl25Wtch3GC4Odg04guf
+         xHwSUF5HkJZWVsEYqQHoC5gl5fQLBowrtOpHCUCd56a5c2IAlxI3KW4RLn0H97S7zQEh
+         Fch3PreWQlXCon8Ff0Hh/n9iRfZEMBAYq8wONKKFjwJu21evFXzJNZ2JfkNXcrdRmAD7
+         jpuaYI98g64Ud0+Bl1qubff67uJTRnoUOhZSXX9YPQ0cQ8W8hRLS7sVrmq7gYo8p1LYp
+         AKEL4y6c7Gl0kxDKHbonRmurI6OeNy746pBWypmNCQupiQqMRV2aaB7P4blaKbtO35e+
+         VkeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711395664; x=1712000464;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cX0Tst/fD3eEaDcxw6zP7p1X7prwnotLNua44hovj0E=;
-        b=SecqSwCJvV2fAULocnKQ+h+0N9uA+7NuofuAAy2R7Xkpw4seXAYoIZUVNMEGSRx5En
-         y0pgb0KY6QmcULpZ38eKO8GrJhNPMDZA9n80mfr5NCq1sYulR9I3diSP8XEaDl7+qCav
-         GvBZ3j45nsP6deFmb6y4S4ox/DfkuW1TbfDLMeB7E6dCQqB/L0aYhtg7gvs/fBoggC6I
-         URnzgNq4UqAVxWD4w7mljmGjdr+N1cwxdivHFmWSvh5vSRffj3hBYWvkMYKAWA3zhH3Q
-         rl2zvwSilrpUTlZWR3EFcrP9j3794FIfyBecb2RQT0QYwZf2uyEQBbL4pH8KbZd6kuYS
-         MveA==
-X-Forwarded-Encrypted: i=1; AJvYcCUvWsis6dHmAlHqY1vWyn7Vjd+mt/1fvBv93YI+c04V9lUt4VI68brNMb4pOw7Y0WOxcYlg337vXkAHz+I64yxKOQU/+G0W
-X-Gm-Message-State: AOJu0Yy9wWeIslKAZDoRP5I4TlnY67nUBE4Kggo9LbTLLYWQi4Q4trf0
-	yu1aWNCa7X/Q5rptFbvfeOEZU6amgA1y7bgzNb3rN95bL0XYXVTJV5WsaCGZMqRHDEv9KfTL/eT
-	9Eg==
-X-Google-Smtp-Source: AGHT+IHu0ZTXU78B+0X+LXpELIc87+D4aJxq4bKR0NhoBZQXd5O+HZEP47xhnKe66UWD9zpspAK+wE700/M=
-X-Received: from edliaw.c.googlers.com ([fda3:e722:ac3:cc00:24:72f4:c0a8:305d])
- (user=edliaw job=sendgmr) by 2002:a17:902:d2cf:b0:1de:f18c:ce4 with SMTP id
- n15-20020a170902d2cf00b001def18c0ce4mr662860plc.0.1711395663954; Mon, 25 Mar
- 2024 12:41:03 -0700 (PDT)
-Date: Mon, 25 Mar 2024 19:40:52 +0000
+        d=1e100.net; s=20230601; t=1711396618; x=1712001418;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xLJhanTyYYdfYx8SCY5kJ/vKByOFilWX6UgvBGxwVFs=;
+        b=Su2l9Uql4m0l19WTXYEYB0XmsPK5X9Cskh3aItNvuJn15o2H23yWU30337Hqx5APi+
+         ND4EWL6IDJXwsA7IGygHyR8++pBbhJpWGix3YF2Jn+P34qVT6o1Bl2Sfjd1Fuj2Dt0kB
+         7AY3zByR34aw7tWKcoM0sf/nkPKWxNdhZjeuq57Y0ACm62uQOJKEKruajozxGCThdnUD
+         yGwzGWkQP80BeHD4kQz8vK68yWQiRU4Mr1NEJ6fiKamgGgI6j1zgtfztyNsqpNJpik0/
+         g5MCr78roZ+mHrCjJ7Ecb4m+UrjEM26gPcLjMUT9UbD1fju+Hums+E8b8mOoN2cXsKe7
+         3TgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWz8pAU99alt0T1LXvB1Gdcenu1OTZuR8OX75PoBiLMVuZzLt5tFi2u70tIyzjN9sK4t2AADd2LtNQyFlW3eEwqkOR1o2HB
+X-Gm-Message-State: AOJu0YxlWCHgldeGIGanluEz0tMMJUFAiDX6Gi56Z3tPimlpIWgpskzW
+	W0PfBNi7WlUvMKnCn+kf1cTZsrAb2MH4BrjVQucmHSGgAJ0vu9k0axbS/FVYPKVnnt7HvKbREcX
+	+X2pT69/TnHnq/d1pbiGcfcXt1VZQYp5+gY5S
+X-Google-Smtp-Source: AGHT+IEEovVpf0oepuwhkpM9avNZcmI74a08OoVnLRWfgzWtpVlsKJKZjmEasujTdhOur6vk4jcXRCYWXsOAyA0/og4=
+X-Received: by 2002:a05:6402:28a:b0:568:856b:f3c5 with SMTP id
+ l10-20020a056402028a00b00568856bf3c5mr622edv.1.1711396617881; Mon, 25 Mar
+ 2024 12:56:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.44.0.396.g6e790dbe36-goog
-Message-ID: <20240325194100.775052-1-edliaw@google.com>
-Subject: [PATCH v3] selftests/mm: Fix ARM related issue with fork after pthread_create
-From: Edward Liaw <edliaw@google.com>
-To: linux-kernel@vger.kernel.org, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, John Fastabend <john.fastabend@gmail.com>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Andrew Morton <akpm@linux-foundation.org>, Shuah Khan <shuah@kernel.org>, 
-	Nathan Chancellor <nathan@kernel.org>, Nick Desaulniers <ndesaulniers@google.com>, 
-	Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>, Jann Horn <jannh@google.com>
-Cc: linux-kselftest@vger.kernel.org, kernel-team@android.com, 
-	Edward Liaw <edliaw@google.com>, Lokesh Gidra <lokeshgidra@google.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-mm@kvack.org, llvm@lists.linux.dev
+MIME-Version: 1.0
+References: <CANn89iL_Oz58VYNLJ6eB=qgmsgY9juo9xAhaPKKaDqOxrjf+0w@mail.gmail.com>
+ <20240325.183800.473265130872711273.syoshida@redhat.com> <CANn89i+VZMvm7YpvPatmQuXeBgh78iFvkFSLYR-KYub4aa6PEg@mail.gmail.com>
+ <20240326.024626.67077498140213947.syoshida@redhat.com>
+In-Reply-To: <20240326.024626.67077498140213947.syoshida@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 25 Mar 2024 20:56:43 +0100
+Message-ID: <CANn89i+uOWhSmgudL+84e-2wow0mNLKe0f_bn5qCVoEUf+dJ=Q@mail.gmail.com>
+Subject: Re: [PATCH net] ipv4: Fix uninit-value access in __ip_make_skb()
+To: Shigeru Yoshida <syoshida@redhat.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	syzkaller@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Following issue was observed while running the uffd-unit-tests selftest
-on ARM devices. On x86_64 no issues were detected:
+On Mon, Mar 25, 2024 at 6:46=E2=80=AFPM Shigeru Yoshida <syoshida@redhat.co=
+m> wrote:
+>
+> On Mon, 25 Mar 2024 11:05:33 +0100, Eric Dumazet wrote:
+> > On Mon, Mar 25, 2024 at 10:38=E2=80=AFAM Shigeru Yoshida <syoshida@redh=
+at.com> wrote:
+> >>
+> >> On Mon, 25 Mar 2024 10:01:25 +0100, Eric Dumazet wrote:
+> >> > On Sun, Mar 24, 2024 at 6:06=E2=80=AFAM Shigeru Yoshida <syoshida@re=
+dhat.com> wrote:
+> >> >>
+> >> >> KMSAN reported uninit-value access in __ip_make_skb() [1].  __ip_ma=
+ke_skb()
+> >> >> tests HDRINCL to know if the skb has icmphdr. However, HDRINCL can =
+cause a
+> >> >> race condition. If calling setsockopt(2) with IP_HDRINCL changes HD=
+RINCL
+> >> >> while __ip_make_skb() is running, the function will access icmphdr =
+in the
+> >> >> skb even if it is not included. This causes the issue reported by K=
+MSAN.
+> >> >>
+> >> >> Check FLOWI_FLAG_KNOWN_NH on fl4->flowi4_flags instead of testing H=
+DRINCL
+> >> >> on the socket.
+> >> >>
+> >> >> [1]
+> >> >
+> >> > What is the kernel version for this trace ?
+> >>
+> >> Sorry, I used the following version:
+> >>
+> >> CPU: 1 PID: 15709 Comm: syz-executor.7 Not tainted 6.8.0-11567-gb3603f=
+cb79b1 #25
+> >> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-1.f=
+c39 04/01/2014
+> >>
+> >> >> BUG: KMSAN: uninit-value in __ip_make_skb+0x2b74/0x2d20 net/ipv4/ip=
+_output.c:1481
+> >> >>  __ip_make_skb+0x2b74/0x2d20 net/ipv4/ip_output.c:1481
+> >> >>  ip_finish_skb include/net/ip.h:243 [inline]
+> >> >>  ip_push_pending_frames+0x4c/0x5c0 net/ipv4/ip_output.c:1508
+> >> >>  raw_sendmsg+0x2381/0x2690 net/ipv4/raw.c:654
+> >> >>  inet_sendmsg+0x27b/0x2a0 net/ipv4/af_inet.c:851
+> >> >>  sock_sendmsg_nosec net/socket.c:730 [inline]
+> >> >>  __sock_sendmsg+0x274/0x3c0 net/socket.c:745
+> >> >>  __sys_sendto+0x62c/0x7b0 net/socket.c:2191
+> >> >>  __do_sys_sendto net/socket.c:2203 [inline]
+> >> >>  __se_sys_sendto net/socket.c:2199 [inline]
+> >> >>  __x64_sys_sendto+0x130/0x200 net/socket.c:2199
+> >> >>  do_syscall_64+0xd8/0x1f0 arch/x86/entry/common.c:83
+> >> >>  entry_SYSCALL_64_after_hwframe+0x6d/0x75
+> >> >>
+> >> >> Uninit was created at:
+> >> >>  slab_post_alloc_hook mm/slub.c:3804 [inline]
+> >> >>  slab_alloc_node mm/slub.c:3845 [inline]
+> >> >>  kmem_cache_alloc_node+0x5f6/0xc50 mm/slub.c:3888
+> >> >>  kmalloc_reserve+0x13c/0x4a0 net/core/skbuff.c:577
+> >> >>  __alloc_skb+0x35a/0x7c0 net/core/skbuff.c:668
+> >> >>  alloc_skb include/linux/skbuff.h:1318 [inline]
+> >> >>  __ip_append_data+0x49ab/0x68c0 net/ipv4/ip_output.c:1128
+> >> >>  ip_append_data+0x1e7/0x260 net/ipv4/ip_output.c:1365
+> >> >>  raw_sendmsg+0x22b1/0x2690 net/ipv4/raw.c:648
+> >> >>  inet_sendmsg+0x27b/0x2a0 net/ipv4/af_inet.c:851
+> >> >>  sock_sendmsg_nosec net/socket.c:730 [inline]
+> >> >>  __sock_sendmsg+0x274/0x3c0 net/socket.c:745
+> >> >>  __sys_sendto+0x62c/0x7b0 net/socket.c:2191
+> >> >>  __do_sys_sendto net/socket.c:2203 [inline]
+> >> >>  __se_sys_sendto net/socket.c:2199 [inline]
+> >> >>  __x64_sys_sendto+0x130/0x200 net/socket.c:2199
+> >> >>  do_syscall_64+0xd8/0x1f0 arch/x86/entry/common.c:83
+> >> >>  entry_SYSCALL_64_after_hwframe+0x6d/0x75
+> >> >>
+> >> >> Fixes: 99e5acae193e ("ipv4: Fix potential uninit variable access bu=
+g in __ip_make_skb()")
+> >> >> Reported-by: syzkaller <syzkaller@googlegroups.com>
+> >> >> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
+> >> >> ---
+> >> >> I think IPv6 has a similar issue. If this patch is accepted, I will=
+ send
+> >> >> a patch for IPv6.
+> >> >> ---
+> >> >>  net/ipv4/ip_output.c | 2 +-
+> >> >>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >> >>
+> >> >> diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
+> >> >> index 1fe794967211..39229fd0601a 100644
+> >> >> --- a/net/ipv4/ip_output.c
+> >> >> +++ b/net/ipv4/ip_output.c
+> >> >> @@ -1473,7 +1473,7 @@ struct sk_buff *__ip_make_skb(struct sock *sk=
+,
+> >> >>                  * by icmp_hdr(skb)->type.
+> >> >>                  */
+> >> >>                 if (sk->sk_type =3D=3D SOCK_RAW &&
+> >> >> -                   !inet_test_bit(HDRINCL, sk))
+> >> >> +                   !(fl4->flowi4_flags & FLOWI_FLAG_KNOWN_NH))
+> >> >>                         icmp_type =3D fl4->fl4_icmp_type;
+> >> >>                 else
+> >> >>                         icmp_type =3D icmp_hdr(skb)->type;
+> >> >> --
+> >> >> 2.44.0
+> >> >>
+> >> >
+> >> > Thanks for your patch.
+> >> >
+> >> > I do not think this is enough, as far as syzkaller is concerned.
+> >> >
+> >> > raw_probe_proto_opt() can leave garbage in fl4_icmp_type (and fl4_ic=
+mp_code)
+> >>
+> >> Thank you for your comment. But I don't understand it clearly. What
+> >> exactly do you mean by "garbage"?
+> >>
+> >> raw_probe_proto_opt() immediately returns 0 if fl4->flowi4_proto is
+> >> not IPPROTO_ICMP:
+> >>
+> >> static int raw_probe_proto_opt(struct raw_frag_vec *rfv, struct flowi4=
+ *fl4)
+> >> {
+> >>         int err;
+> >>
+> >>         if (fl4->flowi4_proto !=3D IPPROTO_ICMP)
+> >>                 return 0;
+> >>
+> >> In this case, the function doesn't set fl4_icmp_type. Do you mean this
+> >> case?
+> >
+> > There are multiple ways to return early from this function.
+> >
+> > In all of them, fl4->fl4_icmp_type is left uninitialized, so syzbot
+> > will find ways to trigger a related bug,
+> > if you assume later that fl4->fl4_icmp_type contains valid (initialized=
+) data.
+>
+> Thank you for your reply. I see your point.
+>
+> fl4->fl4_icmp_type is part of flowi_uli union in flowi4 structure, and
+> flowi4_init_output() initializes fl4_dport and fl4_sport to zero.
+>
+> I thought this also initializes fl4_icmp_type and fl4_icmp_code. Do
+> you think we should initialize fl4_icmp_type and fl4_icmp_code
+> explicitly, otherwise am I misunderstanding?
 
-pthread_create followed by fork caused deadlock in certain cases
-wherein fork required some work to be completed by the created thread.
-Used synchronization to ensure that created thread's start function has
-started before invoking fork.
+Yes, I am precisely saying this : do not rely on some union layout,
+without mentioning it in the changelog
+or even better in a comment.
 
-Signed-off-by: Lokesh Gidra <lokeshgidra@google.com>
-[edliaw: Refactored to use atomic_bool]
-Signed-off-by: Edward Liaw <edliaw@google.com>
----
+If you want to avoid clearing these fields, please add a
+BUILD_BUG_ON() to make sure
+a unrelated future change in include/net/flow.h does not break a
+hidden assumption.
 
-v2: restored accidentally removed uffd_test_case_ops when merging
-v3: fixed commit subject to use selftests/mm prefix
-
- tools/testing/selftests/mm/uffd-common.c     |  3 +++
- tools/testing/selftests/mm/uffd-common.h     |  2 ++
- tools/testing/selftests/mm/uffd-unit-tests.c | 10 ++++++++++
- 3 files changed, 15 insertions(+)
-
-diff --git a/tools/testing/selftests/mm/uffd-common.c b/tools/testing/selftests/mm/uffd-common.c
-index b0ac0ec2356d..7ad6ba660c7d 100644
---- a/tools/testing/selftests/mm/uffd-common.c
-+++ b/tools/testing/selftests/mm/uffd-common.c
-@@ -18,6 +18,7 @@ bool test_uffdio_wp = true;
- unsigned long long *count_verify;
- uffd_test_ops_t *uffd_test_ops;
- uffd_test_case_ops_t *uffd_test_case_ops;
-+atomic_bool ready_for_fork;
-
- static int uffd_mem_fd_create(off_t mem_size, bool hugetlb)
- {
-@@ -518,6 +519,8 @@ void *uffd_poll_thread(void *arg)
- 	pollfd[1].fd = pipefd[cpu*2];
- 	pollfd[1].events = POLLIN;
-
-+	ready_for_fork = true;
-+
- 	for (;;) {
- 		ret = poll(pollfd, 2, -1);
- 		if (ret <= 0) {
-diff --git a/tools/testing/selftests/mm/uffd-common.h b/tools/testing/selftests/mm/uffd-common.h
-index cb055282c89c..cc5629c3d2aa 100644
---- a/tools/testing/selftests/mm/uffd-common.h
-+++ b/tools/testing/selftests/mm/uffd-common.h
-@@ -32,6 +32,7 @@
- #include <inttypes.h>
- #include <stdint.h>
- #include <sys/random.h>
-+#include <stdatomic.h>
-
- #include "../kselftest.h"
- #include "vm_util.h"
-@@ -103,6 +104,7 @@ extern bool map_shared;
- extern bool test_uffdio_wp;
- extern unsigned long long *count_verify;
- extern volatile bool test_uffdio_copy_eexist;
-+extern atomic_bool ready_for_fork;
-
- extern uffd_test_ops_t anon_uffd_test_ops;
- extern uffd_test_ops_t shmem_uffd_test_ops;
-diff --git a/tools/testing/selftests/mm/uffd-unit-tests.c b/tools/testing/selftests/mm/uffd-unit-tests.c
-index 2b9f8cc52639..4a48dc617c6b 100644
---- a/tools/testing/selftests/mm/uffd-unit-tests.c
-+++ b/tools/testing/selftests/mm/uffd-unit-tests.c
-@@ -775,6 +775,8 @@ static void uffd_sigbus_test_common(bool wp)
- 	char c;
- 	struct uffd_args args = { 0 };
-
-+	ready_for_fork = false;
-+
- 	fcntl(uffd, F_SETFL, uffd_flags | O_NONBLOCK);
-
- 	if (uffd_register(uffd, area_dst, nr_pages * page_size,
-@@ -790,6 +792,9 @@ static void uffd_sigbus_test_common(bool wp)
- 	if (pthread_create(&uffd_mon, NULL, uffd_poll_thread, &args))
- 		err("uffd_poll_thread create");
-
-+	while (!ready_for_fork)
-+		; /* Wait for the poll_thread to start executing before forking */
-+
- 	pid = fork();
- 	if (pid < 0)
- 		err("fork");
-@@ -829,6 +834,8 @@ static void uffd_events_test_common(bool wp)
- 	char c;
- 	struct uffd_args args = { 0 };
-
-+	ready_for_fork = false;
-+
- 	fcntl(uffd, F_SETFL, uffd_flags | O_NONBLOCK);
- 	if (uffd_register(uffd, area_dst, nr_pages * page_size,
- 			  true, wp, false))
-@@ -838,6 +845,9 @@ static void uffd_events_test_common(bool wp)
- 	if (pthread_create(&uffd_mon, NULL, uffd_poll_thread, &args))
- 		err("uffd_poll_thread create");
-
-+	while (!ready_for_fork)
-+		; /* Wait for the poll_thread to start executing before forking */
-+
- 	pid = fork();
- 	if (pid < 0)
- 		err("fork");
---
-2.44.0.396.g6e790dbe36-goog
-
+(ie : clearing fl4_dport and fl4_sport also clears fl4_icmp_type and
+fl4_icmp_code.)
 
