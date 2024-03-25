@@ -1,536 +1,414 @@
-Return-Path: <netdev+bounces-81599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFA6B88A6D9
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:37:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8F9A88A6FA
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:40:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C7291F62F2F
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:37:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1C5E1C3CB98
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3FF0137746;
-	Mon, 25 Mar 2024 13:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D65C13E6A0;
+	Mon, 25 Mar 2024 13:17:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CAVX6XFp"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="w/WjBPg4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE801369AD
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 13:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC52713E04C
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 13:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711372135; cv=none; b=qRdc+sO+ZrfwOOQKVdwCgqum6pGcKrhXiPgg9E6OjrjwUAsWzpm2l8sQpy0EirpLH8Y2givyYxJaUPfpg9VnU4iWEuLyZBmZCbTLy3WhcVffoNLX8ScR3Mpwn5IZf6Zltm11QH13KmkvWguF8PdXWIF5Gqu+CcLHxR4gHiPiWaA=
+	t=1711372621; cv=none; b=YWHZ+QROoljXDA4FnGoiuILR2pAsJ722wIgdzr3Y28PldOXudh9/xmaVwRnN1MERKxL2JTenl8A2XBGEctBcoP+SwKCBiSqSBjVD6wtk2IhLw1NCp7X9kqFv5dlSqTF+OC6SswLABzPrDae6n163/8Vu/ymA9B0WfQNY5Rn8j0s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711372135; c=relaxed/simple;
-	bh=nyZuwRcK/e3yMKsAmoNQWzH4thM2GyQPWMKCMJmG17c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SFkgpLqDCDJMGqUg+qukItZOQ0TU4UlIgrzRVpCDK+xKBWikyicGoixqJSYPApeIfhX42dCjAeOwQooeh2+gR6F3Gcdpeisp+kmRWB49YwwXZs0Z++iMRTCk5es+H98nKSZe2Z0+Y4LYst7MNmpLM4w4Gdd30c63Np/zwI9+k5c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CAVX6XFp; arc=none smtp.client-ip=209.85.208.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-56bde8ea904so14900a12.0
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 06:08:52 -0700 (PDT)
+	s=arc-20240116; t=1711372621; c=relaxed/simple;
+	bh=QmnIJL3nNR9+zKW6yXAUDe/cZgsADvcZTb9qeXedrZk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eDp8CBjs24dKdnPRR/elwYZUDCurp+9t20f90CFQjJKSH9NChAjyZRBGVASArbHRQpEv+z+gXa6ut1vcFnAEYxZ/+ZMxp46oUsHNCn0szggNF9OTUUIqmsagAcfjfi0AGvGNHaXvcYXPJc+b4W9iiATPP5rK4IvpFCJDIw5D7XU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=w/WjBPg4; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-34005b5927eso3040884f8f.1
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 06:16:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711372131; x=1711976931; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1exnC3SZ2vdQAYn/Zmavk378Cs+CLx5X+GuJwbZ6RQg=;
-        b=CAVX6XFpL5+B5BEcBShHaWPOFt/+awmGFJwBg84ZeRfd5Dopfhja20G9a96x2k6dCf
-         svDBp03N3nTS38i0i6Cvt5YWpON5vuWZ9WUiZ65kpgJFvbKL7biyMGOsH9PJcf+yrLQW
-         p9t68HdnFzEQVMChWXeUXzwTyjkDDRsvNR360cKgeD4n/9yTZMKJjQirgUtZhvSq6XfJ
-         RwL2XE4cqdoiRoDFWg6Us0HilcYM8vdJdhGqxyGtUITz1rTS/nCB+zkYrPvH9W4ItE8p
-         /EqM9L7+mvPeI9tMVx0h4Txv1iTEt5VukjooQY+p6lTbkOy/gsK01anwyrWloCupTU0A
-         cxvQ==
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711372616; x=1711977416; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6XN7ZpqzE5zYx59YDbBIPeXPDFjIdhS0XqCX5auA4/U=;
+        b=w/WjBPg4BQc1bUiBiK9ozDvRCL8S9uX+XAQZXBM+gL2w/Rl14zx3GZ7O5iaPgwl/Q4
+         weMCJVBjmswr8NkJld6iwOYrWjROsLbEpZ6zwSfo6ctN9x41Fk7MLtuJTCmGy+Nv4XIa
+         ettMuFFUTfQjbauT/dREv2zVaeYN8SpkMgh586EcYCsOvvI9SFMISD92IxOpGtmLY/Y/
+         CSoGq+WfnSDy1yU5mzimF1A1XUywnTzdnj166p4P6opJ46MwJzk73QzRumhcBhKFqSUI
+         3Hrtgm0dU71s96KCBpaEbfarheT8/KG960N9jnL4+2wqM4LdQxHh5omurOFG/jOhNOUi
+         IPug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711372131; x=1711976931;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1exnC3SZ2vdQAYn/Zmavk378Cs+CLx5X+GuJwbZ6RQg=;
-        b=NKb72HZy4pLWz+iJT2Ux4m+oJIdFrJsoZt1Q7DIRgkxlnkGsBcWwPKWzilHA/Xtm/w
-         s2xFUz7D5zf2UlCdgFcWK5JHlkW5J6MVTnK0X8BwRTo0C1xNDeDl5uGN9FV2G54Ll3f0
-         NjKDlziBdzE3xvanMIrzlT8C9eahriftL50t/xedTPcq2vDu8N0TLjc6rQbTCfuqRyU+
-         1YzBcFrM4wOOUZALfkLU5VJ3ohuDWjsIr/C9muq57a73yyuyF/o5kdDBy+8d9TtDy+1m
-         4b4PUax5x0+8XUKr4kv0kZhaWLRHUCJBfLYv2OETZ4pGYDIK7frZwudvyPvNnHrd/ibu
-         xglg==
-X-Forwarded-Encrypted: i=1; AJvYcCVT5Wyp1eKFVLzCguKiWEUUp3F6oAugbQufy7SgE++JlX2j7oGt0kxlcOdgV4vBjJpet0sn0uyYLyleouCUPLR9BFjQ2JaG
-X-Gm-Message-State: AOJu0YxCRWaFhxGWaQfM6YKxDr/Np+syAjjyO3IQZxLH8SWAhWiWK3ry
-	4ZF76A+OR/SzP8XgbPOLfdtk6hYCNlQLjc99kNCvlqLnklf6pEt3WNyk7DyMQaVDFbHaIPr+Dww
-	rV0wQiAeZy/I5rFBkdG4TUOefkm1o/zmF6pGL63E0CNnNvWgiDqNS
-X-Google-Smtp-Source: AGHT+IFI9x5+Nry8p9xlcxI9Rgtkj+Ycf8kbgOjvhErdLDHnb1nWA2LtYrZ+qduM07Gmo+zbr76sgpnfaWRG8nvzkz8=
-X-Received: by 2002:aa7:d298:0:b0:56c:d26:5e59 with SMTP id
- w24-20020aa7d298000000b0056c0d265e59mr122934edq.1.1711372131149; Mon, 25 Mar
- 2024 06:08:51 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711372616; x=1711977416;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6XN7ZpqzE5zYx59YDbBIPeXPDFjIdhS0XqCX5auA4/U=;
+        b=hdi5yoKYOqMYQumWNXA4Prjw/V8ozGbxHysJVAhnjEnUcREQkOx1PoQDt7SuJ0uRg2
+         Z7JXIpkx3rmj9Pt0bYIFwWPafJSE50TPKbkT0yu3Gd/wUu3pIfCDNig0WW+199sPB9L8
+         663ysNkT5AFBZLEdn7E7ydHvnqBosONW9xZhCt6GxhEOxPMEpWaz2a7Erp53NuCRsP6t
+         ZVKY0WJVzCtgUe/jwgqd+egqe3OhsR+v3duc3QkBWZTntFtAd8sgtZwsIa4dkcWr0ncT
+         XjrM1Skyn2i3GaEkia4+qakK370w2W7lDDs1Hp08r2/ZU0gkgqyGSuOe9H8UoVAl6+fO
+         ZYnA==
+X-Forwarded-Encrypted: i=1; AJvYcCUS9VnRvEfVpXzJcgWEj7FU9MLoeyz3iBn0i9N+ojvkMwC41r/T/RZnjwI4UyRAXO7RiHIUdfDNFAspKCo9Lq8XiIDNMbZ0
+X-Gm-Message-State: AOJu0Yxhzq+Oum2jC47zuI+E5rOlwHbj1t9KZjk3PHCHdP0vBZLCDHX+
+	cZXGY84xnrByTunsdJJL19Om7+Fk6/kMR7SCKAe1wzCGvW2WXrNnYPlahIrKgJ8=
+X-Google-Smtp-Source: AGHT+IG11BOeeCkEAckxI39fvS0eu0rxIdYr3GApKfs4ARiNWzFQ1oPCqFmN8Ecb361gganrIc+ExQ==
+X-Received: by 2002:a5d:5710:0:b0:33e:8c7e:608c with SMTP id a16-20020a5d5710000000b0033e8c7e608cmr4716235wrv.13.1711372615843;
+        Mon, 25 Mar 2024 06:16:55 -0700 (PDT)
+Received: from brgl-uxlite.home ([2a01:cb1d:75a:e000:861d:8b72:a859:4ce9])
+        by smtp.gmail.com with ESMTPSA id p11-20020a056000018b00b0033e75e5f280sm9485245wrx.113.2024.03.25.06.16.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Mar 2024 06:16:55 -0700 (PDT)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+To: Marcel Holtmann <marcel@holtmann.org>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Kalle Valo <kvalo@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Will Deacon <will@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Bartosz Golaszewski <brgl@bgdev.pl>,
+	Saravana Kannan <saravanak@google.com>,
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Marek Szyprowski <m.szyprowski@samsung.com>,
+	Alex Elder <elder@linaro.org>,
+	Srini Kandagatla <srinivas.kandagatla@linaro.org>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Abel Vesa <abel.vesa@linaro.org>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Lukas Wunner <lukas@wunner.de>,
+	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-pci@vger.kernel.org,
+	linux-pm@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: [PATCH v6 00/16] power: sequencing: implement the subsystem and add first users
+Date: Mon, 25 Mar 2024 14:16:08 +0100
+Message-Id: <20240325131624.26023-1-brgl@bgdev.pl>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <000000000000657ecd0614456af8@google.com> <3483096f-4782-4ca1-bd8a-25a045646026@suse.de>
-In-Reply-To: <3483096f-4782-4ca1-bd8a-25a045646026@suse.de>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 25 Mar 2024 14:08:36 +0100
-Message-ID: <CANn89iKbygQsCLcb0STk7DVnseNQ6rkSxeJ1cFGDaufDo5eSgg@mail.gmail.com>
-Subject: Re: [syzbot] [net?] KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
-To: Denis Kirjanov <dkirjanov@suse.de>
-Cc: syzbot <syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com>, 
-	davem@davemloft.net, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Mar 25, 2024 at 1:10=E2=80=AFPM Denis Kirjanov <dkirjanov@suse.de> =
-wrote:
->
->
->
-> On 3/22/24 23:10, syzbot wrote:
-> > Hello,
-> >
-> > syzbot found the following issue on:
-> >
-> > HEAD commit:    61387b8dcf1d Merge tag 'for-6.9/dm-vdo' of git://git.ke=
-rne..
-> > git tree:       upstream
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D11effbd1180=
-000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=3Dc6aea81bc9f=
-f5e99
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=3D5fe14f2ff4ccb=
-ace9a26
-> > compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for=
- Debian) 2.40
-> >
-> > Unfortunately, I don't have any reproducer for this issue yet.
-> >
-> > Downloadable assets:
-> > disk image: https://storage.googleapis.com/syzbot-assets/b972a52930fa/d=
-isk-61387b8d.raw.xz
-> > vmlinux: https://storage.googleapis.com/syzbot-assets/caa2592898b6/vmli=
-nux-61387b8d.xz
-> > kernel image: https://storage.googleapis.com/syzbot-assets/4187257afcc5=
-/bzImage-61387b8d.xz
-> >
-> > IMPORTANT: if you fix the issue, please add the following tag to the co=
-mmit:
-> > Reported-by: syzbot+5fe14f2ff4ccbace9a26@syzkaller.appspotmail.com
-> >
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > BUG: KASAN: slab-use-after-free in __ethtool_get_link_ksettings+0x186/0=
-x190 net/ethtool/ioctl.c:441
-> > Read of size 8 at addr ffff888021f46308 by task kworker/0:4/5169
-> >
-> > CPU: 0 PID: 5169 Comm: kworker/0:4 Not tainted 6.8.0-syzkaller-05562-g6=
-1387b8dcf1d #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS=
- Google 02/29/2024
-> > Workqueue: infiniband ib_cache_event_task
-> > Call Trace:
-> >  <TASK>
-> >  __dump_stack lib/dump_stack.c:88 [inline]
-> >  dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:114
-> >  print_address_description mm/kasan/report.c:377 [inline]
-> >  print_report+0xc3/0x620 mm/kasan/report.c:488
-> >  kasan_report+0xd9/0x110 mm/kasan/report.c:601
-> >  __ethtool_get_link_ksettings+0x186/0x190 net/ethtool/ioctl.c:441
-> >  __ethtool_get_link_ksettings+0xf5/0x190 net/ethtool/ioctl.c:445
->
-> Hmm, report says that we have a net_device freed even that we have a dev_=
-hold()
-> before __ethtool_get_link_ksettings()
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
- dev_hold(dev) might be done too late, the device is already being dismantl=
-ed.
+Note: I dropped most of the the review and test tags on purpose, the code
+changed significantly and warrants a new round of reviews and tests.
 
-ib_device_get_netdev() should probably be done under RTNL locking,
-otherwise the final part is racy :
+===
 
-if (res && res->reg_state !=3D NETREG_REGISTERED) {
-     dev_put(res);
-     return NULL;
-}
+Problem statement #1: Dynamic bus chicken-and-egg problem.
 
+Certain on-board PCI devices need to be powered up before they are can be
+detected but their PCI drivers won't get bound until the device is
+powered-up so enabling the relevant resources in the PCI device driver
+itself is impossible.
 
->
-> >  ib_get_eth_speed+0x123/0xb50 drivers/infiniband/core/verbs.c:1984
-> >  siw_query_port+0x3c/0x3e0 drivers/infiniband/sw/siw/siw_verbs.c:179
-> >  iw_query_port drivers/infiniband/core/device.c:2049 [inline]
-> >  ib_query_port drivers/infiniband/core/device.c:2090 [inline]
-> >  ib_query_port+0x3d5/0x8a0 drivers/infiniband/core/device.c:2082
-> >  ib_cache_update.part.0+0xdc/0xa30 drivers/infiniband/core/cache.c:1498
-> >  ib_cache_update drivers/infiniband/core/cache.c:1572 [inline]
-> >  ib_cache_event_task+0x1c2/0x290 drivers/infiniband/core/cache.c:1572
-> >  process_one_work+0x9ac/0x1a60 kernel/workqueue.c:3254
-> >  process_scheduled_works kernel/workqueue.c:3335 [inline]
-> >  worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
-> >  kthread+0x2c4/0x3a0 kernel/kthread.c:388
-> >  ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
-> >  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-> >  </TASK>
-> >
-> > Allocated by task 10125:
-> >  kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
-> >  kasan_save_track+0x14/0x30 mm/kasan/common.c:68
-> >  poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
-> >  __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:387
-> >  kasan_kmalloc include/linux/kasan.h:211 [inline]
-> >  __do_kmalloc_node mm/slub.c:3966 [inline]
-> >  __kmalloc_node+0x226/0x480 mm/slub.c:3973
-> >  kmalloc_node include/linux/slab.h:648 [inline]
-> >  kvmalloc_node+0x9d/0x1a0 mm/util.c:634
-> >  kvmalloc include/linux/slab.h:766 [inline]
-> >  kvzalloc include/linux/slab.h:774 [inline]
-> >  alloc_netdev_mqs+0xb3/0x12b0 net/core/dev.c:10840
-> >  rtnl_create_link+0xc88/0xfa0 net/core/rtnetlink.c:3358
-> >  rtnl_newlink_create net/core/rtnetlink.c:3484 [inline]
-> >  __rtnl_newlink+0x10ae/0x1960 net/core/rtnetlink.c:3714
-> >  rtnl_newlink+0x67/0xa0 net/core/rtnetlink.c:3727
-> >  rtnetlink_rcv_msg+0x3ca/0xe60 net/core/rtnetlink.c:6595
-> >  netlink_rcv_skb+0x16e/0x440 net/netlink/af_netlink.c:2559
-> >  netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
-> >  netlink_unicast+0x545/0x820 net/netlink/af_netlink.c:1361
-> >  netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1905
-> >  sock_sendmsg_nosec net/socket.c:730 [inline]
-> >  __sock_sendmsg net/socket.c:745 [inline]
-> >  __sys_sendto+0x482/0x4e0 net/socket.c:2191
-> >  __do_sys_sendto net/socket.c:2203 [inline]
-> >  __se_sys_sendto net/socket.c:2199 [inline]
-> >  __x64_sys_sendto+0xe0/0x1c0 net/socket.c:2199
-> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> >  do_syscall_64+0xd5/0x260 arch/x86/entry/common.c:83
-> >  entry_SYSCALL_64_after_hwframe+0x6d/0x75
-> >
-> > Freed by task 61:
-> >  kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
-> >  kasan_save_track+0x14/0x30 mm/kasan/common.c:68
-> >  kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:579
-> >  poison_slab_object mm/kasan/common.c:240 [inline]
-> >  __kasan_slab_free+0x11d/0x1a0 mm/kasan/common.c:256
-> >  kasan_slab_free include/linux/kasan.h:184 [inline]
-> >  slab_free_hook mm/slub.c:2106 [inline]
-> >  slab_free mm/slub.c:4280 [inline]
-> >  kfree+0x129/0x370 mm/slub.c:4390
-> >  kvfree+0x47/0x50 mm/util.c:680
-> >  device_release+0xa4/0x240 drivers/base/core.c:2499
-> >  kobject_cleanup lib/kobject.c:689 [inline]
-> >  kobject_release lib/kobject.c:720 [inline]
-> >  kref_put include/linux/kref.h:65 [inline]
-> >  kobject_put+0x1fd/0x5b0 lib/kobject.c:737
-> >  netdev_run_todo+0x7d1/0x1260 net/core/dev.c:10591
-> >  default_device_exit_batch+0x860/0xae0 net/core/dev.c:11632
-> >  ops_exit_list+0x12b/0x180 net/core/net_namespace.c:175
-> >  cleanup_net+0x5b7/0xbf0 net/core/net_namespace.c:637
-> >  process_one_work+0x9ac/0x1a60 kernel/workqueue.c:3254
-> >  process_scheduled_works kernel/workqueue.c:3335 [inline]
-> >  worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
-> >  kthread+0x2c4/0x3a0 kernel/kthread.c:388
-> >  ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
-> >  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-> >
-> > The buggy address belongs to the object at ffff888021f46000
-> >  which belongs to the cache kmalloc-cg-4k of size 4096
-> > The buggy address is located 776 bytes inside of
-> >  freed 4096-byte region [ffff888021f46000, ffff888021f47000)
-> >
-> > The buggy address belongs to the physical page:
-> > page:ffffea000087d000 refcount:1 mapcount:0 mapping:0000000000000000 in=
-dex:0x0 pfn:0x21f40
-> > head:ffffea000087d000 order:3 entire_mapcount:0 nr_pages_mapped:0 pinco=
-unt:0
-> > memcg:ffff8880636ce481
-> > flags: 0xfff00000000840(slab|head|node=3D0|zone=3D1|lastcpupid=3D0x7ff)
-> > page_type: 0xffffffff()
-> > raw: 00fff00000000840 ffff88801504f500 dead000000000122 000000000000000=
-0
-> > raw: 0000000000000000 0000000000040004 00000001ffffffff ffff8880636ce48=
-1
-> > page dumped because: kasan: bad access detected
-> > page_owner tracks the page as allocated
-> > page last allocated via order 3, migratetype Unmovable, gfp_mask 0x1d20=
-c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC=
-|__GFP_HARDWALL), pid 10125, tgid 10125 (syz-executor.2), ts 404185927295, =
-free_ts 404019420685
-> >  set_page_owner include/linux/page_owner.h:31 [inline]
-> >  post_alloc_hook+0x2d4/0x350 mm/page_alloc.c:1533
-> >  prep_new_page mm/page_alloc.c:1540 [inline]
-> >  get_page_from_freelist+0xa28/0x3780 mm/page_alloc.c:3311
-> >  __alloc_pages+0x22b/0x2410 mm/page_alloc.c:4569
-> >  __alloc_pages_node include/linux/gfp.h:238 [inline]
-> >  alloc_pages_node include/linux/gfp.h:261 [inline]
-> >  alloc_slab_page mm/slub.c:2175 [inline]
-> >  allocate_slab mm/slub.c:2338 [inline]
-> >  new_slab+0xcc/0x3a0 mm/slub.c:2391
-> >  ___slab_alloc+0x66d/0x1790 mm/slub.c:3525
-> >  __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3610
-> >  __slab_alloc_node mm/slub.c:3663 [inline]
-> >  slab_alloc_node mm/slub.c:3835 [inline]
-> >  __do_kmalloc_node mm/slub.c:3965 [inline]
-> >  __kmalloc_node_track_caller+0x367/0x470 mm/slub.c:3986
-> >  kmemdup+0x29/0x60 mm/util.c:131
-> >  kmemdup include/linux/fortify-string.h:738 [inline]
-> >  __devinet_sysctl_register+0xbc/0x360 net/ipv4/devinet.c:2577
-> >  devinet_sysctl_register net/ipv4/devinet.c:2629 [inline]
-> >  devinet_sysctl_register+0x17b/0x200 net/ipv4/devinet.c:2619
-> >  inetdev_init+0x28b/0x580 net/ipv4/devinet.c:286
-> >  inetdev_event+0xd23/0x19b0 net/ipv4/devinet.c:1560
-> >  notifier_call_chain+0xbc/0x3e0 kernel/notifier.c:93
-> >  call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1950
-> >  call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
-> >  call_netdevice_notifiers net/core/dev.c:2002 [inline]
-> >  register_netdevice+0x15f5/0x1ca0 net/core/dev.c:10307
-> >  virt_wifi_newlink+0x3ed/0x970 drivers/net/wireless/virtual/virt_wifi.c=
-:553
-> > page last free pid 10234 tgid 10232 stack trace:
-> >  reset_page_owner include/linux/page_owner.h:24 [inline]
-> >  free_pages_prepare mm/page_alloc.c:1140 [inline]
-> >  free_unref_page_prepare+0x527/0xb10 mm/page_alloc.c:2346
-> >  free_unref_page+0x33/0x3c0 mm/page_alloc.c:2486
-> >  __put_partials+0x14c/0x170 mm/slub.c:2906
-> >  qlink_free mm/kasan/quarantine.c:163 [inline]
-> >  qlist_free_all+0x4e/0x140 mm/kasan/quarantine.c:179
-> >  kasan_quarantine_reduce+0x192/0x1e0 mm/kasan/quarantine.c:286
-> >  __kasan_slab_alloc+0x69/0x90 mm/kasan/common.c:322
-> >  kasan_slab_alloc include/linux/kasan.h:201 [inline]
-> >  slab_post_alloc_hook mm/slub.c:3798 [inline]
-> >  slab_alloc_node mm/slub.c:3845 [inline]
-> >  kmem_cache_alloc_node+0x177/0x340 mm/slub.c:3888
-> >  __alloc_skb+0x2b1/0x380 net/core/skbuff.c:658
-> >  alloc_skb_fclone include/linux/skbuff.h:1368 [inline]
-> >  tipc_buf_acquire+0x26/0xe0 net/tipc/msg.c:72
-> >  tipc_msg_build+0x10c/0x1120 net/tipc/msg.c:386
-> >  tipc_sendmcast+0x79e/0xb70 net/tipc/socket.c:881
-> >  __tipc_sendmsg+0x1317/0x1940 net/tipc/socket.c:1469
-> >  tipc_sendmsg+0x4f/0x70 net/tipc/socket.c:1403
-> >  sock_sendmsg_nosec net/socket.c:730 [inline]
-> >  __sock_sendmsg net/socket.c:745 [inline]
-> >  ____sys_sendmsg+0xab8/0xc90 net/socket.c:2584
-> >  ___sys_sendmsg+0x135/0x1e0 net/socket.c:2638
-> >  __sys_sendmmsg+0x1a1/0x450 net/socket.c:2724
-> >
-> > Memory state around the buggy address:
-> >  ffff888021f46200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> >  ffff888021f46280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> >> ffff888021f46300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> >                       ^
-> >  ffff888021f46380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> >  ffff888021f46400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > BUG: KASAN: slab-use-after-free in __ethtool_get_link_ksettings+0x165/0=
-x190 net/ethtool/ioctl.c:445
-> > Read of size 8 at addr ffff888021f46308 by task kworker/0:4/5169
-> >
-> > CPU: 0 PID: 5169 Comm: kworker/0:4 Tainted: G    B              6.8.0-s=
-yzkaller-05562-g61387b8dcf1d #0
-> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS=
- Google 02/29/2024
-> > Workqueue: infiniband ib_cache_event_task
-> > Call Trace:
-> >  <TASK>
-> >  __dump_stack lib/dump_stack.c:88 [inline]
-> >  dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:114
-> >  print_address_description mm/kasan/report.c:377 [inline]
-> >  print_report+0xc3/0x620 mm/kasan/report.c:488
-> >  kasan_report+0xd9/0x110 mm/kasan/report.c:601
-> >  __ethtool_get_link_ksettings+0x165/0x190 net/ethtool/ioctl.c:445
-> >  __ethtool_get_link_ksettings+0xf5/0x190 net/ethtool/ioctl.c:445
-> >  ib_get_eth_speed+0x123/0xb50 drivers/infiniband/core/verbs.c:1984
-> >  siw_query_port+0x3c/0x3e0 drivers/infiniband/sw/siw/siw_verbs.c:179
-> >  iw_query_port drivers/infiniband/core/device.c:2049 [inline]
-> >  ib_query_port drivers/infiniband/core/device.c:2090 [inline]
-> >  ib_query_port+0x3d5/0x8a0 drivers/infiniband/core/device.c:2082
-> >  ib_cache_update.part.0+0xdc/0xa30 drivers/infiniband/core/cache.c:1498
-> >  ib_cache_update drivers/infiniband/core/cache.c:1572 [inline]
-> >  ib_cache_event_task+0x1c2/0x290 drivers/infiniband/core/cache.c:1572
-> >  process_one_work+0x9ac/0x1a60 kernel/workqueue.c:3254
-> >  process_scheduled_works kernel/workqueue.c:3335 [inline]
-> >  worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
-> >  kthread+0x2c4/0x3a0 kernel/kthread.c:388
-> >  ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
-> >  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-> >  </TASK>
-> >
-> > Allocated by task 10125:
-> >  kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
-> >  kasan_save_track+0x14/0x30 mm/kasan/common.c:68
-> >  poison_kmalloc_redzone mm/kasan/common.c:370 [inline]
-> >  __kasan_kmalloc+0xaa/0xb0 mm/kasan/common.c:387
-> >  kasan_kmalloc include/linux/kasan.h:211 [inline]
-> >  __do_kmalloc_node mm/slub.c:3966 [inline]
-> >  __kmalloc_node+0x226/0x480 mm/slub.c:3973
-> >  kmalloc_node include/linux/slab.h:648 [inline]
-> >  kvmalloc_node+0x9d/0x1a0 mm/util.c:634
-> >  kvmalloc include/linux/slab.h:766 [inline]
-> >  kvzalloc include/linux/slab.h:774 [inline]
-> >  alloc_netdev_mqs+0xb3/0x12b0 net/core/dev.c:10840
-> >  rtnl_create_link+0xc88/0xfa0 net/core/rtnetlink.c:3358
-> >  rtnl_newlink_create net/core/rtnetlink.c:3484 [inline]
-> >  __rtnl_newlink+0x10ae/0x1960 net/core/rtnetlink.c:3714
-> >  rtnl_newlink+0x67/0xa0 net/core/rtnetlink.c:3727
-> >  rtnetlink_rcv_msg+0x3ca/0xe60 net/core/rtnetlink.c:6595
-> >  netlink_rcv_skb+0x16e/0x440 net/netlink/af_netlink.c:2559
-> >  netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
-> >  netlink_unicast+0x545/0x820 net/netlink/af_netlink.c:1361
-> >  netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1905
-> >  sock_sendmsg_nosec net/socket.c:730 [inline]
-> >  __sock_sendmsg net/socket.c:745 [inline]
-> >  __sys_sendto+0x482/0x4e0 net/socket.c:2191
-> >  __do_sys_sendto net/socket.c:2203 [inline]
-> >  __se_sys_sendto net/socket.c:2199 [inline]
-> >  __x64_sys_sendto+0xe0/0x1c0 net/socket.c:2199
-> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> >  do_syscall_64+0xd5/0x260 arch/x86/entry/common.c:83
-> >  entry_SYSCALL_64_after_hwframe+0x6d/0x75
-> >
-> > Freed by task 61:
-> >  kasan_save_stack+0x33/0x60 mm/kasan/common.c:47
-> >  kasan_save_track+0x14/0x30 mm/kasan/common.c:68
-> >  kasan_save_free_info+0x3b/0x60 mm/kasan/generic.c:579
-> >  poison_slab_object mm/kasan/common.c:240 [inline]
-> >  __kasan_slab_free+0x11d/0x1a0 mm/kasan/common.c:256
-> >  kasan_slab_free include/linux/kasan.h:184 [inline]
-> >  slab_free_hook mm/slub.c:2106 [inline]
-> >  slab_free mm/slub.c:4280 [inline]
-> >  kfree+0x129/0x370 mm/slub.c:4390
-> >  kvfree+0x47/0x50 mm/util.c:680
-> >  device_release+0xa4/0x240 drivers/base/core.c:2499
-> >  kobject_cleanup lib/kobject.c:689 [inline]
-> >  kobject_release lib/kobject.c:720 [inline]
-> >  kref_put include/linux/kref.h:65 [inline]
-> >  kobject_put+0x1fd/0x5b0 lib/kobject.c:737
-> >  netdev_run_todo+0x7d1/0x1260 net/core/dev.c:10591
-> >  default_device_exit_batch+0x860/0xae0 net/core/dev.c:11632
-> >  ops_exit_list+0x12b/0x180 net/core/net_namespace.c:175
-> >  cleanup_net+0x5b7/0xbf0 net/core/net_namespace.c:637
-> >  process_one_work+0x9ac/0x1a60 kernel/workqueue.c:3254
-> >  process_scheduled_works kernel/workqueue.c:3335 [inline]
-> >  worker_thread+0x6c8/0xf70 kernel/workqueue.c:3416
-> >  kthread+0x2c4/0x3a0 kernel/kthread.c:388
-> >  ret_from_fork+0x48/0x80 arch/x86/kernel/process.c:147
-> >  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-> >
-> > The buggy address belongs to the object at ffff888021f46000
-> >  which belongs to the cache kmalloc-cg-4k of size 4096
-> > The buggy address is located 776 bytes inside of
-> >  freed 4096-byte region [ffff888021f46000, ffff888021f47000)
-> >
-> > The buggy address belongs to the physical page:
-> > page:ffffea000087d000 refcount:1 mapcount:0 mapping:0000000000000000 in=
-dex:0x0 pfn:0x21f40
-> > head:ffffea000087d000 order:3 entire_mapcount:0 nr_pages_mapped:0 pinco=
-unt:0
-> > memcg:ffff8880636ce481
-> > flags: 0xfff00000000840(slab|head|node=3D0|zone=3D1|lastcpupid=3D0x7ff)
-> > page_type: 0xffffffff()
-> > raw: 00fff00000000840 ffff88801504f500 dead000000000122 000000000000000=
-0
-> > raw: 0000000000000000 0000000000040004 00000001ffffffff ffff8880636ce48=
-1
-> > page dumped because: kasan: bad access detected
-> > page_owner tracks the page as allocated
-> > page last allocated via order 3, migratetype Unmovable, gfp_mask 0x1d20=
-c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC=
-|__GFP_HARDWALL), pid 10125, tgid 10125 (syz-executor.2), ts 404185927295, =
-free_ts 404019420685
-> >  set_page_owner include/linux/page_owner.h:31 [inline]
-> >  post_alloc_hook+0x2d4/0x350 mm/page_alloc.c:1533
-> >  prep_new_page mm/page_alloc.c:1540 [inline]
-> >  get_page_from_freelist+0xa28/0x3780 mm/page_alloc.c:3311
-> >  __alloc_pages+0x22b/0x2410 mm/page_alloc.c:4569
-> >  __alloc_pages_node include/linux/gfp.h:238 [inline]
-> >  alloc_pages_node include/linux/gfp.h:261 [inline]
-> >  alloc_slab_page mm/slub.c:2175 [inline]
-> >  allocate_slab mm/slub.c:2338 [inline]
-> >  new_slab+0xcc/0x3a0 mm/slub.c:2391
-> >  ___slab_alloc+0x66d/0x1790 mm/slub.c:3525
-> >  __slab_alloc.constprop.0+0x56/0xb0 mm/slub.c:3610
-> >  __slab_alloc_node mm/slub.c:3663 [inline]
-> >  slab_alloc_node mm/slub.c:3835 [inline]
-> >  __do_kmalloc_node mm/slub.c:3965 [inline]
-> >  __kmalloc_node_track_caller+0x367/0x470 mm/slub.c:3986
-> >  kmemdup+0x29/0x60 mm/util.c:131
-> >  kmemdup include/linux/fortify-string.h:738 [inline]
-> >  __devinet_sysctl_register+0xbc/0x360 net/ipv4/devinet.c:2577
-> >  devinet_sysctl_register net/ipv4/devinet.c:2629 [inline]
-> >  devinet_sysctl_register+0x17b/0x200 net/ipv4/devinet.c:2619
-> >  inetdev_init+0x28b/0x580 net/ipv4/devinet.c:286
-> >  inetdev_event+0xd23/0x19b0 net/ipv4/devinet.c:1560
-> >  notifier_call_chain+0xbc/0x3e0 kernel/notifier.c:93
-> >  call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:1950
-> >  call_netdevice_notifiers_extack net/core/dev.c:1988 [inline]
-> >  call_netdevice_notifiers net/core/dev.c:2002 [inline]
-> >  register_netdevice+0x15f5/0x1ca0 net/core/dev.c:10307
-> >  virt_wifi_newlink+0x3ed/0x970 drivers/net/wireless/virtual/virt_wifi.c=
-:553
-> > page last free pid 10234 tgid 10232 stack trace:
-> >  reset_page_owner include/linux/page_owner.h:24 [inline]
-> >  free_pages_prepare mm/page_alloc.c:1140 [inline]
-> >  free_unref_page_prepare+0x527/0xb10 mm/page_alloc.c:2346
-> >  free_unref_page+0x33/0x3c0 mm/page_alloc.c:2486
-> >  __put_partials+0x14c/0x170 mm/slub.c:2906
-> >  qlink_free mm/kasan/quarantine.c:163 [inline]
-> >  qlist_free_all+0x4e/0x140 mm/kasan/quarantine.c:179
-> >  kasan_quarantine_reduce+0x192/0x1e0 mm/kasan/quarantine.c:286
-> >  __kasan_slab_alloc+0x69/0x90 mm/kasan/common.c:322
-> >  kasan_slab_alloc include/linux/kasan.h:201 [inline]
-> >  slab_post_alloc_hook mm/slub.c:3798 [inline]
-> >  slab_alloc_node mm/slub.c:3845 [inline]
-> >  kmem_cache_alloc_node+0x177/0x340 mm/slub.c:3888
-> >  __alloc_skb+0x2b1/0x380 net/core/skbuff.c:658
-> >  alloc_skb_fclone include/linux/skbuff.h:1368 [inline]
-> >  tipc_buf_acquire+0x26/0xe0 net/tipc/msg.c:72
-> >  tipc_msg_build+0x10c/0x1120 net/tipc/msg.c:386
-> >  tipc_sendmcast+0x79e/0xb70 net/tipc/socket.c:881
-> >  __tipc_sendmsg+0x1317/0x1940 net/tipc/socket.c:1469
-> >  tipc_sendmsg+0x4f/0x70 net/tipc/socket.c:1403
-> >  sock_sendmsg_nosec net/socket.c:730 [inline]
-> >  __sock_sendmsg net/socket.c:745 [inline]
-> >  ____sys_sendmsg+0xab8/0xc90 net/socket.c:2584
-> >  ___sys_sendmsg+0x135/0x1e0 net/socket.c:2638
-> >  __sys_sendmmsg+0x1a1/0x450 net/socket.c:2724
-> >
-> > Memory state around the buggy address:
-> >  ffff888021f46200: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> >  ffff888021f46280: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> >> ffff888021f46300: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> >                       ^
-> >  ffff888021f46380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> >  ffff888021f46400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> >
-> > ---
-> > This report is generated by a bot. It may contain errors.
-> > See https://goo.gl/tpsmEJ for more information about syzbot.
-> > syzbot engineers can be reached at syzkaller@googlegroups.com.
-> >
-> > syzbot will keep track of this issue. See:
-> > https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> >
-> > If the report is already addressed, let syzbot know by replying with:
-> > #syz fix: exact-commit-title
-> >
-> > If you want to overwrite report's subsystems, reply with:
-> > #syz set subsystems: new-subsystem
-> > (See the list of subsystem names on the web dashboard)
-> >
-> > If the report is a duplicate of another one, reply with:
-> > #syz dup: exact-subject-of-another-report
-> >
-> > If you want to undo deduplication, reply with:
-> > #syz undup
-> >
+Problem statement #2: Sharing inter-dependent resources between devices.
+
+Certain devices that use separate drivers (often on different busses)
+share resources (regulators, clocks, etc.). Typically these resources
+are reference-counted but in some cases there are additional interactions
+between them to consider, for example specific power-up sequence timings.
+
+===
+
+The reason for tackling both of these problems in a single series is the
+fact the the platform I'm working on - Qualcomm RB5 - deals with both and
+both need to be addressed in order to enable WLAN and Bluetooth support
+upstream.
+
+The on-board WLAN/BT package - QCA6391 - has a Power Management Unit that
+takes inputs from the host and exposes LDO outputs consumed by the BT and
+WLAN modules which can be powered-up and down independently. However
+a delay of 100ms must be respected between enabling the BT- and
+WLAN-enable GPIOs.
+
+A similar design with a discreet PMU is also employed in other models of
+the WCN family of chips although we can often do without the delays. With
+this series we add support for the WCN7850 as well.
+
+===
+
+We introduce a new subsystem here - the power sequencing framework. The
+qcom-wcn driver that we add is its first user. It implements the power-up
+sequences for QCA6390 and WCN7850 chips. However - we only use it to
+power-up the bluetooth module in the former. We use it to driver the WLAN
+modules in both. The reason for this is that for WCN7850 we have
+comprehensive bindings already upstream together with existing DT users.
+Porting them to using the pwrseq subsystem can be done separately and in
+an incremental manner once the subsystem itself is upstream. We will also
+have to ensure backward DT compatibility. To avoid overcomplicating this
+series, let's leave it out for now.
+
+===
+
+This series is logically split into several sections. I'll go
+patch-by-patch and explain each step.
+
+Patches 1/16-5/16:
+
+These contain all relevant DT bindings changes. We add new documents for
+the QCA6390 & WCN7850 PMUs and ATH12K devices as well as extend the bindings
+for the Qualcomm Bluetooth and ATH11K modules with regulators used by them
+in QCA6390.
+
+Patches 6/16-8/16:
+
+These contain changes to device-tree sources for the three platforms we
+work with in this series. We model the PMUs of the WLAN/BT chips as
+top-level platform devices on the device tree. In order to limit the scope
+of this series and not introduce an excessive amount of confusion with
+deprecating DT bindings, we leave the Bluetooth nodes on sm8650 and sm8550
+as is (meaning: they continue to consumer the GPIOs and power inputs from
+the host). As the WCN7850 module doesn't require any specific timings, we can
+incrementally change that later.
+
+In both cases we add WLAN nodes that consume the power outputs of the PMU.
+For QCA6390 we also make the Bluetooth node of the RB5 consume the outputs
+of the PMU - we can do it as the bindings for this chip did not define any
+supply handles prior to this series meaning we are able to get this correct
+right away.
+
+Patches 9/16-12/16:
+
+These contain the bulk of the PCI changes for this series. We introduce
+a simple framework for powering up PCI devices before detecting them on
+the bus.
+
+The general approach is as follows: PCI devices that need special
+treatment before they can be powered up, scanned and bound to their PCI
+drivers must be described on the device-tree as child nodes of the PCI
+port node. These devices will be instantiated on the platform bus. They
+will in fact be generic platform devices with the compatible of the form
+used for PCI devices already upstream ("pci<vendor ID>,<device ID">). We
+add a new directory under drivers/pci/pwrctl/ that contains PCI pwrctl
+drivers. These drivers are platform drivers that will now be matched
+against the devices instantiated from port children just like any other
+platform pairs.
+
+Both the power control platform device *AND* the associated PCI device
+reuse the same OF node and have access to the same properties. The goal
+of the platform driver is to request and bring up any required resources
+and let the pwrctl framework know that it's now OK to rescan the bus and
+detect the devices. When the device is bound, we are notified about it
+by the PCI bus notifier event and can establish a device link between the
+power control device and the PCI device so that any future extension for
+power-management will already be able to work with the correct hierachy.
+
+The reusing of the OF node is the reason for the small changes to the PCI
+OF core: as the bootloader can possibly leave the relevant regulators on
+before booting linux, the PCI device can be detected before its platform
+abstraction is probed. In this case, we find that device first and mark
+its OF node as reused. The pwrctl framework handles the opposite case
+(when the PCI device is detected only after the platform driver
+successfully enabled it).
+
+Patch 13/16 - 14/16:
+
+These add a relatively simple power sequencing subsystem and the first
+driver using it: the pwrseq module for the PMUs on the WCN family of chips.
+
+I'm proposing to add a subsystem that allows different devices to use a shared
+power sequence split into consumer-specific as well as common "units".
+
+A power sequence provider driver registers a set of units with pwrseq
+core. Each unit can be enabled and disabled and contains an optional list
+of other units which must be enabled before it itself can be. A unit
+represents a discreet chunk of the power sequence.
+
+It also registers a list of targets: a target is an abstraction wrapping
+a unit which allows consumers to tell pwrseq which unit they want to
+reach. Real-life example is the driver we're adding here: there's a set
+of common regulators, two PCIe-specific ones and two enable GPIOs: one
+for Bluetooth and one for WLAN.
+
+The Bluetooth driver requests a descriptor to the power sequencer and
+names the target it wants to reach:
+
+    pwrseq = devm_pwrseq_get(dev, "bluetooth");
+
+The pwrseq core then knows that when the driver calls:
+
+    pwrseq_power_on(pwrseq);
+
+It must enable the "bluetooth-enable" unit but it depends on the
+"regulators-common" unit so this one is enabled first. The provider
+driver is also in charge of assuring an appropriate delay between
+enabling the BT and WLAN enable GPIOs. The WLAN-specific resources are
+handled by the "wlan-enable" unit and so are not enabled until the WLAN
+driver requests the "wlan" target to be powered on.
+
+Another thing worth discussing is the way we associate the consumer with
+the relevant power sequencer. DT maintainers have expressed a discontent
+with the existing mmc pwrseq bindings and have NAKed an earlier
+initiative to introduce global pwrseq bindings to the kernel[1].
+
+In this approach, we model the existing regulators and GPIOs in DT but
+the pwrseq subsystem requires each provider to provide a .match()
+callback. Whenever a consumer requests a power sequencer handle, we
+iterate over the list of pwrseq drivers and call .match() for each. It's
+up to the driver to verify in a platform-specific way whether it deals
+with its consumer and let the core pwrseq code know.
+
+The advantage of this over reusing the regulator or reset subsystem is
+that it's more generalized and can handle resources of all kinds as well
+as deal with any kind of power-on sequences: for instance, Qualcomm has
+a PCI switch they want a driver for but this switch requires enabling
+some resources first (PCI pwrctl) and then configuring the device over
+I2C (which can be handled by the pwrseq provider).
+
+Patch 15:
+
+This patch makes the Qualcomm Bluetooth driver get and use the power
+sequencer for QCA6390.
+
+Patch 16:
+
+While tiny, this patch is possibly the highlight of the entire series.
+It uses the two abstraction layers we introduced before to create an
+elegant power sequencing PCI power control driver and supports the ath11k
+module on QCA6390 and ath12k on WCN7850.
+
+With this series we can now enable BT and WLAN on several new Qualcomm
+boards upstream.
+
+Tested on RB5, sm8650-qrd and sm8550-qrd.
+
+Changelog:
+
+Since v5:
+- unify the approach to modelling the WCN WLAN/BT chips by always exposing
+  the PMU node on the device tree and making the WLAN and BT nodes become
+  consumers of its power outputs; this includes a major rework of the DT
+  sources, bindings and driver code; there's no more a separate PCI
+  pwrctl driver for WCN7850, instead its power-up sequence was moved
+  into the pwrseq driver common for all WCN chips
+- don't set load_uA from new regulator consumers
+- fix reported kerneldoc issues
+- drop voltage ranges for PMU outputs from DT
+- many minor tweaks and reworks
+
+v1: Original RFC:
+
+https://lore.kernel.org/lkml/20240104130123.37115-1-brgl@bgdev.pl/T/
+
+v2: First real patch series (should have been PATCH v2) adding what I
+    referred to back then as PCI power sequencing:
+
+https://lore.kernel.org/linux-arm-kernel/2024021413-grumbling-unlivable-c145@gregkh/T/
+
+v3: RFC for the DT representation of the PMU supplying the WLAN and BT
+    modules inside the QCA6391 package (was largely separate from the
+    series but probably should have been called PATCH or RFC v3):
+
+https://lore.kernel.org/all/CAMRc=Mc+GNoi57eTQg71DXkQKjdaoAmCpB=h2ndEpGnmdhVV-Q@mail.gmail.com/T/
+
+v4: Second attempt at the full series with changed scope (introduction of
+    the pwrseq subsystem, should have been RFC v4)
+
+https://lore.kernel.org/lkml/20240201155532.49707-1-brgl@bgdev.pl/T/
+
+v5: Two different ways of handling QCA6390 and WCN7850:
+
+https://lore.kernel.org/lkml/20240216203215.40870-1-brgl@bgdev.pl/
+
+Bartosz Golaszewski (16):
+  regulator: dt-bindings: describe the PMU module of the QCA6390 package
+  regulator: dt-bindings: describe the PMU module of the WCN7850 package
+  dt-bindings: net: bluetooth: qualcomm: describe regulators for QCA6390
+  dt-bindings: net: wireless: qcom,ath11k: describe the ath11k on
+    QCA6390
+  dt-bindings: net: wireless: describe the ath12k PCI module
+  arm64: dts: qcom: sm8550-qrd: add the Wifi node
+  arm64: dts: qcom: sm8650-qrd: add the Wifi node
+  arm64: dts: qcom: qrb5165-rb5: add the Wifi node
+  PCI: hold the rescan mutex when scanning for the first time
+  PCI/pwrctl: reuse the OF node for power controlled devices
+  PCI/pwrctl: create platform devices for child OF nodes of the port
+    node
+  PCI/pwrctl: add PCI power control core code
+  power: sequencing: implement the pwrseq core
+  power: pwrseq: add a driver for the PMU module on the QCom WCN
+    chipsets
+  Bluetooth: qca: use the power sequencer for QCA6390
+  PCI/pwrctl: add a PCI power control driver for power sequenced devices
+
+ .../net/bluetooth/qualcomm-bluetooth.yaml     |   17 +
+ .../net/wireless/qcom,ath11k-pci.yaml         |   46 +
+ .../bindings/net/wireless/qcom,ath12k.yaml    |  100 ++
+ .../bindings/regulator/qcom,qca6390-pmu.yaml  |  185 +++
+ MAINTAINERS                                   |    8 +
+ arch/arm64/boot/dts/qcom/qrb5165-rb5.dts      |  103 +-
+ arch/arm64/boot/dts/qcom/sm8250.dtsi          |   10 +
+ arch/arm64/boot/dts/qcom/sm8550-qrd.dts       |   97 ++
+ arch/arm64/boot/dts/qcom/sm8550.dtsi          |   10 +
+ arch/arm64/boot/dts/qcom/sm8650-qrd.dts       |   89 ++
+ arch/arm64/boot/dts/qcom/sm8650.dtsi          |   10 +
+ drivers/bluetooth/hci_qca.c                   |   74 +-
+ drivers/pci/Kconfig                           |    1 +
+ drivers/pci/Makefile                          |    1 +
+ drivers/pci/bus.c                             |    9 +-
+ drivers/pci/of.c                              |   14 +-
+ drivers/pci/probe.c                           |    2 +
+ drivers/pci/pwrctl/Kconfig                    |   17 +
+ drivers/pci/pwrctl/Makefile                   |    6 +
+ drivers/pci/pwrctl/core.c                     |  136 +++
+ drivers/pci/pwrctl/pci-pwrctl-pwrseq.c        |   89 ++
+ drivers/pci/remove.c                          |    2 +
+ drivers/power/Kconfig                         |    1 +
+ drivers/power/Makefile                        |    1 +
+ drivers/power/sequencing/Kconfig              |   28 +
+ drivers/power/sequencing/Makefile             |    6 +
+ drivers/power/sequencing/core.c               | 1065 +++++++++++++++++
+ drivers/power/sequencing/pwrseq-qcom-wcn.c    |  336 ++++++
+ include/linux/pci-pwrctl.h                    |   51 +
+ include/linux/pwrseq/consumer.h               |   56 +
+ include/linux/pwrseq/provider.h               |   75 ++
+ 31 files changed, 2614 insertions(+), 31 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/net/wireless/qcom,ath12k.yaml
+ create mode 100644 Documentation/devicetree/bindings/regulator/qcom,qca6390-pmu.yaml
+ create mode 100644 drivers/pci/pwrctl/Kconfig
+ create mode 100644 drivers/pci/pwrctl/Makefile
+ create mode 100644 drivers/pci/pwrctl/core.c
+ create mode 100644 drivers/pci/pwrctl/pci-pwrctl-pwrseq.c
+ create mode 100644 drivers/power/sequencing/Kconfig
+ create mode 100644 drivers/power/sequencing/Makefile
+ create mode 100644 drivers/power/sequencing/core.c
+ create mode 100644 drivers/power/sequencing/pwrseq-qcom-wcn.c
+ create mode 100644 include/linux/pci-pwrctl.h
+ create mode 100644 include/linux/pwrseq/consumer.h
+ create mode 100644 include/linux/pwrseq/provider.h
+
+-- 
+2.40.1
+
 
