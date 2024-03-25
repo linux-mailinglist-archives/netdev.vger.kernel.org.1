@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-81760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 007EE88B143
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:25:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EBBB88B147
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:25:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A981830061E
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:25:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE796301DBB
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:25:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C471245026;
-	Mon, 25 Mar 2024 20:25:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 675C745037;
+	Mon, 25 Mar 2024 20:25:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="A40rn+OK"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="WU3n53h8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB52D43AB6
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 20:25:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8870945033
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 20:25:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711398307; cv=none; b=U4JDPlVxerBpy+YRwrhYY0DnhVy0pBT1f4YkNL0r1giOiKikxJPr/X9/0nfRs/5Qr2we9dD+B8stmY2BosMX4nTieWeCrDXgNd1sNap3ltaDULX5Gg5U/8mFLn9WsaNN1tbaaeIJJQp7yIx8RjiEetyCf3fTdNUJ0W3UrrrClms=
+	t=1711398333; cv=none; b=gTKGI43FnA2vyZdTJIgqPBVZ9sxIvTa5CGek/CTmGydOYGVesWA/BLYjksQoeWPh/50vKcoQwdvF0+a6v+G5wzi8qXoREN20WlJPpeFs9IOpifuBlotwcXGd7OFP6ij7cn20gWMsCgr+THvdCfR0FRG2no7okYMsi7L6PAZ10u4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711398307; c=relaxed/simple;
-	bh=7p09WJiSGsXQo7PM/MWCnQsbBhKl3oZQNHb6ZPosCB0=;
+	s=arc-20240116; t=1711398333; c=relaxed/simple;
+	bh=cvAFTB5Fl4ABRm6q8gAQa76ykQI5qyDDvhFnu3Nlluc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=a81JH5PO/OdwiWvHN063ECWARF/AF+MPHgHh/0BLBRV8omhztdLDa7/nHnZhuRvIUklZwPTQUUelshp95vN39uD6pFPwnlVUzTbbDfcNjGfUGiSkIhpQbwtBbeUWLJX2Ck/Q+iCxnNcoXWyPD8fkbItL+5IAc816tu8Tg3OtpyA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=A40rn+OK; arc=none smtp.client-ip=52.95.49.90
+	 MIME-Version:Content-Type; b=rCoziSIazAKc1fUsbLurwS7wQBDT1oeXdNaqt8rn14xCz6ovxD1YujwX08j+gC7d2R4vE/adXMdkciixpYFrklTk6hH398Pao6zEbSeLXxYsJZ1GaYbFVlembM1hXsRJw2kjcGZ9e2rtpMyyoAEPgCWgiqEYSDp2fVpY9u6kqRw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=WU3n53h8; arc=none smtp.client-ip=72.21.196.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1711398307; x=1742934307;
+  t=1711398332; x=1742934332;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Asgho1UWYenYA2GErEKKF8xNZYxLWHCdH/1HGwxHS7Y=;
-  b=A40rn+OKjTdjaq3B8kcyc2ZUFEP5wjB+5+rejPUtk8J66hf+kRl9AkwD
-   iVcpjPg52VoHFHKw4yYkfB93Tj4CefwdcB84cAl1BfQeOvdxg13kKJ8AP
-   6Mw8xTo86Uhva1zWiY5ygFToNICW6pqd0VuRA+rcAZGgBYQCDB4AZq1V+
+  bh=G1uch6QHxqxni8gJ+VBi5uykeMpQSVHkOLmEZAqaNWs=;
+  b=WU3n53h8wFFfz4wkpkGmuZRGQWw7gGf6nMvdHtHJ8kf05WeRtNFm+FUx
+   g9RgmqMfsE4nN8taaXDhg1mMI3GCEHxFot4K9NroQAgMaFtaiqtUJgyFT
+   EgGgqpiC3UxmG2EXsDKC9Hw3GRbmyXvLEx0LuBGnssi5LdlY8UCO8QgqE
    I=;
 X-IronPort-AV: E=Sophos;i="6.07,154,1708387200"; 
-   d="scan'208";a="395948054"
+   d="scan'208";a="390419938"
 Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 20:25:04 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:43025]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.3.112:2525] with esmtp (Farcaster)
- id 96be7fbe-66ed-4f8a-ac86-6719e46955b8; Mon, 25 Mar 2024 20:25:02 +0000 (UTC)
-X-Farcaster-Flow-ID: 96be7fbe-66ed-4f8a-ac86-6719e46955b8
+  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 20:25:28 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:28254]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.58.246:2525] with esmtp (Farcaster)
+ id 23061839-1b53-47ca-8bc1-56d281280c32; Mon, 25 Mar 2024 20:25:26 +0000 (UTC)
+X-Farcaster-Flow-ID: 23061839-1b53-47ca-8bc1-56d281280c32
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 25 Mar 2024 20:25:02 +0000
+ 15.2.1258.28; Mon, 25 Mar 2024 20:25:26 +0000
 Received: from 88665a182662.ant.amazon.com (10.187.171.62) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Mon, 25 Mar 2024 20:25:00 +0000
+ 15.2.1258.28; Mon, 25 Mar 2024 20:25:24 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
 	<pabeni@redhat.com>
 CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v5 net-next 01/15] af_unix: Allocate struct unix_vertex for each inflight AF_UNIX fd.
-Date: Mon, 25 Mar 2024 13:24:11 -0700
-Message-ID: <20240325202425.60930-2-kuniyu@amazon.com>
+Subject: [PATCH v5 net-next 02/15] af_unix: Allocate struct unix_edge for each inflight AF_UNIX fd.
+Date: Mon, 25 Mar 2024 13:24:12 -0700
+Message-ID: <20240325202425.60930-3-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240325202425.60930-1-kuniyu@amazon.com>
 References: <20240325202425.60930-1-kuniyu@amazon.com>
@@ -77,204 +77,115 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D039UWA001.ant.amazon.com (10.13.139.110) To
+X-ClientProxiedBy: EX19D038UWB003.ant.amazon.com (10.13.139.157) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-We will replace the garbage collection algorithm for AF_UNIX, where
-we will consider each inflight AF_UNIX socket as a vertex and its file
-descriptor as an edge in a directed graph.
+As with the previous patch, we preallocate to skb's scm_fp_list an
+array of struct unix_edge in the number of inflight AF_UNIX fds.
 
-This patch introduces a new struct unix_vertex representing a vertex
-in the graph and adds its pointer to struct unix_sock.
+There we just preallocate memory and do not use immediately because
+sendmsg() could fail after this point.  The actual use will be in
+the next patch.
 
-When we send a fd using the SCM_RIGHTS message, we allocate struct
-scm_fp_list to struct scm_cookie in scm_fp_copy().  Then, we bump
-each refcount of the inflight fds' struct file and save them in
-scm_fp_list.fp.
+When we queue skb with inflight edges, we will set the inflight
+socket's unix_sock as unix_edge->predecessor and the receiver's
+unix_sock as successor, and then we will link the edge to the
+inflight socket's unix_vertex.edges.
 
-After that, unix_attach_fds() inexplicably clones scm_fp_list of
-scm_cookie and sets it to skb.  (We will remove this part after
-replacing GC.)
-
-Here, we add a new function call in unix_attach_fds() to preallocate
-struct unix_vertex per inflight AF_UNIX fd and link each vertex to
-skb's scm_fp_list.vertices.
-
-When sendmsg() succeeds later, if the socket of the inflight fd is
-still not inflight yet, we will set the preallocated vertex to struct
-unix_sock.vertex and link it to a global list unix_unvisited_vertices
-under spin_lock(&unix_gc_lock).
-
-If the socket is already inflight, we free the preallocated vertex.
-This is to avoid taking the lock unnecessarily when sendmsg() could
-fail later.
-
-In the following patch, we will similarly allocate another struct
-per edge, which will finally be linked to the inflight socket's
-unix_vertex.edges.
-
-And then, we will count the number of edges as unix_vertex.out_degree.
+Note that we set NULL to cloned scm_fp_list.edges in scm_fp_dup()
+so that MSG_PEEK does not change the shape of the directed graph.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/af_unix.h |  9 +++++++++
- include/net/scm.h     |  3 +++
- net/core/scm.c        |  7 +++++++
- net/unix/af_unix.c    |  6 ++++++
- net/unix/garbage.c    | 38 ++++++++++++++++++++++++++++++++++++++
- 5 files changed, 63 insertions(+)
+ include/net/af_unix.h | 6 ++++++
+ include/net/scm.h     | 5 +++++
+ net/core/scm.c        | 2 ++
+ net/unix/garbage.c    | 6 ++++++
+ 4 files changed, 19 insertions(+)
 
 diff --git a/include/net/af_unix.h b/include/net/af_unix.h
-index 627ea8e2d915..c270877a5256 100644
+index c270877a5256..55c4abc26a71 100644
 --- a/include/net/af_unix.h
 +++ b/include/net/af_unix.h
-@@ -22,9 +22,17 @@ extern unsigned int unix_tot_inflight;
+@@ -33,6 +33,12 @@ struct unix_vertex {
+ 	unsigned long out_degree;
+ };
  
- void unix_inflight(struct user_struct *user, struct file *fp);
- void unix_notinflight(struct user_struct *user, struct file *fp);
-+int unix_prepare_fpl(struct scm_fp_list *fpl);
-+void unix_destroy_fpl(struct scm_fp_list *fpl);
- void unix_gc(void);
- void wait_for_unix_gc(struct scm_fp_list *fpl);
- 
-+struct unix_vertex {
-+	struct list_head edges;
-+	struct list_head entry;
-+	unsigned long out_degree;
++struct unix_edge {
++	struct unix_sock *predecessor;
++	struct unix_sock *successor;
++	struct list_head vertex_entry;
 +};
 +
  struct sock *unix_peer_get(struct sock *sk);
  
  #define UNIX_HASH_MOD	(256 - 1)
-@@ -62,6 +70,7 @@ struct unix_sock {
- 	struct path		path;
- 	struct mutex		iolock, bindlock;
- 	struct sock		*peer;
-+	struct unix_vertex	*vertex;
- 	struct list_head	link;
- 	unsigned long		inflight;
- 	spinlock_t		lock;
 diff --git a/include/net/scm.h b/include/net/scm.h
-index 92276a2c5543..e34321b6e204 100644
+index e34321b6e204..5f5154e5096d 100644
 --- a/include/net/scm.h
 +++ b/include/net/scm.h
-@@ -27,6 +27,9 @@ struct scm_fp_list {
+@@ -23,12 +23,17 @@ struct scm_creds {
+ 	kgid_t	gid;
+ };
+ 
++#ifdef CONFIG_UNIX
++struct unix_edge;
++#endif
++
+ struct scm_fp_list {
  	short			count;
  	short			count_unix;
  	short			max;
-+#ifdef CONFIG_UNIX
-+	struct list_head	vertices;
-+#endif
+ #ifdef CONFIG_UNIX
+ 	struct list_head	vertices;
++	struct unix_edge	*edges;
+ #endif
  	struct user_struct	*user;
  	struct file		*fp[SCM_MAX_FD];
- };
 diff --git a/net/core/scm.c b/net/core/scm.c
-index 9cd4b0a01cd6..87dfec1c3378 100644
+index 87dfec1c3378..1bcc8a2d65e3 100644
 --- a/net/core/scm.c
 +++ b/net/core/scm.c
-@@ -89,6 +89,9 @@ static int scm_fp_copy(struct cmsghdr *cmsg, struct scm_fp_list **fplp)
- 		fpl->count_unix = 0;
+@@ -90,6 +90,7 @@ static int scm_fp_copy(struct cmsghdr *cmsg, struct scm_fp_list **fplp)
  		fpl->max = SCM_MAX_FD;
  		fpl->user = NULL;
-+#if IS_ENABLED(CONFIG_UNIX)
-+		INIT_LIST_HEAD(&fpl->vertices);
-+#endif
+ #if IS_ENABLED(CONFIG_UNIX)
++		fpl->edges = NULL;
+ 		INIT_LIST_HEAD(&fpl->vertices);
+ #endif
  	}
- 	fpp = &fpl->fp[fpl->count];
- 
-@@ -376,8 +379,12 @@ struct scm_fp_list *scm_fp_dup(struct scm_fp_list *fpl)
- 	if (new_fpl) {
- 		for (i = 0; i < fpl->count; i++)
- 			get_file(fpl->fp[i]);
-+
+@@ -383,6 +384,7 @@ struct scm_fp_list *scm_fp_dup(struct scm_fp_list *fpl)
  		new_fpl->max = new_fpl->count;
  		new_fpl->user = get_uid(fpl->user);
-+#if IS_ENABLED(CONFIG_UNIX)
-+		INIT_LIST_HEAD(&new_fpl->vertices);
-+#endif
+ #if IS_ENABLED(CONFIG_UNIX)
++		new_fpl->edges = NULL;
+ 		INIT_LIST_HEAD(&new_fpl->vertices);
+ #endif
  	}
- 	return new_fpl;
- }
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index 5b41e2321209..a3b25d311560 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -980,6 +980,7 @@ static struct sock *unix_create1(struct net *net, struct socket *sock, int kern,
- 	sk->sk_destruct		= unix_sock_destructor;
- 	u = unix_sk(sk);
- 	u->inflight = 0;
-+	u->vertex = NULL;
- 	u->path.dentry = NULL;
- 	u->path.mnt = NULL;
- 	spin_lock_init(&u->lock);
-@@ -1805,6 +1806,9 @@ static int unix_attach_fds(struct scm_cookie *scm, struct sk_buff *skb)
- 	for (i = scm->fp->count - 1; i >= 0; i--)
- 		unix_inflight(scm->fp->user, scm->fp->fp[i]);
- 
-+	if (unix_prepare_fpl(UNIXCB(skb).fp))
-+		return -ENOMEM;
-+
- 	return 0;
- }
- 
-@@ -1815,6 +1819,8 @@ static void unix_detach_fds(struct scm_cookie *scm, struct sk_buff *skb)
- 	scm->fp = UNIXCB(skb).fp;
- 	UNIXCB(skb).fp = NULL;
- 
-+	unix_destroy_fpl(scm->fp);
-+
- 	for (i = scm->fp->count - 1; i >= 0; i--)
- 		unix_notinflight(scm->fp->user, scm->fp->fp[i]);
- }
 diff --git a/net/unix/garbage.c b/net/unix/garbage.c
-index fa39b6265238..75bdf66b81df 100644
+index 75bdf66b81df..f31917683288 100644
 --- a/net/unix/garbage.c
 +++ b/net/unix/garbage.c
-@@ -101,6 +101,44 @@ struct unix_sock *unix_get_socket(struct file *filp)
- 	return NULL;
+@@ -127,6 +127,11 @@ int unix_prepare_fpl(struct scm_fp_list *fpl)
+ 		list_add(&vertex->entry, &fpl->vertices);
+ 	}
+ 
++	fpl->edges = kvmalloc_array(fpl->count_unix, sizeof(*fpl->edges),
++				    GFP_KERNEL_ACCOUNT);
++	if (!fpl->edges)
++		goto err;
++
+ 	return 0;
+ 
+ err:
+@@ -136,6 +141,7 @@ int unix_prepare_fpl(struct scm_fp_list *fpl)
+ 
+ void unix_destroy_fpl(struct scm_fp_list *fpl)
+ {
++	kvfree(fpl->edges);
+ 	unix_free_vertices(fpl);
  }
  
-+static void unix_free_vertices(struct scm_fp_list *fpl)
-+{
-+	struct unix_vertex *vertex, *next_vertex;
-+
-+	list_for_each_entry_safe(vertex, next_vertex, &fpl->vertices, entry) {
-+		list_del(&vertex->entry);
-+		kfree(vertex);
-+	}
-+}
-+
-+int unix_prepare_fpl(struct scm_fp_list *fpl)
-+{
-+	struct unix_vertex *vertex;
-+	int i;
-+
-+	if (!fpl->count_unix)
-+		return 0;
-+
-+	for (i = 0; i < fpl->count_unix; i++) {
-+		vertex = kmalloc(sizeof(*vertex), GFP_KERNEL);
-+		if (!vertex)
-+			goto err;
-+
-+		list_add(&vertex->entry, &fpl->vertices);
-+	}
-+
-+	return 0;
-+
-+err:
-+	unix_free_vertices(fpl);
-+	return -ENOMEM;
-+}
-+
-+void unix_destroy_fpl(struct scm_fp_list *fpl)
-+{
-+	unix_free_vertices(fpl);
-+}
-+
- DEFINE_SPINLOCK(unix_gc_lock);
- unsigned int unix_tot_inflight;
- static LIST_HEAD(gc_candidates);
 -- 
 2.30.2
 
