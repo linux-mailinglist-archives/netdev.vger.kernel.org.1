@@ -1,143 +1,110 @@
-Return-Path: <netdev+bounces-81464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8322C889F21
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:26:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 293FE889F27
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:27:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D71D2C63A0
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 12:26:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BED0A1F379F4
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 12:27:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20A2D13C908;
-	Mon, 25 Mar 2024 07:31:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F17C915F3F8;
+	Mon, 25 Mar 2024 07:31:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ar8yyvqi"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE5C143C45;
-	Mon, 25 Mar 2024 03:34:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95BB618786F;
+	Mon, 25 Mar 2024 03:44:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711337702; cv=none; b=p6QfApu4PJwr1NJnsAokuJgCc+NXUif/8ggc9UHjGO7pMw1V10bn6Bg+XHJCymCBQ6TarqMCQf0mb22bD9ivQr8FQZ4/T5kVNXsNqA0ifkmGA9EAokFIdsmimagxVWS4rL8BlV+h9WGAlQWTkjRcL8nPKZew/Aeu01fOupYwjP0=
+	t=1711338242; cv=none; b=mVeL9UTqCy03rCFEo61TBJDoTq0xF6ZHO8Z+5c7VEavo1vJCFnP4Tws3ICi+xJpYUUUDGJxC9w/8UycnXJrHmolQ7OQ2HgEWEnfZVTRJ+Km3RcXBnbH2/w/arig12qJSiOIEROlz4nrsnqpRD6JYEKDFeed+u9uYb5Fwuo8pIk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711337702; c=relaxed/simple;
-	bh=0csUpLdZcAisR9lZiWaOn5cqz5pVHfZLbcc0vjP850c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=Q8I4bFttI8Yt2bAdbdvcRwDmHyhI+a+wL4A0PyDkptdXoAIqyLKqyeU+50m9SRfZ/zyTT/DbPfocyHc+/Mufn4FnOb/prI6mHQwaretV/Jt5GLyWq2yN1GkxDCaBc+5iotn39eTP/Np1odDRoBdkw8A/N5LJTgAGBKasBBXY1rg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4V2z596SQNzXjdf;
-	Mon, 25 Mar 2024 11:32:13 +0800 (CST)
-Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
-	by mail.maildlp.com (Postfix) with ESMTPS id 87F6D14037F;
-	Mon, 25 Mar 2024 11:34:57 +0800 (CST)
-Received: from [10.174.178.66] (10.174.178.66) by
- dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 25 Mar 2024 11:34:56 +0800
-Message-ID: <30820fc2-4d98-651d-fb17-a3f2a05ba3ee@huawei.com>
-Date: Mon, 25 Mar 2024 11:34:56 +0800
+	s=arc-20240116; t=1711338242; c=relaxed/simple;
+	bh=teH38ASE4B1X90x37Shf8/P2G9yTLfaBtfwsGauPHPg=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PVsKRlzrzd6myRgfDMYND46vEP36mxQ9SdbFS2VMYu322aomskKqM4O+sHQjJaK3jP8/r2WXw0DkPwqlClEdznrG7Ik4/XEPI18v0ISG/CIiJX/PBXFXxn5G3VYF3mPJC6BoIxjSVnS1lR0pitsUYHNLQBv0gcktwgN0+jhVgG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ar8yyvqi; arc=none smtp.client-ip=209.85.210.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-6e682dbd84bso2474731a34.0;
+        Sun, 24 Mar 2024 20:44:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711338239; x=1711943039; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5XFLppo36Umvbtpc8RsHxYQfKcPgDsuGoxP0BP41l1g=;
+        b=ar8yyvqi1b9wz5VLzRHyMv1jub22l1k5pzDNjasIRX1xL3uxG0OnK0Wz95ptgJrDbm
+         DiZFL5iANzB5GgbEtV77KREpZH21wvlIHodtwWi4ch6O5+UE9w+8h7VpJ6AlsU/EnJnH
+         SdAMOsC47QAwfFZvgCAsP/SRtTkFJ2ckNulrlbaIjGvUqogXB4bdFd1J4F0u0K0hxO8l
+         5/62sEFueNYFPjZpbLZ/ik3Sragdtxw2OKrXe3iYB2DQvHmpBH0Rh36rlHwffkayucDu
+         Uml1rKQ4cgl+frHkHDQYgwZU4DPgFScCS0GP/ixD/ZKrh+YeQRVShb3lny4YQXrF24N7
+         CBIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711338239; x=1711943039;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5XFLppo36Umvbtpc8RsHxYQfKcPgDsuGoxP0BP41l1g=;
+        b=DnIKi2rZixDNTq7eeHskBzzD7sduHgFk4pAczLivduP9K2C2Y0yl6CNwFfEN4WXtl7
+         JyqMSxRUEumXUZBCP7caAH865MqdavNZRKH8fnjoikXcfJ8oKehTBx4uFrg+GMF+rXqy
+         Lr+7RZ6xNZODDUG/wkS9X4T9DAoMHCZVs5hnIuf1BD680Vqe+RO8FDdwzEPjZcf2whwL
+         T2fCAmGFLDeou3PJWTMIolxVnln1m6JfN+zgJceyNtTUdWSww/VrAon2uQyYo2fPSQqq
+         o7MiZd+k/SDE2lSf++8qOPJW00UxKbakF15uL/5W4j3a59+EDxzzycN0mDikqFElcf4h
+         /92Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUodisD9AR4Mp4MfaW8lQwlO6HAEFrwWgVjGAU3yDxLxV0kAl6W0+C3euDUgb+W6GXGzfDZwvgTL7ubcd1Um9B249684ZRZVSjVvNrZGOc3flTJ
+X-Gm-Message-State: AOJu0Yzz2iTE054IKszInnZI6sBE8t+YAMZ24UY/mVJans4qYMzdTagt
+	9RAP7LWOnA20ORaWakAjIeJtR8xVFNCHrkSEVWlAzqE/jwo/I9zb
+X-Google-Smtp-Source: AGHT+IHmYixcHV8K+3RjwVIoS1UeugbmyXSvhC1Y0NyEdKEFU/YXPCpy5uXz876h4cUN0hTlTyZI8w==
+X-Received: by 2002:a05:6870:6108:b0:221:9414:4519 with SMTP id s8-20020a056870610800b0022194144519mr7298644oae.46.1711338239656;
+        Sun, 24 Mar 2024 20:43:59 -0700 (PDT)
+Received: from KERNELXING-MB0.tencent.com ([43.132.141.20])
+        by smtp.gmail.com with ESMTPSA id fk26-20020a056a003a9a00b006e6bf17ba8asm3300045pfb.65.2024.03.24.20.43.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 24 Mar 2024 20:43:59 -0700 (PDT)
+From: Jason Xing <kerneljasonxing@gmail.com>
+To: edumazet@google.com,
+	mhiramat@kernel.org,
+	mathieu.desnoyers@efficios.com,
+	rostedt@goodmis.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org,
+	kerneljasonxing@gmail.com,
+	Jason Xing <kernelxing@tencent.com>
+Subject: [PATCH net-next 0/3] trace: use TP_STORE_ADDRS macro
+Date: Mon, 25 Mar 2024 11:43:44 +0800
+Message-Id: <20240325034347.19522-1-kerneljasonxing@gmail.com>
+X-Mailer: git-send-email 2.33.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.0.2
-Subject: Re: [PATCH net-next] net/smc: make smc_hash_sk/smc_unhash_sk static
-To: Tony Lu <tonylu@linux.alibaba.com>
-CC: <netdev@vger.kernel.org>, <linux-s390@vger.kernel.org>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <wenjia@linux.ibm.com>, <jaka@linux.ibm.com>,
-	<alibuda@linux.alibaba.com>, <guwen@linux.alibaba.com>,
-	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>
-References: <20240325012501.709009-1-shaozhengchao@huawei.com>
- <ZgDsX8-NmJZ1KWfQ@TONYMAC-ALIBABA.local>
-From: shaozhengchao <shaozhengchao@huawei.com>
-In-Reply-To: <ZgDsX8-NmJZ1KWfQ@TONYMAC-ALIBABA.local>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpeml500026.china.huawei.com (7.185.36.106)
+Content-Transfer-Encoding: 8bit
 
+From: Jason Xing <kernelxing@tencent.com>
 
+Using the macro for other tracepoints use to be more concise.
+No functional change.
 
-On 2024/3/25 11:15, Tony Lu wrote:
-> On Mon, Mar 25, 2024 at 09:25:01AM +0800, Zhengchao Shao wrote:
->> smc_hash_sk and smc_unhash_sk are only used in af_smc.c, so make them
->> static and remove the output symbol. They can be called under the path
->> .prot->hash()/unhash().
->>
->> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> 
-Hi Tony:
-	Thanks for the heads-up. I'll send it again until net-next open.
+Jason Xing (3):
+  trace: move to TP_STORE_ADDRS related macro to net_probe_common.h
+  trace: use TP_STORE_ADDRS() macro in inet_sk_error_report()
+  trace: use TP_STORE_ADDRS() macro in inet_sock_set_state()
 
-Zhengchao Shao
+ include/trace/events/net_probe_common.h | 29 ++++++++++++++++++++
+ include/trace/events/sock.h             | 35 ++++---------------------
+ include/trace/events/tcp.h              | 29 --------------------
+ 3 files changed, 34 insertions(+), 59 deletions(-)
 
-> This patch's good. The net-next is still closed for now. You can check
-> here:
-> 
-> 	https://patchwork.hopto.org/net-next.html
-> 
-> Tony Lu
-> 
->> ---
->>   include/net/smc.h | 3 ---
->>   net/smc/af_smc.c  | 6 ++----
->>   2 files changed, 2 insertions(+), 7 deletions(-)
->>
->> diff --git a/include/net/smc.h b/include/net/smc.h
->> index c9dcb30e3fd9..10684d0a33df 100644
->> --- a/include/net/smc.h
->> +++ b/include/net/smc.h
->> @@ -26,9 +26,6 @@ struct smc_hashinfo {
->>   	struct hlist_head ht;
->>   };
->>   
->> -int smc_hash_sk(struct sock *sk);
->> -void smc_unhash_sk(struct sock *sk);
->> -
->>   /* SMCD/ISM device driver interface */
->>   struct smcd_dmb {
->>   	u64 dmb_tok;
->> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
->> index 4b52b3b159c0..e8dcd28a554c 100644
->> --- a/net/smc/af_smc.c
->> +++ b/net/smc/af_smc.c
->> @@ -177,7 +177,7 @@ static struct smc_hashinfo smc_v6_hashinfo = {
->>   	.lock = __RW_LOCK_UNLOCKED(smc_v6_hashinfo.lock),
->>   };
->>   
->> -int smc_hash_sk(struct sock *sk)
->> +static int smc_hash_sk(struct sock *sk)
->>   {
->>   	struct smc_hashinfo *h = sk->sk_prot->h.smc_hash;
->>   	struct hlist_head *head;
->> @@ -191,9 +191,8 @@ int smc_hash_sk(struct sock *sk)
->>   
->>   	return 0;
->>   }
->> -EXPORT_SYMBOL_GPL(smc_hash_sk);
->>   
->> -void smc_unhash_sk(struct sock *sk)
->> +static void smc_unhash_sk(struct sock *sk)
->>   {
->>   	struct smc_hashinfo *h = sk->sk_prot->h.smc_hash;
->>   
->> @@ -202,7 +201,6 @@ void smc_unhash_sk(struct sock *sk)
->>   		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
->>   	write_unlock_bh(&h->lock);
->>   }
->> -EXPORT_SYMBOL_GPL(smc_unhash_sk);
->>   
->>   /* This will be called before user really release sock_lock. So do the
->>    * work which we didn't do because of user hold the sock_lock in the
->> -- 
->> 2.34.1
+-- 
+2.37.3
+
 
