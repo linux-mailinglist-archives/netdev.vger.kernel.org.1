@@ -1,224 +1,227 @@
-Return-Path: <netdev+bounces-81476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7BDF889F8D
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:32:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D5BA889F93
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:32:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F7B72E025C
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 12:32:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40D611C35E08
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 12:32:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EFDA1769E5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6378D176A18;
 	Mon, 25 Mar 2024 07:31:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XNPcrKOi"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="C8gY+sUB";
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="oKAa+QEj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E4A5181309
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 07:10:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711350657; cv=none; b=K37XNHIHODAYfoqJyH2gEggPlPFd1oHPDQchhlCt+1oSUaFExZSliieMluUjJ4DEFN4z0C5W9z7hTcQEwpmfU8WNNTwKFA3Tno9Kig1mYBEQE7lCVJf7VvCo2VhnPhoD5uZxkzKMmv8gSih7qDvs7Ocj30KC3cliWDewymU8Stg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711350657; c=relaxed/simple;
-	bh=VDqqc4FaS3nqEG410984TzqLk1OgwsUduElIlSglyJM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kTik3eH5SpM1J8QAaSAu/rRRBotqxo/hY3TVY/TVnkdovj95ZXLXSldjCo2bp77s/4aFOEE7hiay2DqMeiO7Lz7f7NGOP109vYh3hz7HEtDzpYl3GEqRCY0Bpr8evARBSaPNSxB0ziUxzIf9KW8yqg1jA0ShCz/ygIwKwvp4RQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XNPcrKOi; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1711350655;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=p3FtN9QE0Nl7sj3xGWxMvMJxRPeJKkkDH54Kwbx0i5I=;
-	b=XNPcrKOinux2kpXcr5XKhQC6/LB1gMAxCLeuWB/zCE2w9JM1ILp2tPr0q0YhLchU3zog//
-	sGVw+zTkKIR36AzdL9Oyr5j3LDTMllgSHtc1iW2R7FwYB3nh17mi/M5LyTboLnSf/vEMmq
-	VXiIMs59Xs9wKRB3X0j6ZLHXYi1DNgM=
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com
- [209.85.215.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-303-DPF8vB_bOpu8y1OE8mPjGg-1; Mon, 25 Mar 2024 03:10:53 -0400
-X-MC-Unique: DPF8vB_bOpu8y1OE8mPjGg-1
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-5cf555b2a53so2755191a12.1
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 00:10:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711350652; x=1711955452;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=p3FtN9QE0Nl7sj3xGWxMvMJxRPeJKkkDH54Kwbx0i5I=;
-        b=X/OTU9iZFeLIRk4jPGHpOEBUu7E+jK9EUedBcPU3gTUzPmu6DP/aB7aEuoZIck828h
-         GUTidzzFPJsz1Slo6cjfnV0lJPtNflXTMcXtjlIJrmhLzpCr/M87ZgFSX8viUq8qNx7a
-         MhjZIMRd9FBogviDysSy+7F4Ez5iStx4LlcTf8CN6+JlPcITO1OC9TykMwkDqZkALOv8
-         ySxwXnBCbroHqaixZJ1ZovAjnf6/BZ2TM1+1T1j+FObzknV2aeOBnfM3YLtf9O7Mk8wo
-         IUFFnEKvweYQ/FxC3JA3K6l4ogwWAeFvzbVIb/q1G8OkYnJcJS6breAVdJiy1c4JZirK
-         v/Ew==
-X-Forwarded-Encrypted: i=1; AJvYcCUI67LWdGlKZkAdnZxpmalO6QS57lZl5hp+CYvnR64am4EST0ZutJ5khg3qnd1HYi9hejg5LO6iOkTWsXUAB+7IBrMEFJpb
-X-Gm-Message-State: AOJu0YwfcVFZHP2G/jqBBgRxk++Ty8hKuXiY81M/L+c/8TyQ5Ok6AN4o
-	FDGvfBbOuQjA4JIHXs0ntiU3H//QQvgxB2SBNkvaVkcuw4U8AcofEBTIpA17Z1Rud29cqfwyeAP
-	FBHem9QgkFa4j/QvZ+RLGmxixSO4CbKH4po33pTC78sQcutLIwx7LHP60cLLMwRGBV2ZlLSnZWz
-	xd0pavsJ/H6U6+55Rds7CpAyoQ4vEqLuwt1Yxi
-X-Received: by 2002:a17:903:2ad0:b0:1e0:188c:ad4f with SMTP id lw16-20020a1709032ad000b001e0188cad4fmr7647661plb.26.1711350651805;
-        Mon, 25 Mar 2024 00:10:51 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGryY0YwWrPcst5KxEzpJoy49ptg72bCQ1X4IHF3d4AYLcbOYwvZO8qUUvQddrOyR4NNHcKKNV1UBmnZjG7XvE=
-X-Received: by 2002:a17:903:2ad0:b0:1e0:188c:ad4f with SMTP id
- lw16-20020a1709032ad000b001e0188cad4fmr7647643plb.26.1711350651504; Mon, 25
- Mar 2024 00:10:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E12A181490;
+	Mon, 25 Mar 2024 07:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=68.232.153.233
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711350680; cv=fail; b=SuBV7/8JYOY/falPDosJFHWdjNBpX0iNSRiNgpf3jQsC6xKeDlmT3+9sgXYBHeGeTL8mbcHKwFDeyZyx2d/T+wJo4GX7C7OFSJPFnTclzIH6OjaymNGTimY4qIg+NtcKgiHbrqTLJTasxpuKZ5pc+flNFvI7C+NcuQNWkgrqIIM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711350680; c=relaxed/simple;
+	bh=7LloCdrMGLGxRS9RhEW2FsKQJ/xPgZEw7WIwkPx77KI=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=PBv3b6Bzrk3MriZ53R8IYkuco7ej/ejB7U//+C/HX0WV6U6WGiRocSt19IPnAzn3uEldTaMUkR53paCZXiX2RcnAcurVUwh3stbeD0bIt9OnzVZp7cKj7a1Myenl5n+NTnELJm6CSVs4R2/1qXQMBFMcbRvvuRsABkGd2358L5I=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=C8gY+sUB; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=oKAa+QEj; arc=fail smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1711350677; x=1742886677;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=7LloCdrMGLGxRS9RhEW2FsKQJ/xPgZEw7WIwkPx77KI=;
+  b=C8gY+sUBwCB4tooDirjB7QjQT9n7cerYitWVmrVx2LCKyT8FS9BRnciR
+   SoEbW6zoC1intt29xwrFeHVeGNVLBblNU+/m+VUGHWMs0c4gOE+37Nsc4
+   qrn5GFwG+BB0ELlLNnhmLl/gzkX1hRhE5Qv28UNmldboWZePlKIk7Dut8
+   k3Wh+2reNwX+MfnKI/P5KlAPtPO5qyNAojWBvVKqUd3GuFOO+zoVQCQSa
+   +aCRvQXGtlnWoa62cm3WH28rgZwRIv9OmvhlpfRkatogo/0OPhHcJ4kNn
+   ZyBfRdde+0XgwctZ+evT13Z8+8LqQaZ/bxsCW+7UPvEQLlrt6JyH4mNDG
+   g==;
+X-CSE-ConnectionGUID: SQLTIg0QTKWesyXjKIcpDQ==
+X-CSE-MsgGUID: xd5dY/dlRPGNiw0lK/ZspQ==
+X-IronPort-AV: E=Sophos;i="6.07,152,1708412400"; 
+   d="scan'208";a="19925603"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 25 Mar 2024 00:11:09 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 25 Mar 2024 00:10:49 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (10.10.215.250)
+ by email.microchip.com (10.10.87.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Mon, 25 Mar 2024 00:10:49 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=R1k5HVy2o5r1Wfo9YaamtDaH0AFbyYaqJPisTDsQ73OH4G+CkV5yJIVSdhmjXykuq+fDQUxz+FXFuQ1sUupXwjDixk13GjF3FciM3ScbOD39Gozw7++TM4S5k+SgGUJ2vGFYAkweI+NAWTbxx8egpnaT9mSt/m1MoF28p+VpQne2o4tjqdq8sn9VACJ7n/tBY/IFqJdlJOCEp1+A4EaqajTrNzSLbbFAcARDAq3tpW4Iqb0xft39HagreD65iRxMfUt7zwdwS4+qPpeeGkI8o/HNG8HSa8vv4lbIa0zPpKkJ9Cs6j3+VXyvWmeJo87Z0eJrzS3MVOF4MQ6GkGlWKwQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7LloCdrMGLGxRS9RhEW2FsKQJ/xPgZEw7WIwkPx77KI=;
+ b=jzVc+hQiibCaRcg5lVTV7H48AX5Q0HFbrSpwZNmFpJohBovRKZkoGkDykT4jZ4pVC5cgVvIOg3Y2ibYP1CokVheKLffeW1KP/ljAMLvj1oNm6D6v5npVDitBRG6DPes111X6+OMJ89HfyX/LmhWxnAq0MAcO1eme6uNQP7I5GZFMXZNzSZAM7S2jiEhJ7GT41iRY6A9KJFNMuq+jYoO7vzlqAUPW/azh5d7bKws7h8crMQJxBJgYKnKnbGvbdd5OnlvdhLAeRn6Yuu1xxDD46XH2T3DnXVGNVJrMhKSvW3jIXZzFD1aqOKZszQ4GzRZrKX6F1Uf4ARuvm45o8BsNZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7LloCdrMGLGxRS9RhEW2FsKQJ/xPgZEw7WIwkPx77KI=;
+ b=oKAa+QEjzu7dbPmyKUe3Ayglor7WPWF8ycF7oerBE5viQXmUGqFApbCoVNu7JDwn6/ga6GoCIJiJweHtKAd1N5c0uCcYDgeOG6yiZ/aEjKsiM9BE0e9BDg76C9WkExUkL7BNJ6ZRaOYndYO/+SAbZdqI0JoVObFOYq/6R7NUKhMm+zFJcv0W9Ygmw18GrKy3n+I9cVWWzef9Dx9MKdrpqCc3e2PPm7We9SGr49XKzpVHZohlaWn/+J7DFr4ovMWYb3GMc4CzY1Of6Bfu5V7RyYOps7H5/zQrUzcAREnP70wYMKafqVC9in++U9Xs3CaM2SzNOvNy91KepXeCE86Kfg==
+Received: from SA1PR11MB8278.namprd11.prod.outlook.com (2603:10b6:806:25b::19)
+ by SJ0PR11MB4880.namprd11.prod.outlook.com (2603:10b6:a03:2af::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.31; Mon, 25 Mar
+ 2024 07:10:47 +0000
+Received: from SA1PR11MB8278.namprd11.prod.outlook.com
+ ([fe80::f633:b9d4:f539:177d]) by SA1PR11MB8278.namprd11.prod.outlook.com
+ ([fe80::f633:b9d4:f539:177d%6]) with mapi id 15.20.7386.015; Mon, 25 Mar 2024
+ 07:10:46 +0000
+From: <Parthiban.Veerasooran@microchip.com>
+To: <krzysztof.kozlowski@linaro.org>, <conor@kernel.org>
+CC: <andrew@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <horms@kernel.org>,
+	<saeedm@nvidia.com>, <anthony.l.nguyen@intel.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <corbet@lwn.net>,
+	<linux-doc@vger.kernel.org>, <robh+dt@kernel.org>,
+	<krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+	<devicetree@vger.kernel.org>, <Horatiu.Vultur@microchip.com>,
+	<ruanjinjie@huawei.com>, <Steen.Hegelund@microchip.com>,
+	<vladimir.oltean@nxp.com>, <UNGLinuxDriver@microchip.com>,
+	<Thorsten.Kummermehr@microchip.com>, <Pier.Beruto@onsemi.com>,
+	<Selvamani.Rajagopal@onsemi.com>, <Nicolas.Ferre@microchip.com>,
+	<benjamin.bigler@bernformulastudent.ch>
+Subject: Re: [PATCH net-next v3 12/12] dt-bindings: net: add Microchip's
+ LAN865X 10BASE-T1S MACPHY
+Thread-Topic: [PATCH net-next v3 12/12] dt-bindings: net: add Microchip's
+ LAN865X 10BASE-T1S MACPHY
+Thread-Index: AQHab6Ox6ghenOTJpkWNbGLTwd03cbErBYYAgAAJFoCAAANkgIAVU1wAgAAUTICAAX1RAIAAAHgAgAA4LwCAADuQgIAA+O2AgAAKtoCAABfTgIABsrcAgALuiQA=
+Date: Mon, 25 Mar 2024 07:10:46 +0000
+Message-ID: <be68c2e3-a535-4d7d-8cf0-b7b48742f61a@microchip.com>
+References: <20240306085017.21731-1-Parthiban.Veerasooran@microchip.com>
+ <20240306085017.21731-13-Parthiban.Veerasooran@microchip.com>
+ <20240306-spree-islamist-957acf0ee368@spud>
+ <4c5968a3-c043-45fc-8fff-2a9eaa6de341@lunn.ch>
+ <20240306-ripeness-dimple-e360a031ccde@spud>
+ <05a9a7ee-e4f0-443e-9c8a-8ee649a11448@microchip.com>
+ <2f384a54-74a0-4a75-a325-8985257b5d66@linaro.org>
+ <ba37c212-fb98-407d-9bee-6d14801754d9@microchip.com>
+ <96493beb-afbf-42f2-88f0-ad645422ecdb@linaro.org>
+ <1735add6-4a6a-452b-bf26-1cf19c95493e@microchip.com>
+ <20240321-upcountry-finless-b0e9b1ab4deb@spud>
+ <13a28ba3-2da4-428c-8091-25e75c6c11e8@microchip.com>
+ <d41a53bd-ea1e-476a-a18c-ed51dbac0a98@linaro.org>
+ <b3c5d217-a5e3-4957-884c-02e8c10aba9d@microchip.com>
+ <703de50e-f271-4e65-bda4-85b1835afa6e@linaro.org>
+In-Reply-To: <703de50e-f271-4e65-bda4-85b1835afa6e@linaro.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla Thunderbird
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA1PR11MB8278:EE_|SJ0PR11MB4880:EE_
+x-ms-office365-filtering-correlation-id: 009e6683-4bb0-4877-6aad-08dc4c9ab1a6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: CFeMEhM2a56Brs6D0uwqhpqGysnhM7Lu5+zfkoolOljyQj8/BCYmCojLlRspN4GH9XxxpVNY35YKC7JVwsLx78wImYQdVRTTAbOjbuioltAzjJyaAEdjFvcRfiMJdsGA0KrvBfkTvoQsRJVTtNLs687JAtckNZg2svfO/k7GLYwMZLI0JwVTDOpWb1nfTNNRbi9Y2n9w0Iqsgmj4VAfXV3SoknnKv54OKlgJAd/O+4W56H2M+jb6BvscAH0xKglP/D4TPBbt2MA9Qn+398crcgnpLhlht5F/JRFz0pSgLPp//UFwdycjJIRAq5WQrx2HaSt4JaOwDidSHXa5WZ607ZQs5JlSXv4CPlTOOkIb50T+z3nDb3bycTASjLwygim7xQbpa1nmAVJ9nGORRQs92I3xccaCyYR5Qunzpn0RwpJx0i42qIssp7DmXYIEiYV2QVBdzv/U4bsvcrt8rFVCyCjOLHClhTSjo3gJWJqyLr20Qf8RciJ4rNuLbv3SqxyK7jKzn6gpS3MAV5ZVzR/AG6EWDBMFPwNprpeHCk3dxwQmhz4TQwhPv5yiE39cFUJYFat3HLsZHBywoMvBQxfCqG6wZpl/iRCFUBT/P5foYUMy2t4VdIb4nFwBMHBFes1gpRmBT5Hlwv2fDSxll00SkavtlG4+0f4JvFMUFO3FAb8n+wbtV8mOFwEeOvhwulazZpLa+VoAGchIDzDixdplhg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB8278.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(376005)(7416005)(1800799015)(38070700009);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?VjJrWUNXaGtmMmVBYjh3TzBmN2p3djNqaXExMXRGZ2huOGtETGVTb2hYQldF?=
+ =?utf-8?B?SDFyYUhCRVdtQktYRWx4MXdKKy9IbjdJajdvejEwKzJ0RVBkc3Y3N20zMnNG?=
+ =?utf-8?B?cDJXMEdacmNWN2Z2TzFkSWx5TkluQ0Y0M1NhZEdCY2pEbUF3T05zWHVzamJV?=
+ =?utf-8?B?WFI3VkxuaDVtUVk2QVlMT3JtWlJONHZ1SEdQOU50QjkrQkd2OThnSVRJeXBM?=
+ =?utf-8?B?d0xUNkoraWRSTncvRjlSU3lITVZuY2NPZGUwSTQwYUYvV0dZci9yM3IrN1NR?=
+ =?utf-8?B?M3IxK1QydHM0Wkt1eVBCY25BeWJTWkgxR3lJZmxERTlrajczajJNNDRzL3Fz?=
+ =?utf-8?B?TVYwSGtFZmJXUlVadzBEUlZ3TmgvdjNPOVVlSSszTG1tVFdhcERIaVdaeGZ0?=
+ =?utf-8?B?UStoTVRmMUoyM2x3WlNUWm5NaUVRZ2ZJOWVYZ3piazE4S24rbkFvK3praTVO?=
+ =?utf-8?B?UENJOEhmRldaLzhyazRoc2oyK3dNZmc5aG5nQUNodkRNRVlpNk9XalF5VU9Y?=
+ =?utf-8?B?d0F3MS9CM1VvSk9wbnpZTHM4MERmN0FCRGptOXdRcmlUNHdKU3VPU0M5Slo1?=
+ =?utf-8?B?WUpSb3o3N3FhU3hqM1lRbFl6Y2o3MXRlL0ZEd2dUbGdoZTJ3aXRQQ09LUFJo?=
+ =?utf-8?B?d1ZGUWdGQm1EWm1ENXhRd2JqUVNEV0pKZ3RXYU4xOForbGdJdXc3MERrTGk5?=
+ =?utf-8?B?WVdCQnNSWWpQVEVrQ3VyMnNRTzZORTZEMmZuck9DcGk0NCtiMUhlVGN3M0pS?=
+ =?utf-8?B?VVdHYjVtek8vN2dha254SXVzTTBtZUh1emNHN3hteE5vKzlQZlJtM3BvcTY5?=
+ =?utf-8?B?NThwTUpUNGVmR2J4Y1daQzhBNWpKY3FMWC9LVE5BcGVFYTlGVm9wSUpFblhs?=
+ =?utf-8?B?SXkyWGlBUjV1eVhEOE9SbXJkVy9lVHNQWlBSTEdnNzlYRHl3MVo4RnRMZ2ZT?=
+ =?utf-8?B?K0ROQ25WYmxKR1p6QmhtWkNPeUs2Q1QySi9IMVhSQjhCOFcyN0w2ZjJHSEFr?=
+ =?utf-8?B?ejZoQndnNDVjaGZBd2VwY3NPQUdIT255RDZmUWN0RWM2cTZ5TGtPOEYwVEpH?=
+ =?utf-8?B?TjJFL1dvQlNINHB6K2RlQUs5YnJNMWpWSGhiM00zL2VmZmZ0OFNvdEE2NXhP?=
+ =?utf-8?B?Q042WVIwRy83QzdLSUg3SmJYYlFrdUh4QXVDdmdXa0V0cGF4QjJhRGEyTEhk?=
+ =?utf-8?B?NnorMElqVW1tRy96U0FjR05SekZ3M2dacjJObWNXV3JYMmxhYkFOYTRERzho?=
+ =?utf-8?B?ZTN2M3NSN2E5WWM4endvZHR6WElXVXpvS2dPM01Ca04rbkpGY21YZGxqWTVv?=
+ =?utf-8?B?SEtnOVAyb2Q5cjVQRlhPNTBPL2l6U2V4VlRaM2NUenRKQnY2U0ZFUG8wMHNR?=
+ =?utf-8?B?WkhIQ1RRNG1mR0lsbXEvdnJtWXNiazNMSiszVWEwa09IMnhhc2dvVEdWY3kx?=
+ =?utf-8?B?ZlBhUlErem9hbjlNUVZiSVFUWStGQkVyUEQxLzZzUFlsbXJDQmViL0t1RVEw?=
+ =?utf-8?B?ODFjUlFpMHAxMmhGeFgvYmtwSmFWRVJNTXZXVWRGODAyYURGQll3cmZ3bFIz?=
+ =?utf-8?B?RkVYdThmKzVMejBZcjZaZFRXM1laNE5oV0hKc0xQSnBmWEZxUFZ5NWtuTjR5?=
+ =?utf-8?B?UkdoYi9NYmY2V3g2WUtDeG5iZ3VBaXRITGw3MmVMZXJ2d2ErZE1ydnVmMXJX?=
+ =?utf-8?B?LzhDTTBLTUFUUlNEZzRjclIyZHZvK0d3dzBpWk1PRDdLTG1YT3NoeWFNRUdC?=
+ =?utf-8?B?S29PWU5Od2RPUS94WkdpcUx3UnFxcW5SL1JRMlFidFlSODFqRi9laUtFZmRh?=
+ =?utf-8?B?dkUzbktLanpnWE9RUlRjeFRDQU1EQVVaK2dEcFdvUDJPWFhGWXMrRDJ1TDR6?=
+ =?utf-8?B?TFZ4VnErdUFHSUVDVFMrV2N6M2lSa1JaR3l1cnRQSGRKVGkwSm5mOUw2NHpJ?=
+ =?utf-8?B?Z2dSUnBGK1FvdnFOcjNvQW5BbHJQTTIvZFBDR3JOY1Q5RmhITllidmRKUEdh?=
+ =?utf-8?B?eC9aK05SaDRncS9SK25Sa0toZkFCKzZtazhZMzNPU0NHL1g5cldHQ0hybUxr?=
+ =?utf-8?B?K2RlNFlCbk04NnpyS1pHK1ZNU2o4NTVkZ1Rrd0JkUFRQNDZESTNhQkhkMmor?=
+ =?utf-8?B?b3NhSnNSVktobElBQnFJTHFuc2J1MEJhSkIxYmdEZkVEWG1ZRytlYlhkekd2?=
+ =?utf-8?B?WGc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <F390A5864B043243B8093EEFFE56F526@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240312033557.6351-1-xuanzhuo@linux.alibaba.com>
- <20240312033557.6351-11-xuanzhuo@linux.alibaba.com> <CACGkMEuM35+jDY3kQXtKNBFJi32+hVSnqDuOc2GVqX6L2hcafw@mail.gmail.com>
- <1711009281.7778504-3-xuanzhuo@linux.alibaba.com> <CACGkMEs+x8bObJ0Fr0LbkPzWqYSoU8Y8504=bqZtjux2T5-_Vg@mail.gmail.com>
- <1711087439.5923152-3-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1711087439.5923152-3-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 25 Mar 2024 15:10:39 +0800
-Message-ID: <CACGkMEsMJ+r6JfrHGnQVPeuEFzbWwqHxPgkxS8-SvzqG5VLiKw@mail.gmail.com>
-Subject: Re: [PATCH vhost v4 10/10] virtio_ring: virtqueue_set_dma_premapped
- support disable
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB8278.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 009e6683-4bb0-4877-6aad-08dc4c9ab1a6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Mar 2024 07:10:46.8724
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: e7mM6D1K3Nwi4QB1UfHU6aBRTx0uYiVOA+ilpBXdME+US9qu0/iDKFgpX+I4Re3LWvGMG79ObqO/jGmcAMH2ArGaj/LChj1AezM9JHkWo/1oblqHLGPkfJG4rciCxVAf
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4880
 
-On Fri, Mar 22, 2024 at 2:04=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
->
-> On Fri, 22 Mar 2024 13:13:36 +0800, Jason Wang <jasowang@redhat.com> wrot=
-e:
-> > On Thu, Mar 21, 2024 at 4:22=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
-ba.com> wrote:
-> > >
-> > > On Thu, 21 Mar 2024 14:02:14 +0800, Jason Wang <jasowang@redhat.com> =
-wrote:
-> > > > On Tue, Mar 12, 2024 at 11:36=E2=80=AFAM Xuan Zhuo <xuanzhuo@linux.=
-alibaba.com> wrote:
-> > > > >
-> > > > > Now, the API virtqueue_set_dma_premapped just support to
-> > > > > enable premapped mode.
-> > > > >
-> > > > > If we allow enabling the premapped dynamically, we should
-> > > > > make this API to support disable the premapped mode.
-> > > > >
-> > > > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > > > ---
-> > > > >  drivers/virtio/virtio_ring.c | 34 ++++++++++++++++++++++++++----=
-----
-> > > > >  include/linux/virtio.h       |  2 +-
-> > > > >  2 files changed, 27 insertions(+), 9 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio=
-_ring.c
-> > > > > index 34f4b2c0c31e..3bf69cae4965 100644
-> > > > > --- a/drivers/virtio/virtio_ring.c
-> > > > > +++ b/drivers/virtio/virtio_ring.c
-> > > > > @@ -2801,6 +2801,7 @@ EXPORT_SYMBOL_GPL(virtqueue_resize);
-> > > > >  /**
-> > > > >   * virtqueue_set_dma_premapped - set the vring premapped mode
-> > > > >   * @_vq: the struct virtqueue we're talking about.
-> > > > > + * @premapped: enable/disable the premapped mode.
-> > > > >   *
-> > > > >   * Enable the premapped mode of the vq.
-> > > > >   *
-> > > > > @@ -2819,9 +2820,10 @@ EXPORT_SYMBOL_GPL(virtqueue_resize);
-> > > > >   * 0: success.
-> > > > >   * -EINVAL: vring does not use the dma api, so we can not enable=
- premapped mode.
-> > > > >   */
-> > > > > -int virtqueue_set_dma_premapped(struct virtqueue *_vq)
-> > > > > +int virtqueue_set_dma_premapped(struct virtqueue *_vq, bool prem=
-apped)
-> > > >
-> > > > I think we need to document the requirement for calling this.
-> > > >
-> > > > Looking at the code, it seems it requires to stop the datapath and
-> > > > detach all the used buffers?
-> > >
-> > >
-> > > YES. The complete document is:
-> > >
-> > > /**
-> > >  * virtqueue_set_dma_premapped - set the vring premapped mode
-> > >  * @_vq: the struct virtqueue we're talking about.
-> > >  *
-> > >  * Enable the premapped mode of the vq.
-> > >  *
-> > >  * The vring in premapped mode does not do dma internally, so the dri=
-ver must
-> > >  * do dma mapping in advance. The driver must pass the dma_address th=
-rough
-> > >  * dma_address of scatterlist. When the driver got a used buffer from
-> > >  * the vring, it has to unmap the dma address.
-> > >  *
-> > >  * This function must be called immediately after creating the vq, or=
- after vq
-> > >  * reset, and before adding any buffers to it.
-> >
-> > I'm not sure this is a good design but we need at least some guard for
-> > this, probably WARN for num_added or others.
->
->
-> int virtqueue_set_dma_premapped(struct virtqueue *_vq)
-> {
->         struct vring_virtqueue *vq =3D to_vvq(_vq);
->         u32 num;
->
->         START_USE(vq);
->
->         num =3D vq->packed_ring ? vq->packed.vring.num : vq->split.vring.=
-num;
->
->         if (num !=3D vq->vq.num_free) {
->                 END_USE(vq);
->                 return -EINVAL;
->         }
->
->
-> Now, we have checked the num_free.
-
-Ok, let's add it to the doc.
-
-Thanks
-
->
-> Thanks.
->
->
-> >
-> > Thanks
-> >
-> > >  *
-> > >  * Caller must ensure we don't call this with other virtqueue operati=
-ons
-> > >  * at the same time (except where noted).
-> > >  *
-> > >  * Returns zero or a negative error.
-> > >  * 0: success.
-> > >  * -EINVAL: vring does not use the dma api, so we can not enable prem=
-apped mode.
-> > >  */
-> > >
-> > > Thanks
-> > >
-> > >
-> > > >
-> > > > Thanks
-> > > >
-> > >
-> >
->
-
+SGkgS3J6eXN6dG9mLA0KDQpPbiAyMy8wMy8yNCAzOjU0IHBtLCBLcnp5c3p0b2YgS296bG93c2tp
+IHdyb3RlOg0KPiBFWFRFUk5BTCBFTUFJTDogRG8gbm90IGNsaWNrIGxpbmtzIG9yIG9wZW4gYXR0
+YWNobWVudHMgdW5sZXNzIHlvdSBrbm93IHRoZSBjb250ZW50IGlzIHNhZmUNCj4gDQo+IE9uIDIy
+LzAzLzIwMjQgMDk6MjgsIFBhcnRoaWJhbi5WZWVyYXNvb3JhbkBtaWNyb2NoaXAuY29tIHdyb3Rl
+Og0KPj4+Pg0KPj4+PiAgICAgICAgICAtIGNvbnN0OiBtaWNyb2NoaXAsbGFuODY1MA0KPj4+Pg0K
+Pj4+PiAgICAgICAgICAtIGl0ZW1zOg0KPj4+Pg0KPj4+PiAgICAgICAgICAgICAgLSBjb25zdDog
+bWljcm9jaGlwLGxhbjg2NTENCj4+Pj4NCj4+Pj4gICAgICAgICAgICAgIC0gY29uc3Q6IG1pY3Jv
+Y2hpcCxsYW44NjUwDQo+Pj4+DQo+Pj4+IEV4ZWN1dGVkIGR0X2JpbmRpbmdfY2hlY2sgd2l0aCB0
+aGUgYWJvdmUgdXBkYXRlIGFuZCBpdCB3YXMgc3VjY2Vzc2Z1bC4NCj4+Pj4gSG9wZSB0aGlzIGlz
+IE9LPw0KPj4+DQo+Pj4gVGhpcyBpcyB0aGUgdGhpcmQgdGltZSB5b3UgYXNrIHVzLiBOb25lIG9m
+IHRoZSBwcmV2aW91cyBjYXNlcyB3ZXJlDQo+Pj4gYWN0dWFsbHkgdGVzdGVkLiBNYXliZSB0aGlz
+IG9uZSB3YXMsIG1heWJlIG5vdC4gSSBhc3N1bWUgdGhlIGxhdHRlci4NCj4+Pg0KPj4+IEZpcnN0
+LCB0ZXN0IHlvdXIgY29kZS4NCj4+IEFzIEkgbWVudGlvbmVkIGluIHRoZSBwcmV2aW91cyBlbWFp
+bCBpdHNlbGYsIEkgdGVzdGVkIHRoaXMgY2FzZSBhbmQgdGhlDQo+PiBwcmV2aW91cyBjYXNlIGJv
+dGggaW4gbXkgUlBJIDQgc2V0dXAgYmVmb3JlIHJlcGx5aW5nIHRvIHRoZSBjb21tZW50LiBUaGUN
+Cj4gDQo+IEkgZG9uJ3QgdW5kZXJzdGFuZCBob3cgb25lIGNhbiB0ZXN0IGJpbmRpbmdzIGFuZCBE
+VFMgb24gUlBJIDQuIFRlc3RpbmcNCj4gaXMgd2l0aCBkdF9iaW5kaW5nc19jaGVjayBhbmQgZHRi
+c19jaGVjay4NCk9rLCBtYXkgYmUgSSBoYWQgYSBtaXN1bmRlcnN0YW5kaW5nIGhlcmUuIEV2ZXJ5
+IHRpbWUgSSB1c2VkIHRvIHRlc3QgdGhlIA0KZHJpdmVyIHdpdGggdGhlIGdlbmVyYXRlZCBkdHMg
+aW4gUlBJIDQuIEkgdGhvdWdodCB5b3UgYXJlIGFza2luZyBhYm91dCANCml0LiBJIHVzZWQgdGhl
+IGJlbG93IGNvbW1hbmRzIHRvIGNoZWNrIHRoZSBkdCBiaW5kaW5ncyBhbmQgZHRicy4NCg0KJCBt
+YWtlIEFSQ0g9YXJtIENST1NTX0NPTVBJTEU9YXJtLWxpbnV4LWdudWVhYmloZi0gDQpEVF9TQ0hF
+TUFfRklMRVM9RG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL25ldC9taWNyb2NoaXAs
+bGFuODY1eC55YW1sIA0KZHRfYmluZGluZ19jaGVjaw0KDQokIG1ha2UgQVJDSD1hcm0gQ1JPU1Nf
+Q09NUElMRT1hcm0tbGludXgtZ251ZWFiaWhmLSANCkRUX1NDSEVNQV9GSUxFUz1Eb2N1bWVudGF0
+aW9uL2RldmljZXRyZWUvYmluZGluZ3MvbmV0L21pY3JvY2hpcCxsYW44NjV4LnlhbWwgDQpkdGJz
+X2NoZWNrDQoNClRoZXkgZGlkbid0IHJlcG9ydCBhbnkgZXJyb3IuDQoNCkJlc3QgcmVnYXJkcywN
+ClBhcnRoaWJhbiBWDQo+IA0KPiANCj4gDQo+IEJlc3QgcmVnYXJkcywNCj4gS3J6eXN6dG9mDQo+
+IA0KPiANCg0K
 
