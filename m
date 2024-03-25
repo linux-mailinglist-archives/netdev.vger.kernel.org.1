@@ -1,75 +1,74 @@
-Return-Path: <netdev+bounces-81812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2269A88B28A
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 22:20:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47F0188B2B9
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 22:27:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0B962E225B
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:20:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B11941FA0B5A
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:27:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5B1E6EB52;
-	Mon, 25 Mar 2024 21:19:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CEC06D1B3;
+	Mon, 25 Mar 2024 21:27:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nfl0R74o"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Os2uLtdZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-qk1-f181.google.com (mail-qk1-f181.google.com [209.85.222.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 287502F2D;
-	Mon, 25 Mar 2024 21:19:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F60C481A3;
+	Mon, 25 Mar 2024 21:27:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711401586; cv=none; b=TBuP89+Mrp2e26v6jWTMEIsmm0GjKhlurnUR/HlUIdEiF8LA/DUHs+4o7Wt/GVfMqPoDy9PyjvT1qAzcghIxEtR66ddA5FioB/0bjgLED58NqQKgRawtysqO8bV4/7leOssQ5fG276CwBgYIGDRHTz9LojKcfnL9K6eHT5pG8no=
+	t=1711402031; cv=none; b=EEtHYnW5RQ43r/nTP5TQS2xnqhwJ9ObKIHlIGMdkYOIOuS0+8yvaw3iBypWhMH0ZQD+5K6IcMTO86LHqy2k9BTmqOGRkG2GrPeeghvJrCC5lcQ1bi4dvqO3tfpw4jxmf/+FGx+6d89xqxZg+OvuwWT33TlKCvfEinyfhbV1xUTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711401586; c=relaxed/simple;
-	bh=pyKqoCTD+lIbBbjlyXz91NzejdbHvMMjyPPz9MEw2q4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=feBdyTl3fSpAQ5ZPZMYeZN45mGea+8sPutm8hslrlMelrfRbIGf8K3KiGICOdvaR+jMYbkpvllWNa1+AKFvQMnDQZXxn5rZZtWgtFJA6P3SlmIbLp0fnJNAYkmLICkzKoBaRvgaa1TcsYIw1x1xw5CAu7wKBLK7T8bFNzr6LwLg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nfl0R74o; arc=none smtp.client-ip=209.85.218.46
+	s=arc-20240116; t=1711402031; c=relaxed/simple;
+	bh=Kd3xmesa4LEqQaLnoE03Qd2vDqHAxmlJBp5wo9yPs2s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Dwqt2QtYMxhZbqMdXZgqLhPZsi2HWEqUwBRZy/Es55Qbtgp8AK7OagIkiuZmBjfp9e4KuRWDm1inuqMvMnHDt162wS6iIcggu5xH+rSUAPvO8db2Q2AEKUgPhm3f2WbfcG05UelsJSF4VcxYmYZVx+d8mPurS/CttGcvVQ82Ng0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Os2uLtdZ; arc=none smtp.client-ip=209.85.222.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a466a1f9ea0so289950466b.1;
-        Mon, 25 Mar 2024 14:19:44 -0700 (PDT)
+Received: by mail-qk1-f181.google.com with SMTP id af79cd13be357-789d0c90cadso326141785a.3;
+        Mon, 25 Mar 2024 14:27:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711401583; x=1712006383; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=PoSfbikonTDSBOuLxdHwiEiP9ZejpGDsNbVllGW8OsA=;
-        b=Nfl0R74oM0ELb8ZnV3Mtz85BBIVcC4gn9kVOZ+NLN3GC8k95Ofgjz9UNNbC8D+jA/k
-         SNfLAkOrvICbXyc7R3KW4v53EXHc4PxqCtYe1tIScJ8yR5CepmDoxRw9Vms6trgw3mTq
-         x8W5dJ/xSHpRqNaXpOfgIBnyRNWqi3FO7ip1Tn61Sd9AF4vP9N1574RTbNhKCkHDU05v
-         FZnP+ZYQhuxQ1FV6J6jt1UINriwyuyUNi8lQ7kJzcvU75uDKfnDaL5VQWeBiIwGtzib1
-         w7QSDRyD5/mhDjHkk7/bnbVuoyNbvI2jFdM5WsA3ExbqWYpUAiYJY7ML2rhCsX1vodeg
-         XsRA==
+        d=gmail.com; s=20230601; t=1711402028; x=1712006828; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fcXGrDwZYrN1zzru3Wgu6jq53rbOZgHObeSUTM5zESU=;
+        b=Os2uLtdZqH4lS8a79+gqV231ea3YGDkMw4Cu1M7vLJJcYjm+UD1Xp+JmdxC2IVJAXp
+         uUFuBtYu8Av3CkoQFXyDTesMHOiMfOeNxVp0y413I2BbvvrdM4TPLw3d7lYX6zfjyOnG
+         SWHr4ym+qXqIX0wv43mdJo4+5v9kKU0tLhTI3ny2Y7by7JhB2NfLjlUXfOjUVybRTZ9M
+         M1viemY/ETD4u8UvtgXAst/FZEh6ggXOgqBVwAHNTErg2X9h2lG3Syou9rztlLBEpsIw
+         tmqYRAOGGXRLD1yEB8DZgQi0LrhrOEgT/lF9/6Rju7gSzxBDNfjitBAbT6CZxT1TBZXc
+         g2RA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711401583; x=1712006383;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:user-agent:mime-version:date
-         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PoSfbikonTDSBOuLxdHwiEiP9ZejpGDsNbVllGW8OsA=;
-        b=rCOusTya4GvRR0N6vIuefpNiU4I7zc8LyEaHCBwE5VXGENcffY5Q8O3Ymq7/vdOOkO
-         hntjIQ3dkyu3g9qh+mMONHBpEPbjEidz+cJIbxENPE5DYSC0+a2CPUOZ4OqtRM1X1DK3
-         HXj0F2MhVyfjEalhZyuI3bykNTRyTKt/GilzqSYWjko87R2ny3g7X+lwBHcXKcxMEd9V
-         wu9FRO2a2KjOEEexuDAMjJNXLr31uDzs+UQhdDRpV+WFIJgOs/YJSvE5HOKjMdDM5YcO
-         wjiQuDj3Yj/44ROzSEf1Rvm1U5jN8kJDZox+CmQEf60jRnXgwLCtbVHTrjh1m4kg9WVJ
-         WTgA==
-X-Forwarded-Encrypted: i=1; AJvYcCVbHAXD+cXLHuTvumAizil+g8KQ92aetgKU/WviQUFsTa8dXFQNs1QetokFmtNwnEZ4mDv8jLWkvqNQWDYYS5VQ7czSCwkRp8rtNE1ogDfvPpqnddlhrhrVD0V80C5CKKbjuxXvRFPTLx6AjCu0nxkdRNQ0iA7wTgE32zaZ5qiYHugObhzuEYP4e1CdLR9PcqeYgXyFa4P6Y8iuYtCycuunymiX6ta+iGRHzz4OIi2OO3NBL4nW5mOdZ0F0TzaXXMhW/0WjG6prJO0jIGtf+yE6qdEgKAiPS9mTIVGyC6ljVdpyPAo+KjkTO5jZ03CBK4dVRpZSE4Lp7oS080bl7RRT1sfbqKHSYdHVMnZjkxuDue2gieeqqA+savPxsH1jpjs6zWC8xdDePTFwdqQQTVf0bDg=
-X-Gm-Message-State: AOJu0YzCaPscGqVnSrWOVe6/gwO+fPsH/3FBzE/L+vRFh9xlE1goyu2G
-	sygcujFP0DSHw3gv8JFvNPNVzjqEQ4GXKwvTSJJBwX7piAUHQGG0
-X-Google-Smtp-Source: AGHT+IHJM612MMOX224WqDpitSB3ppYid8xqsHidMYKffDXHZGIA2IVK0z2qzCKVX3AunTfuBNsM1Q==
-X-Received: by 2002:a50:8d14:0:b0:568:a752:5fb3 with SMTP id s20-20020a508d14000000b00568a7525fb3mr7779537eds.15.1711401583242;
-        Mon, 25 Mar 2024 14:19:43 -0700 (PDT)
-Received: from ?IPV6:2a01:c22:7a49:5100:f87e:9160:36e9:a3bd? (dynamic-2a01-0c22-7a49-5100-f87e-9160-36e9-a3bd.c22.pool.telefonica.de. [2a01:c22:7a49:5100:f87e:9160:36e9:a3bd])
-        by smtp.googlemail.com with ESMTPSA id ck5-20020a0564021c0500b0056c1bf78a3asm736491edb.28.2024.03.25.14.19.42
+        d=1e100.net; s=20230601; t=1711402028; x=1712006828;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fcXGrDwZYrN1zzru3Wgu6jq53rbOZgHObeSUTM5zESU=;
+        b=YZeD/MtfsAZz5n/SkNMCExQHlh67WshfVNmV2ZdAZKwYF5iC5ON+tu9m9j1omp0D8e
+         kvEBXv/sEul9glKi1CNPqyZQ74u4mFRcUPzu11i1sNGxvvzQzUnQ8tQ+6g0gKG/Med0T
+         jFWIrVPwreH/aumfWODXN0wptW9oNWH6w4je90xJK2Iogc9oX7sPvkhcafwPEpcWfyYY
+         B296kkx/08frQDX96OaZPy7zaTBr647GYMN1A4LEEMfSrIk98ElANuBYXB0er1TxW2iA
+         hmolOJsB6HLP7v3OG1sQ+GCy4kCfnjFgHTId3v1XwJk19WaYaImxGOJ3uogvSsZ0b312
+         nJ4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUoIyZRLypWSdzc9SEy3h+MXVUbozUzAZfjibQ6AQnDwqvSakZGY89cx4/b4YPnJwqZ31RfdvHawoeiPtlYpYU8ri/HL/WonKhcNw0GhYL6dfcAEkYYfMfFfXEAA3Jj+zDxasTs
+X-Gm-Message-State: AOJu0Yw3YHNxiI6bb0IkESR+OaCatbnWELlEmJd5HFCwLhu0NB5dpr9+
+	1e2B6uwAvEN8PAuXBfNzze4Hq56AFLMWSICexP4mrHEZBp++/wHf
+X-Google-Smtp-Source: AGHT+IEli7TvZHtKaTgDAw8FiZsX/v6sEKF1C9dbpcgJ9fz2dinBG2o+Fvo2t6S/L4KYj7VvPdlpNw==
+X-Received: by 2002:a05:620a:3781:b0:78a:e5f:1595 with SMTP id pi1-20020a05620a378100b0078a0e5f1595mr8105239qkn.45.1711402028153;
+        Mon, 25 Mar 2024 14:27:08 -0700 (PDT)
+Received: from [10.67.48.245] ([192.19.223.252])
+        by smtp.googlemail.com with ESMTPSA id i10-20020ae9ee0a000000b00787fd080d28sm2437251qkg.74.2024.03.25.14.27.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Mar 2024 14:19:42 -0700 (PDT)
-Message-ID: <3376d9e8-7841-43b6-846a-45c75975fbb1@gmail.com>
-Date: Mon, 25 Mar 2024 22:19:41 +0100
+        Mon, 25 Mar 2024 14:27:07 -0700 (PDT)
+Message-ID: <0976fbf5-efb4-4fe6-a68d-28a79309cd05@gmail.com>
+Date: Mon, 25 Mar 2024 14:27:01 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,95 +76,236 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 17/28] net: realtek: r8169: Use PCI_IRQ_INTX
-To: Damien Le Moal <dlemoal@kernel.org>, linux-pci@vger.kernel.org,
- Bjorn Helgaas <bhelgaas@google.com>,
- Manivannan Sadhasivami <manivannan.sadhasivam@linaro.org>,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>, Jaroslav Kysela <perex@perex.cz>,
- linux-sound@vger.kernel.org, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
- linux-serial@vger.kernel.org, Hans de Goede <hdegoede@redhat.com>,
- platform-driver-x86@vger.kernel.org, ntb@lists.linux.dev,
- Lee Jones <lee@kernel.org>, David Airlie <airlied@gmail.com>,
- amd-gfx@lists.freedesktop.org, Jason Gunthorpe <jgg@ziepe.ca>,
- linux-rdma@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240325070944.3600338-1-dlemoal@kernel.org>
- <20240325070944.3600338-18-dlemoal@kernel.org>
+Subject: Re: [PATCH net v3 2/2] net: fec: Suspend the PHY on probe
 Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
- sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
- MVE4yNwdS+UsPeCF/6CQQTzHc+n7DomE7fjJD5J1hOJjqz2XWe71fTvYXzxCFLwXXbBiqDC9
- dNqOe5odPsa4TsWZ09T33g5n2nzTJs4Zw8fCy8rLqix/raVsqr8fw5qM66MVtdmEljFaJ9N8
- /W56qGCp+H8Igk/F7CjlbWXiOlKHA25mPTmbVp7VlFsvsmMokr/imQr+0nXtmvYVaKEUwY2g
- 86IU6RAOuA8E0J5bD/BeyZdMyVEtX1kT404UJZekFytJZrDZetwxM/cAH+1fMx4z751WJmxQ
- J7mIXSPuDfeJhRDt9sGM6aRVfXbZt+wBogxyXepmnlv9K4A13z9DVLdKLrYUiu9/5QEl6fgI
- kPaXlAZmJsQfoKbmPqCHVRYj1lpQtDM/2/BO6gHASflWUHzwmBVZbS/XRs64uJO8CB3+V3fa
- cIivllReueGCMsHh6/8wgPAyopXOWOxbLsZ291fmZqIR0L5Y6b2HvdFN1Xhc+YrQ8TKK+Z4R
- mJRDh0wNQ8Gm89g92/YkHji4jIWlp2fwzCcx5+lZCQ1XdqAiHQARAQABzSZIZWluZXIgS2Fs
- bHdlaXQgPGhrYWxsd2VpdDFAZ21haWwuY29tPsLBjgQTAQgAOBYhBGxfqY/yOyXjyjJehXLe
- ig9U8DoMBQJf9GRVAhsDBQsJCAcCBhUKCQgLAgQWAgMBAh4BAheAAAoJEHLeig9U8DoMSycQ
- AJbfg8HZEK0ljV4M8nvdaiNixWAufrcZ+SD8zhbxl8GispK4F3Yo+20Y3UoZ7FcIidJWUUJL
- axAOkpI/70YNhlqAPMsuudlAieeYZKjIv1WV5ucNZ3VJ7dC+dlVqQdAr1iD869FZXvy91KhJ
- wYulyCf+s4T9YgmLC6jLMBZghKIf1uhSd0NzjyCqYWbk2ZxByZHgunEShOhHPHswu3Am0ftt
- ePaYIHgZs+Vzwfjs8I7EuW/5/f5G9w1vibXxtGY/GXwgGGHRDjFM7RSprGOv4F5eMGh+NFUJ
- TU9N96PQYMwXVxnQfRXl8O6ffSVmFx4H9rovxWPKobLmqQL0WKLLVvA/aOHCcMKgfyKRcLah
- 57vGC50Ga8oT2K1g0AhKGkyJo7lGXkMu5yEs0m9O+btqAB261/E3DRxfI1P/tvDZpLJKtq35
- dXsj6sjvhgX7VxXhY1wE54uqLLHY3UZQlmH3QF5t80MS7/KhxB1pO1Cpcmkt9hgyzH8+5org
- +9wWxGUtJWNP7CppY+qvv3SZtKJMKsxqk5coBGwNkMms56z4qfJm2PUtJQGjA65XWdzQACib
- 2iaDQoBqGZfXRdPT0tC1H5kUJuOX4ll1hI/HBMEFCcO8++Bl2wcrUsAxLzGvhINVJX2DAQaF
- aNetToazkCnzubKfBOyiTqFJ0b63c5dqziAgzsFNBF/0ZFUBEADF8UEZmKDl1w/UxvjeyAeX
- kghYkY3bkK6gcIYXdLRfJw12GbvMioSguvVzASVHG8h7NbNjk1yur6AONfbUpXKSNZ0skV8V
- fG+ppbaY+zQofsSMoj5gP0amwbwvPzVqZCYJai81VobefTX2MZM2Mg/ThBVtGyzV3NeCpnBa
- 8AX3s9rrX2XUoCibYotbbxx9afZYUFyflOc7kEpc9uJXIdaxS2Z6MnYLHsyVjiU6tzKCiVOU
- KJevqvzPXJmy0xaOVf7mhFSNQyJTrZpLa+tvB1DQRS08CqYtIMxRrVtC0t0LFeQGly6bOngr
- ircurWJiJKbSXVstLHgWYiq3/GmCSx/82ObeLO3PftklpRj8d+kFbrvrqBgjWtMH4WtK5uN5
- 1WJ71hWJfNchKRlaJ3GWy8KolCAoGsQMovn/ZEXxrGs1ndafu47yXOpuDAozoHTBGvuSXSZo
- ythk/0EAuz5IkwkhYBT1MGIAvNSn9ivE5aRnBazugy0rTRkVggHvt3/7flFHlGVGpBHxFUwb
- /a4UjJBPtIwa4tWR8B1Ma36S8Jk456k2n1id7M0LQ+eqstmp6Y+UB+pt9NX6t0Slw1NCdYTW
- gJezWTVKF7pmTdXszXGxlc9kTrVUz04PqPjnYbv5UWuDd2eyzGjrrFOsJEi8OK2d2j4FfF++
- AzOMdW09JVqejQARAQABwsF2BBgBCAAgFiEEbF+pj/I7JePKMl6Fct6KD1TwOgwFAl/0ZFUC
- GwwACgkQct6KD1TwOgxUfg//eAoYc0Vm4NrxymfcY30UjHVD0LgSvU8kUmXxil3qhFPS7KA+
- y7tgcKLHOkZkXMX5MLFcS9+SmrAjSBBV8omKoHNo+kfFx/dUAtz0lot8wNGmWb+NcHeKM1eb
- nwUMOEa1uDdfZeKef/U/2uHBceY7Gc6zPZPWgXghEyQMTH2UhLgeam8yglyO+A6RXCh+s6ak
- Wje7Vo1wGK4eYxp6pwMPJXLMsI0ii/2k3YPEJPv+yJf90MbYyQSbkTwZhrsokjQEaIfjrIk3
- rQRjTve/J62WIO28IbY/mENuGgWehRlTAbhC4BLTZ5uYS0YMQCR7v9UGMWdNWXFyrOB6PjSu
- Trn9MsPoUc8qI72mVpxEXQDLlrd2ijEWm7Nrf52YMD7hL6rXXuis7R6zY8WnnBhW0uCfhajx
- q+KuARXC0sDLztcjaS3ayXonpoCPZep2Bd5xqE4Ln8/COCslP7E92W1uf1EcdXXIrx1acg21
- H/0Z53okMykVs3a8tECPHIxnre2UxKdTbCEkjkR4V6JyplTS47oWMw3zyI7zkaadfzVFBxk2
- lo/Tny+FX1Azea3Ce7oOnRUEZtWSsUidtIjmL8YUQFZYm+JUIgfRmSpMFq8JP4VH43GXpB/S
- OCrl+/xujzvoUBFV/cHKjEQYBxo+MaiQa1U54ykM2W4DnHb1UiEf5xDkFd4=
-In-Reply-To: <20240325070944.3600338-18-dlemoal@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+To: John Ernberg <john.ernberg@actia.se>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+ Clark Wang <xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>
+References: <20240306133734.4144808-1-john.ernberg@actia.se>
+ <20240306133734.4144808-3-john.ernberg@actia.se>
+ <20240306190539.4ab9f369@device-28.home>
+ <9490ed31-dede-4a14-9c62-5ef83e30593a@actia.se>
+ <ZflSE8AaYLE3Ri8L@shell.armlinux.org.uk>
+ <f89bec78-0dae-4518-a461-2e64a3dfb9fc@actia.se>
+ <ZfsUvm9YC5O7il3h@shell.armlinux.org.uk>
+ <7f0e5f8b-fb85-4f2b-8d77-4170366a1b55@gmail.com>
+ <Zfs8hWo/aVbvuAgm@shell.armlinux.org.uk>
+ <efffa6e6-f519-4424-8d58-0951e7c68f27@actia.se>
+ <27453913-d4a3-4535-8cf5-2f5f3eb6c7b7@gmail.com>
+ <ed6da286-eba7-4fae-882b-bb960a613dac@actia.se>
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <ed6da286-eba7-4fae-882b-bb960a613dac@actia.se>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 25.03.2024 08:09, Damien Le Moal wrote:
-> Use the macro PCI_IRQ_INTX instead of the deprecated PCI_IRQ_LEGACY
-> macro.
+On 3/25/24 05:20, John Ernberg wrote:
+> Hi Florian,
 > 
-> Signed-off-by: Damien Le Moal <dlemoal@kernel.org>
-> ---
->  drivers/net/ethernet/realtek/r8169_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> On 3/21/24 17:13, Florian Fainelli wrote:
+>> On 3/21/24 09:02, John Ernberg wrote:
+>>> Hi Russell,
+>>>
+>>> On 3/20/24 20:44, Russell King (Oracle) wrote:
+>>>> On Wed, Mar 20, 2024 at 10:13:55AM -0700, Florian Fainelli wrote:
+>>>>>
+>>>>>
+>>>>> On 3/20/2024 9:54 AM, Russell King (Oracle) wrote:
+>>>>>> On Wed, Mar 20, 2024 at 03:25:54PM +0000, John Ernberg wrote:
+>>>>>>> Hi Russel,
+>>>>>>
+>>>>>> Growl. Hi Peter.
+>>>>>>
+>>>>>>> What we really want is the PHY to be suspended on suspend to RAM
+>>>>>>> regardless of us having had an initial link up or not.
+>>>>>>
+>>>>>> So what you're asking is for the PHY to be suspended when the system
+>>>>>> is entering suspend, which is a long time after the system booted and
+>>>>>> thus phy_probe() was called, and could be some time before the system
+>>>>>> resumes.
+>>>>>>
+>>>>>> I'm not sure what the relevance is of phy_probe() that was brought up
+>>>>>> previously then.
+>>>>>>
+>>>>>>> This worked prior to 4c0d2e96ba05 ("net: phy: consider that
+>>>>>>> suspend2ram
+>>>>>>> may cut
+>>>>>>> off PHY power") which was added in Linux 5.11, and 557d5dc83f68
+>>>>>>> ("net:
+>>>>>>> fec: use
+>>>>>>> mac-managed PHY PM") which was added in Linux 5.12.
+>>>>>>
+>>>>>> Looking at the former commit, that looks to me like it is only
+>>>>>> affecting the resume paths, not the suspend paths, so wouldn't have
+>>>>>> any impact itself on what happens when suspend happens.
+>>>>>>
+>>>>>> The latter commit states that it is a work around for an issue with a
+>>>>>> particular PHY. What happens if you revert just this commit, does your
+>>>>>> problem then go away?
+>>>
+>>> Our PHY does not begin working again without reverting both.
+>>> phy_init_hw()
+>>> will remain an issue if it occurs after phy_start().
+>>>
+>>> The commit message in 557d5dc83f68 is not explaining nearly enough, I
+>>> spent a
+>>> few days on it before I proved that commit to be nearly correct (See
+>>> whole
+>>> thread at [1]), it happened to just explode with that PHY. The issue is a
+>>> sequencing issue that was made more prominent by 4c0d2e96ba05, but it
+>>> existed
+>>> since around 2008. Because FEC is both MDIO controller and MAC,
+>>> meaning the
+>>> resume of the link in a link up case runs phy_start() in the FEC resume
+>>> function, which will trigger a mdio bus resume when it completes, in turn
+>>> calling phy_init_hw() (before 4c0d2e96ba05 it was phy_resume() which
+>>> wasn't a
+>>> problem but still wrong sequence wise).
+>>>
+>>>>>>
+>>>>>> Also, please clarify. It seems that you are reporting a regression -
+>>>>>> it used to work for you prior to 557d5dc83f68, but 557d5dc83f68 stops
+>>>>>> it working for you?
+>>>>>>
+>>>>>>> Since FEC requires mac_managed_pm the generic PM suspend-resume paths
+>>>>>>> are not
+>>>>>>> taken. The resume sequencing with generic PM has been broken with the
+>>>>>>> FEC since
+>>>>>>> generic PM of the mdio bus was added, as the FEC will do phy_start()
+>>>>>>> (via FEC
+>>>>>>> resume) and then generic PM runs phy_init_hw() via mdio bus resume
+>>>>>>> (previously:
+>>>>>>> less damaging phy_resume()) due to how the FEC IP block works.
+>>>>>>
+>>>>>> That suggests that even with 557d5dc83f68 reverted, it's broken.
+>>>>>> Digging into the history, what you're referring to dates from January
+>>>>>> 2016, so are you reporting a regression that occured 8 _years_ ago,
+>>>>>> at which point I'd question why it's taken 8 years.
+>>>
+>>> A revert of those is absolutely wrong. Those commits are fixing bigger
+>>> issues.
+>>>
+>>>>>>
+>>>>>> Given the time that has passed, I don't think reverting commits is
+>>>>>> a sane approach. Quite what the right solution is though, I'm not
+>>>>>> sure.
+>>>>>>
+>>>>>>     From the description and the commits pointed to, I just don't see
+>>>>>> that there is anything that could've changed with respect to the first
+>>>>>> boot - if that has changed, then I think more research into what
+>>>>>> caused
+>>>>>> it is needed.
+>>>>>>
+>>>>>> If it's the subsequent state after a suspend-resume cycle, then yes,
+>>>>>> I would agree that its possible that these changes broke this for you.
+>>>>>> Would clearing ndev->phydev->mac_managed_pm just before
+>>>>>> phy_disconnect() in fec_enet_close() fix it for you, so the suspend/
+>>>>>> resume paths for the PHY get used when the network interface is down?
+>>>>>>
+>>>>>> Maybe, however, that's something that should happen in any case inside
+>>>>>> phylib on phy_disconnect() as a matter of course, since the PHY will
+>>>>>> at that point be no longer under the control of the network driver for
+>>>>>> PM purposes. Could you give this idea a try please?
+>>>>>>
+>>>>>
+>>>>> On phy_disconnect() we will do a phy_detach() which calls
+>>>>> phy_suspend().
+>>>>> Given that phy_disconnect() is called from fec_enet_close(), we
+>>>>> still have a
+>>>>> MDIO bus registered and we are not trying to suspend the MDIO bus,
+>>>>> so we
+>>>>> should have an effective phy_suspend() call here, what am I missing?
+>>>>
+>>>> I didn't look there, but if that is the case, then what is John's
+>>>> problem - I can't figure it out, something isn't adding up here.
+>>>>
+>>>
+>>> I could instead add extra phy_suspend() in the suspend path if the
+>>> link is
+>>> down and the FEC is up and running. I rejected it originally thinking
+>>> it was
+>>> a much dirtier fix, but maybe that is the more correct thing to do?
+>>
+>> This does not seem like the proper solution, the only time where an
+>> explicit phy_suspend() should be done in the Ethernet MAC's ->suspend()
+>> routine is if the network device was brought up at the time
+>> (netif_runninng() returns true) *and* you set mac_managed_pm = true
+>> because you must precisely control the order in which the MAC and the
+>> PHY get suspended with respect to each other (typically because the PHY
+>> supplies a RX clock back to the MAC, and some of the MAC logic depends
+>> upon it to operate properly, e.g.: perform a proper FIFO flush etc.).
 > 
-> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-> index 5c879a5c86d7..7288afcc8c94 100644
-> --- a/drivers/net/ethernet/realtek/r8169_main.c
-> +++ b/drivers/net/ethernet/realtek/r8169_main.c
-> @@ -5076,7 +5076,7 @@ static int rtl_alloc_irq(struct rtl8169_private *tp)
->  		rtl_lock_config_regs(tp);
->  		fallthrough;
->  	case RTL_GIGA_MAC_VER_07 ... RTL_GIGA_MAC_VER_17:
-> -		flags = PCI_IRQ_LEGACY;
-> +		flags = PCI_IRQ_INTX;
->  		break;
->  	default:
->  		flags = PCI_IRQ_ALL_TYPES;
+> I'm having some trouble understanding your message in context of my most
+> recent reply to Russell, so please bear with me here as I will
+> potentially ask a really dumb question:
+> 
+> Do I understand this correctly as what used to work in 5.10 was never
+> meant to work and the behavior now is the correct one in the FEC case?
 
-Acked-by: Heiner Kallweit <hkallweit1@gmail.com>
+I am not sure about that, because I do not believe this had been 
+explicitly accounted for, and that is what I am also trying to figure out.
+
+> Meaning that if the link has never been up the PHY must never be handled
+> from a power management perspective?
+
+Let's stray away from saying "link is UP" but instead say interface 
+administratively brought up (ip link set dev <foo> up) so we are on the 
+same page.
+
+> 
+> The only PHY examples I have come across (though not many in total) the
+> PHY has done some initial configuration of itself after POR or release
+> of the reset line.
+> 
+>>
+>>   From there, I see two distinct cases:
+>>
+>> - the network device driver probed, but the network device was never
+>> brought up in the first place in that case, I do not see a path whereby
+>> the PHY would have been suspended, unless the boot firmware already took
+>> care of that (which arguably it should if you are trying to be as power
+>> efficient as possible), although arguably there could be a path within
+>> the kernel where this is also done. It could get really complicated however
+> 
+> Generic PM via mdio_bus_phy_suspend() will suspend the PHY if it has a
+> .suspend callback and mac_managed_pm isn't set.
+
+Correct.
+
+> 
+> mdio_bus_phy_may_suspend() will see that netdev is NULL, which means it
+> returns the inverse of phy->suspended (which is false), meaning the
+> function returns true. Thus phy_suspend() is called.
+
+OK, so right there is where you were were basically depending upon 
+mdio_bus_phy_may_suspend() being called to suspend your PHY device! I 
+don't think this had ever been envisioned to be working that way, if it 
+did that was a byproduct rather than a contract. Introducing 
+mac_managed_pm certainly did break that contract because now we no 
+longer have that "double" suspend and resume that used to happen.
+
+> 
+>>
+>> - the network device driver probed, and the network device was brought
+>> up at least once (regardless of whether a link state was detected or
+>> not), such that the PHY has gone through a phy_start()/phy_stop() cycle,
+>> and upon phy_stop() a phy_suspend() has been called
+>>
+>> It is safe to assume you fall in the first case only, or do you also see
+>> a problem in the second case as well?
+> 
+> There is only a problem in the first case. The second case is working as
+> expected.
+
+Thanks for the clarification.
+-- 
+Florian
 
 
