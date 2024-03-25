@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-81593-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81594-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 667BA88A694
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:30:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEFA688B33C
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 22:54:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3A9529DD0B
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:30:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70A22BA27B4
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:31:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC6CD45037;
-	Mon, 25 Mar 2024 12:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC3A43EA95;
+	Mon, 25 Mar 2024 12:56:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E226047A6F;
-	Mon, 25 Mar 2024 12:51:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0053B38DFB;
+	Mon, 25 Mar 2024 12:55:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711371104; cv=none; b=JJbHICv8aPeynWnNO38PWVwcAm0GRt4V2/X4VD2AIAGbBmaEqe13mbjHlITd+nFatvnaCIXP5r9h00vZmWbls+826gLfRKEHH+K7Fe5y3sye2RDHJ3YV5LCOi07GnNlXpKlKOfRI4iQYXa1VZWyaxsIL2wo2QQsQCdAjbDs2B1Y=
+	t=1711371361; cv=none; b=fm/Eaf2mIb+83nvpsMqp5Uwcc7JSajtKpKDKYoNkmKp68DXBkFlSsqLpC1FGGx26Xk/dDnTln4CsYPQ1LOTkIg7zDYuPrAiA96TkqPT50Ixn/wJj6kSpp4FVJ06w2WluQoIqYZHPIIWLHZFwdcghtnBm5ZMO2eBjTd6gM9w+V3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711371104; c=relaxed/simple;
-	bh=ZVogx11ulyTOf9KakHLa9Y+wnnqXepPLDEtt7Xo49Rk=;
+	s=arc-20240116; t=1711371361; c=relaxed/simple;
+	bh=c4xZArgJXXwnnTGel36776VcScv+UvXSaPw/bNb3bmc=;
 	h=Message-ID:Date:MIME-Version:CC:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=FQPwl3rstC5NwIjtlwmxstjeeglcWY1P2OWwWBa7e/PiPpoRYHFxn0QvR87QlZMOzp8T7SWru4Rpp5OGt7y1hp1YFnk9q7R8Xqxc/D2gtGM9YIe1ndTquDQpXjSSwB4ophHwguwUIgPeFKp4ZUO3VA51d5tjHMHovDYdtN7b9pU=
+	 In-Reply-To:Content-Type; b=NMpJnrblZEqWIs59NPDC9rFJdZgNa7XPx81nuXYRp/8/fUDn89OTpViyHy5XX/q5hb6zqhykRP5AkgXM8XosLSousdJFDzDgI2yKnzPw3uemMET/xLNwpcV28awLIbu7WS1v7/XM+Xc/6qjs9dU/voZxFks6Ri6ylccVgTMCjtU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4V3CV71mj4z1GD2P;
-	Mon, 25 Mar 2024 20:51:11 +0800 (CST)
+Received: from mail.maildlp.com (unknown [172.19.163.44])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4V3Cb508ktz1GD2K;
+	Mon, 25 Mar 2024 20:55:29 +0800 (CST)
 Received: from kwepemm600007.china.huawei.com (unknown [7.193.23.208])
-	by mail.maildlp.com (Postfix) with ESMTPS id 083661A016C;
-	Mon, 25 Mar 2024 20:51:40 +0800 (CST)
+	by mail.maildlp.com (Postfix) with ESMTPS id C53121400D4;
+	Mon, 25 Mar 2024 20:55:57 +0800 (CST)
 Received: from [10.67.120.192] (10.67.120.192) by
  kwepemm600007.china.huawei.com (7.193.23.208) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.35; Mon, 25 Mar 2024 20:51:39 +0800
-Message-ID: <ed3f0650-1c27-4daf-9f92-0fe0927acea9@huawei.com>
-Date: Mon, 25 Mar 2024 20:51:10 +0800
+ 15.1.2507.35; Mon, 25 Mar 2024 20:55:56 +0800
+Message-ID: <fd2ff9ce-077e-4632-b515-f4b4c46b596a@huawei.com>
+Date: Mon, 25 Mar 2024 20:55:56 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,36 +54,35 @@ CC: <shaojijie@huawei.com>, <yisen.zhuang@huawei.com>,
 	<rkannoth@marvell.com>, <shenjian15@huawei.com>, <wangjie125@huawei.com>,
 	<liuyonglong@huawei.com>, <netdev@vger.kernel.org>,
 	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH V3 net 2/3] net: hns3: fix kernel crash when devlink
- reload during pf initialization
-To: Jiri Pirko <jiri@resnulli.us>
+Subject: Re: [PATCH V3 net 1/3] net: hns3: fix index limit to support all
+ queue stats
+To: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
 References: <20240318132948.3624333-1-shaojijie@huawei.com>
- <20240318132948.3624333-3-shaojijie@huawei.com> <Zfl0Xz3vNNH_3Mfo@nanopsycho>
+ <20240318132948.3624333-2-shaojijie@huawei.com>
+ <CAH-L+nPtgMUXve82iVq_q8yTpzDuwR4bHyz+Tv_xb9tYGR=83Q@mail.gmail.com>
 From: Jijie Shao <shaojijie@huawei.com>
-In-Reply-To: <Zfl0Xz3vNNH_3Mfo@nanopsycho>
+In-Reply-To: <CAH-L+nPtgMUXve82iVq_q8yTpzDuwR4bHyz+Tv_xb9tYGR=83Q@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
  kwepemm600007.china.huawei.com (7.193.23.208)
 
 
-on 2024/3/19 19:17, Jiri Pirko wrote:
-> Mon, Mar 18, 2024 at 02:29:47PM CET, shaojijie@huawei.com wrote:
->> From: Yonglong Liu <liuyonglong@huawei.com>
+on 2024/3/18 22:36, Kalesh Anakkur Purayil wrote:
+> On Mon, Mar 18, 2024 at 7:05 PM Jijie Shao <shaojijie@huawei.com> wrote:
+>> From: Jie Wang <wangjie125@huawei.com>
 >>
->> The devlink reload process will access the hardware resources,
->> but the register operation is done before the hardware is initialized.
->> so, if process the devlink reload during initialization, may lead to kernel
->> crash. This patch fixes this by checking whether the NIC is initialized.
-> Fix your locking, you should take devl_lock during your init. That would
-> disallow reload to race with it.
->
-> pw-bot: cr
+>> Currently, hns hardware supports more than 512 queues and the index limit
+>> in hclge_comm_tqps_update_stats is wrong. So this patch removes it.
+>>
+>> Fixes: 287db5c40d15 ("net: hns3: create new set of common tqp stats APIs for PF and VF reuse")
+>> Signed-off-by: Jie Wang <wangjie125@huawei.com>
+>> Signed-off-by: Jijie Shao <shaojijie@huawei.com>
+> Only question I have is whether this is a fix or an enhancement.
+> Nevertheless changes look good to me.
 
-Thanks，
-
-   We have fixed this in v4.
-
-   Jijie Shao
+Actually, it's a fix. The capability of supporting more than 512 queues 
+was not implemented by modifying this statistics. this bug prevents us 
+from querying the statistics of more than 512 queues.
 
 
