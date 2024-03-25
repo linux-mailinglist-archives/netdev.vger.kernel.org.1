@@ -1,148 +1,183 @@
-Return-Path: <netdev+bounces-81578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2868A88A952
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:30:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CB8F88A5E4
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:10:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E2A7BE106E
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:09:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC33F29D3B6
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:10:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7282A145B04;
-	Mon, 25 Mar 2024 12:22:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DA0576049;
+	Mon, 25 Mar 2024 12:23:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kGwx5TGg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="elyGre4R"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B459E14D6ED
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 12:21:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B54159B44
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 12:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711369311; cv=none; b=rwxjAVOiKseSbmVFbnK9yNbWDFbx9eJa9biTqpw1jMaDsGjsezY3jVhDJUPnG54ccXqL4sI0aoq4mJKvYbJuc+ZY07Wo4AbtJzXFu/NJ8uxVq0xPkOK4sC583yta+Vnl4Zt1mRpCtDEvSA4iP1+CNrWSxtYQH9j+a/YcCYIToSQ=
+	t=1711369389; cv=none; b=XaHQ11El4RniXOJDlHSbDVc9Gt4mcFJ2e06Lq9O8VVeVtVsypU8KsOZFlbn5wYAQ5rqpbult8XugrAJCUyhLZbVL8lWH2OvxdnqYwRe9oXh1EtOi3XXiM+evwzMXUFHeOhk9CudH3WYeXpNdqn6bXVaa2SzjyaRq4pJm+9fP20M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711369311; c=relaxed/simple;
-	bh=AE1dlvv5b1X/poInI7A8TX+ny663XWX7KjBuB1GkxY4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
-	 In-Reply-To:Content-Type; b=DZdLfPuQvU0gL2uTG3yoXCtExst97ru81LOrDnnqSBR+UAcbSxQPXasu3kIOTdTBc4bc0NPS0zqxs/zLVt4XNH4HzsBQqfR8UkP8d/I3bgwtDGhkpXG5LNG3k+1LkCt+mPceupxKdzo8jzhxMF8rsdxqx/2hwJVIsMrpM6JVLsI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kGwx5TGg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EB70C433F1;
-	Mon, 25 Mar 2024 12:21:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711369311;
-	bh=AE1dlvv5b1X/poInI7A8TX+ny663XWX7KjBuB1GkxY4=;
-	h=Date:Subject:To:References:Cc:From:In-Reply-To:From;
-	b=kGwx5TGgfuiYR8ZX8r/AtMyeLggJuegzjC9l/G4X1/Qzv21sh0fTjWZqaC+7XhUf/
-	 mZ8cDfDBiUyad17Kal5Xpn9pP1ANsySpsyBLggwXMOef21eBYDRQEsF9qo4FcX3tAp
-	 qFz55xt+zFT5zA5whauc4NEZrdQFfTvtAMRFawak1XDU+iC6UGn1NyT86COpmBJYDS
-	 9o3qM3Q5YkVM0zzt3qvraD0vBneBuJvjJcjYujUibVLhZeOW7BS5k+3STXip5HjKg9
-	 SVUKIO53oQGGji6/gB8keEPd9PeyP+zi13tSRs3Ri4OQkisGd5BiWOtEEoH/WDLG5i
-	 UqoCOROiIbH6A==
-Message-ID: <1cde0059-d319-4a4f-a68d-3b3ffeb3da20@kernel.org>
-Date: Mon, 25 Mar 2024 13:21:47 +0100
+	s=arc-20240116; t=1711369389; c=relaxed/simple;
+	bh=Twb2snY/3F4lbKNfDJVPc78mWoAOfrQSWRoXdsnS2oc=;
+	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=j8beUdL6jxG0OqJl0T4ApCQbeQDbcbQj0PsqzlKksyj9fFN3rLYgkVDrnd1DEmCh1CCvYdiFHq1vVYT4TrvdMgCQmsjxP+RkhKxEb2P2h8OZrY7HJ9SBNP6R+MAa6HNiHq2bGrmTlDki9NyWEH2TvJIOVaqiPfEc52g22pDO09w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=elyGre4R; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711369386;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yzIgO84X7s3kibZ20Fhx+86zvMP8Parlw1wYFhjpBhU=;
+	b=elyGre4RuGKJMcB6OOgR3vqTmVW8QDGa1SaEApij2UDIeIgYNIsNXZ36qxuO65DFqwOl99
+	EYsijG06UMxZKvXKsjsbyy+i+iL6EE+4HFu+YA8pBVwCUCqzGM4T3dA2rZdTv0EZrAA+K4
+	l9DpVAqplJ5OZX1kXfNgfuOD+7qzARs=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-435-3fgJQE6BP2KLaF5Q6qGEQg-1; Mon,
+ 25 Mar 2024 08:23:03 -0400
+X-MC-Unique: 3fgJQE6BP2KLaF5Q6qGEQg-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0D9DD2803633;
+	Mon, 25 Mar 2024 12:23:01 +0000 (UTC)
+Received: from RHTPC1VM0NT (unknown [10.22.32.207])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 811D7492BE8;
+	Mon, 25 Mar 2024 12:23:00 +0000 (UTC)
+From: Aaron Conole <aconole@redhat.com>
+To: Eelco Chaudron <echaudro@redhat.com>
+Cc: netdev@vger.kernel.org,  Pravin B Shelar <pshelar@ovn.org>,  "David S.
+ Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+  dev@openvswitch.org,  linux-kernel@vger.kernel.org,  Numan Siddique
+ <nusiddiq@redhat.com>
+Subject: Re: [PATCH net] openvswitch: Set the skbuff pkt_type for proper
+ pmtud support.
+References: <20240322190603.251831-1-aconole@redhat.com>
+	<7AFF5D6D-568C-449B-83CF-9436DE97CA91@redhat.com>
+Date: Mon, 25 Mar 2024 08:22:56 -0400
+In-Reply-To: <7AFF5D6D-568C-449B-83CF-9436DE97CA91@redhat.com> (Eelco
+	Chaudron's message of "Mon, 25 Mar 2024 09:44:16 +0100")
+Message-ID: <f7t5xxawlen.fsf@redhat.com>
+User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.3 (gnu/linux)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Xen NIC driver have page_pool memory leaks
-Content-Language: en-US
-To: Arthur Borsboom <arthurborsboom@gmail.com>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>
-References: <CALUcmUncphE8v8j1Xme0BcX4JRhqd+gB0UUzS-U=3XXw_3iUiw@mail.gmail.com>
-Cc: Netdev <netdev@vger.kernel.org>, Paul Durrant <paul@xen.org>,
- Wei Liu <wei.liu@kernel.org>,
- "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <CALUcmUncphE8v8j1Xme0BcX4JRhqd+gB0UUzS-U=3XXw_3iUiw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.9
 
-Hi Arthur,
+Eelco Chaudron <echaudro@redhat.com> writes:
 
-(Answer inlined below, which is custom on this mailing list)
+> On 22 Mar 2024, at 20:06, Aaron Conole wrote:
+>
+>> Open vSwitch is originally intended to switch at layer 2, only dealing with
+>> Ethernet frames.  With the introduction of l3 tunnels support, it crossed
+>> into the realm of needing to care a bit about some routing details when
+>> making forwarding decisions.  If an oversized packet would need to be
+>> fragmented during this forwarding decision, there is a chance for pmtu
+>> to get involved and generate a routing exception.  This is gated by the
+>> skbuff->pkt_type field.
+>>
+>> When a flow is already loaded into the openvswitch module this field is
+>> set up and transitioned properly as a packet moves from one port to
+>> another.  In the case that a packet execute is invoked after a flow is
+>> newly installed this field is not properly initialized.  This causes the
+>> pmtud mechanism to omit sending the required exception messages across
+>> the tunnel boundary and a second attempt needs to be made to make sure
+>> that the routing exception is properly setup.  To fix this, we set the
+>> outgoing packet's pkt_type to PACKET_OUTGOING, since it can only get
+>> to the openvswitch module via a port device or packet command.
+>
+> Is this not a problem when the packet comes from the bridge port in the kernel?
 
-On 23/03/2024 14.23, Arthur Borsboom wrote:
-> Hi Jesper,
-> 
-> After a recent kernel upgrade 6.7.6 > 6.8.1 all my Xen guests on Arch
-> Linux are dumping kernel traces.
-> It seems to be indirectly caused by the page pool memory leak
-> mechanism, which is probably a good thing.
-> 
-> I have created a bug report, but there is no response.
-> 
-> https://bugzilla.kernel.org/show_bug.cgi?id=218618
-> 
-> I am uncertain where and to whom I need to report this page leak.
-> Can you help me get this issue fixed?
+It very well may be an issue there as well, but the recommendation is to
+operate with the bridge port down as far as I know, so I don't know if
+this issue has been observed happening from the bridge port.
 
-I'm the page_pool maintainer, but as you say yourself in comment 2 then
-since dba1b8a7ab68 ("mm/page_pool: catch page_pool memory leaks") this
-indicated there is a problem in the xen_netfront driver, which was
-previously not visible.
+Since I will spin a v2 with a comment, do you want me to mention
+something about the bridge port?
 
-Cc'ing the "XEN NETWORK BACKEND DRIVER" maintainers, as this is a driver
-bug.  What confuses me it that I cannot find any modules named
-"xen_netfront" in the upstream tree.
+>> This issue is periodically encountered in complex setups, such as large
+>> openshift deployments, where multiple sets of tunnel traversal occurs.
+>> A way to recreate this is with the ovn-heater project that can setup
+>> a networking environment which mimics such large deployments.  In that
+>> environment, without this patch, we can see:
+>>
+>>   ./ovn_cluster.sh start
+>>   podman exec ovn-chassis-1 ip r a 170.168.0.5/32 dev eth1 mtu 1200
+>>   podman exec ovn-chassis-1 ip netns exec sw01p1  ip r flush cache
+>>   podman exec ovn-chassis-1 ip netns exec sw01p1 ping 21.0.0.3 -M do -s 1300 -c2
+>>   PING 21.0.0.3 (21.0.0.3) 1300(1328) bytes of data.
+>>   From 21.0.0.3 icmp_seq=2 Frag needed and DF set (mtu = 1142)
+>>
+>>   --- 21.0.0.3 ping statistics ---
+>>   2 packets transmitted, 0 received, +1 errors, 100% packet loss, time 1017ms
+>>
+>> Using tcpdump, we can also see the expected ICMP FRAG_NEEDED message is not
+>> sent into the server.
+>>
+>> With this patch, setting the pkt_type, we see the following:
+>>
+>>   podman exec ovn-chassis-1 ip netns exec sw01p1 ping 21.0.0.3 -M do -s 1300 -c2
+>>   PING 21.0.0.3 (21.0.0.3) 1300(1328) bytes of data.
+>>   From 21.0.0.3 icmp_seq=1 Frag needed and DF set (mtu = 1222)
+>>   ping: local error: message too long, mtu=1222
+>>
+>>   --- 21.0.0.3 ping statistics ---
+>>   2 packets transmitted, 0 received, +2 errors, 100% packet loss, time 1061ms
+>>
+>> In this case, the first ping request receives the FRAG_NEEDED message and
+>> a local routing exception is created.
+>>
+>> Reported-at: https://issues.redhat.com/browse/FDP-164
+>> Fixes: 58264848a5a7 ("openvswitch: Add vxlan tunneling support.")
+>> Signed-off-by: Aaron Conole <aconole@redhat.com>
+>> ---
+>> NOTE: An alternate approach would be to add a netlink attribute to preserve
+>>       pkt_type across the kernel->user boundary, but that does require some
+>>       userspace cooperation.
+>
+> I prefer the method in this patch, as it requires no userspace change,
+> i.e. it will work even with older versions of OVS without the need for
+> backports.
 
-IPSEC recently had a similar leak bug. That was fixed in commmit [1]
-c3198822c6cb ("net: esp: fix bad handling of pages from page_pool").
-This xen_netfront driver likely needs a similar fix.
+Yes - that was my thinking as well.
 
---Jesper
+>>  net/openvswitch/actions.c | 2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+>> index 6fcd7e2ca81fe..952c6292100d0 100644
+>> --- a/net/openvswitch/actions.c
+>> +++ b/net/openvswitch/actions.c
+>> @@ -936,6 +936,8 @@ static void do_output(struct datapath *dp, struct sk_buff *skb, int out_port,
+>>  				pskb_trim(skb, ovs_mac_header_len(key));
+>>  		}
+>>
+>> +		skb->pkt_type = PACKET_OUTGOING;
+>> +
+>
+> Maybe add a comment based on the large explanation above?
 
-[1] https://git.kernel.org/torvalds/c/c3198822c6cb
+Okay - I can add one.
 
+>>  		if (likely(!mru ||
+>>  		           (skb->len <= mru + vport->dev->hard_header_len))) {
+>>  			ovs_vport_send(vport, skb, ovs_key_mac_proto(key));
+>> -- 
+>> 2.41.0
 
-Text copied from bugzilla.kernel.org:
--------------------------------------
-[88847.284348] Call Trace:
-[88847.284354]  <IRQ>
-[88847.284361]  dump_stack_lvl+0x47/0x60
-[88847.284378]  bad_page+0x71/0x100
-[88847.284393]  free_unref_page_prepare+0x236/0x390
-[88847.284405]  free_unref_page+0x34/0x180
-[88847.284416]  __pskb_pull_tail+0x3ff/0x4a0
-[88847.284432]  xennet_poll+0x909/0xa40 [xen_netfront 
-12c02fdcf84c692965d9cd6ca5a6ff0a530b4ce9]
-[88847.284470]  __napi_poll+0x28/0x1b0
-[88847.284483]  net_rx_action+0x2b5/0x370
-[88847.284495]  ? handle_irq_desc+0x3e/0x60
-[88847.284511]  __do_softirq+0xc9/0x2c8
-[88847.284523]  __irq_exit_rcu+0xa3/0xc0
-[88847.284536]  sysvec_xen_hvm_callback+0x72/0x90
-[88847.284545]  </IRQ>
-[88847.284549]  <TASK>
-[88847.284552]  asm_sysvec_xen_hvm_callback+0x1a/0x20
-[88847.284562] RIP: 0010:pv_native_safe_halt+0xf/0x20
-[88847.284572] Code: 22 d7 c3 cc cc cc cc 0f 1f 40 00 90 90 90 90 90 90 
-90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d e3 13 27 00 fb 
-f4 <c3> cc cc cc cc 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90
-[88847.284579] RSP: 0018:ffffb2a1800c3e58 EFLAGS: 00000246
-[88847.284587] RAX: 0000000000004000 RBX: ffff91358033b864 RCX: 
-000051404aebd79d
-[88847.284594] RDX: ffff9136f9b00000 RSI: ffff91358033b800 RDI: 
-0000000000000001
-[88847.284599] RBP: ffff91358033b864 R08: ffffffff9b94dca0 R09: 
-0000000000000001
-[88847.284604] R10: 0000000000000018 R11: ffff9136f9b331a4 R12: 
-ffffffff9b94dca0
-[88847.284609] R13: ffffffff9b94dd20 R14: 0000000000000001 R15: 
-0000000000000000
-[88847.284623]  acpi_safe_halt+0x15/0x30
-[88847.284634]  acpi_idle_do_entry+0x2f/0x50
-[88847.284644]  acpi_idle_enter+0x7f/0xd0
-[88847.284655]  cpuidle_enter_state+0x81/0x440
-[88847.284667]  cpuidle_enter+0x2d/0x40
-[88847.284678]  do_idle+0x1d8/0x230
-[88847.284688]  cpu_startup_entry+0x2a/0x30
-[88847.284695]  start_secondary+0x11e/0x140
-[88847.284705]  secondary_startup_64_no_verify+0x184/0x18b
-[88847.284725]  </TASK>
 
