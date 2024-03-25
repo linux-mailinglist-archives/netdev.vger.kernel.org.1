@@ -1,94 +1,119 @@
-Return-Path: <netdev+bounces-81653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F64588A9EB
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:47:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 903AF88AB55
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 18:20:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3322C1F635B9
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:47:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D1B8EB671ED
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:47:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9328A6E613;
-	Mon, 25 Mar 2024 15:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A159E1292E8;
+	Mon, 25 Mar 2024 15:01:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nHYyExmG"
+	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="ZL1W31SA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1925C902;
-	Mon, 25 Mar 2024 15:00:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A799E38DD1
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 15:01:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711378806; cv=none; b=YDmoJtVa29CE44XfLOAOSOCo9fXxwC2fSarzsxoXb+jHtVSsXZliR8i8cGNnPvv46cXsx/wtpxtIC06Y9NKiQv7IXfOExefvB4hl6/h2K9zekCHW0Id4CCxpDsQiZTpnHAGwMpzTmmd/kNqfSRUFe+KU5doS4/2zSxgTxlM42i8=
+	t=1711378891; cv=none; b=axOBFZZala8TsFCLBY9GHOFtWo95c5w2S2VTnLt/0q4kWuUMZQgTf3imiqNRfII45blMw5fUA9SbmosaDstghylS+6reQ/llRqw0RCpy1qFu7ARAy68AKHMXRrpAOV7727qtjVd5JZezR5EtPV0IBbblsIKtGYGxj5zNGX6bU+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711378806; c=relaxed/simple;
-	bh=BGYRiuPHjSs5NCjA0CIitGjed5eRr4jqUQxPMWq3BPk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=mTe+O6HQc5FlsVU88owdAri8vVS9quzY068XuPOLySYQKqBkZUK4UGyfeJMdn1cgZoSu9ZLx1wjXMW+lef53kUdUwj8rKCxg+ks5+OsD5vGjQLUjxl4GBeDkpz0kbkO9O55zGE/wLa7Mv2SudS9nNG8PXMkBwX3CAPjxgiwXz4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nHYyExmG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DFD22C433A6;
-	Mon, 25 Mar 2024 15:00:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711378805;
-	bh=BGYRiuPHjSs5NCjA0CIitGjed5eRr4jqUQxPMWq3BPk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nHYyExmGNiOZhQziDbe7+xeeHOZWjVZxOHwWuV9FhOUQfF2OTi1E5//i67vI4nxro
-	 CvHy2ZjP3wcPgllO8LG4JzLDpg92Bit5c1GtSz83kxclAEIGT/RUUfVZdoUz105btR
-	 P+dZAcxK1hOiTGmCfi8kfxkpp356N3/9LntjWLyYZfQw5wSNIArYCFDwMWIHXMqket
-	 OTRRGGHvu7tdcbFnJ819ls9EXZzWWFH2xVFfiKXT5q75RwdAPxNi3iAGe/Bycj5Igp
-	 eLZwM5Q7YoyvOxEy++f+NPBKTltL2jLKvj2LmCEobhUxZ8Asluv7WrEQy7Z8cOX/x2
-	 /FyqRiJtMCYyA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CA34ED98304;
-	Mon, 25 Mar 2024 15:00:05 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1711378891; c=relaxed/simple;
+	bh=3hCKeKu+RySsWj6xJeXihClyH+s/PnBpp0lvFdlVjyc=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=jfmIuyo952VYr5Cf5+hpRglRf1YTbeNv1vToDekHWOahGFI9Qnkk6y1LPf0OXdqQQRq91fEsWRbuAChluyRMuYJJQYWFgSVjsgKuMpSkrXwZ6r5nWB7bCIThFaj7V/06u+C2vq01elkqLTPidNBzjrAilWM4Jd7lBTpydUWoWyc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=ZL1W31SA; arc=none smtp.client-ip=188.40.30.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
+	s=default2211; h=Content-Type:MIME-Version:Message-ID:Date:References:
+	In-Reply-To:Subject:Cc:To:From:Sender:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=BcOyNqzTX40LbbtWCeDQnZaxtmXtLEyJPCaeK5Tfjqo=; b=ZL1W31SAL8jfaedie6cxH4G4rO
+	Oh6ZuceUYbxZWIBhqSe7+1rOcm6cfglNg/yz6c0kVSgYmPtGu+8izsKuZ9ltGmt81tuHB4P6VCEbm
+	udEF3/8vuxq/CJp2JWOZnsOb0Sf5o47fUqwForqIsaCSmfnXjOaHSiwjzh8hMpP/iC1wyGgHZuJSn
+	Dp5hywovW+RC4/zGnz+3fpLpTDn+bK2MrF2mUTYdEFT9a+u5PUYyzU2Jl8Mok51/Poi3/Kl5NRdmb
+	tlUF1tXwdRKF9G7CywT2hy+oLm/cc2xSDRoLSeISvU7wKIJ5Mw+l7Y21L8zt6euLfvUvsGTXBCBpT
+	fMq7mu+g==;
+Received: from sslproxy04.your-server.de ([78.46.152.42])
+	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <esben@geanix.com>)
+	id 1rolp1-00067X-2K; Mon, 25 Mar 2024 16:01:11 +0100
+Received: from [87.49.146.11] (helo=localhost)
+	by sslproxy04.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <esben@geanix.com>)
+	id 1rolp0-0002pD-1r;
+	Mon, 25 Mar 2024 16:01:10 +0100
+From: Esben Haabendal <esben@geanix.com>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,  Sergey
+ Ryazanov <ryazanov.s.a@gmail.com>,  Paolo Abeni <pabeni@redhat.com>,  Eric
+ Dumazet <edumazet@google.com>
+Subject: Re: [PATCH net-next v2 05/22] ovpn: implement interface
+ creation/destruction via netlink
+In-Reply-To: <20240304150914.11444-6-antonio@openvpn.net> (Antonio Quartulli's
+	message of "Mon, 4 Mar 2024 16:08:56 +0100")
+References: <20240304150914.11444-1-antonio@openvpn.net>
+	<20240304150914.11444-6-antonio@openvpn.net>
+Date: Mon, 25 Mar 2024 16:01:10 +0100
+Message-ID: <871q7yz77t.fsf@geanix.com>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] net: mark racy access on sk->sk_rcvbuf
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171137880582.31307.3532925417151317901.git-patchwork-notify@kernel.org>
-Date: Mon, 25 Mar 2024 15:00:05 +0000
-References: <tencent_5A50BC27A519EBD14E1B0A8685E89405850A@qq.com>
-In-Reply-To: <tencent_5A50BC27A519EBD14E1B0A8685E89405850A@qq.com>
-To: linke li <lilinke99@qq.com>
-Cc: xujianhao01@gmail.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, kuniyu@amazon.com, willemb@google.com,
- wuyun.abel@bytedance.com, leitao@debian.org, alexander@mihalicyn.com,
- dhowells@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain
+X-Authenticated-Sender: esben@geanix.com
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27225/Mon Mar 25 09:30:27 2024)
 
-Hello:
+Antonio Quartulli <antonio@openvpn.net> writes:
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+> Allow userspace to create and destroy an interface using netlink
+> commands.
+>
+> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+> ---
+>  drivers/net/ovpn/netlink.c | 50 ++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 50 insertions(+)
+>
+> diff --git a/drivers/net/ovpn/netlink.c b/drivers/net/ovpn/netlink.c
+> index 2e855ce145e7..02b41034f615 100644
+> --- a/drivers/net/ovpn/netlink.c
+> +++ b/drivers/net/ovpn/netlink.c
+> @@ -154,7 +154,57 @@ static void ovpn_post_doit(const struct genl_split_ops *ops, struct sk_buff *skb
+>  		dev_put(ovpn->dev);
+>  }
+>  
+> +static int ovpn_nl_new_iface(struct sk_buff *skb, struct genl_info *info)
+> +{
+> +	enum ovpn_mode mode = OVPN_MODE_P2P;
+> +	struct net_device *dev;
+> +	char *ifname;
+> +	int ret;
+> +
+> +	if (!info->attrs[OVPN_A_IFNAME])
+> +		return -EINVAL;
+> +
+> +	ifname = nla_data(info->attrs[OVPN_A_IFNAME]);
+> +
+> +	if (info->attrs[OVPN_A_MODE]) {
+> +		mode = nla_get_u8(info->attrs[OVPN_A_MODE]);
+> +		netdev_dbg(dev, "%s: setting device (%s) mode: %u\n", __func__, ifname,
+> +			   mode);
 
-On Thu, 21 Mar 2024 16:44:10 +0800 you wrote:
-> sk->sk_rcvbuf in __sock_queue_rcv_skb() and __sk_receive_skb() can be
-> changed by other threads. Mark this as benign using READ_ONCE().
-> 
-> This patch is aimed at reducing the number of benign races reported by
-> KCSAN in order to focus future debugging effort on harmful races.
-> 
-> Signed-off-by: linke li <lilinke99@qq.com>
-> 
-> [...]
+Maybe print out the message even if the default mode is used, as the
+mode is applied in ovpn_iface_create anyways.
 
-Here is the summary with links:
-  - [v2] net: mark racy access on sk->sk_rcvbuf
-    https://git.kernel.org/netdev/net/c/c2deb2e971f5
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+/Esben
 
