@@ -1,234 +1,122 @@
-Return-Path: <netdev+bounces-81716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 214F088AF96
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:15:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 507B288AE83
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 19:37:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84342BE36A6
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 18:33:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E11BB1F62D55
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 18:37:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DC947173A;
-	Mon, 25 Mar 2024 18:12:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5EAD4AEEF;
+	Mon, 25 Mar 2024 18:20:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HZDg6JCa"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kehs/q75"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A56E85CDE9
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 18:12:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 161F6804
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 18:20:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711390372; cv=none; b=Yp30Q13awAAArfTRaB9ferw/AtsngAzd4bp32xP/Dk98OIAIpIrP8icr7moAlzVgujD5YTM8bVbSUwfFzMUheBA1KRvMKSwBcYsH5yPcjFudJEXwrkiH39VmsIsMMKqyl1ZYMIx9iA8KD/MV8epjruAeD85yWLnzXQ2dMUUgNjw=
+	t=1711390802; cv=none; b=GsCm7F5LeLZnTPu7IR6kJwKrrHB8oNMfJQaUFCtub56DF7s5EiDtFlOZ9QLbceuW4/T4tVRYwOVMt8VVhrw2kjKQIeXUoCaVUkIyb2A2QziFvu8wsLardRhFo32wxIa8kT1bCW4PiCL620k6T/UBA/7KBiHT9cV276j6oJNSSlo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711390372; c=relaxed/simple;
-	bh=3js9m8LIdIDOjS15vaBNl4Xy7s/1IUTNRl1J7ho5058=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IgnmPN+K+AS+jS2donPlR30k9SxDhSF5f7LSuIgeAjTWenyPoRhYg8m/+NfvFTYrG9NZ5w9GZkRhiryFjlLgDl6+KR/NU7l9eYET3Oa13gAbC7hSHwjpPjlbVOq/6zi8fdZzfaUBvcG19LqN3Z1xKngxOB0ZGAzA8qVO9aCWmg0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HZDg6JCa; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <20e4ebd6-0f75-4472-88f3-96d07af6f665@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1711390366;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MbwcdWTRc+bUk4Dft1mEuyAA2zHW3fKnc5xu7hZzC2A=;
-	b=HZDg6JCaizG48xLEOh4+6nCPwIU6zmoorMzWHkis2a+C3Z3zKSMfirPz60RcVPYCf39SJZ
-	zzvqtI3hmOZZb/LWghZ6fzBI/rvQYKKEs3r8ZmooAr4MU6BMOe2CC9IdPDQuI23hKbjbIq
-	+hBwxhkUHZd3qhMiDeSln/ZT+0xSbX0=
-Date: Mon, 25 Mar 2024 11:12:39 -0700
+	s=arc-20240116; t=1711390802; c=relaxed/simple;
+	bh=PFC9ZLK4FnT1EMmd6G3nx+4CemO7fR9rHNubgE+aLz8=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=sQQQO7pO4B1LjG6/J9jHE6HflhtqrCu7gnrsyqfiWOumB59LWmisjPTBzFEA/u1UihUfZsNFnbrhfWghsT3gPl7RuHDoMUBoiFzrXC1iVmiw6aqC94cS2O1B238wK8iwIg0MF1KehKPwXzcTYkj8X8GiSfwao9L+9SbLfxcEdgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kehs/q75; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1711390802; x=1742926802;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=uHhlIrcbjgGugVrnULqKo79hOAeKgkuRQs1mlZIeYWs=;
+  b=kehs/q75m/6qErL71bCz/ABQGlMY6IG1MEwkhUtqHZpy/8FZMB4nrvoW
+   X8IjBhLtyO7OG1UEJUbbb46ie2+5b7YSzoCsxzk9w1GuHvxKTx/Z17Jdq
+   7TFDjJQt4JPpfI/lKPfR8CPZuEtGvJQyKYB0GpvHNjkYG9GEjwKWqy0iY
+   w=;
+X-IronPort-AV: E=Sophos;i="6.07,153,1708387200"; 
+   d="scan'208";a="713639837"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 18:19:51 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:59981]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.85:2525] with esmtp (Farcaster)
+ id 2a48eecb-5f6f-4265-83fe-bc1c6aeb733a; Mon, 25 Mar 2024 18:19:49 +0000 (UTC)
+X-Farcaster-Flow-ID: 2a48eecb-5f6f-4265-83fe-bc1c6aeb733a
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Mon, 25 Mar 2024 18:19:49 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.171.62) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.28; Mon, 25 Mar 2024 18:19:46 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, David Ahern <dsahern@kernel.org>
+CC: Joanne Koong <joannelkoong@gmail.com>, Jianguo Wu <wujianguo106@163.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net 0/8] tcp: Fix bind() regression and more tests.
+Date: Mon, 25 Mar 2024 11:19:15 -0700
+Message-ID: <20240325181923.48769-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v1 bpf-next 2/2] selftests/bpf: Add BPF_FIB_LOOKUP_MARK
- tests
-Content-Language: en-US
-To: Anton Protopopov <aspsk@isovalent.com>
-Cc: Rumen Telbizov <rumen.telbizov@menlosecurity.com>,
- David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
- Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Jiri Olsa <jolsa@kernel.org>,
- Stanislav Fomichev <sdf@google.com>, bpf@vger.kernel.org
-References: <20240322140244.50971-1-aspsk@isovalent.com>
- <20240322140244.50971-3-aspsk@isovalent.com>
- <e8062ef6-b630-45e2-8009-4d2cdc0970ea@linux.dev>
- <ZgBA6X0QgP+TMFd9@zh-lab-node-5>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <ZgBA6X0QgP+TMFd9@zh-lab-node-5>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWB004.ant.amazon.com (10.13.139.164) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 3/24/24 8:04 AM, Anton Protopopov wrote:
-> On Sat, Mar 23, 2024 at 03:34:10PM -0700, Martin KaFai Lau wrote:
->> On 3/22/24 7:02 AM, Anton Protopopov wrote:
->>> This patch extends the fib_lookup test suite by adding a few test
->>> cases for each IP family to test the new BPF_FIB_LOOKUP_MARK flag
->>> to the bpf_fib_lookup:
->>>
->>>     * Test destination IP address selection with and without a mark
->>>       and/or the BPF_FIB_LOOKUP_MARK flag set
->>>
->>> To test this functionality another network namespace and a new veth
->>> pair were added to the test.
->>>
->>
->> [ ... ]
->>
->>>    static const struct fib_lookup_test tests[] = {
->>> @@ -90,10 +105,47 @@ static const struct fib_lookup_test tests[] = {
->>>    	  .daddr = IPV6_ADDR_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
->>>    	  .expected_src = IPV6_IFACE_ADDR_SEC,
->>>    	  .lookup_flags = BPF_FIB_LOOKUP_SRC | BPF_FIB_LOOKUP_SKIP_NEIGH, },
->>> +	/* policy routing */
->>> +	{ .desc = "IPv4 policy routing, default",
->>> +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
->>> +	  .expected_dst = IPV4_GW1, .ifname = "veth3",
->>> +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH, },
->>> +	{ .desc = "IPv4 policy routing, mark doesn't point to a policy",
->>> +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
->>> +	  .expected_dst = IPV4_GW1, .ifname = "veth3",
->>> +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
->>> +	  .mark = MARK_NO_POLICY, },
->>> +	{ .desc = "IPv4 policy routing, mark points to a policy",
->>> +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
->>> +	  .expected_dst = IPV4_GW2, .ifname = "veth3",
->>> +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
->>> +	  .mark = MARK, },
->>> +	{ .desc = "IPv4 policy routing, mark points to a policy, but no flag",
->>> +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
->>> +	  .expected_dst = IPV4_GW1, .ifname = "veth3",
->>> +	  .lookup_flags = BPF_FIB_LOOKUP_SKIP_NEIGH,
->>> +	  .mark = MARK, },
->>> +	{ .desc = "IPv6 policy routing, default",
->>> +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
->>> +	  .expected_dst = IPV6_GW1, .ifname = "veth3",
->>> +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH, },
->>> +	{ .desc = "IPv6 policy routing, mark doesn't point to a policy",
->>> +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
->>> +	  .expected_dst = IPV6_GW1, .ifname = "veth3",
->>> +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
->>> +	  .mark = MARK_NO_POLICY, },
->>> +	{ .desc = "IPv6 policy routing, mark points to a policy",
->>> +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
->>> +	  .expected_dst = IPV6_GW2, .ifname = "veth3",
->>> +	  .lookup_flags = BPF_FIB_LOOKUP_MARK | BPF_FIB_LOOKUP_SKIP_NEIGH,
->>> +	  .mark = MARK, },
->>> +	{ .desc = "IPv6 policy routing, mark points to a policy, but no flag",
->>> +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
->>> +	  .expected_dst = IPV6_GW1, .ifname = "veth3",
->>> +	  .lookup_flags = BPF_FIB_LOOKUP_SKIP_NEIGH,
->>> +	  .mark = MARK, },
->>>    };
->>> -static int ifindex;
->>> -
->>>    static int setup_netns(void)
->>>    {
->>>    	int err;
->>> @@ -144,12 +196,40 @@ static int setup_netns(void)
->>>    	if (!ASSERT_OK(err, "write_sysctl(net.ipv6.conf.veth1.forwarding)"))
->>>    		goto fail;
->>> +	/* Setup for policy routing tests */
->>> +	SYS(fail, "ip link add veth3 type veth peer name veth4");
->>> +	SYS(fail, "ip link set dev veth3 up");
->>> +	SYS(fail, "ip link set dev veth4 netns %s up", NS_REMOTE);
->>> +
->>> +	SYS(fail, "ip addr add %s/24 dev veth3", IPV4_LOCAL);
->>> +	SYS(fail, "ip netns exec %s ip addr add %s/24 dev veth4", NS_REMOTE, IPV4_GW1);
->>> +	SYS(fail, "ip netns exec %s ip addr add %s/24 dev veth4", NS_REMOTE, IPV4_GW2);
->>> +	SYS(fail, "ip addr add %s/64 dev veth3 nodad", IPV6_LOCAL);
->>> +	SYS(fail, "ip netns exec %s ip addr add %s/64 dev veth4 nodad", NS_REMOTE, IPV6_GW1);
->>> +	SYS(fail, "ip netns exec %s ip addr add %s/64 dev veth4 nodad", NS_REMOTE, IPV6_GW2);
->>
->> Trying to see if the setup can be simplified.
->>
->> Does it need to add another netns and setup a reachable IPV[46]_GW[12] gateway?
->>
->> The test is not sending any traffic and it is a BPF_FIB_LOOKUP_SKIP_NEIGH test.
-> 
-> I think this will not work without another namespace, as FIB lookup will
-> return DST="final destination", not DST="gateway", as the gateway is in the
-> same namespace and can be skipped.
+bhash2 has not been well tested for IPV6_V6ONLY option.
 
-hmm... not sure I understand why it would get "final destination". Am I missing something?
-To be specific, there is no need to configure the IPV[46]_GW[12] address:
+This series fixes two regression around IPV6_V6ONLY, one of which
+has been there since bhash2 introduction, and another is introduced
+by a recent change.
 
--	SYS(fail, "ip link set dev veth4 netns %s up", NS_REMOTE);
+Also, this series adds as many tests as possible to catch regression
+easily.  The baseline is 28044fc1d495~ which is pre-bhash2 commit.
 
-	SYS(fail, "ip addr add %s/24 dev veth3", IPV4_LOCAL);
--	SYS(fail, "ip netns exec %s ip addr add %s/24 dev veth4", NS_REMOTE, IPV4_GW1);
--	SYS(fail, "ip netns exec %s ip addr add %s/24 dev veth4", NS_REMOTE, IPV4_GW2);
-	SYS(fail, "ip addr add %s/64 dev veth3 nodad", IPV6_LOCAL);
--	SYS(fail, "ip netns exec %s ip addr add %s/64 dev veth4 nodad", NS_REMOTE, IPV6_GW1);
--	SYS(fail, "ip netns exec %s ip addr add %s/64 dev veth4 nodad", NS_REMOTE, IPV6_GW2);
-	SYS(fail, "ip route add %s/32 via %s", IPV4_REMOTE_DST, IPV4_GW1);
-	SYS(fail, "ip route add %s/32 via %s table %s", IPV4_REMOTE_DST, IPV4_GW2, MARK_TABLE);
-	SYS(fail, "ip -6 route add %s/128 via %s", IPV6_REMOTE_DST, IPV6_GW1);
-	SYS(fail, "ip -6 route add %s/128 via %s table %s", IPV6_REMOTE_DST, IPV6_GW2, MARK_TABLE);
-	SYS(fail, "ip rule add prio 2 fwmark %d lookup %s", MARK, MARK_TABLE);
-	SYS(fail, "ip -6 rule add prio 2 fwmark %d lookup %s", MARK, MARK_TABLE);
+ Tested on 28044fc1d495~:
+  # PASSED: 132 / 132 tests passed.
+  # Totals: pass:132 fail:0 xfail:0 xpass:0 skip:0 error:0
 
-[root@arch-fb-vm1 ~]# ip netns exec fib_lookup_ns /bin/bash
+ net.git:
+  # FAILED: 125 / 132 tests passed.
+  # Totals: pass:125 fail:7 xfail:0 xpass:0 skip:0 error:0
 
-[root@arch-fb-vm1 ~]# ip -6 rule
-0:	from all lookup local
-2:	from all fwmark 0x2a lookup 200
-32766:	from all lookup main
+ With this series:
+  # PASSED: 132 / 132 tests passed.
+  # Totals: pass:132 fail:0 xfail:0 xpass:0 skip:0 error:0
 
-[root@arch-fb-vm1 ~]# ip -6 route show table main
-be:ef::b0:10 via fd01::1 dev veth3 metric 1024 linkdown pref medium
 
-[root@arch-fb-vm1 ~]# ip -6 route show table 200
-be:ef::b0:10 via fd01::2 dev veth3 metric 1024 linkdown pref medium
+Kuniyuki Iwashima (8):
+  tcp: Fix bind() regression for v6-only wildcard and v4-mapped-v6
+    non-wildcard addresses.
+  tcp: Fix bind() regression for v6-only wildcard and v4(-mapped-v6)
+    non-wildcard addresses.
+  selftest: tcp: Make bind() selftest flexible.
+  selftest: tcp: Define the reverse order bind() tests explicitly.
+  selftest: tcp: Add v4-v4 and v6-v6 bind() conflict tests.
+  selftest: tcp: Add more bind() calls.
+  selftest: tcp: Add bind() tests for IPV6_V6ONLY.
+  selftest: tcp: Add bind() tests for SO_REUSEADDR/SO_REUSEPORT.
 
-[root@arch-fb-vm1 ~]# ip -6 route get be:ef::b0:10
-be:ef::b0:10 from :: via fd01::1 dev veth3 src fd01::3 metric 1024 pref medium
+ net/ipv4/inet_connection_sock.c             |  22 +-
+ tools/testing/selftests/net/bind_wildcard.c | 783 ++++++++++++++++++--
+ 2 files changed, 729 insertions(+), 76 deletions(-)
 
-[root@arch-fb-vm1 ~]# ip -6 route get be:ef::b0:10 mark 0x2a
-be:ef::b0:10 from :: via fd01::2 dev veth3 table 200 src fd01::3 metric 1024 pref medium
-
-> 
-> Instead of adding a new namespace I can move the second interface to the
-> root namespace. This will work, but then we're interfering with the root
-> namespace.
-> 
->>> +	SYS(fail, "ip route add %s/32 via %s", IPV4_REMOTE_DST, IPV4_GW1);
->>> +	SYS(fail, "ip route add %s/32 via %s table %s", IPV4_REMOTE_DST, IPV4_GW2, MARK_TABLE);
->>> +	SYS(fail, "ip -6 route add %s/128 via %s", IPV6_REMOTE_DST, IPV6_GW1);
->>> +	SYS(fail, "ip -6 route add %s/128 via %s table %s", IPV6_REMOTE_DST, IPV6_GW2, MARK_TABLE);
->>> +	SYS(fail, "ip rule add prio 2 fwmark %d lookup %s", MARK, MARK_TABLE);
->>> +	SYS(fail, "ip -6 rule add prio 2 fwmark %d lookup %s", MARK, MARK_TABLE);
->>> +
->>> +	err = write_sysctl("/proc/sys/net/ipv4/conf/veth3/forwarding", "1");
->>> +	if (!ASSERT_OK(err, "write_sysctl(net.ipv4.conf.veth3.forwarding)"))
->>> +		goto fail;
->>> +
->>> +	err = write_sysctl("/proc/sys/net/ipv6/conf/veth3/forwarding", "1");
->>> +	if (!ASSERT_OK(err, "write_sysctl(net.ipv6.conf.veth3.forwarding)"))
->>> +		goto fail;
->>> +
->>>    	return 0;
->>>    fail:
->>>    	return -1;
->>>    }
->>
->> [ ... ]
->>
->>> @@ -248,6 +337,7 @@ void test_fib_lookup(void)
->>>    	prog_fd = bpf_program__fd(skel->progs.fib_lookup);
->>>    	SYS(fail, "ip netns add %s", NS_TEST);
->>> +	SYS(fail, "ip netns add %s", NS_REMOTE);
->>
->>
+-- 
+2.30.2
 
 
