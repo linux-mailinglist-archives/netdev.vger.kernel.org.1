@@ -1,123 +1,129 @@
-Return-Path: <netdev+bounces-81802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B33C88B207
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:52:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E075888B5B7
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 01:02:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 009F31C3AA9D
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:52:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4EE72B27CC6
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:54:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF0B35A4D4;
-	Mon, 25 Mar 2024 20:48:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FDB85A7B4;
+	Mon, 25 Mar 2024 20:54:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ctWQF93J"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B/jnsN4s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C8F5A7A8
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 20:48:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC3A2C87C;
+	Mon, 25 Mar 2024 20:54:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711399727; cv=none; b=PDS8+n4MkAAf25maaLU3Dl9pE+vl7crJPgK+SliVG9GZ9XvExXVyEu4UV3tkCTmNpJkS1eJOaJBO7AX6EF7T7vasDb4Q+RhZy8tDF1Kg5galLCjX1Dpq4gYXRGnstK8LDFhzGTkZdP2bHhJwVktwTFVZ1S4f53WduMuleRW/RFw=
+	t=1711400045; cv=none; b=mEZ7HfF0m0x23EtKyJQeYOd0lAsUvmhzX4BKxaYlz8ThTIue/XfeEP1gTDV8JBZfRiJI0Fr0P7ep68L5TUQlNJjF+60oXzXd3B57/OLibeTD/rADTPM4JVhPfOYPppHbhc/djtmWVQAVTce6LzMl6WQGTyLg06NZDFmIb8K6Dd4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711399727; c=relaxed/simple;
-	bh=IxsBgIi8bOIa7NuGF8CvdPaPRA26MXaFaFJE3EBb9cI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=qNOwyJJUixu1/yUKrYln717+D3a753YsSc510mUnB4J1X5wDZup4D0hR8+kQnA5CNjNDAEmGcQkQ3x0IWRpSx0ftZYQ3jDT3QU26gPVY5snEA08s3cZqNcC37Ag726hYnTIIjogQ62n65N5dZRLGy1x8m2e0lVlnvf9Wtma2Lrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ctWQF93J; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-33ddd1624beso2970383f8f.1
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 13:48:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711399724; x=1712004524; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=c45tiodY9E4mSJ1693+kxoxg9aws0ZJlkkhHNQFJhO8=;
-        b=ctWQF93JcCW/mv+Vd9cAPtoj8KoM+JAnEcbFoBZEwLGPzjHH2RLuRYp8tcFWc3XE3d
-         6pSNWsj0NVyKdVgpmZFbTVtUBXm1vJdz+NG5tYxWDCeR7vVKcgK/ORAvSJto+px1aIjn
-         DeFsdSUSgWysDvvybovFmS3KnN4cDKPPuQNwD+imedVebkQVHDJODfwSezIRC4CvLaUm
-         nLYxJSMG5KUQJcMcmcR6jUj9dofUxM+B129dh2YPcA51prwQg3pRZoyObjm7/YMxF62/
-         StgNpjS3BZ82WDh8t0AhmPkvg9kucRLtIReYQgMupWoZ+XKxTwoBzFCgWoCNe3IfwBPq
-         6USQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711399724; x=1712004524;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=c45tiodY9E4mSJ1693+kxoxg9aws0ZJlkkhHNQFJhO8=;
-        b=PO/t8ci/tWhcnSconkh+IiEbg3WcadfziE0il+99B0ublAPFmZanfQSh40u0FQ/ZFe
-         ltb35xcpIHm0p+iXWcEZzURZc9hV9gsFx0iMbnp+CeA/zFki4CycxTvR88zb2s6BAt+Q
-         A2wFNJOTC8q5DZwNCEJTnwesDZgU/QI05ArXECsqIyQDidNpnsk2A7L4ZzO8p4zu0z7e
-         E+exUqZkSMtWvUY9qSOC2LMGIgmcYkVIHzxeofbT2EWAqzg3xe6cRHlGHDQaxpcGB8q6
-         LmlZ1Ub/fc6nlt7xRCLrDgI/PGDvi3Df97bUa2GPuAFNgUm1farO4KgDcCXOlE+MYfbZ
-         oVcA==
-X-Gm-Message-State: AOJu0YxhJZKJmEXl1jNIzA/XKWgtkgm2fj8fEytpcJkDGWFz6RRlKccH
-	680rvOc9k79cY8CGcTbrcD8Au5gWPHQt1kMIKJ4mVQwUGjOF50LM4oKnCtUth+M=
-X-Google-Smtp-Source: AGHT+IFA5PdlbpfclNFliZ3AvPV/2l0sUaRQURofEZLWKGl/Frw/LrxlBNjZdJQBfY9NzaosntJZkA==
-X-Received: by 2002:a5d:6387:0:b0:341:ab6c:71e4 with SMTP id p7-20020a5d6387000000b00341ab6c71e4mr6369617wru.19.1711399723844;
-        Mon, 25 Mar 2024 13:48:43 -0700 (PDT)
-Received: from lenovo-lap.localdomain (89-138-235-214.bb.netvision.net.il. [89.138.235.214])
-        by smtp.googlemail.com with ESMTPSA id bk3-20020a0560001d8300b00341c9956dc9sm5282982wrb.68.2024.03.25.13.48.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Mar 2024 13:48:43 -0700 (PDT)
-From: Yedaya Katsman <yedaya.ka@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Stephen Hemminger <stephen@networkplumber.org>,
-	Yedaya Katsman <yedaya.ka@gmail.com>
-Subject: [PATCH] ip: Make errors direct to "list" instead of "show"
-Date: Mon, 25 Mar 2024 22:48:37 +0200
-Message-Id: <20240325204837.3010-1-yedaya.ka@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1711400045; c=relaxed/simple;
+	bh=K/UWqJ3RELUjwbbwbY+jm8V/OvOciYNRSFf5gpvWG/M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=oWEWMout4aJsQCQAuihEa9T5oSMF7YKcQAdmIbycBcpXo5//b6aLQTvEmtJyYCzWbn7TtT8ICKITeS4xcB5AQp4+LsBV6swm1IN/8Ku3IvDZgW5LF08aURwc1UJsSu/ylFW0kb6wCWAgHQPkmmSOPiPJH8L6WzEcdWDCw/5FHyQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B/jnsN4s; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B526C433C7;
+	Mon, 25 Mar 2024 20:54:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711400045;
+	bh=K/UWqJ3RELUjwbbwbY+jm8V/OvOciYNRSFf5gpvWG/M=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=B/jnsN4smTnxj4WLDKV7xQOHnLZhwOs1v20W5LLbc1G6BS1dsjo2tlu58/+IO9cVo
+	 zWlEbJtp63AsozGP1BMpuQEaAxiXefNlBTSHtnhKvTWNmPDsDO7CwiJJ74c7yqY9/r
+	 4I2Po7xse2RPq0ZW+GqsYs0QsmkBKdwaU1o8VLslNCD3/xr3xmN13LM+lzTKApWDe8
+	 n2lwPYegNWWNuT0oGEFXq1rnp9ViAt6nKw00wBAHmpXiu5pV+GDnflRJKOm6c5Ct1N
+	 jIb96JgdIlCm2nykfI4Xa0ZBNPUcUKKMdJLK5eU5nTbbpRhQwcGZ9PBgOeVQUZhNjf
+	 F3sDjOq8DQgmA==
+Date: Mon, 25 Mar 2024 20:54:01 +0000
+From: Simon Horman <horms@kernel.org>
+To: thomas.perrot@bootlin.com
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: macb: allow MTU change when the interface
+ is up
+Message-ID: <20240325205401.GF403975@kernel.org>
+References: <20240325152735.1708636-1-thomas.perrot@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240325152735.1708636-1-thomas.perrot@bootlin.com>
 
-The usage text and man pages only have "list" in them, but the errors
-when using "ip ila list" and "ip addrlabel list" incorrectly direct to
-running the "show" subcommand. Make them consistent by mentioning "list"
-instead.
+On Mon, Mar 25, 2024 at 04:27:35PM +0100, thomas.perrot@bootlin.com wrote:
+> From: Thomas Perrot <thomas.perrot@bootlin.com>
+> 
+> The macb_change_mtu callback doesn't allow MTU changes when the
+> interface is up because the MTU is used to set the buffer size on
+> GEM.
+> 
+> So, to be able to change the MTU from userspace it is necessary to
+> explicitly down then to up the interface, which is problematic in
+> some cases.
+> 
+> Then we suggest to reset the interface when the interface is already
+> up to allow to change the MTU, regardless of if the interface is up
+> or not.
+> 
+> Signed-off-by: Thomas Perrot <thomas.perrot@bootlin.com>
 
-Signed-off-by: Yedaya Katsman <yedaya.ka@gmail.com>
----
- ip/ipaddrlabel.c | 2 +-
- ip/ipila.c       | 2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Hi Thomas,
 
-diff --git a/ip/ipaddrlabel.c b/ip/ipaddrlabel.c
-index b045827a03ea..d343993b64a9 100644
---- a/ip/ipaddrlabel.c
-+++ b/ip/ipaddrlabel.c
-@@ -101,7 +101,7 @@ static int ipaddrlabel_list(int argc, char **argv)
- 		af = AF_INET6;
- 
- 	if (argc > 0) {
--		fprintf(stderr, "\"ip addrlabel show\" does not take any arguments.\n");
-+		fprintf(stderr, "\"ip addrlabel list\" does not take any arguments.\n");
- 		return -1;
- 	}
- 
-diff --git a/ip/ipila.c b/ip/ipila.c
-index f4387e039f97..50d834f4625c 100644
---- a/ip/ipila.c
-+++ b/ip/ipila.c
-@@ -142,7 +142,7 @@ static int do_list(int argc, char **argv)
- 	ILA_REQUEST(req, 1024, ILA_CMD_GET, NLM_F_REQUEST | NLM_F_DUMP);
- 
- 	if (argc > 0) {
--		fprintf(stderr, "\"ip ila show\" does not take "
-+		fprintf(stderr, "\"ip ila list\" does not take "
- 			"any arguments.\n");
- 		return -1;
- 	}
--- 
-2.34.1
+I'm not sure that it is expected behaviour for an interface
+to reset like this when a change of MTU is requested.
+While conversely I think it is common (if not entirely desirable)
+to prohibit changing the MTU when an interface is up.
+What is the problem being addressed here?
 
+> ---
+>  drivers/net/ethernet/cadence/macb_main.c | 12 ++++++++++--
+>  1 file changed, 10 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/cadence/macb_main.c b/drivers/net/ethernet/cadence/macb_main.c
+> index 898debfd4db3..5c20b162c5da 100644
+> --- a/drivers/net/ethernet/cadence/macb_main.c
+> +++ b/drivers/net/ethernet/cadence/macb_main.c
+> @@ -3019,11 +3019,19 @@ static int macb_close(struct net_device *dev)
+>  
+>  static int macb_change_mtu(struct net_device *dev, int new_mtu)
+>  {
+> -	if (netif_running(dev))
+> -		return -EBUSY;
+> +	int reset = 0;
+
+nit: reset could be bool and set to true and false.
+
+> +
+> +	/* On GEM the buffer size is based on the MTU */
+> +	if (netif_running(dev)) {
+> +		macb_close(dev);
+> +		reset = 1;
+> +	}
+>  
+>  	dev->mtu = new_mtu;
+>  
+> +	if (reset)
+> +		macb_open(dev);
+> +
+>  	return 0;
+>  }
+>  
+> -- 
+> 2.44.0
+> 
+> 
 
