@@ -1,89 +1,126 @@
-Return-Path: <netdev+bounces-81852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F4BA88B4F8
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 00:06:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9711388B529
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 00:21:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D329E1F27DA6
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 23:06:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E57D1F3F6D1
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 23:21:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13EEC82C69;
-	Mon, 25 Mar 2024 23:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD6482D76;
+	Mon, 25 Mar 2024 23:21:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="miVONJQ5"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dth1Ym+y"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A33918174F;
-	Mon, 25 Mar 2024 23:06:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A033A82D74
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 23:21:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711407987; cv=none; b=Z29K7eEwFD8D9Ohg3BbTwPi3/uonv1sd4VSpiOX0NiG+X2J5cC5E2pTG3FS04dqsrvjD9TEsy4aALd/UAQZmy/4UOWM7LX2QUQi1vWaFK2EFl1oiP816I30FVOk1K1N7YaL8bcb4Ic60ipXATPmKPZkh/QKgeURO/KrkAOBSDYM=
+	t=1711408880; cv=none; b=iO/QfI5vXh8980JCOvy3+TYhURtB3f0ZAqCfDvOsajLlitHhOAdpvPHXcX/kmnxHEz9/JNuqkAHnG0pRLBuFLwrHTKyp3zIVpulv/nWR6JXAKqtfNIGAMlfCYotqDtrzB7GZ3VpvofXY0KtZXQJ9PTBf2k5Z6WYPYB83irO3kh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711407987; c=relaxed/simple;
-	bh=1QyVL22FJBxcb4t1+dh5JP6zFPMFsBApFX/CuykGQcQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HRMHVPKE1Fd9LSqmSwz8I1rSNnJkX4Wy6WS6K2IDieW1JHO8u/bvy5Zm+5hGyQGE9PP93o/8FqhNcJvlJbFPDmOqumSRoR3PEyq/YDPQHzLxq2hfalYGx5Su+DUMiG6Z9Txgs9OZmct7yg8oTNh/02gudtTvlu6UgUAM7UML6p8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=miVONJQ5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D81ECC433F1;
-	Mon, 25 Mar 2024 23:06:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711407987;
-	bh=1QyVL22FJBxcb4t1+dh5JP6zFPMFsBApFX/CuykGQcQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=miVONJQ5NXRsG7mtEQGjb5OCHUFlD7yIcjL8Zczot8iH1PlPuzLpzXUWN779YGM8y
-	 sdRSypBm9jXhiqw1IzSFooBJQq5k1wtRXrJIOTx4xbzUnA1RJeHfwPvxzQkJwqjAA2
-	 N6YIqez7RTTZpmbSlWcSMzhmaSXkYG9rvLI4m7dYZcw7TieXzKum/7A5nU+P13vC61
-	 T1cLGk10rXaP0S8Iok04wj1ZA1e/YPTPkHaE8qnOaUkw/8fA7OGzdEbCdysSpVND4U
-	 Gsl75wBe1MjtRVXYky/7xx56/oe9JwwwMEAsu3NP0isHTJVisTQU7YEP34h3oAU2oc
-	 dvb52RefFwqtw==
-Message-ID: <ea5a0baa-64f3-40f8-a775-433eeb0b430e@kernel.org>
-Date: Tue, 26 Mar 2024 08:06:22 +0900
+	s=arc-20240116; t=1711408880; c=relaxed/simple;
+	bh=wJFRfGV8K7liyPfnKvzSO8Kd4P5q8g+CoB6Lfn2nafU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hbtBf0u1TtimDILgdjc2pdE1oxb5bOWAkvVX3TDuou7TvKmLBVCRIc7Tamh7obMOghhFPUZ532cFFutiX8gf7LOQKbg4HRejghYXcCa8M2Lk0MtoXLWSb9LLCBv/W26E2gTi8ys+BnMpX8UzIFLdLXgf7nRTwxHunsj+yQoNmJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dth1Ym+y; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711408877;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hbyrW4oiu2K+eG+UkCoc4x4UhSK2JRbA091u/DQjSuw=;
+	b=dth1Ym+y2hpktYKhnFsRPZdFH+dpABFhcIVbDr4KEz6xFn1b8MJ431dJ18LJblSd40blA4
+	hZBC4GrPr8qq453wot7I/Wm5SjkpdvjkQ7/Ui4zPYh0jiltlYgGFyVehO7JzCtodHtI6c6
+	uM1uFQumt4Y0gVxhZqmb/7NnYdGDNh4=
+Received: from mimecast-mx02.redhat.com (mx-ext.redhat.com [66.187.233.73])
+ by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-628-cfZ_TQtiPGC5DJpskPnxvg-1; Mon,
+ 25 Mar 2024 19:21:14 -0400
+X-MC-Unique: cfZ_TQtiPGC5DJpskPnxvg-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 749E63803905;
+	Mon, 25 Mar 2024 23:21:13 +0000 (UTC)
+Received: from localhost.localdomain (unknown [10.45.225.113])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6226E1C060A4;
+	Mon, 25 Mar 2024 23:21:10 +0000 (UTC)
+From: Michal Schmidt <mschmidt@redhat.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	netdev@vger.kernel.org,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
+	Karol Kolacinski <karol.kolacinski@intel.com>,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	"Temerkhanov, Sergey" <sergey.temerkhanov@intel.com>
+Subject: [PATCH net-next v4 0/3] ice: lighter locking for PTP time reading
+Date: Tue, 26 Mar 2024 00:20:36 +0100
+Message-ID: <20240325232039.76836-1-mschmidt@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 00/28] Remove PCI_IRQ_LEGACY
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
- Manivannan Sadhasivami <manivannan.sadhasivam@linaro.org>,
- linux-scsi@vger.kernel.org, "Martin K . Petersen"
- <martin.petersen@oracle.com>, Jaroslav Kysela <perex@perex.cz>,
- linux-sound@vger.kernel.org, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, linux-usb@vger.kernel.org,
- linux-serial@vger.kernel.org, Hans de Goede <hdegoede@redhat.com>,
- platform-driver-x86@vger.kernel.org, ntb@lists.linux.dev,
- Lee Jones <lee@kernel.org>, David Airlie <airlied@gmail.com>,
- amd-gfx@lists.freedesktop.org, Jason Gunthorpe <jgg@ziepe.ca>,
- linux-rdma@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20240325175941.GA1443646@bhelgaas>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20240325175941.GA1443646@bhelgaas>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.4.1 on 10.11.54.7
 
-On 3/26/24 02:59, Bjorn Helgaas wrote:
-> I applied all these to pci/enumeration for v6.10, thanks!
-> 
-> I added acks and reviewed-by and will update if we receive more, and
-> adjusted subject lines to add "... instead of PCI_IRQ_LEGACY" and in
-> some cases to match history of the file.
+This series removes the use of the heavy-weight PTP hardware semaphore
+in the gettimex64 path. Instead, serialization of access to the time
+register is done using a host-side spinlock. The timer hardware is
+shared between PFs on the PCI adapter, so the spinlock must be shared
+between ice_pf instances too.
 
-Thanks Bjorn !
+Replacing the PTP hardware semaphore entirely with a mutex is also
+possible and you can see it done in my git branch[1], but I am not
+posting those patches yet to keep the scope of this series limited.
+
+[1] https://gitlab.com/mschmidt2/linux/-/commits/ice-ptp-host-side-lock-10
+
+v4:
+ - Patch 1: Use named GENMASK macros and FIELD_PREP.
+
+v3:
+ - Longer variable name ("a" -> "adapter").
+ - Propagate xarray error in ice_adapter_get with ERR_PTR.
+ - Added kernel-doc comments for ice_adapter_{get,put}.
+
+v2:
+ - Patch 1: Rely on xarray's own lock. (Suggested by Jiri Pirko)
+ - Patch 2: Do not use *_irqsave with ptp_gltsyn_time_lock, as it's used
+   only in process contexts.
+
+
+Michal Schmidt (3):
+  ice: add ice_adapter for shared data across PFs on the same NIC
+  ice: avoid the PTP hardware semaphore in gettimex64 path
+  ice: fold ice_ptp_read_time into ice_ptp_gettimex64
+
+ drivers/net/ethernet/intel/ice/Makefile      |   3 +-
+ drivers/net/ethernet/intel/ice/ice.h         |   2 +
+ drivers/net/ethernet/intel/ice/ice_adapter.c | 116 +++++++++++++++++++
+ drivers/net/ethernet/intel/ice/ice_adapter.h |  28 +++++
+ drivers/net/ethernet/intel/ice/ice_main.c    |   8 ++
+ drivers/net/ethernet/intel/ice/ice_ptp.c     |  33 +-----
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c  |   3 +
+ 7 files changed, 163 insertions(+), 30 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_adapter.c
+ create mode 100644 drivers/net/ethernet/intel/ice/ice_adapter.h
 
 -- 
-Damien Le Moal
-Western Digital Research
+2.43.2
 
 
