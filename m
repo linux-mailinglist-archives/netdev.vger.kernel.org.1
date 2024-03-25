@@ -1,115 +1,166 @@
-Return-Path: <netdev+bounces-81553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF07388A32C
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 14:54:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58EFF88AF6C
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:07:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB3B9295397
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:54:07 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 082DCB3D3BC
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:58:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D52DA145330;
-	Mon, 25 Mar 2024 10:36:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Kp8pD+1Q"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60E041448C9;
+	Mon, 25 Mar 2024 10:37:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAEAB1EB2A;
-	Mon, 25 Mar 2024 09:23:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6295E158A14
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 09:36:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711358595; cv=none; b=LZNuvjoUVpQksM2IUDFNgh1ANmRd/ir+i1a6VQ1KTpxHrq/1oLG43X5yfrAn7I4txRQ+t5mluB/kIfYLzJ4OOaGBagcIkJ1YtbalUPYLUQc+3AR/uUFyg6noyUUEjNgzNQn0tvXBr3I2sg7JmXh+30dgCq1ywF/MVpM7zcVTEJw=
+	t=1711359391; cv=none; b=TKj6yJqtIqOWjuLzADa64Zi9lS7V1aPXrXG4URJLJcNqBNBkxKmcLB+X3/obDsYaAPgXk3wuqTBNvWWPvA2+qi2AkEUB7S+vxh0rEMroYDMwflW0Eh1EroXeqPzJwQrTLH3QxmAI80PekH8IOXhpyKszdSXBkYSP1+6oTGM8/7g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711358595; c=relaxed/simple;
-	bh=+Rntwbb4YW9HjwZqjkH2HwaBZOT1e6Wg4co+NigZDyo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=C4aYrSy4js/LbnrDM+YX414UpM9QoWrJTac/K8BFjlbo9LwVsOu+BxHRRcB1hTsdqurnNL+vX1DOo8rpFwjad+jpGyKOdkani4ggupYAfeBkAls4P9CdsMcsR1aHTMpnXRkbcxJvltSjxKfJmJKpinm24pfeswbYWX9OXD+yJyk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Kp8pD+1Q; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711358594; x=1742894594;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=+Rntwbb4YW9HjwZqjkH2HwaBZOT1e6Wg4co+NigZDyo=;
-  b=Kp8pD+1QQVc0bxOc72i6QGVpMyLh0TmLJxawJlcCptezf77RdMbY3DBy
-   6WVLHwKt4X3t11e+wJHm7b3jdtplysF3rF32oCGla3JwA3hcg9jTQWB7g
-   J/2csaferj9H+KDHhRwDqk4H56toy2tapXjTrhCMM6yvSi2FuyU7ogrcs
-   NVZ8wirrJ4cTld/bPTAMUBheZS851J26K0gNz1OnF5fTpFvXk4pXoV6hZ
-   BQo03AFMVPcbz4ipAOKtI7gJLKL+eElgdbskTo52eG+gFvDnc5Plt7lTt
-   Wy4oun4vDQXDe9P95JgAFnl8sJztKTZoUeRX2nCd87I5XBhy6vAgUrM6V
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11023"; a="6533060"
-X-IronPort-AV: E=Sophos;i="6.07,152,1708416000"; 
-   d="scan'208";a="6533060"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 02:23:13 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,11023"; a="914837483"
-X-IronPort-AV: E=Sophos;i="6.07,152,1708416000"; 
-   d="scan'208";a="914837483"
-Received: from smile.fi.intel.com ([10.237.72.54])
-  by fmsmga002.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 02:23:10 -0700
-Received: from andy by smile.fi.intel.com with local (Exim 4.97)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1rogXr-0000000Fvfn-1Ds7;
-	Mon, 25 Mar 2024 11:23:07 +0200
-Date: Mon, 25 Mar 2024 11:23:07 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Herve Codina <herve.codina@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	kernel test robot <lkp@intel.com>, stable@vger.kernel.org
-Subject: Re: [PATCH] net: wan: framer: Add missing static inline qualifiers
-Message-ID: <ZgFCe39GJEARc9g4@smile.fi.intel.com>
-References: <20240325082505.29385-1-herve.codina@bootlin.com>
+	s=arc-20240116; t=1711359391; c=relaxed/simple;
+	bh=/9PRyWcMS3WKQZX2HiQSGZ3VL3BgBc0ZRFWdSaJQ9OE=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Ywj2aBwFUvYCMQ5eA4hzm3YxdU+TFnaY0tfmETvc15ZNYV7p6eVaH22uVjT9i48IU1B/Touefe4beD2L7/oOzdU1ad8souQ7hQf/QJkC/sKrT3e/66dTs68grWwoniEitND2ICMfiEwxpLYsqOFsupEFYcjF5U6/q8wPK6IZSIk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7cbf0ebfda8so393545839f.0
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 02:36:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711359388; x=1711964188;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=TSNIqPkYvxd6e8DwhHfzguzBJvUVKgTbV1cel72QDnY=;
+        b=e/q7aHp4iNBm6Rotu/IpI1yhdPDgVvZa3ZM8KlPaq1MDrz8Ep0Y9er5b+ord+cz+su
+         vREUuOdO6bDNWNLA5cpVIp2G4gbmBa/RihJbmZhUOobFH0g7j3ZsHteXX51rQhtxkIfj
+         23StzsGpXTIwKBvTq2/JFFktE3KH0Ud/QFu4aEpHbtZYKUxNmhEfTGrZZE1MzjsfTayN
+         BY9XCcKhep6RzDdXEPqrvf5E8Djhhw0J9tJFRw+Pn2RRPDYOf/qkc2Se51TjKZapk+Xs
+         Gsm7z5z8tPBdHMKDipKdj/8/wT4/0Unr+7qO3UAvGX883FXF5XqP8Z172UnkQaBbzucH
+         IbBQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV4YmhaRt6BO8KcG010QhDufHFpgWn306qGkkEQNO2mq++QZxX/TcZf4mkXOQ/ozYmRs42IhJIXNN5zdA+opPwSnCYI22Bj
+X-Gm-Message-State: AOJu0Yz5imcktA3kKAxvldL30cxOSampcfUywrHWFKZLDOjqA3SHsBig
+	LaCPDNXhN0MmeJO1DZwxStGxfLCkqAX3/82WyBZ8TmrKWeFOWZ2ptoyQ25M6mi/tRORTamZ/I+m
+	JhcRnbsklCiwjfpIA/LcCC09ngnP0feu9n+VsU8ObVgarJzCSuYiJHzA=
+X-Google-Smtp-Source: AGHT+IGiIKnVaS9EAxan7TjPfAECQrMpgHAmzVJpMvbAAz/7F1Mr6mxydWeOSeapLyDPc2FK+Y9HmSfltI1MhkQBPegpGkybcZ/H
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240325082505.29385-1-herve.codina@bootlin.com>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+X-Received: by 2002:a05:6638:218e:b0:47c:203f:8e68 with SMTP id
+ s14-20020a056638218e00b0047c203f8e68mr151665jaj.3.1711359388512; Mon, 25 Mar
+ 2024 02:36:28 -0700 (PDT)
+Date: Mon, 25 Mar 2024 02:36:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000006f876b061478e878@google.com>
+Subject: [syzbot] [bpf?] [net?] KMSAN: uninit-value in dev_map_lookup_elem
+From: syzbot <syzbot+1a3cf6f08d68868f9db3@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Mar 25, 2024 at 09:25:05AM +0100, Herve Codina wrote:
-> Compilation with CONFIG_GENERIC_FRAMER disabled lead to the following
-> warnings:
->   framer.h:184:16: warning: no previous prototype for function 'framer_get' [-Wmissing-prototypes]
->   184 | struct framer *framer_get(struct device *dev, const char *con_id)
->   framer.h:184:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
->   184 | struct framer *framer_get(struct device *dev, const char *con_id)
->   framer.h:189:6: warning: no previous prototype for function 'framer_put' [-Wmissing-prototypes]
->   189 | void framer_put(struct device *dev, struct framer *framer)
->   framer.h:189:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
->   189 | void framer_put(struct device *dev, struct framer *framer)
+Hello,
 
-Always try to minimize the warnings/backtraces/etc to the point. In this case
-it's enough to have:
+syzbot found the following issue on:
 
-  warning: no previous prototype for function 'framer_get' [-Wmissing-prototypes]
-  warning: no previous prototype for function 'framer_put' [-Wmissing-prototypes]
+HEAD commit:    5e74df2f8f15 Merge tag 'x86-urgent-2024-03-24' of git://gi..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=148872a5180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e6bd769cb793b98a
+dashboard link: https://syzkaller.appspot.com/bug?extid=1a3cf6f08d68868f9db3
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15921a6e180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12e081f1180000
 
-> Add missing 'static inline' qualifiers for these functions.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/1a82880723a7/disk-5e74df2f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/fd3046ac43b9/vmlinux-5e74df2f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2097be59cbc1/bzImage-5e74df2f.xz
 
-Code wise looks good,
-Reviewed-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+1a3cf6f08d68868f9db3@syzkaller.appspotmail.com
 
--- 
-With Best Regards,
-Andy Shevchenko
+=====================================================
+BUG: KMSAN: uninit-value in __dev_map_lookup_elem kernel/bpf/devmap.c:441 [inline]
+BUG: KMSAN: uninit-value in dev_map_lookup_elem+0xf3/0x170 kernel/bpf/devmap.c:796
+ __dev_map_lookup_elem kernel/bpf/devmap.c:441 [inline]
+ dev_map_lookup_elem+0xf3/0x170 kernel/bpf/devmap.c:796
+ ____bpf_map_lookup_elem kernel/bpf/helpers.c:42 [inline]
+ bpf_map_lookup_elem+0x5c/0x80 kernel/bpf/helpers.c:38
+ ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:1997
+ __bpf_prog_run256+0xb5/0xe0 kernel/bpf/core.c:2237
+ bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
+ __bpf_prog_run include/linux/filter.h:657 [inline]
+ bpf_prog_run include/linux/filter.h:664 [inline]
+ __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
+ bpf_trace_run5+0x16f/0x350 kernel/trace/bpf_trace.c:2423
+ __bpf_trace_ext4_remove_blocks+0x45/0x60 include/trace/events/ext4.h:1984
+ __traceiter_ext4_remove_blocks+0xb5/0x170 include/trace/events/ext4.h:1984
+ trace_ext4_remove_blocks include/trace/events/ext4.h:1984 [inline]
+ ext4_remove_blocks fs/ext4/extents.c:2463 [inline]
+ ext4_ext_rm_leaf fs/ext4/extents.c:2686 [inline]
+ ext4_ext_remove_space+0x4e30/0x7e00 fs/ext4/extents.c:2934
+ ext4_ext_truncate+0x1e3/0x390 fs/ext4/extents.c:4440
+ ext4_truncate+0x14c6/0x1e10 fs/ext4/inode.c:4146
+ ext4_evict_inode+0x1886/0x24d0 fs/ext4/inode.c:258
+ evict+0x3ae/0xa60 fs/inode.c:667
+ iput_final fs/inode.c:1741 [inline]
+ iput+0x9ca/0xe10 fs/inode.c:1767
+ d_delete_notify include/linux/fsnotify.h:307 [inline]
+ vfs_rmdir+0x53c/0x790 fs/namei.c:4222
+ do_rmdir+0x630/0x8b0 fs/namei.c:4268
+ __do_sys_rmdir fs/namei.c:4287 [inline]
+ __se_sys_rmdir fs/namei.c:4285 [inline]
+ __x64_sys_rmdir+0x78/0xb0 fs/namei.c:4285
+ do_syscall_64+0xd5/0x1f0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+Local variable stack created at:
+ __bpf_prog_run256+0x45/0xe0 kernel/bpf/core.c:2237
+ bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
+ __bpf_prog_run include/linux/filter.h:657 [inline]
+ bpf_prog_run include/linux/filter.h:664 [inline]
+ __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
+ bpf_trace_run5+0x16f/0x350 kernel/trace/bpf_trace.c:2423
+
+CPU: 0 PID: 5017 Comm: syz-executor365 Not tainted 6.8.0-syzkaller-13236-g5e74df2f8f15 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+=====================================================
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
