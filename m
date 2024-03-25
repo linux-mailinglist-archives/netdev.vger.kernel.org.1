@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-81831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB20488B41C
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 23:31:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1619788B41D
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 23:31:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65C2E1F67AF3
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 22:31:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11B171C2B91D
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 22:31:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 678D88287C;
-	Mon, 25 Mar 2024 22:29:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C38983A0C;
+	Mon, 25 Mar 2024 22:29:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Pg4ZUYG4"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="MOeEz+wf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+Received: from mail-oi1-f173.google.com (mail-oi1-f173.google.com [209.85.167.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4338E839ED
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 22:29:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84785823B5
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 22:29:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711405779; cv=none; b=MZcQ969/7w9LVXuyI5i9U1qMcUkmOpCHCyACqyPYFc76I6WNASwqjlkKwNyjCSF3qutbIiZQ1y9B8o2/TNE56VZhnea20PuIsNKUGqNJj3P9f1nDQP5CjpNY/7UAGt4w3c+DbtM+aoPBoMV/cPbMi4w0XTiMKZO4wTYRDi5EWoc=
+	t=1711405780; cv=none; b=JmjCtgKYKAixFa0udg2ajlzUkenXT9vAa8/htgl02CUM98LGKHY+bPL/CXf9cJVTWoUUHD7YgbRRCD6jCNDkOV7L5Qk1WYlmpzwmMVUgBbQG6y25s12AGP5pUrJTTknrNhzpRvpFBoVjLYUaXhCKtrlQS1NcGxeVJ0KepZse3/4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711405779; c=relaxed/simple;
-	bh=ZxSq0fzId4CL+0Taz5iY88J52A5MWiAR09j9ngQhfDE=;
+	s=arc-20240116; t=1711405780; c=relaxed/simple;
+	bh=hLBBJFTqPTsXFBRVfn8Hx4y5tv6bg4Z5YAiRJroIJ4k=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LxxHyzghXTD2slYXvCoPqG/bY/ZIgztMiEk3G+2pqNbu3XXk46a3aaAemLpqZzsIkYEuM1jIuGEv6JF4BgzVan3UHgmYtyfHEliXOzNOwVXsb6Ly8cGoKX5VDIaAK5Xemm1Caz05eKAWnYFbblvC6ktHQE97HCHYJD1YgXIPPCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Pg4ZUYG4; arc=none smtp.client-ip=209.85.167.170
+	 MIME-Version:Content-Type; b=SzIKJaAA+T1ckiBl657FY/f2yIXxaHf03f45X22kkq6+oAPlWqtG5S1PkKjvTtfT+GBXc1U6Ux9Q5xUl5+j1HXkx4ofwpdbm7qCe9JTCIKKHdqu2LpwwxTrCQFL7j1VAg0/gxYFKw2ZAyWkIQn4GRyO4RAl0GkmLGlKZKqOmD8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=MOeEz+wf; arc=none smtp.client-ip=209.85.167.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3c3d7e7402dso79597b6e.1
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 15:29:36 -0700 (PDT)
+Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3c3915a7afaso3166371b6e.2
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 15:29:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1711405776; x=1712010576; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1711405777; x=1712010577; darn=vger.kernel.org;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DxDLUXce1vxEVms97uDESMfw01pOql+4v3emFpnJOQA=;
-        b=Pg4ZUYG4bUzECjeAI+RJc8OreqtRI7z3lk/Uxx98mI0nRnEc0SRNfahh8/oAdnJa9B
-         9FW9IU7FlAx04gDbdEQp5GmwvFz4GwBd7LOV/loa/Rm0F5d22pTr1w+4Yvp6+8+24szZ
-         aihbRbd+qln/UQJhptYWSenMwZWKaAKDHFrcg=
+        bh=9K3D/iMsEPLjmnJRU/TDVnGD3kmnn2dDmy/1tIXIjPs=;
+        b=MOeEz+wfHLTH9kkySfLceWNkws3MPsxJ6rG9NEtPM3KLBhWVeQTyYdRCHOxadDcPGK
+         JMBdXmKpAwYmmu9Ogz9tKRwi4kGTI63A4a/bMQ/heIpeSwcnk6leiWOsTq5Vq4NkILIg
+         n3qtlyN0C4Ry1205Mj/Z4/532pWVMek9ynLbk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711405776; x=1712010576;
+        d=1e100.net; s=20230601; t=1711405777; x=1712010577;
         h=mime-version:references:in-reply-to:message-id:date:subject:cc:to
          :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DxDLUXce1vxEVms97uDESMfw01pOql+4v3emFpnJOQA=;
-        b=KV9s1tOdRj+YStv/UC56lAQRqu6/ArXULTbHQApuWteZo8wn/EnoeoRdmJNdusuWia
-         8fAn5Zij9Px4FcuwBm5f51SsahsPCnAP5Q4QYdQkbJ7r45Z2Ozy/MLyOVE688C/vK+n4
-         y7EebvCbKYYlxBUiHjTHqLoRR3vMi/2SnWdqL857mwi7nn8N0ptw0kkL9GqCRjovEhYs
-         OGOE4O0U8TBwIKaYv/7IF3yUIGMPIlFNrW6ErDWc9gmB7EmiTVZNfRMfn5zKMtlMfwZK
-         m5Y1Ujoy3kZHZXWtN4ucaUpUozkbc6x3Lsesd+zpKws3Dvj8giLCFHINm5GyNrfnRZW6
-         WjLw==
-X-Gm-Message-State: AOJu0YzBaSrufk3nabhMnjXW4rEZuowohKugV+/E+fZdCHuCHymd60/V
-	tSp5TAVrRpvGFgcDxGYqrc77adCd3yYA4Uudyc/E7afTuHx/9pFMOm8HQUwcRg==
-X-Google-Smtp-Source: AGHT+IE0W1YimfA/lr97Lsrv7PRzxmphUy39b/mz8CtIyBs+3vIIlidkvGfzPcwwJqokzPe90NGipA==
-X-Received: by 2002:a05:6358:9387:b0:17d:221e:d126 with SMTP id h7-20020a056358938700b0017d221ed126mr9555826rwb.23.1711405775890;
-        Mon, 25 Mar 2024 15:29:35 -0700 (PDT)
+        bh=9K3D/iMsEPLjmnJRU/TDVnGD3kmnn2dDmy/1tIXIjPs=;
+        b=I0Uq3daptoLTRL3Dq1dgakSM84I+jNCB8lhuhyYPVYbKkV0Blelcq7KIyIrWupjw1a
+         5DH0Cg7zG+l4DqfQ8M1ljqq011hNH9T6lS5ZV++9ICGAPPN1ayoGKKIXDzLDwtqRLSIl
+         5rpBvYHUnilLhZvzn4YAnWhSj38hqjbYr9C7LXjhoVE61AMuEAGp0L8ILpa05q8/rsJV
+         Z53wDNGEWur/oBo8dnr1KMtVeCSHhXsV1czWi+B6G8NQKc5LSUeDNgd8FtJfNrBCA57N
+         f8skSxKDJ+JMHgTBNlGRLHqAi1oYLkJMQZM9Fak3pmioqZFLYovPq6lrJ1vnB0P9Rcpo
+         wWWQ==
+X-Gm-Message-State: AOJu0YyrNUUd8zF7vaU6VCxSGsww2Z7kV5mx9/bFPqRsQzsrJ3DLhzL7
+	WTGZWGpW5Q1ElTIJk8THjBooVCLSRw4TC9jpNTlr9gxQY0p/x03KVPpQQAv1Jw==
+X-Google-Smtp-Source: AGHT+IEhxUMnna4dqF8ECTbUtA3utEmJFzXhOtGDlV1ifyP2rbhGKJvNThZ5UUFsamrEC7XizdItfA==
+X-Received: by 2002:a05:6830:1681:b0:6e6:baca:a0fd with SMTP id k1-20020a056830168100b006e6bacaa0fdmr9141347otr.0.1711405777240;
+        Mon, 25 Mar 2024 15:29:37 -0700 (PDT)
 Received: from lvnvda5233.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id t10-20020a63dd0a000000b005e438fe702dsm6301610pgg.65.2024.03.25.15.29.34
+        by smtp.gmail.com with ESMTPSA id t10-20020a63dd0a000000b005e438fe702dsm6301610pgg.65.2024.03.25.15.29.36
         (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Mon, 25 Mar 2024 15:29:34 -0700 (PDT)
+        Mon, 25 Mar 2024 15:29:36 -0700 (PDT)
 From: Michael Chan <michael.chan@broadcom.com>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -70,9 +70,9 @@ Cc: netdev@vger.kernel.org,
 	pavan.chebbi@broadcom.com,
 	andrew.gospodarek@broadcom.com,
 	Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Subject: [PATCH net-next 04/12] bnxt_en: Refactor VNIC alloc and cfg functions
-Date: Mon, 25 Mar 2024 15:28:54 -0700
-Message-Id: <20240325222902.220712-5-michael.chan@broadcom.com>
+Subject: [PATCH net-next 05/12] bnxt_en: Introduce rss ctx structure, alloc/free functions
+Date: Mon, 25 Mar 2024 15:28:55 -0700
+Message-Id: <20240325222902.220712-6-michael.chan@broadcom.com>
 X-Mailer: git-send-email 2.32.0
 In-Reply-To: <20240325222902.220712-1-michael.chan@broadcom.com>
 References: <20240325222902.220712-1-michael.chan@broadcom.com>
@@ -83,515 +83,198 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="00000000000060dcf9061483b515"
+	boundary="00000000000074b715061483b577"
 
---00000000000060dcf9061483b515
+--00000000000074b715061483b577
 Content-Transfer-Encoding: 8bit
 
 From: Pavan Chebbi <pavan.chebbi@broadcom.com>
 
-The current VNIC structures are stored in an array bp->vnic_info[].
-The index of the array (vnic_id) is passed to all the functions that
-need to reference the VNIC.
+Add struct bnxt_rss_ctx, related storage lists, required
+defines, and its alloc/free functions.
 
-This patch changes the scheme to pass the VNIC pointer instead of the
-vnic index.  Subsequent patches will create additional VNICs that
-will not be stored in the bp->vnic_info[] array.  Using the VNIC
-pointer will work for all the VNICs.
+Later patches will use them in order to support multiple
+RSS contexts.
 
 Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
 Signed-off-by: Pavan Chebbi <pavan.chebbi@broadcom.com>
 Signed-off-by: Michael Chan <michael.chan@broadcom.com>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 140 +++++++++---------
- drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   5 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c |   2 +-
- 3 files changed, 75 insertions(+), 72 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 54 +++++++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     | 24 +++++++++
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  2 +
+ 3 files changed, 80 insertions(+)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index dd2c5033af02..3f5d7c81a281 100644
+index 3f5d7c81a281..0ede267904ad 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -4241,6 +4241,7 @@ static void bnxt_init_vnics(struct bnxt *bp)
- 		int j;
- 
- 		vnic->fw_vnic_id = INVALID_HW_RING_ID;
-+		vnic->vnic_id = i;
- 		for (j = 0; j < BNXT_MAX_CTX_PER_VNIC; j++)
- 			vnic->fw_rss_cos_lb_ctx[j] = INVALID_HW_RING_ID;
- 
-@@ -5938,9 +5939,9 @@ static void bnxt_hwrm_vnic_update_tunl_tpa(struct bnxt *bp,
- 	req->tnl_tpa_en_bitmap = cpu_to_le32(tunl_tpa_bmap);
- }
- 
--static int bnxt_hwrm_vnic_set_tpa(struct bnxt *bp, u16 vnic_id, u32 tpa_flags)
-+static int bnxt_hwrm_vnic_set_tpa(struct bnxt *bp, struct bnxt_vnic_info *vnic,
-+				  u32 tpa_flags)
- {
--	struct bnxt_vnic_info *vnic = &bp->vnic_info[vnic_id];
- 	u16 max_aggs = VNIC_TPA_CFG_REQ_MAX_AGGS_MAX;
- 	struct hwrm_vnic_tpa_cfg_input *req;
- 	int rc;
-@@ -6154,9 +6155,9 @@ __bnxt_hwrm_vnic_set_rss(struct bnxt *bp, struct hwrm_vnic_rss_cfg_input *req,
- 	req->hash_key_tbl_addr = cpu_to_le64(vnic->rss_hash_key_dma_addr);
- }
- 
--static int bnxt_hwrm_vnic_set_rss(struct bnxt *bp, u16 vnic_id, bool set_rss)
-+static int bnxt_hwrm_vnic_set_rss(struct bnxt *bp, struct bnxt_vnic_info *vnic,
-+				  bool set_rss)
- {
--	struct bnxt_vnic_info *vnic = &bp->vnic_info[vnic_id];
- 	struct hwrm_vnic_rss_cfg_input *req;
- 	int rc;
- 
-@@ -6174,9 +6175,9 @@ static int bnxt_hwrm_vnic_set_rss(struct bnxt *bp, u16 vnic_id, bool set_rss)
- 	return hwrm_req_send(bp, req);
- }
- 
--static int bnxt_hwrm_vnic_set_rss_p5(struct bnxt *bp, u16 vnic_id, bool set_rss)
-+static int bnxt_hwrm_vnic_set_rss_p5(struct bnxt *bp,
-+				     struct bnxt_vnic_info *vnic, bool set_rss)
- {
--	struct bnxt_vnic_info *vnic = &bp->vnic_info[vnic_id];
- 	struct hwrm_vnic_rss_cfg_input *req;
- 	dma_addr_t ring_tbl_map;
- 	u32 i, nr_ctxs;
-@@ -6229,9 +6230,8 @@ static void bnxt_hwrm_update_rss_hash_cfg(struct bnxt *bp)
- 	hwrm_req_drop(bp, req);
- }
- 
--static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, u16 vnic_id)
-+static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, struct bnxt_vnic_info *vnic)
- {
--	struct bnxt_vnic_info *vnic = &bp->vnic_info[vnic_id];
- 	struct hwrm_vnic_plcmodes_cfg_input *req;
- 	int rc;
- 
-@@ -6256,7 +6256,8 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, u16 vnic_id)
- 	return hwrm_req_send(bp, req);
- }
- 
--static void bnxt_hwrm_vnic_ctx_free_one(struct bnxt *bp, u16 vnic_id,
-+static void bnxt_hwrm_vnic_ctx_free_one(struct bnxt *bp,
-+					struct bnxt_vnic_info *vnic,
- 					u16 ctx_idx)
- {
- 	struct hwrm_vnic_rss_cos_lb_ctx_free_input *req;
-@@ -6265,10 +6266,10 @@ static void bnxt_hwrm_vnic_ctx_free_one(struct bnxt *bp, u16 vnic_id,
- 		return;
- 
- 	req->rss_cos_lb_ctx_id =
--		cpu_to_le16(bp->vnic_info[vnic_id].fw_rss_cos_lb_ctx[ctx_idx]);
-+		cpu_to_le16(vnic->fw_rss_cos_lb_ctx[ctx_idx]);
- 
- 	hwrm_req_send(bp, req);
--	bp->vnic_info[vnic_id].fw_rss_cos_lb_ctx[ctx_idx] = INVALID_HW_RING_ID;
-+	vnic->fw_rss_cos_lb_ctx[ctx_idx] = INVALID_HW_RING_ID;
- }
- 
- static void bnxt_hwrm_vnic_ctx_free(struct bnxt *bp)
-@@ -6280,13 +6281,14 @@ static void bnxt_hwrm_vnic_ctx_free(struct bnxt *bp)
- 
- 		for (j = 0; j < BNXT_MAX_CTX_PER_VNIC; j++) {
- 			if (vnic->fw_rss_cos_lb_ctx[j] != INVALID_HW_RING_ID)
--				bnxt_hwrm_vnic_ctx_free_one(bp, i, j);
-+				bnxt_hwrm_vnic_ctx_free_one(bp, vnic, j);
- 		}
- 	}
- 	bp->rsscos_nr_ctxs = 0;
- }
- 
--static int bnxt_hwrm_vnic_ctx_alloc(struct bnxt *bp, u16 vnic_id, u16 ctx_idx)
-+static int bnxt_hwrm_vnic_ctx_alloc(struct bnxt *bp,
-+				    struct bnxt_vnic_info *vnic, u16 ctx_idx)
- {
- 	struct hwrm_vnic_rss_cos_lb_ctx_alloc_output *resp;
- 	struct hwrm_vnic_rss_cos_lb_ctx_alloc_input *req;
-@@ -6299,7 +6301,7 @@ static int bnxt_hwrm_vnic_ctx_alloc(struct bnxt *bp, u16 vnic_id, u16 ctx_idx)
- 	resp = hwrm_req_hold(bp, req);
- 	rc = hwrm_req_send(bp, req);
- 	if (!rc)
--		bp->vnic_info[vnic_id].fw_rss_cos_lb_ctx[ctx_idx] =
-+		vnic->fw_rss_cos_lb_ctx[ctx_idx] =
- 			le16_to_cpu(resp->rss_cos_lb_ctx_id);
- 	hwrm_req_drop(bp, req);
- 
-@@ -6313,10 +6315,9 @@ static u32 bnxt_get_roce_vnic_mode(struct bnxt *bp)
- 	return VNIC_CFG_REQ_FLAGS_ROCE_DUAL_VNIC_MODE;
- }
- 
--int bnxt_hwrm_vnic_cfg(struct bnxt *bp, u16 vnic_id)
-+int bnxt_hwrm_vnic_cfg(struct bnxt *bp, struct bnxt_vnic_info *vnic)
- {
- 	struct bnxt_vnic_info *vnic0 = &bp->vnic_info[BNXT_VNIC_DEFAULT];
--	struct bnxt_vnic_info *vnic = &bp->vnic_info[vnic_id];
- 	struct hwrm_vnic_cfg_input *req;
- 	unsigned int ring = 0, grp_idx;
- 	u16 def_vlan = 0;
-@@ -6364,8 +6365,8 @@ int bnxt_hwrm_vnic_cfg(struct bnxt *bp, u16 vnic_id)
- 	if (vnic->flags & BNXT_VNIC_RSS_FLAG)
- 		ring = 0;
- 	else if (vnic->flags & BNXT_VNIC_RFS_FLAG)
--		ring = vnic_id - 1;
--	else if ((vnic_id == 1) && BNXT_CHIP_TYPE_NITRO_A0(bp))
-+		ring = vnic->vnic_id - 1;
-+	else if ((vnic->vnic_id == 1) && BNXT_CHIP_TYPE_NITRO_A0(bp))
- 		ring = bp->rx_nr_rings - 1;
- 
- 	grp_idx = bp->rx_ring[ring].bnapi->index;
-@@ -6381,25 +6382,25 @@ int bnxt_hwrm_vnic_cfg(struct bnxt *bp, u16 vnic_id)
- #endif
- 	if ((bp->flags & BNXT_FLAG_STRIP_VLAN) || def_vlan)
- 		req->flags |= cpu_to_le32(VNIC_CFG_REQ_FLAGS_VLAN_STRIP_MODE);
--	if (!vnic_id && bnxt_ulp_registered(bp->edev))
-+	if (vnic->vnic_id == BNXT_VNIC_DEFAULT && bnxt_ulp_registered(bp->edev))
- 		req->flags |= cpu_to_le32(bnxt_get_roce_vnic_mode(bp));
- 
- 	return hwrm_req_send(bp, req);
- }
- 
--static void bnxt_hwrm_vnic_free_one(struct bnxt *bp, u16 vnic_id)
-+static void bnxt_hwrm_vnic_free_one(struct bnxt *bp,
-+				    struct bnxt_vnic_info *vnic)
- {
--	if (bp->vnic_info[vnic_id].fw_vnic_id != INVALID_HW_RING_ID) {
-+	if (vnic->fw_vnic_id != INVALID_HW_RING_ID) {
- 		struct hwrm_vnic_free_input *req;
- 
- 		if (hwrm_req_init(bp, req, HWRM_VNIC_FREE))
- 			return;
- 
--		req->vnic_id =
--			cpu_to_le32(bp->vnic_info[vnic_id].fw_vnic_id);
-+		req->vnic_id = cpu_to_le32(vnic->fw_vnic_id);
- 
- 		hwrm_req_send(bp, req);
--		bp->vnic_info[vnic_id].fw_vnic_id = INVALID_HW_RING_ID;
-+		vnic->fw_vnic_id = INVALID_HW_RING_ID;
- 	}
- }
- 
-@@ -6408,15 +6409,14 @@ static void bnxt_hwrm_vnic_free(struct bnxt *bp)
- 	u16 i;
- 
- 	for (i = 0; i < bp->nr_vnics; i++)
--		bnxt_hwrm_vnic_free_one(bp, i);
-+		bnxt_hwrm_vnic_free_one(bp, &bp->vnic_info[i]);
- }
- 
--static int bnxt_hwrm_vnic_alloc(struct bnxt *bp, u16 vnic_id,
-+static int bnxt_hwrm_vnic_alloc(struct bnxt *bp, struct bnxt_vnic_info *vnic,
- 				unsigned int start_rx_ring_idx,
- 				unsigned int nr_rings)
- {
- 	unsigned int i, j, grp_idx, end_idx = start_rx_ring_idx + nr_rings;
--	struct bnxt_vnic_info *vnic = &bp->vnic_info[vnic_id];
- 	struct hwrm_vnic_alloc_output *resp;
- 	struct hwrm_vnic_alloc_input *req;
- 	int rc;
-@@ -6442,7 +6442,7 @@ static int bnxt_hwrm_vnic_alloc(struct bnxt *bp, u16 vnic_id,
- vnic_no_ring_grps:
- 	for (i = 0; i < BNXT_MAX_CTX_PER_VNIC; i++)
- 		vnic->fw_rss_cos_lb_ctx[i] = INVALID_HW_RING_ID;
--	if (vnic_id == BNXT_VNIC_DEFAULT)
-+	if (vnic->vnic_id == BNXT_VNIC_DEFAULT)
- 		req->flags = cpu_to_le32(VNIC_ALLOC_REQ_FLAGS_DEFAULT);
- 
- 	resp = hwrm_req_hold(bp, req);
-@@ -9676,7 +9676,7 @@ static int bnxt_set_tpa(struct bnxt *bp, bool set_tpa)
- 	else if (BNXT_NO_FW_ACCESS(bp))
- 		return 0;
- 	for (i = 0; i < bp->nr_vnics; i++) {
--		rc = bnxt_hwrm_vnic_set_tpa(bp, i, tpa_flags);
-+		rc = bnxt_hwrm_vnic_set_tpa(bp, &bp->vnic_info[i], tpa_flags);
- 		if (rc) {
- 			netdev_err(bp->dev, "hwrm vnic set tpa failure rc for vnic %d: %x\n",
- 				   i, rc);
-@@ -9691,7 +9691,7 @@ static void bnxt_hwrm_clear_vnic_rss(struct bnxt *bp)
- 	int i;
- 
- 	for (i = 0; i < bp->nr_vnics; i++)
--		bnxt_hwrm_vnic_set_rss(bp, i, false);
-+		bnxt_hwrm_vnic_set_rss(bp, &bp->vnic_info[i], false);
- }
- 
- static void bnxt_clear_vnic(struct bnxt *bp)
-@@ -9769,28 +9769,27 @@ static int bnxt_hwrm_set_cache_line_size(struct bnxt *bp, int size)
- 	return hwrm_req_send(bp, req);
- }
- 
--static int __bnxt_setup_vnic(struct bnxt *bp, u16 vnic_id)
-+static int __bnxt_setup_vnic(struct bnxt *bp, struct bnxt_vnic_info *vnic)
- {
--	struct bnxt_vnic_info *vnic = &bp->vnic_info[vnic_id];
- 	int rc;
- 
- 	if (vnic->flags & BNXT_VNIC_RFS_NEW_RSS_FLAG)
- 		goto skip_rss_ctx;
- 
- 	/* allocate context for vnic */
--	rc = bnxt_hwrm_vnic_ctx_alloc(bp, vnic_id, 0);
-+	rc = bnxt_hwrm_vnic_ctx_alloc(bp, vnic, 0);
- 	if (rc) {
- 		netdev_err(bp->dev, "hwrm vnic %d alloc failure rc: %x\n",
--			   vnic_id, rc);
-+			   vnic->vnic_id, rc);
- 		goto vnic_setup_err;
- 	}
- 	bp->rsscos_nr_ctxs++;
- 
- 	if (BNXT_CHIP_TYPE_NITRO_A0(bp)) {
--		rc = bnxt_hwrm_vnic_ctx_alloc(bp, vnic_id, 1);
-+		rc = bnxt_hwrm_vnic_ctx_alloc(bp, vnic, 1);
- 		if (rc) {
- 			netdev_err(bp->dev, "hwrm vnic %d cos ctx alloc failure rc: %x\n",
--				   vnic_id, rc);
-+				   vnic->vnic_id, rc);
- 			goto vnic_setup_err;
- 		}
- 		bp->rsscos_nr_ctxs++;
-@@ -9798,26 +9797,26 @@ static int __bnxt_setup_vnic(struct bnxt *bp, u16 vnic_id)
- 
- skip_rss_ctx:
- 	/* configure default vnic, ring grp */
--	rc = bnxt_hwrm_vnic_cfg(bp, vnic_id);
-+	rc = bnxt_hwrm_vnic_cfg(bp, vnic);
- 	if (rc) {
- 		netdev_err(bp->dev, "hwrm vnic %d cfg failure rc: %x\n",
--			   vnic_id, rc);
-+			   vnic->vnic_id, rc);
- 		goto vnic_setup_err;
- 	}
- 
- 	/* Enable RSS hashing on vnic */
--	rc = bnxt_hwrm_vnic_set_rss(bp, vnic_id, true);
-+	rc = bnxt_hwrm_vnic_set_rss(bp, vnic, true);
- 	if (rc) {
- 		netdev_err(bp->dev, "hwrm vnic %d set rss failure rc: %x\n",
--			   vnic_id, rc);
-+			   vnic->vnic_id, rc);
- 		goto vnic_setup_err;
- 	}
- 
- 	if (bp->flags & BNXT_FLAG_AGG_RINGS) {
--		rc = bnxt_hwrm_vnic_set_hds(bp, vnic_id);
-+		rc = bnxt_hwrm_vnic_set_hds(bp, vnic);
- 		if (rc) {
- 			netdev_err(bp->dev, "hwrm vnic %d set hds failure rc: %x\n",
--				   vnic_id, rc);
-+				   vnic->vnic_id, rc);
- 		}
- 	}
- 
-@@ -9825,33 +9824,33 @@ static int __bnxt_setup_vnic(struct bnxt *bp, u16 vnic_id)
+@@ -9925,6 +9925,53 @@ static int bnxt_alloc_rfs_vnics(struct bnxt *bp)
  	return rc;
  }
  
--int bnxt_hwrm_vnic_rss_cfg_p5(struct bnxt *bp, u16 vnic_id)
-+int bnxt_hwrm_vnic_rss_cfg_p5(struct bnxt *bp, struct bnxt_vnic_info *vnic)
- {
- 	int rc;
- 
--	rc = bnxt_hwrm_vnic_set_rss_p5(bp, vnic_id, true);
-+	rc = bnxt_hwrm_vnic_set_rss_p5(bp, vnic, true);
- 	if (rc) {
- 		netdev_err(bp->dev, "hwrm vnic %d set rss failure rc: %d\n",
--			   vnic_id, rc);
-+			   vnic->vnic_id, rc);
- 		return rc;
- 	}
--	rc = bnxt_hwrm_vnic_cfg(bp, vnic_id);
-+	rc = bnxt_hwrm_vnic_cfg(bp, vnic);
- 	if (rc)
- 		netdev_err(bp->dev, "hwrm vnic %d cfg failure rc: %x\n",
--			   vnic_id, rc);
-+			   vnic->vnic_id, rc);
- 	return rc;
- }
- 
--static int __bnxt_setup_vnic_p5(struct bnxt *bp, u16 vnic_id)
-+static int __bnxt_setup_vnic_p5(struct bnxt *bp, struct bnxt_vnic_info *vnic)
- {
- 	int rc, i, nr_ctxs;
- 
- 	nr_ctxs = bnxt_get_nr_rss_ctxs(bp, bp->rx_nr_rings);
- 	for (i = 0; i < nr_ctxs; i++) {
--		rc = bnxt_hwrm_vnic_ctx_alloc(bp, vnic_id, i);
-+		rc = bnxt_hwrm_vnic_ctx_alloc(bp, vnic, i);
- 		if (rc) {
- 			netdev_err(bp->dev, "hwrm vnic %d ctx %d alloc failure rc: %x\n",
--				   vnic_id, i, rc);
-+				   vnic->vnic_id, i, rc);
- 			break;
- 		}
- 		bp->rsscos_nr_ctxs++;
-@@ -9859,55 +9858,57 @@ static int __bnxt_setup_vnic_p5(struct bnxt *bp, u16 vnic_id)
- 	if (i < nr_ctxs)
- 		return -ENOMEM;
- 
--	rc = bnxt_hwrm_vnic_rss_cfg_p5(bp, vnic_id);
-+	rc = bnxt_hwrm_vnic_rss_cfg_p5(bp, vnic);
- 	if (rc)
- 		return rc;
- 
- 	if (bp->flags & BNXT_FLAG_AGG_RINGS) {
--		rc = bnxt_hwrm_vnic_set_hds(bp, vnic_id);
-+		rc = bnxt_hwrm_vnic_set_hds(bp, vnic);
- 		if (rc) {
- 			netdev_err(bp->dev, "hwrm vnic %d set hds failure rc: %x\n",
--				   vnic_id, rc);
-+				   vnic->vnic_id, rc);
- 		}
- 	}
- 	return rc;
- }
- 
--static int bnxt_setup_vnic(struct bnxt *bp, u16 vnic_id)
-+static int bnxt_setup_vnic(struct bnxt *bp, struct bnxt_vnic_info *vnic)
- {
- 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
--		return __bnxt_setup_vnic_p5(bp, vnic_id);
-+		return __bnxt_setup_vnic_p5(bp, vnic);
- 	else
--		return __bnxt_setup_vnic(bp, vnic_id);
-+		return __bnxt_setup_vnic(bp, vnic);
- }
- 
--static int bnxt_alloc_and_setup_vnic(struct bnxt *bp, u16 vnic_id,
-+static int bnxt_alloc_and_setup_vnic(struct bnxt *bp,
-+				     struct bnxt_vnic_info *vnic,
- 				     u16 start_rx_ring_idx, int rx_rings)
- {
- 	int rc;
- 
--	rc = bnxt_hwrm_vnic_alloc(bp, vnic_id, start_rx_ring_idx, rx_rings);
-+	rc = bnxt_hwrm_vnic_alloc(bp, vnic, start_rx_ring_idx, rx_rings);
- 	if (rc) {
- 		netdev_err(bp->dev, "hwrm vnic %d alloc failure rc: %x\n",
--			   vnic_id, rc);
-+			   vnic->vnic_id, rc);
- 		return rc;
- 	}
--	return bnxt_setup_vnic(bp, vnic_id);
-+	return bnxt_setup_vnic(bp, vnic);
- }
- 
- static int bnxt_alloc_rfs_vnics(struct bnxt *bp)
- {
-+	struct bnxt_vnic_info *vnic;
- 	int i, rc = 0;
- 
--	if (BNXT_SUPPORTS_NTUPLE_VNIC(bp))
--		return bnxt_alloc_and_setup_vnic(bp, BNXT_VNIC_NTUPLE, 0,
--						 bp->rx_nr_rings);
-+	if (BNXT_SUPPORTS_NTUPLE_VNIC(bp)) {
-+		vnic = &bp->vnic_info[BNXT_VNIC_NTUPLE];
-+		return bnxt_alloc_and_setup_vnic(bp, vnic, 0, bp->rx_nr_rings);
++void bnxt_del_one_rss_ctx(struct bnxt *bp, struct bnxt_rss_ctx *rss_ctx,
++			  bool all)
++{
++	if (!all)
++		return;
++
++	list_del(&rss_ctx->list);
++	bp->num_rss_ctx--;
++	clear_bit(rss_ctx->index, bp->rss_ctx_bmap);
++	kfree(rss_ctx);
++}
++
++struct bnxt_rss_ctx *bnxt_alloc_rss_ctx(struct bnxt *bp)
++{
++	struct bnxt_rss_ctx *rss_ctx = NULL;
++
++	rss_ctx = kzalloc(sizeof(*rss_ctx), GFP_KERNEL);
++	if (rss_ctx) {
++		rss_ctx->vnic.rss_ctx = rss_ctx;
++		list_add_tail(&rss_ctx->list, &bp->rss_ctx_list);
++		bp->num_rss_ctx++;
 +	}
- 
- 	if (bp->flags & BNXT_FLAG_CHIP_P5_PLUS)
- 		return 0;
- 
- 	for (i = 0; i < bp->rx_nr_rings; i++) {
--		struct bnxt_vnic_info *vnic;
- 		u16 vnic_id = i + 1;
- 		u16 ring_id = i;
- 
-@@ -9918,7 +9919,7 @@ static int bnxt_alloc_rfs_vnics(struct bnxt *bp)
- 		vnic->flags |= BNXT_VNIC_RFS_FLAG;
- 		if (bp->rss_cap & BNXT_RSS_CAP_NEW_RSS_CAP)
- 			vnic->flags |= BNXT_VNIC_RFS_NEW_RSS_FLAG;
--		if (bnxt_alloc_and_setup_vnic(bp, vnic_id, ring_id, 1))
-+		if (bnxt_alloc_and_setup_vnic(bp, &bp->vnic_info[vnic_id], ring_id, 1))
- 			break;
- 	}
- 	return rc;
-@@ -9936,16 +9937,17 @@ static bool bnxt_promisc_ok(struct bnxt *bp)
- 
- static int bnxt_setup_nitroa0_vnic(struct bnxt *bp)
++	return rss_ctx;
++}
++
++void bnxt_clear_rss_ctxs(struct bnxt *bp, bool all)
++{
++	struct bnxt_rss_ctx *rss_ctx, *tmp;
++
++	list_for_each_entry_safe(rss_ctx, tmp, &bp->rss_ctx_list, list)
++		bnxt_del_one_rss_ctx(bp, rss_ctx, all);
++
++	if (all)
++		bitmap_free(bp->rss_ctx_bmap);
++}
++
++static void bnxt_init_multi_rss_ctx(struct bnxt *bp)
++{
++	bp->rss_ctx_bmap = bitmap_zalloc(BNXT_RSS_CTX_BMAP_LEN, GFP_KERNEL);
++	if (bp->rss_ctx_bmap) {
++		/* burn index 0 since we cannot have context 0 */
++		__set_bit(0, bp->rss_ctx_bmap);
++		INIT_LIST_HEAD(&bp->rss_ctx_list);
++		bp->rss_cap |= BNXT_RSS_CAP_MULTI_RSS_CTX;
++	}
++}
++
+ /* Allow PF, trusted VFs and VFs with default VLAN to be in promiscuous mode */
+ static bool bnxt_promisc_ok(struct bnxt *bp)
  {
-+	struct bnxt_vnic_info *vnic = &bp->vnic_info[1];
- 	unsigned int rc = 0;
+@@ -14612,6 +14659,8 @@ static void bnxt_remove_one(struct pci_dev *pdev)
+ 	unregister_netdev(dev);
+ 	bnxt_free_l2_filters(bp, true);
+ 	bnxt_free_ntp_fltrs(bp, true);
++	if (BNXT_SUPPORTS_MULTI_RSS_CTX(bp))
++		bnxt_clear_rss_ctxs(bp, true);
+ 	clear_bit(BNXT_STATE_IN_FW_RESET, &bp->state);
+ 	/* Flush any pending tasks */
+ 	cancel_work_sync(&bp->sp_task);
+@@ -15223,6 +15272,9 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
  
--	rc = bnxt_hwrm_vnic_alloc(bp, 1, bp->rx_nr_rings - 1, 1);
-+	rc = bnxt_hwrm_vnic_alloc(bp, vnic, bp->rx_nr_rings - 1, 1);
- 	if (rc) {
- 		netdev_err(bp->dev, "Cannot allocate special vnic for NS2 A0: %x\n",
- 			   rc);
- 		return rc;
- 	}
+ 	INIT_LIST_HEAD(&bp->usr_fltr_list);
  
--	rc = bnxt_hwrm_vnic_cfg(bp, 1);
-+	rc = bnxt_hwrm_vnic_cfg(bp, vnic);
- 	if (rc) {
- 		netdev_err(bp->dev, "Cannot allocate special vnic for NS2 A0: %x\n",
- 			   rc);
-@@ -9988,7 +9990,7 @@ static int bnxt_init_chip(struct bnxt *bp, bool irq_re_init)
- 		rx_nr_rings--;
- 
- 	/* default vnic 0 */
--	rc = bnxt_hwrm_vnic_alloc(bp, BNXT_VNIC_DEFAULT, 0, rx_nr_rings);
-+	rc = bnxt_hwrm_vnic_alloc(bp, vnic, 0, rx_nr_rings);
- 	if (rc) {
- 		netdev_err(bp->dev, "hwrm vnic alloc failure rc: %x\n", rc);
- 		goto err_out;
-@@ -9997,7 +9999,7 @@ static int bnxt_init_chip(struct bnxt *bp, bool irq_re_init)
- 	if (BNXT_VF(bp))
- 		bnxt_hwrm_func_qcfg(bp);
- 
--	rc = bnxt_setup_vnic(bp, BNXT_VNIC_DEFAULT);
-+	rc = bnxt_setup_vnic(bp, vnic);
++	if (BNXT_SUPPORTS_NTUPLE_VNIC(bp))
++		bnxt_init_multi_rss_ctx(bp);
++
+ 	rc = register_netdev(dev);
  	if (rc)
- 		goto err_out;
- 	if (bp->rss_cap & BNXT_RSS_CAP_RSS_HASH_TYPE_DELTA)
+ 		goto init_err_cleanup;
+@@ -15243,6 +15295,8 @@ static int bnxt_init_one(struct pci_dev *pdev, const struct pci_device_id *ent)
+ 	bnxt_clear_int_mode(bp);
+ 
+ init_err_pci_clean:
++	if (BNXT_SUPPORTS_MULTI_RSS_CTX(bp))
++		bnxt_clear_rss_ctxs(bp, true);
+ 	bnxt_hwrm_func_drv_unrgtr(bp);
+ 	bnxt_free_hwrm_resources(bp);
+ 	bnxt_hwmon_uninit(bp);
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index fbb53308cb81..81460a96c0dd 100644
+index 81460a96c0dd..4d3104c26cfa 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1256,6 +1256,7 @@ struct bnxt_vnic_info {
+@@ -1256,9 +1256,21 @@ struct bnxt_vnic_info {
  #define BNXT_VNIC_UCAST_FLAG	8
  #define BNXT_VNIC_RFS_NEW_RSS_FLAG	0x10
  #define BNXT_VNIC_NTUPLE_FLAG		0x20
-+	u32		vnic_id;
++#define BNXT_VNIC_RSSCTX_FLAG		0x40
++	struct bnxt_rss_ctx	*rss_ctx;
+ 	u32		vnic_id;
  };
  
++struct bnxt_rss_ctx {
++	struct list_head list;
++	struct bnxt_vnic_info vnic;
++	u16	*rss_indir_tbl;
++	u8	index;
++};
++
++#define BNXT_MAX_ETH_RSS_CTX	32
++#define BNXT_RSS_CTX_BMAP_LEN	(BNXT_MAX_ETH_RSS_CTX + 1)
++
  struct bnxt_hw_rings {
-@@ -2695,7 +2696,7 @@ int bnxt_hwrm_cfa_ntuple_filter_alloc(struct bnxt *bp,
- 				      struct bnxt_ntuple_filter *fltr);
- void bnxt_fill_ipv6_mask(__be32 mask[4]);
- int bnxt_get_nr_rss_ctxs(struct bnxt *bp, int rx_rings);
--int bnxt_hwrm_vnic_cfg(struct bnxt *bp, u16 vnic_id);
-+int bnxt_hwrm_vnic_cfg(struct bnxt *bp, struct bnxt_vnic_info *vnic);
- int __bnxt_hwrm_get_tx_rings(struct bnxt *bp, u16 fid, int *tx_rings);
- int bnxt_nq_rings_in_use(struct bnxt *bp);
- int bnxt_hwrm_set_coal(struct bnxt *);
-@@ -2721,7 +2722,7 @@ int bnxt_hwrm_free_wol_fltr(struct bnxt *bp);
- int bnxt_hwrm_func_resc_qcaps(struct bnxt *bp, bool all);
+ 	int tx;
+ 	int rx;
+@@ -2228,6 +2240,9 @@ struct bnxt {
+ 	/* grp_info indexed by completion ring index */
+ 	struct bnxt_ring_grp_info	*grp_info;
+ 	struct bnxt_vnic_info	*vnic_info;
++	struct list_head	rss_ctx_list;
++	unsigned long		*rss_ctx_bmap;
++	u32			num_rss_ctx;
+ 	int			nr_vnics;
+ 	u16			*rss_indir_tbl;
+ 	u16			rss_indir_tbl_entries;
+@@ -2242,6 +2257,7 @@ struct bnxt {
+ #define BNXT_RSS_CAP_AH_V6_RSS_CAP		BIT(5)
+ #define BNXT_RSS_CAP_ESP_V4_RSS_CAP		BIT(6)
+ #define BNXT_RSS_CAP_ESP_V6_RSS_CAP		BIT(7)
++#define BNXT_RSS_CAP_MULTI_RSS_CTX		BIT(8)
+ 
+ 	u8			rss_hash_key[HW_HASH_KEY_SIZE];
+ 	u8			rss_hash_key_valid:1;
+@@ -2341,6 +2357,10 @@ struct bnxt {
+ #define BNXT_SUPPORTS_NTUPLE_VNIC(bp)	\
+ 	(BNXT_PF(bp) && ((bp)->fw_cap & BNXT_FW_CAP_CFA_RFS_RING_TBL_IDX_V3))
+ 
++#define BNXT_SUPPORTS_MULTI_RSS_CTX(bp)				\
++	(BNXT_PF(bp) && BNXT_SUPPORTS_NTUPLE_VNIC(bp) &&	\
++	 ((bp)->rss_cap & BNXT_RSS_CAP_MULTI_RSS_CTX))
++
+ 	u32			hwrm_spec_code;
+ 	u16			hwrm_cmd_seq;
+ 	u16                     hwrm_cmd_kong_seq;
+@@ -2723,6 +2743,10 @@ int bnxt_hwrm_func_resc_qcaps(struct bnxt *bp, bool all);
  int bnxt_hwrm_func_qcaps(struct bnxt *bp);
  int bnxt_hwrm_fw_set_time(struct bnxt *);
--int bnxt_hwrm_vnic_rss_cfg_p5(struct bnxt *bp, u16 vnic_id);
-+int bnxt_hwrm_vnic_rss_cfg_p5(struct bnxt *bp, struct bnxt_vnic_info *vnic);
+ int bnxt_hwrm_vnic_rss_cfg_p5(struct bnxt *bp, struct bnxt_vnic_info *vnic);
++void bnxt_del_one_rss_ctx(struct bnxt *bp, struct bnxt_rss_ctx *rss_ctx,
++			  bool all);
++struct bnxt_rss_ctx *bnxt_alloc_rss_ctx(struct bnxt *bp);
++void bnxt_clear_rss_ctxs(struct bnxt *bp, bool all);
  int bnxt_open_nic(struct bnxt *, bool, bool);
  int bnxt_half_open_nic(struct bnxt *bp);
  void bnxt_half_close_nic(struct bnxt *bp);
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-index 93f9bd55020f..86dcd2c76587 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c
-@@ -71,7 +71,7 @@ int bnxt_register_dev(struct bnxt_en_dev *edev,
- 	rcu_assign_pointer(ulp->ulp_ops, ulp_ops);
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index 1d240a27455a..771833b1900d 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -969,6 +969,8 @@ static int bnxt_set_channels(struct net_device *dev,
+ 	}
  
- 	if (test_bit(BNXT_STATE_OPEN, &bp->state))
--		bnxt_hwrm_vnic_cfg(bp, 0);
-+		bnxt_hwrm_vnic_cfg(bp, &bp->vnic_info[BNXT_VNIC_DEFAULT]);
- 
- 	bnxt_fill_msix_vecs(bp, bp->edev->msix_entries);
- 	edev->flags |= BNXT_EN_FLAG_MSIX_REQUESTED;
+ 	bnxt_clear_usr_fltrs(bp, true);
++	if (BNXT_SUPPORTS_MULTI_RSS_CTX(bp))
++		bnxt_clear_rss_ctxs(bp, false);
+ 	if (netif_running(dev)) {
+ 		if (BNXT_PF(bp)) {
+ 			/* TODO CHIMP_FW: Send message to all VF's
 -- 
 2.30.1
 
 
---00000000000060dcf9061483b515
+--00000000000074b715061483b577
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -662,14 +345,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIHrT81uxqkMSgdUIUbZJFyRciHZVlAHY
-XLwg55Y13X1NMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDMy
-NTIyMjkzNlowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJWgxNy/tUwVW5+vNV8ILoejY+EdN6DK
+NlqQCI/FLBEgMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDMy
+NTIyMjkzN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQB460h3mW3gIHkVaO8woApuzidHg3pN3jIEY8G0vEOx+qhXlvrQ
-Y0eSaPODobGqFv0V0Qoqq3aJ/1uCP3txdIE52dY8Gi75YISMfPuN/mr/1QV0IL+5u0/ihWgz7kXI
-PPjeUse6QF8xerrPT0ucr+tyRH94BqKSb/16DZCxuQsPV30qBboPn1DVhaH5euNdZGF+aAR6BlBo
-/mmSwzUeUGPGatMBglewWpu/YQX3SkG9YTYxrAsBqqPnF63VXP3cmXGh6NM6+mST/dcrlAsxNCwg
-bASWF5GwdenfUPH6DARmSDBlhGVNDLOdO1lCdG/U66j+COdSC1aBFePsgi0DAv3u
---00000000000060dcf9061483b515--
+ATANBgkqhkiG9w0BAQEFAASCAQBQPWdCq07A2gYkSOj3jwXjEF+hV6v530qnJGTWzlzGWts3+Wvt
+wh9Y5iu+3UP7+34SdqMre6/TDbQuzZU6Vgb4z5QfsUZcNvTQTwZ6ctzM1IqErQ+vVKMl6eKl/MRh
+SMFtq/39O2ye4RA3f6nzr37aFhQm1G7UlX1Ob6AN9kud0Acl1rDZQ1urKwqYscVh6XjhiTO6Z5id
+FpHTAu5Vl0O73MvkN9eUVk1Z6GPW9/kdrwsET0+AZM8nodZAYxomDtoYG3SeDGSSkO35pmB3q5KT
+DgdEziZQdToW6TkZPxvDfqhHCzl0tOR6Xo0IG3h/Us9wFtUWA6Nc6Doj0f8Z1nxr
+--00000000000074b715061483b577--
 
