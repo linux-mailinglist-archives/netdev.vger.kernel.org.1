@@ -1,164 +1,188 @@
-Return-Path: <netdev+bounces-81618-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F33BC88A7DE
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:57:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F280188A809
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:01:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72C89341557
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:56:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B83B2341028
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:58:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324191552E3;
-	Mon, 25 Mar 2024 13:27:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D8B680049;
+	Mon, 25 Mar 2024 13:33:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MZFie8KJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA066CDDC
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 13:27:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A0F080030
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 13:33:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711373253; cv=none; b=dBRuApHfBpST824RQVzWOQWPb+CHjbeMxjxwcgCR95Td7hTtU39phb5tDiTTYUqBEwmgn30GRaL1xMgCjcorNfZpVFfs8CF8uTPoleLtS/q6mZDZTTica9wOsCOisfXK/L22rydUBViADbSeghH+53lCEXtLgFHb00sHxEQloRY=
+	t=1711373596; cv=none; b=I1sIK++kYPZCAL5t6bG+bNYr0GR4tfVrHqfwyah017pI41GwAVoXYZYdYYQf8QqFh6zii5Rm2DDb1UqbOhyBUNR+1GWU5aWgy8Gfs5bZ9AKipQfp7+KBjWraXOa0PiR7lHeGDnIA/vHSuMQ1Nt3NgSS7MiE27Zmlb3MkmCfu6rY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711373253; c=relaxed/simple;
-	bh=P3OWqnkWTXmu2hLFQXYZHkN/5j/+PnQvtI0D/VhpqoA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=ECnaaD4Qg1WqAiz49E/s2Yy7dqFZtRm1ZOWU+JIgFquV0hf9SheYirybsp1wgYrC7WJlAVEVELi1TZIBEykN0xLR/xvLfeQxT4ThUAMoBLh5XBlXp4s8lmszwKwPXrZNTaCR7XjAfbKqkXLdkYRQuUtfklXnW2Glz3PnkJXy148=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3684b6a0c94so43677065ab.3
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 06:27:30 -0700 (PDT)
+	s=arc-20240116; t=1711373596; c=relaxed/simple;
+	bh=PZ2b5uDrLchGLseW3tLESEPk08Ndqt3Gfo+ADY+bNH0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=JqnAiYJ+sVWi8xkGE3GwSgWWC4RJTz9GNApLI+8zBHdr7cAYpwsWzSS9/h6o29b0V3RmEhXiyGNvC+0rJlSp3pcbS32kyhCgyTnkYZREF/YZHH48VXBNRr9KR9ybJ+q7/jgzMP4xbPc6FORd8xYjtu2zIuO7BuVfkus+L0L2Qio=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MZFie8KJ; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-56bde8ea904so15403a12.0
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 06:33:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711373593; x=1711978393; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G9TDu4EJT9P9RuDeozlmDMQWaelM/ItTcO1/ff08eR4=;
+        b=MZFie8KJ3TqmrhQ2KqGDBV1OLrndPBzJAZjn8xLIzV6tDQXJWLNQCE7K4ZZGz2/2jh
+         dDRopIU0I19IiB0IS8ODGH7hE1TockGBwX61NgvkFyn5Fu2e9pqz2tvB4ANbX5aE2OzM
+         Q7BiN4dhl2iSuuuBSuN53aUHpPPdnoQEjumB9TdHKm319boYH5+NfPTO7fzQfHp+dpDZ
+         vCIOmL3PVb9TmU33zz85f+xvarFmvO9OkU2U85ZAHgHVfSEnHZ6ipsCM8Ynu0AF5/TK9
+         hx9/3KOJmSLfhXZZRCG/OI02k4vfLK514OV/uIbkgUeI0xXhmz41GSs8GroRzeadmI75
+         fKdg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711373250; x=1711978050;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ctAtBGkbihJIAqFkPSDzB+Db8NzZcNP/xwNYQUVTKnI=;
-        b=CaXlk/D5roserdbcMO3UVSAEQLp6p+6C74tAZ9TnN7ammIegLtl+WrgBWtF6ROgTgS
-         k2gKgGS2xtpyzghIuWxxH6I7vngCEdxJymgJnLUIrX1kk8usvKOmWnP8MNW026ZmeXQx
-         Dwrsz1DGRSf9uipLgXHZcyQo51fAUBiJUFCzt6BjaBdu7pn/Ela7jue9fYtZMRWsO5im
-         zU50vBGQbTNzQO+GHBUT1iCg12YPyyGzMjgnrUYi2R5NB9txoZa5kkVXstKRJUDoRaVH
-         5GxWq6XIA85aZuHxMX/ISmNrMZ8241q2yXQdWXG2y19ACgqSmj4bMlI8EamWbTiqFGnS
-         j5UQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWu1c1Ezkr5TJtQOygJ5Z2pQSh6bvJmRynhg+Galzj9R/GX7FL7WPB+kdcrGr07ODSP/w4dLXLPNJCSCJwsZMlCvDz/bOoF
-X-Gm-Message-State: AOJu0YwxDgHE4ePGQrDvreZ/yWYzVo5/kMwnbdBfUhlkLDdSHE1VXhAa
-	9b92wahDFTZo1hpRzwEp9OutaXdJqDwlQ03qb25E+KnAmLUsyugduBm/vrvs1xgP9iua/BHrwGp
-	mwf8N8TM8HPsWF5LWPpt6V432TN+jAcKrb0UkiNFPZP/hutpqOlx4Ez8=
-X-Google-Smtp-Source: AGHT+IGmGluipUd2atCJ9yVqGaoUk8r2TJ3zFIvtOyp+7e1pz29myH6X82xI0yqk6k8zElqByK/sZmJlBC8Lz6bl4osd4lT2f4Ya
+        d=1e100.net; s=20230601; t=1711373593; x=1711978393;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=G9TDu4EJT9P9RuDeozlmDMQWaelM/ItTcO1/ff08eR4=;
+        b=eZjdL2C5N1ky0QhwYlQGvIFDSvSKrs9B0DjfXWrxv9lIzqnC6HgYhKo/+JcJZbNJiz
+         WREVsI6a2scHpnYCzYNaeFk9TNY5eMe6CkpHESJT6td2FSdBkNqB2Wubv3SrVB2RPobt
+         jonosQAaSO0BbZivPdh/SDB1usKK1KxVIPDJpDlurGhQ+aoZP6wtXxbyKq5P01esVLfH
+         Rco9Y+1JTsNpBS58fi9BesDdsGV3YuAiibK8+Sh+TJCu8IiUwBegjgzLsfVEMW5tDbEq
+         xfGye/T8J51bt1b94K1kGx3xpMgrb16UQMvBkyMd/vOHb1n9y1EqXh1fzQwshhqand6q
+         A1GA==
+X-Forwarded-Encrypted: i=1; AJvYcCWSZV0YkCa1n1NhPX3ypABIrmjbEC5vV0h6wGg+jdqQDsBM2RaFppIizA90h01YTCIDjuNaqRD3tH6qtrMpNCE1lfL2khDn
+X-Gm-Message-State: AOJu0YxR9gaBvqQPT2dpnZ28nZI+tQddR3DZU2hvZ2/K3QiR7Cb3OiCw
+	D1RM0x5XxZsyJBrBnPhfxY4Nr7n6pINkOubT/eHAw4lx0nbG148IIUBBjJA9jJ2S1IlbN8Nb/PN
+	pYY2pjthKZP3PJ1/MFZr2h56FA2/qOjEeEb69
+X-Google-Smtp-Source: AGHT+IEmBXEEGOIBB06ODeA1YAB7dw+8QWAHNDrJsBFBPzpflN0dddEyqAWZXjUyqs9WxFTvovIDODyg90yr5vB2i/g=
+X-Received: by 2002:aa7:c441:0:b0:56c:d96:8db2 with SMTP id
+ n1-20020aa7c441000000b0056c0d968db2mr124982edr.6.1711373592528; Mon, 25 Mar
+ 2024 06:33:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d02:b0:368:8915:2bd3 with SMTP id
- i2-20020a056e021d0200b0036889152bd3mr218979ila.1.1711373250048; Mon, 25 Mar
- 2024 06:27:30 -0700 (PDT)
-Date: Mon, 25 Mar 2024 06:27:30 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a5c69c06147c2238@google.com>
-Subject: [syzbot] [bpf?] [net?] KMSAN: uninit-value in sock_map_delete_elem
-From: syzbot <syzbot+eb02dc7f03dce0ef39f3@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com, 
-	jakub@cloudflare.com, john.fastabend@gmail.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
+References: <20240322122407.1329861-1-edumazet@google.com> <171111663201.19374.16295682760005551863.git-patchwork-notify@kernel.org>
+ <CAADnVQJy+0=6ZuAz-7dwOPK3sN2QrPiAcxhtojh8p65j0TRNhg@mail.gmail.com>
+In-Reply-To: <CAADnVQJy+0=6ZuAz-7dwOPK3sN2QrPiAcxhtojh8p65j0TRNhg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 25 Mar 2024 14:33:01 +0100
+Message-ID: <CANn89iLSOeFGNogYMHbeLRC5kOwwArMz3d5_2hZmBn6fibyUhw@mail.gmail.com>
+Subject: Re: [PATCH net] bpf: Don't redirect too small packets
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Guillaume Nault <gnault@redhat.com>
+Cc: patchwork-bot+netdevbpf@kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov <ast@kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Andrii Nakryiko <andrii@kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Eric Dumazet <eric.dumazet@gmail.com>, 
+	syzbot+9e27778c0edc62cb97d8@syzkaller.appspotmail.com, 
+	Stanislav Fomichev <sdf@google.com>, Willem de Bruijn <willemb@google.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Sat, Mar 23, 2024 at 4:02=E2=80=AFAM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+>
+> On Fri, Mar 22, 2024 at 7:10=E2=80=AFAM <patchwork-bot+netdevbpf@kernel.o=
+rg> wrote:
+> >
+> > Hello:
+> >
+> > This patch was applied to bpf/bpf.git (master)
+> > by Daniel Borkmann <daniel@iogearbox.net>:
+> >
+> > On Fri, 22 Mar 2024 12:24:07 +0000 you wrote:
+> > > Some drivers ndo_start_xmit() expect a minimal size, as shown
+> > > by various syzbot reports [1].
+> > >
+> > > Willem added in commit 217e6fa24ce2 ("net: introduce device min_heade=
+r_len")
+> > > the missing attribute that can be used by upper layers.
+> > >
+> > > We need to use it in __bpf_redirect_common().
+>
+> This patch broke empty_skb test:
+> $ test_progs -t empty_skb
+>
+> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
+> [redirect_ingress] unexpected ret: veth ETH_HLEN+1 packet ingress
+> [redirect_ingress]: actual -34 !=3D expected 0
+> test_empty_skb:PASS:err: veth ETH_HLEN+1 packet ingress [redirect_egress]=
+ 0 nsec
+> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
+> [redirect_egress] unexpected ret: veth ETH_HLEN+1 packet ingress
+> [redirect_egress]: actual -34 !=3D expected 1
+>
+> And looking at the test I think it's not a test issue.
+> This check
+> if (unlikely(skb->len < dev->min_header_len))
+> is rejecting more than it should.
+>
+> So I reverted this patch for now.
 
-syzbot found the following issue on:
-
-HEAD commit:    70293240c5ce Merge tag 'timers-urgent-2024-03-23' of git:/..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=129e4dc9180000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e6bd769cb793b98a
-dashboard link: https://syzkaller.appspot.com/bug?extid=eb02dc7f03dce0ef39f3
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13b5bbb9180000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14ee1291180000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/0de52742d0b8/disk-70293240.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f304697881bf/vmlinux-70293240.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/2b9d8a9376f0/bzImage-70293240.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+eb02dc7f03dce0ef39f3@syzkaller.appspotmail.com
-
-=====================================================
-BUG: KMSAN: uninit-value in sock_map_delete_elem+0x15e/0x1c0 net/core/sock_map.c:442
- sock_map_delete_elem+0x15e/0x1c0 net/core/sock_map.c:442
- ____bpf_map_delete_elem kernel/bpf/helpers.c:77 [inline]
- bpf_map_delete_elem+0x5c/0x80 kernel/bpf/helpers.c:73
- ___bpf_prog_run+0x13fe/0xe0f0 kernel/bpf/core.c:1997
- __bpf_prog_run160+0xb5/0xe0 kernel/bpf/core.c:2236
- bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
- __bpf_prog_run include/linux/filter.h:657 [inline]
- bpf_prog_run include/linux/filter.h:664 [inline]
- __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
- bpf_trace_run8+0x1bd/0x3a0 kernel/trace/bpf_trace.c:2426
- __bpf_trace_jbd2_handle_stats+0x51/0x70 include/trace/events/jbd2.h:210
- __traceiter_jbd2_handle_stats+0xc5/0x190 include/trace/events/jbd2.h:210
- trace_jbd2_handle_stats include/trace/events/jbd2.h:210 [inline]
- jbd2_journal_stop+0x1157/0x12c0 fs/jbd2/transaction.c:1869
- __ext4_journal_stop+0x115/0x310 fs/ext4/ext4_jbd2.c:134
- ext4_do_writepages+0x1c3c/0x62e0 fs/ext4/inode.c:2692
- ext4_writepages+0x312/0x830 fs/ext4/inode.c:2768
- do_writepages+0x427/0xc30 mm/page-writeback.c:2612
- __writeback_single_inode+0x10d/0x12c0 fs/fs-writeback.c:1650
- writeback_sb_inodes+0xb48/0x1be0 fs/fs-writeback.c:1941
- __writeback_inodes_wb+0x14c/0x440 fs/fs-writeback.c:2012
- wb_writeback+0x4da/0xdf0 fs/fs-writeback.c:2119
- wb_check_old_data_flush fs/fs-writeback.c:2223 [inline]
- wb_do_writeback fs/fs-writeback.c:2276 [inline]
- wb_workfn+0x110c/0x1940 fs/fs-writeback.c:2304
- process_one_work kernel/workqueue.c:3254 [inline]
- process_scheduled_works+0xa81/0x1bd0 kernel/workqueue.c:3335
- worker_thread+0xea5/0x1560 kernel/workqueue.c:3416
- kthread+0x3e2/0x540 kernel/kthread.c:388
- ret_from_fork+0x6d/0x90 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
-
-Local variable stack created at:
- __bpf_prog_run160+0x45/0xe0 kernel/bpf/core.c:2236
- bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
- __bpf_prog_run include/linux/filter.h:657 [inline]
- bpf_prog_run include/linux/filter.h:664 [inline]
- __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
- bpf_trace_run8+0x1bd/0x3a0 kernel/trace/bpf_trace.c:2426
-
-CPU: 0 PID: 33 Comm: kworker/u8:2 Not tainted 6.8.0-syzkaller-13213-g70293240c5ce #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
-Workqueue: writeback wb_workfn (flush-8:0)
-=====================================================
+OK, it seems I missed __bpf_rx_skb() vs __bpf_tx_skb(), but even if I
+move my sanity test in __bpf_tx_skb(),
+the bpf test program still fails, I am suspecting the test needs to be adju=
+sted.
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/core/filter.c b/net/core/filter.c
+index 745697c08acb3a74721d26ee93389efa81e973a0..e9c0e2087a08f1d8afd2c3e8e78=
+71ddc9231b76d
+100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -2128,6 +2128,12 @@ static inline int __bpf_tx_skb(struct
+net_device *dev, struct sk_buff *skb)
+                return -ENETDOWN;
+        }
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
++       if (unlikely(skb->len < dev->min_header_len)) {
++               pr_err_once("__bpf_tx_skb skb->len=3D%u <
+dev(%s)->min_header_len(%u)\n", skb->len, dev->name,
+dev->min_header_len);
++               DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
++               kfree_skb(skb);
++               return -ERANGE;
++       } // Note: this is before we change skb->dev
+        skb->dev =3D dev;
+        skb_set_redirected_noclear(skb, skb_at_tc_ingress(skb));
+        skb_clear_tstamp(skb);
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+-->
 
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
 
-If you want to undo deduplication, reply with:
-#syz undup
+test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
+[redirect_egress] unexpected ret: veth ETH_HLEN+1 packet ingress
+[redirect_egress]: actual -34 !=3D expected 1
+
+[   58.382051] __bpf_tx_skb skb->len=3D1 < dev(veth0)->min_header_len(14)
+[   58.382778] skb len=3D1 headroom=3D78 headlen=3D1 tailroom=3D113
+               mac=3D(64,14) net=3D(78,-1) trans=3D-1
+               shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D0 type=3D0 segs=
+=3D0))
+               csum(0x0 ip_summed=3D0 complete_sw=3D0 valid=3D0 level=3D0)
+               hash(0x0 sw=3D0 l4=3D0) proto=3D0x7f00 pkttype=3D0 iif=3D0
+
+Note that veth driver is one of the few 'Ethernet' drivers that make
+sure to get at least 14 bytes in the skb at ndo_start_xmit()
+after commit 726e2c5929de841fdcef4e2bf995680688ae1b87 ("veth: Ensure
+eth header is in skb's linear part")
+
+BTW this last patch (changing veth) should have been done generically
+from act_mirred
+
+(We do not want to patch ~400 ethernet drivers in the tree)
 
