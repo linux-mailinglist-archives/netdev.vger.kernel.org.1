@@ -1,167 +1,162 @@
-Return-Path: <netdev+bounces-81741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4230588AFB1
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:19:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2207388AFD6
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:25:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 650AF1C61E0D
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 19:19:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53AC21C3B576
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 19:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D2B012B6C;
-	Mon, 25 Mar 2024 19:19:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E38101C6A6;
+	Mon, 25 Mar 2024 19:24:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="iCsjd5/l"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g2GIPcWj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D7A1C6B6
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 19:19:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ABE51946C;
+	Mon, 25 Mar 2024 19:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711394385; cv=none; b=H+W3iQU78T4LvTjMDpCKq5QfiQlqZTK91BYmTP8fjKm7mtVovBKgE53JAw4LuP4cuy1aQyOO4+DWQyatB2VdAzvQdBctfWY/FNwItQ0+ySagT/0S0hRxa5cFHSl0K73jzIAv88+QTx4rBfA+CbLSnYHBE7/waY9isbdLp6hTLY4=
+	t=1711394685; cv=none; b=unkn2fX76BRsSjVl3mfXMcL+IETbMYwXFH4lsU4xKZrr4/QnetbM9k6midWUo+NFSS9brc07bZQqKPVnS1oOceioPFruQ3V9CwvEaOrEaxfrGZOkzIBXaPTu72sq5G2WNLDuBrq65Ng+o0WurMUt3PWxvGi035cTiFbpEr3bK84=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711394385; c=relaxed/simple;
-	bh=xEMxiJB0c6G9z0DMbm7e5y0kwjrYVcpjBOXOzjtHEAQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cHnnuOSk0o+pFp2b17qkfF4NKKZO9zFlnMC2YcXN/Qrc5oFHHFBUMKiAehGKizon5PV/nMKjb8kbYCMBRjEpZFbMBjrWGI4Ux9zGJjMNXhcyJHfdn6nSHKccrQ4g8XM4bTe28xI6ORS0jBPTxtBpA5lNpcYLVYoloSCxergMCyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=iCsjd5/l; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-56a2bb1d84eso8383509a12.1
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 12:19:43 -0700 (PDT)
+	s=arc-20240116; t=1711394685; c=relaxed/simple;
+	bh=TkGuL+w7G+3t6UUem74ucq9Zu8Hv0WBY2IBJlQ7xZQE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MEI9kccaAzouUrU/fbFbh0x2blCh+FJUS9EYj/WLgu51ksfTYBxH+n/w0AU5ZQPE+eSuLCpvU4SNInVSfLTJXgMNdVLNHX7nDF/LkdeaBzGTPQxae7DyN+/p3+OWwZXPm4RFkJwdfLILyfdTVfWolqWicFN+4icIAx4sx9vxzk8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g2GIPcWj; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-5dcc4076c13so2943607a12.0;
+        Mon, 25 Mar 2024 12:24:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1711394382; x=1711999182; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=ugZz785W8pMDPhpwfMM+nuUMqogsJD2dq6g02eauybE=;
-        b=iCsjd5/lWV67rNMya7uouqwFYfrH+11sTrQjp5VODK8fhlyvpuE1uEpP92rCkA8AIJ
-         7gFVkx570SHOI/Ul9y3z1g6r46LPSkEPHIq5BXSf8ar44diMoEDWXZg6kt7NtiwEGkzD
-         JsNhWHN8xhW5p7uLZ9AXK++La1DDDBFD6eQRQ4ep2ljm9b+txluQvLA4rHWSdhWWzYG/
-         E15gYkOz2BhEm3DNukIfXdSACJ+nxdMeTaZEHq76T8ie/vQOjBwC4W/SOL/9OwLtHi6m
-         PODJ22yQ7p9zr7cNV+lbIQ82AEmcK1g5qkg5zAWHYnMsO3QLvM7BJmClEq1Yyfn9rZ2O
-         1pKA==
+        d=gmail.com; s=20230601; t=1711394683; x=1711999483; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=P8SlcQVDmaEWiOte6mDmefSXrzEKVOFtuPmb7V2Kzic=;
+        b=g2GIPcWjYhY/TKBekNp9G3RH5zQW7HWUWyWjU4a3NA2BwZXYGkWMZyla6Wf2JfAzKb
+         sOtkpvEqQWhnzvSloidpzBmsOg1T4T/oVm4/JZorkq0Ublr1neanl0p5cZEqWmEjkgKm
+         DxYu27nZx63MzMH4zEOnk0ocQ3jyGfMyWiuRBCR7WhEKp3WEJYRYJAJyX5FvrkNEVZKD
+         GrUNZOCBCOWk1aRCW8jtTi+HAMdFCCHxHF+f0pMOqcs6q4S8dSJg8piRQSaycYHfgN1u
+         fDzuTBAS1FmQx2bxKD9LfP/dFBiFMtfG3WFNXGB8MjhVkbYvxyUkh8fSR8pN7PfmxVUP
+         Ms+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711394382; x=1711999182;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ugZz785W8pMDPhpwfMM+nuUMqogsJD2dq6g02eauybE=;
-        b=l3njTy1hzmu/O4fYM278NgJuT5N7XTuQ14Q5CVcgo8UcEomo3Yk5RgO2PRBudyxrYQ
-         rPNAcROpLYfAR1UFp4HJyGgiAmB/6C3bhIAFOyyQb/nE68IZNtUSgEz6TyLSiZPgtzzk
-         CxNv0DPY3+Mrz7K9AgQcoIeFCrSmAyjQycmv3QNb9D8AiVJ2nJh2M8tL98kx3RXNvMEk
-         /3FsRYWHZMXaoNZqFru1TAbGK7opFD2UapqSWHz5qNosjDVcFnhSuLepQ9imcrSC6YQF
-         V/3nmwcS0MrVfkwbaC8BnAJLeL4IsED6W4QcUFAcjccPYcQY/Y3ygp1//6rHubmXBKWM
-         ZXqg==
-X-Forwarded-Encrypted: i=1; AJvYcCXX+AjVX5Fm3SAp9mWH5lYQbk/LlmCG7AVe7gXxpJaa6946/JFXClDySzu2DKhvXOtqWz8TChT8SZ/zi/ZwB8OQUAG9JD72
-X-Gm-Message-State: AOJu0YxieI1Wu+qoC0wElRRrKFmqhaC7T+TJkN31DboSFpiHyYSEe51B
-	59Yr/+0kHsdlzWHFnsl/GNGQ/sWDv6psC21wOhzl5S3/67NLw+Lzk8gmrZIgmdc=
-X-Google-Smtp-Source: AGHT+IHpyNyOQRHz+kI0k7EHDSauGOF7bPHup2aMlbQZYZT2xJ/E/g1kriz8PbOzRAytkBellvwTjw==
-X-Received: by 2002:a50:9b4d:0:b0:568:b43f:e2a8 with SMTP id a13-20020a509b4d000000b00568b43fe2a8mr5605054edj.13.1711394381892;
-        Mon, 25 Mar 2024 12:19:41 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.222.44])
-        by smtp.gmail.com with ESMTPSA id b19-20020aa7d493000000b0056a2b87787dsm3272093edr.37.2024.03.25.12.19.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 25 Mar 2024 12:19:41 -0700 (PDT)
-Message-ID: <17d40ec9-ee7d-4ff0-800d-d3da678d6b57@linaro.org>
-Date: Mon, 25 Mar 2024 20:19:39 +0100
+        d=1e100.net; s=20230601; t=1711394683; x=1711999483;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:sender
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=P8SlcQVDmaEWiOte6mDmefSXrzEKVOFtuPmb7V2Kzic=;
+        b=T6nS/EGiTlpRiWfsOHFs/2J2DIm14wqkdhHh/IPKGKXCXs1Odogds9Af0QdDbrD2JF
+         pc31kz7YSBpsZfoTQ3GtO4EkTx6uS/0/ITaZUFsJ/B1BmBnyFtJ2oiaxxDtH3bd8eqJ6
+         8kfE6GNbU+FK2hmRpLZPzG+XrFlHwMWlRpHW6PKxaWPSrsg505aYPprL3zXRIsAawiN8
+         BRHOk8pyCW0sbxOQuG1E7U9/MOo8aUDH4eow9e1yHnDzOCXUo5cJPEZacDRrO8mDJKBL
+         5jj+nxOsRSNnCodxYHYXoE6wUrEvCENvceBZjWkBPBqy0Jaj16Q8u1XFH0HxcGAVS9HL
+         o0Lg==
+X-Forwarded-Encrypted: i=1; AJvYcCXMy/W6KhwZlJyibe2OWrqOcpOBJzHsiL2ZFW8elCXMrf1qkNEiqJq++TcL0E/wqPtW3flV3bmmoSN6Zk5iQDejpNIr/4Uy/JWKK95c8ZRFtCQpGBuhnhHr9bp2jDi/19j1RRBT5vLX2qim1iNkdhGFZ3L0jaK6Tay4QuUOSR9JlHuOVX5qRkeHg3xAFlbytamlXSXBG7jzWFapYI1039vgSgsGt0TtvXmTBoOYIik53pLrBHGxVR+RuIOu+vc3FNcrAAIIsH2YzPErQKmrX1QxeUnqrU4iXCAr5vcsfQA9OEqQYf+vgWp/L23fnWnMJg==
+X-Gm-Message-State: AOJu0YxEp602xXjjpoxl8bSxu0JSd33jAmTr0DefPzeT8QPqG36LVK+8
+	pTQGOPdkUUa00fXuoL+ypps9ZVUHM7hCs0oweuMUs3kUx6d2jyLI
+X-Google-Smtp-Source: AGHT+IFwrImv53xAJXZaDSLJtn5nAAXYRWdj5wAShxC6nIYkDeejlGCGK79rEKa0DnGROBP9wWQclw==
+X-Received: by 2002:a17:90b:3d8:b0:29b:a345:620a with SMTP id go24-20020a17090b03d800b0029ba345620amr10896738pjb.20.1711394683229;
+        Mon, 25 Mar 2024 12:24:43 -0700 (PDT)
+Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id q7-20020a17090a304700b0029bf9969afbsm10113710pjl.53.2024.03.25.12.24.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Mar 2024 12:24:42 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Date: Mon, 25 Mar 2024 12:24:40 -0700
+From: Guenter Roeck <linux@roeck-us.net>
+To: =?iso-8859-1?Q?Ma=EDra?= Canal <mcanal@igalia.com>
+Cc: linux-kselftest@vger.kernel.org, David Airlie <airlied@gmail.com>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Kees Cook <keescook@chromium.org>,
+	Daniel Diaz <daniel.diaz@linaro.org>,
+	David Gow <davidgow@google.com>,
+	Arthur Grillo <arthurgrillo@riseup.net>,
+	Brendan Higgins <brendan.higgins@linux.dev>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Maxime Ripard <mripard@kernel.org>,
+	Ville =?iso-8859-1?Q?Syrj=E4l=E4?= <ville.syrjala@linux.intel.com>,
+	Daniel Vetter <daniel@ffwll.ch>,
+	Thomas Zimmermann <tzimmermann@suse.de>,
+	dri-devel@lists.freedesktop.org, kunit-dev@googlegroups.com,
+	linux-arch@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-parisc@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-sh@vger.kernel.org, loongarch@lists.linux.dev,
+	netdev@vger.kernel.org,
+	Linux Kernel Functional Testing <lkft@linaro.org>
+Subject: Re: [PATCH v2 05/14] drm: Suppress intentional warning backtraces in
+ scaling unit tests
+Message-ID: <e880828b-552e-488e-9f31-3989bec276ae@roeck-us.net>
+References: <20240325175248.1499046-1-linux@roeck-us.net>
+ <20240325175248.1499046-6-linux@roeck-us.net>
+ <0729b218-53f1-4139-b165-a324794a9abd@igalia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] nfc: nci: Fix uninit-value in nci_dev_up
-To: Paolo Abeni <pabeni@redhat.com>, Ryosuke Yasuoka <ryasuoka@redhat.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, syoshida@redhat.com,
- syzbot+7ea9413ea6749baf5574@syzkaller.appspotmail.com
-References: <20240312145658.417288-1-ryasuoka@redhat.com>
- <413249a5-13b0-4a06-9819-650eb4e82b37@linaro.org> <ZfLKjD6aMrGPEgHh@zeus>
- <498dc99d25965877f7d15592dcbb340f97d803b4.camel@redhat.com>
-Content-Language: en-US
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Autocrypt: addr=krzysztof.kozlowski@linaro.org; keydata=
- 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
- D2GYIS41Kv4Isx2dEFh+/Q==
-In-Reply-To: <498dc99d25965877f7d15592dcbb340f97d803b4.camel@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <0729b218-53f1-4139-b165-a324794a9abd@igalia.com>
 
-On 14/03/2024 12:58, Paolo Abeni wrote:
-> On Thu, 2024-03-14 at 18:59 +0900, Ryosuke Yasuoka wrote:
->> On Wed, Mar 13, 2024 at 10:01:27AM +0100, Krzysztof Kozlowski wrote:
->>> On 12/03/2024 15:56, Ryosuke Yasuoka wrote:
->>>
->>>> CPU: 1 PID: 5012 Comm: syz-executor935 Not tainted 6.7.0-syzkaller-00562-g9f8413c4a66f #0
->>>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
->>>
->>> These two lines are not really relevant, it's a virtual platform, so
->>> whether this is Google or Amazon it does not matter, and your log paste
->>> is already quite long. If there is going to be any resend, I propose to
->>> drop.
->>
->> OK. Do you mean all these log messages that syzbot reported should be
->> dropped or I should leave only relavant messages?
+Hi,
 
-No, I proposed to drop "these two lines". Please look at where people
-put their comments and what do they trim from the response.
-
+On Mon, Mar 25, 2024 at 04:05:06PM -0300, Maíra Canal wrote:
+> Hi Guenter,
 > 
-> It's not a big deal either way, but there is a quite established
-> practice of including the whole splat.
+> On 3/25/24 14:52, Guenter Roeck wrote:
+> > The drm_test_rect_calc_hscale and drm_test_rect_calc_vscale unit tests
+> > intentionally trigger warning backtraces by providing bad parameters to
+> > the tested functions. What is tested is the return value, not the existence
+> > of a warning backtrace. Suppress the backtraces to avoid clogging the
+> > kernel log.
+> > 
+> > Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> > Acked-by: Dan Carpenter <dan.carpenter@linaro.org>
+> > Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+> > ---
+> > - Rebased to v6.9-rc1
+> > - Added Tested-by:, Acked-by:, and Reviewed-by: tags
+> > 
+> >   drivers/gpu/drm/tests/drm_rect_test.c | 6 ++++++
+> >   1 file changed, 6 insertions(+)
+> > 
+> > diff --git a/drivers/gpu/drm/tests/drm_rect_test.c b/drivers/gpu/drm/tests/drm_rect_test.c
+> > index 76332cd2ead8..75614cb4deb5 100644
+> > --- a/drivers/gpu/drm/tests/drm_rect_test.c
+> > +++ b/drivers/gpu/drm/tests/drm_rect_test.c
+> > @@ -406,22 +406,28 @@ KUNIT_ARRAY_PARAM(drm_rect_scale, drm_rect_scale_cases, drm_rect_scale_case_desc
+> >   static void drm_test_rect_calc_hscale(struct kunit *test)
+> >   {
+> > +	DEFINE_SUPPRESSED_WARNING(drm_calc_scale);
+> >   	const struct drm_rect_scale_case *params = test->param_value;
+> >   	int scaling_factor;
+> > +	START_SUPPRESSED_WARNING(drm_calc_scale);
+> 
+> I'm not sure if it is not that obvious only to me, but it would be nice
+> to have a comment here, remembering that we provide bad parameters in
+> some test cases.
 
-Yeah, splat was fine in general.
+Sure. Something like this ?
 
+        /*
+         * drm_rect_calc_hscale() generates a warning backtrace whenever bad
+         * parameters are passed to it. This affects all unit tests with an
+         * error code in expected_scaling_factor.
+         */
 
-Best regards,
-Krzysztof
-
+Thanks,
+Guenter
 
