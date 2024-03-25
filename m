@@ -1,111 +1,88 @@
-Return-Path: <netdev+bounces-81679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADB1C88AD3A
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 19:11:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BCB688AB7F
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 18:24:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A9C1B3E57E
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:22:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DF551C3D2C9
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:24:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 967616BB26;
-	Mon, 25 Mar 2024 16:06:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFEA21272B7;
+	Mon, 25 Mar 2024 16:16:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UY2GvH7i"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="A+GtRDey"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9913DABFF;
-	Mon, 25 Mar 2024 16:06:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8D7839F9;
+	Mon, 25 Mar 2024 16:16:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711382819; cv=none; b=OksTsQmDBMZ3feWpBrPV6mpZ+8KU2GQ2xDcZMLvMdGWAuMvtJ9KSvSPAVhJuz9KlWKuy5dl9lrqitobUgTM3YAg2ATeruwn31fj9oQXsn4Q/7+1ayPknBiJIxM19kFmSbtNluuIHOjHP1CKhvZmIiWOqzlBnoO+rjds4Y752VKs=
+	t=1711383400; cv=none; b=rEHygo2iyRxuHoMVYZvqAskmtW7Xm4xiieQdr1Pt0wr1zbrnwS3E6cNwinnVCwJ/ULFBqTpe+Tox2i21kYixyage3pWe1hr3Pi245JwuU0eKh17mT2BiPVOYwWGhPBI7aOdCNZ2VYQAvMxocWza0pLW68NxeyuxNpbDBMrnZhh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711382819; c=relaxed/simple;
-	bh=IZh/2COuzN7LI3CUVc2tFyndfcbuRuvwsPNrBw6vFxg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jw5Swl3PJn+vQR/eidD/TFcLEzUYIOZDBjMUvtnpVxC6D3fz2VuUnJUDfpdPA+INnljPk+LGm5l7GXACVfmzW+8/AgMJ/4O9JUS2WoqHtAXEw0EZxkjOkAYbvAy/S7C5yfGgrg/OKdC+uzvtzU6ppBJltCNZXCdNIY8GAjY2y0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UY2GvH7i; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711382818; x=1742918818;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=IZh/2COuzN7LI3CUVc2tFyndfcbuRuvwsPNrBw6vFxg=;
-  b=UY2GvH7iZuqPsjASOSTIGsIYLkEiYHsrTEzdvMzd7cUEi8Nd8oPnofJZ
-   gratkRr/vFcAbeWavvQ2KlIxhj2Vf8uW3nckOdtnWthVi6pKh+jfFHFYG
-   lBlFBetUiV+bYzMQ+8B0d9UNZJM5pBRTigIu+MfnbZu61cEEfIx93eQ9H
-   ukKhQXQ7cvS8HUf+HPKWGkRNespFhxXezgJt7STZYCefyFJpZBfMMdvCZ
-   mWFaXMC5CutmtXYn5lrdMvzVcM6f6LGSXYgjvEVXQmRu8Nxp3IsSJ7y3V
-   hAHuPlyZ6PKfeZmKJ0mARpUpO71p2Qg2x56OHHTXs4tq0kiwYWr78kk5T
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,11024"; a="17789590"
-X-IronPort-AV: E=Sophos;i="6.07,153,1708416000"; 
-   d="scan'208";a="17789590"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Mar 2024 09:06:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,153,1708416000"; 
-   d="scan'208";a="15563795"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by fmviesa010.fm.intel.com with ESMTP; 25 Mar 2024 09:06:51 -0700
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next] net: pin system percpu page_pools to the corresponding NUMA nodes
-Date: Mon, 25 Mar 2024 17:06:35 +0100
-Message-ID: <20240325160635.3215855-1-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1711383400; c=relaxed/simple;
+	bh=vhysHfkaQ11aFpQ0qHmLTGDQbRzjDgbO6RjYe+i/sVM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Nt7luvbfvUD5SK8FgiJCBDOFWHe3jB5DSVsKISmNd1xNFwTMQBw3YFXzr1tlWgCiRojX7z1vJWyhUmk5IQMTslNUpIpNXlLFNS7BNEfeTcjqGIcvneY/n5eswJpM0NnOqguXPa92hh6R+rV5GiExSykShRnq360sBaAaMe9qaf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=A+GtRDey; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=vhysHfkaQ11aFpQ0qHmLTGDQbRzjDgbO6RjYe+i/sVM=;
+	t=1711383399; x=1712592999; b=A+GtRDey9cKVu1Ia+XKk4zhU7wCcgSSA+tRxzGof/6V5PHR
+	DfzMfEXMZBXnuoL/SZsqyYydwn7nOUPTdEQHW45sqUDxVdJ6EMPb+33NbNevpdwLCafLWiuHZHtYb
+	KcZ7zpgHA+4BI7i11L85XWaiUe8YRncMUbCWoU0BZqXCfPirtLVBBL7wXzWjZL7hU/jROqf4gYuO8
+	h57eXzj+sP1UxlnN+cJ+cPd1LcnVjF6r4PwwNRi+OnXlQE1A6xCR3kOR+UWJ10cun0MVoeYzU+lCP
+	OFdxuj/LYs54RFW9NZyorwWjKAzi6WXM4kqNBtPZMrkiaxlpW4wyaBl782Pq15MQ==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1ron00-0000000DwVC-2aTa;
+	Mon, 25 Mar 2024 17:16:36 +0100
+Message-ID: <0d314451371764362a43c4368469c2be6a17eb8c.camel@sipsolutions.net>
+Subject: Re: kunit alltests runs broken in mainline
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Mark Brown <broonie@kernel.org>
+Cc: Brendan Higgins <brendanhiggins@google.com>, David Gow
+ <davidgow@google.com>,  Rae Moar <rmoar@google.com>,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ kunit-dev@googlegroups.com, x86@kernel.org, linux-wireless@vger.kernel.org
+Date: Mon, 25 Mar 2024 17:16:35 +0100
+In-Reply-To: <c01d6e1c-1dad-4012-b8b0-dccf19b2e3f2@sirena.org.uk>
+References: <b743a5ec-3d07-4747-85e0-2fb2ef69db7c@sirena.org.uk>
+	 <9c9e1297e2548b363fc93e774c8546e6ebf4efd6.camel@sipsolutions.net>
+	 <c01d6e1c-1dad-4012-b8b0-dccf19b2e3f2@sirena.org.uk>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-malware-bazaar: not-scanned
 
-System page_pools are percpu and one instance can be used only on
-one CPU.
-%NUMA_NO_NODE is fine for allocating pages, as the PP core always
-allocates local pages in this case. But for the struct &page_pool
-itself, this node ID means they are allocated on the boot CPU,
-which may belong to a different node than the target CPU.
-Pin system page_pools to the corresponding nodes when creating,
-so that all the allocated data will always be local. Use
-cpu_to_mem() to account memless nodes.
-Nodes != 0 win some Kpps when testing with xdp-trafficgen.
+On Mon, 2024-03-25 at 15:55 +0000, Mark Brown wrote:
+> On Mon, Mar 25, 2024 at 04:29:53PM +0100, Johannes Berg wrote:
+>=20
+> > But I'm not sure why ARCH=3Dum is different?
+>=20
+> It's probably something to do with it lacking a bunch of features of
+> normal architectures, especially around hardware support.
 
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- net/core/dev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Feels though that should make it *more* likely to not have support for
+some hardware driver like iwlwifi, not *less* :-)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 9a67003e49db..fefa484d715a 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -11712,7 +11712,7 @@ static int net_page_pool_create(int cpuid)
- 	struct page_pool_params page_pool_params = {
- 		.pool_size = SYSTEM_PERCPU_PAGE_POOL_SIZE,
- 		.flags = PP_FLAG_SYSTEM_POOL,
--		.nid = NUMA_NO_NODE,
-+		.nid = cpu_to_mem(cpuid),
- 	};
- 	struct page_pool *pp_ptr;
- 
--- 
-2.44.0
+Anyway, does it fix it for you as well? if yes, where/how should we get
+that in?
 
+johannes
 
