@@ -1,235 +1,148 @@
-Return-Path: <netdev+bounces-81577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81578-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBC2888A5DB
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:08:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2868A88A952
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:30:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 319111F615DA
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:08:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E2A7BE106E
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:09:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA9D5788E;
-	Mon, 25 Mar 2024 12:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7282A145B04;
+	Mon, 25 Mar 2024 12:22:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kGwx5TGg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.actia.se (mail.actia.se [212.181.117.226])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6A9E13FD9D;
-	Mon, 25 Mar 2024 12:20:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.181.117.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B459E14D6ED
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 12:21:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711369238; cv=none; b=fhSOj77RCMx7X/IhCBFu4w8jwtQbCNl0v6HgDC3PQVatK3rOicpd3S4j+gQIZLEZHuR6PIi8HEZpcdx1QeWTVpb9cWBh+Sxim4Kf7l5NlrjM+TO9ZIulbwBIz61I71fT82D9cQoL2+CX9/HevQA26abUbzZKXJ1KkiF/i6vWmZo=
+	t=1711369311; cv=none; b=rwxjAVOiKseSbmVFbnK9yNbWDFbx9eJa9biTqpw1jMaDsGjsezY3jVhDJUPnG54ccXqL4sI0aoq4mJKvYbJuc+ZY07Wo4AbtJzXFu/NJ8uxVq0xPkOK4sC583yta+Vnl4Zt1mRpCtDEvSA4iP1+CNrWSxtYQH9j+a/YcCYIToSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711369238; c=relaxed/simple;
-	bh=Rg9Dkjqh2+4xyVRxCQJZZ2VbWGmyVffXWW8+QSjaDBo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=jqPrAV82oetY/O2fEA1dO0jtdZ7UDNkFyD5ZLL2pTTO3DP0qAlas2oxXuDYREzf4By8czV647bWhcgFvEZ3hXqN1YPdVLbEeaY1/mKYhp2nvRsjfSkti6pCm33/FycFJtR2j54EGtvUzZLDwAD8Dtx1JVNpcRtOew9F23ltsLdk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=actia.se; spf=pass smtp.mailfrom=actia.se; arc=none smtp.client-ip=212.181.117.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=actia.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=actia.se
-Received: from S036ANL.actianordic.se (10.12.31.117) by S036ANL.actianordic.se
- (10.12.31.117) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Mon, 25 Mar
- 2024 13:20:25 +0100
-Received: from S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69]) by
- S036ANL.actianordic.se ([fe80::e13e:1feb:4ea6:ec69%4]) with mapi id
- 15.01.2507.037; Mon, 25 Mar 2024 13:20:25 +0100
-From: John Ernberg <john.ernberg@actia.se>
-To: Florian Fainelli <f.fainelli@gmail.com>, "Russell King (Oracle)"
-	<linux@armlinux.org.uk>
-CC: Maxime Chevallier <maxime.chevallier@bootlin.com>, Wei Fang
-	<wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
-	<xiaoning.wang@nxp.com>, NXP Linux Team <linux-imx@nxp.com>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Heiner Kallweit
-	<hkallweit1@gmail.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, Andrew Lunn
-	<andrew@lunn.ch>
-Subject: Re: [PATCH net v3 2/2] net: fec: Suspend the PHY on probe
-Thread-Topic: [PATCH net v3 2/2] net: fec: Suspend the PHY on probe
-Thread-Index: AQHab8t46xO1JP3Hxke5Lu7SCFbkbbEq8XCAgBPPogCAAAPagIACAISAgAAYuQCAAAV2gIAAKfWAgAFUdICAAAMfgIAGCB+A
-Date: Mon, 25 Mar 2024 12:20:25 +0000
-Message-ID: <ed6da286-eba7-4fae-882b-bb960a613dac@actia.se>
-References: <20240306133734.4144808-1-john.ernberg@actia.se>
- <20240306133734.4144808-3-john.ernberg@actia.se>
- <20240306190539.4ab9f369@device-28.home>
- <9490ed31-dede-4a14-9c62-5ef83e30593a@actia.se>
- <ZflSE8AaYLE3Ri8L@shell.armlinux.org.uk>
- <f89bec78-0dae-4518-a461-2e64a3dfb9fc@actia.se>
- <ZfsUvm9YC5O7il3h@shell.armlinux.org.uk>
- <7f0e5f8b-fb85-4f2b-8d77-4170366a1b55@gmail.com>
- <Zfs8hWo/aVbvuAgm@shell.armlinux.org.uk>
- <efffa6e6-f519-4424-8d58-0951e7c68f27@actia.se>
- <27453913-d4a3-4535-8cf5-2f5f3eb6c7b7@gmail.com>
-In-Reply-To: <27453913-d4a3-4535-8cf5-2f5f3eb6c7b7@gmail.com>
-Accept-Language: en-US, sv-SE
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-esetresult: clean, is OK
-x-esetid: 37303A2958D729556C7166
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <4D39503E4B285940B69F7EBCEAD034A6@actia.se>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1711369311; c=relaxed/simple;
+	bh=AE1dlvv5b1X/poInI7A8TX+ny663XWX7KjBuB1GkxY4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=DZdLfPuQvU0gL2uTG3yoXCtExst97ru81LOrDnnqSBR+UAcbSxQPXasu3kIOTdTBc4bc0NPS0zqxs/zLVt4XNH4HzsBQqfR8UkP8d/I3bgwtDGhkpXG5LNG3k+1LkCt+mPceupxKdzo8jzhxMF8rsdxqx/2hwJVIsMrpM6JVLsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kGwx5TGg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6EB70C433F1;
+	Mon, 25 Mar 2024 12:21:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711369311;
+	bh=AE1dlvv5b1X/poInI7A8TX+ny663XWX7KjBuB1GkxY4=;
+	h=Date:Subject:To:References:Cc:From:In-Reply-To:From;
+	b=kGwx5TGgfuiYR8ZX8r/AtMyeLggJuegzjC9l/G4X1/Qzv21sh0fTjWZqaC+7XhUf/
+	 mZ8cDfDBiUyad17Kal5Xpn9pP1ANsySpsyBLggwXMOef21eBYDRQEsF9qo4FcX3tAp
+	 qFz55xt+zFT5zA5whauc4NEZrdQFfTvtAMRFawak1XDU+iC6UGn1NyT86COpmBJYDS
+	 9o3qM3Q5YkVM0zzt3qvraD0vBneBuJvjJcjYujUibVLhZeOW7BS5k+3STXip5HjKg9
+	 SVUKIO53oQGGji6/gB8keEPd9PeyP+zi13tSRs3Ri4OQkisGd5BiWOtEEoH/WDLG5i
+	 UqoCOROiIbH6A==
+Message-ID: <1cde0059-d319-4a4f-a68d-3b3ffeb3da20@kernel.org>
+Date: Mon, 25 Mar 2024 13:21:47 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Xen NIC driver have page_pool memory leaks
+Content-Language: en-US
+To: Arthur Borsboom <arthurborsboom@gmail.com>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>
+References: <CALUcmUncphE8v8j1Xme0BcX4JRhqd+gB0UUzS-U=3XXw_3iUiw@mail.gmail.com>
+Cc: Netdev <netdev@vger.kernel.org>, Paul Durrant <paul@xen.org>,
+ Wei Liu <wei.liu@kernel.org>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <CALUcmUncphE8v8j1Xme0BcX4JRhqd+gB0UUzS-U=3XXw_3iUiw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-SGkgRmxvcmlhbiwNCg0KT24gMy8yMS8yNCAxNzoxMywgRmxvcmlhbiBGYWluZWxsaSB3cm90ZToN
-Cj4gT24gMy8yMS8yNCAwOTowMiwgSm9obiBFcm5iZXJnIHdyb3RlOg0KPj4gSGkgUnVzc2VsbCwN
-Cj4+DQo+PiBPbiAzLzIwLzI0IDIwOjQ0LCBSdXNzZWxsIEtpbmcgKE9yYWNsZSkgd3JvdGU6DQo+
-Pj4gT24gV2VkLCBNYXIgMjAsIDIwMjQgYXQgMTA6MTM6NTVBTSAtMDcwMCwgRmxvcmlhbiBGYWlu
-ZWxsaSB3cm90ZToNCj4+Pj4NCj4+Pj4NCj4+Pj4gT24gMy8yMC8yMDI0IDk6NTQgQU0sIFJ1c3Nl
-bGwgS2luZyAoT3JhY2xlKSB3cm90ZToNCj4+Pj4+IE9uIFdlZCwgTWFyIDIwLCAyMDI0IGF0IDAz
-OjI1OjU0UE0gKzAwMDAsIEpvaG4gRXJuYmVyZyB3cm90ZToNCj4+Pj4+PiBIaSBSdXNzZWwsDQo+
-Pj4+Pg0KPj4+Pj4gR3Jvd2wuIEhpIFBldGVyLg0KPj4+Pj4NCj4+Pj4+PiBXaGF0IHdlIHJlYWxs
-eSB3YW50IGlzIHRoZSBQSFkgdG8gYmUgc3VzcGVuZGVkIG9uIHN1c3BlbmQgdG8gUkFNDQo+Pj4+
-Pj4gcmVnYXJkbGVzcyBvZiB1cyBoYXZpbmcgaGFkIGFuIGluaXRpYWwgbGluayB1cCBvciBub3Qu
-DQo+Pj4+Pg0KPj4+Pj4gU28gd2hhdCB5b3UncmUgYXNraW5nIGlzIGZvciB0aGUgUEhZIHRvIGJl
-IHN1c3BlbmRlZCB3aGVuIHRoZSBzeXN0ZW0NCj4+Pj4+IGlzIGVudGVyaW5nIHN1c3BlbmQsIHdo
-aWNoIGlzIGEgbG9uZyB0aW1lIGFmdGVyIHRoZSBzeXN0ZW0gYm9vdGVkIGFuZA0KPj4+Pj4gdGh1
-cyBwaHlfcHJvYmUoKSB3YXMgY2FsbGVkLCBhbmQgY291bGQgYmUgc29tZSB0aW1lIGJlZm9yZSB0
-aGUgc3lzdGVtDQo+Pj4+PiByZXN1bWVzLg0KPj4+Pj4NCj4+Pj4+IEknbSBub3Qgc3VyZSB3aGF0
-IHRoZSByZWxldmFuY2UgaXMgb2YgcGh5X3Byb2JlKCkgdGhhdCB3YXMgYnJvdWdodCB1cA0KPj4+
-Pj4gcHJldmlvdXNseSB0aGVuLg0KPj4+Pj4NCj4+Pj4+PiBUaGlzIHdvcmtlZCBwcmlvciB0byA0
-YzBkMmU5NmJhMDUgKCJuZXQ6IHBoeTogY29uc2lkZXIgdGhhdCANCj4+Pj4+PiBzdXNwZW5kMnJh
-bQ0KPj4+Pj4+IG1heSBjdXQNCj4+Pj4+PiBvZmYgUEhZIHBvd2VyIikgd2hpY2ggd2FzIGFkZGVk
-IGluIExpbnV4IDUuMTEsIGFuZCA1NTdkNWRjODNmNjggDQo+Pj4+Pj4gKCJuZXQ6DQo+Pj4+Pj4g
-ZmVjOiB1c2UNCj4+Pj4+PiBtYWMtbWFuYWdlZCBQSFkgUE0iKSB3aGljaCB3YXMgYWRkZWQgaW4g
-TGludXggNS4xMi4NCj4+Pj4+DQo+Pj4+PiBMb29raW5nIGF0IHRoZSBmb3JtZXIgY29tbWl0LCB0
-aGF0IGxvb2tzIHRvIG1lIGxpa2UgaXQgaXMgb25seQ0KPj4+Pj4gYWZmZWN0aW5nIHRoZSByZXN1
-bWUgcGF0aHMsIG5vdCB0aGUgc3VzcGVuZCBwYXRocywgc28gd291bGRuJ3QgaGF2ZQ0KPj4+Pj4g
-YW55IGltcGFjdCBpdHNlbGYgb24gd2hhdCBoYXBwZW5zIHdoZW4gc3VzcGVuZCBoYXBwZW5zLg0K
-Pj4+Pj4NCj4+Pj4+IFRoZSBsYXR0ZXIgY29tbWl0IHN0YXRlcyB0aGF0IGl0IGlzIGEgd29yayBh
-cm91bmQgZm9yIGFuIGlzc3VlIHdpdGggYQ0KPj4+Pj4gcGFydGljdWxhciBQSFkuIFdoYXQgaGFw
-cGVucyBpZiB5b3UgcmV2ZXJ0IGp1c3QgdGhpcyBjb21taXQsIGRvZXMgeW91cg0KPj4+Pj4gcHJv
-YmxlbSB0aGVuIGdvIGF3YXk/DQo+Pg0KPj4gT3VyIFBIWSBkb2VzIG5vdCBiZWdpbiB3b3JraW5n
-IGFnYWluIHdpdGhvdXQgcmV2ZXJ0aW5nIGJvdGguIA0KPj4gcGh5X2luaXRfaHcoKQ0KPj4gd2ls
-bCByZW1haW4gYW4gaXNzdWUgaWYgaXQgb2NjdXJzIGFmdGVyIHBoeV9zdGFydCgpLg0KPj4NCj4+
-IFRoZSBjb21taXQgbWVzc2FnZSBpbiA1NTdkNWRjODNmNjggaXMgbm90IGV4cGxhaW5pbmcgbmVh
-cmx5IGVub3VnaCwgSQ0KPj4gc3BlbnQgYQ0KPj4gZmV3IGRheXMgb24gaXQgYmVmb3JlIEkgcHJv
-dmVkIHRoYXQgY29tbWl0IHRvIGJlIG5lYXJseSBjb3JyZWN0IChTZWUgDQo+PiB3aG9sZQ0KPj4g
-dGhyZWFkIGF0IFsxXSksIGl0IGhhcHBlbmVkIHRvIGp1c3QgZXhwbG9kZSB3aXRoIHRoYXQgUEhZ
-LiBUaGUgaXNzdWUgaXMgYQ0KPj4gc2VxdWVuY2luZyBpc3N1ZSB0aGF0IHdhcyBtYWRlIG1vcmUg
-cHJvbWluZW50IGJ5IDRjMGQyZTk2YmEwNSwgYnV0IGl0DQo+PiBleGlzdGVkDQo+PiBzaW5jZSBh
-cm91bmQgMjAwOC4gQmVjYXVzZSBGRUMgaXMgYm90aCBNRElPIGNvbnRyb2xsZXIgYW5kIE1BQywg
-DQo+PiBtZWFuaW5nIHRoZQ0KPj4gcmVzdW1lIG9mIHRoZSBsaW5rIGluIGEgbGluayB1cCBjYXNl
-IHJ1bnMgcGh5X3N0YXJ0KCkgaW4gdGhlIEZFQyByZXN1bWUNCj4+IGZ1bmN0aW9uLCB3aGljaCB3
-aWxsIHRyaWdnZXIgYSBtZGlvIGJ1cyByZXN1bWUgd2hlbiBpdCBjb21wbGV0ZXMsIGluIHR1cm4N
-Cj4+IGNhbGxpbmcgcGh5X2luaXRfaHcoKSAoYmVmb3JlIDRjMGQyZTk2YmEwNSBpdCB3YXMgcGh5
-X3Jlc3VtZSgpIHdoaWNoDQo+PiB3YXNuJ3QgYQ0KPj4gcHJvYmxlbSBidXQgc3RpbGwgd3Jvbmcg
-c2VxdWVuY2Ugd2lzZSkuDQo+Pg0KPj4+Pj4NCj4+Pj4+IEFsc28sIHBsZWFzZSBjbGFyaWZ5LiBJ
-dCBzZWVtcyB0aGF0IHlvdSBhcmUgcmVwb3J0aW5nIGEgcmVncmVzc2lvbiAtDQo+Pj4+PiBpdCB1
-c2VkIHRvIHdvcmsgZm9yIHlvdSBwcmlvciB0byA1NTdkNWRjODNmNjgsIGJ1dCA1NTdkNWRjODNm
-Njggc3RvcHMNCj4+Pj4+IGl0IHdvcmtpbmcgZm9yIHlvdT8NCj4+Pj4+DQo+Pj4+Pj4gU2luY2Ug
-RkVDIHJlcXVpcmVzIG1hY19tYW5hZ2VkX3BtIHRoZSBnZW5lcmljIFBNIHN1c3BlbmQtcmVzdW1l
-IHBhdGhzDQo+Pj4+Pj4gYXJlIG5vdA0KPj4+Pj4+IHRha2VuLiBUaGUgcmVzdW1lIHNlcXVlbmNp
-bmcgd2l0aCBnZW5lcmljIFBNIGhhcyBiZWVuIGJyb2tlbiB3aXRoIHRoZQ0KPj4+Pj4+IEZFQyBz
-aW5jZQ0KPj4+Pj4+IGdlbmVyaWMgUE0gb2YgdGhlIG1kaW8gYnVzIHdhcyBhZGRlZCwgYXMgdGhl
-IEZFQyB3aWxsIGRvIHBoeV9zdGFydCgpDQo+Pj4+Pj4gKHZpYSBGRUMNCj4+Pj4+PiByZXN1bWUp
-IGFuZCB0aGVuIGdlbmVyaWMgUE0gcnVucyBwaHlfaW5pdF9odygpIHZpYSBtZGlvIGJ1cyByZXN1
-bWUNCj4+Pj4+PiAocHJldmlvdXNseToNCj4+Pj4+PiBsZXNzIGRhbWFnaW5nIHBoeV9yZXN1bWUo
-KSkgZHVlIHRvIGhvdyB0aGUgRkVDIElQIGJsb2NrIHdvcmtzLg0KPj4+Pj4NCj4+Pj4+IFRoYXQg
-c3VnZ2VzdHMgdGhhdCBldmVuIHdpdGggNTU3ZDVkYzgzZjY4IHJldmVydGVkLCBpdCdzIGJyb2tl
-bi4NCj4+Pj4+IERpZ2dpbmcgaW50byB0aGUgaGlzdG9yeSwgd2hhdCB5b3UncmUgcmVmZXJyaW5n
-IHRvIGRhdGVzIGZyb20gSmFudWFyeQ0KPj4+Pj4gMjAxNiwgc28gYXJlIHlvdSByZXBvcnRpbmcg
-YSByZWdyZXNzaW9uIHRoYXQgb2NjdXJlZCA4IF95ZWFyc18gYWdvLA0KPj4+Pj4gYXQgd2hpY2gg
-cG9pbnQgSSdkIHF1ZXN0aW9uIHdoeSBpdCdzIHRha2VuIDggeWVhcnMuDQo+Pg0KPj4gQSByZXZl
-cnQgb2YgdGhvc2UgaXMgYWJzb2x1dGVseSB3cm9uZy4gVGhvc2UgY29tbWl0cyBhcmUgZml4aW5n
-IGJpZ2dlcg0KPj4gaXNzdWVzLg0KPj4NCj4+Pj4+DQo+Pj4+PiBHaXZlbiB0aGUgdGltZSB0aGF0
-IGhhcyBwYXNzZWQsIEkgZG9uJ3QgdGhpbmsgcmV2ZXJ0aW5nIGNvbW1pdHMgaXMNCj4+Pj4+IGEg
-c2FuZSBhcHByb2FjaC4gUXVpdGUgd2hhdCB0aGUgcmlnaHQgc29sdXRpb24gaXMgdGhvdWdoLCBJ
-J20gbm90DQo+Pj4+PiBzdXJlLg0KPj4+Pj4NCj4+Pj4+IMKgwqAgRnJvbSB0aGUgZGVzY3JpcHRp
-b24gYW5kIHRoZSBjb21taXRzIHBvaW50ZWQgdG8sIEkganVzdCBkb24ndCBzZWUNCj4+Pj4+IHRo
-YXQgdGhlcmUgaXMgYW55dGhpbmcgdGhhdCBjb3VsZCd2ZSBjaGFuZ2VkIHdpdGggcmVzcGVjdCB0
-byB0aGUgZmlyc3QNCj4+Pj4+IGJvb3QgLSBpZiB0aGF0IGhhcyBjaGFuZ2VkLCB0aGVuIEkgdGhp
-bmsgbW9yZSByZXNlYXJjaCBpbnRvIHdoYXQgDQo+Pj4+PiBjYXVzZWQNCj4+Pj4+IGl0IGlzIG5l
-ZWRlZC4NCj4+Pj4+DQo+Pj4+PiBJZiBpdCdzIHRoZSBzdWJzZXF1ZW50IHN0YXRlIGFmdGVyIGEg
-c3VzcGVuZC1yZXN1bWUgY3ljbGUsIHRoZW4geWVzLA0KPj4+Pj4gSSB3b3VsZCBhZ3JlZSB0aGF0
-IGl0cyBwb3NzaWJsZSB0aGF0IHRoZXNlIGNoYW5nZXMgYnJva2UgdGhpcyBmb3IgeW91Lg0KPj4+
-Pj4gV291bGQgY2xlYXJpbmcgbmRldi0+cGh5ZGV2LT5tYWNfbWFuYWdlZF9wbSBqdXN0IGJlZm9y
-ZQ0KPj4+Pj4gcGh5X2Rpc2Nvbm5lY3QoKSBpbiBmZWNfZW5ldF9jbG9zZSgpIGZpeCBpdCBmb3Ig
-eW91LCBzbyB0aGUgc3VzcGVuZC8NCj4+Pj4+IHJlc3VtZSBwYXRocyBmb3IgdGhlIFBIWSBnZXQg
-dXNlZCB3aGVuIHRoZSBuZXR3b3JrIGludGVyZmFjZSBpcyBkb3duPw0KPj4+Pj4NCj4+Pj4+IE1h
-eWJlLCBob3dldmVyLCB0aGF0J3Mgc29tZXRoaW5nIHRoYXQgc2hvdWxkIGhhcHBlbiBpbiBhbnkg
-Y2FzZSBpbnNpZGUNCj4+Pj4+IHBoeWxpYiBvbiBwaHlfZGlzY29ubmVjdCgpIGFzIGEgbWF0dGVy
-IG9mIGNvdXJzZSwgc2luY2UgdGhlIFBIWSB3aWxsDQo+Pj4+PiBhdCB0aGF0IHBvaW50IGJlIG5v
-IGxvbmdlciB1bmRlciB0aGUgY29udHJvbCBvZiB0aGUgbmV0d29yayBkcml2ZXIgZm9yDQo+Pj4+
-PiBQTSBwdXJwb3Nlcy4gQ291bGQgeW91IGdpdmUgdGhpcyBpZGVhIGEgdHJ5IHBsZWFzZT8NCj4+
-Pj4+DQo+Pj4+DQo+Pj4+IE9uIHBoeV9kaXNjb25uZWN0KCkgd2Ugd2lsbCBkbyBhIHBoeV9kZXRh
-Y2goKSB3aGljaCBjYWxscyANCj4+Pj4gcGh5X3N1c3BlbmQoKS4NCj4+Pj4gR2l2ZW4gdGhhdCBw
-aHlfZGlzY29ubmVjdCgpIGlzIGNhbGxlZCBmcm9tIGZlY19lbmV0X2Nsb3NlKCksIHdlIA0KPj4+
-PiBzdGlsbCBoYXZlIGENCj4+Pj4gTURJTyBidXMgcmVnaXN0ZXJlZCBhbmQgd2UgYXJlIG5vdCB0
-cnlpbmcgdG8gc3VzcGVuZCB0aGUgTURJTyBidXMsIA0KPj4+PiBzbyB3ZQ0KPj4+PiBzaG91bGQg
-aGF2ZSBhbiBlZmZlY3RpdmUgcGh5X3N1c3BlbmQoKSBjYWxsIGhlcmUsIHdoYXQgYW0gSSBtaXNz
-aW5nPw0KPj4+DQo+Pj4gSSBkaWRuJ3QgbG9vayB0aGVyZSwgYnV0IGlmIHRoYXQgaXMgdGhlIGNh
-c2UsIHRoZW4gd2hhdCBpcyBKb2huJ3MNCj4+PiBwcm9ibGVtIC0gSSBjYW4ndCBmaWd1cmUgaXQg
-b3V0LCBzb21ldGhpbmcgaXNuJ3QgYWRkaW5nIHVwIGhlcmUuDQo+Pj4NCj4+DQo+PiBJIGNvdWxk
-IGluc3RlYWQgYWRkIGV4dHJhIHBoeV9zdXNwZW5kKCkgaW4gdGhlIHN1c3BlbmQgcGF0aCBpZiB0
-aGUgDQo+PiBsaW5rIGlzDQo+PiBkb3duIGFuZCB0aGUgRkVDIGlzIHVwIGFuZCBydW5uaW5nLiBJ
-IHJlamVjdGVkIGl0IG9yaWdpbmFsbHkgdGhpbmtpbmcgDQo+PiBpdCB3YXMNCj4+IGEgbXVjaCBk
-aXJ0aWVyIGZpeCwgYnV0IG1heWJlIHRoYXQgaXMgdGhlIG1vcmUgY29ycmVjdCB0aGluZyB0byBk
-bz8NCj4gDQo+IFRoaXMgZG9lcyBub3Qgc2VlbSBsaWtlIHRoZSBwcm9wZXIgc29sdXRpb24sIHRo
-ZSBvbmx5IHRpbWUgd2hlcmUgYW4gDQo+IGV4cGxpY2l0IHBoeV9zdXNwZW5kKCkgc2hvdWxkIGJl
-IGRvbmUgaW4gdGhlIEV0aGVybmV0IE1BQydzIC0+c3VzcGVuZCgpIA0KPiByb3V0aW5lIGlzIGlm
-IHRoZSBuZXR3b3JrIGRldmljZSB3YXMgYnJvdWdodCB1cCBhdCB0aGUgdGltZSANCj4gKG5ldGlm
-X3J1bm5pbm5nKCkgcmV0dXJucyB0cnVlKSAqYW5kKiB5b3Ugc2V0IG1hY19tYW5hZ2VkX3BtID0g
-dHJ1ZSANCj4gYmVjYXVzZSB5b3UgbXVzdCBwcmVjaXNlbHkgY29udHJvbCB0aGUgb3JkZXIgaW4g
-d2hpY2ggdGhlIE1BQyBhbmQgdGhlIA0KPiBQSFkgZ2V0IHN1c3BlbmRlZCB3aXRoIHJlc3BlY3Qg
-dG8gZWFjaCBvdGhlciAodHlwaWNhbGx5IGJlY2F1c2UgdGhlIFBIWSANCj4gc3VwcGxpZXMgYSBS
-WCBjbG9jayBiYWNrIHRvIHRoZSBNQUMsIGFuZCBzb21lIG9mIHRoZSBNQUMgbG9naWMgZGVwZW5k
-cyANCj4gdXBvbiBpdCB0byBvcGVyYXRlIHByb3Blcmx5LCBlLmcuOiBwZXJmb3JtIGEgcHJvcGVy
-IEZJRk8gZmx1c2ggZXRjLikuDQoNCkknbSBoYXZpbmcgc29tZSB0cm91YmxlIHVuZGVyc3RhbmRp
-bmcgeW91ciBtZXNzYWdlIGluIGNvbnRleHQgb2YgbXkgbW9zdCANCnJlY2VudCByZXBseSB0byBS
-dXNzZWxsLCBzbyBwbGVhc2UgYmVhciB3aXRoIG1lIGhlcmUgYXMgSSB3aWxsIA0KcG90ZW50aWFs
-bHkgYXNrIGEgcmVhbGx5IGR1bWIgcXVlc3Rpb246DQoNCkRvIEkgdW5kZXJzdGFuZCB0aGlzIGNv
-cnJlY3RseSBhcyB3aGF0IHVzZWQgdG8gd29yayBpbiA1LjEwIHdhcyBuZXZlciANCm1lYW50IHRv
-IHdvcmsgYW5kIHRoZSBiZWhhdmlvciBub3cgaXMgdGhlIGNvcnJlY3Qgb25lIGluIHRoZSBGRUMg
-Y2FzZT8gDQpNZWFuaW5nIHRoYXQgaWYgdGhlIGxpbmsgaGFzIG5ldmVyIGJlZW4gdXAgdGhlIFBI
-WSBtdXN0IG5ldmVyIGJlIGhhbmRsZWQgDQpmcm9tIGEgcG93ZXIgbWFuYWdlbWVudCBwZXJzcGVj
-dGl2ZT8NCg0KVGhlIG9ubHkgUEhZIGV4YW1wbGVzIEkgaGF2ZSBjb21lIGFjcm9zcyAodGhvdWdo
-IG5vdCBtYW55IGluIHRvdGFsKSB0aGUgDQpQSFkgaGFzIGRvbmUgc29tZSBpbml0aWFsIGNvbmZp
-Z3VyYXRpb24gb2YgaXRzZWxmIGFmdGVyIFBPUiBvciByZWxlYXNlIA0Kb2YgdGhlIHJlc2V0IGxp
-bmUuDQoNCj4gDQo+ICBGcm9tIHRoZXJlLCBJIHNlZSB0d28gZGlzdGluY3QgY2FzZXM6DQo+IA0K
-PiAtIHRoZSBuZXR3b3JrIGRldmljZSBkcml2ZXIgcHJvYmVkLCBidXQgdGhlIG5ldHdvcmsgZGV2
-aWNlIHdhcyBuZXZlciANCj4gYnJvdWdodCB1cCBpbiB0aGUgZmlyc3QgcGxhY2UgaW4gdGhhdCBj
-YXNlLCBJIGRvIG5vdCBzZWUgYSBwYXRoIHdoZXJlYnkgDQo+IHRoZSBQSFkgd291bGQgaGF2ZSBi
-ZWVuIHN1c3BlbmRlZCwgdW5sZXNzIHRoZSBib290IGZpcm13YXJlIGFscmVhZHkgdG9vayANCj4g
-Y2FyZSBvZiB0aGF0ICh3aGljaCBhcmd1YWJseSBpdCBzaG91bGQgaWYgeW91IGFyZSB0cnlpbmcg
-dG8gYmUgYXMgcG93ZXIgDQo+IGVmZmljaWVudCBhcyBwb3NzaWJsZSksIGFsdGhvdWdoIGFyZ3Vh
-Ymx5IHRoZXJlIGNvdWxkIGJlIGEgcGF0aCB3aXRoaW4gDQo+IHRoZSBrZXJuZWwgd2hlcmUgdGhp
-cyBpcyBhbHNvIGRvbmUuIEl0IGNvdWxkIGdldCByZWFsbHkgY29tcGxpY2F0ZWQgaG93ZXZlcg0K
-DQpHZW5lcmljIFBNIHZpYSBtZGlvX2J1c19waHlfc3VzcGVuZCgpIHdpbGwgc3VzcGVuZCB0aGUg
-UEhZIGlmIGl0IGhhcyBhIA0KLnN1c3BlbmQgY2FsbGJhY2sgYW5kIG1hY19tYW5hZ2VkX3BtIGlz
-bid0IHNldC4NCg0KbWRpb19idXNfcGh5X21heV9zdXNwZW5kKCkgd2lsbCBzZWUgdGhhdCBuZXRk
-ZXYgaXMgTlVMTCwgd2hpY2ggbWVhbnMgaXQgDQpyZXR1cm5zIHRoZSBpbnZlcnNlIG9mIHBoeS0+
-c3VzcGVuZGVkICh3aGljaCBpcyBmYWxzZSksIG1lYW5pbmcgdGhlIA0KZnVuY3Rpb24gcmV0dXJu
-cyB0cnVlLiBUaHVzIHBoeV9zdXNwZW5kKCkgaXMgY2FsbGVkLg0KDQo+IA0KPiAtIHRoZSBuZXR3
-b3JrIGRldmljZSBkcml2ZXIgcHJvYmVkLCBhbmQgdGhlIG5ldHdvcmsgZGV2aWNlIHdhcyBicm91
-Z2h0IA0KPiB1cCBhdCBsZWFzdCBvbmNlIChyZWdhcmRsZXNzIG9mIHdoZXRoZXIgYSBsaW5rIHN0
-YXRlIHdhcyBkZXRlY3RlZCBvciANCj4gbm90KSwgc3VjaCB0aGF0IHRoZSBQSFkgaGFzIGdvbmUg
-dGhyb3VnaCBhIHBoeV9zdGFydCgpL3BoeV9zdG9wKCkgY3ljbGUsIA0KPiBhbmQgdXBvbiBwaHlf
-c3RvcCgpIGEgcGh5X3N1c3BlbmQoKSBoYXMgYmVlbiBjYWxsZWQNCj4gDQo+IEl0IGlzIHNhZmUg
-dG8gYXNzdW1lIHlvdSBmYWxsIGluIHRoZSBmaXJzdCBjYXNlIG9ubHksIG9yIGRvIHlvdSBhbHNv
-IHNlZSANCj4gYSBwcm9ibGVtIGluIHRoZSBzZWNvbmQgY2FzZSBhcyB3ZWxsPw0KDQpUaGVyZSBp
-cyBvbmx5IGEgcHJvYmxlbSBpbiB0aGUgZmlyc3QgY2FzZS4gVGhlIHNlY29uZCBjYXNlIGlzIHdv
-cmtpbmcgYXMgDQpleHBlY3RlZC4NCg0KPiANCj4gSWYgdGhlIGZpcnN0IGNhc2UsIEkgYW0gYSBi
-aXQgdG9ybiBhcyB0byBob3cgdG8gYmVzdCBnbyBhYm91dCBpdC4gVGhlIA0KPiBpbml0aWFsIHN0
-YXRlIG9mIHRoZSBQSFkgdXBvbiBrZXJuZWwgYm9vdCBjYW4gYmUgYSB0YWQgZGlmZmljdWx0IHRv
-IHdvcmsgDQo+IHdpdGg6DQo+IA0KPiAtIHNvbWUgcGVvcGxlIHdhbnQgdG8gY29uc2VydmUgcG93
-ZXIgYXMgbXVjaCBhcyBwb3NzaWJsZSAobGlrZSB5b3UsIGxpa2UgDQo+IG1lKSBhbmQgd291bGQg
-bm90IG1pbmQgc2VlaW5nIGEgbGluayBicmVhayB0byBhY2hpZXZlIHRoYXQgc3RhdGUsIG5vciBk
-byANCj4gdGhleSBtaW5kIGEgcGFydGlhbCBvciBmdWxsIHJlY29uZmlndXJhdGlvbiBvZiB0aGUg
-UEhZIGJ5IGl0cyBkcml2ZXINCg0KRm9yIHRoZXNlIGRldmljZXMgd2hlcmUgd2Ugc2VlIHdoYXQg
-d2UgY29uc2lkZXIgYW4gaXNzdWUgd2Ugb25seSByZWFsbHkgDQpjYXJlIGFib3V0IHBvd2VyIGNv
-bnN1bXB0aW9uIGluIHN1c3BlbmQgdG8gUkFNLg0KDQo+IA0KPiAtIHNvbWUgcGVvcGxlIHdhbnQg
-dG8gYXZvaWQgYSBsaW5rIGJyZWFrIGFuZCBqdXN0IGluaGVyaXQgdGhlIGV4aXN0aW5nIA0KPiBv
-cGVyYXRpb25hbCBtb2RlIG9mIHRoZSBQSFkgc3VjaCB0aGF0IHRoZXkgY2FuIGhhdmUgYSB3b3Jr
-aW5nIGxpbmsgYXMgDQo+IHF1aWNrbHkgYXMgcG9zc2libGUNCg0KVGhhbmtzISAvLyBKb2huIEVy
-bmJlcmc=
+Hi Arthur,
+
+(Answer inlined below, which is custom on this mailing list)
+
+On 23/03/2024 14.23, Arthur Borsboom wrote:
+> Hi Jesper,
+> 
+> After a recent kernel upgrade 6.7.6 > 6.8.1 all my Xen guests on Arch
+> Linux are dumping kernel traces.
+> It seems to be indirectly caused by the page pool memory leak
+> mechanism, which is probably a good thing.
+> 
+> I have created a bug report, but there is no response.
+> 
+> https://bugzilla.kernel.org/show_bug.cgi?id=218618
+> 
+> I am uncertain where and to whom I need to report this page leak.
+> Can you help me get this issue fixed?
+
+I'm the page_pool maintainer, but as you say yourself in comment 2 then
+since dba1b8a7ab68 ("mm/page_pool: catch page_pool memory leaks") this
+indicated there is a problem in the xen_netfront driver, which was
+previously not visible.
+
+Cc'ing the "XEN NETWORK BACKEND DRIVER" maintainers, as this is a driver
+bug.  What confuses me it that I cannot find any modules named
+"xen_netfront" in the upstream tree.
+
+IPSEC recently had a similar leak bug. That was fixed in commmit [1]
+c3198822c6cb ("net: esp: fix bad handling of pages from page_pool").
+This xen_netfront driver likely needs a similar fix.
+
+--Jesper
+
+[1] https://git.kernel.org/torvalds/c/c3198822c6cb
+
+
+Text copied from bugzilla.kernel.org:
+-------------------------------------
+[88847.284348] Call Trace:
+[88847.284354]  <IRQ>
+[88847.284361]  dump_stack_lvl+0x47/0x60
+[88847.284378]  bad_page+0x71/0x100
+[88847.284393]  free_unref_page_prepare+0x236/0x390
+[88847.284405]  free_unref_page+0x34/0x180
+[88847.284416]  __pskb_pull_tail+0x3ff/0x4a0
+[88847.284432]  xennet_poll+0x909/0xa40 [xen_netfront 
+12c02fdcf84c692965d9cd6ca5a6ff0a530b4ce9]
+[88847.284470]  __napi_poll+0x28/0x1b0
+[88847.284483]  net_rx_action+0x2b5/0x370
+[88847.284495]  ? handle_irq_desc+0x3e/0x60
+[88847.284511]  __do_softirq+0xc9/0x2c8
+[88847.284523]  __irq_exit_rcu+0xa3/0xc0
+[88847.284536]  sysvec_xen_hvm_callback+0x72/0x90
+[88847.284545]  </IRQ>
+[88847.284549]  <TASK>
+[88847.284552]  asm_sysvec_xen_hvm_callback+0x1a/0x20
+[88847.284562] RIP: 0010:pv_native_safe_halt+0xf/0x20
+[88847.284572] Code: 22 d7 c3 cc cc cc cc 0f 1f 40 00 90 90 90 90 90 90 
+90 90 90 90 90 90 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d e3 13 27 00 fb 
+f4 <c3> cc cc cc cc 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90
+[88847.284579] RSP: 0018:ffffb2a1800c3e58 EFLAGS: 00000246
+[88847.284587] RAX: 0000000000004000 RBX: ffff91358033b864 RCX: 
+000051404aebd79d
+[88847.284594] RDX: ffff9136f9b00000 RSI: ffff91358033b800 RDI: 
+0000000000000001
+[88847.284599] RBP: ffff91358033b864 R08: ffffffff9b94dca0 R09: 
+0000000000000001
+[88847.284604] R10: 0000000000000018 R11: ffff9136f9b331a4 R12: 
+ffffffff9b94dca0
+[88847.284609] R13: ffffffff9b94dd20 R14: 0000000000000001 R15: 
+0000000000000000
+[88847.284623]  acpi_safe_halt+0x15/0x30
+[88847.284634]  acpi_idle_do_entry+0x2f/0x50
+[88847.284644]  acpi_idle_enter+0x7f/0xd0
+[88847.284655]  cpuidle_enter_state+0x81/0x440
+[88847.284667]  cpuidle_enter+0x2d/0x40
+[88847.284678]  do_idle+0x1d8/0x230
+[88847.284688]  cpu_startup_entry+0x2a/0x30
+[88847.284695]  start_secondary+0x11e/0x140
+[88847.284705]  secondary_startup_64_no_verify+0x184/0x18b
+[88847.284725]  </TASK>
 
