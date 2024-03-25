@@ -1,272 +1,131 @@
-Return-Path: <netdev+bounces-81580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C7A6588B1F2
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:49:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EEE688A606
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:15:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB033CC4935
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:14:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 969FE1C39E00
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 15:15:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27BBE128821;
-	Mon, 25 Mar 2024 12:31:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E95B137921;
+	Mon, 25 Mar 2024 12:33:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="Lo7pH32E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GzfE28eV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10314127B71
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 12:31:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEB20168AB
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 12:33:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711369871; cv=none; b=N7ZGJN+5wUTiXneyQxJWgcTdCct99fdMiWNs+fo+Glh3muiMA/5bCgu7OtBkT9M6UM6+G6dHZ5BQYnxk227k74nqCcgzIR/GYlzYOs9+lI84dExakSfJqFhZc8DaW6UKkQ/eq9u6PguS173tDcp8hyrPzkYddhQti+25Qk7Ge7o=
+	t=1711370015; cv=none; b=sg2s+AfKeLK1p6l/9PJKe1jJs+uebWmk459C40kN8cLxxTSHHAOmlOsZszFV4ORVQScn5RjRbRJw/LGTc0uLmqlRNGmSBRyLISfk7vsp0mV72CFsFmpOxmHVm4RTfTVE7FOcxbVXdPzFmFLNGIjFyJxGxXmWMLAH9s/SPGulyJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711369871; c=relaxed/simple;
-	bh=aVlbCxffNsImE8sHfAMIWvGJXmWurPG4VbYMHdhQLEE=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=FnhX6fWPtIqbEjG4Q4QEQdrWVC0cYfoML2hblIm19mSUPTmAwT5IPMwdiUUaSr1tw4t8Yx+S8cOdwywaPAPp/u3uefRJMnKrKoEpzljRSIj25zIYUeuoWrT0lGqDh3OWOOiSxrG4UGjjLn23CTVCy/20wx6ePcsz5Byzej3tqu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=Lo7pH32E; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-a4751063318so156783866b.0
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 05:31:08 -0700 (PDT)
+	s=arc-20240116; t=1711370015; c=relaxed/simple;
+	bh=VWypHvDqgbH8+lPEDiiHWB/9BcQ3jMgQ/+WP7uFRF1I=;
+	h=From:Message-ID:Date:MIME-Version:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=LVZXkh9KwaUxmlXGPQTcQoKfuw114QcAnQKQX9qAaHtPYBrMcvwhieSuV3AC1/5KHXaFjLSO8jKIGtgs8tqNdNGviP1rHjFkolx+H+dmpUHuwzAsYpGxzJv3x4wE13ymUquIOQUyN9ld7QKOGalCggF405us7+OGKenpHyz1C/s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GzfE28eV; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-41482aa8237so14339385e9.2
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 05:33:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1711369867; x=1711974667; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jcU8rzfT1XiiKbhTkgktGjNuFns7iqoHulhoe5/hqUA=;
-        b=Lo7pH32EDvtGcPXVKvcXC+oWlGIjaAtwHInzgo+vICN0fCBF5+04BkcBeaOvTmQxcl
-         hPflHKv1GW3bKNd07k+pu5qQjP1/Vm2r9IEbXIw06l+1buF/Xkw9u+HKtiRoN5wHc3J9
-         Unhhk5DOtoIHgg1bWFAev59Tr8LiHsFUQAs729DIWEVRWznHomIAXdHppKm3bUfSLyAm
-         cV/UgI3t88mz0sFUnyhjw3DvZrF2h+ulC047pqZ4gijZPgENHmjOyfD9ld3XnX+Of5IV
-         4ofFS4167n0xFNx6QiDDtsftGtxgN/3rsUbHbvjm2FNMvVtzk/Ra+Et7il5Z6u77QIC5
-         CTww==
+        d=gmail.com; s=20230601; t=1711370012; x=1711974812; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vmsNGz/SjS01nd2DN2qF7dW1osscxRz3VTWdKl4iAko=;
+        b=GzfE28eVdUJWjCn7Lzf29EHa8AvEFjfbb/wgFoYZ2XNdD0hIuekDDa6xXVo9rqwTKS
+         n7J3AzmpbXk+QWMWOou6+4ZX+AJM2toluA7kJmyShUU59ioBqQ5keOo3gzGgFhflMvUb
+         DkEdGvcc1EkdAJ0Pu/nQm6FMyB/qrl64zucm1hG//AxE8Rwdgc30xCRhQT4j8jmY5r9U
+         IgLrJrPpJ/VdxQ89xgwnnMVL4AgnN9l+e85PBVZ3dZXFu/JGU8qIoeM43i+pqoQ8WIT9
+         FY7lF26J+DaLUVe7Vbcg8z2di4Cf+58ak/M39DD9nYnanvLwyG/Jh6r8YgDBuKTicj0I
+         P7TA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711369867; x=1711974667;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=jcU8rzfT1XiiKbhTkgktGjNuFns7iqoHulhoe5/hqUA=;
-        b=kOOn6Rn657T1nUVDUgRJi3GJY9lVm+Tm9ldJ9osu3w+hcNZZ+IKACWXJroVt0YM613
-         1HTST788DsxDpO9qHlhzB+cQz973n6/QIQx3gKRTPzNklXe3YRUPLjfsL9t1UQ2RdcG1
-         el1LoQSaNL7VfrBTT0cQCfnv6fBYdzA7MGIGK63okLYsdS7wjx1tlCQ3vSgp5+a4BUlJ
-         q1q8v2MqFoebTs1+nG+/z6rDjQ4cv4/KsIRgfGNduel+YcmLjIlyXv6qwPR0X+zPb+IX
-         r6dGQJ6RZZlVDwV95dmmWfWZBJoTdcAYZocmi3wGbsnwErnw/uMX0hPsRpzS00JX2wUc
-         zO7g==
-X-Forwarded-Encrypted: i=1; AJvYcCXWlHjTqoJLlKc4P6i/ATgbMM16H2pyRpKvfznbushCsyP5fRzqK7hRafDlzZ4jPdBLMmVLUPkv/YMnAfFKEQyG4r2TUvO+
-X-Gm-Message-State: AOJu0YwCIAuJUc8E1BTU/jCeRfIGF0BRNy+MVQ0P7tUV5pULSQoJlzS4
-	oHn7RiRxVY7Nb5PXDjA5LUXIzN3D4xdjROuNuaVxzXarEqrCobWOoXv4wWEGJ1w=
-X-Google-Smtp-Source: AGHT+IGsrHcYCvS/Zb86Okam1T7FEifHPpoDZSR+RYzLLEafipL8a0Eaa2hp5duWV+Ok7DmwELZZtA==
-X-Received: by 2002:a17:906:d0d7:b0:a47:5265:9aac with SMTP id bq23-20020a170906d0d700b00a4752659aacmr2438772ejb.55.1711369867358;
-        Mon, 25 Mar 2024 05:31:07 -0700 (PDT)
-Received: from cloudflare.com ([2a09:bac5:5064:2dc::49:1a6])
-        by smtp.gmail.com with ESMTPSA id w17-20020a170906385100b00a46d8e5a031sm2988980ejc.209.2024.03.25.05.31.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Mar 2024 05:31:06 -0700 (PDT)
-References: <000000000000dc9aca0613ec855c@google.com>
- <tencent_F436364A347489774B677A3D13367E968E09@qq.com>
- <CAADnVQJQvcZOA_BbFxPqNyRbMdKTBSMnf=cKvW7NJ8LxxP54sA@mail.gmail.com>
-User-agent: mu4e 1.6.10; emacs 29.2
-From: Jakub Sitnicki <jakub@cloudflare.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Edward Adam Davis
- <eadavis@qq.com>, John Fastabend <john.fastabend@gmail.com>
-Cc: syzbot+c4f4d25859c2e5859988@syzkaller.appspotmail.com,
- 42.hyeyoo@gmail.com, andrii@kernel.org, ast@kernel.org,
- bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
- edumazet@google.com, kafai@fb.com, kpsingh@kernel.org, kuba@kernel.org,
- linux-kernel@vger.kernel.org, namhyung@kernel.org, netdev@vger.kernel.org,
- pabeni@redhat.com, peterz@infradead.org, songliubraving@fb.com,
- syzkaller-bugs@googlegroups.com, yhs@fb.com
-Subject: Re: [PATCH] bpf, sockmap: fix deadlock in rcu_report_exp_cpu_mult
-Date: Mon, 25 Mar 2024 13:23:07 +0100
-In-reply-to: <CAADnVQJQvcZOA_BbFxPqNyRbMdKTBSMnf=cKvW7NJ8LxxP54sA@mail.gmail.com>
-Message-ID: <87y1a6biie.fsf@cloudflare.com>
+        d=1e100.net; s=20230601; t=1711370012; x=1711974812;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vmsNGz/SjS01nd2DN2qF7dW1osscxRz3VTWdKl4iAko=;
+        b=XaLAYb1aFM18jj4AlG9w6kykcumnoDTuU+2zcm+XQBsKWTDh0GtbchdBSJC51+QFtr
+         rMWTdnuXe5qGia00olwjzUtujFHxcwRvSdm81E5eaWLvzPTW4v4wvYDmMB0BwER/UcJj
+         +fJ3JywYAKdf/2QLsRKbGfefEx6VFu/Vu+0PU7X8MyEYacKVFQYjrSXKWAIi+2+LOnPr
+         DY1NHkjaqdjMKfPIsXdPUfY1Qj+UuRJfeicgoS7o4nz4bd1YZL/VJha7Ryuuu9CsdbJi
+         B/kkUgennjGqZAriSJPtoL4KHmIDiTaDs7eJNJO2YCI3xsRjuR9IGGC+C9b7NVEMuAWu
+         zw5g==
+X-Gm-Message-State: AOJu0YyK5yqcd2icMnpUtEXgeLeMTTaYGSUDsyLW482s54SHT70dmxUE
+	fg8ckM9mCff/q2T5y+lqg4M6FtgQMozKAxpba78Rf/0t9TC45LsF
+X-Google-Smtp-Source: AGHT+IG+27VzqWLIHxcr5Aj7meKj47pkoq0+ixCtIODoAioj8TBpbct8mifSSWcSJFFdnpr7uaRQ4g==
+X-Received: by 2002:a05:600c:4792:b0:413:e8db:2c9b with SMTP id k18-20020a05600c479200b00413e8db2c9bmr5309307wmo.40.1711370011823;
+        Mon, 25 Mar 2024 05:33:31 -0700 (PDT)
+Received: from [192.168.21.70] (54-240-197-225.amazon.com. [54.240.197.225])
+        by smtp.gmail.com with ESMTPSA id l21-20020a05600c4f1500b004148ab95c36sm1780656wmq.41.2024.03.25.05.33.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 25 Mar 2024 05:33:31 -0700 (PDT)
+From: Paul Durrant <xadimgnik@gmail.com>
+X-Google-Original-From: Paul Durrant <paul@xen.org>
+Message-ID: <857282f5-5df6-4ed7-b17e-92aae0cf484a@xen.org>
+Date: Mon, 25 Mar 2024 12:33:30 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Reply-To: paul@xen.org
+Subject: Re: Xen NIC driver have page_pool memory leaks
+To: Jesper Dangaard Brouer <hawk@kernel.org>,
+ Arthur Borsboom <arthurborsboom@gmail.com>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Cc: Netdev <netdev@vger.kernel.org>, Wei Liu <wei.liu@kernel.org>,
+ "xen-devel@lists.xenproject.org" <xen-devel@lists.xenproject.org>
+References: <CALUcmUncphE8v8j1Xme0BcX4JRhqd+gB0UUzS-U=3XXw_3iUiw@mail.gmail.com>
+ <1cde0059-d319-4a4f-a68d-3b3ffeb3da20@kernel.org>
+Content-Language: en-US
+Organization: Xen Project
+In-Reply-To: <1cde0059-d319-4a4f-a68d-3b3ffeb3da20@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Sat, Mar 23, 2024 at 12:08 AM -07, Alexei Starovoitov wrote:
-> John,
-> please review.
-> It seems this bug was causing multiple syzbot reports.
+On 25/03/2024 12:21, Jesper Dangaard Brouer wrote:
+> Hi Arthur,
+> 
+> (Answer inlined below, which is custom on this mailing list)
+> 
+> On 23/03/2024 14.23, Arthur Borsboom wrote:
+>> Hi Jesper,
+>>
+>> After a recent kernel upgrade 6.7.6 > 6.8.1 all my Xen guests on Arch
+>> Linux are dumping kernel traces.
+>> It seems to be indirectly caused by the page pool memory leak
+>> mechanism, which is probably a good thing.
+>>
+>> I have created a bug report, but there is no response.
+>>
+>> https://bugzilla.kernel.org/show_bug.cgi?id=218618
+>>
+>> I am uncertain where and to whom I need to report this page leak.
+>> Can you help me get this issue fixed?
+> 
+> I'm the page_pool maintainer, but as you say yourself in comment 2 then
+> since dba1b8a7ab68 ("mm/page_pool: catch page_pool memory leaks") this
+> indicated there is a problem in the xen_netfront driver, which was
+> previously not visible.
+> 
+> Cc'ing the "XEN NETWORK BACKEND DRIVER" maintainers, as this is a driver
+> bug.  What confuses me it that I cannot find any modules named
+> "xen_netfront" in the upstream tree.
+> 
 
-Any chance we could disallow mutating sockhash from interrupt context?
+You should have tried '-' rather than '_' :-)
 
-If that is not an option, then this looks like a good start of a fix.
-But we also need to cover sock_map_unref->sock_sock_map_del_link called
-from sock_hash_delete_elem. It also grabs a spin lock.
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/xen-netfront.c
 
-Also, sockhash is not the only affected map type. I see we're grabbing a
-spin lock in ->map_delete_elem without disabling interrupts as well in:
-
-- sock_map_delete_elem
-- reuseport_array_delete_elem
-- xsk_map_delete_elem
-
-> On Fri, Mar 22, 2024 at 10:42=E2=80=AFPM Edward Adam Davis <eadavis@qq.co=
-m> wrote:
->>
->> [Syzbot reported]
->> WARNING: HARDIRQ-safe -> HARDIRQ-unsafe lock order detected
->> 6.8.0-syzkaller-05221-gea80e3ed09ab #0 Not tainted
->> -----------------------------------------------------
->> rcu_exp_gp_kthr/18 [HC0[0]:SC0[2]:HE0:SE0] is trying to acquire:
->> ffff88802b5ab020 (&htab->buckets[i].lock){+...}-{2:2}, at: spin_lock_bh =
-include/linux/spinlock.h:356 [inline]
->> ffff88802b5ab020 (&htab->buckets[i].lock){+...}-{2:2}, at: sock_hash_del=
-ete_elem+0xb0/0x300 net/core/sock_map.c:939
->>
->> and this task is already holding:
->> ffffffff8e136558 (rcu_node_0){-.-.}-{2:2}, at: sync_rcu_exp_done_unlocke=
-d+0xe/0x140 kernel/rcu/tree_exp.h:169
->> which would create a new lock dependency:
->>  (rcu_node_0){-.-.}-{2:2} -> (&htab->buckets[i].lock){+...}-{2:2}
->>
->> but this new dependency connects a HARDIRQ-irq-safe lock:
->>  (rcu_node_0){-.-.}-{2:2}
->>
->> ... which became HARDIRQ-irq-safe at:
->>   lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
->>   __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
->>   _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
->>   rcu_report_exp_cpu_mult+0x27/0x2f0 kernel/rcu/tree_exp.h:238
->>   csd_do_func kernel/smp.c:133 [inline]
->>   __flush_smp_call_function_queue+0xb2e/0x15b0 kernel/smp.c:542
->>   __sysvec_call_function_single+0xa8/0x3e0 arch/x86/kernel/smp.c:271
->>   instr_sysvec_call_function_single arch/x86/kernel/smp.c:266 [inline]
->>   sysvec_call_function_single+0x9e/0xc0 arch/x86/kernel/smp.c:266
->>   asm_sysvec_call_function_single+0x1a/0x20 arch/x86/include/asm/idtentr=
-y.h:709
->>   __sanitizer_cov_trace_switch+0x90/0x120
->>   update_event_printk kernel/trace/trace_events.c:2750 [inline]
->>   trace_event_eval_update+0x311/0xf90 kernel/trace/trace_events.c:2922
->>   process_one_work kernel/workqueue.c:3254 [inline]
->>   process_scheduled_works+0xa00/0x1770 kernel/workqueue.c:3335
->>   worker_thread+0x86d/0xd70 kernel/workqueue.c:3416
->>   kthread+0x2f0/0x390 kernel/kthread.c:388
->>   ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
->>   ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
->>
->> to a HARDIRQ-irq-unsafe lock:
->>  (&htab->buckets[i].lock){+...}-{2:2}
->>
->> ... which became HARDIRQ-irq-unsafe at:
->> ...
->>   lock_acquire+0x1e4/0x530 kernel/locking/lockdep.c:5754
->>   __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
->>   _raw_spin_lock_bh+0x35/0x50 kernel/locking/spinlock.c:178
->>   spin_lock_bh include/linux/spinlock.h:356 [inline]
->>   sock_hash_delete_elem+0xb0/0x300 net/core/sock_map.c:939
->>   0xffffffffa0001b0e
->>   bpf_dispatcher_nop_func include/linux/bpf.h:1234 [inline]
->>   __bpf_prog_run include/linux/filter.h:657 [inline]
->>   bpf_prog_run include/linux/filter.h:664 [inline]
->>   __bpf_trace_run kernel/trace/bpf_trace.c:2381 [inline]
->>   bpf_trace_run2+0x204/0x420 kernel/trace/bpf_trace.c:2420
->>   trace_contention_end+0xd7/0x100 include/trace/events/lock.h:122
->>   __mutex_lock_common kernel/locking/mutex.c:617 [inline]
->>   __mutex_lock+0x2e5/0xd70 kernel/locking/mutex.c:752
->>   futex_cleanup_begin kernel/futex/core.c:1091 [inline]
->>   futex_exit_release+0x34/0x1f0 kernel/futex/core.c:1143
->>   exit_mm_release+0x1a/0x30 kernel/fork.c:1652
->>   exit_mm+0xb0/0x310 kernel/exit.c:542
->>   do_exit+0x99e/0x27e0 kernel/exit.c:865
->>   do_group_exit+0x207/0x2c0 kernel/exit.c:1027
->>   __do_sys_exit_group kernel/exit.c:1038 [inline]
->>   __se_sys_exit_group kernel/exit.c:1036 [inline]
->>   __x64_sys_exit_group+0x3f/0x40 kernel/exit.c:1036
->>   do_syscall_64+0xfb/0x240
->>   entry_SYSCALL_64_after_hwframe+0x6d/0x75
->>
->> other info that might help us debug this:
->>
->>  Possible interrupt unsafe locking scenario:
->>
->>        CPU0                    CPU1
->>        ----                    ----
->>   lock(&htab->buckets[i].lock);
->>                                local_irq_disable();
->>                                lock(rcu_node_0);
->>                                lock(&htab->buckets[i].lock);
->>   <Interrupt>
->>     lock(rcu_node_0);
->>
->>  *** DEADLOCK ***
->> [Fix]
->> Ensure that the context interrupt state is the same before and after usi=
-ng the
->> bucket->lock.
->>
->> Reported-and-tested-by: syzbot+c4f4d25859c2e5859988@syzkaller.appspotmai=
-l.com
->> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
->> ---
->>  net/core/sock_map.c | 10 ++++++----
->>  1 file changed, 6 insertions(+), 4 deletions(-)
->>
->> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
->> index 27d733c0f65e..ae8f81b26e16 100644
->> --- a/net/core/sock_map.c
->> +++ b/net/core/sock_map.c
->> @@ -932,11 +932,12 @@ static long sock_hash_delete_elem(struct bpf_map *=
-map, void *key)
->>         struct bpf_shtab_bucket *bucket;
->>         struct bpf_shtab_elem *elem;
->>         int ret =3D -ENOENT;
->> +       unsigned long flags;
->>
->>         hash =3D sock_hash_bucket_hash(key, key_size);
->>         bucket =3D sock_hash_select_bucket(htab, hash);
->>
->> -       spin_lock_bh(&bucket->lock);
->> +       spin_lock_irqsave(&bucket->lock, flags);
->>         elem =3D sock_hash_lookup_elem_raw(&bucket->head, hash, key, key=
-_size);
->>         if (elem) {
->>                 hlist_del_rcu(&elem->node);
->> @@ -944,7 +945,7 @@ static long sock_hash_delete_elem(struct bpf_map *ma=
-p, void *key)
->>                 sock_hash_free_elem(htab, elem);
->>                 ret =3D 0;
->>         }
->> -       spin_unlock_bh(&bucket->lock);
->> +       spin_unlock_irqrestore(&bucket->lock, flags);
->>         return ret;
->>  }
->>
->> @@ -1136,6 +1137,7 @@ static void sock_hash_free(struct bpf_map *map)
->>         struct bpf_shtab_elem *elem;
->>         struct hlist_node *node;
->>         int i;
->> +       unsigned long flags;
->>
->>         /* After the sync no updates or deletes will be in-flight so it
->>          * is safe to walk map and remove entries without risking a race
->> @@ -1151,11 +1153,11 @@ static void sock_hash_free(struct bpf_map *map)
->>                  * exists, psock exists and holds a ref to socket. That
->>                  * lets us to grab a socket ref too.
->>                  */
->> -               spin_lock_bh(&bucket->lock);
->> +               spin_lock_irqsave(&bucket->lock, flags);
->>                 hlist_for_each_entry(elem, &bucket->head, node)
->>                         sock_hold(elem->sk);
->>                 hlist_move_list(&bucket->head, &unlink_list);
->> -               spin_unlock_bh(&bucket->lock);
->> +               spin_unlock_irqrestore(&bucket->lock, flags);
->>
->>                 /* Process removed entries out of atomic context to
->>                  * block for socket lock before deleting the psock's
->> --
->> 2.43.0
->>
 
 
