@@ -1,106 +1,128 @@
-Return-Path: <netdev+bounces-81455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A130889ABA
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 11:34:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8168B889669
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 09:51:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E2D1D1F344D2
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 10:34:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B32AC1C30290
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 08:51:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83023143881;
-	Mon, 25 Mar 2024 05:46:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 295CF148311;
+	Mon, 25 Mar 2024 05:48:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bf4PA4AJ"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="hFGNiORE"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4FC21448C5;
-	Mon, 25 Mar 2024 02:13:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E893614A0B2;
+	Mon, 25 Mar 2024 02:16:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711332790; cv=none; b=t6GriCTwVChT//VbpLOuyjwDLji0uRD7+A2zT+2+RH1T1Y2UMmUgs/ZP2l0Mwp4e2xeuFbOdKrsFvZJN73iLtFD4ZgpzXDUJLfSxxE/AkqZDUziN409ca1r/OdL9hzYDdBRXPdPq7jeEucl66Cf1368FxalqI4RGZai+/qNj/ng=
+	t=1711332995; cv=none; b=AEB1tRDep8EPJ+vMZ5lxrCrcEOb4UOlFcn8qtbxiD/+HFSYoUcpk+TJdhS8CNeHIHWc7b76f1GdpkLP/Zg8tCBzZMTk6nYiJURLf1Xai5k8gjInfKL0q7GDuq2/P5n3ycDZSqggEEdwOGMkPDHWhANBb+oiO6Aq+2l5grpvmICE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711332790; c=relaxed/simple;
-	bh=5wz/G6BX39xadTRq0vFfWqYZDZhSRjYlx0kuuawdnUY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RTqZ+N+YfszdbYr0Jv7vsSMJscmQa5uQ6l8VSSkHhwAP0S2Jy/sPwgt4qMFczCXEpzeZwDa7joQg/lTLhLgGIcQK37hWSuH2Kh7R5Uy9MCP2ZCx9XmukLEaoTImoCqJikbHMAmOrqO8MXyU4yVkcIcCb/z8bA0QzF0azKKrVMy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bf4PA4AJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C2673C3278B;
-	Mon, 25 Mar 2024 02:13:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711332787;
-	bh=5wz/G6BX39xadTRq0vFfWqYZDZhSRjYlx0kuuawdnUY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bf4PA4AJ6lFivhLpGcubQoBLV61qpUeFb5CEvCqEnG+WnZVpdTtq1TuutfbOOTnK8
-	 KUbnm61riFCmr43khH6NJi+4O1d75Ldpm05eeetUHo1B1Wi5vnJupujdw46EbtGMoy
-	 guqa2zX2JJk5Oa+qv/Oa+zEqgpaecqGNAMw04MelD+IQ2unKuY71gotTmBa86UnRwW
-	 nytA2WM5NsQWo/cY8jD0IUH2Bh9n9HuqLCO+m9hyxg0EyTrdg7l7WlHXTeT9aqwg9v
-	 uuNMse2kFdLrJV17V0aMiyoJc+5+ucfT+2/0JNrcXygvVB5vKNmDS3mjGr2f763QO+
-	 WAOcXVm6tj7Rw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B4277D2D0E4;
-	Mon, 25 Mar 2024 02:13:07 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1711332995; c=relaxed/simple;
+	bh=VR4eOEFW5ShmHL6/Vr0s9GQA6Het597iqJLSVzfADdE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Z7+716dqTcmFCT5++2zdHp8GufeuQj2AwPVMcCZnQ6Vjr70NuZDsGyFwYzIEPbe8pr9g2icrROUM/vMjEnLcakXpPPRwE1s0KTdcNf9FVbuw73Hhl3A2qwOvjwWwU14CH0p6BvAYqvmmkMreUGYfRZEE6rtbTlGsEhqV9QYE4xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=hFGNiORE; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711332990; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=MkXYrKlmDfjBL44cw5UVxBAr7/tz8PrihVky5B6BZsc=;
+	b=hFGNiOREjoYx3RxLx7cnAWhzzaN5tp/gsIrHMZ91ebhioO4FyczeQm/BCJ6+N6R+OztTS7DA7T8EZ5QPqCUkp48jJd7HtltAcnZeUUnK7n1jKI7sBl4z7CaDU9O4jx0dT+J1GTyCfx3TIkoBIR/IL3Os7v0ENsjklpSiIvLZ9NY=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R691e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046049;MF=guwen@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0W389BL6_1711332988;
+Received: from 30.221.130.215(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0W389BL6_1711332988)
+          by smtp.aliyun-inc.com;
+          Mon, 25 Mar 2024 10:16:30 +0800
+Message-ID: <535bcbb8-c446-458b-b7d4-c13201537ad5@linux.alibaba.com>
+Date: Mon, 25 Mar 2024 10:16:28 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] treewide,
- serdev: change receive_buf() return type to size_t
-From: patchwork-bot+chrome-platform@kernel.org
-Message-Id: 
- <171133278773.9916.16472744560807510288.git-patchwork-notify@kernel.org>
-Date: Mon, 25 Mar 2024 02:13:07 +0000
-References: <20240122180551.34429-1-francesco@dolcini.it>
-In-Reply-To: <20240122180551.34429-1-francesco@dolcini.it>
-To: Francesco Dolcini <francesco@dolcini.it>
-Cc: gregkh@linuxfoundation.org, jirislaby@kernel.org,
- linux-bluetooth@vger.kernel.org, linux-mediatek@lists.infradead.org,
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- greybus-dev@lists.linaro.org, linux-iio@vger.kernel.org,
- netdev@vger.kernel.org, chrome-platform@lists.linux.dev,
- platform-driver-x86@vger.kernel.org, linux-serial@vger.kernel.org,
- linux-sound@vger.kernel.org, francesco.dolcini@toradex.com,
- luiz.dentz@gmail.com, johan@kernel.org, elder@kernel.org, jic23@kernel.org,
- lee@kernel.org, kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
- davem@davemloft.net, krzysztof.kozlowski@linaro.org, hdegoede@redhat.com,
- ilpo.jarvinen@linux.intel.com, bleung@chromium.org, tzungbi@kernel.org,
- robh@kernel.org, Jonathan.Cameron@huawei.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net/smc: make smc_hash_sk/smc_unhash_sk static
+To: Zhengchao Shao <shaozhengchao@huawei.com>, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
+ tonylu@linux.alibaba.com, weiyongjun1@huawei.com, yuehaibing@huawei.com
+References: <20240325012501.709009-1-shaozhengchao@huawei.com>
+From: Wen Gu <guwen@linux.alibaba.com>
+In-Reply-To: <20240325012501.709009-1-shaozhengchao@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
 
-This patch was applied to chrome-platform/linux.git (for-next)
-by Greg Kroah-Hartman <gregkh@linuxfoundation.org>:
 
-On Mon, 22 Jan 2024 19:05:51 +0100 you wrote:
-> From: Francesco Dolcini <francesco.dolcini@toradex.com>
+On 2024/3/25 09:25, Zhengchao Shao wrote:
+> smc_hash_sk and smc_unhash_sk are only used in af_smc.c, so make them
+> static and remove the output symbol. They can be called under the path
+> .prot->hash()/unhash().
 > 
-> receive_buf() is called from ttyport_receive_buf() that expects values
-> ">= 0" from serdev_controller_receive_buf(), change its return type from
-> ssize_t to size_t.
+> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+
+LGTM, Thank you!
+
+Reviewed-by: Wen Gu <guwen@linux.alibaba.com>
+
+> ---
+>   include/net/smc.h | 3 ---
+>   net/smc/af_smc.c  | 6 ++----
+>   2 files changed, 2 insertions(+), 7 deletions(-)
 > 
-> The need for this clean-up was noticed while fixing a warning, see
-> commit 94d053942544 ("Bluetooth: btnxpuart: fix recv_buf() return value").
-> Changing the callback prototype to return an unsigned seems the best way
-> to document the API and ensure that is properly used.
-> 
-> [...]
-
-Here is the summary with links:
-  - [v2] treewide, serdev: change receive_buf() return type to size_t
-    https://git.kernel.org/chrome-platform/c/fed99212acae
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+> diff --git a/include/net/smc.h b/include/net/smc.h
+> index c9dcb30e3fd9..10684d0a33df 100644
+> --- a/include/net/smc.h
+> +++ b/include/net/smc.h
+> @@ -26,9 +26,6 @@ struct smc_hashinfo {
+>   	struct hlist_head ht;
+>   };
+>   
+> -int smc_hash_sk(struct sock *sk);
+> -void smc_unhash_sk(struct sock *sk);
+> -
+>   /* SMCD/ISM device driver interface */
+>   struct smcd_dmb {
+>   	u64 dmb_tok;
+> diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+> index 4b52b3b159c0..e8dcd28a554c 100644
+> --- a/net/smc/af_smc.c
+> +++ b/net/smc/af_smc.c
+> @@ -177,7 +177,7 @@ static struct smc_hashinfo smc_v6_hashinfo = {
+>   	.lock = __RW_LOCK_UNLOCKED(smc_v6_hashinfo.lock),
+>   };
+>   
+> -int smc_hash_sk(struct sock *sk)
+> +static int smc_hash_sk(struct sock *sk)
+>   {
+>   	struct smc_hashinfo *h = sk->sk_prot->h.smc_hash;
+>   	struct hlist_head *head;
+> @@ -191,9 +191,8 @@ int smc_hash_sk(struct sock *sk)
+>   
+>   	return 0;
+>   }
+> -EXPORT_SYMBOL_GPL(smc_hash_sk);
+>   
+> -void smc_unhash_sk(struct sock *sk)
+> +static void smc_unhash_sk(struct sock *sk)
+>   {
+>   	struct smc_hashinfo *h = sk->sk_prot->h.smc_hash;
+>   
+> @@ -202,7 +201,6 @@ void smc_unhash_sk(struct sock *sk)
+>   		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
+>   	write_unlock_bh(&h->lock);
+>   }
+> -EXPORT_SYMBOL_GPL(smc_unhash_sk);
+>   
+>   /* This will be called before user really release sock_lock. So do the
+>    * work which we didn't do because of user hold the sock_lock in the
 
