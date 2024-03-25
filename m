@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-81672-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81673-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 167E088AB2F
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 18:16:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEED688AD36
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 19:11:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7546F36972C
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:16:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C162BC7D1A
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:16:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F4D8152E09;
-	Mon, 25 Mar 2024 15:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACD341534E3;
+	Mon, 25 Mar 2024 15:56:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62C8F14D2A1
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 15:56:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF4C515250B;
+	Mon, 25 Mar 2024 15:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711382218; cv=none; b=Zwg0oNhgBlHGtpsheu6LJBDallg1xvx0OHF7O0DERv3ry0MCpMk/B4yublf2D2fUHPFDDnIhwQDw78lwqRf+jyHz018yzvLhtNWu+LJPVozArfwGgrKwdCNWldLk/HAQCDgdGyhLVoXHyJoxKBUyBHpjCE7TgiAq2ghoFZTlhO0=
+	t=1711382219; cv=none; b=krxNVP3tzRF98mwhWatbd/oayyLbRkmPIqRGbC9wYygbb/HqX9b8VMC5gwEvzgbf8cSQhoEYOYfIr+3/3ZNmTisNyt6qWHutvThXGyZ6IU5UTr0uNP224AC4p9ZjDFEpNyc56k65k/2UXs6B74qnIg65JFi45MeCQZCv1sz4UXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711382218; c=relaxed/simple;
-	bh=A7oIMSkDVlULhWmJ4fmOpvdE+frSZtrq9NuFCSUPWIU=;
+	s=arc-20240116; t=1711382219; c=relaxed/simple;
+	bh=qWAN2IdFrTeqQ3BZOuiogrDcY3pUVy9hIeMRXJbxHWY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MtEQgW3ftz+e8nf80F2pOd7hblKgC3ir07dsMJ69F1PVhJoELnJuMpSYOEzyX0As3FLZsnB5m8Ov+SaiZiwCDRtslfEwt2mXZw7FfVmVQW0s5A9P8PMNcKtLU2JEgUoYsbYq2NWS9RS3WcwGVcI3fiV1k0wmCzWmtSTWRdb1Djs=
+	 MIME-Version; b=NklBNcPMzI7QxlQ0IClXoS1i/Wy0a1wPrQNGY8Ma1yrwen5y5+R6sMDS27vdHreXlQZUcxVsnBLyB8jDblZhWQM2hbQvef6U8OrfYJBr22hbc2O++TNptWg4/SFBHiPujTLA7lFMQOJ57pDUHKSoBzIuUBpMT7hu1H3TylSwisA=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=none smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=217.70.183.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=queasysnail.net
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A5D822000C;
-	Mon, 25 Mar 2024 15:56:53 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D77EC20011;
+	Mon, 25 Mar 2024 15:56:54 +0000 (UTC)
 From: Sabrina Dubroca <sd@queasysnail.net>
 To: netdev@vger.kernel.org
 Cc: Sabrina Dubroca <sd@queasysnail.net>,
-	Gaurav Jain <gaurav.jain@nxp.com>,
-	Simon Horman <horms@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	Shuah Khan <shuah@kernel.org>,
 	Boris Pismenny <borisp@nvidia.com>,
 	John Fastabend <john.fastabend@gmail.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net 2/4] tls: adjust recv return with async crypto and failed copy to userspace
-Date: Mon, 25 Mar 2024 16:56:46 +0100
-Message-ID: <1b5a1eaab3c088a9dd5d9f1059ceecd7afe888d1.1711120964.git.sd@queasysnail.net>
+Subject: [PATCH net 3/4] selftests: tls: add test with a partially invalid iov
+Date: Mon, 25 Mar 2024 16:56:47 +0100
+Message-ID: <720e61b3d3eab40af198a58ce2cd1ee019f0ceb1.1711120964.git.sd@queasysnail.net>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <cover.1711120964.git.sd@queasysnail.net>
 References: <cover.1711120964.git.sd@queasysnail.net>
@@ -57,42 +57,61 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: sd@queasysnail.net
 
-process_rx_list may not copy as many bytes as we want to the userspace
-buffer, for example in case we hit an EFAULT during the copy. If this
-happens, we should only count the bytes that were actually copied,
-which may be 0.
+Make sure that we don't return more bytes than we actually received if
+the userspace buffer was bogus. We expect to receive at least the rest
+of rec1, and possibly some of rec2 (currently, we don't, but that
+would be ok).
 
-Subtracting async_copy_bytes is correct in both peek and !peek cases,
-because decrypted == async_copy_bytes + peeked for the peek case: peek
-is always !ZC, and we can go through either the sync or async path. In
-the async case, we add chunk to both decrypted and
-async_copy_bytes. In the sync case, we add chunk to both decrypted and
-peeked. I missed that in commit 6caaf104423d ("tls: fix peeking with
-sync+async decryption").
-
-Fixes: 4d42cd6bc2ac ("tls: rx: fix return value for async crypto")
 Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
 ---
-I'll send a patch removing the peeked variable and simplifying the
-process_rx_list call for net-next after this series lands there
+ tools/testing/selftests/net/tls.c | 34 +++++++++++++++++++++++++++++++
+ 1 file changed, 34 insertions(+)
 
- net/tls/tls_sw.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 3cdc6bc9fba6..14faf6189eb1 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -2158,6 +2158,9 @@ int tls_sw_recvmsg(struct sock *sk,
- 		else
- 			err = process_rx_list(ctx, msg, &control, 0,
- 					      async_copy_bytes, is_peek, NULL);
-+
-+		/* we could have copied less than we wanted, and possibly nothing */
-+		decrypted += max(err, 0) - async_copy_bytes;
- 	}
+diff --git a/tools/testing/selftests/net/tls.c b/tools/testing/selftests/net/tls.c
+index c6eda21cefb6..f27a12d2a2c9 100644
+--- a/tools/testing/selftests/net/tls.c
++++ b/tools/testing/selftests/net/tls.c
+@@ -1615,6 +1615,40 @@ TEST_F(tls, getsockopt)
+ 	EXPECT_EQ(errno, EINVAL);
+ }
  
- 	copied += decrypted;
++TEST_F(tls, recv_efault)
++{
++	char *rec1 = "1111111111";
++	char *rec2 = "2222222222";
++	struct msghdr hdr = {};
++	struct iovec iov[2];
++	char recv_mem[12];
++	int ret;
++
++	if (self->notls)
++		SKIP(return, "no TLS support");
++
++	EXPECT_EQ(send(self->fd, rec1, 10, 0), 10);
++	EXPECT_EQ(send(self->fd, rec2, 10, 0), 10);
++
++	iov[0].iov_base = recv_mem;
++	iov[0].iov_len = sizeof(recv_mem);
++	iov[1].iov_base = NULL; /* broken iov to make process_rx_list fail */
++	iov[1].iov_len = 1;
++
++	hdr.msg_iovlen = 2;
++	hdr.msg_iov = iov;
++
++	EXPECT_EQ(recv(self->cfd, recv_mem, 1, 0), 1);
++	EXPECT_EQ(recv_mem[0], rec1[0]);
++
++	ret = recvmsg(self->cfd, &hdr, 0);
++	EXPECT_LE(ret, sizeof(recv_mem));
++	EXPECT_GE(ret, 9);
++	EXPECT_EQ(memcmp(rec1, recv_mem, 9), 0);
++	if (ret > 9)
++		EXPECT_EQ(memcmp(rec2, recv_mem + 9, ret - 9), 0);
++}
++
+ FIXTURE(tls_err)
+ {
+ 	int fd, cfd;
 -- 
 2.43.0
 
