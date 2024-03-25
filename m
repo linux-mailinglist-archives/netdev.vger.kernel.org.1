@@ -1,193 +1,341 @@
-Return-Path: <netdev+bounces-81850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EDC688B45A
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 23:41:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C02F88B454
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 23:41:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1568E2E07C8
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 22:41:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D3A21C3DAA6
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 22:41:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACC677F48F;
-	Mon, 25 Mar 2024 22:41:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39059763E7;
+	Mon, 25 Mar 2024 22:41:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="jRZAnNKg";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="dyncDcco"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ntA9HHKo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0F2757F4;
-	Mon, 25 Mar 2024 22:41:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.165.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711406497; cv=fail; b=damjibaGq+g8/azCB31RLzeyolcDL5RA0h4cR6R8bJiEtAljqvjybpH2Ih3WFZjkJB858wreSXu/89fvdzG8UC8+GyAyO0j0Li7j4mcPfrP+PM6SvfKXFroH/etdpS6Xp2FV7jDHvuqKHGjLRap+58UfcDL9V6xabQhUOarM2Hk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711406497; c=relaxed/simple;
-	bh=3g6ZVgi/ixQ1ARXqvitlNf4IPzqHNnis/41n2QmgE5g=;
-	h=To:Cc:Subject:From:In-Reply-To:Message-ID:References:Date:
-	 Content-Type:MIME-Version; b=KINZv613HxCc/eS3BoeQ7kS0GigXSfBfl5k2W23txZr8wzYlWqpgP/LWqHEoG3Hl42qzXUHyeQvri0xtmWhb0t1tg+9s3B/jjAdy3nXlRmQPOBISZ6gXcIe2nFsqWH3bPZ0g2bpqwjIIz3gdCgbyK29lobaEh1fZz0eQvQr32HA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=jRZAnNKg; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=dyncDcco; arc=fail smtp.client-ip=205.220.165.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0333521.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 42PLG7sn020631;
-	Mon, 25 Mar 2024 22:41:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=to : cc : subject :
- from : in-reply-to : message-id : references : date : content-type :
- mime-version; s=corp-2023-11-20;
- bh=lA3ECgfU9G8BAeaGds9VxPvIC81nnfzrc2YqASPKsR4=;
- b=jRZAnNKgry+vVyYdIrAO0neePWZjE5v+yPwD+HKnpc4fYbITc4u3HQfRtHQvW6DEfwWY
- xUOoB5KlDFvpnue+l43gADcOlCoiEGikMTQxPvNKCs35xl6Wql275o9+RDCOD9zpQhfO
- K4oveELENr3UIzDMWhQpIAr2/8zh8wj+wZD2TyguEf2UytDjGmC/JEk447YQfOHfclLs
- 1cK+87ZkhG87SaSl6+zZjykaldLGSg5Jo7qnxXiZwYduQVrEuwoTwMDkrp7NdQwUsDdK
- hKgwsLOl4XJPt/RFkRGtqUqXfxBWTSOieHDi40DhOs2+CoGgfNTlGJbx7OnHbXubp+BN 6w== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3x28ct33f6-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 25 Mar 2024 22:41:10 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 42PMbNBg015935;
-	Mon, 25 Mar 2024 22:41:09 GMT
-Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2169.outbound.protection.outlook.com [104.47.55.169])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3x1nh65kcx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 25 Mar 2024 22:41:09 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EV+VP0uoXVAGqMw+sRTyHy+YyEwsY5fTiYJTfaIA0IdgsVQtHrvO+dpj93YUKtEdtOgXZEBmhHsvoTi0EHhLSyDjEgwqzAEsfoo8J/PvSX9OjfZOoMVkAfMsLCyvxY9fPu6wY6FJvUT6CkZkq93J0W9TpYJsdPngIOEDyIzACx6DlP91v+vuEjG0BUPbrjXPlGWHTiLtdNKl+oih/poMlc0P9PZGNLMwDnXT4KbgJzPxd581mwWjCdj52b/9+BVzq7Qyn+/tpzyr0TdBQuuWV2QARFVfRL5aSP5YWvKoBhzCwMBv72nePG3ljX2jx2VLcRXl1bAN489GbD+EWGJSpA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=lA3ECgfU9G8BAeaGds9VxPvIC81nnfzrc2YqASPKsR4=;
- b=Ms2kAc6hIJfuV3B4wOsUreYd+coqV0AwNIo2JNbIA9klQP3EDROuDlHiMB7KvMnJf33q9xN6zJZa3FBfXEWEg4RJy60Q4GsnDWUf4siMjj9yugdLf9xKkokQO/ApctCAJN1uIxMfBs71duQHbi4sA0ktof4Qw6J8vYTPf3yHeTH2Ssnnb/NqpD8aohWIFOKGOQJeNS8pibyrqd6NG/s3AR+MqD/vgqBlkBEjO3+78ekVsPIkH3Cf9emgYAncBcIytmJQsspBd+jNqCIcCaoGxkwB3q4YU4x7fSxO9lGg3whMsSmr0TeLWye4hhpc1Ceu2//bAQT60YdI2gVVYVAlig==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lA3ECgfU9G8BAeaGds9VxPvIC81nnfzrc2YqASPKsR4=;
- b=dyncDcco3d8RYbnTdWBnz9+kdZS447K4f4NCE33YTNMTYZvIX7TCk9T/9679xPhYRn/FUnnroXT3SjYYP+sYWDnYrBe2JJGZLXDhvRu0VL5LWMF73a9pWsBaWrYEj8NTnGTBuLKwleZGHGHnVVXUD7Al6n+N5WQXX67lbOu61TA=
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com (2603:10b6:510:3d::12)
- by SJ2PR10MB7617.namprd10.prod.outlook.com (2603:10b6:a03:545::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.31; Mon, 25 Mar
- 2024 22:41:06 +0000
-Received: from PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::7856:8db7:c1f6:fc59]) by PH0PR10MB4759.namprd10.prod.outlook.com
- ([fe80::7856:8db7:c1f6:fc59%4]) with mapi id 15.20.7409.031; Mon, 25 Mar 2024
- 22:41:06 +0000
-To: Damien Le Moal <dlemoal@kernel.org>
-Cc: linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
-        Manivannan Sadhasivami <manivannan.sadhasivam@linaro.org>,
-        linux-scsi@vger.kernel.org,
-        "Martin K . Petersen"
- <martin.petersen@oracle.com>,
-        Jaroslav Kysela <perex@perex.cz>, linux-sound@vger.kernel.org,
-        Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>,
-        linux-usb@vger.kernel.org, linux-serial@vger.kernel.org,
-        Hans de Goede <hdegoede@redhat.com>,
-        platform-driver-x86@vger.kernel.org, ntb@lists.linux.dev,
-        Lee Jones
- <lee@kernel.org>, David Airlie <airlied@gmail.com>,
-        amd-gfx@lists.freedesktop.org, Jason Gunthorpe <jgg@ziepe.ca>,
-        linux-rdma@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: Re: [External] : [PATCH 00/28] Remove PCI_IRQ_LEGACY
-From: "Martin K. Petersen" <martin.petersen@oracle.com>
-In-Reply-To: <20240325070944.3600338-1-dlemoal@kernel.org> (Damien Le Moal's
-	message of "Mon, 25 Mar 2024 16:09:11 +0900")
-Organization: Oracle Corporation
-Message-ID: <yq14jcu9bq6.fsf@ca-mkp.ca.oracle.com>
-References: <20240325070944.3600338-1-dlemoal@kernel.org>
-Date: Mon, 25 Mar 2024 18:41:05 -0400
-Content-Type: text/plain
-X-ClientProxiedBy: BL0PR02CA0113.namprd02.prod.outlook.com
- (2603:10b6:208:35::18) To PH0PR10MB4759.namprd10.prod.outlook.com
- (2603:10b6:510:3d::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11695757FE
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 22:41:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711406481; cv=none; b=Kx9KECQd2/R9LJwnsmjut6tSmhATfZcVi8VOJCTcGTQOcfyVuPL3/0S+YpX1Ptz9/RLH8ET10rdZ3LepB1ix+yQTcOlDJuKgq+nzE4q9uXPiUdGpypRXGhjdXzYEUYb4hG1oUhzTelq14p16Hj3dTyQIT2mMm5UcJwJDQ/fCy78=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711406481; c=relaxed/simple;
+	bh=kOceSrr9AIihbgFQiIiS9J6QvyxUmRegSK73ntHaHZk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=iAm+4rVAt60a1eS5xdazsX13qkhLUVmR7WbDvwat8FUza+Cf3SNmR2juKElru6aOzdBtKXLXX8zdICXYVzOGrQJYhqe7Xzf1SDIsCygkKdPlVePRxwNqcyUkPUWP/jnHr9dgHich8UGJzO0h+kPuAlBnu/Zdtzf+uFZcLmexwvM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ntA9HHKo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BD3BC433C7;
+	Mon, 25 Mar 2024 22:41:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711406480;
+	bh=kOceSrr9AIihbgFQiIiS9J6QvyxUmRegSK73ntHaHZk=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ntA9HHKop17/WUeN0pN0k9B9zw6ed/eahY29JpUI1f16n0zzqLUBqRGrZKduklxBy
+	 5lwVTQ0kofdy+2zhJWBYuzh81ghzt+pVvO7pP91KDHHKzEHtEQ2knaVhqtYley9xa7
+	 WW4vVbxyhk6XvmXSQovY0dpBd01frq//OEHI47FZ2fTji+C6syu6M1AyHKCSAa2E/z
+	 VRNdbdNxCQ/DECG+nXLavXGPb4ZZwmCdBj1Ic+tbD7doNn3JzudLQa5CUAJi2u2EBQ
+	 k0otvzXazdeRywhpzNFvMI6F6iiX+tRH8s3Ccu5S1o4JSGb8/jqQX15rVjwbYKDIpa
+	 oZg9iCWn/NjRg==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	Jakub Kicinski <kuba@kernel.org>,
+	alexs@kernel.org,
+	siyanteng@loongson.cn,
+	jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	mcoquelin.stm32@gmail.com,
+	aleksander.lobakin@intel.com,
+	intel-wired-lan@lists.osuosl.org
+Subject: [PATCH net-next] net: remove gfp_mask from napi_alloc_skb()
+Date: Mon, 25 Mar 2024 15:41:14 -0700
+Message-ID: <20240325224116.2585741-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR10MB4759:EE_|SJ2PR10MB7617:EE_
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	M64s68fo0caB6T8oEsGRk8hosny4u4X6t9xlxkTLVqVXTOd6rT5AA93RlLkFy7SOKyK/Hy5DJ+hkv9mWk4KkMaBQj+lh8v/LQQYXDUQYCoCs53foTZ3NdcMifv5TXmNBqiS9p8loU2i+SSKecrysTfpyUopSsXdOQ/DJMvGmWCXSxgT9QacqQz21fjrabfn27Zo9Q9dzgsQ24liov5LcD9v6IxJiFj6CL5yg1LnNoeSupjHwNAUUeRqVTbPpqvEPZpy98J9ZzG92SyI4aQXg1CnQRrrI6cMxo4m7WTnf6TTuche1tV98UbOQEc47nLD+Kg6slDLBoa9WHIXqWArMdt89L/jzEPnCpPD5r3Rv7AE4OatiRmcWfNM5E6Pgn4xet0mkqEe2sZD/1TdVyy4bkw5uQueNElRa/uZC1DON7k8MWnxBdlrgWTw5SKIBpXcQSciyFhGs1GEcmvvlognZeuMthBfjXcNPUTd9kNv0dsOO2oqtTrQCVcqWiYELO1EQe5AKGvq6Rc2riS9vZ3mPgW9Mgt+bHVp+Pbtbzsciu71eAjbbNf0MviJ3Bk4Ig39wKmUoRPPTXjzL3Q31p/vHycBxT4493qnSrZwAz9XGDYsuObaR3FYxDL0h5apSgWtK4Qh5DQohNyEtugvTkxxKK1H7CB/FsEyyl87TCUsytaU=
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR10MB4759.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005)(7416005);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?k9I6uqYz+wqt7JEHHB2LYleYlaud/oclOcUwBHezOjyMTz1ImDd+indXMcZ+?=
- =?us-ascii?Q?RqfpWOnFW1+kwf8u3pYbN+lFwPVwSCgI6c9b9fEgRgnMZLu4JjWr2Q3Th6an?=
- =?us-ascii?Q?rVHRUvev8uQkD6D9Ex+zO3EKbD2bXppQ3noMMukrUArRso0x1Ad3Su7wI1ZO?=
- =?us-ascii?Q?p3eOABB7k2XDQRTKqMpSSIn0gAVBEgwIOw87nRhYxtegG+1gpHdP/TXwe8W9?=
- =?us-ascii?Q?KhlLBKhx6yxYTEmxQbSA8LqL7421q/69UyVx5r/TVZzGQReB8bu54SzPsS8+?=
- =?us-ascii?Q?JRZ5Y6L7YR/AkxKQ0pxIKkZPGbqJtvcXta9OmjpO+GXK13c+nYQWNFfKz+Fg?=
- =?us-ascii?Q?imGMynpIn/2cl9/mHBwT8TFjF87Y9Hl1EJiCe0fxswY9W0EokGXTa8jyNvTx?=
- =?us-ascii?Q?EjmByg1H4QKZqo/SQO6lZi8oFs553tVPZ1bd05T3RLARKyzqPHrzfmWQApA8?=
- =?us-ascii?Q?pYu1IwI9zUNjrHsu9mbYLWgH0dTT7r6lX5qmIisH0hwGqsgEZR1d+BHAH6UH?=
- =?us-ascii?Q?e5iPkbhlutGo+FaPYe09Jjg7v6V0RDPG9wm6yzq6kYZ8FK6lJIoIz8j4C+ma?=
- =?us-ascii?Q?5bH5oAvzH4n+JCByZD19lpsvHwi65V8TpR5GD8+hpDPT48+XZmEucQwHaQoD?=
- =?us-ascii?Q?WiwsUCcwB5hrzVjIp5TY60jiYOW0OSwQLpFKia5+e3ChZIHwWfPzgU2uGEZZ?=
- =?us-ascii?Q?caF9o8eChHip9ZAuAtxBGQTG23IZJ10ibAy24k1+Uf4BpQ4+Ugu6sEArEwyd?=
- =?us-ascii?Q?cJXzZBNYEF+mFWREJl2JXxOa3aHSr5buzcW+kDPRxosWRCfUWkvnLhb/rKVL?=
- =?us-ascii?Q?wDtg3bFjI+WyM9eKDsV2sETv32Iw5+BZOCQQdsLd/RSU2agUPlKL1StKdi3B?=
- =?us-ascii?Q?3hFuXllUbbIBtZOGP7F6hWAgYKuebHeRucTnXyT4gRpLhmm4GG5xp1UeN2wA?=
- =?us-ascii?Q?BCOQKqV2Dp82gFcJ2tHXZ3fOXBQwlXDVpIKzUwpWPg4F6RjuAjIeoDjl1x9T?=
- =?us-ascii?Q?uL+Ssw0DWyy0DsYYMQ4BWPn/l0+8oQsZGRHlDsCwqm9X66HRCjMjtJ11lpz0?=
- =?us-ascii?Q?p/DLRmMyEwUFgAg4DE7pl9SU5AyQf8AbVDicX3RSXB56yBPOsz6GZPyuwMkG?=
- =?us-ascii?Q?TsHwkPwwFc6eRy8tdnoeFwiRTj/vYRxwvLcXyQtL3jVe136JmigItklUccGF?=
- =?us-ascii?Q?YzuPM7vIGPKNyo9jNccLZwwF86C4FAe5hhOwdaUFbS/2M3KjNi/Njh9brt4H?=
- =?us-ascii?Q?53NSq1xEpzg+MeSnN6IQ/fnnWac1SclVaPylrpPBodDaf44OROfmM4QkHOcj?=
- =?us-ascii?Q?F0+6n8wJFI9gFLGoEBuOvs0pYYePXNpiFpaLX1CEz2CEf9bpLFHcPteQgML3?=
- =?us-ascii?Q?eU47yk2MJIEKJYkMdPmBpmteZ63cLrQ7V/sKvS3AnMuuAVsO6XMpjjwzYs3f?=
- =?us-ascii?Q?yInnT/hlfks7BX4wZ10InCCSQVxsMws09SdQ6SH7tX2yzp4TzF7DOnL4Pt6x?=
- =?us-ascii?Q?gpuMo8NYaOfCw3+Zb9hfJtc3i/pIfKfufBiEXUjUeGySaEmftj6ev1H3ml9w?=
- =?us-ascii?Q?fIV9uDHwlibH701StZVwRN6eCfYFiaiOqGxtZZfeGeXUnq4YQkUm5y/K6i8Q?=
- =?us-ascii?Q?fQ=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	RJcU51W8Fu/NWeqnT6/4Os165jMO76dhAOnowOmWN+YnQwGL3wCGvaQNq/7GVpLNpt2bALKyUuYEenk+VzoNHrtKVgaJuja52dNV8byGGSIYHeHaY4gIPA4DTxFjDOh2HTPFdEKDIBUfSDoUZWWxa/pk2Cop0taZU1gajKRMVvhPI1RmKTuyx/x9ZLWiuH+FznXMfVaPLeMmpciYAKA0IXHTmbvIax5Lxj04UKUJ9jiiL0wlFsN7/as8eWuLsDDV+kkkuZkDI3GIizEmMlbH5VS8ebOi/D7/cYXY9JJpBIkYPZj5tn7m+UnTAuYUk7t17WayPehg8vjUIQCD/Zews97NvIZs4Pc6UTjUG2zuAyKL0UVW5xXtF1h5uu9fQ4APHEC3XAj+wcneprkugRrIUGnIqmMM2jDYSkp/S04aWOE4wDhy3na1bXV3Ylsrn68glSiwLjHdiURTdiyr0iE1uzphPmdO4Eg6nHCcdYtrKUkE/G/Gm9qZDrkJ+WvVaWKm9716H9OhywS6wpA9811ucW1oaiN0tkXTPi+AQVEd4qyp1vILX8D17H19V2xtTlA71j+7lSxr/juqCUWH/22zvZcX9Si5Kn4W8hCojQQrFzQ=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 96af9bea-6427-4f88-64ba-08dc4d1ca8d0
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR10MB4759.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2024 22:41:06.7304
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4XwpL+63l314dLfI6/BF6Bk5k4TGLTdAYXe3wWB/hsE24IUyTGOPKs15p2rpt99pVzUD3e+uNJz4H0rQR64K65+RPvz7l4yE3wRFy89DQg0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR10MB7617
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-25_22,2024-03-21_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0
- phishscore=0 mlxscore=0 mlxlogscore=999 spamscore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2403210000 definitions=main-2403250142
-X-Proofpoint-GUID: zg0dHLrcfCofqOo-vhkjTyPHeJCKCX67
-X-Proofpoint-ORIG-GUID: zg0dHLrcfCofqOo-vhkjTyPHeJCKCX67
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
+__napi_alloc_skb() is napi_alloc_skb() with the added flexibility
+of choosing gfp_mask. This is a NAPI function, so GFP_ATOMIC is
+implied. The only practical choice the caller has is whether to
+set __GFP_NOWARN. But that's a false choice, too, allocation failures
+in atomic context will happen, and printing warnings in logs,
+effectively for a packet drop, is both too much and very likely
+non-actionable.
 
-Damien,
+This leads me to a conclusion that most uses of napi_alloc_skb()
+are simply misguided, and should use __GFP_NOWARN in the first
+place. We also have a "standard" way of reporting allocation
+failures via the queue stat API (qstats::rx-alloc-fail).
 
-> This patch series removes the use of the depracated PCI_IRQ_LEGACY macro
-> and replace it with PCI_IRQ_INTX. No functional change.
+The direct motivation for this patch is that one of the drivers
+used at Meta calls napi_alloc_skb() (so prior to this patch without
+__GFP_NOWARN), and the resulting OOM warning is the top networking
+warning in our fleet.
 
-SCSI changes look good to me.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+This is changing mostly the Intel drivers, if the choice of
+flags is important there, please do let me know, why IDPF
+uses bare GFP_ATOMIC, specifically.
 
-Acked-by: Martin K. Petersen <martin.petersen@oracle.com>
+CC: alexs@kernel.org
+CC: siyanteng@loongson.cn
+CC: jesse.brandeburg@intel.com
+CC: anthony.l.nguyen@intel.com
+CC: alexandre.torgue@foss.st.com
+CC: joabreu@synopsys.com
+CC: mcoquelin.stm32@gmail.com
+CC: aleksander.lobakin@intel.com
+CC: intel-wired-lan@lists.osuosl.org
+---
+ Documentation/mm/page_frags.rst                    | 2 +-
+ Documentation/translations/zh_CN/mm/page_frags.rst | 2 +-
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c        | 4 +---
+ drivers/net/ethernet/intel/i40e/i40e_xsk.c         | 3 +--
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c        | 4 +---
+ drivers/net/ethernet/intel/ice/ice_txrx.c          | 3 +--
+ drivers/net/ethernet/intel/ice/ice_xsk.c           | 3 +--
+ drivers/net/ethernet/intel/idpf/idpf_txrx.c        | 5 ++---
+ drivers/net/ethernet/intel/igc/igc_main.c          | 3 +--
+ drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c       | 3 +--
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  | 5 ++---
+ include/linux/skbuff.h                             | 8 +-------
+ net/core/skbuff.c                                  | 8 ++++----
+ 13 files changed, 18 insertions(+), 35 deletions(-)
 
+diff --git a/Documentation/mm/page_frags.rst b/Documentation/mm/page_frags.rst
+index a81617e688a8..503ca6cdb804 100644
+--- a/Documentation/mm/page_frags.rst
++++ b/Documentation/mm/page_frags.rst
+@@ -25,7 +25,7 @@ to be disabled when executing the fragment allocation.
+ The network stack uses two separate caches per CPU to handle fragment
+ allocation.  The netdev_alloc_cache is used by callers making use of the
+ netdev_alloc_frag and __netdev_alloc_skb calls.  The napi_alloc_cache is
+-used by callers of the __napi_alloc_frag and __napi_alloc_skb calls.  The
++used by callers of the __napi_alloc_frag and napi_alloc_skb calls.  The
+ main difference between these two calls is the context in which they may be
+ called.  The "netdev" prefixed functions are usable in any context as these
+ functions will disable interrupts, while the "napi" prefixed functions are
+diff --git a/Documentation/translations/zh_CN/mm/page_frags.rst b/Documentation/translations/zh_CN/mm/page_frags.rst
+index 20bd3fafdc8c..a5b22486a913 100644
+--- a/Documentation/translations/zh_CN/mm/page_frags.rst
++++ b/Documentation/translations/zh_CN/mm/page_frags.rst
+@@ -25,7 +25,7 @@ 个CPU的限制，或者每个CPU的限制，并在执行碎片分配时强制
+ 
+ 网络堆栈在每个CPU使用两个独立的缓存来处理碎片分配。netdev_alloc_cache被使用
+ netdev_alloc_frag和__netdev_alloc_skb调用的调用者使用。napi_alloc_cache
+-被调用__napi_alloc_frag和__napi_alloc_skb的调用者使用。这两个调用的主要区别是
++被调用__napi_alloc_frag和napi_alloc_skb的调用者使用。这两个调用的主要区别是
+ 它们可能被调用的环境。“netdev” 前缀的函数可以在任何上下文中使用，因为这些函数
+ 将禁用中断，而 ”napi“ 前缀的函数只可以在softirq上下文中使用。
+ 
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_txrx.c b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+index 0d7177083708..ac2fcc5ac595 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_txrx.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_txrx.c
+@@ -2144,9 +2144,7 @@ static struct sk_buff *i40e_construct_skb(struct i40e_ring *rx_ring,
+ 	 */
+ 
+ 	/* allocate a skb to store the frags */
+-	skb = __napi_alloc_skb(&rx_ring->q_vector->napi,
+-			       I40E_RX_HDR_SIZE,
+-			       GFP_ATOMIC | __GFP_NOWARN);
++	skb = napi_alloc_skb(&rx_ring->q_vector->napi, I40E_RX_HDR_SIZE);
+ 	if (unlikely(!skb))
+ 		return NULL;
+ 
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_xsk.c b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
+index 11500003af0d..a85b425794df 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_xsk.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_xsk.c
+@@ -301,8 +301,7 @@ static struct sk_buff *i40e_construct_skb_zc(struct i40e_ring *rx_ring,
+ 	net_prefetch(xdp->data_meta);
+ 
+ 	/* allocate a skb to store the frags */
+-	skb = __napi_alloc_skb(&rx_ring->q_vector->napi, totalsize,
+-			       GFP_ATOMIC | __GFP_NOWARN);
++	skb = napi_alloc_skb(&rx_ring->q_vector->napi, totalsize);
+ 	if (unlikely(!skb))
+ 		goto out;
+ 
+diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.c b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
+index b71484c87a84..32bb604a1382 100644
+--- a/drivers/net/ethernet/intel/iavf/iavf_txrx.c
++++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
+@@ -1334,9 +1334,7 @@ static struct sk_buff *iavf_construct_skb(struct iavf_ring *rx_ring,
+ 	net_prefetch(va);
+ 
+ 	/* allocate a skb to store the frags */
+-	skb = __napi_alloc_skb(&rx_ring->q_vector->napi,
+-			       IAVF_RX_HDR_SIZE,
+-			       GFP_ATOMIC | __GFP_NOWARN);
++	skb = napi_alloc_skb(&rx_ring->q_vector->napi, IAVF_RX_HDR_SIZE);
+ 	if (unlikely(!skb))
+ 		return NULL;
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
+index 97d41d6ebf1f..8bb743f78fcb 100644
+--- a/drivers/net/ethernet/intel/ice/ice_txrx.c
++++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
+@@ -1051,8 +1051,7 @@ ice_construct_skb(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp)
+ 	}
+ 
+ 	/* allocate a skb to store the frags */
+-	skb = __napi_alloc_skb(&rx_ring->q_vector->napi, ICE_RX_HDR_SIZE,
+-			       GFP_ATOMIC | __GFP_NOWARN);
++	skb = napi_alloc_skb(&rx_ring->q_vector->napi, ICE_RX_HDR_SIZE);
+ 	if (unlikely(!skb))
+ 		return NULL;
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_xsk.c b/drivers/net/ethernet/intel/ice/ice_xsk.c
+index 1857220d27fe..aa81d1162b81 100644
+--- a/drivers/net/ethernet/intel/ice/ice_xsk.c
++++ b/drivers/net/ethernet/intel/ice/ice_xsk.c
+@@ -555,8 +555,7 @@ ice_construct_skb_zc(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp)
+ 	}
+ 	net_prefetch(xdp->data_meta);
+ 
+-	skb = __napi_alloc_skb(&rx_ring->q_vector->napi, totalsize,
+-			       GFP_ATOMIC | __GFP_NOWARN);
++	skb = napi_alloc_skb(&rx_ring->q_vector->napi, totalsize);
+ 	if (unlikely(!skb))
+ 		return NULL;
+ 
+diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+index 6dd7a66bb897..f940f650cd78 100644
+--- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
++++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
+@@ -3005,8 +3005,7 @@ struct sk_buff *idpf_rx_construct_skb(struct idpf_queue *rxq,
+ 	/* prefetch first cache line of first page */
+ 	net_prefetch(va);
+ 	/* allocate a skb to store the frags */
+-	skb = __napi_alloc_skb(&rxq->q_vector->napi, IDPF_RX_HDR_SIZE,
+-			       GFP_ATOMIC);
++	skb = napi_alloc_skb(&rxq->q_vector->napi, IDPF_RX_HDR_SIZE);
+ 	if (unlikely(!skb)) {
+ 		idpf_rx_put_page(rx_buf);
+ 
+@@ -3060,7 +3059,7 @@ static struct sk_buff *idpf_rx_hdr_construct_skb(struct idpf_queue *rxq,
+ 	struct sk_buff *skb;
+ 
+ 	/* allocate a skb to store the frags */
+-	skb = __napi_alloc_skb(&rxq->q_vector->napi, size, GFP_ATOMIC);
++	skb = napi_alloc_skb(&rxq->q_vector->napi, size);
+ 	if (unlikely(!skb))
+ 		return NULL;
+ 
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 2e1cfbd82f4f..6ba4b8d1f1b1 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -2716,8 +2716,7 @@ static struct sk_buff *igc_construct_skb_zc(struct igc_ring *ring,
+ 
+ 	net_prefetch(xdp->data_meta);
+ 
+-	skb = __napi_alloc_skb(&ring->q_vector->napi, totalsize,
+-			       GFP_ATOMIC | __GFP_NOWARN);
++	skb = napi_alloc_skb(&ring->q_vector->napi, totalsize);
+ 	if (unlikely(!skb))
+ 		return NULL;
+ 
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
+index d34d715c59eb..397cb773fabb 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_xsk.c
+@@ -220,8 +220,7 @@ static struct sk_buff *ixgbe_construct_skb_zc(struct ixgbe_ring *rx_ring,
+ 	net_prefetch(xdp->data_meta);
+ 
+ 	/* allocate a skb to store the frags */
+-	skb = __napi_alloc_skb(&rx_ring->q_vector->napi, totalsize,
+-			       GFP_ATOMIC | __GFP_NOWARN);
++	skb = napi_alloc_skb(&rx_ring->q_vector->napi, totalsize);
+ 	if (unlikely(!skb))
+ 		return NULL;
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 24cd80490d19..bcdde68a099a 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -5109,9 +5109,8 @@ static struct sk_buff *stmmac_construct_skb_zc(struct stmmac_channel *ch,
+ 	unsigned int datasize = xdp->data_end - xdp->data;
+ 	struct sk_buff *skb;
+ 
+-	skb = __napi_alloc_skb(&ch->rxtx_napi,
+-			       xdp->data_end - xdp->data_hard_start,
+-			       GFP_ATOMIC | __GFP_NOWARN);
++	skb = napi_alloc_skb(&ch->rxtx_napi,
++			     xdp->data_end - xdp->data_hard_start);
+ 	if (unlikely(!skb))
+ 		return NULL;
+ 
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 0c7c67b3a87b..dadd3f55d549 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -3355,13 +3355,7 @@ static inline void *napi_alloc_frag_align(unsigned int fragsz,
+ 	return __napi_alloc_frag_align(fragsz, -align);
+ }
+ 
+-struct sk_buff *__napi_alloc_skb(struct napi_struct *napi,
+-				 unsigned int length, gfp_t gfp_mask);
+-static inline struct sk_buff *napi_alloc_skb(struct napi_struct *napi,
+-					     unsigned int length)
+-{
+-	return __napi_alloc_skb(napi, length, GFP_ATOMIC);
+-}
++struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int length);
+ void napi_consume_skb(struct sk_buff *skb, int budget);
+ 
+ void napi_skb_free_stolen_head(struct sk_buff *skb);
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index b99127712e67..e0e172638c0a 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -775,7 +775,7 @@ struct sk_buff *__netdev_alloc_skb(struct net_device *dev, unsigned int len,
+ EXPORT_SYMBOL(__netdev_alloc_skb);
+ 
+ /**
+- *	__napi_alloc_skb - allocate skbuff for rx in a specific NAPI instance
++ *	napi_alloc_skb - allocate skbuff for rx in a specific NAPI instance
+  *	@napi: napi instance this buffer was allocated for
+  *	@len: length to allocate
+  *	@gfp_mask: get_free_pages mask, passed to alloc_skb and alloc_pages
+@@ -787,9 +787,9 @@ EXPORT_SYMBOL(__netdev_alloc_skb);
+  *
+  *	%NULL is returned if there is no free memory.
+  */
+-struct sk_buff *__napi_alloc_skb(struct napi_struct *napi, unsigned int len,
+-				 gfp_t gfp_mask)
++struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
+ {
++	gfp_t gfp_mask = GFP_ATOMIC | __GFP_NOWARN;
+ 	struct napi_alloc_cache *nc;
+ 	struct sk_buff *skb;
+ 	bool pfmemalloc;
+@@ -860,7 +860,7 @@ struct sk_buff *__napi_alloc_skb(struct napi_struct *napi, unsigned int len,
+ skb_fail:
+ 	return skb;
+ }
+-EXPORT_SYMBOL(__napi_alloc_skb);
++EXPORT_SYMBOL(napi_alloc_skb);
+ 
+ void skb_add_rx_frag_netmem(struct sk_buff *skb, int i, netmem_ref netmem,
+ 			    int off, int size, unsigned int truesize)
 -- 
-Martin K. Petersen	Oracle Linux Engineering
+2.44.0
+
 
