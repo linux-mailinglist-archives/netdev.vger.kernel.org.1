@@ -1,123 +1,103 @@
-Return-Path: <netdev+bounces-81626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B8D088A86F
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:10:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4BFC88A879
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:11:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C9681C61A92
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:10:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84C751F66D2E
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:11:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79F5E13C9BC;
-	Mon, 25 Mar 2024 13:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9151C13D8B7;
+	Mon, 25 Mar 2024 13:59:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xl/hE/zs"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="own2Vihg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B80284D33;
-	Mon, 25 Mar 2024 13:57:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D448013D624
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 13:59:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711375063; cv=none; b=Wqc2L3+1NjOdoi9de+hY3+eZo6NlvoETtdwpcLQbZ61NVzNlEybntI+3mvxcM4g/4YWzbrBsK7pK03lTYrg3shd8gfmi9JXIWsrX7B4SiI9Q5khjPD6kx6Ns4GnjJwyEsAKdP1O4iho4Xzj6M3kXO7VQ8HhrxaVLV2Y95GuD1pw=
+	t=1711375166; cv=none; b=Vy5ylgfue1Vw2+8LAzToYqKqSfDjJqwrgEkiib3lnKUCsTb7wDyMEVs3sdptmaCUYpIjKSGuV9OdudhHac7L1krtG/izki/xm4sX6ENTBQTxw95mGKx5NcGWOKhCJv6IYd694PeLz2B6jMj4iD966mkLnT9o8oORgfCH+tGxmsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711375063; c=relaxed/simple;
-	bh=0IIk7fdt/ij7Y30RYxIc4VnrAUsxe7XFLjeK+gaFxHc=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=t/TU1UMryzQj19zrZU+2Y8RpMt1V0+ApAkudlbCJZo6YGG8H4BEfFtJDG0PX8o3yIM8Jt0CqwvILbV2goJP2vjTXr695ifJCZgfhURDrMr3t9CQXkIJqVDtRr99Mk+pEwEIBpEytjWfs2o9MYDgusB5GX+Fb2JFuoemVFCOVhfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xl/hE/zs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E5954C433F1;
-	Mon, 25 Mar 2024 13:57:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711375062;
-	bh=0IIk7fdt/ij7Y30RYxIc4VnrAUsxe7XFLjeK+gaFxHc=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=Xl/hE/zsFcn+ly77x4fZ3ZW5Fcq/0aXBJM4eWJY7Soms+8FR0uHNz51ckpxVOF84p
-	 XROI8xNa4rDlaggLK+yGMSwjivxoa7IL293/w3IBlduPatwoyIzsiCY+o31fKTCTf7
-	 LdsZtzzLHEsGhtGiDNrpCBnUwdKhDUagvU2KAQbB/of3CkNv/XRwhhcnpzdGBwhbx7
-	 YVk/AnxOuf0W1U1b3ScunsyArv4+T7QDY/8OVTTSIKI71d7el/27SmZM1IzlRUp1wC
-	 kCV8SVX+NJS5erHEexMcfI/snqTblbuWstFTOT9d2ZHpnCKT3ITU2NwnhhGX46rico
-	 CKbAyFpjQJBAA==
-From: Kalle Valo <kvalo@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Marcel Holtmann <marcel@holtmann.org>,  Luiz Augusto von Dentz
- <luiz.dentz@gmail.com>,  "David S . Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>,  Rob Herring <robh@kernel.org>,  Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley
- <conor+dt@kernel.org>,  Bjorn Andersson <andersson@kernel.org>,  Konrad
- Dybcio <konrad.dybcio@linaro.org>,  Liam Girdwood <lgirdwood@gmail.com>,
-  Mark Brown <broonie@kernel.org>,  Catalin Marinas
- <catalin.marinas@arm.com>,  Will Deacon <will@kernel.org>,  Bjorn Helgaas
- <bhelgaas@google.com>,  Saravana Kannan <saravanak@google.com>,  Geert
- Uytterhoeven <geert+renesas@glider.be>,  Arnd Bergmann <arnd@arndb.de>,
-  Neil Armstrong <neil.armstrong@linaro.org>,  Marek Szyprowski
- <m.szyprowski@samsung.com>,  Alex Elder <elder@linaro.org>,  Srini
- Kandagatla <srinivas.kandagatla@linaro.org>,  Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>,  Abel Vesa <abel.vesa@linaro.org>,
-  Manivannan Sadhasivam <mani@kernel.org>,  Lukas Wunner <lukas@wunner.de>,
-  Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-  linux-bluetooth@vger.kernel.org,  netdev@vger.kernel.org,
-  devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  linux-wireless@vger.kernel.org,  linux-arm-msm@vger.kernel.org,
-  linux-arm-kernel@lists.infradead.org,  linux-pci@vger.kernel.org,
-  linux-pm@vger.kernel.org,  Bartosz Golaszewski
- <bartosz.golaszewski@linaro.org>
-Subject: Re: [PATCH v6 04/16] dt-bindings: net: wireless: qcom,ath11k:
- describe the ath11k on QCA6390
-References: <20240325131624.26023-1-brgl@bgdev.pl>
-	<20240325131624.26023-5-brgl@bgdev.pl>
-Date: Mon, 25 Mar 2024 15:57:33 +0200
-In-Reply-To: <20240325131624.26023-5-brgl@bgdev.pl> (Bartosz Golaszewski's
-	message of "Mon, 25 Mar 2024 14:16:12 +0100")
-Message-ID: <87r0fy8lde.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1711375166; c=relaxed/simple;
+	bh=aiMUPmr0TYR+OTuWbEB0NdvrDsA6Hxrr0DZTK4iOQcE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mAHqYSmnnRudrTit17Vh7GG3GOaH+SCBQTSJ9RJmml3yn5qgqSHXdp59CErvEjew2x1KmJoT9YZm1kPxuHcoNKksg1xHwXU9wNcm6oLcVmfK5E0TtrjCBPRWCqW01G+GoJwTwlkFJzbmQ61DhGuf1QMbEItj6vZZX5CPMhnI/wE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=own2Vihg; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56bde8ea904so15892a12.0
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 06:59:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711375163; x=1711979963; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aiMUPmr0TYR+OTuWbEB0NdvrDsA6Hxrr0DZTK4iOQcE=;
+        b=own2VihgvevU9YRCiKVFXirQxnmo8wM2siZ5eSbqmQPWPzIs3Osl1KtBc+bYtB46U9
+         o6bTZrWt3Wu8zEx7A02JB2o4iSjknT7Iwwrz4vhTuYpTx6MNZulo5zephBWPcLtI/1JO
+         6uKzNKR2f06SrYKAZc+40kibTuBgCqAFjMi6v267inrTTMf06cGlTpxbh+Pyf7b0+sPC
+         ab3zffwKi4/+i1Q7JpaxB+RdrpEU8/sgqaZHAnrR6/fw2QOr5OSygwBJua1Mwbdi44Rm
+         2sCosPAC0je3Auu4/GWuxiJ59nGD0e8+mn8vDkk+M5QNGGCAfxF7Kcopjz58v6sQpOEZ
+         g9fQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711375163; x=1711979963;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=aiMUPmr0TYR+OTuWbEB0NdvrDsA6Hxrr0DZTK4iOQcE=;
+        b=o3/ca6dq0V/W++XLq11f8Qa2zCwy2/wmDowzto6Rm9pjMeGkzk8OVsp9piERKvv3yC
+         t06UNv6XetpyAtlJ7zwunukzgLt5I9d4EQKnkXTuK4qRYj/v6r2D8PdkHZSsNs0gHdrM
+         Vqy8h9KriEu54ehQLib3X6y8ZvAtauS6WqKYlSvB+zU87QKqnkPIUK0uidOXRgS5k9yl
+         rq+sQsQP5aUfdBb2KgUoaxlo44L0reyANsQpNqPmHDWPfahMBQ7fEgXuRJXCAjlH3UgN
+         3Ud3tDGpe2wPzLVpGgYNFpUDeSFapi96wmuDO2YEM+4O1T7IFBhLiaLnPBzEhm7iM9YG
+         e51g==
+X-Forwarded-Encrypted: i=1; AJvYcCVcWY5UDLs97mJQ46o35ZzxSEmem1gOQ+nOUL4wf4Ix1yl/9PYpmvJu2TNbkLgoKGPTmyz84eH7D9GoPhjiVRfOZZATxRPk
+X-Gm-Message-State: AOJu0Yw6so+BC18IBJZdU1qHkPyd7uGxS1ZUVwlAyyoB7KrcNls4ZbUU
+	4bLUONEQy6I0lxdO5zK3j2kPMf+QDJ1STYKTw+qWrjgkDCJIL2clm0yVJEArevF9fMx71cEbQnh
+	ClgYrxP7ayN38KSQcPds+YgSd1jFTss0pl4Zt
+X-Google-Smtp-Source: AGHT+IEV5wDD3dHJtuQglxOC11Br3likX/HODpqsYK/HFkeJhAxfTM6CLt/xt+yEevunobYcapuEhcWHhd7Md8ZPxBU=
+X-Received: by 2002:aa7:d298:0:b0:56c:d26:5e59 with SMTP id
+ w24-20020aa7d298000000b0056c0d265e59mr130158edq.1.1711375162985; Mon, 25 Mar
+ 2024 06:59:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <tencent_5A50BC27A519EBD14E1B0A8685E89405850A@qq.com>
+In-Reply-To: <tencent_5A50BC27A519EBD14E1B0A8685E89405850A@qq.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 25 Mar 2024 14:59:09 +0100
+Message-ID: <CANn89i+gqBKX-BkY58M0vWfRLsOy2RqyFqX8cwjqo3xacYGXbA@mail.gmail.com>
+Subject: Re: [PATCH v2] net: mark racy access on sk->sk_rcvbuf
+To: linke li <lilinke99@qq.com>
+Cc: xujianhao01@gmail.com, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Willem de Bruijn <willemb@google.com>, 
+	Abel Wu <wuyun.abel@bytedance.com>, Breno Leitao <leitao@debian.org>, 
+	Alexander Mikhalitsyn <alexander@mihalicyn.com>, David Howells <dhowells@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Bartosz Golaszewski <brgl@bgdev.pl> writes:
-
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On Thu, Mar 21, 2024 at 9:44=E2=80=AFAM linke li <lilinke99@qq.com> wrote:
 >
-> Add a PCI compatible for the ATH11K module on QCA6390 and describe the
-> power inputs from the PMU that it consumes.
+> sk->sk_rcvbuf in __sock_queue_rcv_skb() and __sk_receive_skb() can be
+> changed by other threads. Mark this as benign using READ_ONCE().
 >
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> This patch is aimed at reducing the number of benign races reported by
+> KCSAN in order to focus future debugging effort on harmful races.
+>
+> Signed-off-by: linke li <lilinke99@qq.com>
+> ---
+> v1 -> v2: include sk->sk_rcvbuf in __sock_queue_rcv_skb()
 
-[...]
-
-> +allOf:
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            const: pci17cb,1101
-> +    then:
-> +      required:
-> +        - vddrfacmn-supply
-> +        - vddaon-supply
-> +        - vddwlcx-supply
-> +        - vddwlmx-supply
-> +        - vddrfa0p8-supply
-> +        - vddrfa1p2-supply
-> +        - vddrfa1p7-supply
-> +        - vddpcie0p9-supply
-> +        - vddpcie1p8-supply
-
-I don't know DT well enough to know what the "required:" above means,
-but does this take into account that there are normal "plug&play" type
-of QCA6390 boards as well which don't need any DT settings?
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
