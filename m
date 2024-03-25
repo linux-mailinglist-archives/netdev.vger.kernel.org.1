@@ -1,221 +1,179 @@
-Return-Path: <netdev+bounces-81538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A44188A1A7
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 14:22:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 509DF88AF2B
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:01:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C3D891F3A45E
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:22:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6245DBE3AD9
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 13:52:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616E0156640;
-	Mon, 25 Mar 2024 10:28:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b="EMN1gPyj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46F2071B40;
+	Mon, 25 Mar 2024 10:32:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from CHN02-BJS-obe.outbound.protection.partner.outlook.cn (mail-bjschn02on2118.outbound.protection.partner.outlook.cn [139.219.17.118])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A957F179FAA
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 08:44:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711356279; cv=none; b=mydx1tZP44hWX91ysfS1ABKV3ZQQFD4oxxUV54glHSBHQhcvHk9horVBRxTNXG1UJabIHwBEUl1qaKV2i04ieyZNx0397/5FBNHyGIly9ANKg0nID+48S34CYmrqNmYtcqKqmE8aWsNX8PdAw29wCg6t0ThPnSmDJFAlNdwacRc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711356279; c=relaxed/simple;
-	bh=KlNZqGKcY8wJJqzBqoSqe94osLn2EZS8gGGi0MRJ1/Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YcpYyanuIjgsFzH8YWyx7Sh1PNFUY8bgmSBnkR1YMMJDgidB+RUcWGW0ja86R4FThhyuVPpfd+//gn5MZcitEGuQ4sAndCn5bzI+v+dTKYcUlgIaH6fnQktlOfMr00OFgD9Ezu23GqY6eA4ZoP18UT8FyQsT/MzqOc70Y9HN/fY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com; spf=pass smtp.mailfrom=gooddata.com; dkim=pass (1024-bit key) header.d=gooddata.com header.i=@gooddata.com header.b=EMN1gPyj; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gooddata.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gooddata.com
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2d4979cd8c8so42578841fa.0
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 01:44:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gooddata.com; s=google; t=1711356276; x=1711961076; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+AQnc+S8eeewHWVi7q229L+fZxCbZfHJQPdr0bWKRFA=;
-        b=EMN1gPyj3HLA0NFJ77dIOn39zfK9STgDgxUjpl06x9zA+PhdZ9zvr5Ys2KJGzUA/+t
-         h86/r1E71EvkidFmppQWz+KkRaoR/CJTw40rHCF3m4vMCqExLSw4ULT8CX5SYvZqoprj
-         V1YFiEMACEAa+hx9+6PxWcXWQKiO2f5eMFhu0=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711356276; x=1711961076;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+AQnc+S8eeewHWVi7q229L+fZxCbZfHJQPdr0bWKRFA=;
-        b=IhUDIRkQoQ1R8WxgKxgNZiQMaXQGEIVwPa8sf4jPM6g5+DtDHP8Vk0gbooga9QcTQE
-         pxpe45EhbeNK262b81v8Abn1ep0aW6xOJfP8VZs2A9uLOaON7cCBkR42GbyaJW/epbK3
-         pjl2EMJEDhVb2SAbPJhDT/R+HFtCanxIIcn5Aa3pdCzobMUsiGFGhbfnXeCoTAKkuNyN
-         lD5XsGRK4+ek9numjX/DvAbihdkIyruByeZjObSqNZghzHWNxBDnLQJU9Eo0RB6Q0M9f
-         HR8Qws9eCB7kE5Vw6BddhjvRtrq80U1PFFT0DFCbGAe+TYy09BIIJrFPq3qksLGw0r2s
-         BxPw==
-X-Forwarded-Encrypted: i=1; AJvYcCVqdElfFUeklYw/sPKAWuMOyKE4TW4Ms2NS+t5aFTF2KHIp35EapQQAHzZ/Z0VNZIcGAQB3i2yfc+8bQyBIDLGXaoOAzqFB
-X-Gm-Message-State: AOJu0Yx9wYUU81CMsxKm0P7+18C0yRo1hb1Bv4wsN6Lf7gfzqapVADwz
-	od2HTvcEehy34fFOLT0PBJrqb9XDbhsNTamgr1S4/oR20lmXu93kb/0S6IyzkRzbf88ug2DLEwg
-	f96l0c67INTxDIOSbFdJK4MocgbTittEYsvsj
-X-Google-Smtp-Source: AGHT+IHpPljUYvS/v6zIPdlCSCskC5KA1wMk0ygWW04BfrfXUTs4QbWjBPvQqYu8FjNfMaTN+Ytdl3l03Fm/KfIPCY0=
-X-Received: by 2002:a2e:b176:0:b0:2d4:9334:3c11 with SMTP id
- a22-20020a2eb176000000b002d493343c11mr1669978ljm.16.1711356275855; Mon, 25
- Mar 2024 01:44:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D4FC13CF90;
+	Mon, 25 Mar 2024 09:07:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.17.118
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711357677; cv=fail; b=iKrMOvumAkHXiGq0DDSz99G64QiJ0934JfqJM943WPJfF3T5zixxyc0s8CjQBxl8XwnXu/4GAfslkI751XxZlUixPsUSKEWuQJZVVvdvKr4wUoegEM/LO3Or1NqKjvprSurSmC2zUlpo9DcWEKwdzf2acFjKJ3A+yK2vziMBPXQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711357677; c=relaxed/simple;
+	bh=HvRZu9GWHkNDIFzZ6rE7MX4IMloh5vG1SChEJ9K9zHQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=VhxPfiCi8PbqzSpGl0VXPgta543Lm22zK6wf416YALvzs96S5+0GB0+UepA4ousZuwubEXNwUjtIBM0cwQDGtlHzbKuOkMIy0UtOQcBcpG3Psuv8Vns6ri8noRnGG2eS30H+gMjpvWON1aIjhfPAMtsta6XZBiDgSWDKXP+Ldiw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.17.118
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lfmpQ24HzNgd2TbMgwYdnB7kwJR5/a1jnVOOCTC/fmmZ7Ug+47I6Mla/vqfwOWG7sLXj/JWVT8aRzba7kWxjBDR6XPluUnG6JZ4fV6D8rytL4At5ajN02wPqEGmFScBBjJ+lfI2ozzxL+UFZ47Ze0Q9wWZMkYIy0bOCRPAHTVnDIw8rFJkHvl31Rv/eeELyE3YwGXB22VhYPnUbA7M2Yjab4KxHlUAv3jrWNY8Gu4jMN+oU/cu6Iy4Ci8NJhX+ucJmFApEK+ZF6sjSLyHwe0kiMY/1l7V4Ibb/h4IQ+LUcsdjd1ZAJuZjMkt5EKvLNtIBne9DMxJZY5IsO9Chbj0nQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0J47Q3jp5Re6g+8vMEL4EKbZu+hQ5TgZHgD0P7xUT9I=;
+ b=KNcVfFdUW+++MZw08XvVEWkmQ8uhijXA4p8zPb8T8hitVlIqGdXiHvCCBlZw09NWz6PbQSXAays4t9mTM/DbtVGzt0fJQBBhLZJITDBSk5JqdCyokcJq94dWds0b6nk0/y+tZ+DBAU2drIXFOxvPiOadFuBwWgvXnnclIfBTiY+UvLNcxktaHOnVVPYpE3fhkTM+XJaACTm8WVVOklfkZUPZA/JhcxVrW5sQH3Q3dfEUhQi4vW2S6+lvlfCRuPCc8aVuSFQNh6kLtQ6HyiYOEI5rNetpMmS0Z3+/lBj9VR4Bk/+Vhq0QmQ51LLqdxNDiTAzhA9IZM6nOrVjbZAeTdQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
+Received: from BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c211:e::20) by BJSPR01MB0803.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c211:1f::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.26; Mon, 25 Mar
+ 2024 08:51:46 +0000
+Received: from BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn
+ ([fe80::d0cf:5e2e:fd40:4aef]) by
+ BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn ([fe80::d0cf:5e2e:fd40:4aef%4])
+ with mapi id 15.20.7409.028; Mon, 25 Mar 2024 08:51:46 +0000
+From: Tan Chun Hau <chunhau.tan@starfivetech.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Simon Horman <horms@kernel.org>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
+	Russell King <rmk+kernel@armlinux.org.uk>
+Cc: Ley Foon Tan <leyfoon.tan@starfivetech.com>,
+	Jee Heng Sia <jeeheng.sia@starfivetech.com>,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org
+Subject: [PATCH v3 0/1] Add StarFive JH8100 dwmac support
+Date: Mon, 25 Mar 2024 01:51:30 -0700
+Message-Id: <20240325085131.182657-1-chunhau.tan@starfivetech.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SHXPR01CA0005.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c311:1b::14) To BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c211:e::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CA+9S74hbTMxckB=HgRiqL6b8ChZMQfJ6-K9y_GQ0ZDiWkev_vA@mail.gmail.com>
- <20240319131207.GB1096131@fedora> <CA+9S74jMBbgrxaH2Nit50uDQsHES+e+VHnOXkxnq2TrUFtAQRA@mail.gmail.com>
- <CACGkMEvX2R+wKcH5V45Yd6CkgGhADVbpvfmWsHducN2zCS=OKw@mail.gmail.com>
- <CA+9S74g5fR=hBxWk1U2TyvW1uPmU3XgJnjw4Owov8LNwLiiOZw@mail.gmail.com>
- <CACGkMEt4MbyDgdqDGUqQ+0gV-1kmp6CWASDgwMpZnRU8dfPd2Q@mail.gmail.com>
- <CA+9S74hUt_aZCrgN3Yx9Y2OZtwHNan7gmbBa1TzBafW6=YLULQ@mail.gmail.com> <CA+9S74ia-vUag2QMo6zFL7r+wZyOZVmcpe317RdMbK-rpomn+Q@mail.gmail.com>
-In-Reply-To: <CA+9S74ia-vUag2QMo6zFL7r+wZyOZVmcpe317RdMbK-rpomn+Q@mail.gmail.com>
-From: Igor Raits <igor@gooddata.com>
-Date: Mon, 25 Mar 2024 09:44:23 +0100
-Message-ID: <CA+9S74hs_1Ft9iyXOPU_vF_EFKuoG8LjDpSna0QSPMFnMywd_g@mail.gmail.com>
-Subject: Re: REGRESSION: RIP: 0010:skb_release_data+0xb8/0x1e0 in vhost/tun
-To: Jason Wang <jasowang@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	Stefano Garzarella <sgarzare@redhat.com>, Jaroslav Pulchart <jaroslav.pulchart@gooddata.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BJSPR01MB0595:EE_|BJSPR01MB0803:EE_
+X-MS-Office365-Filtering-Correlation-Id: 32a5f5b2-879b-4fc0-c408-08dc4ca8cd20
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	B2kyz0U39qYAn7EdaF41a8kCghd8cDh9oLzgkNlbOZvmYASqRGwsQk4C9qAeEANFyWA+kf6ClNVowIKEzu4xwNg7UqeMYrFsn95FS6LO4wurGmaniFgiK3NAQEmXvQz45g2d+7A6SETDMC0tT3cLYK0C8TNQLwgEka5yTUBj2JZk+kFlovcaZfeToRAdGuGG620obUNf1j0L8d3yoH/yW79IlxcMqzeILUWfqAuelh8F+VoLfcWIRAEQlYtF5xgAvtWCcB06Igl3v0sg640CTqste7gb4SnYOtB2jt62tAOWqjGzziXgo80NsxrDbhLW9QNHm2dUJS0JmL6IXtZYPksqVP7XogX8e7mHjN68XxfwUeUubK1vRgaly7Qv5PqbC2xrFMkl9pccp1/Zs0nSPEiRdOtHULWF8ElUmqWThWVLKDjOVMVtelMDenbtHB/tEf6rkjxGWJy733QbVXXkGRAOalO0VE717DUXc/i3lNbx2zbuMa6riwQpfwBMbd7cJ0kYjYUcy+crZasg4fQBwve4cwgUDGn6EmYnSV28P3EAtKxQokhlPKj+bofTA8hXcgBT2e0Bu+CdQxFuKtSjY5o+xFvBYVzjd9F0a1CHZKVQY3XOIt1dhgZRDA6/lobsfiNogWb9Q85wKxy81QdRbA==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230031)(1800799015)(52116005)(366007)(7416005)(41320700004)(38350700005)(921011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?I84mOhAp95TlYALKem08z5lsOObH/ZJaZwdpZyQkz77sJ5Fg/RcGteW/6HN2?=
+ =?us-ascii?Q?GaLmkiqDO7WqL5ooEzzz4G8Aj+ZZbeWss7vIQLaoyHcB2Ff2fNQIb2BItCFM?=
+ =?us-ascii?Q?IHvop6XnEJjhZA1PRhrn+4360MTGOoDY+nc+VzsvGQMXQjdVdM9Dk3MNav7D?=
+ =?us-ascii?Q?eptIs5LusjpMGRBHWZP7R9EqHvkaG+xDM4tFEr7VmpCIPghvI1VXmCdd5mmv?=
+ =?us-ascii?Q?5yrrEOvKYP815Ejx/qoJH2rKXDC9aQWRpeShfPneVeu470jkGmBBwFg0vFHV?=
+ =?us-ascii?Q?PgxbgpdFwHAHyKw9IEPShSAHV75c1tK7OE9jE/jls+mvrumdfBfNUqh2vlYw?=
+ =?us-ascii?Q?HJPrdtmDO6IJuB9fn35vxnMK0VSH0Is6hohFSZT+JDh79WmSVnt5Hir3PN3X?=
+ =?us-ascii?Q?7RrMGFhynmEKkZ142IUxV8JRQORlk+1ivJ8OMfoeUdipvyloO53r6JH5OkEL?=
+ =?us-ascii?Q?tSzvwxpdpyHax62X9bYHF/K6y0smticveJQtkUlK+u+Jd4r5TIFrVWkHjDV1?=
+ =?us-ascii?Q?BxXK+pI53FijSTzWzckc3UEdJY80F0MuvbpBxnHWnyCGNEUq+O41toNKvg5E?=
+ =?us-ascii?Q?x4jAb/wpu24ByTYDFHZ1SzpoI4O253hihg+oKKjoiRerq4nqcx2xWRjtVLuN?=
+ =?us-ascii?Q?ephL4D3Yuz5rEHEeQp7cwaq9K6RiymPlk7o3C2jUvaSRRRP7VhMMs7uzHpJr?=
+ =?us-ascii?Q?/IBXj+lLWWmLUebEj4YR9ZRobnRXKPG4XQpCpVOKIJFVgZ5gYcsmNOPShAuK?=
+ =?us-ascii?Q?GGJsvQpHhF84E1qEh4hPSOMJAwXq2pFIYr4aeFUYwVc+VG3ICCCIrdD/yY8i?=
+ =?us-ascii?Q?aRYhrTSxfF60ZQgeTJlix+X2lAdmBISAs556Y9Cxbm94tTyo0Se5ssGPSEpv?=
+ =?us-ascii?Q?gND2WNHC7sSZrSiwUafR3U0PtzcEiHsomUC6FTAEk3JMNKmp3oVpvnB7WD/X?=
+ =?us-ascii?Q?uLM/OdR5SVleLYDWRXjXPmkmSywjkFQdsPvpw15Pz4gQs+Wa2xCVIsmEQObU?=
+ =?us-ascii?Q?GhZZkbuRzb7/i1YilwVKMHX7i7AUDlheouIAc67LyZqebt2SMzhqSGXSH9WX?=
+ =?us-ascii?Q?TJJCVawryEb+mwiLsyvx5Wt74Ka0BwSIljRLnu87W15Vr8aM+lFobOGEtsEM?=
+ =?us-ascii?Q?zzbcSpmiRcpx6sEEi6Iw8fYRUADaiWYLAXZ9fn1c4Na5HuMThfkPwI3iaS9V?=
+ =?us-ascii?Q?D7AMyxhw+AeY339+Hw9YcFfvWjsS7GVbPctcSxWEDzwOW4nNvPtetjBf7wvm?=
+ =?us-ascii?Q?bqehHXuXSrxzz3nute6IEP4wFvqAR7qm2WtlO+JKm/SUv8IAVFnvADIO+mWu?=
+ =?us-ascii?Q?QH3gtTYZLZGcm3bYTxBpFF1FYnizmf9Wk9oox/eSkAmqAhIWbPgA74lfVgVW?=
+ =?us-ascii?Q?Q9KeNndn3Wt/RMbJMrYhNBLlbek8T7vg3hjc5koYfN91SSstRGZduH1SLK3O?=
+ =?us-ascii?Q?A06u3RNdEOx440SiXgs/e879yEpJZvl70LhkQdH9hUQJN3pcbQMOhzYLrAWd?=
+ =?us-ascii?Q?73Ld+0ROF7HxY4YOFtsxUYtBBM1CUiOkfRzxtNycPAUYcMqcXajy9es21yG2?=
+ =?us-ascii?Q?JCeVJJHANAmKnwL1jPv8c0uD6WgYPAbBRSJ5vmYqffxnAYts3qYtefE2eZmM?=
+ =?us-ascii?Q?lQ=3D=3D?=
+X-OriginatorOrg: starfivetech.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 32a5f5b2-879b-4fc0-c408-08dc4ca8cd20
+X-MS-Exchange-CrossTenant-AuthSource: BJSPR01MB0595.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Mar 2024 08:51:46.2132
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: o5vlzxmuPu6G36occYdkrh2hQV92yFHBbW3cBkswbwjt7fMDlcwZKQwvzZyJ53g5o2UIz5jq4RAMRjc0tlzfQCxpSN7jUaxZN4py4uroTGo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BJSPR01MB0803
 
-Hello,
+Add StarFive JH8100 dwmac support.
+The JH8100 dwmac shares the same driver code as the JH7110 dwmac
+and has only one reset signal.
+    
+Please refer to below:
+    
+  JH8100: reset-names = "stmmaceth";
+  JH7110: reset-names = "stmmaceth", "ahb";
+  JH7100: reset-names = "ahb";
+    
+Example usage of JH8100 in the device tree:
+    
+gmac0: ethernet@16030000 {
+        compatible = "starfive,jh8100-dwmac",
+                     "starfive,jh7110-dwmac",
+                     "snps,dwmac-5.20";
+        ...
+};
 
-On Fri, Mar 22, 2024 at 12:19=E2=80=AFPM Igor Raits <igor@gooddata.com> wro=
-te:
->
-> Hi Jason,
->
-> On Fri, Mar 22, 2024 at 9:39=E2=80=AFAM Igor Raits <igor@gooddata.com> wr=
-ote:
-> >
-> > Hi Jason,
-> >
-> > On Fri, Mar 22, 2024 at 6:31=E2=80=AFAM Jason Wang <jasowang@redhat.com=
-> wrote:
-> > >
-> > > On Thu, Mar 21, 2024 at 5:44=E2=80=AFPM Igor Raits <igor@gooddata.com=
-> wrote:
-> > > >
-> > > > Hello Jason & others,
-> > > >
-> > > > On Wed, Mar 20, 2024 at 10:33=E2=80=AFAM Jason Wang <jasowang@redha=
-t.com> wrote:
-> > > > >
-> > > > > On Tue, Mar 19, 2024 at 9:15=E2=80=AFPM Igor Raits <igor@gooddata=
-.com> wrote:
-> > > > > >
-> > > > > > Hello Stefan,
-> > > > > >
-> > > > > > On Tue, Mar 19, 2024 at 2:12=E2=80=AFPM Stefan Hajnoczi <stefan=
-ha@redhat.com> wrote:
-> > > > > > >
-> > > > > > > On Tue, Mar 19, 2024 at 10:00:08AM +0100, Igor Raits wrote:
-> > > > > > > > Hello,
-> > > > > > > >
-> > > > > > > > We have started to observe kernel crashes on 6.7.y kernels =
-(atm we
-> > > > > > > > have hit the issue 5 times on 6.7.5 and 6.7.10). On 6.6.9 w=
-here we
-> > > > > > > > have nodes of cluster it looks stable. Please see stacktrac=
-e below. If
-> > > > > > > > you need more information please let me know.
-> > > > > > > >
-> > > > > > > > We do not have a consistent reproducer but when we put some=
- bigger
-> > > > > > > > network load on a VM, the hypervisor's kernel crashes.
-> > > > > > > >
-> > > > > > > > Help is much appreciated! We are happy to test any patches.
-> > > > > > >
-> > > > > > > CCing Michael Tsirkin and Jason Wang for vhost_net.
-> > > > > > >
-> > > > > > > >
-> > > > > > > > [62254.167584] stack segment: 0000 [#1] PREEMPT SMP NOPTI
-> > > > > > > > [62254.173450] CPU: 63 PID: 11939 Comm: vhost-11890 Tainted=
-: G
-> > > > > > > >    E      6.7.10-1.gdc.el9.x86_64 #1
-> > > > > > >
-> > > > > > > Are there any patches in this kernel?
-> > > > > >
-> > > > > > Only one, unrelated to this part. Removal of pr_err("EEVDF sche=
-duling
-> > > > > > fail, picking leftmost\n"); line (reported somewhere few months=
- ago
-> > > > > > and it was suggested workaround until proper solution comes).
-> > > > >
-> > > > > Btw, a bisection would help as well.
-> > > >
-> > > > In the end it seems like we don't really have "stable" setup, so
-> > > > bisection looks to be useless but we did find few things meantime:
-> > > >
-> > > > 1. On 6.6.9 it crashes either with unexpected GSO type or usercopy:
-> > > > Kernel memory exposure attempt detected from SLUB object
-> > > > 'skbuff_head_cache'
-> > >
-> > > Do you have a full calltrace for this?
-> >
-> > I have shared it in one of the messages in this thread.
-> > https://marc.info/?l=3Dlinux-virtualization&m=3D171085443512001&w=3D2
-> >
-> > > > 2. On 6.7.5, 6.7.10 and 6.8.1 it crashes with RIP:
-> > > > 0010:skb_release_data+0xb8/0x1e0
-> > >
-> > > And for this?
-> >
-> > https://marc.info/?l=3Dlinux-netdev&m=3D171083870801761&w=3D2
-> >
-> > > > 3. It does NOT crash on 6.8.1 when VM does not have multi-queue set=
-up
-> > > >
-> > > > Looks like the multi-queue setup (we have 2 interfaces =C3=97 3 vir=
-tio
-> > > > queues for each) is causing problems as if we set only one queue fo=
-r
-> > > > each interface the issue is gone.
-> > > > Maybe there is some race condition in __pfx_vhost_task_fn+0x10/0x10=
- or
-> > > > somewhere around?
-> > >
-> > > I can't tell now, but it seems not because if we have 3 queue pairs w=
-e
-> > > will have 3 vhost threads.
-> > >
-> > > > We have noticed that there are 3 of such functions
-> > > > in the stacktrace that gave us hints about what we could try=E2=80=
-=A6
-> > >
-> > > Let's try to enable SLUB_DEBUG and KASAN to see if we can get
-> > > something interesting.
-> >
-> > We were able to reproduce it even with 1 vhost queue... And now we
-> > have slub_debug + kasan so I hopefully have more useful data for you
-> > now.
-> > I have attached it for better readability.
->
-> Looks like we have found a "stable" kernel and that is 6.1.32. The
-> 6.3.y is broken and we are testing 6.2.y now.
-> My guess it would be related to virtio/vsock: replace virtio_vsock_pkt
-> with sk_buff that was done around that time but we are going to test,
-> bisect and let you know more.
+[1] https://lore.kernel.org/lkml/20231222101001.2541758-2-cristian.ciocaltea@collabora.com
 
-So we have been trying to bisect it but it is basically impossible for
-us to do so as the ICE driver was quite broken for most of the release
-cycle so we have no networking on 99% of the builds and we can't test
-such a setup.
-More specifically, the bug was introduced between 6.2 and 6.3 but we
-could not get much further. The last good commit we were able to test
-was f18f9845f2f10d3d1fc63e4ad16ee52d2d9292fa and then after 20 commits
-where we had no networking we gave up.
+Changes in v3:
+- Postpone until the patch [1] is merged.
+- Reorganize the content to accommodate all compatibility specifications.
 
-If you have some suspicious commit(s) we could revert - happy to test.
+Tan Chun Hau (1):
+  dt-bindings: net: starfive,jh7110-dwmac: Add StarFive JH8100 support
 
-Thanks again.
+ .../devicetree/bindings/net/snps,dwmac.yaml   |  1 +
+ .../bindings/net/starfive,jh7110-dwmac.yaml   | 82 +++++++++++++------
+ 2 files changed, 58 insertions(+), 25 deletions(-)
+
+-- 
+2.25.1
+
 
