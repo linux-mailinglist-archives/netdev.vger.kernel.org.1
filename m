@@ -1,228 +1,159 @@
-Return-Path: <netdev+bounces-81714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12E3588AE12
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 19:25:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4589888AE3B
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 19:29:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9450B1F6423C
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 18:25:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4291332808C
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 18:29:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC4F142E9B;
-	Mon, 25 Mar 2024 17:53:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C4886639;
+	Mon, 25 Mar 2024 17:59:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RnWX/esq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fftc+ZYk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D238F13FD65;
-	Mon, 25 Mar 2024 17:53:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37B4358109;
+	Mon, 25 Mar 2024 17:59:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711389200; cv=none; b=vFXrKpXBgKENRwenbj5tOhzKYTOJtOCeNaLnpiKq3ygpWk7i1txMn48Z4Turin+CU+3GKlb96c/dcG12vvwEwFzabiTWw09kBIx3XtLP5ME+C2ZU4vsXajG7TZmoyRd5jwKpg6gdrlCWpdfjkELSQDNP/E85jtKc6BbmwCoT1Nk=
+	t=1711389584; cv=none; b=k8MILfWEPXJElGPYSJTA9MIbUT1csKgGk7VL4YFeguCcWDw7Z2NHdoVcABzTXJxQewkzGgwU0WSxZzF6wNpBVORiIAhk5q+ZZXawEL59HcEp5fJ1C9s4gn1irXD3VlLitlWDmoe7YbFBSnz1hcH0i4E+HK1FPFK1P3qNuWiYQ54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711389200; c=relaxed/simple;
-	bh=d44to29QxAZRss/vImP1cjs/5S7S45VoMwPRc5E6CzI=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=eonAU2ogD2HF8aHVFSYNo6+SsGsZNNDpfKyaI4pAPEaR+Q9YrrUS2Fd7vnNNDkjLKXuSJHg1QtLRJuDEWJ4wHKlsiGP6bMF61NGZOQiLo6iuMAw4MN0FILtoN70WY6vx17r0Vwyv40tH+SHFqR29WZnJgXT7Q20hZm8G0AHpVvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RnWX/esq; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-1dffa5e3f2dso28792575ad.2;
-        Mon, 25 Mar 2024 10:53:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711389198; x=1711993998; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e1SpZkZqM4zlQDRKNVTJpf19d/YZRyK65cuIsSmn1gc=;
-        b=RnWX/esq4t42NjM6G2nj+GFHvzZDPGgNvDv1Z9K8QzxkOKmJch/ZDGinyU+4dibZ10
-         gDxf+8XWkwp52srS6DJKP5bdZGIQGIRuCX3GmXpNF0lye32gFXgfHQEjKHu7oZ8ZshUr
-         gqS9x+tAEs49ZIIqZVIj1YHSnpPKnTmI8sfImGIy+eDmx+VxbV7langEkjfuJSA7lb99
-         D7msJPfYxzCQ9liAoh0+ak/pYDjs8TtSL9PYMqueNeVcJb3dA/K/KIjyfD6VELFUmlhE
-         diSmRyZi+OISw7Thx7iieAwwLBMOZfPAc9+EzTYfeYUdyQlddodTA/0fYuwL0haH0xTc
-         56xg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711389198; x=1711993998;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:sender:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=e1SpZkZqM4zlQDRKNVTJpf19d/YZRyK65cuIsSmn1gc=;
-        b=QSAj7mRoRgq5tZPssTFljwc39UlKRgA61SWajh3/eEZHqDruRrlofnljbRU2GPN8ZX
-         /lEc+M6r30mhV+o+1pbnj3v50RzTfXTcZVRd40lA1MZZynF6ORsyySRvP/IuCe+3Zzvg
-         gX9iPtzo/pLY/OpcxZr236qEzOBJwbHvAZndqO8X/TAHo67nsd7C/+5Z1FYs2pnh9zbU
-         cpWpWSYKvVXxijvoupUiMiPKof4bzlIsF6dTTQ9cr5Cz42QcTjp48w3tMt/YLu95RWkq
-         MdAEQv+sFKRMLHZ+U78QTqnNY5QfEkoF/jS1D6kTlLzyLIHMiHy0N46+Q1B88tnRxl8M
-         L6ow==
-X-Forwarded-Encrypted: i=1; AJvYcCUXhdXEHqqKgOmIhn73qZ0aozdXcJ/T9iQ8i75xsHTou0FFrA/zmliZRf469BVBIe/YYqXha18YGxnD/8mAN83MAItOo0s2Q/3yhKRPFrv5oyDA3G1IceBx/F5Qlrh75wMMdHVhUYPbZlVgTvl6ocnl+PaeqB85XEDfdLxJzhnm2t2LHCY3xavksPVWIX4g8JNTNkdc3aorMDFKFFTt7p2uLlrJDMsBZDEE6lVR0GW/qMd76dG3soTtK6BfG15anj2khtZ5a9d7xiqsbe+79fRylSFBaTp291ATFwdPlaLKOiYHyO0RQUksVomw5NAe7A==
-X-Gm-Message-State: AOJu0Yzqb+GHdADRWe+OPcPY1PDY5fSOm9gc/keOSZjN/SZDO0OQX8QG
-	t/qx4ak8FttAYnnSODyyHfwReho7anceU6nQJH4Rz7CnFN8kFrMYZYhzO53v
-X-Google-Smtp-Source: AGHT+IHTc79fOqkfgWwaBqDmxHsREbiE6llQARC+UmxA2cQTIolFyUfUQoa6sVIdjGwuI2KMb1NDoA==
-X-Received: by 2002:a17:903:2301:b0:1e0:b5ef:91b with SMTP id d1-20020a170903230100b001e0b5ef091bmr4565322plh.50.1711389197737;
-        Mon, 25 Mar 2024 10:53:17 -0700 (PDT)
-Received: from server.roeck-us.net ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id q8-20020a170902b10800b001e00d9680cesm4933234plr.130.2024.03.25.10.53.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Mar 2024 10:53:17 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-From: Guenter Roeck <linux@roeck-us.net>
-To: linux-kselftest@vger.kernel.org
-Cc: David Airlie <airlied@gmail.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	=?UTF-8?q?Ma=C3=ADra=20Canal?= <mcanal@igalia.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Kees Cook <keescook@chromium.org>,
-	Daniel Diaz <daniel.diaz@linaro.org>,
-	David Gow <davidgow@google.com>,
-	Arthur Grillo <arthurgrillo@riseup.net>,
-	Brendan Higgins <brendan.higgins@linux.dev>,
-	Naresh Kamboju <naresh.kamboju@linaro.org>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Maxime Ripard <mripard@kernel.org>,
-	=?UTF-8?q?Ville=20Syrj=C3=A4l=C3=A4?= <ville.syrjala@linux.intel.com>,
-	Daniel Vetter <daniel@ffwll.ch>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	dri-devel@lists.freedesktop.org,
-	kunit-dev@googlegroups.com,
-	linux-arch@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-parisc@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-riscv@lists.infradead.org,
-	linux-s390@vger.kernel.org,
-	linux-sh@vger.kernel.org,
-	loongarch@lists.linux.dev,
-	netdev@vger.kernel.org,
-	Guenter Roeck <linux@roeck-us.net>,
-	Linux Kernel Functional Testing <lkft@linaro.org>
-Subject: [PATCH v2 14/14] powerpc: Add support for suppressing warning backtraces
-Date: Mon, 25 Mar 2024 10:52:48 -0700
-Message-Id: <20240325175248.1499046-15-linux@roeck-us.net>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240325175248.1499046-1-linux@roeck-us.net>
-References: <20240325175248.1499046-1-linux@roeck-us.net>
+	s=arc-20240116; t=1711389584; c=relaxed/simple;
+	bh=wXPwR8AWQ/l5POkeyRm4pjnxElVQugxHc5xn97XdOt8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=mwSWCal1ciRKVbKK1fL+kXJeF/cgGfRZHGrVsDw1g6YRjBYR6QH05A5jE/xYsoUk1gDVeDiQGNP0RiLH2/kn8mwCVE08GtOxxAS9suifmW/w7oxKZ2zf9RcVPrmkvWZQTwXNfWKr/LcImQKuNtL+DKqFdfH9giZUWKnvt/dGViA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fftc+ZYk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BB4DC433C7;
+	Mon, 25 Mar 2024 17:59:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711389583;
+	bh=wXPwR8AWQ/l5POkeyRm4pjnxElVQugxHc5xn97XdOt8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=fftc+ZYkkbAwFHlbCa37SyMisbtr/6H45opy0Mf+j5xkS4yQN6nnqvgzKIwN5cMkS
+	 JGU7aXj8A44g1kqohrtMvyr8BQtkUKYBcOayA6qCJgtTMwTf/kelwo9pOgN/8QnLsu
+	 UIE6DWfAS1/sVyHXWVKOrMu+RyfOd97ka0hzS3t6wyaEXAFGZi62fjzM3UJynqbbgU
+	 H0lYPyz92L3C3sMx1f4eQH4DhoUNr+56b45xuwEGRsR2xenSlkm1nQPE1Iz9puf+bD
+	 H1LGwlI9nP2qDWP/0zv6RAwWAEhOMg0Ubz9A62rXnjwgOVqq9DoYLXgjg373B75r7y
+	 KgU8mvhg/2W5A==
+Date: Mon, 25 Mar 2024 12:59:41 -0500
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Damien Le Moal <dlemoal@kernel.org>
+Cc: linux-pci@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+	Manivannan Sadhasivami <manivannan.sadhasivam@linaro.org>,
+	linux-scsi@vger.kernel.org,
+	"Martin K . Petersen" <martin.petersen@oracle.com>,
+	Jaroslav Kysela <perex@perex.cz>, linux-sound@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-usb@vger.kernel.org, linux-serial@vger.kernel.org,
+	Hans de Goede <hdegoede@redhat.com>,
+	platform-driver-x86@vger.kernel.org, ntb@lists.linux.dev,
+	Lee Jones <lee@kernel.org>, David Airlie <airlied@gmail.com>,
+	amd-gfx@lists.freedesktop.org, Jason Gunthorpe <jgg@ziepe.ca>,
+	linux-rdma@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 00/28] Remove PCI_IRQ_LEGACY
+Message-ID: <20240325175941.GA1443646@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240325070944.3600338-1-dlemoal@kernel.org>
 
-Add name of functions triggering warning backtraces to the __bug_table
-object section to enable support for suppressing WARNING backtraces.
+On Mon, Mar 25, 2024 at 04:09:11PM +0900, Damien Le Moal wrote:
+> This patch series removes the use of the depracated PCI_IRQ_LEGACY macro
+> and replace it with PCI_IRQ_INTX. No functional change.
+> 
+> Damien Le Moal (28):
+>   PCI: msi: Use PCI_IRQ_INTX
+>   PCI: portdrv: Use PCI_IRQ_INTX
+>   PCI: documentation: Use PCI_IRQ_INTX
+>   sound: intel: Use PCI_IRQ_INTX
+>   usb: hcd-pci: Use PCI_IRQ_INTX
+>   tty: 8250_pci: Use PCI_IRQ_INTX
+>   platform: intel_ips: Use PCI_IRQ_INTX
+>   ntb: Use PCI_IRQ_INTX
+>   mfd: intel-lpss-pci: Use PCI_IRQ_INTX
+>   drm: amdgpu: Use PCI_IRQ_INTX
+>   infiniband: qib: Use PCI_IRQ_INTX
+>   infiniband: vmw_pvrdma: Use PCI_IRQ_INTX
+>   misc: vmci_guest: Use PCI_IRQ_ALL_TYPES
+>   net: xgbe: Use PCI_IRQ_INTX
+>   net: aquantia atlantic: Use PCI_IRQ_INTX
+>   net: atheros: alx: Use PCI_IRQ_INTX
+>   net: realtek: r8169: Use PCI_IRQ_INTX
+>   net: wangxun: Use PCI_IRQ_INTX
+>   net: wireless: ath10k: Use references to INTX instead of LEGACY
+>   net wireless; realtec: Use PCI_IRQ_INTX
+>   scsi: arcmsr: Use PCI_IRQ_INTX
+>   scsi: hpsa: Use PCI_IRQ_INTX
+>   scsi: ipr: Use PCI_IRQ_INTX
+>   scsi: megaraid: Use PCI_IRQ_INTX
+>   scsi: mpt3sas: Use PCI_IRQ_INTX
+>   scsi: pmcraid: Use PCI_IRQ_INTX
+>   scsi: vmw_pvscsi: Do not use PCI_IRQ_LEGACY
+>   PCI: Remove PCI_IRQ_LEGACY
+> 
+>  Documentation/PCI/msi-howto.rst               |  2 +-
+>  Documentation/PCI/pci.rst                     |  2 +-
+>  .../translations/zh_CN/PCI/msi-howto.rst      |  2 +-
+>  Documentation/translations/zh_CN/PCI/pci.rst  |  2 +-
+>  drivers/gpu/drm/amd/amdgpu/amdgpu_irq.c       |  2 +-
+>  drivers/infiniband/hw/qib/qib_iba7220.c       |  2 +-
+>  drivers/infiniband/hw/qib/qib_iba7322.c       |  5 ++-
+>  drivers/infiniband/hw/qib/qib_pcie.c          |  2 +-
+>  .../infiniband/hw/vmw_pvrdma/pvrdma_main.c    |  2 +-
+>  drivers/mfd/intel-lpss-pci.c                  |  2 +-
+>  drivers/misc/vmw_vmci/vmci_guest.c            |  3 +-
+>  drivers/net/ethernet/amd/xgbe/xgbe-pci.c      |  2 +-
+>  .../net/ethernet/aquantia/atlantic/aq_cfg.h   |  2 +-
+>  .../net/ethernet/aquantia/atlantic/aq_hw.h    |  2 +-
+>  .../net/ethernet/aquantia/atlantic/aq_nic.c   |  2 +-
+>  .../ethernet/aquantia/atlantic/aq_pci_func.c  |  9 ++---
+>  .../aquantia/atlantic/hw_atl/hw_atl_a0.c      |  2 +-
+>  .../aquantia/atlantic/hw_atl/hw_atl_b0.c      |  2 +-
+>  .../aquantia/atlantic/hw_atl2/hw_atl2.c       |  2 +-
+>  drivers/net/ethernet/atheros/alx/main.c       |  2 +-
+>  drivers/net/ethernet/realtek/r8169_main.c     |  2 +-
+>  drivers/net/ethernet/wangxun/libwx/wx_lib.c   |  8 ++---
+>  drivers/net/wireless/ath/ath10k/ahb.c         | 18 +++++-----
+>  drivers/net/wireless/ath/ath10k/pci.c         | 36 +++++++++----------
+>  drivers/net/wireless/ath/ath10k/pci.h         |  6 ++--
+>  drivers/net/wireless/realtek/rtw88/pci.c      |  2 +-
+>  drivers/net/wireless/realtek/rtw89/pci.c      |  2 +-
+>  drivers/ntb/hw/idt/ntb_hw_idt.c               |  2 +-
+>  drivers/pci/msi/api.c                         |  8 ++---
+>  drivers/pci/pcie/portdrv.c                    |  8 ++---
+>  drivers/platform/x86/intel_ips.c              |  2 +-
+>  drivers/scsi/arcmsr/arcmsr_hba.c              |  2 +-
+>  drivers/scsi/hpsa.c                           |  2 +-
+>  drivers/scsi/ipr.c                            |  2 +-
+>  drivers/scsi/megaraid/megaraid_sas_base.c     |  4 +--
+>  drivers/scsi/mpt3sas/mpt3sas_base.c           |  2 +-
+>  drivers/scsi/pmcraid.c                        |  2 +-
+>  drivers/scsi/vmw_pvscsi.c                     |  2 +-
+>  drivers/tty/serial/8250/8250_pci.c            |  2 +-
+>  drivers/usb/core/hcd-pci.c                    |  3 +-
+>  include/linux/pci.h                           |  7 ++--
+>  sound/soc/intel/avs/core.c                    |  2 +-
+>  42 files changed, 84 insertions(+), 91 deletions(-)
 
-To limit image size impact, the pointer to the function name is only added
-to the __bug_table section if both CONFIG_KUNIT_SUPPRESS_BACKTRACE and
-CONFIG_DEBUG_BUGVERBOSE are enabled. Otherwise, the __func__ assembly
-parameter is replaced with a (dummy) NULL parameter to avoid an image size
-increase due to unused __func__ entries (this is necessary because __func__
-is not a define but a virtual variable).
+I applied all these to pci/enumeration for v6.10, thanks!
 
-Tested-by: Linux Kernel Functional Testing <lkft@linaro.org>
-Acked-by: Dan Carpenter <dan.carpenter@linaro.org>
-Signed-off-by: Guenter Roeck <linux@roeck-us.net>
----
-- Rebased to v6.9-rc1
-- Added Tested-by:, Acked-by:, and Reviewed-by: tags
-- Introduced KUNIT_SUPPRESS_BACKTRACE configuration option
+I added acks and reviewed-by and will update if we receive more, and
+adjusted subject lines to add "... instead of PCI_IRQ_LEGACY" and in
+some cases to match history of the file.
 
- arch/powerpc/include/asm/bug.h | 37 +++++++++++++++++++++++++---------
- 1 file changed, 28 insertions(+), 9 deletions(-)
-
-diff --git a/arch/powerpc/include/asm/bug.h b/arch/powerpc/include/asm/bug.h
-index 1db485aacbd9..5b06745d20aa 100644
---- a/arch/powerpc/include/asm/bug.h
-+++ b/arch/powerpc/include/asm/bug.h
-@@ -14,6 +14,9 @@
- 	 .section __bug_table,"aw"
- 5001:	 .4byte \addr - .
- 	 .4byte 5002f - .
-+#ifdef CONFIG_KUNIT_SUPPRESS_BACKTRACE
-+	 .4byte 0
-+#endif
- 	 .short \line, \flags
- 	 .org 5001b+BUG_ENTRY_SIZE
- 	 .previous
-@@ -32,30 +35,46 @@
- #endif /* verbose */
- 
- #else /* !__ASSEMBLY__ */
--/* _EMIT_BUG_ENTRY expects args %0,%1,%2,%3 to be FILE, LINE, flags and
--   sizeof(struct bug_entry), respectively */
-+/* _EMIT_BUG_ENTRY expects args %0,%1,%2,%3,%4 to be FILE, __func__, LINE, flags
-+   and sizeof(struct bug_entry), respectively */
- #ifdef CONFIG_DEBUG_BUGVERBOSE
-+
-+#ifdef CONFIG_KUNIT_SUPPRESS_BACKTRACE
-+# define HAVE_BUG_FUNCTION
-+# define __BUG_FUNC_PTR	"	.4byte %1 - .\n"
-+#else
-+# define __BUG_FUNC_PTR
-+#endif /* CONFIG_KUNIT_SUPPRESS_BACKTRACE */
-+
- #define _EMIT_BUG_ENTRY				\
- 	".section __bug_table,\"aw\"\n"		\
- 	"2:	.4byte 1b - .\n"		\
- 	"	.4byte %0 - .\n"		\
--	"	.short %1, %2\n"		\
--	".org 2b+%3\n"				\
-+	__BUG_FUNC_PTR				\
-+	"	.short %2, %3\n"		\
-+	".org 2b+%4\n"				\
- 	".previous\n"
- #else
- #define _EMIT_BUG_ENTRY				\
- 	".section __bug_table,\"aw\"\n"		\
- 	"2:	.4byte 1b - .\n"		\
--	"	.short %2\n"			\
--	".org 2b+%3\n"				\
-+	"	.short %3\n"			\
-+	".org 2b+%4\n"				\
- 	".previous\n"
- #endif
- 
-+#ifdef HAVE_BUG_FUNCTION
-+# define __BUG_FUNC	__func__
-+#else
-+# define __BUG_FUNC	NULL
-+#endif
-+
- #define BUG_ENTRY(insn, flags, ...)			\
- 	__asm__ __volatile__(				\
- 		"1:	" insn "\n"			\
- 		_EMIT_BUG_ENTRY				\
--		: : "i" (__FILE__), "i" (__LINE__),	\
-+		: : "i" (__FILE__), "i" (__BUG_FUNC),	\
-+		  "i" (__LINE__),			\
- 		  "i" (flags),				\
- 		  "i" (sizeof(struct bug_entry)),	\
- 		  ##__VA_ARGS__)
-@@ -80,7 +99,7 @@
- 		if (x)						\
- 			BUG();					\
- 	} else {						\
--		BUG_ENTRY(PPC_TLNEI " %4, 0", 0, "r" ((__force long)(x)));	\
-+		BUG_ENTRY(PPC_TLNEI " %5, 0", 0, "r" ((__force long)(x)));	\
- 	}							\
- } while (0)
- 
-@@ -90,7 +109,7 @@
- 		if (__ret_warn_on)				\
- 			__WARN();				\
- 	} else {						\
--		BUG_ENTRY(PPC_TLNEI " %4, 0",			\
-+		BUG_ENTRY(PPC_TLNEI " %5, 0",			\
- 			  BUGFLAG_WARNING | BUGFLAG_TAINT(TAINT_WARN),	\
- 			  "r" (__ret_warn_on));	\
- 	}							\
--- 
-2.39.2
-
+Bjorn
 
