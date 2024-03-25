@@ -1,144 +1,172 @@
-Return-Path: <netdev+bounces-81784-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81785-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A91C588B5E5
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 01:17:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A9BA88B1D3
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 21:44:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85EA3B46FA8
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:42:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B609F1F3FF5B
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 20:44:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E1659B70;
-	Mon, 25 Mar 2024 20:42:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C125A103;
+	Mon, 25 Mar 2024 20:44:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kZSoDOZk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qj5rNkYi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f172.google.com (mail-vk1-f172.google.com [209.85.221.172])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDAEB59B7A;
-	Mon, 25 Mar 2024 20:42:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD7D12B79;
+	Mon, 25 Mar 2024 20:44:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711399343; cv=none; b=tQXnT8JfxYOZdPD8Ur7EHWksj5aNW+/aN2IFMWyv6Oxf6m2obivboowHfSYmbZY6fo9r9nYMg6JBJfvlXu3VDRjSiI9i7hZdc+9476Qf7vWZ5d4Xfw2yAN47lDFBnzExet/CIv7+qnfZGFt+yvPig/Qe0rNtQLwNY7OwKa9wx6Q=
+	t=1711399475; cv=none; b=Oum+dmedUTn653uKEjTjwIDopaNKM5K3NTQn/tKjRhVZWXdQccZyBMBBbSoAH42SHsADGvYc3msEeQFjgwlOVYfgif6gIEpRwsiln5yu3ulWXG7oPXw1ps7EK+PvMEZJ0n9NHPOC90M7ykKb3Cv3S8FTT+l2Eg+jTKJ65emgJ+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711399343; c=relaxed/simple;
-	bh=pC5vrAPVRrli7aVerpJXftZIlMpAFTi4jMQt7h4ZxrI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PzIWzUEP5zwlZyQF42YUGhhO9si1+UiG2iAdIjhMCdkUEw3dp6VkVPQY8TmIyqC25Fmjw2DN8RcsenDSxjLBr5LrPrc0/9QcGohA1VJaLub3orrCCEk+H8hJpVsDageo/GYZEOD4SzTciE/vBJfiUU+bE+vRD5HM9F2pQORJ7L8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kZSoDOZk; arc=none smtp.client-ip=209.85.221.172
+	s=arc-20240116; t=1711399475; c=relaxed/simple;
+	bh=MoV7yhMatg8/eoYWwtw5NdcTKS7f2GZYby6KdhglCDA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=t3XCV3pxqKtG13+SuMDhjhC2PIQQpod4MI/1ry4/9m7AccslZLI/hQ67VO/E/JuIBzyTKgoVgyTY6Bfa8R4nx8MX6xuqkdqadJ8ADeUcinoB4j5wFoLNukHtF9lQJ6zlWZSf8XeO0hPwEJMiMerZjPwgNn0VwMpygZFGZQAlhlY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qj5rNkYi; arc=none smtp.client-ip=209.85.208.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f172.google.com with SMTP id 71dfb90a1353d-4d436ab8a36so1718231e0c.0;
-        Mon, 25 Mar 2024 13:42:21 -0700 (PDT)
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56bdf81706aso4716416a12.2;
+        Mon, 25 Mar 2024 13:44:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711399341; x=1712004141; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pC5vrAPVRrli7aVerpJXftZIlMpAFTi4jMQt7h4ZxrI=;
-        b=kZSoDOZkCE2wiK8BJANGHbxXzk9AofnVNrgN1A191Ywsgnm7MFva3fnrq7cH4HCwPT
-         oPesowAik9GmqoUhvq/P39YEALAeLrsIi35WszYRj5yyb+QDWKRI1Mdm+6MyrCQO6WwY
-         CADlUArxfsRHAi1N6G66snQH3snQjTBQeUtKgujW1Sp4guez6bDy3HyHUWkl7XlRewBw
-         0yjbk7mP1vSSR/zKdJJAgpDhcqb9Db7f1FBCrjtdIIzvM7qdQUz7Te8qPyw9Z+6hHRQ4
-         kSlpSEfWroI0lYo4zdOLjfumFa/uJVo4WGHYpSRJN7iCUx+y3l9P9XZLAfytmjhoXF2x
-         Q/eA==
+        d=gmail.com; s=20230601; t=1711399471; x=1712004271; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=xXUk1zNC7cPK5fVOurLks4dzlHCRdkWyTT8V0Jfd+04=;
+        b=Qj5rNkYiNnhdq+POX/dB/QLdiTuOgkN8JQBXrodPvmgzezsAL8oD0MAwiuj2wmEGK2
+         FPKM+uHOGRSgXyYwILwa24JZ3zgrYjiHH94bmiCTKGdD5hOJbqu8edmODbDn1V/UknS8
+         AF9QHPYpV8JLknJBOurLD3S1kwpJLQ2vQvnfgRgXBWhvu7GBP5HZv+EGyRZBVl0le2zQ
+         0fUSPriOrBoZRYjKw9uM9UBmS7hO/gbuYT/kuajgnPleAmMJ/At9lh+V0DESXSXfsaBj
+         hdPDYimwUzki4kbzX89XX5DcrhqwEnTQC/DEUGkkrNky/qG1gZIYylfnPyfaWiOxaUZL
+         0HUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711399341; x=1712004141;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pC5vrAPVRrli7aVerpJXftZIlMpAFTi4jMQt7h4ZxrI=;
-        b=kb+BY6Itx7uVaONxwhlMl6LIHnnYixsXu86bWPGe1XJActEBIRwbiaSrylWDENDcJE
-         8hf8I3kF3nIM9zyBX1dBUv7nu1Xft8LXTljRxSb9+fnQPK+wC368j+FfVHgGe6ish6Ke
-         0tMd3xmSudscH+7JIqCZKThAnD53SWqkQxJEZ2WQ6wo1MPbTHV5DKWJoXbf+IlkY84DN
-         UK/9I+nfS6IQ2VewKvba5EPB6mdb9oOhkV7H75UCdUM2dvyG557LK+2tV/m5i2NsWyp/
-         1vKzcZs4L+Y9d/2gr7Gm8LvNNTTIRwErCxNgtCG2WALJjTzFQ+Jhfwx9OeKG97vs8LJp
-         RlWw==
-X-Forwarded-Encrypted: i=1; AJvYcCWdVXeXMrhTznQWAsbMsfZRTnri9mZfW3u+en6BYpER9JIzM9TuTw2B5r1ShkeUaoGvRmkyu7EDmhumaxOGsgPINALaJbCgpG3aeObqouRs/pl1H21k6M3Mxe43yHuWpU/gIJ3g
-X-Gm-Message-State: AOJu0YwCQHebOT9iGUkZ+NRkkUqHDPcley/bc6FWLQUKggiTHQ0x5pji
-	Su3hSxz4FKOOmEAH81k4sSINMu2tReZt0TvVFK9a+8WM+EAR7EfH069eVXYi9eJWtyZrOOCSi3/
-	ihYy1UgfIBrUxZ0/VgTfpfd3DcZI=
-X-Google-Smtp-Source: AGHT+IH7wuhgmBTWbyrg+4XcDEHdWND0NjDNLBpIvKN4mkdZZQN8XR1XJeS5EOpuSlmMzDRKFnCCBvt8g0qFPa8ecr0=
-X-Received: by 2002:a05:6122:1da0:b0:4d4:1340:df12 with SMTP id
- gg32-20020a0561221da000b004d41340df12mr6403898vkb.0.1711399339236; Mon, 25
- Mar 2024 13:42:19 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711399471; x=1712004271;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xXUk1zNC7cPK5fVOurLks4dzlHCRdkWyTT8V0Jfd+04=;
+        b=Mkd65BHazDb285hYXOnfMhG3vRze3Wu8QJ07jXaOQAm4Krmcc0k+CKaasN71uabdrp
+         0ASGgH1H8elXd2vONtI4icxx6eQeN7uLJK+Ufs09mAzhaD1jB/123PDnmoBHaf/9mcZ+
+         Lv1/NHAEvTqf9P7Lvp8HMDwG8s9pjdSJXmrs+H1hjdyNbEJliSyfpO1ncw8uuVjVkYE9
+         mwXhq/oSuZrray4RzQnf2ybS2oGgut6a8I1Ha+DwWui/pVmPx5yxyBC2L+is5n/lT8x1
+         FiD3OU5ReRfZeOV0+4PAKYKgaxX4x5vgMTZhLdtlWrXWIxT1tikus89Y7h8rqNsNetw4
+         YAvg==
+X-Forwarded-Encrypted: i=1; AJvYcCW32QkE9eyyIvL/A3FpZGyA1diY/bPWIxtZkW6yaO+pwGtQuh+b59nrhE6jqYXkozQWhS16OqPefRPBZJtY7gkdC2QNrAIOA31jefJE
+X-Gm-Message-State: AOJu0YxOU1ncA45CDTaaVjxb4RPBXXqw+SrztuIF6tYBHDsTCpHIx1bw
+	pcCr2I0++S/4mBMYjHdFCKM/T55ztGMHuNh/1d/CgzsoC1wbZLiTNMsrj/JaARA=
+X-Google-Smtp-Source: AGHT+IElP7YNWWXnX3JkfInzh/yUf1EjTeJOLIvUrgvNU4FDQbc05MN6pZVbbUBoiA/f1pDZGGYIvA==
+X-Received: by 2002:a50:d54b:0:b0:568:93f:36c6 with SMTP id f11-20020a50d54b000000b00568093f36c6mr5299441edj.22.1711399471083;
+        Mon, 25 Mar 2024 13:44:31 -0700 (PDT)
+Received: from WBEC325.dom.lan ([185.188.71.122])
+        by smtp.gmail.com with ESMTPSA id k18-20020a056402049200b0056c1cba8480sm591751edv.25.2024.03.25.13.44.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Mar 2024 13:44:30 -0700 (PDT)
+From: Pawel Dembicki <paweldembicki@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+	Simon Horman <horms@kernel.org>,
+	Pawel Dembicki <paweldembicki@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com,
+	Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v7 00/16] net: dsa: vsc73xx: Make vsc73xx usable
+Date: Mon, 25 Mar 2024 21:43:25 +0100
+Message-Id: <20240325204344.2298241-1-paweldembicki@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240301221641.159542-1-paweldembicki@gmail.com>
- <20240301221641.159542-8-paweldembicki@gmail.com> <20e792ad-33ce-43a6-8ed0-8db6e1a25c27@gmail.com>
- <20240308130929.4kgctmtzecbpajao@skbuf>
-In-Reply-To: <20240308130929.4kgctmtzecbpajao@skbuf>
-From: =?UTF-8?Q?Pawe=C5=82_Dembicki?= <paweldembicki@gmail.com>
-Date: Mon, 25 Mar 2024 21:42:07 +0100
-Message-ID: <CAJN1Kkw0ufQC0k9LdQCkdVN0+7SD+MM9aZxNxdFnKunC8+MvWA@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 07/16] net: dsa: vsc73xx: Add vlan filtering
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org, 
-	Linus Walleij <linus.walleij@linaro.org>, Simon Horman <horms@kernel.org>, 
-	Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Claudiu Manoil <claudiu.manoil@nxp.com>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	UNGLinuxDriver@microchip.com, Russell King <linux@armlinux.org.uk>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-pt., 8 mar 2024 o 14:09 Vladimir Oltean <olteanv@gmail.com> napisa=C5=82(a)=
-:
->
-> On Tue, Mar 05, 2024 at 03:51:11PM -0800, Florian Fainelli wrote:
-> > On 3/1/24 14:16, Pawel Dembicki wrote:
-> > > This patch implements VLAN filtering for the vsc73xx driver.
-> > >
-> > > After starting VLAN filtering, the switch is reconfigured from QinQ t=
-o
-> > > a simple VLAN aware mode. This is required because VSC73XX chips do n=
-ot
-> > > support inner VLAN tag filtering.
-> > >
-> > > Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
-> > > ---
-> >
-> > [snip]
-> >
-> > [snip]
-> >
-> > Have to admit the logic is a bit hard to follow, but that is also becau=
-se of
-> > my lack of understanding of the requirements surrounding the use of
-> > tag_8021q.
->
-> It's not only that. The code is also a bit hard on the brain for me.
->
-> An alternative coding pattern would be to observe that certain hardware
-> registers (the egress-untagged VLAN, the PVID) depend on a constellation
-> of N input variables (the bridge VLAN filtering state, the tag_8021q
-> active state, the bridge VLAN table). So, to make the code easier to
-> follow and to ensure correctness, in theory a central function could be
-> written, which embeds the same invariant logic of determining what to
-> program the registers with, depending on the N inputs. This invariant
-> function is called from every place that modifies any of the N inputs.
->
-> What Pawe=C5=82 did here was to have slightly different code paths for
-> modifying the hardware registers, each code path adjusted slightly on
-> the state change transition of individual inputs.
->
-> This was a design choice on which I commented very early on, stating
-> that it's unusual but that I can go along with it. It is probably very
-> ingrained with the choice of the untagged_storage[] and pvid_storage[]
-> arrays, the logic of swapping the storage with the hardware at VLAN
-> filtering state change, and thus very hard to change at this stage of
-> development.
+This patch series focuses on making vsc73xx usable.
 
-I have to admit that it wasn't an optimal implementation. I focused on
-the wrong priorities, which led me astray. I prepared v7 and I tried
-to maximize simplicity. I hope it will be more acceptable than the v6
-version.
+The first patch was added in v2; it switches from a poll loop to
+read_poll_timeout.
+
+The second patch is a simple conversion to phylink because adjust_link
+won't work anymore.
+
+The third patch is preparation for future use. Using the
+"phy_interface_mode_is_rgmii" macro allows for the proper recognition
+of all RGMII modes.
+
+Patches 4-5 involve some cleanup: The fourth patch introduces
+a definition with the maximum number of ports to avoid using
+magic numbers. The next one fills in documentation.
+
+The sixth patch implements port state configuration, which is required
+for bridge functionality. STP frames are not forwarded at this moment.
+BPDU frames are only forwarded from/to the PI/SI interface.
+For more information, see chapter 2.7.1 (CPU Forwarding) in the
+datasheet.
+
+Patches 7, 12-15 provide a basic implementation of tag_8021q
+functionality with QinQ support, without VLAN filtering in
+the bridge and simple VLAN awareness in VLAN filtering mode.
+
+Patches 8-11 came from Vladimir Oltean. They prepare for making
+tag8021q more common. VSC73XX uses very similar tag recognition,
+and some code from tag_sja1105 could be moved to tag_8021q for
+common use.
+
+Patch 16 is required to avoid problem with learning on standalone ports.
+
+Pawel Dembicki (12):
+  net: dsa: vsc73xx: use read_poll_timeout instead delay loop
+  net: dsa: vsc73xx: convert to PHYLINK
+  net: dsa: vsc73xx: use macros for rgmii recognition
+  net: dsa: vsc73xx: Add define for max num of ports
+  net: dsa: vsc73xx: add structure descriptions
+  net: dsa: vsc73xx: add port_stp_state_set function
+  net: dsa: vsc73xx: Add vlan filtering
+  net: dsa: vsc73xx: introduce tag 8021q for vsc73xx
+  net: dsa: vsc73xx: Implement the tag_8021q VLAN operations
+  net: dsa: Define max num of bridges in tag8021q implementation
+  net: dsa: vsc73xx: Add bridge support
+  net: dsa: vsc73xx: start treating the BR_LEARNING flag
+
+Vladimir Oltean (4):
+  net: dsa: tag_sja1105: absorb logic for not overwriting precise info
+    into dsa_8021q_rcv()
+  net: dsa: tag_sja1105: absorb entire sja1105_vlan_rcv() into
+    dsa_8021q_rcv()
+  net: dsa: tag_sja1105: prefer precise source port info on SJA1110 too
+  net: dsa: tag_sja1105: refactor skb->dev assignment to
+    dsa_tag_8021q_find_user()
+
+ drivers/net/dsa/Kconfig                |   2 +-
+ drivers/net/dsa/sja1105/sja1105_main.c |   3 +-
+ drivers/net/dsa/vitesse-vsc73xx-core.c | 977 +++++++++++++++++++++----
+ drivers/net/dsa/vitesse-vsc73xx.h      |  69 +-
+ include/linux/dsa/8021q.h              |   5 +
+ include/net/dsa.h                      |   2 +
+ net/dsa/Kconfig                        |   6 +
+ net/dsa/Makefile                       |   1 +
+ net/dsa/tag_8021q.c                    |  81 +-
+ net/dsa/tag_8021q.h                    |   7 +-
+ net/dsa/tag_ocelot_8021q.c             |   2 +-
+ net/dsa/tag_sja1105.c                  |  72 +-
+ net/dsa/tag_vsc73xx_8021q.c            |  68 ++
+ 13 files changed, 1072 insertions(+), 223 deletions(-)
+ create mode 100644 net/dsa/tag_vsc73xx_8021q.c
+
+-- 
+2.34.1
+
 
