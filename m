@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-81638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CD1D88A92C
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:27:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4978788A92F
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 17:27:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32A6A1C62D74
-	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:27:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B507B1F3FA4D
+	for <lists+netdev@lfdr.de>; Mon, 25 Mar 2024 16:27:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFDCD15921C;
-	Mon, 25 Mar 2024 14:28:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 839B21598E3;
+	Mon, 25 Mar 2024 14:29:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="S8PhRyFA"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="FUkXJzyf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+Received: from mail-qv1-f50.google.com (mail-qv1-f50.google.com [209.85.219.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C5DA159207
-	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 14:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65BE0158DDE
+	for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 14:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711376939; cv=none; b=Tk1zN2iF04KtnbaP0L8xwl2wzaxRXGGg2gQwxC5qcCaWRG03dHuUvpzgPNkppRtiF9NmwEvwDO9M8Nz9/o90PVhnFDS/kAnxNXV2csU3Hl2xf9kVu/0M8QonJNK6AcHfWmHb7fzUeOeLqdJpYRcIvXXt6OHM3lsbONXelqckPzk=
+	t=1711376940; cv=none; b=blIvK3EJU9vX2d3l9kA9o5BKt/a4b24/WdjLe06qCVVkhrVvs+rU5V3+Os4rclfqNWzEUmczm8hIZSANJBrZ5JzqNbnDRFJknCt6y7nN0Q7GnrNtmCKwsO+XAKU0FXZ0myZI5R4T8kK079MrwPLAq/B4fODtkTd9ZDjWYov4UEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711376939; c=relaxed/simple;
-	bh=Dg5Xi1cI5mV7dqVUW6sZIlYxTXUiUsp5yhkj7BKQMaA=;
+	s=arc-20240116; t=1711376940; c=relaxed/simple;
+	bh=pL7yhZx97N7nEvIWBtbjgD4/envYSQNTv+I90/m5hSE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=nHZyO6iLIz7ASYprjVTd5mnN4pBGCIdFe4rvJAUfpfX3zTYF2iRKMXpSpX+mnNSxfYzmhOd8sObzdqFEKvBWklbUUUPNSG/PCMsFzXYHaxrQT+9UoEMmC99m2CAOzLqPAGChNImgLR9sSSnLWC/U/cfnPSJWQVSFCsU32AF9cQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=S8PhRyFA; arc=none smtp.client-ip=209.85.219.52
+	 MIME-Version; b=Rh1a3U9AQsUp8yow1PwXmKW6GxxBTvmw5HmtnWxq65Vr8fpPTLD1jVvEhOp+eqTo6nxPC42diOJRLGuGlNxsuUfS+Mh/GsvM1XFH/XNBLY6N08abVPtW7NZ3OoCCAADRK1tIoC4m6vqAjmnZgHtaXxo1N44gvnWZRMqbNDWFb3E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=FUkXJzyf; arc=none smtp.client-ip=209.85.219.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6962a97752eso32403746d6.2
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 07:28:56 -0700 (PDT)
+Received: by mail-qv1-f50.google.com with SMTP id 6a1803df08f44-6969388c36fso2711696d6.1
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 07:28:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1711376935; x=1711981735; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1711376937; x=1711981737; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aoJ4reXxM/htU5/yO7IouaPkgNM1A32Wtu7ZVFyVJMs=;
-        b=S8PhRyFAcyLMHaDXVhHA6sHQxx4AFJDKHZZNbE617aRCgaZ5txfEetEvZl4VRvHB27
-         TZo1ziUy6HQHTK89N/dsoidAK+YFrjP4F3jVEO0twAkM2yE9l0PHGdJD71GfcfUy1cnJ
-         h7Xbs7ckb9n+MBDi6Q+bIKWxjww+PlzECR6J99nWIasdf9AfmaQIYDUYDfR3k0jV5JSx
-         3wfADC0Zy0WfwLGLLTQ2cXtqm9NPFfO8wdpzURMgrUbjqXeYp+ebKS+MtHQDpgrD4n/c
-         Lu9h70FH0UQo1Wz+0tNy9/lZUmYCwsNtEUOcrig7yCrmVc2CobVBOM4hdxInkZal/Hgb
-         jd2g==
+        bh=HT62N5f8JqkgLfRyFNa0hqElBpnfHAcl/G8oNVZSusY=;
+        b=FUkXJzyfTiU1Lja//UddH33ic05Gi83JDxqqjMPlGZqP5WDE8E9ClDhhoWVAdqblCD
+         1OQexO0Uu0cGP2ff7dsoBrIO1tg/yIInAwq0EY7LIh9b7xxjHj+Y6aClHzO2tmNvPUzC
+         YQT6mLvF1Nxf5JIahN7SzQfbNj4tQBu9bX3I0JUZTNZHfwqd6CAkTD2398KkngVsUXeK
+         DtQeonxsVvdxK4qJ0EsYJOh2wepcFlKyZT1uDd3a0+/Nds8ILlLgi5uFbkVx4Ik6W4Mo
+         g/3jNhLmk87Zv2V8fcbBGhpoNq6DMDVjSfBVC4gh2zM58Rc/WGS0zVFJRtgEnd3JyV4A
+         lUzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711376935; x=1711981735;
+        d=1e100.net; s=20230601; t=1711376937; x=1711981737;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aoJ4reXxM/htU5/yO7IouaPkgNM1A32Wtu7ZVFyVJMs=;
-        b=HGaexcT9MmUBMMFVtvgVdixqodTyq9ydjn3pQd4poCD4GJKBlT6SPfHX2o2jMWKe19
-         85AeLLlOm4FzOeEXPOmbe1O+fcIp/vhZLjz8JzKKHeFZUxcRDdQg+6rfSEkEmohhM+fe
-         iVGlNY/OagX63nJMRjlSKiN8foMeY4jgTBr9UaNYagBiXA4Jhw8MqPIwxJ4tEdNueLju
-         4bDEW7qOyzDU/A78B2a0Yj+ciN4HhWuvLSLseo+0HN+MGjmDnb5dU0EzoE64G+t7wMGB
-         F6Y/pliIbzX2Pk6k9Oh5Xvubev+76GRxo59HM+VpWQ6JrzMnW4zjbAi24VqmfMibhoh/
-         cdug==
-X-Gm-Message-State: AOJu0YwUH1g8q7iMWMLqe86pOsGwTomm9x53tMo/XRBMq8h3kT02h6uD
-	RjOdGChhSZwSTl9166nyScNkvqgioykMnZkQlawMPnNXAUNN1G/RIbvMdFbcJYm648Dy2ldCRtE
+        bh=HT62N5f8JqkgLfRyFNa0hqElBpnfHAcl/G8oNVZSusY=;
+        b=rzf9gzZInJDuyGtuzhT5KqzxgyR2StLnY62quySEIg/A5he+A5GFDMsHz/Eo/E0TJs
+         ZAO+6gDTBPNMF1Zcid2IbkuQI8ckX+fuLeDTfl8TnVGtSD7RH9A4Kdl34rea39tx2mtZ
+         VJZC6fZag9OowwgG6f7tsFMsRTxWcRCzMcJjf5tRoDeLByFrAsBHTHG6WhkTFlf7v+AO
+         iZaiCcGSI2MK3nUSY3tRgiwLk7zVGyKIXUDjH1/twubtAYY00/w0aknM6l76ddY7TuIn
+         gl7ZD7ckx3ScAjczpHRopb8ZwKu2TeegSmf2cdh2ffXws2XRQD1hyCHdhp6olZpVdhGp
+         oy5g==
+X-Gm-Message-State: AOJu0YxGrw29kALArOrJllpjGRlglidgfwF9BmNbIBOx1barwlqTRsas
+	xZVIkLw0u+C95Ejc3xIcdE0BEdduU3U27elgN7pu7Btd0eMkK+W5Gjo84uGUdT23kAkGVZlHSmU
 	=
-X-Google-Smtp-Source: AGHT+IFJSP3I7IRpfr8CMQGIxZCbrk0eAicBrltQ1ZOZmNjpiR5c6Mg5e7gob2CzRze7RSrDGdRqvA==
-X-Received: by 2002:a05:6214:21cf:b0:690:bb1c:9dc4 with SMTP id d15-20020a05621421cf00b00690bb1c9dc4mr8399711qvh.28.1711376935191;
-        Mon, 25 Mar 2024 07:28:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHL1qwZETquky+R7h+TMd4rwO0+lrxfKPrxLs1rxN9vpCP5fVLi9zi8Du9wAbT68F3PErcRAw==
+X-Received: by 2002:a05:6214:3002:b0:696:8de9:dbf with SMTP id ke2-20020a056214300200b006968de90dbfmr3636448qvb.0.1711376936835;
+        Mon, 25 Mar 2024 07:28:56 -0700 (PDT)
 Received: from majuu.waya ([174.94.28.98])
-        by smtp.gmail.com with ESMTPSA id l4-20020ad44bc4000000b0069687cdaba3sm1729255qvw.36.2024.03.25.07.28.53
+        by smtp.gmail.com with ESMTPSA id l4-20020ad44bc4000000b0069687cdaba3sm1729255qvw.36.2024.03.25.07.28.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Mar 2024 07:28:54 -0700 (PDT)
+        Mon, 25 Mar 2024 07:28:56 -0700 (PDT)
 From: Jamal Hadi Salim <jhs@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: deb.chatterjee@intel.com,
@@ -91,9 +91,9 @@ Cc: deb.chatterjee@intel.com,
 	victor@mojatatu.com,
 	pctammela@mojatatu.com,
 	bpf@vger.kernel.org
-Subject: [PATCH net-next v13  06/15] p4tc: add P4 data types
-Date: Mon, 25 Mar 2024 10:28:25 -0400
-Message-Id: <20240325142834.157411-7-jhs@mojatatu.com>
+Subject: [PATCH net-next v13  07/15] p4tc: add template API
+Date: Mon, 25 Mar 2024 10:28:26 -0400
+Message-Id: <20240325142834.157411-8-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20240325142834.157411-1-jhs@mojatatu.com>
 References: <20240325142834.157411-1-jhs@mojatatu.com>
@@ -105,43 +105,46 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce abstraction that represents P4 data types.
-This also introduces the Kconfig and Makefile which later patches use.
-Numeric types could be little, host or big endian definitions. The abstraction
-also supports defining:
+Add p4tc template API that will serve as infrastructure for all future
+template objects (in this set pipeline, table, action, and more later)
 
-a) bitstrings using P4 annotations that look like "bit<X>" where X
-   is the number of bits defined in a type
+This commit is not functional by itself. It needs the subsequent patch
+to be of any use. This commit's purpose is to ease review. If something
+were to break and you do git bisect to this patch it will not be helpful.
+In the next release we are planning to merge the two back again.
 
-b) bitslices such that one can define in P4 as bit<8>[0-3] and
-   bit<16>[4-9]. A 4-bit slice from bits 0-3 and a 6-bit slice from bits
-   4-9 respectively.
+The template API infrastructure follows the CRUD (Create, Read/get, Update,
+and Delete) commands.
 
-c) speacialized types like dev (which stands for a netdev), key, etc
+To issue a p4template create command the user will follow the below grammar:
 
-Each type has a bitsize, a name (for debugging purposes), an ID and
-methods/ops. The P4 types will be used by externs, dynamic actions, packet
-headers and other parts of P4TC.
+tc p4template create objtype/[objpath] [objid] objparams
 
-Each type has four ops:
+To show a more concrete example, to create a new pipeline (pipelines
+come in the next commit), the user would issue the following command:
 
-- validate_p4t: Which validates if a given value of a specific type
-  meets valid boundary conditions.
+tc p4template create pipeline/aP4proggie pipeid 1 numtables 1 ...
 
-- create_bitops: Which, given a bitsize, bitstart and bitend allocates and
-  returns a mask and a shift value. For example, if we have type
-  bit<8>[3-3] meaning bitstart = 3 and bitend = 3, we'll create a mask
-  which would only give us the fourth bit of a bit8 value, that is, 0x08.
-  Since we are interested in the fourth bit, the bit shift value will be 3.
-  This is also useful if an "irregular" bitsize is used, for example,
-  bit24. In that case bitstart = 0 and bitend = 23. Shift will be 0 and
-  the mask will be 0xFFFFFF00 if the machine is big endian.
+Note that the user may specify an optional ID to the obj ("pipeid 1" above), if
+none is specified, the kernel will assign one.
 
-- host_read : Which reads the value of a given type and transforms it to
-  host order (if needed)
+The command for update is analogous:
 
-- host_write : Which writes a provided host order value and transforms it
-  to the type's native order (if needed)
+tc p4template update objtype/[objpath] [objid] objparams
+
+Note that for the user may refer to the object by name (in the objpath)
+or directly by ID.
+
+Delete is also analogous:
+
+tc p4template delete objtype/[objpath] [objid]
+
+As is get:
+
+tc p4template get objtype/[objpath] [objid]
+
+One can also dump or flush template objects. This will be better
+exposed in the object specific commits in this patchset
 
 Co-developed-by: Victor Nogueira <victor@mojatatu.com>
 Signed-off-by: Victor Nogueira <victor@mojatatu.com>
@@ -150,202 +153,174 @@ Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 Reviewed-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
 ---
- include/net/p4tc_types.h    |   89 +++
- include/uapi/linux/p4tc.h   |   33 +
- net/sched/Kconfig           |   11 +
- net/sched/Makefile          |    2 +
- net/sched/p4tc/Makefile     |    3 +
- net/sched/p4tc/p4tc_types.c | 1219 +++++++++++++++++++++++++++++++++++
- 6 files changed, 1357 insertions(+)
- create mode 100644 include/net/p4tc_types.h
- create mode 100644 include/uapi/linux/p4tc.h
- create mode 100644 net/sched/p4tc/Makefile
- create mode 100644 net/sched/p4tc/p4tc_types.c
+ include/net/p4tc.h             |  53 +++++
+ include/uapi/linux/p4tc.h      |  42 ++++
+ include/uapi/linux/rtnetlink.h |   9 +
+ net/sched/p4tc/Makefile        |   2 +-
+ net/sched/p4tc/p4tc_tmpl_api.c | 361 +++++++++++++++++++++++++++++++++
+ security/selinux/nlmsgtab.c    |   6 +-
+ 6 files changed, 471 insertions(+), 2 deletions(-)
+ create mode 100644 include/net/p4tc.h
+ create mode 100644 net/sched/p4tc/p4tc_tmpl_api.c
 
-diff --git a/include/net/p4tc_types.h b/include/net/p4tc_types.h
+diff --git a/include/net/p4tc.h b/include/net/p4tc.h
 new file mode 100644
-index 000000000..9b6937969
+index 000000000..e55d7b0b6
 --- /dev/null
-+++ b/include/net/p4tc_types.h
-@@ -0,0 +1,89 @@
++++ b/include/net/p4tc.h
+@@ -0,0 +1,53 @@
 +/* SPDX-License-Identifier: GPL-2.0 */
-+#ifndef __NET_P4TYPES_H
-+#define __NET_P4TYPES_H
-+
-+#include <linux/netlink.h>
-+#include <linux/pkt_cls.h>
-+#include <linux/types.h>
++#ifndef __NET_P4TC_H
++#define __NET_P4TC_H
 +
 +#include <uapi/linux/p4tc.h>
++#include <linux/workqueue.h>
++#include <net/sch_generic.h>
++#include <net/net_namespace.h>
++#include <linux/refcount.h>
++#include <linux/rhashtable.h>
++#include <linux/rhashtable-types.h>
 +
-+#define P4TC_T_MAX_BITSZ 512
++#define P4TC_PATH_MAX 3
 +
-+struct p4tc_type_mask_shift {
-+	void *mask;
-+	u8 shift;
++struct p4tc_dump_ctx {
++	u32 ids[P4TC_PATH_MAX];
 +};
 +
-+struct p4tc_type;
-+struct p4tc_type_ops {
-+	int (*validate_p4t)(struct p4tc_type *container, void *value,
-+			    u16 startbit, u16 endbit,
-+			    struct netlink_ext_ack *extack);
-+	struct p4tc_type_mask_shift *(*create_bitops)(u16 bitsz, u16 bitstart,
-+						      u16 bitend,
-+						      struct netlink_ext_ack *extack);
-+	void (*host_read)(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval);
-+	void (*host_write)(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval);
++struct p4tc_template_common;
++
++struct p4tc_template_ops {
++	struct p4tc_template_common *(*cu)(struct net *net, struct nlmsghdr *n,
++					   struct nlattr *nla,
++					   struct netlink_ext_ack *extack);
++	int (*put)(struct p4tc_template_common *tmpl,
++		   struct netlink_ext_ack *extack);
++	int (*gd)(struct net *net, struct sk_buff *skb, struct nlmsghdr *n,
++		  struct nlattr *nla, struct netlink_ext_ack *extack);
++	int (*fill_nlmsg)(struct net *net, struct sk_buff *skb,
++			  struct p4tc_template_common *tmpl,
++			  struct netlink_ext_ack *extack);
++	int (*dump)(struct sk_buff *skb, struct p4tc_dump_ctx *ctx,
++		    struct nlattr *nla, u32 *ids,
++		    struct netlink_ext_ack *extack);
++	int (*dump_1)(struct sk_buff *skb, struct p4tc_template_common *common);
++	u32 obj_id;
 +};
 +
-+#define P4TC_T_MAX_STR_SZ 32
-+struct p4tc_type {
-+	char name[P4TC_T_MAX_STR_SZ];
-+	const struct p4tc_type_ops *ops;
-+	size_t container_bitsz;
-+	size_t bitsz;
-+	int typeid;
++struct p4tc_template_common {
++	char                     name[P4TC_TMPL_NAMSZ];
++	struct p4tc_template_ops *ops;
 +};
 +
-+struct p4tc_type *p4type_find_byid(int id);
-+bool p4tc_is_type_unsigned_he(int typeid);
-+bool p4tc_is_type_numeric(int typeid);
-+
-+void p4t_copy(struct p4tc_type_mask_shift *dst_mask_shift,
-+	      struct p4tc_type *dst_t, void *dstv,
-+	      struct p4tc_type_mask_shift *src_mask_shift,
-+	      struct p4tc_type *src_t, void *srcv);
-+int p4t_cmp(struct p4tc_type_mask_shift *dst_mask_shift,
-+	    struct p4tc_type *dst_t, void *dstv,
-+	    struct p4tc_type_mask_shift *src_mask_shift,
-+	    struct p4tc_type *src_t, void *srcv);
-+void p4t_release(struct p4tc_type_mask_shift *mask_shift);
-+
-+int p4tc_register_types(void);
-+void p4tc_unregister_types(void);
-+
-+#ifdef CONFIG_RETPOLINE
-+void __p4tc_type_host_read(const struct p4tc_type_ops *ops,
-+			   struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval);
-+void __p4tc_type_host_write(const struct p4tc_type_ops *ops,
-+			    struct p4tc_type *container,
-+			    struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			    void *dval);
-+#else
-+static inline void
-+__p4tc_type_host_read(const struct p4tc_type_ops *ops,
-+		      struct p4tc_type *container,
-+		      struct p4tc_type_mask_shift *mask_shift,
-+		      void *sval, void *dval)
++static inline bool p4tc_tmpl_msg_is_update(struct nlmsghdr *n)
 +{
-+	return ops->host_read(container, mask_shift, sval, dval);
++	return n->nlmsg_type == RTM_UPDATEP4TEMPLATE;
 +}
 +
-+static inline void
-+__p4tc_type_host_write(const struct p4tc_type_ops *ops,
-+		       struct p4tc_type *container,
-+		       struct p4tc_type_mask_shift *mask_shift,
-+		       void *sval, void *dval)
-+{
-+	return ops->host_write(container, mask_shift, sval, dval);
-+}
-+#endif
++int p4tc_tmpl_generic_dump(struct sk_buff *skb, struct p4tc_dump_ctx *ctx,
++			   struct idr *idr, int idx,
++			   struct netlink_ext_ack *extack);
 +
 +#endif
 diff --git a/include/uapi/linux/p4tc.h b/include/uapi/linux/p4tc.h
-new file mode 100644
-index 000000000..0133947c5
---- /dev/null
+index 0133947c5..22ba1c05a 100644
+--- a/include/uapi/linux/p4tc.h
 +++ b/include/uapi/linux/p4tc.h
-@@ -0,0 +1,33 @@
-+/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-+#ifndef __LINUX_P4TC_H
-+#define __LINUX_P4TC_H
+@@ -2,8 +2,47 @@
+ #ifndef __LINUX_P4TC_H
+ #define __LINUX_P4TC_H
+ 
++#include <linux/types.h>
++#include <linux/pkt_sched.h>
 +
-+#define P4TC_MAX_KEYSZ 512
-+
-+enum {
-+	P4TC_T_UNSPEC,
-+	P4TC_T_U8,
-+	P4TC_T_U16,
-+	P4TC_T_U32,
-+	P4TC_T_U64,
-+	P4TC_T_STRING,
-+	P4TC_T_S8,
-+	P4TC_T_S16,
-+	P4TC_T_S32,
-+	P4TC_T_S64,
-+	P4TC_T_MACADDR,
-+	P4TC_T_IPV4ADDR,
-+	P4TC_T_BE16,
-+	P4TC_T_BE32,
-+	P4TC_T_BE64,
-+	P4TC_T_U128,
-+	P4TC_T_S128,
-+	P4TC_T_BOOL,
-+	P4TC_T_DEV,
-+	P4TC_T_KEY,
-+	__P4TC_T_MAX,
++/* pipeline header */
++struct p4tcmsg {
++	__u32 obj;
 +};
 +
-+#define P4TC_T_MAX (__P4TC_T_MAX - 1)
++#define P4TC_MSGBATCH_SIZE 16
 +
-+#endif
-diff --git a/net/sched/Kconfig b/net/sched/Kconfig
-index 8180d0c12..5dbae579b 100644
---- a/net/sched/Kconfig
-+++ b/net/sched/Kconfig
-@@ -675,6 +675,17 @@ config NET_EMATCH_IPT
- 	  To compile this code as a module, choose M here: the
- 	  module will be called em_ipt.
+ #define P4TC_MAX_KEYSZ 512
  
-+config NET_P4TC
-+	bool "P4TC support"
-+	select NET_CLS_ACT
-+	help
-+	  Say Y here if you want to use P4 features on top of TC.
-+	  P4 is an open source,  domain-specific programming language for
-+	  specifying data plane behavior. By enabling P4TC you will be able to
-+	  write a P4 program, use a P4 compiler that supports P4TC backend to
-+	  generate all needed artificats, which when loaded allow you to
-+	  introduce a new kernel datapath that can be controlled via TC.
++#define P4TC_TMPL_NAMSZ 32
 +
- config NET_CLS_ACT
- 	bool "Actions"
- 	select NET_CLS
-diff --git a/net/sched/Makefile b/net/sched/Makefile
-index 82c3f78ca..581f9dd69 100644
---- a/net/sched/Makefile
-+++ b/net/sched/Makefile
-@@ -81,3 +81,5 @@ obj-$(CONFIG_NET_EMATCH_TEXT)	+= em_text.o
- obj-$(CONFIG_NET_EMATCH_CANID)	+= em_canid.o
- obj-$(CONFIG_NET_EMATCH_IPSET)	+= em_ipset.o
- obj-$(CONFIG_NET_EMATCH_IPT)	+= em_ipt.o
++/* Root attributes */
++enum {
++	P4TC_ROOT_UNSPEC,
++	P4TC_ROOT, /* nested messages */
++	__P4TC_ROOT_MAX,
++};
 +
-+obj-$(CONFIG_NET_P4TC)		+= p4tc/
++#define P4TC_ROOT_MAX (__P4TC_ROOT_MAX - 1)
++
++/* P4 Object types */
++enum {
++	P4TC_OBJ_UNSPEC,
++	__P4TC_OBJ_MAX,
++};
++
++#define P4TC_OBJ_MAX (__P4TC_OBJ_MAX - 1)
++
++/* P4 attributes */
++enum {
++	P4TC_UNSPEC,
++	P4TC_PATH,
++	P4TC_PARAMS,
++	__P4TC_MAX,
++};
++
++#define P4TC_MAX (__P4TC_MAX - 1)
++
+ enum {
+ 	P4TC_T_UNSPEC,
+ 	P4TC_T_U8,
+@@ -30,4 +69,7 @@ enum {
+ 
+ #define P4TC_T_MAX (__P4TC_T_MAX - 1)
+ 
++#define P4TC_RTA(r) \
++	((struct rtattr *)(((char *)(r)) + NLMSG_ALIGN(sizeof(struct p4tcmsg))))
++
+ #endif
+diff --git a/include/uapi/linux/rtnetlink.h b/include/uapi/linux/rtnetlink.h
+index 3b687d20c..4f9ebe3e7 100644
+--- a/include/uapi/linux/rtnetlink.h
++++ b/include/uapi/linux/rtnetlink.h
+@@ -194,6 +194,15 @@ enum {
+ 	RTM_GETTUNNEL,
+ #define RTM_GETTUNNEL	RTM_GETTUNNEL
+ 
++	RTM_CREATEP4TEMPLATE = 124,
++#define RTM_CREATEP4TEMPLATE	RTM_CREATEP4TEMPLATE
++	RTM_DELP4TEMPLATE,
++#define RTM_DELP4TEMPLATE	RTM_DELP4TEMPLATE
++	RTM_GETP4TEMPLATE,
++#define RTM_GETP4TEMPLATE	RTM_GETP4TEMPLATE
++	RTM_UPDATEP4TEMPLATE,
++#define RTM_UPDATEP4TEMPLATE	RTM_UPDATEP4TEMPLATE
++
+ 	__RTM_MAX,
+ #define RTM_MAX		(((__RTM_MAX + 3) & ~3) - 1)
+ };
 diff --git a/net/sched/p4tc/Makefile b/net/sched/p4tc/Makefile
-new file mode 100644
-index 000000000..dd1358c9e
---- /dev/null
+index dd1358c9e..e28dfc6eb 100644
+--- a/net/sched/p4tc/Makefile
 +++ b/net/sched/p4tc/Makefile
-@@ -0,0 +1,3 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+obj-y := p4tc_types.o
-diff --git a/net/sched/p4tc/p4tc_types.c b/net/sched/p4tc/p4tc_types.c
+@@ -1,3 +1,3 @@
+ # SPDX-License-Identifier: GPL-2.0
+ 
+-obj-y := p4tc_types.o
++obj-y := p4tc_types.o p4tc_tmpl_api.o
+diff --git a/net/sched/p4tc/p4tc_tmpl_api.c b/net/sched/p4tc/p4tc_tmpl_api.c
 new file mode 100644
-index 000000000..dccbf9c5c
+index 000000000..bbc0c7a05
 --- /dev/null
-+++ b/net/sched/p4tc/p4tc_types.c
-@@ -0,0 +1,1219 @@
++++ b/net/sched/p4tc/p4tc_tmpl_api.c
+@@ -0,0 +1,361 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
-+ * net/sched/p4tc/p4tc_types.c -  P4 datatypes
++ * net/sched/p4tc/p4tc_tmpl_api.c	P4 TC TEMPLATE API
++ *
 + * Copyright (c) 2022-2024, Mojatatu Networks
 + * Copyright (c) 2022-2024, Intel Corporation.
 + * Authors:     Jamal Hadi Salim <jhs@mojatatu.com>
@@ -357,1211 +332,376 @@ index 000000000..dccbf9c5c
 +#include <linux/kernel.h>
 +#include <linux/string.h>
 +#include <linux/errno.h>
++#include <linux/slab.h>
 +#include <linux/skbuff.h>
-+#include <linux/rtnetlink.h>
-+#include <linux/module.h>
 +#include <linux/init.h>
++#include <linux/kmod.h>
++#include <linux/err.h>
++#include <linux/module.h>
 +#include <net/net_namespace.h>
-+#include <net/netlink.h>
-+#include <net/pkt_sched.h>
++#include <net/sock.h>
++#include <net/sch_generic.h>
 +#include <net/pkt_cls.h>
-+#include <net/act_api.h>
-+#include <net/p4tc_types.h>
-+#include <linux/etherdevice.h>
++#include <net/p4tc.h>
++#include <net/netlink.h>
++#include <net/flow_offload.h>
 +
-+static DEFINE_IDR(p4tc_types_idr);
++static const struct nla_policy p4tc_root_policy[P4TC_ROOT_MAX + 1] = {
++	[P4TC_ROOT] = { .type = NLA_NESTED },
++};
 +
-+static void p4tc_types_put(void)
++static const struct nla_policy p4tc_policy[P4TC_MAX + 1] = {
++	[P4TC_PATH] = { .type = NLA_BINARY,
++			.len = P4TC_PATH_MAX * sizeof(u32) },
++	[P4TC_PARAMS] = { .type = NLA_NESTED },
++};
++
++static const struct p4tc_template_ops *p4tc_ops[P4TC_OBJ_MAX + 1] = {};
++
++static bool obj_is_valid(u32 obj_id)
 +{
-+	unsigned long tmp, typeid;
-+	struct p4tc_type *type;
-+
-+	idr_for_each_entry_ul(&p4tc_types_idr, type, tmp, typeid) {
-+		idr_remove(&p4tc_types_idr, typeid);
-+		kfree(type);
-+	}
-+}
-+
-+struct p4tc_type *p4type_find_byid(int typeid)
-+{
-+	return idr_find(&p4tc_types_idr, typeid);
-+}
-+
-+static struct p4tc_type *p4type_find_byname(const char *name)
-+{
-+	unsigned long tmp, typeid;
-+	struct p4tc_type *type;
-+
-+	idr_for_each_entry_ul(&p4tc_types_idr, type, tmp, typeid) {
-+		if (!strncmp(type->name, name, P4TC_T_MAX_STR_SZ))
-+			return type;
-+	}
-+
-+	return NULL;
-+}
-+
-+static bool p4tc_is_type_unsigned_be(int typeid)
-+{
-+	switch (typeid) {
-+	case P4TC_T_BE16:
-+	case P4TC_T_BE32:
-+	case P4TC_T_BE64:
-+		return true;
-+	default:
++	if (obj_id > P4TC_OBJ_MAX)
 +		return false;
-+	}
++
++	return !!p4tc_ops[obj_id];
 +}
 +
-+bool p4tc_is_type_unsigned_he(int typeid)
-+{
-+	switch (typeid) {
-+	case P4TC_T_U8:
-+	case P4TC_T_U16:
-+	case P4TC_T_U32:
-+	case P4TC_T_U64:
-+	case P4TC_T_U128:
-+	case P4TC_T_BOOL:
-+		return true;
-+	default:
-+		return false;
-+	}
-+}
-+
-+static bool p4tc_is_type_unsigned(int typeid)
-+{
-+	return p4tc_is_type_unsigned_he(typeid) ||
-+		p4tc_is_type_unsigned_be(typeid);
-+}
-+
-+static bool p4tc_is_type_signed(int typeid)
-+{
-+	switch (typeid) {
-+	case P4TC_T_S8:
-+	case P4TC_T_S16:
-+	case P4TC_T_S32:
-+	case P4TC_T_S64:
-+	case P4TC_T_S128:
-+		return true;
-+	default:
-+		return false;
-+	}
-+}
-+
-+bool p4tc_is_type_numeric(int typeid)
-+{
-+	return p4tc_is_type_unsigned(typeid) ||
-+		p4tc_is_type_signed(typeid);
-+}
-+
-+void p4t_copy(struct p4tc_type_mask_shift *dst_mask_shift,
-+	      struct p4tc_type *dst_t, void *dstv,
-+	      struct p4tc_type_mask_shift *src_mask_shift,
-+	      struct p4tc_type *src_t, void *srcv)
-+{
-+	u64 readval[BITS_TO_U64(P4TC_MAX_KEYSZ)] = {0};
-+	const struct p4tc_type_ops *srco, *dsto;
-+
-+	dsto = dst_t->ops;
-+	srco = src_t->ops;
-+
-+	__p4tc_type_host_read(srco, src_t, src_mask_shift, srcv,
-+			      &readval);
-+	__p4tc_type_host_write(dsto, dst_t, dst_mask_shift, &readval,
-+			       dstv);
-+}
-+
-+int p4t_cmp(struct p4tc_type_mask_shift *dst_mask_shift,
-+	    struct p4tc_type *dst_t, void *dstv,
-+	    struct p4tc_type_mask_shift *src_mask_shift,
-+	    struct p4tc_type *src_t, void *srcv)
-+{
-+	u64 a[BITS_TO_U64(P4TC_MAX_KEYSZ)] = {0};
-+	u64 b[BITS_TO_U64(P4TC_MAX_KEYSZ)] = {0};
-+	const struct p4tc_type_ops *srco, *dsto;
-+
-+	dsto = dst_t->ops;
-+	srco = src_t->ops;
-+
-+	__p4tc_type_host_read(dsto, dst_t, dst_mask_shift, dstv, a);
-+	__p4tc_type_host_read(srco, src_t, src_mask_shift, srcv, b);
-+
-+	return memcmp(a, b, sizeof(a));
-+}
-+
-+void p4t_release(struct p4tc_type_mask_shift *mask_shift)
-+{
-+	kfree(mask_shift->mask);
-+	kfree(mask_shift);
-+}
-+
-+static int p4t_validate_bitpos(u16 bitstart, u16 bitend, u16 maxbitstart,
-+			       u16 maxbitend, struct netlink_ext_ack *extack)
-+{
-+	if (bitstart > maxbitstart) {
-+		NL_SET_ERR_MSG_MOD(extack, "bitstart too high");
-+		return -EINVAL;
-+	}
-+
-+	if (bitend > maxbitend) {
-+		NL_SET_ERR_MSG_MOD(extack, "bitend too high");
-+		return -EINVAL;
-+	}
-+
-+	if (bitstart > bitend) {
-+		NL_SET_ERR_MSG_MOD(extack, "bitstart > bitend");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int p4t_u32_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	u32 container_maxsz = U32_MAX;
-+	u32 *val = value;
-+	size_t maxval;
-+	int ret;
-+
-+	ret = p4t_validate_bitpos(bitstart, bitend, 31, 31, extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	maxval = GENMASK(bitend, 0);
-+	if (val && (*val > container_maxsz || *val > maxval)) {
-+		NL_SET_ERR_MSG_MOD(extack, "U32 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static struct p4tc_type_mask_shift *
-+p4t_u32_bitops(u16 bitsiz, u16 bitstart, u16 bitend,
-+	       struct netlink_ext_ack *extack)
-+{
-+	struct p4tc_type_mask_shift *mask_shift;
-+	u32 mask = GENMASK(bitend, bitstart);
-+	u32 *cmask;
-+
-+	mask_shift = kzalloc(sizeof(*mask_shift), GFP_KERNEL);
-+	if (!mask_shift)
-+		return ERR_PTR(-ENOMEM);
-+
-+	cmask = kzalloc(sizeof(u32), GFP_KERNEL);
-+	if (!cmask) {
-+		kfree(mask_shift);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	*cmask = mask;
-+
-+	mask_shift->mask = cmask;
-+	mask_shift->shift = bitstart;
-+
-+	return mask_shift;
-+}
-+
-+static void p4t_u32_write(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u32 maskedst = 0;
-+	u32 *dst = dval;
-+	u32 *src = sval;
-+	u8 shift = 0;
-+
-+	if (mask_shift) {
-+		u32 *dmask = mask_shift->mask;
-+
-+		maskedst = *dst & ~*dmask;
-+		shift = mask_shift->shift;
-+	}
-+
-+	*dst = maskedst | (*src << shift);
-+}
-+
-+static void p4t_u32_hread(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u32 *dst = dval;
-+	u32 *src = sval;
-+
-+	if (mask_shift) {
-+		u32 *smask = mask_shift->mask;
-+		u8 shift = mask_shift->shift;
-+
-+		*dst = (*src & *smask) >> shift;
-+	} else {
-+		*dst = *src;
-+	}
-+}
-+
-+static int p4t_s32_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	s32 minsz = S32_MIN, maxsz = S32_MAX;
-+	s32 *val = value;
-+
-+	if (val && (*val > maxsz || *val < minsz)) {
-+		NL_SET_ERR_MSG_MOD(extack, "S32 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_s32_hread(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	s32 *dst = dval;
-+	s32 *src = sval;
-+
-+	*dst = *src;
-+}
-+
-+static void p4t_s32_write(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	s32 *dst = dval;
-+	s32 *src = sval;
-+
-+	*dst = *src;
-+}
-+
-+static int p4t_s64_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	s64 minsz = S64_MIN, maxsz = S64_MAX;
-+	s64 *val = value;
-+
-+	if (val && (*val > maxsz || *val < minsz)) {
-+		NL_SET_ERR_MSG_MOD(extack, "S64 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_s64_hread(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	s64 *dst = dval;
-+	s64 *src = sval;
-+
-+	*dst = *src;
-+}
-+
-+static void p4t_s64_write(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	s64 *dst = dval;
-+	s64 *src = sval;
-+
-+	*dst = *src;
-+}
-+
-+static int p4t_be32_validate(struct p4tc_type *container, void *value,
-+			     u16 bitstart, u16 bitend,
-+			     struct netlink_ext_ack *extack)
-+{
-+	size_t container_maxsz = U32_MAX;
-+	__be32 *val_u32 = value;
-+	__u32 val = 0;
-+	size_t maxval;
-+	int ret;
-+
-+	ret = p4t_validate_bitpos(bitstart, bitend, 31, 31, extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (value)
-+		val = be32_to_cpu(*val_u32);
-+
-+	maxval = GENMASK(bitend, 0);
-+	if (val && (val > container_maxsz || val > maxval)) {
-+		NL_SET_ERR_MSG_MOD(extack, "BE32 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_be32_hread(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	__be32 *src = sval;
-+	u32 *dst = dval;
-+
-+	*dst = be32_to_cpu(*src);
-+}
-+
-+static void p4t_be32_write(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	__be32 *dst = dval;
-+	u32 *src = sval;
-+
-+	*dst = cpu_to_be32(*src);
-+}
-+
-+static void p4t_be64_hread(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	__be64 *src = sval;
-+	u64 *dst = dval;
-+
-+	*dst = be64_to_cpu(*src);
-+}
-+
-+static void p4t_be64_write(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	__be64 *dst = dval;
-+	u64 *src = sval;
-+
-+	*dst = cpu_to_be64(*src);
-+}
-+
-+static int p4t_u16_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	u16 container_maxsz = U16_MAX;
-+	u16 *val = value;
-+	u16 maxval;
-+	int ret;
-+
-+	ret = p4t_validate_bitpos(bitstart, bitend, 15, 15, extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	maxval = GENMASK(bitend, 0);
-+	if (val && (*val > container_maxsz || *val > maxval)) {
-+		NL_SET_ERR_MSG_MOD(extack, "U16 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static struct p4tc_type_mask_shift *
-+p4t_u16_bitops(u16 bitsiz, u16 bitstart, u16 bitend,
-+	       struct netlink_ext_ack *extack)
-+{
-+	struct p4tc_type_mask_shift *mask_shift;
-+	u16 mask = GENMASK(bitend, bitstart);
-+	u16 *cmask;
-+
-+	mask_shift = kzalloc(sizeof(*mask_shift), GFP_KERNEL);
-+	if (!mask_shift)
-+		return ERR_PTR(-ENOMEM);
-+
-+	cmask = kzalloc(sizeof(u16), GFP_KERNEL);
-+	if (!cmask) {
-+		kfree(mask_shift);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	*cmask = mask;
-+
-+	mask_shift->mask = cmask;
-+	mask_shift->shift = bitstart;
-+
-+	return mask_shift;
-+}
-+
-+static void p4t_u16_write(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u16 maskedst = 0;
-+	u16 *dst = dval;
-+	u16 *src = sval;
-+	u8 shift = 0;
-+
-+	if (mask_shift) {
-+		u16 *dmask = mask_shift->mask;
-+
-+		maskedst = *dst & ~*dmask;
-+		shift = mask_shift->shift;
-+	}
-+
-+	*dst = maskedst | (*src << shift);
-+}
-+
-+static void p4t_u16_hread(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u16 *dst = dval;
-+	u16 *src = sval;
-+
-+	if (mask_shift) {
-+		u16 *smask = mask_shift->mask;
-+		u8 shift = mask_shift->shift;
-+
-+		*dst = (*src & *smask) >> shift;
-+	} else {
-+		*dst = *src;
-+	}
-+}
-+
-+static int p4t_s16_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	s16 minsz = S16_MIN, maxsz = S16_MAX;
-+	s16 *val = value;
-+
-+	if (val && (*val > maxsz || *val < minsz)) {
-+		NL_SET_ERR_MSG_MOD(extack, "S16 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_s16_hread(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	s16 *dst = dval;
-+	s16 *src = sval;
-+
-+	*dst = *src;
-+}
-+
-+static void p4t_s16_write(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	s16 *dst = dval;
-+	s16 *src = sval;
-+
-+	*src = *dst;
-+}
-+
-+static int p4t_be16_validate(struct p4tc_type *container, void *value,
-+			     u16 bitstart, u16 bitend,
-+			     struct netlink_ext_ack *extack)
-+{
-+	u16 container_maxsz = U16_MAX;
-+	__be16 *val_u16 = value;
-+	size_t maxval;
-+	u16 val = 0;
-+	int ret;
-+
-+	ret = p4t_validate_bitpos(bitstart, bitend, 15, 15, extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (value)
-+		val = be16_to_cpu(*val_u16);
-+
-+	maxval = GENMASK(bitend, 0);
-+	if (val && (val > container_maxsz || val > maxval)) {
-+		NL_SET_ERR_MSG_MOD(extack, "BE16 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_be16_hread(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	__be16 *src = sval;
-+	u16 *dst = dval;
-+
-+	*dst = be16_to_cpu(*src);
-+}
-+
-+static void p4t_be16_write(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	__be16 *dst = dval;
-+	u16 *src = sval;
-+
-+	*dst = cpu_to_be16(*src);
-+}
-+
-+static int p4t_u8_validate(struct p4tc_type *container, void *value,
-+			   u16 bitstart, u16 bitend,
++int p4tc_tmpl_generic_dump(struct sk_buff *skb, struct p4tc_dump_ctx *ctx,
++			   struct idr *idr, int idx,
 +			   struct netlink_ext_ack *extack)
 +{
-+	size_t container_maxsz = U8_MAX;
-+	u8 *val = value;
-+	u8 maxval;
++	unsigned char *b = nlmsg_get_pos(skb);
++	struct p4tc_template_common *common;
++	unsigned long id = 0;
++	unsigned long tmp;
++	int i = 0;
++
++	id = ctx->ids[idx];
++
++	idr_for_each_entry_continue_ul(idr, common, tmp, id) {
++		struct nlattr *count;
++		int ret;
++
++		if (i == P4TC_MSGBATCH_SIZE)
++			break;
++
++		count = nla_nest_start(skb, i + 1);
++		if (!count)
++			goto out_nlmsg_trim;
++		ret = common->ops->dump_1(skb, common);
++		if (ret < 0) {
++			goto out_nlmsg_trim;
++		} else if (ret) {
++			nla_nest_cancel(skb, count);
++			continue;
++		}
++		nla_nest_end(skb, count);
++
++		i++;
++	}
++
++	if (i == 0) {
++		if (!ctx->ids[idx])
++			NL_SET_ERR_MSG(extack,
++				       "There are no pipeline components");
++		return 0;
++	}
++
++	ctx->ids[idx] = id;
++
++	return skb->len;
++
++out_nlmsg_trim:
++	nlmsg_trim(skb, b);
++	return -ENOMEM;
++}
++
++static int p4tc_template_put(struct net *net,
++			     struct p4tc_template_common *common,
++			     struct netlink_ext_ack *extack)
++{
++	/* Every created template is bound to a pipeline */
++	return common->ops->put(common, extack);
++}
++
++static int tc_ctl_p4_tmpl_1_send(struct sk_buff *skb, struct net *net,
++				 struct nlmsghdr *n, u32 portid)
++{
++	if (n->nlmsg_type == RTM_GETP4TEMPLATE)
++		return rtnl_unicast(skb, net, portid);
++
++	return rtnetlink_send(skb, net, portid, RTNLGRP_TC,
++			      n->nlmsg_flags & NLM_F_ECHO);
++}
++
++static int tc_ctl_p4_tmpl_1(struct sk_buff *skb, struct nlmsghdr *n,
++			    struct nlattr *nla, struct netlink_ext_ack *extack)
++{
++	struct p4tcmsg *t = (struct p4tcmsg *)nlmsg_data(n);
++	struct net *net = sock_net(skb->sk);
++	u32 portid = NETLINK_CB(skb).portid;
++	struct p4tc_template_common *tmpl;
++	struct p4tc_template_ops *obj_op;
++	struct nlattr *tb[P4TC_MAX + 1];
++	struct p4tcmsg *t_new;
++	struct nlmsghdr *nlh;
++	struct sk_buff *nskb;
++	struct nlattr *root;
 +	int ret;
 +
-+	ret = p4t_validate_bitpos(bitstart, bitend, 7, 7, extack);
++	/* All checks will fail at this point because obj_is_valid will return
++	 * false. The next patch will make this functional
++	 */
++	if (!obj_is_valid(t->obj)) {
++		NL_SET_ERR_MSG(extack, "Invalid object type");
++		return -EINVAL;
++	}
++
++	ret = nla_parse_nested(tb, P4TC_MAX, nla, p4tc_policy, extack);
 +	if (ret < 0)
 +		return ret;
 +
-+	maxval = GENMASK(bitend, 0);
-+	if (val && (*val > container_maxsz || *val > maxval)) {
-+		NL_SET_ERR_MSG_MOD(extack, "U8 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static struct p4tc_type_mask_shift *
-+p4t_u8_bitops(u16 bitsiz, u16 bitstart, u16 bitend,
-+	      struct netlink_ext_ack *extack)
-+{
-+	struct p4tc_type_mask_shift *mask_shift;
-+	u8 mask = GENMASK(bitend, bitstart);
-+	u8 *cmask;
-+
-+	mask_shift = kzalloc(sizeof(*mask_shift), GFP_KERNEL);
-+	if (!mask_shift)
-+		return ERR_PTR(-ENOMEM);
-+
-+	cmask = kzalloc(sizeof(u8), GFP_KERNEL);
-+	if (!cmask) {
-+		kfree(mask_shift);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	*cmask = mask;
-+
-+	mask_shift->mask = cmask;
-+	mask_shift->shift = bitstart;
-+
-+	return mask_shift;
-+}
-+
-+static void p4t_u8_write(struct p4tc_type *container,
-+			 struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			 void *dval)
-+{
-+	u8 maskedst = 0;
-+	u8 *dst = dval;
-+	u8 *src = sval;
-+	u8 shift = 0;
-+
-+	if (mask_shift) {
-+		u8 *dmask = (u8 *)mask_shift->mask;
-+
-+		maskedst = *dst & ~*dmask;
-+		shift = mask_shift->shift;
-+	}
-+
-+	*dst = maskedst | (*src << shift);
-+}
-+
-+static void p4t_u8_hread(struct p4tc_type *container,
-+			 struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			 void *dval)
-+{
-+	u8 *dst = dval;
-+	u8 *src = sval;
-+
-+	if (mask_shift) {
-+		u8 *smask = mask_shift->mask;
-+		u8 shift = mask_shift->shift;
-+
-+		*dst = (*src & *smask) >> shift;
-+	} else {
-+		*dst = *src;
-+	}
-+}
-+
-+static int p4t_s8_validate(struct p4tc_type *container, void *value,
-+			   u16 bitstart, u16 bitend,
-+			   struct netlink_ext_ack *extack)
-+{
-+	s8 minsz = S8_MIN, maxsz = S8_MAX;
-+	s8 *val = value;
-+
-+	if (val && (*val > maxsz || *val < minsz)) {
-+		NL_SET_ERR_MSG_MOD(extack, "S8 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_s8_hread(struct p4tc_type *container,
-+			 struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			 void *dval)
-+{
-+	s8 *dst = dval;
-+	s8 *src = sval;
-+
-+	*dst = *src;
-+}
-+
-+static int p4t_u64_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	u64 container_maxsz = U64_MAX;
-+	u8 *val = value;
-+	u64 maxval;
-+	int ret;
-+
-+	ret = p4t_validate_bitpos(bitstart, bitend, 63, 63, extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	maxval = GENMASK_ULL(bitend, 0);
-+	if (val && (*val > container_maxsz || *val > maxval)) {
-+		NL_SET_ERR_MSG_MOD(extack, "U64 value out of range");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static struct p4tc_type_mask_shift *
-+p4t_u64_bitops(u16 bitsiz, u16 bitstart, u16 bitend,
-+	       struct netlink_ext_ack *extack)
-+{
-+	struct p4tc_type_mask_shift *mask_shift;
-+	u64 mask = GENMASK(bitend, bitstart);
-+	u64 *cmask;
-+
-+	mask_shift = kzalloc(sizeof(*mask_shift), GFP_KERNEL);
-+	if (!mask_shift)
-+		return ERR_PTR(-ENOMEM);
-+
-+	cmask = kzalloc(sizeof(u64), GFP_KERNEL);
-+	if (!cmask) {
-+		kfree(mask_shift);
-+		return ERR_PTR(-ENOMEM);
-+	}
-+
-+	*cmask = mask;
-+
-+	mask_shift->mask = cmask;
-+	mask_shift->shift = bitstart;
-+
-+	return mask_shift;
-+}
-+
-+static void p4t_u64_write(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u64 maskedst = 0;
-+	u64 *dst = dval;
-+	u64 *src = sval;
-+	u8 shift = 0;
-+
-+	if (mask_shift) {
-+		u64 *dmask = (u64 *)mask_shift->mask;
-+
-+		maskedst = *dst & ~*dmask;
-+		shift = mask_shift->shift;
-+	}
-+
-+	*dst = maskedst | (*src << shift);
-+}
-+
-+static void p4t_u64_hread(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u64 *dst = dval;
-+	u64 *src = sval;
-+
-+	if (mask_shift) {
-+		u64 *smask = mask_shift->mask;
-+		u8 shift = mask_shift->shift;
-+
-+		*dst = (*src & *smask) >> shift;
-+	} else {
-+		*dst = *src;
-+	}
-+}
-+
-+/* As of now, we are not allowing bitops for u128 */
-+static int p4t_u128_validate(struct p4tc_type *container, void *value,
-+			     u16 bitstart, u16 bitend,
-+			     struct netlink_ext_ack *extack)
-+{
-+	if (bitstart != 0 || bitend != 127) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Only valid bit type larger than bit64 is bit128");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_u128_hread(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	memcpy(sval, dval, sizeof(__u64) * 2);
-+}
-+
-+static void p4t_u128_write(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	memcpy(sval, dval, sizeof(__u64) * 2);
-+}
-+
-+static int p4t_s128_validate(struct p4tc_type *container, void *value,
-+			     u16 bitstart, u16 bitend,
-+			     struct netlink_ext_ack *extack)
-+{
-+	if (bitstart != 0 || bitend != 127) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Only valid int type larger than int64 is int128");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_s128_hread(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	memcpy(sval, dval, sizeof(__u64) * 2);
-+}
-+
-+static void p4t_s128_write(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	memcpy(sval, dval, sizeof(__u64) * 2);
-+}
-+
-+static int p4t_string_validate(struct p4tc_type *container, void *value,
-+			       u16 bitstart, u16 bitend,
-+			       struct netlink_ext_ack *extack)
-+{
-+	if (bitstart != 0 || bitend >= P4TC_T_MAX_STR_SZ) {
-+		NL_SET_ERR_MSG_FMT_MOD(extack,
-+				       "String size must be at most %u\n",
-+				       P4TC_T_MAX_STR_SZ);
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_string_hread(struct p4tc_type *container,
-+			     struct p4tc_type_mask_shift *mask_shift,
-+			     void *sval, void *dval)
-+{
-+	strscpy(sval, dval, P4TC_T_MAX_STR_SZ);
-+}
-+
-+static void p4t_string_write(struct p4tc_type *container,
-+			     struct p4tc_type_mask_shift *mask_shift,
-+			     void *sval, void *dval)
-+{
-+	strscpy(sval, dval, P4TC_T_MAX_STR_SZ);
-+}
-+
-+static int p4t_ipv4_validate(struct p4tc_type *container, void *value,
-+			     u16 bitstart, u16 bitend,
-+			     struct netlink_ext_ack *extack)
-+{
-+	/* Not allowing bit-slices for now */
-+	if (bitstart != 0 || bitend != 31) {
-+		NL_SET_ERR_MSG_MOD(extack, "Invalid bitstart or bitend");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int p4t_mac_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	if (bitstart != 0 || bitend != 47) {
-+		NL_SET_ERR_MSG_MOD(extack, "Invalid bitstart or bitend");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static int p4t_dev_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	if (bitstart != 0 || bitend != 31) {
-+		NL_SET_ERR_MSG_MOD(extack, "Invalid start or endbit values");
-+		return -EINVAL;
-+	}
-+
-+	return 0;
-+}
-+
-+static void p4t_dev_write(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u32 *src = sval;
-+	u32 *dst = dval;
-+
-+	*dst = *src;
-+}
-+
-+static void p4t_dev_hread(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	u32 *src = sval;
-+	u32 *dst = dval;
-+
-+	*dst = *src;
-+}
-+
-+static void p4t_key_hread(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	memcpy(dval, sval, BITS_TO_BYTES(container->bitsz));
-+}
-+
-+static void p4t_key_write(struct p4tc_type *container,
-+			  struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			  void *dval)
-+{
-+	memcpy(dval, sval, BITS_TO_BYTES(container->bitsz));
-+}
-+
-+static int p4t_key_validate(struct p4tc_type *container, void *value,
-+			    u16 bitstart, u16 bitend,
-+			    struct netlink_ext_ack *extack)
-+{
-+	if (p4t_validate_bitpos(bitstart, bitend, 0, P4TC_MAX_KEYSZ, extack))
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+static int p4t_bool_validate(struct p4tc_type *container, void *value,
-+			     u16 bitstart, u16 bitend,
-+			     struct netlink_ext_ack *extack)
-+{
-+	int ret;
-+
-+	ret = p4t_validate_bitpos(bitstart, bitend, 7, 7, extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	return -EINVAL;
-+}
-+
-+static void p4t_bool_hread(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	bool *dst = dval;
-+	bool *src = sval;
-+
-+	*dst = *src;
-+}
-+
-+static void p4t_bool_write(struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	bool *dst = dval;
-+	bool *src = sval;
-+
-+	*dst = *src;
-+}
-+
-+static const struct p4tc_type_ops u8_ops = {
-+	.validate_p4t = p4t_u8_validate,
-+	.create_bitops = p4t_u8_bitops,
-+	.host_read = p4t_u8_hread,
-+	.host_write = p4t_u8_write,
-+};
-+
-+static const struct p4tc_type_ops u16_ops = {
-+	.validate_p4t = p4t_u16_validate,
-+	.create_bitops = p4t_u16_bitops,
-+	.host_read = p4t_u16_hread,
-+	.host_write = p4t_u16_write,
-+};
-+
-+static const struct p4tc_type_ops u32_ops = {
-+	.validate_p4t = p4t_u32_validate,
-+	.create_bitops = p4t_u32_bitops,
-+	.host_read = p4t_u32_hread,
-+	.host_write = p4t_u32_write,
-+};
-+
-+static const struct p4tc_type_ops u64_ops = {
-+	.validate_p4t = p4t_u64_validate,
-+	.create_bitops = p4t_u64_bitops,
-+	.host_read = p4t_u64_hread,
-+	.host_write = p4t_u64_write,
-+};
-+
-+static const struct p4tc_type_ops u128_ops = {
-+	.validate_p4t = p4t_u128_validate,
-+	.host_read = p4t_u128_hread,
-+	.host_write = p4t_u128_write,
-+};
-+
-+static const struct p4tc_type_ops s8_ops = {
-+	.validate_p4t = p4t_s8_validate,
-+	.host_read = p4t_s8_hread,
-+};
-+
-+static const struct p4tc_type_ops s16_ops = {
-+	.validate_p4t = p4t_s16_validate,
-+	.host_read = p4t_s16_hread,
-+	.host_write = p4t_s16_write,
-+};
-+
-+static const struct p4tc_type_ops s32_ops = {
-+	.validate_p4t = p4t_s32_validate,
-+	.host_read = p4t_s32_hread,
-+	.host_write = p4t_s32_write,
-+};
-+
-+static const struct p4tc_type_ops s64_ops = {
-+	.validate_p4t = p4t_s64_validate,
-+	.host_read = p4t_s64_hread,
-+	.host_write = p4t_s64_write,
-+};
-+
-+static const struct p4tc_type_ops s128_ops = {
-+	.validate_p4t = p4t_s128_validate,
-+	.host_read = p4t_s128_hread,
-+	.host_write = p4t_s128_write,
-+};
-+
-+static const struct p4tc_type_ops be16_ops = {
-+	.validate_p4t = p4t_be16_validate,
-+	.create_bitops = p4t_u16_bitops,
-+	.host_read = p4t_be16_hread,
-+	.host_write = p4t_be16_write,
-+};
-+
-+static const struct p4tc_type_ops be32_ops = {
-+	.validate_p4t = p4t_be32_validate,
-+	.create_bitops = p4t_u32_bitops,
-+	.host_read = p4t_be32_hread,
-+	.host_write = p4t_be32_write,
-+};
-+
-+static const struct p4tc_type_ops be64_ops = {
-+	.validate_p4t = p4t_u64_validate,
-+	.host_read = p4t_be64_hread,
-+	.host_write = p4t_be64_write,
-+};
-+
-+static const struct p4tc_type_ops string_ops = {
-+	.validate_p4t = p4t_string_validate,
-+	.host_read = p4t_string_hread,
-+	.host_write = p4t_string_write,
-+};
-+
-+static const struct p4tc_type_ops mac_ops = {
-+	.validate_p4t = p4t_mac_validate,
-+	.create_bitops = p4t_u64_bitops,
-+	.host_read = p4t_u64_hread,
-+	.host_write = p4t_u64_write,
-+};
-+
-+static const struct p4tc_type_ops ipv4_ops = {
-+	.validate_p4t = p4t_ipv4_validate,
-+	.host_read = p4t_be32_hread,
-+	.host_write = p4t_be32_write,
-+};
-+
-+static const struct p4tc_type_ops bool_ops = {
-+	.validate_p4t = p4t_bool_validate,
-+	.host_read = p4t_bool_hread,
-+	.host_write = p4t_bool_write,
-+};
-+
-+static const struct p4tc_type_ops dev_ops = {
-+	.validate_p4t = p4t_dev_validate,
-+	.host_read = p4t_dev_hread,
-+	.host_write = p4t_dev_write,
-+};
-+
-+static const struct p4tc_type_ops key_ops = {
-+	.validate_p4t = p4t_key_validate,
-+	.host_read = p4t_key_hread,
-+	.host_write = p4t_key_write,
-+};
-+
-+#ifdef CONFIG_RETPOLINE
-+void __p4tc_type_host_read(const struct p4tc_type_ops *ops,
-+			   struct p4tc_type *container,
-+			   struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			   void *dval)
-+{
-+	#define HREAD(cops) \
-+	do { \
-+		if (ops == &(cops)) \
-+			return (cops).host_read(container, mask_shift, sval, \
-+						dval); \
-+	} while (0)
-+
-+	HREAD(u8_ops);
-+	HREAD(u16_ops);
-+	HREAD(u32_ops);
-+	HREAD(u64_ops);
-+	HREAD(u128_ops);
-+	HREAD(s8_ops);
-+	HREAD(s16_ops);
-+	HREAD(s32_ops);
-+	HREAD(be16_ops);
-+	HREAD(be32_ops);
-+	HREAD(mac_ops);
-+	HREAD(ipv4_ops);
-+	HREAD(bool_ops);
-+	HREAD(dev_ops);
-+	HREAD(key_ops);
-+
-+	return ops->host_read(container, mask_shift, sval, dval);
-+}
-+
-+void __p4tc_type_host_write(const struct p4tc_type_ops *ops,
-+			    struct p4tc_type *container,
-+			    struct p4tc_type_mask_shift *mask_shift, void *sval,
-+			    void *dval)
-+{
-+	#define HWRITE(cops) \
-+	do { \
-+		if (ops == &(cops)) \
-+			return (cops).host_write(container, mask_shift, sval, \
-+						 dval); \
-+	} while (0)
-+
-+	HWRITE(u8_ops);
-+	HWRITE(u16_ops);
-+	HWRITE(u32_ops);
-+	HWRITE(u64_ops);
-+	HWRITE(u128_ops);
-+	HWRITE(s16_ops);
-+	HWRITE(s32_ops);
-+	HWRITE(be16_ops);
-+	HWRITE(be32_ops);
-+	HWRITE(mac_ops);
-+	HWRITE(ipv4_ops);
-+	HWRITE(bool_ops);
-+	HWRITE(dev_ops);
-+	HWRITE(key_ops);
-+
-+	return ops->host_write(container, mask_shift, sval, dval);
-+}
-+#endif
-+
-+static int ___p4tc_register_type(int typeid, size_t bitsz,
-+				 size_t container_bitsz,
-+				 const char *t_name,
-+				 const struct p4tc_type_ops *ops)
-+{
-+	struct p4tc_type *type;
-+	int err;
-+
-+	if (typeid > P4TC_T_MAX)
-+		return -EINVAL;
-+
-+	if (p4type_find_byid(typeid) || p4type_find_byname(t_name))
-+		return -EEXIST;
-+
-+	if (bitsz > P4TC_T_MAX_BITSZ)
-+		return -E2BIG;
-+
-+	if (container_bitsz > P4TC_T_MAX_BITSZ)
-+		return -E2BIG;
-+
-+	type = kzalloc(sizeof(*type), GFP_ATOMIC);
-+	if (!type)
++	nskb = alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
++	if (!nskb)
 +		return -ENOMEM;
 +
-+	err = idr_alloc_u32(&p4tc_types_idr, type, &typeid, typeid, GFP_ATOMIC);
-+	if (err < 0)
-+		return err;
-+
-+	strscpy(type->name, t_name, P4TC_T_MAX_STR_SZ);
-+	type->typeid = typeid;
-+	type->bitsz = bitsz;
-+	type->container_bitsz = container_bitsz;
-+	type->ops = ops;
-+
-+	return 0;
-+}
-+
-+static int __p4tc_register_type(int typeid, size_t bitsz,
-+				size_t container_bitsz,
-+				const char *t_name,
-+				const struct p4tc_type_ops *ops)
-+{
-+	if (___p4tc_register_type(typeid, bitsz, container_bitsz, t_name, ops) <
-+	    0) {
-+		pr_err("Unable to allocate p4 type %s\n", t_name);
-+		p4tc_types_put();
-+		return -1;
++	nlh = nlmsg_put(nskb, portid, n->nlmsg_seq, n->nlmsg_type,
++			sizeof(*t), n->nlmsg_flags);
++	if (!nlh) {
++		ret = -ENOMEM;
++		goto free_skb;
 +	}
 +
++	t_new = nlmsg_data(nlh);
++	t_new->obj = t->obj;
++
++	root = nla_nest_start(nskb, P4TC_ROOT);
++	if (!root) {
++		ret = -ENOMEM;
++		goto free_skb;
++	}
++
++	obj_op = (struct p4tc_template_ops *)p4tc_ops[t->obj];
++	switch (n->nlmsg_type) {
++	case RTM_CREATEP4TEMPLATE:
++	case RTM_UPDATEP4TEMPLATE:
++		if (NL_REQ_ATTR_CHECK(extack, nla, tb, P4TC_PARAMS)) {
++			NL_SET_ERR_MSG(extack,
++				       "Must specify object attributes");
++			ret = -EINVAL;
++			goto free_skb;
++		}
++		tmpl = obj_op->cu(net, n, tb[P4TC_PARAMS], extack);
++		if (IS_ERR(tmpl)) {
++			ret = PTR_ERR(tmpl);
++			goto free_skb;
++		}
++
++		ret = obj_op->fill_nlmsg(net, nskb, tmpl, extack);
++		if (ret < 0) {
++			p4tc_template_put(net, tmpl, extack);
++			goto free_skb;
++		}
++		break;
++	case RTM_DELP4TEMPLATE:
++	case RTM_GETP4TEMPLATE:
++		ret = obj_op->gd(net, nskb, n, tb[P4TC_PARAMS], extack);
++		if (ret < 0)
++			goto free_skb;
++		break;
++	default:
++		ret = -EINVAL;
++		goto free_skb;
++	}
++
++	nlmsg_end(nskb, nlh);
++
++	return tc_ctl_p4_tmpl_1_send(nskb, net, nlh, portid);
++
++free_skb:
++	kfree_skb(nskb);
++
++	return ret;
++}
++
++static int tc_ctl_p4_tmpl_get(struct sk_buff *skb, struct nlmsghdr *n,
++			      struct netlink_ext_ack *extack)
++{
++	struct nlattr *tb[P4TC_ROOT_MAX + 1];
++	int ret;
++
++	ret = nlmsg_parse(n, sizeof(struct p4tcmsg), tb, P4TC_ROOT_MAX,
++			  p4tc_root_policy, extack);
++	if (ret < 0)
++		return ret;
++
++	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, P4TC_ROOT)) {
++		NL_SET_ERR_MSG(extack,
++			       "Netlink P4TC template attributes missing");
++		return -EINVAL;
++	}
++
++	return tc_ctl_p4_tmpl_1(skb, n, tb[P4TC_ROOT], extack);
++}
++
++static int tc_ctl_p4_tmpl_delete(struct sk_buff *skb, struct nlmsghdr *n,
++				 struct netlink_ext_ack *extack)
++{
++	struct nlattr *tb[P4TC_ROOT_MAX + 1];
++	int ret;
++
++	if (!netlink_capable(skb, CAP_NET_ADMIN))
++		return -EPERM;
++
++	ret = nlmsg_parse(n, sizeof(struct p4tcmsg), tb, P4TC_ROOT_MAX,
++			  p4tc_root_policy, extack);
++	if (ret < 0)
++		return ret;
++
++	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, P4TC_ROOT)) {
++		NL_SET_ERR_MSG(extack,
++			       "Netlink P4TC template attributes missing");
++		return -EINVAL;
++	}
++
++	return tc_ctl_p4_tmpl_1(skb, n, tb[P4TC_ROOT], extack);
++}
++
++static int tc_ctl_p4_tmpl_cu(struct sk_buff *skb, struct nlmsghdr *n,
++			     struct netlink_ext_ack *extack)
++{
++	struct nlattr *tb[P4TC_ROOT_MAX + 1];
++	int ret = 0;
++
++	if (!netlink_capable(skb, CAP_NET_ADMIN))
++		return -EPERM;
++
++	ret = nlmsg_parse(n, sizeof(struct p4tcmsg), tb, P4TC_ROOT_MAX,
++			  p4tc_root_policy, extack);
++	if (ret < 0)
++		return ret;
++
++	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, P4TC_ROOT)) {
++		NL_SET_ERR_MSG(extack,
++			       "Netlink P4TC template attributes missing");
++		return -EINVAL;
++	}
++
++	return tc_ctl_p4_tmpl_1(skb, n, tb[P4TC_ROOT], extack);
++}
++
++static int tc_ctl_p4_tmpl_dump_1(struct sk_buff *skb, struct nlattr *arg,
++				 struct netlink_callback *cb)
++{
++	struct p4tc_dump_ctx *ctx = (void *)cb->ctx;
++	struct netlink_ext_ack *extack = cb->extack;
++	u32 portid = NETLINK_CB(cb->skb).portid;
++	const struct nlmsghdr *n = cb->nlh;
++	struct p4tc_template_ops *obj_op;
++	struct nlattr *tb[P4TC_MAX + 1];
++	u32 ids[P4TC_PATH_MAX] = {};
++	struct p4tcmsg *t_new;
++	struct nlmsghdr *nlh;
++	struct nlattr *root;
++	struct p4tcmsg *t;
++	int ret;
++
++	ret = nla_parse_nested_deprecated(tb, P4TC_MAX, arg, p4tc_policy,
++					  extack);
++	if (ret < 0)
++		return ret;
++
++	t = (struct p4tcmsg *)nlmsg_data(n);
++	/* All checks will fail at this point because obj_is_valid will return
++	 * false. The next patch will make this functional
++	 */
++	if (!obj_is_valid(t->obj)) {
++		NL_SET_ERR_MSG(extack, "Invalid object type");
++		return -EINVAL;
++	}
++
++	nlh = nlmsg_put(skb, portid, n->nlmsg_seq, n->nlmsg_type,
++			sizeof(*t), n->nlmsg_flags);
++	if (!nlh)
++		return -ENOSPC;
++
++	t_new = nlmsg_data(nlh);
++	t_new->obj = t->obj;
++
++	root = nla_nest_start(skb, P4TC_ROOT);
++
++	obj_op = (struct p4tc_template_ops *)p4tc_ops[t->obj];
++	ret = obj_op->dump(skb, ctx, tb[P4TC_PARAMS], ids, extack);
++	if (ret <= 0)
++		goto out;
++	nla_nest_end(skb, root);
++
++	nlmsg_end(skb, nlh);
++
++	return ret;
++
++out:
++	nlmsg_cancel(skb, nlh);
++	return ret;
++}
++
++static int tc_ctl_p4_tmpl_dump(struct sk_buff *skb, struct netlink_callback *cb)
++{
++	struct nlattr *tb[P4TC_ROOT_MAX + 1];
++	int ret;
++
++	ret = nlmsg_parse(cb->nlh, sizeof(struct p4tcmsg), tb, P4TC_ROOT_MAX,
++			  p4tc_root_policy, cb->extack);
++	if (ret < 0)
++		return ret;
++
++	if (NL_REQ_ATTR_CHECK(cb->extack, NULL, tb, P4TC_ROOT)) {
++		NL_SET_ERR_MSG(cb->extack,
++			       "Netlink P4TC template attributes missing");
++		return -EINVAL;
++	}
++
++	return tc_ctl_p4_tmpl_dump_1(skb, tb[P4TC_ROOT], cb);
++}
++
++static int __init p4tc_template_init(void)
++{
++	rtnl_register(PF_UNSPEC, RTM_CREATEP4TEMPLATE, tc_ctl_p4_tmpl_cu, NULL,
++		      0);
++	rtnl_register(PF_UNSPEC, RTM_UPDATEP4TEMPLATE, tc_ctl_p4_tmpl_cu, NULL,
++		      0);
++	rtnl_register(PF_UNSPEC, RTM_DELP4TEMPLATE, tc_ctl_p4_tmpl_delete, NULL,
++		      0);
++	rtnl_register(PF_UNSPEC, RTM_GETP4TEMPLATE, tc_ctl_p4_tmpl_get,
++		      tc_ctl_p4_tmpl_dump, 0);
 +	return 0;
 +}
 +
-+#define p4tc_register_type(...)                            \
-+	do {                                               \
-+		if (__p4tc_register_type(__VA_ARGS__) < 0) \
-+			return -1;                         \
-+	} while (0)
-+
-+int p4tc_register_types(void)
-+{
-+	p4tc_register_type(P4TC_T_U8, 8, 8, "u8", &u8_ops);
-+	p4tc_register_type(P4TC_T_U16, 16, 16, "u16", &u16_ops);
-+	p4tc_register_type(P4TC_T_U32, 32, 32, "u32", &u32_ops);
-+	p4tc_register_type(P4TC_T_U64, 64, 64, "u64", &u64_ops);
-+	p4tc_register_type(P4TC_T_U128, 128, 128, "u128", &u128_ops);
-+	p4tc_register_type(P4TC_T_S8, 8, 8, "s8", &s8_ops);
-+	p4tc_register_type(P4TC_T_BE16, 16, 16, "be16", &be16_ops);
-+	p4tc_register_type(P4TC_T_BE32, 32, 32, "be32", &be32_ops);
-+	p4tc_register_type(P4TC_T_BE64, 64, 64, "be64", &be64_ops);
-+	p4tc_register_type(P4TC_T_S16, 16, 16, "s16", &s16_ops);
-+	p4tc_register_type(P4TC_T_S32, 32, 32, "s32", &s32_ops);
-+	p4tc_register_type(P4TC_T_S64, 64, 64, "s64", &s64_ops);
-+	p4tc_register_type(P4TC_T_S128, 128, 128, "s128", &s128_ops);
-+	p4tc_register_type(P4TC_T_STRING, P4TC_T_MAX_STR_SZ * 4,
-+			   P4TC_T_MAX_STR_SZ * 4, "string", &string_ops);
-+	p4tc_register_type(P4TC_T_MACADDR, 48, 64, "mac", &mac_ops);
-+	p4tc_register_type(P4TC_T_IPV4ADDR, 32, 32, "ipv4", &ipv4_ops);
-+	p4tc_register_type(P4TC_T_BOOL, 32, 32, "bool", &bool_ops);
-+	p4tc_register_type(P4TC_T_DEV, 32, 32, "dev", &dev_ops);
-+	p4tc_register_type(P4TC_T_KEY, P4TC_MAX_KEYSZ, P4TC_MAX_KEYSZ, "key",
-+			   &key_ops);
-+
-+	return 0;
-+}
-+
-+void p4tc_unregister_types(void)
-+{
-+	p4tc_types_put();
-+}
++subsys_initcall(p4tc_template_init);
+diff --git a/security/selinux/nlmsgtab.c b/security/selinux/nlmsgtab.c
+index 8ff670cf1..e50a1c1ff 100644
+--- a/security/selinux/nlmsgtab.c
++++ b/security/selinux/nlmsgtab.c
+@@ -94,6 +94,10 @@ static const struct nlmsg_perm nlmsg_route_perms[] = {
+ 	{ RTM_NEWTUNNEL,	NETLINK_ROUTE_SOCKET__NLMSG_WRITE },
+ 	{ RTM_DELTUNNEL,	NETLINK_ROUTE_SOCKET__NLMSG_WRITE },
+ 	{ RTM_GETTUNNEL,	NETLINK_ROUTE_SOCKET__NLMSG_READ  },
++	{ RTM_CREATEP4TEMPLATE,	NETLINK_ROUTE_SOCKET__NLMSG_WRITE },
++	{ RTM_DELP4TEMPLATE,	NETLINK_ROUTE_SOCKET__NLMSG_WRITE },
++	{ RTM_GETP4TEMPLATE,	NETLINK_ROUTE_SOCKET__NLMSG_READ },
++	{ RTM_UPDATEP4TEMPLATE,	NETLINK_ROUTE_SOCKET__NLMSG_WRITE },
+ };
+ 
+ static const struct nlmsg_perm nlmsg_tcpdiag_perms[] = {
+@@ -177,7 +181,7 @@ int selinux_nlmsg_lookup(u16 sclass, u16 nlmsg_type, u32 *perm)
+ 		 * structures at the top of this file with the new mappings
+ 		 * before updating the BUILD_BUG_ON() macro!
+ 		 */
+-		BUILD_BUG_ON(RTM_MAX != (RTM_NEWTUNNEL + 3));
++		BUILD_BUG_ON(RTM_MAX != (RTM_CREATEP4TEMPLATE + 3));
+ 		err = nlmsg_perm(nlmsg_type, perm, nlmsg_route_perms,
+ 				 sizeof(nlmsg_route_perms));
+ 		break;
 -- 
 2.34.1
 
