@@ -1,116 +1,190 @@
-Return-Path: <netdev+bounces-82229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22C2B88CC33
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 19:45:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95C2C88CC8F
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 20:00:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7DEEEB283F5
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 18:45:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D0391F80BD6
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 19:00:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60D5713C696;
-	Tue, 26 Mar 2024 18:45:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="AFWRWC7t"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BCBE13CA8E;
+	Tue, 26 Mar 2024 19:00:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C93691292C7;
-	Tue, 26 Mar 2024 18:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A7B13C9B9
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 19:00:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711478726; cv=none; b=VgDFJy6C/mB2zh47EeRp6mdq86EccewD5YeityqDzG2KSE8l+4hYrHBSePXSSBwsDXRS5sr1R0R1dRmD8jQh208oWGj934J49ZGrHnRWhFFGvjio7egO5/BMf2WiHJHzNnncizP+0IxL25Bcox9W/Drymj+wk/qYyFRUVPd9AeM=
+	t=1711479634; cv=none; b=mlJ6P1drcliu5Jvie9syx7Wxr2lh6oFspi1Q9II8gwBk5HGim70bMk+Yhke9i91Kz/WENWGvbsdwO3IrqukMVTSAkmjkDz5flQfJGVT1aVaT2bx/IWGcznwoQJkt04AWmItlQ9xexff3OG4XjZl3SIS+YZqI8ZFqhzo0wdEzPJo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711478726; c=relaxed/simple;
-	bh=wQY0mvP9mcZDDkl/5tK4Zee9HLlnOO1nDNKawSvnlbc=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZU34cLo4n7owgrCvo6Ic6pH/SqadLMF1lKIhcANMAEG452kF6DKgxoP912ZsKjGnL3sJ2h0RFgSsogQd3ne/H3OJNsaO+yKdvWqmEXokfR65OqjqU0DHiwWXBMBElRMaaosFocehyIDhL0yWu8PwM20apMXphxb6xwEWImvQDn0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=AFWRWC7t; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.24/8.17.1.24) with ESMTP id 42QCmprI017695;
-	Tue, 26 Mar 2024 11:45:17 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	from:to:cc:subject:date:message-id:mime-version
-	:content-transfer-encoding:content-type; s=pfpt0220; bh=ekx30cLX
-	kPKx7KG2DDmuv4cQEvcz0BL0vVsR8e3P8aM=; b=AFWRWC7tZpo/kdrupzBhe7Sq
-	34hX36+lr5N63HyDlt5dGScaZYbNU0war8xgaJ+wrXHokB0ijlDFe/3q0dxvfdpA
-	cBgg40t4NtVxGfNQt1YPWNUN+rlde0bTL2ht5Tgi7WnrW6iRIlbhPOB+Iu8irD0x
-	ACtyI5IehF1Fea1z4tykj5oRuO5LMcfCwSqWvec20pAaCIDLRekxzyOKznemJaiD
-	A+B6VcvHI6yMXn1P12CfB6gf/sit5tJ5dVhGqjb95iU+MfSj7sI1BlAw+QTabGyy
-	Q/AybLXcls0dey1UTGXM/LwzrOhypGmNjryPJBss4xpqvnmc5D2BNC4qcvSOWQ==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3x3xpu1vhw-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 26 Mar 2024 11:45:17 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Tue, 26 Mar 2024 11:45:16 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Tue, 26 Mar 2024 11:45:16 -0700
-Received: from rchintakuntla-lnx3.sclab.marvell.com (unknown [10.111.142.125])
-	by maili.marvell.com (Postfix) with ESMTP id 526AE3F705E;
-	Tue, 26 Mar 2024 11:45:16 -0700 (PDT)
-From: Radha Mohan Chintakuntla <radhac@marvell.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <sgoutham@marvell.com>,
-        <lcherian@marvell.com>, <gakula@marvell.com>, <hkelam@marvell.com>,
-        <jerinj@marvell.com>, <sbhatta@marvell.com>, <horms@kernel.org>
-CC: Radha Mohan Chintakuntla <radhac@marvell.com>
-Subject: [PATCH net-next RESEND] octeontx2-af: Increase maximum BPID channels
-Date: Tue, 26 Mar 2024 11:45:14 -0700
-Message-ID: <20240326184514.1628284-1-radhac@marvell.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1711479634; c=relaxed/simple;
+	bh=7HDloqRSDdn+FNnsv1j7aPLrnomcwb8pA0DxtNg/nrI=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=VHMoISPeXWEDgXKSloVdOcLc53apJp97kEyQw/62fT3UKh8xk5uI35uEJlMlQn/FQiFxn5KMTCacxeAcCDG77Z/fNkCQWaTNDp0u9GKEgd8ub6QMFbs0rbq8WWp4K/nN7pdg+2tGcsCCe2uZjgXBtya7Nzy49zai7zN95zGFeOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-366a7e3099bso58106945ab.0
+        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 12:00:23 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711479623; x=1712084423;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+EQq1+C0rxxXWWlIywUcuDOKzK5nbEvWmmdoOCe2LpE=;
+        b=B4P6ymRKbTnV7XhFKsQ4L+/tdEeNaZ7m8zQvoN76UbTIZDMUa+edwOGMBHzYFX8oJD
+         iBFjP6F/ASUz2E+i3Chq/lpQqTnTJX4JYRSUtqwc1b+E5d+nq8fW8epFFxt6WQ1n7mIJ
+         M2XP36DgQeOgXrOJ2Rf5nmSVR8te19ybfyEAMglRgJo2/0lEmkufO44g7MZ9qh9v81sl
+         dfWiMnSToljFVQGHtGDRnBZ79fhblh642kRRkatKYMdid+YApAVbEI5ChpIL1jMkeJjJ
+         Xu/3S7fjHiKpKvj6CmgTwvKL73QcxtlrBiXWVlQzlBWmGFBVTq4mSDa4nytth21MpZZQ
+         NWZA==
+X-Forwarded-Encrypted: i=1; AJvYcCVDbON/J7hd/2HwBzPGF98WfJAPIui/Yo3sGSX4+kyGYmvBdVHxS/i5O7YyRYV7O/fkPUvrHbvrM0Z3hPm84gbDOTMoxmEV
+X-Gm-Message-State: AOJu0YxeBpatpI+vPr9SzCDAZVhJRbSZOj8W7b4+fnqwYP/r96QOU2K2
+	dGnmw1Jkc1/EiGOzNXwwRMJQ1NkHp7/zH8NnsuATKHKSuxDFG6DLLfszmjhyHm6/fhu1FepOQsC
+	+Cyizxxolp92CZfaBfeu6xTf0UFLEfOSOejdj26ICywA3zhi3IE533m0=
+X-Google-Smtp-Source: AGHT+IHbFVVAE7ADdPRwhETSn8OEneL86XBPP2rHXEU6ar59LK9sQo7jJrDfHGKTwtewbJIAbSzSFFXEveEa+Y/TTCYUIeydSiLX
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: vOVD8OWwbQ1YekRTIHl-8tNvy0hV6Kw6
-X-Proofpoint-GUID: vOVD8OWwbQ1YekRTIHl-8tNvy0hV6Kw6
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1011,Hydra:6.0.619,FMLib:17.11.176.26
- definitions=2024-03-26_08,2024-03-21_02,2023-05-22_02
+X-Received: by 2002:a05:6e02:12ea:b0:368:7d6b:a7cd with SMTP id
+ l10-20020a056e0212ea00b003687d6ba7cdmr537549iln.3.1711479622876; Tue, 26 Mar
+ 2024 12:00:22 -0700 (PDT)
+Date: Tue, 26 Mar 2024 12:00:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000f6531b061494e696@google.com>
+Subject: [syzbot] [bpf?] [net?] general protection fault in dev_map_enqueue
+From: syzbot <syzbot+af9492708df9797198d6@syzkaller.appspotmail.com>
+To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, eddyz87@gmail.com, 
+	haoluo@google.com, hawk@kernel.org, john.fastabend@gmail.com, 
+	jolsa@kernel.org, kpsingh@kernel.org, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
+	sdf@google.com, song@kernel.org, syzkaller-bugs@googlegroups.com, 
+	yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Any NIX interface type can have maximum 256 channels. So increased the
-backpressure ID count to 256 so that it can cover cn9k and cn10k SoCs that
-have different NIX interface types with varied maximum channels.
+Hello,
 
-Signed-off-by: Radha Mohan Chintakuntla <radhac@marvell.com>
+syzbot found the following issue on:
+
+HEAD commit:    fe46a7dd189e Merge tag 'sound-6.9-rc1' of git://git.kernel..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=158ad421180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fe78468a74fdc3b7
+dashboard link: https://syzkaller.appspot.com/bug?extid=af9492708df9797198d6
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/0f7abe4afac7/disk-fe46a7dd.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/82598d09246c/vmlinux-fe46a7dd.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/efa23788c875/bzImage-fe46a7dd.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+af9492708df9797198d6@syzkaller.appspotmail.com
+
+general protection fault, probably for non-canonical address 0xdffffc0000000000: 0000 [#1] PREEMPT SMP KASAN NOPTI
+KASAN: null-ptr-deref in range [0x0000000000000000-0x0000000000000007]
+CPU: 1 PID: 13398 Comm: syz-executor.3 Not tainted 6.8.0-syzkaller-08951-gfe46a7dd189e #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+RIP: 0010:dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
+Code: 41 56 41 55 41 54 53 48 83 ec 18 49 89 d4 49 89 f5 48 89 fd 49 be 00 00 00 00 00 fc ff df e8 56 3a d8 ff 48 89 e8 48 c1 e8 03 <42> 80 3c 30 00 74 08 48 89 ef e8 60 89 3b 00 4c 8b 7d 00 48 83 c5
+RSP: 0018:ffffc90010e6f688 EFLAGS: 00010256
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000040000
+RDX: ffffc9000fb19000 RSI: 0000000000000c96 RDI: 0000000000000c97
+RBP: 0000000000000000 R08: 0000000000000005 R09: ffffffff8954502e
+R10: 0000000000000004 R11: ffff88805bde3c00 R12: ffff88807e182000
+R13: ffff88805595d070 R14: dffffc0000000000 R15: ffff8880b953c288
+FS:  00007fe7632126c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b32d23000 CR3: 000000006b1cc000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ __xdp_do_redirect_frame net/core/filter.c:4384 [inline]
+ xdp_do_redirect_frame+0x20d/0x4d0 net/core/filter.c:4438
+ xdp_test_run_batch net/bpf/test_run.c:336 [inline]
+ bpf_test_run_xdp_live+0xe8a/0x1e90 net/bpf/test_run.c:384
+ bpf_prog_test_run_xdp+0x813/0x11b0 net/bpf/test_run.c:1267
+ bpf_prog_test_run+0x33c/0x3b0 kernel/bpf/syscall.c:4240
+ __sys_bpf+0x48d/0x810 kernel/bpf/syscall.c:5649
+ __do_sys_bpf kernel/bpf/syscall.c:5738 [inline]
+ __se_sys_bpf kernel/bpf/syscall.c:5736 [inline]
+ __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5736
+ do_syscall_64+0xfd/0x240
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+RIP: 0033:0x7fe76247dda9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 20 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fe7632120c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+RAX: ffffffffffffffda RBX: 00007fe7625abf80 RCX: 00007fe76247dda9
+RDX: 0000000000000050 RSI: 0000000020000240 RDI: 000000000000000a
+RBP: 00007fe7624ca47a R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000000b R14: 00007fe7625abf80 R15: 00007ffcf8e59e58
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:dev_map_enqueue+0x31/0x3e0 kernel/bpf/devmap.c:539
+Code: 41 56 41 55 41 54 53 48 83 ec 18 49 89 d4 49 89 f5 48 89 fd 49 be 00 00 00 00 00 fc ff df e8 56 3a d8 ff 48 89 e8 48 c1 e8 03 <42> 80 3c 30 00 74 08 48 89 ef e8 60 89 3b 00 4c 8b 7d 00 48 83 c5
+RSP: 0018:ffffc90010e6f688 EFLAGS: 00010256
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000040000
+RDX: ffffc9000fb19000 RSI: 0000000000000c96 RDI: 0000000000000c97
+RBP: 0000000000000000 R08: 0000000000000005 R09: ffffffff8954502e
+R10: 0000000000000004 R11: ffff88805bde3c00 R12: ffff88807e182000
+R13: ffff88805595d070 R14: dffffc0000000000 R15: ffff8880b953c288
+FS:  00007fe7632126c0(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b32d23000 CR3: 000000006b1cc000 CR4: 0000000000350ef0
+----------------
+Code disassembly (best guess):
+   0:	41 56                	push   %r14
+   2:	41 55                	push   %r13
+   4:	41 54                	push   %r12
+   6:	53                   	push   %rbx
+   7:	48 83 ec 18          	sub    $0x18,%rsp
+   b:	49 89 d4             	mov    %rdx,%r12
+   e:	49 89 f5             	mov    %rsi,%r13
+  11:	48 89 fd             	mov    %rdi,%rbp
+  14:	49 be 00 00 00 00 00 	movabs $0xdffffc0000000000,%r14
+  1b:	fc ff df
+  1e:	e8 56 3a d8 ff       	call   0xffd83a79
+  23:	48 89 e8             	mov    %rbp,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	42 80 3c 30 00       	cmpb   $0x0,(%rax,%r14,1) <-- trapping instruction
+  2f:	74 08                	je     0x39
+  31:	48 89 ef             	mov    %rbp,%rdi
+  34:	e8 60 89 3b 00       	call   0x3b8999
+  39:	4c 8b 7d 00          	mov    0x0(%rbp),%r15
+  3d:	48                   	rex.W
+  3e:	83                   	.byte 0x83
+  3f:	c5                   	.byte 0xc5
+
+
 ---
-Note: Earlier version didn't have 'net-next' designation in subject. No
-other changes.
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
- drivers/net/ethernet/marvell/octeontx2/af/mbox.h | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-index eb2a20b5a0d0..3d801a1a4f70 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
-@@ -1213,10 +1213,8 @@ struct nix_bp_cfg_req {
- 	/* bpid_per_chan = 1 assigns separate bp id for each channel */
- };
- 
--/* PF can be mapped to either CGX or LBK interface,
-- * so maximum 64 channels are possible.
-- */
--#define NIX_MAX_BPID_CHAN	64
-+/* Maximum channels any single NIX interface can have */
-+#define NIX_MAX_BPID_CHAN	256
- struct nix_bp_cfg_rsp {
- 	struct mbox_msghdr hdr;
- 	u16	chan_bpid[NIX_MAX_BPID_CHAN]; /* Channel and bpid mapping */
--- 
-2.34.1
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
