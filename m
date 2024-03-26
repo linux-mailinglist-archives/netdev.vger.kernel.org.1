@@ -1,115 +1,136 @@
-Return-Path: <netdev+bounces-82035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B021488C236
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:35:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D332F88C255
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:38:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 15136B237C9
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:35:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E68D2A4277
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:38:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4668B57890;
-	Tue, 26 Mar 2024 12:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF525C8FF;
+	Tue, 26 Mar 2024 12:38:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PZDK5pEn"
+	dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b="dY81StrC";
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b="HgTQ8uDg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.tq-group.com (mx1.tq-group.com [93.104.207.81])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A08B5A0FA;
-	Tue, 26 Mar 2024 12:35:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B332656B6D;
+	Tue, 26 Mar 2024 12:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.104.207.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711456526; cv=none; b=b9ln6Nu8dURopnmYGf+yhejfz869SE2sHpsiIXwTG0BwdOyPsmwbAD7P8uKDSREuwaD8ef5BsLpIh8EBva1jlB3ynE27HrtSdZBzqJQcyIpWC7+uIH1Y+Le3OAIsO4c6abhPd67jb79or9bK43YSviG5UP05jGqE/gfaCZJiCdk=
+	t=1711456711; cv=none; b=M+24DIbGI7FOMPkEPFWWg+VTkqVSOAmqdvgzWrgx/zTjenr4pANM4VMvb4M14WoxeEsfSh6OrCek6YEgTgVuV3N7tSgGvY8VYRi5jyWsKrsl4+nwclKrhh7lVdgfCShcIwjDWnNZGowunlTMlIk2109FvQZPCU+rGnWqJ/ki/io=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711456526; c=relaxed/simple;
-	bh=6XTjoV9ZlDTzN5vXMrcYGZJGcOhwU6OBWtS33uI0Xvo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=i3D892kvvGPZn3PMrpNsQ1xmwt6EpPCa3qMfj9/xXWwuiMKiDhN3W4a85WrS5wYRMXhIVbYZSiFRK5dUOBnEsblZRrj19jASyX33mHiJaaZfa7GmhmHI5J+5WrfLVZAtgRMVaSHdd3WQV53X1ql5FKSpTd9l6379IbytP6LG7kI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PZDK5pEn; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-41488f9708fso14299805e9.3;
-        Tue, 26 Mar 2024 05:35:24 -0700 (PDT)
+	s=arc-20240116; t=1711456711; c=relaxed/simple;
+	bh=jFKUb40DZC4SPayHqkoEEjo/AYuxKlE3F6/vEvGczt8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ZhRyU0iCYZFX7aqeVsVwGPiFZQqKsbk28Q0FqTzs+/bARmXK9/+45KKC2HPWIrKGnooZglCIq0+FKMvlsklUHehpOs9WzO7M8ZDQFxWo+eBSVwjPfcXdXsyF7S4NeN/nH3kXqmiUhi2RET613Vp2wZ35EGl3mLxoCDsOamj8lvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com; spf=pass smtp.mailfrom=ew.tq-group.com; dkim=pass (2048-bit key) header.d=tq-group.com header.i=@tq-group.com header.b=dY81StrC; dkim=fail (0-bit key) header.d=ew.tq-group.com header.i=@ew.tq-group.com header.b=HgTQ8uDg reason="key not found in DNS"; arc=none smtp.client-ip=93.104.207.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ew.tq-group.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ew.tq-group.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711456523; x=1712061323; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject
-         :mime-version:date:message-id:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Qj9viDkJqyEnEMoMdMZBdgZRhxl32v2W70TF8U83dEk=;
-        b=PZDK5pEnvwTucdkr4k8C4bCT2abBZisAuVojqflJm4boyzwQPnok9tPXFRGZBeukkL
-         85n+jXA7cmS+pWZwUxZ4M4wKMSeVHGF5Noc1At5Rmw81kmCJZwB0xBOFdRme2SzGkJ6Z
-         ageo9SYOJb1OC5PcZxkUQ9pdO0MeMM+hJRnLqVN8NzgYX87df9ddhsR8Xc4w9CfgHTaQ
-         JkQuvJ/t99pW71Q3Lv6vwRrb2gdNbbwfEadNZJOGSeTkfYI55q7AmCnT7vagk9d3pu/r
-         8TbsElkLZZW6Wka82JTGD5gmqVRpgC7OxiDX4CuyvyE+UaeLFhEjBj6pZRYldLsBC7gW
-         q0cA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711456523; x=1712061323;
-        h=content-transfer-encoding:in-reply-to:from:references:to:subject
-         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Qj9viDkJqyEnEMoMdMZBdgZRhxl32v2W70TF8U83dEk=;
-        b=dh5iQ1nkcuuTDVZ5mYS+vfnbuUD8Y0YZ2eDvr75/8RGdzxdhDd0NgM9MGymklcQXcS
-         OG+SLTCFKn2EOJIaMWKWzFuTj5ZN5rd+oVATdUVHn6g9HIpdnjhnmeKHjTj1n90NVCJ2
-         XYSnYq960ayi/sRhANS/2/4AAFaO012R3dOchAZUNT/xx9km/gNGclGoYhnXg+2k7lc9
-         WADGUzMXL5HgFAtlcEcGZhfcdbsPE4LPTqGeKLjnaV4foaic8BA59UOJLWCHBGTu4LFW
-         4GPnpeWqYBINHnqFsA8FlbN+8022G8i9vGFKP8YDG6gLxBejBPFsPbyT5zmYd2IauxRX
-         dwMQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW7AWQhzGTUw3MO+eASSaNk3C7gGvMBshvhV1N41dSqm5mwWBCWa4Okei35XMyfs1e3EGvsSE/AbOLUW8tRkhBg4G+BU1jpZiZRm+xcV3cCTOtxcrkRqwDTsl+vkjLUlYBtpmc2u79MMtdx9FvKgw/hs3uw0RtaDwNqIdiU+hREBNKP6mEt
-X-Gm-Message-State: AOJu0YwUyWE3qZSL1Ek8n/He4JqxlxNp1kruHDjV5WT7dTuVr7YlTSYm
-	mL+7ZvBxzeZH9hTul5eEE8Ob9w8NEvLH+2nDL/PkdvsflbxobJWT
-X-Google-Smtp-Source: AGHT+IGwgyBsaN7Ms+0IYQV0NG9hS1YRmOySH9NZ+A+pwuMXCxDaV1ICp2UXSJ+LiXZ/6OR9OQynaQ==
-X-Received: by 2002:a7b:c7d0:0:b0:413:fc09:7b19 with SMTP id z16-20020a7bc7d0000000b00413fc097b19mr5846747wmk.40.1711456522630;
-        Tue, 26 Mar 2024 05:35:22 -0700 (PDT)
-Received: from debian ([146.70.204.204])
-        by smtp.gmail.com with ESMTPSA id k26-20020a05600c1c9a00b00414807ef8dfsm11144822wms.5.2024.03.26.05.35.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Mar 2024 05:35:22 -0700 (PDT)
-Message-ID: <494e8cac-e87a-4bc4-8a77-1801a703fd86@gmail.com>
-Date: Tue, 26 Mar 2024 13:35:01 +0100
+  d=tq-group.com; i=@tq-group.com; q=dns/txt; s=key1;
+  t=1711456707; x=1742992707;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=cIgfPJMO3kcEzxeMu7u2y81h8x78l/MyhCWjISx7zGw=;
+  b=dY81StrCE0xfQL9+ls/4admVqW74OXI36xf0X3Ip1gmR1ef6X6G1RQrM
+   RcuY6L3WXILt5eaQo6A6z4tHvUequ6MmkrmW2CZKrbRf2kqzB1oBFRr7t
+   qqi8IMkeYizmSWiUh3aJLIRLGCPbd0HnF70D+X88dfeuf9N73tYgj2AXf
+   qVzBA1bFDhvinCiFOFH0ILcaUuoNR0agpEVA1Fj69JK7F1iUI0j7EaIJ/
+   IkWwdxlTW4wg1Li3FrZntM515hXvcDUu03TyH99C29XbfLj6GsqelaZ60
+   VKBYZAh3vrRHdrcOpPj5Byjk72SclXB70vzO8HDuk0GHXfL41Cy4PTUCp
+   A==;
+X-IronPort-AV: E=Sophos;i="6.07,156,1708383600"; 
+   d="scan'208";a="36105106"
+Received: from vmailcow01.tq-net.de ([10.150.86.48])
+  by mx1.tq-group.com with ESMTP; 26 Mar 2024 13:38:23 +0100
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 98A67171151;
+	Tue, 26 Mar 2024 13:38:17 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ew.tq-group.com;
+	s=dkim; t=1711456699;
+	h=from:subject:date:message-id:to:cc:mime-version:content-type:
+	 content-transfer-encoding; bh=cIgfPJMO3kcEzxeMu7u2y81h8x78l/MyhCWjISx7zGw=;
+	b=HgTQ8uDgi3Z5nlRuwWttnUIPGKz6QOcUDy0hOVm4OfCYDRPYCnQwE3TXqpiQNnghLmz+Ms
+	Hov4GG8MInLm/0kmrdS97TAmwuycSyTQMpD7hD8vrYWYjEZdY1uBDMi81NMttuQkKPD3Nk
+	GHp8YoxgpTZiCLcNob2M1UTvG41FbDOMeUn8NgYhqDd8WZyNDxCVhWI4Ed3ZJoh4cl5glE
+	6OrX7UReElz0TBHG3Qa0nXJFqUYWu/sA0pQvo/zMnXkMgQNVvmsYqV6qkgt0ymxz3TrxzW
+	DcIYMTUjXjcjC+8LufmmImZfLF9aoojbeitfk6TnC+6XlS5+vOvb/2p0eKsmug==
+From: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Lukasz Majewski <lukma@denx.de>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux@ew.tq-group.com,
+	Michael Krummsdorf <michael.krummsdorf@tq-group.com>,
+	Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+Subject: [PATCH] net: dsa: mv88e6xxx: fix usable ports on 88e6020
+Date: Tue, 26 Mar 2024 13:36:54 +0100
+Message-ID: <20240326123655.40666-1-matthias.schiffer@ew.tq-group.com>
+X-Mailer: git-send-email 2.43.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v4 4/4] net: gro: move L3 flush checks to
- tcp_gro_receive
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
- xeb@mail.ru, shuah@kernel.org, idosch@nvidia.com, amcohen@nvidia.com,
- petrm@nvidia.com, jbenc@redhat.com, bpoirier@nvidia.com,
- b.galvani@gmail.com, liujian56@huawei.com, horms@kernel.org,
- linyunsheng@huawei.com, therbert@google.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20240325182543.87683-1-richardbgobert@gmail.com>
- <20240325182543.87683-5-richardbgobert@gmail.com>
- <6601c830c1daa_11c6072943b@willemb.c.googlers.com.notmuch>
-From: Richard Gobert <richardbgobert@gmail.com>
-In-Reply-To: <6601c830c1daa_11c6072943b@willemb.c.googlers.com.notmuch>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 
-Willem de Bruijn wrote:
-> In v3 we discussed how the flush on network layer differences (like
-> TTL or ToS) currently only affect the TCP GRO path, but should apply
-> more broadly.
-> 
-> We agreed that it is fine to leave that to a separate patch series.
-> 
-> But seeing this patch, it introduces a lot of churn, but also makes
-> it harder to address that issue for UDP, as it now moves network
-> layer checks directly to the TCP code.
-Currently the logic of flush_id is scattered in tcp_gro_receive and
-{inet,ipv6}_gro_receive with conditionals rewriting ->flush and ->flush_id,
-so IMO the code should be more concise when it's in one place - in addition
-to not doing checks against non relevant packets.
+From: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
 
-With this patch, the fix will probably be simple, most likely just calling
-gro_network_flush from skb_gro_receive or from the relevant flow in
-udp_gro_receive_segment. Since this bug fix should be simple and it being
-not relevant to the optimization, I'd like to solve it in another series
-and properly test that new flow. Do you agree?
+The switch has 4 ports with 2 internal PHYs, but ports are numbered up
+to 6, with ports 0, 1, 5 and 6 being usable.
+
+Fixes: 71d94a432a15 ("net: dsa: mv88e6xxx: add support for MV88E6020 switch")
+Signed-off-by: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
+Signed-off-by: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
+---
+
+I was unfortunately too busy to notice the issue when the patch this
+Fixes was resubmitted in my name. It would have been better to change
+my From into a Based-on-patch-by or similar when modifying it - and the
+final version obviously wasn't even tested on an 88E6020...
+
+Best regards,
+Matthias
+
+
+ drivers/net/dsa/mv88e6xxx/chip.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index 9ed1821184ece..c95787cb90867 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -5503,8 +5503,12 @@ static const struct mv88e6xxx_info mv88e6xxx_table[] = {
+ 		.family = MV88E6XXX_FAMILY_6250,
+ 		.name = "Marvell 88E6020",
+ 		.num_databases = 64,
+-		.num_ports = 4,
++		/* Ports 2-4 are not routed to pins
++		 * => usable ports 0, 1, 5, 6
++		 */
++		.num_ports = 7,
+ 		.num_internal_phys = 2,
++		.invalid_port_mask = BIT(2) | BIT(3) | BIT(4),
+ 		.max_vid = 4095,
+ 		.port_base_addr = 0x8,
+ 		.phy_base_addr = 0x0,
+-- 
+TQ-Systems GmbH | Mühlstraße 2, Gut Delling | 82229 Seefeld, Germany
+Amtsgericht München, HRB 105018
+Geschäftsführer: Detlef Schneider, Rüdiger Stahl, Stefan Schneider
+https://www.tq-group.com/
+
 
