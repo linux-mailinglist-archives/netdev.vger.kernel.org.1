@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-82124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EB4C88C595
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:47:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69D2488C596
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:47:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A1A9B25650
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:47:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 249BD304889
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:47:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6862213C8F2;
-	Tue, 26 Mar 2024 14:47:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F25DD13C80F;
+	Tue, 26 Mar 2024 14:47:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZICLlkJ8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IM36hn3y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4482813C666
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 14:47:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA4EF13C666
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 14:47:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711464424; cv=none; b=BB21N5SDXtBc4rBoKEQ80O9AdWhqsQz5Agr+9Otbx5jbDGkqyFkYY76YSVNY9jW3V5Bxc4IaUYPrsE74LHkuS101E4+xpJXl1wrJz6Cze13WA9eIolAx8QPa9kWLxcZ0PUDFAw5CSZwzFLBtk+ckzz5LfsgIFa7h3TvmDfmjNQw=
+	t=1711464425; cv=none; b=nQLnzmbg190TJqcwPw232ACSwTYEeXjXTDB855jXYby/WhY5IdzHJzcg/TLZJuySIUXLnrSmk/dPcbhcG+cABFrpsx7qX3S6UJ8REoKG7rOvoFUBP/P8HLnK2w7ecs4H8WbmNwBCC/z06OL60trs/vX1NCo3lFz5CnVd6DD8Slw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711464424; c=relaxed/simple;
-	bh=oblu9EvmQTQpj1KFzD7wrNRmOXsl3wbhZkrpxMtHhDM=;
+	s=arc-20240116; t=1711464425; c=relaxed/simple;
+	bh=WDSMVBdK4khOmOZqIo19jACc2yX49nOcGyxD1syaniE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=iHRlydmjP8es2YjVhATQHMgZHZKsACt/Uye8OqAHizipsHlQ1acVznh4wdW5e+9BlsR26e0vIwZ1kTFIRMz18tNP7ll6JHotanJzym1v5E6KILaQ0/RhMBH+Xztw3xl8T62JfXmHkPvG5RECqGvMjAifL5KYxFxaq/Bm5DtWl3U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZICLlkJ8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A9A6CC433F1;
-	Tue, 26 Mar 2024 14:47:03 +0000 (UTC)
+	 MIME-Version; b=QazQTPMyrK9br09Iqs7Fq8iKo1rvePbsrSWtW/7gFa9btW4NzO0+CIbV/5Efpd0K1fAj1ldG/MzGJ/aUhqZpfI/iXGeEX84E0zltgCVo0tdseSkcI29Tn6qKod3mhUgH6Ym/yNxqGev/aOp2sCbWtypBTaoCUiDzL7/T7XcngVM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IM36hn3y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 41A69C433F1;
+	Tue, 26 Mar 2024 14:47:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711464423;
-	bh=oblu9EvmQTQpj1KFzD7wrNRmOXsl3wbhZkrpxMtHhDM=;
+	s=k20201202; t=1711464425;
+	bh=WDSMVBdK4khOmOZqIo19jACc2yX49nOcGyxD1syaniE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ZICLlkJ8P0VGyESitSCOGlLFMVaYGjBJcaI6/yBf3wRuxDkOBJXszH2wduJqC0J7B
-	 MMLuxdUwPfOcpk8DVGzmJsVak2VOXnCz1QL7dKH2VbHuzUPCFg6L4GJtiGpWEZbu0c
-	 LFjTNYeS1ouxP07I6XlbXJEqsTPMMdZZMAtAy3FGPdHT4LSwLtEjjZ2BKyouRtI34v
-	 HbuIqRG0eSCFRoFqChQLJ7f8iWTC4Zuf/b1ezo0Q4+08KAVlpLiOKBPJ/AG7z7h57r
-	 O1fJKpeNyBrLRDDNyauRdUqN7GU+T67L5PrruH3bt+Abno3xh+sApIWXvIFnLmj9LY
-	 EM1PNwkV02uOQ==
+	b=IM36hn3y1YcE5i/KX+/ITawzmW1Z+vxdwQpNIjou9GJinm7WsZJPuv3OcI3LG8ZP5
+	 M9GtnlIqcRq47ogDTP7TDeWFT+xP6nSSqtw6g7UfRz+HHrx18B/5QIdqrYmIP2OIDn
+	 mbMTdxyJJ1xZCEMpifrf1fjEPUMeS55jIzbPbTMFsJdG4cdNTzHdQTi0YAz4WvNt6E
+	 diEfM1v8QmKzHc3DMtLBLa1VYvEO4FPANbT1wsalzOcQm+Vs/JLFiBKzykhhUC9Kr5
+	 5QmsBBt9wUeJ+bb7KfnrIxs8y/UVl8Ca862dHY1mVtI9bjNvOiuHQtDpO9XHputf3F
+	 uBnurKvc7VfXA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -53,9 +53,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
 	Carolina Jubran <cjubran@nvidia.com>,
 	Dragos Tatulea <dtatulea@nvidia.com>
-Subject: [net 07/10] net/mlx5e: Fix mlx5e_priv_init() cleanup flow
-Date: Tue, 26 Mar 2024 07:46:43 -0700
-Message-ID: <20240326144646.2078893-8-saeed@kernel.org>
+Subject: [net 08/10] net/mlx5e: HTB, Fix inconsistencies with QoS SQs number
+Date: Tue, 26 Mar 2024 07:46:44 -0700
+Message-ID: <20240326144646.2078893-9-saeed@kernel.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240326144646.2078893-1-saeed@kernel.org>
 References: <20240326144646.2078893-1-saeed@kernel.org>
@@ -69,99 +69,73 @@ Content-Transfer-Encoding: 8bit
 
 From: Carolina Jubran <cjubran@nvidia.com>
 
-When mlx5e_priv_init() fails, the cleanup flow calls mlx5e_selq_cleanup which
-calls mlx5e_selq_apply() that assures that the `priv->state_lock` is held using
-lockdep_is_held().
+When creating a new HTB class while the interface is down,
+the variable that follows the number of QoS SQs (htb_max_qos_sqs)
+may not be consistent with the number of HTB classes.
 
-Acquire the state_lock in mlx5e_selq_cleanup().
+Previously, we compared these two values to ensure that
+the node_qid is lower than the number of QoS SQs, and we
+allocated stats for that SQ when they are equal.
 
-Kernel log:
-=============================
-WARNING: suspicious RCU usage
-6.8.0-rc3_net_next_841a9b5 #1 Not tainted
------------------------------
-drivers/net/ethernet/mellanox/mlx5/core/en/selq.c:124 suspicious rcu_dereference_protected() usage!
+Change the check to compare the node_qid with the current
+number of leaf nodes and fix the checking conditions to
+ensure allocation of stats_list and stats for each node.
 
-other info that might help us debug this:
-
-rcu_scheduler_active = 2, debug_locks = 1
-2 locks held by systemd-modules/293:
- #0: ffffffffa05067b0 (devices_rwsem){++++}-{3:3}, at: ib_register_client+0x109/0x1b0 [ib_core]
- #1: ffff8881096c65c0 (&device->client_data_rwsem){++++}-{3:3}, at: add_client_context+0x104/0x1c0 [ib_core]
-
-stack backtrace:
-CPU: 4 PID: 293 Comm: systemd-modules Not tainted 6.8.0-rc3_net_next_841a9b5 #1
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-Call Trace:
- <TASK>
- dump_stack_lvl+0x8a/0xa0
- lockdep_rcu_suspicious+0x154/0x1a0
- mlx5e_selq_apply+0x94/0xa0 [mlx5_core]
- mlx5e_selq_cleanup+0x3a/0x60 [mlx5_core]
- mlx5e_priv_init+0x2be/0x2f0 [mlx5_core]
- mlx5_rdma_setup_rn+0x7c/0x1a0 [mlx5_core]
- rdma_init_netdev+0x4e/0x80 [ib_core]
- ? mlx5_rdma_netdev_free+0x70/0x70 [mlx5_core]
- ipoib_intf_init+0x64/0x550 [ib_ipoib]
- ipoib_intf_alloc+0x4e/0xc0 [ib_ipoib]
- ipoib_add_one+0xb0/0x360 [ib_ipoib]
- add_client_context+0x112/0x1c0 [ib_core]
- ib_register_client+0x166/0x1b0 [ib_core]
- ? 0xffffffffa0573000
- ipoib_init_module+0xeb/0x1a0 [ib_ipoib]
- do_one_initcall+0x61/0x250
- do_init_module+0x8a/0x270
- init_module_from_file+0x8b/0xd0
- idempotent_init_module+0x17d/0x230
- __x64_sys_finit_module+0x61/0xb0
- do_syscall_64+0x71/0x140
- entry_SYSCALL_64_after_hwframe+0x46/0x4e
- </TASK>
-
-Fixes: 8bf30be75069 ("net/mlx5e: Introduce select queue parameters")
+Fixes: 214baf22870c ("net/mlx5e: Support HTB offload")
 Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
 Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en/selq.c | 2 ++
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 2 --
- 2 files changed, 2 insertions(+), 2 deletions(-)
+ .../net/ethernet/mellanox/mlx5/core/en/qos.c  | 33 ++++++++++---------
+ 1 file changed, 17 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/selq.c b/drivers/net/ethernet/mellanox/mlx5/core/en/selq.c
-index f675b1926340..f66bbc846464 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/selq.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/selq.c
-@@ -57,6 +57,7 @@ int mlx5e_selq_init(struct mlx5e_selq *selq, struct mutex *state_lock)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c b/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c
+index e87e26f2c669..6743806b8480 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/qos.c
+@@ -83,24 +83,25 @@ int mlx5e_open_qos_sq(struct mlx5e_priv *priv, struct mlx5e_channels *chs,
  
- void mlx5e_selq_cleanup(struct mlx5e_selq *selq)
- {
-+	mutex_lock(selq->state_lock);
- 	WARN_ON_ONCE(selq->is_prepared);
+ 	txq_ix = mlx5e_qid_from_qos(chs, node_qid);
  
- 	kvfree(selq->standby);
-@@ -67,6 +68,7 @@ void mlx5e_selq_cleanup(struct mlx5e_selq *selq)
- 
- 	kvfree(selq->standby);
- 	selq->standby = NULL;
-+	mutex_unlock(selq->state_lock);
- }
- 
- void mlx5e_selq_prepare_params(struct mlx5e_selq *selq, struct mlx5e_params *params)
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 91848eae4565..b375ef268671 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -5726,9 +5726,7 @@ void mlx5e_priv_cleanup(struct mlx5e_priv *priv)
- 	kfree(priv->tx_rates);
- 	kfree(priv->txq2sq);
- 	destroy_workqueue(priv->wq);
--	mutex_lock(&priv->state_lock);
- 	mlx5e_selq_cleanup(&priv->selq);
--	mutex_unlock(&priv->state_lock);
- 	free_cpumask_var(priv->scratchpad.cpumask);
- 
- 	for (i = 0; i < priv->htb_max_qos_sqs; i++)
+-	WARN_ON(node_qid > priv->htb_max_qos_sqs);
+-	if (node_qid == priv->htb_max_qos_sqs) {
+-		struct mlx5e_sq_stats *stats, **stats_list = NULL;
+-
+-		if (priv->htb_max_qos_sqs == 0) {
+-			stats_list = kvcalloc(mlx5e_qos_max_leaf_nodes(priv->mdev),
+-					      sizeof(*stats_list),
+-					      GFP_KERNEL);
+-			if (!stats_list)
+-				return -ENOMEM;
+-		}
++	WARN_ON(node_qid >= mlx5e_htb_cur_leaf_nodes(priv->htb));
++	if (!priv->htb_qos_sq_stats) {
++		struct mlx5e_sq_stats **stats_list;
++
++		stats_list = kvcalloc(mlx5e_qos_max_leaf_nodes(priv->mdev),
++				      sizeof(*stats_list), GFP_KERNEL);
++		if (!stats_list)
++			return -ENOMEM;
++
++		WRITE_ONCE(priv->htb_qos_sq_stats, stats_list);
++	}
++
++	if (!priv->htb_qos_sq_stats[node_qid]) {
++		struct mlx5e_sq_stats *stats;
++
+ 		stats = kzalloc(sizeof(*stats), GFP_KERNEL);
+-		if (!stats) {
+-			kvfree(stats_list);
++		if (!stats)
+ 			return -ENOMEM;
+-		}
+-		if (stats_list)
+-			WRITE_ONCE(priv->htb_qos_sq_stats, stats_list);
++
+ 		WRITE_ONCE(priv->htb_qos_sq_stats[node_qid], stats);
+ 		/* Order htb_max_qos_sqs increment after writing the array pointer.
+ 		 * Pairs with smp_load_acquire in en_stats.c.
 -- 
 2.44.0
 
