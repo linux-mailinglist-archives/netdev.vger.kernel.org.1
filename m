@@ -1,146 +1,160 @@
-Return-Path: <netdev+bounces-82043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C50CC88C2FA
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:08:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0179288C304
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:09:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 017E01C28134
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:08:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E5591F3E859
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:09:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB2186FE35;
-	Tue, 26 Mar 2024 13:08:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E877673177;
+	Tue, 26 Mar 2024 13:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="Q3BPGshZ";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="ETN1EH6y"
+	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="Wk8dpn8l";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="siTAPSSM"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from wflow7-smtp.messagingengine.com (wflow7-smtp.messagingengine.com [64.147.123.142])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 493396EB56;
-	Tue, 26 Mar 2024 13:08:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B92797175F;
+	Tue, 26 Mar 2024 13:09:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=64.147.123.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711458496; cv=none; b=u8v02o78+AxVpT/9WLLtM8dyw08nW/1d2tNqji1Zez9Ki2WyabwfCs93Mj5xLy5L/7Swv2nbS+aul+6VTwNhzC5nVqy8VEGLNmSgp33B+6HGibIW4WvQdVJ9KL7gmHrCE+CW1yjFvECJJyqfI8Cq5MtKA3FFUElN4ckIrl51GIw=
+	t=1711458563; cv=none; b=TDgiEB5wY7s96rr+8nUV0nwEVycB2p9xb9KFPBcFnUhxU1vS5+Ome8p+OBnGN4EuPn97YqKC40Bj40tUM6ewVpR/ae8uWUyW0Nv2/33Ipj2sBNnFk5iTI8cyf0i8DLj1vqa8q1xn/trCoy8pff3sbd18XcRYDJFiA3pnLS9BKBw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711458496; c=relaxed/simple;
-	bh=EFshh7X9ubM0+XF5Ra6jL39fGH/o4V6QpqW2xLYoLl4=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=rjzFIZWk+jnORBDLcA3WiAoQIrVQMZf81ZsRJxRDa7Arp9//KeQK0cEy5IFVfYUVg3gHKlOiQHrsuGlcHch1sd+45dhpmQBJWxkWO6fhT0EKMkz0/l2W4U3C9a1AByOcuVO/PxhWkCPdH6RHcGNbc7OjmSyA6O7ybAuZL2hgu4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=Q3BPGshZ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=ETN1EH6y; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1711458493;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EFshh7X9ubM0+XF5Ra6jL39fGH/o4V6QpqW2xLYoLl4=;
-	b=Q3BPGshZjYjwajuB08w+lCsgYc4jwV721Wv5kUoUeHfAFvZkyxyndQHGFurpE95oBdR4bX
-	YpJjFXDFZWJr7xwnkfmW3FHTGgNjgbHxVo3KcAN7n83/W4ps0adlGOwyu50R0Qk+O2a69N
-	1xd2Ccp638kp4wALLynd+IL5F4zUqBdo/2mYwtWONS/L22/bdK2/pCCoK6Eqvs0u3M8Gzu
-	Gotov/THQ8uRTkAP5UACHcIJVGxVQLYm0FD6D/oxxhY3szI+2N/c0ILavEIEfPDdTbHsm9
-	PGQnH1iJAOWK1xQbzQTOCcciMsApeSFTClTAJR6WzEw1cNDufscUg0zVIcQDqQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1711458493;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EFshh7X9ubM0+XF5Ra6jL39fGH/o4V6QpqW2xLYoLl4=;
-	b=ETN1EH6yWipj0JNpAd5nRCoQV2L5x2Mn9uiIkmMkcszRTyQQ0yU/InWK3ccY47SVq72IP1
-	H6ZpPfeK79IJ7wAg==
-To: Florian Bezdeka <florian.bezdeka@siemens.com>, Song Yoong Siang
- <yoong.siang.song@intel.com>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, Stanislav Fomichev <sdf@google.com>, Vinicius
- Costa Gomes <vinicius.gomes@intel.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- xdp-hints@xdp-project.net
-Subject: Re: [PATCH iwl-next,v4 1/1] igc: Add Tx hardware timestamp request
- for AF_XDP zero-copy packet
-In-Reply-To: <d2623ac0f1cb07a23976416cdcf9eee1986747b0.camel@siemens.com>
-References: <20240325020928.1987947-1-yoong.siang.song@intel.com>
- <d2623ac0f1cb07a23976416cdcf9eee1986747b0.camel@siemens.com>
-Date: Tue, 26 Mar 2024 14:08:11 +0100
-Message-ID: <87h6gtb0p0.fsf@kurt.kurt.home>
+	s=arc-20240116; t=1711458563; c=relaxed/simple;
+	bh=oSY2YQfIp3WxFRdatF3eB/uMvmpALwRM1eoIubbAtzI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DqwcKaQoHT1T/r668MfAeidJ0STydqnDXskIcaDKr0eVO2HaVlJYGM6+RyjtRHz8rT81a96z+E1TIQg4xHXTzvCPeweeMwNt0hTFkPeMxL7WYBe76DtMmQWYeB6ORopmxFMYm2o5UHyHoH+PxeETX3L40wgf+RXoof/bZ4d15BI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=Wk8dpn8l; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=siTAPSSM; arc=none smtp.client-ip=64.147.123.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
+Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
+	by mailflow.west.internal (Postfix) with ESMTP id 6DF722CC015E;
+	Tue, 26 Mar 2024 09:09:17 -0400 (EDT)
+Received: from mailfrontend1 ([10.202.2.162])
+  by compute1.internal (MEProxy); Tue, 26 Mar 2024 09:09:18 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
+	cc:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to; s=fm1; t=1711458556;
+	 x=1711462156; bh=SbTcD/l8MHa59PyMOlNhqWFEL7/jqCRuzGyHcMwgJkI=; b=
+	Wk8dpn8l+B10C7CBICCIzJZJfi2VVlz8+guq8aVnt2gTfW4j3zOAN8R9huB50+66
+	geKgdkOvlgEzdrFLhcQ/VjnZfSK4psfnHM99iUHOKF9En3K8x53NC/H8695kFGtc
+	d3f52djBiKuhlFoS+W6y8/yOVLWA1Tn8+sUGq2Uh84tRKE1iePDTGSN2VlrbG3j1
+	/vgHK/8cGWz1E152YQsN8OuRIpiA7+2L81oqu8cdBK/MQ37Jaca2v5vKU2J2HBs5
+	mUgQzMWsktTaw7VDlWSHjSNQb7bVyDwwTlae1Ky/JeZ6prA304yVCydNxFuqXu/J
+	dxUf+fOF61jJ+vv6AuQ9Mg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1711458556; x=
+	1711462156; bh=SbTcD/l8MHa59PyMOlNhqWFEL7/jqCRuzGyHcMwgJkI=; b=s
+	iTAPSSMY7adUQkr/h8dvppzUOdGtCZvFlZcYfeoZzFS/rPc68iYQ2vxU2Rj42WZY
+	2Dkof8Tiyg4boG9GfEWpN9CJSHjGpsbw8GVOQZHrHXH1eB3VAUP5vw3pIvhYY9j4
+	A1psBSrBJeLCOdBH58NE6wRKRREtHbiGhbFolBgrMMFr+x5HofJ6mrOmqwes04Hi
+	UgT7PfjWyoevVgtMJ6Zz6GBY77FkRpwW+GYkm9ponWlrbys6WMKBU5eOsxLlpDhB
+	csUG03BsN66E3HX63MOJomXaeGwzd1495IVlSvaApNQhWnbmUEOsCwEYvHiNhHzw
+	sHxgvNdVDqu4T4Wbd0Wdw==
+X-ME-Sender: <xms:_MgCZpsZQmhRD3FQvyVg1aYpZlcfJ1SZMLkAdOVeI6mxX5eCXm6hwA>
+    <xme:_MgCZidFABR26jw64bfm7LbXS1qHgqgVJBcUkDrOCVZK3dHc-6qKDThZuq_V73fr2
+    G3X-RmEJkdwL3UC5wk>
+X-ME-Received: <xmr:_MgCZszTkktQm75dO6Pw3c6hV4enG0xDWqHf9lui1JjTc5BoW3gAOVXs67lI-RpxOHVgRpuw0_NS4F_P_fQIpfT_FfJDnwY>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvledruddufedggeekucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdejnecuhfhrohhmpefpihhk
+    lhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhouggvrhhluhhnugdorhgvnh
+    gvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrghtthgvrhhnpeffkefgudek
+    gefhhfejtedviedtgeetieekffeiudfhgeevteejvedtffdvkefftdenucffohhmrghinh
+    epkhgvrhhnvghlrdhorhhgnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehm
+    rghilhhfrhhomhepnhhikhhlrghsrdhsohguvghrlhhunhguodhrvghnvghsrghssehrrg
+    hgnhgrthgvtghhrdhsvg
+X-ME-Proxy: <xmx:_MgCZgPiwIRnL6Me7HCUBkbftAdwVrvVV3Wd08j9ohFx6nZFUxCkvw>
+    <xmx:_MgCZp-xNgLRTt9OYwh6YJ3CfQ-Ito-OFNkqVY5BvgqsV4XJMVlmvA>
+    <xmx:_MgCZgUXWTYaBgahAeBK_ci2OuiOCpP0FeP5GXWIGlcdJihtddi2cw>
+    <xmx:_MgCZqfc1i-pMdt1MVWdBN32zFA3J0KH5hUWVqP41VyTllRk3MdFCA>
+    <xmx:_MgCZoaJLt2n8sZfGdrTVNtfC7x4Jas-ZlQqZoM10Mii3cUes_UsMPkM47W_UES6>
+Feedback-ID: i80c9496c:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 26 Mar 2024 09:09:15 -0400 (EDT)
+Date: Tue, 26 Mar 2024 14:09:12 +0100
+From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
+To: Paul Barker <paul.barker.ct@bp.renesas.com>
+Cc: Sergey Shtylyov <s.shtylyov@omp.ru>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/2] net: ravb: Always process TX descriptor ring
+Message-ID: <20240326130912.GF1108818@ragnatech.se>
+References: <20240326083740.23364-1-paul.barker.ct@bp.renesas.com>
+ <20240326093843.GD1108818@ragnatech.se>
+ <7e57c68b-1d73-40e2-824a-12193e62047f@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <7e57c68b-1d73-40e2-824a-12193e62047f@bp.renesas.com>
 
---=-=-=
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+On 2024-03-26 09:54:04 +0000, Paul Barker wrote:
+> On 26/03/2024 09:38, Niklas Söderlund wrote:
+> > Hi Paul,
+> > 
+> > Thanks for your work.
+> > 
+> > On 2024-03-26 08:37:39 +0000, Paul Barker wrote:
+> >> The TX queue should be serviced each time the poll function is called,
+> >> even if the full RX work budget has been consumed. This prevents
+> >> starvation of the TX queue when RX bandwidth usage is high.
+> > 
+> > Is this not a design decision? That the driver should prioritize Rx over 
+> > Tx if there is contention. I have no opinion on if this design is good 
+> > or bad, I let Sergey judge that.
+> > 
+> >>
+> >> Fixes: a0d2f20650e8 ("Renesas Ethernet AVB PTP clock driver")
+> > 
+> > However, I do not think it is a bug and should not have a fixes tag.  
+> > Also this fixes tag is incorrect, this points to the commit where ravb.c 
+> > was renamed ravb_main.c. ravb_poll() is not touched by this commit.
+> 
+> Sergey identified these as bugfixes in the following emails:
+>   https://lore.kernel.org/netdev/a364963f-4e4f-dba5-cb59-b2125c14e8fc@omp.ru/
+>   https://lore.kernel.org/netdev/c58ab319-222b-5ab0-0924-7774a473e276@omp.ru/
 
-Hi Florian,
+I see, I missed that. I do not agree, this is not a bugfix, it changes a 
+design decision and the behavior of the driver.
 
-On Tue Mar 26 2024, Florian Bezdeka wrote:
-> On Mon, 2024-03-25 at 10:09 +0800, Song Yoong Siang wrote:
->> This patch adds support to per-packet Tx hardware timestamp request to
->> AF_XDP zero-copy packet via XDP Tx metadata framework. Please note that
->> user needs to enable Tx HW timestamp capability via igc_ioctl() with
->> SIOCSHWTSTAMP cmd before sending xsk Tx hardware timestamp request.
->>=20
->> Same as implementation in RX timestamp XDP hints kfunc metadata, Timer 0
->> (adjustable clock) is used in xsk Tx hardware timestamp. i225/i226 have
->> four sets of timestamping registers. *skb and *xsk_tx_buffer pointers
->> are used to indicate whether the timestamping register is already occupi=
-ed.
->
-> Let me make sure that I fully understand that: In my own words:
->
-> With that applied I'm able to get the point in time from the device
-> when a specific frame made it to the wire. I have to enable that
-> functionality using the mentioned ioctl() call first, and then check
-> the meta area (located in the umem right before the frame payload)
-> while consuming the completion queue/ring. Correct?
->
-> If so, we now have a feedback channel for meta information for/from TX.
-> Are there any plans - or would it be possible - to support Earliest
-> TxTime First (NET_SCHED_ETF) QDisc based on that channel? In the past
-> we had the problem that we we're missing a feedback channel to
-> communicate back invalid lunch times.
+@Sergey: What do you think? If you feel strongly about this being a bug 
+I will yield.
 
-Just asking: How would that work? AFAIK XDP bypasses the Qdisc
-layer. Currently invalid Launch Times are accounted in the ETF Qdisc
-itself. Does that mean every driver has to take care of it?
+> 
+> I got the wrong fixes tag though, it should be:
+>   Fixes: c156633f1353 ("Renesas Ethernet AVB driver proper")
+> 
+> Thanks,
+> 
+> -- 
+> Paul Barker
 
-Thanks,
-Kurt
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
 
------BEGIN PGP SIGNATURE-----
 
-iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmYCyLsTHGt1cnRAbGlu
-dXRyb25peC5kZQAKCRDBk9HyqkZzggJ7D/9ZO6iQENtqCYv6/eWBp7S7wfIxVTnA
-/O1AKCo1zVKtj0of1aR/1pAf1BsbmZNpYXHf0bTL74M6gzJtxRJDb+X9TX++wIRP
-TBAKlWuIiOMTRgKJ6b8lO9Jv3MExJ7WOJDarXI7wFHsgUEwZ4XgDRf+v550KVztw
-t1qEskkv0SCqZsidryG19aSwECAlvkie5JPX6WS5YuvmWRg6Gj4P8GKXUctHakfW
-z2O/mFbuq+fkAsYRA1MLXQw+uVliEoSbNaMkUCC6bH2MmAHJPs9rrmXqTMuWz5tK
-lTA4sh/OYTPJWhqvEPlJp3aCmgDmvd3VyEhxJPdnYdzhPCQ6CG+D4A5hzKjNC0eq
-Dw3UR7Gqsa4lpSrwUOcGZjtmdUQbH+lsKgekCZq/FQeU4McrWGWDJSRHC9Ak6Wge
-Zuh2KmRx7+8TynukUG+mZq0pso+F8bABY0/CK6ftt3KXhq3pS/jsMUZK6FQ0ASXP
-8PFU8imBZQorzkKnXfQv4VD9ZtXuWA9eJ2ipGFCrg2a4BEcVltXEqgy1u0yysZtZ
-Ajj/R8KvMplogG2/MSg4QS6mYxWd4sPGa8TmpSr+h4TPM+x5prFInVhTUTlUyt/D
-2+uooj7jtx07znqgPaMRrRSitxd/qGxEMW+qwNwzDgpSiKFmSyftE0A9UPBo/nSP
-SqzH1kto/s6nmw==
-=EfO9
------END PGP SIGNATURE-----
---=-=-=--
+
+
+-- 
+Kind Regards,
+Niklas Söderlund
 
