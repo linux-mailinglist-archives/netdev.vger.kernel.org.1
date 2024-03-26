@@ -1,235 +1,157 @@
-Return-Path: <netdev+bounces-81952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5056588BE2F
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 10:45:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8487188BE23
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 10:43:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77DA91F6224F
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 09:45:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7E161C3BD9B
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 09:43:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17B1274C0C;
-	Tue, 26 Mar 2024 09:40:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1D746E61B;
+	Tue, 26 Mar 2024 09:38:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F1zcRwBW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LGbWH9i4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46B01482E2
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 09:40:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E59616CDCF
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 09:38:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711446058; cv=none; b=pBqYp8sooPv3pH5Iu5R9eAHQSd808mVVOYBAihhmtn+48N7vp7MUfNAeheEhQCORu/TnVDGwLJDIYIlVm5QZ+XdwlUFSkGKTE4ey0Q+jONySIi3NZ6Rc3kAV/1erdvVHgTTnO6CK/v+qiGm8ruxvrULM3f57qL/7uaAW/LbQwPs=
+	t=1711445898; cv=none; b=iwDyq+WOCtZNnzCVHIgJ3h1USJw+ijnCwzYFRaXsK1qJI6jh15L9wg/jBtpMvbKrHKg48wior3dbiNjwVKnm/Ed2rmTU1XwkjC13suDgCjP+UOikG9Q/gB5Nckdqueve1ukP0uqb/MAARRZKXUUR/uR/0LGWLsSaJ+TwWU+QF4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711446058; c=relaxed/simple;
-	bh=oYZ7Swcqv0ORL+qDvUSwxwDbcwBtILZu0BMHwDTkuVo=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=QnaUTznZ/u6RcsS7r6EYoVLuB2sOFNNxLBQMy8EJK92CAXuV+qAUwCMzwlHd7ULxc1jjlDvDayjnNldUrMwIyb1XbN9DoHw7XWLrsLhitVMK1mlwipQA5XHv8YpZ5YSA9s/4orZz1KqYv4KqO+LZVnhP9R5ockVvcKsJ6xgrzvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F1zcRwBW; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4148c65ea45so6765775e9.2
-        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 02:40:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711446054; x=1712050854; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=bDsk+Xtv1eCqVWO9bQ6FeB3DV/CTqCmG6J4Y1W1yHho=;
-        b=F1zcRwBWX/fnZCjZ/7RTRKEgYl5e1roS3d3yYDTyxqpoSHg1PeK4JsRWMifY5e6VIj
-         KHHmJ2cISujsLEJX6FedN0UMFPrVJVoRze1ukkGd/hTQvZHvZNJPrb9z2KrL5ilfbqTi
-         senq2jjDuOpENfNBgBdAjKj4lfF328LyrGDGSYr4v6eRj279d2myzl8gQ0tX0qePtet4
-         XkOGUY7T/W1+sAqSvNo/EzBE0QGC6nMg/JCdp42HwMHTDnawrRebY8a13fsJl5rE6H0q
-         INsXkfJkjHg9mwhZuuD4aIumMMR0De7toe4cgcl8g7r1FP89i5UgfB6Ma+nHiXOI/UFx
-         mWLA==
+	s=arc-20240116; t=1711445898; c=relaxed/simple;
+	bh=Y6t6I6GHzsa04kOYqj5EDlkqjCcXCb3WPynd2QzK5pg=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=CeIB/5xR1xO6jnfn9uD6uQ+jXOvl+Rl9wabns5/rOHrfa0ih9rkp40lAHiHzoLUNiETizDOR1s7ztZTKjvB3G+KMy3XAc1kBI71LpD7ohfiNbiyoNJJ49sW96g94pS6eGcGzU8iF9qWlB2b71ywcs3NWtuJYHEpAb4uSlasBrzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LGbWH9i4; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711445895;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=Lq57SkoaYLcHxhyvenrH9jNvgNPibBPJSzi3C+8+Nug=;
+	b=LGbWH9i4qqO8waxg8EMlTiDvdr58jtENQgm0VyqOjKXHELSncub9w992MHaLx6ukHjohah
+	Wup0+c3ubFp4Yj+4HSAXQzmH4oirlC5utpG7LQ6oI4f15LHSDaeyXfU5+2T20ZHPckVWPh
+	gp5SwF5cFNEJxxEifl23cUB8yzjCYHo=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-122-Ktl-dfslNMyeJOH3aLJWGQ-1; Tue, 26 Mar 2024 05:38:06 -0400
+X-MC-Unique: Ktl-dfslNMyeJOH3aLJWGQ-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-341bdc085faso488393f8f.0
+        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 02:38:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711446054; x=1712050854;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bDsk+Xtv1eCqVWO9bQ6FeB3DV/CTqCmG6J4Y1W1yHho=;
-        b=vN8Pt6VNafQFAXQb4t3/QbzefEvpLIIG8bwz7joKP1zQcfKk2MaEscgzmkXbNFL7N3
-         kVMjYmQ6xB3U0leVjvnJ+gmyMA1lSlajIlpwspyD5TE4BdXA3uvC7dDvOf9Tame8EamF
-         rjD4Vt5ztBkh3CN8MJc4rDgCkslOQzYu72VDZ5Z6jGRS8eblpV3onijkUB1SrTkYWrZg
-         RS2YbYes00KuHsYK96v079TC+dugZUVTQ59NEzS0MNVjaVFZCzuOV2lULwHTenBHHWbf
-         PebsMZ0pAqlNxTrD1aihUX6w0H9BsPyGTIdhEE7RFHXvCIXrVNIIzgDHL6b0hiHW/62r
-         5BtQ==
-X-Gm-Message-State: AOJu0YxNK8Be7YAWBL4KGA1IH71E1Bhz32SpeqbGUpoZ2fw6A4wuYGHu
-	D56zYuCvttnn3suuLQ/B/xdsmLvRczhZN3Uuj0230TpQPGUh7jJr
-X-Google-Smtp-Source: AGHT+IFJvc/6iMgKHX2soW1stGTHMFAWzSnYstfa9aUeHUO8YtRjrGjR6xIBZNdOq9mU8EU+BVk5RQ==
-X-Received: by 2002:a05:600c:1d08:b0:413:30dc:698a with SMTP id l8-20020a05600c1d0800b0041330dc698amr6581631wms.25.1711446054317;
-        Tue, 26 Mar 2024 02:40:54 -0700 (PDT)
-Received: from imac ([2a02:8010:60a0:0:e486:aac9:8397:25ce])
-        by smtp.gmail.com with ESMTPSA id l9-20020a05600c4f0900b00414895d014fsm6247430wmq.41.2024.03.26.02.40.53
+        d=1e100.net; s=20230601; t=1711445885; x=1712050685;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lq57SkoaYLcHxhyvenrH9jNvgNPibBPJSzi3C+8+Nug=;
+        b=p9gcvK/DgCFbxQz+6J7GAc9EAf51pC4b4LaKez8TG5rJqQJU2Hy7SJqfBvzubpUL9f
+         cbhXMC9n9pUqDjJJUaAFS6sp/nr0U9bc9y56Uu7RbBFHvQr26MDSZJGs7Zrn/tjTQQKd
+         l6of2gr3yzPLWX3F8ocOZhSIlp240byI1TL04RgrFNvKRrk0/zf0S7NvXgjo/UMbzK9N
+         eOn3PVQD84k+R3HJoBJw2wZHlefco464aaESFX0opLkYPWYyPGmMXqpEDGW/H/idY//N
+         ugqj5B2BHwAs3TraTUDuG84/Y8hIoT3G9jtAPZED54vd6QHIiWKIzfnU7YADwmImcZDC
+         j0Jg==
+X-Forwarded-Encrypted: i=1; AJvYcCXgfgHJAOcjvIXE/kBprEb4a7aAXMz1zXBQVHOaFuOfGqJvoGXzdZ4LAGdcRm04FFPZ7pH8Iw3kVmv/AqWlRGRbGbBj7p7F
+X-Gm-Message-State: AOJu0YwvCuG7bUKnbtQowuThIgC3loMmp6LjdgtK47dg10zxgJ0rWXc2
+	q+onTk6/ieCcwI6iUMKR7cjPZXPUOGzzMgSZspn3UBRMvnUwyjoEp7cVcWg9iXr48nkOt7Exfrk
+	6cA0g3e4GvWPry/pfeeJ4X8rE28eeN8wsTvN6mt5wYvOoIoLvwkv5jw==
+X-Received: by 2002:a05:600c:3b0e:b0:414:8889:5a60 with SMTP id m14-20020a05600c3b0e00b0041488895a60mr4417843wms.0.1711445885405;
+        Tue, 26 Mar 2024 02:38:05 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IEDb7+Xm4UQ1SQF7EZa6f47MjQV1Pu9P/Oc97MZ3GpShnalOCbN0Q3zlbmjhipTYkrPkHExhg==
+X-Received: by 2002:a05:600c:3b0e:b0:414:8889:5a60 with SMTP id m14-20020a05600c3b0e00b0041488895a60mr4417829wms.0.1711445885043;
+        Tue, 26 Mar 2024 02:38:05 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-229-159.dyn.eolo.it. [146.241.229.159])
+        by smtp.gmail.com with ESMTPSA id iv16-20020a05600c549000b0041409cabb39sm10946382wmb.18.2024.03.26.02.38.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Mar 2024 02:40:53 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>,  Jiri Pirko <jiri@resnulli.us>,  Jacob Keller
- <jacob.e.keller@intel.com>,  Stanislav Fomichev <sdf@google.com>
-Subject: Re: [PATCHv2 net-next 2/2] doc/netlink/specs: Add vlan attr in
- rt_link spec
-In-Reply-To: <20240326024325.2008639-3-liuhangbin@gmail.com> (Hangbin Liu's
-	message of "Tue, 26 Mar 2024 10:43:25 +0800")
-Date: Tue, 26 Mar 2024 09:34:39 +0000
-Message-ID: <m2o7b11gls.fsf@gmail.com>
-References: <20240326024325.2008639-1-liuhangbin@gmail.com>
-	<20240326024325.2008639-3-liuhangbin@gmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+        Tue, 26 Mar 2024 02:38:04 -0700 (PDT)
+Message-ID: <87e9ab7796a647e7ae674ae2301729f50e4e1b2f.camel@redhat.com>
+Subject: Re: [PATCH net] MAINTAINERS: split Renesas Ethernet drivers entry
+From: Paolo Abeni <pabeni@redhat.com>
+To: Sergey Shtylyov <s.shtylyov@omp.ru>, netdev@vger.kernel.org, 
+ linux-renesas-soc@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+Date: Tue, 26 Mar 2024 10:38:03 +0100
+In-Reply-To: <de0ccc1d-6fc0-583f-4f80-f70e6461d62d@omp.ru>
+References: <de0ccc1d-6fc0-583f-4f80-f70e6461d62d@omp.ru>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
 
-Hangbin Liu <liuhangbin@gmail.com> writes:
->
-> diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/netlink/specs/rt_link.yaml
-> index 8e4d19adee8c..41b49f15236f 100644
-> --- a/Documentation/netlink/specs/rt_link.yaml
-> +++ b/Documentation/netlink/specs/rt_link.yaml
-> @@ -50,7 +50,16 @@ definitions:
->          name: dormant
->        -
->          name: echo
-> -
-> +  -
-> +    name: eth-protocols
+On Sun, 2024-03-24 at 23:40 +0300, Sergey Shtylyov wrote:
+> Since the Renesas Ethernet Switch driver was added by Yoshihiro Shimoda,
+> I started receiving the patches to review for it -- which I was unable to
+> do, as I don't know this hardware and don't even have the manuals for it.
+> Fortunately, Shimoda-san has volunteered to be a reviewer for this new
+> driver, thus let's now split the single entry into 3 per-driver entries,
+> each with its own reviewer...
+>=20
+> Signed-off-by: Sergey Shtylyov <s.shtylyov@omp.ru>
+>=20
+> ---
+> The patch is against the 'main' branch of the Netdev Group's 'net.git' re=
+po...
+>=20
+>  MAINTAINERS |   29 +++++++++++++++++++++++++----
+>  1 file changed, 25 insertions(+), 4 deletions(-)
+>=20
+> Index: net/MAINTAINERS
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> --- net.orig/MAINTAINERS
+> +++ net/MAINTAINERS
+> @@ -18724,13 +18724,24 @@ S:	Supported
+>  F:	Documentation/devicetree/bindings/i2c/renesas,iic-emev2.yaml
+>  F:	drivers/i2c/busses/i2c-emev2.c
+> =20
+> -RENESAS ETHERNET DRIVERS
+> +RENESAS ETHERNET AVB DRIVER
+>  R:	Sergey Shtylyov <s.shtylyov@omp.ru>
+>  L:	netdev@vger.kernel.org
+>  L:	linux-renesas-soc@vger.kernel.org
+> -F:	Documentation/devicetree/bindings/net/renesas,*.yaml
+> -F:	drivers/net/ethernet/renesas/
+> -F:	include/linux/sh_eth.h
+> +F:	Documentation/devicetree/bindings/net/renesas,etheravb.yaml
+> +F:	drivers/net/ethernet/renesas/Kconfig
+> +F:	drivers/net/ethernet/renesas/Makefile
+> +F:	drivers/net/ethernet/renesas/ravb*
+> +
+> +RENESAS ETHERNET SWITCH DRIVER
+> +R:	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
+> +L:	netdev@vger.kernel.org
+> +L:	linux-renesas-soc@vger.kernel.org
+> +F:	Documentation/devicetree/bindings/net/renesas,*ether-switch.yaml
+> +F:	drivers/net/ethernet/renesas/Kconfig
+> +F:	drivers/net/ethernet/renesas/Makefile
+> +F:	drivers/net/ethernet/renesas/rcar_gen4*
+> +F:	drivers/net/ethernet/renesas/rswitch*
 
-I think this should be called vlan-protocols since the enum only
-contains valid vlan protocol values.
+@Shimoda-san, could you please ack the above? We can't appoint you to
+something without your consent ;)
 
-> +    type: enum
-> +    entries:
-> +      -
-> +        name: 8021Q
+Thanks!
 
-The convention with YNL specs is to use lower case for names and let
-e.g. ynl-gen-c convert to upper case for the C domain. So these should
-be '8021q' and '8021ad'.
+Paolo
 
-> +        value: 33024
-> +      -
-> +        name: 8021AD
-> +        value: 34984
->    -
->      name: rtgenmsg
->      type: struct
-> @@ -729,6 +738,43 @@ definitions:
->        -
->          name: filter-mask
->          type: u32
-> +  -
-> +    name: ifla-vlan-flags
-> +    type: struct
-> +    members:
-> +      -
-> +        name: flags
-> +        type: u32
-> +        enum: vlan-flags
-> +        enum-as-flags: true
-> +      -
-> +        name: mask
-> +        type: u32
-> +        display-hint: hex
-> +  -
-> +    name: vlan-flags
-> +    type: flags
-> +    entries:
-> +      -
-> +        name: reorder-hdr
-> +      -
-> +        name: gvrp
-> +      -
-> +        name: loose-binding
-> +      -
-> +        name: mvrp
-> +      -
-> +        name: bridge-binding
-
-Nit: when you specify entries by name only, you can use the abbreviated
-form:
-
-   - reorder-hdr
-   - gvrp
-   - loose-binding
-   - mvrp
-   - bridge-binding
-
-> +  -
-> +    name: ifla-vlan-qos-mapping
-> +    type: struct
-> +    members:
-> +      -
-> +        name: from
-> +        type: u32
-> +      -
-> +        name: to
-> +        type: u32
->  
->  
->  attribute-sets:
-> @@ -1507,6 +1553,38 @@ attribute-sets:
->        -
->          name: num-disabled-queues
->          type: u32
-> +  -
-> +    name: linkinfo-vlan-attrs
-> +    name-prefix: ifla-vlan-
-> +    attributes:
-> +      -
-> +        name: id
-> +        type: u16
-> +      -
-> +        name: flag
-> +        type: binary
-> +        struct: ifla-vlan-flags
-> +      -
-> +        name: egress-qos
-> +        type: nest
-> +        nested-attributes: ifla-vlan-qos
-
-I _think_ this needs 'multi-attr: true'
-
-https://elixir.bootlin.com/linux/latest/source/net/8021q/vlan_netlink.c#L120
-
-> +      -
-> +        name: ingress-qos
-> +        type: nest
-> +        nested-attributes: ifla-vlan-qos
-
-Same for ingress-qos.
-
-> +      -
-> +        name: protocol
-> +        type: u16
-> +        enum: eth-protocols
-> +        byte-order: big-endian
-> +  -
-> +    name: ifla-vlan-qos
-> +    name-prefix: ifla-vlan-qos
-> +    attributes:
-> +      -
-> +        name: mapping
-> +        type: binary
-> +        struct: ifla-vlan-qos-mapping
->    -
->      name: linkinfo-vrf-attrs
->      name-prefix: ifla-vrf-
-> @@ -1666,6 +1744,9 @@ sub-messages:
->        -
->          value: tun
->          attribute-set: linkinfo-tun-attrs
-> +      -
-> +        value: vlan
-> +        attribute-set: linkinfo-vlan-attrs
->        -
->          value: vrf
->          attribute-set: linkinfo-vrf-attrs
 
