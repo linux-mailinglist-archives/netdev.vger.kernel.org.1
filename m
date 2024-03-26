@@ -1,143 +1,153 @@
-Return-Path: <netdev+bounces-81969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45C7588BF59
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:27:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3854088BF85
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:31:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F0E6F1F2B8BE
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 10:27:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B4FE1C367BF
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 10:31:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC1BF5490D;
-	Tue, 26 Mar 2024 10:27:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A75E180041;
+	Tue, 26 Mar 2024 10:29:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K+UohmZq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ZJfpgo4Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3D794C3DE;
-	Tue, 26 Mar 2024 10:27:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7970A768E9
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 10:29:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711448842; cv=none; b=m6jqQ3t1SZVHhPqra8A0yDW99aUi8iTCVoGlSoq3qUqDy7bEOu3z6GQ+8gjKNv/GESPbFL9d5laUx/e7bh+fNGjVoGIQmFSitNb2uYWvUAU5m/k9aZklS847csd37FxEKq2+9jQ8f4MGFvu8v+I030R0vgCKecYEg7Q1g6IoVmg=
+	t=1711448987; cv=none; b=Xa1DchUkPzP5CVc6rRdTbzt4DabCtGboWadMThwmHbfuyouOYOWvPl8zZLNFpGxTZPHKpvKZv+/m4/LSxxI96376ffLU9sw6n9QGoGLjq+bKMUN2hSuw1HgJXYdRv6E7k5s6jl9Uf3KUKoP2XFxCPLkRx1Xc5xGCAIdCutUsltc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711448842; c=relaxed/simple;
-	bh=kOI/dIIevG2xcttP7mDyRu+x/JIjo06VlzOdVnwHXdI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Mxk+M2L2KFVp2zBJpv+by8gyLV19EUWyyyedblS4tzQmJ3jSYReldDyYNKcrwtBbPMQdqmME7B4LydD1aR50HI+SAh8gVF8XgsBVLn3QjKiTbENspCktTY1pMYahz4UDRw8foJTTiRmJXIBBOxKO2cimjfQtQf6VMWx0ja6xCRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K+UohmZq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7240C433C7;
-	Tue, 26 Mar 2024 10:27:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711448842;
-	bh=kOI/dIIevG2xcttP7mDyRu+x/JIjo06VlzOdVnwHXdI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=K+UohmZqYkHjmg4mnlRF69yGlqvYRCKu2Sn7wfzn/iyb0ZQRzPSxvmovNAWZBeVrO
-	 cm6O+2TuN76pQ41G0x+1vxbztFs7xK0tyfQtYHqIAHHBG1FCOUkUIC6i1Az6440IWV
-	 w+8evq0tY3f3g63gBpjY8++vLTq7XBBGzpRBwBBLTCktdvJCNucewfKyFJ/SANK/0q
-	 8sYEOVRKtep2fYutJzbwMcv6XaiImxi8Xqw8bZms+nJGz9baL5iZ7gjy9raDGTK81v
-	 edY2KStCnbGsMsazalq9EQrw+zXloSePNhRt3SAbZYkadXrEeZhAQjFhlU7fjntkVa
-	 1WuDAXqZGoOow==
-Message-ID: <60c891b6-03c9-413c-b41a-14949390d106@kernel.org>
-Date: Tue, 26 Mar 2024 11:27:17 +0100
+	s=arc-20240116; t=1711448987; c=relaxed/simple;
+	bh=y8gwjrNfhhyPwtvkNsOIwPSSVr7z/gt6MPOep8tVyDc=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=HnBxP/bh0IuDiVIfQ4FyZa+/TXzm+7IUNuahim8lswtDr9UlYaf+al7FJ+utRzICu/3i2oDxT5BZSq+reoXrnXzJKDf6Uom4FR9fvkndAd0Ae8DTA4Ts3dJpEdLwxV0Wc2q+KLk3ZQV0Z9KxPdW5NEZ1aCvI9mr6o15gT1kfIHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ZJfpgo4Q; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711448983;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=rGNAumZ7yiaVmw50vUWWecYNtfUFlfoNeFuOj9jByrc=;
+	b=ZJfpgo4QbGum/5vmT8okGDgYJXAm3wJCHZ86+ff9hek7trajzZ9CuN3dwqNF1LLLiZ+V9A
+	JGvZx2D1+X0T1JnseOisJPBgbnt39y6wqVp4s2SjTq4zbrFdZVCS3l4DKngCiOThQ/FFy9
+	UnYwoAB+NfZKQyOkdU2N9oAenxtN+e0=
+Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
+ [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-184-bpQjq7mQPpyexztHYojqLw-1; Tue, 26 Mar 2024 06:29:42 -0400
+X-MC-Unique: bpQjq7mQPpyexztHYojqLw-1
+Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-610eec93d4cso19452557b3.1
+        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 03:29:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711448981; x=1712053781;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rGNAumZ7yiaVmw50vUWWecYNtfUFlfoNeFuOj9jByrc=;
+        b=UlWAN1FAyF0BA3h1WCT0uvIDKeev8738DrEwwK5+Vc67AZjKLNsae++UHVWTlX880w
+         GNOrsEUNYb7W6odCKcP/Ykmrc4FsteUHgkumWSr0vEejWYEk27LNAnP8GndIlkRqIypv
+         LJuMOowTrg4AoK8jCvNZK7UVm2CrqAZjdvu62cB97j5q32ghLAdl8UEMy2QKjsrKVf2y
+         YZsl6VmYI9o+EoTNUBTeUz/n+IEOACI/LDZcILeMFXuZrSdEu5fLaTQf2BHjbCR67k7I
+         2NHTDgSuswGJonyQrsGB6PDI9nSZ0U6m1OMJubC/LuFWbQjIewI8YkBl76EwsMc8YdFK
+         vKLQ==
+X-Gm-Message-State: AOJu0YwHDulCjnSfIHUTGIEmtPOaQnxBICZb+B4qQ9KYST6CIp/8e//S
+	ocTLZOHGuP77aJUx0rQXBk/bYbtNSOiqsmZ/2fiLFan59WzEC/yNZCFeSzM6+HYw+iftx++jlsC
+	epUzLuyIQf99LDWBb89Sm8i3SHsjbPTaykFYVTF903tMVHbeYMazvwA==
+X-Received: by 2002:a05:690c:13:b0:611:280f:5eaf with SMTP id bc19-20020a05690c001300b00611280f5eafmr5834621ywb.4.1711448981234;
+        Tue, 26 Mar 2024 03:29:41 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IGY1rhmvyT6nmzta8EOQpEY9Vk/y+OpR0hPCUZsoW4rMcN+piJ07roo7PYy10H0YZcddmmHGQ==
+X-Received: by 2002:a05:690c:13:b0:611:280f:5eaf with SMTP id bc19-20020a05690c001300b00611280f5eafmr5834590ywb.4.1711448980594;
+        Tue, 26 Mar 2024 03:29:40 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-229-159.dyn.eolo.it. [146.241.229.159])
+        by smtp.gmail.com with ESMTPSA id z1-20020a0dd701000000b0061156eaff81sm1060329ywd.27.2024.03.26.03.29.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Mar 2024 03:29:40 -0700 (PDT)
+Message-ID: <b84992bf3953da59e597883e018a79233a09a0bb.camel@redhat.com>
+Subject: Re: [PATCH net-next 0/3] trace: use TP_STORE_ADDRS macro
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, edumazet@google.com, 
+	mhiramat@kernel.org, mathieu.desnoyers@efficios.com, rostedt@goodmis.org, 
+	kuba@kernel.org, davem@davemloft.net
+Cc: netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, Jason Xing
+	 <kernelxing@tencent.com>
+Date: Tue, 26 Mar 2024 11:29:36 +0100
+In-Reply-To: <CAL+tcoAb3Q13hXnEhukCUwBL0Q1W9qC7LuWyzXYGcDzEM56LqA@mail.gmail.com>
+References: <20240325034347.19522-1-kerneljasonxing@gmail.com>
+	 <CAL+tcoAb3Q13hXnEhukCUwBL0Q1W9qC7LuWyzXYGcDzEM56LqA@mail.gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [TEST] VirtioFS instead of 9p
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-References: <20240325064234.12c436c2@kernel.org>
- <34e4f87d-a0c8-4ac3-afd8-a34bbab016ce@kernel.org>
- <20240325184237.0d5a3a7d@kernel.org>
-Content-Language: en-GB
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
- YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
- c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
- WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
- CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
- nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
- TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
- nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
- VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
- 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
- YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
- AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
- EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
- /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
- MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
- cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
- iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
- jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
- 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
- VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
- BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
- ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
- 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
- 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
- 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
- mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
- Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
- Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
- Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
- x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
- V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
- Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
- HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
- 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
- Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
- voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
- KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
- UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
- vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
- mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
- JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20240325184237.0d5a3a7d@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-Hi Jakub,
+On Tue, 2024-03-26 at 12:14 +0800, Jason Xing wrote:
+> On Mon, Mar 25, 2024 at 11:43=E2=80=AFAM Jason Xing <kerneljasonxing@gmai=
+l.com> wrote:
+> >=20
+> > From: Jason Xing <kernelxing@tencent.com>
+> >=20
+> > Using the macro for other tracepoints use to be more concise.
+> > No functional change.
+> >=20
+> > Jason Xing (3):
+> >   trace: move to TP_STORE_ADDRS related macro to net_probe_common.h
+> >   trace: use TP_STORE_ADDRS() macro in inet_sk_error_report()
+> >   trace: use TP_STORE_ADDRS() macro in inet_sock_set_state()
+> >=20
+> >  include/trace/events/net_probe_common.h | 29 ++++++++++++++++++++
+> >  include/trace/events/sock.h             | 35 ++++---------------------
+>=20
+> I just noticed that some trace files in include/trace directory (like
+> net_probe_common.h, sock.h, skb.h, net.h, sock.h, udp.h, sctp.h,
+> qdisc.h, neigh.h, napi.h, icmp.h, ...) are not owned by networking
+> folks while some files (like tcp.h) have been maintained by specific
+> maintainers/experts (like Eric) because they belong to one specific
+> area. I wonder if we can get more networking guys involved in net
+> tracing.
+>=20
+> I'm not sure if 1) we can put those files into the "NETWORKING
+> [GENERAL]" category, or 2) we can create a new category to include
+> them all.
 
-On 26/03/2024 02:42, Jakub Kicinski wrote:
-> On Mon, 25 Mar 2024 17:32:54 +0100 Matthieu Baerts wrote:
->> With 'virtme-ng' used by NIPA, it is possible to use VirtioFS or
->> OverlayFS instead of 9p.
->>
->> VirtioFS seems to perform much better than 9p [1]. All you need is to
->> install "virtiofsd" daemon in userspace [2]. It looks like Nipa is still
->> using 9p for the rootfs, it might be good to switch to VirtioFS if it is
->> easy :)
-> 
-> "All you need is to install" undersells it a little :)
-> 
-> It's not packaged for silly OS^w^w AWS Linux.
+I think all the file you mentioned are not under networking because of
+MAINTAINER file inaccuracy, and we could move there them accordingly.
+>=20
+> I know people start using BPF to trace them all instead, but I can see
+> some good advantages of those hooks implemented in the kernel, say:
+> 1) help those machines which are not easy to use BPF tools.
+> 2) insert the tracepoint in the middle of some functions which cannot
+> be replaced by bpf kprobe.
+> 3) if we have enough tracepoints, we can generate a timeline to
+> know/detect which flow/skb spends unexpected time at which point.
+> ...
+> We can do many things in this area, I think :)
+>=20
+> What do you think about this, Jakub, Paolo, Eric ?
 
-Thank you for having tried! That's a shame "virtiofsd" is not packaged!
-
-> And the Rust that comes with it doesn't seem to be able to build it :(
-Did you try by installing Rust (rustc, cargo) via rustup [1]? It is even
-possible to get the offline installer if it is easier [2]. With rustup,
-you can easily install newer versions of the Rust toolchain.
-
-[1] https://www.rust-lang.org/learn/get-started
-[2] https://forge.rust-lang.org/infra/other-installation-methods.html
-
-
-Do you need a hand to update the wiki page?
+I agree tracepoints are useful, but I think the general agreement is
+that they are the 'old way', we should try to avoid their
+proliferation.=20
 
 Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+
+Paolo
 
 
