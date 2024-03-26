@@ -1,59 +1,63 @@
-Return-Path: <netdev+bounces-81872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F2688B762
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 03:23:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A34088B769
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 03:29:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47E561F3FB86
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 02:23:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3AA081F324EA
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 02:29:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 891775A0EA;
-	Tue, 26 Mar 2024 02:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 691206F07B;
+	Tue, 26 Mar 2024 02:28:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QWE8Fx2/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="udTdxOGA"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3A657314;
-	Tue, 26 Mar 2024 02:23:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B654E1A8;
+	Tue, 26 Mar 2024 02:28:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711419790; cv=none; b=cBmgjCPXfXhJmtJgtMxg/poiX7IpauhZAAw3Rfg0ujl+ZykcPmZp6z9mxAokrsNboS2yzQNLx7Ue1ZaoLjxSbvYT8H+STiiUlE5oUNX2QzzS9HCpPASTRImRYjiN3fOIeilO80kiDWUgxEctg/+kpuGe0vyp9+qBQ+YkEJVJI14=
+	t=1711420137; cv=none; b=MMakkP2L5rxoXtyh2YNjdC2RCavSl0n9+vEW0mRx1hXBaYEG6TO6JcDLGI5b1Z0/f745FPYphLBUDfP66ag4+MYNKrHHnotGlG+7BH8Ggd+sZkmHOKDFh4szrLQYXVKubNPuMRsJtp+AXBNsEOqiPjTlKCdAAAMxv44bgiIg8j8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711419790; c=relaxed/simple;
-	bh=rLJrlM4Vj3ruWzRskldOfk/gPLlOLe1L+G1vTxKZdrY=;
+	s=arc-20240116; t=1711420137; c=relaxed/simple;
+	bh=Ktz9UbpIvvzi2R8AiNv+RRMOy4vq7/ZgvePg/K1Kn8s=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=K3M7ctdev7t+hC63uG1h9z/ADaJlhpvTnLrKZM9v/HgPNdhLtG+y8+B1zVEpjIIBNnMI1Xg70IzUatnY/WORoX6L9RX0WRSlkKG3Y7ch6YkQQ3qREz+d0vg+lfysAOOQM0SAbQGVYaI+E5dCVA1rpcxBi9E1tCYG1rRDmWm9gFI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QWE8Fx2/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 524B6C433C7;
-	Tue, 26 Mar 2024 02:23:09 +0000 (UTC)
+	 MIME-Version:Content-Type; b=s1d0S0ScxnUdDCjpUlzx+FwF+CdAm2koJxmI7/p1c86tpV+mY2kba6SucD8Oj8cfcri+ba4l8gfrEdpYtDISOuin2nJ6ucoZWlP3pLFNCLjRePu6Dj4/Suv6nOwbBHBRhHvMA0JiufUCnJLVDyT306feyUKso90T0SXzPu2x61c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=udTdxOGA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60579C433C7;
+	Tue, 26 Mar 2024 02:28:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711419789;
-	bh=rLJrlM4Vj3ruWzRskldOfk/gPLlOLe1L+G1vTxKZdrY=;
+	s=k20201202; t=1711420137;
+	bh=Ktz9UbpIvvzi2R8AiNv+RRMOy4vq7/ZgvePg/K1Kn8s=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QWE8Fx2/scMC3CnONx0ZLGfWc2rbLmoseGGGizauI3ApPd01Jj4jgRM8tmF+2vIcB
-	 6t5PzG0hTfn3xh5ZMJDDoSUqrc5ptRHccEh7yXXtmUFnsAybVK533aEmJ7zYjzxTgF
-	 FM/q2FMWabtNTrdN6Znu4TU2btX1KWbjSXcjsOnGNY5QUc9fCfheMMbXIIZJXLA01r
-	 50b/gf6myFShjss80DVQtEo9uZ7EiKygAe9f3e+M2isMdyKIXNlm1UczA9miPPMXUc
-	 3lrX7O9fgu81y4HJfmAlo2G8ZkIXpUVXBeizfZxsnZdHQnlVLHfTOD+pzKOaQnqj66
-	 4Uc7RYyiHDcng==
-Date: Mon, 25 Mar 2024 19:23:08 -0700
+	b=udTdxOGAJBrg51gfL1uwJ93+ngK3GMR3Fm0SHsW8NFMKc9VeZ8WX9rURwWXQQ1s0e
+	 X3QpkfyFYRd5auxgAHs/WDPfEgWkK7wSdwbRSK6qHf0/CGPL8KpZO9/fEKWPQ2XdIY
+	 jnlKG4Dht0MQ7vuTO/6bx6UbifyWIgKxFgzP8LfsnjvuliAD1b+X6o3pf/hbIgdu7n
+	 y+/cszBAu+5pTmwVTHjeiB8jAJDHwN24rlH/UglH/enj2pq0nZaEqnDaDJPPBOzfQq
+	 mZV1xvO24t1nWKFsmZujrP5oEVBubPo6ks4hFNQzy5B7k/2WcFzNu7DrmpBWk+Gcdc
+	 DMB3pyfzrPbRw==
+Date: Mon, 25 Mar 2024 19:28:55 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: edumazet@google.com, mhiramat@kernel.org,
- mathieu.desnoyers@efficios.com, rostedt@goodmis.org, pabeni@redhat.com,
- davem@davemloft.net, netdev@vger.kernel.org,
- linux-trace-kernel@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v2 0/3] tcp: make trace of reset logic complete
-Message-ID: <20240325192308.22e6924c@kernel.org>
-In-Reply-To: <CAL+tcoAXCagwnNNwcP95JcW3Wx-5Zzu87+YFOaaecH5XMS6sMQ@mail.gmail.com>
-References: <20240325062831.48675-1-kerneljasonxing@gmail.com>
-	<20240325183033.79107f1d@kernel.org>
-	<CAL+tcoAXCagwnNNwcP95JcW3Wx-5Zzu87+YFOaaecH5XMS6sMQ@mail.gmail.com>
+To: Balazs Scheidler <bazsi77@gmail.com>
+Cc: kerneljasonxing@gmail.com, kuniyu@amazon.com, netdev@vger.kernel.org,
+ Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
+ <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Balazs Scheidler
+ <balazs.scheidler@axoflow.com>, linux-kernel@vger.kernel.org,
+ linux-trace-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/2] net: udp: add IP/port data to the
+ tracepoint udp/udp_fail_queue_rcv_skb
+Message-ID: <20240325192855.1fb3c331@kernel.org>
+In-Reply-To: <34a9c221a6d644f18c826a1beddba58af6b7a64c.1711361723.git.balazs.scheidler@axoflow.com>
+References: <cover.1711361723.git.balazs.scheidler@axoflow.com>
+	<34a9c221a6d644f18c826a1beddba58af6b7a64c.1711361723.git.balazs.scheidler@axoflow.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,11 +67,27 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 26 Mar 2024 10:13:55 +0800 Jason Xing wrote:
-> Yesterday, I posted two series to do two kinds of things. They are not
-> the same. Maybe you get me wrong :S
+On Mon, 25 Mar 2024 11:29:18 +0100 Balazs Scheidler wrote:
+> +                memset(__entry->saddr, 0, sizeof(struct sockaddr_in6));
+> +                memset(__entry->daddr, 0, sizeof(struct sockaddr_in6));
 
-Ah, my bad, sorry about that. I see that they are different now.
-One is v1 the other v2, both targeting tcp tracing... Easy to miss
-in the post merge window rush :(
+Indent with tabs please, checkpatch says:
+
+ERROR: code indent should use tabs where possible
+#59: FILE: include/trace/events/udp.h:38:
++                memset(__entry->saddr, 0, sizeof(struct sockaddr_in6));$
+
+WARNING: please, no spaces at the start of a line
+#59: FILE: include/trace/events/udp.h:38:
++                memset(__entry->saddr, 0, sizeof(struct sockaddr_in6));$
+
+ERROR: code indent should use tabs where possible
+#60: FILE: include/trace/events/udp.h:39:
++                memset(__entry->daddr, 0, sizeof(struct sockaddr_in6));$
+
+WARNING: please, no spaces at the start of a line
+#60: FILE: include/trace/events/udp.h:39:
++                memset(__entry->daddr, 0, sizeof(struct sockaddr_in6));$
+-- 
+pw-bot: cr
 
