@@ -1,328 +1,247 @@
-Return-Path: <netdev+bounces-82131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD6E788C5BC
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:49:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D8E888C5A5
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:48:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0EE0287DE7
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:49:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 162111F61B14
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:48:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB04F13C67B;
-	Tue, 26 Mar 2024 14:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94E3913C81A;
+	Tue, 26 Mar 2024 14:48:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TU8StDAF"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ig07/6NJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8A9763E6;
-	Tue, 26 Mar 2024 14:49:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E615813C819
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 14:48:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711464585; cv=none; b=c2LjnqB/3nids4LYCCRETjxWFAWpkgcINPdH2KMkee4bzeQByyQIwTXsDtjL2mVw5zsccf/yNDPaVfs7oaa7W467g1cJ+YEFPvD7/N6MUq3oGI1V2XUf2uawOtQvpm10LInqUoF4LwyagFWU738T2fmzEXHVpOVCYdqKZgix2v0=
+	t=1711464482; cv=none; b=XF2Vtb9t6pBfo3/XHL14fdu94EdbBwA5WOBLi7r2II8WSibWQieujn2cvYqcTtreLny5KROilRVRQetGmsZW+InOQeo4ekj7NEIXXhqzzb/PclLGc315YXzkZHslakqinTNNWG/v6TgHvFCBw2d5DTN/mlvb276lfNPx+ghRZW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711464585; c=relaxed/simple;
-	bh=lDWiD7+nw474pdvcvkBIm1FE6rlA0anUmxKsPlaP/CQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QqMfy4QgI7r/N6cjS95uDdewadCRk74del3BOBnkZDVXC8emUMUEWqX7bSGexRxpi0NuV0LfxZhHD9NIhgYkzM+0o4sREVUXlt0oEPjymuvfbh5jGfFQZIaAMACvi7KrpnZzTYxtPrgf9sRtvFwLJ++s2voR/T5ntmiWywMUF7E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TU8StDAF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 83F44C433C7;
-	Tue, 26 Mar 2024 14:49:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711464585;
-	bh=lDWiD7+nw474pdvcvkBIm1FE6rlA0anUmxKsPlaP/CQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TU8StDAF6hFrF/NLuivrhqNn7caz5dOF+e1Bdm1h+X+faqh0YN5MlOabmNrOYgouD
-	 5d5mnrfmNj1BrU/iqcsYqlCwekPmTDr3yH3HHuY4H7PSRmSIx1HhlN7zgsBg5qXcxc
-	 tQjCg8v3djrN3YihebJ5ueIHSkU+cgHiJ8ReDlZKqdNrDC0Gsl16TdmpVzBDRCS2nc
-	 2pgcOe74ycfq0RIXyDLUl18vRjh6EjpSuZS79NfVPHJokzs1F6eUtKXm6WSkjnvW8W
-	 Y39zsyCYQp6NAdqYk8Q+1xQP1WmAx00xm+7QiUDyjp/78HosxzaUjZQO/zDdEkDylp
-	 aHSiI8JdeysZg==
-From: Arnd Bergmann <arnd@kernel.org>
-To: linux-kbuild@vger.kernel.org,
-	Masahiro Yamada <masahiroy@kernel.org>,
-	Harry Wentland <harry.wentland@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	Jani Nikula <jani.nikula@linux.intel.com>,
-	Lucas De Marchi <lucas.demarchi@intel.com>,
-	Oded Gabbay <ogabbay@kernel.org>,
-	Maarten Lankhorst <maarten.lankhorst@linux.intel.com>,
-	Maxime Ripard <mripard@kernel.org>,
-	Thomas Zimmermann <tzimmermann@suse.de>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Andrew Jeffery <andrew@codeconstruct.com.au>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Joel Stanley <joel@jms.id.au>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Nathan Chancellor <nathan@kernel.org>
-Cc: Nicolas Schier <nicolas@fjasle.eu>,
-	Arnd Bergmann <arnd@arndb.de>,
-	dri-devel@lists.freedesktop.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-mm@kvack.org,
-	llvm@lists.linux.dev
-Subject: [PATCH 01/12] kbuild: make -Woverride-init warnings more consistent
-Date: Tue, 26 Mar 2024 15:47:16 +0100
-Message-Id: <20240326144741.3094687-2-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240326144741.3094687-1-arnd@kernel.org>
-References: <20240326144741.3094687-1-arnd@kernel.org>
+	s=arc-20240116; t=1711464482; c=relaxed/simple;
+	bh=3PhPFmtMXTFzXulo7OnKGBtbp3soH+jEYdIaqNsLrJI=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=qW5lsy5o9UWmqvS/PIebc5GPQuQlC9mjLZBI7InaDyK7Fgt6tPKaQUkGDPgLRV6dPPbLXYMGfI3NFVKP7CvzoeTlYehEaRq5F9XBe82gYOW5V7hbFSrbl0T3SYpKTjTU2uWYESfEFuBjagUd1WUNU5NUUamuYDpmhuJg+ADnrZg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ig07/6NJ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711464479;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=jScJXT7RWmrSuuM+GEL3DawWsowDb68KJFR/IcMnJKM=;
+	b=ig07/6NJBmZL2if7EwGXHR7sPiWXPH7npCgqkCqgjpya6vwUdKRctuw0CRbNZta8i7Lmpi
+	T1nHecCam/GTasuHKbfwuLLzer3Ec2iEFZDaBGvKjb5kf2g/xztKUYd/i22qEOae8tYm/o
+	FfipRYIl4hwwuFnThMTc6v8Qt59ZwbU=
+Received: from mail-lf1-f72.google.com (mail-lf1-f72.google.com
+ [209.85.167.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-610-BpGuNXZLNiCfvXDLxmgiow-1; Tue, 26 Mar 2024 10:47:58 -0400
+X-MC-Unique: BpGuNXZLNiCfvXDLxmgiow-1
+Received: by mail-lf1-f72.google.com with SMTP id 2adb3069b0e04-515b6d98f52so209632e87.1
+        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 07:47:58 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711464476; x=1712069276;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=jScJXT7RWmrSuuM+GEL3DawWsowDb68KJFR/IcMnJKM=;
+        b=krOpfx79yCd4+yZyRlKA0Z9hlAeWSZCzADkydbywkIde+1pQIzNOQAvidrnpKSgdhl
+         tCE5ziyjZCrk57wNf3tuu3a/GxRcP2A61vRo+I5OwcJxHiCB4+xVz1PxkOuFncCtbkj3
+         LdGvSq6toX6B/A0xbd5zWxs16kqNseAY25mwqmO52RAhrG5FwtExcY0idxNTbK99SWqD
+         UR4T47cODw0WVwQrLMPYackBQ1pr5gFFNravv/MNzpIND5ooco8tGHh9TUNgEVLON7A1
+         KvvOaJ3NVJQFggaLeMkD707hCa7vLRLCZYr9kAQ8+SJHzSI1lqs5Zd7sMW5wakys8anS
+         LiMw==
+X-Forwarded-Encrypted: i=1; AJvYcCV4F40P/AK4vNy6Vvn931cf/HYv54TxK+LhFr01GuK5Ko53L+hzxkD8BFe/zo1rcApIlPvy7hBlcd1oh/T1A6k13M1/qfO5
+X-Gm-Message-State: AOJu0Yyw+DD6Xs7w7pBFl/tgTjeQsdpgS2NTOj/wXKhduP3WKtfoqD8J
+	sY21gwwkzlmnhSe9Bmp9X/lf3eArk/grnojVfJ2d+g1bdJPLTkNwCZ7L9oPAcfXaaN1XTcm7rEO
+	jwNRGn82dRmQjoLe5P0GeBeqQZfeVIVIoTEsQRL7/Rf0R8jhqRA6s+TSRfo6EtQ==
+X-Received: by 2002:a19:8c52:0:b0:513:30fd:2991 with SMTP id i18-20020a198c52000000b0051330fd2991mr5763245lfj.0.1711464475937;
+        Tue, 26 Mar 2024 07:47:55 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHATkY2AHLmAtWCgq6Q66TQl3TnOeEqIO0zVH4UI6gJ3Hh5NT81qC9HaNonp0FQderrY/k4tg==
+X-Received: by 2002:a19:8c52:0:b0:513:30fd:2991 with SMTP id i18-20020a198c52000000b0051330fd2991mr5763219lfj.0.1711464475437;
+        Tue, 26 Mar 2024 07:47:55 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-229-159.dyn.eolo.it. [146.241.229.159])
+        by smtp.gmail.com with ESMTPSA id k1-20020a170906a38100b00a4644397aa9sm4300119ejz.67.2024.03.26.07.47.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Mar 2024 07:47:54 -0700 (PDT)
+Message-ID: <ea2ad0773c91709094764474bf46825c146d741b.camel@redhat.com>
+Subject: Re: [PATCH net-next v13  06/15] p4tc: add P4 data types
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org
+Cc: deb.chatterjee@intel.com, anjali.singhai@intel.com, 
+ namrata.limaye@intel.com, tom@sipanda.io, mleitner@redhat.com, 
+ Mahesh.Shirshyad@amd.com, Vipin.Jain@amd.com, tomasz.osinski@intel.com, 
+ jiri@resnulli.us, xiyou.wangcong@gmail.com, davem@davemloft.net, 
+ edumazet@google.com, kuba@kernel.org, vladbu@nvidia.com, horms@kernel.org, 
+ khalidm@nvidia.com, toke@redhat.com, daniel@iogearbox.net,
+ victor@mojatatu.com,  pctammela@mojatatu.com, bpf@vger.kernel.org
+Date: Tue, 26 Mar 2024 15:47:52 +0100
+In-Reply-To: <20240325142834.157411-7-jhs@mojatatu.com>
+References: <20240325142834.157411-1-jhs@mojatatu.com>
+	 <20240325142834.157411-7-jhs@mojatatu.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-From: Arnd Bergmann <arnd@arndb.de>
+On Mon, 2024-03-25 at 10:28 -0400, Jamal Hadi Salim wrote:
+> +static int p4t_s32_validate(struct p4tc_type *container, void *value,
+> +			    u16 bitstart, u16 bitend,
+> +			    struct netlink_ext_ack *extack)
+> +{
+> +	s32 minsz =3D S32_MIN, maxsz =3D S32_MAX;
+> +	s32 *val =3D value;
+> +
+> +	if (val && (*val > maxsz || *val < minsz)) {
+> +		NL_SET_ERR_MSG_MOD(extack, "S32 value out of range");
 
-The -Woverride-init warn about code that may be intentional or not,
-but the inintentional ones tend to be real bugs, so there is a bit of
-disagreement on whether this warning option should be enabled by default
-and we have multiple settings in scripts/Makefile.extrawarn as well as
-individual subsystems.
+I'm sorry for the additional questions/points below which could/should
+have been flagged earlier.
 
-Older versions of clang only supported -Wno-initializer-overrides with
-the same meaning as gcc's -Woverride-init, though all supported versions
-now work with both. Because of this difference, an earlier cleanup of
-mine accidentally turned the clang warning off for W=1 builds and only
-left it on for W=2, while it's still enabled for gcc with W=1.
+Out of sheer ignorance IDK if a single P4 command could use multiple
+types, possibly use NL_SET_ERR_MSG_FMT_MOD() and specify the bogus
+value/range.
 
-There is also one driver that only turns the warning off for newer
-versions of gcc but not other compilers, and some but not all the
-Makefiles still use a cc-disable-warning conditional that is no
-longer needed with supported compilers here.
+The same point/question has a few other instances below.
 
-Address all of the above by removing the special cases for clang
-and always turning the warning off unconditionally where it got
-in the way, using the syntax that is supported by both compilers.
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
 
-Fixes: 2cd3271b7a31 ("kbuild: avoid duplicate warning options")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/gpu/drm/amd/display/dc/dce110/Makefile |  2 +-
- drivers/gpu/drm/amd/display/dc/dce112/Makefile |  2 +-
- drivers/gpu/drm/amd/display/dc/dce120/Makefile |  2 +-
- drivers/gpu/drm/amd/display/dc/dce60/Makefile  |  2 +-
- drivers/gpu/drm/amd/display/dc/dce80/Makefile  |  2 +-
- drivers/gpu/drm/i915/Makefile                  |  6 +++---
- drivers/gpu/drm/xe/Makefile                    |  4 ++--
- drivers/net/ethernet/renesas/sh_eth.c          |  2 +-
- drivers/pinctrl/aspeed/Makefile                |  2 +-
- fs/proc/Makefile                               |  2 +-
- kernel/bpf/Makefile                            |  2 +-
- mm/Makefile                                    |  3 +--
- scripts/Makefile.extrawarn                     | 10 +++-------
- 13 files changed, 18 insertions(+), 23 deletions(-)
+[...]
 
-diff --git a/drivers/gpu/drm/amd/display/dc/dce110/Makefile b/drivers/gpu/drm/amd/display/dc/dce110/Makefile
-index f0777d61c2cb..c307f040e48f 100644
---- a/drivers/gpu/drm/amd/display/dc/dce110/Makefile
-+++ b/drivers/gpu/drm/amd/display/dc/dce110/Makefile
-@@ -23,7 +23,7 @@
- # Makefile for the 'controller' sub-component of DAL.
- # It provides the control and status of HW CRTC block.
- 
--CFLAGS_$(AMDDALPATH)/dc/dce110/dce110_resource.o = $(call cc-disable-warning, override-init)
-+CFLAGS_$(AMDDALPATH)/dc/dce110/dce110_resource.o = -Wno-override-init
- 
- DCE110 = dce110_timing_generator.o \
- dce110_compressor.o dce110_opp_regamma_v.o \
-diff --git a/drivers/gpu/drm/amd/display/dc/dce112/Makefile b/drivers/gpu/drm/amd/display/dc/dce112/Makefile
-index 7e92effec894..683866797709 100644
---- a/drivers/gpu/drm/amd/display/dc/dce112/Makefile
-+++ b/drivers/gpu/drm/amd/display/dc/dce112/Makefile
-@@ -23,7 +23,7 @@
- # Makefile for the 'controller' sub-component of DAL.
- # It provides the control and status of HW CRTC block.
- 
--CFLAGS_$(AMDDALPATH)/dc/dce112/dce112_resource.o = $(call cc-disable-warning, override-init)
-+CFLAGS_$(AMDDALPATH)/dc/dce112/dce112_resource.o = -Wno-override-init
- 
- DCE112 = dce112_compressor.o
- 
-diff --git a/drivers/gpu/drm/amd/display/dc/dce120/Makefile b/drivers/gpu/drm/amd/display/dc/dce120/Makefile
-index 1e3ef68a452a..8f508e662748 100644
---- a/drivers/gpu/drm/amd/display/dc/dce120/Makefile
-+++ b/drivers/gpu/drm/amd/display/dc/dce120/Makefile
-@@ -24,7 +24,7 @@
- # It provides the control and status of HW CRTC block.
- 
- 
--CFLAGS_$(AMDDALPATH)/dc/dce120/dce120_resource.o = $(call cc-disable-warning, override-init)
-+CFLAGS_$(AMDDALPATH)/dc/dce120/dce120_resource.o = -Wno-override-init
- 
- DCE120 = dce120_timing_generator.o
- 
-diff --git a/drivers/gpu/drm/amd/display/dc/dce60/Makefile b/drivers/gpu/drm/amd/display/dc/dce60/Makefile
-index fee331accc0e..eede83ad91fa 100644
---- a/drivers/gpu/drm/amd/display/dc/dce60/Makefile
-+++ b/drivers/gpu/drm/amd/display/dc/dce60/Makefile
-@@ -23,7 +23,7 @@
- # Makefile for the 'controller' sub-component of DAL.
- # It provides the control and status of HW CRTC block.
- 
--CFLAGS_$(AMDDALPATH)/dc/dce60/dce60_resource.o = $(call cc-disable-warning, override-init)
-+CFLAGS_$(AMDDALPATH)/dc/dce60/dce60_resource.o = -Wno-override-init
- 
- DCE60 = dce60_timing_generator.o dce60_hw_sequencer.o \
- 	dce60_resource.o
-diff --git a/drivers/gpu/drm/amd/display/dc/dce80/Makefile b/drivers/gpu/drm/amd/display/dc/dce80/Makefile
-index 7eefffbdc925..fba189d26652 100644
---- a/drivers/gpu/drm/amd/display/dc/dce80/Makefile
-+++ b/drivers/gpu/drm/amd/display/dc/dce80/Makefile
-@@ -23,7 +23,7 @@
- # Makefile for the 'controller' sub-component of DAL.
- # It provides the control and status of HW CRTC block.
- 
--CFLAGS_$(AMDDALPATH)/dc/dce80/dce80_resource.o = $(call cc-disable-warning, override-init)
-+CFLAGS_$(AMDDALPATH)/dc/dce80/dce80_resource.o = -Wno-override-init
- 
- DCE80 = dce80_timing_generator.o
- 
-diff --git a/drivers/gpu/drm/i915/Makefile b/drivers/gpu/drm/i915/Makefile
-index 3ef6ed41e62b..4c2f85632391 100644
---- a/drivers/gpu/drm/i915/Makefile
-+++ b/drivers/gpu/drm/i915/Makefile
-@@ -33,9 +33,9 @@ endif
- subdir-ccflags-$(CONFIG_DRM_I915_WERROR) += -Werror
- 
- # Fine grained warnings disable
--CFLAGS_i915_pci.o = $(call cc-disable-warning, override-init)
--CFLAGS_display/intel_display_device.o = $(call cc-disable-warning, override-init)
--CFLAGS_display/intel_fbdev.o = $(call cc-disable-warning, override-init)
-+CFLAGS_i915_pci.o = -Wno-override-init
-+CFLAGS_display/intel_display_device.o = -Wno-override-init
-+CFLAGS_display/intel_fbdev.o = -Wno-override-init
- 
- # Support compiling the display code separately for both i915 and xe
- # drivers. Define I915 when building i915.
-diff --git a/drivers/gpu/drm/xe/Makefile b/drivers/gpu/drm/xe/Makefile
-index 5a428ca00f10..c29a850859ad 100644
---- a/drivers/gpu/drm/xe/Makefile
-+++ b/drivers/gpu/drm/xe/Makefile
-@@ -172,8 +172,8 @@ subdir-ccflags-$(CONFIG_DRM_XE_DISPLAY) += \
- 	-Ddrm_i915_gem_object=xe_bo \
- 	-Ddrm_i915_private=xe_device
- 
--CFLAGS_i915-display/intel_fbdev.o = $(call cc-disable-warning, override-init)
--CFLAGS_i915-display/intel_display_device.o = $(call cc-disable-warning, override-init)
-+CFLAGS_i915-display/intel_fbdev.o = -Wno-override-init
-+CFLAGS_i915-display/intel_display_device.o = -Wno-override-init
- 
- # Rule to build SOC code shared with i915
- $(obj)/i915-soc/%.o: $(srctree)/drivers/gpu/drm/i915/soc/%.c FORCE
-diff --git a/drivers/net/ethernet/renesas/sh_eth.c b/drivers/net/ethernet/renesas/sh_eth.c
-index 475e1e8c1d35..0786eb0da391 100644
---- a/drivers/net/ethernet/renesas/sh_eth.c
-+++ b/drivers/net/ethernet/renesas/sh_eth.c
-@@ -50,7 +50,7 @@
-  * the macros available to do this only define GCC 8.
-  */
- __diag_push();
--__diag_ignore(GCC, 8, "-Woverride-init",
-+__diag_ignore_all("-Woverride-init",
- 	      "logic to initialize all and then override some is OK");
- static const u16 sh_eth_offset_gigabit[SH_ETH_MAX_REGISTER_OFFSET] = {
- 	SH_ETH_OFFSET_DEFAULTS,
-diff --git a/drivers/pinctrl/aspeed/Makefile b/drivers/pinctrl/aspeed/Makefile
-index 489ea1778353..db2a7600ae2b 100644
---- a/drivers/pinctrl/aspeed/Makefile
-+++ b/drivers/pinctrl/aspeed/Makefile
-@@ -1,7 +1,7 @@
- # SPDX-License-Identifier: GPL-2.0-only
- # Aspeed pinctrl support
- 
--ccflags-y += $(call cc-option,-Woverride-init)
-+ccflags-y += -Woverride-init
- obj-$(CONFIG_PINCTRL_ASPEED)	+= pinctrl-aspeed.o pinmux-aspeed.o
- obj-$(CONFIG_PINCTRL_ASPEED_G4)	+= pinctrl-aspeed-g4.o
- obj-$(CONFIG_PINCTRL_ASPEED_G5)	+= pinctrl-aspeed-g5.o
-diff --git a/fs/proc/Makefile b/fs/proc/Makefile
-index bd08616ed8ba..7b4db9c56e6a 100644
---- a/fs/proc/Makefile
-+++ b/fs/proc/Makefile
-@@ -5,7 +5,7 @@
- 
- obj-y   += proc.o
- 
--CFLAGS_task_mmu.o	+= $(call cc-option,-Wno-override-init,)
-+CFLAGS_task_mmu.o	+= -Wno-override-init
- proc-y			:= nommu.o task_nommu.o
- proc-$(CONFIG_MMU)	:= task_mmu.o
- 
-diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile
-index 368c5d86b5b7..e497011261b8 100644
---- a/kernel/bpf/Makefile
-+++ b/kernel/bpf/Makefile
-@@ -4,7 +4,7 @@ ifneq ($(CONFIG_BPF_JIT_ALWAYS_ON),y)
- # ___bpf_prog_run() needs GCSE disabled on x86; see 3193c0836f203 for details
- cflags-nogcse-$(CONFIG_X86)$(CONFIG_CC_IS_GCC) := -fno-gcse
- endif
--CFLAGS_core.o += $(call cc-disable-warning, override-init) $(cflags-nogcse-yy)
-+CFLAGS_core.o += -Wno-override-init $(cflags-nogcse-yy)
- 
- obj-$(CONFIG_BPF_SYSCALL) += syscall.o verifier.o inode.o helpers.o tnum.o log.o token.o
- obj-$(CONFIG_BPF_SYSCALL) += bpf_iter.o map_iter.o task_iter.o prog_iter.o link_iter.o
-diff --git a/mm/Makefile b/mm/Makefile
-index e4b5b75aaec9..4abb40b911ec 100644
---- a/mm/Makefile
-+++ b/mm/Makefile
-@@ -29,8 +29,7 @@ KCOV_INSTRUMENT_mmzone.o := n
- KCOV_INSTRUMENT_vmstat.o := n
- KCOV_INSTRUMENT_failslab.o := n
- 
--CFLAGS_init-mm.o += $(call cc-disable-warning, override-init)
--CFLAGS_init-mm.o += $(call cc-disable-warning, initializer-overrides)
-+CFLAGS_init-mm.o += -Wno-override-init
- 
- mmu-y			:= nommu.o
- mmu-$(CONFIG_MMU)	:= highmem.o memory.o mincore.o \
-diff --git a/scripts/Makefile.extrawarn b/scripts/Makefile.extrawarn
-index 3ce5d503a6da..c5af566e911a 100644
---- a/scripts/Makefile.extrawarn
-+++ b/scripts/Makefile.extrawarn
-@@ -114,6 +114,8 @@ KBUILD_CFLAGS += $(call cc-disable-warning, format-overflow)
- KBUILD_CFLAGS += $(call cc-disable-warning, format-truncation)
- KBUILD_CFLAGS += $(call cc-disable-warning, stringop-truncation)
- 
-+KBUILD_CFLAGS += -Wno-override-init # alias for -Wno-initializer-overrides in clang
-+
- ifdef CONFIG_CC_IS_CLANG
- # Clang before clang-16 would warn on default argument promotions.
- ifneq ($(call clang-min-version, 160000),y)
-@@ -151,10 +153,6 @@ KBUILD_CFLAGS += -Wtype-limits
- KBUILD_CFLAGS += $(call cc-option, -Wmaybe-uninitialized)
- KBUILD_CFLAGS += $(call cc-option, -Wunused-macros)
- 
--ifdef CONFIG_CC_IS_CLANG
--KBUILD_CFLAGS += -Winitializer-overrides
--endif
--
- KBUILD_CPPFLAGS += -DKBUILD_EXTRA_WARN2
- 
- else
-@@ -164,9 +162,7 @@ KBUILD_CFLAGS += -Wno-missing-field-initializers
- KBUILD_CFLAGS += -Wno-type-limits
- KBUILD_CFLAGS += -Wno-shift-negative-value
- 
--ifdef CONFIG_CC_IS_CLANG
--KBUILD_CFLAGS += -Wno-initializer-overrides
--else
-+ifdef CONFIG_CC_IS_GCC
- KBUILD_CFLAGS += -Wno-maybe-uninitialized
- endif
- 
--- 
-2.39.2
+> +static int p4t_be32_validate(struct p4tc_type *container, void *value,
+> +			     u16 bitstart, u16 bitend,
+> +			     struct netlink_ext_ack *extack)
+> +{
+> +	size_t container_maxsz =3D U32_MAX;
+> +	__be32 *val_u32 =3D value;
+> +	__u32 val =3D 0;
+> +	size_t maxval;
+> +	int ret;
+> +
+> +	ret =3D p4t_validate_bitpos(bitstart, bitend, 31, 31, extack);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	if (value)
+> +		val =3D be32_to_cpu(*val_u32);
+> +
+> +	maxval =3D GENMASK(bitend, 0);
+> +	if (val && (val > container_maxsz || val > maxval)) {
+
+The first condition 'val > container_maxsz' is a bit confusing
+(unneeded), as 'val' type is u32 and 'container_maxsz' is U32_MAX
+
+
+> +		NL_SET_ERR_MSG_MOD(extack, "BE32 value out of range");
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+
+[...]
+
+> +static int p4t_u16_validate(struct p4tc_type *container, void *value,
+> +			    u16 bitstart, u16 bitend,
+> +			    struct netlink_ext_ack *extack)
+> +{
+> +	u16 container_maxsz =3D U16_MAX;
+> +	u16 *val =3D value;
+> +	u16 maxval;
+> +	int ret;
+> +
+> +	ret =3D p4t_validate_bitpos(bitstart, bitend, 15, 15, extack);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	maxval =3D GENMASK(bitend, 0);
+> +	if (val && (*val > container_maxsz || *val > maxval)) {
+
+Mutatis mutandis, same thing here
+
+> +		NL_SET_ERR_MSG_MOD(extack, "U16 value out of range");
+> +		return -EINVAL;
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static struct p4tc_type_mask_shift *
+> +p4t_u16_bitops(u16 bitsiz, u16 bitstart, u16 bitend,
+> +	       struct netlink_ext_ack *extack)
+> +{
+> +	struct p4tc_type_mask_shift *mask_shift;
+> +	u16 mask =3D GENMASK(bitend, bitstart);
+> +	u16 *cmask;
+> +
+> +	mask_shift =3D kzalloc(sizeof(*mask_shift), GFP_KERNEL);
+
+(Not specifically related to _this_ allocation) I'm wondering if the
+allocations in this file should GFP_KERNEL_ACCOUNT? If I read correctly
+the user-space can (and is expected to) create an quite large number of
+instances of this structs (???)
+
+[...]
+> +void __p4tc_type_host_write(const struct p4tc_type_ops *ops,
+> +			    struct p4tc_type *container,
+> +			    struct p4tc_type_mask_shift *mask_shift, void *sval,
+> +			    void *dval)
+> +{
+> +	#define HWRITE(cops) \
+> +	do { \
+> +		if (ops =3D=3D &(cops)) \
+> +			return (cops).host_write(container, mask_shift, sval, \
+> +						 dval); \
+> +	} while (0)
+> +
+> +	HWRITE(u8_ops);
+> +	HWRITE(u16_ops);
+> +	HWRITE(u32_ops);
+> +	HWRITE(u64_ops);
+> +	HWRITE(u128_ops);
+> +	HWRITE(s16_ops);
+> +	HWRITE(s32_ops);
+> +	HWRITE(be16_ops);
+> +	HWRITE(be32_ops);
+> +	HWRITE(mac_ops);
+> +	HWRITE(ipv4_ops);
+> +	HWRITE(bool_ops);
+> +	HWRITE(dev_ops);
+> +	HWRITE(key_ops);
+
+possibly
+
+#undef HWRITE
+
+?
+
+Otherwise LGTM!
+
+
+Cheers,
+
+Paolo
 
 
