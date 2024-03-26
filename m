@@ -1,189 +1,195 @@
-Return-Path: <netdev+bounces-81880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9097E88B797
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 03:46:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C851A88B79B
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 03:48:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 477D62E7D62
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 02:46:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E8DE2E41B8
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 02:48:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680A7128387;
-	Tue, 26 Mar 2024 02:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE4F128392;
+	Tue, 26 Mar 2024 02:48:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="xu73QNL6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FEe3uYiH"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F91127B5C
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 02:46:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC4D65788E;
+	Tue, 26 Mar 2024 02:48:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711421213; cv=none; b=pq5JFwMnWjz3kL6E4RL1lszojRX6FQ/Za15ss+6P9v6VNRot9J1J9xWm+RFX9bBAXZMGF02+nqk7qg6ZpA5rIV6N6shE96e1ZXDMDVcApjdSGrOcPttYEqEgwAgjKV+PL1CF6D2VgKgDEX4kzvww093l/8T25SmUORoHN9/FpoM=
+	t=1711421300; cv=none; b=E75zyIoiqMFItJr9NtaIFbtHll7l7O+L09MdE1uQtNVz9aYAymxof/zIxlDF8Dsnv0ZomnHkN0npslhGyNt0thL967EV7k5lX5LZYY88uFf2XKp64WB4lJyXf8sOFeuJDvxQrzhG8HPnyEWu6d17WBcXE5KGYasZFxIYOyh7mdo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711421213; c=relaxed/simple;
-	bh=5/4+FnYP7WrpibFUSjMKZGgmnDOJvtxN/hNT/iYWwQc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nRXJq1cPan2tFlzveUppVMOLQXmZ6DvfVVD9vplg+QIgTScjB6juWsFpVVzjBkwGcUgzikc6rCPTHz8lpcqBzSiwnPBEQSgALozo1HNxRmmSLtQrPcskGNebFz2aNFdfAkHE8fNgMxe5ggr5EsXB7rUVP7a1nHGvaqIhf+MBl6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=xu73QNL6; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711421203; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=+tg+cbDnyeGxeUBGCtIjLT8x555SiGV5b/HSGfpvPmc=;
-	b=xu73QNL693bYNfosaMQnRhTPd4M4pSQM5AuDajfWpxNNHj5ba6d78YuW+Wvd6GW7iczMhh/51pj1TY1G9ENp5Pmk5zL8FYFNV4TebkVlf6x4BIJDaFNnDo8srbaytjCjtwc7Mk9hV9G4pap+pEkpCBxs3kaP2YLN6JD1Tmk3RJQ=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W3JTV0m_1711421201;
-Received: from 30.221.81.94(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W3JTV0m_1711421201)
-          by smtp.aliyun-inc.com;
-          Tue, 26 Mar 2024 10:46:42 +0800
-Message-ID: <62451c11-0957-4d1b-8a34-5e224ea552e0@linux.alibaba.com>
-Date: Tue, 26 Mar 2024 10:46:41 +0800
+	s=arc-20240116; t=1711421300; c=relaxed/simple;
+	bh=Gx9X7vXUylCb0AsyGcpvgof2jbtykG7sjHQU5fJhc9U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YQvfipLOC/YYAaDRzMFgFSKmyGZmvDb7z4KMVSh8Qf1zmfHenMDpsKRhfNW03ufKKnm9J6VLiOwqwZDQdC4LiNSSvjKjb7Q3iZA/uVhALHPx7RRV0yNkk0Y6Nzg1qMU5FtBZ67wLhWChvIuLzAlfT+TAPW4K3VC7ElBlICAdydw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FEe3uYiH; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-56bf6591865so3890946a12.0;
+        Mon, 25 Mar 2024 19:48:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711421297; x=1712026097; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dPPOsfiak5LVxPgduynFfOGZl8R/zGRlnbVETVUqeDA=;
+        b=FEe3uYiHwlcji/cI4IAjnmHayORuB8t5ni+lS9yV9x7Nfijo4dM/SlH4gdCqJclmF8
+         orXRXW3bElOi0AoXHc845pW85Pqq6OlG0KVV0OOrqHFZlbbHCahC50oDfnqPpUKNsxTd
+         0l3yN4TLGNkTWYdkOXi3In5UDr5KUfNN7j5BF2f64k8p5PJPv3utAXfZGsd3RWh25HSj
+         7bL/VZB7HdjxQchwKFoDtAusDpp/WOJcZe/FE5rYpxaIRtgZ6UO/WlaKUTlH/Md7XlC1
+         F+Hpm4yktOxfXxdy7T234uzcpw1/Nuf0TuHEjkMjrTw+rbNEk2gpCtHq76s5b64wAsHw
+         PNBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711421297; x=1712026097;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dPPOsfiak5LVxPgduynFfOGZl8R/zGRlnbVETVUqeDA=;
+        b=U119UVC4Gw98Iz24RIQzJC8WkuFa4Ip2H+1ECaL8hmqkc1hTeugH3vSncXjFvrV3W5
+         /CDi2CP820v3d4kOPDvNMi62GUFoUjjkXpfptUSfU3OPAoExVP7WJV1CuZGAze3pR2Dx
+         YDbStUMvAyNw8GWnpg4h8BxZdOHTu7PwARxbcmdumrN55AqPo/3Uhlm6aTNumTu4doiO
+         MCp95kU002pt18DQ7L9DC0+KRWvcdSa0ZR3bz63bcNkfOIgdswFoSu6P0K8JrN9BD5NN
+         oJ2amP/MIqnYiehfvCFb23EgVEGTt1XehK+SkpPZAhEQu92MgoNqW1WmsxzicONSry4s
+         GW+g==
+X-Forwarded-Encrypted: i=1; AJvYcCXltP9XIbXYd05Xv/xe2N0pw1V2Uxol8GM1Rp6bpT/Yh+pRMtfFXjYeXjq5zIHAVWQjoah88E8PNMJeSO9H0RzZJhMLfGJTvHwTVgXhAUM6obJoM7U7LsA1HJr+FMapzzACWSFhOhCAqDLAMIRa70/tJM/fJWjcnBK4
+X-Gm-Message-State: AOJu0YzyP+8NunBCRHcRRgGKv0R6CtATEx38gyd4/JEY+bYmuXQ1G+kM
+	bwu8HiNQbve944xRT9FA92dvlJX7+VhCV/DOCkg1zEOc38HsTLhIVUU480D4ia4kUzG0nHk2VBW
+	HYEk/LKU+0M3sX+KF0Rl9LicA21Y=
+X-Google-Smtp-Source: AGHT+IG2UDeQj0KZ8zVq2N2nObvvo2nYE/2IM60oh/gA+7rYApndDSID315TbUOlMANw66iWPUDkZ+8cS/yrGaa9fSw=
+X-Received: by 2002:a50:aac9:0:b0:568:d315:b85e with SMTP id
+ r9-20020a50aac9000000b00568d315b85emr6124163edc.36.1711421296733; Mon, 25 Mar
+ 2024 19:48:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 2/2] virtio-net: reduce the CPU consumption of dim worker
-To: Jason Wang <jasowang@redhat.com>
-Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
- "Michael S. Tsirkin" <mst@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
- "David S. Miller" <davem@davemloft.net>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-References: <1711021557-58116-1-git-send-email-hengqi@linux.alibaba.com>
- <1711021557-58116-3-git-send-email-hengqi@linux.alibaba.com>
- <CACGkMEuZ457UU6MhPtKHd_Y0VryvZoNU+uuKOc_4OK7jc62WwA@mail.gmail.com>
- <5708312a-d8eb-40ee-88a9-e16930b94dda@linux.alibaba.com>
- <CACGkMEu8or7+fw3+vX_PY3Qsrm7zVSf6TS9SiE20NpOsz-or6g@mail.gmail.com>
- <b54ad370-67bd-4b8c-82fb-54625e68288b@linux.alibaba.com>
- <CACGkMEv88U1_2K2b0KdmH97gfrdOvK_1ajqh=UTK6=KgZ4OYvQ@mail.gmail.com>
- <36ce2bbf-3a31-4c01-99f3-1875f79e2831@linux.alibaba.com>
- <CACGkMEvShZKd7AvMFtmEWBVGQsQrGkQMTEx8yQYYU0uYqp=uMg@mail.gmail.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <CACGkMEvShZKd7AvMFtmEWBVGQsQrGkQMTEx8yQYYU0uYqp=uMg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <0000000000003dc8e00614076ab6@google.com> <CAADnVQLORV5PT0iTAhRER+iLBTkByCYNBYyvBSgjN1T31K+gOw@mail.gmail.com>
+ <CABWLsetXQ8Xj-RECoyC7mp4YrdSsPwmSvkS36Eq2JKLfAYULuw@mail.gmail.com>
+ <CAADnVQJAa1SREsqz9LY+-1OnbazWC-=O=TPuq-VEWkzp1ckH1Q@mail.gmail.com>
+ <CABWLseuLmAys-YuyFVeug+XR0_xjZROvgRTXz3U6cNiT+pBX0g@mail.gmail.com> <CAADnVQ+oqe6EtC8rc9TSFeUPE1Rbf11Oi-CfTyDxfXT9qM0Vpg@mail.gmail.com>
+In-Reply-To: <CAADnVQ+oqe6EtC8rc9TSFeUPE1Rbf11Oi-CfTyDxfXT9qM0Vpg@mail.gmail.com>
+From: Andrei Matei <andreimatei1@gmail.com>
+Date: Mon, 25 Mar 2024 22:48:05 -0400
+Message-ID: <CABWLses5ZpokYC==6cVKkAz25rYtgtMYn+GpxOd4TuJ7jwcNBw@mail.gmail.com>
+Subject: Re: stack access issue. Re: [syzbot] [bpf?] UBSAN:
+ array-index-out-of-bounds in check_stack_range_initialized
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Edward Adam Davis <eadavis@qq.com>, Andrii Nakryiko <andrii@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Eddy Z <eddyz87@gmail.com>, Hao Luo <haoluo@google.com>, 
+	John Fastabend <john.fastabend@gmail.com>, Jiri Olsa <jolsa@kernel.org>, 
+	KP Singh <kpsingh@kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	Martin KaFai Lau <martin.lau@linux.dev>, Network Development <netdev@vger.kernel.org>, 
+	Stanislav Fomichev <sdf@google.com>, Song Liu <song@kernel.org>, 
+	syzkaller-bugs <syzkaller-bugs@googlegroups.com>, Yonghong Song <yonghong.song@linux.dev>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Fixing in https://lore.kernel.org/bpf/20240324230323.1097685-1-andreimatei1=
+@gmail.com/
 
+FWIW, I managed to decode the BPF program that syzkaller used:
 
-在 2024/3/25 下午4:42, Jason Wang 写道:
-> On Mon, Mar 25, 2024 at 4:22 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
->>
->>
->> 在 2024/3/25 下午3:56, Jason Wang 写道:
->>> On Mon, Mar 25, 2024 at 3:18 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
->>>>
->>>> 在 2024/3/25 下午1:57, Jason Wang 写道:
->>>>> On Mon, Mar 25, 2024 at 10:21 AM Heng Qi <hengqi@linux.alibaba.com> wrote:
->>>>>> 在 2024/3/22 下午1:19, Jason Wang 写道:
->>>>>>> On Thu, Mar 21, 2024 at 7:46 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
->>>>>>>> Currently, ctrlq processes commands in a synchronous manner,
->>>>>>>> which increases the delay of dim commands when configuring
->>>>>>>> multi-queue VMs, which in turn causes the CPU utilization to
->>>>>>>> increase and interferes with the performance of dim.
->>>>>>>>
->>>>>>>> Therefore we asynchronously process ctlq's dim commands.
->>>>>>>>
->>>>>>>> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
->>>>>>> I may miss some previous discussions.
->>>>>>>
->>>>>>> But at least the changelog needs to explain why you don't use interrupt.
->>>>>> Will add, but reply here first.
->>>>>>
->>>>>> When upgrading the driver's ctrlq to use interrupt, problems may occur
->>>>>> with some existing devices.
->>>>>> For example, when existing devices are replaced with new drivers, they
->>>>>> may not work.
->>>>>> Or, if the guest OS supported by the new device is replaced by an old
->>>>>> downstream OS product, it will not be usable.
->>>>>>
->>>>>> Although, ctrlq has the same capabilities as IOq in the virtio spec,
->>>>>> this does have historical baggage.
->>>>> I don't think the upstream Linux drivers need to workaround buggy
->>>>> devices. Or it is a good excuse to block configure interrupts.
->>>> Of course I agree. Our DPU devices support ctrlq irq natively, as long
->>>> as the guest os opens irq to ctrlq.
->>>>
->>>> If other products have no problem with this, I would prefer to use irq
->>>> to solve this problem, which is the most essential solution.
->>> Let's do that.
->> Ok, will do.
->>
->> Do you have the link to the patch where you previously modified the
->> control queue for interrupt notifications.
->> I think a new patch could be made on top of it, but I can't seem to find it.
-> Something like this?
+0: (18) r0 =3D 0x0
+2: (18) r1 =3D map[id:4]
+4: (b7) r8 =3D 0
+5: (7b) *(u64 *)(r10 -8) =3D r8
+6: (bf) r2 =3D r10
+7: (07) r2 +=3D -8
+8: (b7) r3 =3D 8
+9: (b7) r4 =3D 0
+10: (85) call bloom_map_peek_elem#322320
+11: (95) exit
 
-YES. Thanks Jason.
+Where the map is a bloom filter (as Alexei somehow already knew on the patc=
+h
+thread) with a humongous value size.
 
+4: type 30  flags 0x0
+        key 0B  value 2147483649B  max_entries 255  memlock 720B
+
+On Sat, Mar 23, 2024 at 10:55=E2=80=AFPM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
 >
-> https://lore.kernel.org/lkml/6026e801-6fda-fee9-a69b-d06a80368621@redhat.com/t/
+> On Sat, Mar 23, 2024 at 7:12=E2=80=AFPM Andrei Matei <andreimatei1@gmail.=
+com> wrote:
+> >
+> > On Sat, Mar 23, 2024 at 8:52=E2=80=AFPM Alexei Starovoitov
+> > <alexei.starovoitov@gmail.com> wrote:
+> > >
+> > > On Sat, Mar 23, 2024 at 5:50=E2=80=AFPM Andrei Matei <andreimatei1@gm=
+ail.com> wrote:
+> > > >
+> > > > + Edward
+> > > >
+> > > > On Thu, Mar 21, 2024 at 3:33=E2=80=AFAM Alexei Starovoitov
+> > > > <alexei.starovoitov@gmail.com> wrote:
+> > > > >
+> > > > > Hi Andrei,
+> > > > >
+> > > > > looks like the refactoring of stack access introduced a bug.
+> > > > > See the reproducer below.
+> > > > > positive offsets are not caught by check_stack_access_within_boun=
+ds().
+> > > >
+> > > > check_stack_access_within_bounds() tries to catch positive offsets;
+> > > > It does: [1]
+> > > >
+> > > > err =3D check_stack_slot_within_bounds(env, min_off, state, type);
+> > > > if (!err && max_off > 0)
+> > > >   err =3D -EINVAL; /* out of stack access into non-negative offsets=
+ */
+> > > >
+> > > > Notice the max_off > 0 in there.
+> > > > And we have various tests that seem to check that positive offsets =
+are
+> > > > rejected. Do you know what the bug is?
+> > > > I'm thinking maybe there's some overflow going on, except that UBSA=
+N
+> > > > reported an index of -1 as being the problem.
+> > > >
+> > > > Edward, I see that you've been tickling the robot trying to narrow =
+the issue;
+> > > > perhaps you've figured it out?
+> > > >
+> > > > If the bug is not immediately apparent to anyone, I would really ap=
+preciate a
+> > > > bit of tutoring around how to reproduce and get verifier logs.
+> > >
+> > > The repro is right there in the email I forwarded:
+> > >
+> > > > C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D15c3871=
+1180000
+> >
+> > I understand, but how does one go from this to either BPF assembly,
+> > or to running it in such a way that you also get verifier logs?
 >
-> Note that
+> Adding logs to repro.c is too hard, but you can
+> hack the kernel with printk-s.
 >
-> 1) some patch has been merged
-> 2) we probably need to drop the timeout logic as it's another topic
-> 3) need to address other comments
-
-I did a quick read of your patch sets from the previous 5 version:
-[1] 
-https://lore.kernel.org/lkml/6026e801-6fda-fee9-a69b-d06a80368621@redhat.com/t/
-[2] https://lore.kernel.org/all/20221226074908.8154-1-jasowang@redhat.com/
-[3] https://lore.kernel.org/all/20230413064027.13267-1-jasowang@redhat.com/
-[4] https://lore.kernel.org/all/20230524081842.3060-1-jasowang@redhat.com/
-[5] https://lore.kernel.org/all/20230720083839.481487-1-jasowang@redhat.com/
-
-Regarding adding the interrupt to ctrlq, there are a few points where 
-there is no agreement,
-which I summarize below.
-
-1. Require additional interrupt vector resource
-https://lore.kernel.org/all/20230516165043-mutt-send-email-mst@kernel.org/
-2. Adding the interrupt for ctrlq may break some devices
-https://lore.kernel.org/all/f9e75ce5-e6df-d1be-201b-7d0f18c1b6e7@redhat.com/
-3. RTNL breaks surprise removal
-https://lore.kernel.org/all/20230720170001-mutt-send-email-mst@kernel.org/
-
-Regarding the above, there seems to be no conclusion yet.
-If these problems still exist, I think this patch is good enough and we 
-can merge it first.
-
-For the third point, it seems to be being solved by Daniel now [6], but 
-spink lock is used,
-which I think conflicts with the way of adding interrupts to ctrlq.
-
-[6] https://lore.kernel.org/all/20240325214912.323749-1-danielj@nvidia.com/
-
-
-Thanks,
-Heng
-
+> Like the following:
 >
-> THanks
+> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> index de7813947981..d158b83ed16c 100644
+> --- a/kernel/bpf/verifier.c
+> +++ b/kernel/bpf/verifier.c
+> @@ -7179,6 +7179,7 @@ static int check_stack_range_initialized(
+>                         return -EFAULT;
+>                 }
+>
+> +               printk("slot %d %d spi %d\n", slot, slot % BPF_REG_SIZE, =
+spi);
+>                 stype =3D &state->stack[spi].slot_type[slot % BPF_REG_SIZ=
+E];
 >
 >
->> Thanks,
->> Heng
->>
->>> Thanks
->>>
->>>>> And I remember you told us your device doesn't have such an issue.
->>>> YES.
->>>>
->>>> Thanks,
->>>> Heng
->>>>
->>>>> Thanks
->>>>>
->>>>>> Thanks,
->>>>>> Heng
->>>>>>
->>>>>>> Thanks
-
+> shows that spi and slot get negative: -1, -2, ...
 
