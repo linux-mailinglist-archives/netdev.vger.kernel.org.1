@@ -1,111 +1,92 @@
-Return-Path: <netdev+bounces-82046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0191D88C33C
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:19:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26A1188C346
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:21:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 23803B24D0B
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:19:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58C381C20B51
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:21:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C12DE74BE8;
-	Tue, 26 Mar 2024 13:18:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5139971756;
+	Tue, 26 Mar 2024 13:21:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Wxul+hoR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a2ELrMB9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 045A667A00
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 13:18:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B705C61F;
+	Tue, 26 Mar 2024 13:21:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711459139; cv=none; b=RyMXi7rQrf2DUJEgYmn/nCUtgwJs5xxSFerihv/guDA1T0I/MJdexG9yeaeuLAwosJN+8Qh5JC8hRopPishuk11CsQ5zphMEr/Ogl8Bb0f5POHDOC3kynZoyZE484gyb2u3R+EnZpJN9pHV6FITAsh7LhCuigPSj5YKYLgJtcyA=
+	t=1711459304; cv=none; b=Ki9YvdRTREK3aCevoTGoGVDGyCT1T4cPL+faXq3LgK5iFxmnuosWcsmzGwjHSbYkMOhpdj00hYlZBiVL6poD02DA5GNtGQI5Q95iIM8sYf1UMeBnYktJaZGFLINOUoLjr5B3BiHSMg7B+bH71QImwFTeoTlABOLJbTQEC5bpgSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711459139; c=relaxed/simple;
-	bh=GkNJWEH5CqftlvwkYmOjBPCjRnY/1N8DRLYtCKkFu+Q=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pmC8PijXbuHclIF8BwxXxOyBXGaomnWM306WwF3jCjqEPJmc4uePpdTlatzQV/+PDpISsDXANhLQenirTadMcvJw3ic7HvfC/AA8A0E2sZPGWboNTGM7C/pfoFZ/PvrMuit6tnkAz+BmjXspFyv4IU604v0L0Q0l6UheJM6uCQE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Wxul+hoR; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-56c2cfdd728so4739a12.1
-        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 06:18:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711459136; x=1712063936; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GkNJWEH5CqftlvwkYmOjBPCjRnY/1N8DRLYtCKkFu+Q=;
-        b=Wxul+hoRqE3FDD6i4OiwYYohB0HVZbma/AWfcafgcreu8szkK3zyQyd7bpWNR1UvkP
-         pjUAv+zdGnut0KLAxuw1J7/PlShWJzfOgnroQlWAGykKBMrXMsStA14KgZOBdSEz/hDi
-         PSeVd/EPjAMtoio7CabUOoof54h1tjoE8zS4YAP4KVLxB+HlsUAQrxu35VhPLrK1QdhK
-         QC4q3yxlD3XfLvJDnOiO023nxK2U3mBm/v7+J5kZBaJX+k83VESq7zSU1Qg7von2lu7m
-         0aoH+H8+uFr232/ue3YZcHjyOaC23JHIFNL+lmAceaF506sKssKzLeCf/0NCxv0DzyXJ
-         v07w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711459136; x=1712063936;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GkNJWEH5CqftlvwkYmOjBPCjRnY/1N8DRLYtCKkFu+Q=;
-        b=P9qHFWTPzTtmuLcl4J9fAOxGLCKpSjkcT7lwjMmGAzR914IAJYuBHiPBtIjj99MfwE
-         O4/l8anRlFpln28FDZ91xd3+yXhcBgeCEYAbKRvAVLqcW9FGw+2jLZ6k6zZtrVapSZfs
-         ukfARsIxoK4bU3VBpmfjei9IavKchLolXS3fJHnD41gNejrP3NMQRI08b/ETHVPxJ12t
-         stFckYCjZskyqMisb+tKO4iEtoWzXTCDsqJ79KRWc+T5EzTSVLNj/YREjwDoiXRVxe1C
-         6QEab+KSXdhHDwnK2pWtz9sDP7h1YTFmXr2/uSLnY7YF4YK6ltnKk5j/oV1ebV8hp1cL
-         LVrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVc/0xtREdxbC9BE6NYldhRf1FiJoF5BxlRJ30b3+p3vgdqFqjXc6C7a9dUQRpbOrjclnjS/8hvEA9ytDLQk6gI4SGuG1bX
-X-Gm-Message-State: AOJu0Yw5JcDY7Wx1bevje5KmOOiolJdzv2k5oHLreF5AgTVH5sLxoQhw
-	In766gZuKORqH6Kcgc8YIbIAleqPJeRp34eCg9O+0wdtzLJztgetev3/0x6hVH9kOi4UcqZOTFd
-	NTucQ6LBG/Vc/mYA4LbB9xTwVRYcgKXr04HRg
-X-Google-Smtp-Source: AGHT+IHi8Prjn/pM5ByDmdywvVWKS0LKIb81JDGzPnk4MzG+yQ1Dkqp91W2gUekWaLabtcx1vUU3ZCVd8ljiN7a/sBs=
-X-Received: by 2002:aa7:d951:0:b0:56c:303b:f4d4 with SMTP id
- l17-20020aa7d951000000b0056c303bf4d4mr23008eds.1.1711459136081; Tue, 26 Mar
- 2024 06:18:56 -0700 (PDT)
+	s=arc-20240116; t=1711459304; c=relaxed/simple;
+	bh=7nnW/SYUsTIjbiy2s0XB4S4ws24rmjDUYBUn3jc+Px8=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=mzMRnHfwBVeuc8BvOLCT5dhIUe3YSP9sCqc1JFyUbxfgVU7ZTWMpXfes+9Af63+mON1pQTiBZF2vRs0ChWuAPf0h+rUn1A8g7WYOMo6RbUYTu6WT9ZLHErbbd4VOMtlAOcnes2hppZJAKpjnwhrs9fZm3qkzDFmG0NKNB6xVbEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a2ELrMB9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id D3AE0C433F1;
+	Tue, 26 Mar 2024 13:21:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711459303;
+	bh=7nnW/SYUsTIjbiy2s0XB4S4ws24rmjDUYBUn3jc+Px8=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=a2ELrMB9YXmxIK9kirijo9QEu9FrYjDD7tzj/CNx59KPZJlLofkpLP7CvrY3BkgII
+	 B6QGX5AnrCI20lZP7fTaLiBDFrV35sspRGZGz4B0ul/WLjS61/ASOE/ND0uWcUhwDw
+	 LV3b/HB6zHiu32jR3x7BBKoB15WjgoLEhe6ukE3moBf2HStYlxtq9TTH4ZDKxzL6NQ
+	 875r6gDvzqBhQr+fVjO36rC7MhuhslvM+9Jj5Fhw/VoSSN8tuRdnoBMoxDgF/i+TkG
+	 t691C3/skkiX0/29DeAmIGXKTG2sGvvQNCnQvZlZ2DDWvGY7muhmdv7sQZ6V5/vpk9
+	 7X5K0BuAIKsrw==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B3661D2D0EC;
+	Tue, 26 Mar 2024 13:21:43 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240325034347.19522-1-kerneljasonxing@gmail.com>
- <CAL+tcoAb3Q13hXnEhukCUwBL0Q1W9qC7LuWyzXYGcDzEM56LqA@mail.gmail.com>
- <b84992bf3953da59e597883e018a79233a09a0bb.camel@redhat.com> <CAL+tcoAW6YxrW7M8io_JHaNm3-VfY_sWZFBg=6XVmYyPAb1Nag@mail.gmail.com>
-In-Reply-To: <CAL+tcoAW6YxrW7M8io_JHaNm3-VfY_sWZFBg=6XVmYyPAb1Nag@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 26 Mar 2024 14:18:42 +0100
-Message-ID: <CANn89iKK-qPhQ91Sq8rR_=KDWajnY2=Et2bUjDsgoQK4wxFOHw@mail.gmail.com>
-Subject: Re: [PATCH net-next 0/3] trace: use TP_STORE_ADDRS macro
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, mhiramat@kernel.org, mathieu.desnoyers@efficios.com, 
-	rostedt@goodmis.org, kuba@kernel.org, davem@davemloft.net, 
-	netdev@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: pull-request: bpf-next 2024-03-25
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <171145930372.31773.533192202512296878.git-patchwork-notify@kernel.org>
+Date: Tue, 26 Mar 2024 13:21:43 +0000
+References: <20240325233940.7154-1-daniel@iogearbox.net>
+In-Reply-To: <20240325233940.7154-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
-On Tue, Mar 26, 2024 at 11:44=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
+Hello:
 
-> Well, it's a pity that it seems that we are about to abandon this
-> method but it's not that friendly to the users who are unable to
-> deploy BPF...
+This pull request was applied to bpf/bpf.git (master)
+by Paolo Abeni <pabeni@redhat.com>:
 
-It is a pity these tracepoint patches are consuming a lot of reviewer
-time, just because
-some people 'can not deploy BPF'
+On Tue, 26 Mar 2024 00:39:40 +0100 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
+> 
+> The following pull-request contains BPF updates for your *net-next* tree.
+> 
+> We've added 38 non-merge commits during the last 13 day(s) which contain
+> a total of 50 files changed, 867 insertions(+), 274 deletions(-).
+> 
+> [...]
 
-Well, I came up with more ideas about how to improve the
-> trace function in recent days. The motivation of doing this is that I
-> encountered some issues which could be traced/diagnosed by using trace
-> effortlessly without writing some bpftrace codes again and again. The
-> status of trace seems not active but many people are still using it, I
-> believe.
+Here is the summary with links:
+  - pull-request: bpf-next 2024-03-25
+    https://git.kernel.org/bpf/bpf/c/37ccdf7f11b1
 
-'Writing bpftrace codes again and again' is not a good reason to add
-maintenance costs
-to linux networking stack.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
