@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-82119-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82120-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC19988C590
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:47:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DC9888C591
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:47:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 450291F211F2
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:47:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7EA6B1C627AF
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:47:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7944513C81C;
-	Tue, 26 Mar 2024 14:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6476713C82C;
+	Tue, 26 Mar 2024 14:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rTiKCXIN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j4o74JKi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 547DB13C818
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 14:46:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A05613C808
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 14:46:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711464416; cv=none; b=jdZhp6gnNFBXbBekdqPWJTnYHhJneUStyeuJ9i37Rm+kIWUhKFQJ1cYDmXYUBtCbNM4FNoEas7x6bieTCMQYqyPoGt+kqVj1ibVvslM5BlOgxzWK5X/6hySF2mDa00hursVJ8XdXnad1kpHgawWAt4Bo8kIKEefGIjvJ+uMS9/8=
+	t=1711464418; cv=none; b=t7Bo4/P9nf0BYTvlNfzdRH3qbwAkt5gmFxAiBYfxOgqvovHcfbeMYnloVbQp88SIsQOKbhCLMU+B3GBnuuX4dNCFTzySiOBYw/UwklToqCGZ26QrgzLaIj2Flgec3fevhqkH6Pb/neA4w2AW+RmJcS9dVEtFd47GN1BACygNpDU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711464416; c=relaxed/simple;
-	bh=hh/0H6cX+4dK1VYYrl1Rc4KG3n2vekJZLfZJSfQ0UmY=;
+	s=arc-20240116; t=1711464418; c=relaxed/simple;
+	bh=eHfJye8/AU2XdbG2KjGZM/VlHjmoaSA4lCel2jPGFdw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fYn6MgfGuBLTw1HIC+GBP45GcW3WT7B+MTUywMdFYT71wHlbTvjp6hzEVBTlFAEB/GdSlDdKNA35U/9upQWSf/S8BVFeLukElS4E1FgXRF6Nkz87s0aVu7kXq8CFda83Qh7JDUb9ci2IFyfUWB6/Ca7b4DBoObZurDEmAfRXwWY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rTiKCXIN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DD66C433F1;
-	Tue, 26 Mar 2024 14:46:55 +0000 (UTC)
+	 MIME-Version; b=dFETfVpWAwA3DBuJ8bTlu7tLyHadRo7e0dtSwnBYky4mNjdiqf7k6GR0DMncOde4xCH6dAdTpJMLSUNmXY7hZdsQ+QThsDuibHTQHCiyVa/s27Ek4PytsaNHO6RKfG4+J13Pyzqm7Ai9aNuKk5gHp2lzR2kP8lGle/qcL4MK/Bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j4o74JKi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 94EFFC433B2;
+	Tue, 26 Mar 2024 14:46:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711464416;
-	bh=hh/0H6cX+4dK1VYYrl1Rc4KG3n2vekJZLfZJSfQ0UmY=;
+	s=k20201202; t=1711464417;
+	bh=eHfJye8/AU2XdbG2KjGZM/VlHjmoaSA4lCel2jPGFdw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=rTiKCXINf5jfIm9NGV0KsSTic6m7TbSzXCZ16oW6sRy7l/2BaDXpSDQGaQ4UbQt/8
-	 fl0A7/85gF7mR4GS1Affuu1kfPAvF8m5LyuEvZD9IC0ve81yHbyM7y2fXLuu6Z2Emt
-	 8Io59FHn0ErB7wjHz76VEruYyrrDkFyrDuXZhAxALRjsDB5qS6KXi+P6YAgwGFgxRo
-	 PpZGfW0ZrnHX41TuKlXUBSbtV7S24X6LTecH06pzPg8O9ocbFXl3DtGxwNl9eL+3LQ
-	 UPbqG/+/UXTux2LvzV2e1Ez5rYhTsfr2OqAtef6rVz11Ya8VIvoWz7wfyQk3n8Gpnu
-	 WP0MjKe+oT6+A==
+	b=j4o74JKikJxd54nYmDQo3rvOhjCXbY6vtVyhZjf5nWL9j98Tbp3UgCqbMzbmT/muj
+	 dZ+nLSeb408xC5A1+IE+ge6rjyxXzq/RvjkwZ7XN8jE95f635M943ZQUsPciC9gDJq
+	 D5zHQcFUQjJ4wdPm1/W8fNQHoNQetAqDCmw4uErIPkHqyREhvcnMJmAq52nnppuPyJ
+	 8tRfVN4vL/GCySt/Ksdki4FsWHoJirLh1VbEvHHPnAYt50C8tYfC4wvu9C6BFi2C+1
+	 ixJRSG4pisTBhRp4eiPUf0vOmCplbO6pfUFSjrfI/MQIZzRKhx8iPcLfcYgwl7y3eG
+	 VtxbQP4nMpxqA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -51,11 +51,13 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Gal Pressman <gal@nvidia.com>,
 	Leon Romanovsky <leonro@nvidia.com>,
-	Shay Drory <shayd@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>
-Subject: [net 02/10] net/mlx5: Register devlink first under devlink lock
-Date: Tue, 26 Mar 2024 07:46:38 -0700
-Message-ID: <20240326144646.2078893-3-saeed@kernel.org>
+	Michael Liang <mliang@purestorage.com>,
+	Mohamed Khalfella <mkhalfella@purestorage.com>,
+	Yuanyuan Zhong <yzhong@purestorage.com>,
+	Shay Drory <shayd@nvidia.com>
+Subject: [net 03/10] net/mlx5: offset comp irq index in name by one
+Date: Tue, 26 Mar 2024 07:46:39 -0700
+Message-ID: <20240326144646.2078893-4-saeed@kernel.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240326144646.2078893-1-saeed@kernel.org>
 References: <20240326144646.2078893-1-saeed@kernel.org>
@@ -67,172 +69,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Shay Drory <shayd@nvidia.com>
+From: Michael Liang <mliang@purestorage.com>
 
-In case device is having a non fatal FW error during probe, the
-driver will report the error to user via devlink. This will trigger
-a WARN_ON, since mlx5 is calling devlink_register() last.
-In order to avoid the WARN_ON[1], change mlx5 to invoke devl_register()
-first under devlink lock.
+The mlx5 comp irq name scheme is changed a little bit between
+commit 3663ad34bc70 ("net/mlx5: Shift control IRQ to the last index")
+and commit 3354822cde5a ("net/mlx5: Use dynamic msix vectors allocation").
+The index in the comp irq name used to start from 0 but now it starts
+from 1. There is nothing critical here, but it's harmless to change
+back to the old behavior, a.k.a starting from 0.
 
-[1]
-WARNING: CPU: 5 PID: 227 at net/devlink/health.c:483 devlink_recover_notify.constprop.0+0xb8/0xc0
-CPU: 5 PID: 227 Comm: kworker/u16:3 Not tainted 6.4.0-rc5_for_upstream_min_debug_2023_06_12_12_38 #1
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS rel-1.13.0-0-gf21b5a4aeb02-prebuilt.qemu.org 04/01/2014
-Workqueue: mlx5_health0000:08:00.0 mlx5_fw_reporter_err_work [mlx5_core]
-RIP: 0010:devlink_recover_notify.constprop.0+0xb8/0xc0
-Call Trace:
- <TASK>
- ? __warn+0x79/0x120
- ? devlink_recover_notify.constprop.0+0xb8/0xc0
- ? report_bug+0x17c/0x190
- ? handle_bug+0x3c/0x60
- ? exc_invalid_op+0x14/0x70
- ? asm_exc_invalid_op+0x16/0x20
- ? devlink_recover_notify.constprop.0+0xb8/0xc0
- devlink_health_report+0x4a/0x1c0
- mlx5_fw_reporter_err_work+0xa4/0xd0 [mlx5_core]
- process_one_work+0x1bb/0x3c0
- ? process_one_work+0x3c0/0x3c0
- worker_thread+0x4d/0x3c0
- ? process_one_work+0x3c0/0x3c0
- kthread+0xc6/0xf0
- ? kthread_complete_and_exit+0x20/0x20
- ret_from_fork+0x1f/0x30
- </TASK>
-
-Fixes: cf530217408e ("devlink: Notify users when objects are accessible")
-Signed-off-by: Shay Drory <shayd@nvidia.com>
-Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
+Fixes: 3354822cde5a ("net/mlx5: Use dynamic msix vectors allocation")
+Reviewed-by: Mohamed Khalfella <mkhalfella@purestorage.com>
+Reviewed-by: Yuanyuan Zhong <yzhong@purestorage.com>
+Signed-off-by: Michael Liang <mliang@purestorage.com>
+Reviewed-by: Shay Drory <shayd@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/main.c    | 37 ++++++++++---------
- .../mellanox/mlx5/core/sf/dev/driver.c        |  1 -
- 2 files changed, 20 insertions(+), 18 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/main.c b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-index c2593625c09a..59806553889e 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/main.c
-@@ -1480,6 +1480,14 @@ int mlx5_init_one_devl_locked(struct mlx5_core_dev *dev)
- 	if (err)
- 		goto err_register;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
+index 4dcf995cb1a2..6bac8ad70ba6 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c
+@@ -19,6 +19,7 @@
+ #define MLX5_IRQ_CTRL_SF_MAX 8
+ /* min num of vectors for SFs to be enabled */
+ #define MLX5_IRQ_VEC_COMP_BASE_SF 2
++#define MLX5_IRQ_VEC_COMP_BASE 1
  
-+	err = mlx5_crdump_enable(dev);
-+	if (err)
-+		mlx5_core_err(dev, "mlx5_crdump_enable failed with error code %d\n", err);
-+
-+	err = mlx5_hwmon_dev_register(dev);
-+	if (err)
-+		mlx5_core_err(dev, "mlx5_hwmon_dev_register failed with error code %d\n", err);
-+
- 	mutex_unlock(&dev->intf_state_mutex);
- 	return 0;
- 
-@@ -1505,7 +1513,10 @@ int mlx5_init_one(struct mlx5_core_dev *dev)
- 	int err;
- 
- 	devl_lock(devlink);
-+	devl_register(devlink);
- 	err = mlx5_init_one_devl_locked(dev);
-+	if (err)
-+		devl_unregister(devlink);
- 	devl_unlock(devlink);
- 	return err;
- }
-@@ -1517,6 +1528,8 @@ void mlx5_uninit_one(struct mlx5_core_dev *dev)
- 	devl_lock(devlink);
- 	mutex_lock(&dev->intf_state_mutex);
- 
-+	mlx5_hwmon_dev_unregister(dev);
-+	mlx5_crdump_disable(dev);
- 	mlx5_unregister_device(dev);
- 
- 	if (!test_bit(MLX5_INTERFACE_STATE_UP, &dev->intf_state)) {
-@@ -1534,6 +1547,7 @@ void mlx5_uninit_one(struct mlx5_core_dev *dev)
- 	mlx5_function_teardown(dev, true);
- out:
- 	mutex_unlock(&dev->intf_state_mutex);
-+	devl_unregister(devlink);
- 	devl_unlock(devlink);
- }
- 
-@@ -1680,16 +1694,20 @@ int mlx5_init_one_light(struct mlx5_core_dev *dev)
- 	}
- 
- 	devl_lock(devlink);
-+	devl_register(devlink);
-+
- 	err = mlx5_devlink_params_register(priv_to_devlink(dev));
--	devl_unlock(devlink);
- 	if (err) {
- 		mlx5_core_warn(dev, "mlx5_devlink_param_reg err = %d\n", err);
- 		goto query_hca_caps_err;
- 	}
- 
-+	devl_unlock(devlink);
- 	return 0;
- 
- query_hca_caps_err:
-+	devl_unregister(devlink);
-+	devl_unlock(devlink);
- 	mlx5_function_disable(dev, true);
- out:
- 	dev->state = MLX5_DEVICE_STATE_INTERNAL_ERROR;
-@@ -1702,6 +1720,7 @@ void mlx5_uninit_one_light(struct mlx5_core_dev *dev)
- 
- 	devl_lock(devlink);
- 	mlx5_devlink_params_unregister(priv_to_devlink(dev));
-+	devl_unregister(devlink);
- 	devl_unlock(devlink);
- 	if (dev->state != MLX5_DEVICE_STATE_UP)
+ #define MLX5_EQ_SHARE_IRQ_MAX_COMP (8)
+ #define MLX5_EQ_SHARE_IRQ_MAX_CTRL (UINT_MAX)
+@@ -246,6 +247,7 @@ static void irq_set_name(struct mlx5_irq_pool *pool, char *name, int vecidx)
  		return;
-@@ -1943,16 +1962,7 @@ static int probe_one(struct pci_dev *pdev, const struct pci_device_id *id)
- 		goto err_init_one;
  	}
  
--	err = mlx5_crdump_enable(dev);
--	if (err)
--		dev_err(&pdev->dev, "mlx5_crdump_enable failed with error code %d\n", err);
--
--	err = mlx5_hwmon_dev_register(dev);
--	if (err)
--		mlx5_core_err(dev, "mlx5_hwmon_dev_register failed with error code %d\n", err);
--
- 	pci_save_state(pdev);
--	devlink_register(devlink);
- 	return 0;
++	vecidx -= MLX5_IRQ_VEC_COMP_BASE;
+ 	snprintf(name, MLX5_MAX_IRQ_NAME, "mlx5_comp%d", vecidx);
+ }
  
- err_init_one:
-@@ -1973,16 +1983,9 @@ static void remove_one(struct pci_dev *pdev)
- 	struct devlink *devlink = priv_to_devlink(dev);
+@@ -585,7 +587,7 @@ struct mlx5_irq *mlx5_irq_request_vector(struct mlx5_core_dev *dev, u16 cpu,
+ 	struct mlx5_irq_table *table = mlx5_irq_table_get(dev);
+ 	struct mlx5_irq_pool *pool = table->pcif_pool;
+ 	struct irq_affinity_desc af_desc;
+-	int offset = 1;
++	int offset = MLX5_IRQ_VEC_COMP_BASE;
  
- 	set_bit(MLX5_BREAK_FW_WAIT, &dev->intf_state);
--	/* mlx5_drain_fw_reset() and mlx5_drain_health_wq() are using
--	 * devlink notify APIs.
--	 * Hence, we must drain them before unregistering the devlink.
--	 */
- 	mlx5_drain_fw_reset(dev);
- 	mlx5_drain_health_wq(dev);
--	devlink_unregister(devlink);
- 	mlx5_sriov_disable(pdev, false);
--	mlx5_hwmon_dev_unregister(dev);
--	mlx5_crdump_disable(dev);
- 	mlx5_uninit_one(dev);
- 	mlx5_pci_close(dev);
- 	mlx5_mdev_uninit(dev);
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c
-index bc863e1f062e..e3bf8c7e4baa 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/sf/dev/driver.c
-@@ -101,7 +101,6 @@ static void mlx5_sf_dev_remove(struct auxiliary_device *adev)
- 	devlink = priv_to_devlink(mdev);
- 	set_bit(MLX5_BREAK_FW_WAIT, &mdev->intf_state);
- 	mlx5_drain_health_wq(mdev);
--	devlink_unregister(devlink);
- 	if (mlx5_dev_is_lightweight(mdev))
- 		mlx5_uninit_one_light(mdev);
- 	else
+ 	if (!pool->xa_num_irqs.max)
+ 		offset = 0;
 -- 
 2.44.0
 
