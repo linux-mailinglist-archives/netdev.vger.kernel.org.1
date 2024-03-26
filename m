@@ -1,99 +1,103 @@
-Return-Path: <netdev+bounces-82271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7CC6B88D04E
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:50:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D0A688D051
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:51:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE0631C34294
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 21:50:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 73E3CB20ABD
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 21:51:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C061D13D891;
-	Tue, 26 Mar 2024 21:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 775BA13D896;
+	Tue, 26 Mar 2024 21:51:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="u1CLn6Ca"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fKwhpSej"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-188.mta0.migadu.com (out-188.mta0.migadu.com [91.218.175.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9716E3C26;
-	Tue, 26 Mar 2024 21:50:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A45B13D617
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 21:51:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711489831; cv=none; b=ZxvKEZNrm4ddCHgTrArpX0eOmc9mZsUb4IvxUh2FLNj1mzUY9oXfbGsTdPj95gfuyOwh5o5KnWrqHRq3l53K0zZ+9TVKTfhn25mNwtX7R4OcyOceMWjFIi9S4B7VGWxMlD/8Gh2oqkl98+CkhYQN+WqRd/9unVJsAcTZFB4/Crk=
+	t=1711489911; cv=none; b=dzjgfL2oKzPtfzZlY+uDyZMWvph9AjTXoGD8k3vyh3zkCgSFGSsBEqUrLlhvJR9za+7SyAx/xrVEH2sgJMwdoQHXMzkaaACTL4R0b8hr6cUXg/IX7S38pr0Y+x3JU39AKnNbYK3KVgxbbRM7Kcz16vsBmrBnMptPmEesHK1/F0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711489831; c=relaxed/simple;
-	bh=33uz+WHmIlakl60RCwqm1pC6zC15jtM9DE1ZhrH00OE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jt/oSBFNMkysfKdHgLzFtavgupFvavy6aSBoefdbDlC6MlFW8xU4f3o/J7dYtQaOdymBEQuOHL1+uv6m9CjL914Pe+SiKg87Il9y1V5mHRuvoyTXgqY2ZsMImXxgcKK34Qo5q5L9pza6D/zsJiDwEjje937Un43Xpp8/vV05ZWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=u1CLn6Ca; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 6AE4DC433F1;
-	Tue, 26 Mar 2024 21:50:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711489830;
-	bh=33uz+WHmIlakl60RCwqm1pC6zC15jtM9DE1ZhrH00OE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=u1CLn6Cahb8+HyWKcLUEtDXg8lokZ9PsBlIYrLF5ROHXGqvej1P4U0Iz6XPgFGu0J
-	 ALgtqzjTlWB0q/EueuplFPlrdLxQaJGaQDaK+8U0xHRv0NMig9/lXxN4OkOjZPWusp
-	 48jWTiBcLY6fQztCNzNgdq/XNcCjrZ+Gkw9jZB+GNAB9AhTfM4aIvxJuYMvtQ6CLDL
-	 A3OSAIMOZU8OBSDulu44fTRSVHrorJKNbdEZYXfxiSgYV7BVCNpCXN4fShHyVejWml
-	 W6choOtpnPjMEFM6Zsd5eccGuaXlgZnZeoP7op3C6ZD0hGs25sHyiROuEMgERLS0Cu
-	 EIGlJn1ZlSH4g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 58D8AD2D0EC;
-	Tue, 26 Mar 2024 21:50:30 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1711489911; c=relaxed/simple;
+	bh=vYxmHLyzfgtwnYesg1Ae5G7k1t36YsDNaDLGLfhJRh0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=rkiswkK3MGoMqSgSYBO1Q5sUT7Z3OB1KiUEm7/5RexfroxrDj/Qe2yjvPmHDWZ/M/+ffB3e4DinYMvo/mb95WnA34Rx/KuMexoifA/J7xrtOyyhqyQsDeCwOQe7fVL6P1j9pWMMk4jQIxaEEWEFvgqTeRBQEeKmF2OsA7BLJzRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fKwhpSej; arc=none smtp.client-ip=91.218.175.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <4e5e51fb-b36e-4dae-b4b4-32ab5e05f303@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1711489907;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=6k2u73YWr6uRihPOmodZIT3QRs4S+EKNrKvoI6HO22U=;
+	b=fKwhpSejIsW52GDmecKgU36vV9Xc94+/+ArHT2XYaxqBncCKZ+kme8eC3gqJeF8HkPsSjs
+	lp/3k2V6manen8+N3oG/in6Bj7SRYg1RPkd713zSHrL9SjgnT1su/E1PLXkdnzfoapo8Kq
+	hnJKj61yiQRk2FLL72+o3L3KjLqmNJc=
+Date: Tue, 26 Mar 2024 14:51:39 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 bpf-next 0/3] BPF: support mark in bpf_fib_lookup
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171148983036.4165.279265169670914517.git-patchwork-notify@kernel.org>
-Date: Tue, 26 Mar 2024 21:50:30 +0000
-References: <20240326101742.17421-1-aspsk@isovalent.com>
-In-Reply-To: <20240326101742.17421-1-aspsk@isovalent.com>
+Subject: Re: [PATCH v2 bpf-next 2/3] selftests/bpf: Add BPF_FIB_LOOKUP_MARK
+ tests
+Content-Language: en-US
 To: Anton Protopopov <aspsk@isovalent.com>
-Cc: ast@kernel.org, andrii@kernel.org, daniel@iogearbox.net, jolsa@kernel.org,
- martin.lau@linux.dev, sdf@google.com, bpf@vger.kernel.org,
- rumen.telbizov@menlosecurity.com, dsahern@kernel.org, netdev@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Jiri Olsa <jolsa@kernel.org>,
+ Stanislav Fomichev <sdf@google.com>, bpf@vger.kernel.org,
+ Rumen Telbizov <rumen.telbizov@menlosecurity.com>,
+ David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
+References: <20240326101742.17421-1-aspsk@isovalent.com>
+ <20240326101742.17421-3-aspsk@isovalent.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20240326101742.17421-3-aspsk@isovalent.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello:
+On 3/26/24 3:17 AM, Anton Protopopov wrote:
+> +	{ .desc = "IPv4 policy routing, mark points to a policy, but no flag",
+> +	  .daddr = IPV4_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
+> +	  .expected_dst = IPV4_GW1,
+> +	  .lookup_flags = BPF_FIB_LOOKUP_SKIP_NEIGH,
+> +	  .mark = MARK, },
 
-This series was applied to bpf/bpf-next.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
+[ ... ]
 
-On Tue, 26 Mar 2024 10:17:39 +0000 you wrote:
-> This patch series adds policy routing support in bpf_fib_lookup.
-> This is a useful functionality which was missing for a long time,
-> as without it some networking setups can't be implemented in BPF.
-> One example can be found here [1].
-> 
-> A while ago there was an attempt to add this functionality [2] by
-> Rumen Telbizov and David Ahern. I've completely refactored the code,
-> except that the changes to the struct bpf_fib_lookup were copy-pasted
-> from the original patch.
-> 
-> [...]
+> +	{ .desc = "IPv6 policy routing, mark points to a policy, but no flag",
+> +	  .daddr = IPV6_REMOTE_DST, .expected_ret = BPF_FIB_LKUP_RET_SUCCESS,
+> +	  .expected_dst = IPV6_GW1,
+> +	  .lookup_flags = BPF_FIB_LOOKUP_SKIP_NEIGH,
+> +	  .mark = MARK, },
+>   };
 
-Here is the summary with links:
-  - [v2,bpf-next,1/3] bpf: add support for passing mark with bpf_fib_lookup
-    https://git.kernel.org/bpf/bpf-next/c/30ed73eb7d63
-  - [v2,bpf-next,2/3] selftests/bpf: Add BPF_FIB_LOOKUP_MARK tests
-    https://git.kernel.org/bpf/bpf-next/c/656a5bb56ea6
-  - [v2,bpf-next,3/3] bpf: add a check for struct bpf_fib_lookup size
-    https://git.kernel.org/bpf/bpf-next/c/98103fa6cc3f
+[ ... ]
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> @@ -159,6 +221,9 @@ static int set_lookup_params(struct bpf_fib_lookup *params, const struct fib_loo
+>   	params->ifindex = ifindex;
+>   	params->tbid = test->tbid;
+>   
+> +	if (test->lookup_flags & BPF_FIB_LOOKUP_MARK)
 
+Removed this "& BPF_FIB_LOOKUP_MARK" test. Always set the params->mark 
+regardless of test->lookup_flags. This should be the intention of the above "... 
+mark points to a policy, but no flag" tests.
+
+Applied. Thanks.
+
+> +		params->mark = test->mark;
+> +
 
 
