@@ -1,136 +1,106 @@
-Return-Path: <netdev+bounces-82064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D24D88C3E0
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:43:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4772088C3F8
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:45:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 52C9E1C366C3
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:43:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02E09306A0F
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D74474C05;
-	Tue, 26 Mar 2024 13:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58C586AE4;
+	Tue, 26 Mar 2024 13:42:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GWG5AHu2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jI+XzbRe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f182.google.com (mail-qk1-f182.google.com [209.85.222.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 104198005B;
-	Tue, 26 Mar 2024 13:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0060E8625E;
+	Tue, 26 Mar 2024 13:42:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711460435; cv=none; b=OyHqcNZWNciLbDBa9NKgbabkzR/+L/sotr7JtNvgcFO0bDIV/feYY7Mxm4DL0inYHYae1dtnAvhEqm716a9rdrlReDim/O3ECsA87AcRalQY0ThkOG9JTASs1lo0A+vNQt36OBuL+lMLOD/z2NT6ezUr8rlIrOKDuPHN0choDKQ=
+	t=1711460535; cv=none; b=gjDFrERoW8jrcqtTGeajdZuC7jCG6iqw16++RMl7HPEZjRowUyNWeqgH8QJEPdDr9xgvqxmJzDbud08PwVfF2PnSYUwv2fo2gmJIBv732l6sm9JOrtMtlFpSllyJfQ1k2fge+W1YtuxCR8QZhNbJgHSv8EFQHJeUUUHMU9MSWoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711460435; c=relaxed/simple;
-	bh=/Jc0MWHCp4fuAc5CLYtUxmc90iQbiyIL1jxufTmq4K4=;
-	h=Date:From:To:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=KZ19pwjIiHy7NXMWM8ng05qOtaUZDBJ3GXPX2AmvqqGzBgRYj0CFQg16Lr1G+RLg4/qYWB7hnPQNdktoEsmv0RcCEnQqrtap5dcUAm99Ae27xHk4suhz6rllCoBSSREHGgxx4MYMGEkgvnDEZblJsYL4bQin4md0tJIfhlbHlIE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GWG5AHu2; arc=none smtp.client-ip=209.85.222.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f182.google.com with SMTP id af79cd13be357-788598094c4so261356985a.0;
-        Tue, 26 Mar 2024 06:40:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711460433; x=1712065233; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8cKb2/u7bTUjCLAuXknqnuW2euAxMzzYcAXpS6k1T8I=;
-        b=GWG5AHu24n0ofkFTp5wlES/dO/VstowhuqK6IsWUa6y/fubLHqvzb4iq7UFBFTW8aT
-         kGnFdELzfHEAkInn5hxA1Tqxaxe/53L0FMhbIvNv0/ZkBB+jmXKCMx0C7g08QKbMHNlC
-         z7On5J6oPcNbgRV/FqhQwvpPBTQJWtstMAH1hayqOW9cWVS8ZKFifEamoAvZ72umUx4U
-         zfYhYLQdNVE4Ft80EaTBnEJEGnYubStKkIoh0PW9SGR/qvSpIdOroZiL2UNvh2IKv6Si
-         jIn6r4kO+ro7JOPEl1cSniDdGQvs+cCORhphJvoMv2tBD6awON9kpLvR3r2oZl8Xd7CT
-         gcFg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711460433; x=1712065233;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8cKb2/u7bTUjCLAuXknqnuW2euAxMzzYcAXpS6k1T8I=;
-        b=uwwKm/gfLysQE8nFHhSqbLiRaiUabftURVb1pWmz+RCo4Q7Btf7Sg3fvEu4NashVfn
-         mEEPvlaTzCAqbDKSXIvPB9NR0+8r1/J/W1MCZ0nKde71vGGhEmLyIfK/G5NZSuX4K/P6
-         ZsJGmfQDtj7ZXBWZM83JjpiJ+STvFad+K47Nxdrz0GEkNd8nxGCnr2TBzryPhMy4Ashd
-         18eMqAmCOUvbPJfM+ldcKRZeD/piUSzMZ5aHFxQQ6IDa08HNcmAimKpQbxD39edqucvD
-         Wu6aFuyeaUNTbf9OBgx4+FiCTvT6aTwE2nbIHBz6GwNQLxyqSDTxLzOrcRHa9RhgHjgP
-         NTOg==
-X-Forwarded-Encrypted: i=1; AJvYcCXYaeQdtTM+N/Syz9ipDkNm6sWiHo/Dtv58tO63U7DxXGB/q09k6V/Xw1TQIsQ5FRK484OLrHpeer997mhgZdPpLg3vuZ+qwULCBZqPAoSBZeO86kiOnMjZTMTpNIl+r+h9M9SdK1SVOgRYyf8s4g9rVDf1SkRfRx/2CXldCWvGKuS5V2/5
-X-Gm-Message-State: AOJu0YylwmnpimxG3lhDY9npTmWpCgn+ldYePKofq9+Xtgxyi+YA/03H
-	MIv3YMZOZbZXgBeU2igl0RbmEwfh7r/jZUcb+UTJq3dieNsDNr0J
-X-Google-Smtp-Source: AGHT+IED33vhTtcX4UL0LWOVjztttUhUL+F7bTRE2mgHIwp2zhvbcAhTRJiumZ9zpSTsUF3lo1ekZA==
-X-Received: by 2002:a05:620a:55b2:b0:78a:5c88:9b04 with SMTP id vr18-20020a05620a55b200b0078a5c889b04mr2959946qkn.73.1711460432892;
-        Tue, 26 Mar 2024 06:40:32 -0700 (PDT)
-Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
-        by smtp.gmail.com with ESMTPSA id o15-20020ae9f50f000000b007882fe32acasm3017567qkg.3.2024.03.26.06.40.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Mar 2024 06:40:32 -0700 (PDT)
-Date: Tue, 26 Mar 2024 09:40:32 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Richard Gobert <richardbgobert@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- xeb@mail.ru, 
- shuah@kernel.org, 
- idosch@nvidia.com, 
- amcohen@nvidia.com, 
- petrm@nvidia.com, 
- jbenc@redhat.com, 
- bpoirier@nvidia.com, 
- b.galvani@gmail.com, 
- liujian56@huawei.com, 
- horms@kernel.org, 
- linyunsheng@huawei.com, 
- therbert@google.com, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org
-Message-ID: <6602d05046526_13d9ab29498@willemb.c.googlers.com.notmuch>
-In-Reply-To: <494e8cac-e87a-4bc4-8a77-1801a703fd86@gmail.com>
-References: <20240325182543.87683-1-richardbgobert@gmail.com>
- <20240325182543.87683-5-richardbgobert@gmail.com>
- <6601c830c1daa_11c6072943b@willemb.c.googlers.com.notmuch>
- <494e8cac-e87a-4bc4-8a77-1801a703fd86@gmail.com>
-Subject: Re: [PATCH net-next v4 4/4] net: gro: move L3 flush checks to
- tcp_gro_receive
+	s=arc-20240116; t=1711460535; c=relaxed/simple;
+	bh=GE384zJ2zl0wxnEset36cttK55sE59MZHr6t9/cvvFU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uJD69VgJUPl4UMl66B/Tl6Z3AM93lJLBcNDy9TERGfy5f5gAa7+9AhCaEYAfhKo9cEfYlhCH9eP9/aZhODEIJgQ7/3RsG4Hn5iYvTvo8D2rh+M0cyqB/ZJopLJpAI+HMvom3KyVLdoencNOVlHIJvaMf6ACZYss7Lt5GScae4iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jI+XzbRe; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=0H0SVVafNEIHPuTghJFK0QlcgLMitktxgy/wCbUNVnk=; b=jI+XzbRe3qobLyb6lupSjHudZo
+	aXoopCP6oLAOqjRZeEWIpOv5wKAbu0Pui5EbWnOuxDN0TUQKnN6xVnLVttK50Vi/knvYDAMNr2HOY
+	kzNU7wiCFigHmXgKw7OMJV/om0qEa8IZdtwKXbE3nMNaGPEuYNg2glwoKHGNKc7C+69o=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rp73z-00BHWB-Ri; Tue, 26 Mar 2024 14:42:03 +0100
+Date: Tue, 26 Mar 2024 14:42:03 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Suraj Gupta <suraj.gupta2@amd.com>
+Cc: radhey.shyam.pandey@amd.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, michal.simek@amd.com,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, git@amd.com, harini.katakam@amd.com
+Subject: Re: [PATCH net-next RESEND] net: axienet: Fix kernel doc warnings
+Message-ID: <70fdb9ac-f532-49fc-9966-a0dab0ced56b@lunn.ch>
+References: <20240326055347.8919-1-suraj.gupta2@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240326055347.8919-1-suraj.gupta2@amd.com>
 
-Richard Gobert wrote:
-> Willem de Bruijn wrote:
-> > In v3 we discussed how the flush on network layer differences (like
-> > TTL or ToS) currently only affect the TCP GRO path, but should apply
-> > more broadly.
-> > 
-> > We agreed that it is fine to leave that to a separate patch series.
-> > 
-> > But seeing this patch, it introduces a lot of churn, but also makes
-> > it harder to address that issue for UDP, as it now moves network
-> > layer checks directly to the TCP code.
-> Currently the logic of flush_id is scattered in tcp_gro_receive and
-> {inet,ipv6}_gro_receive with conditionals rewriting ->flush and ->flush_id,
-> so IMO the code should be more concise when it's in one place - in addition
-> to not doing checks against non relevant packets.
+On Tue, Mar 26, 2024 at 11:23:47AM +0530, Suraj Gupta wrote:
+> Add description of mdio enable, mdio disable and mdio wait functions.
+> Add description of skb pointer in axidma_bd data structure.
+> Remove 'phy_node' description in axienet local data structure since
+> it is not a valid struct member.
+> Correct description of struct axienet_option.
 > 
-> With this patch, the fix will probably be simple, most likely just calling
-> gro_network_flush from skb_gro_receive or from the relevant flow in
-> udp_gro_receive_segment. Since this bug fix should be simple and it being
-> not relevant to the optimization, I'd like to solve it in another series
-> and properly test that new flow. Do you agree?
+> Fix below kernel-doc warnings in drivers/net/ethernet/xilinx/:
+> 1) xilinx_axienet_mdio.c:1: warning: no structured comments found
+> 2) xilinx_axienet.h:379: warning: Function parameter or struct member
+> 'skb' not described in 'axidma_bd'
+> 3) xilinx_axienet.h:538: warning: Excess struct member 'phy_node'
+> description in 'axienet_local'
+> 4) xilinx_axienet.h:1002: warning: expecting prototype for struct
+> axiethernet_option. Prototype was for struct axienet_option instead
+> 
+> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
+> Reviewed-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+> 
+> ---
+> Note: Earlier version didn't reached to mainline due to my email
+> configuration issues. So again sending out with resend tag.
+> 
+> 
+>  drivers/net/ethernet/xilinx/xilinx_axienet.h  |  4 ++--
+>  .../net/ethernet/xilinx/xilinx_axienet_mdio.c | 23 ++++++++++++++++---
+>  2 files changed, 22 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+> index 807ead678551..d0d1ae3b4e2c 100644
+> --- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
+> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
+> @@ -359,6 +359,7 @@
+>   * @app2:         MM2S/S2MM User Application Field 2.
+>   * @app3:         MM2S/S2MM User Application Field 3.
+>   * @app4:         MM2S/S2MM User Application Field 4.
+> + * @skb:	  Pointer to SKB transferred using DMA
 
-My main concern is moving this code to tcp_offload.c, if it likely
-soon will be moved elsewhere again.
+There looks to be some sort of tab vs spaces issue here?
+
+      Andrew
 
