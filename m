@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-82065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4772088C3F8
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:45:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C36D88C432
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:58:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02E09306A0F
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:45:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E0641C3F516
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:58:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58C586AE4;
-	Tue, 26 Mar 2024 13:42:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0315B757F9;
+	Tue, 26 Mar 2024 13:58:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="jI+XzbRe"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="TfAnJHGU"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0060E8625E;
-	Tue, 26 Mar 2024 13:42:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9C6E125C9;
+	Tue, 26 Mar 2024 13:58:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711460535; cv=none; b=gjDFrERoW8jrcqtTGeajdZuC7jCG6iqw16++RMl7HPEZjRowUyNWeqgH8QJEPdDr9xgvqxmJzDbud08PwVfF2PnSYUwv2fo2gmJIBv732l6sm9JOrtMtlFpSllyJfQ1k2fge+W1YtuxCR8QZhNbJgHSv8EFQHJeUUUHMU9MSWoY=
+	t=1711461498; cv=none; b=Gw07PqYOqx7crn9tsWT6l+MMtBjCKQ3PDCLE9PVD88/ZsG96BGmeFGLsHCWBH0Z7C2KanbWZiRnNDg1yaZjfHfkkAhYdC5ClS3HeeAM0c5EM7NV9FYbOmU8zsybNQEx/E/AmyeoQR70bBxK3DU2Mhaa7DLy+4kgR3H/Zo7NgLQE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711460535; c=relaxed/simple;
-	bh=GE384zJ2zl0wxnEset36cttK55sE59MZHr6t9/cvvFU=;
+	s=arc-20240116; t=1711461498; c=relaxed/simple;
+	bh=UkX75V9l2kKeZPRM2sj6rUQZY2m0OPjpnlnv9BQJ7zM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uJD69VgJUPl4UMl66B/Tl6Z3AM93lJLBcNDy9TERGfy5f5gAa7+9AhCaEYAfhKo9cEfYlhCH9eP9/aZhODEIJgQ7/3RsG4Hn5iYvTvo8D2rh+M0cyqB/ZJopLJpAI+HMvom3KyVLdoencNOVlHIJvaMf6ACZYss7Lt5GScae4iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=jI+XzbRe; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q3Pt8hp1CxKwdcnBlBLTbEUWdOtxAX7MsIV16yx4zTkWfXhLQIYGgB5uCwvxwKLm+bqmMtNbg1RalAh6enLrJd/duzPD3OwSJ1A9b48eAC+MWkMbWPcHQSa/lH8WsYpak4SoFzN/ZgYmfoMo8f/8FX80JKh+MsjLPzH5VFJ0kNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=TfAnJHGU; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,22 +36,35 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0H0SVVafNEIHPuTghJFK0QlcgLMitktxgy/wCbUNVnk=; b=jI+XzbRe3qobLyb6lupSjHudZo
-	aXoopCP6oLAOqjRZeEWIpOv5wKAbu0Pui5EbWnOuxDN0TUQKnN6xVnLVttK50Vi/knvYDAMNr2HOY
-	kzNU7wiCFigHmXgKw7OMJV/om0qEa8IZdtwKXbE3nMNaGPEuYNg2glwoKHGNKc7C+69o=;
+	bh=vNnrYFubP6muTfOE3nnaUwzi5pQkV31BF/tVPuyXjRs=; b=TfAnJHGU62uIy+XDLC9mejbExn
+	EyKUGfPCjZbxdkxhdmwkZHLJWY8syH7wZdLL0KzAmlsqj0lh3RPaRm4fmWJmjFrDIzT2Cc4vvJeDQ
+	KLyQ7UFGJojCR5tYNwV/RZG4lPqL+vGXbCnppM77jN9sAqp4A6NiDvLPjzpF5iqw9wlU=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1rp73z-00BHWB-Ri; Tue, 26 Mar 2024 14:42:03 +0100
-Date: Tue, 26 Mar 2024 14:42:03 +0100
+	id 1rp7JT-00BHZx-Kb; Tue, 26 Mar 2024 14:58:03 +0100
+Date: Tue, 26 Mar 2024 14:58:03 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Suraj Gupta <suraj.gupta2@amd.com>
-Cc: radhey.shyam.pandey@amd.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, michal.simek@amd.com,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, git@amd.com, harini.katakam@amd.com
-Subject: Re: [PATCH net-next RESEND] net: axienet: Fix kernel doc warnings
-Message-ID: <70fdb9ac-f532-49fc-9966-a0dab0ced56b@lunn.ch>
-References: <20240326055347.8919-1-suraj.gupta2@amd.com>
+To: Christophe Roullier <christophe.roullier@foss.st.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>, Marek Vasut <marex@denx.de>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 1/2] dt-bindings: net: add phy-supply property for
+ stm32
+Message-ID: <0e14ad5d-3c25-40ab-981a-fbc4e245fc94@lunn.ch>
+References: <20240326125849.226765-1-christophe.roullier@foss.st.com>
+ <20240326125849.226765-2-christophe.roullier@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,47 +73,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240326055347.8919-1-suraj.gupta2@amd.com>
+In-Reply-To: <20240326125849.226765-2-christophe.roullier@foss.st.com>
 
-On Tue, Mar 26, 2024 at 11:23:47AM +0530, Suraj Gupta wrote:
-> Add description of mdio enable, mdio disable and mdio wait functions.
-> Add description of skb pointer in axidma_bd data structure.
-> Remove 'phy_node' description in axienet local data structure since
-> it is not a valid struct member.
-> Correct description of struct axienet_option.
+On Tue, Mar 26, 2024 at 01:58:48PM +0100, Christophe Roullier wrote:
+> Phandle to a regulator that provides power to the PHY. This
+> regulator will be managed during the PHY power on/off sequence.
 > 
-> Fix below kernel-doc warnings in drivers/net/ethernet/xilinx/:
-> 1) xilinx_axienet_mdio.c:1: warning: no structured comments found
-> 2) xilinx_axienet.h:379: warning: Function parameter or struct member
-> 'skb' not described in 'axidma_bd'
-> 3) xilinx_axienet.h:538: warning: Excess struct member 'phy_node'
-> description in 'axienet_local'
-> 4) xilinx_axienet.h:1002: warning: expecting prototype for struct
-> axiethernet_option. Prototype was for struct axienet_option instead
-> 
-> Signed-off-by: Suraj Gupta <suraj.gupta2@amd.com>
-> Reviewed-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
-> 
+> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
 > ---
-> Note: Earlier version didn't reached to mainline due to my email
-> configuration issues. So again sending out with resend tag.
+>  Documentation/devicetree/bindings/net/stm32-dwmac.yaml | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> 
->  drivers/net/ethernet/xilinx/xilinx_axienet.h  |  4 ++--
->  .../net/ethernet/xilinx/xilinx_axienet_mdio.c | 23 ++++++++++++++++---
->  2 files changed, 22 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet.h b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-> index 807ead678551..d0d1ae3b4e2c 100644
-> --- a/drivers/net/ethernet/xilinx/xilinx_axienet.h
-> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet.h
-> @@ -359,6 +359,7 @@
->   * @app2:         MM2S/S2MM User Application Field 2.
->   * @app3:         MM2S/S2MM User Application Field 3.
->   * @app4:         MM2S/S2MM User Application Field 4.
-> + * @skb:	  Pointer to SKB transferred using DMA
+> diff --git a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> index fc8c96b08d7dc..80937b28fa046 100644
+> --- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> @@ -82,6 +82,9 @@ properties:
+>        Should be phandle/offset pair. The phandle to the syscon node which
+>        encompases the glue register, and the offset of the control register
+>  
+> +  phy-supply:
+> +    description: PHY regulator
 
-There looks to be some sort of tab vs spaces issue here?
+~/linux/drivers/net/ethernet/stmicro/stmmac$ grep regulator_get *
+dwmac-rk.c:	bsp_priv->regulator = devm_regulator_get(dev, "phy");
+dwmac-sun8i.c:	gmac->regulator = devm_regulator_get_optional(dev, "phy");
+dwmac-sunxi.c:	gmac->regulator = devm_regulator_get_optional(dev, "phy");
 
-      Andrew
+Maybe i'm missing something, but i don't see an actual implementation
+of this binding?
+
+	Andrew
 
