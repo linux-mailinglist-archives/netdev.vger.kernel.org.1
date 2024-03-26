@@ -1,200 +1,139 @@
-Return-Path: <netdev+bounces-82263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FC8088CF93
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:03:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 85B3188CFBD
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:11:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04536B218E6
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 21:02:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07448B227DB
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 21:11:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9BFD12B151;
-	Tue, 26 Mar 2024 21:02:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAE4213D539;
+	Tue, 26 Mar 2024 21:11:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WwOCK0EN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bGlSc53g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 799D512B14F
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 21:02:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB5D12AAF3;
+	Tue, 26 Mar 2024 21:11:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711486932; cv=none; b=Nf/7s6SuyxwZ+BDi3FRslPByW8H7Yva9EKZVEeuo7QG5k4cCLoFAZTQSXuHa2kAwnFX4TGOC6YMYV3C7m8lEH+FRHjNBWKgYcK6nscWNdl7tBYYIddu7MH5Nrz6iNQbNeoZpQ12TzkwcKX1QhQ6veg7iJ7wnNX7w0ws3MBGLFqA=
+	t=1711487477; cv=none; b=SMZ6U7jIenAMHhRnK/567M6QXi/bd1cRgi8EtGg2oU1jdek033We5js5rfcUg+6PciSb6y5UeoD+Dm2vE9mHmTpFkS8sKoBYDCXnXpzBe6MmZheWDqih+foh5XAfyHwKJvk1F9eB0ADYUtTtzs/UPMD5KZj2b9XbjdXSFF10Rng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711486932; c=relaxed/simple;
-	bh=jbbCJELoEAQqqkUBdoSUDMfhU+fP4buuslKhPG43iwc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hAxEJYLXN6klMuCEMqJ4HDpIhkcEbTu5v8dQTBglZCnKn5WFVHgTfsEPGuxlM+tlWG0H67l+4cehyMi311TOeO+exNi2rhFAsdR5530jpOwBaG1HhkWxpGvE88DWaAVuPfrivjFrbHKTX6nyzqR4E0erM4YMa0pzmjkLgXEGQgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WwOCK0EN; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1711486931; x=1743022931;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=jbbCJELoEAQqqkUBdoSUDMfhU+fP4buuslKhPG43iwc=;
-  b=WwOCK0ENjAyJB5gvQRhRwxFqo8bYSQRc5Q7LO9t4hZRX45o1TYUGX7r/
-   /7ePIlY2ynJ0Qn+lYTKtvHL0iK+1EjJxThl6oQZYWZ/CU+Vvv90f6LHnB
-   Vd0T2TfRLr1xzIMlnHmoQ+SkaXka7CpEtksoIkNRYvkbAcIygMoCLaxjy
-   0+2uF3ikkRfU6HFXxAckjWaFicOaYanwQ5ycWMTgX6lrMjGxqPEceu1RV
-   Th4AG05okFFooiVu38cwt2Q8u2G44xkDu0PpMvAlVyw7uIDfdMvz9EPQ1
-   kSrw3/5jNPXqI5l45P1Gqcugk2IbSB7QLFj9AeoI0hYTfsSnzhNK2msMt
-   A==;
-X-CSE-ConnectionGUID: W6AK4z0dRJGhecS9vF4+UQ==
-X-CSE-MsgGUID: tr7o8RvhRjiFilPxVz8hKQ==
-X-IronPort-AV: E=McAfee;i="6600,9927,11025"; a="6671376"
-X-IronPort-AV: E=Sophos;i="6.07,157,1708416000"; 
-   d="scan'208";a="6671376"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 14:02:03 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.07,157,1708416000"; 
-   d="scan'208";a="47262051"
-Received: from lkp-server01.sh.intel.com (HELO be39aa325d23) ([10.239.97.150])
-  by fmviesa001.fm.intel.com with ESMTP; 26 Mar 2024 14:02:01 -0700
-Received: from kbuild by be39aa325d23 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1rpDvi-0000PA-2H;
-	Tue, 26 Mar 2024 21:01:58 +0000
-Date: Wed, 27 Mar 2024 05:01:55 +0800
-From: kernel test robot <lkp@intel.com>
-To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	intel-wired-lan@lists.osuosl.org
-Cc: oe-kbuild-all@lists.linux.dev, Jacob Keller <jacob.e.keller@intel.com>,
-	netdev@vger.kernel.org, Wojciech Drewek <wojciech.drewek@intel.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-next v1 09/12] iavf: refactor
- iavf_clean_rx_irq to support legacy and flex descriptors
-Message-ID: <202403270404.dmqDS0ic-lkp@intel.com>
-References: <20240326115116.10040-10-mateusz.polchlopek@intel.com>
+	s=arc-20240116; t=1711487477; c=relaxed/simple;
+	bh=DhbIwGimzO1Ys/eDgtivAIaXcxFjjx+5Qj98m0RzjXQ=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=OLLWA1+PMfhryQ/iBZnlwQn4BzSuUjzoP9PzVrkpAKbma+vDQOm0AjuwhVSrZwkSAqyKikGptRMZG7dgWBy5Ou3iwBqPbC5c5cfucvpuEW5jkPpBvCKfk/bkOf6xWr7mupemDm7vtewbkX/WwD2T523WTDicDLoXT8s3Zl1v3jg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bGlSc53g; arc=none smtp.client-ip=209.85.217.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-476757820ceso1831622137.1;
+        Tue, 26 Mar 2024 14:11:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711487475; x=1712092275; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=C4E86kR2DKRyNfP7j7T5NXYDBgBKUpRjZk7CC48kM2A=;
+        b=bGlSc53gJffjewX7VH7dFLnSgwfdMIj2KUiyo32cAQ7qSl4+BaUmfX7esZKgCo+x5Z
+         7lbGRPcQf6+fFUNAhHhR725MNz/0V1v/oKizKaxl4LJiwdgTTfP2qlMYwIVOqLM9iWal
+         KKafF08XPVi6TMIekFYO2Lyp07JKkdOU7//cub+V3wZMuch1ByDZceLOwugxlj9JSMbY
+         1C1Re36iBRw+QZ1rf74GnY7iB5IORhv+FdWYE6pCHTIEUATOs43zbNX4J8E2bYrTCyjh
+         tqQUX0IbncN6UNo1uibSx2rTSLjtt/Y7df0HHFpYo4OaL9pJAk/Vux2AJF0jsfQ26xO3
+         616w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711487475; x=1712092275;
+        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=C4E86kR2DKRyNfP7j7T5NXYDBgBKUpRjZk7CC48kM2A=;
+        b=AGTszqpYA3a0sTkxDntWEURjLc+t4O4Xmo+8IbNZHORi32+k/6+fLGLvBw4QtpNMUu
+         izaeCh/AmBTAyw/YZ3MwrwZmsmdVpchQmlbeCfVU5/EpCFzWA1NTw4OLBeRzLq3gHTU/
+         5chGxjght53YAAObYKdjUs5ZYAy4TIR1nAkZc1JGeU6CslmdWjjXq7t7egblmeIbCzq+
+         SNkw56xtGhtarecuNmBIMgcwcQrfC12AHqjt9EfmIp6g5PgbBNaGZ9dU8ndkdyFj3YCI
+         BBMn3NhuHDI+JfivDbYEytNLcOn2XM5b8VExg+kUc7Iaw55oLT2iC+8pcQMldJFDdoCf
+         axDw==
+X-Forwarded-Encrypted: i=1; AJvYcCUKIAXrZaIm1Ruf6XN+fWJuusebhSvjsv481Y3Ua+tpDEKCbYPbEyq8kCkrhoX6OkJ5UBarifPK7RI2B1b5JGoK8N95RD38ilqhbX/WaJHAfsI0rAljzN1Ntbm7DVqg692onvC+i+mXOp13eOX/NZpyMnyysjXsna6H
+X-Gm-Message-State: AOJu0YzYljIT7o8VE7pc3Cio2u9dav+xUdrhcbnkEyk7rAVNYg+0mXAc
+	3I5mb5NM1Mv87IWseseR/ef29q+lOVjQTNENCLPb70vaEgp+yBHeocN/YhocpZP0jBp7T7NnOn/
+	6xPBPMOmvpXvTgnFM8gRq3gCjtlY=
+X-Google-Smtp-Source: AGHT+IE7IPPA6+eiifPNtX5vhNKID0Vd5arCLCtKWkE363s0aP8X5jekc/off5y2gyHlDp/JMEXXN7dlJEf7zml3Qc4=
+X-Received: by 2002:a05:6102:12d8:b0:478:23c8:1c23 with SMTP id
+ jd24-20020a05610212d800b0047823c81c23mr950756vsb.14.1711487475103; Tue, 26
+ Mar 2024 14:11:15 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20240326115116.10040-10-mateusz.polchlopek@intel.com>
+From: Kaiming Huang <lightninghkm96@gmail.com>
+Date: Tue, 26 Mar 2024 17:11:04 -0400
+Message-ID: <CAH3=goWGETBPj+-qcKo4E+sXZv1pT+UeVhXnv-q9N4Yagb1m-g@mail.gmail.com>
+Subject: Re: stack access issue. Re: [syzbot] [bpf?] UBSAN:
+ array-index-out-of-bounds in check_stack_range_initialized
+To: Andrei Matei <andreimatei1@gmail.com>
+Cc: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org, 
+	bpf@vger.kernel.org, daniel@iogearbox.net, eadavis@qq.com, eddyz87@gmail.com, 
+	haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org, 
+	kpsingh@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
+	netdev@vger.kernel.org, sdf@google.com, song@kernel.org, 
+	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Mateusz,
+Hi there,
 
-kernel test robot noticed the following build warnings:
+I went across this bug using my static analysis tool as well and was
+glad to find this email thread.
 
-[auto build test WARNING on tnguy-next-queue/dev-queue]
+My understanding is that the root cause of this bug has not been
+identified yet given the previous discussion in this thread.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Mateusz-Polchlopek/virtchnl-add-support-for-enabling-PTP-on-iAVF/20240326-200321
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue.git dev-queue
-patch link:    https://lore.kernel.org/r/20240326115116.10040-10-mateusz.polchlopek%40intel.com
-patch subject: [Intel-wired-lan] [PATCH iwl-next v1 09/12] iavf: refactor iavf_clean_rx_irq to support legacy and flex descriptors
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20240327/202403270404.dmqDS0ic-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 13.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20240327/202403270404.dmqDS0ic-lkp@intel.com/reproduce)
+This is the line of code that has the issue.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202403270404.dmqDS0ic-lkp@intel.com/
+stype = &state->stack[spi].slot_type[slot % BPF_REG_SIZE];
 
-All warnings (new ones prefixed by >>):
+Based on my analysis result, it is the part "slot_type[slot %
+BPF_REG_SIZE]" may result in memory access with a negative index,
+which should not be allowed. spi (as well as min_off, max_off, and
+slot) is(are) supposed to be negative based on my understanding of the
+workflow. But the index of slot_type is not supposed to be negative.
 
-   drivers/net/ethernet/intel/iavf/iavf_txrx.c: In function 'iavf_legacy_rx_csum':
->> drivers/net/ethernet/intel/iavf/iavf_txrx.c:1081:23: warning: variable 'rx_status' set but not used [-Wunused-but-set-variable]
-    1081 |         u32 rx_error, rx_status;
-         |                       ^~~~~~~~~
-   drivers/net/ethernet/intel/iavf/iavf_txrx.c: In function 'iavf_flex_rx_csum':
->> drivers/net/ethernet/intel/iavf/iavf_txrx.c:1118:25: warning: variable 'rx_status1' set but not used [-Wunused-but-set-variable]
-    1118 |         u16 rx_status0, rx_status1, ptype;
-         |                         ^~~~~~~~~~
+The slot_type is defined as below:
 
+u8 slot_type[BPF_REG_SIZE];  //BPF_REG_SIZE is 8
 
-vim +/rx_status +1081 drivers/net/ethernet/intel/iavf/iavf_txrx.c
+So the type of slot_type is u8[8].
 
-  1065	
-  1066	/**
-  1067	 * iavf_legacy_rx_csum - Indicate in skb if hw indicated a good cksum
-  1068	 * @vsi: the VSI we care about
-  1069	 * @skb: skb currently being received and modified
-  1070	 * @rx_desc: the receive descriptor
-  1071	 *
-  1072	 * This function only operates on the VIRTCHNL_RXDID_1_32B_BASE legacy 32byte
-  1073	 * descriptor writeback format.
-  1074	 **/
-  1075	static inline void iavf_legacy_rx_csum(struct iavf_vsi *vsi,
-  1076					       struct sk_buff *skb,
-  1077					       union iavf_rx_desc *rx_desc)
-  1078	{
-  1079		struct iavf_rx_csum_decoded csum_bits;
-  1080		struct iavf_rx_ptype_decoded decoded;
-> 1081		u32 rx_error, rx_status;
-  1082		u64 qword;
-  1083		u16 ptype;
-  1084	
-  1085		qword = le64_to_cpu(rx_desc->wb.qword1.status_error_len);
-  1086		ptype = FIELD_GET(IAVF_RXD_QW1_PTYPE_MASK, qword);
-  1087		rx_error = FIELD_GET(IAVF_RXD_QW1_ERROR_MASK, qword);
-  1088		rx_status = FIELD_GET(IAVF_RXD_QW1_STATUS_MASK, qword);
-  1089		decoded = decode_rx_desc_ptype(ptype);
-  1090	
-  1091		csum_bits.ipe = FIELD_GET(IAVF_RX_DESC_ERROR_IPE_MASK, rx_error);
-  1092		csum_bits.eipe = FIELD_GET(IAVF_RX_DESC_ERROR_EIPE_MASK, rx_error);
-  1093		csum_bits.l4e = FIELD_GET(IAVF_RX_DESC_ERROR_L4E_MASK, rx_error);
-  1094		csum_bits.pprs = FIELD_GET(IAVF_RX_DESC_ERROR_PPRS_MASK, rx_error);
-  1095		csum_bits.l3l4p = FIELD_GET(IAVF_RX_DESC_STATUS_L3L4P_MASK, rx_error);
-  1096		csum_bits.ipv6exadd = FIELD_GET(IAVF_RX_DESC_STATUS_IPV6EXADD_MASK,
-  1097						rx_error);
-  1098		csum_bits.nat = 0;
-  1099		csum_bits.eudpe = 0;
-  1100	
-  1101		iavf_rx_csum(vsi, skb, &decoded, &csum_bits);
-  1102	}
-  1103	
-  1104	/**
-  1105	 * iavf_flex_rx_csum - Indicate in skb if hw indicated a good cksum
-  1106	 * @vsi: the VSI we care about
-  1107	 * @skb: skb currently being received and modified
-  1108	 * @rx_desc: the receive descriptor
-  1109	 *
-  1110	 * This function only operates on the VIRTCHNL_RXDID_2_FLEX_SQ_NIC flexible
-  1111	 * descriptor writeback format.
-  1112	 **/
-  1113	static inline void iavf_flex_rx_csum(struct iavf_vsi *vsi, struct sk_buff *skb,
-  1114					     union iavf_rx_desc *rx_desc)
-  1115	{
-  1116		struct iavf_rx_csum_decoded csum_bits;
-  1117		struct iavf_rx_ptype_decoded decoded;
-> 1118		u16 rx_status0, rx_status1, ptype;
-  1119	
-  1120		rx_status0 = le16_to_cpu(rx_desc->flex_wb.status_error0);
-  1121		rx_status1 = le16_to_cpu(rx_desc->flex_wb.status_error1);
-  1122		ptype = le16_to_cpu(FIELD_GET(IAVF_RX_FLEX_DESC_PTYPE_M,
-  1123					      rx_desc->flex_wb.ptype_flexi_flags0));
-  1124		decoded = decode_rx_desc_ptype(ptype);
-  1125	
-  1126		csum_bits.ipe = FIELD_GET(IAVF_RX_FLEX_DESC_STATUS0_XSUM_IPE_M,
-  1127					  rx_status0);
-  1128		csum_bits.eipe = FIELD_GET(IAVF_RX_FLEX_DESC_STATUS0_XSUM_EIPE_M,
-  1129					   rx_status0);
-  1130		csum_bits.l4e = FIELD_GET(IAVF_RX_FLEX_DESC_STATUS0_XSUM_L4E_M,
-  1131					  rx_status0);
-  1132		csum_bits.eudpe = FIELD_GET(IAVF_RX_FLEX_DESC_STATUS0_XSUM_EUDPE_M,
-  1133					    rx_status0);
-  1134		csum_bits.l3l4p = FIELD_GET(IAVF_RX_FLEX_DESC_STATUS0_L3L4P_M,
-  1135					    rx_status0);
-  1136		csum_bits.ipv6exadd = FIELD_GET(IAVF_RX_FLEX_DESC_STATUS0_IPV6EXADD_M,
-  1137						rx_status0);
-  1138		csum_bits.nat = FIELD_GET(IAVF_RX_FLEX_DESC_STATUS1_NAT_M, rx_status0);
-  1139		csum_bits.pprs = 0;
-  1140	
-  1141		iavf_rx_csum(vsi, skb, &decoded, &csum_bits);
-  1142	}
-  1143	
+However, given "slot" can be negative, say -1. The result of slot %
+BPF_REG_SIZE is -1. This might sound counter-intuitive as % always
+gives positive results. But in C, % operation keeps the sign of
+dividend (and thus that's why I'm not sure whether the fix will catch
+this).
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+You can examine this by simply running this short piece of code. The
+result of the modulo operation is -1 on my end, and that is the reason
+that causes the OOB negative index, and this would be an off-by-one on
+the u8[8].
+
+#include <stdio.h>
+#define BPF_REG_SIZE 8
+int main() {
+    int i = -1;
+    unsigned int j = i % BPF_REG_SIZE;
+    printf("%d\n", j);
+    return 0;
+}
+
+A more severe scenario is when interpreting the j in the above example
+as unsigned int, aka integer overflow/wrap-around, in that case, the
+value of j will be 4,294,967,295. If it is the case, then it is a
+classic OOB access on the u8[8].
+
+Hopefully my illustration makes sense, please let me know if you see
+any issues. Thanks.
+
+Best regards,
+Kaiming.
 
