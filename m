@@ -1,133 +1,123 @@
-Return-Path: <netdev+bounces-81922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A92D888BB2B
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 08:26:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD2B188BB23
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 08:23:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6256D2E2EED
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 07:26:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B33A1C2C423
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 07:23:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727EB130A65;
-	Tue, 26 Mar 2024 07:26:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KH8Ar3YA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39F7C74BEB;
+	Tue, 26 Mar 2024 07:23:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC7CA84D29;
-	Tue, 26 Mar 2024 07:25:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C3F1272A8;
+	Tue, 26 Mar 2024 07:23:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711437961; cv=none; b=IMf5QXRsnAaZdfZ7stMPxhxiP6oJOHHKC8n01imG9ZgAUInAmGjrm1T68NvK62D52r46juCoNhA0DwK4Zfaj59dXwTrFwOOCGx/ZYLxOQeTUBkBMR9VZo6XRX1X491YaN9NIBE6d3zBydQ51qFHbWXaZXHJZ8/1uLVfNbPFDLxw=
+	t=1711437793; cv=none; b=bFHxPAn3ZB3xvDuzXj8JZRILLTyRREnGkrddhB9uUCyvyrnctSHHLmHcE4jAkEftywzNgPTeoFQh3Zkmb64n2i9CmIWzcexvGxAz7yIegam9a/m/7qUv7L7JnWlc8iKJKLHXFZNJ8sBB7ufm+uE0nARyoknZqg79B7dShji9eT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711437961; c=relaxed/simple;
-	bh=SeCIcmLMOaUBgNiXSvNudTBS9oS1ouW0sGgPTGoroXg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=egFdSA9Jj3dtWmMVcEJfBXKIkTE2lOw2bRAacU7ApKrMX+tv1zhe85GuoqCLWgahdo1yBXAvumhIyu6BRhgPaLM80WNSYzTrOOHDYGP7w5NI4YMgPeEZgBFQ8Etg3hPTM9D0gBfPxSwfNIt4tMdXnNbG7XZKNiIX1FqVI2jM5Rw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KH8Ar3YA; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-565c6cf4819so10363679a12.1;
-        Tue, 26 Mar 2024 00:25:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711437958; x=1712042758; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=r4hi5QonY0g+Isq5nzA/ob2FDC2jX5Rj8a6cVlwQSo4=;
-        b=KH8Ar3YAOqJQsv7FpVJtZk9PpVZT4f8NeqIv1ZIaafrBac6x1vklaFd2UUvWOcPNRI
-         YRXdleNkEsngFueCoAAEYZbK9BDUBsf3TiuNBLlr2vvhi3cXYE4+brKVNv2xIw63ejTh
-         M163g6GCv9WtJyGnCuft8EEs0H8Dkm5O+C3E2cFPwduKeWije36GA3g9ZuR9V5TyH7Kh
-         sJbNMb2oROw91yOztBZ/JVBsvtRQxlbbPolqYmQzUEdJD4VZG4FidGXN/lMv+yPH0CUn
-         P+hkXJlGJbiCk0etQ6WF2sLKtO1zRqufRdMrC/3EO69fedM9UWXbTqHEMhpF1iRGnYRr
-         M7hg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711437958; x=1712042758;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=r4hi5QonY0g+Isq5nzA/ob2FDC2jX5Rj8a6cVlwQSo4=;
-        b=iC/2jRhNaNPQk9p8MgoJC+ZIrlpamSn5ZlLVkG0AWCaC0L5JHirlHPOp+/kxlrzEQa
-         JvZ8lMD5wvZwY60UqkjNLJc/r41m/P2fCjK8gMe2PgWvLxhHxF4WI6KRKJKLb+4EqHkv
-         zliF4hVb33WbEF723miiGeIIVEGNMsUb3B/+9OxGBiNiXA7EQfXCV9fufvYTWUYj1yma
-         b2Ezr+/M/cpDu3e/AgiTG2EenJbkgzzbgTrkr+/UzuNB/+JeEpnlOSJT+YdrWbJD2tTf
-         ubYJRUAJKAC1e7DAr6SYZHKXc8h8rrxGPcrCcBgLhjVW4hNs9QwaSKRIKzjf1/yszYIe
-         jCbA==
-X-Forwarded-Encrypted: i=1; AJvYcCXCxrnC0JJsACBdQD7GvQw8FjZ2KvACzLvpmw9yVMjR9D4Tm80Bqfl4R072g+x84okf6bJeYkvtu0QdSjnlsbY0tO3muVdHp34aznjjcEgY5jkQvfTE6YlyFVrjOYqjeoOVsh5Chy27eyNAfIX0b2k1iKjF89JS1T0INuP44NcVi2cVZgUGIBUj
-X-Gm-Message-State: AOJu0YwsZq6+70gXVKKnG7yuIvvXiPmalnCRi6J24105H75IhEO7dpzG
-	94gDK9ebE5ihIYJDl2HoVgGZMf2KYPPEyupTO+L8F5MBCT6Dhj9MZzp0DzfUJW3WwRJUHCup3q1
-	p/peMKgxZGGhpwzsrc27DjB0uBAs=
-X-Google-Smtp-Source: AGHT+IFYsWLrSSReNHOvPWayY/EjNwUNTMWpQJa/7aPbmuCl5KR+IqtJTsrAErsRVn1dbGfKDXHMYxGjGNbT8pQoL+M=
-X-Received: by 2002:a17:906:b10d:b0:a46:ebe6:742e with SMTP id
- u13-20020a170906b10d00b00a46ebe6742emr469183ejy.23.1711437957891; Tue, 26 Mar
- 2024 00:25:57 -0700 (PDT)
+	s=arc-20240116; t=1711437793; c=relaxed/simple;
+	bh=gVdqo+muMxJNWsSySfdIfRgy5LgJ/5g5dMiae7rkDRM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=f2u8Q3DDU9LEbF0zWywyantk89cFfdxkdiMBh9c5gEBrENy2dK5pQ6ojQgp6r1c7QvHcQvQzEOhSfh5OKxPKe5zzN8/nhWTONYHqXYf7pb2QoPThy18+ZfI//gWTYpxkfyjRssuWt1bqGnUF/Cdscl15IZf176iS9+jrVfn4ddI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4V3h855hKhz1wnGj;
+	Tue, 26 Mar 2024 15:22:13 +0800 (CST)
+Received: from dggpeml500026.china.huawei.com (unknown [7.185.36.106])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9A792140120;
+	Tue, 26 Mar 2024 15:23:02 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
+ (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.35; Tue, 26 Mar
+ 2024 15:23:01 +0800
+From: Zhengchao Shao <shaozhengchao@huawei.com>
+To: <netdev@vger.kernel.org>, <linux-s390@vger.kernel.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <wenjia@linux.ibm.com>, <jaka@linux.ibm.com>, <alibuda@linux.alibaba.com>,
+	<tonylu@linux.alibaba.com>, <guwen@linux.alibaba.com>,
+	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>, <shaozhengchao@huawei.com>
+Subject: [PATCH net-next,RESEND] net/smc: make smc_hash_sk/smc_unhash_sk static
+Date: Tue, 26 Mar 2024 15:29:52 +0800
+Message-ID: <20240326072952.2717904-1-shaozhengchao@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1711361723.git.balazs.scheidler@axoflow.com>
- <34a9c221a6d644f18c826a1beddba58af6b7a64c.1711361723.git.balazs.scheidler@axoflow.com>
- <20240325192855.1fb3c331@kernel.org>
-In-Reply-To: <20240325192855.1fb3c331@kernel.org>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 26 Mar 2024 15:25:21 +0800
-Message-ID: <CAL+tcoDXHSMmqUeuMSSObco=_2Vr5tDSRFzXUSsAneOP314jqg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/2] net: udp: add IP/port data to the
- tracepoint udp/udp_fail_queue_rcv_skb
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Balazs Scheidler <bazsi77@gmail.com>, kuniyu@amazon.com, netdev@vger.kernel.org, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Balazs Scheidler <balazs.scheidler@axoflow.com>, 
-	linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
 
-On Tue, Mar 26, 2024 at 10:28=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
->
-> On Mon, 25 Mar 2024 11:29:18 +0100 Balazs Scheidler wrote:
-> > +                memset(__entry->saddr, 0, sizeof(struct sockaddr_in6))=
-;
-> > +                memset(__entry->daddr, 0, sizeof(struct sockaddr_in6))=
-;
->
-> Indent with tabs please, checkpatch says:
->
-> ERROR: code indent should use tabs where possible
-> #59: FILE: include/trace/events/udp.h:38:
-> +                memset(__entry->saddr, 0, sizeof(struct sockaddr_in6));$
->
-> WARNING: please, no spaces at the start of a line
-> #59: FILE: include/trace/events/udp.h:38:
-> +                memset(__entry->saddr, 0, sizeof(struct sockaddr_in6));$
->
-> ERROR: code indent should use tabs where possible
-> #60: FILE: include/trace/events/udp.h:39:
-> +                memset(__entry->daddr, 0, sizeof(struct sockaddr_in6));$
->
-> WARNING: please, no spaces at the start of a line
-> #60: FILE: include/trace/events/udp.h:39:
-> +                memset(__entry->daddr, 0, sizeof(struct sockaddr_in6));$
+smc_hash_sk and smc_unhash_sk are only used in af_smc.c, so make them
+static and remove the output symbol. They can be called under the path
+.prot->hash()/unhash().
 
-More than this, it would be better to put "From Balazs Scheidler
-<balazs.scheidler@axoflow.com>" in the first line of each patch to
-eliminate the mismatched email address warning.
+Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+Reviewed-by: Wen Gu <guwen@linux.alibaba.com>
+---
+ include/net/smc.h | 3 ---
+ net/smc/af_smc.c  | 6 ++----
+ 2 files changed, 2 insertions(+), 7 deletions(-)
 
-Link (Jakub referred to):
-https://patchwork.kernel.org/project/netdevbpf/patch/34a9c221a6d644f18c826a=
-1beddba58af6b7a64c.1711361723.git.balazs.scheidler@axoflow.com/
-Detailed info: https://netdev.bots.linux.dev/static/nipa/837832/13601927/ch=
-eckpatch/stdout
+diff --git a/include/net/smc.h b/include/net/smc.h
+index c9dcb30e3fd9..10684d0a33df 100644
+--- a/include/net/smc.h
++++ b/include/net/smc.h
+@@ -26,9 +26,6 @@ struct smc_hashinfo {
+ 	struct hlist_head ht;
+ };
+ 
+-int smc_hash_sk(struct sock *sk);
+-void smc_unhash_sk(struct sock *sk);
+-
+ /* SMCD/ISM device driver interface */
+ struct smcd_dmb {
+ 	u64 dmb_tok;
+diff --git a/net/smc/af_smc.c b/net/smc/af_smc.c
+index 4b52b3b159c0..e8dcd28a554c 100644
+--- a/net/smc/af_smc.c
++++ b/net/smc/af_smc.c
+@@ -177,7 +177,7 @@ static struct smc_hashinfo smc_v6_hashinfo = {
+ 	.lock = __RW_LOCK_UNLOCKED(smc_v6_hashinfo.lock),
+ };
+ 
+-int smc_hash_sk(struct sock *sk)
++static int smc_hash_sk(struct sock *sk)
+ {
+ 	struct smc_hashinfo *h = sk->sk_prot->h.smc_hash;
+ 	struct hlist_head *head;
+@@ -191,9 +191,8 @@ int smc_hash_sk(struct sock *sk)
+ 
+ 	return 0;
+ }
+-EXPORT_SYMBOL_GPL(smc_hash_sk);
+ 
+-void smc_unhash_sk(struct sock *sk)
++static void smc_unhash_sk(struct sock *sk)
+ {
+ 	struct smc_hashinfo *h = sk->sk_prot->h.smc_hash;
+ 
+@@ -202,7 +201,6 @@ void smc_unhash_sk(struct sock *sk)
+ 		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
+ 	write_unlock_bh(&h->lock);
+ }
+-EXPORT_SYMBOL_GPL(smc_unhash_sk);
+ 
+ /* This will be called before user really release sock_lock. So do the
+  * work which we didn't do because of user hold the sock_lock in the
+-- 
+2.34.1
 
-> --
-> pw-bot: cr
 
