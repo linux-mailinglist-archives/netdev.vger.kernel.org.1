@@ -1,86 +1,115 @@
-Return-Path: <netdev+bounces-82096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3734388C50B
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:23:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E03888C50E
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:26:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F7E8B2280A
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:23:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D45B129B214
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:26:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 334DD8061E;
-	Tue, 26 Mar 2024 14:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T/tDP5Kp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF87312D768;
+	Tue, 26 Mar 2024 14:26:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06B9812D1EC;
-	Tue, 26 Mar 2024 14:23:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from zg8tmja2lje4os43os4xodqa.icoremail.net (zg8tmja2lje4os43os4xodqa.icoremail.net [206.189.79.184])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F34F20DF7;
+	Tue, 26 Mar 2024 14:26:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=206.189.79.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711463014; cv=none; b=bpobLEvFobWeI6CXOOZj4TeR4RI0dHh6ZUHd6jZp271C68V+WXkQvnDlCfb6s+O7O0hLr2ZO1VFdJaOYbZvPQ6QDS+G8VTE18AMATJdEQ9EW4anv3PkE92+8AZhIWWv4MSHOmfayDqex570CJ54D5ABGjAaSrWgYz4cSstpR+ZM=
+	t=1711463171; cv=none; b=OY0GwwCRemAoJLkhUYt6U2OWGQRKn2p9CQ95yGFuzKvgD6r+hBlInRH0DUpepgeJhKJp/VJJLiGyT8u96xxDmquVDz9TutyX9VQ9er+p7hCFBn6q5r3Ty2fiEgiHGpNx+Ejxc9hKnAgo0igJspJauyRMTavbUjoqxUwq9EB1Nuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711463014; c=relaxed/simple;
-	bh=XdKfUbEA/jzMBhPvbRzdoiWa0RgM42GTVwq0+Wg/sd0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pTTYrbkYunuwfheYW7Twqs7HNl8jDpuqtb2ri9hpbAvwFO+FT+9ZCI6DsVaMAFno3ixWHvtmmaGXefpOpnBCvN8APx/8PYO1scBvhqQkm5x5VIB/iOVByp9gvP20CHHNZx7EbASWAU+y+ynDeASaNB05NQxGrZDhoGpuDhvaT04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T/tDP5Kp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7015CC433C7;
-	Tue, 26 Mar 2024 14:23:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711463013;
-	bh=XdKfUbEA/jzMBhPvbRzdoiWa0RgM42GTVwq0+Wg/sd0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=T/tDP5KpP6h2nmPhaOnze2z/DH8wNlEKG1d0pZn2cQ7GfTIO/7BZwB5WF5F9dKTjQ
-	 mWXZ7hJ1VjBPjpuHaQ4FDibZVImKvxCW/1u/Iah7seTe/tmOskX8yvUkqEXs9zW4uW
-	 URy+avXOCDCrQYbr5gQ6IkA8oaYywO1zvCGGJtv+hyt8SbwPjnqFLweeAhyO5xbg2w
-	 hTyLE82Pd7M3OMg/6Np7BQwgda4tVLqVjhDx3SpOkUMZgUy8kcSwl5sgQ7d9rnrCsc
-	 IQvN8aJ5fFFNdReSW9CwcAP13KORRkMuA71DRx5X4jmJtLUaPJI5We+YqSGlPRli9o
-	 mqRkLo7ZqsC9w==
-Date: Tue, 26 Mar 2024 07:23:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: Re: [TEST] VirtioFS instead of 9p
-Message-ID: <20240326072332.08546282@kernel.org>
-In-Reply-To: <60c891b6-03c9-413c-b41a-14949390d106@kernel.org>
-References: <20240325064234.12c436c2@kernel.org>
-	<34e4f87d-a0c8-4ac3-afd8-a34bbab016ce@kernel.org>
-	<20240325184237.0d5a3a7d@kernel.org>
-	<60c891b6-03c9-413c-b41a-14949390d106@kernel.org>
+	s=arc-20240116; t=1711463171; c=relaxed/simple;
+	bh=OC7tCvTydfv2WFPYMhnm6Kce8VRGXQdO45oszdOLx2w=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=R91NulUY6xNDLEUI/teb7v71jErr7BLSD9xau8X82lvpMIaC4TQwwfeYo8Qy9WroD11d0yYnOJSrjps63rjU6dkukK/ZLAOMyoOpiyQknE4V3Kh9CTMVoLFatfnr88hdfjYOWpT5hc1G7mpG1uTSgTSJCZDEydQjmp+PKYRbXKk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn; spf=pass smtp.mailfrom=zju.edu.cn; arc=none smtp.client-ip=206.189.79.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=zju.edu.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=zju.edu.cn
+Received: from ubuntu.localdomain (unknown [218.12.18.99])
+	by mail-app4 (Coremail) with SMTP id cS_KCgDXi8Dm2gJmIc5YAQ--.22282S2;
+	Tue, 26 Mar 2024 22:25:52 +0800 (CST)
+From: Duoming Zhou <duoming@zju.edu.cn>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	linux-hams@vger.kernel.org,
+	pabeni@redhat.com,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	jreuter@yaina.de,
+	Duoming Zhou <duoming@zju.edu.cn>
+Subject: [PATCH net] ax25: fix use-after-free bugs caused by ax25_ds_del_timer
+Date: Tue, 26 Mar 2024 22:25:42 +0800
+Message-Id: <20240326142542.118058-1-duoming@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cS_KCgDXi8Dm2gJmIc5YAQ--.22282S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7uFy7GF45tw47JFyxJr13Jwb_yoW8JF4kpF
+	WqgF43AF97AryqyF48WF1kWryUAFy8Z3yDCFy7ua1Ikwn3X3Z8JF1DK3yIqFW7GFZ5Arn7
+	Cw10qr45uFn5CFUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvm14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lc7CjxVAaw2AFwI0_
+	Jw0_GFylc2xSY4AK67AK6ry5MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r
+	4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF
+	67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2I
+	x0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2
+	z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnU
+	UI43ZEXa7VU1OtxDUUUUU==
+X-CM-SenderInfo: qssqjiasttq6lmxovvfxof0/1tbiAwUMAWYBgRkWjQBPsg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Tue, 26 Mar 2024 11:27:17 +0100 Matthieu Baerts wrote:
-> > "All you need is to install" undersells it a little :)
-> > 
-> > It's not packaged for silly OS^w^w AWS Linux.  
-> 
-> Thank you for having tried! That's a shame "virtiofsd" is not packaged!
-> 
-> > And the Rust that comes with it doesn't seem to be able to build it :(  
-> Did you try by installing Rust (rustc, cargo) via rustup [1]? It is even
-> possible to get the offline installer if it is easier [2]. With rustup,
-> you can easily install newer versions of the Rust toolchain.
-> 
-> [1] https://www.rust-lang.org/learn/get-started
-> [2] https://forge.rust-lang.org/infra/other-installation-methods.html
+When the ax25 device is detaching, the ax25_dev_device_down()
+calls ax25_ds_del_timer() to cleanup the slave_timer. When
+the timer handler is running, the ax25_ds_del_timer() that
+calls del_timer() in it will return directly. As a result,
+the use-after-free bugs could happen, one of the scenarios
+is shown below:
 
-I know, I know, but there's only so many minutes ;)
+      (Thread 1)          |      (Thread 2)
+                          | ax25_ds_timeout()
+ax25_dev_device_down()    |
+  ax25_ds_del_timer()     |
+    del_timer()           |
+  ax25_dev_put() //FREE   |
+                          |  ax25_dev-> //USE
 
-> Do you need a hand to update the wiki page?
+In order to mitigate bugs, when the device is detaching, use
+timer_shutdown_sync() to stop the timer.
 
-Yes please! I believe it's a repo somewhere, but not sure if it's easy
-to send PRs against it. If PRs are not trivial feel free to edit the
-wiki directly.
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Duoming Zhou <duoming@zju.edu.cn>
+---
+ net/ax25/ax25_ds_timer.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+diff --git a/net/ax25/ax25_ds_timer.c b/net/ax25/ax25_ds_timer.c
+index c4f8adbf814..5624c0d174c 100644
+--- a/net/ax25/ax25_ds_timer.c
++++ b/net/ax25/ax25_ds_timer.c
+@@ -43,7 +43,12 @@ void ax25_ds_setup_timer(ax25_dev *ax25_dev)
+ 
+ void ax25_ds_del_timer(ax25_dev *ax25_dev)
+ {
+-	if (ax25_dev)
++	if (!ax25_dev)
++		return;
++
++	if (!ax25_dev->device_up)
++		timer_shutdown_sync(&ax25_dev->dama.slave_timer);
++	else
+ 		del_timer(&ax25_dev->dama.slave_timer);
+ }
+ 
+-- 
+2.17.1
+
 
