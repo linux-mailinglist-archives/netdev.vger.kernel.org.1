@@ -1,142 +1,87 @@
-Return-Path: <netdev+bounces-81909-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81910-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A807088BA2E
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 07:06:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4389188BA42
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 07:13:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB205B20DAB
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 06:06:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F13FD2E49F9
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 06:13:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4AC712AADE;
-	Tue, 26 Mar 2024 06:05:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="KzUPoP/m"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDE6E12AAEA;
+	Tue, 26 Mar 2024 06:13:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3732912AAC7
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 06:05:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+Received: from mail.nfschina.com (unknown [42.101.60.195])
+	by smtp.subspace.kernel.org (Postfix) with SMTP id 3A48812AAE4;
+	Tue, 26 Mar 2024 06:13:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=42.101.60.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711433157; cv=none; b=R80e4NMY5mWb3Kbi4ziclYftFkP2kGl3hO1p4FSI5/EmyTDdBBM3V4QwkFWuN3dvcjpWOZWfrgUHHfnnRKYD8HnY1Dg6o9EkZgUQMz+9G3qS7TjrX2ftNyR5Aa+sytzfDlQSrkXhUaU03qJGjJsvJa0JmoPKDxrBCebH42UToGs=
+	t=1711433589; cv=none; b=Qi3Hohf7Mxq+BdryyIHUiSxbbLPevkO6Pxa5hjKxiZ999oll8MB0MfXOjESABrbZ5QrY4jc/Dm/Gt/xvxHys9zFPbTuvZucOD01ffyuexRheeXXv8bDh2iF3xa+dSYjDAIIU+OFd2qgX0fvALWHZc/jk1PxhfRYNW8jgcKduB7Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711433157; c=relaxed/simple;
-	bh=NO61bJVRsEvpdgUYiYT6U+RNOOLLFAKVZCJYcNwFmiw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=iZZTMupE5ytz16jmR7owICsaxAs23c+F4u6Y+ZJV3P1moTZbP6CydNs4H8q3FVZqhtf3F6Lyrlg92FVGXwCgFeUHF3vfzImXXL7IpjR3ZYVGAGrEPbCOxaIPJUVt31O3ZzxGv3jKUfyywcBrgYWC2M9B45qoaLeavAPWtpkNcTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=KzUPoP/m; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1711433148; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=7luCg4vEwCfkXoYWOAUIDYythaXAUaoq9HfKIfQxAA8=;
-	b=KzUPoP/mqbPMf4nT8rmJe4DjWxK76qp1tBi4xlIJfPQDIAJZ7l7PQ7hQLN+2SKnCszX4kBv1g8TtHad/nPjpUhwVj29uHaHyz+5hj4O7g5gw/OIXi2F7ufw2C6v36lVzrO+m+jz1wAy2mulOqWfNnXD7bzA6COSkcyknMCwMynE=
-X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R161e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045176;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=11;SR=0;TI=SMTPD_---0W3JsaPL_1711433143;
-Received: from 30.221.149.28(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W3JsaPL_1711433143)
-          by smtp.aliyun-inc.com;
-          Tue, 26 Mar 2024 14:05:48 +0800
-Message-ID: <95369596-191b-4cd3-9262-26aff7558561@linux.alibaba.com>
-Date: Tue, 26 Mar 2024 14:05:41 +0800
+	s=arc-20240116; t=1711433589; c=relaxed/simple;
+	bh=oTvXLR4vHq2sfi+YR5JibffxIjM6md8D3zQXRx7K1Sc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ArgK2IzkNxLB/ucBkqpHNr0Mky6I77/GpI+K81M0Q/h8xhkVoqsXQi1/ZbPGXnE3McMriQdeIT/ySkicUUL0TMBvMcPvhIOY8SY6zDoAFGaMHtZCR7iyir9zpmzVd0D9QKT8Djo3g579vcoputeI7xAYbnerfctZS3BX2mfQTVg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com; spf=pass smtp.mailfrom=nfschina.com; arc=none smtp.client-ip=42.101.60.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nfschina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nfschina.com
+Received: from localhost.localdomain (unknown [180.167.10.98])
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPSA id 85F886070B0AF;
+	Tue, 26 Mar 2024 14:13:00 +0800 (CST)
+X-MD-Sfrom: suhui@nfschina.com
+X-MD-SrcIP: 180.167.10.98
+From: Su Hui <suhui@nfschina.com>
+To: sgoutham@marvell.com,
+	gakula@marvell.com,
+	sbhatta@marvell.com,
+	hkelam@marvell.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: Su Hui <suhui@nfschina.com>,
+	saikrishnag@marvell.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net v2 1/2] octeontx2-pf: check negative error code in otx2_open()
+Date: Tue, 26 Mar 2024 14:12:34 +0800
+Message-Id: <20240326061233.4133148-1-suhui@nfschina.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/4] Remove RTNL lock protection of CVQ
-To: Dan Jurgens <danielj@nvidia.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Cc: "mst@redhat.com" <mst@redhat.com>,
- "jasowang@redhat.com" <jasowang@redhat.com>,
- "xuanzhuo@linux.alibaba.com" <xuanzhuo@linux.alibaba.com>,
- "virtualization@lists.linux.dev" <virtualization@lists.linux.dev>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, Jiri Pirko <jiri@nvidia.com>
-References: <20240325214912.323749-1-danielj@nvidia.com>
- <23e442f0-a18b-4da0-9321-f543b028cd7e@linux.alibaba.com>
- <CH0PR12MB8580BA6DB62352F6378E8EBFC9352@CH0PR12MB8580.namprd12.prod.outlook.com>
-From: Heng Qi <hengqi@linux.alibaba.com>
-In-Reply-To: <CH0PR12MB8580BA6DB62352F6378E8EBFC9352@CH0PR12MB8580.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
+otx2_rxtx_enable() return negative error code such as -EIO,
+check -EIO rather than EIO to fix this problem.
 
+Fixes: c926252205c4 ("octeontx2-pf: Disable packet I/O for graceful exit")
+Signed-off-by: Su Hui <suhui@nfschina.com>
+Reviewed-by: Subbaraya Sundeep <sbhatta@marvell.com>
+---
+v2: add "net" in subject
+ drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-在 2024/3/26 下午12:11, Dan Jurgens 写道:
->> From: Heng Qi <hengqi@linux.alibaba.com>
->> Sent: Monday, March 25, 2024 9:54 PM
->> To: Dan Jurgens <danielj@nvidia.com>; netdev@vger.kernel.org
->> Cc: mst@redhat.com; jasowang@redhat.com; xuanzhuo@linux.alibaba.com;
->> virtualization@lists.linux.dev; davem@davemloft.net;
->> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com; Jiri Pirko
->> <jiri@nvidia.com>
->> Subject: Re: [PATCH net-next 0/4] Remove RTNL lock protection of CVQ
->>
->>
->>
->> 在 2024/3/26 上午5:49, Daniel Jurgens 写道:
->>> Currently the buffer used for control VQ commands is protected by the
->>> RTNL lock. Previously this wasn't a major concern because the control
->>> VQ was only used during device setup and user interaction. With the
->>> recent addition of dynamic interrupt moderation the control VQ may be
->>> used frequently during normal operation.
->>>
->>> This series removes the RNTL lock dependancy by introducing a spin
->>> lock to protect the control buffer and writing SGs to the control VQ.
->> Hi Daniel.
->>
->> It's a nice piece of work, but now that we're talking about ctrlq adding
->> interrupts, spin lock has some conflicts with its goals. For example, we expect
->> the ethtool command to be blocked.
->> Therefore, a mutex lock may be more suitable.
->>
->> Any how, the final conclusion may require some waiting.
-> Thanks, Heng
->
-> I took this a step further and made the ctrlq interrupt driven, but an internal reviewer pointed me to this:
-> https://lore.kernel.org/lkml/20230413064027.13267-1-jasowang@redhat.com/ (sorry if it gets safelinked)
->
-> It seemed there was little appetite to go that route last year, because of set RX mode behavior change, and consumption of an additional IRQ.
-
-Hi DanielJ.
-
-Jason now supports this and wants to make changes to ctrlq.
-
-Yes, our requirements for ctrlq have become higher and we need to make 
-updates as expected.
-
-So your patches look good:
-
-         Reviewed-by: Heng Qi <hengqi@linux.alibaba.com>
-
-I will make further modifications on top of these.
-
-Regards,
-Heng
-
->
-> Either way, I think the spin lock is still needed. In my interrupt driven implantation I was allocating a new control buffer instead of just the data fields. The spin lock was tighter around virtqueue_add_sgs, after the kick it would unlock and wait for a completion that would be triggered from the cvq callback.
->
->
->> Regards,
->> Heng
->>
->>> Daniel Jurgens (4):
->>>     virtio_net: Store RSS setting in virtnet_info
->>>     virtio_net: Remove command data from control_buf
->>>     virtio_net: Add a lock for the command VQ.
->>>     virtio_net: Remove rtnl lock protection of command buffers
->>>
->>>    drivers/net/virtio_net.c | 185 ++++++++++++++++++++++-----------------
->>>    1 file changed, 104 insertions(+), 81 deletions(-)
->>>
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+index b40bd0e46751..3f46d5e0fb2e 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+@@ -1933,7 +1933,7 @@ int otx2_open(struct net_device *netdev)
+ 	 * mcam entries are enabled to receive the packets. Hence disable the
+ 	 * packet I/O.
+ 	 */
+-	if (err == EIO)
++	if (err == -EIO)
+ 		goto err_disable_rxtx;
+ 	else if (err)
+ 		goto err_tx_stop_queues;
+-- 
+2.30.2
 
 
