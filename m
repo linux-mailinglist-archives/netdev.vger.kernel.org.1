@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-82255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAA8888CF4E
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 21:46:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C53F588CF48
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 21:45:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7C882B21C9C
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 20:44:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 326472865F6
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 20:45:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA4907173B;
-	Tue, 26 Mar 2024 20:44:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95CE75BAC1;
+	Tue, 26 Mar 2024 20:45:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="nkiAOtYC"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gVTDldcZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BAB23CB
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 20:44:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C488217591
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 20:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711485894; cv=none; b=gbrjgWJtTDFxmbWCKvjaz6IB1NAcV1n7rW3VCHDoE8cQstAsG0KINL6yDbly2vnWyUtflftxLplAn2o0ZSmDf9uUdMWlX8stjliUZNl3lbsXrsrd7DznK4h1Cq5D9RIfk42HKH6AJ1C6tq4RVxd8vUbUoYraqz+tHGIIV27DMdM=
+	t=1711485917; cv=none; b=c/9Bbc7dArWbnUM/Bl63QyfA7lecVtNFIIYRRzpiZQP13G41XjOMftzP1fIaDcjKBYDyRgn7C9QKQBmwWbrv4xpkKZ6zMU/9c4OLOw5szdS3KLl4bmwflEnA5jxDXGRBQmEN50nLFOXbO1D2GgEKyaQO8aXbHAuhL4jPHE4/BTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711485894; c=relaxed/simple;
-	bh=NY0t+klVvqTZkIAAsks+PhtamoL73DVTpjMCH8ee0lQ=;
+	s=arc-20240116; t=1711485917; c=relaxed/simple;
+	bh=RkRd6Y1RDEYuQEERJGFc2/hlLd1t8C+QoB33wplAkgs=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lQoZvH6cHK9w0ndQ+uAAPLxulgi8y1dpDwGuV4gVvN+BX0DwBGn6XFNbK5U38WnC157PSDUpdOnsAZqRmpD2OlQlAhciXb1mYkcjQvRaRtzycMINhrh3BrPaQUrh7d5TXPant/RMyfpjZf/t5uUXCHKPTqVkgkBDddxt4840RJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=nkiAOtYC; arc=none smtp.client-ip=52.119.213.154
+	 MIME-Version:Content-Type; b=dtJDojViLg/Xtv9PaVrZIsDGNDNFIKbc8SS1iaTTEoeQVZ/5OxbZhD6w2f6DKAX3uUac/7DXu+gao+f13SDSb83Z12aOPKMVxnSLbOawv6Ed2USQ8RaDP5YgZVCOyUAUXzbxZzm2X4i67PTK2wuh3C9HwYy2gREwg0zeJ+IoJfc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gVTDldcZ; arc=none smtp.client-ip=52.119.213.150
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1711485894; x=1743021894;
+  t=1711485916; x=1743021916;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=kC3F5PGjXjKCCI0+CSKQLOjTivUEeC1MTWT6pTQkjOg=;
-  b=nkiAOtYCrZKazsOmpCAMOg3K3NgpvkVarEYUZ5/PZOsuEhpjZQUX6Wdb
-   4PoBUKwDryLXuQuLY0XtDv6nrPgH1QhDySEpZKqC8EyfMZLNGqXvoO5Sw
-   5BCd51eyggRhWXkxJJrpqmIa145j6KgK29ndbTpQUsxTEfW+/L15aT7u8
-   E=;
+  bh=ntvH6fPtmbdFNbIsvQYQ8TjXFUeXDa3bnJVDwfL2EtI=;
+  b=gVTDldcZBLcFx7zCM/XYuKOcZW8lISwy0tHtIbfozxh0dDPeDLhV0tWq
+   CIMNZ74A4qdNqr9FIgujkfn3kmqX+Fhk6dDxU6ZrYsgGpnEfxjIyDLrEL
+   UPkJqO0/eCXe/9VzSIS/9xqUdyOW49ZAuSawvRgriEmRxJTldr4kz/MAL
+   o=;
 X-IronPort-AV: E=Sophos;i="6.07,157,1708387200"; 
-   d="scan'208";a="194567645"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 20:44:50 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.21.151:1712]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.59.85:2525] with esmtp (Farcaster)
- id 44b5d267-f51d-4a68-85ff-6f614850e75d; Tue, 26 Mar 2024 20:44:49 +0000 (UTC)
-X-Farcaster-Flow-ID: 44b5d267-f51d-4a68-85ff-6f614850e75d
+   d="scan'208";a="622567292"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 20:45:13 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.7.35:50782]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.17.10:2525] with esmtp (Farcaster)
+ id 5a60ebf1-8cc2-4314-8c6f-25d22732bffc; Tue, 26 Mar 2024 20:45:12 +0000 (UTC)
+X-Farcaster-Flow-ID: 5a60ebf1-8cc2-4314-8c6f-25d22732bffc
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Tue, 26 Mar 2024 20:44:46 +0000
+ 15.2.1258.28; Tue, 26 Mar 2024 20:45:12 +0000
 Received: from 88665a182662.ant.amazon.com (10.106.101.23) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.28; Tue, 26 Mar 2024 20:44:43 +0000
+ 15.2.1258.28; Tue, 26 Mar 2024 20:45:09 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -64,9 +64,9 @@ To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 CC: Joanne Koong <joannelkoong@gmail.com>, Jianguo Wu <wujianguo106@163.com>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v2 net 4/8] selftest: tcp: Define the reverse order bind() tests explicitly.
-Date: Tue, 26 Mar 2024 13:42:47 -0700
-Message-ID: <20240326204251.51301-5-kuniyu@amazon.com>
+Subject: [PATCH v2 net 5/8] selftest: tcp: Add v4-v4 and v6-v6 bind() conflict tests.
+Date: Tue, 26 Mar 2024 13:42:48 -0700
+Message-ID: <20240326204251.51301-6-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20240326204251.51301-1-kuniyu@amazon.com>
 References: <20240326204251.51301-1-kuniyu@amazon.com>
@@ -78,124 +78,138 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D044UWB001.ant.amazon.com (10.13.139.171) To
+X-ClientProxiedBy: EX19D042UWA001.ant.amazon.com (10.13.139.92) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Currently, bind_wildcard.c calls bind() twice for two addresses and
-checks the pre-defined errno against the 2nd call.  Also, the two
-bind() calls are swapped to cover various patterns how bind buckets
-are created.
+We don't have bind() conflict tests for the same protocol pairs.
 
-However, only testing two addresses is insufficient to detect regression.
-So, we will add more bind() calls, and then, we need to define different
-errno for each bind() per test case.
-
-As a prepartion, let's define the reverse order bind() test cases as
-fixtures.
-
-No functional changes are intended.
+Let's add them except for the same address pair, which will be
+covered by the following patch adding 6 more bind() calls for
+each test case.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- tools/testing/selftests/net/bind_wildcard.c | 67 ++++++++++++++++++---
- 1 file changed, 59 insertions(+), 8 deletions(-)
+ tools/testing/selftests/net/bind_wildcard.c | 100 ++++++++++++++++++++
+ 1 file changed, 100 insertions(+)
 
 diff --git a/tools/testing/selftests/net/bind_wildcard.c b/tools/testing/selftests/net/bind_wildcard.c
-index d65c3bb6ba13..143aae383da3 100644
+index 143aae383da3..5100dd713a49 100644
 --- a/tools/testing/selftests/net/bind_wildcard.c
 +++ b/tools/testing/selftests/net/bind_wildcard.c
-@@ -42,6 +42,7 @@ FIXTURE_VARIANT(bind_wildcard)
+@@ -42,6 +42,21 @@ FIXTURE_VARIANT(bind_wildcard)
  	int expected_errno;
  };
  
-+/* (IPv4, IPv6) */
++/* (IPv4, IPv4) */
++FIXTURE_VARIANT_ADD(bind_wildcard, v4_any_v4_local)
++{
++	.family = {AF_INET, AF_INET},
++	.addr = {&in4addr_any, &in4addr_loopback},
++	.expected_errno = EADDRINUSE,
++};
++
++FIXTURE_VARIANT_ADD(bind_wildcard, v4_local_v4_any)
++{
++	.family = {AF_INET, AF_INET},
++	.addr = {&in4addr_loopback, &in4addr_any},
++	.expected_errno = EADDRINUSE,
++};
++
+ /* (IPv4, IPv6) */
  FIXTURE_VARIANT_ADD(bind_wildcard, v4_any_v6_any)
  {
- 	.family = {AF_INET, AF_INET6},
-@@ -98,6 +99,63 @@ FIXTURE_VARIANT_ADD(bind_wildcard, v4_local_v6_v4mapped_local)
+@@ -156,6 +171,91 @@ FIXTURE_VARIANT_ADD(bind_wildcard, v6_v4mapped_local_v4_local)
  	.expected_errno = EADDRINUSE,
  };
  
-+/* (IPv6, IPv4) */
-+FIXTURE_VARIANT_ADD(bind_wildcard, v6_any_v4_any)
++/* (IPv6, IPv6) */
++FIXTURE_VARIANT_ADD(bind_wildcard, v6_any_v6_local)
 +{
-+	.family = {AF_INET6, AF_INET},
-+	.addr = {&in6addr_any, &in4addr_any},
++	.family = {AF_INET6, AF_INET6},
++	.addr = {&in6addr_any, &in6addr_loopback},
 +	.expected_errno = EADDRINUSE,
 +};
 +
-+FIXTURE_VARIANT_ADD(bind_wildcard, v6_any_v4_local)
++FIXTURE_VARIANT_ADD(bind_wildcard, v6_any_v6_v4mapped_any)
 +{
-+	.family = {AF_INET6, AF_INET},
-+	.addr = {&in6addr_any, &in4addr_loopback},
++	.family = {AF_INET6, AF_INET6},
++	.addr = {&in6addr_any, &in6addr_v4mapped_any},
 +	.expected_errno = EADDRINUSE,
 +};
 +
-+FIXTURE_VARIANT_ADD(bind_wildcard, v6_local_v4_any)
++FIXTURE_VARIANT_ADD(bind_wildcard, v6_any_v6_v4mapped_local)
 +{
-+	.family = {AF_INET6, AF_INET},
-+	.addr = {&in6addr_loopback, &in4addr_any},
++	.family = {AF_INET6, AF_INET6},
++	.addr = {&in6addr_any, &in6addr_v4mapped_loopback},
++	.expected_errno = EADDRINUSE,
++};
++
++FIXTURE_VARIANT_ADD(bind_wildcard, v6_local_v6_any)
++{
++	.family = {AF_INET6, AF_INET6},
++	.addr = {&in6addr_loopback, &in6addr_any},
++	.expected_errno = EADDRINUSE,
++};
++
++FIXTURE_VARIANT_ADD(bind_wildcard, v6_local_v6_v4mapped_any)
++{
++	.family = {AF_INET6, AF_INET6},
++	.addr = {&in6addr_loopback, &in6addr_v4mapped_any},
 +	.expected_errno = 0,
 +};
 +
-+FIXTURE_VARIANT_ADD(bind_wildcard, v6_local_v4_local)
++FIXTURE_VARIANT_ADD(bind_wildcard, v6_local_v6_v4mapped_local)
 +{
-+	.family = {AF_INET6, AF_INET},
-+	.addr = {&in6addr_loopback, &in4addr_loopback},
++	.family = {AF_INET6, AF_INET6},
++	.addr = {&in6addr_loopback, &in6addr_v4mapped_loopback},
 +	.expected_errno = 0,
 +};
 +
-+FIXTURE_VARIANT_ADD(bind_wildcard, v6_v4mapped_any_v4_any)
++FIXTURE_VARIANT_ADD(bind_wildcard, v6_v4mapped_any_v6_any)
 +{
-+	.family = {AF_INET6, AF_INET},
-+	.addr = {&in6addr_v4mapped_any, &in4addr_any},
++	.family = {AF_INET6, AF_INET6},
++	.addr = {&in6addr_v4mapped_any, &in6addr_any},
 +	.expected_errno = EADDRINUSE,
 +};
 +
-+FIXTURE_VARIANT_ADD(bind_wildcard, v6_v4mapped_any_v4_local)
++FIXTURE_VARIANT_ADD(bind_wildcard, v6_v4mapped_any_v6_local)
 +{
-+	.family = {AF_INET6, AF_INET},
-+	.addr = {&in6addr_v4mapped_any, &in4addr_loopback},
++	.family = {AF_INET6, AF_INET6},
++	.addr = {&in6addr_v4mapped_any, &in6addr_loopback},
++	.expected_errno = 0,
++};
++
++FIXTURE_VARIANT_ADD(bind_wildcard, v6_v4mapped_any_v6_v4mapped_local)
++{
++	.family = {AF_INET6, AF_INET6},
++	.addr = {&in6addr_v4mapped_any, &in6addr_v4mapped_loopback},
 +	.expected_errno = EADDRINUSE,
 +};
 +
-+FIXTURE_VARIANT_ADD(bind_wildcard, v6_v4mapped_local_v4_any)
++FIXTURE_VARIANT_ADD(bind_wildcard, v6_v4mapped_loopback_v6_any)
 +{
-+	.family = {AF_INET6, AF_INET},
-+	.addr = {&in6addr_v4mapped_loopback, &in4addr_any},
++	.family = {AF_INET6, AF_INET6},
++	.addr = {&in6addr_v4mapped_loopback, &in6addr_any},
 +	.expected_errno = EADDRINUSE,
 +};
 +
-+FIXTURE_VARIANT_ADD(bind_wildcard, v6_v4mapped_local_v4_local)
++FIXTURE_VARIANT_ADD(bind_wildcard, v6_v4mapped_loopback_v6_local)
 +{
-+	.family = {AF_INET6, AF_INET},
-+	.addr = {&in6addr_v4mapped_loopback, &in4addr_loopback},
++	.family = {AF_INET6, AF_INET6},
++	.addr = {&in6addr_v4mapped_loopback, &in6addr_loopback},
++	.expected_errno = 0,
++};
++
++FIXTURE_VARIANT_ADD(bind_wildcard, v6_v4mapped_loopback_v6_v4mapped_any)
++{
++	.family = {AF_INET6, AF_INET6},
++	.addr = {&in6addr_v4mapped_loopback, &in6addr_v4mapped_any},
 +	.expected_errno = EADDRINUSE,
 +};
 +
  static void setup_addr(FIXTURE_DATA(bind_wildcard) *self, int i,
  		       int family, const void *addr_const)
  {
-@@ -167,18 +225,11 @@ void bind_sockets(struct __test_metadata *_metadata,
- 	close(fd[0]);
- }
- 
--TEST_F(bind_wildcard, v4_v6)
-+TEST_F(bind_wildcard, plain)
- {
- 	bind_sockets(_metadata, self, variant->expected_errno,
- 		     &self->addr[0].addr, self->addrlen[0],
- 		     &self->addr[1].addr, self->addrlen[1]);
- }
- 
--TEST_F(bind_wildcard, v6_v4)
--{
--	bind_sockets(_metadata, self, variant->expected_errno,
--		     &self->addr[1].addr, self->addrlen[1],
--		     &self->addr[0].addr, self->addrlen[0]);
--}
--
- TEST_HARNESS_MAIN
 -- 
 2.30.2
 
