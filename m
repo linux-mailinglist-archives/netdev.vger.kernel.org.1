@@ -1,67 +1,74 @@
-Return-Path: <netdev+bounces-82266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A57E88CFCD
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:14:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B89888D023
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:34:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 561B8341FE8
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 21:14:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D175F306F38
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 21:34:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66E6513D62E;
-	Tue, 26 Mar 2024 21:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B854713D8AD;
+	Tue, 26 Mar 2024 21:34:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NLVThY5Y"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uVWgwjD4"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A7EE1E884;
-	Tue, 26 Mar 2024 21:14:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D7B13D617;
+	Tue, 26 Mar 2024 21:34:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711487673; cv=none; b=TK8eihENos9bIj3hsSIXMhKelu50tKVirjaVCwkFMaVUXKQAxafRLk9y4cvfxrecICHZjwagtAqaPMXzMGW1g5+df4yxruCqfeyfuu1GwvrYl5Gr9WFh28f730QqXxAS2G737elH3YrDIX4ApUvjkeMQ8t+VdBfIBCZTWmhwz6g=
+	t=1711488869; cv=none; b=T381LPqvt9p52GdLUtZ8qaYqvW82ro9uclLkx+1lMCO0ObMdAfxnn0nuywrF7QOGGyI6+tRZXI0uoS6wmSSp1qkw9BVZroFpyDyLOFposD9zsrHM1r/sMlaKiLjhcf9qwiowCgE4giVGKOGqRFh7cHsrbEhNiXv1IHSAcO+8kBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711487673; c=relaxed/simple;
-	bh=cxfzcpVl6iw0nLD4z59WnZub1zdzpHD3Ab/gARw6LCQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=WXjygm7jGJyJxeZdCwGhQSgc9luOnhCIwF/ghWQB1IWDnHkpP6TyCWxXPIkMN+YYrgmq4g66WtMGlm6WcUV5bk/nvaoucHfN98EXvO8D9lMwbz0lq63t1bJuHA5n5kJmdcdkKgmhik32+ktM9FH1GyxTpC986Jn5CIC9wtmy9+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NLVThY5Y; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5738BC433F1;
-	Tue, 26 Mar 2024 21:14:32 +0000 (UTC)
+	s=arc-20240116; t=1711488869; c=relaxed/simple;
+	bh=Vp6QKMZSyuFN03oJX7Gy9S9p6P3Gg6AmCMANf0QxqRc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pEab04GCe6qZf4qKJRRlE/zJ7PPtV2s01Vxak59MyWhvaL7plYZh16aTe1ilxdYny2fDRxgMkuswBgXaz/5SOUv9/Tn9S+31lsuif9muUSCQLxjmepMrllCWSL6NF3Mew2PkBgKLsys975ryI2b+BnXXpz6W3scyG8Xbp/NiSJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uVWgwjD4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA317C433F1;
+	Tue, 26 Mar 2024 21:34:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711487672;
-	bh=cxfzcpVl6iw0nLD4z59WnZub1zdzpHD3Ab/gARw6LCQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=NLVThY5Yh2SzMHj4gx9UytpQfFJgRigfFFXt+bm6Vuu3F1XJQiMr6mpQ5ZiPngd1n
-	 Y3oah6WxB6w8vOtameV4wbrxrY5wofrUOI9g31Io5EdLc/j+KK8tfXH3xtt0JxGB2N
-	 41zLFvHWmMYUpsRk36/3btrCOrPAtRy6KTbcAmYOIBNVugRcJC8xbhUFT667lR/66s
-	 K8/Ub7VERzydJeXZrf3U8gIU/jnq6GIZoo3e1f50o0x4S+IefKUpldWak2O8Z9945C
-	 M/N49IG+6Cnb/a1N5y474X7v3YHt+/i2pidMu6YhpMQK8dJegtAohGlEJNPNCUpTS8
-	 8oqh9BxzR+lAw==
-Date: Tue, 26 Mar 2024 16:14:30 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Andy Shevchenko <andriy.shevchenko@intel.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, linux-pci@vger.kernel.org,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	Manivannan Sadhasivami <manivannan.sadhasivam@linaro.org>,
-	linux-scsi@vger.kernel.org,
-	"Martin K . Petersen" <martin.petersen@oracle.com>,
-	Jaroslav Kysela <perex@perex.cz>, linux-sound@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-usb@vger.kernel.org, linux-serial@vger.kernel.org,
-	Hans de Goede <hdegoede@redhat.com>,
-	platform-driver-x86@vger.kernel.org, ntb@lists.linux.dev,
-	Lee Jones <lee@kernel.org>, David Airlie <airlied@gmail.com>,
-	amd-gfx@lists.freedesktop.org, Jason Gunthorpe <jgg@ziepe.ca>,
-	linux-rdma@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 09/28] mfd: intel-lpss-pci: Use PCI_IRQ_INTX
-Message-ID: <20240326211430.GA1497386@bhelgaas>
+	s=k20201202; t=1711488869;
+	bh=Vp6QKMZSyuFN03oJX7Gy9S9p6P3Gg6AmCMANf0QxqRc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=uVWgwjD4ab3E4sy34QBQEECtoSaxU0lDFKM+AuYxrGjQDLJ7ob7m8hnlZuZNzlOol
+	 IifXx+FbxLTbKOe7YjxDiXCmf9ZBJxPrQGdDoCeLjNclIMptnMvss13kozTFYBq9Pg
+	 UDm9WJ/YA0Gr3J/h/+iLa2KcEJyTlyDn2hzrmXJM9wwXpi71SdFpP65ol8fLwYVQKU
+	 FCWo5bRsnhzupCoRb3IaRJtY0rSxTqwnlU90H3lcdjgEAbTIc9Ml4q9L2wO4ku9Phq
+	 xnGJB++507iw0UbYvg01+73b5wfIGwtjGGp28UwCJLYmrtwNIqqVmYYovJncsPRZ0p
+	 n2L9EFIFukgKQ==
+Date: Tue, 26 Mar 2024 16:34:26 -0500
+From: Rob Herring <robh@kernel.org>
+To: Tan Chun Hau <chunhau.tan@starfivetech.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Simon Horman <horms@kernel.org>,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+	Andrew Halaney <ahalaney@redhat.com>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@pengutronix.de>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Ley Foon Tan <leyfoon.tan@starfivetech.com>,
+	Jee Heng Sia <jeeheng.sia@starfivetech.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v4 1/1] dt-bindings: net: starfive,jh7110-dwmac: Add
+ StarFive JH8100 support
+Message-ID: <20240326213426.GA3667606-robh@kernel.org>
+References: <20240326052505.197408-1-chunhau.tan@starfivetech.com>
+ <20240326052505.197408-2-chunhau.tan@starfivetech.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,24 +77,130 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240325210444.GA1449676@bhelgaas>
+In-Reply-To: <20240326052505.197408-2-chunhau.tan@starfivetech.com>
 
-On Mon, Mar 25, 2024 at 04:04:44PM -0500, Bjorn Helgaas wrote:
-> On Mon, Mar 25, 2024 at 09:39:38PM +0200, Andy Shevchenko wrote:
-> > On Mon, Mar 25, 2024 at 04:09:20PM +0900, Damien Le Moal wrote:
-> > > Use the macro PCI_IRQ_INTX instead of the deprecated PCI_IRQ_LEGACY
-> > > macro.
-> > 
-> > Not needed anymore. MFD subsystem has a patch moving this to MSI support.
-> > But you need to coordinate with Lee how to proceed (in case of conflicts MFD
-> > version should be taken).
+On Mon, Mar 25, 2024 at 10:25:05PM -0700, Tan Chun Hau wrote:
+> Add StarFive JH8100 dwmac support.
+> The JH8100 dwmac shares the same driver code as the JH7110 dwmac
+> and has only one reset signal.
 > 
-> Thanks!  It looks like your patch [1] has been applied already and
-> makes this one obsolete, so I dropped this one from the series.
+> Please refer to below:
+> 
+>   JH8100: reset-names = "stmmaceth";
+>   JH7110: reset-names = "stmmaceth", "ahb";
+>   JH7100: reset-names = "ahb";
+> 
+> Example usage of JH8100 in the device tree:
+> 
+> gmac0: ethernet@16030000 {
+>         compatible = "starfive,jh8100-dwmac",
+>                      "starfive,jh7110-dwmac",
+>                      "snps,dwmac-5.20";
+>         ...
+> };
+> 
+> Signed-off-by: Tan Chun Hau <chunhau.tan@starfivetech.com>
+> ---
+>  .../devicetree/bindings/net/snps,dwmac.yaml   |  1 +
+>  .../bindings/net/starfive,jh7110-dwmac.yaml   | 54 ++++++++++++++-----
+>  2 files changed, 41 insertions(+), 14 deletions(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> index 6b0341a8e0ea..a6d596b7dcf4 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -97,6 +97,7 @@ properties:
+>          - snps,dwxgmac-2.10
+>          - starfive,jh7100-dwmac
+>          - starfive,jh7110-dwmac
+> +        - starfive,jh8100-dwmac
+>  
+>    reg:
+>      minItems: 1
+> diff --git a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+> index 0d1962980f57..ce018e9768d2 100644
+> --- a/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/starfive,jh7110-dwmac.yaml
+> @@ -18,6 +18,7 @@ select:
+>          enum:
+>            - starfive,jh7100-dwmac
+>            - starfive,jh7110-dwmac
+> +          - starfive,jh8100-dwmac
+>    required:
+>      - compatible
+>  
+> @@ -30,6 +31,10 @@ properties:
+>        - items:
+>            - const: starfive,jh7110-dwmac
+>            - const: snps,dwmac-5.20
+> +      - items:
+> +          - const: starfive,jh8100-dwmac
+> +          - const: starfive,jh7110-dwmac
+> +          - const: snps,dwmac-5.20
+>  
+>    reg:
+>      maxItems: 1
+> @@ -107,20 +112,41 @@ allOf:
+>            contains:
+>              const: starfive,jh7110-dwmac
+>      then:
+> -      properties:
+> -        interrupts:
+> -          minItems: 3
+> -          maxItems: 3
+> -
+> -        interrupt-names:
+> -          minItems: 3
+> -          maxItems: 3
 
-I put this patch back in to prevent an ordering requirement between
-MFD and PCI.  There will be a trivial merge conflict as Andy
-mentioned.
+interrupts and interrupt-names are the same, so you can leave them here 
+instead of duplicating them as you have.
 
-> [1] https://lore.kernel.org/all/20240312165905.1764507-1-andriy.shevchenko@linux.intel.com/
+> -
+> -        resets:
+> -          minItems: 2
+> -
+> -        reset-names:
+> -          minItems: 2
+> +      if:
+> +        properties:
+> +          compatible:
+> +            contains:
+> +              const: starfive,jh8100-dwmac
+> +      then:
+> +        properties:
+> +          interrupts:
+> +            minItems: 3
+> +            maxItems: 3
+> +
+> +          interrupt-names:
+> +            minItems: 3
+> +            maxItems: 3
+> +
+> +          resets:
+> +            maxItems: 1
+> +
+> +          reset-names:
+> +            const: stmmaceth
+> +      else:
+> +        properties:
+> +          interrupts:
+> +            minItems: 3
+> +            maxItems: 3
+> +
+> +          interrupt-names:
+> +            minItems: 3
+> +            maxItems: 3
+> +
+> +          resets:
+> +            minItems: 2
+> +
+> +          reset-names:
+> +            minItems: 2
+>  
+>  unevaluatedProperties: false
+>  
+> -- 
+> 2.25.1
+> 
 
