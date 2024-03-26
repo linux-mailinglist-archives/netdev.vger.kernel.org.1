@@ -1,161 +1,121 @@
-Return-Path: <netdev+bounces-82184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35C7688C965
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 17:33:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0248388C991
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 17:42:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1AE41F3FCE4
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:33:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB6591F657D3
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:42:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68E817543;
-	Tue, 26 Mar 2024 16:33:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B174C12E6D;
+	Tue, 26 Mar 2024 16:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="tbx9eszl"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aTAbXAa2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3CE315EA6
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 16:33:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B7F611E;
+	Tue, 26 Mar 2024 16:41:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711470790; cv=none; b=jWHmvHs18eyK9k4cRI9Ogdts+0EDh2cbdHhw68fmofhG1waDeIWjUv9NOngUgThT0pXPoWaPwtyNcn5DoSXIlCdeOp6Ix+tXpmGIpyoclAhp8Us75FsX3VXsetpeytL7g09uZ5hOQX/aFNZuZ/L6Pap/N/x9E0Pkoj+cWcNlKqo=
+	t=1711471320; cv=none; b=OIhfrd1lLlYZJFtDHMyOBCTWNtBj6OhcjUqNjrv5wlCkEdW8gO/Fw2xAzYqpoFadZSwVbzUgKYm4V7nJYtTTIR76Ni1E2/WRvNm08xD2elYod9dq33uibqrCGVrGGRCbpH86kpBolnjbHKAyaj+lcfATw0weZ20zdS22uxJeT8E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711470790; c=relaxed/simple;
-	bh=lVoQMVplppCC3bZfzFJMPRwm9a5E9DObxpQyJv4ei/c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=h9IcnUHAKA070wFM+cMWLsC1+wD2iCk8YCFs1OUTBLS3iYKU+wXmbohXrUzWxuCCEblmbJ5Mi9YJO9ZSF1fXgYkm1fnPshIrT36lwPfi8X+6piC4O2zbnADDYkzhtyZj8fzE5c7RyaokmGp/z5oqMVBnJNbhty0lTemFBYm3TIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=tbx9eszl; arc=none smtp.client-ip=209.85.208.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2d4979cd8c8so59435521fa.0
-        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 09:33:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1711470787; x=1712075587; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=eQ6jS2CUTKGhZdxpuXUPTr0agZibBpPyyI13tXK5e6s=;
-        b=tbx9eszl0cv3hSGR2z5T1MUqNEFMqOK0hvuUXK4rky/ZLiX7/ruc4w35Wa6enxWLhy
-         jqYTQ6baqOYwBEPfw8EyZsa1IaqSg7IlHG+YqWDCCA0rIkEN94Vbs5U6ww3v89vN1w1I
-         0nqGzNdcCZSF0zAp6TSiu46brej3P99kOXNi4PRIAzaw0yMELlRpmcXliW4+4QxY+LtV
-         O8xrYDYrVS4Up40ecp8dyuj/sICiqnVfBNZVkxQg6hmXUnZFDaK/qkfK7cpzxGt63mcL
-         eZAhX6x/1ghz8UjnhKhvM95t5Bgtrh5YH7RDfBvymF0vUdIjbVmyPCYnXR5AfFfD5PYR
-         BD1Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711470787; x=1712075587;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=eQ6jS2CUTKGhZdxpuXUPTr0agZibBpPyyI13tXK5e6s=;
-        b=AnbY3sIenhOAPOkWkssC3y3Mo6dSrHVno2Q2rwodacrhMQXs5YQX8lIzZrByNe1M0N
-         Ye1lxkCwDPFPxfUI8v4jSUEi4qxaHt/S36MDXLe300tJ0OTUWkOpx6XojhUCVs7yenWf
-         xvIr90mmx+QWbSd2UIaiuk7v2Bs02jkmKSvpUddt1Kxxz2jIN9U5Jh9dI2Hyh0dCE2tg
-         +P/5YXQTvnLEkf5IRmnJdWSzSfWW2q+cNVEAEJlU9VzTmRn5+xE/1EWpH8YaSU1hQ0sC
-         9gu8dht+eBsfkCpeKzVpGznHvNU93QiSDsj2pG1cPoiloO9vkUoUO5esQy3H4TnEs1v3
-         Pqkg==
-X-Forwarded-Encrypted: i=1; AJvYcCUjl0lfIibwCUZVrHGSk84jVlfKDW67WJJqfxIclT11VH4610d71bUIFaU5XjLefOQGVyYPBJ3rqGNR8h45Ffq+tWLCLzzE
-X-Gm-Message-State: AOJu0Yx+Yjenruot/kwx3MU8phqJyyD8iCL2Uifq8hdIuKIUTEnW0C2L
-	wRuSQwfJJwzpAHOh3GNmuFK2sQhdK6Jew0B4Fr3myyPCRKCoKVyq1oBaI8XqUWQRc4AYupO0xTF
-	MhWf/p8YQxdXdQZqASarRbKvcFPbs8luQ9GPJVA==
-X-Google-Smtp-Source: AGHT+IEPlW3Mndd9DAskKl8BnO4uLoQgb2fvBGrOQCORYGpNt3ZO7pjyZJGUAGM4Jnm65aupzhhwN4AXLf4B/UzV5SQ=
-X-Received: by 2002:a05:651c:210b:b0:2d2:4477:6359 with SMTP id
- a11-20020a05651c210b00b002d244776359mr800282ljq.7.1711470786783; Tue, 26 Mar
- 2024 09:33:06 -0700 (PDT)
+	s=arc-20240116; t=1711471320; c=relaxed/simple;
+	bh=D/32WRfGg/BAJYBjvPV5D+qdqDFfYpgQ3mlM4TaI5OE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mMligWhVpJwWcZozInuR4p1K/GxkfsaON0uOpUmsJd21DxvgnDZ5yMdHoGKwG6ZN/AEop/mZOwqMLQ+5mhj6FyOsl2bcyrql6acatZwF/V+Ow2lygqrBDicU/+ogKMCpMkj4a9FBLCGVUwF9+4TTgOPIV0bEHEq4XCAtucnHShU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aTAbXAa2; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711471318; x=1743007318;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=D/32WRfGg/BAJYBjvPV5D+qdqDFfYpgQ3mlM4TaI5OE=;
+  b=aTAbXAa2KH0syNVGod3rPltLHpGizAROkRTytaMSxT7yOZKvhckYz1GX
+   i399kej3pXUl3rMWH79hPZR7uFwFSl7Ew+7lcEg2SitHMy2n+Ps5Tmbvc
+   RF/CcPMm8aOp/bdAXLPOkzlKABl5goGfEFQxHVB1PYo7vlj1p8ibfO2AN
+   enddrveICCqWKrvLLpgqt1voL5MDOr8k/HV+Im+z2jUIwGMMZS3Dw49I8
+   plvj65XCiFIntTitjYhZwqiVQq0tgadGUdRO7P2H3WwIly5mPQnTFNSyv
+   buBzkUU2zubh1G6MaCjpuwrJh9a+n3gD7sgeLT0DFnhNRSSnmmAnDMLYl
+   A==;
+X-CSE-ConnectionGUID: Rrjav80lQLS5usgmCy0MEA==
+X-CSE-MsgGUID: FbqWCRa+RoGe1SicFW6kAA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11025"; a="24023281"
+X-IronPort-AV: E=Sophos;i="6.07,156,1708416000"; 
+   d="scan'208";a="24023281"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 09:41:45 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,156,1708416000"; 
+   d="scan'208";a="20667384"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orviesa003.jf.intel.com with ESMTP; 26 Mar 2024 09:41:42 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Kees Cook <keescook@chromium.org>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	intel-wired-lan@lists.osuosl.org,
+	linux-hardening@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/3] compiler_types: add Endianness-dependent __counted_by_{le,be}
+Date: Tue, 26 Mar 2024 17:41:13 +0100
+Message-ID: <20240326164116.645718-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240325131624.26023-1-brgl@bgdev.pl> <20240325131624.26023-5-brgl@bgdev.pl>
- <87r0fy8lde.fsf@kernel.org> <CAMRc=Mc2Tc8oHr5NVo=aHAADkJtGCDAVvJs+7V-19m2zGi-vbw@mail.gmail.com>
- <87frwe8jiu.fsf@kernel.org> <CAMRc=MdCv+vTMZML-wzRQqZZavquV3DABYM4KYw-HwqS47sTyw@mail.gmail.com>
- <874jct10yf.fsf@kernel.org>
-In-Reply-To: <874jct10yf.fsf@kernel.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Tue, 26 Mar 2024 17:32:55 +0100
-Message-ID: <CAMRc=Me5ef_kFDz0SyGZb4S+2Ma4i=Fek_tzwj+bYD4DGSV4mA@mail.gmail.com>
-Subject: Re: [PATCH v6 04/16] dt-bindings: net: wireless: qcom,ath11k:
- describe the ath11k on QCA6390
-To: Kalle Valo <kvalo@kernel.org>
-Cc: Marcel Holtmann <marcel@holtmann.org>, Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Bjorn Andersson <andersson@kernel.org>, Konrad Dybcio <konrad.dybcio@linaro.org>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Catalin Marinas <catalin.marinas@arm.com>, Will Deacon <will@kernel.org>, 
-	Bjorn Helgaas <bhelgaas@google.com>, Saravana Kannan <saravanak@google.com>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, Arnd Bergmann <arnd@arndb.de>, 
-	Neil Armstrong <neil.armstrong@linaro.org>, Marek Szyprowski <m.szyprowski@samsung.com>, 
-	Alex Elder <elder@linaro.org>, Srini Kandagatla <srinivas.kandagatla@linaro.org>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Abel Vesa <abel.vesa@linaro.org>, 
-	Manivannan Sadhasivam <mani@kernel.org>, Lukas Wunner <lukas@wunner.de>, 
-	Dmitry Baryshkov <dmitry.baryshkov@linaro.org>, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-msm@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
-	linux-pci@vger.kernel.org, linux-pm@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>, ath11k@lists.infradead.org, 
-	Johan Hovold <johan@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Mar 26, 2024 at 4:12=E2=80=AFPM Kalle Valo <kvalo@kernel.org> wrote=
-:
->
-> Bartosz Golaszewski <brgl@bgdev.pl> writes:
->
-> >> >> I don't know DT well enough to know what the "required:" above mean=
-s,
-> >> >> but does this take into account that there are normal "plug&play" t=
-ype
-> >> >> of QCA6390 boards as well which don't need any DT settings?
-> >> >
-> >> > Do they require a DT node though for some reason?
-> >>
-> >> You can attach the device to any PCI slot, connect the WLAN antenna an=
-d
-> >> it just works without DT nodes. I'm trying to make sure here that basi=
-c
-> >> setup still works.
-> >>
-> >
-> > Sure, definitely. I there's no DT node, then the binding doesn't apply
-> > and the driver (the platform part of it) will not probe.
-> >
-> >> Adding also Johan and ath11k list. For example, I don't know what's th=
-e
-> >> plan with Lenovo X13s, will it use this framework? I guess in theory w=
-e
-> >> could have devices which use qcom,ath11k-calibration-variant from DT b=
-ut
-> >> not any of these supply properties?
-> >>
-> >
-> > Good point. I will receive the X13s in a month from now. I do plan on
-> > upstreaming correct support for WLAN and BT for it as well.
-> >
-> > I guess we can always relax the requirements once a valid use-case appe=
-ars?
->
-> I think we have such cases already now:
->
-> $ git grep ath11k-calibration-variant -- arch
-> arch/arm64/boot/dts/qcom/qcm6490-fairphone-fp5.dts:     qcom,ath11k-calib=
-ration-variant =3D "Fairphone_5";
-> arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts:              =
-       qcom,ath11k-calibration-variant =3D "LE_X13S";
->
-> But please do check that. I'm no DT expert :)
->
+Some structures contain flexible arrays at the end and the counter for
+them, but the counter has explicit Endianness and thus __counted_by()
+can't be used directly.
 
-You're thinking about making the required: field depend on the value
-of qcom,ath11k-calibration-variant? Am I getting this right?
+To increase test coverage for potential problems without breaking
+anything, introduce __counted_by_{le,be} defined depending on platform's
+Endianness to either __counted_by() when applicable or noop otherwise.
+The first user will be virtchnl2.h from idpf just as example with 9 flex
+structures having Little Endian counters.
 
-Bart
+Maybe it would be a good idea to introduce such attributes on compiler
+level if possible, but for now let's stop on what we have.
+
+Alexander Lobakin (3):
+  compiler_types: add Endianness-dependent __counted_by_{le,be}
+  idpf: make virtchnl2.h self-contained
+  idpf: sprinkle __counted_by{,_le}() in the virtchnl2 header
+
+ Documentation/conf.py                       |  2 ++
+ scripts/kernel-doc                          |  1 +
+ include/linux/compiler_types.h              | 11 ++++++++++
+ drivers/net/ethernet/intel/idpf/virtchnl2.h | 24 ++++++++++-----------
+ 4 files changed, 26 insertions(+), 12 deletions(-)
+
+---
+From RFC[0]:
+
+* teach kdoc new attributes (Simon, Kees);
+* add Acked-by (Kees);
+* fix a couple typos;
+* send to net-next (Kees).
+
+[0] https://lore.kernel.org/netdev/20240318130354.2713265-1-aleksander.lobakin@intel.com
+-- 
+2.44.0
+
 
