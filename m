@@ -1,57 +1,59 @@
-Return-Path: <netdev+bounces-81867-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81868-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5263F88B719
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 02:52:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65BA388B724
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 02:56:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 302E91C360E0
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 01:52:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04AA41F3EDA9
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 01:56:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866AD282EB;
-	Tue, 26 Mar 2024 01:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 636DD29408;
+	Tue, 26 Mar 2024 01:56:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GyTUbtTT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sMGh5IKl"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F2D0208A0;
-	Tue, 26 Mar 2024 01:52:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6744E1A8;
+	Tue, 26 Mar 2024 01:56:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711417957; cv=none; b=E+6VqVNkELlWk11W9PoXpaxOz8CTudJtZnkl5UL+lYPyIJi7bDjmQwRJMWGQ8GfUMqpU6X5JjagcbzBqYqqOcHuZDfz/FI+hfuWv2hAf3AL/uB+iBhtADSZUYO/M32tKF0kUI5+Vx+LW+Tmayr9PCcge9WHPU36u++5qCIu1qgI=
+	t=1711418209; cv=none; b=A3VCmLvAhUfpXPc0PvbRCMz9M8VSoNaMgARUMGXx8OUe8vYBRjVsZ8RmHsmppn5lHABfCokuXaOrNRLb2bzCUtZjADZZzdh8PDPxMTYJV/+KM71grON7y1mXRotbWETphEQNK+RGxXRkpKP91QfV5PUrauHU0GnQ/rJpkQTh0Gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711417957; c=relaxed/simple;
-	bh=41HzCcmKGdpC5F2Ac6G0iIm2fkdlbujw9uvFa0tJEh8=;
+	s=arc-20240116; t=1711418209; c=relaxed/simple;
+	bh=lgp0ZYnoQLa2C4vtORXukYuZX/EsNsKnTcsgP/pcSlk=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fr/GYkkFJ5x90XvztdcTTgIE/lhX9w3YG/qTSub0lSfJ5wfs6k0k/8vL/jWypkOZj0utu3k/doffuRhZYWjvrV/qjtjN3aChCj8+M/t9DkFFf3qCRhqpYb7mOV+KUdEedNSg8bzhyhGgKI3Mxpy0haiSBmAJGZAgKGhqcI8eVag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GyTUbtTT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71B70C433F1;
-	Tue, 26 Mar 2024 01:52:36 +0000 (UTC)
+	 MIME-Version:Content-Type; b=KNiP1zOhfXYGWXe4RtlWn9gRTX6QU2uHvufxu1OFsPPbN6nOWCb+F1Q5qErbB1bX0Uiw4WZYy/LmfDDwL7XTVP3JiDg6sNWqQpi57y4Jqid3/cfo53IeBBc9EnvHfmRJX7c9x3XnZu9nNZWg26QDR/7IMDYkwlT9t7aLBd9EHHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sMGh5IKl; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52712C433F1;
+	Tue, 26 Mar 2024 01:56:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711417956;
-	bh=41HzCcmKGdpC5F2Ac6G0iIm2fkdlbujw9uvFa0tJEh8=;
+	s=k20201202; t=1711418208;
+	bh=lgp0ZYnoQLa2C4vtORXukYuZX/EsNsKnTcsgP/pcSlk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GyTUbtTT/+lK39/t1cAhOoP5DswYTsi6hk2B5d43nkrVsvlJ/fcIxIRKMpJJFDMor
-	 5ayovZsp26/P+PSTLTSU3h334wLThM6mxS+aEtq7Zsb77ReMdZ1ESmiDIAjmepaErd
-	 R2VATHqvZqTdc7rjlfIPELACI9CynhopuLXq1NJoeVphzbL33F1FqJF4H79PlBv17q
-	 lOsRnuZb/j0golrV6oTbWtjyQsopxto7B3O56FagUPttf7Y9MQyXAujBuZW6qfMolj
-	 9+1qvXqH7see4+ynEbvnmKkgXTnBQ5jaZHQ3mR6nrzeCqftFWXMByuVVnD3dZ40wzH
-	 D4MxfJ7j2pszw==
-Date: Mon, 25 Mar 2024 18:52:35 -0700
+	b=sMGh5IKltb/la3sUkwTjVZYV+zf51F4xzgVmxOYLxYmCUQNTFPc6QDILoS+CBzWnR
+	 6dPhHnL4lIOD3/MDPg+1cgF3EBvTM0B1OUd9RxAdXu6Rr+Sb4wHuKvN843Emr/k8b0
+	 1bnwQVx66Z9WcsW+UEb7qPu8IfV/e+5pwaDDjZuv68X231PGXXHZnszMV3jn0Wl6Vz
+	 4Y4oNsvjQ+vCijK2ErpDGCbF/QL/YBdd216qlZdfevlZb5n1SUQKOE0Zj5Em4EuDFl
+	 6eJEv+Ow74rbbhcvFLqTXUKMSb3B0PcX2xEWWLsOwpJmHvjeeWNFYz8uG5a9mFnvU+
+	 uVv1Z5md45nOw==
+Date: Mon, 25 Mar 2024 18:56:47 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Mark Brown <broonie@kernel.org>
-Cc: Johannes Berg <johannes.berg@intel.com>, Brendan Higgins
- <brendanhiggins@google.com>, David Gow <davidgow@google.com>, Rae Moar
- <rmoar@google.com>, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, kunit-dev@googlegroups.com, x86@kernel.org
-Subject: Re: kunit alltests runs broken in mainline
-Message-ID: <20240325185235.2f704004@kernel.org>
-In-Reply-To: <b743a5ec-3d07-4747-85e0-2fb2ef69db7c@sirena.org.uk>
-References: <b743a5ec-3d07-4747-85e0-2fb2ef69db7c@sirena.org.uk>
+To: Simon Horman <horms@kernel.org>, thomas.perrot@bootlin.com
+Cc: Nicolas Ferre <nicolas.ferre@microchip.com>, Claudiu Beznea
+ <claudiu.beznea@tuxon.dev>, "David S . Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] net: macb: allow MTU change when the interface
+ is up
+Message-ID: <20240325185647.0ad674e9@kernel.org>
+In-Reply-To: <20240325205401.GF403975@kernel.org>
+References: <20240325152735.1708636-1-thomas.perrot@bootlin.com>
+	<20240325205401.GF403975@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,45 +63,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 25 Mar 2024 15:21:33 +0000 Mark Brown wrote:
-> Hi,
-> 
-> Commit 28b3df1fe6ba2cb4 ("kunit: add wireless unit tests") which I can't
-> seem to find on lore breaks full kunit runs on non-UML builds and is now
-> present in mainline.  If I run:
-> 
->    ./tools/testing/kunit/kunit.py run --alltests --cross_compile x86_64-linux-gnu- --arch x86_64
-> 
-> on a clean tree then I get:
-> 
->    [15:09:20] Configuring KUnit Kernel ...
->    Generating .config ...
->    Populating config with:
->    $ make ARCH=x86_64 O=.kunit olddefconfig CROSS_COMPILE=x86_64-linux-gnu-
->    ERROR:root:Not all Kconfig options selected in kunitconfig were in the generated .config.
->    This is probably due to unsatisfied dependencies.
->    Missing: CONFIG_IWLWIFI=y, CONFIG_WLAN_VENDOR_INTEL=y
-> 
-> UML works fine, but other real architectures (eg, arm64) seem similarly
-> broken.  I've not looked properly yet, I'm a bit confused given that
-> there's not even any dependencies for WLAN_VENDOR_INTEL and it's not
-> mentoned in the defconfig.
+On Mon, 25 Mar 2024 20:54:01 +0000 Simon Horman wrote:
+> I'm not sure that it is expected behaviour for an interface
+> to reset like this when a change of MTU is requested.
+> While conversely I think it is common (if not entirely desirable)
+> to prohibit changing the MTU when an interface is up.
+> What is the problem being addressed here?
 
-I'm late to the party, but FWIW I had to toss this into netdev testing
-tree as a local patch:
+Right..
 
-CONFIG_NETDEVICES=y
-CONFIG_WLAN=y
-CONFIG_DAMON_DBGFS_DEPRECATED=y
-https://github.com/linux-netdev/testing/commit/9a632301bf3dbc9ba553562a0ba2657af6fa84d1
+> >  	dev->mtu = new_mtu;
+> >  
+> > +	if (reset)
+> > +		macb_open(dev);
 
-We run using:
-
-	./tools/testing/kunit/kunit.py run --alltests
-
-it got broken after we fast-forwarded to Linus on Thu, so I assumed it
-was kunit itself that changed. Not that I found the relevant commit.
-
-The DAMON config was also breaking UML for us, BTW, and I don't see
-any fix for that in Linus's tree. Strangeness.
+.. imagine admin does this over SSH on a remote box and system 
+is under memory pressure. Even ignoring the fact you're not checking
+the return value, the result of changing MTU should be either having 
+the requested MTU (success) or having the old MTU (failure).
+Not "machine drops off the network" :(
 
