@@ -1,399 +1,123 @@
-Return-Path: <netdev+bounces-82063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6E5E88C396
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:38:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C277D88C397
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:38:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EA6A71C310F7
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:38:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 467C1B21F6F
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:38:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B8B574BFB;
-	Tue, 26 Mar 2024 13:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3C8F74BE8;
+	Tue, 26 Mar 2024 13:38:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="tg3BbLRq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ANhScBWi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF792182A3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F57E74437
 	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 13:38:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711460315; cv=none; b=CKMAzBfnMK51LdCCkSA0g6I71a6Ejy1tn1vqHx6rZiiYBGTGUGoDHDpwVtLrWV++EC3RVGPoDLWs31KzwDXO1EHM9i15LsgAC82M4beNOwq2T7OIhB9IzMVpDo9pSJzi62bme2VhAZ8V7ldHsHGhwHFBIIE3eSBPx8pDhTMcuCs=
+	t=1711460314; cv=none; b=sgOjcOiZ5yPlS/Bh6+OO8tFbfv3Q7e2oyyAQgrHCnlbIpAHilvoQsC290Bt5I7EaNn6SB3KYG/8se1gSYKSglBORUKGMnQ5GseKCn80V3AXnQ5rQ6M7D6c6TDevYjj1a0OcdhjvNI7RUKb0ZbzITXOKxDfqHz74Aj9iMmqgbpwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711460315; c=relaxed/simple;
-	bh=rqicldKbWLa3RXK2aAkSR/7qHhcLMM5xAl578b0BQkQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BbEro1hUHGJEVgg2TCTXlRrvDL3YDPC2Z8O25YukhRPpWP894SD3VoAD6Qf/9E+Jhrre2N3f5s83EtQmkchXl/+PgtUV++q5Umf3sdOcp8vLbKQW1JrNMBCuAepDisZ50EbW02Q64rIl9wyzWFFAa62uRrkAj6ftx3JWEvf3cJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=tg3BbLRq; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-56c1a50b004so11420a12.0
+	s=arc-20240116; t=1711460314; c=relaxed/simple;
+	bh=qQwh5DXV1GR5CLqTlfRtZ8Epr2JKbvZ81ftaZW160Cs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=PuMhC00i94KV0j2EfIcJ2pe2eHZch8hh6EmSwBNFBMaAn5b93vC4e6F3HVbJhpB+KPj0qfIRFMKRb/CEmGJ6ZlWufNuv5bOGyGmYlT+YpB78OTYZ8DhA83Hc8vjZ21B278Fucg7OLqcMj4WxIcs7Xwl1qr3gDXsRzbe/yvuiBwo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ANhScBWi; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-42a029c8e76so37602671cf.2
         for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 06:38:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711460311; x=1712065111; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1711460312; x=1712065112; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OOPHrk7Duac0e7A01EYwSkd6ukb/Vpfr5dSVKpYww1A=;
-        b=tg3BbLRqVQjlAaRIaCjC6GfLzTHZBNajcN9V02Aaju4zPov7525Lk3RjSDPgEpPqk7
-         5+U39ulbtGzVw2W1mQcG3hkKNwcxijNCgmCp7YpX6v2Mhf1yjgqhvfz7O+dMRW25YcbV
-         z+D08SjW0r0BIQplKn7iypGhGWxsCJDzCDm+GvZPWYo5B6BrEq3516DntRw1b7qBcxpF
-         QwNL6DhPA6d2SJwltw+9jtzJIqITWqM6RS0209mS1unIohgslRu+TJQVDCkMMFc1PO1T
-         9JchY4Utz0V27i+hq/uJmTfPdndIzF7H+pSsX4gNESkReGoGJIl/2yLqwRiHMWD8w0Rr
-         58eg==
+        bh=zwOLi7NSLkcwvI/HWZn8thc0v3Y0sRe4RVro70EHshM=;
+        b=ANhScBWiZm6Mx6RaVff7o50qgMRxUzqNtv4KcjU+TW7SQ3Jdm5AONAznXU9wgzHp7L
+         4e2mlA5Ev7zaiFkBmuqPKeFe0pxmOn8lrFAib1LnzvsSDHIXJ5IcOJ3MveABdcjOqwLp
+         dakxgGm1fDEGqOvqf7BExX94Vr/xHWXK6BXhcCba/qNPAsm5KJTL+8N6o6yNt5wIeAri
+         IjPA6YvwNtyXv++AKnqKFs7XBN4awA665LXze2d0hRS6fXgrDBEyCOLN3DrTAIQQ9NB6
+         Q5ZnMHbTcmmdTailvjeUZJ6lry9PxtYmOONxncGWdAET8Ar2q6P/YSW9orPHuxK3hVO6
+         d5GQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711460311; x=1712065111;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OOPHrk7Duac0e7A01EYwSkd6ukb/Vpfr5dSVKpYww1A=;
-        b=n1NY37ZlNETp+Bt2Yde6XeXmb7D6PnXR/kQKoCeyPmBT0nhYNF/0LODHaMpH6L9jFh
-         HBlgxytFjvxe9U2Yt4ceyi6O/KMrsdlVDEvy3R34qyPDVX+p8aOISHCwINqWQJ082Ofr
-         XnucZiJ0G1BuIy5FexzpNuxoW8pwDHkk3voSHXz7Iffyg5lC7GEvOdPozW9u8KDJ0uaJ
-         O1QmAgLiyPmHhfF1isluwL2YmdeUln2pWmZEChkJS7KaonwwMz1Xih0WsrPJmruuFC8T
-         EyW2kTR3qRpxai0Mnsl9/DRQLIYr8dxNd7WpyLrQ1Qkx/DOvMU77/NlOw3c6yMSPDinw
-         ugAw==
-X-Forwarded-Encrypted: i=1; AJvYcCXRVG1L3j4Ih5F92huTr4JSIq5MGetX57dAnGs3OG95HzT+DtqsINpuv9pU2Qahuk8Vr8WWwTKIAe3yLrPl9BEZQgVlait6
-X-Gm-Message-State: AOJu0YyPykfax5rT9ENBIQFWjD5KCt3AY1+3mT9RPG95aRwgfNswLieL
-	2ITKKUpD+lMr87A2a8jAkh1lU2adX3GwXfxbt/0Hnk6xLXArmIqckSqqZI+9pz/X34shgewBSLB
-	hZnYl5hnSc8XB7JJJutlreqyND82orLrfboag
-X-Google-Smtp-Source: AGHT+IGfhmbXyzhlMjVipQff0Sw7upPXjzCcg+kU6VxJ4FaXEvHb69Kkb3sgwCy2uiropVRZJnmOUWQChZZ/b+6o6MU=
-X-Received: by 2002:a50:fc19:0:b0:56c:5dc:ed7 with SMTP id i25-20020a50fc19000000b0056c05dc0ed7mr151712edr.4.1711460311056;
- Tue, 26 Mar 2024 06:38:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711460312; x=1712065112;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=zwOLi7NSLkcwvI/HWZn8thc0v3Y0sRe4RVro70EHshM=;
+        b=apHMPd1lhoM4Nd225VOeaf7plRBn33JhLUXfhOzQqbOXo0De2LKR2VTLxdqsZoJDDq
+         df1WuK0iQ3yGjOk0WLbq9l0dtf0kdYMW3Tgl5mnFo7PNBZl0Kx5W5lxf/0U1Ac1/l6kC
+         +bGujefRx3VTEQiPKgyqHSIRzHGjJnd1Mbw1Q/gQNekjMVPzuzs7wTuXHzbPElur4aro
+         Q3QZEbPZEj5wQUuSaB6VEoX4clgEXzWi7Mt2szYlXxApb+o18ZEmBBx49yMySoo4GMe5
+         PZORNDekiMUTgdfGMjiNO3OyG2sBY6khC5G/ZjyBEocqv2Ls1aKIusNmzGQtgZC6gPtc
+         U/HA==
+X-Forwarded-Encrypted: i=1; AJvYcCUnZafkE5Y005+Q4aFTcDccvHxAr0O/ko61PaZarGl9l5QI9iSlGufBGuLhAXj0TiqKz/+H8BOHRon1zTzTP0LWUTadkV9U
+X-Gm-Message-State: AOJu0YyF4pU51Z9vUxiSk4rVN4/0bSzzO27bKzZ3ppvq+S7vlL5u1Wqa
+	LJY8x62Bzc1P2GBoBaAB0tjqwMs0mXTNQnRe8wgEesUbdEL1xBO+
+X-Google-Smtp-Source: AGHT+IGepbKqOqViYIISQErMIslRUSe01L9wDJYnxx+/aubLMw3epRyKvHv8YNNWNzb02Qy6EAx6Ug==
+X-Received: by 2002:ac8:5a43:0:b0:431:6078:a2a with SMTP id o3-20020ac85a43000000b0043160780a2amr2945983qta.19.1711460311878;
+        Tue, 26 Mar 2024 06:38:31 -0700 (PDT)
+Received: from localhost (55.87.194.35.bc.googleusercontent.com. [35.194.87.55])
+        by smtp.gmail.com with ESMTPSA id bs8-20020ac86f08000000b004317485a4e9sm354919qtb.66.2024.03.26.06.38.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Mar 2024 06:38:31 -0700 (PDT)
+Date: Tue, 26 Mar 2024 09:38:31 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Antoine Tenart <atenart@kernel.org>, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ edumazet@google.com
+Cc: Antoine Tenart <atenart@kernel.org>, 
+ steffen.klassert@secunet.com, 
+ willemdebruijn.kernel@gmail.com, 
+ netdev@vger.kernel.org
+Message-ID: <6602cfd748870_13d9ab2942e@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20240326113403.397786-4-atenart@kernel.org>
+References: <20240326113403.397786-1-atenart@kernel.org>
+ <20240326113403.397786-4-atenart@kernel.org>
+Subject: Re: [PATCH net v4 3/5] udp: do not transition UDP GRO fraglist
+ partial checksums to unnecessary
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20240322122407.1329861-1-edumazet@google.com> <171111663201.19374.16295682760005551863.git-patchwork-notify@kernel.org>
- <CAADnVQJy+0=6ZuAz-7dwOPK3sN2QrPiAcxhtojh8p65j0TRNhg@mail.gmail.com>
- <CANn89iLSOeFGNogYMHbeLRC5kOwwArMz3d5_2hZmBn6fibyUhw@mail.gmail.com>
- <CAADnVQ+OhsBetPT0avuNVsEwru13UtMjX1U_6_u6xROXBBn-Yg@mail.gmail.com>
- <ZgGmQu09Z9xN7eOD@google.com> <d9531955-06ad-ccdd-d3d0-4779400090ba@iogearbox.net>
- <CANn89iJFOR5ucef0bH=BTKrLOAGsUtF8tM=cYNDTg+=gHDntvw@mail.gmail.com>
-In-Reply-To: <CANn89iJFOR5ucef0bH=BTKrLOAGsUtF8tM=cYNDTg+=gHDntvw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 26 Mar 2024 14:38:20 +0100
-Message-ID: <CANn89iKZ0126qzvpm0bPP7O+M95hcGWKp_HPg+M7vgdDHr0u0A@mail.gmail.com>
-Subject: Re: [PATCH net] bpf: Don't redirect too small packets
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Stanislav Fomichev <sdf@google.com>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
-	Guillaume Nault <gnault@redhat.com>, patchwork-bot+netdevbpf@kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Andrii Nakryiko <andrii@kernel.org>, Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Eric Dumazet <eric.dumazet@gmail.com>, 
-	syzbot+9e27778c0edc62cb97d8@syzkaller.appspotmail.com, 
-	Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Mar 26, 2024 at 2:37=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Tue, Mar 26, 2024 at 1:46=E2=80=AFPM Daniel Borkmann <daniel@iogearbox=
-.net> wrote:
-> >
-> > On 3/25/24 5:28 PM, Stanislav Fomichev wrote:
-> > > On 03/25, Alexei Starovoitov wrote:
-> > >> On Mon, Mar 25, 2024 at 6:33=E2=80=AFAM Eric Dumazet <edumazet@googl=
-e.com> wrote:
-> > >>>
-> > >>> On Sat, Mar 23, 2024 at 4:02=E2=80=AFAM Alexei Starovoitov
-> > >>> <alexei.starovoitov@gmail.com> wrote:
-> > >>>>
-> > >>>> On Fri, Mar 22, 2024 at 7:10=E2=80=AFAM <patchwork-bot+netdevbpf@k=
-ernel.org> wrote:
-> > >>>>>
-> > >>>>> Hello:
-> > >>>>>
-> > >>>>> This patch was applied to bpf/bpf.git (master)
-> > >>>>> by Daniel Borkmann <daniel@iogearbox.net>:
-> > >>>>>
-> > >>>>> On Fri, 22 Mar 2024 12:24:07 +0000 you wrote:
-> > >>>>>> Some drivers ndo_start_xmit() expect a minimal size, as shown
-> > >>>>>> by various syzbot reports [1].
-> > >>>>>>
-> > >>>>>> Willem added in commit 217e6fa24ce2 ("net: introduce device min_=
-header_len")
-> > >>>>>> the missing attribute that can be used by upper layers.
-> > >>>>>>
-> > >>>>>> We need to use it in __bpf_redirect_common().
-> > >>>>
-> > >>>> This patch broke empty_skb test:
-> > >>>> $ test_progs -t empty_skb
-> > >>>>
-> > >>>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
-> > >>>> [redirect_ingress] unexpected ret: veth ETH_HLEN+1 packet ingress
-> > >>>> [redirect_ingress]: actual -34 !=3D expected 0
-> > >>>> test_empty_skb:PASS:err: veth ETH_HLEN+1 packet ingress [redirect_=
-egress] 0 nsec
-> > >>>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
-> > >>>> [redirect_egress] unexpected ret: veth ETH_HLEN+1 packet ingress
-> > >>>> [redirect_egress]: actual -34 !=3D expected 1
-> > >>>>
-> > >>>> And looking at the test I think it's not a test issue.
-> > >>>> This check
-> > >>>> if (unlikely(skb->len < dev->min_header_len))
-> > >>>> is rejecting more than it should.
-> > >>>>
-> > >>>> So I reverted this patch for now.
-> > >>>
-> > >>> OK, it seems I missed __bpf_rx_skb() vs __bpf_tx_skb(), but even if=
- I
-> > >>> move my sanity test in __bpf_tx_skb(),
-> > >>> the bpf test program still fails, I am suspecting the test needs to=
- be adjusted.
-> > >>>
-> > >>>
-> > >>>
-> > >>> diff --git a/net/core/filter.c b/net/core/filter.c
-> > >>> index 745697c08acb3a74721d26ee93389efa81e973a0..e9c0e2087a08f1d8afd=
-2c3e8e7871ddc9231b76d
-> > >>> 100644
-> > >>> --- a/net/core/filter.c
-> > >>> +++ b/net/core/filter.c
-> > >>> @@ -2128,6 +2128,12 @@ static inline int __bpf_tx_skb(struct
-> > >>> net_device *dev, struct sk_buff *skb)
-> > >>>                  return -ENETDOWN;
-> > >>>          }
-> > >>>
-> > >>> +       if (unlikely(skb->len < dev->min_header_len)) {
-> > >>> +               pr_err_once("__bpf_tx_skb skb->len=3D%u <
-> > >>> dev(%s)->min_header_len(%u)\n", skb->len, dev->name,
-> > >>> dev->min_header_len);
-> > >>> +               DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
-> > >>> +               kfree_skb(skb);
-> > >>> +               return -ERANGE;
-> > >>> +       } // Note: this is before we change skb->dev
-> > >>>          skb->dev =3D dev;
-> > >>>          skb_set_redirected_noclear(skb, skb_at_tc_ingress(skb));
-> > >>>          skb_clear_tstamp(skb);
-> > >>>
-> > >>>
-> > >>> -->
-> > >>>
-> > >>>
-> > >>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
-> > >>> [redirect_egress] unexpected ret: veth ETH_HLEN+1 packet ingress
-> > >>> [redirect_egress]: actual -34 !=3D expected 1
-> > >>>
-> > >>> [   58.382051] __bpf_tx_skb skb->len=3D1 < dev(veth0)->min_header_l=
-en(14)
-> > >>> [   58.382778] skb len=3D1 headroom=3D78 headlen=3D1 tailroom=3D113
-> > >>>                 mac=3D(64,14) net=3D(78,-1) trans=3D-1
-> > >>>                 shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D0 type=
-=3D0 segs=3D0))
-> > >>>                 csum(0x0 ip_summed=3D0 complete_sw=3D0 valid=3D0 le=
-vel=3D0)
-> > >>>                 hash(0x0 sw=3D0 l4=3D0) proto=3D0x7f00 pkttype=3D0 =
-iif=3D0
-> > >>
-> > >> Hmm. Something is off.
-> > >> That test creates 15 byte skb.
-> > >> It's not obvious to me how it got reduced to 1.
-> > >> Something stripped L2 header and the prog is trying to redirect
-> > >> such skb into veth that expects skb with L2 ?
-> > >>
-> > >> Stan,
-> > >> please take a look.
-> > >> Since you wrote that test.
-> > >
-> > > Sure. Daniel wants to take a look on a separate thread, so we can syn=
-c
-> > > up. Tentatively, seems like the failure is in the lwt path that does
-> > > indeed drop the l2.
-> >
-> > If we'd change the test into the below, the tc and empty_skb tests pass=
-.
-> > run_lwt_bpf() calls into skb_do_redirect() which has L2 stripped, and t=
-hus
-> > skb->len is 1 in this test. We do use skb_mac_header_len() also in othe=
-r
-> > tc BPF helpers, so perhaps s/skb->len/skb_mac_header_len(skb)/ is the b=
-est
-> > way forward..
-> >
-> > static int __bpf_redirect_common(struct sk_buff *skb, struct net_device=
- *dev,
-> >                                   u32 flags)
-> > {
-> >          /* Verify that a link layer header is carried */
-> >          if (unlikely(skb->mac_header >=3D skb->network_header || skb->=
-len =3D=3D 0)) {
-> >                  kfree_skb(skb);
-> >                  return -ERANGE;
-> >          }
-> >
-> >          if (unlikely(skb_mac_header_len(skb) < dev->min_header_len)) {
->
-> Unfortunately this will not prevent frames with skb->len =3D=3D 1 to reac=
-h
-> an Ethernet driver ndo_start_xmit()
->
-> At ndo_start_xmit(), we do not look where the MAC header supposedly
-> starts in the skb, we only use skb->data
->
-> I have a syzbot repro using team driver, so I added the following part in=
- team :
->
-> diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
-> index 0a44bbdcfb7b9f30a0c27b700246501c5eba322f..75e5ef585a8f05b35cfddbae0=
-bfc377864e6e38c
-> 100644
-> --- a/drivers/net/team/team.c
-> +++ b/drivers/net/team/team.c
-> @@ -1714,6 +1714,11 @@ static netdev_tx_t team_xmit(struct sk_buff
-> *skb, struct net_device *dev)
->         bool tx_success;
->         unsigned int len =3D skb->len;
->
-> +       if (len < 14) {
-> +               pr_err_once("team_xmit(len=3D%u)\n", len);
-> +               DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
-> +               WARN_ON_ONCE(1);
-> +       }
->         tx_success =3D team_queue_override_transmit(team, skb);
->         if (!tx_success)
->                 tx_success =3D team->ops.transmit(team, skb);
->
->
-> And I get (with your suggestion instead of skb->len)
->
+Antoine Tenart wrote:
+> UDP GRO validates checksums and in udp4/6_gro_complete fraglist packets
+> are converted to CHECKSUM_UNNECESSARY to avoid later checks. However
+> this is an issue for CHECKSUM_PARTIAL packets as they can be looped in
+> an egress path and then their partial checksums are not fixed.
+> 
+> Different issues can be observed, from invalid checksum on packets to
+> traces like:
+> 
+>   gen01: hw csum failure
+>   skb len=3008 headroom=160 headlen=1376 tailroom=0
+>   mac=(106,14) net=(120,40) trans=160
+>   shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
+>   csum(0xffff232e ip_summed=2 complete_sw=0 valid=0 level=0)
+>   hash(0x77e3d716 sw=1 l4=1) proto=0x86dd pkttype=0 iif=12
+>   ...
+> 
+> Fix this by only converting CHECKSUM_NONE packets to
+> CHECKSUM_UNNECESSARY by reusing __skb_incr_checksum_unnecessary. All
+> other checksum types are kept as-is, including CHECKSUM_COMPLETE as
+> fraglist packets being segmented back would have their skb->csum valid.
+> 
+> Fixes: 9fd1ff5d2ac7 ("udp: Support UDP fraglist GRO/GSO.")
+> Signed-off-by: Antoine Tenart <atenart@kernel.org>
 
-Missing part in my copy/paste :
-
-[   41.123829] team_xmit(len=3D1)
-[   41.124335] skb len=3D1 headroom=3D78 headlen=3D1 tailroom=3D113
-
-
-> mac=3D(78,0) net=3D(78,-1) trans=3D-1
-> shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D0 type=3D0 segs=3D0))
-> csum(0x0 ip_summed=3D0 complete_sw=3D0 valid=3D0 level=3D0)
-> hash(0x0 sw=3D0 l4=3D0) proto=3D0x88a8 pkttype=3D3 iif=3D0
-> [   41.126553] dev name=3Dteam0 feat=3D0x0000e0064fddfbe9
-> [   41.127132] skb linear:   00000000: 55
-> [   41.128487] ------------[ cut here ]------------
-> [   41.128551] WARNING: CPU: 2 PID: 1880 at
-> drivers/net/team/team.c:1720 team_xmit (drivers/net/team/team.c:1720
-> (discriminator 1))
-> [   41.129072] Modules linked in: macsec macvtap macvlan hsr wireguard
-> curve25519_x86_64 libcurve25519_generic libchacha20poly1305
-> chacha_x86_64 libchacha poly1305_x86_64 batman_adv dummy bridge sr_mod
-> cdrom evdev pcspkr i2c_piix4 9pnet_virtio 9p netfs 9pnet
-> [   41.129613] CPU: 2 PID: 1880 Comm: b330650301 Not tainted 6.8.0-virtme=
- #238
-> [   41.129664] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
-> BIOS 1.16.3-debian-1.16.3-2 04/01/2014
-> [   41.129780] RIP: 0010:team_xmit (drivers/net/team/team.c:1720
-> (discriminator 1))
-> [ 41.129847] Code: 41 54 53 44 8b 7f 70 48 89 fb 41 83 ff 0d 77 1c 80
-> 3d a0 24 8d 01 00 0f 84 0d 01 00 00 80 3d 92 24 8d 01 00 0f 84 e3 00
-> 00 00 <0f> 0b 41 80 be 21 0b 00 00 00 0f 84 9d 00 00 00 0f b7 43 7c 66
-> 85
-> All code
-> =3D=3D=3D=3D=3D=3D=3D=3D
->    0: 41 54                push   %r12
->    2: 53                    push   %rbx
->    3: 44 8b 7f 70          mov    0x70(%rdi),%r15d
->    7: 48 89 fb              mov    %rdi,%rbx
->    a: 41 83 ff 0d          cmp    $0xd,%r15d
->    e: 77 1c                ja     0x2c
->   10: 80 3d a0 24 8d 01 00 cmpb   $0x0,0x18d24a0(%rip)        # 0x18d24b7
->   17: 0f 84 0d 01 00 00    je     0x12a
->   1d: 80 3d 92 24 8d 01 00 cmpb   $0x0,0x18d2492(%rip)        # 0x18d24b6
->   24: 0f 84 e3 00 00 00    je     0x10d
->   2a:* 0f 0b                ud2 <-- trapping instruction
->   2c: 41 80 be 21 0b 00 00 cmpb   $0x0,0xb21(%r14)
->   33: 00
->   34: 0f 84 9d 00 00 00    je     0xd7
->   3a: 0f b7 43 7c          movzwl 0x7c(%rbx),%eax
->   3e: 66                    data16
->   3f: 85                    .byte 0x85
->
-> Code starting with the faulting instruction
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->    0: 0f 0b                ud2
->    2: 41 80 be 21 0b 00 00 cmpb   $0x0,0xb21(%r14)
->    9: 00
->    a: 0f 84 9d 00 00 00    je     0xad
->   10: 0f b7 43 7c          movzwl 0x7c(%rbx),%eax
->   14: 66                    data16
->   15: 85                    .byte 0x85
-> [   41.129902] RSP: 0018:ffffa4210433b938 EFLAGS: 00000246
-> [   41.129945] RAX: 0000000000000000 RBX: ffffa4210858a300 RCX: 000000000=
-0000000
-> [   41.129961] RDX: 0000000000000000 RSI: 00000000ffff7fff RDI: 000000000=
-0000001
-> [   41.129975] RBP: ffffa4210433b960 R08: 0000000000000000 R09: ffffa4210=
-433b630
-> [   41.129989] R10: 0000000000000001 R11: ffffffff8407d340 R12: 000000000=
-0000000
-> [   41.130004] R13: ffffa4210ecee000 R14: ffffa4210ece4000 R15: 000000000=
-0000001
-> [   41.130074] FS:  00007f91d9549740(0000) GS:ffffa42fffa80000(0000)
-> knlGS:0000000000000000
-> [   41.130095] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [   41.130140] CR2: 00007f8953077fb0 CR3: 0000000104f42000 CR4: 000000000=
-00006f0
-> [   41.130229] Call Trace:
-> [   41.130331]  <TASK>
-> [   41.130530] ? show_regs (arch/x86/kernel/dumpstack.c:479)
-> [   41.130598] ? __warn (kernel/panic.c:694)
-> [   41.130611] ? team_xmit (drivers/net/team/team.c:1720 (discriminator 1=
-))
-> [   41.130625] ? report_bug (lib/bug.c:180 lib/bug.c:219)
-> [   41.130640] ? handle_bug (arch/x86/kernel/traps.c:239)
-> [   41.130653] ? exc_invalid_op (arch/x86/kernel/traps.c:260 (discriminat=
-or 1))
-> [   41.130665] ? asm_exc_invalid_op (./arch/x86/include/asm/idtentry.h:62=
-1)
-> [   41.130700] ? team_xmit (drivers/net/team/team.c:1720 (discriminator 1=
-))
-> [   41.130714] ? team_xmit (drivers/net/team/team.c:1719 (discriminator 6=
-))
-> [   41.130734] dev_hard_start_xmit (./include/linux/netdevice.h:4903
-> ./include/linux/netdevice.h:4917 net/core/dev.c:3531
-> net/core/dev.c:3547)
-> [   41.130768] __dev_queue_xmit (./include/linux/netdevice.h:3287
-> (discriminator 25) net/core/dev.c:4336 (discriminator 25))
-> [   41.130780] ? kmalloc_reserve (net/core/skbuff.c:580 (discriminator 4)=
-)
-> [   41.130796] ? pskb_expand_head (net/core/skbuff.c:2292)
-> [   41.130815] __bpf_redirect (./include/linux/netdevice.h:3287
-> (discriminator 25) net/core/filter.c:2143 (discriminator 25)
-> net/core/filter.c:2172 (discriminator 25) net/core/filter.c:2196
-> (discriminator 25))
-> [   41.130825] bpf_clone_redirect (net/core/filter.c:2467
-> (discriminator 1) net/core/filter.c:2439 (discriminator 1))
-> [   41.130841] bpf_prog_9845f5eee09e82c6+0x61/0x66
-> [   41.130948] ? bpf_ksym_find (./include/linux/rbtree_latch.h:113
-> ./include/linux/rbtree_latch.h:208 kernel/bpf/core.c:734)
-> [   41.130963] ? is_bpf_text_address
-> (./arch/x86/include/asm/preempt.h:84 (discriminator 13)
-> ./include/linux/rcupdate.h:97 (discriminator 13)
-> ./include/linux/rcupdate.h:813 (discriminator 13)
-> kernel/bpf/core.c:769 (discriminator 13))
-> [   41.130976] ? kernel_text_address (kernel/extable.c:125
-> (discriminator 1) kernel/extable.c:94 (discriminator 1))
-> [   41.130989] ? __kernel_text_address (kernel/extable.c:79 (discriminato=
-r 1))
-> [   41.131002] ? unwind_get_return_address
-> (arch/x86/kernel/unwind_frame.c:19 (discriminator 1))
-> [   41.131014] ? __pfx_stack_trace_consume_entry (kernel/stacktrace.c:83)
-> [   41.131028] ? arch_stack_walk (arch/x86/kernel/stacktrace.c:26)
-> [   41.131044] ? stack_depot_save_flags (lib/stackdepot.c:675)
-> [   41.131062] ? ktime_get (kernel/time/timekeeping.c:292
-> kernel/time/timekeeping.c:388 kernel/time/timekeeping.c:848)
-> [   41.131076] bpf_test_run (./include/linux/bpf.h:1234
-> ./include/linux/filter.h:657 ./include/linux/filter.h:664
-> net/bpf/test_run.c:425)
-> [   41.131087] ? security_sk_alloc (security/security.c:4662 (discriminat=
-or 13))
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
