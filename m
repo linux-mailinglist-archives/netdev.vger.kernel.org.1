@@ -1,114 +1,109 @@
-Return-Path: <netdev+bounces-82136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22A2888C60B
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:57:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 093C788C634
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:02:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03B601C65BD5
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:57:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 64104B2561C
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:02:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B12812D76F;
-	Tue, 26 Mar 2024 14:57:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1670A13C67C;
+	Tue, 26 Mar 2024 15:02:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eEDTgszZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g8NWE2NM"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f170.google.com (mail-lj1-f170.google.com [209.85.208.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 438C62233A;
-	Tue, 26 Mar 2024 14:57:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778631E484;
+	Tue, 26 Mar 2024 15:02:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711465052; cv=none; b=oDcEc7KBZ/W9E9w/0KQE/HTuMrenwrUtUSwlt1/kBIh1UPSzxYD4Foo9wug0H7DTQwtYsV73mlVXneVMUDEjzyl1NvM4P4zYxjkvlLuq56J+voSvA6/DKpxiK+TwEle5eMt+fJLt0acl+IaCI2iIx0K3lQVEs39FMdtoiFYI/uQ=
+	t=1711465351; cv=none; b=S9kRVjBM4ESdE3/b4H/wL2KrIbUALhZImhdqJlRPcIva+OVwALAQRRbPmIfAfvb+KWU6pS9z9iZ7vZJOVtg5Ph9nGwYycIIY2Gfv00KDKgoATl8x+TqARjIzg2QNokjKiD87AffD/B2k8Z7iuFXSK35LaGdaV66I9hGNyAxV+fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711465052; c=relaxed/simple;
-	bh=s9XKDoLzIfdzIZPmSDkl+/c6CzgijIpyNlXPpUChh3Y=;
+	s=arc-20240116; t=1711465351; c=relaxed/simple;
+	bh=iQrxAiOyf3CwR5nnrMUtNDY+/b8r72mv1Ifri/TfCVk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sAFUGpgU6uKLd4xNYb1p42Hx69B9zSuNAkJ/AcjZRGQXRHA5rqBfLm5b9apU/o1N0+LXbY9ukAMG2vXKw82sDJaBnxheRBKnp/RSYrNFM16dpuY2NeAiwOWjtK2AxNbbt1KM009dbV3O7AKKWkI19zsw1Z+DPPrVnps2ifuv74U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eEDTgszZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 11992C433F1;
-	Tue, 26 Mar 2024 14:57:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711465051;
-	bh=s9XKDoLzIfdzIZPmSDkl+/c6CzgijIpyNlXPpUChh3Y=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=eEDTgszZMXm/jx48aBMxaHQ+11RDtWV+qKBDXof5dvQwi2s6xF2SZ4QDvZNkIqfrm
-	 ot/Ypt72jUs2sLe5XnthJfX/pZ6RxiwU+wcrFl0nbmLotrPQeC5+HzuCGZP5YBnrEg
-	 0W+Cmj9hOuGxaIpTmxeH/4TpDJU9kRhD3gfoi/4ixxukxOwqoiVWYbWT2QDT7HU6zI
-	 CYiLw+U3G8+I/wOpgi6D64ZL9G292gTbct4I3ZVTeMhsXQDdCnPtgvAvjVI0n23F4/
-	 8hUZp4j/Rb/nElraui+g3WDNzRGRU8Jb0Xt9BebsVl58qA/d8VFuBCjbjfVG2X7IdK
-	 LG0mbny1UtSIA==
-Message-ID: <1cd2a70c-17b8-4421-b70b-3c0199a84a6a@kernel.org>
-Date: Tue, 26 Mar 2024 08:57:29 -0600
+	 In-Reply-To:Content-Type; b=mjaSvSo366RffYK2GZpHiDYJWBj9mdt1pxCSEntLTBLeZiaSitsKXiRv3vyBobs9LZ7qJlDWMuMCbWok+aYyDJ7nzP6LyYg/8+EXLna37SeStsiaqAdNLxnfsEpmd5nUqErnUTQeADJ3IskaYDe+ZpbG9W0G9822iJWgA4NBBfQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g8NWE2NM; arc=none smtp.client-ip=209.85.208.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f170.google.com with SMTP id 38308e7fff4ca-2d68cf90ec4so92984941fa.1;
+        Tue, 26 Mar 2024 08:02:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1711465348; x=1712070148; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=/Hsnt5/Fl7rxcLS3/8zPxOL+vJi5J39AzCAfQSaLLx8=;
+        b=g8NWE2NMbBzlep619EsMHdfdkZXguCMBhWxgodN/NLCRXsPzV4/aNc0Wpfl30SjBrb
+         hu6bj2qc0brRCNXL+DVBFRQsxq/dWYDXVdYKXAg5TgFTA3EmXPCtnFvKrdJkxKiGSBtw
+         i+/3OT80q60SVANLg6N28nMHOshpnXYjB/cBrePzhHdGnjvdR6kZq9cKS9flTmgs6CeG
+         hNlVESNKAbm8lJpJZgMPR+TBvo/x6ZMk983FzNLkInsKeBDfI3u+9iAl6tF97L/x9ihb
+         YCoGzW8ZVr/gPEPz4NwSjn9qXpN/6kVsl8enbTYYV424usVLX+2zD1Yk/QFNnhIg7q60
+         vaBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711465348; x=1712070148;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to:subject
+         :mime-version:date:message-id:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=/Hsnt5/Fl7rxcLS3/8zPxOL+vJi5J39AzCAfQSaLLx8=;
+        b=mO+A42SVaCwN0vdVD6DpowHTr5fOaAa5W0LsU03mYqvR1er4VObjlAaWhAsJkaan8a
+         xDsz2eV0jFoUV3LdcOhLX1XojpgdLmWppOLV8IAeZumTAa4wKmzFjEnyJl/K7c7tcZ6k
+         QJmbgnVCJzHmlhN1B6/wmBhGG+cGAGEpYpryLxN4+GvvhgJS8C0ROBIGdywzcbJwvPCZ
+         dSW1Hvg+izmMNm1xHV7RfAImYkUIv0FMv0tGstkyrMoIC965LsI5BPqyLGG4vC3UgXrG
+         4uz0jQeNNih3Ck5uuav1o/1mdD1uk2RZM1i4cONTNuLfIDJy4k8X2fSI5zgrdXIlU60A
+         680Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWlm/HdPmq79mSfsLxbeAZHSZALmEAip4ERqFEuRrBNvMET/qvoVmSZQI4hazvC9or+ZIx2GG3tgbtCB5G9U/hnCVVXe1bhIaDAnbmuC/rmW6JyjvoD/arKcYzA+O8HE4HfAkpHKWQ3U/ysCUXtlidwjSc9Ohc0zzYbBLI8r2MmVFCtewyq
+X-Gm-Message-State: AOJu0YxkR7V0Cqg41viWv+6t8FVgCmuNbDbisKg3yjE8SDs3zG82FUXK
+	t6NrclXwUndML2Mj2QU2wOS+Y4oBPEXQU9PzlEnuZ3hdhOZSX9JkqOiHzZyi
+X-Google-Smtp-Source: AGHT+IHpexITbWll6oy2e6Yq4d/eN+YCh9NgpVg6Ox7pCdRLuCYg8fqZasutwDfMYb9k6ShkQFhh3Q==
+X-Received: by 2002:a05:651c:547:b0:2d6:c5d7:8477 with SMTP id q7-20020a05651c054700b002d6c5d78477mr1085122ljp.36.1711465346996;
+        Tue, 26 Mar 2024 08:02:26 -0700 (PDT)
+Received: from debian ([146.70.204.204])
+        by smtp.gmail.com with ESMTPSA id fa7-20020a056000258700b00341c6b53358sm7902295wrb.66.2024.03.26.08.02.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 26 Mar 2024 08:02:26 -0700 (PDT)
+Message-ID: <6566fd5f-fcdf-4dc7-b8a2-5e8a182f8c49@gmail.com>
+Date: Tue, 26 Mar 2024 16:02:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH V4 0/5] mlx5 ConnectX control misc driver
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Jason Gunthorpe <jgg@nvidia.com>, Christoph Hellwig <hch@infradead.org>,
- Saeed Mahameed <saeed@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
- Leon Romanovsky <leonro@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
- Leonid Bloch <lbloch@nvidia.com>, Itay Avraham <itayavr@nvidia.com>,
- Saeed Mahameed <saeedm@nvidia.com>,
- Aron Silverton <aron.silverton@oracle.com>, linux-kernel@vger.kernel.org,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Andy Gospodarek <andrew.gospodarek@broadcom.com>
-References: <20240207072435.14182-1-saeed@kernel.org>
- <Zcx53N8lQjkpEu94@infradead.org>
- <ZczntnbWpxUFLxjp@C02YVCJELVCG.dhcp.broadcom.net>
- <20240214175735.GG1088888@nvidia.com> <20240304160237.GA2909161@nvidia.com>
- <9cc7127f-8674-43bc-b4d7-b1c4c2d96fed@kernel.org>
- <2024032248-ardently-ribcage-a495@gregkh>
- <510c1b6b-1738-4baa-bdba-54d478633598@kernel.org>
- <Zf2n02q0GevGdS-Z@C02YVCJELVCG> <20240322135826.1c4655e2@kernel.org>
- <e5c61607-4d66-4cd8-bf45-0aac2b3af126@kernel.org>
- <20240322154027.5555780a@kernel.org>
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <20240322154027.5555780a@kernel.org>
+Subject: Re: [PATCH net-next v4 4/4] net: gro: move L3 flush checks to
+ tcp_gro_receive
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ willemdebruijn.kernel@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20240325182543.87683-1-richardbgobert@gmail.com>
+ <20240325182543.87683-5-richardbgobert@gmail.com>
+ <CANn89iKzeTKuBA3NL0DQUmUHmmc0QzZ0X62DUarZ2Q7cKRZvSA@mail.gmail.com>
+ <46e0c775-91e7-4bf6-88f3-53ab5e00414f@gmail.com>
+ <CANn89iJkDbzLKmUGRHNFpfiaO8z19i44qgqkBA9Updt4QsRkyg@mail.gmail.com>
+From: Richard Gobert <richardbgobert@gmail.com>
+In-Reply-To: <CANn89iJkDbzLKmUGRHNFpfiaO8z19i44qgqkBA9Updt4QsRkyg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 3/22/24 4:40 PM, Jakub Kicinski wrote:
-> On Fri, 22 Mar 2024 15:18:09 -0600 David Ahern wrote:
->> can you respond to Jason's email with the proposal for the new fwctl
->> subsystem and identify places you do not agree? That would provide more
->> concrete discussion points. Thanks,
+Eric Dumazet wrote:
 > 
-> Respond in what way, David? Comment on technical aspects of whether 
-> a common class device with a discovery mechanism and a sprinkling of
-> semantically meaningless fields can be implemented? Some trivial object
-> hierarchy?
+> I do not understand this patch 4/4 then.
 > 
-> On whether someone can actually enforce any of the 4 "don't"s, and
-> whether this interface is basically encouraging and giving a leg up
-> to those willing to be dishonest?
-> 
-> Or should we go for another loop of me talking about openness and
-> building common abstractions, and vendors saying how their way of
-> doing basic configuration is so very special, and this is just for
-> debug and security and because others.
-> 
-> There's absolutely no willingness to try and build a common interface
-> here.
+> Why bother moving stuff in net/ipv4/tcp_offload.c if we plan to move
+> it back to where it belongs ?
 
-The proposal is an attempt at a common interface and common tooling to a
-degree but independent of any specific subsystem of which many are
-supported by the device.
+Willem also pointed that out, and I agree. I'll post a v5 and move this
+functionality to gro.c. Currently, gro_network_flush will be called from
+tcp_gro_receive and in a separate series I'll fix the bug by calling
+gro_network_flush in skb_gro_receive or adding it to
+udp_gro_receive_segment - whichever is better.
 
-Your responses continue to align with the notion that because the device
-can spit out ethernet frames, all diagnostics, debugging, configuration,
-etc. MUST go through networking APIs.
-
-You seem unwilling to acknowledge that devices can work for various use
-cases without a netdev driver, and thus aspects of managing that device
-should be done outside of a netdev driver.
+This patch is meaningful by itself - removing checks against non-relevant
+packets and making the flush/flush_id checks in a single place.
 
