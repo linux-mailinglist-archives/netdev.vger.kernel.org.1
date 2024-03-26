@@ -1,152 +1,196 @@
-Return-Path: <netdev+bounces-82245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BE7288CE26
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 21:19:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 814FC88CEDE
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 21:32:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BC2D1C65B7B
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 20:19:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A30781C6141D
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 20:32:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA0213D53E;
-	Tue, 26 Mar 2024 20:19:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F0E913D632;
+	Tue, 26 Mar 2024 20:25:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1gm41FVZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eZhv01Iv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B8113D2A2
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 20:19:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63AA313D884;
+	Tue, 26 Mar 2024 20:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711484377; cv=none; b=maSXP0xHPLU07mKpu6K80kifDk8h7RFjwGXm25OvINgJri/UBOVK4coF4e3+UwCl/PK+FIvCjRm7DcSGFbSq9PLpxatb1gExfwp001mpMvVJMoow1auxqMRp/Exi7EDLNJ0DTQgM2FOg4FUwLuKVS+SrzfA8R9wydzEpQ5wqMt8=
+	t=1711484710; cv=none; b=gdwLGzzsjtVbvxC8GQVJhC73R5wwErmbwmxxZK63GtSRNWqNTxTiEySrmLmPYYkhelioq4WCvHw0cPncc/jDxiAKqVJ4Wq2TCKXtRrj8xWjMd3kmGk4Z8/3It37yApfZYsVHf8GTCo2mrkGgPTOwgLNu9Vl1f2VEiBGCiIpPMzc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711484377; c=relaxed/simple;
-	bh=/HolUtBGOSvO7vytyqHWVK1okzyRfH/uWmvtvWb27FA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VkpydVnmN0rU9Kv6NBAqSaOTly2U70IQmsEC+so+dhFwj2vPSCL9yEACN3sGwXVE6ivtGHcSb4972moCS8EdW8oyz6LXTrgktd7prrMo5F3JBhCakRNcExjKQIPFYRaEmEB3IMt0VBMAhsdY4WiBUPtS3jrkC/edYMbDi0JjwcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1gm41FVZ; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-56c1922096cso2856965a12.0
-        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 13:19:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711484373; x=1712089173; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/HolUtBGOSvO7vytyqHWVK1okzyRfH/uWmvtvWb27FA=;
-        b=1gm41FVZkSn4Ai7WlX1D0mAvsiIhXcNKLG0Z0iVMbEyuhSc6lAFnYsQce/3uLx2VOQ
-         F13pVTO9dMRWzS/d7sfOBXIkS3ngp/9f5y9jWOoAa6189WcyF2NonArWAQ719WFAi114
-         zU2eBR/j4Sp8dRmx3JNiO0l7Z06mGs29qV6F7W7oAwBVZ4wOXL0SG4oZfOKMR4pofar8
-         GukfmgjQtDxSyZ4EeIfkAX4mF4CDBv3LOIhV1e4bHqCsqkAZkHkXbxpNT7BTyqBDSwo0
-         t6V0x1PQN7YCjKQ72LzuDlwkJ2sQ1fUKugFapN4Dt5u28GWEdnMNP+fAmqirbn6HeFth
-         mCEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711484373; x=1712089173;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/HolUtBGOSvO7vytyqHWVK1okzyRfH/uWmvtvWb27FA=;
-        b=YyTy2skj6DD92qfezh4lOjN8fsis+bqF/1wiB2MZ7JVIF2nNQtvF0XagAkRHo2v5pN
-         A0vfqagKBt/p98NV7U6AhtAIi6CJq2suE5eINWRrtqZfwu+ZyKNVCGj5erkCoNgzni5/
-         geY4aW2TcKxb7d50CjioLynqxtqeOvFMTL4Zz0s4zAZgP9l3eZoO7AiNB9Ikrf+F/hGq
-         +Q7HjEVKFw5dEUEbXwruYwYIZmGVqk3gQKJBTWKQ2ZJZMMVzzmIE/SitSX1W/rp9rfd5
-         KryrNJTl1MCdPfUwka7LQLgF2m13Ezi/6Eb5hr5GD7t4ej2cIPYD4ZEhBbQ7YV/4517F
-         6yVw==
-X-Gm-Message-State: AOJu0YyAP2+SW34ICpKQMyL6Jc0G/s4xUFV6g0owgBcSnFs2yGitcDJq
-	cnYFs5m64lP8BYaYIYviblNDVzQHnIpZoze1juGvAL5VtUk0cWr+h9bqZj0DBZD8G3TpTYtp3uL
-	Zn6wqM80Utl6/dxWnMI+8Hx2VPJszuiCDQfgr
-X-Google-Smtp-Source: AGHT+IFjAY/eoFDY4BwdVzDOePbePtoPltk1wuczOVWu/9VSVvPKPc9DWk1TgGZAdfUjGFfCBB9+wtsJgpHCZYEgPKU=
-X-Received: by 2002:a17:906:2dc9:b0:a46:70d1:dda6 with SMTP id
- h9-20020a1709062dc900b00a4670d1dda6mr1426517eji.28.1711484372999; Tue, 26 Mar
- 2024 13:19:32 -0700 (PDT)
+	s=arc-20240116; t=1711484710; c=relaxed/simple;
+	bh=WKb/Rem+q45UacCFCZyCwdPQfAxbGriai4/va9sGbT0=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=a8vDJbI6ug2Us6/ZqPQOAlCCkul/4UY2a48FMCIQc5bD+5UH79D7uuTlY3RXuI6mTur5nAcBK1FDQToO1+7j+iAtkgbSBRIV5AzjrJA57bnGcLuuuRR0RMBKMXmwg56Yb8hXsC63kQTh4B07EORxTmB0Eg3clKexgELXZKQ1mtU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eZhv01Iv; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711484708; x=1743020708;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=WKb/Rem+q45UacCFCZyCwdPQfAxbGriai4/va9sGbT0=;
+  b=eZhv01IvqK5o3TO6SV2inbylGEDga5EEtjioNIhJBOKo6gtWE10t9wEM
+   YCpjNrWWWrHZS6QlIHI/WH36y0U0HwI5psXCNJRddArmE3Y3Ou1jzk6uf
+   7dJNXEcfcTtjMfNlD6S5aimJ+Ipn3bHioLefvmnUAN9b6s6QVs+LMgW/v
+   lxkdaOVb90PZ4k/N2WvHMHNN4CBJHDmfIQ6Mdk2vUumJw/3j8sK5+DJ1T
+   GihES4wQJWXQiCZF7qdJ7ytP9QENwuzS8laRio/mcQiPy/qJsH/+kt2vi
+   QhS3La70w6ow/sK9jeWwEpisEEsmBtchDrsI/OTIwSeoKIbzard8gzZ5x
+   w==;
+X-CSE-ConnectionGUID: WE1rGxAhQt6KYakS5sVGow==
+X-CSE-MsgGUID: iGBTkGOTRNCHOGOT4RBzeQ==
+X-IronPort-AV: E=McAfee;i="6600,9927,11025"; a="17288128"
+X-IronPort-AV: E=Sophos;i="6.07,157,1708416000"; 
+   d="scan'208";a="17288128"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 13:25:07 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,157,1708416000"; 
+   d="scan'208";a="16509223"
+Received: from eldobson-mobl1.ger.corp.intel.com (HELO localhost) ([10.252.55.140])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 13:24:58 -0700
+From: Jani Nikula <jani.nikula@linux.intel.com>
+To: Arnd Bergmann <arnd@kernel.org>, linux-kbuild@vger.kernel.org, Masahiro
+ Yamada <masahiroy@kernel.org>, Harry Wentland <harry.wentland@amd.com>,
+ Alex Deucher <alexander.deucher@amd.com>, Christian =?utf-8?Q?K=C3=B6nig?=
+ <christian.koenig@amd.com>, Lucas De Marchi <lucas.demarchi@intel.com>,
+ Oded Gabbay <ogabbay@kernel.org>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Maxime Ripard <mripard@kernel.org>,
+ Thomas Zimmermann <tzimmermann@suse.de>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Andrew Jeffery
+ <andrew@codeconstruct.com.au>, Linus Walleij <linus.walleij@linaro.org>,
+ Joel Stanley <joel@jms.id.au>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Andrew Morton
+ <akpm@linux-foundation.org>, Nathan Chancellor <nathan@kernel.org>
+Cc: Nicolas Schier <nicolas@fjasle.eu>, Arnd Bergmann <arnd@arndb.de>,
+ dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-mm@kvack.org, llvm@lists.linux.dev
+Subject: Re: [PATCH 01/12] kbuild: make -Woverride-init warnings more
+ consistent
+In-Reply-To: <20240326144741.3094687-2-arnd@kernel.org>
+Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+References: <20240326144741.3094687-1-arnd@kernel.org>
+ <20240326144741.3094687-2-arnd@kernel.org>
+Date: Tue, 26 Mar 2024 22:24:55 +0200
+Message-ID: <87jzlohhbc.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240305020153.2787423-1-almasrymina@google.com>
- <20240305020153.2787423-3-almasrymina@google.com> <ZfegzB341oNc_Ocz@infradead.org>
- <CAHS8izOUi6qGp=LSQb_o5oph-EnhNOuhLkPSfbQRU3eniZvbdA@mail.gmail.com> <ZgC5JoSiWAYf3IgX@infradead.org>
-In-Reply-To: <ZgC5JoSiWAYf3IgX@infradead.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 26 Mar 2024 13:19:20 -0700
-Message-ID: <CAHS8izO5-giYhM1bVCLLOXRXq-Xd0=pi0kPq5E1-R=3i=XihmQ@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 02/15] net: page_pool: create hooks for
- custom page providers
-To: Christoph Hellwig <hch@infradead.org>, shakeel.butt@linux.dev
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, linux-alpha@vger.kernel.org, 
-	linux-mips@vger.kernel.org, linux-parisc@vger.kernel.org, 
-	sparclinux@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
-	linux-arch@vger.kernel.org, bpf@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, linux-media@vger.kernel.org, 
-	dri-devel@lists.freedesktop.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Richard Henderson <richard.henderson@linaro.org>, 
-	Ivan Kokshaysky <ink@jurassic.park.msu.ru>, Matt Turner <mattst88@gmail.com>, 
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, Helge Deller <deller@gmx.de>, 
-	Andreas Larsson <andreas@gaisler.com>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Steven Rostedt <rostedt@goodmis.org>, 
-	Masami Hiramatsu <mhiramat@kernel.org>, Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
-	Arnd Bergmann <arnd@arndb.de>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, John Fastabend <john.fastabend@gmail.com>, 
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Sumit Semwal <sumit.semwal@linaro.org>, =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
-	Pavel Begunkov <asml.silence@gmail.com>, David Wei <dw@davidwei.uk>, Jason Gunthorpe <jgg@ziepe.ca>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Shailend Chand <shailend@google.com>, 
-	Harshitha Ramamurthy <hramamurthy@google.com>, Jeroen de Borst <jeroendb@google.com>, 
-	Praveen Kaligineedi <pkaligineedi@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Sun, Mar 24, 2024 at 4:37=E2=80=AFPM Christoph Hellwig <hch@infradead.or=
-g> wrote:
+On Tue, 26 Mar 2024, Arnd Bergmann <arnd@kernel.org> wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
 >
-> On Fri, Mar 22, 2024 at 10:54:54AM -0700, Mina Almasry wrote:
-> > Sorry I don't mean to argue but as David mentioned, there are some
-> > plans in the works and ones not in the works to extend this to other
-> > memory types. David mentioned io_uring & Jakub's huge page use cases
-> > which may want to re-use this design. I have an additional one in
-> > mind, which is extending devmem TCP for storage devices. Currently
-> > storage devices do not support dmabuf and my understanding is that
-> > it's very hard to do so, and NVMe uses pci_p2pdma instead. I wonder if
-> > it's possible to extend devmem TCP in the future to support pci_p2pdma
-> > to support nvme devices in the future.
+> The -Woverride-init warn about code that may be intentional or not,
+> but the inintentional ones tend to be real bugs, so there is a bit of
+> disagreement on whether this warning option should be enabled by default
+> and we have multiple settings in scripts/Makefile.extrawarn as well as
+> individual subsystems.
 >
-> The block layer needs to suppotr dmabuf for this kind of I/O.
-> Any special netdev to block side channel will be NAKed before you can
-> even send it out.
+> Older versions of clang only supported -Wno-initializer-overrides with
+> the same meaning as gcc's -Woverride-init, though all supported versions
+> now work with both. Because of this difference, an earlier cleanup of
+> mine accidentally turned the clang warning off for W=1 builds and only
+> left it on for W=2, while it's still enabled for gcc with W=1.
+>
+> There is also one driver that only turns the warning off for newer
+> versions of gcc but not other compilers, and some but not all the
+> Makefiles still use a cc-disable-warning conditional that is no
+> longer needed with supported compilers here.
+>
+> Address all of the above by removing the special cases for clang
+> and always turning the warning off unconditionally where it got
+> in the way, using the syntax that is supported by both compilers.
+>
+> Fixes: 2cd3271b7a31 ("kbuild: avoid duplicate warning options")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  drivers/gpu/drm/amd/display/dc/dce110/Makefile |  2 +-
+>  drivers/gpu/drm/amd/display/dc/dce112/Makefile |  2 +-
+>  drivers/gpu/drm/amd/display/dc/dce120/Makefile |  2 +-
+>  drivers/gpu/drm/amd/display/dc/dce60/Makefile  |  2 +-
+>  drivers/gpu/drm/amd/display/dc/dce80/Makefile  |  2 +-
+>  drivers/gpu/drm/i915/Makefile                  |  6 +++---
+>  drivers/gpu/drm/xe/Makefile                    |  4 ++--
+>  drivers/net/ethernet/renesas/sh_eth.c          |  2 +-
+>  drivers/pinctrl/aspeed/Makefile                |  2 +-
+>  fs/proc/Makefile                               |  2 +-
+>  kernel/bpf/Makefile                            |  2 +-
+>  mm/Makefile                                    |  3 +--
+>  scripts/Makefile.extrawarn                     | 10 +++-------
+>  13 files changed, 18 insertions(+), 23 deletions(-)
+>
 
-Thanks, a few questions if you have time to help me understand the
-potential of extending this to storage devices.
+[snip]
 
-Are you envisioning that dmabuf support would be added to the block
-layer (which I understand is part of the VFS and not driver specific),
-or as part of the specific storage driver (like nvme for example)? If
-we can add dmabuf support to the block layer itself that sounds
-awesome. We may then be able to do devmem TCP on all/most storage
-devices without having to modify each individual driver.
+> diff --git a/drivers/gpu/drm/i915/Makefile b/drivers/gpu/drm/i915/Makefile
+> index 3ef6ed41e62b..4c2f85632391 100644
+> --- a/drivers/gpu/drm/i915/Makefile
+> +++ b/drivers/gpu/drm/i915/Makefile
+> @@ -33,9 +33,9 @@ endif
+>  subdir-ccflags-$(CONFIG_DRM_I915_WERROR) += -Werror
+>  
+>  # Fine grained warnings disable
+> -CFLAGS_i915_pci.o = $(call cc-disable-warning, override-init)
+> -CFLAGS_display/intel_display_device.o = $(call cc-disable-warning, override-init)
+> -CFLAGS_display/intel_fbdev.o = $(call cc-disable-warning, override-init)
+> +CFLAGS_i915_pci.o = -Wno-override-init
+> +CFLAGS_display/intel_display_device.o = -Wno-override-init
+> +CFLAGS_display/intel_fbdev.o = -Wno-override-init
+>  
+>  # Support compiling the display code separately for both i915 and xe
+>  # drivers. Define I915 when building i915.
+> diff --git a/drivers/gpu/drm/xe/Makefile b/drivers/gpu/drm/xe/Makefile
+> index 5a428ca00f10..c29a850859ad 100644
+> --- a/drivers/gpu/drm/xe/Makefile
+> +++ b/drivers/gpu/drm/xe/Makefile
+> @@ -172,8 +172,8 @@ subdir-ccflags-$(CONFIG_DRM_XE_DISPLAY) += \
+>  	-Ddrm_i915_gem_object=xe_bo \
+>  	-Ddrm_i915_private=xe_device
+>  
+> -CFLAGS_i915-display/intel_fbdev.o = $(call cc-disable-warning, override-init)
+> -CFLAGS_i915-display/intel_display_device.o = $(call cc-disable-warning, override-init)
+> +CFLAGS_i915-display/intel_fbdev.o = -Wno-override-init
+> +CFLAGS_i915-display/intel_display_device.o = -Wno-override-init
 
-In your estimation, is adding dmabuf support to the block layer
-something technically feasible & acceptable upstream? I notice you
-suggested it so I'm guessing yes to both, but I thought I'd confirm.
+For i915 and xe parts,
 
-Worthy of note this is all pertaining to potential follow up use
-cases, nothing in this particular proposal is trying to do any of this
-yet.
+Acked-by: Jani Nikula <jani.nikula@intel.com>
 
---=20
-Thanks,
-Mina
+>  # Rule to build SOC code shared with i915
+>  $(obj)/i915-soc/%.o: $(srctree)/drivers/gpu/drm/i915/soc/%.c FORCE
+> diff --git a/drivers/net/ethernet/renesas/sh_eth.c b/drivers/net/ethernet/renesas/sh_eth.c
+> index 475e1e8c1d35..0786eb0da391 100644
+> --- a/drivers/net/ethernet/renesas/sh_eth.c
+> +++ b/drivers/net/ethernet/renesas/sh_eth.c
+> @@ -50,7 +50,7 @@
+>   * the macros available to do this only define GCC 8.
+>   */
+>  __diag_push();
+> -__diag_ignore(GCC, 8, "-Woverride-init",
+> +__diag_ignore_all("-Woverride-init",
+>  	      "logic to initialize all and then override some is OK");
+
+This is nice because it's more localized than the per-file
+disable. However, we tried to do this in i915, but this doesn't work for
+GCC versions < 8, and some defconfigs enabling -Werror forced us to
+revert. See commit 290d16104575 ("Revert "drm/i915: use localized
+__diag_ignore_all() instead of per file"").
+
+BR,
+Jani.
+
+
+-- 
+Jani Nikula, Intel
 
