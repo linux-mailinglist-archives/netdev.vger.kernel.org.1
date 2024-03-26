@@ -1,213 +1,366 @@
-Return-Path: <netdev+bounces-82156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BD4C88C829
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:56:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEAA388C864
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 17:02:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF03A1C64840
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:56:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A40833235F6
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:02:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F7C113C813;
-	Tue, 26 Mar 2024 15:53:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9833813C83A;
+	Tue, 26 Mar 2024 16:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="U6A9YwAz"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DpOxoHPK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67CB813C3F4
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 15:53:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711468409; cv=none; b=RKGMJ29n55dXwLqXYAEvn3VDZpqn2YumaBr7vLwunF/Q45UzyYnIAFmqFEjmorsmmqJaQHuRLf5COjgk/2w3TYoUGWpB2KW97qDCLZueXXfMF6pOfwWhIK8aRVcs/myVbBS72kt0kYgRBvEwlNooo5cHLTDCoF8jsq3tMlPHF8s=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711468409; c=relaxed/simple;
-	bh=Y+N9bLji37rdNQ+CJU9oaOIrkQ2E+4Wvpp8us/K+lM8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=WdzEN/SRWpS3/St802yxU03K3h1pd5uT0KEeCnzKZTYclgYOEYn5puk6rN0Z9Yow0mWUueGjRj8Twac4VdL9PPXvw9+9WJYQvyg+Ka2C7DutN696gTjXOQ2bIrUDONF3VAo+xrDyZfme4I+MDCOa2IQADFRbBD2Nhn3cyuj5q/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=U6A9YwAz; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-515a81928a1so4249618e87.3
-        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 08:53:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1711468406; x=1712073206; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=dv7UMkEaxzSl67p37WFyMfXWloPU7wuTTfMss40Utgg=;
-        b=U6A9YwAzvHAsxDTAIkWGDZrDvUUTjoLcdTFlWJQkVFMawLmx9IrndS6DvRtsthrNqJ
-         o+MWjdlykq8G4XM26H5CFNIpRpy/e9WAxOEMlavwGx0pTVT8/dyftk1rY1PP/S0aYNVn
-         ZhhZ2Nm6jKOR6VwpJ6LoTT2wnGgp7F7ZvxDW4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711468406; x=1712073206;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dv7UMkEaxzSl67p37WFyMfXWloPU7wuTTfMss40Utgg=;
-        b=RLEiaDYWzgI3a7N5DnJogZoD8ZLNwCnu7kQ5JJQlO9cA4XNjHnse963T8llg/9imlb
-         CEzptYGoSoOwOem+sL8RsvG1ynWC7GzckpysXkNLuEu+O7hn7Yw3uENZhjQukvGwNVoH
-         EMvJRuBWIN9f2qqJ+wF3PatNvAfr+3sYar445fbbDmZVSqoDLqxpGrHME8Y3GQBMDIl1
-         m9HmyyH6Xo6JWVxg9f6Ime8SiTvWHdq7pbVqYpvTAXcFdOID1X6TkURBm2MgnRoQWto0
-         ksk+a4MD1lSIRhvho+cJL2kbYfWb4AkRGIfm42/4rvuTSwxoA90KfaHUWHxW40RjDxeH
-         2J4w==
-X-Gm-Message-State: AOJu0Yy8k8orhr+gq3jesKt+W7c86PEGu5ApAbTybmeG950i87x+iH3N
-	7Up23kO3yysBaXYJVi6ZrfVoNPnWGzyCBVzYVnenMy0k/fgWITmOJDRGmvH1WoTA9uRdCAPZ9R1
-	Rn2YqbDWC244m9w67ToLsEDtG4yXSZ9qGi7XL
-X-Google-Smtp-Source: AGHT+IGUIZUCdPdieDnY+2wz8yQD4iNPv+s3RrVnzkPu8LFg1v3PEFG7uwKGjodpnxHbs3x3dfQJ/XqFc+VyL7PaoeI=
-X-Received: by 2002:a05:6512:468:b0:513:a6a7:ac88 with SMTP id
- x8-20020a056512046800b00513a6a7ac88mr8778575lfd.14.1711468405515; Tue, 26 Mar
- 2024 08:53:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 542262574B;
+	Tue, 26 Mar 2024 16:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1711468963; cv=fail; b=o7A52MJbG5pb/E48WDPIYMAJfZj/uRMda0bP37ulzOpnzV5GjZNK5DMB8vMWNUhHntpJN14JlMsE6tlqQlxc4AFl7ML5a/DSn/hCcfWSVWA0esmyM1i5ZV8Obt+V6NbOwET/Rxy5g6GxfRK6PdC6nG+YmDY1pWxBR0VR8wZ5IKA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1711468963; c=relaxed/simple;
+	bh=/2mgMQaJfwNFUhuYtUqQIAjPU3T5zPILwM8XmCyQvYM=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=M3HoaftMaX3iPwoPaQLxEO09Z4gCOej7QprZXgmRXCFBxhiiDkyr87uzEfVXevIMnz58dnAjW2ZZu3JWIX06GyVL8Dq8A1FDHcVP2sy7FCPnb58axySliDcKqWZNJi7Ov68mow2qWlAefO3fjRp/q4u7D8hrtYFUc5KNhqID2Tw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DpOxoHPK; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1711468961; x=1743004961;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=/2mgMQaJfwNFUhuYtUqQIAjPU3T5zPILwM8XmCyQvYM=;
+  b=DpOxoHPKmAOU4GGk3V2HgwraZvmDkPVF/QlWr5lTm4RVrXkCaV18lvuI
+   LLKm1eIJzqcG/Ht9r9CjlVVYkEuHLlOalc6gd71D//n8vbQUauxi+zyPF
+   qtnrrzTghhee2suoeyZB1DY0Qg6jL29Wl1sXYTV5yzH+MnNoabHocg7Lw
+   XONybnVubbTs5uVLumEE8U+4+J8U3jTwVNPPqV/X8K4mXWBqj1AicuH9C
+   l8JfLIq9zwyZGmsTUj/MLT+1iGDOyCBInIcDwBXPaE1KCvS/5aBOgiRlS
+   aF+q/DPEoPEwMlO/hu34je3nnyKapAJQJ/eufGdQK2WDokbLDG97PLTb9
+   A==;
+X-CSE-ConnectionGUID: O+4qRj3STs+NLYbB2wE7XA==
+X-CSE-MsgGUID: vmgVabqCR0q5k33+a6Y+FA==
+X-IronPort-AV: E=McAfee;i="6600,9927,11025"; a="31970090"
+X-IronPort-AV: E=Sophos;i="6.07,156,1708416000"; 
+   d="scan'208";a="31970090"
+Received: from fmviesa002.fm.intel.com ([10.60.135.142])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Mar 2024 09:02:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.07,156,1708416000"; 
+   d="scan'208";a="39099580"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmviesa002.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 26 Mar 2024 09:02:34 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 26 Mar 2024 09:02:33 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Tue, 26 Mar 2024 09:02:33 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35 via Frontend Transport; Tue, 26 Mar 2024 09:02:33 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.101)
+ by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.35; Tue, 26 Mar 2024 09:02:32 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=XT0KYlgWpuB07tjkZL7lSsYb8XVc9T2Pj3kbYZyPzQIgNQ3Be79vi/fBXdY1m8lJikUYXO6MXHqyfIC8u+g4bdGWp0GpfI2EHDypjDgn8TPkWj4pWOaPkZRBsFuWcBuO/m/bhwQovdROLL1B5HhKBkjreTnH0oOpM+wAmbSU1f8qxKURVavbCbqN2XFWg6ji/TKWqhAL1TJ4nFuOvMDDbn5lEHVq8EiZDuv1seyMmek4s1nKvRvt9aJ/mz60kZQsDFjvQSqhYcsdCPpo+ZFaJG9FJWDbGi6vIr5CHoAFlepPZleMx/+cFfKzIRU2fgGX841JHwQ5UK4bf2O2QDIKrA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TtQlaNXMJEwJ1Xh99/aCL9bPmpcq1pCx/mV5SgpYZHs=;
+ b=Dykq0OdXf6nF7fo4fg35JOrhgez6pFR/x/8vW0x3BzIDO2QHK2NvV8g9iG/mfNOo0hFXoe03FbdUo/1D/2o3EXCrObts3LJ+SjXwO1F0wZ6n29Vx2jxrtsx8GeTOchY8lW8xyrdDn3JXoOvcKTUtIoKIxqzsCOmrzTaT6s+xPeNUX5iNm78SrdV78uSiSBfqSvTEWQmjuKWqacVn3QDU4IAbrQbSbR2bjG000oU91ACkFy8xu4ElL0p6ZLzNRlxzcRV4ALHAjsDY7O3joLS8h3r2QDzvBAhVl6duKvRjF0rwonMwmFSLHPkGqZP3yYDoxBxDBOw/RVNhkkvQeZARWw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ0PR11MB5866.namprd11.prod.outlook.com (2603:10b6:a03:429::10)
+ by CY8PR11MB7948.namprd11.prod.outlook.com (2603:10b6:930:7f::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.7409.31; Tue, 26 Mar
+ 2024 16:02:25 +0000
+Received: from SJ0PR11MB5866.namprd11.prod.outlook.com
+ ([fe80::aaf8:95c2:2724:9688]) by SJ0PR11MB5866.namprd11.prod.outlook.com
+ ([fe80::aaf8:95c2:2724:9688%6]) with mapi id 15.20.7409.028; Tue, 26 Mar 2024
+ 16:02:22 +0000
+From: "Loktionov, Aleksandr" <aleksandr.loktionov@intel.com>
+To: ivecera <ivecera@redhat.com>, "intel-wired-lan@lists.osuosl.org"
+	<intel-wired-lan@lists.osuosl.org>
+CC: "open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list
+	<linux-kernel@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, "Nguyen,
+ Anthony L" <anthony.l.nguyen@intel.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next 2/7] i40e: Change argument of
+ several client notification functions
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next 2/7] i40e: Change argument of
+ several client notification functions
+Thread-Index: AQHaeUEAGqYb6uMHzU69Qc7Ah6Pn97FKOxnA
+Date: Tue, 26 Mar 2024 16:02:22 +0000
+Message-ID: <SJ0PR11MB5866F87F079606B968A60EFCE5352@SJ0PR11MB5866.namprd11.prod.outlook.com>
+References: <20240318143058.287014-1-ivecera@redhat.com>
+ <20240318143058.287014-3-ivecera@redhat.com>
+In-Reply-To: <20240318143058.287014-3-ivecera@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ0PR11MB5866:EE_|CY8PR11MB7948:EE_
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: CxPECePTIuAyS0p02BBVAwjVT63Sly0G0C9mV32FyZmtFNiX0a3l7I+mwV/jRrvO8qAq+WdHQfW26K8BQgItrMPPB+3AIcKrHNH/Py00YbdWPdGRKdTT5FXZTRXYe7vVKRnXjWkx/Vvwm2roF0Y/zLjDhea97xi/HvYVsOsghEXbH3+QPMaA40JEwkpVTpUqdxNSZNB6WHbSckq7VUnnIi8jHznwj9BsRMY98t/Vgkrv73SXzWp137o3F13bA8TP5EZro4IkKtyknqZRs/RnzuypneAWt9PIqgkix4w5X/pcKhn1SVBx1tKdVI5zOKPAPVObR6TgWlltGfdcVW2nu9tgfNM/DrGN8RFmeOdNX2fm+4N7kD4JJWS1MS0wFlOO9JRgBm3lmqL3k8KDl1FwOj4Jt0M1jBGlq1AffIzaqOk3Fn57pCm4RjlNKVkVEs3lRlzy50v9Uu31q3coA5zZspdEpbTBKq3DVJerz7RjXnb58VksFQkVSEZwTRAILu7VQwhPkAcWiRUZWJcDuniFQRZGnW/vx4AIcVCMHIBLhLKLvLkeVzlZMJUIYmImqbjYbcSED9xJe5fU1stEUhacHUNGWlaCs+aB5A5v7q2orGw9aRxGjmnfqjVVZge/TZAnEXpCmrAEMp11PLcd62tVc7B57JAJItlzok+vWfZfkoI=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5866.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230031)(366007)(1800799015)(376005);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?TWOkk/a0JzmrS1B/JZMjjcQiUVCjUfPtByeWmordvr4OzOe6v0DajReSTOiQ?=
+ =?us-ascii?Q?vZEgi0rOcs7Jtq/qnLeLS1SOXSoLLJUH+IDudXnwqGlG7mMBgvPay+78b4DK?=
+ =?us-ascii?Q?gvbKEiaHgFRAXFE1fWbDwFNyE8ss6DkNCZhwxTkoBvN4zpB8jKzM88M8pmL3?=
+ =?us-ascii?Q?0d+CIElwXUA6lqvgbDgxPKJt+OtThgILWy5FNP8FKVRlMAXqfMx5KqacBIf4?=
+ =?us-ascii?Q?FLUImLRqi0nPnqQuT+O5bIgT35mY3pGXoA3+ERfFjlHlgibCtxTAdKenoM+Y?=
+ =?us-ascii?Q?rDwXD5AXbWVKJ8awqu/bhKssO4HUFN8TkVn1nx17YS5/UJsWfvQ2n7PspiS2?=
+ =?us-ascii?Q?Lcsp1SujuB6FBdGnX3Y50jpA+5pbl4Xw/RoHXSFKfF7eWHiyEobKV3J1Ffnb?=
+ =?us-ascii?Q?igOzq2NDGJw6hSXMKT1+09sD+Ozdyhs8yOpK+1THea6uX10LsW2yDvVY+R6n?=
+ =?us-ascii?Q?QNHY+q0kXXsD78a9eRBGWe8KuGjsuiw34yfeZlvYxkGEDp+dviZgGI7lIv1m?=
+ =?us-ascii?Q?GEAM7RsL0vBRsFy8l4cAlrMi4Oceb+b6LJOM5pQkGjJH/NNMETFBZ7/1omXE?=
+ =?us-ascii?Q?4f5EYUJK/P+EOJ55zKgHBOg/1oUEiD1ck/k8vZoiokSslCcD7rOulEzddIhP?=
+ =?us-ascii?Q?XmiCKw035+dqv7SP3tYSmx46/x2Zg6gXSMOrV2EkO/SbL9IIxatUyYCVuITS?=
+ =?us-ascii?Q?6TwRe/zJpLCaQjWsYvP7XLig9UZB81QfWIQkvkDV7KT4xathY/xoe4RZs7kb?=
+ =?us-ascii?Q?r0VYVsN4iiK545xQpAHLqroJrl3LW6mt71NniEJ7jIyjjCMCr30uv0zUEcfs?=
+ =?us-ascii?Q?X88sPlaKEGQRroElXybzEJypbudLifw7tKSznDVp/fEkrLDkussWKyvSZoem?=
+ =?us-ascii?Q?lqE5/rthlTTd+QEKvyVRPVhULOfSvbry6JLKmwbWzSXSKWqvCm8xsYpK7Pba?=
+ =?us-ascii?Q?as1blRzAD6V1WWWA7YHapENpv62JN70AFZHjIOFKBLMOKApFplQVSRd8jatA?=
+ =?us-ascii?Q?OoNjC9YX9PRTJNeyb62SY52oDvjK4gImc3Sr16RKpIKIG/hbHGiEp13mCp1T?=
+ =?us-ascii?Q?ohlmvyGSqN/2jzGv2PJyPRGl3B4vUgHpfpYS5xOwtFMa+odtq84kxXGLDv+L?=
+ =?us-ascii?Q?HKAjmLRMi7QcOP7Sr7YIMyFeyvR8zgLREh6kXZLxPr6tIUTl1IhOdkrEzTED?=
+ =?us-ascii?Q?0d4DDoAfKjxfPWy1CAq/G8Lm6ILi1uLv8qrm+zeYlsmGDQbat1RQaQcLHfi+?=
+ =?us-ascii?Q?reyVAM7XnBi3gSspAMD5HsXNK+nMVWhpDeQo6EbBnQUNlcN10mXgZZsCvahg?=
+ =?us-ascii?Q?0/GOpaDqRUaFD1l7J7uZXhEFh7o4yvwm9xl2XB+NBKJh1hIfpqwSHEV2xsEl?=
+ =?us-ascii?Q?1CUzsOiv1ogjoTQ4akI+GR4Jzd86jcN64Wn2uY/R3Yak6kJdz0p3SDX7DS75?=
+ =?us-ascii?Q?SkzMgnjVEpLgiDAei77IPd4m1yBCCgcWZsxt+GYim2gisPNlBr1Xj+qAFiGY?=
+ =?us-ascii?Q?+X5yD/DZF3vSZHqdgrteTvjiI5GaQhAEy72yYju7DAMxJslxWetTTwEqgH7f?=
+ =?us-ascii?Q?cpMrAnHPvZLDmSlhFtygNV3WtjOdBAKD/++Jo6s/zhbV4lImWSqDus53t8YX?=
+ =?us-ascii?Q?Gw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240326122149.4377-1-hkelam@marvell.com>
-In-Reply-To: <20240326122149.4377-1-hkelam@marvell.com>
-From: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>
-Date: Tue, 26 Mar 2024 21:23:14 +0530
-Message-ID: <CAH-L+nOcb+EDx6ofMn+5pwQHZDMauCcjqjjKg9-8jSS1LUB9QA@mail.gmail.com>
-Subject: Re: [net Patch] octeontx2-af: Fix issue with loading coalesced KPU profiles
-To: Hariprasad Kelam <hkelam@marvell.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kuba@kernel.org, 
-	davem@davemloft.net, sgoutham@marvell.com, gakula@marvell.com, 
-	jerinj@marvell.com, lcherian@marvell.com, sbhatta@marvell.com, 
-	naveenm@marvell.com, edumazet@google.com, pabeni@redhat.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000623bfb0614924afa"
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5866.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 603eb049-7d27-4d05-3815-08dc4dae1f4a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Mar 2024 16:02:22.4067
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: KN2seefv3YVf3Znr71vPs5Q30KFAWUXl9DGTNNvbimrEWwD9oBwf9PELldizwbHjgOJCZHL2YrAatXCd81Tr+jSHdr8ec6j6hAWVlRXgKyg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7948
+X-OriginatorOrg: intel.com
 
---000000000000623bfb0614924afa
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 26, 2024 at 5:53=E2=80=AFPM Hariprasad Kelam <hkelam@marvell.co=
-m> wrote:
->
-> The current implementation for loading coalesced KPU profiles has
-> a limitation.  The "offset" field, which is used to locate profiles
-> within the profile is restricted to a u16.
->
-> This restricts the number of profiles that can be loaded. This patch
-> addresses this limitation by increasing the size of the "offset" field.
->
-> Fixes: 11c730bfbf5b ("octeontx2-af: support for coalescing KPU profiles")
-> Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
-LGTM
-Reviewed-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On
+> Behalf Of Ivan Vecera
+> Sent: Monday, March 18, 2024 3:31 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: open list:NETWORKING DRIVERS <netdev@vger.kernel.org>; open
+> list <linux-kernel@vger.kernel.org>; Eric Dumazet
+> <edumazet@google.com>; Nguyen, Anthony L
+> <anthony.l.nguyen@intel.com>; Jakub Kicinski <kuba@kernel.org>;
+> Paolo Abeni <pabeni@redhat.com>; David S. Miller
+> <davem@davemloft.net>
+> Subject: [Intel-wired-lan] [PATCH iwl-next 2/7] i40e: Change
+> argument of several client notification functions
+>=20
+Can you rename the title of the commit change -> refactor?
+To make it obvious that there is no functionality change, just refactor?
+
+
+> Commit 0ef2d5afb12d ("i40e: KISS the client interface") simplified
+> the client interface so in practice it supports only one client per
+> i40e netdev. But we have still 2 notification functions that uses
+> as parameter a pointer to VSI of netdevice associated with the
+> client. After the mentioned commit only possible and used VSI is
+> the main (LAN) VSI.
+> So change these functions so they are called with PF pointer
+> argument and the associated VSI (LAN) is taken inside them.
+>=20
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 > ---
->  drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c b/driver=
-s/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> index e350242bbafb..be709f83f331 100644
-> --- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> +++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc.c
-> @@ -1657,7 +1657,7 @@ static int npc_fwdb_detect_load_prfl_img(struct rvu=
- *rvu, uint64_t prfl_sz,
->         struct npc_coalesced_kpu_prfl *img_data =3D NULL;
->         int i =3D 0, rc =3D -EINVAL;
->         void __iomem *kpu_prfl_addr;
-> -       u16 offset;
-> +       u32 offset;
->
->         img_data =3D (struct npc_coalesced_kpu_prfl __force *)rvu->kpu_pr=
-fl_addr;
->         if (le64_to_cpu(img_data->signature) =3D=3D KPU_SIGN &&
+>  drivers/net/ethernet/intel/i40e/i40e.h        |  4 ++--
+>  drivers/net/ethernet/intel/i40e/i40e_client.c | 20 +++++++++------
+> ----
+>  drivers/net/ethernet/intel/i40e/i40e_main.c   | 12 +++++------
+>  3 files changed, 17 insertions(+), 19 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e.h
+> b/drivers/net/ethernet/intel/i40e/i40e.h
+> index 5248e78f7849..0792c7324527 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e.h
+> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
+> @@ -1236,8 +1236,8 @@ static inline void i40e_dbg_exit(void) {}
+> int i40e_lan_add_device(struct i40e_pf *pf);  int
+> i40e_lan_del_device(struct i40e_pf *pf);  void
+> i40e_client_subtask(struct i40e_pf *pf); -void
+> i40e_notify_client_of_l2_param_changes(struct i40e_vsi *vsi); -void
+> i40e_notify_client_of_netdev_close(struct i40e_vsi *vsi, bool
+> reset);
+> +void i40e_notify_client_of_l2_param_changes(struct i40e_pf *pf);
+> void
+> +i40e_notify_client_of_netdev_close(struct i40e_pf *pf, bool
+> reset);
+>  void i40e_notify_client_of_vf_enable(struct i40e_pf *pf, u32
+> num_vfs);  void i40e_notify_client_of_vf_reset(struct i40e_pf *pf,
+> u32 vf_id);  void i40e_client_update_msix_info(struct i40e_pf *pf);
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_client.c
+> b/drivers/net/ethernet/intel/i40e/i40e_client.c
+> index b32071ee84af..93e52138826e 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_client.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_client.c
+> @@ -101,25 +101,26 @@ i40e_notify_client_of_vf_msg(struct i40e_vsi
+> *vsi, u32 vf_id, u8 *msg, u16 len)
+>=20
+>  /**
+>   * i40e_notify_client_of_l2_param_changes - call the client notify
+> callback
+> - * @vsi: the VSI with l2 param changes
+> + * @pf: PF device pointer
+>   *
+> - * If there is a client to this VSI, call the client
+> + * If there is a client, call its callback
+>   **/
+> -void i40e_notify_client_of_l2_param_changes(struct i40e_vsi *vsi)
+> +void i40e_notify_client_of_l2_param_changes(struct i40e_pf *pf)
+>  {
+> -	struct i40e_pf *pf =3D vsi->back;
+>  	struct i40e_client_instance *cdev =3D pf->cinst;
+> +	struct i40e_vsi *vsi =3D pf->vsi[pf->lan_vsi];
+>  	struct i40e_params params;
+>=20
+>  	if (!cdev || !cdev->client)
+>  		return;
+>  	if (!cdev->client->ops || !cdev->client->ops-
+> >l2_param_change) {
+> -		dev_dbg(&vsi->back->pdev->dev,
+> +		dev_dbg(&pf->pdev->dev,
+>  			"Cannot locate client instance l2_param_change
+> routine\n");
+>  		return;
+>  	}
+>  	if (!test_bit(__I40E_CLIENT_INSTANCE_OPENED, &cdev->state)) {
+> -		dev_dbg(&vsi->back->pdev->dev, "Client is not open,
+> abort l2 param change\n");
+> +		dev_dbg(&pf->pdev->dev,
+> +			"Client is not open, abort l2 param change\n");
+>  		return;
+>  	}
+>  	memset(&params, 0, sizeof(params));
+> @@ -157,20 +158,19 @@ static void i40e_client_release_qvlist(struct
+> i40e_info *ldev)
+>=20
+>  /**
+>   * i40e_notify_client_of_netdev_close - call the client close
+> callback
+> - * @vsi: the VSI with netdev closed
+> + * @pf: PF device pointer
+>   * @reset: true when close called due to a reset pending
+>   *
+>   * If there is a client to this netdev, call the client with close
+>   **/
+> -void i40e_notify_client_of_netdev_close(struct i40e_vsi *vsi, bool
+> reset)
+> +void i40e_notify_client_of_netdev_close(struct i40e_pf *pf, bool
+> reset)
+>  {
+> -	struct i40e_pf *pf =3D vsi->back;
+>  	struct i40e_client_instance *cdev =3D pf->cinst;
+>=20
+>  	if (!cdev || !cdev->client)
+>  		return;
+>  	if (!cdev->client->ops || !cdev->client->ops->close) {
+> -		dev_dbg(&vsi->back->pdev->dev,
+> +		dev_dbg(&pf->pdev->dev,
+>  			"Cannot locate client instance close routine\n");
+>  		return;
+>  	}
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> index 2f1604ae78c7..7fed7fb69d4e 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -11283,14 +11283,12 @@ static void i40e_service_task(struct
+> work_struct *work)
+>  		i40e_fdir_reinit_subtask(pf);
+>  		if (test_and_clear_bit(__I40E_CLIENT_RESET, pf->state))
+> {
+>  			/* Client subtask will reopen next time through.
+> */
+> -			i40e_notify_client_of_netdev_close(pf->vsi[pf-
+> >lan_vsi],
+> -							   true);
+> +			i40e_notify_client_of_netdev_close(pf, true);
+>  		} else {
+>  			i40e_client_subtask(pf);
+>  			if (test_and_clear_bit(__I40E_CLIENT_L2_CHANGE,
+>  					       pf->state))
+> -				i40e_notify_client_of_l2_param_changes(
+> -								pf->vsi[pf-
+> >lan_vsi]);
+> +				i40e_notify_client_of_l2_param_changes(pf);
+>  		}
+>  		i40e_sync_filters_subtask(pf);
+>  	} else {
+> @@ -16228,7 +16226,7 @@ static void i40e_remove(struct pci_dev
+> *pdev)
+>  	/* Client close must be called explicitly here because the
+> timer
+>  	 * has been stopped.
+>  	 */
+> -	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi],
+> false);
+> +	i40e_notify_client_of_netdev_close(pf, false);
+>=20
+>  	i40e_fdir_teardown(pf);
+>=20
+> @@ -16487,7 +16485,7 @@ static void i40e_shutdown(struct pci_dev
+> *pdev)
+>  	/* Client close must be called explicitly here because the
+> timer
+>  	 * has been stopped.
+>  	 */
+> -	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi],
+> false);
+> +	i40e_notify_client_of_netdev_close(pf, false);
+>=20
+>  	if (test_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, pf->hw.caps)
+> &&
+>  	    pf->wol_en)
+> @@ -16541,7 +16539,7 @@ static int i40e_suspend(struct device *dev)
+>  	/* Client close must be called explicitly here because the
+> timer
+>  	 * has been stopped.
+>  	 */
+> -	i40e_notify_client_of_netdev_close(pf->vsi[pf->lan_vsi],
+> false);
+> +	i40e_notify_client_of_netdev_close(pf, false);
+>=20
+>  	if (test_bit(I40E_HW_CAP_WOL_MC_MAGIC_PKT_WAKE, pf->hw.caps)
+> &&
+>  	    pf->wol_en)
 > --
-> 2.17.1
->
->
+> 2.43.0
 
-
---=20
-Regards,
-Kalesh A P
-
---000000000000623bfb0614924afa
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
-
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBWowggRSoAMCAQICDDfBRQmwNSI92mit0zANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODI5NTZaFw0yNTA5MTAwODI5NTZaMIGi
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xHzAdBgNVBAMTFkthbGVzaCBBbmFra3VyIFB1cmF5aWwxMjAw
-BgkqhkiG9w0BCQEWI2thbGVzaC1hbmFra3VyLnB1cmF5aWxAYnJvYWRjb20uY29tMIIBIjANBgkq
-hkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxnv1Reaeezfr6NEmg3xZlh4cz9m7QCN13+j4z1scrX+b
-JfnV8xITT5yvwdQv3R3p7nzD/t29lTRWK3wjodUd2nImo6vBaH3JbDwleIjIWhDXLNZ4u7WIXYwx
-aQ8lYCdKXRsHXgGPY0+zSx9ddpqHZJlHwcvas3oKnQN9WgzZtsM7A8SJefWkNvkcOtef6bL8Ew+3
-FBfXmtsPL9I2vita8gkYzunj9Nu2IM+MnsP7V/+Coy/yZDtFJHp30hDnYGzuOhJchDF9/eASvE8T
-T1xqJODKM9xn5xXB1qezadfdgUs8k8QAYyP/oVBafF9uqDudL6otcBnziyDBQdFCuAQN7wIDAQAB
-o4IB5DCCAeAwDgYDVR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZC
-aHR0cDovL3NlY3VyZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJj
-YTIwMjAuY3J0MEEGCCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3Iz
-cGVyc29uYWxzaWduMmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcC
-ARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNV
-HR8EQjBAMD6gPKA6hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNp
-Z24yY2EyMDIwLmNybDAuBgNVHREEJzAlgSNrYWxlc2gtYW5ha2t1ci5wdXJheWlsQGJyb2FkY29t
-LmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGP
-zzAdBgNVHQ4EFgQUI3+tdStI+ABRGSqksMsiCmO9uDAwDQYJKoZIhvcNAQELBQADggEBAGfe1o9b
-4wUud0FMjb/FNdc433meL15npjdYWUeioHdlCGB5UvEaMGu71QysfoDOfUNeyO9YKp0h0fm7clvo
-cBqeWe4CPv9TQbmLEtXKdEpj5kFZBGmav69mGTlu1A9KDQW3y0CDzCPG2Fdm4s73PnkwvemRk9E2
-u9/kcZ8KWVeS+xq+XZ78kGTKQ6Wii3dMK/EHQhnDfidadoN/n+x2ySC8yyDNvy81BocnblQzvbuB
-a30CvRuhokNO6Jzh7ZFtjKVMzYas3oo6HXgA+slRszMu4pc+fRPO41FHjeDM76e6P5OnthhnD+NY
-x6xokUN65DN1bn2MkeNs0nQpizDqd0QxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYD
-VQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25h
-bFNpZ24gMiBDQSAyMDIwAgw3wUUJsDUiPdpordMwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcN
-AQkEMSIEIPvfbLoB88cUPyAcBj8mv4+Av7d69fIDzK87vPksKerNMBgGCSqGSIb3DQEJAzELBgkq
-hkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MDMyNjE1NTMyNVowaQYJKoZIhvcNAQkPMVwwWjAL
-BglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG
-9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQDCl/+kPbpa
-h7G0xhk1qBWELRmmjNcgr1OjFmyRunJ/0yQsfeHk1LPbRZhMVC7bZzM5OpahULZ340gUDr+lpcA1
-MFf2EFPH6dH1XUv6DgtZbXwV3v24msgx6CxlbttMT+22leRgb4dn9jnHaeNBPeCRb2D7LAaHzjDo
-uHj4cFN3e3IL3LvCrUsdLgdCmW+hNgJ3+r9yCGVzP5cU1pDrUP/W9/6CPxZP8UnpVkleARli/d9o
-pva3iYbfVATu2OWeLEemCbj9wd7rqYDFS6h2MahMNxdnNWh8x3pTOczqBGLUDSe1WKeeM7JbJxFB
-h4h3PTeUc5hom8P/+jikVzAhYOpn
---000000000000623bfb0614924afa--
 
