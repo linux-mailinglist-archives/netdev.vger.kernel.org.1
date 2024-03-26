@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-82289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15F9288D146
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 23:41:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E23A88D14A
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 23:41:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7AAD2B23638
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:41:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5454B26449
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:41:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029AA13E02F;
-	Tue, 26 Mar 2024 22:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14EFF13E406;
+	Tue, 26 Mar 2024 22:40:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tmbfHnWP"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="niUVsVHK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B451313D8B2;
-	Tue, 26 Mar 2024 22:39:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67A813E021;
+	Tue, 26 Mar 2024 22:40:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711492783; cv=none; b=qYuqV3xWW3HXGh34Nfm04xZaUGTPJdTls2k/x81fGWzdVUeHUvfO6aBpsl7Ryo9KF5wwUWQSs82ubWCW4dsY5NFv/OVjOSiilOIfSv9qFyu2E40XZ+GvatMfp6+nhlu0W3gLzcttyqdsQTRiznac/Y1ZHiNTTW88tB8vA+Hpecw=
+	t=1711492800; cv=none; b=IyaCnX9AkTqakZF12f4/QEArm1V2DnqShkP2km+dS33QG7LEyuzUxWN9yq646Km8Z0Yhvr7sp5a+oNWD79iHDn9iXBZKvJE6z6OGQBTTMRX7RpKn3Wm8sjicQyV1LiretduXldE4JvPDQ1ATNkyz09N6l9zg7bCx/ssyOmkb5pk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711492783; c=relaxed/simple;
-	bh=F1tdxK6zhURX1XJa26Hj4NTFjwVssRlwDIPa82U+7Bs=;
+	s=arc-20240116; t=1711492800; c=relaxed/simple;
+	bh=lulGfl/VARvXl3v+IQINE9T8HFeaXr5b7miTjpnKPBo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GXu9h8AZaPMalcE7gbRiN5vT29EMNfItd/n0SZrTrFq1q0D8822jtBIG7jibmmNVQRhD/uelmHQV25OWMIguVC7iqW1npZk4aQxCLUtfu5wfyg8lq1LUSvMhCWxTDhhYdBMnMWaeJW9D7+ru/IrDWIrNPSIHeNvZeBo2cfFdd9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tmbfHnWP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE7F5C433C7;
-	Tue, 26 Mar 2024 22:39:39 +0000 (UTC)
+	 MIME-Version; b=aYRPBKlR55ue5TLUGjnBVE1jxa7Xv+6WEU0CLEF+ZGlOhYtE72gnzoDt9gD8LxRJ2H0iiUNi4roFk1zDEjknDyfOLUOKPKS11KXimBwiRg6lcQkx2Vk7B7iWXYtFLvlzs67ktYLIUsVUiW9gGLYEpXljbvrLPj2bG8m6sl+SLac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=niUVsVHK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71FEBC433C7;
+	Tue, 26 Mar 2024 22:39:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711492783;
-	bh=F1tdxK6zhURX1XJa26Hj4NTFjwVssRlwDIPa82U+7Bs=;
+	s=k20201202; t=1711492800;
+	bh=lulGfl/VARvXl3v+IQINE9T8HFeaXr5b7miTjpnKPBo=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=tmbfHnWPYV61Wv5iJoz7qdwrUEHhqEB2TZlr+P4RRDVAYgR6Nr/hl2wuXKgNBL69l
-	 T7Xxg4TYS4ANY2Ynz3yB2yl8CwY+YBN811GkOiH+8PnxmYpSj4YxykOrWs2v0PBxhH
-	 KbDjYSxvhYF/hxF5hmZ/9vbIUKqV6GZlnmxDMeLWYHBeQaFo5zhuV4ufReW5oXHLRs
-	 iSRCp7D4mUt9ukgZ4RHoZoQiHmTokGfajcZaKawN5oJ8Pq9+A56JIheUGJDhLLSAGR
-	 xlMuJniJZpuZvgowiLjFneTAqJ7NlJVshD7RJjwSUGPuUfKKYOvyKZ/IwC6whf469l
-	 MijLyYiwgnU5Q==
+	b=niUVsVHKc3NZHc+8bduQh4f+aNkZPxgGbbD/cp6isZmq1TLeongbEUIco/kjnVt4w
+	 vrcNPIFu1AXIefydV9FNMA85yIawUajQw4k+GVHqaRrM7sLk34fxC8PhMqn8zjPjon
+	 Rvl0Yo4kcCNjUZ9dH+6oF++f+v39DMtxPzVXQfgmjT045TQ9zYUPXioxybMsAynosm
+	 NrWCVpBujF9x8mXOInpLI1ROZ3A+ALXRjiJE0QikPWDETejt3OrZ5Xl6+UGQ3Dy6GX
+	 Juc0uFFkx6qC3xK5BAjJBHy5fiq2zDKL3B6YNW+SF514M+hngUaYRuaQ1LmV9WSQdK
+	 E6vkxMGcrXDBg==
 From: Arnd Bergmann <arnd@kernel.org>
 To: llvm@lists.linux.dev,
-	Ariel Elior <aelior@marvell.com>,
-	Manish Chopra <manishc@marvell.com>
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>
 Cc: Arnd Bergmann <arnd@arndb.de>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
@@ -54,14 +54,16 @@ Cc: Arnd Bergmann <arnd@arndb.de>,
 	Nick Desaulniers <ndesaulniers@google.com>,
 	Bill Wendling <morbo@google.com>,
 	Justin Stitt <justinstitt@google.com>,
-	Simon Horman <horms@kernel.org>,
-	Konstantin Khorenko <khorenko@virtuozzo.com>,
-	Sudarsana Reddy Kalluru <sudarsana.kalluru@cavium.com>,
+	Vlad Buslov <vladbu@nvidia.com>,
+	Roi Dayan <roid@nvidia.com>,
+	Maor Dickman <maord@nvidia.com>,
+	Gal Pressman <gal@nvidia.com>,
 	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH 3/9] qed: avoid truncating work queue length
-Date: Tue, 26 Mar 2024 23:38:02 +0100
-Message-Id: <20240326223825.4084412-4-arnd@kernel.org>
+Subject: [PATCH 4/9] mlx5: avoid truncating error message
+Date: Tue, 26 Mar 2024 23:38:03 +0100
+Message-Id: <20240326223825.4084412-5-arnd@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20240326223825.4084412-1-arnd@kernel.org>
 References: <20240326223825.4084412-1-arnd@kernel.org>
@@ -75,49 +77,31 @@ Content-Transfer-Encoding: 8bit
 
 From: Arnd Bergmann <arnd@arndb.de>
 
-clang complains that the temporary string for the name passed into
-alloc_workqueue() is too short for its contents:
+clang warns that one error message is too long for its destination buffer:
 
-drivers/net/ethernet/qlogic/qed/qed_main.c:1218:3: error: 'snprintf' will always be truncated; specified size is 16, but format string expands to at least 18 [-Werror,-Wformat-truncation]
+drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c:1876:4: error: 'snprintf' will always be truncated; specified size is 80, but format string expands to at least 94 [-Werror,-Wformat-truncation-non-kprintf]
 
-There is no need for a temporary buffer, and the actual name of a workqueue
-is 32 bytes (WQ_NAME_LEN), so just use the interface as intended to avoid
-the truncation.
+Reword it to be a bit shorter so it always fits.
 
-Fixes: 59ccf86fe69a ("qed: Add driver infrastucture for handling mfw requests.")
+Fixes: 70f0302b3f20 ("net/mlx5: Bridge, implement mdb offload")
 Signed-off-by: Arnd Bergmann <arnd@arndb.de>
 ---
- drivers/net/ethernet/qlogic/qed/qed_main.c | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_main.c b/drivers/net/ethernet/qlogic/qed/qed_main.c
-index c278f8893042..8159b4c315b5 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_main.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_main.c
-@@ -1206,7 +1206,6 @@ static void qed_slowpath_task(struct work_struct *work)
- static int qed_slowpath_wq_start(struct qed_dev *cdev)
- {
- 	struct qed_hwfn *hwfn;
--	char name[NAME_SIZE];
- 	int i;
- 
- 	if (IS_VF(cdev))
-@@ -1215,11 +1214,11 @@ static int qed_slowpath_wq_start(struct qed_dev *cdev)
- 	for_each_hwfn(cdev, i) {
- 		hwfn = &cdev->hwfns[i];
- 
--		snprintf(name, NAME_SIZE, "slowpath-%02x:%02x.%02x",
--			 cdev->pdev->bus->number,
--			 PCI_SLOT(cdev->pdev->devfn), hwfn->abs_pf_id);
-+		hwfn->slowpath_wq = alloc_workqueue("slowpath-%02x:%02x.%02x",
-+					 0, 0, cdev->pdev->bus->number,
-+					 PCI_SLOT(cdev->pdev->devfn),
-+					 hwfn->abs_pf_id);
- 
--		hwfn->slowpath_wq = alloc_workqueue(name, 0, 0);
- 		if (!hwfn->slowpath_wq) {
- 			DP_NOTICE(hwfn, "Cannot create slowpath workqueue\n");
- 			return -ENOMEM;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
+index 1b9bc32efd6f..c5ea1d1d2b03 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
+@@ -1874,7 +1874,7 @@ int mlx5_esw_bridge_port_mdb_add(struct net_device *dev, u16 vport_num, u16 esw_
+ 				 "Failed to lookup bridge port vlan metadata to create MDB (MAC=%pM,vid=%u,vport=%u)\n",
+ 				 addr, vid, vport_num);
+ 			NL_SET_ERR_MSG_FMT_MOD(extack,
+-					       "Failed to lookup bridge port vlan metadata to create MDB (MAC=%pM,vid=%u,vport=%u)\n",
++					       "Failed to lookup vlan metadata for MDB (MAC=%pM,vid=%u,vport=%u)\n",
+ 					       addr, vid, vport_num);
+ 			return -EINVAL;
+ 		}
 -- 
 2.39.2
 
