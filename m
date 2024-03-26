@@ -1,50 +1,58 @@
-Return-Path: <netdev+bounces-82000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B78588C0A8
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:30:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C40D588C0CE
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:36:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8A5C0B231D9
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:30:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 017371C3670E
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:36:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81D8255787;
-	Tue, 26 Mar 2024 11:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55B3476047;
+	Tue, 26 Mar 2024 11:34:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GdoWeBba"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XKAuRnIB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DB9254911
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 11:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3278658205
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 11:34:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711452629; cv=none; b=OUR1SBNrivG1XJMeyaCHmFbp6wBvp17YRzzmXOQD8C9wkabGAMQb1hIixYRnG1KYrWn3KQObCSGEYVzdbvKrO2eyXKX3GxrQojsNBRh+6ZNzbgKDlCKcc280ffg4BRdgtReaHlkH/odxch+m9DyNcvEXu1ws5u7FnwH0ekTkRYE=
+	t=1711452847; cv=none; b=o/n3UR5ayxyF4kO1dUSOjGC0z16pKy8y/nOhDT/s8+Z7KXs2EzJMZ1lhvog1a8RlXe3ig+4y+Jq08Pk7n/npdLzIYYO5dMfU5YywsBl8oetV/XZ49IK2IYiLfCJbaRbTlof2R6cdyBYAyqZkM9c1nDsFwY2vjirTsCQlP0OYSOQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711452629; c=relaxed/simple;
-	bh=pNzuutPYocGa/VGVc10Do0k8DJm+idqgUki5Q+34L6o=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dMflm48JhvJLi7k8SkVuMrPiPvW1QrrD0+vu4ciCmeedu6438o699QrImOHFdP7w3gZIeE74RgmfdMxl7My9ncm/yzumlvuvP/mZth9xSAeK4vtTHHDiNTjk/3P7ys5GafhkNVfb47vZtqka3eYAcFo2UrpL649kkTGemHwGLdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GdoWeBba; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 30073C43390;
-	Tue, 26 Mar 2024 11:30:29 +0000 (UTC)
+	s=arc-20240116; t=1711452847; c=relaxed/simple;
+	bh=S7EqxVktKtaOn2Nfok92MLk7D6p3oHosGgcOUuPrNxA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=IkS5cRwteVUAbkfXsT9bsGT2EbT0vLpNBAhrGuRfDAPaf12/2JtI85rxizVSoiMD9iYvWFG7Pa3kNFE3ugshu7NP9TgXKJTYD5ZLALXga4DGKRToK3WHvhVceEK61SUDPoky8tWzNCAz5/kCvoiX3dLzaDZEMzVJd/lUweCeZos=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XKAuRnIB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27668C433F1;
+	Tue, 26 Mar 2024 11:34:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711452629;
-	bh=pNzuutPYocGa/VGVc10Do0k8DJm+idqgUki5Q+34L6o=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GdoWeBbat4FFKOfZyIcGtcOGUuFKXYk+l1Til6KdyjTtPHl4Vk3dLulWkyJZfK1kf
-	 ytKdW5oO40ESuGXHtD2Cqb7x7oMasluUplT/XxrIaQEndAqyJxkmRy+rwn9Jn8vlwR
-	 a5cj5QLCSauBL0vt4X+yqQHKTYAxgxKuDJsED8WR8eFI4oBPGkGkQdN7kPXAL9qimb
-	 g9Bjapj0UExmtMH4XLCt51VRPWF2spxHLcBXsnUk+Ckf1SfQq4bnHsiPWUPej+ZsNH
-	 01G6ep/xYA1YhLLPhKAOzS90BEhQaM6bfzYLaKwz05Xa/LUJ47OKscosR/r9LvVBPS
-	 O4qIVFF6cWvhw==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1C9CAD95062;
-	Tue, 26 Mar 2024 11:30:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1711452846;
+	bh=S7EqxVktKtaOn2Nfok92MLk7D6p3oHosGgcOUuPrNxA=;
+	h=From:To:Cc:Subject:Date:From;
+	b=XKAuRnIB6TB/mOYqcxd2zYW+rhD3cenYrdWDUrB++4rMvZd1UO8CY1PUI72CE9jAe
+	 3J+zszqGtXvR2zFfsPOi8HK9b0SbkARONd4I3W2iIYPgjVQp6tHuKeX9SrAHpqBJk1
+	 0dKbQPxcVRNF6d9Dsjqwca5ZZi0CvlUUADx9oXwKGaZAg71tnf1zWGIz6YVVHR7Bvw
+	 m+Gd08zenY4UpLLIR+OhGOk/flOIs1f/4xtGQmt9sVdRPkW3CcKYupu9jAq3uFXpSY
+	 /zKqDaPIAng4iuedREIrjnPTS1so55B/yAi2HqLlQPJxsTpHLUWHQte4+Vdpv89ZE3
+	 32oN3ikuLS3Qw==
+From: Antoine Tenart <atenart@kernel.org>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com
+Cc: Antoine Tenart <atenart@kernel.org>,
+	steffen.klassert@secunet.com,
+	willemdebruijn.kernel@gmail.com,
+	netdev@vger.kernel.org
+Subject: [PATCH net v4 0/5] gro: various fixes related to UDP tunnels
+Date: Tue, 26 Mar 2024 12:33:57 +0100
+Message-ID: <20240326113403.397786-1-atenart@kernel.org>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,50 +60,77 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v6 net-next 0/4] net: Provide SMP threads for backlog NAPI
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <171145262911.30090.18130373990794866304.git-patchwork-notify@kernel.org>
-Date: Tue, 26 Mar 2024 11:30:29 +0000
-References: <20240325074943.289909-1-bigeasy@linutronix.de>
-In-Reply-To: <20240325074943.289909-1-bigeasy@linutronix.de>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, hawk@kernel.org, pabeni@redhat.com, tglx@linutronix.de,
- wander@redhat.com, yan@cloudflare.com
 
-Hello:
+Hello,
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+We found issues when a UDP tunnel endpoint is in a different netns than
+where UDP GRO happens. This kind of setup is actually quite diverse,
+from having one leg of the tunnel on a remove host, to having a tunnel
+between netns (eg. being bridged in another one or on the host). In our
+case that UDP tunnel was geneve.
 
-On Mon, 25 Mar 2024 08:40:27 +0100 you wrote:
-> The RPS code and "deferred skb free" both send IPI/ function call
-> to a remote CPU in which a softirq is raised. This leads to a warning on
-> PREEMPT_RT because raising softiqrs from function call led to undesired
-> behaviour in the past. I had duct tape in RT for the "deferred skb free"
-> and Wander Lairson Costa reported the RPS case.
-> 
-> This series only provides support for SMP threads for backlog NAPI, I
-> did not attach a patch to make it default and remove the IPI related
-> code to avoid confusion. I can post it for reference it asked.
-> 
-> [...]
+UDP tunnel packets should not be GROed at the UDP level. The fundamental
+issue here is such packet can't be detected in a foolproof way: we can't
+know by looking at a packet alone and the current logic of looking up
+UDP sockets is fragile (socket could be in another netns, packet could
+be modified in between, etc). Because there is no way to make the GRO
+code to correctly handle those packets in all cases, this series aims at
+two things: making the net stack to correctly behave (as in, no crash
+and no invalid packet) when such thing happens, and in some cases to
+prevent this "early GRO" from happening.
 
-Here is the summary with links:
-  - [v6,net-next,1/4] net: Remove conditional threaded-NAPI wakeup based on task state.
-    https://git.kernel.org/netdev/net-next/c/56364c910691
-  - [v6,net-next,2/4] net: Allow to use SMP threads for backlog NAPI.
-    https://git.kernel.org/netdev/net-next/c/dad6b9770263
-  - [v6,net-next,3/4] net: Use backlog-NAPI to clean up the defer_list.
-    https://git.kernel.org/netdev/net-next/c/80d2eefcb4c8
-  - [v6,net-next,4/4] net: Rename rps_lock to backlog_lock.
-    https://git.kernel.org/netdev/net-next/c/765b11f8f4e2
+First three patches fix issues when an "UDP tunneled" packet is being
+GROed too early by rx-udp-gro-forwarding or rx-gro-list.
 
-You are awesome, thank you!
+Last patch is preventing locally generated UDP tunnel packets from being
+GROed. This turns out to be more complex than this patch alone as it
+relies on skb->encapsulation which is currently untrusty in some cases
+(see iptunnel_handle_offloads); but that should fix things in practice
+and is acceptable for a fix. Future work is required to improve things
+(prevent all locally generated UDP tunnel packets from being GROed),
+such as fixing the misuse of skb->encapsulation in drivers; but that
+would be net-next material.
+
+Thanks!
+Antoine
+
+Since v3:
+  - Fixed the udpgro_fwd selftest in patch 5 (Jakub Kicinski feedback).
+  - Improved commit message on patch 3 (Willem de Bruijn feeback).
+
+Since v2:
+  - Fixed a build issue with IPv6=m in patch 1 (Jakub Kicinski
+    feedback).
+  - Fixed typo in patch 1 (Nikolay Aleksandrov feedback).
+  - Added Reviewed-by tag on patch 2 (Willem de Bruijn feeback).
+  - Added back conversion to CHECKSUM_UNNECESSARY but only from non
+    CHECKSUM_PARTIAL in patch 3 (Paolo Abeni & Willem de Bruijn
+    feeback).
+  - Reworded patch 3 commit msg.
+
+Since v1:
+  - Fixed a build issue with IPv6 disabled in patch 1.
+  - Reworked commit log in patch 2 (Willem de Bruijn feedback).
+  - Added Reviewed-by tags on patches 1 & 4 (Willem de Bruijn feeback).
+
+Antoine Tenart (5):
+  udp: do not accept non-tunnel GSO skbs landing in a tunnel
+  gro: fix ownership transfer
+  udp: do not transition UDP GRO fraglist partial checksums to
+    unnecessary
+  udp: prevent local UDP tunnel packets from being GROed
+  selftests: net: gro fwd: update vxlan GRO test expectations
+
+ include/linux/udp.h                       | 28 +++++++++++++++++++++++
+ net/core/gro.c                            |  3 ++-
+ net/ipv4/udp.c                            |  7 ++++++
+ net/ipv4/udp_offload.c                    | 23 +++++++++++--------
+ net/ipv6/udp.c                            |  2 +-
+ net/ipv6/udp_offload.c                    |  8 +------
+ tools/testing/selftests/net/udpgro_fwd.sh | 10 ++------
+ 7 files changed, 54 insertions(+), 27 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.44.0
 
 
