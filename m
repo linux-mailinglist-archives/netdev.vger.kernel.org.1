@@ -1,315 +1,176 @@
-Return-Path: <netdev+bounces-82222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9D6188CB93
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 19:08:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF97488CBFD
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 19:29:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31A9EB230E0
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 18:08:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34B7E1F83703
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 18:29:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10BBA8662C;
-	Tue, 26 Mar 2024 18:08:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162108662C;
+	Tue, 26 Mar 2024 18:29:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="YBE5bhAN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ISB0jyMT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DEEB1B59A
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 18:08:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DE4C53387
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 18:29:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711476504; cv=none; b=MC3fqK6cHpjRUnspwAvvuxoqYbSitaIx43nnUU7tluvHAodVieBkuFwRubOTRxUtdlRGpOJny9rx4LkteHXyOL9aQ/BuuUCBs/9RhZo5VI1cporqK8iH4DEoxlLjYO4fqWLsEPEyOsyNiPKdzYgIHMDPRLIMnn1fnUsQCiM8ry8=
+	t=1711477758; cv=none; b=tMcsHPSvFl11dwlU+PkXZzSPujbOlvXrBoFb/1RHJAqXlEbORSccRnwZHMmuAwI3wDahMIQdyrU8BNhyHEQ7EV5nLwplP7dMGIQPETXuNemuEozJdvJnQrB44dExpcAK7E/H7joEDy3QJlYeS7B/CatXn0lEgir2xmKdgtJToi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711476504; c=relaxed/simple;
-	bh=gQivpQXQ1i5VWKCld7cyvCzkisXrBvr46LNSzeN1xpA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dvUSm4+uSMqVmzkaQmMHvHv3RwhohwUvKc4fX8Q8CTG61QOj2bXWuiABzrzS0D+qX2YL6EIHWoMYj4McqCt/esX3kMwFP4wgU72lNwI+56/UTuk0Y8mM5SlKPzHMtDqPThGB6VubQiYPxyDm2WGz1GEe1O7yxK+Gj5wyA61BNrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=YBE5bhAN; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-56c2cfdd728so1914a12.1
-        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 11:08:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1711476500; x=1712081300; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v9Fih/+9PDXO+qntssbstbtSjBYLkHwpt/fkCd1ZUos=;
-        b=YBE5bhANEFtaOxTv6lFe+afHh1voRYlOegybUpRWrQCBa8isVbBJYaDyiA6Ss19ZF9
-         MTBIzNp4yo3w77ejHdMhCMSyq84//OUAeQyHhy9L8wGDpnTgZfRHkhoc8WlBrwWmpmGB
-         /A4FB2YLJWCxrV5dy3NA28yhjNreCtsXRaObJPRJpfG1ywE74HGj8aIXbml8TGmalPXp
-         tfSCvMIXaWkSc3g6hCgIYEy1zYb7w2dDJRyOKPGx9A8enzuVmqiR6dCdQMDcLt2++D2L
-         t250h9PaabG4Cs/tLEkX8zIMxtit6WDrPm6YShupScrWQ59p1EBOgin7N2yQUgXUOUI3
-         Y8Bg==
+	s=arc-20240116; t=1711477758; c=relaxed/simple;
+	bh=lfuOzSJMbB9qmGdebpJmJCCw2xjCLpe1okomkp6s8+s=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=PxzlbcvToiqPJf4Vs5rYwf8+agG4GJNoscoivk++DwW4gtcdKQtFc8ckoS9zuVjNPR7JPJfG1fHnHL39TLUaPZvqxH0YsOByW0Prclaa372trIw1saklEnTyCGU1xI4l9ch911Rt+8zKTpBcPOw4unIxlBatvh/T41FZmbmCJZ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ISB0jyMT; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1711477755;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:autocrypt:autocrypt;
+	bh=aWFgiiWydJuIrRjsef8kQtkxE3sDrXNTbprmM0pc3QE=;
+	b=ISB0jyMT7jqDNHK3wrF2R7rjJM/khhag29g7tMB6gU+Bqmr+2ef+bltWarj2QDSPhOSD8m
+	Cw3JOXvEToKQcKvhR8HI1hYLp29/xp2huuxd5+HqinT00h7b7I6AiWM8tpOltv2Jf2+kdi
+	wjrcIyAue8NbOeQaPO70Jcjl++J8xWM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-295-pbDeKdO1MDKcCElOZS-blA-1; Tue, 26 Mar 2024 14:29:13 -0400
+X-MC-Unique: pbDeKdO1MDKcCElOZS-blA-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-33ecafa5d4dso1129278f8f.1
+        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 11:29:13 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711476500; x=1712081300;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v9Fih/+9PDXO+qntssbstbtSjBYLkHwpt/fkCd1ZUos=;
-        b=VFJHn1zOwTxYETfnWslE6iFTFCu27HTBD6OWpi2uu7Mg/kMYaK7aCnA0svpNZcg3kE
-         PCmgVkEXtH6PHK3hEp88ItE5SA0bD2RDaF5BWwhInQ9+LyKgMy1613y/c+6rUPOy+nfK
-         ZVMP3rvx5+bQETXIzorc28lEdytfjv9xt9c52NJ6KGl/Oeyc41L3RAdxV5wjOKFuT5ss
-         FHJLARm8y0WPhANTGnDRGnRZX+G7XAbr6x7rY/MIM44nQ91KTBZvPUW0tH0G5ze8H/KA
-         8I5Vvc6AhUkUeoTvAMtfjjkuRpMMD1VXSbk6/kF0P7eRPQ9PRxU+Nhb5kPGPmhfRbfX9
-         HFKw==
-X-Forwarded-Encrypted: i=1; AJvYcCXr/SNd9wX/GPHmIRe+73rtupp9l6papU+1bkkpOH4NhefaArYoh5+M3czSd9B3NGUHkPtqMfxDBYPYi+HYzWNwQZp9r0mA
-X-Gm-Message-State: AOJu0YxbQEWJMWQ0DCRscphkGp/e29Cr7D4s8SMs3V/+HDs1oin6TdZG
-	ObK7ybCwAVUmHX3c40n2MmFO0LbG2SzSc5tpjr/h6Te4gavOMiJ9Er8ZNV3R8Doa3/BlXq7s5Xs
-	kHMPxjtJ9COwVw3GZQHOCRHu06DOTg2tzubdC
-X-Google-Smtp-Source: AGHT+IH0Dy3ilgzfG2eqeM1W2dis2G2NR8sjFcX61Ee0XDx+7jWdenJffz4htuJPh9tF8qH0AJUGDO57EmIE2Jk6uYU=
-X-Received: by 2002:a50:fc02:0:b0:56c:18df:f9e1 with SMTP id
- i2-20020a50fc02000000b0056c18dff9e1mr3186edr.5.1711476500214; Tue, 26 Mar
- 2024 11:08:20 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711477752; x=1712082552;
+        h=mime-version:user-agent:content-transfer-encoding:autocrypt
+         :references:in-reply-to:date:cc:to:from:subject:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=aWFgiiWydJuIrRjsef8kQtkxE3sDrXNTbprmM0pc3QE=;
+        b=M55ZB9QzcWQfRrMA6INnwu0kTO5J3tGxbywTf1OEwDg1Cqeyw7a7nBflQrTXdRShOi
+         r23I4q7/C6pxc34wHvTxQFxtjDWsbkH6VgVLHZ1JEKbawbc1NoCh1jPz0lIX4cDV1iem
+         RLms/lWjsqzohWGXyLLgNig3qrrimue5nMaKjqe/S9i/deljKB/L4pbbHcg59clHKZ68
+         +vmTFZdJ7A3NdzfBPhk+zifTF7WmoDxc2Qo/ZbTzguTo2iyqSVdg96bOXqXpFU/M/VgN
+         9FBHR3q+f5ALQe4PrG1MIcoxFWvcKcGFixXaqQUjV074aiCF9dZsP1Tw3aL6flkSu/nu
+         dfsw==
+X-Forwarded-Encrypted: i=1; AJvYcCWvim64JazBVEcbJ5fc1l3vVavn7SuVBSeFnbrNrVbfka96tIlr+vLDE5UFIWq+Jh55yr057I2duwX0FhytvY5G+cC+FwvG
+X-Gm-Message-State: AOJu0Yzt1pvXrjTbKKmrsxJ8hU2Jq+ugQnH7dGDu1+qCAidzM0PZ8EO5
+	3K0jx8md5Ml2nsgt9fFBpflxuUHBd28VH2zu6lVpYD2+o5hB2h8px0+fmLrG5uT5BuOUEHdXAmx
+	uLZ+t0u8+wicnyf8vIF/ClnToCW7ZwEz3zcU6fUkinMSF7XRG440yw9JncrzA2g==
+X-Received: by 2002:adf:a4d1:0:b0:33d:9e15:12bf with SMTP id h17-20020adfa4d1000000b0033d9e1512bfmr7532508wrb.3.1711477752071;
+        Tue, 26 Mar 2024 11:29:12 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHI4yFMUfLprIEZjUyrpFu496BsxlGIaBa9N7TMoHELMBTmiDo8FUR8QHJimD/76oC/qKpXaQ==
+X-Received: by 2002:adf:a4d1:0:b0:33d:9e15:12bf with SMTP id h17-20020adfa4d1000000b0033d9e1512bfmr7532497wrb.3.1711477751685;
+        Tue, 26 Mar 2024 11:29:11 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-229-159.dyn.eolo.it. [146.241.229.159])
+        by smtp.gmail.com with ESMTPSA id h18-20020a5d4312000000b00341bdd87fcasm10622402wrq.103.2024.03.26.11.29.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Mar 2024 11:29:11 -0700 (PDT)
+Message-ID: <9f3509a7134f7e2dfd633ea62d24815e12b1f482.camel@redhat.com>
+Subject: Re: [PATCH net-next v4 4/4] net: gro: move L3 flush checks to
+ tcp_gro_receive
+From: Paolo Abeni <pabeni@redhat.com>
+To: Richard Gobert <richardbgobert@gmail.com>, Eric Dumazet
+	 <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, willemdebruijn.kernel@gmail.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org
+Date: Tue, 26 Mar 2024 19:29:09 +0100
+In-Reply-To: <57bf675d-c2f0-4022-845c-166891e336be@gmail.com>
+References: <20240325182543.87683-1-richardbgobert@gmail.com>
+	 <20240325182543.87683-5-richardbgobert@gmail.com>
+	 <CANn89iKzeTKuBA3NL0DQUmUHmmc0QzZ0X62DUarZ2Q7cKRZvSA@mail.gmail.com>
+	 <46e0c775-91e7-4bf6-88f3-53ab5e00414f@gmail.com>
+	 <CANn89iJkDbzLKmUGRHNFpfiaO8z19i44qgqkBA9Updt4QsRkyg@mail.gmail.com>
+	 <6566fd5f-fcdf-4dc7-b8a2-5e8a182f8c49@gmail.com>
+	 <d60c6185b8394da02479100981fa3f1306d9c81f.camel@redhat.com>
+	 <57bf675d-c2f0-4022-845c-166891e336be@gmail.com>
+Autocrypt: addr=pabeni@redhat.com; prefer-encrypt=mutual; keydata=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
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240322122407.1329861-1-edumazet@google.com> <171111663201.19374.16295682760005551863.git-patchwork-notify@kernel.org>
- <CAADnVQJy+0=6ZuAz-7dwOPK3sN2QrPiAcxhtojh8p65j0TRNhg@mail.gmail.com>
- <CANn89iLSOeFGNogYMHbeLRC5kOwwArMz3d5_2hZmBn6fibyUhw@mail.gmail.com>
- <CAADnVQ+OhsBetPT0avuNVsEwru13UtMjX1U_6_u6xROXBBn-Yg@mail.gmail.com>
- <ZgGmQu09Z9xN7eOD@google.com> <d9531955-06ad-ccdd-d3d0-4779400090ba@iogearbox.net>
- <CANn89iJFOR5ucef0bH=BTKrLOAGsUtF8tM=cYNDTg+=gHDntvw@mail.gmail.com>
- <CANn89iKZ0126qzvpm0bPP7O+M95hcGWKp_HPg+M7vgdDHr0u0A@mail.gmail.com> <3050c54d-3b3c-53b0-6004-fa11caca27b6@iogearbox.net>
-In-Reply-To: <3050c54d-3b3c-53b0-6004-fa11caca27b6@iogearbox.net>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 26 Mar 2024 19:08:06 +0100
-Message-ID: <CANn89iK25-UnBaz_=15SCZKzAmh2-vgMhfStv5GqFg=95VJE+A@mail.gmail.com>
-Subject: Re: [PATCH net] bpf: Don't redirect too small packets
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Stanislav Fomichev <sdf@google.com>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
-	Guillaume Nault <gnault@redhat.com>, patchwork-bot+netdevbpf@kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Andrii Nakryiko <andrii@kernel.org>, Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Eric Dumazet <eric.dumazet@gmail.com>, 
-	syzbot+9e27778c0edc62cb97d8@syzkaller.appspotmail.com, 
-	Willem de Bruijn <willemb@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Mar 26, 2024 at 6:57=E2=80=AFPM Daniel Borkmann <daniel@iogearbox.n=
-et> wrote:
->
-> On 3/26/24 2:38 PM, Eric Dumazet wrote:
-> > On Tue, Mar 26, 2024 at 2:37=E2=80=AFPM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> >> On Tue, Mar 26, 2024 at 1:46=E2=80=AFPM Daniel Borkmann <daniel@iogear=
-box.net> wrote:
-> >>> On 3/25/24 5:28 PM, Stanislav Fomichev wrote:
-> >>>> On 03/25, Alexei Starovoitov wrote:
-> >>>>> On Mon, Mar 25, 2024 at 6:33=E2=80=AFAM Eric Dumazet <edumazet@goog=
-le.com> wrote:
-> >>>>>> On Sat, Mar 23, 2024 at 4:02=E2=80=AFAM Alexei Starovoitov
-> >>>>>> <alexei.starovoitov@gmail.com> wrote:
-> >>>>>>> On Fri, Mar 22, 2024 at 7:10=E2=80=AFAM <patchwork-bot+netdevbpf@=
-kernel.org> wrote:
-> >>>>>>>>
-> >>>>>>>> Hello:
-> >>>>>>>>
-> >>>>>>>> This patch was applied to bpf/bpf.git (master)
-> >>>>>>>> by Daniel Borkmann <daniel@iogearbox.net>:
-> >>>>>>>>
-> >>>>>>>> On Fri, 22 Mar 2024 12:24:07 +0000 you wrote:
-> >>>>>>>>> Some drivers ndo_start_xmit() expect a minimal size, as shown
-> >>>>>>>>> by various syzbot reports [1].
-> >>>>>>>>>
-> >>>>>>>>> Willem added in commit 217e6fa24ce2 ("net: introduce device min=
-_header_len")
-> >>>>>>>>> the missing attribute that can be used by upper layers.
-> >>>>>>>>>
-> >>>>>>>>> We need to use it in __bpf_redirect_common().
-> >>>>>>>
-> >>>>>>> This patch broke empty_skb test:
-> >>>>>>> $ test_progs -t empty_skb
-> >>>>>>>
-> >>>>>>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
-> >>>>>>> [redirect_ingress] unexpected ret: veth ETH_HLEN+1 packet ingress
-> >>>>>>> [redirect_ingress]: actual -34 !=3D expected 0
-> >>>>>>> test_empty_skb:PASS:err: veth ETH_HLEN+1 packet ingress [redirect=
-_egress] 0 nsec
-> >>>>>>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
-> >>>>>>> [redirect_egress] unexpected ret: veth ETH_HLEN+1 packet ingress
-> >>>>>>> [redirect_egress]: actual -34 !=3D expected 1
-> >>>>>>>
-> >>>>>>> And looking at the test I think it's not a test issue.
-> >>>>>>> This check
-> >>>>>>> if (unlikely(skb->len < dev->min_header_len))
-> >>>>>>> is rejecting more than it should.
-> >>>>>>>
-> >>>>>>> So I reverted this patch for now.
-> >>>>>>
-> >>>>>> OK, it seems I missed __bpf_rx_skb() vs __bpf_tx_skb(), but even i=
-f I
-> >>>>>> move my sanity test in __bpf_tx_skb(),
-> >>>>>> the bpf test program still fails, I am suspecting the test needs t=
-o be adjusted.
-> >>>>>>
-> >>>>>> diff --git a/net/core/filter.c b/net/core/filter.c
-> >>>>>> index 745697c08acb3a74721d26ee93389efa81e973a0..e9c0e2087a08f1d8af=
-d2c3e8e7871ddc9231b76d
-> >>>>>> 100644
-> >>>>>> --- a/net/core/filter.c
-> >>>>>> +++ b/net/core/filter.c
-> >>>>>> @@ -2128,6 +2128,12 @@ static inline int __bpf_tx_skb(struct
-> >>>>>> net_device *dev, struct sk_buff *skb)
-> >>>>>>                   return -ENETDOWN;
-> >>>>>>           }
-> >>>>>>
-> >>>>>> +       if (unlikely(skb->len < dev->min_header_len)) {
-> >>>>>> +               pr_err_once("__bpf_tx_skb skb->len=3D%u <
-> >>>>>> dev(%s)->min_header_len(%u)\n", skb->len, dev->name,
-> >>>>>> dev->min_header_len);
-> >>>>>> +               DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
-> >>>>>> +               kfree_skb(skb);
-> >>>>>> +               return -ERANGE;
-> >>>>>> +       } // Note: this is before we change skb->dev
-> >>>>>>           skb->dev =3D dev;
-> >>>>>>           skb_set_redirected_noclear(skb, skb_at_tc_ingress(skb));
-> >>>>>>           skb_clear_tstamp(skb);
-> >>>>>>
-> >>>>>>
-> >>>>>> -->
-> >>>>>>
-> >>>>>>
-> >>>>>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
-> >>>>>> [redirect_egress] unexpected ret: veth ETH_HLEN+1 packet ingress
-> >>>>>> [redirect_egress]: actual -34 !=3D expected 1
-> >>>>>>
-> >>>>>> [   58.382051] __bpf_tx_skb skb->len=3D1 < dev(veth0)->min_header_=
-len(14)
-> >>>>>> [   58.382778] skb len=3D1 headroom=3D78 headlen=3D1 tailroom=3D11=
-3
-> >>>>>>                  mac=3D(64,14) net=3D(78,-1) trans=3D-1
-> >>>>>>                  shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D0 type=
-=3D0 segs=3D0))
-> >>>>>>                  csum(0x0 ip_summed=3D0 complete_sw=3D0 valid=3D0 =
-level=3D0)
-> >>>>>>                  hash(0x0 sw=3D0 l4=3D0) proto=3D0x7f00 pkttype=3D=
-0 iif=3D0
-> >>>>>
-> >>>>> Hmm. Something is off.
-> >>>>> That test creates 15 byte skb.
-> >>>>> It's not obvious to me how it got reduced to 1.
-> >>>>> Something stripped L2 header and the prog is trying to redirect
-> >>>>> such skb into veth that expects skb with L2 ?
-> >>>>>
-> >>>>> Stan,
-> >>>>> please take a look.
-> >>>>> Since you wrote that test.
-> >>>>
-> >>>> Sure. Daniel wants to take a look on a separate thread, so we can sy=
-nc
-> >>>> up. Tentatively, seems like the failure is in the lwt path that does
-> >>>> indeed drop the l2.
-> >>>
-> >>> If we'd change the test into the below, the tc and empty_skb tests pa=
-ss.
-> >>> run_lwt_bpf() calls into skb_do_redirect() which has L2 stripped, and=
- thus
-> >>> skb->len is 1 in this test. We do use skb_mac_header_len() also in ot=
-her
-> >>> tc BPF helpers, so perhaps s/skb->len/skb_mac_header_len(skb)/ is the=
- best
-> >>> way forward..
-> >>>
-> >>> static int __bpf_redirect_common(struct sk_buff *skb, struct net_devi=
-ce *dev,
-> >>>                                    u32 flags)
-> >>> {
-> >>>           /* Verify that a link layer header is carried */
-> >>>           if (unlikely(skb->mac_header >=3D skb->network_header || sk=
-b->len =3D=3D 0)) {
-> >>>                   kfree_skb(skb);
-> >>>                   return -ERANGE;
-> >>>           }
-> >>>
-> >>>           if (unlikely(skb_mac_header_len(skb) < dev->min_header_len)=
-) {
-> >>
-> >> Unfortunately this will not prevent frames with skb->len =3D=3D 1 to r=
-each
-> >> an Ethernet driver ndo_start_xmit()
-> >>
-> >> At ndo_start_xmit(), we do not look where the MAC header supposedly
-> >> starts in the skb, we only use skb->data
-> >>
-> >> I have a syzbot repro using team driver, so I added the following part=
- in team :
-> >>
-> >> diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
-> >> index 0a44bbdcfb7b9f30a0c27b700246501c5eba322f..75e5ef585a8f05b35cfddb=
-ae0bfc377864e6e38c
-> >> 100644
-> >> --- a/drivers/net/team/team.c
-> >> +++ b/drivers/net/team/team.c
-> >> @@ -1714,6 +1714,11 @@ static netdev_tx_t team_xmit(struct sk_buff
-> >> *skb, struct net_device *dev)
-> >>          bool tx_success;
-> >>          unsigned int len =3D skb->len;
-> >>
-> >> +       if (len < 14) {
-> >> +               pr_err_once("team_xmit(len=3D%u)\n", len);
-> >> +               DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
-> >> +               WARN_ON_ONCE(1);
-> >> +       }
-> >>          tx_success =3D team_queue_override_transmit(team, skb);
-> >>          if (!tx_success)
-> >>                  tx_success =3D team->ops.transmit(team, skb);
-> >>
-> >>
-> >> And I get (with your suggestion instead of skb->len)
-> >
-> > Missing part in my copy/paste :
-> >
-> > [   41.123829] team_xmit(len=3D1)
-> > [   41.124335] skb len=3D1 headroom=3D78 headlen=3D1 tailroom=3D113
-> >
-> >> mac=3D(78,0) net=3D(78,-1) trans=3D-1
->
-> Interesting.
->
-> Could you also dump dev->type and/or dev->min_header_len? I suspect
-> this case may not be ARPHRD_ETHER in team.
->
-> Above says mac=3D(78,0), so mac len is 0 and the check against the
-> dev->min_header_len should have dropped it if it went that branch.
+On Tue, 2024-03-26 at 18:25 +0100, Richard Gobert wrote:
+> Paolo Abeni wrote:
+> > Hi,
+> >=20
+> > On Tue, 2024-03-26 at 16:02 +0100, Richard Gobert wrote:
+> > > This patch is meaningful by itself - removing checks against non-rele=
+vant
+> > > packets and making the flush/flush_id checks in a single place.
+> >=20
+> > I'm personally not sure this patch is a win. The code churn is
+> > significant. I understand this is for performance's sake, but I don't
+> > see the benefit???=20
+> >=20
+>=20
+> Could you clarify what do you mean by code churn?
 
-mac header is reset in __dev_queue_xmit() :
+The diffstat of this patch is not negligible and touches very sensitive
+areas.
 
-         skb_reset_mac_header(skb);
+> > he changelog shows that perf reports slightly lower figures for
+> > inet_gro_receive(). That is expected, as this patch move code out of
+> > such functio. What about inet_gro_flush()/tcp_gro_receive() where such
+> > code is moved?
+> >=20
+>=20
+> Please consider the following 2 common scenarios:
+>=20
+> 1) Multiple packets in the GRO bucket - the common case with multiple
+>    packets in the bucket (i.e. running super_netperf TCP_STREAM) - each l=
+ayer
+>    executes a for loop - going over each packet in the bucket. Specifical=
+ly,
+>    L3 gro_receive loops over the bucket making flush,flush_id,is_atomic
+>    checks.=C2=A0
 
-So when the bpf code ran, skb_mac_header_len(skb) was 14,
-but later the MAC header was set (to skb->data)
+Only for packets with the same rx hash.=20
 
->
-> I wonder, is team driver missing sth like :
->
-> diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
-> index 0a44bbdcfb7b..6256f0d2f565 100644
-> --- a/drivers/net/team/team.c
-> +++ b/drivers/net/team/team.c
-> @@ -2124,6 +2124,7 @@ static void team_setup_by_port(struct net_device *d=
-ev,
->          dev->type =3D port_dev->type;
->          dev->hard_header_len =3D port_dev->hard_header_len;
->          dev->needed_headroom =3D port_dev->needed_headroom;
-> +       dev->min_header_len =3D port_dev->min_header_len;
->          dev->addr_len =3D port_dev->addr_len;
->          dev->mtu =3D port_dev->mtu;
->          memcpy(dev->broadcast, port_dev->broadcast, port_dev->addr_len);
->
+> For most packets in the bucket, these checks are not
+>    relevant. (possibly also dirtying cache lines with non-relevant p
+>    packets). Removing code in the for loop for this case is significant.
+>=20
+> 2) UDP/TCP streams which do not coalesce in GRO. This is the common case
+>    for regular UDP connections (i.e. running netperf UDP_STREAM). In this
+>    case, GRO is just overhead. Removing any code from these layers
+>    is good (shown in the first measurement of the commit message).
 
+If UDP GRO is not enabled, there are no UDP packet staging in the UDP
+gro engine, the bucket list is empty.
 
-I have confirmed that team min_header_len is 14, nothing seems to be
-missing I think.
+> > Additionally the reported deltas is within noise level according to my
+> > personal experience with similar tests.
+> >=20
+>=20
+> I've tested the difference between net-next and this patch repetitively,
+> which showed stable results each time. Is there any specific test you
+> think would be helpful to show the result?
 
-team_xmit(dev team0, skb->len=3D1, dev->min_header_len=3D14)
+Anything that show measurable gain.=C2=A0
+
+Reporting the CPU utilization in the inet_gro_receive() function alone
+is not enough, as part of the load has been moved into
+gro_network_flush()/tcp_gro_receive().
+
+Cheers,
+
+Paolo
+
 
