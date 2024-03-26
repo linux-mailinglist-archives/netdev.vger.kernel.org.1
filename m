@@ -1,246 +1,189 @@
-Return-Path: <netdev+bounces-81879-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81880-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8949188B78D
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 03:44:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9097E88B797
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 03:46:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A62FE1C32E83
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 02:44:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 477D62E7D62
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 02:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C264128807;
-	Tue, 26 Mar 2024 02:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 680A7128387;
+	Tue, 26 Mar 2024 02:46:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kgCUriP5"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="xu73QNL6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E983127B5C
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 02:44:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3F91127B5C
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 02:46:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711421050; cv=none; b=eDUOWQoZHXAopX6sJkitp0FsjIuhfGWQag0vOby/kdOPn8HNZViJfkU/EBG+xUR82GsfoxevJEUtUael0AId1wq1XjmzACDxdo+PoxRcIbe5S/A9AI9rBZfMvFjU+W/koWZNg48hIHx43s+pPxREMxDXjRYTcvFNVJSQWWQFca8=
+	t=1711421213; cv=none; b=pq5JFwMnWjz3kL6E4RL1lszojRX6FQ/Za15ss+6P9v6VNRot9J1J9xWm+RFX9bBAXZMGF02+nqk7qg6ZpA5rIV6N6shE96e1ZXDMDVcApjdSGrOcPttYEqEgwAgjKV+PL1CF6D2VgKgDEX4kzvww093l/8T25SmUORoHN9/FpoM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711421050; c=relaxed/simple;
-	bh=+2h6UDoj+abyeTPA/SOoPTkVJck5zAVgAaweiJ5HNSM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=T+e9FraUmdWl3BMlqTdqUhHhb30pVGWsuSuv3QCAZWQJ2s+CH+qhc76C7+1TSJscQ+qbnR5mw6Y3RlJIaXfdLSewcxBvyD0su/FZDgpjemvGspZ9w90opNewBb+jiYuglwK7o4Py/yPiLdHzOgLxTD3cvdOMKVVKuvZhQfDruVI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kgCUriP5; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6ea9a60f7f5so1988346b3a.3
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 19:44:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711421047; x=1712025847; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1Z6GDA1U0Mv97zX08pGAQIqg+JHkvn/okL+baWjyxlw=;
-        b=kgCUriP5qJ70YdRZwIdpHSNPbYK9zWE0QU1LL+7O1nHhCk2cJuFhOF5RhLHRzXsWEg
-         /HANSRJzhFjLJy6DrgklVOXkJv4ZttnKB4SPzYjL2vNSCFrnb6fhjdWSPja8maQu8hDG
-         ljfSLfvXAaj5efvuU+bcLPVRmzmss7xG0pHVTNDnwGx9zRxkkDAdOZBcuCPzkdkcqxvk
-         +inWqGTgyv/ypq3BVjdAyFOyU2xhIc/p/4S/RvhM+M40NDZGp/7s5xMBZ9yA+s5qxGM0
-         K++LB/oD1oUOfa/yPB2QFMNlaWRWaLatp5pKd8pShYvRtWMdfZ1diRkaMYq4ezrqOP8s
-         Gx+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711421047; x=1712025847;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1Z6GDA1U0Mv97zX08pGAQIqg+JHkvn/okL+baWjyxlw=;
-        b=F67YbfeaVM4eNehR82ChS8h9T8NK0AnEmz4SEX5rEp6WfbMjXp0SALU8TqinIk4bF2
-         xKBfXn7m/mZcqvZlghLApMyaTzMSaIwFb0pyvCLaUNxe/sK/E11sOcLF8PoTOQWQbQ6L
-         1vQOyJPjmRk1nUNsn+2C99zIFcA3IiCRXUGmwLmAmQ9Z/sRyyc1uLJdP7QwrYpPz0Yqh
-         gwX/jgomQUd4+EyWchCsi4GurCAJictJn5AvALgPJJfuc1qzS2suIUB+A1HqxlY4S2WB
-         c+9d89ZOYWBPRWuMm+ETOJmgXnZzB7r8KMxpPNVI/wEZnO0GphkjYl4kuyO95A65w8gr
-         PiGw==
-X-Gm-Message-State: AOJu0YyUbPrSaC2NXrbhg35uJjGyMBCPfs+OiRfG/JXz1/22i/opXuNF
-	fmomCFMZqPiOZrIUKD3Gs0HjUEilItEiItC7HNrb1ExYQ1VoTe4UcAgvKrP0IEabMKJU
-X-Google-Smtp-Source: AGHT+IF84EM9Xyv6QN9GJtCfuuEoy1ALA2Q2ldK9lS07dqeIZER+PD/dLxDQVFyvTYKBLU76XzOUAw==
-X-Received: by 2002:a05:6a21:9210:b0:1a3:b619:4dad with SMTP id tl16-20020a056a21921000b001a3b6194dadmr7983826pzb.0.1711421047145;
-        Mon, 25 Mar 2024 19:44:07 -0700 (PDT)
-Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id x15-20020a170902ec8f00b001def088c036sm5499193plg.19.2024.03.25.19.44.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Mar 2024 19:44:06 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCHv2 net-next 2/2] doc/netlink/specs: Add vlan attr in rt_link spec
-Date: Tue, 26 Mar 2024 10:43:25 +0800
-Message-ID: <20240326024325.2008639-3-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240326024325.2008639-1-liuhangbin@gmail.com>
-References: <20240326024325.2008639-1-liuhangbin@gmail.com>
+	s=arc-20240116; t=1711421213; c=relaxed/simple;
+	bh=5/4+FnYP7WrpibFUSjMKZGgmnDOJvtxN/hNT/iYWwQc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=nRXJq1cPan2tFlzveUppVMOLQXmZ6DvfVVD9vplg+QIgTScjB6juWsFpVVzjBkwGcUgzikc6rCPTHz8lpcqBzSiwnPBEQSgALozo1HNxRmmSLtQrPcskGNebFz2aNFdfAkHE8fNgMxe5ggr5EsXB7rUVP7a1nHGvaqIhf+MBl6s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=xu73QNL6; arc=none smtp.client-ip=115.124.30.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1711421203; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=+tg+cbDnyeGxeUBGCtIjLT8x555SiGV5b/HSGfpvPmc=;
+	b=xu73QNL693bYNfosaMQnRhTPd4M4pSQM5AuDajfWpxNNHj5ba6d78YuW+Wvd6GW7iczMhh/51pj1TY1G9ENp5Pmk5zL8FYFNV4TebkVlf6x4BIJDaFNnDo8srbaytjCjtwc7Mk9hV9G4pap+pEkpCBxs3kaP2YLN6JD1Tmk3RJQ=
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046060;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0W3JTV0m_1711421201;
+Received: from 30.221.81.94(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0W3JTV0m_1711421201)
+          by smtp.aliyun-inc.com;
+          Tue, 26 Mar 2024 10:46:42 +0800
+Message-ID: <62451c11-0957-4d1b-8a34-5e224ea552e0@linux.alibaba.com>
+Date: Tue, 26 Mar 2024 10:46:41 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 2/2] virtio-net: reduce the CPU consumption of dim worker
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
+ "Michael S. Tsirkin" <mst@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+References: <1711021557-58116-1-git-send-email-hengqi@linux.alibaba.com>
+ <1711021557-58116-3-git-send-email-hengqi@linux.alibaba.com>
+ <CACGkMEuZ457UU6MhPtKHd_Y0VryvZoNU+uuKOc_4OK7jc62WwA@mail.gmail.com>
+ <5708312a-d8eb-40ee-88a9-e16930b94dda@linux.alibaba.com>
+ <CACGkMEu8or7+fw3+vX_PY3Qsrm7zVSf6TS9SiE20NpOsz-or6g@mail.gmail.com>
+ <b54ad370-67bd-4b8c-82fb-54625e68288b@linux.alibaba.com>
+ <CACGkMEv88U1_2K2b0KdmH97gfrdOvK_1ajqh=UTK6=KgZ4OYvQ@mail.gmail.com>
+ <36ce2bbf-3a31-4c01-99f3-1875f79e2831@linux.alibaba.com>
+ <CACGkMEvShZKd7AvMFtmEWBVGQsQrGkQMTEx8yQYYU0uYqp=uMg@mail.gmail.com>
+From: Heng Qi <hengqi@linux.alibaba.com>
+In-Reply-To: <CACGkMEvShZKd7AvMFtmEWBVGQsQrGkQMTEx8yQYYU0uYqp=uMg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-With command:
- # ./tools/net/ynl/cli.py \
- --spec Documentation/netlink/specs/rt_link.yaml \
- --do getlink --json '{"ifname": "eno1.2"}' --output-json | \
- jq -C '.linkinfo'
 
-Before:
-Exception: No message format for 'vlan' in sub-message spec 'linkinfo-data-msg'
 
-After:
- {
-   "kind": "vlan",
-   "data": {
-     "protocol": "8021Q",
-     "id": 2,
-     "flag": {
-       "flags": [
-         "reorder-hdr"
-       ],
-       "mask": "0xffffffff"
-     }
-   }
- }
+在 2024/3/25 下午4:42, Jason Wang 写道:
+> On Mon, Mar 25, 2024 at 4:22 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
+>>
+>>
+>> 在 2024/3/25 下午3:56, Jason Wang 写道:
+>>> On Mon, Mar 25, 2024 at 3:18 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
+>>>>
+>>>> 在 2024/3/25 下午1:57, Jason Wang 写道:
+>>>>> On Mon, Mar 25, 2024 at 10:21 AM Heng Qi <hengqi@linux.alibaba.com> wrote:
+>>>>>> 在 2024/3/22 下午1:19, Jason Wang 写道:
+>>>>>>> On Thu, Mar 21, 2024 at 7:46 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
+>>>>>>>> Currently, ctrlq processes commands in a synchronous manner,
+>>>>>>>> which increases the delay of dim commands when configuring
+>>>>>>>> multi-queue VMs, which in turn causes the CPU utilization to
+>>>>>>>> increase and interferes with the performance of dim.
+>>>>>>>>
+>>>>>>>> Therefore we asynchronously process ctlq's dim commands.
+>>>>>>>>
+>>>>>>>> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+>>>>>>> I may miss some previous discussions.
+>>>>>>>
+>>>>>>> But at least the changelog needs to explain why you don't use interrupt.
+>>>>>> Will add, but reply here first.
+>>>>>>
+>>>>>> When upgrading the driver's ctrlq to use interrupt, problems may occur
+>>>>>> with some existing devices.
+>>>>>> For example, when existing devices are replaced with new drivers, they
+>>>>>> may not work.
+>>>>>> Or, if the guest OS supported by the new device is replaced by an old
+>>>>>> downstream OS product, it will not be usable.
+>>>>>>
+>>>>>> Although, ctrlq has the same capabilities as IOq in the virtio spec,
+>>>>>> this does have historical baggage.
+>>>>> I don't think the upstream Linux drivers need to workaround buggy
+>>>>> devices. Or it is a good excuse to block configure interrupts.
+>>>> Of course I agree. Our DPU devices support ctrlq irq natively, as long
+>>>> as the guest os opens irq to ctrlq.
+>>>>
+>>>> If other products have no problem with this, I would prefer to use irq
+>>>> to solve this problem, which is the most essential solution.
+>>> Let's do that.
+>> Ok, will do.
+>>
+>> Do you have the link to the patch where you previously modified the
+>> control queue for interrupt notifications.
+>> I think a new patch could be made on top of it, but I can't seem to find it.
+> Something like this?
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+YES. Thanks Jason.
 
-v2:
- - Add eth-protocols definitions, but only include vlan protocols (Donald Hunter)
- - Set protocol to big-endian (Donald Hunter)
- - Add display-hint for vlan flag mask (Donald Hunter)
----
- Documentation/netlink/specs/rt_link.yaml | 83 +++++++++++++++++++++++-
- 1 file changed, 82 insertions(+), 1 deletion(-)
+>
+> https://lore.kernel.org/lkml/6026e801-6fda-fee9-a69b-d06a80368621@redhat.com/t/
+>
+> Note that
+>
+> 1) some patch has been merged
+> 2) we probably need to drop the timeout logic as it's another topic
+> 3) need to address other comments
 
-diff --git a/Documentation/netlink/specs/rt_link.yaml b/Documentation/netlink/specs/rt_link.yaml
-index 8e4d19adee8c..41b49f15236f 100644
---- a/Documentation/netlink/specs/rt_link.yaml
-+++ b/Documentation/netlink/specs/rt_link.yaml
-@@ -50,7 +50,16 @@ definitions:
-         name: dormant
-       -
-         name: echo
--
-+  -
-+    name: eth-protocols
-+    type: enum
-+    entries:
-+      -
-+        name: 8021Q
-+        value: 33024
-+      -
-+        name: 8021AD
-+        value: 34984
-   -
-     name: rtgenmsg
-     type: struct
-@@ -729,6 +738,43 @@ definitions:
-       -
-         name: filter-mask
-         type: u32
-+  -
-+    name: ifla-vlan-flags
-+    type: struct
-+    members:
-+      -
-+        name: flags
-+        type: u32
-+        enum: vlan-flags
-+        enum-as-flags: true
-+      -
-+        name: mask
-+        type: u32
-+        display-hint: hex
-+  -
-+    name: vlan-flags
-+    type: flags
-+    entries:
-+      -
-+        name: reorder-hdr
-+      -
-+        name: gvrp
-+      -
-+        name: loose-binding
-+      -
-+        name: mvrp
-+      -
-+        name: bridge-binding
-+  -
-+    name: ifla-vlan-qos-mapping
-+    type: struct
-+    members:
-+      -
-+        name: from
-+        type: u32
-+      -
-+        name: to
-+        type: u32
- 
- 
- attribute-sets:
-@@ -1507,6 +1553,38 @@ attribute-sets:
-       -
-         name: num-disabled-queues
-         type: u32
-+  -
-+    name: linkinfo-vlan-attrs
-+    name-prefix: ifla-vlan-
-+    attributes:
-+      -
-+        name: id
-+        type: u16
-+      -
-+        name: flag
-+        type: binary
-+        struct: ifla-vlan-flags
-+      -
-+        name: egress-qos
-+        type: nest
-+        nested-attributes: ifla-vlan-qos
-+      -
-+        name: ingress-qos
-+        type: nest
-+        nested-attributes: ifla-vlan-qos
-+      -
-+        name: protocol
-+        type: u16
-+        enum: eth-protocols
-+        byte-order: big-endian
-+  -
-+    name: ifla-vlan-qos
-+    name-prefix: ifla-vlan-qos
-+    attributes:
-+      -
-+        name: mapping
-+        type: binary
-+        struct: ifla-vlan-qos-mapping
-   -
-     name: linkinfo-vrf-attrs
-     name-prefix: ifla-vrf-
-@@ -1666,6 +1744,9 @@ sub-messages:
-       -
-         value: tun
-         attribute-set: linkinfo-tun-attrs
-+      -
-+        value: vlan
-+        attribute-set: linkinfo-vlan-attrs
-       -
-         value: vrf
-         attribute-set: linkinfo-vrf-attrs
--- 
-2.43.0
+I did a quick read of your patch sets from the previous 5 version:
+[1] 
+https://lore.kernel.org/lkml/6026e801-6fda-fee9-a69b-d06a80368621@redhat.com/t/
+[2] https://lore.kernel.org/all/20221226074908.8154-1-jasowang@redhat.com/
+[3] https://lore.kernel.org/all/20230413064027.13267-1-jasowang@redhat.com/
+[4] https://lore.kernel.org/all/20230524081842.3060-1-jasowang@redhat.com/
+[5] https://lore.kernel.org/all/20230720083839.481487-1-jasowang@redhat.com/
+
+Regarding adding the interrupt to ctrlq, there are a few points where 
+there is no agreement,
+which I summarize below.
+
+1. Require additional interrupt vector resource
+https://lore.kernel.org/all/20230516165043-mutt-send-email-mst@kernel.org/
+2. Adding the interrupt for ctrlq may break some devices
+https://lore.kernel.org/all/f9e75ce5-e6df-d1be-201b-7d0f18c1b6e7@redhat.com/
+3. RTNL breaks surprise removal
+https://lore.kernel.org/all/20230720170001-mutt-send-email-mst@kernel.org/
+
+Regarding the above, there seems to be no conclusion yet.
+If these problems still exist, I think this patch is good enough and we 
+can merge it first.
+
+For the third point, it seems to be being solved by Daniel now [6], but 
+spink lock is used,
+which I think conflicts with the way of adding interrupts to ctrlq.
+
+[6] https://lore.kernel.org/all/20240325214912.323749-1-danielj@nvidia.com/
+
+
+Thanks,
+Heng
+
+>
+> THanks
+>
+>
+>> Thanks,
+>> Heng
+>>
+>>> Thanks
+>>>
+>>>>> And I remember you told us your device doesn't have such an issue.
+>>>> YES.
+>>>>
+>>>> Thanks,
+>>>> Heng
+>>>>
+>>>>> Thanks
+>>>>>
+>>>>>> Thanks,
+>>>>>> Heng
+>>>>>>
+>>>>>>> Thanks
 
 
