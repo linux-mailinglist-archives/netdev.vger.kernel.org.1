@@ -1,63 +1,66 @@
-Return-Path: <netdev+bounces-82099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5930588C534
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:33:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E416888C53D
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:35:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E1EB21F3E2D9
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:33:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 208E01C6279B
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:35:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27AE913C3E8;
-	Tue, 26 Mar 2024 14:33:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2749413C3C6;
+	Tue, 26 Mar 2024 14:35:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Fc7Rcv1V"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ljOk2w0Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FC4813C3E0;
-	Tue, 26 Mar 2024 14:33:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F240713BC3B;
+	Tue, 26 Mar 2024 14:35:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711463584; cv=none; b=udkX89V58h9BdG4whP/Tvskqh0HtnWtw0qV4eH+7fwQr/2B6dLvhQghlKS4Zg42+zyCziSuR57CNXMI4xi1mc+wY35CX3VhkiOZ8BNbwl/YtQ6RVayvtjPxUTymb12XOx1/Qcf2rZJVroqEpg6y8rRB4rQXjjfb20nTw0vmNb1c=
+	t=1711463750; cv=none; b=dQmxNnaNAicA0kpoQDcTTnVlKPl+78r+nfoFz43spgfhnrwr6/9XxGLQG/YECgh7rTSPalZqpzIanqfbGBPY1gc8xKfUueQ00gNlWVclR1YodRcI9qTOd/8OYRHRtZhZ7HP2O2iBP6MQfSJHNRjO2RSotx0zxGKZUf6OB7yh9Y8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711463584; c=relaxed/simple;
-	bh=xbAMRHKr+ODmrMxlSYDlIGrfR3rXNVzQ2E4TjS4KDz4=;
+	s=arc-20240116; t=1711463750; c=relaxed/simple;
+	bh=Ni4Cb8d+9/UtZWDS1MJ8TsKOaKB5beJmlBXXrWRHe/I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k88RSG12BroHNducxbTQYJDo4PDmAopMWtJvi7PuMoFPPc3mARtmrmBFm5/44kHEFfqOKCBl6bRjzZqadFJKP3eg8PPFaa0jkOgqZkIg+BGWHzpsMEPphggSl3yokk/8FaUi6m/5mgoP6BYe83fdbNpNFUNj84YGuBDrJtJbHgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Fc7Rcv1V; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ANjLUAUtamVXM2Bz6Z7r9VVYDd7Y/1RlyFr5ZQF7feM=; b=Fc7Rcv1VFZbxCbc3tJ5NlkRZba
-	+f+0ed/cAG/YRvPahOl9OLZZQWEy2vrV2eGvldeai5xnH8a6MR76LHaR/Fh7oogN7ZwksjDQXywzW
-	GhAgsCuO2lJfRrllkAgRntvm9G+49r6jtBQSTY5U53t5vMwpkQbGnXxADR6h8NIrnt7w=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1rp7r8-00BHtF-KU; Tue, 26 Mar 2024 15:32:50 +0100
-Date: Tue, 26 Mar 2024 15:32:50 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=R/EwqO4bVoy570OXruyjwfceJU/Hcx3reSec+LguVAcuusTTPOIrbtxW5sQtANHa6UjtGl9bBdvFpxpXOtms4sZeXN3LcF6ya9sJ5QvhqNuBt0mP7PlaSXIb43K5aEBAjfP8GCNDPcn9zh0EXcCEP2BBK/wYMepKHfamCSz1+1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ljOk2w0Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 67517C433F1;
+	Tue, 26 Mar 2024 14:35:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1711463749;
+	bh=Ni4Cb8d+9/UtZWDS1MJ8TsKOaKB5beJmlBXXrWRHe/I=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ljOk2w0Zq6ZBjwoNgc5qsqetXQWZmTaojsWyb4v2XxO43hoAfYg8lGvzDZDaieq/F
+	 Dw6U/mn3/Cr60E3fGpxQ96TdizogFMEn4pserO15OvwzLFRz+U6mHZFLTVv2qOcEJg
+	 lbpFSXHuUX3JdnzuFEXUt5TJhX+4SfVBhgcHosNerAhkIGwtMINQqM5dNASgF4guHv
+	 +diZgWE7Ecr4m5YEgNirWGkme+EArfZw9tEg25ZDGVzPxqpDfmXb8rNgTQ4tCZzo+9
+	 mwv0xDYZyGHfagGaScGs9ry9dDrnxjcD5bYe6AICWUKg1LNCPyGOlYD7do/3vHYhi7
+	 fzJMSBkVa99nw==
+Date: Tue, 26 Mar 2024 14:35:44 +0000
+From: Simon Horman <horms@kernel.org>
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: Jesse Brandeburg <jesse.brandeburg@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Stefan Eichenberger <eichest@gmail.com>,
-	Dimitri Fedrau <dima.fedrau@gmail.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/2] net: phy: marvell: implement cable-test for
- 88E308X/88E609X family
-Message-ID: <88dc994b-a3da-4760-b7e0-c6da593b15d6@lunn.ch>
-References: <20240326141238.2315974-1-paweldembicki@gmail.com>
- <20240326141238.2315974-2-paweldembicki@gmail.com>
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Konstantin Khlebnikov <khlebnikov@openvz.org>,
+	Zheng Yan <zheng.z.yan@intel.com>,
+	Sasha Neftin <sasha.neftin@intel.com>,
+	"Rafael J . Wysocki" <rafael.j.wysocki@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>
+Subject: Re: [PATCH 1/3] e1000e: Remove redundant runtime resume for
+ ethtool_ops
+Message-ID: <20240326143544.GY403975@kernel.org>
+References: <20240325222951.1460656-1-helgaas@kernel.org>
+ <20240325222951.1460656-2-helgaas@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,35 +69,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20240326141238.2315974-2-paweldembicki@gmail.com>
+In-Reply-To: <20240325222951.1460656-2-helgaas@kernel.org>
 
-> +		ret = phy_write(phydev, MII_BMCR, 0xa100);
+On Mon, Mar 25, 2024 at 05:29:49PM -0500, Bjorn Helgaas wrote:
+> From: Bjorn Helgaas <bhelgaas@google.com>
+> 
+> e60b22c5b7e5 ("e1000e: fix accessing to suspended device") added
+> ethtool_ops.begin() and .complete(), which used pm_runtime_get_sync() to
+> resume suspended devices before any ethtool_ops callback and allow suspend
+> after it completed.
+> 
+> 3ef672ab1862 ("e1000e: ethtool unnecessarily takes device out of RPM
+> suspend") removed ethtool_ops.begin() and .complete() and instead did
+> pm_runtime_get_sync() only in the individual ethtool_ops callbacks that
+> access device registers.
+> 
+> Subsequently, f32a21376573 ("ethtool: runtime-resume netdev parent before
+> ethtool ioctl ops") added pm_runtime_get_sync() in the dev_ethtool() path,
+> so the device is resumed before *any* ethtool_ops callback, as it was
+> before 3ef672ab1862.
+> 
+> Remove most runtime resumes from ethtool_ops, which are now redundant
+> because the resume has already been done by dev_ethtool().  This is
+> essentially a revert of 3ef672ab1862 ("e1000e: ethtool unnecessarily takes
+> device out of RPM suspend").
+> 
+> There are a couple subtleties:
+> 
+>   - Prior to 3ef672ab1862, the device was resumed only for the duration of
+>     a single ethtool callback.  3ef672ab1862 changed e1000_set_phys_id() so
+>     the device was resumed for ETHTOOL_ID_ACTIVE and remained resumed until
+>     a subsequent callback for ETHTOOL_ID_INACTIVE.  Preserve that part of
+>     3ef672ab1862 so the device will not be runtime suspended while in the
+>     ETHTOOL_ID_ACTIVE state.
+> 
+>   - 3ef672ab1862 added "if (!pm_runtime_suspended())" in before reading the
+>     STATUS register in e1000_get_settings().  This was racy and is now
+>     unnecessary because dev_ethtool() has resumed the device already, so
+>     revert that.
+> 
+> Signed-off-by: Bjorn Helgaas <bhelgaas@google.com>
 
-BMCR_RESET | BMCR_ANENABLE | BMCR_FULLDPLX
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-You should check i have that correct, but no need for magic values
-with this register.
-
-> +static int m88e3082_vct_cable_test_report_trans(int result, u8 distance)
-> +{
-> +	switch (result) {
-> +	case MII_VCT_TXRXPINS_VCTTST_OK:
-> +		if (distance == MII_VCT_TXRXPINS_DISTRFLN_MAX)
-> +			return ETHTOOL_A_CABLE_RESULT_CODE_OK;
-> +		/* Impedance mismatch */
-> +		return ETHTOOL_A_CABLE_RESULT_CODE_UNSPEC;
-
-It is possible to add more results code, if you think Impedance
-mismatch is useful.
-
-> +	ret = phy_write(phydev, MII_BMCR, priv->m88e3082_vct_reg_backup);
-> +	if (ret < 0)
-> +		return ret;
-
-I'm not sure this is required. When the cable test is finished, the
-PHY state machine is moved to PHY_UP. That will cause
-phy_config_aneg() to be called which should set BMCR back to the
-correct value.
-
-	Andrew
 
