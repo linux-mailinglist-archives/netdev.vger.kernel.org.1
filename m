@@ -1,164 +1,404 @@
-Return-Path: <netdev+bounces-82057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A8BA88C388
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:34:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15A8288C38F
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:35:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AB9C1C3B106
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:34:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEBCF2E2B00
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:35:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C830745DC;
-	Tue, 26 Mar 2024 13:34:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66838745E1;
+	Tue, 26 Mar 2024 13:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="tgB4ALv+"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="P9q6g3Gj";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CspRZCmA"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6098E7175F;
-	Tue, 26 Mar 2024 13:34:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46FFE74BF3
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 13:34:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711460075; cv=none; b=IZ5pnSwBRPoA5seBDm1zO3z3WyeHvie5vEBFJ7jwFncvEmyFqalh+MaJ8UMCnFfQjzLNT0dthZRQFrk6VLr1hv9NZt9/K5c+GNJpodT/rs8BJLd+6bWr9OLwL7xcifN+iMoRspC1i21iC+1VMOU5lhf1VRzdNTdOOwy4bKaGBGo=
+	t=1711460099; cv=none; b=Wqx3ZMK5SQ0qMKGV4eEwnq/nN2TZQF93xOY8cF0cBaI//YmLdNxYBrVRMNak7nxji8LycVSZWFdYz7aub68zGryNIqosTefffGygfrQoA1u5VQ/Pf+NGEZnrTBoJcMcFF8wUb1G5x0doJQjiNfXNr2hW3E/Wt2FkAvi1W7JibHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711460075; c=relaxed/simple;
-	bh=C09MDaDhCo5/cwICaB1cD+3IlLSyH394RN6EST48y2k=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=rpIiXq7DFuffe8VFkYI78kwXPqDaDqdCOBkOW+sfX/iaR/7+i8Ud/2igI7ZMuXUjyPXsMEEuxp49Wby8PzBILY8hKel40Rzp1GBe3gfZEYyAwpeJwrDfm06Ys5xhEiFBc5vtSUyGTSAGvWCGA8l28wi6eG9XJCuZTMderet7Hx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=tgB4ALv+; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from wsk (85-222-111-42.dynamic.chello.pl [85.222.111.42])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits))
-	(No client certificate requested)
-	(Authenticated sender: lukma@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id A4C3D87F64;
-	Tue, 26 Mar 2024 14:34:30 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1711460071;
-	bh=TdmERBCHi/8gKslCCrNCorIXxZyxmrn/AoD5wJSNB4U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=tgB4ALv+ajiXCzJ3BUsA6Wf8RWG62Tx13jTecW9THXPUA7URfTAKXUf4ldL+SJH+e
-	 TarYKYMfqG2WxeQkomKmX06SzeQumNQGN+PAKdPjtfjbLqbhhuf8UZEWxpR/L2GbOD
-	 c3Ko8Rgv21fburbwXQybeW4Yuh7uB+Ou3jPJ5/FWjPsCIhqsnzsRvusQIED+m2Xs/V
-	 Yk1xprl5Oh7OCuH0VFN5mdw6cODZ0KVSPLPsr/Vc6skuVrn7NaUkIRNHVBeU2NinHL
-	 te6DdKoWvJjr1XDYg2hbFNAZRluhvedskdDuMz2Ajag75UVZQdCVSIE0AU1UacCsBj
-	 um8u5KLpNMVIA==
-Date: Tue, 26 Mar 2024 14:34:24 +0100
-From: Lukasz Majewski <lukma@denx.de>
-To: Matthias Schiffer <matthias.schiffer@ew.tq-group.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- Vladimir Oltean <olteanv@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux@ew.tq-group.com, Michael Krummsdorf
- <michael.krummsdorf@tq-group.com>
-Subject: Re: [PATCH] net: dsa: mv88e6xxx: fix usable ports on 88e6020
-Message-ID: <20240326143424.3368d9b1@wsk>
-In-Reply-To: <20240326123655.40666-1-matthias.schiffer@ew.tq-group.com>
-References: <20240326123655.40666-1-matthias.schiffer@ew.tq-group.com>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1711460099; c=relaxed/simple;
+	bh=mYt96GKE78FeZHeuQOOo5T0yWfkI40v3e904PiG3yeA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=RYmCK0k2No7IfXR5BIa7ImA74cu/eOQZtwPaWusSz8HAibvR/f7pd+uJHxzLiqIzFznhigiAbeAPyT4i4QUSqFYPyC9UL25M99K9Xf+4gPteulijAPhpx4+W7sPlDi0NeYoejZSflr6EMr/5xzU9zI/MAeHlNplZ+qp6/6SM8AM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=P9q6g3Gj; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CspRZCmA; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1711460095;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=R8Vt8310MOBK5KZ3LiONjdXHDr/aJho3BwtVrzCbubk=;
+	b=P9q6g3GjASNyYWqeCRTbQvVJ7IoDcGDMhL4FyMyiPyKwWjNO7uw0Ov8tUIpOOSC3T7FplH
+	IzbyLnFuygN/bAtiNlv2y5m4ORy4EaZKJEPXvl7U/0nHMIAcPdRfFPBX6UBq/cNurNTJ9/
+	QJ5ae2m8TRX242XD5iRu/wCxT1z3hdo3LPZaYE1sIUBSGIwmdWkl+ywi0bR1Ysn/OA4QxG
+	h51IHRRNeSqP5pxAVM+3CD26ytMa58+9QPh7v64XRguqMcEf1rgL/UbC/9d0OiCVXENDxv
+	7BRHsVKaUGU8/76H4X+3T2kBCcbWFZ0g015uTORiwNcsmTFtQmOhYu5/DaR6Xg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1711460095;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=R8Vt8310MOBK5KZ3LiONjdXHDr/aJho3BwtVrzCbubk=;
+	b=CspRZCmABMU8n/hBaqFOhkY7CkcvWwa2qDdREu2ALe3w3fB5kpaaASvbCNFyMeuTD9+kkf
+	Z9L29YixnoV3ryAA==
+Date: Tue, 26 Mar 2024 14:34:54 +0100
+Subject: [PATCH iwl-next v2] igc: Add MQPRIO offload support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/NP2qDeJCkPvX5.p498HS=_l";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20240212-igc_mqprio-v2-1-587924e6b18c@linutronix.de>
+X-B4-Tracking: v=1; b=H4sIAP3OAmYC/22NQQ6CMBAAv2L2bE1bBMST/zDEtHSFTaDFtiKG8
+ HcLZ4+TyWQWCOgJA1wPC3icKJCzCeTxAE2nbIuMTGKQXJ65FJJR2zyG1+jJMZ5VRc45L4S8QAq
+ 0Csi0V7bptmRQIaLfxOjxSfN+uQN9emZxjlAn01GIzn/3/SR2/+80CSZYqdBUuS6zwuhbT/Ydv
+ bM0nwxCva7rD7k4J+fLAAAA
+To: Jesse Brandeburg <jesse.brandeburg@intel.com>, 
+ Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ Kurt Kanzenbach <kurt@linutronix.de>
+X-Developer-Signature: v=1; a=openpgp-sha256; l=10391; i=kurt@linutronix.de;
+ h=from:subject:message-id; bh=mYt96GKE78FeZHeuQOOo5T0yWfkI40v3e904PiG3yeA=;
+ b=owEBbQKS/ZANAwAKAcGT0fKqRnOCAcsmYgBmAs7+Jed5hgPF92JkQYRFlPERBlnC6h2vh5JSl
+ 8klsoCbJOeJAjMEAAEKAB0WIQS8ub+yyMN909/bWZLBk9HyqkZzggUCZgLO/gAKCRDBk9HyqkZz
+ gvqHEACIXIyrsuFxc2+9/JcvQDGBv3lXWnRGtVz2VMsUScngWT8vkoKgpuWkz0Rv8UD9PnzcFEW
+ PBr7w2kKnvNR1jluyInGNWf93FT75Gbh+06b+hEDaloQ/mO1TtvUHftLCrCsrw8SomWTTxbxZU9
+ E9HyW4I7xqID8BTuH+n5xRTzEXrRGEuwAdZLxTzv8XmMJpM2WjmITaMt/8apuCdacXCnWnjY+mv
+ V3qgxHC4AImeZCHmdNOn45vqpfdtdMFKavK9Ceb5LxzlBjztuwOpMHOavqE4yJPfzrz/rWQMJOx
+ gyOMvjjZZqQILubIoUidd1wPG7ayqZGNh+r2f6b20rrGZs8Vo3Nm3LU0lD7GIWdnpBY1G7YqodT
+ CLAURSqxbv6juqmx9brMrrsomC3pqZFbH6V+UhWaW8Frsj/3C/KIVXov2v2+EgPG+jxbvjONhIM
+ GBtGb8LvDf/z5/v55q0BghoPGUYgkCrMfTcar/pgVt1YnZ3oISO1mJkc3GPywHO80RwU2auZCFw
+ 4m/Hq4NirPWGq/j/pHEV7yhfZUi/c6xqDdSOc7mDFk7OANSFvpV7T+UpmCqSWWwheBs2FNf2W6T
+ JAlqH2PRRgxHsEHqDorHulo4sHS7MKmvht9TksTbDPGr6ftraw0wGTDz6PLyU4uj8XC/16W4T8s
+ Fg704x96ElsDMsQ==
+X-Developer-Key: i=kurt@linutronix.de; a=openpgp;
+ fpr=BCB9BFB2C8C37DD3DFDB5992C193D1F2AA467382
 
---Sig_/NP2qDeJCkPvX5.p498HS=_l
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Add support for offloading MQPRIO. The hardware has four priorities as well
+as four queues. Each queue must be a assigned with a unique priority.
 
-Hi Matthias,
+However, the priorities are only considered in TSN Tx mode. There are two
+TSN Tx modes. In case of MQPRIO the Qbv capability is not required.
+Therefore, use the legacy TSN Tx mode, which performs strict priority
+arbitration.
 
-> From: Michael Krummsdorf <michael.krummsdorf@tq-group.com>
->=20
-> The switch has 4 ports with 2 internal PHYs, but ports are numbered up
-> to 6, with ports 0, 1, 5 and 6 being usable.
->=20
-> Fixes: 71d94a432a15 ("net: dsa: mv88e6xxx: add support for MV88E6020
-> switch") Signed-off-by: Michael Krummsdorf
-> <michael.krummsdorf@tq-group.com> Signed-off-by: Matthias Schiffer
-> <matthias.schiffer@ew.tq-group.com> ---
->=20
-> I was unfortunately too busy to notice the issue when the patch this
-> Fixes was resubmitted in my name. It would have been better to change
-> my From into a Based-on-patch-by or similar when modifying it
+Example for mqprio with hardware offload:
 
-The "discussion" about this work was lasting at least a few months with
-several iterations and changing the design decisions ...
+|tc qdisc replace dev ${INTERFACE} handle 100 parent root mqprio num_tc 4 \
+|   map 0 0 0 0 0 1 2 3 0 0 0 0 0 0 0 0 \
+|   queues 1@0 1@1 1@2 1@3 \
+|   hw 1
 
-> - and
-> the final version obviously wasn't even tested on an 88E6020...
+The mqprio Qdisc also allows to configure the `preemptible_tcs'. However,
+frame preemption is not supported yet.
 
+Tested on Intel i225 and implemented by following data sheet section 7.5.2,
+Transmit Scheduling.
 
-Can you share on which kernel version have you tested the patch that
-you claim that testing was omitted?
+Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
+---
+Changes in v2:
+- Improve changelog (Paul Menzel)
+- Link to v1: https://lore.kernel.org/r/20240212-igc_mqprio-v1-1-7aed95b736db@linutronix.de
+---
+ drivers/net/ethernet/intel/igc/igc.h         | 10 +++-
+ drivers/net/ethernet/intel/igc/igc_defines.h |  9 ++++
+ drivers/net/ethernet/intel/igc/igc_main.c    | 69 +++++++++++++++++++++++++++
+ drivers/net/ethernet/intel/igc/igc_regs.h    |  2 +
+ drivers/net/ethernet/intel/igc/igc_tsn.c     | 71 +++++++++++++++++++++++++++-
+ 5 files changed, 157 insertions(+), 4 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+index 90316dc58630..49ba753ce957 100644
+--- a/drivers/net/ethernet/intel/igc/igc.h
++++ b/drivers/net/ethernet/intel/igc/igc.h
+@@ -227,6 +227,10 @@ struct igc_adapter {
+ 	 */
+ 	spinlock_t qbv_tx_lock;
+ 
++	bool strict_priority_enable;
++	u8 num_tc;
++	u16 queue_per_tc[IGC_MAX_TX_QUEUES];
++
+ 	/* OS defined structs */
+ 	struct pci_dev *pdev;
+ 	/* lock for statistics */
+@@ -346,9 +350,11 @@ extern char igc_driver_name[];
+ #define IGC_FLAG_RX_LEGACY		BIT(16)
+ #define IGC_FLAG_TSN_QBV_ENABLED	BIT(17)
+ #define IGC_FLAG_TSN_QAV_ENABLED	BIT(18)
++#define IGC_FLAG_TSN_LEGACY_ENABLED	BIT(19)
+ 
+-#define IGC_FLAG_TSN_ANY_ENABLED \
+-	(IGC_FLAG_TSN_QBV_ENABLED | IGC_FLAG_TSN_QAV_ENABLED)
++#define IGC_FLAG_TSN_ANY_ENABLED				\
++	(IGC_FLAG_TSN_QBV_ENABLED | IGC_FLAG_TSN_QAV_ENABLED |	\
++	 IGC_FLAG_TSN_LEGACY_ENABLED)
+ 
+ #define IGC_FLAG_RSS_FIELD_IPV4_UDP	BIT(6)
+ #define IGC_FLAG_RSS_FIELD_IPV6_UDP	BIT(7)
+diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
+index 5f92b3c7c3d4..73502a0b4df7 100644
+--- a/drivers/net/ethernet/intel/igc/igc_defines.h
++++ b/drivers/net/ethernet/intel/igc/igc_defines.h
+@@ -547,6 +547,15 @@
+ 
+ #define IGC_MAX_SR_QUEUES		2
+ 
++#define IGC_TXARB_TXQ_PRIO_0_SHIFT	0
++#define IGC_TXARB_TXQ_PRIO_1_SHIFT	2
++#define IGC_TXARB_TXQ_PRIO_2_SHIFT	4
++#define IGC_TXARB_TXQ_PRIO_3_SHIFT	6
++#define IGC_TXARB_TXQ_PRIO_0_MASK	GENMASK(1, 0)
++#define IGC_TXARB_TXQ_PRIO_1_MASK	GENMASK(3, 2)
++#define IGC_TXARB_TXQ_PRIO_2_MASK	GENMASK(5, 4)
++#define IGC_TXARB_TXQ_PRIO_3_MASK	GENMASK(7, 6)
++
+ /* Receive Checksum Control */
+ #define IGC_RXCSUM_CRCOFL	0x00000800   /* CRC32 offload enable */
+ #define IGC_RXCSUM_PCSD		0x00002000   /* packet checksum disabled */
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 2e1cfbd82f4f..b17764973d74 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -6415,6 +6415,13 @@ static int igc_tc_query_caps(struct igc_adapter *adapter,
+ 	struct igc_hw *hw = &adapter->hw;
+ 
+ 	switch (base->type) {
++	case TC_SETUP_QDISC_MQPRIO: {
++		struct tc_mqprio_caps *caps = base->caps;
++
++		caps->validate_queue_counts = true;
++
++		return 0;
++	}
+ 	case TC_SETUP_QDISC_TAPRIO: {
+ 		struct tc_taprio_caps *caps = base->caps;
+ 
+@@ -6432,6 +6439,65 @@ static int igc_tc_query_caps(struct igc_adapter *adapter,
+ 	}
+ }
+ 
++static void igc_save_mqprio_params(struct igc_adapter *adapter, u8 num_tc,
++				   u16 *offset)
++{
++	int i;
++
++	adapter->strict_priority_enable = true;
++	adapter->num_tc = num_tc;
++
++	for (i = 0; i < num_tc; i++)
++		adapter->queue_per_tc[i] = offset[i];
++}
++
++static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
++				 struct tc_mqprio_qopt_offload *mqprio)
++{
++	struct igc_hw *hw = &adapter->hw;
++	int i;
++
++	if (hw->mac.type != igc_i225)
++		return -EOPNOTSUPP;
++
++	if (!mqprio->qopt.num_tc) {
++		adapter->strict_priority_enable = false;
++		goto apply;
++	}
++
++	/* There are as many TCs as Tx queues. */
++	if (mqprio->qopt.num_tc != adapter->num_tx_queues) {
++		NL_SET_ERR_MSG_FMT_MOD(mqprio->extack,
++				       "Only %d traffic classes supported",
++				       adapter->num_tx_queues);
++		return -EOPNOTSUPP;
++	}
++
++	/* Only one queue per TC is supported. */
++	for (i = 0; i < mqprio->qopt.num_tc; i++) {
++		if (mqprio->qopt.count[i] != 1) {
++			NL_SET_ERR_MSG_MOD(mqprio->extack,
++					   "Only one queue per TC supported");
++			return -EOPNOTSUPP;
++		}
++	}
++
++	/* Preemption is not supported yet. */
++	if (mqprio->preemptible_tcs) {
++		NL_SET_ERR_MSG_MOD(mqprio->extack,
++				   "Preemption is not supported yet");
++		return -EOPNOTSUPP;
++	}
++
++	igc_save_mqprio_params(adapter, mqprio->qopt.num_tc,
++			       mqprio->qopt.offset);
++
++	mqprio->qopt.hw = TC_MQPRIO_HW_OFFLOAD_TCS;
++
++apply:
++	return igc_tsn_offload_apply(adapter);
++}
++
+ static int igc_setup_tc(struct net_device *dev, enum tc_setup_type type,
+ 			void *type_data)
+ {
+@@ -6451,6 +6517,9 @@ static int igc_setup_tc(struct net_device *dev, enum tc_setup_type type,
+ 	case TC_SETUP_QDISC_CBS:
+ 		return igc_tsn_enable_cbs(adapter, type_data);
+ 
++	case TC_SETUP_QDISC_MQPRIO:
++		return igc_tsn_enable_mqprio(adapter, type_data);
++
+ 	default:
+ 		return -EOPNOTSUPP;
+ 	}
+diff --git a/drivers/net/ethernet/intel/igc/igc_regs.h b/drivers/net/ethernet/intel/igc/igc_regs.h
+index e5b893fc5b66..c83c723f7c7e 100644
+--- a/drivers/net/ethernet/intel/igc/igc_regs.h
++++ b/drivers/net/ethernet/intel/igc/igc_regs.h
+@@ -238,6 +238,8 @@
+ #define IGC_TQAVCC(_n)		(0x3004 + ((_n) * 0x40))
+ #define IGC_TQAVHC(_n)		(0x300C + ((_n) * 0x40))
+ 
++#define IGC_TXARB		0x3354 /* Tx Arbitration Control TxARB - RW */
++
+ /* System Time Registers */
+ #define IGC_SYSTIML	0x0B600  /* System time register Low - RO */
+ #define IGC_SYSTIMH	0x0B604  /* System time register High - RO */
+diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
+index 22cefb1eeedf..5e2e1c6076f3 100644
+--- a/drivers/net/ethernet/intel/igc/igc_tsn.c
++++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
+@@ -46,6 +46,9 @@ static unsigned int igc_tsn_new_flags(struct igc_adapter *adapter)
+ 	if (is_cbs_enabled(adapter))
+ 		new_flags |= IGC_FLAG_TSN_QAV_ENABLED;
+ 
++	if (adapter->strict_priority_enable)
++		new_flags |= IGC_FLAG_TSN_LEGACY_ENABLED;
++
+ 	return new_flags;
+ }
+ 
+@@ -84,7 +87,7 @@ void igc_tsn_adjust_txtime_offset(struct igc_adapter *adapter)
+ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
+ {
+ 	struct igc_hw *hw = &adapter->hw;
+-	u32 tqavctrl;
++	u32 tqavctrl, txarb;
+ 	int i;
+ 
+ 	wr32(IGC_GTXOFFSET, 0);
+@@ -106,7 +109,26 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
+ 	wr32(IGC_QBVCYCLET_S, 0);
+ 	wr32(IGC_QBVCYCLET, NSEC_PER_SEC);
+ 
++	/* Reset mqprio TC configuration. */
++	netdev_reset_tc(adapter->netdev);
++
++	/* Restore the default Tx arbitration: Priority 0 has the highest
++	 * priority and is assigned to queue 0 and so on and so forth.
++	 */
++	txarb = rd32(IGC_TXARB);
++	txarb &= ~(IGC_TXARB_TXQ_PRIO_0_MASK |
++		   IGC_TXARB_TXQ_PRIO_1_MASK |
++		   IGC_TXARB_TXQ_PRIO_2_MASK |
++		   IGC_TXARB_TXQ_PRIO_3_MASK);
++
++	txarb |= 0x00 << IGC_TXARB_TXQ_PRIO_0_SHIFT;
++	txarb |= 0x01 << IGC_TXARB_TXQ_PRIO_1_SHIFT;
++	txarb |= 0x02 << IGC_TXARB_TXQ_PRIO_2_SHIFT;
++	txarb |= 0x03 << IGC_TXARB_TXQ_PRIO_3_SHIFT;
++	wr32(IGC_TXARB, txarb);
++
+ 	adapter->flags &= ~IGC_FLAG_TSN_QBV_ENABLED;
++	adapter->flags &= ~IGC_FLAG_TSN_LEGACY_ENABLED;
+ 
+ 	return 0;
+ }
+@@ -123,6 +145,50 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
+ 	wr32(IGC_DTXMXPKTSZ, IGC_DTXMXPKTSZ_TSN);
+ 	wr32(IGC_TXPBS, IGC_TXPBSIZE_TSN);
+ 
++	if (adapter->strict_priority_enable) {
++		u32 txarb;
++		int err;
++
++		err = netdev_set_num_tc(adapter->netdev, adapter->num_tc);
++		if (err)
++			return err;
++
++		for (i = 0; i < adapter->num_tc; i++) {
++			err = netdev_set_tc_queue(adapter->netdev, i, 1,
++						  adapter->queue_per_tc[i]);
++			if (err)
++				return err;
++		}
++
++		/* In case the card is configured with less than four queues. */
++		for (; i < IGC_MAX_TX_QUEUES; i++)
++			adapter->queue_per_tc[i] = i;
++
++		/* Configure queue priorities according to the user provided
++		 * mapping.
++		 */
++		txarb = rd32(IGC_TXARB);
++		txarb &= ~(IGC_TXARB_TXQ_PRIO_0_MASK |
++			   IGC_TXARB_TXQ_PRIO_1_MASK |
++			   IGC_TXARB_TXQ_PRIO_2_MASK |
++			   IGC_TXARB_TXQ_PRIO_3_MASK);
++		txarb |= adapter->queue_per_tc[3] << IGC_TXARB_TXQ_PRIO_0_SHIFT;
++		txarb |= adapter->queue_per_tc[2] << IGC_TXARB_TXQ_PRIO_1_SHIFT;
++		txarb |= adapter->queue_per_tc[1] << IGC_TXARB_TXQ_PRIO_2_SHIFT;
++		txarb |= adapter->queue_per_tc[0] << IGC_TXARB_TXQ_PRIO_3_SHIFT;
++		wr32(IGC_TXARB, txarb);
++
++		/* Enable legacy TSN mode which will do strict priority without
++		 * any other TSN features.
++		 */
++		tqavctrl = rd32(IGC_TQAVCTRL);
++		tqavctrl |= IGC_TQAVCTRL_TRANSMIT_MODE_TSN;
++		tqavctrl &= ~IGC_TQAVCTRL_ENHANCED_QAV;
++		wr32(IGC_TQAVCTRL, tqavctrl);
++
++		return 0;
++	}
++
+ 	for (i = 0; i < adapter->num_tx_queues; i++) {
+ 		struct igc_ring *ring = adapter->tx_ring[i];
+ 		u32 txqctl = 0;
+@@ -339,7 +405,8 @@ int igc_tsn_offload_apply(struct igc_adapter *adapter)
+ 	 * cannot be changed dynamically. Require reset the adapter.
+ 	 */
+ 	if (netif_running(adapter->netdev) &&
+-	    (igc_is_device_id_i225(hw) || !adapter->qbv_count)) {
++	    (igc_is_device_id_i225(hw) || !adapter->qbv_count ||
++	     !adapter->strict_priority_enable)) {
+ 		schedule_work(&adapter->reset_task);
+ 		return 0;
+ 	}
 
->=20
-> Best regards,
-> Matthias
->=20
->=20
->  drivers/net/dsa/mv88e6xxx/chip.c | 6 +++++-
->  1 file changed, 5 insertions(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/dsa/mv88e6xxx/chip.c
-> b/drivers/net/dsa/mv88e6xxx/chip.c index 9ed1821184ece..c95787cb90867
-> 100644 --- a/drivers/net/dsa/mv88e6xxx/chip.c
-> +++ b/drivers/net/dsa/mv88e6xxx/chip.c
-> @@ -5503,8 +5503,12 @@ static const struct mv88e6xxx_info
-> mv88e6xxx_table[] =3D { .family =3D MV88E6XXX_FAMILY_6250,
->  		.name =3D "Marvell 88E6020",
->  		.num_databases =3D 64,
-> -		.num_ports =3D 4,
-> +		/* Ports 2-4 are not routed to pins
-> +		 * =3D> usable ports 0, 1, 5, 6
-> +		 */
-> +		.num_ports =3D 7,
->  		.num_internal_phys =3D 2,
-> +		.invalid_port_mask =3D BIT(2) | BIT(3) | BIT(4),
->  		.max_vid =3D 4095,
->  		.port_base_addr =3D 0x8,
->  		.phy_base_addr =3D 0x0,
-
-
-
+---
+base-commit: 537c2e91d3549e5d6020bb0576cf9b54a845255f
+change-id: 20240212-igc_mqprio-039650006128
 
 Best regards,
+-- 
+Kurt Kanzenbach <kurt@linutronix.de>
 
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/NP2qDeJCkPvX5.p498HS=_l
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmYCzuAACgkQAR8vZIA0
-zr0WZQf/TS8tiLOb/uxni7yXlc91NzpTBzJttjl0eCjVQXLAAM91ACAh31rDNN9V
-SpzRqygxu7tCrijEtp4mdNk1M2Q0Yv6dJ+nzDXQwcBfCoXZ8aoW15gO0Dl82Ndso
-Xe1zfzC42AUucu4MIP/gJSYt6zCcUxX2qhoQ/QD8HMHPabR52XviVmIRu+8DswaK
-gu7DLLKGOUZdY3bczYlo+yp+M1Lr+6lAJLuBoERP/xOXZ1pjhluYtvsFFJcvzxzk
-EGU27rFF/vo8qfjaOHQ2gXQT3/IvTEMebT7lVLP71bs71Gnm1/R2uwKhDr2SWpbh
-v8biXDw0AFh1iAm0ecFoOCmu1mSOCQ==
-=mBsF
------END PGP SIGNATURE-----
-
---Sig_/NP2qDeJCkPvX5.p498HS=_l--
 
