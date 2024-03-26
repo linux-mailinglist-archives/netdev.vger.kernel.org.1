@@ -1,108 +1,212 @@
-Return-Path: <netdev+bounces-82290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E23A88D14A
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 23:41:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F44988D12F
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 23:39:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5454B26449
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:41:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EADB532242E
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:39:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14EFF13E406;
-	Tue, 26 Mar 2024 22:40:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="niUVsVHK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 102DF13E037;
+	Tue, 26 Mar 2024 22:38:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C67A813E021;
-	Tue, 26 Mar 2024 22:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B279313E02F
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 22:38:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711492800; cv=none; b=IyaCnX9AkTqakZF12f4/QEArm1V2DnqShkP2km+dS33QG7LEyuzUxWN9yq646Km8Z0Yhvr7sp5a+oNWD79iHDn9iXBZKvJE6z6OGQBTTMRX7RpKn3Wm8sjicQyV1LiretduXldE4JvPDQ1ATNkyz09N6l9zg7bCx/ssyOmkb5pk=
+	t=1711492709; cv=none; b=hqRE3KDLV0I8+rzIjvwOsTpPbww5M3lr2ERfb4LRlnCToCjQM2KBVCnzx/OTuDY50awwOm6J3exB3D/EhULSnm8LwYuiaRrUOPNbc5kBDckc2szjh6bWrONQ3V5H/LkO0FxibW64xkoIATv1XNAzX4WHXNEQGJZpoKVWehf1fG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711492800; c=relaxed/simple;
-	bh=lulGfl/VARvXl3v+IQINE9T8HFeaXr5b7miTjpnKPBo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=aYRPBKlR55ue5TLUGjnBVE1jxa7Xv+6WEU0CLEF+ZGlOhYtE72gnzoDt9gD8LxRJ2H0iiUNi4roFk1zDEjknDyfOLUOKPKS11KXimBwiRg6lcQkx2Vk7B7iWXYtFLvlzs67ktYLIUsVUiW9gGLYEpXljbvrLPj2bG8m6sl+SLac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=niUVsVHK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71FEBC433C7;
-	Tue, 26 Mar 2024 22:39:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711492800;
-	bh=lulGfl/VARvXl3v+IQINE9T8HFeaXr5b7miTjpnKPBo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=niUVsVHKc3NZHc+8bduQh4f+aNkZPxgGbbD/cp6isZmq1TLeongbEUIco/kjnVt4w
-	 vrcNPIFu1AXIefydV9FNMA85yIawUajQw4k+GVHqaRrM7sLk34fxC8PhMqn8zjPjon
-	 Rvl0Yo4kcCNjUZ9dH+6oF++f+v39DMtxPzVXQfgmjT045TQ9zYUPXioxybMsAynosm
-	 NrWCVpBujF9x8mXOInpLI1ROZ3A+ALXRjiJE0QikPWDETejt3OrZ5Xl6+UGQ3Dy6GX
-	 Juc0uFFkx6qC3xK5BAjJBHy5fiq2zDKL3B6YNW+SF514M+hngUaYRuaQ1LmV9WSQdK
-	 E6vkxMGcrXDBg==
-From: Arnd Bergmann <arnd@kernel.org>
-To: llvm@lists.linux.dev,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>,
-	Vlad Buslov <vladbu@nvidia.com>,
-	Roi Dayan <roid@nvidia.com>,
-	Maor Dickman <maord@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH 4/9] mlx5: avoid truncating error message
-Date: Tue, 26 Mar 2024 23:38:03 +0100
-Message-Id: <20240326223825.4084412-5-arnd@kernel.org>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20240326223825.4084412-1-arnd@kernel.org>
-References: <20240326223825.4084412-1-arnd@kernel.org>
+	s=arc-20240116; t=1711492709; c=relaxed/simple;
+	bh=Lbq/0U+KE6IrvSkCL0zaYEXlSWMqVHZH+4PcV8PJj+o=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=aHs1j36mCyUkhd0lQu06uCl6VZya9HoqW05anmojco57O5DOfcFk4YIs9+BB3MUQkMqTrkEmBHEt92+c+nP4xa3aL4F7OOdArapshh2U5TqDTu52w2bdSXcs6RW8aVoCfsUE9zdVwS1R+U/FE7w7tHmmbX4fYMzuUeH+1bFYecs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3665991058fso2679635ab.1
+        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 15:38:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711492706; x=1712097506;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pg4FbvwKuIZDOjcZr1xzWIWjh7nZvLbstqVZUm4IHx8=;
+        b=AkcG3pIKP85iUR2i8GwMT6YoNjrpxu0O7RFUfnBa163o6MvyJRIWkkt2KROgCssk8q
+         0reO4C+FbwAx/97MSud6zRW8kR9gCdRM24WV6qc8LuXjRwWDonNCF1SKilD6mmo1OlpN
+         TwxKRI/D82JR3sdxWy2MPT8Tj6oWtQz7r+V6oc9mg6spq0W4eo7rPwTCvyX3lUOm8Pdu
+         yWGxRqCdKY/h4UngMruexZG4zNPkITmG/Ein8NC0sBWfQmJ+vh6O/Ke0nGDONF2m5mf0
+         OEtdnyDYCZ+k6fP/tWbTqo4Q2XiyM4QN1SFR9A6CUV7bHZegY+yoM/K8J12NT0fx0qjH
+         p/YA==
+X-Forwarded-Encrypted: i=1; AJvYcCXUT4irYLMr0S+HGgwatEFasrde3yLtyFJCh9oyWXdawsiIJnGo+87P2skDYn5NcsDtMyL3AWr6FlVLeBK1sYjLmDYHn2br
+X-Gm-Message-State: AOJu0Yy0KoIG59dp8JNcPZ4VGVQ1PxE2FtKj9+pxBg1kAzxxBCQbM6xF
+	e/JZxmeOMVeo7ZVH1yLTZLISe2sGn9Atyl/UlAOSHsf6kjs2DvdhxJ9e1MioTTWDd7+Y4HyZZcV
+	4CY82/U9rb993r/0Hhc7Rxu7JLayJI9ZgHRgl2yAmHXxTpLWAJ4Gb0sI=
+X-Google-Smtp-Source: AGHT+IE1nOIfaWoCc8LJq4vT89ASXfPLzzJhw0mvC4pk70MpBRfHet54JdkcVxfjmvfsLEzXhlYN3Gv3qaJGMuBqOLsERvcq2crB
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:2199:b0:366:b246:2f10 with SMTP id
+ j25-20020a056e02219900b00366b2462f10mr114997ila.2.1711492705393; Tue, 26 Mar
+ 2024 15:38:25 -0700 (PDT)
+Date: Tue, 26 Mar 2024 15:38:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000bdb4b9061497f2de@google.com>
+Subject: [syzbot] [virtualization?] net boot error: WARNING: refcount bug in __free_pages_ok
+From: syzbot <syzbot+84f677a274bd8b05f6cb@syzkaller.appspotmail.com>
+To: davem@davemloft.net, jasowang@redhat.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, mst@redhat.com, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com, virtualization@lists.linux.dev, 
+	xuanzhuo@linux.alibaba.com
+Content-Type: text/plain; charset="UTF-8"
 
-From: Arnd Bergmann <arnd@arndb.de>
+Hello,
 
-clang warns that one error message is too long for its destination buffer:
+syzbot found the following issue on:
 
-drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c:1876:4: error: 'snprintf' will always be truncated; specified size is 80, but format string expands to at least 94 [-Werror,-Wformat-truncation-non-kprintf]
+HEAD commit:    c1fd3a9433a2 Merge branch 'there-are-some-bugfix-for-the-h..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=134f4c81180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a5e4ca7f025e9172
+dashboard link: https://syzkaller.appspot.com/bug?extid=84f677a274bd8b05f6cb
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-Reword it to be a bit shorter so it always fits.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/89219dafdd42/disk-c1fd3a94.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/d962e40c0da9/vmlinux-c1fd3a94.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/248b8f5eb3a1/bzImage-c1fd3a94.xz
 
-Fixes: 70f0302b3f20 ("net/mlx5: Bridge, implement mdb offload")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+84f677a274bd8b05f6cb@syzkaller.appspotmail.com
+
+Key type pkcs7_test registered
+Block layer SCSI generic (bsg) driver version 0.4 loaded (major 239)
+io scheduler mq-deadline registered
+io scheduler kyber registered
+io scheduler bfq registered
+input: Power Button as /devices/LNXSYSTM:00/LNXPWRBN:00/input/input0
+ACPI: button: Power Button [PWRF]
+input: Sleep Button as /devices/LNXSYSTM:00/LNXSLPBN:00/input/input1
+ACPI: button: Sleep Button [SLPF]
+ioatdma: Intel(R) QuickData Technology Driver 5.00
+ACPI: \_SB_.LNKC: Enabled at IRQ 11
+virtio-pci 0000:00:03.0: virtio_pci: leaving for legacy driver
+ACPI: \_SB_.LNKD: Enabled at IRQ 10
+virtio-pci 0000:00:04.0: virtio_pci: leaving for legacy driver
+ACPI: \_SB_.LNKB: Enabled at IRQ 10
+virtio-pci 0000:00:06.0: virtio_pci: leaving for legacy driver
+virtio-pci 0000:00:07.0: virtio_pci: leaving for legacy driver
+N_HDLC line discipline registered with maxframe=4096
+Serial: 8250/16550 driver, 4 ports, IRQ sharing enabled
+00:03: ttyS0 at I/O 0x3f8 (irq = 4, base_baud = 115200) is a 16550A
+00:04: ttyS1 at I/O 0x2f8 (irq = 3, base_baud = 115200) is a 16550A
+00:05: ttyS2 at I/O 0x3e8 (irq = 6, base_baud = 115200) is a 16550A
+00:06: ttyS3 at I/O 0x2e8 (irq = 7, base_baud = 115200) is a 16550A
+Non-volatile memory driver v1.3
+Linux agpgart interface v0.103
+ACPI: bus type drm_connector registered
+[drm] Initialized vgem 1.0.0 20120112 for vgem on minor 0
+[drm] Initialized vkms 1.0.0 20180514 for vkms on minor 1
+Console: switching to colour frame buffer device 128x48
+platform vkms: [drm] fb0: vkmsdrmfb frame buffer device
+usbcore: registered new interface driver udl
+brd: module loaded
+loop: module loaded
+zram: Added device: zram0
+null_blk: disk nullb0 created
+null_blk: module loaded
+Guest personality initialized and is inactive
+VMCI host device registered (name=vmci, major=10, minor=118)
+Initialized host personality
+usbcore: registered new interface driver rtsx_usb
+usbcore: registered new interface driver viperboard
+usbcore: registered new interface driver dln2
+usbcore: registered new interface driver pn533_usb
+nfcsim 0.2 initialized
+usbcore: registered new interface driver port100
+usbcore: registered new interface driver nfcmrvl
+Loading iSCSI transport class v2.0-870.
+virtio_scsi virtio0: 1/0/0 default/read/poll queues
+------------[ cut here ]------------
+refcount_t: decrement hit 0; leaking memory.
+WARNING: CPU: 1 PID: 1 at lib/refcount.c:31 refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:31
+Modules linked in:
+CPU: 1 PID: 1 Comm: swapper/0 Not tainted 6.8.0-syzkaller-12856-gc1fd3a9433a2 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+RIP: 0010:refcount_warn_saturate+0xfa/0x1d0 lib/refcount.c:31
+Code: b2 00 00 00 e8 97 cf e9 fc 5b 5d c3 cc cc cc cc e8 8b cf e9 fc c6 05 6c 6b e8 0a 01 90 48 c7 c7 e0 34 1f 8c e8 27 6c ac fc 90 <0f> 0b 90 90 eb d9 e8 6b cf e9 fc c6 05 49 6b e8 0a 01 90 48 c7 c7
+RSP: 0000:ffffc90000066e18 EFLAGS: 00010246
+RAX: 57706ef3c4162200 RBX: ffff88801f8f468c RCX: ffff8880166d8000
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: 0000000000000004 R08: ffffffff815800c2 R09: fffffbfff1c396e0
+R10: dffffc0000000000 R11: fffffbfff1c396e0 R12: ffffea0000850dc0
+R13: ffffea0000850dc8 R14: 1ffffd400010a1b9 R15: 0000000000000000
+FS:  0000000000000000(0000) GS:ffff8880b9500000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000000000000 CR3: 000000000e132000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ reset_page_owner include/linux/page_owner.h:25 [inline]
+ free_pages_prepare mm/page_alloc.c:1141 [inline]
+ __free_pages_ok+0xc60/0xd90 mm/page_alloc.c:1270
+ make_alloc_exact+0xa3/0xf0 mm/page_alloc.c:4829
+ vring_alloc_queue drivers/virtio/virtio_ring.c:319 [inline]
+ vring_alloc_queue_split+0x20a/0x600 drivers/virtio/virtio_ring.c:1108
+ vring_create_virtqueue_split+0xc6/0x310 drivers/virtio/virtio_ring.c:1158
+ vring_create_virtqueue+0xca/0x110 drivers/virtio/virtio_ring.c:2683
+ setup_vq+0xe9/0x2d0 drivers/virtio/virtio_pci_legacy.c:131
+ vp_setup_vq+0xbf/0x330 drivers/virtio/virtio_pci_common.c:189
+ vp_find_vqs_msix+0x8b2/0xc80 drivers/virtio/virtio_pci_common.c:331
+ vp_find_vqs+0x4c/0x4e0 drivers/virtio/virtio_pci_common.c:408
+ virtio_find_vqs include/linux/virtio_config.h:233 [inline]
+ virtscsi_init+0x8db/0xd00 drivers/scsi/virtio_scsi.c:887
+ virtscsi_probe+0x3ea/0xf60 drivers/scsi/virtio_scsi.c:945
+ virtio_dev_probe+0x991/0xaf0 drivers/virtio/virtio.c:311
+ really_probe+0x2b8/0xad0 drivers/base/dd.c:656
+ __driver_probe_device+0x1a2/0x390 drivers/base/dd.c:798
+ driver_probe_device+0x50/0x430 drivers/base/dd.c:828
+ __driver_attach+0x45f/0x710 drivers/base/dd.c:1214
+ bus_for_each_dev+0x239/0x2b0 drivers/base/bus.c:368
+ bus_add_driver+0x347/0x620 drivers/base/bus.c:673
+ driver_register+0x23a/0x320 drivers/base/driver.c:246
+ virtio_scsi_init+0x65/0xe0 drivers/scsi/virtio_scsi.c:1083
+ do_one_initcall+0x248/0x880 init/main.c:1238
+ do_initcall_level+0x157/0x210 init/main.c:1300
+ do_initcalls+0x3f/0x80 init/main.c:1316
+ kernel_init_freeable+0x435/0x5d0 init/main.c:1548
+ kernel_init+0x1d/0x2b0 init/main.c:1437
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:243
+ </TASK>
+
+
 ---
- drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
-index 1b9bc32efd6f..c5ea1d1d2b03 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/esw/bridge.c
-@@ -1874,7 +1874,7 @@ int mlx5_esw_bridge_port_mdb_add(struct net_device *dev, u16 vport_num, u16 esw_
- 				 "Failed to lookup bridge port vlan metadata to create MDB (MAC=%pM,vid=%u,vport=%u)\n",
- 				 addr, vid, vport_num);
- 			NL_SET_ERR_MSG_FMT_MOD(extack,
--					       "Failed to lookup bridge port vlan metadata to create MDB (MAC=%pM,vid=%u,vport=%u)\n",
-+					       "Failed to lookup vlan metadata for MDB (MAC=%pM,vid=%u,vport=%u)\n",
- 					       addr, vid, vport_num);
- 			return -EINVAL;
- 		}
--- 
-2.39.2
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
