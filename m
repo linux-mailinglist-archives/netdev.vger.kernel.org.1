@@ -1,264 +1,202 @@
-Return-Path: <netdev+bounces-81894-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81895-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ECE388B88A
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 04:30:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A725F88B93B
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 05:05:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8EB0B23105
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 03:30:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00AD4B2267D
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 04:05:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13796129A6A;
-	Tue, 26 Mar 2024 03:30:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hxST6t1I"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BE09129A9E;
+	Tue, 26 Mar 2024 04:05:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-io1-f71.google.com (mail-io1-f71.google.com [209.85.166.71])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC2986AC1
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 03:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7682C1292D8
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 04:05:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.71
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711423836; cv=none; b=Ct8agnBaR472lt1irmvcG1AJg50w08Zl/W3dwrYxLSq1O/XfQvfO7rIzeB61fpsPvWLaFgW8TpuKYGr3sYqFg4pG7YF6oWW1H48sGa+t5JOcsHwsVs+8zVydhX2I4+YiL8iVQTyUJo2i+qy1mRaPKW9uDtYsxQkQdiyBX1iozfo=
+	t=1711425929; cv=none; b=kxRPnXAf/vYLXLwwh8jL47q2dml3PgqcLD7TQ1SlvbM78TXVzuXyTzKTHmRPMBiO6nmEUfXQHGQYJWSZaaChm/T+b4SAGSk8YbM+KZyce5WjBaVhH1k/Y7WPc8BJS48JhRZzNh3U8dDin+caRl4jUBGXoRIfy37cvuUrPkBADyU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711423836; c=relaxed/simple;
-	bh=ku8YzMn9QMy7xB2oEL6yj+qh7mh+oEzbTYBRUdDchNQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jRuAUEaTXWsvaD2jNTedVYQFQRE47FniqFgLFC7OkMWrDvVuIkjaknk9deFHcl//ci/6NsKHXaahyD8c/3m2ME+tMpf1CZtxel1mxzPg/ZUlm8Y5dXwjfdpvQo+f0DR3+6m8V7D+g5hu/d6SHXCAMDpRL9V2Kx+QlHyHTq92Z+g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hxST6t1I; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6e6c0098328so3415896b3a.3
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 20:30:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711423833; x=1712028633; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rXt+e70s18vvmZvnfHoG/leNZ6ipUAeaM1qUbwNwWzI=;
-        b=hxST6t1Iaai+BkGzQH0V367/ifl0eBvuUU6mjxDrj727ygQSnu5lafaLpRzF02Kiz3
-         xKH3OQf++suzx8kLLS2YRI98jkQ5Q1K1+qPy8uDGyqGtGLOulUvSAktiaB9apImS/hS7
-         wBDT62czZVCxMkuFMGLQOsZbfW5zhfzUxMTty9S0ggxSS2J84qnDQwuJKckHr7hthsvG
-         bq0vDbiW4Md65ZodKUT9d3DpwvixrjG2d0f0a2yAKk2IORQS4IFul3en5CsuJJnLM05r
-         FFbg1xPxUG+vAPF9M3SeJbv62dmI1n3wkmchcVYJubhWSO8Bm986Kp7gB95hU9qF26Kr
-         luaQ==
+	s=arc-20240116; t=1711425929; c=relaxed/simple;
+	bh=RWMooWm2hTg+urHegWoX075dxGCiiXod91LeHWx3vAQ=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Z6Wpl0kg5s4607veIn8GO3p9RfUIAm9upOEPfH4A2ziPXqVzVkowiwBJTmmSUkRhGfnk3i6JYkQ0Suz+8+WzbzNnkp8Fh1PAma31+2STJmCMCL8utPhtoeeQwPKsuUroNpGCzSTahX4bhpSBBsBoEe3tJwv0nDY2udzIqGcS1Z0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.71
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f71.google.com with SMTP id ca18e2360f4ac-7cf179c3da4so522478339f.2
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 21:05:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711423833; x=1712028633;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rXt+e70s18vvmZvnfHoG/leNZ6ipUAeaM1qUbwNwWzI=;
-        b=ANVSRIkvkuSKk6HFlDHjeXVJrjiUpR7UDx7y6Q2Woyu1Z4rWNoki4yAngRXOcHn72p
-         1HbAx10zMmxqEkEXlvY+Pz7BB6LH6EksdWox0tCvwRf3JxImRPwm8/TIlMOgK8bED77i
-         GVsQ0Tsvn+Run5VAWRXXx9sOoqt8XJ3n5eL1t1jnVLtejYPUhpmeVEBYiGt9zj5bX4CX
-         sU4MJuEqaRadip2wgkz+wzr6hyU/Fu6FImm+YUsZirham8KuZNF5X+yCf55/5tEYGpQm
-         OMP95v21MrbBo0kn9FTF8I+E6ETKADR2bLIJzuR5sD6T9NtKuyF5PCD3JyZywC9Gowpm
-         GYVg==
-X-Gm-Message-State: AOJu0YzPKD8lGOrqF//Ingo+sO4GPS9x1DP1JYLfL1Iudh0gcIzJY/I4
-	Qf1+ofSRlXCCZN5veZZdOXWP6kxC44Y+Okz0go/Ke18NaPdBWK3Z5suNqspwzXvC9w==
-X-Google-Smtp-Source: AGHT+IGbCt+BVUMhC+CJnFo7YPm5UcKDsqSI9Gv29tzeBfu/U2NkmI3RXDKBWSE2Dxc4lfR4xm1mGA==
-X-Received: by 2002:a05:6a20:8f0b:b0:1a3:b153:5f4e with SMTP id b11-20020a056a208f0b00b001a3b1535f4emr8893947pzk.54.1711423833368;
-        Mon, 25 Mar 2024 20:30:33 -0700 (PDT)
-Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d13-20020a170902654d00b001dd99fe365dsm5676310pln.42.2024.03.25.20.30.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Mar 2024 20:30:33 -0700 (PDT)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net-next 4/4] uapi: team: use header file generated from YAML spec
-Date: Tue, 26 Mar 2024 11:30:04 +0800
-Message-ID: <20240326033005.2072622-5-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20240326033005.2072622-1-liuhangbin@gmail.com>
-References: <20240326033005.2072622-1-liuhangbin@gmail.com>
+        d=1e100.net; s=20230601; t=1711425926; x=1712030726;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=d7qjNzAOBCybfoRNbZxcOy1j71w0Id/vFEg3S7E5tBY=;
+        b=Jwj98HT0PhkZgZzk99KBp7bToqFCvM+CnB8DaYtVPmocYtSHz/MyV3S6T3ueBnxl7b
+         16C9kLxEYmoLGP++dWOQjIOU5mkz/WjK8PR9Z5EbfaTaKrkoaOEPoK19DScjR8BkYR40
+         6We4p/gBMJ5bGEVjbypmTNwoi7j61925GPUXrWHVMOyIOBqu7ckf9UY5t28fUg8B0czK
+         aO52z7UHsKK+/QIg+71X1lrMcpFXRqpJKDWBgwmxSYya9Rp6ZLOJZI11qeaIE4Ibogze
+         uiGnGkZfDx2/P2S8vN2ikmWAzsVsyE+IvWxu10cwqlzwx6wkd05BhI7Qw3C7hOzE/izk
+         t6tw==
+X-Forwarded-Encrypted: i=1; AJvYcCVNt4iVq8W/+AuMamarpIJLJkHwXU7Oh9aUMcDO/zdROX3GdITnPyON7fMOETE8gGTCl0P/TnVkNccfgbXPElb020VWv+td
+X-Gm-Message-State: AOJu0YzA9dAYkiL/Pss7x5xDTNUDGg+ctLva4o2ZBbyCPBzheTYw1mfi
+	/QAdIOnFIi1Kc8SQNJVyODN4qMyVlqJbtEjXsBfU0Wb8mV6HSZ6DUDN2RTQ2Rsxt+7YwRqfDXrI
+	IzfNonOoR9kf7DAImjZ+R6I2Geesatf9+wcw2lYDkB+0tA387orammUU=
+X-Google-Smtp-Source: AGHT+IFts4zA2Z3bUiY9aEPSNt9BH1OB0xu+cuRCJO43hRtNgnWV2ARVS0eAAhcU5FM6y8Ev6kn3aTZtfo2Eu16PJa6cX5oo/Uec
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a92:cda8:0:b0:367:472c:e7d7 with SMTP id
+ g8-20020a92cda8000000b00367472ce7d7mr484039ild.0.1711425926722; Mon, 25 Mar
+ 2024 21:05:26 -0700 (PDT)
+Date: Mon, 25 Mar 2024 21:05:26 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000006c06870614886611@google.com>
+Subject: [syzbot] [wireless?] KMSAN: uninit-value in ieee80211_rx_handlers (2)
+From: syzbot <syzbot+75af45a00cf13243ba39@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johannes@sipsolutions.net, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-generated with:
+Hello,
 
- $ ./tools/net/ynl/ynl-gen-c.py --mode uapi \
- > --spec Documentation/netlink/specs/team.yaml \
- > --header -o include/uapi/linux/if_team.h
+syzbot found the following issue on:
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+HEAD commit:    4f55aa85a874 Merge tag 'fbdev-for-6.9-rc1' of git://git.ke..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1536e231180000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e6bd769cb793b98a
+dashboard link: https://syzkaller.appspot.com/bug?extid=75af45a00cf13243ba39
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=156ebbb9180000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12605691180000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/7189321e94a5/disk-4f55aa85.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/2cca9c27d4fe/vmlinux-4f55aa85.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/b707938817e2/bzImage-4f55aa85.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+75af45a00cf13243ba39@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in ieee80211_rx_h_action net/mac80211/rx.c:3783 [inline]
+BUG: KMSAN: uninit-value in ieee80211_rx_handlers+0xbeb7/0x10ec0 net/mac80211/rx.c:4188
+ ieee80211_rx_h_action net/mac80211/rx.c:3783 [inline]
+ ieee80211_rx_handlers+0xbeb7/0x10ec0 net/mac80211/rx.c:4188
+ ieee80211_invoke_rx_handlers net/mac80211/rx.c:4223 [inline]
+ ieee80211_prepare_and_rx_handle+0x5424/0x99f0 net/mac80211/rx.c:5071
+ ieee80211_rx_for_interface+0x88d/0x990 net/mac80211/rx.c:5156
+ __ieee80211_rx_handle_packet net/mac80211/rx.c:5312 [inline]
+ ieee80211_rx_list+0x5498/0x6690 net/mac80211/rx.c:5447
+ ieee80211_rx_napi+0x84/0x3f0 net/mac80211/rx.c:5470
+ ieee80211_rx include/net/mac80211.h:5083 [inline]
+ ieee80211_tasklet_handler+0x19f/0x330 net/mac80211/main.c:438
+ tasklet_action_common+0x395/0xd50 kernel/softirq.c:781
+ tasklet_action+0x2d/0x40 kernel/softirq.c:807
+ __do_softirq+0x1c0/0x7d7 kernel/softirq.c:554
+ do_softirq+0x9a/0x100 kernel/softirq.c:455
+ __local_bh_enable_ip+0x9f/0xb0 kernel/softirq.c:382
+ local_bh_enable include/linux/bottom_half.h:33 [inline]
+ __ieee80211_tx_skb_tid_band+0x28a/0x580 net/mac80211/tx.c:6099
+ ieee80211_tx_skb_tid+0x203/0x2a0 net/mac80211/tx.c:6126
+ ieee80211_mgmt_tx+0x1c87/0x2210 net/mac80211/offchannel.c:979
+ rdev_mgmt_tx net/wireless/rdev-ops.h:758 [inline]
+ cfg80211_mlme_mgmt_tx+0xbdd/0x1b90 net/wireless/mlme.c:937
+ nl80211_tx_mgmt+0xfb0/0x1570 net/wireless/nl80211.c:12650
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1113 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
+ genl_rcv_msg+0x1214/0x12c0 net/netlink/genetlink.c:1208
+ netlink_rcv_skb+0x375/0x650 net/netlink/af_netlink.c:2559
+ genl_rcv+0x40/0x60 net/netlink/genetlink.c:1217
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0xf4c/0x1260 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x10df/0x11f0 net/netlink/af_netlink.c:1905
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:745
+ ____sys_sendmsg+0x877/0xb60 net/socket.c:2584
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+ __sys_sendmsg net/socket.c:2667 [inline]
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __x64_sys_sendmsg+0x307/0x4a0 net/socket.c:2674
+ do_syscall_64+0xd5/0x1f0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:3804 [inline]
+ slab_alloc_node mm/slub.c:3845 [inline]
+ kmem_cache_alloc_node+0x613/0xc50 mm/slub.c:3888
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:577
+ __alloc_skb+0x35b/0x7a0 net/core/skbuff.c:668
+ skb_copy+0x116/0xa10 net/core/skbuff.c:2128
+ mac80211_hwsim_tx_frame_no_nl+0x18e1/0x2130 drivers/net/wireless/virtual/mac80211_hwsim.c:1854
+ mac80211_hwsim_tx+0x1c3b/0x2d90 drivers/net/wireless/virtual/mac80211_hwsim.c:2072
+ drv_tx net/mac80211/driver-ops.h:37 [inline]
+ ieee80211_tx_frags+0x5ea/0xd90 net/mac80211/tx.c:1731
+ __ieee80211_tx+0x470/0x640 net/mac80211/tx.c:1785
+ ieee80211_tx+0x532/0x570 net/mac80211/tx.c:1965
+ ieee80211_xmit+0x54a/0x5b0 net/mac80211/tx.c:2057
+ __ieee80211_tx_skb_tid_band+0x27d/0x580 net/mac80211/tx.c:6098
+ ieee80211_tx_skb_tid+0x203/0x2a0 net/mac80211/tx.c:6126
+ ieee80211_mgmt_tx+0x1c87/0x2210 net/mac80211/offchannel.c:979
+ rdev_mgmt_tx net/wireless/rdev-ops.h:758 [inline]
+ cfg80211_mlme_mgmt_tx+0xbdd/0x1b90 net/wireless/mlme.c:937
+ nl80211_tx_mgmt+0xfb0/0x1570 net/wireless/nl80211.c:12650
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1113 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1193 [inline]
+ genl_rcv_msg+0x1214/0x12c0 net/netlink/genetlink.c:1208
+ netlink_rcv_skb+0x375/0x650 net/netlink/af_netlink.c:2559
+ genl_rcv+0x40/0x60 net/netlink/genetlink.c:1217
+ netlink_unicast_kernel net/netlink/af_netlink.c:1335 [inline]
+ netlink_unicast+0xf4c/0x1260 net/netlink/af_netlink.c:1361
+ netlink_sendmsg+0x10df/0x11f0 net/netlink/af_netlink.c:1905
+ sock_sendmsg_nosec net/socket.c:730 [inline]
+ __sock_sendmsg+0x30f/0x380 net/socket.c:745
+ ____sys_sendmsg+0x877/0xb60 net/socket.c:2584
+ ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
+ __sys_sendmsg net/socket.c:2667 [inline]
+ __do_sys_sendmsg net/socket.c:2676 [inline]
+ __se_sys_sendmsg net/socket.c:2674 [inline]
+ __x64_sys_sendmsg+0x307/0x4a0 net/socket.c:2674
+ do_syscall_64+0xd5/0x1f0
+ entry_SYSCALL_64_after_hwframe+0x6d/0x75
+
+CPU: 1 PID: 5018 Comm: syz-executor547 Not tainted 6.8.0-syzkaller-13006-g4f55aa85a874 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 02/29/2024
+=====================================================
+
+
 ---
- include/uapi/linux/if_team.h | 116 +++++++++++++----------------------
- 1 file changed, 43 insertions(+), 73 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/include/uapi/linux/if_team.h b/include/uapi/linux/if_team.h
-index 13c61fecb78b..a5c06243a435 100644
---- a/include/uapi/linux/if_team.h
-+++ b/include/uapi/linux/if_team.h
-@@ -1,108 +1,78 @@
--/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
--/*
-- * include/linux/if_team.h - Network team device driver header
-- * Copyright (c) 2011 Jiri Pirko <jpirko@redhat.com>
-- *
-- * This program is free software; you can redistribute it and/or modify
-- * it under the terms of the GNU General Public License as published by
-- * the Free Software Foundation; either version 2 of the License, or
-- * (at your option) any later version.
-- */
-+/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
-+/* Do not edit directly, auto-generated from: */
-+/*	Documentation/netlink/specs/team.yaml */
-+/* YNL-GEN uapi header */
- 
--#ifndef _UAPI_LINUX_IF_TEAM_H_
--#define _UAPI_LINUX_IF_TEAM_H_
-+#ifndef _UAPI_LINUX_IF_TEAM_H
-+#define _UAPI_LINUX_IF_TEAM_H
- 
-+#define TEAM_GENL_NAME		"team"
-+#define TEAM_GENL_VERSION	1
- 
--#define TEAM_STRING_MAX_LEN 32
--
--/**********************************
-- * NETLINK_GENERIC netlink family.
-- **********************************/
--
--enum {
--	TEAM_CMD_NOOP,
--	TEAM_CMD_OPTIONS_SET,
--	TEAM_CMD_OPTIONS_GET,
--	TEAM_CMD_PORT_LIST_GET,
--
--	__TEAM_CMD_MAX,
--	TEAM_CMD_MAX = (__TEAM_CMD_MAX - 1),
--};
-+#define TEAM_STRING_MAX_LEN			32
-+#define TEAM_GENL_CHANGE_EVENT_MC_GRP_NAME	"change_event"
- 
- enum {
- 	TEAM_ATTR_UNSPEC,
--	TEAM_ATTR_TEAM_IFINDEX,		/* u32 */
--	TEAM_ATTR_LIST_OPTION,		/* nest */
--	TEAM_ATTR_LIST_PORT,		/* nest */
-+	TEAM_ATTR_TEAM_IFINDEX,
-+	TEAM_ATTR_LIST_OPTION,
-+	TEAM_ATTR_LIST_PORT,
- 
- 	__TEAM_ATTR_MAX,
--	TEAM_ATTR_MAX = __TEAM_ATTR_MAX - 1,
-+	TEAM_ATTR_MAX = (__TEAM_ATTR_MAX - 1)
- };
- 
--/* Nested layout of get/set msg:
-- *
-- *	[TEAM_ATTR_LIST_OPTION]
-- *		[TEAM_ATTR_ITEM_OPTION]
-- *			[TEAM_ATTR_OPTION_*], ...
-- *		[TEAM_ATTR_ITEM_OPTION]
-- *			[TEAM_ATTR_OPTION_*], ...
-- *		...
-- *	[TEAM_ATTR_LIST_PORT]
-- *		[TEAM_ATTR_ITEM_PORT]
-- *			[TEAM_ATTR_PORT_*], ...
-- *		[TEAM_ATTR_ITEM_PORT]
-- *			[TEAM_ATTR_PORT_*], ...
-- *		...
-- */
--
- enum {
- 	TEAM_ATTR_ITEM_OPTION_UNSPEC,
--	TEAM_ATTR_ITEM_OPTION,		/* nest */
-+	TEAM_ATTR_ITEM_OPTION,
- 
- 	__TEAM_ATTR_ITEM_OPTION_MAX,
--	TEAM_ATTR_ITEM_OPTION_MAX = __TEAM_ATTR_ITEM_OPTION_MAX - 1,
-+	TEAM_ATTR_ITEM_OPTION_MAX = (__TEAM_ATTR_ITEM_OPTION_MAX - 1)
- };
- 
- enum {
- 	TEAM_ATTR_OPTION_UNSPEC,
--	TEAM_ATTR_OPTION_NAME,		/* string */
--	TEAM_ATTR_OPTION_CHANGED,	/* flag */
--	TEAM_ATTR_OPTION_TYPE,		/* u8 */
--	TEAM_ATTR_OPTION_DATA,		/* dynamic */
--	TEAM_ATTR_OPTION_REMOVED,	/* flag */
--	TEAM_ATTR_OPTION_PORT_IFINDEX,	/* u32 */ /* for per-port options */
--	TEAM_ATTR_OPTION_ARRAY_INDEX,	/* u32 */ /* for array options */
-+	TEAM_ATTR_OPTION_NAME,
-+	TEAM_ATTR_OPTION_CHANGED,
-+	TEAM_ATTR_OPTION_TYPE,
-+	TEAM_ATTR_OPTION_DATA,
-+	TEAM_ATTR_OPTION_REMOVED,
-+	TEAM_ATTR_OPTION_PORT_IFINDEX,
-+	TEAM_ATTR_OPTION_ARRAY_INDEX,
- 
- 	__TEAM_ATTR_OPTION_MAX,
--	TEAM_ATTR_OPTION_MAX = __TEAM_ATTR_OPTION_MAX - 1,
-+	TEAM_ATTR_OPTION_MAX = (__TEAM_ATTR_OPTION_MAX - 1)
- };
- 
- enum {
- 	TEAM_ATTR_ITEM_PORT_UNSPEC,
--	TEAM_ATTR_ITEM_PORT,		/* nest */
-+	TEAM_ATTR_ITEM_PORT,
- 
- 	__TEAM_ATTR_ITEM_PORT_MAX,
--	TEAM_ATTR_ITEM_PORT_MAX = __TEAM_ATTR_ITEM_PORT_MAX - 1,
-+	TEAM_ATTR_ITEM_PORT_MAX = (__TEAM_ATTR_ITEM_PORT_MAX - 1)
- };
- 
- enum {
- 	TEAM_ATTR_PORT_UNSPEC,
--	TEAM_ATTR_PORT_IFINDEX,		/* u32 */
--	TEAM_ATTR_PORT_CHANGED,		/* flag */
--	TEAM_ATTR_PORT_LINKUP,		/* flag */
--	TEAM_ATTR_PORT_SPEED,		/* u32 */
--	TEAM_ATTR_PORT_DUPLEX,		/* u8 */
--	TEAM_ATTR_PORT_REMOVED,		/* flag */
-+	TEAM_ATTR_PORT_IFINDEX,
-+	TEAM_ATTR_PORT_CHANGED,
-+	TEAM_ATTR_PORT_LINKUP,
-+	TEAM_ATTR_PORT_SPEED,
-+	TEAM_ATTR_PORT_DUPLEX,
-+	TEAM_ATTR_PORT_REMOVED,
- 
- 	__TEAM_ATTR_PORT_MAX,
--	TEAM_ATTR_PORT_MAX = __TEAM_ATTR_PORT_MAX - 1,
-+	TEAM_ATTR_PORT_MAX = (__TEAM_ATTR_PORT_MAX - 1)
- };
- 
--/*
-- * NETLINK_GENERIC related info
-- */
--#define TEAM_GENL_NAME "team"
--#define TEAM_GENL_VERSION 0x1
--#define TEAM_GENL_CHANGE_EVENT_MC_GRP_NAME "change_event"
-+enum {
-+	TEAM_CMD_NOOP,
-+	TEAM_CMD_OPTIONS_SET,
-+	TEAM_CMD_OPTIONS_GET,
-+	TEAM_CMD_PORT_LIST_GET,
-+
-+	__TEAM_CMD_MAX,
-+	TEAM_CMD_MAX = (__TEAM_CMD_MAX - 1)
-+};
- 
--#endif /* _UAPI_LINUX_IF_TEAM_H_ */
-+#endif /* _UAPI_LINUX_IF_TEAM_H */
--- 
-2.43.0
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
