@@ -1,404 +1,379 @@
-Return-Path: <netdev+bounces-82059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15A8288C38F
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:35:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4181788C393
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:37:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEBCF2E2B00
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:35:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C456B21C6D
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 13:37:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66838745E1;
-	Tue, 26 Mar 2024 13:34:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B3F74437;
+	Tue, 26 Mar 2024 13:37:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="P9q6g3Gj";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="CspRZCmA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GZ6HZRCb"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46FFE74BF3
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 13:34:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A0F5125C9
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 13:37:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711460099; cv=none; b=Wqx3ZMK5SQ0qMKGV4eEwnq/nN2TZQF93xOY8cF0cBaI//YmLdNxYBrVRMNak7nxji8LycVSZWFdYz7aub68zGryNIqosTefffGygfrQoA1u5VQ/Pf+NGEZnrTBoJcMcFF8wUb1G5x0doJQjiNfXNr2hW3E/Wt2FkAvi1W7JibHI=
+	t=1711460245; cv=none; b=iD++zNVeAb2pUa0rPqAqhydfpqgYxfDPGwLFyWEwg+0c5jdy8W2rsHuRPYVrKPk6eHoupGwd/aKEl5rP98tMKtXsz6TePlDCr1pBryj8AbTqKggXjvHoPN/HzB3tKBMaqfzs0juzCqLd1zk9bWq0nJco+OUuxi1/i6+c7manR0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711460099; c=relaxed/simple;
-	bh=mYt96GKE78FeZHeuQOOo5T0yWfkI40v3e904PiG3yeA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=RYmCK0k2No7IfXR5BIa7ImA74cu/eOQZtwPaWusSz8HAibvR/f7pd+uJHxzLiqIzFznhigiAbeAPyT4i4QUSqFYPyC9UL25M99K9Xf+4gPteulijAPhpx4+W7sPlDi0NeYoejZSflr6EMr/5xzU9zI/MAeHlNplZ+qp6/6SM8AM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=P9q6g3Gj; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=CspRZCmA; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Kurt Kanzenbach <kurt@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1711460095;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=R8Vt8310MOBK5KZ3LiONjdXHDr/aJho3BwtVrzCbubk=;
-	b=P9q6g3GjASNyYWqeCRTbQvVJ7IoDcGDMhL4FyMyiPyKwWjNO7uw0Ov8tUIpOOSC3T7FplH
-	IzbyLnFuygN/bAtiNlv2y5m4ORy4EaZKJEPXvl7U/0nHMIAcPdRfFPBX6UBq/cNurNTJ9/
-	QJ5ae2m8TRX242XD5iRu/wCxT1z3hdo3LPZaYE1sIUBSGIwmdWkl+ywi0bR1Ysn/OA4QxG
-	h51IHRRNeSqP5pxAVM+3CD26ytMa58+9QPh7v64XRguqMcEf1rgL/UbC/9d0OiCVXENDxv
-	7BRHsVKaUGU8/76H4X+3T2kBCcbWFZ0g015uTORiwNcsmTFtQmOhYu5/DaR6Xg==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1711460095;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=R8Vt8310MOBK5KZ3LiONjdXHDr/aJho3BwtVrzCbubk=;
-	b=CspRZCmABMU8n/hBaqFOhkY7CkcvWwa2qDdREu2ALe3w3fB5kpaaASvbCNFyMeuTD9+kkf
-	Z9L29YixnoV3ryAA==
-Date: Tue, 26 Mar 2024 14:34:54 +0100
-Subject: [PATCH iwl-next v2] igc: Add MQPRIO offload support
+	s=arc-20240116; t=1711460245; c=relaxed/simple;
+	bh=MMgVDupJfX/bu0a2pfHYYTpYrt17kqQDyaJkoqkpKV0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QNhvJQMA9t8SQpbaH3fKnp/N05guJKN5awYLG+byVGR/jn1jDd1+xnxHu1UcAmDWBBYmH0Pp0eKvKck60z+aLmiILx48TJsxJRYq92ZkGB91+DyI7UZhkIevZoesvvbavdrKf1e3wLbv7UEUxEz9RiHE4ZwkdTVwRxaj4mHP/CI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GZ6HZRCb; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-56bde8ea904so12458a12.0
+        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 06:37:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1711460241; x=1712065041; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eNueMYNBuCciO/kx2UfzR7J8q8vIM6kZz0r3vAEVIVs=;
+        b=GZ6HZRCbivlKfmwa3ceHodAsCGdZlxFr+aUS48js1IuotKM/OmrpYFobWRq95387ZK
+         7pE5/6xMLuCoKhjZvrnhuuaUgu4gdOWRt/QrOxCCtnfVfx4oFHopoOPmFlemNE7rQQju
+         dk8DmhLC7zoHaRU//tHi4WKpH6L3/MF+6YyRgVYk7QH79wcEEgKSCe5Cr1DeiixGL2AT
+         I/r8rNt7xZq9Rnm122+YFGWE1JczZEy7JiVFfCfuF1SMgXnPQb8XAieHwtV882VCETX4
+         vxI4m4kUsdGdIzTKJQAlvZQJOh3Lop0PLr60WblQbUYwEXqSKwIYwGNpMlcFmZXCOMjL
+         yVYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1711460241; x=1712065041;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eNueMYNBuCciO/kx2UfzR7J8q8vIM6kZz0r3vAEVIVs=;
+        b=q4ylTItA3oOR2/H+x0Lsz9ngj++MlwCF78cydVkMvzafHS7Iq1wv4EetX1MXQxAxt1
+         Sb6dGgcxcslFXUfx2jQ570svzlpKF7jeM+oKyTWk0GNw2TabjHa2HnhXPHx/+uryd/sB
+         tYxZ6q2aTBVmy7YZnt+4Ib47UmFGWNKvzFKcZqQ2ul3816MXqHbIN1IpEgDOCrQolwPJ
+         1vxqzDX1HvGryHXRDyPDLkb9WjXL9uc+uTkfSR1m3YFKTXdv35QLBUeJ5vlLEzPhyoR0
+         tmKCQYQ2CbZlzztrYzlur4PTqsVsYDv2FjdihLLM2Ac7pK4OMysubDpFb+byksQ1XWWg
+         59JA==
+X-Forwarded-Encrypted: i=1; AJvYcCWnjNlwbusKxe+Yqwnjo3WHXjJCkXi7LgPswnZsxGSVKesX2YeBtPUUckmJRbEvP6gdFsNvsZ9AeOOHz204ireoFE+Xv5bF
+X-Gm-Message-State: AOJu0YxYHYKm8R/zGexY0i6v1q29qmsqdCP4/8CFOKxUSIsYgqTdh9ia
+	RhRcFeC+n32Pjceg7rH4PUHKo3KFCkZgR0FUwJVaN/lD8jpEYRCbnJOc3gPc/1qucNbSLbCNhz5
+	wcv5WnwVCqBPRpsaCVpi4CsT5MoF4txX69QX9
+X-Google-Smtp-Source: AGHT+IHMT+1TLpJEW38+w5X3GSRhvqKZ6m7vUAvu5/ghZLxGoVBkjEvgDVeHOWc9dE2qV4SHl8rjAYHqkMqBMQ7cRik=
+X-Received: by 2002:aa7:c384:0:b0:56c:c20:6b40 with SMTP id
+ k4-20020aa7c384000000b0056c0c206b40mr149748edq.0.1711460241191; Tue, 26 Mar
+ 2024 06:37:21 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20240212-igc_mqprio-v2-1-587924e6b18c@linutronix.de>
-X-B4-Tracking: v=1; b=H4sIAP3OAmYC/22NQQ6CMBAAv2L2bE1bBMST/zDEtHSFTaDFtiKG8
- HcLZ4+TyWQWCOgJA1wPC3icKJCzCeTxAE2nbIuMTGKQXJ65FJJR2zyG1+jJMZ5VRc45L4S8QAq
- 0Csi0V7bptmRQIaLfxOjxSfN+uQN9emZxjlAn01GIzn/3/SR2/+80CSZYqdBUuS6zwuhbT/Ydv
- bM0nwxCva7rD7k4J+fLAAAA
-To: Jesse Brandeburg <jesse.brandeburg@intel.com>, 
- Tony Nguyen <anthony.l.nguyen@intel.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, 
- Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
- Kurt Kanzenbach <kurt@linutronix.de>
-X-Developer-Signature: v=1; a=openpgp-sha256; l=10391; i=kurt@linutronix.de;
- h=from:subject:message-id; bh=mYt96GKE78FeZHeuQOOo5T0yWfkI40v3e904PiG3yeA=;
- b=owEBbQKS/ZANAwAKAcGT0fKqRnOCAcsmYgBmAs7+Jed5hgPF92JkQYRFlPERBlnC6h2vh5JSl
- 8klsoCbJOeJAjMEAAEKAB0WIQS8ub+yyMN909/bWZLBk9HyqkZzggUCZgLO/gAKCRDBk9HyqkZz
- gvqHEACIXIyrsuFxc2+9/JcvQDGBv3lXWnRGtVz2VMsUScngWT8vkoKgpuWkz0Rv8UD9PnzcFEW
- PBr7w2kKnvNR1jluyInGNWf93FT75Gbh+06b+hEDaloQ/mO1TtvUHftLCrCsrw8SomWTTxbxZU9
- E9HyW4I7xqID8BTuH+n5xRTzEXrRGEuwAdZLxTzv8XmMJpM2WjmITaMt/8apuCdacXCnWnjY+mv
- V3qgxHC4AImeZCHmdNOn45vqpfdtdMFKavK9Ceb5LxzlBjztuwOpMHOavqE4yJPfzrz/rWQMJOx
- gyOMvjjZZqQILubIoUidd1wPG7ayqZGNh+r2f6b20rrGZs8Vo3Nm3LU0lD7GIWdnpBY1G7YqodT
- CLAURSqxbv6juqmx9brMrrsomC3pqZFbH6V+UhWaW8Frsj/3C/KIVXov2v2+EgPG+jxbvjONhIM
- GBtGb8LvDf/z5/v55q0BghoPGUYgkCrMfTcar/pgVt1YnZ3oISO1mJkc3GPywHO80RwU2auZCFw
- 4m/Hq4NirPWGq/j/pHEV7yhfZUi/c6xqDdSOc7mDFk7OANSFvpV7T+UpmCqSWWwheBs2FNf2W6T
- JAlqH2PRRgxHsEHqDorHulo4sHS7MKmvht9TksTbDPGr6ftraw0wGTDz6PLyU4uj8XC/16W4T8s
- Fg704x96ElsDMsQ==
-X-Developer-Key: i=kurt@linutronix.de; a=openpgp;
- fpr=BCB9BFB2C8C37DD3DFDB5992C193D1F2AA467382
+References: <20240322122407.1329861-1-edumazet@google.com> <171111663201.19374.16295682760005551863.git-patchwork-notify@kernel.org>
+ <CAADnVQJy+0=6ZuAz-7dwOPK3sN2QrPiAcxhtojh8p65j0TRNhg@mail.gmail.com>
+ <CANn89iLSOeFGNogYMHbeLRC5kOwwArMz3d5_2hZmBn6fibyUhw@mail.gmail.com>
+ <CAADnVQ+OhsBetPT0avuNVsEwru13UtMjX1U_6_u6xROXBBn-Yg@mail.gmail.com>
+ <ZgGmQu09Z9xN7eOD@google.com> <d9531955-06ad-ccdd-d3d0-4779400090ba@iogearbox.net>
+In-Reply-To: <d9531955-06ad-ccdd-d3d0-4779400090ba@iogearbox.net>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 26 Mar 2024 14:37:10 +0100
+Message-ID: <CANn89iJFOR5ucef0bH=BTKrLOAGsUtF8tM=cYNDTg+=gHDntvw@mail.gmail.com>
+Subject: Re: [PATCH net] bpf: Don't redirect too small packets
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: Stanislav Fomichev <sdf@google.com>, Alexei Starovoitov <alexei.starovoitov@gmail.com>, 
+	Guillaume Nault <gnault@redhat.com>, patchwork-bot+netdevbpf@kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Andrii Nakryiko <andrii@kernel.org>, Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Eric Dumazet <eric.dumazet@gmail.com>, 
+	syzbot+9e27778c0edc62cb97d8@syzkaller.appspotmail.com, 
+	Willem de Bruijn <willemb@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Add support for offloading MQPRIO. The hardware has four priorities as well
-as four queues. Each queue must be a assigned with a unique priority.
+On Tue, Mar 26, 2024 at 1:46=E2=80=AFPM Daniel Borkmann <daniel@iogearbox.n=
+et> wrote:
+>
+> On 3/25/24 5:28 PM, Stanislav Fomichev wrote:
+> > On 03/25, Alexei Starovoitov wrote:
+> >> On Mon, Mar 25, 2024 at 6:33=E2=80=AFAM Eric Dumazet <edumazet@google.=
+com> wrote:
+> >>>
+> >>> On Sat, Mar 23, 2024 at 4:02=E2=80=AFAM Alexei Starovoitov
+> >>> <alexei.starovoitov@gmail.com> wrote:
+> >>>>
+> >>>> On Fri, Mar 22, 2024 at 7:10=E2=80=AFAM <patchwork-bot+netdevbpf@ker=
+nel.org> wrote:
+> >>>>>
+> >>>>> Hello:
+> >>>>>
+> >>>>> This patch was applied to bpf/bpf.git (master)
+> >>>>> by Daniel Borkmann <daniel@iogearbox.net>:
+> >>>>>
+> >>>>> On Fri, 22 Mar 2024 12:24:07 +0000 you wrote:
+> >>>>>> Some drivers ndo_start_xmit() expect a minimal size, as shown
+> >>>>>> by various syzbot reports [1].
+> >>>>>>
+> >>>>>> Willem added in commit 217e6fa24ce2 ("net: introduce device min_he=
+ader_len")
+> >>>>>> the missing attribute that can be used by upper layers.
+> >>>>>>
+> >>>>>> We need to use it in __bpf_redirect_common().
+> >>>>
+> >>>> This patch broke empty_skb test:
+> >>>> $ test_progs -t empty_skb
+> >>>>
+> >>>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
+> >>>> [redirect_ingress] unexpected ret: veth ETH_HLEN+1 packet ingress
+> >>>> [redirect_ingress]: actual -34 !=3D expected 0
+> >>>> test_empty_skb:PASS:err: veth ETH_HLEN+1 packet ingress [redirect_eg=
+ress] 0 nsec
+> >>>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
+> >>>> [redirect_egress] unexpected ret: veth ETH_HLEN+1 packet ingress
+> >>>> [redirect_egress]: actual -34 !=3D expected 1
+> >>>>
+> >>>> And looking at the test I think it's not a test issue.
+> >>>> This check
+> >>>> if (unlikely(skb->len < dev->min_header_len))
+> >>>> is rejecting more than it should.
+> >>>>
+> >>>> So I reverted this patch for now.
+> >>>
+> >>> OK, it seems I missed __bpf_rx_skb() vs __bpf_tx_skb(), but even if I
+> >>> move my sanity test in __bpf_tx_skb(),
+> >>> the bpf test program still fails, I am suspecting the test needs to b=
+e adjusted.
+> >>>
+> >>>
+> >>>
+> >>> diff --git a/net/core/filter.c b/net/core/filter.c
+> >>> index 745697c08acb3a74721d26ee93389efa81e973a0..e9c0e2087a08f1d8afd2c=
+3e8e7871ddc9231b76d
+> >>> 100644
+> >>> --- a/net/core/filter.c
+> >>> +++ b/net/core/filter.c
+> >>> @@ -2128,6 +2128,12 @@ static inline int __bpf_tx_skb(struct
+> >>> net_device *dev, struct sk_buff *skb)
+> >>>                  return -ENETDOWN;
+> >>>          }
+> >>>
+> >>> +       if (unlikely(skb->len < dev->min_header_len)) {
+> >>> +               pr_err_once("__bpf_tx_skb skb->len=3D%u <
+> >>> dev(%s)->min_header_len(%u)\n", skb->len, dev->name,
+> >>> dev->min_header_len);
+> >>> +               DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
+> >>> +               kfree_skb(skb);
+> >>> +               return -ERANGE;
+> >>> +       } // Note: this is before we change skb->dev
+> >>>          skb->dev =3D dev;
+> >>>          skb_set_redirected_noclear(skb, skb_at_tc_ingress(skb));
+> >>>          skb_clear_tstamp(skb);
+> >>>
+> >>>
+> >>> -->
+> >>>
+> >>>
+> >>> test_empty_skb:FAIL:ret: veth ETH_HLEN+1 packet ingress
+> >>> [redirect_egress] unexpected ret: veth ETH_HLEN+1 packet ingress
+> >>> [redirect_egress]: actual -34 !=3D expected 1
+> >>>
+> >>> [   58.382051] __bpf_tx_skb skb->len=3D1 < dev(veth0)->min_header_len=
+(14)
+> >>> [   58.382778] skb len=3D1 headroom=3D78 headlen=3D1 tailroom=3D113
+> >>>                 mac=3D(64,14) net=3D(78,-1) trans=3D-1
+> >>>                 shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D0 type=3D0=
+ segs=3D0))
+> >>>                 csum(0x0 ip_summed=3D0 complete_sw=3D0 valid=3D0 leve=
+l=3D0)
+> >>>                 hash(0x0 sw=3D0 l4=3D0) proto=3D0x7f00 pkttype=3D0 ii=
+f=3D0
+> >>
+> >> Hmm. Something is off.
+> >> That test creates 15 byte skb.
+> >> It's not obvious to me how it got reduced to 1.
+> >> Something stripped L2 header and the prog is trying to redirect
+> >> such skb into veth that expects skb with L2 ?
+> >>
+> >> Stan,
+> >> please take a look.
+> >> Since you wrote that test.
+> >
+> > Sure. Daniel wants to take a look on a separate thread, so we can sync
+> > up. Tentatively, seems like the failure is in the lwt path that does
+> > indeed drop the l2.
+>
+> If we'd change the test into the below, the tc and empty_skb tests pass.
+> run_lwt_bpf() calls into skb_do_redirect() which has L2 stripped, and thu=
+s
+> skb->len is 1 in this test. We do use skb_mac_header_len() also in other
+> tc BPF helpers, so perhaps s/skb->len/skb_mac_header_len(skb)/ is the bes=
+t
+> way forward..
+>
+> static int __bpf_redirect_common(struct sk_buff *skb, struct net_device *=
+dev,
+>                                   u32 flags)
+> {
+>          /* Verify that a link layer header is carried */
+>          if (unlikely(skb->mac_header >=3D skb->network_header || skb->le=
+n =3D=3D 0)) {
+>                  kfree_skb(skb);
+>                  return -ERANGE;
+>          }
+>
+>          if (unlikely(skb_mac_header_len(skb) < dev->min_header_len)) {
 
-However, the priorities are only considered in TSN Tx mode. There are two
-TSN Tx modes. In case of MQPRIO the Qbv capability is not required.
-Therefore, use the legacy TSN Tx mode, which performs strict priority
-arbitration.
+Unfortunately this will not prevent frames with skb->len =3D=3D 1 to reach
+an Ethernet driver ndo_start_xmit()
 
-Example for mqprio with hardware offload:
+At ndo_start_xmit(), we do not look where the MAC header supposedly
+starts in the skb, we only use skb->data
 
-|tc qdisc replace dev ${INTERFACE} handle 100 parent root mqprio num_tc 4 \
-|   map 0 0 0 0 0 1 2 3 0 0 0 0 0 0 0 0 \
-|   queues 1@0 1@1 1@2 1@3 \
-|   hw 1
+I have a syzbot repro using team driver, so I added the following part in t=
+eam :
 
-The mqprio Qdisc also allows to configure the `preemptible_tcs'. However,
-frame preemption is not supported yet.
+diff --git a/drivers/net/team/team.c b/drivers/net/team/team.c
+index 0a44bbdcfb7b9f30a0c27b700246501c5eba322f..75e5ef585a8f05b35cfddbae0bf=
+c377864e6e38c
+100644
+--- a/drivers/net/team/team.c
++++ b/drivers/net/team/team.c
+@@ -1714,6 +1714,11 @@ static netdev_tx_t team_xmit(struct sk_buff
+*skb, struct net_device *dev)
+        bool tx_success;
+        unsigned int len =3D skb->len;
 
-Tested on Intel i225 and implemented by following data sheet section 7.5.2,
-Transmit Scheduling.
++       if (len < 14) {
++               pr_err_once("team_xmit(len=3D%u)\n", len);
++               DO_ONCE_LITE(skb_dump, KERN_ERR, skb, false);
++               WARN_ON_ONCE(1);
++       }
+        tx_success =3D team_queue_override_transmit(team, skb);
+        if (!tx_success)
+                tx_success =3D team->ops.transmit(team, skb);
 
-Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
----
-Changes in v2:
-- Improve changelog (Paul Menzel)
-- Link to v1: https://lore.kernel.org/r/20240212-igc_mqprio-v1-1-7aed95b736db@linutronix.de
----
- drivers/net/ethernet/intel/igc/igc.h         | 10 +++-
- drivers/net/ethernet/intel/igc/igc_defines.h |  9 ++++
- drivers/net/ethernet/intel/igc/igc_main.c    | 69 +++++++++++++++++++++++++++
- drivers/net/ethernet/intel/igc/igc_regs.h    |  2 +
- drivers/net/ethernet/intel/igc/igc_tsn.c     | 71 +++++++++++++++++++++++++++-
- 5 files changed, 157 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-index 90316dc58630..49ba753ce957 100644
---- a/drivers/net/ethernet/intel/igc/igc.h
-+++ b/drivers/net/ethernet/intel/igc/igc.h
-@@ -227,6 +227,10 @@ struct igc_adapter {
- 	 */
- 	spinlock_t qbv_tx_lock;
- 
-+	bool strict_priority_enable;
-+	u8 num_tc;
-+	u16 queue_per_tc[IGC_MAX_TX_QUEUES];
-+
- 	/* OS defined structs */
- 	struct pci_dev *pdev;
- 	/* lock for statistics */
-@@ -346,9 +350,11 @@ extern char igc_driver_name[];
- #define IGC_FLAG_RX_LEGACY		BIT(16)
- #define IGC_FLAG_TSN_QBV_ENABLED	BIT(17)
- #define IGC_FLAG_TSN_QAV_ENABLED	BIT(18)
-+#define IGC_FLAG_TSN_LEGACY_ENABLED	BIT(19)
- 
--#define IGC_FLAG_TSN_ANY_ENABLED \
--	(IGC_FLAG_TSN_QBV_ENABLED | IGC_FLAG_TSN_QAV_ENABLED)
-+#define IGC_FLAG_TSN_ANY_ENABLED				\
-+	(IGC_FLAG_TSN_QBV_ENABLED | IGC_FLAG_TSN_QAV_ENABLED |	\
-+	 IGC_FLAG_TSN_LEGACY_ENABLED)
- 
- #define IGC_FLAG_RSS_FIELD_IPV4_UDP	BIT(6)
- #define IGC_FLAG_RSS_FIELD_IPV6_UDP	BIT(7)
-diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
-index 5f92b3c7c3d4..73502a0b4df7 100644
---- a/drivers/net/ethernet/intel/igc/igc_defines.h
-+++ b/drivers/net/ethernet/intel/igc/igc_defines.h
-@@ -547,6 +547,15 @@
- 
- #define IGC_MAX_SR_QUEUES		2
- 
-+#define IGC_TXARB_TXQ_PRIO_0_SHIFT	0
-+#define IGC_TXARB_TXQ_PRIO_1_SHIFT	2
-+#define IGC_TXARB_TXQ_PRIO_2_SHIFT	4
-+#define IGC_TXARB_TXQ_PRIO_3_SHIFT	6
-+#define IGC_TXARB_TXQ_PRIO_0_MASK	GENMASK(1, 0)
-+#define IGC_TXARB_TXQ_PRIO_1_MASK	GENMASK(3, 2)
-+#define IGC_TXARB_TXQ_PRIO_2_MASK	GENMASK(5, 4)
-+#define IGC_TXARB_TXQ_PRIO_3_MASK	GENMASK(7, 6)
-+
- /* Receive Checksum Control */
- #define IGC_RXCSUM_CRCOFL	0x00000800   /* CRC32 offload enable */
- #define IGC_RXCSUM_PCSD		0x00002000   /* packet checksum disabled */
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 2e1cfbd82f4f..b17764973d74 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -6415,6 +6415,13 @@ static int igc_tc_query_caps(struct igc_adapter *adapter,
- 	struct igc_hw *hw = &adapter->hw;
- 
- 	switch (base->type) {
-+	case TC_SETUP_QDISC_MQPRIO: {
-+		struct tc_mqprio_caps *caps = base->caps;
-+
-+		caps->validate_queue_counts = true;
-+
-+		return 0;
-+	}
- 	case TC_SETUP_QDISC_TAPRIO: {
- 		struct tc_taprio_caps *caps = base->caps;
- 
-@@ -6432,6 +6439,65 @@ static int igc_tc_query_caps(struct igc_adapter *adapter,
- 	}
- }
- 
-+static void igc_save_mqprio_params(struct igc_adapter *adapter, u8 num_tc,
-+				   u16 *offset)
-+{
-+	int i;
-+
-+	adapter->strict_priority_enable = true;
-+	adapter->num_tc = num_tc;
-+
-+	for (i = 0; i < num_tc; i++)
-+		adapter->queue_per_tc[i] = offset[i];
-+}
-+
-+static int igc_tsn_enable_mqprio(struct igc_adapter *adapter,
-+				 struct tc_mqprio_qopt_offload *mqprio)
-+{
-+	struct igc_hw *hw = &adapter->hw;
-+	int i;
-+
-+	if (hw->mac.type != igc_i225)
-+		return -EOPNOTSUPP;
-+
-+	if (!mqprio->qopt.num_tc) {
-+		adapter->strict_priority_enable = false;
-+		goto apply;
-+	}
-+
-+	/* There are as many TCs as Tx queues. */
-+	if (mqprio->qopt.num_tc != adapter->num_tx_queues) {
-+		NL_SET_ERR_MSG_FMT_MOD(mqprio->extack,
-+				       "Only %d traffic classes supported",
-+				       adapter->num_tx_queues);
-+		return -EOPNOTSUPP;
-+	}
-+
-+	/* Only one queue per TC is supported. */
-+	for (i = 0; i < mqprio->qopt.num_tc; i++) {
-+		if (mqprio->qopt.count[i] != 1) {
-+			NL_SET_ERR_MSG_MOD(mqprio->extack,
-+					   "Only one queue per TC supported");
-+			return -EOPNOTSUPP;
-+		}
-+	}
-+
-+	/* Preemption is not supported yet. */
-+	if (mqprio->preemptible_tcs) {
-+		NL_SET_ERR_MSG_MOD(mqprio->extack,
-+				   "Preemption is not supported yet");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	igc_save_mqprio_params(adapter, mqprio->qopt.num_tc,
-+			       mqprio->qopt.offset);
-+
-+	mqprio->qopt.hw = TC_MQPRIO_HW_OFFLOAD_TCS;
-+
-+apply:
-+	return igc_tsn_offload_apply(adapter);
-+}
-+
- static int igc_setup_tc(struct net_device *dev, enum tc_setup_type type,
- 			void *type_data)
- {
-@@ -6451,6 +6517,9 @@ static int igc_setup_tc(struct net_device *dev, enum tc_setup_type type,
- 	case TC_SETUP_QDISC_CBS:
- 		return igc_tsn_enable_cbs(adapter, type_data);
- 
-+	case TC_SETUP_QDISC_MQPRIO:
-+		return igc_tsn_enable_mqprio(adapter, type_data);
-+
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-diff --git a/drivers/net/ethernet/intel/igc/igc_regs.h b/drivers/net/ethernet/intel/igc/igc_regs.h
-index e5b893fc5b66..c83c723f7c7e 100644
---- a/drivers/net/ethernet/intel/igc/igc_regs.h
-+++ b/drivers/net/ethernet/intel/igc/igc_regs.h
-@@ -238,6 +238,8 @@
- #define IGC_TQAVCC(_n)		(0x3004 + ((_n) * 0x40))
- #define IGC_TQAVHC(_n)		(0x300C + ((_n) * 0x40))
- 
-+#define IGC_TXARB		0x3354 /* Tx Arbitration Control TxARB - RW */
-+
- /* System Time Registers */
- #define IGC_SYSTIML	0x0B600  /* System time register Low - RO */
- #define IGC_SYSTIMH	0x0B604  /* System time register High - RO */
-diff --git a/drivers/net/ethernet/intel/igc/igc_tsn.c b/drivers/net/ethernet/intel/igc/igc_tsn.c
-index 22cefb1eeedf..5e2e1c6076f3 100644
---- a/drivers/net/ethernet/intel/igc/igc_tsn.c
-+++ b/drivers/net/ethernet/intel/igc/igc_tsn.c
-@@ -46,6 +46,9 @@ static unsigned int igc_tsn_new_flags(struct igc_adapter *adapter)
- 	if (is_cbs_enabled(adapter))
- 		new_flags |= IGC_FLAG_TSN_QAV_ENABLED;
- 
-+	if (adapter->strict_priority_enable)
-+		new_flags |= IGC_FLAG_TSN_LEGACY_ENABLED;
-+
- 	return new_flags;
- }
- 
-@@ -84,7 +87,7 @@ void igc_tsn_adjust_txtime_offset(struct igc_adapter *adapter)
- static int igc_tsn_disable_offload(struct igc_adapter *adapter)
- {
- 	struct igc_hw *hw = &adapter->hw;
--	u32 tqavctrl;
-+	u32 tqavctrl, txarb;
- 	int i;
- 
- 	wr32(IGC_GTXOFFSET, 0);
-@@ -106,7 +109,26 @@ static int igc_tsn_disable_offload(struct igc_adapter *adapter)
- 	wr32(IGC_QBVCYCLET_S, 0);
- 	wr32(IGC_QBVCYCLET, NSEC_PER_SEC);
- 
-+	/* Reset mqprio TC configuration. */
-+	netdev_reset_tc(adapter->netdev);
-+
-+	/* Restore the default Tx arbitration: Priority 0 has the highest
-+	 * priority and is assigned to queue 0 and so on and so forth.
-+	 */
-+	txarb = rd32(IGC_TXARB);
-+	txarb &= ~(IGC_TXARB_TXQ_PRIO_0_MASK |
-+		   IGC_TXARB_TXQ_PRIO_1_MASK |
-+		   IGC_TXARB_TXQ_PRIO_2_MASK |
-+		   IGC_TXARB_TXQ_PRIO_3_MASK);
-+
-+	txarb |= 0x00 << IGC_TXARB_TXQ_PRIO_0_SHIFT;
-+	txarb |= 0x01 << IGC_TXARB_TXQ_PRIO_1_SHIFT;
-+	txarb |= 0x02 << IGC_TXARB_TXQ_PRIO_2_SHIFT;
-+	txarb |= 0x03 << IGC_TXARB_TXQ_PRIO_3_SHIFT;
-+	wr32(IGC_TXARB, txarb);
-+
- 	adapter->flags &= ~IGC_FLAG_TSN_QBV_ENABLED;
-+	adapter->flags &= ~IGC_FLAG_TSN_LEGACY_ENABLED;
- 
- 	return 0;
- }
-@@ -123,6 +145,50 @@ static int igc_tsn_enable_offload(struct igc_adapter *adapter)
- 	wr32(IGC_DTXMXPKTSZ, IGC_DTXMXPKTSZ_TSN);
- 	wr32(IGC_TXPBS, IGC_TXPBSIZE_TSN);
- 
-+	if (adapter->strict_priority_enable) {
-+		u32 txarb;
-+		int err;
-+
-+		err = netdev_set_num_tc(adapter->netdev, adapter->num_tc);
-+		if (err)
-+			return err;
-+
-+		for (i = 0; i < adapter->num_tc; i++) {
-+			err = netdev_set_tc_queue(adapter->netdev, i, 1,
-+						  adapter->queue_per_tc[i]);
-+			if (err)
-+				return err;
-+		}
-+
-+		/* In case the card is configured with less than four queues. */
-+		for (; i < IGC_MAX_TX_QUEUES; i++)
-+			adapter->queue_per_tc[i] = i;
-+
-+		/* Configure queue priorities according to the user provided
-+		 * mapping.
-+		 */
-+		txarb = rd32(IGC_TXARB);
-+		txarb &= ~(IGC_TXARB_TXQ_PRIO_0_MASK |
-+			   IGC_TXARB_TXQ_PRIO_1_MASK |
-+			   IGC_TXARB_TXQ_PRIO_2_MASK |
-+			   IGC_TXARB_TXQ_PRIO_3_MASK);
-+		txarb |= adapter->queue_per_tc[3] << IGC_TXARB_TXQ_PRIO_0_SHIFT;
-+		txarb |= adapter->queue_per_tc[2] << IGC_TXARB_TXQ_PRIO_1_SHIFT;
-+		txarb |= adapter->queue_per_tc[1] << IGC_TXARB_TXQ_PRIO_2_SHIFT;
-+		txarb |= adapter->queue_per_tc[0] << IGC_TXARB_TXQ_PRIO_3_SHIFT;
-+		wr32(IGC_TXARB, txarb);
-+
-+		/* Enable legacy TSN mode which will do strict priority without
-+		 * any other TSN features.
-+		 */
-+		tqavctrl = rd32(IGC_TQAVCTRL);
-+		tqavctrl |= IGC_TQAVCTRL_TRANSMIT_MODE_TSN;
-+		tqavctrl &= ~IGC_TQAVCTRL_ENHANCED_QAV;
-+		wr32(IGC_TQAVCTRL, tqavctrl);
-+
-+		return 0;
-+	}
-+
- 	for (i = 0; i < adapter->num_tx_queues; i++) {
- 		struct igc_ring *ring = adapter->tx_ring[i];
- 		u32 txqctl = 0;
-@@ -339,7 +405,8 @@ int igc_tsn_offload_apply(struct igc_adapter *adapter)
- 	 * cannot be changed dynamically. Require reset the adapter.
- 	 */
- 	if (netif_running(adapter->netdev) &&
--	    (igc_is_device_id_i225(hw) || !adapter->qbv_count)) {
-+	    (igc_is_device_id_i225(hw) || !adapter->qbv_count ||
-+	     !adapter->strict_priority_enable)) {
- 		schedule_work(&adapter->reset_task);
- 		return 0;
- 	}
+And I get (with your suggestion instead of skb->len)
 
----
-base-commit: 537c2e91d3549e5d6020bb0576cf9b54a845255f
-change-id: 20240212-igc_mqprio-039650006128
+mac=3D(78,0) net=3D(78,-1) trans=3D-1
+shinfo(txflags=3D0 nr_frags=3D0 gso(size=3D0 type=3D0 segs=3D0))
+csum(0x0 ip_summed=3D0 complete_sw=3D0 valid=3D0 level=3D0)
+hash(0x0 sw=3D0 l4=3D0) proto=3D0x88a8 pkttype=3D3 iif=3D0
+[   41.126553] dev name=3Dteam0 feat=3D0x0000e0064fddfbe9
+[   41.127132] skb linear:   00000000: 55
+[   41.128487] ------------[ cut here ]------------
+[   41.128551] WARNING: CPU: 2 PID: 1880 at
+drivers/net/team/team.c:1720 team_xmit (drivers/net/team/team.c:1720
+(discriminator 1))
+[   41.129072] Modules linked in: macsec macvtap macvlan hsr wireguard
+curve25519_x86_64 libcurve25519_generic libchacha20poly1305
+chacha_x86_64 libchacha poly1305_x86_64 batman_adv dummy bridge sr_mod
+cdrom evdev pcspkr i2c_piix4 9pnet_virtio 9p netfs 9pnet
+[   41.129613] CPU: 2 PID: 1880 Comm: b330650301 Not tainted 6.8.0-virtme #=
+238
+[   41.129664] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996),
+BIOS 1.16.3-debian-1.16.3-2 04/01/2014
+[   41.129780] RIP: 0010:team_xmit (drivers/net/team/team.c:1720
+(discriminator 1))
+[ 41.129847] Code: 41 54 53 44 8b 7f 70 48 89 fb 41 83 ff 0d 77 1c 80
+3d a0 24 8d 01 00 0f 84 0d 01 00 00 80 3d 92 24 8d 01 00 0f 84 e3 00
+00 00 <0f> 0b 41 80 be 21 0b 00 00 00 0f 84 9d 00 00 00 0f b7 43 7c 66
+85
+All code
+=3D=3D=3D=3D=3D=3D=3D=3D
+   0: 41 54                push   %r12
+   2: 53                    push   %rbx
+   3: 44 8b 7f 70          mov    0x70(%rdi),%r15d
+   7: 48 89 fb              mov    %rdi,%rbx
+   a: 41 83 ff 0d          cmp    $0xd,%r15d
+   e: 77 1c                ja     0x2c
+  10: 80 3d a0 24 8d 01 00 cmpb   $0x0,0x18d24a0(%rip)        # 0x18d24b7
+  17: 0f 84 0d 01 00 00    je     0x12a
+  1d: 80 3d 92 24 8d 01 00 cmpb   $0x0,0x18d2492(%rip)        # 0x18d24b6
+  24: 0f 84 e3 00 00 00    je     0x10d
+  2a:* 0f 0b                ud2 <-- trapping instruction
+  2c: 41 80 be 21 0b 00 00 cmpb   $0x0,0xb21(%r14)
+  33: 00
+  34: 0f 84 9d 00 00 00    je     0xd7
+  3a: 0f b7 43 7c          movzwl 0x7c(%rbx),%eax
+  3e: 66                    data16
+  3f: 85                    .byte 0x85
 
-Best regards,
--- 
-Kurt Kanzenbach <kurt@linutronix.de>
-
+Code starting with the faulting instruction
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+   0: 0f 0b                ud2
+   2: 41 80 be 21 0b 00 00 cmpb   $0x0,0xb21(%r14)
+   9: 00
+   a: 0f 84 9d 00 00 00    je     0xad
+  10: 0f b7 43 7c          movzwl 0x7c(%rbx),%eax
+  14: 66                    data16
+  15: 85                    .byte 0x85
+[   41.129902] RSP: 0018:ffffa4210433b938 EFLAGS: 00000246
+[   41.129945] RAX: 0000000000000000 RBX: ffffa4210858a300 RCX: 00000000000=
+00000
+[   41.129961] RDX: 0000000000000000 RSI: 00000000ffff7fff RDI: 00000000000=
+00001
+[   41.129975] RBP: ffffa4210433b960 R08: 0000000000000000 R09: ffffa421043=
+3b630
+[   41.129989] R10: 0000000000000001 R11: ffffffff8407d340 R12: 00000000000=
+00000
+[   41.130004] R13: ffffa4210ecee000 R14: ffffa4210ece4000 R15: 00000000000=
+00001
+[   41.130074] FS:  00007f91d9549740(0000) GS:ffffa42fffa80000(0000)
+knlGS:0000000000000000
+[   41.130095] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   41.130140] CR2: 00007f8953077fb0 CR3: 0000000104f42000 CR4: 00000000000=
+006f0
+[   41.130229] Call Trace:
+[   41.130331]  <TASK>
+[   41.130530] ? show_regs (arch/x86/kernel/dumpstack.c:479)
+[   41.130598] ? __warn (kernel/panic.c:694)
+[   41.130611] ? team_xmit (drivers/net/team/team.c:1720 (discriminator 1))
+[   41.130625] ? report_bug (lib/bug.c:180 lib/bug.c:219)
+[   41.130640] ? handle_bug (arch/x86/kernel/traps.c:239)
+[   41.130653] ? exc_invalid_op (arch/x86/kernel/traps.c:260 (discriminator=
+ 1))
+[   41.130665] ? asm_exc_invalid_op (./arch/x86/include/asm/idtentry.h:621)
+[   41.130700] ? team_xmit (drivers/net/team/team.c:1720 (discriminator 1))
+[   41.130714] ? team_xmit (drivers/net/team/team.c:1719 (discriminator 6))
+[   41.130734] dev_hard_start_xmit (./include/linux/netdevice.h:4903
+./include/linux/netdevice.h:4917 net/core/dev.c:3531
+net/core/dev.c:3547)
+[   41.130768] __dev_queue_xmit (./include/linux/netdevice.h:3287
+(discriminator 25) net/core/dev.c:4336 (discriminator 25))
+[   41.130780] ? kmalloc_reserve (net/core/skbuff.c:580 (discriminator 4))
+[   41.130796] ? pskb_expand_head (net/core/skbuff.c:2292)
+[   41.130815] __bpf_redirect (./include/linux/netdevice.h:3287
+(discriminator 25) net/core/filter.c:2143 (discriminator 25)
+net/core/filter.c:2172 (discriminator 25) net/core/filter.c:2196
+(discriminator 25))
+[   41.130825] bpf_clone_redirect (net/core/filter.c:2467
+(discriminator 1) net/core/filter.c:2439 (discriminator 1))
+[   41.130841] bpf_prog_9845f5eee09e82c6+0x61/0x66
+[   41.130948] ? bpf_ksym_find (./include/linux/rbtree_latch.h:113
+./include/linux/rbtree_latch.h:208 kernel/bpf/core.c:734)
+[   41.130963] ? is_bpf_text_address
+(./arch/x86/include/asm/preempt.h:84 (discriminator 13)
+./include/linux/rcupdate.h:97 (discriminator 13)
+./include/linux/rcupdate.h:813 (discriminator 13)
+kernel/bpf/core.c:769 (discriminator 13))
+[   41.130976] ? kernel_text_address (kernel/extable.c:125
+(discriminator 1) kernel/extable.c:94 (discriminator 1))
+[   41.130989] ? __kernel_text_address (kernel/extable.c:79 (discriminator =
+1))
+[   41.131002] ? unwind_get_return_address
+(arch/x86/kernel/unwind_frame.c:19 (discriminator 1))
+[   41.131014] ? __pfx_stack_trace_consume_entry (kernel/stacktrace.c:83)
+[   41.131028] ? arch_stack_walk (arch/x86/kernel/stacktrace.c:26)
+[   41.131044] ? stack_depot_save_flags (lib/stackdepot.c:675)
+[   41.131062] ? ktime_get (kernel/time/timekeeping.c:292
+kernel/time/timekeeping.c:388 kernel/time/timekeeping.c:848)
+[   41.131076] bpf_test_run (./include/linux/bpf.h:1234
+./include/linux/filter.h:657 ./include/linux/filter.h:664
+net/bpf/test_run.c:425)
+[   41.131087] ? security_sk_alloc (security/security.c:4662 (discriminator=
+ 13))
 
