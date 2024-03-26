@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-82004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E606788C0D5
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:36:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A2DC88C0D8
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 12:36:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17B231C3BDA5
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:36:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC2DA1C25CB2
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 11:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7E387E586;
-	Tue, 26 Mar 2024 11:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98FD780C06;
+	Tue, 26 Mar 2024 11:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dSGOu0b6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oUczJQ3K"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A45237641C
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 11:34:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7335B6CDB6
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 11:34:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711452855; cv=none; b=CTEmh59Bk2nKi0KlHTHQyUa7ARTZtIncGfObL5kweMBTSQbPn+LBEpIWPnfgnv4XSlmaLDD72o+rSCbOwrnfVVKpoPuNQKoKIQORem7v+p1u2mGGZIFB2uyopxBWcif63BxamtkutaSse6nRQMNQ4dpVzijXJaiXh4w065NJc8c=
+	t=1711452858; cv=none; b=AlRXEKZ7T+sZyR4l5eK3DPVmxPYG+Fnhtxd22hdh0V9lGfGrPMu7b43cwcSXFKgVtLJQBAnd1IOLFy9wcyIf4Qj7BxBWzEZLTYvZ+eKadNHXvAtY6neumgvvA2YgNwejFsShXtBXN+66N8Ea2bcWJTGm3dwJTlzhvnQgg5JsyOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711452855; c=relaxed/simple;
-	bh=olpSxbuDYHiKY9yUfuosPYFrh40NPdrcXw4pz6WYTX0=;
+	s=arc-20240116; t=1711452858; c=relaxed/simple;
+	bh=lNZ3GsF+2FDIGqDK/pc65J09dJNN1ybvqZZZwXWhNVs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MmaQZ7Hzg0amkBZ78E97KTdq9cfLPxhRuof9Qjuiklqe56BSOlbheRZciUjHQ+2Lw9Afeb2craMSr6SBFpSc2mnVzckJVkONjwq4JFtmdFl6zwWdGorIwjfYAlLxCCsxcq8oToyWyC/5GhlPBbTQ9Zo1IiB3/dRFc7oNxCEScTM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dSGOu0b6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 32D71C433F1;
-	Tue, 26 Mar 2024 11:34:15 +0000 (UTC)
+	 MIME-Version; b=c7E8xEpTR2YjbaphcCMmIah6FcR1YZlf2hXk0Ut1sKq4fcAJcvGpJayI3q8j2NjTNUbKj1lOTgleQGGfSdHap6ffR330Ry437zO+O11yIwGJ7WB/+Sg1dICDutKJ3gRekgwI2m8yK6sUDWkhFZmzZ1+Z+K7t0SGE8sMZKcJXEfM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oUczJQ3K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E6A89C43601;
+	Tue, 26 Mar 2024 11:34:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711452855;
-	bh=olpSxbuDYHiKY9yUfuosPYFrh40NPdrcXw4pz6WYTX0=;
+	s=k20201202; t=1711452858;
+	bh=lNZ3GsF+2FDIGqDK/pc65J09dJNN1ybvqZZZwXWhNVs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=dSGOu0b6EoH+HEbOwLoVD0BKZxH8jISjzlDoY4hQJKLIZZ+tizgsBfGMWTtQPDhfA
-	 dr/7xJqqjDfo+Qfp7qXp+KPBPFd6TSAgMJ/NRl5O6baDayl6hUaeQbmkgIlR46+Fp+
-	 fJ/8PIjcRyQmyZDPCVH/kg655JUG1uXKYbyX5Ybk0FAbh2sK0tZbUB7L6ygTZVkKYz
-	 NGQFVC3iwQ5W+hBtacR2iQ2DJR/Vcr0/NVjnd0bOiOiGoawEDx4JyBeOgQhbvZeEML
-	 t6MmpnpKCXr3V9lLnb+AIr6MYyRrPk5L09K0IkXw8+neq+D3ExzHNiveOPlHeTbJx0
-	 Q4WbpjvRojEtQ==
+	b=oUczJQ3KZQAH8g5O3nUq/MuoItBMo81KOxqK7O+7oVJO2aArqbkFTTtge0SIJdry0
+	 60Ka34ypjGGO8IlqofrWsuckRoKUgnoCjAhlwn/0auygqQLL5x0/EXhht2Q+340eGF
+	 jl1j/h8tu2rI1D6vSU0H2K8de2Ac0lssUsuWCWXBt3s25vi6T15vBgvXegCAPXRw5t
+	 AeniVmV91tStojlc5TdiFTrwvXITy3lCnILkPScBXqnBku5a28KKXuBAitbvjsHUC/
+	 ZjCd2m3iILSGtknNSMLJT72eHESoJmpXznLhkcBX+wXCOdRtunkLeurpxxtmkvVxDb
+	 rQhO/XXtJVhig==
 From: Antoine Tenart <atenart@kernel.org>
 To: davem@davemloft.net,
 	kuba@kernel.org,
@@ -49,10 +49,11 @@ To: davem@davemloft.net,
 Cc: Antoine Tenart <atenart@kernel.org>,
 	steffen.klassert@secunet.com,
 	willemdebruijn.kernel@gmail.com,
-	netdev@vger.kernel.org
-Subject: [PATCH net v4 3/5] udp: do not transition UDP GRO fraglist partial checksums to unnecessary
-Date: Tue, 26 Mar 2024 12:34:00 +0100
-Message-ID: <20240326113403.397786-4-atenart@kernel.org>
+	netdev@vger.kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH net v4 4/5] udp: prevent local UDP tunnel packets from being GROed
+Date: Tue, 26 Mar 2024 12:34:01 +0100
+Message-ID: <20240326113403.397786-5-atenart@kernel.org>
 X-Mailer: git-send-email 2.44.0
 In-Reply-To: <20240326113403.397786-1-atenart@kernel.org>
 References: <20240326113403.397786-1-atenart@kernel.org>
@@ -64,72 +65,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-UDP GRO validates checksums and in udp4/6_gro_complete fraglist packets
-are converted to CHECKSUM_UNNECESSARY to avoid later checks. However
-this is an issue for CHECKSUM_PARTIAL packets as they can be looped in
-an egress path and then their partial checksums are not fixed.
+GRO has a fundamental issue with UDP tunnel packets as it can't detect
+those in a foolproof way and GRO could happen before they reach the
+tunnel endpoint. Previous commits have fixed issues when UDP tunnel
+packets come from a remote host, but if those packets are issued locally
+they could run into checksum issues.
 
-Different issues can be observed, from invalid checksum on packets to
-traces like:
+If the inner packet has a partial checksum the information will be lost
+in the GRO logic, either in udp4/6_gro_complete or in
+udp_gro_complete_segment and packets will have an invalid checksum when
+leaving the host.
 
-  gen01: hw csum failure
-  skb len=3008 headroom=160 headlen=1376 tailroom=0
-  mac=(106,14) net=(120,40) trans=160
-  shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
-  csum(0xffff232e ip_summed=2 complete_sw=0 valid=0 level=0)
-  hash(0x77e3d716 sw=1 l4=1) proto=0x86dd pkttype=0 iif=12
-  ...
+Prevent local UDP tunnel packets from ever being GROed at the outer UDP
+level.
 
-Fix this by only converting CHECKSUM_NONE packets to
-CHECKSUM_UNNECESSARY by reusing __skb_incr_checksum_unnecessary. All
-other checksum types are kept as-is, including CHECKSUM_COMPLETE as
-fraglist packets being segmented back would have their skb->csum valid.
+Due to skb->encapsulation being wrongly used in some drivers this is
+actually only preventing UDP tunnel packets with a partial checksum to
+be GROed (see iptunnel_handle_offloads) but those were also the packets
+triggering issues so in practice this should be sufficient.
 
 Fixes: 9fd1ff5d2ac7 ("udp: Support UDP fraglist GRO/GSO.")
+Fixes: 36707061d6ba ("udp: allow forwarding of plain (non-fraglisted) UDP GRO packets")
+Suggested-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Antoine Tenart <atenart@kernel.org>
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 ---
- net/ipv4/udp_offload.c | 8 +-------
- net/ipv6/udp_offload.c | 8 +-------
- 2 files changed, 2 insertions(+), 14 deletions(-)
+ net/ipv4/udp_offload.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
 
 diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 3bb69464930b..548476d78237 100644
+index 548476d78237..3498dd1d0694 100644
 --- a/net/ipv4/udp_offload.c
 +++ b/net/ipv4/udp_offload.c
-@@ -722,13 +722,7 @@ INDIRECT_CALLABLE_SCOPE int udp4_gro_complete(struct sk_buff *skb, int nhoff)
- 		skb_shinfo(skb)->gso_type |= (SKB_GSO_FRAGLIST|SKB_GSO_UDP_L4);
- 		skb_shinfo(skb)->gso_segs = NAPI_GRO_CB(skb)->count;
+@@ -559,6 +559,12 @@ struct sk_buff *udp_gro_receive(struct list_head *head, struct sk_buff *skb,
+ 	 */
+ 	NAPI_GRO_CB(skb)->is_flist = 0;
+ 	if (!sk || !udp_sk(sk)->gro_receive) {
++		/* If the packet was locally encapsulated in a UDP tunnel that
++		 * wasn't detected above, do not GRO.
++		 */
++		if (skb->encapsulation)
++			goto out;
++
+ 		if (skb->dev->features & NETIF_F_GRO_FRAGLIST)
+ 			NAPI_GRO_CB(skb)->is_flist = sk ? !udp_test_bit(GRO_ENABLED, sk) : 1;
  
--		if (skb->ip_summed == CHECKSUM_UNNECESSARY) {
--			if (skb->csum_level < SKB_MAX_CSUM_LEVEL)
--				skb->csum_level++;
--		} else {
--			skb->ip_summed = CHECKSUM_UNNECESSARY;
--			skb->csum_level = 0;
--		}
-+		__skb_incr_checksum_unnecessary(skb);
- 
- 		return 0;
- 	}
-diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
-index 312bcaeea96f..bbd347de00b4 100644
---- a/net/ipv6/udp_offload.c
-+++ b/net/ipv6/udp_offload.c
-@@ -174,13 +174,7 @@ INDIRECT_CALLABLE_SCOPE int udp6_gro_complete(struct sk_buff *skb, int nhoff)
- 		skb_shinfo(skb)->gso_type |= (SKB_GSO_FRAGLIST|SKB_GSO_UDP_L4);
- 		skb_shinfo(skb)->gso_segs = NAPI_GRO_CB(skb)->count;
- 
--		if (skb->ip_summed == CHECKSUM_UNNECESSARY) {
--			if (skb->csum_level < SKB_MAX_CSUM_LEVEL)
--				skb->csum_level++;
--		} else {
--			skb->ip_summed = CHECKSUM_UNNECESSARY;
--			skb->csum_level = 0;
--		}
-+		__skb_incr_checksum_unnecessary(skb);
- 
- 		return 0;
- 	}
 -- 
 2.44.0
 
