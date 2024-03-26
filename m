@@ -1,129 +1,121 @@
-Return-Path: <netdev+bounces-82139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 333EA88C671
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:13:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 485E888C691
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 16:15:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DCB301F392AC
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:12:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA3E9B25CD3
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:15:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF71B13C806;
-	Tue, 26 Mar 2024 15:12:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E52413C82F;
+	Tue, 26 Mar 2024 15:14:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OnsBfmYQ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OCyyPqD9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF32762F7;
-	Tue, 26 Mar 2024 15:12:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4389B13C3F1;
+	Tue, 26 Mar 2024 15:14:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711465969; cv=none; b=laRkC1630F4hMHLH7/SamR0l5EP4a2epN23kHVbt4FkxGS7B9TA+qX0Er5pEUo5o0/RNnB9DtdXQxnAB/bjANHYS0yHGKTISTh4fTykok/hI70wZw9lNPVJZ2k75NCj0nV1L8Mf54fpWS1ZzxBvsL9PSI5EtDO/jSKBV/mcNTIM=
+	t=1711466056; cv=none; b=fOGgWUok/nPt5Aqfl8xMrTWuihjzA5VN6DrdhBys4/hU2APWK99wszLiwyqU245wKDChFSBOzJQXOdSIGVUFTTTaIImo/GzlCUHi0x5CZafm8C8xRU5j+zaC2H16QYokZ1Pj46PiQ5OfeG27xVpfJgQkFqU+2D7ssNwU2wUFaNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711465969; c=relaxed/simple;
-	bh=ikOFR/1UVd3fugnFnAzk4C55A/EtnmPKtVt0ZnsoBy4=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=AfPN7K5GX/FTcqwqobMo2TcFe0ai5goSoTaREoo8l1zfC6TiXKya/sWsnrMlB9fRRECjAecw2f1HSyFXLxU80L70Mwkdq2Jpn/Yg5eGOTNvomGn2QXMorma3br4hy6WvDe74kgYVC49HfXCCGFAROJwV4TJ7K+X45ikoVkXj4m4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OnsBfmYQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27B32C433C7;
-	Tue, 26 Mar 2024 15:12:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1711465968;
-	bh=ikOFR/1UVd3fugnFnAzk4C55A/EtnmPKtVt0ZnsoBy4=;
-	h=From:To:Cc:Subject:References:Date:In-Reply-To:From;
-	b=OnsBfmYQ3kUcVfwdwLlABczD8xqZdTvhAxEk92k45DN6zQl3R3V8BxEPB52RsIOJU
-	 stjQT1G1rdii90U9qXs98IyMNHaaDTCEQRCjheQiJfv7GsfcP7WTfAP4YJC9bTC3E2
-	 U4oFUkXDi460w83MY86vMBZHhUlFJ0pfP1iQycDWwr8EXMRByqPpmCcdVUZhE/Einj
-	 E6YlO5SgsJNklcUdUcS8LDVPeYonQPsEUDpnoUl37oHfn/onPcn2ao3QZ3HiUzlsRv
-	 MzSCIzTfANfgo2cPdqYHxv5qhQzfesdvGwwYarZJxx3Kfgylj7B1kLIkeyxpS7QNck
-	 r6RdCdboYcXKQ==
-From: Kalle Valo <kvalo@kernel.org>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Marcel Holtmann <marcel@holtmann.org>,  Luiz Augusto von Dentz
- <luiz.dentz@gmail.com>,  "David S . Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Jakub Kicinski <kuba@kernel.org>,  Paolo
- Abeni <pabeni@redhat.com>,  Rob Herring <robh@kernel.org>,  Krzysztof
- Kozlowski <krzysztof.kozlowski+dt@linaro.org>,  Conor Dooley
- <conor+dt@kernel.org>,  Bjorn Andersson <andersson@kernel.org>,  Konrad
- Dybcio <konrad.dybcio@linaro.org>,  Liam Girdwood <lgirdwood@gmail.com>,
-  Mark Brown <broonie@kernel.org>,  Catalin Marinas
- <catalin.marinas@arm.com>,  Will Deacon <will@kernel.org>,  Bjorn Helgaas
- <bhelgaas@google.com>,  Saravana Kannan <saravanak@google.com>,  Geert
- Uytterhoeven <geert+renesas@glider.be>,  Arnd Bergmann <arnd@arndb.de>,
-  Neil Armstrong <neil.armstrong@linaro.org>,  Marek Szyprowski
- <m.szyprowski@samsung.com>,  Alex Elder <elder@linaro.org>,  Srini
- Kandagatla <srinivas.kandagatla@linaro.org>,  Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>,  Abel Vesa <abel.vesa@linaro.org>,
-  Manivannan Sadhasivam <mani@kernel.org>,  Lukas Wunner <lukas@wunner.de>,
-  Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-  linux-bluetooth@vger.kernel.org,  netdev@vger.kernel.org,
-  devicetree@vger.kernel.org,  linux-kernel@vger.kernel.org,
-  linux-wireless@vger.kernel.org,  linux-arm-msm@vger.kernel.org,
-  linux-arm-kernel@lists.infradead.org,  linux-pci@vger.kernel.org,
-  linux-pm@vger.kernel.org,  Bartosz Golaszewski
- <bartosz.golaszewski@linaro.org>,  ath11k@lists.infradead.org,  Johan
- Hovold <johan@kernel.org>
-Subject: Re: [PATCH v6 04/16] dt-bindings: net: wireless: qcom,ath11k:
- describe the ath11k on QCA6390
-References: <20240325131624.26023-1-brgl@bgdev.pl>
-	<20240325131624.26023-5-brgl@bgdev.pl> <87r0fy8lde.fsf@kernel.org>
-	<CAMRc=Mc2Tc8oHr5NVo=aHAADkJtGCDAVvJs+7V-19m2zGi-vbw@mail.gmail.com>
-	<87frwe8jiu.fsf@kernel.org>
-	<CAMRc=MdCv+vTMZML-wzRQqZZavquV3DABYM4KYw-HwqS47sTyw@mail.gmail.com>
-Date: Tue, 26 Mar 2024 17:12:40 +0200
-In-Reply-To: <CAMRc=MdCv+vTMZML-wzRQqZZavquV3DABYM4KYw-HwqS47sTyw@mail.gmail.com>
-	(Bartosz Golaszewski's message of "Mon, 25 Mar 2024 17:23:35 +0100")
-Message-ID: <874jct10yf.fsf@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	s=arc-20240116; t=1711466056; c=relaxed/simple;
+	bh=AzZ+0V/7UCP04kyacfJaJZkcxE/dAHgDXOr2CADnkio=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TB5+o/yXcZ0oGkGY+i9UHjidR1el7JEWf5whS4Ee73t97R2FuAUCBJDM+DWP0HdsSqaXgIOkSfunlPRyx0+m6Zx4U5zaziuf7JuVsA4f4pccj57CtUbdX0Y/ipo3IYJ9CrU6Z+Tn/AMQXz9muAlhJ4QRJY6MgDpoiroXLu7sCKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OCyyPqD9; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=3vWUrAA8SZ0bCLZDcJmAKQ5MfnH0TVI2Dv0Fp0kU2eA=; b=OCyyPqD9Qte/rxh7EbEj7wBpWD
+	M0PVTxm3eD6v7qzfKYO1ZitDxFc7DSO1niSFC2uJ0tQx3oceXcrn9xDW/qsw0wUXosyACH5xid1hR
+	z9AYNND2tXKNbwipMrvM1OSixeP96D746fZZMa9FgTBYgQWojfiPftbBwIXV0KQIdMUA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1rp8Uw-00BIGs-R1; Tue, 26 Mar 2024 16:13:58 +0100
+Date: Tue, 26 Mar 2024 16:13:58 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Christophe ROULLIER <christophe.roullier@foss.st.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>, Marek Vasut <marex@denx.de>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v4 1/2] dt-bindings: net: add phy-supply property for
+ stm32
+Message-ID: <838d8e91-9b82-4185-8827-055fcaea8fcc@lunn.ch>
+References: <20240326125849.226765-1-christophe.roullier@foss.st.com>
+ <20240326125849.226765-2-christophe.roullier@foss.st.com>
+ <0e14ad5d-3c25-40ab-981a-fbc4e245fc94@lunn.ch>
+ <a19b20ae-d12a-47c8-9d1f-482a84924e6c@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a19b20ae-d12a-47c8-9d1f-482a84924e6c@foss.st.com>
 
-Bartosz Golaszewski <brgl@bgdev.pl> writes:
+On Tue, Mar 26, 2024 at 03:41:13PM +0100, Christophe ROULLIER wrote:
+> 
+> On 3/26/24 14:58, Andrew Lunn wrote:
+> > On Tue, Mar 26, 2024 at 01:58:48PM +0100, Christophe Roullier wrote:
+> > > Phandle to a regulator that provides power to the PHY. This
+> > > regulator will be managed during the PHY power on/off sequence.
+> > > 
+> > > Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> > > Signed-off-by: Christophe Roullier <christophe.roullier@foss.st.com>
+> > > ---
+> > >   Documentation/devicetree/bindings/net/stm32-dwmac.yaml | 3 +++
+> > >   1 file changed, 3 insertions(+)
+> > > 
+> > > diff --git a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> > > index fc8c96b08d7dc..80937b28fa046 100644
+> > > --- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> > > +++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> > > @@ -82,6 +82,9 @@ properties:
+> > >         Should be phandle/offset pair. The phandle to the syscon node which
+> > >         encompases the glue register, and the offset of the control register
+> > > +  phy-supply:
+> > > +    description: PHY regulator
+> > ~/linux/drivers/net/ethernet/stmicro/stmmac$ grep regulator_get *
+> > dwmac-rk.c:	bsp_priv->regulator = devm_regulator_get(dev, "phy");
+> > dwmac-sun8i.c:	gmac->regulator = devm_regulator_get_optional(dev, "phy");
+> > dwmac-sunxi.c:	gmac->regulator = devm_regulator_get_optional(dev, "phy");
+> > 
+> > Maybe i'm missing something, but i don't see an actual implementation
+> > of this binding?
+> > 
+> > 	Andrew
+> 
+> Hi Andrew,
+> 
+> You are right, my next step is to upstream support of Ethernet MP13 glue and
+> some update like Phy regulator support
 
->> >> I don't know DT well enough to know what the "required:" above means,
->> >> but does this take into account that there are normal "plug&play" type
->> >> of QCA6390 boards as well which don't need any DT settings?
->> >
->> > Do they require a DT node though for some reason?
->>
->> You can attach the device to any PCI slot, connect the WLAN antenna and
->> it just works without DT nodes. I'm trying to make sure here that basic
->> setup still works.
->>
->
-> Sure, definitely. I there's no DT node, then the binding doesn't apply
-> and the driver (the platform part of it) will not probe.
->
->> Adding also Johan and ath11k list. For example, I don't know what's the
->> plan with Lenovo X13s, will it use this framework? I guess in theory we
->> could have devices which use qcom,ath11k-calibration-variant from DT but
->> not any of these supply properties?
->>
->
-> Good point. I will receive the X13s in a month from now. I do plan on
-> upstreaming correct support for WLAN and BT for it as well.
->
-> I guess we can always relax the requirements once a valid use-case appears?
+Then please make this binding patch part of the series which
+implements the binding. They go together.
 
-I think we have such cases already now:
-
-$ git grep ath11k-calibration-variant -- arch
-arch/arm64/boot/dts/qcom/qcm6490-fairphone-fp5.dts:     qcom,ath11k-calibration-variant = "Fairphone_5";
-arch/arm64/boot/dts/qcom/sc8280xp-lenovo-thinkpad-x13s.dts:                     qcom,ath11k-calibration-variant = "LE_X13S";
-
-But please do check that. I'm no DT expert :)
-
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
+	Andrew
 
