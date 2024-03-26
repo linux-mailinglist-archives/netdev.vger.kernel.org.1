@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-81893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81894-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF17488B889
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 04:30:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ECE388B88A
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 04:30:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 294E91F3F4F4
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 03:30:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8EB0B23105
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 03:30:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D530C1292F5;
-	Tue, 26 Mar 2024 03:30:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13796129A6A;
+	Tue, 26 Mar 2024 03:30:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="k/0PG/NE"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hxST6t1I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26FE086AC1
-	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 03:30:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC2986AC1
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 03:30:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711423832; cv=none; b=kxviCjYmeECacVLOu+p8KuBu8U5PDxl4gxHkyRu8A8z6pwe53OXfzhpMGgP/acGPJ49npojZTLKZr2jt5NCOfl8jUAQOYnPAvcYuv0tysPsGeBHjSbX45xQredyp+odbAlyVuiuMkIODzcT+5G1YL81DYUzgZLUG7+ixlS+wi6o=
+	t=1711423836; cv=none; b=Ct8agnBaR472lt1irmvcG1AJg50w08Zl/W3dwrYxLSq1O/XfQvfO7rIzeB61fpsPvWLaFgW8TpuKYGr3sYqFg4pG7YF6oWW1H48sGa+t5JOcsHwsVs+8zVydhX2I4+YiL8iVQTyUJo2i+qy1mRaPKW9uDtYsxQkQdiyBX1iozfo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711423832; c=relaxed/simple;
-	bh=cjSJdCmZc8sHk28t/P+DAPX/wk2mglvNjhP83oFxF0s=;
+	s=arc-20240116; t=1711423836; c=relaxed/simple;
+	bh=ku8YzMn9QMy7xB2oEL6yj+qh7mh+oEzbTYBRUdDchNQ=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aLSEWDRjxIJD5Hbj0PAZbAdBXfViSNDF77wMG/v8HuRWhuJk5vvDG1AF1JEmO1IaWp8COkrEuGqJF7cWk5TJE5q9oTdzPsGHQ+svFbGJGuo8aa/2VIiZOn3dLvnrnUY5N+aNdn79/EF+DAeyoo7lnkwpaBBlbT1u8nKPSBiuKuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=k/0PG/NE; arc=none smtp.client-ip=209.85.210.178
+	 MIME-Version; b=jRuAUEaTXWsvaD2jNTedVYQFQRE47FniqFgLFC7OkMWrDvVuIkjaknk9deFHcl//ci/6NsKHXaahyD8c/3m2ME+tMpf1CZtxel1mxzPg/ZUlm8Y5dXwjfdpvQo+f0DR3+6m8V7D+g5hu/d6SHXCAMDpRL9V2Kx+QlHyHTq92Z+g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hxST6t1I; arc=none smtp.client-ip=209.85.210.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-6e6b54a28d0so3291368b3a.2
-        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 20:30:30 -0700 (PDT)
+Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-6e6c0098328so3415896b3a.3
+        for <netdev@vger.kernel.org>; Mon, 25 Mar 2024 20:30:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711423830; x=1712028630; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1711423833; x=1712028633; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6jI+Zv++IpFhuNHj3AUNIbDoIqlQpcsUEnSP8ySrwVU=;
-        b=k/0PG/NEl2R0Zn6lwrb1fzmgXyfkBkIE3rAu4i/2UWe39H/9/bfBdCMm9wPCtyTsrp
-         Nu7N3ohJKYGL4Q/h0W9nnYB8e+t32pqaY9ax5djcLf2Amd4PkOlUS7f0mnP+Qo8Jekos
-         MfDtC3q9hFZGJx+FUe2GDYyHA67lchQb+PnOsDRPpUUCXkQHhVIQjWJMSs88FDkKd0tW
-         kyNxRhXpuh1L+l4sDDBOyx224XhzG84z8XjLHA/7dxXe7M3v7DyekNAvSf6GST4XHTHZ
-         OicVHzigfbaYMDySOWyob0+T63aJdFkGkGnqTe3WTEl5y3lE0Vo6sRWEYKeac8KSd72d
-         5u8w==
+        bh=rXt+e70s18vvmZvnfHoG/leNZ6ipUAeaM1qUbwNwWzI=;
+        b=hxST6t1Iaai+BkGzQH0V367/ifl0eBvuUU6mjxDrj727ygQSnu5lafaLpRzF02Kiz3
+         xKH3OQf++suzx8kLLS2YRI98jkQ5Q1K1+qPy8uDGyqGtGLOulUvSAktiaB9apImS/hS7
+         wBDT62czZVCxMkuFMGLQOsZbfW5zhfzUxMTty9S0ggxSS2J84qnDQwuJKckHr7hthsvG
+         bq0vDbiW4Md65ZodKUT9d3DpwvixrjG2d0f0a2yAKk2IORQS4IFul3en5CsuJJnLM05r
+         FFbg1xPxUG+vAPF9M3SeJbv62dmI1n3wkmchcVYJubhWSO8Bm986Kp7gB95hU9qF26Kr
+         luaQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711423830; x=1712028630;
+        d=1e100.net; s=20230601; t=1711423833; x=1712028633;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=6jI+Zv++IpFhuNHj3AUNIbDoIqlQpcsUEnSP8ySrwVU=;
-        b=euDTlEghj3i2laXcfAEHNYIJIzfb25pHigBVKRJUL2kTi1pkYox0gSjhUEAXhlmM3Z
-         gpU9mH1XyLGEoPZID6NUldqcWLYh883PGcMFEYLM9frSonZ3pDmCuckp6y3+xEI5PkM7
-         2sRzoRpNKYTP4Th5WGoGQ394MO0I3ke/ADf6OhWdjdXGR4px6rpFMxmJh6SoVPaLFtss
-         2Cs/O2IkhK5AqT/oi8fupl9dC6wvtb3Oz6mSxXzWr4KolyhuEZ16TivnPYZtxueW6HSl
-         VsWY4MdUQQXtfv3s5hpzxT6ts/q9gL4nNtQRrSnBqGmkGqILcXe92mUeGNRbsF4/tMVI
-         fJUw==
-X-Gm-Message-State: AOJu0YwT/C1sgYcCHUpJ+nR2ZkTCbcPmK5QDaU0Z/S+SIavHzXIhlP1z
-	Iis+uKXwneMn3hM/dKuZXUz2aTkjcPF+2l9wJyDcP2UINMg1VWd/omg1qeoBF/4tSw==
-X-Google-Smtp-Source: AGHT+IEhxTDF+1tABR70dkPjdKm6IF79WAllaFzU9YObIUFALjVBH+CTB1l1qjs7x7jYh9pAdO7y1Q==
-X-Received: by 2002:a05:6a20:9183:b0:1a3:bdd5:41f6 with SMTP id v3-20020a056a20918300b001a3bdd541f6mr6932632pzd.61.1711423830075;
-        Mon, 25 Mar 2024 20:30:30 -0700 (PDT)
+        bh=rXt+e70s18vvmZvnfHoG/leNZ6ipUAeaM1qUbwNwWzI=;
+        b=ANVSRIkvkuSKk6HFlDHjeXVJrjiUpR7UDx7y6Q2Woyu1Z4rWNoki4yAngRXOcHn72p
+         1HbAx10zMmxqEkEXlvY+Pz7BB6LH6EksdWox0tCvwRf3JxImRPwm8/TIlMOgK8bED77i
+         GVsQ0Tsvn+Run5VAWRXXx9sOoqt8XJ3n5eL1t1jnVLtejYPUhpmeVEBYiGt9zj5bX4CX
+         sU4MJuEqaRadip2wgkz+wzr6hyU/Fu6FImm+YUsZirham8KuZNF5X+yCf55/5tEYGpQm
+         OMP95v21MrbBo0kn9FTF8I+E6ETKADR2bLIJzuR5sD6T9NtKuyF5PCD3JyZywC9Gowpm
+         GYVg==
+X-Gm-Message-State: AOJu0YzPKD8lGOrqF//Ingo+sO4GPS9x1DP1JYLfL1Iudh0gcIzJY/I4
+	Qf1+ofSRlXCCZN5veZZdOXWP6kxC44Y+Okz0go/Ke18NaPdBWK3Z5suNqspwzXvC9w==
+X-Google-Smtp-Source: AGHT+IGbCt+BVUMhC+CJnFo7YPm5UcKDsqSI9Gv29tzeBfu/U2NkmI3RXDKBWSE2Dxc4lfR4xm1mGA==
+X-Received: by 2002:a05:6a20:8f0b:b0:1a3:b153:5f4e with SMTP id b11-20020a056a208f0b00b001a3b1535f4emr8893947pzk.54.1711423833368;
+        Mon, 25 Mar 2024 20:30:33 -0700 (PDT)
 Received: from Laptop-X1.redhat.com ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d13-20020a170902654d00b001dd99fe365dsm5676310pln.42.2024.03.25.20.30.27
+        by smtp.gmail.com with ESMTPSA id d13-20020a170902654d00b001dd99fe365dsm5676310pln.42.2024.03.25.20.30.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Mar 2024 20:30:29 -0700 (PDT)
+        Mon, 25 Mar 2024 20:30:33 -0700 (PDT)
 From: Hangbin Liu <liuhangbin@gmail.com>
 To: netdev@vger.kernel.org
 Cc: "David S. Miller" <davem@davemloft.net>,
@@ -77,9 +77,9 @@ Cc: "David S. Miller" <davem@davemloft.net>,
 	Jacob Keller <jacob.e.keller@intel.com>,
 	Stanislav Fomichev <sdf@google.com>,
 	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net-next 3/4] net: team: use policy generated by YAML spec
-Date: Tue, 26 Mar 2024 11:30:03 +0800
-Message-ID: <20240326033005.2072622-4-liuhangbin@gmail.com>
+Subject: [PATCH net-next 4/4] uapi: team: use header file generated from YAML spec
+Date: Tue, 26 Mar 2024 11:30:04 +0800
+Message-ID: <20240326033005.2072622-5-liuhangbin@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20240326033005.2072622-1-liuhangbin@gmail.com>
 References: <20240326033005.2072622-1-liuhangbin@gmail.com>
@@ -93,254 +93,171 @@ Content-Transfer-Encoding: 8bit
 
 generated with:
 
- $ ./tools/net/ynl/ynl-gen-c.py --mode kernel \
- > --spec Documentation/netlink/specs/team.yaml --source \
- > -o drivers/net/team/team_nl.c
- $ ./tools/net/ynl/ynl-gen-c.py --mode kernel \
- > --spec Documentation/netlink/specs/team.yaml --header \
- > -o drivers/net/team/team_nl.h
-
-The TEAM_ATTR_LIST_PORT in team_nl_policy is removed as it is only in the
-port list reply attributes.
+ $ ./tools/net/ynl/ynl-gen-c.py --mode uapi \
+ > --spec Documentation/netlink/specs/team.yaml \
+ > --header -o include/uapi/linux/if_team.h
 
 Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
 ---
-Draft -> v1: remove all GENL_DONT_VALIDATE_DUMP from genl_small_ops since we
-actually don't have dump option. (Jiri Pirko)
----
- drivers/net/team/Makefile    |  2 +-
- drivers/net/team/team_core.c | 59 +++++-------------------------------
- drivers/net/team/team_nl.c   | 59 ++++++++++++++++++++++++++++++++++++
- drivers/net/team/team_nl.h   | 29 ++++++++++++++++++
- 4 files changed, 96 insertions(+), 53 deletions(-)
- create mode 100644 drivers/net/team/team_nl.c
- create mode 100644 drivers/net/team/team_nl.h
+ include/uapi/linux/if_team.h | 116 +++++++++++++----------------------
+ 1 file changed, 43 insertions(+), 73 deletions(-)
 
-diff --git a/drivers/net/team/Makefile b/drivers/net/team/Makefile
-index 244db32c1060..7a5aa20d286b 100644
---- a/drivers/net/team/Makefile
-+++ b/drivers/net/team/Makefile
-@@ -3,7 +3,7 @@
- # Makefile for the network team driver
- #
- 
--team-y:= team_core.o
-+team-y:= team_core.o team_nl.o
- obj-$(CONFIG_NET_TEAM) += team.o
- obj-$(CONFIG_NET_TEAM_MODE_BROADCAST) += team_mode_broadcast.o
- obj-$(CONFIG_NET_TEAM_MODE_ROUNDROBIN) += team_mode_roundrobin.o
-diff --git a/drivers/net/team/team_core.c b/drivers/net/team/team_core.c
-index 0a44bbdcfb7b..0463ac1dad42 100644
---- a/drivers/net/team/team_core.c
-+++ b/drivers/net/team/team_core.c
-@@ -27,6 +27,8 @@
- #include <net/sch_generic.h>
- #include <linux/if_team.h>
- 
-+#include "team_nl.h"
-+
- #define DRV_NAME "team"
- 
- 
-@@ -2254,28 +2256,7 @@ static struct rtnl_link_ops team_link_ops __read_mostly = {
- 
- static struct genl_family team_nl_family;
- 
--static const struct nla_policy team_nl_policy[TEAM_ATTR_MAX + 1] = {
--	[TEAM_ATTR_UNSPEC]			= { .type = NLA_UNSPEC, },
--	[TEAM_ATTR_TEAM_IFINDEX]		= { .type = NLA_U32 },
--	[TEAM_ATTR_LIST_OPTION]			= { .type = NLA_NESTED },
--	[TEAM_ATTR_LIST_PORT]			= { .type = NLA_NESTED },
--};
--
--static const struct nla_policy
--team_nl_option_policy[TEAM_ATTR_OPTION_MAX + 1] = {
--	[TEAM_ATTR_OPTION_UNSPEC]		= { .type = NLA_UNSPEC, },
--	[TEAM_ATTR_OPTION_NAME] = {
--		.type = NLA_STRING,
--		.len = TEAM_STRING_MAX_LEN,
--	},
--	[TEAM_ATTR_OPTION_CHANGED]		= { .type = NLA_FLAG },
--	[TEAM_ATTR_OPTION_TYPE]			= { .type = NLA_U8 },
--	[TEAM_ATTR_OPTION_DATA]			= { .type = NLA_BINARY },
--	[TEAM_ATTR_OPTION_PORT_IFINDEX]		= { .type = NLA_U32 },
--	[TEAM_ATTR_OPTION_ARRAY_INDEX]		= { .type = NLA_U32 },
--};
--
--static int team_nl_cmd_noop(struct sk_buff *skb, struct genl_info *info)
-+int team_nl_noop_doit(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct sk_buff *msg;
- 	void *hdr;
-@@ -2513,7 +2494,7 @@ static int team_nl_send_options_get(struct team *team, u32 portid, u32 seq,
- 	return err;
- }
- 
--static int team_nl_cmd_options_get(struct sk_buff *skb, struct genl_info *info)
-+int team_nl_options_get_doit(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct team *team;
- 	struct team_option_inst *opt_inst;
-@@ -2538,7 +2519,7 @@ static int team_nl_cmd_options_get(struct sk_buff *skb, struct genl_info *info)
- static int team_nl_send_event_options_get(struct team *team,
- 					  struct list_head *sel_opt_inst_list);
- 
--static int team_nl_cmd_options_set(struct sk_buff *skb, struct genl_info *info)
-+int team_nl_options_set_doit(struct sk_buff *skb, struct genl_info *info)
- {
- 	struct team *team;
- 	int err = 0;
-@@ -2579,7 +2560,7 @@ static int team_nl_cmd_options_set(struct sk_buff *skb, struct genl_info *info)
- 		err = nla_parse_nested_deprecated(opt_attrs,
- 						  TEAM_ATTR_OPTION_MAX,
- 						  nl_option,
--						  team_nl_option_policy,
-+						  team_attr_option_nl_policy,
- 						  info->extack);
- 		if (err)
- 			goto team_put;
-@@ -2802,7 +2783,7 @@ static int team_nl_send_port_list_get(struct team *team, u32 portid, u32 seq,
- 	return err;
- }
- 
--static int team_nl_cmd_port_list_get(struct sk_buff *skb,
-+int team_nl_port_list_get_doit(struct sk_buff *skb,
- 				     struct genl_info *info)
- {
- 	struct team *team;
-@@ -2820,32 +2801,6 @@ static int team_nl_cmd_port_list_get(struct sk_buff *skb,
- 	return err;
- }
- 
--static const struct genl_small_ops team_nl_ops[] = {
--	{
--		.cmd = TEAM_CMD_NOOP,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = team_nl_cmd_noop,
--	},
--	{
--		.cmd = TEAM_CMD_OPTIONS_SET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = team_nl_cmd_options_set,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = TEAM_CMD_OPTIONS_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = team_nl_cmd_options_get,
--		.flags = GENL_ADMIN_PERM,
--	},
--	{
--		.cmd = TEAM_CMD_PORT_LIST_GET,
--		.validate = GENL_DONT_VALIDATE_STRICT | GENL_DONT_VALIDATE_DUMP,
--		.doit = team_nl_cmd_port_list_get,
--		.flags = GENL_ADMIN_PERM,
--	},
--};
--
- static const struct genl_multicast_group team_nl_mcgrps[] = {
- 	{ .name = TEAM_GENL_CHANGE_EVENT_MC_GRP_NAME, },
- };
-diff --git a/drivers/net/team/team_nl.c b/drivers/net/team/team_nl.c
-new file mode 100644
-index 000000000000..208424ab78f5
---- /dev/null
-+++ b/drivers/net/team/team_nl.c
-@@ -0,0 +1,59 @@
-+// SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+/* Do not edit directly, auto-generated from: */
-+/*	Documentation/netlink/specs/team.yaml */
-+/* YNL-GEN kernel source */
-+
-+#include <net/netlink.h>
-+#include <net/genetlink.h>
-+
-+#include "team_nl.h"
-+
-+#include <uapi/linux/if_team.h>
-+
-+/* Common nested types */
-+const struct nla_policy team_attr_option_nl_policy[TEAM_ATTR_OPTION_ARRAY_INDEX + 1] = {
-+	[TEAM_ATTR_OPTION_NAME] = { .type = NLA_STRING, .len = TEAM_STRING_MAX_LEN, },
-+	[TEAM_ATTR_OPTION_CHANGED] = { .type = NLA_FLAG, },
-+	[TEAM_ATTR_OPTION_TYPE] = { .type = NLA_U8, },
-+	[TEAM_ATTR_OPTION_DATA] = { .type = NLA_BINARY, },
-+	[TEAM_ATTR_OPTION_REMOVED] = { .type = NLA_FLAG, },
-+	[TEAM_ATTR_OPTION_PORT_IFINDEX] = { .type = NLA_U32, },
-+	[TEAM_ATTR_OPTION_ARRAY_INDEX] = { .type = NLA_U32, },
-+};
-+
-+const struct nla_policy team_item_option_nl_policy[TEAM_ATTR_ITEM_OPTION + 1] = {
-+	[TEAM_ATTR_ITEM_OPTION] = NLA_POLICY_NESTED(team_attr_option_nl_policy),
-+};
-+
-+/* Global operation policy for team */
-+const struct nla_policy team_nl_policy[TEAM_ATTR_LIST_OPTION + 1] = {
-+	[TEAM_ATTR_TEAM_IFINDEX] = { .type = NLA_U32, },
-+	[TEAM_ATTR_LIST_OPTION] = NLA_POLICY_NESTED(team_item_option_nl_policy),
-+};
-+
-+/* Ops table for team */
-+const struct genl_small_ops team_nl_ops[4] = {
-+	{
-+		.cmd		= TEAM_CMD_NOOP,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.doit		= team_nl_noop_doit,
-+	},
-+	{
-+		.cmd		= TEAM_CMD_OPTIONS_SET,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.doit		= team_nl_options_set_doit,
-+		.flags		= GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd		= TEAM_CMD_OPTIONS_GET,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.doit		= team_nl_options_get_doit,
-+		.flags		= GENL_ADMIN_PERM,
-+	},
-+	{
-+		.cmd		= TEAM_CMD_PORT_LIST_GET,
-+		.validate	= GENL_DONT_VALIDATE_STRICT,
-+		.doit		= team_nl_port_list_get_doit,
-+		.flags		= GENL_ADMIN_PERM,
-+	},
-+};
-diff --git a/drivers/net/team/team_nl.h b/drivers/net/team/team_nl.h
-new file mode 100644
-index 000000000000..c9ec1b22ac4d
---- /dev/null
-+++ b/drivers/net/team/team_nl.h
-@@ -0,0 +1,29 @@
+diff --git a/include/uapi/linux/if_team.h b/include/uapi/linux/if_team.h
+index 13c61fecb78b..a5c06243a435 100644
+--- a/include/uapi/linux/if_team.h
++++ b/include/uapi/linux/if_team.h
+@@ -1,108 +1,78 @@
+-/* SPDX-License-Identifier: GPL-2.0+ WITH Linux-syscall-note */
+-/*
+- * include/linux/if_team.h - Network team device driver header
+- * Copyright (c) 2011 Jiri Pirko <jpirko@redhat.com>
+- *
+- * This program is free software; you can redistribute it and/or modify
+- * it under the terms of the GNU General Public License as published by
+- * the Free Software Foundation; either version 2 of the License, or
+- * (at your option) any later version.
+- */
 +/* SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause) */
 +/* Do not edit directly, auto-generated from: */
 +/*	Documentation/netlink/specs/team.yaml */
-+/* YNL-GEN kernel header */
++/* YNL-GEN uapi header */
+ 
+-#ifndef _UAPI_LINUX_IF_TEAM_H_
+-#define _UAPI_LINUX_IF_TEAM_H_
++#ifndef _UAPI_LINUX_IF_TEAM_H
++#define _UAPI_LINUX_IF_TEAM_H
+ 
++#define TEAM_GENL_NAME		"team"
++#define TEAM_GENL_VERSION	1
+ 
+-#define TEAM_STRING_MAX_LEN 32
+-
+-/**********************************
+- * NETLINK_GENERIC netlink family.
+- **********************************/
+-
+-enum {
+-	TEAM_CMD_NOOP,
+-	TEAM_CMD_OPTIONS_SET,
+-	TEAM_CMD_OPTIONS_GET,
+-	TEAM_CMD_PORT_LIST_GET,
+-
+-	__TEAM_CMD_MAX,
+-	TEAM_CMD_MAX = (__TEAM_CMD_MAX - 1),
+-};
++#define TEAM_STRING_MAX_LEN			32
++#define TEAM_GENL_CHANGE_EVENT_MC_GRP_NAME	"change_event"
+ 
+ enum {
+ 	TEAM_ATTR_UNSPEC,
+-	TEAM_ATTR_TEAM_IFINDEX,		/* u32 */
+-	TEAM_ATTR_LIST_OPTION,		/* nest */
+-	TEAM_ATTR_LIST_PORT,		/* nest */
++	TEAM_ATTR_TEAM_IFINDEX,
++	TEAM_ATTR_LIST_OPTION,
++	TEAM_ATTR_LIST_PORT,
+ 
+ 	__TEAM_ATTR_MAX,
+-	TEAM_ATTR_MAX = __TEAM_ATTR_MAX - 1,
++	TEAM_ATTR_MAX = (__TEAM_ATTR_MAX - 1)
+ };
+ 
+-/* Nested layout of get/set msg:
+- *
+- *	[TEAM_ATTR_LIST_OPTION]
+- *		[TEAM_ATTR_ITEM_OPTION]
+- *			[TEAM_ATTR_OPTION_*], ...
+- *		[TEAM_ATTR_ITEM_OPTION]
+- *			[TEAM_ATTR_OPTION_*], ...
+- *		...
+- *	[TEAM_ATTR_LIST_PORT]
+- *		[TEAM_ATTR_ITEM_PORT]
+- *			[TEAM_ATTR_PORT_*], ...
+- *		[TEAM_ATTR_ITEM_PORT]
+- *			[TEAM_ATTR_PORT_*], ...
+- *		...
+- */
+-
+ enum {
+ 	TEAM_ATTR_ITEM_OPTION_UNSPEC,
+-	TEAM_ATTR_ITEM_OPTION,		/* nest */
++	TEAM_ATTR_ITEM_OPTION,
+ 
+ 	__TEAM_ATTR_ITEM_OPTION_MAX,
+-	TEAM_ATTR_ITEM_OPTION_MAX = __TEAM_ATTR_ITEM_OPTION_MAX - 1,
++	TEAM_ATTR_ITEM_OPTION_MAX = (__TEAM_ATTR_ITEM_OPTION_MAX - 1)
+ };
+ 
+ enum {
+ 	TEAM_ATTR_OPTION_UNSPEC,
+-	TEAM_ATTR_OPTION_NAME,		/* string */
+-	TEAM_ATTR_OPTION_CHANGED,	/* flag */
+-	TEAM_ATTR_OPTION_TYPE,		/* u8 */
+-	TEAM_ATTR_OPTION_DATA,		/* dynamic */
+-	TEAM_ATTR_OPTION_REMOVED,	/* flag */
+-	TEAM_ATTR_OPTION_PORT_IFINDEX,	/* u32 */ /* for per-port options */
+-	TEAM_ATTR_OPTION_ARRAY_INDEX,	/* u32 */ /* for array options */
++	TEAM_ATTR_OPTION_NAME,
++	TEAM_ATTR_OPTION_CHANGED,
++	TEAM_ATTR_OPTION_TYPE,
++	TEAM_ATTR_OPTION_DATA,
++	TEAM_ATTR_OPTION_REMOVED,
++	TEAM_ATTR_OPTION_PORT_IFINDEX,
++	TEAM_ATTR_OPTION_ARRAY_INDEX,
+ 
+ 	__TEAM_ATTR_OPTION_MAX,
+-	TEAM_ATTR_OPTION_MAX = __TEAM_ATTR_OPTION_MAX - 1,
++	TEAM_ATTR_OPTION_MAX = (__TEAM_ATTR_OPTION_MAX - 1)
+ };
+ 
+ enum {
+ 	TEAM_ATTR_ITEM_PORT_UNSPEC,
+-	TEAM_ATTR_ITEM_PORT,		/* nest */
++	TEAM_ATTR_ITEM_PORT,
+ 
+ 	__TEAM_ATTR_ITEM_PORT_MAX,
+-	TEAM_ATTR_ITEM_PORT_MAX = __TEAM_ATTR_ITEM_PORT_MAX - 1,
++	TEAM_ATTR_ITEM_PORT_MAX = (__TEAM_ATTR_ITEM_PORT_MAX - 1)
+ };
+ 
+ enum {
+ 	TEAM_ATTR_PORT_UNSPEC,
+-	TEAM_ATTR_PORT_IFINDEX,		/* u32 */
+-	TEAM_ATTR_PORT_CHANGED,		/* flag */
+-	TEAM_ATTR_PORT_LINKUP,		/* flag */
+-	TEAM_ATTR_PORT_SPEED,		/* u32 */
+-	TEAM_ATTR_PORT_DUPLEX,		/* u8 */
+-	TEAM_ATTR_PORT_REMOVED,		/* flag */
++	TEAM_ATTR_PORT_IFINDEX,
++	TEAM_ATTR_PORT_CHANGED,
++	TEAM_ATTR_PORT_LINKUP,
++	TEAM_ATTR_PORT_SPEED,
++	TEAM_ATTR_PORT_DUPLEX,
++	TEAM_ATTR_PORT_REMOVED,
+ 
+ 	__TEAM_ATTR_PORT_MAX,
+-	TEAM_ATTR_PORT_MAX = __TEAM_ATTR_PORT_MAX - 1,
++	TEAM_ATTR_PORT_MAX = (__TEAM_ATTR_PORT_MAX - 1)
+ };
+ 
+-/*
+- * NETLINK_GENERIC related info
+- */
+-#define TEAM_GENL_NAME "team"
+-#define TEAM_GENL_VERSION 0x1
+-#define TEAM_GENL_CHANGE_EVENT_MC_GRP_NAME "change_event"
++enum {
++	TEAM_CMD_NOOP,
++	TEAM_CMD_OPTIONS_SET,
++	TEAM_CMD_OPTIONS_GET,
++	TEAM_CMD_PORT_LIST_GET,
 +
-+#ifndef _LINUX_TEAM_GEN_H
-+#define _LINUX_TEAM_GEN_H
-+
-+#include <net/netlink.h>
-+#include <net/genetlink.h>
-+
-+#include <uapi/linux/if_team.h>
-+
-+/* Common nested types */
-+extern const struct nla_policy team_attr_option_nl_policy[TEAM_ATTR_OPTION_ARRAY_INDEX + 1];
-+extern const struct nla_policy team_item_option_nl_policy[TEAM_ATTR_ITEM_OPTION + 1];
-+
-+/* Global operation policy for team */
-+extern const struct nla_policy team_nl_policy[TEAM_ATTR_LIST_OPTION + 1];
-+
-+/* Ops table for team */
-+extern const struct genl_small_ops team_nl_ops[4];
-+
-+int team_nl_noop_doit(struct sk_buff *skb, struct genl_info *info);
-+int team_nl_options_set_doit(struct sk_buff *skb, struct genl_info *info);
-+int team_nl_options_get_doit(struct sk_buff *skb, struct genl_info *info);
-+int team_nl_port_list_get_doit(struct sk_buff *skb, struct genl_info *info);
-+
-+#endif /* _LINUX_TEAM_GEN_H */
++	__TEAM_CMD_MAX,
++	TEAM_CMD_MAX = (__TEAM_CMD_MAX - 1)
++};
+ 
+-#endif /* _UAPI_LINUX_IF_TEAM_H_ */
++#endif /* _UAPI_LINUX_IF_TEAM_H */
 -- 
 2.43.0
 
