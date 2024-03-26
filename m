@@ -1,105 +1,94 @@
-Return-Path: <netdev+bounces-81924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-81925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1B97588BB7D
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 08:40:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9EFA88BBBC
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 08:55:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ACEFB1F3825D
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 07:40:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F9E01F38C14
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 07:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16547133286;
-	Tue, 26 Mar 2024 07:40:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8FB132807;
+	Tue, 26 Mar 2024 07:55:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YumBn6wW"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="V3Cn5kn9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636FC132C1A;
-	Tue, 26 Mar 2024 07:40:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4A3C4CB2E;
+	Tue, 26 Mar 2024 07:55:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711438840; cv=none; b=JYQVpcBJBnq7XK6OLSdzSp/0xG6nxQL483E8qC5mXrfYh4K2NHtnHQugT3rx95OFkm5UiwXaSGBJsj1UCch9qK5wvLeq2IPVtN4rJxlbOZhT8eMqEd+SkbXODeNGeZGTeV4xlBb9Qbq7vJQ0aTxp58a8E0q0Z9rVKh8CLRVOdig=
+	t=1711439717; cv=none; b=dI0AeUXhy25kMSL/HWpWHfDuvNjT7ze3VoBXK83V4mjMoSmxIU4hu7l9dAZmhIO4zqwKCFXvSooofm7zD+C6YKVqvD5cHegF5QLTNJgsw82WiW+HxSXc6cbNSz3U/btC+9zWJIpOhL67HiG0YmipjvY5b3jZYbapNIrRy4P4Bk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711438840; c=relaxed/simple;
-	bh=OAj5vxYqi6Ox2sML1jx38TUCq3UEOLTHQ91aVzdlpNg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ObFnfSaza4APr5ftHr0onZDZmikvwWovzcW9aWQnjGA+P3XLk2F9CLXaNxwTDKo8PVCmqX9UU9N1UG8/wz2HSV2nPW+0+gxh6tFfuqZbO6Sqdp6xJ2PvQWiAbv/PLNozBllTLj4rES537i5S1HrkrAZkHv0SIlj8QZvPg1ZcQI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YumBn6wW; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a468226e135so611068166b.0;
-        Tue, 26 Mar 2024 00:40:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711438836; x=1712043636; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OAj5vxYqi6Ox2sML1jx38TUCq3UEOLTHQ91aVzdlpNg=;
-        b=YumBn6wWfNNSkEFDvbiReFlVYZttlcO51m/C3OvjH8jfT9GtpegrcrjpopFMWIbrKI
-         AMf8KWHMcdpLWI+TZcZ/YXqVZfati0j+Kbz9tZPs6gVmU/B4tU/vAuUoRNxsKwNTLd8+
-         t1Qn2os57NDdjQBNPHKwZDDiEjDQXHSrXEEAwsUrKdCc+tdfHVWaPJzPmOQCmlnEnhKr
-         E7tq1VgIpRoMjtRWkLhicyx5vTEuJB2xiMMCba2fC+N6z+PPN5JMh+ZsP/rtmEVyb/6B
-         FtQ4+F9EJMtoNuSo3LQ67NLNMR19M5PyZmTcqiBNJUsHfKC5m4AMgBLkZNg49ueUzUAJ
-         KJQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711438836; x=1712043636;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OAj5vxYqi6Ox2sML1jx38TUCq3UEOLTHQ91aVzdlpNg=;
-        b=pLy6IC4HgL1E/7MplhAafzvWiVjjkE+bEzoWGk7w1BEO03ipnjUR4rxc9SbVst/lDj
-         p8iI7PFH2muVCmglSKy5ZqU5j8mO9O5v2a5DpdNTyxuBajDzR9X8s42EYVfJgPlNwaQi
-         DvzB8TAyPZNrGSXsCsepF+Fd/MbAANZYvb3hr14OJupUjrmB57euqGko/62RT1RVF4Si
-         2cR76Fxc9IEOUqiXHzpWoIyzuXy5aMgUrxkAQMzAbn8mTdamqTEvpF/sL3QVuICctUSh
-         /9pFm6AM7XgqEw1U90Jyn9OP3olQgIdXYbiIcgHPBXehXocJtExD81V+LhJ4JP0KL1r2
-         iOhw==
-X-Forwarded-Encrypted: i=1; AJvYcCX0RNgZtDVlm4CUL76rEtOqGxvutS5xM93lvDRs9P47FWX5GJkGoRH8LOIqeXME+ZQ4aaSMlc8EmxQcZpKI6dUEq2YYVF3NjZSdsomuvtjqUdouS80iPSyZjUKILBqS4fXG4G2gmomRMiyOTve/4evHko7l9SwpE4YEbFhYV5atFrgbInqz3tLq
-X-Gm-Message-State: AOJu0YyM93us54ziIfMbz9HBzY00lTU4x8ebFypNat7V4Iu0Jo20VRZe
-	SjTljFZ2xOiRgtRfscqmkavc1oVFXGGc779wASg4N0Na8XAnxQhb56Oeb46/gyI1Rq/hYYIOtrM
-	FoEzplp2WKHJbdAYfJ001JwxiKkw=
-X-Google-Smtp-Source: AGHT+IHbX3kmzaNoi1M3/W6E/dw1Eaqf4aZjwDqSHfT7En//8qJqco2N34zqAyns+BUh/I9QdZy4LnL3WpYehcgpQ8c=
-X-Received: by 2002:a17:906:52ca:b0:a46:be82:f478 with SMTP id
- w10-20020a17090652ca00b00a46be82f478mr1191938ejn.68.1711438836491; Tue, 26
- Mar 2024 00:40:36 -0700 (PDT)
+	s=arc-20240116; t=1711439717; c=relaxed/simple;
+	bh=GH6L6DVebNLO9qCIIvAyQqQvKLzQMc2f+nrivTepdgg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=BOBKsEgyqd6x71VVUKed4ngqZ/33T3P1GNxhDSkjG6NRV6IcOd9UcT9hkBWrleQecQzMQJa+w+KFxGIDDBss0MwqAA9zi7IYdQPmwYa32o+jmczRWGDRkZm3anHNRiBfXZV/tzt1xnFVgFHU7XZUMKUsbnFmfPEG7bRxOZzHLpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=V3Cn5kn9; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=GH6L6DVebNLO9qCIIvAyQqQvKLzQMc2f+nrivTepdgg=;
+	t=1711439715; x=1712649315; b=V3Cn5kn9MehIgP4+xVrchyL7yrmvlJ97sjRe62bYfFMiuIx
+	91s+0BqJef12RoUaUw/hnu6Fjl8fa9c2whpxTcbtmjfUE6tSFy06wXrdHob0kWdmLU3HyKRQk8iky
+	pd7Pzqowqeb2nF09aYq8TNDEuNISMRNsRBTYF/6u2vFKFM+P3e0KmmVmU8YZA38WfKvnrwO5HxWQ2
+	CGnHROcmO94soLIL19onjZhdztlIVgq63UXe8r2GezRbjbjq1xVA/xJP5TGLBI0en+tRJdTSYUJAl
+	8tpCNnF1y2dmy6g5IrgNFgKtrL2jzIv6uMmBwR7/BGAYT2eXlG5mq5eU387nitkA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.97)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1rp1eL-0000000FYMJ-0ma9;
+	Tue, 26 Mar 2024 08:55:13 +0100
+Message-ID: <33670310a2b84d1a650b2aa087ac9657fa4abf84.camel@sipsolutions.net>
+Subject: Re: kunit alltests runs broken in mainline
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Jakub Kicinski <kuba@kernel.org>, Mark Brown <broonie@kernel.org>
+Cc: Brendan Higgins <brendanhiggins@google.com>, David Gow
+ <davidgow@google.com>,  Rae Moar <rmoar@google.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "kunit-dev@googlegroups.com" <kunit-dev@googlegroups.com>, "x86@kernel.org"
+ <x86@kernel.org>
+Date: Tue, 26 Mar 2024 08:55:12 +0100
+In-Reply-To: <20240325185235.2f704004@kernel.org>
+References: <b743a5ec-3d07-4747-85e0-2fb2ef69db7c@sirena.org.uk>
+	 <20240325185235.2f704004@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.50.4 (3.50.4-1.fc39) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1711361723.git.balazs.scheidler@axoflow.com> <394f9d55197681e910d104dbd35e62fb4098712b.1711361723.git.balazs.scheidler@axoflow.com>
-In-Reply-To: <394f9d55197681e910d104dbd35e62fb4098712b.1711361723.git.balazs.scheidler@axoflow.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 26 Mar 2024 15:39:59 +0800
-Message-ID: <CAL+tcoAy1VU6-pMOsqSCU8EUkyo5q9SEkM=GeDWjW9Mw6os=RQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/2] net: port TP_STORE_ADDR_PORTS_SKB macro
- to be tcp/udp independent
-To: Balazs Scheidler <bazsi77@gmail.com>
-Cc: kuniyu@amazon.com, netdev@vger.kernel.org, 
-	Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, 
-	Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, Eric Dumazet <edumazet@google.com>, 
-	Balazs Scheidler <balazs.scheidler@axoflow.com>, linux-kernel@vger.kernel.org, 
-	linux-trace-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-malware-bazaar: not-scanned
 
-On Mon, Mar 25, 2024 at 6:29=E2=80=AFPM Balazs Scheidler <bazsi77@gmail.com=
-> wrote:
->
-> This patch moves TP_STORE_ADDR_PORTS_SKB() to a common header and removes
-> the TCP specific implementation details.
->
-> Previously the macro assumed the skb passed as an argument is a
-> TCP packet, the implementation now uses an argument to the L4 header and
-> uses that to extract the source/destination ports, which happen
-> to be named the same in "struct tcphdr" and "struct udphdr"
->
-> Signed-off-by: Balazs Scheidler <balazs.scheidler@axoflow.com>
+On Tue, 2024-03-26 at 01:52 +0000, Jakub Kicinski wrote:
+>=20
+> I'm late to the party, but FWIW I had to toss this into netdev testing
+> tree as a local patch:
+>=20
+> CONFIG_NETDEVICES=3Dy
+> CONFIG_WLAN=3Dy
 
-The patch itself looks good to me, feel free to add:
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+I'll send this in the next wireless pull, soon.
+
+> CONFIG_DAMON_DBGFS_DEPRECATED=3Dy
+
+> The DAMON config was also breaking UML for us, BTW, and I don't see
+> any fix for that in Linus's tree. Strangeness.
+
+I noticed that too (though didn't actually find the fix) against net-
+next, wireless trees are still a bit behind. I guess it'll get fixed
+eventually.
+
+johannes
 
