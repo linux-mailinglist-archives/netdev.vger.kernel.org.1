@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-82074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82076-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4F5588C471
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:05:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85BAE88C477
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 15:06:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 510D02E4151
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:05:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 616D91C2E8A1
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 14:06:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 978878288E;
-	Tue, 26 Mar 2024 14:05:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 828B08627F;
+	Tue, 26 Mar 2024 14:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="T966mhM4"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BlbVyBB2"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D7297581E;
-	Tue, 26 Mar 2024 14:04:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3E5A7641D;
+	Tue, 26 Mar 2024 14:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711461900; cv=none; b=NOdK/zh/C0V8mDTb+dSq75gfsSb1X176nprN890NxIFGzUartSFFUjpiPAaCIVI5lJXL/xcPA6s5jOSfmZlcMfkgtHaQZ9LL0keNOFy0n/Wtw86Wg9KEl6ycTqxtogKr6gh9PkNss+jNsRMpfjtN7qqGjrSnjJ9uMTm1yVrupOM=
+	t=1711461901; cv=none; b=m0Ez1fijpyOiZohWn4wN+/YhhsZIlgrHsUeJu1Mn/FpFhUSZyMVHAynwVs4vaS7DxxxrJ2jExKy+hYStKyi/RxH3EgoNjf8jvobdSj7lvNZ49cEK9Y8tIZy0fthgiVknPoXscgzOK3lrQVRR0XEhFJ0nf5fgHbj4BFFXUxKotpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711461900; c=relaxed/simple;
-	bh=FH59797bInmj9cN9sp71rrKs6IDAr4DGgkKsv76D3NY=;
+	s=arc-20240116; t=1711461901; c=relaxed/simple;
+	bh=hoxk5E2wfTQEnDLGp0m0reIgQgoq6LUKdDUMql/JYS0=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Ok+/F+8zFTYk6WIOwu4o7FrIZdriO1RJjFEtKA1i5VUOYZx5AV9KW1NzgfRPtGJa3mt6G2UilksVsnjhd/FCjkYaABzwv6Eh/RtdICh1vZ1oN0pthSjFxFivLbceAvFui2ADbCV/xUT+1r+cFrkstD9JByJXbkS7HaFvGDFAwJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=T966mhM4; arc=none smtp.client-ip=217.70.183.197
+	 In-Reply-To:To:Cc; b=l9WHcICzM78rdiiBtxebldWQhVN41NEm5UbY8Tee+73yd+RuG/xRKWfBS2T66e5/KWHo63UxUywL0mnNkIMuMFmk/1HMaeOiD5kFnn95F7CjL7qNlM5L6n9fzQnfTDkKlyqMVFStV9y5HTsM1Bv5MPAx2VSzriEJ1Au1vHuByt0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BlbVyBB2; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id EF2951C0011;
-	Tue, 26 Mar 2024 14:04:54 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 56EAB1C000D;
+	Tue, 26 Mar 2024 14:04:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1711461896;
+	t=1711461897;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=kO8IjfIavVGTVa8HmrxQ8s1k/vWMDrYAlJQlGwCj6b4=;
-	b=T966mhM4efbuv7OuzmcU9PnfvklMVJnbJVQ53xiYpXFxV0UlbxNd2pYvKzxwz1g0xRgmOK
-	uAJM3LHxxcJPddRQxUIwYzckygBmoQgSzPCJ9bNyvpUj0cCTPb/16GRx9Ojkt9pbMVaWCs
-	HCQp0JXjnYdRNYe2JcVVlDK07m0G3BTMylQAN+mQywEk7vwfEu902eCCMr0P7tGaCwJZK7
-	+/lkj38ssgW7rOMMCTpFzZ489sP+l1h3aE4xszM8AmoTJG9wirf1Udkk23GE8LIKbvcvzQ
-	lVWwY5Uue4kLLaJBTCG/h2iewmI0W8rE+/wbSlLWubdOAVyGR/boK+2KBPxTvA==
+	bh=oLblGQlakkqreOqL4f7yvoQVhLxA5VJ4cIE037WqWTA=;
+	b=BlbVyBB25kLeFNCEIqVoYKYxthJTqlvUn0YocuaM8EaPKbsBNYXn+3qDruUv1WDS2QVmF+
+	62iHjv8e5WFfYlnybTjyYGykZR1OfekX6OPDc0X+gSOKB4MhnvJTfY4f0HqGAV4mGYSuOR
+	pflCkgw5Rk9TfekE+9aLd3NOMoSN0U/4jD1p1d3vwM6o2dJMG8aHaHdWZCALk6fMAq1M0a
+	XA1NhGRsfXzbp6kHWKv3yTw1qyi1kWBbVyOyEusY7YzZ5wJQ4n0frPjVXUM9BBp6TD5oHW
+	i7kbByBSFBlkWNfcJRsiWE3ko+UmQipm22hhiCB700/OyPZafA/hdmJp7DqLVQ==
 From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Tue, 26 Mar 2024 15:04:44 +0100
-Subject: [PATCH net-next v6 07/17] netlink: specs: Modify pse attribute
- prefix
+Date: Tue, 26 Mar 2024 15:04:45 +0100
+Subject: [PATCH net-next v6 08/17] netlink: specs: Expand the pse netlink
+ command with PoE interface
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,7 +57,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20240326-feature_poe-v6-7-c1011b6ea1cb@bootlin.com>
+Message-Id: <20240326-feature_poe-v6-8-c1011b6ea1cb@bootlin.com>
 References: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
 In-Reply-To: <20240326-feature_poe-v6-0-c1011b6ea1cb@bootlin.com>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -81,60 +81,63 @@ X-GND-Sasl: kory.maincent@bootlin.com
 
 From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 
-Remove podl from the attribute prefix to prepare the support of PoE pse
-netlink spec.
+Add the PoE pse attributes prefix to be able to use PoE interface.
+
+Example usage:
+./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --do pse-get \
+             --json '{"header":{"dev-name":"eth0"}}'
+{'header': {'dev-index': 4, 'dev-name': 'eth0'},
+ 'c33-pse-admin-state': 3,
+ 'c33-pse-pw-d-status': 4}
+
+./ynl/cli.py --spec netlink/specs/ethtool.yaml --no-schema --do pse-set \
+             --json '{"header":{"dev-name":"eth0"},
+		     "c33-pse-admin-control":3}'
 
 Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 ---
 
 Changes in v2:
+- Follow the "c33" PoE prefix naming change.
 - Add the ethtool auto generated code.
 
 Changes in v3:
 - Remove the ethtool auto generated code.
 ---
- Documentation/netlink/specs/ethtool.yaml | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ Documentation/netlink/specs/ethtool.yaml | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
 diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
-index 197208f419dc..33e81fa189ca 100644
+index 33e81fa189ca..beaab9f0017f 100644
 --- a/Documentation/netlink/specs/ethtool.yaml
 +++ b/Documentation/netlink/specs/ethtool.yaml
-@@ -878,17 +878,17 @@ attribute-sets:
-         type: nest
-         nested-attributes: header
-       -
--        name: admin-state
-+        name: podl-pse-admin-state
+@@ -889,6 +889,18 @@ attribute-sets:
+         name: podl-pse-pw-d-status
          type: u32
--        name-prefix: ethtool-a-podl-pse-
+         name-prefix: ethtool-a-
++      -
++        name: c33-pse-admin-state
++        type: u32
 +        name-prefix: ethtool-a-
-       -
--        name: admin-control
-+        name: podl-pse-admin-control
-         type: u32
--        name-prefix: ethtool-a-podl-pse-
++      -
++        name: c33-pse-admin-control
++        type: u32
 +        name-prefix: ethtool-a-
-       -
--        name: pw-d-status
-+        name: podl-pse-pw-d-status
-         type: u32
--        name-prefix: ethtool-a-podl-pse-
++      -
++        name: c33-pse-pw-d-status
++        type: u32
 +        name-prefix: ethtool-a-
    -
      name: rss
      attributes:
-@@ -1571,9 +1571,9 @@ operations:
-         reply:
-           attributes: &pse
-             - header
--            - admin-state
--            - admin-control
--            - pw-d-status
-+            - podl-pse-admin-state
-+            - podl-pse-admin-control
-+            - podl-pse-pw-d-status
+@@ -1574,6 +1586,9 @@ operations:
+             - podl-pse-admin-state
+             - podl-pse-admin-control
+             - podl-pse-pw-d-status
++            - c33-pse-admin-state
++            - c33-pse-admin-control
++            - c33-pse-pw-d-status
        dump: *pse-get-op
      -
        name: pse-set
