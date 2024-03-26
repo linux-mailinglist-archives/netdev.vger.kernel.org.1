@@ -1,147 +1,148 @@
-Return-Path: <netdev+bounces-82275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-82285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4488B88D068
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 23:06:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3952888D10A
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 23:35:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92348B213FF
-	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:06:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A0151C3BCEB
+	for <lists+netdev@lfdr.de>; Tue, 26 Mar 2024 22:35:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBDF813D89D;
-	Tue, 26 Mar 2024 22:06:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D3C513D8B5;
+	Tue, 26 Mar 2024 22:34:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tv4f1lNE"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="bxtrlIfD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f47.google.com (mail-ua1-f47.google.com [209.85.222.47])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA4B13D604;
-	Tue, 26 Mar 2024 22:06:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29E7712B151
+	for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 22:34:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1711490788; cv=none; b=lPfwRjd4e5IU/Gb4Gu8lDeSUhULyM4gv6JrPty/lrigSFqPJEmvkvSMWBxzRVcbhUxmp+NWIWogaf5uBNdU+uheqbRr0fiGljUBAgcxBLI2ddvT7NYFgutMKMElSdBdpgBiVFMNezjNPpd6j22l5gl+lqBQE4Li5ybh1PJi5Las=
+	t=1711492492; cv=none; b=bETAdyTUsOF4gYKj5uJWoYNZE3AOn15D4K6aSxewdj2+AF+4rV+XVGJ5BKIJbhlx3EQTuYdAhENylsTe7lmt9ni29d2oVLqvxJjQ8KRE2VyW1YOfAUeB0/Ik6RTCSGfDa79LlxbxrWd6uK/l+qPwBumOiUwvuICnPgCVltuRCtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1711490788; c=relaxed/simple;
-	bh=TL9l5kVxRW7ebqXvNEm/v9prUz+V0nX2Ma1t8SHFn80=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=ryd+feDLm3XzUvhOFFh2KOkVZgUbPUJ6Jz8Z7iu3HTR4PdoZ7uMgHFDcyfNLixnMt41J7Yn5jWNg5ZImciciG66lruxno6DDdvkSEOUDKeSEoEvEcYdYdtreyqhSpmi1nBx6seeUtFKwNfR1lD9MGyuoavGq5Ho8HWpF+BHxng8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tv4f1lNE; arc=none smtp.client-ip=209.85.222.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f47.google.com with SMTP id a1e0cc1a2514c-7e043f577c5so136430241.1;
-        Tue, 26 Mar 2024 15:06:25 -0700 (PDT)
+	s=arc-20240116; t=1711492492; c=relaxed/simple;
+	bh=0M4LvvNI77zQI/9DV2/Qo4nlzkup1uIbZ/plEPq0ClM=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=F7LKxCHs+m4GQmmoNK6hQoYDOoMHKLT9oznw4lxl89hBXtGen5HYo67z7r/w00R4TPnbTLhpXYoeQZBO84VShVkYNUbOD3/m/+wftdQXyY/3hk7aVHgcfOaaeWy/QqM87rShCWvMA/WN6G7FaZSPBKpp0OcoTKgjgoavL0VbCwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=bxtrlIfD; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-56c36f8f932so550943a12.0
+        for <netdev@vger.kernel.org>; Tue, 26 Mar 2024 15:34:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1711490785; x=1712095585; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=TU3+ImXwqiVtc0TZrqGynXRP9+v8b83+IYx34sTtg0o=;
-        b=Tv4f1lNErnWQOOT6HWyb6ssQFBUaj269JGliife3gklKD096gNenMqTcdYFuPAySl6
-         Imy74t9KIp7bjHV5/URQFgNvWK/WGOfGCTZ/Evqy7FMvMArAbyfGv8JcUurSqzTqPUl0
-         7OrhS3Eer3EBRsyV9QbTpbTV6ErQScjp7gwBR5F82Kb/uhSYt77GqkgRz529uRpfE+8t
-         SF19trGRNFfq2Hj43AwpGIEbWdyRH+MrtewgyqRlRvCf25dniGyq/PUkELzotgi0HV4E
-         BrszsjhALIwdUg3Y3WZKwLz9fahKFWDjjNIbEyEgZpoVtSWwIjrUxaBM2Cy6qM5vtyU3
-         gIkQ==
+        d=cloudflare.com; s=google09082023; t=1711492488; x=1712097288; darn=vger.kernel.org;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:from:to:cc:subject:date:message-id:reply-to;
+        bh=ab5N2/+UMfCyeLSLqFwz+fy2fJSFKubepMeB6XNxJn0=;
+        b=bxtrlIfDbbiE/5MrJFqFtrQrJ50HoLyNg9llDly7kaSAi+zSWauS4PBLKN/3QAmD3T
+         ZFgg9rMOD4gSXQbu9mWywK7vJiOZ19uKpz470DBzEDiD8P1x26fhK6VdTDlTVnRuLg/D
+         aBQPJ29Lom9hqjUOzPgc+1bfi3RbFHXe8H1yezqnL4rWkBlF9zIFg52i10HcUNXvqJxV
+         3DLAKxttTZgbIR0pK5cxZkliX+4MXfxO/0rPkeS0KvsDr4hUbBrIerq4wtmVt8lDuGWl
+         zqCGlfY9rfVerVbW6yzIzSr1O86Kw72TZvAPpMQCLtykwg7re0kSg34AprY/yn4BoByZ
+         xyNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1711490785; x=1712095585;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=TU3+ImXwqiVtc0TZrqGynXRP9+v8b83+IYx34sTtg0o=;
-        b=cyHjjLnCqAgWeQV17/6WXrvBtEwxK/X0tWaZ6SKMrJB3MpYn9l3HrM9Yl1dr4NgFII
-         ABew/F5b+Mbai60AgBe5ZILeytYPMXXXMPvCN+9NGv6+WKGrcp2fcq+zfsEV3wRSEWre
-         Lt2g9++ELP/Gp90i5xF4MJBvoeiRAMAC/i3bxpDKSzH8oKWD2vsFsOIEEdf+UFOgMpcR
-         JxCRPwO9Sy5Xu5F+6Q2ycqsnsCK3Imy6d1zNq4VcRi2R0RZmUbJNjLnT3Qpb3PC8VC/e
-         Gy12AVIKlaHKwi/4w6nNCzasQf1XesdkuEm/tAlZbHu3Rgfg6ffofJsb+sQ77diY7D4Q
-         2T1w==
-X-Forwarded-Encrypted: i=1; AJvYcCWfCjAuMhQTDVtCDi7EWYQOBxJ56lp27nWy66hZ5GwiC1VsZiJN7G4fSR9a5BTitmpZrB9hqTLp9ZZJZXoPlN6ywhNeb5vTfxxO5aHTI8qDmhtKuBGsbv3zGX4M7r4NpmSSvisfrXCDIOAoas1OTEoxnp4NvfgVf6bq
-X-Gm-Message-State: AOJu0Yy0IbwmA6huKubMoMTxJnS15YpMR8xYHCrpAEjtzRhZwCgCR5Jd
-	dE2tLj7LkOaoCmqDAQH8+aipwq+thycsANGSWQN+7O3XCMyGLVn88k137uX/YnZzSwIXlO3maaE
-	nht2X02jO42UrRaBJwlOZxqFnW9Y=
-X-Google-Smtp-Source: AGHT+IHuR7Iz9HHCrbPSIDe/Dh6qnQz8tqD5xO0PbRSbfqjZSk6fryeuQ5vQk6JDgn8iIjf9hU/2Re5KklxHU3kqaJk=
-X-Received: by 2002:a05:6102:32d2:b0:476:d94e:da66 with SMTP id
- o18-20020a05610232d200b00476d94eda66mr2905818vss.13.1711490784977; Tue, 26
- Mar 2024 15:06:24 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1711492488; x=1712097288;
+        h=mime-version:message-id:in-reply-to:date:subject:cc:to:from
+         :user-agent:references:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ab5N2/+UMfCyeLSLqFwz+fy2fJSFKubepMeB6XNxJn0=;
+        b=QFCr1EL7XHXF/WRnMmBaZuCNHh9SRfwuKagwBbbjgq5rd03TeugC2Xe3pGfozWARWL
+         y6rjzzL2GLgtAUz9WykhtPsC1SCfpWEYouNw9WEm+MDXVPdfNMPnrmwSkhgJCu0n08iD
+         79bYr6czs0ZQTyWCmbhqsiv+A3L3bidyPeVh1RCsaypJAd1q0AgMHCprlxcH71aRyf/y
+         9y1Eq7IT2s0YfpEoknTJp1dZNuODg6lY4Sy68oVgw7xUOCXCyM8WCNVb/+0W1ugdZcS+
+         nCHyI0fWyMG6XtZBj2zFwhVR3Ol7eKL6DHJKZnsp+WvfKW+YNTI+4XsrP5KB/TIcMftI
+         6ETg==
+X-Forwarded-Encrypted: i=1; AJvYcCXP4YfExeQZ7J9vye15XpZO2rYSjmM+/l87Da1QRil0XdCecZpO9g3k53g+gW/UVaIPJOIFifYOUAe9uAzUe9WOxp8kJzDI
+X-Gm-Message-State: AOJu0YyrDqRiQbNFXtZYE+jR26p6r2dwyQ0qg87cD/0Pxdky4/8go9+5
+	uxsaV49WA87fy1WH3v6a4LvIoEG2AEScO2v3c5NqEYfFvsFq9b3yx9nUASyYDuM=
+X-Google-Smtp-Source: AGHT+IFd29NI7E7fmbI2DetVVaDs2M2zc93WZvEnIfgrzdHQe3qFznuwCZPaHATWQui+pZyinL6lOw==
+X-Received: by 2002:a17:906:2655:b0:a46:e9f9:2208 with SMTP id i21-20020a170906265500b00a46e9f92208mr2494997ejc.3.1711492488485;
+        Tue, 26 Mar 2024 15:34:48 -0700 (PDT)
+Received: from cloudflare.com ([2a09:bac5:5064:2dc::49:1b1])
+        by smtp.gmail.com with ESMTPSA id v8-20020a170906180800b00a46be5169f1sm4672377eje.181.2024.03.26.15.34.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Mar 2024 15:34:47 -0700 (PDT)
+References: <000000000000dc9aca0613ec855c@google.com>
+ <tencent_F436364A347489774B677A3D13367E968E09@qq.com>
+ <CAADnVQJQvcZOA_BbFxPqNyRbMdKTBSMnf=cKvW7NJ8LxxP54sA@mail.gmail.com>
+ <87y1a6biie.fsf@cloudflare.com>
+User-agent: mu4e 1.6.10; emacs 29.2
+From: Jakub Sitnicki <jakub@cloudflare.com>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Edward Adam Davis
+ <eadavis@qq.com>, John Fastabend <john.fastabend@gmail.com>
+Cc: syzbot+c4f4d25859c2e5859988@syzkaller.appspotmail.com,
+ 42.hyeyoo@gmail.com, andrii@kernel.org, ast@kernel.org,
+ bpf@vger.kernel.org, daniel@iogearbox.net, davem@davemloft.net,
+ edumazet@google.com, kafai@fb.com, kpsingh@kernel.org, kuba@kernel.org,
+ linux-kernel@vger.kernel.org, namhyung@kernel.org, netdev@vger.kernel.org,
+ pabeni@redhat.com, peterz@infradead.org, songliubraving@fb.com,
+ syzkaller-bugs@googlegroups.com, yhs@fb.com
+Subject: Re: [PATCH] bpf, sockmap: fix deadlock in rcu_report_exp_cpu_mult
+Date: Tue, 26 Mar 2024 23:15:47 +0100
+In-reply-to: <87y1a6biie.fsf@cloudflare.com>
+Message-ID: <87plvgbp15.fsf@cloudflare.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Kaiming Huang <lightninghkm96@gmail.com>
-Date: Tue, 26 Mar 2024 18:06:14 -0400
-Message-ID: <CAH3=goX+Don_BBskDT0BviROgvjDGQoZ-3YfY+WMwdKsmoh+7w@mail.gmail.com>
-Subject: Re: stack access issue. Re: [syzbot] [bpf?] UBSAN:
- array-index-out-of-bounds in check_stack_range_initialized
-To: Andrei Matei <andreimatei1@gmail.com>
-Cc: alexei.starovoitov@gmail.com, andrii@kernel.org, ast@kernel.org, 
-	bpf@vger.kernel.org, daniel@iogearbox.net, eadavis@qq.com, eddyz87@gmail.com, 
-	haoluo@google.com, john.fastabend@gmail.com, jolsa@kernel.org, 
-	kpsingh@kernel.org, linux-kernel@vger.kernel.org, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, sdf@google.com, song@kernel.org, 
-	syzkaller-bugs@googlegroups.com, yonghong.song@linux.dev, 
-	Kaiming Huang <lightninghkm96@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 
-Hi there,
+On Mon, Mar 25, 2024 at 01:23 PM +01, Jakub Sitnicki wrote:
+> On Sat, Mar 23, 2024 at 12:08 AM -07, Alexei Starovoitov wrote:
+>> It seems this bug was causing multiple syzbot reports.
+> Any chance we could disallow mutating sockhash from interrupt context?
 
-Please discard my previous email as I figured it may be beneficial to
-rephrase some of the content in it for clarity.
+I've been playing with the repro from one of the other reports:
 
-I went across this bug using my static analysis tool as well and was
-glad to find this email thread.
+https://lore.kernel.org/all/CABOYnLzaRiZ+M1v7dPaeObnj_=S4JYmWbgrXaYsyBbWh=553vQ@mail.gmail.com/
 
-My understanding is that the root cause of this bug has not been
-identified yet given the previous discussion in this thread.
+syzkaller workload is artificial. So, if we can avoid it, I'd rather not
+support modifying sockmap/sockhash in contexts where irqs are disabled,
+and lock safety rules are stricter than what we abide to today.
 
-This is the line of code that has the issue.
+Ideally, we allow task and softirq contexts with irqs enabled (so no
+tracing progs attached to timer tick, which syzcaller is using as corpus
+here). Otherwise, we will have to cover for that in selftests.
 
-stype = &state->stack[spi].slot_type[slot % BPF_REG_SIZE];
+I'm thinking about a restriction like:
 
-Based on my analysis result, it is the part "slot_type[slot %
-BPF_REG_SIZE]" may result in memory access with a negative index,
-which should not be allowed. min_off and max_off are supposed to be
-negative based on my understanding of the
-workflow. But the spi, slot, and the index of slot_type are not
-supposed to be negative.
+---8<---
 
-The slot_type is defined as below:
-
-u8 slot_type[BPF_REG_SIZE];  //BPF_REG_SIZE is 8
-
-So the type of slot_type is u8[8].
-
-However, the bug may alter the "slot" to be negative, say -1. Then
-this would cause the result of slot %
-BPF_REG_SIZE is -1. This might sound counter-intuitive as % always
-gives positive results. But in C, % operation keeps the sign of
-the dividend. The applied check checks whether access_size is
-negative, I'm not sure whether the fix will catch
-this sufficiently). Could the fix be potentially directly applied to
-"slot" to ensure it is positive?
-
-You can examine this by simply running this short piece of code. The
-result of the modulo operation is -1 on my end, and that is the reason
-that causes the OOB negative index -1, which was reported by the Syzkaller.
-
-#include <stdio.h>
-#define BPF_REG_SIZE 8
-int main() {
-    int i = -1;
-    unsigned int j = i % BPF_REG_SIZE;
-    printf("%d\n", j);
-    return 0;
-}
-
-A more severe scenario, if possible, is when interpreting the j in the
-above example
-as unsigned int, aka integer overflow/wrap-around, in that case, the
-value of j will be 4,294,967,295. If this is the case, then it is a
-classic OOB access on the u8[8]. I don't know whether this part is feasible.
-
-Hopefully, my illustration makes sense, please let me know if you see
-any issues. Thanks.
-
-Best regards,
-Kaiming.
+diff --git a/net/core/sock_map.c b/net/core/sock_map.c
+index 27d733c0f65e..3692f7256dd6 100644
+--- a/net/core/sock_map.c
++++ b/net/core/sock_map.c
+@@ -907,6 +907,7 @@ static void sock_hash_delete_from_link(struct bpf_map *map, struct sock *sk,
+ 	struct bpf_shtab_elem *elem_probe, *elem = link_raw;
+ 	struct bpf_shtab_bucket *bucket;
+ 
++	WARN_ON_ONCE(irqs_disabled());
+ 	WARN_ON_ONCE(!rcu_read_lock_held());
+ 	bucket = sock_hash_select_bucket(htab, elem->hash);
+ 
+@@ -933,6 +934,10 @@ static long sock_hash_delete_elem(struct bpf_map *map, void *key)
+ 	struct bpf_shtab_elem *elem;
+ 	int ret = -ENOENT;
+ 
++	/* Can't run. We don't play nice with hardirq-safe locks. */
++	if (irqs_disabled())
++		return -EOPNOTSUPP;
++
+ 	hash = sock_hash_bucket_hash(key, key_size);
+ 	bucket = sock_hash_select_bucket(htab, hash);
+ 
+@@ -986,6 +991,7 @@ static int sock_hash_update_common(struct bpf_map *map, void *key,
+ 	struct sk_psock *psock;
+ 	int ret;
+ 
++	WARN_ON_ONCE(irqs_disabled());
+ 	WARN_ON_ONCE(!rcu_read_lock_held());
+ 	if (unlikely(flags > BPF_EXIST))
+ 		return -EINVAL;
 
